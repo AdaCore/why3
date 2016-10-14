@@ -40,6 +40,11 @@ val compose_l : task tlist -> 'a tlist -> 'a tlist
 val seq   : task trans list -> task trans
 val seq_l : task tlist list -> task tlist
 
+(** parallelize transformations: [par l] will duplicate the current
+    task in [n] new tasks, with [n] the length of [l], and apply to each of
+    this new task the corresponding transformation in [l] *)
+val par : task trans list -> task tlist
+
 (** Create Transformation *)
 val fold   : (task_hd -> 'a -> 'a     ) -> 'a -> 'a trans
 val fold_l : (task_hd -> 'a -> 'a list) -> 'a -> 'a tlist
@@ -145,9 +150,12 @@ val apply_transform : string -> Env.env -> task -> task list
 
 *)
 
-type trans_with_args = string list -> task -> task list
+
+type trans_with_args = string list -> Env.env -> task trans
+type trans_with_args_l = string list -> Env.env -> task tlist
 
 val register_transform_with_args : desc:Pp.formatted -> string -> trans_with_args -> unit
+val register_transform_with_args_l : desc:Pp.formatted -> string -> trans_with_args_l -> unit
 
 val apply_transform_args : string -> Env.env -> string list -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)

@@ -162,17 +162,16 @@ let build_name_tables task : name_tables =
 
 (************* wrapper  *************)
 
-type _ trans_typ =
-  | Ttrans : (task -> task list) trans_typ
-  | Tint : 'a trans_typ -> (int -> 'a) trans_typ
-(*
-  | Tstring : 'a trans_typ -> (string -> 'a) trans_typ
-*)
-  | Tty : 'a trans_typ -> (ty -> 'a) trans_typ
-  | Ttysymbol : 'a trans_typ -> (tysymbol -> 'a) trans_typ
-  | Tprsymbol : 'a trans_typ -> (Decl.prsymbol -> 'a) trans_typ
-  | Tterm : 'a trans_typ -> (term -> 'a) trans_typ
-  | Tformula : 'a trans_typ -> (term -> 'a) trans_typ
+type (_, _) trans_typ =
+  | Ttrans    : ((task trans), task) trans_typ
+  | Ttrans_l  : ((task tlist), task list) trans_typ
+  | Tint      : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
+  | Tty       : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
+  | Ttysymbol : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
+  | Tprsymbol : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tterm     : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
+  | Tformula  : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
+  | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
 
 let find_pr s task =
   let tables = build_name_tables task in
@@ -186,45 +185,6 @@ let type_ptree ~as_fmla t task =
   then Typing.type_fmla_in_namespace ns km (fun _ -> None) t
   else Typing.type_term_in_namespace ns km (fun _ -> None) t
 
-(*
-(*** term argument parsed in the context of the task ***)
-let type_ptree ~as_fmla t task =
-  let used_ths = Task.used_theories task in
-  let used_symbs = Task.used_symbols used_ths in
-  let local_decls = Task.local_decls task used_symbs in
-  (* rebuild a theory_uc *)
-  let th_uc = Theory.create_theory (Ident.id_fresh "dummy") in
-  let th_uc =
-    Ident.Mid.fold
-      (fun _id th acc ->
-       let name = th.Theory.th_name in
-       (**)
-       Format.eprintf "[Args_wrapper.type_ptree] use theory %s (%s)@."
-                      _id.Ident.id_string
-                      name.Ident.id_string;
-       (**)
-       Theory.close_namespace
-         (Theory.use_export
-            (Theory.open_namespace acc name.Ident.id_string)
-            th)
-         true)
-      used_ths th_uc
-  in
-  let th_uc =
-    List.fold_left
-      (fun acc d ->
-       (**)
-       Format.eprintf "[Args_wrapper.type_ptree] add decl %a@."
-                      Pretty.print_decl d;
-       (**)
-       Theory.add_decl ~warn:false acc d)
-      th_uc local_decls
-  in
-  if as_fmla
-  then Typing.type_fmla th_uc (fun _ -> None) t
-  else Typing.type_term th_uc (fun _ -> None) t
- *)
-
 let parse_and_type ~as_fmla s task =
   let lb = Lexing.from_string s in
   let t =
@@ -235,65 +195,82 @@ let parse_and_type ~as_fmla s task =
   in
   t
 
-let rec wrap : type a. a trans_typ -> a -> trans_with_args =
-  fun t f l task ->
-  match t with
-  | Ttrans -> f task
-  | Tint t' ->
-    begin
-      match l with
-      | s :: tail ->
-        (try
-          let n = int_of_string s in
-          wrap t' (f n) tail task
-        with Failure _ -> raise (Failure "Parsing error: expecting an integer."))
-      | _ -> failwith "Missing argument: expecting an integer."
-    end
-(*
-  | Tstring t' ->
-    begin
-      match l with
-      | s :: tail -> wrap t' (f s) tail task
-      | _ -> failwith "Missing argument: expecting a string."
-    end
- *)
-  | Tformula t' ->
-    begin
-      match l with
-      | s :: tail ->
-         let te = parse_and_type ~as_fmla:true s task in
-         wrap t' (f te) tail task
-      | _ -> failwith "Missing argument: expecting a formula."
-    end
-  | Tterm t' ->
-    begin
-      match l with
-      | s :: tail ->
-         let te = parse_and_type ~as_fmla:false s task in
-         wrap t' (f te) tail task
-      | _ -> failwith "Missing argument: expecting a term."
-    end
-  | Tty t' ->
-    begin
-      match l with
-      | _s :: tail ->
-         let ty = Ty.ty_int in (* TODO: parsing + typing of s *)
-         wrap t' (f ty) tail task
-      | _ -> failwith "Missing argument: expecting a type."
-    end
-  | Ttysymbol t' ->
-    begin
-      match l with
-      | _s :: tail ->
-         let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
-         wrap t' (f tys) tail task
-      | _ -> failwith "Missing argument: expecting a type symbol."
-    end
-  | Tprsymbol t' ->
-    begin
-      match l with
+let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> task -> b =
+  fun t f l env task ->
+    match t with
+    | Ttrans -> apply f task
+    | Ttrans_l -> apply f task
+    | Tint t' ->
+      begin
+        match l with
+        | s :: tail ->
+          (try
+             let n = int_of_string s in
+             wrap_to_store t' (f n) tail env task
+           with Failure _ -> raise (Failure "Parsing error: expecting an integer."))
+        | _ -> failwith "Missing argument: expecting an integer."
+      end
+    | Tformula t' ->
+      begin
+        match l with
+        | s :: tail ->
+          let te = parse_and_type ~as_fmla:true s task in
+          wrap_to_store t' (f te) tail env task
+        | _ -> failwith "Missing argument: expecting a formula."
+      end
+    | Tterm t' ->
+      begin
+        match l with
+        | s :: tail ->
+          let te = parse_and_type ~as_fmla:false s task in
+          wrap_to_store t' (f te) tail env task
+        | _ -> failwith "Missing argument: expecting a term."
+      end
+    | Tty t' ->
+      begin
+        match l with
+        | _s :: tail ->
+          let ty = Ty.ty_int in (* TODO: parsing + typing of s *)
+          wrap_to_store t' (f ty) tail env task
+        | _ -> failwith "Missing argument: expecting a type."
+      end
+    | Ttysymbol t' ->
+      begin
+        match l with
+        | _s :: tail ->
+          let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
+          wrap_to_store t' (f tys) tail env task
+        | _ -> failwith "Missing argument: expecting a type symbol."
+      end
+    | Tprsymbol t' ->
+      begin
+        match l with
         | s :: tail ->
           let pr = find_pr s task in
-          wrap t' (f pr) tail task
-      | _ -> failwith "Missing argument: expecting a prop symbol."
-    end
+          wrap_to_store t' (f pr) tail env task
+        | _ -> failwith "Missing argument: expecting a prop symbol."
+      end
+    | Ttheory t' ->
+      begin
+        match l with
+        | s :: tail ->
+          (try
+             let path, name = match Str.split (Str.regexp "\.") s with
+               | [name] -> [],name
+               | path::[name] ->
+                 let path = Str.split (Str.regexp "/") path in
+                 path, name
+               | _ -> failwith "Ill-formed theory name"
+             in
+             let th = Env.read_theory env path name in
+             wrap_to_store t' (f th) tail env task
+          with
+            _ ->  failwith "Theory not found.")
+        | _ -> failwith "Missing argument: expecting a theory."
+      end
+
+let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
+  fun t f l env -> Trans.store (wrap_to_store t f l env)
+
+let wrap   : type a. (a, task) trans_typ -> a -> trans_with_args =
+  fun t f l env -> Trans.store (wrap_to_store t f l env)

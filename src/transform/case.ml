@@ -20,26 +20,22 @@ let gen_ident = Ident.id_fresh
 
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
-let case t task =
-(*
-  clean_environment task;
- *)
+let case t =
   let h = Decl.create_prsymbol (gen_ident "h") in
   let hnot = Decl.create_prsymbol (gen_ident "hnot") in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
-  List.map (fun f -> Trans.apply f task) [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
+  Trans.par [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
 
 (* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
-let cut t task =
-  clean_environment task;
-  let g, task = Task.task_separate_goal task in
+let cut t =
+  (* let g, task = Task.task_separate_goal task in *)
   let h = Decl.create_prsymbol (gen_ident "h") in
   let g_t = Decl.create_prop_decl Decl.Pgoal h t in
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
-  let goal_cut = Task.add_decl task g_t in
-  let goal = Task.add_tdecl (Task.add_decl task h_t) g in
-  [goal; goal_cut]
+  let goal_cut = Trans.goal (fun _ _ -> [g_t]) in
+  let goal = Trans.add_decls [h_t] in
+  Trans.par [goal; goal_cut]
 
 let subst_quant c tq x : term =
   let (vsl, tr, te) = t_open_quant tq in
@@ -77,7 +73,7 @@ let exists x task =
       let t = subst_exist t x in
       let pr_goal = create_prsymbol (gen_ident "G") in
       let new_goal = Decl.create_prop_decl Decl.Pgoal pr_goal t in
-      [Task.add_decl task new_goal]
+      Task.add_decl task new_goal
   | _ -> failwith "No goal"
 
 (* Return a new task with hypothesis name removed *)
@@ -94,10 +90,8 @@ let remove_task_decl (name: Ident.ident) : task trans =
     are extracted from same name. Seemed not to work before
   adding "print_task". To be resolved in a better way. *)
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
-let remove name task =
-  clean_environment task;
-  [Trans.apply (remove_task_decl name.pr_name) task]
-
+let remove name =
+  remove_task_decl name.pr_name
 
 let pr_prsymbol pr =
   match pr with
@@ -122,15 +116,15 @@ let instantiate (pr:Decl.prsymbol) t task =
   let ndecl = find_hypothesis name task in
   match ndecl with
   | None -> Format.printf "Hypothesis %s not found@." name.Ident.id_string;
-            [Task.add_tdecl task g]
+    Task.add_tdecl task g
   | Some decl -> (match decl.td_node with
     | Decl {d_node = Dprop (pk, _pr, ht)} ->
       let t_subst = subst_forall ht t in
       let new_pr = create_prsymbol (Ident.id_clone name) in
       let new_decl = create_prop_decl pk new_pr t_subst in
       let task = add_decl task new_decl in
-        [Task.add_tdecl task g]
-    | _ -> Format.printf "Not an hypothesis@."; [Task.add_tdecl task g])
+        Task.add_tdecl task g
+    | _ -> Format.printf "Not an hypothesis@."; Task.add_tdecl task g)
 
 (* TODO find correct librrary *)
 let choose_option a b =
@@ -212,10 +206,12 @@ let apply pr task =
             let new_tb = t_subst_single v x tb in
             (* TODO t_equal is probably too strong *)
             if (Term.t_equal new_tb tg) then
-               [Task.add_decl task (create_prop_decl Pgoal
-                 (create_prsymbol (gen_ident "G")) new_goal)]
+              Task.add_decl task (create_prop_decl Pgoal
+                                    (create_prsymbol (gen_ident "G")) new_goal)
             else
-              (Format.printf "Term substituted was %a. Should be goal was %a. Goal was %a @." Pretty.print_term x Pretty.print_term new_tb Pretty.print_term tg;
+              (Format.printf
+                 "Term substituted was %a. Should be goal was %a. Goal was %a @."
+                 Pretty.print_term x Pretty.print_term new_tb Pretty.print_term tg;
               failwith "After substitution, terms are not exactly identical")
         end
       | _ -> failwith "Not of the form forall immediately followed by implies"
@@ -223,11 +219,15 @@ let apply pr task =
   | Tbinop (Timplies, _ta, _tb) -> failwith "Not implemented yet" (* TODO to be done later *)
   | _ -> failwith "Not of the form forall x. A -> B"
 
-let () = register_transform_with_args ~desc:"test case" "case" (wrap (Tformula Ttrans) case)
-let () = register_transform_with_args ~desc:"test cut" "cut" (wrap (Tformula Ttrans) cut)
-let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
+let use_th th =
+  Trans.add_tdecls [Theory.create_use th]
+
+let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula Ttrans_l) case)
+let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula Ttrans_l) cut)
+(* let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists) *)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
-let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
+(*let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
                                       (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
 let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tprsymbol Ttrans) apply)
-let () = register_transform_with_args ~desc:"test duplicate" "duplicate" (wrap (Tint Ttrans) dup)
+  let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) dup) *)
+let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
