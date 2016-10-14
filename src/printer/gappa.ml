@@ -301,6 +301,12 @@ let rec simpl_fmla truths f =
       try if Hid.find truths ls.ls_name then t_true else t_false
       with Not_found -> f
     end
+  | Tapp (ls, [{ t_node = Tapp (t1, []) }; t2])
+      when ls_equal ls ps_equ && t_equal t2 t_bool_true ->
+    begin
+      try if Hid.find truths t1.ls_name then t_true else t_false
+      with Not_found -> f
+    end
   | Tbinop _ | Tnot _ -> t_map_simp (simpl_fmla truths) f
   | _ -> f
 
@@ -321,6 +327,12 @@ let split_hyp truths pr acc f =
         let () =
           try if Hid.find truths ls.ls_name <> pos then raise Contradiction
           with Not_found -> Hid.add truths ls.ls_name pos in
+        acc
+    | Tapp (ls, [{ t_node = Tapp (t1, []) }; t2])
+        when ls_equal ls ps_equ && t_equal t2 t_bool_true ->
+        let () =
+          try if Hid.find truths t1.ls_name <> pos then raise Contradiction
+          with Not_found -> Hid.add truths t1.ls_name pos in
         acc
     | Ttrue -> if pos then acc else raise Contradiction
     | Tfalse -> if pos then raise Contradiction else acc
