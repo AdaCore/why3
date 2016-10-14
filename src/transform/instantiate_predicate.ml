@@ -43,17 +43,17 @@ let trans spr task_hd (((lpr, past), task) as current) =
   let rec scan_term ((past, task) as current) t =
     let current =
       if t.t_ty = None && match t.t_node with Tapp _ -> false | _ -> true
-      then current else
-      if Sterm.mem t past then current else
-      (
-        Sterm.add t past,
+      then current
+      else if Sterm.mem t past then current
+      else
         List.fold_right (fun (quant, triggers, e) task ->
-          let add vs task =
+          let add vs current =
             try
               let ax = instantiate_prop e quant vs in
+              let (past, task) = scan_term current ax in
               let pr = create_prsymbol (Ident.id_fresh "auto_instance") in
-              Task.add_decl task (create_prop_decl Paxiom pr ax)
-            with TypeMismatch _ | Not_found -> task in
+              (past, Task.add_decl task (create_prop_decl Paxiom pr ax))
+            with TypeMismatch _ | Not_found -> current in
           match triggers, quant with
           | [], [q] ->
               if t.t_ty = None then task
@@ -69,8 +69,7 @@ let trans spr task_hd (((lpr, past), task) as current) =
                     end
                   | _ -> task
                 ) task triggers
-        ) lpr task
-      ) in
+        ) lpr (Sterm.add t past, task) in
     match t.t_node with
     | Tapp _
     | Tbinop _
