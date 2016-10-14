@@ -119,7 +119,7 @@ theory GenericFloat
 
   predicate is_normal    t
   predicate is_subnormal t
-  predicate is_zero      (x:t) = x .= zeroF
+  predicate is_zero      t
   predicate is_infinite  t
   predicate is_nan       t
   predicate is_positive  t
@@ -161,10 +161,11 @@ theory GenericFloat
 
   (* {3 Constructors and Constants} *)
   axiom zeroF_is_positive : is_positive zeroF
-  axiom zeroF_to_real     : to_real zeroF = 0.0
+  axiom zeroF_is_zero     : is_zero zeroF
   axiom half_to_real      : to_real half  = 0.5
 
-  axiom zero_to_real : forall x. is_zero x <-> is_finite x /\ to_real x = 0.0
+  axiom zero_to_real : forall x [is_zero x].
+    is_zero x <-> is_finite x /\ to_real x = 0.0
 
   (* {3 Conversions from other sorts} *)
 
