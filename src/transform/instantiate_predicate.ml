@@ -42,7 +42,9 @@ let trans spr task_hd (((lpr, past), task) as current) =
 
   let rec scan_term ((past, task) as current) t =
     let current =
-      if t.t_ty = None || Sterm.mem t past then current else
+      if t.t_ty = None && match t.t_node with Tapp _ -> false | _ -> true
+      then current else
+      if Sterm.mem t past then current else
       (
         Sterm.add t past,
         List.fold_right (fun (quant, triggers, e) task ->
@@ -53,7 +55,9 @@ let trans spr task_hd (((lpr, past), task) as current) =
               Task.add_decl task (create_prop_decl Paxiom pr ax)
             with TypeMismatch _ | Not_found -> task in
           match triggers, quant with
-          | [], [q] -> add (Mvs.singleton q t) task
+          | [], [q] ->
+              if t.t_ty = None then task
+              else add (Mvs.singleton q t) task
           | [], _ -> task
           | _, _ ->
               List.fold_left (fun task tr ->
