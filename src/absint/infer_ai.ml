@@ -32,8 +32,8 @@ module Make(S:sig
         List.map (fun (p, e) ->
             p, r e) pats
         |> e_case (r e)
-      | Eraise(x, e) ->
-        e_raise x e e.e_ity
+      | Eraise(x, e_) ->
+        e_raise x e_ e.e_ity
       | Etry(e, pv) ->
         Mexn.map (fun (pvs, e) ->
             pvs, r e) pv 

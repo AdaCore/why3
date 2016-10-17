@@ -8,7 +8,7 @@ module Try2
 	exception Myexc d
 	let b(x:int) : int
 	requires { x >= 0 }
-	ensures { result = 10 }
+	ensures { result <= x + 6 }
 	=
 		let i = ref 0 in
 		i := 0;
