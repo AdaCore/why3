@@ -19,13 +19,13 @@ module Make(S:sig
     let rec reconstruct_expr cfg fixp e =
       let r = reconstruct_expr cfg fixp in
       match e.e_node with
-      | Evar(_) | Econst(_) | Eassign(_)
-      | Eabsurd | Epure (_) | Eassert(_) | Eexec(_)
-        -> e
       | Elet(LDvar(pv, e), e2) ->
         (let_var_raw pv (r e)
         |> fst
         |> e_let) (r e2)
+      | Evar(_) | Econst(_) | Eassign(_)
+      | Eabsurd | Epure (_) | Eassert(_) | Eexec(_) | Elet(_)
+        -> e
       | Eif(e1, e2, e3) ->
         e_if (r e1) (r e2) (r e3)
       | Ecase(e,  pats) ->
@@ -44,7 +44,9 @@ module Make(S:sig
         begin
         try
         let _, new_inv = List.find (fun (e_, dom) -> e == e_) fixp in
-        let inv = (AI.domain_to_term cfg new_inv) :: inv in
+        let t = AI.domain_to_term cfg new_inv in
+        let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
+        let inv = t :: inv in
         e_while (r e_cond) inv vari (r e_loop)
         with
         | Not_found ->
@@ -53,7 +55,7 @@ module Make(S:sig
           raise Not_found
         end
       | Efor(pv, (f, d, t), inv, e_loop) ->
-        let _, new_inv = List.find (fun (e_, dom) -> e = e_) fixp in
+        let _, new_inv = List.find (fun (e_, dom) -> e == e_) fixp in
         let inv = (AI.domain_to_term cfg new_inv) :: inv in
         e_for pv (e_var f) d (e_var t) inv (r e_loop)
     in
@@ -64,9 +66,12 @@ module Make(S:sig
       | PDtype(t) -> Some (create_type_decl t)
       | PDpure ->
         let [t] = pdecl.pd_pure in
-        Pretty.print_decl Format.err_formatter t;
-        create_pure_decl t;
-        None
+        begin
+          let open Decl in
+          match t.d_node with
+          | Dprop(Pgoal, _, _) -> None
+          | _ -> Some (create_pure_decl t)
+        end
       | PDlet(l) ->
         begin
         match l with
@@ -90,7 +95,7 @@ module Make(S:sig
             let ce = c_fun cexp.c_cty.cty_args cexp.c_cty.cty_pre cexp.c_cty.cty_post cexp.c_cty.cty_xpost
               cexp.c_cty.cty_oldies new_e
             in
-            let let_expr = let_sym (Ident.id_clone rs.rs_name) ce |> fst in
+            let let_expr = let_sym_raw rs ce |> fst in
             Some (create_let_decl let_expr)
           | _ ->
             Some (create_let_decl l)
@@ -118,7 +123,7 @@ module Make(S:sig
 
     let theory = pmod.mod_theory in
     let preid = Ident.id_clone Theory.(theory.th_name) in
-    let preid = { preid with pre_name = preid.pre_name ^ "infer.mlw" } in
+    let preid = Ident.{ preid with pre_name = preid.pre_name ^ "infer.mlw" } in
     let pmod_uc = create_module env preid
                   |> fun p -> List.fold_left add_to_pmod p pmod.mod_units in
     Format.eprintf "done@.";
