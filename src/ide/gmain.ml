@@ -2089,6 +2089,48 @@ let reload () =
         file_info#set_text msg;
         info_window `ERROR msg
 
+let read_file infer env ?format fn =
+  let module Infer_ai = Infer_ai.Make(struct let env = gconfig.env end) in
+
+  let pmods = Env.read_file Pmodule.mlw_language env ?format fn in
+  let pmods = if infer then
+Mstr.mapi (fun k pmod ->
+    Format.eprintf "%s@.@." k;
+    Infer_ai.infer_loop_invariants pmod) pmods
+else pmods
+in
+  let theories = Pmodule.convert pmods in
+  let ltheories =
+    Mstr.fold
+      (fun name th acc ->
+        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
+        let th_name =
+          Ident.id_register (Ident.id_derive name th.Theory.th_name) in
+         match th.Theory.th_name.Ident.id_loc with
+           | Some l -> (l,th_name,th)::acc
+           | None   -> (Loc.dummy_position,th_name,th)::acc)
+      theories []
+  in
+  List.sort
+    (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
+    ltheories,theories
+
+let set_infer infer =
+let s = (env_session()).S.session in
+let open Session in
+let () = S.PHstr.iter (fun a b ->
+Session.set_file_loader b (fun () -> read_file infer gconfig.env ?format:!opt_parser (Filename.concat project_dir a))
+) s.session_files in
+reload ()
+
+
+
+module Infer_gui = Infer_gui.Make(struct
+    let tools_window_vbox_pack = tools_window_vbox_pack
+    let set_infer = set_infer
+  end)
+
+
 let (_ : GMenu.image_menu_item) =
   file_factory#add_image_item ~key:GdkKeysyms._R
     ~label:"_Reload" ~callback:reload

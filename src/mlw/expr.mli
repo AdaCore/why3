@@ -175,9 +175,11 @@ val e_label_copy : expr -> expr -> expr
 val let_var :
   preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
+val let_var_raw : pvsymbol -> ?ghost:bool -> expr -> let_defn * pvsymbol
+
 val let_sym :
   preid -> ?ghost:bool -> ?kind:rs_kind -> cexp -> let_defn * rsymbol
-
+                                                   
 val let_rec :
   (rsymbol * cexp * variant list * rs_kind) list -> let_defn * rec_defn list
 

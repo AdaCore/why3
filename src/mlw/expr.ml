@@ -698,6 +698,10 @@ let post_of_expr res e =
 
 (* let-definitions *)
 
+let let_var_raw v ?(ghost=false) e =
+  let ghost = ghost || mask_ghost e.e_mask in
+  LDvar (v,e), v
+
 let let_var id ?(ghost=false) e =
   let ghost = ghost || mask_ghost e.e_mask in
   let v = create_pvsymbol id ~ghost e.e_ity in

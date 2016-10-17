@@ -209,7 +209,7 @@ LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
 ifeq (@enable_infer@,yes)
-LIB_ABSINT = apron_to_term  abstract_interpreter
+LIB_ABSINT = apron_to_term  abstract_interpreter infer_ai
 endif
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
@@ -741,7 +741,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig gmain
+IDE_FILES = gconfig infer_gui gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 

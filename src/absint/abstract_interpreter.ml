@@ -1127,7 +1127,18 @@ module Abstract_interpreter(E: sig
         let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
         List.iter (fun (vtx, abs) ->
             printf "acc(%i) = %a@."
-              vtx (Abstract1.print) abs
+              vtx (Abstract1.print) abs;
+            let gen = Abstract1.to_generator_array manpk abs in
+            Generator1.array_print Format.std_formatter gen;
+            let n = Generator1.array_length gen in
+            for i = 0 to n - 1 do
+              let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
+              Linexpr1.print Format.std_formatter linexpr;
+              Format.printf " = ";
+              Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
+              Format.printf "@.";
+            done;
+            Format.printf "@.";
           ) l;
 
         let l = ref [] in
