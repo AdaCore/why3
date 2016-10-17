@@ -12,21 +12,15 @@ module Make(Win: sig
       ~packing:ai_frame#add ()
 
   let () =
-    let iter (name,desc,strat,k) =
-      let b = GButton.toggle_button ~packing:ai_box#add
-          ~label:name ()
-      in
-      (*b#misc#set_tooltip_markup (string_of_desc (name,desc));
-      let i = GMisc.image ~pixbuf:(!image_transf) () in
-      let () = b#set_image i#coerce in
-      let callback () = apply_strategy_on_selection strat in
-      let (_ : GtkSignal.id) = b#connect#pressed ~callback in*)
-      let callback () =
-        Win.set_infer b#active;
-      in
-      let _ = b#connect#toggled ~callback in
-      ()
+    let desc = "Use abstract interpretation to infer <i>while</i> and <i>for</i> loop invariants." in
+    let b = GButton.toggle_button ~packing:ai_box#add
+        ~label:"Infer" ()
     in
-    List.iter iter ["Infer", "Use abstract interpretation to infer <i>while</i> and <i>for</i> loop invariants.", None, None]
+    b#misc#set_tooltip_markup desc;
+    let callback () =
+      Win.set_infer b#active;
+    in
+    let _ = b#connect#toggled ~callback in
+    ()
 
 end

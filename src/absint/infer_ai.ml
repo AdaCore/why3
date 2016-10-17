@@ -10,7 +10,7 @@ module Make(S:sig
   open Ity
 
   let infer_loop_invariants pmod =
-    let module AI = Abstract_interpreter.Abstract_interpreter(struct
+    let module AI = Ai_cfg.Make(struct
         let env = env
         let pmod = pmod
       end)
@@ -43,7 +43,7 @@ module Make(S:sig
       | Ewhile(e_cond, inv, vari, e_loop) ->
         begin
         try
-        let _, new_inv = List.find (fun (e_, dom) -> e == e_) fixp in
+        let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
         let t = AI.domain_to_term cfg new_inv in
         let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
         let inv = t :: inv in
@@ -55,7 +55,7 @@ module Make(S:sig
           raise Not_found
         end
       | Efor(pv, (f, d, t), inv, e_loop) ->
-        let _, new_inv = List.find (fun (e_, dom) -> e == e_) fixp in
+        let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
         let inv = (AI.domain_to_term cfg new_inv) :: inv in
         e_for pv (e_var f) d (e_var t) inv (r e_loop)
     in
@@ -117,7 +117,7 @@ module Make(S:sig
       | Uclone(mod_inst) -> add_clone pmod_uc mod_inst
       | Umeta(m, margs) -> add_meta pmod_uc m margs
       | Uscope(s, t, mis) -> List.fold_left add_to_pmod (open_scope pmod_uc s) mis
-                             |> fun p -> close_scope p t
+                             |> fun p -> close_scope p ~import:t
       | Uuse(pmod) -> use_export pmod_uc pmod
     in
 

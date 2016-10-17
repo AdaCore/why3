@@ -127,7 +127,7 @@ let do_input f =
                     let preconditions = Ity.(Expr.(cexp.c_cty.cty_pre)) in
                     Format.eprintf "@.";
                     let module Abstract_interpreter =
-                      Abstract_interpreter.Abstract_interpreter(struct
+                      Ai_cfg.Make(struct
                         let env = env
                         let pmod = m
                       end) in

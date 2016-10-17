@@ -1,19 +1,18 @@
 
+
 open Format
 open Apron
 
 (* Copied from inlining, it looks like it is difficult to use the code from there
  * without messing up the interface. *)
 
-module Abstract_interpreter(E: sig
+module Make(E: sig
     val env: Env.env
     val pmod: Pmodule.pmodule
   end) = struct
   
   open Term
 
-  let known_logical_ident = Pmodule.(Theory.(E.pmod.mod_theory.th_known))
-  let known_pdecl = Pmodule.(Theory.(E.pmod.mod_known))
   module Ai_logic = Ai_logic.Make(struct
       let env = E.env
       let pmod = E.pmod
@@ -72,11 +71,6 @@ module Abstract_interpreter(E: sig
 
   exception Unknown_hedge
 
-  (* Some useful constants to express return values and linear expressions *)
-  let zero = Coeff.Scalar (Scalar.of_int 0) 
-  let one = Coeff.Scalar (Scalar.of_int 1)
-  let neg_one = Coeff.Scalar (Scalar.of_int (-1))
-
   (* Initialize an hedge *)
 
   let ensure_variable cfg v t =
@@ -97,17 +91,16 @@ module Abstract_interpreter(E: sig
       cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
       v
 
-  let start_cfg rs =
+  let start_cfg _ =
     let cfg = { expr_to_control_point = Hashtbl.create 100;
       variable_mapping = Hashtbl.create 100;
       control_point_count = 0;
       hedge_count = 0;
       g = PSHGraph.create PSHGraph.stdcompare 3 ();
-      apply = (fun _ _ a -> raise Unknown_hedge);
+      apply = (fun _ _ _ -> raise Unknown_hedge);
       env = Environment.make [||] [||];
       loop_invariants = []; }
     in
-    let open Ident in
     cfg
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
@@ -179,7 +172,7 @@ module Abstract_interpreter(E: sig
   let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
-    let rec aux ty ity =
+    let rec aux ity =
       match myty.ty_node with
       | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
         [a, None]
@@ -211,18 +204,17 @@ module Abstract_interpreter(E: sig
                 List.map (fun a -> Some a) pdecl
                 |> List.combine l
             end
-          | Decl.Dtype({ts_def = Some ty; ts_args = args; _ } as tys) ->
-            (* untested code, probably works *)
+          | Decl.Dtype({ts_def = Some _; ts_args = _; _ }) ->
+            (* untested code*)
             let () = assert false in
-            let vars = Ty.ts_match_args tys (List.map Ty.ty_var args) in
-            aux (Ty.ty_inst vars ty) ity
-          | Decl.Ddata([c, b]) ->
+            aux ity
+          | Decl.Ddata([_; _]) ->
             warning_t "Multiple constructors is not supported in abstract interpretation." a; []
           | Decl.Ddata(_) ->
             warning_t "Recursive types is not supported in abstract interpretation." a; []
-          | Decl.Dtype({ ts_def = ty; _}) -> (* This happens when a type is private or has an invariant: it can't be accesed
-                                              * by the logic, so we give up and only look for projections by looking
-                                              * at program projections. *)
+          | Decl.Dtype(_) -> (* This happens when a type is private or has an invariant: it can't be accesed
+                              * by the logic, so we give up and only look for projections by looking
+                              * at program projections. *)
             begin
               try
                 let its = Ity.restore_its tys in
@@ -259,7 +251,7 @@ module Abstract_interpreter(E: sig
         warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
         []
     in
-    aux myty ity
+    aux ity
 
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
@@ -294,7 +286,7 @@ module Abstract_interpreter(E: sig
      * *)
     let rec term_to_var_list coeff t =
       match t.t_node with
-      | Tvar(a) ->
+      | Tvar(_) ->
         begin
         match var_of_term t with
         | Some var -> ([(var, coeff)], 0)
@@ -384,7 +376,6 @@ module Abstract_interpreter(E: sig
                  Abstract1.meet_lincons_array manpk d arr)
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
           begin
-            let open Ty in
             let subv_a = get_subvalues a None in
             let subv_b = get_subvalues b None in
             List.combine subv_a subv_b 
@@ -403,7 +394,7 @@ module Abstract_interpreter(E: sig
              let d2 = fc (fa_not d) in
              Abstract1.join manpk d1 d2)
         | Ttrue  | _ when t_equal t t_bool_true -> (fun d -> d)
-        | Tfalse | _ when t_equal t t_bool_false -> (fun d -> Abstract1.bottom manpk cfg.env)
+        | Tfalse | _ when t_equal t t_bool_false -> (fun _ -> Abstract1.bottom manpk cfg.env)
         | _ ->
           raise (Not_handled t)
       with
@@ -416,7 +407,6 @@ module Abstract_interpreter(E: sig
 
     let to_forget = ref [] in
     try
-      let open Ty in
       match t.t_node with
       | Teps(tb) ->
         let return, t = Term.t_open_bound tb in
@@ -478,7 +468,7 @@ module Abstract_interpreter(E: sig
         { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
       | _ when Ity.ity_equal variable_type Ity.ity_unit
         -> context
-      | Ity.Ityreg(reg), Tyapp(tys, vars) -> 
+      | Ity.Ityreg(reg), Tyapp(_, _) -> 
         begin
           let reg_name = 
             Ity.print_reg_name Format.str_formatter reg
@@ -576,7 +566,7 @@ module Abstract_interpreter(E: sig
       let vreturn = create_vreturn (t_type t) in
       let postcondition = t_eps_close vreturn (t_app ps_equ [t_var vreturn; t] None) in
       let constraints, _ = linear_expressions_from_term cfg context postcondition in
-      new_hedge_cfg cfg (i, j) (fun man abs ->
+      new_hedge_cfg cfg (i, j) (fun _ abs ->
           constraints abs);
       i, j, []
 
@@ -655,7 +645,7 @@ module Abstract_interpreter(E: sig
 
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
           constraints abs
         );
       begin_cp, end_cp, []
@@ -667,11 +657,11 @@ module Abstract_interpreter(E: sig
       let postcondition = t_eps_close vreturn (t_app ps_equ [t_const n; t_var vreturn] None) in
       let constraints, _ = linear_expressions_from_term cfg context postcondition in
 
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
           constraints abs
         );
       begin_cp, end_cp, []
-    | Eexec({c_node = Capp(rsym, args); _}, { Ity.cty_post = post; Ity.cty_result = ity; Ity.cty_effect = effect;  _ }) ->
+    | Eexec({c_node = Capp(rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  _ }) ->
       let eff_write = Ity.(effect.eff_writes) in
 
       (* Computing domain from postcondition *)
@@ -698,7 +688,6 @@ module Abstract_interpreter(E: sig
           (* FIXME: bad, does not work with sub records *)
           ignore @@ Ity.Mreg.mapi (fun a b ->
               Ity.Mpv.mapi (fun c () ->
-                  let open Ity in
                   let var = Ity.Mreg.find a context.region_ident in
                   let _, t =
                     try List.find (fun (p, _) ->
@@ -727,8 +716,7 @@ module Abstract_interpreter(E: sig
         );
       (* FIXME: handle exceptions *)
       begin_cp, end_cp, []
-    | Ewhile(cond, inv, var, content) ->
-      let open Expr in
+    | Ewhile(cond, _, _, content) ->
       (* Condition expression *)
       let cond_term = 
         match Expr.term_of_expr ~prop:false cond with
@@ -744,14 +732,14 @@ module Abstract_interpreter(E: sig
       let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg context content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
+      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ abs ->
           constraints abs
         );
-      new_hedge_cfg cfg (before_loop_cp, after_loop_cp) (fun man abs ->
-          (* todo *)
+      new_hedge_cfg cfg (before_loop_cp, after_loop_cp) (fun _ abs ->
+          (* TODO *)
           abs
         );
-      new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun man abs ->
+      new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun _ abs ->
           abs
         );
       (* FIXME: exceptions while inside the condition *)
@@ -775,20 +763,20 @@ module Abstract_interpreter(E: sig
             match l with
             | [p] ->
               let constraints, to_forget = create_postcondition cfg context p in
-              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun man abs -> constraints abs);
-              new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> Abstract1.forget_array manpk abs (Array.of_list to_forget) false);
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> constraints abs);
+              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> Abstract1.forget_array manpk abs (Array.of_list to_forget) false);
             | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
-              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun man abs -> abs);
-              new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> abs);
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
+              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
           end;
           l, before_assign_cp, e_end_cp
           ) exc in
       
-      let e_exn = Ity.Mexn.fold (fun exc_sym (l, cp_begin, _) e_exn ->
+      let e_exn = Ity.Mexn.fold (fun exc_sym (_, cp_begin, _) e_exn ->
           List.filter (fun (cp, exc_sym_) ->
               if Ity.xs_equal exc_sym exc_sym_ then
                 begin
-                  new_hedge_cfg cfg (cp, cp_begin) (fun man abs ->
+                  new_hedge_cfg cfg (cp, cp_begin) (fun _ abs ->
                        abs
                     );
                   false
@@ -796,7 +784,7 @@ module Abstract_interpreter(E: sig
               else
                 true
             ) e_exn) exc e_exn in
-      new_hedge_cfg cfg (e_end_cp, i) (fun man abs ->
+      new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
           abs
         );
       e_begin_cp, i, !additional_exn @ e_exn
@@ -804,12 +792,11 @@ module Abstract_interpreter(E: sig
       let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg context e in
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (j, k) (fun man abs ->
+      new_hedge_cfg cfg (j, k) (fun man _ ->
           Abstract1.bottom man cfg.env);
-      arg_begin, k, [(arg_end_cp, s)]
+      arg_begin, k, ((arg_end_cp, s)::arg_exn)
 
     | Eif(cond, b, c) ->
-      let open Expr in
       (* Condition expression *)
       let cond_term = 
         match Expr.term_of_expr ~prop:true cond with
@@ -825,13 +812,13 @@ module Abstract_interpreter(E: sig
       let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg context c in
       let start_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (start_cp, b_begin_cp) (fun man abs ->
+      new_hedge_cfg cfg (start_cp, b_begin_cp) (fun _ abs ->
           constraints abs);
-      new_hedge_cfg cfg (start_cp, c_begin_cp) (fun man abs ->
+      new_hedge_cfg cfg (start_cp, c_begin_cp) (fun _ abs ->
           constraints_not abs);
-      new_hedge_cfg cfg (c_end_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (c_end_cp, end_cp) (fun _ abs ->
           abs);
-      new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (b_end_cp, end_cp) (fun _ abs ->
           abs);
       start_cp, end_cp, b_exn @ c_exn
     | Ecase(case_e, l) ->
@@ -844,7 +831,7 @@ module Abstract_interpreter(E: sig
           let context = ref context in
           let constraints, to_forget = match p.pp_pat.pat_node with
             | Pwild -> (fun abs -> abs), []
-            | Pvar(vsym) -> failwith "pattern"
+            | Pvar(_) -> failwith "pattern"
             | Papp(l, p) ->
               let args = List.map (fun p -> match p.pat_node with
                   | Pvar(vsym) ->
@@ -860,14 +847,14 @@ module Abstract_interpreter(E: sig
                   t_app ps_equ [matched_term; t_var vreturn] None) in
               linear_expressions_from_term cfg !context postcondition
 
-            | Por(a, b) -> failwith "pattern or"
-            | Pas(a, b) -> failwith "pattern as"
+            | Por(_) -> failwith "pattern or"
+            | Pas(_) -> failwith "pattern as"
           in
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !context e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
               Abstract1.forget_array man (constraints abs) (Array.of_list to_forget) false
             );
-          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs -> abs);
+          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun _ abs -> abs);
           e_exns := e_exn :: !e_exns;
         ) l;
       case_e_begin_cp, case_end_cp, (List.concat !e_exns)
@@ -919,8 +906,8 @@ module Abstract_interpreter(E: sig
       in
       let constraints_post, _ = linear_expressions_from_term cfg context postcondition in
 
-      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man -> constraints_start);
-      new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun man -> constraints_e);
+      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ -> constraints_start);
+      new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun _ -> constraints_e);
       new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->
           (* k = k + 1 *)
           let expr = Linexpr1.make cfg.env in
@@ -948,7 +935,7 @@ module Abstract_interpreter(E: sig
     let i = new_node_cfg cfg e in
     let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
     let constraints, _ = linear_expressions_from_term cfg context (t_and_l pre) in
-    new_hedge_cfg cfg (i, e_start_cp) (fun man -> constraints);
+    new_hedge_cfg cfg (i, e_start_cp) (fun _ -> constraints);
     i, e_end_cp, e_exn
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
@@ -976,16 +963,16 @@ module Abstract_interpreter(E: sig
 
   let get_fixpoint_man cfg man =
     let (manager:(int,int,'a Abstract1.t,unit) Fixpoint.manager) = {
-      Fixpoint.bottom = begin fun vertex -> Abstract1.bottom man cfg.env end;
-      Fixpoint.canonical = begin fun vertex abs -> Abstract1.canonicalize man abs end;
-      Fixpoint.is_bottom = begin fun vertex abs -> Abstract1.is_bottom man abs end;
-      Fixpoint.is_leq = begin fun vertex abs1 abs2 -> Abstract1.is_leq man abs1 abs2 end;
-      Fixpoint.join = begin fun vertex abs1 abs2 -> Abstract1.join man abs1 abs2 end;
-      Fixpoint.join_list = begin fun vertex labs -> Abstract1.join_array man (Array.of_list labs) end;
-      Fixpoint.widening = begin fun vertex abs1 abs2 -> Abstract1.widening man abs1 abs2 end;
+      Fixpoint.bottom = begin fun _ -> Abstract1.bottom man cfg.env end;
+      Fixpoint.canonical = begin fun _ abs -> Abstract1.canonicalize man abs end;
+      Fixpoint.is_bottom = begin fun _ abs -> Abstract1.is_bottom man abs end;
+      Fixpoint.is_leq = begin fun _ abs1 abs2 -> Abstract1.is_leq man abs1 abs2 end;
+      Fixpoint.join = begin fun _ abs1 abs2 -> Abstract1.join man abs1 abs2 end;
+      Fixpoint.join_list = begin fun _ labs -> Abstract1.join_array man (Array.of_list labs) end;
+      Fixpoint.widening = begin fun _ abs1 abs2 -> Abstract1.widening man abs1 abs2 end;
       Fixpoint.odiff = None;
       Fixpoint.apply = cfg.apply man;
-      Fixpoint.arc_init = begin fun hedge -> () end;
+      Fixpoint.arc_init = begin fun _ -> () end;
       Fixpoint.abstract_init=
         begin fun vertex ->
           if vertex=0 then Abstract1.top man cfg.env else Abstract1.bottom man cfg.env
@@ -1034,7 +1021,7 @@ module Abstract_interpreter(E: sig
         (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
         let l = ref [] in
         PSHGraph.iter_vertex output
-          (fun vtx abs ~pred ~succ ->
+          (fun vtx abs ~pred:_ ~succ:_ ->
              l := (vtx, abs) :: !l);
 
         let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in

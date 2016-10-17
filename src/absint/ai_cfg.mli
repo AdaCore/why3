@@ -1,4 +1,4 @@
-module Abstract_interpreter(S:sig
+module Make(S:sig
     val env: Env.env
     val pmod: Pmodule.pmodule
   end): sig
