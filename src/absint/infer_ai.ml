@@ -83,12 +83,12 @@ module Make(S:sig
             let open Ity in
             let preconditions = Ity.(cexp.c_cty.cty_pre) in
             let cfg = AI.start_cfg rs in
-            let local_ty = AI.empty_local_ty  in
-            let local_ty = List.fold_left (AI.add_variable cfg) local_ty
+            let context = AI.empty_context  in
+            let context = List.fold_left (AI.add_variable cfg) context
                 Ity.(cexp.c_cty.cty_args) in
             Expr.print_expr Format.err_formatter e;
             Format.eprintf "@.";
-            ignore (AI.put_expr_with_pre cfg local_ty e preconditions);
+            ignore (AI.put_expr_with_pre cfg context e preconditions);
             (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
             let fixp = AI.eval_fixpoints cfg in
             let new_e = reconstruct_expr cfg fixp e in

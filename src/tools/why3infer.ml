@@ -132,12 +132,12 @@ let do_input f =
                         let pmod = m
                       end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
-                    let local_ty = Abstract_interpreter.empty_local_ty  in
-                    let local_ty = List.fold_left (Abstract_interpreter.add_variable cfg) local_ty
+                    let context = Abstract_interpreter.empty_context  in
+                    let context = List.fold_left (Abstract_interpreter.add_variable cfg) context
                       Ity.(cexp.c_cty.cty_args) in
                     Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
-                    ignore (Abstract_interpreter.put_expr_with_pre cfg local_ty e preconditions);
+                    ignore (Abstract_interpreter.put_expr_with_pre cfg context e preconditions);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
                     let fixp = Abstract_interpreter.eval_fixpoints cfg
                     |> List.map (fun (expr, domain) ->

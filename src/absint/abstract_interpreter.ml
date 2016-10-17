@@ -26,29 +26,49 @@ module Abstract_interpreter(E: sig
   type apron_domain = Polka.strict Polka.t
 
   type control_point = int
+  type hedge = int
 
   type domain = apron_domain Abstract1.t
 
   (* control flow graph *)
   type cfg = {
-    (* not one to one *)
+    (* Not one to one. Only used for debugging purpose. *)
     expr_to_control_point: (Expr.expr, control_point) Hashtbl.t;
+
+    (* The actual control flow graph *)
     g:(int,int,unit,unit,unit) PSHGraph.t;
+
+    (* If id is the latest node added to the graph, then control_point_count is
+     * equal to id+1 *)
     mutable control_point_count: int;
+
+    (* Same but for hyperedge *)
     mutable hedge_count: int;
+
+    (* Apron environment. Holds every variable that is defined in the program *)
     mutable env: Environment.t;
-    mutable apply: apron_domain Apron.Manager.t -> int -> apron_domain Apron.Abstract1.t array -> unit * apron_domain Apron.Abstract1.t;
+
+    (* This function apply the effect of a transition (an hyperedge) to
+     * an abstract domain *)
+    mutable apply: apron_domain Apron.Manager.t -> hedge -> apron_domain Apron.Abstract1.t array -> unit * apron_domain Apron.Abstract1.t;
+
+    (* Used to save the interesting control points, i.e. the beginning of 
+     * while and for loops *)
     mutable loop_invariants: (Expr.expr * control_point) list;
+
+    (* A term corresponding to an Apron variable. Because of regions, some
+     * terms can represent the same variable (let i = ref 0 in let j = i, terms
+     * 'contents j' and 'contents i' are the same apron variable). *)
     variable_mapping: (Apron.Var.t, Term.term) Hashtbl.t;
   
   }
 
-  type local_ty = {
+  type context = {
       region_ident: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
       local_vars: Var.t Term.Mterm.t
   }
 
-  let empty_local_ty = { region_ident = Ity.Mreg.empty; local_vars = Term.Mterm.empty; }
+  let empty_context = { region_ident = Ity.Mreg.empty; local_vars = Term.Mterm.empty; }
 
   exception Unknown_hedge
 
@@ -203,7 +223,6 @@ module Abstract_interpreter(E: sig
           | Decl.Dtype({ ts_def = ty; _}) -> (* This happens when a type is private or has an invariant: it can't be accesed
                                               * by the logic, so we give up and only look for projections by looking
                                               * at program projections. *)
-            (* warning_t "Could not find type declaration (got type alias)." a; *)
             begin
               try
                 let its = Ity.restore_its tys in
@@ -242,13 +261,13 @@ module Abstract_interpreter(E: sig
     in
     aux myty ity
 
-  (* Get a set of (apron) linear expressions from a constraint stated in why3 logic.
-   * ATM it only works for conjunction, and if there is not that much uninterpreted function.
-   * In the worst case, it returns an empty list.
+  (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
    * The resulting list of linear expressions is weaker than the original why3
-   * formula. *)
-  let linear_expressions_from_term: cfg -> local_ty -> Term.term -> ((domain -> domain) * Var.t list)  = fun cfg local_ty t ->
+   * formula.
+   * In the most imprecise case, it returns an empty list.
+   **)
+  let linear_expressions_from_term: cfg -> context -> Term.term -> ((domain -> domain) * Var.t list)  = fun cfg context t ->
     let open Term in
 
     (* First inline everything, for instance needed for references
@@ -258,11 +277,11 @@ module Abstract_interpreter(E: sig
     (* Let's try to remove the nots that we can *)
     let t = t_descend_nots t in
 
-    let local_ty = ref local_ty in
+    let context = ref context in
 
     let var_of_term t =
       try
-        Some (Term.Mterm.find t (!local_ty).local_vars)
+        Some (Term.Mterm.find t (!context).local_vars)
       with
       | Not_found -> None
     in
@@ -408,7 +427,7 @@ module Abstract_interpreter(E: sig
         let return_term = t_var return_var in
         let subvalues = get_subvalues return_term None in
         let l =
-          List.fold_left (fun local_ty (a, _) ->
+          List.fold_left (fun context (a, _) ->
 
               ignore (Format.flush_str_formatter ());
               let v = Pretty.print_term Format.str_formatter a
@@ -417,10 +436,10 @@ module Abstract_interpreter(E: sig
               in
               to_forget := v :: !to_forget;
               ensure_variable cfg v a;
-              { local_ty with local_vars = Term.Mterm.add a v local_ty.local_vars }
-            ) !local_ty subvalues
+              { context with local_vars = Term.Mterm.add a v context.local_vars }
+            ) !context subvalues
         in
-        local_ty := l;
+        context := l;
         aux (t_subst_single return return_term t), !to_forget
       | _ ->
         aux t, !to_forget
@@ -431,18 +450,17 @@ module Abstract_interpreter(E: sig
       Format.eprintf "@.";
       raise e
 
-  let add_typed_variable cfg local_ty psym variable_type =
+  let add_typed_variable cfg context psym variable_type =
     let open Expr in
     let open Ity in
     let open Ty in
-    let variable_ident = (Ity.(Term.(psym.pv_vs.vs_name))) in
     let logical_term =
       match Expr.term_of_expr ~prop:false (Expr.e_var psym) with
       | Some s -> s
       | None -> assert false
     in
     ignore (Format.flush_str_formatter ());
-    let local_ty = 
+    let context = 
       match Ity.(variable_type.ity_node), (Term.t_type logical_term).ty_node with
       | _ when Ty.ty_equal (t_type logical_term) ty_int ->
         let reg_name = Ity.print_pv Format.str_formatter psym
@@ -450,16 +468,16 @@ module Abstract_interpreter(E: sig
         let v =
           Var.of_string reg_name in
         ensure_variable cfg v logical_term;
-        { local_ty with local_vars = Term.Mterm.add logical_term v local_ty.local_vars }
+        { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
       | _ when Ty.ty_equal (t_type logical_term) ty_bool ->
         let reg_name = Ity.print_pv Format.str_formatter psym
         |> Format.flush_str_formatter in
         let v =
           Var.of_string reg_name in
         ensure_variable cfg v logical_term;
-        { local_ty with local_vars = Term.Mterm.add logical_term v local_ty.local_vars }
+        { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
       | _ when Ity.ity_equal variable_type Ity.ity_unit
-        -> local_ty
+        -> context
       | Ity.Ityreg(reg), Tyapp(tys, vars) -> 
         begin
           let reg_name = 
@@ -471,8 +489,8 @@ module Abstract_interpreter(E: sig
           let subv = get_subvalues vret (Some reg.reg_its) in
           let subv_r = get_subvalues logical_term (Some reg.reg_its) in
           let subv = List.combine subv subv_r in
-          let local_ty, proj_list =
-            List.fold_left (fun (local_ty, acc) ((generic_region_term, pfield), (real_term, _)) ->
+          let context, proj_list =
+            List.fold_left (fun (context, acc) ((generic_region_term, pfield), (real_term, _)) ->
                 let pfield = match pfield with
                   | Some s -> s
                   | None -> assert false
@@ -489,26 +507,26 @@ module Abstract_interpreter(E: sig
                   | Some s -> s
                   | None -> assert false
                 in
-                { local_ty with local_vars = Term.Mterm.add real_term v local_ty.local_vars }, (accessor, real_term) :: acc
-              ) (local_ty, []) subv
+                { context with local_vars = Term.Mterm.add real_term v context.local_vars }, (accessor, real_term) :: acc
+              ) (context, []) subv
           in
-          { local_ty with region_ident = Ity.Mreg.add reg proj_list local_ty.region_ident }
+          { context with region_ident = Ity.Mreg.add reg proj_list context.region_ident }
         end
       | Ity.Ityapp(_), _ ->
         Format.eprintf "Let's check that ";
         Ity.print_ity Format.err_formatter variable_type;
         Format.eprintf " has only non mutable fields.";
         let subv = get_subvalues logical_term None in
-        let local_ty = List.fold_left (fun local_ty (t, _) ->
+        let context = List.fold_left (fun context (t, _) ->
             ignore (Format.flush_str_formatter ());
             let v = Pretty.print_term Format.str_formatter t
                     |> Format.flush_str_formatter
                     |> Var.of_string
             in
             ensure_variable cfg v t;
-            { local_ty with local_vars = Term.Mterm.add t v local_ty.local_vars }) local_ty subv
+            { context with local_vars = Term.Mterm.add t v context.local_vars }) context subv
         in
-        local_ty
+        context
       | _ ->
         (* We can safely give up on a, as no integer variable can descend from it (because it is well typed) *)
         Format.eprintf "Variable could not be added properly: ";
@@ -516,13 +534,13 @@ module Abstract_interpreter(E: sig
         Format.eprintf " of type ";
         Ity.print_ity Format.err_formatter variable_type;
         Format.eprintf "@.";
-        local_ty
-    in local_ty
+        context
+    in context
 
-  let add_variable cfg local_ty pv =
-    add_typed_variable cfg local_ty pv Ity.(pv.pv_ity)
+  let add_variable cfg context pv =
+    add_typed_variable cfg context pv Ity.(pv.pv_ity)
 
-  let create_postcondition cfg local_ty psym =
+  let create_postcondition cfg context psym =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then
       begin
         let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
@@ -534,7 +552,7 @@ module Abstract_interpreter(E: sig
         Format.eprintf "--> Postcondition for let: ";
         Pretty.print_term Format.err_formatter postcondition;
         Format.eprintf "@.";
-        (linear_expressions_from_term cfg local_ty) postcondition
+        (linear_expressions_from_term cfg context) postcondition
       end
     else
       let () = Format.eprintf "no Postocndition:@." in
@@ -542,7 +560,7 @@ module Abstract_interpreter(E: sig
 
 
 
-  (* Adds expr to the cfg. local_ty is the types of the locally defined variable
+  (* Adds expr to the cfg. context is the types of the locally defined variable
    * (useful for references, when we need to get the type of a term in a logical formula).
    *
    * Adds multiple node and edges if expr requires so.
@@ -550,14 +568,14 @@ module Abstract_interpreter(E: sig
    * returns a tuple, whose first element is the entry point of expr in the cfg, and the second
    * one is the ending point. The result of expr is stored is the variable "result"
    * (see var_return) *)
-  let rec put_expr_in_cfg cfg local_ty expr =
+  let rec put_expr_in_cfg cfg context expr =
     let open Expr in
     match expr.e_node with
     | Epure (t) ->
       let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
       let vreturn = create_vreturn (t_type t) in
       let postcondition = t_eps_close vreturn (t_app ps_equ [t_var vreturn; t] None) in
-      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
+      let constraints, _ = linear_expressions_from_term cfg context postcondition in
       new_hedge_cfg cfg (i, j) (fun man abs ->
           constraints abs);
       i, j, []
@@ -580,17 +598,17 @@ module Abstract_interpreter(E: sig
            *  | erase every temporary variable
            *  . end_cp
            **)
-      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg local_ty let_expr in
+      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg context let_expr in
 
-      let local_ty = add_typed_variable cfg local_ty psym variable_type in
+      let context = add_typed_variable cfg context psym variable_type in
 
       let constraints, to_forget =
-        create_postcondition cfg local_ty psym
+        create_postcondition cfg context psym
       in
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg context b in
 
 
       (* Save the effect of the let *)
@@ -606,7 +624,7 @@ module Abstract_interpreter(E: sig
       in
       let vars_to_forget =
         get_subvalues var_term None
-        |> List.map (fun (a, _) -> Term.Mterm.find a local_ty.local_vars)
+        |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
         |> Array.of_list
       in
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
@@ -628,7 +646,7 @@ module Abstract_interpreter(E: sig
           Format.eprintf "--> Postcondition for let: ";
           Pretty.print_term Format.err_formatter postcondition;
           Format.eprintf "@.";
-          (linear_expressions_from_term cfg local_ty) postcondition
+          (linear_expressions_from_term cfg context) postcondition
           end
         else
           let () = Format.eprintf "no Postocndition:@." in
@@ -647,7 +665,7 @@ module Abstract_interpreter(E: sig
 
       let vreturn = create_vreturn Ty.ty_int in
       let postcondition = t_eps_close vreturn (t_app ps_equ [t_const n; t_var vreturn] None) in
-      let constraints, _ = linear_expressions_from_term cfg local_ty postcondition in
+      let constraints, _ = linear_expressions_from_term cfg context postcondition in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
           constraints abs
@@ -667,7 +685,7 @@ module Abstract_interpreter(E: sig
 
       Format.eprintf "@.";
       let constraints =
-        List.map (linear_expressions_from_term cfg local_ty) post
+        List.map (linear_expressions_from_term cfg context) post
         |> List.fold_left (fun f (a, _) ->
             (fun d -> f (a d))) (fun x -> x)
       in
@@ -681,7 +699,7 @@ module Abstract_interpreter(E: sig
           ignore @@ Ity.Mreg.mapi (fun a b ->
               Ity.Mpv.mapi (fun c () ->
                   let open Ity in
-                  let var = Ity.Mreg.find a local_ty.region_ident in
+                  let var = Ity.Mreg.find a context.region_ident in
                   let _, t =
                     try List.find (fun (p, _) ->
                       Ity.pv_equal p c) var
@@ -699,7 +717,7 @@ module Abstract_interpreter(E: sig
                       assert false
                   in
                   Pretty.print_term Format.err_formatter t;
-                  let v = Term.Mterm.find t local_ty.local_vars in
+                  let v = Term.Mterm.find t context.local_vars in
                   Format.eprintf "%s@." (Var.to_string v);
                   abs :=  Abstract1.forget_array man !abs [|v|] false;
                 ) b;
@@ -720,10 +738,10 @@ module Abstract_interpreter(E: sig
           Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
           Term.t_true
       in
-      let constraints, _ = linear_expressions_from_term cfg local_ty cond_term in
+      let constraints, _ = linear_expressions_from_term cfg context cond_term in
 
       let before_loop_cp = new_node_cfg cfg cond in
-      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg local_ty content in
+      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg context content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man abs ->
@@ -740,23 +758,23 @@ module Abstract_interpreter(E: sig
       before_loop_cp, after_loop_cp, loop_exn
     | Etry(e, exc) ->
       let additional_exn = ref [] in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
       let i = new_node_cfg cfg expr in
       let exc = Ity.Mexn.map (fun (l, e) ->
 
-          let local_ty = List.fold_left (fun local_ty p ->
-              add_typed_variable cfg local_ty p Ity.(p.pv_ity)) local_ty l in
+          let context = List.fold_left (fun context p ->
+              add_typed_variable cfg context p Ity.(p.pv_ity)) context l in
 
           let before_assign_cp = new_node_cfg cfg e in
 
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
 
           additional_exn := e_exn @ !additional_exn;
 
           begin
             match l with
             | [p] ->
-              let constraints, to_forget = create_postcondition cfg local_ty p in
+              let constraints, to_forget = create_postcondition cfg context p in
               new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun man abs -> constraints abs);
               new_hedge_cfg cfg (e_end_cp, i) (fun man abs -> Abstract1.forget_array manpk abs (Array.of_list to_forget) false);
             | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
@@ -783,7 +801,7 @@ module Abstract_interpreter(E: sig
         );
       e_begin_cp, i, !additional_exn @ e_exn
     | Eraise(s, e) ->
-      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg local_ty e in
+      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg context e in
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
       new_hedge_cfg cfg (j, k) (fun man abs ->
@@ -801,10 +819,10 @@ module Abstract_interpreter(E: sig
           Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated (migth even be wrong if there are exceptions)";
           Term.t_true
       in
-      let constraints, _ = linear_expressions_from_term cfg local_ty cond_term in
-      let constraints_not, _ = linear_expressions_from_term cfg local_ty (t_not cond_term) in
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg local_ty b in
-      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg local_ty c in
+      let constraints, _ = linear_expressions_from_term cfg context cond_term in
+      let constraints_not, _ = linear_expressions_from_term cfg context (t_not cond_term) in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg context b in
+      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg context c in
       let start_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (start_cp, b_begin_cp) (fun man abs ->
@@ -817,13 +835,13 @@ module Abstract_interpreter(E: sig
           abs);
       start_cp, end_cp, b_exn @ c_exn
     | Ecase(case_e, l) ->
-      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg local_ty case_e in
+      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg context case_e in
       let e_exns = ref [case_e_exn] in
       let case_end_cp = new_node_cfg cfg expr in
       List.iter (fun (p, e) ->
           let open Term in
           let open Expr in
-          let local_ty = ref local_ty in
+          let context = ref context in
           let constraints, to_forget = match p.pp_pat.pat_node with
             | Pwild -> (fun abs -> abs), []
             | Pvar(vsym) -> failwith "pattern"
@@ -831,7 +849,7 @@ module Abstract_interpreter(E: sig
               let args = List.map (fun p -> match p.pat_node with
                   | Pvar(vsym) ->
                     let pv = Ity.restore_pv vsym in
-                    local_ty := add_typed_variable cfg !local_ty pv Ity.(pv.pv_ity);
+                    context := add_typed_variable cfg !context pv Ity.(pv.pv_ity);
                     t_var vsym
                   | _ -> failwith "nested pattern or worse"
                 ) p in
@@ -840,12 +858,12 @@ module Abstract_interpreter(E: sig
               let postcondition =
                 t_eps_close vreturn (
                   t_app ps_equ [matched_term; t_var vreturn] None) in
-              linear_expressions_from_term cfg !local_ty postcondition
+              linear_expressions_from_term cfg !context postcondition
 
             | Por(a, b) -> failwith "pattern or"
             | Pas(a, b) -> failwith "pattern as"
           in
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !local_ty e in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !context e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
               Abstract1.forget_array man (constraints abs) (Array.of_list to_forget) false
             );
@@ -858,7 +876,7 @@ module Abstract_interpreter(E: sig
 
       i, i, []
 
-    | Eghost(e) -> put_expr_in_cfg cfg local_ty e
+    | Eghost(e) -> put_expr_in_cfg cfg context e
 
     | Efor(k, (lo, dir, up), _, e) ->
       (* . before_loop
@@ -877,16 +895,16 @@ module Abstract_interpreter(E: sig
         | Some s, Some u, Some v -> s, u, v
         | _ -> assert false
       in
-      let local_ty = add_variable cfg local_ty k in
-      let k_var = Mterm.find k_term local_ty.local_vars in
+      let context = add_variable cfg context k in
+      let k_var = Mterm.find k_term context.local_vars in
 
       let before_loop_cp = new_node_cfg cfg expr in
       let start_loop_cp = new_node_cfg cfg expr in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
       let end_loop_cp = new_node_cfg cfg expr in
 
       let postcondition_before = t_app ps_equ [k_term; lo] None in
-      let constraints_start, _ = linear_expressions_from_term cfg local_ty postcondition_before in
+      let constraints_start, _ = linear_expressions_from_term cfg context postcondition_before in
 
       let precondition_e =
         if dir = Expr.To then
@@ -894,12 +912,12 @@ module Abstract_interpreter(E: sig
         else
           t_and (t_app le_int [up; k_term] None) (t_app le_int [k_term; lo] None)
       in
-      let constraints_e, _ = linear_expressions_from_term cfg local_ty precondition_e in
+      let constraints_e, _ = linear_expressions_from_term cfg context precondition_e in
 
       let postcondition =
           t_app ps_equ [k_term; up] None
       in
-      let constraints_post, _ = linear_expressions_from_term cfg local_ty postcondition in
+      let constraints_post, _ = linear_expressions_from_term cfg context postcondition in
 
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun man -> constraints_start);
       new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun man -> constraints_e);
@@ -926,10 +944,10 @@ module Abstract_interpreter(E: sig
       let i = new_node_cfg cfg expr in
       i, i, []
 
-  let put_expr_with_pre cfg local_ty e pre =
+  let put_expr_with_pre cfg context e pre =
     let i = new_node_cfg cfg e in
-    let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg local_ty e in
-    let constraints, _ = linear_expressions_from_term cfg local_ty (t_and_l pre) in
+    let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
+    let constraints, _ = linear_expressions_from_term cfg context (t_and_l pre) in
     new_hedge_cfg cfg (i, e_start_cp) (fun man -> constraints);
     i, e_end_cp, e_exn
 
@@ -1039,7 +1057,7 @@ module Abstract_interpreter(E: sig
         let l = ref [] in
         Hashtbl.iter (fun a b ->
             l := (a, b) :: !l;
-          )cfg.expr_to_control_point;
+          ) cfg.expr_to_control_point;
         let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
         List.iter (fun (a, b) ->
 
