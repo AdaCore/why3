@@ -21,7 +21,9 @@ module Make(E: sig
 
 
   (* Apron manager *)
-  let manpk = Polka.manager_alloc_strict()
+  (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
+  type apron_domain = Polka.strict PolkaGrid.t*)
+  let manpk = Polka.manager_alloc_strict ()
   type apron_domain = Polka.strict Polka.t
 
   type control_point = int
@@ -1010,7 +1012,7 @@ module Make(E: sig
         let make_strategy =
           fun is_active ->
             Fixpoint.make_strategy_default
-              ~widening_start:30 ~widening_descend:1
+              ~widening_start:30 ~widening_descend:2
               ~priority:(PSHGraph.Filter is_active)
               ~vertex_dummy ~hedge_dummy
               cfg.g sinit

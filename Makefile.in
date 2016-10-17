@@ -122,7 +122,7 @@ EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 ifeq (@enable_infer@,yes)
-EXTLIBS += gmp apron camllib fixpoint polkaMPQ bigarray
+EXTLIBS += gmp apron camllib fixpoint ppl polkaMPQ polkaGrid bigarray
 endif
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
@@ -875,7 +875,7 @@ lib/coq-tactic/why3tac.cmxs: OFLAGS += $(EXTCMXA)
 
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
 ifeq (@enable_infer@,yes)
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint polkaMPQ bigarray")
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint polkaMPQ ppl polkaGrid bigarray")
 endif
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
