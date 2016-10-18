@@ -1,6 +1,9 @@
+open Domain
+
 module Make(S:sig
     val env: Env.env
     val pmod: Pmodule.pmodule
+    module D: DOMAIN
   end): sig
   type control_point
   type domain

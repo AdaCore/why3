@@ -1,15 +1,14 @@
+open Domain
 
 let ai_print_domains = Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
 
 open Format
 open Apron
 
-(* Copied from inlining, it looks like it is difficult to use the code from there
- * without messing up the interface. *)
-
 module Make(E: sig
     val env: Env.env
     val pmod: Pmodule.pmodule
+    module D: DOMAIN
   end) = struct
   
   let debug_file, debug_fmt =
@@ -33,16 +32,16 @@ module Make(E: sig
   open Ai_logic
 
 
+  module D = E.D
   (* Apron manager *)
   (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
   type apron_domain = Polka.strict PolkaGrid.t*)
-  let manpk = Polka.manager_alloc_strict ()
-  type apron_domain = Polka.strict Polka.t
+  let manpk = D.create_manager ()
 
   type control_point = int
   type hedge = int
 
-  type domain = apron_domain Abstract1.t
+  type domain = D.t 
 
   (* control flow graph *)
   type cfg = {
@@ -64,7 +63,7 @@ module Make(E: sig
 
     (* This function apply the effect of a transition (an hyperedge) to
      * an abstract domain *)
-    mutable apply: apron_domain Apron.Manager.t -> hedge -> apron_domain Apron.Abstract1.t array -> unit * apron_domain Apron.Abstract1.t;
+    mutable apply: D.man -> hedge -> D.t array -> unit * D.t;
 
     (* Used to save the interesting control points, i.e. the beginning of 
      * while and for loops *)
@@ -366,7 +365,7 @@ module Make(E: sig
           (fun d ->
              let d1 = fa d in
              let d2 = fb d in
-             Abstract1.join manpk d1 d2)
+             D.join manpk d1 d2)
         | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int || Ty.ty_equal (t_type a) Ty.ty_bool)
           && 
           (ls_equal ps_equ func ||
@@ -404,7 +403,7 @@ module Make(E: sig
             let arr = Lincons1.array_make cfg.env 1 in
             Lincons1.array_set arr 0 cons;
               (fun d ->
-                 Abstract1.meet_lincons_array manpk d arr)
+                 D.meet_lincons_array manpk d arr)
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
           begin
             let subv_a = get_subvalues a None in
@@ -423,9 +422,9 @@ module Make(E: sig
           (fun d ->
              let d1 = fb (fa d) in
              let d2 = fc (fa_not d) in
-             Abstract1.join manpk d1 d2)
+             D.join manpk d1 d2)
         | Ttrue  | _ when t_equal t t_bool_true -> (fun d -> d)
-        | Tfalse | _ when t_equal t t_bool_false -> (fun _ -> Abstract1.bottom manpk cfg.env)
+        | Tfalse | _ when t_equal t t_bool_false -> (fun _ -> D.bottom manpk cfg.env)
         | _ ->
           raise (Not_handled t)
       with
@@ -645,7 +644,7 @@ module Make(E: sig
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
           let to_forget = Array.of_list to_forget in
-          Abstract1.forget_array man (constraints abs) to_forget false
+          D.forget_array man (constraints abs) to_forget false
         );
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
@@ -659,7 +658,7 @@ module Make(E: sig
         |> Array.of_list
       in
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
-          Abstract1.forget_array man abs vars_to_forget false
+          D.forget_array man abs vars_to_forget false
         );
 
 
@@ -747,7 +746,7 @@ module Make(E: sig
                       assert false
                   in
                   let v = Term.Mterm.find t context.local_vars in
-                  abs :=  Abstract1.forget_array man !abs [|v|] false;
+                  abs :=  D.forget_array man !abs [|v|] false;
                 ) b;
             ) eff_write;
 
@@ -802,8 +801,18 @@ module Make(E: sig
             match l with
             | [p] ->
               let constraints, to_forget = create_postcondition cfg context p in
-              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> constraints abs);
-              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> Abstract1.forget_array manpk abs (Array.of_list to_forget) false);
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs ->
+                  let abs = constraints abs in
+                D.forget_array manpk abs (Array.of_list to_forget) false);
+
+              let var_term = t_var Ity.(p.pv_vs) in
+              let vars_to_forget =
+                get_subvalues var_term None
+                |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
+                |> Array.of_list
+              in
+              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
+                  D.forget_array manpk abs vars_to_forget false);
             | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
               new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
               new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
@@ -832,7 +841,7 @@ module Make(E: sig
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
       new_hedge_cfg cfg (j, k) (fun man _ ->
-          Abstract1.bottom man cfg.env);
+          D.bottom man cfg.env);
       arg_begin, k, ((arg_end_cp, s)::arg_exn)
 
     | Eif(cond, b, c) ->
@@ -891,7 +900,7 @@ module Make(E: sig
           in
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !context e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
-              Abstract1.forget_array man (constraints abs) (Array.of_list to_forget) false
+              D.forget_array man (constraints abs) (Array.of_list to_forget) false
             );
           new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun _ abs -> abs);
           e_exns := e_exn :: !e_exns;
@@ -947,11 +956,11 @@ module Make(E: sig
           (* k = k + 1 *)
           let expr = Linexpr1.make cfg.env in
           Linexpr1.set_array expr [|Coeff.s_of_int 1,  k_var|] (Some (Coeff.s_of_int 1));
-          Abstract1.assign_linexpr man abs k_var expr None
+          D.assign_linexpr man abs k_var expr None
         );
       new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun man abs ->
           let abs = constraints_post abs in
-          Abstract1.forget_array man abs [|k_var|] false);
+          D.forget_array man abs [|k_var|] false);
       cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
       before_loop_cp, end_loop_cp, e_exn
 
@@ -975,7 +984,7 @@ module Make(E: sig
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
   let domain_to_term cfg domain =
-    Apron_to_term.domain_to_term manpk domain (fun a ->
+    D.to_term E.env E.pmod manpk domain (fun a ->
         try
           Hashtbl.find cfg.variable_mapping a
         with 
@@ -997,23 +1006,23 @@ module Make(E: sig
   let dot_fmt = Format.formatter_of_out_channel dot_file;;
 
   let get_fixpoint_man cfg man =
-    let (manager:(int,int,'a Abstract1.t,unit) Fixpoint.manager) = {
-      Fixpoint.bottom = begin fun _ -> Abstract1.bottom man cfg.env end;
-      Fixpoint.canonical = begin fun _ abs -> Abstract1.canonicalize man abs end;
-      Fixpoint.is_bottom = begin fun _ abs -> Abstract1.is_bottom man abs end;
-      Fixpoint.is_leq = begin fun _ abs1 abs2 -> Abstract1.is_leq man abs1 abs2 end;
-      Fixpoint.join = begin fun _ abs1 abs2 -> Abstract1.join man abs1 abs2 end;
-      Fixpoint.join_list = begin fun _ labs -> Abstract1.join_array man (Array.of_list labs) end;
-      Fixpoint.widening = begin fun _ abs1 abs2 -> Abstract1.widening man abs1 abs2 end;
+    let (manager:(int,int, D.t,unit) Fixpoint.manager) = {
+      Fixpoint.bottom = begin fun _ -> D.bottom man cfg.env end;
+      Fixpoint.canonical = begin fun _ abs -> D.canonicalize man abs end;
+      Fixpoint.is_bottom = begin fun _ abs -> D.is_bottom man abs end;
+      Fixpoint.is_leq = begin fun _ abs1 abs2 -> D.is_leq man abs1 abs2 end;
+      Fixpoint.join = begin fun _ abs1 abs2 -> D.join man abs1 abs2 end;
+      Fixpoint.join_list = begin fun _ labs -> D.join_list man labs end;
+      Fixpoint.widening = begin fun _ abs1 abs2 -> D.widening man abs1 abs2 end;
       Fixpoint.odiff = None;
       Fixpoint.apply = cfg.apply man;
       Fixpoint.arc_init = begin fun _ -> () end;
       Fixpoint.abstract_init=
         begin fun vertex ->
-          if vertex=0 then Abstract1.top man cfg.env else Abstract1.bottom man cfg.env
+          if vertex=0 then D.top man cfg.env else D.bottom man cfg.env
         end;
 
-      Fixpoint.print_abstract = Abstract1.print;
+      Fixpoint.print_abstract = D.print;
       Fixpoint.print_arc = (fun fmt () -> pp_print_string fmt "()");
       Fixpoint.print_vertex = pp_print_int;
       Fixpoint.print_hedge = pp_print_int;
@@ -1045,7 +1054,7 @@ module Make(E: sig
         let make_strategy =
           fun is_active ->
             Fixpoint.make_strategy_default
-              ~widening_start:30 ~widening_descend:2
+              ~widening_start:10 ~widening_descend:2
               ~priority:(PSHGraph.Filter is_active)
               ~vertex_dummy ~hedge_dummy
               cfg.g sinit
@@ -1064,8 +1073,8 @@ module Make(E: sig
             let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
             List.iter (fun (vtx, abs) ->
                 printf "acc(%i) = %a@."
-                  vtx (Abstract1.print) abs;
-                let gen = Abstract1.to_generator_array manpk abs in
+                  vtx (D.print) abs;
+                (*let gen = Abstract1.to_generator_array manpk abs in
                 Generator1.array_print Format.std_formatter gen;
                 let n = Generator1.array_length gen in
                 for i = 0 to n - 1 do
@@ -1075,7 +1084,7 @@ module Make(E: sig
                   Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
                   Format.printf "@.";
                 done;
-                Format.printf "@.";
+                Format.printf "@.";*)
               ) l;
 
             let l = ref [] in
@@ -1099,7 +1108,7 @@ module Make(E: sig
                 Expr.print_expr Format.std_formatter expr;
                 Format.printf "@.";
                 let abs = PSHGraph.attrvertex output cp in
-                Format.printf "%a@." Abstract1.print abs;
+                Format.printf "%a@." D.print abs;
                 Pretty.forget_all ();
                 Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
                 printf "@."

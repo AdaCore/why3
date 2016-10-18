@@ -13,6 +13,7 @@ module Make(S:sig
     let module AI = Ai_cfg.Make(struct
         let env = env
         let pmod = pmod
+        module D = (Domain.Polyhedra)
       end)
     in
 
