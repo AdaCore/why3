@@ -1,4 +1,5 @@
 
+let ai_print_domains = Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
 
 open Format
 open Apron
@@ -11,9 +12,17 @@ module Make(E: sig
     val pmod: Pmodule.pmodule
   end) = struct
   
-  let debug_file = open_out "dbg.dot"
-  let debug_fmt = Format.formatter_of_out_channel debug_file
-  let _ = Format.fprintf debug_fmt "digraph graphname {@."
+  let debug_file, debug_fmt =
+    if Debug.test_flag ai_print_domains then
+      let d = open_out "dbg.dot" in
+      Some d, Some (Format.formatter_of_out_channel d)
+    else
+      None, None
+
+  let _ =
+    match debug_fmt with
+    | Some debug_fmt -> Format.fprintf debug_fmt "digraph graphname {@."
+    | None -> ()
   
   open Term
 
@@ -118,13 +127,17 @@ module Make(E: sig
     (* save in the cfg *)
     PSHGraph.add_vertex cfg.g i ();
     (* debug *)
-    
-    Format.fprintf debug_fmt "%d [label=\"" i;
-    if l <> "" then
-      Format.fprintf debug_fmt "%s" l
-    else
-      Expr.print_expr debug_fmt expr;
-    Format.fprintf debug_fmt "\"];@.";
+    begin
+      match debug_fmt with
+      | Some debug_fmt ->
+        Format.fprintf debug_fmt "%d [label=\"" i;
+        if l <> "" then
+          Format.fprintf debug_fmt "%s" l
+        else
+          Expr.print_expr debug_fmt expr;
+        Format.fprintf debug_fmt "\"];@.";
+      | None -> ()
+    end;
     i
 
   (* Adds a new hyperedge between a and b, whose effect is described in f *)
@@ -139,7 +152,10 @@ module Make(E: sig
         (), f man abs
       else old_apply man h tabs
     end;
-    Format.fprintf debug_fmt "%d -> %d@." a b
+    match debug_fmt with
+    | Some debug_fmt ->
+      Format.fprintf debug_fmt "%d -> %d@." a b
+    | None -> ()
 
   exception Not_handled of Term.term
 
@@ -511,7 +527,7 @@ module Make(E: sig
                 ignore (Format.flush_str_formatter ());
                 let v = Pretty.print_term Format.str_formatter generic_region_term
                         |> Format.flush_str_formatter
-                        |> Format.sprintf "%d%s.%s" !var_id reg_name
+                        |> Format.sprintf "r$%s.%s" reg_name
                         |> Var.of_string
                 in
                 ensure_variable cfg v real_term;
@@ -959,11 +975,6 @@ module Make(E: sig
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
   let domain_to_term cfg domain =
-    Hashtbl.iter (fun v k ->
-        Format.eprintf "%s@. -> " (Var.to_string v);
-        Pretty.print_term Format.err_formatter k;
-        Format.eprintf "@.";
-      ) cfg.variable_mapping;
     Apron_to_term.domain_to_term manpk domain (fun a ->
         try
           Hashtbl.find cfg.variable_mapping a
@@ -1048,51 +1059,56 @@ module Make(E: sig
           (fun vtx abs ~pred:_ ~succ:_ ->
              l := (vtx, abs) :: !l);
 
-        (*let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
-        List.iter (fun (vtx, abs) ->
-            printf "acc(%i) = %a@."
-              vtx (Abstract1.print) abs;
-            let gen = Abstract1.to_generator_array manpk abs in
-            Generator1.array_print Format.std_formatter gen;
-            let n = Generator1.array_length gen in
-            for i = 0 to n - 1 do
-              let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
-              Linexpr1.print Format.std_formatter linexpr;
-              Format.printf " = ";
-              Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
-              Format.printf "@.";
-            done;
-            Format.printf "@.";
-          ) l;
+        if Debug.test_flag ai_print_domains then
+          begin
+            let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
+            List.iter (fun (vtx, abs) ->
+                printf "acc(%i) = %a@."
+                  vtx (Abstract1.print) abs;
+                let gen = Abstract1.to_generator_array manpk abs in
+                Generator1.array_print Format.std_formatter gen;
+                let n = Generator1.array_length gen in
+                for i = 0 to n - 1 do
+                  let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
+                  Linexpr1.print Format.std_formatter linexpr;
+                  Format.printf " = ";
+                  Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
+                  Format.printf "@.";
+                done;
+                Format.printf "@.";
+              ) l;
 
-        let l = ref [] in
-        Hashtbl.iter (fun a b ->
-            l := (a, b) :: !l;
-          ) cfg.expr_to_control_point;
-        let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
-        List.iter (fun (a, b) ->
+            let l = ref [] in
+            Hashtbl.iter (fun a b ->
+                l := (a, b) :: !l;
+              ) cfg.expr_to_control_point;
+            let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
+            List.iter (fun (a, b) ->
 
-            Format.eprintf "%d -> " b;
-            Expr.print_expr Format.err_formatter a;
-            Format.eprintf "@."
-          ) l;
+                Format.eprintf "%d -> " b;
+                Expr.print_expr Format.err_formatter a;
+                Format.eprintf "@."
+              ) l;
 
-        (* Print loop invariants *)
+            (* Print loop invariants *)
 
-        Format.printf "Loop invariants:\n@.";
+            Format.printf "Loop invariants:\n@.";
 
-        List.iter (fun (expr, cp) ->
-            Format.printf "For:@.";
-            Expr.print_expr Format.std_formatter expr;
-            Format.printf "@.";
-            let abs = PSHGraph.attrvertex output cp in
-            Format.printf "%a@." Abstract1.print abs;
-            Pretty.forget_all ();
-            Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
-            printf "@."
-          ) cfg.loop_invariants;*)
+            List.iter (fun (expr, cp) ->
+                Format.printf "For:@.";
+                Expr.print_expr Format.std_formatter expr;
+                Format.printf "@.";
+                let abs = PSHGraph.attrvertex output cp in
+                Format.printf "%a@." Abstract1.print abs;
+                Pretty.forget_all ();
+                Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
+                printf "@."
+              ) cfg.loop_invariants;
 
-        Format.fprintf debug_fmt "}@.";
+            match debug_fmt with
+            | Some debug_fmt -> Format.fprintf debug_fmt "}@.";
+            | None -> ()
+          end;
         List.map (fun (expr, cp) ->
             let abs = PSHGraph.attrvertex output cp in
             expr, abs
