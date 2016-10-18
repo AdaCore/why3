@@ -11,6 +11,10 @@ module Make(E: sig
     val pmod: Pmodule.pmodule
   end) = struct
   
+  let debug_file = open_out "dbg.dot"
+  let debug_fmt = Format.formatter_of_out_channel debug_file
+  let _ = Format.fprintf debug_fmt "digraph graphname {@."
+  
   open Term
 
   module Ai_logic = Ai_logic.Make(struct
@@ -82,7 +86,7 @@ module Make(E: sig
         cfg.env <- Environment.add cfg.env [|v|] [||]
       end
   
-  let ident_ret = Ident.{pre_name = "return"; pre_label = Ident.Slab.empty; pre_loc = None; }
+  let ident_ret = Ident.{pre_name = "$$return"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let cached_vreturn = ref (Ty.Mty.empty)
   let create_vreturn ty =
     try
@@ -107,12 +111,20 @@ module Make(E: sig
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
    * debugging purpose ATM) *)
-  let new_node_cfg cfg expr =
+  let new_node_cfg cfg ?label:(l="") expr =
     let i = cfg.control_point_count in
     Hashtbl.add cfg.expr_to_control_point expr i;
     cfg.control_point_count <- i + 1;
     (* save in the cfg *)
     PSHGraph.add_vertex cfg.g i ();
+    (* debug *)
+    
+    Format.fprintf debug_fmt "%d [label=\"" i;
+    if l <> "" then
+      Format.fprintf debug_fmt "%s" l
+    else
+      Expr.print_expr debug_fmt expr;
+    Format.fprintf debug_fmt "\"];@.";
     i
 
   (* Adds a new hyperedge between a and b, whose effect is described in f *)
@@ -126,7 +138,8 @@ module Make(E: sig
         let abs = tabs.(0) in
         (), f man abs
       else old_apply man h tabs
-    end
+    end;
+    Format.fprintf debug_fmt "%d -> %d@." a b
 
   exception Not_handled of Term.term
 
@@ -442,7 +455,10 @@ module Make(E: sig
       Format.eprintf "@.";
       raise e
 
+  let var_id = ref 0
+
   let add_typed_variable cfg context psym variable_type =
+    incr var_id;
     let open Expr in
     let open Ity in
     let open Ty in
@@ -455,17 +471,21 @@ module Make(E: sig
     let context = 
       match Ity.(variable_type.ity_node), (Term.t_type logical_term).ty_node with
       | _ when Ty.ty_equal (t_type logical_term) ty_int ->
-        let reg_name = Ity.print_pv Format.str_formatter psym
-        |> Format.flush_str_formatter in
+        let reg_name = Pretty.print_term Format.str_formatter logical_term
+                       |> Format.flush_str_formatter
+                       |> Format.sprintf "%d%s" !var_id in
         let v =
           Var.of_string reg_name in
+        assert (not (Environment.mem_var cfg.env v));
         ensure_variable cfg v logical_term;
         { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
       | _ when Ty.ty_equal (t_type logical_term) ty_bool ->
-        let reg_name = Ity.print_pv Format.str_formatter psym
-        |> Format.flush_str_formatter in
+        let reg_name = Pretty.print_term Format.str_formatter logical_term
+                       |> Format.flush_str_formatter
+                       |> Format.sprintf "%d%s" !var_id in
         let v =
           Var.of_string reg_name in
+        assert (not (Environment.mem_var cfg.env v));
         ensure_variable cfg v logical_term;
         { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
       | _ when Ity.ity_equal variable_type Ity.ity_unit
@@ -491,7 +511,7 @@ module Make(E: sig
                 ignore (Format.flush_str_formatter ());
                 let v = Pretty.print_term Format.str_formatter generic_region_term
                         |> Format.flush_str_formatter
-                        |> Format.sprintf "%s.%s" reg_name
+                        |> Format.sprintf "%d%s.%s" !var_id reg_name
                         |> Var.of_string
                 in
                 ensure_variable cfg v real_term;
@@ -508,11 +528,14 @@ module Make(E: sig
         Format.eprintf "Let's check that ";
         Ity.print_ity Format.err_formatter variable_type;
         Format.eprintf " has only non mutable fields.";
+        let reg_name = Ity.print_pv Format.str_formatter psym
+        |> Format.flush_str_formatter in
         let subv = get_subvalues logical_term None in
         let context = List.fold_left (fun context (t, _) ->
             ignore (Format.flush_str_formatter ());
             let v = Pretty.print_term Format.str_formatter t
                     |> Format.flush_str_formatter
+                    |> Format.sprintf "%d%s.%s" !var_id reg_name
                     |> Var.of_string
             in
             ensure_variable cfg v t;
@@ -646,14 +669,14 @@ module Make(E: sig
       in
 
       let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg cfg expr in
+      let end_cp = new_node_cfg cfg ~label:"value returned" expr in
       new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
           constraints abs
         );
       begin_cp, end_cp, []
     | Econst(n) ->
       let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg cfg expr in
+      let end_cp = new_node_cfg ~label:"constant returned" cfg expr in
 
       let vreturn = create_vreturn Ty.ty_int in
       let postcondition = t_eps_close vreturn (t_app ps_equ [t_const n; t_var vreturn] None) in
@@ -682,7 +705,7 @@ module Make(E: sig
             (fun d -> f (a d))) (fun x -> x)
       in
       let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg cfg expr in
+      let end_cp = new_node_cfg ~label:"function called" cfg expr in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
           (* effects *)
@@ -707,9 +730,7 @@ module Make(E: sig
                       Format.eprintf ")@.";
                       assert false
                   in
-                  Pretty.print_term Format.err_formatter t;
                   let v = Term.Mterm.find t context.local_vars in
-                  Format.eprintf "%s@." (Var.to_string v);
                   abs :=  Abstract1.forget_array man !abs [|v|] false;
                 ) b;
             ) eff_write;
@@ -878,11 +899,7 @@ module Make(E: sig
        * . e_end --------> start_loop
        *)
       let k_term, lo, up =
-        match Expr.term_of_expr ~prop:false (Expr.e_var k),
-              Expr.term_of_expr ~prop:false (Expr.e_var lo),
-              Expr.term_of_expr ~prop:false (Expr.e_var up) with
-        | Some s, Some u, Some v -> s, u, v
-        | _ -> assert false
+        Ity.(t_var k.pv_vs, t_var lo.pv_vs, t_var up.pv_vs)
       in
       let context = add_variable cfg context k in
       let k_var = Mterm.find k_term context.local_vars in
@@ -942,6 +959,11 @@ module Make(E: sig
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
   let domain_to_term cfg domain =
+    Hashtbl.iter (fun v k ->
+        Format.eprintf "%s@. -> " (Var.to_string v);
+        Pretty.print_term Format.err_formatter k;
+        Format.eprintf "@.";
+      ) cfg.variable_mapping;
     Apron_to_term.domain_to_term manpk domain (fun a ->
         try
           Hashtbl.find cfg.variable_mapping a
@@ -995,7 +1017,7 @@ module Make(E: sig
       Fixpoint.print_workingsets = false;
 
       Fixpoint.dot_fmt = Some dot_fmt;
-      Fixpoint.dot_vertex = (fun fmt v -> Format.fprintf fmt "v%i" v);
+      Fixpoint.dot_vertex = (fun fmt v -> Format.fprintf fmt "v%i@." v);
       Fixpoint.dot_hedge = (fun fmt h -> Format.fprintf fmt "h%i" h);
       Fixpoint.dot_attrvertex = (fun _ -> Format.printf "%d");
       Fixpoint.dot_attrhedge = (fun _ -> Format.printf "%d");
@@ -1026,7 +1048,7 @@ module Make(E: sig
           (fun vtx abs ~pred:_ ~succ:_ ->
              l := (vtx, abs) :: !l);
 
-        let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
+        (*let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
         List.iter (fun (vtx, abs) ->
             printf "acc(%i) = %a@."
               vtx (Abstract1.print) abs;
@@ -1068,8 +1090,9 @@ module Make(E: sig
             Pretty.forget_all ();
             Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
             printf "@."
-          ) cfg.loop_invariants;
+          ) cfg.loop_invariants;*)
 
+        Format.fprintf debug_fmt "}@.";
         List.map (fun (expr, cp) ->
             let abs = PSHGraph.attrvertex output cp in
             expr, abs

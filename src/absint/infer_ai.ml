@@ -57,6 +57,7 @@ module Make(S:sig
       | Efor(pv, (f, d, t), inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
         let inv = (AI.domain_to_term cfg new_inv) :: inv in
+        Pretty.print_term Format.err_formatter (List.hd inv);
         e_for pv (e_var f) d (e_var t) inv (r e_loop)
     in
 

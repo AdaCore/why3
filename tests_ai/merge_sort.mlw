@@ -47,7 +47,8 @@ module Merge
                (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
   = let i = ref l in
     let j = ref m in
-    for k = l to r-1 do
+	let uu = r -1 in
+    for k = l to uu do
       invariant { l <= !i <= m <= !j <= r }
       invariant { !i - l + !j - m = k - l }
       invariant { sorted_sub a l k }
@@ -87,7 +88,7 @@ module Merge
       end
 
 end
-
+(*
 (** {2 Top-down, recursive mergesort}
 
     Split in equal halves, recursively sort the two, and then merge. *)
@@ -286,7 +287,8 @@ module NaturalMergesort
     try
       let mid = ref (find_run a lo) in
       if !mid = n then raise Break;
-      for i = 0 to k-1 do
+	  let o = k-1 in
+      for i = 0 to o do
         invariant { lo + i < !mid < n }
         invariant { sorted_sub a lo !mid }
         invariant { permut_sub (old a) a lo (length a) }
@@ -312,3 +314,4 @@ module NaturalMergesort
     ()
 
 end
+*)
