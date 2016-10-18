@@ -1022,6 +1022,189 @@ module N
              (power radix (p2i sz + p2i sz))*l2i !c <
                     (power radix (p2i sz))*(power radix (p2i sz))  }
 
+ let addmul_limbs (r x y:t) (sz:int32) : limb
+    requires { p2i sz > 0 }
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv y (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz +  p2i sz) }
+    writes { r.data.contents.elts }
+    ensures { value_sub_shift r (p2i sz + p2i sz)
+    	        + power radix (p2i sz + p2i sz) * l2i result
+              = value_sub_shift (old r) (p2i sz + p2i sz)
+	        + value_sub_shift x (p2i sz) * value_sub_shift y (p2i sz) }
+  = 
+    let limb_zero = Limb.of_int 0 in
+    let one = Int32.of_int 1 in
+    let rp = ref r in
+    let ly = ref limb_zero in
+    let lr = ref limb_zero in
+    let c = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    let rec lemma old_tail_shift (i:int)
+      requires { i >= 0 }
+      variant { i }
+      ensures { value_sub_shift (old r) (i+1) = value_sub_shift (old r) i 
+      	      + power radix i * l2i (pelts (old r))[r.offset+i] }
+      =
+	if i > 0 then old_tail_shift (i-1) else assert {1+2=3}  in	
+    while Int32.(<) !i sz do
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { value_sub_shift r (p2i !i + p2i sz)
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+                  = value_sub_shift (old r) (p2i !i + p2i sz)
+		    + value_sub_shift x (p2i sz) * value_sub_shift y (p2i !i) }
+      invariant { (!rp).offset = r.offset + p2i !i }
+      invariant { r.data = (!rp).data }
+      invariant { 0 <= l2i !c <= 1 }
+      invariant { forall j. (!rp).offset + p2i sz <= j ->
+                 (pelts (old r)) [j] = (pelts r)[j]  }
+      variant { p2i sz - p2i !i }
+      label StartLoop in
+      let ghost k = p2i !i in
+      value_sub_concat (pelts r) r.offset (r.offset + k)
+                       (r.offset + k + p2i sz);
+      assert { value_sub_shift r k
+             + (power radix k) * value_sub (pelts r) (r.offset + k)
+                                                   (r.offset + k + p2i sz)
+             = value_sub_shift r (k + p2i sz) };
+      ly := get_ofs y !i;
+      let c' =  addmul_limb !rp x !ly sz in
+      assert { value_sub_shift !rp (p2i sz) + power radix (p2i sz) * l2i c'
+              = value_sub_shift (!rp at StartLoop) (p2i sz)
+                + value_sub_shift x (p2i sz) * l2i !ly };
+      assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
+                r.offset (!rp).offset
+                by (!rp).offset = r.offset + p2i !i
+                so forall j. r.offset <= j < (!rp).offset
+                   ->
+                   (j < (!rp).offset
+                    so (pelts !rp)[j] = (pelts !rp at StartLoop)[j]
+                         = (pelts r at StartLoop)[j]) };
+      lr := get_ofs !rp sz;
+      assert { l2i !lr = l2i (pelts (old r))[r.offset+ p2i !i + p2i sz] };
+      let (res, carry) = add_with_carry c' !lr !c in
+      label BeforeCarry in
+      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
+                        r.offset  (r.offset + p2i !i) res;
+      set_ofs !rp sz res;
+      assert { value_sub_shift !rp (p2i sz) = value_sub_shift (!rp at BeforeCarry) (p2i sz) };
+      c:= carry;
+      i := Int32.(+) !i one;
+      assert { value_sub_shift r k = value_sub_shift (r at BeforeCarry) k
+             = value_sub_shift (r at StartLoop) k};
+      value_sub_tail (pelts r) r.offset (r.offset + p2i sz + k);
+      value_sub_tail (pelts y) y.offset (y.offset + k);
+      old_tail_shift (k+p2i sz);
+      value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
+      assert { value_sub (pelts r) (r.offset+k) (r.offset+k+p2i sz)
+               = value_sub_shift !rp (p2i sz) };
+      assert { value_sub_shift r (p2i !i + p2i sz)
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+                  = value_sub_shift (old r) (p2i !i + p2i sz)
+		    + value_sub_shift x (p2i sz)
+                      * value_sub_shift y (p2i !i)
+               by
+                 power radix (k + p2i sz) = power radix k * power radix (p2i sz)
+               so
+                 value_sub_shift (r at StartLoop) k
+                 + (power radix k) * value_sub (pelts r at StartLoop)
+                                   (r.offset + k) (r.offset + k + p2i sz)
+                 = value_sub_shift (r at StartLoop) (k + p2i sz)
+	       so (value_sub_shift (old r) (p2i !i+p2i sz) 
+		  = value_sub_shift (old r) (k+p2i sz) 
+		  + power radix (k+p2i sz) * l2i !lr
+		  by l2i !lr = l2i (pelts (old r))[r.offset + k + p2i sz])
+	       so
+	          value_sub_shift !rp (p2i sz) + (power radix (p2i sz)) * l2i c' =
+		  value_sub_shift (!rp at StartLoop) (p2i sz) 
+		  + value_sub_shift x (p2i sz) * l2i !ly
+	       so
+                 value_sub_shift r (p2i !i + p2i sz)
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+               = value_sub_shift r (k + p2i sz)
+                    + (power radix (k + p2i sz)) * l2i res
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+               = value_sub_shift r k
+                    + (power radix k) * value_sub_shift !rp (p2i sz)
+                    + (power radix (k + p2i sz)) * l2i res
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+               = value_sub_shift r k
+                    + (power radix k) * value_sub_shift !rp (p2i sz)
+                    + (power radix k) * (power radix (p2i sz)) * l2i res
+                    + (power radix (p2i !i + p2i sz)) * l2i !c
+               = value_sub_shift r k
+                    + (power radix k) * value_sub_shift !rp (p2i sz)
+                    + (power radix k) * (power radix (p2i sz)) * l2i res
+                    + (power radix k) * (power radix (p2i sz)) * radix * l2i !c
+               = value_sub_shift r k
+                    + (power radix k) * value_sub_shift !rp (p2i sz)
+                    + (power radix k) * (power radix (p2i sz))
+                             * (l2i res + radix * l2i !c)
+               = value_sub_shift r k
+                    + (power radix k) * value_sub_shift !rp (p2i sz)
+                    + (power radix k) * (power radix (p2i sz))
+                             * (l2i c' + l2i (!c at StartLoop) + l2i !lr)
+               = value_sub_shift r k + (power radix k)
+                    * (value_sub_shift !rp (p2i sz)
+                      + power radix (p2i sz) * (l2i c'+ l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift r k + (power radix k)
+                    * (value_sub_shift !rp (p2i sz)
+                      + power radix (p2i sz) * l2i c'
+		      + power radix (p2i sz) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift r k + (power radix k)
+                    * (value_sub_shift (!rp at StartLoop) (p2i sz)
+                       + value_sub_shift x (p2i sz) * l2i !ly
+                       + (power radix (p2i sz)) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift r k
+                 + power radix k * (value_sub_shift (!rp at StartLoop) (p2i sz))
+                 + power radix k * (value_sub_shift x (p2i sz) * l2i !ly
+                    + (power radix (p2i sz)) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift (r at StartLoop) k
+                 + power radix k * (value_sub_shift (!rp at StartLoop) (p2i sz))
+                 + power radix k * (value_sub_shift x (p2i sz) * l2i !ly
+                    + (power radix (p2i sz)) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift (r at StartLoop) k
+                 + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
+                                              (r.offset+k+ p2i sz))
+                 + power radix k * (value_sub_shift x (p2i sz) * l2i !ly
+                    + (power radix (p2i sz)) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift (r at StartLoop) (k + p2i sz)
+                 + power radix k * (value_sub_shift x (p2i sz) * l2i !ly
+                    + (power radix (p2i sz)) * (l2i (!c at StartLoop) + l2i !lr))
+               = value_sub_shift (r at StartLoop) (k + p2i sz)
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+                 + power radix k * power radix (p2i sz) * (l2i (!c at StartLoop) + l2i !lr)
+               = value_sub_shift (r at StartLoop) (k + p2i sz)
+                 + power radix k * power radix (p2i sz) * (l2i (!c at StartLoop) + l2i !lr)
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+               = value_sub_shift (r at StartLoop) (k + p2i sz)
+                 + power radix (k + p2i sz) * (l2i (!c at StartLoop) + l2i !lr)
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+               = value_sub_shift (r at StartLoop) (k + p2i sz)
+                 + power radix (k + p2i sz) * (l2i (!c at StartLoop))
+                 + power radix (k + p2i sz) * l2i !lr
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+               = value_sub_shift (old r) (k+p2i sz)
+                 + value_sub_shift x (p2i sz) * value_sub_shift y k
+                 + power radix (k + p2i sz) * l2i !lr
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+               = value_sub_shift (old r) (k+p2i sz)
+                 + power radix (k + p2i sz) * l2i !lr
+                 + value_sub_shift x (p2i sz) * value_sub_shift y k
+                 + power radix k * value_sub_shift x (p2i sz) * l2i !ly
+               = value_sub_shift (old r) (k+p2i sz)
+                 + power radix (k + p2i sz) * l2i !lr
+                 + value_sub_shift x (p2i sz) * (value_sub_shift y k + power radix k * l2i !ly)
+               = value_sub_shift (old r) (k+p2i sz)
+                 + power radix (k + p2i sz) * l2i !lr
+                 + value_sub_shift x (p2i sz) * value_sub_shift y (p2i !i)
+               = value_sub_shift (old r) (p2i !i +p2i sz)
+                 + value_sub_shift x (p2i sz) * value_sub_shift y (p2i !i)
+             };
+      rp := M.incr !rp one;
+    done;
+    !c
+
 end
 
 (*

@@ -8,6 +8,7 @@
 <prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mp2.mlw" expanded="true">
 <theory name="M" sum="2cda8349cd784fdc0df394b320ae4c89">
  <goal name="VC incr" expl="VC for incr">
@@ -23,7 +24,7 @@
  <proof prover="3"><result status="valid" time="0.04" steps="77"/></proof>
  </goal>
 </theory>
-<theory name="N" sum="25b22f629bd4e947f2c4deda5b801434" expanded="true">
+<theory name="N" sum="3462a30e5d74e3d32a310a737c4345a9" expanded="true">
  <goal name="limb_max_bound">
  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
  </goal>
@@ -1521,6 +1522,257 @@
   </goal>
   <goal name="VC mul_limbs.42" expl="42. postcondition">
   <proof prover="3"><result status="valid" time="0.10" steps="98"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC addmul_limbs" expl="VC for addmul_limbs">
+ <transf name="split_goal_wp">
+  <goal name="VC addmul_limbs.1" expl="1. integer overflow">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.2" expl="2. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.3" expl="3. integer overflow">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.4" expl="4. variant decrease">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.5" expl="5. precondition">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.6" expl="6. assertion">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.7" expl="7. postcondition">
+  <proof prover="4"><result status="timeout" time="4.66"/></proof>
+  <proof prover="6"><result status="valid" time="1.90" steps="160"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.8" expl="8. postcondition">
+  <proof prover="4"><result status="timeout" time="4.80"/></proof>
+  <proof prover="6"><result status="valid" time="0.24" steps="127"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.9" expl="9. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.10" expl="10. loop invariant init">
+  <proof prover="6"><result status="valid" time="0.30" steps="116"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.11" expl="11. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.12" expl="12. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.13" expl="13. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.14" expl="14. loop invariant init">
+  <proof prover="6"><result status="valid" time="0.02" steps="70"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.15" expl="15. precondition">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.16" expl="16. assertion">
+  <proof prover="4"><result status="highfailure" time="4.54"/></proof>
+  <proof prover="6"><result status="valid" time="0.15" steps="126"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.17" expl="17. precondition">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.18" expl="18. precondition">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.19" expl="19. precondition">
+  <proof prover="4"><result status="highfailure" time="4.18"/></proof>
+  <proof prover="6"><result status="valid" time="0.08" steps="139"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.20" expl="20. assertion">
+  <proof prover="6"><result status="valid" time="0.06" steps="95"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.21" expl="21. assertion">
+  <proof prover="4"><result status="valid" time="0.14"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.22" expl="22. precondition">
+  <proof prover="4"><undone/></proof>
+  <proof prover="6"><result status="valid" time="0.68" steps="190"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.23" expl="23. assertion">
+  <proof prover="1"><result status="valid" time="0.96"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.24" expl="24. precondition">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.25" expl="25. precondition">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.26" expl="26. precondition">
+  <proof prover="4" timelimit="10"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.27" expl="27. precondition">
+  <proof prover="4"><result status="timeout" time="4.73"/></proof>
+  <proof prover="6"><result status="valid" time="1.28" steps="211"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.28" expl="28. assertion">
+  <transf name="inline_all">
+   <goal name="VC addmul_limbs.28.1" expl="1. assertion">
+   <proof prover="1"><result status="valid" time="4.15"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC addmul_limbs.29" expl="29. integer overflow">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.30" expl="30. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC addmul_limbs.30.1" expl="1. VC for addmul_limbs">
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.78"/></proof>
+   <proof prover="6"><result status="valid" time="0.53" steps="149"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.30.2" expl="2. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="1.08"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC addmul_limbs.31" expl="31. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.32" expl="32. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.33" expl="33. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.34" expl="34. precondition">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.35" expl="35. assertion">
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.75"/></proof>
+  <proof prover="6"><result status="valid" time="1.42" steps="161"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.36" expl="36. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC addmul_limbs.36.1" expl="1. VC for addmul_limbs">
+   <proof prover="4" timelimit="10"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.2" expl="2. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="4.39"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.3" expl="3. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="1.25"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.4" expl="4. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="1.36"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.5" expl="5. VC for addmul_limbs">
+   <transf name="inline_all">
+    <goal name="VC addmul_limbs.36.5.1" expl="1. VC for addmul_limbs">
+    <proof prover="1"><result status="valid" time="0.12"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC addmul_limbs.36.6" expl="6. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="3.36"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.7" expl="7. VC for addmul_limbs">
+   <transf name="inline_all">
+    <goal name="VC addmul_limbs.36.7.1" expl="1. VC for addmul_limbs">
+    <proof prover="1"><result status="valid" time="0.12"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC addmul_limbs.36.8" expl="8. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.9" expl="9. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.10" expl="10. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.11" expl="11. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.12" expl="12. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.00"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.13" expl="13. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.14" expl="14. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.15" expl="15. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.16" expl="16. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.17" expl="17. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="2.25"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.18" expl="18. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.19" expl="19. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.20" expl="20. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.21" expl="21. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.22" expl="22. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.23" expl="23. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.24" expl="24. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.25" expl="25. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.26" expl="26. VC for addmul_limbs">
+   <proof prover="0"><result status="valid" time="2.64"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.27" expl="27. VC for addmul_limbs">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC addmul_limbs.36.28" expl="28. VC for addmul_limbs">
+   <proof prover="1"><result status="valid" time="1.27"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC addmul_limbs.37" expl="37. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.38" expl="38. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="6" obsolete="true"><undone/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.39" expl="39. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.72"/></proof>
+  <proof prover="6"><result status="valid" time="0.43" steps="123"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.40" expl="40. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.41" expl="41. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.42" expl="42. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.49"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.43" expl="43. loop variant decrease">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC addmul_limbs.44" expl="44. postcondition">
+  <proof prover="4"><result status="timeout" time="4.72"/></proof>
+  <proof prover="6"><result status="valid" time="0.04" steps="87"/></proof>
   </goal>
  </transf>
  </goal>
