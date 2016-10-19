@@ -652,6 +652,21 @@ install_no_local::
 clean::
 	rm -f $(SERVER_O) $(CPULIM_O) $(TOOLS)
 
+.PHONY: install_spark2014 install_spark2014_dev
+
+install_spark2014_dev: install_spark2014
+	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
+	$(MKDIR_P) $(DATADIR)/why3/images
+	for i in share/images/*.rc; do \
+	     d=`basename $$i .rc`; \
+	     $(INSTALL_DATA) $$i $(DATADIR)/why3/images; \
+	     $(MKDIR_P) $(DATADIR)/why3/images/$$d; \
+	     $(INSTALL_DATA) share/images/$$d/* $(DATADIR)/why3/images/$$d; \
+	done
+	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
+	$(MKDIR_P) $(DATADIR)/why3/lang
+	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
+
 install_spark2014:
 	mkdir -p $(BINDIR)
 	mkdir -p $(DATADIR)/why3
