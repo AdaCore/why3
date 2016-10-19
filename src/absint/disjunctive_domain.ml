@@ -40,6 +40,19 @@ module Make(A:DOMAIN) = struct
     | None -> []
     | Some t -> [t]
 
+  let cleanup_hard man c =
+    let rec zip a = function
+      | [] -> a
+      | t::q ->
+        let p = List.map (A.is_leq man t) (q @ a)
+                |> List.fold_left (||) false in
+        if p then
+          zip a q
+        else
+          zip (t::a) q
+    in
+    zip [] c
+
   let join man a b =
     let a = cleanup man a in
     let b = cleanup man b in
@@ -54,17 +67,7 @@ module Make(A:DOMAIN) = struct
       else b
     in
     let c = a @ b in
-    let rec zip a = function
-      | [] -> a
-      | t::q ->
-        let p = List.map (A.is_leq man t) (q @ a)
-                |> List.fold_left (||) false in
-        if p then
-          zip a q
-        else
-          zip (t::a) q
-    in
-    zip [] c
+    cleanup_hard man c
 
 
   let join_list man t =
@@ -79,7 +82,6 @@ module Make(A:DOMAIN) = struct
   let widening man a b =
     let a = cleanup man a in
     let b = cleanup man b in
-    let n = List.length a + List.length b in
     let a =
       join_one man a
     in
@@ -104,6 +106,7 @@ module Make(A:DOMAIN) = struct
     List.map (fun t -> A.assign_linexpr man t v l None) t
 
   let to_term env pmod man t var_mapping =
+    let t = cleanup_hard man t in
     let f = A.to_term env pmod in
     let t = List.map (fun t -> f man t var_mapping) t
     |> Term.t_or_simp_l in
