@@ -142,6 +142,8 @@ why3_vc Sub by auto
 
 why3_vc Zero by auto
 
+why3_vc Monotonic using assms by auto
+
 why3_end
 
 section {* Various truncation functions *}
