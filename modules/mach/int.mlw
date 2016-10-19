@@ -129,6 +129,13 @@ module Unsigned
       to_int x + to_int y + to_int c
       /\ 0 <= to_int d <= 1 }
 
+  val sub_with_borrow (x y:t) (b:t) : (t,t)
+    requires { 0 <= to_int b <= 1 }
+    returns { (r, d) ->
+      to_int r - (max+1) * to_int d  =
+      to_int x - to_int y - to_int b
+      /\ 0 <= to_int d <= 1 }
+
   val add3 (x y z:t) : (t,t)
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =

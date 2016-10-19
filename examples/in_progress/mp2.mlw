@@ -497,8 +497,6 @@ module N
              = value_sub_shift x k + l2i y + (power radix k) * l2i !lx
              = value_sub_shift x (p2i !i) + l2i y }
     done;
-    assert { p2i !i = p2i sz \/ l2i !c = 0 };
-    assert { p2i !i < p2i sz -> l2i !c = 0 };
     if Int32.eq !i sz then !c
     else begin
     while Int32.(<) !i sz do
@@ -581,9 +579,9 @@ module N
     done;
     !c
 
-  (** [add r x y sx sy] adds [x] of size [sx] and [y] of size [sy] and writes the result in [r].
-      [sx] must be greater than or equal to [sy]. Returns carry, either 0 or 1. Corresponds to
-      [mpn_add]. *)
+  (** [add r x y sx sy] adds [(x, sx)] to [(y,sy)] and writes the
+      result in [(r, sx)].  [sx] must be greater than or equal to
+      [sy]. Returns carry, either 0 or 1. Corresponds to [mpn_add]. *)
   let add (r x y:t) (sx sy:int32) : limb
     requires { 0 <= p2i sy <= p2i sx }
     requires { valid_ptr_itv x (p2i sx) }
@@ -594,7 +592,7 @@ module N
     ensures { 0 <= l2i result <= 1 }
     writes { r.data.contents.elts }
  =
-    let limb_zero = UInt32.of_int 0 in
+    let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let c = ref limb_zero in
@@ -677,6 +675,236 @@ module N
                  + value_sub_shift y (p2i sy) }
     done;
     !c
+
+  (** [sub_limb r x y sz] substracts [y] from [(x, sz)] and writes
+      the result to [(r, sz)]. Returns borrow, either 0 or
+      1. Corresponds to [mpn_sub_1]. *)
+  let sub_limb (r x:t) (y:limb) (sz:int32) : limb
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    requires { 0 < p2i sz }
+    ensures { value_sub_shift r (p2i sz) - power radix (p2i sz) * l2i result
+              = value_sub_shift x (p2i sz) - l2i y }
+    ensures { 0 <= l2i result <= 1 }
+    writes { r.data.contents.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let b = ref y in
+    let lx = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz && UInt32.ne !b limb_zero do
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { p2i !i > 0 -> 0 <= l2i !b <= 1 }
+      invariant { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+                  = value_sub_shift x (p2i !i) - l2i y }
+      variant { p2i sz - p2i !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      let (res, borrow) = sub_with_borrow !lx !b limb_zero in
+      set_ofs r !i res;
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+                 value_sub_shift x (p2i !i) - l2i y };
+      b := borrow;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+                  = value_sub_shift x (p2i !i) - l2i y
+             by
+               value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+             = value_sub_shift r k + power radix k * l2i res
+                 - power radix (p2i !i) * l2i !b
+             = value_sub_shift r k + power radix k * l2i res
+                 - power radix k * radix * l2i !b
+             = value_sub_shift r k + power radix k * (l2i res - radix * l2i !b)
+             = value_sub_shift r k +
+                 (power radix k) * (l2i !lx - l2i (!b at StartLoop))
+             = value_sub_shift r k - power radix k * l2i (!b at StartLoop)
+                 + power radix k * l2i !lx
+             = value_sub_shift x k - l2i y + power radix k * l2i !lx
+             = value_sub_shift x (p2i !i) - l2i y
+      };
+    done;
+    if Int32.eq !i sz then !b
+    else begin
+    while Int32.(<) !i sz do
+      invariant { l2i !b = 0 }
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+                   = value_sub_shift x (p2i !i) - l2i y }
+      variant { p2i sz - p2i !i }
+      lx := get_ofs x !i;
+      set_ofs r !i !lx;
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+                   = value_sub_shift x (p2i !i) - l2i y };
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+    done;
+    !b
+  end
+
+  (** [sub_limbs r x y sz] substracts [(y, sz)] from [(x, sz)] and
+      writes the result to [(r, sz)]. Returns borrow, either 0 or
+      1. Corresponds to [mpn_sub_n]. *)
+  let sub_limbs (r x y:t) (sz:int32) : limb
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv y (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    ensures { 0 <= l2i result <= 1 }
+    ensures { value_sub_shift r (p2i sz) - power radix (p2i sz) * l2i result
+              = value_sub_shift x (p2i sz) - value_sub_shift y (p2i sz) }
+    writes { r.data.contents.elts }
+  =
+    let limb_zero = UInt32.of_int 0 in
+    let lx = ref limb_zero in
+    let ly = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b
+                  = value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i) }
+      invariant { 0 <= l2i !b <= 1 }
+      label StartLoop in
+      lx := get_ofs x !i;
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs r !i res;
+      assert { value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b =
+      value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i) };
+      b := borrow;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_tail (pelts y) y.offset (y.offset + k);
+      assert { value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b
+                  = value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i)
+               by
+                 value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+               = value_sub_shift r k + power radix k * l2i res
+                   - power radix (p2i !i) * l2i !b
+               = value_sub_shift r k + power radix k * l2i res
+                   - power radix k * radix * l2i !b
+               = value_sub_shift r k
+                 + power radix k * (l2i res - radix * l2i !b)
+               = value_sub_shift r k
+                 + power radix k * (l2i !lx - l2i !ly - l2i (!b at StartLoop))
+               = value_sub_shift r k - power radix k * l2i (!b at StartLoop)
+                 + power radix k * (l2i !lx - l2i !ly)
+               = value_sub_shift x k - value_sub_shift y k
+                 + power radix k * (l2i !lx - l2i !ly)
+               = value_sub_shift x k - value_sub_shift y k
+                 + power radix k * l2i !lx - power radix k * l2i !ly
+               = value_sub_shift x k + power radix k * l2i !lx
+                 - (value_sub_shift y k + power radix k * l2i !ly)
+               = value_sub_shift x (p2i !i)
+                 - (value_sub_shift y k + power radix k * l2i !ly)
+               = value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i)
+        };
+      done;
+      !b
+
+  (** [sub r x y sx sy] adds [(x, sx)] to [(y,sy)] and writes the
+      result in [(r, sx)]. [sx] must be greater than or equal to
+      [sy]. Returns borrow, either 0 or 1. Corresponds to [mpn_sub]. *)
+  let sub (r x y:t) (sx sy:int32) : limb
+    requires { 0 <= p2i sy <= p2i sx }
+    requires { valid_ptr_itv x (p2i sx) }
+    requires { valid_ptr_itv y (p2i sy) }
+    requires { valid_ptr_itv r (p2i sx) }
+    ensures { value_sub_shift r (p2i sx)  - power radix (p2i sx) * l2i result
+              = value_sub_shift x (p2i sx) - value_sub_shift y (p2i sy) }
+    ensures { 0 <= l2i result <= 1 }
+    writes { r.data.contents.elts }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let ly = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    let one = Int32.of_int 1 in
+    while Int32.(<) !i sy do
+      variant { p2i sy - p2i !i }
+      invariant { 0 <= p2i !i <= p2i sy }
+      invariant { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+                  value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i) }
+      invariant { 0 <= l2i !b <= 1 }
+      label StartLoop in
+      lx := get_ofs x !i;
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs r !i res;
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+                  value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i) };
+      b := borrow;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i one;
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_tail (pelts y) y.offset (y.offset + k);
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+              value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i)
+              by
+              value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+              = value_sub_shift r k + power radix k * l2i res
+                - power radix (p2i !i) * l2i !b
+              = value_sub_shift r k + power radix k * l2i res
+                - (power radix k) * radix * l2i !b
+              = value_sub_shift r k
+                + power radix k * (l2i res - radix * l2i !b)
+              = value_sub_shift r k
+                + power radix k * (l2i !lx - l2i !ly - l2i (!b at StartLoop))
+              = value_sub_shift r k - (power radix k) * l2i (!b at StartLoop)
+                + power radix k * (l2i !lx - l2i !ly)
+              = value_sub_shift x k - value_sub_shift y k
+                + power radix k * (l2i !lx - l2i !ly)
+              = value_sub_shift x k + power radix k * l2i !lx
+                - value_sub_shift y k - power radix k * l2i !ly
+              = value_sub_shift x (p2i !i)
+                - (value_sub_shift y k + power radix k * l2i !ly)
+              = value_sub_shift x (p2i !i) - value_sub_shift y (p2i !i) };
+    done;
+    while Int32.(<) !i sx do
+      variant { p2i sx - p2i !i }
+      invariant { p2i sy <= p2i !i <= p2i sx }
+      invariant { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+                  value_sub_shift x (p2i !i) - value_sub_shift y (p2i sy) }
+      invariant { 0 <= l2i !b <= 1 }
+      label StartLoop2 in
+      lx := get_ofs x !i;
+      let res, borrow = sub_with_borrow !lx limb_zero !b in
+      set_ofs r !i res;
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+      value_sub_shift x (p2i !i) - value_sub_shift y (p2i sy) };
+      b := borrow;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i one;
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      assert { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b =
+               value_sub_shift x (p2i !i) - value_sub_shift y (p2i sy)
+            by
+              value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
+            = value_sub_shift r k + power radix k * l2i res
+              - (power radix (p2i !i)) * l2i !b
+            = value_sub_shift r k + power radix k * l2i res
+              - (power radix k) * radix * l2i !b
+            = value_sub_shift r k + power radix k * (l2i res - radix * l2i !b)
+            = value_sub_shift r k
+              + power radix k * (l2i !lx - 0 - l2i (!b at StartLoop2))
+            = value_sub_shift r k - (power radix k) * l2i (!b at StartLoop2)
+              + (power radix k) * l2i !lx
+            = value_sub_shift x k - value_sub_shift y (p2i sy)
+              + (power radix k) * l2i !lx
+            = value_sub_shift x (p2i !i)
+              - value_sub_shift y (p2i sy) }
+    done;
+    !b
 
     (** {2 Multiplication} *)
 
