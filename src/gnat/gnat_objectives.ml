@@ -209,12 +209,6 @@ let next objective =
    in
    build [] Gnat_config.parallel
 
-let () =
-  let trans =
-    Trans.compose_l Split_goal.split_goal_wp Gnat_split_conj.split_conj in
-  Trans.register_transform_l "split_goal_wp_conj" trans
-    ~desc:"split goal followed by conjunction split"
-
 let strategy =
   match Gnat_config.proof_mode with
   | Gnat_config.Per_Path -> ["path_split"; Gnat_split_conj.split_conj_name]
