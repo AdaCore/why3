@@ -27,10 +27,10 @@
    proof-shell-init-cmd		       "fun pg_repeat f 0 = () | pg_repeat f n = (f(); pg_repeat f (n-1));"))
 
 (defun get-prog-name ()
-  (concat "/home/fumex/why3/bin/why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ()))))
+  (concat "why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ()))))
 
 (defun set-prog-name ()
-  (setq proof-prog-name (concat "/home/fumex/why3/bin/why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ())))))
+  (setq proof-prog-name (concat "why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ())))))
 
 (define-derived-mode whyitp-mode proof-mode
   "Why3ITP script" nil
