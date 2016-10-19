@@ -877,8 +877,8 @@ module Make(E: sig
           let open Term in
           let open Expr in
           let context = ref context in
-          let constraints, to_forget = match p.pp_pat.pat_node with
-            | Pwild -> (fun abs -> abs), []
+          let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
+            | Pwild -> (fun abs -> abs), [], []
             | Pvar(_) -> failwith "pattern"
             | Papp(l, p) ->
               let args = List.map (fun p -> match p.pat_node with
@@ -893,16 +893,23 @@ module Make(E: sig
               let postcondition =
                 t_eps_close vreturn (
                   t_app ps_equ [matched_term; t_var vreturn] None) in
-              linear_expressions_from_term cfg !context postcondition
+              let constr, to_forget = linear_expressions_from_term cfg !context postcondition
+              in
+              let vars_to_forget =
+                get_subvalues matched_term None
+                |> List.map (fun (a, _) -> Term.Mterm.find a (!context).local_vars)
+              in
+              constr, to_forget, vars_to_forget 
 
             | Por(_) -> failwith "pattern or"
             | Pas(_) -> failwith "pattern as"
           in
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !context e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
-              D.forget_array man (constraints abs) (Array.of_list to_forget) false
+              D.forget_array man (constraints abs) (Array.of_list to_forget_before) false
             );
-          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun _ abs -> abs);
+          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs ->
+              D.forget_array man abs (Array.of_list to_forget_end) false);
           e_exns := e_exn :: !e_exns;
         ) l;
       case_e_begin_cp, case_end_cp, (List.concat !e_exns)

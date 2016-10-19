@@ -26,18 +26,31 @@ module Make(A:DOMAIN) = struct
     List.map one_in_many a
     |> List.fold_left (&&) true
 
+  let cleanup man a =
+    List.filter (fun t -> not (A.is_bottom man t)) a
+
+  let threshold = 5
+
+
+  let join_one man = function
+    | [] -> None
+    | t::q -> Some (List.fold_left (A.join man) t q)
+
+  let unwrap_domain = function
+    | None -> []
+    | Some t -> [t]
 
   let join man a b =
-    let a = List.filter (fun t -> not (A.is_bottom man t)) a in
-    let b = List.filter (fun t -> not (A.is_bottom man t)) b in
+    let a = cleanup man a in
+    let b = cleanup man b in
     let a =
-      if List.length a > 6 then
-        [List.fold_left (A.join man) (List.hd a) (List.tl a)]
+      if List.length a > threshold then
+        join_one man a |> unwrap_domain
       else a
     in
     let b =
-      if List.length b > 6 then
-        [List.fold_left (A.join man) (List.hd b) (List.tl b)]
+      if List.length b > threshold then
+        join_one man b |> unwrap_domain
       else b
     in
     let c = a @ b in
@@ -51,31 +64,34 @@ module Make(A:DOMAIN) = struct
         else
           zip (t::a) q
     in
-    match c with
-    | [] -> []
-    | t::q -> zip [t] q
+    zip [] c
 
 
   let join_list man t =
-    List.map (List.filter (fun t -> not (A.is_bottom man t))) t
-    |> List.concat
+    match t with
+    | [] -> []
+    | [t] -> t
+    | t::q ->
+      List.fold_left (join man) t q
   
   let print fmt = List.iter (A.print fmt)
 
   let widening man a b =
-    let a = List.filter (fun t -> not (A.is_bottom man t)) a in
-    let b = List.filter (fun t -> not (A.is_bottom man t)) b in
+    let a = cleanup man a in
+    let b = cleanup man b in
+    let n = List.length a + List.length b in
     let a =
-      if List.length a > 6 then
-        [List.fold_left (A.widening man) (List.hd a) (List.tl a)]
-      else a
+      join_one man a
     in
     let b =
-      if List.length b > 6 then
-        [List.fold_left (A.widening man) (List.hd b) (List.tl b)]
-      else b
+      join_one man b
     in
-    join man a b
+    match a, b with
+    | None, None -> []
+    | None, Some c -> [c]
+    | Some c, None -> [c]
+    | Some c, Some d ->
+        [A.widening man c d]
 
   let meet_lincons_array man t e  = List.map (fun t -> A.meet_lincons_array man t e) t
 
