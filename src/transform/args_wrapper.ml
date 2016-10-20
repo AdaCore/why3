@@ -20,6 +20,11 @@ let fresh_printer =
 
 open Stdlib
 
+let sanitizer x = x (*sanitizer char_to_lalpha char_to_lalpha x*)
+
+let id_unique printer id =
+  id_unique_label printer ~sanitizer:sanitizer id
+
 type name_tables = {
     namespace : namespace;
     known_map : known_map;

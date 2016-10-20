@@ -1,6 +1,9 @@
 ?
 t introduce_premises
 (* print goal with premisses introduced *)
+k
+t cut "y = y"
+t cut "TOTO = TOTO"
 t cut "exists x: int. x = x"
 (* print goal with h in context *)
 t exists "5"

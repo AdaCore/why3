@@ -2,7 +2,7 @@
 theory Test
    use import int.Int
 
-   goal G: forall x. exists y. x = 2 * y
+   goal G: forall x "name:TOTO". forall y. x = y -> x = 2 * y
 
    (*
 ng
