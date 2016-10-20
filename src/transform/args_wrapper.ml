@@ -50,12 +50,19 @@ let add_unsafe (s: string) (id: symb) (tables: name_tables) : name_tables =
 
 (* Adds symbols that are introduced to a constructor *)
 let constructor_add (cl: constructor list) tables : name_tables =
-  (* TODO: add also the projections *)
   List.fold_left
-    (fun tables (c: constructor) ->
-      let id = (fst c).ls_name in
+    (fun tables ((ls, cl): constructor) ->
+      let tables = List.fold_left
+          (fun tables (cs: lsymbol option) ->
+            match cs with
+            | Some cs ->
+                let id = cs.ls_name in
+                let s = id_unique tables.printer id in
+                add_unsafe s (Ls cs) tables
+            | None -> tables) tables cl in
+      let id = ls.ls_name in
       let s = id_unique tables.printer id in
-      add_unsafe s (Ls (fst c)) tables)
+      add_unsafe s (Ls ls) tables)
     tables
     cl
 
@@ -290,7 +297,6 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
               let id = Decl.create_prsymbol (Ident.id_fresh s) in
               let new_name = Ident.id_unique p id.pr_name in
               wrap_to_store t' (f new_name) tail env task
-          | _ -> failwith "Missing argument: expecting a string."
         end
     | Tstring t' ->
         begin
