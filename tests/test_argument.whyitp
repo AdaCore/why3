@@ -1,35 +1,45 @@
-b introduce_premises
+?
+t introduce_premises
 (* print goal with premisses introduced *)
-b cut "exists x: int. x = x"
+t cut "exists x: int. x = x"
 (* print goal with h in context *)
-b exists "5"
+t exists "5"
+list-provers
+t cut "0=0"
+ng
+c Alt-Ergo
+c Alt-ergo
+c CVC4
+g
+p
+c Alt-ergo
 (* print new goal G1 with (x = (2 * 5)) *)
-b case "exists x. exists y. x + y = y - x" "h10"
+t case "exists x. exists y. x + y = y - x" "h10"
 (* print the goal with the hypothesis in context *)
 pg
 (* return to context with positive exists *)
-b cut "exists x. exists y. x + y = 0" "he"
+t cut "exists x. exists y. x + y = 0" "he"
 ng
 (* Have to prove h1 with 2 exists *)
-b exists "4"
+t exists "4"
 (* Instantiate x1 *)
-b cut "forall x. forall y. x + y = 0" "hf"
+t cut "forall x. forall y. x + y = 0" "hf"
 (* print with h2 in context *)
-b instantiate "h2" "4"
+t instantiate "h2" "4"
 (* create h21 which is correct *)
-b exists "3"
+t exists "3"
 (* instantiate y in the goal *)
-b cut "forall y. true -> 4 + y = 0"
+t cut "forall y. true -> 4 + y = 0"
 (* generate h3 *)
-b apply h2
+t apply h2
 (* apply h2 to the goal and generate the new goal*)
 gu
 (* go back to the 4 + 3 = 0 goal *)
-b cut "forall y. y = 5 -> 4 + y = 0"
+t cut "forall y. y = 5 -> 4 + y = 0"
 (* new hypothesis to apply *)
-b apply h3
+t apply h3
 (* apply hypothesis and generate the goal 3 = 5 which is correct. *)
-b remove h2
+t remove h2
 (* remove correct hypothesis h2 *)
-b remove CompatOrderMult
+t remove CompatOrderMult
 (* Success *)
