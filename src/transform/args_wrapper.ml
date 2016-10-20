@@ -170,6 +170,7 @@ type (_, _) trans_typ =
   | Ttysymbol : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
   | Tprsymbol : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
   | Tterm     : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
+  | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula  : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
 
@@ -268,6 +269,17 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
             _ ->  failwith "Theory not found.")
         | _ -> failwith "Missing argument: expecting a theory."
       end
+    | Tstring t' ->
+        begin
+          match l with
+          | s :: tail ->
+              let p = (build_name_tables task).printer in
+              let id = Decl.create_prsymbol (Ident.id_fresh s) in
+              let new_name = Ident.id_unique p id.pr_name in
+              wrap_to_store t' (f new_name) tail env task
+          | _ -> failwith "Missing argument: expecting a string."
+        end
+
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
   fun t f l env -> Trans.store (wrap_to_store t f l env)

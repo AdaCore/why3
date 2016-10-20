@@ -20,9 +20,8 @@ let case t =
   Trans.par [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
 
 (* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
-let cut t =
-  (* let g, task = Task.task_separate_goal task in *)
-  let h = Decl.create_prsymbol (gen_ident "h") in
+let cut name t =
+  let h = Decl.create_prsymbol (gen_ident name) in
   let g_t = Decl.create_prop_decl Decl.Pgoal h t in
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
   let goal_cut = Trans.goal (fun _ _ -> [g_t]) in
@@ -83,24 +82,6 @@ let remove_task_decl (name: Ident.ident) : task trans =
 let remove name =
   remove_task_decl name.pr_name
 
-(* let pr_prsymbol pr = *)
-(*   match pr with *)
-(*   | Decl {d_node = Dprop (_pk, pr, _t)} -> Some pr *)
-(*   | _ -> None *)
-
-(* (\* Looks for the hypothesis name and return it. If not found return None *\) *)
-(* let find_hypothesis_aux (name:Ident.ident) (d: task_hd) (ndecl: tdecl option) = *)
-(*   match ndecl with *)
-(*   | Some pr -> Some pr *)
-(*   | None -> *)
-(*       (match d.task_decl.td_node with *)
-(*       | Decl {d_node = Dprop (_pk, pr, _t)} when Ident.id_equal pr.pr_name name -> Some d.task_decl *)
-(*       | _ -> None) *)
-
-(* (\* Return a tdecl option trans which is the specific declaration name name *\) *)
-(* let find_hypothesis (name: Ident.ident) = *)
-(*   Trans.fold (find_hypothesis_aux name) *)
-
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
 let instantiate (pr: Decl.prsymbol) t =
@@ -113,24 +94,6 @@ let instantiate (pr: Decl.prsymbol) t =
           let new_decl = create_prop_decl pk new_pr t_subst in
           [d; new_decl]
       | _ -> [d]) None
-
-(* (\* from task [delta, name:forall x.A |- G, *)
-(*      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *\) *)
-(* let instantiate (pr:Decl.prsymbol) t task = *)
-(*   let name = pr.pr_name in *)
-(*   (\* let g, task = Task.task_separate_goal task in *\) *)
-(*   let ndecl = Trans.fold (find_hypothesis name) task in *)
-(*   match ndecl with *)
-(*   | None -> Format.printf "Hypothesis %s not found@." name.Ident.id_string; *)
-(*     Task.add_tdecl task g *)
-(*   | Some decl -> (match decl.td_node with *)
-(*     | Decl {d_node = Dprop (pk, _pr, ht)} -> *)
-(*       let t_subst = subst_forall ht t in *)
-(*       let new_pr = create_prsymbol (Ident.id_clone name) in *)
-(*       let new_decl = create_prop_decl pk new_pr t_subst in *)
-(*       let task = add_decl task new_decl in *)
-(*         Task.add_tdecl task g *)
-(*     | _ -> Format.printf "Not an hypothesis@."; Task.add_tdecl task g) *)
 
 (* TODO find correct librrary *)
 let choose_option a b =
@@ -244,7 +207,7 @@ let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
 let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula Ttrans_l) case)
-let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula Ttrans_l) cut)
+let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tstring (Tformula Ttrans_l)) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
 let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
