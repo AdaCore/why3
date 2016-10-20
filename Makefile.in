@@ -301,6 +301,8 @@ install_no_local:: clean_old_install
 	$(MKDIR_P) $(DATADIR)/why3
 	$(MKDIR_P) $(DATADIR)/why3/images
 	$(MKDIR_P) $(DATADIR)/why3/vim
+	$(MKDIR_P) $(DATADIR)/why3/vim/ftdetect
+	$(MKDIR_P) $(DATADIR)/why3/vim/syntax
 	$(MKDIR_P) $(DATADIR)/why3/lang
 	$(MKDIR_P) $(DATADIR)/why3/theories
 	$(MKDIR_P) $(DATADIR)/why3/modules/mach
@@ -320,7 +322,8 @@ install_no_local:: clean_old_install
 	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
 	$(INSTALL_DATA) share/Makefile.config $(DATADIR)/why3
-	$(INSTALL_DATA) share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
+	$(INSTALL_DATA) share/vim/ftdetect/why3.vim $(DATADIR)/why3/vim/ftdetect/why3.vim
+	$(INSTALL_DATA) share/vim/syntax/why3.vim $(DATADIR)/why3/vim/syntax/why3.vim
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
 install_no_local_lib::
