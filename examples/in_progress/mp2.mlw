@@ -1616,7 +1616,78 @@ module N
              so
              (power radix (p2i sx + p2i sy))*l2i !c <
                     (power radix (p2i sx))*(power radix (p2i sy))  }
+
+
+  (** {2 Logical operations} *)
+
+  use import int.ComputerDivision
+
+  val lsld (x cnt:limb) : (limb,limb)
+    requires { 0 < l2i cnt < 32 }
+    returns { (r,d) -> l2i r + radix * l2i d =
+              (power 2 (l2i cnt)) * l2i x }
+
+  val lsl (x cnt:limb) : limb
+    requires { 0 < l2i cnt < 32 }
+    ensures { l2i result =
+              (l2i x) * (mod (power 2 (l2i cnt)) radix) }
+
+  val lsr (x cnt:limb) : limb
+    requires { 0 < l2i cnt < 32 }
+    ensures { l2i result = div (l2i x) (power 2 (l2i cnt)) }
+
+  (** [lshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the left and
+      writes the result in [(r, sz)]. Returns the [cnt] most significant
+      bits of [(x, sz)]. *)
+  (*TODO overlapping allowed if r >= x*)
+  let lshift (r x:t) (sz:int32) (cnt:uint32) : limb
+    requires { 0 < l2i cnt < 32 }
+    requires { valid_ptr_itv r (p2i sz) }
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { 0 < p2i sz }
+    ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =    
+              value_sub_shift x (p2i sz) * (power 2 (l2i cnt)) }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let minus_one = Int32.of_int (-1) in
+    let msb = Int32.(-) sz one in
+    let xp = ref (M.incr x msb) in
+    let rp = ref (M.incr r msb) in
+    let high = ref limb_zero in
+    let low = ref (M.get !xp) in
+    let i = ref msb in
+    let l, retval = lsld !low cnt in
+    high := l;
+    while (Int32.(>) !i zero) do
+      variant { p2i !i }
+      invariant { 0 <= p2i !i < p2i sz }
+      invariant { radix * value_sub (pelts r) (r.offset + 1 + p2i !i) (r.offset + p2i sz)
+                  + (power radix (p2i sz - p2i !i)) * l2i retval + l2i !high
+                = value_sub_shift !xp (p2i sz - p2i !i) 
+                  * (power 2 (l2i cnt)) }
+      invariant { (!rp).offset = r.offset + p2i !i }
+      invariant { (!xp).offset = x.offset + p2i !i }
+      invariant { plength !rp = plength r }
+      invariant { pelts !rp = pelts r }
+      invariant { plength !xp = plength x }
+      invariant { pelts !xp = pelts x }
+      xp := M.incr !xp minus_one;
+      low := M.get !xp;
+      let l,h = lsld !low cnt in
+      M.set !rp (Limb.(+) !high h); (*TODO should be (disjoint) logical or *)
+      rp := M.incr !rp minus_one;
+      high := l;
+      i := Int32.(-) !i one;
+   done;
+   M.set !rp !high;
+   retval 
+
 end
+
+
+
 
 (*
 module Heap
