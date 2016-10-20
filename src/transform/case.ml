@@ -12,15 +12,15 @@ let gen_ident = Ident.id_fresh
 
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
-let case t =
-  let h = Decl.create_prsymbol (gen_ident "h") in
-  let hnot = Decl.create_prsymbol (gen_ident "hnot") in
+let case t name =
+  let h = Decl.create_prsymbol (gen_ident name) in
+  let hnot = Decl.create_prsymbol (gen_ident name) in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
   Trans.par [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
 
 (* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
-let cut name t =
+let cut t name =
   let h = Decl.create_prsymbol (gen_ident name) in
   let g_t = Decl.create_prop_decl Decl.Pgoal h t in
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
@@ -206,8 +206,8 @@ let apply pr task =
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
-let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula Ttrans_l) case)
-let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tstring (Tformula Ttrans_l)) cut)
+let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula (Tstring Ttrans_l)) case)
+let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula (Tstring Ttrans_l)) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
 let () = register_transform_with_args ~desc:"test instantiate" "instantiate"

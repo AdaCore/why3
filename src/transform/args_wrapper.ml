@@ -196,6 +196,11 @@ let parse_and_type ~as_fmla s task =
   in
   t
 
+let last_trans: type a b. (a, b) trans_typ -> bool = function
+  | Ttrans -> true
+  | Ttrans_l -> true
+  | _ -> false
+
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> task -> b =
   fun t f l env task ->
     match t with
@@ -269,6 +274,24 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
             _ ->  failwith "Theory not found.")
         | _ -> failwith "Missing argument: expecting a theory."
       end
+(* TODO: Tstring is an optional argument if given last. Replaced by a new ident for "h" if
+   no arguments is given *)
+(* TODO: ugly. Did not know how to use function trans for this. Did not investigate further *)
+    | Tstring t' when (last_trans t') ->
+        begin
+          match l with
+          | [] -> (* No more arguments, we build a string *)
+              let p = (build_name_tables task).printer in
+              let id = Decl.create_prsymbol (Ident.id_fresh "h") in
+              let new_name = Ident.id_unique p id.pr_name in
+              wrap_to_store t' (f new_name) [] env task
+          | s :: tail ->
+              let p = (build_name_tables task).printer in
+              let id = Decl.create_prsymbol (Ident.id_fresh s) in
+              let new_name = Ident.id_unique p id.pr_name in
+              wrap_to_store t' (f new_name) tail env task
+          | _ -> failwith "Missing argument: expecting a string."
+        end
     | Tstring t' ->
         begin
           match l with
@@ -279,7 +302,6 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
               wrap_to_store t' (f new_name) tail env task
           | _ -> failwith "Missing argument: expecting a string."
         end
-
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
   fun t f l env -> Trans.store (wrap_to_store t f l env)

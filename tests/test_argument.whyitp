@@ -1,19 +1,19 @@
 b introduce_premises
 (* print goal with premisses introduced *)
-b cut "He" "exists x: int. x = x"
+b cut "exists x: int. x = x"
 (* print goal with h in context *)
 b exists "5"
 (* print new goal G1 with (x = (2 * 5)) *)
-b case "exists x. exists y. x + y = y - x"
+b case "exists x. exists y. x + y = y - x" "h10"
 (* print the goal with the hypothesis in context *)
 pg
 (* return to context with positive exists *)
-b cut "H" "exists x. exists y. x + y = 0"
+b cut "exists x. exists y. x + y = 0" "he"
 ng
 (* Have to prove h1 with 2 exists *)
 b exists "4"
 (* Instantiate x1 *)
-b cut "H" "forall x. forall y. x + y = 0"
+b cut "forall x. forall y. x + y = 0" "hf"
 (* print with h2 in context *)
 b instantiate "h2" "4"
 (* create h21 which is correct *)
