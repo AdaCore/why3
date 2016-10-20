@@ -1,5 +1,6 @@
 module Make(S:sig
     val env: Env.env
+    module D: Domain.DOMAIN
   end) = struct
 
   let env = S.env
@@ -13,7 +14,7 @@ module Make(S:sig
     let module AI = Ai_cfg.Make(struct
         let env = env
         let pmod = pmod
-        module D = Disjunctive_domain.Make(Domain.Polyhedra)
+        module D = S.D
       end)
     in
 
@@ -55,11 +56,12 @@ module Make(S:sig
           Expr.print_expr Format.err_formatter e;
           raise Not_found
         end
-      | Efor(pv, (f, d, t), inv, e_loop) ->
+      | Efor(pv, (f, d, to_), inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
-        let inv = (AI.domain_to_term cfg new_inv) :: inv in
-        Pretty.print_term Format.err_formatter (List.hd inv);
-        e_for pv (e_var f) d (e_var t) inv (r e_loop)
+        let t = AI.domain_to_term cfg new_inv in
+        let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
+        let inv = t :: inv in
+        e_for pv (e_var f) d (e_var to_) inv (r e_loop)
     in
 
     let clone_infer_pdecl pdecl =

@@ -50,6 +50,21 @@ module McCarthy91
       end
     done;
     !n
+  
+  let f91_nonrec_hard (n0: int)  ensures { result = spec n0 }
+  = let e = ref 1 in
+    let n = ref n0 in
+    while !e > 0 do
+      variant   { 101 - !n + 10 * !e, !e }
+      if !n > 100 then begin
+        n := !n - 10;
+        e := !e - 1
+      end else begin
+        n := !n + 11;
+        e := !e + 1
+      end
+    done;
+    !n
 
   (* Use a 'morally' irrelevant control flow from a recursive function
      to ease proof (the recursive structure does not contribute to the

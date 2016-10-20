@@ -112,4 +112,6 @@ module Make(A:DOMAIN) = struct
     |> Term.t_or_simp_l in
     Pretty.print_term Format.err_formatter t;
     t
+
+  let push_label man env i t = List.map (A.push_label man env i) t
 end

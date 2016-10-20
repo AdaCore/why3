@@ -18,7 +18,11 @@ module type DOMAIN = sig
   val forget_array: man -> t -> Var.t array -> bool -> t
   val assign_linexpr: man -> t -> Var.t -> Linexpr1.t -> t option -> t
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
+
+  val push_label: man -> env -> int -> t -> t
 end
 
 module Polyhedra: DOMAIN
+module Box: DOMAIN
+module Oct: DOMAIN
 

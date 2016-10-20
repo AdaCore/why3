@@ -4,54 +4,64 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../while7.mlw" expanded="true">
-<theory name="While7" sum="541d7c6e23b370aaed84131c842ee501" expanded="true">
- <goal name="VC b" expl="VC for b" expanded="true">
+<prover id="2" name="Z3" version="4.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../while7.mlw">
+<theory name="While7" sum="541d7c6e23b370aaed84131c842ee501">
+ <goal name="VC b" expl="VC for b">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.04" steps="19"/></proof>
  </goal>
 </theory>
 </file>
-<file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="30f8cae141f0726433bfef1c717e1cd5" expanded="true">
- <goal name="VC f91" expl="VC for f91" expanded="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="16"/></proof>
+<file name="../mccarthy.mlw">
+<theory name="McCarthy91" sum="df478ba464216c8d0c863de716b370c3">
+ <goal name="VC f91" expl="VC for f91">
+ <proof prover="1"><result status="valid" time="0.05" steps="16"/></proof>
  </goal>
- <goal name="VC f91_nonrec" expl="VC for f91_nonrec" expanded="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="17"/></proof>
+ <goal name="VC f91_nonrec" expl="VC for f91_nonrec">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.05" steps="17"/></proof>
  </goal>
- <goal name="VC f91_nonrec2" expl="VC for f91_nonrec2" expanded="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="64"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC f91_nonrec2" expl="VC for f91_nonrec2">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="64"/></proof>
+ <transf name="split_goal_wp">
   <goal name="VC f91_nonrec2.1" expl="1. loop variant decrease">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
   <goal name="VC f91_nonrec2.2" expl="2. loop variant decrease">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
   <goal name="VC f91_nonrec2.3" expl="3. postcondition">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.05" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" expanded="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.04" steps="38"/></proof>
+ <goal name="VC f91_nonrec_hard" expl="VC for f91_nonrec_hard">
+ <proof prover="0" timelimit="5" memlimit="1000" obsolete="true"><result status="unknown" time="0.06"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.05"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="4.83"/></proof>
+ </goal>
+ <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec">
+ <proof prover="1"><result status="valid" time="0.06" steps="38"/></proof>
  </goal>
 </theory>
 </file>
 <file name="../while4.mlw">
 <theory name="While3" sum="55dd1b297add0f001518ec17a1474083">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.07"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.11"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.06" steps="5"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.06" steps="6"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="6"/></proof>
   </goal>
   <goal name="VC b.3" expl="3. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC b.4" expl="4. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="12"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.10" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
@@ -60,29 +70,29 @@
 <file name="../aliasing.mlw">
 <theory name="Aliasing1" sum="b92facd9ff7b78c7ef2009f22f8ee88c">
  <goal name="VC b" expl="VC for b">
- <proof prover="1" obsolete="true"><result status="unknown" time="0.07"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../while5.mlw" expanded="true">
-<theory name="While5" sum="5455649d724dd524f5359cac0c00e99f" expanded="true">
- <goal name="VC b" expl="VC for b" expanded="true">
- <proof prover="1" obsolete="true"><result status="unknown" time="0.10"/></proof>
- <transf name="split_goal_wp" expanded="true">
+<file name="../while5.mlw">
+<theory name="While5" sum="5455649d724dd524f5359cac0c00e99f">
+ <goal name="VC b" expl="VC for b">
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.12"/></proof>
+ <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="3"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.10" steps="3"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="3"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.11"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.11" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
@@ -91,8 +101,8 @@
 <file name="../while3.mlw">
 <theory name="While3" sum="71bb287b595da289568a20adb87aca45">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.12"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="5"/></proof>
@@ -101,8 +111,8 @@
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC b.3" expl="3. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="8"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
@@ -111,15 +121,15 @@
 <file name="../tuple2.mlw">
 <theory name="Tuple2" sum="ed583a881844154e97ad906f31cfed3d">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.07"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="4"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.10" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
@@ -128,8 +138,8 @@
 <file name="../while2.mlw">
 <theory name="While2" sum="70623e70d262973f6667539d9999118b">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.07"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.11"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="5"/></proof>
@@ -138,24 +148,31 @@
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC b.3" expl="3. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="8"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../try1.mlw" expanded="true">
-<theory name="Try1" sum="1504cfe9b98911db84ce9af63b3b50a0" expanded="true">
- <goal name="VC b" expl="VC for b" expanded="true">
- <proof prover="1" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <transf name="split_goal_wp" expanded="true">
+<file name="../twoway.mlw">
+<theory name="TwoWaySort" sum="566ceeb325334d75d26216af6f05d5f5">
+ <goal name="VC two_way_sort" expl="VC for two_way_sort">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.15" steps="445"/></proof>
+ </goal>
+</theory>
+</file>
+<file name="../try1.mlw">
+<theory name="Try1" sum="1504cfe9b98911db84ce9af63b3b50a0">
+ <goal name="VC b" expl="VC for b">
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="4"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="3"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.10" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
@@ -164,15 +181,15 @@
 <file name="../try2.mlw">
 <theory name="Try2" sum="9aec6dbcd6a34596ce132a3448cc5453">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.12"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="4"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
@@ -181,15 +198,15 @@
 <file name="../minus1.mlw">
 <theory name="Minus1" sum="1638c22ccc591d520f956f0fce2d432c">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.07"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.11"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.06" steps="5"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="4"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
@@ -198,15 +215,15 @@
 <file name="../tuple1.mlw">
 <theory name="Tuple1" sum="ed583a881844154e97ad906f31cfed3d">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.11"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.06" steps="5"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.08" steps="5"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="4"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
@@ -215,15 +232,15 @@
 <file name="../while1.mlw">
 <theory name="While1" sum="1a1244d8960beea766708919499d4f01">
  <goal name="VC b" expl="VC for b">
- <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
- <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.09"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.10"/></proof>
+ <proof prover="1" timelimit="1" obsolete="true"><result status="unknown" time="0.11"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC b.1" expl="1. loop variant decrease">
   <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
   <goal name="VC b.2" expl="2. postcondition">
-  <proof prover="0" obsolete="true"><result status="unknown" time="0.07"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07" steps="2"/></proof>
+  <proof prover="0" obsolete="true"><result status="unknown" time="0.09"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09" steps="2"/></proof>
   </goal>
  </transf>
  </goal>

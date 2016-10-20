@@ -11,12 +11,12 @@ module Make(E: sig
     module D: DOMAIN
   end) = struct
   
-  let debug_file, debug_fmt =
+  let debug_fmt =
     if Debug.test_flag ai_print_domains then
       let d = open_out "dbg.dot" in
-      Some d, Some (Format.formatter_of_out_channel d)
+      Some (Format.formatter_of_out_channel d)
     else
-      None, None
+      None
 
   let _ =
     match debug_fmt with
@@ -148,6 +148,7 @@ module Make(E: sig
     cfg.apply <- begin fun man h tabs ->
       if h = hedge then
         let abs = tabs.(0) in
+        let abs = D.push_label man cfg.env h abs in
         (), f man abs
       else old_apply man h tabs
     end;
@@ -1053,85 +1054,81 @@ module Make(E: sig
   
   
   let eval_fixpoints cfg =
-    try
-      begin
-        let manager = get_fixpoint_man cfg manpk in
-        let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
-        let sinit = PSette.singleton compare_no_closured 0 in
-        let make_strategy =
-          fun is_active ->
-            Fixpoint.make_strategy_default
-              ~widening_start:5 ~widening_descend:2
-              ~priority:(PSHGraph.Filter is_active)
-              ~vertex_dummy ~hedge_dummy
-              cfg.g sinit
-        in
-        let output = Fixpoint.analysis_guided
-            manager cfg.g sinit make_strategy
-        in
-        (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
-        let l = ref [] in
-        PSHGraph.iter_vertex output
-          (fun vtx abs ~pred:_ ~succ:_ ->
-             l := (vtx, abs) :: !l);
+    begin
+      let manager = get_fixpoint_man cfg manpk in
+      let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
+      let sinit = PSette.singleton compare_no_closured 0 in
+      let make_strategy =
+        fun is_active ->
+          Fixpoint.make_strategy_default
+            ~widening_start:7 ~widening_descend:2
+            ~priority:(PSHGraph.Filter is_active)
+            ~vertex_dummy ~hedge_dummy
+            cfg.g sinit
+      in
+      let output = Fixpoint.analysis_guided
+          manager cfg.g sinit make_strategy
+      in
+      (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
+      let l = ref [] in
+      PSHGraph.iter_vertex output
+        (fun vtx abs ~pred:_ ~succ:_ ->
+           l := (vtx, abs) :: !l);
 
-        if Debug.test_flag ai_print_domains then
-          begin
-            let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
-            List.iter (fun (vtx, abs) ->
-                printf "acc(%i) = %a@."
-                  vtx (D.print) abs;
-                (*let gen = Abstract1.to_generator_array manpk abs in
+      if Debug.test_flag ai_print_domains then
+        begin
+          let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
+          List.iter (fun (vtx, abs) ->
+              printf "acc(%i) = %a@."
+                vtx (D.print) abs;
+              (*let gen = Abstract1.to_generator_array manpk abs in
                 Generator1.array_print Format.std_formatter gen;
                 let n = Generator1.array_length gen in
                 for i = 0 to n - 1 do
-                  let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
-                  Linexpr1.print Format.std_formatter linexpr;
-                  Format.printf " = ";
-                  Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
-                  Format.printf "@.";
+                let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
+                Linexpr1.print Format.std_formatter linexpr;
+                Format.printf " = ";
+                Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
+                Format.printf "@.";
                 done;
                 Format.printf "@.";*)
-              ) l;
+            ) l;
 
-            let l = ref [] in
-            Hashtbl.iter (fun a b ->
-                l := (a, b) :: !l;
-              ) cfg.expr_to_control_point;
-            let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
-            List.iter (fun (a, b) ->
+          let l = ref [] in
+          Hashtbl.iter (fun a b ->
+              l := (a, b) :: !l;
+            ) cfg.expr_to_control_point;
+          let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
+          List.iter (fun (a, b) ->
 
-                Format.eprintf "%d -> " b;
-                Expr.print_expr Format.err_formatter a;
-                Format.eprintf "@."
-              ) l;
+              Format.eprintf "%d -> " b;
+              Expr.print_expr Format.err_formatter a;
+              Format.eprintf "@."
+            ) l;
 
-            (* Print loop invariants *)
+          (* Print loop invariants *)
 
-            Format.printf "Loop invariants:\n@.";
+          Format.printf "Loop invariants:\n@.";
 
-            List.iter (fun (expr, cp) ->
-                Format.printf "For:@.";
-                Expr.print_expr Format.std_formatter expr;
-                Format.printf "@.";
-                let abs = PSHGraph.attrvertex output cp in
-                Format.printf "%a@." D.print abs;
-                Pretty.forget_all ();
-                Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
-                printf "@."
-              ) cfg.loop_invariants;
+          List.iter (fun (expr, cp) ->
+              Format.printf "For:@.";
+              Expr.print_expr Format.std_formatter expr;
+              Format.printf "@.";
+              let abs = PSHGraph.attrvertex output cp in
+              Format.printf "%a@." D.print abs;
+              Pretty.forget_all ();
+              Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
+              printf "@."
+            ) cfg.loop_invariants;
 
-            match debug_fmt with
-            | Some debug_fmt -> Format.fprintf debug_fmt "}@.";
-            | None -> ()
-          end;
-        List.map (fun (expr, cp) ->
-            let abs = PSHGraph.attrvertex output cp in
-            expr, abs
-          ) cfg.loop_invariants
-      end
-    with Manager.Error(exc) ->
-      Manager.print_exclog Format.err_formatter exc;
-      raise (Manager.Error (exc))
+          match debug_fmt with
+          | Some debug_fmt -> Format.fprintf debug_fmt "}@.";
+          | None -> ()
+        end;
+      List.map (fun (expr, cp) ->
+          let abs = PSHGraph.attrvertex output cp in
+          expr, abs
+        ) cfg.loop_invariants
+    end
 
 end

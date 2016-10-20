@@ -18,13 +18,19 @@ module type DOMAIN = sig
   val forget_array: man -> t -> Var.t array -> bool -> t
   val assign_linexpr: man -> t -> Var.t -> Linexpr1.t -> t option -> t
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
+  val push_label: man -> env -> int -> t -> t
 end
 
-module Polyhedra = struct
-  type man = Polka.strict Polka.t Manager.t
-  type env = Environment.t
-  type t = Polka.strict Polka.t Abstract1.t
-  let create_manager = Polka.manager_alloc_strict
+module Make_from_apron(M:sig
+    type man
+    type env
+    type t
+    val create_manager: unit -> man
+  end) = struct
+  type man = M.man
+  type env = M.env
+  type t = M.t
+  let create_manager = M.create_manager
 
 
   module A = Abstract1
@@ -159,4 +165,27 @@ module Polyhedra = struct
       lincons_array_to_term a variable_mapping
     in domain_to_term
 
+  let push_label _ _ _ t = t
+
 end
+
+module Polyhedra = Make_from_apron(struct
+  type man = Polka.strict Polka.t Manager.t
+  type env = Environment.t
+  type t = Polka.strict Polka.t Abstract1.t
+  let create_manager = Polka.manager_alloc_strict
+  end)
+
+module Box = Make_from_apron(struct
+  type man = Box.t Manager.t
+  type env = Environment.t
+  type t = Box.t Abstract1.t
+  let create_manager = Box.manager_alloc
+  end)
+
+module Oct = Make_from_apron(struct
+  type man = Oct.t Manager.t
+  type env = Environment.t
+  type t = Oct.t Abstract1.t
+  let create_manager = Oct.manager_alloc
+  end)

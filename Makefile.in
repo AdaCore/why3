@@ -122,7 +122,7 @@ EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 ifeq (@enable_infer@,yes)
-EXTLIBS += gmp apron camllib fixpoint ppl polkaMPQ polkaGrid bigarray
+EXTLIBS += gmp apron camllib fixpoint ppl boxMPQ octMPQ polkaMPQ polkaGrid bigarray
 endif
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
@@ -209,7 +209,7 @@ LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
 ifeq (@enable_infer@,yes)
-LIB_ABSINT = domain disjunctive_domain ai_logic apron_to_term ai_cfg infer_ai
+LIB_ABSINT = domain trace_partitioning_domain disjunctive_domain ai_logic apron_to_term ai_cfg infer_ai
 endif
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
@@ -750,7 +750,7 @@ IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
 $(IDEDEP): DEPFLAGS += -I src/ide
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I src/absint
 
 # build targets
 
@@ -875,7 +875,7 @@ lib/coq-tactic/why3tac.cmxs: OFLAGS += $(EXTCMXA)
 
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
 ifeq (@enable_infer@,yes)
-lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint polkaMPQ ppl polkaGrid bigarray")
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ ppl polkaGrid bigarray")
 endif
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
@@ -1959,6 +1959,10 @@ clean::
 # lib/why3/why3extract.cmi for the interface (!!!)
 # same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
 src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+src/tools/why3extract.cmx src/ide/infer_gui.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 

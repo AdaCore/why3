@@ -47,17 +47,7 @@ module Merge
                (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
   = let i = ref l in
     let j = ref m in
-	let uu = r -1 in
-    for k = l to uu do
-      invariant { l <= !i <= m <= !j <= r }
-      invariant { !i - l + !j - m = k - l }
-      invariant { sorted_sub a l k }
-      invariant { forall x y: int. l <= x < k -> !i <= y < m -> le a[x] tmp[y] }
-      invariant { forall x y: int. l <= x < k -> !j <= y < r -> le a[x] tmp[y] }
-      invariant { forall v: elt.
-                  occ v tmp.elts l !i + occ v tmp.elts m !j = occ v a.elts l k }
-      invariant { forall i: int.
-                  (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
+    for k = l to r - 1 do
       if !i < m && (!j = r || le tmp[!i] tmp[!j]) then begin
         a[k] <- tmp[!i];
         i := !i + 1
@@ -78,17 +68,15 @@ module Merge
                (0 <= i < l \/ r <= i < length a) -> a[i] = (old a)[i] }
   = if l < m && m < r then (* both sides are non empty *)
       if le a[m-1] a[m] then (* OPTIM: already sorted *)
-        assert { forall i1 i2: int. l <= i1 < m -> m <= i2 < r ->
-                 le a[i1] a[m-1] && le a[m] a[i2] }
+	  ()
       else begin
         label N in
         blit a l tmp l (r - l);
         merge tmp a l m r;
-        assert { permut_sub (a at N) a l r }
       end
 
 end
-(*
+
 (** {2 Top-down, recursive mergesort}
 
     Split in equal halves, recursively sort the two, and then merge. *)
@@ -105,12 +93,9 @@ module TopDownMergesort
     variant { r - l }
   = if l < r-1 then begin
       let m = l + (r - l) / 2 in
-      assert { l <= m < r };
       mergesort_rec a tmp l m;
-      assert { permut_sub (old a) a l r };
       label M in
       mergesort_rec a tmp m r;
-      assert { permut_sub (a at M) a l r };
       merge_using tmp a l m r;
     end
 
@@ -144,60 +129,21 @@ module BottomUpMergesort
     let tmp = Array.copy a in
     let len = ref 1 in
     while !len < n do
-      invariant { 1 <= !len }
-      invariant { permut_all (old a) a }
-      invariant { forall k: int. let l = k * !len in
-                  0 <= l < n -> sorted_sub a l (min n (l + !len)) }
       variant   { 2 * n - !len }
       label L in
       let lo = ref 0 in
       let ghost i = ref 0 in
       while !lo < n - !len do
-        invariant { 0 <= !lo /\ !lo = 2 * !i * !len }
-        invariant { permut_all (a at L) a }
-        invariant { forall k: int. let l = k * !len in
-                    !lo <= l < n -> sorted_sub a l (min n (l + !len)) }
-        invariant { forall k: int. let l = k * (2 * !len) in
-                    0 <= l < !lo -> sorted_sub a l (min n (l + 2 * !len)) }
         variant   { n + !len - !lo }
         let mid = !lo + !len in
-        assert { mid = (2 * !i + 1) * !len };
-        assert { sorted_sub a !lo (min n (!lo + !len)) };
         let hi = min n (mid + !len) in
-        assert { sorted_sub a mid (min n (mid + !len)) };
         label M in
         merge_using tmp a !lo mid hi;
-        assert { permut_sub (a at M) a !lo hi };
-        assert { permut_all (a at M) a };
-        assert { hi = min n (!lo + 2 * !len) };
-        assert { sorted_sub a !lo (min n (!lo + 2 * !len)) };
-        assert { forall k: int. let l = k * !len in mid + !len <= l < n ->
-                   sorted_sub (a at M) l (min n (l + !len)) &&
-                   sorted_sub a        l (min n (l + !len)) };
-        assert { forall k: int. let l = k * (2 * !len) in 0 <= l < mid + !len ->
-                   k <= !i &&
-                   (k < !i ->
-                     min n (l + 2 * !len) <= !lo &&
-                     sorted_sub (a at M) l (min n (l + 2 * !len)) &&
-                     sorted_sub a        l (min n (l + 2 * !len)) )
-                   &&
-                   (k = !i ->
-                     l = !lo /\ sorted_sub a l (min n (l + 2 * !len)))
-               };
         lo := mid + !len;
         ghost incr i
       done;
-      assert { forall k: int. let l = k * (2 * !len) in 0 <= l < n ->
-               l = (k * 2) * !len &&
-               (l < !lo ->
-                 sorted_sub a l (min n (l + 2 * !len))) &&
-               (l >= !lo ->
-                 sorted_sub a l (min n (l + !len)) &&
-                 min n (l + 2 * !len) = min n (l + !len) = n &&
-                 sorted_sub a l (min n (l + 2 * !len))) };
       len := 2 * !len;
     done;
-    assert { sorted_sub a (0 * !len) (min n (0 + !len)) }
 
 end
 
@@ -222,8 +168,6 @@ module NaturalMergesort
   =
     let i = ref (lo + 1) in
     while !i < length a && le a[!i - 1] a[!i] do
-      invariant { lo < !i <= length a }
-      invariant { sorted_sub a lo !i }
       variant   { length a - !i }
       incr i
     done;
@@ -241,25 +185,17 @@ module NaturalMergesort
     let ghost first_run = ref 0 in
     try
     while true do
-      invariant { 0 <= !first_run <= n && sorted_sub a 0 !first_run }
-      invariant { permut_all (old a) a }
       variant   { n - !first_run }
 	  let ghost fst_run_l = !first_run in
       let lo = ref 0 in
       try
       while !lo < n - 1 do
-        invariant { 0 <= !lo <= n }
-        invariant { fst_run_l <= !first_run <= n }
-        invariant { sorted_sub a 0 !first_run }
-        invariant { !lo = 0 \/ !lo >= !first_run > fst_run_l }
         variant   { n - !lo }
         let mid = find_run a !lo in
         if mid = n then begin if !lo = 0 then raise Return; raise Break end;
         let hi = find_run a mid in
         label M in
         merge_using tmp a !lo mid hi;
-        assert { permut_sub (a at M) a !lo hi };
-        assert { permut_all (a at M) a };
         ghost if !lo = 0 then first_run := hi;
         lo := hi;
       done
@@ -289,16 +225,9 @@ module NaturalMergesort
       if !mid = n then raise Break;
 	  let o = k-1 in
       for i = 0 to o do
-        invariant { lo + i < !mid < n }
-        invariant { sorted_sub a lo !mid }
-        invariant { permut_sub (old a) a lo (length a) }
-        invariant { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
         let hi = naturalrec tmp a !mid i in
-        assert { permut_sub (old a) a lo (length a) };
         label M in
         merge_using tmp a lo !mid hi;
-        assert { permut_sub (a at M) a lo hi };
-        assert { permut_sub (a at M) a lo (length a) };
         mid := hi;
         if !mid = n then raise Break
       done;
@@ -314,4 +243,3 @@ module NaturalMergesort
     ()
 
 end
-*)
