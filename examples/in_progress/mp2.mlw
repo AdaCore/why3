@@ -1,6 +1,5 @@
 module M
 
-
   use import map.Map
   use import mach.int.Unsigned
   use import mach.int.Int32
@@ -1645,7 +1644,7 @@ module N
     requires { valid_ptr_itv r (p2i sz) }
     requires { valid_ptr_itv x (p2i sz) }
     requires { 0 < p2i sz }
-    ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =    
+    ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
               value_sub_shift x (p2i sz) * (power 2 (l2i cnt)) }
   =
     let limb_zero = Limb.of_int 0 in
@@ -1665,7 +1664,7 @@ module N
       invariant { 0 <= p2i !i < p2i sz }
       invariant { radix * value_sub (pelts r) (r.offset + 1 + p2i !i) (r.offset + p2i sz)
                   + (power radix (p2i sz - p2i !i)) * l2i retval + l2i !high
-                = value_sub_shift !xp (p2i sz - p2i !i) 
+                = value_sub_shift !xp (p2i sz - p2i !i)
                   * (power 2 (l2i cnt)) }
       invariant { (!rp).offset = r.offset + p2i !i }
       invariant { (!xp).offset = x.offset + p2i !i }
@@ -1682,7 +1681,16 @@ module N
       i := Int32.(-) !i one;
    done;
    M.set !rp !high;
-   retval 
+   retval
+
+  let from_limb (l:limb) : t
+    ensures { value_sub_shift result 1 = l2i l }
+  =
+    let p = malloc (UInt32.of_int 1) in
+    M.set p l;
+    p
+
+  let main () = from_limb (Limb.of_int 42)
 
 end
 
