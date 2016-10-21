@@ -72,7 +72,7 @@ let introduce_constant ls t_rhs proj_name =
   let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
   let axiom_name = ls.ls_name.id_string^"_proj_axiom_"^proj_name in
   let id_new = Ident.id_user ~label:const_label const_name const_loc in
-  intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name
+  intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name:axiom_name
 
 let get_record_field_suffix projection =
   try
@@ -198,8 +198,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 	      (*let applied_projs = Term.Sls.add proj_function applied_projs in*)
 	      let proj_map_projections_defs =
                 introduce_constant ls proj_map_t proj_name in
-              List.append ldecls (
-                List.append [proj_map_decl;proj_axiom] proj_map_projections_defs)
+              ldecls @ [proj_map_decl;proj_axiom] @ proj_map_projections_defs
             )
 	    []
 	    pfs
@@ -223,7 +222,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 	  (fun l pf_1 ->
 	    if Term.Sls.mem pf_1 applied_projs then
 	      (* Do not apply the same projection twice *)
-	      introduce_constant ls term proj_name
+	      l @ introduce_constant ls term proj_name
 	    else
 	      let t_applied = Term.t_app pf_1 [term] pf_1.ls_value in
 	      let proj_name = proj_name^(get_record_field_suffix pf_1) in
@@ -231,7 +230,7 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 	      (* Return declarations for projections of t_applied = pf_1 term *)
 	      let t_applied_projs =
                  projections_for_term ls t_applied proj_name applied_projs env map_projs in
-	      List.append l t_applied_projs
+              l @ t_applied_projs
 	  )
 	  []
 	  pfs
@@ -270,7 +269,7 @@ let introduce_projs env map_projs decl =
   | Dparam ls_projected ->
     (* Create declarations for a projections of ls_projected *)
     let projection_decls = intro_proj_for_ls env map_projs ls_projected in
-    decl::projection_decls
+    projection_decls
 
       (* TODO
   | Dlogic lslist ->
@@ -279,8 +278,12 @@ let introduce_projs env map_projs decl =
     (* TODO *)
     [decl]
       *)
-  | _ -> [decl]
+  | _ -> []
 
+let introduce_projs env map_projs decl =
+  match decl with
+  | Decl d -> introduce_projs env map_projs d
+  | _ -> []
 
 let build_projections_map projs =
   (* Build map from types (Ty.ty) to projections (Term.lsymbol).
@@ -295,18 +298,31 @@ let build_projections_map projs =
 	  Ty.Mty.find ty_proj_arg proj_map
 	with Not_found -> []
       in
-      let projs_for_ty = List.append projs_for_ty [ls_proj] in
+      let projs_for_ty = ls_proj :: projs_for_ty in
       Ty.Mty.add ty_proj_arg projs_for_ty proj_map
     | _ -> assert false
   in
   Sls.fold build_map projs Ty.Mty.empty
 
-let meta_transform2 env projs =
+(* TODO we want to be able to write this. It seems not possible with Trans and
+   more efficient than the version we have below.
+let meta_transform2 f : Task.task -> Task.task = fun task ->
+  Trans.apply (Trans.fold (fun d t ->
+    Trans.apply (Trans.add_decls (f d)) t) task) task
+*)
+
+(* [meta_transform2 f t] Generate new declarations by applying f to each declaration of t
+   and then append these declarations to t *)
+let meta_transform2 f : Task.task Trans.trans =
+  let list_decl = Trans.fold (fun d l -> l @ (f d)) [] in
+  Trans.bind list_decl (fun x -> Trans.add_decls x)
+
+let encapsulate env projs : Task.task Trans.trans =
   let map_projs = build_projections_map projs in
-  Trans.decl (introduce_projs env map_projs) None
+  meta_transform2 (fun d -> introduce_projs env map_projs d.Task.task_decl.td_node)
 
 let intro_projections_counterexmp env =
-  Trans.on_tagged_ls meta_projection (meta_transform2 env)
+  Trans.on_tagged_ls meta_projection (encapsulate env)
 
 
 let () = Trans.register_env_transform "intro_projections_counterexmp" intro_projections_counterexmp
