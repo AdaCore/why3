@@ -273,10 +273,10 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
         match l with
         | s :: tail ->
           (try
-             let path, name = match Str.split (Str.regexp "\.") s with
+             let path, name = match Strings.split '.' s with
                | [name] -> [],name
                | path::[name] ->
-                 let path = Str.split (Str.regexp "/") path in
+                 let path = Strings.split '/' path in
                  path, name
                | _ -> failwith "Ill-formed theory name"
              in
