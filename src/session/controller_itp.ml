@@ -197,7 +197,7 @@ let run_timeout_handler () =
     end
 
 let schedule_proof_attempt_r c id pr ~limit ~callback =
-  graft_proof_attempt c.controller_session id pr ~timelimit:5;
+  graft_proof_attempt c.controller_session id pr ~timelimit:limit.Call_provers.limit_time;
   Queue.add (c,id,pr,limit,callback) scheduled_proof_attempts;
   callback Scheduled;
   run_timeout_handler ()

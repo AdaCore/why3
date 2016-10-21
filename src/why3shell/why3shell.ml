@@ -137,19 +137,6 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 (* -- declare provers -- *)
 
-(* TODO
-let list_provers _fmt _args =
-  let l =
-    Whyconf.Hprover.fold
-      (fun p _ acc -> (Pp.sprintf "%a" Whyconf.print_prover p)::acc)
-      cont.Controller_itp.controller_provers
-      []
-  in
-  let l = List.sort String.compare l in
-  printf "@[<hov 2>== Known provers ==@\n%a@]@."
-          (Pp.print_list Pp.newline Pp.string) l
-*)
-
 (* Return the prover corresponding to given name. name is of the form
   | name
   | name, version
@@ -164,19 +151,6 @@ let return_prover fmt name =
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))
-
-(* One prover named Alt-Ergo in the config file *)
-(*
-let alt_ergo =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-  (** all provers that have the name "Alt-Ergo" *)
-  let provers = Whyconf.filter_provers config fp in
-  if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
-  end else
-    snd (Whyconf.Mprover.choose provers)
-*)
 
 (* -- init controller -- *)
 
@@ -490,30 +464,40 @@ let then_print f fmt args =
 (* _____________________________________________________________________ *)
 (* -------------------- test with transformations ---------------------- *)
 
-let test_schedule_proof_attempt fmt args =
+let test_schedule_proof_attempt fmt (args: string list) =
   (* temporary : get the first goal *)
-  match args with
-    | [name] ->
-       let id = nearest_goal () in
-       let callback status =
-         match status with
-         | Done _prover_result -> (dump_session_raw fmt []; test_print_goal fmt [];
-                                   fprintf fmt "status: %a@."
-                                     Controller_itp.print_status status)
-         | Scheduled | Running -> ()
-         | _ ->
-             fprintf fmt "status: %a@."
-               Controller_itp.print_status status
-       in
-       let limit = Call_provers.{empty_limit with limit_time = 2} in
-       let np = return_prover fmt name in
-       (match np with
-       | None -> ()
-       | Some p ->
-           C.schedule_proof_attempt
-             cont id p.Whyconf.prover
-         ~limit ~callback)
-    | _ -> printf "Give the prover name@."
+  let id = nearest_goal () in
+  let callback status =
+    match status with
+    | Done _prover_result -> (dump_session_raw fmt []; test_print_goal fmt [];
+                              fprintf fmt "status: %a@."
+                                Controller_itp.print_status status)
+    | Scheduled | Running -> ()
+    | _ ->
+        fprintf fmt "status: %a@."
+          Controller_itp.print_status status
+  in
+  let name, limit = match args with
+  | [name] ->
+      (*let default_limit = ???? (* TODO add default_limit in config_prover *) *)
+      name, Call_provers.{empty_limit with limit_time = 2}
+  | [name; timeout] -> name, Call_provers.{empty_limit with
+                                           limit_time = int_of_string timeout}
+  | [name; timeout; oom ] ->
+      name, Call_provers.{limit_time = int_of_string timeout;
+                          limit_mem = int_of_string oom;
+                          limit_steps = 0}
+  | _ -> printf "Bad arguments prover_name, version timeout memlimit@.";
+      "", Call_provers.empty_limit
+  in
+  let np = return_prover fmt name in
+  (match np with
+  | None -> ()
+  | Some p ->
+      C.schedule_proof_attempt
+        cont id p.Whyconf.prover
+        ~limit ~callback)
+(*    | _ -> printf "Give the prover name@."*)
 
 let apply_transform fmt args =
   match args with
