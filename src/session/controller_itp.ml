@@ -68,7 +68,7 @@ let th_proved c th  = Hid.find_def c.proof_state.th_state false th
 let update_theory th ps =
   let goals = theory_goals th in
   Hid.replace ps.th_state (theory_name th)
-    (List.for_all (fun id -> Hpn.find ps.pn_state id) goals)
+    (List.for_all (fun id -> Hpn.find_def ps.pn_state false id) goals)
 
 let rec propagate_proof c (id: Session_itp.proofNodeID) =
   let tr_list = get_transformations c.controller_session id in
