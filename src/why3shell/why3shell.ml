@@ -159,17 +159,25 @@ module C = Why3.Controller_itp.Make(Unix_scheduler)
 let cont_init () =
   (* create controller *)
   if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
-  let fname = Queue.pop files in
-  let ses =
-    if Filename.check_suffix fname ".xml" then
-      Session_itp.load_session fname
-    else
-      begin
-        Queue.push fname files;
-        Session_itp.empty_session ()
-      end
+  let fname = Queue.peek files in
+  (* extract project directory, and create it if needed *)
+  let dir =
+    if Filename.check_suffix fname ".why" ||
+       Filename.check_suffix fname ".mlw"
+    then begin
+      let dir = Filename.chop_extension fname in
+      if not (Sys.file_exists dir) then
+        Unix.mkdir dir 0o777;
+      dir
+    end
+    else Filename.dirname fname
   in
+  (* we load the session *)
+  let ses = Session_itp.load_session dir in
+  (* create the controller *)
   let c = Controller_itp.create_controller env ses in
+  (* update the session *)
+  C.reload_files c env;
   (* add files to controller *)
   Queue.iter (fun fname -> C.add_file c fname) files;
   (* load provers drivers *)
@@ -371,10 +379,11 @@ let nearest_goal () =
 (* -------------------- printing --------------------------------------- *)
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "%a tl=%d %a"
+  fprintf fmt "%a tl=%d %a obsolete=%a"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option Call_provers.print_prover_result) pa.proof_state
+          pp_print_bool pa.proof_obsolete
 
 let rec print_proof_node s (fmt: Format.formatter) p =
   let parent = match get_proof_parent s p with
@@ -405,28 +414,34 @@ and print_trans_node s fmt id =
   let name = get_transf_name s id in
   let args = get_transf_args s id in
   let l = get_sub_tasks s id in
+  let ll = get_detached_sub_tasks s id in
   let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
   if Controller_itp.tn_proved cont id then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name (Pp.print_list Pp.semi pp_print_string) args parent
+  fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a];@ detached[%a] }@]" name
+    (Pp.print_list Pp.semi pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
+    (Pp.print_list Pp.semi (print_proof_node s)) ll
 
 let print_theory s fmt th : unit =
   if Controller_itp.th_proved cont (theory_name th) then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 1> Theory %s;@ [%a]@]" (theory_name th).Ident.id_string
-    (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) (theory_goals th)
+  fprintf fmt "@[<hv 1> Theory %s;@ [%a];@ detached[%a]@]" (theory_name th).Ident.id_string
+    (Pp.print_list Pp.semi (print_proof_node s)) (theory_goals th)
+    (Pp.print_list Pp.semi (print_proof_node s)) (theory_detached_goals th)
 
-let print_file s fmt (file, thl) =
-  fprintf fmt "@[<hv 1> File %s;@ [%a]@]" file.file_name
+let print_file s fmt (file, thl, detached) =
+  fprintf fmt "@[<hv 1> File %s;@ [%a];@ detached[%a]@]" file.file_name
     (Pp.print_list Pp.semi (print_theory s)) thl
+    (Pp.print_list Pp.semi (print_theory s)) detached
 
 let print_s s fmt =
   fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
 
 let print_session fmt s =
-  let l = Stdlib.Hstr.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
-  fprintf fmt "%a@." (print_s s) l;;
+  let l = Stdlib.Hstr.fold
+      (fun _ f acc -> (f,f.file_theories,f.file_detached_theories) :: acc) (get_files s) [] in
+  fprintf fmt "folder %a %a@." pp_print_string (Session_itp.get_dir s) (print_s s) l;;
 
 let dump_session_raw fmt _args =
   fprintf fmt "%a@." print_session cont.Controller_itp.controller_session
@@ -512,17 +527,12 @@ let apply_transform fmt args =
 
 (*******)
 
-let test_save_session _fmt args =
-  match args with
-  | file :: _ ->
-    Session_itp.save_session (file ^ ".xml") cont.Controller_itp.controller_session;
-    printf "session saved@."
-  | [] ->
-    printf "missing session file name@."
+let test_save_session _fmt _args =
+  Session_itp.save_session cont.Controller_itp.controller_session
 
 let test_reload fmt _args =
   fprintf fmt "Reloading... @?";
-  C.reload_files cont;
+  C.reload_files cont env;
   zipper_init ();
   fprintf fmt "done @."
 
@@ -624,7 +634,7 @@ let commands =
     "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
     "g", "prints the current goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
-    "s", "<file> save the current session in <file>.xml", test_save_session;
+    "s", "save the current session", test_save_session;
     "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
     "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
     "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);

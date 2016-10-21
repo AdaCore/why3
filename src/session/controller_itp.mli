@@ -124,10 +124,10 @@ val run_strategy_on_goal :
     inform of the progress *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
-(** [add_file_to_session cont ?fmt fname] parses the source file
+(** [add_fil cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont] *)
 
-val reload_files : controller -> unit
+val reload_files : controller -> Env.env -> unit
 (** reload the files of the given session:
 
   - each file is parsed again and theories/goals extracted from it. If
@@ -167,9 +167,13 @@ val reload_files : controller -> unit
     generated subgoals are in turn matched to the old sub-goals, in
     the same manner as for goals in a theory
 
+    . an old sub-goals without a match is kept with all its former
+      proof attempts and transformations, but no task is associated to
+      it, neither to its subgoals.
+
   - TODO: the presence of obsolete goals should be returned somehow by
     that function, as the presence of unmatch old theories or goals
 
- *)
+*)
 
 end

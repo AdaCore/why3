@@ -31,14 +31,18 @@ type theory
 
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
+val theory_detached_goals : theory -> proofNodeID list
 
 type file = private {
-  file_name     : string;
-  file_format   : string option;
-  file_theories : theory list;
+  file_name              : string;
+  file_format            : string option;
+  file_theories          : theory list;
+  file_detached_theories : theory list;
 }
 
 val get_files : session -> file Stdlib.Hstr.t
+val get_dir : session -> string
+val get_shape_version : session -> int
 
 (** {2 Proof trees}
 
@@ -53,7 +57,7 @@ type proof_attempt = {
   limit               : Call_provers.resource_limit;
   mutable proof_state : Call_provers.prover_result option;
   (* None means that the call was not done or never returned *)
-  proof_obsolete      : bool;
+  mutable proof_obsolete      : bool;
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
@@ -102,10 +106,10 @@ val print_trans_node : session -> Format.formatter -> transID -> unit
 
 val print_session : Format.formatter -> session -> unit
 
-(* val get_proof_attempts : session -> proofNodeID -> proof_attempt Whyconf.Hprover.t *)
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempts : session -> proofNodeID -> proof_attempt list
 val get_sub_tasks : session -> transID -> proofNodeID list
+val get_detached_sub_tasks : session -> transID -> proofNodeID list
 
 val get_transf_args : session -> transID -> string list
 val get_transf_name : session -> transID -> string
@@ -115,18 +119,20 @@ val get_proof_name : session -> proofNodeID -> Ident.ident
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID
 
-val empty_session : ?shape_version:int -> unit -> session
+val empty_session : ?shape_version:int -> string -> session
+(** create an empty_session in the directory specified by the
+    argument *)
 
 val add_file_section :
-  session -> string -> (Theory.theory list) -> Env.fformat option ->
-  session -> theory list -> unit
-(** [add_file_section s fn ths old_s old_ths] adds a new 'file'
-    section in session [s], named [fn], containing fresh theory
+  ?merge:session*theory list*Env.env -> session -> string ->
+  (Theory.theory list) -> Env.fformat option -> unit
+(** [add_file_section ~merge:(old_s,old_ths,env) s fn ths] adds a new
+    'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
     theory nodes generated are computed using [Task.split_theory]. For
     each theory whose name is identical to one theory of old_ths, it
-    is attempted to associate the old goals, proof_attempts and transformations
-    to the goals of the new theory *)
+    is attempted to associate the old goals, proof_attempts and
+    transformations to the goals of the new theory *)
 
 val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
   timelimit:int -> unit
@@ -155,9 +161,9 @@ val remove_transformation : session -> transID -> unit
 (** [remove_transformation s id] removes the transformation [id]
     from the session [s] *)
 
-val save_session : string -> session -> unit
-(** [save_session f s] Save the session [s] in file [f] *)
+val save_session : session -> unit
+(** [save_session s] Save the session [s] *)
 
 val load_session : string -> session
-(** [load_session f] load a session from a file [f]; all the tasks are
-    initialised to None *)
+(** [load_session dir] load a session in directory [dir]; all the
+    tasks are initialised to None *)
