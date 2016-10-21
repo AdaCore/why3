@@ -9,6 +9,9 @@ let debug = Debug.register_info_flag "session_itp"
 type transID = int
 type proofNodeID = int
 
+let print_proofNodeID fmt id =
+  Format.fprintf fmt "%d" id
+
 type theory = {
   theory_name     : Ident.ident;
   theory_goals    : proofNodeID list;
@@ -236,7 +239,7 @@ let rec print_proof_node s (fmt: Format.formatter) p =
   | Trans id -> (get_transfNode s id).transf_name
   in
   fprintf fmt
-    "@[<hv 2> Goal %s;@ parent %s;@ sum %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    "@[<hv 1> Goal %s;@ parent %s;@ sum %s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@]@]"
     pn.proofn_name.id_string parent
     (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
     (Pp.print_list Pp.semi print_proof_attempt)
@@ -249,7 +252,7 @@ and print_trans_node s fmt id =
   let name = tn.transf_name in
   let l = tn.transf_subtasks in
   let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
-  fprintf fmt "@[<hv 2> Trans %s; args %a; parent %s;@ [%a]@]" name (Pp.print_list Pp.colon pp_print_string) args parent
+  fprintf fmt "@[<hv 1> Trans %s;@ args %a;@ parent %s;@ [%a]@]" name (Pp.print_list Pp.colon pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 

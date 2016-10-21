@@ -27,6 +27,10 @@ type transformation_status = TSscheduled | TSdone of transID  | TSfailed
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 
+type strategy_status = STSgoto of proofNodeID * int | STShalt
+
+val print_strategy_status : Format.formatter -> strategy_status -> unit
+
 module type Scheduler = sig
 
     (** Any module of this signature should implement a scheduler,
@@ -108,6 +112,16 @@ val schedule_transformation :
    goal specified by [id]; the function [cb] will be called each time
    the transformation status changes. Typically at Scheduled, then
    Done tid.*)
+
+
+val run_strategy_on_goal :
+  controller ->
+  proofNodeID ->
+  Strategy.t ->
+  callback:(strategy_status -> unit) -> unit
+(** [run_strategy_on_goal c id strat] executes asynchronously the
+    strategy [strat] on the goal [id].  TODO: add callback to get
+    inform of the progress *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_file_to_session cont ?fmt fname] parses the source file

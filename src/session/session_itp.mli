@@ -17,6 +17,8 @@ unique identifiers of type [proofNodeId]
 type session
 
 type proofNodeID
+val print_proofNodeID : Format.formatter -> proofNodeID -> unit
+
 type transID
 
 module Hpn: Exthtbl.S with type key = proofNodeID

@@ -392,7 +392,7 @@ let rec print_proof_node s (fmt: Format.formatter) p =
     fprintf fmt "P";
 
   fprintf fmt
-    "@[<hv 2> Goal %s; parent %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
+    "@[<hv 2>{ Goal=%s;@ parent=%s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@] }@]"
     (get_proof_name s p).Ident.id_string parent
     (Pp.print_list Pp.semi print_proof_attempt)
     (get_proof_attempts s p)
@@ -408,17 +408,17 @@ and print_trans_node s fmt id =
   let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
   if Controller_itp.tn_proved cont id then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 2> Trans %s; args %a; parent %s;@ [%a]@]" name (Pp.print_list Pp.semi pp_print_string) args parent
+  fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name (Pp.print_list Pp.semi pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 let print_theory s fmt th : unit =
   if Controller_itp.th_proved cont (theory_name th) then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" (theory_name th).Ident.id_string
+  fprintf fmt "@[<hv 1> Theory %s;@ [%a]@]" (theory_name th).Ident.id_string
     (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) (theory_goals th)
 
 let print_file s fmt (file, thl) =
-  fprintf fmt "@[<hv 2> File %s;@ [%a]@]" file.file_name
+  fprintf fmt "@[<hv 1> File %s;@ [%a]@]" file.file_name
     (Pp.print_list Pp.semi (print_theory s)) thl
 
 let print_s s fmt =
@@ -574,9 +574,27 @@ let strategies () =
 
 let list_strategies _fmt _args =
   let l = strategies () in
-  let pp_strat fmt (n,s,_,_) = fprintf fmt "%s: %s" s n in
+  let pp_strat fmt (n,s,desc,_) = fprintf fmt "%s (%s): %s" s n desc in
   printf "@[<hov 2>== Known strategies ==@\n%a@]@."
           (Pp.print_list Pp.newline pp_strat) l
+
+let run_strategy _fmt args =
+  match args with
+  | [s] ->
+     let l = strategies () in
+     let st = List.filter (fun (_,c,_,_) -> c=s) l in
+     begin
+       match st with
+       | [(n,_,_,st)] ->
+          printf "running strategy '%s'@." n;
+          let id = nearest_goal () in
+          let callback sts =
+            printf "Strategy status: %a@." print_strategy_status sts
+          in
+          C.run_strategy_on_goal cont id st ~callback
+       | _ -> printf "Strategy '%s' not found@." s
+     end
+  | _ -> printf "Please give the strategy shortcut as argument@."
 
 (*******)
 
@@ -600,18 +618,19 @@ let commands =
     "list-transforms", "list available transformations", list_transforms;
     "list-strategies", "list available strategies", list_strategies;
     "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
-    "t", "<transname> <args>: behave like a but add function to display into the callback", test_transform_and_display;
+    "t", "<transname> <args>: behave like 'a' but add function to display into the callback", test_transform_and_display;
     "p", "print the session in raw form", dump_session_raw;
-    "c", "test schedule_proof_attempt with alt-ergo on the first goal", test_schedule_proof_attempt;
-    "g", "prints the first goal", test_print_goal;
+    "c", "<provername> [timelimit [memlimit]] run a prover on the current goal", test_schedule_proof_attempt;
+    "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
+    "g", "prints the current goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
-    "s", "[s my_session] save the current session in my_session.xml", test_save_session;
-    "ng", "get to the next goal", then_print (move_to_goal_ret_p next_node);
-    "pg", "get to the prev goal", then_print (move_to_goal_ret_p prev_node);
-    "gu", "get to the goal up",  then_print (move_to_goal_ret_p zipper_up);
-    "gd", "get to the goal down",  then_print (move_to_goal_ret_p zipper_down);
-    "gr", "get to the goal right",  then_print (move_to_goal_ret_p zipper_right);
-    "gl", "get to the goal left",  then_print (move_to_goal_ret_p zipper_left);
+    "s", "<file> save the current session in <file>.xml", test_save_session;
+    "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
+    "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
+    "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);
+    "gd", "go to the goal down",  then_print (move_to_goal_ret_p zipper_down);
+    "gr", "go to the goal right",  then_print (move_to_goal_ret_p zipper_right);
+    "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left);
     "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
     "test", "test register known_map",
     (fun _ _ ->

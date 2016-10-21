@@ -30,8 +30,16 @@ type transformation_status =
 let print_trans_status fmt st =
   match st with
   | TSscheduled -> fprintf fmt "TScheduled"
-  | TSdone tid -> fprintf fmt "TSdone" (* TODO print tid *)
+  | TSdone _tid -> fprintf fmt "TSdone" (* TODO print tid *)
   | TSfailed -> fprintf fmt "TSfailed"
+
+type strategy_status = STSgoto of proofNodeID * int | STShalt
+
+let print_strategy_status fmt st =
+  match st with
+  | STSgoto(id,n) -> fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
+  | STShalt -> fprintf fmt "halt"
+
 
 open Ident
 
@@ -41,7 +49,7 @@ type proof_state = {
     pn_state : bool Hpn.t;
   }
 
-let init_proof_state ses =
+let init_proof_state _ses =
   {th_state = Hid.create 7;
    tn_state = Htn.create 42;
    pn_state = Hpn.create 42}
@@ -214,27 +222,97 @@ let schedule_proof_attempt c id pr ~limit ~callback =
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
     let task = get_task c.controller_session id in
-    try
-      let subtasks = Trans.apply_transform_args name c.controller_env args task in
-      let tid = graft_transf c.controller_session id name args subtasks in
-      callback (TSdone tid);
-      false
-    with e when not (Debug.test_flag Debug.stack_trace) ->
-      Format.eprintf
-        "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
+    begin
+      try
+        let subtasks = Trans.apply_transform_args name c.controller_env args task in
+        (* if result is same as input task, consider it as a failure *)
+        begin
+          match subtasks with
+          | [t'] when Task.task_equal t' task ->
+             callback TSfailed
+          | _ ->
+             let tid = graft_transf c.controller_session id name args subtasks in
+             callback (TSdone tid)
+        end
+      with e when not (Debug.test_flag Debug.stack_trace) ->
+        Format.eprintf
+          "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
           name Exn_printer.exn_printer e;
-        callback TSfailed;
-        false
+        callback TSfailed
+    end;
+    false
   in
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
 let schedule_transformation c id name args ~callback =
   let callback s = (match s with
-  | TSdone tid -> update_trans_node c tid false (*(get_sub_tasks c.controller_session tid = [])*) (* TODO need to change schedule transformation to get the id ? *)
+  | TSdone tid -> update_trans_node c tid false
+  (*(get_sub_tasks c.controller_session tid = [])*)
+  (* TODO need to change schedule transformation to get the id ? *)
   | TSfailed -> ()
   | _ -> ()); callback s in
-  schedule_transformation_r c id name args ~callback:callback
+  schedule_transformation_r c id name args ~callback
+
+open Strategy
+
+let run_strategy_on_goal c id strat ~callback =
+  let rec exec_strategy pc strat g =
+    if pc < 0 || pc >= Array.length strat then
+      callback STShalt
+    else
+      match Array.get strat pc with
+      | Icall_prover(p,timelimit,memlimit) ->
+         let callback res =
+           match res with
+           | Scheduled | Running -> (* nothing to do yet *) ()
+           | Done { Call_provers.pr_answer = Call_provers.Valid } ->
+              (* proof succeeded, nothing more to do *)
+              callback STShalt
+           | Interrupted | InternalFailure _
+           | Done _ ->
+              (* proof did not succeed, goto to next step *)
+              callback (STSgoto (g,pc+1));
+              let run_next () = exec_strategy (pc+1) strat g; false in
+              S.idle ~prio:0 run_next
+           | Unedited | JustEdited ->
+                         (* should not happen *)
+                         assert false
+         in
+         let limit = { Call_provers.empty_limit with
+                       Call_provers.limit_time = timelimit;
+                       limit_mem  = memlimit} in
+         schedule_proof_attempt c g p ~limit ~callback
+      | Itransform(trname,pcsuccess) ->
+         let callback ntr =
+           match ntr with
+           | TSfailed -> (* transformation failed *)
+              callback (STSgoto (g,pc+1));
+              let run_next () = exec_strategy (pc+1) strat g; false in
+              S.idle ~prio:0 run_next
+           | TSscheduled -> ()
+           | TSdone tid ->
+              List.iter
+                (fun g ->
+                 callback (STSgoto (g,pcsuccess));
+                 let run_next () =
+                   exec_strategy pcsuccess strat g; false
+                 in
+                 S.idle ~prio:0 run_next)
+                (get_sub_tasks c.controller_session tid);
+              (*Todo._done todo*) ()
+         in
+         schedule_transformation c g trname [] ~callback
+      | Igoto pc ->
+         callback (STSgoto (g,pc));
+         exec_strategy pc strat g
+  in
+  exec_strategy 0 strat id
+
+
+
+
+
 
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
@@ -264,7 +342,7 @@ let add_file c ?format fname =
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let merge_file (old_ses : session) (c : controller) _ file =
+let _merge_file (old_ses : session) (c : controller) _ file =
   let format = file.file_format in
   let old_theories = file.file_theories in
   let new_theories =
