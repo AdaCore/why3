@@ -1061,7 +1061,7 @@ module Make(E: sig
       let make_strategy =
         fun is_active ->
           Fixpoint.make_strategy_default
-            ~widening_start:6 ~widening_descend:3
+            ~widening_start:6 ~widening_descend:2
             ~priority:(PSHGraph.Filter is_active)
             ~vertex_dummy ~hedge_dummy
             cfg.g sinit
