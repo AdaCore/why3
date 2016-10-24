@@ -18,6 +18,7 @@ module type DOMAIN = sig
   val forget_array: man -> t -> Var.t array -> bool -> t
   val assign_linexpr: man -> t -> Var.t -> Linexpr1.t -> t option -> t
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
+  val to_lincons_array: man -> t -> Lincons1.earray
   val push_label: man -> env -> int -> t -> t
 end
 
@@ -166,6 +167,8 @@ module Make_from_apron(M:sig
     in domain_to_term
 
   let push_label _ _ _ t = t
+
+  let to_lincons_array = Abstract1.to_lincons_array
 
 end
 

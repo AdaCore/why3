@@ -11,7 +11,7 @@ module Make(A:DOMAIN) = struct
 
   let top m e = [A.top m e]
 
-  let canonicalize m = List.iter (A.canonicalize m)
+  let canonicalize m _ = () (*List.iter (A.canonicalize m)*)
 
   let is_bottom man t =
     List.map (A.is_bottom man) t
@@ -29,7 +29,7 @@ module Make(A:DOMAIN) = struct
   let cleanup man a =
     List.filter (fun t -> not (A.is_bottom man t)) a
 
-  let threshold = 5
+  let threshold = 25
 
 
   let join_one man = function
@@ -39,6 +39,81 @@ module Make(A:DOMAIN) = struct
   let unwrap_domain = function
     | None -> []
     | Some t -> [t]
+
+  let join_is_precise man a b c =
+    let open Apron in
+    let linexpr_a = A.to_lincons_array man a in
+    let linexpr_b = A.to_lincons_array man b in
+    let a, b, linexpr_a =
+      if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
+        b, a, linexpr_b
+      else
+        a, b, linexpr_a
+    in
+    let precise = ref true in
+    for i = 0 to Lincons1.array_length linexpr_a - 1 do
+      let line = Lincons1.array_get linexpr_a i in
+      (* FIXME: sat lincons *)
+      let opp_typ =
+        let typ = Lincons1.get_typ line in
+        if typ = Lincons1.EQ then
+          [Lincons1.SUP, 1; Lincons1.SUP, -1]
+        else if typ = Lincons1.SUP then
+          [Lincons1.SUPEQ, -1]
+        else if typ = Lincons1.SUPEQ then
+          [Lincons1.SUP, -1]
+        else assert false
+      in
+      let p = List.fold_left (fun p (ty, new_coeff) ->
+          let cp = Lincons1.copy line in
+          let cst = Lincons1.get_cst cp in
+          let cst =
+            if new_coeff = -1 then
+              Coeff.neg cst
+            else if new_coeff = 1 then
+              cst
+            else
+              assert false in
+          Lincons1.set_cst cp cst;
+          Lincons1.set_typ cp ty;
+          Lincons1.iter (fun coeff var ->
+              let coeff =
+                if new_coeff = -1 then
+                  Coeff.neg coeff
+                else if new_coeff = 1 then
+                  coeff
+                else
+                  assert false in
+              Lincons1.set_coeff cp var coeff) line;
+          let a = Lincons1.array_make (Lincons1.get_env cp) 1 in
+          Lincons1.array_set a 0 cp;
+          let new_c = A.meet_lincons_array man c a in
+          p && A.is_leq man new_c b) true opp_typ
+      in
+      precise := !precise && p;
+    done;
+    !precise
+
+
+  let join_precise man a b =
+    List.fold_left (fun a t ->
+        let find_precise_join e =
+          let c = A.join man t e in
+          if join_is_precise man t e c then
+            Some c
+          else
+            None
+        in
+        let a, found = List.fold_left (fun (a, found) e ->
+            match find_precise_join e with
+            | None -> e::a, found
+            | Some c -> c::a, true
+          ) ([], false) a in
+        if found then
+          a
+        else
+          t::a
+      ) a b
 
   let cleanup_hard man c =
     let rec zip a = function
@@ -51,7 +126,8 @@ module Make(A:DOMAIN) = struct
         else
           zip (t::a) q
     in
-    zip [] c
+    zip [] c |> join_precise man []
+
 
   let join man a b =
     let a = cleanup man a in
@@ -66,7 +142,8 @@ module Make(A:DOMAIN) = struct
         join_one man b |> unwrap_domain
       else b
     in
-    let c = a @ b in
+    let c = join_precise man a b in
+    (*let c = a @ b in*)
     cleanup_hard man c
 
 
@@ -114,4 +191,10 @@ module Make(A:DOMAIN) = struct
     t
 
   let push_label man env i t = List.map (A.push_label man env i) t
+
+  let to_lincons_array man t =
+    match join_one man t with
+    | None -> assert false
+    | Some t -> A.to_lincons_array man t
+
 end

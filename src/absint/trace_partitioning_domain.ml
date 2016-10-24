@@ -256,4 +256,10 @@ module Make(A:DOMAIN) = struct
     t
 
   let push_label man env i t = List.map (fun (d, p) -> A.push_label man env i d, LTree([p], i)) t
+  
+  let to_lincons_array man t =
+    match join_one man t with
+    | None -> assert false
+    | Some t -> A.to_lincons_array man (fst t)
+
 end

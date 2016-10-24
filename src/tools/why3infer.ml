@@ -130,7 +130,7 @@ let do_input f =
                       Ai_cfg.Make(struct
                         let env = env
                         let pmod = m
-                        module D = Domain.Oct
+                        module D = Disjunctive_domain.Make(Domain.Polyhedra)
                       end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
                     let context = Abstract_interpreter.empty_context  in
