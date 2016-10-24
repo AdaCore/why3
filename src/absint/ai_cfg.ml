@@ -1,6 +1,7 @@
 open Domain
 
 let ai_print_domains = Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
+let ai_cfg_debug = Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
 
 open Format
 open Apron
@@ -424,8 +425,10 @@ module Make(E: sig
              let d1 = fb (fa d) in
              let d2 = fc (fa_not d) in
              D.join manpk d1 d2)
-        | Ttrue  | _ when t_equal t t_bool_true -> (fun d -> d)
-        | Tfalse | _ when t_equal t t_bool_false -> (fun _ -> D.bottom manpk cfg.env)
+        | Ttrue -> (fun d -> d)
+        | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
+        | Tfalse -> (fun _ -> D.bottom manpk cfg.env)
+        | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom manpk cfg.env)
         | _ ->
           raise (Not_handled t)
       with
@@ -580,13 +583,15 @@ module Make(E: sig
         let postcondition = Term.( t_eps_close vreturn (
             t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
 
-        Format.eprintf "--> Postcondition for let: ";
-        Pretty.print_term Format.err_formatter postcondition;
-        Format.eprintf "@.";
+        if Debug.test_flag ai_cfg_debug then
+          begin
+            Format.eprintf "--> Postcondition for let: ";
+            Pretty.print_term Format.err_formatter postcondition;
+            Format.eprintf "@.";
+          end;
         (linear_expressions_from_term cfg context) postcondition
       end
     else
-      let () = Format.eprintf "no Postocndition:@." in
       (fun abs -> abs), []
 
 
@@ -674,13 +679,15 @@ module Make(E: sig
           let postcondition = Term.( t_eps_close vreturn (
               t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
 
-          Format.eprintf "--> Postcondition for let: ";
-          Pretty.print_term Format.err_formatter postcondition;
-          Format.eprintf "@.";
+          if Debug.test_flag ai_cfg_debug then
+            begin
+              Format.eprintf "--> Postcondition for var: ";
+              Pretty.print_term Format.err_formatter postcondition;
+              Format.eprintf "@.";
+            end;
           (linear_expressions_from_term cfg context) postcondition
           end
         else
-          let () = Format.eprintf "no Postocndition:@." in
           (fun abs -> abs), []
       in
 
@@ -706,15 +713,18 @@ module Make(E: sig
       let eff_write = Ity.(effect.eff_writes) in
 
       (* Computing domain from postcondition *)
-      Format.eprintf "Computing domain from postconditions for function: ";
-      Expr.print_rs Format.err_formatter rsym;
-      List.iter (fun a ->
-          Format.eprintf "    ###>  ";
-          Pretty.print_term Format.err_formatter a;
-          Format.eprintf "@.";
-        ) post;
+      if Debug.test_flag ai_cfg_debug then
+        begin
+          Format.eprintf "Computing domain from postconditions for function: ";
+          Expr.print_rs Format.err_formatter rsym;
+          List.iter (fun a ->
+              Format.eprintf "    ###>  ";
+              Pretty.print_term Format.err_formatter a;
+              Format.eprintf "@.";
+            ) post;
 
-      Format.eprintf "@.";
+          Format.eprintf "@.";
+        end;
       let constraints =
         List.map (linear_expressions_from_term cfg context) post
         |> List.fold_left (fun f (a, _) ->

@@ -130,7 +130,7 @@ module Make(S:sig
     let preid = Ident.{ preid with pre_name = preid.pre_name ^ "infer.mlw" } in
     let pmod_uc = create_module env preid
                   |> fun p -> List.fold_left add_to_pmod p pmod.mod_units in
-    Format.eprintf "done@.";
+    Format.eprintf "Invariants inferred.@.";
     close_module pmod_uc
 
 end
