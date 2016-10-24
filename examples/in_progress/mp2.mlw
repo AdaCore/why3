@@ -1663,6 +1663,7 @@ module N
               (power 2 (l2i cnt)) * l2i x }
     returns { (r,_d) ->  mod (l2i r) (power 2 (l2i cnt)) = 0 }
     returns { (r,_d) ->  l2i r <= radix - (power 2 (l2i cnt)) }
+    returns { (_r,d) -> l2i d < power 2 (l2i cnt) }
   =
     let r,d = lsld x cnt in
     let p = power 2 (l2i cnt) in
@@ -1699,6 +1700,17 @@ module N
                                    -> false)
              so div (l2i r) p <= q-1
              so l2i r = p * div (l2i r) p <= p * (q-1) = p*q - p = radix - p };
+    assert { l2i d < p
+             by
+             l2i r + radix * l2i d = p * l2i x
+             so
+             radix * l2i d <= p * l2i x
+             so
+             l2i x < radix /\ p > 0
+             so p * l2i x < p * radix
+             so radix * l2i d < p * radix
+             so l2i d < p
+             };
     (r,d)
 
   val lsl (x cnt:limb) : limb
@@ -1712,7 +1724,7 @@ module N
 
   (** [lshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the left and
       writes the result in [(r, sz)]. Returns the [cnt] most significant
-      bits of [(x, sz)]. *)
+      bits of [(x, sz)]. Corresponds to [mpn_lshift]. *)
   (*TODO overlapping allowed if r >= x*)
   let lshift (r x:t) (sz:int32) (cnt:uint32) : limb
     requires { 0 < l2i cnt < 32 }
@@ -1752,15 +1764,7 @@ module N
       xp := M.incr !xp minus_one;
       low := M.get !xp;
       let l,h = lsld_ext !low cnt in
-      prod_compat_strict_r (l2i !low) radix (power 2 (l2i cnt));
-      assert { l2i !high + l2i h < radix by
-             l2i l + radix * l2i h = l2i !low * power 2 (l2i cnt)
-             so l2i !low < radix
-             so l2i l + radix * l2i h = l2i !low * power 2 (l2i cnt)
-                < radix * power 2 (l2i cnt)
-             so 0 <= l2i l
-             so radix * l2i h < radix * power 2 (l2i cnt)
-             so l2i h < power 2 (l2i cnt) };
+      assert { l2i !high + l2i h < radix  };
       let ghost v = Limb.(+) !high h in
       value_sub_update_no_change (pelts r) (!rp).offset (r.offset + 1+ p2i !i)
                                  (r.offset + p2i sz) v;
@@ -1854,7 +1858,166 @@ module N
    M.set r !high;
    retval
 
+  (** [rshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the right and
+      writes the result in [(r, sz)]. Returns the [cnt] least significant
+      bits of [(x, sz)]. Corresponds to [mpn_rshift]. *)
+  (*TODO overlapping allowed if r <= x*)
+  let rshift (r x:t) (sz:int32) (cnt:uint32) : limb
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    requires { 0 < l2i cnt < 32 }
+    requires { 0 < p2i sz }
+    ensures { l2i result + radix * value_sub_shift r (p2i sz) 
+              = value_sub_shift x (p2i sz) * (power 2 (32- l2i cnt)) }
+  = 
+    let tnc = UInt32.(-) (UInt32.of_int 32) cnt in
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let msb = Int32.(-) sz one in
+    let xp = ref x in
+    let rp = ref r in
+    let high = ref (M.get !xp) in
+    let retval, h = lsld_ext !high tnc in
+    let low = ref h in
+    let i = ref zero in
+    while (Int32.(<) !i msb) do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= p2i !i <= p2i msb }
+      invariant { l2i retval + radix * (value_sub_shift r (p2i !i) 
+                  + (power radix (p2i !i)) * l2i !low)
+                  = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc)) } 
+      invariant { (!rp).offset = r.offset + p2i !i }
+      invariant { (!xp).offset = x.offset + p2i !i }
+      invariant { plength !rp = plength r }
+      invariant { plength !xp = plength x }
+      invariant { pelts !rp = pelts r }
+      invariant { pelts !xp = pelts x }
+      invariant { l2i !low < power 2 (l2i tnc) }
+      label StartLoop in
+      let ghost k = p2i !i in
+      xp := M.incr !xp one;
+      high := M.get !xp;
+      let l,h = lsld_ext !high tnc in
+      assert { l2i !low + l2i l < radix };
+      let ghost v = Limb.(+) !low l in
+      value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) v;
+      M.set !rp (Limb.(+) !low l);
+      assert { value_sub_shift r k = value_sub_shift (r at StartLoop) k };
+      rp := M.incr !rp one;
+      low := h;
+      i := Int32.(+) !i one;
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts r) x.offset (x.offset + p2i !i);
+      assert { l2i retval + radix * (value_sub_shift r (p2i !i) 
+                 + (power radix (p2i !i)) * l2i !low)
+                 = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc)) 
+               by
+                 l2i (pelts r)[r.offset + k]
+               = l2i (pelts r)[(!rp.offset at StartLoop)]
+               = l2i (!low at StartLoop) + l2i l
+               so
+                 l2i !high = l2i (pelts x)[(!xp).offset]
+               so
+                 l2i retval + radix * (value_sub_shift r (p2i !i) 
+                                      + (power radix (p2i !i)) * l2i !low)
+               = l2i retval + radix * (value_sub_shift r k 
+                              + power radix k * l2i (pelts r)[r.offset+k]
+                              + power radix (p2i !i) * l2i !low)
+               = l2i retval + radix * (value_sub_shift r k
+                              + power radix k * (l2i (!low at StartLoop) + l2i l)
+                              + power radix (p2i !i) * l2i !low)
+               = l2i retval + radix * (value_sub_shift r k
+                              + power radix k * l2i (!low at StartLoop) 
+                              + power radix k * l2i l
+                              + power radix (p2i !i) * l2i !low)
+               = l2i retval + radix * (value_sub_shift r k
+                              + power radix k * l2i (!low at StartLoop))
+                 + radix * (power radix k * l2i l 
+                            + power radix (p2i !i) * l2i !low)
+               = value_sub_shift x (k+1) * power 2 (l2i tnc)
+                 + radix * (power radix k * l2i l 
+                            + power radix (p2i !i) * l2i !low)
+               = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
+                 + radix * (power radix k * l2i l 
+                            + power radix (p2i !i) * l2i !low)
+               = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
+                 + radix * (power radix k * l2i l 
+                            + power radix k * radix * l2i !low)
+               = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
+                 + radix * (power radix k * (l2i l + radix * l2i !low))
+               = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
+                 + radix * (power radix k * l2i !high * power 2 (l2i tnc))
+               = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
+                 + power radix (p2i !i) * l2i !high * power 2 (l2i tnc)
+               = (value_sub_shift x (p2i !i) + power radix (p2i !i) * l2i !high)
+                 * power 2 (l2i tnc)
+               = (value_sub_shift x (p2i !i) 
+                  + power radix (p2i !i) * l2i (pelts x)[x.offset + p2i !i])
+                 * power 2 (l2i tnc)
+               = value_sub_shift x (1 + p2i !i) * power 2 (l2i tnc)
+      };
+    done;
+    label EndLoop in
+    assert { l2i retval + radix * (value_sub_shift r (p2i msb) 
+                  + (power radix (p2i msb)) * l2i !low)
+             = value_sub_shift x (p2i sz) * (power 2 (l2i tnc)) };
+    value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
+    assert { (!rp).offset = r.offset + p2i msb };
+    value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
+    M.set !rp !low;
+    assert { value_sub_shift r (p2i sz) 
+           = value_sub_shift r (p2i msb) + power radix (p2i msb) * l2i !low };
+    assert { value_sub_shift r (p2i sz) 
+           = value_sub_shift (r at EndLoop) (p2i msb) 
+             + power radix (p2i msb) * l2i !low 
+           by
+           value_sub_shift r (p2i msb) = value_sub_shift (r at EndLoop) (p2i msb)
+           };
+    retval
 
+  (** {2 Division} *)
+
+  (** Based on Niels Möller and Torbjörn Granlund, “Improved
+      division by invariant integers” 2010 *)
+
+
+  val invert_limb (d:limb) : limb
+    requires { l2i d > div radix 2 }
+    ensures { l2i result = (div (radix*radix - 1) (l2i d)) - radix }
+
+
+  let div2by1_inv (uh ul d v:limb) : (limb,limb)
+    requires { l2i d > div radix 2 }
+    requires { l2i uh < l2i d }
+    requires { l2i v = (div (radix*radix - 1) (l2i d)) - radix }
+    returns { q,r -> l2i q * l2i d + l2i r = l2i ul + radix * l2i uh }
+    returns { _q, r -> 0 <= l2i r < l2i d }
+  =
+    let zero = Limb.of_int 0 in
+    let one = Limb.of_int 1 in
+    let l,h = mul_double v uh in
+    let r,c = add_with_carry l ul zero in
+    let ql = ref r in
+    let r',c' = add_with_carry uh h c in
+    check { l2i c' = 0 };
+    let qh = ref r' in
+    qh := add_mod !qh one; (*TODO check that mod is correct*)
+    let r = ref (sub_mod ul (mul_mod !qh d)) in
+    if Limb.(>) !r !ql
+    then begin
+      qh := sub_mod !qh one; (*TODO check that mod is correct*)
+      r := add_mod !r d; (* check *)
+    end;
+    if Limb.(>=) !r d
+    then begin
+      qh := Limb.(+) !qh one;
+      r := Limb.(-) !r d;
+    end;
+    (!qh,!r)
+      
+    
+    
 
   let main () = from_limb (Limb.of_int 42)
 
