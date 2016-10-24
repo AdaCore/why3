@@ -3,6 +3,11 @@ t introduce_premises
 (* print goal with premisses introduced *)
 k
 t cut "y = y"
+t cut "forall a: int. forall b: int. a = b -> forall c: int. c = a -> c = a * b"
+t apply h1
+ng
+ng
+
 t cut "TOTO = TOTO"
 t cut "exists x: int. x = x"
 ng

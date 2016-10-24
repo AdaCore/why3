@@ -162,46 +162,51 @@ let find_hypothesis (name:Ident.ident) task =
     | Some pr -> Ident.id_equal pr.pr_name name) then ndecl := Some x) task in
   !ndecl
 
+(* Do as intros: introduce all premises of hypothesis pr and return a triple
+   (goal, list_premises, binded variables) *)
+let intros f =
+  let rec intros_aux lp lv f =
+    match f.t_node with
+    | Tbinop (Timplies, f1, f2) ->
+        intros_aux (f1 :: lp) lv f2
+    | Tquant (Tforall, fq) ->
+        let vsl, _, fs = t_open_quant fq in
+        intros_aux lp (List.fold_left (fun v lv -> Svs.add lv v) lv vsl) fs
+    | _ -> (lp, lv, f) in
+  intros_aux [] Svs.empty f
 
-(* from task [delta, name:forall x.A->B |- G,
-   build the task [delta,name:forall x.A->B] |- A[x -> t]] ou t est tel que B[x->t] = G *)
-let apply pr task =
+open Reduction_engine
+(* Apply:
+   1) takes the hypothesis and introduce parts of it to keep only the last element of
+      the implication. It gathers the premises and variables in a list.
+   2) try to find a good substitution for the list of variables so that last element
+      of implication is equal to the goal.
+   3) generate new goals corresponding to premises with variables instantiated with values found
+      in 2).
+ *)
+let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let name = pr.pr_name in
   let g, task = Task.task_separate_goal task in
-  let tg = term_decl g in
+  let g = term_decl g in
   let d = find_hypothesis name task in
-  if d = None then failwith "Hypothesis not found" else
+  if d = None then failwith "Hypothesis not found";
   let d = Opt.get d in
   let t = term_decl d in
-  match t.t_node with
-  | Tquant (Tforall, tb) ->
-    let (vl, tr, t) = t_open_quant tb in
-    let v = List.hd vl in
-    begin
-      match t.t_node with
-      | Tbinop (Timplies, ta, tb) ->
-        let candidate_unifier = is_unify tb tg v in
-        begin
-          match candidate_unifier with
-          | None -> failwith "Unable to unify the hypothesis with the goal"
-          | Some x ->
-            let new_goal = t_forall_close (List.tl vl) tr (t_subst_single v x ta) in
-            let new_tb = t_subst_single v x tb in
-            (* TODO t_equal is probably too strong *)
-            if (Term.t_equal new_tb tg) then
-              Task.add_decl task (create_prop_decl Pgoal
-                                    (create_prsymbol (gen_ident "G")) new_goal)
-            else
-              (Format.printf
-                 "Term substituted was %a. Should be goal was %a. Goal was %a @."
-                 Pretty.print_term x Pretty.print_term new_tb Pretty.print_term tg;
-              failwith "After substitution, terms are not exactly identical")
-        end
-      | _ -> failwith "Not of the form forall immediately followed by implies"
-    end
-  | Tbinop (Timplies, _ta, _tb) -> failwith "Not implemented yet" (* TODO to be done later *)
-  | _ -> failwith "Not of the form forall x. A -> B"
-
+  let (lp, lv, nt) = intros t in
+  let (_ty, subst) = try first_order_matching lv [nt] [g] with
+    (* TODO export the exception *)
+  | _ -> failwith "Unable to instantiate variables with possible values" in
+  let inst_nt = t_subst subst nt in
+  if (Term.t_equal inst_nt g) then
+    let nlp = List.map (t_subst subst) lp in
+    let lt = List.map (fun ng -> Task.add_decl task (create_prop_decl Pgoal
+                          (create_prsymbol (gen_ident "G")) ng)) nlp in
+    lt
+  else
+    (Format.printf
+      "Term %a and %a are not equal. Failure in matching @."
+       Pretty.print_term inst_nt Pretty.print_term g;
+     failwith "After substitution, terms are not exactly identical"))
 
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
@@ -212,6 +217,7 @@ let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm 
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
 let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
                                       (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
-let () = register_transform_with_args ~desc:"test apply" "apply" (wrap (Tprsymbol Ttrans) (fun x -> Trans.store (apply x)))
+let () = register_transform_with_args_l ~desc:"test apply" "apply"
+    (wrap_l (Tprsymbol Ttrans_l) apply)
 let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
 let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
