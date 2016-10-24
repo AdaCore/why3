@@ -5,6 +5,8 @@ open Decl
 open Theory
 open Task
 open Args_wrapper
+open Reduction_engine
+
 
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
@@ -75,9 +77,6 @@ let remove_task_decl (name: Ident.ident) : task trans =
     | _ -> [d])
     None
 
-(* TODO check if this works in particular when hypothesis names
-    are extracted from same name. Seemed not to work before
-  adding "print_task". To be resolved in a better way. *)
 (* from task [delta, name:A |- G]  build the task [delta |- G] *)
 let remove name =
   remove_task_decl name.pr_name
@@ -94,54 +93,6 @@ let instantiate (pr: Decl.prsymbol) t =
           let new_decl = create_prop_decl pk new_pr t_subst in
           [d; new_decl]
       | _ -> [d]) None
-
-(* TODO find correct librrary *)
-let choose_option a b =
-  match a, b with
-  | Some x, _ -> Some x
-  | None, Some x -> Some x
-  | None, None -> None
-
-(* TODO stupid This function return the term we need to use in place of
-  the variable so that the 2 terms can be equal.
-This function is NOT used to check that the 2 terms are equal as we want
-library function from Term to do that.
-TODO cases are probably forgotten. To be completed  *)
-let rec is_unify t x v =
-  match t.t_node, x.t_node with
-  | Tvar v', _ when v == v' -> Some x
-  | Tapp(ls, tl), Tapp(ls', tl') when ls == ls' ->
-    is_unify_list tl tl' v
-  | Tif (f, t, e), Tif(f', t', e') ->
-    is_unify_list [f;t;e] [f';t';e'] v
-  | Tlet (t, tb), Tlet (t', tb') ->
-    let (_v', e) = t_open_bound tb in
-    let (_v'', e') = t_open_bound tb' in
-    is_unify_list [t; e] [t'; e'] v
-  | Tcase (t, bl), Tcase (t', bl') ->
-    choose_option
-      (List.fold_left2 (fun acc b b' ->
-      let (_, t1) = t_open_branch b in
-      let (_, t2) = t_open_branch b' in
-      choose_option acc (is_unify t1 t2 v)) None bl bl')
-    (is_unify t t' v)
-  | Teps tb, Teps tb' ->
-    let (_v', e) = t_open_bound tb in
-    let (_v'', e') = t_open_bound tb' in
-    is_unify e e' v
-  | Tquant (_q, tq), Tquant (_q', tq') ->
-    let (_vl, _tr, t) = t_open_quant tq in
-    let (_vl', _tr', t') = t_open_quant tq' in
-    is_unify t t' v
-  | Tbinop (_b, t1, t2), Tbinop (_b', t1', t2') ->
-    is_unify_list [t1;t2] [t1';t2'] v
-  | Tnot t, Tnot t' ->
-    is_unify t t' v
-  | _, _ -> None
-
-and is_unify_list tl xl v =
-  List.fold_left2 (fun acc t1 t2 ->
-    choose_option acc (is_unify t1 t2 v)) None tl xl
 
 let term_decl d =
   match d.td_node with
@@ -175,7 +126,6 @@ let intros f =
     | _ -> (lp, lv, f) in
   intros_aux [] Svs.empty f
 
-open Reduction_engine
 (* Apply:
    1) takes the hypothesis and introduce parts of it to keep only the last element of
       the implication. It gathers the premises and variables in a list.
