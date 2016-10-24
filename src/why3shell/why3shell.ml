@@ -124,7 +124,7 @@ let usage_str = Format.sprintf
   (Filename.basename Sys.argv.(0))
 
 (* build command line *)
-let config, base_config, _env =
+let config, base_config, env =
   Why3.Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
 
 let main : Whyconf.main = Whyconf.get_main config
@@ -133,7 +133,7 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
 (* builds the environment from the [loadpath] *)
-let env : Env.env = Env.create_env (Whyconf.loadpath main)
+(*let env : Env.env = Env.create_env (Whyconf.loadpath main)*)
 
 (* -- declare provers -- *)
 
