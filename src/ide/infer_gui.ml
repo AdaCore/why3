@@ -3,7 +3,7 @@ open Domain
 
 module Make(Win: sig
     val tools_window_vbox_pack: GObj.widget -> unit
-    val set_infer: bool -> (module DOMAIN)-> unit
+    val set_infer: bool -> int -> (module DOMAIN)-> unit
   end) = struct
 
   let ai_frame =
@@ -11,7 +11,7 @@ module Make(Win: sig
       ~packing:Win.tools_window_vbox_pack ()
 
   let ai_box =
-    GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
+    GPack.button_box `VERTICAL ~border_width:2 ~spacing:2
       ~packing:ai_frame#add ()
 
   let () =
@@ -22,10 +22,19 @@ module Make(Win: sig
     b#misc#set_tooltip_markup desc;
     let poly = GButton.radio_button ~packing:ai_box#add ~label:"Polyhedra" () in
     let oct = GButton.radio_button ~group:poly#group ~packing:ai_box#add ~label:"Octogons" () in
-    let box = GButton.radio_button ~group:poly#group ~packing:ai_box#add ~label:"Intervals" () in
+    let _box = GButton.radio_button ~group:poly#group ~packing:ai_box#add ~label:"Intervals" () in
     let none = GButton.radio_button ~packing:ai_box#add ~label:"Base domain" () in
     let disj = GButton.radio_button ~group:none#group ~packing:ai_box#add ~label:"Disjunctions" () in
     let trace = GButton.radio_button ~group:disj#group ~packing:ai_box#add ~label:"Trace partitioning" () in
+    let widening = GRange.scale ~packing:ai_box#add `HORIZONTAL () in
+    let adj = widening#adjustment in
+    widening#set_digits 0;
+    adj#set_lower 1.0;
+    adj#set_upper 51.0;
+    adj#set_page_increment 1.0;
+    adj#set_page_size 1.0;
+    adj#set_step_increment 1.0;
+    adj#set_value 5.0;
     let callback () =
       let d =
         if poly#active then
@@ -45,7 +54,7 @@ module Make(Win: sig
         else
           d
       in
-      Win.set_infer b#active d;
+      Win.set_infer b#active (int_of_float adj#value) d;
     in
     let _ = b#connect#toggled ~callback in
     ()

@@ -3,6 +3,7 @@ open Domain
 module Make(S:sig
     val env: Env.env
     val pmod: Pmodule.pmodule
+    val widening: int
     module D: DOMAIN
   end): sig
   type control_point

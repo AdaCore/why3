@@ -2089,10 +2089,11 @@ let reload () =
         file_info#set_text msg;
         info_window `ERROR msg
 
-let read_file d infer env ?format fn =
+let read_file d infer widening env ?format fn =
   let module D = (val d: Domain.DOMAIN) in
   let module Infer_ai = Infer_ai.Make(struct let env = gconfig.env
     module D = D
+    let widening = widening
    end) in
 
   let pmods = Env.read_file Pmodule.mlw_language env ?format fn in
@@ -2118,11 +2119,11 @@ let read_file d infer env ?format fn =
     ltheories,theories
 
 
-let set_infer infer d =
+let set_infer infer widening d =
   let s = (env_session()).S.session in
   let open Session in
   let () = S.PHstr.iter (fun a b ->
-    Session.set_file_loader b (fun () -> read_file d infer Gconfig.(gconfig.env) ?format:!opt_parser (Filename.concat project_dir a))
+    Session.set_file_loader b (fun () -> read_file d infer widening Gconfig.(gconfig.env) ?format:!opt_parser (Filename.concat project_dir a))
   ) s.session_files in
   reload ()
 

@@ -47,6 +47,8 @@ module Make(S: sig
       t_app gt_int args None
     | Tapp(l, args) when ls_equal l ge_int && way ->
       t_app lt_int args None
+    | Tapp(l, args) when ls_equal l ps_equ && way && Ty.ty_equal (t_type (List.hd args)) Ty.ty_int ->
+      t_or (t_app lt_int args None) (t_app gt_int args None)
     | _ ->
       if way then
         t_not t

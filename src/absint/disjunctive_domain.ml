@@ -168,6 +168,8 @@ module Make(A:DOMAIN) = struct
   
 
   let widening man a b =
+    print Format.err_formatter a;
+    Format.eprintf "@.";
     let a = cleanup man a in
     let b = cleanup man b in
     let a =

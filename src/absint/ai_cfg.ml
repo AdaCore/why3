@@ -9,6 +9,7 @@ open Apron
 module Make(E: sig
     val env: Env.env
     val pmod: Pmodule.pmodule
+    val widening: int
     module D: DOMAIN
   end) = struct
   
@@ -768,7 +769,7 @@ module Make(E: sig
     | Ewhile(cond, _, _, content) ->
       (* Condition expression *)
       let cond_term = 
-        match Expr.term_of_expr ~prop:false cond with
+        match Expr.term_of_expr ~prop:true cond with
         | Some s ->
           s
         | None ->
@@ -1071,7 +1072,7 @@ module Make(E: sig
       let make_strategy =
         fun is_active ->
           Fixpoint.make_strategy_default
-            ~widening_start:6 ~widening_descend:2
+            ~widening_start:E.widening ~widening_descend:2
             ~priority:(PSHGraph.Filter is_active)
             ~vertex_dummy ~hedge_dummy
             cfg.g sinit

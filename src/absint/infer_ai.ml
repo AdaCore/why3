@@ -1,5 +1,6 @@
 module Make(S:sig
     val env: Env.env
+    val widening: int
     module D: Domain.DOMAIN
   end) = struct
 
@@ -14,6 +15,7 @@ module Make(S:sig
     let module AI = Ai_cfg.Make(struct
         let env = env
         let pmod = pmod
+        let widening = S.widening
         module D = S.D
       end)
     in
