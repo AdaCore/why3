@@ -658,7 +658,8 @@ clean::
 .PHONY: install_spark2014 install_spark2014_dev
 
 install_spark2014_dev: install_spark2014
-	cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
+	# copying why3ide is optional, so this line is allowed to fail
+	-cp -f bin/why3ide.@OCAMLBEST@ $(BINDIR)/why3ide$(EXE)
 	$(MKDIR_P) $(DATADIR)/why3/images
 	for i in share/images/*.rc; do \
 	     d=`basename $$i .rc`; \
