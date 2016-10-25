@@ -1637,7 +1637,7 @@ module N
 
   (* is a logical lemma in ComputerDivision*)
   let lemma mod_mult (x y z:int)
-    requires { x > 0 /\ y >= 0 /\ z >= 0 }
+    requires { x > 0 /\ y >= 0 /\ z >= 0}
     ensures { mod (x * y + z) x = mod z x }
   =
     ()
@@ -1867,9 +1867,9 @@ module N
     requires { valid_ptr_itv r (p2i sz) }
     requires { 0 < l2i cnt < 32 }
     requires { 0 < p2i sz }
-    ensures { l2i result + radix * value_sub_shift r (p2i sz) 
+    ensures { l2i result + radix * value_sub_shift r (p2i sz)
               = value_sub_shift x (p2i sz) * (power 2 (32- l2i cnt)) }
-  = 
+  =
     let tnc = UInt32.(-) (UInt32.of_int 32) cnt in
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
@@ -1884,9 +1884,9 @@ module N
     while (Int32.(<) !i msb) do
       variant { p2i sz - p2i !i }
       invariant { 0 <= p2i !i <= p2i msb }
-      invariant { l2i retval + radix * (value_sub_shift r (p2i !i) 
+      invariant { l2i retval + radix * (value_sub_shift r (p2i !i)
                   + (power radix (p2i !i)) * l2i !low)
-                  = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc)) } 
+                  = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc)) }
       invariant { (!rp).offset = r.offset + p2i !i }
       invariant { (!xp).offset = x.offset + p2i !i }
       invariant { plength !rp = plength r }
@@ -1909,9 +1909,9 @@ module N
       i := Int32.(+) !i one;
       value_sub_tail (pelts r) r.offset (r.offset + k);
       value_sub_tail (pelts r) x.offset (x.offset + p2i !i);
-      assert { l2i retval + radix * (value_sub_shift r (p2i !i) 
+      assert { l2i retval + radix * (value_sub_shift r (p2i !i)
                  + (power radix (p2i !i)) * l2i !low)
-                 = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc)) 
+                 = value_sub_shift x (1 + p2i !i) * (power 2 (l2i tnc))
                by
                  l2i (pelts r)[r.offset + k]
                = l2i (pelts r)[(!rp.offset at StartLoop)]
@@ -1919,30 +1919,30 @@ module N
                so
                  l2i !high = l2i (pelts x)[(!xp).offset]
                so
-                 l2i retval + radix * (value_sub_shift r (p2i !i) 
+                 l2i retval + radix * (value_sub_shift r (p2i !i)
                                       + (power radix (p2i !i)) * l2i !low)
-               = l2i retval + radix * (value_sub_shift r k 
+               = l2i retval + radix * (value_sub_shift r k
                               + power radix k * l2i (pelts r)[r.offset+k]
                               + power radix (p2i !i) * l2i !low)
                = l2i retval + radix * (value_sub_shift r k
                               + power radix k * (l2i (!low at StartLoop) + l2i l)
                               + power radix (p2i !i) * l2i !low)
                = l2i retval + radix * (value_sub_shift r k
-                              + power radix k * l2i (!low at StartLoop) 
+                              + power radix k * l2i (!low at StartLoop)
                               + power radix k * l2i l
                               + power radix (p2i !i) * l2i !low)
                = l2i retval + radix * (value_sub_shift r k
                               + power radix k * l2i (!low at StartLoop))
-                 + radix * (power radix k * l2i l 
+                 + radix * (power radix k * l2i l
                             + power radix (p2i !i) * l2i !low)
                = value_sub_shift x (k+1) * power 2 (l2i tnc)
-                 + radix * (power radix k * l2i l 
+                 + radix * (power radix k * l2i l
                             + power radix (p2i !i) * l2i !low)
                = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
-                 + radix * (power radix k * l2i l 
+                 + radix * (power radix k * l2i l
                             + power radix (p2i !i) * l2i !low)
                = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
-                 + radix * (power radix k * l2i l 
+                 + radix * (power radix k * l2i l
                             + power radix k * radix * l2i !low)
                = value_sub_shift x (p2i !i) * power 2 (l2i tnc)
                  + radix * (power radix k * (l2i l + radix * l2i !low))
@@ -1952,25 +1952,25 @@ module N
                  + power radix (p2i !i) * l2i !high * power 2 (l2i tnc)
                = (value_sub_shift x (p2i !i) + power radix (p2i !i) * l2i !high)
                  * power 2 (l2i tnc)
-               = (value_sub_shift x (p2i !i) 
+               = (value_sub_shift x (p2i !i)
                   + power radix (p2i !i) * l2i (pelts x)[x.offset + p2i !i])
                  * power 2 (l2i tnc)
                = value_sub_shift x (1 + p2i !i) * power 2 (l2i tnc)
       };
     done;
     label EndLoop in
-    assert { l2i retval + radix * (value_sub_shift r (p2i msb) 
+    assert { l2i retval + radix * (value_sub_shift r (p2i msb)
                   + (power radix (p2i msb)) * l2i !low)
              = value_sub_shift x (p2i sz) * (power 2 (l2i tnc)) };
     value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
     assert { (!rp).offset = r.offset + p2i msb };
     value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
     M.set !rp !low;
-    assert { value_sub_shift r (p2i sz) 
+    assert { value_sub_shift r (p2i sz)
            = value_sub_shift r (p2i msb) + power radix (p2i msb) * l2i !low };
-    assert { value_sub_shift r (p2i sz) 
-           = value_sub_shift (r at EndLoop) (p2i msb) 
-             + power radix (p2i msb) * l2i !low 
+    assert { value_sub_shift r (p2i sz)
+           = value_sub_shift (r at EndLoop) (p2i msb)
+             + power radix (p2i msb) * l2i !low
            by
            value_sub_shift r (p2i msb) = value_sub_shift (r at EndLoop) (p2i msb)
            };
@@ -1981,14 +1981,15 @@ module N
   (** Based on Niels Möller and Torbjörn Granlund, “Improved
       division by invariant integers” 2010 *)
 
+  use import int.MinMax
 
   val invert_limb (d:limb) : limb
-    requires { l2i d > div radix 2 }
+    requires { l2i d >= div radix 2 }
     ensures { l2i result = (div (radix*radix - 1) (l2i d)) - radix }
 
 
   let div2by1_inv (uh ul d v:limb) : (limb,limb)
-    requires { l2i d > div radix 2 }
+    requires { l2i d >= div radix 2 }
     requires { l2i uh < l2i d }
     requires { l2i v = (div (radix*radix - 1) (l2i d)) - radix }
     returns { q,r -> l2i q * l2i d + l2i r = l2i ul + radix * l2i uh }
@@ -1996,28 +1997,173 @@ module N
   =
     let zero = Limb.of_int 0 in
     let one = Limb.of_int 1 in
+    let ghost k = radix * radix - (radix + l2i v) * l2i d in
+    assert { 1 <= k <= l2i d };
     let l,h = mul_double v uh in
-    let r,c = add_with_carry l ul zero in
-    let ql = ref r in
-    let r',c' = add_with_carry uh h c in
-    check { l2i c' = 0 };
-    let qh = ref r' in
-    qh := add_mod !qh one; (*TODO check that mod is correct*)
-    let r = ref (sub_mod ul (mul_mod !qh d)) in
+    let sl,c = add_with_carry l ul zero in
+    let sh,c' = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
+    assert { l2i sl + radix * l2i sh + radix * radix * l2i c'
+    	     = l2i l + radix * l2i h + l2i ul + radix * l2i uh };
+    assert { l2i c' = 0
+    	     by
+	     l2i uh < l2i d
+	     so l2i v * l2i uh <= l2i v * l2i d
+	     so k = radix * radix - (radix + l2i v) * l2i d
+	     	  = radix * radix - radix * l2i d - l2i v * l2i d
+             so l2i v * l2i d = radix * radix - radix * l2i d - k
+	     	      	      = radix * (radix - l2i d) - k
+	     so k > 0
+	     so l2i v * l2i d < radix * (radix - l2i d)
+	     so l2i v * l2i uh < radix * (radix - l2i d)
+	     so l2i l + radix * l2i h = l2i v * l2i uh
+	     so l2i l + radix * l2i h < radix * (radix - l2i d)
+	     so l2i uh <= l2i d - 1
+	     so radix * l2i uh <= radix * (l2i d - 1) = radix * l2i d - radix
+	     so l2i l + radix * l2i h + radix * l2i uh
+	     	< radix * (radix - l2i d) + radix * l2i uh
+	     	<= radix * (radix - l2i d) + radix * l2i d - radix
+		<= radix * (radix - l2i d + l2i d) - radix = radix * radix - radix
+             so l2i ul < radix
+	     so l2i l + radix * l2i h + l2i ul + radix * l2i uh
+	     	= l2i l + radix * l2i h + radix * l2i uh + l2i ul
+		< radix * radix - radix + l2i ul
+		< radix * radix - radix + radix = radix * radix
+	     so l2i sl + radix * l2i sh + radix * radix * l2i c'
+	     	= l2i l + radix * l2i h + l2i ul + radix * l2i uh
+		< radix * radix
+             so radix * radix * l2i c' <= l2i sl + radix * l2i sh + radix * radix * l2i c'
+	     so radix * radix * l2i c' < radix * radix
+     };
+    assert { l2i sl + radix * l2i sh = l2i l + radix * l2i h + l2i ul + radix * l2i uh
+    	     = l2i v * l2i uh + l2i ul + radix * l2i uh
+	     = l2i ul + (radix + l2i v) * l2i uh };
+    let ql = ref sl in
+    let qh = ref sh in
+    let ghost q0 = l2i !ql in
+    let ghost cq = l2i sh + 1 in (*candidate quotient*)
+    let ghost cr = l2i ul - cq * l2i d + radix * l2i uh in (*candidate remainder*)
+    assert { cq * l2i d + cr = l2i ul + radix * l2i uh };
+    qh := add_mod !qh one;
+    assert { l2i !qh = mod cq radix };
+    let p = mul_mod !qh d in
+    let r = ref (sub_mod ul p) in
+    let ghost r' = l2i !r in
+    assert { r' = mod cr radix
+    	     by
+	     let a = (- div (l2i !qh * l2i d) radix) in
+	     r' = l2i !r
+	     = mod (l2i ul - l2i p) radix
+	     = mod (l2i ul - mod (l2i !qh * l2i d) radix) radix
+	     = mod (radix * a
+	       	   + l2i ul - mod (l2i !qh * l2i d) radix) radix
+	     = mod (l2i ul - mod (l2i !qh * l2i d) radix
+	         	   - radix * div (l2i !qh * l2i d) radix) radix
+	     = mod (l2i ul - l2i !qh * l2i d) radix
+	     = mod (l2i ul - mod cq radix * l2i d) radix
+	     = mod (radix * (- (div cq radix)) * l2i d + l2i ul - mod cq radix * l2i d) radix
+	     = mod (l2i ul - (mod cq radix + radix * div cq radix) * l2i d) radix
+	     = mod (l2i ul - cq * l2i d) radix
+	     = mod (radix * l2i uh + l2i ul - cq * l2i d) radix
+	     = mod (l2i ul - cq * l2i d + radix * l2i uh) radix
+	     = mod cr radix };
+    assert { radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d };
+    assert { (* Theorem 2 of Möller&Granlund 2010 *)
+    	     (max (radix - l2i d) (q0 + 1)) - radix <= cr < max (radix - l2i d) q0
+	     by radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
+	     so (l2i uh * k + l2i ul * (radix - l2i d) >= 0
+	     	by l2i uh >= 0 /\ k >= 0 /\ l2i ul >= 0 /\ radix - l2i d >= 0)
+	     so radix * cr >= q0 * l2i d - radix * l2i d
+	     so radix * cr >= - radix * l2i d
+	     so cr >= - l2i d
+	     so radix * cr >= q0 * l2i d - radix * l2i d = (q0 - radix) * l2i d
+	     so radix > l2i d
+	     so cr >= q0 - radix
+	     so 1 <= k < d so l2i uh < l2i d
+	     so l2i uh * k < l2i d * k < l2i d * l2i d
+	     so radix * cr < l2i d * l2i d + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
+	     so l2i ul < radix
+	     so radix - l2i d > 0
+	     so l2i ul * (radix - l2i d) < radix * (radix - l2i d)
+	     so radix * cr < l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
+	     so (radix * cr = (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+	     	by
+	     	l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
+			= radix * (radix - l2i d) + l2i d * l2i d - radix * l2i d + q0 * l2i d
+			= radix * (radix - l2i d) + (l2i d - radix) l2i d +  q0 * l2i d
+			= radix * (radix - l2i d) - l2i d (radix - l2i d) + q0 * l2i d
+			= (radix - l2i d) * (radix - l2i d) + q0 * l2i d)
+	     so let m = max (radix - l2i d) q0 in
+	     	radix - l2i d <= m
+	     so (radix - l2i d) * (radix - l2i d) <= m* (radix - l2i d)
+	     so q0 * l2i d <= m * l2i d
+	     so radix * cr = (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+	     	      	   <= m* (radix - l2i d) + q0 * l2i d
+			   <= m* (radix - l2i d) + m * l2i d
+			   = m * radix
+	     so cr <= m
+		 )
+	   };
+    assert { cr >= 0 -> r' = cr };
+    assert { cr < 0 -> r' = cr + radix };
+    assert { cr < 0 ->
+    	     	( l2i !r > l2i !ql
+		by max (radix - l2i d) (q0 + 1) >= q0 + 1 > q0
+		so cr >= (max (radix - l2i d) (q0 +1)) - radix > q0 - radix
+		so r' = cr + radix > q0 - radix + radix = q0 ) };
     if Limb.(>) !r !ql
     then begin
-      qh := sub_mod !qh one; (*TODO check that mod is correct*)
-      r := add_mod !r d; (* check *)
-    end;
+      qh := sub_mod !qh one;
+      r := add_mod !r d;
+      assert { cr >= 0 ->
+    	       	  ( l2i !r >= l2i d
+		  by r' = cr
+		  so r' < max (radix - l2i d) q0
+		  so r' > q0
+		  so 0 <= r' < radix - l2i d
+		  so l2i d <= r' + l2i d < radix
+		  so l2i !r = mod (r' + l2i d) radix >= l2i d ) };
+      assert { cr < 0 ->
+      	          ( 0 <= l2i !r < l2i d
+		  by r' = cr + radix < radix
+		  so cr >= max (radix - l2i d) (q0 + 1) - radix >= radix - l2i d - radix = - l2i d
+		  so r' = cr + radix >= radix - l2i d
+		  so l2i !r = mod (r' + l2i d) radix
+		  so radix + radix >= r' + l2i d >= radix
+		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix
+		  so l2i !r >= 0
+		  so l2i !r = r' + l2i d - radix < l2i d )
+	    };
+    end
+    else assert { cr >= 0 };
+    assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     if Limb.(>=) !r d
     then begin
+      assert { cr >= 0 };
+      assert { l2i !qh < radix - 1
+      	       by
+	       l2i !qh * l2i d = l2i ul + radix * l2i uh  - l2i !r
+	       so l2i uh <= l2i d - 1
+	       so l2i ul + radix * l2i uh - l2i !r
+	       	  <= l2i ul + radix * (l2i d - 1) - l2i !r
+		  = l2i ul + radix * l2i d - radix - l2i !r
+		  = (l2i ul - radix)  + radix * l2i d - l2i !r
+		  <  radix * l2i d - l2i !r
+		  <= radix * l2i d - l2i d
+		  = (radix - 1) * l2i d
+	       so l2i !qh * l2i d < (radix - 1) * l2i d
+	       so l2i d > 0
+	       so l2i !qh < radix - 1 };
       qh := Limb.(+) !qh one;
       r := Limb.(-) !r d;
+      assert { 0 <= l2i !r < l2i d };
+      assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     end;
+    assert { 0 <= l2i !r < l2i d };
+    assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
-      
-    
-    
+
+
+
 
   let main () = from_limb (Limb.of_int 42)
 
