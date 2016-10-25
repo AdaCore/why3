@@ -11,21 +11,27 @@ let stop f = Slab.mem Split_goal.stop_split f.t_label
 let rec collect_cases acc f =
   match f.t_node with
   | Ttrue | Tfalse | Tapp _ | Tnot _ | Tquant _ | Tlet _
-  | Tbinop ((Timplies | Tiff), _ , _) -> join_and f acc
-  | _ when stop f -> join_and f acc
+  | Tbinop ((Timplies | Tiff), _ , _) -> f :: acc
+  | _ when stop f -> f :: acc
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
   | Tcase _ ->
       (* ??? We should split pattern matching, just as we do for Tif *)
-      join_and f acc
+      f :: acc
   | Tbinop (Tor, f1, f2) ->
-      List.map (t_label_copy f) (collect_cases acc f1 @ collect_cases acc f2)
+      let acc = collect_cases acc f1 in
+      let acc = collect_cases acc f2 in
+      List.map (t_label_copy f) acc
   | Tbinop (Tand, f1, f2) ->
-      List.map (t_label_copy f) (collect_cases (collect_cases acc f1) f2)
+      let left = collect_cases [] f1 in
+      let right = collect_cases [] f2 in
+      List.fold_left (fun acc x ->
+        List.fold_left (fun acc y ->
+          t_label_copy f (t_and x y) :: acc) acc right) acc left
   | Tif (fif,fthen,felse) ->
-      let acc1 = collect_cases acc fthen in
-      let acc2 = collect_cases acc felse in
-      join_and (t_label_copy f fif) acc1 @
-      join_and (t_label_copy f (t_not fif)) acc2
+      let left = collect_cases [] fthen in
+      let right = collect_cases[] felse in
+      join_and (t_label_copy f fif) left @
+      join_and (t_label_copy f (t_not fif)) right @ acc
 
 let rec split f =
   match f.t_node with
