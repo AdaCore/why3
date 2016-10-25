@@ -96,7 +96,7 @@ module Make(E: sig
         cfg.env <- Environment.add cfg.env [|v|] [||]
       end
   
-  let ident_ret = Ident.{pre_name = "$$return"; pre_label = Ident.Slab.empty; pre_loc = None; }
+  let ident_ret = Ident.{pre_name = "$ret"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let cached_vreturn = ref (Ty.Mty.empty)
   let create_vreturn ty =
     try
@@ -575,14 +575,17 @@ module Make(E: sig
   let add_variable cfg context pv =
     add_typed_variable cfg context pv Ity.(pv.pv_ity)
 
-  let create_postcondition cfg context psym =
+  let create_postcondition_equality cfg context psym ?eps:(eps = false)vreturn =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then
       begin
-        let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
-
-        let vreturn = create_vreturn ty in
-        let postcondition = Term.( t_eps_close vreturn (
-            t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
+        let postcondition = 
+            t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None in
+        let postcondition =
+          if eps then
+            Term.(t_eps_close vreturn postcondition)
+          else
+            postcondition
+        in
 
         if Debug.test_flag ai_cfg_debug then
           begin
@@ -591,6 +594,17 @@ module Make(E: sig
             Format.eprintf "@.";
           end;
         (linear_expressions_from_term cfg context) postcondition
+      end
+    else
+      (fun abs -> abs), []
+
+  let create_postcondition cfg context psym =
+    if not Ity.(ity_equal  psym.pv_ity ity_unit) then
+      begin
+        let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
+
+        let vreturn = create_vreturn ty in
+        create_postcondition_equality cfg context psym ~eps:true vreturn
       end
     else
       (fun abs -> abs), []
@@ -710,9 +724,22 @@ module Make(E: sig
           constraints abs
         );
       begin_cp, end_cp, []
-    | Eexec({c_node = Capp(rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  _ }) ->
+    | Eexec({c_node = Capp(rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  Ity.cty_oldies = oldies; _ }) ->
       let eff_write = Ity.(effect.eff_writes) in
-
+      let context, vars_to_forget, constraint_copy_ghost = Ity.Mpv.fold_left (
+          fun (context, vars_to_forget, constraints) k b ->
+            let context = add_typed_variable cfg context k Ity.(k.pv_ity) in
+            let new_constraints, _ = create_postcondition_equality cfg context b ~eps:false Ity.(k.pv_vs) in
+            let var_term = t_var Ity.(k.pv_vs) in
+            let vars_to_forget =
+              (get_subvalues var_term None)::vars_to_forget in
+            context, vars_to_forget, (fun x -> new_constraints (constraints x))
+        ) (context, [], fun x -> x) oldies in
+      let ghost_vars_to_forget =
+        List.concat vars_to_forget
+        |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
+        |> Array.of_list in
+      
       (* Computing domain from postcondition *)
       if Debug.test_flag ai_cfg_debug then
         begin
@@ -735,6 +762,7 @@ module Make(E: sig
       let end_cp = new_node_cfg ~label:"function called" cfg expr in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+          let abs = constraint_copy_ghost abs in
           (* effects *)
           let abs = ref abs in
           (* FIXME: bad, does not work with sub records *)
@@ -762,7 +790,8 @@ module Make(E: sig
                 ) b;
             ) eff_write;
 
-          constraints !abs
+          let abs = constraints !abs in
+          D.forget_array man abs ghost_vars_to_forget false;
         );
       (* FIXME: handle exceptions *)
       begin_cp, end_cp, []
