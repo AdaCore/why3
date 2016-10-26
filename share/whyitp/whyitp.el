@@ -18,16 +18,13 @@
 (defun set-shell-vars()
   "configure Proof General shell for Why3ITP"
   (setq
-   proof-shell-start-goals-regexp	 "====================== Task ====================="
+   proof-shell-start-goals-regexp      "====================== Task ====================="
    proof-shell-restart-cmd             "r\n"
-   proof-shell-end-goals-regexp	       "end"
+   proof-shell-end-goals-regexp        "================================================="
    proof-shell-quit-cmd		       "q\n"
    proof-shell-annotated-prompt-regexp "^> "
    proof-shell-error-regexp            "\\*\\*\\*\\|^.*Error:\\|^uncaught exception \\|^Exception- "
    proof-shell-init-cmd		       "fun pg_repeat f 0 = () | pg_repeat f n = (f(); pg_repeat f (n-1));"))
-
-(defun get-prog-name ()
-  (concat "why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ()))))
 
 (defun set-prog-name ()
   (setq proof-prog-name (concat "why3shell " (replace-regexp-in-string ".whyitp" ".why" (buffer-file-name ())))))
