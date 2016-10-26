@@ -618,8 +618,31 @@ let print_known_map _fmt _args =
      printf "known: %s@." id.Ident.id_string)
     km
 
-(****)
+let find_any_id nt s =
+  try (Stdlib.Mstr.find s nt.Theory.ns_pr).Decl.pr_name with
+  | Not_found -> try (Stdlib.Mstr.find s nt.Theory.ns_ls).Term.ls_name with
+    | Not_found -> (Stdlib.Mstr.find s nt.Theory.ns_ts).Ty.ts_name
 
+let print_id s task fmt =
+  let tables = Args_wrapper.build_name_tables task in
+  let km = tables.Args_wrapper.known_map in
+  let id = try Some (find_any_id tables.Args_wrapper.namespace s) with
+  | Not_found -> Format.fprintf fmt "Does not exists @."; None in
+  if id = None then () else
+  let id = Opt.get id in
+  let d =
+    try Some (Ident.Mid.find id km) with
+    | Not_found -> None in
+  if d = None then () else Format.fprintf fmt "%a @." (Why3printer.print_decl tables) (Opt.get d)
+
+let test_print_id fmt args =
+  let id = nearest_goal () in
+  let task = get_task cont.controller_session id in
+  match args with
+  | [s] -> print_id s task fmt
+  | _ -> Format.fprintf fmt "Wrong number of arguments"
+
+(****)
 
 let commands =
   [
@@ -632,6 +655,7 @@ let commands =
     "p", "print the session in raw form", dump_session_raw;
     "c", "<provername> [timelimit [memlimit]] run a prover on the current goal", test_schedule_proof_attempt;
     "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
+    "print", "<s> print the declaration where s was defined", test_print_id;
     "g", "prints the current goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "s", "save the current session", test_save_session;
