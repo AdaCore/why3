@@ -827,14 +827,15 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
   let new_subtasks = List.map (fun id -> id,new_s)
       new_tr.transf_subtasks in
   let associated,detached =
-    AssoGoals.associate ~use_shapes:true old_subtasks new_subtasks
+    AssoGoals.associate ~use_shapes:false old_subtasks new_subtasks
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
         merge_goal env new_s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
-      | (_, None) ->
-        Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( @.";
+      | ((id,s), None) ->
+        Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( : %s @."
+          (get_proofNode s id).proofn_name.Ident.id_string;
         found_missed_goals_in_theory := true)
     associated;
   (* save the detached goals *)
@@ -883,7 +884,7 @@ let merge_theory env old_s old_th s th : unit =
   (* attach the session to the subtasks to be able to instantiate Pairing *)
   let detached_goals = Hstr.fold (fun _key g tl -> (g,old_s) :: tl) old_goals_table [] in
   let associated,detached =
-    AssoGoals.associate ~use_shapes:true detached_goals !new_goals
+    AssoGoals.associate ~use_shapes:false detached_goals !new_goals
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->

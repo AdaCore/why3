@@ -185,9 +185,9 @@ let timeout_handler () =
   try
     for _i = Queue.length prover_tasks_in_progress
         to 3 * !max_number_of_running_provers do
-      let (c,id,pr,timelimit,callback) = Queue.pop scheduled_proof_attempts in
+      let (c,id,pr,limit,callback) = Queue.pop scheduled_proof_attempts in
       try
-        build_prover_call c id pr timelimit callback
+        build_prover_call c id pr limit callback
       with e when not (Debug.test_flag Debug.stack_trace) ->
         Format.eprintf
           "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
