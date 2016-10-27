@@ -20,8 +20,8 @@ module Make(S:sig
       end)
     in
 
-    let rec reconstruct_expr cfg fixp e =
-      let r = reconstruct_expr cfg fixp in
+    let rec reconstruct_expr cfg context fixp e =
+      let r = reconstruct_expr cfg context fixp in
       match e.e_node with
       | Elet(LDvar(pv, e), e2) ->
         (let_var_raw pv (r e)
@@ -48,7 +48,7 @@ module Make(S:sig
         begin
         try
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
-        let t = AI.domain_to_term cfg new_inv in
+        let t = AI.domain_to_term cfg context new_inv in
         let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
         let inv = t :: inv in
         e_while (r e_cond) inv vari (r e_loop)
@@ -60,7 +60,7 @@ module Make(S:sig
         end
       | Efor(pv, (f, d, to_), inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
-        let t = AI.domain_to_term cfg new_inv in
+        let t = AI.domain_to_term cfg context new_inv in
         let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
         let inv = t :: inv in
         e_for pv (e_var f) d (e_var to_) inv (r e_loop)
@@ -89,15 +89,14 @@ module Make(S:sig
             let open Ity in
             let preconditions = Ity.(cexp.c_cty.cty_pre) in
             let cfg = AI.start_cfg rs in
-            let context = AI.empty_context  in
-            let context = List.fold_left (AI.add_variable cfg) context
-                Ity.(cexp.c_cty.cty_args) in
+            let context = AI.empty_context () in
+            List.iter (AI.add_variable cfg context) Ity.(cexp.c_cty.cty_args);
             Expr.print_expr Format.err_formatter e;
             Format.eprintf "@.";
             ignore (AI.put_expr_with_pre cfg context e preconditions);
             (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
-            let fixp = AI.eval_fixpoints cfg in
-            let new_e = reconstruct_expr cfg fixp e in
+            let fixp = AI.eval_fixpoints cfg context in
+            let new_e = reconstruct_expr cfg context fixp e in
             let ce = c_fun cexp.c_cty.cty_args cexp.c_cty.cty_pre cexp.c_cty.cty_post cexp.c_cty.cty_xpost
               cexp.c_cty.cty_oldies new_e
             in

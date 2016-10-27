@@ -134,17 +134,17 @@ let do_input f =
                         module D = Disjunctive_domain.Make(Domain.Polyhedra)
                       end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
-                    let context = Abstract_interpreter.empty_context  in
-                    let context = List.fold_left (Abstract_interpreter.add_variable cfg) context
-                      Ity.(cexp.c_cty.cty_args) in
+                    let context = Abstract_interpreter.empty_context () in
+                    List.iter (Abstract_interpreter.add_variable cfg context)
+                      Ity.(cexp.c_cty.cty_args);
                     Expr.print_expr Format.err_formatter e;
                     Format.eprintf "@.";
                     ignore (Abstract_interpreter.put_expr_with_pre cfg context e preconditions);
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
-                    let fixp = Abstract_interpreter.eval_fixpoints cfg
+                    let fixp = Abstract_interpreter.eval_fixpoints cfg context
                     |> List.map (fun (expr, domain) ->
                                   let inv =
-                                    Abstract_interpreter.domain_to_term cfg domain
+                                    Abstract_interpreter.domain_to_term cfg context domain
                                     |> Pretty.print_term Format.str_formatter
                                     |> Format.flush_str_formatter
                                     |> Format.sprintf "invariant { %s }\n"

@@ -11,7 +11,7 @@ module Make(S:sig
   type cfg
   type context
 
-  val empty_context : context
+  val empty_context : unit -> context
 
   val start_cfg: Expr.rsymbol -> cfg
 
@@ -19,11 +19,11 @@ module Make(S:sig
 
   val put_expr_with_pre: cfg -> context -> Expr.expr -> Term.term list -> (control_point * control_point * ((control_point * Ity.xsymbol) list))
   
-  val eval_fixpoints: cfg -> (Expr.expr * domain) list
+  val eval_fixpoints: cfg -> context -> (Expr.expr * domain) list
 
-  val domain_to_term: cfg -> domain -> Term.term
+  val domain_to_term: cfg -> context -> domain -> Term.term
 
-  val add_variable: cfg -> context -> Ity.pvsymbol -> context
+  val add_variable: cfg -> context -> Ity.pvsymbol -> unit
 
 
 end

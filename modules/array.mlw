@@ -25,7 +25,7 @@ module Array
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = (old a.elts)[i <- v] /\ (forall k: int. (k <> i -> get a.elts k = get (old a).elts k)) /\ get a.elts i = v}
 
   (** unsafe get/set operations with no precondition *)
 

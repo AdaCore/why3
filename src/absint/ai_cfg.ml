@@ -12,6 +12,12 @@ module Make(E: sig
     val widening: int
     module D: DOMAIN
   end) = struct
+
+  module Ai_logic = Ai_logic.Make(struct
+      let env = E.env
+      let pmod = E.pmod
+    end)
+  open Ai_logic
   
   let debug_fmt =
     if Debug.test_flag ai_print_domains then
@@ -27,18 +33,14 @@ module Make(E: sig
   
   open Term
 
-  module Ai_logic = Ai_logic.Make(struct
-      let env = E.env
+  module D = Uf_domain.Make(struct
+      module A = E.D
       let pmod = E.pmod
+      let env = E.env
     end)
-  open Ai_logic
-
-
-  module D = E.D
   (* Apron manager *)
   (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
   type apron_domain = Polka.strict PolkaGrid.t*)
-  let manpk = D.create_manager ()
 
   type control_point = int
   type hedge = int
@@ -60,8 +62,8 @@ module Make(E: sig
     (* Same but for hyperedge *)
     mutable hedge_count: int;
 
-    (* Apron environment. Holds every variable that is defined in the program *)
-    mutable env: Environment.t;
+    (* Domain environment. Holds every variable that is defined in the program FIXME might be out of date *)
+    mutable env: D.env;
 
     (* This function apply the effect of a transition (an hyperedge) to
      * an abstract domain *)
@@ -78,34 +80,28 @@ module Make(E: sig
   
   }
 
-  type context = {
-      region_ident: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
-      local_vars: Var.t Term.Mterm.t
-  }
+  type context = D.man
 
-  let empty_context = { region_ident = Ity.Mreg.empty; local_vars = Term.Mterm.empty; }
+  let empty_context = D.create_manager
 
   exception Unknown_hedge
 
   (* Initialize an hedge *)
 
-  let ensure_variable cfg v t =
-    if not (Environment.mem_var cfg.env v) then
-      begin
-        Hashtbl.add cfg.variable_mapping v t;
-        cfg.env <- Environment.add cfg.env [|v|] [||]
-      end
-  
   let ident_ret = Ident.{pre_name = "$ret"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let cached_vreturn = ref (Ty.Mty.empty)
-  let create_vreturn ty =
-    try
-      Ty.Mty.find ty !cached_vreturn
-    with
-    | Not_found ->
-      let v  = Term.create_vsymbol ident_ret ty in
-      cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
-      v
+  let create_vreturn manpk ty =
+    let v =
+      try
+        Ty.Mty.find ty !cached_vreturn
+      with
+      | Not_found ->
+        let v  = Term.create_vsymbol ident_ret ty in
+        cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
+        v
+    in
+    D.add_lvariable_to_env manpk v;
+    v
 
   let start_cfg _ =
     let cfg = { expr_to_control_point = Hashtbl.create 100;
@@ -114,7 +110,7 @@ module Make(E: sig
       hedge_count = 0;
       g = PSHGraph.create PSHGraph.stdcompare 3 ();
       apply = (fun _ _ _ -> raise Unknown_hedge);
-      env = Environment.make [||] [||];
+      env = ();
       loop_invariants = []; }
     in
     cfg
@@ -150,7 +146,7 @@ module Make(E: sig
     cfg.apply <- begin fun man h tabs ->
       if h = hedge then
         let abs = tabs.(0) in
-        let abs = D.push_label man cfg.env h abs in
+        let abs = D.push_label man () h abs in
         (), f man abs
       else old_apply man h tabs
     end;
@@ -161,39 +157,6 @@ module Make(E: sig
 
   exception Not_handled of Term.term
 
-  (* utility function that make equivalent classes and sum the last component *)
-  let sum_list a =
-    let a = List.sort (fun (i, _) (j, _) ->
-        compare i j) a in
-    let rec merge = function
-      | [] -> []
-      | [b] -> [b]
-      | (a, b)::(c, d)::q ->
-        if a = c then
-          merge ((a, b + d)::q)
-        else
-          (a, b) :: (merge ((c, d)::q))
-    in
-    merge a
-
-  let access_field constr constr_args a i (proj, t) =
-      match a.t_node with
-      | Tapp(func, args) when func.ls_constr = 1 ->
-        List.nth args i
-      | Tvar(_) | _ ->
-        match proj with
-        | None ->
-          let return = create_vsymbol ident_ret t in
-          let pat = List.mapi (fun k t ->
-              if k = i then
-                pat_var return
-              else
-                pat_wild t
-            ) constr_args in
-          t_case a [t_close_branch (pat_app constr pat (t_type a)) (t_var return)]
-        | Some s ->
-          t_app s [a] (Some t)
-
   let warning_t s t =
     Format.eprintf "-- warning: %s -- triggered by " s;
     Pretty.print_term Format.err_formatter t;
@@ -201,417 +164,49 @@ module Make(E: sig
     Pretty.print_ty Format.err_formatter (Term.t_type t);
     Format.eprintf "@."
             
-          
-  let get_subvalues a ity =
-    let open Ty in
-    let myty = t_type a in
-    let rec aux ity =
-      match myty.ty_node with
-      | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
-        [a, None]
-      | Tyapp(tys, vars) -> 
-        begin
-          let vars = Ty.ts_match_args tys vars in
-          match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-          | Decl.Ddata([_, [ls, ls_projs]]) ->
-            let l =
-              let my_ls_args = List.map (fun i -> Ty.ty_inst vars i) ls.ls_args in
-              List.combine my_ls_args ls_projs
-              |> List.map (fun (arg_type, proj) ->
-                  match proj with
-                  | Some s ->  Some s,
-                               (match s.ls_value with
-                                | Some t ->
-                                  let l = Ty.ty_inst vars t in
-                                  assert (Ty.ty_equal l arg_type);
-                                  l
-                                | None -> assert false)
-                  | None -> None, arg_type)
-              |> List.mapi (access_field ls my_ls_args a)
-            in
-            begin
-              match ity with
-              | None -> List.map (fun a -> a, None) l
-              | Some its ->
-                let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
-                List.map (fun a -> Some a) pdecl
-                |> List.combine l
-            end
-          | Decl.Dtype({ts_def = Some _; ts_args = _; _ }) ->
-            (* untested code*)
-            let () = assert false in
-            aux ity
-          | Decl.Ddata([_; _]) ->
-            warning_t "Multiple constructors is not supported in abstract interpretation." a; []
-          | Decl.Ddata(_) ->
-            warning_t "Recursive types is not supported in abstract interpretation." a; []
-          | Decl.Dtype(_) -> (* This happens when a type is private or has an invariant: it can't be accesed
-                              * by the logic, so we give up and only look for projections by looking
-                              * at program projections. *)
-            begin
-              try
-                let its = Ity.restore_its tys in
-                (match ity with
-                 | None -> ()
-                 | Some s -> assert (Ity.its_equal its s));
-                let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
-                List.map (fun b ->
-                    let l = match Expr.(b.rs_logic) with | Expr.RLls(l) -> l | _ -> assert false in
-                    let this_ty = Expr.(Ity.(ty_of_ity b.rs_cty.cty_result)) in
-                    let ty = Ty.ty_inst vars this_ty in
-                    t_app l [a] (Some ty), if ity = None then None else Some b) pdecl
-              with
-              | Not_found -> failwith "could not restore its"
-            end
-          | Decl.Dind(_) ->
-            warning_t "Could not find type declaration (got inductive predicate)."
-              a;
-            []
-          | Decl.Dlogic(_) ->
-            warning_t "Could not find type declaration (got logic declaration)."
-              a;
-            []
-          | Decl.Dprop(_) ->
-            warning_t "Could not find type declaration (got propsition) for: "
-              a;
-            []
-          | Decl.Dparam(_) ->
-            warning_t "Could not find type declaration (got param)."
-              a;
-            []
-        end
-      | Tyvar(_) ->
-        warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
-        []
-    in
-    aux ity
-
-  (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
-   *
-   * The resulting list of linear expressions is weaker than the original why3
-   * formula.
-   * In the most imprecise case, it returns an empty list.
-   **)
-  let linear_expressions_from_term: cfg -> context -> Term.term -> ((domain -> domain) * Var.t list)  = fun cfg context t ->
-    let open Term in
-
-    (* First inline everything, for instance needed for references
-     * where !i is (!) i and must be replaced by (contents i) *)
-    let t = t_replace_all t in
-
-    (* Let's try to remove the nots that we can *)
-    let t = t_descend_nots t in
-
-    let context = ref context in
-
-    let var_of_term t =
-      try
-        Some (Term.Mterm.find t (!context).local_vars)
-      with
-      | Not_found -> None
-    in
-
-    (* Assuming that t is an arithmetic term, this computes the number of ocurrence of variables
-     * ando the constant of the arithmetic expression.
-     * It returns (variables, constant)
-     *
-     * For instance, 4 + x + y set cst to 4, and constr to [(x, 1), (y, 1)]
-     * *)
-    let rec term_to_var_list coeff t =
-      match t.t_node with
-      | Tvar(_) ->
-        begin
-        match var_of_term t with
-        | Some var -> ([(var, coeff)], 0)
-        | None -> Format.eprintf "Variable undefined: "; Pretty.print_term Format.err_formatter t; Format.eprintf "@."; failwith "undefined var"
-        end
-      | Tconst(Number.ConstInt(n)) ->
-        let n = Number.compute_int n in
-        ([], coeff * (BigInt.to_int n))
-      | Tapp(func, args) when Term.ls_equal func ad_int ->
-        List.fold_left (fun (a, b) c ->
-            let c, d = term_to_var_list coeff c in
-            (a @ c, b + d)) ([], 0)args
-      | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
-        let c, d = term_to_var_list coeff a in
-        let e, f = term_to_var_list (-coeff) b in
-        (c @ e, d + f)
-      | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
-        term_to_var_list (-coeff)  a;
-      | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a])
-      | Tapp(func, [a; {t_node = Tconst(Number.ConstInt(n)); _};]) when Term.ls_equal func mult_int ->
-        let n = Number.compute_int n in
-        term_to_var_list ((BigInt.to_int n) * coeff) a
-      (* FIXME: need a nice domain for algebraic types *)
-      | _ -> (* maybe a record access *)
-        begin
-          match var_of_term t with
-          | None -> Format.eprintf "Could not find term@."; raise (Not_handled t)
-          | Some s ->
-            ([s, coeff], 0)
-        end
-    in
-    
-    (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
-     * the original formula. *)
-    let rec aux t =
-      try
-        match t.t_node with
-        | Tbinop(Tand, a, b) ->
-          let fa = aux a in
-          let fb = aux b in
-          (fun d ->
-            fb (fa d))
-        | Tbinop(Tor, a, b) ->
-          let fa = aux a in
-          let fb = aux b in
-          (fun d ->
-             let d1 = fa d in
-             let d2 = fb d in
-             D.join manpk d1 d2)
-        | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int || Ty.ty_equal (t_type a) Ty.ty_bool)
-          && 
-          (ls_equal ps_equ func ||
-           ls_equal lt_int func ||
-           ls_equal gt_int func ||
-           ls_equal le_int func ||
-           ls_equal ge_int func)
-
-          -> (* ATM, this is handled only for equality and integer comparison *)
-          (* FIXME: >, <=, >=, booleans *)
-            let base_coeff, eq_type =
-              if ls_equal ps_equ func then
-                1, Lincons1.EQ
-              else if ls_equal lt_int func then
-                1, Lincons1.SUP
-              else if ls_equal gt_int func then
-                -1, Lincons1.SUP
-              else if ls_equal le_int func then
-                1, Lincons1.SUPEQ
-              else if ls_equal ge_int func then
-                -1, Lincons1.SUPEQ
-              else
-                assert false
-            in
-            let va, ca = term_to_var_list (-base_coeff) a in
-            let vb, cb = term_to_var_list base_coeff b in
-            let c = ca + cb in
-            let v = sum_list (va @ vb) in
-            let expr = Linexpr1.make cfg.env in
-            let constr = List.map (fun (var, coeff) ->
-                Coeff.Scalar (Scalar.of_int coeff), var) v in
-            Linexpr1.set_list expr constr None;
-            let cons = Lincons1.make expr eq_type in
-            Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int c));
-            let arr = Lincons1.array_make cfg.env 1 in
-            Lincons1.array_set arr 0 cons;
-              (fun d ->
-                 D.meet_lincons_array manpk d arr)
-        | Tapp(func, [a;b]) when ls_equal ps_equ func ->
-          begin
-            let subv_a = get_subvalues a None in
-            let subv_b = get_subvalues b None in
-            List.combine subv_a subv_b 
-            |> List.fold_left (fun f ((a, _), (b, _)) ->
-                let g = aux (t_app ps_equ [a; b] None) in
-                (fun abs ->
-                   f (g (abs)))) (fun abs -> abs)
-          end
-        | Tif(a, b, c) ->
-          let fa = aux a in
-          let fa_not = aux (t_descend_nots a) in
-          let fb = aux b in
-          let fc = aux c in
-          (fun d ->
-             let d1 = fb (fa d) in
-             let d2 = fc (fa_not d) in
-             D.join manpk d1 d2)
-        | Ttrue -> (fun d -> d)
-        | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
-        | Tfalse -> (fun _ -> D.bottom manpk cfg.env)
-        | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom manpk cfg.env)
-        | _ ->
-          raise (Not_handled t)
-      with
-      | Not_handled(t) ->
-        Format.eprintf "Couldn't understand entirely the post condition: ";
-        Pretty.print_term Format.err_formatter t;
-        Format.eprintf "@.";
-        (fun d -> d)
-    in
-
-    let to_forget = ref [] in
-    try
-      match t.t_node with
-      | Teps(tb) ->
-        let return, t = Term.t_open_bound tb in
-        (* Always use the same variable when returning a value, 
-         * otherwise variables keep being created and the previous ones (with the
-         * good constraints) can not be accessed *)
-        let return_var = create_vreturn (return.vs_ty) in
-        let return_term = t_var return_var in
-        let subvalues = get_subvalues return_term None in
-        let l =
-          List.fold_left (fun context (a, _) ->
-
-              ignore (Format.flush_str_formatter ());
-              let v = Pretty.print_term Format.str_formatter a
-                      |> Format.flush_str_formatter
-                      |> Var.of_string
-              in
-              to_forget := v :: !to_forget;
-              ensure_variable cfg v a;
-              { context with local_vars = Term.Mterm.add a v context.local_vars }
-            ) !context subvalues
-        in
-        context := l;
-        aux (t_subst_single return return_term t), !to_forget
-      | _ ->
-        aux t, !to_forget
-    with
-    | e ->
-      Format.eprintf "error while computing domain for post conditions: ";
-      Pretty.print_term Format.err_formatter t;
-      Format.eprintf "@.";
-      raise e
-
-  let var_id = ref 0
-
-  let add_typed_variable cfg context psym variable_type =
-    incr var_id;
-    let open Expr in
-    let open Ity in
-    let open Ty in
-    let logical_term =
-      match Expr.term_of_expr ~prop:false (Expr.e_var psym) with
-      | Some s -> s
-      | None -> assert false
-    in
-    ignore (Format.flush_str_formatter ());
-    let context = 
-      match Ity.(variable_type.ity_node), (Term.t_type logical_term).ty_node with
-      | _ when Ty.ty_equal (t_type logical_term) ty_int ->
-        let reg_name = Pretty.print_term Format.str_formatter logical_term
-                       |> Format.flush_str_formatter
-                       |> Format.sprintf "%d%s" !var_id in
-        let v =
-          Var.of_string reg_name in
-        assert (not (Environment.mem_var cfg.env v));
-        ensure_variable cfg v logical_term;
-        { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
-      | _ when Ty.ty_equal (t_type logical_term) ty_bool ->
-        let reg_name = Pretty.print_term Format.str_formatter logical_term
-                       |> Format.flush_str_formatter
-                       |> Format.sprintf "%d%s" !var_id in
-        let v =
-          Var.of_string reg_name in
-        assert (not (Environment.mem_var cfg.env v));
-        ensure_variable cfg v logical_term;
-        { context with local_vars = Term.Mterm.add logical_term v context.local_vars }
-      | _ when Ity.ity_equal variable_type Ity.ity_unit
-        -> context
-      | Ity.Ityreg(reg), Tyapp(_, _) -> 
-        begin
-          let reg_name = 
-            Ity.print_reg_name Format.str_formatter reg
-            |> Format.flush_str_formatter
-          in
-          let vret = create_vreturn (t_type logical_term) in
-          let vret = t_var vret in
-          let subv = get_subvalues vret (Some reg.reg_its) in
-          let subv_r = get_subvalues logical_term (Some reg.reg_its) in
-          let subv = List.combine subv subv_r in
-          let context, proj_list =
-            List.fold_left (fun (context, acc) ((generic_region_term, pfield), (real_term, _)) ->
-                let pfield = match pfield with
-                  | Some s -> s
-                  | None -> assert false
-                in
-
-                ignore (Format.flush_str_formatter ());
-                let v = Pretty.print_term Format.str_formatter generic_region_term
-                        |> Format.flush_str_formatter
-                        |> Format.sprintf "r$%s.%s" reg_name
-                        |> Var.of_string
-                in
-                ensure_variable cfg v real_term;
-                let accessor = match pfield.rs_field with
-                  | Some s -> s
-                  | None -> assert false
-                in
-                { context with local_vars = Term.Mterm.add real_term v context.local_vars }, (accessor, real_term) :: acc
-              ) (context, []) subv
-          in
-          { context with region_ident = Ity.Mreg.add reg proj_list context.region_ident }
-        end
-      | Ity.Ityapp(_), _ ->
-        Format.eprintf "Let's check that ";
-        Ity.print_ity Format.err_formatter variable_type;
-        Format.eprintf " has only non mutable fields.";
-        let reg_name = Ity.print_pv Format.str_formatter psym
-        |> Format.flush_str_formatter in
-        let subv = get_subvalues logical_term None in
-        let context = List.fold_left (fun context (t, _) ->
-            ignore (Format.flush_str_formatter ());
-            let v = Pretty.print_term Format.str_formatter t
-                    |> Format.flush_str_formatter
-                    |> Format.sprintf "%d%s.%s" !var_id reg_name
-                    |> Var.of_string
-            in
-            ensure_variable cfg v t;
-            { context with local_vars = Term.Mterm.add t v context.local_vars }) context subv
-        in
-        context
-      | _ ->
-        (* We can safely give up on a, as no integer variable can descend from it (because it is well typed) *)
-        Format.eprintf "Variable could not be added properly: ";
-        Pretty.print_term Format.err_formatter logical_term;
-        Format.eprintf " of type ";
-        Ity.print_ity Format.err_formatter variable_type;
-        Format.eprintf "@.";
-        context
-    in context
-
-  let add_variable cfg context pv =
-    add_typed_variable cfg context pv Ity.(pv.pv_ity)
-
-  let create_postcondition_equality cfg context psym ?eps:(eps = false)vreturn =
+  let create_postcondition_equality cfg manpk psym vreturn =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then
       begin
         let postcondition = 
             t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None in
-        let postcondition =
-          if eps then
-            Term.(t_eps_close vreturn postcondition)
-          else
-            postcondition
-        in
-
         if Debug.test_flag ai_cfg_debug then
           begin
             Format.eprintf "--> Postcondition for let: ";
             Pretty.print_term Format.err_formatter postcondition;
             Format.eprintf "@.";
           end;
-        (linear_expressions_from_term cfg context) postcondition
+        D.meet_term manpk postcondition
       end
     else
-      (fun abs -> abs), []
+      (fun abs -> abs)
 
-  let create_postcondition cfg context psym =
+  let create_postcondition cfg manpk psym =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then
       begin
         let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
 
-        let vreturn = create_vreturn ty in
-        create_postcondition_equality cfg context psym ~eps:true vreturn
+        let vreturn = create_vreturn manpk ty in
+        create_postcondition_equality cfg manpk psym vreturn, D.forget_var manpk vreturn
       end
     else
-      (fun abs -> abs), []
+      (fun abs -> abs), (fun abs -> abs)
 
 
+  let remove_eps manpk t =
+    match t.t_node with
+    | Teps(tb) ->
+      let return, t = Term.t_open_bound tb in
+      (* Always use the same variable when returning a value, 
+       * otherwise variables keep being created and the previous ones (with the
+       * good constraints) can not be accessed *)
+      let return_var = create_vreturn manpk (return.vs_ty) in
+      let return_term = t_var return_var in
+      t_subst_single return return_term t
+    | _ ->
+      t
 
-  (* Adds expr to the cfg. context is the types of the locally defined variable
+
+  (* Adds expr to the cfg. manpk is the types of the locally defined variable
    * (useful for references, when we need to get the type of a term in a logical formula).
    *
    * Adds multiple node and edges if expr requires so.
@@ -619,22 +214,19 @@ module Make(E: sig
    * returns a tuple, whose first element is the entry point of expr in the cfg, and the second
    * one is the ending point. The result of expr is stored is the variable "result"
    * (see var_return) *)
-  let rec put_expr_in_cfg cfg context expr =
+  let rec put_expr_in_cfg cfg (manpk:D.man) expr =
     let open Expr in
     match expr.e_node with
     | Epure (t) ->
       let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
-      let vreturn = create_vreturn (t_type t) in
-      let postcondition = t_eps_close vreturn (t_app ps_equ [t_var vreturn; t] None) in
-      let constraints, _ = linear_expressions_from_term cfg context postcondition in
+      let vreturn = create_vreturn manpk (t_type t) in
+      let postcondition = t_app ps_equ [t_var vreturn; t] None in
+      let constraints = D.meet_term manpk postcondition in
       new_hedge_cfg cfg (i, j) (fun _ abs ->
           constraints abs);
       i, j, []
 
     | Elet(LDvar(psym, let_expr), b) ->
-      (* As it may not be an int, the type could be useful, so we can save it *)
-      let variable_type = Expr.(let_expr.e_ity) in
-
           (*
            * let a = b in c
            *
@@ -649,50 +241,42 @@ module Make(E: sig
            *  | erase every temporary variable
            *  . end_cp
            **)
-      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg context let_expr in
+      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg manpk let_expr in
 
-      let context = add_typed_variable cfg context psym variable_type in
+      D.add_variable_to_env manpk psym;
 
-      let constraints, to_forget =
-        create_postcondition cfg context psym
+      let constraints, forget_ret =
+        create_postcondition cfg manpk psym 
       in
+      (*let forget_ret = D.forget_var manpk cfg.env (create_vreturn Ity.(ty_of_ity (psym.pv_ity))) in*)
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg context b in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg manpk b in
 
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
-          let to_forget = Array.of_list to_forget in
-          D.forget_array man (constraints abs) to_forget false
+          constraints abs |> forget_ret
         );
+
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
-      let var_term = match Expr.term_of_expr ~prop:false (Expr.e_var psym) with
-        | Some s -> s
-        | None -> assert false
-      in
-      let vars_to_forget =
-        get_subvalues var_term None
-        |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
-        |> Array.of_list
-      in
+      let forget_fun = D.forget_var manpk Ity.(psym.pv_vs) in
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
-          D.forget_array man abs vars_to_forget false
+          forget_fun abs
         );
-
-
       let_begin_cp, end_cp, let_exn @ b_exn
+
     | Evar(psym) ->
-      let constraints, _ =
+      let constraints =
         if not Ity.(ity_equal  psym.pv_ity ity_unit) then
           begin
           let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
 
-          let vreturn = create_vreturn ty in
-          let postcondition = Term.( t_eps_close vreturn (
-              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None)) in
+          let vreturn = create_vreturn manpk ty in
+          let postcondition = Term.( 
+              t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None) in
 
           if Debug.test_flag ai_cfg_debug then
             begin
@@ -700,10 +284,10 @@ module Make(E: sig
               Pretty.print_term Format.err_formatter postcondition;
               Format.eprintf "@.";
             end;
-          (linear_expressions_from_term cfg context) postcondition
+          D.meet_term manpk postcondition
           end
         else
-          (fun abs -> abs), []
+          (fun abs -> abs)
       in
 
       let begin_cp = new_node_cfg cfg expr in
@@ -716,9 +300,9 @@ module Make(E: sig
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg ~label:"constant returned" cfg expr in
 
-      let vreturn = create_vreturn Ty.ty_int in
-      let postcondition = t_eps_close vreturn (t_app ps_equ [t_const n; t_var vreturn] None) in
-      let constraints, _ = linear_expressions_from_term cfg context postcondition in
+      let vreturn = create_vreturn manpk Ty.ty_int in
+      let postcondition = t_app ps_equ [t_const n; t_var vreturn] None in
+      let constraints = D.meet_term manpk postcondition in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
           constraints abs
@@ -726,19 +310,13 @@ module Make(E: sig
       begin_cp, end_cp, []
     | Eexec({c_node = Capp(rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  Ity.cty_oldies = oldies; _ }) ->
       let eff_write = Ity.(effect.eff_writes) in
-      let context, vars_to_forget, constraint_copy_ghost = Ity.Mpv.fold_left (
-          fun (context, vars_to_forget, constraints) k b ->
-            let context = add_typed_variable cfg context k Ity.(k.pv_ity) in
-            let new_constraints, _ = create_postcondition_equality cfg context b ~eps:false Ity.(k.pv_vs) in
-            let var_term = t_var Ity.(k.pv_vs) in
-            let vars_to_forget =
-              (get_subvalues var_term None)::vars_to_forget in
-            context, vars_to_forget, (fun x -> new_constraints (constraints x))
-        ) (context, [], fun x -> x) oldies in
-      let ghost_vars_to_forget =
-        List.concat vars_to_forget
-        |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
-        |> Array.of_list in
+      let vars_to_forget, constraint_copy_ghost = Ity.Mpv.fold_left (
+          fun (vars_to_forget, constraints) k b ->
+            D.add_variable_to_env manpk k;
+            let new_constraints = create_postcondition_equality cfg manpk b Ity.(k.pv_vs) in
+            let forget_var = D.forget_var manpk Ity.(k.pv_vs) in
+            (fun abs -> vars_to_forget abs |> forget_var), (fun abs -> constraints abs |> new_constraints)
+        ) ((fun x -> x), fun x -> x) oldies in
       
       (* Computing domain from postcondition *)
       if Debug.test_flag ai_cfg_debug then
@@ -754,44 +332,22 @@ module Make(E: sig
           Format.eprintf "@.";
         end;
       let constraints =
-        List.map (linear_expressions_from_term cfg context) post
-        |> List.fold_left (fun f (a, _) ->
-            (fun d -> f (a d))) (fun x -> x)
+        List.map (remove_eps manpk) post
+        |> List.fold_left Term.t_and Term.t_true
+        |> D.meet_term manpk
       in
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg ~label:"function called" cfg expr in
+          
+      let forget_writes = Ity.Mreg.fold_left (fun constr a b ->
+
+          let forget = D.forget_region manpk a b in
+          (fun x ->
+             constr x |> forget)
+        ) (fun x -> x) eff_write in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
-          let abs = constraint_copy_ghost abs in
-          (* effects *)
-          let abs = ref abs in
-          (* FIXME: bad, does not work with sub records *)
-          ignore @@ Ity.Mreg.mapi (fun a b ->
-              Ity.Mpv.mapi (fun c () ->
-                  let var = Ity.Mreg.find a context.region_ident in
-                  let _, t =
-                    try List.find (fun (p, _) ->
-                      Ity.pv_equal p c) var
-                    with
-                    | Not_found ->
-                      Format.eprintf "Couldn't find projection for field ";
-                      Ity.print_pv Format.err_formatter c;
-                      Format.eprintf "@.";
-                      Format.eprintf "(known fields: ";
-                      List.iter (fun (p, _) ->
-                          Ity.print_pv Format.err_formatter p;
-                          Format.eprintf " @.";
-                        ) var;
-                      Format.eprintf ")@.";
-                      assert false
-                  in
-                  let v = Term.Mterm.find t context.local_vars in
-                  abs :=  D.forget_array man !abs [|v|] false;
-                ) b;
-            ) eff_write;
-
-          let abs = constraints !abs in
-          D.forget_array man abs ghost_vars_to_forget false;
+          constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
         );
       (* FIXME: handle exceptions *)
       begin_cp, end_cp, []
@@ -805,10 +361,10 @@ module Make(E: sig
           Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
           Term.t_true
       in
-      let constraints, _ = linear_expressions_from_term cfg context cond_term in
+      let constraints = D.meet_term manpk cond_term in
 
       let before_loop_cp = new_node_cfg cfg cond in
-      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg context content in
+      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg manpk content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ abs ->
@@ -825,35 +381,30 @@ module Make(E: sig
       before_loop_cp, after_loop_cp, loop_exn
     | Etry(e, exc) ->
       let additional_exn = ref [] in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
       let i = new_node_cfg cfg expr in
       let exc = Ity.Mexn.map (fun (l, e) ->
-
-          let context = List.fold_left (fun context p ->
-              add_typed_variable cfg context p Ity.(p.pv_ity)) context l in
+          List.iter (fun p ->
+              D.add_variable_to_env manpk p) l;
 
           let before_assign_cp = new_node_cfg cfg e in
 
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
 
           additional_exn := e_exn @ !additional_exn;
 
           begin
             match l with
             | [p] ->
-              let constraints, to_forget = create_postcondition cfg context p in
+              let constraints, forget_ret = create_postcondition cfg manpk p in
               new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs ->
-                  let abs = constraints abs in
-                D.forget_array manpk abs (Array.of_list to_forget) false);
+                  constraints abs |> forget_ret
+                );
 
-              let var_term = t_var Ity.(p.pv_vs) in
-              let vars_to_forget =
-                get_subvalues var_term None
-                |> List.map (fun (a, _) -> Term.Mterm.find a context.local_vars)
-                |> Array.of_list
-              in
+              let to_forget = D.forget_var manpk Ity.(p.pv_vs) in
               new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
-                  D.forget_array manpk abs vars_to_forget false);
+                  to_forget abs
+                );
             | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
               new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
               new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
@@ -878,11 +429,11 @@ module Make(E: sig
         );
       e_begin_cp, i, !additional_exn @ e_exn
     | Eraise(s, e) ->
-      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg context e in
+      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg manpk e in
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
       new_hedge_cfg cfg (j, k) (fun man _ ->
-          D.bottom man cfg.env);
+          D.bottom man ());
       arg_begin, k, ((arg_end_cp, s)::arg_exn)
 
     | Eif(cond, b, c) ->
@@ -895,10 +446,10 @@ module Make(E: sig
           Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated (migth even be wrong if there are exceptions)";
           Term.t_true
       in
-      let constraints, _ = linear_expressions_from_term cfg context cond_term in
-      let constraints_not, _ = linear_expressions_from_term cfg context (t_not cond_term) in
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg context b in
-      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg context c in
+      let constraints = D.meet_term manpk cond_term in
+      let constraints_not = D.meet_term manpk (t_not cond_term) in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg manpk b in
+      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg manpk c in
       let start_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (start_cp, b_begin_cp) (fun _ abs ->
@@ -911,46 +462,42 @@ module Make(E: sig
           abs);
       start_cp, end_cp, b_exn @ c_exn
     | Ecase(case_e, l) ->
-      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg context case_e in
+      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg manpk case_e in
       let e_exns = ref [case_e_exn] in
       let case_end_cp = new_node_cfg cfg expr in
       List.iter (fun (p, e) ->
           let open Term in
           let open Expr in
-          let context = ref context in
           let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
-            | Pwild -> (fun abs -> abs), [], []
+            | Pwild -> (fun abs -> abs), (fun abs -> abs), (fun x -> x)
             | Pvar(_) -> failwith "pattern"
             | Papp(l, p) ->
               let args = List.map (fun p -> match p.pat_node with
                   | Pvar(vsym) ->
                     let pv = Ity.restore_pv vsym in
-                    context := add_typed_variable cfg !context pv Ity.(pv.pv_ity);
-                    t_var vsym
+                    D.add_variable_to_env manpk pv;
+                    vsym
                   | _ -> failwith "nested pattern or worse"
                 ) p in
-              let matched_term = t_app l args (Some (Ity.ty_of_ity (case_e.e_ity))) in
-              let vreturn = create_vreturn (t_type matched_term) in
+              let matched_term = t_app l (List.map t_var args) (Some (Ity.ty_of_ity (case_e.e_ity))) in
+              let vreturn = create_vreturn manpk (t_type matched_term) in
               let postcondition =
-                t_eps_close vreturn (
-                  t_app ps_equ [matched_term; t_var vreturn] None) in
-              let constr, to_forget = linear_expressions_from_term cfg !context postcondition
+                  t_app ps_equ [matched_term; t_var vreturn] None in
+              let constr = D.meet_term manpk postcondition
               in
-              let vars_to_forget =
-                get_subvalues matched_term None
-                |> List.map (fun (a, _) -> Term.Mterm.find a (!context).local_vars)
-              in
-              constr, to_forget, vars_to_forget 
+              constr, D.forget_var manpk vreturn, (List.fold_left (fun c arg ->
+                  fun x -> c x |> D.forget_var manpk arg) (fun x -> x) args)
 
             | Por(_) -> failwith "pattern or"
             | Pas(_) -> failwith "pattern as"
           in
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg !context e in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
           new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
-              D.forget_array man (constraints abs) (Array.of_list to_forget_before) false
+              constraints abs |> to_forget_before
             );
           new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs ->
-              D.forget_array man abs (Array.of_list to_forget_end) false);
+              to_forget_end abs
+            );
           e_exns := e_exn :: !e_exns;
         ) l;
       case_e_begin_cp, case_end_cp, (List.concat !e_exns)
@@ -959,7 +506,7 @@ module Make(E: sig
 
       i, i, []
 
-    | Eghost(e) -> put_expr_in_cfg cfg context e
+    | Eghost(e) -> put_expr_in_cfg cfg manpk e
 
     | Efor(k, (lo, dir, up), _, e) ->
       (* . before_loop
@@ -974,16 +521,15 @@ module Make(E: sig
       let k_term, lo, up =
         Ity.(t_var k.pv_vs, t_var lo.pv_vs, t_var up.pv_vs)
       in
-      let context = add_variable cfg context k in
-      let k_var = Mterm.find k_term context.local_vars in
+      D.add_variable_to_env manpk k;
 
       let before_loop_cp = new_node_cfg cfg expr in
       let start_loop_cp = new_node_cfg cfg expr in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
       let end_loop_cp = new_node_cfg cfg expr in
 
       let postcondition_before = t_app ps_equ [k_term; lo] None in
-      let constraints_start, _ = linear_expressions_from_term cfg context postcondition_before in
+      let constraints_start = D.meet_term manpk postcondition_before in
 
       let precondition_e =
         if dir = Expr.To then
@@ -991,29 +537,32 @@ module Make(E: sig
         else
           t_and (t_app le_int [up; k_term] None) (t_app le_int [k_term; lo] None)
       in
-      let constraints_e, _ = linear_expressions_from_term cfg context precondition_e in
+      let constraints_e = D.meet_term manpk precondition_e in
 
       let postcondition =
           t_app ps_equ [k_term; up] None
       in
-      let constraints_post, _ = linear_expressions_from_term cfg context postcondition in
+      let constraints_post = D.meet_term manpk postcondition in
 
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ -> constraints_start);
       new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun _ -> constraints_e);
+      let vret_k = create_vreturn manpk Ty.ty_int in
+      let forget_vret = D.forget_var manpk vret_k in
+      let forget_k = D.forget_var manpk Ity.(k.pv_vs) in
+      let next_assignation = t_app ps_equ [t_var vret_k; t_app ad_int [k_term; Term.t_const ( Number.ConstInt (Number.int_const_bin "1"))] None] None |> D.meet_term manpk in
+      let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> D.meet_term manpk in
       new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->
-          (* k = k + 1 *)
-          let expr = Linexpr1.make cfg.env in
-          Linexpr1.set_array expr [|Coeff.s_of_int 1,  k_var|] (Some (Coeff.s_of_int 1));
-          D.assign_linexpr man abs k_var expr None
+          (* vret = k + 1, forget k, k = vret, forget vret *)
+          next_assignation abs |> forget_k |> vret_equal |> forget_vret
         );
       new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun man abs ->
-          let abs = constraints_post abs in
-          D.forget_array man abs [|k_var|] false);
+          constraints_post abs |> forget_k
+        );
       cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
       before_loop_cp, end_loop_cp, e_exn
 
     | _ ->
-      Format.eprintf "expression not handled";
+      Format.eprintf "expression not handled, will probably lead to some errors";
       Expr.print_expr Format.err_formatter expr;
       begin
       match expr.e_loc with
@@ -1023,24 +572,16 @@ module Make(E: sig
       let i = new_node_cfg cfg expr in
       i, i, []
 
-  let put_expr_with_pre cfg context e pre =
+  let put_expr_with_pre cfg manpk e pre =
     let i = new_node_cfg cfg e in
-    let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg context e in
-    let constraints, _ = linear_expressions_from_term cfg context (t_and_l pre) in
+    let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
+    let constraints = D.meet_term manpk (t_and_l pre) in
     new_hedge_cfg cfg (i, e_start_cp) (fun _ -> constraints);
     i, e_end_cp, e_exn
 
   module Apron_to_term = Apron_to_term.Apron_to_term (E)
-  let domain_to_term cfg domain =
-    D.to_term E.env E.pmod manpk domain (fun a ->
-        try
-          Hashtbl.find cfg.variable_mapping a
-        with 
-        | Not_found ->
-          Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
-          raise Not_found
-      )
-
+  let domain_to_term cfg manpk domain =
+    D.to_term manpk domain
 
   let vertex_dummy = -1
   (** dummy value *)
@@ -1055,7 +596,7 @@ module Make(E: sig
 
   let get_fixpoint_man cfg man =
     let (manager:(int,int, D.t,unit) Fixpoint.manager) = {
-      Fixpoint.bottom = begin fun _ -> D.bottom man cfg.env end;
+      Fixpoint.bottom = begin fun _ -> D.bottom man () end;
       Fixpoint.canonical = begin fun _ abs -> D.canonicalize man abs end;
       Fixpoint.is_bottom = begin fun _ abs -> D.is_bottom man abs end;
       Fixpoint.is_leq = begin fun _ abs1 abs2 -> D.is_leq man abs1 abs2 end;
@@ -1093,7 +634,7 @@ module Make(E: sig
     in manager
   
   
-  let eval_fixpoints cfg =
+  let eval_fixpoints cfg manpk =
     begin
       let manager = get_fixpoint_man cfg manpk in
       let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
@@ -1157,7 +698,7 @@ module Make(E: sig
               let abs = PSHGraph.attrvertex output cp in
               Format.printf "%a@." D.print abs;
               Pretty.forget_all ();
-              Pretty.print_term Format.std_formatter (domain_to_term cfg abs);
+              Pretty.print_term Format.std_formatter (domain_to_term cfg manpk abs);
               printf "@."
             ) cfg.loop_invariants;
 
@@ -1170,5 +711,8 @@ module Make(E: sig
           expr, abs
         ) cfg.loop_invariants
     end
+
+  let add_variable cfg a pvs =
+    D.add_variable_to_env a pvs
 
 end
