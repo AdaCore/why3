@@ -15,6 +15,10 @@ open Term
 open Theory
 open Driver_ast
 
+let debug =
+  Debug.register_info_flag "extraction"
+    ~desc:"Print@ details@ of@ program@ extraction."
+
 type driver = {
   drv_env         : Env.env;
   drv_printer     : string option;

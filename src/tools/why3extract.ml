@@ -99,7 +99,7 @@ let opt_driver =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let extract_to ?fname:string th extract =
+let extract_to ?fname:string m =
   let file = Filename.concat opt_output (assert false (*Mlw_ocaml.extract_filename ?fname th *)) in
   let old =
     if Sys.file_exists file then begin
@@ -108,32 +108,29 @@ let extract_to ?fname:string th extract =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
-  extract file ?old (formatter_of_out_channel cout);
+  let fmt = formatter_of_out_channel cout in
+  let tname = m.Pmodule.mod_theory.th_name.Ident.id_string in
+  Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
+  Pdriver.extract_module ?old opt_driver fmt m;
   close_out cout
 
-let extract_to _ =
-  assert false
-(*
+let extract_to =
   let visited = Ident.Hid.create 17 in
-  fun ?fname th extract ->
-    if not (Ident.Hid.mem visited th.th_name) then begin
-      Ident.Hid.add visited th.th_name ();
-      extract_to ?fname th extract
+  fun ?fname m ->
+    let name = m.Pmodule.mod_theory.Theory.th_name in
+    if not (Ident.Hid.mem visited name) then begin
+      Ident.Hid.add visited name ();
+      extract_to ?fname m
     end
-  *)
 
 let use_iter f th =
   List.iter (fun d -> match d.td_node with Use t -> f t | _ -> ()) th.th_decls
 
-let do_extract_module ?fname m =
+let (* rec *) do_extract_module ?fname m =
+  extract_to ?fname m;
   assert false
-(*
-  let extract file ?old fmt = ignore (old);
-    let tname = m.Mlw_module.mod_theory.th_name.Ident.id_string in
-    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname file;
-    Mlw_ocaml.extract_module opt_driver ?old ?fname fmt m
-  in
-  extract_to ?fname m.Mlw_module.mod_theory extract;
+(* TODO: extract also used modules ? Or let each extraction function decide what "used" parts should be extracted ?
+
   let extract_use th' =
     let fname = if th'.th_path = [] then fname else None in
     match
@@ -147,7 +144,7 @@ let do_extract_module ?fname m =
 let do_global_extract (_,p,t) =
   let env = opt_driver.Pdriver.drv_env in
   let m = Pmodule.read_module env p t in
-  assert false (* TODO *)
+  do_extract_module m
 
 
 let do_extract_module_from fname mm (tname,_,t) =
@@ -163,7 +160,7 @@ let do_local_extract fname cin tlist =
   let mm =
     Env.read_channel ?format Pmodule.mlw_language env fname cin in
   if Queue.is_empty tlist then
-    let do_m m = do_extract_module ~fname m in
+    let do_m _ m = do_extract_module ~fname m in
     Mstr.iter do_m mm
   else
     Queue.iter (do_extract_module_from fname mm) tlist

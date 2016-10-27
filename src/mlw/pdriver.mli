@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+val debug : Debug.flag
+
 type driver = private {
   drv_env         : Env.env;
   drv_printer     : string option;
