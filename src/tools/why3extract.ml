@@ -12,7 +12,7 @@
 open Format
 open Why3
 open Stdlib
-open Theory
+open Pmodule
 
 let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
@@ -27,6 +27,7 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
+(* TODO : rename theory into module, -T into -M *)
 let add_opt_theory x =
   let l = Strings.split '.' x in
   let p, t = match List.rev l with
@@ -99,8 +100,9 @@ let opt_driver =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let extract_to ?fname:string m =
-  let file = Filename.concat opt_output (assert false (*Mlw_ocaml.extract_filename ?fname th *)) in
+let extract_to ?fname m =
+  let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+  let file = Filename.concat opt_output (fg ?fname m) in
   let old =
     if Sys.file_exists file then begin
       let backup = file ^ ".bak" in
@@ -109,41 +111,36 @@ let extract_to ?fname:string m =
     end else None in
   let cout = open_out file in
   let fmt = formatter_of_out_channel cout in
-  let tname = m.Pmodule.mod_theory.th_name.Ident.id_string in
+  let tname = m.mod_theory.Theory.th_name.Ident.id_string in
   Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
-  Pdriver.extract_module ?old opt_driver fmt m;
+  pr ?old pargs fmt m;
   close_out cout
 
 let extract_to =
   let visited = Ident.Hid.create 17 in
   fun ?fname m ->
-    let name = m.Pmodule.mod_theory.Theory.th_name in
+    let name = m.mod_theory.Theory.th_name in
     if not (Ident.Hid.mem visited name) then begin
       Ident.Hid.add visited name ();
       extract_to ?fname m
     end
 
-let use_iter f th =
-  List.iter (fun d -> match d.td_node with Use t -> f t | _ -> ()) th.th_decls
+let rec use_iter f l =
+  List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
 
-let (* rec *) do_extract_module ?fname m =
-  extract_to ?fname m;
-  assert false
-(* TODO: extract also used modules ? Or let each extraction function decide what "used" parts should be extracted ?
-
-  let extract_use th' =
-    let fname = if th'.th_path = [] then fname else None in
-    match
-      try Some (Mlw_module.restore_module th') with Not_found -> None
-    with
-      | Some m' -> do_extract_module ?fname m'
-      | None    -> do_extract_theory ?fname th' in
-  use_iter extract_use m.Mlw_module.mod_theory
- *)
+let rec do_extract_module ?fname m =
+  let extract_use m' =
+    let fname =
+      if m'.mod_theory.Theory.th_path = [] then fname else None
+    in
+    do_extract_module ?fname m'
+  in
+  use_iter extract_use m.mod_units;
+  extract_to ?fname m
 
 let do_global_extract (_,p,t) =
   let env = opt_driver.Pdriver.drv_env in
-  let m = Pmodule.read_module env p t in
+  let m = read_module env p t in
   do_extract_module m
 
 
@@ -158,7 +155,7 @@ let do_local_extract fname cin tlist =
   let env = opt_driver.Pdriver.drv_env in
   let format = !opt_parser in
   let mm =
-    Env.read_channel ?format Pmodule.mlw_language env fname cin in
+    Env.read_channel ?format mlw_language env fname cin in
   if Queue.is_empty tlist then
     let do_m _ m = do_extract_module ~fname m in
     Mstr.iter do_m mm

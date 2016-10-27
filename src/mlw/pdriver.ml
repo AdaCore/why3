@@ -218,9 +218,11 @@ let load_driver env file extra_files =
 
 open Stdlib
 
+type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+
 type printer = printer_args -> ?old:in_channel -> Pmodule.pmodule Pp.pp
 
-type reg_printer = Pp.formatted * printer
+type reg_printer = Pp.formatted * filename_generator * printer
 
 let printers : reg_printer Hstr.t = Hstr.create 17
 
@@ -228,18 +230,11 @@ exception KnownPrinter of string
 exception UnknownPrinter of string
 exception NoPrinter
 
-let register_printer ~desc s p =
+let register_printer ~desc s fg p =
   if Hstr.mem printers s then raise (KnownPrinter s);
-  Hstr.replace printers s (desc, p)
+  Hstr.replace printers s (desc, fg, p)
 
-let lookup_printer s =
-  try snd (Hstr.find printers s)
-  with Not_found -> raise (UnknownPrinter s)
-
-let list_printers () =
-  Hstr.fold (fun k (desc,_) acc -> (k,desc)::acc) printers []
-
-let extract_module ?old drv fmt m =
+let lookup_printer drv =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
@@ -251,10 +246,20 @@ let extract_module ?old drv fmt m =
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       converter   = drv.drv_converter;
-    } in
+    }
+  in
+  try
+    let (_,fg,p) = Hstr.find printers p in (fg,printer_args,p)
+  with Not_found -> raise (UnknownPrinter p)
+
+let list_printers () =
+  Hstr.fold (fun k (desc,_,_) acc -> (k,desc)::acc) printers []
+
+(*
+let extract_module ?old drv fmt m =
   let printer = lookup_printer p printer_args in
   Format.fprintf fmt "@[%a@]@?" (printer ?old) m
-
+ *)
 
 (* exception report *)
 

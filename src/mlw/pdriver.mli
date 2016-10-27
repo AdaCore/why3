@@ -39,11 +39,15 @@ val load_driver : Env.env -> string -> string list -> driver
 
 type printer = printer_args -> ?old:in_channel -> Pmodule.pmodule Pp.pp
 
-val register_printer : desc:Pp.formatted -> string -> printer -> unit
+type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 
-val lookup_printer : string -> printer
+val register_printer : desc:Pp.formatted -> string -> filename_generator -> printer -> unit
+
+val lookup_printer : driver -> filename_generator * printer_args * printer
 
 val list_printers : unit -> (string * Pp.formatted) list
 
+(*
 val extract_module : ?old:in_channel ->
    driver -> Format.formatter -> Pmodule.pmodule -> unit
+ *)
