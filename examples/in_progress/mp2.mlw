@@ -1633,11 +1633,11 @@ module N
 
   (** {2 Logical operations} *)
 
-  use import int.ComputerDivision
+  use import int.EuclideanDivision
 
   (* is a logical lemma in ComputerDivision*)
   let lemma mod_mult (x y z:int)
-    requires { x > 0 /\ y >= 0 /\ z >= 0}
+    requires { x > 0 }
     ensures { mod (x * y + z) x = mod z x }
   =
     ()
@@ -1998,6 +1998,7 @@ module N
     let zero = Limb.of_int 0 in
     let one = Limb.of_int 1 in
     let ghost k = radix * radix - (radix + l2i v) * l2i d in
+    let ghost u = l2i ul + radix * l2i uh in
     assert { 1 <= k <= l2i d };
     let l,h = mul_double v uh in
     let sl,c = add_with_carry l ul zero in
@@ -2037,12 +2038,12 @@ module N
     assert { l2i sl + radix * l2i sh = l2i l + radix * l2i h + l2i ul + radix * l2i uh
     	     = l2i v * l2i uh + l2i ul + radix * l2i uh
 	     = l2i ul + (radix + l2i v) * l2i uh };
-    let ql = ref sl in
     let qh = ref sh in
+    let ql = ref sl in
     let ghost q0 = l2i !ql in
     let ghost cq = l2i sh + 1 in (*candidate quotient*)
     let ghost cr = l2i ul - cq * l2i d + radix * l2i uh in (*candidate remainder*)
-    assert { cq * l2i d + cr = l2i ul + radix * l2i uh };
+    assert { cq * l2i d + cr = u};
     qh := add_mod !qh one;
     assert { l2i !qh = mod cq radix };
     let p = mul_mod !qh d in
@@ -2067,6 +2068,7 @@ module N
 	     = mod (l2i ul - cq * l2i d + radix * l2i uh) radix
 	     = mod cr radix };
     assert { radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d };
+    prod_compat_strict_r (l2i ul) radix (radix - l2i d);
     assert { (* Theorem 2 of Möller&Granlund 2010 *)
     	     (max (radix - l2i d) (q0 + 1)) - radix <= cr < max (radix - l2i d) q0
 	     by radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
@@ -2077,65 +2079,135 @@ module N
 	     so cr >= - l2i d
 	     so radix * cr >= q0 * l2i d - radix * l2i d = (q0 - radix) * l2i d
 	     so radix > l2i d
-	     so cr >= q0 - radix
-	     so 1 <= k < d so l2i uh < l2i d
-	     so l2i uh * k < l2i d * k < l2i d * l2i d
+             so radix - q0 > 0
+             so (radix-q0) * l2i d < (radix - q0) * radix
+             so (q0 - radix) * l2i d > (q0 - radix) * radix
+             so radix * cr > (q0 - radix) * radix
+             so cr > q0 - radix
+             so (let m = max (radix - l2i d) (q0 +1) in
+                cr >= m - radix
+                by (cr + radix >= - l2i d + radix
+                   /\ (cr + radix > q0 so cr + radix >= q0 + 1))
+                   so cr + radix >= m)
+	     so 0 < k <= l2i d so 0 <= l2i uh < l2i d
+	     so k * l2i uh < k * l2i d <= l2i d * l2i d
 	     so radix * cr < l2i d * l2i d + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
-	     so l2i ul < radix
-	     so radix - l2i d > 0
 	     so l2i ul * (radix - l2i d) < radix * (radix - l2i d)
 	     so radix * cr < l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
-	     so (radix * cr = (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+	     so (radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
 	     	by
 	     	l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
 			= radix * (radix - l2i d) + l2i d * l2i d - radix * l2i d + q0 * l2i d
-			= radix * (radix - l2i d) + (l2i d - radix) l2i d +  q0 * l2i d
-			= radix * (radix - l2i d) - l2i d (radix - l2i d) + q0 * l2i d
+			= radix * (radix - l2i d) + (l2i d - radix) * l2i d +  q0 * l2i d
+			= radix * (radix - l2i d) - l2i d * (radix - l2i d) + q0 * l2i d
 			= (radix - l2i d) * (radix - l2i d) + q0 * l2i d)
 	     so let m = max (radix - l2i d) q0 in
 	     	radix - l2i d <= m
 	     so (radix - l2i d) * (radix - l2i d) <= m* (radix - l2i d)
-	     so q0 * l2i d <= m * l2i d
-	     so radix * cr = (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+	     so (q0 * l2i d <= m * l2i d by 0 <= q0 <= m /\ 0 < l2i d)
+	     so radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
 	     	      	   <= m* (radix - l2i d) + q0 * l2i d
 			   <= m* (radix - l2i d) + m * l2i d
 			   = m * radix
-	     so cr <= m
-		 )
-	   };
+	     so cr < m
+			   };
     assert { cr >= 0 -> r' = cr };
-    assert { cr < 0 -> r' = cr + radix };
+    assert { cr < 0 ->
+           ( r' = cr + radix
+             by cr >= max (radix - l2i d) (q0 + 1) - radix
+             so cr >= - l2i d
+             so cr + radix >= radix - l2i d >= 0
+             so 0 <= cr + radix < radix
+             so mod (cr + radix) radix = mod cr radix
+             so r' = mod (cr + radix) radix ) };
     assert { cr < 0 ->
     	     	( l2i !r > l2i !ql
 		by max (radix - l2i d) (q0 + 1) >= q0 + 1 > q0
 		so cr >= (max (radix - l2i d) (q0 +1)) - radix > q0 - radix
 		so r' = cr + radix > q0 - radix + radix = q0 ) };
+    assert { 1 <= cq <= radix };
+    assert { (l2i !qh = cq \/ (l2i !qh = 0 /\ cq = radix)
+              by  (1 <= cq < radix -> l2i !qh = mod cq radix = cq) ) };
+    assert { cq = radix ->
+             (cr < 0
+                by cq * l2i d + cr = u
+                so l2i uh <= l2i d - 1
+                so 1 + l2i uh <= l2i d
+                so l2i ul < radix
+                so u = l2i ul + radix * l2i uh
+                     < radix + radix * l2i uh
+                     = radix * (1 + l2i uh)
+                     <= radix * l2i d
+                so u < radix * l2i d
+                so radix * l2i d + cr = u
+                so radix * l2i d + cr < radix * l2i d
+                so cr < 0) };
+    assert { 1 <= cq < radix -> l2i !qh = cq /\ l2i !qh * l2i d + cr = u };
     if Limb.(>) !r !ql
-    then begin
+    then
+    begin
       qh := sub_mod !qh one;
       r := add_mod !r d;
       assert { cr >= 0 ->
-    	       	  ( l2i !r >= l2i d
-		  by r' = cr
+                  (l2i !r = cr + l2i d
+                  by r' = cr
 		  so r' < max (radix - l2i d) q0
 		  so r' > q0
 		  so 0 <= r' < radix - l2i d
 		  so l2i d <= r' + l2i d < radix
-		  so l2i !r = mod (r' + l2i d) radix >= l2i d ) };
+		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d) };
+      assert { cr >= 0 ->
+    	       	  ( l2i !r >= l2i d
+		  by r' = cr >= 0
+                  so l2i !r = r' + l2i d >= l2i d ) };
       assert { cr < 0 ->
-      	          ( 0 <= l2i !r < l2i d
-		  by r' = cr + radix < radix
-		  so cr >= max (radix - l2i d) (q0 + 1) - radix >= radix - l2i d - radix = - l2i d
+                  ( l2i !r = r' + l2i d - radix
+                  by r' = cr + radix < radix
+		  so cr >= max (radix - l2i d) (q0 + 1) - radix
+                        >= radix - l2i d - radix = - l2i d
 		  so r' = cr + radix >= radix - l2i d
 		  so l2i !r = mod (r' + l2i d) radix
 		  so radix + radix >= r' + l2i d >= radix
+		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix ) };
+      assert { cr < 0 ->
+      	          ( 0 <= l2i !r < l2i d
+		  by r' = cr + radix < radix
 		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix
 		  so l2i !r >= 0
-		  so l2i !r = r' + l2i d - radix < l2i d )
-	    };
+		  so l2i !r = r' + l2i d - radix < l2i d ) };
+      assert { cq = radix ->
+                ( l2i !qh * l2i d + l2i !r = u
+                by cq * l2i d + cr = u
+                so cr < 0
+                so r' = cr + radix
+                so u = radix * l2i d + cr
+                     = (radix - 1) * l2i d + l2i d + cr
+                     = (radix - 1) * l2i d + l2i d + r' - radix
+                so r' = cr + radix >= max (radix - l2i d) (q0 + 1)
+                   >= radix - l2i d
+                so radix + radix >= l2i d + r' >= radix
+                so l2i !r = mod (l2i d + r') radix = l2i d + r' - radix
+                so (radix - 1) * l2i d + l2i !r = u
+                so l2i !qh = mod ((mod cq radix) - 1) radix
+                           = mod (-1) radix
+                           = radix - 1
+                so l2i !qh * l2i d + l2i !r = u
+               ) };
+      assert { l2i !r = cr + l2i d by "case_split" cr >= 0 \/ cr < 0 };
+      assert { 1 <= cq <= radix ->
+               ( l2i !qh * l2i d + l2i !r = u
+               by cq * l2i d + cr = u
+               so l2i !qh = cq - 1
+               so l2i !qh * l2i d + cr + l2i d = u
+               so l2i !r = cr + l2i d ) };
     end
-    else assert { cr >= 0 };
-    assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
+    else
+    begin
+       assert { cr >= 0 };
+       assert { 1 <= cq < radix };
+    end;
+    assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh
+            by "case_split" cq = radix \/ 1 <= cq < radix };
     if Limb.(>=) !r d
     then begin
       assert { cr >= 0 };
@@ -2161,9 +2233,6 @@ module N
     assert { 0 <= l2i !r < l2i d };
     assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
-
-
-
 
   let main () = from_limb (Limb.of_int 42)
 
