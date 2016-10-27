@@ -446,6 +446,8 @@ let print_session fmt s =
 let dump_session_raw fmt _args =
   fprintf fmt "%a@." print_session cont.Controller_itp.controller_session
 
+let display_session fmt _args =
+  fprintf fmt "%a@." Controller_itp.print_session cont
 
 let print_position (s: session) (cursor: proof_zipper) fmt: unit =
   match cursor.cursor with
@@ -484,7 +486,7 @@ let test_schedule_proof_attempt fmt (args: string list) =
   let id = nearest_goal () in
   let callback status =
     match status with
-    | Done _prover_result -> (dump_session_raw fmt []; test_print_goal fmt [];
+    | Done _prover_result -> (display_session fmt []; test_print_goal fmt [];
                               fprintf fmt "status: %a@."
                                 Controller_itp.print_status status)
     | Scheduled | Running -> ()
@@ -545,7 +547,7 @@ let test_transform_and_display fmt args =
                  Controller_itp.print_trans_status status;
          match status with
          | TSdone _tid -> (ignore (move_to_goal_ret next_node);
-             dump_session_raw fmt []; test_print_goal fmt [])
+             display_session fmt []; test_print_goal fmt [])
          | _ -> ()
        in
        C.schedule_transformation cont id tr tl ~callback
@@ -652,7 +654,8 @@ let commands =
     "list-strategies", "list available strategies", list_strategies;
     "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
     "t", "<transname> <args>: behave like 'a' but add function to display into the callback", test_transform_and_display;
-    "p", "print the session in raw form", dump_session_raw;
+    "pr", "print the session in raw form", dump_session_raw;
+    "p", "print the session", display_session;
     "c", "<provername> [timelimit [memlimit]] run a prover on the current goal", test_schedule_proof_attempt;
     "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
     "print", "<s> print the declaration where s was defined", test_print_id;

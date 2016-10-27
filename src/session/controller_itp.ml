@@ -115,6 +115,83 @@ let update_trans_node c id b =
   propagate_proof c (get_trans_parent c.controller_session id)
 
 
+
+(* printing *)
+
+module PSession = struct
+
+  open Stdlib
+
+  type any =
+    | Session
+    | File of file
+    | Theory of theory
+    | Goal of proofNodeID
+    | Transf of transID
+    | ProofAttempt of proof_attempt
+
+  type 'a t = { tcont : controller;
+                tkind : any }
+
+  let decomp x =
+    let s = x.tcont.controller_session in
+    let n y acc = { x with tkind = y } :: acc in
+    match x.tkind with
+    | Session -> "", Hstr.fold (fun _ f -> n (File f)) (get_files s) []
+    | File f ->
+       f.file_name,
+       List.fold_right (fun th -> n (Theory th)) f.file_detached_theories
+                       (List.fold_right (fun th -> n (Theory th)) f.file_theories [])
+    | Theory th ->
+       let id = theory_name th in
+       let name = id.Ident.id_string in
+       let name = if th_proved x.tcont id then name else name^"?" in
+       name,
+       List.fold_right (fun g -> n (Goal g)) (theory_goals th)
+                       (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
+    | Goal id ->
+       let gid = get_proof_name s id in
+       let name = gid.Ident.id_string in
+       let name = if pn_proved x.tcont id then name else name^"?" in
+       let pas = get_proof_attempts s id in
+       let trs = get_transformations s id in
+       name,
+       List.fold_right (fun g -> n (Transf g)) trs
+                       (List.fold_right (fun g -> n (ProofAttempt g)) pas [])
+    | ProofAttempt pa ->
+       Pp.sprintf_wnl "%a%s%s"
+                      Whyconf.print_prover pa.prover
+                      (match pa.Session_itp.proof_state with
+                       | Some { Call_provers.pr_answer = Call_provers.Valid} -> ""
+                       | _ -> "?")
+                      (if pa.proof_obsolete then "O" else ""), []
+    | Transf id ->
+       let name = get_transf_name s id in
+       let name = if tn_proved x.tcont id then name else name^"?" in
+       let sts = get_sub_tasks s id in
+       let dsts = get_detached_sub_tasks s id in
+       name,
+       List.fold_right (fun g -> n (Goal g)) sts
+                       (List.fold_right (fun g -> n (Goal g)) dsts [])
+
+end
+
+module P = Print_tree.PMake(PSession)
+
+let print_session fmt c =
+  P.print fmt { PSession.tcont = c; PSession.tkind = PSession.Session }
+
+
+
+
+
+
+
+
+(*********)
+
+
+
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: prio:int -> (unit -> bool) -> unit

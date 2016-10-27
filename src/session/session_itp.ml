@@ -67,14 +67,14 @@ type file = {
 
 module Proofnodeid = struct
   type t = proofNodeID
-  let compare (x : proofNodeID) y  = Pervasives.compare x y
+  let _compare (x : proofNodeID) y  = Pervasives.compare x y
   let equal (x : proofNodeID) y = x = y
   let hash  (x : proofNodeID) = x
 end
 
 module Transid = struct
   type t = transID
-  let compare (x : transID) y  = Pervasives.compare x y
+  let _compare (x : transID) y  = Pervasives.compare x y
   let equal (x : transID) y = x = y
   let hash  (x : transID) = x
 end
@@ -274,28 +274,6 @@ and print_trans_node s fmt id =
   fprintf fmt "@[<hv 1> Trans %s;@ args %a;@ parent %s;@ [%a]@]" name (Pp.print_list Pp.colon pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
-
-(*
-let rec print_tree s fmt t =
-  let pn = get_proofNode s t.tree_node_id in
-  let parent = match pn.proofn_parent with
-    | Theory t -> t.theory_name.id_string
-    | Trans id -> (get_transfNode s id).transf_name
-  in
-  fprintf fmt
-    "@[<hv 2> Goal %s;@ parent %s;@ sum %s;@ @[<hov 2>[%a]@]@ @[<hov 2>[%a]@]@]"
-    t.tree_goal_name parent
-    (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
-    (Pp.print_list Pp.semi print_proof_attempt) t.tree_proof_attempts
-    (Pp.print_list Pp.semi (print_trans s)) t.tree_transformations
-
-and print_trans s fmt (id, name, l) =
-  let tn = get_transfNode s id in
-  let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
-  fprintf fmt "@[<hv 2> Trans %s;@ parent %s;@ [%a]@]" name parent
-    (Pp.print_list Pp.semi (print_tree s)) l
-*)
-
 let print_theory s fmt th : unit =
   fprintf fmt "@[<hv 2> Theory %s;@ [%a]@]" th.theory_name.Ident.id_string
     (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) th.theory_goals
@@ -307,9 +285,10 @@ let print_file s fmt (file, thl) =
 let print_s s fmt =
   fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
 
-let print_session fmt s =
+let _print_session fmt s =
   let l = Hstr.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
   fprintf fmt "%a@." (print_s s) l;;
+
 
 let empty_session ?shape_version dir =
   let shape_version = match shape_version with
@@ -747,7 +726,7 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 let found_obsolete = ref false
 let found_missed_goals_in_theory = ref false
 
-let save_detached_goals env old_s detached_goals_id s parent =
+let save_detached_goals _env old_s detached_goals_id s parent =
   let save_proof parent old_pa_n =
     let old_pa = old_pa_n.proofa_attempt in
     add_proof_attempt s old_pa.prover old_pa.limit

@@ -87,6 +87,8 @@ val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool
 val th_proved: controller -> Ident.ident -> bool
 
+val print_session : Format.formatter -> controller -> unit
+
 module Make(S : Scheduler) : sig
 
 val schedule_proof_attempt :
