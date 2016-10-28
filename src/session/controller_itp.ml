@@ -412,14 +412,14 @@ let read_file env ?format fn =
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
-  add_file_section c.controller_session fname theories format
+  add_file_section ~use_shapes:false c.controller_session fname theories format
 
 (** reload files, associating old proof attempts and transformations
     to the new goals.  old theories and old goals for which we cannot
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let merge_file (old_ses : session) (c : controller) env _ file =
+let merge_file (old_ses : session) (c : controller) env ~use_shapes _ file =
   let format = file.file_format in
   let old_theories = file.file_theories in
   let file_name = Filename.concat (get_dir old_ses) file.file_name in
@@ -430,12 +430,12 @@ let merge_file (old_ses : session) (c : controller) env _ file =
       []
   in
   add_file_section
-    c.controller_session ~merge:(old_ses,old_theories,env) file_name new_theories format
+    c.controller_session ~use_shapes ~merge:(old_ses,old_theories,env) file_name new_theories format
 
 
-let reload_files (c : controller) (env : Env.env) =
+let reload_files (c : controller) (env : Env.env) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
-  Stdlib.Hstr.iter (merge_file old_ses c env) (get_files old_ses)
+  Stdlib.Hstr.iter (merge_file old_ses c env ~use_shapes) (get_files old_ses)
 
 end

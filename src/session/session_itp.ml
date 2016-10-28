@@ -339,7 +339,7 @@ let remove_proof_attempt (s : session) (id : proofNodeID)
    of proofNodeID [id] of parent [p] of task [t] *)
 let mk_proof_node ~version (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
-  let sum = Some (Termcode.task_checksum t) in
+  let sum = Some (Termcode.task_checksum ~version t) in
   let shape = Termcode.t_shape_task ~version t in
   let pn = { proofn_name = n;
              proofn_task = t;
@@ -366,9 +366,17 @@ let mk_proof_node_task (s : session) (t : Task.task)
   let name,_,_ = Termcode.goal_expl_task ~root:false t in
   mk_proof_node ~version:s.session_shape_version s name t parent node_id
 
-let mk_transf_proof_node (s : session) (tid : int) (t : Task.task) =
+let mk_transf_proof_node (s : session) (parent_name : string) (tid : transID) (index : int) (t : Task.task) =
   let id = gen_proofNodeID s in
-  mk_proof_node_task s t (Trans tid) id;
+  let gid,expl,_ = Termcode.goal_expl_task ~root:false t in
+(*  let expl = match expl with
+    | None -> string_of_int index ^ "."
+    | Some e -> string_of_int index ^ ". " ^ e
+  in
+    let expl = Some expl in *)
+  let goal_name = parent_name ^ "." ^ string_of_int index in
+  let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
+  mk_proof_node ~version:s.session_shape_version s goal_name t (Trans tid) id;
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
@@ -385,7 +393,8 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
     (args : string list) (tl : Task.task list) =
   let tid = gen_transID s in
-  let sub_tasks = List.map (mk_transf_proof_node s tid) tl in
+  let parent_name = (get_proofNode s id).proofn_name.Ident.id_string in
+  let sub_tasks = List.mapi (mk_transf_proof_node s parent_name tid) tl in
   mk_transf_node s id tid name args sub_tasks;
   tid
 
@@ -407,6 +416,7 @@ let update_proof_attempt s id pr st =
 
 let db_filename = "why3session.xml"
 let shape_filename = "why3shapes"
+let compressed_shape_filename = "why3shapes.gz"
 let session_dir_for_save = ref "."
 
 exception LoadError of Xml.element * string
@@ -671,28 +681,135 @@ let build_session (s : session) xml =
     Warning.emit "[Warning] Session.load_session: unexpected element '%s'@."
       s
 
+exception ShapesFileError of string
+exception SessionFileError of string
+
+module ReadShapes (C:Compress.S) = struct
+
+let shape = Buffer.create 97
+let sum = Strings.create 32
+
+let read_sum_and_shape ch =
+  let nsum = C.input ch sum 0 32 in
+  if nsum = 0 then raise End_of_file;
+  if nsum <> 32 then
+    begin
+      try
+        C.really_input ch sum nsum (32-nsum)
+      with End_of_file ->
+        raise
+          (ShapesFileError
+             ("shapes files corrupted (checksum '" ^
+                 (String.sub sum 0 nsum) ^
+                 "' too short), ignored"))
+    end;
+  if try C.input_char ch <> ' ' with End_of_file -> true then
+      raise (ShapesFileError "shapes files corrupted (space missing), ignored");
+    Buffer.clear shape;
+    try
+      while true do
+        let c = C.input_char ch in
+        if c = '\n' then raise Exit;
+        Buffer.add_char shape c
+      done;
+      assert false
+    with
+      | End_of_file ->
+        raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
+      | Exit -> Strings.copy sum, Buffer.contents shape
+
+
+  let use_shapes = ref true
+
+  let fix_attributes ch name attrs =
+    if name = "goal" then
+      try
+        let sum,shape = read_sum_and_shape ch in
+        let attrs =
+          try
+            let old_sum = List.assoc "sum" attrs in
+            if sum <> old_sum then
+              begin
+                Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+                raise
+                  (ShapesFileError
+                     "shapes files corrupted (sums do not correspond)")
+              end;
+            attrs
+          with Not_found -> ("sum", sum) :: attrs
+        in
+        ("shape",shape) :: attrs
+      with _ -> use_shapes := false; attrs
+    else attrs
+
+let read_xml_and_shapes xml_fn compressed_fn =
+  use_shapes := true;
+  try
+    let ch = C.open_in compressed_fn in
+    let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
+    C.close_in ch;
+    xml, !use_shapes
+  with Sys_error msg ->
+    raise (ShapesFileError ("cannot open shapes file for reading: " ^ msg))
+end
+
+module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
+module ReadShapesCompress = ReadShapes(Compress.Compress_z)
+
+let read_file_session_and_shapes dir xml_filename =
+  try
+  let compressed_shape_filename =
+    Filename.concat dir compressed_shape_filename
+  in
+  if Sys.file_exists compressed_shape_filename then
+    if Compress.compression_supported then
+     ReadShapesCompress.read_xml_and_shapes
+       xml_filename compressed_shape_filename
+    else
+      begin
+        Warning.emit "[Warning] could not read goal shapes because \
+                                Why3 was not compiled with compress support@.";
+        Xml.from_file xml_filename, false
+      end
+  else
+    let shape_filename = Filename.concat dir shape_filename in
+    if Sys.file_exists shape_filename then
+      ReadShapesNoCompress.read_xml_and_shapes xml_filename shape_filename
+    else
+      begin
+        Warning.emit "[Warning] could not find goal shapes file@.";
+        Xml.from_file xml_filename, false
+      end
+with e ->
+  Warning.emit "[Warning] failed to read goal shapes: %s@."
+    (Printexc.to_string e);
+  Xml.from_file xml_filename, false
+
 let load_session (dir : string) =
   let session = empty_session dir in
   let file = Filename.concat dir db_filename in
-  (* If the xml is present we read it, otherwise we consider it empty *)
-  if Sys.file_exists file then
-    try
-      Termcode.reset_dict ();
-      let xml = Xml.from_file file in
+  let use_shapes =
+    (* If the xml is present we read it, otherwise we consider it empty *)
+    if Sys.file_exists file then
       try
-        build_session session xml.Xml.content;
-        session
-      with Sys_error msg ->
-        failwith ("Open session: sys error " ^ msg)
-    with
-    | Sys_error msg ->
-      (* xml does not exist yet *)
-      raise (SessionFileError msg)
-    | Xml.Parse_error s ->
-      Warning.emit "XML database corrupted, ignored (%s)@." s;
-      raise (SessionFileError "XML corrupted")
-  else
-    session
+        Termcode.reset_dict ();
+        let xml,use_shapes =
+          read_file_session_and_shapes dir file in
+        try
+          build_session session xml.Xml.content;
+          use_shapes
+        with Sys_error msg ->
+          failwith ("Open session: sys error " ^ msg)
+      with
+      | Sys_error msg ->
+        (* xml does not exist yet *)
+        raise (SessionFileError msg)
+      | Xml.Parse_error s ->
+        Warning.emit "XML database corrupted, ignored (%s)@." s;
+        raise (SessionFileError "XML corrupted")
+    else false
+  in
+    session, use_shapes
 
 (* -------------------- merge/update session --------------------------- *)
 
@@ -726,7 +843,7 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 let found_obsolete = ref false
 let found_missed_goals_in_theory = ref false
 
-let save_detached_goals _env old_s detached_goals_id s parent =
+let save_detached_goals old_s detached_goals_id s parent =
   let save_proof parent old_pa_n =
     let old_pa = old_pa_n.proofa_attempt in
     add_proof_attempt s old_pa.prover old_pa.limit
@@ -757,9 +874,9 @@ let save_detached_goals _env old_s detached_goals_id s parent =
         id)
       detached_goals_id
 
-let save_detached_theory env old_s detached_theory s =
+let save_detached_theory old_s detached_theory s =
   let goalsID =
-    save_detached_goals env old_s detached_theory.theory_goals s (Theory detached_theory) in
+    save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory) in
     (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
   { theory_name = detached_theory.theory_name;
     theory_checksum = None;
@@ -788,13 +905,13 @@ let add_registered_transformation s env old_tr goal_id =
     let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
-let rec merge_goal env new_s old_s obsolete old_goal new_goal_id =
+let rec merge_goal ~use_shapes env new_s old_s obsolete old_goal new_goal_id =
   Hprover.iter (merge_proof new_s obsolete new_goal_id) old_goal.proofn_attempts;
-  List.iter (merge_trans env old_s new_s new_goal_id) old_goal.proofn_transformations;
+  List.iter (merge_trans ~use_shapes env old_s new_s new_goal_id) old_goal.proofn_transformations;
   let new_trans = (get_proofNode new_s new_goal_id) in
   new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
 
-and merge_trans env old_s new_s new_goal_id old_tr_id =
+and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
   let new_tr_id =
     add_registered_transformation new_s env old_tr new_goal_id
@@ -805,13 +922,21 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
       old_tr.transf_subtasks in
   let new_subtasks = List.map (fun id -> id,new_s)
       new_tr.transf_subtasks in
+  List.iter
+    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
+       | Some _ -> Debug.dprintf debug "[merge] old subgoal has no checksum@."
+       | None ->  Debug.dprintf debug "[merge] old subgoal has no checksum@.") old_subtasks;
+  List.iter
+    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
+       | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
+       | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
   let associated,detached =
-    AssoGoals.associate ~use_shapes:false old_subtasks new_subtasks
+    AssoGoals.associate ~use_shapes old_subtasks new_subtasks
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal env new_s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
+        merge_goal ~use_shapes env new_s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,s), None) ->
         Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( : %s @."
           (get_proofNode s id).proofn_name.Ident.id_string;
@@ -819,9 +944,9 @@ and merge_trans env old_s new_s new_goal_id old_tr_id =
     associated;
   (* save the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals env old_s detached new_s (Trans new_tr_id)
+  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
 
-let merge_theory env old_s old_th s th : unit =
+let merge_theory ~use_shapes env old_s old_th s th : unit =
   let found_missed_goals_in_theory = ref false in
   let old_goals_table = Hstr.create 7 in
   (* populate old_goals_table *)
@@ -852,7 +977,7 @@ let merge_theory env old_s old_th s th : unit =
          in
          if goal_obsolete then
            found_obsolete := true;
-         merge_goal env s old_s goal_obsolete old_goal ng_id
+         merge_goal ~use_shapes env s old_s goal_obsolete old_goal ng_id
        with
        | Not_found ->
          (* if no goal of matching name is found store it to look for
@@ -863,19 +988,19 @@ let merge_theory env old_s old_th s th : unit =
   (* attach the session to the subtasks to be able to instantiate Pairing *)
   let detached_goals = Hstr.fold (fun _key g tl -> (g,old_s) :: tl) old_goals_table [] in
   let associated,detached =
-    AssoGoals.associate ~use_shapes:false detached_goals !new_goals
+    AssoGoals.associate ~use_shapes detached_goals !new_goals
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal env s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
+        merge_goal ~use_shapes env s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | (_, None) ->
         Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( @.";
         found_missed_goals_in_theory := true)
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_detached_goals <- save_detached_goals env old_s detached s (Theory th);
+  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th);
   (* set goals as non obsolete if no goals was missed and the theory
      checksum match with the previous one *)
   if not !found_missed_goals_in_theory then begin
@@ -893,7 +1018,7 @@ let merge_theory env old_s old_th s th : unit =
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
-let make_theory_section ?merge (s:session) (th:Theory.theory)  : theory =
+let make_theory_section ~use_shapes ?merge (s:session) (th:Theory.theory)  : theory =
   let add_goal parent goal id =
     let name,_expl,task = Termcode.goal_expl_task ~root:true goal in
     mk_proof_node ~version:s.session_shape_version s name task parent id;
@@ -909,14 +1034,14 @@ let make_theory_section ?merge (s:session) (th:Theory.theory)  : theory =
   begin
     match merge with
     | Some (old_s, old_th, env) ->
-      merge_theory env old_s old_th s theory
+      merge_theory ~use_shapes env old_s old_th s theory
     | _ -> ()
   end;
   theory
 
 (* add a why file from a session, if merge is provided try to merge
    its theories with the previous ones with matching names *)
-let add_file_section ?merge (s:session) (fn:string) (theories:Theory.theory list) format
+let add_file_section ~use_shapes ?merge (s:session) (fn:string) (theories:Theory.theory list) format
   : unit =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   if Hstr.mem s.session_files fn then
@@ -936,20 +1061,20 @@ let add_file_section ?merge (s:session) (fn:string) (theories:Theory.theory list
             (* if we found one, we remove it from the table and merge it *)
             let old_th = Hstr.find old_th_table theory_name in
             Hstr.remove old_th_table theory_name;
-            make_theory_section ~merge:(old_ses,old_th,env) s th
+            make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s th
           with Not_found ->
             (* if no theory was found we make a new theory section *)
-            make_theory_section s th
+            make_theory_section ~use_shapes s th
         in
         let theories = List.map add_theory theories in
         (* we save the remaining, detached *)
         let detached = Hstr.fold
             (fun _key th tl ->
-               (save_detached_theory env old_ses th s) :: tl)
+               (save_detached_theory old_ses th s) :: tl)
             old_th_table [] in
         theories, detached
       | None ->
-        List.map (make_theory_section s) theories, []
+        List.map (make_theory_section ~use_shapes s) theories, []
     in
     let f = { file_name = fn;
               file_format = format;
@@ -1203,5 +1328,8 @@ let save_session (s : session) =
   Sysutil.backup_file f;
   let fs = Filename.concat s.session_dir shape_filename in
   Sysutil.backup_file fs;
+  let fz = Filename.concat s.session_dir compressed_shape_filename in
+  Sysutil.backup_file fz;
   session_dir_for_save := s.session_dir;
+  let fs = if Compress.compression_supported then fz else fs in
   save f fs s

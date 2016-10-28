@@ -77,8 +77,8 @@ val empty_session : ?shape_version:int -> string -> session
     argument *)
 
 val add_file_section :
-  ?merge:session*theory list*Env.env -> session -> string ->
-  (Theory.theory list) -> Env.fformat option -> unit
+  use_shapes:bool -> ?merge:session*theory list*Env.env -> session ->
+  string -> (Theory.theory list) -> Env.fformat option -> unit
 (** [add_file_section ~merge:(old_s,old_ths,env) s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
@@ -100,11 +100,11 @@ val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
     corresponding proof attempt with [st]. *)
 
 val graft_transf : session -> proofNodeID -> string -> string list ->
-   Task.task list -> transID
+  Task.task list -> transID
 (** [graft_transf s id name l tl] adds the transformation [name] as a
     child of the task [id] of the session [s]. [l] is the list of
     arguments of the transformation, and [tl] is the list of subtasks.
- *)
+*)
 
 val remove_proof_attempt : session -> proofNodeID -> Whyconf.prover -> unit
 (** [remove_proof_attempt s id pr] removes the proof attempt from the
@@ -117,6 +117,15 @@ val remove_transformation : session -> transID -> unit
 val save_session : session -> unit
 (** [save_session s] Save the session [s] *)
 
-val load_session : string -> session
+val load_session : string -> session * bool
 (** [load_session dir] load a session in directory [dir]; all the
-    tasks are initialised to None *)
+    tasks are initialised to None
+
+    The returned boolean is set when there was shapes read from disk.
+
+    raises [SessionFileError msg] if the database file cannot be read
+    correctly.
+
+    raises [ShapesFileError msg] if the database extra file for shapes
+    cannot be read.
+ *)

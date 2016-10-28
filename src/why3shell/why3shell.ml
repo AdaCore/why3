@@ -173,11 +173,12 @@ let cont_init () =
     else Filename.dirname fname
   in
   (* we load the session *)
-  let ses = Session_itp.load_session dir in
+  let ses,use_shapes = Session_itp.load_session dir in
+  eprintf "using shapes: %a@." pp_print_bool use_shapes;
   (* create the controller *)
   let c = Controller_itp.create_controller env ses in
   (* update the session *)
-  C.reload_files c env;
+  C.reload_files c env ~use_shapes;
   (* add files to controller *)
   Queue.iter (fun fname -> C.add_file c fname) files;
   (* load provers drivers *)
@@ -534,7 +535,8 @@ let test_save_session _fmt _args =
 
 let test_reload fmt _args =
   fprintf fmt "Reloading... @?";
-  C.reload_files cont env;
+  (* use_shapes is true since session is in memory *)
+  C.reload_files cont env ~use_shapes:true;
   zipper_init ();
   fprintf fmt "done @."
 
