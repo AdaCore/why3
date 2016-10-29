@@ -41,10 +41,19 @@ module Make(S:sig
     mutable apron_mapping: Var.t Term.Mterm.t;
     mutable region_mapping: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
     mutable env: Environment.t;
-    mutable defined_terms: unit Term.Mterm.t;
+
+    (* UF_QF *)
+    mutable defined_terms: unit Term.Mterm.t; 
+    mutable term_mapping: Union_find.t Term.Mterm.t;
+    class_mapping: (Union_find.t, Term.term) Hashtbl.t;
+    mutable term_depend: unit Term.Mterm.t Term.Mterm.t;
+    classes_var_mapping: (Union_find.t, Apron.Var.t) Hashtbl.t;
   }
 
-  type uf_t = unit
+  type uf_t = { mutable classes: Union_find.set;
+                mutable known_terms: unit Term.Mterm.t; 
+              }
+
 
   type man = A.man * uf_man
   type env = unit
@@ -55,13 +64,20 @@ module Make(S:sig
                            apron_mapping = Term.Mterm.empty;
                            region_mapping = Ity.Mreg.empty;
                            env = Environment.make [||] [||];
-                           defined_terms = Term.Mterm.empty; }
+                           term_mapping = Term.Mterm.empty;
+                           class_mapping = Hashtbl.create 512;
+                           term_depend = Term.Mterm.empty;
+                           defined_terms = Term.Mterm.empty;
+                           classes_var_mapping = Hashtbl.create 512;
+                         }
+
+  let empty_uf_domain = { classes = Union_find.empty; known_terms = Term.Mterm.empty; }
 
   let bottom (man, uf_man) env =
-    A.bottom man uf_man.env, env
+    A.bottom man uf_man.env, empty_uf_domain
 
   let top (man, uf_man) env =
-    A.top man uf_man.env, env
+    A.top man uf_man.env, empty_uf_domain
 
   let canonicalize (man, _) (a, b) =
     A.canonicalize man a
@@ -70,17 +86,21 @@ module Make(S:sig
     A.is_bottom man a
 
   let is_leq (man, _) (a, b) (c, d) =
-    A.is_leq man a c
+    A.is_leq man a c && Union_find.is_leq b.classes d.classes
 
-  let join (man, _) (a, b) (c, d) =
-    A.join man a c, ()
+  let join_uf uf_man a b =
+    { classes = Union_find.join a.classes b.classes; known_terms = Term.Mterm.union (fun _ _ _ -> Some ()) a.known_terms b.known_terms }
+
+
+  let join (man, uf_man) (a, b) (c, d) =
+    A.join man a c, join_uf uf_man b d
 
   let join_list man l = match l with
     | [] -> assert false
     | t::q -> List.fold_left (join man) t q
 
-  let widening (man, _) (a, b) (c, d) =
-    A.widening man a c, ()
+  let widening (man, uf_man) (a, b) (c, d) =
+    A.widening man a c, join_uf uf_man b d
 
   let print fmt (a, b) = A.print fmt a
 
@@ -201,6 +221,16 @@ module Make(S:sig
     in
     aux ity
 
+  let uf_var = ref 0
+
+  let rec get_depend t =
+    match t.t_node with
+    | Tvar(_) -> Mterm.add t () Mterm.empty
+    | Tapp(_, args) ->
+      List.map get_depend args
+      |> List.fold_left (Mterm.union (fun _ _ _ -> Some ())) Mterm.empty
+    | _ -> Mterm.empty
+
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
    * The resulting list of linear expressions is weaker than the original why3
@@ -230,7 +260,8 @@ module Make(S:sig
      *
      * For instance, 4 + x + y set cst to 4, and constr to [(x, 1), (y, 1)]
      * *)
-    let rec term_to_var_list coeff t =
+    let rec term_to_var_list f coeff t =
+      let re = term_to_var_list f in
       match t.t_node with
       | Tvar(_) ->
         begin
@@ -243,23 +274,42 @@ module Make(S:sig
         ([], coeff * (BigInt.to_int n))
       | Tapp(func, args) when Term.ls_equal func ad_int ->
         List.fold_left (fun (a, b) c ->
-            let c, d = term_to_var_list coeff c in
+            let c, d = re coeff c in
             (a @ c, b + d)) ([], 0)args
       | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
-        let c, d = term_to_var_list coeff a in
-        let e, f = term_to_var_list (-coeff) b in
+        let c, d = re coeff a in
+        let e, f = re (-coeff) b in
         (c @ e, d + f)
       | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
-        term_to_var_list (-coeff)  a;
+        re (-coeff)  a;
       | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a])
       | Tapp(func, [a; {t_node = Tconst(Number.ConstInt(n)); _};]) when Term.ls_equal func mult_int ->
         let n = Number.compute_int n in
-        term_to_var_list ((BigInt.to_int n) * coeff) a
+        re ((BigInt.to_int n) * coeff) a
       (* FIXME: need a nice domain for algebraic types *)
       | _ -> (* maybe a record access *)
         begin
           match var_of_term t with
-          | None -> Format.eprintf "Could not find term@."; raise (Not_handled t)
+          | None -> Format.eprintf "Could not find term, switch it to uninterpreted function.@.";
+            uf_man.defined_terms <- Mterm.add t () uf_man.defined_terms;
+            let c = Union_find.new_class () in
+            uf_man.term_mapping <- Mterm.add t c uf_man.term_mapping;
+            Hashtbl.add uf_man.class_mapping c t;
+            let deps = get_depend t in
+            uf_man.term_depend <- Mterm.fold_left (fun td k () ->
+                let a =
+                  try
+                    Mterm.find k td
+                  with
+                   | Not_found -> Mterm.empty
+                in
+                let a = Mterm.add t () a in
+                Mterm.add k a td) uf_man.term_depend deps;
+            let myvar = incr uf_var; Var.of_string (Format.sprintf "$uf%d" !uf_var) in
+            uf_man.env <- Environment.add uf_man.env [|myvar|] [||];
+            Hashtbl.add uf_man.classes_var_mapping c myvar;
+            Hashtbl.add uf_man.variable_mapping myvar t;
+            ([myvar, coeff], 0)
           | Some s ->
             ([s, coeff], 0)
         end
@@ -274,14 +324,15 @@ module Make(S:sig
           let fa = aux a in
           let fb = aux b in
           (fun d ->
-            fb (fa d))
+             fb (fa d))
         | Tbinop(Tor, a, b) ->
           let fa = aux a in
           let fb = aux b in
-          (fun d ->
-             let d1 = fa d in
-             let d2 = fb d in
-             D.join man d1 d2)
+          (fun (d, a) ->
+             let (d1, a1) = fa (d, a) in
+             let (d2, a2) = fb (d, a) in
+             D.join man d1 d2, join_uf man a1 a2)
+
         | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int || Ty.ty_equal (t_type a) Ty.ty_bool)
           && 
           (ls_equal ps_equ func ||
@@ -306,8 +357,9 @@ module Make(S:sig
               else
                 assert false
             in
-            let va, ca = term_to_var_list (-base_coeff) a in
-            let vb, cb = term_to_var_list base_coeff b in
+            let f = ref (fun d -> d) in
+            let va, ca = term_to_var_list f (-base_coeff) a in
+            let vb, cb = term_to_var_list f base_coeff b in
             let c = ca + cb in
             let v = sum_list (va @ vb) in
             let expr = Linexpr1.make uf_man.env in
@@ -318,31 +370,30 @@ module Make(S:sig
             Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int c));
             let arr = Lincons1.array_make uf_man.env 1 in
             Lincons1.array_set arr 0 cons;
-              (fun d ->
-                 D.meet_lincons_array man d arr)
+            let f = !f in
+            (fun (d, a) ->
+               D.meet_lincons_array man d arr, f a)
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
-          begin
-            let subv_a = get_subvalues a None in
-            let subv_b = get_subvalues b None in
-            List.combine subv_a subv_b 
-            |> List.fold_left (fun f ((a, _), (b, _)) ->
-                let g = aux (t_app ps_equ [a; b] None) in
-                (fun abs ->
-                   f (g (abs)))) (fun abs -> abs)
-          end
+          let subv_a = get_subvalues a None in
+          let subv_b = get_subvalues b None in
+          List.combine subv_a subv_b 
+          |> List.fold_left (fun f ((a, _), (b, _)) ->
+              let g = aux (t_app ps_equ [a; b] None) in
+              (fun abs ->
+                 g abs |> f)) (fun x -> x)
         | Tif(a, b, c) ->
           let fa = aux a in
           let fa_not = aux (t_descend_nots a) in
           let fb = aux b in
           let fc = aux c in
           (fun d ->
-             let d1 = fb (fa d) in
-             let d2 = fc (fa_not d) in
-             D.join man d1 d2)
+             let (d1, a1) = fb (fa d) in
+             let (d2, a2) = fc (fa_not d) in
+             D.join man d1 d2, join_uf man a1 a2)
         | Ttrue -> (fun d -> d)
         | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
-        | Tfalse -> (fun _ -> D.bottom man uf_man.env)
-        | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom man uf_man.env)
+        | Tfalse -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
+        | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
         | _ ->
           raise (Not_handled t)
       with
@@ -353,8 +404,7 @@ module Make(S:sig
         (fun d -> d)
     in
     try
-      let f = aux t in
-    (fun (a, b) -> f a, b)
+      aux t
     with
     | e ->
       Format.eprintf "error while computing domain for post conditions: ";
@@ -530,14 +580,14 @@ module Make(S:sig
       ()
 
   let forget_term (man, uf_man) t =
-      let vars_to_forget =
-        get_subvalues t None
-        |> List.map (fun (a, _) -> Term.Mterm.find a uf_man.apron_mapping)
-        |> Array.of_list
-      in
-      (fun (abs, a) -> 
-          D.forget_array man abs vars_to_forget false, ()
-      )
+    let vars_to_forget =
+      get_subvalues t None
+      |> List.map (fun (a, _) -> Term.Mterm.find a uf_man.apron_mapping)
+      |> Array.of_list
+    in
+    (fun (abs, a) -> 
+       D.forget_array man abs vars_to_forget false, a
+    )
 
   let forget_var m v = forget_term m (t_var v)
 
