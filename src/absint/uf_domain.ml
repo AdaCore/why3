@@ -47,11 +47,12 @@ module Make(S:sig
     mutable term_mapping: Union_find.t Term.Mterm.t;
     class_mapping: (Union_find.t, Term.term) Hashtbl.t;
     mutable term_depend: unit Term.Mterm.t Term.Mterm.t;
-    classes_var_mapping: (Union_find.t, Apron.Var.t) Hashtbl.t;
+    mutable every_term: Union_find.set;
+    classes_var_mapping: (Union_find.t, Apron.Var.t option) Hashtbl.t;
   }
 
-  type uf_t = { mutable classes: Union_find.set;
-                mutable known_terms: unit Term.Mterm.t; 
+  type uf_t = { classes: Union_find.set;
+                known_terms: unit Term.Mterm.t; 
               }
 
 
@@ -69,6 +70,7 @@ module Make(S:sig
                            term_depend = Term.Mterm.empty;
                            defined_terms = Term.Mterm.empty;
                            classes_var_mapping = Hashtbl.create 512;
+                           every_term = Union_find.empty;
                          }
 
   let empty_uf_domain = { classes = Union_find.empty; known_terms = Term.Mterm.empty; }
@@ -142,7 +144,9 @@ module Make(S:sig
     let myty = t_type a in
     let rec aux ity =
       match myty.ty_node with
-      | _ when ty_equal myty ty_int || ty_equal myty ty_bool ->
+      | _ when ty_equal myty ty_bool ->
+        []
+      | _ when ty_equal myty ty_int ->
         [a, None]
       | Tyapp(tys, vars) -> 
         begin
@@ -221,15 +225,77 @@ module Make(S:sig
     in
     aux ity
 
-  let uf_var = ref 0
+  let get_td uf_man a =
+    try
+      let c = Mterm.find a uf_man.term_depend in
+      Format.eprintf "depend found@.";
+      c
+    with
+    | Not_found ->
+      Format.eprintf "depend for term not found:";
+      Pretty.print_term Format.err_formatter a;
+      Format.eprintf "@.";
+      Mterm.empty
 
-  let rec get_depend t =
+  let rec get_depend s t =
     match t.t_node with
-    | Tvar(_) -> Mterm.add t () Mterm.empty
+    | Tvar(_) ->
+      if t_equal s t then
+        Mterm.empty
+      else Mterm.add t () Mterm.empty
     | Tapp(_, args) ->
-      List.map get_depend args
+      List.map (get_depend s) args
       |> List.fold_left (Mterm.union (fun _ _ _ -> Some ())) Mterm.empty
     | _ -> Mterm.empty
+
+  let create_class_var =
+    let uf_var = ref 0 in
+    fun uf_man t ->
+    uf_man.defined_terms <- Mterm.add t () uf_man.defined_terms;
+    let c = Union_find.new_class () in
+    uf_man.term_mapping <- Mterm.add t c uf_man.term_mapping;
+    Hashtbl.add uf_man.class_mapping c t;
+    let deps = get_depend t t in
+    uf_man.term_depend <- Mterm.fold_left (fun td k () ->
+        let a =
+          try
+            Mterm.find k td
+          with
+          | Not_found -> Mterm.empty
+        in
+        let a = Mterm.add t () a in
+        Mterm.add k a td) uf_man.term_depend deps;
+    let myvar = try
+        if Ty.ty_equal (t_type t) Ty.ty_int then
+        Some (Mterm.find t uf_man.apron_mapping)
+        else None
+      with 
+      | Not_found ->
+        incr uf_var;
+        let v = Var.of_string (Format.sprintf "$uf%d" !uf_var) in
+        uf_man.env <- Environment.add uf_man.env [|v|] [||];
+        uf_man.apron_mapping <- Mterm.add t v uf_man.apron_mapping;
+        Hashtbl.add uf_man.variable_mapping v t;
+        Some v
+    in
+    Hashtbl.add uf_man.classes_var_mapping c myvar;
+    c, myvar
+
+  let get_class_for_term uf_man t =
+    try
+      Mterm.find t uf_man.term_mapping
+    with
+    | Not_found ->
+      let c, _ = create_class_var uf_man t in
+      c
+  
+  let get_class_for_term_ro uf_man t =
+    try
+      Mterm.find t uf_man.term_mapping
+    with
+    | Not_found ->
+      assert false
+
 
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
@@ -290,25 +356,11 @@ module Make(S:sig
       | _ -> (* maybe a record access *)
         begin
           match var_of_term t with
-          | None -> Format.eprintf "Could not find term, switch it to uninterpreted function.@.";
-            uf_man.defined_terms <- Mterm.add t () uf_man.defined_terms;
-            let c = Union_find.new_class () in
-            uf_man.term_mapping <- Mterm.add t c uf_man.term_mapping;
-            Hashtbl.add uf_man.class_mapping c t;
-            let deps = get_depend t in
-            uf_man.term_depend <- Mterm.fold_left (fun td k () ->
-                let a =
-                  try
-                    Mterm.find k td
-                  with
-                   | Not_found -> Mterm.empty
-                in
-                let a = Mterm.add t () a in
-                Mterm.add k a td) uf_man.term_depend deps;
-            let myvar = incr uf_var; Var.of_string (Format.sprintf "$uf%d" !uf_var) in
-            uf_man.env <- Environment.add uf_man.env [|myvar|] [||];
-            Hashtbl.add uf_man.classes_var_mapping c myvar;
-            Hashtbl.add uf_man.variable_mapping myvar t;
+          | None ->
+            Format.eprintf "Could not find term";
+            Pretty.print_term Format.err_formatter t;
+            Format.eprintf ", switch it to uninterpreted function.@.";
+            let _, Some myvar = create_class_var uf_man t in
             ([myvar, coeff], 0)
           | Some s ->
             ([s, coeff], 0)
@@ -318,6 +370,7 @@ module Make(S:sig
     (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
      * the original formula. *)
     let rec aux t =
+      Pretty.print_term Format.err_formatter t;
       try
         match t.t_node with
         | Tbinop(Tand, a, b) ->
@@ -333,7 +386,7 @@ module Make(S:sig
              let (d2, a2) = fb (d, a) in
              D.join man d1 d2, join_uf man a1 a2)
 
-        | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int || Ty.ty_equal (t_type a) Ty.ty_bool)
+        | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
           && 
           (ls_equal ps_equ func ||
            ls_equal lt_int func ||
@@ -341,7 +394,8 @@ module Make(S:sig
            ls_equal le_int func ||
            ls_equal ge_int func)
 
-          -> (* ATM, this is handled only for equality and integer comparison *)
+          ->
+
           (* FIXME: >, <=, >=, booleans *)
             let base_coeff, eq_type =
               if ls_equal ps_equ func then
@@ -371,6 +425,35 @@ module Make(S:sig
             let arr = Lincons1.array_make uf_man.env 1 in
             Lincons1.array_set arr 0 cons;
             let f = !f in
+            let f = 
+              if ls_equal ps_equ func then
+                let ca = get_class_for_term uf_man a in
+                let cb = get_class_for_term uf_man b in
+                uf_man.every_term <- Union_find.union ca cb uf_man.every_term;
+                (fun uf_d ->
+                   let tda = Mterm.find a uf_man.term_depend in
+                   let tdb = Mterm.find b uf_man.term_depend in
+                   assert (Mterm.cardinal tda = Mterm.cardinal tdb);
+                   let replaceby a b t =
+                     t_map (fun t ->
+                         if t_equal t a then b else t) t
+                   in
+                   let l = Mterm.fold_left (fun l k _ ->
+                       ((replaceby a b) k, k) :: l) [] tda in
+                   let l = List.map (fun (a, b) ->
+                       get_class_for_term_ro uf_man a, get_class_for_term_ro uf_man b) l in
+                   let l = (ca, cb) :: l in
+                   f uf_d |>
+                   fun c -> { c with classes = List.fold_left (fun c (ca, cb) ->
+                       Union_find.union ca cb c) c.classes l } )
+              else
+                f
+            in
+            let f =
+              if Ty.ty_equal (t_type a) Ty.ty_int then f
+              else fun x -> x
+            in
+
             (fun (d, a) ->
                D.meet_lincons_array man d arr, f a)
         | Tapp(func, [a;b]) when ls_equal ps_equ func ->
@@ -579,15 +662,43 @@ module Make(S:sig
       Format.eprintf "@.";
       ()
 
-  let forget_term (man, uf_man) t =
+  let rec forget_term (man, uf_man) t =
+    let deps =
+      try
+        Mterm.find t uf_man.term_depend
+      with 
+      | Not_found -> Mterm.empty
+    in
+    let c = get_class_for_term uf_man t in
     let vars_to_forget =
       get_subvalues t None
-      |> List.map (fun (a, _) -> Term.Mterm.find a uf_man.apron_mapping)
-      |> Array.of_list
+      |> List.fold_left (fun f (a, _) ->
+          let v = Term.Mterm.find a uf_man.apron_mapping in
+          fun (a, b) ->
+            let mt, (c, d) = f (a, b) in
+            let c = 
+              match mt with
+              | None -> c
+              | Some cl ->
+                let linexpr = Linexpr1.make uf_man.env in
+                Linexpr1.set_array linexpr [|Coeff.s_of_int 1, v|] None;
+                let Some a = Hashtbl.find uf_man.classes_var_mapping cl in
+                D.assign_linexpr man c a linexpr None
+            in
+            mt, (D.forget_array man c [|v|] false, d) )
+        (fun (a, b) ->
+          let mt, bs = Union_find.forget c b.classes in
+           if mt <> None then begin
+           Format.eprintf "forgetting@.";
+           Union_find.print b.classes;
+           end;
+          mt, (a, { b with classes = bs }))
     in
-    (fun (abs, a) -> 
-       D.forget_array man abs vars_to_forget false, a
-    )
+    Mterm.fold_left (fun f t _ ->
+        let g = forget_term (man, uf_man) t in
+        (fun d -> g d |> f))
+      (fun a -> snd (vars_to_forget a))
+    deps
 
   let forget_var m v = forget_term m (t_var v)
 
@@ -627,4 +738,34 @@ module Make(S:sig
           Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
           raise Not_found
       )
+
+  let update_possible_substitutions (man, uf_man) =
+    Union_find.print uf_man.every_term;
+    let k = ref 0 in
+    Union_find.fold_equal (fun () a b ->
+        incr k;
+        Format.eprintf "%d@." !k;
+        let a = Hashtbl.find uf_man.class_mapping a in
+        let b = Hashtbl.find uf_man.class_mapping b in
+        let tda = get_td uf_man a in
+        let tdb = get_td uf_man b in
+        let replaceby a b t =
+          t_map (fun t ->
+              if t_equal t a then b else t) t
+        in
+        let l = Mterm.fold_left (fun l k _ ->
+            ((replaceby a b) k, k) :: l) [] tda in
+        let l = Mterm.fold_left (fun l k _ ->
+            (k, (replaceby b a) k) :: l) l tdb in
+        let tda, tdb = List.fold_left (fun (ma, mb) (for_b, for_a) ->
+            Mterm.add for_a () ma, Mterm.add for_b () mb) (Mterm.empty, Mterm.empty) l in
+        List.iter (fun (a, b) ->
+            ignore (get_class_for_term uf_man a, get_class_for_term uf_man b)) l;
+        uf_man.term_depend <- Mterm.add a tda (Mterm.add b tdb uf_man.term_depend);
+      ) () uf_man.every_term;
+    Format.eprintf "done%d@." (Environment.size uf_man.env);
+    Hashtbl.iter (fun _ t ->
+        Pretty.print_term Format.err_formatter t;
+        Format.eprintf "@.";
+      ) uf_man.class_mapping
 end

@@ -35,6 +35,7 @@ module type TERM_DOMAIN = sig
   val add_variable_to_env: man -> Ity.pvsymbol -> unit
   val add_lvariable_to_env: man -> Term.vsymbol -> unit
   val to_term: man -> t -> Term.term
+  val update_possible_substitutions: man -> unit
 end
 
 module Polyhedra: DOMAIN
