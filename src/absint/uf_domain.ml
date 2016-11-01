@@ -346,27 +346,12 @@ module Make(S:sig
                   | Not_found -> None
                 in
                 match var, var' with
-                | Some var, Some var' ->
-                  let final_repr = Union_find.repr cl ud.classes in
-                  let t = TermToClass.to_term uf_man.class_to_term final_repr in
-                  assert (Union_find.repr cl' ud.classes = final_repr);
-                  let uf_to_var = TermToVar.remove_t ud.uf_to_var var in
-                  let uf_to_var = TermToVar.remove_t uf_to_var var' in
-                  let uf_to_var = TermToVar.add uf_to_var t var in
-                  let ud = { ud with uf_to_var } in
-                  let linexpr = Linexpr1.make uf_man.env in
-                  Linexpr1.set_coeff linexpr var (Coeff.s_of_int 1);
-                  let d = D.assign_linexpr man d var' linexpr None in
-                  D.forget_array man d [|var'|] false, ud
                 | Some var, None  | None, Some var->
-                  let final_repr = Union_find.repr cl ud.classes in
-                  let t = TermToClass.to_term uf_man.class_to_term final_repr in
-                  assert (Union_find.repr cl' ud.classes = final_repr);
-                  let uf_to_var = TermToVar.remove_t ud.uf_to_var var in
-                  let uf_to_var = TermToVar.add uf_to_var t var in
+                  let uf_to_var = TermToVar.add ud.uf_to_var v var in
+                  let uf_to_var = TermToVar.add uf_to_var v' var in
                   let ud = { ud with uf_to_var } in
                   d, ud
-                | None, None ->
+                | _ ->
                   d, ud
               end
 
@@ -456,7 +441,8 @@ module Make(S:sig
                         | Not_found -> TermToVar.add uf_to_var u myvar
                       in
                       Union_find.union tcl (get_class_for_term uf_man u) classes, uf_to_var) (u.classes, u.uf_to_var) equivs in
-                  let u = { u with classes; uf_to_var } in
+                  let u = { u with classes; } in
+                  let u = { u with uf_to_var } in
                   u
                 );
               ([myvar, coeff], 0)
@@ -778,29 +764,28 @@ module Make(S:sig
                 Pretty.print_term Format.err_formatter v;
                 Format.eprintf "@.";
                 let cl = get_class_for_term uf_man v in
-                let was_repr = cl = Union_find.repr cl b.classes in
-                let maybe_repr, s = Union_find.forget cl b.classes in
+                let _, s = Union_find.forget cl b.classes in
                 let b = { b with classes = s } in
-                if was_repr then
+                let old_b = b in
+                let uf_to_var =
                   try
-                    let myv = TermToVar.to_t b.uf_to_var v in
-                    match maybe_repr with
-                    | None -> 
-                      let uf_to_var = TermToVar.remove_term b.uf_to_var v in
-                      if (not (t_equal t v)) then
-                        D.forget_array man a [|myv|] false, { b with uf_to_var }
-                      else
-                        a, { b with uf_to_var }
-                    | Some s ->
-                      let t = TermToClass.to_term uf_man.class_to_term s in
-                      let cl = Union_find.get_class s b.classes in
-                      let uf_to_var = TermToVar.remove_term b.uf_to_var v in
-                      let uf_to_var = TermToVar.add uf_to_var t myv in
-                      a, { b with uf_to_var }
+                    TermToVar.remove_term b.uf_to_var v
+                  with
+                  | Not_found -> b.uf_to_var
+                in
+                let b = { b with uf_to_var } in
+                try
+                  let myv = TermToVar.to_t old_b.uf_to_var v in
+                  try
+                    ignore (TermToVar.to_term b.uf_to_var myv); a, b
                   with
                   | Not_found ->
-                    a, b
-                else
+                    if (not (t_equal t v)) then
+                      D.forget_array man a [|myv|] false, b
+                    else
+                      a, b
+                with
+                | Not_found ->
                   a, b
               end
             else
