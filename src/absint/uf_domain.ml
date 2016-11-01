@@ -92,11 +92,14 @@ module Make(S:sig
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let join_uf uf_man a b =
     let uf_to_var = TermToVar.union a.uf_to_var b.uf_to_var in
+    assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
     { classes = Union_find.join a.classes b.classes; uf_to_var; }
 
+  let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
-    A.join man a c, join_uf uf_man b d
+    let e = join_uf uf_man b d in
+    A.join man a c, e
 
   let join_list man l = match l with
     | [] -> assert false
@@ -104,8 +107,6 @@ module Make(S:sig
 
   let widening (man, uf_man) (a, b) (c, d) =
     A.widening man a c, join_uf uf_man b d
-
-  let print fmt (a, b) = A.print fmt a
 
   let push_label (man, uf_man) env i (a, b) =
     A.push_label man uf_man.env i a, b
@@ -275,6 +276,7 @@ module Make(S:sig
         |> Var.of_string
       in
       uf_man.env <- Environment.add uf_man.env [|v|] [||];
+      Format.eprintf "----adding %s@." (Var.to_string v);
       uf_man.var_to_term <- TermToVar.add uf_man.var_to_term t v;
       v
   
@@ -433,6 +435,7 @@ module Make(S:sig
               f := (fun u ->
                   let u = g u in
                   let equivs = get_equivs uf_man u.classes t in
+                  let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
                   let classes, uf_to_var = List.fold_left (fun (classes, uf_to_var) u ->
                       let uf_to_var = 
                         try
