@@ -549,7 +549,8 @@ module Make(E: sig
       let vret_k = create_vreturn manpk Ty.ty_int in
       let forget_vret = D.forget_var manpk vret_k in
       let forget_k = D.forget_var manpk Ity.(k.pv_vs) in
-      let next_assignation = t_app ps_equ [t_var vret_k; t_app ad_int [k_term; Term.t_const ( Number.ConstInt (Number.int_const_bin "1"))] None] None |> D.meet_term manpk in
+      let res = t_app ad_int [k_term; Term.t_const ( Number.ConstInt (Number.int_const_bin "1"))] (Some Ty.ty_int) in
+      let next_assignation = t_app ps_equ [t_var vret_k; res] None |> D.meet_term manpk in
       let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> D.meet_term manpk in
       new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->
           (* vret = k + 1, forget k, k = vret, forget vret *)

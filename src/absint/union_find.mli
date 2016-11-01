@@ -12,3 +12,4 @@ val fold_class: ('a -> t -> t -> 'a) -> 'a -> set -> 'a
 val flat: set -> t list
 val get_class: t -> set -> t list
 val repr: t -> set -> t 
+val get_repr: set -> t list

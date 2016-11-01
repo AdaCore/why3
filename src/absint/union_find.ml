@@ -145,3 +145,5 @@ let fold_class f a s =
   in
   List.fold_left fold_single a s
 
+let get_repr s =
+  List.map List.hd s
