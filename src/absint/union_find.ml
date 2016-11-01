@@ -11,49 +11,65 @@ let get_class t s =
   | Not_found -> None
 
 let union a b c =
-  if a = b then 
-    c
-  else begin
-    Format.eprintf "Union of %d and %d.@." a b;
-    let ca = get_class a c in
-    let cb = get_class b c in
-    match ca, cb with
-    | None, Some l ->
-      let nl = a::l in
-      List.map (fun k ->
-          if k == l then
-            nl
-          else
-            k) c
-    | Some l, None ->
-      let nl = a::l in
-      List.map (fun k ->
-          if k == l then
-            nl
-          else
-            k) c
-    | None, None ->
+  Format.eprintf "Union of %d and %d.@." a b;
+  let ca = get_class a c in
+  let cb = get_class b c in
+  match ca, cb with
+  | None, Some l ->
+    let nl = a::l in
+    List.map (fun k ->
+        if k == l then
+          nl
+        else
+          k) c
+  | Some l, None ->
+    let nl = b::l in
+    List.map (fun k ->
+        if k == l then
+          nl
+        else
+          k) c
+  | None, None ->
+    if a = b then
+      [a]::c
+    else
       [a; b] :: c
-    | Some l, Some l' when (l == l') ->
-      c
-    | Some l, Some l_ ->
-      let nl = l @ l_ |> List.sort_uniq compare in
-      List.filter (fun k -> not (k == l_)) c
-      |> List.map (fun k ->
-          if k == l then
-            nl
-          else
-            k)
-  end
+  | Some l, Some l' when (l == l') ->
+    c
+  | Some l, Some l_ ->
+    let nl = l @ l_ |> List.sort_uniq compare in
+    List.filter (fun k -> not (k == l_)) c
+    |> List.map (fun k ->
+        if k == l then
+          nl
+        else
+          k)
+
+let intersect l1 l2 =
+  let l1 = List.sort_uniq compare l1 in
+  let l2 = List.sort_uniq compare l2 in
+  let rec do_inter t' l1 = function
+    | [] -> []
+    | t::q -> if t = t' then t::(do_inter t l1 q)
+      else if t < t' then
+        do_inter t' l1 q
+      else
+        do_inter t l2 l1
+  in
+  match l1 with
+  | t::q -> do_inter t q l2
+  | [] -> []
 
 let join a b =
-  List.fold_left (fun a k ->
-      match k with
-      | [] -> a
-      | t::q ->
-        List.fold_left (fun a t' ->
-            union t t' a) a q
-    )  a b
+  List.fold_left (fun l k ->
+      List.fold_left (fun l k' ->
+          let i = intersect k k' in
+          if i <> [] then
+            i::l
+          else
+            l
+        ) [] a
+    )  [] b
 
 let is_leq a b =
   List.fold_left (fun t cb ->
@@ -69,6 +85,16 @@ let new_class =
   fun () ->
     incr i;
     !i
+
+let print s =
+  List.iter (fun k ->
+      Format.eprintf "-- [";
+      List.iter (fun i ->
+          Format.eprintf "%d, " i) k;
+      Format.eprintf "]@.";
+    ) s;
+  Format.eprintf ".@."
+
 
 let forget t s =
   let ct = get_class t s in
@@ -86,15 +112,6 @@ let forget t s =
           else
             k) s
 
-let print s =
-  List.iter (fun k ->
-      Format.eprintf "-- [";
-      List.iter (fun i ->
-          Format.eprintf "%d, " i) k;
-      Format.eprintf "]@.";
-    ) s;
-  Format.eprintf ".@."
-
 
 let fold_equal f acc (s:set) =
   List.fold_left (fun acc c ->
@@ -107,3 +124,25 @@ let fold_equal f acc (s:set) =
       in
       browse_list acc c
     ) acc s
+
+let flat (s:set) =
+  List.concat s
+
+let get_class a s =
+  match get_class a s with
+  | None -> [a]
+  | Some s -> s
+
+let repr a s =
+  List.hd (get_class a s)
+
+let fold_class f a s =
+  let s = List.map (List.sort_uniq compare) s in
+  let fold_single a = function
+    | [] -> a
+    | t::q ->
+      List.fold_left (fun a t' ->
+          f a t' t) a q
+  in
+  List.fold_left fold_single a s
+
