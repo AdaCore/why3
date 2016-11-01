@@ -91,10 +91,6 @@ module Make(S:sig
 
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let join_uf uf_man a b =
-    Union_find.print a.classes;
-    Union_find.print b.classes;
-    Union_find.print (Union_find.join a.classes b.classes);
-    Format.eprintf "joining@.";
     let uf_to_var = TermToVar.union a.uf_to_var b.uf_to_var in
     { classes = Union_find.join a.classes b.classes; uf_to_var; }
 
@@ -290,7 +286,6 @@ module Make(S:sig
           with 
           | Not_found ->
             try
-              Format.eprintf "Couldn't find variable %s, trying uf@." (Var.to_string a);
               let t = TermToVar.to_term b.uf_to_var a in
               let tcl = get_class_for_term uf_man t in
                 let repr = Union_find.repr tcl b.classes in
@@ -315,12 +310,9 @@ module Make(S:sig
 
   let do_eq (man, uf_man) a b =
     fun (d, ud) ->
-      Format.eprintf "!!! equality";
-      Pretty.print_term Format.err_formatter a;
-      Format.eprintf " = ";
-      Pretty.print_term Format.err_formatter b;
+      let ud = { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man a) ud.classes } in
+      let ud = { ud with classes = Union_find.union (get_class_for_term uf_man b) (get_class_for_term uf_man b) ud.classes } in
       let all_values = Union_find.flat ud.classes in
-      Format.eprintf " -> %d@." (List.length all_values);
       let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
       let d, ud = List.fold_left (fun (d, ud) v ->
           let rec replaceby t =
@@ -333,21 +325,12 @@ module Make(S:sig
           if t_equal v v' then
             d, ud
           else
-            let _ =
-              Format.eprintf "--  adding class for ";
-              Pretty.print_term Format.err_formatter v;
-              Format.eprintf " i.e. ";
-              Pretty.print_term Format.err_formatter v';
-              Format.eprintf "@.";
-            in
             let cl = (get_class_for_term uf_man v |> Union_find.repr) ud.classes in
             let cl' = (get_class_for_term uf_man v' |> Union_find.repr) ud.classes in
             if cl = cl' then
               d, ud
             else
               begin
-      let t = to_term (man, uf_man) (d, ud) in
-      Pretty.print_term Format.err_formatter t;
                 let ud = { ud with classes = Union_find.union cl cl' ud.classes } in
                 let var = try
                     Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl))
@@ -380,15 +363,12 @@ module Make(S:sig
                   let uf_to_var = TermToVar.add uf_to_var t var in
                   let ud = { ud with uf_to_var } in
                   d, ud
-                | None, None -> d, ud
+                | None, None ->
+                  d, ud
               end
 
         ) (d, ud) all_values in
       let ud = { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man b) ud.classes } in
-      Format.eprintf "equality done attempt@.@.@.@.@.";
-      let t = to_term (man, uf_man) (d, ud) in
-      Pretty.print_term Format.err_formatter t;
-      Format.eprintf "equality done@.@.@.@.@.";
       d, ud
 
 
@@ -467,8 +447,8 @@ module Make(S:sig
                   let equivs = get_equivs uf_man u.classes t in
                   let classes = List.fold_left (fun classes u ->
                       Union_find.union tcl (get_class_for_term uf_man u) classes) u.classes equivs in
-                  let repr = Union_find.repr tcl u.classes in
                   let u = { u with classes } in
+                  let repr = Union_find.repr tcl u.classes in
                   let t = TermToClass.to_term uf_man.class_to_term repr in
                   let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
                   let t = TermToVar.to_term u.uf_to_var myvar in
@@ -484,7 +464,6 @@ module Make(S:sig
       (* This takes an epsilon-free formula and returns a list of linear expressions weaker than
        * the original formula. *)
       let rec aux t =
-        Pretty.print_term Format.err_formatter t;
         try
           match t.t_node with
           | Tbinop(Tand, a, b) ->
@@ -592,16 +571,7 @@ module Make(S:sig
       try
         let f = aux t in
         (fun d ->
-           Format.eprintf "\027[32mMeeting\027[0m.";
-           Format.eprintf " with "; Pretty.print_term Format.err_formatter t;
-           Format.eprintf "@.before %d -> " (Union_find.flat (snd d).classes |> List.length);
-           let t = to_term (man, uf_man) d in
-           Pretty.print_term Format.err_formatter t;
            let d = f d in
-           Format.eprintf "@.after %d -> " (Union_find.flat (snd d).classes |> List.length);
-           let t = to_term (man, uf_man) d in
-           Pretty.print_term Format.err_formatter t;
-           Format.eprintf "@.";
            d)
       with
       | e ->
@@ -779,18 +749,9 @@ module Make(S:sig
   
   let rec forget_term (man, uf_man) t =
     let f = fun (a, b) ->
-      Format.eprintf "forgetting… ";
-      Pretty.print_term Format.err_formatter t;
-      Format.eprintf " |  ";
-      Pretty.print_term Format.err_formatter (to_term (man, uf_man) (a, b));
-      Format.eprintf "@.";
-
       let all_values = Union_find.flat b.classes in
       let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
       List.fold_left (fun (a, b) v ->
-              Format.eprintf "examining 1… ";
-              Pretty.print_term Format.err_formatter v;
-              Format.eprintf "@.";
           let found = ref false in
           let rec is_in myt =
             if t_equal t myt then
@@ -801,35 +762,24 @@ module Make(S:sig
           if !found && not (t_equal t v) then
             begin
               let cl = get_class_for_term uf_man v in
-              Format.eprintf "examining (%d)… " (List.length (Union_find.get_class cl b.classes));
-              Pretty.print_term Format.err_formatter v;
-              Format.eprintf "@.";
               let was_repr = cl = Union_find.repr cl b.classes in
               let maybe_repr, s = Union_find.forget cl b.classes in
               let b = { b with classes = s } in
-                    Format.eprintf "notrepr!!@.";
               if was_repr then
                 try
-                    Format.eprintf "repr!!@.";
                   let myv = TermToVar.to_t b.uf_to_var v in
                   match maybe_repr with
                   | None -> 
-                    Format.eprintf "none!!@.";
                     let uf_to_var = TermToVar.remove_term b.uf_to_var v in
                     D.forget_array man a [|myv|] false, { b with uf_to_var }
                   | Some s ->
                     let t = TermToClass.to_term uf_man.class_to_term s in
                     let cl = Union_find.get_class s b.classes in
-              Format.eprintf "found term… ";
-              List.map (TermToClass.to_term uf_man.class_to_term) cl |>
-              List.iter (Pretty.print_term Format.err_formatter);
-              Format.eprintf "@.";
                     let uf_to_var = TermToVar.remove_term b.uf_to_var v in
                     let uf_to_var = TermToVar.add uf_to_var t myv in
                     a, { b with uf_to_var }
                 with
                 | Not_found ->
-                    Format.eprintf "notfound!!@.";
                   a, b
               else
                 a, b
@@ -852,11 +802,6 @@ module Make(S:sig
          let cl = get_class_for_term uf_man t in
          let _, classes = Union_find.forget cl b.classes in
          let b = { b with classes } in
-      Format.eprintf "after… ";
-      Pretty.print_term Format.err_formatter t;
-      Format.eprintf " |  ";
-      Pretty.print_term Format.err_formatter (to_term (man, uf_man) (a, b));
-      Format.eprintf "@.";
       a, b)
 
   let forget_var m v = forget_term m (t_var v)

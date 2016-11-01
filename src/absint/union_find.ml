@@ -11,7 +11,6 @@ let get_class t s =
   | Not_found -> None
 
 let union a b c =
-  Format.eprintf "Union of %d and %d.@." a b;
   let ca = get_class a c in
   let cb = get_class b c in
   match ca, cb with
