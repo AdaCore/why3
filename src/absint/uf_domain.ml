@@ -470,7 +470,11 @@ module Make(S:sig
                   let repr = Union_find.repr tcl u.classes in
                   let u = { u with classes } in
                   let t = TermToClass.to_term uf_man.class_to_term repr in
-                  { u with uf_to_var = TermToVar.add u.uf_to_var t myvar });
+                  let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
+                  let t = TermToVar.to_term u.uf_to_var myvar in
+                  let cl = TermToClass.to_t uf_man.class_to_term t in
+                  assert (cl = Union_find.repr cl u.classes); u
+                );
               ([myvar, coeff], 0)
             | Some s ->
               ([s, coeff], 0)
@@ -541,8 +545,6 @@ module Make(S:sig
                 (fun (d, ud) ->
                    let d, ud = g (d, ud) in
                    let a, b = d, f ud in
-      let t = to_term (man, uf_man) (a, b) in
-      Pretty.print_term Format.err_formatter t;
                    a, b
                 )
               else
