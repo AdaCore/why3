@@ -683,7 +683,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig gmain
+IDE_FILES = gconfig why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -733,6 +733,7 @@ install_no_local::
 install_local:: bin/why3ide
 
 endif
+
 
 ###############
 # Session

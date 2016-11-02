@@ -2442,9 +2442,3 @@ let () = Debug.set_flag (Debug.lookup_flag "transform")
 let () = display_warnings ()
 
 let () = GMain.main ()
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
-End:
-*)

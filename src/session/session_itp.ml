@@ -682,7 +682,6 @@ let build_session (s : session) xml =
       s
 
 exception ShapesFileError of string
-exception SessionFileError of string
 
 module ReadShapes (C:Compress.S) = struct
 
