@@ -290,7 +290,6 @@ module Make(S:sig
               let t = TermToVar.to_term b.uf_to_var a in
               let tcl = get_class_for_term uf_man t in
                 let repr = Union_find.repr tcl b.classes in
-              assert (t_equal t (TermToClass.to_term uf_man.class_to_term repr));
               t
 
             with
@@ -315,8 +314,6 @@ module Make(S:sig
 
   let do_eq (man, uf_man) a b =
     fun (d, ud) ->
-      let ud = { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man a) ud.classes } in
-      let ud = { ud with classes = Union_find.union (get_class_for_term uf_man b) (get_class_for_term uf_man b) ud.classes } in
       let all_values = Union_find.flat ud.classes in
       let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
       let d, ud = List.fold_left (fun (d, ud) v ->
@@ -432,8 +429,9 @@ module Make(S:sig
               let myvar = get_var_for_term !meetid uf_man t in
               let g = !f in
               let tcl = get_class_for_term uf_man t in
-              f := (fun u ->
-                  let u = g u in
+              f := (fun (d, u) ->
+                  let d, u = g (d, u) in
+                  let d = D.forget_array man d [|myvar|] false in
                   let equivs = get_equivs uf_man u.classes t in
                   let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
                   let classes, uf_to_var = List.fold_left (fun (classes, uf_to_var) u ->
@@ -446,7 +444,7 @@ module Make(S:sig
                       Union_find.union tcl (get_class_for_term uf_man u) classes, uf_to_var) (u.classes, u.uf_to_var) equivs in
                   let u = { u with classes; } in
                   let u = { u with uf_to_var } in
-                  u
+                  d, u
                 );
               ([myvar, coeff], 0)
             | Some s ->
@@ -516,11 +514,11 @@ module Make(S:sig
                 let g = do_eq (man, uf_man) a b in
                 (fun (d, ud) ->
                    let d, ud = g (d, ud) in
-                   let a, b = d, f ud in
+                   let a, b = f (d, ud) in
                    a, b
                 )
               else
-                (fun (a, b) -> a, f b)
+                f
             in
             let f =
               if Ty.ty_equal (t_type a) Ty.ty_int then f
@@ -538,7 +536,8 @@ module Make(S:sig
             |> List.fold_left (fun f ((a, _), (b, _)) ->
                 let g = aux (t_app ps_equ [a; b] None) in
                 (fun abs ->
-                   g abs |> f)) f_uf
+                   g abs |> f
+                   )) f_uf
           | Tif(a, b, c) ->
             let fa = aux a in
             let fa_not = aux (t_descend_nots a) in
