@@ -1,0 +1,19 @@
+module Uf1
+	use import array.Array
+	use import ref.Ref
+	use import int.Int
+
+	let b(y:int): int
+	ensures { result = 1 } =
+		let a = make 10 0 in
+		let i = ref 0 in
+		let x = ref 0 in
+		let j = y in
+		a[0] <- 1;
+		while !i < 10 do
+		variant { 10 - !i }
+			i := !i + 1;
+			x := a[j] - a[y];
+		done;
+		!x
+end
