@@ -98,12 +98,12 @@ module Make(S:sig
     let uf_to_var = TermToVar.union a.uf_to_var b.uf_to_var in
     let classes =  Union_find.join a.classes b.classes in
     assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
+    assert (List.length (Union_find.flat classes) >= max ( List.length (Union_find.flat a.classes)) (List.length (Union_find.flat b.classes))) ;
     { classes; uf_to_var; }
 
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
-    print Format.err_formatter (a, b); print Format.err_formatter (c, d);
     let e = join_uf uf_man b d in
     A.join man a c, e
 
@@ -355,9 +355,12 @@ module Make(S:sig
                   | Not_found -> None
                 in
                 match var, var' with
-                | Some var, None  | None, Some var->
+                | Some var, None ->
+                  let uf_to_var = TermToVar.add ud.uf_to_var v' var in
+                  let ud = { ud with uf_to_var } in
+                  d, ud
+                | None, Some var->
                   let uf_to_var = TermToVar.add ud.uf_to_var v var in
-                  let uf_to_var = TermToVar.add uf_to_var v' var in
                   let ud = { ud with uf_to_var } in
                   d, ud
                 | _ ->
@@ -807,7 +810,6 @@ module Make(S:sig
 
   let rec forget_term (man, uf_man) t =
     let f = fun (a, b) ->
-      Format.eprintf "Forgetting… "; p t; Format.eprintf "@.";
       let last_n = ref (-1) in
       let d = ref (a, b) in
       let all_values = ref [] in
@@ -826,17 +828,12 @@ module Make(S:sig
             if is_in t v then
               begin
                 let cl = get_class_for_term uf_man v in
-                Format.eprintf "   -   ";
-                p v;
-                Format.eprintf "@.";
                 let b =
                   let tcl = get_class_for_term uf_man t in
                   let alternatives = Union_find.get_class tcl b.classes
                                      |> List.map (TermToClass.to_term uf_man.class_to_term)
                                      |> List.filter (fun k -> not (is_in t k))
                                      |> List.sort (fun i j -> compare (tdepth i) (tdepth j)) in
-                  List.iter (fun i ->
-                      p i; Format.eprintf "####@.") alternatives;
                   let alternative = match alternatives with
                     | [] -> None
                     | t::q ->
@@ -852,9 +849,6 @@ module Make(S:sig
                         t_map replaceby myt
                     in
                     let alt = replaceby v in
-                Format.eprintf "@.";
-                p alt;
-                Format.eprintf "@.";
                     let altcl = get_class_for_term uf_man alt in
                     let b = { b with classes = Union_find.union altcl cl b.classes } in
                     let uf_to_var = 
@@ -887,10 +881,7 @@ module Make(S:sig
                     ignore (TermToVar.to_term b.uf_to_var myv); a, b
                   with
                   | Not_found ->
-                    if (not (t_equal t v)) then
                       D.forget_array man a [|myv|] false, b
-                    else
-                      a, b
                 with
                 | Not_found ->
                   a, b

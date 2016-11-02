@@ -13,18 +13,24 @@ module Make(S:sig type t end) = struct
     with
     | Not_found -> Term.Mterm.empty
 
-  let add oto te t =
-    let v = Obj.magic t in
-    let all = get_all oto t in
-    let all = Term.Mterm.add te () all in
-    { to_term = TMap.add t all oto.to_term;
-      to_t = Term.Mterm.add te t oto.to_t; }
-
   let to_term oto t =
     TMap.find t oto.to_term |> Term.Mterm.choose |> fst
 
   let to_t oto te =
     Term.Mterm.find te oto.to_t
+
+  let add oto te t =
+    let all = get_all oto t in
+    let all = Term.Mterm.add te () all in
+    begin
+      try
+        to_t oto te |> ignore; assert false
+      with
+      | Not_found -> ()
+    end;
+
+    { to_term = TMap.add t all oto.to_term;
+      to_t = Term.Mterm.add te t oto.to_t; }
 
   let remove_t oto t =
     { to_term = TMap.remove t oto.to_term;
@@ -38,6 +44,13 @@ module Make(S:sig type t end) = struct
     { to_term = TMap.add (Term.Mterm.find te oto.to_t) all  oto.to_term;
       to_t = Term.Mterm.remove te oto.to_t }
 
+  let card a = 
+    Term.Mterm.cardinal a.to_t
+
+  let card2 a =
+    TMap.filter (fun _ k -> k <> Term.Mterm.empty) a.to_term |> TMap.cardinal
+
+
   let union a b =
     let c = a in
     Term.Mterm.fold_left (fun c te t ->
@@ -46,8 +59,4 @@ module Make(S:sig type t end) = struct
         with
         | Not_found ->
           add c te t) c b.to_t
-
-  let card a = 
-    Term.Mterm.cardinal a.to_t
-
 end

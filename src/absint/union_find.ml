@@ -61,7 +61,7 @@ let intersect l1 l2 =
   | [] -> []
 
 let join a b =
-  List.fold_left (fun l k ->
+  let c = List.fold_left (fun l k ->
       List.fold_left (fun l k' ->
           let i = intersect k k' in
           if i <> [] then
@@ -70,6 +70,12 @@ let join a b =
             l
         ) l a
     )  [] b
+  in
+  let a = List.concat a in
+  let b = List.concat b in
+  let d = (List.filter (fun t -> not (List.mem t b)) a) @ (List.filter (fun t -> not (List.mem t a)) b) in
+  let d = List.map (fun t -> [t]) d in
+  c @ d
 
 let is_leq a b =
   List.fold_left (fun t cb ->
