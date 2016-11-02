@@ -288,8 +288,6 @@ module Make(S:sig
           | Not_found ->
             try
               let t = TermToVar.to_term b.uf_to_var a in
-              let tcl = get_class_for_term uf_man t in
-                let repr = Union_find.repr tcl b.classes in
               t
 
             with
@@ -313,6 +311,7 @@ module Make(S:sig
     TermToClass.to_t uf_man.class_to_term t
 
   let do_eq (man, uf_man) a b =
+    if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
     fun (d, ud) ->
       let all_values = Union_find.flat ud.classes in
       let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
@@ -357,6 +356,8 @@ module Make(S:sig
         ) (d, ud) all_values in
       let ud = { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man b) ud.classes } in
       d, ud
+    else
+      fun x -> x
 
 
 
@@ -637,6 +638,7 @@ module Make(S:sig
   let cached_vreturn = ref (Ty.Mty.empty)
   let ident_ret = Ident.{pre_name = "$reg"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let create_vreturn man ty =
+    assert (not (Ty.ty_equal ty Ity.ty_unit));
     try
       Ty.Mty.find ty !cached_vreturn
     with
@@ -762,9 +764,6 @@ module Make(S:sig
             is_in v |> ignore;
             if !found then
               begin
-                Format.eprintf "Forgetting… ";
-                Pretty.print_term Format.err_formatter v;
-                Format.eprintf "@.";
                 let cl = get_class_for_term uf_man v in
                 let _, s = Union_find.forget cl b.classes in
                 let b = { b with classes = s } in

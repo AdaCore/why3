@@ -91,6 +91,7 @@ module Make(E: sig
   let ident_ret = Ident.{pre_name = "$ret"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let cached_vreturn = ref (Ty.Mty.empty)
   let create_vreturn manpk ty =
+    assert (not (Ty.ty_equal ty Ity.ty_unit));
     let v =
       try
         Ty.Mty.find ty !cached_vreturn
@@ -199,9 +200,12 @@ module Make(E: sig
       (* Always use the same variable when returning a value, 
        * otherwise variables keep being created and the previous ones (with the
        * good constraints) can not be accessed *)
-      let return_var = create_vreturn manpk (return.vs_ty) in
-      let return_term = t_var return_var in
-      t_subst_single return return_term t
+      if Ty.ty_equal return.vs_ty Ity.ty_unit then
+        t
+      else
+        let return_var = create_vreturn manpk (return.vs_ty) in
+        let return_term = t_var return_var in
+        t_subst_single return return_term t
     | _ ->
       t
 

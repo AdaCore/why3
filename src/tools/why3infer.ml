@@ -171,6 +171,15 @@ let do_input f =
 
       ) m.mod_export.ns_ps
   in
+  (*let open Pmodule in
+  let module Infer_ai =
+    Infer_ai.Make(struct
+      let env = env
+      let pmod = Mstr.choose mm |> snd
+      let widening = 6
+      module D = Disjunctive_domain.Make(Domain.Polyhedra)
+    end) in
+  ignore (Infer_ai.infer_loop_invariants (Mstr.choose mm |> snd));*)
   Mstr.iter do_infer mm;
   let copying_informations = Hashtbl.create 100 in
   !all_while
