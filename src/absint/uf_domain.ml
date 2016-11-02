@@ -714,7 +714,12 @@ module Make(S:sig
               (accessor, real_term) :: acc
             ) [] subv
         in
-        uf_man.region_mapping <- Ity.Mreg.add reg proj_list uf_man.region_mapping
+        let old_projs = try
+            Ity.Mreg.find reg uf_man.region_mapping
+          with
+          | Not_found -> []
+        in
+        uf_man.region_mapping <- Ity.Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping
       end
     | Ity.Ityapp(_), _ ->
       Format.eprintf "Let's check that ";
@@ -814,10 +819,11 @@ module Make(S:sig
     let terms = Ity.Mreg.find v uf_man.region_mapping in
     let members =
       Ity.Mpv.fold_left (fun acc c () ->
-          let _, t =
+          let terms =
             try
-              List.find (fun (p, _) ->
+              List.find_all (fun (p, _) ->
                   Ity.pv_equal p c) terms
+              |> List.map snd
             with
             | Not_found ->
               Format.eprintf "Couldn't find projection for field ";
@@ -831,8 +837,9 @@ module Make(S:sig
               Format.eprintf ")@.";
               assert false
           in
-          t::acc
+          terms :: acc
         ) [] b in
+    let members = List.concat members in
     List.fold_left (fun f t ->
         let a = forget_term (man, uf_man) t in
         fun x -> f x |> a) (fun x -> x) members
