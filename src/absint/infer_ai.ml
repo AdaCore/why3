@@ -46,17 +46,19 @@ module Make(S:sig
         e_ghostify true (r e)
       | Ewhile(e_cond, inv, vari, e_loop) ->
         begin
-        try
-        let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
-        let t = AI.domain_to_term cfg context new_inv in
-        let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
-        let inv = t :: inv in
-        e_while (r e_cond) inv vari (r e_loop)
-        with
-        | Not_found ->
-          Format.eprintf "loop not found@.";
-          Expr.print_expr Format.err_formatter e;
-          raise Not_found
+          try
+            let _, new_inv = (*List.find (fun (e_, _) -> e == e_) fixp*) List.hd fixp in
+            let t = AI.domain_to_term cfg context new_inv in
+            let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
+            let inv = t :: inv in
+            e_while (r e_cond) inv vari (r e_loop)
+          with
+          | Not_found ->
+            Format.eprintf "while loop not found (available loops: %d)@." (List.length fixp);
+            Expr.print_expr Format.err_formatter e;
+            Format.eprintf "@.";
+            Expr.print_expr Format.err_formatter (List.hd fixp |> fst);
+            raise Not_found
         end
       | Efor(pv, (f, d, to_), inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in

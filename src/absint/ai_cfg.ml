@@ -364,8 +364,8 @@ module Make(E: sig
       let constraints = D.meet_term manpk cond_term in
 
       let before_loop_cp = new_node_cfg cfg cond in
-      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg manpk content in
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
+      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg manpk content in
       let after_loop_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ abs ->
           constraints abs
@@ -525,6 +525,7 @@ module Make(E: sig
 
       let before_loop_cp = new_node_cfg cfg expr in
       let start_loop_cp = new_node_cfg cfg expr in
+      cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
       let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
       let end_loop_cp = new_node_cfg cfg expr in
 
@@ -559,7 +560,6 @@ module Make(E: sig
       new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun man abs ->
           constraints_post abs |> forget_k
         );
-      cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
       before_loop_cp, end_loop_cp, e_exn
 
     | _ ->
