@@ -47,13 +47,14 @@ let union a b c =
 let intersect l1 l2 =
   let l1 = List.sort_uniq compare l1 in
   let l2 = List.sort_uniq compare l2 in
+  (* intersection of l2 and t'::l1 *)
   let rec do_inter t' l1 = function
     | [] -> []
     | t::q -> if t = t' then t::(do_inter t l1 q)
       else if t < t' then
         do_inter t' l1 q
       else
-        do_inter t l2 l1
+        do_inter t q l1
   in
   match l1 with
   | t::q -> do_inter t q l2
@@ -67,7 +68,7 @@ let join a b =
             i::l
           else
             l
-        ) [] a
+        ) l a
     )  [] b
 
 let is_leq a b =

@@ -666,8 +666,10 @@ module Make(E: sig
         begin
           let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
           List.iter (fun (vtx, abs) ->
-              printf "acc(%i) = %a@."
-                vtx (D.print) abs;
+             let t = D.to_term manpk abs in
+             printf "acc(%i) -> " vtx;
+             Pretty.print_term Format.std_formatter t;
+             Format.printf "@.";
               (*let gen = Abstract1.to_generator_array manpk abs in
                 Generator1.array_print Format.std_formatter gen;
                 let n = Generator1.array_length gen in

@@ -43,6 +43,7 @@ module Make(S:sig
     variable_mapping: (Apron.Var.t, Term.term) Hashtbl.t;
     mutable apron_mapping: Var.t Term.Mterm.t;
     mutable region_mapping: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
+    mutable region_var: Term.vsymbol list Ity.Mreg.t;
     mutable env: Environment.t;
 
     mutable defined_terms: unit Mterm.t;
@@ -65,6 +66,7 @@ module Make(S:sig
     A.create_manager (), { variable_mapping = Hashtbl.create 512;
                            apron_mapping = Term.Mterm.empty;
                            region_mapping = Ity.Mreg.empty;
+                           region_var = Ity.Mreg.empty;
                            env = Environment.make [||] [||];
                            defined_terms = Mterm.empty;
 
@@ -89,15 +91,19 @@ module Make(S:sig
   let is_leq (man, _) (a, b) (c, d) =
     A.is_leq man a c && Union_find.is_leq b.classes d.classes
 
+  let p = Pretty.print_term Format.err_formatter
+  
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let join_uf uf_man a b =
     let uf_to_var = TermToVar.union a.uf_to_var b.uf_to_var in
+    let classes =  Union_find.join a.classes b.classes in
     assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
-    { classes = Union_find.join a.classes b.classes; uf_to_var; }
+    { classes; uf_to_var; }
 
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
+    print Format.err_formatter (a, b); print Format.err_formatter (c, d);
     let e = join_uf uf_man b d in
     A.join man a c, e
 
@@ -232,6 +238,11 @@ module Make(S:sig
       let c = Union_find.new_class () in
       uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
       c
+  
+  let class_exists uf_man u t =
+    let cl = get_class_for_term uf_man t in
+    Union_find.get_class cl u.classes |> List.length > 1
+
 
   let rec get_depend s t =
     match t.t_node with
@@ -354,6 +365,24 @@ module Make(S:sig
               end
 
         ) (d, ud) all_values in
+      (*let ud =
+        if not (class_exists uf_man ud a) then
+          let tcl = get_class_for_term uf_man a in
+          let equivs = get_equivs uf_man ud.classes a in
+          let classes = List.fold_left (fun classes u ->
+              Union_find.union tcl (get_class_for_term uf_man u) classes) ud.classes equivs in
+          { ud with classes; }
+        else ud
+      in
+      let ud =
+        if not (class_exists uf_man ud b) then
+          let tcl = get_class_for_term uf_man b in
+          let equivs = get_equivs uf_man ud.classes b in
+          let classes = List.fold_left (fun classes u ->
+              Union_find.union tcl (get_class_for_term uf_man u) classes) ud.classes equivs in
+          { ud with classes; }
+        else ud
+      in*)
       let ud = { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man b) ud.classes } in
       d, ud
     else
@@ -434,6 +463,20 @@ module Make(S:sig
                   let d, u = g (d, u) in
                   let d = D.forget_array man d [|myvar|] false in
                   let equivs = get_equivs uf_man u.classes t in
+                  (*Union_find.print u.classes;
+                  Union_find.flat u.classes |> List.iter (fun c ->
+                      let t = TermToClass.to_term uf_man.class_to_term c in
+                      Format.eprintf "%d -> " (Obj.magic c);
+                      Pretty.print_term Format.err_formatter t;
+                      Format.eprintf "@.";
+                    );*)
+                  let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
+                  let u = 
+                  try
+                    { u with uf_to_var = TermToVar.remove_term u.uf_to_var t }
+                  with
+                  | Not_found -> u
+                  in
                   let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
                   let classes, uf_to_var = List.fold_left (fun (classes, uf_to_var) u ->
                       let uf_to_var = 
@@ -714,12 +757,13 @@ module Make(S:sig
               (accessor, real_term) :: acc
             ) [] subv
         in
-        let old_projs = try
-            Ity.Mreg.find reg uf_man.region_mapping
+        let old_projs, old_vars = try
+            Ity.Mreg.find reg uf_man.region_mapping, Ity.Mreg.find reg uf_man.region_var
           with
-          | Not_found -> []
+          | Not_found -> [], []
         in
-        uf_man.region_mapping <- Ity.Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping
+        uf_man.region_mapping <- Ity.Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping;
+        uf_man.region_var <- Ity.Mreg.add reg (Ity.(psym.pv_vs) :: old_vars) uf_man.region_var
       end
     | Ity.Ityapp(_), _ ->
       Format.eprintf "Let's check that ";
@@ -745,9 +789,25 @@ module Make(S:sig
       Ity.print_ity Format.err_formatter variable_type;
       Format.eprintf "@.";
       ()
-  
+            
+  let is_in t myt =
+    let found = ref false in
+    let rec is_in myt =
+      if t_equal t myt then
+        found := true;
+      t_map is_in myt
+    in
+    is_in myt |> ignore;
+    !found
+
+  let rec tdepth t =
+    1 + t_fold (fun k' t ->
+        max (tdepth t) k') 0 t
+
+
   let rec forget_term (man, uf_man) t =
     let f = fun (a, b) ->
+      Format.eprintf "Forgetting… "; p t; Format.eprintf "@.";
       let last_n = ref (-1) in
       let d = ref (a, b) in
       let all_values = ref [] in
@@ -759,17 +819,58 @@ module Make(S:sig
         last_n := List.length !all_values;
       c) do
         let all_values = !all_values in
+        let all_values =
+          List.filter (fun a -> not (t_equal t a)) all_values |> fun l -> List.append l [t] in
+
         d := List.fold_left (fun (a, b) v ->
-            let found = ref false in
-            let rec is_in myt =
-              if t_equal t myt then
-                found := true;
-              t_map is_in myt
-            in
-            is_in v |> ignore;
-            if !found then
+            if is_in t v then
               begin
                 let cl = get_class_for_term uf_man v in
+                Format.eprintf "   -   ";
+                p v;
+                Format.eprintf "@.";
+                let b =
+                  let tcl = get_class_for_term uf_man t in
+                  let alternatives = Union_find.get_class tcl b.classes
+                                     |> List.map (TermToClass.to_term uf_man.class_to_term)
+                                     |> List.filter (fun k -> not (is_in t k))
+                                     |> List.sort (fun i j -> compare (tdepth i) (tdepth j)) in
+                  List.iter (fun i ->
+                      p i; Format.eprintf "####@.") alternatives;
+                  let alternative = match alternatives with
+                    | [] -> None
+                    | t::q ->
+                      Some t
+                  in
+                  match alternative with
+                  | None -> b
+                  | Some alt ->
+                    let rec replaceby myt =
+                      if t_equal myt t then
+                        alt
+                      else
+                        t_map replaceby myt
+                    in
+                    let alt = replaceby v in
+                Format.eprintf "@.";
+                p alt;
+                Format.eprintf "@.";
+                    let altcl = get_class_for_term uf_man alt in
+                    let b = { b with classes = Union_find.union altcl cl b.classes } in
+                    let uf_to_var = 
+                      try
+                        let myv = TermToVar.to_t b.uf_to_var v in
+                        try
+                          ignore (TermToVar.to_t b.uf_to_var alt); b.uf_to_var
+                        with
+                        | Not_found -> TermToVar.add b.uf_to_var alt myv
+                      with
+                      | Not_found -> b.uf_to_var
+                    in
+                    let b = { b with uf_to_var } in
+                    b
+                in
+
                 let _, s = Union_find.forget cl b.classes in
                 let b = { b with classes = s } in
                 let old_b = b in
@@ -802,16 +903,22 @@ module Make(S:sig
     in
     get_subvalues t None
     |> List.fold_left (fun f (a, _) ->
-        let v = Term.Mterm.find a uf_man.apron_mapping in
-        fun (a, b) ->
-          let a ,b = f (a,b) in
-          D.forget_array man a [|v|] false, b )
+        if t_equal a t then
+          f
+        else
+          let g = forget_term (man, uf_man) a in
+          fun d  ->
+            g d |> f)
       (fun x ->
-         let a, b = f x in
+         let d, b = f x in
          let cl = get_class_for_term uf_man t in
          let _, classes = Union_find.forget cl b.classes in
          let b = { b with classes } in
-      a, b)
+         if Ty.ty_equal Ty.ty_int (t_type t) then
+           let v = Term.Mterm.find t uf_man.apron_mapping in
+           D.forget_array man d [|v|] false, b
+         else
+           d, b)
 
   let forget_var m v = forget_term m (t_var v)
 
@@ -840,9 +947,15 @@ module Make(S:sig
           terms :: acc
         ) [] b in
     let members = List.concat members in
-    List.fold_left (fun f t ->
+    let vars = Ity.Mreg.find v uf_man.region_var in
+    let f = List.fold_left (fun f t ->
         let a = forget_term (man, uf_man) t in
-        fun x -> f x |> a) (fun x -> x) members
+        fun x -> f x |> a) (fun x -> x) members in
+    List.fold_left (fun f v ->
+        fun (d, ud) ->
+          let acl = get_class_for_term uf_man (t_var v) in
+          let ud = { ud with classes = Union_find.forget acl ud.classes |> snd } in
+          f (d, ud)) f vars
 
   let update_possible_substitutions (man, uf_man) =
     ()
