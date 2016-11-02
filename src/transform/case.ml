@@ -158,6 +158,64 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
        Pretty.print_term inst_nt Pretty.print_term g;
      failwith "After substitution, terms are not exactly identical"))
 
+(* Replace all occurences of f1 by f2 in t *)
+let rec replace_in_term f1 f2 t =
+  t_map (fun t -> if t_equal t f1 then f2 else replace_in_term f1 f2 t) t
+(* TODO be careful with label copy in t_map *)
+
+let replace rev f1 f2 t =
+  match rev with
+  | true -> replace_in_term f1 f2 t
+  | false -> replace_in_term f2 f1 t
+
+(* Generic fold to be put in Trans ? TODO *)
+let fold (f: decl -> 'a -> 'a) (acc: 'a): 'a Trans.trans =
+  Trans.fold (fun t acc -> match t.task_decl.td_node with
+  | Decl d -> f d acc
+  | _ -> acc) acc
+
+
+let rewrite rev h h1 =
+  let r =
+    fold (fun d acc ->
+      match d.d_node with
+      | Dprop (Paxiom, pr, t) when (Ident.id_equal pr.pr_name h.pr_name)->
+          (match t.t_node with
+          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+              Some (t1, t2)
+          | Tbinop (Tiff, t1, t2) ->
+              Some (t1, t2)
+          | _ -> failwith "Hypothesis is neither an equality nor an equivalence@.")
+      | _ -> acc) None in
+  Trans.bind r
+    (fun r -> Trans.decl (fun d ->
+      match d.d_node with
+      | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal))->
+          (match r with
+          | None -> assert (false) (* Should not happen even in failing cases *)
+          | Some (t1, t2) ->
+              [create_prop_decl p pr (replace rev t1 t2 t)])
+      | _ -> [d]) None)
+
+let rewrite_rev = rewrite false
+
+let rewrite = rewrite true
+
+(* Replace occurences of t1 with t2 in h *)
+let replace t1 t2 h =
+  if not (Ty.ty_equal (t_type t1) (t_type t2)) then
+    failwith "Terms provided are not of the same type @."
+  else
+    (* Create a new goal for equality of the two terms *)
+    let g = Decl.create_prop_decl Decl.Pgoal h (t_app_infer ps_equ [t1; t2]) in
+    let ng = Trans.goal (fun _ _ -> [g]) in
+    let g = Trans.decl (fun d ->
+      match d.d_node with
+      | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h.pr_name && (p = Paxiom || p = Pgoal)) ->
+          [create_prop_decl p pr (replace true t1 t2 t)]
+      | _ -> [d]) None in
+    Trans.par [g; ng]
+
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
@@ -171,3 +229,9 @@ let () = register_transform_with_args_l ~desc:"test apply" "apply"
     (wrap_l (Tprsymbol Ttrans_l) apply)
 let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
 let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
+let () = register_transform_with_args ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
+    (wrap (Tprsymbol (Tprsymbol Ttrans)) (rewrite))
+let () = register_transform_with_args ~desc:"right to left rewrite of first hypothesis into the second" "rewrite_rev"
+    (wrap (Tprsymbol (Tprsymbol Ttrans)) (rewrite_rev))
+let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
+    (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) (replace))

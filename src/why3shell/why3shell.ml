@@ -497,8 +497,10 @@ let test_schedule_proof_attempt fmt (args: string list) =
   in
   let name, limit = match args with
   | [name] ->
-      (*let default_limit = ???? (* TODO add default_limit in config_prover *) *)
-      name, Call_provers.{empty_limit with limit_time = 2}
+      let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
+                                        limit_mem = Whyconf.memlimit main;
+                                        limit_steps = 0} in
+      name, default_limit
   | [name; timeout] -> name, Call_provers.{empty_limit with
                                            limit_time = int_of_string timeout}
   | [name; timeout; oom ] ->
