@@ -557,20 +557,22 @@ let init () =
                         (Filename.basename project_dir) in
    let env_session, is_new_session =
       (* either create a new session, or read an existing ession *)
-      let session, is_new_session =
+      let session, is_new_session, use_shapes =
          if not Gnat_config.force && Sys.file_exists session_dir then
-           let session, _ = Session.read_session session_dir in
-            session , false
+           let session, use_shapes = Session.read_session session_dir in
+            session , false, use_shapes
          else
-           Session.create_session session_dir, true in
+           Session.create_session session_dir, true, false in
+      let ctxt = Session.mk_update_context
+          ~allow_obsolete_goals:true
+          ~release_tasks:false
+          ~keep_unmatched_theories:(Gnat_config.limit_subp <> None)
+          ~use_shapes_for_pairing_sub_goals:use_shapes
+          Gnat_sched.Keygen.keygen
+      in
       let env_session, (_:bool), (_:bool) =
          Session.update_session
-           ~ctxt:{
-             Session.allow_obsolete_goals = true;
-             keep_unmatched_theories = (Gnat_config.limit_subp <> None);
-             release_tasks = false;
-             use_shapes_for_pairing_sub_goals = true;
-             keygen = Gnat_sched.Keygen.keygen }
+           ctxt
            session
            Gnat_config.env
            Gnat_config.config in
