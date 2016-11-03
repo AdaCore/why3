@@ -58,6 +58,13 @@ val decl   : (decl -> decl list     ) -> task -> task trans
     operation) *)
 
 val decl_l : (decl -> decl list list) -> task -> task tlist
+(** [decl_l f t1 t2]: on each declaration d of task [t2]
+    (with [f d] = [ld_1; ld_2; ... ld_n]), create n duplicates (newt_i)
+    of t1 with the declaration d_i replaced by ld_i.
+
+    Note for example that this 'decl_l (fun d -> [[d]; [d]])' will
+    duplicate the task on each declaration and probably run forever.
+*)
 
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
