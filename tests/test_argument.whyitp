@@ -1,5 +1,10 @@
 ?
 t introduce_premises
+t cut "forall x. forall y. x = y -> y + x = 0" H2
+t cut "5 * (3 + 4) = 0"
+ng
+t rewrite H2 h
+p
 t rewrite H G
 t replace y 5 G
 t replace y 5 G

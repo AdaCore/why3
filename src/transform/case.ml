@@ -174,28 +174,87 @@ let fold (f: decl -> 'a -> 'a) (acc: 'a): 'a Trans.trans =
   | Decl d -> f d acc
   | _ -> acc) acc
 
+(* - If f1 unifiable to t with substitution s then return s.f2 and replace every
+     occurences of s.f1 with s.f2 in the rest of the term
+   - Else call recursively on subterms of t *)
+(* If a substitution s is found then new premises are computed as e -> s.e *)
+let replace_subst lp lv f1 f2 t =
+  (* is_replced is common to the whole execution of replace_subst. Once an occurence is found,
+     it changes to Some (s) so that only one instanciation is rewrritten during execution *)
+  (* Note that we can't use an accumulator to do this *)
+  let is_replaced = ref None in
+
+  let rec replace lv f1 f2 t : Term.term =
+  match !is_replaced with
+  | Some subst -> replace_in_term (t_subst subst f1) (t_subst subst f2) t
+  | None ->
+    begin
+      let fom = try Some (first_order_matching lv [f1] [t]) with
+      | _ -> None in
+        (match fom with
+        | None -> t_map (fun t -> replace lv f1 f2 t) t
+        | Some (_ty, subst) ->
+        let sf1 = t_subst subst f1 in
+        if (Term.t_equal sf1 t) then
+        begin
+          is_replaced := Some subst;
+          t_subst subst f2
+        end
+        else
+          replace lv f1 f2 t)
+    end in
+  let t = t_map (replace lv f1 f2) t in
+  match !is_replaced with
+  | None -> failwith "Did not find any occurences in the matched term"
+  | Some subst ->
+    (List.map (t_subst subst) lp, t)
 
 let rewrite rev h h1 =
-  let r =
+  let found_eq =
+    (* Used to find the equality we are rewriting on *)
     fold (fun d acc ->
       match d.d_node with
-      | Dprop (Paxiom, pr, t) when (Ident.id_equal pr.pr_name h.pr_name)->
-          (match t.t_node with
+      | Dprop (Paxiom, pr, t) when Ident.id_equal pr.pr_name h.pr_name ->
+          let lp, lv, f = intros t in
+          let t1, t2 = (match f.t_node with
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
-              Some (t1, t2)
-          | Tbinop (Tiff, t1, t2) ->
-              Some (t1, t2)
-          | _ -> failwith "Hypothesis is neither an equality nor an equivalence@.")
+              (* Support to rewrite from the right *)
+              if rev then (t1, t2) else (t2, t1)
+          | _ -> failwith "Hypothesis not of the form ?a = ?b") in
+          Some (lp, lv, t1, t2)
       | _ -> acc) None in
-  Trans.bind r
-    (fun r -> Trans.decl (fun d ->
-      match d.d_node with
-      | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal))->
-          (match r with
-          | None -> assert (false) (* Should not happen even in failing cases *)
-          | Some (t1, t2) ->
-              [create_prop_decl p pr (replace rev t1 t2 t)])
-      | _ -> [d]) None)
+
+(* Return instantiated premises and the hypothesis correctly rewritten *)
+  let lp_new found_eq =
+    match found_eq with
+    | None -> failwith "Hypothesis not found"
+    | Some (lp, lv, t1, t2) ->
+      fold (fun d acc ->
+        match d.d_node with
+        | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal)) ->
+          let lp, new_term = replace_subst lp lv t1 t2 t in
+            Some (lp, create_prop_decl p pr new_term)
+        | _ -> acc) None in
+
+(* Pass the premises as new goals. Replace the former toberewritten hypothesis to the new rewritten one *)
+  let recreate_tasks lp_new =
+    match lp_new with
+    | None -> failwith "Impossible to unify rewrite equality with any subterm"
+    | Some (lp, new_term) ->
+      let trans_rewriting = Trans.decl (fun d -> match d.d_node with
+        | Dprop (p, pr, _t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal)) ->
+          [new_term]
+        | _ -> [d]) None in
+      let list_par = List.map (fun e -> Trans.decl (fun d -> match d.d_node with
+        | Dprop (p, pr, _t) when (Ident.id_equal pr.pr_name h1.pr_name && p = Paxiom) ->
+          [d]
+        | Dprop (Pgoal, _, _) ->
+          [create_prop_decl Pgoal (Decl.create_prsymbol (gen_ident "G")) e]
+        | _ -> [d] ) None) lp in
+      Trans.par (trans_rewriting :: list_par) in
+
+  (* Composing previous functions *)
+  Trans.bind (Trans.bind found_eq lp_new) recreate_tasks
 
 let rewrite_rev = rewrite false
 
@@ -229,9 +288,9 @@ let () = register_transform_with_args_l ~desc:"test apply" "apply"
     (wrap_l (Tprsymbol Ttrans_l) apply)
 let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
 let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
-let () = register_transform_with_args ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
-    (wrap (Tprsymbol (Tprsymbol Ttrans)) (rewrite))
-let () = register_transform_with_args ~desc:"right to left rewrite of first hypothesis into the second" "rewrite_rev"
-    (wrap (Tprsymbol (Tprsymbol Ttrans)) (rewrite_rev))
+let () = register_transform_with_args_l ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
+    (wrap_l (Tprsymbol (Tprsymbol Ttrans_l)) (rewrite))
+let () = register_transform_with_args_l ~desc:"right to left rewrite of first hypothesis into the second" "rewrite_rev"
+    (wrap_l (Tprsymbol (Tprsymbol Ttrans_l)) (rewrite_rev))
 let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
     (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) (replace))
