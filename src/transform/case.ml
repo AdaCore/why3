@@ -159,8 +159,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
      failwith "After substitution, terms are not exactly identical"))
 
 (* Replace all occurences of f1 by f2 in t *)
-let rec replace_in_term f1 f2 t =
-  t_map (fun t -> if t_equal t f1 then f2 else replace_in_term f1 f2 t) t
+let replace_in_term = Term.t_replace
 (* TODO be careful with label copy in t_map *)
 
 let replace rev f1 f2 t =
