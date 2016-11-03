@@ -79,10 +79,29 @@ let fg ?fname m =
 
 open Format
 
+(*
+
+decl : d:pdecl -> Cdefinition list
+
+  cas sur d.pd_node:
+
+    1: PDlet (LDsym (rs: routine symbol) (expr)
+
+
+pr_unit : mod_unit -> Cdefinition list
+
+  cas numero 1: Udecl d -> appeler fonction decl
+
+*)
+
 let pr args ?old fmt m =
   ignore(args);
   ignore(old);
   ignore(m);
+  (* TODO:
+    iterer sur m.mod_units la fonction pr_unit
+   *)
+
   fprintf fmt "#include <stdio.h>\n\
 \n\
 int main() {\n\
