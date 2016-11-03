@@ -64,6 +64,3 @@ val print_task : formatter -> task -> unit
 val print_theory : formatter -> theory -> unit
 
 val print_namespace : formatter -> string -> theory -> unit
-
-(* TODO dont use this and remove it *)
-val ppunique : string -> string
