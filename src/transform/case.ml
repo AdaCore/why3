@@ -265,7 +265,7 @@ let replace t1 t2 h =
     failwith "Terms provided are not of the same type @."
   else
     (* Create a new goal for equality of the two terms *)
-    let g = Decl.create_prop_decl Decl.Pgoal h (t_app_infer ps_equ [t1; t2]) in
+    let g = Decl.create_prop_decl Decl.Pgoal (create_prsymbol (gen_ident "G")) (t_app_infer ps_equ [t1; t2]) in
     let ng = Trans.goal (fun _ _ -> [g]) in
     let g = Trans.decl (fun d ->
       match d.d_node with
