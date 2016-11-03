@@ -12,7 +12,7 @@
 open Format
 open Why3
 open Stdlib
-open Theory
+open Pmodule
 
 let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
@@ -27,6 +27,7 @@ let add_opt_file x =
   Queue.push (Some x, tlist) opt_queue;
   opt_input := Some tlist
 
+(* TODO : rename theory into module, -T into -M *)
 let add_opt_theory x =
   let l = Strings.split '.' x in
   let p, t = match List.rev l with
@@ -94,13 +95,14 @@ let opt_driver =
     eprintf "Extraction driver (-D) is required.@.";
     exit 1
   | f::ef ->
-    Mlw_driver.load_driver env f ef
+    Pdriver.load_driver env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let extract_to ?fname th extract =
-  let file = Filename.concat opt_output (Mlw_ocaml.extract_filename ?fname th) in
+let extract_to ?fname m =
+  let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+  let file = Filename.concat opt_output (fg ?fname m) in
   let old =
     if Sys.file_exists file then begin
       let backup = file ^ ".bak" in
@@ -108,90 +110,57 @@ let extract_to ?fname th extract =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
-  extract file ?old (formatter_of_out_channel cout);
+  let fmt = formatter_of_out_channel cout in
+  let tname = m.mod_theory.Theory.th_name.Ident.id_string in
+  Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
+  pr ?old pargs fmt m;
   close_out cout
 
 let extract_to =
   let visited = Ident.Hid.create 17 in
-  fun ?fname th extract ->
-    if not (Ident.Hid.mem visited th.th_name) then begin
-      Ident.Hid.add visited th.th_name ();
-      extract_to ?fname th extract
+  fun ?fname m ->
+    let name = m.mod_theory.Theory.th_name in
+    if not (Ident.Hid.mem visited name) then begin
+      Ident.Hid.add visited name ();
+      extract_to ?fname m
     end
 
-let use_iter f th =
-  List.iter (fun d -> match d.td_node with Use t -> f t | _ -> ()) th.th_decls
-
-let rec do_extract_theory ?fname th =
-  let extract file ?old fmt = ignore (old);
-    let tname = th.th_name.Ident.id_string in
-    Debug.dprintf Mlw_ocaml.debug "extract theory %s to file %s@." tname file;
-    Mlw_ocaml.extract_theory opt_driver ?old ?fname fmt th
-  in
-  extract_to ?fname th extract;
-  let extract_use th' =
-    let fname = if th'.th_path = [] then fname else None in
-    do_extract_theory ?fname th' in
-  use_iter extract_use th
+let rec use_iter f l =
+  List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
 
 let rec do_extract_module ?fname m =
-  let extract file ?old fmt = ignore (old);
-    let tname = m.Mlw_module.mod_theory.th_name.Ident.id_string in
-    Debug.dprintf Mlw_ocaml.debug "extract module %s to file %s@." tname file;
-    Mlw_ocaml.extract_module opt_driver ?old ?fname fmt m
+  let extract_use m' =
+    let fname =
+      if m'.mod_theory.Theory.th_path = [] then fname else None
+    in
+    do_extract_module ?fname m'
   in
-  extract_to ?fname m.Mlw_module.mod_theory extract;
-  let extract_use th' =
-    let fname = if th'.th_path = [] then fname else None in
-    match
-      try Some (Mlw_module.restore_module th') with Not_found -> None
-    with
-      | Some m' -> do_extract_module ?fname m'
-      | None    -> do_extract_theory ?fname th' in
-  use_iter extract_use m.Mlw_module.mod_theory
+  use_iter extract_use m.mod_units;
+  extract_to ?fname m
 
 let do_global_extract (_,p,t) =
-  let env = opt_driver.Mlw_driver.drv_env in
-  match Mlw_module.read_module_or_theory env p t with
-  | Mlw_module.Module m -> do_extract_module m
-  | Mlw_module.Theory t -> do_extract_theory t
+  let env = opt_driver.Pdriver.drv_env in
+  let m = read_module env p t in
+  do_extract_module m
 
-let do_extract_theory_from fname m (tname,_,t) =
-  let th = try Mstr.find t m with Not_found ->
-    eprintf "Theory '%s' not found in file '%s'.@." tname fname;
-    exit 1
-  in
-  do_extract_theory ~fname th
 
-let do_extract_module_from fname mm thm (tname,_,t) =
+let do_extract_module_from fname mm (tname,_,t) =
   try
     let m = Mstr.find t mm in do_extract_module ~fname m
-  with Not_found -> try
-    let th = Mstr.find t thm in do_extract_theory ~fname th
   with Not_found ->
-    eprintf "Theory/module '%s' not found in file '%s'.@." tname fname;
+    eprintf "Module '%s' not found in file '%s'.@." tname fname;
     exit 1
 
 let do_local_extract fname cin tlist =
-  let env = opt_driver.Mlw_driver.drv_env in
+  let env = opt_driver.Pdriver.drv_env in
   let format = !opt_parser in
-  try
-    let mm, thm =
-      Env.read_channel ?format Mlw_module.mlw_language env fname cin in
-    if Queue.is_empty tlist then
-      let do_m t m thm = do_extract_module ~fname m; Mstr.remove t thm in
-      let thm = Mstr.fold do_m mm thm in
-      Mstr.iter (fun _ th -> do_extract_theory ~fname th) thm
-    else
-      Queue.iter (do_extract_module_from fname mm thm) tlist
-  with Env.InvalidFormat _ ->
-    let m = Env.read_channel ?format Env.base_language env fname cin in
-    if Queue.is_empty tlist then
-      let add_th t th mi = Ident.Mid.add th.th_name (t,th) mi in
-      let do_th _ (_,th) = do_extract_theory ~fname th in
-      Ident.Mid.iter do_th (Mstr.fold add_th m Ident.Mid.empty)
-    else
-      Queue.iter (do_extract_theory_from fname m) tlist
+  let mm =
+    Env.read_channel ?format mlw_language env fname cin in
+  if Queue.is_empty tlist then
+    let do_m _ m = do_extract_module ~fname m in
+    Mstr.iter do_m mm
+  else
+    Queue.iter (do_extract_module_from fname mm) tlist
 
 let do_input = function
   | None, tlist ->
@@ -209,9 +178,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
