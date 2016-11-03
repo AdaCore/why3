@@ -1,116 +1,3 @@
-module M
-
-  use import map.Map
-  use import mach.int.Unsigned
-  use import mach.int.Int32
-  use import mach.int.UInt32
-  use import array.Array
-  use import int.Int
-  predicate in_us_bounds (n:int) = 0 <= n <= max_uint32
-  predicate in_bounds (n:int) = min_int32 <= n <= max_int32
-  use import ref.Ref
-
-  type ptr 'a = {
-    data : ref (array 'a) ;
-    offset : int ;
-  }
-  (*invariant { in_us_bounds data.length }*)
-  (* it is not required the offset is in 0..elts.length *)
-
-  function plength (p:ptr 'a) : int
-  = p.data.contents.length
-
-  function pelts (p:ptr 'a) : int -> 'a
-  = p.data.contents.elts
-
-  val p2i (n:int32):int
-    ensures { result = Int32.to_int n }
-
-  val predicate is_null (p:ptr 'a) : bool
-    ensures { result <-> plength p = 0 }
-
-  val null () : ptr 'a
-    ensures { plength result = 0 }
-
-  let incr (p:ptr 'a) (ofs:int32) : ptr 'a
-    ensures { result.offset = p.offset + Int32.to_int ofs }
-    ensures { result.data = p.data }
-   =
-    { data = p.data; offset = p.offset + p2i ofs }
-
-  val get (p:ptr 'a) : 'a
-    requires { 0 <= p.offset < plength p }
-    ensures { result = !(p.data)[p.offset] }
-
-  let get_ofs (p:ptr 'a) (ofs:int32) : 'a
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { result = !(p.data)[p.offset + Int32.to_int ofs] }
-  = get (incr p ofs)
-
-  val set (p:ptr 'a) (v:'a) : unit
-    requires { 0 <= p.offset < plength p }
-    ensures { pelts p = Map.set (pelts (old p)) p.offset v }
-    writes { p.data.contents.elts }
-
-  let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { pelts p = Map.set (pelts (old p))
-              (p.offset + Int32.to_int ofs) v }
-    writes { p.data.contents.elts }
- =
-    set (incr p ofs) v
-
-  predicate valid_ptr_shift (p:ptr 'a) (i:int) =
-    0 <= p.offset + i < plength p
-
-  predicate valid_ptr_itv (p:ptr 'a) (sz:int) =
-    in_bounds sz /\ 0 <= sz /\ 0 <= p.offset /\ p.offset + sz <= plength p
-
-  let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
-    requires { valid_ptr_itv p sz }
-    ensures { forall i. 0 <= i < sz -> valid_ptr_shift p i }
-  = ()
-
-  val malloc (sz:uint32) : ptr 'a
-    ensures { plength result = UInt32.to_int sz \/ plength result = 0 }
-    ensures { result.offset = 0 }
-
- (* How to specify that the data array is reset by free/realloc ?*)
-(*  let free (p:ptr 'a) : unit
-    requires { p.offset = 0 }
-    writes { p }
-    ensures { p.data.length = 0 }
-  =  if is_null p then ()
-     else begin
-     let c = incr p (Int32.of_int 0) in
-     p.data <- Array.make 0 (get p);
-     check { c.data.length = 0 }
-     end *)
-  val free (p:ptr 'a) : unit
-    requires { p.offset = 0 }
-    writes { p.data }
-    ensures { plength p = 0 }
- (* = if is_null p then ()
-    else begin
-   (* let c = incr p (Int32.of_int 0) in*)
-    p.data := Array.make 0 (get p);
-    (*check { plength c = 0 }*)
-    end
-  *)
-
-  val realloc (p:ptr 'a) (sz:int32) : ptr 'a
-    requires { Int32.to_int sz > 0 } (* for simplicity, though 0 is legal in C *)
-    requires { p.offset = 0 }
-    writes { p.data }
-    ensures { plength result = Int32.to_int sz \/ plength result = 0 }
-    ensures { plength result = Int32.to_int sz -> plength p = 0 }
-    ensures { plength result = Int32.to_int sz ->
-                forall i:int. 0 <= i < plength (old p) /\ i < Int32.to_int sz ->
-                  !(result.data)[i] = !((old p).data)[i] }
-    ensures { plength result <> Int32.to_int sz -> p = old p }
-
-
-end
 (*
 module Limb
 
@@ -132,7 +19,7 @@ module N
  (**)
   use import array.Array
   use import mach.int.Int32
-  use import M
+  use import mach.c.C
   use import mach.int.UInt32 as Limb
   use import int.Int
   use import int.Power
@@ -173,7 +60,7 @@ module N
   =
     let p = malloc (UInt32.of_int 1) in
     if not (is_null p)
-    then M.set p l;
+    then C.set p l;
     p
 
   use map.MapEq
@@ -1254,7 +1141,7 @@ module N
                  (value_sub_shift y k + power radix k * l2i !ly)
                = value_sub_shift x (p2i sz) * value_sub_shift y (p2i !i)
              };
-      rp := M.incr !rp one;
+      rp := C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
     value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sz);
@@ -1459,7 +1346,7 @@ module N
                = value_sub_shift (old r) (p2i !i +p2i sz)
                  + value_sub_shift x (p2i sz) * value_sub_shift y (p2i !i)
              };
-      rp := M.incr !rp one;
+      rp := C.incr !rp one;
     done;
     !c
 
@@ -1604,7 +1491,7 @@ module N
                  (value_sub_shift y k + power radix k * l2i !ly)
                = value_sub_shift x (p2i sx) * value_sub_shift y (p2i !i)
              };
-      rp := M.incr !rp one;
+      rp := C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sy + p2i sx);
     value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sx);
@@ -1739,10 +1626,10 @@ module N
     let one = Int32.of_int 1 in
     let minus_one = Int32.of_int (-1) in
     let msb = Int32.(-) sz one in
-    let xp = ref (M.incr x msb) in
-    let rp = ref (M.incr r msb) in
+    let xp = ref (C.incr x msb) in
+    let rp = ref (C.incr r msb) in
     let high = ref limb_zero in
-    let low = ref (M.get !xp) in
+    let low = ref (C.get !xp) in
     let i = ref msb in
     let l, retval = lsld_ext !low cnt in
     high := l;
@@ -1761,15 +1648,15 @@ module N
       invariant { pelts !xp = pelts x }
       invariant { l2i !high <= radix - power 2 (l2i cnt) }
       label StartLoop in
-      xp := M.incr !xp minus_one;
-      low := M.get !xp;
+      xp := C.incr !xp minus_one;
+      low := C.get !xp;
       let l,h = lsld_ext !low cnt in
       assert { l2i !high + l2i h < radix  };
       let ghost v = Limb.(+) !high h in
       value_sub_update_no_change (pelts r) (!rp).offset (r.offset + 1+ p2i !i)
                                  (r.offset + p2i sz) v;
-      M.set !rp (Limb.(+) !high h);
-      rp := M.incr !rp minus_one;
+      C.set !rp (Limb.(+) !high h);
+      rp := C.incr !rp minus_one;
       high := l;
       let ghost k = p2i !i in
       i := Int32.(-) !i one;
@@ -1855,7 +1742,7 @@ module N
    value_sub_head (pelts r) r.offset (r.offset + p2i sz);
    value_sub_update_no_change (pelts r) r.offset (r.offset+1)
                               (r.offset + p2i sz) !high;
-   M.set r !high;
+   C.set r !high;
    retval
 
   (** [rshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the right and
@@ -1877,7 +1764,7 @@ module N
     let msb = Int32.(-) sz one in
     let xp = ref x in
     let rp = ref r in
-    let high = ref (M.get !xp) in
+    let high = ref (C.get !xp) in
     let retval, h = lsld_ext !high tnc in
     let low = ref h in
     let i = ref zero in
@@ -1896,15 +1783,15 @@ module N
       invariant { l2i !low < power 2 (l2i tnc) }
       label StartLoop in
       let ghost k = p2i !i in
-      xp := M.incr !xp one;
-      high := M.get !xp;
+      xp := C.incr !xp one;
+      high := C.get !xp;
       let l,h = lsld_ext !high tnc in
       assert { l2i !low + l2i l < radix };
       let ghost v = Limb.(+) !low l in
       value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) v;
-      M.set !rp (Limb.(+) !low l);
+      C.set !rp (Limb.(+) !low l);
       assert { value_sub_shift r k = value_sub_shift (r at StartLoop) k };
-      rp := M.incr !rp one;
+      rp := C.incr !rp one;
       low := h;
       i := Int32.(+) !i one;
       value_sub_tail (pelts r) r.offset (r.offset + k);
@@ -1965,7 +1852,7 @@ module N
     value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
     assert { (!rp).offset = r.offset + p2i msb };
     value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
-    M.set !rp !low;
+    C.set !rp !low;
     assert { value_sub_shift r (p2i sz)
            = value_sub_shift r (p2i msb) + power radix (p2i msb) * l2i !low };
     assert { value_sub_shift r (p2i sz)

@@ -1,3 +1,10 @@
 
-
 printer "c"
+
+module mach.c.C
+
+  syntax type ptr "(%1 *)"
+
+  syntax val malloc "malloc(%1 * sizeof(%v0))"  (* and not %t1 ? *)
+
+end
