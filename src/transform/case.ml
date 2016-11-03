@@ -274,6 +274,56 @@ let replace t1 t2 h =
       | _ -> [d]) None in
     Trans.par [g; ng]
 
+
+let is_good_type t ty =
+  try (Term.t_ty_check t (Some ty); true) with
+  | _ -> false
+
+let induction env x bound =
+  let th = Env.read_theory env ["int"] "Int" in
+  let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
+  let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
+  let one_int = Theory.ns_find_ls th.Theory.th_export ["one"] in
+
+  if (not (is_good_type x Ty.ty_int) || not (is_good_type bound Ty.ty_int)) then
+    failwith "The variable given is not of type int"
+  else
+    let lsx = match x.t_node with
+    | Tvar lsx -> lsx.vs_name
+    | Tapp (lsx, []) -> lsx.ls_name
+    | _ -> failwith "Induction can be done on variables only" in
+
+  let le_bound = Trans.decl (fun d -> match d.d_node with
+    | Dprop (Pgoal, _pr, _t) ->
+        let nt = Term.t_app_infer le_int [x; bound] in
+        let pr = create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "H")) nt in
+        [pr; d]
+    | _ -> [d]) None in
+
+  let x_is_passed = ref false in
+  let ge_bound =
+    Trans.decl (fun d -> match d.d_node with
+    | Dparam (ls) when (Ident.id_equal lsx ls.ls_name) ->
+        (x_is_passed := true; [d])
+    | Dprop (Pgoal, pr, t) ->
+        if not (!x_is_passed) then
+          failwith "The variable is not defined in the task"
+        else
+          let x_ge_bound_t = t_app_infer le_int [bound; x] in
+          let x_ge_bound =
+            create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "H")) x_ge_bound_t in
+          let new_pr = create_prsymbol (gen_ident "G") in
+          let new_goal = create_prop_decl Pgoal new_pr
+              (replace_in_term x (t_app_infer plus_int [x; t_app_infer one_int []]) t) in
+          [x_ge_bound; create_prop_decl Paxiom pr t; new_goal]
+    | Dprop (p, pr, t) ->
+        if !x_is_passed then [create_prop_decl p pr (replace_in_term x (t_app_infer plus_int [x; t_app_infer one_int []]) t)] else [d]
+    (* TODO | Dlogic l ->
+        if !x_is_passed then replace things inside and rebuild it else
+        [d]*)
+    | _ -> [d]) None in
+  Trans.par [le_bound; ge_bound]
+
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
@@ -293,3 +343,5 @@ let () = register_transform_with_args_l ~desc:"right to left rewrite of first hy
     (wrap_l (Tprsymbol (Tprsymbol Ttrans_l)) (rewrite_rev))
 let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
     (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) (replace))
+let () = register_transform_with_args_l ~desc:"induction on int" "induction"
+    (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) (induction))

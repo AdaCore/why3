@@ -24,6 +24,8 @@ type (_, _) trans_typ =
   | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
   | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
+  | Tenv      : ('a, 'b) trans_typ -> ((Env.env -> 'a), 'b) trans_typ
+
 
 (** wrap arguments of transformations, turning string arguments into
     arguments of proper types.  arguments of type term of formula are

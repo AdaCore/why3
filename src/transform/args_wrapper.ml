@@ -185,6 +185,7 @@ type (_, _) trans_typ =
   | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula  : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
+  | Tenv      : ('a, 'b) trans_typ -> ((Env.env -> 'a), 'b) trans_typ
 
 let find_pr s task =
   let tables = build_name_tables task in
@@ -312,6 +313,12 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
               let new_name = Ident.id_unique p id.pr_name in
               wrap_to_store t' (f new_name) tail env task
           | _ -> failwith "Missing argument: expecting a string."
+        end
+    | Tenv t' ->
+        begin
+          match l with
+          | _ ->
+              wrap_to_store t' (f env) l env task
         end
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
