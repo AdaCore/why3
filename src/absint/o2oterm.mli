@@ -6,5 +6,7 @@ module Make : functor (S:sig type t end) -> sig
   val remove_t: t -> S.t -> t
   val to_term: t -> S.t -> Term.term
   val to_t: t -> Term.term -> S.t
+  val choose: t -> Term.term * S.t
   val union: t -> t -> t
+  val card: t -> int
 end

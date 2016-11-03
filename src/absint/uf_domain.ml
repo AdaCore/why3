@@ -36,6 +36,7 @@ module Make(S:sig
     merge a
 
   module TermToVar = O2mterm.Make(struct type t = Var.t end)
+  module TermToVaro = O2oterm.Make(struct type t = Var.t end)
   module TermToClass = O2oterm.Make(struct type t = Union_find.t end)
 
 
@@ -51,11 +52,16 @@ module Make(S:sig
     (* UF_QF *)
     mutable class_to_term: TermToClass.t;
     mutable var_to_term: TermToVar.t;
+
+    apron_var: Var.t;
+    quant_var: Term.term;
   }
 
-  type uf_t = { classes: Union_find.set;
-                uf_to_var: TermToVar.t;
-                }
+  type uf_t = {
+    classes: Union_find.set;
+    uf_to_var: TermToVar.t;
+    quantified_vars: TermToVaro.t;
+  }
 
 
   type man = A.man * uf_man
@@ -63,18 +69,28 @@ module Make(S:sig
   type t = A.t * uf_t
 
   let create_manager () =
+    let ident_ret = Ident.{pre_name = "w"; pre_label = Ident.Slab.empty; pre_loc = None; } in
+    let v  = Term.create_vsymbol ident_ret Ty.ty_int in
+    let apron_var = Var.of_string "$quant" in
+    let quant_var = t_var v in
+    let apron_mapping = Term.Mterm.add quant_var apron_var Term.Mterm.empty in
     A.create_manager (), { variable_mapping = Hashtbl.create 512;
-                           apron_mapping = Term.Mterm.empty;
+                           apron_mapping;
                            region_mapping = Ity.Mreg.empty;
                            region_var = Ity.Mreg.empty;
-                           env = Environment.make [||] [||];
+                           env = Environment.make [|apron_var|] [||];
                            defined_terms = Mterm.empty;
 
                            class_to_term = TermToClass.empty;
                            var_to_term = TermToVar.empty;
+                           apron_var;
+                           quant_var; 
                          }
 
-  let empty_uf_domain = { classes = Union_find.empty; uf_to_var = TermToVar.empty; }
+  let empty_uf_domain = {
+    classes = Union_find.empty;
+    uf_to_var = TermToVar.empty;
+    quantified_vars = TermToVaro.empty; }
 
   let bottom (man, uf_man) env =
     A.bottom man uf_man.env, empty_uf_domain
@@ -94,25 +110,51 @@ module Make(S:sig
   let p = Pretty.print_term Format.err_formatter
   
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
-  let join_uf uf_man a b =
-    let uf_to_var = TermToVar.union a.uf_to_var b.uf_to_var in
+  let join_uf (man, uf_man) d a b =
+    let d = ref d in
+    let uf_to_var = TermToVar.union (fun v1 v2 ->
+        let expr = Linexpr1.make uf_man.env in
+        Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
+        d := D.assign_linexpr man !d v1 expr None;
+        d := D.forget_array man !d [|v2|] false;
+      ) a.uf_to_var b.uf_to_var in
+    let d = !d in
     let classes =  Union_find.join a.classes b.classes in
     assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
     assert (List.length (Union_find.flat classes) >= max ( List.length (Union_find.flat a.classes)) (List.length (Union_find.flat b.classes))) ;
-    { classes; uf_to_var; }
+    let d, quantified_vars =
+      try
+        assert (TermToVaro.card b.quantified_vars <= 1);
+        assert (TermToVaro.card a.quantified_vars <= 1);
+        let t1, v1 = TermToVaro.choose a.quantified_vars in
+        let t2, v2 = TermToVaro.choose b.quantified_vars in
+        if v1 = v2 then raise Not_found;
+        let expr = Linexpr1.make uf_man.env in
+        Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
+        let d = D.assign_linexpr man d v1 expr None in
+        let d = D.forget_array man d [|v2|] false in
+        let () = assert false in
+        d, a.quantified_vars
+      with
+      | Not_found -> d, TermToVaro.union a.quantified_vars b.quantified_vars
+    in
+    d, { classes; uf_to_var; quantified_vars; }
 
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
-    let e = join_uf uf_man b d in
-    A.join man a c, e
+    let a = A.join man a c in
+    let a, e = join_uf (man, uf_man) a b d in
+    a, e
 
   let join_list man l = match l with
     | [] -> assert false
     | t::q -> List.fold_left (join man) t q
 
   let widening (man, uf_man) (a, b) (c, d) =
-    A.widening man a c, join_uf uf_man b d
+    let a = A.widening man a c in
+    let a, e = join_uf (man, uf_man) a b d in
+    a, e
 
   let push_label (man, uf_man) env i (a, b) =
     A.push_label man uf_man.env i a, b
@@ -177,7 +219,7 @@ module Make(S:sig
               match ity with
               | None -> List.map (fun a -> a, None) l
               | Some its ->
-                let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+               let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
                 List.map (fun a -> Some a) pdecl
                 |> List.combine l
             end
@@ -293,18 +335,21 @@ module Make(S:sig
   
   let to_term (man, uf_man) (a, b) =
     let find_var = fun a ->
+      if a = uf_man.apron_var then
+        uf_man.quant_var
+      else
+        try
+          Hashtbl.find uf_man.variable_mapping a
+        with 
+        | Not_found ->
           try
-            Hashtbl.find uf_man.variable_mapping a
-          with 
-          | Not_found ->
-            try
-              let t = TermToVar.to_term b.uf_to_var a in
-              t
+            let t = TermToVar.to_term b.uf_to_var a in
+            t
 
-            with
-            | Not_found ->
-              Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
-              raise Not_found
+          with
+          | Not_found ->
+            Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
+            raise Not_found
     in
     let t = 
       D.to_term S.env S.pmod man a find_var    in
@@ -313,7 +358,11 @@ module Make(S:sig
         let b = TermToClass.to_term uf_man.class_to_term b in
         t_and t (t_equ a b)) t b.classes
     in
-    Union_find.print b.classes; t
+    let var = match uf_man.quant_var.t_node with
+      | Tvar(v) -> v
+      | _ -> assert false
+    in
+    t_quant Tforall (t_close_quant [var] [] t)
 
 
 
@@ -464,7 +513,7 @@ module Make(S:sig
               let tcl = get_class_for_term uf_man t in
               f := (fun (d, u) ->
                   let d, u = g (d, u) in
-                  let d = D.forget_array man d [|myvar|] false in
+                  (*let d = D.forget_array man d [|myvar|] false in*)
                   let equivs = get_equivs uf_man u.classes t in
                   (*Union_find.print u.classes;
                   Union_find.flat u.classes |> List.iter (fun c ->
@@ -473,22 +522,30 @@ module Make(S:sig
                       Pretty.print_term Format.err_formatter t;
                       Format.eprintf "@.";
                     );*)
-                  let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
+                  (*let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
                   let u = 
                   try
                     { u with uf_to_var = TermToVar.remove_term u.uf_to_var t }
                   with
                   | Not_found -> u
                   in
-                  let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in
-                  let classes, uf_to_var = List.fold_left (fun (classes, uf_to_var) u ->
-                      let uf_to_var = 
+                  let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in*)
+                  let classes, uf_to_var, d = List.fold_left (fun (classes, uf_to_var, d) u ->
+                      let uf_to_var, d = 
                         try
-                          ignore (TermToVar.to_t uf_to_var u); uf_to_var
+                          let v = (TermToVar.to_t uf_to_var u) in
+                          let expr = Linexpr1.make uf_man.env in
+                          Linexpr1.set_coeff expr v (Coeff.s_of_int 1);
+                          let d = D.assign_linexpr man d myvar expr None in
+                          if t_equal u t then
+                            (let u' = TermToVar.remove_term uf_to_var t in
+                            TermToVar.add u' t myvar, d)
+                          else 
+                            uf_to_var, d
                         with
-                        | Not_found -> TermToVar.add uf_to_var u myvar
+                        | Not_found -> TermToVar.add uf_to_var u myvar, d
                       in
-                      Union_find.union tcl (get_class_for_term uf_man u) classes, uf_to_var) (u.classes, u.uf_to_var) equivs in
+                      Union_find.union tcl (get_class_for_term uf_man u) classes, uf_to_var,d ) (u.classes, u.uf_to_var, d) equivs in
                   let u = { u with classes; } in
                   let u = { u with uf_to_var } in
                   d, u
@@ -513,9 +570,10 @@ module Make(S:sig
             let fa = aux a in
             let fb = aux b in
             (fun (d, a) ->
-               let (d1, a1) = fa (d, a) in
-               let (d2, a2) = fb (d, a) in
-               D.join man d1 d2, join_uf man a1 a2)
+               let a1 = fa (d, a) in
+               let a2 = fb (d, a) in
+               join (man, uf_man) a1 a2
+            )
 
           | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
                                     && 
@@ -591,13 +649,22 @@ module Make(S:sig
             let fb = aux b in
             let fc = aux c in
             (fun d ->
-               let (d1, a1) = fb (fa d) in
-               let (d2, a2) = fc (fa_not d) in
-               D.join man d1 d2, join_uf man a1 a2)
+               let a1 = fb (fa d) in
+               let a2 = fc (fa_not d) in
+               join (man, uf_man) a1 a2)
           | Ttrue -> (fun d -> d)
           | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
           | Tfalse -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
           | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
+          | Tquant(Tforall, tq) ->
+            begin
+              match t_open_quant tq with
+              | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
+                let quant_var, apron_var = uf_man.quant_var, uf_man.apron_var in (*TermToVaro.choose ud.quantified_vars in*)
+                let t = t_subst_single a quant_var t in
+                aux t
+              | _ -> raise (Not_handled t)
+            end
           | _ ->
             raise (Not_handled t)
         with
@@ -693,7 +760,7 @@ module Make(S:sig
       add_lvariable_to_env man v;
       cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
       v
-
+  
   let add_variable_to_env (man, uf_man) psym =
     incr var_id;
     let open Expr in
@@ -810,6 +877,9 @@ module Make(S:sig
 
   let rec forget_term (man, uf_man) t =
     let f = fun (a, b) ->
+      Format.eprintf "Forgetting ";
+      p t;
+      Format.eprintf "@.";
       let last_n = ref (-1) in
       let d = ref (a, b) in
       let all_values = ref [] in

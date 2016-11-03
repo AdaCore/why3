@@ -35,4 +35,10 @@ module Make(S:sig type t end) = struct
         | Not_found ->
           add c te t) c b.to_t
 
+  let card a = 
+    Term.Mterm.cardinal a.to_t
+
+  let choose a =
+    Term.Mterm.choose a.to_t
+
 end

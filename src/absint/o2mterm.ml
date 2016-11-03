@@ -51,11 +51,13 @@ module Make(S:sig type t end) = struct
     TMap.filter (fun _ k -> k <> Term.Mterm.empty) a.to_term |> TMap.cardinal
 
 
-  let union a b =
+  let union f a b =
     let c = a in
     Term.Mterm.fold_left (fun c te t ->
         try
-          assert (Term.Mterm.find te c.to_t = t); c
+          if not (Term.Mterm.find te c.to_t = t) then
+            f (Term.Mterm.find te c.to_t) t;
+          c
         with
         | Not_found ->
           add c te t) c b.to_t

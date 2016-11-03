@@ -146,6 +146,7 @@ module Make(E: sig
     let old_apply = cfg.apply in
     cfg.apply <- begin fun man h tabs ->
       if h = hedge then
+        let () = Format.eprintf "doing %d@." h in
         let abs = tabs.(0) in
         let abs = D.push_label man () h abs in
         (), f man abs
@@ -351,6 +352,28 @@ module Make(E: sig
         ) (fun x -> x) eff_write in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+          (*Format.eprintf "@.@.@.ghost@.";
+          let abs = constraint_copy_ghost abs in
+          D.print Format.err_formatter abs;
+          D.to_term man abs |>
+          Pretty.print_term Format.err_formatter;
+          Format.eprintf "@.writes@.";
+          let abs = forget_writes abs in
+          D.print Format.err_formatter abs;
+          D.to_term man abs |>
+          Pretty.print_term Format.err_formatter;
+          Format.eprintf "@.constr@.";
+          let abs = constraints abs in
+          D.print Format.err_formatter abs;
+          D.to_term man abs |>
+          Pretty.print_term Format.err_formatter;
+          Format.eprintf "@.forget@.";
+          let abs = vars_to_forget abs in
+          D.print Format.err_formatter abs;
+          D.to_term man abs |>
+          Pretty.print_term Format.err_formatter;
+          Format.eprintf "@.@.";
+          abs*)
           constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
         );
       (* FIXME: handle exceptions *)
