@@ -1,10 +1,69 @@
 
 printer "c"
 
+module ref.Ref
+
+  syntax type ref "%1"
+
+end
+
+module mach.int.Int32
+  syntax val of_int "%1"
+  syntax converter of_int "%1"
+
+  syntax type int32  "int"
+
+  syntax val (+)     "(%1 + %2)"
+  syntax val (-)     "(%1 - %2)"
+  syntax val (*)     "(%1 * %2)"
+  syntax val (/)     "(%1 / %2)"
+  syntax val (%)     "(%1 % %2)"
+  syntax val eq      "(%1 = %2)"
+  syntax val ne      "(%1 != %2)"
+  syntax val (<=)    "(%1 <= %2)"
+  syntax val (<)     "(%1 < %2)"
+  syntax val (>=)    "(%1 >= %2)"
+  syntax val (>)     "(%1 > %2)"
+end
+
+module mach.int.UInt32
+  syntax val of_int "%1"
+  syntax converter of_int "%1"
+
+  syntax constant zero_unsigned "0"
+
+  syntax type uint32 "unsigned int"
+  syntax val (+)     "(%1 + %2)"
+  syntax val (-)     "(%1 - %2)"
+  syntax val (*)     "(%1 * %2)"
+  syntax val (/)     "(%1 / %2)"
+  syntax val (%)     "(%1 % %2)"
+  syntax val eq      "(%1 = %2)"
+  syntax val ne      "(%1 != %2)"
+  syntax val (<=)    "(%1 <= %2)"
+  syntax val (<)     "(%1 < %2)"
+  syntax val (>=)    "(%1 >= %2)"
+  syntax val (>)     "(%1 > %2)"
+
+end
+
+
+
 module mach.c.C
 
   syntax type ptr "(%1 *)"
 
   syntax val malloc "malloc(%1 * sizeof(%v0))"  (* and not %t1 ? *)
+  syntax val free   "free(%1)"
+  syntax val realloc "realloc(%1, %2 * sizeof(%v0))"
+
+  syntax val is_null "%1 == NULL"
+  syntax val null "NULL"
+
+  syntax val get "*(%1)"
+  syntax val set "*(%1) = %2"
+
+  syntax val p2i "%1"
+  syntax converter p2i "%1"
 
 end

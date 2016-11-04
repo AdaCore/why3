@@ -54,15 +54,6 @@ module N
   function value_sub_shift (x:t) (sz:int) : int =
      value_sub (pelts x) x.offset (x.offset + sz)
 
-  let from_limb (l:limb) : t
-    ensures { is_null result \/ plength result = 1 }
-    ensures { is_null result \/ value_sub_shift result 1 = l2i l }
-  =
-    let p = malloc (UInt32.of_int 1) in
-    if not (is_null p)
-    then C.set p l;
-    p
-
   use map.MapEq
   use map.Const
 
@@ -2121,11 +2112,26 @@ module N
     assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
 
-  let main () = from_limb (Limb.of_int 42)
 
 end
 
+module Main
 
+  use import mach.c.C
+  use import N
+
+  let from_limb (l:limb) : t
+    ensures { is_null result \/ plength result = 1 }
+    ensures { is_null result \/ value_sub_shift result 1 = l2i l }
+  =
+    let p = malloc (UInt32.of_int 1) in
+    if not (is_null p)
+    then C.set p l;
+    p
+
+  let main () = from_limb (Limb.of_int 42)
+
+end
 
 
 (*
