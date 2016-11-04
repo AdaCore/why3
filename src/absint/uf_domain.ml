@@ -682,6 +682,7 @@ module Make(S:sig
               match t_open_quant tq with
               | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
                 let quant_var, apron_var = uf_man.quant_var, uf_man.apron_var in (*TermToVaro.choose ud.quantified_vars in*)
+                let t = t_descend_nots t in
                 let t = t_subst_single a quant_var t in
                 aux t
               | _ -> raise (Not_handled t)
@@ -700,12 +701,14 @@ module Make(S:sig
          let d = f d in
          d)
 
-  let is_leq man (a, b) (c, d) =
-    let t1 = to_term man (a, b) in
+  let is_leq (man, uf_man) (a, b) (c, d) =
+    let a', _ = join_uf (man, uf_man) a b d in
+    let c', _ = join_uf (man, uf_man) c d b in
+    (*let t1 = to_term man (a, b) in
     let t2 = to_term man (c, d) in
     let (a, b) = top man () |> meet_term man t1 in
-    let (c, d) = top man () |> meet_term man t2 in
-    let b_dom = A.is_leq (fst man) a c in
+    let (c, d) = top man () |> meet_term man t2 in*)
+    let b_dom = A.is_leq man a' c' in
     let b_uf = Union_find.is_leq b.classes d.classes in
     b_dom && b_uf
 
@@ -858,9 +861,6 @@ module Make(S:sig
         uf_man.region_var <- Ity.Mreg.add reg (Ity.(psym.pv_vs) :: old_vars) uf_man.region_var
       end
     | Ity.Ityapp(_), _ ->
-      Format.eprintf "Let's check that ";
-      Ity.print_ity Format.err_formatter variable_type;
-      Format.eprintf " has only non mutable fields.";
       let reg_name = Ity.print_pv Format.str_formatter psym
                      |> Format.flush_str_formatter in
       let subv = get_subvalues logical_term None in

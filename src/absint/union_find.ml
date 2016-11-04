@@ -77,21 +77,6 @@ let join a b =
   let d = List.map (fun t -> [t]) d in
   c @ d
 
-let is_leq a b =
-  List.fold_left (fun t cb ->
-      t && 
-        List.fold_left (fun t ca ->
-            t || begin
-              let na = List.length ca in
-              (ca @ cb |> List.sort_uniq compare |> List.length) = na
-            end) false a) true b
-
-let new_class =
-  let i = ref 0 in
-  fun () ->
-    incr i;
-    !i
-
 let print s =
   List.iter (fun k ->
       Format.eprintf "-- [";
@@ -101,6 +86,23 @@ let print s =
     ) s;
   Format.eprintf ".@."
 
+
+let is_leq a b =
+  let b = List.fold_left (fun t cb ->
+      t && 
+        List.fold_left (fun t ca ->
+            t || begin
+              let na = List.length ca in
+              (ca @ cb |> List.sort_uniq compare |> List.length) = na
+            end) (match cb with [t] -> true | _ -> false) a) true b
+  in
+  b
+
+let new_class =
+  let i = ref 0 in
+  fun () ->
+    incr i;
+    !i
 
 let forget t s =
   let ct = get_class t s in

@@ -120,6 +120,8 @@ module Make(S: sig
         t_and_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
       else
         t_or_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
+    | Tbinop(Timplies, t1, t2) ->
+      t_descend_nots ~way (t_or (t_not t1) t2)
     | Tnot(t) ->
       t_descend_nots ~way:(not way) t
     | Tapp(l, args) when ls_equal l lt_int && way ->
