@@ -72,7 +72,11 @@ let create_controller env s = {
 
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
 let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
-let th_proved c th  = Hid.find_def c.proof_state.th_state false th
+let th_proved c th  =
+  if (theory_goals th = []) then
+    Hid.find_def c.proof_state.th_state true (theory_name th)
+  else
+    Hid.find_def c.proof_state.th_state false (theory_name th)
 
 (* Update the result of the theory according to its children *)
 let update_theory th ps =
@@ -147,7 +151,7 @@ module PSession = struct
     | Theory th ->
        let id = theory_name th in
        let name = id.Ident.id_string in
-       let name = if th_proved x.tcont id then name^"!" else name^"?" in
+       let name = if th_proved x.tcont th then name^"!" else name^"?" in
        name,
        List.fold_right (fun g -> n (Goal g)) (theory_goals th)
                        (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])

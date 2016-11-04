@@ -86,7 +86,7 @@ val update_trans_node: controller -> Session_itp.transID -> bool -> unit
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool
-val th_proved: controller -> Ident.ident -> bool
+val th_proved: controller -> Session_itp.theory -> bool
 
 val print_session : Format.formatter -> controller -> unit
 

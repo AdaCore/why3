@@ -425,7 +425,7 @@ and print_trans_node s fmt id =
     (Pp.print_list Pp.semi (print_proof_node s)) ll
 
 let print_theory s fmt th : unit =
-  if Controller_itp.th_proved cont (theory_name th) then
+  if Controller_itp.th_proved cont th then
     fprintf fmt "P";
   fprintf fmt "@[<hv 1> Theory %s;@ [%a];@ detached[%a]@]" (theory_name th).Ident.id_string
     (Pp.print_list Pp.semi (print_proof_node s)) (theory_goals th)
