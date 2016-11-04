@@ -343,6 +343,8 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
 

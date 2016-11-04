@@ -160,6 +160,8 @@ val call_on_buffer :
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
 

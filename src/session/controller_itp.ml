@@ -13,6 +13,7 @@ type proof_attempt_status =
     | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
+    | Uninstalled of Whyconf.prover (** prover is uninstalled *)
 
 let print_status fmt st =
   match st with
@@ -23,6 +24,7 @@ let print_status fmt st =
   | Running -> fprintf fmt "Running"
   | Done r -> fprintf fmt "Done(%a)" Call_provers.print_prover_result r
   | InternalFailure e -> fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
+  | Uninstalled pr -> fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
 
 type transformation_status =
   | TSscheduled | TSdone of transID | TSfailed
@@ -145,14 +147,14 @@ module PSession = struct
     | Theory th ->
        let id = theory_name th in
        let name = id.Ident.id_string in
-       let name = if th_proved x.tcont id then name else name^"?" in
+       let name = if th_proved x.tcont id then name^"!" else name^"?" in
        name,
        List.fold_right (fun g -> n (Goal g)) (theory_goals th)
                        (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
-       let name = if pn_proved x.tcont id then name else name^"?" in
+       let name = if pn_proved x.tcont id then name^"!" else name^"?" in
        let pas = get_proof_attempts s id in
        let trs = get_transformations s id in
        name,
@@ -167,7 +169,7 @@ module PSession = struct
                       (if pa.proof_obsolete then "O" else ""), []
     | Transf id ->
        let name = get_transf_name s id in
-       let name = if tn_proved x.tcont id then name else name^"?" in
+       let name = if tn_proved x.tcont id then name^"!" else name^"?" in
        let sts = get_sub_tasks s id in
        let dsts = get_detached_sub_tasks s id in
        name,
@@ -254,6 +256,14 @@ let timeout_handler () =
        update_proof_attempt ses id pr res;
        (* inform the callback *)
        callback (Done res)
+    | Call_provers.ProverInterrupted ->
+       if started then decr number_of_running_provers;
+       (* inform the callback *)
+       callback (Interrupted)
+    | Call_provers.InternalFailure exn ->
+       if started then decr number_of_running_provers;
+       (* inform the callback *)
+       callback (InternalFailure (exn))
   done;
   Queue.transfer q prover_tasks_in_progress;
   (* if the number of prover tasks is less than 3 times the maximum
@@ -352,7 +362,7 @@ let run_strategy_on_goal c id strat ~callback =
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
               S.idle ~prio:0 run_next
-           | Unedited | JustEdited ->
+           | Unedited | JustEdited | Uninstalled _ ->
                          (* should not happen *)
                          assert false
          in
@@ -437,5 +447,124 @@ let reload_files (c : controller) (env : Env.env) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
   Stdlib.Hstr.iter (merge_file old_ses c env ~use_shapes) (get_files old_ses)
+
+
+let replay_proof_attempt c pr limit (id: proofNodeID) ~callback =
+
+  (* The replay can be done on a different machine so we need
+     to check more things before giving the attempt to the scheduler *)
+  if not (Hprover.mem c.controller_provers pr) then
+    callback (Uninstalled pr)
+  else
+    (Queue.add (c, id, pr, limit, callback) scheduled_proof_attempts;
+     callback Scheduled;
+     run_timeout_handler ())
+
+type report =
+  | Result of Call_provers.prover_result * Call_provers.prover_result
+  (** Result(new_result,old_result) *)
+  | CallFailed of exn
+  | Prover_not_installed
+  | Edited_file_absent of string
+  | No_former_result of Call_provers.prover_result
+
+(* TODO find a better way to print it *)
+let print_report fmt (r: report) =
+  match r with
+  | Result (new_r, old_r) ->
+    Format.fprintf fmt "new_result = %a, old_result = %a@."
+      Call_provers.print_prover_result new_r
+      Call_provers.print_prover_result old_r
+  | CallFailed _ ->
+    Format.fprintf fmt "Callfailed@."
+  | Prover_not_installed ->
+    Format.fprintf fmt "Prover not installed@."
+  | Edited_file_absent _ ->
+    Format.fprintf fmt "No edited file@."
+  | No_former_result new_r ->
+    Format.fprintf fmt "new_result = %a, no former result@."
+      Call_provers.print_prover_result new_r
+
+(* TODO to be removed when we have a better way to print *)
+let replay_print (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
+  let pp_elem fmt (id, pr, rl, report) =
+    fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: %a@."
+      (Obj.magic id) Whyconf.print_prover pr rl.Call_provers.limit_time print_report report
+  in
+  Format.printf "%a@." (Pp.print_list Pp.newline pp_elem) lr
+
+let replay ~remove_obsolete ~use_steps c ~callback =
+
+  (* === Side functions used by replay === *)
+  let counting s count =
+    match s with
+    | Interrupted -> count := !count - 1
+    | Done _ -> count := !count - 1
+    | InternalFailure _ -> count := !count - 1
+    | Uninstalled _ -> count := !count - 1
+    | _ -> () in
+
+  let craft_report s r id pr limits pa =
+    match s with
+    | Interrupted -> assert false
+(* Never happen r := (id, pr, limits, CallFailed (User_interrupt)) :: !r *)
+    | Done new_r ->
+        (match pa.Session_itp.proof_state with
+        | None -> (r := (id, pr, limits, No_former_result new_r) :: !r)
+        | Some old_r -> r := (id, pr, limits, Result (new_r, old_r)) :: !r)
+    | InternalFailure e ->
+        r := (id, pr, limits, CallFailed (e)) :: !r
+    | Uninstalled _ -> r := (id, pr, limits, Prover_not_installed) :: !r;
+    | _ -> () in
+
+  let update_node pa s =
+    match s with
+    | Done new_r ->
+        (pa.Session_itp.proof_state <- Some new_r;
+         pa.proof_obsolete <- false)
+    | InternalFailure _ ->
+        pa.proof_obsolete <- true
+    | Uninstalled _ ->
+        pa.proof_obsolete <- true
+    | _ -> () in
+
+  let update_uninstalled c remove_obsolete id s pr =
+    match s with
+    | Uninstalled _ ->
+        if remove_obsolete then
+          remove_proof_attempt c.controller_session id pr
+        else
+          ()
+    | _ -> () in
+
+  (* === replay === *)
+  let session = c.controller_session in
+  let count = ref 0 in
+  let report = ref [] in
+
+  (* TODO count the number of node in a more efficient way *)
+  (* Counting the number of proof_attempt to print report only once *)
+  Session_itp.session_iter_proof_attempt
+    (fun _ _ -> count := !count + 1) session;
+
+  (* Replaying function *)
+  let replay_pa id pa =
+    let pr = pa.prover in
+    (* If use_steps, we give only steps as a limit *)
+    let limit =
+      if use_steps then
+        Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
+      else
+        pa.limit
+    in
+    replay_proof_attempt c pr limit id
+      ~callback:(fun s ->
+        counting s count; craft_report s report id pr limit pa; update_node pa s;
+        update_uninstalled c remove_obsolete id s pr;
+        if !count = 0 then callback !report) in
+
+  (* Calling replay on all the proof_attempts of the session *)
+  Session_itp.session_iter_proof_attempt
+    (fun id pa -> replay_pa id pa) session
 
 end

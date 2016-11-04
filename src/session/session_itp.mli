@@ -16,6 +16,7 @@ unique identifiers of type [proofNodeId]
 
 type session
 
+
 type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
 
@@ -54,6 +55,7 @@ type proof_attempt = {
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
+val session_iter_proof_attempt: (proofNodeID -> proof_attempt -> unit) -> session -> unit
 
 type proof_parent = Trans of transID | Theory of theory
 

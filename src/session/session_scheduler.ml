@@ -153,6 +153,7 @@ let timeout_handler t =
           | Call_provers.ProverFinished res ->
               if started then t.running_proofs <- t.running_proofs - 1;
               callback (Done res)
+          | _ -> assert (false) (* TODO Never reached yet. Deprecated code anyway *)
         end
     | Any_timeout callback as c ->
         if callback () then Queue.add c q

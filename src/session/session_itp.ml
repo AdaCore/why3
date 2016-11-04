@@ -109,7 +109,7 @@ let session_iter_proof_attempt f =
   session_iter_proofNode
     (fun pn ->
        Hprover.iter
-         (fun _ pan -> f pan.proofa_attempt)
+         (fun _ pan -> f pan.proofa_parent pan.proofa_attempt)
         pn.proofn_attempts)
 
 (* This is not needed. Keeping it as information on the structure
@@ -408,7 +408,9 @@ let remove_transformation (s : session) (id : transID) =
 let update_proof_attempt s id pr st =
   let n = get_proofNode s id in
   let pa = Hprover.find n.proofn_attempts pr in
-  pa.proofa_attempt.proof_state <- Some st
+  pa.proofa_attempt.proof_state <- Some st;
+  pa.proofa_attempt.proof_obsolete <- false
+
 
 (****************************)
 (*     session opening      *)
@@ -1103,7 +1105,7 @@ type save_ctxt = {
 let get_used_provers_with_stats session =
   let prover_table = PHprover.create 5 in
   session_iter_proof_attempt
-    (fun pa ->
+    (fun _ pa ->
       (* record mostly used pa.proof_timelimit pa.proof_memlimit *)
       let prover = pa.prover in
       let timelimits,steplimits,memlimits =

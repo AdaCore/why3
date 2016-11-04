@@ -542,6 +542,12 @@ let test_reload fmt _args =
   zipper_init ();
   fprintf fmt "done @."
 
+let test_replay fmt _args =
+  fprintf fmt "Replaying... @?";
+  let callback = C.replay_print in
+  C.replay ~use_steps:false cont ~callback:callback ~remove_obsolete:false;
+  zipper_init ()
+
 let test_transform_and_display fmt args =
   match args with
     | tr :: tl ->
@@ -665,6 +671,7 @@ let commands =
     "print", "<s> print the declaration where s was defined", test_print_id;
     "g", "prints the current goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
+    "rp", "replay", test_replay;
     "s", "save the current session", test_save_session;
     "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
     "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);

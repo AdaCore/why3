@@ -20,6 +20,7 @@ type proof_attempt_status =
     | Running (** external proof attempt is in progress *)
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
+    | Uninstalled of Whyconf.prover (** prover is uninstalled *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
@@ -177,5 +178,36 @@ val reload_files : controller -> Env.env -> use_shapes:bool -> unit
     that function, as the presence of unmatch old theories or goals
 
 *)
+
+type report =
+  | Result of Call_provers.prover_result * Call_provers.prover_result
+        (** Result(new_result,old_result) *)
+  | CallFailed of exn
+  | Prover_not_installed
+  | Edited_file_absent of string
+  | No_former_result of Call_provers.prover_result
+(** Type for the reporting of a replayed call *)
+
+
+(* Callback for the report printing of replay
+   TODO to be removed when we have a better way to print the result of replay *)
+val replay_print:
+    (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list -> unit
+
+(* TODO replay for manual proofs ? *)
+val replay:
+    remove_obsolete:bool -> (** If true, removes obsolete attempt in all cases. Otherwise
+                                keep it in some cases: for example prover is not installed *)
+    use_steps:bool -> (** Replay use recorded number of proof steps if true *)
+    controller ->
+    callback:
+      ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
+            -> unit) ->
+    unit
+(** This function reruns all the proofs of the session, and reports for all proofs the current
+    result and new one (does change the session state and if remove_obsolete is true also remove
+    obsolete proofs that could not be replayed). When finished, call the callback with the reports
+    which are 4-uples [(goalID, prover, limits, report)] *)
+
 
 end
