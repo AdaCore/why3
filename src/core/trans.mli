@@ -80,6 +80,8 @@ val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans
+(** [add_decls ld t1] adds decls ld at the end of the task t1 (before the goal) *)
+
 
 (* Dependent Transformations *)
 
@@ -89,6 +91,14 @@ val on_theory : theory -> (symbol_map list -> 'a trans) -> 'a trans
 val on_meta_excl : meta -> (meta_arg list option -> 'a trans) -> 'a trans
 val on_used_theory : theory -> (bool -> 'a trans) -> 'a trans
 
+(** [on_tagged_* m f] allow to do a transformation having all the tagged declarations
+    in a set as argument of f.
+    If used to modify the existing task, be careful to not make references to
+    declarations found in the set before they are actually declared in the new task.
+
+    For example, this will likely fail:
+      Trans.on_tagged_ls some_meta (fun s -> Trans.decl (fun d -> [d; s.choose]))
+*)
 val on_tagged_ty : meta -> (Sty.t -> 'a trans) -> 'a trans
 val on_tagged_ts : meta -> (Sts.t -> 'a trans) -> 'a trans
 val on_tagged_ls : meta -> (Sls.t -> 'a trans) -> 'a trans
