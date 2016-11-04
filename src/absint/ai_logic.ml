@@ -2,6 +2,7 @@
  * for AI *)
 
 open Term
+open Apron
 
 module Make(S: sig
     val env: Env.env
@@ -22,7 +23,89 @@ module Make(S: sig
   let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
   let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
   let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
+  let zero_int = t_const Number.(ConstInt (int_const_dec "0"))
+  let one_int = t_const Number.(ConstInt (int_const_dec "1"))
+  let int_add =  begin fun a ->
+    match a with
+    | [a; b] ->
+      if t_equal a zero_int then b
+      else if t_equal b zero_int then a
+      else fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) [a; b] Ty.ty_int
+    | _ -> assert false
+  end
+  let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a Ty.ty_int 
+  let int_minus = begin fun a ->
+    match a with
+    | [a; b] ->
+      if t_equal a zero_int then int_minus_u [b]
+      else if t_equal b zero_int then a
+      else fs_app Theory.(ns_find_ls th_int.th_export ["infix -"]) [a; b] Ty.ty_int
+    | _ -> assert false
+  end
+  let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a Ty.ty_int
 
+    
+  exception Cannot_be_expressed
+  
+  type coeff =
+    | CNone
+    | CPos of Term.term
+    | CMinus of Term.term
+    | CMinusOne
+    | COne
+
+  let coeff_to_term = function
+    | Coeff.Scalar(s) ->
+      let i = int_of_string (Scalar.to_string s) in
+      let s = string_of_int (abs i) in
+      let n = Number.int_const_dec s in
+      let n = Number.ConstInt n in
+
+      if i = 1 then
+        COne
+      else if i = -1 then
+        CMinusOne
+      else if i > 0 then
+        CPos (t_const n)
+      else if i < 0 then
+        CMinus (t_const n)
+      else
+        CNone
+    | Coeff.Interval(_) -> raise Cannot_be_expressed
+
+  let varlist_to_term variable_mapping (l, cst) =
+    let open Ty in
+    let term = ref zero_int in
+    List.iter (fun (c, v) ->
+        match coeff_to_term c with
+        | CPos c ->
+          let v = variable_mapping v in
+          term := int_add [!term; int_mult [c; v]];
+        | COne ->
+          let v = variable_mapping v in
+          term := int_add [!term; v];
+        | CMinusOne ->
+          let v = variable_mapping v in
+          term := int_minus [!term; v];
+        | CMinus c ->
+          let v = variable_mapping v in
+          term := int_minus [!term; int_mult [c; v]];
+        | CNone -> ()
+      ) l;
+    let c = coeff_to_term cst in
+    let term = match c with
+      | CNone -> !term
+      | CPos c ->
+        int_add [c; !term]
+      | CMinus c ->
+        int_minus [!term;c]
+      | COne ->
+        int_add [one_int; !term]
+      | CMinusOne ->
+        int_minus [!term; one_int]
+    in
+    term
+  
   (** Descend nots in the tree *)
   (* if way is true, then we must return the negation of t *)
   let rec t_descend_nots ?way:(way=false) t =

@@ -262,4 +262,10 @@ module Make(A:DOMAIN) = struct
     | None -> assert false
     | Some t -> A.to_lincons_array man (fst t)
 
+  let get_linexpr man t v =
+    match join_one man t with
+    | None -> None
+    | Some s ->
+      A.get_linexpr man (fst s) v
+
 end

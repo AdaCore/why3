@@ -34,7 +34,7 @@ module Refint
   use import int.Int
   use export Ref
 
-  let incr (r: ref int) ensures { !r = old !r + 1 /\ !r - 1 = old !r } = r := !r + 1
+  let incr (r: ref int) ensures { !r = old !r + 1 } = r := !r + 1
   let decr (r: ref int) ensures { !r = old !r - 1 } = r := !r - 1
 
   let (+=)   (r: ref int) (v: int) ensures { !r = old !r + v } = r := !r + v

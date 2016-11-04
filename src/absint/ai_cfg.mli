@@ -6,10 +6,14 @@ module Make(S:sig
     val widening: int
     module D: DOMAIN
   end): sig
+  module Domain : Domain.TERM_DOMAIN
+
   type control_point
-  type domain
+  type domain = Domain.t
   type cfg
   type context
+
+  val domain_manager: context -> Domain.man
 
   val empty_context : unit -> context
 
@@ -24,6 +28,7 @@ module Make(S:sig
   val domain_to_term: cfg -> context -> domain -> Term.term
 
   val add_variable: cfg -> context -> Ity.pvsymbol -> unit
+
 
 
 end

@@ -507,7 +507,7 @@ TOOLSGENERATED = src/tools/why3wc.ml
 ifeq (@enable_infer@,yes)
 TOOLS_BIN = why3config why3execute why3extract why3prove \
 	    why3realize why3replay why3wc \
-		why3infer test_disjunction
+		why3infer test_disjunction test_infer
 else
 TOOLS_BIN = why3config why3execute why3extract why3prove \
 		why3realize why3replay why3wc
@@ -542,6 +542,8 @@ bin/why3infer.opt: lib/why3/why3.cmxa src/tools/why3infer.cmx
 bin/why3infer.byte: lib/why3/why3.cma src/tools/why3infer.cmo
 bin/test_disjunction.opt: lib/why3/why3.cmxa src/tools/test_disjunction.cmx
 bin/test_disjunction.byte: lib/why3/why3.cma src/tools/test_disjunction.cmo
+bin/test_infer.opt: lib/why3/why3.cmxa src/tools/test_infer.cmx
+bin/test_infer.byte: lib/why3/why3.cma src/tools/test_infer.cmo
 endif
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo

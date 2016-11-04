@@ -38,6 +38,8 @@ module Make(E: sig
       let pmod = E.pmod
       let env = E.env
     end)
+  module Domain = D
+
   (* Apron manager *)
   (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
   type apron_domain = Polka.strict PolkaGrid.t*)
@@ -79,8 +81,10 @@ module Make(E: sig
     variable_mapping: (Apron.Var.t, Term.term) Hashtbl.t;
   
   }
-
+  
   type context = D.man
+
+  let domain_manager x = x
 
   let empty_context = D.create_manager
 
@@ -146,7 +150,6 @@ module Make(E: sig
     let old_apply = cfg.apply in
     cfg.apply <- begin fun man h tabs ->
       if h = hedge then
-        let () = Format.eprintf "doing %d@." h in
         let abs = tabs.(0) in
         let abs = D.push_label man () h abs in
         (), f man abs
@@ -690,8 +693,10 @@ module Make(E: sig
           let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
           List.iter (fun (vtx, abs) ->
              let t = D.to_term manpk abs in
-             printf "acc(%i) -> " vtx;
+             printf "acc(%i) -> @." vtx;
+             Format.printf "@.";
              Pretty.print_term Format.std_formatter t;
+             Format.printf "@.";
              Format.printf "@.";
               (*let gen = Abstract1.to_generator_array manpk abs in
                 Generator1.array_print Format.std_formatter gen;

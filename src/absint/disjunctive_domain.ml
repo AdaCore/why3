@@ -168,8 +168,6 @@ module Make(A:DOMAIN) = struct
   
 
   let widening man a b =
-    print Format.err_formatter a;
-    Format.eprintf "@.";
     let a = cleanup man a in
     let b = cleanup man b in
     let a =
@@ -202,7 +200,6 @@ module Make(A:DOMAIN) = struct
     let f = A.to_term env pmod in
     let t = List.map (fun t -> f man t var_mapping) t
     |> Term.t_or_simp_l in
-    Pretty.print_term Format.err_formatter t;
     t
 
   let push_label man env i t = List.map (A.push_label man env i) t
@@ -211,5 +208,11 @@ module Make(A:DOMAIN) = struct
     match join_one man t with
     | None -> assert false
     | Some t -> A.to_lincons_array man t
+
+  let get_linexpr man t v =
+    match join_one man t with
+    | None -> None
+    | Some s ->
+      A.get_linexpr man s v
 
 end

@@ -24,6 +24,7 @@ module type DOMAIN = sig
   val assign_linexpr: man -> t -> Var.t -> Linexpr1.t -> t option -> t
   val to_lincons_array: man -> t -> Lincons1.earray
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
+  val get_linexpr: man -> t -> Var.t -> ((Coeff.t * Var.t) list * Coeff.t) option
 end
 
 module type TERM_DOMAIN = sig
@@ -185,6 +186,41 @@ module Make_from_apron(M:sig
   let push_label _ _ _ t = t
 
   let to_lincons_array = Abstract1.to_lincons_array
+
+
+  let get_linexpr man d v =
+    let cons = to_lincons_array man d in
+    let n = Lincons1.array_length cons in
+    let vars = ref None in
+    for i = 0 to n - 1 do
+      let l = Lincons1.array_get cons i in
+      if Lincons1.get_typ l = Lincons1.EQ then
+        begin
+          let found = ref false in
+          let var_list = ref [] in
+          let neg = ref false in
+          Lincons1.iter (fun c v' ->
+              if v <> v' then
+                var_list := (c, v') :: !var_list
+              else match c with
+                | Coeff.Scalar(s) ->
+                  neg := Scalar.equal_int s 1;
+                  if Scalar.equal_int s 1 || Scalar.equal_int s (-1) then
+                    found := true;
+                | _ -> ()) l;
+          if !found then
+            begin
+              if !neg then
+                var_list := List.map (fun (c, v) ->
+                    Coeff.neg c, v) !var_list;
+              vars := Some (!var_list, if !neg then
+                              Coeff.neg @@ Lincons1.get_cst l
+                            else
+                              Lincons1.get_cst l)
+            end
+        end
+    done;
+    !vars
 
 end
 
