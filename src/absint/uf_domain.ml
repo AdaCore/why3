@@ -704,10 +704,6 @@ module Make(S:sig
   let is_leq (man, uf_man) (a, b) (c, d) =
     let a', _ = join_uf (man, uf_man) a b d in
     let c', _ = join_uf (man, uf_man) c d b in
-    (*let t1 = to_term man (a, b) in
-    let t2 = to_term man (c, d) in
-    let (a, b) = top man () |> meet_term man t1 in
-    let (c, d) = top man () |> meet_term man t2 in*)
     let b_dom = A.is_leq man a' c' in
     let b_uf = Union_find.is_leq b.classes d.classes in
     b_dom && b_uf
