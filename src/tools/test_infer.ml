@@ -102,7 +102,7 @@ let option_list = [
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
 
-let do_input f =
+let do_input way f =
   let format = !opt_parser in
   let mm = match f with
     | "-" ->
@@ -117,19 +117,19 @@ let do_input f =
     Mstr.iter (fun k ps -> match ps with
         | PV a -> (* this is a val - nothing to do *) ()
         | RS(rsym) ->
+          let function_name = Ident.(rsym.rs_name.id_string) in
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
           match decl.pd_node with
           | PDlet(let_expr) ->
             begin match let_expr with
               | LDvar(_) -> Format.eprintf "ldvar not handled@."
               | LDsym(rsym_, cexp) ->
-                assert (rs_equal rsym_ rsym);
+                if Some (f ^ ":" ^ function_name) = !opt_file || !opt_file = None then
                 begin
                   match cexp.c_node with
                   | Cfun e ->
                     let open Expr in
                     let preconditions = Ity.(Expr.(cexp.c_cty.cty_pre)) in
-                    Format.eprintf "@.";
                     let module Abstract_interpreter =
                       Ai_cfg.Make(struct
                         let env = env
@@ -177,7 +177,6 @@ let do_input f =
                     in
                     List.iter (Abstract_interpreter.add_variable cfg context)
                       Ity.(cexp.c_cty.cty_args);
-                    Format.eprintf "@.";
                     ignore (Abstract_interpreter.put_expr_with_pre cfg context e preconditions);
                     let whole_e = e in
                     while_invariants context e;
@@ -198,8 +197,8 @@ let do_input f =
                           let man = Abstract_interpreter.domain_manager context in
                           let expected_d = Abstract_interpreter.Domain.top man () |> Abstract_interpreter.Domain.meet_term man inv in
                           let b = Abstract_interpreter.Domain.is_leq man d expected_d in
-                          assert_ f b;
-                          if not b then
+                          assert_ (f ^ ":" ^ function_name) (b <> way);
+                          if b = way then
                             begin
                               let s = 
                                 Abstract_interpreter.domain_to_term cfg context d
@@ -220,6 +219,10 @@ let do_input f =
                                 |> Format.sprintf "invariant { %s }\n"
                               in
                               Format.printf "%s@." s;
+                              Abstract_interpreter.Domain.print Format.std_formatter d;
+                              Format.printf "@.";
+                              Abstract_interpreter.Domain.print Format.std_formatter expected_d;
+                              Format.printf "@.";
                             end
                         | _ -> assert false
                       ) fixp
@@ -235,7 +238,7 @@ let do_input f =
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
                     Format.eprintf " -> not a fun: app@."
-                end
+                end;
               | LDrec(_) -> Format.eprintf "LDrec not handled@."
             end
           | _ -> () 
@@ -247,15 +250,21 @@ let do_input f =
 
 let () =
   try
-    List.iter do_input
+    List.iter (do_input false)
       [
         "tests_ai/auto_cst1.mlw";
         "tests_ai/auto_ref0.mlw";
         "tests_ai/auto_ref1.mlw";
         "tests_ai/auto_ref2.mlw";
         "tests_ai/auto_ref3.mlw";
+        "tests_ai/uf1.mlw";
         "tests_ai/auto_array1.mlw";
-      ]
+      ];
+    List.iter (do_input true)
+      [
+        "tests_ai/auto_array_false.mlw";
+        "tests_ai/auto_ref_false.mlw";
+      ];
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

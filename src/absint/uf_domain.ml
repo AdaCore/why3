@@ -112,35 +112,38 @@ module Make(S:sig
     let uf_to_var = TermToVar.union (fun v1 v2 ->
         let expr = Linexpr1.make uf_man.env in
         Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
-        d := D.assign_linexpr man !d v1 expr None;
+        Linexpr1.set_coeff expr v1 (Coeff.s_of_int (-1));
+        let lincons = Lincons1.make expr Lincons1.EQ in
+        let lincons_array = Lincons1.array_make uf_man.env 1 in
+        Lincons1.array_set lincons_array 0 lincons;
+        d := D.meet_lincons_array man !d lincons_array; 
         d := D.forget_array man !d [|v2|] false;
       ) a.uf_to_var b.uf_to_var in
     let d = !d in
     let classes =  Union_find.join a.classes b.classes in
     assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
     assert (List.length (Union_find.flat classes) >= max ( List.length (Union_find.flat a.classes)) (List.length (Union_find.flat b.classes))) ;
-    let d, quantified_vars =
-      try
-        assert (TermToVaro.card b.quantified_vars <= 1);
-        assert (TermToVaro.card a.quantified_vars <= 1);
-        let t1, v1 = TermToVaro.choose a.quantified_vars in
-        let t2, v2 = TermToVaro.choose b.quantified_vars in
-        if v1 = v2 then raise Not_found;
-        let expr = Linexpr1.make uf_man.env in
-        Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
-        let d = D.assign_linexpr man d v1 expr None in
-        let d = D.forget_array man d [|v2|] false in
-        let () = assert false in
-        d, a.quantified_vars
-      with
-      | Not_found -> d, TermToVaro.union a.quantified_vars b.quantified_vars
-    in
-    d, { classes; uf_to_var; quantified_vars; }
+    d, { classes; uf_to_var; quantified_vars = a.quantified_vars; }
 
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
+    (*let lincons = Lincons1.make (Linexpr1.make uf_man.env) (Lincons1.EQ) in
+    Lincons1.set_coeff lincons (Var.of_string "$quant") (Coeff.s_of_int 1);
+    Lincons1.set_cst lincons (Coeff.s_of_int (-2));
+    let lincons =
+      let a = Lincons1.array_make uf_man.env 1 in
+      Lincons1.array_set a 0 lincons;
+      a
+    in
+    Format.eprintf "aa@.";
+    (A.meet_lincons_array man a lincons) |> A.print Format.err_formatter;
+    Format.eprintf "@.";
+    (A.meet_lincons_array man c lincons) |> A.print Format.err_formatter;
+    Format.eprintf "@.";*)
     let a = A.join man a c in
+    (*(A.meet_lincons_array man a lincons) |> A.print Format.err_formatter;
+    Format.eprintf "end@.";*)
     let a, e = join_uf (man, uf_man) a b d in
     a, e
 
@@ -522,30 +525,18 @@ module Make(S:sig
               let tcl = get_class_for_term uf_man t in
               f := (fun (d, u) ->
                   let d, u = g (d, u) in
-                  (*let d = D.forget_array man d [|myvar|] false in*)
                   let equivs = get_equivs uf_man u.classes t in
-                  (*Union_find.print u.classes;
-                  Union_find.flat u.classes |> List.iter (fun c ->
-                      let t = TermToClass.to_term uf_man.class_to_term c in
-                      Format.eprintf "%d -> " (Obj.magic c);
-                      Pretty.print_term Format.err_formatter t;
-                      Format.eprintf "@.";
-                    );*)
-                  (*let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
-                  let u = 
-                  try
-                    { u with uf_to_var = TermToVar.remove_term u.uf_to_var t }
-                  with
-                  | Not_found -> u
-                  in
-                  let u = { u with uf_to_var = TermToVar.add u.uf_to_var t myvar } in*)
                   let classes, uf_to_var, d = List.fold_left (fun (classes, uf_to_var, d) u ->
                       let uf_to_var, d = 
                         try
                           let v = (TermToVar.to_t uf_to_var u) in
                           let expr = Linexpr1.make uf_man.env in
                           Linexpr1.set_coeff expr v (Coeff.s_of_int 1);
-                          let d = D.assign_linexpr man d myvar expr None in
+                          Linexpr1.set_coeff expr myvar (Coeff.s_of_int (-1));
+                          let lincons = Lincons1.make expr Lincons1.EQ in
+                          let lincons_array = Lincons1.array_make uf_man.env 1 in
+                          Lincons1.array_set lincons_array 0 lincons;
+                          let d = if v <> myvar then D.meet_lincons_array man d lincons_array else d in
                           if t_equal u t then
                             (
                               let u' = TermToVar.remove_term uf_to_var t in
@@ -585,8 +576,8 @@ module Make(S:sig
           | Tbinop(Tand, a, b) ->
             let fa = aux a in
             let fb = aux b in
-            (fun d ->
-               fb (fa d))
+            (fun (d, a) ->
+               fb (fa (d, a)))
           | Tbinop(Tor, a, b) ->
             let fa = aux a in
             let fb = aux b in
@@ -703,7 +694,7 @@ module Make(S:sig
 
   let is_leq (man, uf_man) (a, b) (c, d) =
     let a', _ = join_uf (man, uf_man) a b d in
-    let c', _ = join_uf (man, uf_man) c d b in
+    let c', _ = join_uf (man, uf_man) c b d in
     let b_dom = A.is_leq man a' c' in
     let b_uf = Union_find.is_leq b.classes d.classes in
     b_dom && b_uf
@@ -950,6 +941,7 @@ module Make(S:sig
                     in
                     let alt = replaceby v in
                     let altcl = get_class_for_term uf_man alt in
+                    let b = { b with classes = Union_find.union altcl altcl b.classes } in
                     let b =
                       if not (Ty.ty_equal (t_type v) Ty.ty_int) then
                         { b with classes = Union_find.union altcl cl b.classes }
