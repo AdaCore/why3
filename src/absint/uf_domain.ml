@@ -510,6 +510,8 @@ module Make(S:sig
               let tcl = get_class_for_term uf_man t in
               f := (fun (d, u) ->
                   let d, u = g (d, u) in
+                  (*let d = D.forget_array man d [|myvar|] false in*)
+                  let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
                   let equivs = get_equivs uf_man u.classes t in
                   let classes, uf_to_var, d = List.fold_left (fun (classes, uf_to_var, d) u ->
                       let uf_to_var, d = 
@@ -946,7 +948,6 @@ module Make(S:sig
                     let b = { b with uf_to_var } in
                     b
                 in
-
                 let _, s = Union_find.forget cl b.classes in
                 let b = { b with classes = s } in
                 let old_b = b in
@@ -960,7 +961,8 @@ module Make(S:sig
                 try
                   let myv = TermToVar.to_t old_b.uf_to_var v in
                   try
-                    ignore (TermToVar.to_term b.uf_to_var myv); a, b
+                    let _t = TermToVar.to_term b.uf_to_var myv in
+                    a, b
                   with
                   | Not_found ->
                       D.forget_array man a [|myv|] false, b

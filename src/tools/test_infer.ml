@@ -143,23 +143,19 @@ let do_input way f =
                       let r = while_invariants context in
                       match e.e_node with
                       | Elet(LDvar(pv, e), e2) ->
-                        r e;
-                        r e2
+                        r e @ r e2
                       | Evar(_) | Econst(_) | Eassign(_)
                       | Eabsurd | Epure (_) | Eassert(_) | Eexec(_) | Elet(_)
-                        -> ()
+                        -> []
                       | Eif(e1, e2, e3) ->
-                        r e1;
-                        r e2;
-                        r e3;
+                        r e1 @ r e2 @ r e3
                       | Ecase(e,  pats) ->
                         r e
                       | Eraise(x, e_) ->
                         r e_
                       | Etry(e, pv) ->
-                        Ity.Mexn.map (fun (pvs, e) ->
-                            r e) pv |> ignore;
-                        r e
+                        Ity.Mexn.fold_left (fun l _ (pvs, e) ->
+                            r e @ l) (r e) pv
                       | Eghost(e) ->
                         r e
                       | Ewhile(e_cond, invs, _, e_loop) ->
@@ -167,11 +163,11 @@ let do_input way f =
                           match invs with
                           | inv::_ ->
                             let man = Abstract_interpreter.domain_manager context in
-                            Abstract_interpreter.Domain.top man () |> Abstract_interpreter.Domain.meet_term man inv |> ignore;
-                          | _ -> ()
-                        end;
-                        r e_cond;
-                        r e_loop;
+                            Abstract_interpreter.Domain.meet_term man inv
+                          | _ -> assert false
+                        end ::
+                        r e_cond @
+                        r e_loop
                       | Efor(pv, (f, d, to_), inv, e_loop) ->
                         r e_loop;
                     in
@@ -179,23 +175,16 @@ let do_input way f =
                       Ity.(cexp.c_cty.cty_args);
                     ignore (Abstract_interpreter.put_expr_with_pre cfg context e preconditions);
                     let whole_e = e in
-                    while_invariants context e;
+                    let invs = while_invariants context e in
                     (* will hold the diffrent file offsets (useful when writing multiple invariants) *)
                     let fixp = Abstract_interpreter.eval_fixpoints cfg context
-                    (*|> List.map (fun (expr, domain) ->
-                                  let inv =
-                                    Abstract_interpreter.domain_to_term cfg context domain
-                                    |> Pretty.print_term Format.str_formatter
-                                    |> Format.flush_str_formatter
-                                    |> Format.sprintf "invariant { %s }\n"
-                                  in
-                                  expr, inv)*)
+                               |> List.combine invs
                     in
-                    List.iter (fun (e, d) ->
+                    List.iter (fun (meet_term, (e, d)) ->
                         match e.e_node with
                         | Ewhile(_, inv::_, _, _) ->
                           let man = Abstract_interpreter.domain_manager context in
-                          let expected_d = Abstract_interpreter.Domain.top man () |> Abstract_interpreter.Domain.meet_term man inv in
+                          let expected_d = Abstract_interpreter.Domain.top man () |> meet_term in
                           let b = Abstract_interpreter.Domain.is_leq man d expected_d in
                           assert_ (f ^ ":" ^ function_name) (b <> way);
                           if b = way then
