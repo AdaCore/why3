@@ -71,11 +71,10 @@ let join a b =
         ) l a
     )  [] b
   in
-  let a = List.concat a in
-  let b = List.concat b in
-  let d = (List.filter (fun t -> not (List.mem t b)) a) @ (List.filter (fun t -> not (List.mem t a)) b) in
-  let d = List.map (fun t -> [t]) d in
-  c @ d
+  let all_elts = List.concat (a @ b) in
+  let known_elts = List.concat c in
+  let all_elts = List.filter (fun t -> not (List.mem t known_elts)) all_elts |> List.map (fun t -> [t]) in
+  c @ all_elts
 
 let print s =
   List.iter (fun k ->

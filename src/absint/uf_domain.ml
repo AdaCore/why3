@@ -128,22 +128,7 @@ module Make(S:sig
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
-    (*let lincons = Lincons1.make (Linexpr1.make uf_man.env) (Lincons1.EQ) in
-    Lincons1.set_coeff lincons (Var.of_string "$quant") (Coeff.s_of_int 1);
-    Lincons1.set_cst lincons (Coeff.s_of_int (-2));
-    let lincons =
-      let a = Lincons1.array_make uf_man.env 1 in
-      Lincons1.array_set a 0 lincons;
-      a
-    in
-    Format.eprintf "aa@.";
-    (A.meet_lincons_array man a lincons) |> A.print Format.err_formatter;
-    Format.eprintf "@.";
-    (A.meet_lincons_array man c lincons) |> A.print Format.err_formatter;
-    Format.eprintf "@.";*)
     let a = A.join man a c in
-    (*(A.meet_lincons_array man a lincons) |> A.print Format.err_formatter;
-    Format.eprintf "end@.";*)
     let a, e = join_uf (man, uf_man) a b d in
     a, e
 
@@ -420,7 +405,7 @@ module Make(S:sig
                   if not (Ty.ty_equal (t_type v) Ty.ty_int) then
                     { ud with classes = Union_find.union cl cl' ud.classes }
                   else
-                    ud
+                    { ud with classes = Union_find.union cl' cl' ud.classes }
                 in
                 let var = try
                     Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl))
