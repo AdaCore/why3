@@ -419,11 +419,47 @@ module Make(S:sig
                 in
                 match var, var' with
                 | Some var, None ->
-                  let uf_to_var = TermToVar.add ud.uf_to_var v' var in
+                  let d, var' = 
+                    try
+                      let myv' = TermToVar.to_t uf_man.var_to_term v' in
+                      let expr = Linexpr1.make uf_man.env in
+                      Linexpr1.set_coeff expr myv' (Coeff.s_of_int 1);
+                      Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+                      let lincons = Lincons1.make expr Lincons1.EQ in
+                      let lincons_array = Lincons1.array_make uf_man.env 1 in
+                      Lincons1.array_set lincons_array 0 lincons;
+                      let d = if myv' <> var then D.meet_lincons_array man d lincons_array else d in
+                      d, myv'
+                    with
+                    | Not_found -> d, var
+                  in
+                  let uf_to_var = TermToVar.add ud.uf_to_var v' var' in
                   let ud = { ud with uf_to_var } in
                   d, ud
+                | Some var, Some var' when var <> var' ->
+                  let expr = Linexpr1.make uf_man.env in
+                  Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
+                  Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+                  let lincons = Lincons1.make expr Lincons1.EQ in
+                  let lincons_array = Lincons1.array_make uf_man.env 1 in
+                  Lincons1.array_set lincons_array 0 lincons;
+                  D.meet_lincons_array man d lincons_array, ud 
                 | None, Some var->
-                  let uf_to_var = TermToVar.add ud.uf_to_var v var in
+                  let d, var' = 
+                    try
+                      let myv' = TermToVar.to_t uf_man.var_to_term v in
+                      let expr = Linexpr1.make uf_man.env in
+                      Linexpr1.set_coeff expr myv' (Coeff.s_of_int 1);
+                      Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+                      let lincons = Lincons1.make expr Lincons1.EQ in
+                      let lincons_array = Lincons1.array_make uf_man.env 1 in
+                      Lincons1.array_set lincons_array 0 lincons;
+                      let d = if myv' <> var then D.meet_lincons_array man d lincons_array else d in
+                      d, myv'
+                    with
+                    | Not_found -> d, var
+                  in
+                  let uf_to_var = TermToVar.add ud.uf_to_var v var' in
                   let ud = { ud with uf_to_var } in
                   d, ud
                 | _ ->
@@ -511,7 +547,14 @@ module Make(S:sig
               f := (fun (d, u) ->
                   let d, u = g (d, u) in
                   (*let d = D.forget_array man d [|myvar|] false in*)
-                  let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
+                  let d, u =
+                    try
+                      assert (TermToVar.to_t u.uf_to_var t = myvar); d, u
+                    with
+                    | Not_found ->
+                      let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in
+                      D.forget_array man d [|myvar|] false, u
+                  in
                   let equivs = get_equivs uf_man u.classes t in
                   let classes, uf_to_var, d = List.fold_left (fun (classes, uf_to_var, d) u ->
                       let uf_to_var, d = 
@@ -524,22 +567,7 @@ module Make(S:sig
                           let lincons_array = Lincons1.array_make uf_man.env 1 in
                           Lincons1.array_set lincons_array 0 lincons;
                           let d = if v <> myvar then D.meet_lincons_array man d lincons_array else d in
-                          if t_equal u t then
-                            (
-                              let u' = TermToVar.remove_term uf_to_var t in
-                              let d =
-                                if v <> myvar then
-                                  try
-                                    ignore (TermToVar.to_term u' v); d
-                                  with
-                                  | Not_found ->
-                                    D.forget_array man d [|v|] false;
-                                else
-                                  d
-                              in
-                            TermToVar.add u' t myvar, d)
-                          else 
-                            uf_to_var, d
+                          uf_to_var, d
                         with
                         | Not_found -> TermToVar.add uf_to_var u myvar, d
                       in
