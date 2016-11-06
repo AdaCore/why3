@@ -1,0 +1,93 @@
+
+module Test
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+
+	let b(x:int): unit
+	=
+		let a = make x 1 in
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 }
+		()
+		done; ()
+
+		
+
+	let c(x:int): unit
+	requires { x >= 2 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ (forall k: int. (k = 0 /\ a[k] = 0) \/ k <> 0) }
+		()
+		done; ()
+
+	let d(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ (forall k: int. k = 2 -> a[k] = 1) }
+		()
+		done; ()
+	
+	let e(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		while (true) do
+		variant { 0 }
+		invariant { forall k: int. k = 0 -> (a[k] = 10 \/ a[k] = 1) }
+		a[0] <- 10;
+		()
+		done; ()
+	
+	let f(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (true) do
+		variant { 0 }
+		invariant { forall i: int. (i = 0 -> (a[i] = !k)) }
+		a[0] <- !k + 1;
+		incr k;
+		done; ()
+	
+	let cond(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7
+		else
+			a[0] <- 9;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 9 \/ a[0] = 7))) }
+		()
+		done; ()
+	
+	let cond2(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1 \/ a[0] = 7))) }
+		()
+		done; ()
+	
+end

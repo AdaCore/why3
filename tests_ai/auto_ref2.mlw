@@ -1,0 +1,18 @@
+
+module Test
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+
+	let b(unit): unit
+	=
+		let k = ref 0 in
+		incr k;
+		incr k;
+		while (true) do
+		variant { 0 }
+		invariant { !k = 2}
+		()
+		done; ()
+end
