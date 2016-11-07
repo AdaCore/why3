@@ -4,11 +4,13 @@ module Uf1
 	use import int.Int
 
 	let b(y:int): int
-	ensures { result = 1 } =
+	requires { y >= 1 }
+	ensures { result = -1 } =
 		let a = make (y+1) 0 in
 		let i = ref 0 in
 		let x = ref 0 in
 		a[0] <- 1;
+		a[y] <- 0;
 		let u = a[y] in
 		while !i < 4 do
 		variant { 10 - !i }

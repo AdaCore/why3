@@ -13,7 +13,9 @@ module Make(A:DOMAIN) = struct
 
   let canonicalize m _ = () (*List.iter (A.canonicalize m)*)
   
-  let print fmt = List.iter (A.print fmt)
+  let print fmt = List.iter (fun b ->
+      A.print fmt b;
+      Format.fprintf fmt "@.";)
 
   let is_bottom man t =
     List.map (A.is_bottom man) t
@@ -102,7 +104,9 @@ module Make(A:DOMAIN) = struct
         let find_precise_join e =
           let c = A.join man t e in
           if join_is_precise man t e c then
+            begin
             Some c
+            end
           else
             None
         in
@@ -167,23 +171,30 @@ module Make(A:DOMAIN) = struct
       List.fold_left (join man) t q
   
 
+  (* used once by loop, so it can be costly *)
   let widening man a b =
     let a = cleanup man a in
     let b = cleanup man b in
     let a =
-      join_one man a
+      if List.length a > threshold then
+        join_one man a |> unwrap_domain
+      else a
     in
     let b =
-      join_one man b
+      if List.length b > threshold then
+        join_one man b |> unwrap_domain
+      else b
     in
-    let d = match a, b with
-    | None, None -> []
-    | None, Some c -> [c]
-    | Some c, None -> [c]
-    | Some c, Some d ->
-        [A.widening man c d]
+    let b_leq = List.map (fun b ->
+        b, try
+          List.find (fun a ->
+              A.is_leq man a b) a
+        with
+        | Not_found -> b
+      ) b
     in
-    d
+    List.map (fun (k, v) ->
+        A.widening man v k) b_leq |> cleanup man
 
   let meet_lincons_array man t e  = List.map (fun t -> A.meet_lincons_array man t e) t
 

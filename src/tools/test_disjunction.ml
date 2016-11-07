@@ -135,6 +135,27 @@ let test5 =
 
   assert_ "test5" (List.length d = 1)
 
+let test6 =
+  let man, env, assign, constr, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
+  let d = Dom.top man env in
+  let d = lineq d [1, "x"; -1, "y"] 0 Lincons1.EQ in
+  let d = lineq d [1, "i"] (-8) Lincons1.SUPEQ in
+  let d = lineq d [-1, "i"] 9 Lincons1.SUPEQ in
+
+  let d1 = Dom.top man env in
+  let d1 = lineq d1 [1, "x"; -1, "y"] 0 Lincons1.EQ in
+  let d1 = lineq d1 [1, "i"] (-8) Lincons1.EQ in
+  
+  let d2 = Dom.top man env in
+  let d2 = lineq d2 [1, "x"] 0 Lincons1.EQ in
+  let d = Dom.join man d d2 in
+  let d1 = Dom.join man d1 d2 in
+
+
+  let d3 = Dom.join man d1 d in
+  let d = Dom.widening man d1 d3 in
+  assert_ "test6" (List.length d = 2)
+
 (*
         (((((((- x) + y) = 0 /\ ((i1) - 8) = 0) /\
              ((k) - 8) = 0) /\

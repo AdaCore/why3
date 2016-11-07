@@ -119,9 +119,9 @@ module Test
 	=
 		let a = make x 0 in
 		let k = ref 0 in
-		while (!k < 3) do
+		while (!k < 4) do
 		variant { 0 }
-		invariant { forall i: int. (0 <= i < !k -> (a[i] = 9)) }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = 8)) }
 		a[!k] <- 8;
 		incr k;
 		done; ()
