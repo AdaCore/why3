@@ -4,18 +4,17 @@ module Uf1
 	use import int.Int
 
 	let b(y:int): int
-	requires { 0 <= y < 10 }
 	ensures { result = 1 } =
-		let a = make 10 0 in
+		let a = make (y+1) 0 in
 		let i = ref 0 in
 		let x = ref 0 in
-		let j = y in
 		a[0] <- 1;
+		let u = a[y] in
 		while !i < 4 do
 		variant { 10 - !i }
-		invariant { !i >= 0 /\ !i <= 4 /\ a[0] = 1 /\ (!i = 0 \/ !x = a[j] - a[0]) }
+		invariant { !i >= 0 /\ !i <= 4 /\ a[0] = 1 /\ (!i = 0 \/ !x = a[y] - a[0]) }
 			i := !i + 1;
-			x := a[j] - a[0];
+			x := a[y] - a[0];
 		done;
 		!x
 end

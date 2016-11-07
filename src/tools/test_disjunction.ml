@@ -5,6 +5,16 @@ module Base = Domain.Polyhedra
 
 module Dom = Disjunctive_domain.Make(Base)
 
+let usage_msg = Format.sprintf
+  "Usage: %s"
+  (Filename.basename Sys.argv.(0))
+
+let add_opt x =
+  ()
+
+let config, _, env =
+  Whyconf.Args.initialize [] add_opt usage_msg
+
 let assert_ n b = 
   if b then 
     Format.eprintf "%s \027[32m passed\027[0m.@." n
@@ -25,7 +35,18 @@ let init vars =
   man, env, assign, begin fun constr ->
     List.fold_left (fun d (v, vars, const) ->
         assign v vars const d) (Dom.top man env) constr
+  end, begin fun d constr cst ty ->
+    let expr = Linexpr1.make env in
+    let constr = List.map (fun (i, v) -> Coeff.s_of_int i, Var.of_string v) constr in
+    List.iter (fun (i, v) ->
+                Linexpr1.set_coeff expr v i) constr;
+    Linexpr1.set_cst expr (Coeff.s_of_int cst);
+    let lincons = Lincons1.make expr ty in
+    let lincons_a = Lincons1.array_make env 1 in
+    Lincons1.array_set lincons_a 0 lincons;
+    Dom.meet_lincons_array man d lincons_a
   end
+
 
 
 let dom_eq man d d_ =
@@ -33,7 +54,7 @@ let dom_eq man d d_ =
 
 
 let test1 =
-  let man, env, assign, constr = init ["x"; "y"; "i"; "j"] in
+  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4] in
   let d2 = constr ["y", [], 5] in
   let d1_ = match d1 with
@@ -47,7 +68,7 @@ let test1 =
   |> assert_ "test1"
 
 let test2 =
-  let man, env, assign, constr = init ["x"; "y"; "i"; "j"] in
+  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4] in
   let d2 = constr ["x", [], 3] in
   let d = Dom.join man d1 d2 in
@@ -55,7 +76,7 @@ let test2 =
   |> assert_ "test2"
 
 let test3 = 
-  let man, env, assign, constr = init ["x"; "y"; "i"; "j"] in
+  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4; "y", [], 3] in
   let d2 = constr ["x", [], 3; "y", [], 2] in
   let d = Dom.join man d1 d2 in
@@ -63,7 +84,7 @@ let test3 =
   |> assert_ "test3"
 
 let test4 =
-  let man, env, assign, constr = init ["x"; "y"; "i"; "j"] in
+  let man, env, assign, constr,_  = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 0; "y", [], 1] in
   let d2 = constr ["x", [], 1; "y", [], 0] in
   let d3 = constr ["x", [], 0; "y", [], 0] in
@@ -90,8 +111,43 @@ let test4 =
   |> assert_ "test4 (2)";
   ()
 
+let test5 =
+  let man, env, assign, constr, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
+  let d = Dom.top man env in
+  let d = lineq d [1, "x"; -1, "y"] 0 Lincons1.EQ in
+  let d = lineq d [1, "i"] (-8) Lincons1.EQ in
+  let d = lineq d [1, "k"] (-8) Lincons1.EQ in
+  let d = lineq d [-1, "w"; 1, "j"] (-1) Lincons1.SUPEQ in
+  let d = lineq d [1, "w"] 0 Lincons1.SUPEQ in
+  let d = lineq d [ -1, "j"] 3 Lincons1.SUPEQ in
+  let d = lineq d [ 1, "j"] (-2) Lincons1.SUPEQ in
+  let d = lineq d [ 1, "x"] (-10) Lincons1.SUPEQ in
+
+  let d1 = Dom.top man env in
+  let d1 = lineq d1 [1, "x"; -1, "y"] 0 Lincons1.EQ in
+  let d1 = lineq d1 [1, "i"] (-8) Lincons1.EQ in
+  let d1 = lineq d1 [1, "k"] (-8) Lincons1.EQ in
+  let d1 = lineq d1 [ 1, "j"] (-1) Lincons1.EQ in
+  let d1 = lineq d1 [ 1, "w"] 0 Lincons1.EQ in
+  let d1 = lineq d1 [ 1, "x"] (-10) Lincons1.SUPEQ in
+
+  let d = Dom.join man d d1 in
+
+  assert_ "test5" (List.length d = 1)
+
+(*
+        (((((((- x) + y) = 0 /\ ((i1) - 8) = 0) /\
+             ((k) - 8) = 0) /\
+            0 <= (((- w1) + j) - 1)) /\ 0 <= (3 + (- j))) /\
+          0 <= (j - 2)) /\ 0 <= (x - 10) }
+
+ ((((((- x) + y) = 0 /\ ((i1) - 8) = 0) /\
+     ((k) - 8) = 0) /\ (j - 1) = 0) /\
+   w1 = 0) /\ 0 <= (x - 10) \/*)
+
+
 let _ = 
-  let man, env, assign, constr = init ["x"; "y"; "i"; "j"] in
+  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 0; "x", [], 1] in
-  Dom.print Format.err_formatter d1;
   ()
+

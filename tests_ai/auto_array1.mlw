@@ -90,4 +90,41 @@ module Test
 		()
 		done; ()
 	
+	let init1(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = 8)) }
+		a[!k] <- 8;
+		incr k;
+		done; ()
+	
+	let init2(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = i)) }
+		a[!k] <- !k;
+		incr k;
+		done; ()
+	
+	let init3(x:int): unit
+	requires { x >= 10 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < 3) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = 9)) }
+		a[!k] <- 8;
+		incr k;
+		done; ()
+	
+	
 end
