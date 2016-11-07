@@ -147,7 +147,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
     (* TODO export the exception *)
   | _ -> failwith "Unable to instantiate variables with possible values" in
   let inst_nt = t_subst subst nt in
-  if (Term.t_equal inst_nt g) then
+  if (Term.t_equal_nt_nl inst_nt g) then
     let nlp = List.map (t_subst subst) lp in
     let lt = List.map (fun ng -> Task.add_decl task (create_prop_decl Pgoal
                           (create_prsymbol (gen_ident "G")) ng)) nlp in
