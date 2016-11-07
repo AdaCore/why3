@@ -7,12 +7,11 @@ module C = struct
 
   type ty =
     | Tvoid
-    | Tsyntax of string (* ints, floats, doubles, chars are here *)
+    | Tsyntax of string * ty list (* ints, floats, doubles, chars are here *)
     | Tptr of ty
     | Tarray of ty * expr
     | Tstruct of ident * (ident * ty) list
     | Tunion of ident * (ident * ty) list
-    | Tproto of proto
     | Tnamed of ident (* alias from typedef *)
     (* enum, const could be added *)
 
@@ -33,7 +32,6 @@ module C = struct
     | Enothing
     | Eunop of unop * expr
     | Ebinop of binop * expr * expr
-    | Eternary of expr * expr * expr (* c ? then : else *)
     | Ecast of ty * expr
     | Ecall of expr * expr list
     | Econst of constant
@@ -43,13 +41,13 @@ module C = struct
     | Eindex of expr * expr (* Array access *)
     | Edot of expr * ident (* Field access with dot *)
     | Earrow of expr * ident (* Pointer access with arrow *)
+    | Esyntax of string * ty * (ty array) * (expr*ty) list
 
   and constant =
     | Cint of string
     | Cfloat of string
     | Cchar of string
     | Cstring of string
-    | Ccompound of expr list
 
   type stmt =
     | Snop
@@ -65,6 +63,7 @@ module C = struct
   and definition =
     | Dfun of ident * proto * body
     | Dinclude of ident
+    | Dproto of ident * proto
     | Ddecl of names
     | Dtypedef of ty * ident
     | Dstructural of names (* struct, union... *)
@@ -95,9 +94,6 @@ module C = struct
     | Ebinop (b,e1,e2) -> Ebinop (b,
                                   propagate_in_expr id v e1,
                                   propagate_in_expr id v e2)
-    | Eternary (c,t,e) -> Eternary (propagate_in_expr id v c,
-                                    propagate_in_expr id v t,
-                                    propagate_in_expr id v e)
     | Ecast (ty,e) -> Ecast (ty, propagate_in_expr id v e)
     | Ecall (e, l) -> Ecall (propagate_in_expr id v e,
                              List.map (propagate_in_expr id v) l)
@@ -106,6 +102,8 @@ module C = struct
                                 propagate_in_expr id v e2)
     | Edot (e,i) -> Edot (propagate_in_expr id v e, i)
     | Earrow (e,i) -> Earrow (propagate_in_expr id v e, i)
+    | Esyntax (s,t,ta,l) ->
+      Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l)
     | Enothing -> Enothing
     | Econst c -> Econst c
     | Esize_type ty -> Esize_type ty
@@ -141,7 +139,8 @@ module C = struct
       Ddecl (ty, l), b
     | Dinclude i -> Dinclude i, true
     | Dfun _ -> raise (Unsupported "nested function")
-    | Dtypedef _ -> raise (Unsupported "typedef inside body")
+    | Dtypedef _ -> raise (Unsupported "typedef inside function")
+    | Dproto _ -> raise (Unsupported "prototype inside function")
     | Dstructural (ty,l) ->
       let l,b = aux l in
       Dstructural (ty, l), b
@@ -178,35 +177,20 @@ module Translate = struct
   open Printer
   open Pmodule
 
-  let ty_of_ty info ty =
+  let rec ty_of_ty info ty =
     match ty.ty_node with
     | Tyvar v ->
       begin match query_syntax info.syntax v.tv_name
         with
-        | Some s -> C.Tsyntax s
+        | Some s -> C.Tsyntax (s, [])
         | None -> C.Tnamed (v.tv_name)
       end
-    | Tyapp (ts, _tl) ->
+    | Tyapp (ts, tl) ->
        begin match query_syntax info.syntax ts.ts_name
         with
-        | Some s -> C.Tsyntax s (*TODO something with the %[tv][1-9] logic ?*)
+        | Some s -> C.Tsyntax (s, List.map (ty_of_ty info) tl)
         | None -> raise (NoSyntax ts.ts_name.id_string)
        end
-
-  let ty_of_ts info ts =
-    match query_syntax info.syntax ts.ts_name
-        with
-        | Some s -> C.Tsyntax s (*TODO something with the %[tv][1-9] logic ?*)
-        | None -> raise (NoSyntax ts.ts_name.id_string)
-
-  let ty_of_ity info ity =
-    match ity.ity_node with
-    | Ityvar (tv,_) ->
-      begin match query_syntax info.syntax tv.tv_name with
-      | Some s -> C.Tsyntax s
-      | None -> C.Tnamed (tv.tv_name)
-      end
-    | Ityapp (its,_,_) | Ityreg {reg_its=its} -> ty_of_ts info its.its_ts
 
   let pv_name pv = pv.pv_vs.vs_name
 
@@ -221,13 +205,26 @@ module Translate = struct
       begin match ce.c_node with
       | Cfun e -> expr info e
       | Capp (rs, pvsl) ->
-        let args = List.filter (fun pv -> not pv.pv_ghost) pvsl in
-        C.([],
-           Sexpr(Ecall(Evar(rs.rs_name),
-                       List.map (fun pv -> Evar(pv_name pv)) args)))
+        begin match query_syntax info.syntax rs.rs_name with
+        | Some s ->
+          let params = List.map
+            (fun pv -> (C.Evar(pv_name pv), ty_of_ty info (ty_of_ity pv.pv_ity)))
+            pvsl in
+          let rty = ty_of_ity rs.rs_cty.cty_result in
+          let rtyargs = match rty.ty_node with
+            | Tyvar _ -> [||]
+            | Tyapp (_,args) -> Array.of_list (List.map (ty_of_ty info) args)
+          in
+          C.([], Sexpr(Esyntax(s,ty_of_ty info rty, rtyargs, params)))
+        | None ->
+          let args = List.filter (fun pv -> not pv.pv_ghost) pvsl in
+          C.([],
+             Sexpr(Ecall(Evar(rs.rs_name),
+                         List.map (fun pv -> Evar(pv_name pv)) args)))
+        end
       | _ -> assert false
       end
-    | Eassign _ -> assert false
+    | Eassign _ -> raise (Unsupported "mutable field assign")
     | Elet (ld,e) ->
       begin match ld with
       | LDvar (pv,le) ->
@@ -242,7 +239,7 @@ module Translate = struct
             let cexp = C.(Econst (Cint (BigInt.to_string n))) in
             C.propagate_in_block (pv_name pv) cexp (expr info e)
           | _->
-            let t = ty_of_ity info pv.pv_ity in
+            let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
             let initblock = expr info le in
             [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
             C.Sseq (C.Sblock initblock, C.Sblock (expr info e))
@@ -256,8 +253,9 @@ module Translate = struct
       | [], C.Sexpr c -> [], C.Sif(c,C.Sblock t, C.Sblock e)
       | cblock ->
         let cid = id_register (id_fresh "cond") in (* ? *)
-        [ C.Ddecl (C.Tsyntax "int", [cid, C.Enothing]) ],
+        [ C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing]) ],
         C.Sseq (C.Sblock cblock, C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
+      (* TODO detect empty branches and replace with Snop*)
       end
     | Ewhile (c,_,_,e) ->
       let cd, cs = expr info c in
@@ -266,7 +264,7 @@ module Translate = struct
       | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
       | _ ->
         let cid = id_register (id_fresh "cond") in (* ? *)
-        [C.Ddecl (C.Tsyntax "int", [cid, C.Enothing])],
+        [C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])],
         C.Sseq (C.Sblock (cd, cs), C.Swhile (C.Evar cid, C.Sblock b))
       end
     | Etry _ | Eraise _ -> raise (Unsupported "try/exceptions") (*TODO*)
@@ -280,7 +278,7 @@ module Translate = struct
       let fname = rs.rs_name in
       Format.printf "PDlet rsymbol %s@." fname.id_string;
       begin try
-        if Mid.mem fname info.syntax then []
+        if Mid.mem fname info.syntax then (Format.printf "has syntax@."; [])
         else
         let params = List.map
           (fun pv -> ty_of_ty info pv.pv_vs.vs_ty, pv_name pv)
@@ -289,12 +287,10 @@ module Translate = struct
              rs.rs_cty.cty_args) in
         match ce.c_node with
         | Cfun e ->
-          let rtype = match rs.rs_cty.cty_result.ity_node with
-            | Ityapp (its, _,_) ->
-              ty_of_ts info its.its_ts
-            | _ ->
-              raise (Unsupported "variable return type")
-          in
+          let rity = rs.rs_cty.cty_result in
+          let rtype =
+            if ity_equal rity ity_unit then C.Tvoid
+            else ty_of_ty info (ty_of_ity rity) in
           [C.Dfun (fname, (rtype,params), expr info e)]
         | _ -> raise (Unsupported "Non-function with no syntax in toplevel let")
         with
@@ -302,20 +298,20 @@ module Translate = struct
             Format.printf "%s has no syntax : not extracted@." s;
             []
       end
-    | PDtype [{itd_its = ity}] ->
-      let id = ity.its_ts.ts_name in
+    | PDtype [{itd_its = its}] ->
+      let id = its.its_ts.ts_name in
       Format.printf "PDtype %s@." id.id_string;
-      let def =
-        match ity.its_ts.ts_def with
-        | Some def -> ty_of_ty info def
+      begin
+        match its.its_ts.ts_def with
+        | Some def -> [C.Dtypedef (ty_of_ty info def, id)]
         | None ->
           begin match query_syntax info.syntax id with
-          | Some s -> C.Tsyntax s
+          | Some _ -> []
           | None ->
             raise (Unsupported "type declaration without syntax or alias")
           end
-      in
-      [C.Dtypedef (def, id)]
+      end
+
     | _ -> [] (*TODO exn ? *)
 
 
@@ -335,6 +331,105 @@ module Translate = struct
       Format.printf "Failed because of unsupported construct: %s@." s; []
     | NoSyntax s ->
       Format.printf "Failed because %s has no syntax@." s; []
+end
+
+module Print = struct
+
+  open C
+  open Format
+  open Printer
+  open Pp
+
+  exception Unprinted of string
+
+  let c_keywords = ["auto"; "break"; "case"; "char"; "const"; "continue"; "default"; "do"; "double"; "else"; "enum"; "extern"; "float"; "for"; "goto"; "if"; "int"; "long"; "register"; "return"; "short"; "signed"; "sizeof"; "static"; "struct"; "switch"; "typedef"; "union"; "unsigned"; "void"; "volatile"; "while" ]
+
+  let () = assert (List.length c_keywords = 32)
+
+  let sanitizer = sanitizer char_to_lalpha char_to_alnumus
+  let printer = create_ident_printer c_keywords ~sanitizer
+
+  let print_ident fmt id = fprintf fmt "%s" (id_unique printer id)
+
+  let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+  let rec print_ty ?(paren=false) fmt = function
+    | Tvoid -> fprintf fmt "void"
+    | Tsyntax (s, tl) -> syntax_arguments s print_ty fmt tl
+    | Tptr ty -> fprintf fmt "(%a)*" (print_ty ~paren:true) ty
+    | Tarray (ty, expr) ->
+      fprintf fmt (protect_on paren "%a[%a]")
+        (print_ty ~paren:true) ty (print_expr ~paren:false) expr
+    | Tstruct _ -> raise (Unprinted "structs")
+    | Tunion _ -> raise (Unprinted "unions")
+    | Tnamed id -> print_ident fmt id
+
+  and print_unop fmt = function
+    | Unot -> fprintf fmt "!"
+    | Ustar -> fprintf fmt "*"
+    | Uaddr -> fprintf fmt "&"
+
+  and print_binop fmt = function
+    | Band -> fprintf fmt "&&"
+    | Bor -> fprintf fmt "||"
+    | Beq -> fprintf fmt "=="
+    | Bne -> fprintf fmt "!="
+    | Bassign -> fprintf fmt "="
+
+  and print_expr ?(paren=false) fmt = function
+    | Enothing -> ()
+    | Eunop(u,e) -> fprintf fmt (protect_on paren "%a %a")
+      print_unop u (print_expr ~paren) e
+    | Ebinop(b,e1,e2) ->
+      fprintf fmt (protect_on paren "%a %a %a")
+        (print_expr ~paren:true) e1 print_binop b (print_expr ~paren:true) e2
+    | Ecast(ty, e) ->
+      fprintf fmt (protect_on paren "(%a)%a")
+        (print_ty ~paren:false) ty (print_expr ~paren:true) e
+    | Ecall (e,l) -> fprintf fmt (protect_on paren "%a(%a)")
+      (print_expr ~paren:true) e (print_list comma (print_expr ~paren:false)) l
+    | Econst c -> print_const fmt c
+    | Evar id -> print_ident fmt id
+    | Esize_expr e ->
+      fprintf fmt (protect_on paren "sizeof(%a)") (print_expr ~paren:false) e
+    | Esize_type ty ->
+      fprintf fmt (protect_on paren "sizeof(%a)") (print_ty ~paren:false) ty
+    | Eindex _ | Edot _ | Earrow _ -> raise (Unprinted "struct/array access")
+    | Esyntax (s, t, args, lte) ->
+      gen_syntax_arguments_typed snd (fun _ -> args) s
+        (fun fmt (e,t) -> print_expr ~paren:false fmt e)
+        (print_ty ~paren:false) (C.Enothing,t) fmt lte
+
+  and print_const  fmt = function
+    | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
+
+
+  let rec print_stmt fmt = function
+    | Snop -> ()
+    | Sexpr e -> fprintf fmt "%a;@;" (print_expr ~paren:false) e;
+    | Sblock b -> fprintf fmt "@[<hv>{@;<1 2>@[<hv>%a@]@;}@;@]@;" print_body b
+    | Sseq (s1,s2) -> fprintf fmt "@[<v>%a@;%a@]" print_stmt s1 print_stmt s2
+    | Sif (c,t,e) -> fprintf fmt "if(%a) @ %aelse@ %a"
+      (print_expr ~paren:false) c print_stmt t print_stmt e
+    | Swhile (e,b) -> fprintf fmt "while (%a)@ %a"
+      (print_expr ~paren:false) e print_stmt b
+    | Sfor _ -> raise (Unprinted "for loops")
+    | Sbreak -> fprintf fmt "break;@;"
+    | Sreturn e -> fprintf fmt "return %a;@;" (print_expr ~paren:true) e
+
+  and print_def fmt = function
+    | Dfun (id,(rt,args),body) ->
+      fprintf fmt "%a %a(@[%a@])@ @[<hv>{@;<1 2>@[<hv>%a@]@;}@;@]"
+        (print_ty ~paren:false) rt
+        print_ident id
+        (print_list comma
+           (print_pair_delim nothing space nothing print_ty print_ident)) args
+        print_body body
+    | _ -> assert false
+
+  and print_body fmt = function
+    | _ -> assert false
+
 end
 
 let fg ?fname m =
