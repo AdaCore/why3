@@ -22,6 +22,13 @@ open Theory
 
 open Args_wrapper
 
+(* Labels and locations can be printed by setting the appropriate flags *)
+let debug_print_labels = Debug.register_info_flag "print_labels"
+  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+
+let debug_print_locs = Debug.register_info_flag "print_locs"
+  ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
+
 let id_unique tables id = id_unique tables.printer id
 
 (*
@@ -143,13 +150,20 @@ let print_label = Pretty.print_label
 let print_labels = print_iter1 Slab.iter space print_label
 
 let print_ident_labels fmt id =
-  if not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label
+  if Debug.test_flag debug_print_labels &&
+    not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label;
+  if Debug.test_flag debug_print_locs then
+    Opt.iter (fprintf fmt "@ %a" Pretty.print_loc) id.id_loc
+
+(*  if not (Slab.is_empty id.id_label) then
+    fprintf fmt "@ %a" print_labels id.id_label*)
 
 let rec print_term tables fmt t = print_lterm 0 tables fmt t
 
 and print_lterm pri tables fmt t =
-  if Slab.is_empty t.t_label then print_tnode pri tables fmt t
+  if (Slab.is_empty t.t_label || not (Debug.test_flag debug_print_labels)) then
+    print_tnode pri tables fmt t
   else fprintf fmt (protect_on (pri > 0) "%a %a")
       print_labels t.t_label (print_tnode 0 tables) t
 
