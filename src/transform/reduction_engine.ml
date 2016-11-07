@@ -326,6 +326,14 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     loop (ts,Mvs.add vs t2 mv) r1 r2
                   with Ty.TypeMismatch _ -> raise NoMatch
               end
+            | Tvar vs when Mvs.mem vs mv ->
+                begin
+                  let t = Mvs.find vs mv in
+                  if t_equal t t2 then
+                    loop sigma r1 r2
+                  else
+                    raise NoMatch
+                end
             | Tapp(ls1,args1) ->
               begin
                 match t2.t_node with
@@ -337,6 +345,26 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                       with Ty.TypeMismatch _ -> raise NoMatch
                     end
                   | _ -> raise NoMatch
+              end
+            | Tquant (q1, bv1) ->
+              begin
+                match t2.t_node with
+                | Tquant (q2, bv2) when q1 = q2 ->
+                  let (vl1, _tl1, term1) = t_open_quant bv1 in
+                  let (vl2, _tl2, term2) = t_open_quant bv2 in
+                  let (mt, mv) =
+                    List.fold_left2 (fun (mt, mv) e1 e2 ->
+                      let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
+                      (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2 in
+                  loop (mt, mv) (term1 :: r1) (term2 :: r2)
+                | _ -> raise NoMatch
+              end
+            | Tbinop (b1, t1_l, t1_r) ->
+              begin
+                match t2.t_node with
+                | Tbinop (b2, t2_l, t2_r) when b1 = b2 ->
+                  loop (mt, mv) (t1_l :: t1_r :: r1) (t2_l :: t2_r :: r2)
+                | _ -> raise NoMatch
               end
             | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
                 loop sigma r1 r2
