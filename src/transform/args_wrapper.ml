@@ -133,43 +133,20 @@ let add (d: decl) (tables: name_tables): name_tables =
 
 
 let build_name_tables task : name_tables =
-(*
-  TODO:
-   - simply use [km = Task.task_known task] as the set of identifiers
-     to insert in the tables
-   - only one printer (do not attempt te rebuild qualified idents)
-   - use syntax_map from why3_itp driver
-   - to build the namespace, do a match on the decl associated with the id
-      in [km]
-  | Dtype  -> tysymbol
-  | Ddata | Dparam | Dlogic | Dind  -> lsymbol
-  | Dprop  -> prsymbol
-
-  TODO: use the result of this function in
-    - a new variant of a printer in this file
-    - use the namespace to type the terms
-      (change the code in parser/typing.ml to use namespace
-      instead of theory_uc)
-
-*)
   let pr = fresh_printer () in
   let km = Task.task_known task in
   let tables = {
       namespace = empty_ns;
       known_map = km;
-(*
-      unique_names = Mid.empty ;
- *)
       printer = pr;
   } in
-  Mid.fold
-    (fun _id d tables ->
-(* TODO optimization. We may check if id is already there to not explore twice the same
-   declaration ? *)
-      add d tables)
-    km
-    tables
-
+(*  We want conflicting names to be named as follows:
+    names closer to the goal should be named with lowest
+    disambiguation numbers.
+    This only works for things defined in .why/.mlw because things
+    added by the user are renamed on the fly. *)
+  let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
+  List.fold_left (fun tables d -> add d tables) tables l
 
 
 (************* wrapper  *************)
