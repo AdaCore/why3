@@ -4,10 +4,22 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../matrices.mlw" expanded="true">
-<theory name="MatrixGen" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<file name="../matrices.mlw">
+<theory name="MatrixGen" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="FloatMatrix" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<theory name="Matrix" sum="862099dd531bba3a8ce8aca77f580ae7">
+ <goal name="set_def1">
+ <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+ </goal>
+ <goal name="set_def2">
+ <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+ </goal>
+ <goal name="set_def3">
+ <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+ </goal>
+ <goal name="set_def4">
+ <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
+ </goal>
 </theory>
 <theory name="FixedMatrix" sum="81d1f6ecddc981db1f906002ad2c6515">
  <goal name="rows_and_cols_nonnegative">
@@ -19,7 +31,7 @@
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="MatrixArithmetic" sum="95c5ea5a8476dec9b6807e6463fa7c50">
+<theory name="MatrixArithmetic" sum="179a17c543d2ee8c5d1128db6e7ac5b9">
  <goal name="zero_neutral">
  <transf name="split_goal_wp">
   <goal name="zero_neutral.1" expl="1.">
@@ -64,7 +76,7 @@
  <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="opposite_add">
- <proof prover="0"><result status="valid" time="0.25"/></proof>
+ <proof prover="0"><result status="valid" time="0.49"/></proof>
  </goal>
  <goal name="WP_parameter mul_assoc_get" expl="VC for mul_assoc_get">
  <transf name="split_goal_wp">
@@ -72,7 +84,7 @@
   <proof prover="1"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter mul_assoc_get.2" expl="2. precondition">
-  <proof prover="1"><result status="valid" time="2.40" steps="94"/></proof>
+  <proof prover="1"><result status="valid" time="3.14" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter mul_assoc_get.3" expl="3. assertion">
   <proof prover="1"><result status="valid" time="0.06" steps="37"/></proof>
@@ -145,10 +157,10 @@
  </transf>
  </goal>
  <goal name="mul_zero_right">
- <proof prover="1"><result status="valid" time="1.91" steps="404"/></proof>
+ <proof prover="1"><result status="valid" time="1.91" steps="394"/></proof>
  </goal>
  <goal name="mul_zero_left">
- <proof prover="1"><result status="valid" time="1.65" steps="396"/></proof>
+ <proof prover="1"><result status="valid" time="1.65" steps="387"/></proof>
  </goal>
  <goal name="mul_opp">
  <transf name="split_goal_wp">
@@ -162,14 +174,14 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="mul_opp.4" expl="4.">
-  <proof prover="1"><result status="valid" time="3.92" steps="2401"/></proof>
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="BlockMul" sum="08ae5cbffa4e68e45d31bc65f734c776">
+<theory name="BlockMul" sum="a0d8b3f3a9391a77a23d88b4d4a63f23">
  <goal name="WP_parameter block_mul_ij" expl="VC for block_mul_ij">
- <proof prover="1"><result status="valid" time="2.31" steps="880"/></proof>
+ <proof prover="1"><result status="valid" time="1.25" steps="880"/></proof>
  </goal>
  <goal name="WP_parameter mul_split" expl="VC for mul_split">
  <proof prover="1"><result status="valid" time="0.29" steps="218"/></proof>

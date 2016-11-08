@@ -29,8 +29,9 @@ theory MatrixGen
 
   axiom set_def4:
     forall m: mat 'a, i j: int, v: 'a. 0 <= i < rows m -> 0 <= j < cols m ->
-    forall i' j': int. (i <> i' \/ j <> j') ->
-    get (set m i j v) i' j' = get m i' j'
+    forall i' j': int. 0 <= i' < rows m /\ 0 <= j' < cols m /\
+      (i <> i' \/ j <> j') ->
+      get (set m i j v) i' j' = get m i' j'
 
   predicate (==) (m1 m2: mat 'a) =
     rows m1 = rows m2 && cols m1 = cols m2 &&
@@ -46,12 +47,18 @@ theory MatrixGen
 end
 
 
-theory FloatMatrix
-
-  clone export MatrixGen
-  use HighOrd
+theory Matrix
 
   use import int.Int
+  use HighOrd
+
+  type mat 'a
+
+  function rows (mat 'a) : int
+
+  function cols (mat 'a) : int
+
+  function get (mat 'a) int int : 'a
 
   function create (r c: int) (f: int -> int -> 'a) : mat 'a
 
@@ -66,6 +73,21 @@ theory FloatMatrix
   axiom create_get:
     forall r c: int, f: int -> int -> 'a, i j: int.
     0 <= i < r -> 0 <= j < c -> get (create r c f) i j = f i j
+
+  function set (m:mat 'a) (x y:int) (z:'a) : mat 'a =
+    create m.rows m.cols (\x1 y1. if x1 = x && y1 = y then z else get m x1 y1)
+
+  clone export MatrixGen with type mat 'a = mat 'a,
+    function rows = rows,
+    function cols = cols,
+    function get = get,
+    function set = set,
+    lemma set_def1,
+    lemma set_def2,
+    lemma set_def3,
+    lemma set_def4
+
+  use import int.Int
 
 end
 
@@ -125,7 +147,7 @@ module MatrixArithmetic
   use import int.Int
   use import int.Sum
   use import sum_extended.Sum_extended
-  use import FloatMatrix
+  use import Matrix
 
   (* Zero matrix *)
   constant zerof : int -> int -> int = \_ _. 0
@@ -267,7 +289,7 @@ module BlockMul
   use import int.Int
   use import int.Sum
   use import sum_extended.Sum_extended
-  use import FloatMatrix
+  use import Matrix
   use import MatrixArithmetic
 
   function ofs2 (a: mat int) (ai aj: int) : int -> int -> int

@@ -6,235 +6,235 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../strassen.mlw">
-<theory name="MatrixMultiplication" sum="4657263328dc56ad385beef22e18158d">
+<theory name="MatrixMultiplication" sum="ecada52657159e49826d5c3a35b8124a">
  <goal name="WP_parameter blit" expl="VC for blit">
- <proof prover="1"><result status="valid" time="0.39" steps="297"/></proof>
+ <proof prover="1"><result status="valid" time="0.16" steps="298"/></proof>
  </goal>
  <goal name="WP_parameter block" expl="VC for block">
- <proof prover="1"><result status="valid" time="0.15" steps="149"/></proof>
+ <proof prover="1"><result status="valid" time="0.15" steps="150"/></proof>
  </goal>
  <goal name="WP_parameter block_ws" expl="VC for block_ws">
- <proof prover="1"><result status="valid" time="0.14" steps="83"/></proof>
+ <proof prover="1"><result status="valid" time="0.14" steps="84"/></proof>
  </goal>
  <goal name="WP_parameter add" expl="VC for add">
- <proof prover="1"><result status="valid" time="0.36" steps="388"/></proof>
+ <proof prover="1"><result status="valid" time="0.17" steps="389"/></proof>
  </goal>
  <goal name="WP_parameter add_ws" expl="VC for add_ws">
- <proof prover="1"><result status="valid" time="0.07" steps="77"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="78"/></proof>
  </goal>
  <goal name="WP_parameter sub" expl="VC for sub">
- <proof prover="1"><result status="valid" time="0.56" steps="627"/></proof>
+ <proof prover="1"><result status="valid" time="0.27" steps="628"/></proof>
  </goal>
  <goal name="WP_parameter sub_ws" expl="VC for sub_ws">
- <proof prover="1"><result status="valid" time="0.06" steps="74"/></proof>
+ <proof prover="1"><result status="valid" time="0.06" steps="75"/></proof>
  </goal>
  <goal name="WP_parameter mult_ijk" expl="VC for mult_ijk">
  <transf name="split_goal_wp">
   <goal name="WP_parameter mult_ijk.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.2" expl="2. assertion">
-  <proof prover="1"><result status="valid" time="0.06" steps="80"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="81"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.6" expl="6. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.03" steps="17"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.8" expl="8. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.9" expl="9. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.10" expl="10. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.11" expl="11. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.12" expl="12. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.08" steps="44"/></proof>
+  <proof prover="1"><result status="valid" time="0.08" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.13" expl="13. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.05" steps="39"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.14" expl="14. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.03" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ijk.15" expl="15. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.07" steps="42"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ijk.16" expl="16. type invariant">
   <proof prover="1"><result status="valid" time="0.03" steps="23"/></proof>
   </goal>
+  <goal name="WP_parameter mult_ijk.15" expl="15. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.07" steps="43"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ijk.16" expl="16. type invariant">
+  <proof prover="1"><result status="valid" time="0.03" steps="24"/></proof>
+  </goal>
   <goal name="WP_parameter mult_ijk.17" expl="17. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.18" expl="18. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.04" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.19" expl="19. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.06" steps="38"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.68" steps="379"/></proof>
+  <proof prover="1"><result status="valid" time="0.93" steps="380"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.21" expl="21. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.22" expl="22. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.25" steps="156"/></proof>
+  <proof prover="1"><result status="valid" time="0.25" steps="157"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.23" expl="23. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05" steps="53"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="54"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.24" expl="24. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.25" expl="25. assertion">
-  <proof prover="1"><result status="valid" time="0.09" steps="104"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="105"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.26" expl="26. type invariant">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.27" expl="27. postcondition">
-  <proof prover="1"><result status="valid" time="0.03" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.28" expl="28. postcondition">
-  <proof prover="1"><result status="valid" time="0.05" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ijk.29" expl="29. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter mult_ikj" expl="VC for mult_ikj">
  <transf name="split_goal_wp">
   <goal name="WP_parameter mult_ikj.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.2" expl="2. assertion">
-  <proof prover="1"><result status="valid" time="0.07" steps="80"/></proof>
+  <proof prover="1"><result status="valid" time="0.07" steps="81"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.3" expl="3. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.5" expl="5. postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.6" expl="6. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.04" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.8" expl="8. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.08" steps="41"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.9" expl="9. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.10" expl="10. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.04" steps="20"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.11" expl="11. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.12" expl="12. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.13" expl="13. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.14" expl="14. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.03" steps="21"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.15" expl="15. index in array bounds">
   <proof prover="1"><result status="valid" time="0.04" steps="32"/></proof>
   </goal>
+  <goal name="WP_parameter mult_ikj.4" expl="4. postcondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.5" expl="5. postcondition">
+  <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.6" expl="6. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.7" expl="7. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.04" steps="18"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.8" expl="8. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.08" steps="42"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.9" expl="9. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.04" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.10" expl="10. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.04" steps="21"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.11" expl="11. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.03" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.12" expl="12. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.13" expl="13. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.14" expl="14. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.03" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.15" expl="15. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
   <goal name="WP_parameter mult_ikj.16" expl="16. type invariant">
-  <proof prover="1"><result status="valid" time="0.04" steps="22"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.17" expl="17. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.04" steps="27"/></proof>
-  </goal>
-  <goal name="WP_parameter mult_ikj.18" expl="18. index in array bounds">
   <proof prover="1"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
+  <goal name="WP_parameter mult_ikj.17" expl="17. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter mult_ikj.18" expl="18. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
   <goal name="WP_parameter mult_ikj.19" expl="19. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05" steps="39"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="2.38" steps="539"/></proof>
+  <proof prover="1"><result status="valid" time="1.81" steps="540"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.21" expl="21. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.22" expl="22. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.23" expl="23. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.09" steps="58"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="59"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.24" expl="24. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.25" expl="25. assertion">
-  <proof prover="1"><result status="valid" time="0.09" steps="104"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="105"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.26" expl="26. type invariant">
-  <proof prover="1"><result status="valid" time="0.03" steps="13"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.27" expl="27. postcondition">
-  <proof prover="1"><result status="valid" time="0.05" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.28" expl="28. postcondition">
-  <proof prover="1"><result status="valid" time="0.05" steps="31"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter mult_ikj.29" expl="29. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter assoc_proof" expl="VC for assoc_proof">
- <proof prover="1"><result status="valid" time="0.25" steps="149"/></proof>
+ <proof prover="1"><result status="valid" time="0.12" steps="150"/></proof>
  </goal>
  <goal name="WP_parameter mul_naive" expl="VC for mul_naive">
- <proof prover="1"><result status="valid" time="0.03" steps="7"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="8"/></proof>
  </goal>
  <goal name="WP_parameter double_block" expl="VC for double_block">
- <proof prover="1"><result status="valid" time="0.12" steps="126"/></proof>
+ <proof prover="1"><result status="valid" time="0.12" steps="127"/></proof>
  </goal>
  <goal name="WP_parameter padding" expl="VC for padding">
  <transf name="split_goal_wp">
   <goal name="WP_parameter padding.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.03" steps="9"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter padding.2" expl="2. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter padding.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.03" steps="12"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter padding.4" expl="4. precondition">
-  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter padding.5" expl="5. precondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter padding.6" expl="6. assertion">
   <proof prover="2"><result status="valid" time="0.62"/></proof>
@@ -246,19 +246,19 @@
   <proof prover="2"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter padding.9" expl="9. postcondition">
-  <proof prover="1"><result status="valid" time="0.05" steps="60"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter padding.10" expl="10. postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="60"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter padding.11" expl="11. postcondition">
-  <proof prover="1"><result status="valid" time="0.06" steps="64"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="67"/></proof>
   </goal>
   <goal name="WP_parameter padding.12" expl="12. postcondition">
-  <proof prover="1"><result status="valid" time="0.10" steps="95"/></proof>
+  <proof prover="1"><result status="valid" time="0.10" steps="105"/></proof>
   </goal>
   <goal name="WP_parameter padding.13" expl="13. postcondition">
-  <proof prover="1"><result status="valid" time="0.06" steps="80"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="87"/></proof>
   </goal>
  </transf>
  </goal>
@@ -608,7 +608,7 @@
       <goal name="WP_parameter strassen.112.1.1.1.1" expl="1. precondition">
       <transf name="compute_specified">
        <goal name="WP_parameter strassen.112.1.1.1.1.1" expl="1. precondition">
-       <proof prover="1"><result status="valid" time="0.07" steps="188"/></proof>
+       <proof prover="1"><result status="valid" time="0.18" steps="188"/></proof>
        </goal>
       </transf>
       </goal>
@@ -637,7 +637,7 @@
       <goal name="WP_parameter strassen.115.1.1.1.1" expl="1. precondition">
       <transf name="compute_specified">
        <goal name="WP_parameter strassen.115.1.1.1.1.1" expl="1. precondition">
-       <proof prover="1"><result status="valid" time="0.08" steps="205"/></proof>
+       <proof prover="1"><result status="valid" time="0.20" steps="205"/></proof>
        </goal>
       </transf>
       </goal>
@@ -701,7 +701,7 @@
       <goal name="WP_parameter strassen.123.1.1.1.1" expl="1. precondition">
       <transf name="compute_specified">
        <goal name="WP_parameter strassen.123.1.1.1.1.1" expl="1. precondition">
-       <proof prover="1"><result status="valid" time="0.10" steps="247"/></proof>
+       <proof prover="1"><result status="valid" time="0.24" steps="247"/></proof>
        </goal>
       </transf>
       </goal>
@@ -745,7 +745,7 @@
       <goal name="WP_parameter strassen.131.1.1.1.1" expl="1. precondition">
       <transf name="compute_specified">
        <goal name="WP_parameter strassen.131.1.1.1.1.1" expl="1. precondition">
-       <proof prover="1"><result status="valid" time="0.12" steps="283"/></proof>
+       <proof prover="1"><result status="valid" time="0.27" steps="283"/></proof>
        </goal>
       </transf>
       </goal>
@@ -794,10 +794,10 @@
   <proof prover="1"><result status="valid" time="0.31" steps="281"/></proof>
   </goal>
   <goal name="WP_parameter strassen.144" expl="144. assertion">
-  <proof prover="0"><result status="valid" time="0.48"/></proof>
+  <proof prover="0"><result status="valid" time="0.88"/></proof>
   </goal>
   <goal name="WP_parameter strassen.145" expl="145. assertion">
-  <proof prover="0"><result status="valid" time="0.52"/></proof>
+  <proof prover="0"><result status="valid" time="0.85"/></proof>
   </goal>
   <goal name="WP_parameter strassen.146" expl="146. precondition">
   <proof prover="1"><result status="valid" time="0.47" steps="412"/></proof>
@@ -806,7 +806,7 @@
   <proof prover="1"><result status="valid" time="0.29" steps="293"/></proof>
   </goal>
   <goal name="WP_parameter strassen.148" expl="148. precondition">
-  <proof prover="1"><result status="valid" time="0.44" steps="426"/></proof>
+  <proof prover="1"><result status="valid" time="0.63" steps="426"/></proof>
   </goal>
   <goal name="WP_parameter strassen.149" expl="149. precondition">
   <proof prover="1"><result status="valid" time="0.29" steps="301"/></proof>
@@ -962,10 +962,10 @@
   <proof prover="1"><result status="valid" time="1.27" steps="733"/></proof>
   </goal>
   <goal name="WP_parameter strassen.200" expl="200. precondition">
-  <proof prover="1"><result status="valid" time="0.59" steps="490"/></proof>
+  <proof prover="1"><result status="valid" time="0.76" steps="490"/></proof>
   </goal>
   <goal name="WP_parameter strassen.201" expl="201. precondition">
-  <proof prover="1"><result status="valid" time="1.16" steps="747"/></proof>
+  <proof prover="1"><result status="valid" time="1.39" steps="747"/></proof>
   </goal>
   <goal name="WP_parameter strassen.202" expl="202. precondition">
   <proof prover="1"><result status="valid" time="0.52" steps="498"/></proof>
@@ -983,7 +983,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter strassen.204" expl="204. VC for strassen">
-  <proof prover="1"><result status="valid" time="2.54" steps="1343"/></proof>
+  <proof prover="1"><result status="valid" time="2.98" steps="1343"/></proof>
   </goal>
   <goal name="WP_parameter strassen.205" expl="205. precondition">
   <proof prover="1"><result status="valid" time="0.07" steps="79"/></proof>
@@ -1028,7 +1028,7 @@
   <proof prover="1"><result status="valid" time="0.57" steps="145"/></proof>
   </goal>
   <goal name="WP_parameter strassen.219" expl="219. precondition">
-  <proof prover="1"><result status="valid" time="0.40" steps="145"/></proof>
+  <proof prover="1"><result status="valid" time="0.59" steps="145"/></proof>
   </goal>
   <goal name="WP_parameter strassen.220" expl="220. precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="93"/></proof>
@@ -1039,16 +1039,16 @@
   <goal name="WP_parameter strassen.222" expl="222. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter strassen.222.1" expl="1. VC for strassen">
-   <proof prover="1" timelimit="20"><result status="valid" time="8.66" steps="1255"/></proof>
+   <proof prover="1" timelimit="20"><result status="valid" time="10.65" steps="1255"/></proof>
    </goal>
    <goal name="WP_parameter strassen.222.2" expl="2. VC for strassen">
-   <proof prover="1" timelimit="20"><result status="valid" time="2.20" steps="526"/></proof>
+   <proof prover="1" timelimit="20"><result status="valid" time="3.36" steps="526"/></proof>
    </goal>
    <goal name="WP_parameter strassen.222.3" expl="3. VC for strassen">
    <proof prover="1" timelimit="20"><result status="valid" time="10.19" steps="1592"/></proof>
    </goal>
    <goal name="WP_parameter strassen.222.4" expl="4. VC for strassen">
-   <proof prover="1" timelimit="20"><result status="valid" time="5.98" steps="1031"/></proof>
+   <proof prover="1" timelimit="20"><result status="valid" time="4.24" steps="1031"/></proof>
    </goal>
    <goal name="WP_parameter strassen.222.5" expl="5. VC for strassen">
    <proof prover="1" timelimit="20"><result status="valid" time="14.22" steps="3735"/></proof>
