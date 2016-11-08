@@ -115,6 +115,8 @@ val normalize : limit:int -> engine -> Term.term -> Term.term
 
 open Term
 
+exception NoMatch of (term * term) option
+
 type substitution = term Mvs.t
 
 val first_order_matching: Svs.t -> term list -> term list -> Ty.ty Ty.Mtv.t * substitution

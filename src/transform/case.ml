@@ -7,6 +7,8 @@ open Task
 open Args_wrapper
 open Reduction_engine
 
+let debug_matching = Debug.register_info_flag "print_match"
+  ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
 
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
@@ -144,8 +146,13 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
   let (_ty, subst) = try first_order_matching lv [nt] [g] with
-    (* TODO export the exception *)
-  | _ -> failwith "Unable to instantiate variables with possible values" in
+  | Reduction_engine.NoMatch (Some (t1, t2)) ->
+      (if (Debug.test_flag debug_matching) then
+        Format.printf "Term %a and %a can not be matched. Failure in matching@."
+          Pretty.print_term t1 Pretty.print_term t2
+      else ()); failwith "Unable to instantiate variables with possible values@."
+  | Reduction_engine.NoMatch None -> failwith "Tactic apply matching failure. Please report@."
+  in
   let inst_nt = t_subst subst nt in
   if (Term.t_equal_nt_nl inst_nt g) then
     let nlp = List.map (t_subst subst) lp in
@@ -189,7 +196,12 @@ let replace_subst lp lv f1 f2 t =
   | None ->
     begin
       let fom = try Some (first_order_matching lv [f1] [t]) with
-      | _ -> None in
+      | Reduction_engine.NoMatch (Some (t1, t2)) ->
+        (if (Debug.test_flag debug_matching) then
+          Format.printf "Term %a and %a can not be matched. Failure in matching@."
+          Pretty.print_term t1 Pretty.print_term t2
+        else ()); None
+      | Reduction_engine.NoMatch None -> None in
         (match fom with
         | None -> t_map (fun t -> replace lv f1 f2 t) t
         | Some (_ty, subst) ->
