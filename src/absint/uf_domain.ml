@@ -318,22 +318,27 @@ module Make(S:sig
       uf_man.var_to_term <- TermToVar.add uf_man.var_to_term t v;
       v
   
-  let extract_term (man, uf_man) (a, b) v =
+  let extract_term (man, uf_man) is_in (a, b) v =
     let find_var = fun a ->
       if a = uf_man.apron_var then
         uf_man.quant_var
       else
         try
-          Hashtbl.find uf_man.variable_mapping a
+          let candidate = Hashtbl.find uf_man.variable_mapping a in
+          if is_in candidate then
+            raise Not_found
+          else
+            candidate
         with 
         | Not_found ->
           try
-            let t = TermToVar.to_term b.uf_to_var a in
-            t
+            let t = TermToVar.to_terms b.uf_to_var a in
+            assert (Mterm.cardinal t >= 1);
+            Mterm.filter (fun i _ -> not (is_in i)) t |> Mterm.choose |> fst
 
           with
           | Not_found ->
-            Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
+            assert false;
             raise Not_found
     in
     match D.get_linexpr man a v with
@@ -913,41 +918,25 @@ module Make(S:sig
       c) do
         let all_values = !all_values in
         let all_values =
-          List.filter (fun a -> not (t_equal t a)) all_values |> fun l -> List.append l [t] in
+          List.filter (fun a -> not (t_equal t a) && is_in t a) all_values |> fun l -> List.append l [t] in
+        let int_values, other_values = List.partition (fun t -> Ty.ty_equal (t_type t) Ty.ty_int) all_values in
 
+        let tcl = get_class_for_term uf_man t in
+        let alternatives =
+          Union_find.get_class tcl b.classes
+          |> List.map (TermToClass.to_term uf_man.class_to_term)
+          |> List.filter (fun k -> not (is_in t k))
+          |> List.sort (fun i j -> compare (tdepth i) (tdepth j))
+          |> function
+          | [] -> None
+          | t::_ -> Some t
+        in
         d := List.fold_left (fun (a, b) v ->
-            if is_in t v then
-              begin
                 let cl = get_class_for_term uf_man v in
                 let b =
-                  let tcl = get_class_for_term uf_man t in
-                  let alternatives =
-                    if not (Ty.ty_equal (t_type t) Ty.ty_int) then
-                      Union_find.get_class tcl b.classes
-                      |> List.map (TermToClass.to_term uf_man.class_to_term)
-                      |> List.filter (fun k -> not (is_in t k))
-                      |> List.sort (fun i j -> compare (tdepth i) (tdepth j))
-                    else
-                      try
-                        let myv =
-                          try
-                            TermToVar.to_t b.uf_to_var t
-                          with
-                          | Not_found -> Mterm.find t uf_man.apron_mapping
-                        in
-                        match extract_term (man, uf_man) (a, b) myv with
-                        | Some l -> [l]
-                        | None -> []
-                      with
-                      | Not_found ->
-                        p t;
-                        Format.eprintf "@.";
-                        assert false
-
-                  in
                   match alternatives with
-                  | [] -> b
-                  | alt::_ ->
+                  | None -> b
+                  | Some alt ->
                     let rec replaceby myt =
                       if t_equal myt t then
                         alt
@@ -958,11 +947,47 @@ module Make(S:sig
                     let altcl = get_class_for_term uf_man alt in
                     let b = { b with classes = Union_find.union altcl altcl b.classes } in
                     let b =
-                      if not (Ty.ty_equal (t_type v) Ty.ty_int) then
-                        { b with classes = Union_find.union altcl cl b.classes }
-                      else
-                        b
+                      { b with classes = Union_find.union altcl cl b.classes }
                     in
+                    b
+                in
+                let _, s = Union_find.forget cl b.classes in
+                let b = { b with classes = s } in
+                a, b
+          ) !d other_values;
+        if match int_values with
+          | [] -> false
+          | t'::[] when t_equal t t' -> false
+          | _ -> true
+        then
+          begin
+            let alternatives =
+              if not (Ty.ty_equal (t_type t) Ty.ty_int) then
+                alternatives
+              else
+                let myv =
+                  try
+                    TermToVar.to_t b.uf_to_var t
+                  with
+                  | Not_found -> Mterm.find t uf_man.apron_mapping
+                in
+                extract_term (man, uf_man) (is_in t) (a, b) myv
+            in
+            d := List.fold_left (fun (a, b) v ->
+                let cl = get_class_for_term uf_man v in
+                let b =
+                  match alternatives with
+                  | None -> b
+                  | Some alt ->
+                    let rec replaceby myt =
+                      if t_equal myt t then
+                        alt
+                      else
+                        t_map replaceby myt
+                    in
+                    let alt = replaceby v in
+                    let altcl = get_class_for_term uf_man alt in
+                    let b = { b with classes = Union_find.union altcl altcl b.classes } in
                     let uf_to_var = 
                       try
                         let myv = TermToVar.to_t b.uf_to_var v in
@@ -993,14 +1018,12 @@ module Make(S:sig
                     a, b
                   with
                   | Not_found ->
-                      D.forget_array man a [|myv|] false, b
+                    D.forget_array man a [|myv|] false, b
                 with
                 | Not_found ->
                   a, b
-              end
-            else
-              a, b
-          ) !d all_values
+              ) !d int_values
+          end;
       done;
       !d
     in

@@ -16,6 +16,9 @@ module Make(S:sig type t end) = struct
   let to_term oto t =
     TMap.find t oto.to_term |> Term.Mterm.choose |> fst
 
+  let to_terms oto t =
+    TMap.find t oto.to_term
+
   let to_t oto te =
     Term.Mterm.find te oto.to_t
 

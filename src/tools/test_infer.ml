@@ -247,6 +247,7 @@ let () =
         "tests_ai/auto_ref2.mlw";
         "tests_ai/auto_ref3.mlw";
         "tests_ai/uf1.mlw";
+        "tests_ai/mccarthy.mlw";
         "tests_ai/auto_array1.mlw";
       ];
     List.iter (do_input true)

@@ -148,6 +148,9 @@ let test6 =
   
   let d2 = Dom.top man env in
   let d2 = lineq d2 [1, "x"] 0 Lincons1.EQ in
+  let d4 = Dom.top man env in
+  let d4 = lineq d4 [1, "x"] 0 Lincons1.EQ in
+  Format.printf "%d %d@." ((List.hd d2) |> Base.hash man) ((List.hd d4) |> Base.hash man);
   let d = Dom.join man d d2 in
   let d1 = Dom.join man d1 d2 in
 
