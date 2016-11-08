@@ -5,10 +5,13 @@ open Task
 (** Pre-processing of tasks, to build unique names for all declared
     identifiers of a task.*)
 
+type id_decl = (Decl.decl list) Ident.Mid.t
+
 type name_tables = {
     namespace : Theory.namespace;
     known_map : Decl.known_map;
     printer : ident_printer;
+    id_decl : id_decl;
   }
 
 val build_name_tables : Task.task -> name_tables

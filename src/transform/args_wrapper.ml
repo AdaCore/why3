@@ -25,10 +25,15 @@ let sanitizer x = x (*sanitizer char_to_lalpha char_to_lalpha x*)
 let id_unique printer id =
   id_unique_label printer ~sanitizer:sanitizer id
 
+
+type id_decl = (Decl.decl list) Ident.Mid.t
+
 type name_tables = {
     namespace : namespace;
     known_map : known_map;
     printer : ident_printer;
+(* Associate an id to a list of declarations in which it is used *)
+    id_decl : id_decl;
   }
 
 (* Use symb to encapsulate ids into correct categories of symbols *)
@@ -81,6 +86,50 @@ let ind_decl_add il tables =
     il
     tables
 
+let rec insert l d =
+  match l with
+  | hd :: tl -> if hd == d then l else hd :: insert tl d
+  | [] -> [d]
+
+let add_decls_id id d tables =
+  let l = try (Ident.Mid.find id tables.id_decl) with
+  | Not_found -> [] in
+  {tables with id_decl = Ident.Mid.add id (insert l d) tables.id_decl}
+
+(* [add_id tables d t] To all identifiants id used in t, adds the associated
+   declaration d in the table.id_decl *)
+let rec add_id tables d t =
+  match t.t_node with
+  | Tvar v -> add_decls_id v.vs_name d tables
+  | Tconst _ | Ttrue | Tfalse -> tables
+  | Tapp (l, tl) ->
+      let tables = add_decls_id l.ls_name d tables in
+      List.fold_left (fun tables t -> add_id tables d t) tables tl
+  | Tlet (t, tb) ->
+      let tables = add_id tables d t in
+      let (_v1, t1) = t_open_bound tb in
+      add_id tables d t1
+  | Tcase (t, tbl) ->
+      let tables = add_id tables d t in
+      List.fold_left (fun tables ob ->
+        let (_pat, t) = t_open_branch ob in
+        add_id tables d t) tables tbl
+  | Teps (tb) ->
+      let (_v, t) = t_open_bound tb in
+      add_id tables d t
+  | Tquant (_, tq) ->
+      let (_vl, _, t) = t_open_quant tq in
+      add_id tables d t
+  | Tbinop (_, t1, t2) ->
+      let tables = add_id tables d t1 in
+      add_id tables d t2
+  | Tnot (t) ->
+      add_id tables d t
+  | Tif (t1, t2, t3) ->
+      let tables = add_id tables d t1 in
+      let tables = add_id tables d t2 in
+      add_id tables d t3
+
 (* [add d printer tables] Adds all new declaration of symbol inside d to tables.
   It uses printer to give them a unique name and also register these new names in printer *)
 let add (d: decl) (tables: name_tables): name_tables =
@@ -125,20 +174,23 @@ let add (d: decl) (tables: name_tables): name_tables =
           ind_decl_add tables ind)
         tables
         il
-  | Dprop (_, pr, _) ->
+  | Dprop (_, pr, t) ->
       (* Only pr is new in Dprop (see create_prop_decl) *)
       let id = pr.pr_name in
       let s = id_unique tables.printer id in
-      add_unsafe s (Pr pr) tables
+      let tables = add_unsafe s (Pr pr) tables in
+      add_id tables d t
 
 
 let build_name_tables task : name_tables =
   let pr = fresh_printer () in
   let km = Task.task_known task in
+  let empty_decls = Ident.Mid.empty in
   let tables = {
       namespace = empty_ns;
       known_map = km;
       printer = pr;
+      id_decl = empty_decls
   } in
 (*  We want conflicting names to be named as follows:
     names closer to the goal should be named with lowest

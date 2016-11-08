@@ -654,6 +654,29 @@ let test_print_id fmt args =
   | [s] -> print_id s task fmt
   | _ -> Format.fprintf fmt "Wrong number of arguments"
 
+
+let search s fmt task =
+  let tables = Args_wrapper.build_name_tables task in
+  let id_decl = tables.Args_wrapper.id_decl in
+  let id = try Some (find_any_id tables.Args_wrapper.namespace s) with
+  | Not_found -> Format.fprintf fmt "Does not exists @."; None in
+  if id = None then () else
+  let id = Opt.get id in
+  let l =
+    try Some (Ident.Mid.find id id_decl) with
+    | Not_found -> None in
+  if l = None then () else
+  Format.fprintf fmt "%a @."
+    (Pp.print_list (fun fmt _ -> Format.fprintf fmt "\n")
+       (Why3printer.print_decl tables)) (Opt.get l)
+
+let test_search_id fmt args =
+  let id = nearest_goal () in
+  let task = get_task cont.controller_session id in
+  match args with
+  | [s] -> search s fmt task
+  | _ -> Format.fprintf fmt "Wrong number of arguments"
+
 (****)
 
 let commands =
@@ -669,6 +692,7 @@ let commands =
     "c", "<provername> [timelimit [memlimit]] run a prover on the current goal", test_schedule_proof_attempt;
     "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
     "print", "<s> print the declaration where s was defined", test_print_id;
+    "search", "<s> print some declarations where s appear", test_search_id;
     "g", "prints the current goal", test_print_goal;
     "r", "reload the session (test only)", test_reload;
     "rp", "replay", test_replay;
