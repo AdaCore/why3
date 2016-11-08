@@ -25,6 +25,8 @@ module type DOMAIN = sig
   val to_lincons_array: man -> t -> Lincons1.earray
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
   val get_linexpr: man -> t -> Var.t -> ((Coeff.t * Var.t) list * Coeff.t) option
+  val hash: man -> t -> int
+  val is_eq: man -> t -> t -> bool
 end
 
 module type TERM_DOMAIN = sig

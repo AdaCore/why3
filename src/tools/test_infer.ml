@@ -135,7 +135,7 @@ let do_input way f =
                         let env = env
                         let pmod = m
                         let widening = 4
-                        module D = Disjunctive_domain.Make(Domain.Polyhedra)
+                        module D = Disjunctive_domain_fast.Make(Domain.Polyhedra)
                       end) in
                     let cfg = Abstract_interpreter.start_cfg rsym in
                     let context = Abstract_interpreter.empty_context () in

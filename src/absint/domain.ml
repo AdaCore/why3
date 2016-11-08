@@ -25,6 +25,8 @@ module type DOMAIN = sig
   val to_lincons_array: man -> t -> Lincons1.earray
   val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
   val get_linexpr: man -> t -> Var.t -> ((Coeff.t * Var.t) list * Coeff.t) option
+  val hash: man -> t -> int
+  val is_eq: man -> t -> t -> bool
 end
 
 module type TERM_DOMAIN = sig
@@ -65,6 +67,8 @@ module Make_from_apron(M:sig
   let meet_lincons_array = A.meet_lincons_array
   let forget_array = A.forget_array
   let assign_linexpr = A.assign_linexpr
+  let hash = A.hash
+  let is_eq = A.is_eq
                          
   exception Cannot_be_expressed
 

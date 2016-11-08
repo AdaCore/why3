@@ -7,6 +7,9 @@ module Make(A:DOMAIN) = struct
 
   let create_manager = A.create_manager
 
+  let hash _ _ = assert false
+  let is_eq _ _ _ = assert false
+  
   let bottom m e = []
 
   let top m e = [A.top m e]

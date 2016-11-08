@@ -6,6 +6,9 @@ module Make(A:DOMAIN) = struct
     | LTree of (path list) * label
     | LNone
 
+  let hash _ _ = assert false
+  let is_eq _ _ _ = assert false
+
   let rec print_path = function
     | LNone -> Format.eprintf "none"
     | LTree(p, i) -> Format.eprintf " %d -> (" i;
