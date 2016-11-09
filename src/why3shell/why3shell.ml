@@ -178,9 +178,9 @@ let cont_init () =
   (* create the controller *)
   let c = Controller_itp.create_controller env ses in
   (* update the session *)
-  C.reload_files c env ~use_shapes;
+  Controller_itp.reload_files c env ~use_shapes;
   (* add files to controller *)
-  Queue.iter (fun fname -> C.add_file c fname) files;
+  Queue.iter (fun fname -> Controller_itp.add_file c fname) files;
   (* load provers drivers *)
   Whyconf.Mprover.iter
     (fun _ p ->
@@ -538,7 +538,7 @@ let test_save_session _fmt _args =
 let test_reload fmt _args =
   fprintf fmt "Reloading... @?";
   (* use_shapes is true since session is in memory *)
-  C.reload_files cont env ~use_shapes:true;
+  Controller_itp.reload_files cont env ~use_shapes:true;
   zipper_init ();
   fprintf fmt "done @."
 

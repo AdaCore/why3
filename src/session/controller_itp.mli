@@ -90,46 +90,6 @@ val th_proved: controller -> Session_itp.theory -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
-module Make(S : Scheduler) : sig
-
-val schedule_proof_attempt :
-  controller ->
-  proofNodeID ->
-  Whyconf.prover ->
-  limit:Call_provers.resource_limit ->
-  callback:(proof_attempt_status -> unit) -> unit
-(** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
-   proof attempt for a goal specified by [id] with the prover [p] with
-   time limit [timelimit]; the function [callback] will be called each
-   time the proof attempt status changes. Typically at Scheduled, then
-   Running, then Done. If there is already a proof attempt with [p] it
-   is updated. *)
-
-val schedule_transformation :
-  controller ->
-  proofNodeID ->
-  string ->
-  string list ->
-  callback:(transformation_status -> unit) -> unit
-(** [schedule_transformation c id cb] schedules a transformation for a
-   goal specified by [id]; the function [cb] will be called each time
-   the transformation status changes. Typically at Scheduled, then
-   Done tid.*)
-
-
-val run_strategy_on_goal :
-  controller ->
-  proofNodeID ->
-  Strategy.t ->
-  callback:(strategy_status -> unit) -> unit
-(** [run_strategy_on_goal c id strat] executes asynchronously the
-    strategy [strat] on the goal [id].  TODO: add callback to get
-    inform of the progress *)
-
-val add_file : controller -> ?format:Env.fformat -> string -> unit
-(** [add_fil cont ?fmt fname] parses the source file
-    [fname] and add the resulting theories to the session of [cont] *)
-
 val reload_files : controller -> Env.env -> use_shapes:bool -> unit
 (** reload the files of the given session:
 
@@ -178,6 +138,46 @@ val reload_files : controller -> Env.env -> use_shapes:bool -> unit
     that function, as the presence of unmatch old theories or goals
 
 *)
+
+val add_file : controller -> ?format:Env.fformat -> string -> unit
+(** [add_fil cont ?fmt fname] parses the source file
+    [fname] and add the resulting theories to the session of [cont] *)
+
+module Make(S : Scheduler) : sig
+
+val schedule_proof_attempt :
+  controller ->
+  proofNodeID ->
+  Whyconf.prover ->
+  limit:Call_provers.resource_limit ->
+  callback:(proof_attempt_status -> unit) -> unit
+(** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
+   proof attempt for a goal specified by [id] with the prover [p] with
+   time limit [timelimit]; the function [callback] will be called each
+   time the proof attempt status changes. Typically at Scheduled, then
+   Running, then Done. If there is already a proof attempt with [p] it
+   is updated. *)
+
+val schedule_transformation :
+  controller ->
+  proofNodeID ->
+  string ->
+  string list ->
+  callback:(transformation_status -> unit) -> unit
+(** [schedule_transformation c id cb] schedules a transformation for a
+   goal specified by [id]; the function [cb] will be called each time
+   the transformation status changes. Typically at Scheduled, then
+   Done tid.*)
+
+
+val run_strategy_on_goal :
+  controller ->
+  proofNodeID ->
+  Strategy.t ->
+  callback:(strategy_status -> unit) -> unit
+(** [run_strategy_on_goal c id strat] executes asynchronously the
+    strategy [strat] on the goal [id].  TODO: add callback to get
+    inform of the progress *)
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
