@@ -526,38 +526,10 @@ let test_transform_and_display fmt args =
     | _ -> printf "Error: Give the name of the transformation@."
 
 
-(***************** strategy *****************)
-
-let loaded_strategies = ref []
-
-let strategies () =
-  match !loaded_strategies with
-    | [] ->
-      let strategies = Whyconf.get_strategies config in
-      let strategies =
-        Stdlib.Mstr.fold_left
-          (fun acc _ st ->
-            let name = st.Whyconf.strategy_name in
-            try
-              let code = st.Whyconf.strategy_code in
-              let code = Strategy_parser.parse2 env config code in
-              let shortcut = st.Whyconf.strategy_shortcut in
-              Format.eprintf "[Why3shell] Strategy '%s' loaded.@." name;
-              (name, shortcut, st.Whyconf.strategy_desc, code) :: acc
-            with Strategy_parser.SyntaxError msg ->
-              Format.eprintf
-                "[Why3shell warning] Loading strategy '%s' failed: %s@." name msg;
-              acc)
-          []
-          strategies
-      in
-      let strategies = List.rev strategies in
-      loaded_strategies := strategies;
-      strategies
-    | l -> l
-
 let list_strategies _fmt _args =
-  let l = strategies () in
+  let l = Session_user_interface.strategies
+            cont.Controller_itp.controller_env config
+  in
   let pp_strat fmt (n,s,desc,_) = fprintf fmt "%s (%s): %s" s n desc in
   printf "@[<hov 2>== Known strategies ==@\n%a@]@."
           (Pp.print_list Pp.newline pp_strat) l
@@ -565,7 +537,9 @@ let list_strategies _fmt _args =
 let run_strategy _fmt args =
   match args with
   | [s] ->
-     let l = strategies () in
+     let l = Session_user_interface.strategies
+            cont.Controller_itp.controller_env config
+     in
      let st = List.filter (fun (_,c,_,_) -> c=s) l in
      begin
        match st with
