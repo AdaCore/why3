@@ -136,11 +136,6 @@ module Make(S:sig
     | [] -> assert false
     | t::q -> List.fold_left (join man) t q
 
-  let widening (man, uf_man) (a, b) (c, d) =
-    let a = A.widening man a c in
-    let a, e = join_uf (man, uf_man) a b d in
-    a, e
-
   let push_label (man, uf_man) env i (a, b) =
     A.push_label man uf_man.env i a, b
   
@@ -338,7 +333,7 @@ module Make(S:sig
 
           with
           | Not_found ->
-            assert false;
+            let () = assert false in
             raise Not_found
     in
     match D.get_linexpr man a v with
@@ -1085,4 +1080,10 @@ module Make(S:sig
 
   let update_possible_substitutions (man, uf_man) =
     ()
+  
+  let widening (man, uf_man) (a, b) (c, d) =
+    let a = A.widening man a c in
+    let a, e = join_uf (man, uf_man) a b d in
+    a, e
+
 end
