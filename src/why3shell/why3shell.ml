@@ -154,49 +154,11 @@ let return_prover fmt name =
 
 (* -- init controller -- *)
 
+let cont =
+  Session_user_interface.cont_from_files spec usage_str env files provers
+
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
-let cont_init () =
-  (* create controller *)
-  if Queue.is_empty files then Why3.Whyconf.Args.exit_with_usage spec usage_str;
-  let fname = Queue.peek files in
-  (* extract project directory, and create it if needed *)
-  let dir =
-    if Filename.check_suffix fname ".why" ||
-       Filename.check_suffix fname ".mlw"
-    then begin
-      let dir = Filename.chop_extension fname in
-      if not (Sys.file_exists dir) then
-        Unix.mkdir dir 0o777;
-      dir
-    end
-    else Filename.dirname fname
-  in
-  (* we load the session *)
-  let ses,use_shapes = Session_itp.load_session dir in
-  eprintf "using shapes: %a@." pp_print_bool use_shapes;
-  (* create the controller *)
-  let c = Controller_itp.create_controller env ses in
-  (* update the session *)
-  Controller_itp.reload_files c env ~use_shapes;
-  (* add files to controller *)
-  Queue.iter (fun fname -> Controller_itp.add_file c fname) files;
-  (* load provers drivers *)
-  Whyconf.Mprover.iter
-    (fun _ p ->
-       try
-         let d = Driver.load_driver env p.Whyconf.driver [] in
-         Whyconf.Hprover.add c.Controller_itp.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         let p = p.Whyconf.prover in
-         eprintf "Failed to load driver for %s %s: %a@."
-           p.Whyconf.prover_name p.Whyconf.prover_version
-           Exn_printer.exn_printer e)
-    provers;
-  (* return the controller *)
-  c
-
-let cont = cont_init ()
 
 (* --  -- *)
 

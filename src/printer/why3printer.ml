@@ -430,7 +430,7 @@ let print_sequent _args ?old:_ fmt =
            let tables = build_name_tables task in
            let ut = Task.used_symbols (Task.used_theories task) in
            let ld = Task.local_decls task ut in
-           fprintf fmt "@[<v 0>%a \n=================================================@]"
+           fprintf fmt "@[<v 0>%a@]"
                    (Pp.print_list Pp.newline (print_decl tables)) ld)))
 
 

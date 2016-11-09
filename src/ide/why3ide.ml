@@ -40,11 +40,34 @@ let gconfig = try
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
+let provers : Whyconf.config_prover Whyconf.Mprover.t =
+  Whyconf.get_provers gconfig.config
+
+let cont =
+  Session_user_interface.cont_from_files spec usage_str gconfig.env files provers
+
 let () =
   Debug.dprintf debug "[GUI] Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
+
+
+(************)
+(* controller instance on the GTK scheduler *)
+
+
+module S = struct
+    let idle ~prio f =
+      let (_ : GMain.Idle.id) = GMain.Idle.add ~prio f in ()
+
+    let timeout ~ms f =
+      let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
+      ()
+end
+
+module C = Controller_itp.Make(S)
+
 
 (***************)
 (* Main window *)
@@ -122,8 +145,21 @@ let scrollview =
        gconfig.tree_width <- w)
   in sv
 
-(* temporary *)
-let _ = GMisc.label ~text:"scrollview" ~packing:scrollview#add ()
+(* view for the session tree *)
+let scrolled_session_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT
+    ~packing:scrollview#add
+    ()
+
+let session_view =
+  GText.view ~editable:false ~cursor_visible:false
+             ~packing:scrolled_session_view#add ()
+
+let display_session () =
+  let s = Pp.string_of Controller_itp.print_session cont in
+  session_view#buffer#set_text s
 
 let vbox222 = GPack.vbox ~packing:hp#add ()
 
@@ -146,16 +182,40 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-(* temporary *)
-let () =
-  task_view#source_buffer#set_text "this is the current proof task"
+(* TEMPORARY !!! *)
+let first_goal () =
+  Session_itp.get_task cont.Controller_itp.controller_session (Obj.magic 0)
 
-let command_entry =
-  let e = GEdit.entry ~packing:vbox222#add () in
-  let (_ : GtkSignal.id) =
-    e#connect#activate ~callback:
-      (fun () -> task_view#source_buffer#set_text e#text)
-  in e
+let command_entry = GEdit.entry ~packing:vbox222#add ()
+let message_zone =
+  GText.view ~editable:false ~cursor_visible:false
+             ~packing:vbox222#add ()
+
+let clear_command_entry () = command_entry#set_text ""
+
+let task_driver =
+  let main = Whyconf.get_main gconfig.config in
+  let d = Filename.concat (Whyconf.datadir main)
+                          (Filename.concat "drivers" "why3_itp.drv")
+  in
+  Driver.load_driver cont.Controller_itp.controller_env d []
+
+
+let interp cmd =
+  match cmd with
+    | "p" -> display_session (); clear_command_entry ()
+    | "g" -> clear_command_entry ();
+             let task = first_goal () in
+             let s = Pp.string_of
+                       (Driver.print_task ~cntexample:false task_driver)
+                       task
+             in task_view#source_buffer#set_text s
+
+    | _ -> message_zone#buffer#set_text ("unknown command '"^cmd^"'")
+
+let (_ : GtkSignal.id) =
+  command_entry#connect#activate
+    ~callback:(fun () -> interp command_entry#text)
 
 
 (* start the interface *)
