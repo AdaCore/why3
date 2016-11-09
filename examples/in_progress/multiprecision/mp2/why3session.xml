@@ -10,7 +10,7 @@
 <prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mp2.mlw" expanded="true">
-<theory name="N" sum="0fd57e69a4e5a85538b534b92177aa8f" expanded="true">
+<theory name="N" sum="c3d7d1839f13fa82e0c3d4dacce89969" expanded="true">
  <goal name="limb_max_bound">
  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
  </goal>
@@ -277,47 +277,65 @@
   <goal name="VC compare_same_size.21" expl="21. integer overflow">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC compare_same_size.22" expl="22. postcondition">
+  <goal name="VC compare_same_size.22" expl="22. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.10" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.23" expl="23. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.03" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.24" expl="24. loop variant decrease">
+  <proof prover="3"><result status="valid" time="0.10" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.25" expl="25. postcondition">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC compare_same_size.23" expl="23. assertion">
+  <goal name="VC compare_same_size.26" expl="26. assertion">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC compare_same_size.24" expl="24. precondition">
+  <goal name="VC compare_same_size.27" expl="27. precondition">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC compare_same_size.25" expl="25. assertion">
+  <goal name="VC compare_same_size.28" expl="28. assertion">
   <proof prover="3"><result status="valid" time="0.26" steps="117"/></proof>
   </goal>
-  <goal name="VC compare_same_size.26" expl="26. assertion">
+  <goal name="VC compare_same_size.29" expl="29. assertion">
   <transf name="split_goal_wp">
-   <goal name="VC compare_same_size.26.1" expl="1. VC for compare_same_size">
+   <goal name="VC compare_same_size.29.1" expl="1. VC for compare_same_size">
    <proof prover="1"><result status="valid" time="1.08"/></proof>
    </goal>
-   <goal name="VC compare_same_size.26.2" expl="2. VC for compare_same_size">
+   <goal name="VC compare_same_size.29.2" expl="2. VC for compare_same_size">
    <proof prover="4"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC compare_same_size.27" expl="27. integer overflow">
+  <goal name="VC compare_same_size.30" expl="30. integer overflow">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC compare_same_size.28" expl="28. postcondition">
+  <goal name="VC compare_same_size.31" expl="31. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.10" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.32" expl="32. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.03" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.33" expl="33. loop variant decrease">
+  <proof prover="3"><result status="valid" time="0.10" steps="70"/></proof>
+  </goal>
+  <goal name="VC compare_same_size.34" expl="34. postcondition">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC compare_same_size.29" expl="29. loop invariant preservation">
+  <goal name="VC compare_same_size.35" expl="35. loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC compare_same_size.30" expl="30. loop invariant preservation">
+  <goal name="VC compare_same_size.36" expl="36. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.04" steps="100"/></proof>
   </goal>
-  <goal name="VC compare_same_size.31" expl="31. loop variant decrease">
+  <goal name="VC compare_same_size.37" expl="37. loop variant decrease">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC compare_same_size.32" expl="32. precondition">
+  <goal name="VC compare_same_size.38" expl="38. precondition">
   <proof prover="3"><result status="valid" time="0.05" steps="90"/></proof>
   </goal>
-  <goal name="VC compare_same_size.33" expl="33. postcondition">
+  <goal name="VC compare_same_size.39" expl="39. postcondition">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
@@ -358,31 +376,40 @@
   <goal name="VC is_zero.11" expl="11. integer overflow">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC is_zero.12" expl="12. postcondition">
+  <goal name="VC is_zero.12" expl="12. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.03" steps="70"/></proof>
+  </goal>
+  <goal name="VC is_zero.13" expl="13. loop invariant preservation">
+  <proof prover="3"><result status="valid" time="0.03" steps="70"/></proof>
+  </goal>
+  <goal name="VC is_zero.14" expl="14. loop variant decrease">
+  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
+  </goal>
+  <goal name="VC is_zero.15" expl="15. postcondition">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC is_zero.13" expl="13. postcondition">
-  <proof prover="3"><result status="valid" time="0.21" steps="150"/></proof>
+  <goal name="VC is_zero.16" expl="16. postcondition">
+  <proof prover="3"><result status="valid" time="0.21" steps="157"/></proof>
   </goal>
-  <goal name="VC is_zero.14" expl="14. assertion">
+  <goal name="VC is_zero.17" expl="17. assertion">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC is_zero.15" expl="15. loop invariant preservation">
+  <goal name="VC is_zero.18" expl="18. loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC is_zero.16" expl="16. loop invariant preservation">
+  <goal name="VC is_zero.19" expl="19. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.06" steps="103"/></proof>
   </goal>
-  <goal name="VC is_zero.17" expl="17. loop variant decrease">
+  <goal name="VC is_zero.20" expl="20. loop variant decrease">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC is_zero.18" expl="18. integer overflow">
+  <goal name="VC is_zero.21" expl="21. integer overflow">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC is_zero.19" expl="19. postcondition">
+  <goal name="VC is_zero.22" expl="22. postcondition">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC is_zero.20" expl="20. postcondition">
+  <goal name="VC is_zero.23" expl="23. postcondition">
   <proof prover="3"><result status="valid" time="0.04" steps="85"/></proof>
   </goal>
  </transf>
@@ -1692,10 +1719,10 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.8" expl="8. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="VC mul_limbs.9" expl="9. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -2274,10 +2301,10 @@
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.8" expl="8. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul.9" expl="9. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -2862,7 +2889,6 @@
   <goal name="VC lshift.30" expl="30. loop invariant preservation">
   <transf name="inline_all">
    <goal name="VC lshift.30.1" expl="1. loop invariant preservation">
-   <proof prover="0" timelimit="10" obsolete="true"><result status="timeout" time="9.50"/></proof>
    <proof prover="6"><result status="valid" time="1.85"/></proof>
    </goal>
   </transf>
@@ -3999,7 +4025,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Main" sum="1b5018d2448537aeb1d3eb3e920619ba">
+<theory name="Main" sum="e3434722a0f609aed57855977bbc7d27">
  <goal name="VC from_limb" expl="VC for from_limb">
  <transf name="split_goal_wp">
   <goal name="VC from_limb.1" expl="1. integer overflow">
@@ -4015,15 +4041,28 @@
   <proof prover="3"><result status="valid" time="0.14" steps="123"/></proof>
   </goal>
   <goal name="VC from_limb.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="79"/></proof>
   </goal>
   <goal name="VC from_limb.6" expl="6. postcondition">
+  <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
+  </goal>
+  <goal name="VC from_limb.7" expl="7. postcondition">
+  <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
+  </goal>
+  <goal name="VC from_limb.8" expl="8. postcondition">
   <proof prover="3"><result status="valid" time="0.03" steps="75"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC main" expl="VC for main">
- <proof prover="3"><result status="valid" time="0.03" steps="72"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="VC main.1" expl="1. integer overflow">
+  <proof prover="3"><result status="valid" time="0.02" steps="72"/></proof>
+  </goal>
+  <goal name="VC main.2" expl="2. precondition">
+  <proof prover="3"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

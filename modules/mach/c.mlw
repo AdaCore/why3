@@ -109,5 +109,25 @@ module C
                   !(result.data)[i] = !((old p).data)[i] }
     ensures { plength result <> Int32.to_int sz -> p = old p }
 
+  (** break/return*)
+
+  exception Break
+
+  val break () : unit
+    raises { Break }
+    returns { _ -> false }
+
+  exception Return32 int32
+
+  val return32 (x:int32) : unit
+    raises { Return32 n -> x = n }
+    returns { _ -> false }
+
+  (** Printing *)
+
+  val print_space () : unit
+  val print_newline () : unit
+
+  val print_uint32 (n:uint32):unit
 
 end

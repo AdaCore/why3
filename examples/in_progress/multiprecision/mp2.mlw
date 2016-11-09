@@ -199,8 +199,6 @@ module N
     ensures { c * a < c * b }
   = ()
 
-  exception Break32 int32
-
   use import ref.Refint
 
   function compare_int (x y:int) : int =
@@ -275,13 +273,13 @@ module N
                      };
             res := Int32.of_int (-1)
             end;
-         raise Break32 !res
+         return32 !res;
          end
        else ()
      done;
      value_sub_frame_shift (pelts x) (pelts y) x.offset y.offset (p2i sz);
      zero
-   with Break32 r -> r
+   with Return32 r -> r
    end
 
    (* [is_zero] checks if [x[0..sz-1]] is zero. It corresponds to [mpn_zero_p]. *)
@@ -307,14 +305,14 @@ module N
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
            value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
-           raise Break32 (Int32.of_int 0)
+           return32 (Int32.of_int 0);
          end
          else begin
            assert { 1+2=3 };
          end
        done;
        Int32.of_int 1
-     with Break32 r -> r
+     with Return32 r -> r
      end
 
   (** [zero r sz] sets [(r,sz)] to zero. Corresponds to [mpn_zero]. *)
@@ -334,8 +332,6 @@ module N
     done
 
   (** {2 Addition} *)
-
-  exception Break
 
   (** [add_limb r x y sz] adds to [x] the value of the limb [y],
       writes the result in [r] and returns the carry. [r] and [x]
@@ -2112,24 +2108,71 @@ module N
     assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
 
-
 end
 
 module Main
 
   use import mach.c.C
   use import N
+  use import mach.int.Int32
+  use import int.Int
+  use import ref.Ref
+
+  let print (p:t) (m n:int32) : unit
+    requires { 0 <= p.offset + p2i m
+               <= p.offset + p2i n
+               <= plength p }
+  =
+    let i = ref m in
+    let q = ref (incr p m) in
+    let one = Int32.of_int 1 in
+    while (Int32.(<) !i n) do
+      invariant { p2i m <= p2i !i <= p2i n }
+      invariant { (!q).offset = p.offset + p2i !i }
+      invariant { plength !q = plength p }
+      variant { p2i n - p2i !i }
+      print_uint32 (get !q);
+      print_space ();
+      q := C.incr !q one;
+      i := Int32.(+) !i one;
+    done;
+    print_newline ()
 
   let from_limb (l:limb) : t
     ensures { is_null result \/ plength result = 1 }
     ensures { is_null result \/ value_sub_shift result 1 = l2i l }
+    ensures { result.offset = 0 }
   =
     let p = malloc (UInt32.of_int 1) in
     if not (is_null p)
     then C.set p l;
     p
 
-  let main () = from_limb (Limb.of_int 42)
+  let two_limbs (l1 l2: limb) : t
+    ensures { is_null result \/ plength result = 2 }
+    ensures { is_null result \/ value_sub_shift result 2 = l2i l1 + radix * l2i l2 }
+    ensures { result.offset = 0 }
+  =
+    let p = malloc (UInt32.of_int 2) in
+    if not (is_null p)
+    then begin
+      C.set p l1;
+      C.set (incr p (Int32.of_int 1)) l2
+      end;
+    p
+
+  let main () =
+    let p = from_limb (Limb.of_int 42) in
+    if not (is_null p)
+       then begin
+       print_uint32 (get p);
+       print_newline ();
+       end;
+    free p;
+    let q = two_limbs (Limb.of_int 42) (Limb.of_int 28) in
+    if not (is_null q)
+       then print q (Int32.of_int 0) (Int32.of_int 2);
+    free q;
 
 end
 

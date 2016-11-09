@@ -1,9 +1,13 @@
-
 printer "c"
 
 module ref.Ref
 
   syntax type ref "%1"
+  syntax val ref "%1"
+  syntax converter ref "%1"
+  syntax val (!_) "%1"
+  syntax converter (!_) "%1"
+  syntax val (:=) "%1 = %2" 
 
 end
 
@@ -55,7 +59,10 @@ end
 
 module mach.c.C
 
-  syntax type ptr "(%1 *)"
+  prelude "#include <stdlib.h>"
+  prelude "#include <stdio.h>"
+
+  syntax type ptr "%1 *"
 
   syntax val malloc "malloc(%1 * sizeof(%v0))"  (* and not %t1 ? *)
   syntax val free   "free(%1)"
@@ -64,10 +71,19 @@ module mach.c.C
   syntax val is_null "%1 == NULL"
   syntax val null "NULL"
 
+  syntax val incr "%1+%2"
+
   syntax val get "*(%1)"
   syntax val set "*(%1) = %2"
 
   syntax val p2i "%1"
   syntax converter p2i "%1"
+
+  syntax val break "break"
+  syntax val return32 "return (%1)"
+
+  syntax val print_space "printf(\" \")"
+  syntax val print_newline "printf(\"\\n\")"
+  syntax val print_uint32 "printf(\"%#x\",%1)"
 
 end
