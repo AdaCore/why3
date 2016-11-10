@@ -232,8 +232,10 @@ module C = Controller_itp.Make(S)
 type index =
   | Inone
   | IproofNode of proofNodeID
+  | Itransformation  of transID
   | Ifile of file
   | Itheory of theory
+  | Iproofattempt of proof_attempt
 
 let model_index : index Hint.t = Stdlib.Hint.create 17
 
@@ -248,14 +250,32 @@ let new_node =
   goals_model#set ~row:iter ~column:index_column !cpt;
   goals_model#get_row_reference (goals_model#get_path iter)
 
-let build_subtree_from_goal ses th_row_reference id =
+let build_subtree_proof_attempt_from_goal ses row_ref id =
+  List.iter
+    (fun pa ->
+      let _ = new_node ~parent:row_ref pa.prover.Whyconf.prover_name (Iproofattempt pa) in ())
+    (get_proof_attempts ses id)
+
+let rec build_subtree_from_goal ses th_row_reference id =
   let name = get_proof_name ses id in
-  let _row_ref =
+  let row_ref =
     new_node ~parent:th_row_reference name.Ident.id_string
              (IproofNode id)
   in
-  (* TODO: continue to add transformations and subgoals as sub-trees *)
-  ()
+  List.iter
+    (fun trans_id ->
+      build_subtree_from_trans ses row_ref trans_id)
+    (get_transformations ses id);
+  build_subtree_proof_attempt_from_goal ses row_ref id
+
+and build_subtree_from_trans ses goal_row_reference trans_id =
+  let name = get_transf_name ses trans_id in
+  let row_ref =
+    new_node ~parent:goal_row_reference name (Itransformation trans_id) in
+  List.iter
+    (fun goal_id ->
+      (build_subtree_from_goal ses row_ref goal_id))
+    (get_sub_tasks ses trans_id)
 
 let build_tree_from_session ses =
   let files = get_files ses in
@@ -277,6 +297,11 @@ let build_tree_from_session ses =
 (*    actions     *)
 (******************)
 
+(* To each proofnodeid we have the corresponding gtk_tree_iter *)
+let pn_id_to_gtree = Hpn.create 17
+
+(* TODO We currently use this for transformations etc... With strategies, we sure
+   do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
 
 let run_strategy_on_task s =
@@ -299,6 +324,94 @@ let run_strategy_on_task s =
   | _ -> ()
 
 
+(* TODO maybe an other file for callbacks *)
+(* Callback of a transformation *)
+let callback_update_tree_transform ses gtk_tree_iter = fun status ->
+  match status with
+  | TSdone trans_id ->
+      let row_reference = goals_model#get_row_reference (goals_model#get_path gtk_tree_iter) in
+      build_subtree_from_trans ses row_reference trans_id
+  | _ -> ()
+
+let apply_transform ses =
+  match !current_selected_index with
+  | IproofNode id ->
+    let gtk_tree_index = Hpn.find pn_id_to_gtree id in (* TODO exception *)
+    let callback =
+         callback_update_tree_transform ses gtk_tree_index
+       in
+       C.schedule_transformation cont id "cut" ["0=0"] ~callback
+    | _ -> printf "Error: Give the name of the transformation@."
+
+
+let remove_children iter =
+  if (goals_model#iter_has_child iter) then
+    ignore (goals_model#remove (goals_model#iter_children (Some iter)))
+  else ()
+
+(*
+  match (goals_model#iter_children row_reference) with
+  | None -> ()
+  | iter -> goals_model#remove iter
+*)
+
+(* Callback of a proof_attempt *)
+let callback_update_tree_proof ses gtk_tree_iter id = fun pa_status ->
+  match pa_status with
+  | Done _pr ->
+      let row_reference = goals_model#get_row_reference (goals_model#get_path gtk_tree_iter) in
+      let _ = remove_children gtk_tree_iter in
+      build_subtree_proof_attempt_from_goal ses row_reference id
+  | _ -> () (* TODO *)
+
+(* TODO to be replaced *)
+(* Return the prover corresponding to given name. name is of the form
+  | name
+  | name, version
+  | name, altern
+  | name, version, altern *)
+let return_prover fmt name =
+  let fp = Whyconf.parse_filter_prover name in
+  (** all provers that have the name/version/altern name *)
+  let provers = Whyconf.filter_provers gconfig.config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    fprintf fmt "Prover corresponding to %s has not been found@." name;
+    None
+  end else
+    Some (snd (Whyconf.Mprover.choose provers))
+
+let test_schedule_proof_attempt ses =
+  match !current_selected_index with
+  | IproofNode id ->
+    let gtk_tree_index = Hpn.find pn_id_to_gtree id in
+    let callback = callback_update_tree_proof ses gtk_tree_index id in
+    (* TODO put this somewhere else *)
+    let name, limit = match ["Alt-Ergo"; "1"] with
+    (* TODO recover this
+      | [name] ->
+        let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
+                                          limit_mem = Whyconf.memlimit main;
+                                          limit_steps = 0} in
+        name, default_limit*)
+    | [name; timeout] -> name, Call_provers.{empty_limit with
+                                           limit_time = int_of_string timeout}
+    | [name; timeout; oom ] ->
+        name, Call_provers.{limit_time = int_of_string timeout;
+                            limit_mem = int_of_string oom;
+                            limit_steps = 0}
+  | _ -> printf "Bad arguments prover_name, version timeout memlimit@.";
+      "", Call_provers.empty_limit
+  in
+  let np = return_prover Format.std_formatter name in (* TODO std_formatter dummy argument *)
+  (match np with
+  | None -> ()
+  | Some p ->
+      C.schedule_proof_attempt
+        cont id p.Whyconf.prover
+        ~limit ~callback)
+  | _ -> () (* TODO *)
+(*    | _ -> printf "Give the prover name@."*)
+
 
 let clear_command_entry () = command_entry#set_text ""
 
@@ -307,6 +420,10 @@ let interp cmd =
   match cmd with
     | "s" -> clear_command_entry ();
              run_strategy_on_task "1"
+    | "t" -> clear_command_entry ();
+             apply_transform cont.controller_session
+    | "c" -> clear_command_entry ();
+             test_schedule_proof_attempt cont.controller_session
     | _ -> message_zone#buffer#set_text ("unknown command '"^cmd^"'")
 
 let (_ : GtkSignal.id) =
@@ -322,9 +439,13 @@ let get_selected_row_references () =
 let on_selected_row r =
   let index = goals_model#get ~row:r#iter ~column:index_column in
   try
-    let index = Hint.find model_index index in
-    current_selected_index := index;
-    match index with
+    let session_element = Hint.find model_index index in
+    let () = match session_element with
+             | IproofNode id -> Hpn.add pn_id_to_gtree id r#iter (* TODO maybe not the good place to fill
+                                                                    this table *)
+             | _ -> () in
+    current_selected_index := session_element;
+    match session_element with
     | IproofNode id ->
        let task = get_task cont.controller_session id in
        let s = Pp.string_of
