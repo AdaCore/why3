@@ -343,19 +343,21 @@ let run_timeout_handler () =
     end
 
 let schedule_proof_attempt_r c id pr ~limit ~callback =
-  graft_proof_attempt c.controller_session id pr ~timelimit:limit.Call_provers.limit_time;
-  Queue.add (c,id,pr,limit,callback) scheduled_proof_attempts;
-  callback Scheduled;
+  let panid =
+    graft_proof_attempt c.controller_session id pr ~timelimit:limit.Call_provers.limit_time
+  in
+  Queue.add (c,id,pr,limit,callback panid) scheduled_proof_attempts;
+  callback panid Scheduled;
   run_timeout_handler ()
 
 let schedule_proof_attempt c id pr ~limit ~callback =
-  let callback s = (match s with
+  let callback panid s = (match s with
   | Done pr -> update_proof_node c id (pr.Call_provers.pr_answer == Call_provers.Valid)
   | Interrupted | InternalFailure _ -> update_proof_node c id false
   | _ -> ());
-  callback s
+  callback panid s
   in
-  schedule_proof_attempt_r c id pr ~limit:limit ~callback:callback
+  schedule_proof_attempt_r c id pr ~limit:limit ~callback
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
@@ -401,7 +403,7 @@ let run_strategy_on_goal c id strat ~callback =
     else
       match Array.get strat pc with
       | Icall_prover(p,timelimit,memlimit) ->
-         let callback res =
+         let callback _panid res =
            match res with
            | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->

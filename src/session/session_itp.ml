@@ -8,6 +8,7 @@ let debug = Debug.register_info_flag "session_itp"
 
 type transID = int
 type proofNodeID = int
+type proofAttemptID = int
 
 let print_proofNodeID fmt id =
   Format.fprintf fmt "%d" id
@@ -45,7 +46,7 @@ type proof_node = {
   proofn_parent                  : proof_parent;
   proofn_checksum                : Termcode.checksum option;
   proofn_shape                   : Termcode.shape;
-  proofn_attempts                : proof_attempt_node Hprover.t;
+  proofn_attempts                : proofAttemptID Hprover.t;
   mutable proofn_transformations : transID list;
 }
 
@@ -81,8 +82,11 @@ end
 
 module Hpn = Exthtbl.Make(Proofnodeid)
 module Htn = Exthtbl.Make(Transid)
+module Hpan = Hint
 
 type session = {
+  proofAttempt_table            : proof_attempt_node Hint.t;
+  mutable next_proofAttemptID   : int;
   proofNode_table               : proof_node Hint.t;
   mutable next_proofNodeID      : int;
   trans_table                   : transformation_node Hint.t;
@@ -100,17 +104,12 @@ let init_Hpn (s : session) (h: 'a Hpn.t) (d: 'a) : unit =
 let init_Htn (s : session) (h: 'a Htn.t) (d: 'a) : unit =
   Hint.iter (fun k _pn -> Htn.replace h k d) s.trans_table
 
-let session_iter_proofNode f s =
-  Hint.iter
-    (fun id pn -> if id < s.next_proofNodeID then f pn)
-    s.proofNode_table
+let _session_iter_proofNode f s =
+  Hint.iter f s.proofNode_table
 
-let session_iter_proof_attempt f =
-  session_iter_proofNode
-    (fun pn ->
-       Hprover.iter
-         (fun _ pan -> f pan.proofa_parent pan.proofa_attempt)
-        pn.proofn_attempts)
+let session_iter_proof_attempt f s =
+  Hint.iter (fun _ pan -> f pan.proofa_parent pan.proofa_attempt)
+            s.proofAttempt_table
 
 (* This is not needed. Keeping it as information on the structure
 type tree = {
@@ -176,7 +175,17 @@ let gen_proofNodeID (s : session) =
   s.next_proofNodeID <- id + 1;
   id
 
+let gen_proofAttemptID (s : session) =
+  let id = s.next_proofAttemptID in
+  s.next_proofAttemptID <- id + 1;
+  id
+
 exception BadID
+
+let get_proofAttemptNode (s : session) (id : proofAttemptID) =
+  try
+    Hint.find s.proofAttempt_table id
+  with Not_found -> raise BadID
 
 let get_proofNode (s : session) (id : proofNodeID) =
   try
@@ -195,8 +204,14 @@ let get_transfNode (s : session) (id : transID) =
 let get_transformations (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_transformations
 
+let get_proof_attempt_ids (s : session) (id : proofNodeID) =
+  (get_proofNode s id).proofn_attempts
+
 let get_proof_attempts (s : session) (id : proofNodeID) =
-  Hprover.fold (fun _ a l -> a.proofa_attempt :: l) (get_proofNode s id).proofn_attempts []
+  Hprover.fold (fun _ a l ->
+                let pa = get_proofAttemptNode s a in
+                pa.proofa_attempt :: l)
+               (get_proofNode s id).proofn_attempts []
 
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
@@ -240,7 +255,10 @@ let theory_iter_proofn s f th =
 
 let theory_iter_proof_attempt s f th =
   theory_iter_proofn s
-    (fun pn -> Hprover.iter (fun _ pan -> f pan.proofa_attempt) pn.proofn_attempts) th
+    (fun pn -> Hprover.iter (fun _ pan ->
+                             let pan = get_proofAttemptNode s pan in
+                             f pan.proofa_attempt)
+                            pn.proofn_attempts) th
 
 open Format
 open Ident
@@ -262,7 +280,10 @@ let rec print_proof_node s (fmt: Format.formatter) p =
     pn.proofn_name.id_string parent
     (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
     (Pp.print_list Pp.semi print_proof_attempt)
-      (Hprover.fold (fun _key e l -> e.proofa_attempt :: l) pn.proofn_attempts [])
+      (Hprover.fold (fun _key e l ->
+                     let e = get_proofAttemptNode s e in
+                     e.proofa_attempt :: l)
+                    pn.proofn_attempts [])
     (Pp.print_list Pp.semi (print_trans_node s)) pn.proofn_transformations
 
 and print_trans_node s fmt id =
@@ -295,7 +316,9 @@ let empty_session ?shape_version dir =
     | Some v -> v
     | None -> Termcode.current_shape_version
   in
-  { proofNode_table = Hint.create 97;
+  { proofAttempt_table = Hint.create 97;
+    next_proofAttemptID = 0;
+    proofNode_table = Hint.create 97;
     next_proofNodeID = 0;
     trans_table = Hint.create 97;
     next_transID = 0;
@@ -312,7 +335,17 @@ let empty_session ?shape_version dir =
 let mk_proof_attempt session pid pa =
   let pn = get_proofNode session pid in
   let node = { proofa_parent = pid; proofa_attempt = pa } in
-  Hprover.replace pn.proofn_attempts pa.prover node
+  let id =
+    try Hprover.find pn.proofn_attempts pa.prover
+    with Not_found ->
+      let id = gen_proofAttemptID session in
+      Hprover.add pn.proofn_attempts pa.prover id;
+      id
+  in
+  Hint.replace session.proofAttempt_table id node;
+  id
+
+
 
 let add_proof_attempt session prover limit state obsolete edit parentID =
   let pa = { prover = prover;
@@ -361,14 +394,14 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
              proofn_transformations = [] } in
   Hint.add s.proofNode_table node_id pn
 
-let mk_proof_node_task (s : session) (t : Task.task)
+let _mk_proof_node_task (s : session) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   let name,_,_ = Termcode.goal_expl_task ~root:false t in
   mk_proof_node ~version:s.session_shape_version s name t parent node_id
 
 let mk_transf_proof_node (s : session) (parent_name : string) (tid : transID) (index : int) (t : Task.task) =
   let id = gen_proofNodeID s in
-  let gid,expl,_ = Termcode.goal_expl_task ~root:false t in
+  let gid,_expl,_ = Termcode.goal_expl_task ~root:false t in
 (*  let expl = match expl with
     | None -> string_of_int index ^ "."
     | Some e -> string_of_int index ^ ". " ^ e
@@ -408,6 +441,7 @@ let remove_transformation (s : session) (id : transID) =
 let update_proof_attempt s id pr st =
   let n = get_proofNode s id in
   let pa = Hprover.find n.proofn_attempts pr in
+  let pa = get_proofAttemptNode s pa in
   pa.proofa_attempt.proof_state <- Some st;
   pa.proofa_attempt.proof_obsolete <- false
 
@@ -571,7 +605,7 @@ and load_proof_or_transf session old_provers pid a =
                         Call_provers.limit_mem   = memlimit;
                         Call_provers.limit_steps = steplimit; }
           in
-          add_proof_attempt session p limit res obsolete edit pid
+          ignore(add_proof_attempt session p limit res obsolete edit pid)
         with Failure _ | Not_found ->
           Warning.emit "[Error] prover id not listed in header '%s'@." prover;
           raise (LoadError (a,"prover not listing in header"))
@@ -847,15 +881,17 @@ let found_missed_goals_in_theory = ref false
 let save_detached_goals old_s detached_goals_id s parent =
   let save_proof parent old_pa_n =
     let old_pa = old_pa_n.proofa_attempt in
-    add_proof_attempt s old_pa.prover old_pa.limit
+    ignore (add_proof_attempt s old_pa.prover old_pa.limit
       old_pa.proof_state true old_pa.proof_script
-      parent
+      parent)
   in
   let rec save_goal parent detached_goal_id id =
     let detached_goal = get_proofNode old_s detached_goal_id in
     mk_proof_node_no_task s detached_goal.proofn_name parent id None
       (Termcode.shape_of_string "");
-    Hprover.iter (fun _ -> save_proof id) detached_goal.proofn_attempts;
+    Hprover.iter (fun _ pa ->
+                  let pa = get_proofAttemptNode old_s pa in
+                  save_proof id pa) detached_goal.proofn_attempts;
     List.iter (save_trans id) detached_goal.proofn_transformations;
     let new_trans = (get_proofNode s id) in
     new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
@@ -888,9 +924,9 @@ let merge_proof new_s obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n.proofa_attempt in
   let obsolete = obsolete || old_pa.proof_obsolete in
   found_obsolete := obsolete || !found_obsolete;
-  add_proof_attempt new_s old_pa.prover old_pa.limit
+  ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
     old_pa.proof_state obsolete old_pa.proof_script
-    new_goal
+    new_goal)
 
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
@@ -907,7 +943,10 @@ let add_registered_transformation s env old_tr goal_id =
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
 let rec merge_goal ~use_shapes env new_s old_s obsolete old_goal new_goal_id =
-  Hprover.iter (merge_proof new_s obsolete new_goal_id) old_goal.proofn_attempts;
+  Hprover.iter (fun k pa ->
+                let pa = get_proofAttemptNode old_s pa in
+                merge_proof new_s obsolete new_goal_id k pa)
+               old_goal.proofn_attempts;
   List.iter (merge_trans ~use_shapes env old_s new_s new_goal_id) old_goal.proofn_transformations;
   let new_trans = (get_proofNode new_s new_goal_id) in
   new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
@@ -1253,8 +1292,10 @@ let rec save_goal s ctxt fmt pnid =
   Compress.Compress_z.output_string ctxt.ch_shapes shape;
   Compress.Compress_z.output_char ctxt.ch_shapes '\n';
   let l = Hprover.fold
-      (fun _ a acc -> (Mprover.find a.proofa_attempt.prover ctxt.provers,
-                       a.proofa_attempt) :: acc)
+      (fun _ a acc ->
+       let a = get_proofAttemptNode s a in
+       (Mprover.find a.proofa_attempt.prover ctxt.provers,
+        a.proofa_attempt) :: acc)
       pn.proofn_attempts [] in
   let l = List.sort (fun ((i1,_,_,_),_) ((i2,_,_,_),_) -> compare i1 i2) l in
   List.iter (save_proof_attempt fmt) l;

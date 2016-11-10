@@ -19,11 +19,12 @@ type session
 
 type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
-
 type transID
+type proofAttemptID
 
 module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID
+module Hpan: Exthtbl.S with type key = proofAttemptID
 
 val init_Hpn: session ->'a Hpn.t -> 'a -> unit
 val init_Htn: session ->'a Htn.t -> 'a -> unit
@@ -62,6 +63,8 @@ type proof_parent = Trans of transID | Theory of theory
 val get_task : session -> proofNodeID -> Task.task
 
 val get_transformations : session -> proofNodeID -> transID list
+val get_proof_attempt_ids :
+  session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
 val get_proof_attempts : session -> proofNodeID -> proof_attempt list
 val get_sub_tasks : session -> transID -> proofNodeID list
 val get_detached_sub_tasks : session -> transID -> proofNodeID list
@@ -90,11 +93,12 @@ val add_file_section :
     transformations to the goals of the new theory *)
 
 val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  timelimit:int -> unit
+  timelimit:int -> proofAttemptID
 (** [graft_proof_attempt s id pr t] adds a proof attempt with prover
     [pr] and timelimit [t] in the session [s] as a child of the task
-    [id]. If there already a proof attempt with the same prover,
-    it updates it with the new timelimit. *)
+    [id]. If there already a proof attempt with the same prover, it
+    updates it with the new timelimit. It returns the id of the
+    generated proof attempt. *)
 
 val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
   Call_provers.prover_result -> unit

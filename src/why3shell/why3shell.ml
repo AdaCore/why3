@@ -447,7 +447,7 @@ let then_print f fmt args =
 let test_schedule_proof_attempt fmt (args: string list) =
   (* temporary : get the first goal *)
   let id = nearest_goal () in
-  let callback status =
+  let callback _panid status =
     match status with
     | Done _prover_result -> (display_session fmt []; test_print_goal fmt [];
                               fprintf fmt "status: %a@."

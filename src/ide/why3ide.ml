@@ -190,7 +190,7 @@ let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
-    ~packing:vbox222#add
+    ~packing:(vbox222#pack ?from:None ~expand:true ~fill:true ?padding:None)
     ()
 
 let task_view =
@@ -204,7 +204,7 @@ let task_view =
 let command_entry = GEdit.entry ~packing:vbox222#add ()
 let message_zone =
   GText.view ~editable:false ~cursor_visible:false
-             ~packing:vbox222#add ()
+             ~packing:(vbox222#pack ?from:None ~expand:true ~fill:true ?padding:None) ()
 
 
 (********************************************)
@@ -228,16 +228,19 @@ module C = Controller_itp.Make(S)
 (* Mapping session to the GTK tree *)
 (***********************************)
 
-
 type index =
   | Inone
+  | IproofAttempt of proofAttemptID
   | IproofNode of proofNodeID
   | Itransformation  of transID
   | Ifile of file
   | Itheory of theory
-  | Iproofattempt of proof_attempt
 
 let model_index : index Hint.t = Stdlib.Hint.create 17
+(* To each proofnodeid we have the corresponding row_reference *)
+let pn_id_to_gtree : GTree.row_reference Hpn.t = Hpn.create 17
+let pan_id_to_gtree : GTree.row_reference Hpan.t = Hpan.create 17
+
 
 let new_node =
   let cpt = ref (-1) in
@@ -248,13 +251,24 @@ let new_node =
   let iter = goals_model#append ?parent () in
   goals_model#set ~row:iter ~column:name_column name;
   goals_model#set ~row:iter ~column:index_column !cpt;
-  goals_model#get_row_reference (goals_model#get_path iter)
+  let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
+  begin
+    match ind with
+    | IproofAttempt panid ->
+       Hpan.add pan_id_to_gtree panid new_ref
+    | IproofNode pnid ->
+       Hpn.add pn_id_to_gtree pnid new_ref
+    | _ -> ()
+  end;
+  new_ref
 
 let build_subtree_proof_attempt_from_goal ses row_ref id =
-  List.iter
-    (fun pa ->
-      let _ = new_node ~parent:row_ref pa.prover.Whyconf.prover_name (Iproofattempt pa) in ())
-    (get_proof_attempts ses id)
+  Whyconf.Hprover.iter
+    (fun pa panid ->
+     let name = Pp.string_of Whyconf.print_prover pa in
+      ignore(new_node ~parent:row_ref name
+                 (IproofAttempt panid)))
+    (get_proof_attempt_ids ses id)
 
 let rec build_subtree_from_goal ses th_row_reference id =
   let name = get_proof_name ses id in
@@ -297,9 +311,6 @@ let build_tree_from_session ses =
 (*    actions     *)
 (******************)
 
-(* To each proofnodeid we have the corresponding gtk_tree_iter *)
-let pn_id_to_gtree = Hpn.create 17
-
 (* TODO We currently use this for transformations etc... With strategies, we sure
    do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
@@ -326,19 +337,18 @@ let run_strategy_on_task s =
 
 (* TODO maybe an other file for callbacks *)
 (* Callback of a transformation *)
-let callback_update_tree_transform ses gtk_tree_iter = fun status ->
+let callback_update_tree_transform ses row_reference = fun status ->
   match status with
   | TSdone trans_id ->
-      let row_reference = goals_model#get_row_reference (goals_model#get_path gtk_tree_iter) in
       build_subtree_from_trans ses row_reference trans_id
   | _ -> ()
 
 let apply_transform ses =
   match !current_selected_index with
   | IproofNode id ->
-    let gtk_tree_index = Hpn.find pn_id_to_gtree id in (* TODO exception *)
+    let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
     let callback =
-         callback_update_tree_transform ses gtk_tree_index
+         callback_update_tree_transform ses row_ref
        in
        C.schedule_transformation cont id "cut" ["0=0"] ~callback
     | _ -> printf "Error: Give the name of the transformation@."
@@ -356,13 +366,26 @@ let remove_children iter =
 *)
 
 (* Callback of a proof_attempt *)
-let callback_update_tree_proof ses gtk_tree_iter id = fun pa_status ->
+let callback_update_tree_proof _ses row_ref _id name =
+  fun panid pa_status ->
   match pa_status with
+    | Scheduled ->
+       begin
+       try
+         let _new_row_ref = Hpan.find pan_id_to_gtree panid in
+         () (* TODO: set icon to 'pause' *)
+       with Not_found ->
+            ignore(new_node ~parent:row_ref (name ^ " scheduled") (IproofAttempt panid))
+       end
   | Done _pr ->
-      let row_reference = goals_model#get_row_reference (goals_model#get_path gtk_tree_iter) in
-      let _ = remove_children gtk_tree_iter in
-      build_subtree_proof_attempt_from_goal ses row_reference id
-  | _ -> () (* TODO *)
+       begin
+       try
+         let r = Hpan.find pan_id_to_gtree panid in
+         goals_model#set ~row:r#iter ~column:name_column (name ^ " done")
+       with Not_found -> assert false
+       end
+  | Running -> () (* TODO: set icon to 'play' *)
+  | _ ->  () (* TODO ? *)
 
 (* TODO to be replaced *)
 (* Return the prover corresponding to given name. name is of the form
@@ -383,10 +406,9 @@ let return_prover fmt name =
 let test_schedule_proof_attempt ses =
   match !current_selected_index with
   | IproofNode id ->
-    let gtk_tree_index = Hpn.find pn_id_to_gtree id in
-    let callback = callback_update_tree_proof ses gtk_tree_index id in
+    let row_ref = Hpn.find pn_id_to_gtree id in
     (* TODO put this somewhere else *)
-    let name, limit = match ["Alt-Ergo"; "1"] with
+    let name, limit = match ["Alt-Ergo,1.01"; "10"] with
     (* TODO recover this
       | [name] ->
         let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
@@ -406,6 +428,8 @@ let test_schedule_proof_attempt ses =
   (match np with
   | None -> ()
   | Some p ->
+     let np = Pp.string_of Whyconf.print_prover p.Whyconf.prover in
+     let callback = callback_update_tree_proof ses row_ref id np in
       C.schedule_proof_attempt
         cont id p.Whyconf.prover
         ~limit ~callback)
@@ -441,7 +465,7 @@ let on_selected_row r =
   try
     let session_element = Hint.find model_index index in
     let () = match session_element with
-             | IproofNode id -> Hpn.add pn_id_to_gtree id r#iter (* TODO maybe not the good place to fill
+             | IproofNode id -> Hpn.add pn_id_to_gtree id r (* TODO maybe not the good place to fill
                                                                     this table *)
              | _ -> () in
     current_selected_index := session_element;

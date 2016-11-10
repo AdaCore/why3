@@ -150,7 +150,7 @@ val schedule_proof_attempt :
   proofNodeID ->
   Whyconf.prover ->
   limit:Call_provers.resource_limit ->
-  callback:(proof_attempt_status -> unit) -> unit
+  callback:(proofAttemptID -> proof_attempt_status -> unit) -> unit
 (** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
    proof attempt for a goal specified by [id] with the prover [p] with
    time limit [timelimit]; the function [callback] will be called each
