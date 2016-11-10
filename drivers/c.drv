@@ -1,5 +1,13 @@
 printer "c"
 
+module BuiltIn
+
+  prelude "#include <stdlib.h>"
+  prelude "#include <stdint.h>"
+  prelude "#include <stdio.h>"
+
+end
+
 module ref.Ref
 
   syntax type ref "%1"
@@ -7,7 +15,7 @@ module ref.Ref
   syntax converter ref "%1"
   syntax val (!_) "%1"
   syntax converter (!_) "%1"
-  syntax val (:=) "%1 = %2" 
+  syntax val (:=) "%1 = %2"
 
 end
 
@@ -15,7 +23,7 @@ module mach.int.Int32
   syntax val of_int "%1"
   syntax converter of_int "%1"
 
-  syntax type int32  "int"
+  syntax type int32  "int32_t"
 
   syntax val (+)     "(%1 + %2)"
   syntax val (-)     "(%1 - %2)"
@@ -33,12 +41,15 @@ module mach.int.Int32
 end
 
 module mach.int.UInt32
+
+  prelude "void add_with_carry(...) { }"
+
   syntax val of_int "%1"
   syntax converter of_int "%1"
 
   syntax constant zero_unsigned "0"
 
-  syntax type uint32 "unsigned int"
+  syntax type uint32 "uint32_t"
   syntax val (+)     "(%1 + %2)"
   syntax val (-)     "(%1 - %2)"
   syntax val (-_)    "(-(%1))"
@@ -59,16 +70,13 @@ end
 
 module mach.c.C
 
-  prelude "#include <stdlib.h>"
-  prelude "#include <stdio.h>"
+  syntax type ptr "(%1 *)"
 
-  syntax type ptr "%1 *"
-
-  syntax val malloc "malloc(%1 * sizeof(%v0))"  (* and not %t1 ? *)
+  syntax val malloc "malloc(%1 * sizeof(%v0))"
   syntax val free   "free(%1)"
   syntax val realloc "realloc(%1, %2 * sizeof(%v0))"
 
-  syntax val is_null "%1 == NULL"
+  syntax val is_null "(%1 == NULL)"
   syntax val null "NULL"
 
   syntax val incr "%1+%2"
