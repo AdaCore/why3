@@ -84,3 +84,90 @@ let strategies env config =
       loaded_strategies := strategies;
       strategies
     | l -> l
+
+
+(**** interpretation of command-line *********************)
+
+let sort_pair (x,_) (y,_) = String.compare x y
+
+let list_transforms _args =
+  let l =
+    List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ())
+  in
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
+  in
+  Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
+               (List.sort sort_pair l)
+
+
+let commands =
+  [
+    "list-transforms", "list available transformations", list_transforms;
+(*
+    "list-provers", "list available provers", list_provers;
+    "list-strategies", "list available strategies", list_strategies;
+    "print", "<s> print the declaration where s was defined", test_print_id;
+    "search", "<s> print some declarations where s appear", test_search_id;
+    "r", "reload the session (test only)", test_reload;
+    "rp", "replay", test_replay;
+    "s", "save the current session", test_save_session;
+    "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
+    "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
+    "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);
+    "gd", "go to the goal down",  then_print (move_to_goal_ret_p zipper_down);
+    "gr", "go to the goal right",  then_print (move_to_goal_ret_p zipper_right);
+    "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left)
+ *)
+  ]
+
+let commands_table = Stdlib.Hstr.create 17
+let () =
+  List.iter
+    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
+    commands
+
+let split_args s =
+  let args = ref [] in
+  let b = Buffer.create 17 in
+  let state = ref 0 in
+  for i = 0 to String.length s - 1 do
+    let c = s.[i] in
+    match !state, c with
+    | 0,' ' -> ()
+    | 0,'"' -> state := 1
+    | 0,_ -> Buffer.add_char b c; state := 2
+    | 1,'"' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
+    | 1,_ -> Buffer.add_char b c
+    | 2,' ' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
+    | 2,_ -> Buffer.add_char b c
+    | _ -> assert false
+  done;
+  begin
+    match !state with
+      | 0 -> ()
+      | 1 -> args := Buffer.contents b :: !args (* TODO : report missing '"' *)
+      | 2 -> args := Buffer.contents b :: !args
+      | _ -> assert false
+  end;
+  match List.rev !args with
+    | a::b -> a,b
+    | [] -> "",[]
+
+
+type command =
+  | Transform of string * Trans.gentrans * string list
+  | Query of string
+  | Other of string * string list
+
+let interp env s =
+  let cmd,args = split_args s in
+  try
+    let f = Stdlib.Hstr.find commands_table cmd in
+    Query (f args)
+  with Not_found ->
+       try
+         let t = Trans.lookup_trans env cmd in
+         Transform (cmd,t,args)
+       with Trans.UnknownTrans _ ->
+            Other(cmd,args)

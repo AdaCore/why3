@@ -157,9 +157,6 @@ val list_transforms_l : unit -> (string * Pp.formatted) list
 val named : string -> 'a trans -> 'a trans
 (** give transformation a name without registering *)
 
-val apply_transform : string -> Env.env -> task -> task list
-(** apply a registered 1-to-1 or a 1-to-n, directly *)
-
 (** {2 Transformations with arguments}
 
   These transformations take strings as arguments. For a more "typed" version,
@@ -173,6 +170,19 @@ type trans_with_args_l = string list -> Env.env -> task tlist
 
 val register_transform_with_args : desc:Pp.formatted -> string -> trans_with_args -> unit
 val register_transform_with_args_l : desc:Pp.formatted -> string -> trans_with_args_l -> unit
+
+(** {2 handling of all forms of transformations} *)
+
+type gentrans =
+  | Trans_one of Task.task trans
+  | Trans_list of Task.task tlist
+  | Trans_with_args of trans_with_args
+  | Trans_with_args_l of trans_with_args_l
+
+val lookup_trans : Env.env -> string -> gentrans
+
+val apply_transform : string -> Env.env -> task -> task list
+(** apply a registered 1-to-1 or a 1-to-n, directly.*)
 
 val apply_transform_args : string -> Env.env -> string list -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)

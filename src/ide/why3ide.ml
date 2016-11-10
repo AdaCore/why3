@@ -343,14 +343,14 @@ let callback_update_tree_transform ses row_reference = fun status ->
       build_subtree_from_trans ses row_reference trans_id
   | _ -> ()
 
-let apply_transform ses =
+let apply_transform ses t args =
   match !current_selected_index with
   | IproofNode id ->
     let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
     let callback =
          callback_update_tree_transform ses row_ref
        in
-       C.schedule_transformation cont id "cut" ["0=0"] ~callback
+       C.schedule_transformation cont id t args ~callback
     | _ -> printf "Error: Give the name of the transformation@."
 
 
@@ -439,16 +439,22 @@ let test_schedule_proof_attempt ses =
 
 let clear_command_entry () = command_entry#set_text ""
 
+open Session_user_interface
 
 let interp cmd =
-  match cmd with
-    | "s" -> clear_command_entry ();
-             run_strategy_on_task "1"
-    | "t" -> clear_command_entry ();
-             apply_transform cont.controller_session
-    | "c" -> clear_command_entry ();
-             test_schedule_proof_attempt cont.controller_session
-    | _ -> message_zone#buffer#set_text ("unknown command '"^cmd^"'")
+  match interp cont.controller_env cmd with
+    | Transform(s,_t,args) ->
+       clear_command_entry ();
+       apply_transform cont.controller_session s args
+    | Query s ->
+       message_zone#buffer#set_text s
+    | Other(s,_args) ->
+       match s with
+       | "s" -> clear_command_entry ();
+                run_strategy_on_task "1"
+       | "c" -> clear_command_entry ();
+                test_schedule_proof_attempt cont.controller_session
+       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
