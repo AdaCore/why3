@@ -263,7 +263,8 @@ module Print = struct
   let rec print_stmt ~braces fmt = function
     | Snop -> Format.printf "snop"; ()
     | Sexpr e -> fprintf fmt "%a;" (print_expr ~paren:false) e;
-    | Sblock ([] ,s) when (not braces || one_stmt s) -> (print_stmt ~braces:false) fmt s
+    | Sblock ([] ,s) when (not braces || one_stmt s) ->
+      (print_stmt ~braces:false) fmt s
     | Sblock b -> fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
       (print_stmt ~braces:false) s1
@@ -281,7 +282,8 @@ module Print = struct
     | Sbreak -> fprintf fmt "break;"
     | Sreturn e -> fprintf fmt "return %a;" (print_expr ~paren:true) e
 
-  and print_def fmt = function
+  and print_def fmt def =
+    try match def with
     | Dfun (id,(rt,args),body) ->
        fprintf fmt "%a %a(@[%a@])@ @[<hov>{@;<1 2>@[<hov>%a@]@\n}@\n@]"
                (print_ty ~paren:false) rt
@@ -308,6 +310,7 @@ module Print = struct
     | Dtypedef (ty,id) ->
        fprintf fmt "@[<hov>typedef@ %a@;%a;@]@;"
 	       (print_ty ~paren:false) ty print_ident id
+    with Unprinted s -> Format.printf "Missed a def because : %s@." s
 
   and print_body fmt body =
     print_pair_delim nothing newline nothing
@@ -348,28 +351,34 @@ module Translate = struct
 
   let pv_name pv = pv.pv_vs.vs_name
 
-  let rec expr info ?(is_return=false) (e:expr) : C.body =
+  type syntax_env = { in_unguarded_loop : bool;
+                      computes_return_value : bool;
+                      breaks : Sid.t;
+                      returns : Sid.t; }
+
+  let rec expr info env (e:expr) : C.body =
     if e_ghost e then (Format.printf "translating ghost expr@."; C.([], Snop))
     else if is_e_void e then C.([], Snop)
-    else if is_e_true e then expr info ~is_return (e_nat_const 1)
-    else if is_e_false e then expr info ~is_return (e_nat_const 0)
+    else if is_e_true e then expr info env (e_nat_const 1)
+    else if is_e_false e then expr info env (e_nat_const 0)
     else match e.e_node with
     | Evar pv ->
        let e = C.Evar(pv_name pv) in
-       C.([], if is_return then Sreturn e else Sexpr e)
+       C.([], if env.computes_return_value then Sreturn e else Sexpr e)
     | Econst (Number.ConstInt ic) ->
       let n = Number.compute_int ic in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
-      C.([], if is_return then Sreturn e else Sexpr e)
+      C.([], if env.computes_return_value then Sreturn e else Sexpr e)
     | Econst _ -> raise (Unsupported "real constants")
     | Eexec (ce, _cty) ->
       begin match ce.c_node with
-      | Cfun e -> expr info ~is_return e
+      | Cfun e -> expr info env e
       | Capp (rs, pvsl) ->
          let e =  match query_syntax info.syntax rs.rs_name with
            | Some s ->
               let params =
-		List.map (fun pv -> (C.Evar(pv_name pv), ty_of_ty info (ty_of_ity pv.pv_ity)))
+		List.map (fun pv -> (C.Evar(pv_name pv),
+                                     ty_of_ty info (ty_of_ity pv.pv_ity)))
 			 pvsl in
               let rty = ty_of_ity e.e_ity in
               let rtyargs = match rty.ty_node with
@@ -383,7 +392,8 @@ module Translate = struct
               C.(Ecall(Evar(rs.rs_name), List.map (fun pv -> Evar(pv_name pv)) args))
          in
 	 C.([],
-            if is_return && not (ity_equal rs.rs_cty.cty_result ity_unit)
+            if env.computes_return_value
+              && not (ity_equal rs.rs_cty.cty_result ity_unit)
             then Sreturn e
             else Sexpr e)
       | _ -> raise (Unsupported "Cpur/Cany") (*TODO clarify*)
@@ -393,10 +403,11 @@ module Translate = struct
       begin match ld with
       | LDvar (pv,le) ->
         Format.printf "let %s@." pv.pv_vs.vs_name.id_string;
-        if pv.pv_ghost then expr info ~is_return e
+        if pv.pv_ghost then expr info env e
         else if ity_equal pv.pv_ity ity_unit
-        then ([], C.Sseq (C.Sblock(expr info ~is_return:false le),
-			  C.Sblock(expr info ~is_return e)))
+        then let env' = {env with computes_return_value = false} in
+             ([], C.Sseq (C.Sblock(expr info env' le),
+		          C.Sblock(expr info env e)))
         else begin
           match le.e_node with
           | Econst (Number.ConstInt ic) ->
@@ -404,33 +415,34 @@ module Translate = struct
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
 	    Format.printf "propagate constant %s for var %s@."
 			  (BigInt.to_string n) (pv_name pv).id_string;
-            C.propagate_in_block (pv_name pv) ce (expr info ~is_return e)
+            C.propagate_in_block (pv_name pv) ce (expr info env e)
           | Eexec ({c_node = Capp(rs,_); _},_)
               when Mid.mem rs.rs_name info.converter ->
-            begin match expr info ~is_return:false le with
+            begin match expr info {env with computes_return_value = false} le
+              with
             | [], C.Sexpr(se) ->
-              C.propagate_in_block (pv_name pv) se (expr info ~is_return e)
+              C.propagate_in_block (pv_name pv) se (expr info env e)
             | _ -> assert false
             end
           | _->
             let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
-            match expr info ~is_return:false le with
+            match expr info {env with computes_return_value = false} le with
             | [], C.Sexpr((C.Esyntax(_,_,_,_,b) as se))
                 when b (* converter *) ->
               Format.printf "propagate converter for var %s@."
                 (pv_name pv).id_string;
-              C.propagate_in_block (pv_name pv) se (expr info ~is_return e)
+              C.propagate_in_block (pv_name pv) se (expr info env e)
             | d,s ->
               let initblock = d, C.assignify (pv_name pv) s in
               [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
-              C.Sseq (C.Sblock initblock, C.Sblock (expr info ~is_return e))
+              C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
         end
-      | _ -> assert false
+      | _ -> raise (Unsupported "LDsym/LDrec") (* TODO for rec at least*)
       end
     | Eif (cond, th, el) ->
-       let c = expr info ~is_return:false cond in
-       let t = expr info ~is_return th in
-       let e = expr info ~is_return el in
+       let c = expr info {env with computes_return_value = false} cond in
+       let t = expr info env th in
+       let e = expr info env el in
        begin match c with
 	     | [], C.Sexpr c ->
 		if is_e_false th && is_e_true el
@@ -439,20 +451,55 @@ module Translate = struct
 	     | cdef, cs ->
 		let cid = id_register (id_fresh "cond") in (* ? *)
 		C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
-		C.Sseq (C.assignify cid cs, C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
+		C.Sseq (C.assignify cid cs,
+                        C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
        (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
-    | Ewhile (c,_,_,e) ->
-      let cd, cs = expr info ~is_return:false c in
-      let b = expr info ~is_return:false e in
+    | Ewhile (c,_,_,b) ->
+      Format.printf "while@.";
+      let cd, cs = expr info {env with computes_return_value = false} c in
+      let env' = { computes_return_value = false;
+                   in_unguarded_loop = true;
+                   returns = env.returns;
+                   breaks =
+                     if env.in_unguarded_loop
+                     then Sid.empty else env.breaks } in
+      let b = expr info  env' b in
       begin match cs with
       | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
       | _ ->
         let cid = id_register (id_fresh "cond") in (* ? *)
         [C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])],
-        C.Sseq (C.Sblock (cd, cs), C.Swhile (C.Evar cid, C.Sblock b))
+        C.Sseq (C.Sblock (cd, C.assignify cid cs),
+                C.Swhile (C.Evar cid, C.Sblock b))
       end
-    | Etry _ | Eraise _ -> raise (Unsupported "try/exceptions") (*TODO*)
+    | Etry (b, exm) ->
+      Format.printf "TRY@.";
+      let is_while = match b.e_node with Ewhile _ -> true | _-> false in
+      let breaks,returns = Mexn.fold
+        (fun xs (pvsl,r) (bs,rs) ->
+          let id = xs.xs_name in
+          match pvsl, r.e_node with
+          | [pv], Evar pv' when pv_equal pv pv' && env.computes_return_value ->
+            (bs, Sid.add id rs)
+          | [], _ when is_e_void r && is_while ->
+            (Sid.add id bs, rs)
+          |_ -> raise (Unsupported "non break/return exception in try"))
+        exm (Sid.empty, env.returns)
+      in
+      let env' = { computes_return_value = env.computes_return_value;
+                   in_unguarded_loop = false;
+                   breaks = breaks;
+                   returns = returns;
+                 } in
+      expr info env' b
+    | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
+      Format.printf "BREAK@.";
+      ([], C.Sbreak)
+    | Eraise (xs,r) when Sid.mem xs.xs_name env.returns ->
+      Format.printf "RETURN@.";
+      expr info {env with computes_return_value = true} r
+    | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
     | Eassert _ -> [], C.Snop
     | Ecase _ -> raise (Unsupported "pattern matching")
@@ -463,22 +510,32 @@ module Translate = struct
     | PDlet (LDsym (rs, ce)) ->
       let fname = rs.rs_name in
       Format.printf "PDlet rsymbol %s@." fname.id_string;
-      if Mid.mem fname info.syntax then (Format.printf "has syntax@."; [])
-      else
-        let params = List.map
-		       (fun pv -> ty_of_ty info pv.pv_vs.vs_ty, pv_name pv)
-		       (List.filter
-			  (fun pv -> not pv.pv_ghost && not (ity_equal pv.pv_ity ity_unit))
-			  rs.rs_cty.cty_args) in
-        begin match ce.c_node with
-        | Cfun e ->
-           let rity = rs.rs_cty.cty_result in
-           let rtype =
-             if ity_equal rity ity_unit then C.Tvoid
-             else ty_of_ty info (ty_of_ity rity) in
-           [C.Dfun (fname, (rtype,params), expr info ~is_return:true e)]
-        | _ -> raise (Unsupported "Non-function with no syntax in toplevel let")
-	end
+      begin try
+              if Mid.mem fname info.syntax
+              then (Format.printf "has syntax@."; [])
+              else
+                let params = List.map
+		  (fun pv -> ty_of_ty info pv.pv_vs.vs_ty, pv_name pv)
+		  (List.filter
+		     (fun pv -> not pv.pv_ghost
+                       && not (ity_equal pv.pv_ity ity_unit))
+		     rs.rs_cty.cty_args) in
+                begin match ce.c_node with
+                | Cfun e ->
+                  let rity = rs.rs_cty.cty_result in
+                  let rtype =
+                    if ity_equal rity ity_unit then C.Tvoid
+                    else ty_of_ty info (ty_of_ity rity) in
+                  let env = { computes_return_value = true;
+                              in_unguarded_loop = false;
+                              returns = Sid.empty;
+                              breaks = Sid.empty; } in
+                  [C.Dfun (fname, (rtype,params), expr info env e)]
+                | _ -> raise (Unsupported
+                                "Non-function with no syntax in toplevel let")
+	        end
+        with Unsupported s -> Format.printf "Unsupported : %s@." s; []
+      end
     | PDtype [{itd_its = its}] ->
       let id = its.its_ts.ts_name in
       Format.printf "PDtype %s@." id.id_string;
