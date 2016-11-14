@@ -32,6 +32,7 @@ module C = struct
     | Enothing
     | Eunop of unop * expr
     | Ebinop of binop * expr * expr
+    | Equestion of expr * expr * expr (* c ? t : e *)
     | Ecast of ty * expr
     | Ecall of expr * expr list
     | Econst of constant
@@ -75,20 +76,56 @@ module C = struct
 
   exception NotAValue
 
-  (* [assignify id] transforms a statement that computes a value into
+  let rec is_nop = function
+    | Snop -> true
+    | Sblock ([], s) -> is_nop s
+    | Sseq (s1,s2) -> is_nop s1 && is_nop s2
+    | _ -> false
+
+  let rec one_stmt = function
+    | Snop -> true
+    | Sexpr _ -> true
+    | Sblock (d,s) -> d = [] && one_stmt s
+    | _ -> false
+
+  (** [assignify id] transforms a statement that computes a value into
      a statement that assigns that value to id *)
-  let rec assignify id s =
-    match s with
-    | Snop -> (*Format.printf "assign snop@."; Snop*) raise NotAValue (* ? *)
+  let rec assignify id = function
+    | Snop -> raise NotAValue
     | Sexpr e -> Sexpr (Ebinop (Bassign, Evar id, e))
     | Sblock (ds, s) -> Sblock (ds, assignify id s)
-    | Sseq (s1, s2) -> Sseq (s1, assignify id s2)
+    | Sseq (s1, s2) when not (is_nop s2) -> Sseq (s1, assignify id s2)
+    | Sseq (s1,_) -> assignify id s1
     | Sif (c,t,e) -> Sif (c, assignify id t, assignify id e)
     | Swhile (c,s) -> Swhile (c, assignify id s) (* can this be a value ?*)
     | Sfor (e0,e1,e2,s) -> Sfor (e0,e1,e2, assignify id s)
     | Sbreak -> raise NotAValue
     | Sreturn _ -> raise NotAValue
 
+
+  (** [get_last_expr] extracts the expression computed by the given statement.
+     This is needed when loop conditions are more complex than a simple expression. *)
+  let rec get_last_expr = function
+    | Snop -> raise NotAValue
+    | Sexpr e -> Snop, e
+    | Sblock (ds,s) ->
+      let s',e = get_last_expr s in
+      Sblock(ds,s'), e
+    | Sseq (s1,s2) when not (is_nop s2) ->
+      let s', e = get_last_expr s2 in
+      Sseq(s1,s'), e
+    | Sseq (s1,_) -> get_last_expr s1
+    | Sif (c,Sexpr t,Sexpr e) -> Snop, Equestion(c,t,e)
+    | Sif _ -> raise (Unsupported "while (complex if)")
+    | Swhile (_c,_s) -> raise (Unsupported "while (while) {}")
+    | Sfor _ -> raise (Unsupported "while (for)")
+    | Sbreak -> raise NotAValue
+    | Sreturn _ -> raise NotAValue
+
+  (** [propagate_in_expr id v] and the associated functions replace
+      all instances of [id] by [v] in an
+      expression/statement/definition/block. It is used for constant
+      propagation to reduce the number of variables. *)
   let rec propagate_in_expr id (v:expr) = function
     | Evar i when Ident.id_equal i id -> v
     | Evar i -> Evar i
@@ -96,6 +133,9 @@ module C = struct
     | Ebinop (b,e1,e2) -> Ebinop (b,
                                   propagate_in_expr id v e1,
                                   propagate_in_expr id v e2)
+    | Equestion (c,t,e) -> Equestion(propagate_in_expr id v c,
+                                     propagate_in_expr id v t,
+                                     propagate_in_expr id v e)
     | Ecast (ty,e) -> Ecast (ty, propagate_in_expr id v e)
     | Ecall (e, l) -> Ecall (propagate_in_expr id v e,
                              List.map (propagate_in_expr id v) l)
@@ -158,17 +198,58 @@ module C = struct
   let is_empty_block s = s = Sblock([], Snop)
   let block_of_expr e = [], Sexpr e
 
-  let rec is_nop = function
-    | Snop -> true
-    | Sblock ([], s) -> is_nop s
-    | Sseq (s1,s2) -> is_nop s1 && is_nop s2
-    | _ -> false
+(** [flatten_defs d s] appends all definitions in the statement [s] to d. *)
+  (* TODO check ident unicity ? *)
+  let rec flatten_defs d = function
+    | Sseq (s1,s2) ->
+      let d, s1' = flatten_defs d s1 in
+      let d, s2' = flatten_defs d s2 in
+      d, Sseq(s1',s2')
+    | Sblock (d',s) ->
+      let d',s' = flatten_defs d' s in
+      d@d', s'
+    | Sif (c,t,e) ->
+      let d, t' = flatten_defs d t in
+      let d, e' = flatten_defs d e in
+      d,Sif(c,t',e')
+    | Swhile (c,s) ->
+      let d, s' = flatten_defs d s in
+      d, Swhile (c, s')
+    | Sfor (e1,e2,e3,s) ->
+      let d, s' = flatten_defs d s in
+      d, Sfor(e1,e2,e3,s')
+    | s -> d,s
 
-  let one_stmt = function
-    | Snop -> true
-    | Sexpr _ -> true
-    | Sblock _ -> true
-    | _ -> false
+  let rec elim_nop = function
+    | Sseq (s1,s2) ->
+      let s1 = elim_nop s1 in
+      let s2 = elim_nop s2 in
+      begin match s1,s2 with
+      | Snop, Snop -> Snop
+      | Snop, s | s, Snop -> s
+      | _ -> Sseq(s1,s2)
+      end
+    | Sblock (d,s) ->
+      let s = elim_nop s in
+      begin match d, s with
+      | [], Snop -> Snop
+      | _ -> Sblock(d,s)
+      end
+    | Sif (c,t,e) -> Sif(c, elim_nop t, elim_nop e)
+    | Swhile (c,s) -> Swhile (c, elim_nop s)
+    | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_nop s)
+    | s -> s
+
+  let rec add_to_last_call params = function
+    | Sblock (d,s) -> Sblock (d, add_to_last_call params s)
+    | Sseq (s1,s2) when not (is_nop s2) ->
+      Sseq (s1, add_to_last_call params s2)
+    | Sseq (s1,_) -> add_to_last_call params s1
+    | Sexpr (Ecall(fname, args)) ->
+      Sexpr (Ecall(fname, params@args)) (*change name to ensure no renaming ?*)
+    | Sreturn (Ecall (fname, args)) ->
+      Sreturn (Ecall(fname, params@args))
+    | _ -> raise (Unsupported "tuple pattern matching with too complex def")
 
 end
 
@@ -235,6 +316,11 @@ module Print = struct
     | Ebinop(b,e1,e2) ->
       fprintf fmt (protect_on paren "%a %a %a")
         (print_expr ~paren:true) e1 print_binop b (print_expr ~paren:true) e2
+    | Equestion(c,t,e) ->
+      fprintf fmt (protect_on paren "%a ? %a : %a")
+        (print_expr ~paren:true) c
+        (print_expr ~paren:true) t
+        (print_expr ~paren:true) e
     | Ecast(ty, e) ->
       fprintf fmt (protect_on paren "(%a)%a")
         (print_ty ~paren:false) ty (print_expr ~paren:true) e
@@ -269,15 +355,15 @@ module Print = struct
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
       (print_stmt ~braces:false) s1
       (print_stmt ~braces:false) s2
-    | Sif(c,t,e) when is_empty_block e ->
+    | Sif(c,t,e) when is_nop e ->
        fprintf fmt "if(%a)@\n%a" (print_expr ~paren:false) c
-         (print_stmt ~braces:true) t
+         (print_stmt ~braces:true) (Sblock([],t))
     | Sif (c,t,e) -> fprintf fmt "if(%a)@\n%a@\nelse@\n%a"
       (print_expr ~paren:false) c
-      (print_stmt ~braces:true) t
-      (print_stmt ~braces:true) e
-    | Swhile (e,b) -> fprintf fmt "while (%a)@ %a"
-      (print_expr ~paren:false) e (print_stmt ~braces:true) b
+      (print_stmt ~braces:true) (Sblock([],t))
+      (print_stmt ~braces:true) (Sblock([],e))
+    | Swhile (e,b) -> fprintf fmt "while (%a)@;<1 2>%a"
+      (print_expr ~paren:false) e (print_stmt ~braces:true) (Sblock([],b))
     | Sfor _ -> raise (Unprinted "for loops")
     | Sbreak -> fprintf fmt "break;"
     | Sreturn e -> fprintf fmt "return %a;" (print_expr ~paren:true) e
@@ -302,21 +388,24 @@ module Print = struct
 			     (print_ty ~paren:false) print_ident))
 	args
     | Ddecl (ty, lie) ->
-       fprintf fmt "%a @[<hov>%a@];@;"
+       fprintf fmt "%a @[<hov>%a@];"
 	       (print_ty ~paren:false) ty
 	       (print_list comma print_id_init) lie
     | Dinclude id ->
        fprintf fmt "#include<%a.h>@;" print_ident id
     | Dtypedef (ty,id) ->
-       fprintf fmt "@[<hov>typedef@ %a@;%a;@]@;"
+       fprintf fmt "@[<hov>typedef@ %a@;%a;@]"
 	       (print_ty ~paren:false) ty print_ident id
     with Unprinted s -> Format.printf "Missed a def because : %s@." s
 
   and print_body fmt body =
-    print_pair_delim nothing newline nothing
-		     (print_list newline print_def)
-		     (print_stmt ~braces:true)
-		     fmt body
+    if fst body = []
+    then print_stmt ~braces:true fmt (snd body)
+    else
+      print_pair_delim nothing newline nothing
+        (print_list newline print_def)
+        (print_stmt ~braces:true)
+        fmt body
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -388,8 +477,12 @@ module Translate = struct
               C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
                         Mid.mem rs.rs_name info.converter)
            | None ->
-              let args = List.filter (fun pv -> not pv.pv_ghost) pvsl in
-              C.(Ecall(Evar(rs.rs_name), List.map (fun pv -> Evar(pv_name pv)) args))
+             let args = List.filter
+               (fun pv -> not (pv.pv_ghost
+                               || ity_equal pv.pv_ity ity_unit))
+               pvsl in
+              C.(Ecall(Evar(rs.rs_name),
+                       List.map (fun pv -> Evar(pv_name pv)) args))
          in
 	 C.([],
             if env.computes_return_value
@@ -458,6 +551,9 @@ module Translate = struct
     | Ewhile (c,_,_,b) ->
       Format.printf "while@.";
       let cd, cs = expr info {env with computes_return_value = false} c in
+      (* this is needed so that the extracted expression has all
+         needed variables in its scope *)
+      let cd, cs = C.flatten_defs cd cs in
       let env' = { computes_return_value = false;
                    in_unguarded_loop = true;
                    returns = env.returns;
@@ -468,10 +564,8 @@ module Translate = struct
       begin match cs with
       | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
       | _ ->
-        let cid = id_register (id_fresh "cond") in (* ? *)
-        [C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])],
-        C.Sseq (C.Sblock (cd, C.assignify cid cs),
-                C.Swhile (C.Evar cid, C.Sblock b))
+        let s,e = C.get_last_expr cs in
+        cd, C.Sseq (s, C.Swhile (e, C.Sblock b))
       end
     | Etry (b, exm) ->
       Format.printf "TRY@.";
@@ -502,6 +596,21 @@ module Translate = struct
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
     | Eassert _ -> [], C.Snop
+      (* let (a,b) = f(...) in *)
+    | Ecase (e1,[{pp_pat = {pat_node = Papp(ls,rets)}}, e2])
+        when is_fs_tuple ls
+          && List.for_all (fun p ->
+            match p.pat_node with Pvar _ -> true |_-> false)
+            rets
+          ->
+      let rets = List.map
+        (fun p -> match p.pat_node with
+        | Pvar vs -> C.(Eunop(Uaddr,Evar(vs.vs_name)))
+        | _ -> assert false )
+        rets in
+      let d,s = expr info {env with computes_return_value = false} e1 in
+      let b = expr info env e2 in
+      d, C.(Sseq(add_to_last_call rets s, Sblock b))
     | Ecase _ -> raise (Unsupported "pattern matching")
     | Eghost _ | Epure _ | Eabsurd -> assert false
 
@@ -524,13 +633,17 @@ module Translate = struct
                 | Cfun e ->
                   let rity = rs.rs_cty.cty_result in
                   let rtype =
-                    if ity_equal rity ity_unit then C.Tvoid
+                    if ity_equal rity ity_unit
+                    then C.Tvoid
                     else ty_of_ty info (ty_of_ity rity) in
                   let env = { computes_return_value = true;
                               in_unguarded_loop = false;
                               returns = Sid.empty;
                               breaks = Sid.empty; } in
-                  [C.Dfun (fname, (rtype,params), expr info env e)]
+                  let d,s = expr info env e in
+                  let d,s = C.flatten_defs d s in
+                  let s = C.elim_nop s in
+                  [C.Dfun (fname, (rtype,params), (d,s))]
                 | _ -> raise (Unsupported
                                 "Non-function with no syntax in toplevel let")
 	        end

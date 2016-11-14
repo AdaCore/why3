@@ -273,7 +273,7 @@ module N
                       >= power radix (k-1)
                       > ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
                      };
-            res := Int32.of_int (-1)
+            res := Int32.(-_) (Int32.of_int 1)
             end;
          raise Return32 !res;
          end
@@ -1613,7 +1613,7 @@ module N
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
-    let minus_one = Int32.of_int (-1) in
+    let minus_one = Int32.(-_) (Int32.of_int 1) in
     let msb = Int32.(-) sz one in
     let xp = ref (C.incr x msb) in
     let rp = ref (C.incr r msb) in
