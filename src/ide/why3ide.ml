@@ -366,12 +366,6 @@ let remove_children iter =
     ignore (goals_model#remove (goals_model#iter_children (Some iter)))
   else ()
 
-(*
-  match (goals_model#iter_children row_reference) with
-  | None -> ()
-  | iter -> goals_model#remove iter
-*)
-
 (* Callback of a proof_attempt *)
 let callback_update_tree_proof _ses row_ref _id name =
   fun panid pa_status ->
@@ -394,55 +388,17 @@ let callback_update_tree_proof _ses row_ref _id name =
   | Running -> () (* TODO: set icon to 'play' *)
   | _ ->  () (* TODO ? *)
 
-(* TODO to be replaced *)
-(* Return the prover corresponding to given name. name is of the form
-  | name
-  | name, version
-  | name, altern
-  | name, version, altern *)
-let return_prover fmt name =
-  let fp = Whyconf.parse_filter_prover name in
-  (** all provers that have the name/version/altern name *)
-  let provers = Whyconf.filter_provers gconfig.config fp in
-  if Whyconf.Mprover.is_empty provers then begin
-    fprintf fmt "Prover corresponding to %s has not been found@." name;
-    None
-  end else
-    Some (snd (Whyconf.Mprover.choose provers))
-
-let test_schedule_proof_attempt ses =
+let test_schedule_proof_attempt ses (p: Whyconf.config_prover) limit =
   match !current_selected_index with
   | IproofNode id ->
     let row_ref = Hpn.find pn_id_to_gtree id in
-    (* TODO put this somewhere else *)
-    let name, limit = match ["Alt-Ergo,1.01"; "10"] with
-    (* TODO recover this
-      | [name] ->
-        let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
-                                          limit_mem = Whyconf.memlimit main;
-                                          limit_steps = 0} in
-        name, default_limit*)
-    | [name; timeout] -> name, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout}
-    | [name; timeout; oom ] ->
-        name, Call_provers.{limit_time = int_of_string timeout;
-                            limit_mem = int_of_string oom;
-                            limit_steps = 0}
-  | _ -> printf "Bad arguments prover_name, version timeout memlimit@.";
-      "", Call_provers.empty_limit
-  in
-  let np = return_prover Format.std_formatter name in (* TODO std_formatter dummy argument *)
-  (match np with
-  | None -> ()
-  | Some p ->
-     let np = Pp.string_of Whyconf.print_prover p.Whyconf.prover in
-     let callback = callback_update_tree_proof ses row_ref id np in
-      C.schedule_proof_attempt
-        cont id p.Whyconf.prover
-        ~limit ~callback)
-  | _ -> () (* TODO *)
-(*    | _ -> printf "Give the prover name@."*)
-
+    let prover = p.Whyconf.prover in
+    let printing = prover.Whyconf.prover_name ^ "(" ^ prover.Whyconf.prover_version ^ ")" in
+    let callback = callback_update_tree_proof ses row_ref id printing in
+        C.schedule_proof_attempt
+          cont id prover
+          ~limit ~callback
+  | _ -> message_zone#buffer#set_text ("Must be on a proof node to use a prover.")
 
 let clear_command_entry () = command_entry#set_text ""
 
@@ -455,13 +411,18 @@ let interp cmd =
        apply_transform cont.controller_session s args
     | Query s ->
        message_zone#buffer#set_text s
-    | Other(s,_args) ->
-       match s with
-       | "s" -> clear_command_entry ();
-                run_strategy_on_task "1"
-       | "c" -> clear_command_entry ();
-                test_schedule_proof_attempt cont.controller_session
-       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+    | Other(s,args) ->
+      begin
+        match parse_prover_name gconfig.config s args with
+        | Some (prover_config, limit) ->
+          clear_command_entry ();
+          test_schedule_proof_attempt cont.controller_session prover_config limit
+        | None ->
+          match s with
+          | "s" -> clear_command_entry ();
+                   run_strategy_on_task "1"
+          | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+      end
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
