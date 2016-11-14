@@ -244,7 +244,7 @@ let pan_id_to_gtree : GTree.row_reference Hpan.t = Hpan.create 17
 
 let new_node =
   let cpt = ref (-1) in
-  fun ?parent name ind ->
+  fun ?parent ?(collapse=false) name ind ->
   incr cpt;
   Hint.add model_index !cpt ind;
   let parent = Opt.map (fun x -> x#iter) parent in
@@ -252,6 +252,8 @@ let new_node =
   goals_model#set ~row:iter ~column:name_column name;
   goals_model#set ~row:iter ~column:index_column !cpt;
   let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
+  (* By default expand_path when creating a new node *)
+  if not collapse then goals_view#expand_to_path (goals_model#get_path iter);
   begin
     match ind with
     | IproofAttempt panid ->
@@ -340,7 +342,12 @@ let run_strategy_on_task s =
 let callback_update_tree_transform ses row_reference = fun status ->
   match status with
   | TSdone trans_id ->
-      build_subtree_from_trans ses row_reference trans_id
+      build_subtree_from_trans ses row_reference trans_id;
+      (match Session_itp.get_sub_tasks ses trans_id with
+      | first_goal :: _ ->
+          (* Put the selection on the first goal *)
+          goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
+      | [] -> ())
   | _ -> ()
 
 let apply_transform ses t args =
