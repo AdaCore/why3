@@ -241,6 +241,74 @@ let init_comp () =
   command_entry_completion#set_text_column completion_col;
   command_entry#set_completion command_entry_completion
 
+
+(*********************)
+(* Terminal historic *)
+(*********************)
+
+(* TODO use doubly linked list from Batteries.... *)
+module Dl = struct
+
+  type 'a dl = {content: 'a;
+                mutable next: 'a dl;
+                mutable prev: 'a dl}
+
+  let prepend dl e =
+    let rec new_element = {content = e; next = new_element; prev = new_element} in
+    new_element.next <- dl;
+    new_element.prev <- dl.prev;
+    dl.prev.next <- new_element;
+    dl.prev <- new_element
+
+  let create e =
+    let rec new_element = {content = e; next = new_element; prev = new_element} in
+    new_element
+
+  let prev dl = dl.prev
+
+  let next dl = dl.next
+
+  let get dl = dl.content
+
+end
+
+open Dl
+
+type historic = {mutable top : string dl; mutable current : string dl}
+
+let list_commands : historic =
+  let top = create "" in
+  { top = top; current = top}
+
+let add_command s =
+  prepend list_commands.top s;
+  list_commands.top <- prev list_commands.top;
+  list_commands.current <- list_commands.top
+
+let next_command () =
+  list_commands.current <- next list_commands.current
+
+let prev_command () =
+  list_commands.current <- prev list_commands.current
+
+let get_current () =
+  get list_commands.current
+
+let _ =
+  command_entry#event#connect#key_press
+    (fun (key: 'a Gdk.event) ->
+      match (GdkEvent.Key.hardware_keycode key) with
+      | 111 -> (* Arrow top *)
+          next_command ();
+          let s = get_current () in
+          command_entry#set_text s; true
+      | 116 -> (* Arrow bottom *)
+          prev_command ();
+          let s = get_current () in
+          command_entry#set_text s; true
+      | _ -> false
+      )
+
 (********************************************)
 (* controller instance on the GTK scheduler *)
 (********************************************)
@@ -460,7 +528,7 @@ let interp cmd =
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
-    ~callback:(fun () -> interp command_entry#text)
+    ~callback:(fun () -> add_command command_entry#text; interp command_entry#text)
 
 
 let get_selected_row_references () =
