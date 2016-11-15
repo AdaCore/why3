@@ -121,7 +121,7 @@ let (_ : GMenu.menu_item) =
    2.1 TODO: a tool box ?
    2.2 a horizontal paned containing:
      2.2.1 a scrolled window to hold the tree view of the session
-     2.2.2 a vertical box
+     2.2.2 a vertical paned containing
 *)
 
 let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
@@ -140,7 +140,7 @@ let scrollview =
        gconfig.tree_width <- w)
   in sv
 
-let vbox222 = GPack.vbox ~packing:hp#add ()
+let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
 
 (*  the scrolled window 2.2.1 contains a GTK tree
 
@@ -181,31 +181,34 @@ let goals_model,goals_view =
   Debug.dprintf debug " done@.";
   model,view
 
-(* vbox222 contains:
+(* vpan222 contains:
    2.2.2.1 a view of the current task
-   2.2.2.2 a input field to type commands
+   2.2.2.2 a vertiacal pan which contains
+     2.2.2.2.1 the input field to type commands
+     2.2.2.2.2 the output of the commands
  *)
 
 let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
-    ~packing:(vbox222#pack ?from:None ~expand:true ~fill:true ?padding:None)
-    ()
+    ~packing:vpan222#add ()
 
 let task_view =
   GSourceView2.source_view
     ~editable:false
+    ~cursor_visible:false
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add
     ()
 
+let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
 
-let command_entry = GEdit.entry ~packing:vbox222#add ()
+let command_entry =
+  GEdit.entry ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 let message_zone =
   GText.view ~editable:false ~cursor_visible:false
-             ~packing:(vbox222#pack ?from:None ~expand:true ~fill:true ?padding:None) ()
-
+             ~packing:(vbox2222#pack ?from:None ~expand:true ~fill:true ?padding:None) ()
 
 (********************************************)
 (* controller instance on the GTK scheduler *)
@@ -449,7 +452,9 @@ let on_selected_row r =
        let s = Pp.string_of
                  (Driver.print_task ~cntexample:false task_driver)
                  task
-       in task_view#source_buffer#set_text s
+       in task_view#source_buffer#set_text s;
+       (* scroll to end of text *)
+       task_view#scroll_to_mark `INSERT
     | _ -> task_view#source_buffer#set_text ""
   with
     | Not_found -> task_view#source_buffer#set_text ""
@@ -468,6 +473,7 @@ let (_ : GtkSignal.id) =
 let () =
   build_tree_from_session cont.controller_session;
   (* temporary *)
+  vpan222#set_position 500;
   goals_view#expand_all ();
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
