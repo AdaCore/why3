@@ -272,6 +272,7 @@ module Dl = struct
 
 end
 
+
 open Dl
 
 type historic = {mutable top : string dl; mutable current : string dl}
@@ -296,7 +297,7 @@ let get_current () =
 
 let _ =
   command_entry#event#connect#key_press
-    (fun (key: 'a Gdk.event) ->
+    ~callback:(fun (key: 'a Gdk.event) ->
       match (GdkEvent.Key.hardware_keycode key) with
       | 111 -> (* Arrow top *)
           next_command ();
