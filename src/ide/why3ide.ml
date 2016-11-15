@@ -420,67 +420,59 @@ let build_tree_from_session ses =
    do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
 
-(* TODO maybe an other file for callbacks *)
 (* Callback of a transformation *)
-let callback_update_tree_transform ses row_reference = fun status ->
+let callback_update_tree_transform ses status =
   match status with
   | TSdone trans_id ->
-      build_subtree_from_trans ses row_reference trans_id;
-      (match Session_itp.get_sub_tasks ses trans_id with
+     let id = get_trans_parent ses trans_id in
+     let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
+     build_subtree_from_trans ses row_ref trans_id;
+     (match Session_itp.get_sub_tasks ses trans_id with
       | first_goal :: _ ->
-          (* Put the selection on the first goal *)
-          goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
+         (* Put the selection on the first goal *)
+         goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
       | [] -> ())
   | _ -> ()
 
 let apply_transform ses t args =
   match !current_selected_index with
   | IproofNode id ->
-    let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
-    let callback =
-         callback_update_tree_transform ses row_ref
-       in
-       C.schedule_transformation cont id t args ~callback
-    | _ -> printf "Error: Give the name of the transformation@."
+     let callback = callback_update_tree_transform ses in
+    C.schedule_transformation cont id t args ~callback
+  | _ -> printf "Error: Give the name of the transformation@."
 
-
-let remove_children iter =
-  if (goals_model#iter_has_child iter) then
-    ignore (goals_model#remove (goals_model#iter_children (Some iter)))
-  else ()
 
 (* Callback of a proof_attempt *)
-let callback_update_tree_proof _ses row_ref _id name =
-  fun panid pa_status ->
+let callback_update_tree_proof ses panid pa_status =
+  let pa = get_proof_attempt ses panid in
+  let prover = pa.prover in
+  let name = Pp.string_of Whyconf.print_prover prover in
   match pa_status with
-    | Scheduled ->
-       begin
-       try
-         let _new_row_ref = Hpan.find pan_id_to_gtree panid in
-         () (* TODO: set icon to 'pause' *)
-       with Not_found ->
-            ignore(new_node ~parent:row_ref (name ^ " scheduled") (IproofAttempt panid))
-       end
-  | Done _pr ->
-       begin
+  | Scheduled ->
+     begin
        try
          let r = Hpan.find pan_id_to_gtree panid in
-         goals_model#set ~row:r#iter ~column:name_column (name ^ " done")
-       with Not_found -> assert false
-       end
-  | Running -> () (* TODO: set icon to 'play' *)
+         goals_model#set ~row:r#iter ~column:name_column (name ^ " scheduled")
+       with Not_found ->
+         let parent_id = get_proof_attempt_parent ses panid in
+         let parent = Hpn.find pn_id_to_gtree parent_id in
+         ignore(new_node ~parent (name ^ " scheduled") (IproofAttempt panid))
+     end
+  | Done pr ->
+     let r = Hpan.find pan_id_to_gtree panid in
+     let res = Pp.string_of Call_provers.print_prover_result pr in
+     goals_model#set ~row:r#iter ~column:name_column (name ^ " " ^ res)
+  | Running ->
+     let r = Hpan.find pan_id_to_gtree panid in
+     goals_model#set ~row:r#iter ~column:name_column (name ^ " running")
   | _ ->  () (* TODO ? *)
 
 let test_schedule_proof_attempt ses (p: Whyconf.config_prover) limit =
   match !current_selected_index with
   | IproofNode id ->
-    let row_ref = Hpn.find pn_id_to_gtree id in
     let prover = p.Whyconf.prover in
-    let printing = prover.Whyconf.prover_name ^ "(" ^ prover.Whyconf.prover_version ^ ")" in
-    let callback = callback_update_tree_proof ses row_ref id printing in
-        C.schedule_proof_attempt
-          cont id prover
-          ~limit ~callback
+    let callback = callback_update_tree_proof ses in
+    C.schedule_proof_attempt cont id prover ~limit ~callback
   | _ -> message_zone#buffer#set_text ("Must be on a proof node to use a prover.")
 
 
@@ -498,7 +490,13 @@ let run_strategy_on_task s =
           let callback sts =
             printf "Strategy status: %a@." print_strategy_status sts
           in
-          C.run_strategy_on_goal cont id st ~callback
+          let callback_pa =
+            callback_update_tree_proof cont.controller_session
+          in
+          let callback_tr st =
+            callback_update_tree_transform cont.controller_session st
+          in
+          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
     | _ -> printf "Strategy '%s' not found@." s
      end
   | _ -> ()

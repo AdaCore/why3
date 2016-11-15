@@ -207,6 +207,12 @@ let get_transformations (s : session) (id : proofNodeID) =
 let get_proof_attempt_ids (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_attempts
 
+let get_proof_attempt (s : session) (a : proofAttemptID) =
+  (get_proofAttemptNode s a).proofa_attempt
+
+let get_proof_attempt_parent (s : session) (a : proofAttemptID) =
+  (get_proofAttemptNode s a).proofa_parent
+
 let get_proof_attempts (s : session) (id : proofNodeID) =
   Hprover.fold (fun _ a l ->
                 let pa = get_proofAttemptNode s a in

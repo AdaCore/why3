@@ -396,14 +396,15 @@ let schedule_transformation c id name args ~callback =
 
 open Strategy
 
-let run_strategy_on_goal c id strat ~callback =
+let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
     else
       match Array.get strat pc with
       | Icall_prover(p,timelimit,memlimit) ->
-         let callback _panid res =
+         let callback panid res =
+           callback_pa panid res;
            match res with
            | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
@@ -425,6 +426,7 @@ let run_strategy_on_goal c id strat ~callback =
          schedule_proof_attempt c g p ~limit ~callback
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
+           callback_tr ntr;
            match ntr with
            | TSfailed -> (* transformation failed *)
               callback (STSgoto (g,pc+1));
@@ -439,8 +441,7 @@ let run_strategy_on_goal c id strat ~callback =
                    exec_strategy pcsuccess strat g; false
                  in
                  S.idle ~prio:0 run_next)
-                (get_sub_tasks c.controller_session tid);
-              (*Todo._done todo*) ()
+                (get_sub_tasks c.controller_session tid)
          in
          schedule_transformation c g trname [] ~callback
       | Igoto pc ->

@@ -65,6 +65,8 @@ val get_task : session -> proofNodeID -> Task.task
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :
   session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
+val get_proof_attempt : session -> proofAttemptID -> proof_attempt
+val get_proof_attempt_parent : session -> proofAttemptID -> proofNodeID
 val get_proof_attempts : session -> proofNodeID -> proof_attempt list
 val get_sub_tasks : session -> transID -> proofNodeID list
 val get_detached_sub_tasks : session -> transID -> proofNodeID list

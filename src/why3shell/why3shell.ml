@@ -549,7 +549,9 @@ let run_strategy _fmt args =
           let callback sts =
             printf "Strategy status: %a@." print_strategy_status sts
           in
-          C.run_strategy_on_goal cont id st ~callback
+          let callback_pa _panid _st = () in
+          let callback_tr _tr = () in
+          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
        | _ -> printf "Strategy '%s' not found@." s
      end
   | _ -> printf "Please give the strategy shortcut as argument@."

@@ -169,15 +169,19 @@ val schedule_transformation :
    the transformation status changes. Typically at Scheduled, then
    Done tid.*)
 
-
 val run_strategy_on_goal :
   controller ->
   proofNodeID ->
   Strategy.t ->
+  callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
+  callback_tr:(transformation_status -> unit) ->
   callback:(strategy_status -> unit) -> unit
 (** [run_strategy_on_goal c id strat] executes asynchronously the
-    strategy [strat] on the goal [id].  TODO: add callback to get
-    inform of the progress *)
+    strategy [strat] on the goal [id].  [callback_pa] is called for
+    each proof attempted (as in [schedule_proof_attempt]) and
+    [callback_tr] is called for each transformation applied (as in
+    [schedule_transformation]). [callback] is called on each step of
+    execution of the strategy.  *)
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
