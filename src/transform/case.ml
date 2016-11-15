@@ -10,6 +10,10 @@ open Reduction_engine
 let debug_matching = Debug.register_info_flag "print_match"
   ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
 
+exception Arg_trans of string
+exception Arg_trans_term of (string * Term.term option * Term.term option)
+exception Arg_trans_type of (string * Ty.ty option * Ty.ty option)
+
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
 let gen_ident = Ident.id_fresh
@@ -40,23 +44,22 @@ let subst_quant c tq x : term =
         (let new_t = t_subst_single hdv x te in
         t_quant_close c tl tr new_t)
       with
-      | Ty.TypeMismatch (_ty1, _ty2) -> failwith "type mismatch") (* TODO match errors *)
-  | [] -> failwith "no")
-
+      | Ty.TypeMismatch (ty1, ty2) -> raise (Arg_trans_type ("subst_quant", Some ty1, Some ty2)))
+  | [] -> failwith "subst_quant: Should not happen, please report")
 
 (* Transform the term (exists v, f) into f[x/v] *)
 let subst_exist t x =
   match t.t_node with
   | Tquant (Texists, tq) ->
       subst_quant Texists tq x
-  | _ -> failwith "term do not begin with exists"
+  | _ -> raise (Arg_trans "subst_exist")
 
 (* Transform the term (forall v, f) into f[x/v] *)
 let subst_forall t x =
   match t.t_node with
   | Tquant (Tforall, tq) ->
       subst_quant Tforall tq x
-  | _ -> failwith "term do not begin with forall"
+  | _ -> raise (Arg_trans "subst_forall")
 
 let exists_aux g x =
   let t = subst_exist g x in
@@ -99,7 +102,7 @@ let instantiate (pr: Decl.prsymbol) t =
 let term_decl d =
   match d.td_node with
   | Decl ({d_node = Dprop (_pk, _pr, t)}) -> t
-  | _ -> failwith "Not a correct prop"
+  | _ -> raise (Arg_trans "term_decl")
 
 let pr_prsymbol pr =
   match pr with
@@ -128,6 +131,8 @@ let intros f =
     | _ -> (lp, lv, f) in
   intros_aux [] Svs.empty f
 
+exception Hyp_not_found
+
 (* Apply:
    1) takes the hypothesis and introduce parts of it to keep only the last element of
       the implication. It gathers the premises and variables in a list.
@@ -141,7 +146,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let g, task = Task.task_separate_goal task in
   let g = term_decl g in
   let d = find_hypothesis name task in
-  if d = None then failwith "Hypothesis not found";
+  if d = None then raise Hyp_not_found;
   let d = Opt.get d in
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
@@ -150,8 +155,8 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
       (if (Debug.test_flag debug_matching) then
         Format.printf "Term %a and %a can not be matched. Failure in matching@."
           Pretty.print_term t1 Pretty.print_term t2
-      else ()); failwith "Unable to instantiate variables with possible values@."
-  | Reduction_engine.NoMatch None -> failwith "Tactic apply matching failure. Please report@."
+      else ()); raise (Reduction_engine.NoMatch (Some (t1, t2)))
+  | Reduction_engine.NoMatch None -> raise (Reduction_engine.NoMatch None)
   in
   let inst_nt = t_subst subst nt in
   if (Term.t_equal_nt_nl inst_nt g) then
@@ -160,10 +165,12 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
                           (create_prsymbol (gen_ident "G")) ng)) nlp in
     lt
   else
-    (Format.printf
+    raise (Arg_trans_term ("apply", Some inst_nt, Some g)))
+
+(*(Format.printf
       "Term %a and %a are not equal. Failure in matching @."
        Pretty.print_term inst_nt Pretty.print_term g;
-     failwith "After substitution, terms are not exactly identical"))
+     failwith "After substitution, terms are not exactly identical"))*)
 
 (* Replace all occurences of f1 by f2 in t *)
 let replace_in_term = Term.t_replace
@@ -216,9 +223,11 @@ let replace_subst lp lv f1 f2 t =
     end in
   let t = t_map (replace lv f1 f2) t in
   match !is_replaced with
-  | None -> failwith "Did not find any occurences in the matched term"
+  | None -> raise Not_found
   | Some subst ->
     (List.map (t_subst subst) lp, t)
+
+exception Bad_hypothesis of Term.term
 
 let rewrite rev h h1 =
   let found_eq =
@@ -231,14 +240,14 @@ let rewrite rev h h1 =
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
               (* Support to rewrite from the right *)
               if rev then (t1, t2) else (t2, t1)
-          | _ -> failwith "Hypothesis not of the form ?a = ?b") in
+          | _ -> raise (Bad_hypothesis f)) in
           Some (lp, lv, t1, t2)
       | _ -> acc) None in
 
 (* Return instantiated premises and the hypothesis correctly rewritten *)
   let lp_new found_eq =
     match found_eq with
-    | None -> failwith "Hypothesis not found"
+    | None -> raise Hyp_not_found
     | Some (lp, lv, t1, t2) ->
       fold (fun d acc ->
         match d.d_node with
@@ -250,7 +259,7 @@ let rewrite rev h h1 =
 (* Pass the premises as new goals. Replace the former toberewritten hypothesis to the new rewritten one *)
   let recreate_tasks lp_new =
     match lp_new with
-    | None -> failwith "Impossible to unify rewrite equality with any subterm"
+    | None -> raise (Arg_trans "recreate_tasks")
     | Some (lp, new_term) ->
       let trans_rewriting = Trans.decl (fun d -> match d.d_node with
         | Dprop (p, pr, _t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal)) ->
@@ -274,7 +283,7 @@ let rewrite = rewrite true
 (* Replace occurences of t1 with t2 in h *)
 let replace t1 t2 h =
   if not (Ty.ty_equal (t_type t1) (t_type t2)) then
-    failwith "Terms provided are not of the same type @."
+    raise (Arg_trans_term ("replace", Some t1, Some t2))
   else
     (* Create a new goal for equality of the two terms *)
     let g = Decl.create_prop_decl Decl.Pgoal (create_prsymbol (gen_ident "G")) (t_app_infer ps_equ [t1; t2]) in
@@ -295,15 +304,15 @@ let induction env x bound =
   let th = Env.read_theory env ["int"] "Int" in
   let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
   let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
-  let one_int = Theory.ns_find_ls th.Theory.th_export ["one"] in
+  let one_int = Term.t_const (Number.ConstInt (Number.int_const_dec "1")) in
 
   if (not (is_good_type x Ty.ty_int) || not (is_good_type bound Ty.ty_int)) then
-    failwith "The variable given is not of type int"
+    raise (Arg_trans "induction")
   else
     let lsx = match x.t_node with
     | Tvar lsx -> lsx.vs_name
     | Tapp (lsx, []) -> lsx.ls_name
-    | _ -> failwith "Induction can be done on variables only" in
+    | _ -> raise (Arg_trans "induction") in
 
   let le_bound = Trans.decl (fun d -> match d.d_node with
     | Dprop (Pgoal, _pr, _t) ->
@@ -319,17 +328,17 @@ let induction env x bound =
         (x_is_passed := true; [d])
     | Dprop (Pgoal, pr, t) ->
         if not (!x_is_passed) then
-          failwith "The variable is not defined in the task"
+          raise (Arg_trans "induction")
         else
           let x_ge_bound_t = t_app_infer le_int [bound; x] in
           let x_ge_bound =
             create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "H")) x_ge_bound_t in
           let new_pr = create_prsymbol (gen_ident "G") in
           let new_goal = create_prop_decl Pgoal new_pr
-              (replace_in_term x (t_app_infer plus_int [x; t_app_infer one_int []]) t) in
+              (replace_in_term x (t_app_infer plus_int [x; one_int]) t) in
           [x_ge_bound; create_prop_decl Paxiom pr t; new_goal]
     | Dprop (p, pr, t) ->
-        if !x_is_passed then [create_prop_decl p pr (replace_in_term x (t_app_infer plus_int [x; t_app_infer one_int []]) t)] else [d]
+        if !x_is_passed then [create_prop_decl p pr (replace_in_term x (t_app_infer plus_int [x; one_int]) t)] else [d]
     (* TODO | Dlogic l ->
         if !x_is_passed then replace things inside and rebuild it else
         [d]*)
