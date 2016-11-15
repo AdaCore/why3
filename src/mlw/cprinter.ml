@@ -220,6 +220,15 @@ module C = struct
       d, Sfor(e1,e2,e3,s')
     | s -> d,s
 
+  let rec elim_empty_blocks = function
+    | Sblock ([], s) -> elim_empty_blocks s
+    | Sblock (d,s) -> Sblock (d, elim_empty_blocks s)
+    | Sseq (s1,s2) -> Sseq (elim_empty_blocks s1, elim_empty_blocks s2)
+    | Sif (c,t,e) -> Sif(c, elim_empty_blocks t, elim_empty_blocks e)
+    | Swhile (c,s) -> Swhile(c, elim_empty_blocks s)
+    | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_empty_blocks s)
+    | s -> s
+
   let rec elim_nop = function
     | Sseq (s1,s2) ->
       let s1 = elim_nop s1 in
@@ -286,9 +295,9 @@ module Print = struct
     | Tvoid -> fprintf fmt "void"
     | Tsyntax (s, tl) ->
       syntax_arguments
-        (if paren then ("("^s^")") else s)
+	s
         (print_ty ~paren:false) fmt tl
-    | Tptr ty -> fprintf fmt "(%a)*" (print_ty ~paren:true) ty
+    | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
     | Tarray (ty, expr) ->
       fprintf fmt (protect_on paren "%a[%a]")
         (print_ty ~paren:true) ty (print_expr ~paren:false) expr
@@ -366,6 +375,7 @@ module Print = struct
       (print_expr ~paren:false) e (print_stmt ~braces:true) (Sblock([],b))
     | Sfor _ -> raise (Unprinted "for loops")
     | Sbreak -> fprintf fmt "break;"
+    | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" (print_expr ~paren:true) e
 
   and print_def fmt def =
@@ -442,6 +452,7 @@ module Translate = struct
 
   type syntax_env = { in_unguarded_loop : bool;
                       computes_return_value : bool;
+		      returns_tuple: bool * ident list;
                       breaks : Sid.t;
                       returns : Sid.t; }
 
@@ -463,32 +474,50 @@ module Translate = struct
       begin match ce.c_node with
       | Cfun e -> expr info env e
       | Capp (rs, pvsl) ->
-         let e =  match query_syntax info.syntax rs.rs_name with
-           | Some s ->
-              let params =
-		List.map (fun pv -> (C.Evar(pv_name pv),
-                                     ty_of_ty info (ty_of_ity pv.pv_ity)))
-			 pvsl in
-              let rty = ty_of_ity e.e_ity in
-              let rtyargs = match rty.ty_node with
-		| Tyvar _ -> [||]
-		| Tyapp (_,args) -> Array.of_list (List.map (ty_of_ty info) args)
-              in
-              C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
-                        Mid.mem rs.rs_name info.converter)
-           | None ->
-             let args = List.filter
-               (fun pv -> not (pv.pv_ghost
-                               || ity_equal pv.pv_ity ity_unit))
-               pvsl in
-              C.(Ecall(Evar(rs.rs_name),
-                       List.map (fun pv -> Evar(pv_name pv)) args))
-         in
-	 C.([],
-            if env.computes_return_value
-              && not (ity_equal rs.rs_cty.cty_result ity_unit)
-            then Sreturn e
-            else Sexpr e)
+	 if is_rs_tuple rs && env.computes_return_value
+	 then begin
+	     match env.returns_tuple with
+	     | true, rl ->
+		let args = List.filter (fun pv -> not (pv.pv_ghost
+						       || ity_equal pv.pv_ity ity_unit))
+				       pvsl in
+		assert (List.length rl = List.length args);
+		C.([],
+		   List.fold_right2 (fun res arg acc -> 
+				     Sseq(Sexpr(Ebinop(Bassign,
+						       Eunop(Ustar,Evar(res)),
+						       Evar(pv_name arg))),
+					 acc))
+				    rl args (Sreturn(Enothing)))
+	     | _ -> assert false
+	   end
+	 else 
+	   let e =  match query_syntax info.syntax rs.rs_name with
+	     | Some s ->
+		let params =
+		  List.map (fun pv -> (C.Evar(pv_name pv),
+                                       ty_of_ty info (ty_of_ity pv.pv_ity)))
+			   pvsl in
+		let rty = ty_of_ity e.e_ity in
+		let rtyargs = match rty.ty_node with
+		  | Tyvar _ -> [||]
+		  | Tyapp (_,args) -> Array.of_list (List.map (ty_of_ty info) args)
+		in
+		C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
+                          Mid.mem rs.rs_name info.converter)
+             | None ->
+		let args = List.filter
+			     (fun pv -> not (pv.pv_ghost
+					     || ity_equal pv.pv_ity ity_unit))
+			     pvsl in
+		C.(Ecall(Evar(rs.rs_name),
+			 List.map (fun pv -> Evar(pv_name pv)) args))
+           in
+	   C.([],
+              if env.computes_return_value
+		 && not (ity_equal rs.rs_cty.cty_result ity_unit)
+              then Sreturn e
+              else Sexpr e)
       | _ -> raise (Unsupported "Cpur/Cany") (*TODO clarify*)
       end
     | Eassign _ -> raise (Unsupported "mutable field assign")
@@ -556,6 +585,7 @@ module Translate = struct
       let cd, cs = C.flatten_defs cd cs in
       let env' = { computes_return_value = false;
                    in_unguarded_loop = true;
+		   returns_tuple = env.returns_tuple;
                    returns = env.returns;
                    breaks =
                      if env.in_unguarded_loop
@@ -583,6 +613,7 @@ module Translate = struct
       in
       let env' = { computes_return_value = env.computes_return_value;
                    in_unguarded_loop = false;
+		   returns_tuple = env.returns_tuple;
                    breaks = breaks;
                    returns = returns;
                  } in
@@ -603,14 +634,15 @@ module Translate = struct
             match p.pat_node with Pvar _ -> true |_-> false)
             rets
           ->
-      let rets = List.map
-        (fun p -> match p.pat_node with
-        | Pvar vs -> C.(Eunop(Uaddr,Evar(vs.vs_name)))
+      let rets, defs = List.fold_right
+        (fun p (r, d)-> match p.pat_node with
+        | Pvar vs -> (C.(Eunop(Uaddr,Evar(vs.vs_name)))::r,
+		     C.Ddecl(ty_of_ty info vs.vs_ty, [vs.vs_name, C.Enothing])::d)
         | _ -> assert false )
-        rets in
+        rets ([], []) in
       let d,s = expr info {env with computes_return_value = false} e1 in
       let b = expr info env e2 in
-      d, C.(Sseq(add_to_last_call rets s, Sblock b))
+      d@defs, C.(Sseq(add_to_last_call rets s, Sblock b))
     | Ecase _ -> raise (Unsupported "pattern matching")
     | Eghost _ | Epure _ | Eabsurd -> assert false
 
@@ -630,20 +662,58 @@ module Translate = struct
                        && not (ity_equal pv.pv_ity ity_unit))
 		     rs.rs_cty.cty_args) in
                 begin match ce.c_node with
-                | Cfun e ->
-                  let rity = rs.rs_cty.cty_result in
-                  let rtype =
-                    if ity_equal rity ity_unit
-                    then C.Tvoid
-                    else ty_of_ty info (ty_of_ity rity) in
-                  let env = { computes_return_value = true;
-                              in_unguarded_loop = false;
-                              returns = Sid.empty;
-                              breaks = Sid.empty; } in
-                  let d,s = expr info env e in
-                  let d,s = C.flatten_defs d s in
-                  let s = C.elim_nop s in
-                  [C.Dfun (fname, (rtype,params), (d,s))]
+                      | Cfun e ->
+			 let env = { computes_return_value = true;
+				     in_unguarded_loop = false;
+				     returns_tuple = false, [];
+				     returns = Sid.empty;
+				     breaks = Sid.empty; } in
+			 let rity = rs.rs_cty.cty_result in
+			 let is_simple_tuple ity = 
+			   let arity_zero = function
+			     | Ityapp(_,a,r) -> a = [] && r = []
+			     | Ityreg { reg_args = a; reg_regs = r } -> a = [] && r = []
+			     | Ityvar _ -> true
+			   in
+			   (match ity.ity_node with
+			    | Ityapp ({its_ts = s},_,_) | Ityreg { reg_its = {its_ts = s}; }
+							  -> is_ts_tuple s
+			    | _ -> false)
+			   && (ity_fold (fun acc ity -> acc && arity_zero ity.ity_node) true ity)
+			 in
+			 (* FIXME is it necessary to have arity 0 in regions ?*)
+			 let rtype =
+			   if ity_equal rity ity_unit
+			   then C.Tvoid
+			   else ty_of_ty info (ty_of_ity rity) in
+			 let env, rtype, params = match rtype with
+			   | C.Tnosyntax when is_simple_tuple rity ->
+			      (* instead of returning a tuple, return
+			      void and assign the result to addresses
+			      passed as parameters *)
+			      let returns = 
+				let f ity b acc =
+				  if b
+				  then (C.Tptr(ty_of_ty info (ty_of_ity ity)), 
+					id_register (id_fresh "result"))::acc
+				  else acc
+				in
+				match rity.ity_node with
+				| Ityapp(s, tl,_) 
+				| Ityreg { reg_its = s; reg_args = tl } ->
+				   List.fold_right2 f tl s.its_arg_vis []
+				| Ityvar _ -> assert false
+			      in
+			      {env with returns_tuple = true, List.map snd returns},
+			      C.Tvoid,
+			      returns@params
+			   | _ -> env, rtype, params 
+			 in
+			 let d,s = expr info env e in
+			 (* let d,s = C.flatten_defs d s in *)
+			 let s = C.elim_nop s in
+			 let s = C.elim_empty_blocks s in
+			 [C.Dfun (fname, (rtype,params), (d,s))]
                 | _ -> raise (Unsupported
                                 "Non-function with no syntax in toplevel let")
 	        end

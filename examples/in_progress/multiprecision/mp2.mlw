@@ -1518,11 +1518,6 @@ module N
   =
     ()
 
-  val lsld (x cnt:limb) : (limb,limb)
-    requires { 0 < l2i cnt < 32 }
-    returns { (r,d) -> l2i r + radix * l2i d =
-              (power 2 (l2i cnt)) * l2i x }
-
   let lemma pow2_32 ()
     ensures { power 2 32 = radix }
   =
@@ -2110,30 +2105,21 @@ module N
     assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
 
-end
-
-module Main
-
-  use import mach.c.C
-  use import N
-  use import mach.int.Int32
-  use import int.Int
-  use import ref.Ref
-
+  (** Tests *)
   let print (p:t) (m n:int32) : unit
     requires { 0 <= p.offset + p2i m
                <= p.offset + p2i n
                <= plength p }
   =
     let i = ref m in
-    let q = ref (incr p m) in
+    let q = ref (C.incr p m) in
     let one = Int32.of_int 1 in
     while (Int32.(<) !i n) do
       invariant { p2i m <= p2i !i <= p2i n }
       invariant { (!q).offset = p.offset + p2i !i }
       invariant { plength !q = plength p }
       variant { p2i n - p2i !i }
-      print_uint32 (get !q);
+      print_uint32 (C.get !q);
       print_space ();
       q := C.incr !q one;
       i := Int32.(+) !i one;
@@ -2159,7 +2145,7 @@ module Main
     if not (is_null p)
     then begin
       C.set p l1;
-      C.set (incr p (Int32.of_int 1)) l2
+      C.set (C.incr p (Int32.of_int 1)) l2
       end;
     p
 
@@ -2167,7 +2153,7 @@ module Main
     let p = from_limb (Limb.of_int 42) in
     if not (is_null p)
        then begin
-       print_uint32 (get p);
+       print_uint32 (C.get p);
        print_newline ();
        end;
     free p;

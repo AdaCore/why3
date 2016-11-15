@@ -47,6 +47,47 @@ end
 
 module mach.int.UInt32
 
+  prelude
+
+"
+#define LOW_MASK 0x00000000FFFFFFFFULL
+
+void add_with_carry(uint32_t * res, uint32_t * carry, uint32_t x, uint32_t y, uint32_t c)
+{
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;
+  *res = (uint32_t)(r & LOW_MASK);
+  *carry = (uint32_t)(r >> 32);
+}
+
+void sub_with_borrow(uint32_t * res, uint32_t * borrow, uint32_t x, uint32_t y, uint32_t b)
+{
+  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;
+  *res = (uint32_t)(r & LOW_MASK);
+  *borrow = (uint32_t)(r >> 63); 
+}
+
+void mul_double(uint32_t * low, uint32_t * high, uint32_t x, uint32_t y)
+{
+  uint64_t r = (uint64_t)x * (uint64_t)y;
+  *low = (uint32_t)(r & LOW_MASK);
+  *high = (uint32_t)(r >> 32);
+}
+
+void add3(uint32_t * low, uint32_t * high, uint32_t x, uint32_t y, uint32_t z)
+{
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;
+  *low = (uint32_t)(r & LOW_MASK);
+  *high = (uint32_t)(r >> 32);
+}
+
+void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
+{
+  uint64_t r = (uint64_t)x << cnt;
+  *low = (uint32_t)(r & LOW_MASK);
+  *high = (uint32_t)(r >> 32);
+}
+"
+
   syntax val of_int "%1"
   syntax converter of_int "%1"
 
@@ -64,6 +105,10 @@ module mach.int.UInt32
   syntax val (<)     "%1 < %2"
   syntax val (>=)    "%1 >= %2"
   syntax val (>)     "%1 > %2"
+
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
 end
 
 
