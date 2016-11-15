@@ -181,6 +181,8 @@ type gentrans =
 
 val lookup_trans : Env.env -> string -> gentrans
 
+val list_trans : unit -> string list
+
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly.*)
 

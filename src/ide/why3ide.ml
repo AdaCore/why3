@@ -185,7 +185,7 @@ let goals_model,goals_view =
    2.2.2.1 a view of the current task
    2.2.2.2 a vertiacal pan which contains
      2.2.2.2.1 the input field to type commands
-     2.2.2.2.2 the output of the commands
+     2.2.2.2.2 a scrolled window to hold the output of the commands
  *)
 
 let scrolled_task_view =
@@ -206,9 +206,40 @@ let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
 
 let command_entry =
   GEdit.entry ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
+
 let message_zone =
+  let sv = GBin.scrolled_window
+      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+      ~shadow_type:`ETCHED_OUT ~packing:vbox2222#add ()
+  in
   GText.view ~editable:false ~cursor_visible:false
-             ~packing:(vbox2222#pack ?from:None ~expand:true ~fill:true ?padding:None) ()
+    ~packing:sv#add ()
+
+(****************************)
+(* command entry completion *)
+(****************************)
+
+let completion_cols = new GTree.column_list
+let completion_col = completion_cols#add Gobject.Data.string
+let completion_model = GTree.tree_store completion_cols
+
+let command_entry_completion : GEdit.entry_completion =
+  GEdit.entry_completion ~model:completion_model ~minimum_key_length:1 ~entry:command_entry ()
+
+let add_completion_entry s =
+  let row = completion_model#append () in
+  completion_model#set ~row ~column:completion_col s
+
+let init_comp () =
+  (* add the names of all the the transformations *)
+  List.iter add_completion_entry (Trans.list_trans ());
+  (* add the name of the commands *)
+  List.iter (fun (c,_,_) -> add_completion_entry c)
+    Session_user_interface.commands;
+  (* todo: add queries *)
+
+  command_entry_completion#set_text_column completion_col;
+  command_entry#set_completion command_entry_completion
 
 (********************************************)
 (* controller instance on the GTK scheduler *)
@@ -473,6 +504,7 @@ let (_ : GtkSignal.id) =
 let () =
   build_tree_from_session cont.controller_session;
   (* temporary *)
+  init_comp ();
   vpan222#set_position 500;
   goals_view#expand_all ();
   main_window#add_accel_group accel_group;

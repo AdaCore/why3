@@ -379,6 +379,18 @@ let lookup_trans env name =
         let t = lookup_transform_with_args_l name env in
         Trans_with_args_l t
 
+let list_trans () =
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms_l []
+  in
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms l
+  in
+  let l =
+    Hstr.fold (fun k _ acc -> k::acc) transforms_with_args l
+  in
+    Hstr.fold (fun k _ acc -> k::acc) transforms_with_args_l l
+
 let apply_transform tr_name env task =
    match lookup_trans env tr_name with
     | Trans_one t -> [apply t task]

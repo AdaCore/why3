@@ -154,7 +154,6 @@ let split_args s =
     | a::b -> a,b
     | [] -> "",[]
 
-
 type command =
   | Transform of string * Trans.gentrans * string list
   | Query of string
