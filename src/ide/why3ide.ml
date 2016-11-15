@@ -420,26 +420,6 @@ let build_tree_from_session ses =
    do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
 
-let run_strategy_on_task s =
-  match !current_selected_index with
-  | IproofNode id ->
-     let l = Session_user_interface.strategies
-               cont.controller_env gconfig.config
-     in
-     let st = List.filter (fun (_,c,_,_) -> c=s) l in
-     begin
-       match st with
-       | [(n,_,_,st)] ->
-          printf "running strategy '%s'@." n;
-          let callback sts =
-            printf "Strategy status: %a@." print_strategy_status sts
-          in
-          C.run_strategy_on_goal cont id st ~callback
-    | _ -> printf "Strategy '%s' not found@." s
-     end
-  | _ -> ()
-
-
 (* TODO maybe an other file for callbacks *)
 (* Callback of a transformation *)
 let callback_update_tree_transform ses row_reference = fun status ->
@@ -503,6 +483,27 @@ let test_schedule_proof_attempt ses (p: Whyconf.config_prover) limit =
           ~limit ~callback
   | _ -> message_zone#buffer#set_text ("Must be on a proof node to use a prover.")
 
+
+let run_strategy_on_task s =
+  match !current_selected_index with
+  | IproofNode id ->
+     let l = Session_user_interface.strategies
+               cont.controller_env gconfig.config
+     in
+     let st = List.filter (fun (_,c,_,_) -> c=s) l in
+     begin
+       match st with
+       | [(n,_,_,st)] ->
+          printf "running strategy '%s'@." n;
+          let callback sts =
+            printf "Strategy status: %a@." print_strategy_status sts
+          in
+          C.run_strategy_on_goal cont id st ~callback
+    | _ -> printf "Strategy '%s' not found@." s
+     end
+  | _ -> ()
+
+
 let clear_command_entry () = command_entry#set_text ""
 
 open Session_user_interface
@@ -522,10 +523,22 @@ let interp cmd =
           test_schedule_proof_attempt cont.controller_session prover_config limit
         | None ->
           match s with
-          | "s" -> clear_command_entry ();
-                   run_strategy_on_task "1"
-          | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+       | "auto" ->
+           let s =
+             match args with
+               | "2"::_ -> "2"
+               | _ -> "1"
+           in
+           clear_command_entry ();
+           run_strategy_on_task s
+       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
       end
+(*
+       match s with
+       | "c" -> clear_command_entry ();
+                test_schedule_proof_attempt cont.controller_session
+       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+ *)
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
