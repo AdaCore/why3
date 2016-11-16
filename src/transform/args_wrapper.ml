@@ -263,17 +263,33 @@ let parse_theory env s =
 
 let get_opt_type: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
   fun t ->
-  match t with
-  | Tty t'       -> t'
-  | Ttysymbol t' -> t'
-  | Tenv t'      -> t'
-  | Tint t'      -> t'
-  | Tprsymbol t' -> t'
-  | Tformula t'  -> t'
-  | Tterm t'     -> t'
-  | Ttheory t'   -> t'
-  | Tstring t'   -> t'
-  | _            -> assert false
+    match t with
+    | Tint t'      -> t'
+    | Tty t'       -> t'
+    | Ttysymbol t' -> t'
+    | Tprsymbol t' -> t'
+    | Tterm t'     -> t'
+    | Tstring t'   -> t'
+    | Tformula t'  -> t'
+    | Ttheory t'   -> t'
+    | _            -> assert false
+
+let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
+  fun t ->
+    match t with
+    | Ttrans         -> "trans"
+    | Ttrans_l       -> "transl"
+    | Tint _         -> "integer"
+    | Tty _          -> "type"
+    | Ttysymbol _    -> "type symbol"
+    | Tprsymbol _    -> "prop symbol"
+    | Tterm _        -> "term"
+    | Tstring _      -> "string"
+    | Tformula _     -> "formula"
+    | Ttheory _      -> "theory"
+    | Tenv _         -> "environment"
+    | Topt (s,_)     -> "opt [" ^ s ^ "]"
+    | Toptbool (s,_) -> "boolean opt [" ^ s ^ "]"
 
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> task -> b =
   fun t f l env task ->
@@ -331,14 +347,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f true) tail env task
     | Toptbool (_, t'), _ ->
       wrap_to_store t' (f false) l env task
-    | Tint _, _      -> failwith "Missing argument: expecting an integer."
-    | Tformula _, _  -> failwith "Missing argument: expecting a formula."
-    | Tterm _, _     -> failwith "Missing argument: expecting a term."
-    | Tty _, _       -> failwith "Missing argument: expecting a type."
-    | Ttysymbol _, _ -> failwith "Missing argument: expecting a type symbol."
-    | Tprsymbol _, _ -> failwith "Missing argument: expecting a prop symbol."
-    | Ttheory _, _   -> failwith "Missing argument: expecting a theory."
-    | Tstring _, _   -> failwith "Missing argument: expecting a string."
+    | _, _ -> raise (Arg_expected (string_of_trans_typ t))
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
   fun t f l env -> Trans.store (wrap_to_store t f l env)
