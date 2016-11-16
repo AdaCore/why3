@@ -338,13 +338,13 @@ let get_current () =
 
 let _ =
   command_entry#event#connect#key_press
-    ~callback:(fun (key: 'a Gdk.event) ->
-      match (GdkEvent.Key.hardware_keycode key) with
-      | 111 -> (* Arrow top *)
+    ~callback:(fun (ev: 'a Gdk.event) ->
+      match GdkEvent.Key.keyval ev with
+      | k when k = GdkKeysyms._Up -> (* Arrow up *)
           next_command ();
           let s = get_current () in
           command_entry#set_text s; true
-      | 116 -> (* Arrow bottom *)
+      | k when k = GdkKeysyms._Down -> (* Arrow down *)
           prev_command ();
           let s = get_current () in
           command_entry#set_text s; true
