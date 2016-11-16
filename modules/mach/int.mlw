@@ -113,7 +113,6 @@ module Unsigned
 
   use import int.Int
   use import int.EuclideanDivision
-  use import int.Power
 
   let constant min_unsigned : int = 0
 
@@ -157,11 +156,6 @@ module Unsigned
     returns { (r,d) ->
       to_int r + (max+1) * to_int d =
       to_int x * to_int y }
-
-  val lsld (x cnt:t) : (t,t)
-    requires { 0 < to_int cnt < 32 }
-    returns { (r,d) -> to_int r + (max+1) * to_int d =
-              (power 2 (to_int cnt)) * to_int x }
 
 end
 
@@ -213,6 +207,10 @@ end
 
 module UInt32
 
+  use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+
   type uint32
 
   let constant max_uint32 : int = 0xffffffff
@@ -220,6 +218,16 @@ module UInt32
   clone export Unsigned with
     type t = uint32,
     constant max = max_uint32
+
+  val lsld (x cnt:uint32) : (uint32,uint32)
+    requires { 0 < to_int cnt < 32 }
+    returns { (r,d) -> to_int r + (max_uint32+1) * to_int d =
+              (power 2 (to_int cnt)) * to_int x }
+
+  val div2by1 (l h d:uint32) : uint32
+    requires { to_int d > 0 }
+    ensures { to_int result
+            = div (to_int l + (max_uint32+1) * to_int h) (to_int d) }
 
 (*  use bv.BV32
 

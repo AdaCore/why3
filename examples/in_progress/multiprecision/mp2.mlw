@@ -698,7 +698,7 @@ module N
       done;
       !b
 
-  (** [sub r x y sx sy] adds [(x, sx)] to [(y,sy)] and writes the
+  (** [sub r x y sx sy] substracts [(y,sy)] from [(x, sx)] and writes the
       result in [(r, sx)]. [sx] must be greater than or equal to
       [sy]. Returns borrow, either 0 or 1. Corresponds to [mpn_sub]. *)
   let sub (r x y:t) (sx sy:int32) : limb
@@ -1608,7 +1608,7 @@ module N
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
-    let minus_one = Int32.(-_) (Int32.of_int 1) in
+    let minus_one = Int32.(-_) one in
     let msb = Int32.(-) sz one in
     let xp = ref (C.incr x msb) in
     let rp = ref (C.incr r msb) in
@@ -1854,15 +1854,56 @@ module N
 
   use import int.MinMax
 
-  val invert_limb (d:limb) : limb
-    requires { l2i d >= div radix 2 }
-    ensures { l2i result = (div (radix*radix - 1) (l2i d)) - radix }
+  predicate reciprocal (v d:limb) =
+    l2i v = (div (radix*radix - 1) (l2i d)) - radix
 
+  let lemma fact_div (x y z:int)
+    requires { y > 0 }
+    ensures { div (x + y * z) y = (div x y) + z }
+  =
+    assert { x + y * z = y * (div (x + y * z) y) + mod (x + y * z) y
+             so mod (x + y * z) y = mod (y * z + x) y = mod x y
+             so x + y * z = y * (div (x + y * z) y) + mod x y
+             so
+             x = y * div x y + mod x y
+             so x + y * z = y * div x y + mod x y + y * z
+             so y * (div (x + y * z) y) + mod x y
+                = y * div x y + mod x y + y * z
+             so y * (div (x + y * z) y) = y * div x y + y * z
+                                        = y * ((div x y) + z)
+             so y <> 0
+             so div (x + y * z) y = div x y + z
+           }
+
+  let invert_limb (d:limb) : limb
+    requires { l2i d >= div radix 2 }
+    ensures { reciprocal result d }
+  =
+    let v = div2by1 (Limb.of_int max_uint32)
+                    (Limb.(-) (Limb.of_int max_uint32) d)
+                    d in
+    fact_div (radix * radix - 1) (l2i d) (- radix);
+    assert { l2i v = (div (radix*radix - 1) (l2i d)) - radix
+             by
+             radix - 1 + radix * (radix - 1 - l2i d)
+             = radix - 1 + radix * (radix - 1) - radix * l2i d
+             = radix - 1 + radix * radix - radix - radix * l2i d
+             = radix * radix - 1 - radix * l2i d
+             so
+             radix - 1 + radix * (radix - 1 - l2i d)
+             = radix * radix - 1 - radix * l2i d
+             so
+             l2i v
+             = div ((radix - 1) + radix * (radix - 1 - l2i d)) (l2i d)
+             = div (radix * radix - 1 - radix * l2i d) (l2i d)
+             = div (radix * radix - 1) (l2i d) - radix
+           };
+   v
 
   let div2by1_inv (uh ul d v:limb) : (limb,limb)
     requires { l2i d >= div radix 2 }
     requires { l2i uh < l2i d }
-    requires { l2i v = (div (radix*radix - 1) (l2i d)) - radix }
+    requires { reciprocal v d }
     returns { q,r -> l2i q * l2i d + l2i r = l2i ul + radix * l2i uh }
     returns { _q, r -> 0 <= l2i r < l2i d }
   =
@@ -2104,6 +2145,32 @@ module N
     assert { 0 <= l2i !r < l2i d };
     assert { l2i !qh * l2i d + l2i !r = l2i ul + radix * l2i uh };
     (!qh,!r)
+(*
+  let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    requires { 0 < p2i sz }
+    ensures { value_sub_shift r sz
+              = div (value_sub_shift y sz) (l2i y) + l2i result }
+  =
+    let v = invert_limb y in
+    let limb_zero = Limb.of_int 0 in
+    let msb = Int32.(-) sz one in
+    let minus_one = Int32.(-_) (Int32.of_int 1) in
+    let xp = ref (C.incr x msb) in
+    let qp = ref (C.incr q msb) in
+    let i = ref msb in
+    let r = ref limb_zero in
+    while (Int32.(>=) !i zero) do
+      variant { p2i !i }
+      xp := C.incr !xp minus_one;
+      qp := C.incr !qp minus_one;
+      let (q,rem) = div2by1_inv !r (C.get !xp) y v in
+      r:=rem;
+      C.set !qp q;
+      xp := C.incr !xp minus_one;
+      qp := C.incr !qp minus_one;
+*)
 
   (** Tests *)
   let print (p:t) (m n:int32) : unit
@@ -2152,16 +2219,97 @@ module N
   let main () =
     let p = from_limb (Limb.of_int 42) in
     if not (is_null p)
-       then begin
-       print_uint32 (C.get p);
-       print_newline ();
-       end;
-    free p;
+    then begin
+      print_uint32 (C.get p);
+      print_newline ();
+      free p;
+    end;
     let q = two_limbs (Limb.of_int 0xffffffff) (Limb.of_int 42) in
     if not (is_null q)
-       then print q (Int32.of_int 0) (Int32.of_int 2);
-    free q;
-
+    then begin
+      print q (Int32.of_int 0) (Int32.of_int 2);
+      free q;
+    end;
+    let one = Int32.of_int 1 in
+    let two = Int32.of_int 2 in
+    let three = Int32.of_int 3 in
+    let four = Int32.of_int 4 in
+    let r = malloc (Limb.of_int 4) in
+    let s = malloc (Limb.of_int 4) in
+    if (is_null r || is_null s) then ()
+    else begin
+      zero r four;
+      zero s four;
+      let zero = Int32.of_int 0 in
+      let x = two_limbs (Limb.of_int 42) (Limb.of_int 13) in
+      let y = two_limbs (Limb.of_int 0xffffffff) (Limb.of_int 24) in
+      if (is_null x || is_null y)
+      then ()
+      else begin
+        print x zero two;
+        print y zero two;
+        let c = add r x y two two in
+        print r zero four;
+        print_uint32 c;
+        print_newline ();
+        let c = sub s r x two two in
+        print s zero four;
+        print_uint32 c;
+        print_newline ();
+        let c = sub s x r two two in
+        print s zero four;
+        print_uint32 c;
+        print_newline ();
+        let c = add r y s two two in
+        print r zero four;
+        print_uint32 c;
+        print_newline ();
+        mul r x y two two;
+        print r zero four;
+        let c = rshift s r four (Limb.of_int 3) in
+        print s zero four;
+        print_uint32 c;
+        print_newline ();
+        let c = rshift s r four (Limb.of_int 12) in
+        print s zero four;
+        print_uint32 c;
+        print_newline ();
+        let c = lshift s r three (Limb.of_int 28) in
+        print s zero four;
+        print_uint32 c;
+        print_newline ();
+      end;
+      free x;
+      free y;
+      free r;
+      free s;
+    end;
+    let l = Limb.of_int 0xf0000001 in
+    let v = invert_limb l in
+    print_uint32 l;
+    print_newline ();
+    print_uint32 v;
+    print_newline ();
+    let x = from_limb l in
+    let y = from_limb (Limb.of_int 45) in
+    let r = malloc (Limb.of_int 2) in
+    let s = malloc (Limb.of_int 2) in
+    if (is_null x || is_null y || is_null r || is_null s)
+    then ()
+    else begin
+      mul r x y one one;
+      let _ = add_limb s r (Limb.of_int 15) two in
+      print s (Int32.of_int 0) two;
+      let (q,rem) = div2by1_inv (C.get_ofs s one) (C.get s) l v in
+      print_uint32 q;
+      print_space ();
+      print_uint32 rem;
+      print_newline ();
+    end;
+    free r;
+    free s;
+    free x;
+    free y;
 end
 
 

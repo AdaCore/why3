@@ -88,10 +88,13 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
 }
 "
 
-  syntax val of_int "%1"
-  syntax converter of_int "%1"
+  syntax val of_int "%1U"
+  syntax converter of_int "%1U"
 
   syntax type uint32 "uint32_t"
+
+  syntax constant max_uint32 "0xffffffff"
+  syntax converter max_uint32 "0xffffffff"
 
   syntax val (+)     "%1 + %2"
   syntax val (-)     "%1 - %2"
@@ -109,6 +112,8 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
   syntax val add_mod "%1 + %2"
   syntax val sub_mod "%1 - %2"
   syntax val mul_mod "%1 * %2"
+
+  syntax val div2by1 "(uint32_t)(((uint64_t)%1 | ((uint64_t)%2 << 32))/(uint64_t)%3)"
 end
 
 

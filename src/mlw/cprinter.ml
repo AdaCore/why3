@@ -358,7 +358,7 @@ module Print = struct
   let rec print_stmt ~braces fmt = function
     | Snop -> Format.printf "snop"; ()
     | Sexpr e -> fprintf fmt "%a;" (print_expr ~paren:false) e;
-    | Sblock ([] ,s) when (not braces || one_stmt s) ->
+    | Sblock ([] ,s) when (not braces || (one_stmt s && not (is_nop s))) ->
       (print_stmt ~braces:false) fmt s
     | Sblock b -> fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
@@ -458,7 +458,10 @@ module Translate = struct
 
   let rec expr info env (e:expr) : C.body =
     if e_ghost e then (Format.printf "translating ghost expr@."; C.([], Snop))
-    else if is_e_void e then C.([], Snop)
+    else if is_e_void e then
+      if env.computes_return_value
+      then C.([], Sreturn(Enothing))
+      else C.([], Snop)
     else if is_e_true e then expr info env (e_nat_const 1)
     else if is_e_false e then expr info env (e_nat_const 0)
     else match e.e_node with
@@ -483,7 +486,7 @@ module Translate = struct
 				       pvsl in
 		assert (List.length rl = List.length args);
 		C.([],
-		   List.fold_right2 (fun res arg acc -> 
+		   List.fold_right2 (fun res arg acc ->
 				     Sseq(Sexpr(Ebinop(Bassign,
 						       Eunop(Ustar,Evar(res)),
 						       Evar(pv_name arg))),
@@ -491,7 +494,7 @@ module Translate = struct
 				    rl args (Sreturn(Enothing)))
 	     | _ -> assert false
 	   end
-	 else 
+	 else
 	   let e =  match query_syntax info.syntax rs.rs_name with
 	     | Some s ->
 		let params =
@@ -515,8 +518,10 @@ module Translate = struct
            in
 	   C.([],
               if env.computes_return_value
-		 && not (ity_equal rs.rs_cty.cty_result ity_unit)
-              then Sreturn e
+	      then
+                if (ity_equal rs.rs_cty.cty_result ity_unit)
+                then Sseq(Sexpr e, Sreturn Enothing)
+                else Sreturn e
               else Sexpr e)
       | _ -> raise (Unsupported "Cpur/Cany") (*TODO clarify*)
       end
@@ -669,7 +674,7 @@ module Translate = struct
 				     returns = Sid.empty;
 				     breaks = Sid.empty; } in
 			 let rity = rs.rs_cty.cty_result in
-			 let is_simple_tuple ity = 
+			 let is_simple_tuple ity =
 			   let arity_zero = function
 			     | Ityapp(_,a,r) -> a = [] && r = []
 			     | Ityreg { reg_args = a; reg_regs = r } -> a = [] && r = []
@@ -691,15 +696,15 @@ module Translate = struct
 			      (* instead of returning a tuple, return
 			      void and assign the result to addresses
 			      passed as parameters *)
-			      let returns = 
+			      let returns =
 				let f ity b acc =
 				  if b
-				  then (C.Tptr(ty_of_ty info (ty_of_ity ity)), 
+				  then (C.Tptr(ty_of_ty info (ty_of_ity ity)),
 					id_register (id_fresh "result"))::acc
 				  else acc
 				in
 				match rity.ity_node with
-				| Ityapp(s, tl,_) 
+				| Ityapp(s, tl,_)
 				| Ityreg { reg_its = s; reg_args = tl } ->
 				   List.fold_right2 f tl s.its_arg_vis []
 				| Ityvar _ -> assert false
@@ -707,7 +712,7 @@ module Translate = struct
 			      {env with returns_tuple = true, List.map snd returns},
 			      C.Tvoid,
 			      returns@params
-			   | _ -> env, rtype, params 
+			   | _ -> env, rtype, params
 			 in
 			 let d,s = expr info env e in
 			 (* let d,s = C.flatten_defs d s in *)
