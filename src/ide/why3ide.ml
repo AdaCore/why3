@@ -114,6 +114,13 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
   ~callback:(exit_function ~destroy:true)
 
 let (_ : GMenu.menu_item) =
+  file_factory#add_item ~key:GdkKeysyms._S "_Save session"
+    ~callback:(fun () -> Session_itp.save_session cont.Controller_itp.controller_session)
+
+let (replay_menu_item : GMenu.menu_item) =
+  file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
+
+let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
     ~callback:(exit_function ~destroy:false)
 
@@ -325,6 +332,12 @@ module S = struct
 end
 
 module C = Controller_itp.Make(S)
+
+let (_ : GtkSignal.id) =
+  replay_menu_item#connect#activate
+    ~callback:(fun () ->
+               let callback = C.replay_print in
+               C.replay ~use_steps:false cont ~callback ~remove_obsolete:false)
 
 
 (***********************************)
