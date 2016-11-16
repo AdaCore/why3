@@ -229,7 +229,7 @@ let replace_subst lp lv f1 f2 t =
 
 exception Bad_hypothesis of Term.term
 
-let rewrite rev h h1 =
+let rewrite_in rev h h1 =
   let found_eq =
     (* Used to find the equality we are rewriting on *)
     fold (fun d acc ->
@@ -243,8 +243,7 @@ let rewrite rev h h1 =
           | _ -> raise (Bad_hypothesis f)) in
           Some (lp, lv, t1, t2)
       | _ -> acc) None in
-
-(* Return instantiated premises and the hypothesis correctly rewritten *)
+  (* Return instantiated premises and the hypothesis correctly rewritten *)
   let lp_new found_eq =
     match found_eq with
     | None -> raise Hyp_not_found
@@ -255,8 +254,7 @@ let rewrite rev h h1 =
           let lp, new_term = replace_subst lp lv t1 t2 t in
             Some (lp, create_prop_decl p pr new_term)
         | _ -> acc) None in
-
-(* Pass the premises as new goals. Replace the former toberewritten hypothesis to the new rewritten one *)
+  (* Pass the premises as new goals. Replace the former toberewritten hypothesis to the new rewritten one *)
   let recreate_tasks lp_new =
     match lp_new with
     | None -> raise (Arg_trans "recreate_tasks")
@@ -275,6 +273,14 @@ let rewrite rev h h1 =
 
   (* Composing previous functions *)
   Trans.bind (Trans.bind found_eq lp_new) recreate_tasks
+
+let find_target_prop h : prsymbol trans =
+  Trans.store (fun task ->
+               match h with
+                 | Some pr -> pr
+                 | None -> Task.task_goal task)
+
+let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in rev h)
 
 let rewrite_rev = rewrite false
 
@@ -359,9 +365,9 @@ let () = register_transform_with_args_l ~desc:"test apply" "apply"
 let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
 let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
 let () = register_transform_with_args_l ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
-    (wrap_l (Tprsymbol (Tprsymbol Ttrans_l)) (rewrite))
+    (wrap_l (Tprsymbol (Tprsymbolopt("in",Ttrans_l))) (rewrite))
 let () = register_transform_with_args_l ~desc:"right to left rewrite of first hypothesis into the second" "rewrite_rev"
-    (wrap_l (Tprsymbol (Tprsymbol Ttrans_l)) (rewrite_rev))
+    (wrap_l (Tprsymbol (Tprsymbolopt("in",Ttrans_l))) (rewrite_rev))
 let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
     (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) (replace))
 let () = register_transform_with_args_l ~desc:"induction on int" "induction"

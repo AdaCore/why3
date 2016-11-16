@@ -262,6 +262,7 @@ let timeout_handler_running = ref false
 let max_number_of_running_provers = ref 1
 
 let number_of_running_provers = ref 0
+
 module Hprover = Whyconf.Hprover
 
 (*

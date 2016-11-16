@@ -210,6 +210,7 @@ type (_, _) trans_typ =
   | Tty       : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
   | Ttysymbol : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
   | Tprsymbol : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tprsymbolopt : string * ('a, 'b) trans_typ -> ((Decl.prsymbol option -> 'a), 'b) trans_typ
   | Tterm     : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula  : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
@@ -297,6 +298,15 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
           let pr = find_pr s task in
           wrap_to_store t' (f pr) tail env task
         | _ -> failwith "Missing argument: expecting a prop symbol."
+      end
+    | Tprsymbolopt(argname,t') ->
+      begin
+        match l with
+        | s :: s' :: tail when s = argname ->
+             let pr = find_pr s' task in
+             wrap_to_store t' (f (Some pr)) tail env task
+        | _ ->
+             wrap_to_store t' (f None) l env task
       end
     | Ttheory t' ->
       begin
