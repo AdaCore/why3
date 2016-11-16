@@ -5,6 +5,8 @@ open Gconfig
 open Stdlib
 open Session_itp
 open Controller_itp
+open Session_user_interface
+open Historic
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -278,7 +280,7 @@ let init_comp () =
 
   command_entry_completion#set_text_column completion_col;
 
-  command_entry#set_completion command_entry_completion;
+  command_entry#set_completion command_entry_completion
 
 
 
@@ -287,67 +289,24 @@ let init_comp () =
 (* Terminal historic *)
 (*********************)
 
-(* TODO use doubly linked list from Batteries.... *)
-module Dl = struct
-
-  type 'a dl = {content: 'a;
-                mutable next: 'a dl;
-                mutable prev: 'a dl}
-
-  let prepend dl e =
-    let rec new_element = {content = e; next = new_element; prev = new_element} in
-    new_element.next <- dl;
-    new_element.prev <- dl.prev;
-    dl.prev.next <- new_element;
-    dl.prev <- new_element
-
-  let create e =
-    let rec new_element = {content = e; next = new_element; prev = new_element} in
-    new_element
-
-  let prev dl = dl.prev
-
-  let next dl = dl.next
-
-  let get dl = dl.content
-
-end
-
-
-open Dl
-
-type historic = {mutable top : string dl; mutable current : string dl}
-
-let list_commands : historic =
-  let top = create "" in
-  { top = top; current = top}
-
-let add_command s =
-  prepend list_commands.top s;
-  list_commands.top <- prev list_commands.top;
-  list_commands.current <- list_commands.top
-
-let next_command () =
-  list_commands.current <- next list_commands.current
-
-let prev_command () =
-  list_commands.current <- prev list_commands.current
-
-let get_current () =
-  get list_commands.current
+let list_commands = create_historic()
 
 let _ =
   command_entry#event#connect#key_press
     ~callback:(fun (ev: 'a Gdk.event) ->
       match GdkEvent.Key.keyval ev with
       | k when k = GdkKeysyms._Up -> (* Arrow up *)
-          next_command ();
-          let s = get_current () in
-          command_entry#set_text s; true
+          let s = print_next_command list_commands in
+          (match s with
+          | None -> true
+          | Some s ->
+              (command_entry#set_text s; true))
       | k when k = GdkKeysyms._Down -> (* Arrow down *)
-          prev_command ();
-          let s = get_current () in
-          command_entry#set_text s; true
+          let s = print_prev_command list_commands in
+          (match s with
+          | None -> true
+          | Some s ->
+              (command_entry#set_text s; true))
       | _ -> false
       )
 
@@ -593,7 +552,7 @@ let interp cmd =
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
-    ~callback:(fun () -> add_command command_entry#text; interp command_entry#text)
+    ~callback:(fun () -> add_command list_commands command_entry#text; interp command_entry#text)
 
 
 let get_selected_row_references () =
