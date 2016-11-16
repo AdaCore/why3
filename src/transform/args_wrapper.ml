@@ -100,7 +100,7 @@ let add_decls_id id d tables =
    declaration d in the table.id_decl *)
 let rec add_id tables d t =
   match t.t_node with
-  | Tvar v -> add_decls_id v.vs_name d tables
+  | Tvar _ -> tables
   | Tconst _ | Ttrue | Tfalse -> tables
   | Tapp (l, tl) ->
       let tables = add_decls_id l.ls_name d tables in
