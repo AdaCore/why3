@@ -276,8 +276,21 @@ let init_comp () =
     Session_user_interface.commands;
   (* todo: add queries *)
 
+  let callback ev =
+    let key = GdkEvent.Key.keyval ev in
+    if key = GdkKeysyms._Tab then
+      let _ = command_entry_completion#complete () in
+      true
+    else
+      false
+  in
+  ignore (command_entry#event#connect#key_press callback);
+
   command_entry_completion#set_text_column completion_col;
-  command_entry#set_completion command_entry_completion
+
+  command_entry#set_completion command_entry_completion;
+
+
 
 
 (*********************)

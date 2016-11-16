@@ -21,6 +21,11 @@ let gen_ident = Ident.id_fresh
 (* From task [delta |- G] and term t, build the tasks:
    [delta, t] |- G] and [delta, not t | - G] *)
 let case t name =
+  let name =
+    match name with
+    | Some name -> name
+    | None -> "h"
+  in
   let h = Decl.create_prsymbol (gen_ident name) in
   let hnot = Decl.create_prsymbol (gen_ident name) in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
@@ -29,6 +34,11 @@ let case t name =
 
 (* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
 let cut t name =
+  let name =
+    match name with
+    | Some name -> name
+    | None -> "h"
+  in
   let h = Decl.create_prsymbol (gen_ident name) in
   let g_t = Decl.create_prop_decl Decl.Pgoal h t in
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
@@ -280,11 +290,7 @@ let find_target_prop h : prsymbol trans =
                  | Some pr -> pr
                  | None -> Task.task_goal task)
 
-let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in rev h)
-
-let rewrite_rev = rewrite false
-
-let rewrite = rewrite true
+let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in (not rev) h)
 
 (* Replace occurences of t1 with t2 in h *)
 let replace t1 t2 h =
@@ -354,8 +360,8 @@ let induction env x bound =
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
-let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula (Tstring Ttrans_l)) case)
-let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula (Tstring Ttrans_l)) cut)
+let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) case)
+let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) cut)
 let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
 let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
 let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
@@ -363,12 +369,10 @@ let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
 let () = register_transform_with_args_l ~desc:"test apply" "apply"
     (wrap_l (Tprsymbol Ttrans_l) apply)
 let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
-let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) (use_th))
+let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) use_th)
 let () = register_transform_with_args_l ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
-    (wrap_l (Tprsymbol (Tprsymbolopt("in",Ttrans_l))) (rewrite))
-let () = register_transform_with_args_l ~desc:"right to left rewrite of first hypothesis into the second" "rewrite_rev"
-    (wrap_l (Tprsymbol (Tprsymbolopt("in",Ttrans_l))) (rewrite_rev))
+    (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite)
 let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
-    (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) (replace))
+    (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) replace)
 let () = register_transform_with_args_l ~desc:"induction on int" "induction"
-    (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) (induction))
+    (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) induction)
