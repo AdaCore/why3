@@ -6,6 +6,8 @@ open Stdlib
 open Session_itp
 open Controller_itp
 
+external reset_gc : unit -> unit = "ml_reset_gc"
+
 let debug = Debug.lookup_flag "ide_info"
 
 (************************)
@@ -211,8 +213,16 @@ let task_view =
 
 let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
 
-let command_entry =
-  GEdit.entry ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
+let hbox22221 =
+  GPack.hbox
+    ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
+
+let command_entry = GEdit.entry ~packing:hbox22221#add ()
+
+let monitor =
+  GMisc.label
+    ~text:"0/0/0"
+    ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -221,6 +231,27 @@ let message_zone =
   in
   GText.view ~editable:false ~cursor_visible:false
     ~packing:sv#add ()
+
+(**** Monitor *****)
+
+let fan n =
+  match n mod 4 with
+    | 0 -> "|"
+    | 1 | -3 -> "\\"
+    | 2 | -2 -> "-"
+    | 3 | -1 -> "/"
+    | _ -> assert false
+
+let update_monitor =
+  let c = ref 0 in
+  fun t s r ->
+  reset_gc ();
+  incr c;
+  let r =
+    if r=0 then "0" else
+      (string_of_int r) ^ " " ^ (fan (!c / 4))
+  in
+  monitor#set_text ((string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ r)
 
 (****************************)
 (* command entry completion *)
@@ -332,6 +363,12 @@ module S = struct
 end
 
 module C = Controller_itp.Make(S)
+
+let () =
+  let n = gconfig.session_nb_processes in
+  Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
+  C.set_max_tasks n;
+  C.register_observer update_monitor
 
 let (_ : GtkSignal.id) =
   replay_menu_item#connect#activate
@@ -512,8 +549,8 @@ let run_strategy_on_task s =
           C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
     | _ -> printf "Strategy '%s' not found@." s
      end
-  | _ -> ()
-
+  | _ -> (
+)
 
 let clear_command_entry () = command_entry#set_text ""
 

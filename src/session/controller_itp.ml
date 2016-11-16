@@ -198,11 +198,6 @@ let print_session fmt c =
 
 
 
-module type Scheduler = sig
-  val timeout: ms:int -> (unit -> bool) -> unit
-  val idle: prio:int -> (unit -> bool) -> unit
-end
-
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
@@ -251,6 +246,14 @@ let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
   add_file_section ~use_shapes:false c.controller_session fname theories format
 
+
+
+module type Scheduler = sig
+  val timeout: ms:int -> (unit -> bool) -> unit
+  val idle: prio:int -> (unit -> bool) -> unit
+end
+
+
 module Make(S : Scheduler) = struct
 
 let scheduled_proof_attempts = Queue.create ()
@@ -261,7 +264,16 @@ let timeout_handler_running = ref false
 
 let max_number_of_running_provers = ref 1
 
+let set_max_tasks n =
+  max_number_of_running_provers := n;
+  Prove_client.set_max_running_provers n
+
+
 let number_of_running_provers = ref 0
+
+let observer = ref (fun _ _ _ -> ())
+
+let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
@@ -321,20 +333,26 @@ let timeout_handler () =
   (* if the number of prover tasks is less than 3 times the maximum
      number of running provers, then we heuristically decide to add
      more tasks *)
-  try
-    for _i = Queue.length prover_tasks_in_progress
-        to 3 * !max_number_of_running_provers do
-      let (c,id,pr,limit,callback) = Queue.pop scheduled_proof_attempts in
-      try
-        build_prover_call c id pr limit callback
-      with e when not (Debug.test_flag Debug.stack_trace) ->
-        Format.eprintf
-          "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
-          Exn_printer.exn_printer e;
-        callback (InternalFailure e)
-    done;
-    true
-  with Queue.Empty -> true
+  begin
+    try
+      for _i = Queue.length prover_tasks_in_progress
+          to 3 * !max_number_of_running_provers do
+        let (c,id,pr,limit,callback) = Queue.pop scheduled_proof_attempts in
+        try
+          build_prover_call c id pr limit callback
+        with e when not (Debug.test_flag Debug.stack_trace) ->
+          Format.eprintf
+            "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
+            Exn_printer.exn_printer e;
+          callback (InternalFailure e)
+      done
+  with Queue.Empty -> ()
+  end;
+  let scheduled = Queue.length scheduled_proof_attempts in
+  let waiting_or_running = Queue.length prover_tasks_in_progress in
+  let running = !number_of_running_provers in
+  !observer scheduled (waiting_or_running - running) running;
+  true
 
 let run_timeout_handler () =
   if not !timeout_handler_running then

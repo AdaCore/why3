@@ -145,6 +145,15 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
 
 module Make(S : Scheduler) : sig
 
+val set_max_tasks : int -> unit
+(** sets the maximum number of proof tasks that can be running at the
+    same time. Initially set to 1. *)
+
+val register_observer : (int -> int -> int -> unit) -> unit
+(** records a hook that will be called with the number of waiting
+    tasks, scheduled tasks, and running taks, each time these numbers
+    change *)
+
 val schedule_proof_attempt :
   controller ->
   proofNodeID ->
