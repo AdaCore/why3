@@ -349,6 +349,12 @@ let lookup_transform_with_args_l s =
  try snd (Hstr.find transforms_with_args_l s)
  with Not_found -> raise (UnknownTrans s)
 
+let list_transforms_with_args () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_with_args []
+
+let list_transforms_with_args_l () =
+  Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_with_args_l []
+
 let register_transform_with_args ~desc s p =
   if Hstr.mem transforms_with_args s then raise (KnownTrans s);
   Hstr.replace transforms_with_args s (desc, fun _ -> p)

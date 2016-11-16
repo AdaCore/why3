@@ -171,7 +171,9 @@ let sort_pair (x,_) (y,_) = String.compare x y
 
 let list_transforms _args =
   let l =
-    List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ())
+    List.rev_append
+    (List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ()))
+    (List.rev_append (Trans.list_transforms_with_args ()) (Trans.list_transforms_with_args_l ()))
   in
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
