@@ -50,9 +50,7 @@ let print_tv tables fmt tv =
 let print_vs tables fmt vs =
   fprintf fmt "%s" (id_unique tables vs.vs_name)
 
-(*
-let forget_var vs = forget_id iprinter vs.vs_name
-*)
+let forget_var tables vs = forget_id tables.printer vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th tables fmt th =
@@ -192,7 +190,8 @@ and print_tnode pri tables fmt t = match t.t_node with
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
-        (print_vs tables) v (print_lterm 4 tables) t1 (print_term tables) t2
+        (print_vs tables) v (print_lterm 4 tables) t1 (print_term tables) t2;
+      forget_var tables v
   | Tcase (t1,bl) ->
       fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
         (print_term tables) t1 (print_list newline (print_tbranch tables)) bl
@@ -205,11 +204,13 @@ and print_tnode pri tables fmt t = match t.t_node with
       end else begin
         fprintf fmt (protect_on (pri > 0) "\\ %a%a.@ %a")
           (print_list comma (print_vsty tables)) vl (print_tl tables) tl (print_term tables) e
-      end
+      end;
+      List.iter (forget_var tables) vl
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
       fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
-        (print_list comma (print_vsty tables)) vl (print_tl tables) tl (print_term tables) f
+        (print_list comma (print_vsty tables)) vl (print_tl tables) tl (print_term tables) f;
+      List.iter (forget_var tables) vl
   | Ttrue ->
       fprintf fmt "true"
   | Tfalse ->
@@ -224,7 +225,8 @@ and print_tnode pri tables fmt t = match t.t_node with
 
 and print_tbranch tables fmt br =
   let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat tables) p (print_term tables) t
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat tables) p (print_term tables) t;
+  Svs.iter (forget_var tables) p.pat_vars
 
 and print_tl tables fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
@@ -298,7 +300,8 @@ let print_logic_decl fst tables fmt (ls,ld) =
     (print_ls_kind ~fst) ls (print_ls tables) ls
     print_ident_labels ls.ls_name
     (print_list nothing (print_vs_arg tables)) vl
-    (print_option (print_ls_type tables)) ls.ls_value (print_term tables) e
+    (print_option (print_ls_type tables)) ls.ls_value (print_term tables) e;
+  List.iter (forget_var tables) vl
 
 let print_logic_decl first tables fmt d =
   if not (query_remove (fst d).ls_name) then
@@ -423,9 +426,6 @@ let print_sequent _args ?old:_ fmt =
         info := {info_syn = sm; itp = true};
         Trans.store
           (fun task ->
-(*
-          let task = Trans.apply (Trans.goal Introduction.intros) task in
-*)
            (* print_th_prelude task fmt args.th_prelude; *)
            let tables = build_name_tables task in
            let ut = Task.used_symbols (Task.used_theories task) in
