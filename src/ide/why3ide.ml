@@ -567,7 +567,8 @@ let interp cmd =
     | IproofNode id -> Some id
     | _ -> None
   in
-  match interp cont.controller_env id cont.controller_session cmd with
+  try
+  match interp cont id cmd with
     | Transform(s,_t,args) ->
        clear_command_entry ();
        apply_transform cont.controller_session s args
@@ -603,8 +604,11 @@ let interp cmd =
                            Available queries are:@\n@[%a@]" help_on_queries ()
              in
              message_zone#buffer#set_text text
-          | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+          | _ ->
+             message_zone#buffer#set_text ("unknown command '"^s^"'")
       end
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+       message_zone#buffer#set_text (Pp.sprintf "anomaly: %a" Exn_printer.exn_printer e)
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
@@ -659,5 +663,6 @@ let () =
   goals_view#expand_all ();
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
+  message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
   main_window#show ();
   GMain.main ()

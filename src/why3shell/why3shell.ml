@@ -573,12 +573,12 @@ let print_known_map _fmt _args =
 let test_print_id _fmt args =
   let id = nearest_goal () in
   let task = get_task cont.controller_session id in
-  Format.printf "%s@." (print_id task args)
+  Format.printf "%s@." (print_id cont task args)
 
 let test_search_id _fmt args =
   let id = nearest_goal () in
   let task = get_task cont.controller_session id in
-  Format.printf "%s@." (search_id task args)
+  Format.printf "%s@." (search_id cont task args)
 
 (****)
 

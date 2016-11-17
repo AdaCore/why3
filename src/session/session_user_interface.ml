@@ -170,7 +170,7 @@ let strategies env config =
 
 let sort_pair (x,_) (y,_) = String.compare x y
 
-let list_transforms _args =
+let list_transforms _cont _args =
   let l =
     List.rev_append
     (List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ()))
@@ -181,6 +181,17 @@ let list_transforms _args =
   in
   Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
                (List.sort sort_pair l)
+
+let list_provers cont _args =
+  let l =
+    Whyconf.Hprover.fold
+      (fun p _ acc -> (Pp.sprintf "%a" Whyconf.print_prover p)::acc)
+      cont.Controller_itp.controller_provers
+      []
+  in
+  let l = List.sort String.compare l in
+  Pp.sprintf "%a" (Pp.print_list Pp.newline Pp.string) l
+
 
 let find_any_id nt s =
   try (Stdlib.Mstr.find s nt.Theory.ns_pr).Decl.pr_name with
@@ -203,7 +214,7 @@ let print_id s task =
   in
   Pp.string_of (Why3printer.print_decl tables) d
 
-let print_id task args =
+let print_id _cont task args =
   match args with
   | [s] -> print_id s task
   | _ -> raise Number_of_arguments
@@ -219,20 +230,24 @@ let search s task =
   in
   Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l
 
-let search_id task args =
+let search_id _cont task args =
   match args with
   | [s] -> search s task
   | _ -> raise Number_of_arguments
 
+type query =
+  | Qnotask of (Controller_itp.controller -> string list -> string)
+  | Qtask of (Controller_itp.controller -> Task.task -> string list -> string)
+
 let commands =
   [
-    "list-transforms", "list available transformations", (fun _ -> list_transforms);
+    "list-transforms", "list available transformations", Qnotask list_transforms;
+    "list-provers", "list available provers", Qnotask list_provers;
 (*
-    "list-provers", "list available provers", list_provers;
     "list-strategies", "list available strategies", list_strategies;
 *)
-    "print", "<s> print the declaration where s was defined", print_id;
-    "search", "<s> print some declarations where s appear", search_id;
+    "print", "<s> print the declaration where s was defined", Qtask print_id;
+    "search", "<s> print some declarations where s appear", Qtask search_id;
 (*
     "r", "reload the session (test only)", test_reload;
     "rp", "replay", test_replay;
@@ -290,18 +305,19 @@ type command =
   | Query of string
   | Other of string * string list
 
-let interp env id ses s =
+let interp cont id s =
   let cmd,args = split_args s in
   try
     let f = Stdlib.Hstr.find commands_table cmd in
-    match id with
-    | None -> Query "please select a goal first"
-    | Some id ->
-       let task = Session_itp.get_task ses id in
-       Query (f task args)
+    match f,id with
+    | Qnotask f, _ -> Query (f cont args)
+    | Qtask _, None -> Query "please select a goal first"
+    | Qtask f, Some id ->
+       let task = Session_itp.get_task cont.Controller_itp.controller_session id in
+       Query (f cont task args)
   with Not_found ->
     try
-      let t = Trans.lookup_trans env cmd in
+      let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
       Transform (cmd,t,args)
     with Trans.UnknownTrans _ ->
       Other(cmd,args)
