@@ -63,7 +63,7 @@ void sub_with_borrow(uint32_t * res, uint32_t * borrow, uint32_t x, uint32_t y, 
 {
   uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;
   *res = (uint32_t)(r & LOW_MASK);
-  *borrow = (uint32_t)(r >> 63); 
+  *borrow = (uint32_t)(r >> 63);
 }
 
 void mul_double(uint32_t * low, uint32_t * high, uint32_t x, uint32_t y)
@@ -88,12 +88,10 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
 }
 "
 
-  syntax val of_int "%1U"
   syntax converter of_int "%1U"
 
   syntax type uint32 "uint32_t"
 
-  syntax constant max_uint32 "0xffffffff"
   syntax converter max_uint32 "0xffffffff"
 
   syntax val (+)     "%1 + %2"
@@ -114,6 +112,7 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
   syntax val mul_mod "%1 * %2"
 
   syntax val div2by1 "(uint32_t)(((uint64_t)%1 | ((uint64_t)%2 << 32))/(uint64_t)%3)"
+
 end
 
 

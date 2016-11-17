@@ -10,6 +10,10 @@ module C
   predicate in_bounds (n:int) = min_int32 <= n <= max_int32
   use import ref.Ref
 
+  (* we would like to specify "abstract" here.  but it would prevent
+     to give implementations to the following routines
+     pb with specifying alias in the surface language
+   *)
   type ptr 'a = {
     data : ref (array 'a) ;
     offset : int ;
