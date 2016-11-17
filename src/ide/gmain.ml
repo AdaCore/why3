@@ -417,14 +417,14 @@ let counterexample_view =
     ~packing:scrolled_counterexample_view#add
     ()
 
-let modifiable_sans_font_views = ref [goals_view#misc]
-let modifiable_mono_font_views =
-  ref [task_view#misc;edited_view#misc;output_view#misc;
-       counterexample_view#misc
-]
-let () = task_view#source_buffer#set_language why_lang
-let () = task_view#set_highlight_current_line true
-
+let () =
+  Gconfig.add_modifiable_sans_font_view goals_view#misc;
+  Gconfig.add_modifiable_mono_font_view task_view#misc;
+  Gconfig.add_modifiable_mono_font_view edited_view#misc;
+  Gconfig.add_modifiable_mono_font_view output_view#misc;
+  Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
+  task_view#source_buffer#set_language why_lang;
+  task_view#set_highlight_current_line true
 
 let clear model = model#clear ()
 
@@ -1364,28 +1364,6 @@ let exit_function ~destroy () =
 (*************)
 (* View menu *)
 (*************)
-
-let sans_font_family = "Sans"
-let mono_font_family = "Monospace"
-
-let change_font size =
-(*
-  Tools.resize_images (!Colors.font_size * 2 - 4);
-*)
-  let sff = sans_font_family ^ " " ^ string_of_int size in
-  let mff = mono_font_family ^ " " ^ string_of_int size in
-  let sf = Pango.Font.from_string sff in
-  let mf = Pango.Font.from_string mff in
-  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
-  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
-
-let enlarge_font () =
-  let size = Gconfig.incr_font_size 1 in
-  change_font size
-
-let reduce_font () =
-  let size = Gconfig.incr_font_size (-1) in
-  change_font size
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group

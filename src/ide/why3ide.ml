@@ -108,6 +108,8 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
+(* 1.1 "File" menu *)
+
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
@@ -127,6 +129,13 @@ let (replay_menu_item : GMenu.menu_item) =
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
     ~callback:(exit_function ~destroy:false)
+
+
+(* 1.2 "View" menu
+
+   the entries in that menu are defined later
+
+*)
 
 (* 2. horizontal box contains:
    2.1 TODO: a tool box ?
@@ -219,12 +228,14 @@ let hbox22221 =
   GPack.hbox
     ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
-let command_entry = GEdit.entry ~packing:hbox22221#add ()
-
 let monitor =
   GMisc.label
-    ~text:"0/0/0"
+    ~text:"  0/0/0"
+    ~width:80
+    ~xalign:0.0
     ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
+
+let command_entry = GEdit.entry ~packing:hbox22221#add ()
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -249,11 +260,45 @@ let update_monitor =
   fun t s r ->
   reset_gc ();
   incr c;
-  let r =
-    if r=0 then "0" else
-      (string_of_int r) ^ " " ^ (fan (!c / 4))
-  in
-  monitor#set_text ((string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ r)
+  let f = if r=0 then "  " else fan (!c / 2) ^ " " in
+  monitor#set_text
+    (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
+
+
+(*******************************)
+(* commands of the "View" menu *)
+(*******************************)
+
+let view_menu = factory#add_submenu "_View"
+let view_factory = new GMenu.factory view_menu ~accel_group
+
+(* goals view is not yet multi-selectable
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._A
+    ~label:"Select all"
+    ~callback:(fun () -> goals_view#selection#select_all ()) ()
+ *)
+
+let (_ : GMenu.menu_item) =
+  view_factory#add_item ~key:GdkKeysyms._plus
+    ~callback:enlarge_fonts "Enlarge font"
+
+let (_ : GMenu.menu_item) =
+    view_factory#add_item ~key:GdkKeysyms._minus
+      ~callback:reduce_fonts "Reduce font"
+
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._E
+    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
+
+
+let () =
+  Gconfig.add_modifiable_sans_font_view goals_view#misc;
+  Gconfig.add_modifiable_mono_font_view monitor#misc;
+  Gconfig.add_modifiable_mono_font_view task_view#misc;
+  Gconfig.add_modifiable_mono_font_view command_entry#misc;
+  Gconfig.add_modifiable_mono_font_view message_zone#misc;
+  Gconfig.set_fonts ()
 
 (****************************)
 (* command entry completion *)
@@ -568,10 +613,12 @@ let on_selected_row r =
   let index = goals_model#get ~row:r#iter ~column:index_column in
   try
     let session_element = Hint.find model_index index in
+(*
     let () = match session_element with
              | IproofNode id -> Hpn.add pn_id_to_gtree id r (* TODO maybe not the good place to fill
                                                                     this table *)
              | _ -> () in
+ *)
     current_selected_index := session_element;
     match session_element with
     | IproofNode id ->

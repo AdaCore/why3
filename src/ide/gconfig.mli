@@ -56,9 +56,15 @@ val config : unit -> t
 
 val get_main : unit -> Whyconf.main
 
-val incr_font_size : int -> int
-(** [incr_font_size n] increments current font size by [n] (can be negative)
-    and returns the new size *)
+(*******************)
+(*   font size     *)
+(*******************)
+
+val add_modifiable_sans_font_view : GObj.misc_ops -> unit
+val add_modifiable_mono_font_view : GObj.misc_ops -> unit
+val enlarge_fonts : unit -> unit
+val reduce_fonts : unit -> unit
+val set_fonts : unit -> unit
 
 (*****************)
 (* images, icons *)

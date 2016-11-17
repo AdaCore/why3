@@ -270,11 +270,49 @@ let save_config () = save_config (config ())
 
 let get_main () = (get_main (config ()).config)
 
+(*
+
+
+  font size
+
+
+ *)
+
+
+let sans_font_family = "Sans"
+let mono_font_family = "Monospace"
+
+let modifiable_sans_font_views = ref []
+let modifiable_mono_font_views = ref []
+
+let add_modifiable_sans_font_view v =
+  modifiable_sans_font_views := v :: !modifiable_sans_font_views
+
+let add_modifiable_mono_font_view v =
+  modifiable_mono_font_views := v :: !modifiable_mono_font_views
+
+let change_font size =
+(*
+  Tools.resize_images (!Colors.font_size * 2 - 4);
+*)
+  let sff = sans_font_family ^ " " ^ string_of_int size in
+  let mff = mono_font_family ^ " " ^ string_of_int size in
+  let sf = Pango.Font.from_string sff in
+  let mf = Pango.Font.from_string mff in
+  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
+  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
+
 let incr_font_size n =
   let c = config () in
   let s = max (c.font_size + n) 4 in
   c.font_size <- s;
   s
+
+let enlarge_fonts () = change_font (incr_font_size 1)
+
+let reduce_fonts () = change_font (incr_font_size (-1))
+
+let set_fonts () = change_font (incr_font_size 0)
 
 (*
 
@@ -1198,6 +1236,8 @@ let uninstalled_prover c eS unknown =
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
     policy
+
+
 
 (*
 Local Variables:
