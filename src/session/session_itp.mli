@@ -47,7 +47,8 @@ val get_dir : session -> string
 val get_shape_version : session -> int
 
 
-type proof_attempt = {
+type proof_attempt_node = {
+  parent              : proofNodeID;
   prover              : Whyconf.prover;
   limit               : Call_provers.resource_limit;
   mutable proof_state : Call_provers.prover_result option;
@@ -56,7 +57,7 @@ type proof_attempt = {
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
-val session_iter_proof_attempt: (proofNodeID -> proof_attempt -> unit) -> session -> unit
+val session_iter_proof_attempt: (proofNodeID -> proof_attempt_node -> unit) -> session -> unit
 
 type proof_parent = Trans of transID | Theory of theory
 
@@ -65,9 +66,9 @@ val get_task : session -> proofNodeID -> Task.task
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :
   session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
-val get_proof_attempt : session -> proofAttemptID -> proof_attempt
+val get_proof_attempt_node : session -> proofAttemptID -> proof_attempt_node
 val get_proof_attempt_parent : session -> proofAttemptID -> proofNodeID
-val get_proof_attempts : session -> proofNodeID -> proof_attempt list
+val get_proof_attempts : session -> proofNodeID -> proof_attempt_node list
 val get_sub_tasks : session -> transID -> proofNodeID list
 val get_detached_sub_tasks : session -> transID -> proofNodeID list
 

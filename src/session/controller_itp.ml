@@ -111,8 +111,10 @@ and update_proof c id =
 (* [update_proof_node c id b] Update the whole proof_state
    of c according to the result (id, b) *)
 let update_proof_node c id b =
-  Hpn.replace c.proof_state.pn_state id b;
-  update_proof c id
+  match pn_proved c id with
+  | true -> ()
+  | false -> Hpn.replace c.proof_state.pn_state id b;
+    update_proof c id
 
 (* [update_trans_node c id b] Update the proof_state of c to take the result of (id,b). Then
    propagates it to its parents *)
@@ -161,7 +163,7 @@ module PSession = struct
     | Theory of theory
     | Goal of proofNodeID
     | Transf of transID
-    | ProofAttempt of proof_attempt
+    | ProofAttempt of proof_attempt_node
 
   type 'a t = { tcont : controller;
                 tkind : any }

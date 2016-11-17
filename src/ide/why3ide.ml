@@ -448,7 +448,7 @@ let set_status_column_from_cont cont iter =
   let image = match index with
     | Inone -> assert false
     | IproofAttempt panid ->
-      let pa = get_proof_attempt cont.controller_session panid in
+      let pa = get_proof_attempt_node cont.controller_session panid in
       image_of_result ~obsolete:pa.proof_obsolete pa.Session_itp.proof_state
     | IproofNode pn ->
       if pn_proved cont pn
@@ -579,7 +579,7 @@ let apply_transform cont t args =
 (* Callback of a proof_attempt *)
 let callback_update_tree_proof cont panid pa_status =
   let ses = cont.controller_session in
-  let pa = get_proof_attempt ses panid in
+  let pa = get_proof_attempt_node ses panid in
   let prover = pa.prover in
   let name = Pp.string_of Whyconf.print_prover prover in
   let obsolete = pa.proof_obsolete in
