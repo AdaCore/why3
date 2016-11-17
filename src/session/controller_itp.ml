@@ -79,7 +79,7 @@ let th_proved c th  =
     Hid.find_def c.proof_state.th_state false (theory_name th)
 
 (* Update the result of the theory according to its children *)
-let update_theory th ps =
+let update_theory_proof_state ps th =
   let goals = theory_goals th in
   Hid.replace ps.th_state (theory_name th)
     (List.for_all (fun id -> Hpn.find_def ps.pn_state false id) goals)
@@ -105,7 +105,7 @@ and propagate_trans c (tid: Session_itp.transID) =
 
 and update_proof c id =
   match get_proof_parent c.controller_session id with
-  | Theory th -> update_theory th c.proof_state
+  | Theory th -> update_theory_proof_state c.proof_state th
   | Trans tid -> propagate_trans c tid
 
 (* [update_proof_node c id b] Update the whole proof_state
@@ -120,7 +120,34 @@ let update_trans_node c id b =
   Htn.replace c.proof_state.tn_state id b;
   propagate_proof c (get_trans_parent c.controller_session id)
 
+(* init proof state after reload *)
+let rec reload_goal_proof_state ps c g =
+  let ses = c.controller_session in
+  let tr_list = get_transformations ses g in
+  let pa_list = get_proof_attempts ses g in
+  let proved = List.exists (reload_trans_proof_state ps c) tr_list in
+  let proved = List.exists reload_pa_proof_state pa_list || proved in
+  Hpn.replace c.proof_state.pn_state g proved;
+  proved
 
+and reload_trans_proof_state ps c tr =
+  let proof_list = get_sub_tasks c.controller_session tr in
+  let proved = List.for_all (reload_goal_proof_state ps c) proof_list in
+  Htn.replace c.proof_state.tn_state tr proved;
+  proved
+
+and reload_pa_proof_state pa =
+  match pa.proof_obsolete, pa.Session_itp.proof_state with
+  | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid -> true
+  | _ -> false
+
+(* to be called after reload *)
+let reload_theory_proof_state c th =
+  let ps = c.proof_state in
+  let goals = theory_goals th in
+  let proved = List.for_all (reload_goal_proof_state ps c) goals in
+  Hid.replace ps.th_state (theory_name th)
+    proved
 
 (* printing *)
 
@@ -233,8 +260,11 @@ let merge_file (old_ses : session) (c : controller) env ~use_shapes _ file =
     with _ -> (* TODO: filter only syntax error and typing errors *)
       []
   in
-  add_file_section
-    c.controller_session ~use_shapes ~merge:(old_ses,old_theories,env) file_name new_theories format
+  merge_file_section
+    c.controller_session ~use_shapes ~old_ses ~old_theories ~env file_name new_theories format;
+  Stdlib.Hstr.iter
+    (fun _ f -> List.iter (reload_theory_proof_state c) f.file_theories)
+    (get_files c.controller_session)
 
 
 let reload_files (c : controller) (env : Env.env) ~use_shapes =
@@ -406,11 +436,15 @@ let schedule_transformation_r c id name args ~callback =
 
 let schedule_transformation c id name args ~callback =
   let callback s = (match s with
-  | TSdone tid -> update_trans_node c tid false
-  (*(get_sub_tasks c.controller_session tid = [])*)
-  (* TODO need to change schedule transformation to get the id ? *)
-  | TSfailed -> ()
-  | _ -> ()); callback s in
+      | TSdone tid ->
+        let has_subtasks =
+          match get_sub_tasks c.controller_session tid with
+          | [] -> true
+          | _ -> false
+        in
+        update_trans_node c tid has_subtasks
+      | TSfailed -> ()
+      | _ -> ()); callback s in
   schedule_transformation_r c id name args ~callback
 
 open Strategy

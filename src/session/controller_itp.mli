@@ -75,14 +75,6 @@ type controller = private
 
 val create_controller : Env.env -> Session_itp.session -> controller
 
-(** [update_proof_node c id b] Update the whole proof_state
-   of c according to the result (id, b) *)
-val update_proof_node: controller -> Session_itp.proofNodeID -> bool -> unit
-
-(** [update_trans_node c id b] Update the whole proof_state of c
-   according to the result (id,b) *)
-val update_trans_node: controller -> Session_itp.transID -> bool -> unit
-
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool

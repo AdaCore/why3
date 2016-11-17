@@ -1085,42 +1085,53 @@ let make_theory_section ~use_shapes ?merge (s:session) (th:Theory.theory)  : the
   end;
   theory
 
-(* add a why file from a session, if merge is provided try to merge
-   its theories with the previous ones with matching names *)
-let add_file_section ~use_shapes ?merge (s:session) (fn:string) (theories:Theory.theory list) format
+(* add a why file to a session *)
+let add_file_section ~use_shapes (s:session) (fn:string) (theories:Theory.theory list) format : unit =
+  let fn = Sysutil.relativize_filename s.session_dir fn in
+  if Hstr.mem s.session_files fn then
+    Debug.dprintf debug "[session] file %s already in database@." fn
+  else
+    let theories = List.map (make_theory_section ~use_shapes s) theories in
+    let f = { file_name = fn;
+              file_format = format;
+              file_theories = theories;
+              file_detached_theories = [] }
+    in
+    Hstr.add s.session_files fn f
+
+(* add a why file to a session and try to merge its theories with the
+   provided ones with matching names *)
+let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
+    (s:session) (fn:string) (theories:Theory.theory list) format
   : unit =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   if Hstr.mem s.session_files fn then
     Debug.dprintf debug "[session] file %s already in database@." fn
   else
     let theories,detached =
-      match merge with
-      | Some (old_ses, old_th, env) ->
-        let old_th_table = Hstr.create 7 in
-        List.iter
-          (fun th -> Hstr.add old_th_table th.theory_name.Ident.id_string th)
-          old_th;
-        let add_theory (th: Theory.theory) =
-          try
-            (* look for a theory with same name *)
-            let theory_name = th.Theory.th_name.Ident.id_string in
-            (* if we found one, we remove it from the table and merge it *)
-            let old_th = Hstr.find old_th_table theory_name in
-            Hstr.remove old_th_table theory_name;
-            make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s th
-          with Not_found ->
-            (* if no theory was found we make a new theory section *)
-            make_theory_section ~use_shapes s th
-        in
-        let theories = List.map add_theory theories in
-        (* we save the remaining, detached *)
-        let detached = Hstr.fold
-            (fun _key th tl ->
-               (save_detached_theory old_ses th s) :: tl)
-            old_th_table [] in
-        theories, detached
-      | None ->
-        List.map (make_theory_section ~use_shapes s) theories, []
+      let old_th_table = Hstr.create 7 in
+      List.iter
+        (fun th -> Hstr.add old_th_table th.theory_name.Ident.id_string th)
+        old_theories;
+      let add_theory (th: Theory.theory) =
+        try
+          (* look for a theory with same name *)
+          let theory_name = th.Theory.th_name.Ident.id_string in
+          (* if we found one, we remove it from the table and merge it *)
+          let old_th = Hstr.find old_th_table theory_name in
+          Hstr.remove old_th_table theory_name;
+          make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s th
+        with Not_found ->
+          (* if no theory was found we make a new theory section *)
+          make_theory_section ~use_shapes s th
+      in
+      let theories = List.map add_theory theories in
+      (* we save the remaining, detached *)
+      let detached = Hstr.fold
+          (fun _key th tl ->
+             (save_detached_theory old_ses th s) :: tl)
+          old_th_table [] in
+      theories, detached
     in
     let f = { file_name = fn;
               file_format = format;

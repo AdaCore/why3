@@ -178,12 +178,18 @@ let scrolled_session_view =
 let cols = new GTree.column_list
 let name_column = cols#add Gobject.Data.string
 let index_column = cols#add Gobject.Data.int
+let status_column = cols#add Gobject.Data.gobject
 
 let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
 let view_name_column = GTree.view_column ~title:"Theories/Goals" ()
 let () =
   view_name_column#pack name_renderer;
-  view_name_column#add_attribute name_renderer "text" name_column
+  view_name_column#add_attribute name_renderer "text" name_column;
+  view_name_column#set_sizing `AUTOSIZE
+
+let status_renderer = GTree.cell_renderer_pixbuf [ ]
+let view_status_column = GTree.view_column ~title:"Status"
+    ~renderer:(status_renderer, ["pixbuf", status_column])()
 
 let goals_model,goals_view =
   Debug.dprintf debug "[GUI] Creating tree model...@?";
@@ -194,6 +200,7 @@ let goals_model,goals_view =
   let () = view#set_rules_hint true in
  *)
   ignore (view#append_column view_name_column);
+  ignore (view#append_column view_status_column);
 (*
   ignore (view#append_column view_status_column);
   ignore (view#append_column view_time_column);
@@ -300,6 +307,40 @@ let () =
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   Gconfig.set_fonts ()
 
+let image_of_result ~obsolete rOpt =
+  match rOpt with
+  | None -> !image_undone
+  | Some r ->
+    match r.Call_provers.pr_answer with
+    | Call_provers.Valid ->
+      if obsolete then !image_valid_obs else !image_valid
+    | Call_provers.Invalid ->
+      if obsolete then !image_invalid_obs else !image_invalid
+    | Call_provers.Timeout ->
+      if obsolete then !image_timeout_obs else !image_timeout
+    | Call_provers.OutOfMemory ->
+      if obsolete then !image_outofmemory_obs else !image_outofmemory
+    | Call_provers.StepLimitExceeded ->
+      if obsolete then !image_steplimitexceeded_obs
+      else !image_steplimitexceeded
+    | Call_provers.Unknown _ ->
+      if obsolete then !image_unknown_obs else !image_unknown
+    | Call_provers.Failure _ ->
+      if obsolete then !image_failure_obs else !image_failure
+    | Call_provers.HighFailure ->
+      if obsolete then !image_failure_obs else !image_failure
+
+let image_of_pa_status ~obsolete pa_status =
+  match pa_status with
+    | Controller_itp.Interrupted -> !image_undone
+    | Controller_itp.Unedited -> !image_editor
+    | Controller_itp.JustEdited -> !image_unknown
+    | Controller_itp.Scheduled -> !image_scheduled
+    | Controller_itp.Running -> !image_running
+    | Controller_itp.InternalFailure _
+    | Controller_itp.Uninstalled _ -> !image_failure
+    | Controller_itp.Done r -> image_of_result ~obsolete (Some r)
+
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -401,6 +442,27 @@ let model_index : index Hint.t = Stdlib.Hint.create 17
 let pn_id_to_gtree : GTree.row_reference Hpn.t = Hpn.create 17
 let pan_id_to_gtree : GTree.row_reference Hpan.t = Hpan.create 17
 
+let set_status_column_from_cont cont iter =
+  let index = goals_model#get ~row:iter ~column:index_column in
+  let index = Hint.find model_index index in
+  let image = match index with
+    | Inone -> assert false
+    | IproofAttempt panid ->
+      let pa = get_proof_attempt cont.controller_session panid in
+      image_of_result ~obsolete:pa.proof_obsolete pa.Session_itp.proof_state
+    | IproofNode pn ->
+      if pn_proved cont pn
+      then !image_valid
+      else !image_unknown
+    | Itransformation tn -> if tn_proved cont tn
+      then !image_valid
+      else !image_unknown
+    | Ifile _ -> !image_file
+    | Itheory th -> if th_proved cont th
+      then !image_valid
+      else !image_unknown
+  in
+  goals_model#set ~row:iter ~column:status_column image
 
 let new_node =
   let cpt = ref (-1) in
@@ -424,47 +486,55 @@ let new_node =
   end;
   new_ref
 
-let build_subtree_proof_attempt_from_goal ses row_ref id =
+let build_subtree_proof_attempt_from_goal cont row_ref id =
   Whyconf.Hprover.iter
     (fun pa panid ->
-     let name = Pp.string_of Whyconf.print_prover pa in
-      ignore(new_node ~parent:row_ref name
-                 (IproofAttempt panid)))
-    (get_proof_attempt_ids ses id)
+       let name = Pp.string_of Whyconf.print_prover pa in
+       let r = new_node ~parent:row_ref name (IproofAttempt panid) in
+       set_status_column_from_cont cont r#iter)
+    (get_proof_attempt_ids cont.controller_session id)
 
-let rec build_subtree_from_goal ses th_row_reference id =
+let rec build_subtree_from_goal cont th_row_reference id =
+  let ses = cont.controller_session in
   let name = get_proof_name ses id in
   let row_ref =
     new_node ~parent:th_row_reference name.Ident.id_string
              (IproofNode id)
   in
+  set_status_column_from_cont cont row_ref#iter;
   List.iter
     (fun trans_id ->
-      build_subtree_from_trans ses row_ref trans_id)
+      ignore (build_subtree_from_trans cont row_ref trans_id))
     (get_transformations ses id);
-  build_subtree_proof_attempt_from_goal ses row_ref id
+  build_subtree_proof_attempt_from_goal cont row_ref id
 
-and build_subtree_from_trans ses goal_row_reference trans_id =
+and build_subtree_from_trans cont goal_row_reference trans_id =
+  let ses = cont.controller_session in
   let name = get_transf_name ses trans_id in
   let row_ref =
     new_node ~parent:goal_row_reference name (Itransformation trans_id) in
+  set_status_column_from_cont cont row_ref#iter;
   List.iter
     (fun goal_id ->
-      (build_subtree_from_goal ses row_ref goal_id))
-    (get_sub_tasks ses trans_id)
+      (build_subtree_from_goal cont row_ref goal_id))
+    (get_sub_tasks ses trans_id);
+  row_ref
 
-let build_tree_from_session ses =
+let build_tree_from_session cont =
+  let ses = cont.controller_session in
   let files = get_files ses in
   Stdlib.Hstr.iter
     (fun _ file ->
        let file_row_reference = new_node file.file_name (Ifile file) in
+       set_status_column_from_cont cont file_row_reference#iter;
        List.iter (fun th ->
                   let th_row_reference =
                     new_node ~parent:file_row_reference
                              (theory_name th).Ident.id_string
                              (Itheory th)
                   in
-                  List.iter (build_subtree_from_goal ses th_row_reference)
+                  set_status_column_from_cont cont th_row_reference#iter;
+                  List.iter (build_subtree_from_goal cont th_row_reference)
                             (theory_goals th))
                  file.file_theories)
     files
@@ -477,58 +547,69 @@ let build_tree_from_session ses =
    do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
 
+let rec update_status_column_from cont iter =
+  set_status_column_from_cont cont iter;
+  match goals_model#iter_parent iter with
+  | Some p -> update_status_column_from cont p
+  | None -> ()
+
 (* Callback of a transformation *)
-let callback_update_tree_transform ses status =
+let callback_update_tree_transform cont status =
   match status with
   | TSdone trans_id ->
-     let id = get_trans_parent ses trans_id in
-     let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
-     build_subtree_from_trans ses row_ref trans_id;
-     (match Session_itp.get_sub_tasks ses trans_id with
-      | first_goal :: _ ->
-         (* Put the selection on the first goal *)
-         goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
-      | [] -> ())
+    let ses = cont.controller_session in
+    let id = get_trans_parent ses trans_id in
+    let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
+    let r = build_subtree_from_trans cont row_ref trans_id in
+    update_status_column_from cont r#iter;
+    (match Session_itp.get_sub_tasks ses trans_id with
+     | first_goal :: _ ->
+       (* Put the selection on the first goal *)
+       goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
+     | [] -> ())
   | _ -> ()
 
-let apply_transform ses t args =
+let apply_transform cont t args =
   match !current_selected_index with
   | IproofNode id ->
-     let callback = callback_update_tree_transform ses in
+     let callback = callback_update_tree_transform cont in
     C.schedule_transformation cont id t args ~callback
   | _ -> printf "Error: Give the name of the transformation@."
 
-
 (* Callback of a proof_attempt *)
-let callback_update_tree_proof ses panid pa_status =
+let callback_update_tree_proof cont panid pa_status =
+  let ses = cont.controller_session in
   let pa = get_proof_attempt ses panid in
   let prover = pa.prover in
   let name = Pp.string_of Whyconf.print_prover prover in
-  match pa_status with
+  let obsolete = pa.proof_obsolete in
+  let r = match pa_status with
   | Scheduled ->
      begin
        try
-         let r = Hpan.find pan_id_to_gtree panid in
-         goals_model#set ~row:r#iter ~column:name_column (name ^ " scheduled")
+         Hpan.find pan_id_to_gtree panid
        with Not_found ->
          let parent_id = get_proof_attempt_parent ses panid in
          let parent = Hpn.find pn_id_to_gtree parent_id in
-         ignore(new_node ~parent (name ^ " scheduled") (IproofAttempt panid))
+         new_node ~parent name (IproofAttempt panid)
      end
-  | Done pr ->
-     let r = Hpan.find pan_id_to_gtree panid in
-     let res = Pp.string_of Call_provers.print_prover_result pr in
-     goals_model#set ~row:r#iter ~column:name_column (name ^ " " ^ res)
-  | Running ->
-     let r = Hpan.find pan_id_to_gtree panid in
-     goals_model#set ~row:r#iter ~column:name_column (name ^ " running")
-  | _ ->  () (* TODO ? *)
+  | Done _ ->
+    let r = Hpan.find pan_id_to_gtree panid in
+    begin match goals_model#iter_parent r#iter with
+    | Some iter -> update_status_column_from cont iter
+    | None -> ()
+    end;
+    r
+  | _  -> Hpan.find pan_id_to_gtree panid (* TODO ? *)
+  in
+  goals_model#set ~row:r#iter ~column:status_column
+    (image_of_pa_status ~obsolete pa_status)
 
-let test_schedule_proof_attempt ses (p: Whyconf.config_prover) limit =
+let test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
   match !current_selected_index with
   | IproofNode id ->
     let prover = p.Whyconf.prover in
-    let callback = callback_update_tree_proof ses in
+    let callback = callback_update_tree_proof cont in
     C.schedule_proof_attempt cont id prover ~limit ~callback
   | _ -> message_zone#buffer#set_text ("Must be on a proof node to use a prover.")
 
@@ -548,10 +629,10 @@ let run_strategy_on_task s =
             printf "Strategy status: %a@." print_strategy_status sts
           in
           let callback_pa =
-            callback_update_tree_proof cont.controller_session
+            callback_update_tree_proof cont
           in
           let callback_tr st =
-            callback_update_tree_transform cont.controller_session st
+            callback_update_tree_transform cont st
           in
           C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
     | _ -> printf "Strategy '%s' not found@." s
@@ -571,7 +652,7 @@ let interp cmd =
   match interp cont id cmd with
     | Transform(s,_t,args) ->
        clear_command_entry ();
-       apply_transform cont.controller_session s args
+       apply_transform cont s args
     | Query s ->
        clear_command_entry ();
        message_zone#buffer#set_text s
@@ -580,7 +661,7 @@ let interp cmd =
         match parse_prover_name gconfig.config s args with
         | Some (prover_config, limit) ->
           clear_command_entry ();
-          test_schedule_proof_attempt cont.controller_session prover_config limit
+          test_schedule_proof_attempt cont prover_config limit
         | None ->
           match s with
           | "auto" ->
@@ -656,7 +737,7 @@ let (_ : GtkSignal.id) =
 (***********************)
 
 let () =
-  build_tree_from_session cont.controller_session;
+  build_tree_from_session cont;
   (* temporary *)
   init_comp ();
   vpan222#set_position 500;
