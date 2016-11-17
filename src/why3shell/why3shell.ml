@@ -111,6 +111,7 @@ end
 (************************)
 
 open Why3
+open Session_user_interface
 open Format
 
 (* files of the current task *)
@@ -568,52 +569,15 @@ let print_known_map _fmt _args =
      printf "known: %s@." id.Ident.id_string)
     km
 
-let find_any_id nt s =
-  try (Stdlib.Mstr.find s nt.Theory.ns_pr).Decl.pr_name with
-  | Not_found -> try (Stdlib.Mstr.find s nt.Theory.ns_ls).Term.ls_name with
-    | Not_found -> (Stdlib.Mstr.find s nt.Theory.ns_ts).Ty.ts_name
-
-let print_id s task fmt =
-  let tables = Args_wrapper.build_name_tables task in
-  let km = tables.Args_wrapper.known_map in
-  let id = try Some (find_any_id tables.Args_wrapper.namespace s) with
-  | Not_found -> Format.fprintf fmt "Does not exists @."; None in
-  if id = None then () else
-  let id = Opt.get id in
-  let d =
-    try Some (Ident.Mid.find id km) with
-    | Not_found -> None in
-  if d = None then () else Format.fprintf fmt "%a @." (Why3printer.print_decl tables) (Opt.get d)
-
-let test_print_id fmt args =
+let test_print_id _fmt args =
   let id = nearest_goal () in
   let task = get_task cont.controller_session id in
-  match args with
-  | [s] -> print_id s task fmt
-  | _ -> Format.fprintf fmt "Wrong number of arguments"
+  Format.printf "%s@." (print_id task args)
 
-
-let search s fmt task =
-  let tables = Args_wrapper.build_name_tables task in
-  let id_decl = tables.Args_wrapper.id_decl in
-  let id = try Some (find_any_id tables.Args_wrapper.namespace s) with
-  | Not_found -> Format.fprintf fmt "Does not exists @."; None in
-  if id = None then () else
-  let id = Opt.get id in
-  let l =
-    try Some (Ident.Mid.find id id_decl) with
-    | Not_found -> None in
-  if l = None then () else
-  Format.fprintf fmt "%a @."
-    (Pp.print_list (fun fmt _ -> Format.fprintf fmt "\n")
-       (Why3printer.print_decl tables)) (Opt.get l)
-
-let test_search_id fmt args =
+let test_search_id _fmt args =
   let id = nearest_goal () in
   let task = get_task cont.controller_session id in
-  match args with
-  | [s] -> search s fmt task
-  | _ -> Format.fprintf fmt "Wrong number of arguments"
+  Format.printf "%s@." (search_id task args)
 
 (****)
 

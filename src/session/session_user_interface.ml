@@ -1,5 +1,6 @@
 
 open Format
+open Session_itp
 
 (* TODO: raise exceptions instead of using explicit eprintf/exit *)
 let cont_from_files spec usage_str env files provers =
@@ -30,7 +31,7 @@ let cont_from_files spec usage_str env files provers =
       Unix.mkdir dir 0o777
     end;
   (* we load the session *)
-  let ses,use_shapes = Session_itp.load_session dir in
+  let ses,use_shapes = load_session dir in
   eprintf "using shapes: %a@." pp_print_bool use_shapes;
   (* create the controller *)
   let c = Controller_itp.create_controller env ses in
@@ -181,15 +182,58 @@ let list_transforms _args =
   Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
                (List.sort sort_pair l)
 
+let find_any_id nt s =
+  try (Stdlib.Mstr.find s nt.Theory.ns_pr).Decl.pr_name with
+  | Not_found -> try (Stdlib.Mstr.find s nt.Theory.ns_ls).Term.ls_name with
+    | Not_found -> (Stdlib.Mstr.find s nt.Theory.ns_ts).Ty.ts_name
+
+(* The id you are trying to use is undefined *)
+exception Undefined_id
+(* Bad number of arguments *)
+exception Number_of_arguments
+
+let print_id s task =
+  let tables = Args_wrapper.build_name_tables task in
+  let km = tables.Args_wrapper.known_map in
+  let id = try find_any_id tables.Args_wrapper.namespace s with
+  | Not_found -> raise Undefined_id in
+  let d =
+    try Ident.Mid.find id km with
+    | Not_found -> raise Not_found (* Should not happen *)
+  in
+  Pp.string_of (Why3printer.print_decl tables) d
+
+let print_id task args =
+  match args with
+  | [s] -> print_id s task
+  | _ -> raise Number_of_arguments
+
+let search s task =
+  let tables = Args_wrapper.build_name_tables task in
+  let id_decl = tables.Args_wrapper.id_decl in
+  let id = try find_any_id tables.Args_wrapper.namespace s with
+  | Not_found -> raise Undefined_id  in
+  let l =
+    try Ident.Mid.find id id_decl with
+    | Not_found -> raise Not_found (* Should not happen *)
+  in
+  Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l
+
+let search_id task args =
+  match args with
+  | [s] -> search s task
+  | _ -> raise Number_of_arguments
 
 let commands =
   [
-    "list-transforms", "list available transformations", list_transforms;
+    "list-transforms", "list available transformations", (fun _ -> list_transforms);
 (*
     "list-provers", "list available provers", list_provers;
     "list-strategies", "list available strategies", list_strategies;
-    "print", "<s> print the declaration where s was defined", test_print_id;
-    "search", "<s> print some declarations where s appear", test_search_id;
+*)
+    "print", "<s> print the declaration where s was defined", print_id;
+    "search", "<s> print some declarations where s appear", search_id;
+(*
     "r", "reload the session (test only)", test_reload;
     "rp", "replay", test_replay;
     "s", "save the current session", test_save_session;
@@ -240,11 +284,12 @@ type command =
   | Query of string
   | Other of string * string list
 
-let interp env s =
+let interp env id ses s =
+  let task = Session_itp.get_task ses id in
   let cmd,args = split_args s in
   try
     let f = Stdlib.Hstr.find commands_table cmd in
-    Query (f args)
+    Query (f task args)
   with Not_found ->
        try
          let t = Trans.lookup_trans env cmd in

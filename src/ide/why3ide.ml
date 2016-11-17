@@ -516,10 +516,14 @@ let run_strategy_on_task s =
 
 let clear_command_entry () = command_entry#set_text ""
 
-open Session_user_interface
+let current_id id =
+  match id with
+  | IproofNode id -> id
+  | _ -> assert (false) (* TODO *)
 
 let interp cmd =
-  match interp cont.controller_env cmd with
+  let id = current_id !current_selected_index in
+  match interp cont.controller_env id cont.controller_session cmd with
     | Transform(s,_t,args) ->
        clear_command_entry ();
        apply_transform cont.controller_session s args
