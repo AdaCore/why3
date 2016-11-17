@@ -656,6 +656,9 @@ module Translate = struct
     | PDlet (LDsym (rs, ce)) ->
       let fname = rs.rs_name in
       Format.printf "PDlet rsymbol %s@." fname.id_string;
+      if rs_ghost rs
+      then begin Format.printf "is ghost@."; [] end
+      else
       begin try
               if Mid.mem fname info.syntax
               then (Format.printf "has syntax@."; [])
@@ -677,14 +680,18 @@ module Translate = struct
 			 let is_simple_tuple ity =
 			   let arity_zero = function
 			     | Ityapp(_,a,r) -> a = [] && r = []
-			     | Ityreg { reg_args = a; reg_regs = r } -> a = [] && r = []
+			     | Ityreg { reg_args = a; reg_regs = r } ->
+                               a = [] && r = []
 			     | Ityvar _ -> true
 			   in
 			   (match ity.ity_node with
-			    | Ityapp ({its_ts = s},_,_) | Ityreg { reg_its = {its_ts = s}; }
-							  -> is_ts_tuple s
+			    | Ityapp ({its_ts = s},_,_)
+                            | Ityreg { reg_its = {its_ts = s}; }
+			      -> is_ts_tuple s
 			    | _ -> false)
-			   && (ity_fold (fun acc ity -> acc && arity_zero ity.ity_node) true ity)
+			   && (ity_fold
+                                 (fun acc ity ->
+                                   acc && arity_zero ity.ity_node) true ity)
 			 in
 			 (* FIXME is it necessary to have arity 0 in regions ?*)
 			 let rtype =
