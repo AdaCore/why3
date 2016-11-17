@@ -160,6 +160,7 @@ let cont =
 
 module C = Why3.Controller_itp.Make(Unix_scheduler)
 
+let () = C.set_max_tasks (Whyconf.running_provers_max main)
 
 (* --  -- *)
 
