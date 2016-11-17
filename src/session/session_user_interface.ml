@@ -246,6 +246,12 @@ let commands =
  *)
   ]
 
+let help_on_queries fmt () =
+  let l = List.rev_map (fun (c,h,_) -> (c,h)) commands in
+  let l = List.sort sort_pair l in
+  let p fmt (c,help) = fprintf fmt "%20s : %s" c help in
+  Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
+
 let commands_table = Stdlib.Hstr.create 17
 let () =
   List.iter
@@ -285,17 +291,20 @@ type command =
   | Other of string * string list
 
 let interp env id ses s =
-  let task = Session_itp.get_task ses id in
   let cmd,args = split_args s in
   try
     let f = Stdlib.Hstr.find commands_table cmd in
-    Query (f task args)
+    match id with
+    | None -> Query "please select a goal first"
+    | Some id ->
+       let task = Session_itp.get_task ses id in
+       Query (f task args)
   with Not_found ->
-       try
-         let t = Trans.lookup_trans env cmd in
-         Transform (cmd,t,args)
-       with Trans.UnknownTrans _ ->
-            Other(cmd,args)
+    try
+      let t = Trans.lookup_trans env cmd in
+      Transform (cmd,t,args)
+    with Trans.UnknownTrans _ ->
+      Other(cmd,args)
 
 
 (********* Callbacks tools *******)

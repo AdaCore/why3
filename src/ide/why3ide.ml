@@ -561,18 +561,18 @@ let run_strategy_on_task s =
 
 let clear_command_entry () = command_entry#set_text ""
 
-let current_id id =
-  match id with
-  | IproofNode id -> id
-  | _ -> assert (false) (* TODO *)
-
 let interp cmd =
-  let id = current_id !current_selected_index in
+  let id =
+    match !current_selected_index with
+    | IproofNode id -> Some id
+    | _ -> None
+  in
   match interp cont.controller_env id cont.controller_session cmd with
     | Transform(s,_t,args) ->
        clear_command_entry ();
        apply_transform cont.controller_session s args
     | Query s ->
+       clear_command_entry ();
        message_zone#buffer#set_text s
     | Other(s,args) ->
       begin
@@ -582,22 +582,29 @@ let interp cmd =
           test_schedule_proof_attempt cont.controller_session prover_config limit
         | None ->
           match s with
-       | "auto" ->
-           let s =
-             match args with
+          | "auto" ->
+             let s =
+               match args with
                | "2"::_ -> "2"
                | _ -> "1"
-           in
-           clear_command_entry ();
-           run_strategy_on_task s
-       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
+             in
+             clear_command_entry ();
+             run_strategy_on_task s
+          | "help" ->
+             clear_command_entry ();
+             let text = Pp.sprintf
+                          "Please type a command among the following (automatic completion available)@\n\
+                           @\n\
+                           @ <transformation name> [arguments]@\n\
+                           @ <prover name> [<time limit> [<mem limit>]]@\n\
+                           @ <query> [arguments]@\n\
+                           @ auto [auto level]@\n\
+                           @\n\
+                           Available queries are:@\n@[%a@]" help_on_queries ()
+             in
+             message_zone#buffer#set_text text
+          | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
       end
-(*
-       match s with
-       | "c" -> clear_command_entry ();
-                test_schedule_proof_attempt cont.controller_session
-       | _ -> message_zone#buffer#set_text ("unknown command '"^s^"'")
- *)
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
