@@ -572,7 +572,7 @@ let init () =
       in
       let env_session, (_:bool), (_:bool) =
          Session.update_session
-           ctxt
+           ~ctxt
            session
            Gnat_config.env
            Gnat_config.config in
@@ -877,12 +877,10 @@ let session_find_unproved_pa obj =
 
 let compute_replay_limit_from_pas pas =
   match pas with
-  | { Call_provers.pr_time = time; Call_provers.pr_steps = steps } ->
-    let time = int_of_float time + 1 in
+  | { Call_provers.pr_steps = steps } ->
     let steps = steps + steps / 10 + 1 in
     { Call_provers.empty_limit with
-      Call_provers.limit_steps = steps;
-      limit_time = time }
+      Call_provers.limit_steps = steps }
 
 let for_some_proof_attempt pred map =
   try
