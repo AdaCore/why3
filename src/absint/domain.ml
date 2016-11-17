@@ -57,7 +57,7 @@ module Make_from_apron(M:sig
 
   let bottom = A.bottom
   let top = A.top
-  let canonicalize = A.canonicalize
+  let canonicalize _ _ = ()
   let is_bottom = A.is_bottom
   let is_leq = A.is_leq
   let join = A.join

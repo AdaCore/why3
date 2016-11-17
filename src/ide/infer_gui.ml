@@ -50,7 +50,7 @@ module Make(Win: sig
           (module Disjunctive_domain_fast.Make(D) : DOMAIN)
         else if trace#active then
           let module D = (val d: DOMAIN) in
-          (module Trace_partitioning_domain.Make(D) : DOMAIN)
+          (module Trace_partitioning_domain.Make(Disjunctive_domain_fast.Make(D)) : DOMAIN)
         else
           d
       in

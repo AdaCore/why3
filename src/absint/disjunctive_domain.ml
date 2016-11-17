@@ -36,7 +36,7 @@ module Make(A:DOMAIN) = struct
   let cleanup man a =
     List.filter (fun t -> not (A.is_bottom man t)) a
 
-  let threshold = 25
+  let threshold = 10
 
 
   let join_one man = function

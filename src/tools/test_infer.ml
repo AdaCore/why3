@@ -242,6 +242,7 @@ let () =
     List.iter (do_input false)
       [
         "tests_ai/auto_cst1.mlw";
+        "tests_ai/auto_list1.mlw";
         "tests_ai/auto_ref0.mlw";
         "tests_ai/auto_ref1.mlw";
         "tests_ai/auto_ref2.mlw";
@@ -252,6 +253,7 @@ let () =
       ];
     List.iter (do_input true)
       [
+        "tests_ai/auto_list1false.mlw";
         "tests_ai/auto_array_false.mlw";
         "tests_ai/auto_ref_false.mlw";
       ];

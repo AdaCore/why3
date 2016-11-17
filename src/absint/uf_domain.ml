@@ -379,7 +379,7 @@ module Make(S:sig
   let get_class_for_term_ro uf_man t =
     TermToClass.to_t uf_man.class_to_term t
 
-  let do_eq (man, uf_man) a b =
+  let do_eq_ns (man, uf_man) a b =
     if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
     fun (d, ud) ->
       let all_values = Union_find.flat ud.classes in
@@ -476,6 +476,10 @@ module Make(S:sig
     else
       fun x -> x
 
+  let do_eq (man, uf_man) a b =
+    let f = do_eq_ns (man, uf_man) a b in
+    let g = do_eq_ns (man, uf_man) b a in
+    (fun x -> f x |> g)
 
 
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
@@ -549,7 +553,21 @@ module Make(S:sig
                   (*let d = D.forget_array man d [|myvar|] false in*)
                   let d, u =
                     try
-                      assert (TermToVar.to_t u.uf_to_var t = myvar); d, u
+                      let v' = TermToVar.to_t u.uf_to_var t in
+                      if v' = myvar then
+                        d, u
+                      else
+                        begin
+                          let u = { u with uf_to_var = TermToVar.remove_term u.uf_to_var t } in
+                          let expr = Linexpr1.make uf_man.env in
+                          Linexpr1.set_coeff expr v' (Coeff.s_of_int 1);
+                          Linexpr1.set_coeff expr myvar (Coeff.s_of_int (-1));
+                          let lincons = Lincons1.make expr Lincons1.EQ in
+                          let lincons_array = Lincons1.array_make uf_man.env 1 in
+                          Lincons1.array_set lincons_array 0 lincons;
+                          let d = D.meet_lincons_array man d lincons_array in
+                          D.forget_array man d [|v'|] false, u
+                        end
                     with
                     | Not_found ->
                       let u = { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar } in

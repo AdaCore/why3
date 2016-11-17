@@ -507,6 +507,8 @@ module Make(E: sig
                     let pv = Ity.restore_pv vsym in
                     D.add_variable_to_env manpk pv;
                     vsym
+                  | Pwild ->
+                    create_vreturn manpk p.pat_ty
                   | _ -> failwith "nested pattern or worse"
                 ) p in
               let matched_term = t_app l (List.map t_var args) (Some (Ity.ty_of_ity (case_e.e_ity))) in
