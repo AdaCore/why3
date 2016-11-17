@@ -569,12 +569,39 @@ let callback_update_tree_transform cont status =
      | [] -> ())
   | _ -> ()
 
-let apply_transform cont t args =
+let move_current_row_selection_up () =
+  let current_view = List.hd (goals_view#selection#get_selected_rows) in
+  let current_row = goals_model#get_row_reference current_view in
+  begin match goals_model#iter_parent current_row#iter with
+    | Some parent_iter -> goals_view#selection#select_iter parent_iter
+    | None -> ()
+  end
+
+let move_current_row_selection_down () =
+  let current_iter =
+    try
+      let current_view = List.hd (goals_view#selection#get_selected_rows) in
+      let current_row = goals_model#get_row_reference current_view in
+      Some current_row#iter
+    with Not_found ->
+      None
+  in
+  let child = goals_model#iter_children current_iter in
+  goals_view#selection#select_iter child
+
+let rec apply_transform cont t args =
   match !current_selected_index with
   | IproofNode id ->
      let callback = callback_update_tree_transform cont in
-    C.schedule_transformation cont id t args ~callback
-  | _ -> printf "Error: Give the name of the transformation@."
+     C.schedule_transformation cont id t args ~callback
+  | IproofAttempt _ | Itransformation _ ->
+    move_current_row_selection_up ();
+    apply_transform cont t args
+  | Ifile _ | Itheory _ | Inone ->
+    begin try move_current_row_selection_down () with
+      Not_found -> printf "no goals to apply transform"
+    end;
+    apply_transform cont t args
 
 (* Callback of a proof_attempt *)
 let callback_update_tree_proof cont panid pa_status =
@@ -605,14 +632,20 @@ let callback_update_tree_proof cont panid pa_status =
   goals_model#set ~row:r#iter ~column:status_column
     (image_of_pa_status ~obsolete pa_status)
 
-let test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
+let rec test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
   match !current_selected_index with
   | IproofNode id ->
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof cont in
     C.schedule_proof_attempt cont id prover ~limit ~callback
-  | _ -> message_zone#buffer#set_text ("Must be on a proof node to use a prover.")
-
+  | IproofAttempt _ | Itransformation _ ->
+    move_current_row_selection_up ();
+    test_schedule_proof_attempt cont p limit
+  | Ifile _ | Itheory _ | Inone ->
+    begin try move_current_row_selection_down () with
+      Not_found -> printf "no goals to run prover on"
+    end;
+    test_schedule_proof_attempt cont p limit
 
 let run_strategy_on_task s =
   match !current_selected_index with
