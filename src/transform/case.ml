@@ -359,19 +359,54 @@ let induction env x bound =
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
-let () = register_transform_with_args_l ~desc:"test case" "case" (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) case)
-let () = register_transform_with_args_l ~desc:"test cut" "cut" (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) cut)
-let () = register_transform_with_args ~desc:"test exists" "exists" (wrap (Tterm Ttrans) exists)
-let () = register_transform_with_args ~desc:"test remove" "remove" (wrap (Tprsymbol Ttrans) remove)
-let () = register_transform_with_args ~desc:"test instantiate" "instantiate"
-                                      (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
-let () = register_transform_with_args_l ~desc:"test apply" "apply"
+let () = register_transform_with_args_l
+    ~desc:"case <term> [name] generates hypothesis 'name: term' in a first goal and 'name: ~ term' in a second one."
+    "case"
+    (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) case)
+
+let () = register_transform_with_args_l
+    ~desc:"cut <term> [name] makes a cut with hypothesis 'name: term'"
+    "cut"
+    (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) cut)
+
+let () = register_transform_with_args
+    ~desc:"exists <term> substitutes the variable quantified by exists with term"
+    "exists"
+    (wrap (Tterm Ttrans) exists)
+
+let () = register_transform_with_args
+    ~desc:"remove <prop> removes hypothesis named prop"
+    "remove"
+    (wrap (Tprsymbol Ttrans) remove)
+
+let () = register_transform_with_args
+    ~desc:"instantiate <prop> <term> generates a new hypothesis with first quantified variables of prop replaced with term "
+    "instantiate"
+    (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
+
+let () = register_transform_with_args_l
+    ~desc:"apply <prop> applies prop to the goal" "apply"
     (wrap_l (Tprsymbol Ttrans_l) apply)
-let () = register_transform_with_args_l ~desc:"test duplicate" "duplicate" (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
-let () = register_transform_with_args ~desc:"use theory" "use_th" (wrap (Ttheory Ttrans) use_th)
-let () = register_transform_with_args_l ~desc:"left to right rewrite of first hypothesis into the second" "rewrite"
+
+let () = register_transform_with_args_l
+    ~desc:"duplicate <int> duplicates the goal int times" "duplicate"
+    (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
+
+let () = register_transform_with_args
+    ~desc:"use_th <theory> imports the theory" "use_th"
+    (wrap (Ttheory Ttrans) use_th)
+
+let () = register_transform_with_args_l
+    ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2"
+    "rewrite"
     (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite)
-let () = register_transform_with_args_l ~desc:"replace occurences of first term with second term in given hypothesis/goal" "replace"
+
+let () = register_transform_with_args_l
+    ~desc:"replace <term1> <term2> <name> replaces occcurences of term1 by term2 in prop name"
+    "replace"
     (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) replace)
-let () = register_transform_with_args_l ~desc:"induction on int" "induction"
+
+let () = register_transform_with_args_l
+    ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
+    "induction"
     (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) induction)
