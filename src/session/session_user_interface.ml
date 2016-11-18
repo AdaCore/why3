@@ -199,7 +199,7 @@ let find_any_id nt s =
     | Not_found -> (Stdlib.Mstr.find s nt.Theory.ns_ts).Ty.ts_name
 
 (* The id you are trying to use is undefined *)
-exception Undefined_id
+exception Undefined_id of string
 (* Bad number of arguments *)
 exception Number_of_arguments
 
@@ -207,7 +207,7 @@ let print_id s task =
   let tables = Args_wrapper.build_name_tables task in
   let km = tables.Args_wrapper.known_map in
   let id = try find_any_id tables.Args_wrapper.namespace s with
-  | Not_found -> raise Undefined_id in
+  | Not_found -> raise (Undefined_id s) in
   let d =
     try Ident.Mid.find id km with
     | Not_found -> raise Not_found (* Should not happen *)
@@ -223,7 +223,7 @@ let search s task =
   let tables = Args_wrapper.build_name_tables task in
   let id_decl = tables.Args_wrapper.id_decl in
   let id = try find_any_id tables.Args_wrapper.namespace s with
-  | Not_found -> raise Undefined_id  in
+  | Not_found -> raise (Undefined_id s) in
   let l =
     try Ident.Mid.find id id_decl with
     | Not_found -> raise Not_found (* Should not happen *)
@@ -314,7 +314,10 @@ let interp cont id s =
     | Qtask _, None -> Query "please select a goal first"
     | Qtask f, Some id ->
        let task = Session_itp.get_task cont.Controller_itp.controller_session id in
-       Query (f cont task args)
+       let s = try Query (f cont task args) with
+       | Undefined_id s -> Query ("No existing id corresponding to " ^ s)
+       | Number_of_arguments -> Query "Bad number of arguments"
+       in s
   with Not_found ->
     try
       let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in

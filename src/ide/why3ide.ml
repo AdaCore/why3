@@ -561,6 +561,29 @@ let rec update_status_column_from cont iter =
   | Some p -> update_status_column_from cont p
   | None -> ()
 
+let match_transformation_exception (e: exn) =
+  match e with
+  | Args_wrapper.Arg_parse_error (s1, s2) ->
+      message_zone#buffer#set_text ("Argument parsing error:" ^ s2 ^ "\n" ^ s1)
+  | Args_wrapper.Arg_expected (s) ->
+      message_zone#buffer#set_text ("Argument expected of type: " ^ s)
+  | Args_wrapper.Arg_theory_not_found (s) ->
+      message_zone#buffer#set_text ("Theory not found:" ^ s)
+  | Args_wrapper.Arg_trans (s) ->
+      message_zone#buffer#set_text ("Error in transformation function: " ^ s)
+  | Args_wrapper.Arg_trans_term (s, Some s1, Some s2) ->
+      message_zone#buffer#set_text ("Error in transformation " ^ s ^
+                              " during unification of following two terms:\n" ^
+                              s1 ^ "\n" ^ s2)
+  | Controller_itp.Noprogress ->
+      message_zone#buffer#set_text ("The transformation made no progress")
+  | Args_wrapper.Arg_trans_type (s, Some s1, Some s2) ->
+      message_zone#buffer#set_text ("Error in transformation function:" ^ s ^
+                              ". These types should be equal:\n" ^ s1 ^ "\n" ^ s2)
+  | Args_wrapper.Arg_hyp_not_found s ->
+     message_zone#buffer#set_text ("Hypothesis not found during execution of " ^ s)
+  | _ -> message_zone#buffer#set_text "Uncatched error"
+
 (* Callback of a transformation *)
 let callback_update_tree_transform cont status =
   match status with
@@ -575,6 +598,7 @@ let callback_update_tree_transform cont status =
        (* Put the selection on the first goal *)
        goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
      | [] -> ())
+  | TSfailed e -> match_transformation_exception e
   | _ -> ()
 
 let move_current_row_selection_up () =
@@ -746,12 +770,6 @@ let on_selected_row r =
   let index = goals_model#get ~row:r#iter ~column:index_column in
   try
     let session_element = Hint.find model_index index in
-(*
-    let () = match session_element with
-             | IproofNode id -> Hpn.add pn_id_to_gtree id r (* TODO maybe not the good place to fill
-                                                                    this table *)
-             | _ -> () in
- *)
     current_selected_index := session_element;
     match session_element with
     | IproofNode id ->

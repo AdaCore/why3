@@ -10,10 +10,6 @@ open Reduction_engine
 let debug_matching = Debug.register_info_flag "print_match"
   ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
 
-exception Arg_trans of string
-exception Arg_trans_term of (string * Term.term option * Term.term option)
-exception Arg_trans_type of (string * Ty.ty option * Ty.ty option)
-
 let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
 
 let gen_ident = Ident.id_fresh
@@ -54,7 +50,10 @@ let subst_quant c tq x : term =
         (let new_t = t_subst_single hdv x te in
         t_quant_close c tl tr new_t)
       with
-      | Ty.TypeMismatch (ty1, ty2) -> raise (Arg_trans_type ("subst_quant", Some ty1, Some ty2)))
+      | Ty.TypeMismatch (ty1, ty2) ->
+          raise (Arg_trans_type ("subst_quant",
+                                 Some (Pp.string_of Pretty.print_ty ty1),
+                                 Some (Pp.string_of Pretty.print_ty ty2))))
   | [] -> failwith "subst_quant: Should not happen, please report")
 
 (* Transform the term (exists v, f) into f[x/v] *)
@@ -141,7 +140,6 @@ let intros f =
     | _ -> (lp, lv, f) in
   intros_aux [] Svs.empty f
 
-exception Hyp_not_found
 
 (* Apply:
    1) takes the hypothesis and introduce parts of it to keep only the last element of
@@ -156,7 +154,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let g, task = Task.task_separate_goal task in
   let g = term_decl g in
   let d = find_hypothesis name task in
-  if d = None then raise Hyp_not_found;
+  if d = None then raise (Arg_hyp_not_found "apply");
   let d = Opt.get d in
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
@@ -175,7 +173,9 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
                           (create_prsymbol (gen_ident "G")) ng)) nlp in
     lt
   else
-    raise (Arg_trans_term ("apply", Some inst_nt, Some g)))
+    raise (Arg_trans_term ("apply",
+                           Some (Pp.string_of Pretty.print_term inst_nt),
+                           Some (Pp.string_of Pretty.print_term g))))
 
 (*(Format.printf
       "Term %a and %a are not equal. Failure in matching @."
@@ -237,8 +237,6 @@ let replace_subst lp lv f1 f2 t =
   | Some subst ->
     (List.map (t_subst subst) lp, t)
 
-exception Bad_hypothesis of Term.term
-
 let rewrite_in rev h h1 =
   let found_eq =
     (* Used to find the equality we are rewriting on *)
@@ -250,13 +248,13 @@ let rewrite_in rev h h1 =
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
               (* Support to rewrite from the right *)
               if rev then (t1, t2) else (t2, t1)
-          | _ -> raise (Bad_hypothesis f)) in
+          | _ -> raise (Arg_bad_hypothesis ("rewrite", Some (Pp.string_of Pretty.print_term f)))) in
           Some (lp, lv, t1, t2)
       | _ -> acc) None in
   (* Return instantiated premises and the hypothesis correctly rewritten *)
   let lp_new found_eq =
     match found_eq with
-    | None -> raise Hyp_not_found
+    | None -> raise (Arg_hyp_not_found "rewrite")
     | Some (lp, lv, t1, t2) ->
       fold (fun d acc ->
         match d.d_node with
@@ -295,7 +293,9 @@ let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in (not rev) h)
 (* Replace occurences of t1 with t2 in h *)
 let replace t1 t2 h =
   if not (Ty.ty_equal (t_type t1) (t_type t2)) then
-    raise (Arg_trans_term ("replace", Some t1, Some t2))
+    raise (Arg_trans_term ("replace",
+                           Some (Pp.string_of Pretty.print_term t1),
+                           Some (Pp.string_of Pretty.print_term t2)))
   else
     (* Create a new goal for equality of the two terms *)
     let g = Decl.create_prop_decl Decl.Pgoal (create_prsymbol (gen_ident "G")) (t_app_infer ps_equ [t1; t2]) in
@@ -306,7 +306,6 @@ let replace t1 t2 h =
           [create_prop_decl p pr (replace true t1 t2 t)]
       | _ -> [d]) None in
     Trans.par [g; ng]
-
 
 let is_good_type t ty =
   try (Term.t_ty_check t (Some ty); true) with

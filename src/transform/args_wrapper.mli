@@ -2,6 +2,16 @@
 open Ident
 open Task
 
+exception Arg_trans of string
+exception Arg_trans_term of (string * string option * string option)
+exception Arg_trans_type of (string * string option * string option)
+exception Arg_hyp_not_found of string
+exception Arg_bad_hypothesis of (string * string option)
+
+exception Arg_parse_error of string*string
+exception Arg_expected of string
+exception Arg_theory_not_found of string
+
 (** Pre-processing of tasks, to build unique names for all declared
     identifiers of a task.*)
 

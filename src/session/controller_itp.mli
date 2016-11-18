@@ -11,6 +11,8 @@
 
 open Session_itp
 
+exception Noprogress
+
 (** State of a proof *)
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
@@ -24,7 +26,7 @@ type proof_attempt_status =
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
-type transformation_status = TSscheduled | TSdone of transID  | TSfailed
+type transformation_status = TSscheduled | TSdone of transID  | TSfailed of exn
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 

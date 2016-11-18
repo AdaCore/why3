@@ -17,6 +17,15 @@ let fresh_printer =
  *)
   fun () -> create_ident_printer bl (* ~sanitizer:isanitize *)
 
+exception Arg_trans of string
+exception Arg_trans_term of (string * string option * string option)
+exception Arg_trans_type of (string * string option * string option)
+exception Arg_hyp_not_found of string
+exception Arg_bad_hypothesis of (string * string option)
+
+exception Arg_parse_error of string*string
+exception Arg_expected of string
+exception Arg_theory_not_found of string
 
 open Stdlib
 
@@ -239,10 +248,6 @@ let parse_and_type ~as_fmla s task =
       type_ptree ~as_fmla:as_fmla t task
   in
   t
-
-exception Arg_parse_error of string*string
-exception Arg_expected of string
-exception Arg_theory_not_found of string
 
 let parse_int s =
   try int_of_string s

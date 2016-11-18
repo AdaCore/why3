@@ -4,6 +4,8 @@
 open Format
 open Session_itp
 
+exception Noprogress
+
 (** State of a proof *)
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
@@ -27,13 +29,13 @@ let print_status fmt st =
   | Uninstalled pr -> fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
 
 type transformation_status =
-  | TSscheduled | TSdone of transID | TSfailed
+  | TSscheduled | TSdone of transID | TSfailed of exn
 
 let print_trans_status fmt st =
   match st with
   | TSscheduled -> fprintf fmt "TScheduled"
   | TSdone _tid -> fprintf fmt "TSdone" (* TODO print tid *)
-  | TSfailed -> fprintf fmt "TSfailed"
+  | TSfailed _e -> fprintf fmt "TSfailed"
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
 
@@ -373,9 +375,9 @@ let timeout_handler () =
         try
           build_prover_call c id pr limit callback
         with e when not (Debug.test_flag Debug.stack_trace) ->
-          Format.eprintf
+          (*Format.eprintf
             "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
-            Exn_printer.exn_printer e;
+            Exn_printer.exn_printer e;*)
           callback (InternalFailure e)
       done
   with Queue.Empty -> ()
@@ -420,16 +422,16 @@ let schedule_transformation_r c id name args ~callback =
         begin
           match subtasks with
           | [t'] when Task.task_equal t' task ->
-             callback TSfailed
+             callback (TSfailed Noprogress)
           | _ ->
              let tid = graft_transf c.controller_session id name args subtasks in
              callback (TSdone tid)
         end
       with e when not (Debug.test_flag Debug.stack_trace) ->
-        Format.eprintf
+        (* Format.eprintf
           "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
-          name Exn_printer.exn_printer e;
-        callback TSfailed
+          name Exn_printer.exn_printer e; TODO *)
+        callback (TSfailed e)
     end;
     false
   in
@@ -445,7 +447,7 @@ let schedule_transformation c id name args ~callback =
           | _ -> false
         in
         update_trans_node c tid has_subtasks
-      | TSfailed -> ()
+      | TSfailed _e -> ()
       | _ -> ()); callback s in
   schedule_transformation_r c id name args ~callback
 
@@ -483,7 +485,7 @@ let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback =
          let callback ntr =
            callback_tr ntr;
            match ntr with
-           | TSfailed -> (* transformation failed *)
+           | TSfailed _e -> (* transformation failed *)
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
               S.idle ~prio:0 run_next
