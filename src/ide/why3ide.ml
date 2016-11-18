@@ -356,13 +356,21 @@ let add_completion_entry s =
   let row = completion_model#append () in
   completion_model#set ~row ~column:completion_col s
 
-let init_comp () =
+let init_comp cont =
   (* add the names of all the the transformations *)
   List.iter add_completion_entry (Trans.list_trans ());
   (* add the name of the commands *)
   List.iter (fun (c,_,_) -> add_completion_entry c)
     Session_user_interface.commands;
   (* todo: add queries *)
+
+  (* add provers *)
+  Whyconf.Hprover.iter
+      (fun p _ -> add_completion_entry (p.Whyconf.prover_name^","^p.Whyconf.prover_version))
+      cont.Controller_itp.controller_provers;
+
+  add_completion_entry "auto";
+  add_completion_entry "auto 2";
 
   command_entry_completion#set_text_column completion_col;
 
@@ -772,7 +780,7 @@ let (_ : GtkSignal.id) =
 let () =
   build_tree_from_session cont;
   (* temporary *)
-  init_comp ();
+  init_comp cont;
   vpan222#set_position 500;
   goals_view#expand_all ();
   main_window#add_accel_group accel_group;
