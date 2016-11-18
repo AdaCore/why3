@@ -10,7 +10,7 @@
 <prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mp2.mlw" expanded="true">
-<theory name="N" sum="cc1aa600176adf48026b0e38bca12950" expanded="true">
+<theory name="N" sum="061dc365c9f79ff1bc21c78ae6562492" expanded="true">
  <goal name="limb_max_bound">
  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
  </goal>
@@ -2517,7 +2517,7 @@
  <goal name="VC lsld_ext" expl="VC for lsld_ext">
  <transf name="split_goal_wp">
   <goal name="VC lsld_ext.1" expl="1. precondition">
-  <proof prover="3"><result status="valid" time="0.03" steps="73"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="VC lsld_ext.2" expl="2. assertion">
   <transf name="split_goal_wp">
@@ -2525,7 +2525,7 @@
    <proof prover="2"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC lsld_ext.2.2" expl="2. VC for lsld_ext">
-   <proof prover="0"><result status="valid" time="0.61"/></proof>
+   <proof prover="0"><result status="valid" time="0.37"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2710,7 +2710,8 @@
   <proof prover="3"><result status="valid" time="0.04" steps="98"/></proof>
   </goal>
   <goal name="VC lshift.7" expl="7. precondition">
-  <proof prover="3"><result status="valid" time="0.04" steps="85"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="85"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC lshift.8" expl="8. loop invariant init">
   <proof prover="0"><result status="valid" time="4.65"/></proof>
@@ -2753,8 +2754,7 @@
   <proof prover="3"><result status="valid" time="0.10" steps="119"/></proof>
   </goal>
   <goal name="VC lshift.18" expl="18. precondition">
-  <proof prover="3"><result status="valid" time="0.07" steps="107"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="107"/></proof>
   </goal>
   <goal name="VC lshift.19" expl="19. assertion">
   <transf name="split_goal_wp">
@@ -2946,7 +2946,7 @@
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC rshift.8" expl="8. precondition">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC rshift.9" expl="9. loop invariant init">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
@@ -2983,7 +2983,7 @@
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC rshift.19" expl="19. precondition">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC rshift.20" expl="20. assertion">
   <proof prover="4"><result status="valid" time="0.02"/></proof>
@@ -3232,8 +3232,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC invert_limb" expl="VC for invert_limb" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC invert_limb" expl="VC for invert_limb">
+ <transf name="split_goal_wp">
   <goal name="VC invert_limb.1" expl="1. integer overflow">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -4098,6 +4098,653 @@
   </goal>
  </transf>
  </goal>
+ <goal name="VC divmod_1_norm" expl="VC for divmod_1_norm">
+ <transf name="split_goal_wp">
+  <goal name="VC divmod_1_norm.1" expl="1. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.2" expl="2. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.3" expl="3. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.4" expl="4. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.5" expl="5. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.6" expl="6. integer overflow">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.7" expl="7. integer overflow">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.8" expl="8. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.9" expl="9. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.10" expl="10. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.11" expl="11. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.12" expl="12. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.13" expl="13. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.14" expl="14. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.15" expl="15. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.16" expl="16. loop invariant init">
+  <proof prover="3"><result status="valid" time="0.04" steps="98"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.17" expl="17. assertion">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.18" expl="18. precondition">
+  <proof prover="5"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.19" expl="19. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.20" expl="20. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.21" expl="21. precondition">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.22" expl="22. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.23" expl="23. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.24" expl="24. precondition">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.25" expl="25. integer overflow">
+  <proof prover="2"><result status="valid" time="0.15"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.26" expl="26. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.27" expl="27. precondition">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.28" expl="28. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC divmod_1_norm.28.1" expl="1. VC for divmod_1_norm">
+   <proof prover="6"><result status="valid" time="1.57"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.2" expl="2. VC for divmod_1_norm">
+   <proof prover="0"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   <proof prover="6"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.3" expl="3. VC for divmod_1_norm">
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.4" expl="4. VC for divmod_1_norm">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.5" expl="5. VC for divmod_1_norm">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.6" expl="6. VC for divmod_1_norm">
+   <proof prover="0"><result status="valid" time="0.21"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.7" expl="7. VC for divmod_1_norm">
+   <proof prover="4"><result status="valid" time="0.00"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.8" expl="8. VC for divmod_1_norm">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   <proof prover="2"><result status="valid" time="0.09"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.9" expl="9. VC for divmod_1_norm">
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="6"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.10" expl="10. VC for divmod_1_norm">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.11" expl="11. VC for divmod_1_norm">
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC divmod_1_norm.28.12" expl="12. VC for divmod_1_norm">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="1"><result status="valid" time="0.12"/></proof>
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="6"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC divmod_1_norm.29" expl="29. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.30" expl="30. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.31" expl="31. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.32" expl="32. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.33" expl="33. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.34" expl="34. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.35" expl="35. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.36" expl="36. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.37" expl="37. loop invariant preservation">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.38" expl="38. loop variant decrease">
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC divmod_1_norm.39" expl="39. postcondition">
+  <proof prover="3"><result status="valid" time="0.07" steps="107"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC divmod_1" expl="VC for divmod_1">
+ <transf name="split_goal_wp">
+  <goal name="VC divmod_1.1" expl="1. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.2" expl="2. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.3" expl="3. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.4" expl="4. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.5" expl="5. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.6" expl="6. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.7" expl="7. integer overflow">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.8" expl="8. integer overflow">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.9" expl="9. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.10" expl="10. loop invariant init">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC divmod_1.11" expl="11. loop invariant init">
+  </goal>
+  <goal name="VC divmod_1.12" expl="12. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.13" expl="13. precondition">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.04" steps="96"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.80"/></proof>
+  </goal>
+  <goal name="VC divmod_1.14" expl="14. integer overflow">
+  <proof prover="3" obsolete="true"><result status="valid" time="1.81" steps="462"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.77"/></proof>
+  </goal>
+  <goal name="VC divmod_1.15" expl="15. loop invariant preservation">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.34" steps="203"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+  </goal>
+  <goal name="VC divmod_1.16" expl="16. loop invariant preservation">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.99" steps="452"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.85"/></proof>
+  </goal>
+  <goal name="VC divmod_1.17" expl="17. loop invariant preservation">
+  </goal>
+  <goal name="VC divmod_1.18" expl="18. loop variant decrease">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.61"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.19" expl="19. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.20" expl="20. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.21" expl="21. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.22" expl="22. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.23" expl="23. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.24" expl="24. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.25" expl="25. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.26" expl="26. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.27" expl="27. loop invariant init">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.28" expl="28. loop invariant init">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.03" steps="91"/></proof>
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.29" expl="29. loop invariant init">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.06" steps="103"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+  </goal>
+  <goal name="VC divmod_1.30" expl="30. loop invariant init">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.97"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.47"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.72"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.07"/></proof>
+  </goal>
+  <goal name="VC divmod_1.31" expl="31. assertion">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.32" expl="32. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.12"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.33" expl="33. precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.94"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.71"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+  </goal>
+  <goal name="VC divmod_1.34" expl="34. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC divmod_1.34.1" expl="1. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.96"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.07"/></proof>
+   </goal>
+   <goal name="VC divmod_1.34.2" expl="2. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC divmod_1.34.3" expl="3. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC divmod_1.35" expl="35. integer overflow">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.36" expl="36. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.37" expl="37. precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.79"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+  </goal>
+  <goal name="VC divmod_1.38" expl="38. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC divmod_1.39" expl="39. assertion">
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+  <transf name="split_goal_wp">
+   <goal name="VC divmod_1.39.1" expl="1. VC for divmod_1">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.83"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.2" expl="2. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.41"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="1.06"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.3" expl="3. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.90"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.4" expl="4. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.89"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.85"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.5" expl="5. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.91"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.89"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.6" expl="6. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.7" expl="7. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.8" expl="8. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.9" expl="9. VC for divmod_1">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.19"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.10" expl="10. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.11" expl="11. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.12" expl="12. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.88"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.96"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.13" expl="13. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.14" expl="14. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+   <proof prover="1" obsolete="true"><result status="valid" time="0.15"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.15" expl="15. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.39.16" expl="16. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC divmod_1.40" expl="40. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.41" expl="41. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.42" expl="42. precondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.12"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.65"/></proof>
+  </goal>
+  <goal name="VC divmod_1.43" expl="43. integer overflow">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.23"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+  </goal>
+  <goal name="VC divmod_1.44" expl="44. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.45" expl="45. precondition">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.46" expl="46. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC divmod_1.46.1" expl="1. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.91"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.97"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.08"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="1.42"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.2" expl="2. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.13"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.06"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.3" expl="3. VC for divmod_1">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.09"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.4" expl="4. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.88"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="1.34"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.5" expl="5. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.12"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.04"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.83"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.6" expl="6. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.13"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.03"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.7" expl="7. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.8" expl="8. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="valid" time="0.14"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.96"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.9" expl="9. VC for divmod_1">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.10" expl="10. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.11" expl="11. VC for divmod_1">
+   <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.79"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.12" expl="12. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.13" expl="13. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.14" expl="14. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.83"/></proof>
+   </goal>
+   <goal name="VC divmod_1.46.15" expl="15. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.03"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC divmod_1.47" expl="47. loop invariant preservation">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.11"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.88"/></proof>
+  </goal>
+  <goal name="VC divmod_1.48" expl="48. loop invariant preservation">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.15"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+  </goal>
+  <goal name="VC divmod_1.49" expl="49. loop invariant preservation">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.10"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.84"/></proof>
+  </goal>
+  <goal name="VC divmod_1.50" expl="50. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.51" expl="51. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.52" expl="52. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.53" expl="53. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC divmod_1.54" expl="54. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.02"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.07"/></proof>
+  </goal>
+  <goal name="VC divmod_1.55" expl="55. loop invariant preservation">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC divmod_1.56" expl="56. loop invariant preservation">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.01"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.05"/></proof>
+  </goal>
+  <goal name="VC divmod_1.57" expl="57. loop variant decrease">
+  <proof prover="4" obsolete="true"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC divmod_1.58" expl="58. precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.06"/></proof>
+  </goal>
+  <goal name="VC divmod_1.59" expl="59. precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="1" obsolete="true"><result status="highfailure" time="0.77"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.84"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="VC divmod_1.60" expl="60. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC divmod_1.60.1" expl="1. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+   <proof prover="2" obsolete="true"><result status="valid" time="0.07"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.01"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.83"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC divmod_1.60.2" expl="2. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+   <proof prover="1" obsolete="true"><result status="valid" time="0.11"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.98"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   <proof prover="6" obsolete="true"><result status="timeout" time="5.06"/></proof>
+   </goal>
+   <goal name="VC divmod_1.60.3" expl="3. VC for divmod_1">
+   <proof prover="0" obsolete="true"><result status="valid" time="0.11"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC divmod_1.60.4" expl="4. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.60.5" expl="5. VC for divmod_1">
+   <proof prover="4" obsolete="true"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC divmod_1.60.6" expl="6. VC for divmod_1">
+   <proof prover="1" obsolete="true"><result status="valid" time="0.10"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="4.82"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC divmod_1.61" expl="61. precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="4.97"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.87"/></proof>
+  <proof prover="6" obsolete="true"><result status="timeout" time="5.06"/></proof>
+  </goal>
+  <goal name="VC divmod_1.62" expl="62. precondition">
+  <proof prover="1" obsolete="true"><result status="valid" time="1.56"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.03"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.98"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.86"/></proof>
+  </goal>
+  <goal name="VC divmod_1.63" expl="63. postcondition">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.09"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.81"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="VC print" expl="VC for print">
  <proof prover="3"><result status="valid" time="0.13" steps="162"/></proof>
  </goal>
@@ -4163,8 +4810,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC main" expl="VC for main" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC main" expl="VC for main">
+ <transf name="split_goal_wp">
   <goal name="VC main.1" expl="1. integer overflow">
   <proof prover="3"><result status="valid" time="0.03" steps="72"/></proof>
   </goal>
@@ -4277,10 +4924,7 @@
   <proof prover="3"><result status="valid" time="0.15" steps="122"/></proof>
   </goal>
   <goal name="VC main.38" expl="38. precondition">
-  <proof prover="1"><result status="timeout" time="4.98"/></proof>
-  <proof prover="2"><result status="timeout" time="5.08"/></proof>
   <proof prover="3"><result status="valid" time="4.92" steps="1508"/></proof>
-  <proof prover="4"><result status="timeout" time="4.94"/></proof>
   </goal>
   <goal name="VC main.39" expl="39. precondition">
   <proof prover="3"><result status="valid" time="0.09" steps="118"/></proof>
@@ -4396,7 +5040,7 @@
   <goal name="VC main.76" expl="76. precondition">
   <proof prover="3"><result status="valid" time="0.16" steps="149"/></proof>
   </goal>
-  <goal name="VC main.77" expl="77. precondition" expanded="true">
+  <goal name="VC main.77" expl="77. precondition">
   <proof prover="0"><result status="timeout" time="4.91"/></proof>
   <proof prover="1"><result status="timeout" time="4.98"/></proof>
   <proof prover="2"><result status="timeout" time="5.08"/></proof>
@@ -4618,23 +5262,18 @@
   <proof prover="3"><result status="valid" time="0.62" steps="181"/></proof>
   </goal>
   <goal name="VC main.149" expl="149. integer overflow">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC main.150" expl="150. precondition">
-  <proof prover="3"><result status="timeout" time="4.98"/></proof>
   <proof prover="4"><result status="valid" time="3.03"/></proof>
   </goal>
   <goal name="VC main.151" expl="151. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC main.152" expl="152. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="2.85"/></proof>
   </goal>
   <goal name="VC main.153" expl="153. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.154" expl="154. precondition">
@@ -4643,23 +5282,18 @@
   <proof prover="4"><result status="timeout" time="4.91"/></proof>
   </goal>
   <goal name="VC main.155" expl="155. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.156" expl="156. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.157" expl="157. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.158" expl="158. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.159" expl="159. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.160" expl="160. integer overflow">
@@ -5082,23 +5716,18 @@
   <proof prover="3"><result status="valid" time="0.62" steps="175"/></proof>
   </goal>
   <goal name="VC main.299" expl="299. integer overflow">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.300" expl="300. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="2.82"/></proof>
   </goal>
   <goal name="VC main.301" expl="301. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC main.302" expl="302. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="2.80"/></proof>
   </goal>
   <goal name="VC main.303" expl="303. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.304" expl="304. precondition">
@@ -5107,23 +5736,18 @@
   <proof prover="4"><result status="timeout" time="4.92"/></proof>
   </goal>
   <goal name="VC main.305" expl="305. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.306" expl="306. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.307" expl="307. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.308" expl="308. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.309" expl="309. precondition">
-  <proof prover="3"><result status="timeout" time="4.98"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.310" expl="310. integer overflow">
@@ -5564,23 +6188,18 @@
   <proof prover="3"><result status="valid" time="0.64" steps="177"/></proof>
   </goal>
   <goal name="VC main.455" expl="455. integer overflow">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.456" expl="456. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="2.89"/></proof>
   </goal>
   <goal name="VC main.457" expl="457. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC main.458" expl="458. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="2.88"/></proof>
   </goal>
   <goal name="VC main.459" expl="459. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.460" expl="460. precondition">
@@ -5589,23 +6208,18 @@
   <proof prover="4"><result status="timeout" time="4.91"/></proof>
   </goal>
   <goal name="VC main.461" expl="461. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.462" expl="462. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.463" expl="463. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.464" expl="464. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.465" expl="465. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.466" expl="466. integer overflow">
@@ -6028,23 +6642,18 @@
   <proof prover="3"><result status="valid" time="0.64" steps="171"/></proof>
   </goal>
   <goal name="VC main.605" expl="605. integer overflow">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC main.606" expl="606. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="3.43"/></proof>
   </goal>
   <goal name="VC main.607" expl="607. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC main.608" expl="608. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="2.78"/></proof>
   </goal>
   <goal name="VC main.609" expl="609. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC main.610" expl="610. precondition">
@@ -6053,23 +6662,18 @@
   <proof prover="4"><result status="timeout" time="4.90"/></proof>
   </goal>
   <goal name="VC main.611" expl="611. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.612" expl="612. precondition">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC main.613" expl="613. precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
   <proof prover="4"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC main.614" expl="614. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC main.615" expl="615. precondition">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>

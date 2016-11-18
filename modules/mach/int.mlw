@@ -220,18 +220,18 @@ module UInt32
     constant max = max_uint32
 
   val lsld (x cnt:uint32) : (uint32,uint32)
-    requires { 0 < to_int cnt < 32 }
+    requires { 0 <= to_int cnt < 32 }
     returns { (r,d) -> to_int r + (max_uint32+1) * to_int d =
               (power 2 (to_int cnt)) * to_int x }
 
   val lsl (x cnt:uint32) : uint32
-    requires { 0 < to_int cnt < 32 }
+    requires { 0 <= to_int cnt < 32 }
     requires { (power 2 (to_int cnt)) * to_int x <= max_uint32 }
     ensures { to_int result = (power 2 (to_int cnt)) * to_int x }
 
-  val rsl (x cnt:uint32) : uint32
-    requires { 0 < to_int cnt < 32 }
-    requires { to_int x >= power 2 (to_int cnt) || to_int x = 0 }
+  val lsr (x cnt:uint32) : uint32
+    requires { 0 <= to_int cnt < 32 }
+    requires { mod (to_int x) (power 2 (to_int cnt)) = 0 }
     ensures { to_int x = (power 2 (to_int cnt)) * to_int result }
 
   val div2by1 (l h d:uint32) : uint32
@@ -247,7 +247,7 @@ module UInt32
     ensures { to_int result
             = div (to_int l + (max_uint32+1) * to_int h) (to_int d) }
 
-  val is_msb_set (x:uint32) : bool
+  val predicate is_msb_set (x:uint32) : bool
     ensures { result <-> 2 * to_int x > max_uint32 }
 
 
