@@ -594,10 +594,10 @@ let rec apply_transform cont t args =
   | IproofNode id ->
      let callback = callback_update_tree_transform cont in
      C.schedule_transformation cont id t args ~callback
-  | IproofAttempt _ | Itransformation _ ->
+  | IproofAttempt _ ->
     move_current_row_selection_up ();
     apply_transform cont t args
-  | Ifile _ | Itheory _ | Inone ->
+  | Itransformation _ | Ifile _ | Itheory _ | Inone ->
     begin try move_current_row_selection_down () with
       Not_found -> printf "no goals to apply transform"
     end;
