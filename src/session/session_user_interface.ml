@@ -338,7 +338,7 @@ let return_prover name config =
   (** all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    Format.eprintf "Prover corresponding to %s has not been found@." name;
+    (*Format.eprintf "Prover corresponding to %s has not been found@." name;*)
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))
@@ -366,5 +366,5 @@ let parse_prover_name config name args :
         Some (prover_config, Call_provers.{limit_time = int_of_string timeout;
                                            limit_mem = int_of_string oom;
                                            limit_steps = 0})
-      | _ -> Format.eprintf "Parse_prover_name. Should not happen. Please report@."; None
+      | _ -> (*Format.eprintf "Parse_prover_name. Should not happen. Please report@."; *) None
     end
