@@ -356,6 +356,51 @@ let induction env x bound =
     | _ -> [d]) None in
   Trans.par [le_bound; ge_bound]
 
+(* Destruct the head term of an hypothesis if it is either
+   conjunction, disjunction or exists *)
+let destruct pr : Task.task Trans.tlist =
+  Trans.decl_l (fun d ->
+    match d.d_node with
+    | Dprop (Paxiom, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
+      begin
+        match ht.t_node with
+        | Tbinop (Tand, t1, t2) ->
+          let new_pr1 = create_prsymbol (Ident.id_clone dpr.pr_name) in
+          let new_decl1 = create_prop_decl Paxiom new_pr1 t1 in
+          let new_pr2 = create_prsymbol (Ident.id_clone dpr.pr_name) in
+          let new_decl2 = create_prop_decl Paxiom new_pr2 t2 in
+          [[new_decl1;new_decl2]]
+        | Tbinop (Tor, t1, t2) ->
+          let new_pr1 = create_prsymbol (Ident.id_clone dpr.pr_name) in
+          let new_decl1 = create_prop_decl Paxiom new_pr1 t1 in
+          let new_pr2 = create_prsymbol (Ident.id_clone dpr.pr_name) in
+          let new_decl2 = create_prop_decl Paxiom new_pr2 t2 in
+          [[new_decl1];[new_decl2]]
+        | Tquant (Texists, tb) ->
+          begin
+            let (vsl, tr, te) = Term.t_open_quant tb in
+            match vsl with
+            | x :: tl ->
+                let ls = create_lsymbol (Ident.id_clone x.vs_name) [] (Some x.vs_ty) in
+                let tx = fs_app ls [] x.vs_ty in
+                let x_decl = create_param_decl ls in
+                (try
+                  let part_t = t_subst_single x tx te in
+                  let new_t = t_quant_close Texists tl tr part_t in
+                  let new_pr = create_prsymbol (Ident.id_clone dpr.pr_name) in
+                  let new_decl = create_prop_decl Paxiom new_pr new_t in
+                  [[d; x_decl; new_decl]]
+                with
+                | Ty.TypeMismatch (ty1, ty2) ->
+                    raise (Arg_trans_type ("destruct_exists",
+                                           Some (Pp.string_of Pretty.print_ty ty1),
+                                           Some (Pp.string_of Pretty.print_ty ty2))))
+            | [] -> raise (Arg_trans ("destruct_exists"))
+          end
+        | _ -> raise (Arg_trans ("destruct"))
+      end
+    | _ -> [[d]]) None
+
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
@@ -410,3 +455,10 @@ let () = register_transform_with_args_l
     ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
     "induction"
     (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) induction)
+
+(*
+let () = register_transform_with_args_l
+    ~desc:"destruct <name> destructs the head constructor of hypothesis name"
+    "destruct"
+    (wrap_l (Tprsymbol Ttrans_l) destruct)
+*)
