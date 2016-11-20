@@ -394,12 +394,14 @@ let print_tdecl tables fmt td = match td.td_node with
       fprintf fmt "@[<hov 2>(* meta %s %a *)@]@\n@\n"
         m.meta_name (print_list comma (print_meta_arg tables)) al
 
+(*
 let print_tdecls tables =
   let print_tdecl sm tables fmt td =
     info := {info_syn = sm; itp = false}; print_tdecl tables fmt td; sm, [] in
   let print_tdecl tables = Printer.sprint_tdecl (fun sm -> print_tdecl sm tables) in
   let print_tdecl tables task acc = print_tdecl tables task.Task.task_decl acc in
   Discriminate.on_syntax_map (fun sm -> Trans.fold (print_tdecl tables) (sm,[]))
+*)
 
 (* TODO print_task and print_sequent recompute a table every time they are called.
     Do we want that? *)
@@ -410,56 +412,35 @@ let print_task args ?old:_ fmt task =
   print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
   print_th_prelude task fmt args.th_prelude;
-  let rec print = function
-    | x :: r -> print r; Pp.string fmt x
-    | [] -> () in
-  print (snd (Trans.apply (print_tdecls tables) task));
+  info := {
+    info_syn = Discriminate.get_syntax_map task;
+    itp = !info.itp};
+  let rec print_decls = function
+    | Some t ->
+        print_decls t.Task.task_prev;
+        begin match t.Task.task_decl.Theory.td_node with
+        | Theory.Decl d ->
+            begin try print_decl tables fmt d
+            with Unsupported s -> raise (UnsupportedDecl (d,s)) end
+        | _ -> () end
+    | None -> () in
+  print_decls task;
   fprintf fmt "end@."
 
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."
 
-let print_sequent _args ?old:_ fmt =
-  Trans.apply
-    (Printer.on_syntax_map
-       (fun sm ->
-        info := {info_syn = sm; itp = true};
-        Trans.store
-          (fun task ->
-           (* print_th_prelude task fmt args.th_prelude; *)
-           let tables = build_name_tables task in
-           let ut = Task.used_symbols (Task.used_theories task) in
-           let ld = Task.local_decls task ut in
-           fprintf fmt "@[<v 0>%a@]"
-                   (Pp.print_list Pp.newline (print_decl tables)) ld)))
-
+let print_sequent _args ?old:_ fmt task =
+  info := {info_syn = Discriminate.get_syntax_map task;
+    itp = true};
+  let tables = build_name_tables task in
+  let ut = Task.used_symbols (Task.used_theories task) in
+  let ld = Task.local_decls task ut in
+  fprintf fmt "@[<v 0>%a@]"
+    (Pp.print_list Pp.newline (print_decl tables)) ld
 
 let () = register_printer "why3_itp" print_sequent
   ~desc:"Print@ the@ goal@ in@ a@ format@ dedicated@ to@ ITP."
 
 
 (** *)
-
-
-(*
-let build_name_tables task : name_tables =
-(*
-  TODO:
-   - simply use [km = Task.task_known task] as the set of identifiers
-     to insert in the tables
-   - only one printer (do not attempt te rebuild qualified idents)
-   - use syntax_map from why3_itp driver
-   - to build the namespace, do a match on the decl associated with the id
-      in [km]
-  | Dtype  -> tysymbol
-  | Ddata | Dparam | Dlogic | Dind  -> lsymbol
-  | Dprop  -> prsymbol
-
-  TODO: use the result of this function in
-    - a new variant of a printer in this file
-    - use the namespace to type the terms
-      (change the code in parser/typing.ml to use namespace
-      instead of theory_uc)
-
-*)
-*)
