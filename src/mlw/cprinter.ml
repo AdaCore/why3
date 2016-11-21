@@ -599,8 +599,13 @@ module Translate = struct
       begin match cs with
       | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
       | _ ->
-        let s,e = C.get_last_expr cs in
-        cd, C.Sseq (s, C.Swhile (e, C.Sblock b))
+        begin match C.get_last_expr cs with
+        | C.Snop, e -> cd, C.(Swhile(e, C.Sblock b))
+        | s,e -> cd, C.(Swhile(Econst (Cint "1"),
+                     Sseq(s, 
+                          Sseq(Sif(Eunop(Unot, e), Sbreak, Snop),
+                               C.Sblock b))))
+        end
       end
     | Etry (b, exm) ->
       Format.printf "TRY@.";
