@@ -495,26 +495,32 @@ module Translate = struct
 	     | _ -> assert false
 	   end
 	 else
-	   let e =  match query_syntax info.syntax rs.rs_name with
-	     | Some s ->
-		let params =
-		  List.map (fun pv -> (C.Evar(pv_name pv),
-                                       ty_of_ty info (ty_of_ity pv.pv_ity)))
-			   pvsl in
-		let rty = ty_of_ity e.e_ity in
-		let rtyargs = match rty.ty_node with
-		  | Tyvar _ -> [||]
-		  | Tyapp (_,args) -> Array.of_list (List.map (ty_of_ty info) args)
-		in
-		C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
-                          Mid.mem rs.rs_name info.converter)
-             | None ->
-		let args = List.filter
-			     (fun pv -> not (pv.pv_ghost
-					     || ity_equal pv.pv_ity ity_unit))
-			     pvsl in
-		C.(Ecall(Evar(rs.rs_name),
-			 List.map (fun pv -> Evar(pv_name pv)) args))
+	   let e =
+             match
+               (query_syntax info.syntax rs.rs_name,
+                query_syntax info.converter rs.rs_name) with
+
+               | _, Some s
+               | Some s, _ ->
+		 let params =
+		   List.map (fun pv -> (C.Evar(pv_name pv),
+                                        ty_of_ty info (ty_of_ity pv.pv_ity)))
+		     pvsl in
+		 let rty = ty_of_ity e.e_ity in
+		 let rtyargs = match rty.ty_node with
+		   | Tyvar _ -> [||]
+		   | Tyapp (_,args) ->
+                     Array.of_list (List.map (ty_of_ty info) args)
+		 in
+		 C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
+                           Mid.mem rs.rs_name info.converter)
+               | None, None ->
+		 let args = List.filter
+		   (fun pv -> not (pv.pv_ghost
+				   || ity_equal pv.pv_ity ity_unit))
+		   pvsl in
+		 C.(Ecall(Evar(rs.rs_name),
+			  List.map (fun pv -> Evar(pv_name pv)) args))
            in
 	   C.([],
               if env.computes_return_value
@@ -602,7 +608,7 @@ module Translate = struct
         begin match C.get_last_expr cs with
         | C.Snop, e -> cd, C.(Swhile(e, C.Sblock b))
         | s,e -> cd, C.(Swhile(Econst (Cint "1"),
-                     Sseq(s, 
+                     Sseq(s,
                           Sseq(Sif(Eunop(Unot, e), Sbreak, Snop),
                                C.Sblock b))))
         end
