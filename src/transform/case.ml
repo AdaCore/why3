@@ -456,9 +456,7 @@ let () = register_transform_with_args_l
     "induction"
     (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) induction)
 
-(*
 let () = register_transform_with_args_l
     ~desc:"destruct <name> destructs the head constructor of hypothesis name"
     "destruct"
     (wrap_l (Tprsymbol Ttrans_l) destruct)
-*)

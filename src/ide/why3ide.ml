@@ -582,7 +582,7 @@ let match_transformation_exception (e: exn) =
                               ". These types should be equal:\n" ^ s1 ^ "\n" ^ s2)
   | Args_wrapper.Arg_hyp_not_found s ->
      message_zone#buffer#set_text ("Hypothesis not found during execution of " ^ s)
-  | _ -> message_zone#buffer#set_text "Uncatched error"
+  | _ -> message_zone#buffer#set_text (Pp.sprintf "Uncatched error: %a" Exn_printer.exn_printer e)
 
 (* Callback of a transformation *)
 let callback_update_tree_transform cont status =
