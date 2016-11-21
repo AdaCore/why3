@@ -42,7 +42,7 @@ module McCarthy91
     let n = ref n0 in
     while !e > 0 do
       variant   { 101 - !n + 10 * !e, !e }
-	  invariant { true }
+	  invariant { !e = 0 -> !n > 90 }
       if !n > 100 then begin
         n := !n - 10;
         e := !e - 1

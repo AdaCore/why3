@@ -66,9 +66,9 @@ module Test
 		variant { x - !k }
 
 		if !k >= y then
-		a[!k] <- b
+			a[!k] <- b
 		else
-		a[!k] <- d;
+			a[!k] <- d;
 		incr k;
 		done; a
 	
