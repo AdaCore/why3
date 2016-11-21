@@ -32,23 +32,16 @@ theory BuiltIn
   meta "encoding : kept" type int
 end
 
-theory algebra.Field
-  remove prop add_div
-  remove prop sub_div
-  remove prop neg_div
-  remove prop assoc_mul_div
-  remove prop assoc_div_mul
-  remove prop assoc_div_div
+theory algebra.OrderedUnitaryCommutativeRing
+  remove allprops
 end
 
-theory algebra.OrderedUnitaryCommutativeRing
-  remove prop CompatOrderAdd
-  remove prop CompatOrderMult
+theory algebra.Field
+  remove allprops
 end
 
 theory algebra.OrderedField
-  remove prop CompatOrderAdd
-  remove prop CompatOrderMult
+  remove allprops
 end
 
 theory int.Int
@@ -68,67 +61,31 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
+  remove allprops
 end
 
 theory int.Abs
   syntax function abs "(abs %1)"
-  remove prop Abs_le
-  remove prop Abs_pos
+
+  remove allprops
 end
 
 theory int.MinMax
-   syntax function min "(ite (< %1 %2) %1 %2)"
-   syntax function max "(ite (< %1 %2) %2 %1)"
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
 
-   remove prop Max_l
-   remove prop Min_r
-   remove prop Max_comm
-   remove prop Min_comm
-   remove prop Max_assoc
-   remove prop Min_assoc
+  remove allprops
 end
 
 theory int.EuclideanDivision
-   syntax function div "(div %1 %2)"
-   syntax function mod "(mod %1 %2)"
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
 
-   remove prop Div_mod
-   remove prop Mod_bound
-   remove prop Div_unique
-   remove prop Div_bound
-   remove prop Mod_1
-   remove prop Div_1
-   remove prop Div_inf
-   remove prop Div_inf_neg
-   remove prop Mod_0
-   remove prop Div_1_left
-   remove prop Div_minus1_left
-   remove prop Mod_1_left
-   remove prop Mod_minus1_left
-   remove prop Div_mult
-   remove prop Mod_mult
+  remove allprops
 end
 
 theory int.Div2
-   remove prop div2
+  remove allprops
 end
 
 theory int.ComputerDivision
@@ -137,7 +94,7 @@ end
 
 theory real.Real
 
-prelude ";;; SMT-LIB2: real arithmetic"
+  prelude ";;; SMT-LIB2: real arithmetic"
 
   meta "encoding : kept" type real
 
@@ -156,24 +113,26 @@ prelude ";;; SMT-LIB2: real arithmetic"
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop CommutativeGroup.Assoc
-  remove prop CommutativeGroup.Unit_def_l
-  remove prop CommutativeGroup.Unit_def_r
-  remove prop CommutativeGroup.Inv_def_l
-  remove prop CommutativeGroup.Inv_def_r
-  remove prop CommutativeGroup.Comm.Comm
-  remove prop Assoc.Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm.Comm
-  remove prop Unitary
-  remove prop NonTrivialRing
-  remove prop Inverse
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop ZeroLessOne
+  remove allprops
+end
+
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
+theory real.MinMax
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
+
+  remove allprops
+end
+
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove allprops
 end
 
 theory real.Truncate
@@ -183,76 +142,36 @@ theory real.Truncate
   syntax function floor "(to_int %1)"
   syntax function ceil "(- 1 (to_int (- 1.0 %1)))"
 
-  remove prop Truncate_int
-  remove prop Truncate_down_pos
-  remove prop Truncate_up_neg
-  remove prop Real_of_truncate
-  remove prop Truncate_monotonic
-  remove prop Truncate_monotonic_int1
-  remove prop Truncate_monotonic_int2
-  remove prop Floor_int
-  remove prop Ceil_int
-  remove prop Floor_down
-  remove prop Ceil_up
-  remove prop Floor_monotonic
-  remove prop Ceil_monotonic
+  remove allprops
 end
 
-theory real.MinMax
-   syntax function min "(ite (< %1 %2) %1 %2)"
-   syntax function max "(ite (< %1 %2) %2 %1)"
-
-   remove prop Max_l
-   remove prop Min_r
-   remove prop Max_comm
-   remove prop Min_comm
-   remove prop Max_assoc
-   remove prop Min_assoc
-end
-
-theory real.FromInt
-  syntax function from_int "(to_real %1)"
-
-  remove prop Zero
-  remove prop One
-  remove prop Add
-  remove prop Sub
-  remove prop Mul
-  remove prop Neg
-  remove prop Monotonic
-end
-
-theory real.Abs
-  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
-
-  remove prop Abs_le
-  remove prop Abs_pos
-  (*** remove prop Abs_zero *)
-  remove prop Abs_sum
-  remove prop Abs_prod
-  remove prop triangular_inequality
-end
-
-theory bool.Bool
+theory Bool
    meta "encoding : kept" type bool
    meta "eliminate_algebraic" "no_inversion"
-   (* meta "eliminate_algebraic" "no_selector" *)
 
    syntax type     bool  "Bool"
    syntax function True  "true"
    syntax function False "false"
 
+   remove allprops
+end
+
+theory bool.Bool
    syntax function andb  "(and %1 %2)"
    syntax function orb   "(or %1 %2)"
    syntax function xorb  "(xor %1 %2)"
    syntax function notb  "(not %1)"
    syntax function implb "(=> %1 %2)"
+
+   remove allprops
 end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
   meta "encoding : lskept" function ite
   meta "encoding:ignore_polymorphism_ls" function ite
+
+  remove allprops
 end
 
 theory map.Map
@@ -270,8 +189,8 @@ theory map.Map
 
   meta "encoding:ignore_polymorphism_pr" prop Select_eq
   meta "encoding:ignore_polymorphism_pr" prop Select_neq
-  remove prop Select_eq
-  remove prop Select_neq
+
+  remove allprops
 end
 
 theory map.Const
