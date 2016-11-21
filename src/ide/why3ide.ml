@@ -59,7 +59,11 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers gconfig.config
 
 let cont =
-  Session_user_interface.cont_from_files spec usage_str gconfig.env files provers
+  try
+    Session_user_interface.cont_from_files spec usage_str gconfig.env files provers
+  with e ->
+       eprintf "%a@." Exn_printer.exn_printer e;
+       exit 1
 
 let () =
   Debug.dprintf debug "[GUI] Init the GTK interface...@?";
