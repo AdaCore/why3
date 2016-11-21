@@ -233,7 +233,7 @@ let replace_subst lp lv f1 f2 t =
     end in
   let t = t_map (replace lv f1 f2) t in
   match !is_replaced with
-  | None -> raise Not_found
+  | None -> raise (Arg_trans "matching/replace")
   | Some subst ->
     (List.map (t_subst subst) lp, t)
 
