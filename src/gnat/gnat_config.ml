@@ -284,16 +284,15 @@ let compute_base_provers config str_list =
 let provers, prover_ce, config, env =
   let prover_str_list = computer_prover_str_list () in
   (* did the user request some prover which is not shipped with SPARK? *)
-  let builtin_provers_only =
-    prover_str_list = [] || List.for_all is_builtin_prover prover_str_list in
+  let builtin_provers_only = List.for_all is_builtin_prover prover_str_list in
   (* now load the configuration of Why3 *)
   let config =
-     (* We only read the default config file ($HOME/.why3.conf) if the option
-      * --prover was given, with a non-builtin prover *)
+     (* We only read the default config file ($HOME/.why3.conf) in replay mode,
+        or if the option --prover was given, with a non-builtin prover *)
      try
        let gnatprove_config =
          Whyconf.read_config (Some (gnatprove_why3conf_file ())) in
-       if builtin_provers_only then gnatprove_config
+       if not !opt_replay && builtin_provers_only then gnatprove_config
         else begin
            let conf = (Whyconf.read_config !opt_why3_conf_file) in
            let provers =
