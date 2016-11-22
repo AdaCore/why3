@@ -276,75 +276,6 @@ let update_monitor =
     (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
 
 
-(*******************************)
-(* commands of the "View" menu *)
-(*******************************)
-
-let view_menu = factory#add_submenu "_View"
-let view_factory = new GMenu.factory view_menu ~accel_group
-
-(* goals view is not yet multi-selectable
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._A
-    ~label:"Select all"
-    ~callback:(fun () -> goals_view#selection#select_all ()) ()
- *)
-
-let (_ : GMenu.menu_item) =
-  view_factory#add_item ~key:GdkKeysyms._plus
-    ~callback:enlarge_fonts "Enlarge font"
-
-let (_ : GMenu.menu_item) =
-    view_factory#add_item ~key:GdkKeysyms._minus
-      ~callback:reduce_fonts "Reduce font"
-
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._E
-    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
-
-
-let () =
-  Gconfig.add_modifiable_sans_font_view goals_view#misc;
-  Gconfig.add_modifiable_mono_font_view monitor#misc;
-  Gconfig.add_modifiable_mono_font_view task_view#misc;
-  Gconfig.add_modifiable_mono_font_view command_entry#misc;
-  Gconfig.add_modifiable_mono_font_view message_zone#misc;
-  Gconfig.set_fonts ()
-
-let image_of_result ~obsolete rOpt =
-  match rOpt with
-  | None -> !image_undone
-  | Some r ->
-    match r.Call_provers.pr_answer with
-    | Call_provers.Valid ->
-      if obsolete then !image_valid_obs else !image_valid
-    | Call_provers.Invalid ->
-      if obsolete then !image_invalid_obs else !image_invalid
-    | Call_provers.Timeout ->
-      if obsolete then !image_timeout_obs else !image_timeout
-    | Call_provers.OutOfMemory ->
-      if obsolete then !image_outofmemory_obs else !image_outofmemory
-    | Call_provers.StepLimitExceeded ->
-      if obsolete then !image_steplimitexceeded_obs
-      else !image_steplimitexceeded
-    | Call_provers.Unknown _ ->
-      if obsolete then !image_unknown_obs else !image_unknown
-    | Call_provers.Failure _ ->
-      if obsolete then !image_failure_obs else !image_failure
-    | Call_provers.HighFailure ->
-      if obsolete then !image_failure_obs else !image_failure
-
-let image_of_pa_status ~obsolete pa_status =
-  match pa_status with
-    | Controller_itp.Interrupted -> !image_undone
-    | Controller_itp.Unedited -> !image_editor
-    | Controller_itp.JustEdited -> !image_unknown
-    | Controller_itp.Scheduled -> !image_scheduled
-    | Controller_itp.Running -> !image_running
-    | Controller_itp.InternalFailure _
-    | Controller_itp.Uninstalled _ -> !image_failure
-    | Controller_itp.Done r -> image_of_result ~obsolete (Some r)
-
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -450,31 +381,19 @@ type index =
   | Itheory of theory
 
 let model_index : index Hint.t = Stdlib.Hint.create 17
-(* To each proofnodeid we have the corresponding row_reference *)
-let pn_id_to_gtree : GTree.row_reference Hpn.t = Hpn.create 17
-let pan_id_to_gtree : GTree.row_reference Hpan.t = Hpan.create 17
+(* To each node we have the corresponding row_reference *)
+let file_id_to_gtree : GTree.row_reference Hstr.t = Hstr.create 3
+let th_id_to_gtree   : GTree.row_reference Ident.Hid.t = Ident.Hid.create 7
+let pn_id_to_gtree   : GTree.row_reference Hpn.t = Hpn.create 17
+let tn_id_to_gtree   : GTree.row_reference Htn.t = Htn.create 17
+let pan_id_to_gtree  : GTree.row_reference Hpan.t = Hpan.create 17
 
-let set_status_column_from_cont cont iter =
-  let index = goals_model#get ~row:iter ~column:index_column in
-  let index = Hint.find model_index index in
-  let image = match index with
-    | Inone -> assert false
-    | IproofAttempt panid ->
-      let pa = get_proof_attempt_node cont.controller_session panid in
-      image_of_result ~obsolete:pa.proof_obsolete pa.Session_itp.proof_state
-    | IproofNode pn ->
-      if pn_proved cont pn
-      then !image_valid
-      else !image_unknown
-    | Itransformation tn -> if tn_proved cont tn
-      then !image_valid
-      else !image_unknown
-    | Ifile _ -> !image_file
-    | Itheory th -> if th_proved cont th
-      then !image_valid
-      else !image_unknown
-  in
-  goals_model#set ~row:iter ~column:status_column image
+(* TODO exception for those: *)
+let row_from_file file = Hstr.find file_id_to_gtree (file.file_name)
+let row_from_th   th   = Ident.Hid.find th_id_to_gtree (theory_name th)
+let row_from_pn   pn   = Hpn.find pn_id_to_gtree pn
+let row_from_tn   tn   = Htn.find tn_id_to_gtree tn
+let row_from_pan  pan  = Hpan.find pan_id_to_gtree pan
 
 let new_node =
   let cpt = ref (-1) in
@@ -493,10 +412,64 @@ let new_node =
     | IproofAttempt panid ->
        Hpan.add pan_id_to_gtree panid new_ref
     | IproofNode pnid ->
-       Hpn.add pn_id_to_gtree pnid new_ref
-    | _ -> ()
+      Hpn.add pn_id_to_gtree pnid new_ref
+    | Itransformation tnid ->
+      Htn.add tn_id_to_gtree tnid new_ref
+    | Ifile file ->
+      Hstr.add file_id_to_gtree file.file_name new_ref
+    | Itheory th ->
+      Ident.Hid.add th_id_to_gtree (theory_name th) new_ref
+    | Inone -> ()
   end;
   new_ref
+
+
+let image_of_result ~obsolete rOpt =
+  match rOpt with
+  | None -> !image_undone
+  | Some r ->
+    match r.Call_provers.pr_answer with
+    | Call_provers.Valid ->
+      if obsolete then !image_valid_obs else !image_valid
+    | Call_provers.Invalid ->
+      if obsolete then !image_invalid_obs else !image_invalid
+    | Call_provers.Timeout ->
+      if obsolete then !image_timeout_obs else !image_timeout
+    | Call_provers.OutOfMemory ->
+      if obsolete then !image_outofmemory_obs else !image_outofmemory
+    | Call_provers.StepLimitExceeded ->
+      if obsolete then !image_steplimitexceeded_obs
+      else !image_steplimitexceeded
+    | Call_provers.Unknown _ ->
+      if obsolete then !image_unknown_obs else !image_unknown
+    | Call_provers.Failure _ ->
+      if obsolete then !image_failure_obs else !image_failure
+    | Call_provers.HighFailure ->
+      if obsolete then !image_failure_obs else !image_failure
+
+let set_status_column_from_cont cont iter =
+  let index = goals_model#get ~row:iter ~column:index_column in
+  let index = Hint.find model_index index in
+  let image = match index with
+    | Inone -> assert false
+    | IproofAttempt panid ->
+      let pa = get_proof_attempt_node cont.controller_session panid in
+      image_of_result ~obsolete:pa.proof_obsolete pa.Session_itp.proof_state
+    | IproofNode pn ->
+      if pn_proved cont pn
+      then !image_valid
+      else !image_unknown
+    | Itransformation tn -> if tn_proved cont tn
+      then !image_valid
+      else !image_unknown
+    | Ifile file -> if file_proved cont file
+      then !image_valid
+      else !image_unknown
+    | Itheory th -> if th_proved cont th
+      then !image_valid
+      else !image_unknown
+  in
+  goals_model#set ~row:iter ~column:status_column image
 
 let build_subtree_proof_attempt_from_goal cont row_ref id =
   Whyconf.Hprover.iter
@@ -551,6 +524,87 @@ let build_tree_from_session cont =
                  file.file_theories)
     files
 
+(*******************************)
+(* commands of the "View" menu *)
+(*******************************)
+
+let view_menu = factory#add_submenu "_View"
+let view_factory = new GMenu.factory view_menu ~accel_group
+
+(* goals view is not yet multi-selectable
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._A
+    ~label:"Select all"
+    ~callback:(fun () -> goals_view#selection#select_all ()) ()
+ *)
+
+let (_ : GMenu.menu_item) =
+  view_factory#add_item ~key:GdkKeysyms._plus
+    ~callback:enlarge_fonts "Enlarge font"
+
+let (_ : GMenu.menu_item) =
+    view_factory#add_item ~key:GdkKeysyms._minus
+      ~callback:reduce_fonts "Reduce font"
+
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._E
+    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
+
+let collapse_iter iter =
+  let path = goals_model#get_path iter in
+  goals_view#collapse_row path
+
+let rec collapse_proven_goals_from_pn pn =
+  match pn_proved cont pn with
+  | true  -> collapse_iter (row_from_pn pn)#iter
+  | false ->
+    List.iter collapse_proven_goals_from_tn
+      (get_transformations cont.controller_session pn)
+and collapse_proven_goals_from_tn tn =
+  match tn_proved cont tn with
+  | true  -> collapse_iter (row_from_tn tn)#iter
+  | false ->
+    List.iter collapse_proven_goals_from_pn
+      (get_sub_tasks cont.controller_session tn)
+
+let collapse_proven_goals_from_th th =
+  match th_proved cont th with
+  | true  -> collapse_iter (row_from_th th)#iter
+  | false -> List.iter collapse_proven_goals_from_pn (theory_goals th)
+
+let collapse_proven_goals_from_file file =
+  match file_proved cont file with
+  | true  -> collapse_iter (row_from_file file)#iter
+  | false -> List.iter collapse_proven_goals_from_th file.file_theories
+
+let collapse_proven_goals_from_iter iter =
+  let index = goals_model#get ~row:iter ~column:index_column in
+  let index = Hint.find model_index index in
+  match index with
+  | Inone              -> assert false
+  | IproofAttempt _    -> ()
+  | IproofNode pn      -> collapse_proven_goals_from_pn pn
+  | Itransformation tn -> collapse_proven_goals_from_tn tn
+  | Itheory th         -> collapse_proven_goals_from_th th
+  | Ifile file         -> collapse_proven_goals_from_file file
+
+let collapse_proven_goals () =
+  match goals_model#get_iter_first with
+  | None -> ()
+  | Some root_iter -> collapse_proven_goals_from_iter root_iter
+
+let (_ : GMenu.image_menu_item) =
+  view_factory#add_image_item ~key:GdkKeysyms._C
+    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_goals ()) ()
+
+let () =
+  Gconfig.add_modifiable_sans_font_view goals_view#misc;
+  Gconfig.add_modifiable_mono_font_view monitor#misc;
+  Gconfig.add_modifiable_mono_font_view task_view#misc;
+  Gconfig.add_modifiable_mono_font_view command_entry#misc;
+  Gconfig.add_modifiable_mono_font_view message_zone#misc;
+  Gconfig.set_fonts ()
+
 (******************)
 (*    actions     *)
 (******************)
@@ -559,10 +613,21 @@ let build_tree_from_session cont =
    do not want to move the current index with the computing of strategy. *)
 let current_selected_index = ref Inone
 
-let rec update_status_column_from cont iter =
+let image_of_pa_status ~obsolete pa_status =
+  match pa_status with
+    | Controller_itp.Interrupted   -> !image_undone
+    | Controller_itp.Unedited      -> !image_editor
+    | Controller_itp.JustEdited    -> !image_unknown
+    | Controller_itp.Scheduled     -> !image_scheduled
+    | Controller_itp.Running       -> !image_running
+    | Controller_itp.InternalFailure _
+    | Controller_itp.Uninstalled _ -> !image_failure
+    | Controller_itp.Done r        -> image_of_result ~obsolete (Some r)
+
+let rec update_status_column_from_iter cont iter =
   set_status_column_from_cont cont iter;
   match goals_model#iter_parent iter with
-  | Some p -> update_status_column_from cont p
+  | Some p -> update_status_column_from_iter cont p
   | None -> ()
 
 let match_transformation_exception (e: exn) =
@@ -588,23 +653,6 @@ let match_transformation_exception (e: exn) =
      message_zone#buffer#set_text ("Hypothesis not found during execution of " ^ s)
   | _ -> message_zone#buffer#set_text (Pp.sprintf "Uncatched error: %a" Exn_printer.exn_printer e)
 
-(* Callback of a transformation *)
-let callback_update_tree_transform cont status =
-  match status with
-  | TSdone trans_id ->
-    let ses = cont.controller_session in
-    let id = get_trans_parent ses trans_id in
-    let row_ref = Hpn.find pn_id_to_gtree id in (* TODO exception *)
-    let r = build_subtree_from_trans cont row_ref trans_id in
-    update_status_column_from cont r#iter;
-    (match Session_itp.get_sub_tasks ses trans_id with
-     | first_goal :: _ ->
-       (* Put the selection on the first goal *)
-       goals_view#selection#select_iter (Hpn.find pn_id_to_gtree first_goal)#iter
-     | [] -> ())
-  | TSfailed e -> match_transformation_exception e
-  | _ -> ()
-
 let move_current_row_selection_up () =
   let current_view = List.hd (goals_view#selection#get_selected_rows) in
   let current_row = goals_model#get_row_reference current_view in
@@ -624,6 +672,19 @@ let move_current_row_selection_down () =
   in
   let child = goals_model#iter_children current_iter in
   goals_view#selection#select_iter child
+
+(* Callback of a transformation *)
+let callback_update_tree_transform cont status =
+  match status with
+  | TSdone trans_id ->
+    let ses = cont.controller_session in
+    let id = get_trans_parent ses trans_id in
+    let row_ref = row_from_pn id in
+    let r = build_subtree_from_trans cont row_ref trans_id in
+    update_status_column_from_iter cont r#iter;
+    move_current_row_selection_down ()
+  | TSfailed e -> match_transformation_exception e
+  | _ -> ()
 
 let rec apply_transform cont t args =
   match !current_selected_index with
@@ -653,17 +714,17 @@ let callback_update_tree_proof cont panid pa_status =
          Hpan.find pan_id_to_gtree panid
        with Not_found ->
          let parent_id = get_proof_attempt_parent ses panid in
-         let parent = Hpn.find pn_id_to_gtree parent_id in
+         let parent = row_from_pn parent_id in
          new_node ~parent name (IproofAttempt panid)
      end
   | Done _ ->
-    let r = Hpan.find pan_id_to_gtree panid in
+    let r = row_from_pan panid in
     begin match goals_model#iter_parent r#iter with
-    | Some iter -> update_status_column_from cont iter
+    | Some iter -> update_status_column_from_iter cont iter
     | None -> ()
     end;
     r
-  | _  -> Hpan.find pan_id_to_gtree panid (* TODO ? *)
+  | _  -> row_from_pan panid (* TODO ? *)
   in
   goals_model#set ~row:r#iter ~column:status_column
     (image_of_pa_status ~obsolete pa_status)
@@ -706,8 +767,7 @@ let run_strategy_on_task s =
           C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
     | _ -> printf "Strategy '%s' not found@." s
      end
-  | _ -> (
-)
+  | _ -> ()
 
 let clear_command_entry () = command_entry#set_text ""
 

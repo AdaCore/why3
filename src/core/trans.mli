@@ -164,14 +164,13 @@ val named : string -> 'a trans -> 'a trans
 
 *)
 
-
 type trans_with_args = string list -> Env.env -> task trans
 type trans_with_args_l = string list -> Env.env -> task tlist
 
 val list_transforms_with_args   : unit -> (string * Pp.formatted) list
 val list_transforms_with_args_l : unit -> (string * Pp.formatted) list
 
-val register_transform_with_args : desc:Pp.formatted -> string -> trans_with_args -> unit
+val register_transform_with_args   : desc:Pp.formatted -> string -> trans_with_args -> unit
 val register_transform_with_args_l : desc:Pp.formatted -> string -> trans_with_args_l -> unit
 
 (** {2 handling of all forms of transformations} *)

@@ -79,6 +79,11 @@ let th_proved c th  =
     Hid.find_def c.proof_state.th_state true (theory_name th)
   else
     Hid.find_def c.proof_state.th_state false (theory_name th)
+let file_proved c f =
+  if f.file_theories = [] then
+    true
+  else
+    List.for_all (fun th -> th_proved c th) f.file_theories
 
 (* Update the result of the theory according to its children *)
 let update_theory_proof_state ps th =

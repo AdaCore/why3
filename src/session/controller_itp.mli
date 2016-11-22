@@ -81,6 +81,7 @@ val create_controller : Env.env -> Session_itp.session -> controller
 val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool
 val th_proved: controller -> Session_itp.theory -> bool
+val file_proved: controller -> Session_itp.file -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
