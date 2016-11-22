@@ -6,6 +6,12 @@ open Session_itp
 
 exception Noprogress
 
+let () = Exn_printer.register
+    (fun fmt e ->
+      match e with
+      | Noprogress -> Format.fprintf fmt "The transformation made no progress.\n"
+      | _ -> raise e)
+
 (** State of a proof *)
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)

@@ -17,15 +17,23 @@ let fresh_printer =
  *)
   fun () -> create_ident_printer bl (* ~sanitizer:isanitize *)
 
-exception Arg_trans of string
-exception Arg_trans_term of (string * string option * string option)
-exception Arg_trans_type of (string * string option * string option)
-exception Arg_hyp_not_found of string
-exception Arg_bad_hypothesis of (string * string option)
-
-exception Arg_parse_error of string*string
-exception Arg_expected of string
+exception Arg_parse_error of string * string
+exception Arg_expected of string * string
 exception Arg_theory_not_found of string
+exception Arg_expected_none of string
+
+let () = Exn_printer.register
+    (fun fmt e ->
+      match e with
+      | Arg_parse_error (s1, s2) ->
+          Format.fprintf fmt "Argument parsing error: %s \n %s" s2 s1
+      | Arg_expected (ty, s) ->
+          Format.fprintf fmt "Argument expected of type: %s\n Argument given: %s" ty s
+      | Arg_theory_not_found s ->
+          Format.fprintf fmt "Theory not found %s" s
+      | Arg_expected_none s ->
+          Format.fprintf fmt "Argument expected of type %s. None were given." s
+      | _ -> raise e)
 
 open Stdlib
 
@@ -379,7 +387,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
         | Tstring t' ->
           let arg = Some s' in
           wrap_to_store t' (f arg) tail env task
-        | _ -> assert false
+        | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
       end
     | Topt (_, t'), _ ->
       wrap_to_store (trans_typ_tail t') (f None) l env task
@@ -387,7 +395,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f true) tail env task
     | Toptbool (_, t'), _ ->
       wrap_to_store t' (f false) l env task
-    | _, _ -> raise (Arg_expected (string_of_trans_typ t))
+    | _, [] -> raise (Arg_expected_none (string_of_trans_typ t))
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
   fun t f l env -> Trans.store (wrap_to_store t f l env)
