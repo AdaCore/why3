@@ -682,7 +682,11 @@ let callback_update_tree_transform cont status =
     let row_ref = row_from_pn id in
     let r = build_subtree_from_trans cont row_ref trans_id in
     update_status_column_from_iter cont r#iter;
-    move_current_row_selection_down ()
+    (match Session_itp.get_sub_tasks ses trans_id with
+     | first_goal :: _ ->
+       (* Put the selection on the first goal *)
+       goals_view#selection#select_iter (row_from_pn first_goal)#iter
+     | [] -> ())
   | TSfailed e -> match_transformation_exception e
   | _ -> ()
 
