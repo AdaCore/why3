@@ -759,20 +759,25 @@ let callback_update_tree_proof cont panid pa_status =
   goals_model#set ~row:r#iter ~column:status_column
     (image_of_pa_status ~obsolete pa_status)
 
-let rec test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
-  match !current_selected_index with
-  | IproofNode id ->
-    let prover = p.Whyconf.prover in
-    let callback = callback_update_tree_proof cont in
-    C.schedule_proof_attempt cont id prover ~limit ~callback
-  | IproofAttempt _ | Itransformation _ ->
-    move_current_row_selection_up ();
-    test_schedule_proof_attempt cont p limit
-  | Ifile _ | Itheory _ | Inone ->
-    begin try move_current_row_selection_down () with
-      Not_found -> printf "no goals to run prover on"
-    end;
-    test_schedule_proof_attempt cont p limit
+let test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
+  let prover = p.Whyconf.prover in
+  let callback = callback_update_tree_proof cont in
+  let rec get_goals () =
+    match !current_selected_index with
+    | IproofNode id -> [id]
+    | IproofAttempt _ ->
+      move_current_row_selection_up ();
+      get_goals ()
+    | Itransformation tn ->
+      List.rev (unproven_goals_below_tn cont [] tn)
+    | Ifile file ->
+      List.rev (unproven_goals_below_file cont file)
+    | Itheory th ->
+      List.rev (unproven_goals_below_th cont [] th)
+    | Inone -> []
+  in
+  List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback)
+    (get_goals ())
 
 let run_strategy_on_task s =
   match !current_selected_index with
