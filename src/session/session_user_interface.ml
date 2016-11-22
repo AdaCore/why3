@@ -273,29 +273,35 @@ let () =
     (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
     commands
 
+(* splits input string [s] into substrings separated by space
+   spaces inside quotes or parentheses are not separator.
+   implemented as a hardcoded automaton:
+
+*)
+
 let split_args s =
   let args = ref [] in
+  let par_depth = ref 0 in
   let b = Buffer.create 17 in
+  let push_arg () =
+    let x = Buffer.contents b in
+    if String.length x > 0 then (args := x :: !args; Buffer.clear b)
+  in
+  let push_char c = Buffer.add_char b c in
   let state = ref 0 in
   for i = 0 to String.length s - 1 do
     let c = s.[i] in
     match !state, c with
-    | 0,' ' -> ()
-    | 0,'"' -> state := 1
-    | 0,_ -> Buffer.add_char b c; state := 2
-    | 1,'"' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
-    | 1,_ -> Buffer.add_char b c
-    | 2,' ' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
-    | 2,_ -> Buffer.add_char b c
+    | 0,' ' -> if !par_depth > 0 then push_char c else push_arg ()
+    | 0,'(' -> incr par_depth; push_char c
+    | 0,')' -> decr par_depth; push_char c
+    | 0,'"' -> state := 1; if !par_depth > 0 then push_char c
+    | 0,_ -> push_char c
+    | 1,'"' -> state := 0; if !par_depth > 0 then push_char c
+    | 1,_ -> push_char c
     | _ -> assert false
   done;
-  begin
-    match !state with
-      | 0 -> ()
-      | 1 -> args := Buffer.contents b :: !args (* TODO : report missing '"' *)
-      | 2 -> args := Buffer.contents b :: !args
-      | _ -> assert false
-  end;
+  push_arg ();
   match List.rev !args with
     | a::b -> a,b
     | [] -> "",[]
