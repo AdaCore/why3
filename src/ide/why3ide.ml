@@ -166,7 +166,7 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
-    ~callback:(fun () -> Session_itp.save_session cont.Controller_itp.controller_session)
+    ~callback:(fun () -> Session_itp.save_session cont.controller_session)
 
 let (replay_menu_item : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
@@ -343,7 +343,7 @@ let init_comp cont =
   (* add provers *)
   Whyconf.Hprover.iter
       (fun p _ -> add_completion_entry (p.Whyconf.prover_name^","^p.Whyconf.prover_version))
-      cont.Controller_itp.controller_provers;
+      cont.controller_provers;
 
   add_completion_entry "auto";
   add_completion_entry "auto 2";
@@ -677,11 +677,9 @@ let match_transformation_exception (e: exn) =
 
 let move_current_row_selection_up () =
   let current_view = List.hd (goals_view#selection#get_selected_rows) in
-  let current_row = goals_model#get_row_reference current_view in
-  begin match goals_model#iter_parent current_row#iter with
-    | Some parent_iter -> goals_view#selection#select_iter parent_iter
-    | None -> ()
-  end
+  ignore (GTree.Path.up current_view);
+  let row_up = goals_model#get_row_reference current_view in
+  goals_view#selection#select_iter row_up#iter
 
 let move_current_row_selection_down () =
   let current_iter =
@@ -749,6 +747,12 @@ let callback_update_tree_proof cont panid pa_status =
     | Some iter -> update_status_column_from_iter cont iter
     | None -> ()
     end;
+    begin match get_first_unproven_goal_around_pn_in_th cont pa.parent with
+    | Some next_pn ->
+      goals_view#selection#select_iter (row_from_pn next_pn)#iter
+    | None -> ()
+    end;
+    collapse_proven_goals ();
     r
   | _  -> row_from_pan panid (* TODO ? *)
   in

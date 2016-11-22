@@ -1,6 +1,7 @@
 
 open Format
 open Session_itp
+open Controller_itp
 
 (* TODO: raise exceptions instead of using explicit eprintf/exit *)
 let cont_from_files spec usage_str env files provers =
@@ -54,9 +55,66 @@ let cont_from_files spec usage_str env files provers =
   (* return the controller *)
   c
 
-(*********************)
-(* Terminal historic *)
-(*********************)
+(**********************************)
+(* list unproven goal and related *)
+(**********************************)
+
+let rec unproven_goals_below_tn cont acc tn =
+  if tn_proved cont tn then
+    acc                         (* we ignore "dead" goals *)
+  else
+    let sub_tasks = get_sub_tasks cont.controller_session tn in
+    List.fold_left (unproven_goals_below_pn cont) acc sub_tasks
+
+(* note that if goal is not proved and there is no transformation goal
+   is returned *)
+and unproven_goals_below_pn cont acc goal =
+  if pn_proved cont goal then
+    acc                         (* we ignore "dead" transformations *)
+  else
+    match get_transformations cont.controller_session goal with
+    | [] -> goal :: acc
+    | tns -> List.fold_left (unproven_goals_below_tn cont) acc tns
+
+let unproven_goals_below_th cont acc th =
+  if th_proved cont th then
+    acc
+  else
+    let goals = theory_goals th in
+    List.fold_left (unproven_goals_below_pn cont) acc goals
+
+let unproven_goals_below_file cont file =
+  if file_proved cont file then
+    []
+  else
+    let theories = file.file_theories in
+    List.fold_left (unproven_goals_below_th cont) [] theories
+
+let unproven_goals_in_session cont =
+  let files = get_files cont.controller_session in
+  Stdlib.Hstr.fold (fun _key file acc ->
+      let file_goals = unproven_goals_below_file cont file in
+      List.rev_append file_goals acc)
+    files []
+
+let get_first_unproven_goal_around_pn_in_th cont pn =
+  let ses = cont.controller_session in
+  let rec look_around pn =
+    match get_proof_parent ses pn with
+    | Trans tn  ->
+      begin match unproven_goals_below_tn cont [] tn with
+        | [] -> look_around (get_trans_parent ses tn)
+        | l  -> l
+      end
+    | Theory th -> unproven_goals_below_th cont [] th
+  in
+  match look_around pn with
+  | [] -> None
+  | l -> Some (List.hd (List.rev l))
+
+(********************)
+(* Terminal history *)
+(********************)
 
 module type Historic_type = sig
   type historic
