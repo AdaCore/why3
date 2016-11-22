@@ -72,6 +72,47 @@ let () =
   Gconfig.init ()
 
 
+(********************************)
+(* Source language highlighting *)
+(********************************)
+
+let (why_lang, any_lang) =
+  let main = Whyconf.get_main gconfig.config in
+  let load_path = Filename.concat (Whyconf.datadir main) "lang" in
+  let languages_manager =
+    GSourceView2.source_language_manager ~default:true
+  in
+  languages_manager#set_search_path
+    (load_path :: languages_manager#search_path);
+  let why_lang =
+    match languages_manager#language "why3" with
+    | None ->
+        eprintf "language file for 'why3' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  let any_lang filename =
+    match languages_manager#guess_language ~filename () with
+    | None -> why_lang
+    | Some _ as l -> l in
+  (why_lang, any_lang)
+
+(* Borrowed from Frama-C src/gui/source_manager.ml:
+Try to convert a source file either as UTF-8 or as locale. *)
+let try_convert s =
+  try
+    if Glib.Utf8.validate s then s else Glib.Convert.locale_to_utf8 s
+  with Glib.Convert.Error _ ->
+    try
+      Glib.Convert.convert_with_fallback
+        ~fallback:"#neither UTF-8 nor locale nor ISO-8859-15#"
+        ~to_codeset:"UTF-8"
+        ~from_codeset:"ISO_8859-15"
+        s
+    with Glib.Convert.Error _ as e -> Printexc.to_string e
+
+
+
 (**********************)
 (* Graphical elements *)
 (**********************)
@@ -603,6 +644,7 @@ let () =
   Gconfig.add_modifiable_mono_font_view task_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
+  task_view#source_buffer#set_language why_lang;
   Gconfig.set_fonts ()
 
 (******************)
