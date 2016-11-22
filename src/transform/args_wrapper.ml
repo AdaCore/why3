@@ -266,18 +266,36 @@ let parse_theory env s =
   with
     _ -> raise (Arg_theory_not_found s)
 
-let get_opt_type: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
+let trans_typ_tail: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
   fun t ->
     match t with
-    | Tint t'      -> t'
-    | Tty t'       -> t'
-    | Ttysymbol t' -> t'
-    | Tprsymbol t' -> t'
-    | Tterm t'     -> t'
-    | Tstring t'   -> t'
-    | Tformula t'  -> t'
-    | Ttheory t'   -> t'
-    | _            -> assert false
+    | Tint t      -> t
+    | Tty t       -> t
+    | Ttysymbol t -> t
+    | Tprsymbol t -> t
+    | Tterm t     -> t
+    | Tstring t   -> t
+    | Tformula t  -> t
+    | Ttheory t   -> t
+    | _           -> assert false
+
+type _ trans_typ_is_l = Yes : (task list) trans_typ_is_l | No : task trans_typ_is_l
+
+let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
+  fun t -> match t with
+    | Ttrans         -> No
+    | Ttrans_l       -> Yes
+    | Tint t         -> is_trans_typ_l t
+    | Tty t          -> is_trans_typ_l t
+    | Ttysymbol t    -> is_trans_typ_l t
+    | Tprsymbol t    -> is_trans_typ_l t
+    | Tterm t        -> is_trans_typ_l t
+    | Tstring t      -> is_trans_typ_l t
+    | Tformula t     -> is_trans_typ_l t
+    | Ttheory t      -> is_trans_typ_l t
+    | Tenv t         -> is_trans_typ_l t
+    | Topt (_,t)     -> is_trans_typ_l t
+    | Toptbool (_,t) -> is_trans_typ_l t
 
 let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
   fun t ->
@@ -295,6 +313,23 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tenv _         -> "environment"
     | Topt (s,_)     -> "opt [" ^ s ^ "]"
     | Toptbool (s,_) -> "boolean opt [" ^ s ^ "]"
+
+let rec print_type : type a b. (a, b) trans_typ -> string =
+  fun t ->
+    match t with
+    | Ttrans         -> "()"
+    | Ttrans_l       -> "()"
+    | Tint t         -> "integer -> " ^ print_type t
+    | Tty t          -> "type -> " ^ print_type t
+    | Ttysymbol t    -> "type_symbol -> " ^ print_type t
+    | Tprsymbol t    -> "prop_symbol -> " ^ print_type t
+    | Tterm t        -> "term -> " ^ print_type t
+    | Tstring t      -> "string -> " ^ print_type t
+    | Tformula t     -> "formula -> " ^ print_type t
+    | Ttheory t      -> "theory -> " ^ print_type t
+    | Tenv t         -> "environment -> " ^ print_type t
+    | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
+    | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
 
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> task -> b =
   fun t f l env task ->
@@ -347,7 +382,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
         | _ -> assert false
       end
     | Topt (_, t'), _ ->
-      wrap_to_store (get_opt_type t') (f None) l env task
+      wrap_to_store (trans_typ_tail t') (f None) l env task
     | Toptbool (optname, t'), s :: tail when s = optname ->
       wrap_to_store t' (f true) tail env task
     | Toptbool (_, t'), _ ->
@@ -359,3 +394,16 @@ let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
 
 let wrap   : type a. (a, task) trans_typ -> a -> trans_with_args =
   fun t f l env -> Trans.store (wrap_to_store t f l env)
+
+let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> b trans =
+  fun t f l env -> Trans.store (wrap_to_store t f l env)
+
+let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =
+  fun ~desc name t f  ->
+    let type_desc = Scanf.format_from_string ("type : " ^ print_type t ^ "\n") Pp.empty_formatted in
+    let trans = wrap_any t f in
+    match is_trans_typ_l t with
+    | Yes ->
+      Trans.register_transform_with_args_l ~desc:(type_desc ^^ desc) name trans
+    | No ->
+      Trans.register_transform_with_args ~desc:(type_desc ^^ desc) name trans

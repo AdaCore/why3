@@ -48,3 +48,5 @@ type (_, _) trans_typ =
 val wrap_l : ('a, task list) trans_typ -> 'a -> Trans.trans_with_args_l
 
 val wrap   : ('a, task) trans_typ -> 'a -> Trans.trans_with_args
+
+val wrap_and_register : desc:Pp.formatted -> string -> ('a, 'b) trans_typ -> 'a -> unit

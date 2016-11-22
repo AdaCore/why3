@@ -404,59 +404,60 @@ let destruct pr : Task.task Trans.tlist =
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"case <term> [name] generates hypothesis 'name: term' in a first goal and 'name: ~ term' in a second one."
     "case"
-    (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) case)
+    (Tformula (Topt ("as",Tstring Ttrans_l))) case
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"cut <term> [name] makes a cut with hypothesis 'name: term'"
     "cut"
-    (wrap_l (Tformula (Topt ("as",Tstring Ttrans_l))) cut)
+    (Tformula (Topt ("as",Tstring Ttrans_l))) cut
 
-let () = register_transform_with_args
+let () = wrap_and_register
     ~desc:"exists <term> substitutes the variable quantified by exists with term"
     "exists"
-    (wrap (Tterm Ttrans) exists)
+    (Tterm Ttrans) exists
 
-let () = register_transform_with_args
+let () = wrap_and_register
     ~desc:"remove <prop> removes hypothesis named prop"
     "remove"
-    (wrap (Tprsymbol Ttrans) remove)
+    (Tprsymbol Ttrans) remove
 
-let () = register_transform_with_args
+let () = wrap_and_register
     ~desc:"instantiate <prop> <term> generates a new hypothesis with first quantified variables of prop replaced with term "
     "instantiate"
-    (wrap (Tprsymbol (Tterm Ttrans)) instantiate)
+    (Tprsymbol (Tterm Ttrans)) instantiate
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"apply <prop> applies prop to the goal" "apply"
-    (wrap_l (Tprsymbol Ttrans_l) apply)
+    (Tprsymbol Ttrans_l) apply
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"duplicate <int> duplicates the goal int times" "duplicate"
-    (wrap_l (Tint Ttrans_l) (fun x -> Trans.store (dup x)))
+    (Tint Ttrans_l) (fun x -> Trans.store (dup x))
 
-let () = register_transform_with_args
+let () = wrap_and_register
     ~desc:"use_th <theory> imports the theory" "use_th"
-    (wrap (Ttheory Ttrans) use_th)
+    (Ttheory Ttrans) use_th
 
-let () = register_transform_with_args_l
-    ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2"
-    "rewrite"
-    (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite)
+let _ = wrap_and_register
+    ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" "rewrite"
+    (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite
+  (* register_transform_with_args_l *)
+  (*   ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" *)
+  (*   "rewrite" *)
+  (*   (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite) *)
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"replace <term1> <term2> <name> replaces occcurences of term1 by term2 in prop name"
     "replace"
-    (wrap_l (Tterm (Tterm (Tprsymbol Ttrans_l))) replace)
+    (Tterm (Tterm (Tprsymbol Ttrans_l))) replace
 
-let () = register_transform_with_args_l
+let () = wrap_and_register
     ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
     "induction"
-    (wrap_l (Tenv (Tterm (Tterm Ttrans_l))) induction)
+    (Tenv (Tterm (Tterm Ttrans_l))) induction
 
-let () = register_transform_with_args_l
-    ~desc:"destruct <name> destructs the head constructor of hypothesis name"
-    "destruct"
-    (wrap_l (Tprsymbol Ttrans_l) destruct)
+let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor of hypothesis name"
+    "destruct" (Tprsymbol Ttrans_l) destruct
