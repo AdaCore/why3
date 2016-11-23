@@ -747,7 +747,7 @@ let callback_update_tree_proof cont panid pa_status =
     | Some iter -> update_status_column_from_iter cont iter
     | None -> ()
     end;
-    begin match get_first_unproven_goal_around_pn_in_th cont pa.parent with
+    begin match get_first_unproven_goal_around_pn cont pa.parent with
     | Some next_pn ->
       goals_view#selection#select_iter (row_from_pn next_pn)#iter
     | None -> ()

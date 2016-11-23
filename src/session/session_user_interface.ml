@@ -59,6 +59,9 @@ let cont_from_files spec usage_str env files provers =
 (* list unproven goal and related *)
 (**********************************)
 
+(* If the transformation is proved, return acc.
+   Else, return the concatenation of the reversed list of unproven
+   goals below the transformation and acc *)
 let rec unproven_goals_below_tn cont acc tn =
   if tn_proved cont tn then
     acc                         (* we ignore "dead" goals *)
@@ -66,8 +69,8 @@ let rec unproven_goals_below_tn cont acc tn =
     let sub_tasks = get_sub_tasks cont.controller_session tn in
     List.fold_left (unproven_goals_below_pn cont) acc sub_tasks
 
-(* note that if goal is not proved and there is no transformation goal
-   is returned *)
+(* Same as unproven_goals_below_tn; note that if goal is not proved
+   and there is no transformation, goal is returned (else it is not) *)
 and unproven_goals_below_pn cont acc goal =
   if pn_proved cont goal then
     acc                         (* we ignore "dead" transformations *)
@@ -76,6 +79,7 @@ and unproven_goals_below_pn cont acc goal =
     | [] -> goal :: acc
     | tns -> List.fold_left (unproven_goals_below_tn cont) acc tns
 
+(* Same as unproven_goals_below_tn *)
 let unproven_goals_below_th cont acc th =
   if th_proved cont th then
     acc
@@ -83,6 +87,7 @@ let unproven_goals_below_th cont acc th =
     let goals = theory_goals th in
     List.fold_left (unproven_goals_below_pn cont) acc goals
 
+(* Same as unproven_goals_below_tn *)
 let unproven_goals_below_file cont file =
   if file_proved cont file then
     []
@@ -90,6 +95,7 @@ let unproven_goals_below_file cont file =
     let theories = file.file_theories in
     List.fold_left (unproven_goals_below_th cont) [] theories
 
+(* returns the list of unproven goals in the controller session *)
 let unproven_goals_in_session cont =
   let files = get_files cont.controller_session in
   Stdlib.Hstr.fold (fun _key file acc ->
@@ -97,23 +103,27 @@ let unproven_goals_in_session cont =
       List.rev_append file_goals acc)
     files []
 
-(*
-   [get_first_unproven_goal_around_pn_in_th cont pn]
+(* [get_first_unproven_goal_around_pn cont pn]
    returns the `first unproven goal' 'after' [pn]. Precisely:
    (1) it finds the youngest ancestor a of [pn] that is not proved
    (2) it returns the first unproved leaf of a
-   it returns None if all ancestors are proved (in the theory)
- *)
-let get_first_unproven_goal_around_pn_in_th cont pn : proofNodeID option =
+   it returns None if all ancestors are proved *)
+let get_first_unproven_goal_around_pn cont pn =
   let ses = cont.controller_session in
   let rec look_around pn =
     match get_proof_parent ses pn with
     | Trans tn  ->
-      begin match unproven_goals_below_tn cont [] tn with
-        | [] -> look_around (get_trans_parent ses tn)
-        | l  -> l
-      end
-    | Theory th -> unproven_goals_below_th cont [] th
+      if tn_proved cont tn
+      then look_around (get_trans_parent ses tn)
+      else unproven_goals_below_tn cont [] tn
+    | Theory th ->
+      if th_proved cont th then begin
+        let parent = (theory_parent ses th) in
+        if file_proved cont parent
+        then unproven_goals_in_session cont
+        else unproven_goals_below_file cont parent
+      end else
+        unproven_goals_below_th cont [] th
   in
   match look_around pn with
   | [] -> None

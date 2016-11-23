@@ -16,6 +16,7 @@ let print_proofNodeID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   theory_goals                  : proofNodeID list;
+  theory_parent_name            : string;
   mutable theory_detached_goals : proofNodeID list;
   mutable theory_checksum       : Termcode.checksum option;
 }
@@ -45,7 +46,6 @@ type proof_node = {
   proofn_attempts                : proofAttemptID Hprover.t;
   mutable proofn_transformations : transID list;
 }
-
 
 type transformation_node = {
   transf_name                      : string;
@@ -92,6 +92,9 @@ type session = {
   mutable session_shape_version : int;
   session_prover_ids            : int Hprover.t;
 }
+
+let theory_parent s th =
+  Hstr.find s.session_files th.theory_parent_name
 
 (* TODO replace *)
 let init_Hpn (s : session) (h: 'a Hpn.t) (d: 'a) : unit =
@@ -629,7 +632,7 @@ and load_proof_or_transf session old_provers pid a =
         "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
         s
 
-let load_theory session old_provers acc th =
+let load_theory session parent_name old_provers acc th =
   match th.Xml.name with
   | "theory" ->
     let thname = load_ident th in
@@ -641,6 +644,7 @@ let load_theory session old_provers acc th =
     let mth = { theory_name = thname;
                 theory_checksum = checksum;
                 theory_goals = goals;
+                theory_parent_name = parent_name;
                 theory_detached_goals = [] } in
     List.iter2
       (load_goal session old_provers (Theory mth))
@@ -658,7 +662,7 @@ let load_file session old_provers f =
     let fmt = load_option "format" f in
     let ft = List.rev
         (List.fold_left
-           (load_theory session old_provers) [] f.Xml.elements) in
+           (load_theory session fn old_provers) [] f.Xml.elements) in
     let mf = { file_name = fn;
                file_format = fmt;
                file_theories = ft;
@@ -903,13 +907,14 @@ let save_detached_goals old_s detached_goals_id s parent =
         id)
       detached_goals_id
 
-let save_detached_theory old_s detached_theory s =
+let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory) in
     (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
   { theory_name = detached_theory.theory_name;
     theory_checksum = None;
     theory_goals = goalsID;
+    theory_parent_name = parent_name;
     theory_detached_goals = [] }
 
 let merge_proof new_s obsolete new_goal _ old_pa_n =
@@ -1050,7 +1055,8 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
-let make_theory_section ~use_shapes ?merge (s:session) (th:Theory.theory)  : theory =
+let make_theory_section ~use_shapes ?merge (s:session) parent_name (th:Theory.theory)
+  : theory =
   let add_goal parent goal id =
     let name,_expl,task = Termcode.goal_expl_task ~root:true goal in
     mk_proof_node ~version:s.session_shape_version s name task parent id;
@@ -1060,6 +1066,7 @@ let make_theory_section ~use_shapes ?merge (s:session) (th:Theory.theory)  : the
   let theory = { theory_name = th.Theory.th_name;
                  theory_checksum = None;
                  theory_goals = goalsID;
+                 theory_parent_name = parent_name;
                  theory_detached_goals = [] } in
   let parent = Theory theory in
   List.iter2 (add_goal parent) tasks goalsID;
@@ -1077,7 +1084,7 @@ let add_file_section ~use_shapes (s:session) (fn:string) (theories:Theory.theory
   if Hstr.mem s.session_files fn then
     Debug.dprintf debug "[session] file %s already in database@." fn
   else
-    let theories = List.map (make_theory_section ~use_shapes s) theories in
+    let theories = List.map (make_theory_section ~use_shapes s fn) theories in
     let f = { file_name = fn;
               file_format = format;
               file_theories = theories;
@@ -1106,16 +1113,16 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
           (* if we found one, we remove it from the table and merge it *)
           let old_th = Hstr.find old_th_table theory_name in
           Hstr.remove old_th_table theory_name;
-          make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s th
+          make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s fn th
         with Not_found ->
           (* if no theory was found we make a new theory section *)
-          make_theory_section ~use_shapes s th
+          make_theory_section ~use_shapes s fn th
       in
       let theories = List.map add_theory theories in
       (* we save the remaining, detached *)
       let detached = Hstr.fold
           (fun _key th tl ->
-             (save_detached_theory old_ses th s) :: tl)
+             (save_detached_theory fn old_ses th s) :: tl)
           old_th_table [] in
       theories, detached
     in

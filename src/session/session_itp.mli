@@ -31,10 +31,6 @@ val init_Htn: session ->'a Htn.t -> 'a -> unit
 
 type theory
 
-val theory_name : theory -> Ident.ident
-val theory_goals : theory -> proofNodeID list
-val theory_detached_goals : theory -> proofNodeID list
-
 type file = private {
   file_name              : string;
   file_format            : string option;
@@ -42,10 +38,14 @@ type file = private {
   file_detached_theories : theory list;
 }
 
+val theory_name : theory -> Ident.ident
+val theory_goals : theory -> proofNodeID list
+val theory_detached_goals : theory -> proofNodeID list
+val theory_parent : session -> theory -> file
+
 val get_files : session -> file Stdlib.Hstr.t
 val get_dir : session -> string
 val get_shape_version : session -> int
-
 
 type proof_attempt_node = {
   parent              : proofNodeID;
