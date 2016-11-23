@@ -97,7 +97,14 @@ let unproven_goals_in_session cont =
       List.rev_append file_goals acc)
     files []
 
-let get_first_unproven_goal_around_pn_in_th cont pn =
+(*
+   [get_first_unproven_goal_around_pn_in_th cont pn]
+   returns the `first unproven goal' 'after' [pn]. Precisely:
+   (1) it finds the youngest ancestor a of [pn] that is not proved
+   (2) it returns the first unproved leaf of a
+   it returns None if all ancestors are proved (in the theory)
+ *)
+let get_first_unproven_goal_around_pn_in_th cont pn : proofNodeID option =
   let ses = cont.controller_session in
   let rec look_around pn =
     match get_proof_parent ses pn with

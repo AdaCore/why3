@@ -672,8 +672,6 @@ let rec update_status_column_from_iter cont iter =
   | Some p -> update_status_column_from_iter cont p
   | None -> ()
 
-let match_transformation_exception (e: exn) =
-  message_zone#buffer#set_text (Pp.sprintf "%a" Exn_printer.exn_printer e)
 
 let move_current_row_selection_up () =
   let current_view = List.hd (goals_view#selection#get_selected_rows) in
@@ -707,7 +705,9 @@ let callback_update_tree_transform cont status =
        (* Put the selection on the first goal *)
        goals_view#selection#select_iter (row_from_pn first_goal)#iter
      | [] -> ())
-  | TSfailed e -> match_transformation_exception e
+  | TSfailed e ->
+     message_zone#buffer#set_text
+       (Pp.sprintf "%a" Exn_printer.exn_printer e)
   | _ -> ()
 
 let rec apply_transform cont t args =
