@@ -244,7 +244,8 @@ let output_task drv fname _tname th task dir =
   let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
   let ext = String.sub dest i (String.length dest - i) in
   let cout = open_out (Filename.concat dir (name ^ ext)) in
-  Driver.print_task drv (formatter_of_out_channel cout) task;
+  (* Name tables not necessary outside of ITP *)
+  Driver.print_task drv (formatter_of_out_channel cout) None task;
   close_out cout
 
 let output_task_prepared drv fname _tname th task dir =
@@ -259,7 +260,8 @@ let output_task_prepared drv fname _tname th task dir =
   let ext = String.sub dest i (String.length dest - i) in
   let cout = open_out (Filename.concat dir (name ^ ext)) in
   (* TODO print the counterexample *)
-  let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) task in
+  (* Name tables not necessary outside ITP *)
+  let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) None task in
   close_out cout
 
 let output_theory drv fname _tname th task dir =
@@ -275,7 +277,8 @@ let output_theory drv fname _tname th task dir =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
-  Driver.print_task ?old drv (formatter_of_out_channel cout) task;
+  (* Name table is not necessary outside ITP *)
+  Driver.print_task ?old drv (formatter_of_out_channel cout) None task;
   close_out cout
 
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
@@ -285,14 +288,16 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
+        (* Name tables not necessary outside ITP *)
         let call =
-          Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv task in
+          Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv None task in
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s : %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
+        (* Name tables not necessary outside ITP *)
+        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter None task
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =

@@ -192,9 +192,10 @@ let idle_handler t =
               old,inplace,command,driver,callback,goal) ->
             begin
               try
+                (* Name table are not used outside ITP *)
                 let call =
                   Driver.prove_task ?old ~cntexample ~inplace ~command
-                    ~limit driver goal
+                    ~limit driver None goal
                 in
                 let pa = Check_prover (callback,false,call) in
                 Queue.push pa t.proof_attempts_queue;

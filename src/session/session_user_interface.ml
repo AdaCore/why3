@@ -278,10 +278,10 @@ exception Undefined_id of string
 (* Bad number of arguments *)
 exception Number_of_arguments
 
-let print_id s task =
-  let tables = Args_wrapper.build_name_tables task in
-  let km = tables.Args_wrapper.known_map in
-  let id = try find_any_id tables.Args_wrapper.namespace s with
+let print_id s tables =
+  (* let tables = Args_wrapper.build_name_tables task in*)
+  let km = tables.Task.known_map in
+  let id = try find_any_id tables.Task.namespace s with
   | Not_found -> raise (Undefined_id s) in
   let d =
     try Ident.Mid.find id km with
@@ -294,10 +294,10 @@ let print_id _cont task args =
   | [s] -> print_id s task
   | _ -> raise Number_of_arguments
 
-let search s task =
-  let tables = Args_wrapper.build_name_tables task in
-  let id_decl = tables.Args_wrapper.id_decl in
-  let id = try find_any_id tables.Args_wrapper.namespace s with
+let search s tables =
+  (*let tables = Args_wrapper.build_name_tables task in*)
+  let id_decl = tables.Task.id_decl in
+  let id = try find_any_id tables.Task.namespace s with
   | Not_found -> raise (Undefined_id s) in
   let l =
     try Ident.Mid.find id id_decl with
@@ -312,7 +312,7 @@ let search_id _cont task args =
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
-  | Qtask of (Controller_itp.controller -> Task.task -> string list -> string)
+  | Qtask of (Controller_itp.controller -> Task.name_tables -> string list -> string)
 
 let commands =
   [
@@ -394,8 +394,10 @@ let interp cont id s =
     | Qnotask f, _ -> Query (f cont args)
     | Qtask _, None -> Query "please select a goal first"
     | Qtask f, Some id ->
-       let task = Session_itp.get_task cont.Controller_itp.controller_session id in
-       let s = try Query (f cont task args) with
+       let tables = match Session_itp.get_tables cont.Controller_itp.controller_session id with
+       | None -> raise (Task.Bad_name_table "interp")
+       | Some tables -> tables in
+       let s = try Query (f cont tables args) with
        | Undefined_id s -> Query ("No existing id corresponding to " ^ s)
        | Number_of_arguments -> Query "Bad number of arguments"
        in s

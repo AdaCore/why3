@@ -335,8 +335,8 @@ let list_transforms_l () =
 
 (** transformations with arguments *)
 
-type trans_with_args = string list -> Env.env -> task trans
-type trans_with_args_l = string list -> Env.env -> task tlist
+type trans_with_args = string list -> Env.env -> Task.name_tables -> task trans
+type trans_with_args_l = string list -> Env.env -> Task.name_tables -> task tlist
 
 let transforms_with_args = Hstr.create 17
 let transforms_with_args_l = Hstr.create 17
@@ -404,12 +404,12 @@ let apply_transform tr_name env task =
     | Trans_with_args _ (* [apply (t []) task] *)
     | Trans_with_args_l _ -> assert false (* apply (t []) task *)
 
-let apply_transform_args tr_name env args task =
+let apply_transform_args tr_name env args tables task =
    match lookup_trans env tr_name with
     | Trans_one t -> [apply t task]
     | Trans_list t -> apply t task
-    | Trans_with_args t -> [apply (t args) env task]
-    | Trans_with_args_l t -> apply (t args) env task
+    | Trans_with_args t -> [apply (t args) env tables task]
+    | Trans_with_args_l t -> apply (t args) env tables task
 
 (** Flag-dependent transformations *)
 

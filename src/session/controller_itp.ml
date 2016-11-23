@@ -340,9 +340,10 @@ let build_prover_call c id pr limit callback =
     Whyconf.get_complete_command config_pr
           ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let task = Session_itp.get_task c.controller_session id in
+  let tables = Session_itp.get_tables c.controller_session id in
   let call =
     Driver.prove_task ?old:None ~cntexample:true ~inplace:false ~command
-                      ~limit driver task
+                      ~limit driver tables task
   in
   let pa = (c.controller_session,id,pr,callback,false,call) in
   Queue.push pa prover_tasks_in_progress
@@ -426,9 +427,12 @@ let schedule_proof_attempt c id pr ~limit ~callback =
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
     let task = get_task c.controller_session id in
+    let tables = match get_tables c.controller_session id with
+    | None -> raise (Task.Bad_name_table "schedule_transformation")
+    | Some tables -> tables in
     begin
       try
-        let subtasks = Trans.apply_transform_args name c.controller_env args task in
+        let subtasks = Trans.apply_transform_args name c.controller_env args tables task in
         (* if result is same as input task, consider it as a failure *)
         begin
           match subtasks with

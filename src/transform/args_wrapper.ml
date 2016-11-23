@@ -42,17 +42,6 @@ let sanitizer x = x (*sanitizer char_to_lalpha char_to_lalpha x*)
 let id_unique printer id =
   id_unique_label printer ~sanitizer:sanitizer id
 
-
-type id_decl = (Decl.decl list) Ident.Mid.t
-
-type name_tables = {
-    namespace : namespace;
-    known_map : known_map;
-    printer : ident_printer;
-(* Associate an id to a list of declarations in which it is used *)
-    id_decl : id_decl;
-  }
-
 (* Use symb to encapsulate ids into correct categories of symbols *)
 type symb =
   | Ts of tysymbol
@@ -198,7 +187,6 @@ let add (d: decl) (tables: name_tables): name_tables =
       let tables = add_unsafe s (Pr pr) tables in
       add_id tables d t
 
-
 let build_name_tables task : name_tables =
   let pr = fresh_printer () in
   let km = Task.task_known task in
@@ -236,12 +224,12 @@ type (_, _) trans_typ =
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
   | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
-let find_pr s task =
-  let tables = build_name_tables task in
+let find_pr s tables =
+  (*let tables = build_name_tables task in*)
   Mstr.find s tables.namespace.ns_pr
 
-let type_ptree ~as_fmla t task =
-  let tables = build_name_tables task in
+let type_ptree ~as_fmla t tables =
+  (*let tables = build_name_tables task in*)
   let km = tables.known_map in
   let ns = tables.namespace in
   if as_fmla
@@ -343,73 +331,73 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
     | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
 
-let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> task -> b =
-  fun t f l env task ->
+let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> name_tables -> task -> b =
+  fun t f l env tables task ->
     match t, l with
     | Ttrans, _-> apply f task
     | Ttrans_l, _ -> apply f task
     | Tenvtrans, _ -> apply (f env) task
     | Tenvtrans_l, _ -> apply (f env) task
     | Tint t', s :: tail ->
-      let arg = parse_int s in wrap_to_store t' (f arg) tail env task
+      let arg = parse_int s in wrap_to_store t' (f arg) tail env tables task
     | Tformula t', s :: tail ->
-      let te = parse_and_type ~as_fmla:true s task in
-      wrap_to_store t' (f te) tail env task
+      let te = parse_and_type ~as_fmla:true s tables in
+      wrap_to_store t' (f te) tail env tables task
     | Tterm t', s :: tail ->
-      let te = parse_and_type ~as_fmla:false s task in
-      wrap_to_store t' (f te) tail env task
+      let te = parse_and_type ~as_fmla:false s tables in
+      wrap_to_store t' (f te) tail env tables task
     | Tty t', _s :: tail ->
       let ty = Ty.ty_int in (* TODO: parsing + typing of s *)
-      wrap_to_store t' (f ty) tail env task
+      wrap_to_store t' (f ty) tail env tables task
     | Ttysymbol t', _s :: tail ->
       let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
-      wrap_to_store t' (f tys) tail env task
+      wrap_to_store t' (f tys) tail env tables task
     | Tprsymbol t', s :: tail ->
-      let pr = find_pr s task in
-      wrap_to_store t' (f pr) tail env task
+      let pr = find_pr s tables in
+      wrap_to_store t' (f pr) tail env tables task
     | Ttheory t', s :: tail ->
       let th = parse_theory env s in
-      wrap_to_store t' (f th) tail env task
+      wrap_to_store t' (f th) tail env tables task
     | Tstring t', s :: tail ->
-      wrap_to_store t' (f s) tail env task
+      wrap_to_store t' (f s) tail env tables task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
       begin match t' with
         | Tint t' ->
           let arg = Some (parse_int s') in
-          wrap_to_store t' (f arg) tail env task
+          wrap_to_store t' (f arg) tail env tables task
         | Tprsymbol t' ->
-          let arg = Some (find_pr s' task) in
-          wrap_to_store t' (f arg) tail env task
+          let arg = Some (find_pr s' tables) in
+          wrap_to_store t' (f arg) tail env tables task
         | Tformula t' ->
-          let arg = Some (parse_and_type ~as_fmla:true s' task) in
-          wrap_to_store t' (f arg) tail env task
+          let arg = Some (parse_and_type ~as_fmla:true s' tables) in
+          wrap_to_store t' (f arg) tail env tables task
         | Tterm t' ->
-          let arg = Some (parse_and_type ~as_fmla:false s' task) in
-          wrap_to_store t' (f arg) tail env task
+          let arg = Some (parse_and_type ~as_fmla:false s' tables) in
+          wrap_to_store t' (f arg) tail env tables task
         | Ttheory t' ->
           let arg = Some (parse_theory env s') in
-          wrap_to_store t' (f arg) tail env task
+          wrap_to_store t' (f arg) tail env tables task
         | Tstring t' ->
           let arg = Some s' in
-          wrap_to_store t' (f arg) tail env task
+          wrap_to_store t' (f arg) tail env tables task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
       end
     | Topt (_, t'), _ ->
-      wrap_to_store (trans_typ_tail t') (f None) l env task
+      wrap_to_store (trans_typ_tail t') (f None) l env tables task
     | Toptbool (optname, t'), s :: tail when s = optname ->
-      wrap_to_store t' (f true) tail env task
+      wrap_to_store t' (f true) tail env tables task
     | Toptbool (_, t'), _ ->
-      wrap_to_store t' (f false) l env task
+      wrap_to_store t' (f false) l env tables task
     | _, [] -> raise (Arg_expected_none (string_of_trans_typ t))
 
 let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
-  fun t f l env -> Trans.store (wrap_to_store t f l env)
+  fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
 let wrap   : type a. (a, task) trans_typ -> a -> trans_with_args =
-  fun t f l env -> Trans.store (wrap_to_store t f l env)
+  fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
-let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> b trans =
-  fun t f l env -> Trans.store (wrap_to_store t f l env)
+let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> Task.name_tables -> b trans =
+  fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
 let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =
   fun ~desc name t f  ->

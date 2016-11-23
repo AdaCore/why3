@@ -40,6 +40,7 @@ type proof_attempt_node = {
 type proof_node = {
   proofn_name                    : Ident.ident;
   proofn_task                    : Task.task;
+  proofn_table                   : Task.name_tables option;
   proofn_parent                  : proof_parent;
   proofn_checksum                : Termcode.checksum option;
   proofn_shape                   : Termcode.shape;
@@ -193,6 +194,10 @@ let get_proofNode (s : session) (id : proofNodeID) =
 let get_task (s:session) (id:proofNodeID) =
   let node = get_proofNode s id in
   node.proofn_task
+
+let get_tables (s: session) (id: proofNodeID) =
+  let node = get_proofNode s id in
+  node.proofn_table
 
 let get_transfNode (s : session) (id : transID) =
   try
@@ -367,10 +372,12 @@ let remove_proof_attempt (s : session) (id : proofNodeID)
    of proofNodeID [id] of parent [p] of task [t] *)
 let mk_proof_node ~version (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
+  let tables = Args_wrapper.build_name_tables t in
   let sum = Some (Termcode.task_checksum ~version t) in
   let shape = Termcode.t_shape_task ~version t in
   let pn = { proofn_name = n;
              proofn_task = t;
+             proofn_table = Some tables;
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -382,6 +389,7 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
     (parent : proof_parent) (node_id : proofNodeID) sum shape =
   let pn = { proofn_name = n;
              proofn_task = None;
+             proofn_table = None;
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -936,7 +944,10 @@ let add_registered_transformation s env old_tr goal_id =
   with Not_found ->
     Debug.dprintf debug "[merge_theory] trans not found@.";
     let task = goal.proofn_task in
-    let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args task in
+    let tables = match goal.proofn_table with
+    | None -> raise (Task.Bad_name_table "add_registered_transformation")
+    | Some tables -> tables in
+    let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args tables task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
 let rec merge_goal ~use_shapes env new_s old_s obsolete old_goal new_goal_id =

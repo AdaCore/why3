@@ -433,9 +433,10 @@ let test_print_goal fmt _args =
   (* temporary : get the first goal *)
   let id = nearest_goal () in
   let task = Session_itp.get_task cont.Controller_itp.controller_session id in
+  let tables = Session_itp.get_tables cont.Controller_itp.controller_session id in
   fprintf fmt "@[====================== Task =====================@\n%a@]@."
           (*Pretty.print_task*)
-          (Driver.print_task ~cntexample:false task_driver)
+          (fun fmt -> Driver.print_task ~cntexample:false task_driver fmt tables)
           task
 
 (* Execute f and then print the goal *)
@@ -572,13 +573,17 @@ let print_known_map _fmt _args =
 
 let test_print_id _fmt args =
   let id = nearest_goal () in
-  let task = get_task cont.controller_session id in
-  Format.printf "%s@." (print_id cont task args)
+  let tables = match get_tables cont.controller_session id with
+  | None -> raise (Task.Bad_name_table "test_print_id")
+  | Some tables -> tables in
+  Format.printf "%s@." (print_id cont tables args)
 
 let test_search_id _fmt args =
   let id = nearest_goal () in
-  let task = get_task cont.controller_session id in
-  Format.printf "%s@." (search_id cont task args)
+  let tables = match get_tables cont.controller_session id with
+  | None -> raise (Task.Bad_name_table "test_print_id")
+  | Some tables -> tables in
+  Format.printf "%s@." (search_id cont tables args)
 
 (****)
 

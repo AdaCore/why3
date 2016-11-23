@@ -62,6 +62,7 @@ val session_iter_proof_attempt: (proofNodeID -> proof_attempt_node -> unit) -> s
 type proof_parent = Trans of transID | Theory of theory
 
 val get_task : session -> proofNodeID -> Task.task
+val get_tables: session -> proofNodeID -> Task.name_tables option
 
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :

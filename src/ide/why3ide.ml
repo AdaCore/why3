@@ -903,8 +903,9 @@ let on_selected_row r =
     match session_element with
     | IproofNode id ->
        let task = get_task cont.controller_session id in
+       let tables = get_tables cont.controller_session id in
        let s = Pp.string_of
-                 (Driver.print_task ~cntexample:false task_driver)
+                 (fun fmt -> Driver.print_task ~cntexample:false task_driver fmt tables)
                  task
        in task_view#source_buffer#set_text s;
        (* scroll to end of text *)

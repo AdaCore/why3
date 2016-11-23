@@ -342,6 +342,19 @@ let on_tagged_pr t task =
   let tds = find_meta_tds task t in
   Stdecl.fold add tds.tds_set Spr.empty
 
+(* Printing tasks *)
+type id_decl = (Decl.decl list) Ident.Mid.t
+
+type name_tables = {
+    namespace : namespace;
+    known_map : known_map;
+    printer : ident_printer;
+(* Associate an id to a list of declarations in which it is used *)
+    id_decl : id_decl;
+  }
+
+exception Bad_name_table of string
+
 (* Exception reporting *)
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
@@ -353,6 +366,8 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" m.meta_name
   | NotExclusiveMeta m ->
       Format.fprintf fmt "Metaproperty '%s' is not exclusive" m.meta_name
+  | Bad_name_table s ->
+      Format.fprintf fmt "Name table associated to task was not generated in %s" s
   | _ -> raise exn)
 
 (* task1 : prefix

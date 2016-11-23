@@ -35,6 +35,7 @@ type printer_mapping = {
 }
 
 type printer_args = {
+  name_table : name_tables option;
   env        : Env.env;
   prelude    : prelude;
   th_prelude : prelude_map;
