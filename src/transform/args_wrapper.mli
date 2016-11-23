@@ -24,6 +24,8 @@ val build_name_tables : Task.task -> name_tables
 type (_, _) trans_typ =
   | Ttrans    : (task Trans.trans, task) trans_typ
   | Ttrans_l  : (task Trans.tlist, task list) trans_typ
+  | Tenvtrans   : (Env.env -> (task Trans.trans), task) trans_typ
+  | Tenvtrans_l : (Env.env -> (task Trans.tlist), task list) trans_typ
   | Tint      : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
   | Tty       : ('a, 'b) trans_typ -> ((Ty.ty -> 'a), 'b) trans_typ
   | Ttysymbol : ('a, 'b) trans_typ -> ((Ty.tysymbol -> 'a), 'b) trans_typ
@@ -32,7 +34,6 @@ type (_, _) trans_typ =
   | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula  : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
   | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
-  | Tenv      : ('a, 'b) trans_typ -> ((Env.env -> 'a), 'b) trans_typ
   | Topt      : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
   | Toptbool  : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 

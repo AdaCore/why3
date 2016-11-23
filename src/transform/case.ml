@@ -328,7 +328,7 @@ let is_good_type t ty =
   try (Term.t_ty_check t (Some ty); true) with
   | _ -> false
 
-let induction env x bound =
+let induction x bound env =
   let th = Env.read_theory env ["int"] "Int" in
   let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
   let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
@@ -474,7 +474,7 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
     "induction"
-    (Tenv (Tterm (Tterm Ttrans_l))) induction
+    (Tterm (Tterm Tenvtrans_l)) induction
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor of hypothesis name"
     "destruct" (Tprsymbol Ttrans_l) destruct

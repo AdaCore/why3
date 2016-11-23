@@ -221,19 +221,20 @@ let build_name_tables task : name_tables =
 (************* wrapper  *************)
 
 type (_, _) trans_typ =
-  | Ttrans    : ((task trans), task) trans_typ
-  | Ttrans_l  : ((task tlist), task list) trans_typ
-  | Tint      : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
-  | Tty       : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
-  | Ttysymbol : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
-  | Tprsymbol : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
-  | Tterm     : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
-  | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
-  | Tformula  : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
-  | Ttheory   : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
-  | Tenv      : ('a, 'b) trans_typ -> ((Env.env -> 'a), 'b) trans_typ
-  | Topt      : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
-  | Toptbool  : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
+  | Ttrans      : ((task trans), task) trans_typ
+  | Ttrans_l    : ((task tlist), task list) trans_typ
+  | Tenvtrans   : (Env.env -> (task trans), task) trans_typ
+  | Tenvtrans_l : (Env.env -> (task tlist), task list) trans_typ
+  | Tint        : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
+  | Tty         : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
+  | Ttysymbol   : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
+  | Tprsymbol   : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
+  | Tstring     : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
+  | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
+  | Ttheory     : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
+  | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
+  | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
 let find_pr s task =
   let tables = build_name_tables task in
@@ -291,7 +292,9 @@ type _ trans_typ_is_l = Yes : (task list) trans_typ_is_l | No : task trans_typ_i
 
 let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
   fun t -> match t with
+    | Tenvtrans      -> No
     | Ttrans         -> No
+    | Tenvtrans_l    -> Yes
     | Ttrans_l       -> Yes
     | Tint t         -> is_trans_typ_l t
     | Tty t          -> is_trans_typ_l t
@@ -301,7 +304,6 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tstring t      -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
     | Ttheory t      -> is_trans_typ_l t
-    | Tenv t         -> is_trans_typ_l t
     | Topt (_,t)     -> is_trans_typ_l t
     | Toptbool (_,t) -> is_trans_typ_l t
 
@@ -310,6 +312,8 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     match t with
     | Ttrans         -> "trans"
     | Ttrans_l       -> "transl"
+    | Tenvtrans      -> "env trans"
+    | Tenvtrans_l    -> "env transl"
     | Tint _         -> "integer"
     | Tty _          -> "type"
     | Ttysymbol _    -> "type symbol"
@@ -318,7 +322,6 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tstring _      -> "string"
     | Tformula _     -> "formula"
     | Ttheory _      -> "theory"
-    | Tenv _         -> "environment"
     | Topt (s,_)     -> "opt [" ^ s ^ "]"
     | Toptbool (s,_) -> "boolean opt [" ^ s ^ "]"
 
@@ -327,6 +330,8 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     match t with
     | Ttrans         -> "()"
     | Ttrans_l       -> "()"
+    | Tenvtrans      -> "()"
+    | Tenvtrans_l    -> "()"
     | Tint t         -> "integer -> " ^ print_type t
     | Tty t          -> "type -> " ^ print_type t
     | Ttysymbol t    -> "type_symbol -> " ^ print_type t
@@ -335,7 +340,6 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Tstring t      -> "string -> " ^ print_type t
     | Tformula t     -> "formula -> " ^ print_type t
     | Ttheory t      -> "theory -> " ^ print_type t
-    | Tenv t         -> "environment -> " ^ print_type t
     | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
     | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
 
@@ -344,6 +348,8 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     match t, l with
     | Ttrans, _-> apply f task
     | Ttrans_l, _ -> apply f task
+    | Tenvtrans, _ -> apply (f env) task
+    | Tenvtrans_l, _ -> apply (f env) task
     | Tint t', s :: tail ->
       let arg = parse_int s in wrap_to_store t' (f arg) tail env task
     | Tformula t', s :: tail ->
@@ -366,7 +372,6 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f th) tail env task
     | Tstring t', s :: tail ->
       wrap_to_store t' (f s) tail env task
-    | Tenv t', _ -> wrap_to_store t' (f env) l env task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
       begin match t' with
         | Tint t' ->
