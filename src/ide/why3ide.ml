@@ -422,6 +422,10 @@ type index =
   | Itheory of theory
 
 let model_index : index Hint.t = Stdlib.Hint.create 17
+let get_index iter =
+  let index = goals_model#get ~row:iter ~column:index_column in
+  Hint.find model_index index
+
 (* To each node we have the corresponding row_reference *)
 let file_id_to_gtree : GTree.row_reference Hstr.t = Hstr.create 3
 let th_id_to_gtree   : GTree.row_reference Ident.Hid.t = Ident.Hid.create 7
@@ -489,8 +493,7 @@ let image_of_result ~obsolete rOpt =
       if obsolete then !image_failure_obs else !image_failure
 
 let set_status_column_from_cont cont iter =
-  let index = goals_model#get ~row:iter ~column:index_column in
-  let index = Hint.find model_index index in
+  let index = get_index iter in
   let image = match index with
     | Inone -> assert false
     | IproofAttempt panid ->
@@ -619,8 +622,7 @@ let collapse_proven_goals_from_file file =
   | false -> List.iter collapse_proven_goals_from_th file.file_theories
 
 let collapse_proven_goals_from_iter iter =
-  let index = goals_model#get ~row:iter ~column:index_column in
-  let index = Hint.find model_index index in
+  let index = get_index iter in
   match index with
   | Inone              -> assert false
   | IproofAttempt _    -> ()
@@ -724,6 +726,14 @@ let rec apply_transform cont t args =
     end;
     apply_transform cont t args
 
+let go_to_nearest_unproven_goal_and_collapse pn =
+  begin match get_first_unproven_goal_around_pn cont pn with
+    | Some next_pn ->
+      goals_view#selection#select_iter (row_from_pn next_pn)#iter
+    | None -> ()
+  end;
+  collapse_proven_goals ()
+
 (* Callback of a proof_attempt *)
 let callback_update_tree_proof cont panid pa_status =
   let ses = cont.controller_session in
@@ -732,29 +742,30 @@ let callback_update_tree_proof cont panid pa_status =
   let name = Pp.string_of Whyconf.print_prover prover in
   let obsolete = pa.proof_obsolete in
   let r = match pa_status with
-  | Scheduled ->
-     begin
-       try
-         Hpan.find pan_id_to_gtree panid
-       with Not_found ->
-         let parent_id = get_proof_attempt_parent ses panid in
-         let parent = row_from_pn parent_id in
-         new_node ~parent name (IproofAttempt panid)
-     end
-  | Done _ ->
-    let r = row_from_pan panid in
-    begin match goals_model#iter_parent r#iter with
-    | Some iter -> update_status_column_from_iter cont iter
-    | None -> ()
-    end;
-    begin match get_first_unproven_goal_around_pn cont pa.parent with
-    | Some next_pn ->
-      goals_view#selection#select_iter (row_from_pn next_pn)#iter
-    | None -> ()
-    end;
-    collapse_proven_goals ();
-    r
-  | _  -> row_from_pan panid (* TODO ? *)
+    | Scheduled ->
+      begin
+        try row_from_pan panid
+        with Not_found ->
+          let parent_id = get_proof_attempt_parent ses panid in
+          let parent = row_from_pn parent_id in
+          new_node ~parent name (IproofAttempt panid)
+      end
+    | Done _ ->
+      let r = row_from_pan panid in
+      begin match goals_model#iter_parent r#iter with
+        | Some iter ->
+          update_status_column_from_iter cont iter;
+          let parent_index = get_index iter in
+          begin match !current_selected_index, parent_index with
+            | IproofNode pn, IproofNode ppn when pn = ppn ->
+              go_to_nearest_unproven_goal_and_collapse pn
+            | _ -> ()
+          end;
+        | None -> assert false
+      end;
+
+      r
+    | _  -> row_from_pan panid (* TODO ? *)
   in
   goals_model#set ~row:r#iter ~column:status_column
     (image_of_pa_status ~obsolete pa_status)
@@ -866,9 +877,8 @@ let get_selected_row_references () =
     goals_view#selection#get_selected_rows
 
 let on_selected_row r =
-  let index = goals_model#get ~row:r#iter ~column:index_column in
   try
-    let session_element = Hint.find model_index index in
+    let session_element = get_index r#iter in
     current_selected_index := session_element;
     match session_element with
     | IproofNode id ->
