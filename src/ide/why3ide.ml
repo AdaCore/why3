@@ -323,6 +323,7 @@ let update_monitor =
 
 let completion_cols = new GTree.column_list
 let completion_col = completion_cols#add Gobject.Data.string
+(* let text_col = completion_cols#add Gobject.Data.string *)
 let completion_model = GTree.tree_store completion_cols
 
 let command_entry_completion : GEdit.entry_completion =
@@ -330,7 +331,15 @@ let command_entry_completion : GEdit.entry_completion =
 
 let add_completion_entry s =
   let row = completion_model#append () in
+  (* completion_model#set ~row ~column:text_col "test"; *)
   completion_model#set ~row ~column:completion_col s
+
+let match_function s iter =
+  let candidate = completion_model#get ~row:iter ~column:completion_col in
+  try
+    ignore (Str.search_forward (Str.regexp s) candidate 0);
+    true
+  with Not_found -> false
 
 let init_comp cont =
   (* add the names of all the the transformations *)
@@ -349,6 +358,13 @@ let init_comp cont =
   add_completion_entry "auto 2";
 
   command_entry_completion#set_text_column completion_col;
+  command_entry_completion#set_match_func match_function;
+(*  ignore (command_entry_completion#connect#match_selected
+    ~callback:(fun _ iter ->
+        command_entry#set_text "test";
+        true));*)
+
+    (* GTree.model_filter -> Gtk.tree_iter -> bool *)
 
   command_entry#set_completion command_entry_completion
 
