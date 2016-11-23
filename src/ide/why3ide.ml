@@ -674,7 +674,6 @@ let rec update_status_column_from_iter cont iter =
   | Some p -> update_status_column_from_iter cont p
   | None -> ()
 
-
 let move_current_row_selection_up () =
   let current_view = List.hd (goals_view#selection#get_selected_rows) in
   ignore (GTree.Path.up current_view);
@@ -702,11 +701,18 @@ let callback_update_tree_transform cont status =
     let row_ref = row_from_pn id in
     let r = build_subtree_from_trans cont row_ref trans_id in
     update_status_column_from_iter cont r#iter;
-    (match Session_itp.get_sub_tasks ses trans_id with
-     | first_goal :: _ ->
-       (* Put the selection on the first goal *)
-       goals_view#selection#select_iter (row_from_pn first_goal)#iter
-     | [] -> ())
+    (* move focus if the current index still corresponds to the
+       goal *)
+    let ppn = get_trans_parent cont.controller_session trans_id in
+    begin match !current_selected_index with
+      | IproofNode pn when pn = ppn ->
+        (match Session_itp.get_sub_tasks ses trans_id with
+         | first_goal :: _ ->
+           (* Put the selection on the first goal *)
+           goals_view#selection#select_iter (row_from_pn first_goal)#iter
+         | [] -> ())
+      | _ -> ()
+    end;
   | TSfailed e ->
      message_zone#buffer#set_text
        (Pp.sprintf "%a" Exn_printer.exn_printer e)
@@ -751,20 +757,18 @@ let callback_update_tree_proof cont panid pa_status =
           new_node ~parent name (IproofAttempt panid)
       end
     | Done _ ->
-      let r = row_from_pan panid in
-      begin match goals_model#iter_parent r#iter with
-        | Some iter ->
-          update_status_column_from_iter cont iter;
-          let parent_index = get_index iter in
-          begin match !current_selected_index, parent_index with
-            | IproofNode pn, IproofNode ppn when pn = ppn ->
-              go_to_nearest_unproven_goal_and_collapse pn
-            | _ -> ()
-          end;
-        | None -> assert false
+      let ppn = get_proof_attempt_parent cont.controller_session panid in
+      let piter = (row_from_pn ppn)#iter in
+      update_status_column_from_iter cont piter;
+      (* move focus an collapse if the goal was proven and
+         the current index still corresponds to the goal *)
+      begin match !current_selected_index with
+        | IproofNode pn when pn = ppn ->
+          if pn_proved cont pn then
+            go_to_nearest_unproven_goal_and_collapse pn
+        | _ -> ()
       end;
-
-      r
+      row_from_pan panid
     | _  -> row_from_pan panid (* TODO ? *)
   in
   goals_model#set ~row:r#iter ~column:status_column
