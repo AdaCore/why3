@@ -729,9 +729,9 @@ let callback_update_tree_transform cont status =
          | [] -> ())
       | _ -> ()
     end;
-  | TSfailed e ->
-     message_zone#buffer#set_text
-       (Pp.sprintf "%a" Exn_printer.exn_printer e)
+  | TSfailed (id, e) ->
+      message_zone#buffer#set_text
+        (Pp.sprintf "%a" (get_exception_message cont.controller_session id) e)
   | _ -> ()
 
 let rec apply_transform cont t args =

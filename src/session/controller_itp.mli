@@ -26,7 +26,10 @@ type proof_attempt_status =
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
-type transformation_status = TSscheduled | TSdone of transID  | TSfailed of exn
+type transformation_status =
+    TSscheduled
+  | TSdone of transID
+  | TSfailed of (proofNodeID * exn)
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 

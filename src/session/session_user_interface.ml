@@ -451,3 +451,173 @@ let parse_prover_name config name args :
                                            limit_steps = 0})
       | _ -> (*Format.eprintf "Parse_prover_name. Should not happen. Please report@."; *) None
     end
+
+
+(****** Exception handling *********)
+
+let print_term s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_term tables fmt t
+
+let print_type s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_ty tables fmt t
+
+let print_ts s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_ts tables fmt t
+
+let print_ls s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_ls tables fmt t
+
+let print_tv s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_tv tables fmt t
+
+let print_vsty s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_forget_vsty tables fmt t
+
+let print_pr s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_pr tables fmt t
+
+let print_pat s id fmt t =
+  let tables = match (Session_itp.get_tables s id) with
+  | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
+  | Some tables -> tables in
+  Why3printer.print_pat tables fmt t
+
+(* Exception reporting *)
+
+(* TODO remove references to id.id_string in this function *)
+let bypass_pretty s id =
+  begin fun fmt exn -> match exn with
+  | Ty.TypeMismatch (t1,t2) ->
+      fprintf fmt "Type mismatch between %a and %a"
+        (print_type s id) t1 (print_type s id) t2
+  | Ty.BadTypeArity ({Ty.ts_args = []} as ts, _) ->
+      fprintf fmt "Type symbol %a expects no arguments" (print_ts s id) ts
+  | Ty.BadTypeArity (ts, app_arg) ->
+      let i = List.length ts.Ty.ts_args in
+      fprintf fmt "Type symbol %a expects %i argument%s but is applied to %i"
+        (print_ts s id) ts i (if i = 1 then "" else "s") app_arg
+  | Ty.DuplicateTypeVar tv ->
+      fprintf fmt "Type variable %a is used twice" (print_tv s id) tv
+  | Ty.UnboundTypeVar tv ->
+      fprintf fmt "Unbound type variable: %a" (print_tv s id) tv
+  | Ty.UnexpectedProp ->
+      fprintf fmt "Unexpected propositional type"
+  | Term.BadArity ({Term.ls_args = []} as ls, _) ->
+      fprintf fmt "%s %a expects no arguments"
+        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
+  | Term.BadArity (ls, app_arg) ->
+      let i = List.length ls.Term.ls_args in
+      fprintf fmt "%s %a expects %i argument%s but is applied to %i"
+        (if ls.Term.ls_value = None then "Predicate" else "Function")
+        (print_ls s id) ls i (if i = 1 then "" else "s") app_arg
+  | Term.EmptyCase ->
+      fprintf fmt "Empty match expression"
+  | Term.DuplicateVar vs ->
+      fprintf fmt "Variable %a is used twice" (print_vsty s id) vs
+  | Term.UncoveredVar vs ->
+      fprintf fmt "Variable %a uncovered in \"or\"-pattern" (print_vsty s id) vs
+  | Term.FunctionSymbolExpected ls ->
+      fprintf fmt "Not a function symbol: %a" (print_ls s id) ls
+  | Term.PredicateSymbolExpected ls ->
+      fprintf fmt "Not a predicate symbol: %a" (print_ls s id) ls
+  | Term.ConstructorExpected ls ->
+      fprintf fmt "%s %a is not a constructor"
+        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
+  | Term.TermExpected t ->
+      fprintf fmt "Not a term: %a" (print_term s id) t
+  | Term.FmlaExpected t ->
+      fprintf fmt "Not a formula: %a" (print_term s id) t
+  | Pattern.ConstructorExpected (ls,ty) ->
+      fprintf fmt "%s %a is not a constructor of type %a"
+        (if ls.Term.ls_value = None then "Predicate" else "Function") (print_ls s id) ls
+        (print_type s id) ty
+  | Pattern.NonExhaustive pl ->
+      fprintf fmt "Pattern not covered by a match:@\n  @[%a@]"
+        (print_pat s id) (List.hd pl)
+  | Decl.BadConstructor ls ->
+      fprintf fmt "Bad constructor: %a" (print_ls s id) ls
+  | Decl.BadRecordField ls ->
+      fprintf fmt "Not a record field: %a" (print_ls s id) ls
+  | Decl.RecordFieldMissing (_cs,ls) ->
+      fprintf fmt "Field %a is missing" (print_ls s id) ls
+  | Decl.DuplicateRecordField (_cs,ls) ->
+      fprintf fmt "Field %a is used twice in the same constructor" (print_ls s id) ls
+  | Decl.IllegalTypeAlias ts ->
+      fprintf fmt
+        "Type symbol %a is a type alias and cannot be declared as algebraic"
+        (print_ts s id) ts
+  | Decl.NonFoundedTypeDecl ts ->
+      fprintf fmt "Cannot construct a value of type %a" (print_ts s id) ts
+  | Decl.NonPositiveTypeDecl (_ts, ls, ty) ->
+      fprintf fmt "Constructor %a \
+          contains a non strictly positive occurrence of type %a"
+        (print_ls s id) ls (print_type s id) ty
+  | Decl.InvalidIndDecl (_ls, pr) ->
+      fprintf fmt "Ill-formed inductive clause %a"
+        (print_pr s id) pr
+  | Decl.NonPositiveIndDecl (_ls, pr, ls1) ->
+      fprintf fmt "Inductive clause %a contains \
+          a non strictly positive occurrence of symbol %a"
+        (print_pr s id) pr (print_ls s id) ls1
+  | Decl.BadLogicDecl (ls1,ls2) ->
+      fprintf fmt "Ill-formed definition: symbols %a and %a are different"
+        (print_ls s id) ls1 (print_ls s id) ls2
+  | Decl.UnboundVar vs ->
+      fprintf fmt "Unbound variable: %a" (print_vsty s id) vs
+  | Decl.ClashIdent id ->
+      fprintf fmt "Ident %s is defined twice" id.Ident.id_string
+  | Decl.EmptyDecl ->
+      fprintf fmt "Empty declaration"
+  | Decl.EmptyAlgDecl ts ->
+      fprintf fmt "Algebraic type %a has no constructors" (print_ts s id) ts
+  | Decl.EmptyIndDecl ls ->
+      fprintf fmt "Inductive predicate %a has no constructors" (print_ls s id) ls
+  | Decl.KnownIdent id ->
+      fprintf fmt "Ident %s is already declared" id.Ident.id_string
+  | Decl.UnknownIdent id ->
+      fprintf fmt "Ident %s is not yet declared" id.Ident.id_string
+  | Decl.RedeclaredIdent id ->
+      fprintf fmt "Ident %s is already declared, with a different declaration"
+        id.Ident.id_string
+  | Decl.NoTerminationProof ls ->
+      fprintf fmt "Cannot prove the termination of %a" (print_ls s id) ls
+  | _ -> Format.fprintf fmt "Uncaught: %a" Exn_printer.exn_printer exn
+  end
+
+let get_exception_message ses id fmt e =
+  match e with
+  | Case.Arg_trans_type (s, ty1, ty2) ->
+      Format.fprintf fmt "Error in transformation %s during unification of the following terms:\n %a \n %a"
+        s (print_type ses id) ty1 (print_type ses id) ty2
+  | Case.Arg_trans_term (s, t1, t2) ->
+      Format.fprintf fmt "Error in transformation %s during unification of following two terms:\n %a \n %a" s
+        (print_term ses id) t1 (print_term ses id) t2
+  | Case.Arg_trans (s) ->
+      Format.fprintf fmt "Error in transformation function: %s \n" s
+  | Case.Arg_hyp_not_found (s) ->
+      Format.fprintf fmt "Following hypothesis was not found: %s \n" s
+  | Args_wrapper.Arg_theory_not_found (s) ->
+      Format.fprintf fmt "Theory not found: %s" s
+  | e ->
+      bypass_pretty ses id fmt e

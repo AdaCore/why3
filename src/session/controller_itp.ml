@@ -35,7 +35,7 @@ let print_status fmt st =
   | Uninstalled pr -> fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
 
 type transformation_status =
-  | TSscheduled | TSdone of transID | TSfailed of exn
+  | TSscheduled | TSdone of transID | TSfailed of (proofNodeID * exn)
 
 let print_trans_status fmt st =
   match st with
@@ -437,7 +437,7 @@ let schedule_transformation_r c id name args ~callback =
         begin
           match subtasks with
           | [t'] when Task.task_equal t' task ->
-             callback (TSfailed Noprogress)
+             callback (TSfailed (id, Noprogress))
           | _ ->
              let tid = graft_transf c.controller_session id name args subtasks in
              callback (TSdone tid)
@@ -446,7 +446,7 @@ let schedule_transformation_r c id name args ~callback =
         (* Format.eprintf
           "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
-        callback (TSfailed e)
+        callback (TSfailed (id, e))
     end;
     false
   in

@@ -95,6 +95,20 @@ let rec print_ty_node inn tables fmt ty = match ty.ty_node with
 
 let print_ty = print_ty_node false
 
+let print_vsty tables fmt v =
+  fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
+
+(** Forgetting function for stability of errors *)
+let print_forget_vsty tables fmt v =
+  if (Ident.known_id tables.printer v.vs_name) then
+    fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
+  else
+    begin
+      fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty;
+      forget_var tables v
+    end
+
+
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
   let rec lookup v ty = match ty.ty_node with
@@ -131,9 +145,6 @@ let rec print_pat_node pri tables fmt p = match p.pat_node with
       end
 
 let print_pat = print_pat_node 0
-
-let print_vsty tables fmt v =
-  fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
 
 let print_const = Pretty.print_const
 let print_quant = Pretty.print_quant

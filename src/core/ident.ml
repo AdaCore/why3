@@ -219,6 +219,12 @@ let create_ident_printer ?(sanitizer = same) sl =
     sanitizer = sanitizer;
     blacklist = sl }
 
+let known_id printer id =
+  try
+    (let _ = Hid.find printer.values id in true)
+  with Not_found ->
+    false
+
 let id_unique printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id

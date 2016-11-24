@@ -127,6 +127,10 @@ val id_unique_label :
 val string_unique : ident_printer -> string -> string
 (** Uniquify string *)
 
+val known_id: ident_printer -> ident -> bool
+(** Returns true if the printer already knows the id.
+    false if it does not. *)
+
 val forget_id : ident_printer -> ident -> unit
 (** forget an ident *)
 

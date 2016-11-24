@@ -8,21 +8,10 @@ open Args_wrapper
 open Reduction_engine
 
 exception Arg_trans of string
-exception Arg_trans_term of (string * string * string)
-exception Arg_trans_type of (string * string * string)
+exception Arg_trans_term of (string * Term.term * Term.term)
+exception Arg_trans_type of (string * Ty.ty * Ty.ty)
 exception Arg_hyp_not_found of string
-exception Arg_bad_hypothesis of (string * string)
-
-let () = Exn_printer.register
-    (fun fmt exn -> match exn with
-    | Arg_trans_type (s, s1, s2) ->
-        Format.fprintf fmt "Error in transformation %s during unification of the following terms:\n %s \n %s" s s1 s2
-    | Arg_trans_term (s, s1, s2) ->
-        Format.fprintf fmt "Error in transformation %s during unification of following two terms:\n %s \n %s" s s1 s2
-    | Arg_trans (s) -> Format.fprintf fmt "Error in transformation function: %s \n" s
-    | Arg_hyp_not_found (s) -> Format.fprintf fmt "Following hypothesis was not found: %s \n" s
-    | Arg_theory_not_found (s) -> Format.fprintf fmt "Theory not found: %s" s
-    | e -> raise e)
+exception Arg_bad_hypothesis of (string * Term.term)
 
 let debug_matching = Debug.register_info_flag "print_match"
   ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
@@ -68,9 +57,7 @@ let subst_quant c tq x : term =
         t_quant_close c tl tr new_t)
       with
       | Ty.TypeMismatch (ty1, ty2) ->
-          raise (Arg_trans_type ("subst_quant",
-                                 Pp.string_of Pretty.print_ty ty1,
-                                 Pp.string_of Pretty.print_ty ty2)))
+          raise (Arg_trans_type ("subst_quant", ty1, ty2)))
   | [] -> failwith "subst_quant: Should not happen, please report")
 
 (* Transform the term (exists v, f) into f[x/v] *)
@@ -180,7 +167,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
       (if (Debug.test_flag debug_matching) then
         Format.printf "Term %a and %a can not be matched. Failure in matching@."
           Pretty.print_term t1 Pretty.print_term t2
-      else ()); raise (Arg_trans_term ("apply", Pp.string_of Pretty.print_term t1, Pp.string_of Pretty.print_term t2))
+      else ()); raise (Arg_trans_term ("apply", t1, t2))
   | Reduction_engine.NoMatch None -> raise (Arg_trans ("apply"))
   in
   let inst_nt = t_subst subst nt in
@@ -190,9 +177,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
                           (create_prsymbol (gen_ident "G")) ng)) nlp in
     lt
   else
-    raise (Arg_trans_term ("apply",
-                           Pp.string_of Pretty.print_term inst_nt,
-                           Pp.string_of Pretty.print_term g)))
+    raise (Arg_trans_term ("apply", inst_nt, g)))
 
 (*(Format.printf
       "Term %a and %a are not equal. Failure in matching @."
@@ -265,7 +250,7 @@ let rewrite_in rev h h1 =
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
               (* Support to rewrite from the right *)
               if rev then (t1, t2) else (t2, t1)
-          | _ -> raise (Arg_bad_hypothesis ("rewrite", Pp.string_of Pretty.print_term f))) in
+          | _ -> raise (Arg_bad_hypothesis ("rewrite", f))) in
           Some (lp, lv, t1, t2)
       | _ -> acc) None in
   (* Return instantiated premises and the hypothesis correctly rewritten *)
@@ -310,9 +295,7 @@ let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in (not rev) h)
 (* Replace occurences of t1 with t2 in h *)
 let replace t1 t2 h =
   if not (Ty.ty_equal (t_type t1) (t_type t2)) then
-    raise (Arg_trans_term ("replace",
-                           Pp.string_of Pretty.print_term t1,
-                           Pp.string_of Pretty.print_term t2))
+    raise (Arg_trans_term ("replace", t1, t2))
   else
     (* Create a new goal for equality of the two terms *)
     let g = Decl.create_prop_decl Decl.Pgoal (create_prsymbol (gen_ident "G")) (t_app_infer ps_equ [t1; t2]) in
@@ -409,9 +392,7 @@ let destruct pr : Task.task Trans.tlist =
                   [[d; x_decl; new_decl]]
                 with
                 | Ty.TypeMismatch (ty1, ty2) ->
-                    raise (Arg_trans_type ("destruct_exists",
-                                           Pp.string_of Pretty.print_ty ty1,
-                                           Pp.string_of Pretty.print_ty ty2)))
+                    raise (Arg_trans_type ("destruct_exists", ty1, ty2)))
             | [] -> raise (Arg_trans ("destruct_exists"))
           end
         | _ -> raise (Arg_trans ("destruct"))
