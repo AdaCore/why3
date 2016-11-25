@@ -136,7 +136,10 @@ theory GenericFloat
   predicate is_minus_zero     (x:t) = is_zero x /\ is_negative x
   predicate is_not_nan        (x:t) = is_finite x \/ is_infinite x
 
-  lemma is_not_nan: forall x:t. is_not_nan x <-> not (is_nan x)
+  axiom is_not_nan: forall x:t. is_not_nan x <-> not (is_nan x)
+
+  axiom is_not_finite: forall x:t.
+    not (is_finite x) <-> (is_infinite x \/ is_nan x)
 
   (* {3 Conversions from other sorts} *)
 
@@ -396,14 +399,29 @@ theory GenericFloat
     is_finite (add m x y) /\
     to_real (add m x y) = round m (to_real x +. to_real y)
 
+  lemma add_finite_rev: forall m:mode, x y:t [add m x y].
+    is_finite (add m x y) ->
+    is_finite x /\ is_finite y /\ no_overflow m (to_real x +. to_real y) /\
+    to_real (add m x y) = round m (to_real x +. to_real y)
+
   axiom sub_finite: forall m:mode, x y:t [sub m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x -. to_real y) ->
     is_finite (sub m x y) /\
     to_real (sub m x y) = round m (to_real x -. to_real y)
 
+  lemma sub_finite_rev: forall m:mode, x y:t [sub m x y].
+    is_finite (sub m x y) ->
+    is_finite x /\ is_finite y /\ no_overflow m (to_real x -. to_real y) /\
+    to_real (sub m x y) = round m (to_real x -. to_real y)
+
   axiom mul_finite: forall m:mode, x y:t [mul m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x *. to_real y) ->
     is_finite (mul m x y) /\
+    to_real (mul m x y) = round m (to_real x *. to_real y)
+
+  lemma mul_finite_rev: forall m:mode, x y:t [mul m x y].
+    is_finite (mul m x y) ->
+    is_finite x /\ is_finite y /\ no_overflow m (to_real x *. to_real y) /\
     to_real (mul m x y) = round m (to_real x *. to_real y)
 
   axiom div_finite: forall m:mode, x y:t [div m x y].
@@ -412,9 +430,20 @@ theory GenericFloat
     is_finite (div m x y) /\
     to_real (div m x y) = round m (to_real x /. to_real y)
 
+  lemma div_finite_rev: forall m:mode, x y:t [div m x y].
+    is_finite (div m x y) ->
+    (is_finite x /\ is_finite y /\ no_overflow m (to_real x /. to_real y) /\
+     not is_zero y /\ to_real (div m x y) = round m (to_real x /. to_real y)) \/
+    (is_finite x /\ is_infinite y /\ to_real (div m x y) = 0.)
+
   axiom neg_finite: forall x:t [neg x].
     is_finite x ->
     is_finite (neg x) /\
+    to_real (neg x) = -. to_real x
+
+  lemma neg_finite_rev: forall x:t [neg x].
+    is_finite (neg x) ->
+    is_finite x /\
     to_real (neg x) = -. to_real x
 
   axiom abs_finite: forall x:t [abs x].
@@ -422,6 +451,11 @@ theory GenericFloat
     is_finite (abs x) /\
     to_real (abs x) = Abs.abs (to_real x) /\
     is_positive (abs x)
+
+  lemma abs_finite_rev: forall x:t [abs x].
+    is_finite (abs x) ->
+    is_finite x /\
+    to_real (abs x) = Abs.abs (to_real x)
 
   axiom abs_universal : forall x:t [abs x]. not (is_negative (abs x))
 
@@ -431,13 +465,24 @@ theory GenericFloat
     is_finite (fma m x y z) /\
     to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
 
+  lemma fma_finite_rev: forall m:mode, x y z:t [fma m x y z].
+    is_finite (fma m x y z) ->
+    is_finite x /\ is_finite y /\ is_finite z /\
+    no_overflow m (to_real x *. to_real y +. to_real z) /\
+    to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
+
   (* /!\ externalize square root? more generally, externalize any part
          that needs another theory ? /!\ *)
   use real.Square
 
   axiom sqrt_finite: forall m:mode, x:t [sqrt m x].
-    is_finite x -> x .>= zeroF ->
+    is_finite x -> to_real x >=. 0. ->
     is_finite (sqrt m x) /\
+    to_real (sqrt m x) = round m (Square.sqrt (to_real x))
+
+  lemma sqrt_finite_rev: forall m:mode, x:t [sqrt m x].
+    is_finite (sqrt m x) ->
+    is_finite x /\ to_real x >=. 0. /\
     to_real (sqrt m x) = round m (Square.sqrt (to_real x))
 
   predicate same_sign_real (x:t) (r:real) =
