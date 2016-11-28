@@ -119,6 +119,8 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
 
   syntax val is_msb_set "%1 & 0x80000000U"
 
+  syntax val count_leading_zeros "__builtin_clz(%1)"
+
 end
 
 

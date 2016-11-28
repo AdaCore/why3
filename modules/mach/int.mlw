@@ -250,6 +250,11 @@ module UInt32
   val predicate is_msb_set (x:uint32) : bool
     ensures { result <-> 2 * to_int x > max_uint32 }
 
+  val count_leading_zeros (x:uint32) : uint32
+    requires { to_int x > 0 }
+    ensures { (power 2 (to_int result)) * to_int x <= max_uint32 }
+    ensures { 2 * (power 2 (to_int result)) * to_int x > max_uint32 }
+    ensures { 0 <= to_int result < 32 }
 
 (*  use bv.BV32
 
