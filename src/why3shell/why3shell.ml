@@ -1,7 +1,7 @@
 
 (* TODO *)
 let proof_general = true
-
+(*
 module Unix_scheduler = struct
 
     (* the private list of functions to call on idle, sorted higher
@@ -35,10 +35,11 @@ module Unix_scheduler = struct
       timeout_handler := aux !timeout_handler
 
     (* public function to register a task to run on idle *)
-    let idle ~(prio:int) f = insert_idle_handler prio f
+    let idle ~(prio:int) (f: unit -> bool) : unit =
+      insert_idle_handler prio f
 
     (* public function to register a task to run on timeout *)
-    let timeout ~ms f =
+    let timeout ~(ms:int) (f: unit -> bool) : unit =
       assert (ms > 0);
       let ms = float ms /. 1000.0 in
       let time = Unix.gettimeofday () in
@@ -103,7 +104,7 @@ module Unix_scheduler = struct
        with Exit -> ()
 
 end
-
+*)
 
 
 (************************)
@@ -111,6 +112,7 @@ end
 (************************)
 
 open Why3
+open Unix_scheduler
 open Session_user_interface
 open Format
 
@@ -158,19 +160,19 @@ let return_prover fmt name =
 let cont =
   Session_user_interface.cont_from_files spec usage_str env files provers
 
-module C = Why3.Controller_itp.Make(Unix_scheduler)
+module C = Why3.Controller_itp.Make(Unix_Scheduler)
 
 let () = C.set_max_tasks (Whyconf.running_provers_max main)
 
 (* --  -- *)
 
 let test_idle fmt _args =
-  Unix_scheduler.idle
+  Unix_Scheduler.idle
     ~prio:0
     (fun () -> fprintf fmt "idle@."; false)
 
 let test_timeout fmt _args =
-  Unix_scheduler.timeout
+  Unix_Scheduler.timeout
     ~ms:1000
     (let c = ref 10 in
      fun () -> decr c;
@@ -694,4 +696,7 @@ let () =
   printf "Welcome to Why3 shell. Type '?' for help.@.";
   let chout = open_out "why3shell.out" in
   let fmt = if proof_general then formatter_of_out_channel stdout else formatter_of_out_channel chout in
-  Unix_scheduler.main_loop (interp chout fmt)
+()
+(* TODO cant work like this anymore
+  Unix_Scheduler.main_loop (interp chout fmt)
+*)

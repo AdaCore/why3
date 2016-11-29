@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Why3
+open Itp_server
 
 type t =
     { mutable window_width : int;
@@ -31,9 +32,9 @@ type t =
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;
-      mutable env : Why3.Env.env;
+(*      mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
-      original_config : Whyconf.config;
+      original_config : Whyconf.config;*)
       (* mutable altern_provers : prover option Mprover.t; *)
       (* mutable replace_prover : conf_replace_prover; *)
       mutable hidden_provers : string list;
@@ -43,18 +44,23 @@ type t =
       mutable session_cntexample : bool;
     }
 
-val load_config : Whyconf.config -> Whyconf.config -> Why3.Env.env -> unit
+val load_config : infos -> t
 (** [load_config config original_config env] creates and saves IDE config *)
 
-val init : unit -> unit
+val default_config: t
+(** Used as an empty initial config. Should be removed TODO *)
 
+val init : t -> string -> unit
+
+(*
 val save_config : unit -> unit
+*)
 
-val config : unit -> t
+val config : t -> t -> unit
 (** [config ()] raise [invalid_arg "configuration not yet loaded"]
     if load_config is not called *)
 
-val get_main : unit -> Whyconf.main
+(* val get_main : unit -> Whyconf.main *)
 
 (*******************)
 (*   font size     *)
@@ -62,9 +68,9 @@ val get_main : unit -> Whyconf.main
 
 val add_modifiable_sans_font_view : GObj.misc_ops -> unit
 val add_modifiable_mono_font_view : GObj.misc_ops -> unit
-val enlarge_fonts : unit -> unit
-val reduce_fonts : unit -> unit
-val set_fonts : unit -> unit
+val enlarge_fonts : t -> unit
+val reduce_fonts : t -> unit
+val set_fonts : t -> unit
 
 (*****************)
 (* images, icons *)
@@ -113,10 +119,16 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 
 val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
-val preferences : t -> unit
+(* TODO
+val preferences : string ->
+           Why3.Whyconf.config_prover Why3.Whyconf.Mprover.t ->
+           Why3.Whyconf.config_editor Why3.Whyconf.Meditor.t -> t -> unit
+*)
 
+(*
 val uninstalled_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+*)
 
 (*
 val unknown_prover :

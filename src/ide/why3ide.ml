@@ -1,4 +1,5 @@
 
+(*
 open Format
 open Why3
 open Gconfig
@@ -7,54 +8,73 @@ open Session_itp
 open Controller_itp
 open Session_user_interface
 open Historic
+*)
+
+open Why3
+open Itp_server
+open Gconfig
+open Session_user_interface.Historic
+open Stdlib
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
 let debug = Debug.lookup_flag "ide_info"
 
-(************************)
-(* parsing command line *)
-(************************)
+module Server = Make (Protocol.Protocol_why3ide)
 
-let files = Queue.create ()
-let opt_parser = ref None
+module type Protocol = sig
 
-let spec = Arg.align [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
+  val send_request: ide_request -> unit
+  val get_notified: unit -> notification list
+
+end
+
+module Make (P: Protocol) = struct
+
+(* TODO add at end *)
+(*  let treat_notifications () = ?????
+  let treat_user_inputs () = ?????
+
+  let _ = Unix_Scheduler.idle ~prio:1 treat_notifications
+  let _ = Unix_Scheduler.idle ~prio:1 treat_user_interface
 *)
-  Termcode.arg_extra_expl_prefix
-]
+(* TODO adapt the rest *)
 
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]..."
-  (Filename.basename Sys.argv.(0))
+(* Global initialization has not yet been done *)
+let is_init = ref false
+(* Initial config is empty *)
+(* TODO *)
+let gconfig = Gconfig.default_config
+let main_dir = ref ""
 
-let gconfig = try
-  let config, base_config, env =
-    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
-  if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
-  Gconfig.load_config config base_config env;
-  Gconfig.config ()
+(* TODO temp globals *)
+let provers_list = ref []
+let transformation_list = ref []
+let strategy_list = ref []
+let commands : string list ref = ref []
 
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "%a@." Exn_printer.exn_printer e;
-    exit 1
+(* -------------- Library -------------------- *)
 
+(* TODO
+let _ =
+  let treat_user_inputs () =
+  (* Before accepting user inputs, open a file *)
+  (* TODO right now the server initialize by default
+     P.send_requests (Init usage_str spec)*)
+    let l = P.get_notified () in
+    treat_requests init l
+*)
+
+(*
 let task_driver =
   let main = Whyconf.get_main gconfig.config in
   let d = Filename.concat (Whyconf.datadir main)
                           (Filename.concat "drivers" "why3_itp.drv")
   in
   Driver.load_driver gconfig.env d []
+*)
 
-
+(*
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers gconfig.config
 
@@ -64,12 +84,7 @@ let cont =
   with e ->
        eprintf "%a@." Exn_printer.exn_printer e;
        exit 1
-
-let () =
-  Debug.dprintf debug "[GUI] Init the GTK interface...@?";
-  ignore (GtkMain.Main.init ());
-  Debug.dprintf debug " done.@.";
-  Gconfig.init ()
+*)
 
 
 (********************************)
@@ -77,8 +92,8 @@ let () =
 (********************************)
 
 let (why_lang, any_lang) =
-  let main = Whyconf.get_main gconfig.config in
-  let load_path = Filename.concat (Whyconf.datadir main) "lang" in
+(*  let main = Whyconf.get_main gconfig.config in*)
+  let load_path = Filename.concat !main_dir "lang" in
   let languages_manager =
     GSourceView2.source_language_manager ~default:true
   in
@@ -87,7 +102,7 @@ let (why_lang, any_lang) =
   let why_lang =
     match languages_manager#language "why3" with
     | None ->
-        eprintf "language file for 'why3' not found in directory %s@."
+        Format.eprintf "language file for 'why3' not found in directory %s@."
           load_path;
         exit 1
     | Some _ as l -> l in
@@ -166,14 +181,14 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
-    ~callback:(fun () -> Session_itp.save_session cont.controller_session)
+    ~callback:(fun () -> P.send_request (Save, ""))
 
 let (replay_menu_item : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
-    ~callback:(exit_function ~destroy:false)
+    ~callback:(fun x -> exit_function ~destroy:false x; P.send_request (Exit, ""))
 
 
 (* 1.2 "View" menu
@@ -298,7 +313,7 @@ let message_zone =
     ~packing:sv#add ()
 
 (**** Monitor *****)
-
+(* TODO
 let fan n =
   match n mod 4 with
     | 0 -> "|"
@@ -315,7 +330,7 @@ let update_monitor =
   let f = if r=0 then "  " else fan (!c / 2) ^ " " in
   monitor#set_text
     (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
-
+*)
 
 (****************************)
 (* command entry completion *)
@@ -341,19 +356,21 @@ let match_function s iter =
     true
   with Not_found -> false
 
-let init_comp cont =
+let init_comp () =
   (* add the names of all the the transformations *)
-  List.iter add_completion_entry (Trans.list_trans ());
+  List.iter add_completion_entry !transformation_list;
   (* add the name of the commands *)
-  List.iter (fun (c,_,_) -> add_completion_entry c)
-    Session_user_interface.commands;
+(*  List.iter (fun (c,_,_) -> add_completion_entry c)
+    !commands; (* TODO re-add commands *)*)
   (* todo: add queries *)
 
   (* add provers *)
+  List.iter add_completion_entry !provers_list;
+(*
   Whyconf.Hprover.iter
       (fun p _ -> add_completion_entry (p.Whyconf.prover_name^","^p.Whyconf.prover_version))
       cont.controller_provers;
-
+*)
   add_completion_entry "auto";
   add_completion_entry "auto 2";
 
@@ -400,7 +417,7 @@ let _ =
 (* controller instance on the GTK scheduler *)
 (********************************************)
 
-
+(*
 module S = struct
     let idle ~prio f =
       let (_ : GMain.Idle.id) = GMain.Idle.add ~prio f in ()
@@ -411,24 +428,21 @@ module S = struct
 end
 
 module C = Controller_itp.Make(S)
-
-let () =
-  let n = gconfig.session_nb_processes in
-  Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
-  C.set_max_tasks n;
-  C.register_observer update_monitor
+*)
 
 let (_ : GtkSignal.id) =
   replay_menu_item#connect#activate
     ~callback:(fun () ->
-               let callback = C.replay_print in
-               C.replay ~use_steps:false cont ~callback ~remove_obsolete:false)
+               (*let callback = C.replay_print in*)
+               P.send_request (Replay, ""))
+(*C.replay ~use_steps:false cont ~callback ~remove_obsolete:false)*)
 
+let tree = ref (Node ("", "", Root, {proved = false; name= ""}, []))
 
 (***********************************)
 (* Mapping session to the GTK tree *)
 (***********************************)
-
+(*
 type index =
   | Inone
   | IproofAttempt of proofAttemptID
@@ -455,12 +469,24 @@ let row_from_th   th   = Ident.Hid.find th_id_to_gtree (theory_name th)
 let row_from_pn   pn   = Hpn.find pn_id_to_gtree pn
 let row_from_tn   tn   = Htn.find tn_id_to_gtree tn
 let row_from_pan  pan  = Hpan.find pan_id_to_gtree pan
+*)
+
+let model_node: node_ID Hint.t = Stdlib.Hint.create 17
+
+let node_from_iter iter =
+  let index = goals_model#get ~row:iter ~column:index_column in
+  Hint.find model_node index
+
+let iter_node: GTree.row_reference Hstr.t = Stdlib.Hstr.create 17
+
+let row_ref_from_node node =
+  Hstr.find iter_node node
 
 let new_node =
   let cpt = ref (-1) in
-  fun ?parent ?(collapse=false) name ind ->
+  fun ?parent ?(collapse=false) name (ind: node_ID) ->
   incr cpt;
-  Hint.add model_index !cpt ind;
+  Hint.add model_node !cpt ind;
   let parent = Opt.map (fun x -> x#iter) parent in
   let iter = goals_model#append ?parent () in
   goals_model#set ~row:iter ~column:name_column name;
@@ -469,6 +495,8 @@ let new_node =
   (* By default expand_path when creating a new node *)
   if not collapse then goals_view#expand_to_path (goals_model#get_path iter);
   begin
+(* TODO reverse hashtable necessary ? *)
+    (*
     match ind with
     | IproofAttempt panid ->
        Hpan.add pan_id_to_gtree panid new_ref
@@ -481,6 +509,7 @@ let new_node =
     | Itheory th ->
       Ident.Hid.add th_id_to_gtree (theory_name th) new_ref
     | Inone -> ()
+     *)
   end;
   new_ref
 
@@ -508,29 +537,22 @@ let image_of_result ~obsolete rOpt =
     | Call_provers.HighFailure ->
       if obsolete then !image_failure_obs else !image_failure
 
-let set_status_column_from_cont cont iter =
-  let index = get_index iter in
-  let image = match index with
-    | Inone -> assert false
-    | IproofAttempt panid ->
-      let pa = get_proof_attempt_node cont.controller_session panid in
-      image_of_result ~obsolete:pa.proof_obsolete pa.Session_itp.proof_state
-    | IproofNode pn ->
-      if pn_proved cont pn
-      then !image_valid
-      else !image_unknown
-    | Itransformation tn -> if tn_proved cont tn
-      then !image_valid
-      else !image_unknown
-    | Ifile file -> if file_proved cont file
-      then !image_valid
-      else !image_unknown
-    | Itheory th -> if th_proved cont th
-      then !image_valid
-      else !image_unknown
+let get_type_info (n: node_ID) (t: session_tree): node_type * node_info =
+  (* TODO parcours du tree pour obtenir le type et l'info *)
+  Obj.magic "TODO"
+
+let set_status_column_from_cont iter =
+  let node_ID = node_from_iter iter in
+  let _, info = get_type_info node_ID !tree in
+  let image =
+    if info.proved then
+      !image_valid
+    else
+      !image_unknown
   in
   goals_model#set ~row:iter ~column:status_column image
 
+(*
 let build_subtree_proof_attempt_from_goal cont row_ref id =
   Whyconf.Hprover.iter
     (fun pa panid ->
@@ -564,7 +586,16 @@ and build_subtree_from_trans cont goal_row_reference trans_id =
       (build_subtree_from_goal cont row_ref goal_id))
     (get_sub_tasks ses trans_id);
   row_ref
+*)
 
+let rec build_tree_from_session ?parent (t: session_tree) =
+  match t with
+  | Node (node_ID, pos_ID, node_type, node_info, subtree_list) ->
+    let row_ref = new_node ?parent:parent node_info.name node_ID in
+    set_status_column_from_cont row_ref#iter;
+    List.iter (build_tree_from_session ~parent:row_ref) subtree_list
+
+(*
 let build_tree_from_session cont =
   let ses = cont.controller_session in
   let files = get_files ses in
@@ -583,6 +614,7 @@ let build_tree_from_session cont =
                             (theory_goals th))
                  file.file_theories)
     files
+*)
 
 (*******************************)
 (* commands of the "View" menu *)
@@ -600,11 +632,11 @@ let (_ : GMenu.image_menu_item) =
 
 let (_ : GMenu.menu_item) =
   view_factory#add_item ~key:GdkKeysyms._plus
-    ~callback:enlarge_fonts "Enlarge font"
+    ~callback:(fun _ -> enlarge_fonts gconfig) "Enlarge font"
 
 let (_ : GMenu.menu_item) =
     view_factory#add_item ~key:GdkKeysyms._minus
-      ~callback:reduce_fonts "Reduce font"
+      ~callback:(fun _ -> reduce_fonts gconfig) "Reduce font"
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
@@ -614,12 +646,25 @@ let collapse_iter iter =
   let path = goals_model#get_path iter in
   goals_view#collapse_row path
 
+let get_node_row (n: node_ID) : GTree.row_reference = Obj.magic "TODO"
+
+let rec collapse_proven_tree (tree: session_tree) =
+  match tree with
+  | Node (node_ID, pos_ID, node_type, node_info, subtree_list) ->
+    if node_info.proved then
+      let row = get_node_row node_ID in
+      collapse_iter row#iter
+    else
+      List.iter collapse_proven_tree subtree_list
+
+(* TODO to remove
 let rec collapse_proven_goals_from_pn pn =
   match pn_proved cont pn with
   | true  -> collapse_iter (row_from_pn pn)#iter
   | false ->
     List.iter collapse_proven_goals_from_tn
       (get_transformations cont.controller_session pn)
+
 and collapse_proven_goals_from_tn tn =
   match tn_proved cont tn with
   | true  -> collapse_iter (row_from_tn tn)#iter
@@ -651,10 +696,11 @@ let collapse_proven_goals () =
   match goals_model#get_iter_first with
   | None -> ()
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
+*)
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
-    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_goals ()) ()
+    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_tree !tree) ()
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
@@ -663,7 +709,7 @@ let () =
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   task_view#source_buffer#set_language why_lang;
-  Gconfig.set_fonts ()
+  Gconfig.set_fonts gconfig
 
 (******************)
 (*    actions     *)
@@ -671,7 +717,7 @@ let () =
 
 (* TODO We currently use this for transformations etc... With strategies, we sure
    do not want to move the current index with the computing of strategy. *)
-let current_selected_index = ref Inone
+let current_selected_index = ref ""
 
 let image_of_pa_status ~obsolete pa_status =
   match pa_status with
@@ -685,7 +731,7 @@ let image_of_pa_status ~obsolete pa_status =
     | Controller_itp.Done r        -> image_of_result ~obsolete (Some r)
 
 let rec update_status_column_from_iter cont iter =
-  set_status_column_from_cont cont iter;
+  set_status_column_from_cont iter;
   match goals_model#iter_parent iter with
   | Some p -> update_status_column_from_iter cont p
   | None -> ()
@@ -709,6 +755,7 @@ let move_current_row_selection_down () =
   goals_view#selection#select_iter child
 
 (* Callback of a transformation *)
+(*
 let callback_update_tree_transform cont status =
   match status with
   | TSdone trans_id ->
@@ -733,7 +780,9 @@ let callback_update_tree_transform cont status =
       message_zone#buffer#set_text
         (Pp.sprintf "%a" (get_exception_message cont.controller_session id) e)
   | _ -> ()
+*)
 
+(*
 let rec apply_transform cont t args =
   match !current_selected_index with
   | IproofNode id ->
@@ -747,16 +796,27 @@ let rec apply_transform cont t args =
       Not_found -> printf "no goals to apply transform"
     end;
     apply_transform cont t args
+*)
 
-let go_to_nearest_unproven_goal_and_collapse pn =
+(* TODO this is from tree to tree *)
+(* TODO do this later
+let go_to_nearest_unproven_goal_and_collapse (t: session_tree) =
+  match t with
+  | Node (node_ID, pos_ID, node_type, node_info, subtree_list) ->
+    match node_type with
+    |
+*)
+(*
   begin match get_first_unproven_goal_around_pn cont pn with
     | Some next_pn ->
       goals_view#selection#select_iter (row_from_pn next_pn)#iter
     | None -> ()
   end;
   collapse_proven_goals ()
+*)
 
 (* Callback of a proof_attempt *)
+(*
 let callback_update_tree_proof cont panid pa_status =
   let ses = cont.controller_session in
   let pa = get_proof_attempt_node ses panid in
@@ -789,7 +849,9 @@ let callback_update_tree_proof cont panid pa_status =
   in
   goals_model#set ~row:r#iter ~column:status_column
     (image_of_pa_status ~obsolete pa_status)
+*)
 
+(*
 let test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
   let prover = p.Whyconf.prover in
   let callback = callback_update_tree_proof cont in
@@ -809,7 +871,9 @@ let test_schedule_proof_attempt cont (p: Whyconf.config_prover) limit =
   in
   List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback)
     (get_goals ())
+*)
 
+(*
 let run_strategy_on_task s =
   match !current_selected_index with
   | IproofNode id ->
@@ -834,9 +898,14 @@ let run_strategy_on_task s =
     | _ -> printf "Strategy '%s' not found@." s
      end
   | _ -> ()
+*)
 
 let clear_command_entry () = command_entry#set_text ""
 
+let current_node_ID () = !current_selected_index
+
+
+(*
 let interp cmd =
   let id =
     match !current_selected_index with
@@ -885,10 +954,14 @@ let interp cmd =
       end
   with e when not (Debug.test_flag Debug.stack_trace) ->
        message_zone#buffer#set_text (Pp.sprintf "anomaly: %a" Exn_printer.exn_printer e)
+*)
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
-    ~callback:(fun () -> add_command list_commands command_entry#text; interp command_entry#text)
+    ~callback:(fun () ->
+      add_command list_commands command_entry#text;
+      let node_ID = current_node_ID () in
+      P.send_request (Command command_entry#text, node_ID))
 
 
 let get_selected_row_references () =
@@ -896,6 +969,7 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
+(* TODO we now change it when notify
 let on_selected_row r =
   try
     let session_element = get_index r#iter in
@@ -913,22 +987,25 @@ let on_selected_row r =
     | _ -> task_view#source_buffer#set_text ""
   with
     | Not_found -> task_view#source_buffer#set_text ""
-
+*)
+(*
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     (fun () ->
       match get_selected_row_references () with
         | [r] -> on_selected_row r
         | _ -> ())
+*)
 
 (***********************)
 (* start the interface *)
 (***********************)
 
-let () =
-  build_tree_from_session cont;
+(* TODO after init this *)
+let init () =
+  build_tree_from_session !tree;
   (* temporary *)
-  init_comp cont;
+  init_comp ();
   vpan222#set_position 500;
   goals_view#expand_all ();
   main_window#add_accel_group accel_group;
@@ -936,3 +1013,113 @@ let () =
   message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
   main_window#show ();
   GMain.main ()
+
+exception Bad_initialization
+
+
+exception Disynchronized
+
+let change_row iter node_info : unit =
+  goals_model#set ~row:iter ~column:name_column node_info.name;
+  set_status_column_from_cont iter
+(*  goals_model#set ~row:iter ~column:status_column image*)
+
+(* TODO bad style on update_node functions *)
+let rec update_node genealogy node_ID node_info tree =
+  match tree, genealogy with
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), [] when cur_node_ID = node_ID ->
+    (let n = Node (cur_node_ID, cur_pos_ID, nt, node_info, subtree_list) in
+     let row = row_ref_from_node cur_node_ID in
+     change_row row#iter node_info;
+     n)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), [] when cur_node_ID != node_ID ->
+    (P.send_request (Get_Session_Tree, ""); raise Disynchronized)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), hd :: tl when hd != cur_pos_ID ->
+    Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list) (* TODO raise failed *)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), hd :: tl when hd = cur_pos_ID ->
+    Node (cur_node_ID, cur_pos_ID, nt, ni,
+          List.map (update_node tl node_ID node_info) subtree_list)
+  | t, _ -> t
+
+let rec update_subtree genealogy node_ID subtree tree =
+  match tree, genealogy with
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), [] when cur_node_ID = node_ID ->
+      Node (cur_node_ID, cur_pos_ID, nt, ni, subtree :: subtree_list)
+        (* TODO add side effect on goal view *)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), [] when cur_node_ID != node_ID ->
+    (P.send_request (Get_Session_Tree, ""); raise Disynchronized)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), hd :: tl when hd != cur_pos_ID ->
+    Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list) (* TODO raise failed *)
+  | Node (cur_node_ID, cur_pos_ID, nt, ni, subtree_list), hd :: tl when hd = cur_pos_ID ->
+    Node (cur_node_ID, cur_pos_ID, nt, ni,
+          List.map (update_subtree tl node_ID subtree) subtree_list)
+  | t, _ -> t
+
+let update_tree notification =
+  match notification with
+  | Node_change (node_ID, node_info) ->
+    let genealogy = Str.split (Str.regexp ".") node_ID in
+    (try tree := update_node genealogy node_ID node_info !tree with
+    | Disynchronized -> ())
+  | Session_Tree (session_tree) ->
+    tree := session_tree
+  | New_subtree (nid, subtree) ->
+    let genealogy = Str.split (Str.regexp ".") nid in
+    (try tree := update_subtree genealogy nid subtree !tree with
+    | Disynchronized -> ())
+  | _ -> ()
+
+
+let rec treat_notifs l =
+  if !is_init then
+    match l with
+    | [] -> ()
+    | Initialized _ :: tl ->
+      raise Bad_initialization
+    | Node_change (nid, node_info) :: tl ->
+      update_tree (Node_change (nid, node_info));
+      treat_notifs tl
+    | New_subtree (nid, subtree) :: tl ->
+      update_tree (New_subtree (nid, subtree));
+      treat_notifs tl
+    | Saved :: tl -> treat_notifs tl
+    | Remove nid :: tl -> update_tree (Remove nid); treat_notifs tl
+    | Error e :: tl -> failwith "TODO implement errors"
+    | Message s :: tl -> failwith "TODO implemenbt this"
+    | Session_Tree t :: tl -> update_tree (Session_Tree t)
+  else
+    match l with
+    | [] -> ()
+    | Initialized (infos, pl, trl, sl) :: tl ->
+      begin
+        try
+          (provers_list := pl;
+           transformation_list := trl;
+           strategy_list := sl;
+           is_init := true;
+           let nc = Gconfig.load_config infos in
+           Gconfig.config gconfig nc;
+           Debug.dprintf debug "[GUI] Init the GTK interface...@?";
+           ignore (GtkMain.Main.init ());
+           Debug.dprintf debug " done.@.";
+           Gconfig.init gconfig infos.main_dir;
+           main_dir := infos.main_dir;
+           treat_notifs tl
+          )
+        with e when not (Debug.test_flag Debug.stack_trace) ->
+          Format.eprintf "%a@." Exn_printer.exn_printer e;
+          exit 1
+      end
+    | _ :: tl -> treat_notifs tl
+
+
+let treat_notifications () : bool =
+  let l = P.get_notified () in
+  treat_notifs l;
+  true
+
+  let _ = Unix_scheduler.Unix_Scheduler.idle ~prio:1 treat_notifications
+
+end
+
+module IDE = Make (Protocol.Protocol_why3ide)

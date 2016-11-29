@@ -204,8 +204,9 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 	    mlw_main mlw_interp
 
 LIB_SESSION = compress xml termcode session session_itp unix_scheduler \
-              itp_server session_tools strategy strategy_parser \
-              controller_itp session_scheduler session_user_interface
+              session_tools strategy strategy_parser controller_itp \
+	      session_scheduler session_user_interface itp_server \
+	      protocol
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
