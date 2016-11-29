@@ -653,7 +653,7 @@ theory GenericFloat
   (** big floats are ints *)
   axiom big_float_is_int: forall m i.
     is_finite i ->
-    (i .<= (of_int m (- max_representable_integer)) /\
+    (i .<= (of_int m (- max_representable_integer)) \/
     (of_int m max_representable_integer) .<= i) ->
       is_int i
 
