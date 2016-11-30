@@ -69,20 +69,19 @@ type request_type =
 
 type ide_request = request_type * node_ID
 
-open Unix_scheduler
 open Session_itp
 open Controller_itp
 open Session_user_interface
 open Stdlib
-
-module C = Controller_itp.Make(Unix_Scheduler)
 
 module type Protocol = sig
   val get_requests : unit -> ide_request list
   val notify : notification -> unit
 end
 
-module Make (P:Protocol) = struct
+module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
+
+  module C = Controller_itp.Make(S)
 
   let debug = Debug.lookup_flag "ide_info" (* TODO register itp_server *)
 
@@ -507,7 +506,7 @@ exception Bad_prover_name of prover
     List.iter treat_request (P.get_requests ());
     true
 
-  let _ = Unix_Scheduler.idle ~prio:1 treat_requests
+  let _ = S.idle ~prio:1 treat_requests
 
 
 end

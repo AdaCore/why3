@@ -38,13 +38,21 @@ type error_notification =
 
 type notification =
   | Node_change    of node_ID * node_info
+  (* inform that the data of the given node changed *)
   | New_subtree    of node_ID * session_tree
+  (* the given node has a new child whose contents is the given tree *)
   | Remove         of node_ID
+  (* the given node was removed *)
   | Initialized    of infos * prover list * transformation list * strategy list
+  (* initial global data *)
   | Saved
+  (* the session was saved on disk *)
   | Session_Tree   of session_tree
+  (* the full session tree is sent *)
   | Error          of error_notification
+  (* an error occured *)
   | Message        of string
+  (* an informative message *)
 
 type request_type =
   | Command   of string
@@ -68,8 +76,10 @@ module type Protocol = sig
 
 end
 
-module Make (P:Protocol) : sig
+module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
-  val treat_requests: unit -> bool
+  val get_config: unit -> Whyconf.config
+
+  (* Nothing ! *)
 
 end
