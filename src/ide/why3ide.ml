@@ -905,7 +905,7 @@ let clear_command_entry () = command_entry#set_text ""
 let current_node_ID () = !current_selected_index
 
 
-(*
+(* TODO now split as notifications and inside session_user_interface
 let interp cmd =
   let id =
     match !current_selected_index with

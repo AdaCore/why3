@@ -4,68 +4,61 @@ open Call_provers
 type prover = string
 type transformation = string
 type strategy = string
-type infos =
-    {hidden_provers : string list;
-     session_time_limit : int;
-     session_mem_limit : int;
-     session_nb_processes : int;
-     session_cntexample : bool;
-     main_dir : string}
 
-(*
-     The question of maintaining the session tree (for the server and
-     the ide) is not clear: if we use "random" indices it will be
-     difficult to update a specific node.
 
-     The strategy we use is to have indices as strings instead of
-     ints and use a naming convention of the form index "0.0.n"
-     for the node ["0.0.n"] child of ["0.0"] child of ["0"]
-     child of "" the session.
-     We can then easily go to a specific node given its
-     index, it is stable under adding/moving/removing of subtree,
-     there is no restriction on the number of nodes, and it is easily
-     sendable through any protocol.
+type node_ID = int
+let root_node : node_ID = 0
 
-*)
-type node_ID = string
-type pos_ID = string
-let root_node = ""
+type node_type = NRoot | NFile | NTheory | NTransformation | NGoal | NProofAttempt of bool
 
-type node_type = Root | File | Theory | Transformation | Goal | ProofAttempt of bool
+type node_info =
+    {
+     proved : bool;
+     name   : string;
+    }
 
-type node_info = { proved : bool;
-                   name   : string }
+type global_information =
+    {
+     provers              : prover list;
+     transformations      : transformation list;
+     strategies           : strategy list;
+     (* hidden_provers       : string list; *)
+     (* session_time_limit   : int; *)
+     (* session_mem_limit    : int; *)
+     (* session_nb_processes : int; *)
+     (* session_cntexample   : bool; *)
+     (* main_dir             : string *)
+    }
 
-type session_tree =
-    Node of node_ID * pos_ID * node_type * node_info * session_tree list
-
-type error_notification =
+type message_notification =
   | Proof_error  of node_ID * string
   | Transf_error of node_ID * string
   | Strat_error  of node_ID * string
+  | Replay_Info  of string
+  | Query_Info   of node_ID * string
+  | Query_Error  of node_ID * string
+  | Help         of string
+  | Information  of string
 
 type notification =
   | Node_change    of node_ID * node_info
-  | New_subtree    of node_ID * session_tree
+  | New_node       of node_ID * node_ID * node_type * node_info
   | Remove         of node_ID
-(* TODO Implement informations *)
-  | Initialized    of infos * prover list * transformation list * strategy list
+  | Initialized    of global_information
   | Saved
-  | Session_Tree   of session_tree
-  | Error          of error_notification
-  | Message        of string
+  | Message        of message_notification
 
 type request_type =
-  | Command   of string
-  | Prove     of prover * resource_limit
-  | Transform of transformation * string list
-  | Strategy  of strategy
-  | Open      of string
-  | Get_Session_Tree
-  | Save
-  | Reload
-  | Replay
-  | Exit
+  | Command_req   of string
+  | Prove_req     of prover * resource_limit
+  | Transform_req of transformation * string list
+  | Strategy_req  of strategy
+  | Open_req      of string
+  | Get_Session_Tree_req
+  | Save_req
+  | Reload_req
+  | Replay_req
+  | Exit_req
 
 type ide_request = request_type * node_ID
 
@@ -83,7 +76,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
-  let debug = Debug.lookup_flag "ide_info" (* TODO register itp_server *)
+  let debug = Debug.register_flag "itp_server"
 
   (************************)
   (* parsing command line *)
@@ -109,41 +102,53 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       "Usage: %s [options] [<file.why>|<project directory>]..."
       (Filename.basename Sys.argv.(0))
 
-  let config, base_config, env =
+  let config, _base_config, env =
     let c, b, e =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
     c, b, e
 
-  let task_driver =
-    let main = Whyconf.get_main config in
-    let d = Filename.concat (Whyconf.datadir main)
-        (Filename.concat "drivers" "why3_itp.drv")
-    in
-    Driver.load_driver env d []
+  let get_config () = config
 
   let provers : Whyconf.config_prover Whyconf.Mprover.t =
     Whyconf.get_provers config
 
-(* TODO to be done. *)
-  let get_prover_list () =
-    []
+  let get_prover_list (config: Whyconf.config) =
+    Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
 
-  let get_transformation_list () =
-    []
-
-  let get_strategies_list () =
-    []
-
-  let prover_list: prover list = get_prover_list ()
-  let transformation_list: transformation list = get_transformation_list ()
-  let strategies_list: strategy list = get_strategies_list ()
+  let prover_list: prover list = get_prover_list config
+  let transformation_list: transformation list =
+    List.map fst (Session_user_interface.list_transforms ())
+  let strategies_list: strategy list = []
 
 (* TODO write this *)
-  let get_info_from_main () = Obj.magic "TODO"
+  let infos =
+    {
+     provers = prover_list;
+     transformations = transformation_list;
+     strategies = strategies_list
+   }
 
-  let infos = get_info_from_main ()
+(*
+  let get_global_information c =
+    {
+     provers = get_prover_list ();
+     transformations = get_transformation_list c;
+     strategies = get_strategies_list c;
+
+     hidden_provers = config.????
+     provers              : prover list;
+     transformations      : transformation list;
+     strategies           : strategy list;
+     hidden_provers       : string list;
+     session_time_limit   : int;
+     session_mem_limit    : int;
+     session_nb_processes : int;
+     session_cntexample   : bool;
+     main_dir             : string
+    }
+*)
 
   (* ------------ init controller ------------ *)
 
@@ -152,17 +157,11 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     try
       (let cont =
         Session_user_interface.cont_from_files spec usage_str env files provers in
-      P.notify (Initialized (infos, prover_list, transformation_list, strategies_list));
+      P.notify (Initialized infos);
       cont)
     with e ->
       Format.eprintf "%a@." Exn_printer.exn_printer e;
       exit 1
-
-  let () =
-    let n = infos.session_nb_processes in
-    Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
-    C.set_max_tasks n;
-(* TODO no monitor    C.register_observer update_monitor *)
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -178,39 +177,42 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | AFile file ->
         let name = file.file_name in
         let proved = file_proved cont file in
-        File, {name; proved}
+        NFile, {name; proved}
     | ATh th     ->
         let name = (theory_name th).Ident.id_string in
         let proved = th_proved cont th in
-        Theory, {name; proved}
+        NTheory, {name; proved}
     | ATn tn     ->
         let name = get_transf_name ses tn in
         let proved = tn_proved cont tn in
-        Transformation, {name; proved}
+        NTransformation, {name; proved}
     | APn pn     ->
         let name = (get_proof_name ses pn).Ident.id_string in
         let proved = pn_proved cont pn in
-          Goal, {name; proved}
+          NGoal, {name; proved}
     | APa pan    ->
         let pa = get_proof_attempt_node ses pan in
         let name = Pp.string_of Whyconf.print_prover pa.prover in
-        let proved = match pa.proof_state with
+        let proved = match pa.Session_itp.proof_state with
         | Some pr -> pr.pr_answer = Valid
         | None -> false
         in
-        (ProofAttempt pa.proof_obsolete), {name; proved}
+        (NProofAttempt pa.proof_obsolete), {name; proved}
 
-  let fresh_names = Hstr.create 17
+(* fresh gives new fresh "names" for node_ID using a counter.
+   reset resets the counter so that we can regenerate node_IDs as if session
+   was fresh *)
+  let reset, fresh =
+    let count = ref 0 in
+    (fun () ->
+      count := 0),
+    fun () ->
+      count := !count + 1;
+      !count
 
-  let fresh (parent: node_ID) =
-    let s = try (Hstr.find fresh_names parent) with | _ -> 0 in
-    let v = string_of_int s in
-    Hstr.add fresh_names parent (s + 1);
-    v
+  let model_any : any Hint.t = Hint.create 17
 
-  let model_any : any Hstr.t = Hstr.create 17
-
-  let any_from_node_ID (nid:node_ID) : any = Hstr.find model_any nid
+  let any_from_node_ID (nid:node_ID) : any = Hint.find model_any nid
 
   let pan_to_node_ID  : node_ID Hpan.t = Hpan.create 17
   let pn_to_node_ID   : node_ID Hpn.t = Hpn.create 17
@@ -223,6 +225,14 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let node_ID_from_tn   tn   = Htn.find tn_to_node_ID tn
   let node_ID_from_th   th   = Ident.Hid.find th_to_node_ID (theory_name th)
   let node_ID_from_file file = Hstr.find file_to_node_ID (file.file_name)
+
+  let node_ID_from_any  any  =
+    match any with
+    | AFile file -> node_ID_from_file file
+    | ATh th     -> node_ID_from_th th
+    | ATn tn     -> node_ID_from_tn tn
+    | APn pn     -> node_ID_from_pn pn
+    | APa pan    -> node_ID_from_pan pan
 
 (* TODO match this *)
 exception Bad_prover_name of prover
@@ -243,66 +253,30 @@ exception Bad_prover_name of prover
   (* create a new node in the_tree, update the tables and send a
      notification about it *)
   let new_node ~parent node : node_ID =
-    let pos_id = fresh parent in (* 0 is the root_node, the parent of the files *)
-    let new_id = parent ^ "." ^ pos_id in
-      Hstr.add model_any new_id node;
+    let new_id = fresh () in
+      Hint.add model_any new_id node;
       let ses = cont.controller_session in
       let typ, info = get_info_and_type ses node in
       add_node_to_table node new_id;
-      let subtree = Node (new_id, pos_id, typ, info, []) in
-      P.notify (New_subtree (parent, subtree));
+      P.notify (New_node (new_id, parent, typ, info));
       new_id
 
-  let pos_from_node (n: node_ID): pos_ID =
-    let l = Str.split (Str.regexp ".") n in
-    List.hd (List.rev l)
+  (* TODO this is a dummy constant for root content *)
+  let root_info = { proved = false; name = ""}
+  let root = Obj.magic "TODO" (* TODO do this *)
 
   (* ----------------- build tree from tables ----------------- *)
-  (* This returns the actual algebraic type we defined from the
-     hashtables containing node_ids. This suppose that init was
-     done before it *)
-(* TODO STACKOVERFLOW *)
-  let build_subtree_proof_attempt_from_goal ses id =
-    Whyconf.Hprover.fold
-      (fun _pa panid acc ->
-         let node_id = node_ID_from_pan panid in
-         let pos_id = pos_from_node node_id in
-         let node_type, node_info = get_info_and_type ses (APa panid) in
-         Node (node_id, pos_id, node_type, node_info, []):: acc)
-      (get_proof_attempt_ids cont.controller_session id) []
 
-  let rec build_subtree_from_goal ses id =
-    let nid = node_ID_from_pn id in
-    let pos_ID = pos_from_node nid in
-    let node_type, node_info = get_info_and_type ses (APn id) in
-    let l =
-      List.fold_left
-        (fun acc trans_id -> build_subtree_from_trans ses trans_id :: acc)
-        [] (get_transformations ses id) in
-    let l' = build_subtree_proof_attempt_from_goal ses id in
-    Node (nid, pos_ID, node_type, node_info, l @ l')
-
-  and build_subtree_from_trans ses trans_id =
-    let nid = node_ID_from_tn trans_id in
-    let pos_ID = pos_from_node nid in
-    let node_type, node_info = get_info_and_type ses (ATn trans_id) in
-    let l = List.fold_left
-      (fun acc goal_id -> build_subtree_from_goal ses goal_id :: acc)
-      [] (get_sub_tasks ses trans_id) in
-    Node (nid, pos_ID, node_type, node_info, l)
-
-  let build_subtree_from_theory ses th_id =
-    let nid = node_ID_from_th th_id in
-    let pos_ID = pos_from_node nid in
-    let node_type, node_info = get_info_and_type ses (ATh th_id) in
-    let l = List.fold_left (fun acc id -> build_subtree_from_goal ses id :: acc)
-      [] (theory_goals th_id) in
-    Node (nid, pos_ID, node_type, node_info, l)
-
-  (*  this does not actually compute the tree but generate its node_IDs *)
-  let build_the_tree () : session_tree =
+  (*
+     build_the_tree() returns the whole session tree as notifications beginning
+     with the notification corresponding to a "root node" creation (root of the
+     files)
+  *)
+(* TODO remove this unnecessary
+  let build_the_tree () : unit =
     let ses = cont.controller_session in
     let files = get_files ses in
+    P.notify (New_node (0, 0, Root, root_info));
     let l = Stdlib.Hstr.fold
       (fun _file_key file acc ->
          let file_node_ID = node_ID_from_file file in
@@ -312,44 +286,83 @@ exception Bad_prover_name of prover
                build_subtree_from_theory ses th :: acc) [] file.file_theories in
          Node (file_node_ID, pos_ID, node_type, node_info, l) :: acc
       ) files [] in
-    Node ("", "", Root, Obj.magic 1, l)
-
+*)
 
   (* ----------------- init the tree --------------------------- *)
-
-  let init_subtree_proof_attempt_from_goal parent id =
+  (* Iter on the session tree with a function [f parent current] with type
+     node_ID -> any -> unit *)
+  let iter_subtree_proof_attempt_from_goal
+    (f: parent:node_ID -> any -> unit) parent id =
     Whyconf.Hprover.iter
-      (fun _pa panid -> ignore (new_node ~parent (APa panid)))
+      (fun _pa panid -> f ~parent (APa panid))
       (get_proof_attempt_ids cont.controller_session id)
 
-  let rec init_subtree_from_goal parent id =
+  let rec iter_subtree_from_goal
+    (f: parent:node_ID -> any -> unit) parent id =
     let ses = cont.controller_session in
-    let nid = new_node ~parent (APn id) in
+    f ~parent (APn id);
+    let nid = node_ID_from_pn id in
     List.iter
-      (fun trans_id -> init_subtree_from_trans nid trans_id)
+      (fun trans_id -> iter_subtree_from_trans f nid trans_id)
       (get_transformations ses id);
-    init_subtree_proof_attempt_from_goal nid id
+    iter_subtree_proof_attempt_from_goal f nid id
 
-  and init_subtree_from_trans parent trans_id =
+  and iter_subtree_from_trans
+    (f: parent:node_ID -> any -> unit) parent trans_id =
     let ses = cont.controller_session in
-    let nid = new_node ~parent (ATn trans_id) in
+    f ~parent (ATn trans_id);
+    let nid = node_ID_from_tn trans_id in
     List.iter
-      (fun goal_id -> (init_subtree_from_goal nid goal_id))
+      (fun goal_id -> (iter_subtree_from_goal f nid goal_id))
       (get_sub_tasks ses trans_id)
 
-  (*  this does not actually compute the tree but generate its node_IDs *)
-  let init_the_tree () : unit =
+  let iter_subtree_from_theory
+    (f: parent:node_ID -> any -> unit) parent theory_id =
+    f ~parent (ATh theory_id);
+    let nid = node_ID_from_th theory_id in
+    List.iter (iter_subtree_from_goal f nid)
+               (theory_goals theory_id)
+
+  let iter_subtree_from_file
+    (f: parent:node_ID -> any -> unit) parent file =
+    f ~parent (AFile file);
+    let nid = node_ID_from_file file in
+    List.iter (iter_subtree_from_theory f nid)
+      file.file_theories
+
+  let iter_the_files (f: parent:node_ID -> any -> unit) parent : unit =
     let ses = cont.controller_session in
     let files = get_files ses in
     Stdlib.Hstr.iter
       (fun _ file ->
-         let file_node_ID = new_node root_node (AFile file) in
-         List.iter (fun th ->
-             let th_node_ID = new_node ~parent:file_node_ID (ATh th) in
-             List.iter (init_subtree_from_goal th_node_ID)
-               (theory_goals th))
-           file.file_theories)
+        iter_subtree_from_file f parent file)
       files
+
+  let _init_the_tree (): unit =
+    let f ~parent node_id = ignore (new_node ~parent node_id) in
+    iter_the_files f root
+
+  let init_and_send ~parent any =
+    let nid = new_node ~parent any in
+      let node_type, node_info =
+        get_info_and_type cont.controller_session any in
+      P.notify (New_node (nid, parent, node_type, node_info))
+
+  let init_and_send_subtree_from_trans parent trans_id : unit =
+    iter_subtree_from_trans init_and_send parent trans_id
+
+  let init_and_send_the_tree (): unit =
+    iter_the_files init_and_send root
+
+  let resend_the_tree (): unit =
+    let ses = cont.controller_session in
+    let send_node ~parent any =
+      let node_id = node_ID_from_any any in
+      let node_type, node_info = get_info_and_type ses any in
+      P.notify (New_node (node_id, parent, node_type, node_info)) in
+    P.notify (New_node (0, 0, NRoot, root_info));
+    iter_the_files send_node root
+
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
@@ -402,12 +415,12 @@ exception Bad_prover_name of prover
       let ses = cont.controller_session in
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
-      init_subtree_from_trans nid trans_id
+      init_and_send_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
       let msg =
         Pp.sprintf "%a" (get_exception_message cont.controller_session id) e
       in
-      P.notify (Error (Strat_error(node_ID_from_pn id, msg)))
+      P.notify (Message (Strat_error(node_ID_from_pn id, msg)))
     | _ -> ()
 
   let rec apply_transform nid t args =
@@ -453,7 +466,8 @@ exception Bad_prover_name of prover
 
   (* ----------------- Reload session ------------------- *)
   let clear_tables () : unit =
-    Hstr.clear model_any;
+    reset ();
+    Hint.clear model_any;
     Hpan.clear pan_to_node_ID;
     Hpn.clear pn_to_node_ID;
     Htn.clear tn_to_node_ID;
@@ -463,43 +477,46 @@ exception Bad_prover_name of prover
   let reload_session () : unit =
     clear_tables ();
     reload_files cont env ~use_shapes:true;
-    init_the_tree ()
+    init_and_send_the_tree ()
 
   let replay_session () : unit =
     clear_tables ();
+    let callback = fun lr ->
+      P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false cont ~callback:C.replay_print ~remove_obsolete:false
+    C.replay ~use_steps:false cont ~callback:callback ~remove_obsolete:false
 
   (* ----------------- treat_request -------------------- *)
 
   let rec treat_request (r,nid) = match r with
-    | Prove (p,limit)   -> schedule_proof_attempt nid (get_prover p) limit
-    | Transform (t, args) -> apply_transform nid t args
-    | Strategy st -> run_strategy_on_task nid st
-    | Save -> save_session ()
-    | Reload ->
-      begin
-        reload_session ();
-        P.notify (Session_Tree (build_the_tree ()))
-      end
-    | Get_Session_Tree -> P.notify (Session_Tree (build_the_tree ()))
-    | Replay -> replay_session (); P.notify (Session_Tree (build_the_tree ()))
-    | Command cmd ->
+    | Prove_req (p,limit)     -> schedule_proof_attempt nid (get_prover p) limit
+    | Transform_req (t, args) -> apply_transform nid t args
+    | Strategy_req st         -> run_strategy_on_task nid st
+    | Save_req                -> save_session ()
+    | Reload_req              -> reload_session ();
+    | Get_Session_Tree_req    -> resend_the_tree ()
+    | Replay_req              -> replay_session (); resend_the_tree ()
+    | Command_req cmd         ->
       begin
         match any_from_node_ID nid with
         | APn pn_id ->
           begin
-            match (interp cont (Some pn_id) cmd) with
-            | Transform (s,_t, args) -> treat_request (Transform (s, args), nid)
-            | Query s -> P.notify (Message s)
-            | Other (s, args) -> P.notify (Message "") (* TODO to be implemented *)
+            match (interp config cont (Some pn_id) cmd) with
+            | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
+            | Query s                 -> P.notify (Message (Query_Info (nid, s)))
+            | Prove (p, limit)        -> schedule_proof_attempt nid p limit
+            | Strategies st           -> run_strategy_on_task nid st
+            | Help_message s          -> P.notify (Message (Help s))
+            | QError s                -> P.notify (Message (Query_Error (nid, s)))
+            | Other (s, _args)        ->
+                P.notify (Message (Information ("Unknown command"^s)))
           end
-        | _ -> P.notify (Message "Should be on a proof node") (* TODO make it an error *)
+        | _ ->
+            P.notify (Message (Information "Should be done on a proof node"))
+            (* TODO make it an error *)
       end
-    | _ -> assert false
-(*    | Command cmd         ->
-      | Open file_name      ->
-      | Replay              -> *)
+    | Open_req _file_name     -> assert false (* Unsupported *)
+    | Exit_req                -> exit 0 (* TODO *)
 
 
   let treat_requests () : bool =

@@ -203,7 +203,9 @@ type report =
 (* Callback for the report printing of replay
    TODO to be removed when we have a better way to print the result of replay *)
 val replay_print:
-    (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list -> unit
+    Format.formatter ->
+      (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list ->
+        unit
 
 (* TODO replay for manual proofs ? *)
 val replay:

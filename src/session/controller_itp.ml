@@ -559,12 +559,12 @@ let print_report fmt (r: report) =
       Call_provers.print_prover_result new_r
 
 (* TODO to be removed when we have a better way to print *)
-let replay_print (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
+let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
     fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: %a@."
       (Obj.magic id) Whyconf.print_prover pr rl.Call_provers.limit_time print_report report
   in
-  Format.printf "%a@." (Pp.print_list Pp.newline pp_elem) lr
+  Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
 let replay ~remove_obsolete ~use_steps c ~callback =
 

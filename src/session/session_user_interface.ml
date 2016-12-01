@@ -245,17 +245,18 @@ let strategies env config =
 
 let sort_pair (x,_) (y,_) = String.compare x y
 
-let list_transforms _cont _args =
-  let l =
+let list_transforms () =
     List.rev_append
-    (List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ()))
-    (List.rev_append (Trans.list_transforms_with_args ()) (Trans.list_transforms_with_args_l ()))
-  in
+      (List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ()))
+      (List.rev_append (Trans.list_transforms_with_args ()) (Trans.list_transforms_with_args_l ()))
+
+let list_transforms_query _cont _args =
+  let l = list_transforms () in
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
   in
   Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
-               (List.sort sort_pair l)
+    (List.sort sort_pair l)
 
 let list_provers cont _args =
   let l =
@@ -316,7 +317,7 @@ type query =
 
 let commands =
   [
-    "list-transforms", "list available transformations", Qnotask list_transforms;
+    "list-transforms", "list available transformations", Qnotask list_transforms_query;
     "list-provers", "list available provers", Qnotask list_provers;
 (*
     "list-strategies", "list available strategies", list_strategies;
@@ -382,31 +383,162 @@ let split_args s =
     | [] -> "",[]
 
 type command =
-  | Transform of string * Trans.gentrans * string list
-  | Query of string
-  | Other of string * string list
+  | Transform    of string * Trans.gentrans * string list
+  | Prove        of Whyconf.config_prover * Call_provers.resource_limit
+  | Strategies   of string
+  | Help_message of string
+  | Query        of string
+  | QError       of string
+  | Other        of string * string list
 
-let interp cont id s =
+(********* Callbacks tools *******)
+
+(* Return the prover corresponding to given name. name is of the form
+  | name
+  | name, version
+  | name, altern
+  | name, version, altern *)
+let return_prover name config =
+  let fp = Whyconf.parse_filter_prover name in
+  (** all provers that have the name/version/altern name *)
+  let provers = Whyconf.filter_provers config fp in
+  if Whyconf.Mprover.is_empty provers then begin
+    (*Format.eprintf "Prover corresponding to %s has not been found@." name;*)
+    None
+  end else
+    Some (snd (Whyconf.Mprover.choose provers))
+
+(* Parses the Other command. If it fails to parse it, it answers None otherwise
+   it returns the config of the prover together with the ressource_limit *)
+let parse_prover_name config name args :
+  (Whyconf.config_prover * Call_provers.resource_limit) option =
+  let main = Whyconf.get_main config in
+  match (return_prover name config) with
+  | None -> None
+  | Some prover_config ->
+    begin
+      if (List.length args > 2) then None else
+      match args with
+      | [] ->
+        let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
+                                          limit_mem = Whyconf.memlimit main;
+                                          limit_steps = 0} in
+          Some (prover_config, default_limit)
+      | [timeout] -> Some (prover_config,
+                           Call_provers.{empty_limit with
+                                         limit_time = int_of_string timeout})
+      | [timeout; oom ] ->
+        Some (prover_config, Call_provers.{limit_time = int_of_string timeout;
+                                           limit_mem = int_of_string oom;
+                                           limit_steps = 0})
+      | _ -> None
+    end
+
+let interp_others config cmd args =
+  match parse_prover_name config cmd args with
+  | Some (prover_config, limit) ->
+      Prove (prover_config, limit)
+  | None ->
+      match cmd with
+      | "auto" ->
+          let s =
+            match args with
+            | "2"::_ -> "2"
+            | _ -> "1"
+          in
+          Strategies s
+      | "help" ->
+          let text = Pp.sprintf
+                          "Please type a command among the following (automatic completion available)@\n\
+                           @\n\
+                           @ <transformation name> [arguments]@\n\
+                           @ <prover name> [<time limit> [<mem limit>]]@\n\
+                           @ <query> [arguments]@\n\
+                           @ auto [auto level]@\n\
+                           @\n\
+                           Available queries are:@\n@[%a@]" help_on_queries ()
+          in
+          Help_message text
+      | _ ->
+          Other (cmd, args)
+
+let interp config cont id s =
   let cmd,args = split_args s in
   try
     let f = Stdlib.Hstr.find commands_table cmd in
     match f,id with
     | Qnotask f, _ -> Query (f cont args)
-    | Qtask _, None -> Query "please select a goal first"
+    | Qtask _, None -> QError "please select a goal first"
     | Qtask f, Some id ->
        let tables = match Session_itp.get_tables cont.Controller_itp.controller_session id with
        | None -> raise (Task.Bad_name_table "interp")
        | Some tables -> tables in
        let s = try Query (f cont tables args) with
-       | Undefined_id s -> Query ("No existing id corresponding to " ^ s)
-       | Number_of_arguments -> Query "Bad number of arguments"
+       | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
+       | Number_of_arguments -> QError "Bad number of arguments"
        in s
   with Not_found ->
     try
       let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
       Transform (cmd,t,args)
     with Trans.UnknownTrans _ ->
-      Other(cmd,args)
+      interp_others config cmd args
+
+(*
+let interp cont id cmd =
+  try
+  match interp cont id cmd with
+    | Transform(s,_t,args) ->
+       clear_command_entry ();
+       apply_transform cont s args
+    | Query s ->
+       clear_command_entry ();
+       message_zone#buffer#set_text s
+    | Other(s,args) ->
+      begin
+        match parse_prover_name gconfig.config s args with
+        | Some (prover_config, limit) ->
+          clear_command_entry ();
+Prove          test_schedule_proof_attempt cont prover_config limit
+        | None ->
+          match s with
+Strategies
+          | "auto" ->
+             let s =
+               match args with
+               | "2"::_ -> "2"
+               | _ -> "1"
+             in
+             clear_command_entry ();
+             run_strategy_on_task s
+          | "help" ->
+             clear_command_entry ();
+             let text = Pp.sprintf
+                          "Please type a command among the following (automatic completion available)@\n\
+                           @\n\
+                           @ <transformation name> [arguments]@\n\
+                           @ <prover name> [<time limit> [<mem limit>]]@\n\
+                           @ <query> [arguments]@\n\
+                           @ auto [auto level]@\n\
+                           @\n\
+                           Available queries are:@\n@[%a@]" help_on_queries ()
+             in
+             message_zone#buffer#set_text text
+          | _ ->
+             message_zone#buffer#set_text ("unknown command '"^s^"'")
+      end
+  with e when not (Debug.test_flag Debug.stack_trace) ->
+       message_zone#buffer#set_text (Pp.sprintf "anomaly: %a" Exn_printer.exn_printer e)
+
+*)
+
+
+
+
+
+
+
+
 
 
 (********* Callbacks tools *******)

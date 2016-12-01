@@ -1,4 +1,4 @@
-module Unix_Scheduler : sig
+module Unix_scheduler : sig
 
     val timeout: ms:int -> (unit -> bool) -> unit
     (** [timeout ~ms f] registers the function [f] as a function to be
