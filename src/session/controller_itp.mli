@@ -78,7 +78,8 @@ type controller = private
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller : Env.env -> Session_itp.session -> controller
+val create_controller: Env.env -> controller
+val init_controller: Session_itp.session -> controller -> unit
 
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool

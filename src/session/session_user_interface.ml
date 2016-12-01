@@ -1,10 +1,9 @@
-
 open Format
 open Session_itp
 open Controller_itp
 
 (* TODO: raise exceptions instead of using explicit eprintf/exit *)
-let cont_from_files spec usage_str env files provers =
+let cont_from_files cont spec usage_str env files provers =
   if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
   let fname = Queue.peek files in
   (* extract project directory, and create it if needed *)
@@ -35,25 +34,23 @@ let cont_from_files spec usage_str env files provers =
   let ses,use_shapes = load_session dir in
   eprintf "using shapes: %a@." pp_print_bool use_shapes;
   (* create the controller *)
-  let c = Controller_itp.create_controller env ses in
+  Controller_itp.init_controller ses cont;
  (* update the session *)
-  Controller_itp.reload_files c env ~use_shapes;
+  Controller_itp.reload_files cont env ~use_shapes;
   (* add files to controller *)
-  Queue.iter (fun fname -> Controller_itp.add_file c fname) files;
+  Queue.iter (fun fname -> Controller_itp.add_file cont fname) files;
   (* load provers drivers *)
   Whyconf.Mprover.iter
     (fun _ p ->
        try
          let d = Driver.load_driver env p.Whyconf.driver [] in
-         Whyconf.Hprover.add c.Controller_itp.controller_provers p.Whyconf.prover (p,d)
+         Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
        with e ->
          let p = p.Whyconf.prover in
          eprintf "Failed to load driver for %s %s: %a@."
            p.Whyconf.prover_name p.Whyconf.prover_version
            Exn_printer.exn_printer e)
-    provers;
-  (* return the controller *)
-  c
+    provers
 
 (**********************************)
 (* list unproven goal and related *)

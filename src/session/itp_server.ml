@@ -47,6 +47,7 @@ type notification =
   | Initialized    of global_information
   | Saved
   | Message        of message_notification
+  | Dead           of string
 
 type request_type =
   | Command_req   of string
@@ -102,11 +103,11 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       "Usage: %s [options] [<file.why>|<project directory>]..."
       (Filename.basename Sys.argv.(0))
 
+  (* Files are passed with request Open *)
   let config, _base_config, env =
     let c, b, e =
-      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+      Whyconf.Args.initialize [] (fun _ -> ()) ""
     in
-    if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
     c, b, e
 
   let get_config () = config
@@ -130,37 +131,26 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
      strategies = strategies_list
    }
 
-(*
-  let get_global_information c =
-    {
-     provers = get_prover_list ();
-     transformations = get_transformation_list c;
-     strategies = get_strategies_list c;
+  (* Controller is not initialized: we cannot process any request *)
+  let init_controller = ref false
 
-     hidden_provers = config.????
-     provers              : prover list;
-     transformations      : transformation list;
-     strategies           : strategy list;
-     hidden_provers       : string list;
-     session_time_limit   : int;
-     session_mem_limit    : int;
-     session_nb_processes : int;
-     session_cntexample   : bool;
-     main_dir             : string
-    }
-*)
+  (* Create_controller creates a dummy controller *)
+  let cont =
+    init_controller := false;
+    create_controller env
 
   (* ------------ init controller ------------ *)
 
-  (* TODO: find a way to init cont only when requested (Open file request is send) *)
-  let cont =
+  (* Init cont is called only when an Open is requested *)
+  let init_cont f =
+    Queue.add f files;
     try
-      (let cont =
-        Session_user_interface.cont_from_files spec usage_str env files provers in
-      P.notify (Initialized infos);
-      cont)
+      (Session_user_interface.cont_from_files cont spec usage_str env files provers;
+       init_controller := true;
+       P.notify (Initialized infos))
     with e ->
       Format.eprintf "%a@." Exn_printer.exn_printer e;
+      P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
       exit 1
 
   (* -----------------------------------   ------------------------------------- *)
@@ -515,7 +505,11 @@ exception Bad_prover_name of prover
             P.notify (Message (Information "Should be done on a proof node"))
             (* TODO make it an error *)
       end
-    | Open_req _file_name     -> assert false (* Unsupported *)
+    | Open_req file_name      ->
+        if !init_controller then
+          Controller_itp.add_file cont file_name
+        else
+          init_cont file_name
     | Exit_req                -> exit 0 (* TODO *)
 
 

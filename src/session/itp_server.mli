@@ -53,6 +53,8 @@ type notification =
   (* the session was saved on disk *)
   | Message        of message_notification
   (* an informative message, can be an error message *)
+  | Dead           of string
+  (* server exited *)
 
 type request_type =
   | Command_req   of string

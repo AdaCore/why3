@@ -59,7 +59,7 @@ type proof_state = {
     pn_state : bool Hpn.t;
   }
 
-let init_proof_state _ses =
+let init_proof_state () =
   {th_state = Hid.create 7;
    tn_state = Htn.create 42;
    pn_state = Hpn.create 42}
@@ -71,12 +71,15 @@ type controller =
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-let create_controller env s = {
-    controller_session = s;
-    proof_state = init_proof_state s;
+let create_controller env = {
+    controller_session = Session_itp.dummy_session;
+    proof_state = init_proof_state ();
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
 }
+
+let init_controller s c =
+  c.controller_session <- s
 
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
 let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
