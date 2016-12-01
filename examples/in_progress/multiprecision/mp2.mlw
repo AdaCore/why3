@@ -2337,6 +2337,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   = l2i ul + radix * (l2i um + radix * l2i uh) }
     returns { _q, rl, rh -> 0 <= l2i rl + radix * l2i rh < l2i dl + radix * l2i dh }
   =
+    let ghost d = l2i dl + radix * l2i dh in
+    let ghost u = l2i ul + radix * (l2i um + radix * l2i uh) in
     let zero = Limb.of_int 0 in
     let one = Limb.of_int 1 in
     let q1 = ref zero in
@@ -2344,23 +2346,42 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let r1 = ref zero in
     let l,h = mul_double v uh in
     let sl, c = add_with_carry um l zero in
-    let sh, c = add_with_carry uh h c in
+    let sh, c' = add_with_carry uh h c in
+    assert { l2i sl + radix * l2i sh + radix * radix * l2i c'
+             = l2i um + radix * l2i uh + l2i v * l2i uh }
+    assert { c' = 0 };
     q1 := sh;
+    let ghost q0 = l2i sl in
+    let ghost cq = l2i !q1 + 1 in (*candidate quotient*)
+    q1 := add_mod !q1 one;
+    assert { l2i !q1 = mod cq radix };
     let p = mul_mod dh sh in
     r1 := sub_mod uh p;
+    let ghost a = div (l2i uh - l2i dh * l2i sh) radix in
+    assert { l2i !r1 = a * radix + mod (l2i uh - l2i dh * l2i sh) radix };
     let tl, th = mul_double sh dl in
     let il, b = sub_with_borrow ul tl zero in
-    let ih, _ = sub_with_borrow !r1 th b in
-    let bl,b' = sub_with_borrow il dl zero in
-    let bh, _ = sub_with_borrow ih dh b' in
+    let ih, b' = sub_with_borrow !r1 th b in
+    assert { l2i il + radix * l2i ih - radix * radix * l2i b'
+             = l2i ul + radix * l2i !r1 - l2i sh * l2i dl }
+    assert { l2i b' = 0 };
+    let bl,b2 = sub_with_borrow il dl zero in
+    let bh, b2' = sub_with_borrow ih dh b2 in
+    assert { l2i bl + radix * l2i bh - radix * radix * l2i b2'
+             = l2i il + radix * l2i ih - l2i dl - radix * l2i dh };
+    assert { b2' = 0 };
     r1 := bh;
     r0 := bl;
-    q1 := add_mod !q1 one;
+    let ghost cr = u - d * cq in
+    assert { (l2i !r0 + radix * l2i !r1) = mod cr(radix * radix) };
+    let ghost m = max (radix * radix - d) (q0 * radix) in
+    assert { (* Theorem 3 of Moller&Granlund 2010 *)
+             m - radix * radix <= cr < c };
     if Limb.(>=) !r1 sl
     then begin
       q1 := sub_mod !q1 one;
       let sl, c = add_with_carry !r0 dl zero in
-      let sh, _ = add_with_carry !r1 dh c in
+      let sh, _c = add_with_carry !r1 dh c in
       r1 := sh;
       r0 := sl;
     end;
