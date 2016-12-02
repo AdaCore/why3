@@ -77,7 +77,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
-  let debug = Debug.register_flag "itp_server"
+  let _debug = Debug.register_flag "itp_server"
 
   (************************)
   (* parsing command line *)

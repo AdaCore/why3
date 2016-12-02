@@ -21,8 +21,6 @@ open Printer
 open Theory
 open Task
 
-open Args_wrapper
-
 (* Labels and locations can be printed by setting the appropriate flags *)
 let debug_print_labels = Debug.register_info_flag "print_labels"
   ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
@@ -387,7 +385,7 @@ let print_qt tables fmt th =
     (print_list (constant_string ".") string) th.th_path
     (print_th tables) th
 
-let print_tdecl tables fmt td = match td.td_node with
+let _print_tdecl tables fmt td = match td.td_node with
   | Decl d ->
       fprintf fmt "%a@\n" (print_decl tables) d
   | Use th ->

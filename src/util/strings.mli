@@ -17,6 +17,7 @@ val create : int -> string
 val copy : string -> string
 val set : string -> int -> char -> unit
 
+val lowercase : string -> string
 val capitalize : string -> string
 val uncapitalize : string -> string
 

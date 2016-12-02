@@ -737,6 +737,53 @@ endif
 
 
 ###############
+# WEBSERV
+###############
+
+WEBSERV_FILES = unix_scheduler wserver why3web
+
+WEBSERVMODULES = $(addprefix src/ide/, $(WEBSERV_FILES))
+
+WEBSERVDEP = $(addsuffix .dep, $(WEBSERVMODULES))
+WEBSERVCMO = $(addsuffix .cmo, $(WEBSERVMODULES))
+WEBSERVCMX = $(addsuffix .cmx, $(WEBSERVMODULES))
+
+$(WEBSERVDEP): DEPFLAGS += -I src/ide
+$(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3webserver.byte
+opt:  bin/why3webserver.opt
+
+bin/why3webserver.opt: lib/why3/why3.cmxa $(WEBSERVCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3webserver.byte: lib/why3/why3.cma $(WEBSERVCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(WEBSERVDEP)
+endif
+
+depend: $(WEBSERVDEP)
+
+CLEANDIRS += src/ide
+
+clean_old_install::
+	rm -f $(BINDIR)/why3webserver$(EXE)
+
+install_no_local::
+	$(INSTALL) bin/why3webserver.@OCAMLBEST@ $(TOOLDIR)/why3webserver$(EXE)
+
+install_local:: bin/why3webserver
+
+
+###############
 # Session
 ###############
 
