@@ -11,7 +11,7 @@
 
 open Why3
 open Rc
-open Itp_server
+open Whyconf
 
 let debug = Debug.register_info_flag "ide_info"
   ~desc:"Print@ why3ide@ debugging@ messages."
@@ -51,9 +51,8 @@ type t =
       mutable error_color : string;
       mutable iconset : string;
       (** colors *)
-(*      mutable env : Env.env;
       mutable config : Whyconf.config;
-      original_config : Whyconf.config;*)
+      original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
       (* mutable replace_prover : conf_replace_prover; *)
       (* hidden prover buttons *)
@@ -177,9 +176,9 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
-let load_config (infos: infos) =
-(*  let main = get_main config in*)
-  let ide  = match None (* TODO  Whyconf.get_section config "ide" *) with
+let load_config config original_config =
+  let main = get_main config in
+  let ide  = match Whyconf.get_section config "ide" with
     | None -> default_ide
     | Some s -> load_ide s
   in
@@ -204,71 +203,70 @@ let load_config (infos: infos) =
     iconset = ide.ide_iconset;
     default_prover = ide.ide_default_prover;
     default_editor = ide.ide_default_editor;
-(*    config         = config;*)
-(*    original_config = original_config;
-    env            = env; *)
+    config         = config;
+    original_config = original_config;
     hidden_provers = ide.ide_hidden_provers;
-    session_time_limit = infos.session_time_limit;
-    session_mem_limit = infos.session_mem_limit;
-    session_nb_processes = infos.session_nb_processes;
-    session_cntexample = infos.session_cntexample;
-  }
+    session_time_limit = Whyconf.timelimit main;
+    session_mem_limit = Whyconf.memlimit main;
+    session_nb_processes = Whyconf.running_provers_max main;
+    session_cntexample = Whyconf.cntexample main;
+}
 
-let default_config = load_config
-    {hidden_provers = [];
-     session_time_limit = 5;
-     session_mem_limit = 1000;
-     session_nb_processes = 1;
-     session_cntexample = false;
-     main_dir = ""}
+let save_config t =
+  Debug.dprintf debug "[GUI config] saving IDE config file@.";
+  (* taking original config, without the extra_config *)
+  let config = t.original_config in
+  (* copy possibly modified settings to original config *)
+  let new_main = Whyconf.get_main t.config in
+  let time = Whyconf.timelimit new_main in
+  let mem = Whyconf.memlimit new_main in
+  let nb = Whyconf.running_provers_max new_main in
+  let config = set_main config (set_limits (get_main config) time mem nb) in
+  let new_main = Whyconf.get_main t.config in
+  let cntexample = Whyconf.cntexample new_main in
+  let config = set_main config (set_cntexample (get_main config) cntexample) in
+  (* copy also provers section since it may have changed (the editor
+     can be set via the preferences dialog) *)
+  let config = set_provers config (get_provers t.config) in
+  (* copy also the possibly changed policies *)
+  let config = set_policies config (get_policies t.config) in
+  let ide = empty_section in
+  let ide = set_int ide "window_height" t.window_height in
+  let ide = set_int ide "window_width" t.window_width in
+  let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "current_tab" t.current_tab in
+  let ide = set_int ide "font_size" t.font_size in
+  let ide = set_int ide "verbose" t.verbose in
+  let ide = set_bool ide "intro_premises" t.intro_premises in
+  let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_locs" t.show_locs in
+  let ide = set_bool ide "print_time_limit" t.show_time_limit in
+  let ide = set_int ide "max_boxes" t.max_boxes in
+  let ide = set_int ide "saving_policy" t.saving_policy in
+  let ide = set_string ide "premise_color" t.premise_color in
+  let ide = set_string ide "neg_premise_color" t.neg_premise_color in
+  let ide = set_string ide "goal_color" t.goal_color in
+  let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "iconset" t.iconset in
+  let ide = set_string ide "default_prover" t.default_prover in
+  let ide = set_string ide "default_editor" t.default_editor in
+  let ide = set_stringl ide "hidden_prover" t.hidden_provers in
+  let config = Whyconf.set_section config "ide" ide in
+  Whyconf.save_config config
 
-let update_config former_config new_config =
-  former_config.window_height        <- new_config.window_height;
-  former_config.window_width         <- new_config.window_width;
-  former_config.tree_width           <- new_config.tree_width;
-  former_config.current_tab          <- new_config.current_tab;
-  former_config.font_size            <- new_config.font_size;
-  former_config.verbose              <- new_config.verbose;
-  former_config.intro_premises       <- new_config.intro_premises ;
-  former_config.show_labels          <- new_config.show_labels ;
-  former_config.show_locs            <- new_config.show_locs ;
-  former_config.show_time_limit      <- new_config.show_time_limit;
-  former_config.max_boxes            <- new_config.max_boxes;
-  former_config.saving_policy        <- new_config.saving_policy ;
-  former_config.premise_color        <- new_config.premise_color;
-  former_config.neg_premise_color    <- new_config.neg_premise_color;
-  former_config.goal_color           <- new_config.goal_color;
-  former_config.error_color          <- new_config.error_color;
-  former_config.iconset              <- new_config.iconset;
-  former_config.default_prover       <- new_config.default_prover;
-  former_config.default_editor       <- new_config.default_editor;
-(*    config                         <- config;*)
-(*    original_config                <- original_config;
-      env                            <- env; *)
-  former_config.hidden_provers       <- new_config.hidden_provers;
-  former_config.session_time_limit   <- new_config.session_time_limit;
-  former_config.session_mem_limit    <- new_config.session_mem_limit;
-  former_config.session_nb_processes <- new_config.session_nb_processes;
-  former_config.session_cntexample   <- new_config.session_cntexample
-
-(* TODO change it to allow the error case. As it was beforre *)
 let config,load_config =
-  (*let config = ref default_config in*)
-  (fun former_config new_config ->
-    update_config former_config new_config
-(*match config with
+  let config = ref None in
+  (fun () ->
+    match !config with
       | None -> invalid_arg "configuration not yet loaded"
-      | Some conf -> conf*)),
-  (fun infos ->
-    load_config infos)
+      | Some conf -> conf),
+  (fun conf base_conf ->
+    let c = load_config conf base_conf in
+    config := Some c)
 
-(*
 let save_config () = save_config (config ())
-*)
 
-(*
 let get_main () = (get_main (config ()).config)
-*)
 
 (*
 
@@ -302,17 +300,17 @@ let change_font size =
   List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
 
-let incr_font_size c n =
-  (*let c = config () in*)
+let incr_font_size n =
+  let c = config () in
   let s = max (c.font_size + n) 4 in
   c.font_size <- s;
   s
 
-let enlarge_fonts c = change_font (incr_font_size c 1)
+let enlarge_fonts () = change_font (incr_font_size 1)
 
-let reduce_fonts c = change_font (incr_font_size c (-1))
+let reduce_fonts () = change_font (incr_font_size (-1))
 
-let set_fonts c = change_font (incr_font_size c 0)
+let set_fonts () = change_font (incr_font_size 0)
 
 (*
 
@@ -356,9 +354,10 @@ let image_cleaning = ref !image_default
 
 let why_icon = ref !image_default
 
-let image main_dir ?size f =
+let image ?size f =
+  let main = get_main () in
   let n =
-    Filename.concat main_dir
+    Filename.concat (datadir main)
       (Filename.concat "images" (f^".png"))
   in
   match size with
@@ -400,8 +399,9 @@ let iconname_reload = ref ""
 let iconname_remove = ref ""
 let iconname_cleaning = ref ""
 
-let iconsets main_dir : (string * Why3.Rc.family) =
-  let dir = Filename.concat main_dir "images" in
+let iconsets () : (string * Why3.Rc.family) =
+  let main = get_main () in
+  let dir = Filename.concat (datadir main) "images" in
   let files = Sys.readdir dir in
   let f = ref [] in
   Array.iter
@@ -413,9 +413,10 @@ let iconsets main_dir : (string * Why3.Rc.family) =
     files;
   (dir, !f)
 
-let load_icon_names ide main_dir =
+let load_icon_names () =
+  let ide = config () in
   let iconset = ide.iconset in
-  let _,iconsets = iconsets main_dir in
+  let _,iconsets = iconsets () in
   let iconset,d =
     try
       iconset, List.assoc iconset iconsets
@@ -462,46 +463,46 @@ let load_icon_names ide main_dir =
   iconname_cleaning := get_icon_name "cleaning";
   ()
 
-let resize_images main_dir size =
-  image_default := image main_dir ~size !iconname_default;
-  image_undone := image main_dir ~size !iconname_undone;
-  image_scheduled := image main_dir ~size !iconname_scheduled;
-  image_running := image main_dir ~size !iconname_running;
-  image_valid := image main_dir ~size !iconname_valid;
-  image_unknown := image main_dir ~size !iconname_unknown;
-  image_invalid := image main_dir ~size !iconname_invalid;
-  image_timeout := image main_dir ~size !iconname_timeout;
-  image_outofmemory := image main_dir ~size !iconname_outofmemory;
-  image_steplimitexceeded := image main_dir ~size !iconname_steplimitexceeded;
-  image_failure := image main_dir ~size !iconname_failure;
-  image_valid_obs := image main_dir ~size !iconname_valid_obs;
-  image_unknown_obs := image main_dir ~size !iconname_unknown_obs;
-  image_invalid_obs := image main_dir ~size !iconname_invalid_obs;
-  image_timeout_obs := image main_dir ~size !iconname_timeout_obs;
-  image_outofmemory_obs := image main_dir ~size !iconname_outofmemory_obs;
-  image_steplimitexceeded_obs := image main_dir ~size !iconname_steplimitexceeded_obs;
-  image_failure_obs := image main_dir ~size !iconname_failure_obs;
-  image_yes := image main_dir ~size !iconname_yes;
-  image_no := image main_dir ~size !iconname_no;
-  image_file := image main_dir ~size !iconname_file;
-  image_theory := image main_dir ~size !iconname_theory;
-  image_goal := image main_dir ~size !iconname_goal;
-  image_prover := image main_dir ~size !iconname_prover;
-  image_transf := image main_dir ~size !iconname_transf;
-  image_metas := image main_dir ~size !iconname_metas;
-  image_editor := image main_dir ~size !iconname_editor;
-  image_replay := image main_dir ~size !iconname_replay;
-  image_cancel := image main_dir ~size !iconname_cancel;
-  image_reload := image main_dir ~size !iconname_reload;
-  image_remove := image main_dir ~size !iconname_remove;
-  image_cleaning := image main_dir ~size !iconname_cleaning;
+let resize_images size =
+  image_default := image ~size !iconname_default;
+  image_undone := image ~size !iconname_undone;
+  image_scheduled := image ~size !iconname_scheduled;
+  image_running := image ~size !iconname_running;
+  image_valid := image ~size !iconname_valid;
+  image_unknown := image ~size !iconname_unknown;
+  image_invalid := image ~size !iconname_invalid;
+  image_timeout := image ~size !iconname_timeout;
+  image_outofmemory := image ~size !iconname_outofmemory;
+  image_steplimitexceeded := image ~size !iconname_steplimitexceeded;
+  image_failure := image ~size !iconname_failure;
+  image_valid_obs := image ~size !iconname_valid_obs;
+  image_unknown_obs := image ~size !iconname_unknown_obs;
+  image_invalid_obs := image ~size !iconname_invalid_obs;
+  image_timeout_obs := image ~size !iconname_timeout_obs;
+  image_outofmemory_obs := image ~size !iconname_outofmemory_obs;
+  image_steplimitexceeded_obs := image ~size !iconname_steplimitexceeded_obs;
+  image_failure_obs := image ~size !iconname_failure_obs;
+  image_yes := image ~size !iconname_yes;
+  image_no := image ~size !iconname_no;
+  image_file := image ~size !iconname_file;
+  image_theory := image ~size !iconname_theory;
+  image_goal := image ~size !iconname_goal;
+  image_prover := image ~size !iconname_prover;
+  image_transf := image ~size !iconname_transf;
+  image_metas := image ~size !iconname_metas;
+  image_editor := image ~size !iconname_editor;
+  image_replay := image ~size !iconname_replay;
+  image_cancel := image ~size !iconname_cancel;
+  image_reload := image ~size !iconname_reload;
+  image_remove := image ~size !iconname_remove;
+  image_cleaning := image ~size !iconname_cleaning;
   ()
 
-let init ide main_dir =
+let init () =
   Debug.dprintf debug "[GUI config] reading icons...@?";
-  load_icon_names ide main_dir;
-  why_icon := image main_dir "logo-why";
-  resize_images main_dir 20;
+  load_icon_names ();
+  why_icon := image "logo-why";
+  resize_images 20;
   Debug.dprintf debug " done.@."
 
 let show_legend_window () =
@@ -731,7 +732,7 @@ let general_settings (c : t) (notebook:GPack.notebook) =
 
 (** Appearance *)
 
-let appearance_settings main_dir (c : t) (notebook:GPack.notebook) =
+let appearance_settings (c : t) (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Appearance" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
@@ -818,7 +819,7 @@ let appearance_settings main_dir (c : t) (notebook:GPack.notebook) =
   let icon_sets_box_pack =
     icon_sets_box#pack ?from:None ?expand:None ?fill:None ?padding:None
   in
-  let dir,iconsets = iconsets main_dir  in
+  let dir,iconsets = iconsets () in
   let set_icon_set s () = c.iconset <- s in
   let (_,choices) = List.fold_left
     (fun (acc,l) (s,fields) ->
@@ -872,7 +873,7 @@ let appearance_settings main_dir (c : t) (notebook:GPack.notebook) =
   ()
 
 (* Page "Provers" *)
-(* TODO
+
 let provers_page c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Provers" () in
   let page =
@@ -938,12 +939,11 @@ let provers_page c (notebook:GPack.notebook) =
         b#connect#toggled ~callback:(fun () -> c.default_prover <- name)
       in ())
     (Whyconf.get_provers c.config)
-*)
+
 
 
 (* Page "Uninstalled provers" *)
 
-(* TODO
 let alternatives_frame c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Uninstalled provers" () in
   let page =
@@ -960,7 +960,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   in
   let remove button p () =
     button#destroy ();
-    (* c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))*)
+    c.config <- set_policies c.config (Mprover.remove p (get_policies c.config))
   in
   let iter p policy =
     let label =
@@ -980,9 +980,8 @@ let alternatives_frame c (notebook:GPack.notebook) =
   let page_pack = page#pack ?fill:None ~expand:true ?from:None ?padding:None in
   let _fillbox = GPack.vbox ~packing:page_pack () in
   ()
-*)
 
-let editors_page provers editors c (notebook:GPack.notebook) =
+let editors_page c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Editors" () in
   let page =
     GPack.vbox ~homogeneous:false ~packing:
@@ -1010,13 +1009,13 @@ let editors_page provers editors c (notebook:GPack.notebook) =
   let frame = GBin.frame ~label:"Specific editors" ~packing:vbox_pack () in
   let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
   let box_pack = box#pack ?fill:None ?expand:None ?from:None ?padding:None in
-  let editors = editors (* Whyconf.get_editors c.config *) in
+  let editors = Whyconf.get_editors c.config in
   let _,strings,indexes,map =
-    Whyconf.Meditor.fold
+    Meditor.fold
       (fun k data (i,str,ind,map) ->
-        let n = data.Whyconf.editor_name in
-        (i+1, n::str, Whyconf.Meditor.add k i ind, Whyconf.Meditor.add n k map))
-      editors (2, [], Whyconf.Meditor.empty, Whyconf.Meditor.empty)
+        let n = data.editor_name in
+        (i+1, n::str, Meditor.add k i ind, Meditor.add n k map))
+      editors (2, [], Meditor.empty, Meditor.empty)
   in
   let strings = "(default)" :: "--" :: (List.rev strings) in
   let add_prover p pi =
@@ -1034,7 +1033,7 @@ let editors_page provers editors c (notebook:GPack.notebook) =
     combo#set_row_separator_func
       (Some (fun m row -> m#get ~row ~column = "--"));
     let i =
-      try Whyconf.Meditor.find pi.Whyconf.editor indexes with Not_found -> 0
+      try Meditor.find pi.editor indexes with Not_found -> 0
     in
     combo#set_active i;
     let ( _ : GtkSignal.id) = combo#connect#changed
@@ -1042,28 +1041,27 @@ let editors_page provers editors c (notebook:GPack.notebook) =
         match combo#active_iter with
           | None -> ()
           | Some row ->
-              () (* TODO *)
-	    (*let data =
+	    let data =
               match combo#model#get ~row ~column with
                 | "(default)" -> ""
                 | s ->
-                  try Whyconf.Meditor.find s map
+                  try Meditor.find s map
                   with Not_found -> assert false
             in
 	    (* Debug.dprintf debug "prover %a : selected editor '%s'@." *)
             (*   print_prover p data; *)
-            let provers = provers (* TODO Whyconf.get_provers c.config *) in
+            let provers = Whyconf.get_provers c.config in
             c.config <-
               Whyconf.set_provers c.config
-              (Mprover.add p { pi with editor = data} provers) *)
+              (Mprover.add p { pi with editor = data} provers)
       )
     in
     ()
   in
-  Whyconf.Mprover.iter add_prover provers
+  Mprover.iter add_prover (Whyconf.get_provers c.config)
 
 
-let preferences dir_main provers editors (c : t) =
+let preferences (c : t) =
   let dialog = GWindow.dialog
     ~modal:true ~icon:(!why_icon)
     ~title:"Why3: preferences" ()
@@ -1073,13 +1071,13 @@ let preferences dir_main provers editors (c : t) =
   (* page "general settings" **)
   general_settings c notebook;
   (* page "appearance" **)
-  appearance_settings dir_main c notebook;
+  appearance_settings c notebook;
   (* page "editors" **)
-  editors_page provers editors c notebook;
+  editors_page c notebook;
   (* page "Provers" **)
-  (* TODO provers_page c notebook; *)
+  provers_page c notebook;
   (* page "uninstalled provers" *)
-  (* TODO alternatives_frame c notebook; *)
+  alternatives_frame c notebook;
   (* page "Colors" **)
 (*
   let label2 = GMisc.label ~text:"Colors" () in
@@ -1101,8 +1099,6 @@ let preferences dir_main provers editors (c : t) =
   begin
     match answer with
     | `SAVE ->
-        () (* TODO *)
-(*
       c.config <- Whyconf.set_main c.config
         (Whyconf.set_limits (Whyconf.get_main c.config)
            c.session_time_limit c.session_mem_limit c.session_nb_processes);
@@ -1110,7 +1106,6 @@ let preferences dir_main provers editors (c : t) =
 	(Whyconf.set_cntexample (Whyconf.get_main c.config)
 	   c.session_cntexample);
       save_config ()
-*)
     | `CLOSE | `DELETE_EVENT -> ()
   end;
   dialog#destroy ()
@@ -1129,7 +1124,6 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
 
-(*
 let uninstalled_prover c eS unknown =
   try
     Whyconf.get_prover_upgrade_policy c.config unknown
@@ -1240,7 +1234,7 @@ let uninstalled_prover c eS unknown =
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
     policy
-*)
+
 
 
 (*

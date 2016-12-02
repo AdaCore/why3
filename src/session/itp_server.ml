@@ -9,7 +9,13 @@ type strategy = string
 type node_ID = int
 let root_node : node_ID = 0
 
-type node_type = NRoot | NFile | NTheory | NTransformation | NGoal | NProofAttempt of bool
+type node_type =
+  | NRoot
+  | NFile
+  | NTheory
+  | NTransformation
+  | NGoal
+  | NProofAttempt of Call_provers.prover_answer option * bool
 
 type node_info =
     {
@@ -19,9 +25,10 @@ type node_info =
 
 type global_information =
     {
-     provers              : prover list;
-     transformations      : transformation list;
-     strategies           : strategy list;
+     provers         : prover list;
+     transformations : transformation list;
+     strategies      : strategy list;
+     commands        : string list;
      (* hidden_provers       : string list; *)
      (* session_time_limit   : int; *)
      (* session_mem_limit    : int; *)
@@ -39,22 +46,27 @@ type message_notification =
   | Query_Error  of node_ID * string
   | Help         of string
   | Information  of string
+  | Task_Monitor of int * int * int
 
 type notification =
-  | Node_change    of node_ID * node_info
-  | New_node       of node_ID * node_ID * node_type * node_info
-  | Remove         of node_ID
-  | Initialized    of global_information
+  | Node_change  of node_ID * node_info
+  | New_node     of node_ID * node_ID * node_type * node_info
+  | Remove       of node_ID
+  | Initialized  of global_information
   | Saved
-  | Message        of message_notification
-  | Dead           of string
+  | Message      of message_notification
+  | Dead         of string
+  | Proof_update of node_ID * Controller_itp.proof_attempt_status
+  | Task         of node_ID * string
 
 type request_type =
-  | Command_req   of string
-  | Prove_req     of prover * resource_limit
-  | Transform_req of transformation * string list
-  | Strategy_req  of strategy
-  | Open_req      of string
+  | Command_req       of string
+  | Prove_req         of prover * resource_limit
+  | Transform_req     of transformation * string list
+  | Strategy_req      of strategy
+  | Open_req          of string
+  | Set_max_tasks_req of int
+  | Get_task
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
@@ -86,31 +98,19 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let files = Queue.create ()
   let opt_parser = ref None
 
-  let spec = Arg.align [
-      "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-      "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
-*)
-      Termcode.arg_extra_expl_prefix
-    ]
-
-  let usage_str = Format.sprintf
-      "Usage: %s [options] [<file.why>|<project directory>]..."
-      (Filename.basename Sys.argv.(0))
-
   (* Files are passed with request Open *)
-  let config, _base_config, env =
-    let c, b, e =
-      Whyconf.Args.initialize [] (fun _ -> ()) ""
-    in
+  let config, base_config, env =
+    let c, b, e = Whyconf.Args.init () in
     c, b, e
 
-  let get_config () = config
+  let get_configs () = config, base_config
+
+  let task_driver =
+    let main = Whyconf.get_main config in
+    let d = Filename.concat (Whyconf.datadir main)
+        (Filename.concat "drivers" "why3_itp.drv")
+    in
+    Driver.load_driver env d []
 
   let provers : Whyconf.config_prover Whyconf.Mprover.t =
     Whyconf.get_provers config
@@ -128,7 +128,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     {
      provers = prover_list;
      transformations = transformation_list;
-     strategies = strategies_list
+     strategies = strategies_list;
+     commands =
+       List.map (fun (c,_,_) -> c) Session_user_interface.commands
    }
 
   (* Controller is not initialized: we cannot process any request *)
@@ -145,7 +147,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let init_cont f =
     Queue.add f files;
     try
-      (Session_user_interface.cont_from_files cont spec usage_str env files provers;
+      (Session_user_interface.cont_from_files cont [] "" env files provers;
        init_controller := true;
        P.notify (Initialized infos))
     with e ->
@@ -183,11 +185,12 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | APa pan    ->
         let pa = get_proof_attempt_node ses pan in
         let name = Pp.string_of Whyconf.print_prover pa.prover in
-        let proved = match pa.Session_itp.proof_state with
-        | Some pr -> pr.pr_answer = Valid
-        | None -> false
+        let pr, proved = match pa.Session_itp.proof_state with
+        | Some pr -> Some pr.pr_answer, pr.pr_answer = Valid
+        | None -> None, false
         in
-        (NProofAttempt pa.proof_obsolete), {name; proved}
+        (NProofAttempt (pr, pa.proof_obsolete)),
+        {name; proved}
 
 (* fresh gives new fresh "names" for node_ID using a counter.
    reset resets the counter so that we can regenerate node_IDs as if session
@@ -253,7 +256,7 @@ exception Bad_prover_name of prover
 
   (* TODO this is a dummy constant for root content *)
   let root_info = { proved = false; name = ""}
-  let root = Obj.magic "TODO" (* TODO do this *)
+  let root = 0
 
   (* ----------------- build tree from tables ----------------- *)
 
@@ -332,17 +335,12 @@ exception Bad_prover_name of prover
     let f ~parent node_id = ignore (new_node ~parent node_id) in
     iter_the_files f root
 
-  let init_and_send ~parent any =
-    let nid = new_node ~parent any in
-      let node_type, node_info =
-        get_info_and_type cont.controller_session any in
-      P.notify (New_node (nid, parent, node_type, node_info))
-
   let init_and_send_subtree_from_trans parent trans_id : unit =
-    iter_subtree_from_trans init_and_send parent trans_id
+    iter_subtree_from_trans
+      (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
 
   let init_and_send_the_tree (): unit =
-    iter_the_files init_and_send root
+    iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
 
   let resend_the_tree (): unit =
     let ses = cont.controller_session in
@@ -353,13 +351,26 @@ exception Bad_prover_name of prover
     P.notify (New_node (0, 0, NRoot, root_info));
     iter_the_files send_node root
 
+  (* -- send the task -- *)
+
+  let send_task nid =
+    match any_from_node_ID nid with
+    | APn id ->
+      let task = get_task cont.controller_session id in
+      let tables = get_tables cont.controller_session id in
+      let s = Pp.string_of
+          (fun fmt -> Driver.print_task ~cntexample:false task_driver fmt tables)
+          task in
+      P.notify (Task (nid,s))
+    | _ ->
+      P.notify (Task (nid, "can not associate a task to a node that is not a goal."))
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
   (* Callback of a proof_attempt *)
   let callback_update_tree_proof cont panid pa_status =
     let ses = cont.controller_session in
-    match pa_status with
+    begin match pa_status with
     | Scheduled ->
       begin
         try
@@ -370,12 +381,14 @@ exception Bad_prover_name of prover
           let parent = node_ID_from_pn parent_id in
           ignore (new_node ~parent (APa panid))
       end
-    | Done pr ->
+(*    | Done pr ->
       P.notify (Node_change (node_ID_from_pan panid,
-                             {proved=(pr.pr_answer=Valid); name=""}));
-      (* we don't want to resend the name every time, separate
+                             {proved=(pr.pr_answer=Valid); name=""})); *)
+      (* TODO: we don't want to resend the name every time, separate
          updatable from the rest *)
     | _  -> () (* TODO ? *)
+    end;
+    P.notify (Proof_update (node_ID_from_pan panid, pa_status))
 
   let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
     let prover = p.Whyconf.prover in
@@ -485,6 +498,7 @@ exception Bad_prover_name of prover
     | Save_req                -> save_session ()
     | Reload_req              -> reload_session ();
     | Get_Session_Tree_req    -> resend_the_tree ()
+    | Get_task                -> send_task nid
     | Replay_req              -> replay_session (); resend_the_tree ()
     | Command_req cmd         ->
       begin
@@ -508,8 +522,11 @@ exception Bad_prover_name of prover
     | Open_req file_name      ->
         if !init_controller then
           Controller_itp.add_file cont file_name
-        else
-          init_cont file_name
+        else begin
+          init_cont file_name;
+          init_and_send_the_tree ()
+        end
+    | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0 (* TODO *)
 
 
@@ -517,7 +534,11 @@ exception Bad_prover_name of prover
     List.iter treat_request (P.get_requests ());
     true
 
-  let _ = S.idle ~prio:1 treat_requests
+  let update_monitor t s r = P.notify (Message (Task_Monitor (t,s,r)))
 
+  let _ =
+    S.timeout ~ms:100 treat_requests;
+    (* S.idle ~prio:1 treat_requests; *)
+    C.register_observer update_monitor
 
 end

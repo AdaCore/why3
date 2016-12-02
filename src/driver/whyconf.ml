@@ -907,6 +907,24 @@ module Args = struct
     let lp = List.rev_append !opt_loadpath (loadpath main) in
     config, base_config, Env.create_env lp
 
+  let parse ?(extra_help=Format.pp_print_newline) options default usage =
+    let options = align_options options in
+    Arg.parse options default usage;
+    if !opt_help then begin
+      Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
+      exit 0
+    end;
+    Debug.Args.set_flags_selected ();
+    if Debug.Args.option_list () then exit 0
+
+  let init () =
+    let base_config = read_config !opt_config in
+    let config = List.fold_left merge_config base_config !opt_extra in
+    let main = get_main config in
+    load_plugins main;
+    let lp = List.rev_append !opt_loadpath (loadpath main) in
+    config, base_config, Env.create_env lp
+
   let exit_with_usage options usage =
     Arg.usage (align_options options) usage;
     exit 1
