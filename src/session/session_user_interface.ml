@@ -619,5 +619,7 @@ let get_exception_message ses id fmt e =
       Format.fprintf fmt "Following hypothesis was not found: %s \n" s
   | Args_wrapper.Arg_theory_not_found (s) ->
       Format.fprintf fmt "Theory not found: %s" s
+  | Case.Cannot_infer_type (s) ->
+      Format.fprintf fmt "Cannot infer type of term in tactic %s" s
   | e ->
       bypass_pretty ses id fmt e

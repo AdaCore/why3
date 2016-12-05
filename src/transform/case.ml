@@ -1,4 +1,3 @@
-
 open Trans
 open Term
 open Decl
@@ -12,6 +11,7 @@ exception Arg_trans_term of (string * Term.term * Term.term)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
 exception Arg_hyp_not_found of string
 exception Arg_bad_hypothesis of (string * Term.term)
+exception Cannot_infer_type of string
 
 let debug_matching = Debug.register_info_flag "print_match"
   ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
@@ -80,7 +80,8 @@ let exists_aux g x =
   let new_goal = Decl.create_prop_decl Decl.Pgoal pr_goal t in
       [new_goal]
 
-(* From task [delta |- exists x. G] and term t, build the task [delta] |- G[x -> t]]
+(* From task [delta |- exists x. G] and term t, build
+   the task  [delta |- G[x -> t]].
    Return an error if x and t are not unifiable. *)
 let exists x =
   Trans.goal (fun _ g -> exists_aux g x)
@@ -146,12 +147,13 @@ let intros f =
 
 
 (* Apply:
-   1) takes the hypothesis and introduce parts of it to keep only the last element of
-      the implication. It gathers the premises and variables in a list.
-   2) try to find a good substitution for the list of variables so that last element
-      of implication is equal to the goal.
-   3) generate new goals corresponding to premises with variables instantiated with values found
-      in 2).
+   1) takes the hypothesis and introduce parts of it to keep only the last
+      element of the implication. It gathers the premises and variables in a
+      list.
+   2) try to find a good substitution for the list of variables so that last
+      element of implication is equal to the goal.
+   3) generate new goals corresponding to premises with variables instantiated
+      with values found in 2).
  *)
 let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let name = pr.pr_name in
@@ -179,11 +181,6 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   else
     raise (Arg_trans_term ("apply", inst_nt, g)))
 
-(*(Format.printf
-      "Term %a and %a are not equal. Failure in matching @."
-       Pretty.print_term inst_nt Pretty.print_term g;
-     failwith "After substitution, terms are not exactly identical"))*)
-
 (* Replace all occurences of f1 by f2 in t *)
 let replace_in_term = Term.t_replace
 (* TODO be careful with label copy in t_map *)
@@ -204,8 +201,9 @@ let fold (f: decl -> 'a -> 'a) (acc: 'a): 'a Trans.trans =
    - Else call recursively on subterms of t *)
 (* If a substitution s is found then new premises are computed as e -> s.e *)
 let replace_subst lp lv f1 f2 t =
-  (* is_replced is common to the whole execution of replace_subst. Once an occurence is found,
-     it changes to Some (s) so that only one instanciation is rewrritten during execution *)
+  (* is_replced is common to the whole execution of replace_subst. Once an
+     occurence is found, it changes to Some (s) so that only one instanciation
+     is rewrritten during execution *)
   (* Note that we can't use an accumulator to do this *)
   let is_replaced = ref None in
 
@@ -260,25 +258,37 @@ let rewrite_in rev h h1 =
     | Some (lp, lv, t1, t2) ->
       fold (fun d acc ->
         match d.d_node with
-        | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal)) ->
+        | Dprop (p, pr, t)
+            when (Ident.id_equal pr.pr_name h1.pr_name &&
+                 (p = Paxiom || p = Pgoal)) ->
           let lp, new_term = replace_subst lp lv t1 t2 t in
             Some (lp, create_prop_decl p pr new_term)
         | _ -> acc) None in
-  (* Pass the premises as new goals. Replace the former toberewritten hypothesis to the new rewritten one *)
+  (* Pass the premises as new goals. Replace the former toberewritten
+     hypothesis to the new rewritten one *)
   let recreate_tasks lp_new =
     match lp_new with
     | None -> raise (Arg_trans "recreate_tasks")
     | Some (lp, new_term) ->
-      let trans_rewriting = Trans.decl (fun d -> match d.d_node with
-        | Dprop (p, pr, _t) when (Ident.id_equal pr.pr_name h1.pr_name && (p = Paxiom || p = Pgoal)) ->
+      let trans_rewriting =
+        Trans.decl (fun d -> match d.d_node with
+        | Dprop (p, pr, _t)
+            when (Ident.id_equal pr.pr_name h1.pr_name &&
+                 (p = Paxiom || p = Pgoal)) ->
           [new_term]
         | _ -> [d]) None in
-      let list_par = List.map (fun e -> Trans.decl (fun d -> match d.d_node with
-        | Dprop (p, pr, _t) when (Ident.id_equal pr.pr_name h1.pr_name && p = Paxiom) ->
-          [d]
-        | Dprop (Pgoal, _, _) ->
-          [create_prop_decl Pgoal (Decl.create_prsymbol (gen_ident "G")) e]
-        | _ -> [d] ) None) lp in
+      let list_par =
+        List.map
+          (fun e ->
+            Trans.decl (fun d -> match d.d_node with
+            | Dprop (p, pr, _t)
+              when (Ident.id_equal pr.pr_name h1.pr_name &&
+                    p = Paxiom) ->
+                [d]
+            | Dprop (Pgoal, _, _) ->
+                [create_prop_decl Pgoal (Decl.create_prsymbol (gen_ident "G")) e]
+            | _ -> [d] )
+          None) lp in
       Trans.par (trans_rewriting :: list_par) in
 
   (* Composing previous functions *)
@@ -355,6 +365,59 @@ let induction x bound env =
         [d]*)
     | _ -> [d]) None in
   Trans.par [le_bound; ge_bound]
+
+let create_constant ty =
+  let fresh_name = Ident.id_fresh "x" in
+  let ls = create_lsymbol fresh_name [] (Some ty) in
+  (ls, create_param_decl ls)
+
+let rec return_list list_types =
+  match list_types with
+  | [] -> []
+  | hd :: tl -> create_constant hd :: return_list tl
+
+let rec build_decls cls x =
+  match cls with
+  | [] -> []
+  | (cs, _) :: tl ->
+      let l = return_list cs.ls_args in
+      let ht = t_equ x
+           (t_app_infer cs (List.map (fun x -> t_app_infer (fst x) []) l)) in
+      let h = Decl.create_prsymbol (gen_ident "h") in
+      let new_hyp = Decl.create_prop_decl Decl.Paxiom h ht in
+      ((List.map snd l) @ [new_hyp]) :: build_decls tl x
+
+
+
+(* This tactic acts on a term of algebraic type. It introduces one
+   new goal per constructor of the type and introduce corresponding
+   variables. It also introduce the equality between the term and
+   its destruction in the context.
+ *)
+(* TODO does not work with polymorphic type *)
+let destruct_alg (x: term) : Task.task Trans.tlist =
+  let ty = x.t_ty in
+  let r = ref [] in
+  match ty with
+  | None -> raise (Cannot_infer_type "destruct")
+  | Some ty ->
+    begin
+      match ty.Ty.ty_node with
+      | Ty.Tyvar _ -> raise (Cannot_infer_type "destruct")
+      | Ty.Tyapp (ts, _) ->
+        Trans.decl_l (fun d ->
+          match d.d_node with
+          | Ddata dls ->
+              (try
+                (let cls = List.assoc ts dls in
+                r := build_decls cls x;
+                [[d]]
+                )
+              with Not_found -> [[d]])
+          | Dprop (Pgoal, _, _) ->
+              if !r = [] then [[d]] else List.map (fun x -> x @ [d]) !r
+          | _ -> [[d]]) None
+    end
 
 (* Destruct the head term of an hypothesis if it is either
    conjunction, disjunction or exists *)
@@ -459,3 +522,6 @@ let () = wrap_and_register
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor of hypothesis name"
     "destruct" (Tprsymbol Ttrans_l) destruct
+
+let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type"
+    "destruct_alg" (Tterm Ttrans_l) destruct_alg
