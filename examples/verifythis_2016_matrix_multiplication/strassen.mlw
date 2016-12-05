@@ -236,8 +236,8 @@ module MatrixMultiplication
     requires { 0 <= c2 <= c2 + dc2 <= dc1 }
     ensures { block (block a.mdl r1 dr1 c1 dc1) r2 dr2 c2 dc2 =
       block a.mdl (r1+r2) dr2 (c1+c2) dc2 }
-    ensures { F.cols (block a.mdl r1 dr1 c1 dc1) = dc1 }
-    ensures { F.rows (block a.mdl r1 dr1 c1 dc1) = dr1 }
+    (* ensures { F.cols (block a.mdl r1 dr1 c1 dc1) = dc1 } *)
+    (* ensures { F.rows (block a.mdl r1 dr1 c1 dc1) = dr1 } *)
   = assert { block (block a.mdl r1 dr1 c1 dc1) r2 dr2 c2 dc2 ==
       block a.mdl (r1+r2) dr2 (c1+c2) dc2 }
 
