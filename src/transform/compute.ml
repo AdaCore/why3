@@ -40,7 +40,10 @@ let rule_label = Ident.create_label "rewrite"
 let collect_rule_decl prs e d =
   match d.Decl.d_node with
     | Decl.Dprop((Plemma|Paxiom), pr, t) ->
-      if Decl.Spr.mem pr prs || Ident.Slab.mem rule_label t.t_label then
+      if Decl.Spr.mem pr prs ||
+           Ident.Slab.mem rule_label pr.pr_name.Ident.id_label ||
+             Ident.Slab.mem rule_label t.t_label
+      then
         try add_rule t e
         with NotARewriteRule msg ->
           Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"

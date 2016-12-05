@@ -274,6 +274,18 @@ meta "rewrite" prop a
   from left to right. Beware that there is no check for termination
   nor for confluence of the set of rewrite rules declared.
 \end{itemize}
+Instead of using a meta, it is possible to declare an axiom as a
+rewrite rule by adding the label \verb|"rewrite"| on the axiom name or
+on the axiom itself, e.g.:
+\begin{whycode}
+axiom a "rewrite": forall ... t1 = t2
+lemma b: "rewrite" forall ... f1 <-> f2
+\end{whycode}
+The second form allows some form of local rewriting, e.g.
+\begin{whycode}
+lemma l: forall x y. ("rewrite" x = y) -> f x = f y
+\end{whycode}
+can be proved by \verb|introduce_premises| followed by \verb|"compute_specified"|.
 
 \paragraph{Bound on the number of reductions}
 The computations performed by these transformations can take an
