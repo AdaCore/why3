@@ -261,36 +261,46 @@ let treat_connection _tmout callback addr fd fmt =
           | exc -> print_err_exc exc
     end
 
-let accept_connection delay callback s =
-  let (a,_,_) = Unix.select [s] [] [] delay in
-  match a with
-    | [] ->
-       begin
-         Printf.eprintf "No connection. Compacting... ";
-         flush stderr;
-         Gc.compact ();
-         Printf.eprintf "Ok\n";
-         flush stderr
-       end
-    | [a] ->
-       assert (a == s);
-       let (t, addr) = Unix.accept s in
-       Unix.setsockopt t Unix.SO_KEEPALIVE true;
-       let cleanup () =
-         begin try Unix.shutdown t Unix.SHUTDOWN_SEND with
-                 _ -> ()
-         end;
-         begin try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with
-                 _ -> ()
-         end;
-         try Unix.close t with
-           _ -> ()
-       in
-       let oc = Unix.out_channel_of_descr t in
-       treat_connection delay callback addr t (formatter_of_out_channel oc);
-       close_out oc;
-       cleanup ()
-    | _ -> assert false
+(* buffer for storing character read on stdin *)
+let buf = Bytes.create 256
+
+exception Nothing_to_do
+
+let accept_connection delay callback stdin_callback s =
+  (* eprintf "Unix.select...@."; *)
+  let (a,_,_) = Unix.select [s;Unix.stdin] [] [] delay in
+  (* eprintf " done@."; *)
+  if a = [] then raise Nothing_to_do
+  else
+  List.iter
+    (fun a ->
+       if a == s then
+         let (t, addr) = Unix.accept s in
+         eprintf "got a connection@.";
+         Unix.setsockopt t Unix.SO_KEEPALIVE true;
+         let cleanup () =
+           begin try Unix.shutdown t Unix.SHUTDOWN_SEND with
+                   _ -> ()
+           end;
+           begin try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with
+                   _ -> ()
+           end;
+           try Unix.close t with
+             _ -> ()
+         in
+         let oc = Unix.out_channel_of_descr t in
+         treat_connection delay callback addr t (formatter_of_out_channel oc);
+         close_out oc;
+         eprintf "connection treated@.";
+         cleanup ()
+       else
+         if a == Unix.stdin then
+           let n = Unix.read Unix.stdin buf 0 256 in
+           eprintf "got a stdin input@.";
+           stdin_callback (Bytes.sub_string buf 0 (n-1));
+           eprintf "stdin treated@.";
+           ()
+         else assert false) a
 
 
 (* the private list of functions to call on idle, sorted higher
@@ -333,7 +343,7 @@ let timeout ~ms f =
   let time = Unix.gettimeofday () in
   insert_timeout_handler ms (time +. ms) f
 
-let main_loop addr_opt port g =
+let main_loop addr_opt port callback stdin_callback =
   let addr =
     match addr_opt with
       Some addr ->
@@ -348,12 +358,9 @@ let main_loop addr_opt port g =
   Unix.listen s 4;
   Sys.set_signal Sys.sigpipe Sys.Signal_ignore;
   let tm = Unix.localtime (Unix.time ()) in
-  Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port"
+  eprintf "Ready %4d-%02d-%02d %02d:%02d port %d...@."
                  (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
-                 tm.Unix.tm_hour tm.Unix.tm_min;
-  Printf.eprintf " %d" port;
-  Printf.eprintf "...\n";
-  flush stderr;
+                 tm.Unix.tm_hour tm.Unix.tm_min port;
   while true do
     (* attempt to run the first timeout handler *)
     let time = Unix.gettimeofday () in
@@ -364,16 +371,10 @@ let main_loop addr_opt port g =
         let time = Unix.gettimeofday () in
         if b then insert_timeout_handler ms (ms +. time) f
      | _ ->
-        (* time is not yet passed *)
-        (* attempt to run the first idle handler *)
-        match !idle_handler with
-        | (p,f) :: rem ->
-           idle_handler := rem;
-           let b = f () in
-           if b then insert_idle_handler p f
-        | [] ->
            (* no idle handler *)
-           (* check connection for a some delay *)
+(*
+           eprintf "check connection for a some delay@.";
+*)
            let delay =
              match !timeout_handler with
              | [] -> 0.125
@@ -382,12 +383,21 @@ let main_loop addr_opt port g =
              (* or the time left until the next timeout otherwise *)
            in
            begin
-             try accept_connection delay g s
+             try accept_connection delay callback stdin_callback s
              with
-               Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> ()
-             | Unix.Unix_error ((Unix.EBADF | Unix.ENOTSOCK), "accept", _) as x ->
-                raise x
-             | exc -> print_err_exc exc
-           end;
-           flush stderr
+               | Nothing_to_do ->
+                  begin
+                    (* attempt to run the first idle handler *)
+                    match !idle_handler with
+                    | (p,f) :: rem ->
+                       idle_handler := rem;
+                       let b = f () in
+                       if b then insert_idle_handler p f
+                    | [] -> ()
+                  end
+               | Unix.Unix_error (Unix.ECONNRESET, "accept", _) -> ()
+               | Unix.Unix_error ((Unix.EBADF | Unix.ENOTSOCK), "accept", _) as x ->
+                  raise x
+               | e -> eprintf "Anomaly: %a@." Why3.Exn_printer.exn_printer e
+           end
      done

@@ -2,18 +2,21 @@
 
 
 val main_loop : string option -> int ->
-                (Unix.sockaddr * string list -> string -> string -> Format.formatter -> unit) -> unit
-(** [main_loop addr port g] starts an elementary httpd server at port
-    [port] in the current machine. The variable [addr] is [Some
-    the-address-to-use] or [None] for any of the available addresses
-    of the present machine. The port number is any number greater than
-    1024 (to create a client < 1024, you must be root). At each
-    connection, the function [g] is called: [g (addr, request) scr
-    cont fmt] where [addr] is the client identification socket,
-    [request] the browser request, [scr] the script name (extracted
-    from [request]) and [cont] the stdin contents. [fmt] is the
-    formatter where the answer should be written. It must start by a
-    call to [http_header] below. *)
+                (Unix.sockaddr * string list -> string ->
+                     string -> Format.formatter -> unit) ->
+                (string -> unit) -> unit
+(** [main_loop addr port callback stdin_callback] starts an elementary
+    httpd server at port [port] in the current machine. The variable
+    [addr] is [Some the-address-to-use] or [None] for any of the
+    available addresses of the present machine. The port number is any
+    number greater than 1024 (to create a client < 1024, you must be
+    root). At each connection, the function [callback] is called as
+    [callback (addr, request) scr cont fmt] where [addr] is the client
+    identification socket, [request] the browser request, [scr] the
+    script name (extracted from [request]) and [cont] the stdin
+    contents. [fmt] is the formatter where the answer should be
+    written, it must start by a call to [http_header] below.
+    [stdin_callback] is called on any stdin input line received. *)
 
 val timeout: ms:int -> (unit -> bool) -> unit
 (** [timeout ~ms f] registers the function [f] as a function to be
