@@ -2348,35 +2348,177 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let sl, c = add_with_carry um l zero in
     let sh, c' = add_with_carry uh h c in
     assert { l2i sl + radix * l2i sh + radix * radix * l2i c'
-             = l2i um + radix * l2i uh + l2i v * l2i uh }
-    assert { c' = 0 };
+             = l2i um + radix * l2i uh + l2i v * l2i uh };
+    assert { l2i c' = 0
+             by
+             l2i um + radix * l2i uh < d
+             so radix * l2i uh < d
+             so radix * (l2i um + radix * l2i uh + l2i v * l2i uh)
+                < radix * (d + l2i v * l2i uh)
+                = radix * d + l2i v * radix * l2i uh
+                <= radix * d + l2i v * d
+                = (div (radix * radix * radix - 1) d) * d
+                <= radix * radix * radix - 1
+                < radix * radix * radix
+             so l2i um + radix * l2i uh + l2i v * l2i uh < radix * radix
+             so l2i sl + radix * l2i sh + radix * radix * l2i c' < radix * radix
+             so radix * radix * l2i c' < radix * radix
+     };
     q1 := sh;
     let ghost q0 = l2i sl in
     let ghost cq = l2i !q1 + 1 in (*candidate quotient*)
     q1 := add_mod !q1 one;
     assert { l2i !q1 = mod cq radix };
     let p = mul_mod dh sh in
-    r1 := sub_mod uh p;
-    let ghost a = div (l2i uh - l2i dh * l2i sh) radix in
-    assert { l2i !r1 = a * radix + mod (l2i uh - l2i dh * l2i sh) radix };
+    r1 := sub_mod um p;
+    label CQuot in
+    let ghost a = div (l2i um - l2i dh * l2i sh) radix in
+    (*assert { l2i um - l2i dh * l2i sh = a * radix + l2i !r1
+             by l2i !r1 = mod (l2i um - l2i dh * l2i sh) radix  };*)
     let tl, th = mul_double sh dl in
     let il, b = sub_with_borrow ul tl zero in
     let ih, b' = sub_with_borrow !r1 th b in
     assert { l2i il + radix * l2i ih - radix * radix * l2i b'
-             = l2i ul + radix * l2i !r1 - l2i sh * l2i dl }
-    assert { l2i b' = 0 };
+             = l2i ul + radix * l2i !r1 - l2i sh * l2i dl };
     let bl,b2 = sub_with_borrow il dl zero in
     let bh, b2' = sub_with_borrow ih dh b2 in
     assert { l2i bl + radix * l2i bh - radix * radix * l2i b2'
              = l2i il + radix * l2i ih - l2i dl - radix * l2i dh };
-    assert { b2' = 0 };
+    mod_mult (radix * radix) (l2i b')
+             (l2i ul + radix * l2i !r1 - l2i sh * l2i dl - l2i dl
+                - radix * l2i dh);
+    assert { l2i bl + radix * l2i bh
+             = mod (l2i ul + radix * l2i !r1
+                - l2i sh * l2i dl- l2i dl
+                - radix * l2i dh) (radix * radix)
+             by
+             l2i bl + radix * l2i bh
+             = mod (l2i il + radix * l2i ih
+                - l2i dl - radix * l2i dh) (radix * radix)
+             so l2i il + radix * l2i ih
+                = radix * radix * l2i b' + l2i ul + radix * l2i !r1
+                  - l2i sh * l2i dl
+             so mod (l2i il + radix * l2i ih
+                - l2i dl - radix * l2i dh) (radix * radix)
+                = mod (radix * radix * l2i b' + l2i ul + radix * l2i !r1
+                      - l2i sh * l2i dl - l2i dl - radix * l2i dh)
+                  (radix * radix)
+                = mod (l2i ul + radix * l2i !r1
+                - l2i sh * l2i dl - l2i dl
+                - radix * l2i dh) (radix * radix) };
     r1 := bh;
     r0 := bl;
+    let ghost r' = l2i !r0 + radix * l2i !r1 in
     let ghost cr = u - d * cq in
-    assert { (l2i !r0 + radix * l2i !r1) = mod cr(radix * radix) };
+    assert { (l2i !r0 + radix * l2i !r1) = mod cr(radix * radix)
+              by
+              (l2i !r1 at CQuot = mod (l2i um - l2i dh * l2i sh) radix
+                by let a' = div (l2i dh * l2i sh) radix in
+                   l2i dh * l2i sh = l2i p + radix * a'
+                so l2i !r1 at CQuot = mod (l2i um - l2i p) radix
+                   = mod (radix * a' + l2i um - l2i dh * l2i sh) radix
+                   = mod (l2i um - l2i dh * l2i sh) radix )
+              so l2i um - l2i dh * l2i sh = a * radix + l2i !r1 at CQuot
+              so l2i !r0 + radix * l2i !r1
+                 = mod (l2i ul + radix * l2i (!r1 at CQuot)
+                  - l2i sh * l2i dl - l2i dl
+                  - radix * l2i dh) (radix * radix)
+              so l2i ul + radix * l2i (!r1 at CQuot)
+                   - l2i sh * l2i dl - l2i dl - radix * l2i dh
+                 = l2i ul + radix * (l2i um - l2i dh * l2i sh - a * radix)
+                   - l2i sh * l2i dl - l2i dl - radix * l2i dh
+                 = l2i ul + radix * l2i um - radix * l2i dh * l2i sh
+                   - radix * radix * a - l2i sh * l2i dl - l2i dl
+                   - radix * l2i dh
+                 = l2i ul + radix * l2i um - radix * l2i dh * (l2i sh + 1)
+                   - radix * radix * a - l2i sh * l2i dl - l2i dl
+                 = l2i ul + radix * l2i um - radix * l2i dh * (l2i sh + 1)
+                   - radix * radix * a - l2i dl * (l2i sh + 1)
+                 = l2i ul + radix * l2i um
+                   - (l2i dl + radix * l2i dh) * (l2i sh + 1)
+                   - radix * radix * a
+                 = l2i ul + radix * l2i um - d * cq - radix * radix * a
+                 = u - radix * radix * l2i uh - d * cq - radix * radix * a
+                 = cr + radix * radix * (- a - l2i uh)
+              so (*let y = - a - l2i uh in*)
+                 mod (l2i ul + radix * l2i (!r1 at CQuot)
+                  - l2i sh * l2i dl - l2i dl
+                  - radix * l2i dh) (radix * radix)
+                 = mod (radix * radix * (-a - l2i uh) + cr)
+                       (radix * radix)
+                 = mod cr (radix*radix)
+               };
     let ghost m = max (radix * radix - d) (q0 * radix) in
     assert { (* Theorem 3 of Moller&Granlund 2010 *)
-             m - radix * radix <= cr < c };
+             m - radix * radix <= cr < m
+            by
+            let k = radix * radix * radix - (radix + l2i v) * d in
+            reciprocal_2 v dh dl
+            so let m3 = radix * radix * radix - 1 in
+               (radix + l2i v) * d = d * div m3 d = m3 - mod m3 d
+            so (k = 1 + mod m3 d
+                by k = radix * radix * radix - (radix + l2i v) * d
+                     = m3 + 1 - (radix + l2i v) * d
+                     = m3 + 1 - m3 + mod m3 d
+                     = 1 + mod m3 d)
+            so 1 <=  k <= d
+            so q0 + radix * l2i sh = (radix + l2i v) * l2i uh + l2i um
+            so cq = l2i sh + 1
+            so radix * cq = radix * l2i sh + radix
+               = (radix + l2i v) * l2i uh + l2i um - q0 + radix
+            so (radix * cr = k * l2i uh + (radix * radix - d) * l2i um
+                 + radix * l2i ul + d * q0 - d * radix
+               by radix * cr = radix * (u - cq * d)
+               = radix * u
+                 - ((radix + l2i v) * l2i uh + l2i um - q0 + radix) * d
+               = radix * u - d * (radix + l2i v) * l2i uh
+                 - d * l2i um + d * q0 - d * radix
+               = radix * u - (radix * radix * radix - k) * l2i uh
+                 - d * l2i um + d * q0 - d * radix
+               = (radix * radix * radix * l2i uh + radix * radix * l2i um
+                 + radix * l2i ul) - (radix * radix * radix - k) * l2i uh
+                 - d * l2i um + d * q0 - d * radix
+               = k * l2i uh + radix * radix * l2i um + radix * l2i ul
+                 - d * l2i um + d * q0 - d * radix
+               = k * l2i uh + (radix * radix - d) * l2i um + radix * l2i ul
+                 + d * q0 - d * radix )
+            so cr >= m - radix * radix
+               by (k >= 0 so radix * radix - d >= 0
+               so l2i uh >= 0 so l2i um >= 0 so l2i ul >= 0
+               so  k * l2i uh + (radix * radix - d) * l2i um + radix * l2i ul
+                   >= 0
+               so radix * cr >= d * q0 - d * radix
+               so q0 >= 0 so d >= 0
+               so d * q0 >= 0
+               so radix * cr >= - d * radix
+               so cr >= -d = radix * radix - d - radix * radix
+               so radix * cr >= d * (q0 - radix)
+               so ((radix - q0) * d < (radix - q0) * radix * radix
+               by let rq = radix - q0 in let r2 = radix * radix in
+               rq > 0 /\ d < r2
+               so rq * d < rq * r2 )
+               so d * (q0 - radix) > radix * radix * (q0 - radix)
+               so radix * cr > radix * radix * (q0 - radix)
+               so cr > radix * (q0 - radix) = radix * q0 - radix * radix )
+            so cr < m
+            by (
+               so
+                 if uh <= dh - 1
+                 then
+                   radix * cr
+                   < k * (dh - 1) + (radix * radix - d) * l2i um
+                     + radix * l2i ul + d * q0 - radix * d
+                   <= k * (dh - 1) + (radix * radix - d) * (radix - 1)
+                    + radix * l2i ul + d * q0 - radix * d
+                   <= k * (dh - 1) + (radix * radix - d) * (radix - 1)
+                    + radix * radix + d * q0 - radix * d
+                   <= d * (dh - 1) + (radix * radix - d) * (radix - 1)
+                    + radix * radix + d * q0 - radix * d
+               )
+            };
+    assert { cr >= 0 -> r' = cr };
+    assert { cr < 0 -> r' = cr + radix * radix };
+    assert { 1 <= cq <= radix };
     if Limb.(>=) !r1 sl
     then begin
       q1 := sub_mod !q1 one;
@@ -2385,6 +2527,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       r1 := sh;
       r0 := sl;
     end;
+    assert { l2i !q1 * d + l2i !r0 + radix * l2i !r1 = u };
     if (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin (*unlikely*)
       q1 := add_mod !q1 one;
@@ -2394,7 +2537,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       r1 := bh;
       r0 := bl;
     end;
-    (!q1,!r1,!r0)
+    assert { l2i !q1 * d + l2i !r0 + radix * l2i !r1 = u };
+    assert { 0 <= l2i !r0 + radix * l2i !r1 < d };
+    (!q1,!r0,!r1)
 
   (** Tests *)
   let print (p:t) (m n:int32) : unit
