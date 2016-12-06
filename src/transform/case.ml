@@ -103,6 +103,7 @@ let remove name =
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
 let instantiate (pr: Decl.prsymbol) t =
+  let r = ref [] in
   Trans.decl
     (fun d ->
       match d.d_node with
@@ -110,7 +111,9 @@ let instantiate (pr: Decl.prsymbol) t =
           let t_subst = subst_forall ht t in
           let new_pr = create_prsymbol (Ident.id_clone dpr.pr_name) in
           let new_decl = create_prop_decl pk new_pr t_subst in
-          [d; new_decl]
+          r := [new_decl];
+          [d]
+      | Dprop (Pgoal, _, _) -> !r @ [d]
       | _ -> [d]) None
 
 let term_decl d =
