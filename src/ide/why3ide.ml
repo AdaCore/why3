@@ -12,10 +12,10 @@ let debug = Debug.lookup_flag "ide_info"
 (*******************)
 open Itp_server
 
-module Protocol_why3ide  = struct
+module Protocol_why3ide = struct
 
   let debug_proto = Debug.register_flag "ide_proto"
-      ~desc:"Print@ debugging@ messages@ about@ Why3Ide@ protocol@."
+      ~desc:"Print@ debugging@ messages@ about@ Why3Ide@ protocol@"
 
   let print_request_debug r =
     Debug.dprintf debug_proto "[request]";
@@ -150,88 +150,7 @@ let () =
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
 
-(********************)
-(* Terminal history *)
-(********************)
-
-module type Historic_type = sig
-  type historic
-
-  val create_historic: unit -> historic
-  val print_next_command: historic -> string option
-  val print_prev_command: historic -> string option
-  val add_command: historic -> string -> unit
-
-end
-
-module Historic : Historic_type = struct
-  type 'a hole_list = 'a list * 'a list
-
-  (* TODO this looks like we can make it more efficient either with imperative
-     feature or by being more clever.  With DLlists, we could have added a
-     command in O(1). *)
-  let add e l =
-    match l with
-    | ll, lr ->  [], e :: (List.rev ll) @ lr
-
-  let next l =
-    match l with
-    | ll, [] -> ll, []
-    | ll, [hd] -> ll, [hd]
-    (* Get acts on the right list so we never empty right list *)
-    | ll, cur :: lr -> cur :: ll, lr
-
-  let prev l =
-    match l with
-    | hd :: ll, lr -> ll, hd :: lr
-    | [], lr -> [], lr
-
-  let get l =
-    match l with
-    | _, hd :: _ -> Some hd
-    | _, [] -> None
-
-  type historic = {mutable lc : string hole_list;
-                   mutable tr : bool}
-(* tr is used to know what was the last query from user because cases for the
-   first element of the historic and other elements is not the same *)
-
-  let create_historic () : historic =
-    {lc = [], [];
-     tr = false}
-
-  let get_current h =
-    get h.lc
-
-  let print_next_command h =
-    if h.tr then
-      begin
-        h.lc <- next h.lc;
-        get_current h
-      end
-    else
-      begin
-        let s = get_current h in
-        h.tr <- true;
-        s
-      end
-
-  let print_prev_command h =
-    if h.tr then
-      begin
-        h.lc <- prev h.lc;
-        get_current h
-      end
-    else
-      None
-
-  let add_command h e =
-    h.lc <- add e h.lc;
-    h.tr <- false
-
-end
-
-open Historic
+open Session_user_interface.History
 
 (********************************)
 (* Source language highlighting *)
@@ -520,10 +439,10 @@ let init_completion provers transformations commands =
   command_entry#set_completion command_entry_completion
 
 (*********************)
-(* Terminal historic *)
+(* Terminal history  *)
 (*********************)
 
-let list_commands = create_historic()
+let list_commands = create_history()
 
 let _ =
   command_entry#event#connect#key_press

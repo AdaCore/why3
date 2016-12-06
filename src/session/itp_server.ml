@@ -534,7 +534,18 @@ exception Bad_prover_name of prover
     List.iter treat_request (P.get_requests ());
     true
 
-  let update_monitor t s r = P.notify (Message (Task_Monitor (t,s,r)))
+  let update_monitor =
+    let tr = ref 0 in
+    let sr = ref 0 in
+    let rr = ref 0 in
+    fun t s r ->
+      if (not (t = !tr && s = !sr && r = !rr)) then
+        begin
+          P.notify (Message (Task_Monitor (t,s,r)));
+          tr := t;
+          sr := s;
+          rr := r
+        end
 
   let _ =
     S.timeout ~ms:100 treat_requests;
