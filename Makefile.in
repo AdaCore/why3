@@ -167,7 +167,7 @@ LIBGENERATED = src/util/config.ml \
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp json debug loc lexlib print_tree \
-	   cmdline warning sysutil rc plugin bigInt number pqueue
+	   cmdline warning sysutil rc plugin bigInt number pqueue unix_scheduler
 
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer model_parser
@@ -739,7 +739,7 @@ endif
 # WEBSERV
 ###############
 
-WEBSERV_FILES = unix_scheduler wserver why3web
+WEBSERV_FILES = wserver why3web
 
 WEBSERVMODULES = $(addprefix src/ide/, $(WEBSERV_FILES))
 
