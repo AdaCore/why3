@@ -100,11 +100,12 @@ type pattern = {
 }
 
 and pattern_node =
-  | Pwild
-  | Pvar of vsymbol
-  | Papp of lsymbol * pattern list
-  | Por  of pattern * pattern
+  | Pwild (* _ *)
+  | Pvar of vsymbol (* newly introduced variables *)
+  | Papp of lsymbol * pattern list (* application *)
+  | Por  of pattern * pattern (* | *)
   | Pas  of pattern * vsymbol
+  (* naming a term recognized by pattern as a variable *)
 
 (* h-consing constructors for patterns *)
 

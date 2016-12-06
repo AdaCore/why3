@@ -504,8 +504,6 @@ let print_pat s id fmt t =
   Why3printer.print_pat tables fmt t
 
 (* Exception reporting *)
-
-(* TODO remove references to id.id_string in this function *)
 let bypass_pretty s id =
   begin fun fmt exn -> match exn with
   | Ty.TypeMismatch (t1,t2) ->
