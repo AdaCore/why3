@@ -1,4 +1,5 @@
 open Call_provers
+open Format
 
 (* Information that the IDE may want to have *)
 type prover = string
@@ -47,6 +48,7 @@ type message_notification =
   | Help         of string
   | Information  of string
   | Task_Monitor of int * int * int
+  | Error        of string
 
 type notification =
   | Node_change  of node_ID * node_info
@@ -73,6 +75,21 @@ type request_type =
   | Replay_req
   | Exit_req
 
+let print_request fmt r =
+  match r with
+  | Command_req s             -> fprintf fmt "command \"%s\"" s
+  | Prove_req (prover, _rl)   -> fprintf fmt "prove with %s" prover
+  | Transform_req (tr, _args) -> fprintf fmt "transformation :%s" tr
+  | Strategy_req st           -> fprintf fmt "strategy %s" st
+  | Open_req f                -> fprintf fmt "open file %s" f
+  | Set_max_tasks_req i       -> fprintf fmt "set max tasks %i" i
+  | Get_task                  -> fprintf fmt "get task"
+  | Get_Session_Tree_req      -> fprintf fmt "get session tree"
+  | Save_req                  -> fprintf fmt "save"
+  | Reload_req                -> fprintf fmt "reload"
+  | Replay_req                -> fprintf fmt "replay"
+  | Exit_req                  -> fprintf fmt "exit"
+
 type ide_request = request_type * node_ID
 
 open Session_itp
@@ -96,7 +113,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   (************************)
 
   let files = Queue.create ()
-  let opt_parser = ref None
+  (* TODO never used let _opt_parser = ref None *)
 
   (* Files are passed with request Open *)
   let config, base_config, env =
@@ -491,7 +508,9 @@ exception Bad_prover_name of prover
 
   (* ----------------- treat_request -------------------- *)
 
-  let rec treat_request (r,nid) = match r with
+  let rec treat_request (r,nid) =
+    try (
+    match r with
     | Prove_req (p,limit)     -> schedule_proof_attempt nid (get_prover p) limit
     | Transform_req (t, args) -> apply_transform nid t args
     | Strategy_req st         -> run_strategy_on_task nid st
@@ -528,7 +547,11 @@ exception Bad_prover_name of prover
         end
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0 (* TODO *)
-
+     )
+    with e -> P.notify (Message (Error (Pp.string_of
+      (fun fmt (r,nid,e) -> Format.fprintf fmt
+          "There was an unrecoverable error during treatment of request:\n %a\non node: %d\nwith exception: %a"
+    print_request (Obj.magic r) nid Exn_printer.exn_printer e ) (r, nid, e))))
 
   let treat_requests () : bool =
     List.iter treat_request (P.get_requests ());

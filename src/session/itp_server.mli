@@ -44,8 +44,12 @@ type message_notification =
   | Query_Info   of node_ID * string
   | Query_Error  of node_ID * string
   | Help         of string
+  (* General information *)
   | Information  of string
+  (* Number of task scheduled, running, etc *)
   | Task_Monitor of int * int * int
+  (* An error happened that could not be identified in server *)
+  | Error        of string
 
 type notification =
   | Node_change  of node_ID * node_info
@@ -81,6 +85,8 @@ type request_type =
   | Reload_req
   | Replay_req
   | Exit_req
+
+val print_request: Format.formatter -> request_type -> unit
 
 (* TODO: change to request_type * node_ID list ? *)
 type ide_request = request_type * node_ID

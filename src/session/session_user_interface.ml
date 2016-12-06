@@ -450,57 +450,6 @@ Strategies
 
 
 
-
-
-
-
-
-
-
-(********* Callbacks tools *******)
-
-(* Return the prover corresponding to given name. name is of the form
-  | name
-  | name, version
-  | name, altern
-  | name, version, altern *)
-let return_prover name config =
-  let fp = Whyconf.parse_filter_prover name in
-  (** all provers that have the name/version/altern name *)
-  let provers = Whyconf.filter_provers config fp in
-  if Whyconf.Mprover.is_empty provers then begin
-    (*Format.eprintf "Prover corresponding to %s has not been found@." name;*)
-    None
-  end else
-    Some (snd (Whyconf.Mprover.choose provers))
-
-(* Parses the Other command. If it fails to parse it, it answers None otherwise
-   it returns the config of the prover together with the ressource_limit *)
-let parse_prover_name config name args :
-  (Whyconf.config_prover * Call_provers.resource_limit) option =
-  let main = Whyconf.get_main config in
-  match (return_prover name config) with
-  | None -> None
-  | Some prover_config ->
-    begin
-      if (List.length args > 2) then None else
-      match args with
-      | [] ->
-        let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
-                                          limit_mem = Whyconf.memlimit main;
-                                          limit_steps = 0} in
-          Some (prover_config, default_limit)
-      | [timeout] -> Some (prover_config,
-                           Call_provers.{empty_limit with
-                                         limit_time = int_of_string timeout})
-      | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom;
-                                           limit_steps = 0})
-      | _ -> (*Format.eprintf "Parse_prover_name. Should not happen. Please report@."; *) None
-    end
-
-
 (********************)
 (* Terminal history *)
 (********************)

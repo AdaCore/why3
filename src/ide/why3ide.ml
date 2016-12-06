@@ -19,19 +19,7 @@ module Protocol_why3ide = struct
 
   let print_request_debug r =
     Debug.dprintf debug_proto "[request]";
-    match r with
-    | Command_req s -> Debug.dprintf debug_proto "command \"%s\"" s
-    | Prove_req (prover, _rl) -> Debug.dprintf debug_proto "prove with %s" prover
-    | Transform_req (tr, _args) -> Debug.dprintf debug_proto "transformation :%s" tr
-    | Strategy_req st -> Debug.dprintf debug_proto "strategy %s" st
-    | Open_req f -> Debug.dprintf debug_proto "open file %s" f
-    | Set_max_tasks_req i -> Debug.dprintf debug_proto "set max tasks %i" i
-    | Get_task -> Debug.dprintf debug_proto "get task"
-    | Get_Session_Tree_req -> Debug.dprintf debug_proto "get session tree"
-    | Save_req -> Debug.dprintf debug_proto "save"
-    | Reload_req -> Debug.dprintf debug_proto "reload"
-    | Replay_req -> Debug.dprintf debug_proto "replay"
-    | Exit_req -> Debug.dprintf debug_proto "exit"
+    Debug.dprintf debug_proto "%a" print_request r
 
   let print_msg_debug m = match m with
     | Proof_error (_ids, s) -> Debug.dprintf debug_proto "proof error %s" s
@@ -43,6 +31,7 @@ module Protocol_why3ide = struct
     | Help _s -> Debug.dprintf debug_proto "help"
     | Information s -> Debug.dprintf debug_proto "info %s" s
     | Task_Monitor _ -> Debug.dprintf debug_proto "task montor"
+    | Error s -> Debug.dprintf debug_proto "%s" s
 
   let print_notify_debug n =
     Debug.dprintf debug_proto "[notification]";
@@ -764,15 +753,21 @@ let add_to_msg_zone s =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)    -> add_to_msg_zone s
-  | Transf_error (_id, s)   -> add_to_msg_zone s
-  | Strat_error (_id, s)    -> add_to_msg_zone s
+  | Proof_error (_id, s)   -> add_to_msg_zone s
+  | Transf_error (_id, s)  -> add_to_msg_zone s
+  | Strat_error (_id, s)   -> add_to_msg_zone s
   | Replay_Info s          -> add_to_msg_zone s
-  | Query_Info (_id, s)     -> add_to_msg_zone s
-  | Query_Error (_id, s)    -> add_to_msg_zone s
+  | Query_Info (_id, s)    -> add_to_msg_zone s
+  | Query_Error (_id, s)   -> add_to_msg_zone s
   | Help s                 -> add_to_msg_zone s
   | Information s          -> add_to_msg_zone s
   | Task_Monitor (t, s, r) -> update_monitor t s r
+    (* TODO do not print it *)
+  | Error s                ->
+      if Debug.test_flag debug then
+        add_to_msg_zone s
+      else
+        add_to_msg_zone "Request failed."
 
 let treat_notification n = match n with
   | Node_change (id, info)        ->

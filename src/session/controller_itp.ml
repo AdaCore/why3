@@ -232,13 +232,6 @@ module P = Print_tree.PMake(PSession)
 let print_session fmt c =
   P.print fmt { PSession.tcont = c; PSession.tkind = PSession.Session }
 
-
-
-
-
-
-
-
 (*********)
 
 
