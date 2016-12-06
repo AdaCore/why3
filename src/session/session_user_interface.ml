@@ -611,9 +611,12 @@ let get_exception_message ses id fmt e =
   | Case.Arg_trans_term (s, t1, t2) ->
       Format.fprintf fmt "Error in transformation %s during unification of following two terms:\n %a \n %a" s
         (print_term ses id) t1 (print_term ses id) t2
+  | Case.Arg_trans_pattern (s, p1, p2) ->
+      Format.fprintf fmt "Error in transformation %s during unification of following two patterns:\n %a \n %a" s
+        (print_pat ses id) p1 (print_pat ses id) p2
   | Case.Arg_trans (s) ->
       Format.fprintf fmt "Error in transformation function: %s \n" s
-  | Case.Arg_hyp_not_found (s) ->
+  | Args_wrapper.Arg_hyp_not_found (s) ->
       Format.fprintf fmt "Following hypothesis was not found: %s \n" s
   | Args_wrapper.Arg_theory_not_found (s) ->
       Format.fprintf fmt "Theory not found: %s" s

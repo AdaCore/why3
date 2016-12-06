@@ -116,6 +116,7 @@ val normalize : limit:int -> engine -> Term.term -> Term.term
 open Term
 
 exception NoMatch of (term * term) option
+exception NoMatchpat of (pattern * pattern) option
 
 type substitution = term Mvs.t
 

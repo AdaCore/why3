@@ -8,8 +8,8 @@ open Reduction_engine
 
 exception Arg_trans of string
 exception Arg_trans_term of (string * Term.term * Term.term)
+exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
-exception Arg_hyp_not_found of string
 exception Arg_bad_hypothesis of (string * Term.term)
 exception Cannot_infer_type of string
 
@@ -173,6 +173,11 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
         Format.printf "Term %a and %a can not be matched. Failure in matching@."
           Pretty.print_term t1 Pretty.print_term t2
       else ()); raise (Arg_trans_term ("apply", t1, t2))
+  | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
+      (if (Debug.test_flag debug_matching) then
+        Format.printf "Term %a and %a can not be matched. Failure in matching@."
+          Pretty.print_pat p1 Pretty.print_pat p2
+      else ()); raise (Arg_trans_pattern ("apply", p1, p2))
   | Reduction_engine.NoMatch None -> raise (Arg_trans ("apply"))
   in
   let inst_nt = t_subst subst nt in
@@ -220,6 +225,11 @@ let replace_subst lp lv f1 f2 t =
         (if (Debug.test_flag debug_matching) then
           Format.printf "Term %a and %a can not be matched. Failure in matching@."
           Pretty.print_term t1 Pretty.print_term t2
+        else ()); None
+      | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
+        (if (Debug.test_flag debug_matching) then
+          Format.printf "Term %a and %a can not be matched. Failure in matching@."
+          Pretty.print_pat p1 Pretty.print_pat p2
         else ()); None
       | Reduction_engine.NoMatch None -> None in
         (match fom with
