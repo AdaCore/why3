@@ -515,8 +515,7 @@ theory GenericFloat
       -> is_infinite r /\ same_sign r x)
     /\
     (is_finite x /\ is_finite y /\ not no_overflow m (to_real x -. to_real y)
-      -> same_sign_real r (to_real x -. to_real y)
-         /\ overflow_value m r)
+      -> same_sign_real r (to_real x -. to_real y) /\ overflow_value m r)
     /\
     (is_finite x /\ is_finite y
       -> if diff_sign x y then same_sign r x else sign_zero_result m r)
@@ -542,10 +541,10 @@ theory GenericFloat
     /\ (is_infinite x /\ is_finite y -> is_infinite r)
     /\ (is_infinite x /\ is_infinite y -> is_nan r)
     /\ (is_finite x /\ is_finite y /\ not (is_zero y) /\
-        no_overflow m (to_real x /. to_real y)
-        -> is_finite r /\ to_real r = round m (to_real x /. to_real y))
+        not no_overflow m (to_real x /. to_real y)
+         -> overflow_value m r)
     /\ (is_finite x /\ is_zero y /\ not (is_zero x)
-        -> is_infinite r)
+         -> is_infinite r)
     /\ (is_zero x /\ is_zero y -> is_nan r)
     /\ (not is_nan r -> product_sign r x y)
 
