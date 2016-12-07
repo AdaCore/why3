@@ -139,7 +139,7 @@ module Task =
 
     let task_to_string t =
       ignore (flush_str_formatter ());
-      Driver.print_task alt_ergo_driver str_formatter t;
+      Driver.print_task alt_ergo_driver str_formatter None t;
       flush_str_formatter ()
 
     let gen_id =
