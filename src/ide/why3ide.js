@@ -50,7 +50,7 @@ function stopNotificationHandler() {
 
 function sendRequest(r) {
 var req = new XMLHttpRequest();
-req.open('GET', 'http://localhost:6789/request?value='+r, true);
+req.open('GET', 'http://localhost:6789/request?'+r, true);
 req.overrideMimeType('text/json');
 req.onreadystatechange = function (aEvt) {
   if (req.readyState == XMLHttpRequest.DONE) {

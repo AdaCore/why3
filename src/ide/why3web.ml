@@ -3,8 +3,12 @@ open Why3
 
 module P = struct
 
+ let notifications = ref []
 
- let notify _ = ()
+ let notify n = notifications := n :: ! notifications
+
+ let get_notifications () =
+   let l = !notifications in notifications := []; List.rev l
 
  let requests = ref []
 
@@ -12,18 +16,45 @@ module P = struct
    requests := r :: !requests
 
  let get_requests () =
-   let l = !requests in requests := []; l
+   let l = !requests in requests := []; List.rev l
 
 end
 
-module S = Itp_server.Make (Wserver) (P)
+open Itp_server
+
+module S = Make (Wserver) (P)
 
 open Format
 
 let interp_request args =
   match args with
-  | "button1" -> (Itp_server.Command_req "list-provers", 0)
+  | "list-provers" -> (Command_req "list-provers", root_node)
   | _ -> invalid_arg "Why3web.interp_request"
+
+let print_message_notification fmt n =
+  match n with
+  | Proof_error(nid,s) -> ()
+  | Transf_error(nid,s) -> ()
+  | Strat_error(nid,s) -> ()
+  | Replay_Info(s) -> ()
+  | Query_Info(nid,s) -> fprintf fmt "kind=\"query_info\", node=\"%d\", text=\"%s\"" nid s
+  | Query_Error(nid,s) -> fprintf fmt "kind=\"query_error\", node=\"%d\", text=\"%s\"" nid s
+  | Help s -> fprintf fmt "kind=\"help\", text=\"%s\"" s
+  | Information s -> fprintf fmt "kind=\"information\", text=\"%s\"" s
+  | Task_Monitor(a,b,c) -> ()
+
+let print_notification fmt n =
+  match n with
+  | Node_change(nid,info) -> ()
+  | New_node(nid,nid',nodetype,info) -> ()
+  | Remove(nid) -> ()
+  | Initialized(ginfo) -> ()
+  | Saved -> ()
+  | Message n -> fprintf fmt "{ notification=\"message=\"; %a }"
+                              print_message_notification n
+  | Dead s -> ()
+  | Proof_update(nid,status) -> ()
+  | Task(nid,task) -> ()
 
 let handle_script s args =
   match s with
@@ -36,8 +67,8 @@ let handle_script s args =
            (Pp.sprintf "%a" Exn_printer.exn_printer e) ^ "\" } "
      end
     | "getNotifications" ->
-       let n = Random.int 4 in
-       "{ \"kind\": \"Random\", \"value\" = \"" ^ string_of_int n ^ "\" }"
+       let n = P.get_notifications () in
+       Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
     | _ -> "bad request"
 
 let plist fmt l =
