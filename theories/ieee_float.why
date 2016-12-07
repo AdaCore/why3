@@ -18,6 +18,8 @@
 
 theory RoundingMode
   type mode = RNE | RNA | RTP | RTN | RTZ
+
+  predicate to_nearest (m:mode) = m = RNE \/ m = RNA
 end
 
 theory GenericFloat
@@ -403,6 +405,12 @@ theory GenericFloat
     is_finite (add m x y) ->
     is_finite x /\ is_finite y
 
+  lemma add_finite_rev_n: forall m:mode, x y:t [add m x y].
+    to_nearest m ->
+    is_finite (add m x y) ->
+    no_overflow m (to_real x +. to_real y) /\
+    to_real (add m x y) = round m (to_real x +. to_real y)
+
   axiom sub_finite: forall m:mode, x y:t [sub m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x -. to_real y) ->
     is_finite (sub m x y) /\
@@ -412,6 +420,12 @@ theory GenericFloat
     is_finite (sub m x y) ->
     is_finite x /\ is_finite y
 
+  lemma sub_finite_rev_n: forall m:mode, x y:t [sub m x y].
+    to_nearest m ->
+    is_finite (sub m x y) ->
+    no_overflow m (to_real x -. to_real y) /\
+    to_real (sub m x y) = round m (to_real x -. to_real y)
+
   axiom mul_finite: forall m:mode, x y:t [mul m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x *. to_real y) ->
     is_finite (mul m x y) /\
@@ -420,6 +434,12 @@ theory GenericFloat
   lemma mul_finite_rev: forall m:mode, x y:t [mul m x y].
     is_finite (mul m x y) ->
     is_finite x /\ is_finite y
+
+  lemma mul_finite_rev_n: forall m:mode, x y:t [mul m x y].
+    to_nearest m ->
+    is_finite (mul m x y) ->
+    no_overflow m (to_real x *. to_real y) /\
+    to_real (mul m x y) = round m (to_real x *. to_real y)
 
   axiom div_finite: forall m:mode, x y:t [div m x y].
     is_finite x -> is_finite y ->
@@ -431,6 +451,12 @@ theory GenericFloat
     is_finite (div m x y) ->
     (is_finite x /\ is_finite y /\ not is_zero y) \/
     (is_finite x /\ is_infinite y /\ to_real (div m x y) = 0.)
+
+  lemma div_finite_rev_n: forall m:mode, x y:t [div m x y].
+    to_nearest m ->
+    is_finite (div m x y) -> is_finite y ->
+    no_overflow m (to_real x /. to_real y) /\
+    to_real (div m x y) = round m (to_real x /. to_real y)
 
   axiom neg_finite: forall x:t [neg x].
     is_finite x ->
@@ -464,6 +490,12 @@ theory GenericFloat
   lemma fma_finite_rev: forall m:mode, x y z:t [fma m x y z].
     is_finite (fma m x y z) ->
     is_finite x /\ is_finite y /\ is_finite z
+
+  lemma fma_finite_rev_n: forall m:mode, x y z:t [fma m x y z].
+    to_nearest m ->
+    is_finite (fma m x y z) ->
+    no_overflow m (to_real x *. to_real y +. to_real z) /\
+    to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
 
   (* /!\ externalize square root? more generally, externalize any part
          that needs another theory ? /!\ *)
