@@ -1909,40 +1909,40 @@ module N
     let sl,c = add_with_carry l ul zero in
     let sh,c' = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
     assert { l2i sl + radix * l2i sh + radix * radix * l2i c'
-    	     = l2i l + radix * l2i h + l2i ul + radix * l2i uh };
+             = l2i l + radix * l2i h + l2i ul + radix * l2i uh };
     assert { l2i c' = 0
-    	     by
-	     l2i uh < l2i d
-	     so l2i v * l2i uh <= l2i v * l2i d
-	     so k = radix * radix - (radix + l2i v) * l2i d
-	     	  = radix * radix - radix * l2i d - l2i v * l2i d
+             by
+             l2i uh < l2i d
+             so l2i v * l2i uh <= l2i v * l2i d
+             so k = radix * radix - (radix + l2i v) * l2i d
+                  = radix * radix - radix * l2i d - l2i v * l2i d
              so l2i v * l2i d = radix * radix - radix * l2i d - k
-	     	      	      = radix * (radix - l2i d) - k
-	     so k > 0
-	     so l2i v * l2i d < radix * (radix - l2i d)
-	     so l2i v * l2i uh < radix * (radix - l2i d)
-	     so l2i l + radix * l2i h = l2i v * l2i uh
-	     so l2i l + radix * l2i h < radix * (radix - l2i d)
-	     so l2i uh <= l2i d - 1
-	     so radix * l2i uh <= radix * (l2i d - 1) = radix * l2i d - radix
-	     so l2i l + radix * l2i h + radix * l2i uh
-	     	< radix * (radix - l2i d) + radix * l2i uh
-	     	<= radix * (radix - l2i d) + radix * l2i d - radix
-		<= radix * (radix - l2i d + l2i d) - radix = radix * radix - radix
+                              = radix * (radix - l2i d) - k
+             so k > 0
+             so l2i v * l2i d < radix * (radix - l2i d)
+             so l2i v * l2i uh < radix * (radix - l2i d)
+             so l2i l + radix * l2i h = l2i v * l2i uh
+             so l2i l + radix * l2i h < radix * (radix - l2i d)
+             so l2i uh <= l2i d - 1
+             so radix * l2i uh <= radix * (l2i d - 1) = radix * l2i d - radix
+             so l2i l + radix * l2i h + radix * l2i uh
+                < radix * (radix - l2i d) + radix * l2i uh
+                <= radix * (radix - l2i d) + radix * l2i d - radix
+                <= radix * (radix - l2i d + l2i d) - radix = radix * radix - radix
              so l2i ul < radix
-	     so l2i l + radix * l2i h + l2i ul + radix * l2i uh
-	     	= l2i l + radix * l2i h + radix * l2i uh + l2i ul
-		< radix * radix - radix + l2i ul
-		< radix * radix - radix + radix = radix * radix
-	     so l2i sl + radix * l2i sh + radix * radix * l2i c'
-	     	= l2i l + radix * l2i h + l2i ul + radix * l2i uh
-		< radix * radix
+             so l2i l + radix * l2i h + l2i ul + radix * l2i uh
+                = l2i l + radix * l2i h + radix * l2i uh + l2i ul
+                < radix * radix - radix + l2i ul
+                < radix * radix - radix + radix = radix * radix
+             so l2i sl + radix * l2i sh + radix * radix * l2i c'
+                = l2i l + radix * l2i h + l2i ul + radix * l2i uh
+                < radix * radix
              so radix * radix * l2i c' <= l2i sl + radix * l2i sh + radix * radix * l2i c'
-	     so radix * radix * l2i c' < radix * radix
+             so radix * radix * l2i c' < radix * radix
      };
     assert { l2i sl + radix * l2i sh = l2i l + radix * l2i h + l2i ul + radix * l2i uh
-    	     = l2i v * l2i uh + l2i ul + radix * l2i uh
-	     = l2i ul + (radix + l2i v) * l2i uh };
+             = l2i v * l2i uh + l2i ul + radix * l2i uh
+             = l2i ul + (radix + l2i v) * l2i uh };
     let qh = ref sh in
     let ql = ref sl in
     let ghost q0 = l2i !ql in
@@ -1955,35 +1955,35 @@ module N
     let r = ref (sub_mod ul p) in
     let ghost r' = l2i !r in
     assert { r' = mod cr radix
-    	     by
-	     let a = (- div (l2i !qh * l2i d) radix) in
-	     r' = l2i !r
-	     = mod (l2i ul - l2i p) radix
-	     = mod (l2i ul - mod (l2i !qh * l2i d) radix) radix
-	     = mod (radix * a
-	       	   + l2i ul - mod (l2i !qh * l2i d) radix) radix
-	     = mod (l2i ul - mod (l2i !qh * l2i d) radix
-	         	   - radix * div (l2i !qh * l2i d) radix) radix
-	     = mod (l2i ul - l2i !qh * l2i d) radix
-	     = mod (l2i ul - mod cq radix * l2i d) radix
-	     = mod (radix * (- (div cq radix)) * l2i d + l2i ul - mod cq radix * l2i d) radix
-	     = mod (l2i ul - (mod cq radix + radix * div cq radix) * l2i d) radix
-	     = mod (l2i ul - cq * l2i d) radix
-	     = mod (radix * l2i uh + l2i ul - cq * l2i d) radix
-	     = mod (l2i ul - cq * l2i d + radix * l2i uh) radix
-	     = mod cr radix };
+             by
+             let a = (- div (l2i !qh * l2i d) radix) in
+             r' = l2i !r
+             = mod (l2i ul - l2i p) radix
+             = mod (l2i ul - mod (l2i !qh * l2i d) radix) radix
+             = mod (radix * a
+                   + l2i ul - mod (l2i !qh * l2i d) radix) radix
+             = mod (l2i ul - mod (l2i !qh * l2i d) radix
+                           - radix * div (l2i !qh * l2i d) radix) radix
+             = mod (l2i ul - l2i !qh * l2i d) radix
+             = mod (l2i ul - mod cq radix * l2i d) radix
+             = mod (radix * (- (div cq radix)) * l2i d + l2i ul - mod cq radix * l2i d) radix
+             = mod (l2i ul - (mod cq radix + radix * div cq radix) * l2i d) radix
+             = mod (l2i ul - cq * l2i d) radix
+             = mod (radix * l2i uh + l2i ul - cq * l2i d) radix
+             = mod (l2i ul - cq * l2i d + radix * l2i uh) radix
+             = mod cr radix };
     assert { radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d };
     prod_compat_strict_r (l2i ul) radix (radix - l2i d);
     assert { (* Theorem 2 of Möller&Granlund 2010 *)
-    	     (max (radix - l2i d) (q0 + 1)) - radix <= cr < max (radix - l2i d) q0
-	     by radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
-	     so (l2i uh * k + l2i ul * (radix - l2i d) >= 0
-	     	by l2i uh >= 0 /\ k >= 0 /\ l2i ul >= 0 /\ radix - l2i d >= 0)
-	     so radix * cr >= q0 * l2i d - radix * l2i d
-	     so radix * cr >= - radix * l2i d
-	     so cr >= - l2i d
-	     so radix * cr >= q0 * l2i d - radix * l2i d = (q0 - radix) * l2i d
-	     so radix > l2i d
+             (max (radix - l2i d) (q0 + 1)) - radix <= cr < max (radix - l2i d) q0
+             by radix * cr = l2i uh * k + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
+             so (l2i uh * k + l2i ul * (radix - l2i d) >= 0
+                by l2i uh >= 0 /\ k >= 0 /\ l2i ul >= 0 /\ radix - l2i d >= 0)
+             so radix * cr >= q0 * l2i d - radix * l2i d
+             so radix * cr >= - radix * l2i d
+             so cr >= - l2i d
+             so radix * cr >= q0 * l2i d - radix * l2i d = (q0 - radix) * l2i d
+             so radix > l2i d
              so radix - q0 > 0
              so (radix-q0) * l2i d < (radix - q0) * radix
              so (q0 - radix) * l2i d > (q0 - radix) * radix
@@ -1994,28 +1994,28 @@ module N
                 by (cr + radix >= - l2i d + radix
                    /\ (cr + radix > q0 so cr + radix >= q0 + 1))
                    so cr + radix >= m)
-	     so 0 < k <= l2i d so 0 <= l2i uh < l2i d
-	     so k * l2i uh < k * l2i d <= l2i d * l2i d
-	     so radix * cr < l2i d * l2i d + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
-	     so l2i ul * (radix - l2i d) < radix * (radix - l2i d)
-	     so radix * cr < l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
-	     so (radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
-	     	by
-	     	l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
-			= radix * (radix - l2i d) + l2i d * l2i d - radix * l2i d + q0 * l2i d
-			= radix * (radix - l2i d) + (l2i d - radix) * l2i d +  q0 * l2i d
-			= radix * (radix - l2i d) - l2i d * (radix - l2i d) + q0 * l2i d
-			= (radix - l2i d) * (radix - l2i d) + q0 * l2i d)
-	     so let m = max (radix - l2i d) q0 in
-	     	radix - l2i d <= m
-	     so (radix - l2i d) * (radix - l2i d) <= m* (radix - l2i d)
-	     so (q0 * l2i d <= m * l2i d by 0 <= q0 <= m /\ 0 < l2i d)
-	     so radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
-	     	      	   <= m* (radix - l2i d) + q0 * l2i d
-			   <= m* (radix - l2i d) + m * l2i d
-			   = m * radix
-	     so cr < m
-			   };
+             so 0 < k <= l2i d so 0 <= l2i uh < l2i d
+             so k * l2i uh < k * l2i d <= l2i d * l2i d
+             so radix * cr < l2i d * l2i d + l2i ul * (radix - l2i d) + q0 * l2i d - radix * l2i d
+             so l2i ul * (radix - l2i d) < radix * (radix - l2i d)
+             so radix * cr < l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
+             so (radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+                by
+                l2i d * l2i d + radix * (radix - l2i d) + q0 * l2i d - radix * l2i d
+                        = radix * (radix - l2i d) + l2i d * l2i d - radix * l2i d + q0 * l2i d
+                        = radix * (radix - l2i d) + (l2i d - radix) * l2i d +  q0 * l2i d
+                        = radix * (radix - l2i d) - l2i d * (radix - l2i d) + q0 * l2i d
+                        = (radix - l2i d) * (radix - l2i d) + q0 * l2i d)
+             so let m = max (radix - l2i d) q0 in
+                radix - l2i d <= m
+             so (radix - l2i d) * (radix - l2i d) <= m* (radix - l2i d)
+             so (q0 * l2i d <= m * l2i d by 0 <= q0 <= m /\ 0 < l2i d)
+             so radix * cr < (radix - l2i d) * (radix - l2i d) + q0 * l2i d
+                           <= m* (radix - l2i d) + q0 * l2i d
+                           <= m* (radix - l2i d) + m * l2i d
+                           = m * radix
+             so cr < m
+                           };
     assert { cr >= 0 -> r' = cr };
     assert { cr < 0 ->
            ( r' = cr + radix
@@ -2026,10 +2026,10 @@ module N
              so mod (cr + radix) radix = mod cr radix
              so r' = mod (cr + radix) radix ) };
     assert { cr < 0 ->
-    	     	( l2i !r > l2i !ql
-		by max (radix - l2i d) (q0 + 1) >= q0 + 1 > q0
-		so cr >= (max (radix - l2i d) (q0 +1)) - radix > q0 - radix
-		so r' = cr + radix > q0 - radix + radix = q0 ) };
+                ( l2i !r > l2i !ql
+                by max (radix - l2i d) (q0 + 1) >= q0 + 1 > q0
+                so cr >= (max (radix - l2i d) (q0 +1)) - radix > q0 - radix
+                so r' = cr + radix > q0 - radix + radix = q0 ) };
     assert { 1 <= cq <= radix };
     assert { (l2i !qh = cq \/ (l2i !qh = 0 /\ cq = radix)
               by (1 <= cq < radix -> l2i !qh = mod cq radix = cq)
@@ -2057,30 +2057,30 @@ module N
       assert { cr >= 0 ->
                   (l2i !r = cr + l2i d
                   by r' = cr
-		  so r' < max (radix - l2i d) q0
-		  so r' > q0
-		  so 0 <= r' < radix - l2i d
-		  so l2i d <= r' + l2i d < radix
-		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d) };
+                  so r' < max (radix - l2i d) q0
+                  so r' > q0
+                  so 0 <= r' < radix - l2i d
+                  so l2i d <= r' + l2i d < radix
+                  so l2i !r = mod (r' + l2i d) radix = r' + l2i d) };
       assert { cr >= 0 ->
-    	       	  ( l2i !r >= l2i d
-		  by r' = cr >= 0
+                  ( l2i !r >= l2i d
+                  by r' = cr >= 0
                   so l2i !r = r' + l2i d >= l2i d ) };
       assert { cr < 0 ->
                   ( l2i !r = r' + l2i d - radix
                   by r' = cr + radix < radix
-		  so cr >= max (radix - l2i d) (q0 + 1) - radix
+                  so cr >= max (radix - l2i d) (q0 + 1) - radix
                         >= radix - l2i d - radix = - l2i d
-		  so r' = cr + radix >= radix - l2i d
-		  so l2i !r = mod (r' + l2i d) radix
-		  so radix + radix >= r' + l2i d >= radix
-		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix ) };
+                  so r' = cr + radix >= radix - l2i d
+                  so l2i !r = mod (r' + l2i d) radix
+                  so radix + radix >= r' + l2i d >= radix
+                  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix ) };
       assert { cr < 0 ->
-      	          ( 0 <= l2i !r < l2i d
-		  by r' = cr + radix < radix
-		  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix
-		  so l2i !r >= 0
-		  so l2i !r = r' + l2i d - radix < l2i d ) };
+                  ( 0 <= l2i !r < l2i d
+                  by r' = cr + radix < radix
+                  so l2i !r = mod (r' + l2i d) radix = r' + l2i d - radix
+                  so l2i !r >= 0
+                  so l2i !r = r' + l2i d - radix < l2i d ) };
       assert { cq = radix ->
                 ( l2i !qh * l2i d + l2i !r = u
                 by cq * l2i d + cr = u
@@ -2118,19 +2118,19 @@ module N
     then begin
       assert { cr >= 0 };
       assert { l2i !qh < radix - 1
-      	       by
-	       l2i !qh * l2i d = l2i ul + radix * l2i uh  - l2i !r
-	       so l2i uh <= l2i d - 1
-	       so l2i ul + radix * l2i uh - l2i !r
-	       	  <= l2i ul + radix * (l2i d - 1) - l2i !r
-		  = l2i ul + radix * l2i d - radix - l2i !r
-		  = (l2i ul - radix)  + radix * l2i d - l2i !r
-		  <  radix * l2i d - l2i !r
-		  <= radix * l2i d - l2i d
-		  = (radix - 1) * l2i d
-	       so l2i !qh * l2i d < (radix - 1) * l2i d
-	       so l2i d > 0
-	       so l2i !qh < radix - 1 };
+               by
+               l2i !qh * l2i d = l2i ul + radix * l2i uh  - l2i !r
+               so l2i uh <= l2i d - 1
+               so l2i ul + radix * l2i uh - l2i !r
+                  <= l2i ul + radix * (l2i d - 1) - l2i !r
+                  = l2i ul + radix * l2i d - radix - l2i !r
+                  = (l2i ul - radix)  + radix * l2i d - l2i !r
+                  <  radix * l2i d - l2i !r
+                  <= radix * l2i d - l2i d
+                  = (radix - 1) * l2i d
+               so l2i !qh * l2i d < (radix - 1) * l2i d
+               so l2i d > 0
+               so l2i !qh < radix - 1 };
       qh := Limb.(+) !qh one;
       r := Limb.(-) !r d;
       assert { 0 <= l2i !r < l2i d };
@@ -2410,7 +2410,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     r0 := bl;
     let ghost r' = l2i !r0 + radix * l2i !r1 in
     let ghost cr = u - d * cq in
-    assert { (l2i !r0 + radix * l2i !r1) = mod cr(radix * radix)
+    assert {  r' = mod cr(radix * radix)
               by
               (l2i !r1 at CQuot = mod (l2i um - l2i dh * l2i sh) radix
                 by let a' = div (l2i dh * l2i sh) radix in
@@ -2484,7 +2484,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  + d * q0 - d * radix )
             so (cr >= m - radix * radix
                by (
-	       	  k >= 0 so radix * radix - d >= 0
+                  k >= 0 so radix * radix - d >= 0
                so l2i uh >= 0 so l2i um >= 0 so l2i ul >= 0
                so  k * l2i uh + (radix * radix - d) * l2i um + radix * l2i ul
                    >= 0
@@ -2495,31 +2495,32 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                so cr >= -d = radix * radix - d - radix * radix
                so radix * cr >= d * (q0 - radix)
                so (
-	       	    (radix - q0) * d < (radix - q0) * radix * radix
-               	    by let rq = radix - q0 in let r2 = radix * radix in
-               	    rq > 0 /\ d < r2
-               	    so rq * d < rq * r2
-		  )
+                    (radix - q0) * d < (radix - q0) * radix * radix
+                    by let rq = radix - q0 in let r2 = radix * radix in
+                    rq > 0 /\ d < r2
+                    so rq * d < rq * r2
+                  )
                so d * (q0 - radix) > radix * radix * (q0 - radix)
                so radix * cr > radix * radix * (q0 - radix)
                so cr > radix * (q0 - radix) = radix * q0 - radix * radix
-	          ))
+                  ))
             so cr < m
             by (
-		let bbd = radix * radix - d in
+                let bbd = radix * radix - d in
+                bbd > 0 so
                 if l2i uh <= l2i dh - 1
                 then
-		  let dm = l2i dh - 1 in
-		  l2i uh <= dm
-		  so
-	 	  k * l2i uh <= k * dm
-		  so (k * dm <= d * dm by k <= d /\ 0 <= dm)
-		  so k * l2i uh <= d * dm
-		  so
-		  bbd * l2i um <= bbd * (radix - 1)
-		  so
+                  let dm = l2i dh - 1 in
+                  l2i uh <= dm
+                  so
+                  k * l2i uh <= k * dm
+                  so (k * dm <= d * dm by k <= d /\ 0 <= dm)
+                  so k * l2i uh <= d * dm
+                  so
+                  bbd * l2i um <= bbd * (radix - 1)
+                  so
                   radix * cr
-		  = k * l2i uh + (radix * radix - d) * l2i um
+                  = k * l2i uh + (radix * radix - d) * l2i um
                     + radix * l2i ul + d * q0 - radix * d
                   <= d * dm + bbd * l2i um
                     + radix * l2i ul + d * q0 - radix * d
@@ -2527,156 +2528,198 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     + radix * l2i ul + d * q0 - radix * d
                   < d * dm + bbd * (radix - 1)
                     + radix * radix + d * q0 - radix * d
-		  so radix * radix * cr
-		  < radix * (d * dm + bbd * (radix - 1)
+                  so radix * radix * cr
+                  < radix * (d * dm + bbd * (radix - 1)
                     + radix * radix + d * q0 - radix * d)
-		  = d * radix * (l2i dh - 1) + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * radix * l2i dh - d * radix + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * (d - l2i dl) - d * radix + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * d - d * radix + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * l2i dl
-		  so (d * l2i dl >= 0 by d >= 0 /\ l2i dl >= 0)
-		  so radix * radix * cr
-		  < d * d - d * radix + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * l2i dl
-		  <= d * d - d * radix + bbd * radix * (radix - 1)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * d - d * radix + bbd * (radix * radix - radix)
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * d - d * radix + bbd * radix * radix - (radix * radix - d) * radix
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * d - d * radix + bbd * radix * radix
-		    + radix * d - radix * radix * radix
-		    + radix * radix * radix + radix * d * q0 - radix * radix * d
-		  = d * d + bbd * radix * radix - radix * radix * d + radix * d * q0
-		  = bbd * radix * radix - d * (radix * radix - d) + radix * d * q0
-		  = bbd * radix * radix - d * bbd + radix * d * q0
-		  = bbd * bbd + radix * d * q0
-		  <= bbd * m + d * radix * q0
-		  <= bbd * m + d * m
-		  = radix * radix * m
-		  so cr < m
-		 else
-		  l2i uh = l2i dh
-		  so
-		  (l2i um <= l2i dl - 1 by l2i um + radix * l2i uh < l2i dl + radix * l2i dh)
-		  so
-		  ( radix * radix * cr
-		    < radix * radix * m
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-		 by radix * cr
-		  = k * l2i dh + (radix * radix - d) * l2i um
+                  = d * radix * (l2i dh - 1) + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * radix * l2i dh - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * (d - l2i dl) - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * l2i dl
+                  so (d * l2i dl >= 0 by d >= 0 /\ l2i dl >= 0)
+                  so radix * radix * cr
+                  < d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d - d * l2i dl
+                  <= d * d - d * radix + bbd * radix * (radix - 1)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * (radix * radix - radix)
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * radix - (radix * radix - d) * radix
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d - d * radix + bbd * radix * radix
+                    + radix * d - radix * radix * radix
+                    + radix * radix * radix + radix * d * q0 - radix * radix * d
+                  = d * d + bbd * radix * radix - radix * radix * d + radix * d * q0
+                  = bbd * radix * radix - d * (radix * radix - d) + radix * d * q0
+                  = bbd * radix * radix - d * bbd + radix * d * q0
+                  = bbd * bbd + d * (radix * q0)
+                  <= bbd * m + d * (radix * q0)
+                  <= bbd * m + d * m
+                  = radix * radix * m
+                  so cr < m
+                 else
+                  l2i uh = l2i dh
+                  so
+                  (l2i um <= l2i dl - 1
+                  by l2i um + radix * l2i uh < l2i dl + radix * l2i dh)
+                  so
+                  ( radix * radix * cr
+                    < radix * radix * m
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                 by radix * cr
+                  = k * l2i dh + (radix * radix - d) * l2i um
                     + radix * l2i ul + d * q0 - radix * d
-		  <= d * l2i dh + (radix * radix - d) * l2i um
-		    + radix * l2i ul + d * q0 - radix * d
-		  <= d * l2i dh + (radix * radix - d) * (l2i dl - 1)
-		    + radix * l2i ul + d * q0 - radix * d
-		  < d * l2i dh + (radix * radix - d) * (l2i dl - 1)
-		    + radix * radix + d * q0 - radix * d
-		  so radix * radix * cr
-		  < radix * (d * l2i dh + (radix * radix - d) * (l2i dl - 1)
-		    + radix * radix + d * q0 - radix * d)
-		  = d * radix * l2i dh + (radix * radix - d) * (l2i dl - 1) * radix
-		    + radix * radix * radix + d * q0 * radix - radix * radix * d
-		  = d * (d - l2i dl) + (radix * radix - d) * (radix * l2i dl - radix)
-		    + radix * radix * radix + d * q0 * radix - radix * radix * d
-		  = d * d - d * l2i dl + radix * radix * radix * l2i dl
-		    - d * radix * l2i dl + d * radix - radix * radix * radix
-		    + radix * radix * radix + d * q0 * radix - radix * radix * d
-		  = d * d - d * l2i dl + radix * radix * radix * l2i dl
-		    - d * radix * l2i dl + d * radix + d * q0 * radix - radix * radix * d
-		  = d * d - radix * radix * d + d * radix + d * q0 * radix
-		    + l2i dl * (radix * radix * radix - d - d * radix)
-		  = d * (d - radix * radix) + d * radix + d * q0 * radix
-		    + l2i dl * (radix * radix * radix - d - d * radix)
-		  = bbd * (-d) + d * radix + d * q0 * radix
-		    + l2i dl * (radix * radix * radix - d - d * radix)
-		  = bbd * (bbd - radix * radix) + d * radix + d * q0 * radix
-		    + l2i dl * (radix * radix * radix - d - d * radix)
-		  = bbd * bbd + d * q0 * radix
-		    - bbd * radix * radix + d * radix
-		    + l2i dl * (radix * radix * radix - d * (1 + radix))
-		  = bbd * bbd + d * q0 * radix
-		    - (radix * radix - d) * radix * radix + d * radix
-		    + l2i dl * (radix * radix * radix - d * (1 + radix))
-		  = bbd * bbd + d * q0 * radix
-		    - radix * ((radix * radix - d) * radix - d)
-		    + l2i dl * (radix * radix * radix - d * (1 + radix))
-		  = bbd * bbd + d * q0 * radix
-		    - radix *  (radix * radix * radix - d * radix - d)
-		    + l2i dl * (radix * radix * radix - d * (1 + radix))
-		  = bbd * bbd + d * q0 * radix
-		    - radix * (radix * radix * radix - d * (1+ radix))
-		    + l2i dl * (radix * radix * radix - d * (1 + radix))
-		  = bbd * bbd + d * q0 * radix
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-		  <= bbd * m + d * q0 * radix
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-		  <= bbd * m + d * m
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-		  = (bbd + d) * m
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-		  = radix * radix * m
-		    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix)))
-		  so
-		    (cr < m by
-		    if d <= radix * (radix - 1)
-		    then (radix + 1) * d <= radix * (radix - 1) * (radix + 1)
-		    	 = radix * (radix * radix - 1)
-			 = radix * radix * radix - radix
-			 < radix * radix * radix
-			 so (radix * radix * radix - d * (1+ radix)) > 0
-			 so radix - l2i dl > 0
-			 so (radix - l2i dl) * (radix * radix * radix - d * (1+ radix)) > 0
-			 so
-			 radix * radix * cr
-			 < radix * radix * m
-			   - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
-			 < radix * radix * m
-			 so radix * radix * cr < radix * radix * m
-	            else
-			l2i dl + radix * l2i dh = d > radix * (radix - 1)
-			so l2i dl < radix
-			so l2i dl + radix * l2i dh < radix * (1 + l2i dh)
-			so radix - 1 < 1 + l2i dh
-			so l2i dh > radix - 2
-			so l2i dh = radix - 1
-			so l2i uh = l2i dh
-			so d >= radix * (radix - 1) +1
-			so d * (radix + 1) >= (radix * (radix - 1) + 1) * (radix +1)
-			       	      	   = radix * (radix * radix - 1) + radix + 1
-			       	      	   = radix * radix * radix - radix + radix + 1
-					   = radix * radix * radix + 1
-		 	so d * div (radix * radix * radix - 1) d <= radix * radix * radix - 1
-			       	   	    	    	       	 < radix * radix * radix + 1
-			       	   	    	    	       	 <= d * (radix + 1)
-			so div (radix * radix * radix - 1) d < radix + 1
-			so l2i v = div (radix * radix * radix - 1) d - radix
-			       	 < radix + 1 - radix = 1
-			so l2i v = 0
-			so l2i sh = l2i uh = radix - 1
-			so cq = l2i sh + 1 = radix
-			so cr = u - cq * d
-			      = u - radix * d
-			      = l2i ul + radix * (l2i um + radix * l2i dh)
-			      	       - radix * (l2i dl + radix * l2i dh)
-			      = l2i ul + radix * (l2i um - l2i dl)
-			so l2i um <= l2i dl - 1
-			so 1 + l2i um - l2i dl <= 0
-			so l2i ul < radix
-			so cr = l2i ul + radix * (l2i um - l2i dl)
-			      < radix + radix * (l2i um - l2i dl)
-			      = radix * (1 + l2i um - l2i dl) <= 0
-			so cr < 0 <= m
-	 	   )
-		)
+                  <= d * l2i dh + (radix * radix - d) * l2i um
+                    + radix * l2i ul + d * q0 - radix * d
+                  <= d * l2i dh + (radix * radix - d) * (l2i dl - 1)
+                    + radix * l2i ul + d * q0 - radix * d
+                  < d * l2i dh + (radix * radix - d) * (l2i dl - 1)
+                    + radix * radix + d * q0 - radix * d
+                  so radix * radix * cr
+                  < radix * (d * l2i dh + (radix * radix - d) * (l2i dl - 1)
+                    + radix * radix + d * q0 - radix * d)
+                  = d * radix * l2i dh
+                    + (radix * radix - d) * (l2i dl - 1) * radix
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * (d - l2i dl)
+                    + (radix * radix - d) * (radix * l2i dl - radix)
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * d - d * l2i dl + radix * radix * radix * l2i dl
+                    - d * radix * l2i dl + d * radix - radix * radix * radix
+                    + radix * radix * radix + d * q0 * radix - radix * radix * d
+                  = d * d - d * l2i dl + radix * radix * radix * l2i dl
+                    - d * radix * l2i dl + d * radix + d * q0 * radix
+                    - radix * radix * d
+                  = d * d - radix * radix * d + d * radix + d * q0 * radix
+                    + l2i dl * (radix * radix * radix - d - d * radix)
+                  = d * (d - radix * radix) + d * radix + d * q0 * radix
+                    + l2i dl * (radix * radix * radix - d - d * radix)
+                  = bbd * (-d) + d * radix + d * q0 * radix
+                    + l2i dl * (radix * radix * radix - d - d * radix)
+                  = bbd * (bbd - radix * radix) + d * radix + d * q0 * radix
+                    + l2i dl * (radix * radix * radix - d - d * radix)
+                  = bbd * bbd + d * q0 * radix
+                    - bbd * radix * radix + d * radix
+                    + l2i dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - (radix * radix - d) * radix * radix + d * radix
+                    + l2i dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix * ((radix * radix - d) * radix - d)
+                    + l2i dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix *  (radix * radix * radix - d * radix - d)
+                    + l2i dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - radix * (radix * radix * radix - d * (1+ radix))
+                    + l2i dl * (radix * radix * radix - d * (1 + radix))
+                  = bbd * bbd + d * q0 * radix
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                  <= bbd * m + d * q0 * radix
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                  <= bbd * m + d * m
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                  = (bbd + d) * m
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                  = radix * radix * m
+                    - (radix - l2i dl) * (radix * radix * radix - d * (1+ radix))
+                  )
+                  so
+                    (cr < m by
+                    if d <= radix * (radix - 1)
+                    then (radix + 1) * d <= radix * (radix - 1) * (radix + 1)
+                         = radix * (radix * radix - 1)
+                         = radix * radix * radix - radix
+                         < radix * radix * radix
+                         so (radix * radix * radix - d * (1+ radix)) > 0
+                         so radix - l2i dl > 0
+                         so (radix - l2i dl) * (radix * radix * radix
+                                               - d * (1+ radix))
+                            > 0
+                         so
+                         radix * radix * cr
+                         < radix * radix * m
+                           - (radix - l2i dl) * (radix * radix * radix
+                           - d * (1+ radix))
+                         < radix * radix * m
+                         so radix * radix * cr < radix * radix * m
+                    else
+                        l2i dl + radix * l2i dh = d > radix * (radix - 1)
+                        so l2i dl < radix
+                        so l2i dl + radix * l2i dh < radix * (1 + l2i dh)
+                        so radix - 1 < 1 + l2i dh
+                        so l2i dh > radix - 2
+                        so l2i dh = radix - 1
+                        so l2i uh = l2i dh
+                        so d >= radix * (radix - 1) +1
+                        so d * (radix + 1)
+                           >= (radix * (radix - 1) + 1) * (radix +1)
+                            = radix * (radix * radix - 1) + radix + 1
+                            = radix * radix * radix - radix + radix + 1
+                            = radix * radix * radix + 1
+                        so
+                        (d * div (radix * radix * radix - 1) d
+                             <= d * (radix + 1)
+                          by d * div (radix * radix * radix - 1) d
+                             <= radix * radix * radix - 1
+                             < radix * radix * radix + 1
+                             <= d * (radix + 1))
+                        so (let a = div (radix * radix * radix - 1) d in
+                           a < radix + 1 by  a * d < (radix + 1) * d)
+                        so l2i v = div (radix * radix * radix - 1) d - radix
+                                 < radix + 1 - radix = 1
+                        so l2i v = 0
+                        so l2i sh = l2i uh = radix - 1
+                        so cq = l2i sh + 1 = radix
+                        so cr = u - cq * d
+                              = u - radix * d
+                              = l2i ul + radix * (l2i um + radix * l2i dh)
+                                       - radix * (l2i dl + radix * l2i dh)
+                              = l2i ul + radix * (l2i um - l2i dl)
+                        so l2i um <= l2i dl - 1
+                        so 1 + l2i um - l2i dl <= 0
+                        so l2i ul < radix
+                        so cr = l2i ul + radix * (l2i um - l2i dl)
+                              < radix + radix * (l2i um - l2i dl)
+                              = radix * (1 + l2i um - l2i dl) <= 0
+                        so cr < 0 <= m
+                   )
+                )
             };
     assert { cr >= 0 -> r' = cr };
-    assert { cr < 0 -> r' = cr + radix * radix };
+    assert { cr < 0 -> r' = radix * radix + cr
+             by
+             m >= radix * radix - d
+             so cr >= m - radix * radix >= -d
+             so cr + radix * radix >= radix * radix - d >= 0
+             so 0 <= cr + radix * radix < radix * radix
+             so mod (radix * radix + cr) (radix*radix) = mod cr (radix*radix)
+             so r' = mod (radix * radix + cr) (radix*radix) };
+    assert { cr < 0 -> l2i !r1 >= l2i sl
+             by m >= radix * q0
+             so cr >= m - radix * radix >= radix * q0 - radix * radix
+             so r' = radix * radix + cr >= radix * q0
+             so r' = radix * l2i !r1 + l2i !r0 >= radix * q0
+             so l2i !r0 < radix
+             so r' < radix * l2i !r1 + radix = radix * (l2i !r1 + 1)
+             so radix * q0 < radix * (l2i !r1 + 1)
+             so l2i sl = q0 < l2i !r1 + 1 };
     assert { 1 <= cq <= radix };
+    assert { 1 <= cq < radix -> l2i !q1 = cq so l2i !q1 * d + cr = u };
+    assert { cq = radix ->
+             (cr < 0
+                by cq * d + cr = u
+                so l2i um + radix * l2i uh <= d - 1
+                so radix * d + cr = l2i ul
+                                    + radix * (l2i um + radix * l2i uh)
+                                  <= l2i ul + radix * (d - 1)
+                                  = l2i ul - radix + radix * d
+                                  < radix * d
+             )
+           };
     if Limb.(>=) !r1 sl
     then begin
       q1 := sub_mod !q1 one;
@@ -2684,7 +2727,12 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let sh, _c = add_with_carry !r1 dh c in
       r1 := sh;
       r0 := sl;
-    end;
+    end
+    else assert { l2i !q1 * d + r' = u
+                  by cr >= 0
+                  so r' = cr
+                  so 1 <= cq < radix
+                  so l2i !q1 * d + cr = u };
     assert { l2i !q1 * d + l2i !r0 + radix * l2i !r1 = u };
     if (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin (*unlikely*)
