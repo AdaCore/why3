@@ -141,13 +141,16 @@ module BinarySearchBoolean
     requires { 0 < a.length }
     requires { forall i j. 0 <= i <= j < a.length -> 0 <= a[i] <= a[j] <= 1 }
     requires { a[a.length - 1] = 1 }
-    ensures  { 0 <= result < a.length && a[result] = 1 }
-  =
+    ensures  { 0 <= result < a.length }
+    ensures  { a[result] = 1 }
+    ensures  { forall i. 0 <= i < result -> a[i] = 0 }
+ =
     let lo = ref 0 in
     let hi = ref (length a - 1) in
     while !lo < !hi do
       invariant { 0 <= !lo <= !hi < a.length }
       invariant { a[!hi] = 1 }
+      invariant { forall i. 0 <= i < !lo -> a[i] = 0 }
       variant   { !hi - !lo }
       let mid = !lo + div (!hi - !lo) 2 in
       if a[mid] = 1 then
