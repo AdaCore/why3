@@ -39,6 +39,13 @@ type file = private {
   file_detached_theories : theory list;
 }
 
+type any =
+  | AFile of file
+  | ATh of theory
+  | ATn of transID
+  | APn of proofNodeID
+  | APa of proofAttemptID
+
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
 val theory_detached_goals : theory -> proofNodeID list

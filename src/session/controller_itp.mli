@@ -158,7 +158,8 @@ val schedule_proof_attempt :
   proofNodeID ->
   Whyconf.prover ->
   limit:Call_provers.resource_limit ->
-  callback:(proofAttemptID -> proof_attempt_status -> unit) -> unit
+  callback:(proofAttemptID -> proof_attempt_status -> unit) ->
+  notification:(any -> bool -> unit) -> unit
 (** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
    proof attempt for a goal specified by [id] with the prover [p] with
    time limit [timelimit]; the function [callback] will be called each
@@ -171,7 +172,8 @@ val schedule_transformation :
   proofNodeID ->
   string ->
   string list ->
-  callback:(transformation_status -> unit) -> unit
+  callback:(transformation_status -> unit) ->
+  notification:(any -> bool -> unit) -> unit
 (** [schedule_transformation c id cb] schedules a transformation for a
    goal specified by [id]; the function [cb] will be called each time
    the transformation status changes. Typically at Scheduled, then
@@ -183,7 +185,8 @@ val run_strategy_on_goal :
   Strategy.t ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(transformation_status -> unit) ->
-  callback:(strategy_status -> unit) -> unit
+  callback:(strategy_status -> unit) ->
+  notification:(any -> bool -> unit) -> unit
 (** [run_strategy_on_goal c id strat] executes asynchronously the
     strategy [strat] on the goal [id].  [callback_pa] is called for
     each proof attempted (as in [schedule_proof_attempt]) and

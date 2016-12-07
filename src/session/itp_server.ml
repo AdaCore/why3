@@ -174,13 +174,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   (* -----------------------------------   ------------------------------------- *)
 
-  type any =
-    | AFile of file
-    | ATh of theory
-    | ATn of transID
-    | APn of proofNodeID
-    | APa of proofAttemptID
-
   let get_info_and_type ses (node: any) =
     match node with
     | AFile file ->
@@ -407,6 +400,14 @@ exception Bad_prover_name of prover
     end;
     P.notify (Proof_update (node_ID_from_pan panid, pa_status))
 
+  let notify_change x b =
+    try (
+      let node_ID = node_ID_from_any x in
+      let _, node_info = get_info_and_type cont.controller_session x in
+      P.notify (Node_change (node_ID, {name = node_info.name; proved = b}))
+     )
+    with Not_found -> ()
+
   let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof cont in
@@ -423,7 +424,7 @@ exception Bad_prover_name of prover
       | ATh th     ->
         List.rev (unproven_goals_below_th cont [] th)
     in
-    List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback)
+    List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback ~notification:notify_change)
       goals
 
   (* ----------------- Schedule transformation -------------------- *)
@@ -446,8 +447,11 @@ exception Bad_prover_name of prover
   let rec apply_transform nid t args =
     match any_from_node_ID nid with
     | APn id ->
+      (* let node_ID = node_ID_from_any x in *)
+      (* let _, node_info = get_info_and_type cont.controller_session x in *)
+      (* P.notify (Node_change (node_ID, {name = node_info.name; proved = b})) in *)
       let callback = callback_update_tree_transform in
-      C.schedule_transformation cont id t args ~callback
+      C.schedule_transformation cont id t args ~callback ~notification:notify_change
     | APa panid ->
       let parent_id = get_proof_attempt_parent cont.controller_session panid in
       let parent = node_ID_from_pn parent_id in
@@ -474,7 +478,7 @@ exception Bad_prover_name of prover
           in
           let callback_pa = callback_update_tree_proof cont in
           let callback_tr st = callback_update_tree_transform st in
-          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
+          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change
         | _ -> Format.printf "Strategy '%s' not found@." s
       end
     | _ -> ()
@@ -551,7 +555,7 @@ exception Bad_prover_name of prover
     with e -> P.notify (Message (Error (Pp.string_of
       (fun fmt (r,nid,e) -> Format.fprintf fmt
           "There was an unrecoverable error during treatment of request:\n %a\non node: %d\nwith exception: %a"
-    print_request (Obj.magic r) nid Exn_printer.exn_printer e ) (r, nid, e))))
+    print_request r nid Exn_printer.exn_printer e ) (r, nid, e))))
 
   let treat_requests () : bool =
     List.iter treat_request (P.get_requests ());

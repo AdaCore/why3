@@ -95,48 +95,89 @@ let file_proved c f =
     List.for_all (fun th -> th_proved c th) f.file_theories
 
 (* Update the result of the theory according to its children *)
-let update_theory_proof_state ps th =
+let update_theory_proof_state notification ps th =
   let goals = theory_goals th in
-  Hid.replace ps.th_state (theory_name th)
-    (List.for_all (fun id -> Hpn.find_def ps.pn_state false id) goals)
+  if Hid.mem ps.th_state (theory_name th) then
+  begin
+    let old_state = Hid.find_def ps.th_state false (theory_name th) in
+    let new_state =
+      List.for_all (fun id -> Hpn.find_def ps.pn_state false id) goals in
+    if new_state != old_state then
+      begin
+        Hid.replace ps.th_state (theory_name th) new_state;
+        notification (ATh th) new_state
+      end
+  end
+  else
+  begin
+    let new_state =
+      List.for_all (fun id -> Hpn.find_def ps.pn_state false id) goals in
+    Hid.replace ps.th_state (theory_name th) new_state;
+    notification (ATh th) new_state
+  end
 
-let rec propagate_proof c (id: Session_itp.proofNodeID) =
+let rec propagate_proof notification c (id: Session_itp.proofNodeID) =
   let tr_list = get_transformations c.controller_session id in
   let new_state = List.exists (fun id -> tn_proved c id) tr_list in
   if new_state != pn_proved c id then
     begin
       Hpn.replace c.proof_state.pn_state id new_state;
-      update_proof c id
+      notification (APn id) new_state;
+      update_proof notification c id
     end
 
-and propagate_trans c (tid: Session_itp.transID) =
+and propagate_trans notification c (tid: Session_itp.transID) =
   let proof_list = get_sub_tasks c.controller_session tid in
   let cur_state = tn_proved c tid in
   let new_state = List.for_all (fun id -> pn_proved c id) proof_list in
   if cur_state != new_state then
     begin
       Htn.replace c.proof_state.tn_state tid new_state;
-      propagate_proof c (get_trans_parent c.controller_session tid)
+      notification (ATn tid) new_state;
+      propagate_proof notification c (get_trans_parent c.controller_session tid)
     end
 
-and update_proof c id =
+and update_proof notification c id =
   match get_proof_parent c.controller_session id with
-  | Theory th -> update_theory_proof_state c.proof_state th
-  | Trans tid -> propagate_trans c tid
+  | Theory th -> update_theory_proof_state notification c.proof_state th
+  | Trans tid -> propagate_trans notification c tid
 
 (* [update_proof_node c id b] Update the whole proof_state
    of c according to the result (id, b) *)
-let update_proof_node c id b =
-  match pn_proved c id with
-  | true -> ()
-  | false -> Hpn.replace c.proof_state.pn_state id b;
-    update_proof c id
+let update_proof_node notification c id b =
+  if (Hpn.mem c.proof_state.pn_state id) then
+  begin
+    let b' = Hpn.find_def c.proof_state.pn_state false id in
+    if b != b' then
+    begin
+      Hpn.replace c.proof_state.pn_state id b;
+      notification (APn id) b;
+      update_proof notification c id
+    end
+  end
+  else
+  begin
+    Hpn.replace c.proof_state.pn_state id b;
+    notification (APn id) b;
+    update_proof notification c id
+  end
 
-(* [update_trans_node c id b] Update the proof_state of c to take the result of (id,b). Then
-   propagates it to its parents *)
-let update_trans_node c id b =
-  Htn.replace c.proof_state.tn_state id b;
-  propagate_proof c (get_trans_parent c.controller_session id)
+(* [update_trans_node c id b] Update the proof_state of c to take the result of
+   (id,b). Then propagates it to its parents *)
+let update_trans_node notification c id b =
+  if (Htn.mem c.proof_state.tn_state id) then
+  begin
+    let b' = Htn.find_def c.proof_state.tn_state false id in
+    if b != b' then
+    begin
+      Htn.replace c.proof_state.tn_state id b;
+      notification (ATn id) b
+    end
+  end
+  else
+    (Htn.replace c.proof_state.tn_state id b;
+     notification (ATn id) b);
+  propagate_proof notification c (get_trans_parent c.controller_session id)
 
 (* init proof state after reload *)
 let rec reload_goal_proof_state ps c g =
@@ -411,10 +452,10 @@ let schedule_proof_attempt_r c id pr ~limit ~callback =
   callback panid Scheduled;
   run_timeout_handler ()
 
-let schedule_proof_attempt c id pr ~limit ~callback =
+let schedule_proof_attempt c id pr ~limit ~callback ~notification =
   let callback panid s = (match s with
-  | Done pr -> update_proof_node c id (pr.Call_provers.pr_answer == Call_provers.Valid)
-  | Interrupted | InternalFailure _ -> update_proof_node c id false
+  | Done pr -> update_proof_node notification c id (pr.Call_provers.pr_answer == Call_provers.Valid)
+  | Interrupted | InternalFailure _ -> update_proof_node notification c id false
   | _ -> ());
   callback panid s
   in
@@ -449,7 +490,7 @@ let schedule_transformation_r c id name args ~callback =
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
-let schedule_transformation c id name args ~callback =
+let schedule_transformation c id name args ~callback ~notification =
   let callback s = (match s with
       | TSdone tid ->
         let has_subtasks =
@@ -457,14 +498,14 @@ let schedule_transformation c id name args ~callback =
           | [] -> true
           | _ -> false
         in
-        update_trans_node c tid has_subtasks
+        update_trans_node notification c tid has_subtasks
       | TSfailed _e -> ()
       | _ -> ()); callback s in
   schedule_transformation_r c id name args ~callback
 
 open Strategy
 
-let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback =
+let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback ~notification =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -491,7 +532,7 @@ let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback =
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ~limit ~callback
+         schedule_proof_attempt c g p ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr ntr;
@@ -511,7 +552,7 @@ let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback =
                  S.idle ~prio:0 run_next)
                 (get_sub_tasks c.controller_session tid)
          in
-         schedule_transformation c g trname [] ~callback
+         schedule_transformation c g trname [] ~callback ~notification
       | Igoto pc ->
          callback (STSgoto (g,pc));
          exec_strategy pc strat g

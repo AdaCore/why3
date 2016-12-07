@@ -530,8 +530,11 @@ let new_node ?parent ?(collapse=false) id typ info =
     (* By default expand_path when creating a new node *)
     if not collapse then goals_view#expand_to_path (goals_model#get_path iter);
     Hint.add node_id_to_gtree id new_ref;
-    set_status_column iter
+    set_status_column iter;
+    new_ref
   end
+  else
+    Hint.find node_id_to_gtree id
 
 (*******************************)
 (* commands of the "View" menu *)
@@ -559,10 +562,11 @@ let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._E
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
-(* let collapse_iter iter =
+let collapse_iter iter =
   let path = goals_model#get_path iter in
   goals_view#collapse_row path
 
+(*
 let rec collapse_proven_goals_from_pn pn =
   match pn_proved cont pn with
   | true  -> collapse_iter (row_from_pn pn)#iter
@@ -670,55 +674,8 @@ let interp cmd =
     else
       root_node
   in
-  send_request (Command_req cmd, id)
-(*
-   let id =
-    match !current_selected_index with
-    | IproofNode id -> Some id
-    | _ -> None
-  in
-  try
-  match interp cont id cmd with
-    | Transform(s,_t,args) ->
-       clear_command_entry ();
-       apply_transform cont s args
-    | Query s ->
-       clear_command_entry ();
-       message_zone#buffer#set_text s
-    | Other(s,args) ->
-      begin
-        match parse_prover_name gconfig.config s args with
-        | Some (prover_config, limit) ->
-          clear_command_entry ();
-          test_schedule_proof_attempt cont prover_config limit
-        | None ->
-          match s with
-          | "auto" ->
-             let s =
-               match args with
-               | "2"::_ -> "2"
-               | _ -> "1"
-             in
-             clear_command_entry ();
-             run_strategy_on_task s
-          | "help" ->
-             clear_command_entry ();
-             let text = Pp.sprintf
-                          "Please type a command among the following (automatic completion available)@\n\
-                           @\n\
-                           @ <transformation name> [arguments]@\n\
-                           @ <prover name> [<time limit> [<mem limit>]]@\n\
-                           @ <query> [arguments]@\n\
-                           @ auto [auto level]@\n\
-                           @\n\
-                           Available queries are:@\n@[%a@]" help_on_queries ()
-             in
-             message_zone#buffer#set_text text
-          | _ ->
-             message_zone#buffer#set_text ("unknown command '"^s^"'")
-      end
-  with e when not (Debug.test_flag Debug.stack_trace) ->
-       message_zone#buffer#set_text (Pp.sprintf "anomaly: %a" Exn_printer.exn_printer e) *)
+  send_request (Command_req cmd, id);
+  clear_command_entry ()
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
@@ -762,7 +719,7 @@ let treat_message_notification msg = match msg with
   | Help s                 -> add_to_msg_zone s
   | Information s          -> add_to_msg_zone s
   | Task_Monitor (t, s, r) -> update_monitor t s r
-    (* TODO do not print it *)
+    (* TODO do not print this particular error *)
   | Error s                ->
       if Debug.test_flag debug then
         add_to_msg_zone s
@@ -774,11 +731,15 @@ let treat_notification n = match n with
     Hint.replace node_id_info id info;
     set_status_column (get_node_row id)#iter
   | New_node (id, pid, typ, info) ->
-    begin try
+    begin (try
         let parent = get_node_row pid in
-        new_node ~parent id typ info
+        let row_ref = new_node ~parent id typ info in
+        (* TODO for easier testing of IDE *)
+        if typ = NGoal then goals_view#selection#select_iter row_ref#iter
       with Not_found ->
-        new_node id typ info
+        let row_ref = new_node id typ info in
+        (* TODO for easier testing of IDE *)
+        if typ = NGoal then goals_view#selection#select_iter row_ref#iter);
     end
   | Remove _id                     -> (* TODO *)
     add_to_msg_zone "got a Remove notification not yet supported\n"

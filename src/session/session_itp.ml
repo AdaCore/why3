@@ -63,6 +63,13 @@ type file = {
   file_detached_theories : theory list;
 }
 
+type any =
+  | AFile of file
+  | ATh of theory
+  | ATn of transID
+  | APn of proofNodeID
+  | APa of proofAttemptID
+
 module Proofnodeid = struct
   type t = proofNodeID
   let _compare (x : proofNodeID) y  = Pervasives.compare x y
