@@ -401,8 +401,7 @@ theory GenericFloat
 
   lemma add_finite_rev: forall m:mode, x y:t [add m x y].
     is_finite (add m x y) ->
-    is_finite x /\ is_finite y /\ no_overflow m (to_real x +. to_real y) /\
-    to_real (add m x y) = round m (to_real x +. to_real y)
+    is_finite x /\ is_finite y
 
   axiom sub_finite: forall m:mode, x y:t [sub m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x -. to_real y) ->
@@ -411,8 +410,7 @@ theory GenericFloat
 
   lemma sub_finite_rev: forall m:mode, x y:t [sub m x y].
     is_finite (sub m x y) ->
-    is_finite x /\ is_finite y /\ no_overflow m (to_real x -. to_real y) /\
-    to_real (sub m x y) = round m (to_real x -. to_real y)
+    is_finite x /\ is_finite y
 
   axiom mul_finite: forall m:mode, x y:t [mul m x y].
     is_finite x -> is_finite y -> no_overflow m (to_real x *. to_real y) ->
@@ -421,8 +419,7 @@ theory GenericFloat
 
   lemma mul_finite_rev: forall m:mode, x y:t [mul m x y].
     is_finite (mul m x y) ->
-    is_finite x /\ is_finite y /\ no_overflow m (to_real x *. to_real y) /\
-    to_real (mul m x y) = round m (to_real x *. to_real y)
+    is_finite x /\ is_finite y
 
   axiom div_finite: forall m:mode, x y:t [div m x y].
     is_finite x -> is_finite y ->
@@ -432,8 +429,7 @@ theory GenericFloat
 
   lemma div_finite_rev: forall m:mode, x y:t [div m x y].
     is_finite (div m x y) ->
-    (is_finite x /\ is_finite y /\ no_overflow m (to_real x /. to_real y) /\
-     not is_zero y /\ to_real (div m x y) = round m (to_real x /. to_real y)) \/
+    (is_finite x /\ is_finite y /\ not is_zero y) \/
     (is_finite x /\ is_infinite y /\ to_real (div m x y) = 0.)
 
   axiom neg_finite: forall x:t [neg x].
@@ -467,9 +463,7 @@ theory GenericFloat
 
   lemma fma_finite_rev: forall m:mode, x y z:t [fma m x y z].
     is_finite (fma m x y z) ->
-    is_finite x /\ is_finite y /\ is_finite z /\
-    no_overflow m (to_real x *. to_real y +. to_real z) /\
-    to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
+    is_finite x /\ is_finite y /\ is_finite z
 
   (* /!\ externalize square root? more generally, externalize any part
          that needs another theory ? /!\ *)
@@ -734,13 +728,15 @@ theory GenericFloat
     to_int m x = to_int m (roundToIntegral m x)
 
   axiom to_int_monotonic: forall m:mode, x y:t.
-    is_finite y -> is_finite x -> x .<= y -> (to_int m x) <= (to_int m y)
+    is_finite x -> is_finite y -> le x y -> to_int m x <= to_int m y
 
-  axiom to_int_monotonic_int1: (* /!\ to check if it depends of rounding mode /!\ *)
-    forall m:mode, x:t, i:int. is_finite x -> x .<= (of_int m i) -> (to_int m x) <= i
+  axiom to_int_monotonic_int1:
+    forall m:mode, x:t, i:int. is_finite x ->
+    lt x (of_int m i) -> to_int m x <= i
 
-  axiom to_int_monotonic_int2: (* /!\ to check if it depends of rounding mode /!\ *)
-    forall m:mode, x:t, i:int. is_finite x -> (of_int m i) .<= x -> i <= (to_int m x)
+  axiom to_int_monotonic_int2:
+    forall m:mode, x:t, i:int. is_finite x ->
+    lt (of_int m i) x -> i <= to_int m x
 
   axiom to_int_of_int: forall m:mode, i:int.
     (- max_representable_integer) <= i <= max_representable_integer ->
