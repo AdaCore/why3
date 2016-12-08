@@ -97,7 +97,11 @@ let treat_message_notification fmt msg = match msg with
   | Replay_Info s          -> fprintf fmt "%s@." s
   | Query_Info (_id, s)    -> fprintf fmt "%s@." s
   | Query_Error (_id, s)   -> fprintf fmt "%s@." s
-  | Help s                 -> fprintf fmt "%s@." s
+  | Help s                 -> fprintf fmt "%s@. Additionally for shell:\n\
+goto n -> focuse on n\n\
+ng -> next node\n\
+g -> print the current task\n\
+p -> print the session@." s
   | Information s          -> fprintf fmt "%s@." s
   | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
   | Error s                ->
@@ -222,7 +226,7 @@ let treat_notification fmt n =
     fprintf fmt "got a Saved notification not yet supported@."
   | Message (msg)                 -> treat_message_notification fmt msg
   | Proof_update (_id, _pa)         -> (* TODO *)
-      fprintf fmt "got a Update notification not yet supported@."
+    fprintf fmt "got a Update notification not yet supported@."
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
   | Task (id, s)                  ->
@@ -326,10 +330,13 @@ let interp _chout fmt cmd =
           match cmd with
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" -> send_request (Get_task, !cur_id)
+          | "p" -> print_session fmt
           | _ -> send_request (Command_req cmd, !cur_id)
         end
   end;
-  print_goal fmt !cur_id
+  let node = Hnode.find nodes !cur_id in
+  if node.node_type = SGoal then
+    print_goal fmt !cur_id
 
 let () =
   printf "Welcome to Why3 shell. Type 'help' for help.@.";
