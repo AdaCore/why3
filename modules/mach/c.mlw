@@ -37,6 +37,7 @@ module C
     ensures { plength result = 0 }
 
   let incr (p:ptr 'a) (ofs:int32) : ptr 'a
+    (* TODO: aliases { p, result } *)
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
    =
@@ -92,6 +93,7 @@ module C
      end *)
   val free (p:ptr 'a) : unit
     requires { p.offset = 0 }
+    (* TODO: resets { p.data } *)
     writes { p.data }
     ensures { plength p = 0 }
  (* = if is_null p then ()
