@@ -1,120 +1,74 @@
-(*
-(* TODO *)
-let proof_general = true
-(*
-module Unix_scheduler = struct
-
-    (* the private list of functions to call on idle, sorted higher
-       priority first. *)
-    let idle_handler = ref []
-
-    (* [insert_idle_handler p f] inserts [f] as a new function to call
-       on idle, with priority [p] *)
-    let insert_idle_handler p f =
-      let rec aux l =
-        match l with
-          | [] -> [p,f]
-          | (p1,_) as hd :: rem ->
-             if p > p1 then (p,f) :: l else hd :: aux rem
-      in
-      idle_handler := aux !idle_handler
-
-    (* the private list of functions to call on timeout, sorted on
-       earliest trigger time first. *)
-    let timeout_handler = ref []
-
-    (* [insert_timeout_handler ms t f] inserts [f] as a new function to call
-       on timeout, with time step of [ms] and first call time as [t] *)
-    let insert_timeout_handler ms t f =
-      let rec aux l =
-        match l with
-          | [] -> [ms,t,f]
-          | (_,t1,_) as hd :: rem ->
-             if t < t1 then (ms,t,f) :: l else hd :: aux rem
-      in
-      timeout_handler := aux !timeout_handler
-
-    (* public function to register a task to run on idle *)
-    let idle ~(prio:int) (f: unit -> bool) : unit =
-      insert_idle_handler prio f
-
-    (* public function to register a task to run on timeout *)
-    let timeout ~(ms:int) (f: unit -> bool) : unit =
-      assert (ms > 0);
-      let ms = float ms /. 1000.0 in
-      let time = Unix.gettimeofday () in
-      insert_timeout_handler ms (time +. ms) f
-
-     (* buffer for storing character read on stdin *)
-     let buf = Bytes.create 256
-
-     let prompt_delay = ref 0
-     let print_prompt = ref true
-     let prompt = ref "> "
-
-     (* [main_loop interp] starts the scheduler. On idle, standard input is
-        read.  When a complete line is read from stdin, it is passed
-        as a string to the function [interp] *)
-     let main_loop interp =
-       try
-         while true do
-           if !print_prompt then begin
-             prompt_delay := !prompt_delay + 1;
-             if !prompt_delay = 2 then begin
-               Format.printf "%s@?" !prompt;
-               prompt_delay := 0;
-               print_prompt := false;
-             end
-           end;
-           (* attempt to run the first timeout handler *)
-           (let time = Unix.gettimeofday () in
-           match !timeout_handler with
-           | (ms,t,f) :: rem when t <= time ->
-              timeout_handler := rem;
-              let b = f () in
-              let time = Unix.gettimeofday () in
-              if b then insert_timeout_handler ms (ms +. time) f
-           | _ ->
-              (* time is not yet passed *)
-              (* attempt to run the first idle handler *)
-              match !idle_handler with
-              | (p,f) :: rem ->
-                 idle_handler := rem;
-                 let b = f () in
-                 if b then insert_idle_handler p f
-              | [] ->
-                 (* no idle handler *)
-                 (* check stdin for a some delay *)
-                 let delay =
-                   match !timeout_handler with
-                   | [] -> 0.125
-                   (* 1/8 second by default *)
-                   | (_,t,_) :: _ -> t -. time
-                   (* or the time left until the next timeout otherwise *)
-                 in
-                 let a,_,_ = Unix.select [Unix.stdin] [] [] delay in
-                 match a with
-                 | [_] ->
-                    let n = Unix.read Unix.stdin buf 0 256 in
-                    interp (Bytes.sub_string buf 0 (n-1));
-                    print_prompt := true
-                 | [] -> () (* nothing read *)
-                 | _ -> assert false);
-         done
-       with Exit -> ()
-
-end
+(* TODO
+  - detached theories
+  - obsolete
+  - update proof attempt
 *)
 
+open Why3
+open Unix_scheduler
+open Format
+open Itp_server
+
+
+(*************************)
+(* Protocol of the shell *)
+(*************************)
+module Protocol_shell = struct
+
+  let debug_proto = Debug.register_flag "shell_proto"
+      ~desc:"Print@ debugging@ messages@ about@ Why3Ide@ protocol@"
+
+  let print_request_debug r =
+    Debug.dprintf debug_proto "[request]";
+    Debug.dprintf debug_proto "%a" print_request r
+
+  let print_msg_debug m =
+    Debug.dprintf debug_proto "[message]";
+    Debug.dprintf debug_proto "%a@." print_msg m
+
+  let print_notify_debug n =
+    Debug.dprintf debug_proto "[notification]";
+    Debug.dprintf debug_proto "%a@." print_notify n
+
+  let list_requests: ide_request list ref = ref []
+
+  let get_requests () =
+    if List.length !list_requests > 0 then
+      Debug.dprintf debug_proto "get requests@.";
+    let l = List.rev !list_requests in
+    list_requests := [];
+    l
+
+  let send_request r =
+    print_request_debug (fst r);
+    Debug.dprintf debug_proto "@.";
+    list_requests := r :: !list_requests
+
+  let notification_list: notification list ref = ref []
+
+  let notify n =
+    print_notify_debug n;
+    Debug.dprintf debug_proto "@.";
+    notification_list := n :: !notification_list
+
+  let get_notified () =
+    if List.length !notification_list > 0 then
+      Debug.dprintf debug_proto "get notified@.";
+    let l = List.rev !notification_list in
+    notification_list := [];
+    l
+
+end
+
+let get_notified = Protocol_shell.get_notified
+
+let send_request = Protocol_shell.send_request
+
+module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 
 (************************)
 (* parsing command line *)
 (************************)
-
-open Why3
-open Unix_scheduler
-open Session_user_interface
-open Format
 
 (* files of the current task *)
 let files = Queue.create ()
@@ -126,578 +80,263 @@ let usage_str = Format.sprintf
   "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
   (Filename.basename Sys.argv.(0))
 
-(* build command line *)
-let config, base_config, env =
-  Why3.Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+(* Parse files *)
+let () = Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage spec usage_str
 
-let main : Whyconf.main = Whyconf.get_main config
-(* all the provers detected, from the config file *)
-let provers : Whyconf.config_prover Whyconf.Mprover.t =
-  Whyconf.get_provers config
+(*************************)
+(* Notification Handling *)
+(*************************)
 
-(* builds the environment from the [loadpath] *)
-(*let env : Env.env = Env.create_env (Whyconf.loadpath main)*)
+let treat_message_notification fmt msg = match msg with
+  (* TODO: do something ! *)
+  | Proof_error (_id, s)   -> fprintf fmt "%s@." s
+  | Transf_error (_id, s)  -> fprintf fmt "%s@." s
+  | Strat_error (_id, s)   -> fprintf fmt "%s@." s
+  | Replay_Info s          -> fprintf fmt "%s@." s
+  | Query_Info (_id, s)    -> fprintf fmt "%s@." s
+  | Query_Error (_id, s)   -> fprintf fmt "%s@." s
+  | Help s                 -> fprintf fmt "%s@." s
+  | Information s          -> fprintf fmt "%s@." s
+  | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
+  | Error s                ->
+      fprintf fmt "%s@." s
 
-(* -- declare provers -- *)
+type shell_node_type =
+  | SRoot
+  | SFile
+  | STheory
+  | STransformation
+  | SGoal
+  | SProofAttempt
 
-(* Return the prover corresponding to given name. name is of the form
-  | name
-  | name, version
-  | name, altern
-  | name, version, altern *)
-let return_prover fmt name =
-  let fp = Whyconf.parse_filter_prover name in
-  (** all provers that have the name/version/altern name *)
-  let provers = Whyconf.filter_provers config fp in
-  if Whyconf.Mprover.is_empty provers then begin
-    fprintf fmt "Prover corresponding to %s has not been found@." name;
-    None
-  end else
-    Some (snd (Whyconf.Mprover.choose provers))
 
-(* -- init controller -- *)
+(* TODO will evolve *)
+type node_info = { proved: bool }
 
-let cont =
-  Session_user_interface.cont_from_files spec usage_str env files provers
+type node = {
+  node_ID: node_ID;
+  node_parent: node_ID;
+  node_name: string;
+  mutable node_task: string option;
+  node_proof: Controller_itp.proof_attempt_status option;
+  node_trans_args: string list option;
+  node_type: shell_node_type;
+  mutable node_info: node_info;
+  mutable children_nodes: node_ID list
+  }
 
-module C = Why3.Controller_itp.Make(Unix_Scheduler)
+let root_node_ID = root_node
+let max_ID = ref 1
 
-let () = C.set_max_tasks (Whyconf.running_provers_max main)
+let root_node = {
+  node_ID = root_node_ID;
+  node_parent = root_node_ID;
+  node_name = "root";
+  node_task = None;
+  node_proof = None;
+  node_trans_args = None;
+  node_type = SRoot;
+  node_info = {proved = false};
+  children_nodes = []
+}
 
-(* --  -- *)
+open Stdlib
+open Format
 
-let test_idle fmt _args =
-  Unix_Scheduler.idle
-    ~prio:0
-    (fun () -> fprintf fmt "idle@."; false)
+module Hnode = Hint
+let nodes : node Hnode.t = Hnode.create 17
+let () = Hnode.add nodes root_node_ID root_node
 
-let test_timeout fmt _args =
-  Unix_Scheduler.timeout
-    ~ms:1000
-    (let c = ref 10 in
-     fun () -> decr c;
-               if !c > 0 then
-                 (fprintf fmt "%d@." !c; true)
-               else
-                 (fprintf fmt "boom!@."; false))
+(* Current node_ID *)
+let cur_id = ref root_node_ID
 
-let list_provers _fmt _args =
-  let l =
-    Whyconf.Hprover.fold
-      (fun p _ acc -> (Pp.sprintf "%a" Whyconf.print_prover p)::acc)
-      cont.Controller_itp.controller_provers
-      []
-  in
-  let l = List.sort String.compare l in
-  printf "@[<hov 2>== Known provers ==@\n%a@]@."
-          (Pp.print_list Pp.newline Pp.string) l
+let print_goal fmt n =
+  let node = Hnode.find nodes n in
+  match node.node_task with
+  | None -> fprintf fmt "No goal@."
+  | Some s -> fprintf fmt "Goal is: \n %s@." s
 
-let sort_pair (x,_) (y,_) = String.compare x y
 
-let list_transforms _fmt _args =
-  let l =
-    List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ())
-  in
-  let print_trans_desc fmt (x,r) =
-    fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r in
-  printf "@[<hov 2>== Known transformations ==@\n%a@]@\n@."
-         (Pp.print_list Pp.newline2 print_trans_desc)
-         (List.sort sort_pair l)
+let convert_to_shell_type t =
+  match t with
+  | NRoot -> SRoot
+  | NFile -> SFile
+  | NTheory -> STheory
+  | NTransformation -> STransformation
+  | NGoal -> SGoal
+  | NProofAttempt _ -> SProofAttempt
 
-open Controller_itp
-open Session_itp
-
-(* _____________________________________________________________________ *)
-(* -------------------- zipper ----------------------------------------- *)
-
-type proof_hole =
-    Th of theory list * theory * theory list |
-    Pn of proofNodeID list * proofNodeID * proofNodeID list |
-    Tn of transID list * transID * transID list
-
-type proof_zipper = { mutable cursor : proof_hole; ctxt : proof_hole Stack.t }
-
-let ctxt = Stack.create ()
-
-let zipper =
-  let files =
-    get_files cont.Controller_itp.controller_session
-  in
-  let file = ref None in
-  Stdlib.Hstr.iter (fun _ f -> file := Some f) files;
-  let file = Opt.get !file in
-  match file.file_theories with
-  | th :: tail -> { cursor = (Th ([], th, tail)); ctxt }
-  | _ -> assert false
-
-let zipper_init () =
-  let files =
-    get_files cont.Controller_itp.controller_session
-  in
-  let file = ref None in
-  Stdlib.Hstr.iter (fun _ f -> file := Some f) files;
-  let file = Opt.get !file in
-  match file.file_theories with
-  | th :: tail -> zipper.cursor <- (Th ([], th, tail));
-      while not (Stack.is_empty zipper.ctxt) do ignore (Stack.pop zipper.ctxt) done
-  | _ -> assert false
-
-let zipper_down () =
-  match zipper.cursor with
-  | Th (_,th,_) ->
-    (match theory_goals th with
-    | pn::l ->
-      Stack.push zipper.cursor zipper.ctxt;
-      zipper.cursor <- Pn ([],pn,l);
-      true
-    | _ -> false)
-  | Pn (_,pn,_) ->
-    (match get_transformations cont.controller_session pn with
-    | tn::l ->
-      Stack.push zipper.cursor zipper.ctxt;
-      zipper.cursor <- Tn ([],tn,l);
-      true
-    | _ -> false)
-  | Tn (_,tn,_) ->
-    (match get_sub_tasks cont.controller_session tn with
-    | pn::l ->
-      Stack.push zipper.cursor zipper.ctxt;
-      zipper.cursor <- Pn ([],pn,l);
-      true
-    | _ -> false)
-
-let zipper_up () =
-  if not (Stack.is_empty zipper.ctxt) then begin
-    zipper.cursor <- Stack.pop zipper.ctxt;
-    true
-  end else
-    false
-
-let zipper_right () =
-  match zipper.cursor with
-  | Th (l,cs,hd::r) ->
-    zipper.cursor <- Th (cs::l,hd,r);
-    true
-  | Pn (l,cs,hd::r) ->
-    zipper.cursor <- Pn (cs::l,hd,r);
-    true
-  | Tn (l,cs,hd::r) ->
-    zipper.cursor <- Tn (cs::l,hd,r);
-    true
-  | _ -> false
-
-let zipper_left () =
-  match zipper.cursor with
-  | Th (hd::l,cs,r) ->
-    zipper.cursor <- Th (l,hd,cs::r);
-    true
-  | Pn (hd::l,cs,r) ->
-    zipper.cursor <- Pn (l,hd,cs::r);
-    true
-  | Tn (hd::l,cs,r) ->
-    zipper.cursor <- Tn (l,hd,cs::r);
-    true
-  | _ -> false
-
-(* _____________________________________________________________________ *)
-(* -------------------- moving around ---------------------------------- *)
-
-let rec next_node () =
-  zipper_down () || zipper_right () || (zipper_up () && next_node_no_down ())
-and next_node_no_down () =
-  zipper_right () || (zipper_up () && next_node_no_down ())
-
-let prev_node () = zipper_left () || zipper_up ()
-
-(* This function try to reach a goal from the current position using
-   the move function *)
-let rec move_to_goal move =
-  if move () then
-    match zipper.cursor with
-    | Pn (_,pn,_) -> Some pn
-    | _  -> move_to_goal move
-  else
-    None
-
-let move_to_goal_ret move =
-  match
-    (match move_to_goal move with
-    | None -> Printf.printf "No more goal right; back to root@.";
-	zipper_init(); move_to_goal next_node
-    | Some id -> Some id) with
-  | None -> failwith "After initialization there is no goal to go to@."
-  | Some id -> id
-
-let move_to_goal_ret_p move _ _ = ignore (move_to_goal_ret move)
-
-(* The cursor of the zipper is on a goal *)
-let is_goal_cursor () =
-  match zipper.cursor with
-  | Pn (_, pn, _) -> Some pn
+let return_proof_info (t: node_type) =
+  match t with
+  | NProofAttempt (_pr, _obs) ->
+    Some Controller_itp.Scheduled
   | _ -> None
 
-(* If on goal, do nothing else go to next_goal *)
-let nearest_goal () =
-  match is_goal_cursor () with
-  | None -> move_to_goal_ret next_node
-  | Some id -> id
+let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (i: Itp_server.node_info) =
+  let new_node = {
+    node_ID = n;
+    node_parent = parent;
+    node_name = i.Itp_server.name;
+    node_task = None;
+    node_proof = return_proof_info t;
+    node_trans_args = None; (* TODO *)
+    node_type = convert_to_shell_type t;
+    node_info = {proved = i.Itp_server.proved};
+    children_nodes = []
+  } in
+  try
+    let parent = Hnode.find nodes parent in
+    parent.children_nodes <- parent.children_nodes @ [n];
+    Hnode.add nodes n new_node;
+    max_ID := !max_ID + 1
+  with
+    Not_found -> fprintf fmt "Could not find node %d@." parent
+
+let change_node fmt (n: node_ID) (i: Itp_server.node_info) =
+  try
+    let node = Hnode.find nodes n in
+    node.node_info <- { proved = i.Itp_server.proved }
+  with
+    Not_found -> fprintf fmt "Could not find node %d@." n
+
+let is_proof_attempt node_type =
+  match node_type with
+  | NProofAttempt _ -> true
+  | _ -> false
+
+let treat_notification fmt n =
+  fprintf fmt "Treat notifications@.";
+  match n with
+  | Node_change (id, info)        ->
+    change_node fmt id info
+  | New_node (id, pid, typ, info) ->
+    add_new_node fmt id pid typ info
+  | Remove _id                    -> (* TODO *)
+    fprintf fmt "got a Remove notification not yet supported@."
+  | Initialized _g_info            ->
+    (* TODO *)
+    fprintf fmt "Initialized@."
+  | Saved                         -> (* TODO *)
+    fprintf fmt "got a Saved notification not yet supported@."
+  | Message (msg)                 -> treat_message_notification fmt msg
+  | Proof_update (_id, _pa)         -> (* TODO *)
+      fprintf fmt "got a Update notification not yet supported@."
+  | Dead _s                       -> (* TODO *)
+    fprintf fmt "got a Dead notification not yet supported@."
+  | Task (id, s)                  ->
+    try
+      let node = Hnode.find nodes id in
+      node.node_task <- Some s;
+      if id = !cur_id then print_goal fmt !cur_id
+    with
+      Not_found -> fprintf fmt "Could not find node %d@." id
+
+let get_result pa =
+  match pa with
+  | None -> None
+  | Some pr -> match pr with
+    | Controller_itp.Done pr -> Some pr
+    | _ -> None
 
 (* _____________________________________________________________________ *)
 (* -------------------- printing --------------------------------------- *)
 
-let print_proof_attempt fmt pa =
-  fprintf fmt "%a tl=%d %a obsolete=%a"
-          Whyconf.print_prover pa.prover
-          pa.limit.Call_provers.limit_time
-          (Pp.print_option Call_provers.print_prover_result) pa.proof_state
-          pp_print_bool pa.proof_obsolete
+let print_proof_attempt fmt pa_id =
+  let pa = Hnode.find nodes pa_id in
+  match pa.node_proof with
+  | None -> fprintf fmt "%s" pa.node_name
+  | Some _pr ->
+    fprintf fmt "%s %a"
+      pa.node_name (Pp.print_option Call_provers.print_prover_result) (get_result pa.node_proof)
 
-let rec print_proof_node s (fmt: Format.formatter) p =
-  let parent = match get_proof_parent s p with
-  | Theory t -> (theory_name t).Ident.id_string
-  | Trans id -> get_transf_name s id
-  in
+let rec print_proof_node (fmt: Format.formatter) goal_id =
+  let goal = Hnode.find nodes goal_id in
+  let parent = Hnode.find nodes goal.node_parent in
+  let parent_name = parent.node_name in
   let current_goal =
-    match is_goal_cursor () with
-    | Some pn -> pn = p
-    | _ -> false
+    goal_id = !cur_id
   in
   if current_goal then
     fprintf fmt "**";
-  if Controller_itp.pn_proved cont p then
+  if goal.node_info.proved then
     fprintf fmt "P";
+  let proof_attempts, transformations =
+    List.partition (fun n -> let node = Hnode.find nodes n in
+      node.node_type = SProofAttempt) goal.children_nodes
+  in
 
   fprintf fmt
-    "@[<hv 2>{ Goal=%s;@ parent=%s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@] }@]"
-    (get_proof_name s p).Ident.id_string parent
+    "@[<hv 2>{ Goal=%s, id = %d;@ parent=%s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@] }@]"
+    goal.node_name goal_id parent_name
     (Pp.print_list Pp.semi print_proof_attempt)
-    (get_proof_attempts s p)
-    (Pp.print_list Pp.semi (print_trans_node s)) (get_transformations s p);
+    proof_attempts
+    (Pp.print_list Pp.semi print_trans_node) transformations;
 
   if current_goal then
     fprintf fmt " **"
 
-and print_trans_node s fmt id =
-  let name = get_transf_name s id in
-  let args = get_transf_args s id in
-  let l = get_sub_tasks s id in
-  let ll = get_detached_sub_tasks s id in
-  let parent = (get_proof_name s (get_trans_parent s id)).Ident.id_string in
-  if Controller_itp.tn_proved cont id then
+and print_trans_node fmt id =
+  let trans = Hnode.find nodes id in
+  let name = trans.node_name in
+  let l = trans.children_nodes in
+  let args = trans.node_trans_args in
+  let parent = Hnode.find nodes trans.node_parent in
+  let parent_name = parent.node_name in
+  if trans.node_info.proved then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a];@ detached[%a] }@]" name
-    (Pp.print_list Pp.semi pp_print_string) args parent
-    (Pp.print_list Pp.semi (print_proof_node s)) l
-    (Pp.print_list Pp.semi (print_proof_node s)) ll
+  fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name
+    (Pp.print_option (Pp.print_list Pp.semi pp_print_string)) args parent_name
+    (Pp.print_list Pp.semi print_proof_node) l
 
-let print_theory s fmt th : unit =
-  if Controller_itp.th_proved cont th then
+let print_theory fmt th_id : unit =
+  let th = Hnode.find nodes th_id in
+  if th.node_info.proved then
     fprintf fmt "P";
-  fprintf fmt "@[<hv 1> Theory %s;@ [%a];@ detached[%a]@]" (theory_name th).Ident.id_string
-    (Pp.print_list Pp.semi (print_proof_node s)) (theory_goals th)
-    (Pp.print_list Pp.semi (print_proof_node s)) (theory_detached_goals th)
+  fprintf fmt "@[<hv 1> Theory %s, id: %d;@ [%a]@]" th.node_name th_id
+    (Pp.print_list Pp.semi print_proof_node) th.children_nodes
 
-let print_file s fmt (file, thl, detached) =
-  fprintf fmt "@[<hv 1> File %s;@ [%a];@ detached[%a]@]" file.file_name
-    (Pp.print_list Pp.semi (print_theory s)) thl
-    (Pp.print_list Pp.semi (print_theory s)) detached
+let print_file fmt file_ID =
+  let file = Hnode.find nodes file_ID in
+  assert (file.node_type = SFile);
+  fprintf fmt "@[<hv 1> File %s, id %d;@ [%a];@]" file.node_name file.node_ID
+    (Pp.print_list Pp.semi print_theory) file.children_nodes
 
-let print_s s fmt =
-  fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
+let print_s fmt files =
+  fprintf fmt "@[%a@]" (Pp.print_list Pp.semi print_file) files
 
-let print_session fmt s =
-  let l = Stdlib.Hstr.fold
-      (fun _ f acc -> (f,f.file_theories,f.file_detached_theories) :: acc) (get_files s) [] in
-  fprintf fmt "folder %a %a@." pp_print_string (Session_itp.get_dir s) (print_s s) l;;
+let print_session fmt =
+  let l = root_node.children_nodes in
+  fprintf fmt "root %a@." print_s l
 
-let dump_session_raw fmt _args =
-  fprintf fmt "%a@." print_session cont.Controller_itp.controller_session
+(******************)
+(*    actions     *)
+(******************)
 
-let display_session fmt _args =
-  fprintf fmt "%a@." Controller_itp.print_session cont
-
-let print_position (s: session) (cursor: proof_zipper) fmt: unit =
-  match cursor.cursor with
-  | Th (_, th, _) -> fprintf fmt "%a@." (print_theory s) th
-  | Pn (_, pn, _) -> fprintf fmt "%a@." (print_proof_node s) pn
-  | Tn (_, tn, _) -> fprintf fmt "%a@." (print_trans_node s) tn
-
-let print_position_p s cursor fmt _ = print_position s cursor fmt
-
-let task_driver =
-  let d = Filename.concat (Whyconf.datadir main)
-                          (Filename.concat "drivers" "why3_itp.drv")
-  in
-  Driver.load_driver env d []
-
-(* Print current goal or nearest next goal if we are not on a goal *)
-let test_print_goal fmt _args =
-  (* temporary : get the first goal *)
-  let id = nearest_goal () in
-  let task = Session_itp.get_task cont.Controller_itp.controller_session id in
-  let tables = Session_itp.get_tables cont.Controller_itp.controller_session id in
-  fprintf fmt "@[====================== Task =====================@\n%a@]@."
-          (*Pretty.print_task*)
-          (fun fmt -> Driver.print_task ~cntexample:false task_driver fmt tables)
-          task
-
-(* Execute f and then print the goal *)
-let then_print f fmt args =
-  f fmt args;
-  test_print_goal fmt []
-
-(* _____________________________________________________________________ *)
-(* -------------------- test with transformations ---------------------- *)
-
-let test_schedule_proof_attempt fmt (args: string list) =
-  (* temporary : get the first goal *)
-  let id = nearest_goal () in
-  let callback _panid status =
-    match status with
-    | Done _prover_result -> (display_session fmt []; test_print_goal fmt [];
-                              fprintf fmt "status: %a@."
-                                Controller_itp.print_status status)
-    | Scheduled | Running -> ()
-    | _ ->
-        fprintf fmt "status: %a@."
-          Controller_itp.print_status status
-  in
-  let name, limit = match args with
-  | [name] ->
-      let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
-                                        limit_mem = Whyconf.memlimit main;
-                                        limit_steps = 0} in
-      name, default_limit
-  | [name; timeout] -> name, Call_provers.{empty_limit with
-                                           limit_time = int_of_string timeout}
-  | [name; timeout; oom ] ->
-      name, Call_provers.{limit_time = int_of_string timeout;
-                          limit_mem = int_of_string oom;
-                          limit_steps = 0}
-  | _ -> printf "Bad arguments prover_name, version timeout memlimit@.";
-      "", Call_provers.empty_limit
-  in
-  let np = return_prover fmt name in
-  (match np with
-  | None -> ()
-  | Some p ->
-      C.schedule_proof_attempt
-        cont id p.Whyconf.prover
-        ~limit ~callback)
-(*    | _ -> printf "Give the prover name@."*)
-
-let apply_transform fmt args =
-  match args with
-    | tr :: tl ->
-       let id = nearest_goal () in
-       let callback status =
-         fprintf fmt "transformation status: %a@."
-                 Controller_itp.print_trans_status status
-       in
-       C.schedule_transformation cont id tr tl ~callback
-    | _ -> printf "Error: Give the name of the transformation@."
-
-(*******)
-
-let test_save_session _fmt _args =
-  Session_itp.save_session cont.Controller_itp.controller_session
-
-let test_reload fmt _args =
-  fprintf fmt "Reloading... @?";
-  (* use_shapes is true since session is in memory *)
-  Controller_itp.reload_files cont env ~use_shapes:true;
-  zipper_init ();
-  fprintf fmt "done @."
-
-let test_replay fmt _args =
-  fprintf fmt "Replaying... @?";
-  let callback = C.replay_print in
-  C.replay ~use_steps:false cont ~callback:callback ~remove_obsolete:false;
-  zipper_init ()
-
-let test_transform_and_display fmt args =
-  match args with
-    | tr :: tl ->
-       let id = nearest_goal () in
-       let callback status =
-         fprintf fmt "transformation status: %a@."
-                 Controller_itp.print_trans_status status;
-         match status with
-         | TSdone _tid -> (ignore (move_to_goal_ret next_node);
-             display_session fmt []; test_print_goal fmt [])
-         | _ -> ()
-       in
-       C.schedule_transformation cont id tr tl ~callback
-    | _ -> printf "Error: Give the name of the transformation@."
-
-
-let list_strategies _fmt _args =
-  let l = Session_user_interface.strategies
-            cont.Controller_itp.controller_env config
-  in
-  let pp_strat fmt (n,s,desc,_) = fprintf fmt "%s (%s): %s" s n desc in
-  printf "@[<hov 2>== Known strategies ==@\n%a@]@."
-          (Pp.print_list Pp.newline pp_strat) l
-
-let run_strategy _fmt args =
-  match args with
-  | [s] ->
-     let l = Session_user_interface.strategies
-            cont.Controller_itp.controller_env config
-     in
-     let st = List.filter (fun (_,c,_,_) -> c=s) l in
-     begin
-       match st with
-       | [(n,_,_,st)] ->
-          printf "running strategy '%s'@." n;
-          let id = nearest_goal () in
-          let callback sts =
-            printf "Strategy status: %a@." print_strategy_status sts
-          in
-          let callback_pa _panid _st = () in
-          let callback_tr _tr = () in
-          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback
-       | _ -> printf "Strategy '%s' not found@." s
-     end
-  | _ -> printf "Please give the strategy shortcut as argument@."
-
-(*******)
-
-
-let print_known_map _fmt _args =
-  let id = nearest_goal () in
-  let task = get_task cont.controller_session id in
-  let km = Task.task_known task in
-  Ident.Mid.iter
-    (fun id _d ->
-     printf "known: %s@." id.Ident.id_string)
-    km
-
-let test_print_id _fmt args =
-  let id = nearest_goal () in
-  let tables = match get_tables cont.controller_session id with
-  | None -> raise (Task.Bad_name_table "test_print_id")
-  | Some tables -> tables in
-  Format.printf "%s@." (print_id cont tables args)
-
-let test_search_id _fmt args =
-  let id = nearest_goal () in
-  let tables = match get_tables cont.controller_session id with
-  | None -> raise (Task.Bad_name_table "test_print_id")
-  | Some tables -> tables in
-  Format.printf "%s@." (search_id cont tables args)
-
-(****)
-
-let commands =
-  [
-    "k", "list known identifiers", print_known_map;
-    "list-provers", "list available provers", list_provers;
-    "list-transforms", "list available transformations", list_transforms;
-    "list-strategies", "list available strategies", list_strategies;
-    "a", "<transname> <args>: apply the transformation <transname> with arguments <args>", apply_transform;
-    "t", "<transname> <args>: behave like 'a' but add function to display into the callback", test_transform_and_display;
-    "pr", "print the session in raw form", dump_session_raw;
-    "p", "print the session", display_session;
-    "c", "<provername> [timelimit [memlimit]] run a prover on the current goal", test_schedule_proof_attempt;
-    "st", "<c> apply the strategy whose shortcut is 'c'", run_strategy;
-    "print", "<s> print the declaration where s was defined", test_print_id;
-    "search", "<s> print some declarations where s appear", test_search_id;
-    "g", "prints the current goal", test_print_goal;
-    "r", "reload the session (test only)", test_reload;
-    "rp", "replay", test_replay;
-    "s", "save the current session", test_save_session;
-    "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
-    "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
-    "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);
-    "gd", "go to the goal down",  then_print (move_to_goal_ret_p zipper_down);
-    "gr", "go to the goal right",  then_print (move_to_goal_ret_p zipper_right);
-    "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left);
-    "pcur", "print tree rooted at current position", (print_position_p cont.controller_session zipper);
-    "test", "test register known_map",
-    (fun _ _ ->
-      try
-        let id = nearest_goal () in
-        let task = get_task cont.controller_session id in
-        let _ = Args_wrapper.build_name_tables task in
-        ()
-      with e when not (Debug.test_flag Debug.stack_trace) ->
-        Format.eprintf
-          "@[Exception raised :@ %a@.@]" Exn_printer.exn_printer e);
-    "zu", "navigation up, parent", (fun _ _ -> ignore (zipper_up ()));
-    "zd", "navigation down, left child", (fun _ _ -> ignore (zipper_down ()));
-    "zl", "navigation left, left brother", (fun _ _ -> ignore (zipper_left ()));
-    "zr", "navigation right, right brother", (fun _ _ -> ignore (zipper_right ()))
-  ]
-
-let commands_table = Stdlib.Hstr.create 17
-let () =
-  List.iter
-    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
-    commands
-
-let help () =
-  printf "== Available commands ==@\n";
-  let l = ("q", "exit the shell") ::
-            List.rev_map (fun (c,h,_) -> (c,h)) commands
-  in
-  let l = List.sort sort_pair l in
-  List.iter (fun (c,help) -> printf "%20s : %s@\n" c help) l;
-  printf "@."
-
-
-let split_args s =
-  let args = ref [] in
-  let b = Buffer.create 17 in
-  let state = ref 0 in
-  for i = 0 to String.length s - 1 do
-    let c = s.[i] in
-    match !state, c with
-    | 0,' ' -> ()
-    | 0,'"' -> state := 1
-    | 0,_ -> Buffer.add_char b c; state := 2
-    | 1,'"' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
-    | 1,_ -> Buffer.add_char b c
-    | 2,' ' -> args := Buffer.contents b :: !args; Buffer.clear b; state := 0
-    | 2,_ -> Buffer.add_char b c
-    | _ -> assert false
-  done;
+let interp _chout fmt cmd =
+  (* TODO dont use Str. *)
+  let l = Str.split (Str.regexp " ") cmd in
   begin
-    match !state with
-      | 0 -> ()
-      | 1 -> args := Buffer.contents b :: !args (* TODO : report missing '"' *)
-      | 2 -> args := Buffer.contents b :: !args
-      | _ -> assert false
-  end;
-  match List.rev !args with
-    | a::b -> a,b
-    | [] -> "",[]
-
-let interp chout fmt s =
-  let cmd,args = split_args s in
-  match cmd with
-    | "?" -> help ()
-    | "q" ->
-       fprintf fmt "Shell exited@.";
-       close_out chout;
-       exit 0
+    match l with
+    | ["goto"; n] when int_of_string n < !max_ID ->
+        cur_id := int_of_string n; send_request (Get_task, !cur_id); print_session fmt
     | _ ->
-      let f =
-        try
-          Some (Stdlib.Hstr.find commands_table cmd)
-        with Not_found ->
-          None
-      in
-      match f with
-      | Some f -> f fmt args
-      | None -> printf "unknown command '%s'@." cmd
+        begin
+          match cmd with
+          | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
+          | "g" -> send_request (Get_task, !cur_id)
+          | _ -> send_request (Command_req cmd, !cur_id)
+        end
+  end;
+  print_goal fmt !cur_id
 
 let () =
-  printf "Welcome to Why3 shell. Type '?' for help.@.";
+  printf "Welcome to Why3 shell. Type 'help' for help.@.";
   let chout = open_out "why3shell.out" in
-  let fmt = if proof_general then formatter_of_out_channel stdout else formatter_of_out_channel chout in
-()
-(* TODO cant work like this anymore
-  Unix_Scheduler.main_loop (interp chout fmt)
-*)
-*)
+  let fmt = formatter_of_out_channel chout in
+  Queue.iter (fun f -> send_request (Open_req f, Itp_server.root_node)) files;
+  Unix_scheduler.timeout ~ms:100
+    (fun () -> List.iter
+        (fun n -> treat_notification fmt n) (get_notified ()); true);
+  Unix_scheduler.main_loop (interp chout fmt)

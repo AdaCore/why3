@@ -19,34 +19,15 @@ module Protocol_why3ide = struct
 
   let print_request_debug r =
     Debug.dprintf debug_proto "[request]";
-    Debug.dprintf debug_proto "%a" print_request r
+    Debug.dprintf debug_proto "%a@." print_request r
 
-  let print_msg_debug m = match m with
-    | Proof_error (_ids, s) -> Debug.dprintf debug_proto "proof error %s" s
-    | Transf_error (_ids, s) -> Debug.dprintf debug_proto "transf error %s" s
-    | Strat_error (_ids, s) -> Debug.dprintf debug_proto "start error %s" s
-    | Replay_Info s -> Debug.dprintf debug_proto "replay info %s" s
-    | Query_Info (_ids, s) -> Debug.dprintf debug_proto "query info %s" s
-    | Query_Error (_ids, s) -> Debug.dprintf debug_proto "query error %s" s
-    | Help _s -> Debug.dprintf debug_proto "help"
-    | Information s -> Debug.dprintf debug_proto "info %s" s
-    | Task_Monitor _ -> Debug.dprintf debug_proto "task montor"
-    | Error s -> Debug.dprintf debug_proto "%s" s
+  let print_msg_debug m =
+    Debug.dprintf debug_proto "[message]";
+    Debug.dprintf debug_proto "%a@." print_msg m
 
   let print_notify_debug n =
     Debug.dprintf debug_proto "[notification]";
-    match n with
-    | Node_change (_ni, _nf) -> Debug.dprintf debug_proto "node change"
-    | New_node (_ni, _pni, _nt,  _nf) -> Debug.dprintf debug_proto "new node"
-    | Remove _ni -> Debug.dprintf debug_proto "remove"
-    | Initialized _gi -> Debug.dprintf debug_proto "initialized"
-    | Saved -> Debug.dprintf debug_proto "saved"
-    | Message msg ->
-      Debug.dprintf debug_proto "[message] ";
-      print_msg_debug msg
-    | Dead s -> Debug.dprintf debug_proto "dead :%s" s
-    | Proof_update (_ni, _pas) -> Debug.dprintf debug_proto "proof update"
-    | Task (_ni, _s) -> Debug.dprintf debug_proto "task"
+    Debug.dprintf debug_proto "%a@." print_notify n
 
   let list_requests: ide_request list ref = ref []
 

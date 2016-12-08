@@ -167,7 +167,7 @@ LIBGENERATED = src/util/config.ml \
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
 	   hashcons stdlib exn_printer pp json debug loc lexlib print_tree \
-	   cmdline warning sysutil rc plugin bigInt number pqueue unix_scheduler
+	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer model_parser
@@ -835,7 +835,7 @@ install_local:: bin/why3session
 # Why3 Shell
 ###############
 
-SHELL_FILES = why3shell
+SHELL_FILES = unix_scheduler why3shell
 
 SHELLMODULES = $(addprefix src/why3shell/, $(SHELL_FILES))
 

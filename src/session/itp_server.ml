@@ -75,6 +75,7 @@ type request_type =
   | Replay_req
   | Exit_req
 
+(* Debugging functions *)
 let print_request fmt r =
   match r with
   | Command_req s             -> fprintf fmt "command \"%s\"" s
@@ -89,6 +90,32 @@ let print_request fmt r =
   | Reload_req                -> fprintf fmt "reload"
   | Replay_req                -> fprintf fmt "replay"
   | Exit_req                  -> fprintf fmt "exit"
+
+let print_msg fmt m =
+  match m with
+  | Proof_error (_ids, s)  -> fprintf fmt "proof error %s" s
+  | Transf_error (_ids, s) -> fprintf fmt "transf error %s" s
+  | Strat_error (_ids, s)  -> fprintf fmt "start error %s" s
+  | Replay_Info s          -> fprintf fmt "replay info %s" s
+  | Query_Info (_ids, s)   -> fprintf fmt "query info %s" s
+  | Query_Error (_ids, s)  -> fprintf fmt "query error %s" s
+  | Help _s                -> fprintf fmt "help"
+  | Information s          -> fprintf fmt "info %s" s
+  | Task_Monitor _         -> fprintf fmt "task montor"
+  | Error s                -> fprintf fmt "%s" s
+
+let print_notify fmt n =
+  match n with
+  | Node_change (_ni, _nf)          -> fprintf fmt "node change"
+  | New_node (_ni, _pni, _nt,  _nf) -> fprintf fmt "new node"
+  | Remove _ni                      -> fprintf fmt "remove"
+  | Initialized _gi                 -> fprintf fmt "initialized"
+  | Saved                           -> fprintf fmt "saved"
+  | Message msg                     ->
+      print_msg fmt msg
+  | Dead s                          -> fprintf fmt "dead :%s" s
+  | Proof_update (_ni, _pas)        -> fprintf fmt "proof update"
+  | Task (_ni, _s)                  -> fprintf fmt "task"
 
 type ide_request = request_type * node_ID
 
@@ -525,20 +552,24 @@ exception Bad_prover_name of prover
     | Replay_req              -> replay_session (); resend_the_tree ()
     | Command_req cmd         ->
       begin
-        match any_from_node_ID nid with
-        | APn pn_id ->
-          begin
-            match (interp config cont (Some pn_id) cmd) with
-            | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
-            | Query s                 -> P.notify (Message (Query_Info (nid, s)))
-            | Prove (p, limit)        -> schedule_proof_attempt nid p limit
-            | Strategies st           -> run_strategy_on_task nid st
-            | Help_message s          -> P.notify (Message (Help s))
-            | QError s                -> P.notify (Message (Query_Error (nid, s)))
-            | Other (s, _args)        ->
+        if nid = 0 then
+          (* root_node is not in any_from_node_ID table *)
+          P.notify (Message (Information "Should be done on a proof node"))
+        else
+          match any_from_node_ID nid with
+          | APn pn_id ->
+            begin
+              match (interp config cont (Some pn_id) cmd) with
+              | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
+              | Query s                 -> P.notify (Message (Query_Info (nid, s)))
+              | Prove (p, limit)        -> schedule_proof_attempt nid p limit
+              | Strategies st           -> run_strategy_on_task nid st
+              | Help_message s          -> P.notify (Message (Help s))
+              | QError s                -> P.notify (Message (Query_Error (nid, s)))
+              | Other (s, _args)        ->
                 P.notify (Message (Information ("Unknown command"^s)))
-          end
-        | _ ->
+            end
+          | _ ->
             P.notify (Message (Information "Should be done on a proof node"))
             (* TODO make it an error *)
       end

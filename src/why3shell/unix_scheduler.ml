@@ -55,7 +55,7 @@ module Unix_scheduler = struct
          while true do
            if !print_prompt then begin
              prompt_delay := !prompt_delay + 1;
-             if !prompt_delay = 2 then begin
+             if !prompt_delay = 1 then begin
                Format.printf "%s@?" !prompt;
                prompt_delay := 0;
                print_prompt := false;

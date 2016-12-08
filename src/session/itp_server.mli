@@ -87,6 +87,8 @@ type request_type =
   | Exit_req
 
 val print_request: Format.formatter -> request_type -> unit
+val print_msg: Format.formatter -> message_notification -> unit
+val print_notify: Format.formatter -> notification -> unit
 
 (* TODO: change to request_type * node_ID list ? *)
 type ide_request = request_type * node_ID
