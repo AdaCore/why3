@@ -76,8 +76,6 @@ module Euler290
     variant  { m }
   = if m = 0 then begin
       (* only n = 0 is possible *)
-      assert { power 10 m = 1 };
-      assert { numof a b 10 0 (power 10 m) = if sum_digits a + b = 0 then 1 else 0 };
       if sd a + b = 0 then 1 else 0
     end else begin
       let sum = ref 0 in

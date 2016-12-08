@@ -12,7 +12,7 @@
  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
-<theory name="LinearProbing" sum="0768e41be6d75fc5c0046b8691028429" expanded="true">
+<theory name="LinearProbing" sum="1cbb56a699a651dee5d971c187b7dba9" expanded="true">
  <goal name="bucket_bounds">
  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
  </goal>
@@ -480,12 +480,12 @@
     <ip_library name="list"/>
     <ip_qualid name="list"/>
    </ts_pos>
-   <ts_pos name="ref" arity="1" id="4668"
+   <ts_pos name="ref" arity="1" id="4669"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="ref"/>
    </ts_pos>
-   <ts_pos name="t" arity="0" id="6857"
+   <ts_pos name="t" arity="0" id="6858"
     ip_theory="LinearProbing">
     <ip_qualid name="t"/>
    </ts_pos>
@@ -574,26 +574,26 @@
     <ip_library name="map"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="prefix !" id="4674"
+   <ls_pos name="prefix !" id="4675"
     ip_theory="Ref">
     <ip_library name="ref"/>
     <ip_qualid name="prefix !"/>
    </ls_pos>
-   <ls_pos name="set" id="4841"
+   <ls_pos name="set" id="4842"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="set"/>
    </ls_pos>
-   <ls_pos name="mixfix [&lt;-]" id="4883"
+   <ls_pos name="mixfix [&lt;-]" id="4884"
     ip_theory="Array">
     <ip_library name="array"/>
     <ip_qualid name="mixfix [&lt;-]"/>
    </ls_pos>
-   <ls_pos name="numofd" id="6638"
+   <ls_pos name="numofd" id="6639"
     ip_theory="LinearProbing">
     <ip_qualid name="numofd"/>
    </ls_pos>
-   <ls_pos name="next" id="7478"
+   <ls_pos name="next" id="7479"
     ip_theory="LinearProbing">
     <ip_qualid name="next"/>
    </ls_pos>
@@ -801,16 +801,16 @@
     <ip_library name="map"/>
     <ip_qualid name="Select_neq"/>
    </pr_pos>
-   <pr_pos name="bucket_bounds" id="6299"
+   <pr_pos name="bucket_bounds" id="6300"
     ip_theory="LinearProbing">
     <ip_qualid name="bucket_bounds"/>
    </pr_pos>
-   <pr_pos name="numof_eq" id="6528"
+   <pr_pos name="numof_eq" id="6529"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="numof_eq"/>
    </pr_pos>
-   <pr_pos name="dummy_const" id="6634"
+   <pr_pos name="dummy_const" id="6635"
     ip_theory="LinearProbing">
     <ip_qualid name="NumOfDummy"/>
     <ip_qualid name="dummy_const"/>
@@ -867,19 +867,19 @@
     <meta_arg_ls id="3301"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4674"/>
+    <meta_arg_ls id="4675"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4841"/>
+    <meta_arg_ls id="4842"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="4883"/>
+    <meta_arg_ls id="4884"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="6638"/>
+    <meta_arg_ls id="6639"/>
    </meta>
    <meta name="remove_logic">
-    <meta_arg_ls id="7478"/>
+    <meta_arg_ls id="7479"/>
    </meta>
    <meta name="remove_prop">
     <meta_arg_pr id="1607"/>
@@ -999,13 +999,13 @@
     <meta_arg_pr id="3323"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="6299"/>
+    <meta_arg_pr id="6300"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="6528"/>
+    <meta_arg_pr id="6529"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="6634"/>
+    <meta_arg_pr id="6635"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="2600"/>
@@ -1014,10 +1014,10 @@
     <meta_arg_ts id="2604"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="4668"/>
+    <meta_arg_ts id="4669"/>
    </meta>
    <meta name="remove_type">
-    <meta_arg_ts id="6857"/>
+    <meta_arg_ts id="6858"/>
    </meta>
    <goal name="WP_parameter copy.2" expl="2. type invariant">
    <proof prover="4" timelimit="5"><result status="valid" time="0.19"/></proof>
@@ -1025,7 +1025,7 @@
   </metas>
   </goal>
   <goal name="WP_parameter copy.3" expl="3. type invariant">
-  <proof prover="4"><result status="valid" time="1.49"/></proof>
+  <proof prover="4"><result status="valid" time="1.26"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1338,7 +1338,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter remove.5" expl="5. assertion">
-  <proof prover="0" timelimit="30"><result status="valid" time="20.59"/></proof>
+  <proof prover="0" timelimit="30"><result status="valid" time="23.31"/></proof>
   <proof prover="4" timelimit="30"><result status="valid" time="16.68"/></proof>
   </goal>
   <goal name="WP_parameter remove.6" expl="6. type invariant">
