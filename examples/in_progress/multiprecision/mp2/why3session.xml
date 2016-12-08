@@ -12,7 +12,7 @@
 <prover id="7" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.5pl2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mp2.mlw" expanded="true">
-<theory name="N" sum="55988b7bac1ac5b388e0ee63ca2456ce" expanded="true">
+<theory name="N" sum="9467dfa45e1a3d0833e80074dfba5f3a" expanded="true">
  <goal name="limb_max_bound">
  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
  </goal>
@@ -1697,10 +1697,10 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.8" expl="8. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.9" expl="9. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="VC mul_limbs.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -2279,10 +2279,10 @@
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.8" expl="8. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.9" expl="9. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -5833,6 +5833,244 @@
   </goal>
   <goal name="VC div3by2_inv.59" expl="59. postcondition">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC reciprocal_word_3by2" expl="VC for reciprocal_word_3by2" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="VC reciprocal_word_3by2.1" expl="1. integer overflow">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="73"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="73"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.3" expl="3. assertion">
+  <proof prover="0"><result status="timeout" time="4.90"/></proof>
+  <proof prover="2"><result status="timeout" time="5.95"/></proof>
+  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4"><result status="timeout" time="4.85"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.4" expl="4. assertion">
+  <proof prover="0"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4"><result status="timeout" time="4.87"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.5" expl="5. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2"><result status="timeout" time="5.94"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4"><result status="timeout" time="4.84"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.6" expl="6. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2"><result status="timeout" time="5.91"/></proof>
+  <proof prover="3"><result status="valid" time="0.23" steps="174"/></proof>
+  <proof prover="4"><result status="timeout" time="4.87"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.7" expl="7. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.91" steps="151"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.8" expl="8. assertion">
+  <proof prover="0"><result status="timeout" time="4.90"/></proof>
+  <proof prover="2"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4"><result status="timeout" time="4.89"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.9" expl="9. assertion">
+  <proof prover="0"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3"><result status="timeout" time="4.97"/></proof>
+  <proof prover="4"><result status="timeout" time="4.89"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.10" expl="10. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.94"/></proof>
+  <proof prover="2"><result status="timeout" time="5.89"/></proof>
+  <proof prover="3"><result status="timeout" time="4.98"/></proof>
+  <proof prover="4"><result status="timeout" time="4.92"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.11" expl="11. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2"><result status="timeout" time="5.95"/></proof>
+  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4"><result status="timeout" time="4.88"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.12" expl="12. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.94"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.89"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.13" expl="13. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.14" expl="14. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.15" expl="15. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.16" expl="16. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.95"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.17" expl="17. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.18" expl="18. assertion">
+  <proof prover="0"><result status="timeout" time="4.94"/></proof>
+  <proof prover="2"><result status="timeout" time="5.94"/></proof>
+  <proof prover="3"><result status="timeout" time="4.98"/></proof>
+  <proof prover="4"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.19" expl="19. assertion">
+  <proof prover="0"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4"><result status="timeout" time="4.92"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.20" expl="20. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.88"/></proof>
+  <proof prover="2"><result status="timeout" time="5.91"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4"><result status="timeout" time="4.91"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.21" expl="21. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2"><result status="timeout" time="5.90"/></proof>
+  <proof prover="3"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4"><result status="timeout" time="4.93"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.22" expl="22. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.66"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.23" expl="23. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.72"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.24" expl="24. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.25" expl="25. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.95"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.88"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.26" expl="26. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.89"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.91"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.27" expl="27. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.94"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.28" expl="28. assertion">
+  <proof prover="0"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="2.21" steps="459"/></proof>
+  <proof prover="4"><result status="timeout" time="4.87"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.29" expl="29. assertion">
+  <proof prover="0"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="timeout" time="4.98"/></proof>
+  <proof prover="4"><result status="timeout" time="4.93"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.30" expl="30. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2"><result status="timeout" time="5.94"/></proof>
+  <proof prover="3"><result status="timeout" time="5.01"/></proof>
+  <proof prover="4"><result status="timeout" time="4.89"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.31" expl="31. integer overflow">
+  <proof prover="0"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2"><result status="timeout" time="5.92"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4"><result status="timeout" time="4.85"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.32" expl="32. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.94"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.89"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.33" expl="33. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.92"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.34" expl="34. assertion" expanded="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.95"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.93"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="4.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="VC reciprocal_word_3by2.34.1" expl="1. VC for reciprocal_word_3by2">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC reciprocal_word_3by2.34.2" expl="2. VC for reciprocal_word_3by2" expanded="true">
+   <proof prover="0"><result status="timeout" time="4.91"/></proof>
+   <proof prover="1"><result status="timeout" time="4.98"/></proof>
+   <proof prover="2"><result status="timeout" time="5.94"/></proof>
+   <proof prover="3"><result status="timeout" time="5.00"/></proof>
+   <proof prover="4"><result status="timeout" time="4.77"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.35" expl="35. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.24"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.36" expl="36. assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.91"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.21"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.94"/></proof>
+  </goal>
+  <goal name="VC reciprocal_word_3by2.37" expl="37. postcondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="4.93"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.87"/></proof>
+  <proof prover="3" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="4.90"/></proof>
   </goal>
  </transf>
  </goal>
