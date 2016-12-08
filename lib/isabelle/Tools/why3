@@ -70,16 +70,28 @@ shift $(($OPTIND - 1))
 
 NAME=`dirname "$1"`/`basename "$1" .xml`
 
+if [ "$ISABELLE_WHY3_SESSION" ]; then
+  SESSION="$ISABELLE_WHY3_SESSION"
+else
+  SESSION=Why3
+fi
+
+if [ "$ISABELLE_WHY3_SESSION_DIR" ]; then
+  SESSION_DIR=("-d" "$ISABELLE_WHY3_SESSION_DIR")
+else
+  SESSION_DIR=()
+fi
+
 if [ "$BATCH" = true ]; then
-  "$ISABELLE_PROCESS" -e "use_thy \"$NAME\";" -rq Why3
+  echo "use_thy \"$NAME\";" | "$ISABELLE_TOOL" console "${SESSION_DIR[@]}" -l "$SESSION"
 elif [ "$INTERACTIVE" = true ]; then
   make_theory "$NAME"
   if [ -f "$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER" ]; then
-    "$ISABELLE_TOOL" java -jar "$(jvmpath "$JEDIT_HOME/dist/jedit.jar")" \
-      "-settings=$(jvmpath "$JEDIT_SETTINGS")" "-server=$WHY3_JEDIT_SERVER" \
-      -reuseview -wait "$(jvmpath "${NAME}.thy")"
+    "$ISABELLE_TOOL" java -jar "$(platform_path "$JEDIT_HOME/dist/jedit.jar")" \
+      "-settings=$(platform_path "$JEDIT_SETTINGS")" "-server=$WHY3_JEDIT_SERVER" \
+      -reuseview -wait "$(platform_path "${NAME}.thy")"
   else
-    "$ISABELLE_TOOL" jedit -l Why3 "${NAME}.thy"
+    "$ISABELLE_TOOL" jedit "${SESSION_DIR[@]}" -l "$SESSION" "${NAME}.thy"
   fi
 else
   usage

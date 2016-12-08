@@ -26,12 +26,30 @@ function fail()
 
 ## main
 
-[ "$1" = "-?" ] && usage
+SESSION=Why3
+SESSION_DIR=()
+
+while getopts "l:d:" OPT
+do
+  case "$OPT" in
+    l)
+      SESSION="$OPTARG"
+      ;;
+    d)
+      SESSION_DIR=("-d" "$OPTARG")
+      ;;
+    \?)
+      usage
+      ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
 
 SERVER_FILE="$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER"
 
 if [ -f "$SERVER_FILE" ]; then
   fail "Server already running: \"$SERVER_FILE\""
 else
-  exec "$ISABELLE_TOOL" jedit "-j-server=$WHY3_JEDIT_SERVER" -l Why3 "$@"
+  exec "$ISABELLE_TOOL" jedit "-j-server=$WHY3_JEDIT_SERVER" "${SESSION_DIR[@]}" -l "$SESSION" "$@"
 fi
