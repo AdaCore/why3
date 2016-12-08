@@ -12,7 +12,7 @@
 <prover id="7" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.5pl2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../mp2.mlw" expanded="true">
-<theory name="N" sum="f58d46eb420efd213a732eeaa3fd477c" expanded="true">
+<theory name="N" sum="55988b7bac1ac5b388e0ee63ca2456ce" expanded="true">
  <goal name="limb_max_bound">
  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
  </goal>
@@ -1697,10 +1697,10 @@
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.8" expl="8. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="VC mul_limbs.9" expl="9. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul_limbs.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -2279,10 +2279,10 @@
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.8" expl="8. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC mul.9" expl="9. loop invariant init">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mul.10" expl="10. loop invariant init">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
@@ -4510,8 +4510,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC div3by2_inv" expl="VC for div3by2_inv" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC div3by2_inv" expl="VC for div3by2_inv">
+ <transf name="split_goal_wp">
   <goal name="VC div3by2_inv.1" expl="1. integer overflow">
   <proof prover="3"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
@@ -5415,160 +5415,423 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC div3by2_inv.25" expl="25. precondition">
+  <goal name="VC div3by2_inv.25" expl="25. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.25.1" expl="1. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.2" expl="2. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.61" steps="122"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.3" expl="3. VC for div3by2_inv">
+   <proof prover="3"><result status="valid" time="0.63" steps="127"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.4" expl="4. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.5" expl="5. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.6" expl="6. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.37"/></proof>
+   <proof prover="4"><result status="timeout" time="4.84"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.7" expl="7. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.17"/></proof>
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.8" expl="8. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.9" expl="9. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.10" expl="10. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.44"/></proof>
+   <proof prover="4"><result status="timeout" time="4.83"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.11" expl="11. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.33"/></proof>
+   <proof prover="4"><result status="timeout" time="4.89"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.25.12" expl="12. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.09"/></proof>
+   <proof prover="4"><result status="timeout" time="4.89"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.26" expl="26. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="4"><result status="valid" time="0.07"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.26" expl="26. precondition">
+  <goal name="VC div3by2_inv.27" expl="27. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.27" expl="27. assertion" expanded="true">
-  <proof prover="0"><result status="timeout" time="4.91"/></proof>
-  <proof prover="1"><result status="highfailure" time="3.76"/></proof>
-  <proof prover="2"><result status="timeout" time="5.19"/></proof>
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
-  <proof prover="4"><result status="timeout" time="4.88"/></proof>
-  <proof prover="6" obsolete="true"><result status="timeout" time="5.02"/></proof>
-  <proof prover="7" obsolete="true"><result status="timeout" time="4.79"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.28" expl="28. precondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.29" expl="29. precondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.12"/></proof>
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.30" expl="30. assertion">
-  <proof prover="2"><result status="valid" time="5.93"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.31" expl="31. assertion" expanded="true">
-  <proof prover="0"><result status="timeout" time="4.92"/></proof>
-  <proof prover="1"><result status="timeout" time="4.78"/></proof>
-  <proof prover="2"><result status="timeout" time="5.12"/></proof>
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
-  <proof prover="4"><result status="timeout" time="4.78"/></proof>
-  <proof prover="6" obsolete="true"><result status="timeout" time="5.07"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.32" expl="32. assertion">
-  <proof prover="2"><result status="valid" time="7.06"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.33" expl="33. postcondition">
-  <proof prover="2"><result status="valid" time="0.15"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.34" expl="34. postcondition">
-  <proof prover="2"><result status="valid" time="0.18"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.35" expl="35. assertion">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.11"/></proof>
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.36" expl="36. assertion">
-  <proof prover="2"><result status="valid" time="2.70"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.37" expl="37. postcondition">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.15"/></proof>
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
-  <proof prover="6"><result status="valid" time="0.21"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.38" expl="38. postcondition">
-  <proof prover="2"><result status="valid" time="0.12"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.39" expl="39. assertion">
+  <goal name="VC div3by2_inv.28" expl="28. assertion">
   <transf name="split_goal_wp">
-   <goal name="VC div3by2_inv.39.1" expl="1. VC for div3by2_inv">
-   <proof prover="2"><result status="valid" time="0.08"/></proof>
-   <proof prover="3"><result status="valid" time="0.79" steps="120"/></proof>
+   <goal name="VC div3by2_inv.28.1" expl="1. VC for div3by2_inv">
+   <proof prover="1"><result status="valid" time="0.13"/></proof>
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="VC div3by2_inv.39.2" expl="2. VC for div3by2_inv">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
-   <proof prover="3"><result status="valid" time="0.70" steps="121"/></proof>
+   <goal name="VC div3by2_inv.28.2" expl="2. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
    </goal>
-   <goal name="VC div3by2_inv.39.3" expl="3. VC for div3by2_inv">
-   <proof prover="2"><result status="valid" time="0.10"/></proof>
-   <proof prover="3"><result status="valid" time="0.67" steps="121"/></proof>
+   <goal name="VC div3by2_inv.28.3" expl="3. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC div3by2_inv.39.4" expl="4. VC for div3by2_inv">
-   <proof prover="2"><result status="valid" time="0.09"/></proof>
-   <proof prover="3"><result status="valid" time="0.65" steps="121"/></proof>
-   </goal>
-   <goal name="VC div3by2_inv.39.5" expl="5. VC for div3by2_inv">
-   <proof prover="3"><result status="valid" time="0.74" steps="123"/></proof>
-   </goal>
-   <goal name="VC div3by2_inv.39.6" expl="6. VC for div3by2_inv">
-   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   <goal name="VC div3by2_inv.28.4" expl="4. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="3.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC div3by2_inv.40" expl="40. assertion">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <goal name="VC div3by2_inv.29" expl="29. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.29.1" expl="1. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.2" expl="2. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.3" expl="3. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.05"/></proof>
+   <proof prover="1"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.4" expl="4. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.5" expl="5. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.6" expl="6. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.13"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.7" expl="7. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.8" expl="8. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.9" expl="9. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.10" expl="10. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.11" expl="11. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.12" expl="12. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.13" expl="13. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.47"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.14" expl="14. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.15" expl="15. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.16" expl="16. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.17" expl="17. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.18" expl="18. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.19" expl="19. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.20" expl="20. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.21" expl="21. VC for div3by2_inv">
+   <proof prover="5"><result status="valid" time="0.41"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.22" expl="22. VC for div3by2_inv">
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.29.23" expl="23. VC for div3by2_inv">
+   <proof prover="5"><result status="valid" time="0.13"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="VC div3by2_inv.41" expl="41. precondition">
+  <goal name="VC div3by2_inv.30" expl="30. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.30.1" expl="1. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.2" expl="2. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.3" expl="3. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.15"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.4" expl="4. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.5" expl="5. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.6" expl="6. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.30.7" expl="7. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.31" expl="31. assertion">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.32" expl="32. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.13"/></proof>
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.42" expl="42. precondition">
+  <goal name="VC div3by2_inv.33" expl="33. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.34" expl="34. assertion">
+  <proof prover="2"><result status="valid" time="2.71"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.35" expl="35. assertion">
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.36" expl="36. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.36.1" expl="1. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.2" expl="2. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.84"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.3" expl="3. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.4" expl="4. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.5" expl="5. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.6" expl="6. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.58"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.7" expl="7. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.8" expl="8. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.9" expl="9. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.10" expl="10. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.11" expl="11. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.12" expl="12. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.36.13" expl="13. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.37" expl="37. assertion">
+  <proof prover="2"><result status="valid" time="4.28"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.38" expl="38. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.38.1" expl="1. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="1.09"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.38.2" expl="2. VC for div3by2_inv">
+   <proof prover="5"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.38.3" expl="3. VC for div3by2_inv">
+   <proof prover="5"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.39" expl="39. assertion">
+  <proof prover="2"><result status="valid" time="5.57"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.40" expl="40. postcondition">
+  <proof prover="2"><result status="valid" time="0.15"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.41" expl="41. postcondition">
+  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.42" expl="42. assertion">
+  <proof prover="2"><result status="valid" time="0.47"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.43" expl="43. postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  <proof prover="6"><result status="valid" time="0.21"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.44" expl="44. postcondition">
+  <proof prover="2"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.45" expl="45. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.45.1" expl="1. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.08"/></proof>
+   <proof prover="3"><result status="valid" time="0.79" steps="120"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.45.2" expl="2. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="3"><result status="valid" time="0.70" steps="121"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.45.3" expl="3. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   <proof prover="3"><result status="valid" time="0.67" steps="121"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.45.4" expl="4. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.09"/></proof>
+   <proof prover="3"><result status="valid" time="0.65" steps="121"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.45.5" expl="5. VC for div3by2_inv">
+   <proof prover="3"><result status="valid" time="0.74" steps="123"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.45.6" expl="6. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.46" expl="46. assertion">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.47" expl="47. precondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="4"><result status="valid" time="0.08"/></proof>
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.48" expl="48. precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   <proof prover="2"><result status="valid" time="0.11"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.43" expl="43. assertion">
-  <proof prover="2"><result status="valid" time="0.50"/></proof>
+  <goal name="VC div3by2_inv.49" expl="49. assertion">
+  <proof prover="2"><result status="valid" time="0.29"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.44" expl="44. assertion" expanded="true">
-  <proof prover="0"><result status="timeout" time="4.91"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="4.94"/></proof>
-  <proof prover="2"><result status="timeout" time="5.06"/></proof>
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
-  <proof prover="4"><result status="timeout" time="4.86"/></proof>
-  <proof prover="6" obsolete="true"><result status="timeout" time="5.03"/></proof>
+  <goal name="VC div3by2_inv.50" expl="50. assertion">
+  <proof prover="0"><result status="timeout" time="4.94"/></proof>
+  <proof prover="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  <proof prover="4"><result status="timeout" time="4.80"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.45" expl="45. assertion" expanded="true">
-  <proof prover="2"><result status="valid" time="4.13"/></proof>
+  <goal name="VC div3by2_inv.51" expl="51. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.51.1" expl="1. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.16"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.2" expl="2. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.41"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.3" expl="3. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.4" expl="4. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.5" expl="5. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.6" expl="6. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.34"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.7" expl="7. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.8" expl="8. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.12"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.9" expl="9. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.10" expl="10. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.11" expl="11. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.12" expl="12. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.10"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.51.13" expl="13. VC for div3by2_inv">
+   <proof prover="1"><result status="valid" time="1.42"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="VC div3by2_inv.46" expl="46. postcondition">
+  <goal name="VC div3by2_inv.52" expl="52. assertion">
+  <proof prover="2"><result status="valid" time="4.08"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.53" expl="53. assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC div3by2_inv.53.1" expl="1. VC for div3by2_inv">
+   <proof prover="0"><result status="valid" time="0.54"/></proof>
+   <proof prover="2"><result status="timeout" time="5.07"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.53.2" expl="2. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC div3by2_inv.53.3" expl="3. VC for div3by2_inv">
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC div3by2_inv.54" expl="54. assertion">
+  <proof prover="2"><result status="valid" time="3.49"/></proof>
+  </goal>
+  <goal name="VC div3by2_inv.55" expl="55. postcondition">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="4"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.47" expl="47. postcondition">
+  <goal name="VC div3by2_inv.56" expl="56. postcondition">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.48" expl="48. assertion">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="VC div3by2_inv.49" expl="49. assertion">
+  <goal name="VC div3by2_inv.57" expl="57. assertion">
   <proof prover="2"><result status="valid" time="0.27"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.50" expl="50. postcondition">
+  <goal name="VC div3by2_inv.58" expl="58. postcondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   <proof prover="6"><result status="valid" time="0.21"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC div3by2_inv.51" expl="51. postcondition">
+  <goal name="VC div3by2_inv.59" expl="59. postcondition">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
