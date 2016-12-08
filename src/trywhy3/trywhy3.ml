@@ -275,19 +275,23 @@ module Tabs =
       List.iter
 	(fun tab_group ->
 	 let labels = select tab_group ".why3-tab-label" in
-	 List.iter (
+	 List.iter
 	     (fun tab ->
 	      tab ## onclick <-
 		Dom.handler
-		  (fun _ev ->
-		   List.iter
-		     (fun t ->
-		      ignore (t ## classList ## toggle (Js.string "why3-inactive")))
-		     labels;
-		   Js._false))
-	       ) labels)
-	tab_groups
-
+                    (fun _ev ->
+                   let () = if Js.to_bool
+                       (tab ## classList ## contains (Js.string "why3-inactive")) then
+		       List.iter
+	                  (fun t ->
+                            ignore (t ## classList ## toggle (Js.string "why3-inactive")))
+		            labels
+                   in
+		   Js._false)
+      ) labels)
+      tab_groups
+    let focus id =
+      (Dom_html.getElementById id) ## click ()
   end
 
 module ContextMenu =
@@ -941,6 +945,7 @@ module Controller =
     let () = why3_worker := Some (init_why3_worker ())
 
     let why3_parse () =
+      Tabs.focus "why3-task-list-tab";
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
@@ -952,6 +957,7 @@ module Controller =
       (get_why3_worker()) ## postMessage (msg)
 
     let why3_execute () =
+      Tabs.focus "why3-task-list-tab";
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
