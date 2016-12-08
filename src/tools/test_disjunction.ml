@@ -170,8 +170,74 @@ let test6 =
    w1 = 0) /\ 0 <= (x - 10) \/*)
 
 
-let _ = 
-  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
-  let d1 = constr ["x", [], 0; "x", [], 1] in
-  ()
+
+
+(* fast *)
+
+module Domw = Disjunctive_domain_fast.Make(Base)
+
+let init vars =
+  let vars = List.map Var.of_string vars |> Array.of_list in
+  let man = Domw.create_manager () in
+  let env = Environment.make vars [||] in
+  let assign = fun var_name vars const d ->
+    let expr = Linexpr1.make env in
+    let vars = List.map (fun (i, v) -> Coeff.s_of_int i, Var.of_string v) vars in
+    Linexpr1.set_list expr vars None;
+    Linexpr1.set_cst expr (Coeff.s_of_int const);
+    Domw.assign_linexpr man d (Var.of_string var_name) expr None
+  in
+  man, env, assign, begin fun constr ->
+    List.fold_left (fun d (v, vars, const) ->
+        assign v vars const d) (Domw.top man env) constr
+  end, begin fun d constr cst ty ->
+    let expr = Linexpr1.make env in
+    let lincons = Lincons1.make expr ty in
+    let constr = List.map (fun (i, v) -> Coeff.s_of_int i, Var.of_string v) constr in
+    List.iter (fun (i, v) ->
+                Linexpr1.set_coeff expr v i) constr;
+    Linexpr1.set_cst expr (Coeff.s_of_int cst);
+    let lincons_a = Lincons1.array_make env 1 in
+    Lincons1.array_set lincons_a 0 lincons;
+    Domw.meet_lincons_array man d lincons_a
+  end
+
+
+
+let dom_eq man d d_ =
+  Domw.is_leq man d d_ && Domw.is_leq man d_ d
+
+let test_w1 =
+  let man, env, assign, constr, lineq = init ["x"; "y"; "z"] in
+  let d1 = Domw.top man env in
+  let a1 = lineq d1 [-2, "x"] (3) Lincons1.SUPEQ in
+  let a2 = lineq d1 [1, "x"] (-1) Lincons1.SUPEQ in
+  
+  Domw.print Format.err_formatter a1;
+  assert_ "testcleanup" (dom_eq man a1 a2);
+  Format.eprintf "@.";
+  assert_ "testcleanup" true
+
+let test_w1 =
+  let man, env, assign, constr, lineq = init ["x"; "y"; "z"] in
+  let d1 = Domw.top man env in
+  let a1 = lineq d1 [1, "z"] 0 Lincons1.EQ in
+  let a1 = lineq a1 [1, "y"] 0 Lincons1.EQ in
+  let a1 = lineq a1 [1, "x"] (-2) Lincons1.SUPEQ in
+  
+  let a2 = lineq d1 [1, "z"] (-4) Lincons1.EQ in
+  let a2 = lineq a2 [1, "y"] (-2) Lincons1.EQ in
+  let a2 = lineq a2 [1, "x"] (-2) Lincons1.SUPEQ in
+  
+  let a3 = lineq d1 [1, "z"] (-2) Lincons1.EQ in
+  let a3 = lineq a3 [1, "y"] (-1) Lincons1.EQ in
+  let a3 = lineq a3 [1, "x"] (-2) Lincons1.SUPEQ in
+
+  let d1 = Domw.join man a1 a2 in
+  let d2 = Domw.join man d1 a3 in
+  Domw.print Format.err_formatter d1;
+  let d3 = Domw.widening man d1 d2 in
+  Domw.print Format.err_formatter d3;
+  Format.eprintf "@.";
+  assert_ "testw1" true
 

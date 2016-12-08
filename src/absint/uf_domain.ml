@@ -313,7 +313,9 @@ module Make(S:sig
       uf_man.var_to_term <- TermToVar.add uf_man.var_to_term t v;
       v
   
-  let extract_term (man, uf_man) is_in (a, b) v =
+  exception Bad_domain of D.t
+
+  let rec extract_term (man, uf_man) is_in (dom, b) v =
     let find_var = fun a ->
       if a = uf_man.apron_var then
         uf_man.quant_var
@@ -333,14 +335,18 @@ module Make(S:sig
 
           with
           | Not_found ->
-            let () = assert false in
-            raise Not_found
+            raise (Bad_domain (D.forget_array man dom [|a|] false))
     in
-    match D.get_linexpr man a v with
+    match D.get_linexpr man dom v with
     | Some l ->
-      let t = Ai_logic.varlist_to_term find_var l in
-      assert (Ty.ty_equal (t_type t) Ty.ty_int);
-      Some t
+      begin
+        try
+          let t = Ai_logic.varlist_to_term find_var l in
+          assert (Ty.ty_equal (t_type t) Ty.ty_int);
+          Some t
+        with
+        | Bad_domain(a) -> extract_term (man, uf_man) is_in (a, b) v
+      end
     | None -> None
 
   

@@ -25,7 +25,7 @@ module Test
 		a[1] <- 42;
 		while (true) do
 		variant { 0 }
-		invariant { a[1] = 42 /\ (forall k: int. (k = 0 /\ a[k] = 0) \/ k <> 0) }
+		invariant { a[1] = 42 /\ (forall k: int. (0 <= k <= 1 /\ a[k] = 42 *k) \/ k <> 0) }
 		()
 		done; ()
 

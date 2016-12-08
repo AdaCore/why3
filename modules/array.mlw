@@ -21,7 +21,7 @@ module Array
 
   val ([]) (a: array 'a) (i: int) : 'a
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { result = a[i] }
+    ensures  { result = get a.elts i (*(forall k: int. (0 <= k < length a -> (k = i /\ result = get a.elts k) \/ k <> i) \/ k < 0 \/ k >= length a)*) }
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { "expl:index in array bounds" 0 <= i < length a }

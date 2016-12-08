@@ -1,8 +1,15 @@
 open Domain
 
+type 'a a = { t: 'a list; c: bool; i: int; }
+
+module type D = sig
+  include DOMAIN
+  val round_integers: man -> env -> t -> t
+end
+
 module Make(A:DOMAIN) = struct
 
-  type t = { t: A.t list; c: bool; i: int; }
+  type t = A.t a
   type env = A.env
   
   let hash man t =
@@ -91,6 +98,57 @@ module Make(A:DOMAIN) = struct
 
   let threshold = 25
 
+  let round_integers_a (man, _) env a =
+    let open Apron in
+    let l = A.to_lincons_array man a in
+    let n = Apron.Lincons1.array_length l in
+    let a = ref a in
+    for i = 0 to n -1 do
+      let l = Lincons1.array_get l i in
+      let n = ref 0 in
+      if not (Coeff.equal_int (Lincons1.get_cst l) 0) then
+        begin
+          let i = Lincons1.get_cst l |> function
+            | Coeff.Scalar(s) ->
+              let s = Scalar.to_string s in
+              float_of_string s |> int_of_float
+            | _ -> assert false
+          in
+          let l' = Lincons1.copy l in
+          Lincons1.iter (fun c v ->
+              if not (Coeff.equal_int c 0) then
+                begin
+
+                  let myi = match c with
+                    | Coeff.Scalar(s) ->
+                      let s = Scalar.to_string s in
+                      int_of_string s
+                    | _ -> assert false
+                  in
+                  Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
+                  let c = 
+                    if i mod myi = 0 then
+                      i/(abs myi)
+                    else if i > 0 then i/(abs myi)
+                    else i/(abs myi) - 1
+                  in
+
+                  Lincons1.set_cst l' (Coeff.s_of_int c);
+                  incr n;
+                end
+            ) l;
+          if !n = 1 then
+            begin
+              let ar = Lincons1.array_make env 1 in
+              Lincons1.array_set ar 0 l';
+              a := A.meet_lincons_array man !a ar
+            end
+        end
+    done;
+    !a
+
+  let round_integers m e a = { a with t = List.map (round_integers_a m e) a.t }
+
 
   let join_one man { t; i; _ } =
     match t with
@@ -153,6 +211,7 @@ module Make(A:DOMAIN) = struct
               let a = Lincons1.array_make (Lincons1.get_env cp) 1 in
               Lincons1.array_set a 0 cp;
               let new_c = a_meet_lincons_array man' c a in
+              let new_c = round_integers_a (man, man') (Lincons1.get_env cp) new_c in
               a_is_leq man' new_c b) true opp_typ
         end;
     done;
@@ -231,8 +290,8 @@ module Make(A:DOMAIN) = struct
 
   (* used once by loop, so it can be costly *)
   let widening man a b =
-    let a = cleanup man a in
-    let b = cleanup man b in
+    let a = cleanup_hard man a in
+    let b = cleanup_hard man b in
     let a =
       if List.length a.t > threshold then
         join_one man a
@@ -251,8 +310,9 @@ module Make(A:DOMAIN) = struct
         | Not_found -> b
       ) b.t
     in
-    {t = List.map (fun (k, v) ->
-         A.widening (fst man) v k) b_leq; c = false; i = 0; } |> cleanup man
+    let c = {t = List.map (fun (k, v) ->
+         A.widening (fst man) v k) b_leq; c = false; i = 0; } |> cleanup man in
+    c
 
   let meet_lincons_array man t e  =
     { t with t = List.map (fun t -> a_meet_lincons_array man t e) t.t; c = false; }
