@@ -2827,6 +2827,22 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     assert { 0 <= l2i !r0 + radix * l2i !r1 < d };
     (!q1,!r0,!r1)
 
+  let lemma bounds_imply_rec3by2 (v dh dl:limb)
+    requires { radix * radix * radix - (l2i dl + radix * l2i dh)
+               <= (radix + l2i v) * (l2i dl + radix * l2i dh)
+               < radix * radix * radix }
+    ensures { reciprocal_3by2 v dh dl }
+  = ()
+    (*let ghost d = l2i dl + radix * l2i dh in
+    let ghost w = Limb.of_int (div (radix*radix*radix -1) d - radix) in
+    assert { reciprocal_3by2 w dh dl };
+    let ghost e = l2i v - l2i w in
+    assert { radix * radix * radix - d
+             <= (radix + l2i w) * d
+             < radix * radix * radix };
+    assert { e = 0 }*)
+
+
   let reciprocal_word_3by2 (dh dl:limb) : limb
     requires { l2i dh >= div radix 2 }
     ensures { reciprocal_3by2 result dh dl }
@@ -2836,41 +2852,93 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let v = ref (invert_limb dh) in
     assert { radix * radix - l2i dh
              <= (radix + l2i !v) * l2i dh
-             < radix * radix };
+             < radix * radix
+             by
+             radix + l2i !v = div (radix * radix - 1) (l2i dh) };
     let p = ref (mul_mod dh !v) in
-    assert { (radix + l2i !v) * l2i dh * radix
-             = radix * radix * (radix-1)
-               + radix * l2i !p };
+    assert { (radix + l2i !v) * l2i dh
+             = radix * (radix-1)
+               + l2i !p
+             by
+             mod ((radix + l2i !v) * l2i dh) radix
+             = mod (radix * l2i dh + l2i dh * l2i !v) radix
+             = mod (l2i dh * l2i !v) radix = l2i !p
+             so
+             div ((radix + l2i !v) * l2i dh) radix = radix - 1
+             so
+             (radix + l2i !v) * l2i dh
+             = radix * div ((radix + l2i !v) * l2i dh) radix
+               + mod (l2i dh * l2i !v) radix
+             = radix * (radix - 1) + l2i !p
+             };
+    label Estimate in
     p := add_mod !p dl;
     if Limb.(<) !p dl (* carry out *)
     then begin
-      v := Limb.(-) !v one;
+      assert { l2i (!p at Estimate) + l2i dl >= radix };
+      assert { l2i (!p at Estimate) + l2i dl = radix + l2i !p };
+      assert { l2i !v >= 1
+               by
+               l2i (!p at Estimate) + l2i dl >= radix
+               so l2i (!p at Estimate) > 0
+             };
+      label Carry1 in
       if Limb.(>=) !p dh
       then begin
         v := Limb.(-) !v one;
         p := Limb.(-) !p dh;
+        assert { (radix + l2i !v) * l2i dh + l2i dl
+                 = radix * (radix - 1) + radix + l2i !p
+               };
       end;
+      v := Limb.(-) !v one;
+      assert { l2i !p < l2i dh };
       p := sub_mod !p dh;
     end;
+    assert { (radix + l2i !v) * l2i dh * radix + radix * l2i dl
+               = radix * radix * (radix - 1) + radix * l2i !p
+             by (radix + l2i !v) * l2i dh + l2i dl
+                 = radix * (radix - 1) + l2i !p };
     assert { radix * radix - l2i dh
              <= (radix + l2i !v) * l2i dh + l2i dl
              < radix * radix };
-    assert { (radix + l2i !v) * l2i dh * radix + radix * l2i dl
-             = radix * radix * (radix-1)
-               + radix * l2i !p };
     let tl, th = mul_double !v dl in
+    label Adjust in
     p := add_mod !p th;
     if Limb.(<) !p th (* carry out *)
     then begin
-      v := Limb.(-) !v one;
+      assert { l2i (!p at Adjust) + l2i th >= radix };
+      assert { l2i (!p at Adjust) + l2i th = radix + l2i !p
+               by l2i (!p at Adjust) + l2i th < radix + radix
+               so div (l2i (!p at Adjust) + l2i th) radix = 1
+               so l2i !p = mod (l2i (!p at Adjust) + l2i th) radix
+               so l2i (!p at Adjust) + l2i th
+                  = radix * div (l2i (!p at Adjust) + l2i th) radix
+                    + mod (l2i (!p at Adjust) + l2i th) radix
+                  = radix + l2i !p
+             };
+      assert { l2i !v >= 1
+               by
+               l2i th <> 0
+               so l2i !v <> 0
+             };
       if Limb.(>) !p dh || (Limb.(=) !p dh && Limb.(>=) tl dl)
-      then v := Limb.(-) !v one;
+      then begin
+        (*assert { l2i tl + radix * l2i !p >= d };*)
+        v := Limb.(-) !v one;
+        assert { (radix + l2i !v) * l2i dh * radix + radix * l2i dl
+                   + l2i !v * l2i dl
+                 = radix * radix * (radix-1)
+                   + radix * l2i !p + d + l2i tl }; (* TODO adjust this *)
+      end;
+      v := Limb.(-) !v one;
     end;
     assert { (radix + l2i !v) * d
              = (radix + l2i !v) * l2i dh * radix + radix * l2i dl
                + l2i !v * l2i dl
              = radix * radix * (radix-1)
-               + radix * l2i !p };
+               + radix * l2i !p + l2i tl};
+    bounds_imply_rec3by2 !v dh dl;
     !v
 
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
