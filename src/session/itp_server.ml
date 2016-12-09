@@ -75,6 +75,8 @@ type request_type =
   | Replay_req
   | Exit_req
 
+type ide_request = request_type * node_ID
+
 (* Debugging functions *)
 let print_request fmt r =
   match r with
@@ -116,8 +118,6 @@ let print_notify fmt n =
   | Dead s                          -> fprintf fmt "dead :%s" s
   | Proof_update (_ni, _pas)        -> fprintf fmt "proof update"
   | Task (_ni, _s)                  -> fprintf fmt "task"
-
-type ide_request = request_type * node_ID
 
 open Session_itp
 open Controller_itp
@@ -539,6 +539,14 @@ exception Bad_prover_name of prover
 
   (* ----------------- treat_request -------------------- *)
 
+  let get_proof_node_id nid =
+    try
+      match any_from_node_ID nid with
+      | APn pn_id -> Some pn_id
+      | _ -> None
+    with
+      Not_found -> None
+
   let rec treat_request (r,nid) =
     try (
     match r with
@@ -552,26 +560,16 @@ exception Bad_prover_name of prover
     | Replay_req              -> replay_session (); resend_the_tree ()
     | Command_req cmd         ->
       begin
-        if nid = 0 then
-          (* root_node is not in any_from_node_ID table *)
-          P.notify (Message (Information "Should be done on a proof node"))
-        else
-          match any_from_node_ID nid with
-          | APn pn_id ->
-            begin
-              match (interp config cont (Some pn_id) cmd) with
-              | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
-              | Query s                 -> P.notify (Message (Query_Info (nid, s)))
-              | Prove (p, limit)        -> schedule_proof_attempt nid p limit
-              | Strategies st           -> run_strategy_on_task nid st
-              | Help_message s          -> P.notify (Message (Help s))
-              | QError s                -> P.notify (Message (Query_Error (nid, s)))
-              | Other (s, _args)        ->
-                P.notify (Message (Information ("Unknown command"^s)))
-            end
-          | _ ->
-            P.notify (Message (Information "Should be done on a proof node"))
-            (* TODO make it an error *)
+        let snid = get_proof_node_id nid in
+        match (interp config cont snid cmd) with
+        | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
+        | Query s                 -> P.notify (Message (Query_Info (nid, s)))
+        | Prove (p, limit)        -> schedule_proof_attempt nid p limit
+        | Strategies st           -> run_strategy_on_task nid st
+        | Help_message s          -> P.notify (Message (Help s))
+        | QError s                -> P.notify (Message (Query_Error (nid, s)))
+        | Other (s, _args)        ->
+            P.notify (Message (Information ("Unknown command"^s)))
       end
     | Open_req file_name      ->
         if !init_controller then
