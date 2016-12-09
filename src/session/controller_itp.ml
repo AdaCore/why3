@@ -71,12 +71,33 @@ type controller =
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-let create_controller env = {
+exception LoadDriverFailure of Whyconf.config_prover * exn
+
+let create_controller env provers =
+  let c = {
     controller_session = Session_itp.dummy_session;
     proof_state = init_proof_state ();
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
-}
+    }
+  in
+  (* load provers drivers *)
+  Whyconf.Mprover.iter
+    (fun _ p ->
+       try
+         let d = Driver.load_driver env p.Whyconf.driver [] in
+         Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
+       with e -> raise (LoadDriverFailure(p,e))
+(*
+         let p = p.Whyconf.prover in
+         eprintf "Failed to load driver for %s %s: %a@."
+           p.Whyconf.prover_name p.Whyconf.prover_version
+           Exn_printer.exn_printer e
+ *)
+)
+    provers;
+  c
+
 
 let init_controller s c =
   c.controller_session <- s
@@ -302,7 +323,7 @@ let read_file env ?format fn =
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let merge_file (old_ses : session) (c : controller) env ~use_shapes _ file =
+let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
   let format = file.file_format in
   let old_theories = file.file_theories in
   let file_name = Filename.concat (get_dir old_ses) file.file_name in
@@ -313,16 +334,17 @@ let merge_file (old_ses : session) (c : controller) env ~use_shapes _ file =
       []
   in
   merge_file_section
-    c.controller_session ~use_shapes ~old_ses ~old_theories ~env file_name new_theories format;
+    c.controller_session ~use_shapes ~old_ses ~old_theories
+    ~env:c.controller_env file_name new_theories format;
   Stdlib.Hstr.iter
     (fun _ f -> List.iter (reload_theory_proof_state c) f.file_theories)
     (get_files c.controller_session)
 
 
-let reload_files (c : controller) (env : Env.env) ~use_shapes =
+let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
-  Stdlib.Hstr.iter (merge_file old_ses c env ~use_shapes) (get_files old_ses)
+  Stdlib.Hstr.iter (merge_file old_ses c ~use_shapes) (get_files old_ses)
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in

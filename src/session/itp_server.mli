@@ -7,18 +7,20 @@ type strategy = string
 type node_ID = int
 val root_node : node_ID
 
+
+module type History_type = sig
+  type history
+
+  val create_history: unit -> history
+  val print_next_command: history -> string option
+  val print_prev_command: history -> string option
+  val add_command: history -> string -> unit
+
+end
+
+module History : History_type
+
 (* --------------------------- types to be expanded if needed --------------------------------- *)
-
-type node_type =
-  | NRoot
-  | NFile
-  | NTheory
-  | NTransformation
-  | NGoal
-  | NProofAttempt of Call_provers.prover_answer option * bool
-
-type node_info = { proved : bool; (* TODO: add more *)
-                   name   : string }
 
 (* Global information known when server process has started and that can be
    shared with the IDE through communication *)
@@ -51,12 +53,28 @@ type message_notification =
   (* An error happened that could not be identified in server *)
   | Error        of string
 
+type node_type =
+  | NRoot
+  | NFile
+  | NTheory
+  | NTransformation
+  | NGoal
+  | NProofAttempt (* of Call_provers.prover_answer option * bool *)
+
+type update_info =
+  | Proved of bool
+  | Proof_status_change of
+      Controller_itp.proof_attempt_status
+      * bool   (* obsolete or not *)
+      * Call_provers.resource_limit
+   (* or 3 constructors if better *)
+
 type notification =
-  | Node_change  of node_ID * node_info
-  (* inform that the data of the given node changed *)
-  | New_node     of node_ID * node_ID * node_type * node_info
+  | New_node     of node_ID * node_ID * node_type * string
   (* Notification of creation of new_node:
-     New_node (new_node, parent_node, new_node_type, new_node_content). *)
+     New_node (new_node, parent_node, node_type, name). *)
+  | Node_change  of node_ID * update_info
+  (* inform that the data of the given node changed *)
   | Remove       of node_ID
   (* the given node was removed *)
   | Initialized  of global_information
@@ -67,10 +85,8 @@ type notification =
   (* an informative message, can be an error message *)
   | Dead         of string
   (* server exited *)
-  | Proof_update of node_ID * Controller_itp.proof_attempt_status
-  (* update proof attempt *)
   | Task         of node_ID * string
-  (* te node_ID's task *)
+  (* the node_ID's task *)
 
 type request_type =
   | Command_req       of string

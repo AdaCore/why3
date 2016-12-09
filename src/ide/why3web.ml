@@ -33,6 +33,7 @@ let interp_request args =
 
 let print_message_notification fmt n =
   match n with
+  | Error s -> ()
   | Proof_error(nid,s) -> ()
   | Transf_error(nid,s) -> ()
   | Strat_error(nid,s) -> ()
@@ -102,4 +103,35 @@ let stdin_handler s =
     | "q" -> exit 0
     | _ -> printf "unknown command '%s'@." s
 
-let () = Wserver.main_loop None 6789 handler stdin_handler
+(************************)
+(* parsing command line *)
+(************************)
+
+let files : string Queue.t = Queue.create ()
+
+let opt_parser = ref None
+
+let spec = Arg.align [
+  "-F", Arg.String (fun s -> opt_parser := Some s),
+      "<format> select input format (default: \"why\")";
+  "--format", Arg.String (fun s -> opt_parser := Some s),
+      " same as -F";
+(*
+  "-f",
+   Arg.String (fun s -> input_files := s :: !input_files),
+   "<file> add file to the project (ignored if it is already there)";
+*)
+  Termcode.arg_extra_expl_prefix
+]
+
+let usage_str = sprintf
+  "Usage: %s [options] [<file.why>|<project directory>]..."
+  (Filename.basename Sys.argv.(0))
+
+
+let () =
+  Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+  if Queue.is_empty files then
+     Whyconf.Args.exit_with_usage spec usage_str;
+  Queue.iter (fun f -> P.push_request (Itp_server.Open_req f, Itp_server.root_node)) files;
+  Wserver.main_loop None 6789 handler stdin_handler

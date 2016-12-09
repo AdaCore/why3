@@ -78,8 +78,13 @@ type controller = private
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller: Env.env -> controller
+exception LoadDriverFailure of Whyconf.config_prover * exn
+val create_controller:
+  Env.env -> Whyconf.config_prover Whyconf.Mprover.t -> controller
+(** creates a controller with an empty session *)
+
 val init_controller: Session_itp.session -> controller -> unit
+(** adds a session to a controller *)
 
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool
@@ -89,7 +94,7 @@ val file_proved: controller -> Session_itp.file -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
-val reload_files : controller -> Env.env -> use_shapes:bool -> unit
+val reload_files : controller -> use_shapes:bool -> unit
 (** reload the files of the given session:
 
   - each file is parsed again and theories/goals extracted from it. If

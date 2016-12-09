@@ -120,7 +120,7 @@ let () =
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
 
-open Session_user_interface.History
+open Itp_server.History
 
 (********************************)
 (* Source language highlighting *)
