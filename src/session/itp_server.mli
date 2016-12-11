@@ -59,7 +59,7 @@ type node_type =
   | NTheory
   | NTransformation
   | NGoal
-  | NProofAttempt (* of Call_provers.prover_answer option * bool *)
+  | NProofAttempt
 
 type update_info =
   | Proved of bool
@@ -67,7 +67,6 @@ type update_info =
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
       * Call_provers.resource_limit
-   (* or 3 constructors if better *)
 
 type notification =
   | New_node     of node_ID * node_ID * node_type * string
@@ -88,26 +87,24 @@ type notification =
   | Task         of node_ID * string
   (* the node_ID's task *)
 
-type request_type =
-  | Command_req       of string
-  | Prove_req         of prover * resource_limit
-  | Transform_req     of transformation * string list
-  | Strategy_req      of strategy
-  | Open_req          of string
+type ide_request =
+  | Command_req       of node_ID * string
+  | Prove_req         of node_ID * prover * resource_limit
+  | Transform_req     of node_ID * transformation * string list
+  | Strategy_req      of node_ID * strategy
+  | Open_session_req  of string
+  | Add_file_req      of string
   | Set_max_tasks_req of int
-  | Get_task
+  | Get_task          of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
   | Replay_req
   | Exit_req
 
-val print_request: Format.formatter -> request_type -> unit
+val print_request: Format.formatter -> ide_request -> unit
 val print_msg: Format.formatter -> message_notification -> unit
 val print_notify: Format.formatter -> notification -> unit
-
-(* TODO: change to request_type * node_ID list ? *)
-type ide_request = request_type * node_ID
 
 (* The server part of the protocol *)
 module type Protocol = sig

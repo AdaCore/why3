@@ -71,6 +71,11 @@ type controller =
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
+let clear_proof_state c =
+  Hid.clear c.proof_state.th_state;
+  Htn.clear c.proof_state.tn_state;
+  Hpn.clear c.proof_state.pn_state
+
 exception LoadDriverFailure of Whyconf.config_prover * exn
 
 let create_controller env provers =
@@ -98,8 +103,8 @@ let create_controller env provers =
     provers;
   c
 
-
 let init_controller s c =
+  clear_proof_state (c);
   c.controller_session <- s
 
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid

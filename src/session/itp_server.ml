@@ -737,19 +737,6 @@ type strategy = string
 type node_ID = int
 let root_node : node_ID = 0
 
-type node_type =
-  | NRoot
-  | NFile
-  | NTheory
-  | NTransformation
-  | NGoal
-  | NProofAttempt of Call_provers.prover_answer option * bool
-
-type node_info =
-    {
-     proved : bool;
-     name   : string;
-    }
 
 type global_information =
     {
@@ -777,48 +764,71 @@ type message_notification =
   | Task_Monitor of int * int * int
   | Error        of string
 
-type notification =
-  | Node_change  of node_ID * node_info
-  | New_node     of node_ID * node_ID * node_type * node_info
-  | Remove       of node_ID
-  | Initialized  of global_information
-  | Saved
-  | Message      of message_notification
-  | Dead         of string
-  | Proof_update of node_ID * Controller_itp.proof_attempt_status
-  | Task         of node_ID * string
+type node_type =
+  | NRoot
+  | NFile
+  | NTheory
+  | NTransformation
+  | NGoal
+  | NProofAttempt
 
-type request_type =
-  | Command_req       of string
-  | Prove_req         of prover * resource_limit
-  | Transform_req     of transformation * string list
-  | Strategy_req      of strategy
-  | Open_req          of string
+type update_info =
+  | Proved of bool
+  | Proof_status_change of
+      Controller_itp.proof_attempt_status
+      * bool   (* obsolete or not *)
+      * Call_provers.resource_limit
+
+type notification =
+  | New_node     of node_ID * node_ID * node_type * string
+  (* Notification of creation of new_node:
+     New_node (new_node, parent_node, node_type, name). *)
+  | Node_change  of node_ID * update_info
+  (* inform that the data of the given node changed *)
+  | Remove       of node_ID
+  (* the given node was removed *)
+  | Initialized  of global_information
+  (* initial global data *)
+  | Saved
+  (* the session was saved on disk *)
+  | Message      of message_notification
+  (* an informative message, can be an error message *)
+  | Dead         of string
+  (* server exited *)
+  | Task         of node_ID * string
+  (* the node_ID's task *)
+
+type ide_request =
+  | Command_req       of node_ID * string
+  | Prove_req         of node_ID * prover * resource_limit
+  | Transform_req     of node_ID * transformation * string list
+  | Strategy_req      of node_ID * strategy
+  | Open_session_req  of string
+  | Add_file_req      of string
   | Set_max_tasks_req of int
-  | Get_task
+  | Get_task          of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
   | Replay_req
   | Exit_req
 
-type ide_request = request_type * node_ID
-
 (* Debugging functions *)
 let print_request fmt r =
   match r with
-  | Command_req s             -> fprintf fmt "command \"%s\"" s
-  | Prove_req (prover, _rl)   -> fprintf fmt "prove with %s" prover
-  | Transform_req (tr, _args) -> fprintf fmt "transformation :%s" tr
-  | Strategy_req st           -> fprintf fmt "strategy %s" st
-  | Open_req f                -> fprintf fmt "open file %s" f
-  | Set_max_tasks_req i       -> fprintf fmt "set max tasks %i" i
-  | Get_task                  -> fprintf fmt "get task"
-  | Get_Session_Tree_req      -> fprintf fmt "get session tree"
-  | Save_req                  -> fprintf fmt "save"
-  | Reload_req                -> fprintf fmt "reload"
-  | Replay_req                -> fprintf fmt "replay"
-  | Exit_req                  -> fprintf fmt "exit"
+  | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
+  | Prove_req (_nid, prover, _rl)   -> fprintf fmt "prove with %s" prover
+  | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
+  | Strategy_req (_nid, st)         -> fprintf fmt "strategy %s" st
+  | Open_session_req f              -> fprintf fmt "open session file %s" f
+  | Add_file_req f                  -> fprintf fmt "open file %s" f
+  | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
+  | Get_task _nid                   -> fprintf fmt "get task"
+  | Get_Session_Tree_req            -> fprintf fmt "get session tree"
+  | Save_req                        -> fprintf fmt "save"
+  | Reload_req                      -> fprintf fmt "reload"
+  | Replay_req                      -> fprintf fmt "replay"
+  | Exit_req                        -> fprintf fmt "exit"
 
 let print_msg fmt m =
   match m with
@@ -843,7 +853,6 @@ let print_notify fmt n =
   | Message msg                     ->
       print_msg fmt msg
   | Dead s                          -> fprintf fmt "dead :%s" s
-  | Proof_update (_ni, _pas)        -> fprintf fmt "proof update"
   | Task (_ni, _s)                  -> fprintf fmt "task"
 
 open Stdlib
@@ -904,7 +913,11 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   (* Create_controller creates a dummy controller *)
   let cont =
     init_controller := false;
-    create_controller env provers
+    try
+      create_controller env provers
+    with LoadDriverFailure (p, e) -> P.notify (Message (
+      Error "To implement: could not load driver"));
+      raise (LoadDriverFailure (p, e)) (* TODO *)
 
   (* ------------ init controller ------------ *)
 
@@ -920,6 +933,36 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       exit 1
 
   (* -----------------------------------   ------------------------------------- *)
+
+  let get_node_type (node: any) =
+    match node with
+    | AFile _ -> NFile
+    | ATh _ -> NTheory
+    | ATn _ -> NTransformation
+    | APn _ -> NGoal
+    | APa _ -> NProofAttempt
+
+  let get_node_name (node: any) =
+    match node with
+    | AFile file ->
+      file.file_name
+    | ATh th ->
+      (theory_name th).Ident.id_string
+    | ATn tn ->
+      get_transf_name cont.controller_session tn
+    | APn pn ->
+      (get_proof_name cont.controller_session pn).Ident.id_string
+    | APa pa ->
+      let pa = get_proof_attempt_node cont.controller_session pa in
+      Pp.string_of Whyconf.print_prover pa.prover
+
+(*
+  let get_node_proved (node: any) =
+    match node with
+    | Afile file ->
+      file_proved cont file
+    | ATh th ->
+      th_proved cont th
 
   let get_info_and_type ses (node: any) =
     match node with
@@ -948,6 +991,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         in
         (NProofAttempt (pr, pa.proof_obsolete)),
         {name; proved}
+*)
 
 (* fresh gives new fresh "names" for node_ID using a counter.
    reset resets the counter so that we can regenerate node_IDs as if session
@@ -1005,14 +1049,13 @@ exception Bad_prover_name of prover
   let new_node ~parent node : node_ID =
     let new_id = fresh () in
       Hint.add model_any new_id node;
-      let ses = cont.controller_session in
-      let typ, info = get_info_and_type ses node in
+      (*let ses = cont.controller_session in*)
+      let node_type = get_node_type node in
+      let node_name = get_node_name node in
       add_node_to_table node new_id;
-      P.notify (New_node (new_id, parent, typ, info));
+      P.notify (New_node (new_id, parent, node_type, node_name));
       new_id
 
-  (* TODO this is a dummy constant for root content *)
-  let root_info = { proved = false; name = ""}
   let root = 0
 
   (* ----------------- build tree from tables ----------------- *)
@@ -1100,12 +1143,12 @@ exception Bad_prover_name of prover
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
 
   let resend_the_tree (): unit =
-    let ses = cont.controller_session in
     let send_node ~parent any =
       let node_id = node_ID_from_any any in
-      let node_type, node_info = get_info_and_type ses any in
-      P.notify (New_node (node_id, parent, node_type, node_info)) in
-    P.notify (New_node (0, 0, NRoot, root_info));
+      let node_name = get_node_name any in
+      let node_type = get_node_type any in
+      P.notify (New_node (node_id, parent, node_type, node_name)) in
+    P.notify (New_node (0, 0, NRoot, "root"));
     iter_the_files send_node root
 
   (* -- send the task -- *)
@@ -1145,13 +1188,14 @@ exception Bad_prover_name of prover
          updatable from the rest *)
     | _  -> () (* TODO ? *)
     end;
-    P.notify (Proof_update (node_ID_from_pan panid, pa_status))
+    let limit = (get_proof_attempt_node cont.controller_session panid).limit in
+    let new_status = Proof_status_change (pa_status, false, limit) in
+    P.notify (Node_change (node_ID_from_pan panid, new_status))
 
-  let notify_change x b =
+  let notify_change_proved x b =
     try (
       let node_ID = node_ID_from_any x in
-      let _, node_info = get_info_and_type cont.controller_session x in
-      P.notify (Node_change (node_ID, {name = node_info.name; proved = b}))
+      P.notify (Node_change (node_ID, Proved b))
      )
     with Not_found -> ()
 
@@ -1171,7 +1215,7 @@ exception Bad_prover_name of prover
       | ATh th     ->
         List.rev (unproven_goals_below_th cont [] th)
     in
-    List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback ~notification:notify_change)
+    List.iter (fun id -> C.schedule_proof_attempt cont id prover ~limit ~callback ~notification:notify_change_proved)
       goals
 
   (* ----------------- Schedule transformation -------------------- *)
@@ -1198,7 +1242,7 @@ exception Bad_prover_name of prover
       (* let _, node_info = get_info_and_type cont.controller_session x in *)
       (* P.notify (Node_change (node_ID, {name = node_info.name; proved = b})) in *)
       let callback = callback_update_tree_transform in
-      C.schedule_transformation cont id t args ~callback ~notification:notify_change
+      C.schedule_transformation cont id t args ~callback ~notification:notify_change_proved
     | APa panid ->
       let parent_id = get_proof_attempt_parent cont.controller_session panid in
       let parent = node_ID_from_pn parent_id in
@@ -1223,7 +1267,7 @@ exception Bad_prover_name of prover
           in
           let callback_pa = callback_update_tree_proof cont in
           let callback_tr st = callback_update_tree_transform st in
-          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change
+          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved
         | _ -> Format.printf "Strategy '%s' not found@." s
       end
     | _ -> ()
@@ -1265,22 +1309,22 @@ exception Bad_prover_name of prover
     with
       Not_found -> None
 
-  let rec treat_request (r,nid) =
+  let rec treat_request r =
     try (
     match r with
-    | Prove_req (p,limit)     -> schedule_proof_attempt nid (get_prover p) limit
-    | Transform_req (t, args) -> apply_transform nid t args
-    | Strategy_req st         -> run_strategy_on_task nid st
-    | Save_req                -> save_session ()
-    | Reload_req              -> reload_session ();
-    | Get_Session_Tree_req    -> resend_the_tree ()
-    | Get_task                -> send_task nid
-    | Replay_req              -> replay_session (); resend_the_tree ()
-    | Command_req cmd         ->
+    | Prove_req (nid,p,limit)      -> schedule_proof_attempt nid (get_prover p) limit
+    | Transform_req (nid, t, args) -> apply_transform nid t args
+    | Strategy_req (nid, st)       -> run_strategy_on_task nid st
+    | Save_req                     -> save_session ()
+    | Reload_req                   -> reload_session ();
+    | Get_Session_Tree_req         -> resend_the_tree ()
+    | Get_task nid                 -> send_task nid
+    | Replay_req                   -> replay_session (); resend_the_tree ()
+    | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
         match (interp config cont snid cmd) with
-        | Transform (s, _t, args) -> treat_request (Transform_req (s, args), nid)
+        | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        -> schedule_proof_attempt nid p limit
         | Strategies st           -> run_strategy_on_task nid st
@@ -1289,7 +1333,8 @@ exception Bad_prover_name of prover
         | Other (s, _args)        ->
             P.notify (Message (Information ("Unknown command"^s)))
       end
-    | Open_req file_name      ->
+    | Add_file_req _f -> (* TODO *) ()
+    | Open_session_req file_name      ->
         if !init_controller then
           begin
             Controller_itp.add_file cont file_name;
@@ -1303,9 +1348,9 @@ exception Bad_prover_name of prover
     | Exit_req                -> exit 0 (* TODO *)
      )
     with e -> P.notify (Message (Error (Pp.string_of
-      (fun fmt (r,nid,e) -> Format.fprintf fmt
-          "There was an unrecoverable error during treatment of request:\n %a\non node: %d\nwith exception: %a"
-    print_request r nid Exn_printer.exn_printer e ) (r, nid, e))))
+      (fun fmt (r,e) -> Format.fprintf fmt
+          "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
+    print_request r Exn_printer.exn_printer e ) (r, e))))
 
   let treat_requests () : bool =
     List.iter treat_request (P.get_requests ());

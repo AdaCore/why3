@@ -1,4 +1,4 @@
-open Format
+(*open Format
 open Why3
 open Gconfig
 open Stdlib
@@ -39,7 +39,7 @@ module Protocol_why3ide = struct
     l
 
   let send_request r =
-    print_request_debug (fst r);
+    print_request_debug r;
     Debug.dprintf debug_proto "@.";
     list_requests := r :: !list_requests
 
@@ -217,7 +217,7 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
-    ~callback:(fun () -> send_request (Save_req, root_node))
+    ~callback:(fun () -> send_request Save_req)
 
 let (replay_menu_item : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
@@ -436,21 +436,21 @@ let _ =
 let () =
   let n = gconfig.session_nb_processes in
   Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
-  send_request (Set_max_tasks_req n, root_node)
+  send_request (Set_max_tasks_req n)
 
 let (_ : GtkSignal.id) =
   replay_menu_item#connect#activate
-    ~callback:(fun () -> send_request (Replay_req, root_node))
+    ~callback:(fun () -> send_request Replay_req)
 
 (***********************************)
 (* Mapping session to the GTK tree *)
 (***********************************)
 
 let node_id_type : node_type Hint.t = Hint.create 17
-let node_id_info : node_info Hint.t = Hint.create 17
+let node_id_proved : bool Hint.t = Hint.create 17
 
 let get_node_type id = Hint.find node_id_type id
-let get_node_info id = Hint.find node_id_info id
+let get_node_proved id = Hint.find node_id_proved id
 
 let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
 
@@ -484,7 +484,7 @@ let image_of_result ~obsolete rOpt =
 
 let set_status_column iter =
   let id = get_node_id iter in
-  let proved = (get_node_info id).proved in
+  let proved = get_node_proved id in
   let image = match get_node_type id with
     | NRoot -> assert false
     | NFile
@@ -494,7 +494,7 @@ let set_status_column iter =
       if proved
       then !image_valid
       else !image_unknown
-    | NProofAttempt (pa, obs) ->
+    | NProofAttempt ->
       image_of_result ~obsolete:obs pa
   in
   goals_model#set ~row:iter ~column:status_column image
@@ -761,3 +761,4 @@ let () =
   message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
   main_window#show ();
   GMain.main ()
+*)
