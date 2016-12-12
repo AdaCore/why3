@@ -123,6 +123,87 @@ void lsld(uint32_t * low, uint32_t * high, uint32_t x, uint32_t cnt)
 
 end
 
+module mach.int.UInt64
+
+  prelude
+
+"
+void add_with_carry(uint64_t * res, uint64_t * carry, uint64_t x, uint64_t y, uint64_t c)
+{
+  uint64_t r = x + y + c;
+  *res = r;
+  if (r < x) *carry = 1;
+  else *carry = ((r == x) && c);
+}
+
+void sub_with_borrow(uint64_t * res, uint64_t * borrow, uint64_t x, uint64_t y, uint64_t b)
+{
+  uint64_t r = x - y - b;
+  *res = r;
+  if (r > x) *borrow = 1;
+  else *borrow = ((r == x) && b);
+}
+
+void mul_double(uint64_t * low, uint64_t * high, uint64_t x, uint64_t y)
+{
+  uint64_t h, l;
+  asm(\"mulq %3\" : \"=a\"(l),\"=d\"(h) : \"a\"(x), \"g\"(y));
+  *high = h;
+  *low = l;
+}
+
+void add3(uint64_t * low, uint64_t * high, uint64_t x, uint64_t y, uint64_t z)
+{
+  uint64_t r, c1, c2;
+  add_with_carry(&r, &c1, x, y, 0);
+  add_with_carry(&r, &c2, r, z, 0);
+  *high = c1 + c2;
+  *low = r;
+}
+
+void lsld(uint64_t * low, uint64_t * high, uint64_t x, uint64_t cnt)
+{
+  *high = x >> (64 - cnt);
+  *low = x << cnt;
+}
+"
+
+  syntax converter of_int "%1ULL"
+
+  syntax type uint64 "uint64_t"
+
+  syntax converter max_uint64 "0xffffffffffffffff"
+
+  syntax val (+)     "%1 + %2"
+  syntax val (-)     "%1 - %2"
+  syntax val (*)     "%1 * %2"
+  syntax val (/)     "%1 / %2"
+  syntax val (%)     "%1 % %2"
+  syntax val eq      "%1 == %2"
+  syntax val (=)     "%1 == %2"
+  syntax val ne      "%1 != %2"
+  syntax val (<=)    "%1 <= %2"
+  syntax val (<)     "%1 < %2"
+  syntax val (>=)    "%1 >= %2"
+  syntax val (>)     "%1 > %2"
+
+  syntax val add_mod "%1 + %2"
+  syntax val sub_mod "%1 - %2"
+  syntax val mul_mod "%1 * %2"
+
+  syntax val div2by1
+         "0"
+
+  syntax val lsl "%1 << %2"
+  syntax val lsr "%1 >> %2"
+
+  syntax val is_msb_set "%1 & 0x8000000000000000ULL"
+
+  syntax val count_leading_zeros "__builtin_clz(%1)"
+
+
+end
+
 
 
 module mach.c.C

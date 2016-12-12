@@ -361,14 +361,54 @@ end
 module UInt64
 
   use import int.Int
+  use import int.EuclideanDivision
+  use import int.Power
+
 
   type uint64
 
-  constant max_uint64 : int =  0xffffffffffffffff
+  let constant max_uint64 : int =  0xffffffffffffffff
 
   clone export Unsigned with
     type t = uint64,
     constant max = max_uint64
+
+ val lsld (x cnt:uint64) : (uint64,uint64)
+    requires { 0 <= to_int cnt < 64 }
+    returns { (r,d) -> to_int r + (max_uint64+1) * to_int d =
+              (power 2 (to_int cnt)) * to_int x }
+
+  val lsl (x cnt:uint64) : uint64
+    requires { 0 <= to_int cnt < 64 }
+    requires { (power 2 (to_int cnt)) * to_int x <= max_uint64 }
+    ensures { to_int result = (power 2 (to_int cnt)) * to_int x }
+
+  val lsr (x cnt:uint64) : uint64
+    requires { 0 <= to_int cnt < 64 }
+    requires { mod (to_int x) (power 2 (to_int cnt)) = 0 }
+    ensures { to_int x = (power 2 (to_int cnt)) * to_int result }
+
+  val div2by1 (l h d:uint64) : uint64
+    requires { to_int h < to_int d }
+    (* this pre implies d > 0 and also
+       l + (max+1)*h < (max+1)+(max+1)*h
+                     = (max+1)*(h+1)
+       thus
+       (l + (max+1)*h)/d < (max+1)*(h+1)/d
+                         <= max+1   (since h < d)
+       thus the result is <= max, no overflow
+    *)
+    ensures { to_int result
+            = div (to_int l + (max_uint64+1) * to_int h) (to_int d) }
+
+  val predicate is_msb_set (x:uint64) : bool
+    ensures { result <-> 2 * to_int x > max_uint64 }
+
+  val count_leading_zeros (x:uint64) : uint64
+    requires { to_int x > 0 }
+    ensures { (power 2 (to_int result)) * to_int x <= max_uint64 }
+    ensures { 2 * (power 2 (to_int result)) * to_int x > max_uint64 }
+    ensures { 0 <= to_int result < 64 }
 
 (*  use bv.BV64
 

@@ -20,18 +20,18 @@ module N
   use import array.Array
   use import mach.int.Int32
   use import mach.c.C
-  use import mach.int.UInt32 as Limb
+  use import mach.int.UInt64 as Limb
   use import int.Int
   use import int.Power
   use import map.Map
   use import ref.Ref
-  type limb = uint32
+  type limb = uint64
 
-  lemma limb_max_bound: 1 <= max_uint32
+  lemma limb_max_bound: 1 <= max_uint64
 
-  constant radix : int = max_uint32 + 1
+  constant radix : int = max_uint64 + 1
 
-  function l2i (x:limb) : int = UInt32.to_int x
+  function l2i (x:limb) : int = Limb.to_int x
 
   function p2i (i:int32) : int = Int32.to_int i
 
@@ -145,7 +145,7 @@ module N
     value_sub_concat (Map.set x i v) n i m
 
   let rec lemma value_zero (x:map int limb) (n m:int)
-    requires { MapEq.map_eq_sub x (Const.const UInt32.zero_unsigned) n m }
+    requires { MapEq.map_eq_sub x (Const.const Limb.zero_unsigned) n m }
     variant  { m - n }
     ensures  { value_sub x n m = 0 }
   = if n < m then value_zero x (n+1) m else ()
@@ -216,7 +216,7 @@ module N
   =
    let i = ref sz in
    let zero = Int32.of_int 0 in
-   let uzero = UInt32.of_int 0 in
+   let uzero = Limb.of_int 0 in
    let lx = ref uzero in
    let ly = ref uzero in
    let res = ref zero in
@@ -238,7 +238,7 @@ module N
        assert { 0 <= p2i !i < p2i sz };
        lx := get_ofs x !i;
        ly := get_ofs y !i;
-       if (UInt32.ne !lx !ly)
+       if (Limb.ne !lx !ly)
        then begin
             value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+ p2i sz);
             value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+ p2i sz);
@@ -247,7 +247,7 @@ module N
                    = compare_int (value_sub_shift x k) (value_sub_shift y k) };
             value_sub_tail (pelts x) x.offset (x.offset+k-1);
             value_sub_tail (pelts y) y.offset (y.offset+k-1);
-            if UInt32.(>) !lx !ly
+            if Limb.(>) !lx !ly
             then begin
              value_sub_upper_bound (pelts y) y.offset (y.offset+k-1);
              value_sub_lower_bound (pelts x) x.offset (x.offset+k-1);
@@ -291,7 +291,7 @@ module N
      ensures { Int32.to_int result = 1 <-> value_sub_shift x (p2i sz) = 0 }
    =
      let i = ref sz in
-     let uzero = UInt32.of_int 0 in
+     let uzero = Limb.of_int 0 in
      let lx = ref uzero in
      try
        while Int32.(>=) !i (Int32.of_int 1) do
@@ -302,7 +302,7 @@ module N
          i := Int32.(-) !i (Int32.of_int 1);
          assert { 0 <= p2i !i < p2i sz };
          lx := get_ofs x !i;
-         if (UInt32.ne !lx uzero)
+         if (Limb.ne !lx uzero)
          then begin
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
@@ -348,11 +348,11 @@ module N
     ensures { 0 <= l2i result <= 1 }
     writes { r.data.contents.elts }
   =
-    let limb_zero = UInt32.of_int 0 in
+    let limb_zero = Limb.of_int 0 in
     let c = ref y in
     let lx = ref limb_zero in
     let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && UInt32.ne !c limb_zero do
+    while Int32.(<) !i sz && Limb.ne !c limb_zero do
       invariant { 0 <= p2i !i <= p2i sz }
       invariant { p2i !i > 0 -> 0 <= l2i !c <= 1 }
       invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
@@ -419,7 +419,7 @@ module N
             value_sub_shift x (p2i sz) + value_sub_shift y (p2i sz) }
     writes { r.data.contents.elts }
     =
-    let limb_zero = UInt32.of_int 0 in
+    let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let c = ref limb_zero in
@@ -581,7 +581,7 @@ module N
     let b = ref y in
     let lx = ref limb_zero in
     let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && UInt32.ne !b limb_zero do
+    while Int32.(<) !i sz && Limb.ne !b limb_zero do
       invariant { 0 <= p2i !i <= p2i sz }
       invariant { p2i !i > 0 -> 0 <= l2i !b <= 1 }
       invariant { value_sub_shift r (p2i !i) - power radix (p2i !i) * l2i !b
@@ -647,7 +647,7 @@ module N
               = value_sub_shift x (p2i sz) - value_sub_shift y (p2i sz) }
     writes { r.data.contents.elts }
   =
-    let limb_zero = UInt32.of_int 0 in
+    let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
     let ly = ref limb_zero in
     let b = ref limb_zero in
@@ -807,7 +807,7 @@ module N
                 = value_sub_shift x (p2i sz) * l2i y }
     writes { r.data.contents.elts }
   =
-    let limb_zero = UInt32.of_int 0 in
+    let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
     let c = ref limb_zero in
     let i = ref (Int32.of_int 0) in
@@ -1588,7 +1588,7 @@ module N
       writes the result in [(r, sz)]. Returns the [cnt] most significant
       bits of [(x, sz)]. Corresponds to [mpn_lshift]. *)
   (*TODO overlapping allowed if r >= x*)
-  let lshift (r x:t) (sz:int32) (cnt:uint32) : limb
+  let lshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { 0 < l2i cnt < 32 }
     requires { valid_ptr_itv r (p2i sz) }
     requires { valid_ptr_itv x (p2i sz) }
@@ -1724,7 +1724,7 @@ module N
       writes the result in [(r, sz)]. Returns the [cnt] least significant
       bits of [(x, sz)]. Corresponds to [mpn_rshift]. *)
   (*TODO overlapping allowed if r <= x*)
-  let rshift (r x:t) (sz:int32) (cnt:uint32) : limb
+  let rshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { valid_ptr_itv x (p2i sz) }
     requires { valid_ptr_itv r (p2i sz) }
     requires { 0 < l2i cnt < 32 }
@@ -1732,7 +1732,7 @@ module N
     ensures { l2i result + radix * value_sub_shift r (p2i sz)
               = value_sub_shift x (p2i sz) * (power 2 (32- l2i cnt)) }
   =
-    let tnc = UInt32.(-) (UInt32.of_int 32) cnt in
+    let tnc = Limb.(-) (Limb.of_int 32) cnt in
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
@@ -1870,8 +1870,8 @@ module N
     requires { l2i d >= div radix 2 }
     ensures { reciprocal result d }
   =
-    let v = div2by1 (Limb.of_int max_uint32)
-                    (Limb.(-) (Limb.of_int max_uint32) d)
+    let v = div2by1 (Limb.of_int max_uint64)
+                    (Limb.(-) (Limb.of_int max_uint64) d)
                     d in
     fact_div (radix * radix - 1) (l2i d) (- radix);
     assert { l2i v = (div (radix*radix - 1) (l2i d)) - radix
@@ -2162,7 +2162,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let qp = ref (C.incr q msb) in
     let i = ref msb in
     let r = ref limb_zero in
-    let uone = UInt32.of_int 1 in
+    let uone = Limb.of_int 1 in
     (*normalize divisor*)
     let clz = count_leading_zeros y in
     let ghost mult = power 2 (l2i clz) in
@@ -2964,7 +2964,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     end;
     bounds_imply_rec3by2 !v dh dl;
     !v
-
+(*
   let div_sb_qr (q r x y:t) (sx sy:int32) (v:limb) : unit
     requires { 3 <= sy <= sx }
   =
@@ -2989,7 +2989,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       xp := C.incr !xp minus_one;
       if (Limb.(=) !x1 dh && Limb.(=) (C.get_ofs !xp one) dl) (* unlikely *)
       then begin
-        let q = Limb.of_int Limb.max_uint32 in
+        let q = Limb.of_int Limb.max_uint64 in
         let _ = submul_limb (C.incr !xp mdn) y sy q;
         x1 := C.get_ofs !xp one;
       end
@@ -3006,7 +3006,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         C.set !xp !x0;
         if Limb.(<>) cy2 uzero (*unlikely*)
         then begin
-
+*)
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
     in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to
     [mpn_tdiv_qr]. *)
@@ -3020,7 +3020,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
 
 
   (** Tests *)
-  let print (p:t) (m n:int32) : unit
+ (*
+ let print (p:t) (m n:int32) : unit
     requires { 0 <= p.offset + p2i m
                <= p.offset + p2i n
                <= plength p }
@@ -3062,7 +3063,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       C.set (C.incr p (Int32.of_int 1)) l2
       end;
     p
-
+*)
+(*
   let main () =
     let p = from_limb (Limb.of_int 42) in
     if not (is_null p)
@@ -3157,8 +3159,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     free s;
     free x;
     free y;
+*)
 end
-
 
 (*
 module Heap
