@@ -1139,6 +1139,10 @@ exception Bad_prover_name of prover
     iter_subtree_from_trans
       (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
 
+  let init_and_send_file f =
+    iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
+      root f
+
   let init_and_send_the_tree (): unit =
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
 
@@ -1333,17 +1337,18 @@ exception Bad_prover_name of prover
         | Other (s, _args)        ->
             P.notify (Message (Information ("Unknown command"^s)))
       end
-    | Add_file_req _f -> (* TODO *) ()
+    | Add_file_req f ->
+      begin
+        Controller_itp.add_file cont f;
+        let f = Sysutil.relativize_filename
+            (Session_itp.get_dir cont.controller_session) f in
+        let files = get_files cont.controller_session in
+        let file = Stdlib.Hstr.find files f in
+        init_and_send_file file
+      end
     | Open_session_req file_name      ->
-        if !init_controller then
-          begin
-            Controller_itp.add_file cont file_name;
-            () (* TODO: send notifications for all the new nodes *)
-          end
-        else begin
-          init_cont file_name;
-          init_and_send_the_tree ()
-        end
+      init_cont file_name;
+      init_and_send_the_tree ()
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0 (* TODO *)
      )

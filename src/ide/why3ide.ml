@@ -1,4 +1,4 @@
-(*open Format
+open Format
 open Why3
 open Gconfig
 open Stdlib
@@ -209,7 +209,7 @@ let file_factory = new GMenu.factory file_menu ~accel_group
 
 let exit_function ~destroy () =
   (* will this be treated before gmain quit ?!? *)
-  send_request (Exit_req, root_node);
+  send_request Exit_req;
   ignore(destroy); GMain.quit ()
 
 let (_ : GtkSignal.id) = main_window#connect#destroy
@@ -446,11 +446,31 @@ let (_ : GtkSignal.id) =
 (* Mapping session to the GTK tree *)
 (***********************************)
 
+type pa_status = Controller_itp.proof_attempt_status
+      * bool   (* obsolete or not *) (* TODO *)
+      * Call_provers.resource_limit
+
 let node_id_type : node_type Hint.t = Hint.create 17
 let node_id_proved : bool Hint.t = Hint.create 17
+let node_id_pa : pa_status Hint.t = Hint.create 17
 
 let get_node_type id = Hint.find node_id_type id
 let get_node_proved id = Hint.find node_id_proved id
+let get_node_id_pa id = Hint.find node_id_pa id
+
+let get_obs (pa_st: pa_status) = match pa_st with
+| _, b, _ -> b
+
+let get_proof_attempt (pa_st: pa_status) = match pa_st with
+| pa, _, _ -> pa
+
+let get_limit (pa_st: pa_status) = match pa_st with
+| _, _, l -> l
+
+let get_node_obs id = get_obs (get_node_id_pa id)
+let get_node_proof_attempt id = get_proof_attempt (get_node_id_pa id)
+let get_node_limit id = get_limit (get_node_id_pa id)
+
 
 let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
 
@@ -459,28 +479,32 @@ let node_id_to_gtree : GTree.row_reference Hint.t = Hint.create 42
 (* TODO exception for those: *)
 let get_node_row id = Hint.find node_id_to_gtree id
 
-let image_of_result ~obsolete rOpt =
-  match rOpt with
-  | None -> !image_undone
-  | Some r ->
-    match r with
-    | Call_provers.Valid ->
-      if obsolete then !image_valid_obs else !image_valid
-    | Call_provers.Invalid ->
-      if obsolete then !image_invalid_obs else !image_invalid
-    | Call_provers.Timeout ->
-      if obsolete then !image_timeout_obs else !image_timeout
-    | Call_provers.OutOfMemory ->
-      if obsolete then !image_outofmemory_obs else !image_outofmemory
-    | Call_provers.StepLimitExceeded ->
-      if obsolete then !image_steplimitexceeded_obs
-      else !image_steplimitexceeded
-    | Call_provers.Unknown _ ->
-      if obsolete then !image_unknown_obs else !image_unknown
-    | Call_provers.Failure _ ->
-      if obsolete then !image_failure_obs else !image_failure
-    | Call_provers.HighFailure ->
-      if obsolete then !image_failure_obs else !image_failure
+let image_of_pa_status ~obsolete pa =
+  match pa with
+(*  | None -> !image_undone*)
+  | Controller_itp.Done r ->
+    let pr_answer = r.Call_provers.pr_answer in
+    begin
+      match pr_answer with
+      | Call_provers.Valid ->
+        if obsolete then !image_valid_obs else !image_valid
+      | Call_provers.Invalid ->
+        if obsolete then !image_invalid_obs else !image_invalid
+      | Call_provers.Timeout ->
+        if obsolete then !image_timeout_obs else !image_timeout
+      | Call_provers.OutOfMemory ->
+        if obsolete then !image_outofmemory_obs else !image_outofmemory
+      | Call_provers.StepLimitExceeded ->
+        if obsolete then !image_steplimitexceeded_obs
+        else !image_steplimitexceeded
+      | Call_provers.Unknown _ ->
+        if obsolete then !image_unknown_obs else !image_unknown
+      | Call_provers.Failure _ ->
+        if obsolete then !image_failure_obs else !image_failure
+      | Call_provers.HighFailure ->
+        if obsolete then !image_failure_obs else !image_failure
+    end
+  | _ -> !image_undone
 
 let set_status_column iter =
   let id = get_node_id iter in
@@ -495,17 +519,19 @@ let set_status_column iter =
       then !image_valid
       else !image_unknown
     | NProofAttempt ->
-      image_of_result ~obsolete:obs pa
+      let pa = get_node_proof_attempt id in
+      let obs = get_node_obs id in
+      image_of_pa_status ~obsolete:obs pa
   in
   goals_model#set ~row:iter ~column:status_column image
 
-let new_node ?parent ?(collapse=false) id typ info =
+let new_node ?parent ?(collapse=false) id name typ proved =
   if not (Hint.mem node_id_to_gtree id) then begin
     Hint.add node_id_type id typ;
-    Hint.add node_id_info id info;
+    Hint.add node_id_proved id proved;
     let parent = Opt.map (fun x -> x#iter) parent in
     let iter = goals_model#append ?parent () in
-    goals_model#set ~row:iter ~column:name_column info.name;
+    goals_model#set ~row:iter ~column:name_column name;
     goals_model#set ~row:iter ~column:node_id_column id;
     let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
     (* By default expand_path when creating a new node *)
@@ -608,18 +634,6 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
-let image_of_pa_status ~obsolete pa_status =
-  match pa_status with
-    | Controller_itp.Interrupted   -> !image_undone
-    | Controller_itp.Unedited      -> !image_editor
-    | Controller_itp.JustEdited    -> !image_unknown
-    | Controller_itp.Scheduled     -> !image_scheduled
-    | Controller_itp.Running       -> !image_running
-    | Controller_itp.InternalFailure _
-    | Controller_itp.Uninstalled _ -> !image_failure
-    | Controller_itp.Done r        ->
-      image_of_result ~obsolete (Some r.Call_provers.pr_answer)
-
 let rec update_status_column_from_iter cont iter =
   set_status_column iter;
   match goals_model#iter_parent iter with
@@ -655,7 +669,7 @@ let interp cmd =
     else
       root_node
   in
-  send_request (Command_req cmd, id);
+  send_request (Command_req (id, cmd));
   clear_command_entry ()
 
 let (_ : GtkSignal.id) =
@@ -668,7 +682,7 @@ let on_selected_row r =
     let typ = get_node_type id in
     match typ with
     | NGoal ->
-      send_request (Get_task, id)
+      send_request (Get_task id)
     | _ -> task_view#source_buffer#set_text ""
   with
     | Not_found -> task_view#source_buffer#set_text ""
@@ -708,17 +722,30 @@ let treat_message_notification msg = match msg with
         add_to_msg_zone "Request failed."
 
 let treat_notification n = match n with
-  | Node_change (id, info)        ->
-    Hint.replace node_id_info id info;
-    set_status_column (get_node_row id)#iter
-  | New_node (id, pid, typ, info) ->
+  | Node_change (id, uinfo)        ->
+    begin
+      match uinfo with
+      | Proved b ->
+        begin
+          Hint.replace node_id_proved id b;
+          set_status_column (get_node_row id)#iter
+        end
+      | Proof_status_change (pa, obs, l) ->
+        begin
+          let r = get_node_row id in
+          Hint.replace node_id_pa id (pa, obs, l);
+          goals_model#set ~row:r#iter ~column:status_column
+            (image_of_pa_status ~obsolete:obs pa)
+        end
+    end
+  | New_node (id, parent_id, typ, name) ->
     begin (try
-        let parent = get_node_row pid in
-        let row_ref = new_node ~parent id typ info in
+        let parent = get_node_row parent_id in
+        let row_ref = new_node ~parent id name typ false in
         (* TODO for easier testing of IDE *)
         if typ = NGoal then goals_view#selection#select_iter row_ref#iter
       with Not_found ->
-        let row_ref = new_node id typ info in
+        let row_ref = new_node id name typ false in
         (* TODO for easier testing of IDE *)
         if typ = NGoal then goals_view#selection#select_iter row_ref#iter);
     end
@@ -730,14 +757,14 @@ let treat_notification n = match n with
   | Saved                         -> (* TODO *)
     add_to_msg_zone "got a Saved notification not yet supported\n"
   | Message (msg)                 -> treat_message_notification msg
-  | Proof_update (id, pa)         -> (* TODO *)
+(*  | Proof_update (id, pa)         -> (* TODO *)
     let r = get_node_row id in
     let obsolete = match get_node_type id with
       | NProofAttempt (_, obsolete) -> obsolete
       | _ -> assert false
     in
     goals_model#set ~row:r#iter ~column:status_column
-      (image_of_pa_status ~obsolete pa)
+      (image_of_pa_status ~obsolete pa) *)
   | Dead _s                        -> (* TODO *)
     add_to_msg_zone "got a Dead notification not yet supported\n"
   | Task (_id, s)                  ->
@@ -752,7 +779,9 @@ let treat_notification n = match n with
 
 let () =
   S.timeout ~ms:100 (fun () -> List.iter treat_notification (get_notified ()); true);
-  Queue.iter (fun f -> send_request (Open_req f, root_node)) files;
+  let f = Queue.pop files in
+  send_request (Open_session_req f);
+  Queue.iter (fun f -> send_request (Add_file_req f)) files;
   (* temporary *)
   vpan222#set_position 500;
   goals_view#expand_all ();
@@ -761,4 +790,3 @@ let () =
   message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
   main_window#show ();
   GMain.main ()
-*)
