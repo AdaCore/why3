@@ -214,6 +214,10 @@ module UInt32
   type uint32
 
   let constant max_uint32 : int = 0xffff_ffff
+  let constant length : int = 32
+  constant radix : int = max_uint32 + 1
+
+  (*lemma pow2_length : radix = power 2 32*)
 
   clone export Unsigned with
     type t = uint32,
@@ -368,6 +372,10 @@ module UInt64
   type uint64
 
   let constant max_uint64 : int =  0xffffffffffffffff
+  let constant length : int = 64
+  constant radix : int = max_uint64 + 1
+
+  (*lemma pow2_length : radix64 = power 2 64*)
 
   clone export Unsigned with
     type t = uint64,

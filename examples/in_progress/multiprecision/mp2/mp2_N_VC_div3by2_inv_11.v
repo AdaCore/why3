@@ -299,56 +299,6 @@ Axiom eq_sub_equiv : forall (a:t) (b:t) (i:t) (n:t), (eq_sub a b (to_uint i)
 
 Axiom Extensionality : forall (x:t) (y:t), (eq_sub x y 0%Z 32%Z) -> (x = y).
 
-Axiom t1 : Type.
-Parameter t1_WhyType : WhyType t1.
-Existing Instance t1_WhyType.
-
-Parameter max: Z.
-
-Parameter to_int2: t1 -> Z.
-
-(* Why3 assumption *)
-Definition in_bounds1 (n:Z): Prop := (0%Z <= n)%Z /\ (n <= max)%Z.
-
-Axiom to_int_in_bounds1 : forall (n:t1), (in_bounds1 (to_int2 n)).
-
-Axiom extensionality1 : forall (x:t1) (y:t1), ((to_int2 x) = (to_int2 y)) ->
-  (x = y).
-
-Parameter zero_unsigned: t1.
-
-Axiom zero_unsigned_is_zero : ((to_int2 zero_unsigned) = 0%Z).
-
-Axiom uint32 : Type.
-Parameter uint32_WhyType : WhyType uint32.
-Existing Instance uint32_WhyType.
-
-Parameter to_int3: uint32 -> Z.
-
-(* Why3 assumption *)
-Definition in_bounds2 (n:Z): Prop := (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
-
-Axiom to_int_in_bounds2 : forall (n:uint32), (in_bounds2 (to_int3 n)).
-
-Axiom extensionality2 : forall (x:uint32) (y:uint32),
-  ((to_int3 x) = (to_int3 y)) -> (x = y).
-
-Parameter zero_unsigned1: uint32.
-
-Axiom zero_unsigned_is_zero1 : ((to_int3 zero_unsigned1) = 0%Z).
-
-Parameter is_msb_set: uint32 -> Prop.
-
-Axiom is_msb_set_spec : forall (x:uint32), (is_msb_set x) <->
-  (4294967295%Z < (2%Z * (to_int3 x))%Z)%Z.
-
-(* Why3 assumption *)
-Definition in_us_bounds (n:Z): Prop := (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
-
-(* Why3 assumption *)
-Definition in_bounds3 (n:Z): Prop := ((-2147483648%Z)%Z <= n)%Z /\
-  (n <= 2147483647%Z)%Z.
-
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
@@ -361,6 +311,170 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   match v with
   | (mk_ref x) => x
   end.
+
+(* Why3 assumption *)
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(Z -> a)) (a2:(Z -> a))
+  (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((a1
+  i) = (a2 i)).
+
+(* Why3 assumption *)
+Definition map_eq_sub_shift {a:Type} {a_WT:WhyType a} (x:(Z -> a)) (y:(Z ->
+  a)) (xi:Z) (yi:Z) (sz:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
+  (i < sz)%Z) -> ((x (xi + i)%Z) = (y (yi + i)%Z)).
+
+Axiom map_eq_shift : forall {a:Type} {a_WT:WhyType a}, forall (x:(Z -> a))
+  (y:(Z -> a)) (xi:Z) (yi:Z) (sz:Z) (k:Z), (map_eq_sub_shift x y xi yi sz) ->
+  (((0%Z <= k)%Z /\ (k < sz)%Z) -> ((x (xi + k)%Z) = (y (yi + k)%Z))).
+
+Axiom map_eq_shift_zero : forall {a:Type} {a_WT:WhyType a}, forall (x:(Z ->
+  a)) (y:(Z -> a)) (n:Z) (m:Z), (map_eq_sub_shift x y n n (m - n)%Z) ->
+  (map_eq_sub x y n m).
+
+Axiom uint64 : Type.
+Parameter uint64_WhyType : WhyType uint64.
+Existing Instance uint64_WhyType.
+
+Parameter to_int2: uint64 -> Z.
+
+(* Why3 assumption *)
+Definition in_bounds1 (n:Z): Prop := (0%Z <= n)%Z /\
+  (n <= 18446744073709551615%Z)%Z.
+
+Axiom to_int_in_bounds1 : forall (n:uint64), (in_bounds1 (to_int2 n)).
+
+Axiom extensionality1 : forall (x:uint64) (y:uint64),
+  ((to_int2 x) = (to_int2 y)) -> (x = y).
+
+Parameter zero_unsigned: uint64.
+
+Axiom zero_unsigned_is_zero : ((to_int2 zero_unsigned) = 0%Z).
+
+Parameter is_msb_set: uint64 -> Prop.
+
+Axiom is_msb_set_spec : forall (x:uint64), (is_msb_set x) <->
+  (18446744073709551615%Z < (2%Z * (to_int2 x))%Z)%Z.
+
+(* Why3 assumption *)
+Definition limb := uint64.
+
+Axiom limb_max_bound : (1%Z <= 18446744073709551615%Z)%Z.
+
+Axiom prod_compat_strict_r : forall (a:Z) (b:Z) (c:Z), ((0%Z <= a)%Z /\
+  (a < b)%Z) -> ((0%Z < c)%Z -> ((c * a)%Z < (c * b)%Z)%Z).
+
+Parameter value_sub: (Z -> uint64) -> Z -> Z -> Z.
+
+Axiom value_sub_def : forall (x:(Z -> uint64)) (n:Z) (m:Z), ((n < m)%Z ->
+  ((value_sub x n m) = ((to_int2 (x
+  n)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub x (n + 1%Z)%Z
+  m))%Z)%Z)) /\ ((~ (n < m)%Z) -> ((value_sub x n m) = 0%Z)).
+
+Axiom value_sub_frame : forall (x:(Z -> uint64)) (y:(Z -> uint64)) (n:Z)
+  (m:Z), (map_eq_sub x y n m) -> ((value_sub x n m) = (value_sub y n m)).
+
+Axiom value_sub_frame_shift : forall (x:(Z -> uint64)) (y:(Z -> uint64))
+  (xi:Z) (yi:Z) (sz:Z), (map_eq_sub_shift x y xi yi sz) -> ((value_sub x xi
+  (xi + sz)%Z) = (value_sub y yi (yi + sz)%Z)).
+
+Axiom value_sub_tail : forall (x:(Z -> uint64)) (n:Z) (m:Z), (n <= m)%Z ->
+  ((value_sub x n (m + 1%Z)%Z) = ((value_sub x n m) + ((to_int2 (x
+  m)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z (m - n)%Z))%Z)%Z).
+
+Axiom value_sub_concat : forall (x:(Z -> uint64)) (n:Z) (m:Z) (l:Z),
+  ((n <= m)%Z /\ (m <= l)%Z) -> ((value_sub x n l) = ((value_sub x n
+  m) + ((value_sub x m l) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
+  (m - n)%Z))%Z)%Z).
+
+Axiom value_sub_head : forall (x:(Z -> uint64)) (n:Z) (m:Z), (n < m)%Z ->
+  ((value_sub x n m) = ((to_int2 (x
+  n)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub x (n + 1%Z)%Z
+  m))%Z)%Z).
+
+Axiom value_sub_update : forall (x:(Z -> uint64)) (i:Z) (n:Z) (m:Z)
+  (v:uint64), ((n <= i)%Z /\ (i < m)%Z) -> ((value_sub (map.Map.set x i v) n
+  m) = ((value_sub x n
+  m) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
+  (i - n)%Z) * ((to_int2 v) - (to_int2 (x i)))%Z)%Z)%Z).
+
+Axiom value_zero : forall (x:(Z -> uint64)) (n:Z) (m:Z), (map_eq_sub x
+  (map.Const.const zero_unsigned: (Z -> uint64)) n m) -> ((value_sub x n
+  m) = 0%Z).
+
+Axiom value_sub_update_no_change : forall (x:(Z -> uint64)) (i:Z) (n:Z) (m:Z)
+  (v:uint64), (n <= m)%Z -> (((i < n)%Z \/ (m <= i)%Z) -> ((value_sub x n
+  m) = (value_sub (map.Map.set x i v) n m))).
+
+Axiom value_sub_shift_no_change : forall (x:(Z -> uint64)) (ofs:Z) (i:Z)
+  (sz:Z) (v:uint64), ((i < 0%Z)%Z \/ (sz <= i)%Z) -> ((0%Z <= sz)%Z ->
+  ((value_sub x ofs (ofs + sz)%Z) = (value_sub (map.Map.set x (ofs + i)%Z v)
+  ofs (ofs + sz)%Z))).
+
+Axiom value_sub_lower_bound : forall (x:(Z -> uint64)) (x1:Z) (x2:Z),
+  (0%Z <= (value_sub x x1 x2))%Z.
+
+Axiom value_sub_upper_bound : forall (x:(Z -> uint64)) (x1:Z) (x2:Z),
+  (x1 <= x2)%Z -> ((value_sub x x1
+  x2) < (int.Power.power (18446744073709551615%Z + 1%Z)%Z (x2 - x1)%Z))%Z.
+
+Axiom value_sub_lower_bound_tight : forall (x:(Z -> uint64)) (x1:Z) (x2:Z),
+  (x1 < x2)%Z -> (((int.Power.power (18446744073709551615%Z + 1%Z)%Z
+  ((x2 - x1)%Z - 1%Z)%Z) * (to_int2 (x (x2 - 1%Z)%Z)))%Z <= (value_sub x x1
+  x2))%Z.
+
+Axiom value_sub_upper_bound_tight : forall (x:(Z -> uint64)) (x1:Z) (x2:Z),
+  (x1 < x2)%Z -> ((value_sub x x1
+  x2) < ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
+  ((x2 - x1)%Z - 1%Z)%Z) * ((to_int2 (x (x2 - 1%Z)%Z)) + 1%Z)%Z)%Z)%Z.
+
+Axiom t1 : Type.
+Parameter t1_WhyType : WhyType t1.
+Existing Instance t1_WhyType.
+
+Parameter max: Z.
+
+Parameter to_int3: t1 -> Z.
+
+(* Why3 assumption *)
+Definition in_bounds2 (n:Z): Prop := (0%Z <= n)%Z /\ (n <= max)%Z.
+
+Axiom to_int_in_bounds2 : forall (n:t1), (in_bounds2 (to_int3 n)).
+
+Axiom extensionality2 : forall (x:t1) (y:t1), ((to_int3 x) = (to_int3 y)) ->
+  (x = y).
+
+Parameter zero_unsigned1: t1.
+
+Axiom zero_unsigned_is_zero1 : ((to_int3 zero_unsigned1) = 0%Z).
+
+Axiom uint32 : Type.
+Parameter uint32_WhyType : WhyType uint32.
+Existing Instance uint32_WhyType.
+
+Parameter to_int4: uint32 -> Z.
+
+(* Why3 assumption *)
+Definition in_bounds3 (n:Z): Prop := (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
+
+Axiom to_int_in_bounds3 : forall (n:uint32), (in_bounds3 (to_int4 n)).
+
+Axiom extensionality3 : forall (x:uint32) (y:uint32),
+  ((to_int4 x) = (to_int4 y)) -> (x = y).
+
+Parameter zero_unsigned2: uint32.
+
+Axiom zero_unsigned_is_zero2 : ((to_int4 zero_unsigned2) = 0%Z).
+
+Parameter is_msb_set1: uint32 -> Prop.
+
+Axiom is_msb_set_spec1 : forall (x:uint32), (is_msb_set1 x) <->
+  (4294967295%Z < (2%Z * (to_int4 x))%Z)%Z.
+
+(* Why3 assumption *)
+Definition in_us_bounds (n:Z): Prop := (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
+
+(* Why3 assumption *)
+Definition in_bounds4 (n:Z): Prop := ((-2147483648%Z)%Z <= n)%Z /\
+  (n <= 2147483647%Z)%Z.
 
 (* Why3 assumption *)
 Inductive ptr (a:Type) :=
@@ -401,7 +515,7 @@ Definition valid_ptr_shift {a:Type} {a_WT:WhyType a} (p:(ptr a))
 
 (* Why3 assumption *)
 Definition valid_ptr_itv {a:Type} {a_WT:WhyType a} (p:(ptr a))
-  (sz:Z): Prop := (in_bounds3 sz) /\ ((0%Z <= sz)%Z /\
+  (sz:Z): Prop := (in_bounds4 sz) /\ ((0%Z <= sz)%Z /\
   ((0%Z <= (offset p))%Z /\ (((offset p) + sz)%Z <= (plength p))%Z)).
 
 Axiom valid_itv_to_shift : forall {a:Type} {a_WT:WhyType a}, forall (p:(ptr
@@ -409,103 +523,15 @@ Axiom valid_itv_to_shift : forall {a:Type} {a_WT:WhyType a}, forall (p:(ptr
   (i < sz)%Z) -> (valid_ptr_shift p i).
 
 (* Why3 assumption *)
-Definition limb := uint32.
-
-Axiom limb_max_bound : (1%Z <= 4294967295%Z)%Z.
+Definition t2 := (ptr uint64).
 
 (* Why3 assumption *)
-Definition t2 := (ptr uint32).
-
-Parameter value_sub: (Z -> uint32) -> Z -> Z -> Z.
-
-Axiom value_sub_def : forall (x:(Z -> uint32)) (n:Z) (m:Z), ((n < m)%Z ->
-  ((value_sub x n m) = ((to_int3 (x
-  n)) + ((4294967295%Z + 1%Z)%Z * (value_sub x (n + 1%Z)%Z m))%Z)%Z)) /\
-  ((~ (n < m)%Z) -> ((value_sub x n m) = 0%Z)).
-
-(* Why3 assumption *)
-Definition value (x:(ptr uint32)): Z := (value_sub (pelts x) 0%Z
+Definition value (x:(ptr uint64)): Z := (value_sub (pelts x) 0%Z
   (plength x)).
 
 (* Why3 assumption *)
-Definition value_sub_shift (x:(ptr uint32)) (sz:Z): Z := (value_sub (pelts x)
+Definition value_sub_shift (x:(ptr uint64)) (sz:Z): Z := (value_sub (pelts x)
   (offset x) ((offset x) + sz)%Z).
-
-(* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(Z -> a)) (a2:(Z -> a))
-  (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((a1
-  i) = (a2 i)).
-
-(* Why3 assumption *)
-Definition map_eq_sub_shift {a:Type} {a_WT:WhyType a} (x:(Z -> a)) (y:(Z ->
-  a)) (xi:Z) (yi:Z) (sz:Z): Prop := forall (i:Z), ((0%Z <= i)%Z /\
-  (i < sz)%Z) -> ((x (xi + i)%Z) = (y (yi + i)%Z)).
-
-Axiom map_eq_shift : forall {a:Type} {a_WT:WhyType a}, forall (x:(Z -> a))
-  (y:(Z -> a)) (xi:Z) (yi:Z) (sz:Z) (k:Z), (map_eq_sub_shift x y xi yi sz) ->
-  (((0%Z <= k)%Z /\ (k < sz)%Z) -> ((x (xi + k)%Z) = (y (yi + k)%Z))).
-
-Axiom map_eq_shift_zero : forall {a:Type} {a_WT:WhyType a}, forall (x:(Z ->
-  a)) (y:(Z -> a)) (n:Z) (m:Z), (map_eq_sub_shift x y n n (m - n)%Z) ->
-  (map_eq_sub x y n m).
-
-Axiom value_sub_frame : forall (x:(Z -> uint32)) (y:(Z -> uint32)) (n:Z)
-  (m:Z), (map_eq_sub x y n m) -> ((value_sub x n m) = (value_sub y n m)).
-
-Axiom value_sub_frame_shift : forall (x:(Z -> uint32)) (y:(Z -> uint32))
-  (xi:Z) (yi:Z) (sz:Z), (map_eq_sub_shift x y xi yi sz) -> ((value_sub x xi
-  (xi + sz)%Z) = (value_sub y yi (yi + sz)%Z)).
-
-Axiom value_sub_tail : forall (x:(Z -> uint32)) (n:Z) (m:Z), (n <= m)%Z ->
-  ((value_sub x n (m + 1%Z)%Z) = ((value_sub x n m) + ((to_int3 (x
-  m)) * (int.Power.power (4294967295%Z + 1%Z)%Z (m - n)%Z))%Z)%Z).
-
-Axiom value_sub_concat : forall (x:(Z -> uint32)) (n:Z) (m:Z) (l:Z),
-  ((n <= m)%Z /\ (m <= l)%Z) -> ((value_sub x n l) = ((value_sub x n
-  m) + ((value_sub x m l) * (int.Power.power (4294967295%Z + 1%Z)%Z
-  (m - n)%Z))%Z)%Z).
-
-Axiom value_sub_head : forall (x:(Z -> uint32)) (n:Z) (m:Z), (n < m)%Z ->
-  ((value_sub x n m) = ((to_int3 (x
-  n)) + ((4294967295%Z + 1%Z)%Z * (value_sub x (n + 1%Z)%Z m))%Z)%Z).
-
-Axiom value_sub_update : forall (x:(Z -> uint32)) (i:Z) (n:Z) (m:Z)
-  (v:uint32), ((n <= i)%Z /\ (i < m)%Z) -> ((value_sub (map.Map.set x i v) n
-  m) = ((value_sub x n m) + ((int.Power.power (4294967295%Z + 1%Z)%Z
-  (i - n)%Z) * ((to_int3 v) - (to_int3 (x i)))%Z)%Z)%Z).
-
-Axiom value_zero : forall (x:(Z -> uint32)) (n:Z) (m:Z), (map_eq_sub x
-  (map.Const.const zero_unsigned1: (Z -> uint32)) n m) -> ((value_sub x n
-  m) = 0%Z).
-
-Axiom value_sub_update_no_change : forall (x:(Z -> uint32)) (i:Z) (n:Z) (m:Z)
-  (v:uint32), (n <= m)%Z -> (((i < n)%Z \/ (m <= i)%Z) -> ((value_sub x n
-  m) = (value_sub (map.Map.set x i v) n m))).
-
-Axiom value_sub_shift_no_change : forall (x:(Z -> uint32)) (ofs:Z) (i:Z)
-  (sz:Z) (v:uint32), ((i < 0%Z)%Z \/ (sz <= i)%Z) -> ((0%Z <= sz)%Z ->
-  ((value_sub x ofs (ofs + sz)%Z) = (value_sub (map.Map.set x (ofs + i)%Z v)
-  ofs (ofs + sz)%Z))).
-
-Axiom value_sub_lower_bound : forall (x:(Z -> uint32)) (x1:Z) (x2:Z),
-  (0%Z <= (value_sub x x1 x2))%Z.
-
-Axiom value_sub_upper_bound : forall (x:(Z -> uint32)) (x1:Z) (x2:Z),
-  (x1 <= x2)%Z -> ((value_sub x x1
-  x2) < (int.Power.power (4294967295%Z + 1%Z)%Z (x2 - x1)%Z))%Z.
-
-Axiom value_sub_lower_bound_tight : forall (x:(Z -> uint32)) (x1:Z) (x2:Z),
-  (x1 < x2)%Z -> (((int.Power.power (4294967295%Z + 1%Z)%Z
-  ((x2 - x1)%Z - 1%Z)%Z) * (to_int3 (x (x2 - 1%Z)%Z)))%Z <= (value_sub x x1
-  x2))%Z.
-
-Axiom value_sub_upper_bound_tight : forall (x:(Z -> uint32)) (x1:Z) (x2:Z),
-  (x1 < x2)%Z -> ((value_sub x x1
-  x2) < ((int.Power.power (4294967295%Z + 1%Z)%Z
-  ((x2 - x1)%Z - 1%Z)%Z) * ((to_int3 (x (x2 - 1%Z)%Z)) + 1%Z)%Z)%Z)%Z.
-
-Axiom prod_compat_strict_r : forall (a:Z) (b:Z) (c:Z), ((0%Z <= a)%Z /\
-  (a < b)%Z) -> ((0%Z < c)%Z -> ((c * a)%Z < (c * b)%Z)%Z).
 
 Parameter compare_int: Z -> Z -> Z.
 
@@ -513,100 +539,110 @@ Axiom compare_int_def : forall (x:Z) (y:Z), ((x < y)%Z -> ((compare_int x
   y) = (-1%Z)%Z)) /\ ((~ (x < y)%Z) -> (((x = y) -> ((compare_int x
   y) = 0%Z)) /\ ((~ (x = y)) -> ((compare_int x y) = 1%Z)))).
 
+Axiom pow2_64 : ((int.Power.power 2%Z
+  64%Z) = (18446744073709551615%Z + 1%Z)%Z).
+
 Axiom mod_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
   ((int.EuclideanDivision.mod1 ((x * y)%Z + z)%Z
   x) = (int.EuclideanDivision.mod1 z x)).
 
-Axiom pow2_32 : ((int.Power.power 2%Z 32%Z) = (4294967295%Z + 1%Z)%Z).
-
 (* Why3 assumption *)
-Definition reciprocal (v:uint32) (d:uint32): Prop :=
-  ((to_int3 v) = ((int.EuclideanDivision.div (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - 1%Z)%Z
-  (to_int3 d)) - (4294967295%Z + 1%Z)%Z)%Z).
+Definition reciprocal (v:uint64) (d:uint64): Prop :=
+  ((to_int2 v) = ((int.EuclideanDivision.div (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - 1%Z)%Z
+  (to_int2 d)) - (18446744073709551615%Z + 1%Z)%Z)%Z).
 
 Axiom fact_div : forall (x:Z) (y:Z) (z:Z), (0%Z < y)%Z ->
   ((int.EuclideanDivision.div (x + (y * z)%Z)%Z
   y) = ((int.EuclideanDivision.div x y) + z)%Z).
 
 (* Why3 assumption *)
-Definition reciprocal_2 (v:uint32) (dh:uint32) (dl:uint32): Prop :=
-  ((to_int3 v) = ((int.EuclideanDivision.div ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - 1%Z)%Z
-  ((to_int3 dl) + ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z) - (4294967295%Z + 1%Z)%Z)%Z).
+Definition reciprocal_3by2 (v:uint64) (dh:uint64) (dl:uint64): Prop :=
+  ((to_int2 v) = ((int.EuclideanDivision.div ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - 1%Z)%Z
+  ((to_int2 dl) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z) - (18446744073709551615%Z + 1%Z)%Z)%Z).
 
 (* Why3 goal *)
-Theorem VC_div3by2_inv : forall (uh:uint32) (um:uint32) (ul:uint32)
-  (dh:uint32) (dl:uint32) (v:uint32),
-  (((int.EuclideanDivision.div (4294967295%Z + 1%Z)%Z
-  2%Z) <= (to_int3 dh))%Z /\ ((reciprocal_2 v dh dl) /\
-  (((to_int3 um) + ((4294967295%Z + 1%Z)%Z * (to_int3 uh))%Z)%Z < ((to_int3 dl) + ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z)%Z)) ->
-  let d := ((to_int3 dl) + ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z in
-  forall (zero:uint32), ((to_int3 zero) = 0%Z) -> forall (one:uint32),
-  ((to_int3 one) = 1%Z) -> forall (o:uint32) (o1:uint32),
-  (((to_int3 o) + ((4294967295%Z + 1%Z)%Z * (to_int3 o1))%Z)%Z = ((to_int3 v) * (to_int3 uh))%Z) ->
-  forall (o2:uint32) (o3:uint32),
-  ((((to_int3 o2) + ((4294967295%Z + 1%Z)%Z * (to_int3 o3))%Z)%Z = (((to_int3 um) + (to_int3 o))%Z + (to_int3 zero))%Z) /\
-  ((0%Z <= (to_int3 o3))%Z /\ ((to_int3 o3) <= 1%Z)%Z)) -> forall (o4:uint32)
-  (o5:uint32),
-  ((((to_int3 o4) + ((4294967295%Z + 1%Z)%Z * (to_int3 o5))%Z)%Z = (((to_int3 uh) + (to_int3 o1))%Z + (to_int3 o3))%Z) /\
-  ((0%Z <= (to_int3 o5))%Z /\ ((to_int3 o5) <= 1%Z)%Z)) ->
-  (((((to_int3 o2) + ((4294967295%Z + 1%Z)%Z * (to_int3 o4))%Z)%Z + (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (to_int3 o5))%Z)%Z = (((to_int3 um) + ((4294967295%Z + 1%Z)%Z * (to_int3 uh))%Z)%Z + ((to_int3 v) * (to_int3 uh))%Z)%Z) ->
-  (((to_int3 o5) = 0%Z) -> forall (q1:uint32), (q1 = o4) -> let q0 :=
-  (to_int3 o2) in let cq := ((to_int3 q1) + 1%Z)%Z in forall (o6:uint32),
-  ((to_int3 o6) = (int.EuclideanDivision.mod1 ((to_int3 q1) + (to_int3 one))%Z
-  (4294967295%Z + 1%Z)%Z)) -> forall (q11:uint32), (q11 = o6) ->
-  (((to_int3 q11) = (int.EuclideanDivision.mod1 cq
-  (4294967295%Z + 1%Z)%Z)) -> forall (p:uint32),
-  ((to_int3 p) = (int.EuclideanDivision.mod1 ((to_int3 dh) * (to_int3 o4))%Z
-  (4294967295%Z + 1%Z)%Z)) -> forall (o7:uint32),
-  ((to_int3 o7) = (int.EuclideanDivision.mod1 ((to_int3 um) - (to_int3 p))%Z
-  (4294967295%Z + 1%Z)%Z)) -> forall (r1:uint32), (r1 = o7) ->
-  forall (o8:uint32) (o9:uint32),
-  (((to_int3 o8) + ((4294967295%Z + 1%Z)%Z * (to_int3 o9))%Z)%Z = ((to_int3 o4) * (to_int3 dl))%Z) ->
-  forall (o10:uint32) (o11:uint32),
-  ((((to_int3 o10) - ((4294967295%Z + 1%Z)%Z * (to_int3 o11))%Z)%Z = (((to_int3 ul) - (to_int3 o8))%Z - (to_int3 zero))%Z) /\
-  ((0%Z <= (to_int3 o11))%Z /\ ((to_int3 o11) <= 1%Z)%Z)) ->
-  forall (o12:uint32) (o13:uint32),
-  ((((to_int3 o12) - ((4294967295%Z + 1%Z)%Z * (to_int3 o13))%Z)%Z = (((to_int3 r1) - (to_int3 o9))%Z - (to_int3 o11))%Z) /\
-  ((0%Z <= (to_int3 o13))%Z /\ ((to_int3 o13) <= 1%Z)%Z)) ->
-  (((((to_int3 o10) + ((4294967295%Z + 1%Z)%Z * (to_int3 o12))%Z)%Z - (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (to_int3 o13))%Z)%Z = (((to_int3 ul) + ((4294967295%Z + 1%Z)%Z * (to_int3 r1))%Z)%Z - ((to_int3 o4) * (to_int3 dl))%Z)%Z) ->
-  forall (o14:uint32) (o15:uint32),
-  ((((to_int3 o14) - ((4294967295%Z + 1%Z)%Z * (to_int3 o15))%Z)%Z = (((to_int3 o10) - (to_int3 dl))%Z - (to_int3 zero))%Z) /\
-  ((0%Z <= (to_int3 o15))%Z /\ ((to_int3 o15) <= 1%Z)%Z)) ->
-  forall (o16:uint32) (o17:uint32),
-  ((((to_int3 o16) - ((4294967295%Z + 1%Z)%Z * (to_int3 o17))%Z)%Z = (((to_int3 o12) - (to_int3 dh))%Z - (to_int3 o15))%Z) /\
-  ((0%Z <= (to_int3 o17))%Z /\ ((to_int3 o17) <= 1%Z)%Z)) ->
-  (((((to_int3 o14) + ((4294967295%Z + 1%Z)%Z * (to_int3 o16))%Z)%Z - (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (to_int3 o17))%Z)%Z = ((((to_int3 o10) + ((4294967295%Z + 1%Z)%Z * (to_int3 o12))%Z)%Z - (to_int3 dl))%Z - ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z) ->
+Theorem VC_div3by2_inv : forall (uh:uint64) (um:uint64) (ul:uint64)
+  (dh:uint64) (dl:uint64) (v:uint64),
+  (((int.EuclideanDivision.div (18446744073709551615%Z + 1%Z)%Z
+  2%Z) <= (to_int2 dh))%Z /\ ((reciprocal_3by2 v dh dl) /\
+  (((to_int2 um) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 uh))%Z)%Z < ((to_int2 dl) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z)%Z)) ->
+  let d :=
+  ((to_int2 dl) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z in
+  forall (zero:uint64), ((to_int2 zero) = 0%Z) -> forall (one:uint64),
+  ((to_int2 one) = 1%Z) -> forall (o:uint64) (o1:uint64),
+  (((to_int2 o) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o1))%Z)%Z = ((to_int2 v) * (to_int2 uh))%Z) ->
+  forall (o2:uint64) (o3:uint64),
+  ((((to_int2 o2) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o3))%Z)%Z = (((to_int2 um) + (to_int2 o))%Z + (to_int2 zero))%Z) /\
+  ((0%Z <= (to_int2 o3))%Z /\ ((to_int2 o3) <= 1%Z)%Z)) -> forall (o4:uint64)
+  (o5:uint64),
+  ((((to_int2 o4) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o5))%Z)%Z = (((to_int2 uh) + (to_int2 o1))%Z + (to_int2 o3))%Z) /\
+  ((0%Z <= (to_int2 o5))%Z /\ ((to_int2 o5) <= 1%Z)%Z)) ->
+  (((((to_int2 o2) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o4))%Z)%Z + (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (to_int2 o5))%Z)%Z = (((to_int2 um) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 uh))%Z)%Z + ((to_int2 v) * (to_int2 uh))%Z)%Z) ->
+  (((to_int2 o5) = 0%Z) -> forall (q1:uint64), (q1 = o4) -> let q0 :=
+  (to_int2 o2) in let cq := ((to_int2 q1) + 1%Z)%Z in forall (o6:uint64),
+  ((to_int2 o6) = (int.EuclideanDivision.mod1 ((to_int2 q1) + (to_int2 one))%Z
+  (18446744073709551615%Z + 1%Z)%Z)) -> forall (q11:uint64), (q11 = o6) ->
+  (((to_int2 q11) = (int.EuclideanDivision.mod1 cq
+  (18446744073709551615%Z + 1%Z)%Z)) -> forall (p:uint64),
+  ((to_int2 p) = (int.EuclideanDivision.mod1 ((to_int2 dh) * (to_int2 o4))%Z
+  (18446744073709551615%Z + 1%Z)%Z)) -> forall (o7:uint64),
+  ((to_int2 o7) = (int.EuclideanDivision.mod1 ((to_int2 um) - (to_int2 p))%Z
+  (18446744073709551615%Z + 1%Z)%Z)) -> forall (r1:uint64), (r1 = o7) ->
+  forall (o8:uint64) (o9:uint64),
+  (((to_int2 o8) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o9))%Z)%Z = ((to_int2 o4) * (to_int2 dl))%Z) ->
+  forall (o10:uint64) (o11:uint64),
+  ((((to_int2 o10) - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o11))%Z)%Z = (((to_int2 ul) - (to_int2 o8))%Z - (to_int2 zero))%Z) /\
+  ((0%Z <= (to_int2 o11))%Z /\ ((to_int2 o11) <= 1%Z)%Z)) ->
+  forall (o12:uint64) (o13:uint64),
+  ((((to_int2 o12) - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o13))%Z)%Z = (((to_int2 r1) - (to_int2 o9))%Z - (to_int2 o11))%Z) /\
+  ((0%Z <= (to_int2 o13))%Z /\ ((to_int2 o13) <= 1%Z)%Z)) ->
+  (((((to_int2 o10) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o12))%Z)%Z - (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (to_int2 o13))%Z)%Z = (((to_int2 ul) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 r1))%Z)%Z - ((to_int2 o4) * (to_int2 dl))%Z)%Z) ->
+  forall (o14:uint64) (o15:uint64),
+  ((((to_int2 o14) - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o15))%Z)%Z = (((to_int2 o10) - (to_int2 dl))%Z - (to_int2 zero))%Z) /\
+  ((0%Z <= (to_int2 o15))%Z /\ ((to_int2 o15) <= 1%Z)%Z)) ->
+  forall (o16:uint64) (o17:uint64),
+  ((((to_int2 o16) - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o17))%Z)%Z = (((to_int2 o12) - (to_int2 dh))%Z - (to_int2 o15))%Z) /\
+  ((0%Z <= (to_int2 o17))%Z /\ ((to_int2 o17) <= 1%Z)%Z)) ->
+  (((((to_int2 o14) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o16))%Z)%Z - (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (to_int2 o17))%Z)%Z = ((((to_int2 o10) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o12))%Z)%Z - (to_int2 dl))%Z - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z) ->
   let o18 :=
-  (((((to_int3 ul) + ((4294967295%Z + 1%Z)%Z * (to_int3 r1))%Z)%Z - ((to_int3 o4) * (to_int3 dl))%Z)%Z - (to_int3 dl))%Z - ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z in
-  let o19 := ((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z in
-  (((int.EuclideanDivision.mod1 ((o19 * (to_int3 o13))%Z + o18)%Z
+  (((((to_int2 ul) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 r1))%Z)%Z - ((to_int2 o4) * (to_int2 dl))%Z)%Z - (to_int2 dl))%Z - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z in
+  let o19 :=
+  ((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z in
+  (((int.EuclideanDivision.mod1 ((o19 * (to_int2 o13))%Z + o18)%Z
   o19) = (int.EuclideanDivision.mod1 o18 o19)) ->
-  ((((to_int3 o14) + ((4294967295%Z + 1%Z)%Z * (to_int3 o16))%Z)%Z = (int.EuclideanDivision.mod1 (((((to_int3 ul) + ((4294967295%Z + 1%Z)%Z * (to_int3 r1))%Z)%Z - ((to_int3 o4) * (to_int3 dl))%Z)%Z - (to_int3 dl))%Z - ((4294967295%Z + 1%Z)%Z * (to_int3 dh))%Z)%Z
-  ((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z)) ->
-  forall (r11:uint32), (r11 = o16) -> forall (r0:uint32), (r0 = o14) ->
+  ((((to_int2 o14) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o16))%Z)%Z = (int.EuclideanDivision.mod1 (((((to_int2 ul) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 r1))%Z)%Z - ((to_int2 o4) * (to_int2 dl))%Z)%Z - (to_int2 dl))%Z - ((18446744073709551615%Z + 1%Z)%Z * (to_int2 dh))%Z)%Z
+  ((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z)) ->
+  forall (r11:uint64), (r11 = o16) -> forall (r0:uint64), (r0 = o14) ->
   let cr :=
-  (((to_int3 ul) + ((4294967295%Z + 1%Z)%Z * ((to_int3 um) + ((4294967295%Z + 1%Z)%Z * (to_int3 uh))%Z)%Z)%Z)%Z - (d * cq)%Z)%Z in
-  ((((to_int3 r0) + ((4294967295%Z + 1%Z)%Z * (to_int3 r11))%Z)%Z = (int.EuclideanDivision.mod1 cr
-  ((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z)) -> let k :=
-  ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - (((4294967295%Z + 1%Z)%Z + (to_int3 v))%Z * d)%Z)%Z in
-  ((reciprocal_2 v dh dl) -> let m3 :=
-  ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - 1%Z)%Z in
-  ((((((4294967295%Z + 1%Z)%Z + (to_int3 v))%Z * d)%Z = (d * (int.EuclideanDivision.div m3
+  (((to_int2 ul) + ((18446744073709551615%Z + 1%Z)%Z * ((to_int2 um) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 uh))%Z)%Z)%Z)%Z - (d * cq)%Z)%Z in
+  ((((to_int2 r0) + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 r11))%Z)%Z = (int.EuclideanDivision.mod1 cr
+  ((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z)) ->
+  let k :=
+  ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - (((18446744073709551615%Z + 1%Z)%Z + (to_int2 v))%Z * d)%Z)%Z in
+  ((reciprocal_3by2 v dh dl) -> let m3 :=
+  ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - 1%Z)%Z in
+  ((((((18446744073709551615%Z + 1%Z)%Z + (to_int2 v))%Z * d)%Z = (d * (int.EuclideanDivision.div m3
   d))%Z) /\ ((d * (int.EuclideanDivision.div m3
   d))%Z = (m3 - (int.EuclideanDivision.mod1 m3 d))%Z)) ->
   ((k = (1%Z + (int.EuclideanDivision.mod1 m3 d))%Z) -> (((1%Z <= k)%Z /\
   (k <= d)%Z) ->
-  (((q0 + ((4294967295%Z + 1%Z)%Z * (to_int3 o4))%Z)%Z = ((((4294967295%Z + 1%Z)%Z + (to_int3 v))%Z * (to_int3 uh))%Z + (to_int3 um))%Z) ->
-  ((cq = ((to_int3 o4) + 1%Z)%Z) ->
-  (((((4294967295%Z + 1%Z)%Z * cq)%Z = (((4294967295%Z + 1%Z)%Z * (to_int3 o4))%Z + (4294967295%Z + 1%Z)%Z)%Z) /\
-  ((((4294967295%Z + 1%Z)%Z * (to_int3 o4))%Z + (4294967295%Z + 1%Z)%Z)%Z = ((((((4294967295%Z + 1%Z)%Z + (to_int3 v))%Z * (to_int3 uh))%Z + (to_int3 um))%Z - q0)%Z + (4294967295%Z + 1%Z)%Z)%Z)) ->
-  ((((4294967295%Z + 1%Z)%Z * cr)%Z = (((((k * (to_int3 uh))%Z + ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - d)%Z * (to_int3 um))%Z)%Z + ((4294967295%Z + 1%Z)%Z * (to_int3 ul))%Z)%Z + (d * q0)%Z)%Z - (d * (4294967295%Z + 1%Z)%Z)%Z)%Z) ->
-  ((((ZArith.BinInt.Z.max (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - d)%Z (q0 * (4294967295%Z + 1%Z)%Z)%Z) - ((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z)%Z <= cr)%Z ->
-  ((0%Z < (((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - d)%Z)%Z ->
-  ((~ ((to_int3 uh) <= ((to_int3 dh) - 1%Z)%Z)%Z) ->
-  (((to_int3 uh) = (to_int3 dh)) ->
-  (((to_int3 um) <= ((to_int3 dl) - 1%Z)%Z)%Z ->
-  ((((((k * (to_int3 dh))%Z + ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - d)%Z * (to_int3 um))%Z)%Z + ((4294967295%Z + 1%Z)%Z * (to_int3 ul))%Z)%Z + (d * q0)%Z)%Z - ((4294967295%Z + 1%Z)%Z * d)%Z)%Z <= (((((d * (to_int3 dh))%Z + ((((4294967295%Z + 1%Z)%Z * (4294967295%Z + 1%Z)%Z)%Z - d)%Z * (to_int3 um))%Z)%Z + ((4294967295%Z + 1%Z)%Z * (to_int3 ul))%Z)%Z + (d * q0)%Z)%Z - ((4294967295%Z + 1%Z)%Z * d)%Z)%Z)%Z))))))))))))))))))))).
+  (((q0 + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 o4))%Z)%Z = ((((18446744073709551615%Z + 1%Z)%Z + (to_int2 v))%Z * (to_int2 uh))%Z + (to_int2 um))%Z) ->
+  ((cq = ((to_int2 o4) + 1%Z)%Z) ->
+  (((((18446744073709551615%Z + 1%Z)%Z * cq)%Z = (((18446744073709551615%Z + 1%Z)%Z * (to_int2 o4))%Z + (18446744073709551615%Z + 1%Z)%Z)%Z) /\
+  ((((18446744073709551615%Z + 1%Z)%Z * (to_int2 o4))%Z + (18446744073709551615%Z + 1%Z)%Z)%Z = ((((((18446744073709551615%Z + 1%Z)%Z + (to_int2 v))%Z * (to_int2 uh))%Z + (to_int2 um))%Z - q0)%Z + (18446744073709551615%Z + 1%Z)%Z)%Z)) ->
+  ((((18446744073709551615%Z + 1%Z)%Z * cr)%Z = (((((k * (to_int2 uh))%Z + ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - d)%Z * (to_int2 um))%Z)%Z + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 ul))%Z)%Z + (d * q0)%Z)%Z - (d * (18446744073709551615%Z + 1%Z)%Z)%Z)%Z) ->
+  ((((ZArith.BinInt.Z.max (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - d)%Z (q0 * (18446744073709551615%Z + 1%Z)%Z)%Z) - ((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z)%Z <= cr)%Z ->
+  ((0%Z < (((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - d)%Z)%Z ->
+  ((~ ((to_int2 uh) <= ((to_int2 dh) - 1%Z)%Z)%Z) ->
+  (((to_int2 uh) = (to_int2 dh)) ->
+  (((to_int2 um) <= ((to_int2 dl) - 1%Z)%Z)%Z ->
+  ((((((k * (to_int2 dh))%Z + ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - d)%Z * (to_int2 um))%Z)%Z + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 ul))%Z)%Z + (d * q0)%Z)%Z - ((18446744073709551615%Z + 1%Z)%Z * d)%Z)%Z <= (((((d * (to_int2 dh))%Z + ((((18446744073709551615%Z + 1%Z)%Z * (18446744073709551615%Z + 1%Z)%Z)%Z - d)%Z * (to_int2 um))%Z)%Z + ((18446744073709551615%Z + 1%Z)%Z * (to_int2 ul))%Z)%Z + (d * q0)%Z)%Z - ((18446744073709551615%Z + 1%Z)%Z * d)%Z)%Z)%Z))))))))))))))))))))).
+(* Why3 intros uh um ul dh dl v (h1,(h2,h3)) d zero h4 one h5 o o1 h6 o2 o3
+        (h7,(h8,h9)) o4 o5 (h10,(h11,h12)) h13 h14 q1 h15 q0 cq o6 h16 q11
+        h17 h18 p h19 o7 h20 r1 h21 o8 o9 h22 o10 o11 (h23,(h24,h25)) o12 o13
+        (h26,(h27,h28)) h29 o14 o15 (h30,(h31,h32)) o16 o17 (h33,(h34,h35))
+        h36 o18 o19 h37 h38 r11 h39 r0 h40 cr h41 k h42 m3 (h43,h44) h45
+        (h46,h47) h48 h49 (h50,h51) h52 h53 h54 h55 h56 h57. *)
 intros uh um ul dh dl v (h1,(h2,h3)) d zero h4 one h5 o o1 h6 o2 o3
 (h7,(h8,h9)) o4 o5 (h10,(h11,h12)) h13 h14 q1 h15 q0 cq o6 h16 q11 h17 h18 p
 h19 o7 h20 r1 h21 o8 o9 h22 o10 o11 (h23,(h24,h25)) o12 o13 (h26,(h27,h28))
@@ -619,6 +655,6 @@ apply Zplus_le_compat_r.
 apply Zplus_le_compat_r.
 apply Zmult_le_compat_r.
 omega.
-apply to_int_in_bounds2.
+apply to_int_in_bounds1.
 Qed.
 
