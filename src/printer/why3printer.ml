@@ -28,7 +28,7 @@ let debug_print_labels = Debug.register_info_flag "print_labels"
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let id_unique tables id = id_unique tables.printer id
+let id_unique tables id = id_unique_label tables.printer id
 
 (*
 let forget_tvs () =

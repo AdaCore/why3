@@ -161,7 +161,6 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
-
 (**********************)
 (* Graphical elements *)
 (**********************)
@@ -214,18 +213,6 @@ let exit_function ~destroy () =
 
 let (_ : GtkSignal.id) = main_window#connect#destroy
   ~callback:(exit_function ~destroy:true)
-
-let (_ : GMenu.menu_item) =
-  file_factory#add_item ~key:GdkKeysyms._S "_Save session"
-    ~callback:(fun () -> send_request Save_req)
-
-let (replay_menu_item : GMenu.menu_item) =
-  file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
-
-let (_ : GMenu.menu_item) =
-  file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
-    ~callback:(exit_function ~destroy:false)
-
 
 (* 1.2 "View" menu
 
@@ -303,6 +290,96 @@ let goals_model,goals_view =
 *)
   Debug.dprintf debug " done@.";
   model,view
+
+
+(***********************************)
+(* Mapping session to the GTK tree *)
+(***********************************)
+
+type pa_status = Controller_itp.proof_attempt_status
+      * bool   (* obsolete or not *) (* TODO *)
+      * Call_provers.resource_limit
+
+let node_id_type : node_type Hint.t = Hint.create 17
+let node_id_proved : bool Hint.t = Hint.create 17
+let node_id_pa : pa_status Hint.t = Hint.create 17
+
+let get_node_type id = Hint.find node_id_type id
+let get_node_proved id = Hint.find node_id_proved id
+let get_node_id_pa id = Hint.find node_id_pa id
+
+let get_obs (pa_st: pa_status) = match pa_st with
+| _, b, _ -> b
+
+let get_proof_attempt (pa_st: pa_status) = match pa_st with
+| pa, _, _ -> pa
+
+let get_limit (pa_st: pa_status) = match pa_st with
+| _, _, l -> l
+
+let get_node_obs id = get_obs (get_node_id_pa id)
+let get_node_proof_attempt id = get_proof_attempt (get_node_id_pa id)
+let get_node_limit id = get_limit (get_node_id_pa id)
+
+let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
+
+(* To each node we have the corresponding row_reference *)
+let node_id_to_gtree : GTree.row_reference Hint.t = Hint.create 42
+(* TODO exception for those: *)
+let get_node_row id = Hint.find node_id_to_gtree id
+
+(******************************)
+(* Initialization of the tree *)
+(******************************)
+
+(* TODO root node is convenient. Symmetry with session and parent of a node can
+   always be found. Can be removed. *)
+(* Creating the root of the tree. *)
+let create_root () =
+  let root_iter = goals_model#append () in
+  let root_ref = goals_model#get_row_reference
+    (goals_model#get_path root_iter) in
+  Hint.add node_id_to_gtree root_node root_ref
+
+let remove_tree goals_model =
+  Hint.iter (fun _x i ->
+    try ignore(goals_model#remove (i#iter)) with _ -> ())
+    node_id_to_gtree
+
+let clear_tree_and_table goals_model =
+  remove_tree goals_model;
+  Hint.clear node_id_to_gtree;
+  Hint.clear node_id_type;
+  Hint.clear node_id_proved;
+  Hint.clear node_id_pa
+
+(* Actually creating root *)
+let _ = create_root ()
+
+(**************)
+(* Menu items *)
+(**************)
+let (_ : GMenu.menu_item) =
+  file_factory#add_item ~key:GdkKeysyms._S "_Save session"
+    ~callback:(fun () -> send_request Save_req)
+
+let (replay_menu_item : GMenu.menu_item) =
+  file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
+
+let (_ : GMenu.menu_item) =
+  file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
+    ~callback:(exit_function ~destroy:false)
+
+(* TODO key stroked to be decided *)
+let reload_menu_item : GMenu.menu_item =
+  file_factory#add_item ~key:GdkKeysyms._E "_Reload session"
+    ~callback:(fun () ->
+      (* Clearing the tree *)
+      clear_tree_and_table goals_model;
+      (* Adding the root again *)
+      create_root ();
+      send_request Reload_req)
+
 
 (* vpan222 contains:
    2.2.2.1 a view of the current task
@@ -442,45 +519,19 @@ let (_ : GtkSignal.id) =
   replay_menu_item#connect#activate
     ~callback:(fun () -> send_request Replay_req)
 
-(***********************************)
-(* Mapping session to the GTK tree *)
-(***********************************)
-
-type pa_status = Controller_itp.proof_attempt_status
-      * bool   (* obsolete or not *) (* TODO *)
-      * Call_provers.resource_limit
-
-let node_id_type : node_type Hint.t = Hint.create 17
-let node_id_proved : bool Hint.t = Hint.create 17
-let node_id_pa : pa_status Hint.t = Hint.create 17
-
-let get_node_type id = Hint.find node_id_type id
-let get_node_proved id = Hint.find node_id_proved id
-let get_node_id_pa id = Hint.find node_id_pa id
-
-let get_obs (pa_st: pa_status) = match pa_st with
-| _, b, _ -> b
-
-let get_proof_attempt (pa_st: pa_status) = match pa_st with
-| pa, _, _ -> pa
-
-let get_limit (pa_st: pa_status) = match pa_st with
-| _, _, l -> l
-
-let get_node_obs id = get_obs (get_node_id_pa id)
-let get_node_proof_attempt id = get_proof_attempt (get_node_id_pa id)
-let get_node_limit id = get_limit (get_node_id_pa id)
-
-
-let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
-
-(* To each node we have the corresponding row_reference *)
-let node_id_to_gtree : GTree.row_reference Hint.t = Hint.create 42
-(* TODO exception for those: *)
-let get_node_row id = Hint.find node_id_to_gtree id
+(**************************)
+(* Graphical proof status *)
+(**************************)
 
 let image_of_pa_status ~obsolete pa =
   match pa with
+  | Controller_itp.Unedited -> !image_scheduled (* TODO !image_unedited *)
+  | Controller_itp.JustEdited -> !image_scheduled (* TODO !image_edited *)
+  | Controller_itp.Interrupted -> !image_scheduled (* TODO !image_interrrupted *)
+  | Controller_itp.Scheduled -> !image_scheduled
+  | Controller_itp.Running -> !image_running
+  | Controller_itp.InternalFailure _e -> !image_failure
+  | Controller_itp.Uninstalled _p -> !image_failure (* TODO !image_uninstalled *)
 (*  | None -> !image_undone*)
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
@@ -504,7 +555,6 @@ let image_of_pa_status ~obsolete pa =
       | Call_provers.HighFailure ->
         if obsolete then !image_failure_obs else !image_failure
     end
-  | _ -> !image_undone
 
 let set_status_column iter =
   let id = get_node_id iter in
@@ -524,6 +574,11 @@ let set_status_column iter =
       image_of_pa_status ~obsolete:obs pa
   in
   goals_model#set ~row:iter ~column:status_column image
+
+
+
+
+
 
 let new_node ?parent ?(collapse=false) id name typ proved =
   if not (Hint.mem node_id_to_gtree id) then begin
@@ -674,7 +729,8 @@ let interp cmd =
 
 let (_ : GtkSignal.id) =
   command_entry#connect#activate
-    ~callback:(fun () -> add_command list_commands command_entry#text; interp command_entry#text)
+    ~callback:(fun () -> add_command list_commands command_entry#text;
+      interp command_entry#text)
 
 let on_selected_row r =
   try
@@ -698,6 +754,10 @@ let (_ : GtkSignal.id) =
 (* Notification Handling *)
 (*************************)
 
+(* Function used to print stuff on the message_zone *)
+let print_message s =
+  message_zone#buffer#set_text s
+
 let add_to_msg_zone s =
   let s = message_zone#buffer#get_text () ^ "\n" ^ s in
   message_zone#buffer#set_text s;
@@ -705,21 +765,22 @@ let add_to_msg_zone s =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)   -> add_to_msg_zone s
-  | Transf_error (_id, s)  -> add_to_msg_zone s
-  | Strat_error (_id, s)   -> add_to_msg_zone s
-  | Replay_Info s          -> add_to_msg_zone s
-  | Query_Info (_id, s)    -> add_to_msg_zone s
-  | Query_Error (_id, s)   -> add_to_msg_zone s
-  | Help s                 -> add_to_msg_zone s
-  | Information s          -> add_to_msg_zone s
+  | Proof_error (_id, s)   -> print_message s
+  | Transf_error (_id, s)  -> print_message s
+  | Strat_error (_id, s)   -> print_message s
+  | Replay_Info s          -> print_message s
+  | Query_Info (_id, s)    -> print_message s
+  | Query_Error (_id, s)   -> print_message s
+  | Help s                 -> print_message s
+  | Information s          -> print_message s
   | Task_Monitor (t, s, r) -> update_monitor t s r
+  | Open_File_Error s      -> print_message s
     (* TODO do not print this particular error *)
   | Error s                ->
       if Debug.test_flag debug then
-        add_to_msg_zone s
+        print_message s
       else
-        add_to_msg_zone "Request failed."
+        print_message "Request failed."
 
 let treat_notification n = match n with
   | Node_change (id, uinfo)        ->
@@ -750,12 +811,12 @@ let treat_notification n = match n with
         if typ = NGoal then goals_view#selection#select_iter row_ref#iter);
     end
   | Remove _id                     -> (* TODO *)
-    add_to_msg_zone "got a Remove notification not yet supported\n"
+    print_message "got a Remove notification not yet supported\n"
   | Initialized g_info            ->
     (* TODO: treat other *)
     init_completion g_info.provers g_info.transformations g_info.commands;
   | Saved                         -> (* TODO *)
-    add_to_msg_zone "got a Saved notification not yet supported\n"
+    print_message "got a Saved notification not yet supported\n"
   | Message (msg)                 -> treat_message_notification msg
 (*  | Proof_update (id, pa)         -> (* TODO *)
     let r = get_node_row id in
@@ -766,7 +827,7 @@ let treat_notification n = match n with
     goals_model#set ~row:r#iter ~column:status_column
       (image_of_pa_status ~obsolete pa) *)
   | Dead _s                        -> (* TODO *)
-    add_to_msg_zone "got a Dead notification not yet supported\n"
+    print_message "got a Dead notification not yet supported\n"
   | Task (_id, s)                  ->
     (* TODO: check that the id is the current one *)
     task_view#source_buffer#set_text s;

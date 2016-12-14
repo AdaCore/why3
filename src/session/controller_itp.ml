@@ -518,7 +518,7 @@ let schedule_transformation_r c id name args ~callback =
   callback TSscheduled
 
 let schedule_transformation c id name args ~callback ~notification =
-  let callback s = (match s with
+  let callback s = callback s; (match s with
       | TSdone tid ->
         let has_subtasks =
           match get_sub_tasks c.controller_session tid with
@@ -527,7 +527,7 @@ let schedule_transformation c id name args ~callback ~notification =
         in
         update_trans_node notification c tid has_subtasks
       | TSfailed _e -> ()
-      | _ -> ()); callback s in
+      | _ -> ()) in
   schedule_transformation_r c id name args ~callback
 
 open Strategy

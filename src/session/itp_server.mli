@@ -29,7 +29,7 @@ type global_information =
      provers         : prover list;
      transformations : transformation list;
      strategies      : strategy list;
-     commands        : string list;
+     commands        : string list
      (* hidden_provers       : string list; *)
      (* session_time_limit   : int; *)
      (* session_mem_limit    : int; *)
@@ -39,19 +39,20 @@ type global_information =
     }
 
 type message_notification =
-  | Proof_error  of node_ID * string
-  | Transf_error of node_ID * string
-  | Strat_error  of node_ID * string
-  | Replay_Info  of string
-  | Query_Info   of node_ID * string
-  | Query_Error  of node_ID * string
-  | Help         of string
+  | Proof_error           of node_ID * string
+  | Transf_error          of node_ID * string
+  | Strat_error           of node_ID * string
+  | Replay_Info           of string
+  | Query_Info            of node_ID * string
+  | Query_Error           of node_ID * string
+  | Help                  of string
   (* General information *)
-  | Information  of string
-  (* Number of task scheduled, running, etc *)
-  | Task_Monitor of int * int * int
+  | Information           of string
+  (* Number               of task scheduled, running, etc *)
+  | Task_Monitor          of int * int * int
   (* An error happened that could not be identified in server *)
-  | Error        of string
+  | Error                 of string
+  | Open_File_Error       of string
 
 type node_type =
   | NRoot

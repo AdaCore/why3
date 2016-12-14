@@ -1111,18 +1111,23 @@ let make_theory_section ~use_shapes ?merge (s:session) parent_name (th:Theory.th
   theory
 
 (* add a why file to a session *)
-let add_file_section ~use_shapes (s:session) (fn:string) (theories:Theory.theory list) format : unit =
+let add_file_section ~use_shapes (s:session) (fn:string)
+    (theories:Theory.theory list) format : unit =
   let fn = Sysutil.relativize_filename s.session_dir fn in
+  Format.eprintf "TODO %s\n" fn;
+  Hstr.iter (fun x _i -> Format.eprintf "TOD %s\n" x) s.session_files;
   if Hstr.mem s.session_files fn then
     Debug.dprintf debug "[session] file %s already in database@." fn
   else
-    let theories = List.map (make_theory_section ~use_shapes s fn) theories in
-    let f = { file_name = fn;
-              file_format = format;
-              file_theories = theories;
-              file_detached_theories = [] }
-    in
-    Hstr.add s.session_files fn f
+    begin
+      let theories = List.map (make_theory_section ~use_shapes s fn) theories in
+      let f = { file_name = fn;
+                file_format = format;
+                file_theories = theories;
+                file_detached_theories = [] }
+      in
+      Hstr.add s.session_files fn f
+    end
 
 (* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)

@@ -3,12 +3,14 @@ open Call_provers
 open Session_itp
 open Controller_itp
 
+exception NotADirectory of string
+exception BadFileName of string
+
 let cont_from_session_dir cont dir =
   (* create project directory if needed *)
   if Sys.file_exists dir then
     begin
-      if not (Sys.is_directory dir) then failwith "not a directory"
-    (* TODO: raise (NotADirectory dir) *)
+      if not (Sys.is_directory dir) then raise (NotADirectory dir)
     end
   else
     begin
@@ -24,57 +26,11 @@ let cont_from_session_dir cont dir =
  (* update the session *)
   Controller_itp.reload_files cont ~use_shapes
 
-(*
-(* TODO: raise exceptions instead of using explicit eprintf/exit *)
-let cont_from_files cont spec usage_str env files provers =
-  if Queue.is_empty files then Whyconf.Args.exit_with_usage spec usage_str;
-  let fname = Queue.peek files in
-  (* extract project directory, and create it if needed *)
-  let dir =
-    if Filename.check_suffix fname ".why" ||
-       Filename.check_suffix fname ".mlw"
-    then Filename.chop_extension fname
-    else let _ = Queue.pop files in fname
-  in
-  if Sys.file_exists dir then
-    begin
-      if not (Sys.is_directory dir) then
-        begin
-          Format.eprintf
-            "[Error] @[When@ more@ than@ one@ file@ is@ given@ on@ the@ \
-             command@ line@ the@ first@ one@ must@ be@ the@ directory@ \
-             of@ the@ session.@]@.";
-          Arg.usage spec usage_str; exit 1
-        end
-    end
-  else
-    begin
-      eprintf "[GUI] '%s' does not exist. \
-               Creating directory of that name for the project@." dir;
-      Unix.mkdir dir 0o777
-    end;
-  (* we load the session *)
-  let ses,use_shapes = load_session dir in
-  eprintf "using shapes: %a@." pp_print_bool use_shapes;
-  (* create the controller *)
-  Controller_itp.init_controller ses cont;
- (* update the session *)
-  Controller_itp.reload_files cont ~use_shapes;
-  (* add files to controller *)
-  Queue.iter (fun fname -> Controller_itp.add_file cont fname) files;
-  (* load provers drivers *)
-  Whyconf.Mprover.iter
-    (fun _ p ->
-       try
-         let d = Driver.load_driver env p.Whyconf.driver [] in
-         Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         let p = p.Whyconf.prover in
-         eprintf "Failed to load driver for %s %s: %a@."
-           p.Whyconf.prover_name p.Whyconf.prover_version
-           Exn_printer.exn_printer e)
-    provers
- *)
+(* If we have a file we chop it and return new session based on the directory *)
+let cont_from_file cont f =
+  let dir = try (Filename.chop_extension f) with
+  | Invalid_argument _ -> raise (BadFileName f) in
+  cont_from_session_dir cont dir
 
 (**********************************)
 (* list unproven goal and related *)
@@ -710,6 +666,8 @@ let bypass_pretty s id =
 
 let get_exception_message ses id fmt e =
   match e with
+  | Controller_itp.Noprogress ->
+      Format.fprintf fmt "Transformation made no progress\n"
   | Case.Arg_trans_type (s, ty1, ty2) ->
       Format.fprintf fmt "Error in transformation %s during unification of the following terms:\n %a \n %a"
         s (print_type ses id) ty1 (print_type ses id) ty2
@@ -753,16 +711,17 @@ type global_information =
     }
 
 type message_notification =
-  | Proof_error  of node_ID * string
-  | Transf_error of node_ID * string
-  | Strat_error  of node_ID * string
-  | Replay_Info  of string
-  | Query_Info   of node_ID * string
-  | Query_Error  of node_ID * string
-  | Help         of string
-  | Information  of string
-  | Task_Monitor of int * int * int
-  | Error        of string
+  | Proof_error           of node_ID * string
+  | Transf_error          of node_ID * string
+  | Strat_error           of node_ID * string
+  | Replay_Info           of string
+  | Query_Info            of node_ID * string
+  | Query_Error           of node_ID * string
+  | Help                  of string
+  | Information           of string
+  | Task_Monitor          of int * int * int
+  | Error                 of string
+  | Open_File_Error       of string
 
 type node_type =
   | NRoot
@@ -842,11 +801,12 @@ let print_msg fmt m =
   | Information s          -> fprintf fmt "info %s" s
   | Task_Monitor _         -> fprintf fmt "task montor"
   | Error s                -> fprintf fmt "%s" s
+  | Open_File_Error s        -> fprintf fmt "%s" s
 
 let print_notify fmt n =
   match n with
   | Node_change (_ni, _nf)          -> fprintf fmt "node change"
-  | New_node (_ni, _pni, _nt,  _nf) -> fprintf fmt "new node"
+  | New_node (ni, _pni, _nt,  _nf) -> fprintf fmt "new node %d" ni
   | Remove _ni                      -> fprintf fmt "remove"
   | Initialized _gi                 -> fprintf fmt "initialized"
   | Saved                           -> fprintf fmt "saved"
@@ -907,12 +867,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
        List.map (fun (c,_,_) -> c) commands
    }
 
-  (* Controller is not initialized: we cannot process any request *)
-  let init_controller = ref false
-
   (* Create_controller creates a dummy controller *)
   let cont =
-    init_controller := false;
     try
       create_controller env provers
     with LoadDriverFailure (p, e) -> P.notify (Message (
@@ -921,16 +877,32 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   (* ------------ init controller ------------ *)
 
-  (* Init cont is called only when an Open is requested *)
-  let init_cont dir =
-    try
-      cont_from_session_dir cont dir;
-      init_controller := true;
-      P.notify (Initialized infos)
-    with e ->
-      Format.eprintf "%a@." Exn_printer.exn_printer e;
-      P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
-      exit 1
+  (* Init cont on file or directory. It is called only when an
+     Open_session_req is requested *)
+  let init_cont f =
+    try (
+    if (Sys.file_exists f) then
+    begin
+      if (Sys.is_directory f) then
+      begin
+        cont_from_session_dir cont f;
+        P.notify (Initialized infos)
+      end
+      else
+      begin
+        cont_from_file cont f;
+        P.notify (Initialized infos)
+      end
+    end
+    else
+      P.notify (Message (Open_File_Error ("Not a file: " ^ f))))
+    with
+      | NotADirectory f -> P.notify (Message (Open_File_Error ("Not a directory: " ^ f)))
+      | BadFileName f -> P.notify (Message (Open_File_Error ("Bad file name: " ^ f)))
+      | e ->
+          Format.eprintf "%a@." Exn_printer.exn_printer e;
+          P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
+          exit 1
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -1065,21 +1037,6 @@ exception Bad_prover_name of prover
      with the notification corresponding to a "root node" creation (root of the
      files)
   *)
-(* TODO remove this unnecessary
-  let build_the_tree () : unit =
-    let ses = cont.controller_session in
-    let files = get_files ses in
-    P.notify (New_node (0, 0, Root, root_info));
-    let l = Stdlib.Hstr.fold
-      (fun _file_key file acc ->
-         let file_node_ID = node_ID_from_file file in
-         let pos_ID = pos_from_node file_node_ID in
-         let node_type, node_info = get_info_and_type ses (AFile file) in
-         let l = List.fold_left (fun acc th ->
-               build_subtree_from_theory ses th :: acc) [] file.file_theories in
-         Node (file_node_ID, pos_ID, node_type, node_info, l) :: acc
-      ) files [] in
-*)
 
   (* ----------------- init the tree --------------------------- *)
   (* Iter on the session tree with a function [f parent current] with type
@@ -1144,6 +1101,7 @@ exception Bad_prover_name of prover
       root f
 
   let init_and_send_the_tree (): unit =
+    P.notify (New_node (0, 0, NRoot, "root"));
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
 
   let resend_the_tree (): unit =
@@ -1168,6 +1126,28 @@ exception Bad_prover_name of prover
       P.notify (Task (nid,s))
     | _ ->
       P.notify (Task (nid, "can not associate a task to a node that is not a goal."))
+
+(* -------------------- *)
+
+(* Add a file into the session when (Add_file_req f) is sent *)
+(* Note that f is the path from execution directory to the file and fn is the
+   path from the session directory to the file. *)
+let add_file_to_session cont f =
+  let fn = Sysutil.relativize_filename
+    (Session_itp.get_dir cont.controller_session) f in
+  let files = get_files cont.controller_session in
+  if (not (Stdlib.Hstr.mem files fn)) then
+    if (Sys.file_exists f) then
+    begin
+      Controller_itp.add_file cont f;
+      let file = Stdlib.Hstr.find files fn in
+      init_and_send_file file
+    end
+    else
+      P.notify (Message (Open_File_Error ("Not a file: " ^ f)))
+  else
+    P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
+
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
@@ -1297,7 +1277,6 @@ exception Bad_prover_name of prover
     init_and_send_the_tree ()
 
   let replay_session () : unit =
-    clear_tables ();
     let callback = fun lr ->
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
@@ -1316,7 +1295,9 @@ exception Bad_prover_name of prover
   let rec treat_request r =
     try (
     match r with
-    | Prove_req (nid,p,limit)      -> schedule_proof_attempt nid (get_prover p) limit
+    | Prove_req (nid,p,limit)      ->
+        (try (schedule_proof_attempt nid (get_prover p) limit) with
+        | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))))
     | Transform_req (nid, t, args) -> apply_transform nid t args
     | Strategy_req (nid, st)       -> run_strategy_on_task nid st
     | Save_req                     -> save_session ()
@@ -1338,19 +1319,24 @@ exception Bad_prover_name of prover
             P.notify (Message (Information ("Unknown command"^s)))
       end
     | Add_file_req f ->
-      begin
-        Controller_itp.add_file cont f;
-        let f = Sysutil.relativize_filename
-            (Session_itp.get_dir cont.controller_session) f in
+      add_file_to_session cont f
+(*
+        let fn = Sysutil.relativize_filename
+          (Session_itp.get_dir cont.controller_session) f in
         let files = get_files cont.controller_session in
-        let file = Stdlib.Hstr.find files f in
-        init_and_send_file file
-      end
-    | Open_session_req file_name      ->
-      init_cont file_name;
-      init_and_send_the_tree ()
+        if (not (Hstr.mem files fn)) then
+          begin
+            add_file_to_session cont f;
+            (*Controller_itp.add_file cont f;*)
+            let file = Stdlib.Hstr.find files fn in
+            init_and_send_file file
+          end
+*)
+    | Open_session_req file_or_dir_name      ->
+      init_cont file_or_dir_name;
+      reload_session ()
     | Set_max_tasks_req i     -> C.set_max_tasks i
-    | Exit_req                -> exit 0 (* TODO *)
+    | Exit_req                -> exit 0
      )
     with e -> P.notify (Message (Error (Pp.string_of
       (fun fmt (r,e) -> Format.fprintf fmt
