@@ -17,7 +17,7 @@ open Task
 
 let record_unfolding_threshold = 20
 (* only unfold records whose number of fields (including subrecords) is smaller
- * than this number *)
+ * or equal than this number *)
 
 type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
