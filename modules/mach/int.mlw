@@ -210,6 +210,7 @@ module UInt32
   use import int.Int
   use import int.EuclideanDivision
   use import int.Power
+  use import Int32
 
   type uint32
 
@@ -254,11 +255,15 @@ module UInt32
   val predicate is_msb_set (x:uint32) : bool
     ensures { result <-> 2 * to_int x > max_uint32 }
 
-  val count_leading_zeros (x:uint32) : uint32
+  val count_leading_zeros (x:uint32) : int32
     requires { to_int x > 0 }
-    ensures { (power 2 (to_int result)) * to_int x <= max_uint32 }
-    ensures { 2 * (power 2 (to_int result)) * to_int x > max_uint32 }
-    ensures { 0 <= to_int result < 32 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint32 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint32 }
+    ensures { 0 <= Int32.to_int result < 32 }
+
+  val of_int32(x:int32) : uint32
+    requires { Int32.to_int x >= 0 }
+    ensures { to_int result = Int32.to_int x }
 
 (*  use bv.BV32
 
@@ -367,7 +372,7 @@ module UInt64
   use import int.Int
   use import int.EuclideanDivision
   use import int.Power
-
+  use import Int32
 
   type uint64
 
@@ -412,11 +417,15 @@ module UInt64
   val predicate is_msb_set (x:uint64) : bool
     ensures { result <-> 2 * to_int x > max_uint64 }
 
-  val count_leading_zeros (x:uint64) : uint64
+  val count_leading_zeros (x:uint64) : int32
     requires { to_int x > 0 }
-    ensures { (power 2 (to_int result)) * to_int x <= max_uint64 }
-    ensures { 2 * (power 2 (to_int result)) * to_int x > max_uint64 }
-    ensures { 0 <= to_int result < 64 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint64 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint64 }
+    ensures { 0 <= Int32.to_int result < 64 }
+
+  val of_int32(x:int32) : uint64
+    requires { Int32.to_int x >= 0 }
+    ensures { to_int result = Int32.to_int x }
 
 (*  use bv.BV64
 

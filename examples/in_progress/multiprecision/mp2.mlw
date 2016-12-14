@@ -852,7 +852,6 @@ module N
       least significant limbs to [(r, sz)] and writes the result in [(r,sz)].
       Returns the most significant limb of the product plus the carry
       of the addition. Corresponds to [mpn_addmul_1].*)
-
   let addmul_limb (r x:t) (y:limb) (sz:int32):limb
     requires { valid_ptr_itv x (p2i sz) }
     requires { valid_ptr_itv r (p2i sz) }
@@ -882,7 +881,7 @@ module N
       let ghost k = p2i !i in
       lx := get_ofs x !i;
       lr := get_ofs r !i;
-      assert { l2i !lr = l2i (pelts (old r))[r.offset+ p2i !i] };
+      assert { l2i !lr = l2i (pelts (old r))[r.offset + p2i !i] };
       let rl, rh = Limb.mul_double !lx y in
       let res, carry = Limb.add3 !lr rl !c in
       value_sub_tail (pelts r) r.offset (r.offset + k);
@@ -2146,10 +2145,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let uone = Limb.of_int 1 in
     (*normalize divisor*)
     let clz = count_leading_zeros y in
-    let ghost mult = power 2 (l2i clz) in
-    let ry = lsl y clz in
+    let ghost mult = power 2 (p2i clz) in
+    let ry = lsl y (Limb.of_int32 clz) in
     assert { l2i ry = mult * l2i y };
-    let ghost tlum = power 2 (Limb.length - l2i clz) in
+    let ghost tlum = power 2 (Limb.length - p2i clz) in
     assert { tlum * mult = radix };
     let v = invert_limb ry in
     while (Int32.(>=) !i zero) do
@@ -2174,7 +2173,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let ghost k = p2i !i in
       lx := C.get !xp;
       (*TODO lshift in place would simplify things*)
-      let l,h = lsld_ext !lx clz in
+      let l,h = lsld_ext !lx (Limb.of_int32 clz) in
       mod_mult mult (l2i y) 0;
       assert { l2i !r + l2i h < l2i ry
                by
@@ -2294,7 +2293,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                 + l2i !r
             }
     done;
-    let ghost res = lsr !r clz in
+    let ghost res = lsr !r (Limb.of_int32 clz) in
     assert { l2i !r = l2i res * mult
              so
              mult * value_sub_shift x (p2i sz)
@@ -2305,7 +2304,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
             so
             value_sub_shift x (p2i sz)
               = value_sub_shift q (p2i sz) * l2i y + l2i res };
-    lsr !r clz
+    lsr !r (Limb.of_int32 clz)
 
   predicate reciprocal_3by2 (v dh dl:limb) =
     l2i v = div (radix*radix*radix -1) (l2i dl + radix * l2i dh) - radix
@@ -2945,34 +2944,173 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     end;
     bounds_imply_rec3by2 !v dh dl;
     !v
-(*
-  let div_sb_qr (q r x y:t) (sx sy:int32) (v:limb) : unit
-    requires { 3 <= sy <= sx }
+
+  let sub3 (x y z:limb) : (limb,limb)
+    returns { (r,d) -> l2i x - l2i y - l2i z = l2i r - radix * l2i d
+    	      	     /\ 0 <= l2i d <= 2 }
+  =
+    let limb_zero = Limb.of_int 0 in
+    let u1, b1 = sub_with_borrow x y limb_zero in
+    let u2, b2 = sub_with_borrow u1 z limb_zero in
+    (u2, (Limb.(+) b1 b2))
+
+  (** [submul_limb r x y sz] multiplies [(x, sz)] by [y], substracts the [sz]
+      least significant limbs from [(r, sz)] and writes the result in [(r,sz)].
+      Returns the most significant limb of the product plus the borrow
+      of the substraction. Corresponds to [mpn_submul_1].*)
+  let submul_limb (r x:t) (y:limb) (sz:int32):limb
+    requires { valid_ptr_itv x (p2i sz) }
+    requires { valid_ptr_itv r (p2i sz) }
+    ensures { value_sub_shift r (p2i sz) - (power radix (p2i sz)) * l2i result
+            = value_sub_shift (old r) (p2i sz)
+              - value_sub_shift x (p2i sz) * l2i y }
+    writes { r.data.contents.elts }
+    ensures { forall j. j < r.offset \/ r.offset + p2i sz <= j ->
+              (pelts r)[j] = (pelts (old r))[j] }
+=
+    let limb_zero = Limb.of_int 0 in
+    let lx = ref limb_zero in
+    let lr = ref limb_zero in
+    let b = ref limb_zero in
+    let i = ref (Int32.of_int 0) in
+    while Int32.(<) !i sz do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= p2i !i <= p2i sz }
+      invariant { value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b
+                 = value_sub_shift (old r) (p2i !i)
+                   - value_sub_shift x (p2i !i) * l2i y }
+      invariant { forall j. p2i !i <= j < p2i sz ->
+                 (pelts (old r)) [r.offset+j] = (pelts r)[r.offset + j]  }
+      invariant { forall j. j < r.offset \/ r.offset + p2i sz <= j ->
+                 (pelts r)[j] = (pelts (old r))[j] }
+      label StartLoop in
+      let ghost k = p2i !i in
+      lx := get_ofs x !i;
+      lr := get_ofs r !i;
+      assert { l2i !lr = l2i (pelts (old r))[r.offset + p2i !i] };
+      let rl, rh = Limb.mul_double !lx y in
+      let res, borrow = sub3 !lr rl !b in
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_update (pelts r) (r.offset + p2i !i) r.offset (r.offset + p2i !i +1) res;
+      set_ofs r !i res;
+      assert { forall j. (p2i !i + 1) <= j < p2i sz ->
+               (pelts (old r))[r.offset+j] = (pelts r)[r.offset+j]
+               by
+               (pelts r)[r.offset+j] = ((pelts r) at StartLoop)[r.offset+j]
+                                  = (pelts (old r))[r.offset+j] };
+      assert { value_sub_shift r (p2i !i + 1)
+              = value_sub_shift (r at StartLoop) (p2i !i + 1)
+                + (power radix (p2i !i)) * (l2i res - l2i !lr)
+               };
+      assert { l2i rl + radix * l2i rh <= (radix-1)*(radix-1)
+               by
+               (l2i !lx * l2i y <= l2i !lx * (radix-1) <= (radix-1)*(radix-1)
+                 by
+                0 <= l2i !lx <= radix - 1 /\ 0 <= l2i y <= radix -1)
+                /\
+                l2i rl + radix * l2i rh = l2i !lx * l2i y
+                };
+      assert { l2i rh < radix - 1
+               by
+               l2i rl + radix * l2i rh  <= (radix -1) * (radix -1)
+               so
+               radix * l2i rh <= (radix -1) * (radix -1)
+               };
+      assert { l2i rh = radix - 2 -> l2i rl <= 1
+               by
+               l2i rl + radix * l2i rh <= (radix-1)*(radix-1) };
+      assert { l2i rh = radix - 2 -> l2i borrow <= 1
+               by l2i rl <= 1 };
+      b := Limb.(+) rh borrow;
+      i := Int32.(+) !i (Int32.of_int 1);
+      assert { value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b
+                 = value_sub_shift (old r) (p2i !i)
+                   - value_sub_shift x (p2i !i) * l2i y
+               by
+                (value_sub_shift r (p2i !i) - (power radix (p2i !i)) * l2i !b
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i res - l2i !lr)
+                   - (power radix (p2i !i)) * l2i !b
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i res - l2i !lr)
+                   - (power radix (p2i !i)) * (l2i rh + l2i borrow)
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i res - l2i !lr)
+                   - (power radix k) * radix * (l2i rh + l2i borrow)
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i res - l2i !lr
+                                   - radix * (l2i rh + l2i borrow))
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i res - radix * l2i borrow
+                          - l2i !lr - radix * l2i rh)
+                = value_sub_shift (r at StartLoop) (p2i !i) +
+                   (power radix k) * (l2i !lr - l2i rl - l2i (!b at StartLoop)
+                          - l2i !lr - radix * l2i rh)
+                = value_sub_shift (r at StartLoop) (p2i !i) -
+                   (power radix k) * (l2i rl + radix * l2i rh + l2i (!b at StartLoop))
+                = value_sub_shift (r at StartLoop) (p2i !i) -
+                   (power radix k) * (l2i !lx * l2i y + l2i (!b at StartLoop))
+                = value_sub_shift (r at StartLoop) k
+                    + (power radix k) * l2i !lr
+                    - (power radix k) * (l2i !lx * l2i y + l2i (!b at StartLoop))
+                = value_sub_shift (r at StartLoop) k
+                    - (power radix k) * l2i (!b at StartLoop)
+                    + (power radix k) * (l2i !lr - l2i !lx * l2i y)
+                = value_sub_shift (old r) k
+                    - value_sub_shift x k * l2i y
+                    + (power radix k) * (l2i !lr - l2i !lx * l2i y)
+                = value_sub_shift (old r) k
+                    + (power radix k) * l2i !lr
+                    - (value_sub_shift x k + (power radix k)*l2i !lx) * l2i y
+                = value_sub_shift (old r) (p2i !i)
+                    - (value_sub_shift x k + (power radix k)*l2i !lx) * l2i y
+                = value_sub_shift (old r) (p2i !i)
+                    - value_sub_shift x (p2i !i) * l2i y
+                    by
+                  value_sub_shift (old r) (p2i !i) = value_sub_shift (old r) k
+                     + (power radix k) * l2i !lr
+                     )
+                    };
+    done;
+    !b
+
+  (* [(x,sz)] is normalized if its most significant bit is set. *)
+  predicate normalized (x:t) (sz:int32) =
+    valid_ptr_itv x (p2i sz) /\ l2i (pelts x)[p2i sz - 1] >= div radix 2
+
+  let div_sb_qr (q x y:t) (sx sy:int32) : unit
+    requires { 2 <= p2i sy <= p2i sx }
+    requires { valid_ptr_itv x (p2i sx) }
+    requires { valid_ptr_itv y (p2i sy) }
+    requires { valid_ptr_itv q (p2i sx - p2i sy) }
+    requires { normalized y sy }
   =
     let one = Int32.of_int 1 in
+    let two = Int32.of_int 2 in
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
     let minus_one = Int32.(-_) (Int32.of_int 1) in
     let uone = Limb.of_int 1 in
     let x1 = ref limb_zero in
     let x0 = ref limb_zero in
-    let xp = ref (C.incr x (Int32.(-) sx 2) in
-    let qp = ref (C.incr q (Int32.(-) sx sy))
-    let dh = C.get_ofs y (Int32.(-) sy 1) in
-    let dl = C.get_ofs y (Int32.(-) sy 2) in
+    let xp = ref (C.incr x (Int32.(-) sx two)) in
+    let qp = ref (C.incr q (Int32.(-) sx sy)) in
+    let dh = C.get_ofs y (Int32.(-) sy one) in
+    let dl = C.get_ofs y (Int32.(-) sy two) in
     let v = reciprocal_word_3by2 dh dl in
-    let x1 = ref (C.get_ofs xp one) in
+    let x1 = ref (C.get_ofs !xp one) in
     let i = ref (Int32.(-) sx sy) in
-    let mdn = Int32.(-) 2 sy in
+    let mdn = Int32.(-) two sy in
     let q = ref limb_zero in
     while (Int32.(>) !i zero) do
-      variant { p2i !i };
+      variant { p2i !i }
       xp := C.incr !xp minus_one;
       if (Limb.(=) !x1 dh && Limb.(=) (C.get_ofs !xp one) dl) (* unlikely *)
       then begin
-        q := Limb.of_int Limb.max_uint64 in
-        let _ = submul_limb (C.incr !xp mdn) y sy q;
-        x1 := C.get_ofs !xp one;
+        q := Limb.of_int Limb.max_uint64;
+        let _ = submul_limb (C.incr !xp mdn) y !q sy in
+        x1 := C.get_ofs !xp one
       end
       else begin
         let qu, rh, rl =
@@ -2981,38 +3119,68 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         x1 := rh;
         x0 := rl;
         (* TODO use sy-2 and use the existing x0 and x1 for the last two steps*)
-        let cy = submul_limb (C.incr !xp mdn) y sy q;
+        let cy = submul_limb (C.incr !xp mdn) y !q sy in
        (* let cy1 = if (Limb.(<) !x0 cy) then uone else uzero in
         x0 := sub_mod !x0 cy;
         let cy2 = if (Limb.(<) !x1 cy1) then uone else uzero in
         x1 := sub_mod !x1 cy2;
         C.set !xp !x0;*)
-        if Limb.(<>) cy uzero (*unlikely*)
+        if Limb.ne cy limb_zero (*unlikely*)
         then begin
           (* TODO should be a simple add in place *)
-          let c = addmul_limbs (C.incr !xp mdn) y uone sy in
+          let c = addmul_limb (C.incr !xp mdn) y uone sy in
           x1 := Limb.(+) !x1 (Limb.(+) dh c);
-          q := Limb.(-) !q 1;
+          q := Limb.(-) !q uone;
+	end;
       end;
       qp := C.incr !qp minus_one;
-      C.set !qp !q;
+      C.set !qp !q
     done;
-    C.set_ofs !xp one !x1;
-*)
-
-
+    C.set_ofs !xp one !x1
 
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
     in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to
     [mpn_tdiv_qr]. *)
-  (* TODO special cases for sy = 1 and 2, else call div_sb_qr*)
-  (*
+  let div_qr (q r x y:t) (sx sy:int32) : unit
+    requires { 1 <= p2i sy <= p2i sx}
+    requires { valid_ptr_itv x (p2i sx) }
+    requires { valid_ptr_itv y (p2i sy) }
+    requires { valid_ptr_itv q (p2i sx - p2i sy + 1) } (* TODO check if this is needed*)
+    requires { valid_ptr_itv r (p2i sy) }
+    requires { l2i (pelts y)[p2i sy - 1] > 0 }
+  =
+    let one = Int32.of_int 1 in
+    let two = Int32.of_int 2 in
+    let limb_zero = Limb.of_int 0 in
+    let zero = Int32.of_int 0 in
+    let minus_one = Int32.(-_) (Int32.of_int 1) in
+    let uone = Limb.of_int 1 in
     if (Int32.(=) sy one)
     then
       let lr = divmod_1 q x (C.get y) sx in
       C.set r lr
-    else begin*)
-
+    else
+      let clz = count_leading_zeros (C.get_ofs y (Int32.(-) sy one)) in
+      if Int32.(=) clz zero
+      then begin
+        let nx = malloc (UInt32.of_int32 sx) in
+        let _ = add_limb nx x limb_zero sx in (*TODO actual copy*)
+	div_sb_qr q nx y sx sy;
+	let _ = add_limb r nx limb_zero sy in
+	free nx;
+      end
+      else begin
+        let nx = malloc (UInt32.of_int32 (Int32.(+) sx one)) in
+        let ny = malloc (UInt32.of_int32 sy) in
+	let _ = lshift ny y sy (Limb.of_int32 clz) in
+	let h = lshift nx x sx (Limb.of_int32 clz) in
+	C.set_ofs nx sx h;
+	(* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
+	div_sb_qr q nx ny (Int32.(+) sx (Int32.of_int 1)) sy;
+	let _ = rshift r nx sy (Limb.of_int32 clz) in
+	free nx;
+	free ny;
+      end
 
   (** Tests *)
  (*
