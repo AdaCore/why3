@@ -15,6 +15,10 @@ open Term
 open Decl
 open Task
 
+let record_unfolding_threshold = 20
+(* only unfold records whose number of fields (including subrecords) is smaller
+ * than this number *)
+
 type inline = known_map -> lsymbol -> ty list -> ty option -> bool
 
 let unfold def tl ty =
@@ -121,6 +125,30 @@ let rec add_quant kn (vl,tl,f) v =
         (* zero or more than one constructor *)
         (v::vl, tl, f)
 
+let count_record_fields kn ty =
+  (* if the type [ty] is a record type (= ADT with only one constructor), count
+     the number of fields recursively (that is, unfolding types of fields that
+     are also record types). *)
+  let rec aux acc ty =
+    let l =
+      match ty.ty_node with
+        | Tyapp (ts, _) -> find_constructors kn ts
+        | _ -> []
+    in
+    match l with
+    | [ls,_] ->
+      List.fold_left (fun acc x -> aux (acc + 1) x) acc ls.ls_args
+    | _ -> acc
+  in
+  aux 0 ty
+
+let add_quant_small kn (vl,tl,f) v =
+  (* wrapper around [add_quant] which does nothing if the variable is a record
+     with more than [record_unfolding_threshold] fields *)
+  if count_record_fields kn v.vs_ty > record_unfolding_threshold then
+    (v::vl, tl, f)
+  else add_quant kn (vl,tl,f) v
+
 let let_map fn env t1 tb =
   let x,t2,close = t_open_bound_cb tb in
   let t2 = fn (Mvs.add x t1 env) t2 in
@@ -141,6 +169,7 @@ let dive_to_constructor kn fn env t =
     | _ -> raise Exit)
   in
   dive env t
+
 
 let rec cs_equ kn env t1 t2 =
   if t_equal t1 t2 then t_true
@@ -195,7 +224,7 @@ let eval_match ~inline kn t =
         let vl,tl,f,close = t_open_quant_cb qf in
         let vl,tl,f = if stop
           then (List.rev vl,tl,f)
-          else List.fold_left (add_quant kn) ([],tl,f) vl in
+          else List.fold_left (add_quant_small kn) ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
         t_map_simp (eval env) t) in
