@@ -69,7 +69,7 @@ let handle_script s args =
      end
     | "getNotifications" ->
        let n = P.get_notifications () in
-       Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
+       if n <> [] then Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
     | _ -> "bad request"
 
 let plist fmt l =
