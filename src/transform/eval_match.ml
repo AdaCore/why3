@@ -69,7 +69,7 @@ let flat_case t bl =
   let mk_case = t_case_close and mk_let = t_let_close_simp in
   Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
-let rec add_quant kn (vl,tl,f) v =
+let rec add_quant kn (cnt, vl,tl,f) v =
   (* (vl,tl,f) represents a formula
         forall vl [tl]. f,
       on top of that we want to add a quantification for [v].
@@ -118,12 +118,13 @@ let rec add_quant kn (vl,tl,f) v =
         let t = fs_app ls (List.map t_var nvl) ty in
         let f = t_let_close_simp v t f in
         let tl = tr_map (t_subst_single v t) tl in
+        let cnt = cnt + 1 in
         (* in case any of the fields is also a record, we recurse over the new
            variables. *)
-        List.fold_left (add_quant kn) (vl,tl,f) nvl
+        List.fold_left (add_quant kn) (cnt, vl,tl,f) nvl
     | _ ->
         (* zero or more than one constructor *)
-        (v::vl, tl, f)
+        (cnt, v::vl, tl, f)
 
 let count_record_fields kn ty =
   (* if the type [ty] is a record type (= ADT with only one constructor), count
@@ -142,12 +143,14 @@ let count_record_fields kn ty =
   in
   aux 0 ty
 
-let add_quant_small kn (vl,tl,f) v =
+let add_quant_small kn ((cnt, vl, tl, f) as tuple) v =
   (* wrapper around [add_quant] which does nothing if the variable is a record
-     with more than [record_unfolding_threshold] fields *)
-  if count_record_fields kn v.vs_ty > record_unfolding_threshold then
-    (v::vl, tl, f)
-  else add_quant kn (vl,tl,f) v
+     with more than [record_unfolding_threshold] fields. We also have an extra
+     counter *)
+  if cnt > record_unfolding_threshold ||
+     count_record_fields kn v.vs_ty > record_unfolding_threshold then
+    (cnt, v::vl, tl, f)
+  else add_quant kn tuple v
 
 let let_map fn env t1 tb =
   let x,t2,close = t_open_bound_cb tb in
@@ -222,9 +225,9 @@ let eval_match ~inline kn t =
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->
         let vl,tl,f,close = t_open_quant_cb qf in
-        let vl,tl,f = if stop
-          then (List.rev vl,tl,f)
-          else List.fold_left (add_quant_small kn) ([],tl,f) vl in
+        let _, vl,tl,f = if stop
+          then (0, List.rev vl,tl,f)
+          else List.fold_left (add_quant_small kn) (0,[],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
         t_map_simp (eval env) t) in
@@ -273,7 +276,7 @@ let rec inline_nonrec_linear kn ls tyl ty =
     | Dlogic [_,def] ->
         begin try Wdecl.find inline_cache d with Not_found ->
           let vl,t = open_ls_defn def in
-          let _,_,t = List.fold_left (add_quant kn) ([],[],t) vl in
+          let _,_,_,t = List.fold_left (add_quant kn) (0,[],[],t) vl in
           let t = eval_match ~inline:inline_nonrec_linear kn t in
           let res = linear t in
           Wdecl.set inline_cache d res;
