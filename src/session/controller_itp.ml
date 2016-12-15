@@ -407,7 +407,7 @@ let build_prover_call c id pr limit callback =
   let tables = Session_itp.get_tables c.controller_session id in
   let call =
     Driver.prove_task ?old:None ~cntexample:true ~inplace:false ~command
-                      ~limit driver tables task
+                      ~limit ?name_table:tables driver task
   in
   let pa = (c.controller_session,id,pr,callback,false,call) in
   Queue.push pa prover_tasks_in_progress

@@ -80,7 +80,7 @@ let run_one env config filters dir fname =
             let cout = open_out (Filename.concat dir (name ^ ext)) in
             (* Name table not necessary outside of ITP *)
             Driver.print_task lp.prover_driver
-              (formatter_of_out_channel cout) None task;
+              (formatter_of_out_channel cout) task;
             close_out cout
         ) th
     ) file

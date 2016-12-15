@@ -3,7 +3,7 @@
   - obsolete
   - update proof attempt
 *)
-
+(*
 open Why3
 open Unix_scheduler
 open Format
@@ -347,3 +347,4 @@ let () =
     (fun () -> List.iter
         (fun n -> treat_notification fmt n) (get_notified ()); true);
   Unix_scheduler.main_loop (interp chout fmt)
+*)

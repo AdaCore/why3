@@ -1975,7 +1975,7 @@ let copy_external_proof
             let ch = open_out dst_file in
             let fmt = formatter_of_out_channel ch in
             (* Do not need tables because not a case in itp *)
-            Driver.print_task ~old driver fmt None task;
+            Driver.print_task ~old driver fmt task;
             close_in old;
             close_out ch;
             let dst_file = Sysutil.relativize_filename dir dst_file in
@@ -2024,7 +2024,7 @@ let update_edit_external_proof ~cntexample env_session a =
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
   (* Name table is only used in ITP printing *)
-  Driver.print_task ~cntexample ?old driver fmt None goal;
+  Driver.print_task ~cntexample ?old driver fmt goal;
   Opt.iter close_in old;
   close_out ch;
   file

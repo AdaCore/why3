@@ -46,11 +46,13 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   ?cntexample : bool ->
-  driver -> Format.formatter -> Task.name_tables option -> Task.task -> unit
+  ?name_table: Task.name_tables ->
+  driver -> Format.formatter -> Task.task -> unit
 
 val print_theory :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.name_tables option -> Theory.theory -> unit
+  ?name_table: Task.name_tables ->
+  driver -> Format.formatter -> Theory.theory -> unit
   (** produce a realization of the given theory using the given driver *)
 
 val prove_task :
@@ -59,21 +61,24 @@ val prove_task :
   ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
-  driver -> Task.name_tables option -> Task.task -> Call_provers.prover_call
+  ?name_table  : Task.name_tables ->
+  driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
 val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  driver -> Format.formatter -> Task.name_tables option -> Task.task -> Printer.printer_mapping
+  ?name_table: Task.name_tables ->
+  driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
 val prove_task_prepared :
   command      : string ->
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
-  driver -> Task.name_tables option -> Task.task -> Call_provers.prover_call
+  ?name_table  : Task.name_tables ->
+  driver -> Task.task -> Call_provers.prover_call
 
 
 (** Traverse all metas from a driver *)

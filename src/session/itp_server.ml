@@ -722,7 +722,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let task = get_task cont.controller_session id in
       let tables = get_tables cont.controller_session id in
       let s = Pp.string_of
-          (fun fmt -> Driver.print_task ~cntexample:false task_driver fmt tables)
+          (fun fmt -> Driver.print_task ~cntexample:false ?name_table:tables task_driver fmt)
           task in
       P.notify (Task (nid,s))
     | _ ->
