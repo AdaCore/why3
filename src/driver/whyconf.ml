@@ -923,6 +923,7 @@ module Args = struct
     let main = get_main config in
     load_plugins main;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
+    Debug.Args.set_flags_selected ();
     config, base_config, Env.create_env lp
 
   let exit_with_usage options usage =
