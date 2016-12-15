@@ -205,7 +205,7 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 
 LIB_SESSION = compress xml termcode session session_itp \
               session_tools strategy strategy_parser controller_itp \
-	      session_scheduler itp_server
+	      session_scheduler server_utils itp_server
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -683,7 +683,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig why3ide
+IDE_FILES = gconfig ide_utils why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 

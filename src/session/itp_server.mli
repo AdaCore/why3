@@ -8,20 +8,6 @@ type strategy = string
 type node_ID = int
 val root_node : node_ID
 
-
-
-module type History_type = sig
-  type history
-
-  val create_history: unit -> history
-  val print_next_command: history -> string option
-  val print_prev_command: history -> string option
-  val add_command: history -> string -> unit
-
-end
-
-module History : History_type
-
 (* --------------------------- types to be expanded if needed --------------------------------- *)
 
 (* Global information known when server process has started and that can be

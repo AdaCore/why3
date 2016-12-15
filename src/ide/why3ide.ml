@@ -2,6 +2,7 @@ open Format
 open Why3
 open Gconfig
 open Stdlib
+open Ide_utils.History
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -120,7 +121,6 @@ let () =
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
 
-open Itp_server.History
 
 (********************************)
 (* Source language highlighting *)
@@ -574,11 +574,6 @@ let set_status_column iter =
       image_of_pa_status ~obsolete:obs pa
   in
   goals_model#set ~row:iter ~column:status_column image
-
-
-
-
-
 
 let new_node ?parent ?(collapse=false) id name typ proved =
   if not (Hint.mem node_id_to_gtree id) then begin

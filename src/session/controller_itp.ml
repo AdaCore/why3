@@ -480,11 +480,11 @@ let schedule_proof_attempt_r c id pr ~limit ~callback =
   run_timeout_handler ()
 
 let schedule_proof_attempt c id pr ~limit ~callback ~notification =
-  let callback panid s = (match s with
-  | Done pr -> update_proof_node notification c id (pr.Call_provers.pr_answer == Call_provers.Valid)
-  | Interrupted | InternalFailure _ -> update_proof_node notification c id false
-  | _ -> ());
-  callback panid s
+  let callback panid s =   callback panid s;
+    (match s with
+    | Done pr -> update_proof_node notification c id (pr.Call_provers.pr_answer == Call_provers.Valid)
+    | Interrupted | InternalFailure _ -> update_proof_node notification c id false
+    | _ -> ())
   in
   schedule_proof_attempt_r c id pr ~limit:limit ~callback
 
