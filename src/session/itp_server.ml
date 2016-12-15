@@ -429,7 +429,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
-  let _debug = Debug.register_flag "itp_server"
+  let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
   (************************)
   (* parsing command line *)
@@ -443,11 +443,17 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let get_configs () = config, base_config
 
   let task_driver =
-    let main = Whyconf.get_main config in
-    let d = Filename.concat (Whyconf.datadir main)
-        (Filename.concat "drivers" "why3_itp.drv")
-    in
-    Driver.load_driver env d []
+    try
+      let main = Whyconf.get_main config in
+      let d = Filename.concat (Whyconf.datadir main)
+                              (Filename.concat "drivers" "why3_itp.drv")
+      in
+      let d = Driver.load_driver env d [] in
+      Debug.dprintf debug "[ITP server] driver for task printing loaded@.";
+      d
+    with e ->
+         Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
+         exit 1
 
   let provers : Whyconf.config_prover Whyconf.Mprover.t =
     Whyconf.get_provers config
@@ -475,9 +481,12 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let cont =
     try
       create_controller env provers
-    with LoadDriverFailure (p, e) -> P.notify (Message (
-      Error "To implement: could not load driver"));
-      raise (LoadDriverFailure (p, e)) (* TODO *)
+    with LoadDriverFailure (p,e') as e ->
+      P.notify (Message (Error "To implement: could not load driver"));
+      Format.eprintf "[ITP server] error loading driver for prover %a: %a@."
+                     Whyconf.print_prover p.Whyconf.prover
+                     Exn_printer.exn_printer e';
+      raise e (* TODO *)
 
   (* ------------ init controller ------------ *)
 

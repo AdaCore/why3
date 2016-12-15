@@ -28,12 +28,13 @@ open Format
 
 let interp_request args =
   match args with
-  | "list-provers" -> (Command_req "list-provers", root_node)
+  | "list-provers" -> (Command_req (root_node,"list-provers"))
   | _ -> invalid_arg "Why3web.interp_request"
 
 let print_message_notification fmt n =
   match n with
   | Error s -> ()
+  | Open_File_Error s -> ()
   | Proof_error(nid,s) -> ()
   | Transf_error(nid,s) -> ()
   | Strat_error(nid,s) -> ()
@@ -54,7 +55,6 @@ let print_notification fmt n =
   | Message n -> fprintf fmt "{ notification=\"message=\"; %a }"
                               print_message_notification n
   | Dead s -> ()
-  | Proof_update(nid,status) -> ()
   | Task(nid,task) -> ()
 
 let handle_script s args =
@@ -69,7 +69,8 @@ let handle_script s args =
      end
     | "getNotifications" ->
        let n = P.get_notifications () in
-       if n <> [] then Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
+       (* if n <> [] then  *)
+         Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
     | _ -> "bad request"
 
 let plist fmt l =
@@ -130,8 +131,8 @@ let usage_str = sprintf
 
 
 let () =
-  Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
-  if Queue.is_empty files then
-     Whyconf.Args.exit_with_usage spec usage_str;
-  Queue.iter (fun f -> P.push_request (Itp_server.Open_req f, Itp_server.root_node)) files;
-  Wserver.main_loop None 6789 handler stdin_handler
+    Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+    if Queue.is_empty files then
+      Whyconf.Args.exit_with_usage spec usage_str;
+    Queue.iter (fun f -> P.push_request (Itp_server.Open_session_req f)) files;
+    Wserver.main_loop None 6789 handler stdin_handler
