@@ -499,23 +499,38 @@ module Translate = struct
              match
                (query_syntax info.syntax rs.rs_name,
                 query_syntax info.converter rs.rs_name) with
-
                | _, Some s
                | Some s, _ ->
-		 let params =
-		   List.map (fun pv -> (C.Evar(pv_name pv),
-                                        ty_of_ty info (ty_of_ity pv.pv_ity)))
-		     pvsl in
-		 let rty = ty_of_ity e.e_ity in
-		 let rtyargs = match rty.ty_node with
-		   | Tyvar _ -> [||]
-		   | Tyapp (_,args) ->
-                     Array.of_list (List.map (ty_of_ty info) args)
-		 in
-		 C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
-                           Mid.mem rs.rs_name info.converter)
-               | None, None ->
-		 let args = List.filter
+                 begin
+                   try
+                     let _ = Str.search_forward
+                       (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0 in
+                     let params =
+		       List.map (fun pv -> (C.Evar(pv_name pv),
+                                            ty_of_ty info (ty_of_ity pv.pv_ity)))
+		         pvsl in
+		     let rty = ty_of_ity e.e_ity in
+		     let rtyargs = match rty.ty_node with
+		       | Tyvar _ -> [||]
+		       | Tyapp (_,args) ->
+                         Array.of_list (List.map (ty_of_ty info) args)
+		     in
+		     C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
+                               Mid.mem rs.rs_name info.converter)
+                   with Not_found ->
+		     let args = List.filter
+		       (fun pv -> not (pv.pv_ghost
+				       || ity_equal pv.pv_ity ity_unit))
+		       pvsl in
+                     if pvsl=[]
+                     then C.(Esyntax(s, Tnosyntax, [||], [], true)) (*constant*)
+                     else
+                     (*function defined in the prelude *)
+		     C.(Ecall(Esyntax(s, Tnosyntax, [||], [], true),
+			      List.map (fun pv -> Evar(pv_name pv)) args))
+                 end
+               | _ ->
+                 let args = List.filter
 		   (fun pv -> not (pv.pv_ghost
 				   || ity_equal pv.pv_ity ity_unit))
 		   pvsl in
@@ -536,8 +551,11 @@ module Translate = struct
       begin match ld with
       | LDvar (pv,le) ->
         Format.printf "let %s@." pv.pv_vs.vs_name.id_string;
-        if pv.pv_ghost then expr info env e
+        if pv.pv_ghost
+        (*TODO check it's actually unused *)
+        then expr info env e
         else if ity_equal pv.pv_ity ity_unit
+             || pv.pv_vs.vs_name.id_string.[0] = '_'
         then let env' = {env with computes_return_value = false} in
              ([], C.Sseq (C.Sblock(expr info env' le),
 		          C.Sblock(expr info env e)))
@@ -657,8 +675,9 @@ module Translate = struct
         | _ -> assert false )
         rets ([], []) in
       let d,s = expr info {env with computes_return_value = false} e1 in
+      let s' = C.add_to_last_call rets s in
       let b = expr info env e2 in
-      d@defs, C.(Sseq(add_to_last_call rets s, Sblock b))
+      d@defs, C.(Sseq(s', Sblock b))
     | Ecase _ -> raise (Unsupported "pattern matching")
     | Eghost _ | Epure _ | Eabsurd -> assert false
 

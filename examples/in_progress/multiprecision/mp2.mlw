@@ -3077,7 +3077,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
 
   (* [(x,sz)] is normalized if its most significant bit is set. *)
   predicate normalized (x:t) (sz:int32) =
-    valid_ptr_itv x (p2i sz) /\ l2i (pelts x)[p2i sz - 1] >= div radix 2
+    valid_ptr_itv x (p2i sz)
+    /\ l2i (pelts x)[x.offset + p2i sz - 1] >= div radix 2
 
   let div_sb_qr (q x y:t) (sx sy:int32) : unit
     requires { 2 <= p2i sy <= p2i sx }
@@ -3102,39 +3103,47 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let x1 = ref (C.get_ofs !xp one) in
     let i = ref (Int32.(-) sx sy) in
     let mdn = Int32.(-) two sy in
-    let q = ref limb_zero in
+    let ql = ref limb_zero in
     while (Int32.(>) !i zero) do
       variant { p2i !i }
+      invariant { 0 <= p2i !i <= p2i sx - p2i sy }
+      invariant { (!qp).offset = q.offset + p2i !i }
+      invariant { (!xp).offset = x.offset + p2i sy + p2i !i - 2 }
+      invariant { plength !qp = plength q }
+      invariant { plength !xp = plength x }
+      invariant { pelts !qp = pelts q }
+      invariant { pelts !xp = pelts x }
       xp := C.incr !xp minus_one;
       if (Limb.(=) !x1 dh && Limb.(=) (C.get_ofs !xp one) dl) (* unlikely *)
       then begin
-        q := Limb.of_int Limb.max_uint64;
-        let _ = submul_limb (C.incr !xp mdn) y !q sy in
+        ql := Limb.of_int Limb.max_uint64;
+        let _ = submul_limb (C.incr !xp mdn) y !ql sy in
         x1 := C.get_ofs !xp one
       end
       else begin
         let qu, rh, rl =
             div3by2_inv !x1 (C.get_ofs !xp one) (C.get !xp) dh dl v in
-        q := qu;
+        ql := qu;
         x1 := rh;
         x0 := rl;
         (* TODO use sy-2 and use the existing x0 and x1 for the last two steps*)
-        let cy = submul_limb (C.incr !xp mdn) y !q sy in
+        let cy = submul_limb (C.incr !xp mdn) y !ql sy in
        (* let cy1 = if (Limb.(<) !x0 cy) then uone else uzero in
         x0 := sub_mod !x0 cy;
         let cy2 = if (Limb.(<) !x1 cy1) then uone else uzero in
-        x1 := sub_mod !x1 cy2;
-        C.set !xp !x0;*)
+        x1 := sub_mod !x1 cy2;*)
+        C.set !xp !x0;
         if Limb.ne cy limb_zero (*unlikely*)
         then begin
           (* TODO should be a simple add in place *)
           let c = addmul_limb (C.incr !xp mdn) y uone sy in
           x1 := Limb.(+) !x1 (Limb.(+) dh c);
-          q := Limb.(-) !q uone;
+          ql := Limb.(-) !ql uone;
 	end;
       end;
       qp := C.incr !qp minus_one;
-      C.set !qp !q
+      C.set !qp !ql;
+      i := Int32.(-) !i one;
     done;
     C.set_ofs !xp one !x1
 
@@ -3172,7 +3181,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       else begin
         let nx = malloc (UInt32.of_int32 (Int32.(+) sx one)) in
         let ny = malloc (UInt32.of_int32 sy) in
-	let _ = lshift ny y sy (Limb.of_int32 clz) in
+	let _c = lshift ny y sy (Limb.of_int32 clz) in
 	let h = lshift nx x sx (Limb.of_int32 clz) in
 	C.set_ofs nx sx h;
 	(* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
