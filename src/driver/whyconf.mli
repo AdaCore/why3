@@ -258,13 +258,6 @@ module Args : sig
     (string -> unit) -> string ->
     config * config * Env.env
 
-  val init : unit -> config * config * Env.env
-
-  val parse :
-    ?extra_help : (Format.formatter -> unit -> unit) ->
-    (string * Arg.spec * string) list ->
-    (string -> unit) -> string -> unit
-
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
 
 end

@@ -440,7 +440,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   let server_data = ref None
 
-  let d () =
+  let get_server_data () =
     match !server_data with
     | None ->
        Format.eprintf "[ITP server] not yet initialized@.";
@@ -490,7 +490,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   (* Init cont on file or directory. It is called only when an
      Open_session_req is requested *)
   let init_cont f =
-    let d = d () in
+    let d = get_server_data () in
     let prover_list = get_prover_list d.config in
     let transformation_list = List.map fst (list_transforms ()) in
     let strategies_list =
@@ -543,7 +543,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | APa _ -> NProofAttempt
 
   let get_node_name (node: any) =
-    let d = d () in
+    let d = get_server_data () in
     match node with
     | AFile file ->
       file.file_name
@@ -631,7 +631,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
 
   let get_prover p =
-    let d = d () in
+    let d = get_server_data () in
     match return_prover p d.config with
     | None -> raise (Bad_prover_name p)
     | Some c -> c
@@ -665,14 +665,15 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
      node_ID -> any -> unit *)
   let iter_subtree_proof_attempt_from_goal
     (f: parent:node_ID -> any -> unit) parent id =
-    let d = d () in
+    let d = get_server_data () in
     Whyconf.Hprover.iter
       (fun _pa panid -> f ~parent (APa panid))
       (get_proof_attempt_ids d.cont.controller_session id)
 
   let rec iter_subtree_from_goal
     (f: parent:node_ID -> any -> unit) parent id =
-    let ses = cont.controller_session in
+    let d = get_server_data () in
+    let ses = d.cont.controller_session in
     f ~parent (APn id);
     let nid = node_ID_from_pn id in
     List.iter
@@ -682,7 +683,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   and iter_subtree_from_trans
     (f: parent:node_ID -> any -> unit) parent trans_id =
-    let ses = cont.controller_session in
+    let d = get_server_data () in
+    let ses = d.cont.controller_session in
     f ~parent (ATn trans_id);
     let nid = node_ID_from_tn trans_id in
     List.iter
@@ -704,7 +706,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       file.file_theories
 
   let iter_the_files (f: parent:node_ID -> any -> unit) parent : unit =
-    let ses = cont.controller_session in
+    let d = get_server_data () in
+    let ses = d.cont.controller_session in
     let files = get_files ses in
     Stdlib.Hstr.iter
       (fun _ file ->
@@ -742,12 +745,13 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   (* -- send the task -- *)
   let send_task nid =
+    let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-      let task = get_task cont.controller_session id in
-      let tables = get_tables cont.controller_session id in
+      let task = get_task d.cont.controller_session id in
+      let tables = get_tables d.cont.controller_session id in
       let s = Pp.string_of
-          (fun fmt -> Driver.print_task ~cntexample:false ?name_table:tables task_driver fmt)
+          (fun fmt -> Driver.print_task ~cntexample:false ?name_table:tables d.task_driver fmt)
           task in
       P.notify (Task (nid,s))
     | _ ->
@@ -810,22 +814,23 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     with Not_found -> ()
 
   let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
+    let d = get_server_data () in
     let prover = p.Whyconf.prover in
-    let callback = callback_update_tree_proof cont in
+    let callback = callback_update_tree_proof d.cont in
     let goals =
       match any_from_node_ID nid with
       | APn pnid   -> [pnid]
       | APa panid  ->
-          let ses = cont.controller_session in
+          let ses = d.cont.controller_session in
           [get_proof_attempt_parent ses panid]
       | ATn tn     ->
-        List.rev (unproven_goals_below_tn cont [] tn)
+        List.rev (unproven_goals_below_tn d.cont [] tn)
       | AFile file ->
-        List.rev (unproven_goals_below_file cont file)
+        List.rev (unproven_goals_below_file d.cont file)
       | ATh th     ->
-        List.rev (unproven_goals_below_th cont [] th)
+        List.rev (unproven_goals_below_th d.cont [] th)
     in
-    List.iter (fun id -> C.schedule_proof_attempt cont id prover
+    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover
                 ~limit ~callback ~notification:notify_change_proved)
       goals
 
@@ -833,26 +838,28 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   (* Callback of a transformation *)
   let callback_update_tree_transform status =
+    let d = get_server_data () in
     match status with
     | TSdone trans_id ->
-      let ses = cont.controller_session in
+      let ses = d.cont.controller_session in
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
       init_and_send_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
       let msg =
-        Pp.sprintf "%a" (get_exception_message cont.controller_session id) e
+        Pp.sprintf "%a" (get_exception_message d.cont.controller_session id) e
       in
       P.notify (Message (Strat_error(node_ID_from_pn id, msg)))
     | _ -> ()
 
   let rec apply_transform nid t args =
+    let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
       let callback = callback_update_tree_transform in
-      C.schedule_transformation cont id t args ~callback ~notification:notify_change_proved
+      C.schedule_transformation d.cont id t args ~callback ~notification:notify_change_proved
     | APa panid ->
-      let parent_id = get_proof_attempt_parent cont.controller_session panid in
+      let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
       let parent = node_ID_from_pn parent_id in
       apply_transform parent t args
     | ATn _ | AFile _ | ATh _ ->
@@ -862,9 +869,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   (* ----------------- run strategy -------------------- *)
 
   let run_strategy_on_task nid s =
+    let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-      let l = strategies cont.controller_env config loaded_strategies in
+      let l = strategies d.cont.controller_env d.config loaded_strategies in
       let st = List.filter (fun (_,c,_,_) -> c=s) l in
       begin
         match st with
@@ -873,16 +881,17 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           let callback sts =
             Format.printf "Strategy status: %a@." print_strategy_status sts
           in
-          let callback_pa = callback_update_tree_proof cont in
+          let callback_pa = callback_update_tree_proof d.cont in
           let callback_tr st = callback_update_tree_transform st in
-          C.run_strategy_on_goal cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved
+          C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved
         | _ -> Format.printf "Strategy '%s' not found@." s
       end
     | _ -> ()
 
   (* ----------------- Save session --------------------- *)
   let save_session () =
-    Session_itp.save_session cont.controller_session;
+    let d = get_server_data () in
+    Session_itp.save_session d.cont.controller_session;
     P.notify Saved
 
   (* ----------------- Reload session ------------------- *)
@@ -896,15 +905,17 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     Hstr.clear file_to_node_ID
 
   let reload_session () : unit =
+    let d = get_server_data () in
     clear_tables ();
-    reload_files cont ~use_shapes:true;
+    reload_files d.cont ~use_shapes:true;
     init_and_send_the_tree ()
 
   let replay_session () : unit =
+    let d = get_server_data () in
     let callback = fun lr ->
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false cont ~callback:callback ~remove_obsolete:false
+    C.replay ~use_steps:false d.cont ~callback:callback ~remove_obsolete:false
 
   (* ----------------- treat_request -------------------- *)
 
@@ -917,6 +928,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       Not_found -> None
 
   let rec treat_request r =
+    let d = get_server_data () in
     try (
     match r with
     | Prove_req (nid,p,limit)      ->
@@ -937,7 +949,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
-        match (interp commands commands_table config cont snid cmd) with
+        match (interp commands commands_table d.config d.cont snid cmd) with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        -> schedule_proof_attempt nid p limit
@@ -948,7 +960,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
             P.notify (Message (Information ("Unknown command"^s)))
       end
     | Add_file_req f ->
-      add_file_to_session cont f
+      add_file_to_session d.cont f
     | Open_session_req file_or_dir_name      ->
       init_cont file_or_dir_name;
       reload_session ()

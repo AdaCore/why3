@@ -131,8 +131,11 @@ let usage_str = sprintf
 
 
 let () =
-    Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+    let config, base_config, env =
+      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+    in
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
     Queue.iter (fun f -> P.push_request (Itp_server.Open_session_req f)) files;
+    S.init_server config env;
     Wserver.main_loop None 6789 handler stdin_handler
