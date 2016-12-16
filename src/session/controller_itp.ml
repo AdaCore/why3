@@ -76,32 +76,13 @@ let clear_proof_state c =
   Htn.clear c.proof_state.tn_state;
   Hpn.clear c.proof_state.pn_state
 
-exception LoadDriverFailure of Whyconf.config_prover * exn
-
-let create_controller env provers =
-  let c = {
+let create_controller env =
+  {
     controller_session = Session_itp.dummy_session;
     proof_state = init_proof_state ();
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
-    }
-  in
-  (* load provers drivers *)
-  Whyconf.Mprover.iter
-    (fun _ p ->
-       try
-         let d = Driver.load_driver env p.Whyconf.driver [] in
-         Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
-       with e -> raise (LoadDriverFailure(p,e))
-(*
-         let p = p.Whyconf.prover in
-         eprintf "Failed to load driver for %s %s: %a@."
-           p.Whyconf.prover_name p.Whyconf.prover_version
-           Exn_printer.exn_printer e
- *)
-)
-    provers;
-  c
+  }
 
 let init_controller s c =
   clear_proof_state (c);

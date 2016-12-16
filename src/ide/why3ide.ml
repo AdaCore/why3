@@ -77,8 +77,6 @@ module S = struct
       ()
 end
 
-module Server = Itp_server.Make (S) (Protocol_why3ide)
-
 (************************)
 (* parsing command line *)
 (************************)
@@ -104,8 +102,9 @@ let usage_str = sprintf
   (Filename.basename Sys.argv.(0))
 
 let gconfig = try
-    let config,base_config = Server.get_configs () in
-    Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+     = Server.get_configs () in
+    let config,base_config, env =
+      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str;
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
     Gconfig.load_config config base_config;
@@ -114,6 +113,10 @@ let gconfig = try
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+module Server = Itp_server.Make (S) (Protocol_why3ide)
+
+let () = Server.init_controller config base_config env
 
 let () =
   Debug.dprintf debug "[GUI] Init the GTK interface...@?";

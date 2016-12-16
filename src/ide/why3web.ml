@@ -33,29 +33,29 @@ let interp_request args =
 
 let print_message_notification fmt n =
   match n with
-  | Error s -> ()
-  | Open_File_Error s -> ()
-  | Proof_error(nid,s) -> ()
-  | Transf_error(nid,s) -> ()
-  | Strat_error(nid,s) -> ()
-  | Replay_Info(s) -> ()
+  | Error _s -> ()
+  | Open_File_Error _s -> ()
+  | Proof_error(_nid,_s) -> ()
+  | Transf_error(_nid,_s) -> ()
+  | Strat_error(_nid,_s) -> ()
+  | Replay_Info(_s) -> ()
   | Query_Info(nid,s) -> fprintf fmt "kind=\"query_info\", node=\"%d\", text=\"%s\"" nid s
   | Query_Error(nid,s) -> fprintf fmt "kind=\"query_error\", node=\"%d\", text=\"%s\"" nid s
   | Help s -> fprintf fmt "kind=\"help\", text=\"%s\"" s
   | Information s -> fprintf fmt "kind=\"information\", text=\"%s\"" s
-  | Task_Monitor(a,b,c) -> ()
+  | Task_Monitor(_a,_b,_c) -> ()
 
 let print_notification fmt n =
   match n with
-  | Node_change(nid,info) -> ()
-  | New_node(nid,nid',nodetype,info) -> ()
-  | Remove(nid) -> ()
-  | Initialized(ginfo) -> ()
+  | Node_change(_nid,_info) -> ()
+  | New_node(_nid,_nid',_nodetype,_info) -> ()
+  | Remove(_nid) -> ()
+  | Initialized(_ginfo) -> ()
   | Saved -> ()
   | Message n -> fprintf fmt "{ notification=\"message=\"; %a }"
                               print_message_notification n
-  | Dead s -> ()
-  | Task(nid,task) -> ()
+  | Dead _s -> ()
+  | Task(_nid,_task) -> ()
 
 let handle_script s args =
   match s with

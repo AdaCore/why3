@@ -431,18 +431,23 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
-  (************************)
-  (* parsing command line *)
-  (************************)
+  type server_data =
+    { config : Whyconf.config;
+      task_driver : Driver.driver;
+      provers : Whyconf.config_prover Whyconf.Mprover.t;
+      cont : Controller_itp.controller;
+    }
 
-  (* Files are passed with request Open *)
-  let config, base_config, env =
-    let c, b, e = Whyconf.Args.init () in
-    c, b, e
+  let server_data = ref None
 
-  let get_configs () = config, base_config
+  let d () =
+    match !server_data with
+    | None ->
+       Format.eprintf "[ITP server] not yet initialized@.";
+       exit 1
+    | Some x -> x
 
-  let task_driver =
+  let task_driver config env =
     try
       let main = Whyconf.get_main config in
       let d = Filename.concat (Whyconf.datadir main)
@@ -452,58 +457,66 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       Debug.dprintf debug "[ITP server] driver for task printing loaded@.";
       d
     with e ->
-         Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
-         exit 1
-
-  let provers : Whyconf.config_prover Whyconf.Mprover.t =
-    Whyconf.get_provers config
+      Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
+      exit 1
 
   let get_prover_list (config: Whyconf.config) =
     Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
 
-  let prover_list: prover list = get_prover_list config
-  let transformation_list: transformation list =
-    List.map fst (list_transforms ())
-  let strategies_list: strategy list =
-    let l = strategies env config loaded_strategies in
-    List.map (fun (a,_,_,_) -> a) l
 
-  let infos =
-    {
-     provers = prover_list;
-     transformations = transformation_list;
-     strategies = strategies_list;
-     commands =
-       List.map (fun (c,_,_) -> c) commands
-    }
-
-  (* Create_controller creates a dummy controller *)
-  let cont =
-    try
-      create_controller env provers
-    with LoadDriverFailure (p,e') as e ->
-      P.notify (Message (Error "To implement: could not load driver"));
-      Format.eprintf "[ITP server] error loading driver for prover %a: %a@."
-                     Whyconf.print_prover p.Whyconf.prover
-                     Exn_printer.exn_printer e';
-      raise e (* TODO *)
+  let init_server config env =
+    let provers = Whyconf.get_provers config in
+    let c = create_controller env in
+    let task_driver = task_driver config env in
+    Whyconf.Mprover.iter
+      (fun _ p ->
+       try
+         let d = Driver.load_driver c.controller_env p.Whyconf.driver [] in
+         Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
+       with e ->
+         Format.eprintf
+           "[ITP server] error loading driver for prover %a: %a@."
+           Whyconf.print_prover p.Whyconf.prover
+           Exn_printer.exn_printer e)
+      provers;
+    server_data := Some
+                     { config = config;
+                       task_driver = task_driver;
+                       provers = provers;
+                       cont = c }
 
   (* ------------ init controller ------------ *)
 
   (* Init cont on file or directory. It is called only when an
      Open_session_req is requested *)
   let init_cont f =
+    let d = d () in
+    let prover_list = get_prover_list d.config in
+    let transformation_list = List.map fst (list_transforms ()) in
+    let strategies_list =
+      let l = strategies d.cont.controller_env d.config loaded_strategies in
+      List.map (fun (a,_,_,_) -> a) l
+    in
+    let infos =
+      {
+        provers = prover_list;
+        transformations = transformation_list;
+        strategies = strategies_list;
+        commands =
+          List.map (fun (c,_,_) -> c) commands
+      }
+    in
     try (
       if (Sys.file_exists f) then
       begin
         if (Sys.is_directory f) then
         begin
-          cont_from_session_dir cont f;
+          cont_from_session_dir d.cont f;
           P.notify (Initialized infos)
         end
         else
         begin
-          cont_from_file cont f;
+          cont_from_file d.cont f;
           P.notify (Initialized infos)
         end
       end
@@ -530,17 +543,18 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | APa _ -> NProofAttempt
 
   let get_node_name (node: any) =
+    let d = d () in
     match node with
     | AFile file ->
       file.file_name
     | ATh th ->
       (theory_name th).Ident.id_string
     | ATn tn ->
-      get_transf_name cont.controller_session tn
+      get_transf_name d.cont.controller_session tn
     | APn pn ->
-      (get_proof_name cont.controller_session pn).Ident.id_string
+      (get_proof_name d.cont.controller_session pn).Ident.id_string
     | APa pa ->
-      let pa = get_proof_attempt_node cont.controller_session pa in
+      let pa = get_proof_attempt_node d.cont.controller_session pa in
       Pp.string_of Whyconf.print_prover pa.prover
 
 (*
@@ -617,7 +631,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
 
   let get_prover p =
-    match return_prover p config with
+    let d = d () in
+    match return_prover p d.config with
     | None -> raise (Bad_prover_name p)
     | Some c -> c
 
@@ -650,9 +665,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
      node_ID -> any -> unit *)
   let iter_subtree_proof_attempt_from_goal
     (f: parent:node_ID -> any -> unit) parent id =
+    let d = d () in
     Whyconf.Hprover.iter
       (fun _pa panid -> f ~parent (APa panid))
-      (get_proof_attempt_ids cont.controller_session id)
+      (get_proof_attempt_ids d.cont.controller_session id)
 
   let rec iter_subtree_from_goal
     (f: parent:node_ID -> any -> unit) parent id =

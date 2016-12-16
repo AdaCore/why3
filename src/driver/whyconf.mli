@@ -251,6 +251,7 @@ val set_family  : config -> string -> Rc.family  -> config
 (** Common command line options *)
 
 module Args : sig
+
   val initialize :
     ?extra_help : (Format.formatter -> unit -> unit) ->
     (string * Arg.spec * string) list ->
@@ -265,4 +266,5 @@ module Args : sig
     (string -> unit) -> string -> unit
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+
 end

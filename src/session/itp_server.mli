@@ -105,7 +105,9 @@ end
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
+(*
   val get_configs: unit -> Whyconf.config * Whyconf.config
+ *)
 
   (* Nothing ! *)
 

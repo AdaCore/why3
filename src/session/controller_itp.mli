@@ -78,10 +78,8 @@ type controller = private
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-exception LoadDriverFailure of Whyconf.config_prover * exn
-val create_controller:
-  Env.env -> Whyconf.config_prover Whyconf.Mprover.t -> controller
-(** creates a controller with an empty session *)
+val create_controller: Env.env -> controller
+(** creates a controller with no prover and an empty session *)
 
 val init_controller: Session_itp.session -> controller -> unit
 (** adds a session to a controller *)

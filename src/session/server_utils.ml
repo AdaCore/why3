@@ -1,5 +1,4 @@
 open Format
-open Stdlib
 open Session_itp
 
 exception NotADirectory of string
