@@ -375,7 +375,7 @@ let (_ : GMenu.menu_item) =
 
 (* TODO key stroked to be decided *)
 let reload_menu_item : GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._E "_Reload session"
+  file_factory#add_item ~key:GdkKeysyms._E "r_Eload session"
     ~callback:(fun () ->
       (* Clearing the tree *)
       clear_tree_and_table goals_model;
@@ -427,6 +427,17 @@ let message_zone =
   in
   GText.view ~editable:false ~cursor_visible:false
     ~packing:sv#add ()
+
+(**** Message-zone printing functions *****)
+
+(* Function used to print stuff on the message_zone *)
+let print_message s =
+  message_zone#buffer#set_text s
+
+let add_to_msg_zone s =
+  let s = message_zone#buffer#get_text () ^ "\n" ^ s in
+  message_zone#buffer#set_text s;
+  message_zone#scroll_to_mark `INSERT
 
 (**** Monitor *****)
 
@@ -748,18 +759,65 @@ let (_ : GtkSignal.id) =
         | [r] -> on_selected_row r
         | _ -> ())
 
+let remove_item: GMenu.menu_item =
+  file_factory#add_item "Remove"
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
+      | _ -> print_message "Select only one node to perform this action")
+
+(*********************************)
+(* add a new file in the project *)
+(*********************************)
+
+let filter_all_files () =
+  let f = GFile.filter ~name:"All" () in
+  f#add_pattern "*" ;
+  f
+
+let filter_why_files () =
+  GFile.filter
+    ~name:"Why3 source files"
+    ~patterns:[ "*.why"; "*.mlw"] ()
+
+let select_file ~request =
+  let d = GWindow.file_chooser_dialog ~action:`OPEN
+    ~title:"Why3: Add file in project"
+    ()
+  in
+  d#add_button_stock `CANCEL `CANCEL ;
+  d#add_select_button_stock `OPEN `OPEN ;
+  d#add_filter (filter_why_files ()) ;
+  d#add_filter (filter_all_files ()) ;
+  begin match d#run () with
+  | `OPEN ->
+      begin
+        match d#filename with
+          | None -> ()
+          | Some f -> request f
+      end
+  | `DELETE_EVENT | `CANCEL -> ()
+  end ;
+  d#destroy ()
+
+let open_item: GMenu.menu_item =
+  file_factory#add_item ~key:GdkKeysyms._A "_Add file"
+    ~callback:(fun () ->
+      select_file ~request:(fun f -> send_request (Add_file_req f)))
+
+let open_session: GMenu.menu_item =
+  file_factory#add_item ~key:GdkKeysyms._O "Open session"
+    ~callback:(fun () ->
+      select_file ~request:(fun f ->
+        (* Clearing the ide tree *)
+        clear_tree_and_table goals_model;
+        (* Adding the root again *)
+        create_root ();
+        send_request (Open_session_req f)))
+
 (*************************)
 (* Notification Handling *)
 (*************************)
-
-(* Function used to print stuff on the message_zone *)
-let print_message s =
-  message_zone#buffer#set_text s
-
-let add_to_msg_zone s =
-  let s = message_zone#buffer#get_text () ^ "\n" ^ s in
-  message_zone#buffer#set_text s;
-  message_zone#scroll_to_mark `INSERT
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
@@ -773,7 +831,6 @@ let treat_message_notification msg = match msg with
   | Information s          -> print_message s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s      -> print_message s
-    (* TODO do not print this particular error *)
   | Error s                ->
       if Debug.test_flag debug then
         print_message s
@@ -808,8 +865,15 @@ let treat_notification n = match n with
         (* TODO for easier testing of IDE *)
         if typ = NGoal then goals_view#selection#select_iter row_ref#iter);
     end
-  | Remove _id                     -> (* TODO *)
-    print_message "got a Remove notification not yet supported\n"
+  | Remove id                     ->
+    let n = get_node_row id in
+    begin
+      ignore (goals_model#remove(n#iter));
+      Hint.remove node_id_to_gtree id;
+      Hint.remove node_id_type id;
+      Hint.remove node_id_proved id;
+      Hint.remove node_id_pa id
+    end
   | Initialized g_info            ->
     (* TODO: treat other *)
     init_completion g_info.provers g_info.transformations g_info.commands;

@@ -371,6 +371,7 @@ type ide_request =
   | Add_file_req      of string
   | Set_max_tasks_req of int
   | Get_task          of node_ID
+  | Remove_subtree    of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
@@ -388,6 +389,7 @@ let print_request fmt r =
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_task _nid                   -> fprintf fmt "get task"
+  | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
@@ -411,7 +413,7 @@ let print_msg fmt m =
 let print_notify fmt n =
   match n with
   | Node_change (_ni, _nf)          -> fprintf fmt "node change"
-  | New_node (ni, _pni, _nt,  _nf) -> fprintf fmt "new node %d" ni
+  | New_node (ni, _pni, _nt,  _nf)  -> fprintf fmt "new node %d" ni
   | Remove _ni                      -> fprintf fmt "remove"
   | Initialized _gi                 -> fprintf fmt "initialized"
   | Saved                           -> fprintf fmt "saved"
@@ -434,7 +436,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   type server_data =
     { config : Whyconf.config;
       task_driver : Driver.driver;
-      provers : Whyconf.config_prover Whyconf.Mprover.t;
+      sd_provers : Whyconf.config_prover Whyconf.Mprover.t;
       cont : Controller_itp.controller;
     }
 
@@ -482,7 +484,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     server_data := Some
                      { config = config;
                        task_driver = task_driver;
-                       provers = provers;
+                       sd_provers = provers;
                        cont = c }
 
   (* ------------ init controller ------------ *)
@@ -944,6 +946,16 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ();
     | Get_Session_Tree_req         -> resend_the_tree ()
+    | Remove_subtree nid           ->
+        let n = any_from_node_ID nid in
+        begin
+        try
+          Session_itp.remove_subtree d.cont.controller_session n ~notification:(fun x ->
+            let nid = node_ID_from_any x in
+            P.notify (Remove nid))
+        with RemoveError -> (* TODO send an error instead of information *)
+          P.notify (Message (Information "Cannot remove a proof node or theory"))
+        end
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
     | Command_req (nid, cmd)       ->

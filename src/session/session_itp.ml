@@ -70,22 +70,8 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
-module Proofnodeid = struct
-  type t = proofNodeID
-  let _compare (x : proofNodeID) y  = Pervasives.compare x y
-  let equal (x : proofNodeID) y = x = y
-  let hash  (x : proofNodeID) = x
-end
-
-module Transid = struct
-  type t = transID
-  let _compare (x : transID) y  = Pervasives.compare x y
-  let equal (x : transID) y = x = y
-  let hash  (x : transID) = x
-end
-
-module Hpn = Exthtbl.Make(Proofnodeid)
-module Htn = Exthtbl.Make(Transid)
+module Hpn = Hint
+module Htn = Hint
 module Hpan = Hint
 
 type session = {
@@ -185,6 +171,7 @@ let get_trans (s : session) (n : int) =
   let _ = Hint.find s.trans_table n in n
 *)
 
+(* Generation of new IDs *)
 let gen_transID (s : session) =
   let id = s.next_transID in
   s.next_transID <- id + 1;
@@ -199,6 +186,8 @@ let gen_proofAttemptID (s : session) =
   let id = s.next_proofAttemptID in
   s.next_proofAttemptID <- id + 1;
   id
+
+(* Get elements of the session tree *)
 
 exception BadID
 
@@ -260,6 +249,98 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
+
+
+(* Remove elements of the session tree *)
+
+let remove_transformation (s : session) (id : transID) =
+  let nt = get_transfNode s id in
+  Hint.remove s.trans_table id;
+  let pn = get_proofNode s nt.transf_parent in
+  let trans_up = List.filter (fun tid -> tid != id) pn.proofn_transformations in
+  pn.proofn_transformations <- trans_up
+
+let remove_proof_attempt (s : session) (id : proofNodeID)
+    (prover : Whyconf.prover) =
+  let pn = get_proofNode s id in
+  let pa = Hprover.find pn.proofn_attempts prover in
+  Hprover.remove pn.proofn_attempts prover;
+  Hint.remove s.proofAttempt_table pa
+
+let remove_proof_attempt_pa s (id: proofAttemptID) =
+  let pa = get_proof_attempt_node s id in
+  let pn = pa.parent in
+  let prover = pa.prover in
+  remove_proof_attempt s pn prover
+
+(* Iterations functions on the session tree *)
+
+let rec fold_all_any_of_transn s f acc trid =
+  let tr = get_transfNode s trid in
+  let acc =
+    List.fold_left
+      (fold_all_any_of_proofn s f)
+      acc tr.transf_subtasks
+  in
+  f acc (ATn trid)
+
+and fold_all_any_of_proofn s f acc pnid =
+  let pn = get_proofNode s pnid in
+  let acc =
+    List.fold_left
+      (fun acc trid ->
+        fold_all_any_of_transn s f acc trid)
+      acc pn.proofn_transformations
+  in
+  let acc =
+    Hprover.fold
+      (fun _p paid acc ->
+        f acc (APa paid))
+      pn.proofn_attempts acc
+  in
+  f acc (APn pnid)
+
+let fold_all_any_of_theory s f acc th =
+  let acc = List.fold_left (fold_all_any_of_proofn s f) acc th.theory_goals in
+  f acc (ATh th)
+
+let fold_all_any_of_file s f acc file =
+  let acc = List.fold_left (fold_all_any_of_theory s f) acc file.file_theories in
+  f acc (AFile file)
+
+let fold_all_any s f acc any =
+  match any with
+  | AFile file -> fold_all_any_of_file s f acc file
+  | ATh th -> fold_all_any_of_theory s f acc th
+  | APn pn -> fold_all_any_of_proofn s f acc pn
+  | ATn tn -> fold_all_any_of_transn s f acc tn
+  | APa _ -> f acc any
+
+exception RemoveError
+
+let remove_subtree s (n: any) ~notification : unit =
+
+  let remove s (n: any) =
+    (* These removal functions should not be used for direct removal: subtrees
+       must be removed first.  *)
+    let remove_file s (f: file) =
+      Hstr.remove s.session_files f.file_name in
+    let remove_proof_node s pnid =
+      Hint.remove s.proofNode_table pnid in
+    let remove_theory _s (_th: theory) =
+      (* Not in any table *)
+      () in
+  match n with
+  | ATn tn -> remove_transformation s tn
+  | APa pa -> remove_proof_attempt_pa s pa
+  | AFile f -> remove_file s f
+  | APn pn -> remove_proof_node s pn
+  | ATh th -> remove_theory s th
+  in
+  match n with
+  | APn _pn -> raise RemoveError
+  | ATh _th -> raise RemoveError
+  | _ -> ignore (fold_all_any s (fun acc x -> remove s x; notification x; acc) [] n)
 
 let rec fold_all_sub_goals_of_proofn s f acc pnid =
   let pn = get_proofNode s pnid in
@@ -384,10 +465,6 @@ let graft_proof_attempt (s : session) (id : proofNodeID) (pr : Whyconf.prover)
                 Call_provers.limit_steps = -1; } in
   add_proof_attempt s pr limit None false None id
 
-let remove_proof_attempt (s : session) (id : proofNodeID)
-    (prover : Whyconf.prover) =
-  let pn = get_proofNode s id in
-  Hprover.remove pn.proofn_attempts prover
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
    of proofNodeID [id] of parent [p] of task [t] *)
@@ -455,12 +532,6 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
   mk_transf_node s id tid name args sub_tasks;
   tid
 
-let remove_transformation (s : session) (id : transID) =
-  let nt = get_transfNode s id in
-  Hint.remove s.trans_table id;
-  let pn = get_proofNode s nt.transf_parent in
-  let trans_up = List.filter (fun tid -> tid != id) pn.proofn_transformations in
-  pn.proofn_transformations <- trans_up
 
 let update_proof_attempt s id pr st =
   let n = get_proofNode s id in
@@ -1114,8 +1185,6 @@ let make_theory_section ~use_shapes ?merge (s:session) parent_name (th:Theory.th
 let add_file_section ~use_shapes (s:session) (fn:string)
     (theories:Theory.theory list) format : unit =
   let fn = Sysutil.relativize_filename s.session_dir fn in
-  Format.eprintf "TODO %s\n" fn;
-  Hstr.iter (fun x _i -> Format.eprintf "TOD %s\n" x) s.session_files;
   if Hstr.mem s.session_files fn then
     Debug.dprintf debug "[session] file %s already in database@." fn
   else

@@ -156,3 +156,11 @@ val load_session : string -> session * bool
     raises [ShapesFileError msg] if the database extra file for shapes
     cannot be read.
  *)
+
+exception RemoveError
+
+val remove_subtree: session -> any -> notification:(any -> unit) -> unit
+(** [remove_subtree s a notification] remove the subtree originating from a in
+    session s then call the notification function (used to notify the ide.
+
+    If called on a theory or proof node, raise RemoveError *)

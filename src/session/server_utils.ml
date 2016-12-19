@@ -25,7 +25,7 @@ let cont_from_session_dir cont dir =
   eprintf "using shapes: %a@." pp_print_bool use_shapes;
   (* create the controller *)
   Controller_itp.init_controller ses cont;
- (* update the session *)
+  (* update the session *)
   Controller_itp.reload_files cont ~use_shapes
 
 (* If we have a file we chop it and return new session based on the directory *)

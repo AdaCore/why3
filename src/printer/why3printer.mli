@@ -20,8 +20,6 @@
 
 *)
 
-open Ident
-
 val print_ls   : Task.name_tables -> Format.formatter -> Term.lsymbol  -> unit
 val print_tv   : Task.name_tables -> Format.formatter -> Ty.tvsymbol   -> unit
 val print_ts   : Task.name_tables -> Format.formatter -> Ty.tysymbol   -> unit
