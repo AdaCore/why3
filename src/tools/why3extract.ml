@@ -13,6 +13,8 @@ open Format
 open Why3
 open Stdlib
 open Pmodule
+(* open Compile (\* intermediate ML AST *\) *)
+open Ocaml_printer
 
 let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
@@ -128,14 +130,22 @@ let extract_to =
 let rec use_iter f l =
   List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
 
+let test_extract fmt m =
+  print_module fmt m;
+  fprintf fmt "@\n@\n";
+  (* Translate.module_ m *)
+  extract_module fmt m
+
 let rec do_extract_module ?fname m =
+  test_extract (Format.formatter_of_out_channel stdout) m;
   let extract_use m' =
     let fname =
       if m'.mod_theory.Theory.th_path = [] then fname else None
     in
     do_extract_module ?fname m'
   in
-  use_iter extract_use m.mod_units;
+  (* for now, do not do a recursive extraction *)
+  (* use_iter extract_use m.mod_units; *)
   extract_to ?fname m
 
 let do_global_extract (_,p,t) =

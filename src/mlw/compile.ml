@@ -48,6 +48,7 @@
 
 open Ident
 open Ity
+open Term
 
 module ML = struct
 
@@ -79,8 +80,9 @@ module ML = struct
     | Xexit             (* Pervasives.Exit *)
 
   type expr = {
-    e_node : expr_node;
-    e_ity  : ity;
+    e_node   : expr_node;
+    e_ity    : ity;
+    e_effect : effect;
   }
 
   and expr_node =
@@ -119,6 +121,68 @@ module ML = struct
         (* TODO add return type? *)
     | Dexn  of ident * ty option
 
+  let create_expr e_node e_ity e_effect =
+    { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
+
 (* TODO add here some smart constructors for ML expressions *)
+
+end
+
+(** Translation from Mlw to ML *)
+
+module Translate = struct
+
+  open Expr    (* Mlw expressions *)
+
+  open Pmodule (* for the type of modules *)
+  open Pdecl   (* for the type of program declarations *)
+
+  (** programs *)
+
+  let pv_name pv = pv.pv_vs.vs_name
+
+  (* expressions *)
+  let rec expr e =
+    match e.e_node with
+    | Evar pvs ->
+       let pv_id = pv_name pvs in
+       ML.create_expr (ML.Eident pv_id) e.e_ity e.e_effect
+    | _ -> assert false (* TODO *)
+
+  (* program declarations *)
+  let pdecl pd =
+    match pd.pd_node with
+    | PDlet (LDvar (_, _)) ->
+       []
+    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cfun e})) ->
+       [ML.Dlet (false, [rsn, [], expr e])]
+    | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
+       Format.printf "LDsym Capp--> %s@." rsn.id_string;
+       []
+    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cpur _})) ->
+       Format.printf "LDsym Cpur--> %s@." rsn.id_string;
+       []
+    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cany})) ->
+       Format.printf "LDsym Cany--> %s@." rsn.id_string;
+       []
+    | PDlet (LDrec _) ->
+       []
+    | PDpure ->
+       []
+    | _ -> (* TODO *) assert false
+
+  (* unit module declarations *)
+  let mdecl = function
+    | Udecl pd ->
+       pdecl pd
+    | Uuse _ ->
+       []
+    | Uscope _ ->
+       []
+    | _ -> (* TODO *) assert false
+
+  (* modules *)
+  let module_ m =
+    List.concat (List.map mdecl m.mod_units)
 
 end
