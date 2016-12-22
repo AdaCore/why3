@@ -48,6 +48,7 @@
 
 open Ident
 open Ity
+open Ty
 open Term
 
 module ML = struct
@@ -124,7 +125,11 @@ module ML = struct
   let create_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
 
-(* TODO add here some smart constructors for ML expressions *)
+  (* TODO add here some smart constructors for ML expressions *)
+  let ml_let id e1 e2 =
+    Elet (id, e1, e2)
+
+  let tunit = Ttuple []
 
 end
 
@@ -137,9 +142,30 @@ module Translate = struct
   open Pmodule (* for the type of modules *)
   open Pdecl   (* for the type of program declarations *)
 
+  (* types *)
+  let rec type_ ty =
+    match ty.ty_node with
+    | Tyvar tvs ->
+       ML.Tvar tvs.tv_name
+    | Tyapp (ts, tyl) when is_ts_tuple ts ->
+       ML.Ttuple (List.map type_ tyl)
+    | Tyapp (ts, tyl) ->
+       ML.Tapp (ts.ts_name, List.map type_ tyl)
+
+  let vsty vs =
+    vs.vs_name, type_ vs.vs_ty
+
   (** programs *)
 
   let pv_name pv = pv.pv_vs.vs_name
+
+  let pvty pv =
+    if pv.pv_ghost then (pv_name pv, ML.tunit)
+    else vsty pv.pv_vs
+
+  (* function arguments *)
+  let args = (* point-free *)
+    List.map pvty
 
   (* expressions *)
   let rec expr e =
@@ -147,6 +173,9 @@ module Translate = struct
     | Evar pvs ->
        let pv_id = pv_name pvs in
        ML.create_expr (ML.Eident pv_id) e.e_ity e.e_effect
+    | Elet (LDvar (pvs, e1), e2) ->
+       let ml_let = ML.ml_let (pv_name pvs) (expr e1) (expr e2) in
+       ML.create_expr ml_let e.e_ity e.e_effect
     | _ -> assert false (* TODO *)
 
   (* program declarations *)
@@ -154,8 +183,8 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDvar (_, _)) ->
        []
-    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cfun e})) ->
-       [ML.Dlet (false, [rsn, [], expr e])]
+    | PDlet (LDsym ({rs_name = rsn; rs_cty = cty}, {c_node = Cfun e})) ->
+       [ML.Dlet (false, [rsn, args cty.cty_args, expr e])]
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
        Format.printf "LDsym Capp--> %s@." rsn.id_string;
        []
@@ -186,3 +215,9 @@ module Translate = struct
     List.concat (List.map mdecl m.mod_units)
 
 end
+
+(*
+ * Local Variables:
+ * compile-command: "make -C ../.."
+ * End:
+ *)

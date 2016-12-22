@@ -1,0 +1,22 @@
+module M
+
+  use import int.Int
+
+  let f (y: int) (x: int) : int
+    requires { x >= 0 }
+    ensures  { result >= 0 }
+  = x
+
+  let g (x: int) : int
+    requires { x > 0 }
+    ensures  { result > 0 }
+  = let y = x in
+    y
+
+end
+
+(*
+ * Local Variables:
+ * compile-command: "../bin/why3extract -D ../drivers/c.drv -o extract test_extraction_mario.mlw"
+ * End:
+ *)
