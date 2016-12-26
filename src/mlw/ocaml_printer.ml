@@ -16,7 +16,6 @@ open Format
 open Pmodule
 open Theory
 open Ident
-open Printer
 open Pp
 
 module Print = struct
@@ -50,40 +49,41 @@ module Print = struct
   let print_tv fmt tv =
     fprintf fmt "'%s" (id_unique aprinter tv)
 
+  (** Types *)
+
+  let protect_on b s =
+    if b then "(" ^^ s ^^ ")" else s
+
   let star fmt () = fprintf fmt " *@ "
 
-  let rec print_ty fmt = function
+  let rec print_ty ?(paren=false) fmt = function
     | Tvar id ->
        print_tv fmt id
     | Ttuple [] ->
        fprintf fmt "unit"
     | Ttuple tl ->
-       fprintf fmt "%a" (print_list star print_ty) tl
+       fprintf fmt (protect_on paren "%a") (print_list star (print_ty ~paren:false)) tl
     | Tapp (ts, []) ->
        print_ident fmt ts
     | Tapp (ts, [ty]) ->
-       fprintf fmt "%a@ %a" print_ty ty print_ident ts
+       fprintf fmt (protect_on paren "%a@ %a")
+               (print_ty ~paren:true) ty print_ident ts
     | Tapp (ts, tl) ->
-       fprintf fmt "(%a)@ %a"
-               (print_list comma print_ty) tl
+       fprintf fmt (protect_on paren "(%a)@ %a")
+               (print_list comma (print_ty ~paren:false)) tl
                print_ident ts
 
   let print_vsty fmt (v, ty) =
-    fprintf fmt "%a:@ %a" print_ident v print_ty ty
+    fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false) ty
+
+  let print_tv_arg = print_tv
+  let print_tv_args fmt = function
+    | []   -> ()
+    | [tv] -> fprintf fmt "%a@ " print_tv_arg tv
+    | tvl  -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
   let print_vs_arg fmt vs =
     fprintf fmt "@[(%a)@]" print_vsty vs
-
-  let rec print_ty fmt = function
-    | Tvar id ->
-       print_tv fmt id
-    | Ttuple [] ->
-       fprintf fmt "unit"
-    | Ttuple tl ->
-       fprintf fmt "%a" (print_list star print_ty) tl
-    | Tapp (ts, []) ->
-       print_ident fmt ts
-    | _ -> assert false (* TODO *)
 
   let print_path =
     print_list dot pp_print_string (* point-free *)
@@ -106,10 +106,38 @@ module Print = struct
                print_ident id
                print_expr e1
                print_expr e2
-    | _ -> assert false (* TODO *)
+    | _ -> (* TODO *) assert false
 
   and print_expr fmt e =
     print_enode fmt e.e_node
+
+  let print_type_decl fmt (id, args, tydef) =
+    let print_constr fmt (id, constrs) =
+      match constrs with
+      | [] ->
+         fprintf fmt "@[<hov 4>| %a@]"
+                 print_ident id (* FIXME: first letter must be uppercase
+                                       -> print_uident *)
+      | l ->
+         fprintf fmt "@[<hov 4>| %a of %a@]"
+                 print_ident id (* FIXME: print_uident *)
+                 (print_list star (print_ty ~paren:false)) l
+    in
+    let print_def fmt = function
+      | Dabstract ->
+         ()
+      | Ddata csl ->
+         fprintf fmt " =@\n%a" (print_list newline print_constr) csl
+      | Dalias ty ->
+         fprintf fmt " =@ %a" (print_ty ~paren:false) ty
+      | _ -> (* TODO *) assert false
+    in
+    fprintf fmt "@[<hov 2>%s %a%a%a@]"
+            (if true then "type" else "and") (* FIXME: mutual recursive types *)
+            print_tv_args args
+            print_ident id  (* FIXME: first letter must be lowercase
+                                   -> print_lident *)
+            print_def tydef
 
   let print_decl fmt = function
     | Dlet (isrec, [id, vl, e]) ->
@@ -119,7 +147,10 @@ module Print = struct
                (print_list space print_vs_arg) vl
                print_expr e;
        fprintf fmt "@\n@\n"
-    | _ -> assert false (* TODO *)
+    | Dtype dl ->
+       print_list newline print_type_decl fmt dl;
+       fprintf fmt "@\n@\n"
+    | _ -> (* TODO *) assert false
 
 end
 

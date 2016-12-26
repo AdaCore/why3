@@ -122,7 +122,7 @@ module ML = struct
         (* TODO add return type? *)
     | Dexn  of ident * ty option
 
-  let create_expr e_node e_ity e_effect =
+  let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
 
   (* TODO add here some smart constructors for ML expressions *)
@@ -155,7 +155,19 @@ module Translate = struct
   let vsty vs =
     vs.vs_name, type_ vs.vs_ty
 
+  let type_args = (* point-free *)
+    List.map (fun x -> x.tv_name)
+
   (** programs *)
+
+  (* individual types *)
+  let rec ity t =
+    match t.ity_node with
+    | Ityvar ({tv_name = tv}, _) ->
+       ML.Tvar tv
+    | Ityapp ({its_ts = ts}, itl, _) ->
+       ML.Tapp (ts.ts_name, List.map ity itl)
+    | _ -> (* TODO *) assert false
 
   let pv_name pv = pv.pv_vs.vs_name
 
@@ -172,11 +184,39 @@ module Translate = struct
     match e.e_node with
     | Evar pvs ->
        let pv_id = pv_name pvs in
-       ML.create_expr (ML.Eident pv_id) e.e_ity e.e_effect
+       ML.mk_expr (ML.Eident pv_id) e.e_ity e.e_effect
     | Elet (LDvar (pvs, e1), e2) ->
        let ml_let = ML.ml_let (pv_name pvs) (expr e1) (expr e2) in
-       ML.create_expr ml_let e.e_ity e.e_effect
-    | _ -> assert false (* TODO *)
+       ML.mk_expr ml_let e.e_ity e.e_effect
+    | _ -> (* TODO *) assert false
+
+  let its_args ts = ts.its_ts.ts_args
+  let itd_name td = td.itd_its.its_ts.ts_name
+
+  let ddata_constructs = (* point-free *)
+    List.map (fun ({rs_cty = rsc} as rs) ->
+        rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
+
+  (** Question pour Jean-Christophe et Andreï :
+       est-ce que vous pouriez m'expliquer le champ itd_fields,
+       utilisé dans une déclaration de type ? *)
+
+  (* type declarations/definitions *)
+  let tdef itd =
+    let s = itd.itd_its in
+    let id = itd_name itd in
+    let args = its_args s in
+    begin match s.its_def, itd.itd_constructors with
+      | None, [] ->
+         (* let args = its_args s in *)
+         ML.Dtype [id, type_args args, ML.Dabstract]
+      | None, cl ->
+         (* let args = its_args s in *)
+         ML.Dtype [id, type_args args, ML.Ddata (ddata_constructs cl)]
+      | Some t, _ ->
+         ML.Dtype [id, type_args args, ML.Dalias (ity t)]
+      (* | _ -> (\* TODO *\) assert false *)
+    end
 
   (* program declarations *)
   let pdecl pd =
@@ -198,6 +238,8 @@ module Translate = struct
        []
     | PDpure ->
        []
+    | PDtype itl ->
+       List.map tdef itl
     | _ -> (* TODO *) assert false
 
   (* unit module declarations *)
