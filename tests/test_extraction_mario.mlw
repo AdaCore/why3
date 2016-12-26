@@ -1,13 +1,14 @@
 module M
 
   use import int.Int
+  use import seq.Seq
 
-  let f (y: int) (x: int) : int
+  let function f (y: int) (x: int) : int
     requires { x >= 0 }
     ensures  { result >= 0 }
   = x
 
-  let g (x: int) : int
+  let g (ghost z: int) (x: int) : int
     requires { x > 0 }
     ensures  { result > 0 }
   = let y = x in
@@ -22,6 +23,13 @@ module M
   type ntree 'a = Empty | Node 'a (list 'a)
 
   type list_int = list int
+
+  type cursor 'a = {
+    collection : list 'a;
+    index      : int;
+    mutable index2     : int;
+    ghost mutable v : seq 'a;
+  }
 
 end
 

@@ -193,29 +193,40 @@ module Translate = struct
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
 
+  let drecord_fields {itd_its = its; itd_fields = fl} =
+    List.map (fun ({rs_cty = rsc} as rs) ->
+      (List.exists (pv_equal (Opt.get rs.rs_field)) its.its_mfields),
+      rs.rs_name,
+      if rs_ghost rs then ML.tunit else ity rsc.cty_result) fl
+
   let ddata_constructs = (* point-free *)
     List.map (fun ({rs_cty = rsc} as rs) ->
-        rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
+      rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
 
   (** Question pour Jean-Christophe et Andreï :
-       est-ce que vous pouriez m'expliquer le champ itd_fields,
-       utilisé dans une déclaration de type ? *)
+       est-ce que vous pouriez m'expliquer le champ [itd_fields],
+       utilisé dans une définition de type ([its_defn]) ?
+       MIS-À-JOUR : je viens de coder l'extraction d'une définition
+         d'un type enregistrement et je comprends maintenant que che
+         champ est utilisé pour stocker les champs d'une définition de
+         type enregistrement. Je veux toujours savoir s'il y a des
+         cas particulaires d'utilisation, en particulier vis-à-vis du
+         champ [itd_constructors] *)
 
   (* type declarations/definitions *)
   let tdef itd =
     let s = itd.itd_its in
     let id = itd_name itd in
     let args = its_args s in
-    begin match s.its_def, itd.itd_constructors with
-      | None, [] ->
-         (* let args = its_args s in *)
+    begin match s.its_def, itd.itd_constructors, itd.itd_fields with
+      | None, [], [] ->
          ML.Dtype [id, type_args args, ML.Dabstract]
-      | None, cl ->
-         (* let args = its_args s in *)
+      | None, cl, [] ->
          ML.Dtype [id, type_args args, ML.Ddata (ddata_constructs cl)]
-      | Some t, _ ->
+      | None, _, _ ->
+         ML.Dtype [id, type_args args, ML.Drecord (drecord_fields itd)]
+      | Some t, _, _ ->
          ML.Dtype [id, type_args args, ML.Dalias (ity t)]
-      (* | _ -> (\* TODO *\) assert false *)
     end
 
   (* program declarations *)
@@ -260,6 +271,6 @@ end
 
 (*
  * Local Variables:
- * compile-command: "make -C ../.."
+ * compile-command: "make -C ../.. -j3"
  * End:
  *)

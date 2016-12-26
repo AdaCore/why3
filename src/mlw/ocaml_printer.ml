@@ -112,8 +112,8 @@ module Print = struct
     print_enode fmt e.e_node
 
   let print_type_decl fmt (id, args, tydef) =
-    let print_constr fmt (id, constrs) =
-      match constrs with
+    let print_constr fmt (id, cs_args) =
+      match cs_args with
       | [] ->
          fprintf fmt "@[<hov 4>| %a@]"
                  print_ident id (* FIXME: first letter must be uppercase
@@ -123,14 +123,21 @@ module Print = struct
                  print_ident id (* FIXME: print_uident *)
                  (print_list star (print_ty ~paren:false)) l
     in
+    let print_field fmt (is_mutable, id, ty) =
+      fprintf fmt "%s%a: %a;"
+              (if is_mutable then "mutable " else "")
+              print_ident id
+              (print_ty ~paren:false) ty
+    in
     let print_def fmt = function
       | Dabstract ->
          ()
       | Ddata csl ->
          fprintf fmt " =@\n%a" (print_list newline print_constr) csl
+      | Drecord fl ->
+         fprintf fmt " = {@\n%a@\n}" (print_list newline print_field) fl
       | Dalias ty ->
          fprintf fmt " =@ %a" (print_ty ~paren:false) ty
-      | _ -> (* TODO *) assert false
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
             (if true then "type" else "and") (* FIXME: mutual recursive types *)
@@ -161,3 +168,9 @@ let extract_module fmt m =
   let mdecls = Translate.module_ m in
   print_list nothing Print.print_decl fmt mdecls;
   fprintf fmt "@."
+
+(*
+ * Local Variables:
+ * compile-command: "make -C ../.. -j3"
+ * End:
+ *)
