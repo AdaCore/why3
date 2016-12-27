@@ -49,12 +49,12 @@ module Print = struct
   let print_tv fmt tv =
     fprintf fmt "'%s" (id_unique aprinter tv)
 
-  (** Types *)
-
   let protect_on b s =
     if b then "(" ^^ s ^^ ")" else s
 
   let star fmt () = fprintf fmt " *@ "
+
+  (** Types *)
 
   let rec print_ty ?(paren=false) fmt = function
     | Tvar id ->
@@ -62,7 +62,8 @@ module Print = struct
     | Ttuple [] ->
        fprintf fmt "unit"
     | Ttuple tl ->
-       fprintf fmt (protect_on paren "%a") (print_list star (print_ty ~paren:false)) tl
+       fprintf fmt (protect_on paren "@[%a@]")
+               (print_list star (print_ty ~paren:false)) tl
     | Tapp (ts, []) ->
        print_ident fmt ts
     | Tapp (ts, [ty]) ->
@@ -98,15 +99,47 @@ module Print = struct
   let print_module_name fmt m =
     print_theory_name fmt m.mod_theory
 
+  let rec print_pat fmt = function
+    | Pwild ->
+       fprintf fmt "_"
+    | Pident id ->
+       print_ident fmt id
+    | Pas (p, id) ->
+       fprintf fmt "%a as %a" print_pat p print_ident id
+    | Por (p1, p2) ->
+       fprintf fmt "%a | %a" print_pat p1 print_pat p2
+    | Ptuple pl ->
+       fprintf fmt "(%a)" (print_list comma print_pat) pl
+    | Papp (id, []) ->
+       print_ident fmt id
+    | Papp (id, [p]) ->
+       fprintf fmt "%a %a" print_ident id print_pat p
+    | Papp (id, pl) ->
+       fprintf fmt "%a (%a)" print_ident id (print_list comma print_pat) pl
+    | Precord fl ->
+       let print_field fmt (id, p) =
+         fprintf fmt "%a = %a" print_ident id print_pat p
+       in
+       fprintf fmt "{ %a }" (print_list semi print_field) fl
+
   let rec print_enode fmt = function
     | Eident id ->
        print_ident fmt id
     | Elet (id, e1, e2) ->
        fprintf fmt "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a"
-               print_ident id
-               print_expr e1
-               print_expr e2
+         print_ident id print_expr e1 print_expr e2
+    | Eabsurd ->
+       fprintf fmt "assert false (* absurd *)"
+    | Eapp (e, el) ->
+       fprintf fmt "@[<hov 2>%a %a@]"
+         print_ident e (print_list space print_ident) el
+    | Ematch (e, pl) ->
+       fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
+         print_expr e (print_list newline print_branch) pl
     | _ -> (* TODO *) assert false
+
+  and print_branch fmt (p, e) =
+    fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e
 
   and print_expr fmt e =
     print_enode fmt e.e_node
@@ -157,6 +190,11 @@ module Print = struct
     | Dtype dl ->
        print_list newline print_type_decl fmt dl;
        fprintf fmt "@\n@\n"
+    | Dexn (id, None) ->
+       fprintf fmt "exception %a@\n@\n" print_ident id
+    | Dexn (id, Some t) ->
+       fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
+               print_ident id (print_ty ~paren:true) t
     | _ -> (* TODO *) assert false
 
 end

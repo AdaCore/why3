@@ -31,6 +31,24 @@ module M
     ghost mutable v : seq 'a;
   }
 
+  exception Empty (list int, int)
+  exception Out_of_bounds int
+
+  let rec length (x: int) (l: list 'a) : int
+    variant  { l }
+  = match l with
+    | Nil -> x
+    | Cons _ r -> length x r
+    end
+
+  let t (x:int) : int
+    requires { false }
+  = absurd
+
+  let rec ff (x: int) : int
+    diverges
+  = ff x
+
 end
 
 (*

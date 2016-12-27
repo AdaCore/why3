@@ -44,6 +44,17 @@
 
 *)
 
+(*
+  Questions pour Jean-Christophe et Andreï :
+    - est-ce qu'il y a des utilisations particulières du champ
+      [itd_fields], vis-à-vis du champ [itd_constructors] ?
+
+    - comme l'AST [expr] est déjà en forme normale-A, est-ce que je
+      peux utiliser des applications de la forme [Eapp ident * ident list] ?
+
+*)
+
+
 (** Abstract syntax of ML *)
 
 open Ident
@@ -80,6 +91,8 @@ module ML = struct
     | Xsyntax of string
     | Xexit             (* Pervasives.Exit *)
 
+  type ity = I of Ity.ity | C of Ity.cty (* TODO: keep like this? *)
+
   type expr = {
     e_node   : expr_node;
     e_ity    : ity;
@@ -90,7 +103,7 @@ module ML = struct
     | Econst  of Number.integer_constant
     | Ebool   of bool
     | Eident  of ident
-    | Eapp    of expr * expr list
+    | Eapp    of ident * ident list
     | Efun    of var list * expr
     | Elet    of ident * expr * expr
     | Eletrec of is_rec * (ident * var list * expr) list * expr
@@ -125,7 +138,7 @@ module ML = struct
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
 
-  (* TODO add here some smart constructors for ML expressions *)
+  (* smart constructors *)
   let ml_let id e1 e2 =
     Elet (id, e1, e2)
 
@@ -158,6 +171,21 @@ module Translate = struct
   let type_args = (* point-free *)
     List.map (fun x -> x.tv_name)
 
+  let rec pat p =
+    match p.pat_node with
+    | Pwild ->
+       ML.Pwild
+    | Pvar vs ->
+       ML.Pident vs.vs_name
+    | Por (p1, p2) ->
+       ML.Por (pat p1, pat p2)
+    | Pas (p, vs) ->
+       ML.Pas (pat p, vs.vs_name)
+    | Papp (ls, pl) when is_fs_tuple ls ->
+       ML.Ptuple (List.map pat pl)
+    | Papp (ls, pl) ->
+       ML.Papp (ls.ls_name, List.map pat pl)
+
   (** programs *)
 
   (* individual types *)
@@ -165,6 +193,8 @@ module Translate = struct
     match t.ity_node with
     | Ityvar ({tv_name = tv}, _) ->
        ML.Tvar tv
+    | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
+       ML.Ttuple (List.map ity itl)
     | Ityapp ({its_ts = ts}, itl, _) ->
        ML.Tapp (ts.ts_name, List.map ity itl)
     | _ -> (* TODO *) assert false
@@ -175,6 +205,10 @@ module Translate = struct
     if pv.pv_ghost then (pv_name pv, ML.tunit)
     else vsty pv.pv_vs
 
+  let for_direction = function
+    | To -> ML.To
+    | DownTo -> ML.DownTo
+
   (* function arguments *)
   let args = (* point-free *)
     List.map pvty
@@ -184,11 +218,24 @@ module Translate = struct
     match e.e_node with
     | Evar pvs ->
        let pv_id = pv_name pvs in
-       ML.mk_expr (ML.Eident pv_id) e.e_ity e.e_effect
+       ML.mk_expr (ML.Eident pv_id) (ML.I e.e_ity) e.e_effect
     | Elet (LDvar (pvs, e1), e2) ->
        let ml_let = ML.ml_let (pv_name pvs) (expr e1) (expr e2) in
-       ML.mk_expr ml_let e.e_ity e.e_effect
+       ML.mk_expr ml_let (ML.I e.e_ity) e.e_effect
+    | Eexec ({c_node = Capp (rs, pvl)}, _) ->
+       let rs_id = rs.rs_name in
+       let pv_id = List.map pv_name pvl in
+       ML.mk_expr (ML.Eapp (rs_id, pv_id)) (ML.I e.e_ity) e.e_effect
+    | Eabsurd ->
+       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) e.e_effect
+    | Ecase (e1, pl) ->
+       let e1 = expr e1 in
+       let pl = List.map ebranch pl in
+       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) e.e_effect
     | _ -> (* TODO *) assert false
+
+  and ebranch ({pp_pat = p}, e) =
+    pat p, expr e
 
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
@@ -202,16 +249,6 @@ module Translate = struct
   let ddata_constructs = (* point-free *)
     List.map (fun ({rs_cty = rsc} as rs) ->
       rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
-
-  (** Question pour Jean-Christophe et Andreï :
-       est-ce que vous pouriez m'expliquer le champ [itd_fields],
-       utilisé dans une définition de type ([its_defn]) ?
-       MIS-À-JOUR : je viens de coder l'extraction d'une définition
-         d'un type enregistrement et je comprends maintenant que che
-         champ est utilisé pour stocker les champs d'une définition de
-         type enregistrement. Je veux toujours savoir s'il y a des
-         cas particulaires d'utilisation, en particulier vis-à-vis du
-         champ [itd_constructors] *)
 
   (* type declarations/definitions *)
   let tdef itd =
@@ -245,23 +282,27 @@ module Translate = struct
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Cany})) ->
        Format.printf "LDsym Cany--> %s@." rsn.id_string;
        []
-    | PDlet (LDrec _) ->
-       []
+    | PDlet (LDrec rl) ->
+       let rec_def =
+         List.map (fun {rec_fun = e; rec_rsym = rs} ->
+           let e = match e.c_node with Cfun e -> e | _ -> assert false in
+           rs.rs_name, args rs.rs_cty.cty_args, expr e) rl in
+       [ML.Dlet (true, rec_def)]
     | PDpure ->
        []
     | PDtype itl ->
        List.map tdef itl
-    | _ -> (* TODO *) assert false
+    | PDexn ({xs_name = xsn} as xs) ->
+       if ity_equal xs.xs_ity ity_unit then
+         [ML.Dexn (xsn, None)]
+       else
+         [ML.Dexn (xsn, Some (ity xs.xs_ity))]
 
   (* unit module declarations *)
   let mdecl = function
     | Udecl pd ->
        pdecl pd
-    | Uuse _ ->
-       []
-    | Uscope _ ->
-       []
-    | _ -> (* TODO *) assert false
+    |  _ -> (* TODO *) []
 
   (* modules *)
   let module_ m =
