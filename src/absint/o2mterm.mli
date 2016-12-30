@@ -9,4 +9,5 @@ module Make : functor (S:sig type t end) -> sig
   val to_t: t -> Term.term -> S.t
   val union: (S.t -> S.t -> unit) -> t -> t -> t
   val card: t -> int
+  val get_inconsistent: t -> t -> Term.term list
 end

@@ -128,7 +128,26 @@ module Make(S:sig
   let print fmt (a, b) = A.print fmt a
 
   let join (man, uf_man) (a, b) (c, d) =
+    (* Why3 terms and APRON variables must be kept consistent. So. First there is
+     * the case where two different terms are linked to the same APRON variable.
+     * One on them must be erased. *)
+    let terms = TermToVar.get_inconsistent b.uf_to_var d.uf_to_var in
+    let c, d = List.fold_left (fun (c, d) t ->
+        let v = TermToVar.to_t d.uf_to_var t in
+        let d = { d with uf_to_var = TermToVar.remove_term d.uf_to_var t } in
+        let c = try
+            TermToVar.to_term d.uf_to_var v |> ignore;
+            c
+          with
+          | Not_found ->
+            D.forget_array man c [|v|] false
+        in
+        c, d) (c, d) terms
+    in
+
     let a = A.join man a c in
+    (* And then join_uf takes care of one term linked to 2 variables. (They are made equal,
+     * and then forgotten.) *)
     let a, e = join_uf (man, uf_man) a b d in
     a, e
 

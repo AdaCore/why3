@@ -468,16 +468,18 @@ module Make(E: sig
 
     | Eif(cond, b, c) ->
       (* Condition expression *)
-      let cond_term = 
+      let cond_term, not_cond_term = 
         match Expr.term_of_expr ~prop:true cond with
         | Some s ->
-          s
+          s, t_not s
         | None ->
-          Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated (migth even be wrong if there are exceptions)";
-          Term.t_true
+          Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated@.";
+          Expr.print_expr Format.err_formatter cond;
+          Format.eprintf "@.";
+          Term.t_true, Term.t_true
       in
       let constraints = D.meet_term manpk cond_term in
-      let constraints_not = D.meet_term manpk (t_not cond_term) in
+      let constraints_not = D.meet_term manpk not_cond_term in
       let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg manpk b in
       let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg manpk c in
       let start_cp = new_node_cfg cfg expr in
