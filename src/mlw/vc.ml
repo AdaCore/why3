@@ -656,7 +656,6 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mexn.empty) cty e =
   let k = Mexn.fold (fun _ ((i,_), xq) k ->
     Kseq (k, i, Kstop xq)) xq k in
   (* move the postconditions under the VCgen tag *)
-  (* FIXME: VCgen labels should not be pushed under proxy let *)
   let k = if Slab.mem sp_label e.e_label then Ktag (SP, k) else
           if Slab.mem wp_label e.e_label then Ktag (WP, k) else k in
   let k = bind_oldies oldies (bind_oldies cty.cty_oldies k) in
