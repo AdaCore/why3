@@ -32,8 +32,7 @@ let no_eval = Debug.register_flag "vc_no_eval"
 let case_split = Ident.create_label "case_split"
 let add_case t = t_label_add case_split t
 
-let ls_of_rs s =
-  match s.rs_logic with RLls ls -> ls | _ -> assert false
+let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
 
 let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
 let clone_pv v = clone_vs v.pv_vs
@@ -299,7 +298,6 @@ type ktag = WP | SP | Push of bool
 
 type kode =
   | Kseq   of kode * int * kode
-  | Kcont  of int
   | Kpar   of kode * kode
   | Kif    of pvsymbol * kode * kode
   | Kcase  of pvsymbol * (pattern * kode) list
@@ -308,21 +306,18 @@ type kode =
   | Kval   of pvsymbol list * term
   | Kcut   of term
   | Kstop  of term
+  | Kcont  of int
   | Kaxiom of kode
   | Ktag   of ktag * kode
 
 let rec k_print fmt k = match k with
-  | Kseq (k1,0,k2) -> Format.fprintf fmt
+  | Kseq (k1 ,0, k2) -> Format.fprintf fmt
       "@[%a;@\n%a@]" k_print k1 k_print k2
-  | Kseq (k1,i,k2) -> Format.fprintf fmt
+  | Kseq (k1, i, k2) -> Format.fprintf fmt
       "@[TRY %a@\n%d : %a@]" k_print k1 i k_print k2
-  | Kcont 0 -> Format.fprintf fmt
-      "SKIP"
-  | Kcont i -> Format.fprintf fmt
-      "RAISE %d" i
-  | Kpar (Kstop f,k2) -> Format.fprintf fmt
+  | Kpar (Kstop f, k2) -> Format.fprintf fmt
       "@[@[<hov 4>CHECK %a@];@\n%a@]" Pretty.print_term f k_print k2
-  | Kpar (k1,k2) -> Format.fprintf fmt
+  | Kpar (k1, k2) -> Format.fprintf fmt
       "@[[ @[%a@]@\n| @[%a@] ]@]" k_print k1 k_print k2
   | Kif (v, k1, k2) -> Format.fprintf fmt
       "@[IF %a@\nTHEN %a@\nELSE %a@]"
@@ -330,28 +325,34 @@ let rec k_print fmt k = match k with
   | Kcase (v, bl) ->
       let branch fmt (p,k) = Format.fprintf fmt
         "@[<hov 4>| %a ->@ %a@]" Pretty.print_pat p k_print k in
-      Format.fprintf fmt "@[CASE %a\n%a@]"
+      Format.fprintf fmt "@[CASE %a\n@[%a@]@]"
         Ity.print_pv v (Pp.print_list Pp.newline branch) bl
-  | Khavoc _wr -> Format.fprintf fmt "HAVOC"
-  | Klet (v,t,{t_node = Ttrue}) -> Format.fprintf fmt
+  | Khavoc _wr -> Format.fprintf fmt "HAVOC" (* TODO *)
+  | Klet (v, t, {t_node = Ttrue}) -> Format.fprintf fmt
       "@[<hov 4>LET %a = %a@]" Ity.print_pv v Pretty.print_term t
   | Klet (v,t,f) -> Format.fprintf fmt
-      "@[<hov 4>LET %a = %a ST@ %a@]" Ity.print_pv v
+      "@[<hov 4>LET %a = %a WITH@ %a@]" Ity.print_pv v
         Pretty.print_term t Pretty.print_term f
   | Kval (vl,{t_node = Ttrue}) -> Format.fprintf fmt
       "@[<hov 4>VAL %a@]" (Pp.print_list Pp.space Ity.print_pv) vl
   | Kval (vl,f) -> Format.fprintf fmt
-      "@[<hov 4>VAL %a ST@ %a@]"
+      "@[<hov 4>VAL %a WITH@ %a@]"
         (Pp.print_list Pp.space Ity.print_pv) vl Pretty.print_term f
   | Kcut f -> Format.fprintf fmt
       "@[<hov 4>ASSERT %a@]" Pretty.print_term f
   | Kstop f -> Format.fprintf fmt
-      "@[<hov 4>HALT %a@]" Pretty.print_term f
+      "@[<hov 4>STOP %a@]" Pretty.print_term f
+  | Kcont 0 -> Format.fprintf fmt
+      "SKIP"
+  | Kcont i -> Format.fprintf fmt
+      "RAISE %d" i
   | Kaxiom k -> Format.fprintf fmt
-      "@[<hov 4>LEMMA %a@]" k_print k
+      "@[<hov 4>AXIOM %a@]" k_print k
   | Ktag (tag, k) ->
-      let s = match tag with WP -> "WP" | SP -> "SP"
-        | Push true -> "PC" | Push false -> "PO" in
+      let s = match tag with
+        | WP -> "WP" | SP -> "SP"
+        | Push true -> "PUSH CLOSED"
+        | Push false -> "PUSH OPEN" in
       Format.fprintf fmt "@[<hov 4>%s %a@]" s k_print k
 
 (** stage 1: expr -> kode *)
@@ -682,8 +683,6 @@ let reflow vc_wp k =
               Ktag (Push (not (Mint.mem 0 out2)), k2) in
             Kseq (k1, i, k2), join (Mint.remove i out1) out2
         | None -> k1, out1 (* dead code *) end
-    | Kcont i ->
-        k, Mint.singleton i true
     | Kpar (k1, k2) ->
         let k1, out1 = mark vc_tag k1 in
         let k2, out2 = mark vc_tag k2 in
@@ -702,6 +701,8 @@ let reflow vc_wp k =
         k, Mint.singleton 0 true
     | Kstop _ ->
         k, Mint.empty
+    | Kcont i ->
+        k, Mint.singleton i true
     | Kaxiom k ->
         let k, _ = mark vc_tag k in
         k, Mint.singleton 0 true
@@ -718,15 +719,10 @@ let reflow vc_wp k =
         let cl = cl || match Mint.find_opt 0 q with
           | Some (_, cl) -> cl | None -> false in
         let q = Mint.add i (push k2 q, cl) q in
-        if i = 0 || cl then push k1 q
-        else Kseq (push k1 q, i, Kcont 0)
+        if i = 0 || cl then push k1 q else
+        Kseq (push k1 q, i, Kcont 0)
     | Kseq (k1, i, k2) ->
         Kseq (push k1 (Mint.remove i q), i, push k2 q)
-    | Kcont i ->
-        begin match Mint.find_opt i q with
-        | Some (q, cl) ->
-            if i = 0 || cl then q else Kseq (q, 0, k)
-        | None -> k end
     | Kpar (k1, k2) ->
         Kpar (push k1 q, push k2 q)
     | Kif (v, k1, k2) ->
@@ -739,6 +735,11 @@ let reflow vc_wp k =
         | None -> k end
     | Kstop _ ->
         k
+    | Kcont i ->
+        begin match Mint.find_opt i q with
+        | Some (q, cl) when i = 0 || cl -> q
+        | Some (q, _) -> Kseq (q, 0, k)
+        | None -> k end
     | Kaxiom k ->
         let k = push k Mint.empty in
         begin match Mint.find_opt 0 q with
@@ -928,52 +929,7 @@ let sp_combine_map sp1 sp2 =
   Mint.union (fun _ (sp1, wr1) (sp2, wr2) ->
     Some (sp_combine sp1 wr1 sp2 wr2)) sp1 sp2
 
-let rec wp_expr kn k q = match k with
-  | Kseq (k1, i, k2) ->
-      wp_expr kn k1 (Mint.add i (wp_expr kn k2 q) q)
-  | Kcont i ->
-      Mint.find i q
-  | Kpar (k1, k2) ->
-      wp_and (wp_expr kn k1 q) (wp_expr kn k2 q)
-  | Kif ({pv_vs = v}, k1, k2) ->
-      let test = t_equ (t_var v) t_bool_true in
-      wp_if test (wp_expr kn k1 q) (wp_expr kn k2 q)
-  | Kcase ({pv_vs = v}, bl) ->
-      let branch (p,k) = t_close_branch p (wp_expr kn k q) in
-      wp_case (t_var v) (List.map branch bl)
-  | Khavoc wr ->
-      let q = Mint.find 0 q in
-      let dst = dst_of_wp wr q in
-      if Mpv.is_empty dst then q else
-      let regs = name_regions kn wr dst in
-      let () = print_dst dst; print_regs regs in
-      let add _ t fvs = t_freevars fvs t in
-      let fvs = Mreg.fold add regs Mvs.empty in
-      let update {pv_vs = o; pv_ity = ity} n q =
-        let t, fl = havoc kn wr regs (t_var o) ity [] in
-        if Mvs.mem n fvs then
-          sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) q
-        else t_let_close_simp n t (sp_implies (t_and_l fl) q) in
-      let q = t_subst (adjustment dst) q in
-      let q = Mpv.fold update dst q in
-      wp_forall (Mvs.keys fvs) q
-  | Klet (v, t, f) ->
-      wp_let v t (sp_implies f (Mint.find 0 q))
-  | Kval (vl, f) ->
-      let q = sp_implies f (Mint.find 0 q) in
-      wp_forall (List.map (fun v -> v.pv_vs) vl) q
-  | Kcut f ->
-      wp_and_asym f (Mint.find 0 q)
-  | Kstop f ->
-      f
-  | Kaxiom k ->
-      sp_implies (wp_expr kn k Mint.empty) (Mint.find 0 q)
-  | Ktag (SP, k) ->
-      let k = Mint.fold (fun i q k -> Kseq (k, i, Kstop q)) q k in
-      let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
-  | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
-
-and sp_expr kn k rdm dst = match k with
+let rec sp_expr kn k rdm dst = match k with
   | Kseq (Klet (v, t, f), 0, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
       let rd2 = t_freepvs (t_freepvs rd2 t) f in
@@ -1085,13 +1041,13 @@ and sp_expr kn k rdm dst = match k with
       let sp = sp_exists (Lists.map_filter lost vl) f in
       let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
       t_true, Mint.singleton 0 (sp, Mpv.empty), rd
-  | Kcont i ->
-      t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kcut f ->
       let rd = t_freepvs (Mint.find 0 rdm) f in
       f, Mint.singleton 0 (f, Mpv.empty), rd
   | Kstop f ->
       f, Mint.empty, t_freepvs Spv.empty f
+  | Kcont i ->
+      t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kaxiom k ->
       let f = wp_expr kn k Mint.empty in
       let rd = t_freepvs (Mint.find 0 rdm) f in
@@ -1101,6 +1057,51 @@ and sp_expr kn k rdm dst = match k with
       let rd = t_freepvs (Mint.find_def Spv.empty 0 rdm) f in
       f, Mint.singleton 0 (t_true, Mpv.empty), rd
   | Ktag ((Push _|SP), _) -> assert false (* cannot happen *)
+
+and wp_expr kn k q = match k with
+  | Kseq (k1, i, k2) ->
+      wp_expr kn k1 (Mint.add i (wp_expr kn k2 q) q)
+  | Kpar (k1, k2) ->
+      wp_and (wp_expr kn k1 q) (wp_expr kn k2 q)
+  | Kif ({pv_vs = v}, k1, k2) ->
+      let test = t_equ (t_var v) t_bool_true in
+      wp_if test (wp_expr kn k1 q) (wp_expr kn k2 q)
+  | Kcase ({pv_vs = v}, bl) ->
+      let branch (p,k) = t_close_branch p (wp_expr kn k q) in
+      wp_case (t_var v) (List.map branch bl)
+  | Khavoc wr ->
+      let q = Mint.find 0 q in
+      let dst = dst_of_wp wr q in
+      if Mpv.is_empty dst then q else
+      let regs = name_regions kn wr dst in
+      let () = print_dst dst; print_regs regs in
+      let add _ t fvs = t_freevars fvs t in
+      let fvs = Mreg.fold add regs Mvs.empty in
+      let update {pv_vs = o; pv_ity = ity} n q =
+        let t, fl = havoc kn wr regs (t_var o) ity [] in
+        if Mvs.mem n fvs then
+          sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) q
+        else t_let_close_simp n t (sp_implies (t_and_l fl) q) in
+      let q = t_subst (adjustment dst) q in
+      let q = Mpv.fold update dst q in
+      wp_forall (Mvs.keys fvs) q
+  | Klet (v, t, f) ->
+      wp_let v t (sp_implies f (Mint.find 0 q))
+  | Kval (vl, f) ->
+      let q = sp_implies f (Mint.find 0 q) in
+      wp_forall (List.map (fun v -> v.pv_vs) vl) q
+  | Kcut f ->
+      wp_and_asym f (Mint.find 0 q)
+  | Kstop f ->
+      f
+  | Kcont i ->
+      Mint.find i q
+  | Kaxiom k ->
+      sp_implies (wp_expr kn k Mint.empty) (Mint.find 0 q)
+  | Ktag (SP, k) ->
+      let k = Mint.fold (fun i q k -> Kseq (k, i, Kstop q)) q k in
+      let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
+  | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
 (** VCgen *)
 
