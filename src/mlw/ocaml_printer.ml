@@ -122,7 +122,30 @@ module Print = struct
        in
        fprintf fmt "{ %a }" (print_list semi print_field) fl
 
+  let print_const fmt c =
+    let n = Number.compute_int c in
+    let m = BigInt.to_int n in
+    fprintf fmt "%d" m
+
+  (** Expressions *)
+
+  let extract_op {id_string = s} =
+    try Some (Strings.remove_prefix "infix " s) with Not_found ->
+    try Some (Strings.remove_prefix "prefix " s) with Not_found ->
+    None
+
+  let print_apply fmt s vl =
+    match extract_op s, vl with
+    | Some o, [t1; t2] ->
+       fprintf fmt "@[<hov 1>%a %s %a@]"
+         print_ident t1 o print_ident t2
+    | _, tl ->
+       fprintf fmt "@[<hov 2>%a %a@]"
+         print_ident s (print_list space print_ident) tl
+
   let rec print_enode fmt = function
+    | Econst c ->
+       fprintf fmt "%a" print_const c
     | Eident id ->
        print_ident fmt id
     | Elet (id, e1, e2) ->
@@ -130,12 +153,13 @@ module Print = struct
          print_ident id print_expr e1 print_expr e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
-    | Eapp (e, el) ->
-       fprintf fmt "@[<hov 2>%a %a@]"
-         print_ident e (print_list space print_ident) el
+    | Eapp (s, vl) ->
+       print_apply fmt s vl
     | Ematch (e, pl) ->
        fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
          print_expr e (print_list newline print_branch) pl
+    | Eblock [] ->
+       fprintf fmt "()"
     | _ -> (* TODO *) assert false
 
   and print_branch fmt (p, e) =
@@ -154,8 +178,7 @@ module Print = struct
       | l ->
          fprintf fmt "@[<hov 4>| %a of %a@]"
                  print_ident id (* FIXME: print_uident *)
-                 (print_list star (print_ty ~paren:false)) l
-    in
+                 (print_list star (print_ty ~paren:false)) l in
     let print_field fmt (is_mutable, id, ty) =
       fprintf fmt "%s%a: %a;"
               (if is_mutable then "mutable " else "")
@@ -170,8 +193,7 @@ module Print = struct
       | Drecord fl ->
          fprintf fmt " = {@\n%a@\n}" (print_list newline print_field) fl
       | Dalias ty ->
-         fprintf fmt " =@ %a" (print_ty ~paren:false) ty
-    in
+         fprintf fmt " =@ %a" (print_ty ~paren:false) ty in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
             (if true then "type" else "and") (* FIXME: mutual recursive types *)
             print_tv_args args

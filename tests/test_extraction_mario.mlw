@@ -31,28 +31,30 @@ module M
     ghost mutable v : seq 'a;
   }
 
+  let update (c: cursor int) : unit
+  = let t = ghost c.v <- empty in t; ()
+
   exception Empty (list int, int)
   exception Out_of_bounds int
 
-  let rec length (x: int) (l: list 'a) : int
+  let rec length (l: list 'a) : int
     variant  { l }
   = match l with
-    | Nil -> x
-    | Cons _ r -> length x r
+    | Nil -> 0
+    | Cons _ r -> 1 + length r
     end
 
   let t (x:int) : int
     requires { false }
   = absurd
 
-  let rec ff (x: int) : int
-    diverges
-  = ff x
+  let a () : unit
+  = assert { true }
 
 end
 
 (*
  * Local Variables:
- * compile-command: "../bin/why3extract -D ../drivers/c.drv -o extract test_extraction_mario.mlw"
+ * compile-command: "make -C .. -j3; ../bin/why3extract -D ../drivers/c.drv -o extract test_extraction_mario.mlw"
  * End:
  *)

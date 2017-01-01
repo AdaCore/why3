@@ -49,9 +49,13 @@
     - est-ce qu'il y a des utilisations particulières du champ
       [itd_fields], vis-à-vis du champ [itd_constructors] ?
 
-    - comme l'AST [expr] est déjà en forme normale-A, est-ce que je
-      peux utiliser des applications de la forme [Eapp ident * ident list] ?
+    - comme l'AST [expr] est déjà en forme normale-A, est-ce que ça
+      fait du sense pour vous d'utiliser des applications de la forme
+      [Eapp of ident * ident list] ?
+ *)
 
+(*
+  TODO: réfléchir sur l'affectation parallèle
 *)
 
 
@@ -91,7 +95,7 @@ module ML = struct
     | Xsyntax of string
     | Xexit             (* Pervasives.Exit *)
 
-  type ity = I of Ity.ity | C of Ity.cty (* TODO: keep like this? *)
+  type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
 
   type expr = {
     e_node   : expr_node;
@@ -143,6 +147,11 @@ module ML = struct
     Elet (id, e1, e2)
 
   let tunit = Ttuple []
+
+  let enope = Eblock []
+
+  let mk_unit =
+    mk_expr enope (I Ity.ity_unit) Ity.eff_empty
 
 end
 
@@ -214,24 +223,30 @@ module Translate = struct
     List.map pvty
 
   (* expressions *)
-  let rec expr e =
+  let rec expr ({e_effect = eff } as e) =
+    assert (not eff.eff_ghost);
     match e.e_node with
+    | Econst c ->
+       let c = match c with Number.ConstInt c -> c | _ -> assert false in
+       ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
        let pv_id = pv_name pvs in
-       ML.mk_expr (ML.Eident pv_id) (ML.I e.e_ity) e.e_effect
+       ML.mk_expr (ML.Eident pv_id) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
        let ml_let = ML.ml_let (pv_name pvs) (expr e1) (expr e2) in
-       ML.mk_expr ml_let (ML.I e.e_ity) e.e_effect
+       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Eexec ({c_node = Capp (rs, pvl)}, _) ->
        let rs_id = rs.rs_name in
        let pv_id = List.map pv_name pvl in
-       ML.mk_expr (ML.Eapp (rs_id, pv_id)) (ML.I e.e_ity) e.e_effect
+       ML.mk_expr (ML.Eapp (rs_id, pv_id)) (ML.I e.e_ity) eff
     | Eabsurd ->
-       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) e.e_effect
+       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, pl) ->
        let e1 = expr e1 in
        let pl = List.map ebranch pl in
-       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) e.e_effect
+       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
+    | Eassert _ ->
+       ML.mk_unit
     | _ -> (* TODO *) assert false
 
   and ebranch ({pp_pat = p}, e) =

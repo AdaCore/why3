@@ -513,7 +513,7 @@ module Translate = struct
       | Elet ({ let_sym = LetV pv }, e2) when ity_equal pv.pv_ity ity_mark ->
           expr info e2
       | Elet ({ let_sym = LetV pv; let_expr = e1 }, e2) when is_underscore pv ->
-          ML.eseq (expr info e1) (expr info e2)
+         ML.eseq (expr info e1) (expr info e2)
       | Elet ({ let_sym = lv ; let_expr = e1 }, e2) ->
           ML.Elet (lv_name lv, expr info e1, expr info e2)
       | Eif (e0, e1, e2) ->
