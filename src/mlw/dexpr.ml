@@ -1152,13 +1152,13 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
       let ld, env = var_defn uloc env dldf in
       let e2 = expr uloc env de in
-      e_let ld e2
+      e_let_check e2 ld
   | DElet (dldf,de) ->
       let ldl, env = sym_defn uloc env dldf in
       List.fold_left e_let_check (expr uloc env de) ldl
   | DErec (drdf,de) ->
       let ld, env = rec_defn uloc env drdf in
-      e_let ld (expr uloc env de)
+      e_let_check (expr uloc env de) ld
   | DEnot de ->
       e_not (expr uloc env de)
   | DEand (de1,de2) ->

@@ -162,6 +162,7 @@ val t_open_branch : term_branch -> pattern * term
 val t_open_quant : term_quant -> vsymbol list * trigger * term
 
 val t_open_bound_with : term -> term_bound -> term
+val t_clone_bound_id : term_bound -> preid
 
 (** open bindings with optimized closing callbacks *)
 

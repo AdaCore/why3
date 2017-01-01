@@ -769,6 +769,8 @@ let t_open_quant (vl,b,tl,f) =
   let tl = tr_map (t_subst_unsafe m) tl in
   vl, tl, t_subst_unsafe m f
 
+let t_clone_bound_id (v,_,_) = id_clone v.vs_name
+
 (** open bindings with optimized closing callbacks *)
 
 let t_open_bound_cb tb =
@@ -1514,6 +1516,9 @@ let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
 
 let small t = match t.t_node with
   | Tvar _ | Tconst _ -> true
+(* NOTE: shouldn't we allow this?
+  | Tapp (_,[]) -> true
+*)
   | _ -> false
 
 let t_let_simp e ((v,b,t) as bt) =

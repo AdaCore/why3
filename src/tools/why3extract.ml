@@ -138,7 +138,7 @@ let test_extract fmt m =
 
 let rec do_extract_module ?fname m =
   test_extract (Format.formatter_of_out_channel stdout) m;
-  let extract_use m' =
+  let _extract_use m' =
     let fname =
       if m'.mod_theory.Theory.th_path = [] then fname else None
     in
