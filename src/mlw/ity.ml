@@ -1156,6 +1156,10 @@ let open_post_with t q = match q.t_node with
   | Teps bf -> t_open_bound_with t bf
   | _ -> invalid_arg "Ity.open_post_with"
 
+let clone_post_result q = match q.t_node with
+  | Teps bf -> t_clone_bound_id bf
+  | _ -> invalid_arg "Ity.clone_post_result"
+
 type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;

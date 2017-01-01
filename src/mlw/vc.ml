@@ -39,8 +39,13 @@ let clone_pv v = clone_vs v.pv_vs
 
 let pv_is_unit v = ity_equal v.pv_ity ity_unit
 
-let res_of_ity ity =
-  create_pvsymbol (id_fresh "result") ity
+let pv_of_ity s ity = create_pvsymbol (id_fresh s) ity
+
+let res_of_post ity = function
+  | q::_ -> create_pvsymbol (clone_post_result q) ity
+  | _ -> pv_of_ity "result" ity
+
+let res_of_cty cty = res_of_post cty.cty_result cty.cty_post
 
 let proxy_of_expr =
   let label = Slab.singleton proxy_label in fun e ->
@@ -249,7 +254,7 @@ let wp_of_inv loc lab expl pl =
 let wp_of_pre loc lab pl = wp_of_inv loc lab expl_pre pl
 
 let wp_of_post expl ity ql =
-  let v = res_of_ity ity in let t = t_var v.pv_vs in
+  let v = res_of_post ity ql in let t = t_var v.pv_vs in
   let make q = vc_expl None Slab.empty expl (open_post_with t q) in
   v, t_and_l (List.map make ql)
 
@@ -271,8 +276,8 @@ let sp_of_post loc lab expl v ql = let t = t_var v.pv_vs in
 
 let cty_enrich_post c = match c with
   | {c_node = Cfun e; c_cty = cty} ->
-      let {pv_vs = u} = res_of_ity e.e_ity in
-      let prop = ity_equal e.e_ity ity_bool in
+      let {pv_vs = u} = res_of_cty cty in
+      let prop = ty_equal u.vs_ty ty_bool in
       begin match term_of_expr ~prop e with
         | Some f ->
             let f = match f.t_node with
@@ -498,21 +503,21 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
           Kseq (Kaxiom (k_havoc eff ax), 0, k) in
-        let add_rs sm s ({c_cty = cty} as c) (vl,k) = match s.rs_logic with
+        let add_rs sm s c (vl,k) = match s.rs_logic with
           | RLls _ -> assert false (* not applicable *)
           | RLnone -> vl, k
           | RLlemma ->
-              let v = res_of_ity cty.cty_result in
-              let q = sp_of_post None Slab.empty expl_post v cty.cty_post in
+              let v = res_of_cty c.c_cty and q = c.c_cty.cty_post in
+              let q = sp_of_post None Slab.empty expl_post v q in
               let q = if pv_is_unit v
                 then t_subst_single v.pv_vs t_void q
                 else t_exists_close_simp [v.pv_vs] [] q in
-              vl, add_axiom cty q k
+              vl, add_axiom c.c_cty q k
           | RLpv v ->
               let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
               let q = cty_exec_post (cty_enrich_post c) in
               let q = sp_of_post None Slab.empty expl_post v q in
-              v::vl, add_axiom cty q k in
+              v::vl, add_axiom c.c_cty q k in
         let vl, k = match ld with
           | LDrec rdl ->
               let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in
@@ -566,11 +571,11 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let branch xs (vl,e) (xl,xm) =
           let i = new_exn env in
           let xk = k_expr env lps e res xmap in
-          let v,xk = match vl with
-            | [] -> res_of_ity ity_unit, xk
+          let v, xk = match vl with
+            | [] -> pv_of_ity "_" ity_unit, xk
             | [v] -> v, xk
             | vl ->
-                let v = res_of_ity xs.xs_ity in
+                let v = pv_of_ity "exv" xs.xs_ity in
                 let cs = fs_tuple (List.length vl) in
                 let pl = List.map (fun v -> pat_var v.pv_vs) vl in
                 v, Kcase (v, [pat_app cs pl v.pv_vs.vs_ty, xk]) in
