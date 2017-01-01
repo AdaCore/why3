@@ -50,8 +50,10 @@ let proxy_of_expr =
 
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
+let lf_label = Ident.create_label "vc:liberal_for"
 
-let vc_labels = Slab.add sp_label (Slab.add wp_label Slab.empty)
+let vc_labels = Slab.add lf_label
+  (Slab.add sp_label (Slab.add wp_label Slab.empty))
 
 (* VCgen environment *)
 
@@ -619,8 +621,11 @@ let rec k_expr env lps e res xmap =
         let k = Kseq (Kval ([v], sp_and bounds prev), 0, k) in
         let k = Kpar (k, Kval ([res], last)) in
         let k = Kpar (Kstop init, k_havoc e.e_effect k) in
-        Kpar (Kseq (Kval ([], expl_bounds (ps_app le [a; b])), 0, k),
-                 Kval ([res], expl_bounds (ps_app gt [a; b])))
+        if Slab.mem lf_label e.e_label then
+          Kpar (Kseq (Kval ([], expl_bounds (ps_app le [a; b])), 0, k),
+                   Kval ([res], expl_bounds (ps_app gt [a; b])))
+        else
+          Kpar (Kstop (expl_bounds (ps_app le [a; b_pl_1])), k)
   in
   if Slab.mem sp_label e.e_label then Ktag (SP, k) else
   if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
