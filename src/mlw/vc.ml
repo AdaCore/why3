@@ -172,8 +172,14 @@ let wp_case t bl =
 let wp_forall vl wp = t_forall_close_simp vl [] wp
 let sp_exists vl sp = t_exists_close_simp vl [] sp
 
-let wp_let v t wp = t_let_close_simp v t wp
-let sp_let v t sp = t_let_close_simp v t sp
+let wp_let v t wp =
+  if pv_is_unit v then t_subst_single v.pv_vs t_void wp
+                  else t_let_close_simp v.pv_vs t wp
+
+let sp_let v t sp rd =
+  if pv_is_unit v then t_subst_single v.pv_vs t_void sp else
+  if Spv.mem v rd then sp_and (t_equ (t_var v.pv_vs) t) sp else
+  t_let_close_simp v.pv_vs t sp
 
 (* variant decrease preconditions *)
 
@@ -664,6 +670,9 @@ let reflow vc_wp k =
   let join _ _ _ = Some false in
   let join = Mint.union join in
   let rec mark vc_tag k = match k with
+    | Kseq ((Khavoc _ | Klet _ | Kval _ | Kcut _) as k1, 0, k2) ->
+        let k2, out2 = mark vc_tag k2 in
+        Kseq (k1, 0, k2), out2
     | Kseq (k1, i, k2) ->
         let k1, out1 = mark vc_tag k1 in
         begin match Mint.find_opt i out1 with
@@ -702,10 +711,12 @@ let reflow vc_wp k =
     | Ktag ((WP|SP), k) ->
         mark vc_tag k
     | Ktag (Push _, _) ->
-        assert false (* can't happen *)
+        assert false (* cannot happen *)
   in
   let rec push k q = match k with
     | Kseq (k1, i, Ktag (Push cl, k2)) ->
+        let cl = cl || match Mint.find_opt 0 q with
+          | Some (_, cl) -> cl | None -> false in
         let q = Mint.add i (push k2 q, cl) q in
         if i = 0 || cl then push k1 q
         else Kseq (push k1 q, i, Kcont 0)
@@ -733,13 +744,11 @@ let reflow vc_wp k =
         begin match Mint.find_opt 0 q with
         | Some (q, _) -> Kseq (Kaxiom k, 0, q)
         | None -> Kaxiom k end
-    | Ktag (Push cl, k) ->
-        let cl = cl || match Mint.find_opt 0 q with
-          | Some (_, cl) -> cl | None -> false in
-        Ktag (Push cl, push k q)
     | Ktag ((WP|SP) as tag, k) ->
         assert (Mint.is_empty q);
         Ktag (tag, push k q)
+    | Ktag (Push _, _) ->
+        assert false (* cannot happen *)
   in
   let k = if vc_wp then k else Ktag (SP, k) in
   push (fst (mark WP k)) Mint.empty
@@ -919,13 +928,6 @@ let sp_combine_map sp1 sp2 =
   Mint.union (fun _ (sp1, wr1) (sp2, wr2) ->
     Some (sp_combine sp1 wr1 sp2 wr2)) sp1 sp2
 
-let out_val i vl sp rdm =
-  let rd = Mint.find i rdm in
-  let lost v = if Spv.mem v rd then None else Some v.pv_vs in
-  let sp = sp_exists (Lists.map_filter lost vl) sp in
-  let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
-  t_true, Mint.singleton i (sp, Mpv.empty), rd
-
 let rec wp_expr kn k q = match k with
   | Kseq (k1, i, k2) ->
       wp_expr kn k1 (Mint.add i (wp_expr kn k2 q) q)
@@ -951,13 +953,12 @@ let rec wp_expr kn k q = match k with
         let t, fl = havoc kn wr regs (t_var o) ity [] in
         if Mvs.mem n fvs then
           sp_implies (t_and_l (cons_t_simp (t_var n) t fl)) q
-        else wp_let n t (sp_implies (t_and_l fl) q) in
+        else t_let_close_simp n t (sp_implies (t_and_l fl) q) in
       let q = t_subst (adjustment dst) q in
       let q = Mpv.fold update dst q in
       wp_forall (Mvs.keys fvs) q
   | Klet (v, t, f) ->
-      let t = if pv_is_unit v then t_void else t in
-      wp_let v.pv_vs t (sp_implies f (Mint.find 0 q))
+      wp_let v t (sp_implies f (Mint.find 0 q))
   | Kval (vl, f) ->
       let q = sp_implies f (Mint.find 0 q) in
       wp_forall (List.map (fun v -> v.pv_vs) vl) q
@@ -973,48 +974,46 @@ let rec wp_expr kn k q = match k with
   | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
 and sp_expr kn k rdm dst = match k with
-  | Kseq (Klet (v, t, f), 0, k2)
-    when not (Mint.exists (fun _ rd -> Spv.mem v rd) rdm) ->
-      let t = if pv_is_unit v then t_void else t in
+  | Kseq (Klet (v, t, f), 0, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
       let rd2 = t_freepvs (t_freepvs rd2 t) f in
-      let wp2 = wp_let v.pv_vs t (sp_implies f wp2) in
-      let close (sp, wr) = sp_let v.pv_vs t (sp_and f sp), wr in
-      wp2, Mint.map close sp2, Spv.remove v rd2
+      let wp = wp_let v t (sp_implies f wp2) in
+      let close _ (sp2, wr2) rd2 =
+        Some (sp_let v t (sp_and f sp2) rd2, wr2) in
+      wp, Mint.inter close sp2 rdm, Spv.remove v rd2
   | Kseq (k1, i, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
-      let get_wr2 _ (_, wr) wr2 = Mpv.set_union wr wr2 in
+      let get_wr _ (_, w) m = Mpv.set_union w m in
+      let wr2 = Mint.fold get_wr sp2 Mpv.empty in
       let fresh_wr2 v _ = clone_pv v in
       let fresh_rd2 v _ = if ity_immutable v.pv_ity
                           then None else Some (clone_pv v) in
-      let dst' = Mpv.set_union
-        (Mpv.mapi fresh_wr2 (Mint.fold get_wr2 sp2 Mpv.empty))
-        (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst)) in
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
-        (Mpv.set_union dst' dst) in
-      let sp_xi, wr_xi = Mint.find i sp1 in
-      let adj = adjustment wr_xi in
+        (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
+        (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
+      let sp0, wr0 = Mint.find i sp1 in
       let bound = Spv.diff rd2 rd1 in
-      let add_vs v vl = v.pv_vs :: vl in
+      let concat rd wr = List.rev_append (List.rev_map
+        (fun v -> v.pv_vs) (Spv.elements rd)) (Mpv.values wr) in
       let wp2 =
-        let vl = Spv.fold add_vs bound (Mpv.values wr_xi) in
-        wp_forall vl (sp_implies sp_xi (t_subst adj wp2)) in
-      let cut_rd _ rd bnd = Spv.diff bnd rd in
-      let bound = Mint.fold cut_rd rdm bound in
-      let wr_new = Mpv.set_inter wr_xi dst' in
-      let wr_old = Mpv.set_inter wr_xi dst in
-      let close (sp2, wr2) =
-        let wr2 = Mpv.set_union wr2 wr_old in
-        let vl = Spv.fold add_vs bound (Mpv.values wr_new) in
-        sp_exists vl (sp_and sp_xi (t_subst adj sp2)), wr2 in
-      let sp2 = Mint.map close sp2 in
+        let adj = adjustment wr0 and vl = concat bound wr0 in
+        wp_forall vl (sp_implies sp0 (t_subst adj wp2)) in
+      let close (sp, wr) rd =
+        let wr0_dst = Mpv.set_inter dst
+          (Mpv.set_diff (Mpv.set_inter wr0 rd) wr) in
+        let wr = Mpv.set_union wr wr0_dst in
+        let vl = concat
+          (Spv.diff bound rd) (Mpv.set_diff wr0 wr0_dst) in
+        let adj = adjustment (Mpv.set_union wr0_dst wr0) in
+        let sp0 = t_subst (advancement wr0 wr0_dst) sp0 in
+        sp_exists vl (sp_and sp0 (t_subst adj sp)), wr in
+      let close _ sp rd = Some (close sp rd) in
+      let sp2 = Mint.inter close sp2 rdm in
       let advance (sp, wr) =
         let dst = Mpv.set_inter dst wr in
         t_subst (advancement wr dst) sp, dst in
       let sp1 = Mint.map advance (Mint.remove i sp1) in
       wp_and wp1 wp2, sp_combine_map sp1 sp2, rd1
-  | Kcont i ->
-      out_val i [] t_true rdm
   | Kpar (k1, k2) ->
       let wp1, sp1, rd1 = sp_expr kn k1 rdm dst in
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
@@ -1076,18 +1075,27 @@ and sp_expr kn k rdm dst = match k with
       let rd = Mreg.fold add_rhs wr rd in
       t_true, Mint.singleton 0 (sp, dst), rd
   | Klet (v, t, f) ->
-      let f = if pv_is_unit v
-        then t_subst_single v.pv_vs t_void f
-        else sp_and (t_equ (t_var v.pv_vs) t) f in
-      out_val 0 [v] f rdm
+      let rd = Mint.find 0 rdm in
+      let sp = sp_let v t f rd in
+      let rd = Spv.remove v (t_freepvs rd sp) in
+      t_true, Mint.singleton 0 (sp, Mpv.empty), rd
   | Kval (vl, f) ->
-      out_val 0 vl f rdm
+      let rd = Mint.find 0 rdm in
+      let lost v = if Spv.mem v rd then None else Some v.pv_vs in
+      let sp = sp_exists (Lists.map_filter lost vl) f in
+      let rd = List.fold_right Spv.remove vl (t_freepvs rd sp) in
+      t_true, Mint.singleton 0 (sp, Mpv.empty), rd
+  | Kcont i ->
+      t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kcut f ->
-      let _, sp, rd = out_val 0 [] f rdm in f, sp, rd
+      let rd = t_freepvs (Mint.find 0 rdm) f in
+      f, Mint.singleton 0 (f, Mpv.empty), rd
   | Kstop f ->
       f, Mint.empty, t_freepvs Spv.empty f
   | Kaxiom k ->
-      out_val 0 [] (wp_expr kn k Mint.empty) rdm
+      let f = wp_expr kn k Mint.empty in
+      let rd = t_freepvs (Mint.find 0 rdm) f in
+      t_true, Mint.singleton 0 (f, Mpv.empty), rd
   | Ktag (WP, k) ->
       let f = wp_expr kn k (Mint.map (fun _ -> t_true) rdm) in
       let rd = t_freepvs (Mint.find_def Spv.empty 0 rdm) f in
