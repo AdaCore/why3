@@ -223,31 +223,30 @@ let decrease env loc lab expl olds news =
     | _ -> t_false in
   vc_expl loc lab expl (decr olds news)
 
+let old_of_pv {pv_vs = v; pv_ity = ity} =
+  create_pvsymbol (id_clone v.vs_name) (ity_purify ity)
+
 let oldify_variant varl =
-  if varl = [] then Mpv.empty, varl else
-  let old_of_pv {pv_vs = v; pv_ity = ity} =
-    create_pvsymbol (id_clone v.vs_name) (ity_purify ity) in
   let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
     if ity_immutable v.pv_ity then None else Some (old_of_pv v))
     (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
   if Mpv.is_empty fpv then Mpv.empty, varl else
-  let o2n = Mpv.fold (fun v o s -> Mpv.add o v s) fpv Mpv.empty in
-  let n2o = Mpv.fold (fun v o s ->
+  let o2v = Mpv.fold (fun v o s -> Mpv.add o v s) fpv Mpv.empty in
+  let v2o = Mpv.fold (fun v o s ->
     Mvs.add v.pv_vs (t_var o.pv_vs) s) fpv Mvs.empty in
-  o2n, List.map (fun (t,r) -> t_subst n2o t, r) varl
+  o2v, List.map (fun (t,r) -> t_subst v2o t, r) varl
+
+let renew_oldies o2v =
+  let renew o v (n2v, o2n) = let n = old_of_pv v in
+    Mpv.add n v n2v, Mvs.add o.pv_vs (t_var n.pv_vs) o2n in
+  Mpv.fold renew o2v (Mpv.empty, Mvs.empty)
 
 (* convert user specifications into wp and sp *)
 
 let wp_of_inv loc lab expl pl =
   t_and_l (List.map (vc_expl loc lab expl) pl)
 
-let wp_of_pre env lps loc lab expl = function
-  | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
-      let olds, rels = Mls.find ls lps in
-      let news = List.combine tl rels in
-      let p = decrease env loc lab expl_variant olds news in
-      wp_and p (wp_of_inv loc lab expl pl)
-  | pl -> wp_of_inv loc lab expl pl
+let wp_of_pre loc lab pl = wp_of_inv loc lab expl_pre pl
 
 let wp_of_post expl ity ql =
   let v = res_of_ity ity in let t = t_var v.pv_vs in
@@ -264,7 +263,7 @@ let push_stop loc lab expl f =
 let sp_of_inv loc lab expl pl =
   t_and_l (List.map (push_stop loc lab expl) pl)
 
-let sp_of_pre expl pl = sp_of_inv None Slab.empty expl pl
+let sp_of_pre pl = sp_of_inv None Slab.empty expl_pre pl
 
 let sp_of_post loc lab expl v ql = let t = t_var v.pv_vs in
   let push q = push_stop loc lab expl (open_post_with t q) in
@@ -391,30 +390,23 @@ let term_of_kode res k =
       t, f, k
   | None -> raise Exit
 
-let bind_oldies o2n k = Mpv.fold (fun o n k ->
-  Kseq (Klet (o, t_var n.pv_vs, t_true), 0, k)) o2n k
+let k_unit res = Kval ([res], t_true)
+
+let bind_oldies o2v k = Mpv.fold (fun o v k ->
+  Kseq (Klet (o, t_var v.pv_vs, t_true), 0, k)) o2v k
 
 let k_havoc eff k =
   if Sreg.is_empty eff.eff_covers then k else
   let conv wr = Mpv.map (fun () -> None) wr in
   Kseq (Khavoc (Mreg.map conv eff.eff_writes), 0, k)
 
-let k_of_post loc lab expl v ql =
-  let sp = sp_of_post loc lab expl v ql in
-  match term_of_post ~prop:false v.pv_vs sp with
-  | Some (t, sp) -> Klet (v, t_label ?loc lab t, sp)
-  | None -> Kval ([v], sp)
-
-let k_unit res = Kval ([res], t_true)
-
 let complete_xpost cty {eff_raises = xss} skip =
   Mexn.set_union (Mexn.set_inter cty.cty_xpost xss)
     (Mexn.map (fun () -> []) (Mexn.set_diff xss skip))
 
-(* FIXME: in letrec, rec_rsym must have their oldies renamed *)
-let rec k_expr env lps e res xmap =
+let rec k_expr env lps ({e_loc = loc} as e) res xmap =
   let lab = Slab.diff e.e_label vc_labels in
-  let t_lab t = t_label ?loc:e.e_loc lab t in
+  let t_lab t = t_label ?loc lab t in
   let var_or_proxy e k = match e.e_node with
     | Evar v -> k v
     | _ -> let v = proxy_of_expr e in
@@ -424,18 +416,29 @@ let rec k_expr env lps e res xmap =
         Klet (res, t_lab (t_var v.pv_vs), t_true)
     | Econst c ->
         Klet (res, t_lab (t_const c), t_true)
-    | Eexec (c, cty) ->
-        let k = k_of_post e.e_loc lab expl_post res cty.cty_post in
+    | Eexec (c, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
+        let p, (oldies, sbs) = match pre with
+          | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
+              let ovl, rll = Mls.find ls lps in
+              let nvl = List.combine tl rll in
+              let d = decrease env loc lab expl_variant ovl nvl in
+              wp_and d (wp_of_pre loc lab pl), renew_oldies oldies
+          | pl -> wp_of_pre loc lab pl, (oldies, Mvs.empty) in
+        let k_of_post expl v ql =
+          let sp = sp_of_post loc lab expl v ql in
+          let sp = t_subst sbs sp (* rename oldies *) in
+          match term_of_post ~prop:false v.pv_vs sp with
+          | Some (t, sp) -> Klet (v, t_lab t, sp)
+          | None -> Kval ([v], sp) in
+        let k = k_of_post expl_post res cty.cty_post in
         let skip = match c.c_node with
           | Cfun _ -> xmap | _ -> Mexn.empty in
         let xq = complete_xpost cty e.e_effect skip in
-        let xq = Mexn.inter (fun _ ql (i,v) ->
-          let k = k_of_post e.e_loc lab expl_xpost v ql in
-          Some (Kseq (k, 0, Kcont i))) xq xmap in
-        let k = Mexn.fold (fun _ xk k -> Kpar (k, xk)) xq k in
-        let k = bind_oldies cty.cty_oldies (k_havoc e.e_effect k) in
-        let p = wp_of_pre env lps e.e_loc lab expl_pre cty.cty_pre in
-        let k = if cty.cty_pre = [] then k else Kpar (Kstop p, k) in
+        let k = Mexn.fold2_inter (fun _ ql (i,v) k ->
+          let xk = k_of_post expl_xpost v ql in
+          Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
+        let k = bind_oldies oldies (k_havoc e.e_effect k) in
+        let k = if pre = [] then k else Kpar (Kstop p, k) in
         begin match c.c_node with
           | Cfun e -> Kpar (k_fun env lps ~xmap c.c_cty e, k)
           | _ -> k end
@@ -492,7 +495,7 @@ let rec k_expr env lps e res xmap =
                             e1.e_effect.eff_writes in
         (* postcondition, as in [Pdecl.create_let_decl] *)
         let add_axiom cty q k = if can_simp q then k else
-          let p = Kval (cty.cty_args, sp_of_pre expl_pre cty.cty_pre) in
+          let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
           Kseq (Kaxiom (k_havoc eff ax), 0, k) in
         let add_rs sm s ({c_cty = cty} as c) (vl,k) = match s.rs_logic with
@@ -594,16 +597,16 @@ let rec k_expr env lps e res xmap =
           t_if_simp (t_lab t) t_bool_true t_bool_false in
         Klet (res, t, t_true)
     | Eabsurd ->
-        Kstop (vc_expl e.e_loc lab expl_absurd t_false)
+        Kstop (vc_expl loc lab expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
-        (* inv & . havoc ; inv ; if e0 then e1 ; inv /\ decr *)
         let init = wp_of_inv None lab expl_loop_init invl in
         let prev = sp_of_inv None lab expl_loop_init invl in
         let keep = wp_of_inv None lab expl_loop_keep invl in
-        let oldies, ovarl = oldify_variant varl in
-        let keep = if varl = [] then keep else
-          let decr = decrease env e.e_loc lab expl_loop_vari ovarl varl in
-          wp_and keep decr in
+        let keep, oldies =
+          if varl = [] then keep, Mpv.empty else
+          let oldies, ovarl = oldify_variant varl in
+          let d = decrease env loc lab expl_loop_vari ovarl varl in
+          wp_and d keep, oldies in
         let k = Kseq (k_expr env lps e1 res xmap, 0, Kstop keep) in
         let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
@@ -618,7 +621,7 @@ let rec k_expr env lps e res xmap =
           | To     -> env.ps_int_gt, env.ps_int_le, env.fs_int_pl
           | DownTo -> env.ps_int_lt, env.ps_int_ge, env.fs_int_mn in
         let bounds = t_and (ps_app le [a; i]) (ps_app le [i; b]) in
-        let expl_bounds f = vc_expl e.e_loc lab expl_for_bound f in
+        let expl_bounds f = vc_expl loc lab expl_for_bound f in
         let i_pl_1 = fs_app pl [i; one] ty_int in
         let b_pl_1 = fs_app pl [b; one] ty_int in
         let init = t_subst_single v.pv_vs a init in
@@ -652,7 +655,7 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mexn.empty) cty e =
   let k = if Slab.mem sp_label e.e_label then Ktag (SP, k) else
           if Slab.mem wp_label e.e_label then Ktag (WP, k) else k in
   let k = bind_oldies oldies (bind_oldies cty.cty_oldies k) in
-  Kseq (Kval (cty.cty_args, sp_of_pre expl_pre cty.cty_pre), 0, k)
+  Kseq (Kval (cty.cty_args, sp_of_pre cty.cty_pre), 0, k)
 
 and k_rec env lps rdl =
   let k_rd {rec_fun = c; rec_varl = varl} =
@@ -660,8 +663,9 @@ and k_rec env lps rdl =
       | Cfun e -> e | _ -> assert false in
     if varl = [] then k_fun env lps c.c_cty e else
     let oldies, varl = oldify_variant varl in
-    let add lps rd = let decr = ls_decr_of_rec_defn rd in
-      Mls.add (Opt.get decr) (varl, List.map snd rd.rec_varl) lps in
+    let add lps rd =
+      let decr = Opt.get (ls_decr_of_rec_defn rd) in
+      Mls.add decr (varl, List.map snd rd.rec_varl) lps in
     k_fun env (List.fold_left add lps rdl) ~oldies c.c_cty e in
   List.map k_rd rdl
 
@@ -778,10 +782,9 @@ let adjustment dst = Mpv.fold (fun o n sbs ->
   Mvs.add o.pv_vs (t_var n) sbs) dst Mvs.empty
 
 let advancement dst0 dst1 =
-  let pair _ v n =
-    if vs_equal v n then None else Some (v,n) in
-  let add _ (v,n) sbs = Mvs.add v (t_var n) sbs in
-  Mpv.fold add (Mpv.inter pair dst0 dst1) Mvs.empty
+  let add _ v n sbs =
+    if vs_equal v n then sbs else Mvs.add v (t_var n) sbs in
+  Mpv.fold2_inter add dst0 dst1 Mvs.empty
 
 (* express shared region values as "v.f1.f2.f3" when possible *)
 
