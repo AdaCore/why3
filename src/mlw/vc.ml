@@ -83,6 +83,9 @@ let mk_env {Theory.th_export = ns} kn = {
   exn_count = ref 0;
 }
 
+(* every exception-catching clause is represented by
+   a unique integer, so that we can move code inside
+   try-with expressions without capturing exceptions *)
 let new_exn env = incr env.exn_count; !(env.exn_count)
 
 (* FIXME: cannot verify int.why because of a cyclic dependency.
@@ -246,7 +249,7 @@ let renew_oldies o2v =
     Mpv.add n v n2v, Mvs.add o.pv_vs (t_var n.pv_vs) o2n in
   Mpv.fold renew o2v (Mpv.empty, Mvs.empty)
 
-(* convert user specifications into wp and sp *)
+(* convert user specifications into goals (wp) and premises (sp) *)
 
 let wp_of_inv loc lab expl pl =
   t_and_l (List.map (vc_expl loc lab expl) pl)
@@ -274,45 +277,55 @@ let sp_of_post loc lab expl v ql = let t = t_var v.pv_vs in
   let push q = push_stop loc lab expl (open_post_with t q) in
   t_and_l (List.map push ql)
 
+(* definitions of local let-functions are inserted in the VC
+   as premises for the subsequent code (in the same way as
+   definitions of top-level let-functions are translated to
+   logical definitions in Pdecl.create_let_decl) *)
 let cty_enrich_post c = match c with
   | {c_node = Cfun e; c_cty = cty} ->
       let {pv_vs = u} = res_of_cty cty in
       let prop = ty_equal u.vs_ty ty_bool in
       begin match term_of_expr ~prop e with
-        | Some f ->
-            let f = match f.t_node with
-              | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
-                when ls_equal ps ps_equ
-                  && ls_equal fs fs_bool_true -> t
-              | _ -> f in
-            let q = match f.t_ty with
-              | None -> t_iff (t_equ (t_var u) t_bool_true) f
-              | Some _ -> t_equ (t_var u) f in
-            cty_add_post cty [create_post u q]
-        | None when cty.cty_post = [] ->
-            begin match post_of_expr (t_var u) e with
-            | Some f -> cty_add_post cty [create_post u f]
-            | None -> cty end
-        | None -> cty end
+      | Some f ->
+          let f = match f.t_node with
+            | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
+              when ls_equal ps ps_equ
+                && ls_equal fs fs_bool_true -> t
+            | _ -> f in
+          let q = match f.t_ty with
+            | None -> t_iff (t_equ (t_var u) t_bool_true) f
+            | Some _ -> t_equ (t_var u) f in
+          cty_add_post cty [create_post u q]
+      | None when cty.cty_post = [] ->
+          begin match post_of_expr (t_var u) e with
+          | Some f -> cty_add_post cty [create_post u f]
+          | None -> cty end
+      | None -> cty end
   | _ -> c.c_cty
 
-(* simplified syntax tree *)
+(* k-expressions: simplified code *)
 
 type ktag = WP | SP | Push of bool
 
 type kode =
-  | Kseq   of kode * int * kode
-  | Kpar   of kode * kode
-  | Kif    of pvsymbol * kode * kode
-  | Kcase  of pvsymbol * (pattern * kode) list
-  | Khavoc of pvsymbol option Mpv.t Mreg.t
-  | Klet   of pvsymbol * term * term
-  | Kval   of pvsymbol list * term
-  | Kcut   of term
-  | Kstop  of term
-  | Kcont  of int
-  | Kaxiom of kode
-  | Ktag   of ktag * kode
+  | Kseq   of kode * int * kode           (* 0: sequence, N: try-with *)
+  | Kpar   of kode * kode                 (* non-deterministic choice *)
+  | Kif    of pvsymbol * kode * kode          (* deterministic choice *)
+  | Kcase  of pvsymbol * (pattern * kode) list    (* pattern matching *)
+  | Khavoc of pvsymbol option Mpv.t Mreg.t  (* writes and assignments *)
+  | Klet   of pvsymbol * term * term         (* let v = t such that f *)
+  | Kval   of pvsymbol list * term        (* let vl = any such that f *)
+  | Kcut   of term                        (* assert: check and assume *)
+  | Kstop  of term                        (* check and halt execution *)
+  | Kcont  of int                                (* 0: skip, N: raise *)
+  | Kaxiom of kode                  (* axiom-functions: assume the VC *)
+  | Ktag   of ktag * kode          (* switch VCgen or mark to push up *)
+
+(* kode requires, and expr provides, the following invariants:
+   - a used variable must be defined by Klet or declared by Kval
+     on every codepath leading to its use, and only once
+   - in Klet(v,t,_), variable v does not occur in term t
+   - every visible variable is a pvsymbol *)
 
 let rec k_print fmt k = match k with
   | Kseq (k1 ,0, k2) -> Format.fprintf fmt
@@ -359,8 +372,10 @@ let rec k_print fmt k = match k with
         | Push false -> "PUSH OPEN" in
       Format.fprintf fmt "@[<hov 4>%s %a@]" s k_print k
 
-(** stage 1: expr -> kode *)
-
+(* check if a pure k-expression can be converted to a term.
+   We need this for simple conjuctions, disjuctions, and
+   pattern-matching exprs, to avoid considering each branch
+   separately; also to have a single substitutable term. *)
 let term_of_kode res k =
   let rec get_stack st k = match k with
     | Klet (v, t, f) when pv_equal v res -> st, Some (t, f), 0, Kcont 0
@@ -395,6 +410,8 @@ let term_of_kode res k =
       t, f, k
   | None -> raise Exit
 
+(* stage 1: expr -> kode *)
+
 let k_unit res = Kval ([res], t_true)
 
 let bind_oldies o2v k = Mpv.fold (fun o v k ->
@@ -405,10 +422,19 @@ let k_havoc eff k =
   let conv wr = Mpv.map (fun () -> None) wr in
   Kseq (Khavoc (Mreg.map conv eff.eff_writes), 0, k)
 
+(* missing exceptional postconditions are set to True,
+   unless we skip them altogether and let the exception
+   escape into the outer code (only for abstract blocks) *)
 let complete_xpost cty {eff_raises = xss} skip =
   Mexn.set_union (Mexn.set_inter cty.cty_xpost xss)
     (Mexn.map (fun () -> []) (Mexn.set_diff xss skip))
 
+(* translate the expression [e] into a k-expression:
+   [lps] stores the variants of outer recursive functions
+   [res] names the result of the normal execution of [e]
+   [xmap] maps every raised exception to a pair [i,xres]:
+   - [i] is a positive int assigned at the catching site
+   - [xres] names the value carried by the exception *)
 let rec k_expr env lps ({e_loc = loc} as e) res xmap =
   let lab = Slab.diff e.e_label vc_labels in
   let t_lab t = t_label ?loc lab t in
@@ -421,8 +447,13 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         Klet (res, t_lab (t_var v.pv_vs), t_true)
     | Econst c ->
         Klet (res, t_lab (t_const c), t_true)
-    | Eexec (c, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
+    | Eexec (ce, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
+        (* [ VC(ce) (if ce is a lambda executed in-place)
+           | STOP pre
+           | HAVOC ; [ ASSUME post | ASSUME xpost ; RAISE ] ] *)
         let p, (oldies, sbs) = match pre with
+          (* for recursive calls, compute the 'variant decrease'
+             precondition and rename the oldies to avoid clash *)
           | {t_node = Tapp (ls, tl)} :: pl when Mls.mem ls lps ->
               let ovl, rll = Mls.find ls lps in
               let nvl = List.combine tl rll in
@@ -436,16 +467,21 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           | Some (t, sp) -> Klet (v, t_lab t, sp)
           | None -> Kval ([v], sp) in
         let k = k_of_post expl_post res cty.cty_post in
-        let skip = match c.c_node with
+        (* in abstract blocks, exceptions without postconditions
+           escape from the block into the outer code. Otherwise,
+           every exception in eff_raises is an alternative block
+           with the xpost assumed and the exception raised. *)
+        let skip = match ce.c_node with
           | Cfun _ -> xmap | _ -> Mexn.empty in
         let xq = complete_xpost cty e.e_effect skip in
         let k = Mexn.fold2_inter (fun _ ql (i,v) k ->
           let xk = k_of_post expl_xpost v ql in
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
+        (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
         let k = if pre = [] then k else Kpar (Kstop p, k) in
-        begin match c.c_node with
-          | Cfun e -> Kpar (k_fun env lps ~xmap c.c_cty e, k)
+        begin match ce.c_node with
+          | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
           | _ -> k end
     | Eassign asl ->
         let cv = e.e_effect.eff_covers in
@@ -459,7 +495,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
             | None   -> Some (Mpv.singleton f v)
             | Some s -> Some (Mpv.add f v s)) r wr in
         let wr = List.fold_left add Mreg.empty asl in
-        (* we compute the same region bijection as eff_assign,
+        (* we compute the same region bijection as in eff_assign,
            except we do not need any consistency checking now *)
         let reg_rexp {reg_its = s; reg_args = tl; reg_regs = rl} wfs =
           let ity_rexp xl t = ity_exp_fold (fun l r -> r :: l) xl t in
@@ -493,9 +529,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
     | Elet ((LDsym _| LDrec _) as ld, e1) ->
         let k = k_expr env lps e1 res xmap in
         (* when we havoc the VC of a locally defined function,
-          we must take into account every write in the following
-          expression and ignore the resets, because the function
-          may be executed before the resets. *)
+           we must take into account every write in the following
+           expression and ignore the resets, because the function
+           may be executed before the resets. *)
         let eff = eff_write e1.e_effect.eff_reads
                             e1.e_effect.eff_writes in
         (* postcondition, as in [Pdecl.create_let_decl] *)
@@ -538,39 +574,46 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
               Kpar (k_havoc eff (k_fun env lps cty e), k)
           | _ -> k end
     | Eif (e0, e1, e2) ->
+        (* with both branches pure, switch to SP to avoid splitting *)
         let s = eff_pure e1.e_effect && eff_pure e2.e_effect in
         let k1 = k_expr env lps e1 res xmap in
         let k2 = k_expr env lps e2 res xmap in
-        if s then try
-          let t1, f1, k1 = term_of_kode res k1 in
-          let t2, f2, k2 = term_of_kode res k2 in
-          var_or_proxy e0 (fun v ->
+        let kk v =
+          if s then try
+            let t1, f1, k1 = term_of_kode res k1 in
+            let t2, f2, k2 = term_of_kode res k2 in
             let test = t_equ (t_var v.pv_vs) t_bool_true in
+            (* with both branches simple, define a resulting term *)
             let t = t_if_simp test t1 t2 and f = sp_if test f1 f2 in
-            Kseq (Ktag (SP, Kif (v, k1, k2)), 0, Klet (res, t, f)))
-        with Exit ->
-          var_or_proxy e0 (fun v -> Ktag (SP, Kif (v, k1, k2)))
-        else var_or_proxy e0 (fun v -> Kif (v, k1, k2))
+            Kseq (Ktag (SP, Kif (v, k1, k2)), 0, Klet (res, t, f))
+          with Exit -> Ktag (SP, Kif (v, k1, k2))
+          else Kif (v, k1, k2) in
+        var_or_proxy e0 kk
     | Ecase (e0, bl) ->
+        (* with all branches pure, switch to SP to avoid splitting *)
         let s = List.for_all (fun (_,e) -> eff_pure e.e_effect) bl in
         let branch (pp,e) = pp.pp_pat, k_expr env lps e res xmap in
         let bl = List.map branch bl in
-        if s then try
-          let add_br (p,k) (bl,tl,fl) =
-            let t, f, k = term_of_kode res k in
-            let tl = t_close_branch p t :: tl in
-            (p,k)::bl, tl, t_close_branch p f :: fl in
-          let bl, tl, fl = List.fold_right add_br bl ([],[],[]) in
-          var_or_proxy e0 (fun v -> let tv = t_var v.pv_vs in
+        let kk v =
+          if s then try
+            let add_br (p,k) (bl,tl,fl) =
+              let t, f, k = term_of_kode res k in
+              let tl = t_close_branch p t :: tl in
+              (p,k)::bl, tl, t_close_branch p f :: fl in
+            let bl, tl, fl = List.fold_right add_br bl ([],[],[]) in
+            (* with all branches simple, define a resulting term *)
+            let tv = t_var v.pv_vs in
             let t = t_case tv tl and f = sp_case tv fl in
-            Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f)))
-        with Exit ->
-          var_or_proxy e0 (fun v -> Ktag (SP, Kcase (v, bl)))
-        else var_or_proxy e0 (fun v -> Kcase (v, bl))
+            Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f))
+          with Exit -> Ktag (SP, Kcase (v, bl))
+          else Kcase (v, bl) in
+        var_or_proxy e0 kk
     | Etry (e0, bl) ->
+        (* try-with is just another semicolon *)
         let branch xs (vl,e) (xl,xm) =
           let i = new_exn env in
           let xk = k_expr env lps e res xmap in
+          (* a single pv for the carried value *)
           let v, xk = match vl with
             | [] -> pv_of_ity "_" ity_unit, xk
             | [v] -> v, xk
@@ -582,6 +625,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           (i,xk)::xl, Mexn.add xs (i,v) xm in
         let xl, xmap = Mexn.fold branch bl ([], xmap) in
         let k = k_expr env lps e0 res xmap in
+        (* catched xsymbols are converted to unique integers,
+           so that we can now serialise the "with" clauses
+           and avoid capturing the wrong exceptions *)
         List.fold_left (fun k (i,xk) -> Kseq (k,i,xk)) k xl
     | Eraise (xs, e0) ->
         let i, v = Mexn.find xs xmap in
@@ -604,6 +650,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
     | Eabsurd ->
         Kstop (vc_expl loc lab expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
+        (* [ STOP inv
+           | HAVOC ; ASSUME inv ; IF e0 THEN e1 ; STOP inv
+                                        ELSE SKIP ] *)
         let init = wp_of_inv None lab expl_loop_init invl in
         let prev = sp_of_inv None lab expl_loop_init invl in
         let keep = wp_of_inv None lab expl_loop_keep invl in
@@ -636,16 +685,26 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = Kseq (Kval ([v], sp_and bounds prev), 0, k) in
         let k = Kpar (k, Kval ([res], last)) in
         let k = Kpar (Kstop init, k_havoc e.e_effect k) in
-        if Slab.mem lf_label e.e_label then
+        if Slab.mem lf_label e.e_label then (* "liberal for"
+          [ ASSUME a <= b ;
+            [ STOP inv[a]
+            | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
+                      | ASSUME inv[b+1] ] ]
+          | ASSUME a > b ] *)
           Kpar (Kseq (Kval ([], expl_bounds (ps_app le [a; b])), 0, k),
                    Kval ([res], expl_bounds (ps_app gt [a; b])))
-        else
+        else (* "strict for"
+          [ STOP a <= b+1
+          | STOP inv[a]
+          | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
+                    | ASSUME inv[b+1] ] ] *)
           Kpar (Kstop (expl_bounds (ps_app le [a; b_pl_1])), k)
   in
   if Slab.mem sp_label e.e_label then Ktag (SP, k) else
   if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
 
 and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mexn.empty) cty e =
+  (* ASSUME pre ; LET oarg = arg ; TRY e ; STOP post WITH xpost *)
   let res, q = wp_of_post expl_post cty.cty_result cty.cty_post in
   let xq = complete_xpost cty e.e_effect xmap in
   let xq = Mexn.mapi (fun xs ql ->
@@ -666,6 +725,9 @@ and k_rec env lps rdl =
     let e = match c.c_node with
       | Cfun e -> e | _ -> assert false in
     if varl = [] then k_fun env lps c.c_cty e else
+    (* store in lps our variant at the entry point
+       and the list of well-founded orderings
+       for each function in the let-rec block *)
     let oldies, varl = oldify_variant varl in
     let add lps rd =
       let decr = Opt.get (ls_decr_of_rec_defn rd) in
@@ -673,11 +735,21 @@ and k_rec env lps rdl =
     k_fun env (List.fold_left add lps rdl) ~oldies c.c_cty e in
   List.map k_rd rdl
 
-(** stage 2: push sub-expressions up as far as we can *)
+(* stage 2: push sub-expressions up as far as we can *)
 
+(* remove dead code, reassociate sequences to the right,
+   and move exception-handling code to the raise site
+   when there is only one. This reduces duplication of
+   premises for SP and allows it to use let-in instead
+   of quantifiers over an equality when possible. *)
 let reflow vc_wp k =
   let join _ _ _ = Some false in
   let join = Mint.union join in
+  (* count the exit points for every outcome, normal or
+     exceptional; remove the subsequent code if none,
+     tag the subsequent code for moving up if single.
+     For every kode to be pushed up, remember if
+     it can exit normally (open) or not (closed). *)
   let rec mark vc_tag k = match k with
     | Kseq ((Khavoc _ | Klet _ | Kval _ | Kcut _) as k1, 0, k2) ->
         let k2, out2 = mark vc_tag k2 in
@@ -716,6 +788,9 @@ let reflow vc_wp k =
         k, Mint.singleton 0 true
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
+        (* WP ((SP k1); k2) could be SP (k1; WP k2),
+           but we cannot freely switch from SP to WP,
+           so we forbid pushing under another VCgen *)
         Ktag (tag, k), Mint.map (fun _ -> false) out
     | Ktag ((WP|SP), k) ->
         mark vc_tag k
@@ -724,9 +799,14 @@ let reflow vc_wp k =
   in
   let rec push k q = match k with
     | Kseq (k1, i, Ktag (Push cl, k2)) ->
+        (* if k2 is open but we push a closed code
+           for 0 in it, then k2 becomes closed *)
         let cl = cl || match Mint.find_opt 0 q with
           | Some (_, cl) -> cl | None -> false in
         let q = Mint.add i (push k2 q, cl) q in
+        (* if k2 is an open exception-handling code
+           being pushed in k1, then we must still
+           raise i after k2 and catch it here *)
         if i = 0 || cl then push k1 q else
         Kseq (push k1 q, i, Kcont 0)
     | Kseq (k1, i, k2) ->
@@ -764,7 +844,7 @@ let reflow vc_wp k =
 
 (** stage 3: WP *)
 
-(* a "destination map" maps program variables (pre-effect state)
+(* a "destination map" maps pvsymbols (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
 let ity_affected wr ity =
