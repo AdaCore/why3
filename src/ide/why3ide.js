@@ -19,13 +19,55 @@ function readBody(xhr) {
     return data;
 }
 
+function interpNotif(n) {
+    if (n != null) {
+        switch (n["notification"]) {
+        case "None": break;
+        case "Initialized" :
+            printAnswer("got initialized: TODO");
+            break;
+        case "New_node" :
+/*
+            printAnswer("got new node: nid = " + n.nid + " parent = " + n.parent + " type = " + n.nodetype);
+*/
+            var pid ='session';
+            if (n.parent != n.nid) {
+                pid = "nid"+n.parent;
+            }
+            else {
+                var session = document.getElementById(pid);
+                session.innerHTML = "";
+            }
+            var parent = document.getElementById(pid);
+            var linode = document.createElement("LI");
+            var textnode = document.createTextNode(n.nodetype + " " + n.name);
+            linode.appendChild(textnode);
+            var ulnode = document.createElement("UL");
+            ulnode.setAttribute('id',"nid"+n.nid);
+            linode.appendChild(ulnode);
+            parent.appendChild(linode);
+            break;
+        default:
+            printAnswer("unsupported notification: " + n["notification"]);
+        }
+    }
+}
+
 function getNotification () {
 var req = new XMLHttpRequest();
 req.open('GET', 'http://localhost:6789/getNotifications', true);
 req.onreadystatechange = function (aEvt) {
   if (req.readyState == XMLHttpRequest.DONE) {
-     if(req.status == 200)
-      printAnswer("" + readBody(req));
+     if(req.status == 200) {
+         var r = readBody(req);
+         /* printAnswer("r = |" + r + "|"); */
+         var a = JSON.parse(r);
+         if (a != null) {
+            var l = a.length;
+             /* printAnswer("length = " + l); */
+            for (var n=0; n < l; n++) interpNotif(a[n])
+         }
+         }
      else
       printAnswer("Erreur " + req.status);
   }

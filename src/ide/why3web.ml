@@ -48,13 +48,22 @@ let message_notification n =
   | Task_Monitor(a,b,c) ->
      Obj ["message_kind",String "Task_Monitor"; "a", Int a; "b", Int b; "c", Int c]
 
+let nodetype t =
+  match t with
+  | NRoot -> "root"
+  | NFile -> "file"
+  | NTheory -> "theory"
+  | NTransformation -> "transformation"
+  | NGoal -> "goal"
+  | NProofAttempt -> "proofattempt"
+
 let notification n =
   match n with
   | Node_change(nid,_info) ->
      Obj ["notification",String "Node_change"; "nid", Int nid; "info",String "TODO"]
-  | New_node(nid,parent,_nodetype,_info) ->
+  | New_node(nid,parent,nt,name) ->
      Obj ["notification",String "New_node"; "nid", Int nid; "parent", Int parent;
-          "nodetype", String "TODO"; "info",String "TODO"]
+          "nodetype", String (nodetype nt); "name",String name]
   | Remove nid ->
      Obj ["notification",String "Remove"; "nid", Int nid]
   | Initialized _ginfo ->
@@ -68,8 +77,6 @@ let notification n =
   | Task(nid,_task) ->
      Obj ["notification",String "Task"; "nid", Int nid; "task", String "TODO"]
 
-let print_notification fmt n = Json.print fmt (notification n)
-
 let handle_script s args =
   match s with
   | "request" ->
@@ -82,8 +89,11 @@ let handle_script s args =
      end
     | "getNotifications" ->
        let n = P.get_notifications () in
-       (* if n <> [] then  *)
-         Pp.sprintf "getNotifications: %a@." (Pp.print_list Pp.space print_notification) n
+       let n =
+         if n = [] then [Obj ["notification",String "None"]]
+         else List.map notification n
+       in
+       Pp.sprintf "%a@." Json.print (Array n)
     | _ -> "bad request"
 
 let plist fmt l =
@@ -101,6 +111,7 @@ let handler (addr,req) script cont fmt =
        eprintf "script: `%s'@." script;
        eprintf "cont: `%s'@." cont;
        let ans = handle_script script cont in
+       eprintf "answer: `%s'@." ans;
        Wserver.http_header fmt "HTTP/1.0 200 OK";
        fprintf fmt "Access-Control-Allow-Origin: *\n";
        fprintf fmt "\n"; (* end of header *)

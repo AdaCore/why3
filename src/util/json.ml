@@ -58,8 +58,8 @@ type value =
 
 let rec print fmt v =
   match v with
-  | Obj l -> map_bindings (fun s -> s) print fmt l
-  | Array l -> list print fmt l
+  | Obj l -> if l <> [] then map_bindings (fun s -> s) print fmt l else fprintf fmt "{null}"
+  | Array l -> if l <> [] then list print fmt l else fprintf fmt "[null]"
   | String s -> string fmt s
   | Int i -> int fmt i
   | Float f -> float fmt f
