@@ -106,9 +106,112 @@ module Make(S:sig
 
   let p = Pretty.print_term Format.err_formatter
   
+  let get_class_for_term uf_man t =
+    try
+      TermToClass.to_t uf_man.class_to_term t
+    with
+    | Not_found ->
+      let c = Union_find.new_class () in
+      uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
+      c
+  
+  
+  let get_equivs uf_man uf t =
+    let tcl = TermToClass.to_t uf_man.class_to_term t in
+    match t.t_node with
+    | Tvar(_) | Tconst(_) when not( Ty.ty_equal (t_type t) Ty.ty_int) ->
+      List.map (TermToClass.to_term uf_man.class_to_term) (Union_find.get_class tcl uf)
+    | Tapp(lsym, args) ->
+      let l = List.fold_left (fun args argi ->
+          let tclarg = get_class_for_term uf_man argi in
+          let argsi =
+            List.map (TermToClass.to_term uf_man.class_to_term) (Union_find.get_class tclarg uf) in
+          List.map (fun ai ->
+              List.map (fun l -> ai::l) args) argsi |> List.concat) [[]] args
+      in
+      l
+      |> List.map List.rev
+      |> List.map (fun a -> t_app lsym a (Some (t_type t)))
+    | _ -> [t]
+
+  let do_eq_ns (man, uf_man) a b =
+    if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
+    fun (d, ud) ->
+      let all_values = Union_find.flat ud.classes in
+      let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
+      let d, ud = List.fold_left (fun (d, ud) v ->
+          let rec replaceby t =
+            if t_equal t a then
+              b
+            else
+              t_map replaceby t
+          in
+          let v' = replaceby v in
+          if t_equal v v' then
+            d, ud
+          else
+            let cl = (get_class_for_term uf_man v |> Union_find.repr) ud.classes in
+            let cl' = (get_class_for_term uf_man v' |> Union_find.repr) ud.classes in
+            if cl = cl' then
+              d, ud
+            else
+              begin
+                let ud =
+                  if not (Ty.ty_equal (t_type v) Ty.ty_int) then
+                    { ud with classes = Union_find.union cl cl' ud.classes }
+                  else
+                    { ud with classes = Union_find.union cl' cl' ud.classes }
+                in
+                let var = try
+                    Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl))
+                  with
+                  | Not_found -> None
+                in
+                let var' = try
+                    Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl'))
+                  with
+                  | Not_found -> None
+                in
+                match var, var' with
+                | Some var, Some var' when var <> var' ->
+                  let expr = Linexpr1.make uf_man.env in
+                  Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
+                  Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+                  let lincons = Lincons1.make expr Lincons1.EQ in
+                  let lincons_array = Lincons1.array_make uf_man.env 1 in
+                  Lincons1.array_set lincons_array 0 lincons;
+                  Pretty.print_term Format.err_formatter v;
+                  Pretty.print_term Format.err_formatter v';
+                  Format.eprintf "blip@.";
+                  let d = D.meet_lincons_array man d lincons_array in
+                  d, ud
+                | _ ->
+                  d, ud
+              end
+
+        ) (d, ud) all_values in
+      let ud =
+        if not (Ty.ty_equal (t_type a) (Ty.ty_int)) then
+          { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man b) ud.classes }
+        else ud
+      in
+      d, ud
+    else
+      fun x -> x
+
+  let do_eq (man, uf_man) a b =
+    let f = do_eq_ns (man, uf_man) a b in
+    let g = do_eq_ns (man, uf_man) b a in
+    (fun x ->
+       f x |> g )
+
+
+
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let join_uf (man, uf_man) d a b =
     let d = ref d in
+    let eqs = ref [] in
+    let classes =  Union_find.join a.classes b.classes in
     let uf_to_var = TermToVar.union (fun v1 v2 ->
         let expr = Linexpr1.make uf_man.env in
         Linexpr1.set_coeff expr v2 (Coeff.s_of_int 1);
@@ -118,12 +221,25 @@ module Make(S:sig
         Lincons1.array_set lincons_array 0 lincons;
         d := D.meet_lincons_array man !d lincons_array; 
         d := D.forget_array man !d [|v2|] false;
-      ) a.uf_to_var b.uf_to_var in
+      ) (fun te ->
+        (*let eqs' =
+          try
+            get_equivs uf_man classes te |> List.map (fun t -> t, te)
+          with
+          | Not_found -> []
+        in
+        eqs := !eqs @ eqs';*) ()
+      )
+      a.uf_to_var b.uf_to_var in
     let d = !d in
-    let classes =  Union_find.join a.classes b.classes in
-    assert (TermToVar.card uf_to_var >= max (TermToVar.card a.uf_to_var) (TermToVar.card b.uf_to_var));
-    assert (List.length (Union_find.flat classes) >= max ( List.length (Union_find.flat a.classes)) (List.length (Union_find.flat b.classes))) ;
-    d, { classes; uf_to_var; quantified_vars = a.quantified_vars; }
+    let e = { classes; uf_to_var; quantified_vars = a.quantified_vars; } in
+    List.fold_left (fun (d, e) (a, b) ->
+        D.print Format.std_formatter d;
+        let d, e = do_eq (man, uf_man) a b (d, e) in
+        Format.printf "@.";
+        D.print Format.std_formatter d;
+        assert false |> ignore;
+      d, e) (d, e) !eqs
 
   let print fmt (a, b) = A.print fmt a
 
@@ -271,15 +387,6 @@ module Make(S:sig
     in
     aux ity
 
-  let get_class_for_term uf_man t =
-    try
-      TermToClass.to_t uf_man.class_to_term t
-    with
-    | Not_found ->
-      let c = Union_find.new_class () in
-      uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
-      c
-  
   let class_exists uf_man u t =
     let cl = get_class_for_term uf_man t in
     Union_find.get_class cl u.classes |> List.length > 1
@@ -295,25 +402,6 @@ module Make(S:sig
       List.map (get_depend s) args
       |> List.fold_left (Mterm.union (fun _ _ _ -> Some ())) Mterm.empty
     | _ -> Mterm.empty
-
-  let get_equivs uf_man uf t =
-    let tcl = TermToClass.to_t uf_man.class_to_term t in
-    match t.t_node with
-    | Tvar(_) | Tconst(_) when not( Ty.ty_equal (t_type t) Ty.ty_int) ->
-      List.map (TermToClass.to_term uf_man.class_to_term) (Union_find.get_class tcl uf)
-    | Tapp(lsym, args) ->
-      let l = List.fold_left (fun args argi ->
-          let tclarg = get_class_for_term uf_man argi in
-          let argsi =
-            List.map (TermToClass.to_term uf_man.class_to_term) (Union_find.get_class tclarg uf) in
-          List.map (fun ai ->
-              List.map (fun l -> ai::l) args) argsi |> List.concat) [[]] args
-      in
-      l
-      |> List.map List.rev
-      |> List.map (fun a -> t_app lsym a (Some (t_type t)))
-    | _ -> [t]
-
 
 
   let get_var_for_term id uf_man t =
@@ -404,109 +492,6 @@ module Make(S:sig
   let get_class_for_term_ro uf_man t =
     TermToClass.to_t uf_man.class_to_term t
 
-  let do_eq_ns (man, uf_man) a b =
-    if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
-    fun (d, ud) ->
-      let all_values = Union_find.flat ud.classes in
-      let all_values = List.map (TermToClass.to_term uf_man.class_to_term) all_values in
-      let d, ud = List.fold_left (fun (d, ud) v ->
-          let rec replaceby t =
-            if t_equal t a then
-              b
-            else
-              t_map replaceby t
-          in
-          let v' = replaceby v in
-          if t_equal v v' then
-            d, ud
-          else
-            let cl = (get_class_for_term uf_man v |> Union_find.repr) ud.classes in
-            let cl' = (get_class_for_term uf_man v' |> Union_find.repr) ud.classes in
-            if cl = cl' then
-              d, ud
-            else
-              begin
-                let ud =
-                  if not (Ty.ty_equal (t_type v) Ty.ty_int) then
-                    { ud with classes = Union_find.union cl cl' ud.classes }
-                  else
-                    { ud with classes = Union_find.union cl' cl' ud.classes }
-                in
-                let var = try
-                    Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl))
-                  with
-                  | Not_found -> None
-                in
-                let var' = try
-                    Some (TermToVar.to_t ud.uf_to_var (TermToClass.to_term uf_man.class_to_term cl'))
-                  with
-                  | Not_found -> None
-                in
-                match var, var' with
-                | Some var, None ->
-                  let d, var' = 
-                    try
-                      let myv' = TermToVar.to_t uf_man.var_to_term v' in
-                      let expr = Linexpr1.make uf_man.env in
-                      Linexpr1.set_coeff expr myv' (Coeff.s_of_int 1);
-                      Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
-                      let lincons = Lincons1.make expr Lincons1.EQ in
-                      let lincons_array = Lincons1.array_make uf_man.env 1 in
-                      Lincons1.array_set lincons_array 0 lincons;
-                      let d = if myv' <> var then D.meet_lincons_array man d lincons_array else d in
-                      d, myv'
-                    with
-                    | Not_found -> d, var
-                  in
-                  let uf_to_var = TermToVar.add ud.uf_to_var v' var' in
-                  let ud = { ud with uf_to_var } in
-                  d, ud
-                | Some var, Some var' when var <> var' ->
-                  let expr = Linexpr1.make uf_man.env in
-                  Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
-                  Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
-                  let lincons = Lincons1.make expr Lincons1.EQ in
-                  let lincons_array = Lincons1.array_make uf_man.env 1 in
-                  Lincons1.array_set lincons_array 0 lincons;
-                  D.meet_lincons_array man d lincons_array, ud 
-                | None, Some var->
-                  let d, var' = 
-                    try
-                      let myv' = TermToVar.to_t uf_man.var_to_term v in
-                      let expr = Linexpr1.make uf_man.env in
-                      Linexpr1.set_coeff expr myv' (Coeff.s_of_int 1);
-                      Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
-                      let lincons = Lincons1.make expr Lincons1.EQ in
-                      let lincons_array = Lincons1.array_make uf_man.env 1 in
-                      Lincons1.array_set lincons_array 0 lincons;
-                      let d = if myv' <> var then D.meet_lincons_array man d lincons_array else d in
-                      d, myv'
-                    with
-                    | Not_found -> d, var
-                  in
-                  let uf_to_var = TermToVar.add ud.uf_to_var v var' in
-                  let ud = { ud with uf_to_var } in
-                  d, ud
-                | _ ->
-                  d, ud
-              end
-
-        ) (d, ud) all_values in
-      let ud =
-        if not (Ty.ty_equal (t_type a) (Ty.ty_int)) then
-          { ud with classes = Union_find.union (get_class_for_term uf_man a) (get_class_for_term uf_man b) ud.classes }
-        else ud
-      in
-      d, ud
-    else
-      fun x -> x
-
-  let do_eq (man, uf_man) a b =
-    let f = do_eq_ns (man, uf_man) a b in
-    let g = do_eq_ns (man, uf_man) b a in
-    (fun x -> f x |> g)
-
-
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
    * The resulting list of linear expressions is weaker than the original why3
@@ -575,6 +560,15 @@ module Make(S:sig
               let tcl = get_class_for_term uf_man t in
               f := (fun (d, u) ->
                   let d, u = g (d, u) in
+                  let d, u =
+                    try
+                      if not (t_equal (TermToVar.to_term u.uf_to_var myvar) t) then
+                        D.forget_array man d [|myvar|] false, { u with uf_to_var = TermToVar.remove_t u.uf_to_var myvar }
+                      else
+                        d, u
+                    with
+                    | Not_found -> d, u
+                  in
                   (*let d = D.forget_array man d [|myvar|] false in*)
                   let d, u =
                     try
@@ -1011,7 +1005,8 @@ module Make(S:sig
                 in
                 extract_term (man, uf_man) (is_in t) (a, b) myv
             in
-            d := List.fold_left (fun (a, b) v ->
+            d :=
+              List.fold_left (fun (a, b) v ->
                 let cl = get_class_for_term uf_man v in
                 let b =
                   match alternatives with
@@ -1042,13 +1037,6 @@ module Make(S:sig
                 let _, s = Union_find.forget cl b.classes in
                 let b = { b with classes = s } in
                 let old_b = b in
-                let uf_to_var =
-                  try
-                    TermToVar.remove_term b.uf_to_var v
-                  with
-                  | Not_found -> b.uf_to_var
-                in
-                let b = { b with uf_to_var } in
                 try
                   let myv = TermToVar.to_t old_b.uf_to_var v in
                   try
@@ -1062,6 +1050,12 @@ module Make(S:sig
                   a, b
               ) !d int_values
           end;
+        d :=
+        let a, b = !d in
+              let uf_to_var, orphan_vars = TermToVar.filter_term b.uf_to_var (fun t' ->
+                  not (is_in t t')) in
+              D.forget_array man a (Array.of_list orphan_vars) false, { b with uf_to_var }
+              ;
       done;
       !d
     in
@@ -1087,30 +1081,7 @@ module Make(S:sig
   let forget_var m v = forget_term m (t_var v)
 
   let forget_region (man, uf_man) v b =
-    let terms = Ity.Mreg.find v uf_man.region_mapping in
-    let members =
-      Ity.Mpv.fold_left (fun acc c () ->
-          let terms =
-            try
-              List.find_all (fun (p, _) ->
-                  Ity.pv_equal p c) terms
-              |> List.map snd
-            with
-            | Not_found ->
-              Format.eprintf "Couldn't find projection for field ";
-              Ity.print_pv Format.err_formatter c;
-              Format.eprintf "@.";
-              Format.eprintf "(known fields: ";
-              List.iter (fun (p, _) ->
-                  Ity.print_pv Format.err_formatter p;
-                  Format.eprintf " @.";
-                ) terms;
-              Format.eprintf ")@.";
-              assert false
-          in
-          terms :: acc
-        ) [] b in
-    let members = List.concat members in
+    let members = Ity.Mreg.find v uf_man.region_mapping |> List.map snd in
     let vars = Ity.Mreg.find v uf_man.region_var in
     let f = List.fold_left (fun f t ->
         let a = forget_term (man, uf_man) t in
@@ -1119,7 +1090,8 @@ module Make(S:sig
         fun (d, ud) ->
           let acl = get_class_for_term uf_man (t_var v) in
           let ud = { ud with classes = Union_find.forget acl ud.classes |> snd } in
-          f (d, ud)) f vars
+          let d = f (d, ud) in
+          d) f vars
 
   let update_possible_substitutions (man, uf_man) =
     ()

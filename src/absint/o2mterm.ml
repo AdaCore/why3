@@ -54,7 +54,7 @@ module Make(S:sig type t end) = struct
     TMap.filter (fun _ k -> k <> Term.Mterm.empty) a.to_term |> TMap.cardinal
 
 
-  let union f a b =
+  let union f g a b =
     let c = a in
     Term.Mterm.fold_left (fun c te t ->
         try
@@ -63,6 +63,7 @@ module Make(S:sig type t end) = struct
           c
         with
         | Not_found ->
+          g te;
           add c te t) c b.to_t
 
   let get_inconsistent a b =
@@ -73,4 +74,17 @@ module Make(S:sig type t end) = struct
           Term.Mterm.bindings d |> List.map fst |> fun i -> Some i
         | _ -> None) a.to_term b.to_term
     |> TMap.bindings |> List.map snd |> List.concat
+
+  let filter_term a f =
+    let orphans = ref [] in
+    let map =
+      { to_t = Term.Mterm.filter (fun t _ -> f t) a.to_t;
+        to_term = TMap.mapi (fun v t ->
+            let s = Term.Mterm.filter (fun t _ -> f t) t in
+            if Term.Mterm.is_empty s then
+              orphans := v :: !orphans;
+            s
+          ) a.to_term; }
+    in map, !orphans
+
 end

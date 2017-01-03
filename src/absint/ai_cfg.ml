@@ -197,7 +197,7 @@ module Make(E: sig
       (fun abs -> abs), (fun abs -> abs)
 
 
-  let remove_eps manpk t =
+  let remove_eps ?ret:(ret=None) manpk t =
     match t.t_node with
     | Teps(tb) ->
       let return, t = Term.t_open_bound tb in
@@ -207,9 +207,14 @@ module Make(E: sig
       if Ty.ty_equal return.vs_ty Ity.ty_unit then
         t
       else
-        let return_var = create_vreturn manpk (return.vs_ty) in
-        let return_term = t_var return_var in
-        t_subst_single return return_term t
+        begin
+          match ret with
+          | None ->
+            let return_var = create_vreturn manpk (return.vs_ty) in
+            let return_term = t_var return_var in
+            t_subst_single return return_term t
+          | Some v -> t_subst_single return (t_var v) t
+        end
     | _ ->
       t
 
@@ -222,12 +227,15 @@ module Make(E: sig
    * returns a tuple, whose first element is the entry point of expr in the cfg, and the second
    * one is the ending point. The result of expr is stored is the variable "result"
    * (see var_return) *)
-  let rec put_expr_in_cfg cfg (manpk:D.man) expr =
+  let rec put_expr_in_cfg cfg (manpk:D.man) ?ret:(ret=None) expr =
     let open Expr in
     match expr.e_node with
     | Epure (t) ->
       let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
-      let vreturn = create_vreturn manpk (t_type t) in
+      let vreturn = match ret with
+        | None -> create_vreturn manpk (t_type t)
+        | Some v -> v
+      in
       let postcondition = t_app ps_equ [t_var vreturn; t] None in
       let constraints = D.meet_term manpk postcondition in
       new_hedge_cfg cfg (i, j) (fun _ abs ->
@@ -249,23 +257,19 @@ module Make(E: sig
            *  | erase every temporary variable
            *  . end_cp
            **)
-      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg cfg manpk let_expr in
-
       D.add_variable_to_env manpk psym;
+      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg ~ret:(Some Ity.(psym.pv_vs)) cfg manpk let_expr in
 
-      let constraints, forget_ret =
-        create_postcondition cfg manpk psym 
-      in
       (*let forget_ret = D.forget_var manpk cfg.env (create_vreturn Ity.(ty_of_ity (psym.pv_ity))) in*)
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg manpk b in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk b in
 
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
-          constraints abs |> forget_ret
+          abs
         );
 
       let end_cp = new_node_cfg cfg expr in
@@ -282,7 +286,10 @@ module Make(E: sig
           begin
           let ty = Term.(Ity.(psym.pv_vs.vs_ty) ) in
 
-          let vreturn = create_vreturn manpk ty in
+          let vreturn = match ret with
+            | None -> create_vreturn manpk ty
+            | Some v -> v
+          in
           let postcondition = Term.( 
               t_app ps_equ [t_var Ity.(psym.pv_vs);(t_var vreturn)] None) in
 
@@ -308,7 +315,10 @@ module Make(E: sig
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg ~label:"constant returned" cfg expr in
 
-      let vreturn = create_vreturn manpk Ty.ty_int in
+      let vreturn = match ret with
+        | None -> create_vreturn manpk Ty.ty_int
+        | Some v -> v
+      in
       let postcondition = t_app ps_equ [t_const n; t_var vreturn] None in
       let constraints = D.meet_term manpk postcondition in
 
@@ -340,7 +350,7 @@ module Make(E: sig
           Format.eprintf "@.";
         end;
       let constraints =
-        List.map (remove_eps manpk) post
+        List.map (remove_eps ~ret manpk) post
         |> List.fold_left Term.t_and Term.t_true
         |> D.meet_term manpk
       in
@@ -355,41 +365,19 @@ module Make(E: sig
         ) (fun x -> x) eff_write in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
-          (*Format.eprintf "@.@.@.ghost@.";
-          let abs = constraint_copy_ghost abs in
-          D.print Format.err_formatter abs;
-          D.to_term man abs |>
-          Pretty.print_term Format.err_formatter;
-          Format.eprintf "@.writes@.";
-          let abs = forget_writes abs in
-          D.print Format.err_formatter abs;
-          D.to_term man abs |>
-          Pretty.print_term Format.err_formatter;
-          Format.eprintf "@.constr@.";
-          let abs = constraints abs in
-          D.print Format.err_formatter abs;
-          D.to_term man abs |>
-          Pretty.print_term Format.err_formatter;
-          Format.eprintf "@.forget@.";
-          let abs = vars_to_forget abs in
-          D.print Format.err_formatter abs;
-          D.to_term man abs |>
-          Pretty.print_term Format.err_formatter;
-          Format.eprintf "@.@.";
-          abs*)
           constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
         );
       (* FIXME: handle exceptions *)
       begin_cp, end_cp, []
     | Ewhile(cond, _, _, content) ->
       (* Condition expression *)
-      let cond_term = 
+      let cond_term, cond_term_not = 
         match Expr.term_of_expr ~prop:true cond with
         | Some s ->
-          s
+          s, t_not s
         | None ->
           Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
-          Term.t_true
+          Term.t_true, Term.t_true
       in
       let constraints = D.meet_term manpk cond_term in
 
@@ -411,7 +399,7 @@ module Make(E: sig
       before_loop_cp, after_loop_cp, loop_exn
     | Etry(e, exc) ->
       let additional_exn = ref [] in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
       let i = new_node_cfg cfg expr in
       let exc = Ity.Mexn.map (fun (l, e) ->
           List.iter (fun p ->
@@ -419,7 +407,7 @@ module Make(E: sig
 
           let before_assign_cp = new_node_cfg cfg e in
 
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
 
           additional_exn := e_exn @ !additional_exn;
 
@@ -480,8 +468,8 @@ module Make(E: sig
       in
       let constraints = D.meet_term manpk cond_term in
       let constraints_not = D.meet_term manpk not_cond_term in
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg cfg manpk b in
-      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg cfg manpk c in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk b in
+      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg ~ret cfg manpk c in
       let start_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
       new_hedge_cfg cfg (start_cp, b_begin_cp) (fun _ abs ->
@@ -514,7 +502,10 @@ module Make(E: sig
                   | _ -> failwith "nested pattern or worse"
                 ) p in
               let matched_term = t_app l (List.map t_var args) (Some (Ity.ty_of_ity (case_e.e_ity))) in
-              let vreturn = create_vreturn manpk (t_type matched_term) in
+              let vreturn = match ret with
+                | None -> create_vreturn manpk (t_type matched_term)
+                | Some v -> v
+              in
               let postcondition =
                   t_app ps_equ [matched_term; t_var vreturn] None in
               let constr = D.meet_term manpk postcondition
@@ -540,7 +531,7 @@ module Make(E: sig
 
       i, i, []
 
-    | Eghost(e) -> put_expr_in_cfg cfg manpk e
+    | Eghost(e) -> put_expr_in_cfg ~ret cfg manpk e
 
     | Efor(k, (lo, dir, up), _, e) ->
       (* . before_loop
@@ -700,7 +691,6 @@ module Make(E: sig
              printf "acc(%i) -> @." vtx;
              Format.printf "@.";
              Pretty.print_term Format.std_formatter t;
-             Format.printf "@.";
              Format.printf "@.";
               (*let gen = Abstract1.to_generator_array manpk abs in
                 Generator1.array_print Format.std_formatter gen;

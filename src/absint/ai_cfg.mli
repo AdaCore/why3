@@ -19,7 +19,7 @@ module Make(S:sig
 
   val start_cfg: Expr.rsymbol -> cfg
 
-  val put_expr_in_cfg: cfg -> context -> Expr.expr -> (control_point * control_point * ((control_point * Ity.xsymbol) list))
+  val put_expr_in_cfg: cfg -> context -> ?ret:Term.vsymbol option -> Expr.expr -> (control_point * control_point * ((control_point * Ity.xsymbol) list))
 
   val put_expr_with_pre: cfg -> context -> Expr.expr -> Term.term list -> (control_point * control_point * ((control_point * Ity.xsymbol) list))
   
