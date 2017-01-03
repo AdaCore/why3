@@ -31,31 +31,44 @@ let interp_request args =
   | "list-provers" -> (Command_req (root_node,"list-provers"))
   | _ -> invalid_arg "Why3web.interp_request"
 
-let print_message_notification fmt n =
-  match n with
-  | Error _s -> ()
-  | Open_File_Error _s -> ()
-  | Proof_error(_nid,_s) -> ()
-  | Transf_error(_nid,_s) -> ()
-  | Strat_error(_nid,_s) -> ()
-  | Replay_Info(_s) -> ()
-  | Query_Info(nid,s) -> fprintf fmt "kind=\"query_info\", node=\"%d\", text=\"%s\"" nid s
-  | Query_Error(nid,s) -> fprintf fmt "kind=\"query_error\", node=\"%d\", text=\"%s\"" nid s
-  | Help s -> fprintf fmt "kind=\"help\", text=\"%s\"" s
-  | Information s -> fprintf fmt "kind=\"information\", text=\"%s\"" s
-  | Task_Monitor(_a,_b,_c) -> ()
+open Json
 
-let print_notification fmt n =
+let message_notification n =
   match n with
-  | Node_change(_nid,_info) -> ()
-  | New_node(_nid,_nid',_nodetype,_info) -> ()
-  | Remove(_nid) -> ()
-  | Initialized(_ginfo) -> ()
-  | Saved -> ()
-  | Message n -> fprintf fmt "{ notification=\"message=\"; %a }"
-                              print_message_notification n
-  | Dead _s -> ()
-  | Task(_nid,_task) -> ()
+  | Error s -> Obj ["message_kind",String "Error"; "msg",String s]
+  | Open_File_Error s -> Obj ["message_kind",String "Open_File_Error"; "msg", String s]
+  | Proof_error(nid,s) -> Obj ["message_kind",String "Proof_error"; "nid", Int nid; "msg", String s]
+  | Transf_error(nid,s) -> Obj ["message_kind",String "Transf_error"; "nid", Int nid; "msg", String s]
+  | Strat_error(nid,s) -> Obj ["message_kind",String "Strat_error"; "nid", Int nid; "msg", String s]
+  | Replay_Info s -> Obj ["message_kind",String "Replay_info"; "msg", String s]
+  | Query_Info(nid,s) -> Obj ["message_kind",String "Query_info"; "nid", Int nid; "msg", String s]
+  | Query_Error(nid,s) -> Obj ["message_kind",String "Query_error"; "nid", Int nid; "msg", String s]
+  | Help s -> Obj ["message_kind",String "Help"; "msg", String s]
+  | Information s -> Obj ["message_kind",String "Information"; "msg", String s]
+  | Task_Monitor(a,b,c) ->
+     Obj ["message_kind",String "Task_Monitor"; "a", Int a; "b", Int b; "c", Int c]
+
+let notification n =
+  match n with
+  | Node_change(nid,_info) ->
+     Obj ["notification",String "Node_change"; "nid", Int nid; "info",String "TODO"]
+  | New_node(nid,parent,_nodetype,_info) ->
+     Obj ["notification",String "New_node"; "nid", Int nid; "parent", Int parent;
+          "nodetype", String "TODO"; "info",String "TODO"]
+  | Remove nid ->
+     Obj ["notification",String "Remove"; "nid", Int nid]
+  | Initialized _ginfo ->
+     Obj ["notification",String "Initialized"; "ginfo", String "TODO"]
+  | Saved ->
+     Obj ["notification",String "Saved"]
+  | Message n ->
+     Obj ["notification",String "Message"; "msg", message_notification n]
+  | Dead s ->
+     Obj ["notification",String "Dead"; "msg", String s]
+  | Task(nid,_task) ->
+     Obj ["notification",String "Task"; "nid", Int nid; "task", String "TODO"]
+
+let print_notification fmt n = Json.print fmt (notification n)
 
 let handle_script s args =
   match s with
@@ -131,7 +144,7 @@ let usage_str = sprintf
 
 
 let () =
-    let config, base_config, env =
+    let config, _base_config, env =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     if Queue.is_empty files then

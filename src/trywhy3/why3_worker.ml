@@ -100,7 +100,7 @@ module Task =
     let clear_warnings () = warnings := []
     let () =
       Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
-                        let _, a,b,c = Loc.get loc in
+                        let _, a,b,_ = Loc.get loc in
                         warnings := ((a-1,b), msg) :: !warnings)
 
 
@@ -139,7 +139,7 @@ module Task =
 
     let task_to_string t =
       ignore (flush_str_formatter ());
-      Driver.print_task alt_ergo_driver str_formatter None t;
+      Driver.print_task alt_ergo_driver str_formatter t;
       flush_str_formatter ()
 
     let gen_id =

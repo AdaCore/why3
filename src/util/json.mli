@@ -42,3 +42,16 @@ val print_json_field :
   string -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit
 (* given a field name, a value and a printer for the value, print a json
    mapping (field assignment). Do not print anything else. *)
+
+type value =
+  | Obj of (string * value) list
+  | Array of value list
+  | String of string
+  | Int of int
+  | Float of float
+  | Bool of bool
+  | Null
+
+val print : Format.formatter -> value -> unit
+
+val parse : string -> value
