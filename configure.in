@@ -522,8 +522,13 @@ if test "$enable_coq_support" = yes; then
          COQPPLIBS="$COQLIB/parsing/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
-      8.5*|trunk)
+      8.5*)
          coq_compat_version="COQ85"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
+      8.6*|trunk)
+         coq_compat_version="COQ86"
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
