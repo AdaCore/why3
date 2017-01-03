@@ -225,7 +225,8 @@ let rec split_core sp f =
       let close = iclose (case f2 sf2.fwd sf2.neg) in
       let lside = if sp.side_split then close sf1.pos else
         !+(t_implies sf2.fwd sf1.bwd) in
-      ret sf2.pos sf1.neg sf2.bwd sf1.fwd (sf2.side ++ lside ++ close sf1.side)
+      let side = sf2.side ++ lside ++ sf1.side in
+      ret sf2.pos sf1.neg sf2.bwd sf1.fwd side
   | Tbinop (Timplies,f1,f2) ->
       let (>->) = alias2 f1 f2 t_implies in
       let sf1 = rc f1 and sf2 = rc f2 in
