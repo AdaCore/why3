@@ -1,4 +1,5 @@
 open Why3
+open Stdlib
 
 type key = int
 (* The key type, with which we identify nodes in the Why3 VC tree *)
@@ -364,7 +365,7 @@ let register_result goal result =
        if not (GoalSet.is_empty obj_rec.to_be_proved) then obj, Work_Left
        else if obj_rec.not_proved then obj, Not_Proved else obj, Proved
      end else begin try
-	 (* the goal was not proved. *)
+         (* the goal was not proved. *)
          (* We first check whether another prover may apply *)
          if Gnat_config.manual_prover = None &&
             not (all_provers_tried goal) then begin
@@ -393,12 +394,12 @@ let register_result goal result =
          nb_goals_done := !nb_goals_done + n;
 
          if Gnat_config.counterexamples then begin
-	     (* The goal will be scheduled to get a counterexample *)
-	     obj_rec.not_proved <- true;
-	     obj_rec.counter_example <- true;
-	     GoalSet.add obj_rec.to_be_proved goal;
-	     (* The goal will be scheduled manually in Gnat_main.handle_result
-	        so it is not put to the obj_rec.to_be_scheduled *)
+           (* The goal will be scheduled to get a counterexample *)
+           obj_rec.not_proved <- true;
+           obj_rec.counter_example <- true;
+           GoalSet.add obj_rec.to_be_proved goal;
+           (* The goal will be scheduled manually in Gnat_main.handle_result
+               so it is not put to the obj_rec.to_be_scheduled *)
 
              obj, Counter_Example
          end else obj, Not_Proved
@@ -657,7 +658,7 @@ let add_to_stat prover pr stat =
        add_to_stat prover pr stat
      with Exit ->
        try
-	 Session.PHstr.iter (fun _ tr ->
+         Session.PHstr.iter (fun _ tr ->
            if tr.Session.transf_verified <> None then
              List.iter (extract_stat_goal stat) tr.Session.transf_goals;
           (* need to exit here so once we found a transformation that proves
@@ -736,9 +737,54 @@ let add_to_stat prover pr stat =
            Gnat_loc.S.iter (fun l ->
               Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
              (Gnat_loc.orig_loc l)) trace);
-	(trace_fn, trace)
+        (trace_fn, trace)
       end
       else ("", Gnat_loc.S.empty)
+
+   (* Group of functions to build a json object for a session tree.
+      More precisely a session forest, because we start with a list of
+      goals for a given check. See gnat_report.mli for the JSON
+      structure that we use here. *)
+   let rec check_to_json obj =
+     let obj_rec = Gnat_expl.HCheck.find explmap obj in
+     let l = ref [] in
+     GoalSet.iter (fun x -> l := goal_to_json x :: !l) obj_rec.toplevel;
+     Json.List !l
+   and goal_to_json g =
+     let s = Mstr.empty in
+     Json.Record
+       (Mstr.add "proof_attempts" (proof_attempts_to_json g)
+          (Mstr.add "transformations" (transformations_to_json g) s))
+   and proof_attempts_to_json g =
+     let s = Mstr.empty in
+     let r = Session.PHprover.fold (fun prover pa acc ->
+         let pr_name = prover.Whyconf.prover_name in
+         match pa.Session.proof_obsolete, pa.Session.proof_state with
+         | false, Session.Done pr ->
+           Mstr.add pr_name (proof_result_to_json pr) acc
+         | _, _ -> acc) g.Session.goal_external_proofs s in
+     Json.Record r
+
+   and proof_result_to_json r =
+     let answer =
+       Pp.sprintf "%a"
+         Call_provers.print_prover_answer r.Call_provers.pr_answer in
+     let s = Mstr.empty in
+     let r =
+       Mstr.add "time" (Json.Float r.Call_provers.pr_time)
+         (Mstr.add "steps" (Json.Int r.Call_provers.pr_steps)
+            (Mstr.add "result" (Json.String answer) s)) in
+     Json.Record r
+   and transformations_to_json g =
+     let map =
+       Session.PHstr.fold (fun tf_name tf acc ->
+           Mstr.add tf_name (transformation_to_json tf) acc)
+         g.Session.goal_transformations
+         Mstr.empty
+     in
+     Json.Record map
+   and transformation_to_json tf =
+     Json.List (List.map goal_to_json tf.Session.transf_goals)
 
 end
 

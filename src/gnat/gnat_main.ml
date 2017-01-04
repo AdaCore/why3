@@ -99,12 +99,12 @@ and interpret_result pa pas =
       goal has been dealt with, and only then pass on to handle_vc_result *)
    match pas with
    | Session.Done r ->
-         let goal = pa.Session.proof_parent in
-         let answer = r.Call_provers.pr_answer in
-         if answer = Call_provers.HighFailure &&
-	   not Gnat_config.counterexamples then
-           Gnat_report.add_warning r.Call_provers.pr_output;
-         handle_vc_result goal (answer = Call_provers.Valid)
+     let goal = pa.Session.proof_parent in
+     let answer = r.Call_provers.pr_answer in
+     if answer = Call_provers.HighFailure &&
+        not Gnat_config.counterexamples then
+       Gnat_report.add_warning r.Call_provers.pr_output;
+     handle_vc_result goal (answer = Call_provers.Valid)
    | _ ->
          ()
 
@@ -220,7 +220,7 @@ let report_messages obj =
         | None -> None
         | Some pa -> Gnat_manual.manual_proof_info pa in
       Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
-  Gnat_report.register obj result
+  Gnat_report.register obj (Gnat_objectives.Save_VCs.check_to_json obj) result
 
 let _ =
    (* This is the main code. We read the file into the session if not already

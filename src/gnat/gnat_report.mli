@@ -28,15 +28,15 @@ open Why3
    that occured during execution of gnatwhy3.
 
 
-     result = { "id"         : int,
-                "reason"     : string,
-                "result"     : bool,
-                "extra_info" : int,
-                "trace_file" : string,
-                "vc_file"    : string,
-                "editor_cmd" : string,
-                "stats"      : stats_rec,
-                "cntexmp"    : cntexmp_rec
+     result = { "id"             : int,
+                "reason"         : string,
+                "result"         : bool,
+                "extra_info"     : int,
+                "trace_file"     : string,
+                "vc_file"        : string,
+                "editor_cmd"     : string,
+                "proof_attempts" : list goal,
+                "cntexmp"        : cntexmp_rec
                 }
 
    The field "id" contains the id of the VC. The field "reason" identifies the
@@ -50,18 +50,6 @@ open Why3
    proof, and "editor_cmd" the command to spawn for an external editor for this
    VC.
 
-   The optional field "stats" contains a mapping from each prover name to a
-   stat record, which indicates the number of VCs proved by this prover, with
-   max time and steps. Note that stats_rec is a record with a variable number
-   of fields, indicated with the [] syntax. It's not a list, nor does it
-   contain a list.
-
-     stats_rec = { [prover_name : stats_entry] }
-
-     stats_entry = { "count"     : int,
-                     "max_steps" : int,
-                     "max_time"  : float }
-
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.
 
@@ -71,7 +59,7 @@ open Why3
   is always a string. Usually the strings are integer values saved as strings,
   but the special value "vc_line" is also used.
 
-     linesentry = { [ linenumber : list lineentry }
+     linesentry = { [ linenumber : list lineentry ] }
 
      lineentry = { "kind"  : string,
                    "name"  : string,
@@ -83,6 +71,20 @@ open Why3
    - "old"
    - "result"
 
+   The field "proof_attempts" basically contains a copy of the session
+   tree in JSON format. It's a tree structure whose nodes are goals,
+   transformations and proof attempts:
+
+   goal = { "transformations" : list trans,
+            pa : proof_attempt }
+
+   trans = { [transname : goal] }
+
+   proof_attempt = { [prover : infos ] }
+
+   infos = { time : float,
+             steps : integer,
+             result : string }
 
    *)
 
@@ -105,8 +107,10 @@ type result_info =
        (string * string) option        (* for manual provers,
                                           pair of (vc_file, editor_cmd) *)
 
-val register : Gnat_expl.check -> result_info -> unit
-(* register a proof result for the given objective, and the given result *)
+val register : Gnat_expl.check -> Json.json -> result_info -> unit
+(* [register check check_tree info] registers a proof result,
+   represented by [info] for a given [check]. The [check_tree] is a
+   json object encoding the session tree of the check. *)
 
 val print_messages : unit -> unit
 (* print all messages that have been registered so far. Also

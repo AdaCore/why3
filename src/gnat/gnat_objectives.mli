@@ -162,6 +162,8 @@ module Save_VCs : sig
 
    val vc_file : goal -> string
    (* get the file name for a given goal *)
+
+   val check_to_json : objective -> Json.json
 end
 
 val all_split_leaf_goals : unit -> unit

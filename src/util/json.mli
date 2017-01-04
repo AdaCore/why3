@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(* use the simple printer functions to quickly print some JSON *)
+
 val string : Format.formatter -> string -> unit
 (* print json string, that is add '"' to the front and back, and escape '"' and
    '\' in the string *)
@@ -42,3 +44,17 @@ val print_json_field :
   string -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a -> unit
 (* given a field name, a value and a printer for the value, print a json
    mapping (field assignment). Do not print anything else. *)
+
+(* for more complex applications it may be convenient to build a an
+   explicit JSON object. Use this type for that and the print_json
+   function to print it *)
+
+type json =
+  | Int of int
+  | Float of float
+  | Bool of bool
+  | String of string
+  | List of json list
+  | Record of json Stdlib.Mstr.t
+
+val print_json : Format.formatter -> json -> unit

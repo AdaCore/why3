@@ -21,6 +21,7 @@ type result_info =
 type msg =
   { result        : bool;
     stats         : stats option;
+    check_tree    : Json.json;
     extra_info    : int option;
     tracefile     : string;
     cntexmp_model : Model_parser.model option;
@@ -54,7 +55,7 @@ let adapt_stats statsopt =
           Gnat_config.back_convert_steps ~prover:name v.max_steps}) stats;
       Some newstats
 
-let register check result =
+let register check check_tree result =
   let valid, extra_info, stats, tracefile, model, manual =
     match result with
     | Proved stats -> true, None, Some stats, "", None, None
@@ -71,6 +72,7 @@ let register check result =
     { result        = valid;
       extra_info    = extra_info;
       stats         = adapt_stats stats;
+      check_tree    = check_tree;
       tracefile     = tracefile;
       cntexmp_model = model;
       manual_proof  = manual } in
@@ -102,11 +104,11 @@ let print_cntexmp_model fmt model =
     if not (Model_parser.is_model_empty m) then begin
       Format.fprintf fmt ", ";
       print_json_field "cntexmp"
-	(Model_parser.print_model_json
-	   ~me_name_trans:spark_counterexample_transform
-	   ~vc_line_trans:(fun _ -> "vc_line"))
-	fmt
-	m
+        (Model_parser.print_model_json
+           ~me_name_trans:spark_counterexample_transform
+           ~vc_line_trans:(fun _ -> "vc_line"))
+        fmt
+        m
     end
 
 let print_manual_proof_info fmt info =
@@ -132,15 +134,16 @@ let print_stats fmt stats =
       let get_name pr = pr.Whyconf.prover_name in
       Format.fprintf fmt ", ";
       print_json_field "stats"
-	(map_bindings get_name print_prover_stats) fmt kv_list
+        (map_bindings get_name print_prover_stats) fmt kv_list
 
 let print_json_msg fmt (check, m) =
-  Format.fprintf fmt "{%a, %a, %a, %a%a%a%a%a}"
+  Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a%a}"
     (print_json_field "id" int) check.Gnat_expl.id
     (print_json_field "reason" string)
       (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
+    (print_json_field "check_tree" Json.print_json) m.check_tree
     print_stats m.stats
     print_trace_file m.tracefile
     print_cntexmp_model m.cntexmp_model
