@@ -648,14 +648,6 @@ theory GenericFloat
   lemma Max_r : forall x y:t. y .<= x -> (max x y) .= x
   lemma Max_l : forall x y:t. x .<= y -> (max x y) .= y
 
-  (* FS: wrong for 0 and -0. Using eq instead makes them wrong for NaN and *)
-  (*     NaN                                                               *)
-  (* lemma Min_comm : forall x y:t. min x y = min y x *)
-  (* lemma Max_comm : forall x y:t. max x y = max y x *)
-
-  lemma Min_assoc : forall x y z:t. min (min x y) z = min x (min y z)
-  lemma Max_assoc : forall x y z:t. max (max x y) z = max x (max y z)
-
   (* _____________ *)
 
   use real.Truncate
@@ -678,7 +670,7 @@ theory GenericFloat
   (** big floats are ints *)
   axiom big_float_is_int: forall m i.
     is_finite i ->
-    (i .<= (of_int m (- max_representable_integer)) \/
+    (i .<= neg (of_int m max_representable_integer) \/
     (of_int m max_representable_integer) .<= i) ->
       is_int i
 
@@ -706,12 +698,12 @@ theory GenericFloat
 
   axiom ceil_lest: forall x y:t. x .<= y /\ is_int y -> (roundToIntegral RTP x) .<= y
 
-  axiom ceil_to_real: forall m:mode, x:t.
-    (.- (of_int m max_representable_integer)) .<= x .<= (of_int m max_representable_integer) ->
+  axiom ceil_to_real: forall x:t.
+    is_finite x ->
       to_real (roundToIntegral RTP x) = FromInt.from_int (Truncate.ceil (to_real x))
 
   axiom ceil_to_int: forall m:mode, x:t.
-    (.- (of_int m max_representable_integer)) .<= x .<= (of_int m max_representable_integer) ->
+    is_finite x ->
       to_int m (roundToIntegral RTP x) = Truncate.ceil (to_real x)
 
   (** floor *)
@@ -720,12 +712,12 @@ theory GenericFloat
 
   axiom floor_lest: forall x y:t. y .<= x /\ is_int y -> y .<= (roundToIntegral RTN x)
 
-  axiom floor_to_real: forall m:mode, x:t.
-    (.- (of_int m max_representable_integer)) .<= x .<= (of_int m max_representable_integer) ->
+  axiom floor_to_real: forall x:t.
+    is_finite x ->
       to_real (roundToIntegral RTN x) = FromInt.from_int (Truncate.floor (to_real x))
 
   axiom floor_to_int: forall m:mode, x:t.
-    (.- (of_int m max_representable_integer)) .<= x .<= (of_int m max_representable_integer) ->
+    is_finite x ->
       to_int m (roundToIntegral RTN x) = Truncate.floor (to_real x)
 
   (* Rna *)
@@ -746,28 +738,12 @@ theory GenericFloat
     forall x:t. ((roundToIntegral RTP x) .- x) .= (x .- (roundToIntegral RTN x)) ->
     is_positive x -> roundToIntegral RNA x = roundToIntegral RTP x
 
-  axiom RNA_near_int:
-    forall i x:t. is_int i -> (.- half) .< x .< half ->
-      roundToIntegral RNA (i .+ x) = i
-
-  (* axiom rna_to_real: forall x:t. *)
-  (*   is_finite x -> *)
-  (*     to_real (roundToIntegralTiesToAway x) = FromInt.from_int (to_int x) *)
-
   (* to_int *)
   axiom to_int_roundToIntegral: forall m:mode, x:t.
     to_int m x = to_int m (roundToIntegral m x)
 
   axiom to_int_monotonic: forall m:mode, x y:t.
     is_finite x -> is_finite y -> le x y -> to_int m x <= to_int m y
-
-  axiom to_int_monotonic_int1:
-    forall m:mode, x:t, i:int. is_finite x ->
-    lt x (of_int m i) -> to_int m x <= i
-
-  axiom to_int_monotonic_int2:
-    forall m:mode, x:t, i:int. is_finite x ->
-    lt (of_int m i) x -> i <= to_int m x
 
   axiom to_int_of_int: forall m:mode, i:int.
     (- max_representable_integer) <= i <= max_representable_integer ->
@@ -838,11 +814,8 @@ end
 theory Float32
   use int.Int
   use import real.Real
-  (* use bv.BV32 *)
 
   type t
-
-  (* function from_bv BV32.t : t *)
 
   constant max_representable_integer : int = 16777216
   constant max_real : real = 0x1.FFFFFEp127
@@ -851,8 +824,6 @@ theory Float32
     type t = t,
     constant max_real = max_real,
     constant max_representable_integer = max_representable_integer
-
-  (* axiom half_bv: half = from_bv (BV32.of_uint 0x3F00_0000) *)
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -864,14 +835,10 @@ theory Float32
 end
 
 theory Float64
-  use bv.BV64
   use int.Int
-  use real.FromInt
   use import real.Real
 
   type t
-
-  (* function from_bv BV64.t : t *)
 
   constant max_representable_integer : int = 9007199254740992
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
@@ -880,8 +847,6 @@ theory Float64
     type t = t,
     constant max_real = max_real,
     constant max_representable_integer = max_representable_integer
-
-  (* axiom half_bv: half = from_bv (BV64.of_uint 0x3FE0_0000_0000_0000) *)
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
