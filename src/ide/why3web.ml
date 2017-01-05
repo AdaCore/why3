@@ -28,8 +28,9 @@ open Format
 
 let interp_request args =
   match args with
-  | "list-provers" -> (Command_req (root_node,"list-provers"))
-  | _ -> invalid_arg "Why3web.interp_request"
+  | "reload" -> Reload_req
+  | "list-provers" -> Command_req (root_node,"list-provers")
+  | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 open Json
 
