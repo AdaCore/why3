@@ -115,16 +115,14 @@ theory ieee_float.Float64
 (* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
    syntax function to_int
      "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
-  syntax function of_int
-    "((_ to_fp 11 53) %1 (ite (< %2 0) ((_ int2bv 1025) (+ (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026))) %2)) ((_ int2bv 1025) %2)))"
+ (* we do not define of_int since z3 will not prove anything if it
+    appears (05/01/2017) *)
 end
 
 theory ieee_float.Float32
   (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
    syntax function to_int
      "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
-  syntax function of_int
-    "((_ to_fp 8 24) %1 (ite (< %2 0) ((_ int2bv 129) (+ (bv2int (bvshl (_ bv1 130) (_ bv129 130))) %2)) ((_ int2bv 129) %2)))"
 end
 
 theory real.Square
