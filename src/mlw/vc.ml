@@ -133,16 +133,14 @@ let sp_and sp1 sp2 = match sp1.t_node, sp2.t_node with
   | _, Ttrue | Tfalse, _ -> sp1
   | _, _ -> t_and sp1 sp2
 
+(* sp_or adds "case_split", so we avoid using it here *)
 let sp_if c sp1 sp2 = match c.t_node, sp1.t_node, sp2.t_node with
-  | Ttrue, _, _  -> sp1
-  | Tfalse, _, _ -> sp2
-  | Tnot _, Ttrue, Tfalse -> c
-  | Tnot c, Ttrue, _ -> sp_implies c sp2
-  | Tnot c, Tfalse, _ -> sp_and c sp2
-  | _, Ttrue, _ -> sp_or c sp2
-  | _, Tfalse, _ -> sp_and (t_not c) sp2
-  | _, _, Ttrue -> sp_implies c sp1
+  | Ttrue, _, _  | _, Ttrue,  Ttrue  -> sp1
+  | Tfalse, _, _ | _, Tfalse, Tfalse -> sp2
   | _, _, Tfalse -> sp_and c sp1
+  | _, Tfalse, _ -> sp_and (t_not_simp c) sp2
+  | _, Ttrue, _  -> t_or c sp2
+  | _, _, Ttrue  -> t_or (t_not_simp c) sp1
   | _, _, _ -> add_case (t_if c sp1 sp2)
 
 let sp_case t bl =
@@ -167,9 +165,8 @@ let wp_and_asym wp1 wp2 = match wp1.t_node, wp2.t_node with
 let wp_if c wp1 wp2 = match c.t_node, wp1.t_node, wp2.t_node with
   | Ttrue, _, _  when can_simp wp2 -> wp1
   | Tfalse, _, _ when can_simp wp1 -> wp2
-  | Tnot c, Ttrue, _  when can_simp wp1 -> sp_implies c wp2
-  | _, Ttrue, _  when can_simp wp1 -> sp_implies (t_not c) wp2
   | _, _, Ttrue  when can_simp wp2 -> sp_implies c wp1
+  | _, Ttrue, _  when can_simp wp1 -> sp_implies (t_not_simp c) wp2
   | _, _, _ -> t_if c wp1 wp2
 
 let wp_case t bl =
@@ -844,7 +841,7 @@ let reflow vc_wp k =
 
 (** stage 3: WP *)
 
-(* a "destination map" maps pvsymbols (pre-effect state)
+(* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
 let ity_affected wr ity =
@@ -1016,14 +1013,16 @@ let sp_combine_map sp1 sp2 =
   Mint.union (fun _ (sp1, wr1) (sp2, wr2) ->
     Some (sp_combine sp1 wr1 sp2 wr2)) sp1 sp2
 
+(* compute compact verification conditions, in the style
+   of the Flanagan and Saxe paper (POPL'01). *)
 let rec sp_expr kn k rdm dst = match k with
   | Kseq (Klet (v, t, f), 0, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
-      let rd2 = t_freepvs (t_freepvs rd2 t) f in
+      let rd1 = t_freepvs (t_freepvs rd2 t) f in
       let wp = wp_let v t (sp_implies f wp2) in
-      let close _ (sp2, wr2) rd2 =
-        Some (sp_let v t (sp_and f sp2) rd2, wr2) in
-      wp, Mint.inter close sp2 rdm, Spv.remove v rd2
+      let close _ (sp, wr) rd =
+        Some (sp_let v t (sp_and f sp) rd, wr) in
+      wp, Mint.inter close sp2 rdm, Spv.remove v rd1
   | Kseq (k1, i, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
       let get_wr _ (_, w) m = Mpv.set_union w m in
