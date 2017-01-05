@@ -3,12 +3,10 @@
   - obsolete
   - update proof attempt
 *)
-(*
 open Why3
 open Unix_scheduler
 open Format
 open Itp_server
-
 
 (*************************)
 (* Protocol of the shell *)
@@ -40,7 +38,7 @@ module Protocol_shell = struct
     l
 
   let send_request r =
-    print_request_debug (fst r);
+    print_request_debug r;
     Debug.dprintf debug_proto "@.";
     list_requests := r :: !list_requests
 
@@ -64,8 +62,6 @@ let get_notified = Protocol_shell.get_notified
 
 let send_request = Protocol_shell.send_request
 
-module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
-
 (************************)
 (* parsing command line *)
 (************************)
@@ -81,9 +77,17 @@ let usage_str = Format.sprintf
   (Filename.basename Sys.argv.(0))
 
 (* Parse files *)
-let () = Whyconf.Args.parse spec (fun f -> Queue.add f files) usage_str;
+let config, base_config, env =
+  let config, base_config, env =
+    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
   if Queue.is_empty files then
-    Whyconf.Args.exit_with_usage spec usage_str
+    Whyconf.Args.exit_with_usage spec usage_str;
+  (config, base_config, env)
+
+module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
+
+(* Initialize the server *)
+let () = Server.init_server config env
 
 (*************************)
 (* Notification Handling *)
@@ -106,6 +110,7 @@ p -> print the session@." s
   | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
   | Error s                ->
       fprintf fmt "%s@." s
+  | Open_File_Error s -> fprintf fmt "%s@." s
 
 type shell_node_type =
   | SRoot
@@ -116,9 +121,6 @@ type shell_node_type =
   | SProofAttempt
 
 
-(* TODO will evolve *)
-type node_info = { proved: bool }
-
 type node = {
   node_ID: node_ID;
   node_parent: node_ID;
@@ -127,7 +129,7 @@ type node = {
   node_proof: Controller_itp.proof_attempt_status option;
   node_trans_args: string list option;
   node_type: shell_node_type;
-  mutable node_info: node_info;
+  mutable node_proved: bool;
   mutable children_nodes: node_ID list
   }
 
@@ -142,7 +144,7 @@ let root_node = {
   node_proof = None;
   node_trans_args = None;
   node_type = SRoot;
-  node_info = {proved = false};
+  node_proved = false;
   children_nodes = []
 }
 
@@ -162,7 +164,6 @@ let print_goal fmt n =
   | None -> fprintf fmt "No goal@."
   | Some s -> fprintf fmt "Goal is: \n %s@." s
 
-
 let convert_to_shell_type t =
   match t with
   | NRoot -> SRoot
@@ -170,24 +171,25 @@ let convert_to_shell_type t =
   | NTheory -> STheory
   | NTransformation -> STransformation
   | NGoal -> SGoal
-  | NProofAttempt _ -> SProofAttempt
+  | NProofAttempt -> SProofAttempt
 
 let return_proof_info (t: node_type) =
   match t with
-  | NProofAttempt (_pr, _obs) ->
+  | NProofAttempt ->
     Some Controller_itp.Scheduled
   | _ -> None
 
-let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (i: Itp_server.node_info) =
+let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) =
+  if t = NRoot then () else
   let new_node = {
     node_ID = n;
     node_parent = parent;
-    node_name = i.Itp_server.name;
+    node_name = name;
     node_task = None;
     node_proof = return_proof_info t;
     node_trans_args = None; (* TODO *)
     node_type = convert_to_shell_type t;
-    node_info = {proved = i.Itp_server.proved};
+    node_proved = false;
     children_nodes = []
   } in
   try
@@ -198,16 +200,21 @@ let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (i: Itp_serve
   with
     Not_found -> fprintf fmt "Could not find node %d@." parent
 
-let change_node fmt (n: node_ID) (i: Itp_server.node_info) =
+let change_node fmt (n: node_ID) (u: Itp_server.update_info) =
   try
     let node = Hnode.find nodes n in
-    node.node_info <- { proved = i.Itp_server.proved }
+    (match u with
+    | Proved b ->
+        node.node_proved <- b
+    | Proof_status_change (_pas, _b, _rl) when node.node_type = SProofAttempt ->
+        fprintf fmt "Not yet supported@." (* TODO *)
+    | _ -> fprintf fmt "Not yet supported@.") (* TODO *)
   with
     Not_found -> fprintf fmt "Could not find node %d@." n
 
 let is_proof_attempt node_type =
   match node_type with
-  | NProofAttempt _ -> true
+  | NProofAttempt -> true
   | _ -> false
 
 let treat_notification fmt n =
@@ -215,18 +222,16 @@ let treat_notification fmt n =
   match n with
   | Node_change (id, info)        ->
     change_node fmt id info
-  | New_node (id, pid, typ, info) ->
-    add_new_node fmt id pid typ info
+  | New_node (id, pid, typ, name) ->
+    add_new_node fmt id pid typ name
   | Remove _id                    -> (* TODO *)
     fprintf fmt "got a Remove notification not yet supported@."
-  | Initialized _g_info            ->
+  | Initialized _g_info           ->
     (* TODO *)
     fprintf fmt "Initialized@."
   | Saved                         -> (* TODO *)
     fprintf fmt "got a Saved notification not yet supported@."
   | Message (msg)                 -> treat_message_notification fmt msg
-  | Proof_update (_id, _pa)         -> (* TODO *)
-    fprintf fmt "got a Update notification not yet supported@."
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
   | Task (id, s)                  ->
@@ -264,7 +269,7 @@ let rec print_proof_node (fmt: Format.formatter) goal_id =
   in
   if current_goal then
     fprintf fmt "**";
-  if goal.node_info.proved then
+  if goal.node_proved then
     fprintf fmt "P";
   let proof_attempts, transformations =
     List.partition (fun n -> let node = Hnode.find nodes n in
@@ -288,7 +293,7 @@ and print_trans_node fmt id =
   let args = trans.node_trans_args in
   let parent = Hnode.find nodes trans.node_parent in
   let parent_name = parent.node_name in
-  if trans.node_info.proved then
+  if trans.node_proved then
     fprintf fmt "P";
   fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name
     (Pp.print_option (Pp.print_list Pp.semi pp_print_string)) args parent_name
@@ -296,7 +301,7 @@ and print_trans_node fmt id =
 
 let print_theory fmt th_id : unit =
   let th = Hnode.find nodes th_id in
-  if th.node_info.proved then
+  if th.node_proved then
     fprintf fmt "P";
   fprintf fmt "@[<hv 1> Theory %s, id: %d;@ [%a]@]" th.node_name th_id
     (Pp.print_list Pp.semi print_proof_node) th.children_nodes
@@ -324,14 +329,14 @@ let interp _chout fmt cmd =
   begin
     match l with
     | ["goto"; n] when int_of_string n < !max_ID ->
-        cur_id := int_of_string n; send_request (Get_task, !cur_id); print_session fmt
+        cur_id := int_of_string n; send_request (Get_task !cur_id); print_session fmt
     | _ ->
         begin
           match cmd with
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
-          | "g" -> send_request (Get_task, !cur_id)
+          | "g" -> send_request (Get_task !cur_id)
           | "p" -> print_session fmt
-          | _ -> send_request (Command_req cmd, !cur_id)
+          | _ -> send_request (Command_req (!cur_id, cmd))
         end
   end;
   let node = Hnode.find nodes !cur_id in
@@ -342,9 +347,9 @@ let () =
   printf "Welcome to Why3 shell. Type 'help' for help.@.";
   let chout = open_out "why3shell.out" in
   let fmt = formatter_of_out_channel chout in
-  Queue.iter (fun f -> send_request (Open_req f, Itp_server.root_node)) files;
+  let f = Queue.pop files in send_request (Open_session_req f);
+  (*Queue.iter (fun f -> send_request (Add_file_req f)) files;*)
   Unix_scheduler.timeout ~ms:100
     (fun () -> List.iter
         (fun n -> treat_notification fmt n) (get_notified ()); true);
   Unix_scheduler.main_loop (interp chout fmt)
-*)
