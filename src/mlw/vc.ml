@@ -831,8 +831,7 @@ let reflow vc_wp k =
         | Some (q, _) -> Kseq (Kaxiom k, 0, q)
         | None -> Kaxiom k end
     | Ktag ((WP|SP) as tag, k) ->
-        assert (Mint.is_empty q);
-        Ktag (tag, push k q)
+        Ktag (tag, push k Mint.empty)
     | Ktag (Push _, _) ->
         assert false (* cannot happen *)
   in
