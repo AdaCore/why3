@@ -122,7 +122,7 @@ EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 ifeq (@enable_infer@,yes)
-EXTLIBS += gmp apron camllib fixpoint ppl boxMPQ octMPQ polkaMPQ polkaGrid bigarray
+EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ bigarray
 endif
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))

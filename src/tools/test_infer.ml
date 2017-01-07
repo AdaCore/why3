@@ -124,7 +124,7 @@ let do_input way f =
             begin match let_expr with
               | LDvar(_) -> Format.eprintf "ldvar not handled@."
               | LDsym(rsym_, cexp) ->
-                if Some (f ^ ":" ^ function_name) = !opt_file || !opt_file = None then
+                if Some (f ^ ":" ^ function_name) = !opt_file || Some f = !opt_file || !opt_file = None then
                 begin
                   match cexp.c_node with
                   | Cfun e ->
@@ -193,7 +193,7 @@ let do_input way f =
                                 Abstract_interpreter.domain_to_term cfg context d
                                 |> Pretty.print_term Format.str_formatter
                                 |> Format.flush_str_formatter
-                                |> Format.sprintf "invariant { %s }\n"
+                                |> Format.sprintf "invariant computed { %s }\n"
                               in
                               Expr.print_expr Format.std_formatter whole_e;
                               Format.printf "@.For expression: @.";

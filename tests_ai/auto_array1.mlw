@@ -5,9 +5,18 @@ module Test
 	use import ref.Refint
 	use import int.Int
 
+	let basic(x:int): unit
+	=
+		let a = make x 2 in
+		while (true) do
+		variant { 0 }
+		invariant { forall w:int. 0 <= w < x -> a[w] = 2 }
+		()
+		done; ()
+
 	let b(x:int): unit
 	=
-		let a = make x 1 in
+		let a = make x 2 in
 		a[1] <- 42;
 		while (true) do
 		variant { 0 }
@@ -29,6 +38,17 @@ module Test
 		()
 		done; ()
 
+	let d_basic(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { length a = x }
+		()
+		done; ()
 	let d(x:int): unit
 	requires { x >= 3 }
 	=

@@ -26,14 +26,27 @@ module Make(S:sig type t end) = struct
     { to_term = TMap.remove (Term.Mterm.find te oto.to_t) oto.to_term;
       to_t = Term.Mterm.remove te oto.to_t }
 
-  let union a b =
-    let c = a in
-    Term.Mterm.fold_left (fun c te t ->
-        try
-          assert (Term.Mterm.find te c.to_t = t); c
-        with
-        | Not_found ->
-          add c te t) c b.to_t
+  let union a b f g =
+    Term.Mterm.fold_left (fun a te t ->
+        let a =
+          try
+            let t' = to_t a te in
+            if t' <> t then
+              f t' t te;
+            remove_term a te
+          with
+          | Not_found -> a
+        in
+        let a =
+          try
+            let te' = to_term a t in
+            if not (Term.t_equal te te') then
+              g te' te t;
+            remove_t a t
+          with
+          | Not_found -> a
+        in
+        add a te t) a b.to_t
 
   let card a = 
     Term.Mterm.cardinal a.to_t
