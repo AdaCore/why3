@@ -37,6 +37,13 @@ module Make(S:sig
 
   module TermToVar = O2oterm.Make(struct type t = Var.t end)
   module TermToClass = O2oterm.Make(struct type t = Union_find.t end)
+  module VarPool = struct
+    module S = Set.Make(struct type t = Var.t let compare = compare end)
+    include S
+
+    let to_list a =
+      S.fold (fun a l -> a :: l) a []
+  end
 
 
   type uf_man = {
@@ -58,7 +65,7 @@ module Make(S:sig
   type uf_t = {
     classes: Union_find.set;
     uf_to_var: TermToVar.t;
-    var_pool: Var.t list;
+    var_pool: VarPool.t;
   }
 
 
@@ -68,11 +75,14 @@ module Make(S:sig
     
   let tmp_pool = ["$p1";"$p2"; "$p3"] |> List.map Var.of_string
 
-  let rec build_var_pool = function
-    | 0 -> []
-    | n -> Var.of_string (Format.sprintf "$%d" n) :: build_var_pool (n - 1)
+  let build_var_pool n = 
+    let rec build_var_pool_aux = function
+      | 0 -> []
+      | n -> Var.of_string (Format.sprintf "$%d" n) :: build_var_pool_aux (n - 1)
+    in
+    build_var_pool_aux n |> VarPool.of_list
 
-  let npool = 40
+  let npool = 10
 
   let create_manager () =
     let ident_ret = Ident.{pre_name = "w"; pre_label = Ident.Slab.empty; pre_loc = None; } in
@@ -85,7 +95,7 @@ module Make(S:sig
                            apron_mapping;
                            region_mapping = Ity.Mreg.empty;
                            region_var = Ity.Mreg.empty;
-                           env = Environment.make (Array.of_list (apron_var :: var_pool @ tmp_pool)) [||];
+                           env = Environment.make (Array.of_list (apron_var :: (VarPool.to_list var_pool) @ tmp_pool)) [||];
                            defined_terms = Mterm.empty;
 
                            class_to_term = TermToClass.empty;
@@ -192,9 +202,9 @@ module Make(S:sig
       TermToVar.to_t uf_to_var term
     with
     | Not_found ->
-      let apron_var = !ref_dom.var_pool |> List.hd in
+      let apron_var = VarPool.choose !ref_dom.var_pool in
       let uf_to_var = TermToVar.add uf_to_var term apron_var in
-      ref_dom := { !ref_dom with var_pool = !ref_dom.var_pool |> List.tl; uf_to_var };
+      ref_dom := { !ref_dom with var_pool = VarPool.remove apron_var !ref_dom.var_pool; uf_to_var };
       apron_var
 
   let eq_var (man, uf_man) b v1 v2 =
@@ -209,22 +219,55 @@ module Make(S:sig
     else
       b
 
+  let invariant_uf b =
+    let s = ref VarPool.empty in
+    try
+      let k = ref b.uf_to_var in
+      while true do
+        let _, v = TermToVar.choose !k in
+        s := VarPool.add v !s;
+        k := TermToVar.remove_t !k v;
+      done;
+    with
+    | Not_found -> 
+      assert (VarPool.is_empty (VarPool.inter b.var_pool !s ));
+      assert (VarPool.equal (VarPool.union b.var_pool !s ) (build_var_pool npool));
+      ()
+
+
+  let print_uf b =
+    let k = ref b.uf_to_var in
+    try
+      while true do
+        let t, v = TermToVar.choose !k in 
+        p t; Format.eprintf " ---> %s@." (Var.to_string v);
+        k := TermToVar.remove_t !k v;
+      done;
+    with
+    | Not_found -> Format.eprintf "uf_to_var ended.@."
+
   let join_uf (man, uf_man) b d c =
+    invariant_uf b;
+    invariant_uf d;
     let classes = Union_find.join b.classes d.classes in
     let rc = ref c in
     let vars_to_replace = ref [] in
     let tmp_pool = ref tmp_pool in
+    let var_pool =
+      ref d.var_pool
+    in
     let uf_to_var = TermToVar.union
         d.uf_to_var
         b.uf_to_var
         (fun v1 v2 t ->
-        let var_pool = List.hd !tmp_pool in
+        let var_tmp = List.hd !tmp_pool in
         tmp_pool := List.tl !tmp_pool;
-        rc := eq_var (man, uf_man) !rc v1 var_pool;
+        rc := eq_var (man, uf_man) !rc v1 var_tmp;
         rc := D.forget_array man !rc [|v1|] false;
-        vars_to_replace := (t, var_pool) :: !vars_to_replace;
+        var_pool := VarPool.add v1 !var_pool;
+        vars_to_replace := (t, var_tmp) :: !vars_to_replace;
         assert (try
-                  TermToVar.to_term d.uf_to_var var_pool |> ignore; false
+                  TermToVar.to_term d.uf_to_var var_tmp |> ignore; false
                 with
                 | Not_found -> true);
             )
@@ -232,11 +275,8 @@ module Make(S:sig
            vars_to_replace := (t, v) :: !vars_to_replace;
 )
     in
-    let var_pool =
-      if List.length b.var_pool > List.length d.var_pool then
-        d.var_pool
-      else
-        b.var_pool in
+    let var_pool = !var_pool in
+    let var_pool = VarPool.inter b.var_pool var_pool in
     let b = { classes; uf_to_var; var_pool } in
     let rud = ref b in
     List.iter (fun (t, v) ->
@@ -246,6 +286,7 @@ module Make(S:sig
         if v <> new_var then
           rc := D.forget_array man !rc [|v|] false;
       ) !vars_to_replace;
+    invariant_uf !rud;
     !rc, !rud
 
 
@@ -890,7 +931,9 @@ module Make(S:sig
                       try
                         TermToVar.to_t b.uf_to_var t |> ignore; None
                       with
-                      | Not_found -> Some t
+                      | Not_found ->
+                        if tdepth t < 4 then Some t
+                        else None
                     else
                       None
                   ) alt_cl
@@ -900,7 +943,7 @@ module Make(S:sig
               a, { b with uf_to_var = TermToVar.add uf_to_var alt_term apron_var }
             with
             | Not_found ->
-              D.forget_array man a [|apron_var|] false, b
+              D.forget_array man a [|apron_var|] false, { b with var_pool = VarPool.add apron_var b.var_pool; uf_to_var }
           with
           | Not_found ->
             a, b

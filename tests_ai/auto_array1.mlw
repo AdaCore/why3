@@ -24,6 +24,16 @@ module Test
 		()
 		done; ()
 
+
+	let b2(x:int): unit
+	=
+		let a = make x 2 in
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { forall k: int. 0 <= k < length a -> (k > 1 -> a[k] = 2) }
+		()
+		done; ()
 		
 
 	let c(x:int): unit
@@ -160,6 +170,19 @@ module Test
 		a[!k] <- 42
 		else
 		a[!k] <- 43;
+		incr k;
+		done; a
+	
+	let init_non_lin(x:int): array int
+	requires { x >= 0 }
+	ensures { forall i: int. 0 <= i < x -> result[i] = i * i }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { true }
+		a[!k] <- !k * !k;
 		incr k;
 		done; a
 	
