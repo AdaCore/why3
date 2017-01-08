@@ -165,11 +165,11 @@ module Make(S:sig
     else
       t_app min_u_int [t_nat_const (-a)] (Some Ty.ty_int)
 
-  let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Term.Sls.empty; } env known_logical_ident
+ (* let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Term.Sls.empty; } env known_logical_ident*)
 
   (* we assume that there will be no overflow (oops) *)
   let rec eval_term t =
-    let t =  Reduction_engine0.normalize ~limit:50 engine  t in
+    let t = t (* Reduction_engine0.normalize ~limit:50 engine  t*) in
     if Ty.ty_equal (t_type t) Ty.ty_int then
       let rec eval_num t =
         match t.t_node with
@@ -191,9 +191,9 @@ module Make(S:sig
           begin
             match ta, tb with
             | None, None -> None, ca - cb
-            | Some t, Some v -> Some (t_app min_int [t; v] None), ca - cb
+            | Some t, Some v -> Some (t_app_infer min_int [t; v]), ca - cb
             | Some t, None -> Some t, ca - cb
-            | None, Some t -> Some (t_app min_u_int [t] None), ca - cb
+            | None, Some t -> Some (t_app_infer min_u_int [t]), ca - cb
           end
         | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
           let ta, ca = eval_num a in
@@ -214,27 +214,30 @@ module Make(S:sig
     else
       t_map eval_term t
 
+  let rec replaceby a b t =
+    if t_equal t a then
+      b
+    else
+      t_map (replaceby a b) t
+
   let do_eq (man, uf_man) a b =
     if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
       fun (d, ud) ->
         let cla = get_class_for_term uf_man a in
-        let clb = get_class_for_term uf_man a in
-        let ud = { ud with classes = Union_find.union cla cla (Union_find.union clb clb ud.classes); } in
+        let clb = get_class_for_term uf_man b in
+        let ud = { ud with classes = Union_find.union cla clb ud.classes; } in
         let all_values = Union_find.flat ud.classes in
-        let all_values =
+        let all_terms =
           List.map (fun cl ->
               TermToClass.to_term uf_man.class_to_term cl, ()) all_values
-          |> Term.Mterm.of_list in
+        in
+        let all_values = all_terms
+                         |> Term.Mterm.of_list in
+        let all_terms = all_terms |> List.map fst in
         Term.Mterm.fold (fun v () (d, ud) ->
             (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
              * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
              * However, it is unclear wether it is or it is not a limitation. *)
-            let rec replaceby a b t =
-              if t_equal t a then
-                b
-              else
-                t_map (replaceby a b) t
-            in
             let v' = replaceby a b v in
             let v'' = replaceby b a v in
             let v' =
@@ -248,6 +251,18 @@ module Make(S:sig
                 eval_term v''
               with
               | Constant -> v
+            in
+            let v' =
+              if List.exists (t_equal v') all_terms then
+                v'
+              else
+                v
+            in
+            let v'' =
+              if List.exists (t_equal v'') all_terms then
+                v''
+              else
+                v
             in
             if t_equal v v' && t_equal v v'' then
               d, ud
@@ -968,15 +983,15 @@ module Make(S:sig
         with
         | Not_found -> a, b
       in
-      let a, b =
+      let (a, b), alt =
         try
           let cl = Union_find.get_class (get_class_for_term uf_man t) b.classes
                    |> List.map (TermToClass.to_term uf_man.class_to_term)
                    |> List.find (fun t' -> not (is_in t t'))
           in
-          do_eq (man, uf_man) cl t (a, b)
+          do_eq (man, uf_man) cl t (a, b), Some cl
         with
-        | Not_found -> a, b
+        | Not_found -> (a, b), None
       in
       let all_values' = Union_find.flat b.classes in
       let all_values' = List.map (fun c ->
@@ -990,12 +1005,19 @@ module Make(S:sig
       Format.eprintf "@.";
       List.iter (fun (cl, t) ->
           p t;
+          Format.eprintf "@.";
+          begin
+            match alt with
+            | Some t -> p t;
+            | None -> Format.eprintf "no alt";
+          end;
           Format.eprintf "   -> %d@." (List.length (Union_find.get_class cl b.classes));) all_values;*)
       let int_values, other_values =
         List.partition (fun (_, t) ->
             Ty.ty_equal (t_type t) Ty.ty_int) all_values in
       let b = List.fold_left (fun b (cl, t) ->
           { b with classes = Union_find.forget cl b.classes |> snd }) b other_values in
+      let forgot_var = t in
       let a, b = List.fold_left (fun (a, b) (cl, t) ->
           let old_cl = b.classes in
           let b = { b with classes = Union_find.forget cl b.classes |> snd } in
@@ -1004,6 +1026,13 @@ module Make(S:sig
             let uf_to_var = TermToVar.remove_term b.uf_to_var t in
             try
               let alt_cl = Union_find.get_class cl old_cl in
+              let alt_cl, classes = match alt with
+              | Some alt ->
+                let new_t = replaceby forgot_var alt t in
+                let new_cl = get_class_for_term uf_man new_t in
+                new_cl :: alt_cl, Union_find.forget cl (Union_find.union cl new_cl old_cl) |> snd
+              | None -> alt_cl, b.classes
+              in
               let alt_term =
                 List.map (fun c ->
                     if c <> cl then
@@ -1021,7 +1050,7 @@ module Make(S:sig
                 |> List.find (function Some _ -> true | _ -> false)
                 |> function Some x -> x | _ -> assert false
               in
-              a, { b with uf_to_var = TermToVar.add uf_to_var alt_term apron_var }
+              a, { b with uf_to_var = TermToVar.add uf_to_var alt_term apron_var; classes }
             with
             | Not_found ->
               D.forget_array man a [|apron_var|] false, { b with var_pool = VarPool.add apron_var b.var_pool; uf_to_var }
