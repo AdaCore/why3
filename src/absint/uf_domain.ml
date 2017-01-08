@@ -158,40 +158,119 @@ module Make(S:sig
       ) (d, None) l
     |> fst
 
+  exception Constant
+
+  let t_z_const a =
+    if a >= 0 then t_nat_const a
+    else
+      t_app min_u_int [t_nat_const (-a)] (Some Ty.ty_int)
+
+  let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Term.Sls.empty; } env known_logical_ident
+
+  (* we assume that there will be no overflow (oops) *)
+  let rec eval_term t =
+    let t =  Reduction_engine0.normalize ~limit:50 engine  t in
+    if Ty.ty_equal (t_type t) Ty.ty_int then
+      let rec eval_num t =
+        match t.t_node with
+        | Tvar(vs) -> Some t, 0
+        | Tconst(Number.ConstInt(n)) ->
+          let n = Number.compute_int n in
+          (None, BigInt.to_int n)
+        | Tapp(func, args) when Term.ls_equal func ad_int ->
+          List.fold_left (fun (a, b) c ->
+              let tc, cc = eval_num c in
+              match tc, a with
+              | None, None -> None, b + cc
+              | Some t, Some v -> Some (t_app ad_int [v; t] (Some Ty.ty_int)), b + cc
+              | Some t, None | None, Some t -> Some t, b + cc
+            ) (None, 0) args
+        | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
+          let ta, ca = eval_num a in
+          let tb, cb = eval_num b in
+          begin
+            match ta, tb with
+            | None, None -> None, ca - cb
+            | Some t, Some v -> Some (t_app min_int [t; v] None), ca - cb
+            | Some t, None -> Some t, ca - cb
+            | None, Some t -> Some (t_app min_u_int [t] None), ca - cb
+          end
+        | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
+          let ta, ca = eval_num a in
+          begin
+            match ta with
+            | None -> None, - ca
+            | Some a -> Some (t_app min_u_int [a] (Some Ty.ty_int)), - ca
+          end
+        | Tapp(func, args) ->
+          let t = t_app func (List.map eval_term args) (Some (t_type t)) in
+          Some t, 0
+        | _ -> Some t, 0
+      in
+      match eval_num t with
+      | Some t, 0 -> t
+      | Some t, a -> t_app ad_int [t; t_z_const a] (Some Ty.ty_int)
+      | None, a -> raise Constant
+    else
+      t_map eval_term t
+
   let do_eq (man, uf_man) a b =
-    fun (d, ud) ->
-      let all_values = Union_find.flat ud.classes in
-      let all_values =
-        List.map (fun cl ->
-            TermToClass.to_term uf_man.class_to_term cl, ()) all_values
-        |> Term.Mterm.of_list in
-      Term.Mterm.fold (fun v () (d, ud) ->
-          let rec replaceby t =
-            if t_equal t a then
-              b
-            else
-              t_map replaceby t
-          in
-          let v' = replaceby v in
-          if t_equal v v' then
-            d, ud
-          else
-            begin
-              let cl  = get_class_for_term uf_man v
-              and cl' = get_class_for_term uf_man v'
-              in
-              let ud = { ud with classes = Union_find.union cl cl' ud.classes } in
-              let d =
-                if Ty.ty_equal (t_type v) Ty.ty_int then
-                  Union_find.get_class cl ud.classes
-                  |> List.map (TermToClass.to_term uf_man.class_to_term)
-                  |> apply_equal (man, uf_man) ud d
-                else
-                  d
-              in
+    if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
+      fun (d, ud) ->
+        let cla = get_class_for_term uf_man a in
+        let clb = get_class_for_term uf_man a in
+        let ud = { ud with classes = Union_find.union cla cla (Union_find.union clb clb ud.classes); } in
+        let all_values = Union_find.flat ud.classes in
+        let all_values =
+          List.map (fun cl ->
+              TermToClass.to_term uf_man.class_to_term cl, ()) all_values
+          |> Term.Mterm.of_list in
+        Term.Mterm.fold (fun v () (d, ud) ->
+            (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
+             * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
+             * However, it is unclear wether it is or it is not a limitation. *)
+            let rec replaceby a b t =
+              if t_equal t a then
+                b
+              else
+                t_map (replaceby a b) t
+            in
+            let v' = replaceby a b v in
+            let v'' = replaceby b a v in
+            let v' =
+              try
+                eval_term v'
+              with
+              | Constant -> v
+            in
+            let v'' =
+              try
+                eval_term v''
+              with
+              | Constant -> v
+            in
+            if t_equal v v' && t_equal v v'' then
               d, ud
-            end
-        ) all_values (d, ud)
+            else
+              begin
+                let cl  = get_class_for_term uf_man v
+                and cl' = get_class_for_term uf_man v'
+                and cl'' = get_class_for_term uf_man v''
+                in
+                let ud = { ud with classes = Union_find.union cl cl'' (Union_find.union cl cl' ud.classes) } in
+                let d =
+                  if Ty.ty_equal (t_type v) Ty.ty_int then
+                    Union_find.get_class cl ud.classes
+                    |> List.map (TermToClass.to_term uf_man.class_to_term)
+                    |> apply_equal (man, uf_man) ud d
+                  else
+                    d
+                in
+                d, ud
+              end
+          ) all_values (d, ud)
+    else
+      fun x -> x
 
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let print fmt (a, b) = A.print fmt a
@@ -639,6 +718,8 @@ module Make(S:sig
             let subv_b = get_subvalues b None in
             List.combine subv_a subv_b 
             |> List.fold_left (fun f ((a, _), (b, _)) ->
+                p a;
+                p b;
                 let g = aux (t_app ps_equ [a; b] None) in
                 (fun abs ->
                    g abs |> f

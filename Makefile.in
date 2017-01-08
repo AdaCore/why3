@@ -209,7 +209,7 @@ LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
 ifeq (@enable_infer@,yes)
-LIB_ABSINT = o2oterm o2mterm domain trace_partitioning_domain disjunctive_domain disjunctive_domain_fast ai_logic apron_to_term union_find uf_domain ai_cfg infer_ai
+LIB_ABSINT = reduction_engine0 o2oterm o2mterm domain trace_partitioning_domain disjunctive_domain disjunctive_domain_fast ai_logic apron_to_term union_find uf_domain ai_cfg infer_ai
 endif
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
