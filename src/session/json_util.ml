@@ -123,6 +123,8 @@ let convert_request_constructor (r: ide_request) =
   | Set_max_tasks_req _  -> String "Set_max_tasks_req"
   | Get_task _           -> String "Get_task"
   | Remove_subtree _     -> String "Remove_subtree"
+  | Copy_paste _         -> String "Copy_paste"
+  | Copy_detached _      -> String "Copy_detached"
   | Get_Session_Tree_req -> String "Get_Session_Tree_req"
   | Save_req             -> String "Save_req"
   | Reload_req           -> String "Reload_req"
@@ -165,6 +167,13 @@ let print_request_to_json (r: ide_request): json_object =
   | Remove_subtree n ->
       Assoc ["ide_request", cc r;
              "node_ID", Int n]
+  | Copy_paste (from_id, to_id) ->
+      Assoc ["ide_request", cc r;
+             "node_ID", Int from_id;
+             "node_ID", Int to_id]
+  | Copy_detached from_id ->
+      Assoc ["ide_request", cc r;
+             "node_ID", Int from_id]
   | Get_Session_Tree_req ->
       Assoc ["ide_request", cc r]
   | Save_req ->
@@ -339,18 +348,22 @@ let parse_request (constr: string) l =
     Set_max_tasks_req n
   | "Get_task", ["node_ID", Int n] ->
     Get_task n
-  |  "Remove_subtree", ["node_ID", Int n] ->
+  | "Remove_subtree", ["node_ID", Int n] ->
     Remove_subtree n
+  | "Copy_paste", ["node_ID", Int from_id; "node_ID", Int to_id] ->
+    Copy_paste (from_id, to_id)
+  | "Copy_detached", ["node_ID", Int n] ->
+    Copy_detached n
   | "Get_Session_Tree_req", [] ->
-      Get_Session_Tree_req
+    Get_Session_Tree_req
   | "Save_req", [] ->
-      Save_req
+    Save_req
   | "Reload_req", [] ->
-      Reload_req
+    Reload_req
   | "Replay_req", [] ->
-      Replay_req
+    Replay_req
   | "Exit_req", [] ->
-      Exit_req
+    Exit_req
   | _ -> raise (NotRequest "")
 
 let parse_request (j: json_object): ide_request =

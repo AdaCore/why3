@@ -372,6 +372,8 @@ type ide_request =
   | Set_max_tasks_req of int
   | Get_task          of node_ID
   | Remove_subtree    of node_ID
+  | Copy_paste        of node_ID * node_ID
+  | Copy_detached     of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
@@ -390,6 +392,8 @@ let print_request fmt r =
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_task _nid                   -> fprintf fmt "get task"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
+  | Copy_paste _                    -> fprintf fmt "copy paste"
+  | Copy_detached _                 -> fprintf fmt "copy detached"
   | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
@@ -465,7 +469,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let get_prover_list (config: Whyconf.config) =
     Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
 
-
   let init_server config env =
     let provers = Whyconf.get_provers config in
     let c = create_controller env in
@@ -539,10 +542,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let get_node_type (node: any) =
     match node with
     | AFile _ -> NFile
-    | ATh _ -> NTheory
-    | ATn _ -> NTransformation
-    | APn _ -> NGoal
-    | APa _ -> NProofAttempt
+    | ATh _   -> NTheory
+    | ATn _   -> NTransformation
+    | APn _   -> NGoal
+    | APa _   -> NProofAttempt
 
   let get_node_name (node: any) =
     let d = get_server_data () in
@@ -944,7 +947,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Transform_req (nid, t, args) -> apply_transform nid t args
     | Strategy_req (nid, st)       -> run_strategy_on_task nid st
     | Save_req                     -> save_session ()
-    | Reload_req                   -> reload_session ();
+    | Reload_req                   -> reload_session ()
     | Get_Session_Tree_req         -> resend_the_tree ()
     | Remove_subtree nid           ->
         let n = any_from_node_ID nid in
@@ -956,6 +959,21 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         with RemoveError -> (* TODO send an error instead of information *)
           P.notify (Message (Information "Cannot remove a proof node or theory"))
         end
+    | Copy_paste (from_id, to_id)    ->
+        let from_any = any_from_node_ID from_id in
+        let to_any = any_from_node_ID to_id in
+        C.copy_paste ~notification:notify_change_proved
+          ~callback_pa:(callback_update_tree_proof d.cont)
+          ~callback_tr:(callback_update_tree_transform)
+          d.cont from_any to_any
+
+    | Copy_detached from_id        ->
+        let from_any = any_from_node_ID from_id in
+        let copy ~parent p =
+          let parent = node_ID_from_any parent in
+          ignore (new_node ~parent p)
+        in
+        C.copy_detached ~copy d.cont from_any
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
     | Command_req (nid, cmd)       ->
@@ -969,7 +987,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
-            P.notify (Message (Information ("Unknown command"^s)))
+            P.notify (Message (Information ("Unknown command: "^s)))
       end
     | Add_file_req f ->
       add_file_to_session d.cont f

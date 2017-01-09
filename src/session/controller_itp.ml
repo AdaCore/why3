@@ -461,7 +461,7 @@ let schedule_proof_attempt_r c id pr ~limit ~callback =
   run_timeout_handler ()
 
 let schedule_proof_attempt c id pr ~limit ~callback ~notification =
-  let callback panid s =   callback panid s;
+  let callback panid s = callback panid s;
     (match s with
     | Done pr -> update_proof_node notification c id (pr.Call_provers.pr_answer == Call_provers.Valid)
     | Interrupted | InternalFailure _ -> update_proof_node notification c id false
@@ -566,6 +566,65 @@ let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback ~notific
          exec_strategy pc strat g
   in
   exec_strategy 0 strat id
+
+let schedule_pa_with_same_arguments c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
+  let prover = pa.prover in
+  let limit = pa.limit in
+  schedule_proof_attempt c pn prover ~limit ~callback ~notification
+
+let schedule_tr_with_same_arguments c (tr: transID) (pn: proofNodeID) ~callback ~notification =
+  let s = c.controller_session in
+  let args = get_transf_args s tr in
+  let name = get_transf_name s tr in
+  schedule_transformation c pn name args ~callback ~notification
+
+exception BadCopyPaste
+
+(* Reproduce the transformation made on node on an other one *)
+let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
+  let s = c.controller_session in
+  if (not (is_below s from_any to_any) &&
+      not (is_below s to_any from_any)) then
+    match from_any, to_any with
+    | AFile _, AFile _ ->
+        raise BadCopyPaste
+    | ATh _from_th, ATh _to_th ->
+        raise BadCopyPaste
+    | APn from_pn, APn to_pn ->
+      let from_pa_list = get_proof_attempts s from_pn in
+      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn
+          ~callback:callback_pa ~notification) from_pa_list;
+      let from_tr_list = get_transformations s from_pn in
+      let callback x st = callback_tr st;
+        match st with
+        | TSdone tid -> copy_paste c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
+        | _ -> ()
+      in
+      List.iter (fun x -> schedule_tr_with_same_arguments c x to_pn
+          ~callback:(callback x) ~notification) from_tr_list
+    | ATn from_tn, ATn to_tn ->
+        let from_tn_list = get_sub_tasks s from_tn in
+        let to_tn_list = get_sub_tasks s to_tn in
+        if (List.length from_tn_list = List.length to_tn_list) then
+          List.iter2 (fun x y -> copy_paste c (APn x) (APn y)
+              ~notification ~callback_pa ~callback_tr) from_tn_list to_tn_list
+    | _ -> raise BadCopyPaste
+
+
+let copy_detached ~copy c from_any =
+  match from_any with
+  | APn from_pn ->
+    begin
+      let pn_id = copy_proof_node_as_detached c.controller_session from_pn in
+      let parent = get_any_parent c.controller_session from_any in
+      match parent with
+      | None -> raise BadCopyDetached
+      | Some parent ->
+          copy ~parent (APn pn_id);
+          copy_structure ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
+    end
+  | _ -> raise BadCopyDetached (* Only goal can be detached *)
+
 
 let replay_proof_attempt c pr limit (id: proofNodeID) ~callback =
 

@@ -206,6 +206,16 @@ type report =
   | No_former_result of Call_provers.prover_result
 (** Type for the reporting of a replayed call *)
 
+(* [copy_paste c a b] try to copy subtree originating at node a to node b *)
+val copy_paste:
+    notification:(any -> bool -> unit) ->
+    callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
+    callback_tr:(transformation_status -> unit) ->
+    controller -> any -> any -> unit
+
+val copy_detached:
+    copy:(parent:any -> any -> unit) ->
+    controller -> any -> unit
 
 (* Callback for the report printing of replay
    TODO to be removed when we have a better way to print the result of replay *)

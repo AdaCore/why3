@@ -67,6 +67,9 @@ type proof_attempt_node = {
 
 val session_iter_proof_attempt: (proofNodeID -> proof_attempt_node -> unit) -> session -> unit
 
+(* [is_below s a b] true if a is below b in the session tree *)
+val is_below: session -> any -> any -> bool
+
 type proof_parent = Trans of transID | Theory of theory
 
 val get_task : session -> proofNodeID -> Task.task
@@ -88,6 +91,14 @@ val get_proof_name : session -> proofNodeID -> Ident.ident
 
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID
+
+val get_any_parent: session -> any -> any option
+
+exception BadCopyDetached
+
+(** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
+val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID
+val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
 
 val empty_session : ?shape_version:int -> string -> session
 (** create an empty_session in the directory specified by the

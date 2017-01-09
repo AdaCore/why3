@@ -368,6 +368,29 @@ let theory_iter_proof_attempt s f th =
                              f pan)
          pn.proofn_attempts) th
 
+(**************)
+(* Copy/Paste *)
+(**************)
+
+let get_any_parent s a =
+  match a with
+  | AFile _f -> None
+  | ATh th  -> Some (AFile (theory_parent s th))
+  | ATn tr  -> Some (APn (get_trans_parent s tr))
+  | APn pn  ->
+      (match (get_proofNode s pn).proofn_parent with
+      | Theory th -> Some (ATh th)
+      | Trans tr -> Some (ATn tr))
+  | APa pa  ->
+      Some (APn (get_proof_attempt_node s pa).parent)
+
+(* True if bid is an ancestor of aid, false if not *)
+let rec is_below s (aid: any) (bid: any) =
+  aid = bid ||
+  match (get_any_parent s aid) with
+  | None     -> false
+  | Some pid -> is_below s pid bid
+
 open Format
 open Ident
 
@@ -495,6 +518,25 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
              proofn_transformations = [] } in
   Hint.add s.proofNode_table node_id pn
 
+(* Detach a new proof to a proof_parent *)
+let graft_detached_proof_on_parent s (pn: proofNodeID) (parent: proof_parent) =
+  match parent with
+  | Theory th ->
+      th.theory_detached_goals <- th.theory_detached_goals @ [pn]
+  | Trans tr_id ->
+      let tr = get_transfNode s tr_id in
+      tr.transf_detached_subtasks <- tr.transf_detached_subtasks @ [pn]
+
+(* Intended as a feature to save a proof (also for testing detached stuff) *)
+let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
+  let pn = get_proofNode s pn_id in
+  let new_pn_id = gen_proofNodeID s in
+  let parent = pn.proofn_parent in
+  let new_goal_name = Ident.id_register (Ident.id_clone pn.proofn_name) in
+  let _new_pn = mk_proof_node_no_task s new_goal_name parent new_pn_id pn.proofn_checksum pn.proofn_shape in
+  graft_detached_proof_on_parent s new_pn_id parent;
+  new_pn_id
+
 let _mk_proof_node_task (s : session) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   let name,_,_ = Termcode.goal_expl_task ~root:false t in
@@ -523,6 +565,41 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
              transf_detached_subtasks = [] } in
   Hint.add s.trans_table node_id tn;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
+
+exception BadCopyDetached
+
+let rec copy_structure ~notification s from_any to_any : unit =
+  match from_any, to_any with
+  | APn from_id, APn to_id ->
+    let transformations = get_transformations s from_id in
+    let new_transformations =
+      List.map (fun x ->
+        let tr_id = gen_transID s in
+        let old_tr = get_transfNode s x in
+        mk_transf_node s to_id tr_id old_tr.transf_name old_tr.transf_args [];
+        notification ~parent:to_any (ATn tr_id);
+        copy_structure ~notification s (ATn x) (ATn tr_id);
+        tr_id) transformations in
+    (get_proofNode s to_id).proofn_transformations <- new_transformations;
+    Hprover.iter (fun _k old_pa ->
+      let old_pa = get_proof_attempt_node s old_pa in
+      let pa_id = add_proof_attempt s old_pa.prover old_pa.limit None true None to_id in
+      notification ~parent:to_any (APa pa_id)) (get_proofNode s from_id).proofn_attempts
+  | ATn from_tn, ATn to_tn ->
+    let sub_tasks = get_sub_tasks s from_tn in
+    let new_sub_tasks =
+      List.map (fun old_pn_id ->
+        let old_pn = get_proofNode s old_pn_id in
+        let pn_id = gen_proofNodeID s in
+        let new_id = Ident.id_register (Ident.id_clone old_pn.proofn_name) in
+        mk_proof_node_no_task s new_id (Trans to_tn)
+          pn_id old_pn.proofn_checksum old_pn.proofn_shape;
+        notification ~parent:to_any (APn pn_id);
+        copy_structure ~notification s (APn old_pn_id) (APn pn_id);
+        pn_id) sub_tasks in
+    let tr = get_transfNode s to_tn in
+    tr.transf_detached_subtasks <- new_sub_tasks
+  | _ -> raise BadCopyDetached
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
     (args : string list) (tl : Task.task list) =

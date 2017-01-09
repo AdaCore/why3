@@ -428,7 +428,6 @@ let reload_menu_item : GMenu.menu_item =
       create_root ();
       send_request Reload_req)
 
-
 (* vpan222 contains:
    2.2.2.1 a view of the current task
    2.2.2.2 a vertiacal pan which contains
@@ -810,6 +809,53 @@ let remove_item: GMenu.menu_item =
       match get_selected_row_references () with
       | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
       | _ -> print_message "Select only one node to perform this action")
+
+
+
+
+(*************************************)
+(* Commands of the Experimental menu *)
+(*************************************)
+
+let exp_menu = factory#add_submenu "_Experimental"
+let exp_factory = new GMenu.factory exp_menu ~accel_group
+
+
+(* Current copied node *)
+let saved_copy = ref None
+
+let copy () =
+  match get_selected_row_references () with
+  | [r] -> let n = get_node_id r#iter in
+    saved_copy := Some n
+  | _ -> ()
+
+let paste () =
+  match get_selected_row_references () with
+  | [r] ->
+      let m = get_node_id r#iter in
+    (match !saved_copy with
+    | Some n -> send_request (Copy_paste (n, m))
+    | None -> ())
+  | _ -> ()
+
+let detached_copy () =
+  match get_selected_row_references () with
+  | [r] -> let n = get_node_id r#iter in
+    send_request (Copy_detached n)
+  | _ -> ()
+
+let (_ : GMenu.menu_item) =
+  exp_factory#add_item ~key:GdkKeysyms._C
+    ~callback:copy "Copy"
+
+let (_ : GMenu.menu_item) =
+  exp_factory#add_item ~key:GdkKeysyms._V
+    ~callback:paste "Paste"
+
+let (_ : GMenu.menu_item) =
+  exp_factory#add_item ~key:GdkKeysyms._D
+    ~callback:detached_copy "Detached copy"
 
 (*********************************)
 (* add a new file in the project *)

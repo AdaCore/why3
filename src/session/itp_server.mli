@@ -86,6 +86,8 @@ type ide_request =
   | Set_max_tasks_req of int
   | Get_task          of node_ID
   | Remove_subtree    of node_ID
+  | Copy_paste        of node_ID * node_ID
+  | Copy_detached     of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req
