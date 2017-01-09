@@ -302,7 +302,7 @@ let cty_enrich_post c = match c with
 
 (* k-expressions: simplified code *)
 
-type ktag = WP | SP | Push of bool
+type ktag = WP | SP | Out of bool Mint.t | Push of bool
 
 type kode =
   | Kseq   of kode * int * kode           (* 0: sequence, N: try-with *)
@@ -356,18 +356,15 @@ let rec k_print fmt k = match k with
       "@[<hov 4>ASSERT %a@]" Pretty.print_term f
   | Kstop f -> Format.fprintf fmt
       "@[<hov 4>STOP %a@]" Pretty.print_term f
-  | Kcont 0 -> Format.fprintf fmt
-      "SKIP"
-  | Kcont i -> Format.fprintf fmt
-      "RAISE %d" i
-  | Kaxiom k -> Format.fprintf fmt
-      "@[<hov 4>AXIOM %a@]" k_print k
-  | Ktag (tag, k) ->
-      let s = match tag with
-        | WP -> "WP" | SP -> "SP"
-        | Push true -> "PUSH CLOSED"
-        | Push false -> "PUSH OPEN" in
-      Format.fprintf fmt "@[<hov 4>%s %a@]" s k_print k
+  | Kcont 0 -> Format.fprintf fmt "SKIP"
+  | Kcont i -> Format.fprintf fmt "RAISE %d" i
+  | Kaxiom k -> Format.fprintf fmt "@[<hov 4>AXIOM %a@]" k_print k
+  | Ktag (WP, k) -> Format.fprintf fmt "@[<hov 4>WP %a@]" k_print k
+  | Ktag (SP, k) -> Format.fprintf fmt "@[<hov 4>SP %a@]" k_print k
+  | Ktag (Out out, k) -> Format.fprintf fmt "@[<hov 4>OUT %a %a@]"
+      (Pp.print_list Pp.space Pp.int) (Mint.keys out) k_print k
+  | Ktag (Push cl, k) -> Format.fprintf fmt "@[<hov 4>PUSH %s %a@]"
+      (if cl then "CLOSED" else "OPEN") k_print k
 
 (* check if a pure k-expression can be converted to a term.
    We need this for simple conjuctions, disjuctions, and
@@ -785,13 +782,19 @@ let reflow vc_wp k =
         k, Mint.singleton 0 true
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
-        (* WP ((SP k1); k2) could be SP (k1; WP k2),
-           but we cannot freely switch from SP to WP,
-           so we forbid pushing under another VCgen *)
-        Ktag (tag, k), Mint.map (fun _ -> false) out
+        (* A switch from SP to WP is only sound when the kode
+           has no outcomes at all, otherwise we refuse and fail.
+           Therefore, WP ((SP k1); k2) cannot be SP (k1; WP k2),
+           and we forbid pushing under another VCgen altogether.
+           We also store the exact outcomes of k in Out, to be
+           able to filter the context when switching to SP. *)
+        (* TODO: provide localisation for the error message *)
+        if tag = WP && not (Mint.is_empty out) then
+          Loc.errorm "Cannot switch to the classical WP procedure";
+        Ktag (Out out, Ktag (tag, k)), Mint.map (fun _ -> false) out
     | Ktag ((WP|SP), k) ->
         mark vc_tag k
-    | Ktag (Push _, _) ->
+    | Ktag ((Out _|Push _), _) ->
         assert false (* cannot happen *)
   in
   let rec push k q = match k with
@@ -830,7 +833,7 @@ let reflow vc_wp k =
         begin match Mint.find_opt 0 q with
         | Some (q, _) -> Kseq (Kaxiom k, 0, q)
         | None -> Kaxiom k end
-    | Ktag ((WP|SP) as tag, k) ->
+    | Ktag ((WP|SP|Out _) as tag, k) ->
         Ktag (tag, push k Mint.empty)
     | Ktag (Push _, _) ->
         assert false (* cannot happen *)
@@ -1202,10 +1205,12 @@ let rec sp_expr kn k rdm dst = match k with
       let f = wp_expr kn k Mint.empty in
       let rd = t_freepvs (Mint.find 0 rdm) f in
       t_true, Mint.singleton 0 (f, Mpv.empty), rd
+  | Ktag (Out out, k) ->
+      sp_expr kn k (Mint.set_inter rdm out) dst
   | Ktag (WP, k) ->
-      let f = wp_expr kn k (Mint.map (fun _ -> t_true) rdm) in
-      let rd = t_freepvs (Mint.find_def Spv.empty 0 rdm) f in
-      f, Mint.singleton 0 (t_true, Mpv.empty), rd
+      assert (Mint.is_empty rdm);
+      let f = wp_expr kn k Mint.empty in
+      f, Mint.empty, t_freepvs Spv.empty f
   | Ktag ((Push _|SP), _) -> assert false (* cannot happen *)
 
 and wp_expr kn k q = match k with
@@ -1248,6 +1253,8 @@ and wp_expr kn k q = match k with
       Mint.find i q
   | Kaxiom k ->
       sp_implies (wp_expr kn k Mint.empty) (Mint.find 0 q)
+  | Ktag (Out out, k) ->
+      wp_expr kn k (Mint.set_inter q out)
   | Ktag (SP, k) ->
       let k = Mint.fold (fun i q k -> Kseq (k, i, Kstop q)) q k in
       let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
