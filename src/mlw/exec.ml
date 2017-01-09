@@ -37,6 +37,8 @@ let create dr thkm mokm =
 let has_syntax {driver = drv} id =
   Mid.mem id (drv.drv_syntax) || Mid.mem id (drv.drv_converter)
 
+let is_exec_pdecl _ _ = assert false (* TODO *)
+(*
 let rec is_exec_expr cxt e =
   match e.e_node with
   | Evar _
@@ -69,3 +71,4 @@ let is_exec_pdecl cxt pd =
   | PDlet (LDsym ({rs_name = rs}, {c_node = Cfun e})) ->
      is_exec_expr cxt e
   | _ -> assert false
+*)
