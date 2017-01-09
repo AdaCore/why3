@@ -58,12 +58,24 @@ let is_global c t =
   | VarRef id, Var id' -> id = id'
   | _ -> false
 
+let push_named = Environ.push_named
+
+let betadeltaiota = Closure.betadeltaiota
+
+module RedFlags = Closure.RedFlags
+
 ELSE
 
 open Universes
 open Globnames
 open Vars
+
+IFDEF COQ85 THEN
 open Errors
+ELSE
+open CErrors
+open Stdarg
+END
 
 let declare_summary name freeze unfreeze init =
   Summary.declare_summary name
@@ -111,6 +123,34 @@ let find_reference t1 t2 =
   fun x -> lazy (Lazy.force th x)
 
 let is_global c t = is_global (Lazy.force c) t
+
+IFDEF COQ85 THEN
+
+let push_named = Environ.push_named
+let betadeltaiota = Closure.betadeltaiota
+
+module RedFlags = Closure.RedFlags
+
+ELSE
+
+let push_named (id, c, t) env =
+  Environ.push_named
+    (match c with
+     | None -> Context.Named.Declaration.LocalAssum (id, t)
+     | Some b -> Context.Named.Declaration.LocalDef (id, b, t))
+    env
+
+let pf_hyps gl =
+  List.map (function
+    | Context.Named.Declaration.LocalAssum (id, t) -> (id, None, t)
+    | Context.Named.Declaration.LocalDef (id, b, t) -> (id, Some b, t))
+    (pf_hyps gl)
+
+let betadeltaiota = CClosure.all
+
+module RedFlags = CClosure.RedFlags
+
+END
 
 DECLARE PLUGIN "why3tac"
 
@@ -260,7 +300,7 @@ let coq_rename_vars env vars =
 let coq_rename_var env na t =
   let avoid = ids_of_named_context (Environ.named_context env) in
   let id = next_name_away na avoid in
-  id, Environ.push_named (id, None, t) env
+  id, push_named (id, None, t) env
 
 let preid_of_id id = Ident.id_fresh (string_of_id id)
 
@@ -524,8 +564,8 @@ let rec tr_arith_constant dep t = match kind_of_term t with
 
 let rec tr_type dep tvm env evd t =
   let t = Reductionops.clos_norm_flags
-      (Closure.RedFlags.red_add_transparent
-	 Closure.betadeltaiota (get_transp_state env))
+      (RedFlags.red_add_transparent
+	 betadeltaiota (get_transp_state env))
       env evd t in
   if is_global coq_Z t then
     Ty.ty_int
@@ -1355,7 +1395,9 @@ let why3tac ?(timelimit=timelimit) s gl =
   | StepLimitExceeded -> error "Step Limit Exceeded"
   | HighFailure -> error ("Prover failure\n" ^ res.pr_output ^ "\n")
 
-IFDEF COQ85 THEN
+IFDEF COQ84 THEN
+
+ELSE
 
 let why3tac ?timelimit s = Proofview.V82.tactic (why3tac ?timelimit s)
 

@@ -92,7 +92,7 @@ why3_vc Abs_sum by auto
 
 why3_vc abs_def by (simp add: Real.abs_real_def)
 
-why3_vc Abs_prod by (simp add: Rings.linordered_idom_class.abs_mult)
+why3_vc Abs_prod by (simp add: abs_mult)
 
 why3_vc triangular_inequality by (simp add: Real.abs_real_def)
 
@@ -141,6 +141,8 @@ why3_vc One by auto
 why3_vc Sub by auto
 
 why3_vc Zero by auto
+
+why3_vc Monotonic using assms by auto
 
 why3_end
 

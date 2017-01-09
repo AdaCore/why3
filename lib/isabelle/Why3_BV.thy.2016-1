@@ -120,7 +120,7 @@ lemma rotater1_rotater_swap: "rotater1 (rotater n xs) = rotater n (rotater1 xs)"
   by (simp add: rotater_def funpow_swap1)
 
 lemma length_rotater1 [simp]: "length (rotater1 xs) = length xs"
-  by (simp add: rotater1_def split add: list.split)
+  by (simp add: rotater1_def split: list.split)
 
 lemma rotater1_nth:
   assumes "0 < length xs"
@@ -258,8 +258,8 @@ why3_open "bv/BV8.xml"
     sub=minus
     neg=uminus
     mul=times
-    udiv=div
-    urem=mod
+    udiv=divide
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -448,8 +448,8 @@ why3_open "bv/BV16.xml"
     sub=minus
     neg=uminus
     mul=times
-    udiv=div
-    urem=mod
+    udiv=divide
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -638,8 +638,8 @@ why3_open "bv/BV32.xml"
     sub=minus
     neg=uminus
     mul=times
-    udiv=div
-    urem=mod
+    udiv=divide
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -828,8 +828,8 @@ why3_open "bv/BV64.xml"
     sub=minus
     neg=uminus
     mul=times
-    udiv=div
-    urem=mod
+    udiv=divide
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl

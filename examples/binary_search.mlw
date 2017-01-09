@@ -14,7 +14,7 @@ module BinarySearch
   exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
-  let binary_search (a : array int) (v : int)
+  let binary_search (a : array int) (v : int) : int
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
@@ -57,7 +57,7 @@ module BinarySearchAnyMidPoint
   val midpoint (l:int) (u:int) : int
     requires { l <= u } ensures { l <= result <= u }
 
-  let binary_search (a :array int) (v : int)
+  let binary_search (a :array int) (v : int) : int
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
     ensures  { 0 <= result < length a /\ a[result] = v }
     raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
@@ -98,7 +98,7 @@ module BinarySearchInt32
   exception Break int32 (* raised to exit the loop *)
   exception Not_found   (* raised to signal a search failure *)
 
-  let binary_search (a : array int32) (v : int32)
+  let binary_search (a : array int32) (v : int32) : int32
     requires { forall i1 i2 : int. 0 <= i1 <= i2 < to_int a.length ->
                to_int a[i1] <= to_int a[i2] }
     ensures  { 0 <= to_int result < to_int a.length /\ a[to_int result] = v }
@@ -125,5 +125,40 @@ module BinarySearchInt32
     with Break i ->
       i
     end
+
+end
+
+(* A particular case with Boolean values (0 or 1) and a sentinel 1 at the end.
+   We look for the first position containing a 1. *)
+
+module BinarySearchBoolean
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import array.Array
+
+  let binary_search (a: array int) : int
+    requires { 0 < a.length }
+    requires { forall i j. 0 <= i <= j < a.length -> 0 <= a[i] <= a[j] <= 1 }
+    requires { a[a.length - 1] = 1 }
+    ensures  { 0 <= result < a.length }
+    ensures  { a[result] = 1 }
+    ensures  { forall i. 0 <= i < result -> a[i] = 0 }
+ =
+    let lo = ref 0 in
+    let hi = ref (length a - 1) in
+    while !lo < !hi do
+      invariant { 0 <= !lo <= !hi < a.length }
+      invariant { a[!hi] = 1 }
+      invariant { forall i. 0 <= i < !lo -> a[i] = 0 }
+      variant   { !hi - !lo }
+      let mid = !lo + div (!hi - !lo) 2 in
+      if a[mid] = 1 then
+        hi := mid
+      else
+        lo := mid + 1
+    done;
+    !lo
 
 end

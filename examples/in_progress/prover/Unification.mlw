@@ -307,8 +307,8 @@ module Impl
           && eval rho.unifier y = Var_fo_term y
           && st tm rho.unifier = Var_fo_term y
           && is_fo_term_free_var_in_fo_term y (st tm rho.unifier)) && y >= 0 } ;
-        let by = BA.get rhob y in
-        match by with
+        let by' = BA.get rhob y in
+        match by' with
           | Nil -> bottomvar rhob rho y ;
             if x = y
             then raise UnificationFailure
@@ -902,18 +902,18 @@ module Impl
               assert { st bxm rhoi' = sc rhobm rhoi' x
                 = rhoi' x = st t1m rhoi' && st bxm rhoi' = st t1m rhoi' } ;
               res
-            | _ -> let by = BA.get rhob y in
-              match by with
-                | Cons (Assign by) _ -> (*checkit rho y it2 ;*)
-                  let bym = by.model_fo_term_field in
+            | _ -> let by' = BA.get rhob y in
+              match by' with
+                | Cons (Assign by') _ -> (*checkit rho y it2 ;*)
+                  let bym = by'.model_fo_term_field in
                   let rhobm = rho.unifier_base_model in
                   let rhoi = rho.unifier in
-                  assert { sdata_inv (Assign by) } ;
+                  assert { sdata_inv (Assign by') } ;
                   assert { bym = rhobm y (*/\ mem y fv*) } ;
                   assert { st bym rhoi = sc rhobm rhoi y = rhoi y = st t2m rhoi
                     && forall s:func int (fo_term int int).
                       st bym (sc rhoi s) = st t2m (sc rhoi s) } ;
-                  let res = unification_term t1 by lv rhob rho lp (*fv s it1 (it2-1)*) in
+                  let res = unification_term t1 by' lv rhob rho lp (*fv s it1 (it2-1)*) in
                   let rhoi' = res.final_unifier.unifier in
                   assert { st bym rhoi' = sc rhobm rhoi' y
                     = rhoi' y = st t2m rhoi' && st bym rhoi' = st t2m rhoi' } ;

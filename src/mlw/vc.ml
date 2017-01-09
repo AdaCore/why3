@@ -133,16 +133,14 @@ let sp_and sp1 sp2 = match sp1.t_node, sp2.t_node with
   | _, Ttrue | Tfalse, _ -> sp1
   | _, _ -> t_and sp1 sp2
 
+(* sp_or adds "case_split", so we avoid using it here *)
 let sp_if c sp1 sp2 = match c.t_node, sp1.t_node, sp2.t_node with
-  | Ttrue, _, _  -> sp1
-  | Tfalse, _, _ -> sp2
-  | Tnot _, Ttrue, Tfalse -> c
-  | Tnot c, Ttrue, _ -> sp_implies c sp2
-  | Tnot c, Tfalse, _ -> sp_and c sp2
-  | _, Ttrue, _ -> sp_or c sp2
-  | _, Tfalse, _ -> sp_and (t_not c) sp2
-  | _, _, Ttrue -> sp_implies c sp1
+  | Ttrue, _, _  | _, Ttrue,  Ttrue  -> sp1
+  | Tfalse, _, _ | _, Tfalse, Tfalse -> sp2
   | _, _, Tfalse -> sp_and c sp1
+  | _, Tfalse, _ -> sp_and (t_not_simp c) sp2
+  | _, Ttrue, _  -> t_or c sp2
+  | _, _, Ttrue  -> t_or (t_not_simp c) sp1
   | _, _, _ -> add_case (t_if c sp1 sp2)
 
 let sp_case t bl =
@@ -167,9 +165,8 @@ let wp_and_asym wp1 wp2 = match wp1.t_node, wp2.t_node with
 let wp_if c wp1 wp2 = match c.t_node, wp1.t_node, wp2.t_node with
   | Ttrue, _, _  when can_simp wp2 -> wp1
   | Tfalse, _, _ when can_simp wp1 -> wp2
-  | Tnot c, Ttrue, _  when can_simp wp1 -> sp_implies c wp2
-  | _, Ttrue, _  when can_simp wp1 -> sp_implies (t_not c) wp2
   | _, _, Ttrue  when can_simp wp2 -> sp_implies c wp1
+  | _, Ttrue, _  when can_simp wp1 -> sp_implies (t_not_simp c) wp2
   | _, _, _ -> t_if c wp1 wp2
 
 let wp_case t bl =
@@ -704,7 +701,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
   if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
 
 and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mexn.empty) cty e =
-  (* ASSUME pre ; LET oarg = arg ; TRY e ; STOP post WITH xpost *)
+  (* ASSUME pre ; LET o = arg ; TRY e ; STOP post WITH STOP xpost *)
   let res, q = wp_of_post expl_post cty.cty_result cty.cty_post in
   let xq = complete_xpost cty e.e_effect xmap in
   let xq = Mexn.mapi (fun xs ql ->
@@ -834,8 +831,7 @@ let reflow vc_wp k =
         | Some (q, _) -> Kseq (Kaxiom k, 0, q)
         | None -> Kaxiom k end
     | Ktag ((WP|SP) as tag, k) ->
-        assert (Mint.is_empty q);
-        Ktag (tag, push k q)
+        Ktag (tag, push k Mint.empty)
     | Ktag (Push _, _) ->
         assert false (* cannot happen *)
   in
@@ -844,7 +840,7 @@ let reflow vc_wp k =
 
 (** stage 3: WP *)
 
-(* a "destination map" maps pvsymbols (pre-effect state)
+(* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
 let ity_affected wr ity =
@@ -1016,16 +1012,65 @@ let sp_combine_map sp1 sp2 =
   Mint.union (fun _ (sp1, wr1) (sp2, wr2) ->
     Some (sp_combine sp1 wr1 sp2 wr2)) sp1 sp2
 
+(* compute compact verification conditions, in the style
+   of the Flanagan and Saxe paper (POPL'01).
+
+   Here is how it works, on a small example:
+
+      sp_expr kn k
+              rdm = [0 -> {v1; v2}; 1 -> {v1; v3}]
+              dst = [v1 -> u1; v2 -> u2; v3 -> u3]
+      = (wp, [0 -> (sp_0, [v1 -> u1]);
+              1 -> (sp_1, [v3 -> u3])], {v0; v1})
+
+   [sp_expr kn k rdm dst] returns a triple [(wp, sp+wr, rd)].
+
+   The mapping [rdm] provides the post-reads set for every
+   possible outcome of [k]. If [k] ends normally (outcome 0),
+   the subsequent execution will read program variables [v1]
+   and [v2]. If [k] terminates with an exception (outcome 1),
+   the subsequent execution will read [v1] and [v3].
+
+   The mapping [dst] provides post-write names for every
+   mutable variable in [rdm]. If [k] modifies [v1] (on any
+   execution path), the final value must be put in [u1],
+   and similarly for [v2] and [v3].
+
+   The set [rd] contains every previously defined or declared
+   variable that may be read by [k] or by the subsequent code
+   for any outcome of [k]. In our example, [k] and the code
+   after [k] depends on [v0] and [v1]; the variables [v2] and
+   [v3] are defined or declared by [k] itself and thus do not
+   appear in [rd].
+
+   The formula [wp] is a safety precondition of [k], logically
+   equivalent to [WP(k,true)]. Every free variable in [wp] is
+   in [rd].
+
+   The mapping [sp+wr] provides the postcondition [sp_i] and
+   the actual write effect [wr_i] for every outcome [i] of [k].
+   The write effect [wr_i] is necessarily a submap of [dst]
+   restricted to the corresponding post-read set [rdm(i)].
+   For example, it is possible that [k] also modifies [v3]
+   on the normal execution path, but since [v3] is not read
+   after the normal termination of [k], it is not in [wr_0].
+   Every free variable in [sp_i] is either in [rd] or in
+   the range of [wr_i], or otherwise in [rdm(i)]. Every
+   variable in the range of [wr_i] is free in [sp_i]. *)
+
 let rec sp_expr kn k rdm dst = match k with
   | Kseq (Klet (v, t, f), 0, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
-      let rd2 = t_freepvs (t_freepvs rd2 t) f in
+      let rd1 = t_freepvs (t_freepvs rd2 t) f in
       let wp = wp_let v t (sp_implies f wp2) in
-      let close _ (sp2, wr2) rd2 =
-        Some (sp_let v t (sp_and f sp2) rd2, wr2) in
-      wp, Mint.inter close sp2 rdm, Spv.remove v rd2
+      let close _ (sp, wr) rd =
+        Some (sp_let v t (sp_and f sp) rd, wr) in
+      wp, Mint.inter close sp2 rdm, Spv.remove v rd1
   | Kseq (k1, i, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      (* the dst parameter for k1 must include a fresh final
+         name for every variable modified by k2 (on any path),
+         and for every variable read by k2 that is not in dst *)
       let get_wr _ (_, w) m = Mpv.set_union w m in
       let wr2 = Mint.fold get_wr sp2 Mpv.empty in
       let fresh_wr2 v _ = clone_pv v in
@@ -1034,24 +1079,42 @@ let rec sp_expr kn k rdm dst = match k with
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
+      (* retrieve the postcondition and the write effect for the
+         outcome i: they prepend everything that happens in k2 *)
       let sp0, wr0 = Mint.find i sp1 in
-      let bound = Spv.diff rd2 rd1 in
+      (* in (sp0 -> wp2) we bind everything that is not in rd1,
+         knowing that variables that are not in rd2 are already
+         bound in sp0. We also bind all the final names. *)
       let concat rd wr = List.rev_append (List.rev_map
         (fun v -> v.pv_vs) (Spv.elements rd)) (Mpv.values wr) in
+      let bound = Spv.diff rd2 rd1 in
       let wp2 =
+        (* variables in wp2 must be adjusted wrt. wr0 *)
         let adj = adjustment wr0 and vl = concat bound wr0 in
         wp_forall vl (sp_implies sp0 (t_subst adj wp2)) in
+      (* compute (sp0 /\ sp2_j) for every outcome j of k2 *)
       let close (sp, wr) rd =
+        (* retrieve the write effects in wr0 that are visible
+           in the post-reads of k2, i.e., are not masked by
+           a write in k2 on the corresponding execution path *)
         let wr0_dst = Mpv.set_inter dst
           (Mpv.set_diff (Mpv.set_inter wr0 rd) wr) in
-        let wr = Mpv.set_union wr wr0_dst in
+        let wr = Mpv.set_union wr0_dst wr in
+        (* we must not bind variables that are visible in the
+           post-reads of k2, so we remove the post-reads from
+           bound, and we remove the visible writes from wr0 *)
         let vl = concat
           (Spv.diff bound rd) (Mpv.set_diff wr0 wr0_dst) in
+        (* visible writes in sp0 are not masked by wr, and so
+           must be advanced to dst. Variables in sp must then
+           be adjusted wrt. this "advanced" write effect. *)
         let adj = adjustment (Mpv.set_union wr0_dst wr0) in
         let sp0 = t_subst (advancement wr0 wr0_dst) sp0 in
         sp_exists vl (sp_and sp0 (t_subst adj sp)), wr in
       let close _ sp rd = Some (close sp rd) in
       let sp2 = Mint.inter close sp2 rdm in
+      (* finally, the postcondition and the write effect for
+         every other outcome of k1 must be advanced to dst *)
       let advance (sp, wr) =
         let dst = Mpv.set_inter dst wr in
         t_subst (advancement wr dst) sp, dst in

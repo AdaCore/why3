@@ -610,7 +610,11 @@ clean::
 
 .PHONY: gallery
 
-gallery::
+gallery:: gallery-simple gallery-subs
+
+.PHONY: gallery-simple
+
+gallery-simple::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
@@ -627,7 +631,7 @@ gallery::
 
 .PHONY: gallery-subs
 
-GALLERYSUBS=avl
+GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp
 
 gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
@@ -797,7 +801,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
+COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
 COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -823,14 +827,20 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(SHOW) 'Camlp    $<'
 	$(HIDE)$(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
+COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
+
+ifeq (@coq_compat_version@,COQ86)
+COQRTAC += -I lib/coq-tactic
+endif
+
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
+	$(HIDE)WHY3CONFIG="" $(COQC) -byte $(COQRTAC) $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
 src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cmxs
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
+	$(HIDE)WHY3CONFIG="" $(COQC) -opt $(COQRTAC) $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 # depend and clean targets
@@ -1145,7 +1155,7 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy
+ISABELLEVERSIONSPECIFIC=why3.ML Why3_Bool.thy Why3_BV.thy Why3_Int.thy Why3_List.thy Why3_Number.thy Why3_Set.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1436,9 +1446,17 @@ install_no_local::
 # trywhy3
 #########
 
+ifeq ($(DEBUGJS),yes)
+ JSOO_DEBUG=--pretty --debug-info --source-map
+ JS_MAPS=alt_ergo_worker.map  trywhy3.map  why3_worker.map
+else
+ JSOO_DEBUG=
+ JS_MAPS=
+endif
+
 ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
         -syntax camlp4o -I src/trywhy3 \
 	-I $(ALTERGODIR)/src/util \
 	-I $(ALTERGODIR)/src/structures \
@@ -1479,7 +1497,7 @@ TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
 	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
 	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
-	ace-builds/src-min-noconflict/theme-chrome.js
+	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
 trywhy3_package: trywhy3
 	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3FILES))
@@ -1487,11 +1505,11 @@ trywhy3_package: trywhy3
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/examples/*.mlw
-	js_of_ocaml -I src/trywhy3 \
+	js_of_ocaml --extern-fs $(JSOO_DEBUG) -I src/trywhy3 \
 		--file=why3_worker.js:/ \
 		--file=alt_ergo_worker.js:/ \
-	        --file=examples/index.txt:/ \
-		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/"` \
+	        --file=examples/index.txt:/examples/index.txt \
+		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/examples/%P"` \
 	+weak.js +nat.js $<
 
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
@@ -1499,9 +1517,9 @@ src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
-	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
+		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
 	+weak.js +nat.js $<
 
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
@@ -1509,7 +1527,7 @@ src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/try
 
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
-	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
+	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
@@ -1616,10 +1634,10 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
+	$(COQC) -byte $(COQRTAC) bench/coq-tactic/test.v
 
 test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
+	$(COQC) -opt $(COQRTAC) bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
