@@ -52,6 +52,7 @@ drivers () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
+        if [[ $f == drivers/c.drv ]]; then continue; fi
 	echo -n "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
