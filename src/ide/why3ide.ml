@@ -387,7 +387,9 @@ let create_root () =
   let root_iter = goals_model#append () in
   let root_ref = goals_model#get_row_reference
     (goals_model#get_path root_iter) in
-  Hint.add node_id_to_gtree root_node root_ref
+  Hint.add node_id_to_gtree root_node root_ref;
+  Hint.add node_id_proved root_node false
+
 
 let remove_tree goals_model =
   Hint.iter (fun _x i ->
@@ -681,39 +683,16 @@ let collapse_iter iter =
   let path = goals_model#get_path iter in
   goals_view#collapse_row path
 
-(*
-let rec collapse_proven_goals_from_pn pn =
-  match pn_proved cont pn with
-  | true  -> collapse_iter (row_from_pn pn)#iter
-  | false ->
-    List.iter collapse_proven_goals_from_tn
-      (get_transformations cont.controller_session pn)
-and collapse_proven_goals_from_tn tn =
-  match tn_proved cont tn with
-  | true  -> collapse_iter (row_from_tn tn)#iter
-  | false ->
-    List.iter collapse_proven_goals_from_pn
-      (get_sub_tasks cont.controller_session tn)
-
-let collapse_proven_goals_from_th th =
-  match th_proved cont th with
-  | true  -> collapse_iter (row_from_th th)#iter
-  | false -> List.iter collapse_proven_goals_from_pn (theory_goals th)
-
-let collapse_proven_goals_from_file file =
-  match file_proved cont file with
-  | true  -> collapse_iter (row_from_file file)#iter
-  | false -> List.iter collapse_proven_goals_from_th file.file_theories
-
-let collapse_proven_goals_from_iter iter =
-  let index = get_index iter in
-  match index with
-  | Inone              -> assert false
-  | IproofAttempt _    -> ()
-  | IproofNode pn      -> collapse_proven_goals_from_pn pn
-  | Itransformation tn -> collapse_proven_goals_from_tn tn
-  | Itheory th         -> collapse_proven_goals_from_th th
-  | Ifile file         -> collapse_proven_goals_from_file file
+let rec collapse_proven_goals_from_iter iter =
+  let node_id = get_node_id iter in
+  let is_proved = get_node_proved node_id in
+  if is_proved then
+    collapse_iter iter
+  else
+    let n = goals_model#iter_n_children (Some iter) in
+    for i = 0 to (n - 1) do
+      collapse_proven_goals_from_iter (goals_model#iter_children ?nth:(Some i) (Some iter))
+    done
 
 let collapse_proven_goals () =
   match goals_model#get_iter_first with
@@ -722,7 +701,7 @@ let collapse_proven_goals () =
 
 let (_ : GMenu.image_menu_item) =
   view_factory#add_image_item ~key:GdkKeysyms._C
-    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_goals ()) () *)
+    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_goals ()) ()
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
