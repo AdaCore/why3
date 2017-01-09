@@ -40,14 +40,28 @@ var Why3HighlightRules = function() {
 
     this.$rules = {
         "start" : [
-            {
-                token : "comment",
-                regex : '\\(\\*.*?\\*\\)\\s*?$'
+            { token : [ "paren.lparen", "text", "paren.rparen" ],
+              regex : "([(])([*])([)])"
             },
-            {
-                token : "comment",
-                regex : '\\(\\*.*',
-                next : "comment"
+            {   //black magic from Rust mode to handle nested comments.
+                token : "comment.start",
+                regex : "\\(\\*",
+                stateName : "comment",
+                push : [
+                    {
+                        token: 'comment.start',
+                        regex : "\\(\\*",
+                        push : 'comment'
+                    },
+                    {
+                        token: 'comment.end',
+                        regex: "\\*\\)",
+                        next: 'pop'
+                    },
+                    {
+                        defaultToken: 'comment'
+                    }
+                ]
             },
             {
                 token : "string", // single line
@@ -95,18 +109,6 @@ var Why3HighlightRules = function() {
                 regex : "\\s+"
             }
         ],
-        "comment" : [
-            {
-                token : "comment", // closing comment
-                regex : ".*?\\*\\)",
-                next : "start"
-            },
-            {
-                token : "comment", // comment spanning whole line
-                regex : ".+"
-            }
-        ],
-
         "qstring" : [
             {
                 token : "string",
@@ -114,10 +116,12 @@ var Why3HighlightRules = function() {
                 next : "start"
             }, {
                 token : "string",
-                regex : '.+'
+                regex : '[^"]'
             }
         ]
     };
+
+    this.normalizeRules();
 };
 
 oop.inherits(Why3HighlightRules, TextHighlightRules);
@@ -225,7 +229,7 @@ var indenter = /(?:[({[=:]|[-=]>|\b(?:else|try|with))\s*$/;
     this.autoOutdent = function(state, doc, row) {
         this.$outdent.autoOutdent(doc, row);
     };
-
+    this.blockComment = {start: "(*", end: "*)", nestable: true};
     this.$id = "ace/mode/why3";
 }).call(Mode.prototype);
 

@@ -57,7 +57,7 @@ Proof.
 intros a a_WT v m l u h1.
 assert (u - l <= 0)%Z as h1' by omega.
 unfold occ.
-destruct (u - l)%Z ; try easy.
+destruct (u - l)%Z ; try reflexivity.
 now elim h1'.
 Qed.
 

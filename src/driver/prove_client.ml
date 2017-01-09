@@ -171,27 +171,31 @@ type final_answer = {
   time      : float;
   timeout   : bool;
   out_file  : string;
-  exit_code : int;
+  exit_code : int64;
 }
 
 type answer =
   | Started of int
   | Finished of final_answer
 
-let read_answer s = match Strings.split ';' s with
-  | "F":: id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
-      (* same trick we use in other parsing code. The file name may contain
-         ';'. Luckily, the file name comes last, so we still split on ';',
-         and put the pieces back together afterwards *)
-      Finished { id = int_of_string id;
-        out_file = Strings.join ";" rest;
-        time = float_of_string time_s;
-        exit_code = int_of_string exit_s;
-        timeout = (timeout_s = "1"); }
-  | "S" :: [id] ->
-      Started (int_of_string id)
-  | _ ->
-      raise (InvalidAnswer s)
+let read_answer s =
+  try
+    match Strings.split ';' s with
+    | "F":: id :: exit_s :: time_s :: timeout_s :: ( (_ :: _) as rest) ->
+        (* same trick we use in other parsing code. The file name may contain
+           ';'. Luckily, the file name comes last, so we still split on ';',
+           and put the pieces back together afterwards *)
+        Finished { id = int_of_string id;
+          out_file = Strings.join ";" rest;
+          time = float_of_string time_s;
+          exit_code = Int64.of_string exit_s;
+          timeout = (timeout_s = "1"); }
+    | "S" :: [id] ->
+        Started (int_of_string id)
+    | _ ->
+        raise (InvalidAnswer s)
+  with Failure "int_of_string" ->
+    raise (InvalidAnswer s)
 
 let read_answers ~blocking =
   List.map read_answer (List.filter (fun x -> x <> "") (read_lines blocking))

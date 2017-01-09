@@ -128,3 +128,33 @@ let split_intro =
 let () = Trans.register_transform_l "split_intro" split_intro
   ~desc:"Same@ as@ split_goal_wp,@ but@ moves@ \
     the@ implication@ antecedents@ to@ premises."
+
+
+(** Destruction of existential quantifiers in axioms.
+    Contributed by Nicolas Jeannerod [niols@niols.fr] *)
+let rec eliminate_exists_aux pr t =
+  match t.t_node with
+  | Tquant (Texists, q) ->
+     let vsl, _, t' = t_open_quant q in
+     let intro_var subst vs =
+       let ls =
+         create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty)
+       in
+       Mvs.add vs (fs_app ls [] vs.vs_ty) subst, create_param_decl ls
+     in
+     let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
+     let t' = t_subst subst t' in
+     let t = t_label_copy t t' in
+     dl @ eliminate_exists_aux pr t
+  | _ ->
+     [create_prop_decl Paxiom pr t]
+
+let eliminate_exists d =
+  match d.d_node with
+  | Dprop (Paxiom, pr, t) -> eliminate_exists_aux pr t
+  | _ -> [d]
+
+let () = Trans.register_transform
+           "introduce_exists"
+           (Trans.decl eliminate_exists None)
+           ~desc:"Replace axioms of the form 'exists x. P' by 'constant x axiom P'."

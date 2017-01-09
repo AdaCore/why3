@@ -201,7 +201,7 @@ fun mk_vc name_concl prems concls =
      ((Binding.name ("H" ^ string_of_int (i + 1)), []), [(t, [])])) prems),
    Element.Shows (map_index (fn (i, t) =>
      (if name_concl then (Binding.name ("C" ^ string_of_int (i + 1)), [])
-      else Attrib.empty_binding,
+      else Binding.empty_atts,
       [(t, [HOLogic.mk_Trueprop
           (Var (("C", i + 1), HOLogic.boolT))])])) concls));
 
@@ -328,7 +328,7 @@ fun read_prop ctxt x = HOLogic.mk_Trueprop (read_term ctxt x);
 
 fun prep_datatypes ctxt dts =
   let val ctxt' = fold (fn ((s, _), args, _) =>
-    Typedecl.basic_typedecl (Binding.name s, length args, NoSyn) #>
+    Typedecl.basic_typedecl {final = true} (Binding.name s, length args, NoSyn) #>
     snd #> Local_Theory.background_theory (add_type s)) dts ctxt
   in map (fn (b, args, constrs) =>
     (b, args, map (apsnd (map (read_type ctxt'))) constrs)) dts
@@ -572,12 +572,19 @@ fun err_decl thy s decl =
     [Pretty.str s, Pretty.fbrk, Pretty.fbrk,
      the (pretty_decl (K true, K "") (Proof_Context.init_global thy) decl)])));
 
+fun add_axioms s [t] =
+      Specification.axiom ((fact_binding s, []), t) #> snd
+  | add_axioms s ts =
+      fold_map Specification.axiom
+        (map_index (fn (i, t) =>
+           ((fact_binding (s ^ "_" ^ string_of_int (i + 1)), []), t)) ts) #>
+      apfst (pair (fact_binding s)) #>
+      uncurry Global_Theory.store_thms #> snd;
+
 fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       (case lookup_thm thy id of
          NONE =>
-           (thy |> Specification.axiomatization
-              [] [((fact_binding s, []), ts)] |> snd,
-            true)
+           (add_axioms s ts thy, true)
        | SOME thms =>
            if length thms = length ts andalso
              forall (Pattern.matches thy o apfst Thm.prop_of) (thms ~~ ts)
@@ -589,7 +596,7 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
            if realize then (thy, false) else
            (case lookup_type' thy id of
               NONE =>
-                (thy |> globalize (Typedecl.typedecl
+                (thy |> globalize (Typedecl.typedecl {final = true}
                    (Binding.name s, map (rpair dummyS) args, NoSyn) #> snd) |>
                  add_type s,
                  true)
@@ -604,7 +611,7 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       (case lookup_const' thy id of
          NONE =>
            (thy |> Specification.axiomatization
-              [(Binding.name s, SOME T, NoSyn)] [] |> snd |>
+              [(Binding.name s, SOME T, NoSyn)] [] [] [] |> snd |>
             add_const s,
             true)
        | SOME s' => (add_const_raw NONE (s, s') thy, false))
@@ -614,7 +621,7 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
         case lookup_def thy id of
           NONE =>
             (thy |> globalize (Specification.definition
-               (NONE, (Attrib.empty_binding, eqn)) #> snd) |>
+               NONE [] [] (Binding.empty_atts, eqn) #> snd) |>
              add_const s,
              true)
         | SOME [th] =>
@@ -704,7 +711,7 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
           NONE =>
             (thy |> globalize (fn lthy => Function_Fun.add_fun
                (map (fn (s, T) => (Binding.name s, SOME T, NoSyn)) eqnss')
-               (map (pair Attrib.empty_binding) (maps snd eqnss))
+               (map (fn t => ((Binding.empty_atts, t), [], [])) (maps snd eqnss))
                Function_Fun.fun_config lthy) |>
              fold (add_const o fst) eqnss',
              true)
@@ -815,7 +822,7 @@ fun prove_vc vc_name lthy =
     val thy = Proof_Context.theory_of lthy;
     val (ctxt, stmt) = get_vc thy vc_name
   in
-    Specification.theorem Thm.theoremK NONE
+    Specification.theorem true Thm.theoremK NONE
       (fn thmss => (Local_Theory.background_theory
          (mark_proved vc_name (flat thmss))))
       (fact_binding vc_name, []) [] [ctxt] stmt false lthy
@@ -826,9 +833,9 @@ val _ =
     "open a new Why3 environment and load a Why3-generated .xml file"
     (Resources.provide_parse_files "why3_open" --
      Scan.optional (Parse.reserved "constants" |-- Parse.!!! (Scan.repeat1
-       (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.xname))) [] --
+       (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.name))) [] --
      Scan.optional (Parse.reserved "types" |-- (Scan.repeat1
-       (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.xname))) [] >>
+       (Parse.name --| Args.$$$ "=" -- Parse.!!! Parse.name))) [] >>
      (Toplevel.theory o why3_open));
 
 val _ =
@@ -857,25 +864,25 @@ val _ =
 val _ =
   Outer_Syntax.command @{command_keyword "why3_consts"}
     "associate Why3 constants with constants"
-    (Scan.repeat1 (Parse.xname --| Args.$$$ "=" -- Parse.xname) >>
+    (Scan.repeat1 (Parse.name --| Args.$$$ "=" -- Parse.name) >>
        (Toplevel.theory o fold add_why3_const));
 
 val _ =
   Outer_Syntax.command @{command_keyword "why3_types"}
     "associate Why3 types with types"
-    (Scan.repeat1 (Parse.xname --| Args.$$$ "=" -- Parse.xname) >>
+    (Scan.repeat1 (Parse.name --| Args.$$$ "=" -- Parse.name) >>
        (Toplevel.theory o fold add_why3_type));
 
 val _ =
   Outer_Syntax.command @{command_keyword "why3_thms"}
     "associate Why3 axioms with theorems"
-    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse.xthms1) >>
+    (Parse.and_list1 (Parse.name --| Args.$$$ "=" -- Parse.thms1) >>
        (Toplevel.theory o fold add_why3_thm));
 
 val _ =
   Outer_Syntax.command @{command_keyword "why3_defs"}
     "associate Why3 definitions with definitions"
-    (Parse.and_list1 (Parse.xname --| Args.$$$ "=" -- Parse.xthms1) >>
+    (Parse.and_list1 (Parse.name --| Args.$$$ "=" -- Parse.thms1) >>
        (Toplevel.theory o fold add_why3_def));
 
 val setup = Theory.at_end (fn thy =>

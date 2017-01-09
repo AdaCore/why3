@@ -150,6 +150,11 @@ theory TestIntros
   goal G3 :
     forall x y: t 'a 'b, z z': t int 'c. z = z' -> x = y
 
+
+  axiom A: exists x. x * 6 = 42
+
+  goal g: false
+
 end
 
 
