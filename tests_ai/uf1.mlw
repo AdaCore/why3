@@ -14,7 +14,7 @@ module Uf1
 		let u = a[y] in
 		while !i < 4 do
 		variant { 10 - !i }
-		invariant { !i >= 0 /\ !i <= 4 /\ a[0] = 1 /\ (!i = 0 \/ !x = a[y] - a[0]) }
+		invariant { !i >= 0 /\ !i <= 4 (*/\ a[0] = 1*) /\ (!i = 0 \/ !x = a[y] - a[0]) }
 			i := !i + 1;
 			x := a[y] - a[0];
 		done;

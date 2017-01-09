@@ -250,6 +250,7 @@ let () =
         "tests_ai/uf1.mlw";
         "tests_ai/mccarthy.mlw";
         "tests_ai/auto_array1.mlw";
+        "tests_ai/bool.mlw"
       ];
     List.iter (do_input true)
       [

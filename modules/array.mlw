@@ -268,7 +268,7 @@ module ArraySwap
   let swap (a:array 'a) (i:int) (j:int) : unit
     requires { 0 <= i < length a /\ 0 <= j < length a }
     writes   { a }
-    ensures  { exchange (old a) a i j }
+    ensures  { exchange (old a) a i j /\ length (old a) = length a }
   = let v = a[i] in
     a[i] <- a[j];
     a[j] <- v

@@ -61,7 +61,7 @@ module Make(A:DOMAIN) = struct
     with
     | Not_found ->
       let c = A.meet_lincons_array (fst man) a l in
-      Hashdoml.add (snd man).meet_lincons (a, l, fst man) c;
+      (* Hashdoml.add (snd man).meet_lincons (a, l, fst man) c; *)
       c
 
   let a_is_leq man a b =
@@ -73,7 +73,7 @@ module Make(A:DOMAIN) = struct
     with
     | Not_found ->
       let c = A.join (fst man) a b in
-      Hashdom.add (snd man).real_join_tbl (a, b, fst man) c;
+      (* Hashdom.add (snd man).real_join_tbl (a, b, fst man) c; *)
       c
 
   let is_leq man a b =
@@ -215,7 +215,7 @@ module Make(A:DOMAIN) = struct
               a_is_leq man' new_c b) true opp_typ
         end;
     done;
-      Hashdom.add (snd man').join_tbl (a, b, man) !precise;
+      (*Hashdom.add (snd man').join_tbl (a, b, man) !precise; *)
     !precise
 
 

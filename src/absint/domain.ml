@@ -108,16 +108,22 @@ module Make_from_apron(M:sig
     in
     let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int in
 
-    let int_of_string s =
-      let f = float_of_string s in
-      let i = int_of_float f in
-      assert (float_of_int i = f);
-      i
+    let rec int_of_s s =
+      let open Scalar in
+      match s with
+      | Float f -> 
+        let i = int_of_float f in
+        assert (float_of_int i = f);
+        i
+      | Mpqf t ->
+        int_of_s (Float (Mpqf.to_float t))
+      | Mpfrf t ->
+        int_of_s (Float (Mpfr.to_float t))
     in
 
     let coeff_to_term = function
       | Coeff.Scalar(s) ->
-        let i = int_of_string (Scalar.to_string s) in
+        let i = int_of_s s in
         let s = string_of_int (abs i) in
         let n = Number.int_const_dec s in
         let n = Number.ConstInt n in
