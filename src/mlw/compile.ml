@@ -224,7 +224,7 @@ module Translate = struct
 
   (* expressions *)
   let rec expr ({e_effect = eff } as e) =
-    assert (not eff.eff_ghost);
+    (* assert (not eff.eff_ghost); *)
     match e.e_node with
     | Econst c ->
        let c = match c with Number.ConstInt c -> c | _ -> assert false in
@@ -247,6 +247,11 @@ module Translate = struct
        ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
     | Eassert _ ->
        ML.mk_unit
+    | Eif (e1, e2, e3) ->
+       let e1 = expr e1 in
+       let e2 = expr e2 in
+       let e3 = expr e3 in
+       ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
     | _ -> (* TODO *) assert false
 
   and ebranch ({pp_pat = p}, e) =
@@ -287,6 +292,7 @@ module Translate = struct
     | PDlet (LDvar (_, _)) ->
        []
     | PDlet (LDsym ({rs_name = rsn; rs_cty = cty}, {c_node = Cfun e})) ->
+       Format.printf "exec:%b@." (Exec.is_exec_pdecl () pd);
        [ML.Dlet (false, [rsn, args cty.cty_args, expr e])]
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
        Format.printf "LDsym Capp--> %s@." rsn.id_string;
