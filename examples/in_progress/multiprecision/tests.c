@@ -52,9 +52,9 @@ int main () {
   refq = TMP_ALLOC_LIMBS (max_n + 1);
   refr = TMP_ALLOC_LIMBS (max_n + 1);
 
-  for (an = 1; an <= max_n; an += 1)
+  for (an = 3; an <= max_n; an += 1)
     {
-      for (bn = 1; bn <= an; bn += 1)
+      for (bn = 3; bn <= an; bn += 1)
 	{
 	  mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
@@ -106,8 +106,8 @@ int main () {
 		      (int) an, (int) bn, (int) rn);
 	      printf ("a: "); mpn_dump (ap, an);
 	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("r:   "); mpn_dump (rr, rn);
-	      printf ("ref: "); mpn_dump (refr, rn);
+	      printf ("r:   "); mpn_dump (rq, rn);
+	      printf ("ref: "); mpn_dump (refq, rn);
 	      abort();
 	    }
 #endif

@@ -3080,12 +3080,19 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     valid_ptr_itv x (p2i sz)
     /\ l2i (pelts x)[x.offset + p2i sz - 1] >= div radix 2
 
-  let div_sb_qr (q x y:t) (sx sy:int32) : unit
+  let div_sb_qr (q x y:t) (sx sy:int32) : limb
     requires { 2 <= p2i sy <= p2i sx }
     requires { valid_ptr_itv x (p2i sx) }
     requires { valid_ptr_itv y (p2i sy) }
     requires { valid_ptr_itv q (p2i sx - p2i sy) }
     requires { normalized y sy }
+    ensures { value_sub_shift (old x) (p2i sx) =
+              (value_sub_shift q (p2i sx - p2i sy)
+              + power radix (p2i sx - p2i sy) * l2i result)
+                * value_sub_shift y (p2i sy)
+              + value_sub_shift x (p2i sy) }
+    ensures { value_sub_shift x (p2i sy) < value_sub_shift y (p2i sy) }
+    ensures { 0 <= l2i result <= 1 }
   =
     let one = Int32.of_int 1 in
     let two = Int32.of_int 2 in
@@ -3098,12 +3105,68 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let xp = ref (C.incr x (Int32.(-) sx two)) in
     let qp = ref (C.incr q (Int32.(-) sx sy)) in
     let dh = C.get_ofs y (Int32.(-) sy one) in
+    assert { l2i dh >= div radix 2 by normalized y sy };
     let dl = C.get_ofs y (Int32.(-) sy two) in
     let v = reciprocal_word_3by2 dh dl in
     let x1 = ref (C.get_ofs !xp one) in
     let i = ref (Int32.(-) sx sy) in
     let mdn = Int32.(-) two sy in
     let ql = ref limb_zero in
+    let xd = C.incr !xp mdn in
+    let r = compare_same_size xd y sy in
+    let qh = if (Int32.(>=) r zero)
+             then uone
+             else limb_zero in
+    let ghost vy = value_sub_shift y (p2i sy) in
+    label PreAdjust in
+    if Limb.ne qh limb_zero
+    then begin
+         assert { l2i qh = 1 };
+         let b = submul_limb xd y uone sy in (* TODO sub in place *)
+         assert { l2i b = 0 };
+         assert { value_sub_shift (xd at PreAdjust) (p2i sy)
+                  = value_sub_shift xd (p2i sy) + vy };
+         assert { value_sub_shift (old x) (p2i sx)
+                  = value_sub_shift x (p2i sx)
+                    + power radix (p2i sx - p2i sy) * vy };
+         assert { value_sub_shift (old x) (p2i sx) =
+                  (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
+                  * vy * power radix (p2i !i)
+                  + value_sub_shift x (p2i sy + p2i !i)
+                 by
+                   p2i !i = p2i sx - p2i sy
+                 so power radix (p2i sx - p2i sy - p2i !i) = 1
+                 so value_sub_shift !qp (p2i sx - p2i sy - p2i !i) = 0
+                 so value_sub_shift x (p2i sy + p2i !i)
+                    = value_sub_shift x (p2i sx) };
+         value_sub_lower_bound_tight (pelts y) y.offset (y.offset + p2i sy);
+         assert { value_sub (pelts x) (!xp.offset + p2i mdn)
+                 (!xp.offset + p2i mdn + p2i sy)
+                 < vy
+                 by
+                 value_sub (pelts x) (!xp.offset + p2i mdn)
+                           (!xp.offset + p2i mdn + p2i sy)
+                 = value_sub_shift xd (p2i sy)
+                 = value_sub_shift (xd at PreAdjust) (p2i sy) - vy
+                 so value_sub_shift (xd at PreAdjust) (p2i sy)
+                    < power radix (p2i sy)
+                 so vy >= l2i dh * power radix (p2i sy - 1)
+                 so 2 * vy >= 2 * l2i dh * power radix (p2i sy - 1)
+                 so 2 * l2i dh >= radix
+                 so 2 * vy >= power radix (p2i sy)
+                 so value_sub_shift (xd at PreAdjust) (p2i sy) < 2 * vy
+                 so value_sub_shift (xd at PreAdjust) (p2i sy) - vy < vy };
+         assert { l2i dl + radix * l2i dh
+                  >= l2i (pelts x)[(!xp).offset] + radix * l2i !x1
+                  by value_sub (pelts x) (!xp.offset + p2i mdn)
+                 (!xp.offset + p2i mdn + p2i sy)
+                     < value_sub_shift y (p2i sy) };
+         end
+    else begin
+         assert { l2i dl + radix * l2i dh
+                  >= l2i (pelts x)[(!xp).offset] + radix * l2i !x1 };
+         end;
     while (Int32.(>) !i zero) do
       variant { p2i !i }
       invariant { 0 <= p2i !i <= p2i sx - p2i sy }
@@ -3113,6 +3176,16 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       invariant { plength !xp = plength x }
       invariant { pelts !qp = pelts q }
       invariant { pelts !xp = pelts x }
+      invariant { value_sub_shift (old x) (p2i sx) =
+                  (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
+                  * vy * power radix (p2i !i)
+                  + value_sub_shift x (p2i sy + p2i !i) } (* one less and x1 ? *)
+      invariant { value_sub (pelts x) (!xp.offset + p2i mdn)
+                 (!xp.offset + p2i mdn + p2i sy)
+                 < vy }
+      invariant { l2i dl + radix * l2i dh
+                  >= l2i (pelts x)[(!xp).offset] + radix * l2i !x1 }
       xp := C.incr !xp minus_one;
       if (Limb.(=) !x1 dh && Limb.(=) (C.get_ofs !xp one) dl) (* unlikely *)
       then begin
@@ -3121,6 +3194,14 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         x1 := C.get_ofs !xp one
       end
       else begin
+        assert { l2i dl + radix * l2i dh
+                  > l2i (pelts x)[(!xp).offset + 1] + radix * l2i !x1
+                  by
+                  (l2i dl + radix * l2i dh
+                   = l2i (pelts x)[(!xp).offset + 1] + radix * l2i !x1
+               ->
+                   l2i !x1 = l2i dh
+                   /\ l2i (pelts x)[(!xp).offset + 1] = l2i dl )};
         let qu, rh, rl =
             div3by2_inv !x1 (C.get_ofs !xp one) (C.get !xp) dh dl v in
         ql := qu;
@@ -3145,7 +3226,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       C.set !qp !ql;
       i := Int32.(-) !i one;
     done;
-    C.set_ofs !xp one !x1
+    C.set_ofs !xp one !x1;
+    qh
 
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
     in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to
@@ -3174,7 +3256,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       then begin
         let nx = malloc (UInt32.of_int32 sx) in
         let _ = add_limb nx x limb_zero sx in (*TODO actual copy*)
-	div_sb_qr q nx y sx sy;
+	let _ = div_sb_qr q nx y sx sy in
 	let _ = add_limb r nx limb_zero sy in
 	free nx;
       end
@@ -3185,7 +3267,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
 	let h = lshift nx x sx (Limb.of_int32 clz) in
 	C.set_ofs nx sx h;
 	(* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-	div_sb_qr q nx ny (Int32.(+) sx (Int32.of_int 1)) sy;
+	let _ = div_sb_qr q nx ny (Int32.(+) sx (Int32.of_int 1)) sy in
 	let _ = rshift r nx sy (Limb.of_int32 clz) in
 	free nx;
 	free ny;
