@@ -1669,6 +1669,16 @@ test-ocaml-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmx
 	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
 	@tests/test-extraction/a.out
 
+#######################################
+# this should be removed in the future
+######################################
+test-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
+	@mkdir -p tests/test-extraction-mario
+	@cd tests ; ../bin/why3extract.opt -D ../drivers/ocaml64.drv \
+	  test_extraction_mario.mlw -o test-extraction-mario
+	@cd tests/test-extraction-mario/ ; \
+	  $(OCAMLOPT) test_extraction_mario__M.ml
+
 ################
 # documentation
 ################

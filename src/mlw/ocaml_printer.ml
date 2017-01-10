@@ -139,6 +139,8 @@ module Print = struct
     | Some o, [t1; t2] ->
        fprintf fmt "@[<hov 1>%a %s %a@]"
          print_ident t1 o print_ident t2
+    | _, [] ->
+      print_ident fmt s
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
          print_ident s (print_list space print_ident) tl
@@ -221,16 +223,36 @@ module Print = struct
 
 end
 
-let extract_module fmt m =
+let extract_module pargs ?old fmt ({mod_theory = th} as m) =
+  ignore (pargs);
+  ignore (old);
+  ignore (m);
+  let info = {
+    info_syn          = pargs.Pdriver.syntax;
+    info_convert      = pargs.Pdriver.converter;
+    info_current_th   = th;
+    info_current_mo   = Some m;
+    info_th_known_map = th.th_known;
+    info_mo_known_map = m.mod_known;
+    info_fname        = None; (* TODO *)
+  } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
-  let mdecls = Translate.module_ m in
+  let mdecls = Translate.module_ info m in
   print_list nothing Print.print_decl fmt mdecls;
   fprintf fmt "@."
 
+let fg ?fname m =
+  let mod_name = m.Pmodule.mod_theory.Theory.th_name.id_string in
+  match fname with
+  | None   -> mod_name ^ ".ml"
+  | Some f -> (Filename.remove_extension f) ^ "__" ^ mod_name ^ ".ml"
+
+let () = Pdriver.register_printer "ocaml" ~desc:"printer for OCaml code" fg extract_module
+
 (*
  * Local Variables:
- * compile-command: "make -C ../.. -j3"
+ * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
  * End:
  *)

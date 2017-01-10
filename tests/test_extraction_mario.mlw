@@ -31,8 +31,10 @@ module M
     ghost mutable v : seq 'a;
   }
 
-  let update (c: cursor int) : unit
-  = let t = ghost c.v <- empty in t; ()
+  use import ref.Ref
+
+  (* let update (c: cursor int) : int *)
+  (* = c.index *)
 
   exception Empty (list int, int)
   exception Out_of_bounds int
@@ -51,10 +53,16 @@ module M
   let a () : unit
   = assert { true }
 
+  let singleton (x: int) (l: list int) : list int =
+    let x = Nil in x
+
+  let test (x: int) : int =
+    let y = x in y + 1
+
 end
 
 (*
  * Local Variables:
- * compile-command: "make -C .. -j3; ../bin/why3extract -D ../drivers/c.drv -o extract test_extraction_mario.mlw"
+ * compile-command: "make -C .. test-extraction"
  * End:
  *)

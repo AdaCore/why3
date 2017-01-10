@@ -1,11 +1,13 @@
 
 (** Arithmetic-independent OCaml driver *)
 
+(* FIXME
 theory HighOrd
   syntax type func "(%1 -> %2)"
   syntax type pred "(%1 -> bool)"
   syntax function (@) "(%1 %2)"
 end
+*)
 
 theory option.Option
   syntax type     option "(%1 option)"
@@ -80,4 +82,3 @@ module null.Null
   syntax val  get         "(fun x -> x)"
 
 end
-

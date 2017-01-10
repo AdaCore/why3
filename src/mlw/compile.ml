@@ -52,6 +52,10 @@
     - comme l'AST [expr] est déjà en forme normale-A, est-ce que ça
       fait du sense pour vous d'utiliser des applications de la forme
       [Eapp of ident * ident list] ?
+
+    - faire un module Erasure, pour y concentrer tout ce qui
+      appartient à l'éffacement du code fantôme ?
+
  *)
 
 (*
@@ -65,6 +69,7 @@ open Ident
 open Ity
 open Ty
 open Term
+open Printer
 
 module ML = struct
 
@@ -154,6 +159,16 @@ module ML = struct
     mk_expr enope (I Ity.ity_unit) Ity.eff_empty
 
 end
+
+type info = {
+  info_syn          : syntax_map;
+  info_convert      : syntax_map;
+  info_current_th   : Theory.theory;
+  info_current_mo   : Pmodule.pmodule option;
+  info_th_known_map : Decl.known_map;
+  info_mo_known_map : Pdecl.known_map;
+  info_fname        : string option;
+}
 
 (** Translation from Mlw to ML *)
 
@@ -252,6 +267,9 @@ module Translate = struct
        let e2 = expr e2 in
        let e3 = expr e3 in
        ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
+    (* | Eassign [(_, {rs_field = None; rs_name = id}, pv)] -> *)
+    (*    let pv_id = pv_name pv in *)
+    (*    ML.mk_expr ( *)
     | _ -> (* TODO *) assert false
 
   and ebranch ({pp_pat = p}, e) =
@@ -271,7 +289,7 @@ module Translate = struct
       rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
 
   (* type declarations/definitions *)
-  let tdef itd =
+  let tdef info itd =
     let s = itd.itd_its in
     let id = itd_name itd in
     let args = its_args s in
@@ -287,12 +305,12 @@ module Translate = struct
     end
 
   (* program declarations *)
-  let pdecl pd =
+  let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDvar (_, _)) ->
        []
     | PDlet (LDsym ({rs_name = rsn; rs_cty = cty}, {c_node = Cfun e})) ->
-       Format.printf "exec:%b@." (Exec.is_exec_pdecl () pd);
+       (* Format.printf "exec:%b@." (Exec.is_exec_pdecl () pd); *)
        [ML.Dlet (false, [rsn, args cty.cty_args, expr e])]
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
        Format.printf "LDsym Capp--> %s@." rsn.id_string;
@@ -312,7 +330,7 @@ module Translate = struct
     | PDpure ->
        []
     | PDtype itl ->
-       List.map tdef itl
+       List.map (tdef info) itl
     | PDexn ({xs_name = xsn} as xs) ->
        if ity_equal xs.xs_ity ity_unit then
          [ML.Dexn (xsn, None)]
@@ -320,19 +338,19 @@ module Translate = struct
          [ML.Dexn (xsn, Some (ity xs.xs_ity))]
 
   (* unit module declarations *)
-  let mdecl = function
+  let mdecl info = function
     | Udecl pd ->
-       pdecl pd
+       pdecl info pd
     |  _ -> (* TODO *) []
 
   (* modules *)
-  let module_ m =
-    List.concat (List.map mdecl m.mod_units)
+  let module_ info m =
+    List.concat (List.map (mdecl info) m.mod_units)
 
 end
 
 (*
  * Local Variables:
- * compile-command: "make -C ../.. -j3"
+ * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
  * End:
  *)
