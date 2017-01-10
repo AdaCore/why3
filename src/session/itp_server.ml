@@ -47,39 +47,6 @@ let unproven_goals_below_file cont file =
     let theories = file.file_theories in
     List.fold_left (unproven_goals_below_th cont) [] theories
 
-(* returns the list of unproven goals in the controller session *)
-let unproven_goals_in_session cont =
-  let files = get_files cont.controller_session in
-  Stdlib.Hstr.fold (fun _key file acc ->
-      let file_goals = unproven_goals_below_file cont file in
-      List.rev_append file_goals acc)
-    files []
-
-(* [get_first_unproven_goal_around_pn cont pn]
-   returns the `first unproven goal' 'after' [pn]. Precisely:
-   (1) it finds the youngest ancestor a of [pn] that is not proved
-   (2) it returns the first unproved leaf of a
-   it returns None if all ancestors are proved *)
-let _get_first_unproven_goal_around_pn cont pn =
-  let ses = cont.controller_session in
-  let rec look_around pn =
-    match get_proof_parent ses pn with
-    | Trans tn  ->
-      if tn_proved cont tn
-      then look_around (get_trans_parent ses tn)
-      else unproven_goals_below_tn cont [] tn
-    | Theory th ->
-      if th_proved cont th then begin
-        let parent = (theory_parent ses th) in
-        if file_proved cont parent
-        then unproven_goals_in_session cont
-        else unproven_goals_below_file cont parent
-      end else
-        unproven_goals_below_th cont [] th
-  in
-  match look_around pn with
-  | [] -> None
-  | l -> Some (List.hd (List.rev l))
 
 (****************)
 (* Command list *)
@@ -800,11 +767,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           let parent = node_ID_from_pn parent_id in
           ignore (new_node ~parent (APa panid))
       end
-    (* | Done pr -> *)
-    (*   P.notify (Node_change (node_ID_from_pan panid, Proved true)) *)
-                             (*{proved=(pr.pr_answer=Valid); name=""})); *)
-      (* TODO: we don't want to resend the name every time, separate
-         updatable from the rest *)
     | _  -> () (* TODO ? *)
     end;
     let limit = (get_proof_attempt_node cont.controller_session panid).limit in

@@ -2,7 +2,8 @@ open Why3
 open Format
 open Gconfig
 open Stdlib
-open Ide_utils.History
+open Ide_utils
+open History
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -789,9 +790,6 @@ let remove_item: GMenu.menu_item =
       | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
       | _ -> print_message "Select only one node to perform this action")
 
-
-
-
 (*************************************)
 (* Commands of the Experimental menu *)
 (*************************************)
@@ -907,10 +905,40 @@ let treat_message_notification msg = match msg with
       else
         print_message "Request failed."
 
+
+(***********************)
+(* First Unproven goal *)
+(***********************)
+
+let is_goal node =
+  get_node_type node = NGoal
+
+let proved node =
+  get_node_proved node
+
+let children node =
+  let iter = (get_node_row node)#iter in
+  let n = goals_model#iter_n_children (Some iter) in
+  let acc = ref [] in
+  for i = 0 to (n-1) do
+    let new_iter = goals_model#iter_children ?nth:(Some i) (Some iter) in
+    let child_node = get_node_id new_iter in
+    if (get_node_type child_node != NProofAttempt) then
+      acc := child_node :: !acc
+  done;
+  !acc
+
+let get_parent node =
+  let iter = (get_node_row node)#iter in
+  let parent_iter = goals_model#iter_parent iter in
+  match parent_iter with
+  | None -> None
+  | Some parent -> Some (get_node_id parent)
+
 let treat_notification n = match n with
   | Node_change (id, uinfo)        ->
     begin
-      match uinfo with
+      (match uinfo with
       | Proved b ->
         begin
           Hint.replace node_id_proved id b;
@@ -922,18 +950,22 @@ let treat_notification n = match n with
           Hint.replace node_id_pa id (pa, obs, l);
           goals_model#set ~row:r#iter ~column:status_column
             (image_of_pa_status ~obsolete:obs pa)
-        end
+        end);
+      (* Moving cursor on first unproved goal around *)
+      let node = get_first_unproven_goal_around ~proved:proved
+        ~children:children ~get_parent:get_parent ~is_goal:is_goal id in
+      match node with
+      | None -> ()
+      | Some node ->
+          let iter = (get_node_row node)#iter in
+          goals_view#selection#select_iter iter
     end
   | New_node (id, parent_id, typ, name) ->
     begin (try
         let parent = get_node_row parent_id in
-        let row_ref = new_node ~parent id name typ false in
-        (* TODO for easier testing of IDE *)
-        if typ = NGoal then goals_view#selection#select_iter row_ref#iter
+        ignore (new_node ~parent id name typ false)
       with Not_found ->
-        let row_ref = new_node id name typ false in
-        (* TODO for easier testing of IDE *)
-        if typ = NGoal then goals_view#selection#select_iter row_ref#iter);
+        ignore (new_node id name typ false))
     end
   | Remove id                     ->
     let n = get_node_row id in
@@ -950,14 +982,6 @@ let treat_notification n = match n with
   | Saved                         -> (* TODO *)
     print_message "got a Saved notification not yet supported\n"
   | Message (msg)                 -> treat_message_notification msg
-(*  | Proof_update (id, pa)         -> (* TODO *)
-    let r = get_node_row id in
-    let obsolete = match get_node_type id with
-      | NProofAttempt (_, obsolete) -> obsolete
-      | _ -> assert false
-    in
-    goals_model#set ~row:r#iter ~column:status_column
-      (image_of_pa_status ~obsolete pa) *)
   | Dead _s                        -> (* TODO *)
     print_message "got a Dead notification not yet supported\n"
   | Task (_id, s)                  ->

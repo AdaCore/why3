@@ -68,3 +68,33 @@ module History = struct
     h.tr <- false
 
 end
+
+(***********************)
+(* First Unproven goal *)
+(***********************)
+
+(* Children should not give the proof attempts *)
+let rec unproven_goals_below_node ~proved ~children ~is_goal acc node =
+  if proved node then
+    acc
+  else
+    let nodes = children node in
+    if is_goal node && nodes = [] then
+      node :: acc
+    else
+      List.fold_left (unproven_goals_below_node ~proved ~children ~is_goal)
+        acc nodes
+
+let get_first_unproven_goal_around ~proved ~children ~get_parent ~is_goal node =
+  let rec look_around node =
+    match get_parent node with
+    | None -> unproven_goals_below_node ~proved ~children ~is_goal [] node
+    | Some parent ->
+        if proved parent then
+          look_around parent
+        else
+          unproven_goals_below_node ~proved ~children ~is_goal [] parent
+  in
+  match look_around node with
+  | [] -> None
+  | hd :: _tl  -> Some hd
