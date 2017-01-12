@@ -15,28 +15,14 @@ open Itp_server
 (* Debugging Json protocol *)
 (***************************)
 
-(* TODO This part is temporarly here because it is the only place it can be defined
-   without cyclic dependencies *)
-let parse_json_object (s: string) =
-  let lb = Lexing.from_string s in
-  let x = Json_parser.json_object (fun x -> Json_lexer.read x) lb in
-  x
 
-let parse_notification (s: string) : notification =
-  let json = parse_json_object s in
-  Json_util.parse_notification json
-
-let parse_request (s: string) : ide_request =
-  let json = parse_json_object s in
-  Json_util.parse_request json
-
-(* TODO remove exception handling in print_request_json and print_notification_json *)
+(* TODO remove print_request_json and print_notification_json *)
 exception Badparsing
 
 let print_request_json fmt (r: ide_request) =
   (try (
     let s = Pp.string_of Json_util.print_request r in
-    let x = parse_request s in
+    let x = Json_util.parse_request s in
     if r = x then () else raise Badparsing)
   with
     _ -> Format.eprintf "Bad parsing@.");
@@ -44,7 +30,7 @@ let print_request_json fmt (r: ide_request) =
 
 let print_notification_json fmt (n: notification) =
   (try (
-    let x = parse_notification (Pp.string_of Json_util.print_notification n) in
+    let x = Json_util.parse_notification (Pp.string_of Json_util.print_notification n) in
     if n = x then () else raise Badparsing)
   with
     _ -> Format.eprintf "Bad parsing@.");

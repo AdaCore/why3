@@ -10,8 +10,8 @@
 (********************************************************************)
 
 val string : Format.formatter -> string -> unit
-(* print json string, that is add '"' to the front and back, and escape '"' and
-   '\' in the string *)
+(* print json string, that is add '"' to the front and back, and escape
+   characters escaped in JSON string *)
 val int : Format.formatter -> int -> unit
 (* print an integer *)
 val bool : Format.formatter -> bool -> unit
@@ -54,4 +54,7 @@ type value =
 
 val print : Format.formatter -> value -> unit
 
+(* To parse a json value, use file Json_parser and function json_object. See
+   end of session/Json_util.ml for an example use.
 val parse : string -> value
+ *)

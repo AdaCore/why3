@@ -166,8 +166,8 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp json debug loc lexlib print_tree \
-	   cmdline warning sysutil rc plugin bigInt number pqueue
+	   hashcons stdlib exn_printer pp json  json_parser json_lexer debug loc \
+	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
 	   task pretty dterm env trans printer model_parser
@@ -205,7 +205,7 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 
 LIB_SESSION = compress xml termcode session session_itp \
               session_tools strategy strategy_parser controller_itp \
-	      session_scheduler server_utils itp_server json_util json_parser json_lexer
+	      session_scheduler server_utils itp_server json_util
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \

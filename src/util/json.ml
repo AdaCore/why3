@@ -14,11 +14,19 @@ open Format
 let string fmt s =
   let b = Buffer.create (2 * String.length s) in
   Buffer.add_char b '"';
-  for i = 0 to String.length s -1 do
-    match s.[i] with
-    | '"' -> Buffer.add_string b "\\\""
+  let i = ref 0 in
+  while !i <= String.length s -1 do
+    (match s.[!i] with
+    | '"'  -> Buffer.add_string b "\\\""
     | '\\' -> Buffer.add_string b "\\\\"
-    | c -> Buffer.add_char b c
+    | '/'  -> Buffer.add_string b "\\/"
+    | '\b' -> Buffer.add_string b "\\b"
+    | c when c = Char.chr 12 -> Buffer.add_string b "\\f"
+    | '\n' -> Buffer.add_string b "\\n"
+    | '\r' -> Buffer.add_string b "\\r"
+    | '\t' -> Buffer.add_string b "\\t"
+    | c    -> Buffer.add_char b c);
+    i := !i + 1
   done;
   Buffer.add_char b '"';
   fprintf fmt "%s" (Buffer.contents b)
@@ -65,6 +73,3 @@ let rec print fmt v =
   | Float f -> float fmt f
   | Bool b -> bool fmt b
   | Null -> fprintf fmt "null"
-
-
-let parse _s = failwith "Json.parse not yet implemented"
