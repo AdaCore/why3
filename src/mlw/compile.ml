@@ -69,7 +69,6 @@ open Ident
 open Ity
 open Ty
 open Term
-open Printer
 
 module ML = struct
 
@@ -97,7 +96,6 @@ module ML = struct
 
   type exn =
     | Xident  of ident
-    | Xsyntax of string
     | Xexit             (* Pervasives.Exit *)
 
   type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
@@ -110,7 +108,6 @@ module ML = struct
 
   and expr_node =
     | Econst  of Number.integer_constant
-    | Ebool   of bool
     | Eident  of ident
     | Eapp    of ident * ident list
     | Efun    of var list * expr
@@ -159,16 +156,6 @@ module ML = struct
     mk_expr enope (I Ity.ity_unit) Ity.eff_empty
 
 end
-
-type info = {
-  info_syn          : syntax_map;
-  info_convert      : syntax_map;
-  info_current_th   : Theory.theory;
-  info_current_mo   : Pmodule.pmodule option;
-  info_th_known_map : Decl.known_map;
-  info_mo_known_map : Pdecl.known_map;
-  info_fname        : string option;
-}
 
 (** Translation from Mlw to ML *)
 
@@ -238,7 +225,7 @@ module Translate = struct
     List.map pvty
 
   (* expressions *)
-  let rec expr ({e_effect = eff } as e) =
+  let rec expr info ({e_effect = eff} as e) =
     (* assert (not eff.eff_ghost); *)
     match e.e_node with
     | Econst c ->
@@ -248,32 +235,31 @@ module Translate = struct
        let pv_id = pv_name pvs in
        ML.mk_expr (ML.Eident pv_id) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
-       let ml_let = ML.ml_let (pv_name pvs) (expr e1) (expr e2) in
+       let ml_let = ML.ml_let (pv_name pvs) (expr info e1) (expr info e2) in
        ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Eexec ({c_node = Capp (rs, pvl)}, _) ->
-       let rs_id = rs.rs_name in
-       let pv_id = List.map pv_name pvl in
+      let rs_id = rs.rs_name in
+      let pv_id = List.map pv_name pvl in
        ML.mk_expr (ML.Eapp (rs_id, pv_id)) (ML.I e.e_ity) eff
     | Eabsurd ->
        ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, pl) ->
-       let e1 = expr e1 in
-       let pl = List.map ebranch pl in
+       let e1 = expr info e1 in
+       let pl = List.map (ebranch info) pl in
        ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
     | Eassert _ ->
        ML.mk_unit
     | Eif (e1, e2, e3) ->
-       let e1 = expr e1 in
-       let e2 = expr e2 in
-       let e3 = expr e3 in
+       let e1 = expr info e1 in
+       let e2 = expr info e2 in
+       let e3 = expr info e3 in
        ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
-    (* | Eassign [(_, {rs_field = None; rs_name = id}, pv)] -> *)
-    (*    let pv_id = pv_name pv in *)
-    (*    ML.mk_expr ( *)
+    | Eghost eg ->
+       expr info eg (* it keeps its ghost status *)
     | _ -> (* TODO *) assert false
 
-  and ebranch ({pp_pat = p}, e) =
-    pat p, expr e
+  and ebranch info ({pp_pat = p}, e) =
+    pat p, expr info e
 
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
@@ -289,7 +275,7 @@ module Translate = struct
       rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
 
   (* type declarations/definitions *)
-  let tdef info itd =
+  let tdef itd =
     let s = itd.itd_its in
     let id = itd_name itd in
     let args = its_args s in
@@ -310,8 +296,7 @@ module Translate = struct
     | PDlet (LDvar (_, _)) ->
        []
     | PDlet (LDsym ({rs_name = rsn; rs_cty = cty}, {c_node = Cfun e})) ->
-       (* Format.printf "exec:%b@." (Exec.is_exec_pdecl () pd); *)
-       [ML.Dlet (false, [rsn, args cty.cty_args, expr e])]
+       [ML.Dlet (false, [rsn, args cty.cty_args, expr info e])]
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
        Format.printf "LDsym Capp--> %s@." rsn.id_string;
        []
@@ -325,12 +310,12 @@ module Translate = struct
        let rec_def =
          List.map (fun {rec_fun = e; rec_rsym = rs} ->
            let e = match e.c_node with Cfun e -> e | _ -> assert false in
-           rs.rs_name, args rs.rs_cty.cty_args, expr e) rl in
+           rs.rs_name, args rs.rs_cty.cty_args, expr info e) rl in
        [ML.Dlet (true, rec_def)]
     | PDpure ->
        []
     | PDtype itl ->
-       List.map (tdef info) itl
+       List.map tdef itl
     | PDexn ({xs_name = xsn} as xs) ->
        if ity_equal xs.xs_ity ity_unit then
          [ML.Dexn (xsn, None)]

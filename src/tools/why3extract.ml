@@ -13,8 +13,6 @@ open Format
 open Why3
 open Stdlib
 open Pmodule
-(* open Compile (\* intermediate ML AST *\) *)
-(* open Ocaml_printer *)
 
 let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
@@ -129,21 +127,6 @@ let extract_to =
 
 let rec use_iter f l =
   List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
-
-(* let test_extract ?fname m = *)
-(*   Format.printf "antes@\n"; *)
-(*   let (fg, _, _) = Pdriver.lookup_printer opt_driver in *)
-(*   Format.printf "aqui@\n"; *)
-(*   let file = Filename.concat opt_output (fg ?fname m) in *)
-(*   let cout = open_out file in *)
-(*   let fmt = formatter_of_out_channel cout in *)
-(*   fprintf fmt "(\*@\n"; *)
-(*   print_module fmt m; *)
-(*   fprintf fmt "(\*@\n"; *)
-(*   fprintf fmt "@\n@\n"; *)
-(*   (\* Translate.module_ m *\) *)
-(*   extract_module opt_driver fmt m; *)
-(*   close_out cout *)
 
 let rec do_extract_module ?fname m =
   (* test_extract ?fname m; *)

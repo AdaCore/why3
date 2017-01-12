@@ -17,6 +17,19 @@ open Pmodule
 open Theory
 open Ident
 open Pp
+open Ity
+open Term
+open Printer
+
+type info = {
+  info_syn          : syntax_map;
+  info_convert      : syntax_map;
+  info_current_th   : Theory.theory;
+  info_current_mo   : Pmodule.pmodule option;
+  info_th_known_map : Decl.known_map;
+  info_mo_known_map : Pdecl.known_map;
+  info_fname        : string option;
+}
 
 module Print = struct
 
@@ -134,41 +147,59 @@ module Print = struct
     try Some (Strings.remove_prefix "prefix " s) with Not_found ->
     None
 
-  let print_apply fmt s vl =
+  let pv_name pv = pv.pv_vs.vs_name
+
+  let print_apply info fmt s vl =
+    let open Pdecl in
+    let open Expr in
+    let is_field {itd_fields = fl} =
+      List.exists (fun x ->
+          match x.rs_logic with
+          | RLls ls -> id_equal ls.ls_name s | _ -> false) fl
+    in
+    let isfield =
+      match Mid.find_opt s info.info_mo_known_map with
+      | Some {pd_node = PDtype itsd} -> (* can a record be encoded *)
+                                        (* in a recursive data-type ? *)
+         List.exists is_field itsd
+      | _ -> false
+    in
     match extract_op s, vl with
     | Some o, [t1; t2] ->
        fprintf fmt "@[<hov 1>%a %s %a@]"
          print_ident t1 o print_ident t2
     | _, [] ->
-      print_ident fmt s
+       print_ident fmt s
+    | _, [t1] when isfield ->
+       fprintf fmt "%a.%a" print_ident t1 print_ident s
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
          print_ident s (print_list space print_ident) tl
 
-  let rec print_enode fmt = function
+  let rec print_enode info fmt = function
     | Econst c ->
        fprintf fmt "%a" print_const c
     | Eident id ->
        print_ident fmt id
     | Elet (id, e1, e2) ->
        fprintf fmt "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a"
-         print_ident id print_expr e1 print_expr e2
+         print_ident id (print_expr info) e1 (print_expr info) e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
     | Eapp (s, vl) ->
-       print_apply fmt s vl
+       print_apply info fmt s vl
     | Ematch (e, pl) ->
        fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
-         print_expr e (print_list newline print_branch) pl
+         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eblock [] ->
        fprintf fmt "()"
     | _ -> (* TODO *) assert false
 
-  and print_branch fmt (p, e) =
-    fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e
+  and print_branch info fmt (p, e) =
+    fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p (print_expr info) e
 
-  and print_expr fmt e =
-    print_enode fmt e.e_node
+  and print_expr info fmt e =
+    print_enode info fmt e.e_node
 
   let print_type_decl fmt (id, args, tydef) =
     let print_constr fmt (id, cs_args) =
@@ -203,13 +234,13 @@ module Print = struct
                                    -> print_lident *)
             print_def tydef
 
-  let print_decl fmt = function
+  let print_decl info fmt = function
     | Dlet (isrec, [id, vl, e]) ->
        fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
                (if isrec then "let rec" else "let")
                print_ident id
                (print_list space print_vs_arg) vl
-               print_expr e;
+               (print_expr info) e;
        fprintf fmt "@\n@\n"
     | Dtype dl ->
        print_list newline print_type_decl fmt dl;
@@ -236,11 +267,12 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
+  fprintf fmt "(*@\n%a@\n*)@\n@\n" print_module m;
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
   let mdecls = Translate.module_ info m in
-  print_list nothing Print.print_decl fmt mdecls;
+  print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
 
 let fg ?fname m =
