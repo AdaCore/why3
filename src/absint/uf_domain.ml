@@ -374,10 +374,15 @@ module Make(S:sig
     let b = { classes; uf_to_var; var_pool } in
     let rud = ref b in
     List.iter (fun (t, v) ->
-        let new_var = 
-          get_var_for_term uf_man rud t in
-        rc := eq_var (man, uf_man) !rc v new_var;
-        if v <> new_var then
+        try
+          let new_var = 
+            get_var_for_term uf_man rud t in
+          rc := eq_var (man, uf_man) !rc v new_var;
+          if v <> new_var then
+            rc := D.forget_array man !rc [|v|] false;
+        with
+        | Not_found ->
+          Format.eprintf "REACHED END OF THE POOL@.@.@.";
           rc := D.forget_array man !rc [|v|] false;
       ) !vars_to_replace;
     invariant_uf !rud;
@@ -648,10 +653,17 @@ module Make(S:sig
           begin
             match var_of_term t with
             | None ->
-              let myvar = get_var_for_term uf_man rud t in
-              let cl = get_class_for_term uf_man t in
-              rud := { !rud with classes = Union_find.union cl cl !rud.classes };
-              ([myvar, coeff], 0)
+              begin
+                try
+                  let myvar = get_var_for_term uf_man rud t in
+                  let cl = get_class_for_term uf_man t in
+                  rud := { !rud with classes = Union_find.union cl cl !rud.classes };
+                  ([myvar, coeff], 0)
+                with
+                | Not_found ->
+                  Format.eprintf "REACHED END OF THE POOL@.@.@.@.@.";
+                  raise (Not_handled t)
+              end
             | Some s ->
               ([s, coeff], 0)
           end

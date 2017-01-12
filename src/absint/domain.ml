@@ -143,40 +143,41 @@ module Make_from_apron(M:sig
 
     let lincons_to_term l variable_mapping =
       let open Ty in
-      let term = ref int_zero in
+      let termr = ref int_zero in
+      let terml = ref int_zero in
       Lincons1.iter (fun c v ->
           match coeff_to_term c with
           | CPos c ->
             let v = variable_mapping v in
-            term := int_add [!term; int_mult [c; v]];
+            termr := int_add [!termr; int_mult [c; v]];
           | COne ->
             let v = variable_mapping v in
-            term := int_add [!term; v];
+            termr := int_add [!termr; v];
           | CMinusOne ->
             let v = variable_mapping v in
-            term := int_minus [!term; v];
+            terml := int_add [!terml; v];
           | CMinus c ->
             let v = variable_mapping v in
-            term := int_minus [!term; int_mult [c; v]];
+            terml := int_add [!terml; int_mult [c; v]];
           | CNone -> ()
         ) l;
       let c = coeff_to_term (Lincons1.get_cst l) in
-      let term = match c with
-        | CNone -> !term
+      let termr, terml = match c with
+        | CNone -> !termr, !terml
         | CPos c ->
-          int_add [c; !term]
+          int_add [c; !termr], !terml
         | CMinus c ->
-          int_minus [!term;c]
+          !termr, int_add [!terml;c]
         | COne ->
-          int_add [int_one; !term]
+          int_add [int_one; !termr], !terml
         | CMinusOne ->
-          int_minus [!term; int_one]
+          !termr, int_add [!terml; int_one]
       in
       match Lincons1.get_typ l with
-      | Lincons1.EQ -> ps_app ps_equ [term; int_zero]
-      | Lincons1.SUP -> ps_app int_lt [int_zero; term]
-      | Lincons1.SUPEQ -> ps_app int_le [int_zero; term;]
-      | Lincons1.DISEQ ->  t_not (ps_app ps_equ [term; int_zero])
+      | Lincons1.EQ -> ps_app ps_equ [terml; termr]
+      | Lincons1.SUP -> ps_app int_lt [terml; termr]
+      | Lincons1.SUPEQ -> ps_app int_le [terml; termr;]
+      | Lincons1.DISEQ ->  t_not (ps_app ps_equ [terml; termr])
     in
 
     let lincons_array_to_term l variable_mapping =
