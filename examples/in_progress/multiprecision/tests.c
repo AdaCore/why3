@@ -65,11 +65,11 @@ int main () {
 
 #ifdef TEST_GMP
 	  mpn_mul (refp, ap, an, bp, bn);
-          mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
+          // mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
 	  mul (rp, ap, bp, an, bn);
-          div_qr(rq, rr, ap, bp, an, bn);
+          //div_qr(rq, rr, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
