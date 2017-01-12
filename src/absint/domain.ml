@@ -162,21 +162,25 @@ module Make_from_apron(M:sig
           | CNone -> ()
         ) l;
       let c = coeff_to_term (Lincons1.get_cst l) in
-      let termr, terml = match c with
-        | CNone -> !termr, !terml
+      let termr, terml, strict, terml_strict = match c with
+        | CNone -> !termr, !terml, false, !terml
         | CPos c ->
-          int_add [c; !termr], !terml
+          int_add [c; !termr], !terml, false, !terml
         | CMinus c ->
-          !termr, int_add [!terml;c]
+          !termr, int_add [!terml;c], false, !terml
         | COne ->
-          int_add [int_one; !termr], !terml
+          int_add [int_one; !termr], !terml, false, !terml
         | CMinusOne ->
-          !termr, int_add [!terml; int_one]
+          !termr, int_add [int_one; !terml], true, !terml
       in
       match Lincons1.get_typ l with
       | Lincons1.EQ -> ps_app ps_equ [terml; termr]
       | Lincons1.SUP -> ps_app int_lt [terml; termr]
-      | Lincons1.SUPEQ -> ps_app int_le [terml; termr;]
+      | Lincons1.SUPEQ ->
+        if strict then
+          ps_app int_lt [terml_strict; termr]
+        else
+          ps_app int_le [terml; termr;]
       | Lincons1.DISEQ ->  t_not (ps_app ps_equ [terml; termr])
     in
 

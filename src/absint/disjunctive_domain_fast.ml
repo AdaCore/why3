@@ -337,11 +337,26 @@ module Make(A:DOMAIN) = struct
     { t with t = List.map (fun t -> A.assign_linexpr (fst man) t v l None) t.t; c = false; }
 
   let to_term env pmod man t var_mapping =
+    let f = A.to_term env pmod (fst man) in
     let t = cleanup_hard man t in
-    let f = A.to_term env pmod in
-    let t = List.map (fun t -> f (fst man) t var_mapping) t.t
+    let globals =
+      match (join_one man t).t with
+      | [] -> []
+      | [t] ->
+        f t var_mapping |> Ai_logic.extract_atom_from_conjuction []
+      | _ -> assert false
+    in
+    let rec redundant t =
+      if List.exists (Term.t_equal t) globals then
+        Term.t_true
+      else
+        Term.t_map_simp redundant t
+    in
+    let t = List.map (fun t ->
+        f t var_mapping
+        |> redundant) t.t
     |> Term.t_or_simp_l in
-    t
+    List.fold_left Term.t_and_simp t globals
 
   let push_label man env i t = t
 

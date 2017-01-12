@@ -204,3 +204,10 @@ module Make(S: sig
       t_label_copy t (t_unfold t.t_loc fs tl t.t_ty)
     | _ -> t
 end
+
+let rec extract_atom_from_conjuction l t =
+  match t.t_node with
+  | Tbinop(Tand, a, b) ->
+    extract_atom_from_conjuction
+      (extract_atom_from_conjuction l a) b
+  | _ -> t::l
