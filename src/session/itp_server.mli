@@ -58,9 +58,9 @@ type update_info =
       * Call_provers.resource_limit
 
 type notification =
-  | New_node     of node_ID * node_ID * node_type * string
+  | New_node     of node_ID * node_ID * node_type * string * bool
   (* Notification of creation of new_node:
-     New_node (new_node, parent_node, node_type, name). *)
+     New_node (new_node, parent_node, node_type, name, detached). *)
   | Node_change  of node_ID * update_info
   (* inform that the data of the given node changed *)
   | Remove       of node_ID

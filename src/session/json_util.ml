@@ -245,12 +245,13 @@ let convert_message (m: message_notification) =
 let print_notification_to_json (n: notification): json_object =
   let cc = convert_notification_constructor in
   match n with
-  | New_node (nid, parent, node_type, name) ->
+  | New_node (nid, parent, node_type, name, detached) ->
       Assoc ["notification", cc n;
              "node_ID", Int nid;
              "parent_ID", Int parent;
              "node_type", convert_node_type node_type;
-             "name", String name]
+             "name", String name;
+             "detached", Bool detached]
   | Node_change (nid, update) ->
       Assoc ["notification", cc n;
              "node_ID", Int nid;
@@ -528,8 +529,9 @@ let parse_notification constr l =
   | "New_node", ["node_ID", Int nid;
                  "parent_ID", Int parent;
                  "node_type", node_type;
-                 "name", String name] ->
-      New_node (nid, parent, parse_node_type_from_json node_type, name)
+                 "name", String name;
+                 "detached", Bool detached] ->
+      New_node (nid, parent, parse_node_type_from_json node_type, name, detached)
   | "Node_change", ["node_ID", Int nid;
                     "update", update] ->
       Node_change (nid, parse_update update)

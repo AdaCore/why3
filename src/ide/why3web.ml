@@ -62,9 +62,9 @@ let notification n =
   match n with
   | Node_change(nid,_info) ->
      Obj ["notification",String "Node_change"; "nid", Int nid; "info",String "TODO"]
-  | New_node(nid,parent,nt,name) ->
+  | New_node(nid,parent,nt,name,detached) ->
      Obj ["notification",String "New_node"; "nid", Int nid; "parent", Int parent;
-          "nodetype", String (nodetype nt); "name",String name]
+          "nodetype", String (nodetype nt); "name",String name; "detached",Bool detached]
   | Remove nid ->
      Obj ["notification",String "Remove"; "nid", Int nid]
   | Initialized _ginfo ->

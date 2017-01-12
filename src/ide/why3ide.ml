@@ -352,6 +352,7 @@ type pa_status = Controller_itp.proof_attempt_status
 let node_id_type : node_type Hint.t = Hint.create 17
 let node_id_proved : bool Hint.t = Hint.create 17
 let node_id_pa : pa_status Hint.t = Hint.create 17
+let node_id_detached : bool Hint.t = Hint.create 17
 
 let get_node_type id = Hint.find node_id_type id
 let get_node_proved id = Hint.find node_id_proved id
@@ -376,6 +377,9 @@ let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
 let node_id_to_gtree : GTree.row_reference Hint.t = Hint.create 42
 (* TODO exception for those: *)
 let get_node_row id = Hint.find node_id_to_gtree id
+
+let get_node_detached id =
+  Hint.find node_id_detached id
 
 (******************************)
 (* Initialization of the tree *)
@@ -620,15 +624,19 @@ let image_of_pa_status ~obsolete pa =
 let set_status_column iter =
   let id = get_node_id iter in
   let proved = get_node_proved id in
+  let detached = get_node_detached id in
   let image = match get_node_type id with
     | NRoot -> assert false
     | NFile
     | NTheory
     | NTransformation
     | NGoal ->
-      if proved
-      then !image_valid
-      else !image_unknown
+      if detached then
+        !image_valid_obs
+      else
+        if proved
+        then !image_valid
+        else !image_unknown
     | NProofAttempt ->
       let pa = get_node_proof_attempt id in
       let obs = get_node_obs id in
@@ -636,10 +644,11 @@ let set_status_column iter =
   in
   goals_model#set ~row:iter ~column:status_column image
 
-let new_node ?parent ?(collapse=false) id name typ proved =
+let new_node ?parent ?(collapse=false) id name typ proved detached =
   if not (Hint.mem node_id_to_gtree id) then begin
     Hint.add node_id_type id typ;
     Hint.add node_id_proved id proved;
+    Hint.add node_id_detached id detached;
     let parent = Opt.map (fun x -> x#iter) parent in
     let iter = goals_model#append ?parent () in
     goals_model#set ~row:iter ~column:name_column name;
@@ -771,7 +780,11 @@ let on_selected_row r =
     let typ = get_node_type id in
     match typ with
     | NGoal ->
-      send_request (Get_task id)
+      let detached = get_node_detached id in
+      if detached then
+        task_view#source_buffer#set_text ""
+      else
+        send_request (Get_task id)
     | _ -> task_view#source_buffer#set_text ""
   with
     | Not_found -> task_view#source_buffer#set_text ""
@@ -960,12 +973,12 @@ let treat_notification n = match n with
           let iter = (get_node_row node)#iter in
           goals_view#selection#select_iter iter
     end
-  | New_node (id, parent_id, typ, name) ->
+  | New_node (id, parent_id, typ, name, detached) ->
     begin (try
         let parent = get_node_row parent_id in
-        ignore (new_node ~parent id name typ false)
+        ignore (new_node ~parent id name typ false detached)
       with Not_found ->
-        ignore (new_node id name typ false))
+        ignore (new_node id name typ false, detached))
     end
   | Remove id                     ->
     let n = get_node_row id in

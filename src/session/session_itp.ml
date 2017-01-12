@@ -98,7 +98,7 @@ let dummy_session =
    session_dir           = "";
    session_files         = Hstr.create 23;
    session_shape_version = 0;
-   session_prover_ids    = Hprover.create 23
+   session_prover_ids    = Hprover.create 23;
  }
 
 let theory_parent s th =
@@ -250,6 +250,29 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
+(* TODO to be done with detached transformations *)
+let get_detached_trans (_s: session) (_id: proofNodeID) =
+  []
+
+let is_detached (s: session) (a: any) =
+  match a with
+  | AFile _file -> false
+  | ATh th     ->
+    let parent_name = th.theory_parent_name in
+    let parent = Hstr.find s.session_files parent_name in
+    List.exists (fun x -> x = th) parent.file_detached_theories
+  | ATn tn     ->
+    let pn_id = get_trans_parent s tn in
+    let pn = get_proofNode s pn_id in
+    pn.proofn_task = None || List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
+  | APn pn     ->
+    let pn = get_proofNode s pn in
+    pn.proofn_task = None
+  | APa pa     ->
+    let pa = get_proof_attempt_node s pa in
+    let pn_id = pa.parent in
+    let pn = get_proofNode s pn_id in
+    pa.proof_obsolete || pn.proofn_task = None
 
 (* Remove elements of the session tree *)
 

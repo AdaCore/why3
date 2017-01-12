@@ -311,9 +311,9 @@ type update_info =
       * Call_provers.resource_limit
 
 type notification =
-  | New_node     of node_ID * node_ID * node_type * string
+  | New_node     of node_ID * node_ID * node_type * string * bool
   (* Notification of creation of new_node:
-     New_node (new_node, parent_node, node_type, name). *)
+     New_node (new_node, parent_node, node_type, name, detached). *)
   | Node_change  of node_ID * update_info
   (* inform that the data of the given node changed *)
   | Remove       of node_ID
@@ -383,15 +383,15 @@ let print_msg fmt m =
 
 let print_notify fmt n =
   match n with
-  | Node_change (_ni, _nf)          -> fprintf fmt "node change"
-  | New_node (ni, _pni, _nt,  _nf)  -> fprintf fmt "new node %d" ni
-  | Remove _ni                      -> fprintf fmt "remove"
-  | Initialized _gi                 -> fprintf fmt "initialized"
-  | Saved                           -> fprintf fmt "saved"
-  | Message msg                     ->
+  | Node_change (_ni, _nf)             -> fprintf fmt "node change"
+  | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
+  | Remove _ni                         -> fprintf fmt "remove"
+  | Initialized _gi                    -> fprintf fmt "initialized"
+  | Saved                              -> fprintf fmt "saved"
+  | Message msg                        ->
       print_msg fmt msg
-  | Dead s                          -> fprintf fmt "dead :%s" s
-  | Task (_ni, _s)                  -> fprintf fmt "task"
+  | Dead s                             -> fprintf fmt "dead :%s" s
+  | Task (_ni, _s)                     -> fprintf fmt "task"
 
 module type Protocol = sig
   val get_requests : unit -> ide_request list
@@ -529,6 +529,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let pa = get_proof_attempt_node d.cont.controller_session pa in
       Pp.string_of Whyconf.print_prover pa.prover
 
+  let get_node_detached (node: any) =
+    let d = get_server_data () in
+    is_detached d.cont.controller_session node
+
 (*
   let get_node_proved (node: any) =
     match node with
@@ -623,8 +627,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       Hint.add model_any new_id node;
       let node_type = get_node_type node in
       let node_name = get_node_name node in
+      let node_detached = get_node_detached node in
       add_node_to_table node new_id;
-      P.notify (New_node (new_id, parent, node_type, node_name));
+      P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
       new_id
 
   let root = 0
@@ -703,7 +708,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       root f
 
   let init_and_send_the_tree (): unit =
-    P.notify (New_node (0, 0, NRoot, "root"));
+    P.notify (New_node (0, 0, NRoot, "root", false));
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
 
   let resend_the_tree (): unit =
@@ -711,8 +716,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let node_id = node_ID_from_any any in
       let node_name = get_node_name any in
       let node_type = get_node_type any in
-      P.notify (New_node (node_id, parent, node_type, node_name)) in
-    P.notify (New_node (0, 0, NRoot, "root"));
+      let node_detached = get_node_detached any in
+      P.notify (New_node (node_id, parent, node_type, node_name, node_detached)) in
+    P.notify (New_node (0, 0, NRoot, "root", false));
     iter_the_files send_node root
 
   (* -- send the task -- *)

@@ -130,7 +130,8 @@ type node = {
   node_trans_args: string list option;
   node_type: shell_node_type;
   mutable node_proved: bool;
-  mutable children_nodes: node_ID list
+  mutable children_nodes: node_ID list;
+  mutable node_detached: bool
   }
 
 let root_node_ID = root_node
@@ -145,7 +146,8 @@ let root_node = {
   node_trans_args = None;
   node_type = SRoot;
   node_proved = false;
-  children_nodes = []
+  children_nodes = [];
+  node_detached = false
 }
 
 open Stdlib
@@ -179,7 +181,7 @@ let return_proof_info (t: node_type) =
     Some Controller_itp.Scheduled
   | _ -> None
 
-let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) =
+let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string) (detached: bool) =
   if t = NRoot then () else
   let new_node = {
     node_ID = n;
@@ -190,7 +192,8 @@ let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string
     node_trans_args = None; (* TODO *)
     node_type = convert_to_shell_type t;
     node_proved = false;
-    children_nodes = []
+    children_nodes = [];
+    node_detached = detached
   } in
   try
     let parent = Hnode.find nodes parent in
@@ -222,8 +225,8 @@ let treat_notification fmt n =
   match n with
   | Node_change (id, info)        ->
     change_node fmt id info
-  | New_node (id, pid, typ, name) ->
-    add_new_node fmt id pid typ name
+  | New_node (id, pid, typ, name, detached) ->
+    add_new_node fmt id pid typ name detached
   | Remove _id                    -> (* TODO *)
     fprintf fmt "got a Remove notification not yet supported@."
   | Initialized _g_info           ->
