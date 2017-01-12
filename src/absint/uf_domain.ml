@@ -10,6 +10,7 @@ module Make(S:sig
   module A = S.A
   module D = A
   
+  open Ai_logic
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
       let pmod = S.pmod
@@ -581,11 +582,7 @@ module Make(S:sig
         let b = TermToClass.to_term uf_man.class_to_term b in
         t_and t (t_equ a b)) t b.classes
     in
-    let var = match uf_man.quant_var.t_node with
-      | Tvar(v) -> v
-      | _ -> assert false
-    in
-    t_quant Tforall (t_close_quant [var] [] t)
+    descend_quantifier uf_man.quant_var t
 
   
   let get_class_for_term_ro uf_man t =

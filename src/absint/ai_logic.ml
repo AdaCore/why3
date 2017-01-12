@@ -211,3 +211,41 @@ let rec extract_atom_from_conjuction l t =
     extract_atom_from_conjuction
       (extract_atom_from_conjuction l a) b
   | _ -> t::l
+
+let is_in t myt =
+  let found = ref false in
+  let rec is_in myt =
+    if t_equal t myt then
+      found := true;
+    t_map is_in myt
+  in
+  is_in myt |> ignore;
+  !found
+
+let rec descend_quantifier q t =
+  match t.t_node with
+  | Tbinop(Tand, a, b) ->
+    let ia = is_in q a
+    and ib = is_in q b in
+    if ia && ib then
+      let var = match q.t_node with
+        | Tvar(v) -> v
+        | _ -> assert false
+      in
+      t_quant Tforall (t_close_quant [var] [] t)
+    else if ia && not ib then
+      t_and_simp (descend_quantifier q a) b
+    else if not ia && ib then
+      t_and_simp a (descend_quantifier q b)
+    else
+      t_and_simp a b
+  | _ ->
+      let var = match q.t_node with
+        | Tvar(v) -> v
+        | _ -> assert false
+      in
+      t_quant Tforall (t_close_quant [var] [] t)
+
+
+
+
