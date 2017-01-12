@@ -97,6 +97,18 @@ module Make(A:DOMAIN) = struct
       { t = List.filter (fun t -> not (A.is_bottom man t)) a.t; c = true; i = a.i; }
 
   let threshold = 25
+    
+  let rec int_of_s s =
+      let open Apron.Scalar in
+      match s with
+      | Float f -> 
+        let i = int_of_float f in
+        assert (float_of_int i = f);
+        i
+      | Mpqf t ->
+        int_of_s (Float (Mpqf.to_float t))
+      | Mpfrf t ->
+        int_of_s (Float (Mpfr.to_float t))
 
   let round_integers_a (man, _) env a =
     let open Apron in
@@ -110,8 +122,7 @@ module Make(A:DOMAIN) = struct
         begin
           let i = Lincons1.get_cst l |> function
             | Coeff.Scalar(s) ->
-              let s = Scalar.to_string s in
-              float_of_string s |> int_of_float
+              int_of_s s
             | _ -> assert false
           in
           let l' = Lincons1.copy l in

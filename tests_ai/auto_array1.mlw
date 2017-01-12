@@ -186,5 +186,16 @@ module Test
 		incr k;
 		done; a
 	
+	let instantiation(n: int): unit
+		requires { n >= 0 }
+		=
+		let a = make n 10 in
+		let b = a[5] in
+		while true do
+			variant { 0 }
+			invariant { b = 10 }
+			()
+		done;
+		()
 	
 end

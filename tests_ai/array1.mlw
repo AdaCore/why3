@@ -72,5 +72,21 @@ module Test
 		incr k;
 		done; a
 	
+	let init6 (x:int) (y:int) (d:int) (b:int) (c:int) : array int
+	requires { x > y >= 0 }
+	ensures { forall i: int. (0 <= i < y -> result[i] = 0) /\ (y <= i < x -> result[i] = 1) }
+	=
+		let a = make x 3 in
+		let k = ref 0 in
+		while (!k < x) do
+	(*invariant { forall i: int. (i < !k -> (0 <= i < y -> a[i] = d) /\ (y <= i < x -> a[i] = b)) }*)
+		variant { x - !k }
+
+		if !k >= y then
+			a[!k] <- 1
+		else
+			a[!k] <- 0;
+		incr k;
+		done; a
 	
 end
