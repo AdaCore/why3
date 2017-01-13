@@ -3,26 +3,26 @@ module M
   use import int.Int
   use import seq.Seq
 
-  (* let function f (y: int) (x: int) : int *)
-  (*   requires { x >= 0 } *)
-  (*   ensures  { result >= 0 } *)
-  (* = x *)
+  let function f (y: int) (x: int) : int
+    requires { x >= 0 }
+    ensures  { result >= 0 }
+  = x
 
-  (* let g (ghost z: int) (x: int) : int *)
-  (*   requires { x > 0 } *)
-  (*   ensures  { result > 0 } *)
-  (* = let y = x in *)
-  (*   y *)
+  let g (ghost z: int) (x: int) : int
+    requires { x > 0 }
+    ensures  { result > 0 }
+  = let y = x in
+    y
 
-  (* type t 'a 'b 'c 'd *)
+  type t 'a 'b 'c 'd
 
   type list 'a = Nil | Cons 'a (list 'a)
 
-  (* type btree 'a = E | N (btree 'a) 'a (btree 'a) *)
+  type btree 'a = E | N (btree 'a) 'a (btree 'a)
 
-  (* type ntree 'a = Empty | Node 'a (list 'a) *)
+  type ntree 'a = Empty | Node 'a (list 'a)
 
-  (* type list_int = list int *)
+  type list_int = list int
 
   type cursor 'a = {
     collection : list 'a;
@@ -31,38 +31,38 @@ module M
     ghost mutable v : seq 'a;
   }
 
-  (* use import ref.Ref *)
+  use import ref.Ref
 
   let update (c: cursor int) : int
   = c.index
 
-  (* exception Empty (list int, int) *)
-  (* exception Out_of_bounds int *)
+  exception Empty (list int, int)
+  exception Out_of_bounds int
 
-  (* let rec length (l: list 'a) : int *)
-  (*   variant  { l } *)
-  (* = match l with *)
-  (*   | Nil -> 0 *)
-  (*   | Cons _ r -> 1 + length r *)
-  (*   end *)
+  let rec length (l: list 'a) : int
+    variant  { l }
+  = match l with
+    | Nil -> 0
+    | Cons _ r -> 1 + length r
+    end
 
-  (* let t (x:int) : int *)
-  (*   requires { false } *)
-  (* = absurd *)
+  let t (x:int) : int
+    requires { false }
+  = absurd
 
-  (* let a () : unit *)
-  (* = assert { true } *)
+  let a () : unit
+  = assert { true }
 
-  (* let singleton (x: int) (l: list int) : list int = *)
-  (*   let x = Nil in x *)
+  let singleton (x: int) (l: list int) : list int =
+    let x = Nil in x
 
-  (* use import int.Int *)
+  use import int.Int
 
-  (* let test (x: int) : int = *)
-  (*   let y = *)
-  (*     let z = x in *)
-  (*     (ghost z) + 1 *)
-  (*   in 42 *)
+  let test (x: int) : int =
+    let y =
+      let z = x in
+      (ghost z) + 1
+    in 42
 
 end
 

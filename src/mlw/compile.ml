@@ -72,12 +72,17 @@ open Term
 
 module ML = struct
 
+  open Expr
+  open Pdecl
+
   type ty =
-    | Tvar    of ident
+    | Tvar    of tvsymbol
     | Tapp    of ident * ty list
     | Ttuple  of ty list
 
-  type var = ident * ty
+  type is_ghost = bool
+
+  type var = ident * ty * is_ghost
 
   type pat =
     | Pwild
@@ -108,38 +113,43 @@ module ML = struct
 
   and expr_node =
     | Econst  of Number.integer_constant
-    | Eident  of ident
-    | Eapp    of ident * ident list
+    | Evar    of pvsymbol
+    | Eapp    of rsymbol * pvsymbol list
     | Efun    of var list * expr
-    | Elet    of ident * expr * expr
-    | Eletrec of is_rec * (ident * var list * expr) list * expr
+    | Elet    of pvsymbol * expr * expr
+    | Eletrec of is_rec * (rsymbol * var list * expr) list * expr
     | Eif     of expr * expr * expr
     | Ecast   of expr * ty
     | Etuple  of expr list (* at least 2 expressions *)
-    | Econstr of ident * expr list
     | Ematch  of expr * (pat * expr) list
     | Ebinop  of expr * binop * expr
     | Enot    of expr
     | Eblock  of expr list
     | Ewhile  of expr * expr
-    | Efor    of ident * ident * for_direction * ident * expr
+    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
     | Eraise  of exn * expr option
-    | Etry    of expr * (exn * ident option * expr) list
+    | Etry    of expr * (exn * pvsymbol option * expr) list
     | Eabsurd
 
   type is_mutable = bool
 
   type typedef =
-    | Dabstract
     | Ddata     of (ident * ty list) list
     | Drecord   of (is_mutable * ident * ty) list
     | Dalias    of ty
 
+  type its_defn = {
+    its_name    : ident;
+    its_args    : tvsymbol list;
+    its_private : bool;
+    its_def     : typedef option;
+  }
+
   type decl = (* TODO add support for the extraction of ocaml modules *)
-    | Dtype of (ident * ident list * typedef) list
-    | Dlet  of is_rec * (ident * var list * expr) list
+    | Dtype of its_defn list
+    | Dlet  of is_rec * (rsymbol * var list * expr) list
         (* TODO add return type? *)
-    | Dexn  of ident * ty option
+    | Dexn  of xsymbol * ty option
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -154,6 +164,11 @@ module ML = struct
 
   let mk_unit =
     mk_expr enope (I Ity.ity_unit) Ity.eff_empty
+
+  let mk_var id ty ghost = (id, ty, ghost)
+
+  let mk_its_defn id args private_ def =
+    { its_name = id; its_args = args; its_private = private_; its_def = def; }
 
 end
 
@@ -170,7 +185,7 @@ module Translate = struct
   let rec type_ ty =
     match ty.ty_node with
     | Tyvar tvs ->
-       ML.Tvar tvs.tv_name
+       ML.Tvar tvs
     | Tyapp (ts, tyl) when is_ts_tuple ts ->
        ML.Ttuple (List.map type_ tyl)
     | Tyapp (ts, tyl) ->
@@ -202,8 +217,8 @@ module Translate = struct
   (* individual types *)
   let rec ity t =
     match t.ity_node with
-    | Ityvar ({tv_name = tv}, _) ->
-       ML.Tvar tv
+    | Ityvar (tvs, _) ->
+       ML.Tvar tvs
     | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
        ML.Ttuple (List.map ity itl)
     | Ityapp ({its_ts = ts}, itl, _) ->
@@ -213,8 +228,11 @@ module Translate = struct
   let pv_name pv = pv.pv_vs.vs_name
 
   let pvty pv =
-    if pv.pv_ghost then (pv_name pv, ML.tunit)
-    else vsty pv.pv_vs
+    if pv.pv_ghost then
+      ML.mk_var (pv_name pv) ML.tunit true
+    else
+      let (vs, vs_ty) = vsty pv.pv_vs in
+      ML.mk_var vs vs_ty false
 
   let for_direction = function
     | To -> ML.To
@@ -232,15 +250,12 @@ module Translate = struct
        let c = match c with Number.ConstInt c -> c | _ -> assert false in
        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
-       let pv_id = pv_name pvs in
-       ML.mk_expr (ML.Eident pv_id) (ML.I e.e_ity) eff
+       ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
-       let ml_let = ML.ml_let (pv_name pvs) (expr info e1) (expr info e2) in
+       let ml_let = ML.ml_let pvs (expr info e1) (expr info e2) in
        ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Eexec ({c_node = Capp (rs, pvl)}, _) ->
-      let rs_id = rs.rs_name in
-      let pv_id = List.map pv_name pvl in
-       ML.mk_expr (ML.Eapp (rs_id, pv_id)) (ML.I e.e_ity) eff
+       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
     | Eabsurd ->
        ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, pl) ->
@@ -264,30 +279,35 @@ module Translate = struct
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
 
-  let drecord_fields {itd_its = its; itd_fields = fl} =
-    List.map (fun ({rs_cty = rsc} as rs) ->
-      (List.exists (pv_equal (Opt.get rs.rs_field)) its.its_mfields),
-      rs.rs_name,
-      if rs_ghost rs then ML.tunit else ity rsc.cty_result) fl
-
-  let ddata_constructs = (* point-free *)
-    List.map (fun ({rs_cty = rsc} as rs) ->
-      rs.rs_name, List.map (fun {pv_vs = pv} -> type_ pv.vs_ty) rsc.cty_args)
-
   (* type declarations/definitions *)
   let tdef itd =
     let s = itd.itd_its in
-    let id = itd_name itd in
-    let args = its_args s in
+    let ddata_constructs = (* point-free *)
+      List.map (fun ({rs_cty = rsc} as rs) ->
+          rs.rs_name,
+          let args = List.filter (fun x -> not x.pv_ghost) rsc.cty_args in
+          List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
+    in
+    let drecord_fields = (* point-free *)
+      List.map (fun ({rs_cty = rsc} as rs) ->
+          (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
+          rs.rs_name,
+          if rs_ghost rs then ML.tunit else ity rsc.cty_result)
+    in
+    let id = s.its_ts.ts_name in
+    let is_private = s.its_private in
+    let args = s.its_ts.ts_args in
     begin match s.its_def, itd.itd_constructors, itd.itd_fields with
       | None, [], [] ->
-         ML.Dtype [id, type_args args, ML.Dabstract]
+         ML.mk_its_defn id args is_private None
       | None, cl, [] ->
-         ML.Dtype [id, type_args args, ML.Ddata (ddata_constructs cl)]
-      | None, _, _ ->
-         ML.Dtype [id, type_args args, ML.Drecord (drecord_fields itd)]
+         let cl = ddata_constructs cl in
+         ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
+      | None, _, pjl ->
+         let pjl = drecord_fields pjl in
+         ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
       | Some t, _, _ ->
-         ML.Dtype [id, type_args args, ML.Dalias (ity t)]
+         ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
     end
 
   (* program declarations *)
@@ -295,32 +315,29 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDvar (_, _)) ->
        []
-    | PDlet (LDsym ({rs_name = rsn; rs_cty = cty}, {c_node = Cfun e})) ->
-       [ML.Dlet (false, [rsn, args cty.cty_args, expr info e])]
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
+       [ML.Dlet (false, [rs, args cty.cty_args, expr info e])]
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
-       Format.printf "LDsym Capp--> %s@." rsn.id_string;
        []
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Cpur _})) ->
-       Format.printf "LDsym Cpur--> %s@." rsn.id_string;
        []
     | PDlet (LDsym ({rs_name = rsn}, {c_node = Cany})) ->
-       Format.printf "LDsym Cany--> %s@." rsn.id_string;
        []
     | PDlet (LDrec rl) ->
        let rec_def =
          List.map (fun {rec_fun = e; rec_rsym = rs} ->
            let e = match e.c_node with Cfun e -> e | _ -> assert false in
-           rs.rs_name, args rs.rs_cty.cty_args, expr info e) rl in
+           rs, args rs.rs_cty.cty_args, expr info e) rl in
        [ML.Dlet (true, rec_def)]
     | PDpure ->
        []
     | PDtype itl ->
-       List.map tdef itl
-    | PDexn ({xs_name = xsn} as xs) ->
+       [ML.Dtype (List.map tdef itl)]
+    | PDexn xs ->
        if ity_equal xs.xs_ity ity_unit then
-         [ML.Dexn (xsn, None)]
+         [ML.Dexn (xs, None)]
        else
-         [ML.Dexn (xsn, Some (ity xs.xs_ity))]
+         [ML.Dexn (xs, Some (ity xs.xs_ity))]
 
   (* unit module declarations *)
   let mdecl info = function

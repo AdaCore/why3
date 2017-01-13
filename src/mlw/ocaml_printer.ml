@@ -20,6 +20,8 @@ open Pp
 open Ity
 open Term
 open Printer
+open Expr
+open Ty
 
 type info = {
   info_syn          : syntax_map;
@@ -60,7 +62,7 @@ module Print = struct
   (* let print_uident = print_qident ~sanitizer:Strings.capitalize *)
 
   let print_tv fmt tv =
-    fprintf fmt "'%s" (id_unique aprinter tv)
+    fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
   let protect_on b s =
     if b then "(" ^^ s ^^ ")" else s
@@ -70,8 +72,8 @@ module Print = struct
   (** Types *)
 
   let rec print_ty ?(paren=false) fmt = function
-    | Tvar id ->
-       print_tv fmt id
+    | Tvar tv ->
+       print_tv fmt tv
     | Ttuple [] ->
        fprintf fmt "unit"
     | Ttuple tl ->
@@ -87,7 +89,7 @@ module Print = struct
                (print_list comma (print_ty ~paren:false)) tl
                print_ident ts
 
-  let print_vsty fmt (v, ty) =
+  let print_vsty fmt (v, ty, _) =
     fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false) ty
 
   let print_tv_arg = print_tv
@@ -149,45 +151,40 @@ module Print = struct
 
   let pv_name pv = pv.pv_vs.vs_name
 
-  let print_apply info fmt s vl =
-    let open Pdecl in
-    let open Expr in
-    let is_field {itd_fields = fl} =
-      List.exists (fun x ->
-          match x.rs_logic with
-          | RLls ls -> id_equal ls.ls_name s | _ -> false) fl
-    in
+  let print_apply info fmt rs pvl =
     let isfield =
-      match Mid.find_opt s info.info_mo_known_map with
-      | Some {pd_node = PDtype itsd} -> (* can a record be encoded *)
-                                        (* in a recursive data-type ? *)
-         List.exists is_field itsd
-      | _ -> false
+      match rs.rs_field with
+      | None -> false
+      | Some _ -> true
     in
-    match extract_op s, vl with
+    match extract_op rs.rs_name, pvl with
     | Some o, [t1; t2] ->
        fprintf fmt "@[<hov 1>%a %s %a@]"
-         print_ident t1 o print_ident t2
+         print_pv t1 o print_pv t2
     | _, [] ->
-       print_ident fmt s
+       print_ident fmt rs.rs_name
     | _, [t1] when isfield ->
-       fprintf fmt "%a.%a" print_ident t1 print_ident s
+       fprintf fmt "%a.%a" print_pv t1 print_ident rs.rs_name
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
-         print_ident s (print_list space print_ident) tl
+         print_ident rs.rs_name (print_list space print_pv) tl
 
   let rec print_enode info fmt = function
     | Econst c ->
        fprintf fmt "%a" print_const c
-    | Eident id ->
-       print_ident fmt id
-    | Elet (id, e1, e2) ->
+    | Evar pvs ->
+       print_ident fmt (pv_name pvs)
+    | Elet (pv, e1, e2) ->
        fprintf fmt "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a"
-         print_ident id (print_expr info) e1 (print_expr info) e2
+         print_ident (pv_name pv) (print_expr info) e1 (print_expr info) e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
-    | Eapp (s, vl) ->
-       print_apply info fmt s vl
+    | Eapp (s, []) when rs_equal s rs_true ->
+       fprintf fmt "true"
+    | Eapp (s, []) when rs_equal s rs_false ->
+       fprintf fmt "false"
+    | Eapp (s, pvl) ->
+       print_apply info fmt s pvl
     | Ematch (e, pl) ->
        fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
          (print_expr info) e (print_list newline (print_branch info)) pl
@@ -201,7 +198,7 @@ module Print = struct
   and print_expr info fmt e =
     print_enode info fmt e.e_node
 
-  let print_type_decl fmt (id, args, tydef) =
+  let print_type_decl fmt its =
     let print_constr fmt (id, cs_args) =
       match cs_args with
       | [] ->
@@ -216,40 +213,42 @@ module Print = struct
       fprintf fmt "%s%a: %a;"
               (if is_mutable then "mutable " else "")
               print_ident id
-              (print_ty ~paren:false) ty
-    in
+              (print_ty ~paren:false) ty in
     let print_def fmt = function
-      | Dabstract ->
-         ()
-      | Ddata csl ->
-         fprintf fmt " =@\n%a" (print_list newline print_constr) csl
-      | Drecord fl ->
-         fprintf fmt " = {@\n%a@\n}" (print_list newline print_field) fl
-      | Dalias ty ->
-         fprintf fmt " =@ %a" (print_ty ~paren:false) ty in
+      | None ->
+        ()
+      | Some (Ddata csl) ->
+        fprintf fmt " =@\n%a" (print_list newline print_constr) csl
+      | Some (Drecord fl) ->
+        fprintf fmt " = %s{@\n%a@\n}"
+          (if its.its_private then "private " else "")
+          (print_list newline print_field) fl
+      | Some (Dalias ty) ->
+        fprintf fmt " =@ %a" (print_ty ~paren:false) ty
+    in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
-            (if true then "type" else "and") (* FIXME: mutual recursive types *)
-            print_tv_args args
-            print_ident id  (* FIXME: first letter must be lowercase
+      (if true then "type" else "and") (* FIXME: mutual recursive types *)
+      print_tv_args its.its_args
+      print_ident its.its_name  (* FIXME: first letter must be lowercase
                                    -> print_lident *)
-            print_def tydef
+      print_def its.its_def
 
   let print_decl info fmt = function
-    | Dlet (isrec, [id, vl, e]) ->
+    | Dlet (isrec, [rs, pvl, e]) ->
        fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
                (if isrec then "let rec" else "let")
-               print_ident id
-               (print_list space print_vs_arg) vl
+               print_ident rs.rs_name
+               (print_list space print_vs_arg) pvl
                (print_expr info) e;
        fprintf fmt "@\n@\n"
     | Dtype dl ->
        print_list newline print_type_decl fmt dl;
        fprintf fmt "@\n@\n"
-    | Dexn (id, None) ->
-       fprintf fmt "exception %a@\n@\n" print_ident id
-    | Dexn (id, Some t) ->
+    | Dexn (xs, None) ->
+       fprintf fmt "exception %a@\n@\n" print_ident xs.xs_name
+    | Dexn (xs, Some t) ->
        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-               print_ident id (print_ty ~paren:true) t
+               print_ident xs.xs_name (print_ty ~paren:true) t
     | _ -> (* TODO *) assert false
 
 end
