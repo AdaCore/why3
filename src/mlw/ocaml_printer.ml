@@ -274,13 +274,16 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
 
+(*
 let fg ?fname m =
   let mod_name = m.Pmodule.mod_theory.Theory.th_name.id_string in
   match fname with
   | None   -> mod_name ^ ".ml"
   | Some f -> (Filename.remove_extension f) ^ "__" ^ mod_name ^ ".ml"
 
-let () = Pdriver.register_printer "ocaml" ~desc:"printer for OCaml code" fg extract_module
+let () = Pdriver.register_printer "ocaml"
+  ~desc:"printer for OCaml code" fg extract_module
+*)
 
 (*
  * Local Variables:
