@@ -55,7 +55,7 @@ module Print = struct
 
   let print_qident ~sanitizer info fmt id =
     try
-      let lp, m, q =
+      let _, _, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
       let s = String.concat "__" q in
@@ -67,7 +67,7 @@ module Print = struct
            false info.info_current_mo
       then fprintf fmt "%s" s
       else
-        let fname = if lp = [] then info.info_fname else None in
+        (* let fname = if lp = [] then info.info_fname else None in *)
         let m = Strings.capitalize "m" in
         fprintf fmt "%s.%s" m s
     with Not_found ->
@@ -311,16 +311,22 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
 
-(*
+
 let fg ?fname m =
   let mod_name = m.Pmodule.mod_theory.Theory.th_name.id_string in
   match fname with
   | None   -> mod_name ^ ".ml"
-  | Some f -> (Filename.remove_extension f) ^ "__" ^ mod_name ^ ".ml"
+  | Some f ->
+    (* TODO: replace with Filename.remove_extension
+     * after migration to OCaml 4.04+ *)
+    let remove_extension s =
+      try Filename.chop_extension s
+      with Invalid_argument _ -> s
+    in
+    (remove_extension f) ^ "__" ^ mod_name ^ ".ml"
 
 let () = Pdriver.register_printer "ocaml"
   ~desc:"printer for OCaml code" fg extract_module
-*)
 
 (*
  * Local Variables:
