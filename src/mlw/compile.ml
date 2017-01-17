@@ -56,6 +56,8 @@
     - faire un module Erasure, pour y concentrer tout ce qui
       appartient à l'éffacement du code fantôme ?
 
+    - comment est-ce qu'il marche la [mask] d'un [prog_pattern] ?
+
  *)
 
 (*
@@ -69,11 +71,11 @@ open Ident
 open Ity
 open Ty
 open Term
+open Printer
 
 module ML = struct
 
   open Expr
-  open Pdecl
 
   type ty =
     | Tvar    of tvsymbol
@@ -114,12 +116,13 @@ module ML = struct
   and expr_node =
     | Econst  of Number.integer_constant
     | Evar    of pvsymbol
-    | Eapp    of rsymbol * pvsymbol list
+    | Eapp    of rsymbol * expr list
     | Efun    of var list * expr
     | Elet    of pvsymbol * expr * expr
     | Eletrec of is_rec * (rsymbol * var list * expr) list * expr
     | Eif     of expr * expr * expr
     | Ecast   of expr * ty
+    | Eassign of (rsymbol * pvsymbol) list
     | Etuple  of expr list (* at least 2 expressions *)
     | Ematch  of expr * (pat * expr) list
     | Ebinop  of expr * binop * expr
@@ -170,7 +173,25 @@ module ML = struct
   let mk_its_defn id args private_ def =
     { its_name = id; its_args = args; its_private = private_; its_def = def; }
 
+  let eseq e1 e2 =
+    match e1.e_node, e2.e_node with
+    | Eblock [], e | e, Eblock [] -> e
+    | Eblock e1, Eblock e2 -> Eblock (e1 @ e2)
+    | _, Eblock e2 -> Eblock (e1 :: e2)
+    | Eblock e1, _ -> Eblock (e1 @ [e2])
+    | _ -> Eblock [e1; e2]
+
 end
+
+type info = {
+  info_syn          : syntax_map;
+  info_convert      : syntax_map;
+  info_current_th   : Theory.theory;
+  info_current_mo   : Pmodule.pmodule option;
+  info_th_known_map : Decl.known_map;
+  info_mo_known_map : Pdecl.known_map;
+  info_fname        : string option;
+}
 
 (** Translation from Mlw to ML *)
 
@@ -197,35 +218,76 @@ module Translate = struct
   let type_args = (* point-free *)
     List.map (fun x -> x.tv_name)
 
+  let filter_ghost_params l =
+    let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+    let p e = not e.pv_ghost in
+    let rec filter_ghost_params_cps l k =
+      match l with
+      | [] -> k []
+      | e :: r ->
+        filter_ghost_params_cps r
+          (fun fr -> k (if p e then (def e) :: fr else fr))
+    in
+    filter_ghost_params_cps l (fun x -> x)
+
+  let filter2_ghost_params p def al l =
+    let rec filter2_ghost_params_cps l k =
+      match l with
+      | []  -> k []
+      | [e] -> k (if p e then [def e] else [al e])
+      | e :: r ->
+        filter2_ghost_params_cps r
+          (fun fr -> k (if p e then (def e) :: fr else fr))
+    in
+    filter2_ghost_params_cps l (fun x -> x)
+
+  let rec filter_ghost_params_pat = function
+    | MaskVisible -> Format.printf "visible@\n"
+    | MaskGhost   -> Format.printf "ghost@\n"
+    | MaskTuple l ->
+      Format.printf "list@\n";
+      List.iter (filter_ghost_params_pat) l
+
   let rec pat p =
     match p.pat_node with
     | Pwild ->
-       ML.Pwild
+      ML.Pwild
     | Pvar vs ->
-       ML.Pident vs.vs_name
+      ML.Pident vs.vs_name
     | Por (p1, p2) ->
-       ML.Por (pat p1, pat p2)
+      ML.Por (pat p1, pat p2)
     | Pas (p, vs) ->
-       ML.Pas (pat p, vs.vs_name)
+      ML.Pas (pat p, vs.vs_name)
     | Papp (ls, pl) when is_fs_tuple ls ->
-       ML.Ptuple (List.map pat pl)
+      ML.Ptuple (List.map pat pl)
     | Papp (ls, pl) ->
-       ML.Papp (ls.ls_name, List.map pat pl)
+      let rs = restore_rs ls in
+      let args = rs.rs_cty.cty_args in
+      let pat_pl = List.fold_left2
+          (fun acc pv pp -> if not pv.pv_ghost then (pat pp) :: acc else acc)
+          [] args pl
+      in
+      ML.Papp (ls.ls_name, List.rev pat_pl)
 
   (** programs *)
+
+  let pv_name pv = pv.pv_vs.vs_name
+
+  let is_underscore pv =
+    (pv_name pv).id_string = "_" && ity_equal pv.pv_ity ity_unit
 
   (* individual types *)
   let rec ity t =
     match t.ity_node with
     | Ityvar (tvs, _) ->
-       ML.Tvar tvs
+      ML.Tvar tvs
     | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
-       ML.Ttuple (List.map ity itl)
+      ML.Ttuple (List.map ity itl)
     | Ityapp ({its_ts = ts}, itl, _) ->
-       ML.Tapp (ts.ts_name, List.map ity itl)
-    | _ -> (* TODO *) assert false
-
-  let pv_name pv = pv.pv_vs.vs_name
+      ML.Tapp (ts.ts_name, List.map ity itl)
+    | Ityreg {reg_its = its; reg_args = args} ->
+      let args = List.map ity args in
+      ML.Tapp (its.its_ts.ts_name, args)
 
   let pvty pv =
     if pv.pv_ghost then
@@ -242,6 +304,23 @@ module Translate = struct
   let args = (* point-free *)
     List.map pvty
 
+  let app info rs pvl =
+    let isconstructor () =
+      match Mid.find_opt rs.rs_name info.info_mo_known_map with
+      | Some {pd_node = PDtype its} ->
+        let is_constructor its =
+          List.exists (rs_equal rs) its.itd_constructors in
+        List.exists is_constructor its
+      | _ -> false
+    in
+    match pvl with
+    | pvl when isconstructor () -> filter_ghost_params pvl
+    | pvl ->
+      let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+      let al _ = ML.mk_unit in
+      let p e = not e.pv_ghost in
+      filter2_ghost_params p def al pvl
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     (* assert (not eff.eff_ghost); *)
@@ -250,14 +329,26 @@ module Translate = struct
        let c = match c with Number.ConstInt c -> c | _ -> assert false in
        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
-       ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
+      ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
+    | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
+      ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
+    | Elet (LDvar (pvs, e1), e2) when e_ghost e1 ->
+      let ml_let = ML.ml_let pvs ML.mk_unit (expr info e2) in
+       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
        let ml_let = ML.ml_let pvs (expr info e1) (expr info e2) in
        ML.mk_expr ml_let (ML.I e.e_ity) eff
+    | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
+      ML.mk_unit
+    | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
+      ML.mk_unit
     | Eexec ({c_node = Capp (rs, pvl)}, _) ->
-       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
+      let pvl = app info rs pvl in
+      ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
     | Eabsurd ->
-       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
+      ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
+    | Ecase (e1, _) when e_ghost e1 ->
+      ML.mk_unit
     | Ecase (e1, pl) ->
        let e1 = expr info e1 in
        let pl = List.map (ebranch info) pl in
@@ -270,11 +361,13 @@ module Translate = struct
        let e3 = expr info e3 in
        ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
     | Eghost eg ->
-       expr info eg (* it keeps its ghost status *)
+      expr info eg (* it keeps its ghost status *)
+    | Eassign [(_, rs, pv)] ->
+      ML.mk_expr (ML.Eassign [(rs, pv)]) (ML.I e.e_ity) eff
     | _ -> (* TODO *) assert false
 
-  and ebranch info ({pp_pat = p}, e) =
-    pat p, expr info e
+  and ebranch info ({pp_pat = p} as pp, e) =
+    (filter_ghost_params_pat pp.pp_mask; pat p, expr info e)
 
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
@@ -313,24 +406,31 @@ module Translate = struct
   (* program declarations *)
   let pdecl info pd =
     match pd.pd_node with
-    | PDlet (LDvar (_, _)) ->
-       []
+    | PDlet (LDsym (rs, _)) when rs_ghost rs ->
+      []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
-       [ML.Dlet (false, [rs, args cty.cty_args, expr info e])]
-    | PDlet (LDsym ({rs_name = rsn}, {c_node = Capp _})) ->
-       []
-    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cpur _})) ->
-       []
-    | PDlet (LDsym ({rs_name = rsn}, {c_node = Cany})) ->
-       []
+      let args_filter =
+        let p (_, _, is_ghost) = not is_ghost in
+        let def = fun x -> x in
+        let al = fun x -> x in
+        filter2_ghost_params p def al (args cty.cty_args) in
+      [ML.Dlet (false, [rs, args_filter, expr info e])]
     | PDlet (LDrec rl) ->
-       let rec_def =
-         List.map (fun {rec_fun = e; rec_rsym = rs} ->
-           let e = match e.c_node with Cfun e -> e | _ -> assert false in
-           rs, args rs.rs_cty.cty_args, expr info e) rl in
-       [ML.Dlet (true, rec_def)]
+      let rec_def =
+        List.map (fun {rec_fun = e; rec_rsym = rs} ->
+          let e = match e.c_node with Cfun e -> e | _ -> assert false in
+          let args_filter =
+            let p (_, _, is_ghost) = not is_ghost in
+            let def = fun x -> x in
+            let al = fun x -> x in
+            filter2_ghost_params p def al (args rs.rs_cty.cty_args) in
+          rs, args_filter, expr info e) rl
+      in
+      [ML.Dlet (true, rec_def)]
+    | PDlet (LDsym _)
+    | PDlet (LDvar (_, _))
     | PDpure ->
-       []
+      []
     | PDtype itl ->
        [ML.Dtype (List.map tdef itl)]
     | PDexn xs ->

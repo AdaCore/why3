@@ -13,25 +13,15 @@
 
 open Compile
 open Format
-open Pmodule
-open Theory
 open Ident
 open Pp
 open Ity
 open Term
-open Printer
 open Expr
 open Ty
-
-type info = {
-  info_syn          : syntax_map;
-  info_convert      : syntax_map;
-  info_current_th   : Theory.theory;
-  info_current_mo   : Pmodule.pmodule option;
-  info_th_known_map : Decl.known_map;
-  info_mo_known_map : Pdecl.known_map;
-  info_fname        : string option;
-}
+open Theory
+open Pmodule
+open Stdlib
 
 module Print = struct
 
@@ -48,6 +38,11 @@ module Print = struct
      "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with";
      "raise";]
 
+  let is_ocaml_keyword =
+    let h = Hstr.create 16 in
+    List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
+    Hstr.mem h
+
   let iprinter, aprinter =
     let isanitize = sanitizer char_to_alpha char_to_alnumus in
     let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
@@ -58,8 +53,29 @@ module Print = struct
     let s = id_unique iprinter id in
     fprintf fmt "%s" s
 
-  (* let print_lident = print_qident ~sanitizer:Strings.uncapitalize *)
-  (* let print_uident = print_qident ~sanitizer:Strings.capitalize *)
+  let print_qident ~sanitizer info fmt id =
+    try
+      let lp, m, q =
+        try Pmodule.restore_path id
+        with Not_found -> Theory.restore_path id in
+      let s = String.concat "__" q in
+      let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
+      let s = sanitizer s in
+      let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
+      if Sid.mem id info.info_current_th.th_local ||
+         Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
+           false info.info_current_mo
+      then fprintf fmt "%s" s
+      else
+        let fname = if lp = [] then info.info_fname else None in
+        let m = Strings.capitalize "m" in
+        fprintf fmt "%s.%s" m s
+    with Not_found ->
+      let s = id_unique ~sanitizer iprinter id in
+      fprintf fmt "%s" s
+
+  let print_lident = print_qident ~sanitizer:Strings.uncapitalize
+  let print_uident = print_qident ~sanitizer:Strings.capitalize
 
   let print_tv fmt tv =
     fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
@@ -73,21 +89,21 @@ module Print = struct
 
   let rec print_ty ?(paren=false) fmt = function
     | Tvar tv ->
-       print_tv fmt tv
+      print_tv fmt tv
     | Ttuple [] ->
-       fprintf fmt "unit"
+      fprintf fmt "unit"
     | Ttuple tl ->
-       fprintf fmt (protect_on paren "@[%a@]")
-               (print_list star (print_ty ~paren:false)) tl
+      fprintf fmt (protect_on paren "@[%a@]")
+        (print_list star (print_ty ~paren:false)) tl
     | Tapp (ts, []) ->
-       print_ident fmt ts
+      print_ident fmt ts
     | Tapp (ts, [ty]) ->
-       fprintf fmt (protect_on paren "%a@ %a")
-               (print_ty ~paren:true) ty print_ident ts
+      fprintf fmt (protect_on paren "%a@ %a")
+        (print_ty ~paren:true) ty print_ident ts
     | Tapp (ts, tl) ->
-       fprintf fmt (protect_on paren "(%a)@ %a")
-               (print_list comma (print_ty ~paren:false)) tl
-               print_ident ts
+      fprintf fmt (protect_on paren "(%a)@ %a")
+        (print_list comma (print_ty ~paren:false)) tl
+        print_ident ts
 
   let print_vsty fmt (v, ty, _) =
     fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false) ty
@@ -151,32 +167,43 @@ module Print = struct
 
   let pv_name pv = pv.pv_vs.vs_name
 
-  let print_apply info fmt rs pvl =
+  let rec print_apply info fmt rs pvl =
     let isfield =
       match rs.rs_field with
       | None -> false
-      | Some _ -> true
+      | Some _ -> true in
+    let isconstructor () =
+      let open Pdecl in
+      match Mid.find_opt rs.rs_name info.info_mo_known_map with
+      | Some {pd_node = PDtype its} ->
+        let is_constructor its =
+          List.exists (rs_equal rs) its.itd_constructors in
+        List.exists is_constructor its
+      | _ -> false
     in
     match extract_op rs.rs_name, pvl with
     | Some o, [t1; t2] ->
        fprintf fmt "@[<hov 1>%a %s %a@]"
-         print_pv t1 o print_pv t2
+         (print_expr info) t1 o (print_expr info) t2
     | _, [] ->
        print_ident fmt rs.rs_name
     | _, [t1] when isfield ->
-       fprintf fmt "%a.%a" print_pv t1 print_ident rs.rs_name
+      fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
+    | _, tl when isconstructor () ->
+      fprintf fmt "@[<hov 2>%a (%a)@]"
+        print_ident rs.rs_name (print_list comma (print_expr info)) tl
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
-         print_ident rs.rs_name (print_list space print_pv) tl
+         print_ident rs.rs_name (print_list space (print_expr info)) tl
 
-  let rec print_enode info fmt = function
+  and print_enode info fmt = function
     | Econst c ->
        fprintf fmt "%a" print_const c
     | Evar pvs ->
-       print_ident fmt (pv_name pvs)
+       (print_lident info) fmt (pv_name pvs)
     | Elet (pv, e1, e2) ->
        fprintf fmt "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a"
-         print_ident (pv_name pv) (print_expr info) e1 (print_expr info) e2
+         (print_lident info) (pv_name pv) (print_expr info) e1 (print_expr info) e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
     | Eapp (s, []) when rs_equal s rs_true ->
@@ -186,10 +213,20 @@ module Print = struct
     | Eapp (s, pvl) ->
        print_apply info fmt s pvl
     | Ematch (e, pl) ->
-       fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
-         (print_expr info) e (print_list newline (print_branch info)) pl
+      fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
+        (print_expr info) e (print_list newline (print_branch info)) pl
+    | Eassign [(rs, pv)] ->
+      fprintf fmt "%a <-@ %a" print_ident rs.rs_name print_ident (pv_name pv)
+    | Eif (e1, e2, e3) ->
+      fprintf fmt
+        "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]"
+        (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
-       fprintf fmt "()"
+      fprintf fmt "()"
+    | Eblock [e] ->
+      print_expr info fmt e
+    | Eblock el ->
+      fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]" (print_list semi (print_expr info)) el
     | _ -> (* TODO *) assert false
 
   and print_branch info fmt (p, e) =
@@ -235,7 +272,7 @@ module Print = struct
 
   let print_decl info fmt = function
     | Dlet (isrec, [rs, pvl, e]) ->
-       fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
+       fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
                (if isrec then "let rec" else "let")
                print_ident rs.rs_name
                (print_list space print_vs_arg) pvl
