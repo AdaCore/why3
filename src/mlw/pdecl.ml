@@ -55,7 +55,7 @@ let its_recursive s = not s.its_nonfree &&
   s.its_reg_vis = [] && s.its_reg_frz = [] &&
   s.its_def = None
 
-let create_semi_constructor id s fl pjl invl =
+let create_semi_constructor id s fdl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in
   let rgl = List.map ity_reg s.its_regions in
   let ity = ity_app s tvl rgl in
@@ -63,62 +63,66 @@ let create_semi_constructor id s fl pjl invl =
   let t = t_var res in
   let get_pj p = match p.rs_logic with RLls s -> s | _ -> assert false in
   let mk_q {pv_vs = v} p = t_equ (fs_app (get_pj p) [t] v.vs_ty) (t_var v) in
-  let q = create_post res (t_and_simp_l (List.map2 mk_q fl pjl)) in
+  let q = create_post res (t_and_simp_l (List.map2 mk_q fdl pjl)) in
   let eff = match ity.ity_node with
     | Ityreg r -> eff_reset eff_empty (Sreg.singleton r)
     | _ -> eff_empty in
-  let c = create_cty fl invl [q] Mexn.empty Mpv.empty eff ity in
+  let c = create_cty fdl invl [q] Mexn.empty Mpv.empty eff ity in
   create_rsymbol id c
 
-let create_plain_record_decl ~priv ~mut id args fldl invl =
+let create_plain_record_decl ~priv ~mut id args fdl invl =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
   let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
-  let add_fd fs (fm,fd) = Mpv.add_new exn fd fm fs in
-  let flds = List.fold_left add_fd Mpv.empty fldl in
-  let fldl = List.map snd fldl in
-  let s = create_plain_record_itysymbol ~priv ~mut id args flds invl in
-  let pjl = List.map (create_projection s) fldl in
-  let cl = if priv then [] else if invl <> [] then
-    [create_semi_constructor cid s fldl pjl invl] else
-    [create_constructor ~constr:1 cid s fldl] in
-  mk_itd s pjl cl invl
+  let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
+  let fds = List.fold_left add_fd Mpv.empty fdl in
+  let fdl = List.map snd fdl in
+  let s = create_plain_record_itysymbol ~priv ~mut id args fds invl in
+  let pjl = List.map (create_projection s) fdl in
+  let csl = if priv then [] else if invl <> [] then
+    [create_semi_constructor cid s fdl pjl invl] else
+    [create_constructor ~constr:1 cid s fdl] in
+  mk_itd s pjl csl invl
 
-let create_rec_record_decl s fldl =
-  if not (its_recursive s) then invalid_arg "Pdecl.create_rec_record_decl";
+let create_rec_record_decl s fdl =
+  let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
+  if not (its_recursive s) then raise exn;
   let id = s.its_ts.ts_name in
   let cid = id_fresh ?loc:id.id_loc ("mk " ^ id.id_string) in
-  List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fldl;
-  let pjl = List.map (create_projection s) fldl in
-  let cs = create_constructor ~constr:1 cid s fldl in
+  List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
+  let cs = create_constructor ~constr:1 cid s fdl in
+  let pjl = List.map (create_projection s) fdl in
   mk_itd s pjl [cs] []
 
-let create_variant_decl get_its cl =
-  let exn = Invalid_argument "Pdecl.create_variant_decl" in
-  let get_pjl (_,fl) = List.fold_right (fun (p,f) l ->
-    if p then f::l else l) fl [] in
-  let get_pjs (_,fl) = List.fold_left (fun s (p,f) ->
-    if p then Spv.add f s else s) Spv.empty fl in
-  let get_fds (_,fl) = List.fold_left (fun s (_,f) ->
-    Spv.add_new exn f s) Spv.empty fl in
-  let pjl = match cl with
-    | cs::cl ->
-        let pjs = get_pjs cs in
-        List.iter (fun cs ->
-          if not (Spv.equal (get_pjs cs) pjs) then raise exn) cl;
-        get_pjl cs
-    | [] -> raise exn in
-  let s = get_its (List.map get_fds cl) and constr = List.length cl in
-  let mk_cs (cid,fl) = create_constructor ~constr cid s (List.map snd fl) in
-  mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs cl) []
+let create_variant_decl exn get_its csl =
+  (* named projections are the same in each constructor *)
+  let fdl, rest = match csl with
+    | (_,fdl)::csl -> fdl, csl | [] -> raise exn in
+  let add_pj pjs (p, fd) = if p then Spv.add fd pjs else pjs in
+  let get_pjs fdl = List.fold_left add_pj Spv.empty fdl in
+  let pjs = get_pjs fdl in
+  List.iter (fun (_, fdl) -> let s = get_pjs fdl in
+    if not (Spv.equal s pjs) then raise exn) rest;
+  (* therefore, we take them from the first constructor *)
+  let add_pj (p, fd) pjl = if p then fd::pjl else pjl in
+  let pjl = List.fold_right add_pj fdl [] in
+  (* we must also check each field of each constructor *)
+  let add_fd fds (_, fd) = Spv.add_new exn fd fds in
+  let get_fds (_, fdl) = List.fold_left add_fd Spv.empty fdl in
+  (* and now we can create the type symbol and the constructors *)
+  let s = get_its (List.map get_fds csl) and constr = List.length csl in
+  let mk_cs (id, fdl) = create_constructor ~constr id s (List.map snd fdl) in
+  mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs csl) []
 
-let create_plain_variant_decl id args cl =
-  create_variant_decl (create_plain_variant_itysymbol id args) cl
+let create_plain_variant_decl id args csl =
+  let exn = Invalid_argument "Pdecl.create_plain_variant_decl" in
+  create_variant_decl exn (create_plain_variant_itysymbol id args) csl
 
-let create_rec_variant_decl s cl =
-  if not (its_recursive s) then invalid_arg "Pdecl.create_rec_variant_decl";
+let create_rec_variant_decl s csl =
+  let exn = Invalid_argument "Pdecl.create_rec_variant_decl" in
+  if not (its_recursive s) then raise exn;
   let stv = Stv.of_list s.its_ts.ts_args in
   let get_its fdl = List.iter (Spv.iter (check_field stv)) fdl; s in
-  create_variant_decl get_its cl
+  create_variant_decl exn get_its csl
 
 (** {2 Module declarations} *)
 

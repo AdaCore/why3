@@ -102,14 +102,14 @@ exception UnboundRegion of region
 
 val create_plain_record_itysymbol : priv:bool -> mut:bool ->
   preid -> tvsymbol list -> bool Mpv.t -> term list -> itysymbol
-(** [create_plain_record_itysymbol ~priv ~mut id args fields inv] creates
+(** [create_plain_record_itysymbol ~priv ~mut id args fields invl] creates
     a new type symbol for a non-recursive record type, possibly private
     or mutable. Every known field is represented by a [pvsymbol] mapped
     to its mutability status in [fields]. Variables corresponding to
     mutable fields are stored in the created type symbol and used in
     effects. The [priv] flag should be set to [true] for private records.
     The [mut] flag should be set to [true] to mark the new type as mutable
-    even if it does not have known mutable fields. The [inv] parameter
+    even if it does not have known mutable fields. The [invl] parameter
     contains the list of invariant formulas that may only depend on
     variables from [fields]. Abstract types are considered to be private
     immutable records with no fields. *)
