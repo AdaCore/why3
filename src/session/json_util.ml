@@ -1,7 +1,7 @@
-open Itp_server
+open Itp_communication
 open Controller_itp
 open Call_provers
-open Json
+open Json_base
 
 (* TODO match exceptions and complete some cases *)
 
@@ -94,14 +94,17 @@ let convert_notification_constructor n =
   | Dead _        -> String "Dead"
   | Task _        -> String "Task"
 
-let convert_node_type nt =
+let convert_node_type_string nt =
   match nt with
-  | NRoot           -> String "NRoot"
-  | NFile           -> String "NFile"
-  | NTheory         -> String "NTheory"
-  | NTransformation -> String "NTransformation"
-  | NGoal           -> String "NGoal"
-  | NProofAttempt   -> String "NProofAttempt"
+  | NRoot           -> "NRoot"
+  | NFile           -> "NFile"
+  | NTheory         -> "NTheory"
+  | NTransformation -> "NTransformation"
+  | NGoal           -> "NGoal"
+  | NProofAttempt   -> "NProofAttempt"
+
+let convert_node_type nt =
+  String (convert_node_type_string nt)
 
 let convert_request_constructor (r: ide_request) =
   match r with
@@ -122,7 +125,7 @@ let convert_request_constructor (r: ide_request) =
   | Replay_req           -> String "Replay_req"
   | Exit_req             -> String "Exit_req"
 
-let print_request_to_json (r: ide_request): Json.value =
+let print_request_to_json (r: ide_request): Json_base.value =
   let cc = convert_request_constructor in
   match r with
   | Command_req (nid, s) ->
@@ -233,7 +236,7 @@ let convert_message (m: message_notification) =
       Obj ["mess_notif", cc m;
              "open_error", String s]
 
-let print_notification_to_json (n: notification): Json.value =
+let print_notification_to_json (n: notification): Json_base.value =
   let cc = convert_notification_constructor in
   match n with
   | New_node (nid, parent, node_type, name, detached) ->
@@ -266,17 +269,21 @@ let print_notification_to_json (n: notification): Json.value =
              "node_ID", Int nid;
              "task", String s]
 
-
-
 let print_notification fmt (n: notification) =
-  Format.fprintf fmt "%a" Json.print (print_notification_to_json n)
+  Format.fprintf fmt "%a" Json_base.print (print_notification_to_json n)
 
 let print_request fmt (r: ide_request) =
-  Format.fprintf fmt "%a" Json.print (print_request_to_json r)
+  Format.fprintf fmt "%a" Json_base.print (print_request_to_json r)
+
+let print_list_notification fmt (nl: notification list) =
+  Format.fprintf fmt "%a" (Json_base.list print_notification) nl
+
+let print_list_request fmt (rl: ide_request list) =
+  Format.fprintf fmt "%a" (Json_base.list print_request) rl
 
 exception NotProver
 
-let parse_prover_from_json (j: Json.value) =
+let parse_prover_from_json (j: Json_base.value) =
   match j with
   | Obj ["prover_name", String pn;
            "prover_version", String pv;
@@ -286,7 +293,7 @@ let parse_prover_from_json (j: Json.value) =
 
 exception NotLimit
 
-let parse_limit_from_json (j: Json.value) =
+let parse_limit_from_json (j: Json_base.value) =
   match j with
   | Obj ["limit_time", Int t;
            "limit_mem", Int m;
@@ -342,11 +349,11 @@ let parse_request (constr: string) l =
     Exit_req
   | _ -> raise (NotRequest "")
 
-let parse_request (j: Json.value): ide_request =
+let parse_request_json (j: Json_base.value): ide_request =
   match j with
   | Obj (("ide_request", String constr) :: l) ->
       parse_request constr l
-  | _ -> let s =Pp.string_of Json.print j in
+  | _ -> let s =Pp.string_of Json_base.print j in
     begin Format.eprintf "BEGIN \n %s \nEND\n@." s; raise (NotRequest s); end
 
 exception NotNodeType
@@ -524,7 +531,7 @@ let parse_notification constr l =
        Task (nid, s)
   | _ -> raise NotNotification
 
-let parse_notification j =
+let parse_notification_json j =
   match j with
   | Obj (("notification", String constr) :: l) ->
       parse_notification constr l
@@ -532,13 +539,26 @@ let parse_notification j =
 
 let parse_json_object (s: string) =
   let lb = Lexing.from_string s in
-  let x = Json_parser.json_object (fun x -> Json_lexer.read x) lb in
+  let x = Json_parser.value (fun x -> Json_lexer.read x) lb in
   x
 
 let parse_notification (s: string) : notification =
   let json = parse_json_object s in
-  parse_notification json
+  parse_notification_json json
 
 let parse_request (s: string) : ide_request =
   let json = parse_json_object s in
-  parse_request json
+  parse_request_json json
+
+
+let parse_list_notification (s: string): notification list =
+  let json = parse_json_object s in
+  match json with
+  | Array l -> List.map parse_notification_json l
+  | _ -> raise NotNotification
+
+let parse_list_request (s: string): ide_request list =
+  let json = parse_json_object s in
+  match json with
+  | Array l -> List.map parse_request_json l
+  | _ -> raise (NotRequest "Not list")

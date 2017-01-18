@@ -316,18 +316,18 @@ let interleave_with_source
 *)
 let print_model_element_json me_name_to_str fmt me =
   let print_value fmt =
-    fprintf fmt "%a" (print_model_value_sanit Json.string) me.me_value in
+    fprintf fmt "%a" (print_model_value_sanit Json_base.string) me.me_value in
   let print_kind fmt =
     match me.me_name.men_kind with
-    | Result -> fprintf fmt "%a" Json.string "result"
-    | Old -> fprintf fmt "%a" Json.string "old"
-    | Error_message -> fprintf fmt "%a" Json.string "error_message"
-    | Other -> fprintf fmt "%a" Json.string "other" in
+    | Result -> fprintf fmt "%a" Json_base.string "result"
+    | Old -> fprintf fmt "%a" Json_base.string "old"
+    | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
+    | Other -> fprintf fmt "%a" Json_base.string "other" in
   let print_name fmt =
-    Json.string fmt (me_name_to_str me) in
+    Json_base.string fmt (me_name_to_str me) in
   let print_value_or_kind_or_name fmt printer =
     printer fmt in
-  Json.map_bindings
+  Json_base.map_bindings
     (fun s -> s)
     print_value_or_kind_or_name
     fmt
@@ -336,14 +336,14 @@ let print_model_element_json me_name_to_str fmt me =
      ("kind", print_kind)]
 
 let print_model_elements_json me_name_to_str fmt model_elements =
-  Json.list
+  Json_base.list
     (print_model_element_json me_name_to_str)
     fmt
     model_elements
 
 let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
     (file_name, model_file) =
-  Json.map_bindings
+  Json_base.map_bindings
     (fun i ->
       match model.vc_term_loc with
       | None ->
@@ -371,7 +371,7 @@ let print_model_json
       List.append bindings [(file_name, (file_name, model_file))])
     []
     (StringMap.bindings model.model_files) in
-  Json.map_bindings
+  Json_base.map_bindings
     (fun s -> s)
     (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
     fmt

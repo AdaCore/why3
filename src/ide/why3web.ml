@@ -20,6 +20,7 @@ module P = struct
 
 end
 
+open Itp_communication
 open Itp_server
 
 module S = Make (Wserver) (P)
@@ -32,7 +33,7 @@ let interp_request args =
   | "list-provers" -> Command_req (root_node,"list-provers")
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
-open Json
+open Json_base
 
 let message_notification n =
   match n with
@@ -90,11 +91,7 @@ let handle_script s args =
      end
     | "getNotifications" ->
        let n = P.get_notifications () in
-       let n =
-         if n = [] then [Obj ["notification",String "None"]]
-         else List.map notification n
-       in
-       Pp.sprintf "%a@." Json.print (Array n)
+       Pp.sprintf "%a@." Json_util.print_list_notification n
     | _ -> "bad request"
 
 let plist fmt l =
@@ -161,6 +158,6 @@ let () =
     in
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
-    Queue.iter (fun f -> P.push_request (Itp_server.Open_session_req f)) files;
+    Queue.iter (fun f -> P.push_request (Open_session_req f)) files;
     S.init_server config env;
     Wserver.main_loop None 6789 handler stdin_handler

@@ -6,6 +6,7 @@
 open Why3
 open Unix_scheduler
 open Format
+open Itp_communication
 open Itp_server
 
 (*************************)
@@ -203,7 +204,7 @@ let add_new_node fmt (n: node_ID) (parent: node_ID) (t: node_type) (name: string
   with
     Not_found -> fprintf fmt "Could not find node %d@." parent
 
-let change_node fmt (n: node_ID) (u: Itp_server.update_info) =
+let change_node fmt (n: node_ID) (u: update_info) =
   try
     let node = Hnode.find nodes n in
     (match u with

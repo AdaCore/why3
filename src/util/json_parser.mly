@@ -3,12 +3,14 @@
 by Yaron Minsky, Anil Madhavapeddy, and Jason Hickey. Their 'unlicence' allows
 it. *)
 (****************************************************************************)
-%start <Json.value> json_object
+(* A JSON text can actually be any JSON value *)
+%start <Json_base.value> value
 %token <int> INT
 %token <float> FLOAT
 %token <string> STRING
 %token TRUE
 %token FALSE
+%token NULL
 %token LEFTBRC RIGHTBRC
 %token LEFTSQ
 %token RIGHTSQ
@@ -18,18 +20,18 @@ it. *)
 %%
 
 json_object:
-| EOF { Json.Null }
-| LEFTBRC RIGHTBRC { Json.Null }
+| EOF { Json_base.Null }
+| LEFTBRC RIGHTBRC { Json_base.Null }
 (* Left recursive rule are more efficient *)
-| LEFTBRC members RIGHTBRC { Json.Obj (List.rev $2) }
+| LEFTBRC members RIGHTBRC { Json_base.Obj (List.rev $2) }
 
 members:
 | json_pair { [ $1 ] }
 | members COMMA json_pair { $3 :: $1 }
 
 array:
-| LEFTSQ RIGHTSQ { Json.Array [] }
-| LEFTSQ elements RIGHTSQ { Json.Array (List.rev $2) }
+| LEFTSQ RIGHTSQ { Json_base.Array [] }
+| LEFTSQ elements RIGHTSQ { Json_base.Array (List.rev $2) }
 
 elements:
 | value { [$1] }
@@ -39,10 +41,11 @@ json_pair:
 | STRING COLON value { ($1, $3) }
 
 value:
-| STRING { Json.String $1 }
-| INT { Json.Int $1 }
-| FLOAT { Json.Float $1 }
+| STRING { Json_base.String $1 }
+| INT { Json_base.Int $1 }
+| FLOAT { Json_base.Float $1 }
 | json_object { $1 }
 | array { $1 }
-| TRUE { Json.Bool true}
-| FALSE { Json.Bool false }
+| TRUE { Json_base.Bool true}
+| FALSE { Json_base.Bool false }
+| NULL { Json_base.Null }

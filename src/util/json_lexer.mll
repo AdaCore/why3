@@ -28,6 +28,7 @@ rule read =
   | float    { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
   | "true"   { TRUE }
   | "false"  { FALSE }
+  | "null"   { NULL }
   | '"'      { read_string (Buffer.create 17) lexbuf }
   | '{'      { LEFTBRC }
   | '}'      { RIGHTBRC }

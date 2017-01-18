@@ -166,7 +166,7 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp json  json_parser json_lexer debug loc \
+	   hashcons stdlib exn_printer pp json_base json_parser json_lexer debug loc \
 	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
@@ -205,7 +205,8 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 
 LIB_SESSION = compress xml termcode session session_itp \
               session_tools strategy strategy_parser controller_itp \
-	      session_scheduler server_utils itp_server json_util
+	      session_scheduler server_utils itp_communication \
+	      itp_server json_util
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -1533,6 +1534,9 @@ install_local:: bin/why3doc
 
 ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
 
+JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
+        -syntax camlp4o -I src/ide
+
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
         -syntax camlp4o -I src/trywhy3 \
 	-I $(ALTERGODIR)/src/util \
@@ -1592,7 +1596,6 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
-
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
@@ -1602,6 +1605,16 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
+src/ide/why3js_ocaml.cmo: src/ide/why3js_ocaml.ml
+	$(JSOCAMLCW) $(BFLAGS) -c $<
+
+src/ide/why3js_ocaml.byte: $(TRYWHY3CMO) src/ide/why3js_ocaml.cmo
+	$(JSOCAMLCW) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/ide/why3js_ocaml.js: src/ide/why3js_ocaml.byte
+	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
+
+new_src_ide: lib/why3/why3.cma bin/why3webserver.opt src/ide/why3js_ocaml.js
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
