@@ -791,7 +791,7 @@ let reflow vc_wp k =
         (* TODO: provide localisation for the error message *)
         if tag = WP && not (Mint.is_empty out) then
           Loc.errorm "Cannot switch to the classical WP procedure";
-        Ktag (Out out, Ktag (tag, k)), Mint.map (fun _ -> false) out
+        Ktag (Out out, Ktag (tag, k)), Mint.map Util.ffalse out
     | Ktag ((WP|SP), k) ->
         mark vc_tag k
     | Ktag ((Out _|Push _), _) ->

@@ -15,6 +15,8 @@ open Term
 open Decl
 open Pdecl
 
+(* helper functions for algebraic types *)
+
 let is_projection kn ls = ls.ls_constr = 0 &&
   match Mid.find ls.ls_name kn with
   | { pd_node = PDtype _ } -> true
@@ -46,10 +48,42 @@ let apply_projection kn ls cs tl =
     | _ -> acc in
   List.fold_left2 find t_true tl pjl
 
-let flat_case t bl =
-  let mk_b b = let p,t = t_open_branch b in [p],t in
-  let mk_case = t_case_close and mk_let = t_let_close_simp in
-  Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
+(* Part I - Invariant handling *)
+
+let ls_valid =
+  let v = create_tvsymbol (id_fresh "a") in
+  create_psymbol (id_fresh "valid") [ty_var v]
+
+(* Integer "points" represent individual values whose invariant
+   may be broken. The special point 0 represents any value with
+   verified invariant. Fresh points are assigned to values from
+   top to bottom, so that a lesser point can never be reached
+   from a greater point. Each point is associated to a list of
+   fresh variables that correspond to the "temporary fields" of
+   the point. Committing a point means that we prove that the
+   temporary fields satisfy the invariant and then assume that
+   the temporary fields are equal to the respective projections.
+
+   Recursive "caps" represent deconstructible values from which
+   points can be reached. Each variable is associated to a cap.
+   A cap is either a zero point (committed value), a non-zero
+   point (a record with a breakable invariant), a constructible
+   value (characterized by the set of possible constructors),
+   or a record with an unbreakable invariant. *)
+
+type cap =
+  | P of int            (* point *)
+  | C of cap list Mls.t (* algebraic type *)
+  | R of cap list       (* record with unbreakable invariant *)
+
+type point = {
+  p_fields : (vsymbol * cap) Mls.t; (* temporary fields *)
+  p_root   : term;                  (* term we can be reached from *)
+  p_path   : (pattern * term) list; (* deconstruction from the root *)
+  p_inv    : term list;             (* instantiated invariant *)
+}
+
+(* Part II - EvalMatch simplification *)
 
 (* we destruct tuples, units, and singleton records *)
 let destructible kn ty =
@@ -89,16 +123,16 @@ let unfold_inlineable kn ls tl ty = match find_inlineable kn ls with
 
 let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
   match destructible kn ty with
-    | Some ls ->
-        let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
-        let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
-        let nvl = List.map mk_v ls.ls_args in
-        let t = fs_app ls (List.map t_var nvl) ty in
-        let f = t_let_close_simp v t f in
-        let tl = tr_map (t_subst_single v t) tl in
-        List.fold_left (add_quant kn) (vl,tl,f) nvl
-    | None ->
-        (v::vl, tl, f)
+  | Some ls ->
+      let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
+      let mk_v ty = create_vsymbol (id_clone v.vs_name) (ty_inst s ty) in
+      let nvl = List.map mk_v ls.ls_args in
+      let t = fs_app ls (List.map t_var nvl) ty in
+      let f = t_let_close_simp v t f in
+      let tl = tr_map (t_subst_single v t) tl in
+      List.fold_left (add_quant kn) (vl,tl,f) nvl
+  | None ->
+      (v::vl, tl, f)
 
 let let_map fn env t1 tb =
   let x,t2,close = t_open_bound_cb tb in
@@ -131,6 +165,11 @@ let rec cs_equ env t1 t2 =
     dive_to_constructor (right cs1 tl1) env t2 in
   try dive_to_constructor (left t2) env t1
   with Exit -> t_equ t1 t2
+
+let flat_case t bl =
+  let mk_b b = let p,t = t_open_branch b in [p],t in
+  let mk_case = t_case_close and mk_let = t_let_close_simp in
+  Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
 let rec eval_match kn stop env t =
   let stop = stop || Slab.mem Term.stop_split t.t_label in
