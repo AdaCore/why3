@@ -626,8 +626,8 @@ let fields_of_invariant ftv flds invl =
 
     private mutable:
       all arguments are frozen, exposed, liable, fixed, visible
-      all regions frozen in the fields or reachable from
-      the invariant are frozen, the rest are mutable
+      all regions frozen in the fields or reachable
+      from the invariant are frozen, the rest are mutable
         => mutable regions cannot appear in the strengthened
            invariant in a refining type
       rexp, rlbl, rfxd, rvis are computed from the known fields
@@ -689,6 +689,25 @@ let create_plain_variant_itysymbol id args flds =
   let flds = List.fold_left (fun acc flds ->
     Mpv.set_union acc (Mpv.map Util.ffalse flds)) Mpv.empty flds in
   create_plain_record_itysymbol ~priv:false ~mut:false id args flds []
+
+(** detect fragile types *)
+
+let ity_fragile ity =
+  let rec fragile liable () ity = match ity.ity_node with
+    | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
+    | Ityapp (s,tl,rl) ->
+        (* an outer invariant depends on a mutable value *)
+        if liable && s.its_mutable then raise Exit;
+        (* our breakable invariant depends on a mutable field *)
+        if s.its_fragile && not s.its_private then raise Exit;
+        (* otherwise, check the exposed non-frozen components *)
+        let fn _ x t = if x.its_exposed && not x.its_frozen then
+          fragile (liable || x.its_liable) () t in
+        its_fold fn () s tl rl
+    | Ityvar _ -> () in
+  try fragile false () ity; false with Exit -> true
+
+let ty_fragile ty = ity_fragile (ity_of_ty_pure ty)
 
 (** pvsymbol creation *)
 

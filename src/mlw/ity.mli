@@ -149,6 +149,12 @@ val ity_pure : ity -> bool
 val ity_closed : ity -> bool
 (** a closed type contains no type variables *)
 
+val ity_fragile : ity -> bool
+(** a fragile type may contain a component with a broken invariant *)
+
+val ty_fragile : ty -> bool
+(** a fragile logical type is a snapshot of a fragile program type *)
+
 (** {2 Type constructors} *)
 
 exception BadItyArity of itysymbol * int
