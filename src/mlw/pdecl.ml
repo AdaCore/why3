@@ -44,16 +44,14 @@ let check_field stv f =
     "This field has non-pure type, it cannot be used \
      in a recursive type definition"
 
-let its_recursive s = not s.its_nonfree &&
-  not s.its_private && not s.its_mutable &&
+let its_recursive s =
+  not s.its_nonfree && not s.its_private &&
+  not s.its_mutable && not s.its_fragile &&
   s.its_mfields = [] && s.its_regions = [] &&
-  List.for_all (fun x -> x) s.its_arg_imm &&
-  List.for_all (fun x -> x) s.its_arg_exp &&
-  List.for_all (fun x -> x) s.its_arg_vis &&
-  List.for_all (fun x -> x) s.its_arg_frz &&
-  s.its_reg_imm = [] && s.its_reg_exp = [] &&
-  s.its_reg_vis = [] && s.its_reg_frz = [] &&
-  s.its_def = None
+  s.its_reg_flg = [] && s.its_def = None &&
+  List.for_all (fun x -> x.its_frozen &&
+    x.its_exposed && not x.its_liable &&
+    x.its_fixed && x.its_visible) s.its_arg_flg
 
 let create_semi_constructor id s fdl pjl invl =
   let tvl = List.map ity_var s.its_ts.ts_args in

@@ -17,20 +17,23 @@ open Term
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** logical type symbol *)
-  its_nonfree : bool;           (** has an invariant *)
+  its_nonfree : bool;           (** has no constructors *)
   its_private : bool;           (** private type *)
   its_mutable : bool;           (** mutable type *)
+  its_fragile : bool;           (** mutable in the invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
-  its_arg_imm : bool list;      (** non-updatable parameters *)
-  its_arg_exp : bool list;      (** exposed type parameters *)
-  its_arg_vis : bool list;      (** non-ghost type parameters *)
-  its_arg_frz : bool list;      (** irreplaceable parameters *)
-  its_reg_imm : bool list;      (** non-updatable components *)
-  its_reg_exp : bool list;      (** exposed shareable components *)
-  its_reg_vis : bool list;      (** non-ghost shareable components *)
-  its_reg_frz : bool list;      (** irreplaceable shareable components *)
+  its_arg_flg : its_flag list;  (** flags for type args *)
+  its_reg_flg : its_flag list;  (** flags for regions *)
   its_def     : ity option;     (** type alias *)
+}
+
+and its_flag = private {
+  its_frozen  : bool;   (** cannot be updated *)
+  its_exposed : bool;   (** directly reachable from a field *)
+  its_liable  : bool;   (** exposed in the type invariant *)
+  its_fixed   : bool;   (** exposed in a non-mutable field *)
+  its_visible : bool;   (** visible from the non-ghost code *)
 }
 
 and ity = private {
