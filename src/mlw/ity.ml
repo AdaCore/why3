@@ -349,11 +349,15 @@ let ity_fragile ity =
   let rec fragile liable () ity = match ity.ity_node with
     | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
     | Ityapp (s,tl,rl) ->
+        (* can we be broken or break an outer invariant? *)
+        if s.its_fragile || (liable && s.its_mutable) then raise Exit else
+        (* can we have broken reachable components? *)
+        if s.its_private || (s.its_nonfree && not s.its_mutable) then () else
+        (* reachable frozen components cannot be broken *)
         let fn () x t =
-          if x.its_exposed && not x.its_frozen
-          then fragile (liable || x.its_liable) () t in
-        if s.its_fragile || (liable && s.its_mutable)
-          then raise Exit else its_fold fn () s tl rl
+          if x.its_exposed && not x.its_frozen then
+            fragile (liable || x.its_liable) () t in
+        its_fold fn () s tl rl
     | Ityvar _ -> () in
   try fragile false () ity; false with Exit -> true
 
@@ -637,38 +641,58 @@ let fields_of_invariant ftv flds invl =
       rexp, rlbl, rfxd, rvis are computed from the known fields
         => known regions cannot appear in the added fields
            in a refining type (no field aliases)
+      cannot have its own invariant broken
+      commits fields on construction and freezes them
+        => not fragile and cannot have broken components
 
     private mutable:
       all arguments are frozen, exposed, liable, fixed, visible
-      all regions frozen in the fields or reachable
-      from the invariant are frozen, the rest are mutable
+      all regions frozen in the fields or reachable from
+        the invariant are frozen, the rest are mutable
         => mutable regions cannot appear in the strengthened
            invariant in a refining type
       rexp, rlbl, rfxd, rvis are computed from the known fields
         => known regions cannot appear in the added fields
            in a refining type (no field aliases)
+      cannot have its own invariant broken
+      commits fields on construction and freezes the non-liables
+      cannot have broken type parameters or broken liable fields
+      however, a mutable region can break a non-liable field
+        => fragile if has a fragile non-liable field
 
     nonfree immutable:
       all reachable arguments are frozen, otherwise we lose unicity
       all reachable regions are frozen, otherwise we lose unicity [!]
       aexp, albl, afxd, avis are computed from the known fields
       rexp, rlbl, rfxd, rvis are computed from the known fields
+      cannot have its own invariant broken
+      commits fields on construction and freezes them
+        => not fragile and cannot have broken components
 
-    nonfree mutable, free mutable, free immutable:
+    nonfree mutable:
       afrz, aexp, albl, afxd, avis are computed from the known fields
       rfrz, rexp, rlbl, rfxd, rvis are computed from the known fields
+      commits fields on construction but does not freeze them
+      can be broken from a liable reachable non-frozen component
+      can have broken compontents (reachable and non-frozen)
+        => fragile if has a liable mutable field or a fragile field
+
+    free mutable, free immutable non-recursive:
+      afrz, aexp, albl, afxd, avis are computed from the known fields
+      rfrz, rexp, rlbl, rfxd, rvis are computed from the known fields
+      does not commit fields on construction, and can have a broken
+        snapshot field (undetectable from regions)
+        => fragile if has a fragile field
+      can have broken compontents (reachable and non-frozen)
+
+    recursive (free, immutable, no known fields, no regions):
+      all arguments are frozen, exposed, non-liable, fixed, visible
+      commits fields on construction and freezes them
+        => not fragile and cannot have broken components
+        (can treat it as free immutable, since all paths are frozen)
 
   [!] if this rule makes an exposed region frozen, we declare
-      the type mutable to preserve mutability.
-
-  We declare a type fragile when it is not private (private types
-  cannot have broken invariants), and when it either has a mutable
-  field occurring in its invariant or when it has a fragile field.
-  The latter condition is necessary because an updatable type can
-  have a fragile snapshot field, which will not appear among its
-  regions (since it is a snapshot) nor among its type parameters
-  (since it is a field). In this case, going into subcomponents
-  will be useless, and we must account for it using its_fragile. *)
+      the type mutable to preserve mutability. *)
 
 let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let sargs = Stv.of_list args in
@@ -691,11 +715,14 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let rtop = collect ity_top_regs flds Sreg.empty in
   let regs = Mreg.keys rtop in
   let nfr = priv || invl <> [] in
-  let mut = mut || not (Mpv.is_empty fmut) ||
-          (* [!] *) (nfr && not (Sreg.subset rexp rfrz)) in
-  let frg = not priv &&
-    (not (Mpv.is_empty (Mpv.set_inter flbl fmut)) ||
-    Mpv.exists (fun f _ -> ity_fragile f.pv_ity) flds) in
+  let mut = mut || not (Mpv.is_empty fmut) || (* [!] *)
+      (nfr && not (Sreg.subset rexp rfrz)) in
+  let frg = if nfr && not mut then false else
+    if priv && mut then (* private mutable *)
+      Mpv.exists (fun f _ -> ity_fragile f.pv_ity) fout
+    else (* non-free mutable or free *)
+      not (Mpv.is_empty (Mpv.set_inter flbl fmut)) ||
+      Mpv.exists (fun f _ -> ity_fragile f.pv_ity) flds in
   let afrz = if priv then sargs else if nfr && not mut
                                 then collect ity_rch_vars flds Stv.empty
                                 else collect ity_frz_vars flds Stv.empty in
