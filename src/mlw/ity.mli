@@ -20,7 +20,7 @@ type itysymbol = private {
   its_nonfree : bool;           (** has no constructors *)
   its_private : bool;           (** private type *)
   its_mutable : bool;           (** mutable type *)
-  its_fragile : bool;           (** mutable in the invariant *)
+  its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
@@ -151,9 +151,6 @@ val ity_closed : ity -> bool
 
 val ity_fragile : ity -> bool
 (** a fragile type may contain a component with a broken invariant *)
-
-val ty_fragile : ty -> bool
-(** a fragile logical type is a snapshot of a fragile program type *)
 
 (** {2 Type constructors} *)
 

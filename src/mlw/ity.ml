@@ -21,7 +21,7 @@ type itysymbol = {
   its_nonfree : bool;           (** has no constructors *)
   its_private : bool;           (** private type *)
   its_mutable : bool;           (** mutable type *)
-  its_fragile : bool;           (** mutable in the invariant *)
+  its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
@@ -343,6 +343,20 @@ let rec ity_frz_fold fn acc ity =
 let ity_r_frozen s ity =
   Util.any ity_frz_fold (Mreg.contains s) ity
 
+(** detect fragile types *)
+
+let ity_fragile ity =
+  let rec fragile liable () ity = match ity.ity_node with
+    | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
+    | Ityapp (s,tl,rl) ->
+        let fn () x t =
+          if x.its_exposed && not x.its_frozen
+          then fragile (liable || x.its_liable) () t in
+        if s.its_fragile || (liable && s.its_mutable)
+          then raise Exit else its_fold fn () s tl rl
+    | Ityvar _ -> () in
+  try fragile false () ity; false with Exit -> true
+
 (* traversal functions on non-ghost regions *)
 
 let rec ity_vis_fold fn acc ity =
@@ -645,7 +659,16 @@ let fields_of_invariant ftv flds invl =
       rfrz, rexp, rlbl, rfxd, rvis are computed from the known fields
 
   [!] if this rule makes an exposed region frozen, we declare
-      the type mutable to preserve mutability. *)
+      the type mutable to preserve mutability.
+
+  We declare a type fragile when it is not private (private types
+  cannot have broken invariants), and when it either has a mutable
+  field occurring in its invariant or when it has a fragile field.
+  The latter condition is necessary because an updatable type can
+  have a fragile snapshot field, which will not appear among its
+  regions (since it is a snapshot) nor among its type parameters
+  (since it is a field). In this case, going into subcomponents
+  will be useless, and we must account for it using its_fragile. *)
 
 let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let sargs = Stv.of_list args in
@@ -670,7 +693,9 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let nfr = priv || invl <> [] in
   let mut = mut || not (Mpv.is_empty fmut) ||
           (* [!] *) (nfr && not (Sreg.subset rexp rfrz)) in
-  let frg = not (Mpv.is_empty (Mpv.set_inter flbl fmut)) in
+  let frg = not priv &&
+    (not (Mpv.is_empty (Mpv.set_inter flbl fmut)) ||
+    Mpv.exists (fun f _ -> ity_fragile f.pv_ity) flds) in
   let afrz = if priv then sargs else if nfr && not mut
                                 then collect ity_rch_vars flds Stv.empty
                                 else collect ity_frz_vars flds Stv.empty in
@@ -689,25 +714,6 @@ let create_plain_variant_itysymbol id args flds =
   let flds = List.fold_left (fun acc flds ->
     Mpv.set_union acc (Mpv.map Util.ffalse flds)) Mpv.empty flds in
   create_plain_record_itysymbol ~priv:false ~mut:false id args flds []
-
-(** detect fragile types *)
-
-let ity_fragile ity =
-  let rec fragile liable () ity = match ity.ity_node with
-    | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
-    | Ityapp (s,tl,rl) ->
-        (* an outer invariant depends on a mutable value *)
-        if liable && s.its_mutable then raise Exit;
-        (* our breakable invariant depends on a mutable field *)
-        if s.its_fragile && not s.its_private then raise Exit;
-        (* otherwise, check the exposed non-frozen components *)
-        let fn _ x t = if x.its_exposed && not x.its_frozen then
-          fragile (liable || x.its_liable) () t in
-        its_fold fn () s tl rl
-    | Ityvar _ -> () in
-  try fragile false () ity; false with Exit -> true
-
-let ty_fragile ty = ity_fragile (ity_of_ty_pure ty)
 
 (** pvsymbol creation *)
 
