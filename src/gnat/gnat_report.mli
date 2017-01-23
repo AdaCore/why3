@@ -35,7 +35,7 @@ open Why3
                 "trace_file"     : string,
                 "vc_file"        : string,
                 "editor_cmd"     : string,
-                "proof_attempts" : list goal,
+                "check_tree"     : list goal,
                 "cntexmp"        : cntexmp_rec
                 }
 
