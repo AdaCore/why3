@@ -345,21 +345,25 @@ let ity_r_frozen s ity =
 
 (** detect fragile types *)
 
+let rec ity_fragile liable () ity = match ity.ity_node with
+  | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
+  | Ityapp (s,tl,rl) ->
+      (* can we be broken or break an outer invariant? *)
+      if s.its_fragile || (liable && s.its_mutable) then raise Exit else
+      (* can we have broken reachable components? *)
+      if s.its_private || (s.its_nonfree && not s.its_mutable) then () else
+      (* reachable frozen components cannot be broken *)
+      let fn () x t =
+        if x.its_exposed && not x.its_frozen then
+          ity_fragile (liable || x.its_liable) () t in
+      its_fold fn () s tl rl
+  | Ityvar _ -> ()
+
+let ity_liquid ity =
+  try ity_fragile true () ity; false with Exit -> true
+
 let ity_fragile ity =
-  let rec fragile liable () ity = match ity.ity_node with
-    | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
-    | Ityapp (s,tl,rl) ->
-        (* can we be broken or break an outer invariant? *)
-        if s.its_fragile || (liable && s.its_mutable) then raise Exit else
-        (* can we have broken reachable components? *)
-        if s.its_private || (s.its_nonfree && not s.its_mutable) then () else
-        (* reachable frozen components cannot be broken *)
-        let fn () x t =
-          if x.its_exposed && not x.its_frozen then
-            fragile (liable || x.its_liable) () t in
-        its_fold fn () s tl rl
-    | Ityvar _ -> () in
-  try fragile false () ity; false with Exit -> true
+  try ity_fragile false () ity; false with Exit -> true
 
 (* traversal functions on non-ghost regions *)
 
@@ -721,8 +725,8 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
     if priv && mut then (* private mutable *)
       Mpv.exists (fun f _ -> ity_fragile f.pv_ity) fout
     else (* non-free mutable or free *)
-      not (Mpv.is_empty (Mpv.set_inter flbl fmut)) ||
-      Mpv.exists (fun f _ -> ity_fragile f.pv_ity) flds in
+      Mpv.exists (fun f m -> m || ity_liquid f.pv_ity) flbl ||
+      Mpv.exists (fun f _ -> ity_fragile f.pv_ity) fout in
   let afrz = if priv then sargs else if nfr && not mut
                                 then collect ity_rch_vars flds Stv.empty
                                 else collect ity_frz_vars flds Stv.empty in
