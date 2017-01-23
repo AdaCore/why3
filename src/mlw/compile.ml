@@ -111,6 +111,7 @@ module ML = struct
     e_node   : expr_node;
     e_ity    : ity;
     e_effect : effect;
+    (* TODO: add the set of free variables? *)
   }
 
   and expr_node =

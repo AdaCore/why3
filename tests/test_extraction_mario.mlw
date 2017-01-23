@@ -39,6 +39,17 @@ module M
   exception Empty (list int, int)
   exception Out_of_bounds int
 
+  (* exception are unary constructors *)
+(*
+  let raise1 () =
+    raises { Empty -> true }
+    raise (Empty (Nil, 0))
+  let raise2 () =
+    raises { Empty -> true }
+    let p = (Nil, 0) in
+    raise (Empty p)
+*)
+
   let rec length (l: list 'a) : int
     variant  { l }
   = match l with
@@ -56,6 +67,16 @@ module M
   let singleton (x: int) (l: list int) : list int =
     let x = Nil in x
 
+(* FIXME constructors in Why3 can be partially applied
+         => an eta-expansion is needed
+         be careful with side-effects
+         "let c = Cons e in" should be translated to
+         "let c = let o = e in fun x -> Cons (o, x) in ..." in OCaml
+  let constructor1 () =
+    let x = Cons in
+    x 42
+*)
+
   use import int.Int
 
   let test (x: int) : int =
@@ -68,7 +89,7 @@ module M
 
   let add_list_ghost (x: int) (l: list_ghost) : list_ghost =
     match l with
-    | Cons2 _ Nil2 _ | Nil2 -> Cons2 x Nil2 1
+    | Cons2 _ Nil2 _ | Nil2 -> Cons2 x Nil2 (1+2)
     | Cons2 _ _ n -> Cons2 x l (n+1)
     end
 
@@ -87,12 +108,14 @@ module M
     42
 
   let test_call (x: int) : int =
+    (* FIXME let partial = test_filter_ghost_args x in
+    partial 42; *)
     test_filter_ghost_args x 0
 
   let many_args (a b c d e f g h i j k l m: int) : int = 42
 
   let foo (x: int) : int =
-    let _ = 42 in
+    let _ = 42 in (* FIXME? print _ in OCaml *)
     x
 
 end
