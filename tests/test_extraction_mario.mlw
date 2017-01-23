@@ -31,6 +31,9 @@ module M
     ghost mutable v : seq 'a;
   }
 
+  let create_cursor (l: list int) (i i2: int) : cursor int =
+    { collection = l; index = i; index2 = i2; v = empty }
+
   use import ref.Ref
 
   let update (c: cursor int) : int
@@ -117,6 +120,11 @@ module M
   let foo (x: int) : int =
     let _ = 42 in (* FIXME? print _ in OCaml *)
     x
+
+  (* let filter_record (c: cursor 'a) : int = *)
+  (*   match c with *)
+  (*   | { collection = l; index = i; index2 = i2; v = v} -> i *)
+  (*   end *)
 
 end
 

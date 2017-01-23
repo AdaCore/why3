@@ -242,12 +242,12 @@ module Translate = struct
     in
     filter2_ghost_params_cps l (fun x -> x)
 
-  let rec filter_ghost_params_pat = function
-    | MaskVisible -> Format.printf "visible@\n"
-    | MaskGhost   -> Format.printf "ghost@\n"
-    | MaskTuple l ->
-      Format.printf "list@\n";
-      List.iter (filter_ghost_params_pat) l
+  (* let rec filter_ghost_params_pat = function *)
+  (*   | MaskVisible -> Format.printf "visible@\n" *)
+  (*   | MaskGhost   -> Format.printf "ghost@\n" *)
+  (*   | MaskTuple l -> *)
+  (*     Format.printf "list@\n"; *)
+  (*     List.iter (filter_ghost_params_pat) l *)
 
   let rec pat p =
     match p.pat_node with
@@ -367,8 +367,8 @@ module Translate = struct
       ML.mk_expr (ML.Eassign [(rs, pv)]) (ML.I e.e_ity) eff
     | _ -> (* TODO *) assert false
 
-  and ebranch info ({pp_pat = p} as pp, e) =
-    (filter_ghost_params_pat pp.pp_mask; pat p, expr info e)
+  and ebranch info ({pp_pat = p}, e) =
+    (pat p, expr info e)
 
   let its_args ts = ts.its_ts.ts_args
   let itd_name td = td.itd_its.its_ts.ts_name
@@ -449,6 +449,16 @@ module Translate = struct
   (* modules *)
   let module_ info m =
     List.concat (List.map (mdecl info) m.mod_units)
+
+end
+
+(** Erasure operations related to ghost code *)
+
+module Erasure = struct
+
+  open ML
+
+
 
 end
 

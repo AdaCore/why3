@@ -22,6 +22,7 @@ open Ty
 open Theory
 open Pmodule
 open Stdlib
+open Pdecl
 
 module Print = struct
 
@@ -167,6 +168,14 @@ module Print = struct
 
   let pv_name pv = pv.pv_vs.vs_name
 
+  let get_record info rs =
+    match Mid.find_opt rs.rs_name info.info_mo_known_map with
+    | Some {pd_node = PDtype itdl} ->
+      let itd = List.find (fun {itd_constructors=constr} ->
+          List.exists (rs_equal rs) constr) itdl in
+      List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
+    | _ -> []
+
   let rec print_apply info fmt rs pvl =
     let isfield =
       match rs.rs_field with
@@ -190,8 +199,24 @@ module Print = struct
     | _, [t1] when isfield ->
       fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
     | _, tl when isconstructor () ->
-      fprintf fmt "@[<hov 2>%a (%a)@]"
-        print_ident rs.rs_name (print_list comma (print_expr info)) tl
+      let pjl = get_record info rs in
+      if pjl = [] then
+        fprintf fmt "@[<hov 2>%a (%a)@]"
+          print_ident rs.rs_name (print_list comma (print_expr info)) tl
+      else
+        let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
+          match l1, l2 with
+          | x1 :: r1, x2 :: r2 ->
+            printf "x1:%a@\n" print_ident x1.rs_name;
+            print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
+            print_list2 sep sep_m print1 print2 fmt (r1, r2)
+          | _ -> ()
+        in
+        let print_rs info fmt rs =
+          fprintf fmt "%a" (print_lident info) rs.rs_name
+        in
+        fprintf fmt "@[<hov 2>{ %a }@]"
+          (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
          print_ident rs.rs_name (print_list space (print_expr info)) tl
