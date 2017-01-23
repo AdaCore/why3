@@ -9,13 +9,19 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Stdlib
 open Ident
 open Ty
 open Term
 open Decl
+open Ity
+open Expr
 open Pdecl
 
 (* helper functions for algebraic types *)
+
+let ls_of_rs s = match s.rs_logic with
+  RLls ls -> ls | _ -> assert false
 
 let is_projection kn ls = ls.ls_constr = 0 &&
   match Mid.find ls.ls_name kn with
@@ -74,14 +80,80 @@ let ls_valid =
 type cap =
   | P of int            (* point *)
   | C of cap list Mls.t (* algebraic type *)
-  | R of cap list       (* record with unbreakable invariant *)
+  | R of cap Mls.t      (* record with unbreakable invariant *)
 
 type point = {
+  p_leaf   : term;                  (* term we can be reached from *)
+  p_stem   : (term * pattern) list; (* deconstruction from a root *)
   p_fields : (vsymbol * cap) Mls.t; (* temporary fields *)
-  p_root   : term;                  (* term we can be reached from *)
-  p_path   : (pattern * term) list; (* deconstruction from the root *)
-  p_inv    : term list;             (* instantiated invariant *)
 }
+
+type binding =
+  | E of point  (* endpoint *)
+  | L of int    (* link *)
+
+type state = {
+  s_roots  : cap Mvs.t;       (* non-broken roots may be unbound *)
+  s_points : binding Mint.t;  (* non-broken points may be unbound *)
+}
+
+let new_point =
+  let c = ref 0 in
+  fun () -> incr c; !c
+
+(* notes:
+  - do not collapse on Eif and Ecase in k_expr when the type is fragile *)
+
+let add_var kn st v =
+  let rp = ref st.s_points in
+  let rec down stem leaf ty = match ty.ty_node with
+    | Tyvar _ -> P 0
+    | Tyapp (s, tl) ->
+        let s = restore_its s in
+        if not s.its_fragile && (* no need to go any further *)
+           List.for_all (fun f -> f.its_frozen) s.its_arg_flg then P 0 else
+        let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
+        let d = find_its_defn kn s in
+        if s.its_private || (s.its_nonfree && not s.its_fragile) then
+          (* unbreakable invariant *)
+          let add_field m f =
+            let pj = ls_of_rs f in
+            let ty = Ty.ty_inst sbs (Opt.get f.rs_field).pv_vs.vs_ty in
+            match down stem (fs_app pj [leaf] ty) ty with
+            | P 0 -> m | c -> Mls.add pj c m in
+          let pjs = List.fold_left add_field Mls.empty d.itd_fields in
+          if Mls.is_empty pjs then P 0 else R pjs
+        else if s.its_nonfree then
+          (* breakable invariant *)
+          assert false (* TODO *)
+        else
+          (* constructible type *)
+          let add_field m f = Mpv.add (Opt.get f.rs_field) (ls_of_rs f) m in
+          let pjm = List.fold_left add_field Mpv.empty d.itd_fields in
+          let add_constr m c =
+            let cs = ls_of_rs c in
+            let inst f = Ty.ty_inst sbs f.pv_vs.vs_ty in
+            let tyl = List.map inst c.rs_cty.cty_args in
+            let conv_field f ty_f =
+              match Mpv.find_opt f pjm with
+              | Some pj -> down stem (fs_app pj [leaf] ty_f) ty_f
+              | None ->
+                  let pat_arg ({pv_vs = v} as a) ty = if pv_equal a f
+                    then pat_var (create_vsymbol (id_clone v.vs_name) ty)
+                    else pat_wild ty in
+                  let pl = List.map2 pat_arg c.rs_cty.cty_args tyl in
+                  let pat = pat_app cs pl ty in
+                  let v = Svs.choose pat.pat_vars in
+                  down ((leaf, pat)::stem) (t_var v) ty_f in
+            let fdl = List.map2 conv_field c.rs_cty.cty_args tyl in
+            let whole = function P 0 -> true | _ -> false in
+            if List.for_all whole fdl then m else Mls.add cs fdl m in
+          let css = List.fold_left add_constr Mls.empty d.itd_constructors in
+          if Mls.is_empty css then P 0 else C css
+  in
+  match down [] (t_var v) v.vs_ty with
+  | P 0 -> st (* not broken *)
+  | c -> { s_roots = Mvs.add v c st.s_roots; s_points = !rp }
 
 (* Part II - EvalMatch simplification *)
 
