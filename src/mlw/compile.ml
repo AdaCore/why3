@@ -219,9 +219,7 @@ module Translate = struct
   let type_args = (* point-free *)
     List.map (fun x -> x.tv_name)
 
-  let filter_ghost_params l =
-    let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
-    let p e = not e.pv_ghost in
+  let filter_ghost_params p def l =
     let rec filter_ghost_params_cps l k =
       match l with
       | [] -> k []
@@ -241,13 +239,6 @@ module Translate = struct
           (fun fr -> k (if p e then (def e) :: fr else fr))
     in
     filter2_ghost_params_cps l (fun x -> x)
-
-  (* let rec filter_ghost_params_pat = function *)
-  (*   | MaskVisible -> Format.printf "visible@\n" *)
-  (*   | MaskGhost   -> Format.printf "ghost@\n" *)
-  (*   | MaskTuple l -> *)
-  (*     Format.printf "list@\n"; *)
-  (*     List.iter (filter_ghost_params_pat) l *)
 
   let rec pat p =
     match p.pat_node with
@@ -315,7 +306,10 @@ module Translate = struct
       | _ -> false
     in
     match pvl with
-    | pvl when isconstructor () -> filter_ghost_params pvl
+    | pvl when isconstructor () ->
+      let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+      let p e = not e.pv_ghost in
+      filter_ghost_params p def pvl
     | pvl ->
       let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
       let al _ = ML.mk_unit in
@@ -382,24 +376,24 @@ module Translate = struct
           let args = List.filter (fun x -> not x.pv_ghost) rsc.cty_args in
           List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
     in
-    let drecord_fields = (* point-free *)
-      List.map (fun ({rs_cty = rsc} as rs) ->
-          (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
-          rs.rs_name,
-          if rs_ghost rs then ML.tunit else ity rsc.cty_result)
+    let drecord_fields ({rs_cty = rsc} as rs) = (* point-free *)
+      (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
+      rs.rs_name,
+      ity rsc.cty_result
     in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
     begin match s.its_def, itd.itd_constructors, itd.itd_fields with
       | None, [], [] ->
-         ML.mk_its_defn id args is_private None
+        ML.mk_its_defn id args is_private None
       | None, cl, [] ->
-         let cl = ddata_constructs cl in
-         ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
+        let cl = ddata_constructs cl in
+        ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
       | None, _, pjl ->
-         let pjl = drecord_fields pjl in
-         ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
+        let p e = not (rs_ghost e) in
+        let pjl = filter_ghost_params p drecord_fields pjl in
+        ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
       | Some t, _, _ ->
          ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
     end

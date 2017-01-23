@@ -50,6 +50,13 @@ module Print = struct
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
+  let forget_tvs () =
+    forget_all aprinter
+
+  let forget_id vs = forget_id iprinter vs
+  let forget_var (id, _, _) = forget_id id
+  let forget_vars = List.iter forget_var
+
   let print_ident fmt id =
     let s = id_unique iprinter id in
     fprintf fmt "%s" s
@@ -302,6 +309,8 @@ module Print = struct
                print_ident rs.rs_name
                (print_list space print_vs_arg) pvl
                (print_expr info) e;
+       forget_vars pvl;
+       forget_tvs ();
        fprintf fmt "@\n@\n"
     | Dtype dl ->
        print_list newline print_type_decl fmt dl;
