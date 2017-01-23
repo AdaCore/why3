@@ -16,7 +16,7 @@ module MatrixMultiplication
     ensures { result.rows = a.rows /\ result.columns = b.columns }
     ensures { matrix_product result a b }
   = let rs = make (rows a) (columns b) 0 in
-    for i = 0 to rows a - 1 do
+    for i = 0 to a.rows - 1 do
       invariant { forall i0 j0. i <= i0 < rows a /\ 0 <= j0 < columns b ->
         rs.elts[i0][j0] = 0 }
       invariant { forall i0 j0. 0 <= i0 < i /\ 0 <= j0 < columns b ->

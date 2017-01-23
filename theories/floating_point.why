@@ -490,7 +490,7 @@ theory GenFloatSpecFull
     (is_NaN x -> is_NaN r)
     /\ (is_infinite x -> is_infinite r)
     /\ (is_finite x -> is_finite r /\ value r = - value x)
-    /\ (not is_NaN x -> diff_sign r x)
+    /\ (not is_NaN r -> diff_sign r x)
     /\ exact r = - exact x
     /\ model r = - model x
 

@@ -1,0 +1,13 @@
+theory Bug
+    use import map.Map
+
+    type t
+    type p 'a = PTR t
+
+    function load (p 'a) :'a
+
+    goal bug: forall i.
+        let p = ((PTR i):(p (map t t))) in
+        let q = ((PTR i):(p t)) in
+    (load p)[i] = (load q)
+end
