@@ -6,6 +6,7 @@ type reason =
    | VC_Division_Check
    | VC_Index_Check
    | VC_Overflow_Check
+   | VC_FP_Overflow_Check
    | VC_Range_Check
    | VC_Predicate_Check
    | VC_Predicate_Check_On_Default_Value
@@ -74,6 +75,7 @@ let reason_from_string s =
    | "VC_DIVISION_CHECK"            -> VC_Division_Check
    | "VC_INDEX_CHECK"               -> VC_Index_Check
    | "VC_OVERFLOW_CHECK"            -> VC_Overflow_Check
+   | "VC_FP_OVERFLOW_CHECK"         -> VC_FP_Overflow_Check
    | "VC_RANGE_CHECK"               -> VC_Range_Check
    | "VC_PREDICATE_CHECK"           -> VC_Predicate_Check
    | "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE" ->
@@ -120,6 +122,7 @@ let reason_to_ada reason =
    | VC_Division_Check            -> "VC_DIVISION_CHECK"
    | VC_Index_Check               -> "VC_INDEX_CHECK"
    | VC_Overflow_Check            -> "VC_OVERFLOW_CHECK"
+   | VC_FP_Overflow_Check         -> "VC_FP_OVERFLOW_CHECK"
    | VC_Range_Check               -> "VC_RANGE_CHECK"
    | VC_Predicate_Check           -> "VC_PREDICATE_CHECK"
    | VC_Predicate_Check_On_Default_Value ->
@@ -163,6 +166,7 @@ let reason_to_string reason =
    | VC_Division_Check            -> "division_check"
    | VC_Index_Check               -> "index_check"
    | VC_Overflow_Check            -> "overflow_check"
+   | VC_FP_Overflow_Check         -> "fp_overflow_check"
    | VC_Range_Check               -> "range_check"
    | VC_Predicate_Check           -> "predicate_check"
    | VC_Predicate_Check_On_Default_Value -> "predicate_check_on_default_value"
