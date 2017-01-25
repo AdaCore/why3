@@ -234,7 +234,7 @@ module Print = struct
     | Evar pvs ->
        (print_lident info) fmt (pv_name pvs)
     | Elet (pv, e1, e2) ->
-       fprintf fmt "@[<hov 2>let @[%a@] =@ @[%a@]@] in@ %a"
+       fprintf fmt "@[<hov 2>let %a =@ @[%a@]@] in@ %a"
          (print_lident info) (pv_name pv) (print_expr info) e1 (print_expr info) e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
@@ -258,11 +258,29 @@ module Print = struct
     | Eblock [e] ->
       print_expr info fmt e
     | Eblock el ->
-      fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]" (print_list semi (print_expr info)) el
+      fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]"
+        (print_list semi (print_expr info)) el
+    | Efun (varl, e) ->
+      printf "list length:%d@\n" (List.length varl);
+      fprintf fmt "@[<hov 2>(fun %a ->@ %a)@]"
+        (print_list space print_vs_arg) varl (print_expr info) e
+    | Eletrec (is_rec, [rs, [], ef], ein) ->
+      fprintf fmt "@[<hov 2>let %s%a =@ @[%a@]@] in@ %a"
+        (if is_rec then "rec " else "")
+        (print_lident info) rs.rs_name
+        (print_expr info) ef
+        (print_expr info) ein
+    | Eletrec (is_rec, [rs, args, ef], ein) ->
+      fprintf fmt "@[<hov 2>let %s%a %a@ =@ @[%a@]@] in@ %a"
+        (if is_rec then "rec " else "")
+        (print_lident info) rs.rs_name
+        (print_list space print_vs_arg) args
+        (print_expr info) ef
+        (print_expr info) ein
     | _ -> (* TODO *) assert false
 
   and print_branch info fmt (p, e) =
-    fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p (print_expr info) e
+    fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]" print_pat p (print_expr info) e
 
   and print_expr info fmt e =
     print_enode info fmt e.e_node
@@ -304,7 +322,7 @@ module Print = struct
 
   let print_decl info fmt = function
     | Dlet (isrec, [rs, pvl, e]) ->
-       fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
+       fprintf fmt "@[<hov 2>%s %a@ %a =@ @[%a@]@]"
                (if isrec then "let rec" else "let")
                print_ident rs.rs_name
                (print_list space print_vs_arg) pvl

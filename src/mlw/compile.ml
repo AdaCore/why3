@@ -331,8 +331,28 @@ module Translate = struct
       let ml_let = ML.ml_let pvs ML.mk_unit (expr info e2) in
        ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
-       let ml_let = ML.ml_let pvs (expr info e1) (expr info e2) in
-       ML.mk_expr ml_let (ML.I e.e_ity) eff
+      let ml_let = ML.ml_let pvs (expr info e1) (expr info e2) in
+      ML.mk_expr ml_let (ML.I e.e_ity) eff
+    | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
+      let p pv = not pv.pv_ghost in
+      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
+      let al pv = pv_name pv, ML.tunit, false in
+      let args = filter2_ghost_params p def al cty.cty_args in
+      let ef = expr info ef in
+      let ein = expr info ein in
+      let ml_letrec = ML.Eletrec (false, [rs, args, ef], ein) in
+      ML.mk_expr ml_letrec (ML.I e.e_ity) eff
+    | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); _}), ein) ->
+      let p pv = not pv.pv_ghost in
+      let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+      let al _ = ML.mk_unit in
+      let args = filter2_ghost_params p def al pvl in
+      let eapp =
+        ML.mk_expr (ML.Eapp (rs_app, args)) (ML.I ein.e_ity) ein.e_effect in
+      let ein = expr info ein in
+
+      let ml_letrec = ML.Eletrec (false, [rsf, [], eapp], ein) in
+      ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
@@ -340,6 +360,14 @@ module Translate = struct
     | Eexec ({c_node = Capp (rs, pvl)}, _) ->
       let pvl = app info rs pvl in
       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
+    | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
+      Format.printf "Length of args:%d@\n" (List.length cty.cty_args);
+      let p pv = not pv.pv_ghost in
+      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
+      let al pv = pv_name pv, ML.tunit, false in
+      let args = filter2_ghost_params p def al cty.cty_args in
+      ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
+    | Eexec _ -> assert false
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
@@ -359,6 +387,11 @@ module Translate = struct
       expr info eg (* it keeps its ghost status *)
     | Eassign [(_, rs, pv)] ->
       ML.mk_expr (ML.Eassign [(rs, pv)]) (ML.I e.e_ity) eff
+    | Epure _ -> assert false
+    | Efor _ -> assert false
+    | Ewhile _ -> assert false
+    | Etry _ -> assert false
+    | Eraise _ -> assert false
     | _ -> (* TODO *) assert false
 
   and ebranch info ({pp_pat = p}, e) =

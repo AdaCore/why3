@@ -31,8 +31,16 @@ module M
     ghost mutable v : seq 'a;
   }
 
-  let create_cursor (l: list int) (i i2: int) : cursor int =
-    { collection = l; index = i; index2 = i2; v = empty }
+  type r 'a = {
+    aa: 'a;
+    ghost i: int;
+  }
+
+  (* let create_cursor (l: list int) (i i2: int) : cursor int = *)
+  (*   { collection = l; index = i; index2 = i2; v = empty } *)
+
+  let create_r (x: int) (y: int) : r int =
+    { aa = x; i = y }
 
   use import ref.Ref
 
@@ -80,8 +88,6 @@ module M
     x 42
 *)
 
-  use import int.Int
-
   let test (x: int) : int =
     let y =
       let z = x in
@@ -111,8 +117,6 @@ module M
     42
 
   let test_call (x: int) : int =
-    (* FIXME let partial = test_filter_ghost_args x in
-    partial 42; *)
     test_filter_ghost_args x 0
 
   let many_args (a b c d e f g h i j k l m: int) : int = 42
@@ -120,6 +124,19 @@ module M
   let foo (x: int) : int =
     let _ = 42 in (* FIXME? print _ in OCaml *)
     x
+
+  let test_fun (x: int) : int -> int =
+    fun (y: int) -> x + y
+
+  let test_partial (x: int) : int =
+    let partial = test_filter_ghost_args x in
+    partial 42
+
+  let test_local (x: int) : int =
+    let fact (x: int) (y: int): int = x + y
+    in
+    fact x 42
+
 
   (* let filter_record (c: cursor 'a) : int = *)
   (*   match c with *)
