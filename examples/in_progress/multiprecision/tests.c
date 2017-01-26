@@ -59,6 +59,8 @@ int main () {
 	  mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
 
+          if (bp[bn-1] == 0) continue;
+
 #ifdef BENCH
   for (int iter = 0; iter != 10000; ++iter) {
 #endif
@@ -95,8 +97,10 @@ int main () {
 		      (int) an, (int) bn, (int) rn);
 	      printf ("a: "); mpn_dump (ap, an);
 	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("r:   "); mpn_dump (rr, rn);
-	      printf ("ref: "); mpn_dump (refr, rn);
+	      printf ("q:    "); mpn_dump (rq, an-bn+1);
+	      printf ("refq: "); mpn_dump (refq, an-bn+1);
+	      printf ("r:    "); mpn_dump (rr, rn);
+	      printf ("refr: "); mpn_dump (refr, rn);
 	      abort();
 	    }
           rn = an - bn + 1;

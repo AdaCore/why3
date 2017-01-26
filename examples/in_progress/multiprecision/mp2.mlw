@@ -3537,26 +3537,24 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   "case_split" l2i dh > l2i !x1 \/
                    (l2i dh = l2i !x1 /\ l2i dl > l2i (pelts x)[(!xp).offset + 1])
         };
-        let qu, rh, rl =
+        let qu, rl, rh =
             div3by2_inv !x1 (C.get_ofs !xp one) (C.get !xp) dh dl v in
         ql := qu;
         x1 := rh;
         x0 := rl;
         label SubProd in
-        (* TODO use sy-2 and use the existing x0 and x1 for the last two steps*)
         let cy = submul_limb (C.incr !xp mdn) y !ql (Int32.(-) sy two) in
         let cy1 = if (Limb.(<) !x0 cy) then uone else limb_zero in
         x0 := sub_mod !x0 cy;
         let cy2 = if (Limb.(<) !x1 cy1) then uone else limb_zero in
         x1 := sub_mod !x1 cy1;
-        (* TODO update x1 here *)
         assert { 0 <= l2i cy2 <= 1 };
         (* assert { cy = 1 -> rh = 0 }; (* and "cy0" > rl *)*)
         C.set !xp !x0;
         if Limb.ne cy2 limb_zero (*unlikely*)
         then begin
           (* TODO should be a simple add in place *)
-          let c = addmul_limb (C.incr !xp mdn) y uone sy in
+          let c = addmul_limb (C.incr !xp mdn) y uone (Int32.(-) sy one) in
           assert { 0 <= l2i c <= 1 };
           x1 := Limb.(+) !x1 (Limb.(+) dh c);
           ql := Limb.(-) !ql uone;
@@ -3593,9 +3591,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let clz = count_leading_zeros (C.get_ofs y (Int32.(-) sy one)) in
       if Int32.(=) clz zero
       then begin
-        let nx = malloc (UInt32.of_int32 sx) in
+        let nx = malloc (UInt32.of_int32 (Int32.(+) sx one)) in
         let _ = add_limb nx x limb_zero sx in (*TODO actual copy*)
-        let _ = div_sb_qr q nx y sx sy in
+        C.set_ofs nx sx limb_zero;
+        let _ = div_sb_qr q nx y (Int32.(+) sx one) sy in
         let _ = add_limb r nx limb_zero sy in
         free nx;
       end
