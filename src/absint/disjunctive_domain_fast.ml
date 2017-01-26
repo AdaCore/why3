@@ -56,10 +56,10 @@ module Make(A:DOMAIN) = struct
     |> List.fold_left ( && ) true
   
   let a_meet_lincons_array man a l =
-    try
+    (*try
       Hashdoml.find (snd man).meet_lincons (a, l, fst man)
     with
-    | Not_found ->
+    | Not_found ->*)
       let c = A.meet_lincons_array (fst man) a l in
       (* Hashdoml.add (snd man).meet_lincons (a, l, fst man) c; *)
       c
@@ -68,10 +68,10 @@ module Make(A:DOMAIN) = struct
     A.is_leq (fst man) a b
   
   let a_join man a b =
-    try
+    (*try
       Hashdom.find (snd man).real_join_tbl (a, b, fst man)
     with
-    | Not_found ->
+    | Not_found ->*)
       let c = A.join (fst man) a b in
       (* Hashdom.add (snd man).real_join_tbl (a, b, fst man) c; *)
       c
@@ -111,6 +111,7 @@ module Make(A:DOMAIN) = struct
         int_of_s (Float (Mpfr.to_float t))
 
   let round_integers_a (man, _) env a =
+    
     let open Apron in
     let l = A.to_lincons_array man a in
     let n = Apron.Lincons1.array_length l in
@@ -167,10 +168,10 @@ module Make(A:DOMAIN) = struct
     | t::q -> { t = [List.fold_left (a_join man) t q]; c = true; i; }
 
   let join_is_precise man a b c =
-    try
+    (*try
       Hashdom.find (snd man).join_tbl (a, b, (fst man))
     with
-    | Not_found ->
+    | Not_found ->*)
       let man' = man in
     let man = fst man in
     let open Apron in
