@@ -61,7 +61,7 @@ module Make_from_apron(M:sig
   let is_bottom = A.is_bottom
   let is_leq = A.is_leq
   let join = A.join
-  let join_list m t = A.join_array m (Array.of_list t)
+  let join_list m t = List.fold_left (fun l a -> A.join m l a) (List.hd t) (List.tl t)
   let widening = A.widening
   let print = A.print
   let meet_lincons_array = A.meet_lincons_array
@@ -239,12 +239,21 @@ module Make_from_apron(M:sig
 
 end
 
+
 module Polyhedra = Make_from_apron(struct
   type man = Polka.strict Polka.t Manager.t
   type env = Environment.t
   type t = Polka.strict Polka.t Abstract1.t
   let create_manager = Polka.manager_alloc_strict
   end)
+
+(*
+module Polyhedra = Make_from_apron(struct
+  type man = Elina.t Manager.t
+  type env = Environment.t
+  type t = Elina.t Abstract1.t
+  let create_manager = Elina.manager_alloc
+  end)*)
 
 module Box = Make_from_apron(struct
   type man = Box.t Manager.t
