@@ -59,7 +59,11 @@ int main () {
 	  mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
 
-          if (bp[bn-1] == 0) continue;
+          if (bp[bn-1] == 0) 
+            {
+              printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn); 
+              continue;
+            };
 
 #ifdef BENCH
   for (int iter = 0; iter != 10000; ++iter) {
