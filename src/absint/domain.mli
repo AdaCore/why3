@@ -15,6 +15,7 @@ module type ABSTRACT_DOMAIN = sig
   val widening: man -> t -> t -> t
   val print: Format.formatter -> t -> unit
   val push_label: man -> env -> int -> t -> t
+  val is_join_precise: man -> t -> t -> t option
 end
 
 module type DOMAIN = sig
@@ -38,7 +39,7 @@ module type TERM_DOMAIN = sig
   val add_variable_to_env: man -> Ity.pvsymbol -> unit
   val add_lvariable_to_env: man -> Term.vsymbol -> unit
   val to_term: man -> t -> Term.term
-  val update_possible_substitutions: man -> unit
+  val make_consistent: man -> t -> t -> t * t
 end
 
 module Polyhedra: DOMAIN

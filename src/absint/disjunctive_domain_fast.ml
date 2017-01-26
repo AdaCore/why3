@@ -299,6 +299,8 @@ module Make(A:DOMAIN) = struct
     | t::q ->
       List.fold_left (join man) t q
   
+  let is_join_precise man a b = Some (join man a b)
+  
 
   (* used once by loop, so it can be costly *)
   let widening man a b =

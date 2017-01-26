@@ -1,7 +1,20 @@
 open Domain
 
-module Make(A:DOMAIN) = struct
-  type t = A.t list
+module Make(S:sig
+    module A:TERM_DOMAIN
+    val env: Env.env
+    val pmod: Pmodule.pmodule
+  end) = struct
+  module A = S.A
+  module D = A
+  
+  open Ai_logic
+  module Ai_logic = Ai_logic.Make(struct
+      let env = S.env
+      let pmod = S.pmod
+    end)
+  open Ai_logic
+  
   type man = A.man
   type env = A.env
 
@@ -102,8 +115,6 @@ module Make(A:DOMAIN) = struct
     !c*)
     cleanup_hard man c
 
-  let is_join_precise man a b = Some (join man a b)
-
 
 
 
@@ -140,34 +151,35 @@ module Make(A:DOMAIN) = struct
     List.map (fun (k, v) ->
         A.widening man v k) b_leq |> cleanup man
 
-  let meet_lincons_array man t e  = List.map (fun t -> A.meet_lincons_array man t e) t
-
-  let forget_array man t a b =
-    List.map (fun t -> A.forget_array man t a b) t
-
-  let assign_linexpr man t v l t_ =
-    (* FIXME: what if t_ <> None? *)
-    assert (t_ = None);
-    List.map (fun t -> A.assign_linexpr man t v l None) t
-
-  let to_term env pmod man t var_mapping =
-    let t = cleanup_hard man t in
-    let f = A.to_term env pmod in
-    let t = List.map (fun t -> f man t var_mapping) t
+  let to_term man t =
+    let t = List.map (fun t -> A.to_term man t) t
     |> Term.t_or_simp_l in
     t
 
   let push_label man env i t = List.map (A.push_label man env i) t
+  
+  let rec meet_term man term elt =
+    let open Term in
+    match term.t_node with
+    | Tbinop(Tor, a, b) ->
+      join man (meet_term man a elt) (meet_term man b elt)
+    | Tbinop(Tand, a, b) ->
+      meet_term man a elt |> meet_term man b
+    | Tbinop(_) -> assert false
+    | _ -> List.map (A.meet_term man term) elt
 
-  let to_lincons_array man t =
-    match join_one man t with
-    | None -> assert false
-    | Some t -> A.to_lincons_array man t
+  let forget_var man vs t =
+    List.map (A.forget_var man vs) t
+  
+  let forget_term man vs t =
+    List.map (A.forget_term man vs) t
+  
+  let forget_region man reg m t =
+    List.map (A.forget_region man reg m) t
 
-  let get_linexpr man t v =
-    match join_one man t with
-    | None -> None
-    | Some s ->
-      A.get_linexpr man s v
-
+  let add_variable_to_env = A.add_variable_to_env
+  let add_lvariable_to_env = A.add_lvariable_to_env
+  let is_join_precise man a b =
+    Some (join man a b)
+  let make_consistent man a b = failwith "not implemented"
 end

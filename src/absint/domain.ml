@@ -15,6 +15,7 @@ module type ABSTRACT_DOMAIN = sig
   val widening: man -> t -> t -> t
   val print: Format.formatter -> t -> unit
   val push_label: man -> env -> int -> t -> t
+  val is_join_precise: man -> t -> t -> t option
 end
 
 module type DOMAIN = sig
@@ -38,7 +39,7 @@ module type TERM_DOMAIN = sig
   val add_variable_to_env: man -> Ity.pvsymbol -> unit
   val add_lvariable_to_env: man -> Term.vsymbol -> unit
   val to_term: man -> t -> Term.term
-  val update_possible_substitutions: man -> unit
+  val make_consistent: man -> t -> t -> t * t
 end
 
 module Make_from_apron(M:sig
@@ -236,6 +237,125 @@ module Make_from_apron(M:sig
         end
     done;
     !vars
+  
+  let rec int_of_s s =
+      let open Apron.Scalar in
+      match s with
+      | Float f -> 
+        let i = int_of_float f in
+        assert (float_of_int i = f);
+        i
+      | Mpqf t ->
+        int_of_s (Float (Mpqf.to_float t))
+      | Mpfrf t ->
+        int_of_s (Float (Mpfr.to_float t))
+
+  
+  let round_integers man env a =
+    let open Apron in
+    let l = A.to_lincons_array man a in
+    let n = Apron.Lincons1.array_length l in
+    let a = ref a in
+    for i = 0 to n -1 do
+      let l = Lincons1.array_get l i in
+      let n = ref 0 in
+      if not (Coeff.equal_int (Lincons1.get_cst l) 0) then
+        begin
+          let i = Lincons1.get_cst l |> function
+            | Coeff.Scalar(s) ->
+              int_of_s s
+            | _ -> assert false
+          in
+          let l' = Lincons1.copy l in
+          Lincons1.iter (fun c v ->
+              if not (Coeff.equal_int c 0) then
+                begin
+
+                  let myi = match c with
+                    | Coeff.Scalar(s) ->
+                      let s = Scalar.to_string s in
+                      int_of_string s
+                    | _ -> assert false
+                  in
+                  Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
+                  let c = 
+                    if i mod myi = 0 then
+                      i/(abs myi)
+                    else if i > 0 then i/(abs myi)
+                    else i/(abs myi) - 1
+                  in
+
+                  Lincons1.set_cst l' (Coeff.s_of_int c);
+                  incr n;
+                end
+            ) l;
+          if !n = 1 then
+            begin
+              let ar = Lincons1.array_make env 1 in
+              Lincons1.array_set ar 0 l';
+              a := A.meet_lincons_array man !a ar
+            end
+        end
+    done;
+    !a
+
+  let is_join_precise man a b =
+    let c = A.join man a b in
+    let open Apron in
+    let linexpr_a = A.to_lincons_array man a in
+    let linexpr_b = A.to_lincons_array man b in
+    let a, b, linexpr_a, linexpr_b =
+      if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
+        b, a, linexpr_b, linexpr_a
+      else
+        a, b, linexpr_a, linexpr_b
+    in
+    let precise = ref true in
+    for i = 0 to Lincons1.array_length linexpr_a - 1 do
+      let line = Lincons1.array_get linexpr_a i in
+      (* FIXME: sat lincons *)
+      let opp_typ =
+        let typ = Lincons1.get_typ line in
+        if typ = Lincons1.EQ then
+          [Lincons1.SUP, 1; Lincons1.SUP, -1]
+        else if typ = Lincons1.SUP then
+          [Lincons1.SUPEQ, -1]
+        else if typ = Lincons1.SUPEQ then
+          [Lincons1.SUP, -1]
+        else assert false
+      in
+      precise := !precise && begin
+          List.fold_left (fun p (ty, new_coeff) ->
+              p &&
+              let cp = Lincons1.copy line in
+              let cst = Lincons1.get_cst cp in
+              let cst =
+                if new_coeff = -1 then
+                  Coeff.neg cst
+                else if new_coeff = 1 then
+                  cst
+                else
+                  assert false in
+              Lincons1.set_cst cp cst;
+              Lincons1.set_typ cp ty;
+              Lincons1.iter (fun coeff var ->
+                  let coeff =
+                    if new_coeff = -1 then
+                      Coeff.neg coeff
+                    else if new_coeff = 1 then
+                      coeff
+                    else
+                      assert false in
+                  Lincons1.set_coeff cp var coeff) line;
+              let a = Lincons1.array_make (Lincons1.get_env cp) 1 in
+              Lincons1.array_set a 0 cp;
+              let new_c = meet_lincons_array man c a in
+              let new_c = round_integers man (Lincons1.get_env cp) new_c in
+              is_leq man new_c b) true opp_typ
+        end;
+    done;
+    if !precise then Some c
+    else None
 
 end
 

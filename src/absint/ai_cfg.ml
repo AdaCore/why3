@@ -662,7 +662,6 @@ module Make(E: sig
   
   let eval_fixpoints cfg manpk =
     begin
-      D.update_possible_substitutions manpk;
       let manager = get_fixpoint_man cfg manpk in
       let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
       let sinit = PSette.singleton compare_no_closured 0 in
