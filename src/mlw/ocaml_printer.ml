@@ -198,9 +198,9 @@ module Print = struct
       | _ -> false
     in
     match extract_op rs.rs_name, pvl with
-    | Some o, [t1; t2] ->
-       fprintf fmt "@[<hov 1>%a %s %a@]"
-         (print_expr info) t1 o (print_expr info) t2
+    | Some o, [e1; e2] ->
+      fprintf fmt "@[<hov 1>%a %s %a@]"
+        (print_expr info) e1 o (print_expr info) e2
     | _, [] ->
        print_ident fmt rs.rs_name
     | _, [t1] when isfield ->
@@ -214,7 +214,6 @@ module Print = struct
         let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
           match l1, l2 with
           | x1 :: r1, x2 :: r2 ->
-            printf "x1:%a@\n" print_ident x1.rs_name;
             print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
             print_list2 sep sep_m print1 print2 fmt (r1, r2)
           | _ -> ()
@@ -222,7 +221,7 @@ module Print = struct
         let print_rs info fmt rs =
           fprintf fmt "%a" (print_lident info) rs.rs_name
         in
-        fprintf fmt "@[<hov 2>{ %a }@]"
+        fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, tl ->
        fprintf fmt "@[<hov 2>%a %a@]"
@@ -234,21 +233,26 @@ module Print = struct
     | Evar pvs ->
        (print_lident info) fmt (pv_name pvs)
     | Elet (pv, e1, e2) ->
-       fprintf fmt "@[<hov 2>let %a =@ @[%a@]@] in@ %a"
-         (print_lident info) (pv_name pv) (print_expr info) e1 (print_expr info) e2
+       fprintf fmt "@[<hov 2>let %a =@ %a@] in@\n%a"
+         (print_lident info) (pv_name pv)
+         (print_expr info) e1 (print_expr info) e2
     | Eabsurd ->
        fprintf fmt "assert false (* absurd *)"
     | Eapp (s, []) when rs_equal s rs_true ->
        fprintf fmt "true"
     | Eapp (s, []) when rs_equal s rs_false ->
-       fprintf fmt "false"
+      fprintf fmt "false"
+    | Eapp (s, [e1; e2]) when rs_equal s rs_func_app ->
+      fprintf fmt "@[<hov 1>%a %a@]"
+        (print_expr info) e1 (print_expr info) e2
     | Eapp (s, pvl) ->
        print_apply info fmt s pvl
     | Ematch (e, pl) ->
       fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign [(rs, pv)] ->
-      fprintf fmt "%a <-@ %a" print_ident rs.rs_name print_ident (pv_name pv)
+      fprintf fmt "%a <-@ %a"
+        print_ident rs.rs_name print_ident (pv_name pv)
     | Eif (e1, e2, e3) ->
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]"
@@ -261,7 +265,6 @@ module Print = struct
       fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]"
         (print_list semi (print_expr info)) el
     | Efun (varl, e) ->
-      printf "list length:%d@\n" (List.length varl);
       fprintf fmt "@[<hov 2>(fun %a ->@ %a)@]"
         (print_list space print_vs_arg) varl (print_expr info) e
     | Eletrec (is_rec, [rs, [], ef], ein) ->

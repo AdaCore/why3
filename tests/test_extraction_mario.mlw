@@ -83,10 +83,16 @@ module M
          be careful with side-effects
          "let c = Cons e in" should be translated to
          "let c = let o = e in fun x -> Cons (o, x) in ..." in OCaml
+
+   Mário: I think A-normal form takes care of the side-effects problem
+*)
   let constructor1 () =
     let x = Cons in
     x 42
-*)
+
+  let foofoo (x: int) : int =
+    let ghost y = x + 1 in
+    x
 
   let test (x: int) : int =
     let y =
@@ -133,10 +139,25 @@ module M
     partial 42
 
   let test_local (x: int) : int =
-    let fact (x: int) (y: int): int = x + y
-    in
+    let fact (x: int) (y: int): int = x + y in
     fact x 42
 
+  let test_lets (x: int) : int =
+    let y = x in
+    let z = y + 1 in
+    let yxz = y * x * z in
+    let xzy = x + z + y in
+    let res = yxz - xzy in
+    res
+
+  let test_partial2 (x: int) : int =
+    let sum : int -> int -> int = fun x y -> x + y in
+    let incr_a (a: int) = sum a in
+    incr_a x x
+
+  let constr_partial (x: int) : list int =
+    let x = Cons 42 in
+    x Nil
 
   (* let filter_record (c: cursor 'a) : int = *)
   (*   match c with *)
