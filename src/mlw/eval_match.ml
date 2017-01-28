@@ -101,7 +101,7 @@ let new_point =
   let c = ref 0 in
   fun () -> incr c; !c
 
-(* notes:
+(* TODO:
   - do not collapse on Eif and Ecase in k_expr when the type is fragile
 *)
 
@@ -109,7 +109,7 @@ let add_var kn st v =
   let rp = ref st.s_points in
   let rec down stem leaf ty = match ty.ty_node with
     | Tyvar _ -> P 0
-    | Tyapp (s, tl) ->
+    | Tyapp (s,tl) ->
         let s = restore_its s in
         if not s.its_fragile && (* no need to go any further *)
            List.for_all (fun f -> f.its_frozen) s.its_arg_flg &&
@@ -117,7 +117,21 @@ let add_var kn st v =
         let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
         let d = find_its_defn kn s in
         if s.its_nonfree then if s.its_fragile then (* breakable record *)
-          assert false (* TODO *)
+          let rec name t = match t.t_node with
+            | Tapp (pj,[t]) -> name t ^ "_" ^ pj.ls_name.id_string
+            | Tvar v -> v.vs_name.id_string
+            | _ -> assert false (* never *) in
+          let bn = name leaf in
+          let add_field m f =
+            let ty = Ty.ty_inst sbs (Opt.get f.rs_field).pv_vs.vs_ty in
+            let nm = bn ^ "_" ^ f.rs_name.id_string in
+            let v = create_vsymbol (id_fresh nm) ty in
+            Mls.add (ls_of_rs f) (v, down [] (t_var v) ty) m in
+          let pjs = List.fold_left add_field Mls.empty d.itd_fields in
+          let bd = E {p_leaf = leaf; p_stem = stem; p_fields = pjs} in
+          let np = new_point () in
+          rp := Mint.add np bd !rp;
+          P np
         else (* unbreakable record *)
           let add_field m f =
             let pj = ls_of_rs f in
