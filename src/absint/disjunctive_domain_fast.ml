@@ -2,11 +2,6 @@ open Domain
 
 type 'a a = { t: 'a list; c: bool; i: int; }
 
-module type D = sig
-  include DOMAIN
-  val round_integers: man -> env -> t -> t
-end
-
 module Make(A:DOMAIN) = struct
 
   type t = A.t a
@@ -97,150 +92,16 @@ module Make(A:DOMAIN) = struct
       { t = List.filter (fun t -> not (A.is_bottom man t)) a.t; c = true; i = a.i; }
 
   let threshold = 25
-    
-  let rec int_of_s s =
-      let open Apron.Scalar in
-      match s with
-      | Float f -> 
-        let i = int_of_float f in
-        assert (float_of_int i = f);
-        i
-      | Mpqf t ->
-        int_of_s (Float (Mpqf.to_float t))
-      | Mpfrf t ->
-        int_of_s (Float (Mpfr.to_float t))
-
-  let round_integers_a (man, _) env a =
-    
-    let open Apron in
-    let l = A.to_lincons_array man a in
-    let n = Apron.Lincons1.array_length l in
-    let a = ref a in
-    for i = 0 to n -1 do
-      let l = Lincons1.array_get l i in
-      let n = ref 0 in
-      if not (Coeff.equal_int (Lincons1.get_cst l) 0) then
-        begin
-          let i = Lincons1.get_cst l |> function
-            | Coeff.Scalar(s) ->
-              int_of_s s
-            | _ -> assert false
-          in
-          let l' = Lincons1.copy l in
-          Lincons1.iter (fun c v ->
-              if not (Coeff.equal_int c 0) then
-                begin
-
-                  let myi = match c with
-                    | Coeff.Scalar(s) ->
-                      let s = Scalar.to_string s in
-                      int_of_string s
-                    | _ -> assert false
-                  in
-                  Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
-                  let c = 
-                    if i mod myi = 0 then
-                      i/(abs myi)
-                    else if i > 0 then i/(abs myi)
-                    else i/(abs myi) - 1
-                  in
-
-                  Lincons1.set_cst l' (Coeff.s_of_int c);
-                  incr n;
-                end
-            ) l;
-          if !n = 1 then
-            begin
-              let ar = Lincons1.array_make env 1 in
-              Lincons1.array_set ar 0 l';
-              a := A.meet_lincons_array man !a ar
-            end
-        end
-    done;
-    !a
-
-  let round_integers m e a = { a with t = List.map (round_integers_a m e) a.t }
-
 
   let join_one man { t; i; _ } =
     match t with
     | [] -> bottom () ()
     | t::q -> { t = [List.fold_left (a_join man) t q]; c = true; i; }
 
-  let join_is_precise man a b c =
-    (*try
-      Hashdom.find (snd man).join_tbl (a, b, (fst man))
-    with
-    | Not_found ->*)
-      let man' = man in
-    let man = fst man in
-    let open Apron in
-    let linexpr_a = A.to_lincons_array man a in
-    let linexpr_b = A.to_lincons_array man b in
-    let a, b, linexpr_a, linexpr_b =
-      if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
-        b, a, linexpr_b, linexpr_a
-      else
-        a, b, linexpr_a, linexpr_b
-    in
-    let precise = ref true in
-    for i = 0 to Lincons1.array_length linexpr_a - 1 do
-      let line = Lincons1.array_get linexpr_a i in
-      (* FIXME: sat lincons *)
-      let opp_typ =
-        let typ = Lincons1.get_typ line in
-        if typ = Lincons1.EQ then
-          [Lincons1.SUP, 1; Lincons1.SUP, -1]
-        else if typ = Lincons1.SUP then
-          [Lincons1.SUPEQ, -1]
-        else if typ = Lincons1.SUPEQ then
-          [Lincons1.SUP, -1]
-        else assert false
-      in
-      precise := !precise && begin
-          List.fold_left (fun p (ty, new_coeff) ->
-              p &&
-              let cp = Lincons1.copy line in
-              let cst = Lincons1.get_cst cp in
-              let cst =
-                if new_coeff = -1 then
-                  Coeff.neg cst
-                else if new_coeff = 1 then
-                  cst
-                else
-                  assert false in
-              Lincons1.set_cst cp cst;
-              Lincons1.set_typ cp ty;
-              Lincons1.iter (fun coeff var ->
-                  let coeff =
-                    if new_coeff = -1 then
-                      Coeff.neg coeff
-                    else if new_coeff = 1 then
-                      coeff
-                    else
-                      assert false in
-                  Lincons1.set_coeff cp var coeff) line;
-              let a = Lincons1.array_make (Lincons1.get_env cp) 1 in
-              Lincons1.array_set a 0 cp;
-              let new_c = a_meet_lincons_array man' c a in
-              let new_c = round_integers_a (man, man') (Lincons1.get_env cp) new_c in
-              a_is_leq man' new_c b) true opp_typ
-        end;
-    done;
-      (*Hashdom.add (snd man').join_tbl (a, b, man) !precise; *)
-    !precise
-
-
   let join_precise man a b =
     { t = List.fold_left (fun a t ->
         let find_precise_join e =
-          let c = a_join man t e in
-          if join_is_precise man t e c then
-            begin
-            Some c
-            end
-          else
-            None
+          A.is_join_precise (fst man) t e
         in
         let a, found = List.fold_left (fun (a, found) e ->
             match find_precise_join e with
