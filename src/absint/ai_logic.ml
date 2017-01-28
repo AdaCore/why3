@@ -134,6 +134,14 @@ module Make(S: sig
       t_app lt_int args None
     | Tapp(l, args) when ls_equal l ps_equ && way && Ty.ty_equal (t_type (List.hd args)) Ty.ty_int ->
       t_or (t_app lt_int args None) (t_app gt_int args None)
+    | Tapp(l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
+      t_app ps_equ [b;t_bool_false] None
+    | Tapp(l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
+      t_app ps_equ [b;t_bool_false] None
+    | Tapp(l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+      t_app ps_equ [b;t_bool_true] None
+    | Tapp(l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+      t_app ps_equ [b;t_bool_true] None
     | _ ->
       if way then
         t_not t
