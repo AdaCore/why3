@@ -83,8 +83,6 @@ module Make(S:sig
   let npool = 10
 
   let create_manager () =
-    let ident_ret = Ident.{pre_name = "w"; pre_label = Ident.Slab.empty; pre_loc = None; } in
-    let v  = Term.create_vsymbol ident_ret Ty.ty_int in
     let apron_mapping = Term.Mterm.empty in
     let var_pool = build_var_pool npool in
     A.create_manager (), { variable_mapping = Hashtbl.create 512;
@@ -1077,7 +1075,12 @@ module Make(S:sig
     let a = A.widening man a c in
     a, e
 
-  let is_join_precise man a b = None
+  let is_join_precise (man, uf_man) (a, b) (c, d) = 
+    let c, b = join_uf (man, uf_man) b d c in
+    match A.is_join_precise man a c with
+    | None -> None
+    | Some d ->
+      Some (d, b)
 
   let make_consistent _ a b = a, b
 

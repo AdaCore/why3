@@ -34,8 +34,12 @@ module Make(E: sig
   open Term
 
   module D = Quant_domain.Make(struct
-      module A = Uf_domain.Make(struct
-          module A = E.D
+      module A = Disjunctive_term_domain.Make(struct
+          module A = Uf_domain.Make(struct
+              module A = E.D
+              let pmod = E.pmod
+              let env = E.env
+            end)
           let pmod = E.pmod
           let env = E.env
         end)

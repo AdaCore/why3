@@ -27,7 +27,7 @@ module Array
     requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { (*a.elts = (old a.elts)[i <- v] /\*)
 	(forall k: int. ((0 <= k < a.length ->  (k <> i /\ get a.elts k = get (old a).elts k \/ (k = i /\ get a.elts k = v)))))
-	/\ get a.elts i = v
+	(*/\ get a.elts i = v*)
 	/\ length a = (old (length a))}
 
   (** unsafe get/set operations with no precondition *)

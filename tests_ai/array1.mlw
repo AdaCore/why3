@@ -42,7 +42,7 @@ module Test
 		incr k;
 		done; a
 	
-	let init4(x:int): array int
+	(*let init4(x:int): array int
 	requires { x >= 0 }
 	ensures { forall i: int. 0 <= i < x -> result[i] = i * i }
 	=
@@ -52,7 +52,7 @@ module Test
 		variant { x - !k }
 		a[!k] <- !k * !k;
 		incr k;
-		done; a
+		done; a*)
 	
 	
 	let init5 (x:int) (y:int) (d:int) (b:int) (c:int) : array int
@@ -88,5 +88,4 @@ module Test
 			a[!k] <- 0;
 		incr k;
 		done; a
-	
 end
