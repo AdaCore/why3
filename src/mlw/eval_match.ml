@@ -102,7 +102,8 @@ let new_point =
   fun () -> incr c; !c
 
 (* notes:
-  - do not collapse on Eif and Ecase in k_expr when the type is fragile *)
+  - do not collapse on Eif and Ecase in k_expr when the type is fragile
+*)
 
 let add_var kn st v =
   let rp = ref st.s_points in
@@ -111,11 +112,13 @@ let add_var kn st v =
     | Tyapp (s, tl) ->
         let s = restore_its s in
         if not s.its_fragile && (* no need to go any further *)
-           List.for_all (fun f -> f.its_frozen) s.its_arg_flg then P 0 else
+           List.for_all (fun f -> f.its_frozen) s.its_arg_flg &&
+           List.for_all (fun f -> f.its_frozen) s.its_reg_flg then P 0 else
         let sbs = List.fold_right2 Mtv.add s.its_ts.ts_args tl Mtv.empty in
         let d = find_its_defn kn s in
-        if s.its_private || (s.its_nonfree && not s.its_fragile) then
-          (* unbreakable invariant *)
+        if s.its_nonfree then if s.its_fragile then (* breakable record *)
+          assert false (* TODO *)
+        else (* unbreakable record *)
           let add_field m f =
             let pj = ls_of_rs f in
             let ty = Ty.ty_inst sbs (Opt.get f.rs_field).pv_vs.vs_ty in
@@ -123,11 +126,7 @@ let add_var kn st v =
             | P 0 -> m | c -> Mls.add pj c m in
           let pjs = List.fold_left add_field Mls.empty d.itd_fields in
           if Mls.is_empty pjs then P 0 else R pjs
-        else if s.its_nonfree then
-          (* breakable invariant *)
-          assert false (* TODO *)
-        else
-          (* constructible type *)
+        else (* constructible type *)
           let add_field m f = Mpv.add (Opt.get f.rs_field) (ls_of_rs f) m in
           let pjm = List.fold_left add_field Mpv.empty d.itd_fields in
           let add_constr m c =
@@ -145,11 +144,10 @@ let add_var kn st v =
                   let pat = pat_app cs pl ty in
                   let v = Svs.choose pat.pat_vars in
                   down ((leaf, pat)::stem) (t_var v) ty_f in
-            let fdl = List.map2 conv_field c.rs_cty.cty_args tyl in
-            let whole = function P 0 -> true | _ -> false in
-            if List.for_all whole fdl then m else Mls.add cs fdl m in
+            Mls.add cs (List.map2 conv_field c.rs_cty.cty_args tyl) m in
           let css = List.fold_left add_constr Mls.empty d.itd_constructors in
-          if Mls.is_empty css then P 0 else C css
+          let chk _ l = List.for_all (function P 0 -> true | _ -> false) l in
+          if Mls.for_all chk css then P 0 else C css
   in
   match down [] (t_var v) v.vs_ty with
   | P 0 -> st (* not broken *)
