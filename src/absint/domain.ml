@@ -360,20 +360,20 @@ module Make_from_apron(M:sig
 end
 
 
-module Polyhedra = Make_from_apron(struct
+(*module Polyhedra = Make_from_apron(struct
   type man = Polka.strict Polka.t Manager.t
   type env = Environment.t
   type t = Polka.strict Polka.t Abstract1.t
   let create_manager = Polka.manager_alloc_strict
-  end)
+  end)*)
 
-(*
+
 module Polyhedra = Make_from_apron(struct
   type man = Elina.t Manager.t
   type env = Environment.t
   type t = Elina.t Abstract1.t
   let create_manager = Elina.manager_alloc
-  end)*)
+  end)
 
 module Box = Make_from_apron(struct
   type man = Box.t Manager.t

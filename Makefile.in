@@ -122,7 +122,7 @@ EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
 
 ifeq (@enable_infer@,yes)
-EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ bigarray
+EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ elina bigarray
 endif
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
@@ -209,7 +209,7 @@ LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
 ifeq (@enable_infer@,yes)
-LIB_ABSINT = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find uf_domain ai_cfg infer_ai
+LIB_ABSINT = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg infer_ai
 endif
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
@@ -258,6 +258,15 @@ else
 src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
+
+ifeq (@ELINA@,yes)
+src/absint/elina.ml: config.status src/session/compress_z.ml
+	cp src/session/compress_z.ml $@
+else
+src/session/compress.ml: config.status src/session/compress_none.ml
+	cp src/session/compress_none.ml $@
+endif
+
 
 # hide deprecated warnings for strings
 

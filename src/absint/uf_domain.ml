@@ -58,9 +58,6 @@ module Make(S:sig
 
     (* UF_QF *)
     mutable class_to_term: TermToClass.t;
-
-    apron_var: Var.t;
-    quant_var: Term.term;
   }
 
   type uf_t = {
@@ -88,20 +85,16 @@ module Make(S:sig
   let create_manager () =
     let ident_ret = Ident.{pre_name = "w"; pre_label = Ident.Slab.empty; pre_loc = None; } in
     let v  = Term.create_vsymbol ident_ret Ty.ty_int in
-    let apron_var = Var.of_string "$quant" in
-    let quant_var = t_var v in
-    let apron_mapping = Term.Mterm.add quant_var apron_var Term.Mterm.empty in
+    let apron_mapping = Term.Mterm.empty in
     let var_pool = build_var_pool npool in
     A.create_manager (), { variable_mapping = Hashtbl.create 512;
                            apron_mapping;
                            region_mapping = Ity.Mreg.empty;
                            region_var = Ity.Mreg.empty;
-                           env = Environment.make (Array.of_list (apron_var :: (VarPool.to_list var_pool) @ tmp_pool)) [||];
+                           env = Environment.make (Array.of_list ((VarPool.to_list var_pool) @ tmp_pool)) [||];
                            defined_terms = Mterm.empty;
 
                            class_to_term = TermToClass.empty;
-                           apron_var;
-                           quant_var; 
                          }
 
   let empty_uf_domain = {
@@ -529,22 +522,19 @@ module Make(S:sig
 
   let rec extract_term (man, uf_man) is_in (dom, b) v =
     let find_var = fun a ->
-      if a = uf_man.apron_var then
-        uf_man.quant_var
-      else
+      try
+        let candidate = Hashtbl.find uf_man.variable_mapping a in
+        if is_in candidate then
+          raise Not_found
+        else
+          candidate
+      with 
+      | Not_found ->
         try
-          let candidate = Hashtbl.find uf_man.variable_mapping a in
-          if is_in candidate then
-            raise Not_found
-          else
-            candidate
-        with 
+          TermToVar.to_term b.uf_to_var a
+        with
         | Not_found ->
-          try
-            TermToVar.to_term b.uf_to_var a
-          with
-          | Not_found ->
-            raise (Bad_domain (D.forget_array man dom [|a|] false))
+          raise (Bad_domain (D.forget_array man dom [|a|] false))
     in
     match D.get_linexpr man dom v with
     | Some l ->
@@ -558,22 +548,19 @@ module Make(S:sig
       end
     | None -> None
 
-  
+
   let to_term (man, uf_man) (a, b) =
     let find_var = fun a ->
-      if a = uf_man.apron_var then
-        uf_man.quant_var
-      else
+      try
+        Hashtbl.find uf_man.variable_mapping a
+      with 
+      | Not_found ->
         try
-          Hashtbl.find uf_man.variable_mapping a
-        with 
+          TermToVar.to_term b.uf_to_var a
+        with
         | Not_found ->
-          try
-            TermToVar.to_term b.uf_to_var a
-          with
-          | Not_found ->
-            Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
-            raise Not_found
+          Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
+          raise Not_found
     in
     let t = 
       D.to_term S.env S.pmod man a find_var    in
@@ -582,9 +569,9 @@ module Make(S:sig
         let b = TermToClass.to_term uf_man.class_to_term b in
         t_and t (t_equ a b)) t b.classes
     in
-    descend_quantifier uf_man.quant_var t
+    t
 
-  
+
   let get_class_for_term_ro uf_man t =
     TermToClass.to_t uf_man.class_to_term t
 
@@ -761,16 +748,6 @@ module Make(S:sig
           | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
           | Tfalse -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
           | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
-          | Tquant(Tforall, tq) ->
-            begin
-              match t_open_quant tq with
-              | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
-                let quant_var, apron_var = uf_man.quant_var, uf_man.apron_var in (*TermToVaro.choose ud.quantified_vars in*)
-                let t = t_descend_nots t in
-                let t = t_subst_single a quant_var t in
-                aux t
-              | _ -> raise (Not_handled t)
-            end
           | _ ->
             raise (Not_handled t)
         with

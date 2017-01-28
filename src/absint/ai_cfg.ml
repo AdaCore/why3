@@ -33,8 +33,12 @@ module Make(E: sig
   
   open Term
 
-  module D = Uf_domain.Make(struct
-      module A = E.D
+  module D = Quant_domain.Make(struct
+      module A = Uf_domain.Make(struct
+          module A = E.D
+          let pmod = E.pmod
+          let env = E.env
+        end)
       let pmod = E.pmod
       let env = E.env
     end)
