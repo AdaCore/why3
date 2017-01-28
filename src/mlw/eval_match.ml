@@ -80,7 +80,7 @@ let ls_valid =
 type cap =
   | P of int            (* point *)
   | C of cap list Mls.t (* algebraic type *)
-  | R of cap Mls.t      (* record with unbreakable invariant *)
+  | R of cap Mls.t      (* record with an unbreakable invariant *)
 
 type point = {
   p_leaf   : term;                  (* term we can be reached from *)
@@ -166,6 +166,30 @@ let add_var kn st v =
   match down [] (t_var v) v.vs_ty with
   | P 0 -> st (* not broken *)
   | c -> { s_roots = Mvs.add v c st.s_roots; s_points = !rp }
+
+let is_committed {s_points = sp} c =
+  let rec down = function
+    | P 0 -> ()
+    | P n -> begin match Mint.find_opt n sp with
+        | Some (L n) -> down (P n)
+        | Some (E _) -> raise Exit
+        | None -> () end
+    | C css -> Mls.iter (fun _ fl -> List.iter down fl) css
+    | R pjs -> Mls.iter (fun _ c -> down c) pjs in
+  try down c; true with Exit -> false
+
+let add_pat st c p =
+  let rec down rt c p = match p.pat_node with
+    | Pwild -> rt
+    | Pvar v -> Mvs.add v c rt
+    | Papp (cs, pl) -> begin match c with
+        | C css -> begin match Mls.find_opt cs css with
+            | Some cl -> List.fold_left2 down rt cl pl
+            | None -> rt (* all fields are committed *) end
+        | _ -> assert false (* should never happen *) end
+    | Por _ -> assert (is_committed st c); rt
+    | Pas (p,v) -> Mvs.add v c (down rt c p) in
+  { st with s_roots = down st.s_roots c p }
 
 (* Part II - EvalMatch simplification *)
 
