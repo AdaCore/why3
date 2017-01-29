@@ -29,6 +29,10 @@
   let empty_annotation =
     { loop_invariant = []; loop_variant = [] }
 
+  let infix  s = "infix "  ^ s
+  let prefix s = "prefix " ^ s
+  let mixfix s = "mixfix " ^ s
+
 %}
 
 %token <string> INTEGER
@@ -41,12 +45,14 @@
 %token PLUS MINUS TIMES DIV MOD
 
 /* annotations */
-%token INVARIANT VARIANT
+%token INVARIANT VARIANT ASSERT
+%token ARROW LRARROW
 
+%right ARROW LRARROW
 %left OR
 %left AND
 %nonassoc NOT
-%nonassoc CMP
+%left CMP
 %left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc unary_minus
@@ -153,10 +159,10 @@ loop_annotation:
     { let a = $2 in { a with loop_variant = variant_union $1 a.loop_variant } }
 
 invariant:
-| INVARIANT i=term { i }
+| INVARIANT i=term NEWLINE { i }
 
 variant:
-| VARIANT l=comma_list1(term) { List.map (fun t -> t, None) l }
+| VARIANT l=comma_list1(term) NEWLINE { List.map (fun t -> t, None) l }
 
 simple_stmt: located(simple_stmt_desc) { $1 };
 
@@ -169,6 +175,8 @@ simple_stmt_desc:
     { Sset (e1, e2, e3) }
 | PRINT e = expr
     { Sprint e }
+| ASSERT t = term
+    { Sassert t }
 | e = expr
     { Seval e }
 ;
@@ -184,10 +192,48 @@ mk_term(X): d = X { mk_term d $startpos $endpos }
 term: t = mk_term(term_) { t }
 
 term_:
+| term_arg_
+    { match $1 with (* break the infix relation chain *)
+      | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
+| NOT term
+    { Tunop (Tnot, $2) }
+| l = term ; o = bin_op ; r = term
+    { Tbinop (l, o, r) }
+| l = term ; o = infix_op ; r = term
+    { Tinfix (l, o, r) }
+| l = term ; o = div_mod_op ; r = term
+    { Tidapp (Qident o, [l; r]) }
+
+(* term_arg: mk_term(term_arg_) { $1 } *)
+
+term_arg_:
 | ident       { Tident (Qident $1) }
 | INTEGER     { Tconst (Number.ConstInt ((Number.int_const_dec $1))) }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
+
+%inline bin_op:
+| ARROW   { Timplies }
+| LRARROW { Tiff }
+| OR      { Tor }
+| AND     { Tand }
+
+%inline infix_op:
+| PLUS   { mk_id (infix "+") $startpos $endpos }
+| MINUS  { mk_id (infix "-") $startpos $endpos }
+| TIMES  { mk_id (infix "*") $startpos $endpos }
+| c=CMP  { let op = match c with
+          | Beq -> "="
+          | Bneq -> "<>"
+          | Blt  -> "<"
+          | Ble  -> "<="
+          | Bgt  -> ">"
+          | Bge  -> ">=" in
+           mk_id (infix op) $startpos $endpos }
+
+%inline div_mod_op:
+| DIV  { mk_id "div" $startpos $endpos }
+| MOD  { mk_id "mod" $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }

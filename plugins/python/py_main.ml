@@ -14,7 +14,7 @@ open Mlw_module
 open Ptree
 open Stdlib
 
-let debug = Debug.register_flag "mini-python"
+let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"
 
 let mk_id ?(loc=Loc.dummy_position) name =
@@ -22,6 +22,8 @@ let mk_id ?(loc=Loc.dummy_position) name =
 
 let mk_expr ?(loc=Loc.dummy_position) d =
   { expr_desc = d; expr_loc = loc }
+let mk_term ?(loc=Loc.dummy_position) d =
+  { term_desc = d; term_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 
@@ -37,11 +39,23 @@ let empty_spec = {
 }
 
 type env = {
-  vars: unit Hstr.t;
+  vars: ident Hstr.t;
 }
 
 let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
 let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
+
+(* dereference all variables from the environment *)
+let deref env t =
+  let deref _ ({id_loc=loc} as id) t =
+    let tid = mk_term ~loc (Tident (Qident id)) in
+    let tid = mk_term ~loc (Tidapp (prefix ~loc "!", [tid])) in
+    mk_term ~loc:t.term_loc (Tlet (id, tid, t)) in
+  Hstr.fold deref env.vars t
+
+let loop_annotation env a =
+  { loop_invariant = List.map (deref env) a.loop_invariant;
+    loop_variant   = List.map (fun (t, o) -> deref env t, o) a.loop_variant }
 
 let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Enone ->
@@ -78,11 +92,11 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
   | Py_ast.Eunop (Py_ast.Unot, e) ->
     mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
-  | Py_ast.Ecall (id, el) ->
+  | Py_ast.Ecall (_id, _el) ->
     assert false (*TODO*)
-  | Py_ast.Elist el ->
+  | Py_ast.Elist _el ->
     assert false
-  | Py_ast.Eget (e1, e2) ->
+  | Py_ast.Eget (_e1, _e2) ->
     assert false (*TODO*)
 
 let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
@@ -96,8 +110,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Sif (e, s1, s2) ->
     mk_expr ~loc (Eif (expr env e, stmt env s1, stmt env s2))
   | Py_ast.Swhile (e, ann, s) ->
-    mk_expr ~loc (Ewhile (expr env e, ann, stmt env s))
-  | Py_ast.Sreturn e ->
+    mk_expr ~loc (Ewhile (expr env e, loop_annotation env ann, stmt env s))
+  | Py_ast.Sreturn _e ->
     assert false (*TODO*)
   | Py_ast.Sassign (id, e) ->
     let e = expr env e in
@@ -106,10 +120,12 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       mk_expr ~loc (Einfix (x, mk_id ~loc "infix :=", e))
     else
       block env loc [s]
-  | Py_ast.Sfor (id, e, s) ->
+  | Py_ast.Sfor (_id, _e, _s) ->
     assert false (*TODO*)
-  | Py_ast.Sset (e1, e2, e3) ->
+  | Py_ast.Sset (_e1, _e2, _e3) ->
     assert false (*TODO*)
+  | Py_ast.Sassert t ->
+    mk_expr ~loc (Eassert (Aassert, deref env t))
 
 and block env loc = function
   | [] ->
@@ -117,7 +133,7 @@ and block env loc = function
   | { Py_ast.stmt_loc = loc; stmt_desc = Py_ast.Sassign (id, e) } :: sl
     when not (Hstr.mem env.vars id.id_str) ->
     let e = expr env e in (* check e *before* adding id to environment *)
-    Hstr.add env.vars id.id_str ();
+    Hstr.add env.vars id.id_str id;
     let e1 = mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e])) in
     mk_expr ~loc (Elet (id, Gnone, e1, block env loc sl))
   | { Py_ast.stmt_loc = loc } as s :: sl ->

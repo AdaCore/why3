@@ -36,10 +36,20 @@
   let string_buffer = Buffer.create 1024
 
   let stack = ref [0]  (* indentation stack *)
+
   let rec unindent n = match !stack with
     | m :: _ when m = n -> []
     | m :: st when m > n -> stack := st; END :: unindent n
     | _ -> raise (Lexing_error "bad indentation")
+
+  let update_stack n =
+    match !stack with
+    | m :: _ when m < n ->
+      stack := n :: !stack;
+      [NEWLINE; BEGIN]
+    | _ ->
+      NEWLINE :: unindent n
+
 }
 
 let letter = ['a'-'z' 'A'-'Z']
@@ -47,22 +57,17 @@ let digit = ['0'-'9']
 let ident = letter (letter | digit | '_')*
 let integer = ['0'-'9']+
 let space = ' ' | '\t'
-let comment = "#" [^'\n']*
+let comment = "#" [^'#''\n'] [^'\n']*
 
 rule next_tokens = parse
-  | '\n'
-      { newline lexbuf;
-	let n = indentation lexbuf in
-	match !stack with
-	  | m :: _ when m < n ->
-	      stack := n :: !stack;
-	      [NEWLINE; BEGIN]
-	  | _ ->
-	      NEWLINE :: unindent n
-      }
+  | '\n'    { newline lexbuf; update_stack (indentation lexbuf) }
   | (space | comment)+
-      { next_tokens lexbuf }
-  | ident as id { [id_or_kwd id] }
+            { next_tokens lexbuf }
+  | "##" space* "invariant" space+ { [INVARIANT] }
+  | "##" space* "variant"   space+ { [VARIANT] }
+  | "##" space* "assert"    space+ { [ASSERT] }
+  | ident as id
+            { [id_or_kwd id] }
   | '+'     { [PLUS] }
   | '-'     { [MINUS] }
   | '*'     { [TIMES] }
@@ -81,14 +86,19 @@ rule next_tokens = parse
   | ']'     { [RSQ] }
   | ','     { [COMMA] }
   | ':'     { [COLON] }
+  (* logic symbols *)
+  | "->"    { [ARROW] }
+  | "->"    { [LRARROW] }
   | integer as s
             { [INTEGER s] }
   | '"'     { [STRING (string lexbuf)] }
   | eof     { [EOF] }
   | _ as c  { raise (Lexing_error ("illegal character: " ^ String.make 1 c)) }
 
+(* count the indentation, i.e. the number of space characters from bol *)
 and indentation = parse
   | (space | comment)* '\n'
+      (* skip empty lines *)
       { newline lexbuf; indentation lexbuf }
   | space* as s
       { String.length s }

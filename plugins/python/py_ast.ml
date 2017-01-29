@@ -54,6 +54,7 @@ and stmt_desc =
   | Sfor of ident * expr * stmt
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
+  | Sassert of Ptree.term
 
 and def = ident * ident list * stmt
 
