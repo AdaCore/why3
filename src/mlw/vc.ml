@@ -888,12 +888,16 @@ let rec explore_paths kn aff regs t ity =
   | Ityapp (s,tl,rl) -> explore_its kn aff regs t s tl rl
 
 and explore_its kn aff regs t s tl rl =
+  let itd = find_its_defn kn s in
+  let sum = match itd.itd_constructors with
+    | _::_::_ -> true | _ -> false in
   let isb = its_match_regs s tl rl in
   let follow regs rs =
     let ity = ity_full_inst isb rs.rs_cty.cty_result in
+    if sum && ity_fragile ity then regs (* danger *) else
     let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
     explore_paths kn aff regs (t_app ls [t] ty) ity in
-  List.fold_left follow regs (find_its_defn kn s).itd_fields
+  List.fold_left follow regs itd.itd_fields
 
 let name_regions kn wr dst =
   let rec reg_aff_regs s r =

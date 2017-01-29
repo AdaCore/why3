@@ -144,6 +144,12 @@ let mkR pjs =
 
 (* TODO:
   - do not collapse on Eif and Ecase in k_expr when the type is fragile
+
+  - projection application may require committing when the argument is
+    a C with unjoinable caps. We can and should detect such applications
+    inside specifications and produce appropriate commits. We should also
+    avoid creating such applications outside stop_split: Vc.name_regions
+    should NEVER use a projection with a fragile instantiated value type.
 *)
 
 let add_var kn st v =
