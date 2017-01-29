@@ -217,7 +217,9 @@ let cap_valid st c =
   try down c; true with Exit -> false
 
 let add_pat st c p =
-  let rec down rt c p = match p.pat_node with
+  let rec down rt c p =
+    if c = V then rt else
+    match p.pat_node with
     | Pwild -> rt
     | Pvar v -> Mvs.add v c rt
     | Papp (cs,pl) -> begin match c with
