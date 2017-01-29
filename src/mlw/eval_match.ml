@@ -134,12 +134,17 @@ let rec get_point st n =
   | L n -> get_point st n
   | b -> n, b
 
+let isV = function V -> true | _ -> false
+
+let add_point v c sr =
+  if isV c then sr else Mvs.add v c sr
+
 let mkC css =
-  let chk _ l = List.for_all (function V -> true | _ -> false) l in
+  let chk _ l = List.for_all isV l in
   if Mls.for_all chk css then V else C css
 
 let mkR pjs =
-  let chk _ c = match c with V -> true | _ -> false in
+  let chk _ c = isV c in
   if Mls.for_all chk pjs then V else R pjs
 
 (* TODO:
@@ -204,9 +209,9 @@ let add_var kn st v =
             Mls.add cs (List.map2 conv_field c.rs_cty.cty_args tyl) m in
           mkC (List.fold_left add_constr Mls.empty d.itd_constructors)
   in
-  match down [] (t_var v) v.vs_ty with
-  | V -> st (* not broken *)
-  | c -> { s_roots = Mvs.add v c st.s_roots; s_points = !rp }
+  let c = down [] (t_var v) v.vs_ty in
+  let sr = add_point v c st.s_roots in
+  { s_roots = sr; s_points = !rp }
 
 let cap_valid st c =
   let rec down = function
@@ -218,7 +223,7 @@ let cap_valid st c =
 
 let add_pat st c p =
   let rec down rt c p =
-    if c = V then rt else
+    if isV c then rt else
     match p.pat_node with
     | Pwild -> rt
     | Pvar v -> Mvs.add v c rt
@@ -335,7 +340,7 @@ let cap_of_term kn st t =
     | Tlet (t0,tb) ->
         let t0, c0 = down sr [] t0 in
         let v, t1 = t_open_bound tb in
-        let sr = Mvs.add v c0 sr in
+        let sr = add_point v c0 sr in
         let t1, c1 = down sr pjl t1 in
         t_label_copy t (t_let_close v t0 t1), c1
     | Tcase (t0,bl) ->
