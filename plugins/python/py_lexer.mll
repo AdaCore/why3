@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 {
   open Lexing
@@ -10,12 +20,12 @@
     let h = Hashtbl.create 32 in
     List.iter (fun (s, tok) -> Hashtbl.add h s tok)
       ["def", DEF; "if", IF; "else", ELSE;
-       "return", RETURN; "print", PRINT;
+       "return", RETURN; "print", PRINT; "while", WHILE;
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
-       "True", CST (Cbool true);
-       "False", CST (Cbool false);
-       "None", CST Cnone;];
+       "True", TRUE;
+       "False", FALSE;
+       "None", NONE;];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
   let newline lexbuf =
@@ -72,9 +82,8 @@ rule next_tokens = parse
   | ','     { [COMMA] }
   | ':'     { [COLON] }
   | integer as s
-            { try [CST (Cint (int_of_string s))]
-              with _ -> raise (Lexing_error ("constant too large: " ^ s)) }
-  | '"'     { [CST (Cstring (string lexbuf))] }
+            { [INTEGER s] }
+  | '"'     { [STRING (string lexbuf)] }
   | eof     { [EOF] }
   | _ as c  { raise (Lexing_error ("illegal character: " ^ String.make 1 c)) }
 
@@ -104,7 +113,7 @@ and string = parse
 {
 
   let next_token =
-    let tokens = Queue.create () in (* prochains lexèmes à renvoyer *)
+    let tokens = Queue.create () in
     fun lb ->
       if Queue.is_empty tokens then begin
 	let l = next_tokens lb in

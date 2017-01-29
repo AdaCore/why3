@@ -1,7 +1,17 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
-(* Arbres de syntaxe abstraite de Mini-Python *)
+open Why3
 
-type ident = string
+type ident = Ptree.ident
 
 type unop =
   | Uneg (* -e *)
@@ -12,15 +22,16 @@ type binop =
   | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
   | Band | Bor                          (* && || *)
 
-type constant =
-  | Cnone
-  | Cbool of bool
-  | Cstring of string
-  | Cint of int (* en Python les entiers sont en réalité de précision
-                   arbitraire; on simplifie ici *)
+type expr = {
+  expr_desc: expr_desc;
+  expr_loc : Why3.Loc.position;
+}
 
-type expr =
-  | Ecst of constant
+and expr_desc =
+  | Enone
+  | Ebool of bool
+  | Eint of string
+  | Estring of string
   | Eident of ident
   | Ebinop of binop * expr * expr
   | Eunop of unop * expr
@@ -28,12 +39,18 @@ type expr =
   | Elist of expr list
   | Eget of expr * expr (* e1[e2] *)
 
-and stmt =
+and stmt = {
+  stmt_desc: stmt_desc;
+  stmt_loc : Loc.position;
+}
+
+and stmt_desc =
   | Sif of expr * stmt * stmt
   | Sreturn of expr
   | Sassign of ident * expr
   | Sprint of expr
   | Sblock of stmt list
+  | Swhile of expr * Ptree.loop_annotation * stmt
   | Sfor of ident * expr * stmt
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
