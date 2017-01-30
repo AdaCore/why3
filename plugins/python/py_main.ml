@@ -122,8 +122,9 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       block env ~loc [s]
   | Py_ast.Sfor (_id, _e, _s) ->
     assert false (*TODO*)
-  | Py_ast.Sset (_e1, _e2, _e3) ->
-    assert false (*TODO*)
+  | Py_ast.Sset (e1, e2, e3) ->
+    mk_expr ~loc (Eidapp (mixfix ~loc "[]<-",
+                          [expr env e1; expr env e2; expr env e3]))
   | Py_ast.Sassert t ->
     mk_expr ~loc (Eassert (Aassert, deref env t))
 

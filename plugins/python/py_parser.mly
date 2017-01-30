@@ -215,6 +215,8 @@ term_:
 | q=quant l=comma_list1(ident) DOT t=term
     { let var id = id.id_loc, Some id, false, None in
       Tquant (q, List.map var l, [], t) }
+| id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
+    { Tidapp (Qident id, l) }
 
 quant:
 | FORALL  { Tforall }

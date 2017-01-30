@@ -5,18 +5,29 @@ module Python
   use import ref.Ref
   use seq.Seq as S
 
+  (* Python's lists are resizable arrays *)
   type list 'a = ref (S.seq 'a)
 
   function ([]) (l: list 'a) (i: int) : 'a =
-    S.([]) !l i
+    S.get !l i
+
+  function len (l: list 'a) : int =
+    S.length !l
 
   let ([]) (l: list 'a) (i: int) : 'a
     requires { 0 <= i < S.length !l }
     ensures  { result = l[i] }
-  = S.([]) !l i
+  = S.get !l i
+
+  let ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
+    requires { 0 <= i < S.length !l }
+    writes   { l }
+    ensures  { !l = S.set (old !l) i v }
+  = l := S.set !l i v
 
   val range (l u: int) : list int
     requires { l <= u }
+    ensures  { S.length !result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
 end

@@ -11,6 +11,15 @@ while b < 100:
   a = b-a
 l = range(0, 10)
 ## assert forall i. 0 <= i < 10 -> l[i] >= 0
+l[2] = 42
+## assert l[2] == 42
+i = 0
+while i < 10:
+  ## invariant 0 <= i
+  ## invariant forall j. 0 <= j < i -> l[j] == 0
+  ## invariant len(l) == 10
+  l[i] = 0
+  i = i+1
 
 # Local Variables:
 # compile-command: "make -C ../.. && why3 ide test.py"
