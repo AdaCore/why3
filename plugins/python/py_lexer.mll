@@ -23,9 +23,10 @@
        "return", RETURN; "print", PRINT; "while", WHILE;
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
-       "True", TRUE;
-       "False", FALSE;
-       "None", NONE;];
+       "True", TRUE; "False", FALSE; "None", NONE;
+       (* annotations *)
+       "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
+      ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
   let newline lexbuf =
@@ -80,15 +81,16 @@ rule next_tokens = parse
   | "<="    { [CMP Ble] }
   | ">"     { [CMP Bgt] }
   | ">="    { [CMP Bge] }
-  | '('     { [LP] }
-  | ')'     { [RP] }
-  | '['     { [LSQ] }
-  | ']'     { [RSQ] }
+  | '('     { [LEFTPAR] }
+  | ')'     { [RIGHTPAR] }
+  | '['     { [LEFTSQ] }
+  | ']'     { [RIGHTSQ] }
   | ','     { [COMMA] }
   | ':'     { [COLON] }
   (* logic symbols *)
   | "->"    { [ARROW] }
   | "->"    { [LRARROW] }
+  | "."     { [DOT] }
   | integer as s
             { [INTEGER s] }
   | '"'     { [STRING (string lexbuf)] }

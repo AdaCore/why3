@@ -33,6 +33,8 @@
   let prefix s = "prefix " ^ s
   let mixfix s = "mixfix " ^ s
 
+  let get_op s e = Qident (mk_id (mixfix "[]") s e)
+
 %}
 
 %token <string> INTEGER
@@ -41,13 +43,16 @@
 %token <string> IDENT
 %token DEF IF ELSE RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
 %token EOF
-%token LP RP LSQ RSQ COMMA EQUAL COLON BEGIN END NEWLINE
+%token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
-
-/* annotations */
+(* annotations *)
 %token INVARIANT VARIANT ASSERT
-%token ARROW LRARROW
+%token ARROW LRARROW FORALL EXISTS DOT THEN LET
 
+(* precedences *)
+
+%nonassoc IN
+%nonassoc DOT ELSE
 %right ARROW LRARROW
 %left OR
 %left AND
@@ -55,8 +60,8 @@
 %left CMP
 %left PLUS MINUS
 %left TIMES DIV MOD
-%nonassoc unary_minus
-%nonassoc LSQ
+%nonassoc unary_minus prec_prefix_op
+%nonassoc LEFTSQ
 
 %start file
 
@@ -70,7 +75,7 @@ file:
 ;
 
 def:
-| DEF f = ident LP x = separated_list(COMMA, ident) RP
+| DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
   COLON s = suite
     { f, x, s }
 ;
@@ -93,7 +98,7 @@ expr_desc:
     { Estring s }
 | id = ident
     { Eident id }
-| e1 = expr LSQ e2 = expr RSQ
+| e1 = expr LEFTSQ e2 = expr RIGHTSQ
     { Eget (e1, e2) }
 | MINUS e1 = expr %prec unary_minus
     { Eunop (Uneg, e1) }
@@ -101,11 +106,11 @@ expr_desc:
     { Eunop (Unot, e1) }
 | e1 = expr o = binop e2 = expr
     { Ebinop (o, e1, e2) }
-| f = ident LP e = separated_list(COMMA, expr) RP
+| f = ident LEFTPAR e = separated_list(COMMA, expr) RIGHTPAR
     { Ecall (f, e) }
-| LSQ l = separated_list(COMMA, expr) RSQ
+| LEFTSQ l = separated_list(COMMA, expr) RIGHTSQ
     { Elist l }
-| LP e = expr RP
+| LEFTPAR e = expr RIGHTPAR
     { e.expr_desc }
 ;
 
@@ -171,7 +176,7 @@ simple_stmt_desc:
     { Sreturn e }
 | id = ident EQUAL e = expr
     { Sassign (id, e) }
-| e1 = expr LSQ e2 = expr RSQ EQUAL e3 = expr
+| e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
     { Sset (e1, e2, e3) }
 | PRINT e = expr
     { Sprint e }
@@ -197,20 +202,40 @@ term_:
       | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
 | NOT term
     { Tunop (Tnot, $2) }
+| prefix_op term %prec prec_prefix_op
+    { Tidapp (Qident $1, [$2]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op ; r = term
     { Tinfix (l, o, r) }
 | l = term ; o = div_mod_op ; r = term
     { Tidapp (Qident o, [l; r]) }
+| IF term THEN term ELSE term
+    { Tif ($2, $4, $6) }
+| LET id=ident EQUAL t1=term IN t2=term
+    { Tlet (id, t1, t2) }
+| q=quant l=comma_list1(ident) DOT t=term
+    { let var id = id.id_loc, Some id, false, None in
+      Tquant (q, List.map var l, [], t) }
 
-(* term_arg: mk_term(term_arg_) { $1 } *)
+quant:
+| FORALL  { Tforall }
+| EXISTS  { Texists }
+
+term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
 | INTEGER     { Tconst (Number.ConstInt ((Number.int_const_dec $1))) }
+| NONE        { Ttuple [] }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
+| term_sub_                 { $1 }
+
+term_sub_:
+| LEFTPAR term RIGHTPAR                             { $2.term_desc }
+| term_arg LEFTSQ term RIGHTSQ
+    { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 
 %inline bin_op:
 | ARROW   { Timplies }
@@ -228,8 +253,12 @@ term_arg_:
           | Blt  -> "<"
           | Ble  -> "<="
           | Bgt  -> ">"
-          | Bge  -> ">=" in
+          | Bge  -> ">="
+          | Badd|Bsub|Bmul|Bdiv|Bmod|Band|Bor -> assert false in
            mk_id (infix op) $startpos $endpos }
+
+%inline prefix_op:
+| MINUS { mk_id (prefix "-")  $startpos $endpos }
 
 %inline div_mod_op:
 | DIV  { mk_id "div" $startpos $endpos }

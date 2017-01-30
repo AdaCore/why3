@@ -44,6 +44,7 @@ type env = {
 
 let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
 let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
+let mixfix ~loc s = Qident (mk_id ~loc ("mixfix " ^ s))
 
 (* dereference all variables from the environment *)
 let deref env t =
@@ -92,12 +93,12 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
   | Py_ast.Eunop (Py_ast.Unot, e) ->
     mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
-  | Py_ast.Ecall (_id, _el) ->
-    assert false (*TODO*)
+  | Py_ast.Ecall (id, el) ->
+    mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
   | Py_ast.Elist _el ->
     assert false
-  | Py_ast.Eget (_e1, _e2) ->
-    assert false (*TODO*)
+  | Py_ast.Eget (e1, e2) ->
+    mk_expr ~loc (Eidapp (mixfix ~loc "[]", [expr env e1; expr env e2]))
 
 let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   match d with
@@ -161,7 +162,8 @@ let read_channel env path file c =
     let q = Qdot (Qident (mk_id f), mk_id m) in
     let use = {use_theory = q; use_import = Some (true, m) }, None in
     inc.use_clone  Loc.dummy_position use in
-  List.iter use_import ["int", "Int"; "ref", "Ref"; "seq", "Seq"];
+  List.iter use_import
+    ["int", "Int"; "ref", "Ref"; "python", "Python"];
   translate inc f;
   inc.close_module ();
   let mm, _ as res = Mlw_typing.close_file () in
