@@ -80,8 +80,8 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
       | Py_ast.Badd -> Eidapp (infix ~loc "+", [e1; e2])
       | Py_ast.Bsub -> Eidapp (infix ~loc "-", [e1; e2])
       | Py_ast.Bmul -> Eidapp (infix ~loc "*", [e1; e2])
-      | Py_ast.Bdiv -> assert false (*TODO*)
-      | Py_ast.Bmod -> assert false (*TODO*)
+      | Py_ast.Bdiv -> Eidapp (Qident (mk_id ~loc "div"), [e1; e2])
+      | Py_ast.Bmod -> Eidapp (Qident (mk_id ~loc "mod"), [e1; e2])
       | Py_ast.Beq  -> Eidapp (infix ~loc "=", [e1; e2])
       | Py_ast.Bneq -> Eidapp (infix ~loc "<>", [e1; e2])
       | Py_ast.Blt  -> Eidapp (infix ~loc "<", [e1; e2])
@@ -120,13 +120,13 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       mk_expr ~loc (Einfix (x, mk_id ~loc "infix :=", e))
     else
       block env ~loc [s]
-  | Py_ast.Sfor (_id, _e, _s) ->
+  | Py_ast.Sfor (_id, _e, _a, _s) ->
     assert false (*TODO*)
   | Py_ast.Sset (e1, e2, e3) ->
     mk_expr ~loc (Eidapp (mixfix ~loc "[]<-",
                           [expr env e1; expr env e2; expr env e3]))
-  | Py_ast.Sassert t ->
-    mk_expr ~loc (Eassert (Aassert, deref env t))
+  | Py_ast.Sassert (k, t) ->
+    mk_expr ~loc (Eassert (k, deref env t))
 
 and block env ?(loc=Loc.dummy_position) = function
   | [] ->

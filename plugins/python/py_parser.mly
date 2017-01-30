@@ -14,6 +14,10 @@
   open Ptree
   open Py_ast
 
+  let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
+    | Error -> Format.fprintf fmt "syntax error"
+    | _ -> raise exn)
+
   let floc s e = Loc.extract (s,e)
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
@@ -46,7 +50,7 @@
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
-%token INVARIANT VARIANT ASSERT
+%token INVARIANT VARIANT ASSUME ASSERT CHECK
 %token ARROW LRARROW FORALL EXISTS DOT THEN LET
 
 (* precedences *)
@@ -145,13 +149,17 @@ stmt_desc:
     { Sif (c, s, []) }
 | IF c = expr COLON s1 = suite ELSE COLON s2 = suite
     { Sif (c, s1, s2) }
-| WHILE e = expr COLON s = simple_stmt NEWLINE
-    { Swhile (e, empty_annotation, [s]) }
-| WHILE e = expr COLON NEWLINE BEGIN a=loop_annotation l=nonempty_list(stmt) END
-    { Swhile (e, a, l) }
-| FOR x = ident IN e = expr COLON s = suite
-    { Sfor (x, e, s) }
+| WHILE e = expr COLON b=loop_body
+    { let a, l = b in Swhile (e, a, l) }
+| FOR x = ident IN e = expr COLON b=loop_body
+    { let a, l = b in Sfor (x, e, a, l) }
 ;
+
+loop_body:
+| s = simple_stmt NEWLINE
+  { empty_annotation, [s] }
+| NEWLINE BEGIN a=loop_annotation l=nonempty_list(stmt) END
+  { a, l }
 
 loop_annotation:
 | (* epsilon *)
@@ -178,11 +186,16 @@ simple_stmt_desc:
     { Sset (e1, e2, e3) }
 | PRINT e = expr
     { Sprint e }
-| ASSERT t = term
-    { Sassert t }
+| k=assertion_kind t = term
+    { Sassert (k, t) }
 | e = expr
     { Seval e }
 ;
+
+assertion_kind:
+| ASSERT  { Aassert }
+| ASSUME  { Aassume }
+| CHECK   { Acheck }
 
 ident:
   id = IDENT { mk_id id $startpos $endpos }

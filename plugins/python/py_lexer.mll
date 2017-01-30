@@ -16,6 +16,10 @@
 
   exception Lexing_error of string
 
+  let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
+  | Lexing_error s -> Format.fprintf fmt "syntax error: %s" s
+  | _ -> raise exn)
+
   let id_or_kwd =
     let h = Hashtbl.create 32 in
     List.iter (fun (s, tok) -> Hashtbl.add h s tok)
@@ -67,12 +71,15 @@ rule next_tokens = parse
   | "##" space* "invariant" space+ { [INVARIANT] }
   | "##" space* "variant"   space+ { [VARIANT] }
   | "##" space* "assert"    space+ { [ASSERT] }
+  | "##" space* "assume"    space+ { [ASSUME] }
+  | "##" space* "check"     space+ { [CHECK] }
+  | "##"    { raise (Lexing_error "expecting an annotation") }
   | ident as id
             { [id_or_kwd id] }
   | '+'     { [PLUS] }
   | '-'     { [MINUS] }
   | '*'     { [TIMES] }
-  | '/'     { [DIV] }
+  | "//"    { [DIV] }
   | '%'     { [MOD] }
   | '='     { [EQUAL] }
   | "=="    { [CMP Beq] }

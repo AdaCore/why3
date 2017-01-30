@@ -30,4 +30,9 @@ module Python
     ensures  { S.length !result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
+  (* TODO: specify division and modulus according to
+     https://docs.python.org/3/reference/expressions.html *)
+  function div int int : int
+  function mod int int : int
+
 end

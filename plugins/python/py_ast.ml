@@ -50,10 +50,10 @@ and stmt_desc =
   | Sassign of ident * expr
   | Sprint of expr
   | Swhile of expr * Ptree.loop_annotation * block
-  | Sfor of ident * expr * block
+  | Sfor of ident * expr *  Ptree.loop_annotation * block
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
-  | Sassert of Ptree.term
+  | Sassert of Ptree.assertion_kind * Ptree.term
 
 and block = stmt list
 
