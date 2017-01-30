@@ -36,8 +36,9 @@ and expr_desc =
   | Ebinop of binop * expr * expr
   | Eunop of unop * expr
   | Ecall of ident * expr list
-  | Elist of expr list
-  | Eget of expr * expr (* e1[e2] *)
+  | Elist of expr list   (* [e1, e2, ..., en] *)
+  | Emake of expr * expr (* [e1] * e2 *)
+  | Eget of expr * expr  (* e1[e2] *)
 
 and stmt = {
   stmt_desc: stmt_desc;
@@ -57,7 +58,7 @@ and stmt_desc =
 
 and block = stmt list
 
-and def = ident * ident list * block
+and def = ident * ident list * Ptree.spec * block
 
 and file = def list * block
 

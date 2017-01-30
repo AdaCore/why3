@@ -20,6 +20,7 @@
 
   let floc s e = Loc.extract (s,e)
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
+  let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }
   let mk_stmt loc d = { stmt_desc = d; stmt_loc = loc }
@@ -39,6 +40,23 @@
 
   let get_op s e = Qident (mk_id (mixfix "[]") s e)
 
+  let empty_spec = {
+    sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
+    sp_reads   = [];    sp_writes  = [];  sp_variant = [];
+    sp_checkrw = false; sp_diverge = false;
+  }
+
+  let spec_union s1 s2 = {
+    sp_pre     = s1.sp_pre @ s2.sp_pre;
+    sp_post    = s1.sp_post @ s2.sp_post;
+    sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
+    sp_reads   = s1.sp_reads @ s2.sp_reads;
+    sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_variant = variant_union s1.sp_variant s2.sp_variant;
+    sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
+    sp_diverge = s1.sp_diverge || s2.sp_diverge;
+  }
+
 %}
 
 %token <string> INTEGER
@@ -50,7 +68,7 @@
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
-%token INVARIANT VARIANT ASSUME ASSERT CHECK
+%token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES
 %token ARROW LRARROW FORALL EXISTS DOT THEN LET
 
 (* precedences *)
@@ -80,9 +98,24 @@ file:
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
-  COLON s = suite
-    { f, x, s }
+  COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
+    { f, x, s, l }
 ;
+
+spec:
+| (* epsilon *)     { empty_spec }
+| single_spec spec  { spec_union $1 $2 }
+
+single_spec:
+| REQUIRES t=term NEWLINE
+    { { empty_spec with sp_pre = [t] } }
+| ENSURES e=ensures NEWLINE
+    { { empty_spec with sp_post = [floc $startpos(e) $endpos(e), e] } }
+
+ensures:
+| term
+    { let id = mk_id "result" $startpos $endpos in
+      [mk_pat (Pvar id) $startpos $endpos, $1] }
 
 expr:
 | d = expr_desc
@@ -110,6 +143,10 @@ expr_desc:
     { Eunop (Unot, e1) }
 | e1 = expr o = binop e2 = expr
     { Ebinop (o, e1, e2) }
+| e1 = expr TIMES e2 = expr
+    { match e1.expr_desc with
+      | Elist [e1] -> Emake (e1, e2)
+      | _ -> Ebinop (Bmul, e1, e2) }
 | f = ident LEFTPAR e = separated_list(COMMA, expr) RIGHTPAR
     { Ecall (f, e) }
 | LEFTSQ l = separated_list(COMMA, expr) RIGHTSQ
@@ -121,7 +158,6 @@ expr_desc:
 %inline binop:
 | PLUS  { Badd }
 | MINUS { Bsub }
-| TIMES { Bmul }
 | DIV   { Bdiv }
 | MOD   { Bmod }
 | c=CMP { c    }

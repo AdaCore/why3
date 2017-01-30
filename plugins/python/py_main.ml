@@ -36,10 +36,15 @@ let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
 let deref_id ~loc id =
   mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
+let array_set ~loc a i v =
+  mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
 let constant ~loc s =
   mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
 let len ~loc =
   Qident (mk_id ~loc "len")
+let array_make ~loc n v =
+  mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
+                        [n; v]))
 
 let empty_spec = {
   sp_pre     = [];
@@ -122,8 +127,21 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
   | Py_ast.Ecall (id, el) ->
     mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
-  | Py_ast.Elist _el ->
-    assert false (*TODO*)
+  | Py_ast.Emake (e1, e2) -> (* [e1]*e2 *)
+    array_make ~loc (expr env e2) (expr env e1)
+  | Py_ast.Elist [] ->
+    array_make ~loc (constant ~loc "0") (constant ~loc "0")
+  | Py_ast.Elist el ->
+    let n = List.length el in
+    let n = constant ~loc (string_of_int n) in
+    let id = mk_id ~loc "new array" in
+    mk_expr ~loc (Elet (id, Gnone, array_make ~loc n (constant ~loc "0"),
+    let i = ref (-1) in
+    let init seq e =
+      incr i; let i = constant ~loc (string_of_int !i) in
+      let assign = array_set ~loc (mk_var ~loc id) i (expr env e) in
+      mk_expr ~loc (Esequence (assign, seq)) in
+    List.fold_left init (mk_var ~loc id) el))
   | Py_ast.Eget (e1, e2) ->
     mk_expr ~loc (Eidapp (mixfix ~loc "[]", [expr env e1; expr env e2]))
 
@@ -145,8 +163,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     else
       block env ~loc [s]
   | Py_ast.Sset (e1, e2, e3) ->
-    mk_expr ~loc (Eidapp (mixfix ~loc "[]<-",
-                          [expr env e1; expr env e2; expr env e3]))
+    array_set ~loc (expr env e1) (expr env e2) (expr env e3)
   | Py_ast.Sassert (k, t) ->
     mk_expr ~loc (Eassert (k, deref env t))
   | Py_ast.Swhile (e, ann, s) ->
@@ -192,7 +209,27 @@ and block env ?(loc=Loc.dummy_position) = function
     let sl = block env ~loc sl in
     mk_expr ~loc (Esequence (s, sl))
 
-let translate inc (_dl, s) =
+let post env (loc, l) =
+  loc, List.map (fun (pat, t) -> pat, deref env t) l
+
+let spec env sp =
+  assert (sp.sp_xpost = [] && sp.sp_reads = [] && sp.sp_writes = []
+    && sp.sp_variant = []);
+  { sp with
+    sp_pre = List.map (deref env) sp.sp_pre;
+    sp_post = List.map (post env) sp.sp_post }
+
+let def inc (id, idl, sp, bl) =
+  let env = empty_env in
+  let env = List.fold_left add_var env idl in
+  let param id = id.id_loc, Some id, false, None in
+  let params = List.map param idl in
+  let fd = (params, None, block env bl, spec env sp) in
+  let d = Dfun (id, Gnone, fd) in
+  inc.new_pdecl id.id_loc d
+
+let translate inc (dl, s) =
+  List.iter (def inc) dl;
   let params = [Loc.dummy_position, None, false, Some (PTtuple [])] in
   let env = empty_env in
   let fd = (params, None, block env s, empty_spec) in

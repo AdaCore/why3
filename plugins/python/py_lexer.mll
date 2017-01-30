@@ -33,6 +33,16 @@
       ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
+  let annotation =
+    let h = Hashtbl.create 32 in
+    List.iter (fun (s, tok) -> Hashtbl.add h s tok)
+      ["invariant", INVARIANT; "variant", VARIANT;
+       "assert", ASSERT; "assume", ASSUME; "check", CHECK;
+       "requires", REQUIRES; "ensures", ENSURES;
+      ];
+    fun s -> try Hashtbl.find h s with Not_found ->
+      raise (Lexing_error ("no such annotation '" ^ s ^ "'"))
+
   let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <-
@@ -68,11 +78,8 @@ rule next_tokens = parse
   | '\n'    { newline lexbuf; update_stack (indentation lexbuf) }
   | (space | comment)+
             { next_tokens lexbuf }
-  | "#@" space* "invariant" space+ { [INVARIANT] }
-  | "#@" space* "variant"   space+ { [VARIANT] }
-  | "#@" space* "assert"    space+ { [ASSERT] }
-  | "#@" space* "assume"    space+ { [ASSUME] }
-  | "#@" space* "check"     space+ { [CHECK] }
+  | "#@" space* (ident as id)
+            { [annotation id] }
   | "#@"    { raise (Lexing_error "expecting an annotation") }
   | ident as id
             { [id_or_kwd id] }

@@ -3,35 +3,35 @@ module Python
 
   use import int.Int
   use import ref.Ref
-  use array.Array as A
+  use array.Array
 
   (* Python's lists are actually resizable arrays, but we simplify here *)
-  type list 'a = A.array 'a
+  type list 'a = Array.array 'a
 
   function ([]) (l: list 'a) (i: int) : 'a =
-    A.get l i
+    Array.get l i
 
   function len (l: list 'a) : int =
-    A.length l
+    Array.length l
 
   let len (l: list 'a) : int
     ensures { result = len(l) }
-  = A.length l
+  = Array.length l
 
   let ([]) (l: list 'a) (i: int) : 'a
-    requires { 0 <= i < A.length l }
+    requires { 0 <= i < Array.length l }
     ensures  { result = l[i] }
-  = A.([]) l i
+  = Array.([]) l i
 
   let ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
-    requires { 0 <= i < A.length l }
+    requires { 0 <= i < Array.length l }
     writes   { l }
-    ensures  { l = A.([<-]) (old l) i v }
-  = A.([]<-) l i v
+    ensures  { l = Array.([<-]) (old l) i v }
+  = Array.([]<-) l i v
 
   val range (l u: int) : list int
     requires { l <= u }
-    ensures  { A.length result = u - l }
+    ensures  { Array.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
   (* Python's division and modulus according are neither Euclidean division,

@@ -1,4 +1,10 @@
 
+# def swap(a, i, j):
+#   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
+#   t = a[i]
+#   a[i] = a[j]
+#   a[j] = t
+
 a = 0
 b = 1
 while b < 100:
@@ -24,11 +30,16 @@ while i < 10:
   i = i+1
 
 sum = 0
-for x in l:
+for x in [42]*3:
   #@ invariant sum >= 0
   print(x)
   #@ assert x >= 0
   sum = sum+x
+
+foo = [1,2,3]
+#@ assert len(foo)==3
+#@ assert foo[1]==2
+
 
 # Python's division is neither Euclidean division, nor computer division
 #@ assert  4 //  3 ==  1 and  4 %  3 ==  1
