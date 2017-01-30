@@ -1,4 +1,9 @@
 
+from random import randint
+
+i = randint(0, 10)
+#@ assert 0 <= i <= 10
+
 # def swap(a, i, j):
 #   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
 #   t = a[i]

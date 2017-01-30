@@ -64,6 +64,7 @@
 %token <Py_ast.binop> CMP
 %token <string> IDENT
 %token DEF IF ELSE RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
+%token FROM IMPORT
 %token EOF
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
@@ -92,9 +93,13 @@
 %%
 
 file:
-| NEWLINE? dl = list(def) b = list(stmt) EOF
+| NEWLINE? import* dl=list(def) b=list(stmt) EOF
     { dl, b }
 ;
+
+import:
+| FROM m=ident IMPORT f=ident NEWLINE
+  { () (* FIXME: check legal imports *) }
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
