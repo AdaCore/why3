@@ -86,58 +86,47 @@ let is_fragile_projection ls =
       | _ -> assert false
   with Not_found -> false
 
-(* Integer "points" represent individual values whose invariant
-   may be broken. The special point 0 represents any value with
-   verified invariant. Fresh points are assigned to values from
-   top to bottom, so that a lesser point can never be reached
-   from a greater point. Each point is associated to a list of
-   fresh variables that correspond to the "temporary fields" of
-   the point. Committing a point means that we prove that the
-   temporary fields satisfy the invariant and then assume that
-   the temporary fields are equal to the respective projections.
+(* Integer-indexed "pins" represent individual values whose
+   invariant may be broken. Fresh pins are assigned to values
+   from top to bottom, so that a lesser pin can never be reached
+   from a greater pin. Each pin is associated to a list of fresh
+   variables that correspond to "temporary fields". Committing
+   a pin means that we prove that the temporary fields satisfy
+   the invariant and then assume that the temporary fields are
+   equal to the respective projections.
 
    Recursive "caps" represent deconstructible values from which
-   points can be reached. Each variable is associated to a cap.
-   A cap is either a committed value, a point (a non-committed
+   pins can be reached. Each variable is associated to a cap.
+   A cap is either a committed value, a pin (a non-committed
    record with a breakable invariant), a constructible value
    (characterized by the set of possible constructors), or
    a record with an unbreakable invariant. *)
 
 type cap =
   | V                   (* valid *)
-  | P of int            (* point *)
+  | P of int            (* pin *)
   | C of cap list Mls.t (* algebraic type *)
   | R of cap Mls.t      (* record with an unbreakable invariant *)
 
-type point = {
+type pin = {
   p_leaf   : term;                  (* term we can be reached from *)
   p_stem   : (term * pattern) list; (* deconstruction from a root *)
   p_fields : (vsymbol * cap) Mls.t; (* temporary fields *)
 }
 
-type binding =
-  | W           (* valid point *)
-  | B of point  (* broken point *)
-  | L of int    (* link *)
-
-type state = {
-  s_roots  : cap Mvs.t;       (* non-broken roots may be unbound *)
-  s_points : binding Mint.t;  (* non-broken points may be unbound *)
-}
-
-let new_point =
+let new_index =
   let c = ref 0 in
   fun () -> incr c; !c
 
-let rec get_point st n =
-  match Mint.find_def W n st.s_points with
-  | L n -> get_point st n
-  | b -> n, b
+let rec get_index uf n =
+  match Mint.find_opt n uf with
+  | Some n -> get_index uf n
+  | None -> n
 
 let isV = function V -> true | _ -> false
 
-let add_point v c sr =
-  if isV c then sr else Mvs.add v c sr
+let add_cap v c caps =
+  if isV c then caps else Mvs.add v c caps
 
 let mkC css =
   let chk _ l = List.for_all isV l in
@@ -157,8 +146,8 @@ let mkR pjs =
     should NEVER use a projection with a fragile instantiated value type.
 *)
 
-let add_var kn st v =
-  let rp = ref st.s_points in
+let add_var kn pins v =
+  let rp = ref pins in
   let rec down stem leaf ty = match ty.ty_node with
     | Tyvar _ -> V
     | Tyapp (s,tl) ->
@@ -178,10 +167,10 @@ let add_var kn st v =
             let v = create_vsymbol (id_fresh nm) ty in
             Mls.add (ls_of_rs f) (v, down [] (t_var v) ty) m in
           let pjs = List.fold_left add_field Mls.empty d.itd_fields in
-          let bd = B {p_leaf = leaf; p_stem = stem; p_fields = pjs} in
-          let np = new_point () in
-          rp := Mint.add np bd !rp;
-          P np
+          let pin = {p_leaf = leaf; p_stem = stem; p_fields = pjs} in
+          let n = new_index () in
+          rp := Mint.add n pin !rp;
+          P n
         else (* unbreakable record *)
           let add_field m f =
             let pj = ls_of_rs f in
@@ -210,49 +199,54 @@ let add_var kn st v =
           mkC (List.fold_left add_constr Mls.empty d.itd_constructors)
   in
   let c = down [] (t_var v) v.vs_ty in
-  let sr = add_point v c st.s_roots in
-  { s_roots = sr; s_points = !rp }
+  (* do not inline *) c, !rp
 
-let cap_valid st c =
+let cap_valid uf pins c =
   let rec down = function
     | V -> ()
-    | P n -> if snd (get_point st n) <> W then raise Exit
+    | P n -> if Mint.mem (get_index uf n) pins then raise Exit
     | C css -> Mls.iter (fun _ fl -> List.iter down fl) css
     | R pjs -> Mls.iter (fun _ c -> down c) pjs in
   try down c; true with Exit -> false
 
-let add_pat st c p =
-  let rec down rt c p =
-    if isV c then rt else
+let add_pat uf pins caps c p =
+  let rec down caps c p =
+    if isV c then caps else
     match p.pat_node with
-    | Pwild -> rt
-    | Pvar v -> Mvs.add v c rt
+    | Pwild -> caps
+    | Pvar v -> Mvs.add v c caps
     | Papp (cs,pl) -> begin match c with
         | C css -> begin match Mls.find_opt cs css with
-            | Some cl -> List.fold_left2 down rt cl pl
-            | None -> rt (* all fields are committed *) end
-        | _ -> assert false (* should never happen *) end
-    | Por _ -> assert (cap_valid st c); rt
-    | Pas (p,v) -> Mvs.add v c (down rt c p) in
-  { st with s_roots = down st.s_roots c p }
+            | Some cl -> List.fold_left2 down caps cl pl
+            | None -> caps (* impossible branch *) end
+        | _ -> assert false (* can never happen *) end
+    | Por _ -> assert (cap_valid uf pins c); caps
+    | Pas (p,v) -> Mvs.add v c (down caps c p) in
+  down caps c p
 
-let rec cap_join st c1 c2 = match c1, c2 with
-  | V, c | c, V ->
-      assert (cap_valid st c); V
-  | P n1, P n2 ->
-      let n1, b1 = get_point st n1 in
-      let n2, b2 = get_point st n2 in
-      if b1 = W then begin assert (b2 = W); V end
-      else begin assert (n1 = n2); P n1 end
-  | C s1, C s2 ->
-      let join _ l1 l2 = Some (List.map2 (cap_join st) l1 l2) in
-      mkC (Mls.union join s1 s2)
-  | R s1, R s2 ->
-      let join _ c1 c2 = Some (cap_join st c1 c2) in
-      mkR (Mls.union join s1 s2)
-  | _ -> assert false
+let cap_join uf pins c1 c2 =
+  let rec down c1 c2 = match c1, c2 with
+    | V, c | c, V ->
+        assert (cap_valid uf pins c); V
+    | P n1, P n2 ->
+        let n1 = get_index uf n1 in
+        let n2 = get_index uf n2 in
+        if Mint.mem n1 pins
+          then begin assert (n1 = n2); P n1 end
+          else begin assert (not (Mint.mem n2 pins)); V end
+    | C s1, C s2 ->
+        let join _ l1 l2 = Some (List.map2 down l1 l2) in
+        mkC (Mls.union join s1 s2)
+    | R s1, R s2 ->
+        let join _ c1 c2 = Some (down c1 c2) in
+        mkR (Mls.union join s1 s2)
+    | _ -> assert false in
+  down c1 c2
 
-let cap_of_term kn st t =
+let cap_of_term kn uf pins caps t =
+  let cap_join_opt c cj = match cj with
+    | Some cj -> cap_join uf pins c cj
+    | None -> c in
   let rec unroll t = function
     | (pj,t0)::pjl ->
         let t = t_app pj [t] t0.t_ty in
@@ -262,12 +256,12 @@ let cap_of_term kn st t =
     | _, [] -> t, c
     | V, _ -> unroll t pjl0, V
     | P n, (pj,t0)::pjl ->
-        begin match get_point st n with
-        | _, L _ -> assert false (* never *)
-        | _, W -> unroll t pjl0, V
-        | _, B p ->
-            let v, c = Mls.find pj p.p_fields in
-            unwind (t_label_copy t0 (t_var v)) c pjl end
+        let n = get_index uf n in
+        begin match Mint.find_opt n pins with
+        | Some pin ->
+            let v, c = Mls.find pj pin.p_fields in
+            unwind (t_label_copy t0 (t_var v)) c pjl
+        | None -> unroll t pjl0, V end
     | C css, (pj,t0)::pjl when Mls.cardinal css = 1 ->
         let cs, fl = Mls.choose css in
         let c = apply_projection kn pj cs fl in
@@ -297,8 +291,7 @@ let cap_of_term kn st t =
           t_close_branch (pat_app cs pl ty) t0, c in
         let add_branch cs fl (bl, cj) =
           let b, c = mk_branch cs fl in
-          b::bl, Some (match cj with
-            | Some cj -> cap_join st c cj | None -> c) in
+          b::bl, Some (cap_join_opt c cj) in
         let bl, c = Mls.fold add_branch css (bb, None) in
         t_case t bl, Opt.get c
     | R pjs, (pj,t0)::pjl ->
@@ -306,77 +299,76 @@ let cap_of_term kn st t =
         let t = t_app pj [t] t0.t_ty in
         unwind (t_label_copy t0 t) c pjl
   in
-  let rec down sr pjl t = match t.t_node with
+  let rec down caps pjl t = match t.t_node with
     | Tvar v -> (* projection propagation *)
-        unwind t (Mvs.find_def V v sr) pjl
+        unwind t (Mvs.find_def V v caps) pjl
     | Tconst _ -> (* constants are valid *)
         unroll t pjl, V
     | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
-        let t1, c1 = down sr pjl t1 in
-        let t2, c2 = down sr pjl t2 in
-        ignore (cap_join st c1 c2);
+        let t1, c1 = down caps pjl t1 in
+        let t2, c2 = down caps pjl t2 in
+        ignore (cap_join uf pins c1 c2);
         t_label_copy t (t_equ t1 t2), V
     | Tapp (ls,[t1]) when is_fragile_projection ls ->
-        down sr ((ls,t)::pjl) t1
+        down caps ((ls,t)::pjl) t1
     | Tapp (ls,tl) when is_fragile_constructor ls ->
         begin match pjl with
         | (pj,t0)::pjl ->
             let t = apply_projection kn pj ls tl in
-            down sr pjl (t_label_copy t0 t)
+            down caps pjl (t_label_copy t0 t)
         | [] ->
-            let tl, cl = List.split (List.map (down sr []) tl) in
+            let tl, cl = List.split (List.map (down caps []) tl) in
             let t = t_label_copy t (t_app ls tl t.t_ty) in
             t, mkC (Mls.singleton ls cl) end
     | Tapp (ls,tl) ->
         let tl = List.map (fun t ->
-          let t, c = down sr [] t in
-          assert (cap_valid st c); t) tl in
+          let t, c = down caps [] t in
+          assert (cap_valid uf pins c); t) tl in
         unroll (t_label_copy t (t_app ls tl t.t_ty)) pjl, V
     | Tif (t0,t1,t2) ->
-        let t0, _  = down sr [] t0 in
-        let t1, c1 = down sr pjl t1 in
-        let t2, c2 = down sr pjl t2 in
-        t_label_copy t (t_if t0 t1 t2), cap_join st c1 c2
+        let t0, _  = down caps [] t0 in
+        let t1, c1 = down caps pjl t1 in
+        let t2, c2 = down caps pjl t2 in
+        t_label_copy t (t_if t0 t1 t2), cap_join uf pins c1 c2
     | Tlet (t0,tb) ->
-        let t0, c0 = down sr [] t0 in
+        let t0, c0 = down caps [] t0 in
         let v, t1 = t_open_bound tb in
-        let sr = add_point v c0 sr in
-        let t1, c1 = down sr pjl t1 in
+        let caps = add_cap v c0 caps in
+        let t1, c1 = down caps pjl t1 in
         t_label_copy t (t_let_close v t0 t1), c1
     | Tcase (t0,bl) ->
-        let t0, c0 = down sr [] t0 in
+        let t0, c0 = down caps [] t0 in
         let mk_branch b =
           let p, t1 = t_open_branch b in
-          let st = add_pat {st with s_roots = sr} c0 p in
-          let t1, c1 = down st.s_roots pjl t1 in
+          let caps = add_pat uf pins caps c0 p in
+          let t1, c1 = down caps pjl t1 in
           t_close_branch p t1, c1 in
         let add_branch b (bl, cj) =
           let b, c = mk_branch b in
-          b::bl, Some (match cj with
-            | Some cj -> cap_join st c cj | None -> c) in
+          b::bl, Some (cap_join_opt c cj) in
         let bl, c = List.fold_right add_branch bl ([], None) in
         t_label_copy t (t_case t0 bl), Opt.get c
     | Teps tb ->
         let v, f = t_open_bound tb in
-        let f, _ = down sr [] f in
+        let f, _ = down caps [] f in
         unroll (t_label_copy t (t_eps_close v f)) pjl, V
     | Tquant (q,tq) ->
         let vl, tt, t0 = t_open_quant tq in
-        let down t = fst (down sr [] t) in
+        let down t = fst (down caps [] t) in
         let tt = List.map (List.map down) tt in
         let tq = t_close_quant vl tt (down t0) in
         t_label_copy t (t_quant q tq), V
     | Tbinop (op,f1,f2) ->
-        let f1, _ = down sr [] f1 in
-        let f2, _ = down sr [] f2 in
+        let f1, _ = down caps [] f1 in
+        let f2, _ = down caps [] f2 in
         t_label_copy t (t_binary op f1 f2), V
     | Tnot f ->
-        let f, _ = down sr [] f in
+        let f, _ = down caps [] f in
         t_label_copy t (t_not f), V
     | Ttrue | Tfalse ->
         t, V
   in
-  down st.s_roots [] t
+  down caps [] t
 
 (* Part II - EvalMatch simplification *)
 
