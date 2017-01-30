@@ -114,19 +114,10 @@ type pin = {
   p_fields : (vsymbol * cap) Mls.t; (* temporary fields *)
 }
 
-let new_index =
-  let c = ref 0 in
-  fun () -> incr c; !c
-
-let rec get_index uf n =
-  match Mint.find_opt n uf with
-  | Some n -> get_index uf n
-  | None -> n
-
 let isV = function V -> true | _ -> false
 
-let add_cap v c caps =
-  if isV c then caps else Mvs.add v c caps
+let mkP n =
+  if n = 0 then V else P n
 
 let mkC css =
   let chk _ l = List.for_all isV l in
@@ -135,6 +126,19 @@ let mkC css =
 let mkR pjs =
   let chk _ c = isV c in
   if Mls.for_all chk pjs then V else R pjs
+
+let add_cap v c caps =
+  if isV c then caps else Mvs.add v c caps
+
+let new_index =
+  let c = ref 0 in
+  fun () -> incr c; !c
+
+let rec get_index uf n =
+  if n = 0 then 0 else
+  match Mint.find_opt n uf with
+  | Some n -> get_index uf n
+  | None -> n
 
 (* TODO:
   - do not collapse on Eif and Ecase in k_expr when the type is fragile
@@ -170,7 +174,7 @@ let add_var kn pins v =
           let pin = {p_leaf = leaf; p_stem = stem; p_fields = pjs} in
           let n = new_index () in
           rp := Mint.add n pin !rp;
-          P n
+          mkP n
         else (* unbreakable record *)
           let add_field m f =
             let pj = ls_of_rs f in
@@ -201,51 +205,46 @@ let add_var kn pins v =
   let c = down [] (t_var v) v.vs_ty in
   (* do not inline *) c, !rp
 
-let cap_valid uf pins c =
+let cap_valid uf c =
   let rec down = function
     | V -> ()
-    | P n -> if Mint.mem (get_index uf n) pins then raise Exit
+    | P n -> if get_index uf n <> 0 then raise Exit
     | C css -> Mls.iter (fun _ fl -> List.iter down fl) css
     | R pjs -> Mls.iter (fun _ c -> down c) pjs in
   try down c; true with Exit -> false
 
-let add_pat uf pins caps c p =
-  let rec down caps c p =
-    if isV c then caps else
-    match p.pat_node with
-    | Pwild -> caps
-    | Pvar v -> Mvs.add v c caps
-    | Papp (cs,pl) -> begin match c with
-        | C css -> begin match Mls.find_opt cs css with
-            | Some cl -> List.fold_left2 down caps cl pl
-            | None -> caps (* impossible branch *) end
-        | _ -> assert false (* can never happen *) end
-    | Por _ -> assert (cap_valid uf pins c); caps
-    | Pas (p,v) -> Mvs.add v c (down caps c p) in
-  down caps c p
+let rec add_pat uf caps c p =
+  if isV c then caps else
+  match p.pat_node with
+  | Pwild -> caps
+  | Pvar v -> Mvs.add v c caps
+  | Papp (cs,pl) -> begin match c with
+      | C css -> begin match Mls.find_opt cs css with
+          | Some cl -> List.fold_left2 (add_pat uf) caps cl pl
+          | None -> caps (* impossible branch *) end
+      | _ -> assert false (* can never happen *) end
+  | Por _ -> assert (cap_valid uf c); caps
+  | Pas (p,v) -> Mvs.add v c (add_pat uf caps c p)
 
-let cap_join uf pins c1 c2 =
-  let rec down c1 c2 = match c1, c2 with
-    | V, c | c, V ->
-        assert (cap_valid uf pins c); V
-    | P n1, P n2 ->
-        let n1 = get_index uf n1 in
-        let n2 = get_index uf n2 in
-        if Mint.mem n1 pins
-          then begin assert (n1 = n2); P n1 end
-          else begin assert (not (Mint.mem n2 pins)); V end
-    | C s1, C s2 ->
-        let join _ l1 l2 = Some (List.map2 down l1 l2) in
-        mkC (Mls.union join s1 s2)
-    | R s1, R s2 ->
-        let join _ c1 c2 = Some (down c1 c2) in
-        mkR (Mls.union join s1 s2)
-    | _ -> assert false in
-  down c1 c2
+let rec cap_join uf c1 c2 = match c1, c2 with
+  | V, c | c, V ->
+      assert (cap_valid uf c); V
+  | P n1, P n2 ->
+      let n1 = get_index uf n1 in
+      let n2 = get_index uf n2 in
+      assert (n1 = n2);
+      mkP n1
+  | C s1, C s2 ->
+      let join _ l1 l2 = Some (List.map2 (cap_join uf) l1 l2) in
+      mkC (Mls.union join s1 s2)
+  | R s1, R s2 ->
+      let join _ c1 c2 = Some (cap_join uf c1 c2) in
+      mkR (Mls.union join s1 s2)
+  | _ -> assert false
 
 let cap_of_term kn uf pins caps t =
   let cap_join_opt c cj = match cj with
-    | Some cj -> cap_join uf pins c cj
+    | Some cj -> cap_join uf c cj
     | None -> c in
   let rec unroll t = function
     | (pj,t0)::pjl ->
@@ -307,7 +306,7 @@ let cap_of_term kn uf pins caps t =
     | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
         let t1, c1 = down caps pjl t1 in
         let t2, c2 = down caps pjl t2 in
-        ignore (cap_join uf pins c1 c2);
+        ignore (cap_join uf c1 c2);
         t_label_copy t (t_equ t1 t2), V
     | Tapp (ls,[t1]) when is_fragile_projection ls ->
         down caps ((ls,t)::pjl) t1
@@ -323,13 +322,13 @@ let cap_of_term kn uf pins caps t =
     | Tapp (ls,tl) ->
         let tl = List.map (fun t ->
           let t, c = down caps [] t in
-          assert (cap_valid uf pins c); t) tl in
+          assert (cap_valid uf c); t) tl in
         unroll (t_label_copy t (t_app ls tl t.t_ty)) pjl, V
     | Tif (t0,t1,t2) ->
         let t0, _  = down caps [] t0 in
         let t1, c1 = down caps pjl t1 in
         let t2, c2 = down caps pjl t2 in
-        t_label_copy t (t_if t0 t1 t2), cap_join uf pins c1 c2
+        t_label_copy t (t_if t0 t1 t2), cap_join uf c1 c2
     | Tlet (t0,tb) ->
         let t0, c0 = down caps [] t0 in
         let v, t1 = t_open_bound tb in
@@ -340,7 +339,7 @@ let cap_of_term kn uf pins caps t =
         let t0, c0 = down caps [] t0 in
         let mk_branch b =
           let p, t1 = t_open_branch b in
-          let caps = add_pat uf pins caps c0 p in
+          let caps = add_pat uf caps c0 p in
           let t1, c1 = down caps pjl t1 in
           t_close_branch p t1, c1 in
         let add_branch b (bl, cj) =
