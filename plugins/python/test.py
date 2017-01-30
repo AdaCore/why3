@@ -23,18 +23,20 @@ while i < 10:
   l[i] = 0
   i = i+1
 
+sum = 0
 for x in l:
+  #@ invariant sum >= 0
   print(x)
+  #@ assert x >= 0
+  sum = sum+x
 
-# # arithmetic
-# # Python's division is not *Euclidean* division
-# q = -4 // 3
-# #@ assert q == -2
-# r = -4 % 3
-# #@ assert r == 2
-# #@ assert 4 // -3 == -2
-# #@ assert 4 % -3 == -2
+# Python's division is neither Euclidean division, nor computer division
+#@ assert  4 //  3 ==  1 and  4 %  3 ==  1
+#@ assert -4 //  3 == -2 and -4 %  3 ==  2
+#@ assert  4 // -3 == -2 and  4 % -3 == -2
+#@ assert -4 // -3 ==  1 and -4 % -3 == -1
 
 # Local Variables:
 # compile-command: "make -C ../.. && why3 prove -P alt-ergo test.py"
 # End:
+

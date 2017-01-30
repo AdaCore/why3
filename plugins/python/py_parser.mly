@@ -152,7 +152,7 @@ stmt_desc:
 | WHILE e = expr COLON b=loop_body
     { let a, l = b in Swhile (e, a, l) }
 | FOR x = ident IN e = expr COLON b=loop_body
-    { let a, l = b in Sfor (x, e, a, l) }
+    { let a, l = b in Sfor (x, e, a.loop_invariant, l) }
 ;
 
 loop_body:

@@ -123,7 +123,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Ecall (id, el) ->
     mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
   | Py_ast.Elist _el ->
-    assert false
+    assert false (*TODO*)
   | Py_ast.Eget (e1, e2) ->
     mk_expr ~loc (Eidapp (mixfix ~loc "[]", [expr env e1; expr env e2]))
 
@@ -152,33 +152,32 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Swhile (e, ann, s) ->
     mk_expr ~loc
       (Ewhile (expr env e, loop_annotation env ann, block env ~loc s))
-  | Py_ast.Sfor (id, e, ann, body) ->
-    (* for x in e: s
-                             is translated to
+  | Py_ast.Sfor (id, e, inv, body) ->
+    (* for x in e:
+         s
+
+    is translated to
+
        let l = e in
-       let i = ref 0 in
-       while !i < len(e) do
-         invariant 0 <= !i (and user invariants)
-         let x = l[!i] in
-         s;
-         i := !i + 1
+       for i = 0 to len(l)-1 do
+         user invariants
+         let x = l[i] in
+         s
        done
     *)
     let i, l, env = for_vars ~loc env in
     let e = expr env e in
-    let env = add_var env id in
     mk_expr ~loc (Elet (l, Gnone, e, (* evaluate e only once *)
-    mk_expr ~loc (Elet (i, Gnone, mk_ref ~loc (constant ~loc "0"),
+    let lb = constant ~loc "0" in
     let lenl = mk_expr ~loc (Eidapp (len ~loc, [mk_var ~loc l])) in
-    let test =
-      mk_expr ~loc (Eidapp (infix ~loc "<", [deref_id ~loc i; lenl])) in
-    mk_expr ~loc (Ewhile (test, loop_annotation env ann,
+    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl;constant ~loc "1"])) in
+    mk_expr ~loc (Efor (i, lb, To, ub, List.map (deref env) inv,
     let li = mk_expr ~loc
-      (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; deref_id ~loc i])) in
+      (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; mk_var ~loc i])) in
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc li,
-    mk_expr ~loc (Esequence (block env body,
-    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "incr"), [mk_var ~loc i])))
-    )))))))))
+    let env = add_var env id in
+    block env body
+    ))))))
 
 and block env ?(loc=Loc.dummy_position) = function
   | [] ->

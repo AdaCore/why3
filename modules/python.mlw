@@ -34,11 +34,38 @@ module Python
     ensures  { A.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
-  (* TODO: specify division and modulus according to
+  (* Python's division and modulus according are neither Euclidean division,
+     nor computer division, but something else defined in
      https://docs.python.org/3/reference/expressions.html *)
-  function div int int : int
-  function mod int int : int
 
+  use import int.Abs
+  use int.EuclideanDivision as E
+
+  function div (x y: int) : int =
+    let q = E.div x y in
+    if y >= 0 then q else if E.mod x y > 0 then q-1 else q
+  function mod (x y: int) : int =
+    let r = E.mod x y in
+    if y >= 0 then r else if r > 0 then r+y else r
+
+  lemma div_mod:
+    forall x y:int. y <> 0 -> x = y * div x y + mod x y
+  lemma mod_bounds:
+    forall x y:int. y <> 0 -> 0 <= abs (mod x y) < abs y
+  lemma mod_sign:
+    forall x y:int. y <> 0 -> if y < 0 then mod x y <= 0 else mod x y >= 0
+
+  let (//) (x y: int) : int
+    requires { y <> 0 }
+    ensures  { result = div x y }
+  = div x y
+
+  let (%) (x y: int) : int
+    requires { y <> 0 }
+    ensures  { result = mod x y }
+  = mod x y
+
+  (* random.randint *)
   val randint (l u: int) : int
     requires { l <= u }
     ensures  { l <= result <= u }
