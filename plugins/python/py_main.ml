@@ -20,12 +20,26 @@ let debug = Debug.register_flag "python"
 let mk_id ?(loc=Loc.dummy_position) name =
   { id_str = name; id_lab = []; id_loc = loc }
 
+let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
+let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
+let mixfix ~loc s = Qident (mk_id ~loc ("mixfix " ^ s))
+
 let mk_expr ?(loc=Loc.dummy_position) d =
   { expr_desc = d; expr_loc = loc }
 let mk_term ?(loc=Loc.dummy_position) d =
   { term_desc = d; term_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
+let mk_var ~loc id =
+  mk_expr ~loc (Eident (Qident id))
+let mk_ref ~loc e =
+  mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
+let deref_id ~loc id =
+  mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
+let constant ~loc s =
+  mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
+let len ~loc =
+  Qident (mk_id ~loc "len")
 
 let empty_spec = {
   sp_pre     = [];
@@ -39,12 +53,22 @@ let empty_spec = {
 }
 
 type env = {
-  vars: ident Hstr.t;
+  vars: ident Mstr.t;
+  for_index: int;
 }
 
-let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
-let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
-let mixfix ~loc s = Qident (mk_id ~loc ("mixfix " ^ s))
+let empty_env =
+  { vars = Mstr.empty;
+    for_index = 0; }
+
+let add_var env id =
+  { env with vars = Mstr.add id.id_str id env.vars }
+
+let for_vars ~loc env =
+  let i = env.for_index in
+  let env = { env with for_index = i + 1 } in
+  let i = string_of_int env.for_index in
+  mk_id ~loc ("for index " ^ i ), mk_id ~loc ("for list " ^ i), env
 
 (* dereference all variables from the environment *)
 let deref env t =
@@ -52,11 +76,14 @@ let deref env t =
     let tid = mk_term ~loc (Tident (Qident id)) in
     let tid = mk_term ~loc (Tidapp (prefix ~loc "!", [tid])) in
     mk_term ~loc:t.term_loc (Tlet (id, tid, t)) in
-  Hstr.fold deref env.vars t
+  Mstr.fold deref env.vars t
 
 let loop_annotation env a =
   { loop_invariant = List.map (deref env) a.loop_invariant;
     loop_variant   = List.map (fun (t, o) -> deref env t, o) a.loop_variant }
+
+let add_loop_invariant i a =
+  { a with loop_invariant = i :: a.loop_invariant }
 
 let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Enone ->
@@ -64,13 +91,13 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Ebool b ->
     mk_expr ~loc (if b then Etrue else Efalse)
   | Py_ast.Eint s ->
-    mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
+    constant ~loc s
   | Py_ast.Estring _s ->
     assert false (*TODO*)
   | Py_ast.Eident id ->
-    if not (Hstr.mem env.vars id.id_str) then
+    if not (Mstr.mem id.id_str env.vars) then
       Loc.errorm ~loc "unbound variable %s" id.id_str;
-    mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
+    deref_id ~loc id
   | Py_ast.Ebinop (op, e1, e2) ->
     let e1 = expr env e1 in
     let e2 = expr env e2 in
@@ -108,35 +135,59 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     mk_expr ~loc (Elet (mk_id ~loc "_", Gnone, expr env e, mk_unit ~loc))
   | Py_ast.Sif (e, s1, s2) ->
     mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
-  | Py_ast.Swhile (e, ann, s) ->
-    mk_expr ~loc
-      (Ewhile (expr env e, loop_annotation env ann, block env ~loc s))
   | Py_ast.Sreturn _e ->
     assert false (*TODO*)
   | Py_ast.Sassign (id, e) ->
     let e = expr env e in
-    if Hstr.mem env.vars id.id_str then
+    if Mstr.mem id.id_str env.vars then
       let x = let loc = id.id_loc in mk_expr ~loc (Eident (Qident id)) in
       mk_expr ~loc (Einfix (x, mk_id ~loc "infix :=", e))
     else
       block env ~loc [s]
-  | Py_ast.Sfor (_id, _e, _a, _s) ->
-    assert false (*TODO*)
   | Py_ast.Sset (e1, e2, e3) ->
     mk_expr ~loc (Eidapp (mixfix ~loc "[]<-",
                           [expr env e1; expr env e2; expr env e3]))
   | Py_ast.Sassert (k, t) ->
     mk_expr ~loc (Eassert (k, deref env t))
+  | Py_ast.Swhile (e, ann, s) ->
+    mk_expr ~loc
+      (Ewhile (expr env e, loop_annotation env ann, block env ~loc s))
+  | Py_ast.Sfor (id, e, ann, body) ->
+    (* for x in e: s
+                             is translated to
+       let l = e in
+       let i = ref 0 in
+       while !i < len(e) do
+         invariant 0 <= !i (and user invariants)
+         let x = l[!i] in
+         s;
+         i := !i + 1
+       done
+    *)
+    let i, l, env = for_vars ~loc env in
+    let e = expr env e in
+    let env = add_var env id in
+    mk_expr ~loc (Elet (l, Gnone, e, (* evaluate e only once *)
+    mk_expr ~loc (Elet (i, Gnone, mk_ref ~loc (constant ~loc "0"),
+    let lenl = mk_expr ~loc (Eidapp (len ~loc, [mk_var ~loc l])) in
+    let test =
+      mk_expr ~loc (Eidapp (infix ~loc "<", [deref_id ~loc i; lenl])) in
+    mk_expr ~loc (Ewhile (test, loop_annotation env ann,
+    let li = mk_expr ~loc
+      (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; deref_id ~loc i])) in
+    mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc li,
+    mk_expr ~loc (Esequence (block env body,
+    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "incr"), [mk_var ~loc i])))
+    )))))))))
 
 and block env ?(loc=Loc.dummy_position) = function
   | [] ->
     mk_unit ~loc
   | { Py_ast.stmt_loc = loc; stmt_desc = Py_ast.Sassign (id, e) } :: sl
-    when not (Hstr.mem env.vars id.id_str) ->
+    when not (Mstr.mem id.id_str env.vars) ->
     let e = expr env e in (* check e *before* adding id to environment *)
-    Hstr.add env.vars id.id_str id;
-    let e1 = mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e])) in
-    mk_expr ~loc (Elet (id, Gnone, e1, block env ~loc sl))
+    let env = add_var env id in
+    mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc e, block env ~loc sl))
   | { Py_ast.stmt_loc = loc } as s :: sl ->
     let s = stmt env s in
     let sl = block env ~loc sl in
@@ -144,7 +195,7 @@ and block env ?(loc=Loc.dummy_position) = function
 
 let translate inc (_dl, s) =
   let params = [Loc.dummy_position, None, false, Some (PTtuple [])] in
-  let env = { vars = Hstr.create 32 } in
+  let env = empty_env in
   let fd = (params, None, block env s, empty_spec) in
   let main = Dfun (mk_id "main", Gnone, fd) in
   inc.new_pdecl Loc.dummy_position main
@@ -165,7 +216,7 @@ let read_channel env path file c =
     let use = {use_theory = q; use_import = Some (true, m) }, None in
     inc.use_clone  Loc.dummy_position use in
   List.iter use_import
-    ["int", "Int"; "ref", "Ref"; "python", "Python"];
+    ["int", "Int"; "ref", "Refint"; "python", "Python"];
   translate inc f;
   inc.close_module ();
   let mm, _ as res = Mlw_typing.close_file () in

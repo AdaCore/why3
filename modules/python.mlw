@@ -3,36 +3,44 @@ module Python
 
   use import int.Int
   use import ref.Ref
-  use seq.Seq as S
+  use array.Array as A
 
-  (* Python's lists are resizable arrays *)
-  type list 'a = ref (S.seq 'a)
+  (* Python's lists are actually resizable arrays, but we simplify here *)
+  type list 'a = A.array 'a
 
   function ([]) (l: list 'a) (i: int) : 'a =
-    S.get !l i
+    A.get l i
 
   function len (l: list 'a) : int =
-    S.length !l
+    A.length l
+
+  let len (l: list 'a) : int
+    ensures { result = len(l) }
+  = A.length l
 
   let ([]) (l: list 'a) (i: int) : 'a
-    requires { 0 <= i < S.length !l }
+    requires { 0 <= i < A.length l }
     ensures  { result = l[i] }
-  = S.get !l i
+  = A.([]) l i
 
   let ([]<-) (l: list 'a) (i: int) (v: 'a) : unit
-    requires { 0 <= i < S.length !l }
+    requires { 0 <= i < A.length l }
     writes   { l }
-    ensures  { !l = S.set (old !l) i v }
-  = l := S.set !l i v
+    ensures  { l = A.([<-]) (old l) i v }
+  = A.([]<-) l i v
 
   val range (l u: int) : list int
     requires { l <= u }
-    ensures  { S.length !result = u - l }
+    ensures  { A.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
   (* TODO: specify division and modulus according to
      https://docs.python.org/3/reference/expressions.html *)
   function div int int : int
   function mod int int : int
+
+  val randint (l u: int) : int
+    requires { l <= u }
+    ensures  { l <= result <= u }
 
 end

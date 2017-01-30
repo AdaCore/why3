@@ -62,18 +62,18 @@ let digit = ['0'-'9']
 let ident = letter (letter | digit | '_')*
 let integer = ['0'-'9']+
 let space = ' ' | '\t'
-let comment = "#" [^'#''\n'] [^'\n']*
+let comment = "#" [^'@''\n'] [^'\n']*
 
 rule next_tokens = parse
   | '\n'    { newline lexbuf; update_stack (indentation lexbuf) }
   | (space | comment)+
             { next_tokens lexbuf }
-  | "##" space* "invariant" space+ { [INVARIANT] }
-  | "##" space* "variant"   space+ { [VARIANT] }
-  | "##" space* "assert"    space+ { [ASSERT] }
-  | "##" space* "assume"    space+ { [ASSUME] }
-  | "##" space* "check"     space+ { [CHECK] }
-  | "##"    { raise (Lexing_error "expecting an annotation") }
+  | "#@" space* "invariant" space+ { [INVARIANT] }
+  | "#@" space* "variant"   space+ { [VARIANT] }
+  | "#@" space* "assert"    space+ { [ASSERT] }
+  | "#@" space* "assume"    space+ { [ASSUME] }
+  | "#@" space* "check"     space+ { [CHECK] }
+  | "#@"    { raise (Lexing_error "expecting an annotation") }
   | ident as id
             { [id_or_kwd id] }
   | '+'     { [PLUS] }
