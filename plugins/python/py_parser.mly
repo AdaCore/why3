@@ -71,7 +71,7 @@
 
 file:
 | NEWLINE? dl = list(def) b = list(stmt) EOF
-    { dl, { stmt_desc = Sblock b; stmt_loc = floc $startpos(b) $endpos(b) } }
+    { dl, b }
 ;
 
 def:
@@ -129,13 +129,11 @@ located(X):
 | X { mk_stmt (floc $startpos $endpos) $1 }
 ;
 
-suite: located(suite_desc) { $1 };
-
-suite_desc:
+suite:
 | s = simple_stmt NEWLINE
-    { s.stmt_desc }
+    { [s] }
 | NEWLINE BEGIN l = nonempty_list(stmt) END
-    { Sblock l }
+    { l }
 ;
 
 stmt: located(stmt_desc) { $1 };
@@ -144,13 +142,13 @@ stmt_desc:
 | s = simple_stmt NEWLINE
     { s.stmt_desc }
 | IF c = expr COLON s = suite
-    { Sif (c, s, mk_stmt (floc $startpos $endpos) (Sblock [])) }
+    { Sif (c, s, []) }
 | IF c = expr COLON s1 = suite ELSE COLON s2 = suite
     { Sif (c, s1, s2) }
 | WHILE e = expr COLON s = simple_stmt NEWLINE
-    { Swhile (e, empty_annotation, s) }
+    { Swhile (e, empty_annotation, [s]) }
 | WHILE e = expr COLON NEWLINE BEGIN a=loop_annotation l=nonempty_list(stmt) END
-    { Swhile (e, a, mk_stmt (floc $startpos(l) $endpos(l)) (Sblock l)) }
+    { Swhile (e, a, l) }
 | FOR x = ident IN e = expr COLON s = suite
     { Sfor (x, e, s) }
 ;

@@ -102,16 +102,15 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
 
 let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   match d with
-  | Py_ast.Sblock sl ->
-    block env loc sl
   | Py_ast.Seval e ->
     expr env e
   | Py_ast.Sprint e ->
     mk_expr ~loc (Elet (mk_id ~loc "_", Gnone, expr env e, mk_unit ~loc))
   | Py_ast.Sif (e, s1, s2) ->
-    mk_expr ~loc (Eif (expr env e, stmt env s1, stmt env s2))
+    mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
   | Py_ast.Swhile (e, ann, s) ->
-    mk_expr ~loc (Ewhile (expr env e, loop_annotation env ann, stmt env s))
+    mk_expr ~loc
+      (Ewhile (expr env e, loop_annotation env ann, block env ~loc s))
   | Py_ast.Sreturn _e ->
     assert false (*TODO*)
   | Py_ast.Sassign (id, e) ->
@@ -120,7 +119,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       let x = let loc = id.id_loc in mk_expr ~loc (Eident (Qident id)) in
       mk_expr ~loc (Einfix (x, mk_id ~loc "infix :=", e))
     else
-      block env loc [s]
+      block env ~loc [s]
   | Py_ast.Sfor (_id, _e, _s) ->
     assert false (*TODO*)
   | Py_ast.Sset (_e1, _e2, _e3) ->
@@ -128,7 +127,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Sassert t ->
     mk_expr ~loc (Eassert (Aassert, deref env t))
 
-and block env loc = function
+and block env ?(loc=Loc.dummy_position) = function
   | [] ->
     mk_unit ~loc
   | { Py_ast.stmt_loc = loc; stmt_desc = Py_ast.Sassign (id, e) } :: sl
@@ -136,14 +135,16 @@ and block env loc = function
     let e = expr env e in (* check e *before* adding id to environment *)
     Hstr.add env.vars id.id_str id;
     let e1 = mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e])) in
-    mk_expr ~loc (Elet (id, Gnone, e1, block env loc sl))
+    mk_expr ~loc (Elet (id, Gnone, e1, block env ~loc sl))
   | { Py_ast.stmt_loc = loc } as s :: sl ->
-    mk_expr ~loc (Esequence (stmt env s, block env loc sl))
+    let s = stmt env s in
+    let sl = block env ~loc sl in
+    mk_expr ~loc (Esequence (s, sl))
 
 let translate inc (_dl, s) =
   let params = [Loc.dummy_position, None, false, Some (PTtuple [])] in
   let env = { vars = Hstr.create 32 } in
-  let fd = (params, None, stmt env s, empty_spec) in
+  let fd = (params, None, block env s, empty_spec) in
   let main = Dfun (mk_id "main", Gnone, fd) in
   inc.new_pdecl Loc.dummy_position main
 

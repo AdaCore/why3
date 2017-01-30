@@ -45,18 +45,20 @@ and stmt = {
 }
 
 and stmt_desc =
-  | Sif of expr * stmt * stmt
+  | Sif of expr * block * block
   | Sreturn of expr
   | Sassign of ident * expr
   | Sprint of expr
-  | Sblock of stmt list
-  | Swhile of expr * Ptree.loop_annotation * stmt
-  | Sfor of ident * expr * stmt
+  | Swhile of expr * Ptree.loop_annotation * block
+  | Sfor of ident * expr * block
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
   | Sassert of Ptree.term
 
-and def = ident * ident list * stmt
+and block = stmt list
 
-and file = def list * stmt
+and def = ident * ident list * block
+
+and file = def list * block
+
 
