@@ -63,7 +63,7 @@
 %token <string> STRING
 %token <Py_ast.binop> CMP
 %token <string> IDENT
-%token DEF IF ELSE RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
+%token DEF IF ELSE ELIF RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
 %token FROM IMPORT
 %token EOF
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
@@ -98,7 +98,7 @@ file:
 ;
 
 import:
-| FROM m=ident IMPORT f=ident NEWLINE
+| FROM _m=ident IMPORT _f=ident NEWLINE
   { () (* FIXME: check legal imports *) }
 
 def:
@@ -186,15 +186,22 @@ stmt: located(stmt_desc) { $1 };
 stmt_desc:
 | s = simple_stmt NEWLINE
     { s.stmt_desc }
-| IF c = expr COLON s = suite
-    { Sif (c, s, []) }
-| IF c = expr COLON s1 = suite ELSE COLON s2 = suite
+| IF c = expr COLON s1 = suite s2=else_branch
     { Sif (c, s1, s2) }
 | WHILE e = expr COLON b=loop_body
     { let a, l = b in Swhile (e, a, l) }
 | FOR x = ident IN e = expr COLON b=loop_body
     { let a, l = b in Sfor (x, e, a.loop_invariant, l) }
 ;
+
+else_branch:
+| /* epsilon */
+    { [] }
+| ELSE COLON s2=suite
+    { s2 }
+| ELIF c=expr COLON s1=suite s2=else_branch
+    { [mk_stmt (floc $startpos $endpos) (Sif (c, s1, s2))] }
+
 
 loop_body:
 | s = simple_stmt NEWLINE

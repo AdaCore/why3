@@ -23,7 +23,7 @@
   let id_or_kwd =
     let h = Hashtbl.create 32 in
     List.iter (fun (s, tok) -> Hashtbl.add h s tok)
-      ["def", DEF; "if", IF; "else", ELSE;
+      ["def", DEF; "if", IF; "else", ELSE; "elif", ELIF;
        "return", RETURN; "print", PRINT; "while", WHILE;
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;

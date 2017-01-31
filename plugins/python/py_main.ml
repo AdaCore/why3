@@ -98,7 +98,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Eint s ->
     constant ~loc s
   | Py_ast.Estring _s ->
-    assert false (*TODO*)
+    mk_unit ~loc (*FIXME*)
   | Py_ast.Eident id ->
     if not (Mstr.mem id.id_str env.vars) then
       Loc.errorm ~loc "unbound variable %s" id.id_str;
