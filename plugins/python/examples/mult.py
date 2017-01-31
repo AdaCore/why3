@@ -1,6 +1,6 @@
 
-a = input("entrez a : ")
-b = input("entrez b : ")
+a = int(input("entrez a : "))
+b = int(input("entrez b : "))
 
 #@ assume b >= 0
 
@@ -17,4 +17,3 @@ while q > 0:
 
 print(r)
 #@ assert r == a * b
-

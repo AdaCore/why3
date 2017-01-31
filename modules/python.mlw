@@ -72,6 +72,9 @@ module Python
 
   val input () : int
 
+  val int (n: int) : int
+    ensures { result = n }
+
   exception Break
 
 end

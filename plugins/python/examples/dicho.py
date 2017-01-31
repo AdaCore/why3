@@ -16,7 +16,7 @@ while i < n:
 #@ assert forall i1, i2. 0 <= i1 <= i2 < len(a) -> a[i1] <= a[i2]
 
 print(a)
-v = input("quelle valeur cherchez-vous : ")
+v = int(input("quelle valeur cherchez-vous : "))
 
 l = 0
 u = n-1
