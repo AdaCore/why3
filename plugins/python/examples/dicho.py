@@ -21,10 +21,10 @@ v = input("quelle valeur cherchez-vous : ")
 l = 0
 u = n-1
 r = -1
-while r == -1 and l <= u:
+while l <= u:
     #@ invariant 0 <= l and u < n
-    #@ invariant -1 <= r < n
-    #@ invariant if r >= 0 then a[r] == v else forall i. 0 <= i < n -> a[i] == v -> l <= i <= u
+    #@ invariant r == -1
+    #@ invariant forall i. 0 <= i < n -> a[i] == v -> l <= i <= u
     #@ variant u-l
     m = (l + u) // 2
     #@ assert l <= m and m <= u
