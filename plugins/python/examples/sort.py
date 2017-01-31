@@ -6,9 +6,9 @@ a = [0] * n
 
 for i in range(0, len(a)):
     a[i] = randint(0, 100)
-    print(a[i])
 
-#for m in range(1, len(a)):
+print(a)
+
 m = 1
 while m < len(a):
     #@ invariant 0 <= m <= len(a)
@@ -30,6 +30,5 @@ while m < len(a):
 
 #@ assert forall i,j. 0 <= i <= j < len(a) -> a[i] <= a[j]
 
-for i in range(0, len(a)):
-    print(a[i])
+print(a)
 
