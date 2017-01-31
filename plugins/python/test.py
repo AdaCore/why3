@@ -1,11 +1,11 @@
 
 from random import randint
 
-# def swap(a, i, j):
-#   # @ requires 0 <= i < len(a) and 0 <= j < len(a)
-#   t = a[i]
-#   a[i] = a[j]
-#   a[j] = t
+def swap(a, i, j):
+  #@ requires 0 <= i < len(a) and 0 <= j < len(a)
+  t = a[i]
+  a[i] = a[j]
+  a[j] = t
 
 i = randint(0, 10)
 #@ assert 0 <= i <= 10

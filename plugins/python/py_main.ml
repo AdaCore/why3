@@ -243,7 +243,11 @@ let def inc (id, idl, sp, bl) =
   let env = List.fold_left add_var env idl in
   let param id = id.id_loc, Some id, false, None in
   let params = List.map param idl in
-  let fd = (params, None, block env bl, spec env sp) in
+  let local bl id =
+    let loc = id.id_loc in
+    mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id), bl)) in
+  let bl = List.fold_left local (block env bl) idl in
+  let fd = (params, None, bl, (* spec env *) sp) in
   let d = Dfun (id, Gnone, fd) in
   inc.new_pdecl id.id_loc d
 
