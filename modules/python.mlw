@@ -70,4 +70,8 @@ module Python
     requires { l <= u }
     ensures  { l <= result <= u }
 
+  val input () : int
+
+  exception Break
+
 end

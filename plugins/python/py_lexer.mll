@@ -28,7 +28,7 @@
        "for", FOR; "in", IN;
        "and", AND; "or", OR; "not", NOT;
        "True", TRUE; "False", FALSE; "None", NONE;
-       "from", FROM; "import", IMPORT;
+       "from", FROM; "import", IMPORT; "break", BREAK;
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
       ];

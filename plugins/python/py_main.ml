@@ -16,6 +16,7 @@ open Stdlib
 
 let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"
+let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
 let mk_id ?(loc=Loc.dummy_position) name =
   { id_str = name; id_lab = []; id_loc = loc }
@@ -42,6 +43,10 @@ let constant ~loc s =
   mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
 let len ~loc =
   Qident (mk_id ~loc "len")
+let break ~loc =
+  Qident (mk_id ~loc "Break")
+let catch_break ~loc =
+  [break ~loc, None, mk_unit ~loc]
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))
@@ -89,6 +94,15 @@ let loop_annotation env a =
 
 let add_loop_invariant i a =
   { a with loop_invariant = i :: a.loop_invariant }
+
+let rec has_break s = match s.Py_ast.stmt_desc with
+  | Py_ast.Sbreak -> true
+  | Py_ast.Sreturn _ | Py_ast.Sassign _ | Py_ast.Sprint _
+  | Py_ast.Seval _ | Py_ast.Sset _ | Py_ast.Sassert _
+  | Py_ast.Swhile _ -> false
+  | Py_ast.Sif (_, bl1, bl2) -> has_breakl bl1 || has_breakl bl2
+  | Py_ast.Sfor (_, _, _, bl) -> has_breakl bl
+and has_breakl bl = List.exists has_break bl
 
 let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Enone ->
@@ -167,8 +181,11 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Sassert (k, t) ->
     mk_expr ~loc (Eassert (k, deref env t))
   | Py_ast.Swhile (e, ann, s) ->
-    mk_expr ~loc
-      (Ewhile (expr env e, loop_annotation env ann, block env ~loc s))
+    let loop = mk_expr ~loc
+      (Ewhile (expr env e, loop_annotation env ann, block env ~loc s)) in
+    if has_breakl s then mk_expr ~loc (Etry (loop, catch_break ~loc)) else loop
+  | Py_ast.Sbreak ->
+    mk_expr ~loc (Eraise (break ~loc, None))
   | Py_ast.Sfor (id, e, inv, body) ->
     (* for x in e:
          s

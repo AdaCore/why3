@@ -64,7 +64,7 @@
 %token <Py_ast.binop> CMP
 %token <string> IDENT
 %token DEF IF ELSE ELIF RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
-%token FROM IMPORT
+%token FROM IMPORT BREAK
 %token EOF
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
@@ -238,6 +238,8 @@ simple_stmt_desc:
     { Sassert (k, t) }
 | e = expr
     { Seval e }
+| BREAK
+    { Sbreak }
 ;
 
 assertion_kind:

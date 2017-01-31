@@ -2,7 +2,7 @@
 from random import randint
 
 # def swap(a, i, j):
-#   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
+#   # @ requires 0 <= i < len(a) and 0 <= j < len(a)
 #   t = a[i]
 #   a[i] = a[j]
 #   a[j] = t
