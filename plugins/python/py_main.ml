@@ -36,6 +36,8 @@ let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
   mk_expr ~loc (Eident (Qident id))
+let mk_tvar ~loc id =
+  mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
 let deref_id ~loc id =
@@ -225,7 +227,12 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     let lb = constant ~loc "0" in
     let lenl = mk_expr ~loc (Eidapp (len ~loc, [mk_var ~loc l])) in
     let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl;constant ~loc "1"])) in
-    mk_expr ~loc (Efor (i, lb, To, ub, List.map (deref env) inv,
+    let invariant inv =
+      let loc = inv.term_loc in
+      let li = mk_term ~loc
+        (Tidapp (mixfix ~loc "[]", [mk_tvar ~loc l; mk_tvar ~loc i])) in
+      mk_term ~loc (Tlet (id, li, deref env inv)) in
+    mk_expr ~loc (Efor (i, lb, To, ub, List.map invariant inv,
     let li = mk_expr ~loc
       (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; mk_var ~loc i])) in
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc li,

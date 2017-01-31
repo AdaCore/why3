@@ -1,11 +1,11 @@
 
 from random import randint
 
-def testat():
-  x = 0
-  #@ label L
-  x = x+1
-  #@ assert at(x,L) == 0
+# def testat():
+#   x = 0
+#   #@ label L
+#   x = x+1
+#   #@ assert at(x,L) == 0
 
 def f(x):
   #@ ensures result > x
@@ -17,6 +17,11 @@ def swap(a, i, j):
   t = a[i]
   a[i] = a[j]
   a[j] = t
+
+def foo(x):
+  for k in range(0, 10):
+    #@ invariant 0 <= k <= 10
+    print(k)
 
 i = randint(0, 10)
 #@ assert 0 <= i <= 10
