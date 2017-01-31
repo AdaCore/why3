@@ -63,7 +63,7 @@
 %token <string> STRING
 %token <Py_ast.binop> CMP
 %token <string> IDENT
-%token DEF IF ELSE ELIF RETURN PRINT WHILE FOR IN AND OR NOT NONE TRUE FALSE
+%token DEF IF ELSE ELIF RETURN WHILE FOR IN AND OR NOT NONE TRUE FALSE
 %token FROM IMPORT BREAK
 %token EOF
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
@@ -232,8 +232,6 @@ simple_stmt_desc:
     { Sassign (id, e) }
 | e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
     { Sset (e1, e2, e3) }
-| PRINT e = expr
-    { Sprint e }
 | k=assertion_kind t = term
     { Sassert (k, t) }
 | e = expr

@@ -97,7 +97,7 @@ let add_loop_invariant i a =
 
 let rec has_break s = match s.Py_ast.stmt_desc with
   | Py_ast.Sbreak -> true
-  | Py_ast.Sreturn _ | Py_ast.Sassign _ | Py_ast.Sprint _
+  | Py_ast.Sreturn _ | Py_ast.Sassign _
   | Py_ast.Seval _ | Py_ast.Sset _ | Py_ast.Sassert _
   | Py_ast.Swhile _ -> false
   | Py_ast.Sif (_, bl1, bl2) -> has_breakl bl1 || has_breakl bl2
@@ -139,6 +139,10 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
   | Py_ast.Eunop (Py_ast.Unot, e) ->
     mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
+  | Py_ast.Ecall ({id_str="print"}, el) ->
+    let eval res e =
+      mk_expr ~loc (Elet (mk_id ~loc "_", Gnone, expr env e, res)) in
+    List.fold_left eval (mk_unit ~loc) el
   | Py_ast.Ecall (id, el) ->
     mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
   | Py_ast.Emake (e1, e2) -> (* [e1]*e2 *)
@@ -163,8 +167,6 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   match d with
   | Py_ast.Seval e ->
     expr env e
-  | Py_ast.Sprint e ->
-    mk_expr ~loc (Elet (mk_id ~loc "_", Gnone, expr env e, mk_unit ~loc))
   | Py_ast.Sif (e, s1, s2) ->
     mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
   | Py_ast.Sreturn _e ->

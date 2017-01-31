@@ -49,7 +49,6 @@ and stmt_desc =
   | Sif of expr * block * block
   | Sreturn of expr
   | Sassign of ident * expr
-  | Sprint of expr
   | Swhile of expr * Ptree.loop_annotation * block
   | Sfor of ident * expr * Ptree.invariant * block
   | Seval of expr
