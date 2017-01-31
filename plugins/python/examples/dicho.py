@@ -40,3 +40,8 @@ while l <= u:
 #@ assert -1 <= r < n
 #@ assert if r >= 0 then a[r] == v else forall i. 0 <= i < n -> a[i] != v
 
+if r == -1:
+    print("valeur absente")
+else:
+    print("position", r)
+
