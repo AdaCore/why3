@@ -103,20 +103,21 @@ let loop_annotation env a =
 let add_loop_invariant i a =
   { a with loop_invariant = i :: a.loop_invariant }
 
-let rec has_stmt p s =
-  p s || match s.Py_ast.stmt_desc with
-  | Py_ast.Sbreak | Py_ast.Sreturn _ | Py_ast.Sassign _
-  | Py_ast.Seval _ | Py_ast.Sset _ | Py_ast.Sassert _
-  | Py_ast.Swhile _ -> false
-  | Py_ast.Sif (_, bl1, bl2) -> has_stmtl p bl1 || has_stmtl p bl2
-  | Py_ast.Sfor (_, _, _, bl) -> has_stmtl p bl
-and has_stmtl p bl = List.exists (has_stmt p) bl
+let rec has_break s = match s.stmt_desc with
+  | Sbreak -> true
+  | Sreturn _ | Sassign _ | Slabel _
+  | Seval _ | Sset _ | Sassert _ | Swhile _ -> false
+  | Sif (_, bl1, bl2) -> has_breakl bl1 || has_breakl bl2
+  | Sfor (_, _, _, bl) -> has_breakl bl
+and has_breakl bl = List.exists has_break bl
 
-let has_breakl =
-  has_stmtl (function {stmt_desc = Sbreak } -> true | _ -> false)
-(* FIXME: raise an error on missing return statements *)
-let has_returnl =
-  has_stmtl (function {stmt_desc = Sreturn _ } -> true | _ -> false)
+let rec has_return s = match s.stmt_desc with
+  | Sreturn _ -> true
+  | Sbreak | Sassign _ | Slabel _
+  | Seval _ | Sset _ | Sassert _ -> false
+  | Sif (_, bl1, bl2) -> has_returnl bl1 || has_returnl bl2
+  | Swhile (_, _, bl) | Sfor (_, _, _, bl) -> has_returnl bl
+and has_returnl bl = List.exists has_return bl
 
 let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Enone ->
@@ -203,6 +204,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     else loop
   | Py_ast.Sbreak ->
     mk_expr ~loc (Eraise (break ~loc, None))
+  | Py_ast.Slabel _ ->
+    mk_unit ~loc (* ignore lonely marks *)
   | Py_ast.Sfor (id, e, inv, body) ->
     (* for x in e:
          s
@@ -233,6 +236,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
 and block env ?(loc=Loc.dummy_position) = function
   | [] ->
     mk_unit ~loc
+  | { stmt_loc = loc; stmt_desc = Slabel id } :: sl ->
+    mk_expr ~loc (Emark (id, block env ~loc sl))
   | { Py_ast.stmt_loc = loc; stmt_desc = Py_ast.Sassign (id, e) } :: sl
     when not (Mstr.mem id.id_str env.vars) ->
     let e = expr env e in (* check e *before* adding id to environment *)

@@ -55,6 +55,7 @@ and stmt_desc =
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
   | Sassert of Ptree.assertion_kind * Ptree.term
   | Sbreak
+  | Slabel of ident
 
 and block = stmt list
 

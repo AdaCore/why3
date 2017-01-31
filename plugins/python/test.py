@@ -1,6 +1,12 @@
 
 from random import randint
 
+def testat():
+  x = 0
+  #@ label L
+  x = x+1
+  #@ assert at(x,L) == 0
+
 def f(x):
   #@ ensures result > x
   return x+1

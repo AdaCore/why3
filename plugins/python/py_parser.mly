@@ -69,7 +69,7 @@
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL COLON BEGIN END NEWLINE
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
-%token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES
+%token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token ARROW LRARROW FORALL EXISTS DOT THEN LET
 
 (* precedences *)
@@ -238,6 +238,8 @@ simple_stmt_desc:
     { Seval e }
 | BREAK
     { Sbreak }
+| LABEL id=ident
+    { Slabel id }
 ;
 
 assertion_kind:

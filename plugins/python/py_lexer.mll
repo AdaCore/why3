@@ -40,6 +40,7 @@
       ["invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
        "requires", REQUIRES; "ensures", ENSURES;
+       "label", LABEL;
       ];
     fun s -> try Hashtbl.find h s with Not_found ->
       raise (Lexing_error ("no such annotation '" ^ s ^ "'"))
