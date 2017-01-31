@@ -129,7 +129,6 @@ let rec use_iter f l =
   List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
 
 let rec do_extract_module ?fname m =
-  (* test_extract ?fname m; *)
   let _extract_use m' =
     let fname =
       if m'.mod_theory.Theory.th_path = [] then fname else None
@@ -158,9 +157,10 @@ let do_local_extract fname cin tlist =
   let format = !opt_parser in
   let mm =
     Env.read_channel ?format mlw_language env fname cin in
-  if Queue.is_empty tlist then
+  if Queue.is_empty tlist then begin
     let do_m _ m = do_extract_module ~fname m in
-    Mstr.iter do_m mm
+    Mstr.iter do_m mm;
+  end
   else
     Queue.iter (do_extract_module_from fname mm) tlist
 
@@ -170,7 +170,8 @@ let do_input = function
   | Some f, tlist ->
     let fname, cin = match f with
       | "-" -> "stdin", stdin
-      | f   -> f, open_in f in
+      | f   ->
+        f, open_in f in
     do_local_extract fname cin tlist;
     close_in cin
 

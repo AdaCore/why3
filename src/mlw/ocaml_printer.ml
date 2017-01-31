@@ -183,6 +183,13 @@ module Print = struct
       List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
+  let args_syntax s tl =
+    try
+      ignore (Str.search_forward (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0);
+
+    with Not_found ->
+      tl
+
   let rec print_apply info fmt rs pvl =
     let isfield =
       match rs.rs_field with
@@ -224,8 +231,16 @@ module Print = struct
         fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, tl ->
-       fprintf fmt "@[<hov 2>%a %a@]"
-         print_ident rs.rs_name (print_list space (print_expr info)) tl
+      let open Printer in
+      match query_syntax info.info_convert rs.rs_name,
+            query_syntax info.info_syn rs.rs_name with
+      | Some s, _
+      | _, Some s ->
+        fprintf fmt "@[<hov 2>%s %a@]"
+          s (print_list space (print_expr info)) tl
+      | _ ->
+        fprintf fmt "@[<hov 2>%a %a@]"
+          print_ident rs.rs_name (print_list space (print_expr info)) tl
 
   and print_enode info fmt = function
     | Econst c ->
@@ -325,7 +340,7 @@ module Print = struct
 
   let print_decl info fmt = function
     | Dlet (isrec, [rs, pvl, e]) ->
-       fprintf fmt "@[<hov 2>%s %a@ %a =@ @[%a@]@]"
+       fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
                (if isrec then "let rec" else "let")
                print_ident rs.rs_name
                (print_list space print_vs_arg) pvl
@@ -378,6 +393,7 @@ let fg ?fname m =
       try Filename.chop_extension s
       with Invalid_argument _ -> s
     in
+    let f = Filename.basename f in
     (remove_extension f) ^ "__" ^ mod_name ^ ".ml"
 
 let () = Pdriver.register_printer "ocaml"

@@ -86,6 +86,8 @@ module ML = struct
 
   type var = ident * ty * is_ghost
 
+  type for_direction = To | DownTo
+
   type pat =
     | Pwild
     | Pident  of ident
@@ -98,8 +100,6 @@ module ML = struct
   type is_rec = bool
 
   type binop = Band | Bor | Beq
-
-  type for_direction = To | DownTo
 
   type exn =
     | Xident  of ident
@@ -193,6 +193,13 @@ type info = {
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
 }
+
+let has_syntax cxt id =
+  (* Mid.iter *)
+  (*   (fun id' _ -> Format.printf "id': %s@\n" id'.id_string) *)
+  (*   cxt.info_syn; *)
+  query_syntax cxt.info_syn id <> None ||
+  query_syntax cxt.info_convert id <> None
 
 (** Translation from Mlw to ML *)
 
@@ -382,7 +389,7 @@ module Translate = struct
       let al pv = pv_name pv, ML.tunit, false in
       let args = filter2_ghost_params pv_not_ghost def al cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
-    | Eexec _ -> assert false
+    | Eexec ({c_node = Cany}, _) -> assert false
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
@@ -398,13 +405,19 @@ module Translate = struct
        let e2 = expr info e2 in
        let e3 = expr info e3 in
        ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
+    | Ewhile (e1, _, _, e2) ->
+      let e1 = expr info e1 in
+      let e2 = expr info e2 in
+      ML.mk_expr (ML.Ewhile (e1, e2)) (ML.I e.e_ity) eff
+    | Efor (pv1, (pv2, direction, pv3), _, efor) ->
+      let e = expr info e in
+      let direction = for_direction direction in
+      ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, e)) (ML.I efor.e_ity) eff
     | Eghost eg ->
       expr info eg (* it keeps its ghost status *)
     | Eassign [(_, rs, pv)] ->
       ML.mk_expr (ML.Eassign [(rs, pv)]) (ML.I e.e_ity) eff
     | Epure _ -> assert false
-    | Efor _ -> assert false
-    | Ewhile _ -> assert false
     | Etry _ -> assert false
     | Eraise _ -> assert false
     | _ -> (* TODO *) assert false
@@ -416,7 +429,7 @@ module Translate = struct
   let itd_name td = td.itd_its.its_ts.ts_name
 
   (* type declarations/definitions *)
-  let tdef itd =
+  let tdef info itd =
     let s = itd.itd_its in
     let ddata_constructs = (* point-free *)
       List.map (fun ({rs_cty = rsc} as rs) ->
@@ -446,10 +459,17 @@ module Translate = struct
          ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
     end
 
+  let is_val e =
+    match e.e_node with
+    | Eexec ({c_node = Cany}, _) -> true
+    | _ -> false
+
   (* program declarations *)
   let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
+      []
+    | PDlet (LDsym (rs, {c_node = Cfun e})) when is_val e ->
       []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args_filter =
@@ -471,11 +491,11 @@ module Translate = struct
       in
       [ML.Dlet (true, rec_def)]
     | PDlet (LDsym _)
-    | PDlet (LDvar (_, _))
-    | PDpure ->
+    | PDpure
+    | PDlet (LDvar (_, _)) ->
       []
     | PDtype itl ->
-       [ML.Dtype (List.map tdef itl)]
+      [ML.Dtype (List.map (tdef info) itl)]
     | PDexn xs ->
        if ity_equal xs.xs_ity ity_unit then
          [ML.Dexn (xs, None)]
