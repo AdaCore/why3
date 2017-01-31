@@ -11,6 +11,7 @@
 
 open Why3
 open Mlw_module
+open Py_ast
 open Ptree
 open Stdlib
 
@@ -29,6 +30,8 @@ let mk_expr ?(loc=Loc.dummy_position) d =
   { expr_desc = d; expr_loc = loc }
 let mk_term ?(loc=Loc.dummy_position) d =
   { term_desc = d; term_loc = loc }
+let mk_pat ?(loc=Loc.dummy_position) d =
+  { pat_desc = d; pat_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
 let mk_var ~loc id =
@@ -45,8 +48,13 @@ let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =
   Qident (mk_id ~loc "Break")
-let catch_break ~loc =
+let break_handler ~loc =
   [break ~loc, None, mk_unit ~loc]
+let return ~loc =
+  Qident (mk_id ~loc "Return")
+let return_handler ~loc =
+  let x = mk_id ~loc "x" in
+  [return ~loc, Some (mk_pat ~loc (Pvar x)), mk_var ~loc x]
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))
@@ -95,14 +103,20 @@ let loop_annotation env a =
 let add_loop_invariant i a =
   { a with loop_invariant = i :: a.loop_invariant }
 
-let rec has_break s = match s.Py_ast.stmt_desc with
-  | Py_ast.Sbreak -> true
-  | Py_ast.Sreturn _ | Py_ast.Sassign _
+let rec has_stmt p s =
+  p s || match s.Py_ast.stmt_desc with
+  | Py_ast.Sbreak | Py_ast.Sreturn _ | Py_ast.Sassign _
   | Py_ast.Seval _ | Py_ast.Sset _ | Py_ast.Sassert _
   | Py_ast.Swhile _ -> false
-  | Py_ast.Sif (_, bl1, bl2) -> has_breakl bl1 || has_breakl bl2
-  | Py_ast.Sfor (_, _, _, bl) -> has_breakl bl
-and has_breakl bl = List.exists has_break bl
+  | Py_ast.Sif (_, bl1, bl2) -> has_stmtl p bl1 || has_stmtl p bl2
+  | Py_ast.Sfor (_, _, _, bl) -> has_stmtl p bl
+and has_stmtl p bl = List.exists (has_stmt p) bl
+
+let has_breakl =
+  has_stmtl (function {stmt_desc = Sbreak } -> true | _ -> false)
+(* FIXME: raise an error on missing return statements *)
+let has_returnl =
+  has_stmtl (function {stmt_desc = Sreturn _ } -> true | _ -> false)
 
 let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Enone ->
@@ -169,8 +183,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     expr env e
   | Py_ast.Sif (e, s1, s2) ->
     mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
-  | Py_ast.Sreturn _e ->
-    assert false (*TODO*)
+  | Py_ast.Sreturn e ->
+    mk_expr ~loc (Eraise (return ~loc, Some (expr env e)))
   | Py_ast.Sassign (id, e) ->
     let e = expr env e in
     if Mstr.mem id.id_str env.vars then
@@ -185,7 +199,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Swhile (e, ann, s) ->
     let loop = mk_expr ~loc
       (Ewhile (expr env e, loop_annotation env ann, block env ~loc s)) in
-    if has_breakl s then mk_expr ~loc (Etry (loop, catch_break ~loc)) else loop
+    if has_breakl s then mk_expr ~loc (Etry (loop, break_handler ~loc))
+    else loop
   | Py_ast.Sbreak ->
     mk_expr ~loc (Eraise (break ~loc, None))
   | Py_ast.Sfor (id, e, inv, body) ->
@@ -225,8 +240,7 @@ and block env ?(loc=Loc.dummy_position) = function
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc e, block env ~loc sl))
   | { Py_ast.stmt_loc = loc } as s :: sl ->
     let s = stmt env s in
-    let sl = block env ~loc sl in
-    mk_expr ~loc (Esequence (s, sl))
+    if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
 
 let post env (loc, l) =
   loc, List.map (fun (pat, t) -> pat, deref env t) l
@@ -238,16 +252,25 @@ let spec env sp =
     sp_pre = List.map (deref env) sp.sp_pre;
     sp_post = List.map (post env) sp.sp_post }
 
+(* f(x1,...,xn): body
+
+   let f x1 ... xn =
+     let x1 = ref x1 in ... let xn = ref xn in
+     try body with Return x -> x *)
 let def inc (id, idl, sp, bl) =
+  let loc = id.id_loc in
   let env = empty_env in
   let env = List.fold_left add_var env idl in
-  let param id = id.id_loc, Some id, false, None in
-  let params = List.map param idl in
+  let body = block env bl in
+  let body = if has_returnl bl then
+      mk_expr ~loc (Etry (body, return_handler ~loc)) else body in
   let local bl id =
     let loc = id.id_loc in
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id), bl)) in
-  let bl = List.fold_left local (block env bl) idl in
-  let fd = (params, None, bl, (* spec env *) sp) in
+  let body = List.fold_left local body idl in
+  let param id = id.id_loc, Some id, false, None in
+  let params = List.map param idl in
+  let fd = (params, None, body, sp) in
   let d = Dfun (id, Gnone, fd) in
   inc.new_pdecl id.id_loc d
 

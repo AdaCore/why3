@@ -1,8 +1,13 @@
 
 from random import randint
 
+def f(x):
+  #@ ensures result > x
+  return x+1
+
 def swap(a, i, j):
   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
+  #@ ensures  a[i] == old(a[j])
   t = a[i]
   a[i] = a[j]
   a[j] = t
