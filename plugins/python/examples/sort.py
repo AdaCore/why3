@@ -1,3 +1,4 @@
+
 from random import randint
 
 n = 42
@@ -17,10 +18,10 @@ while m < len(a):
     k = m
     while k > 0 and a[k-1] > x:
         #@ invariant 0 <= k <= m
-        #@ invariant forall j. k < j <= m -> x < a[j]
-        #@ invariant forall i,j. k < i <= j <= m -> a[i] <= a[j]
-        #@ invariant forall i,j. 0 <= i <= j < k -> a[i] <= a[j]
-        #@ invariant forall i,j. 0 <= i < k < j <= m -> a[i] <= a[j]
+        #@ invariant forall i,j. 0 <= i <= j < k               -> a[i] <= a[j]
+        #@ invariant forall i,j. 0 <= i      < k <      j <= m -> a[i] <= a[j]
+        #@ invariant forall i,j.               k < i <= j <= m -> a[i] <= a[j]
+        #@ invariant forall j.                 k <      j <= m -> x    <  a[j]
         #@ variant k
         a[k] = a[k-1]
         k = k - 1
