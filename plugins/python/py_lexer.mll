@@ -105,7 +105,8 @@ rule next_tokens = parse
   | ':'     { [COLON] }
   (* logic symbols *)
   | "->"    { [ARROW] }
-  | "->"    { [LRARROW] }
+  | "<-"    { [LARROW] }
+  | "<->"   { [LRARROW] }
   | "."     { [DOT] }
   | integer as s
             { [INTEGER s] }

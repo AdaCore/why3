@@ -39,6 +39,7 @@
   let mixfix s = "mixfix " ^ s
 
   let get_op s e = Qident (mk_id (mixfix "[]") s e)
+  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
 
   let empty_spec = {
     sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
@@ -70,7 +71,7 @@
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
-%token ARROW LRARROW FORALL EXISTS DOT THEN LET
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET
 
 (* precedences *)
 
@@ -299,6 +300,8 @@ term_sub_:
 | LEFTPAR term RIGHTPAR                             { $2.term_desc }
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
+| term_arg LEFTSQ term LARROW term RIGHTSQ
+    { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 
 %inline bin_op:
 | ARROW   { Timplies }

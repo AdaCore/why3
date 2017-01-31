@@ -1,3 +1,15 @@
+module MapOcc
+  use import int.Int
+  use import map.Map
+  use import map.Occ
+
+  lemma occ_exchange :
+    forall m: map int 'a, l u i j: int, x y z: 'a.
+      l <= i < u ->
+      l <= j < u ->
+        Occ.occ z m[i <- x][j <- y] l u =
+        Occ.occ z m[i <- y][j <- x] l u
+end
 
 module Python
 
@@ -10,6 +22,9 @@ module Python
 
   function ([]) (l: list 'a) (i: int) : 'a =
     Array.get l i
+
+  function ([<-]) (l: list 'a) (i: int) (v: 'a) : list 'a =
+    Array.set l i v
 
   function len (l: list 'a) : int =
     Array.length l
@@ -33,6 +48,13 @@ module Python
     requires { l <= u }
     ensures  { Array.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
+
+  (* ad-hoc facts about exchange *)
+
+  use MapOcc
+
+  function occurrence (v: 'a) (l: list 'a) : int =
+    MapOcc.Occ.occ v l.Array.elts 0 l.Array.length
 
   (* Python's division and modulus according are neither Euclidean division,
      nor computer division, but something else defined in
