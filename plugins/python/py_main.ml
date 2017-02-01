@@ -19,18 +19,18 @@ let debug = Debug.register_flag "python"
   ~desc:"mini-python plugin debug flag"
 let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
-let mk_id ?(loc=Loc.dummy_position) name =
+let mk_id ~loc name =
   { id_str = name; id_lab = []; id_loc = loc }
 
 let infix  ~loc s = Qident (mk_id ~loc ("infix "  ^ s))
 let prefix ~loc s = Qident (mk_id ~loc ("prefix " ^ s))
 let mixfix ~loc s = Qident (mk_id ~loc ("mixfix " ^ s))
 
-let mk_expr ?(loc=Loc.dummy_position) d =
+let mk_expr ~loc d =
   { expr_desc = d; expr_loc = loc }
-let mk_term ?(loc=Loc.dummy_position) d =
+let mk_term ~loc d =
   { term_desc = d; term_loc = loc }
-let mk_pat ?(loc=Loc.dummy_position) d =
+let mk_pat ~loc d =
   { pat_desc = d; pat_loc = loc }
 let mk_unit ~loc =
   mk_expr ~loc (Etuple [])
@@ -237,10 +237,10 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       (Eidapp (mixfix ~loc "[]", [mk_var ~loc l; mk_var ~loc i])) in
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc li,
     let env = add_var env id in
-    block env body
+    block ~loc env body
     ))))))
 
-and block env ?(loc=Loc.dummy_position) = function
+and block env ~loc = function
   | [] ->
     mk_unit ~loc
   | { stmt_loc = loc; stmt_desc = Slabel id } :: sl ->
@@ -273,7 +273,7 @@ let def inc (id, idl, sp, bl) =
   let loc = id.id_loc in
   let env = empty_env in
   let env = List.fold_left add_var env idl in
-  let body = block env bl in
+  let body = block env ~loc bl in
   let body = if has_returnl bl then
       mk_expr ~loc (Etry (body, return_handler ~loc)) else body in
   let local bl id =
@@ -286,17 +286,18 @@ let def inc (id, idl, sp, bl) =
   let d = Dfun (id, Gnone, fd) in
   inc.new_pdecl id.id_loc d
 
-let translate inc (dl, s) =
+let translate ~loc inc (dl, s) =
   List.iter (def inc) dl;
-  let params = [Loc.dummy_position, None, false, Some (PTtuple [])] in
+  let params = [loc, None, false, Some (PTtuple [])] in
   let env = empty_env in
-  let fd = (params, None, block env s, empty_spec) in
-  let main = Dfun (mk_id "main", Gnone, fd) in
-  inc.new_pdecl Loc.dummy_position main
+  let fd = (params, None, block env ~loc s, empty_spec) in
+  let main = Dfun (mk_id ~loc "main", Gnone, fd) in
+  inc.new_pdecl loc main
 
 let read_channel env path file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
+  let loc = Loc.user_position file 0 0 0 in
   let f = Loc.with_location (Py_parser.file Py_lexer.next_token) lb in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let file = Filename.basename file in
@@ -304,14 +305,14 @@ let read_channel env path file c =
   let name = String.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
   let inc = Mlw_typing.open_file env path in
-  inc.open_module (mk_id name);
+  inc.open_module (mk_id ~loc name);
   let use_import (f, m) =
-    let q = Qdot (Qident (mk_id f), mk_id m) in
+    let q = Qdot (Qident (mk_id ~loc f), mk_id ~loc m) in
     let use = {use_theory = q; use_import = Some (true, m) }, None in
-    inc.use_clone  Loc.dummy_position use in
+    inc.use_clone loc use in
   List.iter use_import
     ["int", "Int"; "ref", "Refint"; "python", "Python"];
-  translate inc f;
+  translate ~loc inc f;
   inc.close_module ();
   let mm, _ as res = Mlw_typing.close_file () in
   if path = [] && Debug.test_flag debug then begin
