@@ -23,6 +23,7 @@ open Theory
 open Pmodule
 open Stdlib
 open Pdecl
+open Printer
 
 module Print = struct
 
@@ -95,26 +96,33 @@ module Print = struct
 
   (** Types *)
 
-  let rec print_ty ?(paren=false) fmt = function
+  let rec print_ty ?(paren=false) info fmt = function
     | Tvar tv ->
       print_tv fmt tv
     | Ttuple [] ->
       fprintf fmt "unit"
     | Ttuple tl ->
       fprintf fmt (protect_on paren "@[%a@]")
-        (print_list star (print_ty ~paren:false)) tl
-    | Tapp (ts, []) ->
-      print_ident fmt ts
-    | Tapp (ts, [ty]) ->
-      fprintf fmt (protect_on paren "%a@ %a")
-        (print_ty ~paren:true) ty print_ident ts
+        (print_list star (print_ty ~paren:false info)) tl
     | Tapp (ts, tl) ->
-      fprintf fmt (protect_on paren "(%a)@ %a")
-        (print_list comma (print_ty ~paren:false)) tl
-        print_ident ts
+      begin match query_syntax info.info_syn ts with
+        | Some s -> syntax_arguments s (print_ty info) fmt tl
+        | None   ->
+          begin match tl with
+            | [] ->
+              print_ident fmt ts
+            | [ty] ->
+              fprintf fmt (protect_on paren "%a@ %a")
+                (print_ty ~paren:true info) ty print_ident ts
+            | tl ->
+              fprintf fmt (protect_on paren "(%a)@ %a")
+                (print_list comma (print_ty ~paren:false info)) tl
+                print_ident ts
+          end
+      end
 
-  let print_vsty fmt (v, ty, _) =
-    fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false) ty
+  let print_vsty info fmt (v, ty, _) =
+    fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false info) ty
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -122,8 +130,8 @@ module Print = struct
     | [tv] -> fprintf fmt "%a@ " print_tv_arg tv
     | tvl  -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
-  let print_vs_arg fmt vs =
-    fprintf fmt "@[(%a)@]" print_vsty vs
+  let print_vs_arg info fmt vs =
+    fprintf fmt "@[(%a)@]" (print_vsty info) vs
 
   let print_path =
     print_list dot pp_print_string (* point-free *)
@@ -183,14 +191,16 @@ module Print = struct
       List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
-  let args_syntax s tl =
+  let rec args_syntax info fmt s tl =
     try
       ignore (Str.search_forward (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0);
-
+      printf "template: %s@\n" s;
+      syntax_arguments s (print_expr info) fmt tl
     with Not_found ->
-      tl
+      ()
+      (* tl *)
 
-  let rec print_apply info fmt rs pvl =
+  and print_apply info fmt rs pvl =
     let isfield =
       match rs.rs_field with
       | None -> false
@@ -231,11 +241,12 @@ module Print = struct
         fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, tl ->
-      let open Printer in
       match query_syntax info.info_convert rs.rs_name,
             query_syntax info.info_syn rs.rs_name with
       | Some s, _
       | _, Some s ->
+        syntax_arguments s (print_expr info) fmt tl;
+        args_syntax info fmt s tl;
         fprintf fmt "@[<hov 2>%s %a@]"
           s (print_list space (print_expr info)) tl
       | _ ->
@@ -281,7 +292,7 @@ module Print = struct
         (print_list semi (print_expr info)) el
     | Efun (varl, e) ->
       fprintf fmt "@[<hov 2>(fun %a ->@ %a)@]"
-        (print_list space print_vs_arg) varl (print_expr info) e
+        (print_list space (print_vs_arg info)) varl (print_expr info) e
     | Eletrec (is_rec, [rs, [], ef], ein) ->
       fprintf fmt "@[<hov 2>let %s%a =@ @[%a@]@] in@ %a"
         (if is_rec then "rec " else "")
@@ -292,7 +303,7 @@ module Print = struct
       fprintf fmt "@[<hov 2>let %s%a %a@ =@ @[%a@]@] in@ %a"
         (if is_rec then "rec " else "")
         (print_lident info) rs.rs_name
-        (print_list space print_vs_arg) args
+        (print_list space (print_vs_arg info)) args
         (print_expr info) ef
         (print_expr info) ein
     | _ -> (* TODO *) assert false
@@ -303,7 +314,7 @@ module Print = struct
   and print_expr info fmt e =
     print_enode info fmt e.e_node
 
-  let print_type_decl fmt its =
+  let print_type_decl info fmt its =
     let print_constr fmt (id, cs_args) =
       match cs_args with
       | [] ->
@@ -313,12 +324,12 @@ module Print = struct
       | l ->
          fprintf fmt "@[<hov 4>| %a of %a@]"
                  print_ident id (* FIXME: print_uident *)
-                 (print_list star (print_ty ~paren:false)) l in
+                 (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
       fprintf fmt "%s%a: %a;"
               (if is_mutable then "mutable " else "")
               print_ident id
-              (print_ty ~paren:false) ty in
+              (print_ty ~paren:false info) ty in
     let print_def fmt = function
       | None ->
         ()
@@ -329,7 +340,7 @@ module Print = struct
           (if its.its_private then "private " else "")
           (print_list newline print_field) fl
       | Some (Dalias ty) ->
-        fprintf fmt " =@ %a" (print_ty ~paren:false) ty
+        fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
       (if true then "type" else "and") (* FIXME: mutual recursive types *)
@@ -343,19 +354,19 @@ module Print = struct
        fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
                (if isrec then "let rec" else "let")
                print_ident rs.rs_name
-               (print_list space print_vs_arg) pvl
+               (print_list space (print_vs_arg info)) pvl
                (print_expr info) e;
        forget_vars pvl;
        forget_tvs ();
        fprintf fmt "@\n@\n"
     | Dtype dl ->
-       print_list newline print_type_decl fmt dl;
+       print_list newline (print_type_decl info) fmt dl;
        fprintf fmt "@\n@\n"
     | Dexn (xs, None) ->
        fprintf fmt "exception %a@\n@\n" print_ident xs.xs_name
     | Dexn (xs, Some t) ->
        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-               print_ident xs.xs_name (print_ty ~paren:true) t
+               print_ident xs.xs_name (print_ty ~paren:true info) t
     | _ -> (* TODO *) assert false
 
 end

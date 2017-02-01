@@ -468,8 +468,8 @@ module Translate = struct
   let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
-      []
-    | PDlet (LDsym (rs, {c_node = Cfun e})) when is_val e ->
+       []
+    | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e ->
       []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args_filter =
