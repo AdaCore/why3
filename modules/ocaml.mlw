@@ -1,0 +1,43 @@
+(* module OCaml *)
+
+(* use export int.Int *)
+(* use export int.MinMax *)
+(* use export option.Option *)
+(* use export list.List *)
+(* use export seq.Seq *)
+
+(* scope Sys *)
+(*   constant max_array_length : int *)
+(* end *)
+
+(* use array.Array *)
+(* type array 'a = Array.array 'a *)
+
+(* end *)
+
+module Sys
+
+  use import int.Int
+  use import mach.int.Int63
+
+  val constant max_array_length : int63
+  axiom non_neg_max_array_length : to_int max_array_length >= 0
+
+end
+
+module Pervasives
+
+  exception Exit
+
+  use import int.Int
+  use import mach.int.Int63
+
+  val succ (x: int63) : int63
+    requires { "expl:integer overflow" in_bounds (to_int x + 1) }
+    ensures  { to_int result = to_int x + 1 }
+
+  val pred (x: int63) : int63
+    requires { "expl:integer overflow" in_bounds (to_int x - 1) }
+    ensures  { to_int result = to_int x - 1 }
+
+end
