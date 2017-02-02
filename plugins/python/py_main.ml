@@ -208,19 +208,29 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     mk_expr ~loc (Eraise (break ~loc, None))
   | Py_ast.Slabel _ ->
     mk_unit ~loc (* ignore lonely marks *)
-  | Py_ast.Sfor (id, e, inv, body) ->
-    (* for x in e:
-         s
-
-    is translated to
-
+  (* make a special case for
+       for id in range(e1, e2):
+    *)
+  | Py_ast.Sfor (id, {expr_desc=Ecall ({id_str="range"}, [e1;e2])},
+                 inv, body) ->
+    let inv = List.map (deref env) inv in
+    mk_expr ~loc (Efor (id, expr env e1, To, expr env e2, inv,
+    mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id),
+    let env = add_var env id in
+    block ~loc env body))))
+  (* otherwise, translate
+       for id in e:
+         #@ invariant inv
+         body
+    to
        let l = e in
        for i = 0 to len(l)-1 do
-         user invariants
-         let x = l[i] in
-         s
+         invariant { let id = l[i] in I }
+         let id = ref l[i] in
+         body
        done
     *)
+  | Py_ast.Sfor (id, e, inv, body) ->
     let i, l, env = for_vars ~loc env in
     let e = expr env e in
     mk_expr ~loc (Elet (l, Gnone, e, (* evaluate e only once *)
@@ -264,6 +274,8 @@ let spec env sp =
     sp_pre = List.map (deref env) sp.sp_pre;
     sp_post = List.map (post env) sp.sp_post }
 
+let no_params ~loc = [loc, None, false, Some (PTtuple [])]
+
 (* f(x1,...,xn): body
 
    let f x1 ... xn =
@@ -281,16 +293,14 @@ let def inc (id, idl, sp, bl) =
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id), bl)) in
   let body = List.fold_left local body idl in
   let param id = id.id_loc, Some id, false, None in
-  let params = List.map param idl in
+  let params = if idl = [] then no_params ~loc else List.map param idl in
   let fd = (params, None, body, sp) in
   let d = Dfun (id, Gnone, fd) in
   inc.new_pdecl id.id_loc d
 
 let translate ~loc inc (dl, s) =
   List.iter (def inc) dl;
-  let params = [loc, None, false, Some (PTtuple [])] in
-  let env = empty_env in
-  let fd = (params, None, block env ~loc s, empty_spec) in
+  let fd = (no_params ~loc, None, block empty_env ~loc s, empty_spec) in
   let main = Dfun (mk_id ~loc "main", Gnone, fd) in
   inc.new_pdecl loc main
 

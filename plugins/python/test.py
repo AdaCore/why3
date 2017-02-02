@@ -1,12 +1,6 @@
 
 from random import randint
 
-# def testat():
-#   x = 0
-#   #@ label L
-#   x = x+1
-#   #@ assert at(x,L) == 0
-
 def f(x):
   #@ ensures result > x
   return x+1
@@ -18,10 +12,12 @@ def swap(a, i, j):
   a[i] = a[j]
   a[j] = t
 
-def foo(x):
-  for k in range(0, 10):
-    #@ invariant 0 <= k <= 10
-    print(k)
+def t10():
+  s = 0
+  for i in range(0, 10):
+    #@ invariant 2 * s == i * (i-1)
+    s = s + i
+  #@ assert s == 55
 
 i = randint(0, 10)
 #@ assert 0 <= i <= 10
