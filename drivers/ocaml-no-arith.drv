@@ -68,9 +68,9 @@ end
 module ref.Ref
   syntax type     ref      "(%1 Pervasives.ref)"
   syntax function contents "%1.Pervasives.contents"
-  syntax val      ref      "Pervasives.ref"
-  syntax val      (!_)     "Pervasives.(!)"
-  syntax val      (:=)     "Pervasives.(:=)"
+  syntax val      ref      "Pervasives.ref %1"
+  syntax val      (!_)     "Pervasives.(!) %1"
+  syntax val      (:=)     "Pervasives.(:=) %1 %2"
 end
 
 module null.Null
