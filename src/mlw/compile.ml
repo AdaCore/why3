@@ -102,8 +102,7 @@ module ML = struct
   type binop = Band | Bor | Beq
 
   type exn =
-    | Xident  of ident
-    | Xexit             (* Pervasives.Exit *)
+    | Xident of ident
 
   type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
 
@@ -123,7 +122,7 @@ module ML = struct
     | Eletrec of is_rec * (rsymbol * var list * expr) list * expr
     | Eif     of expr * expr * expr
     | Ecast   of expr * ty
-    | Eassign of (rsymbol * pvsymbol) list
+    | Eassign of (pvsymbol * rsymbol * pvsymbol) list
     | Etuple  of expr list (* at least 2 expressions *)
     | Ematch  of expr * (pat * expr) list
     | Ebinop  of expr * binop * expr
@@ -340,7 +339,7 @@ module Translate = struct
 
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
-    (* assert (not eff.eff_ghost); *)
+    assert (not eff.eff_ghost);
     match e.e_node with
     | Econst c ->
        let c = match c with Number.ConstInt c -> c | _ -> assert false in
@@ -410,16 +409,24 @@ module Translate = struct
       let e2 = expr info e2 in
       ML.mk_expr (ML.Ewhile (e1, e2)) (ML.I e.e_ity) eff
     | Efor (pv1, (pv2, direction, pv3), _, efor) ->
-      let e = expr info e in
+      let efor = expr info efor in
       let direction = for_direction direction in
-      ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, e)) (ML.I efor.e_ity) eff
-    | Eghost eg ->
-      expr info eg (* it keeps its ghost status *)
-    | Eassign [(_, rs, pv)] ->
-      ML.mk_expr (ML.Eassign [(rs, pv)]) (ML.I e.e_ity) eff
+      ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff
+    | Eghost _ ->
+      ML.mk_unit
+    | Eassign [(rho, rs, pv)] ->
+      ML.mk_expr (ML.Eassign [(rho, rs, pv)]) (ML.I e.e_ity) eff
     | Epure _ -> assert false
     | Etry _ -> assert false
-    | Eraise _ -> assert false
+    | Eraise (xs, ex) ->
+      let ex =
+        let open ML in
+        match expr info ex with
+        | {e_node = Eblock []} -> None
+        | e -> Some e
+      in
+      let exn = ML.Xident xs.xs_name in
+      ML.mk_expr (ML.Eraise (exn, ex)) (ML.I e.e_ity) eff
     | _ -> (* TODO *) assert false
 
   and ebranch info ({pp_pat = p}, e) =

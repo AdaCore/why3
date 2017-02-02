@@ -55,8 +55,17 @@ module Print = struct
     forget_all aprinter
 
   let forget_id vs = forget_id iprinter vs
+  let _forget_ids = List.iter forget_id
   let forget_var (id, _, _) = forget_id id
   let forget_vars = List.iter forget_var
+
+  let rec forget_pat = function
+    | Pwild -> ()
+    | Pident id -> forget_id id
+    | Papp (_, pl) | Ptuple pl -> List.iter forget_pat pl
+    | Precord pl -> List.iter (fun (_,p) -> forget_pat p) pl
+    | Por (p1, p2) -> forget_pat p1; forget_pat p2
+    | Pas (p, _) -> forget_pat p
 
   let print_ident fmt id =
     let s = id_unique iprinter id in
@@ -104,6 +113,9 @@ module Print = struct
     | Ttuple tl ->
       fprintf fmt (protect_on paren "@[%a@]")
         (print_list star (print_ty ~paren:false info)) tl
+    | Tapp (ts, [t1; t2]) when id_equal ts ts_func.ts_name ->
+      fprintf fmt (protect_on paren "@[%a ->@ %a@]")
+        (print_ty ~paren:true info) t1 (print_ty info) t2
     | Tapp (ts, tl) ->
       begin match query_syntax info.info_syn ts with
         | Some s -> syntax_arguments s (print_ty info) fmt tl
@@ -169,11 +181,6 @@ module Print = struct
        in
        fprintf fmt "{ %a }" (print_list semi print_field) fl
 
-  let print_const fmt c =
-    let n = Number.compute_int c in
-    let m = BigInt.to_int n in
-    fprintf fmt "%d" m
-
   (** Expressions *)
 
   let extract_op {id_string = s} =
@@ -194,11 +201,8 @@ module Print = struct
   let rec args_syntax info fmt s tl =
     try
       ignore (Str.search_forward (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0);
-      printf "template: %s@\n" s;
       syntax_arguments s (print_expr info) fmt tl
-    with Not_found ->
-      ()
-      (* tl *)
+    with Not_found -> ()
 
   and print_apply info fmt rs pvl =
     let isfield =
@@ -214,15 +218,16 @@ module Print = struct
         List.exists is_constructor its
       | _ -> false
     in
-    match extract_op rs.rs_name, pvl with
-    | Some o, [e1; e2] ->
-      fprintf fmt "@[<hov 1>%a %s %a@]"
-        (print_expr info) e1 o (print_expr info) e2
-    | _, [] ->
-       print_ident fmt rs.rs_name
-    | _, [t1] when isfield ->
+    match query_syntax info.info_convert rs.rs_name,
+          query_syntax info.info_syn rs.rs_name, pvl with
+    | Some s, _, _
+    | _, Some s, _ ->
+      syntax_arguments s (print_expr info) fmt pvl
+    | _, _, [] ->
+      print_ident fmt rs.rs_name
+    | _,  _, [t1] when isfield ->
       fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
-    | _, tl when isconstructor () ->
+    | _, _, tl when isconstructor () ->
       let pjl = get_record info rs in
       if pjl = [] then
         fprintf fmt "@[<hov 2>%a (%a)@]"
@@ -240,45 +245,43 @@ module Print = struct
         in
         fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
-    | _, tl ->
-      match query_syntax info.info_convert rs.rs_name,
-            query_syntax info.info_syn rs.rs_name with
-      | Some s, _
-      | _, Some s ->
-        syntax_arguments s (print_expr info) fmt tl;
-        args_syntax info fmt s tl;
-        fprintf fmt "@[<hov 2>%s %a@]"
-          s (print_list space (print_expr info)) tl
-      | _ ->
+    | _, _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]"
           print_ident rs.rs_name (print_list space (print_expr info)) tl
 
   and print_enode info fmt = function
     | Econst c ->
-       fprintf fmt "%a" print_const c
+      let n = Number.compute_int c in
+      fprintf fmt "(Z.of_string \"%s\")" (BigInt.to_string n)
     | Evar pvs ->
-       (print_lident info) fmt (pv_name pvs)
+      (print_lident info) fmt (pv_name pvs)
     | Elet (pv, e1, e2) ->
-       fprintf fmt "@[<hov 2>let %a =@ %a@] in@\n%a"
-         (print_lident info) (pv_name pv)
-         (print_expr info) e1 (print_expr info) e2
+      fprintf fmt "@[<hov 2>let %a =@ %a@] in@\n%a"
+        (print_lident info) (pv_name pv)
+        (print_expr info) e1 (print_expr info) e2;
+      forget_id (pv_name pv)
     | Eabsurd ->
-       fprintf fmt "assert false (* absurd *)"
+      fprintf fmt "assert false (* absurd *)"
     | Eapp (s, []) when rs_equal s rs_true ->
-       fprintf fmt "true"
+      fprintf fmt "true"
     | Eapp (s, []) when rs_equal s rs_false ->
       fprintf fmt "false"
     | Eapp (s, [e1; e2]) when rs_equal s rs_func_app ->
       fprintf fmt "@[<hov 1>%a %a@]"
         (print_expr info) e1 (print_expr info) e2
     | Eapp (s, pvl) ->
-       print_apply info fmt s pvl
+      print_apply info fmt s pvl
     | Ematch (e, pl) ->
-      fprintf fmt "@[begin match @[%a@] with@\n@[<hov>%a@] end@]"
+      fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@] end"
         (print_expr info) e (print_list newline (print_branch info)) pl
-    | Eassign [(rs, pv)] ->
-      fprintf fmt "%a <-@ %a"
-        print_ident rs.rs_name print_ident (pv_name pv)
+    | Eassign [(rho, rs, pv)] ->
+      fprintf fmt "%a.%a <-@ %a"
+        print_ident (pv_name rho) print_ident rs.rs_name
+        print_ident (pv_name pv)
+    | Eif (e1, e2, {e_node = Eblock []}) ->
+      fprintf fmt
+        "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]"
+        (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]"
@@ -306,7 +309,32 @@ module Print = struct
         (print_list space (print_vs_arg info)) args
         (print_expr info) ef
         (print_expr info) ein
-    | _ -> (* TODO *) assert false
+    | Ewhile (e1, e2) ->
+      fprintf fmt "@[<hov 2>while %a do@ %a@ done@]"
+        (print_expr info) e1 (print_expr info) e2
+    | Eraise (Xident id, None) -> (* FIXME : check exceptions in driver *)
+      fprintf fmt "raise %a" (print_uident info) id
+    | Eraise (Xident id, Some e) ->
+      fprintf fmt "(raise %a %a)"
+        (print_uident info) id (print_expr info) e
+    | Etuple _ -> (* TODO *) assert false
+    | Efor (pv1, pv2, direction, pv3, e) ->
+      let print_for_direction fmt = function
+        | To -> fprintf fmt "to"
+        | DownTo -> fprintf fmt "downto"
+      in
+      fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
+        (print_lident info) (pv_name pv1)
+        (print_lident info) (pv_name pv2)
+        print_for_direction direction
+        (print_lident info) (pv_name pv3)
+        (print_expr info) e
+    | Etry _ -> (* TODO *) assert false
+    | Enot _ -> (* TODO *) assert false
+    | Ebinop _ -> (* TODO *) assert false
+    | Eletrec _ -> (* TODO *) assert false
+    | Ecast _ -> (* TODO *) assert false
+    | Eassign _ -> (* TODO *) assert false
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]" print_pat p (print_expr info) e
@@ -350,6 +378,13 @@ module Print = struct
       print_def its.its_def
 
   let print_decl info fmt = function
+    | Dlet (isrec, [rs, [], e]) ->
+       fprintf fmt "@[<hov 2>%s %a =@ %a@]"
+               (if isrec then "let rec" else "let")
+               print_ident rs.rs_name
+               (print_expr info) e;
+       forget_tvs ();
+       fprintf fmt "@\n@\n"
     | Dlet (isrec, [rs, pvl, e]) ->
        fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
                (if isrec then "let rec" else "let")
@@ -384,7 +419,6 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
-  fprintf fmt "(*@\n%a@\n*)@\n@\n" print_module m;
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
