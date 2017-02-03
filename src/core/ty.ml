@@ -67,6 +67,8 @@ module Mts = Tsym.M
 module Hts = Tsym.H
 module Wts = Tsym.W
 
+type coercions_map = () (* TO BE COMPLETED *)
+
 let ts_equal : tysymbol -> tysymbol -> bool = (==)
 let ty_equal : ty       -> ty       -> bool = (==)
 
@@ -265,4 +267,3 @@ let oty_cons = Opt.fold (fun tl t -> t::tl)
 
 let ty_equal_check ty1 ty2 =
   if not (ty_equal ty1 ty2) then raise (TypeMismatch (ty1, ty2))
-
