@@ -25,7 +25,7 @@ module BinaryMultiplication
       variant   { !y }
       if !y % 2 = 1 then z := !z + !x;
       x := 2 * !x;
-      y := div !y 2
+      y := !y / 2
     done;
     !z
 
