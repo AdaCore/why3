@@ -67,8 +67,6 @@ module Mts = Tsym.M
 module Hts = Tsym.H
 module Wts = Tsym.W
 
-type coercions_map = () (* TO BE COMPLETED *)
-
 let ts_equal : tysymbol -> tysymbol -> bool = (==)
 let ty_equal : ty       -> ty       -> bool = (==)
 

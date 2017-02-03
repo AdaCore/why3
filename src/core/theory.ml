@@ -143,20 +143,24 @@ let register_meta ~desc s al excl =
 let register_meta_excl ~desc s al = register_meta ~desc s al true
 let register_meta      ~desc s al = register_meta ~desc s al false
 
+
 let lookup_meta s = Hstr.find_exn meta_table (UnknownMeta s) s
 
 let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
 
 (** Theory *)
 
+type coercions_map = (lsymbol Mts.t) Mts.t
+
 type theory = {
-  th_name   : ident;      (* theory name *)
-  th_path   : string list;(* environment qualifiers *)
-  th_decls  : tdecl list; (* theory declarations *)
-  th_export : namespace;  (* exported namespace *)
-  th_known  : known_map;  (* known identifiers *)
-  th_local  : Sid.t;      (* locally declared idents *)
-  th_used   : Sid.t;      (* used theories *)
+  th_name   : ident;        (* theory name *)
+  th_path   : string list;  (* environment qualifiers *)
+  th_decls  : tdecl list;   (* theory declarations *)
+  th_export : namespace;    (* exported namespace *)
+  th_known  : known_map;    (* known identifiers *)
+  th_local  : Sid.t;        (* locally declared idents *)
+  th_used   : Sid.t;        (* used theories *)
+  th_crcmap : coercions_map; (* coercions *)
 }
 
 and tdecl = {
@@ -262,6 +266,7 @@ type theory_uc = {
   uc_known  : known_map;
   uc_local  : Sid.t;
   uc_used   : Sid.t;
+  uc_crcmap : coercions_map;
 }
 
 exception CloseTheory
@@ -277,17 +282,27 @@ let empty_theory n p = {
   uc_known  = Mid.empty;
   uc_local  = Sid.empty;
   uc_used   = Sid.empty;
+  uc_crcmap = Mts.empty;
 }
 
 let close_theory uc = match uc.uc_export with
-  | [e] -> {
+  | [e] ->
+     Mts.iter
+       (fun k m ->
+         (Mts.iter (fun k2 ls -> Format.eprintf "%s * %s -> %s@."
+                                                k.ts_name.id_string
+                                                k2.ts_name.id_string
+                                                ls.ls_name.id_string) m
+         )) uc.uc_crcmap;
+         {
       th_name   = uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_export = e;
       th_known  = uc.uc_known;
       th_local  = uc.uc_local;
-      th_used   = uc.uc_used }
+      th_used   = uc.uc_used;
+      th_crcmap = uc.uc_crcmap}
   | _ -> raise CloseTheory
 
 let get_namespace uc = List.hd uc.uc_import
@@ -331,6 +346,17 @@ let known_meta kn al =
   in
   List.iter check al
 
+
+let add_coercion crcmap m al = match al with
+  | [MAls ({ls_args = [{ ty_node = Tyapp (ty1,_) }];
+           ls_value = Some { ty_node = Tyapp (ty2,_) }} as ls)] ->
+     let crcmap1 =
+       try Mts.find ty1 crcmap
+       with Not_found -> Mts.empty in
+     let crcmap2  = Mts.add ty2 ls crcmap1 in
+     Mts.add ty1 crcmap2 crcmap
+  | _ -> assert false
+
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
       uc_decls = td :: uc.uc_decls;
@@ -343,6 +369,10 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
+  | Meta (m,al) when m.meta_name = "coercion" ->
+     known_meta uc.uc_known al;
+     { uc with uc_decls = td :: uc.uc_decls;
+               uc_crcmap = add_coercion uc.uc_crcmap m al  }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
@@ -809,6 +839,7 @@ let builtin_theory =
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
   let uc = add_param_decl uc ps_equ in
+  let _ = register_meta ~desc:"coercion" "coercion" [MTlsymbol] in
   close_theory uc
 
 let create_theory ?(path=[]) n =
