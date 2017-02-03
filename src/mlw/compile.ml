@@ -346,6 +346,8 @@ module Translate = struct
        ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
       ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
+    | Elet (LDvar (pvs, e1), e2) when is_underscore pvs && e_ghost e2 ->
+      ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) when e_ghost e1 ->
@@ -523,13 +525,13 @@ end
 
 (** Erasure operations related to ghost code *)
 
-module Erasure = struct
+(* module Erasure = struct *)
 
-  open ML
+(*   open ML *)
 
 
 
-end
+(* end *)
 
 (*
  * Local Variables:

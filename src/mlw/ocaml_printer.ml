@@ -419,6 +419,7 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
+  fprintf fmt "(*@\n%a@\n*)" print_module m;
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
