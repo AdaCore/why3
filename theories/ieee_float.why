@@ -25,6 +25,7 @@ end
 theory GenericFloat
 
   use import int.Int
+  use import bv.Pow2int
   use real.Abs
   use real.FromInt
   use real.Truncate
@@ -88,7 +89,6 @@ theory GenericFloat
   function fma  mode t t t : t (* x * y + z *)
 
   function sqrt mode t   : t
-  function rem                t t : t
 
   function roundToIntegral mode t : t
 
@@ -213,27 +213,19 @@ theory GenericFloat
   constant max_real : real (* defined when cloning *)
   constant max_int  : int
 
-(* constant emax = pow2 (eb -1)
-   axiom max_real: max_real = pow2 emax - pow2 (emax - sb) *)
+  constant emax : int = pow2 (eb - 1)
 
+  axiom max_int : max_int = pow2 emax - pow2 (emax - sb)
   axiom max_real_int: max_real = FromInt.from_int max_int
 
   predicate in_range (x:real) = -. max_real <=. x <=. max_real
 
-  axiom is_finite: forall x:t. is_finite x -> in_range (to_real x)
+  predicate in_int_range (i:int) = - max_int <= i <= max_int
 
-  axiom zero_is_finite : is_finite zeroF
+  axiom is_finite: forall x:t. is_finite x -> in_range (to_real x)
 
   (* used as a condition to propagate is_finite *)
   predicate no_overflow (m:mode) (x:real) = in_range (round m x)
-
-  axiom of_int_is_finite: forall m:mode, x:int [of_int m x].
-    no_overflow m (FromInt.from_int x) ->
-    is_finite (of_int m x)
-
-  axiom of_int_to_real: forall m:mode, x:int [of_int m x].
-    no_overflow m (FromInt.from_int x) ->
-    to_real (of_int m x) = round m (FromInt.from_int x)
 
   (* Axioms on round *)
 
@@ -259,22 +251,18 @@ theory GenericFloat
   axiom Round_up_neg:
     forall x:real. round RTP (-.x) = -. round RTN x
 
-  (* The biggest representable integer whose predecessor (i.e. -1) is
-     representable *)
-  constant max_representable_integer : int (* defined when cloning RENAME -> max_safe_integer ? *)
-  (* pow2sb ? *)
+  (* The biggest representable integer whose predecessor (i.e. -1) is  representable *)
+  constant pow2sb : int (* defined when cloning *)
+  axiom pow2sb: pow2sb = pow2 sb
 
-(* axiom max_representable_integer:
-    max_representable_integer = pow2 sb *)
-
-  predicate exact_int (i: int) =
-    (- max_representable_integer) <= i <= max_representable_integer
+  (* range in which every integer is representable *)
+  predicate in_safe_int_range (i: int) = - pow2sb <= i <= pow2sb
 
   (* round and integers *)
 
   axiom Exact_rounding_for_integers:
     forall m:mode, i:int.
-      exact_int i ->
+      in_safe_int_range i ->
         round m (FromInt.from_int i) = FromInt.from_int i
 
   (** {3 Comparisons} *)
@@ -635,29 +623,18 @@ theory GenericFloat
   (* exact arithmetic with integers *)
 
   axiom of_int_add_exact: forall m n, i j.
-    exact_int i -> exact_int j ->
-    exact_int (i + j) -> eq (of_int m (i + j)) (add n (of_int m i) (of_int m j))
+    in_safe_int_range i -> in_safe_int_range j ->
+    in_safe_int_range (i + j) -> eq (of_int m (i + j)) (add n (of_int m i) (of_int m j))
 
   axiom of_int_sub_exact: forall m n, i j.
-    exact_int i -> exact_int j ->
-    exact_int (i - j) -> eq (of_int m (i - j)) (sub n (of_int m i) (of_int m j))
+    in_safe_int_range i -> in_safe_int_range j ->
+    in_safe_int_range (i - j) -> eq (of_int m (i - j)) (sub n (of_int m i) (of_int m j))
 
   axiom of_int_mul_exact: forall m n, i j.
-    exact_int i -> exact_int j ->
-    exact_int (i * j) -> eq (of_int m (i * j)) (mul n (of_int m i) (of_int m j))
+    in_safe_int_range i -> in_safe_int_range j ->
+    in_safe_int_range (i * j) -> eq (of_int m (i * j)) (mul n (of_int m i) (of_int m j))
 
-  (* magic axioms  *)
-
-  (* those two are wrong, find a correct version *)
-  (* axiom sqrt_m : forall a b. *)
-  (* is_finite a -> is_finite b -> is_positive b -> no_overflow *)
-  (* (to_real a * to_real b) -> *)
-  (*     gt (mul a a) b -> ge a (sqrt b) *)
-
-  (* axiom div_m  : forall a b c. *)
-  (* is_finite a -> is_finite b -> is_finite c ->
-     no_overflow (to_real a * to_real c) -> not is_zero c -> *)
-  (*     gt (mul a c) b -> ge a (div b c) *)
+  (* min and max *)
 
   lemma Min_r : forall x y:t. y .<= x -> (min x y) .= y
   lemma Min_l : forall x y:t. x .<= y -> (min x y) .= x
@@ -671,29 +648,70 @@ theory GenericFloat
   (* This predicate specify if a float is finite and is an integer *)
   predicate is_int (x:t)
 
+  (** characterizing integers *)
+
+  (* by construction *)
   axiom zeroF_is_int: is_int zeroF
 
   axiom of_int_is_int: forall m, x.
-    (- max_int) <= x <= max_int -> is_int (of_int m x)
+    in_int_range x -> is_int (of_int m x)
 
-  axiom is_int_is_finite: forall x. is_int x -> is_finite x
+  axiom big_float_is_int: forall m i.
+    is_finite i ->
+    i .<= neg (of_int m pow2sb) \/ (of_int m pow2sb) .<= i ->
+      is_int i
+
+  axiom roundToIntegral_is_int: forall m:mode, x:t. is_finite x ->
+    is_int (roundToIntegral m x)
+
+  (* by propagation *)
+  axiom eq_is_int: forall x y. eq x y -> is_int x -> is_int y
+
+  axiom add_int: forall x y m. is_int x -> is_int y ->
+    is_finite (add m x y) -> is_int (add m x y)
+
+  axiom sub_int: forall x y m. is_int x -> is_int y ->
+    is_finite (sub m x y) -> is_int (sub m x y)
+
+  axiom mul_int: forall x y m. is_int x -> is_int y ->
+    is_finite (mul m x y) -> is_int (mul m x y)
+
+  axiom fma_int: forall x y z m. is_int x -> is_int y -> is_int z ->
+    is_finite (fma m x y z) -> is_int (fma m x y z)
+
+  axiom neg_int: forall x. is_int x -> is_int (neg x)
+
+  axiom abs_int: forall x. is_int x -> is_int (abs x)
+
+  (** basic properties of float integers *)
+
+  axiom is_int_of_int: forall x m m'.
+    is_int x -> eq x (of_int m' (to_int m x))
+
+  axiom is_int_to_int: forall m x.
+    is_int x -> in_int_range (to_int m x)
+
+  axiom is_int_is_finite: forall x.
+    is_int x -> is_finite x
 
   axiom int_to_real: forall m x.
     is_int x -> to_real x = FromInt.from_int (to_int m x)
 
+  (* exact arithmetic with integers (alt) *)
+(* axiom int_add_exact: forall m n, i j.
+    is_int i -> is_int j -> in_safe_int_range (to_int m i + to_int m j) ->
+      to_int m (add n i j) = to_int m i + to_int m j
+
+  axiom int_sub_exact: forall m n, i j.
+    is_int  i -> is_int j -> in_safe_int_range (to_int m i - to_int m j) ->
+      to_int m (sub n i j) = to_int m i - to_int m j
+
+  axiom int_mul_exact: forall m n, i j.
+    is_int i -> is_int j -> in_safe_int_range (to_int m i * to_int m j) ->
+      to_int m (mul n i j) = to_int m i * to_int m j *)
+
 (*  axiom int_mode: forall m1 m2 x.
     is_int x -> to_int m1 x = to_int m2 x  etc ...*)
-  (** big floats are ints *)
-  axiom big_float_is_int: forall m i.
-    is_finite i ->
-    (i .<= neg (of_int m max_representable_integer) \/
-    (of_int m max_representable_integer) .<= i) ->
-      is_int i
-
-  (** rounded are ints *)
-
-  axiom roundToIntegral_is_int: forall m:mode, x:t. is_finite x ->
-    is_int (roundToIntegral m x)
 
   (** rounding ints *)
 
@@ -762,11 +780,8 @@ theory GenericFloat
     is_finite x -> is_finite y -> le x y -> to_int m x <= to_int m y
 
   axiom to_int_of_int: forall m:mode, i:int.
-    exact_int i ->
+    in_safe_int_range i ->
       to_int m (of_int m i) = i
-
-  axiom to_int_eq_of_int: forall m, x, i.
-    is_int x -> to_int m x = i -> x .= of_int m i
 
   axiom eq_to_int: forall m, x y. is_finite x -> x .= y ->
     to_int m x = to_int m y
@@ -839,13 +854,21 @@ theory Float32
 
   type t
 
-  constant max_representable_integer : int = 16777216
+  constant pow2sb : int = 16777216
   constant max_real : real = 0x1.FFFFFEp127
+  constant eb : int = 8
+  constant sb : int = 24
 
   clone export GenericFloat with
     type t = t,
+    constant eb = eb,
+    constant sb = sb,
     constant max_real = max_real,
-    constant max_representable_integer = max_representable_integer
+    constant pow2sb = pow2sb,
+    goal eb_gt_1,
+    goal sb_gt_1,
+    goal max_int,
+    goal pow2sb
 
   lemma round_bound_ne :
     forall x:real [round RNE x].
@@ -864,13 +887,21 @@ theory Float64
 
   type t
 
-  constant max_representable_integer : int = 9007199254740992
+  constant pow2sb : int = 9007199254740992
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
+  constant eb : int = 11
+  constant sb : int = 53
 
   clone export GenericFloat with
     type t = t,
+    constant eb = eb,
+    constant sb = sb,
     constant max_real = max_real,
-    constant max_representable_integer = max_representable_integer
+    constant pow2sb = pow2sb,
+    goal eb_gt_1,
+    goal sb_gt_1,
+    goal max_int,
+    goal pow2sb
 
   lemma round_bound_ne :
     forall x:real [round RNE x].

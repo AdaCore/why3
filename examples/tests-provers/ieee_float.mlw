@@ -7,7 +7,7 @@ module TestIeeeFloat
 
   lemma Test01:
        forall x:t.
-          .-(of_int RNE 2) .<= x .<= (of_int RNE 2) -> zeroF .<= x .* x .<= (of_int RNE 4)
+          .-(of_int RNE 2) .<= x .<= (of_int RNE 2) -> .- (of_int RNE 4) .<= x .* x .<= (of_int RNE 4)
 
 end
 
@@ -16,7 +16,7 @@ module M603_018
 
   constant x : t = zeroF
   constant y : t = of_int RNE 1
-  constant z : t = half
+  constant z : t = y ./ (of_int RNE 2)
   constant t : t = (x .+ y) ./ (of_int RNE 2)
 
   let triplet (x y z : t)
@@ -116,6 +116,8 @@ end
 
 module Test
   use import ieee_float.Float32
+
+  constant half : t = of_int RNE 1 ./ of_int RNE 2
 
   goal G1: forall x. is_finite x -> x .- half .<= roundToIntegral RNA x .<= x .+ half
 

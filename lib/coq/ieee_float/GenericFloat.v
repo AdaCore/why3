@@ -11,6 +11,7 @@ Require real.Abs.
 Require real.FromInt.
 Require real.Truncate.
 Require real.Square.
+Require bv.Pow2int.
 
 Require Import Flocq.Core.Fcore.
 Require Import Flocq.Appli.Fappli_IEEE.
@@ -227,10 +228,6 @@ Admitted.
 
 (* Why3 goal *)
 Notation sqrt := (Bsqrt sb emax Hsb' Hemax' (fun b => (true,One_Nan_pl))).
-
-(* Why3 goal *)
-Definition rem: t -> t -> t.
-Admitted.
 
 Notation z_to_fp := (fun m x => binary_normalize sb emax Hsb' Hemax' m x 0 false).
 
@@ -844,6 +841,12 @@ Definition max_int: Z.
 Defined.
 
 (* Why3 goal *)
+Lemma max_int1 : (max_int = ((bv.Pow2int.pow2 (bv.Pow2int.pow2 (eb - 1%Z)%Z)) - (bv.Pow2int.pow2 ((bv.Pow2int.pow2 (eb - 1%Z)%Z) - sb)%Z))%Z).
+  rewrite two_p_equiv, two_p_equiv, two_p_equiv.
+  now unfold max_int, emax.
+Qed.
+
+(* Why3 goal *)
 Lemma max_real_int : (max_real = (Reals.Raxioms.IZR max_int)).
   unfold max_int.
   rewrite <-Z2R_IZR, Z2R_minus.
@@ -855,6 +858,10 @@ Qed.
 (* Why3 assumption *)
 Definition in_range (x:R): Prop := ((-max_real)%R <= x)%R /\
   (x <= max_real)%R.
+
+(* Why3 assumption *)
+Definition in_int_range (i:Z): Prop := ((-max_int)%Z <= i)%Z /\
+  (i <= max_int)%Z.
 
 Lemma in_range_bpow_radix2_emax: forall x, in_range x -> Rabs x < bpow radix2 emax.
   unfold in_range; intros.
@@ -896,11 +903,6 @@ Lemma Rabs_round_max_real_emax:
     fold to_real (round m x) in H0.
     rewrite <-H0, Abs.Abs_le.
     apply (is_finite1 _ H).
-Qed.
-
-(* Why3 goal *)
-Lemma zero_is_finite : (is_finite zeroF).
-  easy.
 Qed.
 
 (* Why3 assumption *)
@@ -946,21 +948,6 @@ Lemma of_int_correct :
 
   - apply no_overflow_Rabs_round_emax.
     rewrite IZR_alt; apply h1.
-Qed.
-
-(* Why3 goal *)
-Lemma of_int_is_finite : forall (m:mode) (x:Z), (no_overflow m
-  (Reals.Raxioms.IZR x)) -> (is_finite (of_int m x)).
-  intros m x h1.
-  apply (of_int_correct h1).
-Qed.
-
-(* Why3 goal *)
-Lemma of_int_to_real : forall (m:mode) (x:Z), (no_overflow m
-  (Reals.Raxioms.IZR x)) -> ((to_real (of_int m x)) = (round m
-  (Reals.Raxioms.IZR x))).
-  intros m x h1.
-  apply (of_int_correct h1).
 Qed.
 
 (* Why3 goal *)
@@ -1045,14 +1032,18 @@ now rewrite Ropp_involutive.
 Qed.
 
 (* Why3 goal *)
-Definition max_representable_integer: Z.
+Definition pow2sb: Z.
   exact (Zpower 2 sb).
 Defined.
 
+(* Why3 goal *)
+Lemma pow2sb1 : (pow2sb = (bv.Pow2int.pow2 sb)).
+  now rewrite two_p_equiv.
+Qed.
+
 (* Why3 assumption *)
-Definition exact_int (i:Z): Prop :=
-  ((-max_representable_integer)%Z <= i)%Z /\
-  (i <= max_representable_integer)%Z.
+Definition in_safe_int_range (i:Z): Prop := ((-pow2sb)%Z <= i)%Z /\
+  (i <= pow2sb)%Z.
 
 Lemma max_rep_int_bounded: bounded sb emax (shift_pos (sb_pos - 1) 1) 1 = true.
   unfold bounded.
@@ -1076,13 +1067,13 @@ Definition Bmax_rep_int: t.
   exact (B754_finite sb emax false _ _ max_rep_int_bounded).
 Defined.
 
-Lemma IZR_max_representable_integer: IZR max_representable_integer = bpow radix2 sb.
-  unfold max_representable_integer. simpl.
+Lemma IZR_pow2sb: IZR pow2sb = bpow radix2 sb.
+  unfold pow2sb. simpl.
   rewrite Z2R_IZR; reflexivity.
 Qed.
 
-Lemma Bmax_rep_int_to_real: to_real Bmax_rep_int = IZR max_representable_integer.
-  rewrite IZR_max_representable_integer.
+Lemma Bmax_rep_int_to_real: to_real Bmax_rep_int = IZR pow2sb.
+  rewrite IZR_pow2sb.
   unfold to_real, B2R; simpl.
   rewrite shift_pos_correct.
   rewrite Z.pow_pos_fold.
@@ -1098,7 +1089,7 @@ Lemma Bmax_rep_int_to_real: to_real Bmax_rep_int = IZR max_representable_integer
   ring.
 Qed.
 
-Lemma max_representable_integer_lt_max_int: (max_representable_integer <= max_int)%Z.
+Lemma pow2sb_lt_max_int: (pow2sb <= max_int)%Z.
   apply le_IZR.
   rewrite <-max_real_int, <-Bmax_rep_int_to_real.
   apply is_finite1.
@@ -1106,7 +1097,7 @@ Lemma max_representable_integer_lt_max_int: (max_representable_integer <= max_in
 Qed.
 
 Lemma rep_int_in_range:
-  forall i, (- max_representable_integer <= i <= max_representable_integer)%Z ->
+  forall i, (- pow2sb <= i <= pow2sb)%Z ->
             in_range (IZR i).
   intros.
   rewrite <-Z.abs_le in H.
@@ -1114,7 +1105,7 @@ Lemma rep_int_in_range:
   rewrite <-Rabs_Zabs in r.
   unfold in_range.
   apply Rabs_le_inv.
-  apply Rle_trans with (r2 := IZR max_representable_integer); auto.
+  apply Rle_trans with (r2 := IZR pow2sb); auto.
 
   rewrite <-Bmax_rep_int_to_real, <-max_value_to_real.
   apply le_to_real; try easy.
@@ -1126,12 +1117,12 @@ Lemma rep_int_in_range:
 Qed.
 
 (* Why3 goal *)
-Lemma Exact_rounding_for_integers : forall (m:mode) (i:Z), (exact_int i) ->
-  ((round m (Reals.Raxioms.IZR i)) = (Reals.Raxioms.IZR i)).
+Lemma Exact_rounding_for_integers : forall (m:mode) (i:Z), (in_safe_int_range
+  i) -> ((round m (Reals.Raxioms.IZR i)) = (Reals.Raxioms.IZR i)).
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
-assert (Zabs z <= max_representable_integer)%Z.
+assert (Zabs z <= pow2sb)%Z.
 apply Z.abs_le with (1:=Hz).
 destruct (Zle_lt_or_eq _ _ H) as [Bz|Bz] ; clear H Hz.
 apply generic_format_FLT.
@@ -1142,7 +1133,7 @@ rewrite Z2R_IZR.
 now rewrite Rmult_1_r.
 split. easy.
 unfold emin; generalize Hsb' Hemax'; omega.
-unfold max_representable_integer in Bz.
+unfold pow2sb in Bz.
 change 2%Z with (radix_val radix2) in Bz.
 apply generic_format_abs_inv.
 rewrite  <- Z2R_IZR, <- Z2R_abs, Bz, Z2R_Zpower.
@@ -1154,13 +1145,13 @@ apply Zlt_le_weak.
 apply Hsb'.
 Qed.
 
-Lemma exact_int_no_overflow : forall m {i}, exact_int i -> no_overflow m (IZR i).
+Lemma in_safe_int_range_no_overflow : forall m {i}, in_safe_int_range i -> no_overflow m (IZR i).
   intros m i h.
   apply Bounded_real_no_overflow.
-  unfold exact_int in h.
+  unfold in_safe_int_range in h.
   unfold in_range.
   rewrite max_real_int, <-FromInt.Neg, <-Z2R_IZR, <-Z2R_IZR, <-Z2R_IZR.
-  pose proof max_representable_integer_lt_max_int.
+  pose proof pow2sb_lt_max_int.
   split; apply Z2R_le; auto with zarith.
 Qed.
 
@@ -1535,6 +1526,7 @@ Qed.
 Lemma positive_to_real : forall (x:t), (is_finite x) -> ((is_positive x) ->
   (0%R <= (to_real x))%R).
   intros x h1 h2.
+  assert (is_finite zeroF) as zero_is_finite by easy.
   rewrite <-zeroF_to_real; apply (le_to_real _ _ zero_is_finite h1).
   generalize (is_positive_correct x); intro H; destruct H, H; auto.
   rewrite H; auto.
@@ -1562,6 +1554,7 @@ Qed.
 Lemma to_real_positive : forall (x:t), (is_finite x) ->
   ((0%R < (to_real x))%R -> (is_positive x)).
   intros x h1 h2.
+  assert (is_finite zeroF) as zero_is_finite by easy.
   rewrite <-zeroF_to_real, <-(lt_finite _ _ (conj zero_is_finite h1)) in h2.
   generalize (is_positive_correct x); intro H; destruct H; auto.
 Qed.
@@ -1570,6 +1563,7 @@ Qed.
 Lemma negative_to_real : forall (x:t), (is_finite x) -> ((is_negative x) ->
   ((to_real x) <= 0%R)%R).
   intros x h1 h2.
+  assert (is_finite zeroF) as zero_is_finite by easy.
   rewrite <-zeroF_to_real; apply (le_to_real _ _ h1 zero_is_finite).
   generalize (is_negative_correct x); intro H; destruct H, H; auto.
   rewrite H; auto.
@@ -1597,6 +1591,7 @@ Qed.
 Lemma to_real_negative : forall (x:t), (is_finite x) ->
   (((to_real x) < 0%R)%R -> (is_negative x)).
   intros x h1 h2.
+  assert (is_finite zeroF) as zero_is_finite by easy.
   rewrite <-zeroF_to_real, <-(lt_finite _ _ (conj h1 zero_is_finite)) in h2.
   generalize (is_negative_correct x); intro H; destruct H; auto.
 Qed.
@@ -1825,6 +1820,7 @@ Lemma div_finite : forall (m:mode) (x:t) (y:t), (is_finite x) -> ((is_finite
   ((is_finite (div m x y)) /\ ((to_real (div m x y)) = (round m
   ((to_real x) / (to_real y))%R)))))).
   intros m x y h1 h2 h3 h4.
+  assert (is_finite zeroF) as zero_is_finite by easy.
   rewrite (to_real_eq zero_is_finite h2) in h3.
   apply not_eq_sym in h3.
   generalize (Bdiv_correct sb emax Hsb'' Hemax' nan_bf m x y h3); rewrite Rlt_bool_true, h1.
@@ -2235,6 +2231,7 @@ intros m x y r.
         destruct H2 as [H2|H2]; apply (f_equal to_real) in H2.
         rewrite zeroF_to_real in H2.
         rewrite <-H2; auto.
+        assert (is_finite zeroF) as zero_is_finite by easy.
         destruct (neg_finite zeroF zero_is_finite).
         rewrite H5, zeroF_to_real, Ropp_0 in H2.
         rewrite <-H2; auto. }
@@ -2258,6 +2255,32 @@ intros m x y r.
         destruct overflow_to_inf in H4; easy.
 
     + apply Rnot_lt_le; assumption.
+Qed.
+
+Lemma no_overflow_or_not: forall m x, no_overflow m x \/ ~ no_overflow m x.
+  intros m x.
+  rewrite no_overflow_Rabs_round_emax.
+  destruct (Rlt_dec (Rabs (round m x)) (bpow radix2 emax));[left|right]; assumption.
+Qed.
+
+Lemma add_finite_rev_n' : forall (m:mode) (x:t) (y:t),
+    is_finite (add m x y) ->
+    (no_overflow m ((to_real x) + (to_real y))%R
+     /\ to_real (add m x y) = round m ((to_real x) + (to_real y))%R)
+    \/ to_real (add m x y) = max_real \/ to_real (add m x y) =-  max_real .
+intros m x y h1.
+destruct (add_finite_rev m x y h1).
+
+destruct (no_overflow_or_not m (to_real x + to_real y));[left|right].
+
+split; [auto|apply add_finite; easy].
+destruct (add_special m x y) as (_,(_,(_,(_,(_,(h,_)))))).
+assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x + to_real y)) by auto.
+apply h in H2; clear h.
+destruct H2.
+destruct (add m x y), b, m; simpl in *; try easy;
+  try (destruct H3, H4; now auto);
+  destruct H3, H3; auto.
 Qed.
 
 (* Why3 goal *)
@@ -2465,6 +2488,7 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
         destruct H2 as [H2|H2]; apply (f_equal to_real) in H2.
         rewrite zeroF_to_real in H2.
         rewrite <-H2; auto.
+        assert (is_finite zeroF) as zero_is_finite by easy.
         destruct (neg_finite zeroF zero_is_finite).
         rewrite H5, zeroF_to_real, Ropp_0 in H2.
         rewrite <-H2; auto. }
@@ -2488,6 +2512,26 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
         destruct overflow_to_inf in H4; easy.
 
     + apply Rnot_lt_le; assumption.
+Qed.
+
+Lemma sub_finite_rev_n' : forall (m:mode) (x:t) (y:t),
+    is_finite (sub m x y) ->
+    (no_overflow m ((to_real x) - (to_real y))%R
+     /\ to_real (sub m x y) = round m ((to_real x) - (to_real y))%R)
+    \/ to_real (sub m x y) = max_real \/ to_real (sub m x y) =-  max_real .
+intros m x y h1.
+destruct (sub_finite_rev m x y h1).
+
+destruct (no_overflow_or_not m (to_real x - to_real y));[left|right].
+
+split; [auto|apply sub_finite; easy].
+destruct (sub_special m x y) as (_,(_,(_,(_,(_,(h,_)))))).
+assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x - to_real y)) by auto.
+apply h in H2; clear h.
+destruct H2.
+destruct (sub m x y), b, m; simpl in *; try easy;
+  try (destruct H3, H4; now auto);
+  destruct H3, H3; auto.
 Qed.
 
 (* Why3 goal *)
@@ -2689,6 +2733,25 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
       rewrite sign_FF_B2FF, sign_FF_overflow in H1.
       rewrite is_negative_Bsign; auto.
       destruct x,b,y,b; auto.
+Qed.
+
+Lemma mul_finite_rev_n' : forall (m:mode) (x:t) (y:t),
+    is_finite (mul m x y) ->
+    (no_overflow m ((to_real x) * (to_real y))%R
+     /\ to_real (mul m x y) = round m ((to_real x) * (to_real y))%R)
+    \/ to_real (mul m x y) = max_real \/ to_real (mul m x y) =-  max_real .
+intros m x y h1.
+destruct (mul_finite_rev m x y h1).
+
+destruct (no_overflow_or_not m (to_real x * to_real y));[left|right].
+
+split; [auto|apply mul_finite; easy].
+destruct (mul_special m x y) as (_,(_,(_,(_,(_,(_,(h,_))))))).
+assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x * to_real y)) by auto.
+apply h in H2; clear h.
+destruct (mul m x y), b, m; simpl in *; try easy;
+  try (destruct H2, H3; now auto);
+  destruct H2, H2; auto.
 Qed.
 
 (* Why3 goal *)
@@ -2982,6 +3045,25 @@ Lemma fma_special : forall (m:mode) (x:t) (y:t) (z:t), let r := (fma m x y
 intros m x y z r.
 Admitted.
 
+Lemma fma_finite_rev_n' : forall (m:mode) (x:t) (y:t) (z:t),
+    is_finite (fma m x y z) ->
+    (no_overflow m (to_real x * to_real y + to_real z)%R
+     /\ to_real (fma m x y z) = round m (to_real x * to_real y + to_real z)%R)
+    \/ to_real (fma m x y z) = max_real \/ to_real (fma m x y z) =-  max_real .
+intros m x y z h1.
+destruct (fma_finite_rev m x y z h1) as (H,(H0,H1)).
+
+destruct (no_overflow_or_not m (to_real x * to_real y + to_real z));[left|right].
+
+split; [auto|apply fma_finite; easy].
+destruct (fma_special m x y z) as (_,(_,(_,(_,(_,(_,(_,(_,(_,(_,(h,_))))))))))).
+assert (is_finite x /\ is_finite y /\ is_finite z /\ ~ no_overflow m (to_real x * to_real y + to_real z)) by auto.
+apply h in H3; clear h.
+destruct (fma m x y z), b, m; simpl in *; try easy;
+  try (destruct H3, H4, H4; now auto);
+  destruct H3, H4, H5; auto.
+Qed.
+
 (* Why3 goal *)
 Lemma sqrt_special : forall (m:mode) (x:t), let r := (sqrt m x) in (((is_nan
   x) -> (is_nan r)) /\ (((is_plus_infinity x) -> (is_plus_infinity r)) /\
@@ -3020,68 +3102,88 @@ Lemma sqrt_special : forall (m:mode) (x:t), let r := (sqrt m x) in (((is_nan
     rewrite H; easy.
 Qed.
 
+Lemma in_int_range_no_overflow : forall m {i}, in_int_range i -> no_overflow m (IZR i).
+  intros m i h.
+  apply Bounded_real_no_overflow.
+  unfold in_int_range in h.
+  unfold in_range.
+  rewrite max_real_int, <-FromInt.Neg, <-Z2R_IZR, <-Z2R_IZR, <-Z2R_IZR.
+  pose proof pow2sb_lt_max_int.
+  split; apply Z2R_le; auto with zarith.
+Qed.
+
 (* Why3 goal *)
-Lemma of_int_add_exact : forall (m:mode) (n:mode) (i:Z) (j:Z), (exact_int
-  i) -> ((exact_int j) -> ((exact_int (i + j)%Z) -> (eq (of_int m (i + j)%Z)
-  (add n (of_int m i) (of_int m j))))).
+Lemma of_int_add_exact : forall (m:mode) (n:mode) (i:Z) (j:Z),
+  (in_safe_int_range i) -> ((in_safe_int_range j) -> ((in_safe_int_range
+  (i + j)%Z) -> (eq (of_int m (i + j)%Z) (add n (of_int m i) (of_int m
+  j))))).
   intros m n i j h1 h2 h3.
-  assert (h1':= exact_int_no_overflow m h1).
-  assert (h2':= exact_int_no_overflow m h2).
-  assert (h3':= exact_int_no_overflow n h3).
-  assert (h3'':= exact_int_no_overflow m h3).
-  assert (is_finite (of_int m i)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m j)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int n (i+j)%Z)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m (i+j)%Z)) by (apply of_int_is_finite; assumption).
+  assert (h1':= in_safe_int_range_no_overflow m h1).
+  assert (h2':= in_safe_int_range_no_overflow m h2).
+  assert (h3':= in_safe_int_range_no_overflow n h3).
+  assert (h3'':= in_safe_int_range_no_overflow m h3).
+  assert (is_finite (of_int m i)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m j)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int n (i+j)%Z)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m (i+j)%Z)) by (apply of_int_correct; assumption).
+  destruct (of_int_correct h1') as (f,_).
+  destruct (of_int_correct h2') as (g,_).
   destruct (add_finite n (of_int m i) (of_int m j)); auto.
-  simpl; rewrite of_int_to_real, of_int_to_real; auto.
-  rewrite Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
+  simpl; rewrite f, g, Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
   rewrite <-plus_IZR; assumption.
-  rewrite to_real_eq, H4, of_int_to_real, of_int_to_real, of_int_to_real; auto.
+  destruct (of_int_correct h3'') as (h,_).
+  rewrite to_real_eq, H4, f, g, h; auto.
   repeat rewrite Exact_rounding_for_integers; auto.
   rewrite <-plus_IZR, Exact_rounding_for_integers; auto; reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_sub_exact : forall (m:mode) (n:mode) (i:Z) (j:Z), (exact_int
-  i) -> ((exact_int j) -> ((exact_int (i - j)%Z) -> (eq (of_int m (i - j)%Z)
-  (sub n (of_int m i) (of_int m j))))).
+Lemma of_int_sub_exact : forall (m:mode) (n:mode) (i:Z) (j:Z),
+  (in_safe_int_range i) -> ((in_safe_int_range j) -> ((in_safe_int_range
+  (i - j)%Z) -> (eq (of_int m (i - j)%Z) (sub n (of_int m i) (of_int m
+  j))))).
   intros m n i j h1 h2 h3.
-  assert (h1':= exact_int_no_overflow m h1).
-  assert (h2':= exact_int_no_overflow m h2).
-  assert (h3':= exact_int_no_overflow n h3).
-  assert (h3'':= exact_int_no_overflow m h3).
-  assert (is_finite (of_int m i)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m j)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int n (i-j)%Z)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m (i-j)%Z)) by (apply of_int_is_finite; assumption).
+  assert (h1':= in_safe_int_range_no_overflow m h1).
+  assert (h2':= in_safe_int_range_no_overflow m h2).
+  assert (h3':= in_safe_int_range_no_overflow n h3).
+  assert (h3'':= in_safe_int_range_no_overflow m h3).
+  assert (is_finite (of_int m i)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m j)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int n (i-j)%Z)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m (i-j)%Z)) by (apply of_int_correct; assumption).
+  destruct (of_int_correct h1') as (f,_).
+  destruct (of_int_correct h2') as (g,_).
   destruct (sub_finite n (of_int m i) (of_int m j)); auto.
-  simpl; rewrite of_int_to_real, of_int_to_real; auto.
-  rewrite Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
+  simpl; rewrite f, g, Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
   rewrite <-minus_IZR; assumption.
-  rewrite to_real_eq, H4, of_int_to_real, of_int_to_real, of_int_to_real; auto.
+  destruct (of_int_correct h3'') as (h,_).
+  rewrite to_real_eq, H4, f, g, h; auto.
   repeat rewrite Exact_rounding_for_integers; auto.
   rewrite <-minus_IZR, Exact_rounding_for_integers; auto; reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_mul_exact : forall (m:mode) (n:mode) (i:Z) (j:Z), (exact_int
-  i) -> ((exact_int j) -> ((exact_int (i * j)%Z) -> (eq (of_int m (i * j)%Z)
-  (mul n (of_int m i) (of_int m j))))).
+Lemma of_int_mul_exact : forall (m:mode) (n:mode) (i:Z) (j:Z),
+  (in_safe_int_range i) -> ((in_safe_int_range j) -> ((in_safe_int_range
+  (i * j)%Z) -> (eq (of_int m (i * j)%Z) (mul n (of_int m i) (of_int m
+  j))))).
   intros m n i j h1 h2 h3.
-  assert (h1':= exact_int_no_overflow m h1).
-  assert (h2':= exact_int_no_overflow m h2).
-  assert (h3':= exact_int_no_overflow n h3).
-  assert (h3'':= exact_int_no_overflow m h3).
-  assert (is_finite (of_int m i)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m j)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int n (i*j)%Z)) by (apply of_int_is_finite; assumption).
-  assert (is_finite (of_int m (i*j)%Z)) by (apply of_int_is_finite; assumption).
+  assert (h1':= in_safe_int_range_no_overflow m h1).
+  assert (h2':= in_safe_int_range_no_overflow m h2).
+  assert (h3':= in_safe_int_range_no_overflow n h3).
+  assert (h3'':= in_safe_int_range_no_overflow m h3).
+  assert (is_finite (of_int m i)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m j)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int n (i*j)%Z)) by (apply of_int_correct; assumption).
+  assert (is_finite (of_int m (i*j)%Z)) by (apply of_int_correct; assumption).
+  destruct (of_int_correct h1') as (f,_).
+  destruct (of_int_correct h2') as (g,_).
   destruct (mul_finite n (of_int m i) (of_int m j)); auto.
-  simpl; rewrite of_int_to_real, of_int_to_real; auto.
-  rewrite Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
+  simpl; rewrite f, g,
+         Exact_rounding_for_integers, Exact_rounding_for_integers; auto.
   rewrite <-mult_IZR; assumption.
-  rewrite to_real_eq, H4, of_int_to_real, of_int_to_real, of_int_to_real; auto.
+  destruct (of_int_correct h3'') as (h,_).
+  rewrite to_real_eq, H4, f, g, h; auto.
   repeat rewrite Exact_rounding_for_integers; auto.
   rewrite <-mult_IZR, Exact_rounding_for_integers; auto; reflexivity.
 Qed.
@@ -3231,8 +3333,8 @@ Lemma zeroF_is_int : (is_int zeroF).
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_is_int : forall (m:mode) (x:Z), (((-max_int)%Z <= x)%Z /\
-  (x <= max_int)%Z) -> (is_int (of_int m x)).
+Lemma of_int_is_int : forall (m:mode) (x:Z), (in_int_range x) -> (is_int
+  (of_int m x)).
   intros m x (h1,h2).
   assert (no_overflow m (IZR x)) as h3.
   apply Bounded_real_no_overflow.
@@ -3248,13 +3350,7 @@ Lemma of_int_is_int : forall (m:mode) (x:Z), (((-max_int)%Z <= x)%Z /\
   apply is_intR_Z2R.
 Qed.
 
-(* Why3 goal *)
-Lemma is_int_is_finite : forall (x:t), (is_int x) -> (is_finite x).
-unfold is_int; easy.
-Qed.
-
-(* Why3 goal *)
-Lemma int_to_real : forall (m:mode) (x:t), (is_int x) ->
+Lemma int_to_real_ : forall {m:mode} {x:t}, (is_int x) ->
   ((to_real x) = (Reals.Raxioms.IZR (to_int m x))).
 intros m x h1.
 destruct h1.
@@ -3280,57 +3376,56 @@ Qed.
 Lemma neg_int_to_int : forall {x} {m:mode}, is_int x -> to_int m (neg x) = (- (to_int m x))%Z.
   intros x m h.
   apply eq_IZR.
-  rewrite FromInt.Neg, <-(int_to_real _ _ h), <-(int_to_real _ _ (neg_is_int h)).
+  rewrite FromInt.Neg, <-(int_to_real_ h), <-(int_to_real_ (neg_is_int h)).
   destruct h.
   apply neg_finite; auto.
 Qed.
 
-Lemma Bmax_rep_int_to_int: forall {m}, to_int m Bmax_rep_int = max_representable_integer.
+Lemma Bmax_rep_int_to_int: forall {m}, to_int m Bmax_rep_int = pow2sb.
   intro m.
   apply eq_IZR.
-  rewrite <-int_to_real.
+  rewrite <-int_to_real_.
   apply Bmax_rep_int_to_real.
   apply Bmax_rep_int_is_int.
 Qed.
 
-Lemma max_representable_integer_finite : forall (m:mode), is_finite (of_int m max_representable_integer).
+Lemma pow2sb_finite : forall (m:mode), is_finite (of_int m pow2sb).
   intro.
-  apply of_int_is_finite.
+  apply of_int_correct.
   apply Bounded_real_no_overflow.
   apply rep_int_in_range.
   split; auto with zarith.
-  unfold max_representable_integer.
+  unfold pow2sb.
   assert (0 <= 2 ^ sb)%Z by (apply Z.pow_nonneg; auto with zarith).
   auto with zarith.
 Qed.
 
-Lemma Bmax_rep_int_of_int: forall {m:mode}, Bmax_rep_int = of_int m max_representable_integer.
+Lemma Bmax_rep_int_of_int: forall {m:mode}, Bmax_rep_int = of_int m pow2sb.
   intro m.
-  pose proof max_representable_integer_finite.
+  pose proof pow2sb_finite.
   apply feq_eq; auto.
   easy.
   rewrite to_real_eq; auto.
 
-  assert (- max_representable_integer <= max_representable_integer <= max_representable_integer)%Z.
+  assert (- pow2sb <= pow2sb <= pow2sb)%Z.
   split; auto with zarith.
-  assert (0 < max_representable_integer)%Z.
+  assert (0 < pow2sb)%Z.
   apply (Z.pow_pos_nonneg 2 sb); auto with zarith.
   apply Z.lt_le_incl, Hsb'.
   auto with zarith.
 
-  rewrite of_int_to_real.
-  rewrite Bmax_rep_int_to_real.
-  symmetry.
-  apply Exact_rounding_for_integers; auto.
-
+  destruct (@of_int_correct m pow2sb) as (f,_); auto.
   apply Bounded_real_no_overflow.
   apply rep_int_in_range; auto.
+
+  rewrite f, Bmax_rep_int_to_real.
+  symmetry.
+  apply Exact_rounding_for_integers; auto.
 Qed.
 
 (* Why3 goal *)
 Lemma big_float_is_int : forall (m:mode) (i:t), (is_finite i) -> (((le i
-  (neg (of_int m max_representable_integer))) \/ (le (of_int m
-  max_representable_integer) i)) -> (is_int i)).
+  (neg (of_int m pow2sb))) \/ (le (of_int m pow2sb) i)) -> (is_int i)).
   intros m i h1 h2.
   destruct i; try easy.
   apply B754_zero_is_int.
@@ -3359,7 +3454,7 @@ Qed.
 Lemma max_value_to_int : forall m, to_int m max_value = max_int.
   intro m.
   apply eq_IZR.
-  rewrite <-max_real_int, <-int_to_real, max_value_to_real.
+  rewrite <-max_real_int, <-int_to_real_, max_value_to_real.
   reflexivity.
   unfold is_int.
 
@@ -3373,7 +3468,7 @@ Lemma neg_to_int_max_value : forall {m}, (- to_int m max_value)%Z = to_int m (ne
   pose proof (neg_is_int H).
   apply eq_IZR.
   rewrite Ropp_Ropp_IZR.
-  rewrite <-int_to_real, <-int_to_real  by auto.
+  rewrite <-int_to_real_, <-int_to_real_  by auto.
   destruct (neg_finite max_value) as (_,h); auto.
 Qed.
 
@@ -3406,7 +3501,7 @@ Lemma roundToIntegral_finite: forall m {x}, is_finite x -> is_finite (roundToInt
   intros m x h; destruct x; auto.
   unfold roundToIntegral.
   destruct Z.eq_dec; auto.
-  apply of_int_is_finite.
+  apply of_int_correct.
   apply (is_finite_to_int RTZ m h).
 Qed.
 
@@ -3425,6 +3520,175 @@ Lemma roundToIntegral_is_int : forall (m:mode) (x:t), (is_finite x) ->
     apply of_int_is_int.
     apply is_finite_to_int2.
     assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma eq_is_int : forall (x:t) (y:t), (eq x y) -> ((is_int x) -> (is_int y)).
+  intros x y h1 (h2,h3).
+  unfold is_int.
+  split; [apply (eq_finite_dist h1); auto|].
+  unfold is_intR in *.
+  apply to_real_eq_alt in h1.
+  rewrite h1 in *; assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma add_int : forall (x:t) (y:t) (m:mode), (is_int x) -> ((is_int y) ->
+  ((is_finite (add m x y)) -> (is_int (add m x y)))).
+intros x y m (h1,h1') (h2,h2') h3.
+destruct (add_finite_rev_n' m x y h3).
++ destruct H.
+  unfold is_int.
+  split; auto.
+  rewrite H0.
+  apply is_intR_round.
+  apply is_intR_equiv.
+  exists (floor (to_real x) + floor (to_real y))%Z.
+  unfold is_intR in h1', h2'; rewrite h1', h2' at 1.
+  symmetry; apply Z2R_plus.
++ split; auto.
+  rewrite max_real_int, <-Z2R_IZR in H.
+  destruct H; apply is_intR_equiv.
+  exists max_int; assumption.
+  exists (- max_int)%Z.
+  rewrite Z2R_opp; assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma sub_int : forall (x:t) (y:t) (m:mode), (is_int x) -> ((is_int y) ->
+  ((is_finite (sub m x y)) -> (is_int (sub m x y)))).
+intros x y m (h1,h1') (h2,h2') h3.
+destruct (sub_finite_rev_n' m x y h3).
++ destruct H.
+  unfold is_int.
+  split; auto.
+  rewrite H0.
+  apply is_intR_round.
+  apply is_intR_equiv.
+  exists (floor (to_real x) - floor (to_real y))%Z.
+  unfold is_intR in h1', h2'; rewrite h1', h2' at 1.
+  symmetry; apply Z2R_minus.
++ split; auto.
+  rewrite max_real_int, <-Z2R_IZR in H.
+  destruct H; apply is_intR_equiv.
+  exists max_int; assumption.
+  exists (- max_int)%Z.
+  rewrite Z2R_opp; assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma mul_int : forall (x:t) (y:t) (m:mode), (is_int x) -> ((is_int y) ->
+  ((is_finite (mul m x y)) -> (is_int (mul m x y)))).
+intros x y m (h1,h1') (h2,h2') h3.
+destruct (mul_finite_rev_n' m x y h3).
++ destruct H.
+  unfold is_int.
+  split; auto.
+  rewrite H0.
+  apply is_intR_round.
+  apply is_intR_equiv.
+  exists (floor (to_real x) * floor (to_real y))%Z.
+  unfold is_intR in h1', h2'; rewrite h1', h2' at 1.
+  symmetry; apply Z2R_mult.
++ split; auto.
+  rewrite max_real_int, <-Z2R_IZR in H.
+  destruct H; apply is_intR_equiv.
+  exists max_int; assumption.
+  exists (- max_int)%Z.
+  rewrite Z2R_opp; assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma fma_int : forall (x:t) (y:t) (z:t) (m:mode), (is_int x) -> ((is_int
+  y) -> ((is_int z) -> ((is_finite (fma m x y z)) -> (is_int (fma m x y
+  z))))).
+intros x y z m (h1,h1') (h2,h2') (h3,h3') h4.
+destruct (fma_finite_rev_n' m x y z h4).
++ destruct H.
+  unfold is_int.
+  split; auto.
+  rewrite H0.
+  apply is_intR_round.
+  apply is_intR_equiv.
+  exists (floor (to_real x) * floor (to_real y) + floor (to_real z))%Z.
+  unfold is_intR in h1', h2', h3'; rewrite h1', h2', h3' at 1.
+  rewrite Z2R_plus, Z2R_mult; reflexivity.
++ split; auto.
+  rewrite max_real_int, <-Z2R_IZR in H.
+  destruct H; apply is_intR_equiv.
+  exists max_int; assumption.
+  exists (- max_int)%Z.
+  rewrite Z2R_opp; assumption.
+Qed.
+
+(* Why3 goal *)
+Lemma neg_int : forall (x:t), (is_int x) -> (is_int (neg x)).
+intros x (h1,h2).
+destruct (neg_finite x h1).
+split; try easy.
+unfold is_intR in *.
+rewrite H0.
+rewrite h2 at 2.
+rewrite <-Z2R_opp, Zfloor_Z2R, Z2R_opp.
+apply f_equal, h2.
+Qed.
+
+(* Why3 goal *)
+Lemma abs_int : forall (x:t), (is_int x) -> (is_int (abs x)).
+intros x (h1,h2).
+destruct (abs_finite x h1) as (h3,(h4,h5)).
+split; try easy.
+unfold is_intR in *.
+rewrite h4.
+rewrite h2 at 2.
+rewrite <-Z2R_abs, Zfloor_Z2R, Z2R_abs.
+apply f_equal, h2.
+Qed.
+
+(* Why3 goal *)
+Lemma is_int_of_int : forall (x:t) (m:mode) (m':mode), (is_int x) -> (eq x
+  (of_int m' (to_int m x))).
+  intros x m m' h1.
+  assert (h1':=h1).
+  destruct h1 as (h1,h2).
+  assert (no_overflow m' (IZR (to_int m x))) by
+      (apply is_finite_to_int; auto).
+  destruct (of_int_correct H) as (h3,(h4,h5)); auto.
+  rewrite to_real_eq; auto.
+  rewrite h3, <-int_to_real_; auto.
+  symmetry; apply Round_to_real; auto.
+Qed.
+
+(* Why3 goal *)
+Lemma is_int_to_int : forall (m:mode) (x:t), (is_int x) -> (in_int_range
+  (to_int m x)).
+intros m x h1.
+pose proof (@int_to_real_ m x h1).
+unfold in_int_range.
+destruct h1.
+apply is_finite1 in H0.
+unfold in_range in H0.
+destruct H0.
+split; apply le_IZR; try rewrite FromInt.Neg; rewrite <-max_real_int, <-H; auto.
+Qed.
+
+(* Why3 goal *)
+Lemma is_int_is_finite : forall (x:t), (is_int x) -> (is_finite x).
+unfold is_int; easy.
+Qed.
+
+(* Why3 goal *)
+Lemma int_to_real : forall (m:mode) (x:t), (is_int x) ->
+  ((to_real x) = (Reals.Raxioms.IZR (to_int m x))).
+intros m x.
+apply int_to_real_.
+Qed.
+
+Lemma of_int_to_real : forall (m:mode) (x:Z), (no_overflow m
+  (Reals.Raxioms.IZR x)) -> ((to_real (of_int m x)) = (round m
+  (Reals.Raxioms.IZR x))).
+  intros m x h1.
+  apply (of_int_correct h1).
 Qed.
 
 (* TODO: add to theory ? *)
@@ -3468,7 +3732,7 @@ Lemma to_real_roundToIntegral: forall {x} m, is_finite x -> to_real (roundToInte
       rewrite of_int_to_real.
       rewrite Exact_rounding_for_integers; auto.
       rewrite Z2R_IZR; reflexivity.
-      unfold exact_int; auto.
+      unfold in_safe_int_range; auto.
       apply Bounded_real_no_overflow.
       apply rep_int_in_range; auto.
     - rewrite (@Bmax_rep_int_of_int m) in H1.
@@ -4262,34 +4526,18 @@ apply to_int_le; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_of_int : forall (m:mode) (i:Z), (exact_int i) -> ((to_int m
-  (of_int m i)) = i).
+Lemma to_int_of_int : forall (m:mode) (i:Z), (in_safe_int_range i) ->
+  ((to_int m (of_int m i)) = i).
 intros m i (h1,h2).
 apply eq_IZR.
 rewrite <-int_to_real.
 rewrite of_int_to_real.
 apply Exact_rounding_for_integers; auto.
-unfold exact_int; auto.
+unfold in_safe_int_range; auto.
 apply Bounded_real_no_overflow, rep_int_in_range; auto.
 apply of_int_is_int.
-pose proof max_representable_integer_lt_max_int.
-auto with zarith.
-Qed.
-
-(* Why3 goal *)
-Lemma to_int_eq_of_int : forall (m:mode) (x:t) (i:Z), (is_int x) ->
-  (((to_int m x) = i) -> (eq x (of_int m i))).
-intros m x i (h1,h2) h3.
-assert (no_overflow m (IZR i)).
-{ rewrite <-h3.
-  rewrite <-int_to_real; auto.
-  apply Bounded_real_no_overflow.
-  apply is_finite1; auto. }
-rewrite to_real_eq; auto.
-2: apply of_int_is_finite; auto.
-rewrite of_int_to_real; auto.
-rewrite <-h3, <-(int_to_real m); auto.
-rewrite Round_to_real; auto.
+pose proof pow2sb_lt_max_int.
+unfold in_int_range; auto with zarith.
 Qed.
 
 (* Why3 goal *)

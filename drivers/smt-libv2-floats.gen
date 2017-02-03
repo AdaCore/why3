@@ -20,7 +20,6 @@ theory ieee_float.GenericFloat
    syntax function fma  "(fp.fma %1 %2 %3 %4)"
 
    syntax function sqrt "(fp.sqrt %1 %2)"
-   syntax function rem  "(fp.rem %1 %2)"
 
    syntax function roundToIntegral "(fp.roundToIntegral %1 %2)"
 
@@ -63,7 +62,6 @@ theory ieee_float.Float32
   syntax converter (!_) "((_ to_fp 8 24) %1 %2)"
 
   syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
-  syntax function half      "((_ to_fp 8 24) #x3F000000)"
 
   remove allprops
 end
@@ -76,7 +74,6 @@ theory ieee_float.Float64
   syntax converter (!_) "((_ to_fp 11 53) %1 %2)"
 
   syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
-  syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
 
   remove allprops
 end
