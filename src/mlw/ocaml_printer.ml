@@ -198,6 +198,8 @@ module Print = struct
       List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
+  let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
+
   let rec args_syntax info fmt s tl =
     try
       ignore (Str.search_forward (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0);
@@ -270,7 +272,7 @@ module Print = struct
       fprintf fmt "@[<hov 1>%a %a@]"
         (print_expr info) e1 (print_expr info) e2
     | Eapp (s, pvl) ->
-      print_apply info fmt s pvl
+      print_apply info fmt (Hrs.find_def ht_rs s s) pvl
     | Ematch (e, pl) ->
       fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@] end"
         (print_expr info) e (print_list newline (print_branch info)) pl
@@ -378,22 +380,35 @@ module Print = struct
       print_def its.its_def
 
   let print_decl info fmt = function
-    | Dlet (isrec, [rs, [], e]) ->
-       fprintf fmt "@[<hov 2>%s %a =@ %a@]"
-               (if isrec then "let rec" else "let")
+    | Dlet (rs, [], e) ->
+       fprintf fmt "@[<hov 2>let %a =@ %a@]"
                print_ident rs.rs_name
                (print_expr info) e;
        forget_tvs ();
        fprintf fmt "@\n@\n"
-    | Dlet (isrec, [rs, pvl, e]) ->
-       fprintf fmt "@[<hov 2>%s %a@ %a =@ %a@]"
-               (if isrec then "let rec" else "let")
-               print_ident rs.rs_name
+    | Dlet (rs, pvl, e) ->
+       fprintf fmt "@[<hov 2>let %a@ %a =@ %a@]"
+               (print_lident info) rs.rs_name
                (print_list space (print_vs_arg info)) pvl
                (print_expr info) e;
        forget_vars pvl;
        forget_tvs ();
        fprintf fmt "@\n@\n"
+    | Dletrec rdef ->
+      let print_one fst fmt = function
+        | {rec_sym = rs1; rec_args = args; rec_exp = e } ->
+          fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
+            (if fst then "let rec" else "and")
+            (print_lident info) rs1.rs_name
+            (print_list space (print_vs_arg info)) args
+            (print_expr info) e;
+          forget_vars args;
+          forget_tvs ()
+      in
+      List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
+      print_list_next newline print_one fmt rdef;
+      List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef;
+      fprintf fmt "@\n@\n"
     | Dtype dl ->
        print_list newline (print_type_decl info) fmt dl;
        fprintf fmt "@\n@\n"
@@ -402,8 +417,6 @@ module Print = struct
     | Dexn (xs, Some t) ->
        fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
                print_ident xs.xs_name (print_ty ~paren:true info) t
-    | _ -> (* TODO *) assert false
-
 end
 
 let extract_module pargs ?old fmt ({mod_theory = th} as m) =
@@ -419,7 +432,6 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
-  fprintf fmt "(*@\n%a@\n*)" print_module m;
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;

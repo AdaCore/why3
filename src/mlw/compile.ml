@@ -149,10 +149,18 @@ module ML = struct
   }
 
   type decl = (* TODO add support for the extraction of ocaml modules *)
-    | Dtype of its_defn list
-    | Dlet  of is_rec * (rsymbol * var list * expr) list
+    | Dtype   of its_defn list
+    | Dlet    of rsymbol * var list * expr
+    | Dletrec of rdef list
         (* TODO add return type? *)
-    | Dexn  of xsymbol * ty option
+    | Dexn    of xsymbol * ty option
+
+  and rdef = {
+    rec_sym  : rsymbol; (* exported *)
+    rec_rsym : rsymbol; (* internal *)
+    rec_args : var list;
+    rec_exp  : expr;
+  }
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -415,7 +423,7 @@ module Translate = struct
       let direction = for_direction direction in
       ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff
     | Eghost _ ->
-      ML.mk_unit
+      assert false
     | Eassign [(rho, rs, pv)] ->
       ML.mk_expr (ML.Eassign [(rho, rs, pv)]) (ML.I e.e_ity) eff
     | Epure _ -> assert false
@@ -486,19 +494,20 @@ module Translate = struct
         let def = fun x -> x in
         let al = fun x -> x in
         filter2_ghost_params p def al (args cty.cty_args) in
-      [ML.Dlet (false, [rs, args_filter, expr info e])]
+      [ML.Dlet (rs, args_filter, expr info e)]
     | PDlet (LDrec rl) ->
       let rec_def =
-        List.map (fun {rec_fun = e; rec_rsym = rs} ->
+        List.map (fun {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} ->
           let e = match e.c_node with Cfun e -> e | _ -> assert false in
           let args_filter =
             let p (_, _, is_ghost) = not is_ghost in
             let def = fun x -> x in
             let al = fun x -> x in
-            filter2_ghost_params p def al (args rs.rs_cty.cty_args) in
-          rs, args_filter, expr info e) rl
+            filter2_ghost_params p def al (args rs1.rs_cty.cty_args) in
+          { ML.rec_sym = rs1; ML.rec_rsym = rs2;
+            ML.rec_args = args_filter; ML.rec_exp = expr info e }) rl
       in
-      [ML.Dlet (true, rec_def)]
+      [ML.Dletrec rec_def]
     | PDlet (LDsym _)
     | PDpure
     | PDlet (LDvar (_, _)) ->
