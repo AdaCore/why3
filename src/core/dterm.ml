@@ -235,6 +235,10 @@ let dty_unify_app ls unify (l1: 'a list) (l2: dty list) =
   try List.iter2 unify l1 l2 with Invalid_argument _ ->
     raise (BadArity (ls, List.length l1))
 
+let dty_unify_app_map ls unify (l1: 'a list) (l2: dty list) =
+  try List.map2 unify l1 l2 with Invalid_argument _ ->
+    raise (BadArity (ls, List.length l1))
+
 let dpat_expected_type dp dty =
   try dty_unify dp.dp_dty dty with Exit -> Loc.errorm ?loc:dp.dp_loc
     "This pattern has type %a,@ but is expected to have type %a"
@@ -258,6 +262,15 @@ let dfmla_expected_type dt = match dt.dt_dty with
 let dexpr_expected_type dt dty = match dty with
   | Some dty -> dterm_expected_type dt dty
   | None -> dfmla_expected_type dt
+
+
+let ts_of_dty = function
+  | Dapp (ts, _) | Duty { ty_node = Tyapp (ts , _)} -> ts
+  | _ -> assert false (*fixme*)
+
+
+let darg_expected dt_dty dty = dty_unify dt_dty dty
+
 
 (** Constructors *)
 
@@ -290,42 +303,80 @@ let dpattern ?loc node =
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
-let dterm ?loc node =
-  let get_dty = function
+
+
+
+
+let dterm tuc ?loc node =
+let rec dterm_expected dt dty =
+    match dt.dt_dty with
+    | Some dt_dty ->
+       begin
+         try
+           dty_unify dt_dty dty; dt
+         with Exit ->
+           begin
+             match ty_of_dty false dt_dty, ty_of_dty false dty with
+             | { ty_node = Tyapp (ts1, _) }
+             , { ty_node = Tyapp (ts2, _) } ->
+                begin
+                  try
+                    let ls =
+                      Mts.find ts2 (Mts.find ts1 tuc.Theory.uc_crcmap) in
+                    dterm_node loc (DTapp (ls, [dt]))
+                  with Not_found ->
+                    Loc.errorm ?loc:dt.dt_loc
+                               "This term has type %a,@ but is expected to have type %a"
+                               print_dty dt_dty
+                               print_dty dty
+                end
+             | _  ->  Loc.errorm ?loc:dt.dt_loc
+                                 "This term has type %a,@ but is expected to have type %a"
+                                 print_dty dt_dty print_dty dty
+           end
+       end
+    | None ->
+       try
+         dty_unify dty_bool dty; dt
+       with Exit ->  Loc.error ?loc:dt.dt_loc TermExpected
+
+and dterm_node loc node =
+    let f ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in
+    match node with
     | DTvar (_,dty) ->
-        Some dty
+       f (Some dty)
     | DTgvar vs ->
-        Some (dty_of_ty vs.vs_ty)
+       f (Some (dty_of_ty vs.vs_ty))
     | DTconst (Number.ConstInt _) ->
-        Some dty_int
+       f (Some dty_int)
     | DTconst (Number.ConstReal _) ->
-        Some dty_real
-    | DTapp (ls,dtl) ->
-        let dtyl, dty = specialize_ls ls in
-        dty_unify_app ls dterm_expected_type dtl dtyl;
-        dty
+       f (Some dty_real)
+    | DTapp (ls, dtl) ->
+       let dtyl, dty = specialize_ls ls in
+       { dt_node = DTapp (ls, dty_unify_app_map ls dterm_expected dtl dtyl);
+         dt_dty  = dty;
+         dt_loc  = loc }
     | DTfapp ({dt_dty = Some res} as dt1,dt2) ->
-        let rec not_arrow = function
-          | Dvar {contents = Dval dty} -> not_arrow dty
-          | Duty {ty_node = Tyapp (ts,_)}
-          | Dapp (ts,_) -> not (ts_equal ts Ty.ts_func)
-          | Dvar _ -> false | _ -> true in
-        if not_arrow res then Loc.errorm ?loc:dt1.dt_loc
-          "This term has type %a,@ it cannot be applied" print_dty res;
-        let dtyl, dty = specialize_ls fs_func_app in
-        dty_unify_app fs_func_app dterm_expected_type [dt1;dt2] dtyl;
-        dty
+       let rec not_arrow = function
+         | Dvar {contents = Dval dty} -> not_arrow dty
+         | Duty {ty_node = Tyapp (ts,_)} | Dapp (ts,_) -> not (ts_equal ts Ty.ts_func)
+         | Dvar _ -> false | _ -> true in
+       if not_arrow res then Loc.errorm ?loc:dt1.dt_loc
+                                        "This term has type %a,@ it cannot be applied" print_dty res;
+       let dtyl, dty = specialize_ls fs_func_app in
+       dty_unify_app fs_func_app dterm_expected_type [dt1;dt2] dtyl;
+       f dty
     | DTfapp ({dt_dty = None; dt_loc = loc},_) ->
-        Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
+       Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->
-        dfmla_expected_type df;
-        dexpr_expected_type dt2 dt1.dt_dty;
-        if dt2.dt_dty = None then None else dt1.dt_dty
+       dfmla_expected_type df;
+       dexpr_expected_type dt2 dt1.dt_dty;
+       if dt2.dt_dty = None then f None else f dt1.dt_dty
     | DTlet (dt,_,df) ->
-        ignore (dty_of_dterm dt);
-        df.dt_dty
+       ignore (dty_of_dterm dt);
+       f df.dt_dty
     | DTcase (_,[]) ->
-        raise EmptyCase
+       raise EmptyCase
     | DTcase (dt,(dp1,df1)::bl) ->
         dterm_expected_type dt dp1.dp_dty;
         let check (dp,df) =
@@ -333,39 +384,39 @@ let dterm ?loc node =
           dexpr_expected_type df df1.dt_dty in
         List.iter check bl;
         let is_fmla (_,df) = df.dt_dty = None in
-        if List.exists is_fmla bl then None else df1.dt_dty
+        if List.exists is_fmla bl then f None else f df1.dt_dty
     | DTeps (_,dty,df) ->
-        dfmla_expected_type df;
-        Some dty
+       dfmla_expected_type df;
+       f (Some dty)
     | DTquant (DTlambda,vl,_,df) ->
-        let res = Opt.get_def dty_bool df.dt_dty in
-        let app (_,l,_) r = Dapp (ts_func,[l;r]) in
-        Some (List.fold_right app vl res)
+       let res = Opt.get_def dty_bool df.dt_dty in
+       let app (_,l,_) r = Dapp (ts_func,[l;r]) in
+       f (Some (List.fold_right app vl res))
     | DTquant ((DTforall|DTexists),_,_,df) ->
-        dfmla_expected_type df;
-        None
+       dfmla_expected_type df;
+       f None
     | DTbinop (_,df1,df2) ->
         dfmla_expected_type df1;
         dfmla_expected_type df2;
-        None
+        f None
     | DTnot df ->
         dfmla_expected_type df;
-        None
+        f None
     | DTtrue | DTfalse ->
         (* we put here [Some dty_bool] instead of [None] because we can
            always replace [true] by [True] and [false] by [False], so that
            there is no need to count these constructs as "formulas" which
            require explicit if-then-else conversion to bool *)
-        Some dty_bool
+       f (Some dty_bool)
     | DTcast (dt,ty) ->
-        let dty = dty_of_ty ty in
-        dterm_expected_type dt dty;
-        Some dty
+       let dty = dty_of_ty ty in
+           dterm_expected dt dty
     | DTuloc (dt,_)
     | DTlabel (dt,_) ->
-        dt.dt_dty in
-  let dty = Loc.try1 ?loc get_dty node in
-  { dt_node = node; dt_dty = dty; dt_loc = loc }
+       f (dt.dt_dty)
+  in Loc.try1 ?loc (dterm_node loc) node
+
+
 
 (** Final stage *)
 
