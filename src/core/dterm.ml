@@ -303,42 +303,36 @@ let dpattern ?loc node =
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
-
-
-
-
 let dterm tuc ?loc node =
-let rec dterm_expected dt dty =
+  let rec dterm_expected dt dty =
     match dt.dt_dty with
     | Some dt_dty ->
-       begin
-         try
-           dty_unify dt_dty dty; dt
-         with Exit ->
-           begin
-             match ty_of_dty false dt_dty, ty_of_dty false dty with
-             | { ty_node = Tyapp (ts1, _) }
-             , { ty_node = Tyapp (ts2, _) } ->
-                begin
-                  try
-                    let ls =
-                      Mts.find ts2 (Mts.find ts1 tuc.Theory.uc_crcmap) in
-                    dterm_node loc (DTapp (ls, [dt]))
-                  with Not_found ->
-                    Loc.errorm ?loc:dt.dt_loc
-                               "This term has type %a,@ but is expected to have type %a"
-                               print_dty dt_dty
-                               print_dty dty
-                end
-             | _  ->  Loc.errorm ?loc:dt.dt_loc
-                                 "This term has type %a,@ but is expected to have type %a"
-                                 print_dty dt_dty print_dty dty
-           end
-       end
+      begin
+        try dty_unify dt_dty dty; dt with Exit ->
+          begin
+            match ty_of_dty false dt_dty, ty_of_dty false dty with
+            | { ty_node = Tyapp (ts1, _) }, { ty_node = Tyapp (ts2, _) } ->
+              begin
+                try
+                  let ls =
+                    Mts.find ts2 (Mts.find ts1 tuc.Theory.uc_crcmap) in
+                  dterm_node loc (DTapp (ls, [dt]))
+                with Not_found ->
+                  Loc.errorm ?loc:dt.dt_loc
+                    "This term has type %a,@ but is expected to have type %a"
+                    print_dty dt_dty
+                    print_dty dty
+              end
+            | _  ->
+              Loc.errorm ?loc:dt.dt_loc
+                "This term has type %a,@ but is expected to have type %a"
+                print_dty dt_dty print_dty dty
+          end
+      end
     | None ->
-       try
-         dty_unify dty_bool dty; dt
-       with Exit ->  Loc.error ?loc:dt.dt_loc TermExpected
+      try
+        dty_unify dty_bool dty; dt
+      with Exit ->  Loc.error ?loc:dt.dt_loc TermExpected
 
 and dterm_node loc node =
     let f ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in

@@ -348,14 +348,14 @@ let known_meta kn al =
 
 
 let add_coercion crcmap m al = match al with
-  | [MAls ({ls_args = [{ ty_node = Tyapp (ty1,_) }];
-           ls_value = Some { ty_node = Tyapp (ty2,_) }} as ls)] ->
-     let crcmap1 =
-       try Mts.find ty1 crcmap
-       with Not_found -> Mts.empty in
+  | [MAls ({ls_args  = [{ ty_node = Tyapp (ty1,_) }];
+            ls_value = Some { ty_node = Tyapp (ty2,_) }} as ls)] ->
+     let crcmap1 = try Mts.find ty1 crcmap with Not_found -> Mts.empty in
      let crcmap2  = Mts.add ty2 ls crcmap1 in
      Mts.add ty1 crcmap2 crcmap
   | _ -> assert false
+
+let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
 
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
@@ -369,10 +369,9 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
-  | Meta (m,al) when m.meta_name = "coercion" ->
+  | Meta (m,al) when meta_equal m meta_coercion ->
      known_meta uc.uc_known al;
-     { uc with uc_decls = td :: uc.uc_decls;
-               uc_crcmap = add_coercion uc.uc_crcmap m al  }
+     { uc with uc_crcmap = add_coercion uc.uc_crcmap m al  }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
@@ -839,7 +838,6 @@ let builtin_theory =
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
   let uc = add_param_decl uc ps_equ in
-  let _ = register_meta ~desc:"coercion" "coercion" [MTlsymbol] in
   close_theory uc
 
 let create_theory ?(path=[]) n =
