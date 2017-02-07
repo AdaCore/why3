@@ -143,7 +143,6 @@ let register_meta ~desc s al excl =
 let register_meta_excl ~desc s al = register_meta ~desc s al true
 let register_meta      ~desc s al = register_meta ~desc s al false
 
-
 let lookup_meta s = Hstr.find_exn meta_table (UnknownMeta s) s
 
 let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
@@ -462,7 +461,8 @@ let use_export uc th =
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
-      uc_export = merge_ns true  th.th_export e0 :: ste }
+      uc_export = merge_ns true  th.th_export e0 :: ste;
+      uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
 (** Clone *)

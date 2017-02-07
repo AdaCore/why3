@@ -38,9 +38,8 @@ let union s1 s2 =
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NotACoercion ls ->
-      Format.fprintf fmt "function %s cannot be used as a coercion"
+      Format.fprintf fmt "Function %s cannot be used as a coercion"
         ls.ls_name.id_string
   | CoercionCycle ls ->
       Format.fprintf fmt "Coercion %s introduces a cycle" ls.ls_name.id_string
   | _ -> raise exn end
-
