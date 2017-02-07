@@ -150,40 +150,6 @@ let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
 
 (** Theory *)
 
-module Coercion = struct
-  type t = (lsymbol Mts.t) Mts.t
-
-  exception CoercionCycle of lsymbol
-
-  let mem ts1 ts2 crcmap =
-    try let m = Mts.find ts1 crcmap in Mts.mem ts2 m
-    with Not_found -> false
-
-  let check_cycle ts1 ts2 crcmap =
-    (* we know that the graph is transitively closed *)
-    mem ts2 ts1 crcmap
-
-  let add crcmap = function
-    | [MAls ({ls_args  = [{ty_node = Tyapp (ty1,_)}];
-              ls_value = Some {ty_node = Tyapp (ty2,_)}} as ls)] ->
-      if check_cycle ty1 ty2 crcmap then raise (CoercionCycle ls)
-      else
-        let m1 = try Mts.find ty1 crcmap with Not_found -> Mts.empty in
-        if Mts.mem ty2 m1 then
-          Warning.emit
-            "Coercion %s hiddes previous coercion from %s to %s"
-            ls.ls_name.id_string ty1.ts_name.id_string ty2.ts_name.id_string;
-        let m2 = Mts.add ty2 ls m1 in
-        Mts.add ty1 m2 crcmap
-    | _ -> assert false
-
-  let find ts1 ts2 crcmap =
-    Mts.find ts2 (Mts.find ts1 crcmap)
-
-  (* let join m1 m2 = *)
-
-end
-
 type theory = {
   th_name   : ident;        (* theory name *)
   th_path   : string list;  (* environment qualifiers *)
@@ -314,7 +280,7 @@ let empty_theory n p = {
   uc_known  = Mid.empty;
   uc_local  = Sid.empty;
   uc_used   = Sid.empty;
-  uc_crcmap = Mts.empty;
+  uc_crcmap = Coercion.empty;
 }
 
 let close_theory uc = match uc.uc_export with
@@ -384,9 +350,9 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
-  | Meta (m,al) when meta_equal m meta_coercion ->
+  | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
      known_meta uc.uc_known al;
-     { uc with uc_crcmap = Coercion.add uc.uc_crcmap al  }
+     { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
@@ -934,7 +900,5 @@ let () = Exn_printer.register
       Format.fprintf fmt "Metaproperty %s expects a %a argument but \
         is applied to %a"
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
-  | Coercion.CoercionCycle ls ->
-      Format.fprintf fmt "Coercion %s introduces a cycle" ls.ls_name.id_string
   | _ -> raise exn
   end

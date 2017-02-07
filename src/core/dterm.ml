@@ -263,12 +263,6 @@ let dexpr_expected_type dt dty = match dty with
   | Some dty -> dterm_expected_type dt dty
   | None -> dfmla_expected_type dt
 
-let ts_of_dty = function
-  | Dapp (ts, _) | Duty { ty_node = Tyapp (ts , _)} -> ts
-  | _ -> assert false (*fixme*)
-
-let darg_expected dt_dty dty = dty_unify dt_dty dty
-
 (** Constructors *)
 
 let dpattern ?loc node =
@@ -302,29 +296,29 @@ let dpattern ?loc node =
 
 let dterm tuc ?loc node =
   let rec dterm_expected dt dty =
+    let loc = dt.dt_loc in
     match dt.dt_dty with
     | Some dt_dty ->
       begin try dty_unify dt_dty dty; dt with Exit ->
-        begin match ty_of_dty false dt_dty, ty_of_dty false dty with
+        let ty1 = ty_of_dty ~strict:false dt_dty in
+        let ty2 = ty_of_dty ~strict:false dty in
+        try begin match ty1, ty2 with
           | { ty_node = Tyapp (ts1, _) }, { ty_node = Tyapp (ts2, _) } ->
-            begin try
-                let open Theory in
-                let ls = Coercion.find ts1 ts2 tuc.uc_crcmap in
-                dterm_node loc (DTapp (ls, [dt]))
-              with Not_found ->
-                Loc.errorm ?loc:dt.dt_loc
-                  "This term has type %a,@ but is expected to have type %a"
-                  print_dty dt_dty print_dty dty end
+              let open Theory in
+              let ls = Coercion.find tuc.uc_crcmap ts1 ts2 in
+              dterm_node loc (DTapp (ls, [dt]))
           | _  ->
-            Loc.errorm ?loc:dt.dt_loc
-              "This term has type %a,@ but is expected to have type %a"
-              print_dty dt_dty print_dty dty end
-      end
+              raise Not_found
+        end with Not_found ->
+          Loc.errorm ?loc
+            "This term has type %a,@ but is expected to have type %a"
+            print_dty dt_dty print_dty dty
+        end
     | None ->
       try dty_unify dty_bool dty; dt with Exit ->
-        Loc.error ?loc:dt.dt_loc TermExpected
+        Loc.error ?loc TermExpected
 
-and dterm_node loc node =
+  and dterm_node loc node =
     let f ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in
     match node with
     | DTvar (_,dty) ->

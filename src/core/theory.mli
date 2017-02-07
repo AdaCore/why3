@@ -80,15 +80,6 @@ val list_metas  : unit -> meta list
 
 (** {2 Theories} *)
 
-module Coercion : sig
-  type t
-
-  val add : t -> meta_arg list -> t
-
-  val find : tysymbol -> tysymbol -> t -> lsymbol
-
-end
-
 type theory = private {
   th_name   : ident;        (* theory name *)
   th_path   : string list;  (* environment qualifiers *)
