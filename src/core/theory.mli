@@ -80,7 +80,14 @@ val list_metas  : unit -> meta list
 
 (** {2 Theories} *)
 
-type coercions_map = (lsymbol Mts.t) Mts.t
+module Coercion : sig
+  type t
+
+  val add : t -> meta_arg list -> t
+
+  val find : tysymbol -> tysymbol -> t -> lsymbol
+
+end
 
 type theory = private {
   th_name   : ident;        (* theory name *)
@@ -90,7 +97,7 @@ type theory = private {
   th_known  : known_map;    (* known identifiers *)
   th_local  : Sid.t;        (* locally declared idents *)
   th_used   : Sid.t;        (* used theories *)
-  th_crcmap : coercions_map (* coercions *)
+  th_crcmap : Coercion.t    (* coercions *)
 }
 
 and tdecl = private {
@@ -130,7 +137,7 @@ type theory_uc = private {
   uc_known  : known_map;
   uc_local  : Sid.t;
   uc_used   : Sid.t;
-  uc_crcmap : coercions_map;
+  uc_crcmap : Coercion.t;
 
 }
 
