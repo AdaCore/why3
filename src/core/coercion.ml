@@ -57,24 +57,22 @@ let join crc1 crc2 =
 let rec add_crc crcmap crc trans =
   let close_right c1 _ty c2 macc =
     add_crc macc (join c1 c2) false in
-  let close_left_right c ty1 _ macc =
-    try
-      let m1 = Mts.find ty1 macc in
-      if Mts.mem c.crc_src m1
+  let close_left_right _ty1 m1 macc =
+      if Mts.mem crc.crc_src m1
       then
-        let c1 = Mts.find c.crc_src m1 in
-        let m2 = try Mts.find c.crc_tar macc
+        let c1 = Mts.find crc.crc_src m1 in
+        let m2 = try Mts.find crc.crc_src macc
                  with Not_found -> Mts.empty in
         Mts.fold (close_right c1) m2 macc
       else macc
-    with Not_found -> macc in
+  in
   if not trans then insert crc crcmap else
     let crcmap_uc1 = insert crc crcmap in
     let crcmap_uc2 =
       let m1 =
         try Mts.find crc.crc_tar crcmap_uc1 with Not_found -> Mts.empty in
       Mts.fold (close_right crc) m1 crcmap_uc1 in
-    Mts.fold (close_left_right crc) crcmap_uc2 crcmap_uc2
+    Mts.fold (close_left_right) crcmap_uc2 crcmap_uc2
 
 
 let add crcmap ls =
