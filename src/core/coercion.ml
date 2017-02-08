@@ -14,7 +14,6 @@ let empty = Mts.empty
 
 exception NotACoercion of lsymbol
 exception CoercionCycle of lsymbol
-exception Cycle
 exception CoercionAlreadyDefined of tysymbol * tysymbol
 
 let create_crc ls =
@@ -43,7 +42,11 @@ let decide c_old c_new _m1 _m =
 
 let insert c m =
   let put c m1 m2 = Mts.add c.crc_src (Mts.add c.crc_tar c m1) m2 in
-  if mem c.crc_tar c.crc_src m then raise Cycle ;
+  if mem c.crc_tar c.crc_src m then
+    begin match c.crc_lsl with
+      | ls :: _ -> raise (CoercionCycle ls)
+      | _ -> assert false (* there is always at least one coercion *)
+    end;
   let m1 = try Mts.find c.crc_src m with Not_found -> Mts.empty in
   if Mts.mem c.crc_tar m1 then decide (Mts.find c.crc_tar m1) c m1 m;
   put c m1 m
@@ -104,19 +107,21 @@ let union s1 s2 =
 
 let print crcmap =
   Mts.iter
-       (fun k m ->
-         (Mts.iter (fun k2 _ -> Format.eprintf "coercion from %s to %s @."
-                                                k.ts_name.id_string
-                                                k2.ts_name.id_string)
-                   m ))
-       crcmap
-
+    (fun k m ->
+       (Mts.iter (fun k2 _ -> Format.eprintf "coercion from %s to %s @."
+                     k.ts_name.id_string
+                     k2.ts_name.id_string)
+          m ))
+    crcmap
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NotACoercion ls ->
-      Format.fprintf fmt "Function %s cannot be used as a coercion"
-        ls.ls_name.id_string
+    Format.fprintf fmt "Function %s cannot be used as a coercion"
+      ls.ls_name.id_string
   | CoercionCycle ls ->
-      Format.fprintf fmt "Coercion %s introduces a cycle" ls.ls_name.id_string
+    Format.fprintf fmt "Coercion %s introduces a cycle" ls.ls_name.id_string
+  | CoercionAlreadyDefined (ts1, ts2) ->
+    Format.fprintf fmt "A coercion from %s to %s@ is already defined"
+      ts1.ts_name.id_string ts2.ts_name.id_string
   | _ -> raise exn end
