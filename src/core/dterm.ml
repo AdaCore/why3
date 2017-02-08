@@ -294,9 +294,17 @@ let dpattern ?loc node =
   let dty, vars = Loc.try1 ?loc get_dty node in
   { dp_node = node; dp_dty = dty; dp_vars = vars; dp_loc = loc }
 
-let slab_coercion = Slab.singleton Pretty.label_coercion
+(* let slab_coercion = Slab.singleton Pretty.label_coercion *)
 
 let dterm tuc ?loc node =
+  let compose l dt =
+    let dt =  List.fold_left
+                (fun dacc ls ->
+                  let (_, dty) = specialize_ls ls in
+                  { dt_node = DTapp (ls, [dacc]);
+                    dt_dty  = dty;
+                    dt_loc  = loc }) dt l in
+    dt.dt_node in
   let rec dterm_expected dt dty =
     let loc = dt.dt_loc in
     match dt.dt_dty with
@@ -306,11 +314,19 @@ let dterm tuc ?loc node =
         let ty2 = ty_of_dty ~strict:false dty in
         try begin match ty1, ty2 with
           | { ty_node = Tyapp (ts1, _) }, { ty_node = Tyapp (ts2, _) } ->
+(*
               let open Theory in
               let ls = Coercion.find tuc.uc_crcmap ts1 ts2 in
               let t = dterm_node loc (DTapp (ls, [dt])) in
               { t with dt_node = DTlabel (t, slab_coercion) }
           | _  -> raise Not_found
+*)
+             let open Theory in
+             let open Coercion in
+             let crc = find tuc.uc_crcmap ts1 ts2 in
+             dterm_node loc (compose crc.crc_lsl dt)
+          | _  ->
+              raise Not_found
         end with Not_found ->
           Loc.errorm ?loc
             "This term has type %a,@ but is expected to have type %a"

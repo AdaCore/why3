@@ -284,6 +284,7 @@ let empty_theory n p = {
 
 let close_theory uc = match uc.uc_export with
   | [e] ->
+     Coercion.print uc.uc_crcmap;
     { th_name   = uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
