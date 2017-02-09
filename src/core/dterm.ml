@@ -296,15 +296,16 @@ let dpattern ?loc node =
 
 let slab_coercion = Slab.singleton Pretty.label_coercion
 
+let rec apply_coercion ~loc k dt = match k with
+  | Coercion.CRCleaf ls ->
+    let (_, dty) = specialize_ls ls in
+    let dt =
+      { dt_node = DTapp (ls, [dt]); dt_dty  = dty; dt_loc  = loc } in
+    { dt with dt_node = DTlabel (dt, slab_coercion) }
+  | Coercion.CRCcomp (k1, k2) ->
+    apply_coercion ~loc k2 (apply_coercion ~loc k1 dt)
+
 let dterm tuc ?loc node =
-  let compose l dt =
-    let mk_dt dacc ls =
-      let (_, dty) = specialize_ls ls in
-      let dt =
-        { dt_node = DTapp (ls, [dacc]); dt_dty  = dty; dt_loc  = loc } in
-      { dt with dt_node = DTlabel (dt, slab_coercion) } in
-    let dt = List.fold_left mk_dt dt l in
-    dt.dt_node in
   let rec dterm_expected dt dty =
     let loc = dt.dt_loc in
     match dt.dt_dty with
@@ -317,7 +318,7 @@ let dterm tuc ?loc node =
              let open Theory in
              let open Coercion in
              let crc = find tuc.uc_crcmap ts1 ts2 in
-             dterm_node loc (compose crc.crc_lsl dt)
+             dterm_node loc (apply_coercion ~loc crc.crc_kind dt).dt_node
           | _  ->
               raise Not_found
         end with Not_found ->
@@ -328,6 +329,21 @@ let dterm tuc ?loc node =
     | None ->
       try dty_unify dty_bool dty; dt with Exit ->
         Loc.error ?loc TermExpected
+
+  and dfmla_expected dt = match dt.dt_dty with
+    | Some dt_dty ->
+      begin try dty_unify dt_dty dty_bool; dt with Exit ->
+        let ty1 = ty_of_dty ~strict:false dt_dty in
+        try begin match ty1 with
+          | { ty_node = Tyapp (ts1, _) } ->
+             let crc = Coercion.find tuc.Theory.uc_crcmap ts1 ts_bool in
+             let dt = apply_coercion ~loc crc.Coercion.crc_kind dt in
+             dterm_node loc dt.dt_node
+          | _  ->
+              raise Not_found
+        end with Not_found ->
+          Loc.error ?loc:dt.dt_loc FmlaExpected end
+    | None -> dt
 
   and dterm_node loc node =
     let mk_dty ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in
@@ -359,9 +375,11 @@ let dterm tuc ?loc node =
     | DTfapp ({dt_dty = None; dt_loc = loc},_) ->
        Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->
-       dfmla_expected_type df;
+       let df = dfmla_expected df in
        dexpr_expected_type dt2 dt1.dt_dty;
-       if dt2.dt_dty = None then mk_dty None else mk_dty dt1.dt_dty
+       { dt_node = DTif (df, dt1, dt2);
+         dt_dty = if dt2.dt_dty = None then None else dt1.dt_dty;
+         dt_loc = loc }
     | DTlet (dt,_,df) ->
        ignore (dty_of_dterm dt);
        mk_dty df.dt_dty
@@ -400,7 +418,7 @@ let dterm tuc ?loc node =
        mk_dty (Some dty_bool)
     | DTcast (dt,ty) ->
        let dty = dty_of_ty ty in
-           dterm_expected dt dty
+       dterm_expected dt dty
     | DTuloc (dt,_)
     | DTlabel (dt,_) ->
        mk_dty (dt.dt_dty)
