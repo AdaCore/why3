@@ -47,9 +47,9 @@ syn cluster  whyContained contains=whyTodo,whyImport,whyExport,whyTheoryContents
 " ,whyPreDef,whyModParam,whyModParam1,whyPreMPRestr,whyMPRestr,whyMPRestr1,whyMPRestr2,whyMPRestr3,whyModRHS,whyFuncWith,whyFuncStruct,whyModTypeRestr,whyModTRWith,whyWith,whyWithRest,whyModType,whyFullMod,whyVal
 
 " Enclosing delimiters
-syn region   whyEncl transparent matchgroup=whyKeyword start="(" matchgroup=whyKeyword end=")" contains=ALLBUT,@whyContained,whyParenErr
-syn region   whyEncl transparent matchgroup=whyKeyword start="{" matchgroup=whyKeyword end="}"  contains=ALLBUT,@whyContained,whyBraceErr
-syn region   whyEncl transparent matchgroup=whyKeyword start="\[" matchgroup=whyKeyword end="\]" contains=ALLBUT,@whyContained,whyBrackErr
+syn region   whyEncl transparent matchgroup=whyKeyChar start="(" matchgroup=whyKeyChar end=")" contains=ALLBUT,@whyContained,whyParenErr
+syn region   whyEncl transparent matchgroup=whyKeyChar start="{" matchgroup=whyKeyChar end="}"  contains=ALLBUT,@whyContained,whyBraceErr
+syn region   whyEncl transparent start="\[" end="\]" contains=ALLBUT,@whyContained,whyBrackErr
 
 " Comments
 syn region   whyComment start="(\*" end="\*)" contains=whyComment,whyTodo
@@ -111,7 +111,7 @@ syn region   whyString       start=+"+ skip=+\\\\\|\\"+ end=+"+
 syn match    whyOperator     "->"
 syn match    whyOperator     "<->\?"
 syn match    whyOperator     "/\\"
-syn match    whyOperator     "\\[/!?]\?"
+syn match    whyOperator     "\\/"
 syn match    whyOperator     "&&"
 syn match    whyOperator     "<>"
 syn match    whyKeyChar      "|"
@@ -184,9 +184,9 @@ if version >= 508 || !exists("did_why_syntax_inits")
   HiLink whyConstructor    Constant
 
   HiLink whyKeyword	   Keyword
-  HiLink whyKeyChar	   Keyword
-  HiLink whyAnyVar	   Keyword
-  HiLink whyOperator	   Keyword
+  HiLink whyKeyChar	   Operator
+  HiLink whyAnyVar	   Operator
+  HiLink whyOperator	   Operator
   HiLink whySpec	   Identifier
 
   HiLink whyNumber	   Number

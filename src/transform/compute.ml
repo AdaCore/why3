@@ -41,7 +41,9 @@ let collect_rules p env km prs t =
   let acc = Task.task_fold
     (fun acc td -> match td.Theory.td_node with
       | Theory.Decl { d_node = Dprop((Plemma|Paxiom), pr, t) }
-        when Decl.Spr.mem pr prs || Ident.Slab.mem rule_label t.t_label ->
+        when Decl.Spr.mem pr prs ||
+           Ident.Slab.mem rule_label pr.pr_name.Ident.id_label ||
+             Ident.Slab.mem rule_label t.t_label ->
           (pr,t) :: acc
       | _ -> acc)
     [] t

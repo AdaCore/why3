@@ -918,18 +918,16 @@ let add_logics muc dl =
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
   let create_symbol mkk d =
-    let id = d.ld_ident.id_str in
-    let v = create_user_id d.ld_ident in
+    let id = create_user_id d.ld_ident in
     let pl = tyl_of_params muc d.ld_params in
     let ty = Opt.map (ty_of_pty muc.muc_theory) d.ld_type in
-    let ls = create_lsymbol v pl ty in
-    Hstr.add lsymbols id ls;
+    let ls = create_lsymbol id pl ty in
+    Hstr.add lsymbols d.ld_ident.id_str ls;
     Loc.try2 ~loc:d.ld_loc add_decl mkk (create_param_decl ls) in
   let mkk = List.fold_left create_symbol muc dl in
   (* 2. then type-check all definitions *)
   let type_decl d (abst,defn) =
-    let id = d.ld_ident.id_str in
-    let ls = Hstr.find lsymbols id in
+    let ls = Hstr.find lsymbols d.ld_ident.id_str in
     let create_var (loc,x,_,_) ty =
       let id = match x with
         | Some id -> create_user_id id
@@ -959,18 +957,16 @@ let add_inductives muc s dl =
   (* 1. create all symbols and make an environment with these symbols *)
   let psymbols = Hstr.create 17 in
   let create_symbol mkk d =
-    let id = d.in_ident.id_str in
-    let v = create_user_id d.in_ident in
+    let id = create_user_id d.in_ident in
     let pl = tyl_of_params muc d.in_params in
-    let ps = create_psymbol v pl in
-    Hstr.add psymbols id ps;
+    let ps = create_psymbol id pl in
+    Hstr.add psymbols d.in_ident.id_str ps;
     Loc.try2 ~loc:d.in_loc add_decl mkk (create_param_decl ps) in
   let mkk = List.fold_left create_symbol muc dl in
   (* 2. then type-check all definitions *)
   let propsyms = Hstr.create 17 in
   let type_decl d =
-    let id = d.in_ident.id_str in
-    let ps = Hstr.find psymbols id in
+    let ps = Hstr.find psymbols d.in_ident.id_str in
     let clause (loc, id, f) =
       Hstr.replace propsyms id.id_str loc;
       let f = type_fmla_pure mkk Mstr.empty Dterm.denv_empty f in

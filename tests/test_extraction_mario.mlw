@@ -1,0 +1,177 @@
+module M
+
+  use import mach.int.Int31
+
+  let f (x: int31) : int
+  = min_int31
+
+(*   use import seq.Seq *)
+
+(*   let function f (y: int) (x: int) : int *)
+(*     requires { x >= 0 } *)
+(*     ensures  { result >= 0 } *)
+(*   = x *)
+
+(*   let g (ghost z: int) (x: int) : int *)
+(*     requires { x > 0 } *)
+(*     ensures  { result > 0 } *)
+(*   = let y = x in *)
+(*     y *)
+
+(*   type t 'a 'b 'c 'd *)
+
+(*   type list 'a = Nil | Cons 'a (list 'a) *)
+
+(*   type btree 'a = E | N (btree 'a) 'a (btree 'a) *)
+
+(*   type ntree 'a = Empty | Node 'a (list 'a) *)
+
+(*   type list_int = list int *)
+
+(*   type cursor 'a = { *)
+(*     collection : list 'a; *)
+(*     index      : int; *)
+(*     mutable index2     : int; *)
+(*     ghost mutable v : seq 'a; *)
+(*   } *)
+
+(*   type r 'a = { *)
+(*     aa: 'a; *)
+(*     ghost i: int; *)
+(*   } *)
+
+(*   (\* let create_cursor (l: list int) (i i2: int) : cursor int = *\) *)
+(*   (\*   { collection = l; index = i; index2 = i2; v = empty } *\) *)
+
+(*   let create_r (x: int) (y: int) : r int = *)
+(*     { aa = x; i = y } *)
+
+(*   use import ref.Ref *)
+
+(*   let update (c: cursor int) : int *)
+(*   = c.index *)
+
+(*   exception Empty (list int, int) *)
+(*   exception Out_of_bounds int *)
+
+(*   (\* exception are unary constructors *\) *)
+(* (\* *)
+(*   let raise1 () = *)
+(*     raises { Empty -> true } *)
+(*     raise (Empty (Nil, 0)) *)
+(*   let raise2 () = *)
+(*     raises { Empty -> true } *)
+(*     let p = (Nil, 0) in *)
+(*     raise (Empty p) *)
+(* *\) *)
+
+(*   let rec length (l: list 'a) : int *)
+(*     variant  { l } *)
+(*   = match l with *)
+(*     | Nil -> 0 *)
+(*     | Cons _ r -> 1 + length r *)
+(*     end *)
+
+(*   let t (x:int) : int *)
+(*     requires { false } *)
+(*   = absurd *)
+
+(*   let a () : unit *)
+(*   = assert { true } *)
+
+(*   let singleton (x: int) (l: list int) : list int = *)
+(*     let x = Nil in x *)
+
+(* (\* FIXME constructors in Why3 can be partially applied *)
+(*          => an eta-expansion is needed *)
+(*          be careful with side-effects *)
+(*          "let c = Cons e in" should be translated to *)
+(*          "let c = let o = e in fun x -> Cons (o, x) in ..." in OCaml *)
+
+(*    Mário: I think A-normal form takes care of the side-effects problem *)
+(* *\) *)
+(*   let constructor1 () = *)
+(*     let x = Cons in *)
+(*     x 42 *)
+
+(*   let foofoo (x: int) : int = *)
+(*     let ghost y = x + 1 in *)
+(*     x *)
+
+(*   let test (x: int) : int = *)
+(*     let y = *)
+(*       let z = x in *)
+(*       (ghost z) + 1 *)
+(*     in 42 *)
+
+(*   type list_ghost = Nil2 | Cons2 int list_ghost (ghost int) *)
+
+(*   let add_list_ghost (x: int) (l: list_ghost) : list_ghost = *)
+(*     match l with *)
+(*     | Cons2 _ Nil2 _ | Nil2 -> Cons2 x Nil2 (1+2) *)
+(*     | Cons2 _ _ n -> Cons2 x l (n+1) *)
+(*     end *)
+
+(*   let ggg () : int = 42 *)
+
+(*   let call (x:int) : int = *)
+(*     ggg () + 42 *)
+
+(*   let test_filter_ghost_args (x: int) (ghost y: int) : int = *)
+(*     x + 42 *)
+
+(*   let test_filter_ghost_args2 (x: int) (ghost y: int) (z: int) : int = *)
+(*     x + z *)
+
+(*   let test_filter_ghost_args3 (ghost y: int) : int = *)
+(*     42 *)
+
+(*   let test_call (x: int) : int = *)
+(*     test_filter_ghost_args x 0 *)
+
+(*   let many_args (a b c d e f g h i j k l m: int) : int = 42 *)
+
+(*   let foo (x: int) : int = *)
+(*     let _ = 42 in (\* FIXME? print _ in OCaml *\) *)
+(*     x *)
+
+(*   let test_fun (x: int) : int -> int = *)
+(*     fun (y: int) -> x + y *)
+
+(*   let test_partial (x: int) : int = *)
+(*     let partial = test_filter_ghost_args x in *)
+(*     partial 42 *)
+
+(*   let test_local (x: int) : int = *)
+(*     let fact (x: int) (y: int): int = x + y in *)
+(*     fact x 42 *)
+
+(*   let test_lets (x: int) : int = *)
+(*     let y = x in *)
+(*     let z = y + 1 in *)
+(*     let yxz = y * x * z in *)
+(*     let xzy = x + z + y in *)
+(*     let res = yxz - xzy in *)
+(*     res *)
+
+(*   let test_partial2 (x: int) : int = *)
+(*     let sum : int -> int -> int = fun x y -> x + y in *)
+(*     let incr_a (a: int) = sum a in *)
+(*     incr_a x x *)
+
+(*   let constr_partial (x: int) : list int = *)
+(*     let x = Cons 42 in *)
+(*     x Nil *)
+
+  (* let filter_record (c: cursor 'a) : int = *)
+  (*   match c with *)
+  (*   | { collection = l; index = i; index2 = i2; v = v} -> i *)
+  (*   end *)
+
+end
+
+(*
+ * Local Variables:
+ * compile-command: "make -C .. test-extraction"
+ * End:
+ *)

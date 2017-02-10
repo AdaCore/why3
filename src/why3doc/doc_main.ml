@@ -82,6 +82,7 @@ let print_file fname =
     fprintf fmt "<p>%s <a href=\"index.html\">index</a></p>@\n<hr>@\n" title;
   Doc_lexer.do_file fmt fname;
   if not !opt_body then Doc_html.print_footer fmt ();
+  pp_print_flush fmt ();
   close_out c
 
 let () =

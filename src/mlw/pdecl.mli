@@ -26,7 +26,7 @@ type its_defn = private {
 
 val create_plain_record_decl : priv:bool -> mut:bool ->
   preid -> tvsymbol list -> (bool * pvsymbol) list -> term list -> its_defn
-(** [create_plain_record_decl ~priv ~mut id args fields inv] creates
+(** [create_plain_record_decl ~priv ~mut id args fields invl] creates
     a declaration for a non-recursive record type, possibly private
     and/or mutable. The known record fields are listed with their
     mutability status. The [priv] flag should be set to [true] for
@@ -36,9 +36,9 @@ val create_plain_record_decl : priv:bool -> mut:bool ->
     fields, as well as for non-private records that have an invariant:
     marking such a type as mutable gives every value of this type a
     distinct identity, allowing us to track values with broken invariants.
-    The [inv] parameter contains the list of invariant formulas that may
+    The [invl] parameter contains the list of invariant formulas that may
     only depend on free variables from [fields]. If the type is private,
-    then every field occurring in [inv] must have an immutable type.
+    then every field occurring in [invl] must have an immutable type.
     Abstract types are considered to be private records with no fields. *)
 
 val create_rec_record_decl : itysymbol -> pvsymbol list -> its_defn

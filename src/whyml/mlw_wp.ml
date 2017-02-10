@@ -610,6 +610,8 @@ let rec track_values state names lesson cond f = match f.t_node with
         let condl = List.filter good condl in
         let l = Mint.add p1 (cond::condl) lesson in
         l, t_label_copy f (get_invariant state.st_km t1)
+  | _ when (Slab.mem keep_on_simp_label f.t_label) ->
+      lesson, f
   | Tbinop (Timplies, f1, f2) ->
       let l, f1 = track_values state names lesson cond f1 in
       let _, f2 = track_values state names l cond f2 in

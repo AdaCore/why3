@@ -522,8 +522,13 @@ if test "$enable_coq_support" = yes; then
          COQPPLIBS="$COQLIB/parsing/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
-      8.5*|trunk)
+      8.5*)
          coq_compat_version="COQ85"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
+      8.6*|trunk)
+         coq_compat_version="COQ86"
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
@@ -638,9 +643,9 @@ else
         ISABELLEDETECTEDVERSION=`$ISABELLE version | sed -n -e 's|Isabelle\([[^:]]*\).*$|\1|p' `
 
         case $ISABELLEDETECTEDVERSION in
-          2015*)
+          2016-1*)
 	        enable_isabelle_support=yes
-                ISABELLEVERSION=2015
+                ISABELLEVERSION=2016-1
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           2016*)
@@ -651,8 +656,8 @@ else
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2015 or later; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2015)"
+	        AC_MSG_WARN(You need Isabelle 2016 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2016)"
                 ;;
         esac
     fi

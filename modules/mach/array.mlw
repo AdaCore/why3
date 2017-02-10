@@ -66,7 +66,7 @@ module Array32
     ensures  { result.length = a.length }
     ensures  { forall i:int. 0 <= i < to_int result.length -> result[i] = a[i] }
 
-  val fill (a: array 'a) (ofs: int32) (len: int32) (v: 'a) : unit
+  val fill (a: array 'a) (ofs: int32) (len: int32) (v: 'a) : unit writes {a}
     requires { 0 <= to_int ofs /\ 0 <= to_int len }
     requires { to_int ofs + to_int len <= to_int a.length }
     ensures  { forall i:int.
@@ -265,6 +265,7 @@ module Array63
     ensures  { forall i:int. 0 <= i < to_int result.length -> result[i] = a[i] }
 
   val fill (a: array 'a) (ofs: int63) (len: int63) (v: 'a) : unit
+    writes   { a }
     requires { 0 <= to_int ofs /\ 0 <= to_int len }
     requires { to_int ofs + to_int len <= to_int a.length }
     ensures  { forall i:int.

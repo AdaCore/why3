@@ -15,7 +15,7 @@ echo '<html>' > $HTML
 echo '<head><title>Why3 Bench</title></head>' >> $HTML
 echo '<body>' >> $HTML
 echo '<h1>Why3 bench</h1>' >> $HTML
- 
+
 run_dir () {
     echo '<h2>Directory '$1'</h2>' >> $HTML
     echo '<ul>' >> $HTML
@@ -68,7 +68,7 @@ echo ""
 echo "=== Programs ==="
 run_dir .
 run_dir foveoos11-cm
-run_dir hoare_logic
+run_dir WP_revisited
 run_dir vacid_0_binary_heaps "-I vacid_0_binary_heaps"
 echo ""
 

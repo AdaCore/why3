@@ -17,20 +17,23 @@ open Term
 
 type itysymbol = private {
   its_ts      : tysymbol;       (** logical type symbol *)
-  its_nonfree : bool;           (** has an invariant *)
+  its_nonfree : bool;           (** has no constructors *)
   its_private : bool;           (** private type *)
   its_mutable : bool;           (** mutable type *)
+  its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
   its_regions : region list;    (** shareable components *)
-  its_arg_imm : bool list;      (** non-updatable parameters *)
-  its_arg_exp : bool list;      (** exposed type parameters *)
-  its_arg_vis : bool list;      (** non-ghost type parameters *)
-  its_arg_frz : bool list;      (** irreplaceable parameters *)
-  its_reg_imm : bool list;      (** non-updatable components *)
-  its_reg_exp : bool list;      (** exposed shareable components *)
-  its_reg_vis : bool list;      (** non-ghost shareable components *)
-  its_reg_frz : bool list;      (** irreplaceable shareable components *)
+  its_arg_flg : its_flag list;  (** flags for type args *)
+  its_reg_flg : its_flag list;  (** flags for regions *)
   its_def     : ity option;     (** type alias *)
+}
+
+and its_flag = private {
+  its_frozen  : bool;   (** cannot be updated *)
+  its_exposed : bool;   (** directly reachable from a field *)
+  its_liable  : bool;   (** exposed in the type invariant *)
+  its_fixed   : bool;   (** exposed in a non-mutable field *)
+  its_visible : bool;   (** visible from the non-ghost code *)
 }
 
 and ity = private {
@@ -102,14 +105,14 @@ exception UnboundRegion of region
 
 val create_plain_record_itysymbol : priv:bool -> mut:bool ->
   preid -> tvsymbol list -> bool Mpv.t -> term list -> itysymbol
-(** [create_plain_record_itysymbol ~priv ~mut id args fields inv] creates
+(** [create_plain_record_itysymbol ~priv ~mut id args fields invl] creates
     a new type symbol for a non-recursive record type, possibly private
     or mutable. Every known field is represented by a [pvsymbol] mapped
     to its mutability status in [fields]. Variables corresponding to
     mutable fields are stored in the created type symbol and used in
     effects. The [priv] flag should be set to [true] for private records.
     The [mut] flag should be set to [true] to mark the new type as mutable
-    even if it does not have known mutable fields. The [inv] parameter
+    even if it does not have known mutable fields. The [invl] parameter
     contains the list of invariant formulas that may only depend on
     variables from [fields]. Abstract types are considered to be private
     immutable records with no fields. *)
@@ -145,6 +148,9 @@ val ity_pure : ity -> bool
 
 val ity_closed : ity -> bool
 (** a closed type contains no type variables *)
+
+val ity_fragile : ity -> bool
+(** a fragile type may contain a component with a broken invariant *)
 
 (** {2 Type constructors} *)
 
@@ -388,6 +394,7 @@ type post = term  (** postcondition: eps result . post_fmla *)
 
 val open_post : post -> vsymbol * term
 val open_post_with : term -> post -> term
+val clone_post_result : post -> preid
 
 val create_post : vsymbol -> term -> post
 
