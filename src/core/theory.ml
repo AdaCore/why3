@@ -150,13 +150,14 @@ let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
 (** Theory *)
 
 type theory = {
-  th_name   : ident;      (* theory name *)
-  th_path   : string list;(* environment qualifiers *)
-  th_decls  : tdecl list; (* theory declarations *)
-  th_export : namespace;  (* exported namespace *)
-  th_known  : known_map;  (* known identifiers *)
-  th_local  : Sid.t;      (* locally declared idents *)
-  th_used   : Sid.t;      (* used theories *)
+  th_name   : ident;        (* theory name *)
+  th_path   : string list;  (* environment qualifiers *)
+  th_decls  : tdecl list;   (* theory declarations *)
+  th_export : namespace;    (* exported namespace *)
+  th_known  : known_map;    (* known identifiers *)
+  th_local  : Sid.t;        (* locally declared idents *)
+  th_used   : Sid.t;        (* used theories *)
+  th_crcmap : Coercion.t;   (* coercions *)
 }
 
 and tdecl = {
@@ -262,6 +263,7 @@ type theory_uc = {
   uc_known  : known_map;
   uc_local  : Sid.t;
   uc_used   : Sid.t;
+  uc_crcmap : Coercion.t;
 }
 
 exception CloseTheory
@@ -277,17 +279,19 @@ let empty_theory n p = {
   uc_known  = Mid.empty;
   uc_local  = Sid.empty;
   uc_used   = Sid.empty;
+  uc_crcmap = Coercion.empty;
 }
 
 let close_theory uc = match uc.uc_export with
-  | [e] -> {
-      th_name   = uc.uc_name;
+  | [e] ->
+    { th_name   = uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_export = e;
       th_known  = uc.uc_known;
       th_local  = uc.uc_local;
-      th_used   = uc.uc_used }
+      th_used   = uc.uc_used;
+      th_crcmap = uc.uc_crcmap }
   | _ -> raise CloseTheory
 
 let get_namespace uc = List.hd uc.uc_import
@@ -331,6 +335,8 @@ let known_meta kn al =
   in
   List.iter check al
 
+let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
+
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
       uc_decls = td :: uc.uc_decls;
@@ -343,6 +349,9 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
+  | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
+     known_meta uc.uc_known al;
+     { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls }
   | Meta (_,al) -> known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
@@ -452,7 +461,8 @@ let use_export uc th =
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
-      uc_export = merge_ns true  th.th_export e0 :: ste }
+      uc_export = merge_ns true  th.th_export e0 :: ste;
+      uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
 (** Clone *)

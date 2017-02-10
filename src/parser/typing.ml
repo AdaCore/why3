@@ -210,17 +210,17 @@ let is_reusable dt = match dt.dt_node with
   | DTapp (_,[]) -> true
   | _ -> false
 
-let mk_var n dt =
+let mk_var tuc n dt =
   let dty = match dt.dt_dty with
     | None -> dty_of_ty ty_bool
     | Some dty -> dty in
-  Dterm.dterm ?loc:dt.dt_loc (DTvar (n, dty))
+  Dterm.dterm tuc ?loc:dt.dt_loc (DTvar (n, dty))
 
-let mk_let ~loc n dt node =
-  DTlet (dt, id_user n loc, Dterm.dterm ~loc node)
+let mk_let tuc ~loc n dt node =
+  DTlet (dt, id_user n loc, Dterm.dterm tuc ~loc node)
 
-let mk_closure loc ls =
-  let mk dt = Dterm.dterm ~loc dt in
+let mk_closure tuc loc ls =
+  let mk dt = Dterm.dterm tuc ~loc dt in
   let mk_v i _ =
     Some (id_user ("y" ^ string_of_int i) loc), dty_fresh (), None in
   let mk_t (id, dty, _) = mk (DTvar ((Opt.get id).pre_name, dty)) in
@@ -230,12 +230,12 @@ let mk_closure loc ls =
 let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
     List.fold_left (fun e1 (loc, e2) ->
-      DTfapp (Dterm.dterm ~loc e1, e2)) e el
+      DTfapp (Dterm.dterm tuc ~loc e1, e2)) e el
   in
   let rec apply_ls loc ls al l el = match l, el with
     | (_::l), (e::el) -> apply_ls loc ls (e::al) l el
     | [], _ -> func_app (DTapp (ls, List.rev_map snd al)) el
-    | _, [] -> func_app (mk_closure loc ls) (List.rev_append al el)
+    | _, [] -> func_app (mk_closure tuc loc ls) (List.rev_append al el)
   in
   let qualid_app q el = match gvars at q with
     | Some v -> func_app (DTgvar v.pv_vs) el
@@ -259,7 +259,7 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
     | _ ->
         func_app (DTfapp (dterm tuc gvars at denv e1, e2)) el
   in
-  Dterm.dterm ~loc (match desc with
+  Dterm.dterm tuc ~loc (match desc with
   | Ptree.Tident q ->
       qualid_app q []
   | Ptree.Tidapp (q, tl) ->
@@ -276,15 +276,15 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
         if op.id_str = "infix <>" then
           let op = { op with id_str = "infix =" } in
           let ls = find_lsymbol tuc (Qident op) in
-          DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
+          DTnot (Dterm.dterm tuc ~loc (DTapp (ls, [de1;de2])))
         else
           DTapp (find_lsymbol tuc (Qident op), [de1;de2]) in
       let rec chain loc de1 op1 = function
         | { term_desc = Ptree.Tinfix (e2, op2, e3); term_loc = loc23 } ->
             let de2 = dterm tuc gvars at denv e2 in
             let loc12 = loc_cutoff loc loc23 e2.term_loc in
-            let de12 = Dterm.dterm ~loc:loc12 (apply loc12 de1 op1 de2) in
-            let de23 = Dterm.dterm ~loc:loc23 (chain loc23 de2 op2 e3) in
+            let de12 = Dterm.dterm tuc ~loc:loc12 (apply loc12 de1 op1 de2) in
+            let de23 = Dterm.dterm tuc ~loc:loc23 (chain loc23 de2 op2 e3) in
             DTbinop (DTand, de12, de23)
         | e23 ->
             apply loc de1 op1 (dterm tuc gvars at denv e23) in
@@ -321,8 +321,8 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
         | { term_desc = Ptree.Tbinop (e2, DTiff, e3); term_loc = loc23 } ->
             let de2 = dterm tuc gvars at denv e2 in
             let loc12 = loc_cutoff loc loc23 e2.term_loc in
-            let de12 = Dterm.dterm ~loc:loc12 (DTbinop (DTiff, de1, de2)) in
-            let de23 = Dterm.dterm ~loc:loc23 (chain loc23 de2 e3) in
+            let de12 = Dterm.dterm tuc ~loc:loc12 (DTbinop (DTiff, de1, de2)) in
+            let de23 = Dterm.dterm tuc ~loc:loc23 (chain loc23 de2 e3) in
             DTbinop (DTand, de12, de23)
         | { term_desc = Ptree.Tbinop (_, DTimplies, _); term_loc = loc23 } ->
             Loc.errorm ~loc:loc23 "An unparenthesized implication cannot be \
@@ -351,13 +351,13 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tupdate (e1, fl) ->
       let e1 = dterm tuc gvars at denv e1 in
       let re = is_reusable e1 in
-      let v = if re then e1 else mk_var "q " e1 in
+      let v = if re then e1 else mk_var tuc "q " e1 in
       let get_val _ pj = function
         | Some e -> dterm tuc gvars at denv e
-        | None -> Dterm.dterm ~loc (DTapp (pj,[v])) in
+        | None -> Dterm.dterm tuc ~loc (DTapp (pj,[v])) in
       let cs, fl = parse_record ~loc tuc get_val fl in
       let d = DTapp (cs, fl) in
-      if re then d else mk_let ~loc "q " e1 d
+      if re then d else mk_let tuc ~loc "q " e1 d
   | Ptree.Tat (e1, l) ->
       DTlabel (dterm tuc gvars (Some l.id_str) denv e1, Slab.empty)
   | Ptree.Tnamed (Lpos uloc, e1) ->

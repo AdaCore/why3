@@ -45,6 +45,7 @@ module Bounded_int
   constant max : int
 
   val function to_int (n:t) : int
+  meta coercion function to_int
 
   predicate in_bounds (n:int) = min <= n <= max
 

@@ -26,6 +26,9 @@ let debug_print_labels = Debug.register_info_flag "print_labels"
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
+let debug_print_coercions = Debug.register_info_flag "print_coercions"
+  ~desc:"Print@ coercions@ in@ logical@ formulas."
+
 let iprinter,aprinter,tprinter,pprinter =
   let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
             "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
@@ -47,6 +50,8 @@ let forget_all () =
   forget_all aprinter;
   forget_all tprinter;
   forget_all pprinter
+
+let label_coercion = create_label "coercion"
 
 let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
 let print_labels = print_iter1 Slab.iter space print_label
@@ -258,6 +263,9 @@ and print_tnode pri fmt t = match t.t_node with
       print_vs fmt v
   | Tconst c ->
       print_const fmt c
+  | Tapp (_, [t1]) when Slab.mem label_coercion t.t_label &&
+                        Debug.test_noflag debug_print_coercions ->
+      print_lterm pri fmt (t_label t1.t_label t1)
   | Tapp (fs, tl) when is_fs_tuple fs ->
       fprintf fmt "(%a)" (print_list comma print_term) tl
   | Tapp (fs, tl) when unambig_fs fs ->
