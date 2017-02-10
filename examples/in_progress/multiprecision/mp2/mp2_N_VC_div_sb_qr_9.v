@@ -687,14 +687,18 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   forall (j:Z), ((j < (offset xd1))%Z \/
   (((offset xd1) + (to_int o20))%Z <= j)%Z) -> (((pelts xd2)
   j) = ((pelts xd1) j))) -> (((value_sub_shift x4
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) ->
-  ((((to_int2 x0) < (to_int2 cy))%Z -> forall (o21:uint64),
+  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> forall (cy1:uint64),
+  ((((to_int2 x0) < (to_int2 cy))%Z /\ (cy1 = uone)) \/
+  ((~ ((to_int2 x0) < (to_int2 cy))%Z) /\ (cy1 = limb_zero))) ->
+  forall (o21:uint64),
   ((to_int2 o21) = (int.EuclideanDivision.mod1 ((to_int2 x0) - (to_int2 cy))%Z
   (18446744073709551615%Z + 1%Z)%Z)) -> forall (x01:uint64), (x01 = o21) ->
-  ((((to_int2 x12) < (to_int2 uone))%Z -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 uone))%Z
+  forall (cy2:uint64), ((((to_int2 x12) < (to_int2 cy1))%Z /\
+  (cy2 = uone)) \/ ((~ ((to_int2 x12) < (to_int2 cy1))%Z) /\
+  (cy2 = limb_zero))) -> forall (o22:uint64),
+  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 cy1))%Z
   (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 uone))%Z /\ ((to_int2 uone) <= 1%Z)%Z) -> let o23 :=
+  (((0%Z <= (to_int2 cy2))%Z /\ ((to_int2 cy2) <= 1%Z)%Z) -> let o23 :=
   (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 := (offset xd1) in
   let o25 := (offset xp3) in let o26 := (pelts x4) in
   (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
@@ -724,11 +728,11 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
   ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
   ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 uone))%Z)%Z = (((value_sub_shift xd1
+  (to_int sy)) * (to_int2 cy2))%Z)%Z = (((value_sub_shift xd1
   (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
   (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (uone = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 uone) = (to_int2 limb_zero)))) ->
+  forall (o36:bool), (((~ (cy2 = limb_zero)) -> (o36 = true)) /\
+  ((o36 = true) -> ~ ((to_int2 cy2) = (to_int2 limb_zero)))) ->
   ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
   (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
   ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
@@ -776,268 +780,7 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
   n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
   (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x12) < (to_int2 uone))%Z) -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 uone))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 limb_zero))%Z /\ ((to_int2 limb_zero) <= 1%Z)%Z) ->
-  let o23 := (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 :=
-  (offset xd1) in let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 limb_zero))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (limb_zero = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 limb_zero) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x0) < (to_int2 cy))%Z) -> forall (o21:uint64),
-  ((to_int2 o21) = (int.EuclideanDivision.mod1 ((to_int2 x0) - (to_int2 cy))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x01:uint64), (x01 = o21) ->
-  ((((to_int2 x12) < (to_int2 limb_zero))%Z -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 limb_zero))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 uone))%Z /\ ((to_int2 uone) <= 1%Z)%Z) -> let o23 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 := (offset xd1) in
-  let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 uone))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (uone = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 uone) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x12) < (to_int2 limb_zero))%Z) -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 limb_zero))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 limb_zero))%Z /\ ((to_int2 limb_zero) <= 1%Z)%Z) ->
-  let o23 := (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 :=
-  (offset xd1) in let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 limb_zero))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (limb_zero = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 limb_zero) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))))))))))))))))))))) /\
+  m))%Z))))))))))))))))))))))))))))))))))))))))) /\
   ((~ ((to_int zero) <= (to_int r))%Z) -> forall (x1:uint64) (xp:(ptr
   uint64)) (x2:(ptr uint64)), ((xp = (mk_ptr (data x2) (offset o2))) /\
   ((length (contents (data x2))) = (length (contents (data o2))))) ->
@@ -1124,14 +867,18 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   forall (j:Z), ((j < (offset xd1))%Z \/
   (((offset xd1) + (to_int o20))%Z <= j)%Z) -> (((pelts xd2)
   j) = ((pelts xd1) j))) -> (((value_sub_shift x4
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) ->
-  ((((to_int2 x0) < (to_int2 cy))%Z -> forall (o21:uint64),
+  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> forall (cy1:uint64),
+  ((((to_int2 x0) < (to_int2 cy))%Z /\ (cy1 = uone)) \/
+  ((~ ((to_int2 x0) < (to_int2 cy))%Z) /\ (cy1 = limb_zero))) ->
+  forall (o21:uint64),
   ((to_int2 o21) = (int.EuclideanDivision.mod1 ((to_int2 x0) - (to_int2 cy))%Z
   (18446744073709551615%Z + 1%Z)%Z)) -> forall (x01:uint64), (x01 = o21) ->
-  ((((to_int2 x12) < (to_int2 uone))%Z -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 uone))%Z
+  forall (cy2:uint64), ((((to_int2 x12) < (to_int2 cy1))%Z /\
+  (cy2 = uone)) \/ ((~ ((to_int2 x12) < (to_int2 cy1))%Z) /\
+  (cy2 = limb_zero))) -> forall (o22:uint64),
+  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 cy1))%Z
   (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 uone))%Z /\ ((to_int2 uone) <= 1%Z)%Z) -> let o23 :=
+  (((0%Z <= (to_int2 cy2))%Z /\ ((to_int2 cy2) <= 1%Z)%Z) -> let o23 :=
   (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 := (offset xd1) in
   let o25 := (offset xp3) in let o26 := (pelts x4) in
   (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
@@ -1161,11 +908,11 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
   ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
   ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 uone))%Z)%Z = (((value_sub_shift xd1
+  (to_int sy)) * (to_int2 cy2))%Z)%Z = (((value_sub_shift xd1
   (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
   (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (uone = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 uone) = (to_int2 limb_zero)))) ->
+  forall (o36:bool), (((~ (cy2 = limb_zero)) -> (o36 = true)) /\
+  ((o36 = true) -> ~ ((to_int2 cy2) = (to_int2 limb_zero)))) ->
   ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
   (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
   ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
@@ -1213,268 +960,7 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
   n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
   (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x12) < (to_int2 uone))%Z) -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 uone))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 limb_zero))%Z /\ ((to_int2 limb_zero) <= 1%Z)%Z) ->
-  let o23 := (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 :=
-  (offset xd1) in let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 limb_zero))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (limb_zero = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 limb_zero) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x0) < (to_int2 cy))%Z) -> forall (o21:uint64),
-  ((to_int2 o21) = (int.EuclideanDivision.mod1 ((to_int2 x0) - (to_int2 cy))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x01:uint64), (x01 = o21) ->
-  ((((to_int2 x12) < (to_int2 limb_zero))%Z -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 limb_zero))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 uone))%Z /\ ((to_int2 uone) <= 1%Z)%Z) -> let o23 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 := (offset xd1) in
-  let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 uone))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (uone = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 uone) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))) /\
-  ((~ ((to_int2 x12) < (to_int2 limb_zero))%Z) -> forall (o22:uint64),
-  ((to_int2 o22) = (int.EuclideanDivision.mod1 ((to_int2 x12) - (to_int2 limb_zero))%Z
-  (18446744073709551615%Z + 1%Z)%Z)) -> forall (x13:uint64), (x13 = o22) ->
-  (((0%Z <= (to_int2 limb_zero))%Z /\ ((to_int2 limb_zero) <= 1%Z)%Z) ->
-  let o23 := (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o24 :=
-  (offset xd1) in let o25 := (offset xp3) in let o26 := (pelts x4) in
-  (((value_sub (map.Map.set o26 o25 x01) o24 o23) = ((value_sub o26 o24
-  o23) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o25 - o24)%Z) * ((to_int2 x01) - (to_int2 (o26 o25)))%Z)%Z)%Z) ->
-  let o27 := ((offset x4) + (to_int i1))%Z in let o28 := (offset x4) in
-  let o29 := (pelts x4) in (((value_sub o29 o28
-  o27) = (value_sub (map.Map.set o29 (offset xp3) x01) o28 o27)) ->
-  let o30 := (((offset xd1) + (to_int sy))%Z - 2%Z)%Z in let o31 :=
-  (offset xd1) in let o32 := (pelts x4) in (((value_sub o32 o31
-  o30) = (value_sub (map.Map.set o32 (offset xp3) x01) o31 o30)) ->
-  forall (xp4:(ptr uint64)) (x5:(ptr uint64)),
-  ((length (contents (data x5))) = (length (contents (data xp3)))) ->
-  let xd3 := (mk_ptr (data x5) (offset xd1)) in
-  (((length (contents (data x5))) = (length (contents (data x4)))) ->
-  (((xp4 = (mk_ptr (data x5) (offset xp3))) /\
-  ((length (contents (data x5))) = (length (contents (data xp3))))) ->
-  (((x5 = (mk_ptr (data x5) (offset x4))) /\
-  ((length (contents (data x5))) = (length (contents (data x4))))) ->
-  (((pelts (mk_ptr (data x5) (offset xp3))) = (map.Map.set (pelts xp3)
-  (offset xp3) x01)) -> (((value_sub_shift x5
-  (to_int i1)) = (value_sub_shift x3 (to_int i1))) -> let o33 :=
-  (((offset xd1) + (to_int sy))%Z - 1%Z)%Z in let o34 := (offset xd1) in
-  let o35 := (pelts x5) in (((value_sub o35 o34
-  (o33 + 1%Z)%Z) = ((value_sub o35 o34 o33) + ((to_int2 (o35
-  o33)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o33 - o34)%Z))%Z)%Z) -> (((((value_sub_shift xd3
-  ((to_int sy) - 1%Z)%Z) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  ((to_int sy) - 1%Z)%Z) * (to_int2 x13))%Z)%Z - ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 limb_zero))%Z)%Z = (((value_sub_shift xd1
-  (to_int sy)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int sy)) * (to_int2 x11))%Z)%Z - ((to_int2 ql) * vy)%Z)%Z) ->
-  forall (o36:bool), (((~ (limb_zero = limb_zero)) -> (o36 = true)) /\
-  ((o36 = true) -> ~ ((to_int2 limb_zero) = (to_int2 limb_zero)))) ->
-  ((~ (o36 = true)) -> forall (o37:(ptr uint64)),
-  (((offset o37) = ((offset qp) + (to_int minus_one))%Z) /\
-  ((data o37) = (data qp))) -> forall (qp1:(ptr uint64)), (qp1 = o37) ->
-  let o38 :=
-  ((((offset qp1) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o39 := ((offset qp1) + 1%Z)%Z in let o40 := (pelts q1) in
-  (((value_sub o40 o39 o38) = (value_sub (map.Map.set o40 (offset qp1) ql)
-  o39 o38)) -> forall (qp2:(ptr uint64)) (q2:(ptr uint64)),
-  ((length (contents (data q2))) = (length (contents (data qp1)))) ->
-  (((qp2 = (mk_ptr (data q2) (offset qp1))) /\
-  ((length (contents (data q2))) = (length (contents (data qp1))))) ->
-  (((q2 = (mk_ptr (data q2) (offset q1))) /\
-  ((length (contents (data q2))) = (length (contents (data q1))))) ->
-  (((pelts (mk_ptr (data q2) (offset qp1))) = (map.Map.set (pelts qp1)
-  (offset qp1) ql)) -> let o41 :=
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z in
-  let o42 := (offset qp2) in let o43 := (pelts q2) in (((value_sub o43 o42
-  o41) = ((to_int2 (o43
-  o42)) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub o43 (o42 + 1%Z)%Z
-  o41))%Z)%Z) -> let o44 :=
-  ((((offset x5) + (to_int sy))%Z + (to_int i1))%Z - 1%Z)%Z in let o45 :=
-  (offset x5) in let o46 := (pelts x5) in (((value_sub o46 o45
-  (o44 + 1%Z)%Z) = ((value_sub o46 o45 o44) + ((to_int2 (o46
-  o44)) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o44 - o45)%Z))%Z)%Z) -> let o47 := ((offset x5) + s)%Z in let o48 :=
-  (offset xd1) in let o49 := (offset x5) in let o50 := (pelts x5) in
-  (((value_sub o50 o49 o47) = ((value_sub o50 o49 o48) + ((value_sub o50 o48
-  o47) * (int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (o48 - o49)%Z))%Z)%Z) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub (pelts q2)
-  ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z))%Z)%Z) ->
-  (((value_sub (pelts q2) ((offset qp2) + 1%Z)%Z
-  ((((offset qp2) + (to_int sx))%Z - (to_int sy))%Z - (to_int i1))%Z) = (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z)) -> (((value_sub_shift qp2
-  (((to_int sx) - (to_int sy))%Z - (to_int i1))%Z) = ((to_int2 ql) + ((18446744073709551615%Z + 1%Z)%Z * (value_sub_shift qp
-  (((to_int sx) - (to_int sy))%Z - k)%Z))%Z)%Z) -> (((value_sub_shift x5
-  s) = ((value_sub_shift x5
-  (to_int i1)) + ((int.Power.power (18446744073709551615%Z + 1%Z)%Z
-  (to_int i1)) * (value_sub_shift xd3 ((to_int sy) - 1%Z)%Z))%Z)%Z) ->
-  let n := (to_int i1) in let m := ((to_int sy) - 1%Z)%Z in let x6 :=
-  (18446744073709551615%Z + 1%Z)%Z in (((int.Power.power x6
-  s) = (int.Power.power x6 (n + m)%Z)) -> (((0%Z <= n)%Z /\ ((0%Z <= m)%Z /\
-  forall (x7:Z) (n1:Z) (m1:Z), (0%Z <= n1)%Z -> ((0%Z <= m1)%Z ->
-  ((int.Power.power x7 (n1 + m1)%Z) = ((int.Power.power x7
-  n1) * (int.Power.power x7 m1))%Z)))) -> ((int.Power.power x6
-  (n + m)%Z) = ((int.Power.power x6 n) * (int.Power.power x6
-  m))%Z))))))))))))))))))))))))))))))))))))))))))))))).
+  m))%Z))))))))))))))))))))))))))))))))))))))))))).
 (* Why3 intros q x y sx sy ((h1,h2),(h3,(h4,(h5,h6)))) one h7 two h8
         limb_zero h9 zero h10 o h11 minus_one h12 uone h13 o1 h14 o2
         (h15,h16) o3 h17 o4 (h18,h19) o5 h20 dh h21 o6 h22 dl v h23 o7 h24
@@ -1483,39 +969,6 @@ intros q x y sx sy ((h1,h2),(h3,(h4,(h5,h6)))) one h7 two h8 limb_zero h9
 zero h10 o h11 minus_one h12 uone h13 o1 h14 o2 (h15,h16) o3 h17 o4 (h18,h19)
 o5 h20 dh h21 o6 h22 dl v h23 o7 h24 mdn h25 xd (h26,h27) vy r h28.
 split. intros.
-split. intros.
-split. intros.
-apply H63.
-omega.
-omega.
-intros.
-apply H63.
-omega.
-omega.
-intros.
-split.
-intros.
-apply H63.
-omega.
-omega.
-intros.
-apply H63.
-omega.
-omega.
-split.
-intros.
-split.
-intros.
-apply H63.
-omega.
-omega.
-intros.
-apply H63.
-omega.
-omega.
-intros.
-split.
-intros.
 apply H63.
 omega.
 omega.

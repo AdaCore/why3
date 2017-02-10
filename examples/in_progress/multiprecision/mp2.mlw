@@ -3141,18 +3141,15 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     then begin
          assert { l2i qh = 1 };
          let b = submul_limb xd y uone sy in (* TODO sub in place *)
-         let ghost gx1 = l2i (C.get_ofs !xp one) in
-         let lemma init_invariants ()
+         begin
              ensures { value_sub_shift (x at PreAdjust) (p2i sx) =
                   (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
                    + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
                   * vy * power radix (p2i !i)
-                  + value_sub_shift x (p2i sy + p2i !i - 1)
-                    + power radix (p2i sy + p2i !i - 1) * gx1 }
+                  + value_sub_shift x (p2i sx) }
              ensures { value_sub (pelts x) (!xp.offset + p2i mdn)
                  (!xp.offset + p2i mdn + p2i sy)
                  < vy }
-         =
            value_sub_upper_bound (pelts x) xd.offset (xd.offset + p2i sy);
            assert { l2i b = 0 };
            assert { value_sub_shift (xd at PreAdjust) (p2i sy)
@@ -3194,16 +3191,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
                    + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
                   * vy * power radix (p2i !i)
-                  + value_sub_shift x (p2i sy + p2i !i - 1)
-                    + power radix (p2i sy + p2i !i - 1) * gx1
+                  + value_sub_shift x (p2i sx)
                  by
                    p2i !i = p2i sx - p2i sy
                  so power radix (p2i sx - p2i sy - p2i !i) = 1
-                 so value_sub_shift !qp (p2i sx - p2i sy - p2i !i) = 0
-                 so l2i (pelts x)[x.offset + p2i sy + p2i !i - 1] = gx1
-                 so value_sub_shift x (p2i sy + p2i !i - 1)
-                    + power radix (p2i sy + p2i !i - 1) * gx1
-                    = value_sub_shift x (p2i sx) };
+                 so value_sub_shift !qp (p2i sx - p2i sy - p2i !i) = 0 };
            value_sub_lower_bound_tight (pelts y) y.offset (y.offset + p2i sy);
            assert { value_sub (pelts x) (!xp.offset + p2i mdn)
                  (!xp.offset + p2i mdn + p2i sy)
@@ -3221,15 +3213,22 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  so 2 * vy >= radix * power radix (p2i sy - 1) = power radix (p2i sy)
                  so value_sub_shift (xd at PreAdjust) (p2i sy) < 2 * vy
                  so value_sub_shift (xd at PreAdjust) (p2i sy) - vy < vy };
-            ()
-         in
-         init_invariants ()
+           end
          end
     else begin
          assert { value_sub (pelts x) (!xp.offset + p2i mdn)
                  (!xp.offset + p2i mdn + p2i sy)
                  < vy
                  by p2i r < 0 };
+         assert { value_sub_shift (x at PreAdjust) (p2i sx) =
+                  (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
+                   * vy * power radix (p2i !i)
+                   + value_sub_shift x (p2i sx)
+                 by l2i qh = 0
+                 so p2i sx - p2i sy - p2i !i = 0
+                 so (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i)) = 0 };
          end
     end;
     let ghost gx1 = l2i (C.get_ofs !xp one) in
@@ -3266,6 +3265,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
              };
     value_sub_tail (pelts x) (!xp.offset + p2i mdn)
                    (!xp.offset + p2i mdn + p2i sy - 1);
+    value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
+  
     x1 := (C.get_ofs !xp one);
     assert { value_sub (pelts x) (!xp.offset + p2i mdn)
                  (!xp.offset + p2i mdn + p2i sy - 1)
@@ -3286,6 +3287,23 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
              = value_sub (pelts x) (!xp.offset + p2i mdn)
                          (!xp.offset + p2i mdn + p2i sy)
              < vy };
+    assert { value_sub_shift (x at PreAdjust) (p2i sx) =
+                  (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
+                  * vy * power radix (p2i !i)
+                  + value_sub_shift x (p2i sy + p2i !i - 1)
+                  + power radix (p2i sy + p2i !i - 1) * l2i !x1
+                by value_sub_shift (x at PreAdjust) (p2i sx) =
+                   (value_sub_shift !qp (p2i sx - p2i sy - p2i !i)
+                   + l2i qh * power radix (p2i sx - p2i sy - p2i !i))
+                   * vy * power radix (p2i !i)
+                   + value_sub_shift x (p2i sx)
+                so p2i sx = p2i sy + p2i !i
+                so (pelts x)[x.offset + p2i sy + p2i !i - 1] = !x1
+                so value_sub_shift x (p2i sy + p2i !i - 1)
+                  + power radix (p2i sy + p2i !i - 1) * l2i !x1
+                  = value_sub_shift x (p2i sx)
+           };
     end;
     while (Int32.(>) !i zero) do
       variant { p2i !i }
@@ -4276,7 +4294,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   + value_sub_shift x (p2i sy - 1)
                   + power radix (p2i sy - 1) * l2i !x1
                 = (value_sub_shift !qp (p2i sx - p2i sy)
-                  + l2i qh * power radix (p2i sx - p2i sy))
+                  + qh * power radix (p2i sx - p2i sy))
                   * value_sub_shift y (p2i sy)
                   + value_sub_shift x (p2i sy) };
     qh

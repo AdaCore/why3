@@ -735,7 +735,7 @@ module Translate = struct
 			      passed as parameters *)
 			      let returns =
 				let f ity b acc =
-				  if b
+				  if b.its_visible
 				  then (C.Tptr(ty_of_ty info (ty_of_ity ity)),
 					id_register (id_fresh "result"))::acc
 				  else acc
@@ -743,7 +743,7 @@ module Translate = struct
 				match rity.ity_node with
 				| Ityapp(s, tl,_)
 				| Ityreg { reg_its = s; reg_args = tl } ->
-				   List.fold_right2 f tl s.its_arg_vis []
+				   List.fold_right2 f tl s.its_arg_flg []
 				| Ityvar _ -> assert false
 			      in
 			      {env with returns_tuple = true, List.map snd returns},
