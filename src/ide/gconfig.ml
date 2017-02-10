@@ -40,6 +40,7 @@ type t =
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
+      mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
@@ -74,6 +75,7 @@ type ide = {
   ide_verbose : int;
   ide_intro_premises : bool;
   ide_show_labels : bool;
+  ide_show_coercions : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
   ide_max_boxes : int;
@@ -98,6 +100,7 @@ let default_ide =
     ide_verbose = 0;
     ide_intro_premises = true;
     ide_show_labels = false;
+    ide_show_coercions = true;
     ide_show_locs = false;
     ide_show_time_limit = false;
     ide_max_boxes = 16;
@@ -132,6 +135,8 @@ let load_ide section =
         "intro_premises";
     ide_show_labels =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
+    ide_show_coercions =
+      get_bool section ~default:default_ide.ide_show_labels "print_coercions";
     ide_show_locs =
       get_bool section ~default:default_ide.ide_show_locs "print_locs";
     ide_show_time_limit =
@@ -172,6 +177,11 @@ let set_labels_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
+let set_coercions_flag =
+  let fl = Debug.lookup_flag "print_coercions" in
+  fun b ->
+    (if b then Debug.set_flag else Debug.unset_flag) fl
+
 let set_locs_flag =
   let fl = Debug.lookup_flag "print_locs" in
   fun b ->
@@ -184,6 +194,7 @@ let load_config config original_config env =
     | Some s -> load_ide s
   in
   set_labels_flag ide.ide_show_labels;
+  set_coercions_flag ide.ide_show_coercions;
   set_locs_flag ide.ide_show_locs;
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
@@ -193,6 +204,7 @@ let load_config config original_config env =
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
     show_labels   = ide.ide_show_labels ;
+    show_coercions = ide.ide_show_coercions ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
     max_boxes = ide.ide_max_boxes;
@@ -241,6 +253,7 @@ let save_config t =
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
   let ide = set_bool ide "print_labels" t.show_labels in
+  let ide = set_bool ide "print_coercions" t.show_coercions in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
   let ide = set_int ide "max_boxes" t.max_boxes in
@@ -746,6 +759,18 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
       (fun () ->
          c.show_labels <- not c.show_labels;
          set_labels_flag c.show_labels)
+  in
+  let showcoercions =
+    GButton.check_button
+      ~label:"show coercions in formulas"
+      ~packing:display_options_box#add ()
+      ~active:c.show_coercions
+  in
+  let (_ : GtkSignal.id) =
+    showcoercions#connect#toggled ~callback:
+      (fun () ->
+         c.show_coercions <- not c.show_coercions;
+         set_coercions_flag c.show_coercions)
   in
   let showlocs =
     GButton.check_button

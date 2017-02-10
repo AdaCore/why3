@@ -99,7 +99,7 @@ val denv_get_opt : denv -> string -> dterm_node option
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
-val dterm : ?loc:Loc.position -> dterm_node -> dterm
+val dterm : Theory.theory_uc -> ?loc:Loc.position -> dterm_node -> dterm
 
 (** Final stage *)
 

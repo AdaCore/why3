@@ -1,0 +1,23 @@
+
+type t
+function f t : int
+meta coercion function f
+goal G: forall x: t. 42 = x
+
+type a
+type b
+type c
+
+function b_to_c b : c
+meta coercion function b_to_c
+function a_to_b a : b
+meta coercion function a_to_b
+
+predicate is_c c
+goal G2: forall x: a. is_c x
+
+function is_zero int : bool
+meta coercion function is_zero
+
+goal G3: if 42 then 1=2 else 3=4
+

@@ -155,19 +155,19 @@ module NQueens63
 
   predicate is_board (board: array int63) (pos: int) =
     forall q: int. 0 <= q < pos ->
-    0 <= to_int board[q] < to_int (length board)
+    0 <= board[q] < (length board)
 
   exception MInconsistent
 
   let check_is_consistent (board: array int63) (pos: int63)
-    requires { 0 <= to_int pos < to_int (length board) }
-    requires { is_board board (to_int pos + 1) }
+    requires { 0 <= pos < (length board) }
+    requires { is_board board (pos + 1) }
   = try
       let q = ref (of_int 0) in
       while !q < pos do
-        invariant { 0 <= to_int !q <= to_int pos }
-        invariant { is_board board (to_int pos + 1) }
-        variant   { to_int pos - to_int !q }
+        invariant { 0 <= !q <= pos }
+        invariant { is_board board (pos + 1) }
+        variant   { pos - !q }
         let bq   = board[!q]   in
         let bpos = board[pos] in
         if bq        = bpos     then raise MInconsistent;
@@ -184,20 +184,20 @@ module NQueens63
 
   let rec count_bt_queens
     (solutions: ref P.t) (board: array int63) (n: int63) (pos: int63)
-    requires { to_int (length board) = to_int n }
-    requires { 0 <= to_int pos <= to_int n }
-    requires { is_board board (to_int pos) }
-    variant  { to_int n - to_int pos }
-    ensures  { is_board board (to_int pos) }
+    requires { (length board) = n }
+    requires { 0 <= pos <= n }
+    requires { is_board board (pos) }
+    variant  { n - pos }
+    ensures  { is_board board (pos) }
   =
     if eq pos n then
       solutions := P.succ !solutions
     else
       let i = ref (of_int 0) in
       while !i < n do
-        invariant { 0 <= to_int !i <= to_int n }
-        invariant { is_board board (to_int pos) }
-        variant   { to_int n - to_int !i }
+        invariant { 0 <= !i <= n }
+        invariant { is_board board (pos) }
+        variant   { n - !i }
         board[pos] <- !i;
         if check_is_consistent board pos then
           count_bt_queens solutions board n (pos + of_int 1);
@@ -205,7 +205,7 @@ module NQueens63
       done
 
   let count_queens (n: int63) : P.t
-    requires { to_int n >= 0 }
+    requires { n >= 0 }
     ensures  { true }
   =
      let solutions = ref (P.zero ()) in

@@ -169,7 +169,7 @@ LIB_UTIL = config bigInt util opt lists strings \
 	   hashcons stdlib exn_printer pp json debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
-LIB_CORE = ident ty term pattern decl theory \
+LIB_CORE = ident ty term pattern decl coercion theory \
 	   task pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
@@ -1748,7 +1748,7 @@ MODULESTODOC = \
 	util/util util/opt util/lists util/strings \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/stdlib util/rc util/debug \
-	core/ident core/ty core/term core/decl core/theory \
+	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task \
 	driver/whyconf driver/call_provers driver/driver \
 	session/session session/session_tools session/session_scheduler

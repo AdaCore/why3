@@ -22,6 +22,7 @@ type t =
       mutable default_editor : string;
       mutable intro_premises : bool;
       mutable show_labels : bool;
+      mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;

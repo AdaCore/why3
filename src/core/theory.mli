@@ -81,13 +81,14 @@ val list_metas  : unit -> meta list
 (** {2 Theories} *)
 
 type theory = private {
-  th_name   : ident;      (* theory name *)
-  th_path   : string list;(* environment qualifiers *)
-  th_decls  : tdecl list; (* theory declarations *)
-  th_export : namespace;  (* exported namespace *)
-  th_known  : known_map;  (* known identifiers *)
-  th_local  : Sid.t;      (* locally declared idents *)
-  th_used   : Sid.t;      (* used theories *)
+  th_name   : ident;        (* theory name *)
+  th_path   : string list;  (* environment qualifiers *)
+  th_decls  : tdecl list;   (* theory declarations *)
+  th_export : namespace;    (* exported namespace *)
+  th_known  : known_map;    (* known identifiers *)
+  th_local  : Sid.t;        (* locally declared idents *)
+  th_used   : Sid.t;        (* used theories *)
+  th_crcmap : Coercion.t    (* coercions *)
 }
 
 and tdecl = private {
@@ -127,6 +128,8 @@ type theory_uc = private {
   uc_known  : known_map;
   uc_local  : Sid.t;
   uc_used   : Sid.t;
+  uc_crcmap : Coercion.t;
+
 }
 
 val create_theory : ?path:string list -> preid -> theory_uc
@@ -225,4 +228,3 @@ exception KnownMeta of meta
 exception UnknownMeta of string
 exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
-

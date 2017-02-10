@@ -17,6 +17,8 @@ open Decl
 open Theory
 open Task
 
+val label_coercion: label
+
 val forget_all : unit -> unit     (* flush id_unique *)
 val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
 val forget_var : vsymbol -> unit  (* flush id_unique for a variable *)
