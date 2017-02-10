@@ -344,7 +344,6 @@ let dterm tuc ?loc node =
         end with Not_found ->
           Loc.error ?loc:dt.dt_loc FmlaExpected end
     | None -> dt
-
   and dterm_node loc node =
     let mk_dty ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in
     match node with
@@ -356,6 +355,12 @@ let dterm tuc ?loc node =
        mk_dty (Some dty_int)
     | DTconst (Number.ConstReal _) ->
        mk_dty (Some dty_real)
+    | DTapp (ls, dtl) when ls_equal ls ps_equ ->
+       let dtyl, dty = specialize_ls ls in
+       let dtl = dty_unify_app_map ls dterm_expected (List.rev dtl) dtyl in
+       { dt_node = DTapp (ls, dtl);
+         dt_dty  = dty;
+         dt_loc  = loc }
     | DTapp (ls, dtl) ->
        let dtyl, dty = specialize_ls ls in
        { dt_node = DTapp (ls, dty_unify_app_map ls dterm_expected dtl dtyl);
