@@ -59,6 +59,11 @@ module Print = struct
   let forget_var (id, _, _) = forget_id id
   let forget_vars = List.iter forget_var
 
+  let forget_let_defn = function
+  | Lvar (v,_) -> forget_pv v
+  | Lsym (s,_,_) -> forget_rs s
+  | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
+
   let rec forget_pat = function
     | Pwild -> ()
     | Pident id -> forget_id id
@@ -251,17 +256,43 @@ module Print = struct
         fprintf fmt "@[<hov 2>%a %a@]"
           print_ident rs.rs_name (print_list space (print_expr info)) tl
 
+  and print_let_def info fmt = function
+    | Lvar (pv, e) ->
+      fprintf fmt "@[<hov 2>let %a =@ %a@]"
+        (print_lident info) (pv_name pv) (print_expr info) e;
+      (* forget_id (pv_name pv) *)
+    | Lsym (rs, args, ef) ->
+      fprintf fmt "@[<hov 2>let %a %a@ =@ @[%a@]@]"
+        (print_lident info) rs.rs_name
+        (print_list space (print_vs_arg info)) args
+        (print_expr info) ef;
+      forget_vars args
+    | Lrec (rdef) ->
+      let print_one fst fmt = function
+        | { rec_sym = rs1; rec_args = args; rec_exp = e } ->
+          fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
+            (if fst then "let rec" else "and")
+            (print_lident info) rs1.rs_name
+            (print_list space (print_vs_arg info)) args
+            (print_expr info) e;
+          forget_vars args;
+          forget_tvs ()
+      in
+      List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
+      print_list_next newline print_one fmt rdef;
+      List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
+
   and print_enode info fmt = function
     | Econst c ->
       let n = Number.compute_int c in
       fprintf fmt "(Z.of_string \"%s\")" (BigInt.to_string n)
     | Evar pvs ->
       (print_lident info) fmt (pv_name pvs)
-    | Elet (pv, e1, e2) ->
-      fprintf fmt "@[<hov 2>let %a =@ %a@] in@\n%a"
-        (print_lident info) (pv_name pv)
-        (print_expr info) e1 (print_expr info) e2;
-      forget_id (pv_name pv)
+    | Elet (let_def, e) ->
+      fprintf fmt "@[%a@] in@ %a"
+        (print_let_def info) let_def
+        (print_expr info) e;
+      forget_let_defn let_def
     | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
     | Eapp (s, []) when rs_equal s rs_true ->
@@ -298,19 +329,6 @@ module Print = struct
     | Efun (varl, e) ->
       fprintf fmt "@[<hov 2>(fun %a ->@ %a)@]"
         (print_list space (print_vs_arg info)) varl (print_expr info) e
-    | Eletrec (is_rec, [rs, [], ef], ein) ->
-      fprintf fmt "@[<hov 2>let %s%a =@ @[%a@]@] in@ %a"
-        (if is_rec then "rec " else "")
-        (print_lident info) rs.rs_name
-        (print_expr info) ef
-        (print_expr info) ein
-    | Eletrec (is_rec, [rs, args, ef], ein) ->
-      fprintf fmt "@[<hov 2>let %s%a %a@ =@ @[%a@]@] in@ %a"
-        (if is_rec then "rec " else "")
-        (print_lident info) rs.rs_name
-        (print_list space (print_vs_arg info)) args
-        (print_expr info) ef
-        (print_expr info) ein
     | Ewhile (e1, e2) ->
       fprintf fmt "@[<hov 2>while %a do@ %a@ done@]"
         (print_expr info) e1 (print_expr info) e2
@@ -334,7 +352,6 @@ module Print = struct
     | Etry _ -> (* TODO *) assert false
     | Enot _ -> (* TODO *) assert false
     | Ebinop _ -> (* TODO *) assert false
-    | Eletrec _ -> (* TODO *) assert false
     | Ecast _ -> (* TODO *) assert false
     | Eassign _ -> (* TODO *) assert false
 
@@ -380,34 +397,9 @@ module Print = struct
       print_def its.its_def
 
   let print_decl info fmt = function
-    | Dlet (rs, [], e) ->
-       fprintf fmt "@[<hov 2>let %a =@ %a@]"
-               print_ident rs.rs_name
-               (print_expr info) e;
-       forget_tvs ();
-       fprintf fmt "@\n@\n"
-    | Dlet (rs, pvl, e) ->
-       fprintf fmt "@[<hov 2>let %a@ %a =@ %a@]"
-               (print_lident info) rs.rs_name
-               (print_list space (print_vs_arg info)) pvl
-               (print_expr info) e;
-       forget_vars pvl;
-       forget_tvs ();
-       fprintf fmt "@\n@\n"
-    | Dletrec rdef ->
-      let print_one fst fmt = function
-        | {rec_sym = rs1; rec_args = args; rec_exp = e } ->
-          fprintf fmt "@[<hov 2>%s %a@ %a@ =@ %a@]"
-            (if fst then "let rec" else "and")
-            (print_lident info) rs1.rs_name
-            (print_list space (print_vs_arg info)) args
-            (print_expr info) e;
-          forget_vars args;
-          forget_tvs ()
-      in
-      List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
-      print_list_next newline print_one fmt rdef;
-      List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef;
+    | Dlet (ldef) ->
+      print_let_def info fmt ldef;
+      forget_tvs ();
       fprintf fmt "@\n@\n"
     | Dtype dl ->
        print_list newline (print_type_decl info) fmt dl;
