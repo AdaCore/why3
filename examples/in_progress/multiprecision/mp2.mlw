@@ -3756,6 +3756,79 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                      + power radix (p2i sy - 2) *
                        (l2i rl + radix * l2i rh)
                   };
+           value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 2);
+           assert { value_sub_shift xd (p2i sy - 1)
+                    = value_sub_shift xd (p2i sy - 2)
+                      + power radix (p2i sy - 2) * l2i !x0
+                    by (pelts xd)[xd.offset + p2i sy - 2] = !x0
+                    so value_sub_shift xd (p2i sy - 1)
+                       = value_sub (pelts xd) xd.offset (xd.offset + p2i sy - 1)
+                       = value_sub (pelts xd) xd.offset (xd.offset + p2i sy - 2)
+                         + power radix (p2i sy - 2) * l2i !x0
+                       = value_sub_shift xd (p2i sy - 2)
+                         + power radix (p2i sy - 2) * l2i !x0 };
+           assert { value_sub_shift xd (p2i sy - 2)
+                     - power radix (p2i sy - 2) * l2i cy
+                     + power radix (p2i sy - 2) *
+                       (l2i rl + radix * l2i rh)
+                    =  value_sub_shift xd (p2i sy - 1)
+                    + power radix (p2i sy - 1) * l2i !x1
+                    - power radix (p2i sy) * l2i cy2
+                    by
+                     (l2i rl + radix * l2i rh - l2i cy
+                     = l2i !x0 + radix * l2i !x1 - radix * radix * l2i cy2
+                     by
+                         (l2i !x0 - radix * l2i cy1 = l2i rl - l2i cy
+                         by
+                         l2i !x0 = mod (l2i rl - l2i cy) radix
+                         so - radix < l2i rl - l2i cy < radix
+                         so (if l2i rl < l2i cy
+                             then l2i cy1 = 1
+                                  /\ (- radix < l2i rl - l2i cy < 0
+                                  so
+                                     div (l2i rl - l2i cy) radix = - 1
+                                  so l2i rl - l2i cy
+                                     = radix * div (l2i rl - l2i cy) radix
+                                       + mod (l2i rl - l2i cy) radix
+                                     = l2i !x0 - radix
+                                     = l2i !x0 - radix * l2i cy1)
+                             else l2i cy1 = 0 /\ l2i rl - l2i cy = l2i !x0)
+                         )
+                      so l2i !x1 - radix * l2i cy2 = l2i rh - l2i cy1
+                      so radix * l2i !x1 - radix * radix * l2i cy2
+                         = radix * l2i rh - radix * l2i cy1
+                      so radix * l2i rh
+                         = radix * l2i cy1
+                           + radix * l2i !x1 - radix * radix * l2i cy2
+                      so l2i rl + radix * l2i rh - l2i cy
+                         = l2i rl - l2i cy + radix * l2i rh
+                         = l2i !x0 - radix * l2i cy1 + radix * l2i rh
+                         = l2i !x0 - radix * l2i cy1
+                           + radix * l2i cy1
+                           + radix * l2i !x1 - radix * radix * l2i cy2
+                         = l2i !x0 + radix * l2i !x1 - radix * radix * l2i cy2
+                    )
+                    so
+                       - power radix (p2i sy - 2) * l2i cy
+                       + power radix (p2i sy - 2) * (l2i rl + radix * l2i rh)
+                     = power radix (p2i sy - 2)
+                       * (l2i rl + radix * l2i rh - l2i cy)
+                     = power radix (p2i sy - 2)
+                       * (l2i !x0 + radix * l2i !x1 - radix * radix * l2i cy2)
+                     = power radix (p2i sy - 2) * l2i !x0
+                       + power radix (p2i sy - 1) * l2i !x1
+                       - power radix (p2i sy) * l2i cy2
+                     so value_sub_shift xd (p2i sy - 2)
+                        - power radix (p2i sy - 2) * l2i cy
+                        + power radix (p2i sy - 2) * (l2i rl + radix * l2i rh)
+                      = value_sub_shift xd (p2i sy - 2)
+                        + power radix (p2i sy - 2) * l2i !x0
+                        + power radix (p2i sy - 1) * l2i !x1
+                        - power radix (p2i sy) * l2i cy2
+                      = value_sub_shift xd (p2i sy - 1)
+                        + power radix (p2i sy - 1) * l2i !x1
+                        - power radix (p2i sy) * l2i cy2
+                  };
         end;
         if Limb.ne cy2 limb_zero (*unlikely*)
         then begin
