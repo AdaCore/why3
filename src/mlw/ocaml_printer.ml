@@ -52,7 +52,7 @@ module Print = struct
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
   let forget_tvs () =
-    forget_all aprinter
+    forget_all iprinter
 
   let forget_id vs = forget_id iprinter vs
   let _forget_ids = List.iter forget_id
