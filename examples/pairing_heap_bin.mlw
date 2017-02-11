@@ -12,7 +12,7 @@ module Heap
   use import int.Int
 
   type elt
-  predicate le elt elt
+  val predicate le elt elt
 
   clone relations.TotalPreOrder with type t = elt, predicate rel = le
 
@@ -79,7 +79,7 @@ module Size
   use import bintree.Tree
   use import bintree.Size as T
 
-  function size (h: heap) : int = match h with
+  let function size (h: heap) : int = match h with
     | E -> 0
     | T _ r -> 1 + T.size r
     end
@@ -130,7 +130,7 @@ module PairingHeap
   use import Size
   use import Occ
 
-  predicate le elt elt
+  val predicate le elt elt
   clone import relations.TotalPreOrder with type t = elt, predicate rel = le
 
   predicate le_root (e: elt) (h: heap) = match h with
@@ -195,7 +195,7 @@ module PairingHeap
 
   let is_empty (h: heap) : bool
     ensures { result <-> size h = 0 }
-  = h = E
+  = match h with E -> true | _ -> false end
 
   let size (h: heap) : int
     ensures { result = size h }
