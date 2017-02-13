@@ -255,8 +255,9 @@ module OptimalNumberOfRegisters
     ensures { 2 <= result }
 
   (** the minimal number of registers needed to evaluate e *)
-  let rec function n (e: expr) : int =
-    match e with
+  let rec function n (e: expr) : int
+  variant { e }
+  = match e with
     | Evar _     -> 1
     | Eneg e     -> n e
     | Eadd e1 e2 -> let n1 = n e1 in let n2 = n e2 in

@@ -118,8 +118,7 @@ module ML = struct
     | Evar    of pvsymbol
     | Eapp    of rsymbol * expr list
     | Efun    of var list * expr
-    | Elet    of pvsymbol * expr * expr
-    | Eletrec of is_rec * (rsymbol * var list * expr) list * expr
+    | Elet    of let_def * expr
     | Eif     of expr * expr * expr
     | Ecast   of expr * ty
     | Eassign of (pvsymbol * rsymbol * pvsymbol) list
@@ -133,6 +132,18 @@ module ML = struct
     | Eraise  of exn * expr option
     | Etry    of expr * (exn * pvsymbol option * expr) list
     | Eabsurd
+
+  and let_def =
+    | Lvar of pvsymbol * expr
+    | Lsym of rsymbol * var list * expr
+    | Lrec of rdef list
+
+  and rdef = {
+    rec_sym  : rsymbol; (* exported *)
+    rec_rsym : rsymbol; (* internal *)
+    rec_args : var list;
+    rec_exp  : expr;
+  }
 
   type is_mutable = bool
 
@@ -150,24 +161,19 @@ module ML = struct
 
   type decl = (* TODO add support for the extraction of ocaml modules *)
     | Dtype   of its_defn list
-    | Dlet    of rsymbol * var list * expr
-    | Dletrec of rdef list
+    | Dlet    of let_def
         (* TODO add return type? *)
     | Dexn    of xsymbol * ty option
 
-  and rdef = {
-    rec_sym  : rsymbol; (* exported *)
-    rec_rsym : rsymbol; (* internal *)
-    rec_args : var list;
-    rec_exp  : expr;
-  }
+  (* type pmodule = { *)
+  (* } *)
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
 
   (* smart constructors *)
-  let ml_let id e1 e2 =
-    Elet (id, e1, e2)
+  let ml_let_var pv e1 e2 =
+    Elet (Lvar (pv, e1), e2)
 
   let tunit = Ttuple []
 
@@ -345,13 +351,15 @@ module Translate = struct
       let al _ = ML.mk_unit in
       filter2_ghost_params pv_not_ghost def al pvl
 
+  (* let rec let_defn *)
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     assert (not eff.eff_ghost);
     match e.e_node with
     | Econst c ->
-       let c = match c with Number.ConstInt c -> c | _ -> assert false in
-       ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
+      let c = match c with Number.ConstInt c -> c | _ -> assert false in
+      ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
       ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) when is_underscore pvs && e_ghost e2 ->
@@ -359,10 +367,10 @@ module Translate = struct
     | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) when e_ghost e1 ->
-      let ml_let = ML.ml_let pvs ML.mk_unit (expr info e2) in
-       ML.mk_expr ml_let (ML.I e.e_ity) eff
+      let ml_let = ML.ml_let_var pvs ML.mk_unit (expr info e2) in
+      ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
-      let ml_let = ML.ml_let pvs (expr info e1) (expr info e2) in
+      let ml_let = ML.ml_let_var pvs (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
       let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
@@ -370,21 +378,39 @@ module Translate = struct
       let args = filter2_ghost_params pv_not_ghost def al cty.cty_args in
       let ef = expr info ef in
       let ein = expr info ein in
-      let ml_letrec = ML.Eletrec (false, [rs, args, ef], ein) in
+      let ml_letrec = ML.Elet (ML.Lsym (rs, args, ef), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
 
       let eta_app = make_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
-      let ml_letrec = ML.Eletrec (false, [rsf, [], eta_app], ein) in
+      let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eta_app), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       let pvl = app info rs_app pvl in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
       let ein = expr info ein in
-      let ml_letrec = ML.Eletrec (false, [rsf, [], eapp], ein) in
+      let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eapp), ein) in
+      ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+    | Elet (LDrec rdefl, ein) ->
+      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
+      let al pv = pv_name pv, ML.tunit, false in
+      let ein = expr info ein in
+      let rdefl =
+        List.map (fun rdef ->
+          match rdef with
+          | {rec_sym = rs1; rec_rsym = rs2;
+             rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
+            let args =
+              filter2_ghost_params pv_not_ghost def al cty.cty_args in
+            let ef = expr info ef in
+            { ML.rec_sym = rs1; ML.rec_rsym = rs2;
+              ML.rec_args = args; ML.rec_exp = ef }
+          | _ -> assert false) rdefl
+      in
+      let ml_letrec = ML.Elet (ML.Lrec rdefl, ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
@@ -398,22 +424,23 @@ module Translate = struct
       let al pv = pv_name pv, ML.tunit, false in
       let args = filter2_ghost_params pv_not_ghost def al cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
-    | Eexec ({c_node = Cany}, _) -> assert false
+    | Eexec ({c_node = Cany}, _) ->
+      (* Error message here *) assert false
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
       ML.mk_unit
     | Ecase (e1, pl) ->
-       let e1 = expr info e1 in
-       let pl = List.map (ebranch info) pl in
-       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
+      let e1 = expr info e1 in
+      let pl = List.map (ebranch info) pl in
+      ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
     | Eassert _ ->
-       ML.mk_unit
+      ML.mk_unit
     | Eif (e1, e2, e3) ->
-       let e1 = expr info e1 in
-       let e2 = expr info e2 in
-       let e3 = expr info e3 in
-       ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
+      let e1 = expr info e1 in
+      let e2 = expr info e2 in
+      let e3 = expr info e3 in
+      ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
     | Ewhile (e1, _, _, e2) ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
@@ -446,7 +473,7 @@ module Translate = struct
   let itd_name td = td.itd_its.its_ts.ts_name
 
   (* type declarations/definitions *)
-  let tdef info itd =
+  let tdef itd =
     let s = itd.itd_its in
     let ddata_constructs = (* point-free *)
       List.map (fun ({rs_cty = rsc} as rs) ->
@@ -494,7 +521,7 @@ module Translate = struct
         let def = fun x -> x in
         let al = fun x -> x in
         filter2_ghost_params p def al (args cty.cty_args) in
-      [ML.Dlet (rs, args_filter, expr info e)]
+      [ML.Dlet (ML.Lsym (rs, args_filter, expr info e))]
     | PDlet (LDrec rl) ->
       let rec_def =
         List.map (fun {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} ->
@@ -507,13 +534,13 @@ module Translate = struct
           { ML.rec_sym = rs1; ML.rec_rsym = rs2;
             ML.rec_args = args_filter; ML.rec_exp = expr info e }) rl
       in
-      [ML.Dletrec rec_def]
+      [ML.Dlet (ML.Lrec rec_def)]
     | PDlet (LDsym _)
     | PDpure
     | PDlet (LDvar (_, _)) ->
       []
     | PDtype itl ->
-      [ML.Dtype (List.map (tdef info) itl)]
+      [ML.Dtype (List.map tdef itl)]
     | PDexn xs ->
        if ity_equal xs.xs_ity ity_unit then
          [ML.Dexn (xs, None)]
