@@ -349,7 +349,6 @@ module N
       i := Int32.(+) !i (Int32.of_int 1);
       value_sub_tail (pelts r) r.offset (r.offset + k);
       value_sub_tail (pelts x) x.offset (x.offset + k);
-      let ghost m = power radix k in
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
              = value_sub_shift x (p2i !i) + l2i y
              by
@@ -1713,7 +1712,6 @@ module N
               = value_sub_shift x (p2i sz) * (power 2 (Limb.length - l2i cnt)) }
   =
     let tnc = Limb.(-) (Limb.of_int Limb.length) cnt in
-    let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
     let msb = Int32.(-) sz one in
@@ -1809,7 +1807,9 @@ module N
     value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
     C.set !rp !low;
     assert { value_sub_shift r (p2i sz)
-           = value_sub_shift r (p2i msb) + power radix (p2i msb) * l2i !low };
+           = value_sub_shift r (p2i msb) + power radix (p2i msb) * l2i !low
+           by value_sub_shift r (p2i sz)
+              = value_sub_shift r (p2i msb) + power radix (p2i msb) * (pelts r)[r.offset + msb] };
     assert { value_sub_shift r (p2i sz)
            = value_sub_shift (r at EndLoop) (p2i msb)
              + power radix (p2i msb) * l2i !low
@@ -2142,7 +2142,6 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let qp = ref (C.incr q msb) in
     let i = ref msb in
     let r = ref limb_zero in
-    let uone = Limb.of_int 1 in
     (*normalize divisor*)
     let clz = count_leading_zeros y in
     let ghost mult = power 2 (p2i clz) in
@@ -3266,7 +3265,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     value_sub_tail (pelts x) (!xp.offset + p2i mdn)
                    (!xp.offset + p2i mdn + p2i sy - 1);
     value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
-  
+
     x1 := (C.get_ofs !xp one);
     assert { value_sub (pelts x) (!xp.offset + p2i mdn)
                  (!xp.offset + p2i mdn + p2i sy - 1)
@@ -3328,7 +3327,6 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   >= l2i (pelts x)[(!xp).offset] + radix * l2i !x1 }
       label StartLoop in
       let ghost k = p2i !i in
-      let ghost os = p2i sy + k - 1 in
       i := Int32.(-) !i one;
       let ghost s = p2i sy + p2i !i - 1 in
       xp := C.incr !xp minus_one;
