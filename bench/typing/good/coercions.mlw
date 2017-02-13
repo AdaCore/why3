@@ -11,6 +11,7 @@ module Simple
 end
 
 module SameOne
+
   use import Simple
 
 end
@@ -31,7 +32,7 @@ module SimplePolymorphic
   function f (t 'a) : int
   meta coercion function f
 
-goal G: forall x: t (bool,bool). x = 42
+  goal G: forall x: t (bool,bool). x = 42
 
 end
 
@@ -53,11 +54,13 @@ module Transitivity
 end
 
 module SameTransitivity
+
   use import Transitivity
 
 end
 
 module SameTransitivityCheck
+
   use import Transitivity
   use import SameTransitivity
 
@@ -84,13 +87,13 @@ module TrickyPolymorphicAlpha
   type t1 'a
   type t2 'a
 
- function f (t 'a) : t1 (list 'a)
- meta coercion function f
+  function f (t 'a) : t1 (list 'a)
+  meta coercion function f
 
- function g (t1 'a) : t2 (list 'a)
- meta coercion function g
+  function g (t1 'a) : t2 (list 'a)
+  meta coercion function g
 
- goal a : forall x:t int, y:t2 (list (list int)). x = y
+  goal a : forall x:t int, y:t2 (list (list int)). x = y
 
 end
 
@@ -108,27 +111,24 @@ module TrickyPolymorphicBeta
   function g (t1 'a) : t2 (list 'a)
   meta coercion function g
 
-
   goal a : forall x:t int, y:t2 (list (list int)). x = y
 
 end
 
 module InTypeArgs
 
+  type t1 'a
+  type t2 'a
+  type t3 'a
 
-type t1 'a
-type t2 'a
-type t3 'a
+  function t2_of_t1 (t1 'a) : t2 'a
+  meta coercion function t2_of_t1
 
-function t2_of_t1 (t1 'a) : t2 'a
-meta coercion function t2_of_t1
+  function bool_of_int bool : int
+  meta coercion function bool_of_int
 
-function bool_of_int bool : int
-meta coercion function bool_of_int
+  function h (x: t1 'a) (b: int) : t1 int
 
-
-function h (x: t1 'a) (b: int) : t1 int
-
-goal G: forall x: t1 'a, y: t2 int. h x true = y
+  goal G: forall x: t1 'a, y: t2 int. h x true = y
 
 end

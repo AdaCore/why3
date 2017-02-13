@@ -296,15 +296,14 @@ let dpattern ?loc node =
 
 let slab_coercion = Slab.singleton Pretty.label_coercion
 
-let rec apply_coercion ~loc k dt = match k with
-  | Coercion.CRCleaf ls ->
+let apply_coercion ~loc l dt =
+  let apply dt ls =
      let (dtyl, dty) = specialize_ls ls in
      let dtl = [dt] in
      List.iter2 dterm_expected_type dtl dtyl;
      let dt = { dt_node = DTapp (ls, dtl); dt_dty  = dty; dt_loc  = loc } in
-     { dt with dt_node = DTlabel (dt, slab_coercion) }
-  | Coercion.CRCcomp (k1, k2) ->
-     apply_coercion ~loc k2 (apply_coercion ~loc k1 dt)
+     { dt with dt_node = DTlabel (dt, slab_coercion) } in
+  List.fold_left apply dt l
 
 (* coercions using just head tysymbols without type arguments: *)
 (* TODO: this can be improved *)
@@ -333,9 +332,8 @@ let dterm_expected tuc dt dty =
     if (ts_equal ts1 ts2) then dt
     else
       let crc = Coercion.find tuc.Theory.uc_crcmap ts1 ts2 in
-      apply_coercion ~loc:dt.dt_loc crc.Coercion.crc_kind dt
+      apply_coercion ~loc:dt.dt_loc crc dt
   with Not_found | UndefinedTypeVar _ -> dt
-
 
 let dterm_expected_dterm tuc dt dty =
   let dt = dterm_expected tuc dt (Some dty) in
@@ -346,7 +344,6 @@ let dfmla_expected_dterm tuc dt =
   let dt = dterm_expected tuc dt None in
   dfmla_expected_type dt;
   dt
-
 
 let dterm tuc ?loc node =
   let dterm_node loc node =
