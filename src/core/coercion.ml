@@ -110,16 +110,9 @@ let print_kind fmt crc =
        Format.fprintf fmt "%a@\n%a" print_kind k1 print_kind k2
   in print_kind fmt crc
 
-let rec print_kind_ls fmt = function
-  | CRCleaf ls ->
-     Format.fprintf fmt "%s" ls.ls_name.id_string
-  | CRCcomp (k1, k2) ->
-     Format.fprintf fmt "%a; %a" print_kind_ls k1 print_kind_ls k2
-
 let already_a_coercion fmt crc =
   Format.fprintf fmt
-    "There is already a coercion [%a] from type %s to type %s:@\n%a"
-    print_kind_ls crc.crc_kind
+    "There is already a coercion from type %s to type %s:@\n%a"
     crc.crc_src.ts_name.id_string crc.crc_tar.ts_name.id_string
     print_kind crc.crc_kind
 
