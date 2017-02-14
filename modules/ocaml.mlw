@@ -1,19 +1,19 @@
-(* module OCaml *)
+module OCaml
 
-(* use export int.Int *)
-(* use export int.MinMax *)
-(* use export option.Option *)
-(* use export list.List *)
-(* use export seq.Seq *)
+use export int.Int
+use export int.MinMax
+use export option.Option
+use export list.List
+use export seq.Seq
 
-(* scope Sys *)
-(*   constant max_array_length : int *)
-(* end *)
+scope Sys
+  constant max_array_length : int
+end
 
-(* use array.Array *)
-(* type array 'a = Array.array 'a *)
+use array.Array
+type array 'a = Array.array 'a
 
-(* end *)
+end
 
 module Sys
 

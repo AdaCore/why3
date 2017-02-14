@@ -141,8 +141,8 @@ module LeftistHeap
   = match h with
     | E -> absurd
     | N _ l _ r ->
-       match l with E -> root_is_miminum l | _ -> () end;
-       match r with E -> root_is_miminum r | _ -> () end
+       match l with E -> () | _ -> root_is_miminum l end;
+       match r with E -> () | _ -> root_is_miminum r end
     end
 
   function rank (h: t) : int = match h with

@@ -49,30 +49,30 @@ module Bounded_int
 
   predicate in_bounds (n:int) = min <= n <= max
 
-  axiom to_int_in_bounds: forall n:t. in_bounds (to_int n)
+  axiom to_int_in_bounds: forall n:t. in_bounds n
 
   val of_int (n:int) : t
     requires { "expl:integer overflow" in_bounds n }
-    ensures  { to_int result = n }
+    ensures  { result = n }
 
   val (+) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (to_int a + to_int b) }
-    ensures   { to_int result = to_int a + to_int b }
+    requires { "expl:integer overflow" in_bounds (a + b) }
+    ensures   { result = a + b }
 
   val (-) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (to_int a - to_int b) }
-    ensures  { to_int result = to_int a - to_int b }
+    requires { "expl:integer overflow" in_bounds (a - b) }
+    ensures  { result = a - b }
 
-  val (*) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (to_int a * to_int b) }
-    ensures  { to_int result = to_int a * to_int b }
+  val ( * ) (a:t) (b:t) : t
+    requires { "expl:integer overflow" in_bounds (a * b) }
+    ensures  { result = a * b }
 
   val (-_) (a:t) : t
-    requires { "expl:integer overflow" in_bounds (- to_int a) }
-    ensures  { to_int result = - to_int a }
+    requires { "expl:integer overflow" in_bounds (- a) }
+    ensures  { result = - a }
 
   val eq (a:t) (b:t) : bool
-    ensures { to_int a = to_int b -> result }
+    ensures { to_int a = to_int b -> result } (* leave this to_int ? *)
     ensures { result -> a = b }
 
   val ne (a:t) (b:t) : bool
