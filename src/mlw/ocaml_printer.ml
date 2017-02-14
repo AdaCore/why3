@@ -68,7 +68,6 @@ module Print = struct
     | Pwild -> ()
     | Pident id -> forget_id id
     | Papp (_, pl) | Ptuple pl -> List.iter forget_pat pl
-    | Precord pl -> List.iter (fun (_,p) -> forget_pat p) pl
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
@@ -163,38 +162,6 @@ module Print = struct
   let print_module_name fmt m =
     print_theory_name fmt m.mod_theory
 
-  let rec print_pat fmt = function
-    | Pwild ->
-       fprintf fmt "_"
-    | Pident id ->
-       print_ident fmt id
-    | Pas (p, id) ->
-       fprintf fmt "%a as %a" print_pat p print_ident id
-    | Por (p1, p2) ->
-       fprintf fmt "%a | %a" print_pat p1 print_pat p2
-    | Ptuple pl ->
-       fprintf fmt "(%a)" (print_list comma print_pat) pl
-    | Papp (id, []) ->
-       print_ident fmt id
-    | Papp (id, [p]) ->
-       fprintf fmt "%a %a" print_ident id print_pat p
-    | Papp (id, pl) ->
-       fprintf fmt "%a (%a)" print_ident id (print_list comma print_pat) pl
-    | Precord fl ->
-       let print_field fmt (id, p) =
-         fprintf fmt "%a = %a" print_ident id print_pat p
-       in
-       fprintf fmt "{ %a }" (print_list semi print_field) fl
-
-  (** Expressions *)
-
-  let extract_op {id_string = s} =
-    try Some (Strings.remove_prefix "infix " s) with Not_found ->
-    try Some (Strings.remove_prefix "prefix " s) with Not_found ->
-    None
-
-  let pv_name pv = pv.pv_vs.vs_name
-
   let get_record info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
     | Some {pd_node = PDtype itdl} ->
@@ -203,33 +170,79 @@ module Print = struct
       List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
+  let rec print_pat info fmt = function
+    | Pwild ->
+       fprintf fmt "_"
+    | Pident id ->
+       print_ident fmt id
+    | Pas (p, id) ->
+       fprintf fmt "%a as %a" (print_pat info) p print_ident id
+    | Por (p1, p2) ->
+       fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
+    | Ptuple pl ->
+      fprintf fmt "(%a)" (print_list comma (print_pat info)) pl
+    | Papp (ls, pl) ->
+      match query_syntax info.info_syn ls.ls_name, pl with
+      | Some s, _ ->
+        syntax_arguments s (print_pat info) fmt pl
+      | None, pl ->
+        let rs = restore_rs ls in
+        let pjl = get_record info rs in
+        match pjl, pl with
+        | [], []  ->
+          fprintf fmt "%a" (print_uident info) ls.ls_name
+        | [], [p] ->
+          fprintf fmt "%a %a"
+            (print_uident info) ls.ls_name (print_pat info) p
+        | [], _   ->
+          fprintf fmt "%a (%a)"
+            (print_uident info) ls.ls_name
+            (print_list comma (print_pat info)) pl
+        | _, _    ->
+          let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
+          match l1, l2 with
+          | x1 :: r1, x2 :: r2 ->
+            print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
+            print_list2 sep sep_m print1 print2 fmt (r1, r2)
+          | _ -> ()
+        in
+        let print_rs info fmt rs =
+          fprintf fmt "%a" (print_lident info) rs.rs_name in
+        fprintf fmt "@[<hov 2>{ %a}@]"
+          (print_list2 semi equal (print_rs info) (print_pat info)) (pjl, pl)
+
+  (** Expressions *)
+
+  let pv_name pv = pv.pv_vs.vs_name
+
   let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
-  let rec args_syntax info fmt s tl =
-    try
-      ignore (Str.search_forward (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0);
-      syntax_arguments s (print_expr info) fmt tl
-    with Not_found -> ()
-
-  and print_apply info fmt rs pvl =
+  let rec print_apply info fmt rs pvl =
     let isfield =
       match rs.rs_field with
       | None -> false
       | Some _ -> true in
     let isconstructor () =
-      let open Pdecl in
       match Mid.find_opt rs.rs_name info.info_mo_known_map with
       | Some {pd_node = PDtype its} ->
         let is_constructor its =
           List.exists (rs_equal rs) its.itd_constructors in
         List.exists is_constructor its
-      | _ -> false
-    in
+      | _ -> false in
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _, _
+    | Some s, _, _ ->
+      let print_constant fmt e = match e.e_node with
+        | Econst c ->
+          let c = BigInt.to_int (Number.compute_int c) in
+          fprintf fmt "%d" c
+        | _ -> print_expr info fmt e in
+      syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
       syntax_arguments s (print_expr info) fmt pvl
+    | _, _, tl when is_rs_tuple rs ->
+      fprintf fmt "@[(%a)@]"
+        (print_list comma (print_expr info)) tl
     | _, _, [] ->
       print_ident fmt rs.rs_name
     | _,  _, [t1] when isfield ->
@@ -245,22 +258,19 @@ module Print = struct
           | x1 :: r1, x2 :: r2 ->
             print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
             print_list2 sep sep_m print1 print2 fmt (r1, r2)
-          | _ -> ()
-        in
+          | _ -> () in
         let print_rs info fmt rs =
-          fprintf fmt "%a" (print_lident info) rs.rs_name
-        in
+          fprintf fmt "%a" (print_lident info) rs.rs_name in
         fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, _, tl ->
-        fprintf fmt "@[<hov 2>%a %a@]"
-          print_ident rs.rs_name (print_list space (print_expr info)) tl
+      fprintf fmt "@[<hov 2>%a %a@]"
+        print_ident rs.rs_name (print_list space (print_expr info)) tl
 
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         (print_lident info) (pv_name pv) (print_expr info) e;
-      (* forget_id (pv_name pv) *)
     | Lsym (rs, args, ef) ->
       fprintf fmt "@[<hov 2>let %a %a@ =@ @[%a@]@]"
         (print_lident info) rs.rs_name
@@ -356,7 +366,8 @@ module Print = struct
     | Eassign _ -> (* TODO *) assert false
 
   and print_branch info fmt (p, e) =
-    fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]" print_pat p (print_expr info) e
+    fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]"
+      (print_pat info) p (print_expr info) e
 
   and print_expr info fmt e =
     print_enode info fmt e.e_node
@@ -424,6 +435,7 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
+  (* fprintf fmt "(\*@\n%a@\n*\)@\n" print_module m; *)
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;

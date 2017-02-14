@@ -91,9 +91,8 @@ module ML = struct
   type pat =
     | Pwild
     | Pident  of ident
-    | Papp    of ident * pat list
+    | Papp    of lsymbol * pat list
     | Ptuple  of pat list
-    | Precord of (ident * pat) list
     | Por     of pat * pat
     | Pas     of pat * ident
 
@@ -282,7 +281,7 @@ module Translate = struct
           (fun acc pv pp -> if not pv.pv_ghost then (pat pp) :: acc else acc)
           [] args pl
       in
-      ML.Papp (ls.ls_name, List.rev pat_pl)
+      ML.Papp (ls, List.rev pat_pl)
 
   (** programs *)
 
@@ -343,15 +342,9 @@ module Translate = struct
       ML.mk_expr (ML.Eapp (rsc, args)) (ML.C cty_app) cty_app.cty_effect in
     ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C cty_app) cty_app.cty_effect
 
-  let app info rs pvl =
+  let app pvl =
     let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
-    if isconstructor info rs then
-      filter_ghost_params pv_not_ghost def pvl
-    else
-      let al _ = ML.mk_unit in
-      filter2_ghost_params pv_not_ghost def al pvl
-
-  (* let rec let_defn *)
+    filter_ghost_params pv_not_ghost def pvl
 
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
@@ -388,7 +381,7 @@ module Translate = struct
       let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eta_app), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
-      let pvl = app info rs_app pvl in
+      let pvl = app pvl in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
       let ein = expr info ein in
@@ -417,7 +410,7 @@ module Translate = struct
     | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
-      let pvl = app info rs pvl in
+      let pvl = app pvl in
       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
@@ -559,13 +552,31 @@ module Translate = struct
 
 end
 
-(** Erasure operations related to ghost code *)
+(** Optimistion operations *)
 
 (* module Erasure = struct *)
 
 (*   open ML *)
 
-
+(*   let rec remove_superf_let subs e = *)
+(*     match e.e_node with *)
+(*     | Evar pv -> try let Hpv.find pv  *)
+(*     | Eapp    of rsymbol * expr list *)
+(*     | Efun    of var list * expr *)
+(*     | Elet    of let_def * expr *)
+(*     | Eif     of expr * expr * expr *)
+(*     | Ecast   of expr * ty *)
+(*     | Eassign of (pvsymbol * rsymbol * pvsymbol) list *)
+(*     | Etuple  of expr list (\* at least 2 expressions *\) *)
+(*     | Ematch  of expr * (pat * expr) list *)
+(*     | Ebinop  of expr * binop * expr *)
+(*     | Enot    of expr *)
+(*     | Eblock  of expr list *)
+(*     | Ewhile  of expr * expr *)
+(*     | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr *)
+(*     | Eraise  of exn * expr option *)
+(*     | Etry    of expr * (exn * pvsymbol option * expr) list *)
+(*     | _ -> e.e_node *)
 
 (* end *)
 
