@@ -183,6 +183,8 @@ module ML = struct
 
   let mk_var id ty ghost = (id, ty, ghost)
 
+  let mk_var_unit () = id_register (id_fresh "_"), tunit, true
+
   let mk_its_defn id args private_ def =
     { its_name = id; its_args = args; its_private = private_; its_def = def; }
 
@@ -314,10 +316,6 @@ module Translate = struct
     | To -> ML.To
     | DownTo -> ML.DownTo
 
-  (* function arguments *)
-  let args = (* point-free *)
-    List.map pvty
-
   let isconstructor info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
     | Some {pd_node = PDtype its} ->
@@ -346,6 +344,16 @@ module Translate = struct
     let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
     filter_ghost_params pv_not_ghost def pvl
 
+  (* function arguments *)
+  let filter_params args =
+    let args = List.map pvty args in
+    let p (_, _, is_ghost) = not is_ghost in
+    List.filter p args
+
+  let params args =
+    let args = filter_params args in
+    if args = [] then [ML.mk_var_unit ()] else args
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     assert (not eff.eff_ghost);
@@ -366,38 +374,35 @@ module Translate = struct
       let ml_let = ML.ml_let_var pvs (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
-      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
-      let al pv = pv_name pv, ML.tunit, false in
-      let args = filter2_ghost_params pv_not_ghost def al cty.cty_args in
+      let args = params cty.cty_args in
       let ef = expr info ef in
       let ein = expr info ein in
       let ml_letrec = ML.Elet (ML.Lsym (rs, args, ef), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
-
       let eta_app = make_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
       let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eta_app), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
+      (* partial application *)
       let pvl = app pvl in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
       let ein = expr info ein in
-      let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eapp), ein) in
+      let args =
+        if filter_params cty.cty_args = [] then [ML.mk_var_unit ()] else [] in
+      let ml_letrec = ML.Elet (ML.Lsym (rsf, args, eapp), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
-      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
-      let al pv = pv_name pv, ML.tunit, false in
       let ein = expr info ein in
       let rdefl =
         List.map (fun rdef ->
           match rdef with
           | {rec_sym = rs1; rec_rsym = rs2;
              rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
-            let args =
-              filter2_ghost_params pv_not_ghost def al cty.cty_args in
+            let args = params cty.cty_args in
             let ef = expr info ef in
             { ML.rec_sym = rs1; ML.rec_rsym = rs2;
               ML.rec_args = args; ML.rec_exp = ef }
@@ -413,9 +418,7 @@ module Translate = struct
       let pvl = app pvl in
       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
-      let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
-      let al pv = pv_name pv, ML.tunit, false in
-      let args = filter2_ghost_params pv_not_ghost def al cty.cty_args in
+      let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cany}, _) ->
       (* Error message here *) assert false
@@ -507,25 +510,20 @@ module Translate = struct
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
        []
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e ->
+      (* FIXME: check that this symbol is defined in driver *)
       []
+    | PDlet (LDsym ({rs_cty = {cty_args = []}} as rs, {c_node = Cfun e})) ->
+      [ML.Dlet (ML.Lsym (rs, [], expr info e))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
-      let args_filter =
-        let p (_, _, is_ghost) = not is_ghost in
-        let def = fun x -> x in
-        let al = fun x -> x in
-        filter2_ghost_params p def al (args cty.cty_args) in
-      [ML.Dlet (ML.Lsym (rs, args_filter, expr info e))]
+      let args = params cty.cty_args in
+      [ML.Dlet (ML.Lsym (rs, args, expr info e))]
     | PDlet (LDrec rl) ->
       let rec_def =
         List.map (fun {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} ->
           let e = match e.c_node with Cfun e -> e | _ -> assert false in
-          let args_filter =
-            let p (_, _, is_ghost) = not is_ghost in
-            let def = fun x -> x in
-            let al = fun x -> x in
-            filter2_ghost_params p def al (args rs1.rs_cty.cty_args) in
+          let args = params rs1.rs_cty.cty_args in
           { ML.rec_sym = rs1; ML.rec_rsym = rs2;
-            ML.rec_args = args_filter; ML.rec_exp = expr info e }) rl
+            ML.rec_args = args; ML.rec_exp = expr info e }) rl
       in
       [ML.Dlet (ML.Lrec rec_def)]
     | PDlet (LDsym _)

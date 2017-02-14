@@ -1,12 +1,8 @@
 module M
 
-  use import mach.int.Int63
-
-  let f (x: int63) : int
-  = min_int63
-
   use import seq.Seq
   use import int.Int
+  use import mach.int.Int
 
   let function f_function (y: int) (x: int) : int
     requires { x >= 0 }
@@ -118,17 +114,23 @@ module M
   let call (x:int) : int =
     ggg () + 42
 
-  let test_filter_ghost_args (x: int) (ghost y: int) : int =
-    x + 42
+  (* functions with ghost arguments *)
+
+  let test_filter_ghost_args (x: int) (ghost y: int) =
+    1 / 0
+
+  let test_call (x: int) : int =
+    test_filter_ghost_args x 0 + 1
+
+  let constant test_partial : int =
+    let partial = test_filter_ghost_args 3 in
+    42
 
   let test_filter_ghost_args2 (x: int) (ghost y: int) (z: int) : int =
     x + z
 
   let test_filter_ghost_args3 (ghost y: int) : int =
-    42
-
-  let test_call (x: int) : int =
-    test_filter_ghost_args x 0
+    1 / 0
 
   let many_args (a b c d e f g h i j k l m: int) : int = 42
 
@@ -138,10 +140,6 @@ module M
 
   let test_fun (x: int) : int -> int =
     fun (y: int) -> x + y
-
-  let test_partial (x: int) : int =
-    let partial = test_filter_ghost_args x in
-    partial 42
 
   let test_local (x: int) : int =
     let fact (x: int) (y: int): int = x + y in
@@ -168,6 +166,27 @@ module M
     match c with
     | { collection = l; index = i; index2 = i2; v = v} -> i
     end
+
+  (** test the execution of the extracted code *)
+
+  use import ocaml.Pervasives
+
+  let test1 () raises { AssertFailure } =
+    ocaml_assert (1 + 1 = 2)
+
+  (** machine arithmetic *)
+
+  use import mach.int.Int63
+
+  let f (x: int63) : int
+  = min_int63
+
+  let test2 () raises { AssertFailure }
+  = ocaml_assert (of_int 1 + of_int 1 = of_int 2)
+
+  let main () raises { AssertFailure } =
+    test1 ();
+    test2 ()
 
 end
 

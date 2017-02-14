@@ -231,12 +231,12 @@ module Print = struct
       | _ -> false in
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _, _ ->
+    | Some s, _, [{e_node = Econst _}] ->
       let print_constant fmt e = match e.e_node with
         | Econst c ->
-          let c = BigInt.to_int (Number.compute_int c) in
-          fprintf fmt "%d" c
-        | _ -> print_expr info fmt e in
+          let s = BigInt.to_string (Number.compute_int c) in
+          fprintf fmt "%s" s
+        | _ -> assert false in
       syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
       syntax_arguments s (print_expr info) fmt pvl
