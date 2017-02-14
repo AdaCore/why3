@@ -367,9 +367,10 @@ module Translate = struct
       ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
-    | Elet (LDvar (pvs, e1), e2) when e_ghost e1 ->
-      let ml_let = ML.ml_let_var pvs ML.mk_unit (expr info e2) in
-      ML.mk_expr ml_let (ML.I e.e_ity) eff
+    | Elet (LDvar (_pvs, e1), e2) when e_ghost e1 ->
+      (* let ml_let = ML.ml_let_var pvs ML.mk_unit (expr info e2) in *)
+      expr info e2
+      (* ML.mk_expr ml_let (ML.I e.e_ity) eff *)
     | Elet (LDvar (pvs, e1), e2) ->
       let ml_let = ML.ml_let_var pvs (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
@@ -568,10 +569,13 @@ module Transform = struct
     match e.e_node with
     | Evar pv ->
       (try Mpv.find pv subst with Not_found -> e)
-    | Elet (Lvar (pv, ({e_node = Econst _} as e1)), e2) ->
+    | Elet (Lvar (pv, ({e_node = Econst _} as e1)), e2)
+    | Elet (Lvar (pv, ({e_node = Eblock []} as e1)), e2) ->
       add_subst pv e1 e2
     | Elet (Lvar (pv, ({e_node = Eapp (rs, [])} as e1)), e2)
       when Translate.isconstructor info rs ->
+      (* only optimize constructors with no argument *)
+      (* as it is a Lvar the constructor is not completely applied *)
       add_subst pv e1 e2
     | Elet (ld, e) ->
       mk (Elet (let_def info subst ld, expr info subst e))

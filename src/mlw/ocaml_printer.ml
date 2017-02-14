@@ -272,7 +272,7 @@ module Print = struct
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         (print_lident info) (pv_name pv) (print_expr info) e;
     | Lsym (rs, args, ef) ->
-      fprintf fmt "@[<hov 2>let %a %a@ =@ @[%a@]@]"
+      fprintf fmt "@[<hov 2>let %a@ @[%a@]@ =@ @[%a@]@]"
         (print_lident info) rs.rs_name
         (print_list space (print_vs_arg info)) args
         (print_expr info) ef;
@@ -416,13 +416,13 @@ module Print = struct
       forget_tvs ();
       fprintf fmt "@\n@\n"
     | Dtype dl ->
-       print_list newline (print_type_decl info) fmt dl;
-       fprintf fmt "@\n@\n"
+      print_list newline (print_type_decl info) fmt dl;
+      fprintf fmt "@\n@\n"
     | Dexn (xs, None) ->
        fprintf fmt "exception %a@\n@\n" print_ident xs.xs_name
     | Dexn (xs, Some t) ->
-       fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
-               print_ident xs.xs_name (print_ty ~paren:true info) t
+      fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
+        print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
 let extract_module pargs ?old fmt ({mod_theory = th} as m) =
