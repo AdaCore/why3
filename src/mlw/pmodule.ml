@@ -113,9 +113,22 @@ and mod_inst = {
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
+  mi_pk  : prop_kind Mpr.t;
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mexn.t;
+}
+
+let empty_mod_inst m = {
+  mi_mod = m;
+  mi_ty  = Mts.empty;
+  mi_ts  = Mts.empty;
+  mi_ls  = Mls.empty;
+  mi_pr  = Mpr.empty;
+  mi_pk  = Mpr.empty;
+  mi_pv  = Mvs.empty;
+  mi_rs  = Mrs.empty;
+  mi_xs  = Mexn.empty;
 }
 
 (** {2 Module under construction} *)
@@ -456,7 +469,7 @@ let cl_find_xs cl xs =
   else Mexn.find xs cl.xs_table
 
 let clone_ls inst cl ls =
-  if Mls.mem ls inst.inst_ls then raise (CannotInstantiate ls.ls_name);
+  if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
   let constr = ls.ls_constr in
   let id = id_clone ls.ls_name in
   let at = List.map (clone_ty cl) ls.ls_args in
@@ -465,16 +478,16 @@ let clone_ls inst cl ls =
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
 
-let cl_init_ty cl ({ts_name = id} as ts) ty =
-  let its = restore_its ts and ity = ity_of_ty ty in
+let cl_init_ty cl ({ts_name = id} as ts) ity =
+  let its = restore_its ts in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
   if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
     its_pure its && ity_immutable ity) then raise (BadInstance id);
   cl.ty_table <- Mts.add ts ity cl.ty_table
 
-let cl_init_ts cl ({ts_name = id} as ts) ts' =
-  let its = restore_its ts and its' = restore_its ts' in
+let cl_init_ts cl ({ts_name = id} as ts) its' =
+  let its = restore_its ts and ts' = its'.its_ts in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   if not (List.length ts.ts_args = List.length ts'.ts_args &&
     its_pure its && its_pure its') then raise (BadInstance id);
@@ -497,10 +510,10 @@ let cl_init_pr cl {pr_name = id} _ =
 
 let cl_init m inst =
   let cl = empty_clones m in
-  Mts.iter (cl_init_ty cl) inst.inst_ty;
-  Mts.iter (cl_init_ts cl) inst.inst_ts;
-  Mls.iter (cl_init_ls cl) inst.inst_ls;
-  Mpr.iter (cl_init_pr cl) inst.inst_pr;
+  Mts.iter (cl_init_ty cl) inst.mi_ty;
+  Mts.iter (cl_init_ts cl) inst.mi_ts;
+  Mls.iter (cl_init_ls cl) inst.mi_ls;
+  Mpr.iter (cl_init_pr cl) inst.mi_pk;
   cl
 
 (* clone declarations *)
@@ -508,7 +521,7 @@ let cl_init m inst =
 let clone_decl inst cl uc d = match d.d_node with
   | Dtype _ | Ddata _ -> assert false (* impossible *)
   | Dparam ls ->
-      if Mls.mem ls inst.inst_ls then uc else
+      if Mls.mem ls inst.mi_ls then uc else
       let d = create_param_decl (clone_ls inst cl ls) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dlogic ldl ->
@@ -521,7 +534,7 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dind (s, idl) ->
       let get_ls (ls,_) = clone_ls inst cl ls in
       let get_case (pr,f) =
-        if Mpr.mem pr inst.inst_pr then raise (CannotInstantiate pr.pr_name);
+        if Mpr.mem pr inst.mi_pk then raise (CannotInstantiate pr.pr_name);
         let pr' = create_prsymbol (id_clone pr.pr_name) in
         cl.pr_table <- Mpr.add pr pr' cl.pr_table;
         pr', clone_fmla cl f in
@@ -530,7 +543,7 @@ let clone_decl inst cl uc d = match d.d_node with
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
-      let skip, k' = match k, Mpr.find_opt pr inst.inst_pr with
+      let skip, k' = match k, Mpr.find_opt pr inst.mi_pk with
         | Pgoal, _ -> true, Pgoal
         | Plemma, Some Pgoal -> true, Pgoal
         | Plemma, _ -> false, Plemma
@@ -567,7 +580,7 @@ let clone_type_decl inst cl tdl =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
     let id' = id_clone id in
-    let cloned = Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty in
+    let cloned = Mts.mem ts inst.mi_ts || Mts.mem ts inst.mi_ty in
     let conv_pj v = create_pvsymbol
       (id_clone v.pv_vs.vs_name) ~ghost:v.pv_ghost (conv_ity alg v.pv_ity) in
     let save_itd itd =
@@ -896,6 +909,7 @@ let clone_export uc m inst =
           mi_ts = Mts.map (cl_find_its cl) mi.mi_ts;
           mi_ls = Mls.map (cl_find_ls cl) mi.mi_ls;
           mi_pr = Mpr.map (cl_find_pr cl) mi.mi_pr;
+          mi_pk = mi.mi_pk;
           mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
           mi_xs = Mexn.map (cl_find_xs cl) mi.mi_xs}
@@ -919,6 +933,7 @@ let clone_export uc m inst =
     mi_ts  = cl.ts_table;
     mi_ls  = cl.ls_table;
     mi_pr  = cl.pr_table;
+    mi_pk  = inst.mi_pk;
     mi_pv  = cl.pv_table;
     mi_rs  = cl.rs_table;
     mi_xs  = cl.xs_table} in

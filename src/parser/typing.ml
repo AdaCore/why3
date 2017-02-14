@@ -997,62 +997,63 @@ let find_module env file q =
   if Debug.test_flag Glob.flag then Glob.use (qloc_last q) m.mod_theory.th_name;
   m
 
-let type_inst ({muc_theory = tuc} as _muc) {mod_theory = t} s =
+let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
   let add_inst s = function
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
-        let ts2 = find_tysymbol tuc q in
-        if Mts.mem ts1 s.inst_ty then Loc.error ~loc:(qloc p)
+        let ts2 = find_itysymbol muc q in
+        if Mts.mem ts1 s.mi_ty then Loc.error ~loc:(qloc p)
           (ClashSymbol ts1.ts_name.id_string);
-        { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-            (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
+        { s with mi_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
+            (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.mi_ts }
     | CStsym (p,tvl,pty) ->
         let ts1 = find_tysymbol_ns t.th_export p in
         let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
-        let ts2 = Loc.try3 ~loc:(qloc p) create_tysymbol
-          (id_clone ts1.ts_name) tvl (Some (ty_of_pty tuc pty)) in
-        let ty2 = ty_app ts2 (List.map ty_var ts1.ts_args) in
-        let check v ty = match ty.ty_node with
-          | Tyvar u -> tv_equal u v | _ -> false in
-        begin match ty2.ty_node with
-        | Tyapp (ts2, tyl) when Lists.equal check tvl tyl ->
-            if Mts.mem ts1 s.inst_ty then Loc.error ~loc:(qloc p)
+        let ts2 = Loc.try3 ~loc:(qloc p) create_alias_itysymbol
+          (id_clone ts1.ts_name) tvl (ity_of_pty muc pty) in
+        let ty2 = ity_app ts2 (List.map ity_var ts1.ts_args) [] in
+        let check v ty = match ty.ity_node with
+          | Ityvar (u, _) -> tv_equal u v | _ -> false in
+        begin match ty2.ity_node with
+        | Ityapp (ts2, tyl, _) | Ityreg { reg_its = ts2; reg_args = tyl }
+          when Lists.equal check tvl tyl ->
+            if Mts.mem ts1 s.mi_ty then Loc.error ~loc:(qloc p)
               (ClashSymbol ts1.ts_name.id_string);
-            { s with inst_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
-                (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.inst_ts }
+            { s with mi_ts = Loc.try4 ~loc:(qloc p) Mts.add_new
+                (ClashSymbol ts1.ts_name.id_string) ts1 ts2 s.mi_ts }
         | _ ->
-            if Mts.mem ts1 s.inst_ts then Loc.error ~loc:(qloc p)
+            if Mts.mem ts1 s.mi_ts then Loc.error ~loc:(qloc p)
               (ClashSymbol ts1.ts_name.id_string);
-            { s with inst_ty = Loc.try4 ~loc:(qloc p) Mts.add_new
-                (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.inst_ty }
+            { s with mi_ty = Loc.try4 ~loc:(qloc p) Mts.add_new
+                (ClashSymbol ts1.ts_name.id_string) ts1 ty2 s.mi_ty }
         end
     | CSfsym (p,q) ->
         let ls1 = find_fsymbol_ns t.th_export p in
         let ls2 = find_fsymbol tuc q in
-        { s with inst_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
-            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.inst_ls }
+        { s with mi_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
+            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.mi_ls }
     | CSpsym (p,q) ->
         let ls1 = find_psymbol_ns t.th_export p in
         let ls2 = find_psymbol tuc q in
-        { s with inst_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
-            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.inst_ls }
+        { s with mi_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
+            (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.mi_ls }
     | CSvsym (p,_) ->
         Loc.errorm ~loc:(qloc p)
           "program symbol instantiation is not supported yet" (* TODO *)
     | CSaxiom p ->
         let pr = find_prop_ns t.th_export p in
-        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
-            (ClashSymbol pr.pr_name.id_string) pr Paxiom s.inst_pr }
+        { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Paxiom s.mi_pk }
     | CSlemma p ->
         let pr = find_prop_ns t.th_export p in
-        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
-            (ClashSymbol pr.pr_name.id_string) pr Plemma s.inst_pr }
+        { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Plemma s.mi_pk }
     | CSgoal p ->
         let pr = find_prop_ns t.th_export p in
-        { s with inst_pr = Loc.try4 ~loc:(qloc p) Mpr.add_new
-            (ClashSymbol pr.pr_name.id_string) pr Pgoal s.inst_pr }
+        { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new
+            (ClashSymbol pr.pr_name.id_string) pr Pgoal s.mi_pk }
   in
-  List.fold_left add_inst empty_inst s
+  List.fold_left add_inst (empty_mod_inst m) s
 
 let add_decl muc env file d =
   let vc = muc.muc_theory.uc_path = [] &&

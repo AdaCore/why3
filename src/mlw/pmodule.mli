@@ -66,10 +66,13 @@ and mod_inst = {
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
   mi_pr  : prsymbol Mpr.t;
+  mi_pk  : prop_kind Mpr.t;
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mexn.t;
 }
+
+val empty_mod_inst: pmodule -> mod_inst
 
 (** {2 Module under construction} *)
 
@@ -106,7 +109,7 @@ val restore_module : theory -> pmodule
 
 val use_export : pmodule_uc -> pmodule -> pmodule_uc
 
-val clone_export : pmodule_uc -> pmodule -> Theory.th_inst -> pmodule_uc
+val clone_export : pmodule_uc -> pmodule -> mod_inst -> pmodule_uc
 
 (** {2 Logic decls} *)
 
