@@ -512,7 +512,7 @@ module Translate = struct
   let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
-       []
+      []
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e ->
       (* FIXME: check that this symbol is defined in driver *)
       []
@@ -562,43 +562,47 @@ module Transform = struct
 
   type subst = expr Mpv.t
 
-  let rec expr subst e =
+  let rec expr info subst e =
     let mk n = { e with e_node = n } in
+    let add_subst pv e1 e2 = expr info (Mpv.add pv e1 subst) e2 in
     match e.e_node with
     | Evar pv ->
       (try Mpv.find pv subst with Not_found -> e)
     | Elet (Lvar (pv, ({e_node = Econst _} as e1)), e2) ->
-      expr (Mpv.add pv e1 subst) e2
+      add_subst pv e1 e2
+    | Elet (Lvar (pv, ({e_node = Eapp (rs, [])} as e1)), e2)
+      when Translate.isconstructor info rs ->
+      add_subst pv e1 e2
     | Elet (ld, e) ->
-      mk (Elet (let_def subst ld, expr subst e))
+      mk (Elet (let_def info subst ld, expr info subst e))
     | Eapp (rs, el) ->
-      mk (Eapp (rs, List.map (expr subst) el))
+      mk (Eapp (rs, List.map (expr info subst) el))
     | Efun (vl, e) ->
-      mk (Efun (vl, expr subst e))
+      mk (Efun (vl, expr info subst e))
     | Eif (e1, e2, e3) ->
-      mk (Eif (expr subst e1, expr subst e2, expr subst e3))
+      mk (Eif (expr info subst e1, expr info subst e2, expr info subst e3))
     | Ecast (e, ty) ->
-      mk (Ecast (expr subst e, ty))
+      mk (Ecast (expr info subst e, ty))
     | Etuple el ->
-      mk (Etuple (List.map (expr subst) el))
+      mk (Etuple (List.map (expr info subst) el))
     | Ematch (e, bl) ->
-      mk (Ematch (expr subst e, List.map (branch subst) bl))
+      mk (Ematch (expr info subst e, List.map (branch info subst) bl))
     | Ebinop (e1, op, e2) ->
-      mk (Ebinop (expr subst e1, op, expr subst e2))
+      mk (Ebinop (expr info subst e1, op, expr info subst e2))
     | Enot e ->
-      mk (Enot (expr subst e))
+      mk (Enot (expr info subst e))
     | Eblock el ->
-      mk (Eblock (List.map (expr subst) el))
+      mk (Eblock (List.map (expr info subst) el))
     | Ewhile (e1, e2) ->
-      mk (Ewhile (expr subst e1, expr subst e2))
+      mk (Ewhile (expr info subst e1, expr info subst e2))
     | Efor (x, pv1, dir, pv2, e) ->
-      let e = mk (Efor (x, pv1, dir, pv2, expr subst e)) in
+      let e = mk (Efor (x, pv1, dir, pv2, expr info subst e)) in
       (* be careful when pv1 and pv2 are in subst *)
       mk_let subst pv1 (mk_let subst pv2 e)
     | Eraise (exn, eo) ->
-      mk (Eraise (exn, Opt.map (expr subst) eo))
+      mk (Eraise (exn, Opt.map (expr info subst) eo))
     | Etry (e, bl) ->
-      mk (Etry (expr subst e, List.map (xbranch subst) bl))
+      mk (Etry (expr info subst e, List.map (xbranch info subst) bl))
     | Eassign al ->
       let assign e (_, _, pv) = mk_let subst pv e in
       List.fold_left assign e al
@@ -610,26 +614,26 @@ module Transform = struct
       { e with e_node = Elet (Lvar (pv, e1), e) }
     with Not_found -> e
 
-  and branch subst (pat, e) = pat, expr subst e
-  and xbranch subst (exn, pat, e) = exn, pat, expr subst e
+  and branch info subst (pat, e) = pat, expr info subst e
+  and xbranch info subst (exn, pat, e) = exn, pat, expr info subst e
 
-  and let_def subst = function
+  and let_def info subst = function
     | Lvar (pv, e) ->
       assert (not (Mpv.mem pv subst)); (* no capture *)
-      Lvar (pv, expr subst e)
+      Lvar (pv, expr info subst e)
     | Lsym (rs, args, e) ->
-      Lsym (rs, args, expr subst e)
-    | Lrec rl -> Lrec (List.map (rdef subst) rl)
+      Lsym (rs, args, expr info subst e)
+    | Lrec rl -> Lrec (List.map (rdef info subst) rl)
 
-  and rdef subst r =
-    { r with rec_exp = expr subst r.rec_exp }
+  and rdef info subst r =
+    { r with rec_exp = expr info subst r.rec_exp }
 
-  let decl = function
+  let decl info = function
     | Dtype _ | Dexn _ as d -> d
-    | Dlet def -> Dlet (let_def Mpv.empty def)
+    | Dlet def -> Dlet (let_def info Mpv.empty def)
 
-  let module_ =
-    List.map decl
+  let module_ info  =
+    List.map (decl info)
 
 end
 

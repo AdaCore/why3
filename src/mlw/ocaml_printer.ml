@@ -367,7 +367,6 @@ module Print = struct
     | Enot _ -> (* TODO *) assert false
     | Ebinop _ -> (* TODO *) assert false
     | Ecast _ -> (* TODO *) assert false
-    | Eassign _ -> (* TODO *) assert false
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]"
@@ -444,7 +443,7 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
   let mdecls = Translate.module_ info m in
-  let mdecls = Transform.module_ mdecls in
+  let mdecls = Transform.module_ info mdecls in
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
 
