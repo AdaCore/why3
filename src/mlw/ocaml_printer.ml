@@ -317,10 +317,14 @@ module Print = struct
     | Ematch (e, pl) ->
       fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@] end"
         (print_expr info) e (print_list newline (print_branch info)) pl
-    | Eassign [(rho, rs, pv)] ->
-      fprintf fmt "%a.%a <-@ %a"
-        print_ident (pv_name rho) print_ident rs.rs_name
-        print_ident (pv_name pv)
+    | Eassign al ->
+      let assign fmt (rho, rs, pv) =
+        fprintf fmt "%a.%a <-@ %a"
+          print_ident (pv_name rho) print_ident rs.rs_name
+          print_ident (pv_name pv) in
+      begin match al with
+      | [] -> assert false | [a] -> assign fmt a
+      | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]"
@@ -440,6 +444,7 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
   let mdecls = Translate.module_ info m in
+  let mdecls = Transform.module_ mdecls in
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
 

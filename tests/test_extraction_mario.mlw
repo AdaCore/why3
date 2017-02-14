@@ -167,12 +167,31 @@ module M
     | { collection = l; index = i; index2 = i2; v = v} -> i
     end
 
+  (** for loops *)
+
+(* FIXME
+  let for_loop1 () =
+    let r = ref 0 in
+    for i = 0 to 10 do r := !r + i done;
+    !r
+*)
+
   (** test the execution of the extracted code *)
 
   use import ocaml.Pervasives
 
   let test1 () raises { AssertFailure } =
     ocaml_assert (1 + 1 = 2)
+
+  (** parallel assignement *)
+
+  type record1 = { mutable field: int }
+
+  let test_parallel_assign () raises { AssertFailure } =
+    let a = { field = 0 } in
+    let b = { field = 1 } in
+    (a.field, b.field) <- (b.field, a.field);
+    ocaml_assert (a.field = 1)
 
   (** machine arithmetic *)
 
@@ -186,7 +205,8 @@ module M
 
   let main () raises { AssertFailure } =
     test1 ();
-    test2 ()
+    test2 ();
+    test_parallel_assign ()
 
 end
 

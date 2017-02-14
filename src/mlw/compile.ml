@@ -164,8 +164,8 @@ module ML = struct
         (* TODO add return type? *)
     | Dexn    of xsymbol * ty option
 
-  (* type pmodule = { *)
-  (* } *)
+  type pmodule =
+    decl list
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -447,10 +447,10 @@ module Translate = struct
       ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff
     | Eghost _ ->
       assert false
-    | Eassign [(rho, rs, pv)] ->
-      ML.mk_expr (ML.Eassign [(rho, rs, pv)]) (ML.I e.e_ity) eff
-    | Epure _ -> assert false
-    | Etry _ -> assert false
+    | Eassign al ->
+      ML.mk_expr (ML.Eassign al) (ML.I e.e_ity) eff
+    | Epure _ -> assert false (*TODO*)
+    | Etry _ -> assert false (*TODO*)
     | Eraise (xs, ex) ->
       let ex =
         let open ML in
@@ -460,7 +460,11 @@ module Translate = struct
       in
       let exn = ML.Xident xs.xs_name in
       ML.mk_expr (ML.Eraise (exn, ex)) (ML.I e.e_ity) eff
-    | _ -> (* TODO *) assert false
+    | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _) ->
+      assert false (*TODO*)
+    | Eexec ({c_node=Cpur (_, _); _ }, _) ->
+      assert false (*TODO*)
+
 
   and ebranch info ({pp_pat = p}, e) =
     (pat p, expr info e)
@@ -550,33 +554,84 @@ module Translate = struct
 
 end
 
-(** Optimistion operations *)
+(** Some transformations *)
 
-(* module Erasure = struct *)
+module Transform = struct
 
-(*   open ML *)
+  open ML
 
-(*   let rec remove_superf_let subs e = *)
-(*     match e.e_node with *)
-(*     | Evar pv -> try let Hpv.find pv  *)
-(*     | Eapp    of rsymbol * expr list *)
-(*     | Efun    of var list * expr *)
-(*     | Elet    of let_def * expr *)
-(*     | Eif     of expr * expr * expr *)
-(*     | Ecast   of expr * ty *)
-(*     | Eassign of (pvsymbol * rsymbol * pvsymbol) list *)
-(*     | Etuple  of expr list (\* at least 2 expressions *\) *)
-(*     | Ematch  of expr * (pat * expr) list *)
-(*     | Ebinop  of expr * binop * expr *)
-(*     | Enot    of expr *)
-(*     | Eblock  of expr list *)
-(*     | Ewhile  of expr * expr *)
-(*     | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr *)
-(*     | Eraise  of exn * expr option *)
-(*     | Etry    of expr * (exn * pvsymbol option * expr) list *)
-(*     | _ -> e.e_node *)
+  type subst = expr Mpv.t
 
-(* end *)
+  let rec expr subst e =
+    let mk n = { e with e_node = n } in
+    match e.e_node with
+    | Evar pv ->
+      (try Mpv.find pv subst with Not_found -> e)
+    | Elet (Lvar (pv, ({e_node = Econst _} as e1)), e2) ->
+      expr (Mpv.add pv e1 subst) e2
+    | Elet (ld, e) ->
+      mk (Elet (let_def subst ld, expr subst e))
+    | Eapp (rs, el) ->
+      mk (Eapp (rs, List.map (expr subst) el))
+    | Efun (vl, e) ->
+      mk (Efun (vl, expr subst e))
+    | Eif (e1, e2, e3) ->
+      mk (Eif (expr subst e1, expr subst e2, expr subst e3))
+    | Ecast (e, ty) ->
+      mk (Ecast (expr subst e, ty))
+    | Etuple el ->
+      mk (Etuple (List.map (expr subst) el))
+    | Ematch (e, bl) ->
+      mk (Ematch (expr subst e, List.map (branch subst) bl))
+    | Ebinop (e1, op, e2) ->
+      mk (Ebinop (expr subst e1, op, expr subst e2))
+    | Enot e ->
+      mk (Enot (expr subst e))
+    | Eblock el ->
+      mk (Eblock (List.map (expr subst) el))
+    | Ewhile (e1, e2) ->
+      mk (Ewhile (expr subst e1, expr subst e2))
+    | Efor (x, pv1, dir, pv2, e) ->
+      let e = mk (Efor (x, pv1, dir, pv2, expr subst e)) in
+      (* be careful when pv1 and pv2 are in subst *)
+      mk_let subst pv1 (mk_let subst pv2 e)
+    | Eraise (exn, eo) ->
+      mk (Eraise (exn, Opt.map (expr subst) eo))
+    | Etry (e, bl) ->
+      mk (Etry (expr subst e, List.map (xbranch subst) bl))
+    | Eassign al ->
+      let assign e (_, _, pv) = mk_let subst pv e in
+      List.fold_left assign e al
+    | Econst _ | Eabsurd -> e
+
+  and mk_let subst pv e =
+    try
+      let e1 = Mpv.find pv subst in
+      { e with e_node = Elet (Lvar (pv, e1), e) }
+    with Not_found -> e
+
+  and branch subst (pat, e) = pat, expr subst e
+  and xbranch subst (exn, pat, e) = exn, pat, expr subst e
+
+  and let_def subst = function
+    | Lvar (pv, e) ->
+      assert (not (Mpv.mem pv subst)); (* no capture *)
+      Lvar (pv, expr subst e)
+    | Lsym (rs, args, e) ->
+      Lsym (rs, args, expr subst e)
+    | Lrec rl -> Lrec (List.map (rdef subst) rl)
+
+  and rdef subst r =
+    { r with rec_exp = expr subst r.rec_exp }
+
+  let decl = function
+    | Dtype _ | Dexn _ as d -> d
+    | Dlet def -> Dlet (let_def Mpv.empty def)
+
+  let module_ =
+    List.map decl
+
+end
 
 (*
  * Local Variables:
