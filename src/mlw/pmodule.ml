@@ -498,6 +498,7 @@ let cl_init_ts cl ({ts_name = id} as ts) its' =
   cl.ts_table <- Mts.add its.its_ts its' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
+  (* FIXME check that ls is not associated to some rsymbol *)
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
     with TypeMismatch _ -> raise (BadInstance id) in
@@ -510,6 +511,7 @@ let cl_init_ls cl ({ls_name = id} as ls) ls' =
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_rs cl ({rs_name = id} as rs) rs' =
+  (* FIXME check that rs is not a constructor, nor a field *)
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   (* arity and types will be checked when refinement VC is generated *)
   begin match rs.rs_logic, rs'.rs_logic with
@@ -548,6 +550,7 @@ let cl_init m inst =
   Mvs.iter (cl_init_pv cl) inst.mi_pv;
   Mxs.iter (cl_init_xs cl) inst.mi_xs;
   Mpr.iter (cl_init_pr cl) inst.mi_pk;
+  Mpr.iter (fun {pr_name = id} _ -> raise (BadInstance id)) inst.mi_pr;
   cl
 
 (* clone declarations *)
@@ -609,7 +612,9 @@ let clone_type_decl inst cl tdl =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let htd = Hits.create 5 in
-
+  let vcs = ref ([] : (itysymbol * term) list) in
+  (* FIXME: check that type_decl does not define any ls/rs
+     that belongs to inst, nor pr in inst.mi_pk *)
   let rec visit alg ({its_ts = {ts_name = id} as ts} as s) d =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
@@ -630,14 +635,12 @@ let clone_type_decl inst cl tdl =
       save_itd itd
     end else
     (* abstract *)
-    if d.itd_fields = [] && d.itd_constructors = [] &&
-                            d.itd_invariant = [] then begin
-      if cloned then Hits.add htd s None else begin
-        let itd = create_plain_record_decl id' ts.ts_args
-          ~priv:s.its_private ~mut:s.its_mutable [] [] in
-        cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
-        save_itd itd
-      end
+    if s.its_private && cloned then begin
+      assert (d.itd_constructors = []);
+      assert (List.length tdl = 1);
+      Hits.add htd s None;
+      (* TODO: check typing conditions for refined record type *)
+      (* TODO: add a VC for invariants (if any) *)
     end else
     (* variant *)
     if not s.its_mutable && d.itd_constructors <> [] &&
@@ -692,7 +695,8 @@ let clone_type_decl inst cl tdl =
     clone_ity cl ity in
 
   Mits.iter (visit Sits.empty) def;
-  Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl
+  Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl,
+  !vcs
 
 type smap = {
   sm_vs : vsymbol Mvs.t;
@@ -891,10 +895,17 @@ and clone_let_defn cl sm ld = match ld with
         sm_save_rs cl sm d.rec_sym d'.rec_sym) sm rdl rdl' in
       sm, ld
 
+let add_vc uc (its, f) =
+  let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
+  let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let d = create_pure_decl (create_prop_decl Pgoal pr f) in
+  add_pdecl ~vc:false uc d
+
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
-      let tdl = clone_type_decl inst cl tdl in
-      if tdl = [] then uc else
+      let tdl, vcl = clone_type_decl inst cl tdl in
+      if tdl = [] then List.fold_left add_vc uc vcl else
       add_pdecl ~vc:false uc (create_type_decl tdl)
   | PDlet ld ->
       let reads = match ld with
@@ -911,6 +922,8 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)
+  | PDexn xs when Mxs.mem xs inst.mi_xs ->
+      uc
   | PDexn xs ->
       let id = id_clone xs.xs_name in
       let ity = clone_ity cl xs.xs_ity in
