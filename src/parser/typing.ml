@@ -479,7 +479,7 @@ let dpost muc ql lvm old ity =
 let dxpost muc ql lvm old =
   let add_exn (q,pf) m =
     let xs = find_xsymbol muc q in
-    Mexn.change (fun l -> match pf, l with
+    Mxs.change (fun l -> match pf, l with
       | Some pf, Some l -> Some (pf :: l)
       | Some pf, None   -> Some (pf :: [])
       | None,    None   -> Some []
@@ -488,11 +488,11 @@ let dxpost muc ql lvm old =
     if pfl = [] then [] else
     dpost muc [loc,pfl] lvm old xs.xs_ity in
   let exn_map (loc,xpfl) =
-    let m = List.fold_right add_exn xpfl Mexn.empty in
-    Mexn.mapi (fun xs pfl -> mk_xpost loc xs pfl) m in
+    let m = List.fold_right add_exn xpfl Mxs.empty in
+    Mxs.mapi (fun xs pfl -> mk_xpost loc xs pfl) m in
   let add_map ql m =
-    Mexn.union (fun _ l r -> Some (l @ r)) (exn_map ql) m in
-  List.fold_right add_map ql Mexn.empty
+    Mxs.union (fun _ l r -> Some (l @ r)) (exn_map ql) m in
+  List.fold_right add_map ql Mxs.empty
 
 let dreads muc rl lvm =
   let dreads q = match find_local_pv muc lvm q with Some v -> v
@@ -1055,7 +1055,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
     | CSxsym (p,q) ->
         let xs1 = find_xsymbol_ns m.mod_export p in
         let xs2 = find_xsymbol muc q in
-        { s with mi_xs = Loc.try4 ~loc:(qloc p) Mexn.add_new
+        { s with mi_xs = Loc.try4 ~loc:(qloc p) Mxs.add_new
             (ClashSymbol xs1.xs_name.id_string) xs1 xs2 s.mi_xs }
     | CSaxiom p ->
         let pr = find_prop_ns t.th_export p in

@@ -65,7 +65,7 @@ let create_semi_constructor id s fdl pjl invl =
   let eff = match ity.ity_node with
     | Ityreg r -> eff_reset eff_empty (Sreg.singleton r)
     | _ -> eff_empty in
-  let c = create_cty fdl invl [q] Mexn.empty Mpv.empty eff ity in
+  let c = create_cty fdl invl [q] Mxs.empty Mpv.empty eff ity in
   create_rsymbol id c
 
 let create_plain_record_decl ~priv ~mut id args fdl invl =
@@ -186,8 +186,8 @@ let get_syms node pure =
     let add_tl syms tl = syms_tl syms tl in
     let add_xq xs ql syms = syms_xs xs (add_tl syms ql) in
     let syms = add_tl (add_tl syms c.cty_pre) c.cty_post in
-    let syms = Mexn.fold add_xq c.cty_xpost syms in
-    Sexn.fold syms_xs c.cty_effect.eff_raises syms in
+    let syms = Mxs.fold add_xq c.cty_xpost syms in
+    Sxs.fold syms_xs c.cty_effect.eff_raises syms in
   let rec syms_expr syms e = match e.e_node with
     | Evar _ | Econst _ | Eabsurd -> syms
     | Eassert (_,t) | Epure t -> syms_term syms t
@@ -226,7 +226,7 @@ let get_syms node pure =
     | Etry (d,xl) ->
         let add_branch xs (vl,e) syms =
           syms_xs xs (syms_pvl (syms_expr syms e) vl) in
-        Mexn.fold add_branch xl (syms_expr syms d)
+        Mxs.fold add_branch xl (syms_expr syms d)
     | Eraise (xs,e) ->
         syms_xs xs (syms_eity syms e)
   and syms_eity syms e =

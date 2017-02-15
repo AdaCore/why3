@@ -862,8 +862,8 @@ module Exn = MakeMSH (struct
   let tag xs = Weakhtbl.tag_hash xs.xs_name.id_tag
 end)
 
-module Sexn = Exn.S
-module Mexn = Exn.M
+module Sxs = Exn.S
+module Mxs = Exn.M
 
 (* effects *)
 
@@ -883,7 +883,7 @@ type effect = {
   eff_taints : Sreg.t;        (* ghost code writes *)
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
-  eff_raises : Sexn.t;        (* raised exceptions *)
+  eff_raises : Sxs.t;         (* raised exceptions *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -894,7 +894,7 @@ let eff_empty = {
   eff_taints = Sreg.empty;
   eff_covers = Sreg.empty;
   eff_resets = Sreg.empty;
-  eff_raises = Sexn.empty;
+  eff_raises = Sxs.empty;
   eff_oneway = false;
   eff_ghost  = false;
 }
@@ -905,13 +905,13 @@ let eff_equal e1 e2 =
   Sreg.equal e1.eff_taints e2.eff_taints &&
   Sreg.equal e1.eff_covers e2.eff_covers &&
   Sreg.equal e1.eff_resets e2.eff_resets &&
-  Sexn.equal e1.eff_raises e2.eff_raises &&
+  Sxs.equal e1.eff_raises e2.eff_raises &&
   e1.eff_oneway = e2.eff_oneway &&
   e1.eff_ghost = e2.eff_ghost
 
 let eff_pure e =
   Mreg.is_empty e.eff_writes &&
-  Sexn.is_empty e.eff_raises &&
+  Sxs.is_empty e.eff_raises &&
   not e.eff_oneway
 
 let check_writes {eff_writes = wrt} pvs =
@@ -951,7 +951,7 @@ let eff_ghostify gh e =
 
 let eff_ghostify_weak gh e =
   if not gh || e.eff_ghost then e else
-  if e.eff_oneway || not (Sexn.is_empty e.eff_raises) then e else
+  if e.eff_oneway || not (Sxs.is_empty e.eff_raises) then e else
   if not (Sreg.equal e.eff_taints (visible_writes e)) then e else
   (* it is not enough to catch BadGhostWrite from eff_ghostify below,
      because e may not have in eff_reads the needed visible variables
@@ -1083,7 +1083,7 @@ let eff_assign asl =
     eff_taints = taint;
     eff_covers = Mreg.domain (Mreg.set_diff writes resets);
     eff_resets = resets;
-    eff_raises = Sexn.empty;
+    eff_raises = Sxs.empty;
     eff_oneway = false;
     eff_ghost  = ghost } in
   (* verify that we can rebuild every value *)
@@ -1108,8 +1108,8 @@ let eff_reset_overwritten ({eff_writes = wr} as e) =
   let svv, rst = Mreg.fold add_write wr (Sreg.empty,Sreg.empty) in
   { e with eff_resets = Sreg.diff rst svv }
 
-let eff_raise e x = { e with eff_raises = Sexn.add x e.eff_raises }
-let eff_catch e x = { e with eff_raises = Sexn.remove x e.eff_raises }
+let eff_raise e x = { e with eff_raises = Sxs.add x e.eff_raises }
+let eff_catch e x = { e with eff_raises = Sxs.remove x e.eff_raises }
 
 let merge_fields _ f1 f2 = Some (Spv.union f1 f2)
 
@@ -1123,7 +1123,7 @@ let eff_union e1 e2 = {
   eff_covers = Sreg.union (remove_stale e2 e1.eff_covers)
                           (remove_stale e1 e2.eff_covers);
   eff_resets = Sreg.union e1.eff_resets e2.eff_resets;
-  eff_raises = Sexn.union e1.eff_raises e2.eff_raises;
+  eff_raises = Sxs.union e1.eff_raises e2.eff_raises;
   eff_oneway = e1.eff_oneway || e2.eff_oneway;
   eff_ghost  = e1.eff_ghost && e2.eff_ghost }
 
@@ -1142,12 +1142,12 @@ let eff_union e1 e2 =
 
 let eff_contaminate e1 e2 =
   if not e1.eff_ghost then e2 else
-  if Sexn.is_empty e1.eff_raises then e2 else
+  if Sxs.is_empty e1.eff_raises then e2 else
   eff_ghostify true e2
 
 let eff_contaminate_weak e1 e2 =
   if not e1.eff_ghost then e2 else
-  if Sexn.is_empty e1.eff_raises then eff_ghostify_weak true e2 else
+  if Sxs.is_empty e1.eff_raises then eff_ghostify_weak true e2 else
   eff_ghostify true e2
 
 let eff_union_par e1 e2 =
@@ -1221,7 +1221,7 @@ type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
   cty_post   : post list;
-  cty_xpost  : post list Mexn.t;
+  cty_xpost  : post list Mxs.t;
   cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
@@ -1256,7 +1256,7 @@ let cty_ghostify gh ({cty_effect = eff} as c) =
 let spec_t_fold fn_t acc pre post xpost =
   let fn_l a fl = List.fold_left fn_t a fl in
   let acc = fn_l (fn_l acc pre) post in
-  Mexn.fold (fun _ l a -> fn_l a l) xpost acc
+  Mxs.fold (fun _ l a -> fn_l a l) xpost acc
 
 let check_tvs reads result pre post xpost =
   (* every type variable in spec comes either from a known vsymbol
@@ -1284,7 +1284,7 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
   check_pre pre; check_post exn result post;
-  Mexn.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
+  Mxs.iter (fun xs xq -> check_post exn xs.xs_ity xq) xpost;
   (* mask is consistent with result *)
   mask_check exn result mask;
   let mask = mask_reduce mask in
@@ -1295,7 +1295,7 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
      reads are forbidden, to simplify instantiation later. *)
   Mpv.iter (fun {pv_ghost = gh; pv_ity = o} {pv_ity = t} ->
     if not (gh && o == ity_purify t) then raise exn) oldies;
-  let preads = spec_t_fold t_freepvs sarg pre [] Mexn.empty in
+  let preads = spec_t_fold t_freepvs sarg pre [] Mxs.empty in
   let qreads = spec_t_fold t_freepvs Spv.empty [] post xpost in
   let effect = eff_read_post effect qreads in
   let oldies = Mpv.set_inter oldies effect.eff_reads in
@@ -1311,7 +1311,7 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
     | _, {t_node = Tfalse} -> true | _ -> false in
   let filter _ () = function
     | [q] when is_false q -> None | _ -> Some () in
-  let raises = Mexn.diff filter effect.eff_raises xpost in
+  let raises = Mxs.diff filter effect.eff_raises xpost in
   let effect = { effect with eff_raises = raises } in
   (* remove effects on unknown regions. We reset eff_taints
      instead of simply filtering the existing set in order
@@ -1388,7 +1388,7 @@ let cty_apply c vl args res =
                       (fun t -> t_ty_subst tsb vsb t) in
   let subst_l l = List.map subst_t l in
   cty_unsafe (List.rev rargs) (subst_l c.cty_pre)
-    (subst_l c.cty_post) (Mexn.map subst_l c.cty_xpost)
+    (subst_l c.cty_post) (Mxs.map subst_l c.cty_xpost)
     oldies eff res c.cty_mask freeze
 
 let cty_tuple args =
@@ -1401,7 +1401,7 @@ let cty_tuple args =
   let eff = eff_read (Spv.of_list args) in
   let eff = eff_ghostify (mask = MaskGhost) eff in
   let frz = List.fold_right freeze_pv args isb_empty in
-  cty_unsafe [] [] [post] Mexn.empty Mpv.empty eff res mask frz
+  cty_unsafe [] [] [post] Mxs.empty Mpv.empty eff res mask frz
 
 let cty_exec_post_raw c =
   let ity = List.fold_right (fun a ity ->
@@ -1465,7 +1465,7 @@ let cty_exec ({cty_effect = eff} as c) =
      Still, Expr never uses it like this: it is merely attached to Eexec
      to provide the converted specification for VC generation. Pvsymbols
      that carry the resulting value, however, cannot be generalized. *)
-  cty_unsafe [] pre post Mexn.empty Mpv.empty eff ity MaskVisible c.cty_freeze
+  cty_unsafe [] pre post Mxs.empty Mpv.empty eff ity MaskVisible c.cty_freeze
 
 let cty_exec c = if c.cty_args = [] then c else cty_exec c
 
@@ -1485,14 +1485,14 @@ let cty_read_post c pvs =
 let cty_add_pre pre c = if pre = [] then c else begin check_pre pre;
   let c = cty_read_pre (List.fold_left t_freepvs Spv.empty pre) c in
   let rd = List.fold_right Spv.add c.cty_args c.cty_effect.eff_reads in
-  check_tvs rd c.cty_result pre [] Mexn.empty;
+  check_tvs rd c.cty_result pre [] Mxs.empty;
   { c with cty_pre = pre @ c.cty_pre } end
 
 let cty_add_post c post = if post = [] then c else begin
   check_post (Invalid_argument "Ity.cty_add_post") c.cty_result post;
   let c = cty_read_post c (List.fold_left t_freepvs Spv.empty post) in
   let rd = List.fold_right Spv.add c.cty_args c.cty_effect.eff_reads in
-  check_tvs rd c.cty_result [] post Mexn.empty;
+  check_tvs rd c.cty_result [] post Mxs.empty;
   { c with cty_post = post @ c.cty_post } end
 
 (** pretty-printing *)
@@ -1666,7 +1666,7 @@ let print_spec args pre post xpost oldies eff fmt ity =
   Pp.print_list Pp.nothing print_pre fmt pre;
   Pp.print_list Pp.nothing print_old fmt (Mpv.bindings oldies);
   Pp.print_list Pp.nothing print_post fmt post;
-  Pp.print_list Pp.nothing print_xpost fmt (Mexn.bindings xpost)
+  Pp.print_list Pp.nothing print_xpost fmt (Mxs.bindings xpost)
 
 let print_cty fmt c = print_spec c.cty_args c.cty_pre c.cty_post
   c.cty_xpost c.cty_oldies c.cty_effect fmt (Some c.cty_result)

@@ -171,7 +171,7 @@ let create_projection s v =
   let arg = create_pvsymbol (id_fresh "arg") ity in
   let ls = create_fsymbol id [arg.pv_vs.vs_ty] v.pv_vs.vs_ty in
   let q = make_post (fs_app ls [t_var arg.pv_vs] v.pv_vs.vs_ty) in
-  let c = create_cty [arg] [] [q] Mexn.empty Mpv.empty eff v.pv_ity in
+  let c = create_cty [arg] [] [q] Mxs.empty Mpv.empty eff v.pv_ity in
   mk_rs ls.ls_name c (RLls ls) (Some v)
 
 exception FieldExpected of rsymbol
@@ -198,7 +198,7 @@ let create_constructor ~constr id s fl =
   let eff = match ity.ity_node with
     | Ityreg r -> eff_reset eff_empty (Sreg.singleton r)
     | _ -> eff_empty in
-  let c = create_cty fl [] [q] Mexn.empty Mpv.empty eff ity in
+  let c = create_cty fl [] [q] Mxs.empty Mpv.empty eff ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let rs_of_ls ls =
@@ -207,7 +207,7 @@ let rs_of_ls ls =
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
   let q = make_post (t_app ls t_args ls.ls_value) in
   let ity = ity_of_ty (t_type q) in
-  let c = create_cty v_args [] [q] Mexn.empty Mpv.empty eff_empty ity in
+  let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 (** {2 Program patterns} *)
@@ -310,7 +310,7 @@ and expr_node =
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * invariant list * expr
-  | Etry    of expr * (pvsymbol list * expr) Mexn.t
+  | Etry    of expr * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
@@ -375,7 +375,7 @@ let e_fold fn acc e = match e.e_node with
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
   | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
-  | Etry (d,xl) -> Mexn.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
+  | Etry (d,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
 
 exception FoundExpr of Loc.position option * expr
 
@@ -732,7 +732,7 @@ let c_pur s vl ityl ity =
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
   let eff = eff_ghostify true eff_empty in
-  let cty = create_cty v_args [] [q] Mexn.empty Mpv.empty eff ity in
+  let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
 let mk_proxy ghost e hd = match e.e_node with
@@ -806,7 +806,7 @@ let rs_func_app = rs_of_ls fs_func_app
 let ld_func_app =
   let v_args = rs_func_app.rs_cty.cty_args in
   let ity = rs_func_app.rs_cty.cty_result in
-  let c = create_cty v_args [] [] Mexn.empty Mpv.empty eff_empty ity in
+  let c = create_cty v_args [] [] Mxs.empty Mpv.empty eff_empty ity in
   LDsym (rs_func_app, c_any c)
 
 let e_func_app fn e =
@@ -906,19 +906,19 @@ let e_try e xl =
     | [v] -> v.pv_ity, mask_of_pv v
     | vl -> ity_tuple (List.map (fun v -> v.pv_ity) vl),
             MaskTuple (List.map mask_of_pv vl) in
-  Mexn.iter (fun xs (vl,d) ->
+  Mxs.iter (fun xs (vl,d) ->
     let ity, mask = get_mask vl in
     if mask_spill xs.xs_mask mask then
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check ity xs.xs_ity;
     ity_equal_check d.e_ity e.e_ity) xl;
   let ghost = e.e_effect.eff_ghost in
-  let eeff = Mexn.fold (fun xs _ eff ->
+  let eeff = Mxs.fold (fun xs _ eff ->
     eff_catch eff xs) xl e.e_effect in
-  let dl = Mexn.fold (fun _ (_,d) l -> d::l) xl [] in
+  let dl = Mxs.fold (fun _ (_,d) l -> d::l) xl [] in
   let add_mask mask d = mask_union mask d.e_mask in
   let mask = List.fold_left add_mask e.e_mask dl in
-  let xeff = Mexn.fold (fun _ (vl,d) eff ->
+  let xeff = Mxs.fold (fun _ (vl,d) eff ->
     let add s v = Spv.add_new (Invalid_argument "Expr.e_try") v s in
     let deff = eff_bind (List.fold_left add Spv.empty vl) d.e_effect in
     try_effect dl eff_union_par eff deff) xl eff_empty in
@@ -984,7 +984,7 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Ecase (d,bl) -> e_case (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
   | Etry (d,xl) -> e_try (e_rs_subst sm d)
-      (Mexn.map (fun (v,e) -> v, e_rs_subst sm e) xl))
+      (Mxs.map (fun (v,e) -> v, e_rs_subst sm e) xl))
 
 and c_rs_subst sm ({c_node = n; c_cty = c} as d) = match n with
   | Cany | Cpur _ -> d
@@ -1311,7 +1311,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
   | Etry (e,bl) ->
-      let bl = Mexn.bindings bl in
+      let bl = Mxs.bindings bl in
       fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
         print_expr e (Pp.print_list Pp.newline print_xbranch) bl
   | Eabsurd ->

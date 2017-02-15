@@ -116,7 +116,7 @@ and mod_inst = {
   mi_pk  : prop_kind Mpr.t;
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
-  mi_xs  : xsymbol Mexn.t;
+  mi_xs  : xsymbol Mxs.t;
 }
 
 let empty_mod_inst m = {
@@ -128,7 +128,7 @@ let empty_mod_inst m = {
   mi_pk  = Mpr.empty;
   mi_pv  = Mvs.empty;
   mi_rs  = Mrs.empty;
-  mi_xs  = Mexn.empty;
+  mi_xs  = Mxs.empty;
 }
 
 (** {2 Module under construction} *)
@@ -364,7 +364,7 @@ type clones = {
   mutable fd_table : pvsymbol Mpv.t;
   mutable pv_table : pvsymbol Mvs.t;
   mutable rs_table : rsymbol Mrs.t;
-  mutable xs_table : xsymbol Mexn.t;
+  mutable xs_table : xsymbol Mxs.t;
 }
 
 let empty_clones m = {
@@ -377,7 +377,7 @@ let empty_clones m = {
   fd_table = Mpv.empty;
   pv_table = Mvs.empty;
   rs_table = Mrs.empty;
-  xs_table = Mexn.empty;
+  xs_table = Mxs.empty;
 }
 
 (* populate the clone structure *)
@@ -468,7 +468,7 @@ let cl_find_rs cl rs =
 
 let cl_find_xs cl xs =
   if not (Sid.mem xs.xs_name cl.cl_local) then xs
-  else Mexn.find xs cl.xs_table
+  else Mxs.find xs cl.xs_table
 
 let clone_ls inst cl ls =
   if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
@@ -526,7 +526,7 @@ let cl_init_xs cl ({xs_name = id} as xs) xs' =
     with TypeMismatch _ -> raise (BadInstance id) end;
   if mask_spill xs'.xs_mask xs.xs_mask then
     raise (BadInstance id);
-  cl.xs_table <- Mexn.add xs xs' cl.xs_table
+  cl.xs_table <- Mxs.add xs xs' cl.xs_table
 
 let cl_init_pv cl ({vs_name = id} as vs) pv' =
   let pv = restore_pv vs in
@@ -546,7 +546,7 @@ let cl_init m inst =
   Mls.iter (cl_init_ls cl) inst.mi_ls;
   Mrs.iter (cl_init_rs cl) inst.mi_rs;
   Mvs.iter (cl_init_pv cl) inst.mi_pv;
-  Mexn.iter (cl_init_xs cl) inst.mi_xs;
+  Mxs.iter (cl_init_xs cl) inst.mi_xs;
   Mpr.iter (cl_init_pr cl) inst.mi_pk;
   cl
 
@@ -744,10 +744,10 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let pre = if drop_decr then List.tl cty.cty_pre else cty.cty_pre in
   let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
-  let xpost = Mexn.fold (fun xs fl q ->
+  let xpost = Mxs.fold (fun xs fl q ->
     let xs = cl_find_xs cl xs in
     let fl = clone_invl cl sm_olds fl in
-    Mexn.add xs fl q) cty.cty_xpost Mexn.empty in
+    Mxs.add xs fl q) cty.cty_xpost Mxs.empty in
   let add_read v s = Spv.add (sm_find_pv sm_args v) s in
   let reads = Spv.fold add_read (cty_reads cty) Spv.empty in
   let reads = List.fold_right add_read cty.cty_args reads in
@@ -760,7 +760,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
   let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
-  let eff = Sexn.fold add_raise cty.cty_effect.eff_raises eff in
+  let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
@@ -826,8 +826,8 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
-        Mexn.add (cl_find_xs cl xs) (vl', clone_expr cl sm e) m in
-      e_try (clone_expr cl sm d) (Mexn.fold conv_br xl Mexn.empty)
+        Mxs.add (cl_find_xs cl xs) (vl', clone_expr cl sm e) m in
+      e_try (clone_expr cl sm d) (Mxs.fold conv_br xl Mxs.empty)
   | Eraise (xs, e) ->
       e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eassert (k, f) ->
@@ -915,7 +915,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let id = id_clone xs.xs_name in
       let ity = clone_ity cl xs.xs_ity in
       let xs' = create_xsymbol id ~mask:xs.xs_mask ity in
-      cl.xs_table <- Mexn.add xs xs' cl.xs_table;
+      cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       add_pdecl ~vc:false uc (create_exn_decl xs')
   | PDpure ->
       List.fold_left (clone_decl inst cl) uc d.pd_pure
@@ -946,7 +946,7 @@ let clone_export uc m inst =
           mi_pk = mi.mi_pk;
           mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
-          mi_xs = Mexn.map (cl_find_xs cl) mi.mi_xs}
+          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs}
         with Not_found -> uc end
     | Umeta (m,al) ->
         begin try add_meta uc m (List.map (function

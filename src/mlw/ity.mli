@@ -322,8 +322,8 @@ type xsymbol = private {
   xs_mask : mask;
 }
 
-module Mexn : Extmap.S with type key = xsymbol
-module Sexn : Extset.S with module M = Mexn
+module Mxs : Extmap.S with type key = xsymbol
+module Sxs : Extset.S with module M = Mxs
 
 val xs_compare : xsymbol -> xsymbol -> int
 val xs_equal : xsymbol -> xsymbol -> bool
@@ -349,7 +349,7 @@ type effect = private {
   eff_taints : Sreg.t;        (* ghost code writes *)
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
-  eff_raises : Sexn.t;        (* raised exceptions *)
+  eff_raises : Sxs.t;         (* raised exceptions *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -402,7 +402,7 @@ type cty = private {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
   cty_post   : post list;
-  cty_xpost  : post list Mexn.t;
+  cty_xpost  : post list Mxs.t;
   cty_oldies : pvsymbol Mpv.t;
   cty_effect : effect;
   cty_result : ity;
@@ -411,7 +411,7 @@ type cty = private {
 }
 
 val create_cty : ?mask:mask -> pvsymbol list ->
-  pre list -> post list -> post list Mexn.t ->
+  pre list -> post list -> post list Mxs.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
 (** [create_cty ?mask args pre post xpost oldies effect result] creates
     a computation type. [post] and [mask] must be consistent with [result].
@@ -496,5 +496,5 @@ val print_pvty : Format.formatter -> pvsymbol -> unit (* pvsymbol : type *)
 val print_cty  : Format.formatter -> cty -> unit      (* computation type *)
 
 val print_spec :
-  pvsymbol list -> pre list -> post list -> post list Mexn.t -> pvsymbol Mpv.t
+  pvsymbol list -> pre list -> post list -> post list Mxs.t -> pvsymbol Mpv.t
     -> effect -> Format.formatter -> ity option -> unit (* piecemeal cty *)

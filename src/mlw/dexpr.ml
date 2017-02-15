@@ -375,7 +375,7 @@ type 'a later = pvsymbol Mstr.t -> register_old -> 'a
 type dspec_final = {
   ds_pre     : term list;
   ds_post    : (pvsymbol * term) list;
-  ds_xpost   : (pvsymbol * term) list Mexn.t;
+  ds_xpost   : (pvsymbol * term) list Mxs.t;
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
@@ -775,7 +775,7 @@ let create_invariant pl = List.map to_fmla pl
 let create_post ity ql = List.map (fun (v,f) ->
   ity_equal_check ity v.pv_ity; Ity.create_post v.pv_vs (to_fmla f)) ql
 
-let create_xpost xql = Mexn.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
+let create_xpost xql = Mxs.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
 
 (** User effects *)
 
@@ -815,7 +815,7 @@ let effect_of_dspec dsp =
     | _ ->
         Loc.errorm ?loc:t.t_loc "mutable expression expected" in
   let wl, eff = List.fold_left add_write ([], eff_read pvs) dsp.ds_writes in
-  let eff = Mexn.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
+  let eff = Mxs.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
 
@@ -824,8 +824,8 @@ let effect_of_dspec dsp =
 let check_spec inr dsp ecty ({e_loc = loc} as e) =
   let bad_read  reff eff = not (Spv.subset  reff.eff_reads  eff.eff_reads) in
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
-                                            weff.eff_writes eff.eff_writes) in
-  let bad_raise xeff eff = not (Sexn.subset xeff.eff_raises eff.eff_raises) in
+                                           weff.eff_writes eff.eff_writes) in
+  let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
   (* computed effect vs user effect *)
   let uwrl, ue = effect_of_dspec dsp in
   let ucty = create_cty ecty.cty_args ecty.cty_pre ecty.cty_post
@@ -847,7 +847,7 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
       "this@ write@ effect@ does@ not@ happen@ in@ the@ expression") uwrl;
   if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
-    print_xs (Sexn.choose (Sexn.diff ueff.eff_raises eeff.eff_raises));
+    print_xs (Sxs.choose (Sxs.diff ueff.eff_raises eeff.eff_raises));
   if check_ue && ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc
       "this@ expression@ does@ not@ diverge";
   (* check that every computed effect is listed *)
@@ -858,10 +858,10 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if check_rw && bad_write eeff ueff then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> bad_write eff ueff) e)
       "this@ expression@ produces@ an@ unlisted@ write@ effect";
-  if ecty.cty_args <> [] && bad_raise eeff ueff then Sexn.iter (fun xs ->
-    Loc.errorm ?loc:(e_locate_effect (fun eff -> Sexn.mem xs eff.eff_raises) e)
+  if ecty.cty_args <> [] && bad_raise eeff ueff then Sxs.iter (fun xs ->
+    Loc.errorm ?loc:(e_locate_effect (fun eff -> Sxs.mem xs eff.eff_raises) e)
       "this@ expression@ raises@ unlisted@ exception@ %a"
-      print_xs xs) (Sexn.diff eeff.eff_raises ueff.eff_raises);
+      print_xs xs) (Sxs.diff eeff.eff_raises ueff.eff_raises);
   if eeff.eff_oneway && not ueff.eff_oneway then
     Loc.errorm ?loc:(e_locate_effect (fun eff -> eff.eff_oneway) e)
       "this@ expression@ may@ diverge,@ but@ this@ is@ not@ \
@@ -1210,8 +1210,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
         let vm, pat = create_prog_pattern dp.dp_pat xs.xs_ity mask in
         let e = expr uloc (add_pv_map env vm) de in
         Mstr.iter (fun _ v -> check_used_pv e v) vm;
-        Mexn.add xs ((pat, e) :: Mexn.find_def [] xs m) m in
-      let xsm = List.fold_left add_branch Mexn.empty bl in
+        Mxs.add xs ((pat, e) :: Mxs.find_def [] xs m) m in
+      let xsm = List.fold_left add_branch Mxs.empty bl in
       let is_simple p = match p.pat_node with
         | Papp (fs,[]) -> is_fs_tuple fs
         | Pvar _ | Pwild -> true | _ -> false in
@@ -1259,7 +1259,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
               let _,pp = create_prog_pattern PPwild xs.xs_ity mask in
               (pp, e_raise xs e (ity_of_dity res)) :: bl in
             vl, e_case e (List.rev bl) in
-      e_try e1 (Mexn.mapi mk_branch xsm)
+      e_try e1 (Mxs.mapi mk_branch xsm)
   | DEraise (xs,de) ->
       e_raise xs (expr uloc env de) (ity_of_dity res)
   | DEghost de ->
@@ -1301,7 +1301,7 @@ and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
     let ghost = env.ghs || gh || kind = RKlemma in
     let pvl = binders ghost bl in
     let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
-    let cty = create_cty ~mask pvl [] [] Mexn.empty Mpv.empty eff_empty ity in
+    let cty = create_cty ~mask pvl [] [] Mxs.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
   let env, fdl = Lists.map_fold_left step1 {env with inr = true} dfdl in
@@ -1374,7 +1374,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
       let e = expr uloc env_empty de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
-      let c = c_fun [] [] [] Mexn.empty Mpv.empty e in
+      let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
       (* the rsymbol will carry a single postcondition "the result
          is equal to the logical constant". Any user-written spec
          will be checked once, in-place, under Eexec. Since kind

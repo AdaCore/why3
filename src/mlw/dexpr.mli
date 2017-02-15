@@ -64,7 +64,7 @@ type 'a later = pvsymbol Mstr.t -> register_old -> 'a
 type dspec_final = {
   ds_pre     : term list;
   ds_post    : (pvsymbol * term) list;
-  ds_xpost   : (pvsymbol * term) list Mexn.t;
+  ds_xpost   : (pvsymbol * term) list Mxs.t;
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;

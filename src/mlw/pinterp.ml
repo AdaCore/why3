@@ -623,7 +623,7 @@ let rec eval_expr env (e : expr) : result =
       match r with
         | Excep(ex,t) ->
           begin
-            match Mexn.find ex el with
+            match Mxs.find ex el with
             | ([], e2) ->
               (* assert (t = Vvoid); *)
               eval_expr env e2

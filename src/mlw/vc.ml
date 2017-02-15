@@ -420,8 +420,8 @@ let k_havoc eff k =
    unless we skip them altogether and let the exception
    escape into the outer code (only for abstract blocks) *)
 let complete_xpost cty {eff_raises = xss} skip =
-  Mexn.set_union (Mexn.set_inter cty.cty_xpost xss)
-    (Mexn.map (fun () -> []) (Mexn.set_diff xss skip))
+  Mxs.set_union (Mxs.set_inter cty.cty_xpost xss)
+    (Mxs.map (fun () -> []) (Mxs.set_diff xss skip))
 
 (* translate the expression [e] into a k-expression:
    [lps] stores the variants of outer recursive functions
@@ -466,9 +466,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
            every exception in eff_raises is an alternative block
            with the xpost assumed and the exception raised. *)
         let skip = match ce.c_node with
-          | Cfun _ -> xmap | _ -> Mexn.empty in
+          | Cfun _ -> xmap | _ -> Mxs.empty in
         let xq = complete_xpost cty e.e_effect skip in
-        let k = Mexn.fold2_inter (fun _ ql (i,v) k ->
+        let k = Mxs.fold2_inter (fun _ ql (i,v) k ->
           let xk = k_of_post expl_xpost v ql in
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
         (* oldies and havoc are common for all outcomes *)
@@ -616,15 +616,15 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
                 let cs = fs_tuple (List.length vl) in
                 let pl = List.map (fun v -> pat_var v.pv_vs) vl in
                 v, Kcase (v, [pat_app cs pl v.pv_vs.vs_ty, xk]) in
-          (i,xk)::xl, Mexn.add xs (i,v) xm in
-        let xl, xmap = Mexn.fold branch bl ([], xmap) in
+          (i,xk)::xl, Mxs.add xs (i,v) xm in
+        let xl, xmap = Mxs.fold branch bl ([], xmap) in
         let k = k_expr env lps e0 res xmap in
         (* catched xsymbols are converted to unique integers,
            so that we can now serialise the "with" clauses
            and avoid capturing the wrong exceptions *)
         List.fold_left (fun k (i,xk) -> Kseq (k,i,xk)) k xl
     | Eraise (xs, e0) ->
-        let i, v = Mexn.find xs xmap in
+        let i, v = Mxs.find xs xmap in
         Kseq (k_expr env lps e0 v xmap, 0, Kcont i)
     | Eassert (Assert, f) ->
         let f = vc_expl None lab expl_assert f in
@@ -697,16 +697,16 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
   if Slab.mem sp_label e.e_label then Ktag (SP, k) else
   if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
 
-and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mexn.empty) cty e =
+and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   (* ASSUME pre ; LET o = arg ; TRY e ; STOP post WITH STOP xpost *)
   let res, q = wp_of_post expl_post cty.cty_result cty.cty_post in
   let xq = complete_xpost cty e.e_effect xmap in
-  let xq = Mexn.mapi (fun xs ql ->
+  let xq = Mxs.mapi (fun xs ql ->
     let v, xq = wp_of_post expl_xpost xs.xs_ity ql in
     (new_exn env, v), xq) xq in
-  let xmap = Mexn.set_union (Mexn.map fst xq) xmap in
+  let xmap = Mxs.set_union (Mxs.map fst xq) xmap in
   let k = Kseq (k_expr env lps e res xmap, 0, Kstop q) in
-  let k = Mexn.fold (fun _ ((i,_), xq) k ->
+  let k = Mxs.fold (fun _ ((i,_), xq) k ->
     Kseq (k, i, Kstop xq)) xq k in
   (* move the postconditions under the VCgen tag *)
   let k = if Slab.mem sp_label e.e_label then Ktag (SP, k) else
