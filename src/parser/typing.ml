@@ -1037,9 +1037,26 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
         let ls2 = find_psymbol tuc q in
         { s with mi_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
             (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.mi_ls }
-    | CSvsym (p,_) ->
-        Loc.errorm ~loc:(qloc p)
-          "program symbol instantiation is not supported yet" (* TODO *)
+    | CSvsym (p,q) ->
+        let rs1 = find_prog_symbol_ns m.mod_export p in
+        let rs2 = find_prog_symbol muc q in
+        begin match rs1, rs2 with
+        | RS rs1, RS rs2 ->
+            { s with mi_rs = Loc.try4 ~loc:(qloc p) Mrs.add_new
+                (ClashSymbol rs1.rs_name.id_string) rs1 rs2 s.mi_rs }
+        | PV pv1, PV pv2 ->
+            { s with mi_pv = Loc.try4 ~loc:(qloc p) Mvs.add_new
+                (ClashSymbol pv1.pv_vs.vs_name.id_string) pv1.pv_vs pv2 s.mi_pv }
+        | PV _, RS _ ->
+            Loc.errorm ~loc:(qloc q) "program constant expected"
+        | RS _, PV _ ->
+            Loc.errorm ~loc:(qloc q) "program function expected"
+        end
+    | CSxsym (p,q) ->
+        let xs1 = find_xsymbol_ns m.mod_export p in
+        let xs2 = find_xsymbol muc q in
+        { s with mi_xs = Loc.try4 ~loc:(qloc p) Mexn.add_new
+            (ClashSymbol xs1.xs_name.id_string) xs1 xs2 s.mi_xs }
     | CSaxiom p ->
         let pr = find_prop_ns t.th_export p in
         { s with mi_pk = Loc.try4 ~loc:(qloc p) Mpr.add_new

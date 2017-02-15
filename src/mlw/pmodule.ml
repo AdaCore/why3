@@ -423,7 +423,9 @@ and clone_reg cl reg =
      We cannot check in cl.cl_local to see if they are there.
      Instead, we should prefill cl.pv_table and cl.rn_table
      with all top-level pvsymbols (local or external) before
-     descending into a let_defn. *)
+     descending into a let_defn.
+     TODO: add to module/uc a list of locally-defined toplevel
+     variables, as well as a set of imported toplevel variables. *)
   try Mreg.find reg cl.rn_table with Not_found ->
   let tl = List.map (clone_ity cl) reg.reg_args in
   let rl = List.map (clone_ity cl) reg.reg_regs in
@@ -489,8 +491,10 @@ let cl_init_ty cl ({ts_name = id} as ts) ity =
 let cl_init_ts cl ({ts_name = id} as ts) its' =
   let its = restore_its ts and ts' = its'.its_ts in
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  if not (List.length ts.ts_args = List.length ts'.ts_args &&
-    its_pure its && its_pure its') then raise (BadInstance id);
+  if not (List.length ts.ts_args = List.length ts'.ts_args) then
+    raise (BadInstance id);
+  if not (its_pure its && its_pure its') then
+    raise (BadInstance id); (* TODO: accept refinement of private records *)
   cl.ts_table <- Mts.add its.its_ts its' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
@@ -505,6 +509,33 @@ let cl_init_ls cl ({ls_name = id} as ls) ls' =
     with Invalid_argument _ -> raise (BadInstance id));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
+let cl_init_rs cl ({rs_name = id} as rs) rs' =
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  (* arity and types will be checked when refinement VC is generated *)
+  begin match rs.rs_logic, rs'.rs_logic with
+  | RLnone, RLnone | RLlemma, RLlemma -> ()
+  | RLls ls, RLls ls' -> cl_init_ls cl ls ls'
+  | _ -> raise (BadInstance id)
+  end;
+  cl.rs_table <- Mrs.add rs rs' cl.rs_table
+
+let cl_init_xs cl ({xs_name = id} as xs) xs' =
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  begin try let ity = clone_ity cl xs.xs_ity in
+            ignore (ity_match isb_empty xs'.xs_ity ity)
+    with TypeMismatch _ -> raise (BadInstance id) end;
+  if mask_spill xs'.xs_mask xs.xs_mask then
+    raise (BadInstance id);
+  cl.xs_table <- Mexn.add xs xs' cl.xs_table
+
+let cl_init_pv cl ({vs_name = id} as vs) pv' =
+  let pv = restore_pv vs in
+  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
+  let ity = clone_ity cl pv.pv_ity in
+  if not (ity_equal ity pv'.pv_ity) then raise (BadInstance id);
+  if pv'.pv_ghost && not pv.pv_ghost then raise (BadInstance id);
+  cl.pv_table <- Mvs.add vs pv' cl.pv_table
+
 let cl_init_pr cl {pr_name = id} _ =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
 
@@ -513,6 +544,9 @@ let cl_init m inst =
   Mts.iter (cl_init_ty cl) inst.mi_ty;
   Mts.iter (cl_init_ts cl) inst.mi_ts;
   Mls.iter (cl_init_ls cl) inst.mi_ls;
+  Mrs.iter (cl_init_rs cl) inst.mi_rs;
+  Mvs.iter (cl_init_pv cl) inst.mi_pv;
+  Mexn.iter (cl_init_xs cl) inst.mi_xs;
   Mpr.iter (cl_init_pr cl) inst.mi_pk;
   cl
 

@@ -248,6 +248,8 @@ single_clone_subst:
 | PREDICATE qualid              { CSpsym  ($2,$2) }
 | VAL       qualid EQUAL qualid { CSvsym  ($2,$4) }
 | VAL       qualid              { CSvsym  ($2,$2) }
+| EXCEPTION qualid EQUAL qualid { CSxsym  ($2,$4) }
+| EXCEPTION qualid              { CSxsym  ($2,$2) }
 | AXIOM     qualid              { CSaxiom ($2) }
 | LEMMA     qualid              { CSlemma ($2) }
 | GOAL      qualid              { CSgoal  ($2) }
