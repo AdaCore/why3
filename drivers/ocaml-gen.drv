@@ -17,16 +17,16 @@ module int.Int
   syntax constant zero "Z.zero"
   syntax constant one  "Z.one"
 
-  syntax predicate (<)  "(Z.lt  %1 %2)"
-  syntax predicate (<=) "(Z.leq %1 %2)"
-  syntax predicate (>)  "(Z.gt  %1 %2)"
-  syntax predicate (>=) "(Z.geq %1 %2)"
-  syntax val (=)  "(Z.equal %1 %2)"
+  syntax predicate (<)   "(Z.lt %1 %2)"
+  syntax predicate (<=)  "(Z.leq %1 %2)"
+  syntax predicate (>)   "(Z.gt %1 %2)"
+  syntax predicate (>=)  "(Z.geq %1 %2)"
+  syntax val       (=)   "(Z.equal %1 %2)"
 
-  syntax function (+)   "(Z.add %1 %2)"
-  syntax function (-)   "(Z.sub %1 %2)"
-  syntax function ( * ) "(Z.mul %1 %2)"
-  syntax function (-_)  "(Z.neg %1)"
+  syntax function  (+)   "(Z.add %1 %2)"
+  syntax function  (-)   "(Z.sub %1 %2)"
+  syntax function  ( * ) "(Z.mul %1 %2)"
+  syntax function  (-_)  "(Z.neg %1)"
 end
 
 theory int.Abs

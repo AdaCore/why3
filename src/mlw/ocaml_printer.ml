@@ -286,7 +286,7 @@ module Print = struct
             (print_list space (print_vs_arg info)) args
             (print_expr info) e;
           forget_vars args;
-          forget_tvs ()
+          (* forget_tvs () *)
       in
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
       print_list_next newline print_one fmt rdef;

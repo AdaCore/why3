@@ -171,10 +171,13 @@ module ML = struct
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
 
   (* smart constructors *)
-  let ml_let_var pv e1 e2 =
+  let mk_let_var pv e1 e2 =
     Elet (Lvar (pv, e1), e2)
 
   let tunit = Ttuple []
+
+  let ity_int         = I ity_int
+  let ity_unit        = I ity_unit
 
   let enope = Eblock []
 
@@ -356,6 +359,74 @@ module Translate = struct
 
   exception ExtractionAny
 
+  let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body eff =
+    let body_ity  = ity_func ity_int ity_unit in
+    let body_pv   =
+      let body_id = id_fresh "body" in create_pvsymbol body_id body_ity in
+    let body_expr = ML.mk_expr (ML.Evar body_pv) (ML.I body_ity) eff in
+    let i_expr, from_expr, to_expr =
+      let ity_int = ML.ity_int in let eff_e = eff_empty in
+      ML.mk_expr (ML.Evar i_pv)     ity_int eff_e,
+      ML.mk_expr (ML.Evar from_pv)  ity_int eff_e,
+      ML.mk_expr (ML.Evar to_pv)    ity_int eff_e in
+    let for_rs =
+      let for_id  = id_fresh "for_loop_to" in
+      let for_cty = create_cty [i_pv; to_pv; body_pv] [] [] Mxs.empty
+          Mpv.empty eff ity_unit in
+      create_rsymbol for_id for_cty in
+    let for_expr =
+      let test = ML.mk_expr (ML.Eapp (op_b_rs, [i_expr; to_expr]))
+          (ML.I ity_bool) eff_empty in
+      let sc_expr = (* expression for "i + 1", to become "Z.add i 1" *)
+        let one_const = Number.int_const_dec "1" in
+        let one_expr =
+          ML.mk_expr (ML.Econst one_const) ML.ity_int eff_empty in
+        let i_plus_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
+        ML.mk_expr i_plus_one ML.ity_int eff_empty in
+       let rec_call  =
+        ML.mk_expr (ML.Eapp (for_rs, [sc_expr; to_expr; body_expr]))
+          ML.ity_unit eff in
+      let body_app =
+        ML.mk_expr (ML.Eapp (rs_func_app, [body_expr; i_expr]))
+          ML.ity_unit eff in
+      let seq_expr =
+        ML.mk_expr (ML.eseq body_app rec_call) ML.ity_unit eff in
+      ML.mk_expr (ML.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
+    let ty_int = ity ity_int in
+    let for_call_expr =
+      let body_fun = ML.Efun ([pv_name i_pv, ty_int, false], body) in
+      let body_fun_expr = ML.mk_expr body_fun ML.ity_unit eff in
+      let for_call = ML.Eapp (for_rs, [i_expr; to_expr; body_fun_expr]) in
+      ML.mk_expr for_call ML.ity_unit eff in
+    let let_i_for_call_expr =
+      let let_i = ML.mk_let_var i_pv from_expr for_call_expr in
+      ML.mk_expr let_i ML.ity_unit eff in
+    let pv_name pv = pv.pv_vs.vs_name in
+    let ty_int_to_unit = ity body_ity in
+    let args = [(pv_name    i_pv, ty_int,         false);
+                (pv_name   to_pv, ty_int,         false);
+                 pv_name body_pv, ty_int_to_unit, false] in
+    let for_rec_def = {
+      ML.rec_sym = for_rs;
+      ML.rec_rsym = for_rs;
+      ML.rec_args = args;
+      ML.rec_exp = for_expr
+    } in
+    let for_let = ML.Elet (ML.Lrec [for_rec_def], let_i_for_call_expr) in
+    ML.mk_expr for_let ML.ity_unit eff
+
+  let mk_for_downto info i_pv from_pv to_pv body eff =
+    let ge_rs, minus_rs =
+      let ns = (Opt.get info.info_current_mo).mod_export in
+      ns_find_rs ns ["Int"; "infix >="], ns_find_rs ns ["Int"; "infix -"] in
+    mk_for ge_rs minus_rs i_pv from_pv to_pv body eff
+
+  let mk_for_to info i_pv from_pv to_pv body eff =
+    let le_rs, plus_rs =
+      let ns = (Opt.get info.info_current_mo).mod_export in
+      ns_find_rs ns ["Int"; "infix <="], ns_find_rs ns ["Int"; "infix +"] in
+    mk_for le_rs plus_rs i_pv from_pv to_pv body eff
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     assert (not eff.eff_ghost);
@@ -370,11 +441,9 @@ module Translate = struct
     | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (_pvs, e1), e2) when e_ghost e1 ->
-      (* let ml_let = ML.ml_let_var pvs ML.mk_unit (expr info e2) in *)
       expr info e2
-      (* ML.mk_expr ml_let (ML.I e.e_ity) eff *)
     | Elet (LDvar (pvs, e1), e2) ->
-      let ml_let = ML.ml_let_var pvs (expr info e1) (expr info e2) in
+      let ml_let = ML.mk_let_var pvs (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
       let args = params cty.cty_args in
@@ -401,14 +470,12 @@ module Translate = struct
     | Elet (LDrec rdefl, ein) ->
       let ein = expr info ein in
       let rdefl =
-        List.map (fun rdef ->
-          match rdef with
+        List.map (fun rdef -> match rdef with
           | {rec_sym = rs1; rec_rsym = rs2;
              rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
-            let args = params cty.cty_args in
-            let ef = expr info ef in
-            { ML.rec_sym = rs1; ML.rec_rsym = rs2;
-              ML.rec_args = args; ML.rec_exp = ef }
+            let args = params cty.cty_args in let ef = expr info ef in
+            { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
+              ML.rec_args = args; ML.rec_exp  = ef }
           | _ -> assert false) rdefl
       in
       let ml_letrec = ML.Elet (ML.Lrec rdefl, ein) in
@@ -444,10 +511,14 @@ module Translate = struct
       let e1 = expr info e1 in
       let e2 = expr info e2 in
       ML.mk_expr (ML.Ewhile (e1, e2)) (ML.I e.e_ity) eff
-    | Efor (pv1, (pv2, direction, pv3), _, efor) ->
+    | Efor (pv1, (pv2, To, pv3), _, efor) ->
       let efor = expr info efor in
-      let direction = for_direction direction in
-      ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff
+      mk_for_to info pv1 pv2 pv3 efor eff
+      (* let direction = for_direction direction in *)
+      (* ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff *)
+    | Efor (pv1, (pv2, DownTo, pv3), _, efor) ->
+      let efor = expr info efor in
+      mk_for_downto info pv1 pv2 pv3 efor eff
     | Eghost _ ->
       assert false
     | Eassign al ->
@@ -467,7 +538,6 @@ module Translate = struct
       assert false (*TODO*)
     | Eexec ({c_node=Cpur (_, _); _ }, _) ->
       assert false (*TODO*)
-
 
   and ebranch info ({pp_pat = p}, e) =
     (pat p, expr info e)
@@ -570,7 +640,7 @@ module Transform = struct
     match e.e_node with
     | Evar pv ->
       (try Mpv.find pv subst with Not_found -> e)
-    | Elet (Lvar (pv, ({e_node = Econst _} as e1)), e2)
+    | Elet (Lvar (pv, ({e_node = Econst _ } as e1)), e2)
     | Elet (Lvar (pv, ({e_node = Eblock []} as e1)), e2) ->
       add_subst pv e1 e2
     | Elet (Lvar (pv, ({e_node = Eapp (rs, [])} as e1)), e2)

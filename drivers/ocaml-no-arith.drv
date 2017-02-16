@@ -73,6 +73,10 @@ module ref.Ref
   syntax val      (:=)     "Pervasives.(:=) %1 %2"
 end
 
+module ref.Refint
+  syntax val incr "%1 := Z.succ (Pervasives.(!) %1)"
+end
+
 module null.Null
 
   syntax type t           "%1"
