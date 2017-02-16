@@ -369,6 +369,66 @@ let cap_of_term kn uf pins caps t =
   in
   down caps [] t
 
+let uf_inter uf1 uf2 =
+  let uf1 = Mint.map (get_index uf1) uf1 in
+  let uf2 = Mint.map (get_index uf2) uf2 in
+  let inter n m1 m2 acc =
+    if m1 = m2 then acc else
+    let easy = if m1 < m2
+      then get_index uf1 m2 = m1
+      else get_index uf2 m1 = m2 in
+    if easy then acc else
+    let inner b = Some (match b with
+      | Some m -> min m n
+      | None -> n) in
+    let outer b = Some (match b with
+      | Some m -> Mint.change inner m2 m
+      | None -> Mint.singleton m2 n) in
+    Mint.change outer m1 acc in
+  let map = Mint.fold2_inter inter uf1 uf2 Mint.empty in
+  let inter n m1 m2 =
+    if m1 = m2 then Some m1 else
+    try let m = Mint.find m2 (Mint.find m1 map) in
+        if m = n then None else Some m
+    with Not_found -> Some (max m1 m2) in
+  Mint.inter inter uf1 uf2
+
+let rec track kn uf pins caps pos f = match f.t_node with
+  | Tvar _ | Tconst _ | Teps _ -> assert false (* never *)
+  | Tapp (ls,[t1;t2]) when not pos && ls_equal ls ps_equ ->
+      assert false (* TODO *)
+  | _ when Slab.mem stop_split f.t_label ->
+      fst (cap_of_term kn uf pins caps f), uf
+  | Tapp _ ->
+      fst (cap_of_term kn uf pins caps f), uf
+  | Tif (f0,f1,f2) ->
+      let f0, _ = cap_of_term kn uf pins caps f0 in
+      let f1, uf1 = track kn uf pins caps pos f1 in
+      let f2, uf2 = track kn uf pins caps pos f2 in
+      t_label_copy f (t_if f0 f1 f2), uf_inter uf1 uf2
+  | Tlet (_,_) -> assert false (* TODO *)
+  | Tcase (_,_) -> assert false (* TODO *)
+  | Tquant (_,_) -> assert false (* TODO *)
+  | Tbinop (Tand,f1,f2) ->
+      let f1, uf1 = track kn uf  pins caps pos f1 in
+      let f2, uf2 = track kn uf1 pins caps pos f2 in
+      t_label_copy f (t_and f1 f2), uf2
+  | Tbinop (Timplies,f1,f2) ->
+      let f1, uf1 = track kn uf  pins caps (not pos) f1 in
+      let f2, _   = track kn uf1 pins caps pos f2 in
+      t_label_copy f (t_implies f1 f2), uf
+  | Tbinop (Tor,f1,f2) ->
+      let f1, uf1 = track kn uf pins caps pos f1 in
+      let f2, uf2 = track kn uf pins caps pos f2 in
+      t_label_copy f (t_or f1 f2), uf_inter uf1 uf2
+  | Tbinop (Tiff,_,_) ->
+      fst (cap_of_term kn uf pins caps f), uf
+  | Tnot f1 ->
+      let f1, _ = track kn uf pins caps (not pos) f1 in
+      t_label_copy f (t_not f1), uf
+  | Ttrue | Tfalse ->
+      f, uf
+
 (* Part II - EvalMatch simplification *)
 
 (* we destruct tuples, units, and singleton records *)
