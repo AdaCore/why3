@@ -822,7 +822,7 @@ let effect_of_dspec dsp =
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
 let check_spec inr dsp ecty ({e_loc = loc} as e) =
-  let bad_read  reff eff = not (Spv.subset  reff.eff_reads  eff.eff_reads) in
+  let bad_read  reff eff = not (Spv.subset reff.eff_reads  eff.eff_reads) in
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
                                            weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
