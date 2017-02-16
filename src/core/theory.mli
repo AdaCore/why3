@@ -84,11 +84,11 @@ type theory = private {
   th_name   : ident;        (* theory name *)
   th_path   : string list;  (* environment qualifiers *)
   th_decls  : tdecl list;   (* theory declarations *)
+  th_crcmap : Coercion.t;   (* implicit coercions *)
   th_export : namespace;    (* exported namespace *)
   th_known  : known_map;    (* known identifiers *)
   th_local  : Sid.t;        (* locally declared idents *)
   th_used   : Sid.t;        (* used theories *)
-  th_crcmap : Coercion.t    (* coercions *)
 }
 
 and tdecl = private {
@@ -122,14 +122,13 @@ type theory_uc = private {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
   uc_export : namespace list;
   uc_known  : known_map;
   uc_local  : Sid.t;
   uc_used   : Sid.t;
-  uc_crcmap : Coercion.t;
-
 }
 
 val create_theory : ?path:string list -> preid -> theory_uc
