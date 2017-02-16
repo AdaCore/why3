@@ -88,8 +88,9 @@ let is_fragile_projection ls =
 
 (* Integer-indexed "pins" represent individual values whose
    invariant may be broken. Fresh pins are assigned to values
-   from top to bottom, so that a lesser pin can never be reached
-   from a greater pin. Each pin is associated to a list of fresh
+   bottom-up, and the canonical representative pin in a UF class
+   is the minimal one. Thus, a greater pin can never be reached
+   from a lesser pin. Each pin is associated to a list of fresh
    variables that correspond to "temporary fields". Committing
    a pin means that we prove that the temporary fields satisfy
    the invariant and then assume that the temporary fields are
@@ -243,9 +244,6 @@ let rec cap_join uf c1 c2 = match c1, c2 with
   | _ -> assert false
 
 let cap_of_term kn uf pins caps t =
-  let cap_join_opt c cj = match cj with
-    | Some cj -> cap_join uf c cj
-    | None -> c in
   let rec unroll t = function
     | (pj,t0)::pjl ->
         let t = t_app pj [t] t0.t_ty in
@@ -279,7 +277,7 @@ let cap_of_term kn uf pins caps t =
           | Tyapp (ts,tl) ->
               find_constructors_ts kn ts, ts_match_args ts tl
           | _ -> assert false in
-        let mk_branch cs fl =
+        let add_branch cs fl (bl, cj) =
           let fdl = List.assq cs csl in
           let mk_pat fd_ty fd = match fd with
             | Some ls when ls_equal pj ls -> p0
@@ -287,10 +285,8 @@ let cap_of_term kn uf pins caps t =
           let pl = List.map2 mk_pat cs.ls_args fdl in
           let c = find_projection_field pj fl fdl in
           let t0, c = unwind t0 c pjl in
-          t_close_branch (pat_app cs pl ty) t0, c in
-        let add_branch cs fl (bl, cj) =
-          let b, c = mk_branch cs fl in
-          b::bl, Some (cap_join_opt c cj) in
+          let b = t_close_branch (pat_app cs pl ty) t0 in
+          b::bl, Some (Opt.fold (cap_join uf) c cj) in
         let bl, c = Mls.fold add_branch css (bb, None) in
         t_case t bl, Opt.get c
     | R pjs, (pj,t0)::pjl ->
@@ -337,14 +333,12 @@ let cap_of_term kn uf pins caps t =
         t_label_copy t (t_let_close v t0 t1), c1
     | Tcase (t0,bl) ->
         let t0, c0 = down caps [] t0 in
-        let mk_branch b =
+        let add_branch b (bl, cj) =
           let p, t1 = t_open_branch b in
           let caps = add_pat uf caps c0 p in
-          let t1, c1 = down caps pjl t1 in
-          t_close_branch p t1, c1 in
-        let add_branch b (bl, cj) =
-          let b, c = mk_branch b in
-          b::bl, Some (cap_join_opt c cj) in
+          let t1, c = down caps pjl t1 in
+          let b = t_close_branch p t1 in
+          b::bl, Some (Opt.fold (cap_join uf) c cj) in
         let bl, c = List.fold_right add_branch bl ([], None) in
         t_label_copy t (t_case t0 bl), Opt.get c
     | Teps tb ->
@@ -406,9 +400,38 @@ let rec track kn uf pins caps pos f = match f.t_node with
       let f1, uf1 = track kn uf pins caps pos f1 in
       let f2, uf2 = track kn uf pins caps pos f2 in
       t_label_copy f (t_if f0 f1 f2), uf_inter uf1 uf2
-  | Tlet (_,_) -> assert false (* TODO *)
-  | Tcase (_,_) -> assert false (* TODO *)
-  | Tquant (_,_) -> assert false (* TODO *)
+  | Tlet (t0,fb) ->
+      let t0, c0 =  cap_of_term kn uf pins caps t0 in
+      let v, f1 = t_open_bound fb in
+      let caps = add_cap v c0 caps in
+      let f1, uf = track kn uf pins caps pos f1 in
+      t_label_copy f (t_let_close v t0 f1), uf
+  | Tcase (t0,bl) ->
+      let t0, c0 = cap_of_term kn uf pins caps t0 in
+      let add_branch b (bl, ufj) =
+        let p, f1 = t_open_branch b in
+        let caps = add_pat uf caps c0 p in
+        let f1, uf1 = track kn uf pins caps pos f1 in
+        let b = t_close_branch p f1 in
+        b::bl, Some (Opt.fold uf_inter uf1 ufj) in
+      let bl, uf = List.fold_right add_branch bl ([], None) in
+      t_label_copy f (t_case t0 bl), Opt.get uf
+  | Tquant (q,fq) ->
+      let vl, tt, f0 = t_open_quant fq in
+      let down t = fst (cap_of_term kn uf pins caps t) in
+      let tt = List.map (List.map down) tt in
+      let valid = match q with
+        | Tforall -> not pos
+        | Texists -> pos in
+      let caps, pins =
+        if valid then caps, pins else
+        let add (caps, pins) v =
+          let c, pins = add_var kn pins v in
+          add_cap v c caps, pins in
+        List.fold_left add (caps, pins) vl in
+      let f0, uf = track kn uf pins caps pos f0 in
+      let f0 = t_quant q (t_close_quant vl tt f0) in
+      t_label_copy f f0, uf
   | Tbinop (Tand,f1,f2) ->
       let f1, uf1 = track kn uf  pins caps pos f1 in
       let f2, uf2 = track kn uf1 pins caps pos f2 in
