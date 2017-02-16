@@ -1,12 +1,9 @@
 
 (* main file for ../test_extraction.mlw so that we *run* the extracted code *)
 
-open Why3extract
-open Test_extraction__TestExtraction
+let (=) = Z.eq
 
-let (=) = Why3__BigInt.eq
-
-let b42 = Why3__BigInt.of_int 42
+let b42 = Z.of_int 42
 let () = assert (test_int    () = b42)
 let () = assert (test_int32  () = b42)
 let () = assert (test_uint32 () = b42)

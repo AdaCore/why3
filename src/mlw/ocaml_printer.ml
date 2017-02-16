@@ -315,7 +315,7 @@ module Print = struct
     | Eapp (s, pvl) ->
       print_apply info fmt (Hrs.find_def ht_rs s s) pvl
     | Ematch (e, pl) ->
-      fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@] end"
+      fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@]@\nend"
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
@@ -438,7 +438,6 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = None; (* TODO *)
   } in
-  (* fprintf fmt "(\*@\n%a@\n*\)@\n" print_module m; *)
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
     Print.print_module_name m;
@@ -446,7 +445,6 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
   let mdecls = Transform.module_ info mdecls in
   print_list nothing (Print.print_decl info) fmt mdecls;
   fprintf fmt "@."
-
 
 let fg ?fname m =
   let mod_name = m.Pmodule.mod_theory.Theory.th_name.id_string in

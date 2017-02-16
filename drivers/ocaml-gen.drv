@@ -106,10 +106,9 @@ module queue.Queue
 end
 
 module array.Array
-  prelude "open Why3extract"
-  syntax type array "(%1 Why3__Array.t)"
+  syntax type array "(%1 Array.t)"
 
-  syntax function ([]) "(Why3__Array.get %1 %2)"
+  syntax function ([]) "(Array.get %1 %2)"
 
   syntax exception OutOfBounds "Why3__Array.OutOfBounds"
 

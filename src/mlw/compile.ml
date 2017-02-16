@@ -354,6 +354,8 @@ module Translate = struct
     let args = filter_params args in
     if args = [] then [ML.mk_var_unit ()] else args
 
+  exception ExtractionAny
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     assert (not eff.eff_ghost);
@@ -422,7 +424,7 @@ module Translate = struct
       let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cany}, _) ->
-      (* Error message here *) assert false
+      raise ExtractionAny
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
@@ -504,19 +506,15 @@ module Translate = struct
          ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
     end
 
-  let is_val e =
-    match e.e_node with
-    | Eexec ({c_node = Cany}, _) -> true
-    | _ -> false
+  exception ExtractionVal of rsymbol
 
   (* program declarations *)
   let pdecl info pd =
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
-    | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e ->
-      (* FIXME: check that this symbol is defined in driver *)
-      []
+    | PDlet (LDsym (rs, {c_node = Cany}))->
+      raise (ExtractionVal rs)
     | PDlet (LDsym ({rs_cty = {cty_args = []}} as rs, {c_node = Cfun e})) ->
       [ML.Dlet (ML.Lsym (rs, [], expr info e))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
@@ -528,20 +526,15 @@ module Translate = struct
           let e = match e.c_node with Cfun e -> e | _ -> assert false in
           let args = params rs1.rs_cty.cty_args in
           { ML.rec_sym = rs1; ML.rec_rsym = rs2;
-            ML.rec_args = args; ML.rec_exp = expr info e }) rl
-      in
+            ML.rec_args = args; ML.rec_exp = expr info e }) rl in
       [ML.Dlet (ML.Lrec rec_def)]
-    | PDlet (LDsym _)
-    | PDpure
-    | PDlet (LDvar (_, _)) ->
+    | PDlet (LDsym _) | PDpure | PDlet (LDvar (_, _)) ->
       []
     | PDtype itl ->
       [ML.Dtype (List.map tdef itl)]
     | PDexn xs ->
-       if ity_equal xs.xs_ity ity_unit then
-         [ML.Dexn (xs, None)]
-       else
-         [ML.Dexn (xs, Some (ity xs.xs_ity))]
+      if ity_equal xs.xs_ity ity_unit then [ML.Dexn (xs, None)]
+      else [ML.Dexn (xs, Some (ity xs.xs_ity))]
 
   (* unit module declarations *)
   let mdecl info = function
@@ -552,6 +545,14 @@ module Translate = struct
   (* modules *)
   let module_ info m =
     List.concat (List.map (mdecl info) m.mod_units)
+
+  let () = Exn_printer.register (fun fmt e -> match e with
+    | ExtractionAny ->
+      Format.fprintf fmt "Cannot extract an undefined node"
+    | ExtractionVal rs ->
+      Format.fprintf fmt "Function %a cannot be extracted"
+        print_rs rs
+    | _ -> raise e)
 
 end
 
@@ -575,7 +576,7 @@ module Transform = struct
     | Elet (Lvar (pv, ({e_node = Eapp (rs, [])} as e1)), e2)
       when Translate.isconstructor info rs ->
       (* only optimize constructors with no argument *)
-      (* as it is a Lvar the constructor is not completely applied *)
+      (* because of Lvar we know the constructor is completely applied *)
       add_subst pv e1 e2
     | Elet (ld, e) ->
       mk (Elet (let_def info subst ld, expr info subst e))
