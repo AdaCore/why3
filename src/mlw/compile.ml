@@ -267,6 +267,12 @@ module Translate = struct
     in
     filter2_ghost_params_cps l (fun x -> x)
 
+  let rec filter_ghost_rdef def = function
+    | [] -> []
+    | { rec_sym = rs; rec_rsym = rrs } :: l
+      when rs_ghost rs || rs_ghost rrs -> filter_ghost_rdef def l
+    | rdef :: l -> def rdef :: filter_ghost_rdef def l
+
   let rec pat p =
     match p.pat_node with
     | Pwild ->
@@ -357,60 +363,58 @@ module Translate = struct
     let args = filter_params args in
     if args = [] then [ML.mk_var_unit ()] else args
 
-  exception ExtractionAny
-
   let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body eff =
+    let i_expr, from_expr, to_expr =
+      let int_ity = ML.ity_int in let eff_e = eff_empty in
+      ML.mk_expr (ML.Evar i_pv)     int_ity eff_e,
+      ML.mk_expr (ML.Evar from_pv)  int_ity eff_e,
+      ML.mk_expr (ML.Evar to_pv)    int_ity eff_e in
     let body_ity  = ity_func ity_int ity_unit in
     let body_pv   =
       let body_id = id_fresh "body" in create_pvsymbol body_id body_ity in
     let body_expr = ML.mk_expr (ML.Evar body_pv) (ML.I body_ity) eff in
-    let i_expr, from_expr, to_expr =
-      let ity_int = ML.ity_int in let eff_e = eff_empty in
-      ML.mk_expr (ML.Evar i_pv)     ity_int eff_e,
-      ML.mk_expr (ML.Evar from_pv)  ity_int eff_e,
-      ML.mk_expr (ML.Evar to_pv)    ity_int eff_e in
-    let for_rs =
+    let for_rs    =
       let for_id  = id_fresh "for_loop_to" in
       let for_cty = create_cty [i_pv; to_pv; body_pv] [] [] Mxs.empty
-          Mpv.empty eff ity_unit in
+                               Mpv.empty eff ity_unit in
       create_rsymbol for_id for_cty in
     let for_expr =
       let test = ML.mk_expr (ML.Eapp (op_b_rs, [i_expr; to_expr]))
-          (ML.I ity_bool) eff_empty in
-      let sc_expr = (* expression for "i + 1", to become "Z.add i 1" *)
+                            (ML.I ity_bool) eff_empty in
+      let next_expr =
         let one_const = Number.int_const_dec "1" in
-        let one_expr =
+        let one_expr  =
           ML.mk_expr (ML.Econst one_const) ML.ity_int eff_empty in
-        let i_plus_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
-        ML.mk_expr i_plus_one ML.ity_int eff_empty in
+        let i_op_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
+        ML.mk_expr i_op_one ML.ity_int eff_empty in
        let rec_call  =
-        ML.mk_expr (ML.Eapp (for_rs, [sc_expr; to_expr; body_expr]))
-          ML.ity_unit eff in
+        ML.mk_expr (ML.Eapp (for_rs, [next_expr; to_expr; body_expr]))
+                    ML.ity_unit eff in
       let body_app =
         ML.mk_expr (ML.Eapp (rs_func_app, [body_expr; i_expr]))
-          ML.ity_unit eff in
+                    ML.ity_unit eff in
       let seq_expr =
         ML.mk_expr (ML.eseq body_app rec_call) ML.ity_unit eff in
       ML.mk_expr (ML.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
     let ty_int = ity ity_int in
-    let for_call_expr =
-      let body_fun = ML.Efun ([pv_name i_pv, ty_int, false], body) in
+    let for_call_expr   =
+      let body_fun      = ML.Efun ([pv_name i_pv, ty_int, false], body) in
       let body_fun_expr = ML.mk_expr body_fun ML.ity_unit eff in
-      let for_call = ML.Eapp (for_rs, [i_expr; to_expr; body_fun_expr]) in
+      let for_call      = ML.Eapp (for_rs, [i_expr; to_expr; body_fun_expr]) in
       ML.mk_expr for_call ML.ity_unit eff in
     let let_i_for_call_expr =
       let let_i = ML.mk_let_var i_pv from_expr for_call_expr in
       ML.mk_expr let_i ML.ity_unit eff in
     let pv_name pv = pv.pv_vs.vs_name in
     let ty_int_to_unit = ity body_ity in
-    let args = [(pv_name    i_pv, ty_int,         false);
-                (pv_name   to_pv, ty_int,         false);
-                 pv_name body_pv, ty_int_to_unit, false] in
+    let args = [
+      (pv_name    i_pv,         ty_int, false);
+      (pv_name   to_pv,         ty_int, false);
+      (pv_name body_pv, ty_int_to_unit, false);
+    ] in
     let for_rec_def = {
-      ML.rec_sym = for_rs;
-      ML.rec_rsym = for_rs;
-      ML.rec_args = args;
-      ML.rec_exp = for_expr
+      ML.rec_sym  = for_rs; ML.rec_args = args;
+      ML.rec_rsym = for_rs; ML.rec_exp  = for_expr;
     } in
     let for_let = ML.Elet (ML.Lrec [for_rec_def], let_i_for_call_expr) in
     ML.mk_expr for_let ML.ity_unit eff
@@ -427,6 +431,8 @@ module Translate = struct
       ns_find_rs ns ["Int"; "infix <="], ns_find_rs ns ["Int"; "infix +"] in
     mk_for le_rs plus_rs i_pv from_pv to_pv body eff
 
+  exception ExtractionAny
+
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
     assert (not eff.eff_ghost);
@@ -436,12 +442,12 @@ module Translate = struct
       ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pvs ->
       ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
-    | Elet (LDvar (pvs, e1), e2) when is_underscore pvs && e_ghost e2 ->
-      ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) (ML.I e.e_ity) eff
-    | Elet (LDvar (pvs, e1), e2) when is_underscore pvs ->
-      ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
-    | Elet (LDvar (_pvs, e1), e2) when e_ghost e1 ->
+    | Elet (LDvar (pv, e1), e2) when e_ghost e1 || pv.pv_ghost ->
       expr info e2
+    | Elet (LDvar (pv, e1), e2) when is_underscore pv && e_ghost e2 ->
+      expr info e1
+    | Elet (LDvar (pv, e1), e2) when is_underscore pv ->
+      ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pvs, e1), e2) ->
       let ml_let = ML.mk_let_var pvs (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
@@ -520,6 +526,7 @@ module Translate = struct
       let efor = expr info efor in
       mk_for_downto info pv1 pv2 pv3 efor eff
     | Eghost _ ->
+      (* ML.mk_unit; *)
       assert false
     | Eassign al ->
       ML.mk_expr (ML.Eassign al) (ML.I e.e_ity) eff
@@ -583,20 +590,18 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
-    | PDlet (LDsym (rs, {c_node = Cany}))->
+    | PDlet (LDsym (rs, {c_node = Cany})) ->
       raise (ExtractionVal rs)
-    | PDlet (LDsym ({rs_cty = {cty_args = []}} as rs, {c_node = Cfun e})) ->
-      [ML.Dlet (ML.Lsym (rs, [], expr info e))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       [ML.Dlet (ML.Lsym (rs, args, expr info e))]
     | PDlet (LDrec rl) ->
-      let rec_def =
-        List.map (fun {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} ->
-          let e = match e.c_node with Cfun e -> e | _ -> assert false in
-          let args = params rs1.rs_cty.cty_args in
-          { ML.rec_sym = rs1; ML.rec_rsym = rs2;
-            ML.rec_args = args; ML.rec_exp = expr info e }) rl in
+      let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
+        let e = match e.c_node with Cfun e -> e | _ -> assert false in
+        let args = params rs1.rs_cty.cty_args in
+        { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
+          ML.rec_args = args; ML.rec_exp  = expr info e } in
+      let rec_def = filter_ghost_rdef def rl in
       [ML.Dlet (ML.Lrec rec_def)]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar (_, _)) ->
       []

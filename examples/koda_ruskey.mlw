@@ -412,7 +412,7 @@ module KodaRuskey
   use import int.Int
   use import ref.Ref
 
-  val map_of_array (a: array 'a) : M.map int 'a
+  val ghost map_of_array (a: array 'a) : M.map int 'a
     ensures { result = a.elts }
 
   val ghost visited: ref visited
