@@ -1,4 +1,16 @@
 
+
+module Binary
+
+  use import int.Int
+  use import mach.int.Int63
+
+  goal G: forall x: int63, y: int. x = y /\ y = x
+
+end
+
+
+
 module Simple
 
   type t

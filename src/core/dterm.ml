@@ -322,12 +322,30 @@ let ts_of_dty = function
   | Some dt_dty -> ts_of_dty dt_dty
   | None        -> ts_bool
 
+(* NB: this function is not a morphism w.r.t.
+   the identity of type variables. *)
+let rec ty_of_dty_raw = function
+  | Dvar { contents = Dval (Duty ty) } ->
+     ty
+  | Dvar ({ contents = Dval dty }) ->
+     ty_of_dty_raw dty
+  | Dvar _ ->
+     ty_var (create_tvsymbol (id_fresh "xi"))
+  | Dapp (ts,dl) ->
+     ty_app ts (List.map (ty_of_dty_raw) dl)
+  | Duty ty -> ty
+
+let ty_of_dty_raw = function
+  | Some dt_dty -> ty_of_dty_raw dt_dty
+  | None        -> ty_bool
+
 let dterm_expected tuc dt dty =
   try
     let (ts1, ts2) = ts_of_dty dt.dt_dty, ts_of_dty dty in
     if (ts_equal ts1 ts2) then dt
     else
-      let crc = Coercion.find tuc.Theory.uc_crcmap ts1 ts2 in
+      let (ty1, ty2) = ty_of_dty_raw dt.dt_dty, ty_of_dty_raw dty in
+      let crc = Coercion.find tuc.Theory.uc_crcmap ty1 ty2 in
       apply_coercion crc dt
   with Not_found | Exit -> dt
 
@@ -354,12 +372,36 @@ let dterm tuc ?loc node =
     | DTconst (Number.ConstReal _) ->
         mk_dty (Some dty_real)
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
-        let dtyl, dty = specialize_ls ls in
-        let dtl = dty_unify_app_map ls
-          (dterm_expected_dterm tuc) (List.rev dtl) dtyl in
-        { dt_node = DTapp (ls, List.rev dtl);
-          dt_dty  = dty;
-          dt_loc  = loc }
+       let swap, dtl =
+         match dtl with
+         | [dt1; dt2] ->
+            begin
+              try
+                let (ts1, ts2) = (ts_of_dty dt1.dt_dty, ts_of_dty dt2.dt_dty) in
+                if (ts_equal ts1 ts2) then (false, dtl)
+                else
+                  let (ty1, ty2) =
+                    (ty_of_dty_raw dt1.dt_dty, ty_of_dty_raw dt2.dt_dty)
+                  in
+                  begin
+                    try let _ = Coercion.find tuc.Theory.uc_crcmap ty1 ty2
+                        in (true, List.rev dtl)
+                    with Not_found ->
+                      try let _ = Coercion.find tuc.Theory.uc_crcmap ty2 ty1
+                          in (false, dtl)
+                      with Not_found -> (false, dtl)
+                  end
+              with Exit -> (false, dtl)
+              (* raised by ts_of_dty, i.e., ts1 or ts2 is a type variable *)
+            end
+         | _ -> assert false (* since ls = ps_equ *)
+       in
+       let dtyl, dty = specialize_ls ls in
+       let dtl = dty_unify_app_map ls
+                   (dterm_expected_dterm tuc) dtl dtyl in
+       { dt_node = DTapp (ls, if swap then List.rev dtl else dtl);
+         dt_dty  = dty;
+         dt_loc  = loc }
     | DTapp (ls, dtl) ->
         let dtyl, dty = specialize_ls ls in
         { dt_node = DTapp (ls,

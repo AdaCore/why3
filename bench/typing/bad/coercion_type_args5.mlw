@@ -1,0 +1,10 @@
+
+use import list.List
+
+
+function to_bool (list bool) : bool
+meta coercion function to_bool
+
+goal G: forall x: list int, y: bool. x = y
+
+(*This term has type bool, but is expected to have type list int *)

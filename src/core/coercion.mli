@@ -15,7 +15,7 @@ val add: t -> lsymbol -> t
         - function [ls] cannot be used as a coercion, e.g. [ty1 = ty2];
         - a coercion from [ty1] to [ty2] is already defined *)
 
-val find: t -> tysymbol -> tysymbol -> lsymbol list
+val find: t -> ty -> ty -> lsymbol list
   (** returns the coercion, or raises [Not_found] *)
 
 val union: t -> t -> t
