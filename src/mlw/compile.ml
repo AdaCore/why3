@@ -124,7 +124,7 @@ module ML = struct
     | Enot    of expr
     | Eblock  of expr list
     | Ewhile  of expr * expr
-    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
+    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr (* Why3's type int *)
     | Eraise  of xsymbol * expr option
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eabsurd

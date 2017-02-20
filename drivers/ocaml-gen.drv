@@ -6,7 +6,7 @@ printer "ocaml"
 
 theory BuiltIn
   syntax type int "Z.t"
-  syntax predicate  (=)   "(%1 = %2)"
+  syntax predicate  (=)   "%1 = %2"
 end
 
 import "ocaml-no-arith.drv"
@@ -17,25 +17,25 @@ module int.Int
   syntax constant zero "Z.zero"
   syntax constant one  "Z.one"
 
-  syntax predicate (<)   "(Z.lt %1 %2)"
-  syntax predicate (<=)  "(Z.leq %1 %2)"
-  syntax predicate (>)   "(Z.gt %1 %2)"
-  syntax predicate (>=)  "(Z.geq %1 %2)"
-  syntax val       (=)   "(Z.equal %1 %2)"
+  syntax predicate (<)   "Z.lt %1 %2"
+  syntax predicate (<=)  "Z.leq %1 %2"
+  syntax predicate (>)   "Z.gt %1 %2"
+  syntax predicate (>=)  "Z.geq %1 %2"
+  syntax val       (=)   "Z.equal %1 %2"
 
-  syntax function  (+)   "(Z.add %1 %2)"
-  syntax function  (-)   "(Z.sub %1 %2)"
-  syntax function  ( * ) "(Z.mul %1 %2)"
-  syntax function  (-_)  "(Z.neg %1)"
+  syntax function  (+)   "Z.add %1 %2"
+  syntax function  (-)   "Z.sub %1 %2"
+  syntax function  ( * ) "Z.mul %1 %2"
+  syntax function  (-_)  "Z.neg %1"
 end
 
 theory int.Abs
-  syntax function abs "(Z.abs %1)"
+  syntax function abs "Z.abs %1"
 end
 
 theory int.MinMax
-  syntax function min "(Z.min %1 %2)"
-  syntax function max "(Z.max %1 %2)"
+  syntax function min "Z.min %1 %2"
+  syntax function max "Z.max %1 %2"
 end
 
 (* TODO
@@ -47,18 +47,18 @@ end
 *)
 
 theory int.EuclideanDivision
-  syntax function div "(Z.ediv %1 %2)"
-  syntax function mod "(Z.erem %1 %2)"
+  syntax function div "Z.ediv %1 %2"
+  syntax function mod "Z.erem %1 %2"
 end
 
 theory int.ComputerDivision
-  syntax function div "(Z.div %1 %2)"
-  syntax function mod "(Z.rem %1 %2)"
+  syntax function div "Z.div %1 %2"
+  syntax function mod "Z.rem %1 %2"
 end
 
 (* TODO Z.pow has type t -> int -> t, not t -> t -> t
 theory int.Power
-  syntax function power "(Z.pow %1 %2)"
+  syntax function power "Z.pow %1 %2"
 end
 
 theory int.Fact
@@ -75,7 +75,7 @@ end
 (* WhyML *)
 
 module stack.Stack
-  syntax type      t        "(%1 Stack.t)"
+  syntax type      t        "%1 Stack.t"
   syntax val       create   "Stack.create"
   syntax val       push     "Stack.push"
   syntax exception Empty    "Stack.Empty"
@@ -86,11 +86,11 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "(Z.of_int (Stack.length %1))"
+  syntax val       length   "Z.of_int (Stack.length %1)"
 end
 
 module queue.Queue
-  syntax type      t         "(%1 Queue.t)"
+  syntax type      t         "%1 Queue.t"
   syntax val       create    "Queue.create"
   syntax val       push      "Queue.push"
   syntax exception Empty     "Queue.Empty"
@@ -106,23 +106,23 @@ module queue.Queue
 end
 
 module array.Array
-  syntax type array "(%1 Array.t)"
+  syntax type array "%1 array"
 
-  syntax function ([]) "(Array.get %1 %2)"
+  syntax function ([]) "%1.(Z.to_int %2)"
 
-  syntax exception OutOfBounds "Why3__Array.OutOfBounds"
+  (* syntax exception OutOfBounds "Why3__Array.OutOfBounds" *) (* FIXME *)
 
-  syntax val ([])          "Array.get"
-  syntax val ([]<-)        "Array.set"
-  syntax val length        "Array.length"
-  syntax val defensive_get "Why3__Array.defensive_get"
-  syntax val defensive_set "Why3__Array.defensive_set"
-  syntax val make          "Why3__Array.make"
-  syntax val append        "Why3__Array.append"
-  syntax val sub           "Why3__Array.sub"
-  syntax val copy          "Why3__Array.copy"
-  syntax val fill          "Why3__Array.fill"
-  syntax val blit          "Why3__Array.blit"
+  syntax val ([])          "%1.(Z.to_int %2)"
+  syntax val ([]<-)        "%1.(Z.to_int %2) <- %3"
+  syntax val length        "Z.of_int (Array.length %1)"
+  syntax val defensive_get "%1.(Z.to_int %2)"
+  syntax val defensive_set "%1.(Z.to_int %2) <- %3"
+  syntax val make          "Array.make (Z.to_int %1) %2"
+  syntax val append        "Array.append %1 %2"
+  syntax val sub           "Array.sub %1 (Z.to_int %2) (Z.to_int %3)"
+  syntax val copy          "Array.copy %1"
+  syntax val fill          "Array.fill %1 (Z.to_int %2) (Z.to_int %3) %4"
+  syntax val blit          "Array.blit %1 (Z.to_int %2) %3 (Z.to_int %4) (Z.to_int %5)"
 end
 
 module matrix.Matrix

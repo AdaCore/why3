@@ -116,13 +116,13 @@ module Print = struct
       fprintf fmt "unit"
     | Ttuple tl ->
       fprintf fmt (protect_on paren "@[%a@]")
-        (print_list star (print_ty ~paren:false info)) tl
+        (print_list star (print_ty ~paren:true info)) tl
     | Tapp (ts, [t1; t2]) when id_equal ts ts_func.ts_name ->
       fprintf fmt (protect_on paren "@[%a ->@ %a@]")
         (print_ty ~paren:true info) t1 (print_ty info) t2
     | Tapp (ts, tl) ->
       begin match query_syntax info.info_syn ts with
-        | Some s -> syntax_arguments s (print_ty info) fmt tl
+        | Some s -> syntax_arguments s (print_ty ~paren:true info) fmt tl
         | None   ->
           begin match tl with
             | [] ->
@@ -217,7 +217,15 @@ module Print = struct
 
   let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
-  let rec print_apply info fmt rs pvl =
+  let is_true e = match e.e_node with
+    | Eapp (s, []) -> rs_equal s rs_true
+    | _ -> false
+
+  let is_false e = match e.e_node with
+    | Eapp (s, []) -> rs_equal s rs_false
+    | _ -> false
+
+  let rec print_apply info rs fmt pvl =
     let isfield =
       match rs.rs_field with
       | None -> false
@@ -239,7 +247,7 @@ module Print = struct
         | _ -> assert false in
       syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
-      syntax_arguments s (print_expr info) fmt pvl
+      syntax_arguments s (print_expr ~paren:true info) fmt pvl
     | _, _, tl when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]"
         (print_list comma (print_expr info)) tl
@@ -265,7 +273,7 @@ module Print = struct
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
     | _, _, tl ->
       fprintf fmt "@[<hov 2>%a %a@]"
-        print_ident rs.rs_name (print_list space (print_expr info)) tl
+        print_ident rs.rs_name (print_list space (print_expr ~paren:true info)) tl
 
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
@@ -313,7 +321,8 @@ module Print = struct
       fprintf fmt "@[<hov 1>%a %a@]"
         (print_expr info) e1 (print_expr info) e2
     | Eapp (s, pvl) ->
-      print_apply info fmt (Hrs.find_def ht_rs s s) pvl
+      fprintf fmt (protect_on paren "%a")
+        (print_apply info (Hrs.find_def ht_rs s s)) pvl
     | Ematch (e, pl) ->
       fprintf fmt "begin match @[%a@] with@\n@[<hov>%a@]@\nend"
         (print_expr info) e (print_list newline (print_branch info)) pl
@@ -329,6 +338,12 @@ module Print = struct
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]"
         (print_expr info) e1 (print_expr info) e2
+    | Eif (e1, e2, e3) when is_true e2 ->
+      fprintf fmt
+        (protect_on paren "@[<hv>%a || %a@]") (print_expr info) e1 (print_expr info) e3
+    | Eif (e1, e2, e3) when is_false e3 ->
+      fprintf fmt
+        (protect_on paren "@[<hv>%a && %a@]") (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]"
