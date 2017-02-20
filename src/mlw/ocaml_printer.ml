@@ -292,7 +292,7 @@ module Print = struct
       print_list_next newline print_one fmt rdef;
       List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
 
-  and print_enode info fmt = function
+  and print_enode ?(paren=false) info fmt = function
     | Econst c ->
       let n = Number.compute_int c in
       fprintf fmt "(Z.of_string \"%s\")" (BigInt.to_string n)
@@ -346,11 +346,11 @@ module Print = struct
     | Ewhile (e1, e2) ->
       fprintf fmt "@[<hov 2>while %a do@ %a@ done@]"
         (print_expr info) e1 (print_expr info) e2
-    | Eraise (Xident id, None) -> (* FIXME : check exceptions in driver *)
-      fprintf fmt "raise %a" (print_uident info) id
-    | Eraise (Xident id, Some e) ->
-      fprintf fmt "(raise %a %a)"
-        (print_uident info) id (print_expr info) e
+    | Eraise (xs, None) -> (* FIXME : check exceptions in driver *)
+      fprintf fmt (protect_on paren "raise %a") (print_uident info) xs.xs_name
+    | Eraise (xs, Some e) ->
+      fprintf fmt (protect_on paren "raise (%a %a)")
+        (print_uident info) xs.xs_name (print_expr ~paren:true info) e
     | Etuple _ -> (* TODO *) assert false
     | Efor (pv1, pv2, direction, pv3, e) ->
       let print_for_direction fmt = function
@@ -358,12 +358,13 @@ module Print = struct
         | DownTo -> fprintf fmt "downto"
       in
       fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
-        (print_lident info) (pv_name pv1)
-        (print_lident info) (pv_name pv2)
+        (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
         print_for_direction direction
-        (print_lident info) (pv_name pv3)
-        (print_expr info) e
-    | Etry _ -> (* TODO *) assert false
+        (print_lident info) (pv_name pv3) (print_expr info) e
+    | Etry (e, bl) ->
+      fprintf fmt
+        "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
+        (print_expr info) e (print_list newline (print_xbranch info)) bl
     | Enot _ -> (* TODO *) assert false
     | Ebinop _ -> (* TODO *) assert false
     | Ecast _ -> (* TODO *) assert false
@@ -372,8 +373,14 @@ module Print = struct
     fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]"
       (print_pat info) p (print_expr info) e
 
-  and print_expr info fmt e =
-    print_enode info fmt e.e_node
+  and print_xbranch info fmt (xs, pvl, e) =
+    let print_var fmt pv =
+      print_lident info fmt (pv_name pv) in
+    fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) (xs.xs_name)
+      (print_list nothing print_var) pvl (print_expr info) e
+
+  and print_expr ?(paren=false) info fmt e =
+    print_enode ~paren info fmt e.e_node
 
   let print_type_decl info fmt its =
     let print_constr fmt (id, cs_args) =

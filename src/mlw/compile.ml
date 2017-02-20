@@ -100,9 +100,6 @@ module ML = struct
 
   type binop = Band | Bor | Beq
 
-  type exn =
-    | Xident of ident
-
   type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
 
   type expr = {
@@ -128,8 +125,8 @@ module ML = struct
     | Eblock  of expr list
     | Ewhile  of expr * expr
     | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
-    | Eraise  of exn * expr option
-    | Etry    of expr * (exn * pvsymbol option * expr) list
+    | Eraise  of xsymbol * expr option
+    | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eabsurd
 
   and let_def =
@@ -176,8 +173,8 @@ module ML = struct
 
   let tunit = Ttuple []
 
-  let ity_int         = I ity_int
-  let ity_unit        = I ity_unit
+  let ity_int  = I ity_int
+  let ity_unit = I ity_unit
 
   let enope = Eblock []
 
@@ -498,6 +495,7 @@ module Translate = struct
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cany}, _) ->
       raise ExtractionAny
+      (* ML.mk_unit *)
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
@@ -520,27 +518,26 @@ module Translate = struct
     | Efor (pv1, (pv2, To, pv3), _, efor) ->
       let efor = expr info efor in
       mk_for_to info pv1 pv2 pv3 efor eff
-      (* let direction = for_direction direction in *)
-      (* ML.mk_expr (ML.Efor (pv1, pv2, direction, pv3, efor)) (ML.I e.e_ity) eff *)
     | Efor (pv1, (pv2, DownTo, pv3), _, efor) ->
       let efor = expr info efor in
       mk_for_downto info pv1 pv2 pv3 efor eff
-    | Eghost _ ->
-      (* ML.mk_unit; *)
-      assert false
+    | Eghost _ -> assert false
     | Eassign al ->
       ML.mk_expr (ML.Eassign al) (ML.I e.e_ity) eff
     | Epure _ -> assert false (*TODO*)
-    | Etry _ -> assert false (*TODO*)
+    | Etry (etry, pvl_e_map) ->
+      let etry = expr info etry in
+      let bl   =
+        let bl_map = Mxs.bindings pvl_e_map in
+        List.map (fun (xs, (pvl, e)) -> xs, pvl, expr info e) bl_map in
+      ML.mk_expr (ML.Etry (etry, bl)) (ML.I e.e_ity) eff
     | Eraise (xs, ex) ->
       let ex =
-        let open ML in
         match expr info ex with
-        | {e_node = Eblock []} -> None
+        | {ML.e_node = ML.Eblock []} -> None
         | e -> Some e
       in
-      let exn = ML.Xident xs.xs_name in
-      ML.mk_expr (ML.Eraise (exn, ex)) (ML.I e.e_ity) eff
+      ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) eff
     | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _) ->
       assert false (*TODO*)
     | Eexec ({c_node=Cpur (_, _); _ }, _) ->
@@ -591,7 +588,8 @@ module Translate = struct
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
     | PDlet (LDsym (rs, {c_node = Cany})) ->
-      raise (ExtractionVal rs)
+      []
+      (* raise (ExtractionVal rs) *)
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       [ML.Dlet (ML.Lsym (rs, args, expr info e))]

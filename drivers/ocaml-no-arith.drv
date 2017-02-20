@@ -73,8 +73,14 @@ module ref.Ref
   syntax val      (:=)     "Pervasives.(:=) %1 %2"
 end
 
+(* FIXME: once we extract ref.Refint, this module
+          will no longer be useful in the driver *)
 module ref.Refint
   syntax val incr "%1 := Z.succ (Pervasives.(!) %1)"
+  syntax val decr "%1 := Z.pred (Pervasives.(!) %1)"
+  syntax val (+=) "%1 := Z.add (Pervasives.(!) %1) %2"
+  syntax val (-=) "%1 := Z.sub (Pervasives.(!) %1) %2"
+  syntax val ( *= ) "%1 := Z.mul (Pervasives.(!) %1) %2"
 end
 
 module null.Null
