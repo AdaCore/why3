@@ -308,8 +308,7 @@ module Print = struct
       (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
       fprintf fmt "@[%a@] in@ %a"
-        (print_let_def info) let_def
-        (print_expr info) e;
+        (print_let_def info) let_def (print_expr info) e;
       forget_let_defn let_def
     | Eabsurd ->
       fprintf fmt "assert false (* absurd *)"
@@ -335,15 +334,14 @@ module Print = struct
       | [] -> assert false | [a] -> assign fmt a
       | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
-      fprintf fmt
-        "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]"
+      fprintf fmt "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]"
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) when is_true e2 ->
-      fprintf fmt
-        (protect_on paren "@[<hv>%a || %a@]") (print_expr info) e1 (print_expr info) e3
+      fprintf fmt (protect_on paren "@[<hv>%a || %a@]")
+        (print_expr info) e1 (print_expr info) e3
     | Eif (e1, e2, e3) when is_false e3 ->
-      fprintf fmt
-        (protect_on paren "@[<hv>%a && %a@]") (print_expr info) e1 (print_expr info) e2
+      fprintf fmt (protect_on paren "@[<hv>%a && %a@]")
+        (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt
         "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]"

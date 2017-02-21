@@ -356,9 +356,10 @@ module Translate = struct
     let p (_, _, is_ghost) = not is_ghost in
     List.filter p args
 
-  let params args =
-    let args = filter_params args in
-    if args = [] then [ML.mk_var_unit ()] else args
+  let params = function
+    | []   -> []
+    | args -> let args = filter_params args in
+      if args = [] then [ML.mk_var_unit ()] else args
 
   let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body eff =
     let i_expr, from_expr, to_expr =
