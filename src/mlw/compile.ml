@@ -116,22 +116,20 @@ module ML = struct
     | Efun    of var list * expr
     | Elet    of let_def * expr
     | Eif     of expr * expr * expr
-    | Ecast   of expr * ty
+    (* | Ecast   of expr * ty *)
     | Eassign of (pvsymbol * rsymbol * pvsymbol) list
-    | Etuple  of expr list (* at least 2 expressions *)
     | Ematch  of expr * (pat * expr) list
-    | Ebinop  of expr * binop * expr
-    | Enot    of expr
     | Eblock  of expr list
     | Ewhile  of expr * expr
-    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr (* Why3's type int *)
+    (* For loop for Why3's type int *)
+    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
     | Eraise  of xsymbol * expr option
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eabsurd
 
   and let_def =
     | Lvar of pvsymbol * expr
-    | Lsym of rsymbol * var list * expr
+    | Lsym of rsymbol * ty * var list * expr
     | Lrec of rdef list
 
   and rdef = {
@@ -139,6 +137,7 @@ module ML = struct
     rec_rsym : rsymbol; (* internal *)
     rec_args : var list;
     rec_exp  : expr;
+    rec_res  : ty;
   }
 
   type is_mutable = bool
@@ -208,21 +207,13 @@ type info = {
   info_fname        : string option;
 }
 
-let has_syntax cxt id =
-  (* Mid.iter *)
-  (*   (fun id' _ -> Format.printf "id': %s@\n" id'.id_string) *)
-  (*   cxt.info_syn; *)
-  query_syntax cxt.info_syn id <> None ||
-  query_syntax cxt.info_convert id <> None
-
 (** Translation from Mlw to ML *)
 
 module Translate = struct
 
-  open Expr    (* Mlw expressions *)
-
-  open Pmodule (* for the type of modules *)
-  open Pdecl   (* for the type of program declarations *)
+  open Expr
+  open Pmodule
+  open Pdecl
 
   (* useful predicates and transformations *)
   let pv_not_ghost e = not e.pv_ghost
@@ -361,19 +352,15 @@ module Translate = struct
     | args -> let args = filter_params args in
       if args = [] then [ML.mk_var_unit ()] else args
 
-  let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body eff =
+  let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body_expr eff =
     let i_expr, from_expr, to_expr =
       let int_ity = ML.ity_int in let eff_e = eff_empty in
       ML.mk_expr (ML.Evar i_pv)     int_ity eff_e,
       ML.mk_expr (ML.Evar from_pv)  int_ity eff_e,
       ML.mk_expr (ML.Evar to_pv)    int_ity eff_e in
-    let body_ity  = ity_func ity_int ity_unit in
-    let body_pv   =
-      let body_id = id_fresh "body" in create_pvsymbol body_id body_ity in
-    let body_expr = ML.mk_expr (ML.Evar body_pv) (ML.I body_ity) eff in
     let for_rs    =
       let for_id  = id_fresh "for_loop_to" in
-      let for_cty = create_cty [i_pv; to_pv; body_pv] [] [] Mxs.empty
+      let for_cty = create_cty [i_pv; to_pv] [] [] Mxs.empty
                                Mpv.empty eff ity_unit in
       create_rsymbol for_id for_cty in
     let for_expr =
@@ -386,35 +373,26 @@ module Translate = struct
         let i_op_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
         ML.mk_expr i_op_one ML.ity_int eff_empty in
        let rec_call  =
-        ML.mk_expr (ML.Eapp (for_rs, [next_expr; to_expr; body_expr]))
-                    ML.ity_unit eff in
-      let body_app =
-        ML.mk_expr (ML.Eapp (rs_func_app, [body_expr; i_expr]))
+        ML.mk_expr (ML.Eapp (for_rs, [next_expr; to_expr]))
                     ML.ity_unit eff in
       let seq_expr =
-        ML.mk_expr (ML.eseq body_app rec_call) ML.ity_unit eff in
+        ML.mk_expr (ML.eseq body_expr rec_call) ML.ity_unit eff in
       ML.mk_expr (ML.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
     let ty_int = ity ity_int in
     let for_call_expr   =
-      let body_fun      = ML.Efun ([pv_name i_pv, ty_int, false], body) in
-      let body_fun_expr = ML.mk_expr body_fun ML.ity_unit eff in
-      let for_call      = ML.Eapp (for_rs, [i_expr; to_expr; body_fun_expr]) in
+      let for_call      = ML.Eapp (for_rs, [from_expr; to_expr]) in
       ML.mk_expr for_call ML.ity_unit eff in
-    let let_i_for_call_expr =
-      let let_i = ML.mk_let_var i_pv from_expr for_call_expr in
-      ML.mk_expr let_i ML.ity_unit eff in
     let pv_name pv = pv.pv_vs.vs_name in
-    let ty_int_to_unit = ity body_ity in
     let args = [
-      (pv_name    i_pv,         ty_int, false);
-      (pv_name   to_pv,         ty_int, false);
-      (pv_name body_pv, ty_int_to_unit, false);
+      (pv_name  i_pv, ty_int, false);
+      (pv_name to_pv, ty_int, false);
     ] in
     let for_rec_def = {
       ML.rec_sym  = for_rs; ML.rec_args = args;
       ML.rec_rsym = for_rs; ML.rec_exp  = for_expr;
+      ML.rec_res  = ML.tunit;
     } in
-    let for_let = ML.Elet (ML.Lrec [for_rec_def], let_i_for_call_expr) in
+    let for_let = ML.Elet (ML.Lrec [for_rec_def], for_call_expr) in
     ML.mk_expr for_let ML.ity_unit eff
 
   let mk_for_downto info i_pv from_pv to_pv body eff =
@@ -453,23 +431,26 @@ module Translate = struct
       let args = params cty.cty_args in
       let ef = expr info ef in
       let ein = expr info ein in
-      let ml_letrec = ML.Elet (ML.Lsym (rs, args, ef), ein) in
+      let res = ity cty.cty_result in
+      let ml_letrec = ML.Elet (ML.Lsym (rs, res, args, ef), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
       let eta_app = make_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
-      let ml_letrec = ML.Elet (ML.Lsym (rsf, [], eta_app), ein) in
+      let res = ity cty.cty_result in
+      let ml_letrec = ML.Elet (ML.Lsym (rsf, res, [], eta_app), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
       let pvl = app pvl in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
-      let ein = expr info ein in
+      let ein  = expr info ein in
+      let res  = ity cty.cty_result in
       let args =
         if filter_params cty.cty_args = [] then [ML.mk_var_unit ()] else [] in
-      let ml_letrec = ML.Elet (ML.Lsym (rsf, args, eapp), ein) in
+      let ml_letrec = ML.Elet (ML.Lsym (rsf, res, args, eapp), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
       let ein = expr info ein in
@@ -477,9 +458,10 @@ module Translate = struct
         List.map (fun rdef -> match rdef with
           | {rec_sym = rs1; rec_rsym = rs2;
              rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
+            let res  = ity rs1.rs_cty.cty_result in
             let args = params cty.cty_args in let ef = expr info ef in
             { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-              ML.rec_args = args; ML.rec_exp  = ef }
+              ML.rec_args = args; ML.rec_exp  = ef ; ML.rec_res  = res }
           | _ -> assert false) rdefl
       in
       let ml_letrec = ML.Elet (ML.Lrec rdefl, ein) in
@@ -589,17 +571,19 @@ module Translate = struct
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
     | PDlet (LDsym (rs, {c_node = Cany})) ->
-      []
-      (* raise (ExtractionVal rs) *)
+      raise (ExtractionVal rs)
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
-      [ML.Dlet (ML.Lsym (rs, args, expr info e))]
+      let res = ity cty.cty_result in
+      [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
     | PDlet (LDrec rl) ->
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
-        let e = match e.c_node with Cfun e -> e | _ -> assert false in
+        let e    = match e.c_node with Cfun e -> e | _ -> assert false in
         let args = params rs1.rs_cty.cty_args in
+        let res  = ity rs1.rs_cty.cty_result in
         { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-          ML.rec_args = args; ML.rec_exp  = expr info e } in
+          ML.rec_args = args; ML.rec_exp  = expr info e;
+          ML.rec_res  = res } in
       let rec_def = filter_ghost_rdef def rl in
       [ML.Dlet (ML.Lrec rec_def)]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar (_, _)) ->
@@ -660,16 +644,10 @@ module Transform = struct
       mk (Efun (vl, expr info subst e))
     | Eif (e1, e2, e3) ->
       mk (Eif (expr info subst e1, expr info subst e2, expr info subst e3))
-    | Ecast (e, ty) ->
-      mk (Ecast (expr info subst e, ty))
-    | Etuple el ->
-      mk (Etuple (List.map (expr info subst) el))
+    (* | Ecast (e, ty) -> *)
+    (*   mk (Ecast (expr info subst e, ty)) *)
     | Ematch (e, bl) ->
       mk (Ematch (expr info subst e, List.map (branch info subst) bl))
-    | Ebinop (e1, op, e2) ->
-      mk (Ebinop (expr info subst e1, op, expr info subst e2))
-    | Enot e ->
-      mk (Enot (expr info subst e))
     | Eblock el ->
       mk (Eblock (List.map (expr info subst) el))
     | Ewhile (e1, e2) ->
@@ -700,8 +678,8 @@ module Transform = struct
     | Lvar (pv, e) ->
       assert (not (Mpv.mem pv subst)); (* no capture *)
       Lvar (pv, expr info subst e)
-    | Lsym (rs, args, e) ->
-      Lsym (rs, args, expr info subst e)
+    | Lsym (rs, res, args, e) ->
+      Lsym (rs, res, args, expr info subst e)
     | Lrec rl -> Lrec (List.map (rdef info subst) rl)
 
   and rdef info subst r =
