@@ -264,8 +264,8 @@ term_:
       | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
 | NOT term
     { Tunop (Tnot, $2) }
-| prefix_op term %prec prec_prefix_op
-    { Tidapp (Qident $1, [$2]) }
+| o = prefix_op ; t = term %prec prec_prefix_op
+    { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op ; r = term
