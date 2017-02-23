@@ -3338,7 +3338,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       if (Limb.(=) !x1 dh && Limb.(=) nx0 dl) (* unlikely *)
       then begin
         ql := Limb.of_int Limb.max_uint64;
-        value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
+        value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
         value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
         let ghost vlx = value_sub_shift xd (p2i sy - 1) in
         assert { value_sub_shift xd (sy)
@@ -3393,7 +3393,23 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
          assert { !x1 = dh };
         end;
         label SubMax in
+        let ghost xc = copy (x.data.contents) in
+        value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
         let b = submul_limb xd y !ql sy in
+        begin
+          ensures { value_sub_shift x (!i)
+                 = value_sub_shift (x at SubMax) (!i) }
+          assert { forall j. x.offset <= j < x.offset + !i
+                          -> (pelts x)[j] = xc.elts[j]
+                   by
+                   (pelts x)[j] = (pelts x at SubMax)[j]
+                   so
+                   ((pelts x at SubMax)[j] = xc.elts[j]
+                   by
+                   0 <= j /\ j < xc.Array.length
+                   ) };
+          value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
+        end;
         value_sub_upper_bound (pelts xd) xd.offset (xd.offset + p2i sy);
         value_sub_lower_bound (pelts xd) xd.offset (xd.offset + p2i sy);
         value_sub_head (pelts xd) xd.offset (xd.offset + p2i sy - 1);
@@ -3492,9 +3508,30 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
         assert { value_sub_shift xd (sy - 1)
                  + power radix (sy - 1) * !x1
-                 = value_sub_shift (xd at SubMax)
+                 = value_sub_shift (xd at SubMax) sy
                    + power radix (sy) * (!x1 at StartLoop)
                    - !ql * vy
+                 by
+                 value_sub_shift xd (sy)
+                 = value_sub_shift (xd at SubMax) (sy)
+                   - (!ql) * vy
+                   + power radix (sy) * b
+                 so b = dh = !x1 at StartLoop
+                 so pelts !xp = pelts x = pelts xd
+                 so ((pelts xd)[xd.offset + sy - 1] = !x1
+                    by
+                    xd.offset = x.offset + !i
+                    so (!xp).offset = x.offset + !i + sy - 2
+                    so (!xp).offset + 1 = xd.offset + sy - 1
+                    so (pelts xd)[xd.offset + sy - 1]
+                       = (pelts !xp)[(!xp).offset + 1]
+                       = !x1
+                    )
+                 so value_sub_shift xd (sy)
+                    = value_sub_shift xd (sy - 1)
+                      + power radix (sy - 1) * (pelts xd)[xd.offset + sy - 1]
+                    = value_sub_shift xd (sy - 1)
+                      + power radix (sy - 1) * !x1
                };
         assert { value_sub_shift (old x) (sx) =
                   (value_sub_shift !qp (sx - sy - !i)
@@ -3512,37 +3549,36 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  = value_sub_shift (xd at SubMax) (sy)
                    - (!ql) * vy
                    + power radix (sy) * dh
-                 so ((pelts xd)[xd.offset + sy - 1] = !x1
-                    by
-                    xd.offset = x.offset + !i
-                    so (!xp).offset = x.offset + !i + sy - 2
-                    so (!xp).offset + 1 = xd.offset + sy - 1
-                    so (pelts xd)[xd.offset + sy - 1]
-                       = (pelts !xp)[(!xp).offset + 1]
-                       = !x1
-                    )
-                 so value_sub_shift xd (sy)
-                    = value_sub_shift xd (sy - 1)
-                      + power radix (sy - 1) * (pelts xd)[xd.offset + sy - 1]
-                    = value_sub_shift xd (sy - 1)
-                      + power radix (sy - 1) * !x1
-                 so (value_sub_shift x (sx)
+                 so (value_sub_shift x s
                     = value_sub_shift x (!i)
                       + power radix (!i)
                         * value_sub_shift xd (sy - 1)
                     by
                       xd.offset = x.offset + !i
-                      so x.offset + sx = xd.offset + sy - 1
-                      value_sub_shift x sx
+                      so x.offset + s = xd.offset + sy - 1
+                      so value_sub (pelts x) (x.offset + !i) (x.offset + s)
+                         = value_sub_shift xd (sy - 1)
+                      so value_sub_shift x s
                     = value_sub_shift x (!i)
                       + power radix (!i)
                         * value_sub (pelts x) (x.offset + !i)
-                                              (x.offset + sx)
+                                              (x.offset + s)
                     = value_sub_shift x (!i)
                       + power radix (!i)
                         * value_sub_shift xd (sy - 1))
-                 so power radix s
+                 so (power radix s
                     = power radix (!i) * power radix (sy - 1)
+                    by
+                    let n = !i in
+                    let m = sy - 1 in
+                    let x = radix in
+                    power x s = power x (n + m)
+                    so (power x (n + m) = power x n * power x m
+                       by 0 <= n
+                       so 0 <= m
+                       so forall x:int, n:int, m:int.
+                                 0 <= n -> 0 <= m ->
+                                 power x (n + m) = (power x n * power x m)))
                  so (value_sub_shift x s + power radix s * !x1
                     = value_sub_shift x (!i)
                       + power radix (!i) * (value_sub_shift xd (sy))
@@ -3559,10 +3595,28 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     = value_sub_shift x (!i)
                       + power radix (!i) * (value_sub_shift xd (sy))
                     )
-                 so value_sub_shift (x at StartLoop) (sy + k - 1)
-                    = value_sub_shift (x at SubMax) (!i)
+                 so (value_sub_shift (x at StartLoop) (sy + k - 1)
+                    = value_sub_shift (x at SubMax) !i
                       + power radix (!i)
-                        * value_sub_shift (xd at SubMax) (sy) (*to detail*)
+                        * value_sub_shift (xd at SubMax) sy
+                    by
+                    pelts xd at SubMax = pelts x at SubMax
+                    so x.offset at SubMax + !i = xd.offset at SubMax
+                    so
+                    value_sub_shift (x at StartLoop) (sy + k - 1)
+                    = value_sub (pelts x at SubMax) (x at SubMax).offset
+                                (xd.offset at SubMax)
+                      + power radix !i
+                        * value_sub (pelts x at SubMax)
+                           (xd.offset at SubMax)
+                           (xd.offset at SubMax + sy)
+                    so value_sub (pelts x at SubMax) (x at SubMax).offset
+                                 (xd at SubMax).offset
+                       = value_sub_shift (x at SubMax) !i
+                    so value_sub (pelts x at SubMax) (xd.offset at SubMax)
+                                                     (xd.offset at SubMax + sy)
+                       = value_sub_shift (xd at SubMax) sy
+                    )
                  so value_sub_shift x (!i)
                     = value_sub_shift (x at SubMax) (!i)
                  so value_sub_shift x s + power radix s * !x1
@@ -3591,6 +3645,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                                     (sx - sy - k)
                  so power radix (sx - sy - !i)
                     = radix * power radix (sx - sy - k)
+                 so radix * power radix !i = power radix k
                  so (value_sub_shift !qp (sx - sy - !i)
                       + qh * power radix (sx - sy - !i))
                       * vy * power radix (!i)
@@ -3625,6 +3680,13 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                       + (value_sub_shift (!qp at StartLoop)
                                     (sx - sy - k)
                                  + qh * power radix (sx - sy - k))
+                        * vy * radix * power radix (!i)
+                      + value_sub_shift x s
+                      + power radix s * !x1
+                    = !ql * vy * power radix (!i)
+                      + (value_sub_shift (!qp at StartLoop)
+                                    (sx - sy - k)
+                                 + qh * power radix (sx - sy - k))
                         * vy * power radix k
                       + value_sub_shift x s
                       + power radix s * !x1
@@ -3652,6 +3714,20 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                       + power radix (sy + k - 1) * (!x1 at StartLoop)
                     = value_sub_shift (old x) (sx)
                   };
+        assert { value_sub (pelts x) (!xp.offset + mdn)
+                   (!xp.offset + mdn + sy - 1)
+                   + power radix (sy - 1) * !x1
+                   < vy
+                   by
+                     pelts x = pelts xd
+                   so xd.offset = !xp.offset + mdn
+                   so !xp.offset + mdn + sy - 1 = xd.offset + sy - 1
+                   so
+                     value_sub_shift xd (sy - 1)
+                     = value_sub (pelts xd) xd.offset (xd.offset + sy - 1)
+                     = value_sub (pelts x) (!xp.offset + mdn)
+                       (!xp.offset + mdn + sy - 1)
+               };
       end
       else begin
         assert { dl + radix * dh
