@@ -39,7 +39,7 @@ val load_driver : Env.env -> string -> string list -> driver
 
 type printer =
   printer_args -> ?old:in_channel -> ?fname:string -> Pmodule.pmodule ->
-  Compile.decl Pp.pp
+  Compile.ML.decl Pp.pp
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 

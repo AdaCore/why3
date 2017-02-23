@@ -119,16 +119,16 @@ let opt_driver =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-let extract_to ?fname ({mod_theory = th} as m) =
+let extract_to ?fname m =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let info = {
-    info_syn          = pargs.Pdriver.syntax;
-    info_convert      = pargs.Pdriver.converter;
-    info_current_th   = th;
-    info_current_mo   = Some m;
-    info_th_known_map = th.Theory.th_known;
-    info_mo_known_map = m.mod_known;
-    info_fname        = Opt.map Compile.clean_name fname
+    (* info_syn          = pargs.Pdriver.syntax; *)
+    (* info_convert      = pargs.Pdriver.converter; *)
+    (* info_current_th   = th; *)
+    Translate.info_current_mo   = Some m;
+    (* info_th_known_map = th.Theory.th_known; *)
+    Translate.info_mo_known_map = m.mod_known;
+    (* info_fname        = Opt.map Compile.clean_name fname *)
   } in
   let mdecls = Translate.module_ info m in
   let mdecls = Transform.module_ info mdecls in
@@ -147,8 +147,7 @@ let extract_to ?fname ({mod_theory = th} as m) =
     Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
     List.iter (pr ?old ?fname pargs m fmt) mdecls;
     close_out cout
-  | Monolithic ->
-    ()
+  | Monolithic -> ()
 
 let extract_to =
   let visited = Ident.Hid.create 17 in

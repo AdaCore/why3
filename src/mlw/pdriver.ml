@@ -222,7 +222,7 @@ type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 
 type printer =
   printer_args -> ?old:in_channel -> ?fname:string -> Pmodule.pmodule ->
-  Compile.decl Pp.pp
+  Compile.ML.decl Pp.pp
 
 type reg_printer = Pp.formatted * filename_generator * printer
 

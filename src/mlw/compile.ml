@@ -211,18 +211,6 @@ module ML = struct
 
 end
 
-type decl = ML.decl
-
-type info = {
-  info_syn          : syntax_map;
-  info_convert      : syntax_map;
-  info_current_th   : Theory.theory;
-  info_current_mo   : Pmodule.pmodule option;
-  info_th_known_map : Decl.known_map;
-  info_mo_known_map : Pdecl.known_map;
-  info_fname        : string option;
-}
-
 (** Translation from Mlw to ML *)
 
 module Translate = struct
@@ -230,6 +218,16 @@ module Translate = struct
   open Expr
   open Pmodule
   open Pdecl
+
+  type info = {
+    (* info_syn          : syntax_map; *)
+    (* info_convert      : syntax_map; *)
+    (* info_current_th   : Theory.theory; *)
+    info_current_mo   : Pmodule.pmodule option;
+    (* info_th_known_map : Decl.known_map; *)
+    info_mo_known_map : Pdecl.known_map;
+    (* info_fname        : string option; *)
+  }
 
   (* useful predicates and transformations *)
   let pv_not_ghost e = not e.pv_ghost
@@ -337,7 +335,7 @@ module Translate = struct
       List.exists is_constructor its
     | _ -> false
 
-  let make_eta_expansion rsc pvl cty_app =
+  let mk_eta_expansion rsc pvl cty_app =
     (* FIXME : effects and types of the expression in this situation *)
     let args_f =
       let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
@@ -452,9 +450,12 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
-      let eta_app = make_eta_expansion rs_app pvl cty in
+      (* partial application of constructor *)
+      let eta_app = mk_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
-      let res = ity cty.cty_result in
+      let mk_func pv f = ity_func pv.pv_ity f in
+      let func = List.fold_right mk_func cty.cty_args cty.cty_result in
+      let res = ity func in
       let ml_letrec = ML.Elet (ML.Lsym (rsf, res, [], eta_app), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
@@ -486,6 +487,9 @@ module Translate = struct
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
       ML.mk_unit
+    | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
+      when isconstructor info rs ->
+      mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
       let pvl = app pvl in
       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff

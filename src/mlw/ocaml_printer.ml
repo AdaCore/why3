@@ -25,6 +25,16 @@ open Stdlib
 open Pdecl
 open Printer
 
+type info = {
+  info_syn          : syntax_map;
+  info_convert      : syntax_map;
+  info_current_th   : Theory.theory;
+  info_current_mo   : Pmodule.pmodule option;
+  info_th_known_map : Decl.known_map;
+  info_mo_known_map : Pdecl.known_map;
+  info_fname        : string option;
+}
+
 module Print = struct
 
   open ML
@@ -448,10 +458,8 @@ module Print = struct
         print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
-let extract_module pargs ?old ?fname ({mod_theory = th} as m) fmt d =
-  ignore (pargs);
+let print_decl pargs ?old ?fname ({mod_theory = th} as m) fmt d =
   ignore (old);
-  ignore (m);
   let info = {
     info_syn          = pargs.Pdriver.syntax;
     info_convert      = pargs.Pdriver.converter;
@@ -470,7 +478,7 @@ let fg ?fname m =
   (module_name ?fname path mod_name) ^ ".ml"
 
 let () = Pdriver.register_printer "ocaml"
-  ~desc:"printer for OCaml code" fg extract_module
+  ~desc:"printer for OCaml code" fg print_decl
 
 (*
  * Local Variables:
