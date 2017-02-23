@@ -79,10 +79,11 @@ let fg ?fname m =
 
 open Format
 
-let pr args ?old ?fname fmt m =
+let pr args ?old ?fname m fmt d =
   ignore(args);
   ignore(old);
   ignore(m);
+  ignore(d);
   ignore(fname);
   fprintf fmt "#include <stdio.h>\n\
 \n\

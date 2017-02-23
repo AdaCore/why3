@@ -211,6 +211,8 @@ module ML = struct
 
 end
 
+type decl = ML.decl
+
 type info = {
   info_syn          : syntax_map;
   info_convert      : syntax_map;

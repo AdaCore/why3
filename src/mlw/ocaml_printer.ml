@@ -448,7 +448,7 @@ module Print = struct
         print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
-let extract_module pargs ?old ?fname fmt ({mod_theory = th} as m) =
+let extract_module pargs ?old ?fname ({mod_theory = th} as m) fmt d =
   ignore (pargs);
   ignore (old);
   ignore (m);
@@ -461,12 +461,7 @@ let extract_module pargs ?old ?fname fmt ({mod_theory = th} as m) =
     info_mo_known_map = m.mod_known;
     info_fname        = Opt.map Compile.clean_name fname
   } in
-  fprintf fmt
-    "(* This file has been generated from Why3 module %a *)@\n@\n"
-    Print.print_module_name m;
-  let mdecls = Translate.module_ info m in
-  let mdecls = Transform.module_ info mdecls in
-  print_list nothing (Print.print_decl info) fmt mdecls;
+  Print.print_decl info fmt d;
   fprintf fmt "@."
 
 let fg ?fname m =
