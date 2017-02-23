@@ -10,8 +10,8 @@ theories for classical functions.
 
 theory Int
 
-  constant zero : int = 0
-  constant one  : int = 1
+  let constant zero : int = 0
+  let constant one  : int = 1
 
   val (=) (x y : int) : bool ensures { result <-> x = y }
 

@@ -50,6 +50,7 @@ let add_opt_theory x =
 let opt_parser = ref None
 let opt_output = ref None
 let opt_driver = ref []
+let opt_recurs = ref false
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -66,6 +67,8 @@ let option_list = [
       "<file> specify an extraction driver";
   "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
+  "--recursive", Arg.Unit (fun () -> opt_recurs := true),
+      " perform recursive extraction ";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
@@ -100,6 +103,8 @@ let opt_driver =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
+let opt_recurs = !opt_recurs
+
 let extract_to ?fname m =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let file = Filename.concat opt_output (fg ?fname m) in
@@ -113,7 +118,7 @@ let extract_to ?fname m =
   let fmt = formatter_of_out_channel cout in
   let tname = m.mod_theory.Theory.th_name.Ident.id_string in
   Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
-  pr ?old pargs fmt m;
+  pr ?old ?fname pargs fmt m;
   close_out cout
 
 let extract_to =
@@ -129,21 +134,19 @@ let rec use_iter f l =
   List.iter (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
 
 let rec do_extract_module ?fname m =
-  let _extract_use m' =
+  let extract_use m' =
     let fname =
       if m'.mod_theory.Theory.th_path = [] then fname else None
     in
     do_extract_module ?fname m'
   in
-  (* for now, do not do a recursive extraction *)
-  (* use_iter extract_use m.mod_units; *)
+  if opt_recurs then use_iter extract_use m.mod_units;
   extract_to ?fname m
 
 let do_global_extract (_,p,t) =
   let env = opt_driver.Pdriver.drv_env in
   let m = read_module env p t in
   do_extract_module m
-
 
 let do_extract_module_from fname mm (tname,_,t) =
   try

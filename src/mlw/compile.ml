@@ -73,6 +73,20 @@ open Ty
 open Term
 open Printer
 
+let clean_name fname =
+  (* TODO: replace with Filename.remove_extension
+   * after migration to OCaml 4.04+ *)
+  let remove_extension s =
+    try Filename.chop_extension s with Invalid_argument _ -> s in
+  let f = Filename.basename fname in (remove_extension f)
+
+let module_name ?fname path t =
+  let fname    = match fname, path with
+    | None, "why3"::_ -> "why3"
+    | None, _   -> String.concat "__" path
+    | Some f, _ -> clean_name f in
+  fname ^ "__" ^ t
+
 module ML = struct
 
   open Expr
@@ -476,8 +490,7 @@ module Translate = struct
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
-    | Eexec ({c_node = Cany}, _) ->
-      raise ExtractionAny
+    | Eexec ({c_node = Cany}, _) -> raise ExtractionAny
       (* ML.mk_unit *)
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
@@ -570,8 +583,9 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
-    | PDlet (LDsym (rs, {c_node = Cany})) ->
-      raise (ExtractionVal rs)
+    | PDlet (LDsym (_rs, {c_node = Cany})) ->
+      []
+      (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       let res = ity cty.cty_result in

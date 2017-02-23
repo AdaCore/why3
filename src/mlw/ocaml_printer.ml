@@ -77,7 +77,7 @@ module Print = struct
 
   let print_qident ~sanitizer info fmt id =
     try
-      let _, _, q =
+      let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
       let s = String.concat "__" q in
@@ -89,8 +89,8 @@ module Print = struct
            false info.info_current_mo
       then fprintf fmt "%s" s
       else
-        (* let fname = if lp = [] then info.info_fname else None in *)
-        let m = Strings.capitalize "m" in
+        let fname = if lp = [] then info.info_fname else None in
+        let m = Strings.capitalize (module_name ?fname lp t) in
         fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
@@ -302,16 +302,19 @@ module Print = struct
       forget_let_defn let_def
     | Eabsurd ->
       fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Eapp (s, []) when rs_equal s rs_true ->
+    | Eapp (rs, []) when rs_equal rs rs_true ->
       fprintf fmt "true"
-    | Eapp (s, []) when rs_equal s rs_false ->
+    | Eapp (rs, []) when rs_equal rs rs_false ->
       fprintf fmt "false"
-    | Eapp (s, [e1; e2]) when rs_equal s rs_func_app ->
+    | Eapp (rs, [e1; e2]) when rs_equal rs rs_func_app ->
       fprintf fmt "@[<hov 1>%a %a@]"
         (print_expr info) e1 (print_expr info) e2
-    | Eapp (s, pvl) ->
+    | Eapp (rs, [])  ->
+      (* avoids parenthesis around values *)
+      fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
+    | Eapp (rs, pvl) ->
       fprintf fmt (protect_on paren "%a")
-        (print_apply info (Hrs.find_def ht_rs s s)) pvl
+        (print_apply info (Hrs.find_def ht_rs rs rs)) pvl
     | Ematch (e, pl) ->
       fprintf fmt (protect_on paren
       "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
@@ -445,7 +448,7 @@ module Print = struct
         print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
-let extract_module pargs ?old fmt ({mod_theory = th} as m) =
+let extract_module pargs ?old ?fname fmt ({mod_theory = th} as m) =
   ignore (pargs);
   ignore (old);
   ignore (m);
@@ -456,7 +459,7 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
     info_current_mo   = Some m;
     info_th_known_map = th.th_known;
     info_mo_known_map = m.mod_known;
-    info_fname        = None; (* TODO *)
+    info_fname        = Opt.map Compile.clean_name fname
   } in
   fprintf fmt
     "(* This file has been generated from Why3 module %a *)@\n@\n"
@@ -467,18 +470,9 @@ let extract_module pargs ?old fmt ({mod_theory = th} as m) =
   fprintf fmt "@."
 
 let fg ?fname m =
-  let mod_name = m.Pmodule.mod_theory.Theory.th_name.id_string in
-  match fname with
-  | None   -> mod_name ^ ".ml"
-  | Some f ->
-    (* TODO: replace with Filename.remove_extension
-     * after migration to OCaml 4.04+ *)
-    let remove_extension s =
-      try Filename.chop_extension s
-      with Invalid_argument _ -> s
-    in
-    let f = Filename.basename f in
-    (remove_extension f) ^ "__" ^ mod_name ^ ".ml"
+  let mod_name = m.mod_theory.th_name.id_string in
+  let path     = m.mod_theory.th_path in
+  (module_name ?fname path mod_name) ^ ".ml"
 
 let () = Pdriver.register_printer "ocaml"
   ~desc:"printer for OCaml code" fg extract_module
