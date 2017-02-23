@@ -71,7 +71,6 @@ open Ident
 open Ity
 open Ty
 open Term
-open Printer
 
 let clean_name fname =
   (* TODO: replace with Filename.remove_extension
@@ -81,7 +80,7 @@ let clean_name fname =
   let f = Filename.basename fname in (remove_extension f)
 
 let module_name ?fname path t =
-  let fname    = match fname, path with
+  let fname = match fname, path with
     | None, "why3"::_ -> "why3"
     | None, _   -> String.concat "__" path
     | Some f, _ -> clean_name f in
@@ -174,8 +173,35 @@ module ML = struct
         (* TODO add return type? *)
     | Dexn    of xsymbol * ty option
 
-  type pmodule =
-    decl list
+  type known_map = decl Mid.t
+
+  type pmodule = {
+    mod_decl  : decl list;
+    mod_known : known_map;
+  }
+
+  let add_known_decl id decl k_map =
+    Mid.add id decl k_map
+
+  let rec fold_deps_ty pmod = function
+    | Tvar _ -> []
+    | Tapp (id, ty_l) ->
+      let d = Mid.find id pmod.mod_known in
+      d :: List.concat (List.map (fold_deps_ty pmod) ty_l)
+    | Ttuple ty_l -> assert false
+
+  let fold_deps_typedef pmod = function
+    | Ddata constr_l -> assert false
+    | Drecord pjl -> assert false
+    | Dalias ty -> fold_deps_ty pmod ty
+
+  let fold_deps_its_defn pmod its_d = match its_d.its_def with
+    | None -> []
+    | Some typedef -> fold_deps_typedef pmod typedef
+
+  let fold_deps pmod = function
+    | Dtype its_dl -> List.concat (List.map (fold_deps_its_defn pmod) its_dl)
+    | _ -> assert false (*TODO*)
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -220,13 +246,8 @@ module Translate = struct
   open Pdecl
 
   type info = {
-    (* info_syn          : syntax_map; *)
-    (* info_convert      : syntax_map; *)
-    (* info_current_th   : Theory.theory; *)
     info_current_mo   : Pmodule.pmodule option;
-    (* info_th_known_map : Decl.known_map; *)
     info_mo_known_map : Pdecl.known_map;
-    (* info_fname        : string option; *)
   }
 
   (* useful predicates and transformations *)
@@ -594,8 +615,10 @@ module Translate = struct
       (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
-      let res = ity cty.cty_result in
-      [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
+      let res  = ity cty.cty_result in
+      let decl = ML.Dlet (ML.Lsym (rs, res, args, expr info e)) in
+      let add_known = Mid.singleton rs.rs_name decl in
+      [decl, add_known]
     | PDlet (LDrec rl) ->
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
         let e    = match e.c_node with Cfun e -> e | _ -> assert false in
@@ -605,14 +628,24 @@ module Translate = struct
           ML.rec_args = args; ML.rec_exp  = expr info e;
           ML.rec_res  = res } in
       let rec_def = filter_ghost_rdef def rl in
-      [ML.Dlet (ML.Lrec rec_def)]
+      let decl    = ML.Dlet (ML.Lrec rec_def) in
+      let mk_add_km m {ML.rec_sym = rs} =
+        ML.add_known_decl rs.rs_name decl m in
+      let add_known = List.fold_left mk_add_km Mid.empty rec_def in
+      [decl, add_known]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar (_, _)) ->
       []
     | PDtype itl ->
-      [ML.Dtype (List.map tdef itl)]
+      let itsd = List.map tdef itl in
+      let decl = ML.Dtype itsd in
+      let mk_add_mk m {ML.its_name = id} = ML.add_known_decl id decl m in
+      let add_known = List.fold_left mk_add_mk Mid.empty itsd in
+      [decl, add_known]
     | PDexn xs ->
-      if ity_equal xs.xs_ity ity_unit then [ML.Dexn (xs, None)]
-      else [ML.Dexn (xs, Some (ity xs.xs_ity))]
+      let decl = if ity_equal xs.xs_ity ity_unit then ML.Dexn (xs, None)
+        else ML.Dexn (xs, Some (ity xs.xs_ity)) in
+      let add_known = Mid.singleton xs.xs_name decl in
+      [decl, add_known]
 
   (* unit module declarations *)
   let mdecl info = function
@@ -622,7 +655,14 @@ module Translate = struct
 
   (* modules *)
   let module_ info m =
-    List.concat (List.map (mdecl info) m.mod_units)
+    let known_m = ref Mid.empty in
+    let mk_decl_and_km (decl, known_m_new) =
+      known_m := Mid.set_union !known_m known_m_new;
+      decl in
+    let comp munit =
+      let m = mdecl info munit in List.map mk_decl_and_km m in
+    let decl = List.map comp m.mod_units in
+    { ML.mod_decl = List.concat decl; ML.mod_known = !known_m }
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | ExtractionAny ->

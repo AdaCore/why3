@@ -91,18 +91,22 @@ let () =
 
 let opt_recurs = !opt_recurs
 
+type output = Empty | File of string
+
+let get_output = function Empty -> assert false | File s -> s
+
 (* FIXME: accept --mono without -o and use to standard output *)
 let opt_output =
   match !opt_output, opt_recurs with
   | None, Monolithic ->
-    eprintf "Output file (-o) is required.@."; exit 1
+    Empty
   | None, (Recursive | SingleModule) ->
     eprintf "Output directory (-o) is required.@."; exit 1
   | Some d, (Recursive | SingleModule) when not (Sys.file_exists d) ->
     eprintf "%s: no such directory.@." d; exit 1
   | Some d, (Recursive | SingleModule) when not (Sys.is_directory d) ->
     eprintf "%s: not a directory.@." d; exit 1
-  | Some d, _ -> d
+  | Some d, _ -> File d
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
@@ -122,19 +126,14 @@ let opt_driver =
 let extract_to ?fname m =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let info = {
-    (* info_syn          = pargs.Pdriver.syntax; *)
-    (* info_convert      = pargs.Pdriver.converter; *)
-    (* info_current_th   = th; *)
     Translate.info_current_mo   = Some m;
-    (* info_th_known_map = th.Theory.th_known; *)
     Translate.info_mo_known_map = m.mod_known;
-    (* info_fname        = Opt.map Compile.clean_name fname *)
   } in
   let mdecls = Translate.module_ info m in
-  let mdecls = Transform.module_ info mdecls in
+  let mdecls = Transform.module_ info mdecls.ML.mod_decl in
   match opt_recurs with
   | Recursive | SingleModule ->
-    let file = Filename.concat opt_output (fg ?fname m) in
+    let file = Filename.concat (get_output opt_output) (fg ?fname m) in
     let old =
       if Sys.file_exists file then begin
         let backup = file ^ ".bak" in
@@ -147,7 +146,11 @@ let extract_to ?fname m =
     Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
     List.iter (pr ?old ?fname pargs m fmt) mdecls;
     close_out cout
-  | Monolithic -> ()
+  | Monolithic ->
+    let fmt = formatter_of_out_channel stdout in
+    let tname = m.mod_theory.Theory.th_name.Ident.id_string in
+    Debug.dprintf Pdriver.debug "extract module %s standard output@." tname;
+    List.iter (pr ?fname pargs m fmt) mdecls
 
 let extract_to =
   let visited = Ident.Hid.create 17 in
@@ -181,13 +184,6 @@ let do_global_extract (_,p,t) =
   do_extract_module m
 
 let do_extract_module_from fname mm (tname,_,t) =
-(*
-  fprintf fmt
-    "(* This file has been generated from Why3 module %a *)@\n@\n"
-    Print.print_module_name m;
-  let mdecls = Translate.module_ info m in
-  let mdecls = Transform.module_ info mdecls in
-*)
   try
     let m = Mstr.find t mm in do_extract_module ~fname m
   with Not_found ->
@@ -234,7 +230,7 @@ let () =
   try
     Queue.iter do_input opt_queue;
     begin match opt_recurs with
-    | Monolithic -> assert false (*TODO*)
+    | Monolithic -> () (* assert false *) (*TODO*)
     | Recursive | SingleModule -> () end
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
