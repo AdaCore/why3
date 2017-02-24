@@ -150,7 +150,7 @@ let extract_to ?fname m =
     let fmt = formatter_of_out_channel stdout in
     let tname = m.mod_theory.Theory.th_name.Ident.id_string in
     Debug.dprintf Pdriver.debug "extract module %s standard output@." tname;
-    List.iter (pr ?fname pargs m fmt) mdecls
+    List.iter (pr pargs m fmt) mdecls
 
 let extract_to =
   let visited = Ident.Hid.create 17 in

@@ -509,7 +509,8 @@ module Translate = struct
     | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
-      when isconstructor info rs ->
+      when isconstructor info rs && cty.cty_args <> [] ->
+      (* partial application of constructors *)
       mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
       let pvl = app pvl in
@@ -517,8 +518,8 @@ module Translate = struct
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
-    | Eexec ({c_node = Cany}, _) -> raise ExtractionAny
-      (* ML.mk_unit *)
+    | Eexec ({c_node = Cany}, _) -> (* raise ExtractionAny *)
+      ML.mk_unit
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->

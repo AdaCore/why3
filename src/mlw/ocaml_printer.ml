@@ -447,14 +447,14 @@ module Print = struct
     | Dlet ldef ->
       print_let_def info fmt ldef;
       forget_tvs ();
-      fprintf fmt "@\n@\n"
+      fprintf fmt "@\n"
     | Dtype dl ->
       print_list_next newline (print_type_decl info) fmt dl;
-      fprintf fmt "@\n@\n"
+      fprintf fmt "@\n"
     | Dexn (xs, None) ->
-       fprintf fmt "exception %a@\n@\n" print_ident xs.xs_name
+       fprintf fmt "exception %a@\n" print_ident xs.xs_name
     | Dexn (xs, Some t) ->
-      fprintf fmt "@[<hov 2>exception %a of %a@]@\n@\n"
+      fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
         print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
