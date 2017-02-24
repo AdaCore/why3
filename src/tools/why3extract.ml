@@ -19,52 +19,32 @@ let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
   (Filename.basename Sys.argv.(0))
 
+type extract_target =
+  | File   of string
+  | Module of string * string
+  | Symbol of string * string * string
+
 let opt_queue = Queue.create ()
 
 let opt_input = ref None
 
 let add_opt_file x =
-  let tlist = Queue.create () in
-  Queue.push (Some x, tlist) opt_queue;
-  opt_input := Some tlist
-
-let add_opt_theory x =
-  let l = Strings.split '.' x in
-  let p, t = match List.rev l with
-    | t::p -> List.rev p, t
-    | _ -> assert false
-  in
-  match !opt_input, p with
-  | None, [] ->
-      eprintf "Option '-M'/'--module' with a non-qualified \
-        argument requires an input file.@.";
-      exit 1
-  | Some tlist, [] ->
-      Queue.push (x, p, t) tlist
-  | _ ->
-      let tlist = Queue.create () in
-      Queue.push (None, tlist) opt_queue;
-      opt_input := None;
-      Queue.push (x, p, t) tlist
+  let target = match Strings.split '.' x with
+  | [f]     -> File f
+  | [f;m]   -> Module (f, m)
+  | [f;m;s] -> Symbol (f, m, s)
+  | _ -> Format.eprintf "Invalid input argument@."; exit 1 in
+  Queue.push (Some target) opt_queue
 
 let opt_parser = ref None
 let opt_output = ref None
 let opt_driver = ref []
-type extraction_mode = Monolithic | Recursive | SingleModule
-let opt_recurs = ref SingleModule
+type extraction_mode = Recursive | Single
+let opt_recurs = ref Single
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
-  (* TODO: -T/--theory should disappear *)
-  "-T", Arg.String add_opt_theory,
-      "<theory> select <theory> in the input file or in the library";
-  "--theory", Arg.String add_opt_theory,
-      " same as -T";
-  "-M", Arg.String add_opt_theory,
-      "<module> select <module> in the input file or in the library";
-  "--module", Arg.String add_opt_theory,
-      " same as -M";
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
@@ -75,8 +55,6 @@ let option_list = [
       " same as -D";
   "--recursive", Arg.Unit (fun () -> opt_recurs := Recursive),
       " perform a recursive extraction";
-  "--mono", Arg.Unit (fun () -> opt_recurs := Monolithic),
-      " perform a monolithic extraction";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<file|dir> destination of extracted code";
   "--output", Arg.String (fun s -> opt_output := Some s),
@@ -91,22 +69,15 @@ let () =
 
 let opt_recurs = !opt_recurs
 
-type output = Empty | File of string
+type output = Empty | Dir of string
 
-let get_output = function Empty -> assert false | File s -> s
+let get_output = function Empty -> assert false | Dir s -> s
 
 (* FIXME: accept --mono without -o and use to standard output *)
 let opt_output =
-  match !opt_output, opt_recurs with
-  | None, Monolithic ->
-    Empty
-  | None, (Recursive | SingleModule) ->
-    eprintf "Output directory (-o) is required.@."; exit 1
-  | Some d, (Recursive | SingleModule) when not (Sys.file_exists d) ->
-    eprintf "%s: no such directory.@." d; exit 1
-  | Some d, (Recursive | SingleModule) when not (Sys.is_directory d) ->
-    eprintf "%s: not a directory.@." d; exit 1
-  | Some d, _ -> File d
+  match !opt_output with
+  | None   -> Empty
+  | Some d -> Dir d
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
@@ -132,7 +103,7 @@ let extract_to ?fname m =
   let mdecls = Translate.module_ info m in
   let mdecls = Transform.module_ info mdecls.ML.mod_decl in
   match opt_recurs with
-  | Recursive | SingleModule ->
+  | Single ->
     let file = Filename.concat (get_output opt_output) (fg ?fname m) in
     let old =
       if Sys.file_exists file then begin
@@ -146,11 +117,7 @@ let extract_to ?fname m =
     Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
     List.iter (pr ?old ?fname pargs m fmt) mdecls;
     close_out cout
-  | Monolithic ->
-    let fmt = formatter_of_out_channel stdout in
-    let tname = m.mod_theory.Theory.th_name.Ident.id_string in
-    Debug.dprintf Pdriver.debug "extract module %s standard output@." tname;
-    List.iter (pr pargs m fmt) mdecls
+  | Recursive -> assert false (*TODO*)
 
 let extract_to =
   let visited = Ident.Hid.create 17 in
@@ -173,45 +140,50 @@ let rec do_extract_module ?fname m =
     do_extract_module ?fname m'
   in
   begin match opt_recurs with
-  | Recursive | Monolithic -> use_iter extract_use m.mod_units
-  | SingleModule -> ()
+  | Recursive -> use_iter extract_use m.mod_units
+  | Single -> ()
   end;
   extract_to ?fname m
 
-let do_global_extract (_,p,t) =
-  let env = opt_driver.Pdriver.drv_env in
-  let m = read_module env p t in
-  do_extract_module m
+(* let do_global_extract (_,p,t) = *)
+(*   let env = opt_driver.Pdriver.drv_env in *)
+(*   let m = read_module env p t in *)
+(*   do_extract_module m *)
 
-let do_extract_module_from fname mm (tname,_,t) =
+let do_extract_module_from fname mm m =
   try
-    let m = Mstr.find t mm in do_extract_module ~fname m
+    let m = Mstr.find m mm in do_extract_module ~fname m
   with Not_found ->
-    eprintf "Module '%s' not found in file '%s'.@." tname fname;
+    eprintf "Module '%s' not found in file '%s'.@." m fname;
     exit 1
 
-let do_local_extract fname cin tlist =
+let do_extract_symbol_from fname mm m s = () (*TODO*)
+
+let do_local_extract target =
   let env = opt_driver.Pdriver.drv_env in
   let format = !opt_parser in
-  let mm =
-    Env.read_channel ?format mlw_language env fname cin in
-  if Queue.is_empty tlist then begin
+  match target with
+  | File fname ->
+    let cin = open_in fname in
+    let mm = Env.read_channel ?format mlw_language env fname cin in
     let do_m _ m = do_extract_module ~fname m in
     Mstr.iter do_m mm;
-  end
-  else
-    Queue.iter (do_extract_module_from fname mm) tlist
+    close_in cin
+  | Module (fname, m) ->
+    let cin = open_in fname in
+    let mm = Env.read_channel ?format mlw_language env fname cin in
+    do_extract_module_from fname mm m;
+    close_in cin
+  | Symbol (fname, m, s) ->
+    let cin = open_in fname in
+    let mm = Env.read_channel ?format mlw_language env fname cin in
+    do_extract_symbol_from fname mm m s;
+    close_in cin
 
 let do_input = function
-  | None, tlist ->
-    Queue.iter do_global_extract tlist
-  | Some f, tlist ->
-    let fname, cin = match f with
-      | "-" -> "stdin", stdin
-      | f   ->
-        f, open_in f in
-    do_local_extract fname cin tlist;
-    close_in cin
+  | None -> assert false (*TODO*)
+    (* Queue.iter do_global_extract tlist *)
+  | Some target -> do_local_extract target
 
 (*
 let visited = Hid.create 1024
@@ -237,9 +209,9 @@ let monolithic () =
 let () =
   try
     Queue.iter do_input opt_queue;
-    begin match opt_recurs with
-    | Monolithic -> (* monolithic () *) assert false (*TODO*)
-    | Recursive | SingleModule -> () end
+    (* begin match opt_recurs with *)
+    (* | Monolithic -> (\* monolithic () *\) assert false (\*TODO*\) *)
+    (* | Recursive | SingleModule -> () end *)
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
