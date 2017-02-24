@@ -76,7 +76,7 @@ type pattern = private {
   pat_ty   : ty;
 }
 
-and pattern_node = private
+and pattern_node =
   | Pwild
   | Pvar of vsymbol
   | Papp of lsymbol * pattern list
@@ -117,7 +117,7 @@ type term = private {
   t_loc   : Loc.position option;
 }
 
-and term_node = private
+and term_node =
   | Tvar of vsymbol
   | Tconst of Number.constant
   | Tapp of lsymbol * term list

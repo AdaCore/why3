@@ -114,7 +114,7 @@ type expr = private {
   e_loc    : Loc.position option;
 }
 
-and expr_node = private
+and expr_node =
   | Evar    of pvsymbol
   | Econst  of Number.constant
   | Eexec   of cexp * cty
@@ -136,7 +136,7 @@ and cexp = private {
   c_cty  : cty;
 }
 
-and cexp_node = private
+and cexp_node =
   | Capp of rsymbol * pvsymbol list
   | Cpur of lsymbol * pvsymbol list
   | Cfun of expr
