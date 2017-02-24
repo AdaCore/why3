@@ -286,7 +286,7 @@ let add_pdecl_no_logic uc d =
   | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
 
-let add_pdecl uc d =
+let add_pdecl_raw uc d =
   let uc = add_pdecl_no_logic uc d in
   let th = List.fold_left add_decl uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
@@ -327,7 +327,7 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  close_module (add_pdecl uc (create_type_decl [td]))
+  close_module (add_pdecl_raw uc (create_type_decl [td]))
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -350,7 +350,7 @@ let add_pdecl ~vc uc d =
      on built-in theories like TupleN or HighOrd. Also, we expect
      int.Int or any other library theory to be in the context:
      importing them automatically seems to be too invasive. *)
-  add_pdecl (List.fold_left add_pdecl uc dl) d
+  add_pdecl_raw (List.fold_left add_pdecl_raw uc dl) d
 
 (** {2 Cloning} *)
 
@@ -515,7 +515,7 @@ let cl_init_rs cl ({rs_name = id} as rs) rs' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   (* arity and types will be checked when refinement VC is generated *)
   begin match rs.rs_logic, rs'.rs_logic with
-  | RLnone, RLnone | RLlemma, RLlemma -> ()
+  | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
   | RLls ls, RLls ls' -> cl_init_ls cl ls ls'
   | _ -> raise (BadInstance id)
   end;
@@ -907,7 +907,35 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let tdl, vcl = clone_type_decl inst cl tdl in
       if tdl = [] then List.fold_left add_vc uc vcl else
       add_pdecl ~vc:false uc (create_type_decl tdl)
+  | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
+      if c.c_node <> Cany then raise (BadInstance rs.rs_name);
+      let kind = match rs.rs_logic with
+        | RLnone -> RKnone
+        | RLpv _ -> raise (BadInstance rs.rs_name)
+        | RLls ls when ls.ls_value = None -> RKpred
+        | RLls _ -> RKfunc
+        | RLlemma -> RKlemma in
+      let cty = clone_cty cl (sm_of_cl cl) c.c_cty in
+      let rs' = Mrs.find rs inst.mi_rs in
+      let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
+      let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
+        cty.cty_post cty.cty_xpost cty.cty_oldies e in
+      let id = id_clone rs.rs_name in (* FIXME better name *)
+      let ld, _ = let_sym id ~ghost:(rs_ghost rs) ~kind cexp in
+      (* FIXME check ghost status and mask of cexp/ld wrt rs *)
+      (* FIXME check effects of cexp/ld wrt rs *)
+      (* FIXME add correspondance for "let lemma" to cl.pr_table *)
+      let dl = Vc.vc uc.muc_env uc.muc_known (create_let_decl ld) in
+      List.fold_left add_pdecl_raw uc dl
   | PDlet ld ->
+      begin match ld with
+        | LDvar ({pv_vs=vs}, _) when Mvs.mem vs inst.mi_pv ->
+            raise (BadInstance vs.vs_name)
+        | LDrec rdl ->
+            let no_inst { rec_sym = rs } =
+              if Mrs.mem rs inst.mi_rs then raise (BadInstance rs.rs_name) in
+            List.iter no_inst rdl
+        | _ -> () end;
       let reads = match ld with
         | LDvar (_,e) -> e.e_effect.eff_reads
         | LDsym (_,c) -> cty_reads c.c_cty
