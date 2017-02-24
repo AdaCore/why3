@@ -214,7 +214,7 @@ let do_input = function
     close_in cin
 
 (*
-let visited = Hid.create (1 lsl 20)
+let visited = Hid.create 1024
 let toextract = ref []
 
 let rec visit id =
@@ -224,13 +224,21 @@ let rec visit id =
     Hid.add visited id ();
     toextract := id :: !toextract
   end
+
+let monolithic () =
+  (* TODO call visit on all ids to extract *)
+  let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+  let extract id =
+    let d = Hid.find Compile.knownmap id in in
+    pr pargs d in
+  List.iter extract !toextract
 *)
 
 let () =
   try
     Queue.iter do_input opt_queue;
     begin match opt_recurs with
-    | Monolithic -> () (* assert false *) (*TODO*)
+    | Monolithic -> (* monolithic () *) assert false (*TODO*)
     | Recursive | SingleModule -> () end
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
