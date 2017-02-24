@@ -754,11 +754,13 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (contents (data x5)) in forall (xc1:(array uint64)),
   (((length xc1) = (length o43)) /\ forall (i2:Z), ((0%Z <= i2)%Z /\
   (i2 < (length xc1))%Z) -> ((mixfix_lbrb xc1 i2) = (mixfix_lbrb o43 i2))) ->
-  let o44 := ((offset x5) + (to_int i1))%Z in let o45 := (offset x5) in
-  (((value_sub (pelts x5) o45 o44) = (value_sub (elts xc1) o45 o44)) ->
-  forall (o46:int32), ((to_int o46) = ((to_int sy) - (to_int one))%Z) ->
-  forall (xp5:(ptr uint64)) (x6:(ptr uint64)), let xd4 := (mk_ptr (data x6)
-  (offset xd1)) in
+  ((forall (j:Z), (((offset x5) <= j)%Z /\
+  (j < ((offset x5) + (to_int i1))%Z)%Z) -> (((pelts x5) j) = ((elts xc1)
+  j))) -> let o44 := ((offset x5) + (to_int i1))%Z in let o45 :=
+  (offset x5) in (((value_sub (pelts x5) o45 o44) = (value_sub (elts xc1) o45
+  o44)) -> forall (o46:int32),
+  ((to_int o46) = ((to_int sy) - (to_int one))%Z) -> forall (xp5:(ptr
+  uint64)) (x6:(ptr uint64)), let xd4 := (mk_ptr (data x6) (offset xd1)) in
   (((length (contents (data x6))) = (length (contents (data x5)))) ->
   (((xp5 = (mk_ptr (data x6) (offset xp4))) /\
   ((length (contents (data x6))) = (length (contents (data xp4))))) ->
@@ -832,7 +834,7 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (n + m1)%Z) = ((int.Power.power x8 n) * (int.Power.power x8 m1))%Z)))) ->
   ((int.Power.power x7 ((to_int i1) + m)%Z) = ((int.Power.power x7
   (to_int i1)) * (int.Power.power x7
-  m))%Z))))))))))))))))))))))))))))))))))))))))))))))))))))) /\
+  m))%Z)))))))))))))))))))))))))))))))))))))))))))))))))))))) /\
   ((~ ((to_int zero) <= (to_int r))%Z) -> forall (x1:uint64) (xp:(ptr
   uint64)) (x2:(ptr uint64)), ((xp = (mk_ptr (data x2) (offset o2))) /\
   ((length (contents (data x2))) = (length (contents (data o2))))) ->
@@ -986,11 +988,13 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (contents (data x5)) in forall (xc1:(array uint64)),
   (((length xc1) = (length o43)) /\ forall (i2:Z), ((0%Z <= i2)%Z /\
   (i2 < (length xc1))%Z) -> ((mixfix_lbrb xc1 i2) = (mixfix_lbrb o43 i2))) ->
-  let o44 := ((offset x5) + (to_int i1))%Z in let o45 := (offset x5) in
-  (((value_sub (pelts x5) o45 o44) = (value_sub (elts xc1) o45 o44)) ->
-  forall (o46:int32), ((to_int o46) = ((to_int sy) - (to_int one))%Z) ->
-  forall (xp5:(ptr uint64)) (x6:(ptr uint64)), let xd4 := (mk_ptr (data x6)
-  (offset xd1)) in
+  ((forall (j:Z), (((offset x5) <= j)%Z /\
+  (j < ((offset x5) + (to_int i1))%Z)%Z) -> (((pelts x5) j) = ((elts xc1)
+  j))) -> let o44 := ((offset x5) + (to_int i1))%Z in let o45 :=
+  (offset x5) in (((value_sub (pelts x5) o45 o44) = (value_sub (elts xc1) o45
+  o44)) -> forall (o46:int32),
+  ((to_int o46) = ((to_int sy) - (to_int one))%Z) -> forall (xp5:(ptr
+  uint64)) (x6:(ptr uint64)), let xd4 := (mk_ptr (data x6) (offset xd1)) in
   (((length (contents (data x6))) = (length (contents (data x5)))) ->
   (((xp5 = (mk_ptr (data x6) (offset xp4))) /\
   ((length (contents (data x6))) = (length (contents (data xp4))))) ->
@@ -1064,16 +1068,20 @@ Theorem VC_div_sb_qr : forall (q:(ptr uint64)) (x:(ptr uint64)) (y:(ptr
   (n + m1)%Z) = ((int.Power.power x8 n) * (int.Power.power x8 m1))%Z)))) ->
   ((int.Power.power x7 ((to_int i1) + m)%Z) = ((int.Power.power x7
   (to_int i1)) * (int.Power.power x7
-  m))%Z))))))))))))))))))))))))))))))))))))))))))))))))))))))).
+  m))%Z)))))))))))))))))))))))))))))))))))))))))))))))))))))))).
+(* Why3 intros q x y sx sy ((h1,h2),(h3,(h4,(h5,h6)))) one h7 two h8
+        limb_zero h9 zero h10 o h11 minus_one h12 uone h13 o1 h14 o2
+        (h15,h16) o3 h17 o4 (h18,h19) o5 h20 dh h21 o6 h22 dl v h23 o7 h24
+        mdn h25 xd (h26,h27) vy r h28. *)
 intros q x y sx sy ((h1,h2),(h3,(h4,(h5,h6)))) one h7 two h8 limb_zero h9
 zero h10 o h11 minus_one h12 uone h13 o1 h14 o2 (h15,h16) o3 h17 o4 (h18,h19)
 o5 h20 dh h21 o6 h22 dl v h23 o7 h24 mdn h25 xd (h26,h27) vy r h28.
 split.
 intros.
-apply H81.
+apply H82.
 omega. omega.
 intros.
-apply H81.
+apply H82.
 omega. omega.
 Qed.
 
