@@ -26,14 +26,15 @@ type extract_target =
 
 let opt_queue = Queue.create ()
 
-let opt_input = ref None
+(* let opt_input = ref None *)
 
 let add_opt_file x =
-  let target = match Strings.split '.' x with
-  | [f]     -> File f
-  | [f;m]   -> Module (f, m)
-  | [f;m;s] -> Symbol (f, m, s)
-  | _ -> Format.eprintf "Invalid input argument@."; exit 1 in
+  let target =
+    if Sys.file_exists x then File x else match Strings.split '.' x with
+      | [f]     -> File f (* FIXME *)
+      | [f;m]   -> Module (f, m)
+      | [f;m;s] -> Symbol (f, m, s)
+      | _ -> Format.eprintf "Invalid input argument@."; exit 1 in
   Queue.push (Some target) opt_queue
 
 let opt_parser = ref None
@@ -64,8 +65,10 @@ let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let () =
-  if Queue.is_empty opt_queue then
+  if Queue.is_empty opt_queue then begin
+    eprintf "aqui@";
     Whyconf.Args.exit_with_usage option_list usage_msg
+  end
 
 let opt_recurs = !opt_recurs
 
@@ -102,22 +105,19 @@ let extract_to ?fname m =
   } in
   let mdecls = Translate.module_ info m in
   let mdecls = Transform.module_ info mdecls.ML.mod_decl in
-  match opt_recurs with
-  | Single ->
-    let file = Filename.concat (get_output opt_output) (fg ?fname m) in
-    let old =
-      if Sys.file_exists file then begin
-        let backup = file ^ ".bak" in
-        Sys.rename file backup;
-        Some (open_in backup)
-      end else None in
-    let cout = open_out file in
-    let fmt = formatter_of_out_channel cout in
-    let tname = m.mod_theory.Theory.th_name.Ident.id_string in
-    Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
-    List.iter (pr ?old ?fname pargs m fmt) mdecls;
-    close_out cout
-  | Recursive -> assert false (*TODO*)
+  let file = Filename.concat (get_output opt_output) (fg ?fname m) in
+  let old =
+    if Sys.file_exists file then begin
+      let backup = file ^ ".bak" in
+      Sys.rename file backup;
+      Some (open_in backup)
+    end else None in
+  let cout = open_out file in
+  let fmt = formatter_of_out_channel cout in
+  let tname = m.mod_theory.Theory.th_name.Ident.id_string in
+  Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
+  List.iter (pr ?old ?fname pargs m fmt) mdecls;
+  close_out cout
 
 let extract_to =
   let visited = Ident.Hid.create 17 in
@@ -163,18 +163,23 @@ let do_local_extract target =
   let env = opt_driver.Pdriver.drv_env in
   let format = !opt_parser in
   match target with
-  | File fname ->
+  | File fname -> eprintf "ici@.";
     let cin = open_in fname in
+    eprintf "before format@.";
     let mm = Env.read_channel ?format mlw_language env fname cin in
+    eprintf "after format@.";
     let do_m _ m = do_extract_module ~fname m in
     Mstr.iter do_m mm;
     close_in cin
-  | Module (fname, m) ->
+  | Module (fname, m) -> eprintf "ici2@.";
+    let fname = fname ^ ".mlw" in
     let cin = open_in fname in
+    eprintf "before format@.";
     let mm = Env.read_channel ?format mlw_language env fname cin in
+    eprintf "after@.";
     do_extract_module_from fname mm m;
     close_in cin
-  | Symbol (fname, m, s) ->
+  | Symbol (fname, m, s) -> eprintf "ici3@.";
     let cin = open_in fname in
     let mm = Env.read_channel ?format mlw_language env fname cin in
     do_extract_symbol_from fname mm m s;
@@ -183,7 +188,8 @@ let do_local_extract target =
 let do_input = function
   | None -> assert false (*TODO*)
     (* Queue.iter do_global_extract tlist *)
-  | Some target -> do_local_extract target
+  | Some target ->
+    do_local_extract target
 
 (*
 let visited = Hid.create 1024
