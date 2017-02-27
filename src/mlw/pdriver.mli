@@ -38,8 +38,8 @@ val load_driver : Env.env -> string -> string list -> driver
       @param string list additional drivers containing only theories/modules *)
 
 type printer =
-  printer_args -> ?old:in_channel -> ?fname:string -> Pmodule.pmodule ->
-  Compile.ML.decl Pp.pp
+  printer_args -> ?old:in_channel -> ?fname:string -> bool ->
+  Pmodule.pmodule -> Compile.ML.decl Pp.pp
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 

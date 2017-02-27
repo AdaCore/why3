@@ -33,6 +33,7 @@ type info = {
   info_th_known_map : Decl.known_map;
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
+  recursive         : bool;
 }
 
 module Print = struct
@@ -86,7 +87,7 @@ module Print = struct
     fprintf fmt "%s" s
 
   let print_qident ~sanitizer info fmt id =
-    try
+    try if not info.recursive then raise Not_found;
       let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
@@ -458,7 +459,7 @@ module Print = struct
         print_ident xs.xs_name (print_ty ~paren:true info) t
 end
 
-let print_decl pargs ?old ?fname ({mod_theory = th} as m) fmt d =
+let print_decl pargs ?old ?fname recursive ({mod_theory = th} as m) fmt d =
   ignore (old);
   let info = {
     info_syn          = pargs.Pdriver.syntax;
@@ -467,7 +468,8 @@ let print_decl pargs ?old ?fname ({mod_theory = th} as m) fmt d =
     info_current_mo   = Some m;
     info_th_known_map = th.th_known;
     info_mo_known_map = m.mod_known;
-    info_fname        = Opt.map Compile.clean_name fname
+    info_fname        = Opt.map Compile.clean_name fname;
+    recursive         = recursive;
   } in
   Print.print_decl info fmt d;
   fprintf fmt "@."

@@ -183,24 +183,21 @@ module ML = struct
   let add_known_decl id decl k_map =
     Mid.add id decl k_map
 
-  let rec fold_deps_ty pmod = function
-    | Tvar _ -> []
-    | Tapp (id, ty_l) ->
-      let d = Mid.find id pmod.mod_known in
-      d :: List.concat (List.map (fold_deps_ty pmod) ty_l)
-    | Ttuple ty_l -> assert false
+  let rec iter_deps_ty f = function
+    | Tvar _ -> ()
+    | Tapp (id, ty_l) -> f id; List.iter (iter_deps_ty f) ty_l
+    | Ttuple ty_l -> List.iter (iter_deps_ty f) ty_l
 
-  let fold_deps_typedef pmod = function
-    | Ddata constr_l -> assert false
-    | Drecord pjl -> assert false
-    | Dalias ty -> fold_deps_ty pmod ty
+  let iter_deps_typedef f = function
+    | Ddata _constr_l -> assert false
+    | Drecord _pjl -> assert false
+    | Dalias ty -> iter_deps_ty f ty
 
-  let fold_deps_its_defn pmod its_d = match its_d.its_def with
-    | None -> []
-    | Some typedef -> fold_deps_typedef pmod typedef
+  let iter_deps_its_defn f its_d =
+    Opt.iter (iter_deps_typedef f) its_d.its_def
 
-  let fold_deps pmod = function
-    | Dtype its_dl -> List.concat (List.map (fold_deps_its_defn pmod) its_dl)
+  let iter_deps f = function
+    | Dtype its_dl -> List.iter (iter_deps_its_defn f) its_dl
     | _ -> assert false (*TODO*)
 
   let mk_expr e_node e_ity e_effect =
@@ -648,6 +645,12 @@ module Translate = struct
       let add_known = Mid.singleton xs.xs_name decl in
       [decl, add_known]
 
+  let pdecl_m m pd =
+    let info = {
+      info_current_mo   = Some m;
+      info_mo_known_map = m.mod_known; } in
+    pdecl info pd
+
   (* unit module declarations *)
   let mdecl info = function
     | Udecl pd ->
@@ -655,7 +658,10 @@ module Translate = struct
     |  _ -> (* TODO *) []
 
   (* modules *)
-  let module_ info m =
+  let module_ m =
+    let info = {
+      info_current_mo   = Some m;
+      info_mo_known_map = m.mod_known; } in
     let known_m = ref Mid.empty in
     let mk_decl_and_km (decl, known_m_new) =
       known_m := Mid.set_union !known_m known_m_new;
@@ -663,7 +669,7 @@ module Translate = struct
     let comp munit =
       let m = mdecl info munit in List.map mk_decl_and_km m in
     let decl = List.map comp m.mod_units in
-    { ML.mod_decl = List.concat decl; ML.mod_known = !known_m }
+    { ML.mod_decl = List.concat decl; ML.mod_known = !known_m }, info
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | ExtractionAny ->
@@ -746,12 +752,12 @@ module Transform = struct
   and rdef info subst r =
     { r with rec_exp = expr info subst r.rec_exp }
 
-  let decl info = function
+  let pdecl info = function
     | Dtype _ | Dexn _ as d -> d
     | Dlet def -> Dlet (let_def info Mpv.empty def)
 
-  let module_ info  =
-    List.map (decl info)
+  let module_ info m =
+    { m with mod_decl = List.map (pdecl info) m.mod_decl }
 
 end
 

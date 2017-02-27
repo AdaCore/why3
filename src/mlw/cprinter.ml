@@ -79,12 +79,13 @@ let fg ?fname m =
 
 open Format
 
-let pr args ?old ?fname m fmt d =
+let pr args ?old ?fname recursive m fmt d =
   ignore(args);
   ignore(old);
   ignore(m);
   ignore(d);
   ignore(fname);
+  ignore(recursive);
   fprintf fmt "#include <stdio.h>\n\
 \n\
 int main() {\n\
