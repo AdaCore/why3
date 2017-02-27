@@ -88,22 +88,24 @@ let opt_driver =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
+let get_cout_old ?fname fg m = match opt_output with
+  | None ->
+    let tname = m.mod_theory.Theory.th_name.Ident.id_string in
+    Debug.dprintf Pdriver.debug "extract module %s to standard output" tname;
+    stdout, None
+  | Some f ->
+    let file = Filename.concat f (fg ?fname m) in
+    let tname = m.mod_theory.Theory.th_name.Ident.id_string in
+    Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
+    let old = if Sys.file_exists file then begin
+        let backup = file ^ ".bak" in
+        Sys.rename file backup;
+        Some (open_in backup) end else None in
+    open_out file, old
+
 let print_mdecls ?fname m mdecls =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
-  let cout, old = match opt_output with
-    | None ->
-      let tname = m.mod_theory.Theory.th_name.Ident.id_string in
-      Debug.dprintf Pdriver.debug "extract module %s to standard output" tname;
-      stdout, None
-    | Some f ->
-      let file = Filename.concat f (fg ?fname m) in
-      let tname = m.mod_theory.Theory.th_name.Ident.id_string in
-      Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
-      let old = if Sys.file_exists file then begin
-          let backup = file ^ ".bak" in
-          Sys.rename file backup;
-          Some (open_in backup) end else None in
-      open_out file, old in
+  let cout, old = get_cout_old fg m ?fname in
   let fmt = formatter_of_out_channel stdout in
   let recursive = opt_recurs = Recursive in
   List.iter (pr pargs ?old ?fname recursive m fmt) mdecls;
@@ -158,13 +160,8 @@ let get_symbol ns find str_symbol =
   try let symbol = find ns [str_symbol] in Some symbol
   with Not_found -> None
 
-let do_extract_symbol_from fname mlw_file m str_symbol =
-  let pmod =
-    try Mstr.find m mlw_file with Not_found ->
-      eprintf "Module '%s' not found in the file '%s'.@." m fname;
-      exit 1 in
-  let ns = pmod.mod_export in
-  let id = match get_symbol ns ns_find_rs str_symbol with
+let find_symbol_id fname m ns str_symbol =
+  match get_symbol ns ns_find_rs str_symbol with
     | Some rs -> rs.Expr.rs_name
     | None -> (* creative indentation *)
     begin match get_symbol ns ns_find_its str_symbol with
@@ -176,7 +173,17 @@ let do_extract_symbol_from fname mlw_file m str_symbol =
       eprintf "Symbol '%s' not found in module '%s' of file '%s'.@."
         str_symbol m fname;
       exit 1
-    end end in
+    end end
+
+let find_pmod m mlw_file fname =
+  try Mstr.find m mlw_file with Not_found ->
+    eprintf "Module '%s' not found in the file '%s'.@." m fname;
+    exit 1
+
+let do_extract_symbol_from fname mlw_file m str_symbol =
+  let pmod = find_pmod m mlw_file fname in
+  let ns = pmod.mod_export in
+  let id = find_symbol_id fname m ns str_symbol in
   let decl = Ident.Mid.find id pmod.mod_known in
   extract_to ~fname ~decl pmod
 
@@ -209,33 +216,49 @@ let do_input = function
   | Some target ->
     do_local_extract target
 
-(*
-let visited = Hid.create 1024
+let visited = Ident.Hid.create 1024
 let toextract = ref []
 
+let env = opt_driver.Pdriver.drv_env
+
 let rec visit id =
-  if not (Hid.mem id visited) then begin
-    let p = restore_path id in
-    let m = ... module Why3 ... in
+  if not (Ident.Hid.mem visited id) then begin
+    let (_path, t, _q) = Pmodule.restore_path id in
+    let m = read_module env _path t in
     let m = translate_module m in
-    let d = Hid.find m.mod_known id in
+    let d = Ident.Mid.find id m.ML.mod_known in
     ML.iter_deps visit d;
-    Hid.add visited id ();
+    Ident.Hid.add visited id ();
     toextract := id :: !toextract
   end
 
 let flat_extraction () =
-  (* TODO call visit on all ids to extract *)
-  let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
-  let extract id =
-    let d = Hid.find Compile.knownmap id in in
-    pr pargs d in
-  List.iter extract !toextract
-*)
+  Queue.iter (fun target -> match Opt.get target with
+      | File _ -> ()
+      | Module _ -> () (*TODO*)
+      | Symbol (fname, m, s) ->
+        let format = !opt_parser in
+        let fname = fname ^ ".mlw" in
+        let mm = read_mlw_file ?format env fname in
+        let pmod = find_pmod m mm fname in
+        let ns = pmod.mod_export in
+        let id = find_symbol_id fname m ns s in
+        let m = translate_module pmod in
+        visit id;
+        let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+        let extract id =
+          let d = Ident.Mid.find id m.ML.mod_known in
+          let cout, old = get_cout_old ~fname fg pmod in
+          let fmt = formatter_of_out_channel cout in
+          pr ?old ~fname pargs true pmod fmt d;
+          if cout <> stdout then close_out cout in
+        List.iter extract !toextract) opt_queue
 
 let () =
   try
-    Queue.iter do_input opt_queue;
+    match opt_recurs with
+    | Single -> Queue.iter do_input opt_queue
+    | Recursive -> flat_extraction ();
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

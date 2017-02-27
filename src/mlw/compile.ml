@@ -185,19 +185,23 @@ module ML = struct
 
   let rec iter_deps_ty f = function
     | Tvar _ -> ()
-    | Tapp (id, ty_l) -> f id; List.iter (iter_deps_ty f) ty_l
+    | Tapp (id, ty_l) -> Format.eprintf "id here:%s@." id.id_string;
+      f id; Format.eprintf "after@."; List.iter (iter_deps_ty f) ty_l
     | Ttuple ty_l -> List.iter (iter_deps_ty f) ty_l
 
   let iter_deps_typedef f = function
-    | Ddata _constr_l -> assert false
-    | Drecord _pjl -> assert false
+    | Ddata constrl ->
+      List.iter (fun (_, tyl) -> List.iter (iter_deps_ty f) tyl) constrl
+    | Drecord _pjl -> assert false (*TODO*)
     | Dalias ty -> iter_deps_ty f ty
 
   let iter_deps_its_defn f its_d =
     Opt.iter (iter_deps_typedef f) its_d.its_def
 
   let iter_deps f = function
-    | Dtype its_dl -> List.iter (iter_deps_its_defn f) its_dl
+    | Dtype its_dl ->
+      Format.eprintf "here@.";
+      List.iter (iter_deps_its_defn f) its_dl
     | _ -> assert false (*TODO*)
 
   let mk_expr e_node e_ity e_effect =
