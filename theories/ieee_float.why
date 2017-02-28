@@ -340,8 +340,10 @@ theory GenericFloat
   axiom to_real_negative: forall x [is_negative x].
     is_finite x -> to_real x <. 0.0 -> is_negative x
 
-  axiom negative_xor_positive: forall x. not (is_positive x /\ is_negative x)
-  axiom negative_or_positive: forall x. is_finite x -> is_positive x \/ is_negative x
+  axiom negative_xor_positive: forall x.
+    not (is_positive x /\ is_negative x)
+  axiom negative_or_positive: forall x.
+    is_not_nan x -> is_positive x \/ is_negative x
 
   lemma diff_sign_trans:
     forall x y z:t. (diff_sign x y /\ diff_sign y z) -> same_sign x z

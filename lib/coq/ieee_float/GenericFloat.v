@@ -1604,10 +1604,10 @@ destruct x, b; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_or_positive : forall (x:t), (is_finite x) -> ((is_positive
+Lemma negative_or_positive : forall (x:t), (is_not_nan x) -> ((is_positive
   x) \/ (is_negative x)).
 intros x h1.
-destruct x, b; simpl; auto; easy.
+destruct x, b; simpl; auto; now elim h1.
 Qed.
 
 (* Why3 goal *)
