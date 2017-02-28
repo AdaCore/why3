@@ -28,19 +28,23 @@ let opt_queue = Queue.create ()
 
 (* let opt_input = ref None *)
 
-let add_opt_file x =
-  let target =
-    if Sys.file_exists x then File x else match Strings.split '.' x with
-      | [f;m]   -> Module (f, m)
-      | [f;m;s] -> Symbol (f, m, s)
-      | _ -> Format.eprintf "Invalid input argument.@."; exit 1 in
-  Queue.push (Some target) opt_queue
-
 let opt_parser = ref None
 let opt_output = ref None
 let opt_driver = ref []
-type extraction_mode = Recursive | Single
-let opt_recurs = ref Single
+
+type recurs_single = Recursive | Single
+let opt_rec_single = ref Single
+
+type flat_modular = Flat | Modular
+let opt_modu_flat = ref Flat
+
+let add_opt_file x =
+  let target = if Sys.file_exists x then File x else
+      match Strings.split '.' x with
+      | [f;m] -> Module (f, m)
+      | [f;m;s] -> Symbol (f, m, s)
+      | _ -> Format.eprintf "Invalid input argument.@."; exit 1 in
+  Queue.push (Some target) opt_queue
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -53,8 +57,10 @@ let option_list = [
       "<file> specify an extraction driver";
   "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
-  "--recursive", Arg.Unit (fun () -> opt_recurs := Recursive),
+  "--recursive", Arg.Unit (fun () -> opt_rec_single := Recursive),
       " perform a recursive extraction";
+  "--modular", Arg.Unit (fun () -> opt_modu_flat := Modular),
+      " perform a modular extraction";
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<file|dir> destination of extracted code";
   "--output", Arg.String (fun s -> opt_output := Some s),
@@ -68,10 +74,11 @@ let () =
     Whyconf.Args.exit_with_usage option_list usage_msg
   end
 
-let opt_recurs = !opt_recurs
-
 (* FIXME: accept --mono without -o and use to standard output *)
 let opt_output = !opt_output
+
+let opt_rec_single = !opt_rec_single
+let opt_modu_flat  = !opt_modu_flat
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
@@ -91,7 +98,7 @@ let opt_driver =
 let get_cout_old ?fname fg m = match opt_output with
   | None ->
     let tname = m.mod_theory.Theory.th_name.Ident.id_string in
-    Debug.dprintf Pdriver.debug "extract module %s to standard output" tname;
+    Debug.dprintf Pdriver.debug "extract module %s to standard output@." tname;
     stdout, None
   | Some f ->
     let file = Filename.concat f (fg ?fname m) in
@@ -106,8 +113,8 @@ let get_cout_old ?fname fg m = match opt_output with
 let print_mdecls ?fname m mdecls =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let cout, old = get_cout_old fg m ?fname in
-  let fmt = formatter_of_out_channel stdout in
-  let recursive = opt_recurs = Recursive in
+  let fmt = formatter_of_out_channel cout in
+  let recursive = opt_rec_single = Recursive in
   List.iter (pr pargs ?old ?fname recursive m fmt) mdecls;
   if cout <> stdout then close_out cout
 
@@ -123,7 +130,7 @@ let translate_module =
 
 let extract_to ?fname ?decl m =
   let mdecls = match decl with
-    | None -> (translate_module m).ML.mod_decl
+    | None   -> (translate_module m).ML.mod_decl
     | Some d -> List.map fst (Translate.pdecl_m m d) in
   print_mdecls ?fname m mdecls
 
@@ -138,7 +145,7 @@ let rec do_extract_module ?fname m =
     in
     do_extract_module ?fname m'
   in
-  begin match opt_recurs with
+  begin match opt_rec_single with
   | Recursive -> use_iter extract_use m.mod_units
   | Single -> ()
   end;
@@ -221,44 +228,45 @@ let toextract = ref []
 
 let env = opt_driver.Pdriver.drv_env
 
-let rec visit id =
+let rec visit mm id =
   if not (Ident.Hid.mem visited id) then begin
     let (_path, t, _q) = Pmodule.restore_path id in
-    let m = read_module env _path t in
+    let m = Mstr.find t mm in
     let m = translate_module m in
     let d = Ident.Mid.find id m.ML.mod_known in
-    ML.iter_deps visit d;
+    ML.iter_deps (visit mm) d;
     Ident.Hid.add visited id ();
     toextract := id :: !toextract
   end
 
-let flat_extraction () =
-  Queue.iter (fun target -> match Opt.get target with
-      | File _ -> ()
-      | Module _ -> () (*TODO*)
-      | Symbol (fname, m, s) ->
-        let format = !opt_parser in
-        let fname = fname ^ ".mlw" in
-        let mm = read_mlw_file ?format env fname in
-        let pmod = find_pmod m mm fname in
-        let ns = pmod.mod_export in
-        let id = find_symbol_id fname m ns s in
-        let m = translate_module pmod in
-        visit id;
-        let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
-        let extract id =
-          let d = Ident.Mid.find id m.ML.mod_known in
-          let cout, old = get_cout_old ~fname fg pmod in
-          let fmt = formatter_of_out_channel cout in
-          pr ?old ~fname pargs true pmod fmt d;
-          if cout <> stdout then close_out cout in
-        List.iter extract !toextract) opt_queue
+let flat_extraction target = match Opt.get target with (* FIXME *)
+  | File _ -> ()
+  | Module _ -> () (*TODO*)
+  | Symbol (fname, m, s) ->
+    let format = !opt_parser in
+    let fname = fname ^ ".mlw" in
+    let mm = read_mlw_file ?format env fname in
+    let pmod = find_pmod m mm fname in
+    let ns = pmod.mod_export in
+    let id = find_symbol_id fname m ns s in
+    visit mm id;
+    let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
+    let extract id =
+      let (_path, t, _q) = Pmodule.restore_path id in
+      let m = Mstr.find t mm in
+      let m = translate_module m in
+      let d = Ident.Mid.find id m.ML.mod_known in
+      let cout, old = get_cout_old ~fname fg pmod in
+      let fmt = formatter_of_out_channel cout in
+      pr ?old ~fname pargs false pmod fmt d;
+      if cout <> stdout then close_out cout in
+    List.iter extract (List.rev !toextract)
 
 let () =
   try
-    match opt_recurs with
-    | Single -> Queue.iter do_input opt_queue
-    | Recursive -> flat_extraction ();
+    match opt_modu_flat with
+    | Modular -> Queue.iter do_input opt_queue;
+    | Flat -> Queue.iter flat_extraction opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

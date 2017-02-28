@@ -185,8 +185,7 @@ module ML = struct
 
   let rec iter_deps_ty f = function
     | Tvar _ -> ()
-    | Tapp (id, ty_l) -> Format.eprintf "id here:%s@." id.id_string;
-      f id; Format.eprintf "after@."; List.iter (iter_deps_ty f) ty_l
+    | Tapp (id, ty_l) -> f id; List.iter (iter_deps_ty f) ty_l
     | Ttuple ty_l -> List.iter (iter_deps_ty f) ty_l
 
   let iter_deps_typedef f = function
@@ -200,7 +199,6 @@ module ML = struct
 
   let iter_deps f = function
     | Dtype its_dl ->
-      Format.eprintf "here@.";
       List.iter (iter_deps_its_defn f) its_dl
     | _ -> assert false (*TODO*)
 
