@@ -197,9 +197,83 @@ module ML = struct
   let iter_deps_its_defn f its_d =
     Opt.iter (iter_deps_typedef f) its_d.its_def
 
+  let iter_deps_args f =
+    List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg)
+
+  let rec iter_deps_xbranch f (xs, _, e) =
+    f xs.xs_name;
+    iter_deps_expr f e
+
+  and iter_deps_pat_list f patl =
+    List.iter (iter_deps_pat f) patl
+
+  and iter_deps_pat f = function
+    | Pwild | Pident _ -> ()
+    | Papp (ls, patl) ->
+      f ls.ls_name;
+      iter_deps_pat_list f patl
+    | Ptuple patl -> iter_deps_pat_list f patl
+    | Por (p1, p2) ->
+      iter_deps_pat f p1;
+      iter_deps_pat f p2
+    | Pas (p, _) -> iter_deps_pat f p
+
+  and iter_deps_expr f e = match e.e_node with
+    | Econst _ | Evar _ | Eabsurd -> ()
+    | Eapp (rs, exprl) ->
+      f rs.rs_name; List.iter (iter_deps_expr f) exprl
+    | Efun _ -> assert false
+    | Elet (Lvar (_, e1), e2) ->
+      iter_deps_expr f e1;
+      iter_deps_expr f e2
+    | Elet (Lsym (_, ty_result, args, e1), e2) ->
+      iter_deps_ty f ty_result;
+      List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
+      iter_deps_expr f e1;
+      iter_deps_expr f e2
+    | Elet ((Lrec rdef), e) ->
+      List.iter
+        (fun {rec_sym = rs; rec_args = args; rec_exp = e; rec_res = res} ->
+           f rs.rs_name; iter_deps_args f args;
+           iter_deps_expr f e; iter_deps_ty f res) rdef;
+      iter_deps_expr f e
+    | Ematch (e, branchl) ->
+      iter_deps_expr f e;
+      List.iter (fun (p, e) -> iter_deps_pat f p; iter_deps_expr f e) branchl
+    | Eif (e1, e2, e3) ->
+      iter_deps_expr f e1;
+      iter_deps_expr f e2;
+      iter_deps_expr f e3
+    | Eblock exprl ->
+      List.iter (iter_deps_expr f) exprl
+    | Ewhile (e1, e2) ->
+      iter_deps_expr f e1;
+      iter_deps_expr f e2
+    | Efor (_, _, _, _, e) ->
+      iter_deps_expr f e
+    | Eraise (xs, None) ->
+      f xs.xs_name
+    | Eraise (xs, Some e) ->
+      f xs.xs_name;
+      iter_deps_expr f e
+    | Etry (e, xbranchl) ->
+      iter_deps_expr f e;
+      List.iter (iter_deps_xbranch f) xbranchl
+    | Eassign assingl ->
+      List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
+
   let iter_deps f = function
     | Dtype its_dl ->
       List.iter (iter_deps_its_defn f) its_dl
+    | Dlet (Lsym (_rs, ty_result, args, e)) ->
+      iter_deps_ty f ty_result;
+      iter_deps_args f args;
+      iter_deps_expr f e
+    | Dlet (Lrec rdef) ->
+      List.iter
+        (fun {rec_sym = rs; rec_args = args; rec_exp = e; rec_res = res} ->
+           f rs.rs_name; iter_deps_args f args;
+           iter_deps_expr f e; iter_deps_ty f res) rdef
     | _ -> assert false (*TODO*)
 
   let mk_expr e_node e_ity e_effect =
@@ -268,15 +342,11 @@ module Translate = struct
   let type_args = (* point-free *)
     List.map (fun x -> x.tv_name)
 
-  let filter_ghost_params p def l =
-    let rec filter_ghost_params_cps l k =
-      match l with
-      | [] -> k []
-      | e :: r ->
-        filter_ghost_params_cps r
-          (fun fr -> k (if p e then (def e) :: fr else fr))
-    in
-    filter_ghost_params_cps l (fun x -> x)
+  let rec filter_ghost_params p def = function
+    | [] -> []
+    | pv :: l ->
+      if p pv then def pv :: (filter_ghost_params p def l)
+      else filter_ghost_params p def l
 
   let filter2_ghost_params p def al l =
     let rec filter2_ghost_params_cps l k =
@@ -371,10 +441,6 @@ module Translate = struct
       ML.mk_expr (ML.Eapp (rsc, args)) (ML.C cty_app) cty_app.cty_effect in
     ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C cty_app) cty_app.cty_effect
 
-  let app pvl =
-    let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
-    filter_ghost_params pv_not_ghost def pvl
-
   (* function arguments *)
   let filter_params args =
     let args = List.map pvty args in
@@ -385,6 +451,21 @@ module Translate = struct
     | []   -> []
     | args -> let args = filter_params args in
       if args = [] then [ML.mk_var_unit ()] else args
+
+  let filter_params_cty p def pvl cty_args =
+    if List.length pvl <> List.length cty_args then
+      raise (Invalid_argument "Different size lists.@.");
+    let rec loop = function
+      | [], [] -> []
+      | pv :: l1, arg :: l2 ->
+        if p pv && p arg then def pv :: loop (l1, l2)
+        else loop (l1, l2)
+      | _ -> assert false
+    in loop (pvl, cty_args)
+
+  let app pvl cty_args =
+    let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+    filter_params_cty pv_not_ghost def pvl cty_args
 
   let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body_expr eff =
     let i_expr, from_expr, to_expr =
@@ -480,13 +561,12 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
-      let pvl = app pvl in
+      let pvl = app pvl rsf.rs_cty.cty_args in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
       let ein  = expr info ein in
       let res  = ity cty.cty_result in
-      let args =
-        if filter_params cty.cty_args = [] then [ML.mk_var_unit ()] else [] in
+      let args = params cty.cty_args in
       let ml_letrec = ML.Elet (ML.Lsym (rsf, res, args, eapp), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
@@ -512,7 +592,7 @@ module Translate = struct
       (* partial application of constructors *)
       mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
-      let pvl = app pvl in
+      let pvl = app pvl rs.rs_cty.cty_args in
       ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let args = params cty.cty_args in
@@ -527,7 +607,7 @@ module Translate = struct
       let e1 = expr info e1 in
       let pl = List.map (ebranch info) pl in
       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
-    | Eassert _ ->
+    | Eassert _ -> (* ML.mk_expr ML.Ehole ML.ity_unit eff *)
       ML.mk_unit
     | Eif (e1, e2, e3) ->
       let e1 = expr info e1 in

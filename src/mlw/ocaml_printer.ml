@@ -125,8 +125,8 @@ module Print = struct
       print_list2 sep sep_m print1 print2 fmt (r1, r2)
     | _ -> ()
 
-  let print_rs info fmt rs =
-    fprintf fmt "%a" (print_lident info) rs.rs_name
+  let print_rs fmt rs =
+    fprintf fmt "%a" print_ident rs.rs_name
 
   (** Types *)
 
@@ -194,9 +194,9 @@ module Print = struct
     | Pwild ->
        fprintf fmt "_"
     | Pident id ->
-       print_ident fmt id
+       (print_lident info) fmt id
     | Pas (p, id) ->
-       fprintf fmt "%a as %a" (print_pat info) p print_ident id
+       fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
     | Por (p1, p2) ->
        fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
     | Ptuple pl ->
@@ -211,7 +211,7 @@ module Print = struct
         | []  -> print_papp info ls fmt pl
         | pjl ->
           fprintf fmt "@[<hov 2>{ %a}@]"
-            (print_list2 semi equal (print_rs info) (print_pat info)) (pjl, pl)
+            (print_list2 semi equal print_rs (print_pat info)) (pjl, pl)
 
   and print_papp info ls fmt = function
     | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
@@ -260,21 +260,25 @@ module Print = struct
     | _, _, tl when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]"
         (print_list comma (print_expr info)) tl
-    | _, _, [] ->
-      print_ident fmt rs.rs_name
     | _,  _, [t1] when isfield ->
-      fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
+      fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
     | _, _, tl when isconstructor () ->
       let pjl = get_record info rs in
-      if pjl = [] then
-        fprintf fmt "@[<hov 2>%a (%a)@]"
-          print_ident rs.rs_name (print_list comma (print_expr info)) tl
-      else
-        fprintf fmt "@[<hov 2>{ %a}@]"
-          (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
+      begin match pjl, tl with
+        | [], [] ->
+          (print_uident info) fmt rs.rs_name
+        | [], tl ->
+          fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
+            (print_list comma (print_expr info)) tl
+        | pjl, tl ->
+          fprintf fmt "@[<hov 2>{ %a}@]"
+            (print_list2 semi equal print_rs (print_expr info)) (pjl, tl)
+      end
+    | _, _, [] ->
+      (print_lident info) fmt rs.rs_name
     | _, _, tl ->
-      fprintf fmt "@[<hov 2>%a %a@]"
-        print_ident rs.rs_name (print_list space (print_expr ~paren:true info)) tl
+      fprintf fmt "@[<hov 2>%a %a@]" (print_lident info) rs.rs_name
+        (print_list space (print_expr ~paren:true info)) tl
 
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
@@ -333,8 +337,8 @@ module Print = struct
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
         fprintf fmt "%a.%a <-@ %a"
-          print_ident (pv_name rho) print_ident rs.rs_name
-          print_ident (pv_name pv) in
+          (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
+          (print_lident info) (pv_name pv) in
       begin match al with
       | [] -> assert false | [a] -> assign fmt a
       | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
@@ -427,7 +431,7 @@ module Print = struct
                (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
       fprintf fmt "%s%a: %a;" (if is_mutable then "mutable " else "")
-        print_ident id (print_ty ~paren:false info) ty in
+        (print_lident info) id (print_ty ~paren:false info) ty in
     let print_def fmt = function
       | None ->
         ()
@@ -453,10 +457,10 @@ module Print = struct
       print_list_next newline (print_type_decl info) fmt dl;
       fprintf fmt "@\n"
     | Dexn (xs, None) ->
-       fprintf fmt "exception %a@\n" print_ident xs.xs_name
+       fprintf fmt "exception %a@\n" (print_uident info) xs.xs_name
     | Dexn (xs, Some t) ->
       fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
-        print_ident xs.xs_name (print_ty ~paren:true info) t
+        (print_uident info) xs.xs_name (print_ty ~paren:true info) t
 end
 
 let print_decl pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d =

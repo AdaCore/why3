@@ -38,7 +38,7 @@ let opt_rec_single = ref Single
 type flat_modular = Flat | Modular
 let opt_modu_flat = ref Flat
 
-let is_uppercase c = c = Char.uppercase c
+let is_uppercase c = c = Char.uppercase_ascii c
 
 let add_opt_file x =
   let invalid_path () = Format.eprintf "invalid path: %s@." x; exit 1 in
@@ -95,11 +95,24 @@ let () =
     Whyconf.Args.exit_with_usage option_list usage_msg
   end
 
-(* FIXME: accept --mono without -o and use to standard output *)
-let opt_output = !opt_output
-
 let opt_rec_single = !opt_rec_single
 let opt_modu_flat  = !opt_modu_flat
+
+(* FIXME: accept --mono without -o and use to standard output *)
+let opt_output = match opt_modu_flat, !opt_output with
+  | Modular, None ->
+    eprintf "Output directory (-o) is required for modular extraction.@.";
+    exit 1
+  | Modular, Some s when not (Sys.file_exists s) ->
+    eprintf "Option '-o' should be given an existing directory as argument.@.";
+    exit 1
+  | Modular, Some s when not (Sys.is_directory s) ->
+    eprintf "Option '-o' should be given a directory as argument.@.";
+    exit 1
+  | Flat, Some s when Sys.is_directory s ->
+    eprintf "Option '-o' should not be given a directory as argument.@.";
+    exit 1
+  | Modular, Some _ | Flat, None | Flat, Some _ -> !opt_output
 
 let driver_file s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
@@ -255,17 +268,20 @@ let find_decl mm id =
 
 let rec visit mm id =
   if not (Ident.Hid.mem visited id) then begin
-    let d = find_decl mm id in
-    ML.iter_deps (visit mm) d;
-    Ident.Hid.add visited id ();
-    toextract := id :: !toextract
+    try
+      let d = find_decl mm id in
+      (* Can I change these the two lines (* *) ? *)
+      Ident.Hid.add visited id (); (* *)
+      ML.iter_deps (visit mm) d;   (* *)
+      toextract := id :: !toextract
+    with Not_found -> ()
   end
 
 let visit mm id =
   if opt_rec_single = Recursive then visit mm id
   else toextract := id :: !toextract
 
-let flat_extraction target = match Opt.get target with (* FIXME *)
+let flat_extraction target = match Opt.get target with
   | File _ -> ()
   (*  let format = !opt_parser in
       read_mlw_file ?format env fname *)
@@ -284,23 +300,22 @@ let flat_extraction target = match Opt.get target with (* FIXME *)
 let () =
   try
     match opt_modu_flat with
-    | Modular ->
-      Queue.iter do_input opt_queue
+    | Modular -> Queue.iter do_input opt_queue
     | Flat ->
       Queue.iter flat_extraction opt_queue;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let mm = Mstr.empty in
+      let cout = match opt_output with
+          | None -> stdout
+          | Some file -> open_out file in
+      let fmt = formatter_of_out_channel cout in
       let extract id =
         let pm = find_module_id mm id in
         let m = translate_module pm in
         let d = Ident.Mid.find id m.ML.mod_known in
-        let cout = match opt_output with
-          | None -> stdout
-          | Some file -> open_out file in
-        let fmt = formatter_of_out_channel cout in
-        pr pargs false pm fmt d;
-        if cout <> stdout then close_out cout in
-      List.iter extract (List.rev !toextract)
+        pr pargs ~flat:true pm fmt d in
+      List.iter extract (List.rev !toextract);
+      if cout <> stdout then close_out cout
 
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

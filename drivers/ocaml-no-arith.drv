@@ -43,6 +43,10 @@ theory list.List
   syntax function Cons "%1 :: %2"
 end
 
+theory list.Length
+  syntax function length "List.length %1"
+end
+
 theory list.Mem
   syntax predicate mem "List.mem %1 %2"
 end
