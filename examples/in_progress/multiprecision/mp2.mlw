@@ -5109,7 +5109,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     assert { value_sub_shift y 2 = dl + radix * dh };
     let i = ref (Int32.(-) sx two) in
     let dinv = reciprocal_word_3by2 dh dl in
-    ("vc:sp" if (Limb.(>=) !rh dh && (Limb.(>) !rh dh || Limb.(>=) !rl dl))
+    ("vc:sp" if (Limb.(>=) !rh dh && ("vc:sp" Limb.(>) !rh dh || Limb.(>=) !rl dl))
     then
       label Adjust in
       begin
@@ -5166,8 +5166,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ensures { !rl + radix * !rh < dl + radix * dh }
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
-      end
-    );
+      end);
     while (Int32.(>) !i zero) do
       variant { p2i !i }
       invariant { 0 <= !i <= sx - 2 }
@@ -5202,7 +5201,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     + value_sub_shift x !i
                     + power radix (!i) * (!rl + radix * !rh)
                by
-                 value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
+                  value_sub_shift x k = value_sub_shift x !i + power radix !i * !lx
+               so value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
                  = qu + radix
                         * value_sub (pelts q) (q.offset + k) (q.offset + sx - 2)
                so power radix (sx - 2 - !i) = radix * power radix (sx - 2 - k)
