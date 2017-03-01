@@ -5120,6 +5120,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     + value_sub_shift x !i
                     + power radix (!i) * (!rl + radix * !rh) }
         ensures { !rl + radix * !rh < dl + radix * dh }
+        ensures { !qh = 1 }
         let (r0, b) = sub_with_borrow !rl dl uzero in
         let (r1, b') = sub_with_borrow !rh dh b in
         assert { b' = 0 };
@@ -5164,6 +5165,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     + value_sub_shift x !i
                     + power radix (!i) * (!rl + radix * !rh) }
         ensures { !rl + radix * !rh < dl + radix * dh }
+        ensures { !qh = 0 }
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
       end);
@@ -5184,14 +5186,24 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let ghost k = p2i !i in
       xp := C.incr !xp minus_one;
       lx := C.get !xp;
+      label Got in
       let (qu, r0, r1) = div3by2_inv !rh !rl !lx dh dl dinv in
       rh := r1;
       rl := r0;
       i := Int32.(-) !i one;
       C.set_ofs q !i qu;
-      assert { qu * (dl + radix * dh) + !rl + radix * !rh
-               = !lx + radix * !rl at StartLoop
-                 + radix * radix * !rh at StartLoop };
+      assert { qu * (dl + radix * dh) + r0 + radix * r1
+               = !lx + radix * (!rl at StartLoop)
+                     + radix * radix * (!rh at StartLoop)
+               by
+                 radix * ((!rl at StartLoop) + radix * (!rh at StartLoop))
+                 = radix * (!rl at StartLoop) + radix * radix * (!rh at StartLoop)
+               so
+                 qu * (dl + radix * dh) + r0 + radix * r1
+               = !lx + radix * ((!rl at StartLoop) + radix * (!rh at StartLoop))
+               = !lx + radix * (!rl at StartLoop)
+                     + radix * radix * (!rh at StartLoop)
+             };
       value_sub_head (pelts q) (q.offset + p2i !i) (q.offset + p2i sx - 2);
       value_sub_tail (pelts x) x.offset (x.offset + p2i !i);
       assert { value_sub_shift x sx
@@ -5265,8 +5277,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                       * value_sub_shift y 2 * power radix k
                     + value_sub_shift x !i
                     + power radix !i
-                      * (!lx + radix * !rl at StartLoop
-                         + radix * radix * !rh at StartLoop)
+                      * (!lx + radix * (!rl at StartLoop)
+                         + radix * radix * (!rh at StartLoop))
                   = (value_sub (pelts q) (q.offset + k)
                                            (q.offset + sx - 2)
                                + !qh * power radix (sx - 2 - k))
@@ -5292,8 +5304,16 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   = value_sub_shift x sx
           };
     done;
+    assert { !i = 0 };
+    assert { value_sub_shift x sx
+             = (value_sub (pelts q) q.offset (q.offset + sx - 2)
+                      + !qh * power radix (sx - 2))
+                    * value_sub_shift y 2
+                    + !rl + radix * !rh
+             by power radix !i = 1 };
     C.set_ofs x one !rh;
     C.set x !rl;
+    assert { value_sub_shift x 2 = !rl + radix * !rh };
     !qh
 
 
