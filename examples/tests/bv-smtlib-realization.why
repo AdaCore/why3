@@ -19,7 +19,7 @@ theory BV_Check
   use import bv.Pow2int
 
   lemma two_power_size_val : two_power_size = pow2 size
-  lemma max_int_val : max_int = two_power_size - 1
+  lemma max_int_val : t'maxInt = two_power_size - 1
 
   lemma to_uint_extensionality :
     forall v,v':t. t'int v = t'int v' -> v = v'
@@ -34,10 +34,10 @@ theory BV_Check
 
   lemma Of_int_zero: zeros = of_int 0
 
-  lemma Of_int_ones: ones = of_int max_int
+  lemma Of_int_ones: ones = of_int t'maxInt
 
   goal nth_out_of_bound:
-    forall x n. size <= n <= max_int -> nth x n = False
+    forall x n. size <= n <= t'maxInt -> nth x n = False
 
   goal Nth_zero: forall n:int. 0 <= n < size -> nth zeros n = False
 

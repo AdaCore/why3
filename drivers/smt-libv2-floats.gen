@@ -57,9 +57,8 @@ end
 theory ieee_float.Float32
   (* Part I *)
   syntax type t "Float32"
-
-  syntax converter from_binary "((_ to_fp 8 24) ((_ int2bv 32) %1))"
-  syntax converter (!_) "((_ to_fp 8 24) %1 %2)"
+  meta "literal:keep" type t
+  syntax literal t "(fp #b%s1b #b%e8b #b%m23b)"
 
   syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
 
@@ -69,9 +68,8 @@ end
 theory ieee_float.Float64
   (* Part I *)
   syntax type t "Float64"
-
-  syntax converter from_binary "((_ to_fp 11 53) ((_ int2bv 64) %1))"
-  syntax converter (!_) "((_ to_fp 11 53) %1 %2)"
+  meta "literal:keep" type t
+  syntax literal t "(fp #b%s1b #b%e11b #b%m52b)"
 
   syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
 

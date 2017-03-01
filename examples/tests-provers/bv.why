@@ -2,19 +2,19 @@ theory CheckBV64
   use import bv.BV64
   use int.Int
 
-  constant one   : t                                         = of_int 1
-  constant two   : t                                         = of_int 2
+  constant one   : t                                         = 1
+  constant two   : t                                         = 2
   constant sz    : int                                       = 64
-  constant mx    : int                                       =        0xFFFF_FFFF_FFFF_FFFF
-  constant md    : int                                       =      0x1_0000_0000_0000_0000
-  constant lastb : t                                         = of_int 0x8000_0000_0000_0000
+  constant mx    : int                                       = 0xFFFF_FFFF_FFFF_FFFF
+  constant md    : int                                       = 0x1_0000_0000_0000_0000
+  constant lastb : t                                         = 0x8000_0000_0000_0000
 
-  goal ok_zero   : zeros                                     = (of_int 0)
+  goal ok_zero   : zeros                                     = (0:t)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : t'int zeros                             = 0
-  goal ok_ones2  : t'int ones                              = mx
+  goal ok_zero2  : t'int zeros                               = 0
+  goal ok_ones2  : t'int ones                                = mx
   goal ok_size   : size                                      = sz
-  goal ok_max    : max_int                                   = mx
+  goal ok_max    : t'maxInt                                     = mx
   goal ok_tpsize : two_power_size                            = md
 
   goal ok1       : add ones one                              = zeros
@@ -57,15 +57,15 @@ theory CheckBV64
 
   (* from example/logic/bitvectors.why *)
 
-  constant b0000  : t                                        = of_int 0b0000
-  constant b0001  : t                                        = of_int 0b0001
-  constant b0010  : t                                        = of_int 0b0010
-  constant b0011  : t                                        = of_int 0b0011
-  constant b0110  : t                                        = of_int 0b0110
-  constant b0101  : t                                        = of_int 0b0101
-  constant b0111  : t                                        = of_int 0b0111
-  constant b1100  : t                                        = of_int 0b1100
-  constant b11100 : t                                        = of_int 0b11100
+  constant b0000  : t                                        = 0b0000
+  constant b0001  : t                                        = 0b0001
+  constant b0010  : t                                        = 0b0010
+  constant b0011  : t                                        = 0b0011
+  constant b0110  : t                                        = 0b0110
+  constant b0101  : t                                        = 0b0101
+  constant b0111  : t                                        = 0b0111
+  constant b1100  : t                                        = 0b1100
+  constant b11100 : t                                        = 0b11100
 
   constant size_sub_one : int                                = Int.(-) size 1
 
@@ -76,23 +76,23 @@ theory CheckBV64
   goal f2 :  bw_or b0011 b0110                               = b0110
 
   goal g3 :  bw_xor b0011 b0110                              = b0101
-  goal g4 :  bw_not b0011                                    = (of_int 0xFFFFFFFFFFFFFFFC)
+  goal g4 :  bw_not b0011                                    = (0xFFFFFFFFFFFFFFFC:t)
 
-  goal g3a : lsr_bv b0111 (of_int 2)                         = b0001
+  goal g3a : lsr_bv b0111 (2:t)                              = b0001
   goal g3b : lsr_bv ones (of_int size_sub_one)               = b0001
-  goal f3  : lsr_bv ones (of_int 0x100000001)                = (of_int 0x7FFFFFFF)
+  goal f3  : lsr_bv ones (0x100000001:t)                     = (0x7FFFFFFF:t)
 
-  goal g4a : lsl_bv b0111 (of_int 2)                         = b11100
-  goal g4b : lsl_bv b0001 (of_int 31)                        = (of_int 0x80000000)
+  goal g4a : lsl_bv b0111 (2:t)                              = b11100
+  goal g4b : lsl_bv b0001 (31:t)                             = (0x80000000:t)
 
-  goal g5a : asr_bv b0111 (of_int 2)                         = b0001
+  goal g5a : asr_bv b0111 (2:t)                              = b0001
   goal g5b : asr_bv ones (of_int (Int.(-) size 1))           = ones
 
   goal g7 : t'int b11100                                   = 28
   goal f7 : t'int ones                                     = Int.(-_) 1
 
-  goal g8a : nth_bv b0110 (of_int 2)                         = True
-  goal g8b : nth_bv b0110 (of_int 3)                         = False
+  goal g8a : nth_bv b0110 (2:t)                              = True
+  goal g8b : nth_bv b0110 (3:t)                              = False
 
   goal Nth_Bv_bw_and:
     forall v1 v2 n. ult n size_bv ->
@@ -145,19 +145,19 @@ theory CheckBV32
   use import bv.BV32
   use int.Int
 
-  constant one   : t                                         = of_int 1
-  constant two   : t                                         = of_int 2
+  constant one   : t                                         = 1
+  constant two   : t                                         = 2
   constant sz    : int                                       = 32
   constant mx    : int                                       = 0xFFFFFFFF
   constant md    : int                                       = 0x100000000
-  constant lastb : t                                         = of_int 0x80000000
+  constant lastb : t                                         = 0x80000000
 
-  goal ok_zero   : zeros                                     = (of_int 0)
+  goal ok_zero   : zeros                                     = (0:t)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : t'int zeros                             = 0
-  goal ok_ones2  : t'int ones                              = mx
+  goal ok_zero2  : t'int zeros                               = 0
+  goal ok_ones2  : t'int ones                                = mx
   goal ok_size   : size                                      = sz
-  goal ok_max    : max_int                                   = mx
+  goal ok_max    : t'maxInt                                     = mx
   goal ok_tpsize : two_power_size                            = md
 
   goal ok1       : add ones one                              = zeros
@@ -203,19 +203,19 @@ theory CheckBV16
   use import bv.BV16
   use int.Int
 
-  constant one   : t                                         = of_int 1
-  constant two   : t                                         = of_int 2
+  constant one   : t                                         = 1
+  constant two   : t                                         = 2
   constant sz    : int                                       = 16
   constant mx    : int                                       = 65535
   constant md    : int                                       = 65536
-  constant lastb : t                                         = of_int 32768
+  constant lastb : t                                         = 32768
 
-  goal ok_zero   : zeros                                     = (of_int 0)
+  goal ok_zero   : zeros                                     = (0:t)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : t'int zeros                             = 0
-  goal ok_ones2  : t'int ones                              = mx
+  goal ok_zero2  : t'int zeros                               = 0
+  goal ok_ones2  : t'int ones                                = mx
   goal ok_size   : size                                      = sz
-  goal ok_max    : max_int                                   = mx
+  goal ok_max    : t'maxInt                                     = mx
   goal ok_tpsize : two_power_size                            = md
 
   goal ok1       : add ones one                              = zeros
@@ -261,19 +261,19 @@ theory CheckBV8
   use import bv.BV8
   use int.Int
 
-  constant one   : t                                         = of_int 1
-  constant two   : t                                         = of_int 2
+  constant one   : t                                         = 1
+  constant two   : t                                         = 2
   constant sz    : int                                       = 8
   constant mx    : int                                       = 255
   constant md    : int                                       = 256
-  constant lastb : t                                         = of_int 128
+  constant lastb : t                                         = 128
 
-  goal ok_zero   : zeros                                     = (of_int 0)
+  goal ok_zero   : zeros                                     = (0:t)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : t'int zeros                             = 0
-  goal ok_ones2  : t'int ones                              = mx
+  goal ok_zero2  : t'int zeros                               = 0
+  goal ok_ones2  : t'int ones                                = mx
   goal ok_size   : size                                      = sz
-  goal ok_max    : max_int                                   = mx
+  goal ok_max    : t'maxInt                                     = mx
   goal ok_tpsize : two_power_size                            = md
 
   goal ok1       : add ones one                              = zeros

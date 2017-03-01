@@ -64,12 +64,6 @@ theory GenericFloat
   (* [m;x] = ( 1 + m * 2^(1-eb) ) * 2^( x - exp_bias ) *)
   (* max_value = [2^(eb-1); 2^sb - 2] *)
 
-  (* constructor, perform an unchecked convertion from the binary *)
-  (* representation of a float. this is a workaround and should   *)
-  (* only be used for literals!                                   *)
-  function from_binary      int  : t
-  function (!)         mode real : t (* constructor from real literals *)
-
   (* {3 Operators} *)
 
   function abs      t   : t
@@ -489,8 +483,6 @@ theory GenericFloat
     no_overflow m (to_real x *. to_real y +. to_real z) /\
     to_real (fma m x y z) = round m (to_real x *. to_real y +. to_real z)
 
-  (* /!\ externalize square root? more generally, externalize any part
-         that needs another theory ? /!\ *)
   use real.Square
 
   axiom sqrt_finite: forall m:mode, x:t [sqrt m x].
@@ -699,19 +691,6 @@ theory GenericFloat
   axiom int_to_real: forall m x.
     is_int x -> to_real x = FromInt.from_int (to_int m x)
 
-  (* exact arithmetic with integers (alt) *)
-(* axiom int_add_exact: forall m n, i j.
-    is_int i -> is_int j -> in_safe_int_range (to_int m i + to_int m j) ->
-      to_int m (add n i j) = to_int m i + to_int m j
-
-  axiom int_sub_exact: forall m n, i j.
-    is_int  i -> is_int j -> in_safe_int_range (to_int m i - to_int m j) ->
-      to_int m (sub n i j) = to_int m i - to_int m j
-
-  axiom int_mul_exact: forall m n, i j.
-    is_int i -> is_int j -> in_safe_int_range (to_int m i * to_int m j) ->
-      to_int m (mul n i j) = to_int m i * to_int m j *)
-
 (*  axiom int_mode: forall m1 m2 x.
     is_int x -> to_int m1 x = to_int m2 x  etc ...*)
 
@@ -803,7 +782,6 @@ theory Float_BV_Converter
   use import RoundingMode
 
   (* with unsigned int as bitvector *)
-  (* /!\ factorise to not have systematically all bv theories used  *)
   type t                        (* float *)
 
   function of_ubv8  mode BV8.t  : t
@@ -842,31 +820,31 @@ theory Float_BV_Converter
     forall m, x y. BV64.ule x y -> le (of_ubv64 m x) (of_ubv64 m y)
 
   axiom of_ubv8_to_real : forall m, x.
-    to_real (of_ubv8  m x) = FromInt.from_int (BV8.to_uint x)
+    to_real (of_ubv8  m x) = FromInt.from_int (BV8.t'int x)
   axiom of_ubv16_to_real: forall m, x.
-    to_real (of_ubv16 m x) = FromInt.from_int (BV16.to_uint x)
+    to_real (of_ubv16 m x) = FromInt.from_int (BV16.t'int x)
   (* of_ubv32_to_real is defined at cloning *)
   axiom of_ubv64_to_real: forall m, x.
-    to_real (of_ubv64 m x) = round m (FromInt.from_int (BV64.to_uint x))
+    to_real (of_ubv64 m x) = round m (FromInt.from_int (BV64.t'int x))
 end
 
 theory Float32
   use int.Int
   use import real.Real
 
-  type t
+  type t = < float 8 24 >
 
   constant pow2sb : int = 16777216
   constant max_real : real = 0x1.FFFFFEp127
-  constant eb : int = 8
-  constant sb : int = 24
 
   clone export GenericFloat with
     type t = t,
-    constant eb = eb,
-    constant sb = sb,
+    constant eb = t'eb,
+    constant sb = t'sb,
     constant max_real = max_real,
     constant pow2sb = pow2sb,
+    function to_real = t'real,
+    predicate is_finite = t'isFinite,
     goal eb_gt_1,
     goal sb_gt_1,
     goal max_int,
@@ -887,19 +865,19 @@ theory Float64
   use int.Int
   use import real.Real
 
-  type t
+  type t = < float 11 53 >
 
   constant pow2sb : int = 9007199254740992
   constant max_real : real = 0x1.FFFFFFFFFFFFFp1023
-  constant eb : int = 11
-  constant sb : int = 53
 
   clone export GenericFloat with
     type t = t,
-    constant eb = eb,
-    constant sb = sb,
+    constant eb = t'eb,
+    constant sb = t'sb,
     constant max_real = max_real,
     constant pow2sb = pow2sb,
+    function to_real = t'real,
+    predicate is_finite = t'isFinite,
     goal eb_gt_1,
     goal sb_gt_1,
     goal max_int,
@@ -931,15 +909,15 @@ theory FloatConverter
     Float64.round m1 (Float32.round m2 x) = Float32.round m2 x
 
   lemma to_float64_exact:
-    forall m:mode, x:Float32.t. Float32.is_finite x ->
-      Float64.is_finite (to_float64 m x)
-   /\ Float64.to_real (to_float64 m x) = Float32.to_real x
+    forall m:mode, x:Float32.t. Float32.t'isFinite x ->
+      Float64.t'isFinite (to_float64 m x)
+   /\ Float64.t'real (to_float64 m x) = Float32.t'real x
 
   lemma to_float32_conv:
-    forall m:mode, x:Float64.t. Float64.is_finite x ->
-      Float32.no_overflow m (Float64.to_real x) ->
-        Float32.is_finite (to_float32 m x)
-     /\ Float32.to_real (to_float32 m x) = Float32.round m (Float64.to_real x)
+    forall m:mode, x:Float64.t. Float64.t'isFinite x ->
+      Float32.no_overflow m (Float64.t'real x) ->
+        Float32.t'isFinite (to_float32 m x)
+     /\ Float32.t'real (to_float32 m x) = Float32.round m (Float64.t'real x)
 
 end
 
@@ -948,13 +926,13 @@ theory Float32_BV_Converter
 
   clone export Float_BV_Converter with
     type t = t,
-    predicate is_finite = is_finite,
+    predicate is_finite = t'isFinite,
     predicate le = (.<=),
-    function to_real = to_real,
+    function to_real = t'real,
     function round = round
 
   axiom of_ubv32_to_real : forall m, x.
-    to_real (of_ubv32 m x) = round m (FromInt.from_int (BV32.to_uint x))
+    t'real (of_ubv32 m x) = round m (FromInt.from_int (BV32.t'int x))
 end
 
 theory Float64_BV_Converter
@@ -962,11 +940,11 @@ theory Float64_BV_Converter
 
   clone export Float_BV_Converter with
     type t = t,
-    predicate is_finite = is_finite,
+    predicate is_finite = t'isFinite,
     predicate le = (.<=),
-    function to_real = to_real,
+    function to_real = t'real,
     function round = round
 
   axiom of_ubv32_to_real : forall m, x.
-    to_real (of_ubv32 m x) = FromInt.from_int (BV32.to_uint x)
+    t'real (of_ubv32 m x) = FromInt.from_int (BV32.t'int x)
 end

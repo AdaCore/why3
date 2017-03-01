@@ -51,7 +51,7 @@ let rec abstract_terms kn range_metas float_metas type_kept acc t =
   | _ ->
       t_map_fold (abstract_terms kn range_metas float_metas type_kept) acc t
 
-let elim le_int le_real abs_real type_kept kn
+let elim le_int le_real neg_real type_kept kn
     range_metas float_metas d (known_lit,task) =
   match d.d_node with
   | Dtype ts when Mts.exists (fun ts' _ -> ts_equal ts ts') range_metas
@@ -98,11 +98,13 @@ let elim le_int le_real abs_real type_kept kn
       let m_string = Format.flush_str_formatter () in
       Number.print_in_base 10 None Format.str_formatter e;
       let e_string = Format.flush_str_formatter () in
-      let term = t_const
+      let max_term = t_const
           (Number.ConstReal
              (Number.real_const_hex m_string "" (Some e_string))) ty_real in
       (* compose axiom *)
-      let f = t_app le_real [t_app abs_real [v_term] (Some ty_real); term] None in
+      let f = t_and (t_app le_real [t_app neg_real [max_term] (Some ty_real); v_term] None)
+          (t_app le_real [v_term; max_term] None) in
+        (* t_app le_real [t_app abs_real [v_term] (Some ty_real); term] None in *)
       let f = t_implies (t_app is_finite [t_var v] None) f in
       let f = t_forall_close [v] [] f in
       let ax_decl = create_prop_decl Paxiom pr f in
@@ -116,11 +118,11 @@ let elim le_int le_real abs_real type_kept kn
       let t = List.fold_left Task.add_decl task (List.rev local_decl) in
       (known_lit, Task.add_decl t d)
 
-let eliminate le_int le_real abs_real type_kept
+let eliminate le_int le_real neg_real type_kept
     range_metas float_metas t (known_lit, acc) =
   match t.Task.task_decl.td_node with
   | Decl d ->
-      elim le_int le_real abs_real type_kept
+      elim le_int le_real neg_real type_kept
         t.Task.task_known range_metas float_metas d (known_lit, acc)
   | Meta (m, [MAts ts]) when meta_equal m meta_keep_lit ->
       let td = create_meta Libencoding.meta_kept [MAty (ty_app ts [])] in
@@ -135,8 +137,7 @@ let eliminate_literal env =
   let le_int = ns_find_ls th.th_export ["infix <="] in
   let th = Env.read_theory env ["real"] "Real" in
   let le_real = ns_find_ls th.th_export ["infix <="] in
-  let th = Env.read_theory env ["real"] "Abs" in
-  let abs_real = ns_find_ls th.th_export ["abs"] in
+  let neg_real = ns_find_ls th.th_export ["prefix -"] in
   Trans.on_meta meta_range (fun range_metas ->
       Trans.on_meta meta_float (fun float_metas ->
           let range_metas = List.fold_left (fun acc meta_arg ->
@@ -151,7 +152,7 @@ let eliminate_literal env =
           Trans.on_tagged_ts meta_keep_lit
             (fun type_kept ->
                Trans.fold_map
-                 (eliminate le_int le_real abs_real type_kept
+                 (eliminate le_int le_real neg_real type_kept
                     range_metas float_metas)
                  Mterm.empty None)))
 

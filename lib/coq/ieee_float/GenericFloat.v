@@ -21,6 +21,11 @@ Require Import ZArith.
 Require Import Fourier.
 Require Import real.Truncate.
 
+Implicit Arguments B754_zero [[prec] [emax]].
+Implicit Arguments B754_infinity [[prec] [emax]].
+Implicit Arguments B754_nan [[prec] [emax]].
+Implicit Arguments B754_finite [[prec] [emax]].
+
 (* Why3 assumption *)
 Inductive mode :=
   | RNE : mode
@@ -79,6 +84,7 @@ Definition emax : Z.
   exact (radix2 ^ (eb - 1))%Z.
 Defined.
 
+
 (* Why3 goal *)
 Definition t : Type.
   exact (binary_float sb emax).
@@ -86,7 +92,7 @@ Defined.
 
 (* Why3 goal *)
 Definition zeroF: t.
-  exact (B754_zero sb emax false).
+  exact (B754_zero false).
 Defined.
 
 Let emin := (3 - emax - sb)%Z.
@@ -177,20 +183,12 @@ Lemma max_eb_bounded : bounded sb emax (2 ^ sb_pos - 1) (emax - sb) = true.
   assert (1 <= 2 ^ (sb - 1))%Z.
   apply Z.lt_pred_le, (Zpower_gt_0 radix2 (sb - 1)); trivial.
   omega.
-  apply Zle_bool_true; easy.
+  apply Zle_bool_true; auto with zarith.
 Qed.
 
 Definition max_value: t.
-  exact (B754_finite sb emax false (2 ^ sb_pos - 1) (emax - sb) max_eb_bounded).
+  exact (B754_finite false (2 ^ sb_pos - 1) (emax - sb) max_eb_bounded).
 Defined.
-
-(* Why3 goal *)
-Definition from_binary: Z -> t.
-Admitted.
-
-(* Why3 goal *)
-Definition prefix_ex: mode -> R -> t.
-Admitted.
 
 Definition One_Nan_pl: nan_pl sb.
   unfold nan_pl, Fcore_digits.digits2_pos.
@@ -198,7 +196,7 @@ Definition One_Nan_pl: nan_pl sb.
   apply Hsbb.
 Qed.
 
-Definition One_Nan: t := B754_nan sb emax false One_Nan_pl.
+Definition One_Nan: t := B754_nan false One_Nan_pl.
 
 Definition nan_bf: binary_float sb emax -> binary_float sb emax -> bool * nan_pl sb.
   exact (fun b nan => (true,One_Nan_pl)).
@@ -245,13 +243,13 @@ Defined.
 Definition roundToIntegral: mode -> t -> t.
   exact (fun m x =>
            match x with
-             | B754_zero _ _ b => B754_zero _ _ b
-             | B754_infinity _ _ b => B754_infinity _ _ b
-             | B754_nan _ _ b n => B754_nan _ _ b n
-             | B754_finite _ _ b ma e _ =>
+             | B754_zero b => B754_zero b
+             | B754_infinity b => B754_infinity b
+             | B754_nan b n => B754_nan b n
+             | B754_finite b ma e _ =>
                let x_int := fp_to_z m x in
                match Z.eq_dec x_int 0%Z with
-               | left _ => B754_zero _ _ b
+               | left _ => B754_zero b
                | right _ => z_to_fp RTZ x_int
                end
            end).
@@ -330,7 +328,8 @@ Lemma lt_le: forall {x y}, lt x y -> le x y.
 Qed.
 
 Lemma eq_zero_iff: forall {x}, eq zeroF x <-> x = zeroF \/ x = neg zeroF.
-  intro; unfold eq; destruct x, b; simpl.
+  Print binary_float.
+  intro; unfold eq; destruct x ; destruct b; simpl.
   split; auto.
   split; auto.
   split; [easy| intro h; destruct h; easy].
@@ -344,8 +343,8 @@ Qed.
 (* Why3 goal *)
 Definition is_normal: t -> Prop.
   exact (fun x => match x with
-                    | B754_zero _ _ _ => True
-                    | B754_finite _ _ _ _ e _ => (emin < e)%Z
+                    | B754_zero _ => True
+                    | B754_finite _ _ e _ => (emin < e)%Z
                     | _ => False
         end).
 Defined.
@@ -353,7 +352,7 @@ Defined.
 (* Why3 goal *)
 Definition is_subnormal: t -> Prop.
   exact (fun x => match x with
-                    | B754_finite _ _ _ _ e _ => (emin = e)%Z
+                    | B754_finite _ _ e _ => (emin = e)%Z
                     | _ => False
         end).
 Defined.
@@ -363,12 +362,12 @@ Definition is_zero: t -> Prop.
   exact (fun x => eq zeroF x).
 Defined.
 
-Lemma zero_is_zero: forall {b}, is_zero (B754_zero _ _ b).
+Lemma zero_is_zero: forall {b}, is_zero (B754_zero b).
   easy.
 Qed.
 
 Lemma is_zero_B754_zero :
-  forall x, is_zero x <-> exists b, x = B754_zero sb emax b.
+  forall x, is_zero x <-> exists b, x = B754_zero b.
   intro.
   unfold is_zero; rewrite eq_zero_iff.
   unfold zeroF.
@@ -380,13 +379,13 @@ Lemma is_zero_B754_zero :
 Qed.
 
 Lemma zero_or_not : forall x, ~ is_zero x \/ is_zero x.
-  destruct x, b; try (right; easy); left; simpl; try easy.
+  destruct x ; destruct b; try (right; easy); left; simpl; try easy.
 Qed.
 
 (* Why3 goal *)
 Definition is_infinite: t -> Prop.
   exact (fun x => match x with
-                  | B754_infinity _ _ _ => True
+                  | B754_infinity _ => True
                   | _ => False
                   end).
 Defined.
@@ -404,7 +403,7 @@ Lemma is_infinite_not_nan: forall {x}, is_infinite x -> ~ is_nan x.
   intro x; destruct x; easy.
 Qed.
 
-Lemma le_infinity: forall {x}, ~ is_nan x -> le x (B754_infinity _ _ false).
+Lemma le_infinity: forall {x}, ~ is_nan x -> le x (B754_infinity false).
   intros.
   unfold le.
   destruct x; try easy.
@@ -426,19 +425,19 @@ Lemma eq_not_nan_refl: forall {x : t}, ~ is_nan x -> eq x x.
 Qed.
 
 Lemma eq_not_nan: forall {x y}, eq x y -> ~ is_nan x /\ ~ is_nan y.
-  intros; destruct x, y; try easy; destruct b; easy.
+  intros; destruct x; destruct y; try easy; intuition; destruct b; easy.
 Qed.
 
 Lemma lt_not_nan: forall {x y}, lt x y -> ~ is_nan x /\ ~ is_nan y.
-  intros; destruct x, y; try easy; destruct b; easy.
+  intros; destruct x, y; try easy; intuition; destruct b; easy.
 Qed.
 
 Lemma le_or_lt_or_nan: forall x y, le x y \/ lt y x \/ is_nan x \/ is_nan y.
   destruct x, y; auto; try easy;
     try (destruct b, b0; auto; easy).
   unfold le, lt.
-  set (x:=(B754_finite sb emax b m e e0)).
-  set (y:=(B754_finite sb emax b0 m0 e1 e2)).
+  set (x:=(B754_finite b m e e0)).
+  set (y:=(B754_finite b0 m0 e1 e2)).
   rewrite (Bcompare_correct sb emax x y), (Bcompare_correct sb emax y x); auto.
   destruct (Rtotal_order (B2R sb emax x) (B2R sb emax y)) as [h|[h|h]].
   rewrite (Rcompare_Lt _ _ h), (Rcompare_Gt _ _ h); auto.
@@ -449,50 +448,50 @@ Qed.
 (* Why3 goal *)
 Definition is_positive: t -> Prop.
   exact (fun x => match x with
-                    | B754_zero _ _ false => True
-                    | B754_finite _ _ false _ e _ => True
-                    | B754_infinity _ _ false => True
+                    | B754_zero false => True
+                    | B754_finite false _ e _ => True
+                    | B754_infinity false => True
                     | _ => False
         end).
 Defined.
 
 Hint Unfold is_positive.
 
-Lemma is_positive_Bsign: forall x, ~ is_nan x -> is_positive x <-> Bsign sb emax x = false.
+Lemma is_positive_Bsign: forall x, ~ is_nan x -> (is_positive x <-> Bsign sb emax x = false).
   split.
-  destruct x, b; easy.
-  destruct x, b; try easy.
+  destruct x ; destruct b; try easy.
+  destruct x ; destruct b; try easy.
   contradict H; easy.
 Qed.
 
-Lemma is_positive_correct: forall x, is_positive x <-> lt zeroF x \/ x = B754_zero sb emax false.
+Lemma is_positive_correct: forall x, is_positive x <-> lt zeroF x \/ x = B754_zero false.
   split.
-  intro h; destruct x, b; auto; easy.
-  intro h; destruct h, x, b; easy.
+  intro h; destruct x ; destruct b; auto; easy.
+  intro h; destruct h; destruct x ; destruct b; easy.
 Qed.
 
 (* Why3 goal *)
 Definition is_negative: t -> Prop.
   exact (fun x => match x with
-                    | B754_zero _ _ true => True
-                    | B754_finite _ _ true _ e _ => True
-                    | B754_infinity _ _ true => True
+                    | B754_zero true => True
+                    | B754_finite true _ e _ => True
+                    | B754_infinity true => True
                     | _ => False
         end).
 Defined.
 
 Hint Unfold is_negative.
 
-Lemma is_negative_Bsign: forall x, ~ is_nan x -> is_negative x <-> Bsign sb emax x = true.
+Lemma is_negative_Bsign: forall x, ~ is_nan x -> (is_negative x <-> Bsign sb emax x = true).
   split.
-  destruct x, b; easy.
-  destruct x, b; easy.
+  destruct x ; destruct b; easy.
+  destruct x ; destruct b; easy.
 Qed.
 
-Lemma is_negative_correct: forall x, is_negative x <-> gt zeroF x \/ x = B754_zero sb emax true.
+Lemma is_negative_correct: forall x, is_negative x <-> gt zeroF x \/ x = B754_zero true.
   split.
-  intro h; destruct x, b; auto; easy.
-  intro h; destruct h, x, b; easy.
+  intro h; destruct x ; destruct b; auto; easy.
+  intro h; destruct h; destruct x ; destruct b; easy.
 Qed.
 
 (* Why3 goal *)
@@ -567,9 +566,9 @@ Qed.
 
 Lemma is_finite_B: forall (x:t),
     is_finite x ->
-    exists b, x = B754_zero sb emax b \/ exists b m e p, x = B754_finite sb emax b m e p.
+    exists b, x = B754_zero b \/ exists b m e p, x = B754_finite b m e p.
   intro x.
-  destruct x; try easy; unfold is_finite; intros.
+  destruct x; try easy; intros.
   exists b; auto.
   exists b; right.
   exists b, m, e, e0; trivial.
@@ -620,7 +619,7 @@ Lemma Some_ext: forall {T} (a b:T), Some a = Some b <-> a = b.
 Qed.
 
 Lemma to_real_eq: forall {x:t} {y:t}, is_finite x -> is_finite y ->
-                                      eq x y <-> to_real x = to_real y.
+                                      (eq x y <-> to_real x = to_real y).
   intros x y h1 h2.
   unfold eq.
   rewrite (Bcompare_correct _ _ x y h1 h2), Some_ext.
@@ -675,7 +674,7 @@ Lemma zeroF_to_real : ((to_real zeroF) = 0%R).
 easy.
 Qed.
 
-Lemma B754_zero_to_real: forall {b}, to_real (B754_zero _ _ b) = 0.
+Lemma B754_zero_to_real: forall {b}, to_real (B754_zero b) = 0.
   intro b.
   rewrite <-(to_real_eq_alt zero_is_zero).
   apply zeroF_to_real.
@@ -730,7 +729,7 @@ Lemma to_int_eq: forall {m x y}, eq x y -> to_int m x = to_int m y.
       destruct m; simpl; subst; auto.
 Qed.
 
-Lemma to_int_B754_zero: forall {b m}, to_int m (B754_zero _ _ b) = 0%Z.
+Lemma to_int_B754_zero: forall {b m}, to_int m (B754_zero b) = 0%Z.
   intros b m.
   rewrite <-(to_int_eq zero_is_zero).
   apply to_int_zeroF.
@@ -789,7 +788,7 @@ Lemma min_real_is_F2R: @F2R radix2 {| Fnum := Z.neg (2 ^ sb_pos - 1); Fexp := em
 Qed.
 
 Lemma max_value_to_real: to_real max_value = max_real.
-  unfold to_real, B2R; simpl.
+  unfold B2R; simpl.
   apply max_real_is_F2R.
 Qed.
 
@@ -900,7 +899,6 @@ Lemma Rabs_round_max_real_emax:
     apply max_real_lt_bpow_radix2_emax.
 
   - destruct (r_to_fp_correct m x h).
-    fold to_real (round m x) in H0.
     rewrite <-H0, Abs.Abs_le.
     apply (is_finite1 _ H).
 Qed.
@@ -938,7 +936,7 @@ Lemma of_int_correct :
   intros m x h1.
   generalize (binary_normalize_correct sb emax Hsb' Hemax' m x 0 false).
   rewrite Rlt_bool_true.
-  - intro; destruct H, H0.
+  - intro; destruct H; destruct H0.
     rewrite IZR_alt in H1.
     split.
     rewrite IZR_alt in H; auto.
@@ -1064,7 +1062,7 @@ Lemma max_rep_int_bounded: bounded sb emax (shift_pos (sb_pos - 1) 1) 1 = true.
 Qed.
 
 Definition Bmax_rep_int: t.
-  exact (B754_finite sb emax false _ _ max_rep_int_bounded).
+  exact (B754_finite false _ _ max_rep_int_bounded).
 Defined.
 
 Lemma IZR_pow2sb: IZR pow2sb = bpow radix2 sb.
@@ -1074,7 +1072,7 @@ Qed.
 
 Lemma Bmax_rep_int_to_real: to_real Bmax_rep_int = IZR pow2sb.
   rewrite IZR_pow2sb.
-  unfold to_real, B2R; simpl.
+  unfold B2R; simpl.
   rewrite shift_pos_correct.
   rewrite Z.pow_pos_fold.
   unfold F2R.
@@ -1206,7 +1204,7 @@ case (Z_dec e e1); intro.
 
   + unfold eq in h4; simpl in h4.
     destruct b0.
-    * rewrite Z.compare_refl, Some_ext, <-Pos.compare_antisym in h4.
+    * rewrite Z.compare_refl, Some_ext, Pos.compare_cont_antisym in h4.
       rewrite (Pos.compare_eq _ _ h4) in n.
       destruct n; reflexivity.
 
@@ -1221,12 +1219,10 @@ Lemma to_real_refl: forall {x:t} {y:t}, is_finite x -> is_finite y ->
   intros x y h1 h2 h3 h4.
   destruct x, y; try easy.
   + destruct b, b0, h4; easy.
-  + unfold to_real in h3.
-    symmetry in h3.
+  + symmetry in h3.
     apply F2R_eq_0_reg in h3.
     destruct b0; contradict h3; easy.
-  + unfold to_real in h3.
-    apply F2R_eq_0_reg in h3.
+  + apply F2R_eq_0_reg in h3.
     destruct b; contradict h3; easy.
   + apply feq_eq; auto.
     rewrite eq_zero_iff; intro.
@@ -1288,7 +1284,7 @@ Lemma eq_special : forall (x:t) (y:t), (eq x y) -> ((is_not_nan x) /\
   destruct (not_nan _ h2); [left|right].
   - split; [apply i|apply (eq_finite_dist h1 i)].
   - split; [apply i|split;[apply (eq_infinite_dist h1 i)|]].
-    destruct x, y, b, b0; auto; easy.
+    destruct x, y; destruct b, b0; auto; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1317,9 +1313,9 @@ Qed.
 Lemma lt_eq_trans : forall {x y z:t}, lt x y -> eq y z -> lt x z.
   intros x y z h1 h2.
   destruct x, y, z; try easy; try (destruct b, b0, b1; easy).
-  set (x:=B754_finite sb emax b m e e0);
-    set (y:=B754_finite sb emax b0 m0 e1 e2);
-    set (z:=B754_finite sb emax b1 m1 e3 e4); fold x y z in h1, h2.
+  set (x:=B754_finite b m e e0);
+    set (y:=B754_finite b0 m0 e1 e2);
+    set (z:=B754_finite b1 m1 e3 e4); fold x y z in h1, h2.
   pose proof (Bcompare_correct sb emax x y).
   pose proof (Bcompare_correct sb emax y z).
   pose proof (Bcompare_correct sb emax x z).
@@ -1330,21 +1326,22 @@ Lemma lt_eq_trans : forall {x y z:t}, lt x y -> eq y z -> lt x z.
   unfold lt.
   rewrite H1 by easy; clear H1.
   apply f_equal, Rcompare_Lt.
-  apply Rlt_le_trans with (B2R sb emax (B754_finite sb emax b0 m0 e1 e2)).
+  apply Rlt_le_trans with (B2R sb emax (B754_finite b0 m0 e1 e2)).
   + apply Rcompare_Lt_inv.
     now injection h1.
   + apply Rcompare_not_Gt_inv.
     inversion h1; inversion h2.
     destruct Rcompare; try easy.
-    destruct Rcompare; easy.
+    destruct Rcompare; try easy;
+    simpl; rewrite H1; discriminate.
 Qed.
 
 Lemma eq_lt_trans : forall {x y z:t}, eq x y -> lt y z -> lt x z.
   intros x y z h1 h2.
   destruct x, y, z; try easy; try (destruct b, b0, b1; easy).
-  set (x:=B754_finite sb emax b m e e0);
-    set (y:=B754_finite sb emax b0 m0 e1 e2);
-    set (z:=B754_finite sb emax b1 m1 e3 e4); fold x y z in h1, h2.
+  set (x:=B754_finite b m e e0);
+    set (y:=B754_finite b0 m0 e1 e2);
+    set (z:=B754_finite b1 m1 e3 e4); fold x y z in h1, h2.
   pose proof (Bcompare_correct sb emax x y).
   pose proof (Bcompare_correct sb emax y z).
   pose proof (Bcompare_correct sb emax x z).
@@ -1355,10 +1352,11 @@ Lemma eq_lt_trans : forall {x y z:t}, eq x y -> lt y z -> lt x z.
   unfold lt.
   rewrite H1 by easy; clear H1.
   apply f_equal, Rcompare_Lt.
-  apply Rle_lt_trans with (B2R sb emax (B754_finite sb emax b0 m0 e1 e2)).
+  apply Rle_lt_trans with (B2R sb emax (B754_finite b0 m0 e1 e2)).
   + apply Rcompare_not_Gt_inv.
     inversion h1; inversion h2.
-    destruct Rcompare; easy.
+    destruct Rcompare; try easy;
+    simpl; rewrite H0; discriminate.
   + apply Rcompare_Lt_inv.
     now injection h2.
 Qed.
@@ -1366,9 +1364,9 @@ Qed.
 Lemma lt_lt_trans : forall {x y z:t}, lt x y -> lt y z -> lt x z.
   intros x y z h1 h2.
   destruct x, y, z; try easy; try (destruct b, b0, b1; easy).
-  set (x:=B754_finite sb emax b m e e0);
-    set (y:=B754_finite sb emax b0 m0 e1 e2);
-    set (z:=B754_finite sb emax b1 m1 e3 e4); fold x y z in h1, h2.
+  set (x:=B754_finite b m e e0);
+    set (y:=B754_finite b0 m0 e1 e2);
+    set (z:=B754_finite b1 m1 e3 e4); fold x y z in h1, h2.
   pose proof (Bcompare_correct sb emax x y).
   pose proof (Bcompare_correct sb emax y z).
   pose proof (Bcompare_correct sb emax x z).
@@ -1378,7 +1376,7 @@ Lemma lt_lt_trans : forall {x y z:t}, lt x y -> lt y z -> lt x z.
   unfold lt.
   rewrite H1 by easy; clear H1.
   apply f_equal, Rcompare_Lt.
-  apply Rlt_trans with (B2R sb emax (B754_finite sb emax b0 m0 e1 e2)).
+  apply Rlt_trans with (B2R sb emax (B754_finite b0 m0 e1 e2)).
   + apply Rcompare_Lt_inv.
     now injection h1.
   + apply Rcompare_Lt_inv.
@@ -1408,8 +1406,8 @@ Lemma le_ge_asym : forall (x:t) (y:t), ((le x y) /\ (le y x)) -> (eq x y).
 intros x y.
 unfold le, eq.
 destruct x, y; intros (h,h1); auto; try (destruct b,b0,h,h1; easy).
-set (x:=B754_finite sb emax b m e e0);
-  set (y:=B754_finite sb emax b0 m0 e1 e2);
+set (x:=B754_finite b m e e0);
+  set (y:=B754_finite b0 m0 e1 e2);
   fold x y in h, h1.
 pose proof (Bcompare_correct sb emax x y).
 pose proof (Bcompare_correct sb emax y x).
@@ -1444,8 +1442,8 @@ Lemma not_lt_ge : forall (x:t) (y:t), ((~ (lt x y)) /\ ((is_not_nan x) /\
   intros x y.
   rewrite is_not_nan1; rewrite is_not_nan1.
   destruct x, y; intros (h,(h1,h2)); auto; try (destruct b, b0; auto; destruct h1; auto; easy).
-  set (x:=B754_finite sb emax b m e e0);
-    set (y:=B754_finite sb emax b0 m0 e1 e2);
+  set (x:=B754_finite b m e e0);
+    set (y:=B754_finite b0 m0 e1 e2);
     fold x y in h, h1, h2.
   pose proof (Bcompare_correct sb emax x y).
   pose proof (Bcompare_correct sb emax y x).
@@ -1465,8 +1463,8 @@ Lemma not_gt_le : forall (x:t) (y:t), ((~ (lt y x)) /\ ((is_not_nan x) /\
   intros x y.
   rewrite is_not_nan1; rewrite is_not_nan1.
   destruct x, y; intros (h,(h1,h2)); auto; try (destruct b, b0; auto; destruct h1; auto; easy).
-  set (x:=B754_finite sb emax b m e e0);
-    set (y:=B754_finite sb emax b0 m0 e1 e2);
+  set (x:=B754_finite b m e e0);
+    set (y:=B754_finite b0 m0 e1 e2);
     fold x y in h, h1, h2.
   pose proof (Bcompare_correct sb emax x y).
   pose proof (Bcompare_correct sb emax y x).
@@ -1487,14 +1485,14 @@ Lemma le_special : forall (x:t) (y:t), (le x y) -> (((is_finite x) /\
   rewrite is_not_nan1; rewrite is_not_nan1.
   unfold le in h.
   destruct x, y; auto; try easy; try (destruct b, b0; auto; destruct h; auto; easy).
-  - right; right. destruct b0, h; easy.
-  - right; left. destruct b, h; easy.
+  - right; right. destruct b0, h; split; easy.
+  - right; left. destruct b, h; split; easy.
   - right. destruct b, b0, h; try easy.
-    + left; easy.
-    + left; easy.
-    + right; easy.
-  - right; left. destruct b, h; easy.
-  - right; right. destruct b, b0, h; easy.
+    + left; split; easy.
+    + left; split; easy.
+    + right; split; easy.
+  - right; left. destruct b, h; split; easy.
+  - right; right. destruct b, b0, h; split; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1508,18 +1506,18 @@ Lemma lt_special : forall (x:t) (y:t), (lt x y) -> (((is_finite x) /\
   unfold is_plus_infinity, is_minus_infinity.
   destruct x, y; auto; try easy; try (destruct b, b0; easy).
 
-  - right; right. destruct b0; easy.
-  - right; left. destruct b; easy.
-  - right; right. destruct b, b0; easy.
-  - right; left. destruct b; easy.
-  - right; right. destruct b, b0; easy.
+  - right; right. destruct b0; split; try split; easy.
+  - right; left. destruct b; split; try split; easy.
+  - right; right. destruct b, b0; split; try split; easy.
+  - right; left. destruct b; split; try split; easy.
+  - right; right. destruct b, b0; split; try split; easy.
 Qed.
 
 (* Why3 goal *)
 Lemma lt_lt_finite : forall (x:t) (y:t) (z:t), (lt x y) -> ((lt y z) ->
   (is_finite y)).
 intros x y z h1 h2.
-destruct x, y, z, b, b0, b1; easy.
+destruct x, y, z; destruct b, b0, b1; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1600,14 +1598,14 @@ Qed.
 Lemma negative_xor_positive : forall (x:t), ~ ((is_positive x) /\
   (is_negative x)).
 intros x.
-destruct x, b; easy.
+destruct x ; destruct b; easy.
 Qed.
 
 (* Why3 goal *)
 Lemma negative_or_positive : forall (x:t), (is_not_nan x) -> ((is_positive
   x) \/ (is_negative x)).
 intros x h1.
-destruct x, b; simpl; auto; now elim h1.
+destruct x ; destruct b; simpl; auto; now elim h1.
 Qed.
 
 (* Why3 goal *)
@@ -1617,10 +1615,10 @@ Lemma diff_sign_trans : forall (x:t) (y:t) (z:t), ((diff_sign x y) /\
   intros x y z (h1,h2).
   pose proof (negative_xor_positive y) as H.
   destruct h1 as [(h,h1)|(h,h1)], h2 as [(h2,h3)|(h2,h3)].
-  - contradict H; easy.
-  - left; easy.
-  - right; easy.
-  - contradict H; easy.
+  - contradict H; split; easy.
+  - left; split; easy.
+  - right; split; easy.
+  - contradict H; split; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1631,7 +1629,7 @@ unfold diff_sign.
 case (Rcase_abs (to_real y)); intro; [left|right].
 - split; [apply to_real_positive; try easy|apply to_real_negative; easy].
   apply Rmult_lt_reg_r with (r := (-to_real y)); try fourier.
-  rewrite Rmult_0_l, <-Ropp_mult_distr_r.
+  rewrite Rmult_0_l, Ropp_mult_distr_r_reverse.
   apply Ropp_0_gt_lt_contravar.
   fourier.
 - destruct r.
@@ -1687,7 +1685,7 @@ Lemma add_finite : forall (m:mode) (x:t) (y:t), (is_finite x) -> ((is_finite
   ((to_real x) + (to_real y))%R))))).
 intros m x y h1 h2 h3.
 generalize (Bplus_correct sb emax Hsb'' Hemax' nan_bf m x y h1 h2); rewrite Rlt_bool_true.
-intro; easy.
+intro; split; easy.
 apply (in_range_bpow_radix2_emax _ h3).
 Qed.
 
@@ -1712,8 +1710,8 @@ destruct x, y; try easy; try (rewrite B754_zero_to_real).
 apply Bounded_real_no_overflow; rewrite (@B754_zero_to_real b0); split; fourier.
 apply Bounded_real_no_overflow; rewrite Rplus_0_l; apply is_finite1; auto.
 apply Bounded_real_no_overflow; rewrite Rplus_0_r; apply is_finite1; auto.
-set (x := B754_finite sb emax b m0 e e0).
-set (y := B754_finite sb emax b0 m1 e1 e2).
+set (x := B754_finite b m0 e e0).
+set (y := B754_finite b0 m1 e1 e2).
 fold x y in h2, H, H0.
 destruct (Rlt_le_dec (Rabs (round m (to_real x + to_real y))) (bpow radix2 emax)).
 rewrite no_overflow_Rabs_round_emax; assumption.
@@ -1731,7 +1729,7 @@ Lemma sub_finite : forall (m:mode) (x:t) (y:t), (is_finite x) -> ((is_finite
   ((to_real x) - (to_real y))%R))))).
 intros m x y h1 h2 h3.
 generalize (Bminus_correct sb emax Hsb'' Hemax' nan_bf m x y h1 h2); rewrite Rlt_bool_true.
-intro; easy.
+intro; split; easy.
 apply (in_range_bpow_radix2_emax _ h3).
 Qed.
 
@@ -1758,8 +1756,8 @@ apply Bounded_real_no_overflow.
 rewrite Rminus_0_l, <-(B2R_Bopp _ _ pair).
 apply is_finite1, is_finite_Bopp.
 apply Bounded_real_no_overflow; rewrite Rminus_0_r; apply is_finite1; auto.
-set (x := B754_finite sb emax b m0 e e0).
-set (y := B754_finite sb emax b0 m1 e1 e2).
+set (x := B754_finite b m0 e e0).
+set (y := B754_finite b0 m1 e1 e2).
 fold x y in h2, H, H0.
 destruct (Rlt_le_dec (Rabs (round m (to_real x - to_real y))) (bpow radix2 emax)).
 rewrite no_overflow_Rabs_round_emax; assumption.
@@ -1777,7 +1775,7 @@ Lemma mul_finite : forall (m:mode) (x:t) (y:t), (is_finite x) -> ((is_finite
   ((to_real x) * (to_real y))%R))))).
 intros m x y h1 h2 h3.
 generalize (Bmult_correct sb emax Hsb'' Hemax' nan_bf m x y); rewrite Rlt_bool_true, h1, h2.
-intro; easy.
+intro; split; easy.
 apply (in_range_bpow_radix2_emax _ h3).
 Qed.
 
@@ -1802,8 +1800,8 @@ destruct x, y; try easy; try (rewrite B754_zero_to_real).
 apply Bounded_real_no_overflow; rewrite (@B754_zero_to_real b0); split; fourier.
 unfold no_overflow; rewrite Rmult_0_l, <-zeroF_to_real, Round_to_real, zeroF_to_real; auto; split; fourier.
 unfold no_overflow; rewrite Rmult_0_r, <-zeroF_to_real, Round_to_real, zeroF_to_real; auto; split; fourier.
-set (x := B754_finite sb emax b m0 e e0).
-set (y := B754_finite sb emax b0 m1 e1 e2).
+set (x := B754_finite b m0 e e0).
+set (y := B754_finite b0 m1 e1 e2).
 fold x y in h2, H, H0.
 destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax)).
 rewrite no_overflow_Rabs_round_emax; assumption.
@@ -1824,7 +1822,7 @@ Lemma div_finite : forall (m:mode) (x:t) (y:t), (is_finite x) -> ((is_finite
   rewrite (to_real_eq zero_is_finite h2) in h3.
   apply not_eq_sym in h3.
   generalize (Bdiv_correct sb emax Hsb'' Hemax' nan_bf m x y h3); rewrite Rlt_bool_true, h1.
-  intro; easy.
+  intro; split; easy.
   apply (in_range_bpow_radix2_emax _ h4).
 Qed.
 
@@ -1835,9 +1833,9 @@ Lemma div_finite_rev : forall (m:mode) (x:t) (y:t), (is_finite (div m x
   intros m x y h1.
   destruct x, y; try easy.
   right; destruct b, b0; easy.
-  left; destruct b, b0; easy.
-  right; destruct b, b0; easy.
-  left; destruct b, b0; easy.
+  left; destruct b, b0; split; try split; easy.
+  right; destruct b, b0; split; try split; easy.
+  left; destruct b, b0; split; try split; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1853,8 +1851,8 @@ Lemma div_finite_rev_n : forall (m:mode) (x:t) (y:t), (to_nearest m) ->
     destruct x, y; try easy; try (rewrite B754_zero_to_real).
     rewrite Real.infix_sl_def, Rmult_0_l.
     apply Bounded_real_no_overflow; split; fourier.
-    set (x := B754_finite sb emax b m0 e e0).
-    set (y := B754_finite sb emax b0 m1 e1 e2).
+    set (x := B754_finite b m0 e e0).
+    set (y := B754_finite b0 m1 e1 e2).
     fold x y in h2, h3,h4,h5,h6.
     destruct (Rlt_le_dec (Rabs (round m (to_real x / to_real y))) (bpow radix2 emax)).
     rewrite no_overflow_Rabs_round_emax; assumption.
@@ -1922,7 +1920,7 @@ Lemma abs_le: forall {x y}, le (neg y) x /\ le x y -> le (abs x) y.
       destruct (le_special _ _ b) as [H|[H|H]].
       - destruct x; easy.
       - pose proof (le_special _ _ a).
-        unfold is_minus_infinity, is_plus_infinity, neg in H0.
+        unfold is_minus_infinity, is_plus_infinity in H0.
         destruct H0, H0, x, y; auto; try easy; destruct b0, b1; auto.
       - destruct y; unfold is_plus_infinity in H; easy.
 
@@ -1937,7 +1935,7 @@ Lemma abs_le: forall {x y}, le (neg y) x /\ le x y -> le (abs x) y.
     * destruct (le_special _ _ b) as [H|[H|H]].
       - destruct y; easy.
       - unfold is_minus_infinity in H; destruct x; easy.
-      - destruct y, H as (H,(_,H')), b0; try easy.
+      - destruct y, H as (H,(_,H')); destruct b0; try easy.
         assert (~ is_nan x) by (rewrite <-is_not_nan1; assumption).
         apply le_infinity.
         destruct x; easy.
@@ -1949,7 +1947,7 @@ Lemma abs_le: forall {x y}, le (neg y) x /\ le x y -> le (abs x) y.
 
   + intros (_,a).
     destruct y; unfold le, Bcompare in a; try easy.
-    destruct x, b0; easy.
+    destruct x as [b0|b0|b0|b0]; destruct b0; easy.
 Qed.
 
 (* Why3 goal *)
@@ -1995,7 +1993,7 @@ Lemma sqrt_finite : forall (m:mode) (x:t), (is_finite x) ->
   intros m x h1 h2.
   destruct (Bsqrt_correct sb emax Hsb' Hemax' (fun b => (true,One_Nan_pl)) m x) as (g,(g1,g2)).
   split; auto.
-  destruct x, b; try easy.
+  destruct x ; destruct b; try easy.
   contradict h2.
   apply Rlt_not_le, non_zero_negative_to_real; easy.
 Qed.
@@ -2005,13 +2003,13 @@ Lemma sqrt_finite_rev : forall (m:mode) (x:t), (is_finite (sqrt m x)) ->
   ((is_finite x) /\ ((0%R <= (to_real x))%R /\ ((to_real (sqrt m
   x)) = (round m (Reals.R_sqrt.sqrt (to_real x)))))).
   intros m x h1.
-  assert (is_finite x) by (destruct x, b; easy).
+  assert (is_finite x) by (destruct x ; destruct b; easy).
   split; [easy|].
   assert (0 <= to_real x).
-  { destruct x, b; try easy.
+  { destruct x ; destruct b; try easy.
     rewrite (@B754_zero_to_real true); fourier.
     rewrite (@B754_zero_to_real false); fourier.
-    assert (is_positive (B754_finite sb emax false m0 e e0)) by easy.
+    assert (is_positive (B754_finite false m0 e e0)) by easy.
     apply positive_to_real; auto. }
   split; [easy| apply sqrt_finite; auto].
 Qed.
@@ -2048,11 +2046,11 @@ Lemma add_special : forall (m:mode) (x:t) (y:t), let r := (add m x y) in
 intros m x y r.
   unfold same_sign, diff_sign, same_sign, same_sign_real.
   split;[intro h|split;[intros (h,h1)|split;[intros (h,h1)|split;[intros (h,(h1,h2))|split;[intros (h,(h1,h2))|split;[intros (h,(h1,h2))|split;[intro h|intro h]]]]]]].
-  - destruct x, y, b, b0, h; easy.
-  - destruct x, y, b0; auto; easy.
-  - destruct x, y, b; auto; easy.
-  - destruct x, y, b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
-  - destruct x, y, b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
+  - destruct x, y; destruct b, b0, h; easy.
+  - destruct x, y; destruct b0; auto; easy.
+  - destruct x, y; destruct b; auto; easy.
+  - destruct x, y; destruct b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
+  - destruct x, y; destruct b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
   - rewrite no_overflow_Rabs_round_max_real, Rabs_round_max_real_emax in h2.
     apply Rnot_lt_le in h2.
     pose proof (Bplus_correct sb emax Hsb' Hemax' nan_bf m x y h h1).
@@ -2070,8 +2068,8 @@ intros m x y r.
         rewrite Rplus_0_r.
         rewrite <-(@B754_zero_to_real false) at 1 2.
         destruct b;[right;split;[easy|]|left;split;[easy|]]; apply lt_finite; easy.
-      * replace (add m (B754_finite sb emax b m0 e e0) (B754_finite sb emax b0 m1 e1 e2)) with r in H by auto.
-        pose proof (sign_FF_overflow m (Bsign sb emax (B754_finite sb emax b m0 e e0))).
+      * replace (add m (B754_finite b m0 e e0) (B754_finite b0 m1 e1 e2)) with r in H by auto.
+        pose proof (sign_FF_overflow m (Bsign sb emax (B754_finite b m0 e e0))).
         rewrite <-H in H1.
         rewrite sign_FF_B2FF in H1.
         simpl Bsign at 2 in H1.
@@ -2082,21 +2080,21 @@ intros m x y r.
             destruct r; try easy;
               destruct n; easy. }
 
-        simpl in H0.
-        destruct b;rewrite <-H0;[right|left];split.
+        simpl in H0. {
+        destruct b;rewrite <-H0;[right|left]; split.
 
-        -- rewrite <-is_negative_Bsign in H1; auto.
-        -- assert (to_real (B754_finite sb emax true m0 e e0) < 0) by
+        - rewrite <-is_negative_Bsign in H1; auto.
+        - assert (to_real (B754_finite true m0 e e0) < 0) by
               (apply non_zero_negative_to_real; easy).
-           assert (to_real (B754_finite sb emax true m1 e1 e2) < 0) by
-               (apply non_zero_negative_to_real; easy).
-           fourier.
-        -- rewrite <-is_positive_Bsign in H1; auto.
-        -- assert (0 < to_real (B754_finite sb emax false m0 e e0)) by
+          assert (to_real (B754_finite true m1 e1 e2) < 0) by
+              (apply non_zero_negative_to_real; easy).
+          fourier.
+        - rewrite <-is_positive_Bsign in H1; auto.
+        - assert (0 < to_real (B754_finite false m0 e e0)) by
               (apply non_zero_positive_to_real; easy).
-           assert (0 < to_real (B754_finite sb emax false m1 e1 e2)) by
-               (apply non_zero_positive_to_real; easy).
-           fourier.
+          assert (0 < to_real (B754_finite false m1 e1 e2)) by
+              (apply non_zero_positive_to_real; easy).
+          fourier. }
 
     + replace (add m x y) with r in H by auto.
       assert (H':=H).
@@ -2108,69 +2106,69 @@ intros m x y r.
       * destruct r; try easy; destruct n; easy.
       * destruct r; try easy; destruct n; easy.
       * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
+            (destruct x ; destruct b; simpl; auto). {
         destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H'; easy.
-           intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
-        -- split.
-           destruct r; easy.
-           intro.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign in H2; auto; easy.
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H'; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+          apply Pos.pow_gt_1.
+          zify; auto with zarith.
+        - split.
+          destruct r; easy.
+          intro.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign in H2; auto; easy. }
       * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
+            (destruct x ; destruct b; simpl; auto). {
         destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           intro.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign in H2; auto. rewrite H' in H2; easy.
-           destruct r; try easy; destruct n; easy.
-        -- split.
-           intro; split.
-           destruct r; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
-           ++ assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-              rewrite is_positive_Bsign; easy.
+        - split.
+          intro.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign in H2; auto. rewrite H' in H2; easy.
+          destruct r; try easy; destruct n; easy.
+        - split.
+          intro; split.
+          destruct r; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith.
+          + assert (~is_nan r) by
+                (destruct r; try easy; destruct n; easy).
+            rewrite is_positive_Bsign; easy. }
       * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
+            (destruct x ; destruct b; simpl; auto).
         assert (~is_nan r) by
             (destruct H1, r; try easy; destruct n; easy).
-        rewrite is_positive_Bsign; auto.
+        rewrite is_positive_Bsign; auto. {
         destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           rewrite H'; easy.
-           intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
-        -- split.
-           ++ intro; split.
-              destruct r; try easy; destruct n; easy.
-              replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-              **  rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
-              **  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-                  apply Pos.pow_gt_1.
-                  zify; auto with zarith.
-           ++ easy.
+        - split.
+          rewrite H'; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith.
+        - split.
+          + intro; split.
+            destruct r; try easy; destruct n; easy.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+            *  rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
+            *  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+               apply Pos.pow_gt_1.
+               zify; auto with zarith.
+           + easy. }
   - destruct H.
     pose proof (Bplus_correct sb emax Hsb' Hemax' nan_bf m x y H H0).
     destruct (Rlt_le_dec (Rabs (round m (to_real x + to_real y))) (bpow radix2 emax)).
@@ -2180,26 +2178,26 @@ intros m x y r.
       assert (~is_nan r) by (destruct r; easy).
       destruct h as [(h,h')|(h,h')];[left|right];split;auto.
       * rewrite is_positive_Bsign; auto.
-        destruct y,b,x,b; try easy.
+        destruct y; destruct b, x; destruct b; try easy.
         rewrite Rcompare_Gt in h3; auto.
-        assert (0 < to_real (B754_finite sb emax false m0 e e0)) by
+        assert (0 < to_real (B754_finite false m0 e e0)) by
             (apply non_zero_positive_to_real; easy).
-        assert (0 < to_real (B754_finite sb emax false m1 e1 e2)) by
+        assert (0 < to_real (B754_finite false m1 e1 e2)) by
             (apply non_zero_positive_to_real; easy).
         fourier.
       * rewrite is_negative_Bsign; auto.
-        destruct y,b,x,b; try easy.
+        destruct y; destruct b,x; destruct b; try easy.
         rewrite Rcompare_Lt in h3; auto.
-        assert (to_real (B754_finite sb emax true  m0 e e0) < 0) by
+        assert (to_real (B754_finite true  m0 e e0) < 0) by
             (apply non_zero_negative_to_real; easy).
-        assert (to_real (B754_finite sb emax true m1 e1 e2) < 0) by
+        assert (to_real (B754_finite true m1 e1 e2) < 0) by
             (apply non_zero_negative_to_real; easy).
         fourier.
     + rewrite Rlt_bool_false in H1; auto.
       destruct H1 as (h1,h2).
       replace (add m x y) with r in h1 by auto.
       destruct (is_nan_dec r).
-      destruct x,b,y,b; try easy; destruct m;
+      destruct x; destruct b,y; destruct b; try easy; destruct m;
         unfold binary_overflow in h1; simpl in h1;
           destruct r; try easy; destruct n; easy.
 
@@ -2241,7 +2239,7 @@ intros m x y r.
 
       assert (~is_nan r) by (destruct H2, r; easy).
 
-      destruct x, b, y, b;
+      destruct x ; destruct b; destruct y ; destruct b;
         try (simpl in H; contradict H; now auto);
         try (destruct m; simpl in r; easy);
         simpl in h;
@@ -2278,8 +2276,8 @@ destruct (add_special m x y) as (_,(_,(_,(_,(_,(h,_)))))).
 assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x + to_real y)) by auto.
 apply h in H2; clear h.
 destruct H2.
-destruct (add m x y), b, m; simpl in *; try easy;
-  try (destruct H3, H4; now auto);
+destruct (add m x y); destruct b, m; simpl in *; try easy;
+  try (destruct H3; destruct H4; now auto);
   destruct H3, H3; auto.
 Qed.
 
@@ -2299,11 +2297,11 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
   intros m x y r.
   unfold same_sign, diff_sign, same_sign, same_sign_real.
   split;[intro h|split;[intros (h,h1)|split;[intros (h,h1)|split;[intros (h,(h1,h2))|split;[intros (h,(h1,h2))|split;[intros (h,(h1,h2))|split;[intro h|intro h]]]]]]].
-  - destruct x, y, b, b0; destruct h; easy.
-  - destruct x, y, b, b0; auto; easy.
-  - destruct x, y, b, b0; auto; easy.
-  - destruct x, y, b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
-  - destruct x, y, b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
+  - destruct x, y; destruct b, b0; destruct h; easy.
+  - destruct x, y; destruct b, b0; auto; easy.
+  - destruct x, y; destruct b, b0; auto; easy.
+  - destruct x, y; destruct b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
+  - destruct x, y; destruct b, b0; destruct h2 as [(h2,h3)|(h2,h3)]; auto; easy.
   - rewrite no_overflow_Rabs_round_max_real, Rabs_round_max_real_emax in h2.
     apply Rnot_lt_le in h2.
     pose proof (Bminus_correct sb emax Hsb' Hemax' nan_bf m x y h h1).
@@ -2316,15 +2314,15 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
       * rewrite B754_zero_to_real at 1 2.
         rewrite Rminus_0_l.
         rewrite <-(@B754_zero_to_real false) at 1 2.
-        destruct (neg_finite (B754_finite sb emax b0 m0 e e0)) as (_,h3); auto.
+        destruct (neg_finite (B754_finite b0 m0 e e0)) as (_,h3); auto.
         rewrite <-h3.
         destruct b0;[left;split;[easy|]|right;split;[easy|]]; apply lt_finite; easy.
       * rewrite B754_zero_to_real at 1 2.
         rewrite Rminus_0_r.
         rewrite <-(@B754_zero_to_real false) at 1 2.
         destruct b;[right;split;[easy|]|left;split;[easy|]]; apply lt_finite; easy.
-      * replace (sub m (B754_finite sb emax b m0 e e0) (B754_finite sb emax b0 m1 e1 e2)) with r in H by auto.
-        pose proof (sign_FF_overflow m (Bsign sb emax (B754_finite sb emax b m0 e e0))).
+      * replace (sub m (B754_finite b m0 e e0) (B754_finite b0 m1 e1 e2)) with r in H by auto.
+        pose proof (sign_FF_overflow m (Bsign sb emax (B754_finite b m0 e e0))).
         rewrite <-H in H1.
         rewrite sign_FF_B2FF in H1.
         simpl Bsign at 2 in H1.
@@ -2336,22 +2334,22 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
               destruct n; easy. }
 
         simpl in H0.
-        apply Bool.negb_sym in H0.
+        apply Bool.negb_sym in H0. {
 
         destruct b; simpl in H0;rewrite H0 in *;[right|left];split.
 
-        -- rewrite <-is_negative_Bsign in H1; auto.
-        -- assert (to_real (B754_finite sb emax true m0 e e0) < 0) by
+        - rewrite <-is_negative_Bsign in H1; auto.
+        - assert (to_real (B754_finite true m0 e e0) < 0) by
               (apply non_zero_negative_to_real; easy).
-           assert (0 < to_real (B754_finite sb emax false m1 e1 e2)) by
-               (apply non_zero_positive_to_real; easy).
-           fourier.
-        -- rewrite <-is_positive_Bsign in H1; auto.
-        -- assert (0 < to_real (B754_finite sb emax false m0 e e0)) by
+          assert (0 < to_real (B754_finite false m1 e1 e2)) by
               (apply non_zero_positive_to_real; easy).
-           assert (to_real (B754_finite sb emax true m1 e1 e2) < 0) by
-               (apply non_zero_negative_to_real; easy).
-           fourier.
+          fourier.
+        - rewrite <-is_positive_Bsign in H1; auto.
+        - assert (0 < to_real (B754_finite false m0 e e0)) by
+              (apply non_zero_positive_to_real; easy).
+          assert (to_real (B754_finite true m1 e1 e2) < 0) by
+              (apply non_zero_negative_to_real; easy).
+          fourier. }
 
     + replace (sub m x y) with r in H by auto.
       assert (H':=H).
@@ -2363,69 +2361,69 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
       * destruct r; try easy; destruct n; easy.
       * destruct r; try easy; destruct n; easy.
       * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
+            (destruct x ; destruct b; simpl; auto). {
         destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H'; easy.
-           intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H'; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith.
+        - split.
+          destruct r; easy.
+          intro.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign in H2; auto; easy. }
+      * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
+            (destruct x ; destruct b; simpl; auto). {
+        destruct H1; rewrite H1 in H', H0, H; simpl in H.
+        - split.
+          intro.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign in H2; auto. rewrite H' in H2; easy.
+          destruct r; try easy; destruct n; easy.
+        - split.
+          intro; split.
+          destruct r; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
               apply Pos.pow_gt_1.
               zify; auto with zarith.
-        -- split.
-           destruct r; easy.
-           intro.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign in H2; auto; easy.
+          + assert (~is_nan r) by
+                (destruct r; try easy; destruct n; easy).
+            rewrite is_positive_Bsign; easy. }
       * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
-        destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           intro.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign in H2; auto. rewrite H' in H2; easy.
-           destruct r; try easy; destruct n; easy.
-        -- split.
-           intro; split.
-           destruct r; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
-           ++ assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-              rewrite is_positive_Bsign; easy.
-      * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-            (destruct x, b; simpl; auto).
+            (destruct x ; destruct b; simpl; auto).
         assert (~is_nan r) by
             (destruct H1, r; try easy; destruct n; easy).
-        rewrite is_positive_Bsign; auto.
+        rewrite is_positive_Bsign; auto. {
         destruct H1; rewrite H1 in H', H0, H; simpl in H.
-        -- split.
-           rewrite H'; easy.
-           intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-           ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith.
-        -- split.
-           ++ intro; split.
-              destruct r; try easy; destruct n; easy.
-              replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
-              **  rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
-              **  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-                  apply Pos.pow_gt_1.
-                  zify; auto with zarith.
-           ++ easy.
+        - split.
+          rewrite H'; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith.
+        - split.
+          + intro; split.
+            destruct r; try easy; destruct n; easy.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H.
+            *  rewrite <-max_real_is_F2R, <-FF2R_B2FF, H; auto.
+            *  rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+               apply Pos.pow_gt_1.
+               zify; auto with zarith.
+          + easy. }
   - destruct H.
     pose proof (Bminus_correct sb emax Hsb' Hemax' nan_bf m x y H H0).
     destruct (Rlt_le_dec (Rabs (round m (to_real x - to_real y))) (bpow radix2 emax)).
@@ -2435,26 +2433,26 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
       assert (~is_nan r) by (destruct r; easy).
       destruct h as [(h,h')|(h,h')];[left|right];split;auto.
       * rewrite is_positive_Bsign; auto.
-        destruct y,b,x,b; try easy.
+        destruct y; destruct b,x; destruct b; try easy.
         rewrite Rcompare_Gt in h3; auto.
-        assert (to_real (B754_finite sb emax true m0 e e0) < 0) by
+        assert (to_real (B754_finite true m0 e e0) < 0) by
             (apply non_zero_negative_to_real; easy).
-        assert (0 < to_real (B754_finite sb emax false m1 e1 e2)) by
+        assert (0 < to_real (B754_finite false m1 e1 e2)) by
             (apply non_zero_positive_to_real; easy).
         fourier.
       * rewrite is_negative_Bsign; auto.
-        destruct y,b,x,b; try easy.
+        destruct y; destruct b,x; destruct b; try easy.
         rewrite Rcompare_Lt in h3; auto.
-        assert (0 < to_real (B754_finite sb emax false m0 e e0)) by
+        assert (0 < to_real (B754_finite false m0 e e0)) by
             (apply non_zero_positive_to_real; easy).
-        assert (to_real (B754_finite sb emax true m1 e1 e2) < 0) by
+        assert (to_real (B754_finite true m1 e1 e2) < 0) by
             (apply non_zero_negative_to_real; easy).
         fourier.
     + rewrite Rlt_bool_false in H1; auto.
       destruct H1 as (h1,h2).
       replace (sub m x y) with r in h1 by auto.
       destruct (is_nan_dec r).
-      destruct x,b,y,b; try easy; destruct m;
+      destruct x; destruct b,y; destruct b; try easy; destruct m;
         unfold binary_overflow in h1; simpl in h1;
           destruct r; try easy; destruct n; easy.
 
@@ -2498,7 +2496,7 @@ Lemma sub_special : forall (m:mode) (x:t) (y:t), let r := (sub m x y) in
 
       assert (~is_nan r) by (destruct H2, r; easy).
 
-      destruct x, b, y, b;
+      destruct x ; destruct b; destruct y ; destruct b;
         try (simpl in H; contradict H; now auto);
         try (destruct m; simpl in r; easy);
         simpl in h;
@@ -2529,8 +2527,8 @@ destruct (sub_special m x y) as (_,(_,(_,(_,(_,(h,_)))))).
 assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x - to_real y)) by auto.
 apply h in H2; clear h.
 destruct H2.
-destruct (sub m x y), b, m; simpl in *; try easy;
-  try (destruct H3, H4; now auto);
+destruct (sub m x y); destruct b, m; simpl in *; try easy;
+  try (destruct H3; destruct H4; now auto);
   destruct H3, H3; auto.
 Qed.
 
@@ -2549,10 +2547,10 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
   intuition.
   - destruct x; easy.
   - destruct x, y; easy.
-  - destruct x, y, b; easy.
-  - destruct x, y, b; try easy; contradict H2; easy.
-  - destruct x, y, b0; easy.
-  - destruct x, y, b0; try easy; contradict H2; easy.
+  - destruct x, y; destruct b; easy.
+  - destruct x, y; destruct b; try easy; contradict H2; easy.
+  - destruct x, y; destruct b0; easy.
+  - destruct x, y; destruct b0; try easy; contradict H2; easy.
   - destruct x, y; easy.
   - rewrite no_overflow_Rabs_round_max_real, Rabs_round_max_real_emax in H2.
     apply Rnot_lt_le in H2.
@@ -2568,109 +2566,109 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
     * destruct r; try easy; destruct n; easy.
     * destruct r; try easy; destruct n; easy.
     * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-          (destruct x, b; simpl; auto).
+          (destruct x ; destruct b; simpl; auto).
       assert (Bsign sb emax y = true \/ Bsign sb emax y = false) by
-          (destruct y, b; simpl; auto).
-      destruct H3, H4; rewrite H3, H4 in H1', H1; simpl in H1, H1'.
-      -- split.
-         destruct r; easy.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-      -- split.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-         intro; split.
-         destruct r; try easy; destruct n; easy.
-         replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
-         ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
-         ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+          (destruct y; destruct b; simpl; auto). {
+        destruct H3, H4; rewrite H3, H4 in H1', H1; simpl in H1, H1'.
+        - split.
+          destruct r; easy.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
             apply Pos.pow_gt_1.
             zify; auto with zarith.
-      -- split.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-         intro; split.
-         destruct r; try easy; destruct n; easy.
-         replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
-         ++ rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
-         ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+          intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
+          + rewrite <-min_real_is_F2R, <-FF2R_B2FF, H1; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
             apply Pos.pow_gt_1.
             zify; auto with zarith.
-      -- split.
-         destruct r; easy.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+        - split.
+          destruct r; easy.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
     * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-          (destruct x, b; simpl; auto).
+          (destruct x ; destruct b; simpl; auto).
       assert (Bsign sb emax y = true \/ Bsign sb emax y = false) by
-          (destruct y, b; simpl; auto).
+          (destruct y; destruct b; simpl; auto). {
       destruct H3, H4; rewrite H3, H4 in H1', H1; simpl in H1, H1'.
-      -- split.
-         { intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
-           ++ rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith. }
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-      -- split.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-         destruct r; try easy; destruct n; easy.
-      -- split.
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-         destruct r; try easy; destruct n; easy.
-      -- split.
-         { intro; split.
-           destruct r; try easy; destruct n; easy.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
-           ++ rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
-           ++ rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-              apply Pos.pow_gt_1.
-              zify; auto with zarith. }
-         assert (~is_nan r) by
-             (destruct r; try easy; destruct n; easy).
-         rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+      - split.
+        { intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
+          + rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith. }
+        assert (~is_nan r) by
+            (destruct r; try easy; destruct n; easy).
+        rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+      - split.
+        assert (~is_nan r) by
+            (destruct r; try easy; destruct n; easy).
+        rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+        destruct r; try easy; destruct n; easy.
+      - split.
+        assert (~is_nan r) by
+            (destruct r; try easy; destruct n; easy).
+        rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+        destruct r; try easy; destruct n; easy.
+      - split.
+        { intro; split.
+          destruct r; try easy; destruct n; easy.
+          replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
+          + rewrite <-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
+          + rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
+            apply Pos.pow_gt_1.
+            zify; auto with zarith. }
+        assert (~is_nan r) by
+            (destruct r; try easy; destruct n; easy).
+        rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
     * assert (Bsign sb emax x = true \/ Bsign sb emax x = false) by
-          (destruct x, b; simpl; auto).
+          (destruct x ; destruct b; simpl; auto).
       assert (Bsign sb emax y = true \/ Bsign sb emax y = false) by
-          (destruct y, b; simpl; auto).
+          (destruct y; destruct b; simpl; auto).
       replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H1.
       { rewrite <-min_real_is_F2R,<-max_real_is_F2R, <-FF2R_B2FF, H1; auto.
         destruct H3, H4; rewrite H3, H4 in *; simpl in *.
-        -- split.
-           intro; split; [destruct r; easy|auto].
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-        -- split.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-           intro; split; [destruct r; try easy; destruct n; easy|auto].
-        -- split.
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
-           intro; split; [destruct r; try easy; destruct n; easy|auto].
-        -- split.
-           intro; split; [destruct r; easy|auto].
-           assert (~is_nan r) by
-               (destruct r; try easy; destruct n; easy).
-           rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
+        - split.
+          intro; split; [destruct r; easy|auto].
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+          intro; split; [destruct r; try easy; destruct n; easy|auto].
+        - split.
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy.
+          intro; split; [destruct r; try easy; destruct n; easy|auto].
+        - split.
+          intro; split; [destruct r; easy|auto].
+          assert (~is_nan r) by
+              (destruct r; try easy; destruct n; easy).
+          rewrite is_positive_Bsign, H1'; intro h; contradict h; easy. }
       rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto.
-            apply Pos.pow_gt_1.
-            zify; auto with zarith.
+      apply Pos.pow_gt_1.
+      zify; auto with zarith.
   - pose proof (Bmult_correct sb emax Hsb' Hemax' nan_bf m x y).
     destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax));
     [rewrite Rlt_bool_true in H1; auto| rewrite Rlt_bool_false in H1; auto].
@@ -2682,11 +2680,11 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
       apply h3 in H1.
       rewrite is_positive_Bsign; auto.
       unfold r.
-      destruct x,b,y,b; easy.
+      destruct x; destruct b,y; destruct b; easy.
     + apply (f_equal sign_FF) in H1.
       rewrite sign_FF_B2FF, sign_FF_overflow in H1.
       rewrite is_positive_Bsign; auto.
-      destruct x,b,y,b; easy.
+      destruct x; destruct b,y; destruct b; easy.
   - pose proof (Bmult_correct sb emax Hsb' Hemax' nan_bf m x y).
     destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax));
     [rewrite Rlt_bool_true in H1; auto| rewrite Rlt_bool_false in H1; auto].
@@ -2698,11 +2696,11 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
       apply h3 in H1.
       rewrite is_positive_Bsign; auto.
       unfold r.
-      destruct x,b,y,b; easy.
+      destruct x; destruct b,y; destruct b; easy.
     + apply (f_equal sign_FF) in H1.
       rewrite sign_FF_B2FF, sign_FF_overflow in H1.
       rewrite is_positive_Bsign; auto.
-      destruct x,b,y,b; easy.
+      destruct x; destruct b,y; destruct b; easy.
   - pose proof (Bmult_correct sb emax Hsb' Hemax' nan_bf m x y).
     destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax));
     [rewrite Rlt_bool_true in H1; auto| rewrite Rlt_bool_false in H1; auto].
@@ -2713,11 +2711,11 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
         simpl in H. contradict H; auto. }
       apply h3 in H1.
       rewrite is_negative_Bsign; auto.
-      destruct x,b,y,b; auto.
+      destruct x; destruct b,y; destruct b; auto.
     + apply (f_equal sign_FF) in H1.
       rewrite sign_FF_B2FF, sign_FF_overflow in H1.
       rewrite is_negative_Bsign; auto.
-      destruct x,b,y,b; auto.
+      destruct x; destruct b,y; destruct b; auto.
   - pose proof (Bmult_correct sb emax Hsb' Hemax' nan_bf m x y).
     destruct (Rlt_le_dec (Rabs (round m (to_real x * to_real y))) (bpow radix2 emax));
     [rewrite Rlt_bool_true in H1; auto| rewrite Rlt_bool_false in H1; auto].
@@ -2728,11 +2726,11 @@ Lemma mul_special : forall (m:mode) (x:t) (y:t), let r := (mul m x y) in
         simpl in H. contradict H; auto. }
       apply h3 in H1.
       rewrite is_negative_Bsign; auto.
-      destruct x,b,y,b; auto.
+      destruct x; destruct b,y; destruct b; auto.
     + apply (f_equal sign_FF) in H1.
       rewrite sign_FF_B2FF, sign_FF_overflow in H1.
       rewrite is_negative_Bsign; auto.
-      destruct x,b,y,b; auto.
+      destruct x; destruct b,y; destruct b; auto.
 Qed.
 
 Lemma mul_finite_rev_n' : forall (m:mode) (x:t) (y:t),
@@ -2749,8 +2747,8 @@ split; [auto|apply mul_finite; easy].
 destruct (mul_special m x y) as (_,(_,(_,(_,(_,(_,(h,_))))))).
 assert (is_finite x /\ is_finite y /\ ~ no_overflow m (to_real x * to_real y)) by auto.
 apply h in H2; clear h.
-destruct (mul m x y), b, m; simpl in *; try easy;
-  try (destruct H2, H3; now auto);
+destruct (mul m x y); destruct b, m; simpl in *; try easy;
+  try (destruct H2; destruct H3; now auto);
   destruct H2, H2; auto.
 Qed.
 
@@ -2769,9 +2767,9 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
   intuition.
   - destruct x; easy.
   - destruct x, y; easy.
-  - destruct x, y, b; easy.
-  - destruct x, y, b; try easy; contradict H2; easy.
-  - destruct x, y, b0; easy.
+  - destruct x, y; destruct b; easy.
+  - destruct x, y; destruct b; try easy; contradict H2; easy.
+  - destruct x, y; destruct b0; easy.
   - assert (to_real y <> 0) by (rewrite zero_to_real in H1; auto).
     pose proof (Bdiv_correct sb emax Hsb' Hemax' nan_bf m x y H2).
     rewrite Rlt_bool_false in H4.
@@ -2782,64 +2780,64 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
         destruct b, n in H4; easy.
       * destruct r; try easy.
         destruct b, n in H4; easy.
-      * destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4.
+      * destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4. {
+          split; intro.
+          - destruct r; destruct b; easy.
+          - split; [destruct r; try easy; destruct b, n in H4; easy|].
+            apply (f_equal (FF2R radix2)) in H4.
+            rewrite FF2R_B2FF in H4.
+            simpl in H4.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
+                (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
+                 apply Pos.pow_gt_1;
+                 zify; auto with zarith).
+            rewrite <-min_real_is_F2R; assumption. }
+        split; intro; [destruct r; easy|].
+        destruct r; try easy.
+        destruct b; try easy.
+        simpl in H5; contradict H5; auto.
+        destruct n; easy.
+      * destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4. {
         split; intro.
-        -- destruct r, b; easy.
-        -- split; [destruct r; try easy; destruct b, n in H4; easy|].
-           apply (f_equal (FF2R radix2)) in H4.
-           rewrite FF2R_B2FF in H4.
-           simpl in H4.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
-               (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                apply Pos.pow_gt_1;
-                zify; auto with zarith).
-           rewrite <-min_real_is_F2R; assumption.
-        -- split; intro; [destruct r; easy|].
-           destruct r; try easy.
-           destruct b; try easy.
-           ++ simpl in H5; contradict H5; auto.
-           ++ destruct n; easy.
-      * destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4.
+        - destruct r; destruct b; easy.
+        - destruct r; try easy.
+           destruct n; easy. }
+        { split; intro.
+          + split;[destruct r; easy|].
+            apply (f_equal (FF2R radix2)) in H4.
+            rewrite FF2R_B2FF in H4.
+            simpl in H4.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
+                (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
+                 apply Pos.pow_gt_1;
+                 zify; auto with zarith).
+            rewrite <-max_real_is_F2R; assumption.
+          + destruct r; try easy; try (destruct n; easy).
+            destruct b; try easy.
+            simpl in H5; contradict H5; auto. }
+      * { destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4;
         split; intro.
-        -- destruct r, b; easy.
-        -- destruct r; try easy.
-           destruct n; easy.
-        -- split; intro.
-           ++ split;[destruct r; easy|].
-              apply (f_equal (FF2R radix2)) in H4.
-              rewrite FF2R_B2FF in H4.
-              simpl in H4.
-              replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
-                  (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                   apply Pos.pow_gt_1;
-                   zify; auto with zarith).
-              rewrite <-max_real_is_F2R; assumption.
-           ++ destruct r; try easy; try (destruct n; easy).
-              destruct b; try easy.
-              simpl in H5; contradict H5; auto.
-      * destruct (xorb (Bsign sb emax x) (Bsign sb emax y)); simpl in H4;
-        split; intro.
-        -- destruct r, b; easy.
-        -- split;[destruct r, b; try easy; destruct n; easy|].
-           apply (f_equal (FF2R radix2)) in H4.
-           rewrite FF2R_B2FF in H4.
-           simpl in H4.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
-               (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                apply Pos.pow_gt_1;
-                zify; auto with zarith).
-           rewrite <-min_real_is_F2R; assumption.
-        -- split; [destruct r; try easy| ].
-           apply (f_equal (FF2R radix2)) in H4.
-           rewrite FF2R_B2FF in H4.
-           simpl in H4.
-           replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
-               (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
-                apply Pos.pow_gt_1;
-                zify; auto with zarith).
-           rewrite <-max_real_is_F2R; assumption.
-        -- contradict H5.
-           destruct r, b; try easy; destruct n; easy.
+          - destruct r; destruct b; easy.
+          - split;[destruct r; destruct b; try easy; destruct n; easy|].
+            apply (f_equal (FF2R radix2)) in H4.
+            rewrite FF2R_B2FF in H4.
+            simpl in H4.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
+                (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
+                 apply Pos.pow_gt_1;
+                 zify; auto with zarith).
+            rewrite <-min_real_is_F2R; assumption.
+          - split; [destruct r; try easy| ].
+            apply (f_equal (FF2R radix2)) in H4.
+            rewrite FF2R_B2FF in H4.
+            simpl in H4.
+            replace (Z.pow_pos 2 sb_pos - 1)%Z with (Z.pos (2 ^ sb_pos - 1)) in H4 by
+                (rewrite Pos2Z.inj_sub, Pos2Z.inj_pow_pos; auto;
+                 apply Pos.pow_gt_1;
+                 zify; auto with zarith).
+            rewrite <-max_real_is_F2R; assumption.
+          - contradict H5.
+            destruct r; destruct b; try easy; destruct n; easy. }
     + clear H4.
       rewrite no_overflow_Rabs_round_emax in H3.
       apply Rge_le, Rfourier_not_lt_ge; assumption.
@@ -2851,11 +2849,11 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
   - rewrite is_zero_B754_zero in H0; destruct H0.
     rewrite is_zero_B754_zero in H1; destruct H1.
     destruct x, y; easy.
-  - destruct x, b, y, b; try easy.
+  - destruct x ; destruct b; destruct y ; destruct b; try easy.
     contradict H; auto.
     contradict H; auto.
-    set (x:=B754_finite sb emax false m0 e e0);
-      set (y:=B754_finite sb emax false m1 e1 e2); fold x y in r, H0, H2.
+    set (x:=B754_finite false m0 e e0);
+      set (y:=B754_finite false m1 e1 e2); fold x y in r, H0, H2.
     assert (to_real y <> 0).
     { assert (0 < to_real y) by
           (apply non_zero_positive_to_real; easy).
@@ -2872,11 +2870,11 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
     + apply (f_equal sign_FF) in H3.
       rewrite sign_FF_B2FF, sign_FF_overflow in H3.
       rewrite is_positive_Bsign; auto.
-  - destruct x, b, y, b; try easy.
+  - destruct x ; destruct b; destruct y ; destruct b; try easy.
     contradict H; auto.
     contradict H; auto.
-    set (x:=B754_finite sb emax true m0 e e0);
-      set (y:=B754_finite sb emax true m1 e1 e2); fold x y in r, H0, H2.
+    set (x:=B754_finite true m0 e e0);
+      set (y:=B754_finite true m1 e1 e2); fold x y in r, H0, H2.
     assert (to_real y <> 0).
     { assert (to_real y < 0) by
           (apply non_zero_negative_to_real; easy).
@@ -2893,11 +2891,11 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
     + apply (f_equal sign_FF) in H3.
       rewrite sign_FF_B2FF, sign_FF_overflow in H3.
       rewrite is_positive_Bsign; auto.
-  - destruct x, b, y, b; try easy.
+  - destruct x ; destruct b; destruct y ; destruct b; try easy.
     contradict H; auto.
     contradict H; auto.
-    set (x:=B754_finite sb emax false m0 e e0);
-      set (y:=B754_finite sb emax true m1 e1 e2); fold x y in r, H0, H2.
+    set (x:=B754_finite false m0 e e0);
+      set (y:=B754_finite true m1 e1 e2); fold x y in r, H0, H2.
     assert (to_real y <> 0).
     { assert (to_real y < 0) by
           (apply non_zero_negative_to_real; easy).
@@ -2914,11 +2912,11 @@ Lemma div_special : forall (m:mode) (x:t) (y:t), let r := (div m x y) in
     + apply (f_equal sign_FF) in H3.
       rewrite sign_FF_B2FF, sign_FF_overflow in H3.
       rewrite is_negative_Bsign; auto.
-  - destruct x, b, y, b; try easy.
+  - destruct x ; destruct b; destruct y ; destruct b; try easy.
     contradict H; auto.
     contradict H; auto.
-    set (x:=B754_finite sb emax true m0 e e0);
-      set (y:=B754_finite sb emax false m1 e1 e2); fold x y in r, H0, H2.
+    set (x:=B754_finite true m0 e e0);
+      set (y:=B754_finite false m1 e1 e2); fold x y in r, H0, H2.
     assert (to_real y <> 0).
     { assert (0 < to_real y) by
           (apply non_zero_positive_to_real; easy).
@@ -3005,14 +3003,14 @@ Lemma abs_le_inv: forall {x y}, le (abs x) y -> le (neg y) x /\ le x y.
       - unfold is_minus_infinity in H1; destruct x; easy.
       - destruct y, H1; try easy.
         unfold is_plus_infinity in H1; destruct b; try easy.
-        destruct x, b; easy.
-    * unfold le, neg, Bcompare.
-      destruct x, y, b, b0; simpl; split; auto; easy.
-    * destruct x; unfold le, abs, Bcompare in a; try easy.
+        destruct x ; destruct b; split; easy.
+    * unfold Bcompare.
+      destruct x, y; destruct b, b0; simpl; split; auto; easy.
+    * destruct x; unfold le, Bcompare in a; try easy.
       destruct a as [a|a]; contradict a; easy.
   + intros a.
     destruct y; unfold le, Bcompare in a; try easy.
-    destruct x, b0; try easy.
+    destruct x; destruct b0; split; easy.
 Qed.
 
 (* Why3 goal *)
@@ -3059,9 +3057,9 @@ split; [auto|apply fma_finite; easy].
 destruct (fma_special m x y z) as (_,(_,(_,(_,(_,(_,(_,(_,(_,(_,(h,_))))))))))).
 assert (is_finite x /\ is_finite y /\ is_finite z /\ ~ no_overflow m (to_real x * to_real y + to_real z)) by auto.
 apply h in H3; clear h.
-destruct (fma m x y z), b, m; simpl in *; try easy;
-  try (destruct H3, H4, H4; now auto);
-  destruct H3, H4, H5; auto.
+destruct (fma m x y z); destruct b, m; simpl in *; try easy;
+  try (destruct H3; destruct H4; destruct H4; now auto);
+  destruct H3; destruct H4; destruct H5; auto.
 Qed.
 
 (* Why3 goal *)
@@ -3074,10 +3072,10 @@ Lemma sqrt_special : forall (m:mode) (x:t), let r := (sqrt m x) in (((is_nan
   intuition.
   - destruct x; easy.
   - unfold is_plus_infinity in *.
-    destruct x, b; easy.
+    destruct x ; destruct b; easy.
   - unfold is_minus_infinity in H.
-    destruct x, b; easy.
-  - destruct x, b; try easy.
+    destruct x ; destruct b; easy.
+  - destruct x ; destruct b; try easy.
     rewrite B754_zero_to_real in H1; fourier.
     rewrite B754_zero_to_real in H1; fourier.
     apply (to_real_negative _ H0) in H1.
@@ -3283,7 +3281,7 @@ Lemma is_int_or_not: forall (x:t), is_int x \/ ~ is_int x.
     rewrite Zfloor_Z2R; auto.
   - right; intro h; destruct h; easy.
   - right; intro h; destruct h; easy.
-  - set (x := (B754_finite sb emax b m e e0)).
+  - set (x := (B754_finite b m e e0)).
     unfold is_int, is_intR.
     destruct (Req_dec (to_real x) (Z2R (floor (to_real x)))).
     left.
@@ -3298,7 +3296,7 @@ Lemma Bmax_rep_int_is_int: is_int Bmax_rep_int.
   rewrite <-Z2R_IZR; apply is_intR_Z2R.
 Qed.
 
-Lemma B754_zero_is_int : forall {b}, (is_int (B754_zero sb emax b)).
+Lemma B754_zero_is_int : forall {b}, (is_int (B754_zero b)).
   split;auto.
   rewrite B754_zero_to_real.
   unfold is_intR.
@@ -3431,7 +3429,7 @@ Lemma big_float_is_int : forall (m:mode) (i:t), (is_finite i) -> (((le i
   apply B754_zero_is_int.
   split; auto.
   rewrite <-Bmax_rep_int_of_int in h2.
-  unfold to_real,F2R,Fnum,Fexp.
+  unfold B2R, F2R,Fnum,Fexp.
 
   assert (1 <= e)%Z.
   { unfold le in h2; simpl Bcompare in h2.
@@ -3516,7 +3514,7 @@ Lemma roundToIntegral_is_int : forall (m:mode) (x:t), (is_finite x) ->
     split;[apply h1|].
     simpl; unfold is_intR.
     rewrite <-FromInt.Zero, Floor_int; reflexivity.
-    change (is_int (of_int RTZ (to_int m (B754_finite sb emax b m0 e e0)))).
+    change (is_int (of_int RTZ (to_int m (B754_finite b m0 e e0)))).
     apply of_int_is_int.
     apply is_finite_to_int2.
     assumption.
@@ -3674,7 +3672,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma is_int_is_finite : forall (x:t), (is_int x) -> (is_finite x).
-unfold is_int; easy.
+intros x (h,_); assumption.
 Qed.
 
 (* Why3 goal *)
@@ -3705,7 +3703,7 @@ Lemma to_real_roundToIntegral: forall {x} m, is_finite x -> to_real (roundToInte
   contradict n.
   apply to_int_B754_zero.
 
-  set (x:= B754_finite sb emax b m0 e e0); fold x in h, h.
+  set (x:= B754_finite b m0 e e0); fold x in h, h.
   change (to_real (of_int RTZ (to_int m x)) = Z2R (to_int m x)).
 
   assert (is_finite Bmax_rep_int) by auto.
@@ -3715,7 +3713,7 @@ Lemma to_real_roundToIntegral: forall {x} m, is_finite x -> to_real (roundToInte
        \/ ((le x (neg Bmax_rep_int)) \/ (le Bmax_rep_int x))) as h1.
   destruct (le_or_lt_or_nan x Bmax_rep_int) as [h1|[h1|[h1|h1]]].
   + destruct (le_or_lt_or_nan (neg Bmax_rep_int) x) as [h2|[h2|[h2|h2]]].
-    - left; easy.
+    - left; split; easy.
     - right; left; apply lt_le; auto.
     - destruct (neg Bmax_rep_int); easy.
     - destruct x; easy.
@@ -3865,7 +3863,7 @@ Lemma floor_lest : forall (x:t) (y:t), ((le y x) /\ (is_int y)) -> (le y
     unfold is_minus_infinity in h.
     destruct y; easy.
   - unfold is_plus_infinity in h.
-    destruct h, H, H0, h2, x; try easy.
+    destruct h; destruct H; destruct H0, h2, x; try easy.
 Qed.
 
 (* Why3 goal *)
@@ -3893,7 +3891,7 @@ Lemma same_sign_roundToIntegral:
   intros x m h.
   unfold same_sign.
   destruct x; try (destruct b; simpl; now auto); clear h.
-  set (x:=B754_finite sb emax b m0 e e0).
+  set (x:=B754_finite b m0 e e0).
   assert (no_overflow RTZ (IZR (to_int m x))) by
       (apply is_finite_to_int; auto).
   destruct (of_int_correct H) as (_,(_,h1)); clear H.
@@ -3975,7 +3973,7 @@ Lemma RNA_down : forall (x:t), (lt (sub RNE x (roundToIntegral RTN x))
   x) = (roundToIntegral RTN x)).
   intros x h.
   destruct x; try easy.
-  set (x:=(B754_finite sb emax b m e e0)); fold x in h.
+  set (x:=(B754_finite b m e e0)); fold x in h.
   assert (forall m', is_finite (roundToIntegral m' x)) as h1.
   intro m'.
   apply roundToIntegral_finite; auto.
@@ -4020,7 +4018,7 @@ Lemma RNA_up : forall (x:t), (lt (sub RNE (roundToIntegral RTP x) x) (sub RNE
   x) = (roundToIntegral RTP x)).
   intros x h.
   destruct x; try easy.
-  set (x:=(B754_finite sb emax b m e e0)); fold x in h.
+  set (x:=(B754_finite b m e e0)); fold x in h.
   assert (forall m', is_finite (roundToIntegral m' x)) as h1.
   intro m'.
   apply roundToIntegral_finite; auto.
@@ -4232,11 +4230,11 @@ Lemma half_bounded: bounded sb emax (shift_pos (sb_pos - 1) 1) (- sb) = true.
 Qed.
 
 Definition half: t.
-  exact (B754_finite sb emax false _ _ half_bounded).
+  exact (B754_finite false _ _ half_bounded).
 Defined.
 
 Lemma half_to_real : ((to_real half) = (05 / 10)%R).
-  unfold to_real, B2R, half; simpl.
+  unfold B2R, half; simpl.
   rewrite shift_pos_correct.
   rewrite Z.pow_pos_fold.
   unfold F2R.
@@ -4263,7 +4261,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
   - simpl.
     replace 0 with (Z2R 0) by auto.
     rewrite Zfloor_Z2R, Zceil_Z2R; auto.
-  - set (x:=(B754_finite sb emax b m e e0)); fold x in h.
+  - set (x:=(B754_finite b m e e0)); fold x in h.
     assert (forall m', is_finite (roundToIntegral m' x)) as h1 by
           (intro m'; apply roundToIntegral_finite; auto).
 
@@ -4312,8 +4310,8 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
         rewrite (Round_to_real RNE) in h by auto.
         rewrite (proj2 (neg_finite _ x_fin)) in h.
 
-        destruct (Rle_lt_dec (to_real x) (-/2)).
-        -- assert (
+        { destruct (Rle_lt_dec (to_real x) (-/2)).
+        - assert (
                round RNE (to_real x - to_real (roundToIntegral RTN x)) =
                to_real x - to_real (roundToIntegral RTN x)) as aux1.
            { rewrite Real.infix_mn_def, <-(proj2 (neg_finite _ (h1 RTN))).
@@ -4328,7 +4326,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            rewrite aux1 in h.
            rewrite to_real_roundToIntegral in h; auto.
 
-        -- clear r r0.
+        - clear r r0.
            rewrite to_real_roundToIntegral in h; auto.
            unfold to_int in h.
            rewrite H0 in *.
@@ -4341,7 +4339,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            apply (Round_monotonic RNE) in H2.
            rewrite Round_to_real in H2 by easy.
            rewrite half_to_real in H2.
-           assert false by fourier; easy.
+           assert false by fourier; easy. }
       * assert (floor (to_real x) = 0%Z) by
             (apply Zfloor_imp; simpl Z2R; split; fourier).
         assert (ceil (to_real x) = 0%Z) by
@@ -4361,8 +4359,8 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
         replace (to_real x - 0) with (to_real x) in h by ring.
         rewrite (Round_to_real RNE) in h by auto.
 
-        destruct (Rle_lt_dec (/2) (to_real x)).
-        -- assert (
+        { destruct (Rle_lt_dec (/2) (to_real x)).
+        - assert (
                round RNE (to_real (roundToIntegral RTP x) - to_real x) =
                to_real (roundToIntegral RTP x) - to_real x) as aux1.
            { rewrite Real.infix_mn_def, <-(proj2 (neg_finite _ x_fin)).
@@ -4378,7 +4376,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            unfold  to_int in h.
            rewrite h at 1; ring.
 
-        -- clear r r0.
+        - clear r r0.
            rewrite to_real_roundToIntegral in h; auto.
            unfold to_int in h.
            rewrite H0 in *.
@@ -4392,7 +4390,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            apply (Round_monotonic RNE) in H2.
            rewrite Round_to_real in H2 by easy.
            rewrite half_to_real in H2.
-           assert false by fourier; easy.
+           assert false by fourier; easy. }
 Qed.
 
 (* Why3 goal *)
@@ -4401,7 +4399,7 @@ Lemma RNA_down_tie : forall (x:t), (eq (sub RNE x (roundToIntegral RTN x))
   ((roundToIntegral RNA x) = (roundToIntegral RTN x))).
   intros x h h'.
   destruct x; try easy.
-  set (x:=(B754_finite sb emax b m e e0)); fold x in h, h'.
+  set (x:=(B754_finite b m e e0)); fold x in h, h'.
   assert (forall m', is_finite (roundToIntegral m' x)) as h1 by
         (intro m'; apply roundToIntegral_finite; auto).
   apply to_real_refl; auto.
@@ -4418,7 +4416,7 @@ Lemma RNA_down_tie : forall (x:t), (eq (sub RNE x (roundToIntegral RTN x))
   simpl in H'.
   rewrite <-Z2R_IZR, H', Zfloor_Z2R; reflexivity.
 
-  unfold ZnearestA.
+  unfold Znearest.
   rewrite Rcompare_Eq.
   rewrite Zle_bool_false; auto.
   apply lt_Z2R.
@@ -4457,7 +4455,7 @@ Lemma RNA_up_tie : forall (x:t), (eq (sub RNE (roundToIntegral RTP x) x)
   ((roundToIntegral RNA x) = (roundToIntegral RTP x))).
   intros x h h'.
   destruct x; try easy.
-  set (x:=(B754_finite sb emax b m e e0)); fold x in h, h'.
+  set (x:=(B754_finite b m e e0)); fold x in h, h'.
   assert (forall m', is_finite (roundToIntegral m' x)) as h1 by
         (intro m'; apply roundToIntegral_finite; auto).
   apply to_real_refl; auto.
@@ -4474,7 +4472,7 @@ Lemma RNA_up_tie : forall (x:t), (eq (sub RNE (roundToIntegral RTP x) x)
   simpl in H'.
   rewrite <-Z2R_IZR, H', Zceil_Z2R; reflexivity.
 
-  unfold ZnearestA.
+  unfold Znearest.
   rewrite Rcompare_Eq.
   rewrite Zle_bool_true; auto.
   apply non_zero_positive_to_real in h'; auto.
@@ -4514,7 +4512,7 @@ Lemma to_int_roundToIntegral : forall (m:mode) (x:t), ((to_int m
   unfold to_int at 2.
   rewrite to_real_roundToIntegral; auto.
   destruct (valid_rnd_round_mode m) as (_,h).
-  pose proof (h (to_int m (B754_finite sb emax b m0 e e0))).
+  pose proof (h (to_int m (B754_finite b m0 e e0))).
   destruct m; auto.
 Qed.
 

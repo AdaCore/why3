@@ -520,14 +520,32 @@ let add_types dl th =
     let uc = add_ty_decl uc ts in
     match ts.ts_def with
     | NoDef | Alias _ -> uc
-    | Range _ ->
+    | Range rg ->
         (* FIXME: "t'to_int" is probably better *)
         let nm = ts.ts_name.id_string ^ "'int" in
         let id = id_derive nm ts.ts_name in
         let pj = create_fsymbol id [ty_app ts []] ty_int in
         let uc = add_param_decl uc pj in
-        add_meta uc meta_range [MAts ts; MAls pj]
-    | Float _ ->
+        let uc = add_meta uc meta_range [MAts ts; MAls pj] in
+        (* create max attribute *)
+        let nm = ts.ts_name.id_string ^ "'maxInt" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t =
+          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_upper)))
+            ty_int
+        in
+        let uc = add_logic_decl uc [make_ls_defn ls [] t] in
+        (* create min attribute *)
+        let nm = ts.ts_name.id_string ^ "'minInt" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t =
+          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_lower)))
+            ty_int
+        in
+        add_logic_decl uc [make_ls_defn ls [] t]
+    | Float fmt ->
         (* FIXME: "t'to_real" is probably better *)
         let nm = ts.ts_name.id_string ^ "'real" in
         let id = id_derive nm ts.ts_name in
@@ -538,7 +556,19 @@ let add_types dl th =
         let id = id_derive nm ts.ts_name in
         let iF = create_psymbol id [ty_app ts []] in
         let uc = add_param_decl uc iF in
-        add_meta uc meta_float [MAts ts; MAls pj; MAls iF]
+        let uc = add_meta uc meta_float [MAts ts; MAls pj; MAls iF] in
+        (* create exponent digits attribute *)
+        let nm = ts.ts_name.id_string ^ "'eb" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t = t_nat_const fmt.Number.fp_exponent_digits in
+        let uc = add_logic_decl uc [make_ls_defn ls [] t] in
+        (* create significand digits attribute *)
+        let nm = ts.ts_name.id_string ^ "'sb" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t = t_nat_const fmt.Number.fp_significand_digits in
+        add_logic_decl uc [make_ls_defn ls [] t]
   in
   try
     let th = List.fold_left add_ty_decl th abstr in

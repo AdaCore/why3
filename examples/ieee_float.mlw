@@ -1,13 +1,10 @@
-module TestIeeeFloat
+theory A
 
-  use import ieee_float.Float32
-  use real.Abs
+  use ieee_float.Float32
+  use ieee_float.Float64
 
-  lemma Test00: forall x:t.  abs x .<= (of_int RNE 2) -> .- (of_int RNE 3) .<= x
-
-  lemma Test01:
-       forall x:t.
-          .-(of_int RNE 2) .<= x .<= (of_int RNE 2) -> .- (of_int RNE 4) .<= x .* x .<= (of_int RNE 4)
+  lemma ebsb32 : Float32.t'eb = 8  /\ Float32.t'sb = 24
+  lemma ebsb64 : Float64.t'eb = 11 /\ Float64.t'sb = 53
 
 end
 
@@ -15,18 +12,18 @@ module M603_018
   use import ieee_float.Float32
 
   constant x : t = zeroF
-  constant y : t = of_int RNE 1
-  constant z : t = y ./ (of_int RNE 2)
-  constant t : t = (x .+ y) ./ (of_int RNE 2)
+  constant y : t = 1.0
+  constant z : t = y ./ (2.0:t)
+  constant t : t = (x .+ y) ./ (2.0:t)
 
   let triplet (x y z : t)
     requires { x .<= z /\ z .<= y }
-    requires { .-(of_int RNE 1) .<= x /\ x .<= (of_int RNE 10) }
-    requires { y .= x .+ (of_int RNE 1) }
+    requires { .-(1.0:t) .<= x /\ x .<= (10.0:t) }
+    requires { y .= x .+ (1.0:t) }
     requires { roundToIntegral RTN z = x }
     requires { roundToIntegral RTP z = y }
   =
-    let t = (x .+ y) ./ (of_int RNE 2) in
+    let t = (x .+ y) ./ (2.0:t) in
     assert { roundToIntegral RTN x .= x };
     assert { roundToIntegral RTN y .= y };
     assert { roundToIntegral RTN z .= x };
@@ -60,40 +57,34 @@ module M121_039_nonlinear
 
   use import ieee_float.Float32
 
-  constant max : t = of_int RNE 340282346638528859811704183484516925440
+  constant max : t = 340282346638528859811704183484516925440.0
   constant min : t = .- max
 
-  constant one : t = of_int RNE 1
-  constant zero : t = zeroF
+  constant one : t = 1.0
 
   predicate in_range (x :t) = min .<= x .<= max
 
-  (* predicate axiom_mult t t t *)
-
-  (* axiom axiom_mult : forall a b y. *)
-  (*   axiom_mult a b y = if a .<= b /\ y .<= zero then a .* y .>= b .* y else false *)
-
   predicate axiom_mult (a b y : t) =
-     if a .<= b /\ y .<= zero then a .* y .>= b .* y else false
+     if a .<= b /\ y .<= zeroF then a .* y .>= b .* y else false
 
   let test (a x y:t)
-    requires { zero .<= a .<= one }
+    requires { zeroF .<= a .<= one }
     requires { .- one .<= x .<= one }
     requires { .- one .<= y .<= one }
-    requires { x .> zero /\ y .< zero /\ x .+ y .>= zero }
-    ensures  { result .>= zero /\ result .<= (of_int RNE 2) }
+    requires { x .> zeroF /\ y .< zeroF /\ x .+ y .>= zeroF }
+    ensures  { result .>= zeroF /\ result .<= (2.0:t) }
   =
     assert { axiom_mult a one y };
 
-    assert { a .>= zero };
+    assert { a .>= zeroF };
     assert { a .<= one };
-    assert { x .> zero };
-    assert { y .<= zero };
-    assert { y .* a .<= zero };
+    assert { x .> zeroF };
+    assert { y .<= zeroF };
+    assert { y .* a .<= zeroF };
     assert { y .* a .>= y .* one };
     assert { x .+ y .* a .>= x .+ y };
-    assert { x .+ y .>= zero };
-    assert { x .+ y .* a .>= zero };
+    assert { x .+ y .>= zeroF };
+    assert { x .+ y .* a .>= zeroF };
 
     x .+ y .* a
 
@@ -111,14 +102,5 @@ module LB09_025_conversion
     ensures  { result = to_int RNE x }
   =
     to_int RNE x
-
-end
-
-module Test
-  use import ieee_float.Float32
-
-  constant half : t = of_int RNE 1 ./ of_int RNE 2
-
-  goal G1: forall x. is_finite x -> x .- half .<= roundToIntegral RNA x .<= x .+ half
 
 end

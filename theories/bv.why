@@ -398,18 +398,17 @@ end
 theory BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
-  constant max_int        : int = 0xFFFF_FFFF_FFFF_FFFF
 
   use int.Int (* needed to use range types *)
 
-  type t = < range 0x0000_0000_0000_0000 0xFFFF_FFFF_FFFF_FFFF >
+  type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -419,18 +418,17 @@ end
 theory BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
-  constant max_int        : int = 0xFFFF_FFFF
 
   use int.Int (* needed to use range types *)
 
-  type t = < range 0x0000_0000 0xFFFF_FFFF >
+  type t = < range 0 0xFFFF_FFFF >
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -440,18 +438,17 @@ end
 theory BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
-  constant max_int : int = 0xFFFF
 
   use int.Int (* needed to use range types *)
 
-  type t = < range 0x0000 0xFFFF >
+  type t = < range 0 0xFFFF >
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -461,18 +458,17 @@ end
 theory BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
-  constant max_int        : int = 0xFF
 
   use int.Int (* needed to use range types *)
 
-  type t = < range 0x00 0xFF >
+  type t = < range 0 0xFF >
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
