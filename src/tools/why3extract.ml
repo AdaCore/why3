@@ -137,11 +137,17 @@ let get_cout_old ?fname fg m = match opt_output with
 
 let print_mdecls ?fname m mdecls =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
-  let cout, old = get_cout_old fg m ?fname in
-  let fmt = formatter_of_out_channel cout in
-  let flat = opt_modu_flat = Flat in
-  List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
-  if cout <> stdout then close_out cout
+  let test_decl_not_driver decl =
+    let decl_name = ML.get_decl_name decl in
+    let test_id_not_driver id =
+      Printer.query_syntax pargs.Pdriver.syntax id = None in
+    List.exists test_id_not_driver decl_name in
+  if List.exists test_decl_not_driver mdecls then begin
+    let cout, old = get_cout_old fg m ?fname in
+    let fmt = formatter_of_out_channel cout in
+    let flat = opt_modu_flat = Flat in
+    List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
+    if cout <> stdout then close_out cout end
 
 let find_module_path mm path m = match path with
   | [] ->
@@ -308,15 +314,15 @@ let () =
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let mm = Mstr.empty in
       let cout = match opt_output with
-          | None -> stdout
-          | Some file -> open_out file in
+        | None -> stdout
+        | Some file -> open_out file in
       let fmt = formatter_of_out_channel cout in
-      let extract id =
+      let extract fmt id =
         let pm = find_module_id mm id in
         let m = translate_module pm in
         let d = Ident.Mid.find id m.ML.mod_known in
         pr pargs ~flat:true pm fmt d in
-      List.iter extract (List.rev !toextract);
+      List.iter (extract fmt) (List.rev !toextract);
       if cout <> stdout then close_out cout
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

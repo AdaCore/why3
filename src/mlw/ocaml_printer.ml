@@ -269,8 +269,8 @@ module Print = struct
       | [], [] ->
         (print_uident info) fmt rs.rs_name
       | [], tl ->
-        fprintf fmt "@[<hov 2>%a (%a)@]"
-          print_ident rs.rs_name (print_list comma (print_expr info)) tl
+        fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
+          (print_list comma (print_expr info)) tl
       | pjl, tl ->
         fprintf fmt "@[<hov 2>{ %a}@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
@@ -466,8 +466,9 @@ module Print = struct
   let print_decl info fmt decl =
     let decl_name = get_decl_name decl in
     let decide_print id =
-      if query_syntax info.info_syn id = None then
-        print_decl info fmt decl in
+      if query_syntax info.info_syn id = None then begin
+        print_decl info fmt decl;
+        fprintf fmt "@." end in
     List.iter decide_print decl_name
 
 end
@@ -484,8 +485,7 @@ let print_decl pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d =
     info_fname        = Opt.map Compile.clean_name fname;
     flat              = flat;
   } in
-  Print.print_decl info fmt d;
-  fprintf fmt "@."
+  Print.print_decl info fmt d
 
 let fg ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in

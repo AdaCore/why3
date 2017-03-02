@@ -114,7 +114,7 @@ module LeftistHeap
   type t = tree elt
 
   (* [e] is no greater than the root of [h], if any *)
-  let predicate le_root (e: elt) (h: t) = match h with
+  predicate le_root (e: elt) (h: t) = match h with
     | E -> true
     | N _ _ x _ -> le e x
     end
