@@ -1517,7 +1517,11 @@ module N
     returns { (r,_d) ->  l2i r <= radix - (power 2 (cnt)) }
     returns { (_r,d) -> l2i d < power 2 (cnt) }
   =
-    let (r:limb,d:limb) = lsld x cnt in (* have to write an l2i for each of r and d ? *)
+    let uzero = Limb.of_int 0 in
+    if (Limb.(=) cnt uzero) then (x, uzero)
+    else
+    begin
+    let (r:limb,d:limb) = lsld x cnt in
     let p = power 2 (l2i cnt) in
     let q = power 2 (Limb.length - l2i cnt) in
     assert { p > 0 /\ q > 0 };
@@ -1564,6 +1568,7 @@ module N
              so d < p
              };
     (r,d)
+    end
 
   (** [lshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the left and
       writes the result in [(r, sz)]. Returns the [cnt] most significant
@@ -2132,7 +2137,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     requires { 0 < sz }
     requires { 0 < y }
     ensures { value_sub_shift x (sz)
-              = value_sub_shift q (sz) * y + result }
+              = value_sub_shift q sz * y + result }
+    ensures { result < y }
   =
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
@@ -5316,49 +5322,109 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     assert { value_sub_shift x 2 = !rl + radix * !rh };
     !qh
 
+  let copy (r x:t) (sz:int32) : unit
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
+    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+  =
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let i = ref zero in
+    let xp = ref x in
+    let rp = ref r in
+    while (Int32.(<) !i sz) do
+      variant { p2i sz - p2i !i }
+      invariant { 0 <= !i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset !i }
+      invariant { pelts !xp = pelts x }
+      invariant { pelts !rp = pelts r }
+      invariant { plength !xp = plength x }
+      invariant { plength !rp = plength r }
+      invariant { !xp.offset = x.offset + !i }
+      invariant { !rp.offset = r.offset + !i }
+      C.set !rp (C.get !xp);
+      rp := C.incr !rp one;
+      xp := C.incr !xp one;
+      i := Int32.(+) !i one;
+    done
 
 
 
   (** [div_qr q r x y sx sy] divides [(x,sx)] by [(y,sy)], writes the quotient
     in [(q, (sx-sy))] and the remainder in [(r, sy)]. Corresponds to
     [mpn_tdiv_qr]. *)
-  let div_qr (q r x y:t) (sx sy:int32) : unit
-    requires { 1 <= sy <= sx}
+  let div_qr (q r x y nx ny:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid_ptr_itv x (sx) }
     requires { valid_ptr_itv y (sy) }
     requires { valid_ptr_itv q (sx - sy + 1) } (* TODO check if this is needed*)
     requires { valid_ptr_itv r (sy) }
-    requires { (pelts y)[sy - 1] > 0 }
+    requires { valid_ptr_itv nx (sx + 1) }
+    requires { valid_ptr_itv ny sy }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value_sub_shift x sx
+              = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                + value_sub_shift r sy }
+    ensures { value_sub_shift r sy < value_sub_shift y sy }
   =
+    label Start in
     let one = Int32.of_int 1 in
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
+    let two = Int32.of_int 2 in
     if (Int32.(=) sy one)
     then
       let lr = divmod_1 q x (C.get y) sx in
       C.set r lr
     else
+    if (Int32.(=) sy two)
+    then
       let clz = count_leading_zeros (C.get_ofs y (Int32.(-) sy one)) in
       if Int32.(=) clz zero
       then begin
-        let nx = malloc (UInt32.of_int32 (Int32.(+) sx one)) in
-        let _ = add_limb nx x limb_zero sx in (*TODO actual copy*)
+        copy nx x sx;
+        (*value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);*)
+        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) limb_zero;
         C.set_ofs nx sx limb_zero;
-        let _ = div_sb_qr q nx y (Int32.(+) sx one) sy in
-        let _ = add_limb r nx limb_zero sy in
-        free nx;
+        value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+        label Div2_ns in
+        let _ = divmod_2 q nx y (Int32.(+) sx one) in
+        copy r nx sy;
+        assert { value_sub_shift x sx
+                 = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                 + value_sub_shift r sy
+               by  value_sub_shift r sy = value_sub_shift nx sy
+               so value_sub_shift x sx = value_sub_shift (nx at Div2_ns) sx
+               };
+        ()
       end
       else begin
-        let nx = malloc (UInt32.of_int32 (Int32.(+) sx one)) in
-        let ny = malloc (UInt32.of_int32 sy) in
         let _c = lshift ny y sy (Limb.of_int32 clz) in
         let h = lshift nx x sx (Limb.of_int32 clz) in
         C.set_ofs nx sx h;
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-        let _ = div_sb_qr q nx ny (Int32.(+) sx (Int32.of_int 1)) sy in
+        let _ = divmod_2 q nx ny (Int32.(+) sx one) in
         let _ = rshift r nx sy (Limb.of_int32 clz) in
-        free nx;
-        free ny;
+        ()
+      end
+    else
+      let clz = count_leading_zeros (C.get_ofs y (Int32.(-) sy one)) in
+      if Int32.(=) clz zero
+      then begin
+        copy nx x sx;
+        C.set_ofs nx sx limb_zero;
+        let _ = div_sb_qr q nx y (Int32.(+) sx one) sy in
+        copy r nx sy;
+        ()
+      end
+      else begin
+        let _c = lshift ny y sy (Limb.of_int32 clz) in
+        let h = lshift nx x sx (Limb.of_int32 clz) in
+        C.set_ofs nx sx h;
+        (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
+        let _ = div_sb_qr q nx ny (Int32.(+) sx one) sy in
+        let _ = rshift r nx sy (Limb.of_int32 clz) in
+        ()
       end
 
   (** Tests *)

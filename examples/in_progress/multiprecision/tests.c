@@ -9,7 +9,8 @@ uint64_t add(uint64_t * r3, uint64_t * x4, uint64_t * y3, int32_t sx, int32_t
 void mul(uint64_t * r10, uint64_t * x11, uint64_t * y10, int32_t sx2, int32_t
          sy2);
 
-void div_qr(uint64_t * q, uint64_t * r, uint64_t * x, uint64_t * y, int32_t sx, int32_t sy);
+void div_qr(uint64_t * q, uint64_t * r, uint64_t * x, uint64_t * y,
+            uint64_t * nx, uint64_t * ny,  int32_t sx, int32_t sy);
 
 #define TMP_ALLOC_LIMBS(n) malloc((n) * 8)
 
@@ -28,7 +29,7 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 #endif
 
 int main () {
-  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
+  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, nap, nbp;
   mp_size_t max_n, an, bn, rn;
   //gmp_randstate_t rands;
   //TMP_DECL;
@@ -45,6 +46,8 @@ int main () {
 
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
+  nap = TMP_ALLOC_LIMBS (max_n + 1);
+  nbp = TMP_ALLOC_LIMBS (max_n + 1);
   rp = TMP_ALLOC_LIMBS (2 * max_n);
   refp = TMP_ALLOC_LIMBS (2 * max_n);
   rq = TMP_ALLOC_LIMBS (max_n + 1);
@@ -52,16 +55,16 @@ int main () {
   refq = TMP_ALLOC_LIMBS (max_n + 1);
   refr = TMP_ALLOC_LIMBS (max_n + 1);
 
-  for (an = 3; an <= max_n; an += 1)
+  for (an = 2; an <= max_n; an += 1)
     {
-      for (bn = 3; bn <= an; bn += 1)
+      for (bn = 1; bn <= an; bn += 1)
 	{
 	  mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
 
-          if (bp[bn-1] == 0) 
+          if (bp[bn-1] == 0)
             {
-              printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn); 
+              printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
               continue;
             };
 
@@ -75,7 +78,7 @@ int main () {
 #endif
 #ifdef TEST_WHY3
 	  mul (rp, ap, bp, an, bn);
-          div_qr(rq, rr, ap, bp, an, bn);
+          div_qr(rq, rr, ap, bp, nap, nbp, an, bn);
 #endif
 
 #ifdef BENCH
@@ -101,8 +104,8 @@ int main () {
 		      (int) an, (int) bn, (int) rn);
 	      printf ("a: "); mpn_dump (ap, an);
 	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("q:    "); mpn_dump (rq, an-bn+1);
-	      printf ("refq: "); mpn_dump (refq, an-bn+1);
+	      printf ("q:    "); mpn_dump (rq, an-bn+2);
+	      printf ("refq: "); mpn_dump (refq, an-bn+2);
 	      printf ("r:    "); mpn_dump (rr, rn);
 	      printf ("refr: "); mpn_dump (refr, rn);
 	      abort();

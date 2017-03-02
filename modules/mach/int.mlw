@@ -226,7 +226,7 @@ module UInt32
     constant max = max_uint32
 
   val lsld (x cnt:uint32) : (uint32,uint32)
-    requires { 0 <= to_int cnt < 32 }
+    requires { 0 < to_int cnt < 32 }
     returns { (r,d) -> to_int r + (max_uint32+1) * to_int d =
               (power 2 (to_int cnt)) * to_int x }
 
@@ -388,7 +388,7 @@ module UInt64
     constant max = max_uint64
 
  val lsld (x cnt:uint64) : (uint64,uint64)
-    requires { 0 <= to_int cnt < 64 }
+    requires { 0 < to_int cnt < 64 }
     returns { (r,d) -> to_int r + (max_uint64+1) * to_int d =
               (power 2 (to_int cnt)) * to_int x }
 
