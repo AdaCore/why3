@@ -16,7 +16,8 @@ open Pmodule
 open Compile
 
 let usage_msg = sprintf
-  "Usage: %s [options] -D <driver> -o <dir> [[file|-] [-T <theory>]...]..."
+  "Usage: %s [options] -D <driver> [-o <dir|file>] \
+             [<file>.<Module>*.<symbol>?|-]"
   (Filename.basename Sys.argv.(0))
 
 type extract_target =
@@ -68,7 +69,9 @@ let option_list = [
   "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
       " same as -D";
   "--recursive", Arg.Unit (fun () -> opt_rec_single := Recursive),
-      " perform a recursive extraction";
+      " recursively extract all dependencies";
+  "--flat", Arg.Unit (fun x -> x),
+      " perform a flat extraction (default option)";
   "--modular", Arg.Unit (fun () -> opt_modu_flat := Modular),
       " perform a modular extraction";
   "-o", Arg.String (fun s -> opt_output := Some s),
@@ -79,17 +82,6 @@ let option_list = [
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
-let find_module_path mm path m = match path with
-  | [] ->
-    Mstr.find m mm
-  | path ->
-    let mm = Env.read_library Pmodule.mlw_language env path in
-    Mstr.find m mm
-
-let find_module_id mm id =
-  let (path, m, _) = Pmodule.restore_path id in
-  find_module_path mm path m
-
 let () =
   if Queue.is_empty opt_queue then begin
     Whyconf.Args.exit_with_usage option_list usage_msg
@@ -98,7 +90,6 @@ let () =
 let opt_rec_single = !opt_rec_single
 let opt_modu_flat  = !opt_modu_flat
 
-(* FIXME: accept --mono without -o and use to standard output *)
 let opt_output = match opt_modu_flat, !opt_output with
   | Modular, None ->
     eprintf "Output directory (-o) is required for modular extraction.@.";
@@ -109,8 +100,8 @@ let opt_output = match opt_modu_flat, !opt_output with
   | Modular, Some s when not (Sys.is_directory s) ->
     eprintf "Option '-o' should be given a directory as argument.@.";
     exit 1
-  | Flat, Some s when Sys.is_directory s ->
-    eprintf "Option '-o' should not be given a directory as argument.@.";
+  | Flat, Some s when Sys.file_exists s && Sys.is_directory s ->
+    eprintf "Option '-o' should be given a file as argument.@.";
     exit 1
   | Modular, Some _ | Flat, None | Flat, Some _ -> !opt_output
 
@@ -152,6 +143,17 @@ let print_mdecls ?fname m mdecls =
   List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
   if cout <> stdout then close_out cout
 
+let find_module_path mm path m = match path with
+  | [] ->
+    Mstr.find m mm
+  | path ->
+    let mm = Env.read_library Pmodule.mlw_language env path in
+    Mstr.find m mm
+
+let find_module_id mm id =
+  let (path, m, _) = Pmodule.restore_path id in
+  find_module_path mm path m
+
 let translate_module =
   let memo = Ident.Hid.create 16 in
   fun m ->
@@ -170,7 +172,7 @@ let extract_to =
       Ident.Hid.add memo name ();
       let mdecls = match decl with
         | None   -> (translate_module m).ML.mod_decl
-        | Some d -> List.map fst (Translate.pdecl_m m d) in
+        | Some d -> Translate.pdecl_m m d in
       print_mdecls ?fname m mdecls
     end
 
@@ -316,7 +318,6 @@ let () =
         pr pargs ~flat:true pm fmt d in
       List.iter extract (List.rev !toextract);
       if cout <> stdout then close_out cout
-
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

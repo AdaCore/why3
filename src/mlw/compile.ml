@@ -180,7 +180,14 @@ module ML = struct
     mod_known : known_map;
   }
 
-  let add_known_decl id decl k_map =
+  let get_decl_name = function
+    | Dtype itdefl -> List.map (fun {its_name = id} -> id) itdefl
+    | Dlet (Lvar (pv, _)) -> [pv.pv_vs.vs_name]
+    | Dlet (Lsym (rs, _, _, _)) -> [rs.rs_name]
+    | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
+    | Dexn (xs, _) -> [xs.xs_name]
+
+  let add_known_decl decl k_map id =
     Mid.add id decl k_map
 
   let rec iter_deps_ty f = function
@@ -191,7 +198,7 @@ module ML = struct
   let iter_deps_typedef f = function
     | Ddata constrl ->
       List.iter (fun (_, tyl) -> List.iter (iter_deps_ty f) tyl) constrl
-    | Drecord _pjl -> assert false (*TODO*)
+    | Drecord pjl -> List.iter (fun (_, _, ty) -> iter_deps_ty f ty) pjl
     | Dalias ty -> iter_deps_ty f ty
 
   let iter_deps_its_defn f its_d =
@@ -274,7 +281,9 @@ module ML = struct
         (fun {rec_sym = rs; rec_args = args; rec_exp = e; rec_res = res} ->
            f rs.rs_name; iter_deps_args f args;
            iter_deps_expr f e; iter_deps_ty f res) rdef
-    | _ -> assert false (*TODO*)
+    | Dlet (Lvar (_, e)) -> iter_deps_expr f e
+    | Dexn (_, None) -> ()
+    | Dexn (_, Some ty) -> iter_deps_ty f ty
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -298,7 +307,8 @@ module ML = struct
   let mk_var_unit () = id_register (id_fresh "_"), tunit, true
 
   let mk_its_defn id args private_ def =
-    { its_name = id; its_args = args; its_private = private_; its_def = def; }
+    { its_name    = id      ; its_args = args;
+      its_private = private_; its_def  = def; }
 
   let eseq e1 e2 =
     match e1.e_node, e2.e_node with
@@ -696,9 +706,8 @@ module Translate = struct
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       let res  = ity cty.cty_result in
-      let decl = ML.Dlet (ML.Lsym (rs, res, args, expr info e)) in
-      let add_known = Mid.singleton rs.rs_name decl in
-      [decl, add_known]
+      [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
+      (* let add_known = Mid.singleton rs.rs_name decl in *)
     | PDlet (LDrec rl) ->
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
         let e    = match e.c_node with Cfun e -> e | _ -> assert false in
@@ -708,24 +717,21 @@ module Translate = struct
           ML.rec_args = args; ML.rec_exp  = expr info e;
           ML.rec_res  = res } in
       let rec_def = filter_ghost_rdef def rl in
-      let decl    = ML.Dlet (ML.Lrec rec_def) in
-      let mk_add_km m {ML.rec_sym = rs} =
-        ML.add_known_decl rs.rs_name decl m in
-      let add_known = List.fold_left mk_add_km Mid.empty rec_def in
-      [decl, add_known]
-    | PDlet (LDsym _) | PDpure | PDlet (LDvar (_, _)) ->
+      [ML.Dlet (ML.Lrec rec_def)]
+      (* let mk_add_km m {ML.rec_sym = rs} = *)
+      (*   ML.add_known_decl decl m rs.rs_name in *)
+      (* let add_known = List.fold_left mk_add_km Mid.empty rec_def in *)
+    | PDlet (LDsym _) | PDpure | PDlet (LDvar _) ->
       []
     | PDtype itl ->
       let itsd = List.map tdef itl in
-      let decl = ML.Dtype itsd in
-      let mk_add_mk m {ML.its_name = id} = ML.add_known_decl id decl m in
-      let add_known = List.fold_left mk_add_mk Mid.empty itsd in
-      [decl, add_known]
+      [ML.Dtype itsd]
+      (* let mk_add_mk m {ML.its_name = id} = ML.add_known_decl decl m id in *)
+      (* let add_known = List.fold_left mk_add_mk Mid.empty itsd in *)
     | PDexn xs ->
-      let decl = if ity_equal xs.xs_ity ity_unit then ML.Dexn (xs, None)
-        else ML.Dexn (xs, Some (ity xs.xs_ity)) in
-      let add_known = Mid.singleton xs.xs_name decl in
-      [decl, add_known]
+      if ity_equal xs.xs_ity ity_unit then [ML.Dexn (xs, None)]
+      else [ML.Dexn (xs, Some (ity xs.xs_ity))]
+      (* let add_known = Mid.singleton xs.xs_name decl in *)
 
   let pdecl_m m pd =
     let info = {
@@ -744,14 +750,12 @@ module Translate = struct
     let info = {
       info_current_mo   = Some m;
       info_mo_known_map = m.mod_known; } in
-    let known_m = ref Mid.empty in
-    let mk_decl_and_km (decl, known_m_new) =
-      known_m := Mid.set_union !known_m known_m_new;
-      decl in
-    let comp munit =
-      let m = mdecl info munit in List.map mk_decl_and_km m in
-    let decl = List.map comp m.mod_units in
-    { ML.mod_decl = List.concat decl; ML.mod_known = !known_m }, info
+    let mod_decl = List.concat (List.map (mdecl info) m.mod_units) in
+    let add known_map decl =
+      let idl = ML.get_decl_name decl in
+      List.fold_left (ML.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty mod_decl in
+    { ML.mod_decl = mod_decl; ML.mod_known = mod_known }, info
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | ExtractionAny ->
@@ -838,8 +842,46 @@ module Transform = struct
     | Dtype _ | Dexn _ as d -> d
     | Dlet def -> Dlet (let_def info Mpv.empty def)
 
+  (* let pdecl, module_ = *)
+  (*   let mod_known = ref Mid.empty in *)
+  (*   let pdecl info = function *)
+  (*     | (Dtype itdefl) as decl -> *)
+  (*       let add {its_name = id} = mod_known := Mid.add id decl !mod_known in *)
+  (*       List.iter add itdefl; *)
+  (*       decl *)
+  (*     | Dexn (xs, _) as decl -> *)
+  (*       mod_known := Mid.add xs.xs_name decl !mod_known; *)
+  (*       decl *)
+  (*     | Dlet (Lvar (pv, e)) -> *)
+  (*       let let_var = Lvar (pv, expr info Mpv.empty e) in *)
+  (*       let decl = Dlet let_var in *)
+  (*       mod_known := Mid.add pv.pv_vs.vs_name decl !mod_known; *)
+  (*       decl *)
+  (*     | Dlet (Lsym (rs, res, args, e)) -> *)
+  (*       let let_sym = Lsym (rs, res, args, expr info Mpv.empty e) in *)
+  (*       let decl = Dlet let_sym in *)
+  (*       mod_known := Mid.add rs.Expr.rs_name decl !mod_known; *)
+  (*       decl *)
+  (*     | Dlet (Lrec rl) -> *)
+  (*       let let_rec = Lrec (List.map (rdef info Mpv.empty) rl) in *)
+  (*       let decl = Dlet let_rec in *)
+  (*       List.iter (fun {rec_sym = rs} -> *)
+  (*           mod_known := Mid.add rs.Expr.rs_name decl !mod_known) rl; *)
+  (*       decl in *)
+  (*   let module_ info m = *)
+  (*     let mod_decl = List.map (pdecl info) m.mod_decl in *)
+  (*     let r = { mod_decl = mod_decl; mod_known = !mod_known } in *)
+  (*     mod_known := Mid.empty; *)
+  (*     r in *)
+  (*   pdecl, module_ *)
+
   let module_ info m =
-    { m with mod_decl = List.map (pdecl info) m.mod_decl }
+    let mod_decl = List.map (pdecl info) m.mod_decl in
+    let add known_map decl =
+      let idl = get_decl_name decl in
+      List.fold_left (ML.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty mod_decl in
+    { mod_decl = mod_decl; mod_known = mod_known }
 
 end
 
