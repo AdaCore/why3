@@ -87,7 +87,7 @@ module Print = struct
     fprintf fmt "%s" s
 
   let print_qident ~sanitizer info fmt id =
-    try (* if info.flat then raise Not_found; *)
+    try
       let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
@@ -111,8 +111,8 @@ module Print = struct
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
   let print_uident = print_qident ~sanitizer:Strings.capitalize
 
-  let print_tv fmt tv =
-    fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
+  let print_tv info fmt tv =
+    fprintf fmt "'%a" (print_lident info) tv.tv_name
 
   let protect_on b s =
     if b then "(" ^^ s ^^ ")" else s
@@ -133,7 +133,7 @@ module Print = struct
 
   let rec print_ty ?(paren=false) info fmt = function
     | Tvar tv ->
-      print_tv fmt tv
+      print_tv info fmt tv
     | Ttuple [] ->
       fprintf fmt "unit"
     | Ttuple tl ->
@@ -161,11 +161,11 @@ module Print = struct
   let print_vsty info fmt (v, ty, _) =
     fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false info) ty
 
-  let print_tv_arg = print_tv
-  let print_tv_args fmt = function
+  let print_tv_arg info = print_tv info
+  let print_tv_args info fmt = function
     | []   -> ()
-    | [tv] -> fprintf fmt "%a@ " print_tv_arg tv
-    | tvl  -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
+    | [tv] -> fprintf fmt "%a@ " (print_tv_arg info) tv
+    | tvl  -> fprintf fmt "(%a)@ " (print_list comma (print_tv_arg info)) tvl
 
   let print_vs_arg info fmt vs =
     fprintf fmt "@[(%a)@]" (print_vsty info) vs
@@ -446,7 +446,7 @@ module Print = struct
         fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
-      (if fst then "type" else "and") print_tv_args its.its_args
+      (if fst then "type" else "and") (print_tv_args info) its.its_args
       (print_lident info) its.its_name print_def its.its_def
 
   let print_decl info fmt = function

@@ -290,9 +290,11 @@ let visit mm id =
   else toextract := id :: !toextract
 
 let flat_extraction target = match Opt.get target with
-  | File _ -> ()
-  (*  let format = !opt_parser in
-      read_mlw_file ?format env fname *)
+  | File fname ->
+    let format = !opt_parser in
+    let mm = read_mlw_file ?format env fname in
+    let do_m _ m = do_extract_module ~fname m in
+    Mstr.iter do_m mm
   | Module (path, m) ->
     let mm = Mstr.empty in
     let m = find_module_path mm path m in

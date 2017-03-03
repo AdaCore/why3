@@ -65,7 +65,7 @@ end
 *)
 
 module mach.int.Int63
-  syntax val of_int "%1"
+  syntax val of_int "Z.to_int %1"
   syntax converter of_int "%1"
 
   syntax function to_int "Z.of_int %1"
