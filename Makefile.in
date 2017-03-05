@@ -1674,8 +1674,8 @@ test-ocaml-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmx
 #######################################
 test-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
 	@mkdir -p tests/test-extraction-mario
-	@bin/why3extract.opt -D drivers/ocaml64.drv \
-	  tests/test_extraction_mario.mlw -o tests/test-extraction-mario/
+	@bin/why3extract.opt -D drivers/ocaml64.drv --modular --recursive \
+	  -L tests/ test_extraction_mario.M -o tests/test-extraction-mario/
 	@ocamlfind ocamlopt -package zarith -linkpkg \
 	  -I tests/test-extraction-mario/ \
 	  tests/test-extraction-mario/test_extraction_mario__M.ml \

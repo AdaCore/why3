@@ -41,6 +41,7 @@ theory list.List
   syntax type     list "%1 list"
   syntax function Nil  "[]"
   syntax function Cons "%1 :: %2"
+  syntax predicate is_nil "%1 = []"
 end
 
 theory list.Length

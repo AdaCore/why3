@@ -318,6 +318,7 @@ module Print = struct
       forget_let_defn let_def
     | Eabsurd ->
       fprintf fmt (protect_on paren "assert false (* absurd *)")
+    | Ehole -> ()
     | Eapp (rs, []) when rs_equal rs rs_true ->
       fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->

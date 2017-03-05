@@ -245,3 +245,7 @@ module ocaml.Pervasives
   syntax exception Exit "Pervasives.Exit"
   syntax val ocaml_assert "assert (%1)"
 end
+
+module HighOrd
+  syntax type (->) "%1 -> %2"
+end

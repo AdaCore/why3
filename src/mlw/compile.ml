@@ -139,6 +139,7 @@ module ML = struct
     | Eraise  of xsymbol * expr option
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eabsurd
+    | Ehole
 
   and let_def =
     | Lvar of pvsymbol * expr
@@ -226,7 +227,7 @@ module ML = struct
     | Pas (p, _) -> iter_deps_pat f p
 
   and iter_deps_expr f e = match e.e_node with
-    | Econst _ | Evar _ | Eabsurd -> ()
+    | Econst _ | Evar _ | Eabsurd | Ehole -> ()
     | Eapp (rs, exprl) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
     | Efun _ -> assert false
@@ -302,6 +303,9 @@ module ML = struct
   let mk_unit =
     mk_expr enope (I Ity.ity_unit) Ity.eff_empty
 
+  let mk_hole =
+    mk_expr Ehole (I Ity.ity_unit) Ity.eff_empty
+
   let mk_var id ty ghost = (id, ty, ghost)
 
   let mk_var_unit () = id_register (id_fresh "_"), tunit, true
@@ -312,7 +316,7 @@ module ML = struct
 
   let eseq e1 e2 =
     match e1.e_node, e2.e_node with
-    | Eblock [], e | e, Eblock [] -> e
+    | (Eblock [] | Ehole), e | e, (Eblock [] | Ehole) -> e
     | Eblock e1, Eblock e2 -> Eblock (e1 @ e2)
     | _, Eblock e2 -> Eblock (e1 :: e2)
     | Eblock e1, _ -> Eblock (e1 @ [e2])
@@ -463,10 +467,8 @@ module Translate = struct
       if args = [] then [ML.mk_var_unit ()] else args
 
   let filter_params_cty p def pvl cty_args =
-    if List.length pvl <> List.length cty_args then
-      raise (Invalid_argument "Different size lists.@.");
     let rec loop = function
-      | [], [] -> []
+      | [], _ -> []
       | pv :: l1, arg :: l2 ->
         if p pv && p arg then def pv :: loop (l1, l2)
         else loop (l1, l2)
@@ -549,8 +551,8 @@ module Translate = struct
       expr info e1
     | Elet (LDvar (pv, e1), e2) when is_underscore pv ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
-    | Elet (LDvar (pvs, e1), e2) ->
-      let ml_let = ML.mk_let_var pvs (expr info e1) (expr info e2) in
+    | Elet (LDvar (pv, e1), e2) ->
+      let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
       let args = params cty.cty_args in
@@ -571,7 +573,7 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
-      let pvl = app pvl rsf.rs_cty.cty_args in
+      let pvl = app pvl rs_app.rs_cty.cty_args in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
       let ein  = expr info ein in
@@ -608,7 +610,7 @@ module Translate = struct
       let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
     | Eexec ({c_node = Cany}, _) -> (* raise ExtractionAny *)
-      ML.mk_unit
+      ML.mk_hole
     | Eabsurd ->
       ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
@@ -617,8 +619,7 @@ module Translate = struct
       let e1 = expr info e1 in
       let pl = List.map (ebranch info) pl in
       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
-    | Eassert _ -> (* ML.mk_expr ML.Ehole ML.ity_unit eff *)
-      ML.mk_unit
+    | Eassert _ -> ML.mk_unit
     | Eif (e1, e2, e3) ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
@@ -637,7 +638,7 @@ module Translate = struct
     | Eghost _ -> assert false
     | Eassign al ->
       ML.mk_expr (ML.Eassign al) (ML.I e.e_ity) eff
-    | Epure _ -> assert false (*TODO*)
+    | Epure _ -> (* assert false (\*TODO*\) *) ML.mk_hole
     | Etry (etry, pvl_e_map) ->
       let etry = expr info etry in
       let bl   =
@@ -651,10 +652,10 @@ module Translate = struct
         | e -> Some e
       in
       ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) eff
-    | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _) ->
-      assert false (*TODO*)
-    | Eexec ({c_node=Cpur (_, _); _ }, _) ->
-      assert false (*TODO*)
+    | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
+    (*   assert false (\*TODO*\) *)
+    | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
+    (*   assert false (\*TODO*\) *)
 
   and ebranch info ({pp_pat = p}, e) =
     (pat p, expr info e)
@@ -695,6 +696,10 @@ module Translate = struct
 
   exception ExtractionVal of rsymbol
 
+  let is_val = function
+    | Eexec ({c_node = Cany}, _) -> true
+    | _ -> false
+
   (* program declarations *)
   let pdecl info pd =
     match pd.pd_node with
@@ -703,11 +708,12 @@ module Translate = struct
     | PDlet (LDsym (_rs, {c_node = Cany})) ->
       []
       (* raise (ExtractionVal _rs) *)
+    | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
+      []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       let res  = ity cty.cty_result in
       [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
-      (* let add_known = Mid.singleton rs.rs_name decl in *)
     | PDlet (LDrec rl) ->
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
         let e    = match e.c_node with Cfun e -> e | _ -> assert false in
@@ -718,20 +724,14 @@ module Translate = struct
           ML.rec_res  = res } in
       let rec_def = filter_ghost_rdef def rl in
       [ML.Dlet (ML.Lrec rec_def)]
-      (* let mk_add_km m {ML.rec_sym = rs} = *)
-      (*   ML.add_known_decl decl m rs.rs_name in *)
-      (* let add_known = List.fold_left mk_add_km Mid.empty rec_def in *)
     | PDlet (LDsym _) | PDpure | PDlet (LDvar _) ->
       []
     | PDtype itl ->
       let itsd = List.map tdef itl in
       [ML.Dtype itsd]
-      (* let mk_add_mk m {ML.its_name = id} = ML.add_known_decl decl m id in *)
-      (* let add_known = List.fold_left mk_add_mk Mid.empty itsd in *)
     | PDexn xs ->
       if ity_equal xs.xs_ity ity_unit then [ML.Dexn (xs, None)]
       else [ML.Dexn (xs, Some (ity xs.xs_ity))]
-      (* let add_known = Mid.singleton xs.xs_name decl in *)
 
   let pdecl_m m pd =
     let info = {
@@ -816,7 +816,7 @@ module Transform = struct
     | Eassign al ->
       let assign e (_, _, pv) = mk_let subst pv e in
       List.fold_left assign e al
-    | Econst _ | Eabsurd -> e
+    | Econst _ | Eabsurd | Ehole -> e
 
   and mk_let subst pv e =
     try
