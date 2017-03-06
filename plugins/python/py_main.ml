@@ -211,10 +211,12 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   (* make a special case for
        for id in range(e1, e2):
     *)
-  | Py_ast.Sfor (id, {expr_desc=Ecall ({id_str="range"}, [e1;e2])},
+  | Py_ast.Sfor (id, {Py_ast.expr_desc=Ecall ({id_str="range"}, [e1;e2])},
                  inv, body) ->
     let inv = List.map (deref env) inv in
-    mk_expr ~loc (Efor (id, expr env e1, To, expr env e2, inv,
+    let e_to = expr env e2 in
+    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [e_to;constant ~loc "1"])) in
+    mk_expr ~loc (Efor (id, expr env e1, To, ub, inv,
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id),
     let env = add_var env id in
     block ~loc env body))))
