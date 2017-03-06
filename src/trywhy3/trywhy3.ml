@@ -223,7 +223,7 @@ module Editor =
     let why3_loc_to_range buffer loc =
       let goto_line lstop =
         let rec loop lcur i =
-          if lcur == lstop then i
+          if lcur >= lstop then i
           else
             let c = get_char buffer i in
             loop (if c == 0 then lcur+1 else lcur) (i+1)
