@@ -1470,7 +1470,7 @@ else
  JS_MAPS=
 endif
 
-ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
+ALTERGODIR=src/trywhy3/alt-ergo
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
         -syntax camlp4o -I src/trywhy3 \
@@ -1483,27 +1483,25 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
 	-I $(ALTERGODIR)/src/sat \
 	-I $(ALTERGODIR)/src/main
 
-ALTERGOMODS=util/numsNumbers util/numbers \
-	util/version util/myUnix util/config util/options \
-	util/hashcons util/hstring util/lists util/loc \
+ALTERGOMODS=util/config util/version util/emap util/myUnix util/myDynlink \
+	util/myZip util/util util/lists util/numsNumbers util/numbers \
+	util/timers util/options util/gc_debug util/loc util/hashcons \
+	util/hstring \
+	structures/exception structures/symbols structures/ty \
+	structures/parsed structures/typed structures/term structures/literal \
+	structures/formula structures/explanation structures/errors \
 	util/profiling_default util/profiling \
-	util/util \
-	structures/parsed structures/symbols \
-	structures/ty structures/errors \
-	structures/term structures/literal structures/formula \
-	structures/explanation structures/exception \
 	parsing/why_parser parsing/why_lexer \
-	preprocess/existantial preprocess/triggers \
-	preprocess/why_typing preprocess/cnf \
-	theories/polynome theories/ac \
-	theories/intervals theories/inequalities \
-	theories/intervalCalculus \
-	theories/arith theories/records theories/bitv \
-	theories/arrays theories/sum theories/uf theories/use \
-	theories/combine theories/ccx theories/theory \
-	instances/matching \
+	preprocess/existantial preprocess/triggers preprocess/why_typing \
+	preprocess/cnf \
+	instances/matching instances/instances \
+	theories/polynome theories/ac theories/uf theories/use \
+	theories/intervals theories/inequalities theories/intervalCalculus \
+	theories/arith theories/records theories/bitv theories/arrays \
+	theories/sum theories/combine theories/ccx theories/theory \
 	sat/sat_solvers \
 	main/frontend
+
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 TRYWHY3CMO=lib/why3/why3.cma
 TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
@@ -1512,7 +1510,7 @@ TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
 	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
 	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
-	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
 trywhy3_package: trywhy3
@@ -1546,7 +1544,7 @@ src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) -I +ocplib-simplex $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) ocplibSimplex.cma $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
 src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
