@@ -555,7 +555,7 @@ module Translate = struct
         (*TODO check it's actually unused *)
         then expr info env e
         else if ity_equal pv.pv_ity ity_unit
-             || pv.pv_vs.vs_name.id_string.[0] = '_'
+             || pv.pv_vs.vs_name.id_string = "_"
         then let env' = {env with computes_return_value = false} in
              ([], C.Sseq (C.Sblock(expr info env' le),
 		          C.Sblock(expr info env e)))

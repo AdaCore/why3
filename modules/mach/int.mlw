@@ -258,8 +258,8 @@ module UInt32
 
   val count_leading_zeros (x:uint32) : int32
     requires { to_int x > 0 }
-    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint32 }
-    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint32 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x < max_uint32 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x >= max_uint32 }
     ensures { 0 <= Int32.to_int result < 32 }
 
   val of_int32(x:int32) : uint32
@@ -420,8 +420,8 @@ module UInt64
 
   val count_leading_zeros (x:uint64) : int32
     requires { to_int x > 0 }
-    ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint64 }
-    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint64 }
+    ensures { (power 2 (Int32.to_int result)) * to_int x < max_uint64 }
+    ensures { 2 * (power 2 (Int32.to_int result)) * to_int x >= max_uint64 }
     ensures { 0 <= Int32.to_int result < 64 }
 
   val of_int32(x:int32) : uint64
