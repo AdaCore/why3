@@ -179,14 +179,13 @@ module Editor =
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
-      let task_viewer_theme : Js.js_string Js.t = get_global "task_viewer_theme" in
       let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
       ignore (JSU.(meth_call editor "setTheme" [| inject editor_theme |]));
       ignore (JSU.(meth_call (get_session editor) "setMode" [| inject editor_mode |]));
       JSU.(set editor (Js.string "$blockScrolling") _Infinity);
 
-      ignore (JSU.(meth_call task_viewer "setTheme" [| inject task_viewer_theme |]));
+      ignore (JSU.(meth_call task_viewer "setTheme" [| inject editor_theme |]));
       ignore (JSU.(meth_call (get_session task_viewer) "setMode" [| inject task_viewer_mode |]));
       JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
 
