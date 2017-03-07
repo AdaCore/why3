@@ -310,6 +310,7 @@ let read_channel env path file c =
   let lb = Lexing.from_channel c in
   Loc.set_file file lb;
   let loc = Loc.user_position file 0 0 0 in
+  Py_lexer.stack := [0];  (* reinitialise indentation stack *)
   let f = Loc.with_location (Py_parser.file Py_lexer.next_token) lb in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let file = Filename.basename file in
