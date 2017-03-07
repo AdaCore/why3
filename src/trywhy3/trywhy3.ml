@@ -226,7 +226,7 @@ module Editor =
           if lcur >= lstop then i
           else
             let c = get_char buffer i in
-            loop (if c == 0 then lcur+1 else lcur) (i+1)
+            loop (if c == 10 then lcur+1 else lcur) (i+1)
         in
         loop 1 0
       in
