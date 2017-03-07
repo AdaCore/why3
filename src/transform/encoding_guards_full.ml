@@ -269,7 +269,7 @@ end
 (** {2 main part} *)
 
 let decl kept d = match d.d_node with
-  | Dtype { ts_def = Some _ } -> []
+  | Dtype { ts_def = Alias _ } -> []
   | Dtype ts -> d :: Lib.lsdecl_of_ts_select ts
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic types are not supported, run eliminate_algebraic"

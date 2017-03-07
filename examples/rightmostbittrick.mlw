@@ -5,15 +5,15 @@ module Rmbt
 
   let ghost rightmost_position_set (a : t) : t
     requires { a <> zeros }
-    ensures  { ult result (of_int 64) }
+    ensures  { ult result (64:t) }
     ensures  { eq_sub_bv a zeros zeros result }
     ensures  { nth_bv a result }
   =
     let i = ref zeros in
-    while ult !i (of_int 64) && not (nth_bv a !i) do
-      variant {64 - to_uint !i}
+    while ult !i (64:t) && not (nth_bv a !i) do
+      variant {64 - t'int !i}
       invariant {eq_sub_bv a zeros zeros !i}
-      i := add !i (of_int 1)
+      i := add !i one
     done;
     !i
 
@@ -28,7 +28,7 @@ module Rmbt
     ensures  { nth result !p }
   =
     let ghost p_bv = rightmost_position_set x in
-    ghost p := to_uint p_bv;
+    ghost p := t'int p_bv;
     assert { nth_bv (neg x) p_bv };
     bw_and x (neg x)
 

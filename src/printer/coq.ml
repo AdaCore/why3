@@ -674,7 +674,7 @@ let print_previous_proof def info fmt previous =
 let print_type_decl ~prev info fmt ts =
   if is_ts_tuple ts then () else
   match ts.ts_def with
-    | None ->
+    | NoDef | Range _ | Float _ ->
       if info.realization then
         match prev with
         | Some (Query (_,Notation,c)) ->
@@ -700,7 +700,7 @@ let print_type_decl ~prev info fmt ts =
         end;
         fprintf fmt "@\n"
       end
-    | Some ty ->
+    | Alias ty ->
       fprintf fmt "(* Why3 assumption *)@\n@[<hov 2>Definition %a%a :=@ %a.@]@\n@\n"
         print_ts ts
           (print_list_pre space

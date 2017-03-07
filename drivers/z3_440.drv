@@ -23,6 +23,7 @@ transformation "eliminate_definition"
 *)
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
+transformation "eliminate_literal"
 transformation "eliminate_epsilon"
 
 transformation "simplify_formula"
@@ -81,7 +82,7 @@ end
    have the same name for the function to_uint *)
 theory bv.BV64
   syntax converter of_int "((_ int2bv 64) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -89,7 +90,7 @@ end
 
 theory bv.BV32
   syntax converter of_int "((_ int2bv 32) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -97,7 +98,7 @@ end
 
 theory bv.BV16
   syntax converter of_int "((_ int2bv 16) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -105,7 +106,7 @@ end
 
 theory bv.BV8
   syntax converter of_int "((_ int2bv 8) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2

@@ -55,7 +55,7 @@ type info = {
 (** type *)
 let complex_type = Wty.memoize 3 (fun ty ->
   let s = Pp.string_of_wnl Pretty.print_ty ty in
-  create_tysymbol (id_fresh s) [] None)
+  create_tysymbol (id_fresh s) [] NoDef)
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ -> unsupported "cvc3: you must encode the polymorphism"
@@ -202,7 +202,7 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_type_decl info fmt ts =
-  if ts.ts_args = [] && ts.ts_def = None then
+  if ts.ts_args = [] && not (is_alias_type_def ts.ts_def) then
   if not (Mid.mem ts.ts_name info.info_syn) then
   fprintf fmt "%a : TYPE;@\n@\n" print_ident ts.ts_name
 

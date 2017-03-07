@@ -171,7 +171,7 @@ type final_answer = {
   time      : float;
   timeout   : bool;
   out_file  : string;
-  exit_code : int;
+  exit_code : int64;
 }
 
 type answer =
@@ -188,7 +188,7 @@ let read_answer s =
         Finished { id = int_of_string id;
           out_file = Strings.join ";" rest;
           time = float_of_string time_s;
-          exit_code = int_of_string exit_s;
+          exit_code = Int64.of_string exit_s;
           timeout = (timeout_s = "1"); }
     | "S" :: [id] ->
         Started (int_of_string id)

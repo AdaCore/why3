@@ -39,7 +39,7 @@ and pdecl_node =
 
 let pd_equal : pdecl -> pdecl -> bool = (==)
 
-let ts_mark = create_tysymbol (id_fresh "'mark") [] None
+let ts_mark = create_tysymbol (id_fresh "'mark") [] NoDef
 let ty_mark = ty_app ts_mark []
 let ity_mark = ity_pur ts_mark []
 

@@ -11,8 +11,8 @@ theory CheckBV64
 
   goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zeros                             = 0
-  goal ok_ones2  : to_uint ones                              = mx
+  goal ok_zero2  : t'int zeros                             = 0
+  goal ok_ones2  : t'int ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
@@ -88,8 +88,8 @@ theory CheckBV64
   goal g5a : asr_bv b0111 (of_int 2)                         = b0001
   goal g5b : asr_bv ones (of_int (Int.(-) size 1))           = ones
 
-  goal g7 : to_uint b11100                                   = 28
-  goal f7 : to_uint ones                                     = Int.(-_) 1
+  goal g7 : t'int b11100                                   = 28
+  goal f7 : t'int ones                                     = Int.(-_) 1
 
   goal g8a : nth_bv b0110 (of_int 2)                         = True
   goal g8b : nth_bv b0110 (of_int 3)                         = False
@@ -154,8 +154,8 @@ theory CheckBV32
 
   goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zeros                             = 0
-  goal ok_ones2  : to_uint ones                              = mx
+  goal ok_zero2  : t'int zeros                             = 0
+  goal ok_ones2  : t'int ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
@@ -212,8 +212,8 @@ theory CheckBV16
 
   goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zeros                             = 0
-  goal ok_ones2  : to_uint ones                              = mx
+  goal ok_zero2  : t'int zeros                             = 0
+  goal ok_ones2  : t'int ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md
@@ -270,8 +270,8 @@ theory CheckBV8
 
   goal ok_zero   : zeros                                     = (of_int 0)
   goal ok_ones   : ones                                      = (of_int mx)
-  goal ok_zero2  : to_uint zeros                             = 0
-  goal ok_ones2  : to_uint ones                              = mx
+  goal ok_zero2  : t'int zeros                             = 0
+  goal ok_ones2  : t'int ones                              = mx
   goal ok_size   : size                                      = sz
   goal ok_max    : max_int                                   = mx
   goal ok_tpsize : two_power_size                            = md

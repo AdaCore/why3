@@ -1,0 +1,120 @@
+
+(* Fenwick trees (or binary indexed tree) for prefix/interval sums.
+   Represent an integer array over interval [0;n[ such that the following
+   operations are both efficient:
+   . incrementation of individual cell (O(log(n)))
+   . Query sum of elements over interval [a;b[ (O(log(b-a)))
+
+   Author: Martin Clochard (Université Paris Sud) *)
+
+(* Array-based implementation with i->(2i+1,2i+2) node encoding:
+   . Integer represent nodes
+   . 0 is the root
+   . childs of node n are 2n+1 and 2n+2
+   . Leaves represent the model array cells. For n > 0 elements in the model,
+     they are represented by the cells over the range [n-1;2n-1[
+   The structure manage queries by keeping for each node the sum of the
+   values of all descendant leaves, which we call here 'node summary' *)
+module Fenwick
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import int.Sum
+  use import array.Array as A
+
+  (* Encode fenwick trees within an array. The leaves field represent
+     the actual number of element within the model. *)
+  type fenwick = {
+    t : array int;
+    ghost leaves : int;
+  }
+
+  (* Invariant *)
+  predicate valid (f:fenwick) =
+    f.leaves >= 0 /\
+    f.t.length = (if f.leaves = 0 then 0 else 2 * f.leaves - 1) /\
+    forall i. 0 <= i /\ i < f.leaves - 1 ->
+      f.t[i] = f.t[2*i+1] + f.t[2*i+2]
+
+  (* Get the i-th elements of the model. *)
+  function get (f:fenwick) (i:int) : int = f.t[i+f.leaves-1]
+  (* Get the sum of elements over range [a;b[ *)
+  function rget (f:fenwick) (a b:int) : int = sum a b (get f)
+
+  (* Create a Fenwick tree initialized at 0 *)
+  let make (lv:int) : fenwick
+    requires { lv >= 0 }
+    ensures { valid result }
+    ensures { forall i. 0 <= i < lv -> get result i = 0 }
+    ensures { result.leaves = lv }
+  = { t = if lv = 0 then make 0 0 else make (2*lv-1) 0;
+      leaves = lv }
+
+  (* Add x to the l-th cell *)
+  let add (f:fenwick) (l:int) (x:int) : unit
+    requires { 0 <= l < f.leaves /\ valid f }
+    ensures { valid f }
+    ensures { forall i. 0 <= i < f.leaves /\ i <> l ->
+      get f i = get (old f) i }
+    ensures { get f l = get (old f) l + x }
+  = let lc = ref (div f.t.length 2 + l) in
+    f.t[!lc] <- f.t[!lc] + x;
+    (* Update node summaries for all elements on the path
+       from the updated leaf to the root. *)
+    'I:
+    while !lc <> 0 do
+      invariant { 0 <= !lc < f.t.length }
+      invariant { forall i. 0 <= i /\ i < f.leaves - 1 ->
+        f.t[i] = f.t[2*i+1] + f.t[2*i+2] -
+          if 2*i+1 <= !lc <= 2*i+2 then x else 0 }
+      invariant { forall i. f.leaves - 1 <= i < f.t.length ->
+        f.t[i] = (at f 'I).t[i] }
+      variant { !lc }
+      lc := div (!lc - 1) 2;
+      f.t[!lc] <- f.t[!lc] + x
+    done
+
+  (* Lemma to shift dum indices. *)
+  let rec ghost sum_dec (a b c:int) : unit
+    requires { a <= b }
+    ensures { forall f g. (forall i. a <= i < b -> f i = g (i+c)) ->
+      sum a b f = sum (a+c) (b+c) g }
+    variant { b - a }
+  = if a < b then sum_dec (a+1) b c
+
+  (* Crucial lemma for the query routine: Summing the node summaries
+     over range [2a+1;2b+1[ is equivalent to summing node summaries
+     over range [a;b[. This is because the elements of range [2a+1;2b+1[
+     are exactly the childs of elements of range [a;b[. *)
+  let rec ghost fen_compact (f:fenwick) (a b:int) : unit
+    requires { 0 <= a <= b /\ 2 * b < f.t.length /\ valid f }
+    ensures { sum a b (A.get f.t) = sum (2*a+1) (2*b+1) (A.get f.t) }
+    variant { b - a }
+  = if a < b then fen_compact f (a+1) b
+
+  (* Query sum of elements over interval [a,b[. *)
+  let query (f:fenwick) (a b:int) : int
+    requires { 0 <= a <= b <= f.leaves /\ valid f }
+    ensures { result = rget f a b }
+  = let lv = div f.t.length 2 in
+    let ra = ref (a + lv) in let rb = ref (b + lv) in
+    let acc = ref 0 in
+    ghost sum_dec a b lv;
+    (* If ra = rb, the sum is 0.
+       Otherwise, adjust the range to odd boundaries in constant time
+       and use compaction lemma to halve interval size. *)
+    while !ra <> !rb do
+      invariant { 0 <= !ra <= !rb <= f.t.length }
+      invariant { !acc + sum !ra !rb (A.get f.t) = rget f a b }
+      variant { !rb - !ra }
+      if mod !ra 2 = 0 then acc := !acc + f.t[!ra];
+      ra := div !ra 2;
+      rb := !rb - 1;
+      if mod !rb 2 <> 0 then acc := !acc + f.t[!rb];
+      rb := div !rb 2;
+      ghost fen_compact f !ra !rb
+    done;
+    !acc
+
+end

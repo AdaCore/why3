@@ -179,12 +179,16 @@ module Editor =
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
+      let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
-      List.iter (fun e ->
-		 ignore (JSU.(meth_call e "setTheme" [| inject editor_theme |]));
-		 ignore (JSU.(meth_call (get_session e) "setMode" [| inject editor_mode |]));
-		 JSU.(set e (Js.string "$blockScrolling") _Infinity)
-		) [ editor; task_viewer ];
+      ignore (JSU.(meth_call editor "setTheme" [| inject editor_theme |]));
+      ignore (JSU.(meth_call (get_session editor) "setMode" [| inject editor_mode |]));
+      JSU.(set editor (Js.string "$blockScrolling") _Infinity);
+
+      ignore (JSU.(meth_call task_viewer "setTheme" [| inject editor_theme |]));
+      ignore (JSU.(meth_call (get_session task_viewer) "setMode" [| inject task_viewer_mode |]));
+      JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
+
       JSU.(meth_call task_viewer "setReadOnly" [| inject Js._true|])
 
     let undo () =
@@ -219,7 +223,7 @@ module Editor =
     let why3_loc_to_range buffer loc =
       let goto_line lstop =
         let rec loop lcur i =
-          if lcur == lstop then i
+          if lcur >= lstop then i
           else
             let c = get_char buffer i in
             loop (if c == 0 then lcur+1 else lcur) (i+1)
@@ -275,19 +279,23 @@ module Tabs =
       List.iter
 	(fun tab_group ->
 	 let labels = select tab_group ".why3-tab-label" in
-	 List.iter (
+	 List.iter
 	     (fun tab ->
 	      tab ## onclick <-
 		Dom.handler
-		  (fun _ev ->
-		   List.iter
-		     (fun t ->
-		      ignore (t ## classList ## toggle (Js.string "why3-inactive")))
-		     labels;
-		   Js._false))
-	       ) labels)
-	tab_groups
-
+                    (fun _ev ->
+                   let () = if Js.to_bool
+                       (tab ## classList ## contains (Js.string "why3-inactive")) then
+		       List.iter
+	                  (fun t ->
+                            ignore (t ## classList ## toggle (Js.string "why3-inactive")))
+		            labels
+                   in
+		   Js._false)
+      ) labels)
+      tab_groups
+    let focus id =
+      (Dom_html.getElementById id) ## click ()
   end
 
 module ContextMenu =
@@ -941,6 +949,7 @@ module Controller =
     let () = why3_worker := Some (init_why3_worker ())
 
     let why3_parse () =
+      Tabs.focus "why3-task-list-tab";
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
@@ -952,6 +961,7 @@ module Controller =
       (get_why3_worker()) ## postMessage (msg)
 
     let why3_execute () =
+      Tabs.focus "why3-task-list-tab";
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();

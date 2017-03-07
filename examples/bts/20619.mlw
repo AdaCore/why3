@@ -1,0 +1,10 @@
+module Bug
+  exception A (unit, unit)
+
+  let foo (_: unit) : unit =
+    try
+      ()
+    with
+    | A _ -> ()
+    end
+end

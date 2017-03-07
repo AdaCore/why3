@@ -84,6 +84,7 @@ let ident_printer () =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  info_rliteral   : syntax_map;
   mutable info_model : S.t;
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
@@ -141,6 +142,21 @@ let collect_model_ls info ls =
       add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
 
+let number_format = {
+  Number.long_int_support = true;
+  Number.extra_leading_zeros_support = false;
+  Number.dec_int_support = Number.Number_default;
+  Number.hex_int_support = Number.Number_unsupported;
+  Number.oct_int_support = Number.Number_unsupported;
+  Number.bin_int_support = Number.Number_unsupported;
+  Number.def_int_support = Number.Number_unsupported;
+  Number.dec_real_support = Number.Number_unsupported;
+  Number.hex_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
+  Number.def_real_support = Number.Number_unsupported;
+}
+
 (** expr *)
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
@@ -152,21 +168,24 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = false;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } -> ts
+        | _ -> assert false (* impossible *) in
+      (* look for syntax literal ts in driver *)
+      begin match query_syntax info.info_rliteral ts.ts_name, c with
+        | Some st, Number.ConstInt c ->
+          syntax_range_literal st fmt c
+        | Some st, Number.ConstReal c ->
+          let fp = match ts.ts_def with
+            | Float fp -> fp
+            | _ -> assert false in
+          syntax_float_literal st fp fmt c
+        | None, _ -> Number.print number_format fmt c
+        (* TODO/FIXME: we must assert here that the type is either
+            ty_int or ty_real, otherwise it makes no sense to print
+            the literal. Do we ensure that preserved literal types
+            are exactly those that have a dedicated syntax? *)
+      end
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
     (* let's check if a converter applies *)
@@ -379,7 +398,7 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_type_decl info fmt ts =
-  if ts.ts_def <> None then () else
+  if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   fprintf fmt "(declare-sort %a %i)@\n@\n"
     (print_ident info) ts.ts_name (List.length ts.ts_args)
@@ -481,20 +500,21 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc cntexample args info fmt d =
+  match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-      (print_list space (print_data_decl info)) dl
+      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+        (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smtv2 : inductive definition are not supported"
+      "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f
@@ -510,6 +530,7 @@ let print_task args ?old:_ fmt task =
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_converters = Printer.get_converter_map task;
+    info_rliteral = Printer.get_rliteral_map task;
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;

@@ -74,9 +74,6 @@ let real_const_hex i f e =
   Opt.iter check_exp e;
   RConstHex (i,f,e)
 
-(** Printing *)
-
-
 let compute_any radix s =
   let n = String.length s in
   let rec compute acc i =
@@ -92,6 +89,8 @@ let compute_any radix s =
       compute (BigInt.add_int v (BigInt.mul_int radix acc)) (i + 1)
     end in
   (compute BigInt.zero 0)
+
+(** Printing *)
 
 let compute_int c =
   match c with
@@ -257,15 +256,216 @@ let print support fmt = function
   | ConstReal (RConstDec (i, f, e)) -> print_dec_real support fmt i f e
   | ConstReal (RConstHex (i, f, e)) -> print_hex_real support fmt i f e
 
-let () = Exn_printer.register
-  begin fun fmt exn -> match exn with
-  | InvalidConstantLiteral (n,s) ->
-      fprintf fmt "Invalid constant literal in base %d: '%s'" n s
-  | _ -> raise exn
+let char_of_int i =
+  if i < 10 then
+    Char.chr (i + Char.code '0')
+  else
+    Char.chr (i + Char.code 'A' - 10)
+
+open BigInt
+
+let print_zeros fmt n =
+  for _i = 0 to n - 1 do
+    pp_print_char fmt '0'
+  done
+
+let rec print_in_base_aux radix digits fmt i =
+  if lt i radix then begin
+    begin match digits with
+      | Some n -> print_zeros fmt (n - 1)
+      | None -> ()
+    end;
+    fprintf fmt "%c" (char_of_int (to_int i))
+  end
+  else
+    let d,m = computer_div_mod i radix in
+    let digits = Opt.map ((+) (-1)) digits in
+    print_in_base_aux radix digits fmt d;
+    fprintf fmt "%c" (char_of_int (to_int m))
+
+let print_in_base radix digits fmt i =
+  print_in_base_aux (of_int radix) digits fmt i
+
+(** Range checks *)
+
+type int_range = {
+  ir_lower : BigInt.t;
+  ir_upper : BigInt.t;
+}
+
+exception OutOfRange of integer_constant
+
+let check_range c {ir_lower = lo; ir_upper = hi} =
+  let cval = compute_int c in
+  if BigInt.lt cval lo || BigInt.gt cval hi then raise (OutOfRange c)
+
+(** Float checks *)
+
+type float_format = {
+  fp_exponent_digits    : int;
+  fp_significand_digits : int; (* counting the hidden bit *)
+}
+
+exception NonRepresentableFloat of real_constant
+
+let debug_float = Debug.register_info_flag "float"
+  ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ \
+         float@ literal@ checks@ messages."
+
+let float_parser c =
+  let exp_parser e = match e.[0] with
+    | '-' -> minus (compute_any 10 (String.sub e 1 (String.length e - 1)))
+    | _   -> compute_any 10 e
+  in
+
+  (* get the value s and e such that c = s * 2 ^ e *)
+  let s, e =
+    match c with
+    (* c = a.b * 10 ^ e *)
+    | RConstDec (a,b,e) ->
+      let b_length = String.length b in
+      let s = ref (compute_any 10 (a ^ b)) in
+      let e = sub (match e with
+          | None -> Debug.dprintf debug_float "c = %s.%s" a b;
+            zero
+          | Some e -> Debug.dprintf debug_float "c = %s.%se%s" a b e;
+            exp_parser e)
+          (of_int b_length)
+      in
+      (* transform c = s * 10 ^ i into c = s' * 2 ^ i' *)
+      let s =
+        if lt e zero then begin
+          let efive = pow_int_pos_bigint 5 (minus e) in
+          let dv, rem = euclidean_div_mod !s efive in
+          if not (eq rem zero) then begin
+            raise (NonRepresentableFloat c);
+          end else
+            dv
+        end else
+          mul !s (pow_int_pos_bigint 5 e)
+      in
+      Debug.dprintf debug_float " = %s * 2 ^ %s" (to_string s) (to_string e);
+      ref s, ref e
+
+    (* c = a.b * 2 ^ e *)
+    | RConstHex (a,b,e) ->
+      let b_length = String.length b in
+      ref (compute_any 16 (a ^ b)),
+      ref (sub (match e with
+          | None -> Debug.dprintf debug_float "c = %s.%s" a b;
+            zero
+          | Some e -> Debug.dprintf debug_float "c = %s.%sp%s" a b e;
+            exp_parser e)
+          (of_int (b_length * 4)))
+  in
+  s, e
+
+let compute_float c fp =
+  let eb = BigInt.of_int fp.fp_exponent_digits in
+  let sb = BigInt.of_int fp.fp_significand_digits in
+  (* 2 ^ (sb - 1)    min representable normalized significand*)
+  let smin = pow_int_pos_bigint 2 (sub sb one) in
+  (* (2 ^ sb) - 1    max representable normalized significand*)
+  let smax = sub (pow_int_pos_bigint 2 sb) one in
+  (* 2 ^ (eb - 1)    exponent of the infinities *)
+  let emax = pow_int_pos_bigint 2 (sub eb one) in
+  (* 1 - emax        exponent of the denormalized *)
+  let eden = sub one emax in
+  (* 3 - emax - sb   smallest denormalized' exponent *)
+  let emin = sub (add (of_int 2) eden) sb in
+
+  (* get [s] and [e] such that "c = s * 2 ^ e" *)
+  let s, e = float_parser c in
+
+  (* if s = 0 stop now *)
+  if eq !s zero then
+    zero, zero
+
+  else begin
+
+    (* if s is too big or e is too small, try to remove trailing zeros
+       in s and incr e *)
+    while gt !s smax || lt !e emin do
+      let new_s, rem = euclidean_div_mod !s (of_int 2) in
+      if not (eq rem zero) then begin
+        Debug.dprintf debug_float "Too many digits in significand.";
+        raise (NonRepresentableFloat c);
+      end else begin
+        s := new_s;
+        e := succ !e
+      end
+    done;
+
+    (* if s is too small and e is too big, add trailing zeros in s and
+       decr e *)
+    while lt !s smin && gt !e emin do
+      s := mul_int 2 !s;
+      e := pred !e
+    done;
+
+    Debug.dprintf debug_float " = %s * 2 ^ %s@." (to_string !s) (to_string !e);
+
+    if lt !s smin then begin
+      (* denormal case *)
+
+      Debug.dprintf debug_float "final: c = 0.[%s] * 2 ^ ([0] - bias + 1); bias=%s, i.e, 0[%a][%a]@."
+        (to_string !s) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
+      (print_in_base 2 (Some (to_int (sub sb one)))) !s;
+
+      !s, zero
+
+    end else begin
+      (* normal case *)
+
+      (* normalize the exponent *)
+      let fe = add !e (sub sb one) in
+
+      (* now that s and e are in shape, check that e is not too big *)
+      if ge fe emax then begin
+        Debug.dprintf debug_float "Exponent too big.";
+        raise (NonRepresentableFloat c)
+      end;
+
+      (* add the exponent bia to e *)
+      let fe = add fe (sub emax one) in
+      let fs = sub !s smin in
+
+      Debug.dprintf debug_float "final: c = 1.[%s] * 2 ^ ([%s] - bias); bias=%s, i.e, 0[%a][%a]@."
+        (to_string fs) (to_string fe) (to_string (sub emax one))
+        (print_in_base 2 (Some (to_int eb))) fe
+        (print_in_base 2 (Some (to_int (sub sb one)))) fs;
+
+      assert (le zero fs && lt fs (pow_int_pos_bigint 2 (sub sb one))
+              && le zero fe && lt fe (sub (pow_int_pos_bigint 2 eb) one));
+
+      fe, fs
+    end
   end
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let check_float c fp = ignore (compute_float c fp)
+
+let print_integer_constant fmt = function
+  | IConstDec s -> fprintf fmt "%s" s
+  | IConstHex s -> fprintf fmt "0x%s" s
+  | IConstOct s -> fprintf fmt "0o%s" s
+  | IConstBin s -> fprintf fmt "0b%s" s
+
+let print_real_constant fmt = function
+  | RConstDec (i,f,None)   -> fprintf fmt "%s.%s" i f
+  | RConstDec (i,f,Some e) -> fprintf fmt "%s.%se%s" i f e
+  | RConstHex (i,f,Some e) -> fprintf fmt "0x%s.%sp%s" i f e
+  | RConstHex (i,f,None)   -> fprintf fmt "0x%s.%s" i f
+
+let print_constant fmt = function
+  | ConstInt c  -> print_integer_constant fmt c
+  | ConstReal c -> print_real_constant fmt c
+
+let () = Exn_printer.register (fun fmt exn -> match exn with
+  | InvalidConstantLiteral (n,s) ->
+      fprintf fmt "Invalid integer literal in base %d: '%s'" n s
+  | NonRepresentableFloat c ->
+      fprintf fmt "Invalid floating point literal: '%a'"
+        print_real_constant c
+  | OutOfRange c ->
+      fprintf fmt "Integer literal %a is out of range" print_integer_constant c
+  | _ -> raise exn)
