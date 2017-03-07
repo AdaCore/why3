@@ -476,6 +476,14 @@ module TaskList =
       Editor.set_value ~editor:Editor.task_viewer (Js.string "")
 
     let error_marker = ref None
+
+    let update_error_marker new_m =
+      begin match !error_marker with
+      | Some (m, _) -> Editor.remove_marker m
+      | None -> ()
+      end;
+      error_marker := new_m
+
     let () =
       Editor.set_on_event
         "change"
@@ -483,9 +491,7 @@ module TaskList =
                                   Editor.saved := false;
                                   ExampleList.unselect ();
 				  Editor.clear_annotations ();
-                                  match !error_marker with
-                                    None -> ()
-                                  | Some (m, _) -> Editor.remove_marker m;error_marker := None))
+                                  update_error_marker None))
 
     let () =
       Editor.set_on_event
@@ -509,7 +515,7 @@ module TaskList =
 
       | ErrorLoc ((l1, b, l2, e), s) ->
          let r = Editor.mk_range l1 b l2 e in
-         error_marker := Some (Editor.add_marker "why3-error" r, r);
+         update_error_marker (Some (Editor.add_marker "why3-error" r, r));
          print_error s;
 	 Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
 
