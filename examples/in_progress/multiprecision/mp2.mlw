@@ -1,6 +1,5 @@
 module N
 
- (**)
   use import array.Array
   use import map.Map
   use import mach.int.Int32
@@ -5432,6 +5431,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    so value_sub_shift y 2 >= radix
                    so value_sub_shift q (sx - 1) >= 0
                    so _qh >= 0
+                   so (value_sub_shift q (sx - 1)
+                           + power radix (sx - 1) * _qh) >= 0
                    so (value_sub_shift q (sx - 1) + power radix (sx - 1) * _qh)
                       * value_sub_shift y 2
                       + value_sub_shift nx 2
@@ -5451,7 +5452,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       end
       else begin
         let  _c = lshift ny y sy (Limb.of_int32 clz) in
-        begin ensures { normalized ny sy }
+        begin
+          ensures { normalized ny sy }
+          ensures { value_sub_shift ny sy = power 2 clz * value_sub_shift y sy }
           let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
           assert { value_sub_shift y sy
                    = value_sub_shift y (sy - 1) + power radix (sy - 1) * dh };
@@ -5460,6 +5463,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
           let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
           assert { normalized ny sy
+                   /\ value_sub_shift ny sy = power 2 clz * value_sub_shift y sy
                    by
                    value_sub_shift y sy < (dh + 1) * power radix (sy - 1)
                    so value_sub_shift ny sy + (power radix sy) * _c
@@ -5482,7 +5486,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                       = power 2 clz * value_sub_shift y sy
                    so value_sub_shift y sy >= dh * power radix (sy - 1)
                    so value_sub_shift ny sy
-                      >= power 2 clz * dh * power radix (sy - 1)
+                      >= power 2  clz * dh * power radix (sy - 1)
                    so value_sub_shift ny sy =
                       value_sub_shift ny (sy - 1) + power radix (sy - 1) * ndh
                       < power radix (sy - 1) + power radix (sy - 1) * ndh
@@ -5498,10 +5502,91 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         end;
         let h = lshift nx x sx (Limb.of_int32 clz) in
         C.set_ofs nx sx h;
+        begin
+          ensures { value_sub_shift nx (sx + 1)
+                    = p * value_sub_shift x sx  }
+          value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+          assert { value_sub_shift nx (sx + 1)
+                    = p * value_sub_shift x sx
+                   by
+                   value_sub_shift nx sx + power radix sx * h
+                    = p * value_sub_shift x sx
+                   so value_sub_shift nx (sx + 1)
+                      = value_sub_shift nx sx + power radix sx * h
+                 }
+        end;
         label Div2_s in
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
         let _qh = divmod_2 q nx ny (Int32.(+) sx one) in
-        let _ = rshift r nx sy (Limb.of_int32 clz) in
+        let _l = rshift r nx sy (Limb.of_int32 clz) in
+        begin ensures { value_sub_shift nx 2 = p * value_sub_shift r 2 }
+          assert { _l = 0
+                 by
+                   (mod (value_sub_shift nx sy) p = 0
+                    by
+                      value_sub_shift (nx at Div2_s) (sx + 1)
+                   = (value_sub_shift q (sx - 1) + power radix (sx - 1) * _qh)
+                      * value_sub_shift ny sy
+                      + value_sub_shift nx sy
+                   so value_sub_shift (nx at Div2_s) (sx + 1)
+                    = p * value_sub_shift x sx
+                   so value_sub_shift ny sy = p * value_sub_shift y sy
+                   so value_sub_shift nx sy
+                      = value_sub_shift (nx at Div2_s) (sx + 1)
+                        - (value_sub_shift q (sx - 1)
+                          + power radix (sx - 1) * _qh)
+                          * value_sub_shift ny sy
+                      = p * value_sub_shift x sx
+                        - p * (value_sub_shift q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                            * value_sub_shift y sy
+                      = p * (value_sub_shift x sx
+                             - (value_sub_shift q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                               * value_sub_shift y sy)
+                   so let n = (value_sub_shift x sx
+                                - (value_sub_shift q (sx - 1)
+                                   + power radix (sx - 1) * _qh)
+                                   * value_sub_shift y sy)
+                      in
+                      value_sub_shift nx sy = p * n
+                      so value_sub_shift nx sy >= 0
+                      so p > 0
+                      so n >= 0
+                      so mod (value_sub_shift nx sy) p
+                         = mod (p * n) p
+                         = mod ((p*n)+0) p
+                         = mod 0 p
+                         = 0
+                 )
+                 so _l + radix * value_sub_shift r sy
+                    = power 2 (Limb.length - clz) * (value_sub_shift nx sy)
+                 so let a = div (value_sub_shift nx sy) p in
+                    value_sub_shift nx sy = p * a
+                 so power 2 (Limb.length - clz) * p = radix
+                 so power 2 (Limb.length - clz) * (value_sub_shift nx sy)
+                    = power 2 (Limb.length - clz) * (p * a)
+                    = (power 2 (Limb.length - clz) * p) * a
+                    = radix * a
+                 so mod (radix * value_sub_shift r sy + _l) radix
+                    = mod _l radix
+                 so mod (radix * value_sub_shift r sy + _l) radix
+                    = mod (radix * a) radix = 0
+                 so mod _l radix = 0
+                 so 0 <= _l < radix
+               };
+          assert { value_sub_shift nx 2 = p * value_sub_shift r 2
+                   by
+                   radix * value_sub_shift r 2
+                   = power 2 (Limb.length - clz) * value_sub_shift nx 2
+                   so p * power 2 (Limb.length - clz)
+                      = radix
+                   so p * radix * value_sub_shift r 2
+                      = p * power 2 (Limb.length - clz) * value_sub_shift nx 2
+                      = radix * value_sub_shift nx 2
+                   so p * value_sub_shift r 2 = value_sub_shift nx 2
+                 }
+        end;
         assert { value_sub_shift x sx
                  = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
                  + value_sub_shift r sy
@@ -5511,7 +5596,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    * value_sub_shift ny 2
                    + value_sub_shift nx 2
                 so value_sub_shift (nx at Div2_s) (sx + 1)
-                 = p * value_sub_shift x sx
+                    = p * value_sub_shift x sx
                 so value_sub_shift ny 2 = p * value_sub_shift y 2
                 so (_qh = 0
                     by
@@ -5521,6 +5606,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     so value_sub_shift q (sx - 1) >= 0
                     so value_sub_shift nx 2 >= 0
                     so (value_sub_shift q (sx - 1) + power radix (sx - 1) * _qh)
+                       >= 0
+                    so (value_sub_shift q (sx - 1) + power radix (sx - 1) * _qh)
                          * value_sub_shift ny 2
                        + value_sub_shift nx 2
                        >= (value_sub_shift q (sx - 1)
@@ -5528,7 +5615,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                           * value_sub_shift ny 2
                        >= (value_sub_shift q (sx - 1)
                            + power radix (sx - 1) * _qh)
-                          * p * radix
+                          * (p * radix)
                        >= power radix (sx - 1) * _qh * p * radix
                        = power radix sx * p * _qh
                     so power radix sx * p
@@ -5545,22 +5632,249 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ()
       end
     else
-      let clz = count_leading_zeros (C.get_ofs y (Int32.(-) sy one)) in
+      let clz = clz_ext (C.get_ofs y (Int32.(-) sy one)) in
+      let ghost p = power 2 (p2i clz) in
       if Int32.(=) clz zero
       then begin
         copy nx x sx;
+        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) limb_zero;
         C.set_ofs nx sx limb_zero;
-        let _ = div_sb_qr q nx y (Int32.(+) sx one) sy in
+        value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+        label Div_ns in
+        let _qh = div_sb_qr q nx y (Int32.(+) sx one) sy in
         copy r nx sy;
+        assert { value_sub_shift x sx
+                 = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                 + value_sub_shift r sy
+               by value_sub_shift r sy = value_sub_shift nx sy
+               so value_sub_shift (nx at Div_ns) (sx + 1) < power radix sx
+               so value_sub_shift (nx at Div_ns) (sx + 1)
+                  = value_sub_shift (nx at Div_ns) sx
+               so (_qh = 0
+                   by
+                   power radix sx
+                   > value_sub_shift (nx at Div_ns) (sx + 1)
+                   = (value_sub_shift q (sx - sy + 1)
+                      + power radix (sx - sy + 1) * _qh)
+                    * value_sub_shift y sy
+                    + value_sub_shift nx sy
+                   so value_sub_shift nx sy >= 0
+                   so value_sub_shift y sy >= power radix (sy -  1)
+                   so value_sub_shift q (sx - sy + 1) >= 0
+                   so _qh >= 0
+                   so power radix (sx - sy + 1) * power radix (sy - 1)
+                      = power radix sx
+                   so (value_sub_shift q (sx - sy + 1)
+                           + power radix (sx - sy + 1) * _qh) >= 0
+                   so (value_sub_shift q (sx - sy + 1)
+                       + power radix (sx - sy + 1) * _qh)
+                      * value_sub_shift y sy
+                      + value_sub_shift nx sy
+                      >= (value_sub_shift q (sx - sy + 1)
+                           + power radix (sx - sy + 1) * _qh)
+                         * value_sub_shift y sy
+                      >= (value_sub_shift q (sx - sy + 1)
+                           + power radix (sx - sy + 1) * _qh)
+                         * power radix (sy - 1)
+                      >= power radix (sx - sy + 1) * _qh * power radix (sy - 1)
+                      = power radix sx * _qh
+                   so power radix sx > power radix sx * _qh
+                  )
+               so value_sub_shift x sx = value_sub_shift (nx at Div_ns) sx
+               };
         ()
       end
       else begin
         let _c = lshift ny y sy (Limb.of_int32 clz) in
+        begin
+          ensures { normalized ny sy }
+          ensures { value_sub_shift ny sy = power 2 clz * value_sub_shift y sy }
+          let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
+          assert { value_sub_shift y sy
+                   = value_sub_shift y (sy - 1) + power radix (sy - 1) * dh };
+          value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
+          assert { normalized ny sy
+                   /\ value_sub_shift ny sy = power 2 clz * value_sub_shift y sy
+                   by
+                   value_sub_shift y sy < (dh + 1) * power radix (sy - 1)
+                   so value_sub_shift ny sy + (power radix sy) * _c
+                      = power 2 clz * value_sub_shift y sy
+                      = power 2 clz
+                        * (value_sub_shift y (sy - 1)
+                           + dh * power radix (sy - 1))
+                   so power 2 clz * dh <= radix - power 2 clz
+                   so (_c = 0
+                      by
+                        value_sub_shift ny sy + (power radix sy) * _c
+                        = power 2 clz * value_sub_shift y (sy - 1)
+                          + power 2 clz * dh * power radix (sy - 1)
+                        < power 2 clz * power radix (sy - 1)
+                          + power 2 clz * dh * power radix (sy - 1)
+                        <= power 2 clz * power radix (sy - 1)
+                          + (radix - power 2 clz) * power radix (sy - 1)
+                         = radix * power radix (sy - 1)
+                         = power radix sy
+                      so value_sub_shift ny sy >= 0
+                      so power radix sy * _c < power radix sy
+                      so power radix sy > 0
+                      so _c >= 0
+                      )
+                   so value_sub_shift ny sy
+                      = power 2 clz * value_sub_shift y sy
+                   so value_sub_shift y sy >= dh * power radix (sy - 1)
+                   so value_sub_shift ny sy
+                      >= power 2  clz * dh * power radix (sy - 1)
+                   so value_sub_shift ny sy =
+                      value_sub_shift ny (sy - 1) + power radix (sy - 1) * ndh
+                      < power radix (sy - 1) + power radix (sy - 1) * ndh
+                      = power radix (sy - 1) * (ndh + 1)
+                   so power radix (sy - 1) * (ndh + 1)
+                      > power radix (sy - 1) * (power 2 clz * dh)
+                   so ndh + 1 > power 2 clz * dh
+                   so ndh >= power 2 clz * dh
+                   so 2 * power 2 clz * dh >= radix
+                   so 2 * ndh >= radix
+                   so ndh >= div radix 2
+                 };
+        end;
         let h = lshift nx x sx (Limb.of_int32 clz) in
         C.set_ofs nx sx h;
+        begin
+          ensures { value_sub_shift nx (sx + 1)
+                    = p * value_sub_shift x sx  }
+          value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+          assert { value_sub_shift nx (sx + 1)
+                    = p * value_sub_shift x sx
+                   by
+                   value_sub_shift nx sx + power radix sx * h
+                    = p * value_sub_shift x sx
+                   so value_sub_shift nx (sx + 1)
+                      = value_sub_shift nx sx + power radix sx * h
+                 }
+        end;
+        label Div_s in
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-        let _ = div_sb_qr q nx ny (Int32.(+) sx one) sy in
-        let _ = rshift r nx sy (Limb.of_int32 clz) in
+        let _qh = div_sb_qr q nx ny (Int32.(+) sx one) sy in
+        let _l = rshift r nx sy (Limb.of_int32 clz) in
+        begin ensures { value_sub_shift nx sy = p * value_sub_shift r sy }
+          assert { _l = 0
+                 by
+                   (mod (value_sub_shift nx sy) p = 0
+                    by
+                      value_sub_shift (nx at Div_s) (sx + 1)
+                   = (value_sub_shift q (sx - sy + 1) + power radix (sx - sy + 1) * _qh)
+                      * value_sub_shift ny sy
+                      + value_sub_shift nx sy
+                   so value_sub_shift (nx at Div_s) (sx + 1)
+                    = p * value_sub_shift x sx
+                   so value_sub_shift ny sy = p * value_sub_shift y sy
+                   so value_sub_shift nx sy
+                      = value_sub_shift (nx at Div_s) (sx + 1)
+                        - (value_sub_shift q (sx - sy + 1)
+                          + power radix (sx - sy + 1) * _qh)
+                          * value_sub_shift ny sy
+                      = p * value_sub_shift x sx
+                        - p * (value_sub_shift q (sx - sy + 1)
+                               + power radix (sx - sy + 1) * _qh)
+                            * value_sub_shift y sy
+                      = p * (value_sub_shift x sx
+                             - (value_sub_shift q (sx - sy + 1)
+                               + power radix (sx - sy + 1) * _qh)
+                               * value_sub_shift y sy)
+                   so let n = (value_sub_shift x sx
+                                - (value_sub_shift q (sx - sy + 1)
+                                   + power radix (sx - sy + 1) * _qh)
+                                   * value_sub_shift y sy)
+                      in
+                      value_sub_shift nx sy = p * n
+                      so value_sub_shift nx sy >= 0
+                      so p > 0
+                      so n >= 0
+                      so mod (value_sub_shift nx sy) p
+                         = mod (p * n) p
+                         = mod ((p*n)+0) p
+                         = mod 0 p
+                         = 0
+                 )
+                 so _l + radix * value_sub_shift r sy
+                    = power 2 (Limb.length - clz) * (value_sub_shift nx sy)
+                 so let a = div (value_sub_shift nx sy) p in
+                    value_sub_shift nx sy = p * a
+                 so power 2 (Limb.length - clz) * p = radix
+                 so power 2 (Limb.length - clz) * (value_sub_shift nx sy)
+                    = power 2 (Limb.length - clz) * (p * a)
+                    = (power 2 (Limb.length - clz) * p) * a
+                    = radix * a
+                 so mod (radix * value_sub_shift r sy + _l) radix
+                    = mod _l radix
+                 so mod (radix * value_sub_shift r sy + _l) radix
+                    = mod (radix * a) radix = 0
+                 so mod _l radix = 0
+                 so 0 <= _l < radix
+               };
+          assert { value_sub_shift nx sy = p * value_sub_shift r sy
+                   by
+                   radix * value_sub_shift r sy
+                   = power 2 (Limb.length - clz) * value_sub_shift nx sy
+                   so p * power 2 (Limb.length - clz)
+                      = radix
+                   so p * radix * value_sub_shift r sy
+                      = p * power 2 (Limb.length - clz) * value_sub_shift nx sy
+                      = radix * value_sub_shift nx sy
+                   so p * value_sub_shift r sy = value_sub_shift nx sy
+                 }
+        end;
+        assert { value_sub_shift x sx
+                 = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                 + value_sub_shift r sy
+                by
+                 value_sub_shift (nx at Div_s) (sx + 1)
+                 = (value_sub_shift q (sx - sy + 1)
+                     + power radix (sx - sy + 1) * _qh)
+                   * value_sub_shift ny sy
+                   + value_sub_shift nx sy
+                so value_sub_shift (nx at Div_s) (sx + 1)
+                    = p * value_sub_shift x sx
+                so power radix (sx - sy + 1) * power radix (sy - 1)
+                   = power radix sx
+                so value_sub_shift ny sy = p * value_sub_shift y sy
+                so (_qh = 0
+                    by
+                    value_sub_shift x sx < power radix sx
+                    so value_sub_shift y sy >= power radix (sy - 1)
+                    so value_sub_shift ny sy >= p * power radix (sy - 1)
+                    so value_sub_shift q (sx - sy + 1) >= 0
+                    so value_sub_shift nx sy >= 0
+                    so (value_sub_shift q (sx - sy + 1)
+                         + power radix (sx - sy + 1) * _qh)
+                       >= 0
+                    so (value_sub_shift q (sx - sy + 1)
+                         + power radix (sx - sy + 1) * _qh)
+                       * value_sub_shift ny sy
+                       + value_sub_shift nx sy
+                       >= (value_sub_shift q (sx - sy + 1)
+                           + power radix (sx - sy + 1) * _qh)
+                          * value_sub_shift ny sy
+                       >= (value_sub_shift q (sx - sy + 1)
+                           + power radix (sx - sy + 1) * _qh)
+                          * (p * power radix (sy - 1))
+                       >= power radix (sx - sy + 1) * _qh * p
+                          * power radix (sy - 1)
+                       = power radix sx * p * _qh
+                    so power radix sx * p
+                       > value_sub_shift (nx at Div_s) (sx + 1)
+                       >= power radix sx * p * _qh
+                    )
+                so value_sub_shift nx sy = p * value_sub_shift r sy
+                so p * value_sub_shift x sx
+                   = value_sub_shift q (sx - sy + 1) * p * value_sub_shift y sy
+                     + p * value_sub_shift r sy
+                   = p * (value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                          + value_sub_shift r sy)
+               };
         ()
       end
 
