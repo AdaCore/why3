@@ -230,7 +230,9 @@ module ML = struct
     | Econst _ | Evar _ | Eabsurd | Ehole -> ()
     | Eapp (rs, exprl) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
-    | Efun _ -> assert false
+    | Efun (args, e) ->
+      List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
+      iter_deps_expr f e
     | Elet (Lvar (_, e1), e2) ->
       iter_deps_expr f e1;
       iter_deps_expr f e2
@@ -394,9 +396,8 @@ module Translate = struct
     | Papp (ls, pl) ->
       let rs = restore_rs ls in
       let args = rs.rs_cty.cty_args in
-      let pat_pl = List.fold_left2
-          (fun acc pv pp -> if not pv.pv_ghost then (pat pp) :: acc else acc)
-          [] args pl
+      let mk acc pv pp = if not pv.pv_ghost then (pat pp) :: acc else acc in
+      let pat_pl = List.fold_left2 mk [] args pl
       in
       ML.Papp (ls, List.rev pat_pl)
 
@@ -438,6 +439,34 @@ module Translate = struct
         List.exists (rs_equal rs) its.itd_constructors in
       List.exists is_constructor its
     | _ -> false
+
+  (* let get_record info rs = *)
+  (*   match Mid.find_opt rs.rs_name info.info_mo_known_map with *)
+  (*   | Some {pd_node = PDtype itdl} -> *)
+  (*     let f itd = List.exists (rs_equal rs) itd.itd_fields in *)
+  (*     let itd = List.find f itdl in *)
+  (*     let is_private = itd.itd_its.its_private in *)
+
+  (*   | _ -> true, [] *)
+
+  let is_private_record info rs =
+    match Mid.find_opt rs.rs_name info.info_mo_known_map with
+    | Some {pd_node = PDtype itdl} ->
+      let f itd = List.exists (rs_equal rs) itd.itd_fields in
+      let itd = List.find f itdl in
+      itd.itd_its.its_private
+    | _ -> assert false (* rs is a field *)
+
+  let get_record info rs =
+    match Mid.find_opt rs.rs_name info.info_mo_known_map with
+    | Some {pd_node = PDtype itdl} ->
+      let f pjl_constr = List.exists (rs_equal rs) pjl_constr in
+      let itd =
+        try List.find (fun itd -> f itd.itd_constructors) itdl
+        with Not_found -> List.find (fun itd -> f itd.itd_fields) itdl in
+      let no_g e = not (rs_ghost e) in
+      List.filter no_g itd.itd_fields, Some itd.itd_its.its_private
+    | _ -> [], None
 
   let mk_eta_expansion rsc pvl cty_app =
     (* FIXME : effects and types of the expression in this situation *)
@@ -487,7 +516,7 @@ module Translate = struct
       ML.mk_expr (ML.Evar to_pv)    int_ity eff_e in
     let for_rs    =
       let for_id  = id_fresh "for_loop_to" in
-      let for_cty = create_cty [i_pv; to_pv] [] [] Mxs.empty
+      let for_cty = create_cty [i_pv] [] [] Mxs.empty
                                Mpv.empty eff ity_unit in
       create_rsymbol for_id for_cty in
     let for_expr =
@@ -500,20 +529,17 @@ module Translate = struct
         let i_op_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
         ML.mk_expr i_op_one ML.ity_int eff_empty in
        let rec_call  =
-        ML.mk_expr (ML.Eapp (for_rs, [next_expr; to_expr]))
+        ML.mk_expr (ML.Eapp (for_rs, [next_expr]))
                     ML.ity_unit eff in
       let seq_expr =
         ML.mk_expr (ML.eseq body_expr rec_call) ML.ity_unit eff in
       ML.mk_expr (ML.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
     let ty_int = ity ity_int in
     let for_call_expr   =
-      let for_call      = ML.Eapp (for_rs, [from_expr; to_expr]) in
+      let for_call      = ML.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff in
     let pv_name pv = pv.pv_vs.vs_name in
-    let args = [
-      (pv_name  i_pv, ty_int, false);
-      (pv_name to_pv, ty_int, false);
-    ] in
+    let args = [ pv_name  i_pv, ty_int, false ] in
     let for_rec_def = {
       ML.rec_sym  = for_rs; ML.rec_args = args;
       ML.rec_rsym = for_rs; ML.rec_exp  = for_expr;
@@ -543,8 +569,8 @@ module Translate = struct
     | Econst c ->
       let c = match c with Number.ConstInt c -> c | _ -> assert false in
       ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
-    | Evar pvs ->
-      ML.mk_expr (ML.Evar pvs) (ML.I e.e_ity) eff
+    | Evar pv ->
+      ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) eff
     | Elet (LDvar (pv, e1), e2) when e_ghost e1 || pv.pv_ghost ->
       expr info e2
     | Elet (LDvar (pv, e1), e2) when is_underscore pv && e_ghost e2 ->
@@ -605,7 +631,15 @@ module Translate = struct
       mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
       let pvl = app pvl rs.rs_cty.cty_args in
-      ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff
+      let (pjl, is_private) = get_record info rs in
+      begin match pvl, pjl, is_private with
+      | [pv_expr], [_], Some false ->
+        (* singleton public record type obtained by ghost fields erasure *)
+        pv_expr
+      | _ -> ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff end
+    | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
+      (* abstract block *)
+      expr info e
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let args = params cty.cty_args in
       ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
@@ -672,7 +706,7 @@ module Translate = struct
           let args = List.filter pv_not_ghost rsc.cty_args in
           List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
     in
-    let drecord_fields ({rs_cty = rsc} as rs) = (* point-free *)
+    let drecord_fields ({rs_cty = rsc} as rs) =
       (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
       rs.rs_name,
       ity rsc.cty_result
@@ -689,7 +723,14 @@ module Translate = struct
       | None, _, pjl ->
         let p e = not (rs_ghost e) in
         let pjl = filter_ghost_params p drecord_fields pjl in
-        ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
+        begin match pjl with
+          | [] -> ML.mk_its_defn id args is_private None
+          | [(is_mutable, _, ty_pj)]
+            when not s.its_private && not is_mutable ->
+            (* singleton public record with an imutable field *)
+            ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
+          | pjl -> ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
+        end
       | Some t, _, _ ->
          ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
     end
@@ -716,7 +757,7 @@ module Translate = struct
       [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
     | PDlet (LDrec rl) ->
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
-        let e    = match e.c_node with Cfun e -> e | _ -> assert false in
+        let e = match e.c_node with Cfun e -> e | _ -> assert false in
         let args = params rs1.rs_cty.cty_args in
         let res  = ity rs1.rs_cty.cty_result in
         { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
@@ -741,8 +782,7 @@ module Translate = struct
 
   (* unit module declarations *)
   let mdecl info = function
-    | Udecl pd ->
-       pdecl info pd
+    | Udecl pd -> pdecl info pd
     |  _ -> (* TODO *) []
 
   (* modules *)

@@ -238,7 +238,7 @@ module Print = struct
   let rec print_apply info rs fmt pvl =
     let isfield =
       match rs.rs_field with
-      | None -> false
+      | None   -> false
       | Some _ -> true in
     let isconstructor () =
       match Mid.find_opt rs.rs_name info.info_mo_known_map with
@@ -338,7 +338,7 @@ module Print = struct
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
-        fprintf fmt "%a.%a <-@ %a"
+        fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
           print_ident (pv_name rho) print_ident rs.rs_name
           print_ident (pv_name pv) in
       begin match al with
