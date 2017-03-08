@@ -412,7 +412,7 @@ let compute_float c fp =
         (to_string !s) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
       (print_in_base 2 (Some (to_int (sub sb one)))) !s;
 
-      !s, zero
+      zero, !s
 
     end else begin
       (* normal case *)
