@@ -183,10 +183,10 @@ module ML = struct
 
   let get_decl_name = function
     | Dtype itdefl -> List.map (fun {its_name = id} -> id) itdefl
-    | Dlet (Lvar (pv, _)) -> [pv.pv_vs.vs_name]
-    | Dlet (Lsym (rs, _, _, _)) -> [rs.rs_name]
     | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
-    | Dexn (xs, _) -> [xs.xs_name]
+    | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
+    | Dlet (Lsym ({rs_name=id}, _, _, _))
+    | Dexn ({xs_name=id}, _) -> [id]
 
   let add_known_decl decl k_map id =
     Mid.add id decl k_map
