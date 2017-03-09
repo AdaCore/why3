@@ -149,6 +149,13 @@ and string = parse
 	List.iter (fun t -> Queue.add t tokens) l
       end;
       Queue.pop tokens
+
+  let parse file c =
+    let lb = Lexing.from_channel c in
+    Why3.Loc.set_file file lb;
+    stack := [0];  (* reinitialise indentation stack *)
+    Why3.Loc.with_location (Py_parser.file next_token) lb
+
 }
 
 

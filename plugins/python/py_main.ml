@@ -307,17 +307,14 @@ let translate ~loc inc (dl, s) =
   inc.new_pdecl loc main
 
 let read_channel env path file c =
-  let lb = Lexing.from_channel c in
-  Loc.set_file file lb;
-  let loc = Loc.user_position file 0 0 0 in
-  Py_lexer.stack := [0];  (* reinitialise indentation stack *)
-  let f = Loc.with_location (Py_parser.file Py_lexer.next_token) lb in
+  let f = Py_lexer.parse file c in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let file = Filename.basename file in
   let file = Filename.chop_extension file in
   let name = String.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
   let inc = Mlw_typing.open_file env path in
+  let loc = Why3.Loc.user_position file 0 0 0 in
   inc.open_module (mk_id ~loc name);
   let use_import (f, m) =
     let q = Qdot (Qident (mk_id ~loc f), mk_id ~loc m) in
