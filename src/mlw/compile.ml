@@ -440,8 +440,6 @@ module Translate = struct
       List.exists is_constructor its
     | _ -> false
 
-  let is_private_record itd = itd.itd_its.its_private
-
   let is_singleton_imutable itd =
     let not_g e = not (rs_ghost e) in
     let pjl = itd.itd_fields in
@@ -452,18 +450,28 @@ module Translate = struct
     | [is_mutable] -> not is_mutable
     | _ -> false
 
-  let is_optimizable_record itd =
-    not (is_private_record itd) && is_singleton_imutable itd
-
-  let get_record info rs =
+  let get_record_itd info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
     | Some {pd_node = PDtype itdl} ->
       let f pjl_constr = List.exists (rs_equal rs) pjl_constr in
-      let itd = begin match rs.rs_field with
+      let itd = match rs.rs_field with
         | Some _ -> List.find (fun itd -> f itd.itd_fields) itdl
-        | None -> List.find (fun itd -> f itd.itd_constructors) itdl end in
-      is_optimizable_record itd
-    | _ -> false
+        | None -> List.find (fun itd -> f itd.itd_constructors) itdl in
+      if itd.itd_fields = [] then None else Some itd
+    | _ -> None
+
+  let is_optimizable_record_itd itd =
+    not itd.itd_its.its_private && is_singleton_imutable itd
+
+  let is_optimizable_record_rs info rs =
+    Opt.fold (fun _ -> is_optimizable_record_itd) false (get_record_itd info rs)
+
+  let is_empty_record_itd itd =
+    let is_ghost rs = rs_ghost rs in
+    List.for_all is_ghost itd.itd_fields
+
+  let is_empty_record info rs =
+    Opt.fold (fun _ -> is_empty_record_itd) false (get_record_itd info rs)
 
   let mk_eta_expansion rsc pvl cty_app =
     (* FIXME : effects and types of the expression in this situation *)
@@ -620,6 +628,8 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
+    | Eexec ({c_node = Capp (rs, _)}, _) when is_empty_record info rs ->
+      ML.mk_unit
     | Eexec ({c_node = Capp (rs, _)}, _) when rs_ghost rs ->
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
@@ -629,9 +639,7 @@ module Translate = struct
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
       let pvl = app pvl rs.rs_cty.cty_args in
       begin match pvl with
-      | [pv_expr] when get_record info rs ->
-        (* singleton public record type obtained by ghost fields erasure *)
-        pv_expr
+      | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
       | _ -> ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
       (* abstract block *)
@@ -720,10 +728,8 @@ module Translate = struct
         let p e = not (rs_ghost e) in
         let pjl = filter_ghost_params p drecord_fields pjl in
         begin match pjl with
-          | [] -> ML.mk_its_defn id args is_private None
-          | [(is_mutable, _, ty_pj)]
-            when not s.its_private && not is_mutable ->
-            (* singleton public record with an imutable field *)
+          | [] -> ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit))
+          | [_, _, ty_pj] when is_optimizable_record_itd itd ->
             ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
           | pjl -> ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
         end

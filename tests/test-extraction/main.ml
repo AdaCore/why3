@@ -1,19 +1,19 @@
 
 (* main file for ../test_extraction.mlw so that we *run* the extracted code *)
 
-let (=) = Z.eq
+open Test
+
+let (=) = Z.equal
 
 let b42 = Z.of_int 42
 let () = assert (test_int    () = b42)
-let () = assert (test_int32  () = b42)
-let () = assert (test_uint32 () = b42)
 let () = assert (test_int63  () = b42)
-let () = assert (test_int64  () = b42)
-let () = assert (test_uint64 () = b42)
 
 let () = assert (test_ref     () = b42)
 let () = assert (test_array   () = b42)
-let () = assert (test_array31 () = b42)
+let () = assert (test_array63 () = b42)
+
+let () = main ()
 
 let () = Format.printf "  OCaml extraction test successful@."
 

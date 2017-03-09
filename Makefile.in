@@ -1650,37 +1650,14 @@ test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
 
 test-runstrat: test-runstrat.$(OCAMLBEST)
 
-test-ocaml-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
-	@echo "driver ocaml32"
-	@mkdir -p tests/test-extraction
-	@cd tests ; ../bin/why3extract.opt -D ocaml32 \
-	  test_extraction.mlw -o test-extraction
-	@cd tests/test-extraction/ ; \
-	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
-	  @BIGINTLIB@.cmxa why3extract.cmxa \
-	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
-	@tests/test-extraction/a.out
+test-ocaml-extraction: bin/why3.opt bin/why3extract.opt
 	@echo "driver ocaml64"
-	@cd tests ; ../bin/why3extract.opt -D ocaml64 \
-	  test_extraction.mlw -o test-extraction
-	@cd tests/test-extraction/ ; \
-	  $(OCAMLOPT) @BIGINTINCLUDE@ -I ../../lib/why3 \
-	  @BIGINTLIB@.cmxa why3extract.cmxa \
-	  ref__Refint.ml test_extraction__TestExtraction.ml main.ml
+	@bin/why3extract.opt -D ocaml64 -L tests \
+	  test_extraction.TestExtraction -o tests/test-extraction/test.ml
+	@ocamlfind ocamlopt -package zarith -linkpkg -I tests/test-extraction/ \
+	  tests/test-extraction/test.ml tests/test-extraction/main.ml \
+          -o tests/test-extraction/a.out
 	@tests/test-extraction/a.out
-
-#######################################
-# this should be removed in the future
-#######################################
-test-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
-	@mkdir -p tests/test-extraction-mario
-	@bin/why3extract.opt -D drivers/ocaml64.drv --modular --recursive \
-	  -L tests/ test_extraction_mario.M -o tests/test-extraction-mario/
-	@ocamlfind ocamlopt -package zarith -linkpkg \
-	  -I tests/test-extraction-mario/ \
-	  tests/test-extraction-mario/test_extraction_mario__M.ml \
-	  tests/test-extraction-mario/main.ml -o a.out
-	@tests/test-extraction-mario/a.out
 
 ################
 # documentation
