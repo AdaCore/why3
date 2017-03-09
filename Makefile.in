@@ -913,7 +913,11 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 COQLIBS_BOOL_FILES = Bool
 COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
+ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry Truncate
+else
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
+endif
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -1002,11 +1006,11 @@ install_no_local::
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_SEQ)) $(LIBDIR)/why3/coq/seq/
 	$(MKDIR_P) $(LIBDIR)/why3/coq/bv
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_BV)) $(LIBDIR)/why3/coq/bv/
-	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
-	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/floating_point
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
 
 update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float headers-coq
