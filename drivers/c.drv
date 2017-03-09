@@ -138,6 +138,13 @@ module mach.int.UInt64
   prelude
 
 "
+#include \"config.h\"
+#include \"gmp.h\"
+#include \"gmp-impl.h\"
+#include \"longlong.h\"
+
+#undef invert_limb
+
 void add64_with_carry(uint64_t * res, uint64_t * carry, uint64_t x, uint64_t y, uint64_t c)
 {
   uint64_t r = x + y + c;
@@ -156,16 +163,13 @@ void sub64_with_borrow(uint64_t * res, uint64_t * borrow, uint64_t x, uint64_t y
 
 void mul64_double(uint64_t * low, uint64_t * high, uint64_t x, uint64_t y)
 {
-  uint64_t h, l;
-  asm(\"mulq %3\" : \"=a\"(l),\"=d\"(h) : \"a\"(x), \"rm\"(y));
-  *high = h;
-  *low = l;
+  umul_ppmm(*high,*low,x,y);
 }
 
 uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 {
   uint64_t q,r;
-  asm(\"divq %4\" : \"=a\"(q),\"=d\"(r) : \"a\"(ul), \"d\"(uh), \"rm\"(d));
+  udiv_qrnnd(q,r,uh,ul,d);
   return q;
 }
 
@@ -184,6 +188,23 @@ void lsld64(uint64_t * low, uint64_t * high, uint64_t x, uint64_t cnt)
   *low = x << cnt;
 }
 "
+  (*
+  
+void mul64_double(uint64_t * low, uint64_t * high, uint64_t x, uint64_t y)
+{
+  uint64_t h, l;
+  asm(\"mulq %3\" : \"=a\"(l),\"=d\"(h) : \"a\"(x), \"rm\"(y));
+  *high = h;
+  *low = l;
+}
+
+uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  uint64_t q,r;
+  asm(\"divq %4\" : \"=a\"(q),\"=d\"(r) : \"a\"(ul), \"d\"(uh), \"rm\"(d));
+  return q;
+}
+  *)
 
   syntax converter of_int "%1ULL"
 

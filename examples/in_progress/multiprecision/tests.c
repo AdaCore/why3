@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 uint64_t add(uint64_t * r3, uint64_t * x4, uint64_t * y3, int32_t sx, int32_t
              sy);
@@ -31,6 +32,8 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, nap, nbp;
   mp_size_t max_n, an, bn, rn;
+  struct timeval begin, end;
+  double elapsed;
   //gmp_randstate_t rands;
   //TMP_DECL;
   //TMP_MARK;
@@ -62,29 +65,33 @@ int main () {
 	  mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
 
-          if (bp[bn-1] == 0)
+          while (bp[bn-1] == 0)
             {
-              printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
-              continue;
+              //printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
+              mpn_random2 (bp, bn + 1);
             };
 
 #ifdef BENCH
-  for (int iter = 0; iter != 10000; ++iter) {
+          
+          gettimeofday(&begin, NULL);
+          for (int iter = 0; iter != 10000; ++iter) {
 #endif
 
 #ifdef TEST_GMP
-	  mpn_mul (refp, ap, an, bp, bn);
-          mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
+            mpn_mul (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-	  mul (rp, ap, bp, an, bn);
-          div_qr(rq, rr, ap, bp, nap, nbp, an, bn);
+            mul (rp, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
-  }
+          }
+          gettimeofday(&end, NULL);
+          elapsed = 
+            (end.tv_sec - begin.tv_sec)
+            + ((end.tv_usec - begin.tv_usec)/1000000.0);
+          printf ("multiplication: an=%d, bn=%d, t=%f\n", (int)an, (int)bn, elapsed); 
 #endif
-
 #ifdef COMPARE
 	  rn = an + bn;
 	  if (mpn_cmp (refp, rp, rn))
@@ -97,6 +104,42 @@ int main () {
 	      printf ("ref: "); mpn_dump (refp, rn);
 	      abort();
 	    }
+#endif
+        }
+    }
+  for (an = 2; an <= max_n; an += 1)
+    {
+      for (bn = 1; bn <= an; bn += 1)
+        {
+          mpn_random2 (ap, an + 1);
+	  mpn_random2 (bp, bn + 1);
+          
+          while (bp[bn-1] == 0)
+            {
+              //printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
+              mpn_random2 (bp, bn + 1);
+            };
+#ifdef BENCH
+          gettimeofday(&begin, NULL);
+          for (int iter = 0; iter != 100000; ++iter) {
+#endif
+          
+#ifdef TEST_GMP
+            mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            div_qr(rq, rr, ap, bp, nap, nbp, an, bn);
+#endif
+
+#ifdef BENCH
+        }
+          gettimeofday(&end, NULL);
+          elapsed = 
+            (end.tv_sec - begin.tv_sec)
+            + ((end.tv_usec - begin.tv_usec)/1000000.0);
+          printf ("division: an=%d, bn=%d, t=%f\n", (int)an, (int)bn, elapsed); 
+#endif
+#ifdef COMPARE
           rn = bn;
           if (mpn_cmp (refr, rr, rn))
 	    {
@@ -124,7 +167,7 @@ int main () {
 #endif
 	}
     }
-
+  
   //TMP_FREE;
   //tests_end ();
   return 0;
