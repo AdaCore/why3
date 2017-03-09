@@ -49,19 +49,19 @@ rule token = parse
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "mk___split_fields"(opt_num as n) opt_num {
+  | "mk___split_fields"(opt_num as n) opt_num "___" {
     match n with
     | "" -> MK_SPLIT_FIELD ("mk___split_fields",0)
     | n -> MK_SPLIT_FIELD ("mk____split_fields"^n, int_of_string n) }
-  | "mk___rep"(opt_num as n) opt_num {
+  | "mk___rep"(opt_num as n) opt_num "___" {
     match n with
     | "" -> MK_REP ("mk___rep", 0)
     | n -> MK_REP ("mk___rep"^n, int_of_string n) }
-  | "mk___t"(opt_num as n) opt_num {
+  | "mk___t"(opt_num as n) opt_num "___" {
     match n with
     | "" -> MK_T ("mk___t", 0)
     | n -> MK_T ("mk___t"^n, int_of_string n) }
-  | "mk___split_discrs"(opt_num as n) opt_num {
+  | "mk___split_discrs"(opt_num as n) opt_num "___" {
     match n with
     | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
     | n -> MK_SPLIT_DISCRS ("mk____split_discrs"^n, int_of_string n) }
