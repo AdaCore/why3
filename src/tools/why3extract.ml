@@ -173,14 +173,16 @@ let translate_module =
 let extract_to =
   let memo = Ident.Hid.create 16 in
   fun ?fname ?decl m ->
-    let name = m.mod_theory.Theory.th_name in
-    if not (Ident.Hid.mem memo name) then begin
-      Ident.Hid.add memo name ();
-      let mdecls = match decl with
-        | None   -> (translate_module m).ML.mod_decl
-        | Some d -> Translate.pdecl_m m d in
-      print_mdecls ?fname m mdecls
-    end
+    match m.mod_theory.Theory.th_path with
+    | ("why3" | "map")::_ -> ()
+    | _ -> let name = m.mod_theory.Theory.th_name in
+        if not (Ident.Hid.mem memo name) then begin
+          Ident.Hid.add memo name ();
+          let mdecls = match decl with
+            | None   -> (translate_module m).ML.mod_decl
+            | Some d -> Translate.pdecl_m m d in
+          print_mdecls ?fname m mdecls
+        end
 
 let rec use_iter f l =
   List.iter
@@ -189,8 +191,7 @@ let rec use_iter f l =
 let rec do_extract_module ?fname m =
   let extract_use m' =
     let fname =
-      if m'.mod_theory.Theory.th_path = [] then fname else None
-    in
+      if m'.mod_theory.Theory.th_path = [] then fname else None in
     do_extract_module ?fname m'
   in
   begin match opt_rec_single with
@@ -278,9 +279,8 @@ let rec visit mm id =
   if not (Ident.Hid.mem visited id) then begin
     try
       let d = find_decl mm id in
-      (* Can I change these the two lines (* *) ? *)
-      Ident.Hid.add visited id (); (* *)
-      ML.iter_deps (visit mm) d;   (* *)
+      Ident.Hid.add visited id ();
+      ML.iter_deps (visit mm) d;
       toextract := id :: !toextract
     with Not_found -> ()
   end

@@ -268,6 +268,9 @@ module Print = struct
       begin match pjl, tl with
       | [], [] ->
         (print_uident info) fmt rs.rs_name
+      | [], [t] ->
+        fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
+          (print_expr info) t
       | [], tl ->
         fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
           (print_list comma (print_expr info)) tl
@@ -334,7 +337,7 @@ module Print = struct
         (print_apply info (Hrs.find_def ht_rs rs rs)) pvl
     | Ematch (e, pl) ->
       fprintf fmt (protect_on paren
-      "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
+      "begin match @[%a@] with@\n@[%a@] end")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =

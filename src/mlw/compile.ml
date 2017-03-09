@@ -440,33 +440,30 @@ module Translate = struct
       List.exists is_constructor its
     | _ -> false
 
-  (* let get_record info rs = *)
-  (*   match Mid.find_opt rs.rs_name info.info_mo_known_map with *)
-  (*   | Some {pd_node = PDtype itdl} -> *)
-  (*     let f itd = List.exists (rs_equal rs) itd.itd_fields in *)
-  (*     let itd = List.find f itdl in *)
-  (*     let is_private = itd.itd_its.its_private in *)
+  let is_private_record itd = itd.itd_its.its_private
 
-  (*   | _ -> true, [] *)
+  let is_singleton_imutable itd =
+    let not_g e = not (rs_ghost e) in
+    let pjl = itd.itd_fields in
+    let mfields = itd.itd_its.its_mfields in
+    let pv_equal_field rs = pv_equal (Opt.get rs.rs_field) in
+    let get_mutable rs = List.exists (pv_equal_field rs) mfields in
+    match filter_ghost_params not_g get_mutable pjl with
+    | [is_mutable] -> not is_mutable
+    | _ -> false
 
-  let is_private_record info rs =
-    match Mid.find_opt rs.rs_name info.info_mo_known_map with
-    | Some {pd_node = PDtype itdl} ->
-      let f itd = List.exists (rs_equal rs) itd.itd_fields in
-      let itd = List.find f itdl in
-      itd.itd_its.its_private
-    | _ -> assert false (* rs is a field *)
+  let is_optimizable_record itd =
+    not (is_private_record itd) && is_singleton_imutable itd
 
   let get_record info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
     | Some {pd_node = PDtype itdl} ->
       let f pjl_constr = List.exists (rs_equal rs) pjl_constr in
-      let itd =
-        try List.find (fun itd -> f itd.itd_constructors) itdl
-        with Not_found -> List.find (fun itd -> f itd.itd_fields) itdl in
-      let no_g e = not (rs_ghost e) in
-      List.filter no_g itd.itd_fields, Some itd.itd_its.its_private
-    | _ -> [], None
+      let itd = begin match rs.rs_field with
+        | Some _ -> List.find (fun itd -> f itd.itd_fields) itdl
+        | None -> List.find (fun itd -> f itd.itd_constructors) itdl end in
+      is_optimizable_record itd
+    | _ -> false
 
   let mk_eta_expansion rsc pvl cty_app =
     (* FIXME : effects and types of the expression in this situation *)
@@ -631,9 +628,8 @@ module Translate = struct
       mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); _}, _) ->
       let pvl = app pvl rs.rs_cty.cty_args in
-      let (pjl, is_private) = get_record info rs in
-      begin match pvl, pjl, is_private with
-      | [pv_expr], [_], Some false ->
+      begin match pvl with
+      | [pv_expr] when get_record info rs ->
         (* singleton public record type obtained by ghost fields erasure *)
         pv_expr
       | _ -> ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff end
