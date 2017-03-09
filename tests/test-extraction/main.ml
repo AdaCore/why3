@@ -15,7 +15,7 @@ let () = assert (test_array63 () = b42)
 
 let () = main ()
 
-let () = Format.printf "  OCaml extraction test successful@."
+let () = Format.printf "OCaml extraction test successful@."
 
 (*
 Local Variables:

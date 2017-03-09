@@ -55,7 +55,7 @@ let add_opt_file x =
         let path, m = Lists.chop_last path in
         Symbol (path, m, s)
       end in
-  Queue.push (Some target) opt_queue
+  Queue.push target opt_queue
 
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
@@ -245,7 +245,7 @@ let read_mlw_file ?format env fname =
   close_in cin;
   mm
 
-let do_local_extract target =
+let do_modular target =
   let format = !opt_parser in
   match target with
   | File fname ->
@@ -260,12 +260,6 @@ let do_local_extract target =
     let mm = Mstr.empty in
     let m = find_module_path mm path m in
     do_extract_symbol_from m s
-
-let do_input = function
-  | None -> assert false (*TODO*)
-    (* Queue.iter do_global_extract tlist *)
-  | Some target ->
-    do_local_extract target
 
 let visited = Ident.Hid.create 1024
 let toextract = ref []
@@ -289,32 +283,39 @@ let visit mm id =
   if opt_rec_single = Recursive then visit mm id
   else toextract := id :: !toextract
 
-let flat_extraction target = match Opt.get target with
+let flat_extraction mm = function
   | File fname ->
     let format = !opt_parser in
-    let mm = read_mlw_file ?format env fname in
-    let do_m _ m = do_extract_module ~fname m in
-    Mstr.iter do_m mm
+    let mmf = read_mlw_file ?format env fname in
+    let do_m s m mm =
+      if Mstr.mem s mm then begin
+        eprintf "multiple module '%s'; use -L . instead@." s;
+        exit 1
+      end;
+      let tm = translate_module m in
+      Ident.Mid.iter (fun id _ -> visit mm id) tm.ML.mod_known;
+      Mstr.add s m mm in
+    Mstr.fold do_m mmf mm
   | Module (path, m) ->
-    let mm = Mstr.empty in
     let m = find_module_path mm path m in
     let m = translate_module m in
-    Ident.Mid.iter (fun id _ -> visit mm id) m.ML.mod_known
+    Ident.Mid.iter (fun id _ -> visit mm id) m.ML.mod_known;
+    mm
   | Symbol (path, m, s) ->
-    let mm = Mstr.empty in
     let m = find_module_path mm path m in
     let ns = m.mod_export in
     let id = find_symbol_id ns s in
-    visit mm id
+    visit mm id;
+    mm
 
 let () =
   try
     match opt_modu_flat with
-    | Modular -> Queue.iter do_input opt_queue
+    | Modular ->
+      Queue.iter do_modular opt_queue
     | Flat ->
-      Queue.iter flat_extraction opt_queue;
+      let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
-      let mm = Mstr.empty in
       let cout = match opt_output with
         | None -> stdout
         | Some file -> open_out file in
