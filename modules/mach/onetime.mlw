@@ -7,12 +7,18 @@ module OneTime
 
   type t = abstract { v: int; mutable valid: bool }
 
-  val to_int (x: t) : int
+  val function to_int (x: t) : int
     ensures { result = x.v }
+
+  meta coercion function to_int
 
   val zero (): t
     ensures { result.valid }
     ensures { result.v = 0 }
+
+  val one () : t
+    ensures { result.valid }
+    ensures { result.v = 1 }
 
   val succ (x: t) : t
     requires { x.valid }

@@ -10,25 +10,8 @@
 (********************************************************************)
 
 (*
-  - option to extract into a single file
-
-  - no more why3extract.cma
-    use driver preludes instead
-
-  - 2 drivers for nums and zarith
-
-  - no delcaration at all for a module -> no file produced
-    (e.g. ref.Ref)
-
   - suggest a command line to compile the extracted code
     (for instance in a comment)
-
-  - drivers for val now may use %1, %2, etc. (though not mandatory)
-    Capp f x y
-      "..." -> "..." x y
-      "...%1..." -> "...x..." y
-      "..(*%1*)..." -> "...(*x*)..." y
-      "..%1..%3.." -> (fun z -> "..x..z..")  (y ignored)
 
   - extract file f.mlw into OCaml file f.ml, with sub-modules
 
@@ -38,32 +21,7 @@
 
   - if a WhyML module M is extracted to something that is a signature,
     then extract "module type B_sig = ..." (as well as "module B = ...")
-
-  - use a black list in printer to avoid clash with Pervasives symbols
-    (e.g. ref, (!), etc.)
-
 *)
-
-(*
-  Questions pour Jean-Christophe et Andreï :
-    - est-ce qu'il y a des utilisations particulières du champ
-      [itd_fields], vis-à-vis du champ [itd_constructors] ?
-
-    - comme l'AST [expr] est déjà en forme normale-A, est-ce que ça
-      fait du sense pour vous d'utiliser des applications de la forme
-      [Eapp of ident * ident list] ?
-
-    - faire un module Erasure, pour y concentrer tout ce qui
-      appartient à l'éffacement du code fantôme ?
-
-    - comment est-ce qu'il marche la [mask] d'un [prog_pattern] ?
-
- *)
-
-(*
-  TODO: réfléchir sur l'affectation parallèle
-*)
-
 
 (** Abstract syntax of ML *)
 

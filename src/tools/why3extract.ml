@@ -170,11 +170,18 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
+let not_extractable_theories = ["why3"; "map";]
+
+let is_not_extractable_theory =
+  let h = Hstr.create 16 in
+  List.iter (fun s -> Hstr.add h s ()) not_extractable_theories;
+  Hstr.mem h
+
 let extract_to =
   let memo = Ident.Hid.create 16 in
   fun ?fname ?decl m ->
     match m.mod_theory.Theory.th_path with
-    | ("why3" | "map")::_ -> ()
+    | t::_ when is_not_extractable_theory t -> ()
     | _ -> let name = m.mod_theory.Theory.th_name in
         if not (Ident.Hid.mem memo name) then begin
           Ident.Hid.add memo name ();
