@@ -187,8 +187,10 @@ let options = Arg.align [
           " Load fake why3.conf instead of real one";
    "--socket", Arg.String set_socket_name,
           " The name of the socket to be used";
-   "--debug", Arg.Set opt_debug,
-          " Enable debug mode";
+   "--debug", Arg.Tuple [Arg.Set opt_debug; Arg.Set opt_standalone],
+          " Enable debug mode; also deactivates why3server";
+   "--debug-server", Arg.Set opt_debug,
+          " Enable debug mode and keep why3server activated";
    "--standalone", Arg.Set opt_standalone,
           " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
