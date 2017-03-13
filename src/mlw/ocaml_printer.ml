@@ -327,7 +327,7 @@ module Print = struct
     | Eapp (rs, []) when rs_equal rs rs_false ->
       fprintf fmt "false"
     | Eapp (rs, [e1; e2]) when rs_equal rs rs_func_app ->
-      fprintf fmt "@[<hov 1>%a %a@]"
+      fprintf fmt (protect_on paren "@[<hov 1>%a %a@]")
         (print_expr info) e1 (print_expr info) e2
     | Eapp (rs, [])  ->
       (* avoids parenthesis around values *)
@@ -374,7 +374,7 @@ module Print = struct
       fprintf fmt (protect_on paren "@[<hov 2>(fun %a ->@ %a)@]")
         (print_list space (print_vs_arg info)) varl (print_expr info) e
     | Ewhile (e1, e2) ->
-      fprintf fmt "@[<hov 2>while %a do@ %a@ done@]"
+      fprintf fmt "@[<hov 2>while %a do@\n%a@ done@]"
         (print_expr info) e1 (print_expr info) e2
     | Eraise (xs, e_opt) ->
       print_raise ~paren info xs fmt e_opt

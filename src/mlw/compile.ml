@@ -779,15 +779,19 @@ module Transform = struct
     let mk n = { e with e_node = n } in
     let add_subst pv e1 e2 = expr info (Mpv.add pv e1 subst) e2 in
     match e.e_node with
-    | Evar pv ->
-      (try Mpv.find pv subst with Not_found -> e)
-    | Elet (Lvar (pv, ({e_node = Econst _ } as e1)), e2)
-    | Elet (Lvar (pv, ({e_node = Eblock []} as e1)), e2) ->
-      add_subst pv e1 e2
-    | Elet (Lvar (pv, ({e_node = Eapp (rs, [])} as e1)), e2)
-      when Translate.isconstructor info rs ->
-      (* only optimize constructors with no argument *)
-      (* because of Lvar we know the constructor is completely applied *)
+    | Evar pv -> (try Mpv.find pv subst with Not_found -> e)
+    (* | Elet (Lvar (pv, ({e_node = Econst _ } as e1)), e2) *)
+    (* | Elet (Lvar (pv, ({e_node = Eblock []} as e1)), e2) *)
+    (*   when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label -> *)
+    (*   add_subst pv e1 e2 *)
+    (* | Elet (Lvar (pv, ({e_node = Eapp (rs, _)} as e1)), e2) *)
+    (*   when Translate.isconstructor info rs && *)
+    (*        Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label -> *)
+    (*   (\* because of Lvar we know the constructor is completely applied *\) *)
+    (*   add_subst pv e1 e2 *)
+    | Elet (Lvar (pv, e1), e2)
+      when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label ->
+      let e1 = expr info subst e1 in
       add_subst pv e1 e2
     | Elet (ld, e) ->
       mk (Elet (let_def info subst ld, expr info subst e))
@@ -797,8 +801,6 @@ module Transform = struct
       mk (Efun (vl, expr info subst e))
     | Eif (e1, e2, e3) ->
       mk (Eif (expr info subst e1, expr info subst e2, expr info subst e3))
-    (* | Ecast (e, ty) -> *)
-    (*   mk (Ecast (expr info subst e, ty)) *)
     | Ematch (e, bl) ->
       mk (Ematch (expr info subst e, List.map (branch info subst) bl))
     | Eblock el ->
