@@ -96,6 +96,7 @@ and term_desc =
   | Ttuple of term list
   | Trecord of (qualid * term) list
   | Tupdate of term * (qualid * term) list
+  | Teps of (ident * pty) * term
 
 (*s Declarations. *)
 

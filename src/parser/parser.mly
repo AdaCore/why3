@@ -563,8 +563,8 @@ term_:
     { Tmatch (mk_term (Ttuple $2) $startpos($2) $endpos($2), $4) }
 | quant comma_list1(quant_vars) triggers DOT term
     { Tquant ($1, List.concat $2, $3, $5) }
-| EPSILON
-    { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
+| EPSILON eps_var DOT term
+    { Teps ($2, $4) }
 | label term %prec prec_named
     { Tnamed ($1, $2) }
 | term cast
@@ -613,6 +613,9 @@ match_cases(X):
 
 quant_vars:
 | binder_var+ cast? { List.map (fun (l,i) -> l, i, false, $2) $1 }
+
+eps_var:
+| labels(lident) cast { ($1, $2) }
 
 triggers:
 | (* epsilon *)                                                 { [] }
