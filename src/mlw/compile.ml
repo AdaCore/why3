@@ -343,10 +343,14 @@ module Translate = struct
     match p.pat_node with
     | Pwild ->
       ML.Pwild
+    | Pvar vs when (restore_pv vs).pv_ghost ->
+      ML.Pwild
     | Pvar vs ->
       ML.Pident vs.vs_name
     | Por (p1, p2) ->
       ML.Por (pat p1, pat p2)
+    | Pas (p, vs) when (restore_pv vs).pv_ghost ->
+      pat p
     | Pas (p, vs) ->
       ML.Pas (pat p, vs.vs_name)
     | Papp (ls, pl) when is_fs_tuple ls ->
@@ -354,17 +358,13 @@ module Translate = struct
     | Papp (ls, pl) ->
       let rs = restore_rs ls in
       let args = rs.rs_cty.cty_args in
-      let mk acc pv pp = if not pv.pv_ghost then (pat pp) :: acc else acc in
-      let pat_pl = List.fold_left2 mk [] args pl
-      in
+      let mk acc pv pp = if not pv.pv_ghost then pat pp :: acc else acc in
+      let pat_pl = List.fold_left2 mk [] args pl in
       ML.Papp (ls, List.rev pat_pl)
 
   (** programs *)
 
   let pv_name pv = pv.pv_vs.vs_name
-
-  let is_underscore pv =
-    (pv_name pv).id_string = "_" && ity_equal pv.pv_ity ity_unit
 
   (* individual types *)
   let rec ity t =
@@ -534,11 +534,12 @@ module Translate = struct
       ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
     | Evar pv ->
       ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) eff
-    | Elet (LDvar (pv, e1), e2) when e_ghost e1 || pv.pv_ghost ->
+    | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
       expr info e2
-    | Elet (LDvar (pv, e1), e2) when is_underscore pv && e_ghost e2 ->
-      expr info e1
-    | Elet (LDvar (pv, e1), e2) when is_underscore pv ->
+    | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
+      ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) ML.ity_unit eff
+    | Elet (LDvar (pv, e1), e2) when pv.pv_ghost ||
+                                     not (Mpv.mem pv e2.e_effect.eff_reads) ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
