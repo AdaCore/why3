@@ -1,0 +1,8 @@
+
+type uref = { mutable cnt : int }
+type dref = { mutable urf : uref }
+type tref = { mutable drf : dref }
+
+let che (t t1: tref) (d : dref)
+  ensures { t.drf.urf.cnt = 1 /\ t1.drf.urf.cnt = 0 }
+= (t.drf, d.urf, t.drf.urf, t1.drf) <- (d, {cnt = 1}, {cnt = 0}, t.drf)
