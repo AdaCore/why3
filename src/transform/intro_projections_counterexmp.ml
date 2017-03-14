@@ -124,7 +124,8 @@ let get_list_projs t map_projs =
 let rec projections_for_term ls term proj_name applied_projs env map_projs =
   (* Return declarations for projections of the term.
      Parameter proj_name is the name of the projection
-     Parameter applied_proj_f is a set of projection functions already applied to the term *)
+     Parameter applied_proj_f is a set of projection functions already applied
+     to the term *)
   match (Opt.get term.t_ty).ty_node with
   | Tyapp (ts, [_t_from; _t_to]) when ts.ts_name.id_string = "map" -> begin
       let pfs = get_list_projs term map_projs in

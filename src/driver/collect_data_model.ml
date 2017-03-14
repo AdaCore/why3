@@ -5,7 +5,7 @@ open Strings
 exception Not_value
 
 (* Adds all referenced cvc4 variables found in the term t to table *)
-let rec get_variables_term (table: correspondance_table) t =
+let rec get_variables_term (table: correspondence_table) t =
   match t with
   | Variable _ | Function_Local_Variable _ | Boolean _ | Integer _
   | Decimal _ | Other _ | Bitvector _ -> table
@@ -40,7 +40,7 @@ and get_variables_array table a =
      let table = get_variables_term table t1 in
      get_variables_term table t2
 
-let get_all_var (table: correspondance_table) =
+let get_all_var (table: correspondence_table) =
   Mstr.fold (fun _key element table ->
     match element with
     | _, Noelement -> table
@@ -89,7 +89,7 @@ let remove_end_num s =
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
 let add_vars_to_table table value =
-  let rec add_vars_to_table (table: correspondance_table) value =
+  let rec add_vars_to_table (table: correspondence_table) value =
     let t = match (snd value) with
     | Term t -> t
     | Function (_, t) -> t
@@ -184,7 +184,7 @@ and refine_function table term =
     To_array (refine_function table t)
 
 
-and refine_variable_value (table: correspondance_table) key v =
+and refine_variable_value (table: correspondence_table) key v =
   let (b, t) = v in
   if b then
     table
@@ -319,7 +319,7 @@ let corres_else_element table to_rep of_rep =
   in
   corres_else_element table to_rep of_rep
 
-let to_rep_of_rep (table: correspondance_table) =
+let to_rep_of_rep (table: correspondence_table) =
   let to_reps =
     List.sort (fun x y -> String.compare (fst x) (fst y))
       (Mstr.fold (fun key value acc ->
@@ -342,7 +342,7 @@ let to_rep_of_rep (table: correspondance_table) =
   to_rep_of_rep table to_reps of_reps
 
 
-let create_list (table: correspondance_table) =
+let create_list (table: correspondence_table) =
 
   (* First populate the table with all references to a cvc variable *)
   let table = get_all_var table in

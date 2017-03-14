@@ -27,9 +27,9 @@ type definition =
   | Noelement
 
 (* Type returned by parsing of model.
-   An hashtable that makes a correspondance between names (string) and
+   An hashtable that makes a correspondence between names (string) and
    associated definition (complex stuff) *)
-type correspondance_table = (bool * definition) Mstr.t
+type correspondence_table = (bool * definition) Mstr.t
 
 let rec print_array fmt a =
   match a with
@@ -63,7 +63,7 @@ let print_def fmt d =
   | Term t -> Format.fprintf fmt "TERM : %a" print_term t
   | Noelement -> Format.fprintf fmt "NOELEMENT"
 
-let add_element x (t: correspondance_table) b =
+let add_element x (t: correspondence_table) b =
   match x with
   | None -> t
   | Some (key, value) ->

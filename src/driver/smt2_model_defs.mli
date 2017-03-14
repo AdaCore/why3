@@ -29,13 +29,13 @@ type definition =
   | Noelement
 
 (* Type returned by parsing of model.
-   An hashtable that makes a correspondance between names (string) and
+   An hashtable that makes a correspondence between names (string) and
    associated definition (complex stuff) *)
 (* The boolean is true when the term has no external variable *)
-type correspondance_table = (bool * definition) Mstr.t
+type correspondence_table = (bool * definition) Mstr.t
 
 val add_element: (string * definition) option ->
-  correspondance_table -> bool -> correspondance_table
+  correspondence_table -> bool -> correspondence_table
 
 
 val make_local: variable list -> term -> term
