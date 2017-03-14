@@ -2,20 +2,20 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.6" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.4pl6" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../dfa_example.mlw" expanded="true">
 <theory name="DfaExample" sum="660b70fa1d4035d9e6c3f57fd8521252" expanded="true">
  <goal name="nil_notin_r1">
- <proof prover="2" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="0.79"/></proof>
+ <proof prover="0" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="0.26"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  <proof prover="7" memlimit="4000"><result status="valid" time="0.08" steps="140"/></proof>
  </goal>
  <goal name="WP_parameter all_in_r0" expl="VC for all_in_r0">
- <proof prover="7" memlimit="4000"><result status="valid" time="2.96" steps="2858"/></proof>
+ <proof prover="7" memlimit="4000"><result status="valid" time="2.51" steps="2624"/></proof>
  </goal>
  <goal name="words_in_r1_end_with_one">
  <proof prover="8"><result status="valid" time="0.06"/></proof>
@@ -36,7 +36,7 @@
  <goal name="WP_parameter one_w_in_r1" expl="VC for one_w_in_r1">
  <transf name="split_goal_wp">
   <goal name="WP_parameter one_w_in_r1.1" expl="1. postcondition">
-  <proof prover="7"><result status="valid" time="0.28" steps="377"/></proof>
+  <proof prover="7"><result status="valid" time="0.28" steps="376"/></proof>
   </goal>
   <goal name="WP_parameter one_w_in_r1.2" expl="2. assertion">
   <proof prover="7"><result status="valid" time="0.24" steps="386"/></proof>

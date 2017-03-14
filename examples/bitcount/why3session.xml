@@ -11,7 +11,7 @@
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="4000"/>
 <file name="../bitcount.mlw" expanded="true">
-<theory name="BitCount8bit_fact" sum="476b3eb457557c47229e7aecfbd25d56" expanded="true">
+<theory name="BitCount8bit_fact" sum="5c0756551629e92d348c4c0765463575" expanded="true">
  <goal name="nth_as_bv_is_int">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  <proof prover="5"><result status="valid" time="0.08"/></proof>
@@ -132,10 +132,10 @@
   </goal>
   <goal name="WP_parameter step2.7" expl="7. postcondition">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
-  <proof prover="3"><result status="valid" time="0.53" steps="272"/></proof>
+  <proof prover="3"><result status="valid" time="0.36" steps="272"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   <proof prover="5"><result status="valid" time="0.12"/></proof>
-  <proof prover="6"><result status="valid" time="0.54" steps="495"/></proof>
+  <proof prover="6"><result status="valid" time="0.13" steps="195"/></proof>
   </goal>
  </transf>
  </goal>
@@ -246,7 +246,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BitCounting32" sum="7925406e0d68ff12c1657367a352ec1c" expanded="true">
+<theory name="BitCounting32" sum="d3ec4a555f0dfe5daf56b63b86543132" expanded="true">
  <goal name="WP_parameter proof0" expl="VC for proof0" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter proof0.1" expl="1. assertion" expanded="true">
@@ -455,7 +455,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter proof2.11" expl="11. postcondition">
-  <proof prover="2"><result status="valid" time="0.18"/></proof>
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
   <proof prover="4"><result status="valid" time="0.10"/></proof>
   <proof prover="5"><result status="valid" time="0.14"/></proof>
   </goal>
@@ -560,7 +560,7 @@
    </goal>
    <goal name="WP_parameter proof3.12.3" expl="3. VC for proof3">
    <proof prover="3"><result status="valid" time="0.03" steps="99"/></proof>
-   <proof prover="4"><result status="valid" time="0.18"/></proof>
+   <proof prover="4"><result status="valid" time="0.06"/></proof>
    <proof prover="5"><result status="valid" time="0.08"/></proof>
    <proof prover="6"><result status="valid" time="0.04" steps="100"/></proof>
    </goal>
@@ -730,13 +730,13 @@
  </transf>
  </goal>
 </theory>
-<theory name="Hamming" sum="210a1b46c3cddb38fb5cb6db3ab64d4e" expanded="true">
+<theory name="Hamming" sum="8bd81e81e80e840bd23d0d6292055eb6" expanded="true">
  <goal name="WP_parameter hammingD" expl="VC for hammingD">
  <transf name="split_goal_wp">
   <goal name="WP_parameter hammingD.1" expl="1. assertion">
   <proof prover="3"><result status="valid" time="0.83" steps="423"/></proof>
   <proof prover="5"><result status="valid" time="0.07"/></proof>
-  <proof prover="6"><result status="valid" time="3.20" steps="516"/></proof>
+  <proof prover="6"><result status="valid" time="2.70" steps="516"/></proof>
   </goal>
   <goal name="WP_parameter hammingD.2" expl="2. postcondition">
   <proof prover="3"><result status="timeout" time="6.00"/></proof>
@@ -823,7 +823,7 @@
  <proof prover="6"><result status="valid" time="0.03" steps="79"/></proof>
  </goal>
 </theory>
-<theory name="AsciiCode" sum="15d3dd0d94109f980fe09e104ebd90b6" expanded="true">
+<theory name="AsciiCode" sum="f4b119f334b21233232db77090f88aa8" expanded="true">
  <goal name="WP_parameter bv_even" expl="VC for bv_even">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bv_even.1" expl="1. assertion">
@@ -925,7 +925,7 @@
    <proof prover="6"><result status="valid" time="0.17" steps="181"/></proof>
    </goal>
    <goal name="WP_parameter ascii.4.2" expl="2. assertion">
-   <proof prover="5"><result status="valid" time="0.27"/></proof>
+   <proof prover="5"><result status="valid" time="0.14"/></proof>
    <proof prover="6"><result status="valid" time="0.16" steps="159"/></proof>
    </goal>
    <goal name="WP_parameter ascii.4.3" expl="3. assertion">
@@ -982,7 +982,7 @@
   <proof prover="2"><result status="valid" time="4.31"/></proof>
   <proof prover="4" memlimit="1000"><result status="valid" time="5.75"/></proof>
   <proof prover="5"><result status="valid" time="1.42"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="2.06" steps="3155"/></proof>
+  <proof prover="6" memlimit="1000"><result status="valid" time="2.06" steps="3154"/></proof>
   </goal>
  </transf>
  </goal>
