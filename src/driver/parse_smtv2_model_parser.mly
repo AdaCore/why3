@@ -12,7 +12,7 @@
 %{
 %}
 
-%start <Smt2_model_defs.correspondance_table> output
+%start <Smt2_model_defs.correspondence_table> output
 %token <string> SPACE
 %token <string> ATOM
 %token MODEL
