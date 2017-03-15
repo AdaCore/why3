@@ -9,6 +9,18 @@
 (*                                                                  *)
 (********************************************************************)
 
+
+(* Handling of labels *)
+
+val model_trace_regexp: Str.regexp
+  (* The term labeled with "model_trace:name" will be in counterexample with
+     name "name" *)
+
+val label_starts_with: Str.regexp -> Ident.label -> bool
+
+val get_label: Ident.Slab.t -> Str.regexp -> Ident.Slab.elt
+
+
 val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
  (**
     Transformation that for each declared abstract function or predicate

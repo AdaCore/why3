@@ -17,16 +17,22 @@
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Boolean of bool
  | Array of model_array
+ | Record of model_record
  | Bitvector of string
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : model_value;
+  arr_index_key : string;
   arr_index_value : model_value;
 }
 and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
+}
+and model_record ={
+  discrs : model_value list;
+  fields : model_value list;
 }
 
 val array_create_constant :
@@ -36,7 +42,7 @@ val array_create_constant :
 
 val array_add_element :
   array : model_array ->
-  index : model_value ->
+  index : string      ->
   value : model_value ->
   model_array
 (** Adds an element to the array.

@@ -12,134 +12,207 @@
 %{
 %}
 
-%start <Model_parser.model_element list> output
+%start <Smt2_model_defs.correspondance_table> output
 %token <string> SPACE
 %token <string> ATOM
 %token MODEL
 %token STORE
 %token CONST
 %token AS
+%token DEFINE_FUN
+%token DECLARE_FUN
+%token DECLARE_SORT
+%token DECLARE_DATATYPES
+%token FORALL
+%token UNDERSCORE
+%token AS_ARRAY
+%token EQUAL
+%token ITE
+%token LAMBDA
+%token ARRAY_LAMBDA
+%token TRUE FALSE
+%token LET
+%token <string> COMMENT
 %token <string> BITVECTOR_VALUE
+%token BITVECTOR_TYPE
 %token <string> INT_STR
 %token <string> MINUS_INT_STR
 %token <string * string> DEC_STR
 %token <string * string> MINUS_DEC_STR
 %token LPAREN RPAREN
-%token MK_T_REF
+%token <string * int> MK_REP
+%token <string * int> MK_SPLIT_FIELD
+%token <string * int> MK_T
+%token <string * int> MK_SPLIT_DISCRS
 %token EOF
 %%
 
+
 output:
-| possible_space LPAREN MODEL output1 RPAREN {$4}
-| output1 {$1}
+| EOF { Stdlib.Mstr.empty }
+| LPAREN ps MODEL ps list_decls RPAREN { $5 }
 
-output1:
-| EOF { [] }
-| possible_space text { [] }
-| possible_space LPAREN text { [] }
-    (* Error of the prover while getting counter-example *)
-| possible_space LPAREN pairs RPAREN { $3 }
-
-pairs:
-| possible_space { [] }
-| possible_space LPAREN term SPACE value RPAREN pairs
-    { (Model_parser.create_model_element ~name:$3 ~value:$5 ())::$7 }
-
-possible_space:
-| { "" }
-| SPACE { $1 }
-
-term:
-| text { $1 }
-| LPAREN term_list RPAREN
-    { "(" ^ $2 ^ ")" }
-
-term_list:
-| possible_space { $1 }
-| possible_space term term_list { $1 ^ $2 ^ $3 }
-
-text:
-| MINUS_INT_STR { $1 }
-| INT_STR { $1 }
-| text_without_int { $1 }
-
-text_without_int:
-| ATOM { $1 }
-| STORE { "store" }
-| CONST { "const"  }
-| AS { "as" }
-
-value:
-| LPAREN MK_T_REF SPACE value RPAREN { $4 }
-| integer { $1 }
-| decimal { $1 }
-| other_val_str { Model_parser.Unparsed $1 }
-| array { Model_parser.Array $1 }
-| bitvector { Model_parser.Bitvector $1 }
-
-integer:
-| INT_STR { Model_parser.Integer $1 }
-| LPAREN possible_space MINUS_INT_STR possible_space RPAREN
-    { Model_parser.Integer $3 }
-
-decimal:
-| DEC_STR { Model_parser.Decimal $1 }
-| LPAREN possible_space MINUS_DEC_STR possible_space RPAREN
-    { Model_parser.Decimal ($3) }
-
-(* Everything that cannot be integer (positive and negative) and array. *)
-other_val_str:
-| text_without_int { $1 }
-| LPAREN possible_space RPAREN { "(" ^ $2 ^ ")" }
-| LPAREN possible_space paren_other_val_str RPAREN
-    { "(" ^ $3 ^ ")" }
-
-(* Everything that cannot be negative integer and start of an array  *)
-paren_other_val_str:
-| other_than_neg_int_and_array_store term_list { $1 ^ $2 }
-| LPAREN possible_space other_than_const_array possible_space RPAREN
-    { "(" ^ $3 ^ ")" }
-
-other_than_neg_int_and_array_store:
-| INT_STR { $1 }
-| ATOM { $1 }
-| CONST { "const"  }
-| AS { "as" }
-
-other_than_const_array:
-| MINUS_INT_STR { $1 }
-| INT_STR { $1 }
-| CONST { "const"  }
+list_decls:
+| LPAREN decl RPAREN ps { Smt2_model_defs.add_element $2 Stdlib.Mstr.empty false}
+| LPAREN decl RPAREN ps list_decls { Smt2_model_defs.add_element $2 $5 false }
+| COMMENT ps list_decls  { $3 } (* Lines beginning with ';' are ignored *)
 
 (* Examples:
-   (1) Map from int to int:
-     (store (store ((as const (Array Int Int)) 0) 1 2) 3 4)
-   (2) Map from int to bool:
-     (store (store ((as const (Array Int Int)) false) 1 true) 3 true)
-   (3) Map from int to map from int to int (all elemets are 0):
-     ((as const (Array Int (Array Int Int))) ((as const (Array Int Int)) 0))
-   (4) Map from int to map from int to int (element [1][1] is 3, all others are 0)
-     (store (store ((as const (Array Int (Array Int Int))) ((as const (Array Int Int)) 0)) 0 (store ((as const (Array Int Int)) 0) 0 3)) 1 (store ((as const (Array Int Int)) 0) 1 3))
+"(define-fun to_rep ((_ufmt_1 enum_t)) Int 0)"
+"(declare-sort enum_t 0)"
+"(declare-datatypes () ((tuple0 (Tuple0))
+))"
 *)
-array:
-| LPAREN possible_space
-    LPAREN possible_space
-      AS SPACE CONST possible_space array_skipped_part possible_space
-    RPAREN possible_space
-    value possible_space
-  RPAREN
-    { Model_parser.array_create_constant ~value:$13 }
-| LPAREN possible_space
-    STORE possible_space array possible_space value SPACE value
-    possible_space
-  RPAREN
-    { Model_parser.array_add_element ~array:$5 ~index:$7 ~value:$9 }
+decl:
+| DEFINE_FUN SPACE tname ps LPAREN ps args_lists RPAREN
+    ps ireturn_type SPACE smt_term
+    { let t = Smt2_model_defs.make_local $7 $12 in
+        Some ($3, (Smt2_model_defs.Function ($7, t))) }
+| DECLARE_SORT SPACE isort_def { None }
+| DECLARE_DATATYPES SPACE idata_def ps { None }
+| DECLARE_FUN SPACE tname ps LPAREN ps args_lists RPAREN
+    ps ireturn_type { None } (* z3 declare function *)
+| FORALL SPACE LPAREN ps args_lists RPAREN ps smt_term { None } (* z3 cardinality *)
 
-array_skipped_part:
-| LPAREN term_list RPAREN {}
+(* Names. For atoms that are used to recognize different types of values,
+   we return the string the lexer detected (as expected). These names
+   are not used. *)
+tname:
+| name { $1 }
+| MK_REP { fst $1 }
+| MK_SPLIT_FIELD { fst $1 }
+| MK_T { fst $1 }
+| MK_SPLIT_DISCRS { fst $1 }
+
+
+smt_term:
+| name      { Smt2_model_defs.Variable $1  }
+| integer   { Smt2_model_defs.Integer $1   }
+| decimal   { Smt2_model_defs.Decimal $1   }
+| array     { Smt2_model_defs.Array $1     }
+| bitvector { Smt2_model_defs.Bitvector $1 }
+| boolean   { Smt2_model_defs.Boolean $1   }
+(* ite (= ?a ?b) ?c ?d *)
+| LPAREN ITE ps pair_equal ps smt_term ps smt_term RPAREN
+    {  match $4 with
+    | None -> Smt2_model_defs.Other ""
+    | Some (t1, t2) -> Smt2_model_defs.Ite (t1, t2, $6, $8) }
+(* No parsable value are applications. *)
+| application { Smt2_model_defs.Other "" }
+(* This is SPARK-specific stuff. It is used to parse records, discriminants
+   and stuff generated by SPARK with specific "keywords" :
+   mk___rep(num), mk___split_field(num) etc *)
+| LPAREN MK_REP SPACE list_smt_term RPAREN
+    { Smt2_model_defs.build_record_discr (List.rev $4) }
+(* Specifically for mk___t, we are only interested in the first value *)
+| LPAREN MK_T SPACE list_smt_term RPAREN { List.hd (List.rev $4) }
+| LPAREN MK_SPLIT_FIELD SPACE list_smt_term RPAREN
+    { Smt2_model_defs.Record (snd $2, List.rev $4) }
+| LPAREN MK_SPLIT_DISCRS SPACE list_smt_term RPAREN
+    { Smt2_model_defs.Discr (snd $2, List.rev $4) }
+(* Particular case for functions that are defined as an equality:
+   define-fun f ((a int) (b int)) (= a b) *)
+| LPAREN EQUAL ps list_smt_term RPAREN { Smt2_model_defs.Other "" }
+| LPAREN LET ps LPAREN list_let RPAREN SPACE smt_term RPAREN
+    { Smt2_model_defs.substitute $5 $8 }
+(* z3 specific constructor *)
+| LPAREN UNDERSCORE ps AS_ARRAY ps tname RPAREN
+    { Smt2_model_defs.To_array (Smt2_model_defs.Variable $6) }
+
+
+(* value of let are not used *)
+list_let:
+| { [] }
+| LPAREN tname SPACE smt_term RPAREN ps list_let { ($2, $4) :: $7 }
+(* TODO not efficient *)
+
+(* Condition of an if-then-else. We are only interested in equality case *)
+pair_equal:
+| LPAREN EQUAL ps smt_term ps smt_term RPAREN { Some ($4, $6) }
+| application { None }
+| name { None }
+
+list_smt_term:
+| smt_term { [$1] }
+| list_smt_term SPACE smt_term { $3 :: $1}
+
+application:
+| LPAREN ps name SPACE list_smt_term RPAREN { $3 }
+
+array:
+| LPAREN ps
+    LPAREN AS SPACE CONST ps ireturn_type
+    RPAREN ps smt_term
+  RPAREN{ Smt2_model_defs.Const $11 }
+| LPAREN ps
+    STORE ps array SPACE smt_term SPACE smt_term ps
+  RPAREN { Smt2_model_defs.Store ($5, $7, $9) }
+(* When array is of type int -> bool, Cvc4 returns something that looks like:
+   (ARRAY_LAMBDA (LAMBDA ((BOUND_VARIABLE_1162 Int)) false)) *)
+| LPAREN
+    ARRAY_LAMBDA ps
+    LPAREN LAMBDA ps LPAREN args_lists RPAREN ps smt_term
+  RPAREN ps RPAREN
+    { Smt2_model_defs.Const $11 }
+
+(* Possible space *)
+ps:
+| { }
+| SPACE { }
+
+args_lists:
+| { [] }
+| LPAREN args RPAREN ps args_lists { $2 :: $5 }
+(* TODO This is inefficient and should be done in a left recursive way *)
+
+args:
+| name SPACE ireturn_type { $1 }
+
+name:
+| ATOM { $1 }
+(* Should not happen in relevant part of the model (ad hoc) *)
+| BITVECTOR_TYPE { "" }
+
+integer:
+| INT_STR { $1 }
+| LPAREN ps MINUS_INT_STR ps RPAREN
+    { $3 }
+
+decimal:
+| DEC_STR { $1 }
+| LPAREN ps MINUS_DEC_STR ps RPAREN
+    { $3 }
 
 (* Example:
    (_ bv2048 16) *)
 bitvector:
 | BITVECTOR_VALUE
     { $1 }
+
+boolean:
+| TRUE  { true  }
+| FALSE { false }
+
+(* BEGIN IGNORED TYPES *)
+(* Types are badly parsed (for future use) but never saved *)
+ireturn_type:
+| tname {}
+| LPAREN idata_type RPAREN {}
+
+isort_def:
+| tname SPACE integer { }
+
+idata_def:
+| LPAREN ps RPAREN ps LPAREN ps LPAREN idata_type RPAREN ps RPAREN { }
+| LPAREN ps RPAREN ps LPAREN ps LPAREN RPAREN ps RPAREN { }
+
+ilist_app:
+| tname { }
+| tname SPACE ilist_app { }
+| LPAREN idata_type RPAREN { }
+| LPAREN idata_type RPAREN SPACE ilist_app { }
+
+idata_type:
+| tname { }
+| tname SPACE ilist_app { }
+(* END IGNORED TYPES *)

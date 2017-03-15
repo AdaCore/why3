@@ -13,6 +13,7 @@ open Decl
 open Ty
 open Term
 open Ident
+open Intro_projections_counterexmp
 
 (** For see intro_vc_vars_counterexmp.mli for detailed description
     of this transformation. *)
@@ -29,8 +30,6 @@ let model_vc_label = Ident.create_label "model_vc"
   (* Identifies the term that triggers the VC. *)
 let model_vc_post_label = Ident.create_label "model_vc_post"
 (* Identifies the postcondition that triggers the VC. *)
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
 
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
@@ -41,15 +40,6 @@ type vc_term_info = {
   vc_pre_or_post : bool;
   (* true if VC was generated for precondition or postcondition *)
 }
-
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
 
 let is_model_vc_label l = l = model_vc_label || l = model_vc_post_label
 
@@ -99,7 +89,8 @@ let model_trace_for_postcondition ~labels =
   with Not_found ->
     labels
 
-let is_counterexample_label l = l = model_label || l = model_projected_label
+let is_counterexample_label l =
+  l = model_label || l = model_projected_label
 
 
 (* Preid table necessary to avoid duplication of *_vc_constant *)
@@ -133,11 +124,12 @@ let rec do_intro info vc_loc vc_map vc_var t =
       match info.vc_loc with
       | None -> []
       | Some loc ->
+
 	  (* variable inside the term T that triggers VC. If the variable
 	     should be in counterexample, introduce new constant in location
 	     loc with all labels necessary for collecting it for counterexample
 	     and make it equal to the variable *)
-	  if Slab.exists is_counterexample_label ls.id_label then
+          if Slab.exists is_counterexample_label ls.id_label then
 	    let const_label = if info.vc_pre_or_post then
 	      model_trace_for_postcondition ~labels:ls.id_label
 	    else
@@ -157,7 +149,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
 	    else
 	      begin
 		Hprid.add vc_map id_new true;
-		Intro_projections_counterexmp.intro_const_equal_to_term
+		intro_const_equal_to_term
 		  ~term:t ~id_new:id_new ~axiom_name
 	      end
 	  else
@@ -292,7 +284,13 @@ let rec intros info vc_loc vc_map vc_var f =
 	(d :: l @ decl, goal)
       else
         (d :: decl, goal)
-  | _ -> remove_positive_foralls vc_var f
+  | _ ->
+      let (dl, goal) = remove_positive_foralls vc_var f in
+      if info.vc_inside then
+        let l = do_intro info vc_loc vc_map vc_var f in
+        (l @ dl, goal)
+      else
+        (dl,goal)
 
 let do_intro_vc_vars_counterexmp info vc_loc pr t =
   (* TODO initial guess on number of counter-examples to print *)
