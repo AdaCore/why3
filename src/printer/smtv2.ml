@@ -135,8 +135,11 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
+let model_projected_label = Ident.create_label "model_projected"
+
 let collect_model_ls info ls =
-  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+  if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
+  Slab.mem model_projected_label ls.ls_name.id_label) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -427,20 +430,15 @@ let print_info_model cntexample fmt info =
   let info_model = info.info_model in
   if not (S.is_empty info_model) && cntexample then
     begin
-	  (*
-            fprintf fmt "@[(get-value (%a))@]@\n"
-            (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
-      fprintf fmt "@[(get-value (";
-
+      fprintf fmt "@[(get-model ";
       let model_map =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
           let s = flush_str_formatter () in
-          fprintf fmt "%s " s;
 	  Stdlib.Mstr.add s f acc)
 	info_model
 	Stdlib.Mstr.empty in
-      fprintf fmt "))@]@\n";
+      fprintf fmt ")@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -465,6 +463,7 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
+      (*if cntexample then fprintf fmt "@[(push)@]@\n"; (* z3 specific stuff *)*)
       fprintf fmt "@[(check-sat)@]@\n";
       let model_list = print_info_model cntexample fmt info in
       if cntexample then begin
