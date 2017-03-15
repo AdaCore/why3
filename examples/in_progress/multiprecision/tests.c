@@ -30,7 +30,7 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 #endif
 
 int main () {
-  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, nap, nbp;
+  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
   mp_size_t max_n, an, bn, rn;
   struct timeval begin, end;
   double elapsed;
@@ -49,8 +49,8 @@ int main () {
 
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
-  nap = TMP_ALLOC_LIMBS (max_n + 1);
-  nbp = TMP_ALLOC_LIMBS (max_n + 1);
+  /* nap = TMP_ALLOC_LIMBS (max_n + 1); */
+  /* nbp = TMP_ALLOC_LIMBS (max_n + 1); */
   rp = TMP_ALLOC_LIMBS (2 * max_n);
   refp = TMP_ALLOC_LIMBS (2 * max_n);
   rq = TMP_ALLOC_LIMBS (max_n + 1);
@@ -72,7 +72,7 @@ int main () {
             };
 
 #ifdef BENCH
-          
+
           gettimeofday(&begin, NULL);
           for (int iter = 0; iter != 10000; ++iter) {
 #endif
@@ -87,10 +87,10 @@ int main () {
 #ifdef BENCH
           }
           gettimeofday(&end, NULL);
-          elapsed = 
+          elapsed =
             (end.tv_sec - begin.tv_sec)
             + ((end.tv_usec - begin.tv_usec)/1000000.0);
-          printf ("multiplication: an=%d, bn=%d, t=%f\n", (int)an, (int)bn, elapsed); 
+          printf ("multiplication: an=%d, bn=%d, t=%f\n", (int)an, (int)bn, elapsed);
 #endif
 #ifdef COMPARE
 	  rn = an + bn;
@@ -113,7 +113,7 @@ int main () {
         {
           mpn_random2 (ap, an + 1);
 	  mpn_random2 (bp, bn + 1);
-          
+
           while (bp[bn-1] == 0)
             {
               //printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
@@ -123,21 +123,26 @@ int main () {
           gettimeofday(&begin, NULL);
           for (int iter = 0; iter != 100000; ++iter) {
 #endif
-          
+
 #ifdef TEST_GMP
             mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            div_qr(rq, rr, ap, bp, nap, nbp, an, bn);
+            tdiv_qr(rq, rr, ap, bp, an, bn);
 #endif
 
 #ifdef BENCH
         }
           gettimeofday(&end, NULL);
-          elapsed = 
+          elapsed =
             (end.tv_sec - begin.tv_sec)
             + ((end.tv_usec - begin.tv_usec)/1000000.0);
-          printf ("division: an=%d, bn=%d, t=%f\n", (int)an, (int)bn, elapsed); 
+          printf ("division: an=%d, bn=%d, t=%f\n"
+//, am=%016lx\n
+
+                  , (int)an, (int)bn, elapsed
+                  // , ap[an]
+                  );
 #endif
 #ifdef COMPARE
           rn = bn;
@@ -167,7 +172,7 @@ int main () {
 #endif
 	}
     }
-  
+
   //TMP_FREE;
   //tests_end ();
   return 0;

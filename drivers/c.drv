@@ -253,13 +253,17 @@ end
 
 module mach.c.C
 
+  prelude "#include <assert.h>"
+
   syntax type ptr "%1 *"
+  syntax type bool "int" (* ? *)
 
   syntax val malloc "malloc(%1 * sizeof(%v0))"
   syntax val free   "free(%1)"
   syntax val realloc "realloc(%1, %2 * sizeof(%v0))"
 
-  syntax val is_null "%1 == NULL"
+  syntax val is_null "(%1) == NULL"
+  syntax val is_not_null "(%1) != NULL"
   syntax val null "NULL"
 
   syntax val incr "%1+%2"
@@ -272,6 +276,8 @@ module mach.c.C
 
   syntax val p2i "%1"
   syntax converter p2i "%1"
+
+  syntax val c_assert "assert ( %1 )"
 
   syntax val print_space "printf(\" \")"
   syntax val print_newline "printf(\"\\n\")"

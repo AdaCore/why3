@@ -5878,6 +5878,29 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ()
       end
 
+  let tdiv_qr (q r x y:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
+    requires { valid_ptr_itv x (sx) }
+    requires { valid_ptr_itv y (sy) }
+    requires { valid_ptr_itv q (sx - sy + 1) } (* TODO check if this is needed*)
+    requires { valid_ptr_itv r (sy) }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value_sub_shift x sx
+              = value_sub_shift q (sx - sy + 1) * value_sub_shift y sy
+                + value_sub_shift r sy }
+    ensures { value_sub_shift r sy < value_sub_shift y sy }
+    diverges
+  =
+    let uone = UInt32.of_int 1 in
+    let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) uone) in
+    c_assert (is_not_null nx);
+    let ny = malloc (UInt32.of_int32 sy) in
+    c_assert (is_not_null ny);
+    div_qr q r x y nx ny sx sy;
+    free nx;
+    free ny;
+
+
   (** Tests *)
  (*
  let print (p:t) (m n:int32) : unit

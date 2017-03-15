@@ -115,6 +115,13 @@ module C
                   !(result.data)[i] = !((old p).data)[i] }
     ensures { plength result <> Int32.to_int sz -> p = old p }
 
+  val predicate is_not_null (p:ptr 'a) : bool
+    ensures { result <-> plength p <> 0 }
+
+  val c_assert (e:bool) : unit
+    ensures { e }
+    diverges
+
   (** Printing *)
 
   val print_space () : unit
