@@ -791,7 +791,8 @@ module Transform = struct
     (*   (\* because of Lvar we know the constructor is completely applied *\) *)
     (*   add_subst pv e1 e2 *)
     | Elet (Lvar (pv, e1), e2)
-      when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label ->
+      when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label &&
+           eff_pure e1.e_effect ->
       let e1 = expr info subst e1 in
       add_subst pv e1 e2
     | Elet (ld, e) ->

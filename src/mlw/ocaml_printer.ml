@@ -333,6 +333,7 @@ module Print = struct
       (* avoids parenthesis around values *)
       fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
     | Eapp (rs, pvl) ->
+      eprintf "rs->%s@." rs.rs_name.id_string;
       fprintf fmt (protect_on paren "%a")
         (print_apply info (Hrs.find_def ht_rs rs rs)) pvl
     | Ematch (e, pl) ->

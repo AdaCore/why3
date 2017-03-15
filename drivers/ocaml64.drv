@@ -72,11 +72,11 @@ module ref.Ref
 end
 
 module ref.Refint
-  syntax val incr "%1 := Z.succ (Pervasives.(!) %1)"
-  syntax val decr "%1 := Z.pred (Pervasives.(!) %1)"
-  syntax val (+=) "%1 := Z.add (Pervasives.(!) %1) %2"
-  syntax val (-=) "%1 := Z.sub (Pervasives.(!) %1) %2"
-  syntax val ( *= ) "%1 := Z.mul (Pervasives.(!) %1) %2"
+  syntax val incr "%1 := Z.succ (!%1)"
+  syntax val decr "%1 := Z.pred (!%1)"
+  syntax val (+=) "%1 := Z.add (!%1) %2"
+  syntax val (-=) "%1 := Z.sub (!%1) %2"
+  syntax val ( *= ) "%1 := Z.mul (!%1) %2"
 end
 
 module null.Null
