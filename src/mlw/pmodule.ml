@@ -470,8 +470,37 @@ let cl_find_xs cl xs =
   if not (Sid.mem xs.xs_name cl.cl_local) then xs
   else Mxs.find xs cl.xs_table
 
-let clone_ls inst cl ls =
-  if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
+let cl_init m inst =
+  let cl = empty_clones m in
+  let non_local id =
+    if not (Sid.mem id cl.cl_local) then raise (NonLocal id) in
+  Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ts;
+  Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ty;
+  let check_ls ls _ =
+    non_local ls.ls_name;
+    try  ignore (restore_rs ls); raise (BadInstance ls.ls_name)
+    with Not_found -> () in
+  Mls.iter check_ls inst.mi_ls;
+  let check_rs rs _ =
+    non_local rs.rs_name;
+    match (Mid.find rs.rs_name m.mod_known).pd_node with
+    | PDtype _ -> raise (BadInstance rs.rs_name)
+    | PDlet  _ | PDexn  _ | PDpure -> () in
+  Mrs.iter check_rs inst.mi_rs;
+  Mvs.iter (fun vs _ -> non_local vs.vs_name) inst.mi_pv;
+  Mxs.iter (fun xs _ -> non_local xs.xs_name) inst.mi_xs;
+  let check_pk pr _ =
+    non_local pr.pr_name;
+    match (Mid.find pr.pr_name m.mod_known).pd_node with
+    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance pr.pr_name)
+    | PDpure -> () in
+  Mpr.iter check_pk inst.mi_pk;
+  Mpr.iter (fun pr _ -> raise (BadInstance pr.pr_name)) inst.mi_pr;
+  cl
+
+(* clone declarations *)
+
+let clone_ls cl ls =
   let constr = ls.ls_constr in
   let id = id_clone ls.ls_name in
   let at = List.map (clone_ty cl) ls.ls_args in
@@ -480,103 +509,41 @@ let clone_ls inst cl ls =
   cl.ls_table <- Mls.add ls ls' cl.ls_table;
   ls'
 
-let cl_init_ty cl ({ts_name = id} as ts) ity =
-  let its = restore_its ts in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  let stv = Stv.of_list ts.ts_args in
-  if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-    its_pure its && ity_immutable ity) then raise (BadInstance id);
-  cl.ty_table <- Mts.add ts ity cl.ty_table
-
-let cl_init_ts cl ({ts_name = id} as ts) its' =
-  let its = restore_its ts and ts' = its'.its_ts in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  if not (List.length ts.ts_args = List.length ts'.ts_args) then
-    raise (BadInstance id);
-  if not (its_pure its && its_pure its') then
-    raise (BadInstance id); (* TODO: accept refinement of private records *)
-  cl.ts_table <- Mts.add its.its_ts its' cl.ts_table
-
-let cl_init_ls cl ({ls_name = id} as ls) ls' =
-  (* FIXME check that ls is not associated to some rsymbol *)
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance id) in
-  let sbs = match ls.ls_value,ls'.ls_value with
-    | Some ty, Some ty' -> mtch Mtv.empty ty ty'
-    | None, None -> Mtv.empty
-    | _ -> raise (BadInstance id) in
-  ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance id));
-  cl.ls_table <- Mls.add ls ls' cl.ls_table
-
-let cl_init_rs cl ({rs_name = id} as rs) rs' =
-  (* FIXME check that rs is not a constructor, nor a field *)
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  (* arity and types will be checked when refinement VC is generated *)
-  begin match rs.rs_logic, rs'.rs_logic with
-  | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
-  | RLls ls, RLls ls' -> cl_init_ls cl ls ls'
-  | _ -> raise (BadInstance id)
-  end;
-  cl.rs_table <- Mrs.add rs rs' cl.rs_table
-
-let cl_init_xs cl ({xs_name = id} as xs) xs' =
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  begin try let ity = clone_ity cl xs.xs_ity in
-            ignore (ity_match isb_empty xs'.xs_ity ity)
-    with TypeMismatch _ -> raise (BadInstance id) end;
-  if mask_spill xs'.xs_mask xs.xs_mask then
-    raise (BadInstance id);
-  cl.xs_table <- Mxs.add xs xs' cl.xs_table
-
-let cl_init_pv cl ({vs_name = id} as vs) pv' =
-  let pv = restore_pv vs in
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
-  let ity = clone_ity cl pv.pv_ity in
-  if not (ity_equal ity pv'.pv_ity) then raise (BadInstance id);
-  if pv'.pv_ghost && not pv.pv_ghost then raise (BadInstance id);
-  cl.pv_table <- Mvs.add vs pv' cl.pv_table
-
-let cl_init_pr cl {pr_name = id} _ =
-  if not (Sid.mem id cl.cl_local) then raise (NonLocal id)
-
-let cl_init m inst =
-  let cl = empty_clones m in
-  Mts.iter (cl_init_ty cl) inst.mi_ty;
-  Mts.iter (cl_init_ts cl) inst.mi_ts;
-  Mls.iter (cl_init_ls cl) inst.mi_ls;
-  Mrs.iter (cl_init_rs cl) inst.mi_rs;
-  Mvs.iter (cl_init_pv cl) inst.mi_pv;
-  Mxs.iter (cl_init_xs cl) inst.mi_xs;
-  Mpr.iter (cl_init_pr cl) inst.mi_pk;
-  Mpr.iter (fun {pr_name = id} _ -> raise (BadInstance id)) inst.mi_pr;
-  cl
-
-(* clone declarations *)
-
 let clone_decl inst cl uc d = match d.d_node with
   | Dtype _ | Ddata _ -> assert false (* impossible *)
+  | Dparam ({ls_name = id} as ls) when Mls.mem ls inst.mi_ls ->
+      let ls' = Mls.find ls inst.mi_ls in
+      let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
+        with TypeMismatch _ -> raise (BadInstance id) in
+      let sbs = match ls.ls_value,ls'.ls_value with
+        | Some ty, Some ty' -> mtch Mtv.empty ty ty'
+        | None, None -> Mtv.empty
+        | _ -> raise (BadInstance id) in
+      ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
+        with Invalid_argument _ -> raise (BadInstance id));
+      cl.ls_table <- Mls.add ls ls' cl.ls_table;
+      uc
   | Dparam ls ->
-      if Mls.mem ls inst.mi_ls then uc else
-      let d = create_param_decl (clone_ls inst cl ls) in
+      let d = create_param_decl (clone_ls cl ls) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dlogic ldl ->
-      let get_ls (ls,_) = ignore (clone_ls inst cl ls) in
+      List.iter (fun (ls,_) ->
+        if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
+        ignore (clone_ls cl ls)) ldl;
       let get_logic (_,ld) =
         Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
-      List.iter get_ls ldl;
       let d = create_logic_decl (List.map get_logic ldl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dind (s, idl) ->
-      let get_ls (ls,_) = clone_ls inst cl ls in
+      let lls = List.map (fun (ls,_) ->
+        if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
+        clone_ls cl ls) idl in
       let get_case (pr,f) =
         if Mpr.mem pr inst.mi_pk then raise (CannotInstantiate pr.pr_name);
         let pr' = create_prsymbol (id_clone pr.pr_name) in
         cl.pr_table <- Mpr.add pr pr' cl.pr_table;
         pr', clone_fmla cl f in
       let get_ind ls (_,la) = ls, List.map get_case la in
-      let lls = List.map get_ls idl in
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
       add_pdecl ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
@@ -608,13 +575,17 @@ let cl_save_rs cl s s' =
   | RLnone, RLnone -> ()
   | _ -> assert false
 
+(*
+let ls_of_rs rs = match rs.rs_logic with
+  | RLls ls -> ls
+  | _ -> assert false
+*)
+
 let clone_type_decl inst cl tdl =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let htd = Hits.create 5 in
   let vcs = ref ([] : (itysymbol * term) list) in
-  (* FIXME: check that type_decl does not define any ls/rs
-     that belongs to inst, nor pr in inst.mi_pk *)
   let rec visit alg ({its_ts = {ts_name = id} as ts} as s) d =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
@@ -636,8 +607,21 @@ let clone_type_decl inst cl tdl =
     end else
     (* abstract *)
     if s.its_private && cloned then begin
-      assert (d.itd_constructors = []);
       assert (List.length tdl = 1);
+      begin match Mts.find_opt ts inst.mi_ts with
+      | Some s' ->
+          if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
+            raise (BadInstance id);
+          if not (its_pure s && its_pure s') then raise (BadInstance id);
+          (* TODO: accept refinement of private records *)
+          cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
+      | None -> begin match Mts.find_opt ts inst.mi_ty with
+      | Some ity ->
+          let stv = Stv.of_list ts.ts_args in
+          if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
+                    its_pure s && ity_immutable ity) then raise (BadInstance id);
+          cl.ty_table <- Mts.add ts ity cl.ty_table
+      | None -> assert false end end;
       Hits.add htd s None;
       (* TODO: check typing conditions for refined record type *)
       (* TODO: add a VC for invariants (if any) *)
@@ -917,6 +901,13 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         | RLlemma -> RKlemma in
       let cty = clone_cty cl (sm_of_cl cl) c.c_cty in
       let rs' = Mrs.find rs inst.mi_rs in
+      (* arity and types will be checked when refinement VC is generated *)
+      begin match rs.rs_logic, rs'.rs_logic with
+      | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
+      | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
+      | _ -> raise (BadInstance rs.rs_name)
+      end;
+      cl.rs_table <- Mrs.add rs rs' cl.rs_table;
       let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
         cty.cty_post cty.cty_xpost cty.cty_oldies e in
@@ -950,7 +941,13 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
       add_pdecl ~vc:false uc (create_let_decl ld)
-  | PDexn xs when Mxs.mem xs inst.mi_xs ->
+  | PDexn ({xs_name = id} as xs) when Mxs.mem xs inst.mi_xs ->
+      let xs' = Mxs.find xs inst.mi_xs in
+      begin try let ity = clone_ity cl xs.xs_ity in
+                ignore (ity_match isb_empty xs'.xs_ity ity)
+        with TypeMismatch _ -> raise (BadInstance id) end;
+      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance id);
+      cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       uc
   | PDexn xs ->
       let id = id_clone xs.xs_name in
