@@ -64,9 +64,11 @@ let parse : raw_model_parser = function input ->
     let match_end = Str.match_end () in
     let nr1 = Str.regexp "(:reason-unknown" in
     let nr2 = Str.regexp "(error \"Can" in
+    let nr3 = Str.regexp "Abort  trap" in (* TODO bug on mac *)
     let res1 = try Str.search_forward nr1 input 0 with Not_found -> 0 in
     let res2 = try Str.search_forward nr2 input 0 with Not_found -> 0 in
-    let res = max (res1) (res2) in
+    let res3 = try Str.search_forward nr3 input 0 with Not_found -> 0 in
+    let res = max (max res1 res2) res3 in
     let model_string =
       if res = 0 then "" else String.sub input match_end (res - match_end) in
     do_parsing model_string

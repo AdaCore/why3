@@ -50,12 +50,13 @@
 
 output:
 | EOF { Stdlib.Mstr.empty }
-| LPAREN ps MODEL ps list_decls RPAREN { $5 }
+| LPAREN ps MODEL ps list_decls (* RPAREN *) { $5 } (* TODO cvc4 bug mac *)
 
 list_decls:
-| LPAREN decl RPAREN ps { Smt2_model_defs.add_element $2 Stdlib.Mstr.empty false}
+| LPAREN decl RPAREN ps EOF { Smt2_model_defs.add_element $2 Stdlib.Mstr.empty false}
 | LPAREN decl RPAREN ps list_decls { Smt2_model_defs.add_element $2 $5 false }
-| COMMENT ps list_decls  { $3 } (* Lines beginning with ';' are ignored *)
+| RPAREN EOF { Stdlib.Mstr.empty }
+| COMMENT ps list_decls EOF  { $3 } (* Lines beginning with ';' are ignored *)
 
 (* Examples:
 "(define-fun to_rep ((_ufmt_1 enum_t)) Int 0)"
