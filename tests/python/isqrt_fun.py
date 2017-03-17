@@ -10,7 +10,7 @@ def isqrt(n):
         #@ invariant 0 <= r
         #@ invariant r * r <= n
         #@ invariant s == (r+1) * (r+1)
-        #@ variant n - s
+        #@ variant   n - s
         r = r + 1
         s = s + 2 * r + 1
     return r

@@ -23,7 +23,7 @@
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }
-  let mk_stmt loc d = { stmt_desc = d; stmt_loc = loc }
+  let mk_stmt loc d = Dstmt { stmt_desc = d; stmt_loc = loc }
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -71,6 +71,7 @@
 %token PLUS MINUS TIMES DIV MOD
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
+%token FUNCTION PREDICATE
 %token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET
 
 (* precedences *)
@@ -90,22 +91,37 @@
 %start file
 
 %type <Py_ast.file> file
+%type <Py_ast.decl> stmt
 
 %%
 
 file:
-| NEWLINE? import* dl=list(def) b=list(stmt) EOF
-    { dl, b }
+| NEWLINE* EOF
+    { [] }
+| NEWLINE? dl=nonempty_list(decl) NEWLINE? EOF
+    { dl }
 ;
 
+decl:
+| import { $1 }
+| def    { $1 }
+| stmt   { $1 }
+| func   { $1 }
+
 import:
-| FROM _m=ident IMPORT _f=ident NEWLINE
-  { () (* FIXME: check legal imports *) }
+| FROM m=ident IMPORT l=separated_list(COMMA, ident) NEWLINE
+  { Dimport (m, l) }
+
+func:
+| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
+  { Dlogic (true, id, l) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR NEWLINE
+  { Dlogic (false, id, l) }
 
 def:
 | DEF f = ident LEFTPAR x = separated_list(COMMA, ident) RIGHTPAR
   COLON NEWLINE BEGIN s=spec l=nonempty_list(stmt) END
-    { f, x, s, l }
+    { Ddef (f, x, s, l) }
 ;
 
 spec:
@@ -117,6 +133,8 @@ single_spec:
     { { empty_spec with sp_pre = [t] } }
 | ENSURES e=ensures NEWLINE
     { { empty_spec with sp_post = [floc $startpos(e) $endpos(e), e] } }
+| variant
+    { { empty_spec with sp_variant = $1 } }
 
 ensures:
 | term
@@ -182,11 +200,11 @@ suite:
     { l }
 ;
 
-stmt: located(stmt_desc) { $1 };
+stmt:
+| located(stmt_desc)      { $1 }
+| s = simple_stmt NEWLINE { s }
 
 stmt_desc:
-| s = simple_stmt NEWLINE
-    { s.stmt_desc }
 | IF c = expr COLON s1 = suite s2=else_branch
     { Sif (c, s1, s2) }
 | WHILE e = expr COLON b=loop_body

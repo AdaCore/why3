@@ -40,7 +40,7 @@
       ["invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
        "requires", REQUIRES; "ensures", ENSURES;
-       "label", LABEL;
+       "label", LABEL; "function", FUNCTION; "predicate", PREDICATE;
       ];
     fun s -> try Hashtbl.find h s with Not_found ->
       raise (Lexing_error ("no such annotation '" ^ s ^ "'"))
@@ -79,6 +79,8 @@ let comment = "#" [^'@''\n'] [^'\n']*
 rule next_tokens = parse
   | '\n'    { newline lexbuf; update_stack (indentation lexbuf) }
   | (space | comment)+
+            { next_tokens lexbuf }
+  | "\\" space* '\n' space* "#@"?
             { next_tokens lexbuf }
   | "#@" space* (ident as id)
             { [annotation id] }

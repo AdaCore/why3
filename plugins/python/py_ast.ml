@@ -57,10 +57,14 @@ and stmt_desc =
   | Sbreak
   | Slabel of ident
 
-and block = stmt list
+and block = decl list
 
-and def = ident * ident list * Ptree.spec * block
+and decl =
+  | Dimport of ident * ident list
+  | Ddef  of ident * ident list * Ptree.spec * block
+  | Dstmt of stmt
+  | Dlogic of bool (*is_func*) * ident * ident list
 
-and file = def list * block
+type file = block
 
 
