@@ -42,6 +42,9 @@ module AsHtml =
     let span e = element e
   end
 
+let select e cls =
+  Dom.list_of_nodeList (e ## querySelectorAll (Js.string cls))
+
 let getElement_exn cast id =
   Js.Opt.get (cast (Dom_html.getElementById id)) (fun () -> raise Not_found)
 
@@ -85,6 +88,33 @@ let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) =
 (* TEMPORAZRY TODO s todo *)
 exception TODO1
 exception TODO2
+
+
+
+module Tabs =
+  struct
+
+    let () =
+      let tab_groups = select Dom_html.document ".why3-tab-group" in
+      List.iter
+	(fun tab_group ->
+	 let labels = select tab_group ".why3-tab-label" in
+	 List.iter (
+	     (fun tab ->
+	      tab ##. onclick :=
+		Dom.handler
+		  (fun _ev ->
+		   List.iter
+		     (fun t ->
+		      ignore (t ##. classList ## add (Js.string "why3-inactive")))
+		     labels;
+                   tab ##. classList ## remove (Js.string "why3-inactive");
+		   Js._false))
+	       ) labels)
+	tab_groups
+
+  end
+
 
 module Editor =
   struct
@@ -325,6 +355,39 @@ let convert_request r =
 
 let sendRequest r =
   sendRequest (convert_request r)
+
+
+
+
+module Panel =
+  struct
+    let main_panel = getElement AsHtml.div "why3-main-panel"
+    let tab_container = getElement AsHtml.div "why3-tab-container"
+    let resize_bar = getElement AsHtml.div "why3-resize-bar"
+    let reset () =
+      let edit_style = tab_container ##. style in
+      JSU.(set edit_style (Js.string "flexGrow") (Js.string "2"));
+      JSU.(set edit_style (Js.string "flexBasis") (Js.string ""))
+
+    let () =
+      let mouse_down = ref false in
+      resize_bar ##. onmousedown := Dom.handler (fun _ -> mouse_down := true; Js._false);
+      resize_bar ##. ondblclick := Dom.handler (fun _ -> reset (); Js._false);
+      main_panel ##. onmouseup := Dom.handler (fun _ -> mouse_down := false; Js._false);
+      main_panel ##. onmousemove :=
+	Dom.handler (fun e ->
+		     if !mouse_down then begin
+			 let offset =
+			   (e ##. clientX) - (main_panel ##. offsetLeft)
+			 in
+			 let offset = Js.string ((string_of_int offset) ^ "px") in
+			 let edit_style = tab_container ##. style in
+			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
+			     JSU.(set edit_style (Js.string "flexBasis") offset);
+			     Js._false
+		       end
+		     else Js._true)
+  end
 
 
 module TaskList =
