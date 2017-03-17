@@ -60,11 +60,13 @@ let getElement cast id =
 
 module PE = struct
   let error_panel = getElement AsHtml.div "why3-error-bg"
+  let doc = Dom_html.document
 
   let print cls msg =
-    error_panel ##. innerHTML :=
-      Js.string ("<p class='" ^ cls ^ "'>" ^
-                  msg ^ "</p>")
+    let node = doc##createElement (Js.string "P") in
+    let textnode = doc##createTextNode (Js.string msg) in
+    appendChild node textnode;
+    appendChild error_panel node
 
   let error_print_error = print "why3-error"
 
