@@ -27,12 +27,19 @@ module S = Make (Wserver) (P)
 
 open Format
 
+(* TODO make it cleaner with adapted functions *)
 let interp_request args =
   let args_list = Strings.split '_' args in
   match args_list with
   | [ "reload" ]  -> Reload_req
   | [ "list-provers" ]  -> Command_req (root_node,"list-provers")
   | "gettask" :: n :: [] -> Get_task (int_of_string n)
+  | [s] ->
+      if Strings.has_prefix "Command=" s then
+        let com = Strings.remove_prefix "Command=" s in
+        Command_req (root_node, com)
+      else
+        invalid_arg "TODO"
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =

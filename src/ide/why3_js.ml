@@ -296,13 +296,7 @@ module ToolBar =
 
 
 let form = getElement AsHtml.form "why3-form"
-(*
-let () =
-  let cb = fun key ->
-    if key ##. keyCode = 97 then
-      Js._false else Js._false in
-  form ##. onkeypress := (Dom.handler cb)
-*)
+
 type httpRequest =
   | Get_task of string
   | Reload
@@ -318,7 +312,7 @@ let sendRequest r =
          PE.printAnswer ("Erreur " ^ string_of_int (xhr ##. status)) in
    xhr ## overrideMimeType (Js.string "text/json");
    let _ = xhr ## _open (Js.string "GET")
-                (Js.string ("http://localhost:6789/request?"^r))  (Js._true) in
+                (Js.string ("http://localhost:6789/request?"^r))  Js._true in
    xhr ##. onreadystatechange := (Js.wrap_callback onreadystatechange);
    xhr ## send (Js.null)
 
