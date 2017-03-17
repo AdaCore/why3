@@ -154,7 +154,10 @@ GENERATED =
 ##############
 
 LIBGENERATED = src/util/config.ml \
-	       src/util/rc.ml src/util/lexlib.ml src/parser/lexer.ml \
+	       src/util/rc.ml src/util/lexlib.ml \
+	       src/util/json_parser.mli src/util/json_parser.ml \
+	       src/util/json_lexer.ml \
+	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
@@ -166,7 +169,9 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer pp json_base json_parser json_lexer debug loc \
+	   hashcons stdlib exn_printer pp \
+	   json_base json_parser json_lexer \
+	   debug loc \
 	   lexlib print_tree cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl theory \
