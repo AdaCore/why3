@@ -40,7 +40,8 @@ let interpNotif (n: notification) =
         match (Js.Opt.to_option ses) with
         | None -> raise TODO1
         | Some ses ->
-            (ses ## innerHTML <- (Js.string "")); printAnswer "Node 0 reinitialized everything");
+            (ses ## innerHTML <- (Js.string ""));
+            printAnswer "Node 0 reinitialized everything");
       let parentnode = doc ## getElementById (Js.string !pid) in
       (match (Js.Opt.to_option parentnode) with
       | None -> printAnswer !pid; raise TODO2
@@ -73,14 +74,9 @@ el.addEventListener('contextmenu', function(ev) {
 exception NoNotification
 
 let interpNotifications l =
-  let rec interpNotifications l =
-    match l with
-    | [] -> ()
-    | hd :: tl -> interpNotif hd; interpNotifications tl
-  in
   match l with
   | [] -> raise NoNotification
-  | l -> interpNotifications l
+  | l -> List.iter interpNotif l
 
 let getNotification2 () =
   let xhr = XmlHttpRequest.create () in
@@ -129,16 +125,3 @@ let stopNotificationHandler () =
    match !notifHandler with
    | None -> ()
    | Some n -> Dom_html.window ## clearInterval (n); notifHandler := None
-
-let () = Js.Unsafe.global##stopNotificationHandler <-
-   Js.wrap_callback stopNotificationHandler
-
-let () = Js.Unsafe.global##startNotificationHandler <-
-   Js.wrap_callback startNotificationHandler
-
-let () = Js.Unsafe.global##sendRequest <- Js.wrap_callback sendRequest
-
-let () = Js.Unsafe.global##getNotification1 <- Js.wrap_callback getNotification2
-
-let () = Js.Unsafe.global##printAnswer1 <-
-  Js.wrap_callback (fun s -> printAnswer s)

@@ -28,56 +28,12 @@ module S = Make (Wserver) (P)
 open Format
 
 let interp_request args =
-  match args with
-  | "reload" -> Reload_req
-  | "list-provers" -> Command_req (root_node,"list-provers")
+  let args_list = Strings.split '_' args in
+  match args_list with
+  | [ "reload" ]  -> Reload_req
+  | [ "list-provers" ]  -> Command_req (root_node,"list-provers")
+  | "gettask" :: n :: [] -> Get_task (int_of_string n)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
-
-open Json_base
-
-let message_notification n =
-  match n with
-  | Error s -> Obj ["message_kind",String "Error"; "msg",String s]
-  | Open_File_Error s -> Obj ["message_kind",String "Open_File_Error"; "msg", String s]
-  | Proof_error(nid,s) -> Obj ["message_kind",String "Proof_error"; "nid", Int nid; "msg", String s]
-  | Transf_error(nid,s) -> Obj ["message_kind",String "Transf_error"; "nid", Int nid; "msg", String s]
-  | Strat_error(nid,s) -> Obj ["message_kind",String "Strat_error"; "nid", Int nid; "msg", String s]
-  | Replay_Info s -> Obj ["message_kind",String "Replay_info"; "msg", String s]
-  | Query_Info(nid,s) -> Obj ["message_kind",String "Query_info"; "nid", Int nid; "msg", String s]
-  | Query_Error(nid,s) -> Obj ["message_kind",String "Query_error"; "nid", Int nid; "msg", String s]
-  | Help s -> Obj ["message_kind",String "Help"; "msg", String s]
-  | Information s -> Obj ["message_kind",String "Information"; "msg", String s]
-  | Task_Monitor(a,b,c) ->
-     Obj ["message_kind",String "Task_Monitor"; "a", Int a; "b", Int b; "c", Int c]
-
-let nodetype t =
-  match t with
-  | NRoot -> "root"
-  | NFile -> "file"
-  | NTheory -> "theory"
-  | NTransformation -> "transformation"
-  | NGoal -> "goal"
-  | NProofAttempt -> "proofattempt"
-
-let notification n =
-  match n with
-  | Node_change(nid,_info) ->
-     Obj ["notification",String "Node_change"; "nid", Int nid; "info",String "TODO"]
-  | New_node(nid,parent,nt,name,detached) ->
-     Obj ["notification",String "New_node"; "nid", Int nid; "parent", Int parent;
-          "nodetype", String (nodetype nt); "name",String name; "detached",Bool detached]
-  | Remove nid ->
-     Obj ["notification",String "Remove"; "nid", Int nid]
-  | Initialized _ginfo ->
-     Obj ["notification",String "Initialized"; "ginfo", String "TODO"]
-  | Saved ->
-     Obj ["notification",String "Saved"]
-  | Message n ->
-     Obj ["notification",String "Message"; "msg", message_notification n]
-  | Dead s ->
-     Obj ["notification",String "Dead"; "msg", String s]
-  | Task(nid,_task) ->
-     Obj ["notification",String "Task"; "nid", Int nid; "task", String "TODO"]
 
 let handle_script s args =
   match s with
@@ -89,10 +45,10 @@ let handle_script s args =
          "{ \"request_error\": \"" ^ args ^ "\" ; \"error\": \"" ^
            (Pp.sprintf "%a" Exn_printer.exn_printer e) ^ "\" } "
      end
-    | "getNotifications" ->
-       let n = P.get_notifications () in
-       Pp.sprintf "%a@." Json_util.print_list_notification n
-    | _ -> "bad request"
+  | "getNotifications" ->
+      let n = P.get_notifications () in
+      Pp.sprintf "%a@." Json_util.print_list_notification n
+  | _ -> "bad request"
 
 let plist fmt l =
   List.iter  (fun x -> fprintf fmt "'%s'@\n" x) l

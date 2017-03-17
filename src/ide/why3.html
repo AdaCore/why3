@@ -16,7 +16,7 @@
       var library_index = "examples/index.txt";
     </script>
     <script defer="defer" type="text/javascript"
-            src="why3.js"></script>
+            src="why3_js.js"></script>
   </head>
   <body>
     <div id="why3-main-container" class="why3-container">
@@ -109,11 +109,32 @@
 
 	<div id="why3-task-viewer-container" class="why3-container">
           <div id="why3-viewer-bg" class="why3-widget"> </div>
-          <div  id="why3-task-viewer">Ceci est la tache</div>
+          <div id="why3-task-viewer">Ceci est la tache</div>
 	</div>
 
 
       </div>
+
+<!-- TODO to be changed error -->
+      <div id="why3-error-panel" class="why3-wide-view">
+        <span class="why3-tab-label why3-widget why3-inactive">Errors</span>
+        <div id="why3-error-container" class="why3-container">
+          <div id="why3-error-bg" class="why3-widget"> </div>
+	  <div id="why3-error" tabindex="-1" ></div>
+	</div>
+
+      </div>
+
+<!-- TODO saisie -->
+      <div id="why3-form-cont" class="why3-wide-view">
+        <form id="why3-form" method="get"
+              enctype="multipart/form-data"
+              action="http://localhost:6789/request">
+          <input type="text" name="Command">
+        </form>
+      </div>
+
+
     </div>
     <!-- open and save -->
     <a id="why3-save-as" href="" class="why3-hidden"></a>
