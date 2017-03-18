@@ -73,8 +73,7 @@ module PE = struct
   let error_print_msg = print "why3-msg"
 
 (* TODO remove this *)
-  let printAnswer s =
-  error_print_msg s
+  let printAnswer s = error_print_msg s
 
 end
 
@@ -86,12 +85,6 @@ let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) =
   match !data with
   | None -> raise Not_found
   | Some data -> PE.printAnswer (Js.to_string data); Js.to_string data
-
-(* TEMPORAZRY TODO s todo *)
-exception TODO1
-exception TODO2
-
-
 
 module Tabs =
   struct
@@ -326,10 +319,10 @@ module ToolBar =
 
   end
 
-
 let form = getElement AsHtml.form "why3-form"
 
 type httpRequest =
+  | Command of int * string
   | Get_task of string
   | Reload
 
@@ -348,18 +341,14 @@ let sendRequest r =
    xhr ##. onreadystatechange := (Js.wrap_callback onreadystatechange);
    xhr ## send (Js.null)
 
-(* TODO we currently split on the '_' to get arguments. This is bad.
-   TODO This is probably also bad to always make request with URI *)
-let convert_request r =
-  match r with
-  | Reload -> "reload"
-  | Get_task n -> "gettask_"^n
+let sendPostRequest = sendRequest
 
 let sendRequest r =
-  sendRequest (convert_request r)
-
-
-
+  match r with
+  | Reload -> sendRequest "reload"
+  | Get_task n -> sendRequest ("gettask_"^n)
+  | Command (n, c) ->
+      sendPostRequest ("node="^(string_of_int n)^"Command="^c)
 
 module Panel =
   struct
@@ -402,7 +391,6 @@ module TaskList =
     (* Task list as we get them from the server *)
     let printed_task_list = Hashtbl.create 16
 
-
     let print cls msg =
       task_list ##. innerHTML :=
         (Js.string ("<p class='" ^ cls ^ "'>" ^
@@ -416,7 +404,6 @@ module TaskList =
       Js.string (Format.sprintf
 		   "<span id='%s_container'><span id='%s_icon'></span> %s <span id='%s_msg'></span></span><ul id='%s_ul'></ul>"
 		   id id expl id id)
-
 
     let attach_to_parent id parent_id expl =
       let doc = Dom_html.document in
@@ -625,20 +612,39 @@ end
 (*   | Some answers -> *)
 (*       Dom.appendChild answers node *)
 
-
+let remove_node n =
+  let element = getElement AsHtml.span n in
+  let parent = element ##. parentNode in
+  let parent = Js.Opt.to_option parent in
+  match parent with
+  | None -> failwith "TODO"
+  | Some parent ->
+      Dom.removeChild parent element
 
 let interpNotif (n: notification) =
   match n with
   | Initialized g ->
-      TaskList.print_msg "Initialized"
+      PE.printAnswer "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
       TaskList.attach_new_node nid parent ntype name detached;
       TaskList.onclick_do_something (string_of_int nid)
   | Task (nid, task) ->
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
-  | _ -> failwith "TODO"
-(*  | New_task (id, task) ->
-      Populate task*)
+  | Remove nid ->
+      remove_node (string_of_int nid)
+  | Saved ->
+      PE.printAnswer "Saved"
+  | Message m ->
+      let s = Format.asprintf "%a" Json_util.print_notification n in
+      PE.printAnswer s
+  | Dead s ->
+      PE.printAnswer s
+  | Node_change (nid, up) ->
+    begin
+      match up with
+      | Proved b -> TaskList.update_status `Valid (string_of_int nid)
+      | _ -> failwith "TODO"
+    end
 
 exception NoNotification
 
@@ -680,30 +686,6 @@ let stopNotificationHandler () =
    | None -> ()
    | Some n -> Dom_html.window ## clearInterval (n); notifHandler := None
 
-(*
-        let ses = doc ## getElementById (Js.string !pid) in
-        match (Js.Opt.to_option ses) with
-        | None -> raise TODO1
-        | Some ses ->
-            (ses ## innerHTML <- (Js.string ""));
-            TaskList.print_msg "Node 0 reinitialized everything");
-      let parentnode = doc ## getElementById (Js.string !pid) in
-      (match (Js.Opt.to_option parentnode) with
-      | None -> TaskList.print_msg !pid; raise TODO2
-      | Some parentnode ->
-      let linode = doc ## createElement (Js.string "LI") in
-      let text = (Json_util.convert_node_type_string ntype) ^ " " ^ name in
-      let textnode = doc##createTextNode (Js.string text) in
-      Dom.appendChild linode textnode;
-      let ulnode = doc ## createElement (Js.string "UL") in
-      ulnode ## setAttribute (Js.string "id",
-                              Js.string ("nid" ^ string_of_int nid));
-      Dom.appendChild linode ulnode;
-      Dom.appendChild parentnode linode;
-      TaskList.print_msg "new_node") (* TODO *)
-  | _ -> TaskList.print_msg "Unsupported" (* TODO *)
-*)
-
 let () =
   ToolBar.(add_action button_open
     (fun () -> PE.printAnswer "Open"; startNotificationHandler ()))
@@ -722,9 +704,11 @@ let () =
                (*interpNotif (New_node (0, 0, NRoot, "blah", false));*)
                interpNotif (New_node (1, 0, NFile, "beh", false));
                interpNotif (New_node (2, 1, NGoal, "beh2", false));
-               TaskList.update_status `Unknown "1";
-               TaskList.onclick_do_something "1"
-
+               interpNotif (Node_change (1, Proved true));
+               (*TaskList.update_status `Unknown "1";
+               TaskList.onclick_do_something "1";*)
+               remove_node "2"
+(* TODO remove seems to work ! *)
              ))
 
 
