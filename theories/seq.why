@@ -170,6 +170,41 @@ theory ToList
 
 end
 
+theory OfList
+  use import int.Int
+  use import option.Option
+  use import Seq
+  use import list.List
+  use import list.Length as L
+  use import list.Nth
+  use import list.Append
+
+  function of_list (l: list 'a) : seq 'a
+    = match l with
+      | Nil -> empty
+      | Cons x r -> cons x (of_list r)
+      end
+  meta coercion function of_list
+
+  lemma length_of_list:
+    forall l: list 'a. length l = L.length l
+
+  lemma elts_seq_of_list: forall l: list 'a.
+    forall i. 0 <= i < length l -> Some (get l i) = nth i l
+
+  let rec lemma of_list_app (l1 l2: list 'a)
+    ensures { l1 ++ l2 == Seq.(++) l1 l2 }
+    variant { l1 }
+  = match l1 with
+    | Nil -> ()
+    | Cons _ r -> of_list_app r l2
+    end
+
+  lemma of_list_app_length:
+    forall l1 l2: list 'a. length (l1 ++ l2) = length l1 + length l2
+
+end
+
 theory Mem
 
   use import int.Int
