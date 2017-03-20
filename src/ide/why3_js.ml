@@ -327,7 +327,6 @@ type httpRequest =
   | Reload
 
 let sendRequest r =
-(* TODO    let r = Js.to_string r in*)
    let xhr = XmlHttpRequest.create () in
    let onreadystatechange () =
      if xhr ##. readyState == XmlHttpRequest.DONE then
@@ -341,14 +340,12 @@ let sendRequest r =
    xhr ##. onreadystatechange := (Js.wrap_callback onreadystatechange);
    xhr ## send (Js.null)
 
-let sendPostRequest = sendRequest
-
 let sendRequest r =
   match r with
   | Reload -> sendRequest "reload"
   | Get_task n -> sendRequest ("gettask_"^n)
   | Command (n, c) ->
-      sendPostRequest ("node="^(string_of_int n)^"Command="^c)
+      sendRequest ("command=" ^ (string_of_int n)^","^c)
 
 module Panel =
   struct
@@ -456,85 +453,6 @@ module TaskList =
         "focus"
         (Js.wrap_callback  clear_task_selection )
 
-(* TODO remove all this *)
-    type id = string
-    type loc = int * int * int * int
-    type why3_loc = string * (int * int * int) (* kind, line, column, length *)
-    type status = [`New | `Valid | `Unknown ]
-
-    type why3_output =
-      | Error of string (* msg *)
-      | ErrorLoc of (loc * string) (* loc * msg *)
-      | Theory of id * string (* Theory (id, name) *)
-      | Task of (id * id * string * string * why3_loc list * string * int)
-            (* id, parent id, expl, code, location list, pretty, steps*)
-      | Result of string list
-      | UpdateStatus of status * id
-      | Warning of ((int*int) * string) list
-      | Idle
-
-   let print_why3_output o =
-      let doc = Dom_html.document in
-      (* see why3_worker.ml *)
-      match o with
-     | Idle | Warning [] -> ()
-      | Warning lst ->
-         let annot =
-           List.map (fun ((l1, c1), msg) ->
-                     (l1,c1, Js.string msg, Js.string "warning")) lst
-         in
-         Editor.set_annotations annot
-
-      | Error s -> print_error s
-
-      (*| ErrorLoc ((l1, b, l2, e), s) ->
-         let r = Editor.mk_range l1 b l2 e in
-         error_marker := Some (Editor.add_marker "why3-error" r, r);
-         print_error s;
-	 Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
-*)
-      | Result sl ->
-         clear ();
-         let ul = Dom_html.createUl doc in
-         appendChild task_list ul;
-         List.iter (fun (s : string) ->
-                    let li = Dom_html.createLi doc in
-                    li ##. innerHTML := (Js.string s);
-                    appendChild ul li;) sl
-
-      | Theory (th_id, th_name) ->
-	 attach_to_parent th_id "why3-theory-list" th_name
-
-      | Task (id, parent_id, expl, _code, locs, pretty, _) ->
-	 begin
-	   try
-	     ignore (Dom_html.getElementById id)
-	   with Not_found ->
-		attach_to_parent id (parent_id ^ "_ul") expl;
-		let span = getElement AsHtml.span (id ^ "_container") in
-		span ##. onclick :=
-		  Dom.handler
-		    (fun ev ->
-		     let ctrl = Js.to_bool (ev ##. ctrlKey) in
-		     if is_selected id then
-                       if ctrl then deselect_task id else
-			 clear_task_selection ()
-		     else begin
-			 if not ctrl then clear_task_selection ();
-                         select_task id span pretty
-                       end;
-		     Js._false);
-		addMouseEventListener
-		  true span "contextmenu"
-		  (fun e ->
-		   clear_task_selection ();
-                   select_task id span pretty;
-		   let x = max 0 ((e ##.clientX) - 2) in
-		   let y = max 0 ((e ##.clientY) - 2) in
-		   ContextMenu.show_at x y)
-	 end
-      | _ -> ()
-
 let onclick_do_something id =
   let span = getElement AsHtml.span (id ^ "_container") in
   span ##. onclick :=
@@ -598,20 +516,6 @@ let attach_new_node nid parent (ntype: node_type) name (detached: bool) =
       else
         attach_to_parent nid (parent^"_ul") name
 
-end
-
-(* let printAnswer s = *)
-(*   let doc = TaskList.task_list (\*Dom_html.document*\) in *)
-(*   let node = doc##createElement (Js.string "P") in *)
-(*   let textnode = doc##createTextNode (Js.string s) in *)
-(*   Dom.appendChild node textnode; *)
-(*   let answers = doc ## getElementById (Js.string "answers") in *)
-(*   let opt_answers = Js.Opt.to_option answers in *)
-(*   match opt_answers with *)
-(*   | None -> () *)
-(*   | Some answers -> *)
-(*       Dom.appendChild answers node *)
-
 let remove_node n =
   let element = getElement AsHtml.span n in
   let parent = element ##. parentNode in
@@ -620,6 +524,8 @@ let remove_node n =
   | None -> failwith "TODO"
   | Some parent ->
       Dom.removeChild parent element
+
+end
 
 let interpNotif (n: notification) =
   match n with
@@ -631,7 +537,7 @@ let interpNotif (n: notification) =
   | Task (nid, task) ->
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->
-      remove_node (string_of_int nid)
+      TaskList.remove_node (string_of_int nid)
   | Saved ->
       PE.printAnswer "Saved"
   | Message m ->
@@ -686,6 +592,22 @@ let stopNotificationHandler () =
    | None -> ()
    | Some n -> Dom_html.window ## clearInterval (n); notifHandler := None
 
+
+(* TODO make a module *)
+(* Form for commands *)
+let form = getElement AsHtml.form "why3-form"
+
+let () = Js.Unsafe.set form "target" "form-answer"
+
+let () =  form ##. onsubmit := Dom.full_handler
+    (fun _ _ -> let a = Form.get_form_contents form in
+    List.iter (fun x -> match x with
+    | (c, s) when c = "command" ->
+        sendRequest
+          (Command
+             (int_of_string !TaskList.selected_task, s))
+    | _ -> ()) a; Js._false)
+
 let () =
   ToolBar.(add_action button_open
     (fun () -> PE.printAnswer "Open"; startNotificationHandler ()))
@@ -707,7 +629,7 @@ let () =
                interpNotif (Node_change (1, Proved true));
                (*TaskList.update_status `Unknown "1";
                TaskList.onclick_do_something "1";*)
-               remove_node "2"
+               TaskList.remove_node "2"
 (* TODO remove seems to work ! *)
              ))
 

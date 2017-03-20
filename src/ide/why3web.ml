@@ -27,19 +27,38 @@ module S = Make (Wserver) (P)
 
 open Format
 
-(* TODO make it cleaner with adapted functions *)
+(* Decode URI *)
+let decode s =
+  let b = Buffer.create (String.length s) in
+  let i = ref 0 in
+  while !i <= String.length s -1 do
+    (match s.[!i] with
+    (* | '+' -> Buffer.add_string b " " *)
+    | '%' ->
+        begin
+          let a = int_of_string ("0x" ^ (String.sub s (!i + 1) 2)) in
+          i := !i + 2;
+          Buffer.add_char b (char_of_int a);
+        end
+    | a -> Buffer.add_char b a);
+    i := !i + 1;
+  done;
+  Buffer.contents b
+
+(* TODO make it cleaner and less inefficient with adapted functions *)
 let interp_request args =
-  let args_list = Strings.split '_' args in
-  match args_list with
-  | [ "reload" ]  -> Reload_req
-  | [ "list-provers" ]  -> Command_req (root_node,"list-provers")
-  | "gettask" :: n :: [] -> Get_task (int_of_string n)
-  | [s] ->
-      if Strings.has_prefix "Command=" s then
-        let com = Strings.remove_prefix "Command=" s in
-        Command_req (root_node, com)
-      else
-        invalid_arg "TODO"
+  match args with
+  | args when Strings.has_prefix "reload" args -> Reload_req
+  | args when Strings.has_prefix "list-provers" args ->
+      Command_req (root_node,"list-provers")
+  | args when Strings.has_prefix "command=" args ->
+      let com = Strings.remove_prefix "command=" args in
+      (match (Strings.bounded_split ',' com 2) with
+      | n :: com :: [] ->
+          Command_req (int_of_string n, com)
+      | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
+  | args when Strings.has_prefix "gettask_" args ->
+      Get_task (int_of_string (Strings.remove_prefix "gettask_" args))
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =
@@ -70,6 +89,7 @@ let handler (addr,req) script cont fmt =
        eprintf "addr : %s@." (string_of_addr addr);
        eprintf "req: @[%a@]@." plist req;
        eprintf "script: `%s'@." script;
+       let cont = decode cont in
        eprintf "cont: `%s'@." cont;
        let ans = handle_script script cont in
        eprintf "answer: `%s'@." ans;
