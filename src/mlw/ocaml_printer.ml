@@ -111,8 +111,8 @@ module Print = struct
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
   let print_uident = print_qident ~sanitizer:Strings.capitalize
 
-  let print_tv info fmt tv =
-    fprintf fmt "'%a" (print_lident info) tv.tv_name
+  let print_tv fmt tv =
+    fprintf fmt "'%s" (id_unique aprinter tv.tv_name)
 
   let protect_on b s =
     if b then "(" ^^ s ^^ ")" else s
@@ -121,6 +121,8 @@ module Print = struct
 
   let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
     match l1, l2 with
+    | [x1], [x2] ->
+      print1 fmt x1; sep_m fmt (); print2 fmt x2
     | x1 :: r1, x2 :: r2 ->
       print1 fmt x1; sep_m fmt (); print2 fmt x2; sep fmt ();
       print_list2 sep sep_m print1 print2 fmt (r1, r2)
@@ -133,7 +135,7 @@ module Print = struct
 
   let rec print_ty ?(paren=false) info fmt = function
     | Tvar tv ->
-      print_tv info fmt tv
+      print_tv fmt tv
     | Ttuple [] ->
       fprintf fmt "unit"
     | Ttuple tl ->
@@ -161,11 +163,11 @@ module Print = struct
   let print_vsty info fmt (v, ty, _) =
     fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false info) ty
 
-  let print_tv_arg info = print_tv info
-  let print_tv_args info fmt = function
+  let print_tv_arg = print_tv
+  let print_tv_args fmt = function
     | []   -> ()
-    | [tv] -> fprintf fmt "%a@ " (print_tv_arg info) tv
-    | tvl  -> fprintf fmt "(%a)@ " (print_list comma (print_tv_arg info)) tvl
+    | [tv] -> fprintf fmt "%a@ " print_tv_arg tv
+    | tvl  -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
   let print_vs_arg info fmt vs =
     fprintf fmt "@[(%a)@]" (print_vsty info) vs
@@ -211,7 +213,7 @@ module Print = struct
         match pjl with
         | []  -> print_papp info ls fmt pl
         | pjl ->
-          fprintf fmt "@[<hov 2>{ %a}@]"
+          fprintf fmt "@[<hov 2>{ %a }@]"
             (print_list2 semi equal (print_rs info) (print_pat info)) (pjl, pl)
 
   and print_papp info ls fmt = function
@@ -235,7 +237,7 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
-  let rec print_apply info rs fmt pvl =
+  let rec print_apply ?(paren=false) info rs fmt pvl =
     let isfield =
       match rs.rs_field with
       | None   -> false
@@ -269,19 +271,20 @@ module Print = struct
       | [], [] ->
         (print_uident info) fmt rs.rs_name
       | [], [t] ->
-        fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
-          (print_expr info) t
+        fprintf fmt "@[<hov 2>%a %a@]"
+          (print_uident info) rs.rs_name (print_expr info) t
       | [], tl ->
         fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
           (print_list comma (print_expr info)) tl
       | pjl, tl ->
-        fprintf fmt "@[<hov 2>{ %a}@]"
+        fprintf fmt "@[<hov 2>{ %a }@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
       end
     | _, _, [] ->
       (print_lident info) fmt rs.rs_name
     | _, _, tl ->
-      fprintf fmt "@[<hov 2>%a %a@]" (print_lident info) rs.rs_name
+      fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+        (print_lident info) rs.rs_name
         (print_list space (print_expr ~paren:true info)) tl
 
   and print_let_def info fmt = function
@@ -333,12 +336,19 @@ module Print = struct
       (* avoids parenthesis around values *)
       fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
     | Eapp (rs, pvl) ->
-      eprintf "rs->%s@." rs.rs_name.id_string;
-      fprintf fmt (protect_on paren "%a")
-        (print_apply info (Hrs.find_def ht_rs rs rs)) pvl
+      begin match query_syntax info.info_convert rs.rs_name, pvl with
+        | Some s, [{e_node = Econst _}] ->
+          let print_constant fmt e = begin match e.e_node with
+            | Econst c ->
+              let s = BigInt.to_string (Number.compute_int c) in
+              fprintf fmt "%s" s
+            | _ -> assert false end in
+          syntax_arguments s print_constant fmt pvl
+        | _ ->
+          fprintf fmt (protect_on paren "%a")
+            (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
-      fprintf fmt (protect_on paren
-      "begin match @[%a@] with@\n@[%a@] end")
+      fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@] end")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
@@ -451,7 +461,7 @@ module Print = struct
         fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
-      (if fst then "type" else "and") (print_tv_args info) its.its_args
+      (if fst then "type" else "and") print_tv_args its.its_args
       (print_lident info) its.its_name print_def its.its_def
 
   let print_decl info fmt = function
