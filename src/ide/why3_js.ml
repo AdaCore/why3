@@ -548,8 +548,17 @@ let interpNotif (n: notification) =
   | Node_change (nid, up) ->
     begin
       match up with
-      | Proved b -> TaskList.update_status `Valid (string_of_int nid)
-      | _ -> failwith "TODO"
+      | Proved true -> TaskList.update_status `Valid (string_of_int nid)
+      | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
+      | Proof_status_change (c, obsolete, rl) ->
+        begin
+        (* TODO complete other tests *)
+          match c with
+          | Controller_itp.Done pr
+            when pr.Call_provers.pr_answer = Call_provers.Valid ->
+              TaskList.update_status `Valid (string_of_int nid)
+          | _ -> TaskList.update_status `Unknown (string_of_int nid)
+        end
     end
 
 exception NoNotification
