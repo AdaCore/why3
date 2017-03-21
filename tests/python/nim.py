@@ -1,6 +1,7 @@
 
 #@ predicate win(n)
 #@ predicate lose(n)
+#@ assume forall n. n >= 1 -> lose(n) -> win(n) -> False
 
 #@ assume lose(1)
 #@ assume forall n. n >= 1 and lose(n) -> win(n+1) \
@@ -8,14 +9,23 @@
 #@ assume forall n. n >= 1 and win(n) and win(n+1) \
 #@   and win(n+2) -> lose(n+3)
 
-#@ assume forall n. n >= 1 -> lose(n) -> win(n) -> False
-#@ assume forall n. n >= 1 -> (lose(n) <-> n % 4 == 1)
+# @ assume forall n. n >= 1 -> (lose(n) <-> n % 4 == 1)
+def lemma(n):
+    #@ requires n >= 1
+    #@ ensures  lose(n) <-> n % 4 == 1
+    #@ variant  n
+    if n >= 5:
+        lemma(n-1)
+        lemma(n-2)
+        lemma(n-3)
+        lemma(n-4)
 
 start = int(input("start = "))
 #@ assume start >= 1
 n = start
 while n > 0:
     #@ invariant lose(start) -> lose(n)
+    #@ assert win(n) -> win(start)
     print(n, " matches")
     k = int(input("your turn: "))
     #@ assume k == 1 or k == 2 or k == 3
@@ -25,6 +35,7 @@ while n > 0:
         print("you lose")
         break
     if n == 1:
+        #@ assert win(n + k)
         #@ assert win(start)
         print("you win")
         break
@@ -35,6 +46,8 @@ while n > 0:
         k = 3
     else:
         k = m - 1
+    lemma(n)
+    lemma(n-k)
     #@ assert win(n) -> lose(n - k)
     n = n - k
 
