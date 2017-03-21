@@ -138,17 +138,13 @@ body {
 }
 
 /*** MAIN EDITOR ***/
-#why3-editor-container {
-    position:relative;
-    flex-grow:2;
-}
+
 #why3-tab-container {
     flex-grow:1;
     position:relative;
     margin:0;
     padding:0;
 }
-
 #why3-editor {
     position:absolute;
     top:0;
@@ -157,19 +153,6 @@ body {
     right:0;
     padding:0;
     margin:0;
-}
-#why3-editor-bg {
-    display:none;
-    position:absolute;
-    opacity:0.75;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:100;
-}
-#why3-editor-bg:hover {
-    cursor:progress;
 }
 
 /*** TABS ***/
@@ -225,6 +208,11 @@ body {
     height:100%;
 }
 #why3-task-list {
+    overflow:auto;
+    width:100%;
+    height:100%;
+}
+#why3-editor {
     overflow:auto;
     width:100%;
     height:100%;

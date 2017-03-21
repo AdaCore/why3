@@ -181,7 +181,7 @@ module Editor =
     let get_value ?(editor=editor) () : Js.js_string Js.t =
       JSU.meth_call editor "getValue" [| |]
 
-    let set_value ?(editor=editor) (str : Js.js_string Js.t) =
+    let set_value ~editor (str : Js.js_string Js.t) =
       ignore JSU.(meth_call editor "setValue" [| inject (str); inject ~-1 |])
 
     let _Range = Js.Unsafe.global##._Range
@@ -232,7 +232,7 @@ module Editor =
 	ignore JSU.(meth_call editor "on" [| inject (Js.string e);
 					   inject f|])
 
-
+(*
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
 
       let disable () =
@@ -243,7 +243,7 @@ module Editor =
       let enable () =
         ignore JSU.(meth_call editor "setReadOnly" [| inject Js._false|]);
         editor_bg ##. style ##. display := Js.string "none"
-
+ *)
 
       let confirm_unsaved () =
         if not !saved then
@@ -278,12 +278,14 @@ module ContextMenu =
       if !enabled then
         task_menu ##. style ##. display := Js.string "none"
 
+(*
     let add_action b f =
       b ##. onclick := Dom.handler (fun _ ->
 				   hide ();
 				   f ();
 				   Editor.(focus editor);
 				   Js._false)
+ *)
     let () = addMouseEventListener false task_menu "mouseleave"
 	(fun _ -> hide())
 
