@@ -988,6 +988,7 @@ let treat_notification n = match n with
     task_view#source_buffer#set_text s;
     (* scroll to end of text *)
     task_view#scroll_to_mark `INSERT
+  | File_contents _ -> assert false (* This IDE never requests file contents *)
 
 (***********************)
 (* start the interface *)

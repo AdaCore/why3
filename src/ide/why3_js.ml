@@ -465,11 +465,10 @@ let onclick_do_something id =
 	else begin
 	  if not ctrl then clear_task_selection ();
           let pretty =
-            if Hashtbl.mem printed_task_list id then
-              Hashtbl.find printed_task_list id
-            else
+            try Hashtbl.find printed_task_list id
+            with Not_found ->
               (sendRequest (Get_task id);
-               "loading task")
+               "loading task, please wait")
           in (* TODO dummy value *)
           select_task id span pretty
         end;
@@ -479,10 +478,8 @@ let onclick_do_something id =
     (fun e ->
       clear_task_selection ();
       let pretty =
-          if Hashtbl.mem printed_task_list id then
-            Hashtbl.find printed_task_list id
-          else
-            (sendRequest (Get_task id); "")
+        try Hashtbl.find printed_task_list id
+        with Not_found -> (sendRequest (Get_task id); "")
       in
       select_task id span pretty;
       let x = max 0 ((e ##.clientX) - 2) in
@@ -537,6 +534,8 @@ let interpNotif (n: notification) =
       TaskList.attach_new_node nid parent ntype name detached;
       TaskList.onclick_do_something (string_of_int nid);
       sendRequest (Get_task (string_of_int nid))
+  | File_contents (_f,_s) ->
+     assert false (* TODO *)
   | Task (nid, task) ->
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->

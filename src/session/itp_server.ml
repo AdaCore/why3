@@ -269,6 +269,7 @@ let print_request fmt r =
   | Open_session_req f              -> fprintf fmt "open session file %s" f
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
+  | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_task _nid                   -> fprintf fmt "get task"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
@@ -303,6 +304,7 @@ let print_notify fmt n =
   | Message msg                        ->
       print_msg fmt msg
   | Dead s                             -> fprintf fmt "dead :%s" s
+  | File_contents (_f, _s)             -> fprintf fmt "file contents"
   | Task (_ni, _s)                     -> fprintf fmt "task"
 
 module type Protocol = sig
@@ -867,6 +869,12 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           ignore (new_node ~parent p)
         in
         C.copy_detached ~copy d.cont from_any
+    | Get_file_contents f          ->
+       begin try let s = Sysutil.file_contents f in
+                 P.notify (File_contents(f,s))
+             with Invalid_argument s ->
+               P.notify (Message (Error s))
+       end
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
     | Command_req (nid, cmd)       ->

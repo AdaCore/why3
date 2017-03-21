@@ -68,6 +68,8 @@ type notification =
   (* server exited *)
   | Task         of node_ID * string
   (* the node_ID's task *)
+  | File_contents of string * string
+  (* contents of the file *)
 
 type ide_request =
   | Command_req       of node_ID * string
@@ -77,6 +79,7 @@ type ide_request =
   | Open_session_req  of string
   | Add_file_req      of string
   | Set_max_tasks_req of int
+  | Get_file_contents of string
   | Get_task          of node_ID
   | Remove_subtree    of node_ID
   | Copy_paste        of node_ID * node_ID
