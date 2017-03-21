@@ -495,10 +495,13 @@ let update_status st id =
     let span_msg = getElement AsHtml.span (id ^ "_msg") in
     let cls =
       match st with
-        `New -> "fa fa-fw fa-cog fa-spin fa-fw why3-task-pending"
+      | `Scheduled -> "fa fa-fw fa-cog why3-task-pending"
+      | `Running -> "fa fa-fw fa-cog fa-spin why3-task-pending"
       | `Valid -> span_msg ##. innerHTML := Js.string "";
 	  "fa-check-circle why3-task-valid"
       | `Unknown -> "fa-question-circle why3-task-unknown"
+      | `Timeout -> "fa-clock-o why3-task-unknown"
+      | `Failure -> "fa-bomb why3-task-unknown"
     in
     span_icon ##. className := Js.string cls
   with
@@ -554,10 +557,17 @@ let interpNotif (n: notification) =
         begin
         (* TODO complete other tests *)
           match c with
-          | Controller_itp.Done pr
-            when pr.Call_provers.pr_answer = Call_provers.Valid ->
-              TaskList.update_status `Valid (string_of_int nid)
-          | _ -> TaskList.update_status `Unknown (string_of_int nid)
+          | Controller_itp.Done pr ->
+             TaskList.update_status
+               Call_provers.(match pr.pr_answer with
+                              | Valid -> `Valid
+                              | Unknown _ -> `Unknown
+                              | Timeout -> `Timeout
+                              | _ -> `Failure)
+               (string_of_int nid)
+          | Controller_itp.Running -> TaskList.update_status `Running (string_of_int nid)
+          | Controller_itp.Scheduled -> TaskList.update_status `Scheduled (string_of_int nid)
+          | _ -> TaskList.update_status `Failure (string_of_int nid)
         end
     end
 
