@@ -634,18 +634,31 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     iter_the_files send_node root
 
   (* -- send the task -- *)
+  let task_of_id d id =
+    let task = get_task d.cont.controller_session id in
+    let tables = get_tables d.cont.controller_session id in
+    Pp.string_of
+      (Driver.print_task ~cntexample:false ?name_table:tables d.task_driver)
+      task
+
   let send_task nid =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-      let task = get_task d.cont.controller_session id in
-      let tables = get_tables d.cont.controller_session id in
-      let s = Pp.string_of
-          (fun fmt -> Driver.print_task ~cntexample:false ?name_table:tables d.task_driver fmt)
-          task in
-      P.notify (Task (nid,s))
-    | _ ->
-      P.notify (Task (nid, "can not associate a task to a node that is not a goal."))
+       let s = task_of_id d id in
+       P.notify (Task (nid,s))
+    | ATh t ->
+       P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string))
+    | APa pid ->
+       let parid = get_proof_attempt_parent  d.cont.controller_session pid in
+       let s = task_of_id d parid in
+       P.notify (Task (nid,s))
+    | AFile f ->
+       P.notify (Task (nid, "File " ^ f.file_name))
+    | ATn tid ->
+       let name = get_transf_name d.cont.controller_session tid in
+       let args = get_transf_args d.cont.controller_session tid in
+       P.notify (Task (nid, "Transformation " ^ String.concat " " (name :: args)))
 
   (* -------------------- *)
 
