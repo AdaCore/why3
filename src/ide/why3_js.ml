@@ -474,17 +474,16 @@ let onclick_do_something id =
           select_task id span pretty
         end;
 	Js._false);
-  let pretty =
-    if Hashtbl.mem printed_task_list id then
-      Hashtbl.find printed_task_list id
-    else
-      (sendRequest (Get_task id);
-       "loading task")
-  in
   addMouseEventListener
     true span "contextmenu"
     (fun e ->
       clear_task_selection ();
+      let pretty =
+          if Hashtbl.mem printed_task_list id then
+            Hashtbl.find printed_task_list id
+          else
+            (sendRequest (Get_task id); "")
+      in
       select_task id span pretty;
       let x = max 0 ((e ##.clientX) - 2) in
       let y = max 0 ((e ##.clientY) - 2) in
@@ -533,7 +532,8 @@ let interpNotif (n: notification) =
       PE.printAnswer "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
       TaskList.attach_new_node nid parent ntype name detached;
-      TaskList.onclick_do_something (string_of_int nid)
+      TaskList.onclick_do_something (string_of_int nid);
+      sendRequest (Get_task (string_of_int nid))
   | Task (nid, task) ->
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->
