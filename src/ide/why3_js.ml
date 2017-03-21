@@ -565,7 +565,7 @@ exception NoNotification
 
 let interpNotifications l =
   match l with
-  | [] -> raise NoNotification
+  | [] -> ()
   | l -> List.iter interpNotif l
 
 let getNotification2 () =
@@ -579,7 +579,7 @@ let getNotification2 () =
         interpNotifications nl
 (* TODO *)
       else
-        raise NoNotification
+        ()
         (* TODO printAnswer ("Erreur" ^ string_of_int xhr##status)*)
   in
   (xhr ##. onreadystatechange :=
