@@ -1,8 +1,4 @@
-(****************************************************************************)
-(* This is extracted/adapted from the code found in the book Real World Ocaml
-by Yaron Minsky, Anil Madhavapeddy, and Jason Hickey. Their 'unlicence' allows
-it. *)
-(****************************************************************************)
+
 
 {
 exception SyntaxError of string
@@ -42,6 +38,7 @@ rule read =
 and read_string buf =
   parse
   | '"'       { STRING (Buffer.contents buf) }
+  | '\\' '"'  { Buffer.add_char buf '"'; read_string buf lexbuf }
   | '\\' '/'  { Buffer.add_char buf '/'; read_string buf lexbuf }
   | '\\' '\\' { Buffer.add_char buf '\\'; read_string buf lexbuf }
   | '\\' 'b'  { Buffer.add_char buf '\b'; read_string buf lexbuf }
@@ -53,5 +50,5 @@ and read_string buf =
     { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_string buf lexbuf
     }
-  | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf ^ (Buffer.contents buf))) }
+  | _ { raise (SyntaxError ("Illegal string character: " ^ (Buffer.contents buf) ^ Lexing.lexeme lexbuf)) }
   | eof { raise (SyntaxError ("String is not terminated")) }

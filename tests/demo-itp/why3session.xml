@@ -2,182 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="2" steplimit="1" memlimit="0"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="1" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="1.01" timelimit="10" steplimit="1" memlimit="0"/>
-<prover id="3" name="Z3" version="4.4.1" timelimit="1" steplimit="1" memlimit="0"/>
+<prover id="0" name="Z3" version="4.4.1" timelimit="5" memlimit="0"/>
 <file name="../demo-itp.mlw">
-<theory name="Power" sum="578b01834fce822dc9327264318cf1d0">
+<theory name="Power" sum="1c745a16ebe3e09577a4b58a87bd9d8b">
  <goal name="power_1">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
- <transf name="introduce_premises" >
-  <goal name="power_1.0">
-  <transf name="replace" arg1="1" arg2="0+1" arg3="power_1">
-   <goal name="power_1.0.0">
-   <transf name="replace" arg1="1" arg2="(0+1)" arg3="power_1">
-    <goal name="power_1.0.0.0">
-    <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
-    </goal>
-    <goal name="power_1.0.0.1">
-    </goal>
-   </transf>
-   <transf name="rewrite" arg1="power_s">
-    <goal name="power_1.0.0.0">
-    <transf name="rewrite" arg1="power_0">
-     <goal name="power_1.0.0.0.0">
-     <transf name="compute_in_goal" >
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-    <goal name="power_1.0.0.1">
-    <transf name="compute_in_goal" >
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="power_1.0.1">
-   <transf name="compute_in_goal" >
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="sqrt4_256">
- <proof prover="1"><result status="unknown" time="0.01"/></proof>
- <proof prover="2"><result status="unknown" time="0.01"/></proof>
- <proof prover="3" timelimit="10"><result status="timeout" time="10.00"/></proof>
- <transf name="exists" arg1="4">
-  <goal name="sqrt4_256.0">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
- </transf>
  </goal>
  <goal name="power_sum">
- <transf name="introduce_premises" >
-  <goal name="power_sum.0">
-  <transf name="induction" arg1="n" arg2="0">
-   <goal name="power_sum.0.0">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="power_sum.0.1">
-   <proof prover="2" timelimit="1"><result status="valid" time="0.02" steps="11"/></proof>
-   <proof prover="3"><result status="timeout" time="0.99"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
  </goal>
  <goal name="power_0_left">
- <transf name="introduce_premises" >
-  <goal name="power_0_left.0">
-  <transf name="induction" arg1="n" arg2="1">
-   <goal name="power_0_left.0.0">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-   <goal name="power_0_left.0.1">
-   <proof prover="3"><result status="valid" time="0.01"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
  </goal>
  <goal name="little_fermat_3">
- <transf name="introduce_premises" >
-  <goal name="little_fermat_3.0">
-  <transf name="induction" arg1="x" arg2="0">
-   <goal name="little_fermat_3.0.0">
-   <proof prover="1"><result status="unknown" time="0.01"/></proof>
-   <proof prover="2"><result status="timeout" time="10.01"/></proof>
-   <proof prover="3" timelimit="10"><result status="timeout" time="9.74"/></proof>
-   <transf name="exists" arg1="0">
-    <goal name="little_fermat_3.0.0.0">
-    <proof prover="2" timelimit="1"><result status="valid" time="0.00" steps="4"/></proof>
-    <proof prover="3"><result status="timeout" time="1.00"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="little_fermat_3.0.1">
-   <transf name="destruct" arg1="little_fermat_3">
-    <goal name="little_fermat_3.0.1.0">
-    <transf name="remove" arg1="little_fermat_31">
-     <goal name="little_fermat_3.0.1.0.0">
-     <transf name="exists" arg1="y+x*(x+1)">
-      <goal name="little_fermat_3.0.1.0.0.0">
-      <transf name="replace" arg1="power (x+1) 3" arg2="power (x+1) (0+1+1+1)" arg3="G">
-       <goal name="little_fermat_3.0.1.0.0.0.0">
-       <proof prover="1"><result status="unknown" time="0.00"/></proof>
-       <proof prover="2"><result status="timeout" time="10.00"/></proof>
-       <proof prover="3" timelimit="10"><result status="timeout" time="9.64"/></proof>
-       <transf name="replace" arg1="power x 3" arg2="power x (0+1+1+1)" arg3="little_fermat_3">
-        <goal name="little_fermat_3.0.1.0.0.0.0.0">
-        <proof prover="1"><result status="unknown" time="0.01"/></proof>
-        <proof prover="2"><result status="timeout" time="10.00"/></proof>
-        <proof prover="3" timelimit="10"><result status="timeout" time="9.68"/></proof>
-        <transf name="rewrite" arg1="power_s">
-         <goal name="little_fermat_3.0.1.0.0.0.0.0.0">
-         <proof prover="1"><result status="unknown" time="0.01"/></proof>
-         <proof prover="2"><result status="timeout" time="10.01"/></proof>
-         <proof prover="3" timelimit="10"><result status="timeout" time="9.65"/></proof>
-         <transf name="rewrite" arg1="power_s">
-          <goal name="little_fermat_3.0.1.0.0.0.0.0.0.0">
-          <transf name="rewrite" arg1="power_s">
-           <goal name="little_fermat_3.0.1.0.0.0.0.0.0.0.0">
-           <proof prover="1"><result status="timeout" time="10.91"/></proof>
-           <proof prover="2"><result status="timeout" time="10.01"/></proof>
-           <proof prover="3" timelimit="10"><result status="timeout" time="9.75"/></proof>
-           </goal>
-           <goal name="little_fermat_3.0.1.0.0.0.0.0.0.0.1">
-           </goal>
-          </transf>
-          </goal>
-          <goal name="little_fermat_3.0.1.0.0.0.0.0.0.1">
-          </goal>
-         </transf>
-         </goal>
-         <goal name="little_fermat_3.0.1.0.0.0.0.0.1">
-         </goal>
-        </transf>
-        </goal>
-        <goal name="little_fermat_3.0.1.0.0.0.0.1">
-        </goal>
-       </transf>
-       </goal>
-       <goal name="little_fermat_3.0.1.0.0.0.1">
-       <proof prover="3"><result status="valid" time="0.01"/></proof>
-       </goal>
-      </transf>
-      </goal>
-     </transf>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
- </goal>
-</theory>
-</file>
-<file name="../../examples/isqrt.mlw">
-<theory name="Square" sum="9d10f7a99e3dc8b97241d913352efc97">
- <goal name="sqr_non_neg">
- </goal>
- <goal name="sqr_increasing">
- </goal>
- <goal name="sqr_sum">
- </goal>
-</theory>
-<theory name="Simple" sum="3eedbf7f16a30c54f16ce00579ce34b2">
- <goal name="WP_parameter isqrt">
- </goal>
- <goal name="WP_parameter main">
- </goal>
-</theory>
-<theory name="NewtonMethod" sum="ea55a43436c4d177632e02b018206bd5">
- <goal name="WP_parameter sqrt">
  </goal>
 </theory>
 </file>
