@@ -141,6 +141,8 @@ let () =
     in
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
-    Queue.iter (fun f -> P.push_request (Open_session_req f)) files;
+    let f = Queue.pop files in
+    P.push_request (Open_session_req f);
+    Queue.iter (fun f -> P.push_request (Add_file_req f)) files;
     S.init_server config env;
     Wserver.main_loop None 6789 handler stdin_handler
