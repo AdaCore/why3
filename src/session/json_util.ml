@@ -554,8 +554,9 @@ let parse_request (s: string) : ide_request =
 let parse_list_notification (s: string): notification list =
   let json = parse_json_object s in
   match json with
+  | Array [Null] -> []
   | Array l -> List.map parse_notification_json l
-  | _ -> raise NotNotification
+  | _ -> []
 
 let parse_list_request (s: string): ide_request list =
   let json = parse_json_object s in

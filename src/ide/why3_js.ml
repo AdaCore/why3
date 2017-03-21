@@ -79,12 +79,10 @@ end
 
 let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) =
   let data = ref None in
-  let resType = xhr ##. responseType in
-  PE.printAnswer (Js.to_string resType);
   data := Some (xhr ##. responseText);
   match !data with
   | None -> raise Not_found
-  | Some data -> PE.printAnswer (Js.to_string data); Js.to_string data
+  | Some data -> Js.to_string data
 
 module Tabs =
   struct
@@ -575,10 +573,8 @@ let getNotification2 () =
         PE.printAnswer ("r = |" ^ r ^ "|"); (* TODO *)
         let nl = Json_util.parse_list_notification r in
         interpNotifications nl
-(* TODO *)
       else
         ()
-        (* TODO printAnswer ("Erreur" ^ string_of_int xhr##status)*)
   in
   (xhr ##. onreadystatechange :=
     (Js.wrap_callback onreadystatechange));
