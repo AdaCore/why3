@@ -442,6 +442,8 @@ module TaskList =
     let clear () =
       clear_task_selection ();
       task_list ##. innerHTML := Js.string "";
+      selected_task := "0";
+      Hashtbl.clear printed_task_list;
       Editor.set_value ~editor:Editor.task_viewer (Js.string "")
 
     let () =
@@ -624,7 +626,7 @@ let () =
 
 let () =
   ToolBar.(add_action button_reload
-    (fun () -> PE.printAnswer "Reload"; sendRequest Reload))
+    (fun () -> PE.printAnswer "Reload"; TaskList.clear (); sendRequest Reload))
 
 let () =
   ToolBar.(add_action button_redo
