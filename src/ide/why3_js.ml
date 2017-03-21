@@ -62,7 +62,7 @@ module PE = struct
   let error_panel = getElement AsHtml.div "why3-error-bg"
   let doc = Dom_html.document
 
-  let print cls msg =
+  let print _cls msg =
     let node = doc##createElement (Js.string "P") in
     let textnode = doc##createTextNode (Js.string msg) in
     appendChild node textnode;
@@ -319,8 +319,6 @@ module ToolBar =
 
   end
 
-let form = getElement AsHtml.form "why3-form"
-
 type httpRequest =
   | Command of int * string
   | Get_task of string
@@ -506,7 +504,7 @@ let update_status st id =
     Not_found -> ()
 
 (* Attach a new node to the task tree if it does not already exists *)
-let attach_new_node nid parent (ntype: node_type) name (detached: bool) =
+let attach_new_node nid parent (_ntype: node_type) name (_detached: bool) =
   let parent = string_of_int parent in
   let nid = string_of_int nid in
   try ignore (getElement_exn AsHtml.ul (nid^"_ul")) with
@@ -529,7 +527,7 @@ end
 
 let interpNotif (n: notification) =
   match n with
-  | Initialized g ->
+  | Initialized _g ->
       PE.printAnswer "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
       TaskList.attach_new_node nid parent ntype name detached;
@@ -540,7 +538,7 @@ let interpNotif (n: notification) =
       TaskList.remove_node (string_of_int nid)
   | Saved ->
       PE.printAnswer "Saved"
-  | Message m ->
+  | Message _ ->
       let s = Format.asprintf "%a" Json_util.print_notification n in
       PE.printAnswer s
   | Dead s ->
@@ -550,7 +548,7 @@ let interpNotif (n: notification) =
       match up with
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
-      | Proof_status_change (c, obsolete, rl) ->
+      | Proof_status_change (c, _obsolete, _rl) ->
         begin
         (* TODO complete other tests *)
           match c with
@@ -595,6 +593,8 @@ let startNotificationHandler () =
    if (!notifHandler = None) then
      notifHandler := Some (Dom_html.window ## setInterval
                        (Js.wrap_callback getNotification2)  (Js.float 1000.0))
+
+let () = startNotificationHandler ()
 
 let stopNotificationHandler () =
    match !notifHandler with
