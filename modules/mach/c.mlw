@@ -18,8 +18,7 @@ module C
     data : ref (array 'a) ;
     offset : int ;
   }
-  (*invariant { in_us_bounds data.length }*)
-  (* it is not required the offset is in 0..elts.length *)
+  (*invariant { in_us_bounds data.length, offset }*)
 
   function plength (p:ptr 'a) : int
   = p.data.contents.length
@@ -80,29 +79,10 @@ module C
     ensures { plength result = UInt32.to_int sz \/ plength result = 0 }
     ensures { result.offset = 0 }
 
- (* How to specify that the data array is reset by free/realloc ?*)
-(*  let free (p:ptr 'a) : unit
-    requires { p.offset = 0 }
-    writes { p }
-    ensures { p.data.length = 0 }
-  =  if is_null p then ()
-     else begin
-     let c = incr p (Int32.of_int 0) in
-     p.data <- Array.make 0 (get p);
-     check { c.data.length = 0 }
-     end *)
   val free (p:ptr 'a) : unit
     requires { p.offset = 0 }
-    (* TODO: resets { p.data } *)
     writes { p.data }
     ensures { plength p = 0 }
- (* = if is_null p then ()
-    else begin
-   (* let c = incr p (Int32.of_int 0) in*)
-    p.data := Array.make 0 (get p);
-    (*check { plength c = 0 }*)
-    end
-  *)
 
   val realloc (p:ptr 'a) (sz:int32) : ptr 'a
     requires { Int32.to_int sz > 0 } (* for simplicity, though 0 is legal in C *)
