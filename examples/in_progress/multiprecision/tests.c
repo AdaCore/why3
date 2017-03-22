@@ -33,6 +33,7 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 
 
 void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
+  //printf ("an %d bn %d\n", an, bn);
   mpn_random2 (ap, an + 1);
   mpn_random2 (bp, bn + 1);
   while (bp[bn-1] == 0)
@@ -77,7 +78,7 @@ int main () {
 #endif
   for (an = 2; an <= max_n; an += 1)
     {
-      for (bn = 1; bn <= max_n; bn += 1)
+      for (bn = 1; bn <= an; bn += 1)
 	{
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
@@ -104,6 +105,8 @@ int main () {
             + ((end.tv_usec - begin.tv_usec)/1000000.0);
           }
           printf ("%d %d %f\n", an, bn, elapsed);
+          if (an==bn)
+            printf ("\n"); //for gnuplot
 #endif
 #ifdef COMPARE
 	  rn = an + bn;

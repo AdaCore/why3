@@ -220,6 +220,34 @@ module C = struct
       d, Sfor(e1,e2,e3,s')
     | s -> d,s
 
+
+  let rec group_defs_by_type l =
+    (* heuristic to reduce the number of lines of defs*)
+    let rec group_types t1 t2 =
+      match t1, t2 with
+      | Tsyntax (s1, l1), Tsyntax (s2, l2) ->
+        List.length l1 = List.length l2
+        && List.for_all2 group_types l1 l2
+        && (s1 = s2)
+        && (not (String.contains s1 '*'))
+      | Tsyntax _, _ | _, Tsyntax _ -> false
+      | t1, t2 -> t1 = t2
+    in
+    match l with
+    | [] | [_] -> l
+    | Ddecl (ty1, el1) :: Ddecl (ty2, el2) :: l'
+        when group_types ty1 ty2
+          -> group_defs_by_type (Ddecl(ty1, el1@el2)::l')
+    | Ddecl (ty1, el1) :: Ddecl (ty2, el2) :: Ddecl (ty3, el3) :: l'
+        when group_types ty1 ty3
+          -> group_defs_by_type (Ddecl (ty1, el1@el3) :: Ddecl (ty2, el2) :: l')
+    | Ddecl (ty1, el1) :: Ddecl (ty2, el2) :: Ddecl (ty3, el3) :: l'
+        when group_types ty2 ty3
+          -> group_defs_by_type (Ddecl (ty1, el1) :: Ddecl (ty2, el2@el3) :: l')
+    | Ddecl (ty1, el1) :: l' ->
+      Ddecl (ty1, el1) :: group_defs_by_type l'
+    | _ -> l
+
   let rec elim_empty_blocks = function
     | Sblock ([], s) -> elim_empty_blocks s
     | Sblock (d,s) -> Sblock (d, elim_empty_blocks s)
@@ -291,6 +319,13 @@ module Print = struct
 
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
+  let extract_stars ty =
+    let rec aux acc = function
+      | Tptr t -> aux (acc+1) t
+      | t -> (acc, t)
+    in
+  aux 0 ty
+
   let rec print_ty ?(paren=false) fmt = function
     | Tvoid -> fprintf fmt "void"
     | Tsyntax (s, tl) ->
@@ -298,6 +333,7 @@ module Print = struct
 	s
         (print_ty ~paren:false) fmt tl
     | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
+    (* should be handled in extract_stars *)
     | Tarray (ty, expr) ->
       fprintf fmt (protect_on paren "%a[%a]")
         (print_ty ~paren:true) ty (print_expr ~paren:false) expr
@@ -351,7 +387,11 @@ module Print = struct
   and print_const  fmt = function
     | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
 
-  let print_id_init fmt = function
+  let print_id_init ~stars fmt ie =
+    (if stars > 0
+    then fprintf fmt "%s " (String.make stars '*')
+    else ());
+    match ie with
     | id, Enothing -> print_ident fmt id
     | id,e -> fprintf fmt "%a = %a" print_ident id (print_expr ~paren:false) e
 
@@ -398,9 +438,11 @@ module Print = struct
 			     (print_ty ~paren:false) print_ident))
 	args
     | Ddecl (ty, lie) ->
-       fprintf fmt "%a @[<hov>%a@];"
-	       (print_ty ~paren:false) ty
-	       (print_list comma print_id_init) lie
+      let nb, ty = extract_stars ty in
+      assert (nb=0);
+      fprintf fmt "%a @[<hov>%a@];"
+	(print_ty ~paren:false) ty
+	(print_list comma (print_id_init ~stars:nb)) lie
     | Dinclude id ->
        fprintf fmt "#include<%a.h>@;" print_ident id
     | Dtypedef (ty,id) ->
@@ -408,14 +450,14 @@ module Print = struct
 	       (print_ty ~paren:false) ty print_ident id
     with Unprinted s -> Format.printf "Missed a def because : %s@." s
 
-  and print_body fmt body =
-    if fst body = []
-    then print_stmt ~braces:true fmt (snd body)
+  and print_body fmt (def, s) =
+    if def = []
+    then print_stmt ~braces:true fmt s
     else
       print_pair_delim nothing newline nothing
         (print_list newline print_def)
         (print_stmt ~braces:true)
-        fmt body
+        fmt (def,s)
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -481,9 +523,12 @@ module Translate = struct
 	 then begin
 	     match env.returns_tuple with
 	     | true, rl ->
-		let args = List.filter (fun pv -> not (pv.pv_ghost
-						       || ity_equal pv.pv_ity ity_unit))
-				       pvsl in
+		let args =
+                  List.filter
+                    (fun pv -> not (pv.pv_ghost
+				    || ity_equal pv.pv_ity ity_unit))
+		    pvsl
+                in
 		assert (List.length rl = List.length args);
 		C.([],
 		   List.fold_right2 (fun res arg acc ->
@@ -536,7 +581,7 @@ module Translate = struct
 		   pvsl in
 		 C.(Ecall(Evar(rs.rs_name),
 			  List.map (fun pv -> Evar(pv_name pv)) args))
-           in
+         in
 	   C.([],
               if env.computes_return_value
 	      then
@@ -588,7 +633,8 @@ module Translate = struct
               [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
               C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
         end
-      | _ -> raise (Unsupported "LDsym/LDrec") (* TODO for rec at least*)
+      | LDsym _ -> raise (Unsupported "LDsym")
+      | LDrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
       end
     | Eif (cond, th, el) ->
        let c = expr info {env with computes_return_value = false} cond in
@@ -612,6 +658,7 @@ module Translate = struct
       (* this is needed so that the extracted expression has all
          needed variables in its scope *)
       let cd, cs = C.flatten_defs cd cs in
+      let cd = C.group_defs_by_type cd in
       let env' = { computes_return_value = false;
                    in_unguarded_loop = true;
 		   returns_tuple = env.returns_tuple;
@@ -752,7 +799,9 @@ module Translate = struct
 			   | _ -> env, rtype, params
 			 in
 			 let d,s = expr info env e in
-			 (* let d,s = C.flatten_defs d s in *)
+                         (*TODO check if we want this flatten*)
+			 let d,s = C.flatten_defs d s in
+                         let d = C.group_defs_by_type d in
 			 let s = C.elim_nop s in
 			 let s = C.elim_empty_blocks s in
 			 [C.Dfun (fname, (rtype,params), (d,s))]

@@ -2,17 +2,17 @@ all: why3 extract
 why3:
 	make -C ../../..
 extract: why3
-	why3 extract -D c -o build mp2.mlw -T N
+	why3 extract -D c -D mp.drv -o build -L . -T mp2.N
 tests: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 tests.c build/mp2.mlw__N.c -I$(GMP_DIR) -lgmp -o tests
+	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -lgmp -o tests
 why3mulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/mp2.mlw__N.c -I$(GMP_DIR) -lgmp -o why3mulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3mulbench
 why3divbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/mp2.mlw__N.c -I$(GMP_DIR) -lgmp -o why3divbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3divbench
 gmpmulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/mp2.mlw__N.c -I$(GMP_DIR) -lgmp -o gmpmulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -lgmp -o gmpmulbench
 gmpdivbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/mp2.mlw__N.c -I$(GMP_DIR) -lgmp -o gmpdivbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -lgmp -o gmpdivbench
 
 alltests: tests why3mulbench why3divbench gmpmulbench gmpdivbench
 
