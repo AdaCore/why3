@@ -545,25 +545,25 @@ theory Sum
 
 end
 
-(* TODO: redesign these modules using higher-order instead
-
+(*
 (** {2 Induction on lists} *)
 
 theory Induction
 
   use import List
 
-  type elt
+  (* type elt *)
 
-  predicate p (list elt)
+  (* predicate p (list elt) *)
 
   axiom Induction:
-    p (Nil: list elt) ->
-    (forall x:elt. forall l:list elt. p l -> p (Cons x l)) ->
-    forall l:list elt. p l
+    forall p: list 'a -> bool.
+    p (Nil: list 'a) ->
+    (forall x:'a. forall l:list 'a. p l -> p (Cons x l)) ->
+    forall l:list 'a. p l
 
 end
-
+*)
 
 (** {2 Maps as lists of pairs} *)
 
@@ -571,14 +571,10 @@ theory Map
 
   use import List
 
-  type a
-  type b
-  function f a : b
-
-  function map (l: list a) : list b =
+  function map (f: 'a -> 'b) (l: list 'a) : list 'b =
     match l with
     | Nil      -> Nil
-    | Cons x r -> Cons (f x) (map r)
+    | Cons x r -> Cons (f x) (map f r)
     end
 end
 
@@ -588,11 +584,21 @@ theory FoldLeft
 
   use import List
 
-  function fold_left (f: 'b -> 'a -> b') (acc: 'b) (l: list 'a) : 'b =
+  function fold_left (f: 'b -> 'a -> 'b) (acc: 'b) (l: list 'a) : 'b =
     match l with
     | Nil      -> acc
-    | Cons x r -> fold_left (f acc x) r
+    | Cons x r -> fold_left f (f acc x) r
     end
+
+  use import Append
+
+  lemma fold_left_append:
+    forall l1"induction" l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
+    fold_left f acc (l1++l2) = fold_left f (fold_left f acc l1) l2
+
+  (* lemma fold_left_step: *)
+  (*   forall l: list 'a, f: 'b -> 'a -> 'b, acc : 'b, x: 'a. *)
+  (*   f (fold_left f acc l) x = fold_left f acc (Cons x l) *)
 
 end
 
@@ -600,14 +606,13 @@ theory FoldRight
 
   use import List
 
-  function fold_right (f: 'a -> 'b -> b') (l: list 'a) (acc: 'b) : 'b =
+  function fold_right (f: 'a -> 'b -> 'b) (l: list 'a) (acc: 'b) : 'b =
     match l with
     | Nil      -> acc
-    | Cons x r -> f x (fold_right r acc)
+    | Cons x r -> f x (fold_right f r acc)
     end
 
 end
-*)
 
 (** {2 Importation of all list theories in one} *)
 

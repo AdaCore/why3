@@ -179,11 +179,10 @@ theory OfList
   use import list.Nth
   use import list.Append
 
-  function of_list (l: list 'a) : seq 'a
-    = match l with
-      | Nil -> empty
-      | Cons x r -> cons x (of_list r)
-      end
+  function of_list (l: list 'a) : seq 'a = match l with
+    | Nil -> empty
+    | Cons x r -> cons x (of_list r)
+    end
   meta coercion function of_list
 
   lemma length_of_list:
@@ -438,6 +437,30 @@ theory Permut
   lemma exchange_permut_all:
     forall s1 s2: seq 'a, i j: int.
     exchange s1 s2 i j -> permut_all s1 s2
+
+end
+
+theory FoldLeft
+
+  use import Seq
+  use import int.Int
+
+  function fold ('b -> 'a -> 'b) 'b (seq 'a) int : 'b
+
+  axiom fold_stop: forall f: 'b -> 'a -> 'b, acc: 'b, s: seq 'a, i: int.
+    i >= length s -> fold f acc s i = acc
+  axiom fold_loop: forall f: 'b -> 'a -> 'b, acc: 'b, s: seq 'a, i: int.
+    i < length s -> fold f acc s i = fold f (f acc s[i]) s (i+1)
+
+  function fold_left (f: 'b -> 'a -> 'b) (acc: 'b) (s: seq 'a) : 'b =
+    fold f acc s 0
+
+  use import list.List
+  use import OfList
+  use list.FoldLeft as List
+
+  lemma fold_left_equiv: forall l: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
+    List.fold_left f acc l = fold_left f acc (of_list l)
 
 end
 

@@ -259,7 +259,7 @@ module Print = struct
         | _ -> assert false in
       syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
-      syntax_arguments s (print_expr ~paren:true info) fmt pvl
+      syntax_arguments s (print_expr ~paren:true info) fmt pvl;
     | _, _, tl when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]"
         (print_list comma (print_expr info)) tl
@@ -330,7 +330,7 @@ module Print = struct
       fprintf fmt "false"
     | Eapp (rs, [e1; e2]) when rs_equal rs rs_func_app ->
       fprintf fmt (protect_on paren "@[<hov 1>%a %a@]")
-        (print_expr info) e1 (print_expr info) e2
+        (print_expr info) e1 (print_expr ~paren:true info) e2
     | Eapp (rs, [])  ->
       (* avoids parenthesis around values *)
       fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
@@ -344,8 +344,8 @@ module Print = struct
             | _ -> assert false end in
           syntax_arguments s print_constant fmt pvl
         | _ ->
-          fprintf fmt (protect_on paren "%a")
-            (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+      fprintf fmt (protect_on paren "%a")
+        (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
       fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@] end")
         (print_expr info) e (print_list newline (print_branch info)) pl
@@ -381,7 +381,7 @@ module Print = struct
       fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]"
         (print_list semi (print_expr info)) el
     | Efun (varl, e) ->
-      fprintf fmt (protect_on paren "@[<hov 2>(fun %a ->@ %a)@]")
+      fprintf fmt (protect_on paren "@[<hov 2>fun %a ->@ %a@]")
         (print_list space (print_vs_arg info)) varl (print_expr info) e
     | Ewhile (e1, e2) ->
       fprintf fmt "@[<hov 2>while %a do@\n%a@ done@]"
