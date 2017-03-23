@@ -62,9 +62,6 @@ module Print = struct
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
-  let forget_tvs () =
-    forget_all iprinter
-
   let forget_id vs = forget_id iprinter vs
   let _forget_ids = List.iter forget_id
   let forget_var (id, _, _) = forget_id id
@@ -86,21 +83,24 @@ module Print = struct
     let s = id_unique iprinter id in
     fprintf fmt "%s" s
 
+  let is_local_id info id =
+    Sid.mem id info.info_current_th.th_local ||
+      Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
+      false info.info_current_mo
+
   let print_qident ~sanitizer info fmt id =
     try
+      if info.flat then raise Not_found;
       let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
       let s = String.concat "__" q in
       let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
       let s = sanitizer s in
-      let s = if is_ocaml_keyword s then s ^ "_renamed" else s in
-      if Sid.mem id info.info_current_th.th_local ||
-         Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
-           false info.info_current_mo
-      then fprintf fmt "%s" s
+      let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
+      if is_local_id info id then
+        fprintf fmt "%s" s
       else begin
-        if info.flat then raise Not_found;
         let fname = if lp = [] then info.info_fname else None in
         let m = Strings.capitalize (module_name ?fname lp t) in
         fprintf fmt "%s.%s" m s end
@@ -305,8 +305,7 @@ module Print = struct
             (print_lident info) rs1.rs_name
             (print_list space (print_vs_arg info)) args
             (print_ty info) res (print_expr info) e;
-          forget_vars args;
-          (* forget_tvs () *)
+          forget_vars args
       in
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
       print_list_next newline print_one fmt rdef;
@@ -467,7 +466,6 @@ module Print = struct
   let print_decl info fmt = function
     | Dlet ldef ->
       print_let_def info fmt ldef;
-      forget_tvs ();
       fprintf fmt "@\n"
     | Dtype dl ->
       print_list_next newline (print_type_decl info) fmt dl;

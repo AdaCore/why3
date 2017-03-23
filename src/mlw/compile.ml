@@ -742,9 +742,10 @@ module Translate = struct
     pdecl info pd
 
   (* unit module declarations *)
-  let mdecl info = function
+  let rec mdecl info = function
     | Udecl pd -> pdecl info pd
-    |  _ -> (* TODO *) []
+    | Uscope (_, _, l) -> List.concat (List.map (mdecl info) l)
+    | Uuse _ | Uclone _ | Umeta _ -> []
 
   (* modules *)
   let module_ m =
