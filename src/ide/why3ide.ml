@@ -371,17 +371,6 @@ let get_node_detached id =
 (* Initialization of the tree *)
 (******************************)
 
-(* TODO root node is convenient. Symmetry with session and parent of a node can
-   always be found. Can be removed. *)
-(* Creating the root of the tree. *)
-let create_root () =
-  let root_iter = goals_model#append () in
-  let root_ref = goals_model#get_row_reference
-    (goals_model#get_path root_iter) in
-  Hint.add node_id_to_gtree root_node root_ref;
-  Hint.add node_id_proved root_node false
-
-
 let remove_tree goals_model =
   Hint.iter (fun _x i ->
     try ignore(goals_model#remove (i#iter)) with _ -> ())
@@ -394,8 +383,6 @@ let clear_tree_and_table goals_model =
   Hint.clear node_id_proved;
   Hint.clear node_id_pa
 
-(* Actually creating root *)
-let _ = create_root ()
 
 (**************)
 (* Menu items *)
@@ -417,8 +404,6 @@ let reload_menu_item : GMenu.menu_item =
     ~callback:(fun () ->
       (* Clearing the tree *)
       clear_tree_and_table goals_model;
-      (* Adding the root again *)
-      create_root ();
       send_request Reload_req)
 
 (* vpan222 contains:
@@ -635,8 +620,13 @@ let new_node ?parent ?(collapse=false) id name typ proved detached =
     Hint.add node_id_type id typ;
     Hint.add node_id_proved id proved;
     Hint.add node_id_detached id detached;
-    let parent = Opt.map (fun x -> x#iter) parent in
-    let iter = goals_model#append ?parent () in
+    (* The tree does not have a root by default so the task is a forest with
+       several root files *)
+    let iter =
+      match parent with
+      | None -> goals_model#append ()
+      | Some p -> goals_model#append ~parent:p#iter ()
+    in
     goals_model#set ~row:iter ~column:name_column name;
     goals_model#set ~row:iter ~column:node_id_column id;
     let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
@@ -750,6 +740,7 @@ let interp cmd =
   let id = if List.length rows > 0 then
       get_node_id ((List.hd rows)#iter)
     else
+      (* If no nodes are in the tree send command on default root node *)
       root_node
   in
   send_request (Command_req (id, cmd));
@@ -878,8 +869,6 @@ let open_session: GMenu.menu_item =
       select_file ~request:(fun f ->
         (* Clearing the ide tree *)
         clear_tree_and_table goals_model;
-        (* Adding the root again *)
-        create_root ();
         send_request (Open_session_req f)))
 
 (*************************)
@@ -964,7 +953,7 @@ let treat_notification n = match n with
         let parent = get_node_row parent_id in
         ignore (new_node ~parent id name typ false detached)
       with Not_found ->
-        ignore (new_node id name typ false, detached))
+        ignore (new_node id name typ false detached))
     end
   | Remove id                     ->
     let n = get_node_row id in

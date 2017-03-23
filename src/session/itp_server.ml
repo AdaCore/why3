@@ -546,8 +546,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
       new_id
 
-  let root = 0
-
   (****************************)
   (* Iter on the session tree *)
   (****************************)
@@ -611,7 +609,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   let _init_the_tree (): unit =
     let f ~parent node_id = ignore (new_node ~parent node_id) in
-    iter_the_files f root
+    iter_the_files f root_node
 
   let init_and_send_subtree_from_trans parent trans_id : unit =
     iter_subtree_from_trans
@@ -619,11 +617,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   let init_and_send_file f =
     iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
-      root f
+      root_node f
 
   let init_and_send_the_tree (): unit =
-    P.notify (New_node (0, 0, NRoot, "root", false));
-    iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root
+    iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root_node
 
   let resend_the_tree (): unit =
     let send_node ~parent any =
@@ -632,8 +629,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let node_type = get_node_type any in
       let node_detached = get_node_detached any in
       P.notify (New_node (node_id, parent, node_type, node_name, node_detached)) in
-    P.notify (New_node (0, 0, NRoot, "root", false));
-    iter_the_files send_node root
+    iter_the_files send_node root_node
 
   (* -- send the task -- *)
   let task_of_id d id =
