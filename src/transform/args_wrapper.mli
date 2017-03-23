@@ -5,6 +5,8 @@ exception Arg_parse_error of string * string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
+exception Arg_hyp_not_found of string
+
 
 (** Pre-processing of tasks, to build unique names for all declared
     identifiers of a task.*)

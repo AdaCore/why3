@@ -300,13 +300,24 @@ type config = {
 
 
 exception NoMatch of (term * term) option
+exception NoMatchpat of (pattern * pattern) option
+
+type matched = P of pattern | T of term
+
+let rec open_branches acc_p acc_t tbl1 =
+  match tbl1 with
+  | hd :: tl ->
+    let (p, t) = t_open_branch hd in
+    open_branches (P p :: acc_p) (T t :: acc_t) tl
+  | [] -> (acc_p, acc_t)
+
 
 let first_order_matching (vars : Svs.t) (largs : term list)
     (args : term list) : Ty.ty Ty.Mtv.t * substitution =
   let rec loop ((mt,mv) as sigma) largs args =
     match largs,args with
       | [],[] -> sigma
-      | t1::r1, t2::r2 ->
+      | T t1::r1, T t2::r2 ->
         begin
 (*
           Format.eprintf "matching terms %a and %a...@."
@@ -338,8 +349,9 @@ let first_order_matching (vars : Svs.t) (largs : term list)
               begin
                 match t2.t_node with
                   | Tapp(ls2,args2) when ls_equal ls1 ls2 ->
-                    let mt, mv = loop sigma (List.rev_append args1 r1)
-                      (List.rev_append args2 r2) in
+                    let mt, mv = loop sigma
+                        (List.rev_append (List.map (fun x -> T x) args1) r1)
+                        (List.rev_append (List.map (fun x -> T x) args2) r2) in
                     begin
                       try Ty.oty_match mt t1.t_ty t2.t_ty, mv
                       with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1, t2)))
@@ -356,21 +368,22 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     List.fold_left2 (fun (mt, mv) e1 e2 ->
                       let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
                       (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2 in
-                  loop (mt, mv) (term1 :: r1) (term2 :: r2)
+                  loop (mt, mv) (T term1 :: r1) (T term2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tbinop (b1, t1_l, t1_r) ->
               begin
                 match t2.t_node with
                 | Tbinop (b2, t2_l, t2_r) when b1 = b2 ->
-                  loop (mt, mv) (t1_l :: t1_r :: r1) (t2_l :: t2_r :: r2)
+                  loop (mt, mv) (T t1_l :: T t1_r :: r1) (T t2_l :: T t2_r :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tif (t11, t12, t13) ->
               begin
                 match t2.t_node with
                 | Tif (t21, t22, t23) ->
-                  loop (mt, mv) (t11 :: t12 :: t13 :: r1) (t21 :: t22 :: t23 :: r2)
+                  loop (mt, mv) (T t11 :: T t12 :: T t13 :: r1)
+                      (T t21 :: T t22 :: T t23 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tlet (t1, tb1) ->
@@ -381,12 +394,24 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                   let (v2, tl2) = t_open_bound tb2 in
                   let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
                   let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (t1 :: tl1 :: r1) (t2 :: tl2 :: r2)
+                  loop (mt, mv) (T t1 :: T tl1 :: r1) (T t2 :: T tl2 :: r2)
                 | _ ->
                   raise (NoMatch (Some (t1, t2)))
               end
-            (* TODO not supported. How do patterns work ? *)
-            | Tcase _ -> raise (NoMatch (Some (t1, t2)))
+            (* We assume that patterns are well-formed (ie already typed)
+               and that it is not possible to have an occurence of a pattern
+               introduced variable into a branch that does not depend on this
+               pattern *)
+            | Tcase (t1, tbl1) ->
+              begin
+                match t2.t_node with
+                | Tcase (t2, tbl2) ->
+                  let list_p1, list_t1 = open_branches [] [] tbl1 in
+                  let list_p2, list_t2 = open_branches [] [] tbl2 in
+                  loop sigma (T t1 :: list_p1 @ list_t1 @ r1)
+                    (T t2 :: list_p2 @ list_t2 @ r2)
+                | _ -> raise (NoMatch (Some (t1, t2)))
+              end
             | Teps tb1 ->
               begin
                 match t2.t_node with
@@ -395,23 +420,82 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                   let (v2, t2) = t_open_bound tb2 in
                   let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
                   let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (t1 :: r1) (t2 :: r2)
+                  loop (mt, mv) (T t1 :: r1) (T t2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tnot t1 ->
               begin
                 match t2.t_node with
                 | Tnot t2 ->
-                  loop sigma (t1 :: r1) (t2 :: r2)
+                  loop sigma (T t1 :: r1) (T t2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
                 loop sigma r1 r2
             | Tvar _ | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2)))
         end
+
+      | P p1 :: r1, P p2 :: r2 ->
+        begin
+          match p1.pat_node with
+          | Pwild ->
+            begin
+              match p2.pat_node with
+              | Pwild -> loop sigma r1 r2
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+          | Pvar v1 when Mvs.mem v1 mv ->
+            begin
+              match p2.pat_node with
+              | Pvar v2 ->
+                if t_equal (t_var v2) (Mvs.find v1 mv) then
+                  loop (mt,mv) r1 r2
+                else
+                  raise (NoMatch (Some (t_var v1, t_var v2)))
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+          | Pvar v1 ->
+            begin
+              match p2.pat_node with
+              | Pvar v2 ->
+                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+                  let mv = Mvs.add v1 (t_var v2) mv in
+                  loop (mt, mv) r1 r2
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+          | Papp (ls1, pl1) ->
+            begin
+              match p2.pat_node with
+              | Papp (ls2, pl2) ->
+                if ls_equal ls1 ls2 then
+                  loop (mt, mv) ((List.map (fun x -> P x) pl1) @ r1)
+                    ((List.map (fun x -> P x) pl2) @ r2)
+                else
+                  raise (NoMatchpat (Some (p1, p2)))
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+          | Por (p11, p12) ->
+            begin
+              match p2.pat_node with
+              | Por (p21, p22) ->
+                loop (mt, mv) (P p11 :: P p12 :: r1) (P p21 :: P p22 :: r2)
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+          | Pas (p1, v1) ->
+            begin
+              match p2.pat_node with
+              | Pas (p2, v2) ->
+                let mt= Ty.ty_match mt v1.vs_ty v2.vs_ty in
+                let mv = Mvs.add v1 (t_var v2) mv in
+                loop (mt, mv) (P p1 :: r1) (P p2 :: r2)
+              | _ -> raise (NoMatchpat (Some (p1, p2)))
+            end
+        end
       | _ -> raise (NoMatch None)
   in
-  loop (Ty.Mtv.empty, Mvs.empty) largs args
+  loop (Ty.Mtv.empty, Mvs.empty)
+    (List.map (fun x -> T x) largs)
+    (List.map (fun x -> T x) args)
 
 exception Irreducible
 

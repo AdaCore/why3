@@ -21,6 +21,7 @@ exception Arg_parse_error of string * string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
+exception Arg_hyp_not_found of string
 
 let () = Exn_printer.register
     (fun fmt e ->
@@ -353,7 +354,8 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
       wrap_to_store t' (f tys) tail env tables task
     | Tprsymbol t', s :: tail ->
-      let pr = find_pr s tables in
+      let pr = try (find_pr s tables) with
+               | Not_found -> raise (Arg_hyp_not_found s) in
       wrap_to_store t' (f pr) tail env tables task
     | Ttheory t', s :: tail ->
       let th = parse_theory env s in
@@ -366,7 +368,8 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
           let arg = Some (parse_int s') in
           wrap_to_store t' (f arg) tail env tables task
         | Tprsymbol t' ->
-          let arg = Some (find_pr s' tables) in
+          let arg = try Some (find_pr s' tables) with
+                    | Not_found -> raise (Arg_hyp_not_found s') in
           wrap_to_store t' (f arg) tail env tables task
         | Tformula t' ->
           let arg = Some (parse_and_type ~as_fmla:true s' tables) in
