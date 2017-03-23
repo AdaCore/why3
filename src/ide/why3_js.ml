@@ -59,21 +59,25 @@ let getElement cast id =
 (**********)
 
 module PE = struct
-  let error_panel = getElement AsHtml.div "why3-error-bg"
+  let log_panel = getElement AsHtml.div "why3-log-bg"
   let doc = Dom_html.document
+  let error_container = getElement AsHtml.div "why3-error-container"
 
   let print _cls msg =
     let node = doc##createElement (Js.string "P") in
     let textnode = doc##createTextNode (Js.string msg) in
     appendChild node textnode;
-    appendChild error_panel node
+    appendChild log_panel node
 
-  let error_print_error = print "why3-error"
+  let log_print_error = print "why3-error"
 
-  let error_print_msg = print "why3-msg"
+  let log_print_msg = print "why3-msg"
+
+  let error_print_msg s =
+    error_container ##. innerHTML := Js.string s
 
 (* TODO remove this *)
-  let printAnswer s = error_print_msg s
+  let printAnswer s = log_print_msg s
 
 end
 
@@ -529,7 +533,7 @@ end
 let interpNotif (n: notification) =
   match n with
   | Initialized _g ->
-      PE.printAnswer "Initialized"
+      PE.error_print_msg "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
       TaskList.attach_new_node nid parent ntype name detached;
       TaskList.onclick_do_something (string_of_int nid);
@@ -541,12 +545,37 @@ let interpNotif (n: notification) =
   | Remove nid ->
       TaskList.remove_node (string_of_int nid)
   | Saved ->
-      PE.printAnswer "Saved"
-  | Message _ ->
+      PE.error_print_msg "Saved"
+  | Message m ->
+    begin
+      match m with
+      | Proof_error (nid, s) ->
+        PE.error_print_msg
+          (Format.asprintf "Proof error on selected node: \"%s\"" s)
+      | Transf_error (nid, s) ->
+        PE.error_print_msg
+          (Format.asprintf "Transformation error on selected node: \"%s\"" s)
+      | Strat_error (nid, s) ->
+        PE.error_print_msg
+          (Format.asprintf "Strategy error on selected node: \"%s\"" s)
+      | Query_Error (nid, s) ->
+        PE.error_print_msg
+          (Format.asprintf "Query error on selected node: \"%s\"" s)
+      | Query_Info (nid, s) -> PE.error_print_msg s
+      | Help s -> PE.error_print_msg s
+      | Information s -> PE.error_print_msg s
+      | Error s ->
+          PE.error_print_msg
+            (Format.asprintf "Error: \"%s\"" s)
+      | Open_File_Error s ->
+          PE.error_print_msg
+            (Format.asprintf "Error while opening file: \"%s\"" s)
+      | _ -> ();
       let s = Format.asprintf "%a" Json_util.print_notification n in
       PE.printAnswer s
+    end
   | Dead s ->
-      PE.printAnswer s
+      PE.error_print_msg s
   | Node_change (nid, up) ->
     begin
       match up with
@@ -638,20 +667,6 @@ let () =
 let () =
   ToolBar.(add_action button_reload
     (fun () -> PE.printAnswer "Reload"; TaskList.clear (); sendRequest Reload))
-
-let () =
-  ToolBar.(add_action button_redo
-             (fun () -> (*TaskList.print_msg "Redo";*)
-               (*interpNotif (New_node (0, 0, NRoot, "blah", false));*)
-               interpNotif (New_node (1, 0, NFile, "beh", false));
-               interpNotif (New_node (2, 1, NGoal, "beh2", false));
-               interpNotif (Node_change (1, Proved true));
-               (*TaskList.update_status `Unknown "1";
-               TaskList.onclick_do_something "1";*)
-               TaskList.remove_node "2"
-(* TODO remove seems to work ! *)
-             ))
-
 
 (* TODO Server handling *)
 (*let () = Js.Unsafe.global##stopNotificationHandler <-

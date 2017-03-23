@@ -749,7 +749,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let msg =
         Pp.sprintf "%a" (get_exception_message d.cont.controller_session id) e
       in
-      P.notify (Message (Strat_error(node_ID_from_pn id, msg)))
+      P.notify (Message (Transf_error (node_ID_from_pn id, msg)))
     | _ -> ()
 
   let rec apply_transform nid t args =
