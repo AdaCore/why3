@@ -27,6 +27,7 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 #define COMPARE
 #define TEST_GMP
 #define TEST_WHY3
+#define TEST_ADD
 #define TEST_MUL
 #define TEST_DIV
 #endif
@@ -48,6 +49,7 @@ int main () {
   mp_size_t max_n, an, bn, rn;
   struct timeval begin, end;
   double elapsed;
+  uint64_t c, refc;
   //gmp_randstate_t rands;
   //TMP_DECL;
   //TMP_MARK;
@@ -72,6 +74,71 @@ int main () {
   refq = TMP_ALLOC_LIMBS (max_n + 1);
   refr = TMP_ALLOC_LIMBS (max_n + 1);
 
+#ifdef TEST_ADD
+#ifdef BENCH
+  printf ("#an bn t(s)\n");
+#endif
+  for (an = 2; an <= max_n; an += 1)
+    {
+      for (bn = 1; bn <= an; bn += 1)
+	{
+	  init_valid (ap, bp, an, bn);
+#ifdef BENCH
+          elapsed = 0;
+          for (int iter = 0; iter != 100; ++iter) {
+            init_valid (ap, bp, an, bn);
+            gettimeofday(&begin, NULL);
+            for (int i = 0; i != 100; ++i)
+              {
+#endif
+
+#ifdef TEST_GMP
+            c = mpn_add (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            refc = add (rp, ap, bp, an, bn);
+#endif
+
+#ifdef BENCH
+              }
+            gettimeofday(&end, NULL);
+            elapsed +=
+            (end.tv_sec - begin.tv_sec)
+            + ((end.tv_usec - begin.tv_usec)/1000000.0);
+          }
+          printf ("%d %d %f\n", an, bn, elapsed);
+          if (an==bn)
+            printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+	  rn = an;
+	  if (mpn_cmp (refp, rp, rn))
+	    {
+	      printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+		      (int) an, (int) bn, (int) rn);
+	      printf ("a: "); mpn_dump (ap, an);
+	      printf ("b: "); mpn_dump (bp, bn);
+	      printf ("r:   "); mpn_dump (rp, rn);
+	      printf ("ref: "); mpn_dump (refp, rn);
+	      abort();
+	    }
+          if (c != refc)
+	    {
+	      printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+		      (int) an, (int) bn, (int) rn);
+	      printf ("a: "); mpn_dump (ap, an);
+	      printf ("b: "); mpn_dump (bp, bn);
+	      printf ("c:    %016lx\n", c); 
+	      printf ("refc: %016lx\n", refc); 
+	      abort();
+	    }
+#endif
+        }
+    }
+#ifdef COMPARE
+  printf ("addition ok\n");
+#endif
+#endif
 #ifdef TEST_MUL
 #ifdef BENCH
   printf ("#an bn t(s)\n");
