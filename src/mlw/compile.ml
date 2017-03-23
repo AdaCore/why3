@@ -98,6 +98,7 @@ module ML = struct
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eabsurd
     | Ehole
+    (* | Eany *)
 
   and let_def =
     | Lvar of pvsymbol * expr
@@ -126,15 +127,24 @@ module ML = struct
     its_def     : typedef option;
   }
 
-  type decl = (* TODO add support for the extraction of ocaml modules *)
+  type decl =
     | Dtype   of its_defn list
     | Dlet    of let_def
-        (* TODO add return type? *)
     | Dexn    of xsymbol * ty option
+    | Dclone  of ident * decl list
+(*
+    | Dfunctor of ident * (ident * decl list) list * decl list
+*)
 
   type known_map = decl Mid.t
 
+  type from_module = {
+    from_mod: Pmodule.pmodule option;
+    from_km : Pdecl.known_map;
+  }
+
   type pmodule = {
+    mod_from  : from_module;
     mod_decl  : decl list;
     mod_known : known_map;
   }
@@ -145,6 +155,7 @@ module ML = struct
     | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
     | Dlet (Lsym ({rs_name=id}, _, _, _))
     | Dexn ({xs_name=id}, _) -> [id]
+    | Dclone _ -> [] (* FIXME? *)
 
   let add_known_decl decl k_map id =
     Mid.add id decl k_map
@@ -230,7 +241,7 @@ module ML = struct
     | Eassign assingl ->
       List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
 
-  let iter_deps f = function
+  let rec iter_deps f = function
     | Dtype its_dl ->
       List.iter (iter_deps_its_defn f) its_dl
     | Dlet (Lsym (_rs, ty_result, args, e)) ->
@@ -245,6 +256,7 @@ module ML = struct
     | Dlet (Lvar (_, e)) -> iter_deps_expr f e
     | Dexn (_, None) -> ()
     | Dexn (_, Some ty) -> iter_deps_ty f ty
+    | Dclone (_, dl) -> List.iter (iter_deps f) dl
 
   let mk_expr e_node e_ity e_effect =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect }
@@ -291,11 +303,6 @@ module Translate = struct
   open Expr
   open Pmodule
   open Pdecl
-
-  type info = {
-    info_current_mo   : Pmodule.pmodule option;
-    info_mo_known_map : Pdecl.known_map;
-  }
 
   (* useful predicates and transformations *)
   let pv_not_ghost e = not e.pv_ghost
@@ -391,7 +398,7 @@ module Translate = struct
     | DownTo -> ML.DownTo
 
   let isconstructor info rs =
-    match Mid.find_opt rs.rs_name info.info_mo_known_map with
+    match Mid.find_opt rs.rs_name info.ML.from_km with
     | Some {pd_node = PDtype its} ->
       let is_constructor its =
         List.exists (rs_equal rs) its.itd_constructors in
@@ -409,7 +416,7 @@ module Translate = struct
     | _ -> false
 
   let get_record_itd info rs =
-    match Mid.find_opt rs.rs_name info.info_mo_known_map with
+    match Mid.find_opt rs.rs_name info.ML.from_km with
     | Some {pd_node = PDtype itdl} ->
       let f pjl_constr = List.exists (rs_equal rs) pjl_constr in
       let itd = match rs.rs_field with
@@ -513,13 +520,13 @@ module Translate = struct
 
   let mk_for_downto info i_pv from_pv to_pv body eff =
     let ge_rs, minus_rs =
-      let ns = (Opt.get info.info_current_mo).mod_export in
+      let ns = (Opt.get info.ML.from_mod).mod_export in
       ns_find_rs ns ["Int"; "infix >="], ns_find_rs ns ["Int"; "infix -"] in
     mk_for ge_rs minus_rs i_pv from_pv to_pv body eff
 
   let mk_for_to info i_pv from_pv to_pv body eff =
     let le_rs, plus_rs =
-      let ns = (Opt.get info.info_current_mo).mod_export in
+      let ns = (Opt.get info.ML.from_mod).mod_export in
       ns_find_rs ns ["Int"; "infix <="], ns_find_rs ns ["Int"; "infix +"] in
     mk_for le_rs plus_rs i_pv from_pv to_pv body eff
 
@@ -702,8 +709,8 @@ module Translate = struct
     | Eexec ({c_node = Cany}, _) -> true
     | _ -> false
 
-  (* program declarations *)
-  let pdecl info pd =
+  (* pids: identifiers from cloned modules without definitions *)
+  let pdecl _pids info pd =
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
@@ -736,28 +743,68 @@ module Translate = struct
       else [ML.Dexn (xs, Some (ity xs.xs_ity))]
 
   let pdecl_m m pd =
-    let info = {
-      info_current_mo   = Some m;
-      info_mo_known_map = m.mod_known; } in
-    pdecl info pd
+    let info = { ML.from_mod = Some m; ML.from_km  = m.mod_known; } in
+    pdecl Sid.empty info pd
 
   (* unit module declarations *)
-  let rec mdecl info = function
-    | Udecl pd -> pdecl info pd
-    | Uscope (_, _, l) -> List.concat (List.map (mdecl info) l)
+  let rec mdecl pids info = function
+    | Udecl pd -> pdecl pids info pd
+    | Uscope (_, _, l) -> List.concat (List.map (mdecl pids info) l)
     | Uuse _ | Uclone _ | Umeta _ -> []
+
+  let abstract_or_alias_type itd =
+    itd.itd_fields = [] && itd.itd_constructors = []
+
+  let empty_pdecl pd  = match pd.pd_node with
+    | PDlet (LDsym (_, {c_node = Cfun _})) | PDlet (LDrec _) -> false
+    | PDexn _ -> false (* FIXME? *)
+    | PDtype itl -> List.for_all abstract_or_alias_type itl
+    | _ -> true
+  let rec empty_munit = function
+    | Udecl pd -> empty_pdecl pd
+    | Uclone mi -> List.for_all empty_munit mi.mi_mod.mod_units
+    | Uscope (_, _, l) -> List.for_all empty_munit l
+    | Uuse _ | Umeta _ -> true
+
+  let is_empty_clone mi =
+    Mts.is_empty mi.mi_ty &&
+    Mts.is_empty mi.mi_ts &&
+    Mls.is_empty mi.mi_ls &&
+    Decl.Mpr.is_empty mi.mi_pr &&
+    Decl.Mpr.is_empty mi.mi_pk &&
+    Mvs.is_empty mi.mi_pv &&
+    Mrs.is_empty mi.mi_rs &&
+    Mxs.is_empty mi.mi_xs &&
+    List.for_all empty_munit mi.mi_mod.mod_units
+
+  let find_params dl =
+    let add params = function
+      | Uclone mi when is_empty_clone mi -> mi :: params
+      | _ -> params in
+    List.fold_left add [] dl
+
+  let make_param from mi =
+    let id = mi.mi_mod.mod_theory.Theory.th_name in
+    Format.printf "param %s@." id.id_string;
+    let dl =
+      List.concat (List.map (mdecl Sid.empty from) mi.mi_mod.mod_units) in
+    ML.Dclone (id, dl)
+
+  let ids_of_params pids mi =
+    Mid.fold (fun id _ pids -> Sid.add id pids) mi.mi_mod.mod_known pids
 
   (* modules *)
   let module_ m =
-    let info = {
-      info_current_mo   = Some m;
-      info_mo_known_map = m.mod_known; } in
-    let mod_decl = List.concat (List.map (mdecl info) m.mod_units) in
+    let from = { ML.from_mod = Some m; ML.from_km = m.mod_known; } in
+    let params = find_params m.mod_units in
+    let pids = List.fold_left ids_of_params Sid.empty params in
+    let mod_decl = List.concat (List.map (mdecl pids from) m.mod_units) in
+    let mod_decl = List.map (make_param from) params @ mod_decl in
     let add known_map decl =
       let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add Mid.empty mod_decl in
-    { ML.mod_decl = mod_decl; ML.mod_known = mod_known }, info
+    { ML.mod_from = from; ML.mod_decl = mod_decl; ML.mod_known = mod_known }
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | ExtractionAny ->
@@ -844,16 +891,16 @@ module Transform = struct
     { r with rec_exp = expr info subst r.rec_exp }
 
   let pdecl info = function
-    | Dtype _ | Dexn _ as d -> d
+    | Dtype _ | Dexn _ | Dclone _ as d -> d
     | Dlet def -> Dlet (let_def info Mpv.empty def)
 
-  let module_ info m =
-    let mod_decl = List.map (pdecl info) m.mod_decl in
+  let module_ m =
+    let mod_decl = List.map (pdecl m.mod_from) m.mod_decl in
     let add known_map decl =
       let idl = get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add Mid.empty mod_decl in
-    { mod_decl = mod_decl; mod_known = mod_known }
+    { m with mod_decl = mod_decl; mod_known = mod_known }
 
 end
 

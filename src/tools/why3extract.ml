@@ -165,8 +165,8 @@ let translate_module =
   fun m ->
     let name = m.mod_theory.Theory.th_name in
     try Ident.Hid.find memo name with Not_found ->
-      let pm, info = Translate.module_ m in
-      let pm       = Transform.module_ info pm in
+      let pm = Translate.module_ m in
+      let pm = Transform.module_ pm in
       Ident.Hid.add memo name pm;
       pm
 

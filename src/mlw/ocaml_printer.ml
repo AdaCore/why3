@@ -475,6 +475,8 @@ module Print = struct
     | Dexn (xs, Some t)->
       fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
         print_ident xs.xs_name (print_ty ~paren:true info) t
+    | Dclone _ ->
+      assert false (*TODO*)
 
   let print_decl info fmt decl =
     let decl_name = get_decl_name decl in
