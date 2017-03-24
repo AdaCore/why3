@@ -45,13 +45,15 @@ module N
 
   function p2i (i:int32) : int = Int32.to_int i
 
-  exception Return32 int32(** {2 Integer value of a natural number} *)
+  exception Return32 int32
 
   let lemma prod_compat_strict_r (a b c:int)
     requires { 0 <= a < b }
     requires { 0 < c }
     ensures { c * a < c * b }
   = ()
+
+  (** {2 Integer value of a natural number} *)
 
   (** [value_sub x n m] denotes the integer represented by
      the digits x[n..m-1] with lsb at index n *)
@@ -5947,7 +5949,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid_ptr_itv x (sx) }
     requires { valid_ptr_itv y (sy) }
-    requires { valid_ptr_itv q (sx - sy + 1) } (* TODO check if this is needed*)
+    requires { valid_ptr_itv q (sx - sy + 1) } (* TODO check if this is needed *)
     requires { valid_ptr_itv r (sy) }
     requires { (pelts y)[y.offset + sy - 1] > 0 }
     ensures { value_sub_shift x sx
@@ -5965,153 +5967,4 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     free nx;
     free ny;
 
-(*
-  type u 
-
-  let test (x:u) : unit
-  =
-    let y = malloc (UInt32.of_int 1) in
-    free y
-*)
-  (** Tests *)
- (*
- let print (p:t) (m n:int32) : unit
-    requires { 0 <= p.offset + m
-               <= p.offset + n
-               <= plength p }
-  =
-    let i = ref m in
-    let q = ref (C.incr p m) in
-    let one = Int32.of_int 1 in
-    while (Int32.(<) !i n) do
-      invariant { m <= !i <= n }
-      invariant { (!q).offset = p.offset + !i }
-      invariant { plength !q = plength p }
-      variant { n - !i }
-      print_uint32 (C.get !q);
-      print_space ();
-      q := C.incr !q one;
-      i := Int32.(+) !i one;
-    done;
-    print_newline ()
-
-  let from_limb (l:limb) : t
-    ensures { is_null result \/ plength result = 1 }
-    ensures { is_null result \/ value_sub_shift result 1 = l }
-    ensures { result.offset = 0 }
-  =
-    let p = malloc (UInt32.of_int 1) in
-    if not (is_null p)
-    then C.set p l;
-    p
-
-  let two_limbs (l1 l2: limb) : t
-    ensures { is_null result \/ plength result = 2 }
-    ensures { is_null result \/ value_sub_shift result 2 = l1 + radix * l2 }
-    ensures { result.offset = 0 }
-  =
-    let p = malloc (UInt32.of_int 2) in
-    if not (is_null p)
-    then begin
-      C.set p l1;
-      C.set (C.incr p (Int32.of_int 1)) l2
-      end;
-    p
-*)
-(*
-  let main () =
-    let p = from_limb (Limb.of_int 42) in
-    if not (is_null p)
-    then begin
-      print_uint32 (C.get p);
-      print_newline ();
-      free p;
-    end;
-    let q = two_limbs (Limb.of_int 0xffffffff) (Limb.of_int 42) in
-    if not (is_null q)
-    then begin
-      print q (Int32.of_int 0) (Int32.of_int 2);
-      free q;
-    end;
-    let one = Int32.of_int 1 in
-    let two = Int32.of_int 2 in
-    let three = Int32.of_int 3 in
-    let four = Int32.of_int 4 in
-    let r = malloc (Limb.of_int 4) in
-    let s = malloc (Limb.of_int 4) in
-    if (is_null r || is_null s) then ()
-    else begin
-      zero r four;
-      zero s four;
-      let zero = Int32.of_int 0 in
-      let x = two_limbs (Limb.of_int 42) (Limb.of_int 13) in
-      let y = two_limbs (Limb.of_int 0xffffffff) (Limb.of_int 24) in
-      if (is_null x || is_null y)
-      then ()
-      else begin
-        print x zero two;
-        print y zero two;
-        let c = add r x y two two in
-        print r zero four;
-        print_uint32 c;
-        print_newline ();
-        let c = sub s r x two two in
-        print s zero four;
-        print_uint32 c;
-        print_newline ();
-        let c = sub s x r two two in
-        print s zero four;
-        print_uint32 c;
-        print_newline ();
-        let c = add r y s two two in
-        print r zero four;
-        print_uint32 c;
-        print_newline ();
-        mul r x y two two;
-        print r zero four;
-        let c = rshift s r four (Limb.of_int 3) in
-        print s zero four;
-        print_uint32 c;
-        print_newline ();
-        let c = rshift s r four (Limb.of_int 12) in
-        print s zero four;
-        print_uint32 c;
-        print_newline ();
-        let c = lshift s r three (Limb.of_int 28) in
-        print s zero four;
-        print_uint32 c;
-        print_newline ();
-      end;
-      free x;
-      free y;
-      free r;
-      free s;
-    end;
-    let l = Limb.of_int 0xf0000001 in
-    let v = invert_limb l in
-    print_uint32 l;
-    print_newline ();
-    print_uint32 v;
-    print_newline ();
-    let x = from_limb l in
-    let y = from_limb (Limb.of_int 45) in
-    let r = malloc (Limb.of_int 2) in
-    let s = malloc (Limb.of_int 2) in
-    if (is_null x || is_null y || is_null r || is_null s)
-    then ()
-    else begin
-      mul r x y one one;
-      let _ = add_limb s r (Limb.of_int 15) two in
-      print s (Int32.of_int 0) two;
-      let (q,rem) = div2by1_inv (C.get_ofs s one) (C.get s) l v in
-      print_uint32 q;
-      print_space ();
-      print_uint32 rem;
-      print_newline ();
-    end;
-    free r;
-    free s;
-    free x;
-    free y;
-*)
 end
