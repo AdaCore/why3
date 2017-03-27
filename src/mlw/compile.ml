@@ -545,8 +545,12 @@ module Translate = struct
       expr info e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
       ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) ML.ity_unit eff
-    | Elet (LDvar (pv, e1), e2) when pv.pv_ghost ||
-                                     not (Mpv.mem pv e2.e_effect.eff_reads) ->
+    | Elet (LDvar (pv, _e1), e2) (* FIXME *)
+      when pv.pv_ghost (* || not (Mpv.mem pv e2.e_effect.eff_reads) *) ->
+      (* ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity)
+         eff *)
+      expr info e2
+    | Elet (LDvar (pv, e1), e2) when not (Mpv.mem pv e2.e_effect.eff_reads) ->
       ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
@@ -822,6 +826,9 @@ module Transform = struct
 
   open ML
 
+  let conflict_reads_writes spv spv_mreg =
+    Mreg.exists (fun _ v -> not (Spv.is_empty (Spv.diff v spv))) spv_mreg
+
   type subst = expr Mpv.t
 
   let rec expr info subst e =
@@ -838,9 +845,10 @@ module Transform = struct
     (*        Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label -> *)
     (*   (\* because of Lvar we know the constructor is completely applied *\) *)
     (*   add_subst pv e1 e2 *)
-    | Elet (Lvar (pv, e1), e2)
+    | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
       when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label &&
-           eff_pure e1.e_effect ->
+           eff_pure eff1 &&
+           not (conflict_reads_writes eff1.eff_reads eff2.eff_writes) ->
       let e1 = expr info subst e1 in
       add_subst pv e1 e2
     | Elet (ld, e) ->

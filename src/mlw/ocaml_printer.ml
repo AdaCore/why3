@@ -68,7 +68,7 @@ module Print = struct
   let forget_vars = List.iter forget_var
 
   let forget_let_defn = function
-  | Lvar (v,_) -> forget_pv v
+  | Lvar (v,_) -> forget_id v.pv_vs.vs_name
   | Lsym (s,_,_,_) -> forget_rs s
   | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
@@ -318,7 +318,7 @@ module Print = struct
     | Evar pvs ->
       (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
-      fprintf fmt (protect_on paren "@[%a@] in@ %a")
+      fprintf fmt (protect_on paren "@[%a@] in@ @[%a@]")
         (print_let_def info) let_def (print_expr info) e;
       forget_let_defn let_def
     | Eabsurd ->
