@@ -492,7 +492,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
-let print_constructor_decl global_stuff add_stuff info fmt (ls,args) =
+let print_constructor_decl global_stuff add_stuff nb_cons info fmt (ls,args) =
+  nb_cons := !nb_cons + 1;
   let _ = flush_str_formatter () in
   fprintf str_formatter "%a" (print_ident info) ls.ls_name;
   let ls_ls_name = flush_str_formatter () in
@@ -546,13 +547,13 @@ let print_constructor_decl global_stuff add_stuff info fmt (ls,args) =
     add_stuff := ls_ls_name :: !add_stuff
   with _ -> ()
 
-let print_data_decl global_stuff add_stuff info fmt (ts,cl) =
+let print_data_decl global_stuff add_stuff nb_cons info fmt (ts,cl) =
   let _ = flush_str_formatter () in
   fprintf str_formatter "%a" (print_ident info) ts.ts_name;
   let s = flush_str_formatter () in
   fprintf fmt "@[(%s@ %a)@]"
     s
-    (print_list space (print_constructor_decl global_stuff add_stuff info)) cl;
+    (print_list space (print_constructor_decl global_stuff add_stuff nb_cons info)) cl;
   global_stuff := s :: !global_stuff;
   add_stuff := s :: !add_stuff
 
@@ -571,7 +572,8 @@ let print_arg fmt (a, b) =
   else
     fprintf fmt "(%s %s)" a b
 
-let print_saved_constructors fmt l =
+let print_saved_constructors nb_cons fmt l =
+  if List.length l <= nb_cons + 1 then () else
   match l with
   | [] -> ()
   | [_hd] -> ()
@@ -594,10 +596,11 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
   | Ddata dl ->
     let global_stuff = ref [] in
     let add_stuff = ref [] in
+    let nb_cons = ref 0 in
     fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-      (print_list space (print_data_decl global_stuff add_stuff info)) dl;
+      (print_list space (print_data_decl global_stuff add_stuff nb_cons info)) dl;
     print_saved_projections fmt !global_stuff;
-    print_saved_constructors fmt !add_stuff
+    print_saved_constructors !nb_cons fmt !add_stuff
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
