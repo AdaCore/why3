@@ -378,6 +378,7 @@ type dspec_final = {
   ds_xpost   : (pvsymbol * term) list Mxs.t;
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
+  ds_alias   : (term * term) list;
   ds_diverge : bool;
   ds_checkrw : bool;
 }
@@ -773,7 +774,15 @@ let create_assert = to_fmla
 let create_invariant pl = List.map to_fmla pl
 
 let create_post ity ql = List.map (fun (v,f) ->
-  ity_equal_check ity v.pv_ity; Ity.create_post v.pv_vs (to_fmla f)) ql
+  try
+    ity_equal_check ity v.pv_ity;
+    Ity.create_post v.pv_vs (to_fmla f)
+  with TypeMismatch _ ->
+    let ty = ty_of_ity ity in
+    ty_equal_check ty (ty_of_ity v.pv_ity);
+    let preid = Ident.id_clone v.pv_vs.vs_name in
+    Ity.create_post (create_vsymbol preid ty) (to_fmla f)
+  ) ql
 
 let create_xpost xql = Mxs.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
 
@@ -818,6 +827,22 @@ let effect_of_dspec dsp =
   let eff = Mxs.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
+
+let alias_of_dspec dsp ity =
+  let add_alias (sbs, regs) (t, rt) = (* FIXME conflicts + result on right *)
+    match (effect_of_term t, effect_of_term rt) with
+    | (_, ({ity_node = Ityreg reg} as ity), _),
+      (_, ({ity_node = Ityreg _} as rity), _) ->
+      (ity_match sbs rity ity, Sreg.add reg regs)
+    | (_, {ity_node = Ityreg _}, _), _ ->
+      Loc.errorm ?loc:rt.t_loc "mutable expression expected"
+    | _ ->
+      Loc.errorm ?loc:t.t_loc "mutable expression expected" in
+  let sbs, regs =
+    List.fold_left add_alias (isb_empty, Sreg.empty) dsp.ds_alias in
+  let ity = ity_full_inst sbs ity in
+  let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in (* FIXME ? *)
+  ity, regs
 
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
@@ -1002,9 +1027,11 @@ let cty_of_spec env bl mask dsp dity =
   let env, old = add_label env "0" in
   let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
+  let ity, regs = alias_of_dspec dsp ity in
   let eff = eff_ghostify env.ghs eff in
   let eff = eff_reset_overwritten eff in
-  let eff = eff_reset eff (ity_freeregs Sreg.empty ity) in
+  let res = Sreg.diff (ity_freeregs Sreg.empty ity) regs in
+  let eff = eff_reset eff res in
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in

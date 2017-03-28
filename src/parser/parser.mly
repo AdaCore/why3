@@ -72,6 +72,7 @@
     sp_xpost   = [];
     sp_reads   = [];
     sp_writes  = [];
+    sp_alias   = [];
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
@@ -83,6 +84,7 @@
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_alias   = s1.sp_alias @ s2.sp_alias;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
@@ -136,7 +138,7 @@
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
 %token PRIVATE RAISE RAISES READS REC REQUIRES RETURNS
-%token TO TRY VAL VARIANT WHILE WRITES
+%token TO TRY VAL VARIANT WHILE WRITES ALIAS
 
 (* symbols *)
 
@@ -147,6 +149,7 @@
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
+%token TILDE
 %token UNDERSCORE
 
 %token EOF
@@ -855,12 +858,16 @@ single_spec:
     { { empty_spec with sp_reads = $3; sp_checkrw = true } }
 | WRITES LEFTBRC comma_list0(term) RIGHTBRC
     { { empty_spec with sp_writes = $3; sp_checkrw = true } }
+| ALIAS LEFTBRC comma_list0(alias_pair) RIGHTBRC
+	{ { empty_spec with sp_alias = $3 } } (* FIXME checkrw ? *)
 | RAISES LEFTBRC comma_list1(xsymbol) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | DIVERGES
     { { empty_spec with sp_diverge = true } }
 | variant
     { { empty_spec with sp_variant = $1 } }
+
+%inline alias_pair: term TILDE term { ($1,$3) }
 
 ensures:
 | term

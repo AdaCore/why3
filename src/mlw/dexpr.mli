@@ -67,6 +67,7 @@ type dspec_final = {
   ds_xpost   : (pvsymbol * term) list Mxs.t;
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
+  ds_alias   : (term * term) list;
   ds_diverge : bool;
   ds_checkrw : bool;
 }

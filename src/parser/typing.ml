@@ -505,6 +505,14 @@ let dwrites muc wl lvm =
   let dwrites t = type_term muc lvm old t in
   List.map dwrites wl
 
+let dalias muc al lvm =
+  let old _ _ = Loc.errorm
+      "`at' and `old' cannot be used in the `alias' clause" in
+  let dalias (t1,t2) =
+    (type_term muc lvm old t1, type_term muc lvm old t2) in
+  List.map dalias al
+
+
 let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
   | s -> Loc.errorm ~loc:(qloc q) "Not an order relation: %a" Pretty.print_ls s
@@ -520,6 +528,7 @@ let dspec muc sp lvm old ity = {
   ds_xpost   = dxpost muc sp.sp_xpost lvm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
+  ds_alias   = dalias muc sp.sp_alias lvm;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge; }
 
@@ -648,9 +657,11 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let e = match pty with
         | Some pty -> { e with expr_desc = Ecast (e, pty) }
         | None -> e in
-      let ds = match sp.sp_variant with
-        | ({term_loc = loc},_)::_ ->
-            Loc.errorm ~loc "unexpected 'variant' clause"
+      let ds = match (sp.sp_variant, sp.sp_alias) with
+        | (({term_loc = loc},_)::_,_) ->
+          Loc.errorm ~loc "unexpected 'variant' clause"
+        | (_,({term_loc = loc},_)::_) ->
+          Loc.errorm ~loc "unexpected 'alias' clause"
         | _ -> dspec muc sp in
       DEfun (bl, msk, ds, dexpr muc (denv_add_args denv bl) e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->

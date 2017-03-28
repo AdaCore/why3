@@ -60,6 +60,7 @@
         (* programs *)
         "abstract", ABSTRACT;
         "absurd", ABSURD;
+        "alias", ALIAS;
         "any", ANY;
         "assert", ASSERT;
         "assume", ASSUME;
@@ -199,6 +200,8 @@ rule token = parse
       { EQUAL }
   | "<>"
       { LTGT }
+  | "~"
+      { TILDE }
   | "["
       { LEFTSQ }
   | "]"
