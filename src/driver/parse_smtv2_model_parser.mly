@@ -40,6 +40,7 @@
 %token <string * string> DEC_STR
 %token <string * string> MINUS_DEC_STR
 %token LPAREN RPAREN
+%token MK_ANYTHING
 %token <string * int> MK_REP
 %token <string * int> MK_SPLIT_FIELD
 %token <string * int> MK_T
@@ -83,7 +84,7 @@ tname:
 | MK_SPLIT_FIELD { fst $1 }
 | MK_T { fst $1 }
 | MK_SPLIT_DISCRS { fst $1 }
-
+| MK_ANYTHING { "" } (* ignore text on this keyword for the moment *)
 
 smt_term:
 | name      { Smt2_model_defs.Variable $1  }
@@ -110,6 +111,7 @@ smt_term:
     { Smt2_model_defs.Record (snd $2, List.rev $4) }
 | LPAREN MK_SPLIT_DISCRS SPACE list_smt_term RPAREN
     { Smt2_model_defs.Discr (snd $2, List.rev $4) }
+| LPAREN MK_ANYTHING ps smt_term RPAREN { $4 } (* ad hoc for refs *)
 (* Particular case for functions that are defined as an equality:
    define-fun f ((a int) (b int)) (= a b) *)
 | LPAREN EQUAL ps list_smt_term RPAREN { Smt2_model_defs.Other "" }

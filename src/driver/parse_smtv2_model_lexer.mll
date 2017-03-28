@@ -19,6 +19,7 @@ let space = [' ''\t''\n''\r']
 let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
 let dec_num = num"."num
+let name = (['a'-'z']*'_'*['0'-'9']*)*
 
 rule token = parse
   | '\n'
@@ -65,6 +66,7 @@ rule token = parse
     match n with
     | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
     | n -> MK_SPLIT_DISCRS ("mk____split_discrs"^n, int_of_string n) }
+  | "mk" name "___" { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
   | "(_ bv"(num as bv_value)" "num")" { BITVECTOR_VALUE bv_value }
   | "(_ BitVec "num")" { BITVECTOR_TYPE }
   | num as integer
