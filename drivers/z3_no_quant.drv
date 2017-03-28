@@ -50,11 +50,8 @@ steps ":rlimit-count.*\\([0-9]+.?[0-9]*\\)" 1
 (** Extra theories supported by Z3 *)
 
 (* float literals  *)
-
-theory "ada__model".Finite_Float_Literal
-  remove prop l_real
-  remove prop l_is_finite
-  remove prop l_representable
+theory "_gnatprove_standard".Floating
+  syntax function rem "(fp.rem %1 %2)"
 end
 
 theory "_gnatprove_standard".Float32_next_prev
@@ -83,16 +80,13 @@ theory ieee_float.Float64
 (* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
    syntax function to_int
      "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
-  syntax function of_int
-    "((_ to_fp 11 53) %1 (ite (< %2 0) ((_ int2bv 1025) (+ (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026))) %2)) ((_ int2bv 1025) %2)))"
+     (* we do not translate of_int since z3 will not prove anything if it appears in its context, see PC07-014 *)
 end
 
 theory ieee_float.Float32
   (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
    syntax function to_int
      "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
-  syntax function of_int
-    "((_ to_fp 8 24) %1 (ite (< %2 0) ((_ int2bv 129) (+ (bv2int (bvshl (_ bv1 130) (_ bv129 130))) %2)) ((_ int2bv 129) %2)))"
 end
 
 theory real.Square
@@ -135,20 +129,17 @@ theory _gnatprove_standard_th.Integer
    syntax function bool_gt "(> %1 %2)"
    syntax function bool_ge "(>= %1 %2)"
 
-   remove prop bool_eq_axiom
-   remove prop bool_ne_axiom
-   remove prop bool_lt_axiom
-   remove prop bool_int__le_axiom
-   remove prop bool_gt_axiom
-   remove prop bool_ge_axiom
+   remove allprops
 end
 
 theory _gnatprove_standard_th.Boolean_Func
    syntax function bool_eq "(= %1 %2)"
+   remove allprops
 end
 
 theory ada__model_th.Discrete_Base_Theory
-  syntax function bool_eq "(= %1 %2)"
+   syntax function bool_eq "(= %1 %2)"
+   remove allprops
 end
 
 theory _gnatprove_standard.BVAda
@@ -159,14 +150,5 @@ theory _gnatprove_standard.BVAda
    syntax function bool_gt "(bvugt %1 %2)"
    syntax function bool_ge "(bvuge %1 %2)"
 
-   remove prop Power_0
-   remove prop Power_1
-   remove prop Power_s
-   remove prop Power_s_alt
-   remove prop Power_sum
-   remove prop Power_mult
-   remove prop Power_mult2
-
-   remove prop bv_min_to_uint
-   remove prop bv_max_to_uint
+   remove allprops
 end

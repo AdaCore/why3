@@ -40,7 +40,7 @@ let run_alt_ergo_on_task text =
   match Why_typing.split_goals ltd with
   | [d] ->
     let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
-    SAT.reset_steps ();
+    SAT.reset_refs ();
     let stat = ref (Invalid "no answer from Alt-Ergo") in
     let f s = stat := s in
     begin

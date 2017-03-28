@@ -585,9 +585,10 @@ let goal_task_text g =
     task_text (S.goal_task g)
 
 let file_contents f =
-  try
-    Sysutil.file_contents f
-  with Invalid_argument s -> s
+  let s = try Sysutil.file_contents f
+          with Invalid_argument s -> s
+  in try_convert s
+
 
 let update_tabs a =
   let task_text =

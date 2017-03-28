@@ -1,0 +1,48 @@
+theory T
+  use import int.Int
+
+  type q
+
+  type t is range t2int: 0 .. 42
+
+  (* meta "range:keep" type t *)
+
+  goal g : forall x:t. x = (12 : t)
+end
+
+theory U
+  use import bv.BV8
+
+  type q
+
+  (* meta "range:keep" type t *)
+
+  goal g : forall x:t. x = (12 : t)
+end
+
+module M
+  use import bv.BV16
+  use import int.Int
+
+  let f (x : t) : t
+   ensures { ule result (12 : t) }
+  = bw_and x (12 : t)
+
+end
+
+module N
+  use import bv.BV8
+  use import int.Int
+
+  use import int.NumOf
+
+  meta "encoding : kept" type t
+
+  let ghost step1 (n x1 : t) (i : int) : unit
+  =
+    assert { let i' = of_int i in
+             let twoi = mul (2 : t) i' in
+                 to_uint (bw_and (lsr_bv x1 twoi) (0x03 : t))
+               = numof (nth n) (to_uint twoi) (to_uint twoi + 2) }
+
+end

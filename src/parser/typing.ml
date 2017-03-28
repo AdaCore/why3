@@ -290,8 +290,10 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       let e1, ch = if chainable_op uc op2
         then get_chain e12 ch else e12, ch in
       make_chain (dterm uc gvars denv e1) ch
-  | Ptree.Tconst c ->
-      DTconst c
+  | Ptree.Tconst (Number.ConstInt _ as c) ->
+      DTconst (c, ty_int)
+  | Ptree.Tconst (Number.ConstReal _ as c) ->
+      DTconst (c, ty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm uc gvars denv e1 in
@@ -372,7 +374,12 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm uc gvars denv e1, Slab.singleton lab)
   | Ptree.Tcast (e1, ty) ->
-      DTcast (dterm uc gvars denv e1, ty_of_pty uc ty))
+    (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
+      let e1 = dterm uc gvars denv e1 in
+      let ty = ty_of_pty uc ty in
+      match e1.dt_node with
+      | DTconst (c,_) -> DTconst (c, ty)
+      | _ -> DTcast (e1, ty))
 
 (** Export for program parsing *)
 
@@ -403,10 +410,9 @@ let add_types dl th =
   let tysymbols = Hstr.create 17 in
   let rec visit x =
     let d = Mstr.find x def in
-    try
-      match Hstr.find tysymbols x with
-        | None -> Loc.errorm ~loc:d.td_loc "Cyclic type definition"
-        | Some ts -> ts
+    try match Hstr.find tysymbols x with
+      | None -> Loc.errorm ~loc:d.td_loc "Cyclic type definition"
+      | Some ts -> ts
     with Not_found ->
       Hstr.add tysymbols x None;
       let vars = Hstr.create 17 in
@@ -442,9 +448,17 @@ let add_types dl th =
               | PTparen ty ->
                   apply ty
             in
-            create_tysymbol id vl (Some (apply ty))
+            create_tysymbol id vl (Alias (apply ty))
+        | TDrange (lo,hi) ->
+            let ir = { Number.ir_lower = lo;
+                       Number.ir_upper = hi } in
+            Loc.try2 ~loc:d.td_loc create_tysymbol id vl (Range ir)
+        | TDfloat (eb,sb) ->
+            let fp = { Number.fp_exponent_digits = eb;
+                       Number.fp_significand_digits = sb } in
+            Loc.try2 ~loc:d.td_loc create_tysymbol id vl (Float fp)
         | TDabstract | TDalgebraic _ ->
-            create_tysymbol id vl None
+            create_tysymbol id vl NoDef
         | TDrecord _ ->
             assert false
       in
@@ -454,7 +468,8 @@ let add_types dl th =
   let th' =
     let add_ts (abstr,alias) d =
       let ts = visit d.td_ident.id_str in
-      if ts.ts_def = None then ts::abstr, alias else abstr, ts::alias in
+      if is_alias_type_def ts.ts_def then
+        abstr, ts::alias else ts::abstr, alias in
     let abstr,alias = List.fold_left add_ts ([],[]) dl in
     try
       let th = List.fold_left add_ty_decl th abstr in
@@ -472,8 +487,10 @@ let add_types dl th =
           ts
     in
     match d.td_def with
-      | TDabstract -> ts::abstr, algeb, alias
-      | TDalias _ -> abstr, algeb, ts::alias
+      | TDabstract | TDrange _ | TDfloat _ ->
+          ts::abstr, algeb, alias
+      | TDalias _ ->
+          abstr, algeb, ts::alias
       | TDalgebraic cl ->
           let ht = Hstr.create 17 in
           let constr = List.length cl in
@@ -505,6 +522,60 @@ let add_types dl th =
           assert false
   in
   let abstr,algeb,alias = List.fold_right decl dl ([],[],[]) in
+  let add_ty_decl uc ts =
+    let uc = add_ty_decl uc ts in
+    match ts.ts_def with
+    | NoDef | Alias _ -> uc
+    | Range rg ->
+        (* FIXME: "t'to_int" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'int" in
+        let id = id_derive nm ts.ts_name in
+        let pj = create_fsymbol id [ty_app ts []] ty_int in
+        let uc = add_param_decl uc pj in
+        let uc = add_meta uc meta_range [MAts ts; MAls pj] in
+        (* create max attribute *)
+        let nm = ts.ts_name.id_string ^ "'maxInt" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t =
+          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_upper)))
+            ty_int
+        in
+        let uc = add_logic_decl uc [make_ls_defn ls [] t] in
+        (* create min attribute *)
+        let nm = ts.ts_name.id_string ^ "'minInt" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t =
+          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_lower)))
+            ty_int
+        in
+        add_logic_decl uc [make_ls_defn ls [] t]
+    | Float fmt ->
+        (* FIXME: "t'to_real" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'real" in
+        let id = id_derive nm ts.ts_name in
+        let pj = create_fsymbol id [ty_app ts []] ty_real in
+        let uc = add_param_decl uc pj in
+        (* FIXME: "t'is_finite" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'isFinite" in
+        let id = id_derive nm ts.ts_name in
+        let iF = create_psymbol id [ty_app ts []] in
+        let uc = add_param_decl uc iF in
+        let uc = add_meta uc meta_float [MAts ts; MAls pj; MAls iF] in
+        (* create exponent digits attribute *)
+        let nm = ts.ts_name.id_string ^ "'eb" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t = t_nat_const fmt.Number.fp_exponent_digits in
+        let uc = add_logic_decl uc [make_ls_defn ls [] t] in
+        (* create significand digits attribute *)
+        let nm = ts.ts_name.id_string ^ "'sb" in
+        let id = id_derive nm ts.ts_name in
+        let ls = create_fsymbol id [] ty_int  in
+        let t = t_nat_const fmt.Number.fp_significand_digits in
+        add_logic_decl uc [make_ls_defn ls [] t]
+  in
   try
     let th = List.fold_left add_ty_decl th abstr in
     let th = if algeb = [] then th else add_data_decl th algeb in
@@ -526,7 +597,7 @@ let prepare_typedef td =
   if td.td_inv <> [] then
     Loc.errorm ~loc:td.td_loc "pure types cannot have invariants";
   match td.td_def with
-  | TDabstract | TDalgebraic _ | TDalias _ ->
+  | TDabstract | TDrange _ | TDfloat _ | TDalgebraic _ | TDalias _ ->
       td
   | TDrecord fl ->
       let field { f_loc = loc; f_ident = id; f_pty = ty;
@@ -682,7 +753,7 @@ let rec clone_ns kn sl path ns2 ns1 s =
     | Some ts2 when ts_equal ts1 ts2 -> acc
     | Some _ when not (Sid.mem ts1.ts_name sl) ->
         raise (NonLocal ts1.ts_name)
-    | Some _ when ts1.ts_def <> None ->
+    | Some _ when ts1.ts_def <> NoDef ->
         raise (CannotInstantiate ts1.ts_name)
     | Some ts2 ->
         begin match (Mid.find ts1.ts_name kn).d_node with
@@ -690,7 +761,7 @@ let rec clone_ns kn sl path ns2 ns1 s =
           | _ -> raise (CannotInstantiate ts1.ts_name)
         end
     | None when not (Sid.mem ts1.ts_name sl) -> acc
-    | None when ts1.ts_def <> None -> acc
+    | None when ts1.ts_def <> NoDef -> acc
     | None ->
         begin match (Mid.find ts1.ts_name kn).d_node with
           | Decl.Dtype _ -> Loc.errorm
@@ -765,7 +836,7 @@ let type_inst th t s =
       let ts1 = find_tysymbol_ns t.th_export p in
       let id = id_user (ts1.ts_name.id_string ^ "_subst") loc in
       let tvl = List.map (fun id -> tv_of_string id.id_str) tvl in
-      let def = Some (ty_of_pty th pty) in
+      let def = Alias (ty_of_pty th pty) in
       let ts2 = Loc.try3 ~loc create_tysymbol id tvl def in
       if Mts.mem ts1 s.inst_ts
       then Loc.error ~loc (ClashSymbol ts1.ts_name.id_string);

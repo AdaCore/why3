@@ -183,7 +183,7 @@ let mfield_of_rs s = match s.rs_cty.cty_args, s.rs_field with
 let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
   let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
-  if s.its_privmut || s.its_def <> None then raise exn;
+  if s.its_privmut || s.its_def <> NoDef then raise exn;
   if s.its_mfields <> [] then begin
     if constr <> 1 then raise exn;
     let mfs = Spv.of_list s.its_mfields in
@@ -1005,7 +1005,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Econst c -> print_const fmt c
+  | Econst c -> Number.print_constant fmt c
   | Eexec c -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->

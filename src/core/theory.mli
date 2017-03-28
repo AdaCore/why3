@@ -78,6 +78,9 @@ val register_meta_excl :
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
 
+val meta_range : meta
+val meta_float : meta
+
 (** {2 Theories} *)
 
 type theory = private {
@@ -226,4 +229,3 @@ exception KnownMeta of meta
 exception UnknownMeta of string
 exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
-

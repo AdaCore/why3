@@ -1361,7 +1361,7 @@ and load_metas ctxt mg a =
             let tvs = Util.foldi (fun l _ ->
               (create_tvsymbol (Ident.id_fresh "a"))::l)
               [] 0 arity in
-            let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs None in
+            let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs NoDef in
             Hint.add hts intid ts;
             let idpos_ts = Mts.add ts pos idpos.idpos_ts in
             { idpos with idpos_ts = idpos_ts }

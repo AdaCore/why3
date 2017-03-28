@@ -1,0 +1,61 @@
+import "alt_ergo_common.drv"
+import "no-bv.gen"
+
+theory int.Abs
+  syntax function abs "abs_int(%1)"
+  remove prop Abs_le
+  remove prop Abs_pos
+end
+
+theory real.Abs
+  syntax function abs "abs_real(%1)"
+end
+
+theory real.FromInt
+  syntax function from_int "real_of_int(%1)"
+  remove prop Zero
+  remove prop One
+  remove prop Add
+  remove prop Sub
+  remove prop Mul
+  remove prop Neg
+end
+
+theory real.MinMax
+  syntax function min "min_real(%1, %2)"
+  syntax function max "max_real(%1, %2)"
+end
+
+theory real.PowerInt
+  syntax function power "pow_real_int(%1, %2)"
+end
+
+theory real.PowerReal
+  syntax function pow "pow_real_real(%1, %2)"
+end
+
+theory real.Square
+  syntax function sqrt "sqrt_real(%1)"
+end
+
+theory ieee_float.GenericFloat
+  remove prop Round_monotonic
+  remove prop Round_idempotent
+end
+
+theory ieee_float.RoundingMode
+  syntax type mode "fpa_rounding_mode"
+  syntax function RNE "NearestTiesToEven"
+  syntax function RNA "NearestTiesToAway"
+  syntax function RTN "Down"
+  syntax function RTP "Up"
+  syntax function RTZ "ToZero"
+end
+
+theory ieee_float.Float32
+  syntax function round "float32(%1,%2)"
+end
+
+theory ieee_float.Float64
+  syntax function round "float64(%1,%2)"
+end

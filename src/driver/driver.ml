@@ -163,6 +163,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
     | Rconverter (q,s,b) ->
         let cs = syntax_converter (find_ls th q) s b in
         add_meta th cs meta
+    | Rliteral (q,s,b) ->
+        let cs = syntax_literal (find_ts th q) s b in
+        add_meta th cs meta
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->

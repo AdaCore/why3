@@ -199,9 +199,10 @@ module Translate = struct
         []
 
   let type_decl info ts = match ts.ts_def with
-    | None ->
+    | NoDef | Range _ | Float _ ->
+        (* FIXME: how should we extract Range and Float? *)
         ML.Dabstract
-    | Some ty ->
+    | Alias ty ->
         ML.Dalias (type_ info ty)
 
   let type_args = List.map (fun tv -> tv.tv_name)

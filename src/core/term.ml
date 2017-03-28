@@ -822,12 +822,29 @@ let t_app ls tl ty = ignore (ls_app_inst ls tl ty); t_app ls tl ty
 let fs_app fs tl ty = t_app fs tl (Some ty)
 let ps_app ps tl    = t_app ps tl None
 
-let t_const c = match c with
-  | Number.ConstInt _  -> t_const c ty_int
-  | Number.ConstReal _ -> t_const c ty_real
-
 let t_nat_const n =
-  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ty_int
+
+exception InvalidLiteralType of ty
+
+let t_const c ty =
+  let ts = match ty.ty_node with
+    | Tyapp (ts,[]) -> ts
+    | _ -> raise (InvalidLiteralType ty) in
+  begin match c with
+    | Number.ConstInt c when not (ts_equal ts ts_int) ->
+        begin match ts.ts_def with
+          | Range ir -> Number.check_range c ir
+          | _ -> raise (InvalidLiteralType ty)
+        end
+    | Number.ConstReal c when not (ts_equal ts ts_real) ->
+        begin match ts.ts_def with
+          | Float fp -> Number.check_float c fp
+          | _ -> raise (InvalidLiteralType ty)
+        end
+    | _ -> ()
+  end;
+  t_const c ty
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;

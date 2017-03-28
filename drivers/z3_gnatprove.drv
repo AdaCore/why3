@@ -47,11 +47,8 @@ steps ":rlimit-count *\\([0-9]+\\)" 1
 (** Extra theories supported by Z3 *)
 
 (* float literals  *)
-
-theory "ada__model".Finite_Float_Literal
-  remove prop l_real
-  remove prop l_is_finite
-  remove prop l_representable
+theory "_gnatprove_standard".Floating
+  syntax function rem "(fp.rem %1 %2)"
 end
 
 theory "_gnatprove_standard".Float32_next_prev

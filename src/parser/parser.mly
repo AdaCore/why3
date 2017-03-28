@@ -148,10 +148,10 @@ end
 
 (* Tokens *)
 
-%token <string> LIDENT UIDENT
+%token <string> LIDENT LIDENT_QUOTE UIDENT UIDENT_QUOTE
 %token <Ptree.integer_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Ptree.real_constant> FLOAT
+%token <Ptree.real_constant> REAL
 %token <string> STRING
 %token <Loc.position> POSITION
 %token <string> QUOTE_UIDENT QUOTE_LIDENT OPAQUE_QUOTE_LIDENT
@@ -159,9 +159,9 @@ end
 (* keywords *)
 
 %token AS AXIOM BY CLONE COINDUCTIVE CONSTANT
-%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
+%token ELSE END EPSILON EXISTS EXPORT FALSE FLOAT FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
-%token LET MATCH META NAMESPACE NOT PROP PREDICATE
+%token LET MATCH META NAMESPACE NOT PROP PREDICATE RANGE
 %token SO THEN THEORY TRUE TYPE USE WITH
 
 (* program keywords *)
@@ -177,7 +177,7 @@ end
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LAMBDA LTGT
+%token DOT DOTDOT EQUAL LAMBDA LT GT LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -205,7 +205,7 @@ end
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
-%left EQUAL LTGT OP1
+%left EQUAL LTGT LT GT OP1
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
 %left OP2
@@ -241,10 +241,10 @@ theory_or_module:
 | module_head module_decl* END  { Increment.close_module () }
 
 theory_head:
-| THEORY labels(uident)  { Increment.open_theory $2 }
+| THEORY labels(uident_nq)  { Increment.open_theory $2 }
 
 module_head:
-| MODULE labels(uident)  { Increment.open_module $2 }
+| MODULE labels(uident_nq)  { Increment.open_module $2 }
 
 theory_decl:
 | decl            { Increment.new_decl  (floc $startpos $endpos) $1 }
@@ -260,7 +260,7 @@ module_decl:
     { Increment.close_namespace (floc $startpos($1) $endpos($1)) $1 }
 
 namespace_head:
-| NAMESPACE boption(IMPORT) uident
+| NAMESPACE boption(IMPORT) uident_nq
    { Increment.open_namespace $3.id_str; $2 }
 
 (* Use and clone *)
@@ -302,9 +302,9 @@ decl:
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
 | INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
 | COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM labels(ident) COLON term            { Dprop (Decl.Paxiom, $2, $4) }
-| LEMMA labels(ident) COLON term            { Dprop (Decl.Plemma, $2, $4) }
-| GOAL  labels(ident) COLON term            { Dprop (Decl.Pgoal, $2, $4) }
+| AXIOM labels(ident_nq) COLON term         { Dprop (Decl.Paxiom, $2, $4) }
+| LEMMA labels(ident_nq) COLON term         { Dprop (Decl.Plemma, $2, $4) }
+| GOAL  labels(ident_nq) COLON term         { Dprop (Decl.Pgoal, $2, $4) }
 | META sident comma_list1(meta_arg)         { Dmeta ($2, $3) }
 
 meta_arg:
@@ -319,7 +319,7 @@ meta_arg:
 (* Type declarations *)
 
 type_decl:
-| labels(lident) ty_var* typedefn
+| labels(lident_nq) ty_var* typedefn
   { let model, vis, def, inv = $3 in
     let vis = if model then Abstract else vis in
     { td_ident = $1; td_params = $2;
@@ -327,7 +327,7 @@ type_decl:
       td_inv = inv; td_loc = floc $startpos $endpos } }
 
 late_invariant:
-| labels(lident) ty_var* invariant+
+| labels(lident_nq) ty_var* invariant+
   { { td_ident = $1; td_params = $2;
       td_model = false; td_vis = Public; td_def = TDabstract;
       td_inv = $3; td_loc = floc $startpos $endpos } }
@@ -344,6 +344,13 @@ typedefn:
     { $1, $2, TDrecord $4, $6 }
 | model abstract ty invariant*
     { $1, $2, TDalias $3, $4 }
+(* FIXME: allow negative bounds *)
+| EQUAL LT RANGE INTEGER INTEGER GT
+    { false, Public,
+      TDrange (Number.compute_int $4, Number.compute_int $5), [] }
+| EQUAL LT FLOAT INTEGER INTEGER GT
+    { false, Public,
+      TDfloat (small_integer $4, small_integer $5), [] }
 
 model:
 | EQUAL         { false }
@@ -355,7 +362,7 @@ abstract:
 | ABSTRACT      { Abstract }
 
 type_field:
-| field_modifiers labels(lident) cast
+| field_modifiers labels(lident_nq) cast
   { { f_ident = $2; f_mutable = fst $1; f_ghost = snd $1;
       f_pty = $3; f_loc = floc $startpos $endpos } }
 
@@ -367,7 +374,7 @@ field_modifiers:
 | MUTABLE GHOST { true,  true  }
 
 type_case:
-| labels(uident) params { floc $startpos $endpos, $1, $2 }
+| labels(uident_nq) params { floc $startpos $endpos, $1, $2 }
 
 (* Logic declarations *)
 
@@ -403,7 +410,7 @@ ind_defn:
 | EQUAL bar_list1(ind_case) { $2 }
 
 ind_case:
-| labels(ident) COLON term  { floc $startpos $endpos, $1, $3 }
+| labels(ident_nq) COLON term  { floc $startpos $endpos, $1, $3 }
 
 (* Type expressions *)
 
@@ -516,11 +523,11 @@ binder_vars_head:
       | _ -> Loc.error ~loc:(floc $startpos $endpos) Error }
 
 binder_var:
-| labels(lident)  { floc $startpos $endpos, Some $1 }
-| anon_binder     { $1 }
+| labels(lident_nq) { floc $startpos $endpos, Some $1 }
+| anon_binder       { $1 }
 
 anon_binder:
-| UNDERSCORE      { floc $startpos $endpos, None }
+| UNDERSCORE        { floc $startpos $endpos, None }
 
 (* Logical terms *)
 
@@ -638,7 +645,7 @@ quant:
 
 numeral:
 | INTEGER { Number.ConstInt $1 }
-| FLOAT   { Number.ConstReal $1 }
+| REAL    { Number.ConstReal $1 }
 
 (* Program declarations *)
 
@@ -647,8 +654,8 @@ pdecl:
 | LET top_ghost labels(lident_rich) fun_defn        { Dfun ($3, $2, $4) }
 | LET top_ghost labels(lident_rich) EQUAL fun_expr  { Dfun ($3, $2, $5) }
 | LET REC with_list1(rec_defn)                      { Drec $3 }
-| EXCEPTION labels(uident)                          { Dexn ($2, PTtuple []) }
-| EXCEPTION labels(uident) ty                       { Dexn ($2, $3) }
+| EXCEPTION labels(uident_nq)                       { Dexn ($2, PTtuple []) }
+| EXCEPTION labels(uident_nq) ty                    { Dexn ($2, $3) }
 
 top_ghost:
 | (* epsilon *) { Gnone  }
@@ -739,7 +746,7 @@ expr_:
           Ematch (e, [$3, $7]) }
 | LET top_ghost labels(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($3, $2, $5, $7) }
-| LET top_ghost labels(lident) fun_defn IN seq_expr
+| LET top_ghost labels(lident_nq) fun_defn IN seq_expr
     { Efun ($3, $2, $4, $6) }
 | LET top_ghost labels(lident_op_id) fun_defn IN seq_expr
     { Efun ($3, $2, $4, $6) }
@@ -913,12 +920,12 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS labels(lident)    { Pas ($1,$3) }
+| mk_pat(pat_uni_) AS labels(lident_nq) { Pas ($1,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast($1,$2) }
 
 pat_arg_:
 | UNDERSCORE                            { Pwild }
-| labels(lident)                        { Pvar $1 }
+| labels(lident_nq)                     { Pvar $1 }
 | uqualid                               { Papp ($1,[]) }
 | LEFTPAR RIGHTPAR                      { Ptuple [] }
 | LEFTPAR pattern_ RIGHTPAR             { $2 }
@@ -930,15 +937,34 @@ ident:
 | uident { $1 }
 | lident { $1 }
 
+ident_nq:
+| uident_nq { $1 }
+| lident_nq { $1 }
+
 uident:
 | UIDENT          { mk_id $1 $startpos $endpos }
+| UIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+
+uident_nq:
+| UIDENT          { mk_id $1 $startpos $endpos }
+| UIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
 | lident_keyword  { mk_id $1 $startpos $endpos }
+| LIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+
+lident_nq:
+| LIDENT          { mk_id $1 $startpos $endpos }
+| lident_keyword  { mk_id $1 $startpos $endpos }
+| LIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
 
 lident_keyword:
 | MODEL           { "model" }
+| RANGE           { "range" }
+| FLOAT           { "float" }
 
 quote_uident:
 | QUOTE_UIDENT  { mk_id ("'" ^ $1) $startpos $endpos }
@@ -951,12 +977,8 @@ opaque_quote_lident:
 
 (* Idents + symbolic operation names *)
 
-ident_rich:
-| uident        { $1 }
-| lident_rich   { $1 }
-
 lident_rich:
-| lident        { $1 }
+| lident_nq     { $1 }
 | lident_op_id  { $1 }
 
 lident_op_id:
@@ -980,6 +1002,8 @@ op_symbol:
 | OP2 { $1 }
 | OP3 { $1 }
 | OP4 { $1 }
+| LT  { "<" }
+| GT  { ">" }
 
 %inline oppref:
 | o = OPPREF { mk_id (prefix o)  $startpos $endpos }
@@ -994,16 +1018,24 @@ prefix_op:
 | o = OP4   { mk_id (infix o)    $startpos $endpos }
 | EQUAL     { mk_id (infix "=")  $startpos $endpos }
 | LTGT      { mk_id (infix "<>") $startpos $endpos }
+| LT        { mk_id (infix "<")  $startpos $endpos }
+| GT        { mk_id (infix ">")  $startpos $endpos }
 
 (* Qualified idents *)
 
 qualid:
-| ident_rich              { Qident $1 }
-| uqualid DOT ident_rich  { Qdot ($1, $3) }
+| uident                    { Qident $1 }
+| lident                    { Qident $1 }
+| lident_op_id              { Qident $1 }
+| uqualid DOT uident        { Qdot ($1, $3) }
+| uqualid DOT lident        { Qdot ($1, $3) }
+| uqualid DOT lident_op_id  { Qdot ($1, $3) }
 
 lqualid_rich:
-| lident_rich             { Qident $1 }
-| uqualid DOT lident_rich { Qdot ($1, $3) }
+| lident                    { Qident $1 }
+| lident_op_id              { Qident $1 }
+| uqualid DOT lident        { Qdot ($1, $3) }
+| uqualid DOT lident_op_id  { Qdot ($1, $3) }
 
 lqualid:
 | lident              { Qident $1 }

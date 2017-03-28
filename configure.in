@@ -176,8 +176,8 @@ OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version* *\(.*\)$|\1|p' `
 echo "ocaml version is $OCAMLVERSION"
 
 case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*|4.00.*)
-        AC_MSG_ERROR(You need Objective Caml 4.01.0 or higher);;
+  0.*|1.*|2.*|3.*|4.00.*|4.01.*|4.02.[[0-2]])
+        AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher);;
 esac
 
 # Ocaml library path

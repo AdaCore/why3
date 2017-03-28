@@ -9,7 +9,6 @@ prelude ";; produced by z3_432.drv ;;"
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-
 import "smt-libv2.drv"
 import "no-bv.gen"
 import "discrimination.gen"
@@ -25,6 +24,8 @@ transformation "eliminate_definition"
 *)
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
+transformation "eliminate_literal"
+transformation "eliminate_epsilon"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)

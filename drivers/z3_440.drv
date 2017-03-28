@@ -7,9 +7,9 @@
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "smt-libv2-floats.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -23,6 +23,8 @@ transformation "eliminate_definition"
 *)
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic_if_poly"
+transformation "eliminate_literal"
+transformation "eliminate_epsilon"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
@@ -80,7 +82,7 @@ end
    have the same name for the function to_uint *)
 theory bv.BV64
   syntax converter of_int "((_ int2bv 64) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -88,7 +90,7 @@ end
 
 theory bv.BV32
   syntax converter of_int "((_ int2bv 32) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -96,7 +98,7 @@ end
 
 theory bv.BV16
   syntax converter of_int "((_ int2bv 16) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
@@ -104,8 +106,26 @@ end
 
 theory bv.BV8
   syntax converter of_int "((_ int2bv 8) %1)"
-  syntax function to_uint "(bv2int %1)"
+  syntax function t'int "(bv2int %1)"
 
   remove prop Nth_bv_is_nth
   remove prop Nth_bv_is_nth2
+end
+
+theory ieee_float.Float64
+(* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
+   syntax function to_int
+     "(ite (= ((_ extract 1024 1024) ((_ fp.to_sbv 1025) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 1025) %1 %2)) (- (bv2int ((_ fp.to_sbv 1025) %1 %2)) (bv2int (bvshl (_ bv1 1026) (_ bv1025 1026)))))"
+ (* we do not define of_int since z3 will not prove anything if it
+    appears (05/01/2017) *)
+end
+
+theory ieee_float.Float32
+  (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
+   syntax function to_int
+     "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
+end
+
+theory real.Square
+  remove allprops
 end

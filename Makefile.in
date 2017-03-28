@@ -197,9 +197,8 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
 		reduction_engine compute induction_pr prop_curry \
-		rec_logic eliminate_bounded_types \
-		gnat_split_conj gnat_split_disj \
-		eliminate_unused_hypo
+		rec_logic gnat_split_conj gnat_split_disj \
+		eliminate_unused_hypo eliminate_literal
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 smtv2_cvc_ce coq\
 	      pvs isabelle \
@@ -380,19 +379,26 @@ endif
 
 PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+		plugins/python/py_lexer.ml \
+		plugins/python/py_parser.ml plugins/python/py_parser.mli \
 		plugins/parser/dimacs.ml \
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_PYTHON = py_ast py_parser py_lexer py_main
 
-PLUGINS = genequlin dimacs tptp
+PLUGINS = genequlin dimacs tptp python
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
+PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
 
 ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
@@ -407,13 +413,13 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp
+PLUGDIRS = parser printer transform tptp python
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
@@ -456,6 +462,14 @@ lib/plugins/tptp.cmxs: $(TPTPCMX)
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
 lib/plugins/tptp.cmo: $(TPTPCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+lib/plugins/python.cmxs: $(PYTHONCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/python.cmo: $(PYTHONCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
@@ -989,7 +1003,11 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 COQLIBS_BOOL_FILES = Bool
 COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
+ifeq (@enable_coq_fp_libs@,yes)
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry Truncate
+else
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
+endif
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -1017,9 +1035,12 @@ ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
+
+COQLIBS_IEEEFLOAT_FILES = GenericFloat
+COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
 
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
@@ -1046,6 +1067,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BV_FILES); do \
 	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_IEEEFLOAT_FILES); do \
+	echo 'theory ieee_float.'"$$f"' meta "realized_theory" "ieee_float.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -1076,9 +1099,11 @@ install_no_local::
 ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/floating_point
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1109,6 +1134,9 @@ update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theorie
 
 update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/bv.why
 	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T bv.$$f -o lib/coq/bv/; done
+
+update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/ieee_float.why
+	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T ieee_float.$$f -o lib/coq/ieee_float/; done
 
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
@@ -1548,7 +1576,7 @@ else
  JS_MAPS=
 endif
 
-ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
+ALTERGODIR=src/trywhy3/alt-ergo
 
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
         -syntax camlp4o -I src/trywhy3 \
@@ -1561,27 +1589,25 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
 	-I $(ALTERGODIR)/src/sat \
 	-I $(ALTERGODIR)/src/main
 
-ALTERGOMODS=util/numsNumbers util/numbers \
-	util/version util/myUnix util/config util/options \
-	util/hashcons util/hstring util/lists util/loc \
+ALTERGOMODS=util/config util/version util/emap util/myUnix util/myDynlink \
+	util/myZip util/util util/lists util/numsNumbers util/numbers \
+	util/timers util/options util/gc_debug util/loc util/hashcons \
+	util/hstring \
+	structures/exception structures/symbols structures/ty \
+	structures/parsed structures/typed structures/term structures/literal \
+	structures/formula structures/explanation structures/errors \
 	util/profiling_default util/profiling \
-	util/util \
-	structures/parsed structures/symbols \
-	structures/ty structures/errors \
-	structures/term structures/literal structures/formula \
-	structures/explanation structures/exception \
 	parsing/why_parser parsing/why_lexer \
-	preprocess/existantial preprocess/triggers \
-	preprocess/why_typing preprocess/cnf \
-	theories/polynome theories/ac \
-	theories/intervals theories/inequalities \
-	theories/intervalCalculus \
-	theories/arith theories/records theories/bitv \
-	theories/arrays theories/sum theories/uf theories/use \
-	theories/combine theories/ccx theories/theory \
-	instances/matching \
+	preprocess/existantial preprocess/triggers preprocess/why_typing \
+	preprocess/cnf \
+	instances/matching instances/instances \
+	theories/polynome theories/ac theories/uf theories/use \
+	theories/intervals theories/inequalities theories/intervalCalculus \
+	theories/arith theories/records theories/bitv theories/arrays \
+	theories/sum theories/combine theories/ccx theories/theory \
 	sat/sat_solvers \
 	main/frontend
+
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 TRYWHY3CMO=lib/why3/why3.cma
 TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
@@ -1590,7 +1616,7 @@ TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
 	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
 	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
-	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
 trywhy3_package: trywhy3
@@ -1624,7 +1650,7 @@ src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) -I +ocplib-simplex $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) ocplibSimplex.cma $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
 src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo

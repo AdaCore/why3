@@ -20,7 +20,6 @@ theory ieee_float.GenericFloat
    syntax function fma  "(fp.fma %1 %2 %3 %4)"
 
    syntax function sqrt "(fp.sqrt %1 %2)"
-   syntax function rem  "(fp.rem %1 %2)"
 
    syntax function roundToIntegral "(fp.roundToIntegral %1 %2)"
 
@@ -42,7 +41,7 @@ theory ieee_float.GenericFloat
    syntax predicate is_positive  "(fp.isPositive  %1)"
    syntax predicate is_negative  "(fp.isNegative  %1)"
 
-   syntax predicate is_finite "(or (fp.isNormal %1) (or (fp.isZero %1) (fp.isSubnormal %1)))"
+   syntax predicate is_finite "(not (or (fp.isInfinite %1) (fp.isNaN %1)))"
 
    syntax function to_real  "(fp.to_real %1)"
 
@@ -58,12 +57,10 @@ end
 theory ieee_float.Float32
   (* Part I *)
   syntax type t "Float32"
-
-  syntax converter from_binary "((_ to_fp 8 24) ((_ int2bv 32) %1))"
-  syntax converter (!_) "((_ to_fp 8 24) %1 %2)"
+  meta "literal:keep" type t
+  syntax literal t "(fp #b%s1b #b%e8b #b%m23b)"
 
   syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
-  syntax function half      "((_ to_fp 8 24) #x3F000000)"
 
   remove allprops
 end
@@ -71,12 +68,10 @@ end
 theory ieee_float.Float64
   (* Part I *)
   syntax type t "Float64"
-
-  syntax converter from_binary "((_ to_fp 11 53) ((_ int2bv 64) %1))"
-  syntax converter (!_) "((_ to_fp 11 53) %1 %2)"
+  meta "literal:keep" type t
+  syntax literal t "(fp #b%s1b #b%e11b #b%m52b)"
 
   syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
-  syntax function half      "((_ to_fp 11 53) #x3FE0000000000000)"
 
   remove allprops
 end

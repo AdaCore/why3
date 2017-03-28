@@ -62,7 +62,7 @@ type info = {
 
 let complex_type = Wty.memoize 3 (fun ty ->
   let s = Pp.string_of_wnl Pretty.print_ty ty in
-  create_tysymbol (id_fresh s) [] None)
+  create_tysymbol (id_fresh s) [] NoDef)
 
 let rec print_type info fmt ty = match ty.ty_node with
   | Tyvar _ when info.info_fmt = TFF0 ->
@@ -200,7 +200,7 @@ let print_fmla info fmt f =
 
 let print_decl info fmt d = match d.d_node with
   | Dtype _ when info.info_fmt = FOF -> ()
-  | Dtype { ts_def = Some _ } -> ()
+  | Dtype { ts_def = Alias _ } -> ()
   | Dtype { ts_args = _::_ } when info.info_fmt = TFF0 -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->

@@ -179,12 +179,16 @@ module Editor =
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
+      let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
-      List.iter (fun e ->
-		 ignore (JSU.(meth_call e "setTheme" [| inject editor_theme |]));
-		 ignore (JSU.(meth_call (get_session e) "setMode" [| inject editor_mode |]));
-		 JSU.(set e (Js.string "$blockScrolling") _Infinity)
-		) [ editor; task_viewer ];
+      ignore (JSU.(meth_call editor "setTheme" [| inject editor_theme |]));
+      ignore (JSU.(meth_call (get_session editor) "setMode" [| inject editor_mode |]));
+      JSU.(set editor (Js.string "$blockScrolling") _Infinity);
+
+      ignore (JSU.(meth_call task_viewer "setTheme" [| inject editor_theme |]));
+      ignore (JSU.(meth_call (get_session task_viewer) "setMode" [| inject task_viewer_mode |]));
+      JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
+
       JSU.(meth_call task_viewer "setReadOnly" [| inject Js._true|])
 
     let undo () =
@@ -219,10 +223,10 @@ module Editor =
     let why3_loc_to_range buffer loc =
       let goto_line lstop =
         let rec loop lcur i =
-          if lcur == lstop then i
+          if lcur >= lstop then i
           else
             let c = get_char buffer i in
-            loop (if c == 0 then lcur+1 else lcur) (i+1)
+            loop (if c == 10 then lcur+1 else lcur) (i+1)
         in
         loop 1 0
       in
@@ -472,6 +476,14 @@ module TaskList =
       Editor.set_value ~editor:Editor.task_viewer (Js.string "")
 
     let error_marker = ref None
+
+    let update_error_marker new_m =
+      begin match !error_marker with
+      | Some (m, _) -> Editor.remove_marker m
+      | None -> ()
+      end;
+      error_marker := new_m
+
     let () =
       Editor.set_on_event
         "change"
@@ -479,9 +491,7 @@ module TaskList =
                                   Editor.saved := false;
                                   ExampleList.unselect ();
 				  Editor.clear_annotations ();
-                                  match !error_marker with
-                                    None -> ()
-                                  | Some (m, _) -> Editor.remove_marker m;error_marker := None))
+                                  update_error_marker None))
 
     let () =
       Editor.set_on_event
@@ -505,7 +515,7 @@ module TaskList =
 
       | ErrorLoc ((l1, b, l2, e), s) ->
          let r = Editor.mk_range l1 b l2 e in
-         error_marker := Some (Editor.add_marker "why3-error" r, r);
+         update_error_marker (Some (Editor.add_marker "why3-error" r, r));
          print_error s;
 	 Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
 
