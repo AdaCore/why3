@@ -96,6 +96,7 @@ module ML = struct
     | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
     | Eraise  of xsymbol * expr option
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
+    | Eignore of expr
     | Eabsurd
     | Ehole
     (* | Eany *)
@@ -240,6 +241,7 @@ module ML = struct
       List.iter (iter_deps_xbranch f) xbranchl
     | Eassign assingl ->
       List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
+    | Eignore e -> iter_deps_expr f e
 
   let rec iter_deps f = function
     | Dtype its_dl ->
@@ -267,8 +269,12 @@ module ML = struct
 
   let tunit = Ttuple []
 
-  let ity_int  = I ity_int
-  let ity_unit = I ity_unit
+  let ity_int  = I Ity.ity_int
+  let ity_unit = I Ity.ity_unit
+
+  let is_unit = function
+    | I i -> ity_equal i Ity.ity_unit
+    | _ -> false
 
   let enope = Eblock []
 
@@ -285,6 +291,10 @@ module ML = struct
   let mk_its_defn id args private_ def =
     { its_name    = id      ; its_args = args;
       its_private = private_; its_def  = def; }
+
+  let mk_ignore e =
+    if is_unit e.e_ity then e
+    else { e_node = Eignore e; e_effect = e.e_effect; e_ity = ity_unit }
 
   let eseq e1 e2 =
     match e1.e_node, e2.e_node with
@@ -545,13 +555,11 @@ module Translate = struct
       expr info e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
       ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) ML.ity_unit eff
-    | Elet (LDvar (pv, _e1), e2) (* FIXME *)
-      when pv.pv_ghost (* || not (Mpv.mem pv e2.e_effect.eff_reads) *) ->
-      (* ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity)
-         eff *)
-      expr info e2
-    | Elet (LDvar (pv, e1), e2) when not (Mpv.mem pv e2.e_effect.eff_reads) ->
-      ML.mk_expr (ML.eseq (expr info e1) (expr info e2)) (ML.I e.e_ity) eff
+    | Elet (LDvar (pv, e1), e2)
+      when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
+      if eff_pure e1.e_effect then expr info e2
+      else let e1 = ML.mk_ignore (expr info e1) in
+        ML.mk_expr (ML.eseq e1 (expr info e2)) (ML.I e.e_ity) eff
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
@@ -831,76 +839,110 @@ module Transform = struct
 
   type subst = expr Mpv.t
 
+  let mk_list_eb ebl f =
+    let mk_acc e (e_acc, s_acc) =
+      let e, s = f e in e::e_acc, Spv.union s s_acc in
+    List.fold_right mk_acc ebl ([], Spv.empty)
+
   let rec expr info subst e =
-    let mk n = { e with e_node = n } in
+    let mk e_node = { e with e_node = e_node } in
     let add_subst pv e1 e2 = expr info (Mpv.add pv e1 subst) e2 in
     match e.e_node with
-    | Evar pv -> (try Mpv.find pv subst with Not_found -> e)
-    (* | Elet (Lvar (pv, ({e_node = Econst _ } as e1)), e2) *)
-    (* | Elet (Lvar (pv, ({e_node = Eblock []} as e1)), e2) *)
-    (*   when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label -> *)
-    (*   add_subst pv e1 e2 *)
-    (* | Elet (Lvar (pv, ({e_node = Eapp (rs, _)} as e1)), e2) *)
-    (*   when Translate.isconstructor info rs && *)
-    (*        Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label -> *)
-    (*   (\* because of Lvar we know the constructor is completely applied *\) *)
-    (*   add_subst pv e1 e2 *)
+    | Evar pv ->
+      (try Mpv.find pv subst, Spv.singleton pv with Not_found -> e, Spv.empty)
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
       when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label &&
            eff_pure eff1 &&
            not (conflict_reads_writes eff1.eff_reads eff2.eff_writes) ->
-      let e1 = expr info subst e1 in
-      add_subst pv e1 e2
+      let e1, s1 = expr info subst e1 in
+      let e2, s2 = add_subst pv e1 e2 in
+      let s_union = Spv.union s1 s2 in
+      if Spv.mem pv s2 then e2, s_union (* [pv] was substituted in [e2] *)
+      else (* [pv] was not substituted in [e2], e.g [e2] is an [Efun] *)
+        mk (Elet (Lvar (pv, e1), e2)), s_union
     | Elet (ld, e) ->
-      mk (Elet (let_def info subst ld, expr info subst e))
+      let e, spv = expr info subst e in
+      let e_let, spv_let = let_def info subst ld in
+      mk (Elet (e_let, e)), Spv.union spv spv_let
     | Eapp (rs, el) ->
-      mk (Eapp (rs, List.map (expr info subst) el))
+      let e_app, spv = mk_list_eb el (expr info subst) in
+      mk (Eapp (rs, e_app)), spv
     | Efun (vl, e) ->
-      mk (Efun (vl, expr info subst e))
+      (* We begin the inlining of proxy variables in an [Efun]
+         with the empty substituion. This keeps A-normal lets,
+         preventing undiserable capture of variables insinde. *)
+      let e, spv = expr info Mpv.empty e in
+      mk (Efun (vl, e)), spv
     | Eif (e1, e2, e3) ->
-      mk (Eif (expr info subst e1, expr info subst e2, expr info subst e3))
+      let e1, s1 = expr info subst e1 in
+      let e2, s2 = expr info subst e2 in
+      let e3, s3 = expr info subst e3 in
+      mk (Eif (e1, e2, e3)), Spv.union (Spv.union s1 s2) s3
     | Ematch (e, bl) ->
-      mk (Ematch (expr info subst e, List.map (branch info subst) bl))
+      let e, spv = expr info subst e in
+      let e_bl, spv_bl = mk_list_eb bl (branch info subst) in
+      mk (Ematch (e, e_bl)), Spv.union spv spv_bl
     | Eblock el ->
-      mk (Eblock (List.map (expr info subst) el))
+      let e_app, spv = mk_list_eb el (expr info subst) in
+      mk (Eblock e_app), spv
     | Ewhile (e1, e2) ->
-      mk (Ewhile (expr info subst e1, expr info subst e2))
+      let e1, s1 = expr info subst e1 in
+      let e2, s2 = expr info subst e2 in
+      mk (Ewhile (e1, e2)), Spv.union s1 s2
     | Efor (x, pv1, dir, pv2, e) ->
-      let e = mk (Efor (x, pv1, dir, pv2, expr info subst e)) in
+      let e, spv = expr info subst e in
+      let e = mk (Efor (x, pv1, dir, pv2, e)) in
       (* be careful when pv1 and pv2 are in subst *)
-      mk_let subst pv1 (mk_let subst pv2 e)
-    | Eraise (exn, eo) ->
-      mk (Eraise (exn, Opt.map (expr info subst) eo))
+      mk_let subst pv1 (mk_let subst pv2 e), spv
+    | Eraise (exn, None) -> mk (Eraise (exn, None)), Spv.empty
+    | Eraise (exn, Some e) ->
+      let e, spv = expr info subst e in
+      mk (Eraise (exn, Some e)), spv
     | Etry (e, bl) ->
-      mk (Etry (expr info subst e, List.map (xbranch info subst) bl))
+      let e, spv = expr info subst e in
+      let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
+      mk (Etry (e, e_bl)), Spv.union spv spv_bl
     | Eassign al ->
       let assign e (_, _, pv) = mk_let subst pv e in
-      List.fold_left assign e al
-    | Econst _ | Eabsurd | Ehole -> e
+      List.fold_left assign e al, Spv.empty
+    | Econst _ | Eabsurd | Ehole -> e, Spv.empty
+    | Eignore e ->
+      let e, spv = expr info subst e in
+      mk (Eignore e), spv
 
   and mk_let subst pv e =
-    try
-      let e1 = Mpv.find pv subst in
+    try let e1 = Mpv.find pv subst in
       { e with e_node = Elet (Lvar (pv, e1), e) }
     with Not_found -> e
 
-  and branch info subst (pat, e) = pat, expr info subst e
-  and xbranch info subst (exn, pat, e) = exn, pat, expr info subst e
+  and branch info subst (pat, e) =
+    let e, spv = expr info subst e in (pat, e), spv
+  and xbranch info subst (exn, pvl, e) =
+    let e, spv = expr info subst e in (exn, pvl, e), spv
 
   and let_def info subst = function
     | Lvar (pv, e) ->
       assert (not (Mpv.mem pv subst)); (* no capture *)
-      Lvar (pv, expr info subst e)
+      let e, spv = expr info subst e in
+      Lvar (pv, e), spv
     | Lsym (rs, res, args, e) ->
-      Lsym (rs, res, args, expr info subst e)
-    | Lrec rl -> Lrec (List.map (rdef info subst) rl)
+      let e, spv = expr info subst e in
+      Lsym (rs, res, args, e), spv
+    | Lrec rl ->
+      let rdef, spv = mk_list_eb rl (rdef info subst) in
+      Lrec rdef, spv
 
   and rdef info subst r =
-    { r with rec_exp = expr info subst r.rec_exp }
+    let rec_exp, spv = expr info subst r.rec_exp in
+    { r with rec_exp = rec_exp }, spv
 
   let pdecl info = function
     | Dtype _ | Dexn _ | Dclone _ as d -> d
-    | Dlet def -> Dlet (let_def info Mpv.empty def)
+    | Dlet def ->
+      (* for top-level symbols we can forget
+         the set of inlined variables *)
+      let e, _ = let_def info Mpv.empty def in
+      Dlet e
 
   let module_ m =
     let mod_decl = List.map (pdecl m.mod_from) m.mod_decl in

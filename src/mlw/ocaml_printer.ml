@@ -402,6 +402,7 @@ module Print = struct
       fprintf fmt
         "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
+    | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
     (* | Enot _ -> (\* TODO *\) assert false *)
     (* | Ebinop _ -> (\* TODO *\) assert false *)
     (* | Ecast _ -> (\* TODO *\) assert false *)
