@@ -1,15 +1,65 @@
-module C
+module A
 
+  use import map.Map
   use import mach.int.Int32
+  use import mach.int.UInt32
+  use import array.Array
+  use import int.Int
 
   type ptr 'a = private {
-    mutable data : 'a;
+    mutable data : array 'a;
     offset : int ;
   }
+
+  function plength (p:ptr 'a) : int
+  = p.data.length
+
+  function pelts (p:ptr 'a) : int -> 'a
+  = p.data.elts
 
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
-    alias { p.data ~ result.data }
+    alias { p.data ~ result.data }
+
+  val malloc (sz:uint32) : ptr 'a
+    ensures { plength result = UInt32.to_int sz }
+    ensures { result.offset = 0 }
+
+  val get (p:ptr 'a) : 'a
+    requires { 0 <= p.offset < plength p }
+    ensures { result = (p.data)[p.offset] }
+(*
+  let get_ofs (p:ptr 'a) (ofs:int32) : 'a
+    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
+    ensures { result = (p.data)[p.offset + Int32.to_int ofs] }
+  = get (incr p ofs)
+*)
+  val set (p:ptr 'a) (v:'a) : unit
+    requires { 0 <= p.offset < plength p }
+    ensures { pelts p = Map.set (pelts (old p)) p.offset v }
+    writes { p.data.elts }
+(*
+  let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
+    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
+    ensures { pelts p = Map.set (pelts (old p))
+              (p.offset + Int32.to_int ofs) v }
+    writes { p.data.elts }
+  =
+    set (incr p ofs) v
+*)
+  let test () : unit
+  =
+    let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
+    let three = UInt32.of_int 3 in
+    let p = malloc three in
+    let q = incr p zero in
+    set p 42;
+    let x = get q in
+    assert { x = 42 };
+    set q 27;
+    let y = get p in
+    assert { y = 27 }
 
 end

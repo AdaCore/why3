@@ -505,11 +505,15 @@ let dwrites muc wl lvm =
   let dwrites t = type_term muc lvm old t in
   List.map dwrites wl
 
-let dalias muc al lvm =
+let dalias muc al lvm ity =
   let old _ _ = Loc.errorm
       "`at' and `old' cannot be used in the `alias' clause" in
   let dalias (t1,t2) =
-    (type_term muc lvm old t1, type_term muc lvm old t2) in
+    (type_term muc lvm old t1,
+     (* result only allowed on the right *)
+     let v = create_pvsymbol (id_fresh "result") ity in
+     let lvm = Mstr.add "result" v lvm in
+     type_term muc lvm old t2) in
   List.map dalias al
 
 
@@ -528,7 +532,7 @@ let dspec muc sp lvm old ity = {
   ds_xpost   = dxpost muc sp.sp_xpost lvm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
-  ds_alias   = dalias muc sp.sp_alias lvm;
+  ds_alias   = dalias muc sp.sp_alias lvm ity;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge; }
 

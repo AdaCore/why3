@@ -833,13 +833,16 @@ let alias_of_dspec dsp ity =
     match (effect_of_term t, effect_of_term rt) with
     | (_, ({ity_node = Ityreg reg} as ity), _),
       (_, ({ity_node = Ityreg _} as rity), _) ->
-      (ity_match sbs rity ity, Sreg.add reg regs)
+      (ity_match sbs ity rity, Sreg.add reg regs)
     | (_, {ity_node = Ityreg _}, _), _ ->
       Loc.errorm ?loc:rt.t_loc "mutable expression expected"
     | _ ->
       Loc.errorm ?loc:t.t_loc "mutable expression expected" in
   let sbs, regs =
-    List.fold_left add_alias (isb_empty, Sreg.empty) dsp.ds_alias in
+    List.fold_left
+      add_alias
+      (ity_match isb_empty ity ity, Sreg.empty)
+      dsp.ds_alias in
   let ity = ity_full_inst sbs ity in
   let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in (* FIXME ? *)
   ity, regs
