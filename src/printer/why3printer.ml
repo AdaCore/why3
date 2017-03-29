@@ -93,8 +93,10 @@ let rec print_ty_node inn tables fmt ty = match ty.ty_node with
 
 let print_ty = print_ty_node false
 
+(*
 let print_vsty tables fmt v =
   fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
+ *)
 
 (** Forgetting function for stability of errors *)
 let print_forget_vsty tables fmt v =
@@ -144,7 +146,13 @@ let rec print_pat_node pri tables fmt p = match p.pat_node with
 
 let print_pat = print_pat_node 0
 
-let print_const = Pretty.print_const
+(*
+let print_const = Number.print_constant
+ *)
+
+let print_vsty tables fmt v =
+  fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
+
 let print_quant = Pretty.print_quant
 let print_binop = Pretty.print_binop
 
@@ -188,7 +196,7 @@ and print_tnode pri tables fmt t = match t.t_node with
   | Tvar v ->
       print_vs tables fmt v
   | Tconst c ->
-      print_const fmt c
+      Number.print_constant fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs tables fmt tl
   | Tapp (fs, tl) ->
@@ -260,14 +268,22 @@ let print_constr tables fmt (cs,pjl) =
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl tables fmt ts = match ts.ts_def with
-  | None ->
+  | NoDef ->
       fprintf fmt "@[<hov 2>type %a%a%a@]@\n"
         (print_ts tables) ts print_ident_labels ts.ts_name
         (print_list nothing (print_tv_arg tables)) ts.ts_args
-  | Some ty ->
+  | Alias ty ->
       fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n"
         (print_ts tables) ts print_ident_labels ts.ts_name
         (print_list nothing (print_tv_arg tables)) ts.ts_args (print_ty tables) ty
+  | Range _ir -> (* TODO *)
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <range ...>@]@\n@\n"
+        (print_ts tables) ts print_ident_labels ts.ts_name
+        (print_list nothing (print_tv_arg tables)) ts.ts_args
+  | Float _fp -> (* TODO *)
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <float ...>@]@\n@\n"
+        (print_ts tables) ts print_ident_labels ts.ts_name
+        (print_list nothing (print_tv_arg tables)) ts.ts_args
 
 let print_type_decl tables fmt ts =
   if not (query_remove ts.ts_name) then

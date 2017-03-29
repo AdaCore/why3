@@ -21,7 +21,7 @@ module GmpModel
   use export array.Array
 
   constant beta' : int
-  axiom beta'_gt_1: 1 < beta'
+  axiom one_lt_beta' : 1 < beta'
   constant beta : int = 2 * beta'
 
   type memory = array int
@@ -154,7 +154,7 @@ module GmpAuxiliaryfunctions
   if (nat_eq_bool !l !h) then
      c := !c - !b
   else
-     begin 
+     begin
        (mpn_sub_1 (plus np (mult (S (S O)) !l))
                   (plus np (mult (S (S O)) !l))
                   (S O) !b);

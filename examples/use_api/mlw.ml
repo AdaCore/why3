@@ -11,7 +11,7 @@
 
 (*******************
 
-This file builds some MLW modules using the API 
+This file builds some MLW modules using the API
 
 ******************)
 
@@ -64,9 +64,9 @@ let d =
   }
   in
   let body =
-    let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
-    let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
-    let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
+    let c6  = Term.t_nat_const 6 in
+    let c7  = Term.t_nat_const 7 in
+    let c42 = Term.t_nat_const 42 in
     let p =
       Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
     in
@@ -134,7 +134,8 @@ let d2 =
       (* e1 : the appropriate instance of "ref" *)
       let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
       (* we apply it to 0 *)
-      let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let c0 = Mlw_expr.e_const
+        (Number.ConstInt (Number.int_const_dec "0")) Mlw_ty.ity_int in
       Mlw_expr.e_app e1 [c0]
     in
     (* building the first part of the let x = ref 0 *)

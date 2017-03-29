@@ -28,7 +28,7 @@ let meta_base = register_meta_excl "encoding : base" [MTty]
     polymorphism@ encoding@ (`int'@ or@ `real'@ only)."
 
 (* sort symbol of the default base type *)
-let ts_base = create_tysymbol (id_fresh "uni") [] None
+let ts_base = create_tysymbol (id_fresh "uni") [] NoDef
 
 (* default base type *)
 let ty_base = ty_app ts_base []
@@ -37,7 +37,7 @@ let ty_base = ty_app ts_base []
 let d_ts_base = create_ty_decl ts_base
 
 (* sort symbol of (polymorphic) types *)
-let ts_type = create_tysymbol (id_fresh "ty") [] None
+let ts_type = create_tysymbol (id_fresh "ty") [] NoDef
 
 (* sort of (polymorphic) types *)
 let ty_type = ty_app ts_type []
@@ -162,7 +162,7 @@ let d_monomorph ty_base kept lsmap d =
   let consts = ref Sls.empty in
   let t_mono = t_monomorph ty_base kept lsmap consts in
   let dl = match d.d_node with
-    | Dtype { ts_def = Some _ } -> []
+    | Dtype { ts_def = Alias _ } -> []
     | Dtype ts when not (Sty.exists (ty_s_any (ts_equal ts)) kept) -> []
     | Dtype ts ->
         [create_ty_decl ts]
@@ -242,7 +242,7 @@ let monomorphise_task =
 
 (* replace type variables in a goal with fresh type constants *)
 let ts_of_tv = Htv.memo 63 (fun tv ->
-  create_tysymbol (id_clone tv.tv_name) [] None)
+  create_tysymbol (id_clone tv.tv_name) [] NoDef)
 
 let monomorphise_goal = Trans.goal (fun pr f ->
   let stv = t_ty_freevars Stv.empty f in

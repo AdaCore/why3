@@ -309,7 +309,9 @@ let add_prover_shortcuts env prover =
 let add_id_prover_shortcut env id prover priority =
   match Hstr.find_opt env.prover_shortcuts id with
   | Some (p,_) when p >= priority -> ()
+(*
   | Some _ -> assert false
+ *)
   | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
 
 let prover_auto_levels = Hprover.create 5

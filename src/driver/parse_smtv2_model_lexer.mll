@@ -27,6 +27,7 @@ rule token = parse
   | "mk_t__ref"(num*) { MK_T_REF }
   | "store" { STORE }
   | "const" { CONST }
+  | "model" {MODEL}
   | "as" { AS }
   | '('
       { LPAREN }

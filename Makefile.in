@@ -186,8 +186,7 @@ LIB_MLW = ity expr dexpr pdecl pmodule
 LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal induction \
-		detect_polymorphism \
-		reduction_engine compute \
+		detect_polymorphism reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -199,9 +198,10 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
 		induction_pr prop_curry \
-		args_wrapper case
+		args_wrapper case \
+		eliminate_literal
 
-LIB_PRINTER = alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
+LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
 LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
@@ -306,6 +306,8 @@ install_no_local:: clean_old_install
 	$(MKDIR_P) $(DATADIR)/why3
 	$(MKDIR_P) $(DATADIR)/why3/images
 	$(MKDIR_P) $(DATADIR)/why3/vim
+	$(MKDIR_P) $(DATADIR)/why3/vim/ftdetect
+	$(MKDIR_P) $(DATADIR)/why3/vim/syntax
 	$(MKDIR_P) $(DATADIR)/why3/lang
 	$(MKDIR_P) $(DATADIR)/why3/theories
 	$(MKDIR_P) $(DATADIR)/why3/modules/mach
@@ -325,7 +327,8 @@ install_no_local:: clean_old_install
 	$(INSTALL_DATA) share/images/*.png $(DATADIR)/why3/images
 	$(INSTALL_DATA) share/why3session.dtd $(DATADIR)/why3
 	$(INSTALL_DATA) share/Makefile.config $(DATADIR)/why3
-	$(INSTALL_DATA) share/vim/why3.vim $(DATADIR)/why3/vim/why3.vim
+	$(INSTALL_DATA) share/vim/ftdetect/why3.vim $(DATADIR)/why3/vim/ftdetect/why3.vim
+	$(INSTALL_DATA) share/vim/syntax/why3.vim $(DATADIR)/why3/vim/syntax/why3.vim
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 
 install_no_local_lib::
@@ -379,19 +382,26 @@ endif
 
 PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+		plugins/python/py_lexer.ml \
+		plugins/python/py_parser.ml plugins/python/py_parser.mli \
 		plugins/parser/dimacs.ml \
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_PYTHON = py_ast py_parser py_lexer py_main
 
-PLUGINS = genequlin dimacs tptp
+PLUGINS = genequlin dimacs tptp python
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
+PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
 
 ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
@@ -406,13 +416,13 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp
+PLUGDIRS = parser printer transform tptp python
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
@@ -455,6 +465,14 @@ lib/plugins/tptp.cmxs: $(TPTPCMX)
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
 lib/plugins/tptp.cmo: $(TPTPCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+lib/plugins/python.cmxs: $(PYTHONCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/python.cmo: $(PYTHONCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
@@ -619,7 +637,11 @@ clean::
 
 .PHONY: gallery
 
-gallery::
+gallery:: gallery-simple gallery-subs
+
+.PHONY: gallery-simple
+
+gallery-simple::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
@@ -636,7 +658,7 @@ gallery::
 
 .PHONY: gallery-subs
 
-GALLERYSUBS=avl
+GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp
 
 gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
@@ -900,7 +922,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = kernel interp intf lib library parsing pretyping proofs printing tactics toplevel
+COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
 COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -926,14 +948,20 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(SHOW) 'Camlp    $<'
 	$(HIDE)$(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
+COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
+
+ifeq (@coq_compat_version@,COQ86)
+COQRTAC += -I lib/coq-tactic
+endif
+
 src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
+	$(HIDE)WHY3CONFIG="" $(COQC) -byte $(COQRTAC) $< && \
 	    touch src/coq-tactic/.why3-vo-byte
 
 src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cmxs
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 $< && \
+	$(HIDE)WHY3CONFIG="" $(COQC) -opt $(COQRTAC) $< && \
 	    touch src/coq-tactic/.why3-vo-opt
 
 # depend and clean targets
@@ -988,7 +1016,11 @@ COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 COQLIBS_BOOL_FILES = Bool
 COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
+ifeq (@enable_coq_fp_libs@,yes)
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry Truncate
+else
 COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
+endif
 COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
@@ -1016,9 +1048,12 @@ ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
+
+COQLIBS_IEEEFLOAT_FILES = GenericFloat
+COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
 
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
@@ -1045,6 +1080,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory seq.'"$$f"' meta "realized_theory" "seq.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_BV_FILES); do \
 	echo 'theory bv.'"$$f"' meta "realized_theory" "bv.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_IEEEFLOAT_FILES); do \
+	echo 'theory ieee_float.'"$$f"' meta "realized_theory" "ieee_float.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
 	) > $@
@@ -1075,9 +1112,11 @@ install_no_local::
 ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/floating_point
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FP)) $(LIBDIR)/why3/coq/floating_point/
+	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv headers-coq
+update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float headers-coq
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1108,6 +1147,9 @@ update-coq-seq: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theorie
 
 update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/bv.why
 	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T bv.$$f -o lib/coq/bv/; done
+
+update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/ieee_float.why
+	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T ieee_float.$$f -o lib/coq/ieee_float/; done
 
 update-coq-fp: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/floating_point.why
 	for f in $(COQLIBS_FP_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T floating_point.$$f -o lib/coq/floating_point/; done
@@ -1248,7 +1290,7 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy
+ISABELLEVERSIONSPECIFIC=why3.ML Why3_Bool.thy Why3_BV.thy Why3_Int.thy Why3_List.thy Why3_Number.thy Why3_Set.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1537,7 +1579,15 @@ install_local:: bin/why3doc
 # trywhy3
 #########
 
-ALTERGODIR=src/trywhy3/alt-ergo-1.00-private-2015-01-29
+ifeq ($(DEBUGJS),yes)
+ JSOO_DEBUG=--pretty --debug-info --source-map
+ JS_MAPS=alt_ergo_worker.map  trywhy3.map  why3_worker.map
+else
+ JSOO_DEBUG=
+ JS_MAPS=
+endif
+
+ALTERGODIR=src/trywhy3/alt-ergo
 
 JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
         -I src/ide
@@ -1553,27 +1603,25 @@ JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
 	-I $(ALTERGODIR)/src/sat \
 	-I $(ALTERGODIR)/src/main
 
-ALTERGOMODS=util/numsNumbers util/numbers \
-	util/version util/myUnix util/config util/options \
-	util/hashcons util/hstring util/lists util/loc \
+ALTERGOMODS=util/config util/version util/emap util/myUnix util/myDynlink \
+	util/myZip util/util util/lists util/numsNumbers util/numbers \
+	util/timers util/options util/gc_debug util/loc util/hashcons \
+	util/hstring \
+	structures/exception structures/symbols structures/ty \
+	structures/parsed structures/typed structures/term structures/literal \
+	structures/formula structures/explanation structures/errors \
 	util/profiling_default util/profiling \
-	util/util \
-	structures/parsed structures/symbols \
-	structures/ty structures/errors \
-	structures/term structures/literal structures/formula \
-	structures/explanation structures/exception \
 	parsing/why_parser parsing/why_lexer \
-	preprocess/existantial preprocess/triggers \
-	preprocess/why_typing preprocess/cnf \
-	theories/polynome theories/ac \
-	theories/intervals theories/inequalities \
-	theories/intervalCalculus \
-	theories/arith theories/records theories/bitv \
-	theories/arrays theories/sum theories/uf theories/use \
-	theories/combine theories/ccx theories/theory \
-	instances/matching \
+	preprocess/existantial preprocess/triggers preprocess/why_typing \
+	preprocess/cnf \
+	instances/matching instances/instances \
+	theories/polynome theories/ac theories/uf theories/use \
+	theories/intervals theories/inequalities theories/intervalCalculus \
+	theories/arith theories/records theories/bitv theories/arrays \
+	theories/sum theories/combine theories/ccx theories/theory \
 	sat/sat_solvers \
 	main/frontend
+
 ALTERGOCMO=$(addprefix $(ALTERGODIR)/src/, $(addsuffix .cmo,$(ALTERGOMODS)))
 TRYWHY3CMO=lib/why3/why3.cma
 TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
@@ -1582,8 +1630,8 @@ TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
 	fontawesome/fonts/FontAwesome.otf fontawesome/fonts/fontawesome-webfont.svg \
 	fontawesome/fonts/fontawesome-webfont.woff fontawesome/fonts/fontawesome-webfont.eot \
 	fontawesome/fonts/fontawesome-webfont.ttf  fontawesome/fonts/fontawesome-webfont.woff2 \
-	 ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
-	ace-builds/src-min-noconflict/theme-chrome.js
+	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
 trywhy3_package: trywhy3
 	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3FILES))
@@ -1591,20 +1639,20 @@ trywhy3_package: trywhy3
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/examples/*.mlw
-	js_of_ocaml -I src/trywhy3 \
+	js_of_ocaml --extern-fs $(JSOO_DEBUG) -I src/trywhy3 \
 		--file=why3_worker.js:/ \
 		--file=alt_ergo_worker.js:/ \
-	        --file=examples/index.txt:/ \
-		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/"` \
+	        --file=examples/index.txt:/examples/index.txt \
+		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/examples/%P"` \
 	+weak.js +nat.js $<
 
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
-	js_of_ocaml --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/"` \
+		`find theories modules \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
 	+weak.js +nat.js $<
 
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
@@ -1631,10 +1679,10 @@ src/ide/why3_js.js: src/ide/why3_js.byte
 new_src_ide: lib/why3/why3.cma bin/why3webserver.opt src/ide/why3_js.js
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
-	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
+	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) -I +ocplib-simplex $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) ocplibSimplex.cma $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
 src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
@@ -1741,10 +1789,10 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
 test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
+	$(COQC) -byte $(COQRTAC) bench/coq-tactic/test.v
 
 test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt -R lib/coq-tactic Why3 -R lib/coq Why3 bench/coq-tactic/test.v
+	$(COQC) -opt $(COQRTAC) bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
@@ -1992,7 +2040,8 @@ clean::
 
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
-src/tools/why3extract.cmx: src/tools/why3extract.ml
+# same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
+src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 

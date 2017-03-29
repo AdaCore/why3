@@ -1,0 +1,307 @@
+
+(** Pairing heaps (M. Fredman, R. Sedgewick, D. Sleator, R. Tarjan, 1986).
+
+    Purely applicative implementation, following Okasaki's implementation
+    in his book "Purely Functional Data Structures" (Section 5.5).
+
+    Author: Mário Pereira (Université Paris Sud)
+*)
+
+module Heap
+
+  use import int.Int
+
+  type elt
+  predicate le elt elt
+
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  type heap
+
+  function size heap : int
+
+  function occ elt heap : int
+
+  predicate mem (x: elt) (h: heap) = occ x h > 0
+
+  function minimum heap : elt
+
+  predicate is_minimum (x: elt) (h: heap) =
+    mem x h && forall e. mem e h -> le x e
+
+  axiom min_def:
+    forall h. 0 < size h -> is_minimum (minimum h) h
+
+  val empty () : heap
+    ensures { size result = 0 }
+    ensures { forall x. occ x result = 0 }
+
+  val is_empty (h: heap) : bool
+    ensures { result <-> size h = 0 }
+
+  val size (h: heap) : int
+    ensures { result = size h }
+
+  val merge (h1 h2: heap) : heap
+    ensures { forall x. occ x result = occ x h1 + occ x h2 }
+    ensures { size result = size h1 + size h2 }
+
+  val insert (x: elt) (h: heap) : heap
+    ensures { occ x result = occ x h + 1 }
+    ensures { forall y. y <> x -> occ y h = occ y result }
+    ensures { size result = size h + 1 }
+
+  val find_min (h: heap) : elt
+    requires { size h > 0 }
+    ensures  { result = minimum h }
+
+  val delete_min (h: heap) : heap
+    requires { size h > 0 }
+    ensures  { let x = minimum h in occ x result = occ x h - 1 }
+    ensures  { forall y. y <> minimum h -> occ y result = occ y h }
+    ensures  { size result = size h - 1 }
+
+end
+
+module HeapType
+
+  use import list.List
+
+  type elt
+  type heap = E | T elt (list heap)
+
+end
+
+module Size
+
+  use import HeapType
+  use import int.Int
+  use import list.List
+
+  function size (h: heap) : int = match h with
+    | E -> 0
+    | T _ l -> 1 + size_list l
+    end
+  with size_list (l: list heap) : int = match l with
+    | Nil -> 0
+    | Cons h r -> size h + size_list r
+    end
+
+  let rec lemma size_nonneg (h: heap)
+    ensures { size h >= 0 }
+    variant { h }
+  = match h with
+    | E -> ()
+    | T _ l -> size_list_nonneg l
+    end
+  with size_list_nonneg (l: list heap)
+    ensures { size_list l >= 0 }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons h r ->
+       size_nonneg h; size_list_nonneg r
+    end
+
+  let lemma size_empty (h: heap)
+    ensures { size h = 0 <-> h = E }
+  = match h with
+    | E -> ()
+    | T _ l ->
+      size_list_nonneg l
+    end
+
+end
+
+module Occ
+
+  use import HeapType
+  use import int.Int
+  use import list.List
+
+  function occ (x: elt) (h: heap) : int = match h with
+    | E -> 0
+    | T e l -> (if x = e then 1 else 0) + occ_list x l
+    end
+  with occ_list (x: elt) (l: list heap) : int = match l with
+    | Nil -> 0
+    | Cons h r -> occ x h + occ_list x r
+    end
+
+  let rec lemma occ_nonneg (x: elt) (h: heap)
+    ensures { occ x h >= 0 }
+    variant { h }
+  = match h with
+    | E -> ()
+    | T _ l -> occ_list_nonneg x l
+    end
+  with occ_list_nonneg (x: elt) (l: list heap)
+    ensures { occ_list x l >= 0 }
+    variant { l }
+  = match l with
+    | Nil -> ()
+    | Cons h r ->
+       occ_nonneg x h; occ_list_nonneg x r
+    end
+
+  predicate mem (x: elt) (h: heap) =
+    0 < occ x h
+
+  predicate mem_list (x: elt) (l: list heap) =
+    0 < occ_list x l
+
+end
+
+module PairingHeap
+
+  use import int.Int
+  use export HeapType
+  use export Size
+  use export Occ
+  use import list.List
+  use import list.Length
+
+  predicate le elt elt
+  clone import relations.TotalPreOrder with type t = elt, predicate rel = le
+
+  (* [e] is no greater than the root of [h], if any *)
+  predicate le_root (e: elt) (h: heap) = match h with
+    | E -> true
+    | T x _ -> le e x
+    end
+
+  lemma le_root_trans:
+    forall x y h. le x y -> le_root y h -> le_root x h
+
+  (* [e] is no greater than the roots of the trees in [l] *)
+  predicate le_roots (e: elt) (l: list heap) = match l with
+    | Nil -> true
+    | Cons h r -> le_root e h && le_roots e r
+    end
+
+  lemma le_roots_trans:
+    forall x y l. le x y -> le_roots y l -> le_roots x l
+
+  predicate no_middle_empty (h: heap) = match h with
+    | E -> true
+    | T _ l -> no_middle_empty_list l
+    end
+  with no_middle_empty_list (l: list heap) = match l with
+    | Nil -> true
+    | Cons h r -> h <> E && no_middle_empty h && no_middle_empty_list r
+    end
+
+  predicate heap (h: heap) = match h with
+    | E -> true
+    | T x l -> le_roots x l && heaps l
+    end
+  with heaps (l: list heap) = match l with
+    | Nil -> true
+    | Cons h r -> heap h && heaps r
+    end
+
+  predicate inv (h: heap) =
+    heap h && no_middle_empty h
+
+  let rec lemma heap_mem (h: heap)
+    requires { heap h }
+    variant  { h }
+    ensures  { forall x. le_root x h -> forall y. mem y h -> le x y }
+  = match h with
+    | E -> ()
+    | T _ l -> heap_mem_list l
+    end
+  with heap_mem_list (l: list heap)
+    requires { heaps l }
+    variant  { l }
+    ensures  { forall x. le_roots x l -> forall y. mem_list y l -> le x y }
+  = match l with
+    | Nil -> ()
+    | Cons h r ->
+       heap_mem h;
+       heap_mem_list r
+    end
+
+  predicate is_minimum (x: elt) (h: heap) =
+    mem x h && forall e. mem e h -> le x e
+
+  function minimum heap : elt
+  axiom minimum_def: forall x l. minimum (T x l) = x
+
+  let lemma root_is_minimum (h: heap)
+    requires { 0 < size h }
+    requires { heap h }
+    ensures  { is_minimum (minimum h) h }
+  = match h with
+    | E -> absurd
+    | T x l -> occ_list_nonneg x l
+    end
+
+  let empty () : heap
+    ensures { inv result }
+    ensures { size result = 0 }
+    ensures { forall e. not (mem e result) }
+  = E
+
+  let is_empty (h: heap) : bool
+    ensures { result <-> size h = 0 }
+  = h = E
+
+  let merge (h1 h2: heap) : heap
+    requires { inv h1 && inv h2 }
+    ensures  { inv result }
+    ensures  { size result = size h1 + size h2 }
+    ensures  { forall x. occ x result = occ x h1 + occ x h2 }
+  = match h1, h2 with
+    | E, h | h, E -> h
+    | T x1 l1, T x2 l2 ->
+       if le x1 x2 then
+         T x1 (Cons h2 l1)
+       else
+         T x2 (Cons h1 l2)
+    end
+
+  let insert (x: elt) (h: heap) : heap
+    requires { inv h }
+    ensures  { inv result }
+    ensures  { size result = size h + 1 }
+    ensures  { occ x result = occ x h + 1 }
+    ensures  { forall y. x <> y -> occ y result = occ y h }
+  = merge (T x Nil) h
+
+  let find_min (h: heap) : elt
+    requires { 0 < size h }
+    requires { inv h }
+    ensures  { result = minimum h }
+  = match h with
+    | E -> absurd
+    | T x _ -> x
+    end
+
+  let rec merge_pairs (l: list heap) : heap
+    requires { heaps l && no_middle_empty_list l }
+    ensures  { inv result }
+    ensures  { size result = size_list l }
+    ensures  { forall x. occ x result = occ_list x l }
+    variant  { length l }
+  = match l with
+    | Nil -> E
+    | Cons h Nil -> assert { h <> E }; h
+    | Cons h1 (Cons h2 r) ->
+       merge (merge h1 h2) (merge_pairs r)
+    end
+
+  let delete_min (h: heap) : heap
+    requires { inv h }
+    requires { 0 < size h }
+    ensures  { inv result }
+    ensures  { occ (minimum h) result = occ (minimum h) h - 1 }
+    ensures  { forall y. y <> minimum h -> occ y result = occ y h }
+    ensures  { size result = size h - 1 }
+  = match h with
+    | E -> absurd
+    | T _ l ->
+       merge_pairs l
+    end
+
+end

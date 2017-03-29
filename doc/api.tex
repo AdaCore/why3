@@ -5,8 +5,9 @@ This chapter is a tutorial for the users who want to link their own
 OCaml code with the \why library. We progressively introduce the way
 one can use the library to build terms, formulas, theories, proof
 tasks, call external provers on tasks, and apply transformations on
-tasks. The complete documentation for API calls is given
-at URL~\url{http://why3.lri.fr/api-\whyversion/}.
+tasks. The complete documentation for API calls is given\begin{latexonly}
+at URL~\urlapi{}.\end{latexonly}
+%HEVEA at this \ahref{\urlapi}{URL}.
 
 We assume the reader has a fair knowledge of the OCaml
 language. Notice that the \why library must be installed, see
@@ -291,9 +292,9 @@ access the internal identifier for addition: it must be retrieved from
 the standard theory \texttt{Int} of the file \texttt{int.why} (see
 Chap~\ref{sec:library}).
 \begin{ocamlcode}
-let two : Term.term = 
+let two : Term.term =
   Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
-let four : Term.term = 
+let four : Term.term =
   Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
 let int_theory : Theory.theory =
   Env.read_theory env ["int"] "Int"
@@ -327,7 +328,7 @@ To illustrate how to build quantified formulas, let us consider
 the formula $\forall x:int. x*x \geq 0$. The first step is to
 obtain the symbols from \texttt{Int}.
 \begin{ocamlcode}
-let zero : Term.term = 
+let zero : Term.term =
   Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
@@ -362,14 +363,14 @@ be done by a sequence of calls:
 
 Creation of a theory named \verb|My_theory| is done by
 \begin{ocamlcode}
-let my_theory : Theory.theory_uc = 
+let my_theory : Theory.theory_uc =
   Theory.create_theory (Ident.id_fresh "My_theory")
 \end{ocamlcode}
 
 First let us add formula 1 above as a goal:
 \begin{ocamlcode}
 let decl_goal1 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1 
+  Decl.create_prop_decl Decl.Pgoal goal_id1 fmla1
 let my_theory : Theory.theory_uc =
   Theory.add_decl my_theory decl_goal1
 \end{ocamlcode}
@@ -379,12 +380,12 @@ already defined to create task 1 above.
 Adding formula 2 needs to add the declarations of predicate variables A
 and B first:
 \begin{ocamlcode}
-let my_theory : Theory.theory_uc = 
-  Theory.add_param_decl my_theory prop_var_A 
-let my_theory : Theory.theory_uc = 
-  Theory.add_param_decl my_theory prop_var_B 
+let my_theory : Theory.theory_uc =
+  Theory.add_param_decl my_theory prop_var_A
+let my_theory : Theory.theory_uc =
+  Theory.add_param_decl my_theory prop_var_B
 let decl_goal2 : Decl.decl =
-  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2 
+  Decl.create_prop_decl Decl.Pgoal goal_id2 fmla2
 let my_theory : Theory.theory_uc = Theory.add_decl my_theory decl_goal2
 \end{ocamlcode}
 
@@ -395,33 +396,33 @@ combination of an ``export'' and the creation of a namespace. We
 provide a helper function for that:
 \begin{ocamlcode}
 (* [use th1 th2] insert the equivalent of a "use import th2" in
-  theory th1 under construction *) 
-let use th1 th2 = 
-  let name = th2.Theory.th_name in 
-  Theory.close_namespace 
-    (Theory.use_export 
+  theory th1 under construction *)
+let use th1 th2 =
+  let name = th2.Theory.th_name in
+  Theory.close_namespace
+    (Theory.use_export
       (Theory.open_namespace th1 name.Ident.id_string) th2) true
 \end{ocamlcode}
 Addition of formula 3 is then
 \begin{ocamlcode}
 let my_theory : Theory.theory_uc = use my_theory int_theory
-let decl_goal3 : Decl.decl = 
+let decl_goal3 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id3 fmla3
-let my_theory : Theory.theory_uc = 
-  Theory.add_decl my_theory decl_goal3  
+let my_theory : Theory.theory_uc =
+  Theory.add_decl my_theory decl_goal3
 \end{ocamlcode}
 
 Addition of goal 4 is nothing more complex:
 \begin{ocamlcode}
-let decl_goal4 : Decl.decl = 
+let decl_goal4 : Decl.decl =
   Decl.create_prop_decl Decl.Pgoal goal_id4 fmla4
-let my_theory : 
-  Theory.theory_uc = Theory.add_decl my_theory decl_goal4  
+let my_theory :
+  Theory.theory_uc = Theory.add_decl my_theory decl_goal4
 \end{ocamlcode}
 
 Finally, we close our theory under construction as follows.
 \begin{ocamlcode}
-let my_theory : Theory.theory = Theory.close_theory my_theory  
+let my_theory : Theory.theory = Theory.close_theory my_theory
 \end{ocamlcode}
 
 We can inspect what we did by printing that theory:
@@ -433,19 +434,19 @@ which outputs
 theory is:
 theory My_theory
   (* use BuiltIn *)
-  
+
   goal goal1 : true \/ false
-  
+
   predicate A
-  
+
   predicate B
-  
+
   goal goal2 : A /\ B -> A
-  
+
   (* use int.Int *)
-  
+
   goal goal3 : (2 + 2) = 4
-  
+
   goal goal4 : forall x:int. (x * x) >= 0
 end
 \end{verbatim}
@@ -453,7 +454,7 @@ end
 From a theory, one can compute at once all the proof tasks it contains
 as follows:
 \begin{ocamlcode}
-let my_tasks : Task.task list = 
+let my_tasks : Task.task list =
   List.rev (Task.split_theory my_theory None None)
 \end{ocamlcode}
 Note that the tasks are returned in reverse order, so we reverse the
@@ -461,7 +462,7 @@ list above.
 
 We can check our generated tasks by printing them:
 \begin{ocamlcode}
-let () = 
+let () =
   printf "Tasks are:@.";
   let _ =
     List.fold_left

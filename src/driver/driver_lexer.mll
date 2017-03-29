@@ -57,6 +57,7 @@
         "exception", EXCEPTION;
         "val", VAL;
         "converter", CONVERTER;
+        "literal", LITERAL;
       ]
 
 }

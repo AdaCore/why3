@@ -338,7 +338,8 @@ let induction x bound env =
   let th = Env.read_theory env ["int"] "Int" in
   let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
   let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
-  let one_int = Term.t_const (Number.ConstInt (Number.int_const_dec "1")) in
+  let one_int =
+    Term.t_const (Number.ConstInt (Number.int_const_dec "1")) Ty.ty_int in
 
   if (not (is_good_type x Ty.ty_int) || not (is_good_type bound Ty.ty_int)) then
     raise (Arg_trans "induction")

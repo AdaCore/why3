@@ -827,12 +827,29 @@ let t_app ls tl ty = ignore (ls_app_inst ls tl ty); t_app ls tl ty
 let fs_app fs tl ty = t_app fs tl (Some ty)
 let ps_app ps tl    = t_app ps tl None
 
-let t_const c = match c with
-  | Number.ConstInt _  -> t_const c ty_int
-  | Number.ConstReal _ -> t_const c ty_real
-
 let t_nat_const n =
-  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ty_int
+
+exception InvalidLiteralType of ty
+
+let t_const c ty =
+  let ts = match ty.ty_node with
+    | Tyapp (ts,[]) -> ts
+    | _ -> raise (InvalidLiteralType ty) in
+  begin match c with
+    | Number.ConstInt c when not (ts_equal ts ts_int) ->
+        begin match ts.ts_def with
+          | Range ir -> Number.check_range c ir
+          | _ -> raise (InvalidLiteralType ty)
+        end
+    | Number.ConstReal c when not (ts_equal ts ts_real) ->
+        begin match ts.ts_def with
+          | Float fp -> Number.check_float c fp
+          | _ -> raise (InvalidLiteralType ty)
+        end
+    | _ -> ()
+  end;
+  t_const c ty
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
@@ -1603,22 +1620,41 @@ let t_exists_close_merge vs f = match f.t_node with
       t_exists_close (vs@vs') trs f
   | _ -> t_exists_close vs [] f
 
-let t_map_simp fn f = t_label_copy f (match f.t_node with
-  | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
-      t_equ_simp (fn t1) (fn t2)
-  | Tif (f1, f2, f3) ->
-      t_if_simp (fn f1) (fn f2) (fn f3)
-  | Tlet (t, b) ->
-      let u,t2,close = t_open_bound_cb b in
-      t_let_simp (fn t) (close u (fn t2))
-  | Tquant (q, b) ->
-      let vl,tl,f1,close = t_open_quant_cb b in
-      t_quant_simp q (close vl (tr_map fn tl) (fn f1))
-  | Tbinop (op, f1, f2) ->
-      t_binary_simp op (fn f1) (fn f2)
-  | Tnot f1 ->
-      t_not_simp (fn f1)
-  | _ -> t_map fn f)
+let t_map_simp fn f =
+    if can_simp f then
+    t_label_copy f (match f.t_node with
+    | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
+	t_equ_simp (fn t1) (fn t2)
+    | Tif (f1, f2, f3) ->
+	t_if_simp (fn f1) (fn f2) (fn f3)
+    | Tlet (t, b) ->
+	let u,t2,close = t_open_bound_cb b in
+	t_let_simp (fn t) (close u (fn t2))
+    | Tquant (q, b) ->
+	let vl,tl,f1,close = t_open_quant_cb b in
+	t_quant_simp q (close vl (tr_map fn tl) (fn f1))
+    | Tbinop (op, f1, f2) ->
+	t_binary_simp op (fn f1) (fn f2)
+    | Tnot f1 ->
+	t_not_simp (fn f1)
+    | _ -> t_map fn f)
+    else
+    t_label_copy f (match f.t_node with
+    | Tapp (p, [t1;t2]) when ls_equal p ps_equ ->
+	t_equ (fn t1) (fn t2)
+    | Tif (f1, f2, f3) ->
+	t_if (fn f1) (fn f2) (fn f3)
+    | Tlet (t, b) ->
+	let u,t2,close = t_open_bound_cb b in
+	t_let (fn t) (close u (fn t2))
+    | Tquant (q, b) ->
+	let vl,tl,f1,close = t_open_quant_cb b in
+	t_quant q (close vl (tr_map fn tl) (fn f1))
+    | Tbinop (op, f1, f2) ->
+	t_binary op (fn f1) (fn f2)
+    | Tnot f1 ->
+	t_not (fn f1)
+    | _ -> t_map fn f)
 
 let t_map_simp fn = t_map_simp (fun t ->
   let res = fn t in t_ty_check res t.t_ty; res)

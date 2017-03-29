@@ -22,6 +22,9 @@ open Worker_proto
 
 let () = log_time ("Initialising why3 worker: start ")
 
+(* Name of the pseudo file *)
+
+let temp_file_name = "/trywhy3_input.mlw"
 
 (* reads the config file *)
 let config : Whyconf.config = Whyconf.read_config (Some why3_conf_file)
@@ -93,7 +96,10 @@ module Task =
 
     let get_parent_id id = (get_info id).parent_id
 
-    let mk_loc (_, a,b,c) = (a,b,c)
+    let mk_loc (f, a,b,c) =
+      if f = temp_file_name then
+        Some (a,b,c)
+      else None
 
 
     let warnings = ref []
@@ -112,7 +118,10 @@ module Task =
       (* from why 3 ide *)
       let locs = ref [] in
       let rec get_locs kind f =
-        Opt.iter (fun loc -> locs := (kind, mk_loc (Loc.get loc)) :: !locs) f.Term.t_loc;
+        Opt.iter (fun loc ->
+            match mk_loc (Loc.get loc) with
+              None -> ()
+            | Some l -> locs := (kind, l) :: !locs) f.Term.t_loc;
         Term.t_fold (fun () t -> get_locs kind t ) () f
       in
       let rec get_t_locs f =
@@ -158,7 +167,10 @@ module Task =
       in
       let id_loc = match vid.Ident.id_loc with
           None -> []
-        | Some l -> [ ("why3-loc-goal",mk_loc (Loc.get l)) ]
+        | Some l -> begin match mk_loc (Loc.get l) with
+              Some l -> [ ("why3-loc-goal", l) ]
+            | None -> []
+          end
       in
       let task_info =
         { task = `Task(task);
@@ -382,7 +394,6 @@ let why3_execute (modules,_theories) =
   in
   W.send result
 
-let temp_file_name = "/input.mlw"
 
 let () = Sys_js.register_file ~name:temp_file_name ~content:""
 

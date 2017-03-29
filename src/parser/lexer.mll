@@ -36,6 +36,7 @@
         "exists", EXISTS;
         "export", EXPORT;
         "false", FALSE;
+        "float", FLOAT;
         "forall", FORALL;
         "function", FUNCTION;
         "goal", GOAL;
@@ -51,6 +52,7 @@
         "not", NOT;
         "predicate", PREDICATE;
         "prop", PROP;
+        "range", RANGE;
         "so", SO;
         "then", THEN;
         "theory", THEORY;
@@ -101,8 +103,13 @@ let lalpha = ['a'-'z' '_']
 let ualpha = ['A'-'Z']
 let alpha = lalpha | ualpha
 let digit = ['0'-'9']
-let lident = lalpha (alpha | digit | '\'')*
-let uident = ualpha (alpha | digit | '\'')*
+let digit_or_us = ['0'-'9' '_']
+let alpha_no_us = ['a'-'z' 'A'-'Z']
+let suffix = (alpha_no_us | '\''* digit_or_us)* '\''*
+let lident = lalpha suffix
+let uident = ualpha suffix
+let lident_quote = lident ('\'' alpha_no_us suffix)+
+let uident_quote = uident ('\'' alpha_no_us suffix)+
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
 let op_char_1 = ['=' '<' '>' '~']
@@ -133,8 +140,12 @@ rule token = parse
       { UNDERSCORE }
   | lident as id
       { try Hashtbl.find keywords id with Not_found -> LIDENT id }
+  | lident_quote as id
+      { LIDENT_QUOTE id }
   | uident as id
       { UIDENT id }
+  | uident_quote as id
+      { UIDENT_QUOTE id }
   | ['0'-'9'] ['0'-'9' '_']* as s
       { INTEGER (Number.int_const_dec (Lexlib.remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
@@ -146,14 +157,14 @@ rule token = parse
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?
-      { FLOAT (Number.real_const_dec i f
+      { REAL (Number.real_const_dec i f
           (Opt.map Lexlib.remove_leading_plus e)) }
   | '0' ['x' 'X'] (hexadigit+ as i) ("" as f) ['p' 'P'] (['-' '+']? digit+ as e)
   | '0' ['x' 'X'] (hexadigit+ as i) '.' (hexadigit* as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
   | '0' ['x' 'X'] (hexadigit* as i) '.' (hexadigit+ as f)
         (['p' 'P'] (['-' '+']? digit+ as e))?
-      { FLOAT (Number.real_const_hex i f
+      { REAL (Number.real_const_hex i f
           (Opt.map Lexlib.remove_leading_plus e)) }
   | "(*)"
       { LEFTPAR_STAR_RIGHTPAR }
@@ -201,10 +212,14 @@ rule token = parse
       { DOTDOT }
   | "|"
       { BAR }
-  | "="
-      { EQUAL }
+  | "<"
+      { LT }
+  | ">"
+      { GT }
   | "<>"
       { LTGT }
+  | "="
+      { EQUAL }
   | "["
       { LEFTSQ }
   | "]"
@@ -248,9 +263,3 @@ rule token = parse
     ~desc:"WhyML@ logical@ language"
 
 }
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. test"
-End:
-*)

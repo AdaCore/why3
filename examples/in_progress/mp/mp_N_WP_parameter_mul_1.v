@@ -3,6 +3,7 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require map.Map.
+Require map.Const.
 Require int.Int.
 Require int.Abs.
 Require int.ComputerDivision.
@@ -10,10 +11,6 @@ Require int.Power.
 
 (* Why3 assumption *)
 Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 Axiom int31 : Type.
 Parameter int31_WhyType : WhyType int31.
@@ -57,10 +54,6 @@ Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
 (* Why3 assumption *)
 Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
   a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
-
-(* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a} (n:int31) (v:a): (array a) :=
-  (mk_array n (map.Map.const v: (map.Map.map Z a))).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
@@ -148,7 +141,7 @@ Axiom value_sub_update : forall (x:(map.Map.map Z uint32)) (i:Z) (n:Z) (m:Z)
   (i - n)%Z) * ((to_int1 v) - (to_int1 (map.Map.get x i)))%Z)%Z)%Z).
 
 Axiom value_zero : forall (x:(map.Map.map Z uint32)) (n:Z) (m:Z), (map_eq_sub
-  x (map.Map.const zero_unsigned: (map.Map.map Z uint32)) n m) ->
+  x (map.Const.const zero_unsigned: (map.Map.map Z uint32)) n m) ->
   ((value_sub x n m) = 0%Z).
 
 Axiom value_sub_lower_bound : forall (x:(map.Map.map Z uint32)) (x1:Z)
@@ -186,56 +179,72 @@ Theorem WP_parameter_mul : forall (x:int31) (x1:(map.Map.map Z uint32))
   forall (result:bool), ((result = true) <-> ((to_int o1) < (to_int x))%Z) ->
   ((~ (result = true)) -> ((in_bounds ((to_int x) + (to_int y))%Z) ->
   forall (o2:int31), ((to_int o2) = ((to_int x) + (to_int y))%Z) ->
-  ((0%Z <= (to_int o2))%Z -> ((0%Z <= (to_int o2))%Z -> ((map_eq_sub
-  (map.Map.const limb_zero: (map.Map.map Z uint32))
-  (map.Map.const limb_zero: (map.Map.map Z uint32)) 0%Z
-  ((to_int x) + (to_int y))%Z) ->
-  (((value_sub (map.Map.const limb_zero: (map.Map.map Z uint32)) 0%Z
+  ((0%Z <= (to_int o2))%Z -> forall (zd:int31) (zd1:(map.Map.map Z uint32)),
+  ((0%Z <= (to_int zd))%Z /\ ((zd = o2) /\ forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (to_int o2))%Z) -> ((map.Map.get zd1 i) = limb_zero))) -> ((map_eq_sub
+  zd1 (map.Const.const limb_zero: (map.Map.map Z uint32)) 0%Z
+  ((to_int x) + (to_int y))%Z) -> (((value_sub zd1 0%Z
   ((to_int x) + (to_int y))%Z) = 0%Z) -> ((((0%Z <= (to_int zero))%Z /\
   (((to_int zero) <= (to_int x))%Z /\ ((to_int x) <= (to_int x))%Z)) /\
   (((0%Z <= (to_int zero))%Z /\ (((to_int zero) <= (to_int y))%Z /\
   ((to_int y) <= (to_int y))%Z)) /\ ((0%Z <= (to_int zero))%Z /\
-  ((((to_int zero) + ((to_int x) - (to_int zero))%Z)%Z + ((to_int y) - (to_int zero))%Z)%Z <= (to_int o2))%Z))) ->
-  forall (zd:(map.Map.map Z uint32)), forall (c:uint32),
-  ((0%Z <= (to_int o2))%Z /\ (((value_sub zd 0%Z
-  (to_int o2)) + ((int.Power.power (4294967295%Z + 1%Z)%Z
-  (((to_int zero) + ((to_int x) - (to_int zero))%Z)%Z + ((to_int y) - (to_int zero))%Z)%Z) * (to_int1 c))%Z)%Z = ((value_sub (map.Map.const limb_zero: (map.Map.map
-  Z uint32)) 0%Z (to_int o2)) + ((int.Power.power (4294967295%Z + 1%Z)%Z
+  ((((to_int zero) + ((to_int x) - (to_int zero))%Z)%Z + ((to_int y) - (to_int zero))%Z)%Z <= (to_int zd))%Z))) ->
+  forall (zd2:(map.Map.map Z uint32)), forall (usc:uint32),
+  ((0%Z <= (to_int zd))%Z /\ (((value_sub zd2 0%Z
+  (to_int zd)) + ((int.Power.power (4294967295%Z + 1%Z)%Z
+  (((to_int zero) + ((to_int x) - (to_int zero))%Z)%Z + ((to_int y) - (to_int zero))%Z)%Z) * (to_int1 usc))%Z)%Z = ((value_sub zd1
+  0%Z (to_int zd)) + ((int.Power.power (4294967295%Z + 1%Z)%Z
   (to_int zero)) * ((value_sub x1 (to_int zero) (to_int x)) * (value_sub y1
-  (to_int zero) (to_int y)))%Z)%Z)%Z)) -> ((to_int1 c) = 0%Z)))))))))))).
+  (to_int zero) (to_int y)))%Z)%Z)%Z)) -> ((to_int1 usc) = 0%Z))))))))))).
 (* Why3 intros x x1 y y1 (h1,h2) h3 limb_zero h4 h5 zero h6 h7 o h8 h9 o1 h10
-        result h11 h12 h13 o2 h14 h15 h16 h17 h18
-        ((h19,(h20,h21)),((h22,(h23,h24)),(h25,h26))) zd c (h27,h28). *)
+        result h11 h12 h13 o2 h14 h15 zd zd1 (h16,(h17,h18)) h19 h20
+        ((h21,(h22,h23)),((h24,(h25,h26)),(h27,h28))) zd2 usc (h29,h30). *)
 Proof.
-intros x x1 y y1 (h1,h2) h3 limb_zero h4 h5 zero h6 h7 o h8 h9 o1 h10 result
-h11 h12 h13 o2 h14 h15 h16 h17 h18
-((h19,(h20,h21)),((h22,(h23,h24)),(h25,h26))) zd c (h27,h28).
+intros x x1 y y1 (h1,h2) h3 limb_zero h4 h5 zero h6 h7 o h8 h9 o1 h10
+        result h11 h12 h13 o2 h14 h15 zd zd1 (h16,(h17,h18)) h19 h20
+        ((h21,(h22,h23)),((h24,(h25,h26)),(h27,h28))) zd2 usc (h29,h30).
 apply Zle_antisym.
 2: apply to_int_in_bounds1.
 apply Z.le_ngt.
 intros H.
 revert h28.
-rewrite h6, 2!Zminus_0_r, Power.Power_0, Zmult_1_l.
-rewrite h14, h18, 2!Zplus_0_l.
+rewrite h6.
+rewrite 2!Zminus_0_r.
 intros H1.
 assert (H2 := value_sub_upper_bound x1 0 (to_int x) h1).
 assert (H3 := value_sub_upper_bound y1 0 (to_int y) h2).
 rewrite Zminus_0_r in H2, H3.
 refine (_ (Zmult_lt_compat _ _ _ _ (conj _ H2) (conj _ H3))).
 apply Z.le_ngt.
-rewrite <- H1.
 rewrite <- Power.Power_sum by easy.
 pattern ((4294967295 + 1) ^ (to_int x + to_int y))%Z at 1 ;
   replace ((4294967295 + 1) ^ (to_int x + to_int y))%Z with (0 + (4294967295 + 1) ^ (to_int x + to_int y) * 1)%Z by ring.
-apply Zplus_le_compat.
-apply value_sub_lower_bound.
+rewrite Zmult_1_r.
+rewrite Zplus_0_l.
+rewrite h6 in h30.
+rewrite Zminus_0_r in h30.
+rewrite Zminus_0_r in h30.
+rewrite Zplus_0_l in h30.
+2:apply value_sub_lower_bound.
+2:apply value_sub_lower_bound.
+rewrite <- h14 in h20.
+rewrite <- h17 in h20.
+rewrite h20 in h30.
+rewrite Zplus_0_l in h30.
+rewrite Power.Power_0 in h30.
+rewrite Zmult_1_l in h30.
+rewrite <- h30.
+rewrite <- h14.
+rewrite <- h17.
+set (m := ((4294967295 + 1) ^ to_int zd)%Z).
+apply Zle_trans with (m:= (m* to_int1 usc)%Z).
+rewrite <- Zmult_1_r at 1.
 apply Zmult_le_compat_l.
-apply (Zlt_le_succ _ _ H).
+omega.
 apply Power.Power_non_neg.
-split.
 easy.
-now apply (Zplus_le_compat 0 _ 0).
-apply value_sub_lower_bound.
+rewrite <- Zplus_0_l at 1.
+apply Zplus_le_compat_r.
 apply value_sub_lower_bound.
 Qed.
 

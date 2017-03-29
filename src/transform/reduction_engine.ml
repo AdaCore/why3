@@ -23,7 +23,8 @@ let v_label_copy orig v =
   | Term t -> Term (t_label_copy orig t)
 
 let const_of_positive n =
-    t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+  t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+    Ty.ty_int
 
 let ls_minus = ref ps_equ (* temporary *)
 
@@ -47,7 +48,7 @@ let big_int_of_const c =
 let big_int_of_value v =
   match v with
   | Int n -> n
-  | Term {t_node = Tconst c } -> big_int_of_const c
+  | Term { t_node = Tconst c } -> big_int_of_const c
   | Term { t_node = Tapp (ls,[{ t_node = Tconst c }]) }
     when ls_compare ls !ls_minus = 0 -> BigInt.minus (big_int_of_const c)
   | _ -> raise NotNum

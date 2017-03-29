@@ -142,6 +142,14 @@ let create_model_element ~name ~value ?location ?term () =
     me_term = term;
   }
 
+let construct_name (name: string): model_element_name =
+  let (name, type_s) = split_model_trace_name name in
+  let me_kind = match type_s with
+  | "result" -> Result
+  | "old" -> Old
+  | _ -> Other in
+  {men_name = name; men_kind = me_kind}
+
 (*
 let print_location fmt m_element =
     match m_element.me_location with
@@ -403,32 +411,24 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
-let rec build_model_rec raw_model terms model =
-match raw_model with
-  | [] -> model
-  | model_element::raw_strings_tail ->
-    let (element_name, element_location, element_term, terms_tail) =
-      match terms with
-      | [] -> (model_element.me_name.men_name, None, None, [])
-      | term::t_tail ->
-	let get_element_name term raw_string  =
-	  try
-	    get_model_trace_string ~labels:term.t_label
-	  with Not_found -> raw_string in
-        ((get_element_name term model_element.me_name.men_name),
-         term.t_loc,
-         Some term, t_tail) in
-    let new_model_element = create_model_element
-      ~name:element_name
-      ~value:model_element.me_value
-      ?location:element_location
-      ?term:element_term
-      () in
-    let model = add_to_model model new_model_element in
-    build_model_rec
-      raw_strings_tail
-      terms_tail
-      model
+let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
+  List.fold_left (fun model raw_element ->
+    let raw_element_name = raw_element.me_name.men_name in
+    try
+      (
+       let t = Mstr.find raw_element_name term_map in
+       let real_model_trace = construct_name (get_model_trace_string ~labels:t.t_label) in
+       let model_element = {
+	 me_name = real_model_trace;
+	 me_value = raw_element.me_value;
+	 me_location = t.t_loc;
+	 me_term = Some t;
+       } in
+       add_to_model model model_element
+      )
+    with Not_found -> model)
+    model
+    raw_model
 
 let handle_contradictory_vc model_files vc_term_loc =
   (* The VC is contradictory if the location of the term that triggers VC

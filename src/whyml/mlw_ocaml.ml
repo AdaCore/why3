@@ -168,6 +168,8 @@ module Translate = struct
 
   open Decl
 
+  let type_unit = ML.Ttuple []
+
   let rec type_ info ty = match ty.ty_node with
     | Tyvar v ->
         ML.Tvar v.tv_name
@@ -197,9 +199,10 @@ module Translate = struct
         []
 
   let type_decl info ts = match ts.ts_def with
-    | None ->
+    | NoDef | Range _ | Float _ ->
+        (* FIXME: how should we extract Range and Float? *)
         ML.Dabstract
-    | Some ty ->
+    | Alias ty ->
         ML.Dalias (type_ info ty)
 
   let type_args = List.map (fun tv -> tv.tv_name)
@@ -458,7 +461,10 @@ module Translate = struct
     | _ -> assert false
 
   let pv_name pv = pv.pv_vs.vs_name
-  let pvty info pv = vsty info pv.pv_vs
+
+  let pvty info pv =
+    if pv.pv_ghost then (pv.pv_vs.vs_name, type_unit)
+    else vsty info pv.pv_vs
 
   let lv_name = function
     | LetV pv -> pv_name pv
@@ -473,12 +479,20 @@ module Translate = struct
     | _ -> true
 
   let filter_ghost_params =
+(* removal of ghost does not work
     let dummy = create_pvsymbol (Ident.id_fresh "") ity_unit in
     fun args ->
     match List.filter (fun v -> not v.Mlw_ty.pv_ghost) args with
     | [] -> [dummy]
     | l -> l
-
+*)
+    fun args -> args (* filtering ghost happens in pvty *)
+(*
+    List.map
+      (fun v -> if v.Mlw_ty.pv_ghost then
+                  create_pvsymbol (Ident.id_fresh "") ity_unit
+                else v)
+ *)
   let rec expr info e =
     assert (not e.e_ghost);
     match e.e_node with
@@ -499,6 +513,7 @@ module Translate = struct
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
+(*
       | Eapp (e, v, _) when v.pv_ghost ->
          (* ghost parameters are ignored *)
          begin
@@ -506,10 +521,13 @@ module Translate = struct
            | Eapp _ -> expr info e
            | _ -> ML.Eapp (expr info e, [ML.enop])
          end
+ *)
       | Eapp (e, v, _) ->
           ML.Eapp (expr info e, [ML.Eident (pv_name v)])
-      | Elet ({ let_expr = e1 }, e2) when e1.e_ghost ->
-          expr info e2
+      | Elet ({ let_sym = lv; let_expr = e1 }, e2) when e1.e_ghost ->
+         (* TODO: remove superflous let *)
+         ML.Elet (lv_name lv, ML.enop, expr info e2)
+
       | Elet ({ let_sym = LetV pv }, e2) when ity_equal pv.pv_ity ity_mark ->
           expr info e2
       | Elet ({ let_sym = LetV pv; let_expr = e1 }, e2) when is_underscore pv ->

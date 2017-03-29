@@ -231,7 +231,7 @@ let find_ts ~loc env impl s args =
     try Hstr.find impl s with Not_found ->
       let args = List.map (fun _ -> create_tvsymbol (id_fresh "a")) args in
       let ss = if s = "int" || s = "real" then "_" ^ s else s in
-      let ts = SType (create_tysymbol (id_user ss loc) args None) in
+      let ts = SType (create_tysymbol (id_user ss loc) args NoDef) in
       Hstr.add impl s ts;
       ts in
   match ts with
@@ -284,7 +284,9 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Elet _ | Eite _ | Eqnt _ | Ebin _
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
 
-let t_int_const s = t_const (Number.ConstInt (Number.int_const_dec s))
+let t_int_const s =
+  t_const (Number.ConstInt (Number.int_const_dec s)) ty_int
+
 (* unused
 let t_real_const r = t_const (Number.ConstReal r)
 *)
@@ -307,7 +309,7 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
   | Enum (Nint s) -> t_int_const s
   | Enum (Nreal (i,f,e)) ->
       t_const (Number.ConstReal
-        (Number.real_const_dec i (Opt.get_def "0" f) e))
+        (Number.real_const_dec i (Opt.get_def "0" f) e)) ty_real
   | Enum (Nrat (n,d)) ->
       let n = t_int_const n and d = t_int_const d in
       let frac = ns_find_ls denv.th_rat.th_export ["frac"] in
@@ -371,7 +373,7 @@ and fmla denv env impl pol tvl { e_loc = loc; e_node = n } = match n with
             | Some false, Qexists (* premises *) ->
                 let _,ln,cn,_ = Loc.get loc in
                 let sk = Format.sprintf "_%s_%d_%d" s ln cn in
-                let ts = create_tysymbol (id_user sk loc) tvl None in
+                let ts = create_tysymbol (id_user sk loc) tvl NoDef in
                 let tv = ty_app ts (List.map ty_var tvl) in
                 Hstr.add impl sk (SType ts);
                 Mstr.add s (STSko tv) env, pol, tvl, vl, true
@@ -537,7 +539,7 @@ let typedecl denv env impl loc s (tvl,(el,e)) =
       | _ -> error ~loc DependentTy
     in
     let ss = if s = "int" || s = "real" then "_" ^ s else s in
-    let ts = create_tysymbol (id_user ss loc) (List.map ntv el) None in
+    let ts = create_tysymbol (id_user ss loc) (List.map ntv el) NoDef in
     Hstr.add impl s (SType ts)
   else
     (* function/predicate symbol *)

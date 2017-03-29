@@ -27,7 +27,7 @@ type itysymbol = {
   its_arg_frz : bool list;      (** irreplaceable type parameters *)
   its_reg_vis : bool list;      (** non-ghost shareable components *)
   its_reg_frz : bool list;      (** irreplaceable shareable components *)
-  its_def     : ity option;     (** type alias *)
+  its_def     : ity type_def;   (** type definition *)
 }
 
 and ity = {
@@ -117,14 +117,14 @@ let reg_compare reg1 reg2 = id_compare reg1.reg_name reg2.reg_name
 let pv_compare  pv1  pv2  = id_compare pv1.pv_vs.vs_name pv2.pv_vs.vs_name
 
 let its_mutable s = s.its_privmut || s.its_mfields <> [] ||
-  match s.its_def with Some {ity_node = Ityreg _} -> true | _ -> false
+  match s.its_def with Alias {ity_node = Ityreg _} -> true | _ -> false
 
 let its_impure s = its_mutable s || s.its_regions <> []
 
 exception NonUpdatable of itysymbol * ity
 
 let check_its_args s tl =
-  assert (s.its_def = None);
+  assert (not (is_alias_type_def s.its_def));
   let check_imm acc imm ity =
     if imm && not ity.ity_pure then raise (NonUpdatable (s,ity));
     acc && ity.ity_pure in
@@ -408,17 +408,17 @@ let ity_pur s tl =
   (* compute the substitution even for non-aliases to verify arity *)
   let sbs = its_match_args s tl in
   match s.its_def with
-  | Some ity ->
+  | Alias ity ->
       ity_full_inst sbs (ity_purify ity)
-  | None ->
+  | _ ->
       ity_pur_unsafe s tl
 
 let create_region sbs id s tl rl = match s.its_def with
-  | Some { ity_node = Ityreg r } ->
+  | Alias { ity_node = Ityreg r } ->
       let tl = List.map (ity_full_inst sbs) r.reg_args in
       let rl = List.map (reg_full_inst sbs) r.reg_regs in
       mk_reg id r.reg_its tl rl
-  | None when its_mutable s ->
+  | _ when its_mutable s ->
       mk_reg id s tl rl
   | _ -> invalid_arg "Ity.create_region"
 
@@ -426,11 +426,11 @@ let ity_app sbs s tl rl =
   if its_mutable s then
     ity_reg (create_region sbs (id_fresh "rho") s tl rl)
   else match s.its_def with
-  | Some ity ->
+  | Alias ity ->
       ity_full_inst sbs ity
-  | None when rl = [] ->
+  | _ when rl = [] ->
       ity_pur_unsafe s tl
-  | None ->
+  | _ ->
       ity_app_unsafe s tl rl
 
 let rec ity_inst_fresh sbs ity = match ity.ity_node with
@@ -498,15 +498,20 @@ let rec ity_of_ty ty = match ty.ty_node with
 let its_of_ts ts imm =
   let tl = List.map Util.ttrue ts.ts_args in
   let il = if imm then tl else List.map Util.ffalse ts.ts_args in
+  let def = match ts.ts_def with
+    | Alias ty -> Alias (ity_of_ty ty)
+    | Range ir -> Range ir
+    | Float fp -> Float fp
+    | NoDef    -> NoDef in
   create_its ~ts ~pm:false ~mfld:[] ~regs:[] ~aimm:il ~aexp:tl ~avis:tl
-          ~afrz:tl ~rvis:[] ~rfrz:[] ~def:(Opt.map ity_of_ty ts.ts_def)
+          ~afrz:tl ~rvis:[] ~rfrz:[] ~def
 
 let create_itysymbol_pure id args =
-  its_of_ts (create_tysymbol id args None) true
+  its_of_ts (create_tysymbol id args NoDef) true
 
 let create_itysymbol_alias id args def =
   (* FIXME? should we compute [arg|reg]_[imm|exp|vis|frz]? *)
-  let ts = create_tysymbol id args (Some (ty_of_ity def)) in
+  let ts = create_tysymbol id args (Alias (ty_of_ity def)) in
   let regs = Sreg.elements (let add_r s r = Sreg.add r s in
     match def.ity_node with
     | Ityreg reg -> reg_r_fold add_r Sreg.empty reg
@@ -514,12 +519,12 @@ let create_itysymbol_alias id args def =
   let tl = List.map Util.ttrue args in
   let rl = List.map Util.ttrue regs in
   create_its ~ts ~pm:false ~mfld:[] ~regs ~aimm:tl ~aexp:tl
-    ~avis:tl ~afrz:tl ~rvis:rl ~rfrz:rl ~def:(Some def)
+    ~avis:tl ~afrz:tl ~rvis:rl ~rfrz:rl ~def:(Alias def)
 
 exception ImpureField of ity
 
 let create_itysymbol_rich id args pm flds =
-  let ts = create_tysymbol id args None in
+  let ts = create_tysymbol id args NoDef in
   let collect_vis fn acc =
     Mpv.fold (fun f _ a -> if f.pv_ghost then a else fn a f.pv_ity) flds acc in
   let collect_imm fn acc =
@@ -536,7 +541,7 @@ let create_itysymbol_rich id args pm flds =
     Mpv.iter (fun {pv_vs = v; pv_ity = i} _ -> if not i.ity_pure
       then Loc.error ?loc:v.vs_name.id_loc (ImpureField i)) flds;
     create_its ~ts ~pm ~mfld ~regs:[] ~aimm:tl ~aexp:tl ~avis:tl
-      ~afrz:tl ~rvis:[] ~rfrz:[] ~def:None
+      ~afrz:tl ~rvis:[] ~rfrz:[] ~def:NoDef
   end else (* non-private updatable type *)
     let top_regs ity = ity_r_fold (fun s r -> Sreg.add r s) ity in
     let regs = Sreg.elements (collect_all top_regs Sreg.empty) in
@@ -549,7 +554,7 @@ let create_itysymbol_rich id args pm flds =
     let afrz = check_args (collect_imm ity_freevars Stv.empty) in
     let rfrz = check_regs (collect_imm ity_freeregs Sreg.empty) in
     create_its ~ts ~pm ~mfld ~regs ~aimm ~aexp ~avis ~afrz ~rvis
-      ~rfrz ~def:None
+      ~rfrz ~def:NoDef
 
 (** pvsymbol creation *)
 

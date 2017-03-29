@@ -6,6 +6,7 @@ valid "Finished Why3 theory"
 fail "\\*\\*\\* \\(.*\\)$" "\\1"
 time "why3cpulimit time : %s s"
 
+transformation "eliminate_literal"
 transformation "eliminate_epsilon"
 transformation "eliminate_if_fmla"
 transformation "eliminate_let_fmla"
@@ -163,12 +164,13 @@ theory number.Gcd
   syntax function gcd "<app><const name=\"GCD.gcd_class.gcd\"/>%1%2</app>"
 end
 
-theory number.Prime
-  syntax predicate prime "<app><const name=\"Primes.prime\"/><app><const name=\"Int.nat\"/>%1</app></app>"
-end
-
 theory number.Coprime
   syntax predicate coprime "<app><const name=\"GCD.gcd_class.coprime\"/>%1%2</app>"
+end
+
+theory algebra.Field
+  syntax function inv "<app><const name=\"Fields.inverse_class.inverse\"/>%1</app>"
+  syntax function (/) "<app><const name=\"Rings.divide_class.divide\"/>%1%2</app>"
 end
 
 theory real.Real

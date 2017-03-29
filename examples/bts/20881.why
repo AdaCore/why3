@@ -1,0 +1,37 @@
+
+
+theory OK
+
+type t 'a = A | B (t 'a)
+
+
+goal g : forall x: t 'a. A <> B x
+
+end
+
+
+theory Bug1
+
+type t 'a = A int
+
+function f (t 'a) : 'a
+
+goal g : let p = (A 0: t int) in
+         let q = (A 1: t int) in
+         f p = f q
+
+end
+
+theory Bug
+    use import map.Map
+
+    type t
+    type p 'a = PTR t
+
+    function load (p 'a) :'a
+
+    goal bug: forall i.
+        let p = ((PTR i):(p (map t t))) in
+        let q = ((PTR i):(p t)) in
+    (load p)[i] = (load q)
+end

@@ -32,7 +32,7 @@ let conv_ts tenv undefined name ty =
     try
       Hty.find tenv.specials ty
     with Not_found ->
-      let ts = create_tysymbol (id_clone name) [] None in
+      let ts = create_tysymbol (id_clone name) [] NoDef in
       Hty.add tenv.specials ty ts;
       ts in
   Hts.replace undefined ts ();
@@ -128,7 +128,7 @@ let fold tenv taskpre task =
   match taskpre.task_decl.td_node with
     | Decl d ->
       begin match d.d_node with
-        | Dtype { ts_def = Some _ }
+        | Dtype { ts_def = Alias _ }
         | Dtype { ts_args = _::_ } -> task
         | Dtype ts -> add_ty_decl task ts
         | Ddata _ ->
@@ -151,9 +151,9 @@ let fold tenv taskpre task =
         let ud = Hts.create 3 in
         let map = function
           | MAty ty -> MAty (conv_ty tenv ud ty)
-          | MAts {ts_name = name; ts_args = []; ts_def = Some ty} ->
-            MAts (conv_ts tenv ud name ty)
-          | MAts {ts_args = []; ts_def = None} as x -> x
+          | MAts {ts_name = name; ts_args = []; ts_def = Alias ty} ->
+              MAts (conv_ts tenv ud name ty)
+          | MAts {ts_args = []} as x -> x
           | MAts _ -> raise Exit
           | MAls ls -> MAls (conv_ls tenv ud ls)
           | MApr _ -> raise Exit

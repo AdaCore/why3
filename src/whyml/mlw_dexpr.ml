@@ -77,12 +77,9 @@ let ity_of_dity dity =
   ity dity
 
 let dity_int  = Dpur (ts_int,  [])
-let dity_real = Dpur (ts_real, [])
 let dity_bool = Dpur (ts_bool, [])
 let dity_unit = Dpur (ts_unit, [])
 
-let dvty_int  = [], dity_int
-let dvty_real = [], dity_real
 let dvty_bool = [], dity_bool
 let dvty_unit = [], dity_unit
 
@@ -398,7 +395,7 @@ and dexpr_node =
   | DEplapp of plsymbol * dexpr list
   | DElsapp of lsymbol * dexpr list
   | DEapply of dexpr * dexpr
-  | DEconst of Number.constant
+  | DEconst of Number.constant * ity
   | DElam of dbinder list * dexpr * dspec later
   | DElet of dlet_defn * dexpr
   | DEfun of dfun_defn * dexpr
@@ -676,10 +673,7 @@ let dexpr ?loc node =
         let argl, res = specialize_ls fs_func_app in
         dity_unify_app fs_func_app dexpr_expected_type [de1;de2] argl;
         [], res
-    | DEconst (Number.ConstInt _) ->
-        dvty_int
-    | DEconst (Number.ConstReal _) ->
-        dvty_real
+    | DEconst (_, ity) -> [], dity_of_ity ity
     | DEfun ((_,_,[],_,_),_) ->
         invalid_arg "Mlw_dexpr.dexpr: empty argument list in DEfun"
     | DElet (_,de)
@@ -1203,8 +1197,8 @@ and try_expr keep_loc uloc env ({de_dvty = argl,res} as de0) =
       e_app e1 [e_ghostify gh (get env de2)]
   | DEapply (de1,de2) ->
       e_lapp fs_func_app [get env de1; get env de2] (ity_of_dity res)
-  | DEconst c ->
-      e_const c
+  | DEconst (c,ity) ->
+      e_const c ity
   | DElet ((id,gh,de1),de2) ->
       let e1 = get env de1 in
       let mk_expr e1 =

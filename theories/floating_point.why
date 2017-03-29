@@ -413,6 +413,7 @@ end
 theory GenFloatSpecFull
 
   use import real.Real
+  use import real.Square
   use import Rounding
   use import SpecialValues
   clone export GenFloatFull
@@ -481,7 +482,7 @@ theory GenFloatSpecFull
          -> is_finite r /\ value r = round m (value x * value y))
     /\ (is_finite x /\ is_finite y /\ not no_overflow m (value x * value y)
          -> overflow_value m r)
-    /\ product_sign r x y
+    /\ (not is_NaN r -> product_sign r x y)
     /\ exact r = exact x * exact y
     /\ model r = model x * model y
 
@@ -489,10 +490,9 @@ theory GenFloatSpecFull
     (is_NaN x -> is_NaN r)
     /\ (is_infinite x -> is_infinite r)
     /\ (is_finite x -> is_finite r /\ value r = - value x)
-    /\ diff_sign r x
+    /\ (not is_NaN r -> diff_sign r x)
     /\ exact r = - exact x
     /\ model r = - model x
-
 
   predicate div_post (m:mode) (x:t) (y:t) (r:t) =
     (is_NaN x \/ is_NaN y -> is_NaN r)
@@ -507,10 +507,57 @@ theory GenFloatSpecFull
         -> overflow_value m r)
     /\ (is_finite x /\ is_gen_zero y /\ value x <> 0.0
         -> is_infinite r)
-    /\(is_gen_zero x /\ is_gen_zero y -> is_NaN r)
-    /\ product_sign r x y
+    /\ (is_gen_zero x /\ is_gen_zero y -> is_NaN r)
+    /\ (not is_NaN r -> product_sign r x y)
     /\ exact r = exact x / exact y
     /\ model r = model x / model y
+
+  predicate fma_post (m:mode) (x y z:t) (r:t) =
+    (is_NaN x \/ is_NaN y \/ is_NaN z -> is_NaN r)
+    /\ (is_gen_zero x /\ is_infinite y -> is_NaN r)
+    /\ (is_infinite x /\ is_gen_zero y -> is_NaN r)
+    /\ (is_finite x /\ value x <> 0.0 /\ is_infinite y /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_finite x /\ value x <> 0.0 /\ is_infinite y /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_infinite x /\ is_finite y /\ value y <> 0.0 /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_infinite x /\ is_finite y /\ value y <> 0.0 /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_infinite x /\ is_infinite y /\ is_finite z
+        -> is_infinite r /\ product_sign r x y)
+    /\ (is_finite x /\ is_finite y /\ is_infinite z
+        -> is_infinite r /\ same_sign r z)
+    /\ (is_infinite x /\ is_infinite y /\ is_infinite z
+        -> (if product_sign z x y then is_infinite r /\ same_sign r z
+            else is_NaN r))
+    /\ (is_finite x /\ is_finite y /\ is_finite z /\
+        no_overflow m (value x * value y + value z)
+        -> is_finite r /\
+        value r = round m (value x * value y + value z) /\
+        (if product_sign z x y then same_sign r z
+         else (value x * value y + value z = 0.0 ->
+               if m = Down then sign r = Neg else sign r = Pos)))
+    /\ (is_finite x /\ is_finite y /\ is_finite z /\
+        not no_overflow m (value x * value y + value z)
+        -> SpecialValues.same_sign_real (sign r) (value x * value y + value z)
+        /\ overflow_value m r)
+    /\ exact r = exact x * exact y + exact z
+    /\ model r = model x * model y + model z
+
+  predicate sqrt_post (m:mode) (x:t) (r:t) =
+    (is_NaN x -> is_NaN r)
+    /\ (is_plus_infinity x -> is_plus_infinity r)
+    /\ (is_minus_infinity x -> is_NaN r)
+    /\ (is_finite x /\ value x < 0.0 -> is_NaN r)
+    /\ (is_finite x /\ value x = 0.0
+        -> is_finite r /\ value r = 0.0 /\ same_sign r x)
+    /\ (is_finite x /\ value x > 0.0
+        -> is_finite r /\ value r = round m (sqrt (value x)) /\ sign r = Pos)
+    /\ exact r = sqrt (exact x)
+    /\ model r = sqrt (model x)
 
   predicate of_real_exact_post (x:real) (r:t) =
     is_finite r /\ value r = x /\ exact r = x /\ model r = x
@@ -532,9 +579,8 @@ theory GenFloatSpecFull
   predicate gt (x:t) (y:t) = lt y x
 
   predicate eq (x:t) (y:t) =
-    is_not_NaN x /\ is_not_NaN y /\
-      ((is_finite x /\ is_finite y /\ value x = value y) \/
-       (is_infinite x /\ is_infinite y /\ same_sign x y))
+    (is_finite x /\ is_finite y /\ value x = value y) \/
+    (is_infinite x /\ is_infinite y /\ same_sign x y)
 
   predicate ne (x:t) (y:t) = not (eq x y)
 

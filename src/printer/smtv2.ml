@@ -18,6 +18,7 @@ open Ty
 open Term
 open Decl
 open Printer
+open Cntexmp_printer
 
 let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
@@ -71,57 +72,19 @@ let ident_printer () =
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
-      "map"; "bv"; "subset"; "union"; "default"
+      "map"; "bv"; "subset"; "union"; "default";
+
+(* floats *)
+      "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san
 
-(* Information about the term that triggers VC.  *)
-type vc_term_info = {
-  mutable vc_inside : bool;
-  (* true if the term that triggers VC is currently processed *)
-  mutable vc_loc : Loc.position option;
-  (* the position of the term that triggers VC *)
-  mutable vc_func_name : string option;
-  (* the name of the function for that VC was made. None if VC
-     is not generated for postcondition or precondition) *)
-}
-
-module TermCmp = struct
-  type t = term
-
-  let before loc1 loc2 =
-  (* Return true if loc1 is strictly before loc2 *)
-    match loc1 with
-    | None -> false
-    | Some loc1 ->
-      match loc2 with
-      | None -> false
-      | Some loc2 ->
-	let (_, line1, col1, _) = Loc.get loc1 in
-	  let (_, line2, col2, _) = Loc.get loc2 in
-	  if line1 <> line2 then
-	    if line1 < line2 then true
-	    else false
-	  else
-	    if col1 < col2 then true
-	    else false
-
-  let compare a b =
-    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
-    then 0 else
-      (* Order the terms accoridng to their source code locations  *)
-      if before a.t_loc b.t_loc then 1
-      else -1
-
-end
-
-module S = Set.Make(TermCmp)
-
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  info_rliteral   : syntax_map;
   mutable info_model : S.t;
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
@@ -172,33 +135,6 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
-let model_label = Ident.create_label "model"
-  (* This label identifies terms that should be in counter-example. *)
-let model_vc_term_label = Ident.create_label "model_vc"
-  (* This label identifies the term that triggers the VC. *)
-
-let add_model_element el info_model =
-(** Add element el (term) to info_model.
-    If an element with the same hash (the same set of labels + the same
-    location) as the element el already exists in info_model, replace it with el.
-
-    The reason is that  we do not want to display two model elements with the same
-    name in the same location and usually it is better to display the last one.
-
-    Note that two model elements can have the same name and location if why is used
-    as an intemediate language and the locations are locations in the source language.
-    Then, more why constructs (terms) can represent a single construct in the source
-    language and more terms have thus the same model name and location. This happens,
-    e.g., if why code is generated from SPARK. There, the first iteration of while
-    cycle is unrolled in some cases. If the task contains both a term representing a
-    variable in the first iteration of unrolled loop and a term representing the variable
-    in the subsequent loop iterations, only the latter is relevant for the counterexample
-    and it is the one that comes after the former one (and that is why we always keep the
-    last term).
-*)
-  let info_model = S.remove el info_model in
-  S.add el info_model
-
 let collect_model_ls info ls =
   if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
     let t = t_app ls [] ls.ls_value in
@@ -206,84 +142,20 @@ let collect_model_ls info ls =
       add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
 
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counter-example with name "name" *)
-
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
-let add_old lab_str =
-  try
-    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
-    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
-    if after = "@init" then
-      (String.sub lab_str 0 pos) ^ "@old"
-    else lab_str
-  with Not_found -> lab_str ^ "@old"
-
-let model_trace_for_postcondition ~labels info =
-  (* Modifies the  model_trace label of a term in the postcondition:
-     - if term corresponds to the initial value of a function
-     parameter, model_trace label will have postfix @old
-     - if term corresponds to the return value of a function, add
-     model_trace label in a form function_name@result
-  *)
-  try
-    let trace_label = get_label labels model_trace_regexp in
-    let lab_str = add_old trace_label.lab_string in
-    if lab_str = trace_label.lab_string then
-      labels
-    else
-      let other_labels = Slab.remove trace_label labels in
-      Slab.add
-	(Ident.create_label lab_str)
-	other_labels
-  with Not_found ->
-    (* no model_trace label => the term represents the return value *)
-    Slab.add
-      (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" info.info_vc_term.vc_func_name)  ^ "@result"))
-      labels
-
-let get_fun_name name =
-  let splitted = Strings.bounded_split ':' name 2 in
-  match splitted with
-  | _::[second] ->
-    second
-  | _ ->
-    ""
-
-let check_enter_vc_term t info =
-  (* Check whether the term that triggers VC is entered.
-     If it is entered, extract the location of the term and if the VC is
-     postcondition or precondition of a function, extract the name of
-     the corresponding function.
-  *)
-  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
-    let vc_term_info = info.info_vc_term in
-    vc_term_info.vc_inside <- true;
-    vc_term_info.vc_loc <- t.t_loc;
-    try
-      (* Label "model_func" => the VC is postcondition or precondition *)
-      (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func") in
-      vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
-    with Not_found ->
-      (* No label "model_func" => the VC is not postcondition or precondition *)
-      ()
-  end
-
-let check_exit_vc_term t info =
-  (* Check whether the term triggering VC is exited. *)
-  if info.info_in_goal && Slab.mem model_vc_term_label t.t_label then begin
-    info.info_vc_term.vc_inside <- false;
-  end
+let number_format = {
+  Number.long_int_support = true;
+  Number.extra_leading_zeros_support = false;
+  Number.dec_int_support = Number.Number_default;
+  Number.hex_int_support = Number.Number_unsupported;
+  Number.oct_int_support = Number.Number_unsupported;
+  Number.bin_int_support = Number.Number_unsupported;
+  Number.def_int_support = Number.Number_unsupported;
+  Number.dec_real_support = Number.Number_unsupported;
+  Number.hex_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
+  Number.def_real_support = Number.Number_unsupported;
+}
 
 (** expr *)
 let rec print_term info fmt t =
@@ -292,25 +164,28 @@ let rec print_term info fmt t =
   if Slab.mem model_label t.t_label then
     info.info_model <- add_model_element t info.info_model;
 
-  check_enter_vc_term t info;
+  check_enter_vc_term t info.info_in_goal info.info_vc_term;
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = false;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } -> ts
+        | _ -> assert false (* impossible *) in
+      (* look for syntax literal ts in driver *)
+      begin match query_syntax info.info_rliteral ts.ts_name, c with
+        | Some st, Number.ConstInt c ->
+          syntax_range_literal st fmt c
+        | Some st, Number.ConstReal c ->
+          let fp = match ts.ts_def with
+            | Float fp -> fp
+            | _ -> assert false in
+          syntax_float_literal st fp fmt c
+        | None, _ -> Number.print number_format fmt c
+        (* TODO/FIXME: we must assert here that the type is either
+            ty_int or ty_real, otherwise it makes no sense to print
+            the literal. Do we ensure that preserved literal types
+            are exactly those that have a dedicated syntax? *)
+      end
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
     (* let's check if a converter applies *)
@@ -338,7 +213,7 @@ let rec print_term info fmt t =
 		  | None ->
 		    ls.ls_name.id_label
 		  | Some _ ->
-		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info in
+		    model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
 		let _t_check_pos = t_label ~loc labels t in
 		(* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
@@ -379,7 +254,7 @@ let rec print_term info fmt t =
   | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
   in
 
-  check_exit_vc_term t info;
+  check_exit_vc_term t info.info_in_goal info.info_vc_term;
 
 
 and print_fmla info fmt f =
@@ -387,7 +262,7 @@ and print_fmla info fmt f =
   if Slab.mem model_label f.t_label then
     info.info_model <- add_model_element f info.info_model;
 
-  check_enter_vc_term f info;
+  check_enter_vc_term f info.info_in_goal info.info_vc_term;
 
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
@@ -459,7 +334,7 @@ and print_fmla info fmt f =
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
 
-  check_exit_vc_term f info
+  check_exit_vc_term f info.info_in_goal info.info_vc_term
 
 and print_boolean_branches info subject pr fmt bl =
   let error () = unsupportedTerm subject
@@ -523,7 +398,7 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_type_decl info fmt ts =
-  if ts.ts_def <> None then () else
+  if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   fprintf fmt "(declare-sort %a %i)@\n@\n"
     (print_ident info) ts.ts_name (List.length ts.ts_args)
@@ -547,26 +422,33 @@ let print_logic_decl info fmt (ls,def) =
     List.iter (forget_var info) vsl
   end
 
-let print_info_model cntexample fmt model_list info =
+let print_info_model cntexample fmt info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if model_list != [] && cntexample then
+  if not (S.is_empty info_model) && cntexample then
     begin
 	  (*
             fprintf fmt "@[(get-value (%a))@]@\n"
             (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
       fprintf fmt "@[(get-value (";
-      List.iter (fun f ->
-	fprintf str_formatter "%a" (print_fmla info) f;
-        let s = flush_str_formatter () in
-        fprintf fmt "%s " s;
-      ) model_list;
+
+      let model_map =
+	S.fold (fun f acc ->
+          fprintf str_formatter "%a" (print_fmla info) f;
+          let s = flush_str_formatter () in
+          fprintf fmt "%s " s;
+	  Stdlib.Mstr.add s f acc)
+	info_model
+	Stdlib.Mstr.empty in
       fprintf fmt "))@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
-      info.info_model <- info_model
+      info.info_model <- info_model;
+      model_map
     end
+  else
+    Stdlib.Mstr.empty
 
 let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
   | Paxiom ->
@@ -583,9 +465,8 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      let model_list = S.elements info.info_model in
       fprintf fmt "@[(check-sat)@]@\n";
-      print_info_model cntexample fmt model_list info;
+      let model_list = print_info_model cntexample fmt info in
       if cntexample then begin
 	(* (get-info :reason-unknown) *)
 	fprintf fmt "@[(get-info :reason-unknown)@]@\n";
@@ -619,20 +500,21 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc cntexample args info fmt d =
+  match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-      (print_list space (print_data_decl info)) dl
+      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+        (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smtv2 : inductive definition are not supported"
+      "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f
@@ -648,6 +530,7 @@ let print_task args ?old:_ fmt task =
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_converters = Printer.get_converter_map task;
+    info_rliteral = Printer.get_rliteral_map task;
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;

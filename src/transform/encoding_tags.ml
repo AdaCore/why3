@@ -115,9 +115,8 @@ let ls_desc info ls =
   [create_prop_decl Paxiom pr (t_type_close (expl_term info true) f)]
 
 let decl info d = match d.d_node with
-  | Dtype { ts_def = Some _ } -> []
-  | Dtype ts ->
-      [d; lsdecl_of_ts ts]
+  | Dtype { ts_def = Alias _ } -> []
+  | Dtype ts -> [d; lsdecl_of_ts ts]
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls ->

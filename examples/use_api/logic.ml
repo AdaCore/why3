@@ -120,12 +120,14 @@ An arithmetic goal: 2+2 = 4
 
 *)
 
-let two : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "2"))
-let four : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "4"))
-let int_theory : Theory.theory =
-  Env.read_theory env ["int"] "Int"
+let two  : Term.term = Term.t_nat_const 2
+let four : Term.term = Term.t_nat_const 4
+
+let int_theory : Theory.theory = Env.read_theory env ["int"] "Int"
+
 let plus_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix +"]
+
 let two_plus_two : Term.term = Term.fs_app plus_symbol [two;two] Ty.ty_int
 let two_plus_two : Term.term = Term.t_app_infer plus_symbol [two;two]
 let fmla3 : Term.term = Term.t_equ two_plus_two four
@@ -150,19 +152,20 @@ let () = printf "@[On task 3, alt-ergo answers %a@."
   Call_provers.print_prover_result result3
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
-let zero : Term.term = Term.t_const (Number.ConstInt (Number.int_const_dec "0"))
+let zero : Term.term = Term.t_nat_const 0
+
 let mult_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix *"]
+
 let ge_symbol : Term.lsymbol =
   Theory.ns_find_ls int_theory.Theory.th_export ["infix >="]
 
 let var_x : Term.vsymbol =
   Term.create_vsymbol (Ident.id_fresh "x") Ty.ty_int
+
 let x : Term.term = Term.t_var var_x
-let x_times_x : Term.term =
-  Term.t_app_infer mult_symbol [x;x]
-let fmla4_aux : Term.term =
-  Term.ps_app ge_symbol [x_times_x;zero]
+let x_times_x : Term.term = Term.t_app_infer mult_symbol [x;x]
+let fmla4_aux : Term.term = Term.ps_app ge_symbol [x_times_x;zero]
 let fmla4 : Term.term = Term.t_forall_close [var_x] [] fmla4_aux
 
 let task4 = None
@@ -275,9 +278,9 @@ let d =
   }
   in
   let body =
-    let c6 = Term.t_const (Number.ConstInt (Number.int_const_dec "6")) in
-    let c7 = Term.t_const (Number.ConstInt (Number.int_const_dec "7")) in
-    let c42 = Term.t_const (Number.ConstInt (Number.int_const_dec "42")) in
+    let c6 = Term.t_nat_const 6 in
+    let c7 = Term.t_nat_const 7 in
+    let c42 = Term.t_nat_const 42 in
     let p =
       Term.t_equ (Term.t_app_infer mul_int [c6;c7]) c42
     in
@@ -344,7 +347,8 @@ let d2 =
       (* e1 : the appropriate instance of "ref" *)
       let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
       (* we apply it to 0 *)
-      let c0 = Mlw_expr.e_const (Number.ConstInt (Number.int_const_dec "0")) in
+      let c0 = Mlw_expr.e_const
+        (Number.ConstInt (Number.int_const_dec "0")) Mlw_ty.ity_int in
       Mlw_expr.e_app e1 [c0]
     in
     (* building the first part of the let x = ref 0 *)

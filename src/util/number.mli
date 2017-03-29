@@ -43,7 +43,13 @@ val compute_int : integer_constant -> BigInt.t
 val real_const_dec : string -> string -> string option -> real_constant
 val real_const_hex : string -> string -> string option -> real_constant
 
-(** Printing *)
+(** Pretty-printing *)
+
+val print_integer_constant : formatter -> integer_constant -> unit
+val print_real_constant : formatter -> real_constant -> unit
+val print_constant : formatter -> constant -> unit
+
+(** Pretty-printing with conversion *)
 
 type integer_format =
   (string -> unit, Format.formatter, unit) format
@@ -82,3 +88,40 @@ type number_support = {
 }
 
 val print : number_support -> formatter -> constant -> unit
+
+val print_in_base : int -> int option -> formatter -> BigInt.t -> unit
+(** [print_in_base radix digits fmt i] prints the value of [i] in base
+    [radix]. If digits is not [None] adds leading 0s to have [digits]
+    characters. *)
+
+(** Range checking *)
+
+type int_range = {
+  ir_lower : BigInt.t;
+  ir_upper : BigInt.t;
+}
+
+exception OutOfRange of integer_constant
+
+val check_range : integer_constant -> int_range -> unit
+(** [check_range c ir] checks that [c] is in the range described
+    by [ir], and raises [OutOfRange c] if not. *)
+
+(** Float checking *)
+
+type float_format = {
+  fp_exponent_digits    : int;
+  fp_significand_digits : int; (* counting the hidden bit *)
+}
+
+exception NonRepresentableFloat of real_constant
+
+val compute_float : real_constant -> float_format -> BigInt.t * BigInt.t
+(** [compute_float c fp] checks that [c] is a float literal
+    representable in the format [fp]. Returns a pair [e,s] with
+    [s] the significand (without the hidden bit), and [e] the biased
+    exponent. Raises [NonRepresentableFloat c] exception otherwise. *)
+
+val check_float : real_constant -> float_format -> unit
+(** [check_float c fp] is the same as [compute_float c fp]
+    but does not return any value. *)

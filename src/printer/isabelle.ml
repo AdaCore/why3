@@ -158,6 +158,18 @@ let print_abs info pr fmt (v, t) =
 
 let p_type p = p.pat_ty
 
+let rec split_por p = match p.pat_node with
+  | Pwild -> [pat_wild p.pat_ty]
+  | Pvar v -> [pat_var v]
+  | Pas _ -> assert false
+  | Por (p1, p2) -> split_por p1 @ split_por p2
+  | Papp (cs, pl) ->
+      List.map (fun zs -> pat_app cs zs p.pat_ty)
+        (List.fold_right
+           (fun xs xss -> List.concat
+              (List.map (fun x -> List.map (fun ys -> x :: ys) xss) xs))
+           (List.map split_por pl) [[]])
+
 let rec print_pat info fmt p = match p.pat_node with
   | Pwild -> print_const fmt "Pure.dummy_pattern"
   | Pvar v -> print_var info fmt v
@@ -258,8 +270,9 @@ and print_quant info defs s fmt (vl, f) = match vl with
       (print_abs info (print_quant info defs s))) fmt (s, (v, (vl', f)))
 
 and print_branch info defs fmt br =
-  let p, _ as q = t_open_branch br in
-  elem' "pat" (pair (print_pat info) (print_term info defs)) fmt q;
+  let p, t = t_open_branch br in
+  print_list nothing (elem' "pat" (pair (print_pat info) (print_term info defs)))
+    fmt (List.map (fun q -> (q, t)) (split_por p));
   Svs.iter forget_var p.pat_vars
 
 let rec dest_conj t = match t.t_node with
@@ -376,9 +389,10 @@ let print_ind_decls info s fmt tl =
 
 let print_type_decl info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn || is_ts_tuple ts) then
+  let def = match ts.ts_def with Alias ty -> Some ty | _ -> None in
     (elem "typedecl" (print_ts info)
        (pair print_tparams (print_option (print_ty info)))
-       fmt (ts, (ts.ts_args, ts.ts_def));
+       fmt (ts, (ts.ts_args, def));
      forget_tvs ())
 
 let print_param_decl info fmt ls =

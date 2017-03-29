@@ -130,8 +130,8 @@ module BitsSpec
 
   use bv.BV32
   val below (n: BV32.t) : t
-    requires { BV32.ule n (BV32.of_int 32) }
-    ensures  { result.mdl = interval 0 (BV32.to_uint n) }
+    requires { BV32.ule n (32:BV32.t) }
+    ensures  { result.mdl = interval 0 (BV32.t'int n) }
 end
 
 module Bits "the 1-bits of an integer, as a set of integers"
@@ -182,12 +182,12 @@ module Bits "the 1-bits of an integer, as a set of integers"
   let mul2 (a: t) : t
     ensures { result.mdl = remove size (succ a.mdl) }
   =
-    { bv = lsl_bv a.bv (of_int 1); mdl = remove size (succ a.mdl) }
+    { bv = lsl_bv a.bv (1:BV32.t); mdl = remove size (succ a.mdl) }
 
   let div2 (a: t) : t
     ensures { result.mdl = pred a.mdl }
   =
-    { bv = lsr_bv a.bv (of_int 1); mdl = pred a.mdl }
+    { bv = lsr_bv a.bv (1:BV32.t); mdl = pred a.mdl }
 
   let diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
@@ -218,17 +218,17 @@ module Bits "the 1-bits of an integer, as a set of integers"
     assert {nth_bv (neg a.bv) n_bv};
     let res = bw_and a.bv (neg a.bv) in
     assert {forall i. 0 <= i < n -> not (nth res i)};
-    assert {bits_interval_is_zeros_bv res (add n_bv (of_int 1)) (sub (of_int 31) n_bv )};
+    assert {bits_interval_is_zeros_bv res (add n_bv (1:BV32.t)) (sub (31:BV32.t) n_bv )};
     assert {bits_interval_is_zeros res (n + 1) (31 - n)};
     { bv = res;
       mdl = singleton n }
 
   let below (n: BV32.t) : t
-    requires { BV32.ule n (BV32.of_int 32) }
-    ensures  { result.mdl = interval 0 (to_uint n) }
+    requires { BV32.ule n (32:BV32.t) }
+    ensures  { result.mdl = interval 0 (t'int n) }
   =
     { bv = bw_not (lsl_bv ones n);
-      mdl = interval 0 (to_uint n) }
+      mdl = interval 0 (t'int n) }
 
 end
 
@@ -331,7 +331,7 @@ module NQueensBits
     end
 
   let queens (q: BV32.t)
-    requires { BV32.to_uint q = n }
+    requires { BV32.t'int q = n }
     requires { BV32.ule q BV32.size_bv }
     requires { !s = 0 }
     ensures  { result = !s }

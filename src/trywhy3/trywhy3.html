@@ -14,6 +14,7 @@
       var load_embedded_files = false;
       var editor_theme = "ace/theme/chrome";
       var editor_mode = "ace/mode/why3";
+      var task_viewer_mode = "ace/mode/why3";
       var library_index = "examples/index.txt";
     </script>
     <script defer="defer" type="text/javascript"
@@ -97,11 +98,11 @@
 	<div id="why3-resize-bar" class="why3-widget" ></div>
 	<div id="why3-tab-container" class="why3-container">
 	  <div id="why3-tab-panel" class="why3-tab-group">
-	    <span class="why3-tab-label why3-widget" >Task list</span>
+	    <span id="why3-task-list-tab" class="why3-tab-label why3-widget" >Task list</span>
 	    <div class="why3-widget why3-tab">
 	      <div id="why3-task-list" class="why3-widget"></div>
 	    </div>
-	    <span class="why3-tab-label why3-widget why3-inactive" >Task view</span>
+	    <span id="why3-task-view-tab" class="why3-tab-label why3-widget why3-inactive" >Task view</span>
 	    <div class="why3-widget why3-tab"><div  id="why3-task-viewer"></div></div>
 	  </div>
 	</div>

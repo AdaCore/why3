@@ -147,7 +147,8 @@ val lookup_nonghost_reg : Sreg.t -> ity -> bool
 val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)
 val ty_unit : ty
 
-val ity_int : ity
+val ity_int  : ity
+val ity_real : ity
 val ity_bool : ity
 val ity_unit : ity
 
