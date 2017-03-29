@@ -37,6 +37,7 @@ module C
 
   let incr (p:ptr 'a) (ofs:int32) : ptr 'a
     (* TODO: aliases { p, result } *)
+    requires { p.offset + ofs <= plength p }
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
    =
@@ -76,6 +77,7 @@ module C
   = ()
 
   val malloc (sz:uint32) : ptr 'a
+    requires { sz > 0 }
     ensures { plength result = UInt32.to_int sz \/ plength result = 0 }
     ensures { result.offset = 0 }
 

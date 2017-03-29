@@ -595,7 +595,7 @@ module Translate = struct
     | Elet (ld,e) ->
       begin match ld with
       | LDvar (pv,le) ->
-        Format.printf "let %s@." pv.pv_vs.vs_name.id_string;
+        (*Format.printf "let %s@." pv.pv_vs.vs_name.id_string;*)
         if pv.pv_ghost
         (*TODO check it's actually unused *)
         then expr info env e

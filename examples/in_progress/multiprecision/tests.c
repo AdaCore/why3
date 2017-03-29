@@ -85,10 +85,10 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 100; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 100; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 

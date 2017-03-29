@@ -45,6 +45,7 @@ module N
 
   function p2i (i:int32) : int = Int32.to_int i
 
+  exception Break
   exception Return32 int32
 
   let lemma prod_compat_strict_r (a b c:int)
@@ -509,12 +510,14 @@ module N
                  + (value_sub_shift y k + (power radix k) * !ly)
               = value_sub_shift x (!i) + value_sub_shift y (!i) };
     done;
-    while Int32.(<) !i sx do
+    try
+    begin while Int32.(<) !i sx do
       variant { sx - !i }
       invariant { sy <= !i <= sx }
       invariant { value_sub_shift r (!i) + (power radix (!i)) * !c =
                 value_sub_shift x (!i) + value_sub_shift y (sy) }
       invariant { 0 <= !c <= 1 }
+      (if (Limb.(=) !c (Limb.of_int 0)) then raise Break);
       label StartLoop2 in
       lx := get_ofs x !i;
       let res, carry = add_with_carry !lx limb_zero !c in
@@ -543,6 +546,36 @@ module N
                  + (power radix k) * !lx
               = value_sub_shift x (!i)
                  + value_sub_shift y (sy) }
+    done;
+    assert { !i = sx }
+    end
+    with Break -> assert { !c = 0 }
+    end;
+    while Int32.(<) !i sx do
+      variant { sx - !i }
+      invariant { sy <= !i <= sx }
+      invariant { !i = sx \/ !c = 0 }
+      invariant { value_sub_shift r (!i) + power radix !i * !c =
+                value_sub_shift x (!i) + value_sub_shift y (sy) }
+      assert { !c = 0 by !i < sx };
+      lx := get_ofs x !i;
+      set_ofs r !i !lx;
+      let ghost k = p2i !i in
+      i := Int32.(+) !i (Int32.of_int 1);
+      value_sub_tail (pelts r) r.offset (r.offset + k);
+      value_sub_tail (pelts x) x.offset (x.offset + k);
+      assert { value_sub_shift r !i + power radix !i * !c
+               = value_sub_shift x !i + value_sub_shift y sy
+               by
+               value_sub_shift r !i + power radix !i * !c
+                 = value_sub_shift r !i
+                 = value_sub_shift r k + power radix k * !lx
+               so value_sub_shift x !i
+                  = value_sub_shift x k + power radix k * !lx
+               so value_sub_shift r k
+                  = value_sub_shift r k + power radix k * !c
+                  = value_sub_shift x k + value_sub_shift y sy
+             }
     done;
     !c
 
