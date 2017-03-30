@@ -170,6 +170,9 @@ module type S =
 
     val remove_left: t -> elt -> t
     (** [remove_left s x] is the same as [remove x s]. *)
+
+    val print: (Format.formatter -> elt -> unit) ->
+               Format.formatter -> t -> unit
   end
 
 module MakeOfMap (M : Extmap.S) : S with module M = M
