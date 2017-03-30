@@ -24,11 +24,22 @@ In the following, strings are referred to with the non-terminal
 
 \subsection{Identifiers}
 
-The syntax distinguishes lowercase and
-uppercase identifiers and, similarly, lowercase and uppercase
-qualified identifiers.
+Identifiers are non-empty sequences of characters among letters,
+digits, the underscore character and the quote character. They cannot
+start with a digit or a quote.
 
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
+
+The syntax distinguishes identifiers that start with a lowercase or an
+uppercase letter (resp. \nonterm{lident}{} and \nonterm{uident}{}), and
+similarly, lowercase and uppercase qualified identifiers.
+
+The restricted classes of identifiers denoted by \nonterm{lident-nq}{}
+and \nonterm{uident-nq}{} correspond to identifiers where the quote
+character cannot be followed by a letter. Identifiers where a quote is
+followed by a letter are reserved and cannot be used as identifier for
+declarations introduced by the user (see Section~\ref{sec:rangetypes}).
+
 
 \subsection{Constants}
 The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
@@ -124,6 +135,7 @@ TO BE COMPLETED
 TO BE COMPLETED
 
 \subsubsection{Range types}
+\label{sec:rangetypes}
 
 A declaration of the form \texttt{type r = < range \textit{a b} >}
 defines a type that projects into the integer range
@@ -160,12 +172,12 @@ This type is used in the standard library in the theories
 \texttt{bv.BV8}, \texttt{bv.BV16}, \texttt{bv.BV32}, \texttt{bv.BV64}.
 
 
-\subsubsection{floating point types}
+\subsubsection{Floating-point Types}
 
 A declaration of the form \texttt{type f = < float \textit{eb sb} >}
-defines the type of floating point numbers as specified by the
-IEEE-754 standard. Here the literal \texttt{\textit{eb}} represents
-the number of bits in the exponent and the literal
+defines a type of floating-point numbers as specified by the IEEE-754
+standard~\cite{ieee754}. Here the literal \texttt{\textit{eb}}
+represents the number of bits in the exponent and the literal
 \texttt{\textit{sb}} the number of bits in the significand (including
 the hidden bit). Note that in order to make such a declaration the
 theory \texttt{real.Real} must be imported.
@@ -183,9 +195,13 @@ Defining such a type \texttt{f} automatically introduces the following:
   constant  f'eb : int
   constant  f'sb : int
 \end{whycode}
-The predicate \texttt{f'isFinite} is the finitness predicate associated to
-the float format. The function \texttt{f'real} projects a finite term of type
-\texttt{f} to its real value, it is not specified for non finite terms.
+As specified by the IEEE standard, float formats includes infinite
+values and also a special NaN value (Not-a-Number) to represent
+results of undefined operations such as $0/0$.  The predicate
+\texttt{f'isFinite} indicates whether its argument is neither infinite
+nor NaN. The function \texttt{f'real} projects a finite term of type
+\texttt{f} to its real value, its result is not specified for non finite
+terms.
 
 Unless specified otherwise with the meta \texttt{"keep:literal"} on
 \texttt{f}, the transformation \emph{eliminate\_literal} will
