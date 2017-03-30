@@ -244,9 +244,29 @@ module TestExtraction
   let test2 () raises { AssertFailure }
   = ocaml_assert (of_int 1 + of_int 1 = of_int 2)
 
+  (* testing proxy-variables inlining mechanism inside a lambda *)
+  let test3 () raises { AssertFailure }
+  = let i = ref (of_int 42) in
+    let c = Cons !i in
+    i := (of_int 0);
+    let c = c Nil in
+    ocaml_assert (match c with Cons x _ -> x = of_int 42 | _ -> true end)
+
+  (* testing proxy-variables inlining with conflicting effects *)
+  let test4 () raises { AssertFailure }
+  = let f (x y: int63) raises { AssertFailure }
+    = ocaml_assert (y = of_int 42);
+      x + y in
+    let i = ref (of_int 42) in
+    let res = f (i := of_int 0; !i) !i in
+    ocaml_assert (!i = of_int 0);
+    ocaml_assert (res = of_int 42)
+
   let main () raises { AssertFailure } =
     test1 ();
     test2 ();
+    test3 ();
+    test4 ();
     test_parallel_assign ()
 
 end

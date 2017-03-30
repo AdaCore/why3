@@ -581,6 +581,11 @@ let ls_of_rs rs = match rs.rs_logic with
   | _ -> assert false
 *)
 
+let clone_type_record cl s s' =
+  (* check if fields from former type are also declared in the new type *)
+
+  cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
+
 let clone_type_decl inst cl tdl =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
@@ -614,12 +619,12 @@ let clone_type_decl inst cl tdl =
             raise (BadInstance id);
           if not (its_pure s && its_pure s') then raise (BadInstance id);
           (* TODO: accept refinement of private records *)
-          cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
+          clone_type_record cl s s'
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity ->
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                    its_pure s && ity_immutable ity) then raise (BadInstance id);
+                  its_pure s && ity_immutable ity) then raise (BadInstance id);
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
@@ -892,6 +897,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       if tdl = [] then List.fold_left add_vc uc vcl else
       add_pdecl ~vc:false uc (create_type_decl tdl)
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
+      (* only refine [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);
       let kind = match rs.rs_logic with
         | RLnone -> RKnone

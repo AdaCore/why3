@@ -834,8 +834,11 @@ module Transform = struct
 
   open ML
 
-  let conflict_reads_writes spv spv_mreg =
-    Mreg.exists (fun _ v -> not (Spv.is_empty (Spv.diff v spv))) spv_mreg
+  let no_reads_writes_conflict spv spv_mreg =
+    let is_reg {pv_ity = ity} = match ity.ity_node with
+        | Ityreg rho -> not (Mreg.mem rho spv_mreg)
+        | _ -> true in
+    Spv.for_all is_reg spv
 
   type subst = expr Mpv.t
 
@@ -848,12 +851,12 @@ module Transform = struct
     let mk e_node = { e with e_node = e_node } in
     let add_subst pv e1 e2 = expr info (Mpv.add pv e1 subst) e2 in
     match e.e_node with
-    | Evar pv ->
-      (try Mpv.find pv subst, Spv.singleton pv with Not_found -> e, Spv.empty)
+    | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
+        with Not_found -> e, Spv.empty end
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
       when Slab.mem Expr.proxy_label pv.pv_vs.vs_name.id_label &&
            eff_pure eff1 &&
-           not (conflict_reads_writes eff1.eff_reads eff2.eff_writes) ->
+           no_reads_writes_conflict eff1.eff_reads eff2.eff_writes ->
       let e1, s1 = expr info subst e1 in
       let e2, s2 = add_subst pv e1 e2 in
       let s_union = Spv.union s1 s2 in
@@ -868,10 +871,17 @@ module Transform = struct
       let e_app, spv = mk_list_eb el (expr info subst) in
       mk (Eapp (rs, e_app)), spv
     | Efun (vl, e) ->
-      (* We begin the inlining of proxy variables in an [Efun]
-         with the empty substituion. This keeps A-normal lets,
-         preventing undiserable capture of variables insinde. *)
-      let e, spv = expr info Mpv.empty e in
+      (* For now, we accept to inline constants and constructors
+         with zero arguments inside a [Efun]. *)
+      let p _k e = match e.e_node with
+        | Econst _ -> true
+        | Eapp (rs, []) when Translate.isconstructor info rs -> true
+        | _ -> false in
+      let restrict_subst = Mpv.filter p subst in
+      (* We begin the inlining of proxy variables in an [Efun] with a
+         restricted substituion. This keeps some proxy lets, preventing
+         undiserable captures inside the [Efun] expression. *)
+      let e, spv = expr info restrict_subst e in
       mk (Efun (vl, e)), spv
     | Eif (e1, e2, e3) ->
       let e1, s1 = expr info subst e1 in
@@ -939,8 +949,7 @@ module Transform = struct
   let pdecl info = function
     | Dtype _ | Dexn _ | Dclone _ as d -> d
     | Dlet def ->
-      (* for top-level symbols we can forget
-         the set of inlined variables *)
+      (* for top-level symbols we can forget the set of inlined variables *)
       let e, _ = let_def info Mpv.empty def in
       Dlet e
 
