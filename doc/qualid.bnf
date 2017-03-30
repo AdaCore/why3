@@ -3,11 +3,21 @@
   \
   ualpha ::= "A"-"Z"
   \
-  alpha ::= lalpha | ualpha
+  digit-or-us ::= "0"-"9" | "_"
   \
-  lident ::= lalpha (alpha | digit | "'")*
+  alpha-no-us ::= "a"-"z" | "A"-"Z"
   \
-  uident ::= ualpha (alpha | digit | "'")*
+  suffix ::= (alpha-no-us | "'"* digit-or-us)* "\"*
+  \
+  lident-nq ::= lalpha suffix
+  \
+  uident-nq ::= ualpha suffix
+  \
+  lident ::= lident ("'" alpha-no-us suffix)+
+  \
+  uident ::= uident ("'" alpha-no-us suffix)+
+  \
+  ident-nq ::= lident-nq | uident-nq
   \
   ident ::= lident | uident
   \
