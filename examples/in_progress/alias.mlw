@@ -1,3 +1,29 @@
+
+module Test
+
+  type t = {
+     mutable f : int;
+  }
+
+  val c1 (x:t) : t
+    alias { x.f ~ result.f }
+
+(*
+  let test () =
+    let x = { f = 42 } in
+    let y = c x in
+    if any bool then x else y
+*)
+
+  let c2 (x:t) : unit =
+    let y = x in
+    let z = if any bool then x else y in
+    ()
+
+
+end
+
+
 module A
 
   use import map.Map
