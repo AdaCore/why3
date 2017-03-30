@@ -381,7 +381,8 @@ let clear_tree_and_table goals_model =
   Hint.clear node_id_to_gtree;
   Hint.clear node_id_type;
   Hint.clear node_id_proved;
-  Hint.clear node_id_pa
+  Hint.clear node_id_pa;
+  Hint.clear node_id_detached
 
 
 (**************)

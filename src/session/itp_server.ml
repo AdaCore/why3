@@ -447,14 +447,32 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     let d = get_server_data () in
     is_detached d.cont.controller_session node
 
-(*
-  let get_node_proved (node: any) =
+  let get_node_proved new_id (node: any) =
+    let d = get_server_data () in
+    let cont = d.cont in
     match node with
-    | Afile file ->
-      file_proved cont file
+    | AFile file ->
+      P.notify (Node_change (new_id, Proved (file_proved cont file)))
     | ATh th ->
-      th_proved cont th
+      P.notify (Node_change (new_id, Proved (th_proved cont th)))
+    | ATn tn ->
+      P.notify (Node_change (new_id, Proved (tn_proved cont tn)))
+    | APn pn ->
+      P.notify (Node_change (new_id, Proved (pn_proved cont pn)))
+    | APa pa ->
+      let pa = get_proof_attempt_node cont.controller_session pa in
+      let is_obsolete = pa.proof_obsolete in
+      let resource_limit = pa.limit in
+      begin
+        match pa.proof_state with
+        | Some pa ->
+            P.notify (Node_change (
+                       new_id, Proof_status_change
+                                (Done pa, is_obsolete, resource_limit)))
+        | _ -> ()
+      end
 
+(*
   let get_info_and_type ses (node: any) =
     match node with
     | AFile file ->
@@ -544,6 +562,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let node_detached = get_node_detached node in
       add_node_to_table node new_id;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+      get_node_proved new_id node;
       new_id
 
   (****************************)
@@ -628,7 +647,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let node_name = get_node_name any in
       let node_type = get_node_type any in
       let node_detached = get_node_detached any in
-      P.notify (New_node (node_id, parent, node_type, node_name, node_detached)) in
+      P.notify (New_node (node_id, parent, node_type, node_name, node_detached));
+      get_node_proved node_id any in
     iter_the_files send_node root_node
 
   (* -- send the task -- *)
