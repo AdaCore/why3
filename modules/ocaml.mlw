@@ -34,6 +34,7 @@ end
 module OCaml
 
   use export int.Int
+  use mach.int.Int63
   use export int.MinMax
   use export option.Option
   use export list.List
@@ -41,7 +42,9 @@ module OCaml
 
   use Sys
 
-  use array.Array
+  use mach.array.Array63 as Array
   type array 'a = Array.array 'a
+
+  type int63 = Int63.int63
 
 end
