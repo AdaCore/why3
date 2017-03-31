@@ -260,12 +260,12 @@ module Print = struct
       syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
       syntax_arguments s (print_expr ~paren:true info) fmt pvl;
-    | _, _, tl when is_rs_tuple rs ->
+    | _, None, tl when is_rs_tuple rs ->
       fprintf fmt "@[(%a)@]"
         (print_list comma (print_expr info)) tl
-    | _,  _, [t1] when isfield ->
+    | _, None, [t1] when isfield ->
       fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
-    | _, _, tl when isconstructor () ->
+    | _, None, tl when isconstructor () ->
       let pjl = get_record info rs in
       begin match pjl, tl with
       | [], [] ->
@@ -280,9 +280,9 @@ module Print = struct
         fprintf fmt "@[<hov 2>{ %a }@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
       end
-    | _, _, [] ->
+    | _, None, [] ->
       (print_lident info) fmt rs.rs_name
-    | _, _, tl ->
+    | _, None, tl ->
       fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
         (print_lident info) rs.rs_name
         (print_list space (print_expr ~paren:true info)) tl

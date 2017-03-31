@@ -835,10 +835,10 @@ module Transform = struct
   open ML
 
   let no_reads_writes_conflict spv spv_mreg =
-    let is_reg {pv_ity = ity} = match ity.ity_node with
+    let is_not_write {pv_ity = ity} = match ity.ity_node with
         | Ityreg rho -> not (Mreg.mem rho spv_mreg)
         | _ -> true in
-    Spv.for_all is_reg spv
+    Spv.for_all is_not_write spv
 
   type subst = expr Mpv.t
 
@@ -879,7 +879,7 @@ module Transform = struct
         | _ -> false in
       let restrict_subst = Mpv.filter p subst in
       (* We begin the inlining of proxy variables in an [Efun] with a
-         restricted substituion. This keeps some proxy lets, preventing
+         restricted substitution. This keeps some proxy lets, preventing
          undiserable captures inside the [Efun] expression. *)
       let e, spv = expr info restrict_subst e in
       mk (Efun (vl, e)), spv
