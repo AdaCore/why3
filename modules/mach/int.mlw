@@ -222,6 +222,9 @@ module Int63
     constant min = min_int63,
     constant max = max_int63
 
+  let constant zero = of_int 0
+  let constant one = of_int 1
+
 (*  use bv.BV63
 
   val to_bv (x: int63) : BV63.t
