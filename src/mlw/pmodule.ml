@@ -581,12 +581,31 @@ let ls_of_rs rs = match rs.rs_logic with
   | _ -> assert false
 *)
 
-let clone_type_record cl s s' =
+let clone_type_record cl s d s' d' =
+  let id = s.its_ts.ts_name in
   (* check if fields from former type are also declared in the new type *)
-
+  let s_plj' = Srs.of_list d'.itd_fields in
+  let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
+    let pj_str = pj.pv_vs.vs_name.id_string in
+    let pj_ity = pj.pv_ity in
+    let pj_ght = pj.pv_ghost in
+    let in_set ({rs_field = pj'} as rs')= let pj' = Opt.get pj' in
+      let pj'_str = pj'.pv_vs.vs_name.id_string in
+      let pj'_ity = pj'.pv_ity in
+      let pj'_ght = pj'.pv_ghost in
+      let ls, ls' = match rs.rs_logic, rs'.rs_logic with
+        | RLls ls, RLls ls' -> ls, ls'
+        | _ -> assert false in
+      (* FIXME: refractor this code. I am not happy with its organization *)
+      cl.ls_table <- Mls.add ls ls' cl.ls_table;
+      (* TODO? : populate rs_table *)
+      pj_str = pj'_str && ity_equal pj_ity pj'_ity && pj_ght = pj'_ght in
+    Srs.exists in_set s_plj' in
+  let contains_all = List.for_all match_pj d.itd_fields in
+  if not contains_all then raise (BadInstance id);
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
-let clone_type_decl inst cl tdl =
+let clone_type_decl inst cl tdl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let htd = Hits.create 5 in
@@ -619,7 +638,12 @@ let clone_type_decl inst cl tdl =
             raise (BadInstance id);
           if not (its_pure s && its_pure s') then raise (BadInstance id);
           (* TODO: accept refinement of private records *)
-          clone_type_record cl s s'
+          let pd' = Mid.find s'.its_ts.ts_name kn in
+          let d' = begin match pd'.pd_node with
+            | PDtype [d'] -> d'
+            | _ -> raise (BadInstance id) (* FIXME? *)
+          end in
+          clone_type_record cl s d s' d'
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity ->
           let stv = Stv.of_list ts.ts_args in
@@ -893,11 +917,11 @@ let add_vc uc (its, f) =
 
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
-      let tdl, vcl = clone_type_decl inst cl tdl in
+      let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
       add_pdecl ~vc:false uc (create_type_decl tdl)
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
-      (* only refine [val] symbols *)
+      (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);
       let kind = match rs.rs_logic with
         | RLnone -> RKnone
