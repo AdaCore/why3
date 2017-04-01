@@ -575,34 +575,34 @@ let cl_save_rs cl s s' =
   | RLnone, RLnone -> ()
   | _ -> assert false
 
-(*
+(* Mário: recovered this commented function *)
 let ls_of_rs rs = match rs.rs_logic with
   | RLls ls -> ls
   | _ -> assert false
-*)
+
+exception PreStop of rsymbol (* Remove after migration to OCaml 4.04+ *)
+let in_set_exn exn p srs =
+  (* let exception PreStop of rsymbol in -> after migration to OCaml 4.04+ *)
+  try Srs.iter (fun rs -> if p rs then raise (PreStop rs)) srs; raise exn
+  with PreStop rs -> rs
 
 let clone_type_record cl s d s' d' =
   let id = s.its_ts.ts_name in
-  (* check if fields from former type are also declared in the new type *)
   let s_plj' = Srs.of_list d'.itd_fields in
+  (* check if fields from former type are also declared in the new type *)
   let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
     let pj_str = pj.pv_vs.vs_name.id_string in
     let pj_ity = pj.pv_ity in
     let pj_ght = pj.pv_ghost in
-    let in_set ({rs_field = pj'} as rs')= let pj' = Opt.get pj' in
+    let in_set {rs_field = pj'} = let pj' = Opt.get pj' in
       let pj'_str = pj'.pv_vs.vs_name.id_string in
       let pj'_ity = pj'.pv_ity in
       let pj'_ght = pj'.pv_ghost in
-      let ls, ls' = match rs.rs_logic, rs'.rs_logic with
-        | RLls ls, RLls ls' -> ls, ls'
-        | _ -> assert false in
-      (* FIXME: refractor this code. I am not happy with its organization *)
-      cl.ls_table <- Mls.add ls ls' cl.ls_table;
-      (* TODO? : populate rs_table *)
       pj_str = pj'_str && ity_equal pj_ity pj'_ity && pj_ght = pj'_ght in
-    Srs.exists in_set s_plj' in
-  let contains_all = List.for_all match_pj d.itd_fields in
-  if not contains_all then raise (BadInstance id);
+    let rs' = in_set_exn (BadInstance id) in_set s_plj' in
+    let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
+    cl.ls_table <- Mls.add ls ls' cl.ls_table in (* TODO? : populate rs_table *)
+  List.iter match_pj d.itd_fields;
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
 let clone_type_decl inst cl tdl kn =
