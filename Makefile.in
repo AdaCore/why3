@@ -617,6 +617,11 @@ bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
+bin/gnatwhy3.byte: lib/why3/why3.cma $(GNATCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+
 bin/gnatwhy3: bin/gnatwhy3.@OCAMLBEST@
 	ln -sf gnatwhy3.@OCAMLBEST@ $@
 
