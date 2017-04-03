@@ -1147,19 +1147,23 @@ let rec merge_goal ~use_shapes env new_s old_s obsolete old_goal new_goal_id =
                 let pa = get_proof_attempt_node old_s pa in
                 merge_proof new_s obsolete new_goal_id k pa)
                old_goal.proofn_attempts;
-  List.iter (merge_trans ~use_shapes env old_s new_s new_goal_id) old_goal.proofn_transformations;
+  List.iter
+    (merge_trans ~use_shapes env old_s new_s new_goal_id)
+    old_goal.proofn_transformations;
   let new_trans = (get_proofNode new_s new_goal_id) in
   new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
 
 and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
+  let old_subtasks = List.map (fun id -> id,old_s)
+      old_tr.transf_subtasks in
+  (* add_registered_transformation actually apply the transformation. It can fail *)
+  try (
   let new_tr_id =
     add_registered_transformation new_s env old_tr new_goal_id
   in
   let new_tr = get_transfNode new_s new_tr_id in
   (* attach the session to the subtasks to be able to instantiate Pairing *)
-  let old_subtasks = List.map (fun id -> id,old_s)
-      old_tr.transf_subtasks in
   let new_subtasks = List.map (fun id -> id,new_s)
       new_tr.transf_subtasks in
   List.iter
@@ -1184,7 +1188,11 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     associated;
   (* save the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
+  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id))
+  with | _ ->
+    (* TODO should create a detached transformation instead *)
+    ()
+
 
 let merge_theory ~use_shapes env old_s old_th s th : unit =
   let found_missed_goals_in_theory = ref false in
