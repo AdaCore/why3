@@ -277,7 +277,8 @@ module Print = struct
         fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
           (print_list comma (print_expr info)) tl
       | pjl, tl ->
-        fprintf fmt "@[<hov 2>{ %a }@]"
+        let equal fmt () = fprintf fmt " = " in
+        fprintf fmt "@[<hov 2>{ @[%a@] }@]"
           (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
       end
     | _, None, [] ->
@@ -347,7 +348,7 @@ module Print = struct
       fprintf fmt (protect_on paren "%a")
         (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
-      fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@] end")
+      fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@]@\nend")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
@@ -408,7 +409,7 @@ module Print = struct
     (* | Ecast _ -> (\* TODO *\) assert false *)
 
   and print_branch info fmt (p, e) =
-    fprintf fmt "@[<hov 4>| %a ->@ @[%a@]@]"
+    fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
       (print_pat info) p (print_expr info) e
 
   and print_raise ~paren info xs fmt e_opt =
