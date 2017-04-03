@@ -316,6 +316,31 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
+  (* Manipulations of files that handle errors *)
+  let cont_from_session_dir cont f =
+    try cont_from_session_dir cont f; true with
+    | e ->
+        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+        P.notify (Message (Error s)); false
+
+  let cont_from_file cont f =
+    try cont_from_file cont f; true with
+    | e ->
+        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+        P.notify (Message (Error s)); false
+
+  let reload_files cont ~use_shapes =
+    try reload_files cont ~use_shapes; true with
+    | e ->
+        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+        P.notify (Message (Error s)); false
+
+  let add_file c ?format fname =
+    try add_file c ?format fname; true with
+    | e ->
+        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+        P.notify (Message (Error s)); false
+
   let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
   type server_data =
@@ -397,22 +422,29 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       begin
         if (Sys.is_directory f) then
         begin
-          cont_from_session_dir d.cont f;
-          P.notify (Initialized infos)
+          let b = cont_from_session_dir d.cont f in
+          if b then
+            P.notify (Initialized infos);
+          b
         end
         else
         begin
-          cont_from_file d.cont f;
-          P.notify (Initialized infos)
+          let b = cont_from_file d.cont f in
+          if b then
+            P.notify (Initialized infos);
+          b
         end
       end
       else
-        P.notify (Message (Open_File_Error ("Not a file: " ^ f))))
+        begin
+          P.notify (Message (Open_File_Error ("Not a file: " ^ f)));
+          false
+        end)
     with
       | NotADirectory f ->
-          P.notify (Message (Open_File_Error ("Not a directory: " ^ f)))
+          P.notify (Message (Open_File_Error ("Not a directory: " ^ f))); false
       | BadFileName f ->
-          P.notify (Message (Open_File_Error ("Bad file name: " ^ f)))
+          P.notify (Message (Open_File_Error ("Bad file name: " ^ f))); false
       | e ->
           Format.eprintf "%a@." Exn_printer.exn_printer e;
           P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
@@ -464,7 +496,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let is_obsolete = pa.proof_obsolete in
       let resource_limit = pa.limit in
       begin
-        match pa.proof_state with
+        match pa.Session_itp.proof_state with
         | Some pa ->
             P.notify (Node_change (
                        new_id, Proof_status_change
@@ -690,9 +722,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     if (not (Stdlib.Hstr.mem files fn)) then
       if (Sys.file_exists f) then
       begin
-        Controller_itp.add_file cont f;
-        let file = Stdlib.Hstr.find files fn in
-        init_and_send_file file
+        let b = add_file cont f in
+        if b then
+          let file = Stdlib.Hstr.find files fn in
+          init_and_send_file file
       end
       else
         P.notify (Message (Open_File_Error ("Not a file: " ^ f)))
@@ -823,8 +856,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   let reload_session () : unit =
     let d = get_server_data () in
     clear_tables ();
-    reload_files d.cont ~use_shapes:true;
-    init_and_send_the_tree ()
+    let b = reload_files d.cont ~use_shapes:true in
+    if b then
+      init_and_send_the_tree ()
 
   let replay_session () : unit =
     let d = get_server_data () in
@@ -909,8 +943,13 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Add_file_req f ->
       add_file_to_session d.cont f
     | Open_session_req file_or_dir_name      ->
-      init_cont file_or_dir_name;
-      reload_session ()
+      begin
+        let b = init_cont file_or_dir_name in
+        if b then
+          reload_session ()
+        else
+          () (* Eventually print debug here *)
+      end
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0
      )

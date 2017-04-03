@@ -316,8 +316,8 @@ let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
   let new_theories =
     try
       read_file c.controller_env file_name ?format
-    with _ -> (* TODO: filter only syntax error and typing errors *)
-      []
+    with e -> (* TODO: filter only syntax error and typing errors *)
+      raise e
   in
   merge_file_section
     c.controller_session ~use_shapes ~old_ses ~old_theories
