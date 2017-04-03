@@ -22,6 +22,7 @@ type (_, _) trans_typ =
   | Tty       : ('a, 'b) trans_typ -> ((Ty.ty -> 'a), 'b) trans_typ
   | Ttysymbol : ('a, 'b) trans_typ -> ((Ty.tysymbol -> 'a), 'b) trans_typ
   | Tprsymbol : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tlsymbol  : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tterm     : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
   | Tstring   : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula  : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ

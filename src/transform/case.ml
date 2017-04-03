@@ -538,6 +538,43 @@ let intros n pr f =
 
 let introduce_premises n = Trans.goal (intros n)
 
+let t_replace_app unf ls_defn t =
+  let (vl, tls) = ls_defn in
+  match t.t_node with
+  | Tapp (ls, tl) when ls_equal unf ls ->
+      let mvs =
+        List.fold_left2 (fun acc (v: vsymbol) (t: term) ->
+          Mvs.add v t acc) Mvs.empty vl tl in
+      t_subst mvs tls
+  | _ -> t
+
+let t_ls_replace ls ls_defn t =
+  t_replace_app ls ls_defn (t_map (t_replace_app ls ls_defn) t)
+
+let unfold unf h =
+  let r = ref None in
+  Trans.decl
+    (fun d ->
+      match d.d_node with
+        (* Do not work on mutually recursive functions *)
+      | Dlogic [(ls, ls_defn)] when ls_equal ls unf ->
+          r := Some (open_ls_defn ls_defn);
+          [d]
+      | Dprop (k, pr, t) when pr_equal h pr  ->
+        begin
+          match !r with
+          | None -> [d]
+          | Some ls_defn ->
+              let t = t_ls_replace unf ls_defn t in
+              let new_decl = create_prop_decl k pr t in
+              [new_decl]
+        end
+      | _ -> [d]) None
+
+let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
+    "unfold"
+    (Tlsymbol (Tprsymbol Ttrans)) unfold
+
 let () = wrap_and_register ~desc:"intros n"
     "intros"
     (Tint Ttrans) introduce_premises

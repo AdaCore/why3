@@ -218,6 +218,7 @@ type (_, _) trans_typ =
   | Tty         : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
   | Ttysymbol   : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
   | Tprsymbol   : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tlsymbol    : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Tstring     : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
@@ -226,8 +227,10 @@ type (_, _) trans_typ =
   | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
 let find_pr s tables =
-  (*let tables = build_name_tables task in*)
   Mstr.find s tables.namespace.ns_pr
+
+let find_ls s tables =
+  Mstr.find s tables.namespace.ns_ls
 
 let type_ptree ~as_fmla t tables =
   (*let tables = build_name_tables task in*)
@@ -271,6 +274,7 @@ let trans_typ_tail: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
     | Tty t       -> t
     | Ttysymbol t -> t
     | Tprsymbol t -> t
+    | Tlsymbol t  -> t
     | Tterm t     -> t
     | Tstring t   -> t
     | Tformula t  -> t
@@ -289,6 +293,7 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tty t          -> is_trans_typ_l t
     | Ttysymbol t    -> is_trans_typ_l t
     | Tprsymbol t    -> is_trans_typ_l t
+    | Tlsymbol t     -> is_trans_typ_l t
     | Tterm t        -> is_trans_typ_l t
     | Tstring t      -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
@@ -307,6 +312,7 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tty _          -> "type"
     | Ttysymbol _    -> "type symbol"
     | Tprsymbol _    -> "prop symbol"
+    | Tlsymbol _     -> "logic symbol"
     | Tterm _        -> "term"
     | Tstring _      -> "string"
     | Tformula _     -> "formula"
@@ -325,6 +331,7 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Tty t          -> "type -> " ^ print_type t
     | Ttysymbol t    -> "type_symbol -> " ^ print_type t
     | Tprsymbol t    -> "prop_symbol -> " ^ print_type t
+    | Tlsymbol t     -> "logic_symbol -> " ^ print_type t
     | Tterm t        -> "term -> " ^ print_type t
     | Tstring t      -> "string -> " ^ print_type t
     | Tformula t     -> "formula -> " ^ print_type t
@@ -355,6 +362,10 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f tys) tail env tables task
     | Tprsymbol t', s :: tail ->
       let pr = try (find_pr s tables) with
+               | Not_found -> raise (Arg_hyp_not_found s) in
+      wrap_to_store t' (f pr) tail env tables task
+    | Tlsymbol t', s :: tail ->
+      let pr = try (find_ls s tables) with
                | Not_found -> raise (Arg_hyp_not_found s) in
       wrap_to_store t' (f pr) tail env tables task
     | Ttheory t', s :: tail ->
