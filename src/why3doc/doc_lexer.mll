@@ -44,7 +44,7 @@
     "mutable"; "private"; "raise"; "rec";
     "to"; "try"; "val"; "while"; ]
 
-  let is_keyword2 = make_table [ "absurd"; "assert"; "assume";
+  let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
     "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
     "returns"; "variant"; "writes"; "diverges"; ]
 

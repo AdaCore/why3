@@ -5,23 +5,20 @@ module Test
      mutable f : int;
   }
 
-  val c1 (x:t) : t
+  val c (x:t) : t
+    ensures { x.f = result.f }
     alias { x.f ~ result.f }
 
-(*
   let test () =
     let x = { f = 42 } in
     let y = c x in
+    assert { y.f = 42 };
+    y.f <- 27;
+    assert { x.f = 27 };
     if any bool then x else y
-*)
-
-  let c2 (x:t) : unit =
-    let y = x in
-    let z = if any bool then x else y in
-    ()
-
 
 end
+
 
 
 module A
@@ -55,17 +52,17 @@ module A
   val get (p:ptr 'a) : 'a
     requires { 0 <= p.offset < plength p }
     ensures { result = (p.data)[p.offset] }
-(*
+
   let get_ofs (p:ptr 'a) (ofs:int32) : 'a
     requires { 0 <= p.offset + Int32.to_int ofs < plength p }
     ensures { result = (p.data)[p.offset + Int32.to_int ofs] }
   = get (incr p ofs)
-*)
+
   val set (p:ptr 'a) (v:'a) : unit
     requires { 0 <= p.offset < plength p }
     ensures { pelts p = Map.set (pelts (old p)) p.offset v }
     writes { p.data.elts }
-(*
+
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
     requires { 0 <= p.offset + Int32.to_int ofs < plength p }
     ensures { pelts p = Map.set (pelts (old p))
@@ -73,11 +70,10 @@ module A
     writes { p.data.elts }
   =
     set (incr p ofs) v
-*)
+
   let test () : unit
   =
     let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
     let three = UInt32.of_int 3 in
     let p = malloc three in
     let q = incr p zero in

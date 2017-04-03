@@ -829,22 +829,35 @@ let effect_of_dspec dsp =
   wl, eff
 
 let alias_of_dspec dsp ity =
-  let add_alias (sbs, regs) (t, rt) = (* FIXME conflicts + result on right *)
+  let rec subst reg ity2 ity =
+    match ity.ity_node with
+    | Ityreg r when reg_equal r reg -> ity2
+    | Ityapp (s, l, r) ->
+      ity_app s (List.map (subst reg ity2) l) (List.map (subst reg ity2) r)
+    | Ityvar _ -> ity
+    | Ityreg { reg_its = s; reg_args = l; reg_regs = r } -> (* FIXME ? *)
+      ity_app s (List.map (subst reg ity2) l) (List.map (subst reg ity2) r)
+  in
+  let add_alias (ity, regs) (t, rt) =
+    (* FIXME conflicts *)
     match (effect_of_term t, effect_of_term rt) with
-    | (_, ({ity_node = Ityreg reg} as ity), _),
-      (_, ({ity_node = Ityreg _} as rity), _) ->
-      (ity_match sbs ity rity, Sreg.add reg regs)
+    | (_, ({ity_node = Ityreg reg} as nity), _),
+      (v, ({ity_node = Ityreg rreg}), _) ->
+      if v.pv_vs.vs_name.id_string = "result"
+      then
+        (subst rreg nity ity, Sreg.add reg regs)
+      else Loc.errorm ?loc:rt.t_loc "result expected" (* FIXME ? *)
     | (_, {ity_node = Ityreg _}, _), _ ->
       Loc.errorm ?loc:rt.t_loc "mutable expression expected"
     | _ ->
       Loc.errorm ?loc:t.t_loc "mutable expression expected" in
-  let sbs, regs =
+  let ity, regs =
     List.fold_left
       add_alias
-      (ity_match isb_empty ity ity, Sreg.empty)
+      (ity, Sreg.empty)
       dsp.ds_alias in
-  let ity = ity_full_inst sbs ity in
-  let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in (* FIXME ? *)
+  let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in
+  (* FIXME ? *)
   ity, regs
 
 (* TODO: add warnings for empty postconditions (anywhere)
@@ -1022,15 +1035,16 @@ let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
 (** Abstract values *)
 
-let cty_of_spec env bl mask dsp dity =
+let cty_of_spec env bl mask dspl dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
   let preold = Mstr.find_opt "0" env.old in
   let env, old = add_label env "0" in
-  let dsp = get_later env dsp ity in
-  let _, eff = effect_of_dspec dsp in
+  let dsp = get_later env dspl ity in
   let ity, regs = alias_of_dspec dsp ity in
+  let dsp = get_later env dspl ity in (* FIXME ? *)
+  let _, eff = effect_of_dspec dsp in
   let eff = eff_ghostify env.ghs eff in
   let eff = eff_reset_overwritten eff in
   let res = Sreg.diff (ity_freeregs Sreg.empty ity) regs in

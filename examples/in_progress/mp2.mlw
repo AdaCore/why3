@@ -12,17 +12,17 @@ module M
   use import ref.Ref
 
   type ptr 'a = {
-    data : ref (array 'a) ;
+    mutable data : (array 'a) ;
     offset : int ;
   }
   (*invariant { in_us_bounds data.length }*)
   (* it is not required the offset is in 0..elts.length *)
 
   function plength (p:ptr 'a) : int
-  = p.data.contents.length
+  = p.data.length
 
   function pelts (p:ptr 'a) : int -> 'a
-  = p.data.contents.elts
+  = p.data.elts
 
   val p2i (n:int32):int
     ensures { result = Int32.to_int n }
@@ -33,31 +33,30 @@ module M
   val null () : ptr 'a
     ensures { plength result = 0 }
 
-  let incr (p:ptr 'a) (ofs:int32) : ptr 'a
+  val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
-   =
-    { data = p.data; offset = p.offset + p2i ofs }
+    alias { p.data ~ result.data }
 
   val get (p:ptr 'a) : 'a
     requires { 0 <= p.offset < plength p }
-    ensures { result = !(p.data)[p.offset] }
+    ensures { result = (p.data)[p.offset] }
 
   let get_ofs (p:ptr 'a) (ofs:int32) : 'a
     requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { result = !(p.data)[p.offset + Int32.to_int ofs] }
+    ensures { result = (p.data)[p.offset + Int32.to_int ofs] }
   = get (incr p ofs)
 
   val set (p:ptr 'a) (v:'a) : unit
     requires { 0 <= p.offset < plength p }
     ensures { pelts p = Map.set (pelts (old p)) p.offset v }
-    writes { p.data.contents.elts }
+    writes { p.data.elts }
 
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
     requires { 0 <= p.offset + Int32.to_int ofs < plength p }
     ensures { pelts p = Map.set (pelts (old p))
               (p.offset + Int32.to_int ofs) v }
-    writes { p.data.contents.elts }
+    writes { p.data.elts }
  =
     set (incr p ofs) v
 
@@ -107,7 +106,7 @@ module M
     ensures { plength result = Int32.to_int sz -> plength p = 0 }
     ensures { plength result = Int32.to_int sz ->
                 forall i:int. 0 <= i < plength (old p) /\ i < Int32.to_int sz ->
-                  !(result.data)[i] = !((old p).data)[i] }
+                  (result.data)[i] = ((old p).data)[i] }
     ensures { plength result <> Int32.to_int sz -> p = old p }
 
 
@@ -457,7 +456,7 @@ module N
     ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
               value_sub_shift x (p2i sz) + l2i y }
     ensures { 0 <= l2i result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = UInt32.of_int 0 in
     let c = ref y in
@@ -530,7 +529,7 @@ module N
     ensures { 0 <= l2i result <= 1 }
     ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result =
             value_sub_shift x (p2i sz) + value_sub_shift y (p2i sz) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     =
     let limb_zero = UInt32.of_int 0 in
     let lx = ref limb_zero in
@@ -592,7 +591,7 @@ module N
     ensures { value_sub_shift r (p2i sx) + (power radix (p2i sx)) * l2i result =
               value_sub_shift x (p2i sx) + value_sub_shift y (p2i sy) }
     ensures { 0 <= l2i result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
  =
     let limb_zero = UInt32.of_int 0 in
     let lx = ref limb_zero in
@@ -688,7 +687,7 @@ module N
     requires { valid_ptr_itv r (p2i sz) }
     ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result
                 = value_sub_shift x (p2i sz) * l2i y }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = UInt32.of_int 0 in
     let lx = ref limb_zero in
@@ -762,7 +761,7 @@ module N
     ensures { value_sub_shift r (p2i sz) + (power radix (p2i sz)) * l2i result
             = value_sub_shift (old r) (p2i sz)
               + value_sub_shift x (p2i sz) * l2i y }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { forall j. j < r.offset \/ r.offset + p2i sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
   =
@@ -880,7 +879,7 @@ module N
     requires { valid_ptr_itv x (p2i sz) }
     requires { valid_ptr_itv y (p2i sz) }
     requires { valid_ptr_itv r (p2i sz +  p2i sz) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (p2i sz + p2i sz)
               = value_sub_shift x (p2i sz) * value_sub_shift y (p2i sz) }
   =
@@ -1044,7 +1043,7 @@ module N
     requires { valid_ptr_itv x (p2i sz) }
     requires { valid_ptr_itv y (p2i sz) }
     requires { valid_ptr_itv r (p2i sz +  p2i sz) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (p2i sz + p2i sz)
                 + power radix (p2i sz + p2i sz) * l2i result
               = value_sub_shift (old r) (p2i sz + p2i sz)
@@ -1230,7 +1229,7 @@ module N
     requires { valid_ptr_itv x (p2i sx) }
     requires { valid_ptr_itv y (p2i sy) }
     requires { valid_ptr_itv r (p2i sy + p2i sx) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (p2i sy + p2i sx)
               = value_sub_shift x (p2i sx) * value_sub_shift y (p2i sy) }
   =

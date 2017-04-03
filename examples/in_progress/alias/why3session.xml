@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../alias.mlw" expanded="true">
+<theory name="Test" sum="4f615f42994e005c74bb48e590b6e1d2">
+ <goal name="VC test" expl="VC for test">
+ <transf name="split_goal_wp">
+  <goal name="VC test.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC test.2" expl="2. assertion">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="A" sum="52efc6362ddeccc17cada1f302ec1654">
+ <goal name="VC get_ofs" expl="VC for get_ofs">
+ <transf name="split_goal_wp">
+  <goal name="VC get_ofs.1" expl="1. precondition">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC get_ofs.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC set_ofs" expl="VC for set_ofs">
+ <transf name="split_goal_wp">
+  <goal name="VC set_ofs.1" expl="1. precondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC set_ofs.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC test" expl="VC for test">
+ <transf name="split_goal_wp">
+  <goal name="VC test.1" expl="1. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
+  </goal>
+  <goal name="VC test.2" expl="2. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
+  </goal>
+  <goal name="VC test.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="77"/></proof>
+  </goal>
+  <goal name="VC test.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="84"/></proof>
+  </goal>
+  <goal name="VC test.5" expl="5. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="84"/></proof>
+  </goal>
+  <goal name="VC test.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="85"/></proof>
+  </goal>
+  <goal name="VC test.7" expl="7. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="88"/></proof>
+  </goal>
+  <goal name="VC test.8" expl="8. assertion">
+  <proof prover="0"><result status="valid" time="0.02" steps="88"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
