@@ -580,26 +580,25 @@ let ls_of_rs rs = match rs.rs_logic with
   | RLls ls -> ls
   | _ -> assert false
 
-exception PreStop of rsymbol (* Remove after migration to OCaml 4.04+ *)
-let in_set_exn exn p srs =
-  (* let exception PreStop of rsymbol in -> after migration to OCaml 4.04+ *)
-  try Srs.iter (fun rs -> if p rs then raise (PreStop rs)) srs; raise exn
-  with PreStop rs -> rs
-
 let clone_type_record cl s d s' d' =
   let id = s.its_ts.ts_name in
-  let s_plj' = Srs.of_list d'.itd_fields in
+  let fields' = Hstr.create 16 in
+  let add_field' ({rs_field = pj'} as rs') =
+    let pj' = Opt.get pj' in
+    Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
+  List.iter add_field' d'.itd_fields;
   (* check if fields from former type are also declared in the new type *)
   let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
     let pj_str = pj.pv_vs.vs_name.id_string in
-    let pj_ity = pj.pv_ity in
+    let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
-    let in_set {rs_field = pj'} = let pj' = Opt.get pj' in
-      let pj'_str = pj'.pv_vs.vs_name.id_string in
-      let pj'_ity = pj'.pv_ity in
-      let pj'_ght = pj'.pv_ghost in
-      pj_str = pj'_str && ity_equal pj_ity pj'_ity && pj_ght = pj'_ght in
-    let rs' = in_set_exn (BadInstance id) in_set s_plj' in
+    let rs' = try Hstr.find fields' pj_str
+      with Not_found -> raise (BadInstance id) in
+    let pj' = Opt.get rs'.rs_field in
+    let pj'_ity = pj'.pv_ity in
+    let pj'_ght = pj'.pv_ghost in
+    if not (ity_equal pj_ity pj'_ity && pj_ght = pj'_ght) then
+      raise (BadInstance id);
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table in (* TODO? : populate rs_table *)
   List.iter match_pj d.itd_fields;
@@ -631,17 +630,21 @@ let clone_type_decl inst cl tdl kn =
     end else
     (* abstract *)
     if s.its_private && cloned then begin
-      assert (List.length tdl = 1);
+      (* FIXME: currently, we cannot refine a block of mutual types *)
+      if List.length tdl <> 1 then raise (CannotInstantiate id);
+        (* FIXME: better error messsage *)
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
             raise (BadInstance id);
           if not (its_pure s && its_pure s') then raise (BadInstance id);
-          (* TODO: accept refinement of private records *)
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = begin match pd'.pd_node with
             | PDtype [d'] -> d'
-            | _ -> raise (BadInstance id) (* FIXME? *)
+            | PDtype _ ->
+              (* FIXME: we could refine with mutual types *)
+              raise (BadInstance id)
+            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
           end in
           clone_type_record cl s d s' d'
       | None -> begin match Mts.find_opt ts inst.mi_ty with
