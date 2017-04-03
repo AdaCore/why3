@@ -304,7 +304,7 @@ let flat_extraction mm = function
       Mstr.add s m mm in
     Mstr.fold do_m mmf mm
   | Module (path, m) ->
-    let m = find_module_path mm path m in
+    let m = find_module_path mm path m in (* FIXME: catch Not_found here *)
     let m = translate_module m in
     Ident.Mid.iter (fun id _ -> visit mm id) m.ML.mod_known;
     mm
