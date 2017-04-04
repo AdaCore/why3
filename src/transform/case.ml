@@ -48,6 +48,20 @@ let cut t name =
   let goal = Trans.add_decls [h_t] in
   Trans.par [goal; goal_cut]
 
+(* From task [delta |- G] , build the tasks [delta] |- t] and [delta, t | - G] *)
+let assert_tac t name =
+  let name =
+    match name with
+    | Some name -> name
+    | None -> "h"
+  in
+  let h = Decl.create_prsymbol (gen_ident name) in
+  let g_t = Decl.create_prop_decl Decl.Pgoal h t in
+  let h_t = Decl.create_prop_decl Decl.Paxiom h t in
+  let goal_cut = Trans.goal (fun _ _ -> [g_t]) in
+  let goal = Trans.add_decls [h_t] in
+  Trans.par [goal_cut; goal]
+
 let subst_quant c tq x : term =
   let (vsl, tr, te) = t_open_quant tq in
   (match vsl with
@@ -385,30 +399,36 @@ let create_constant ty =
   let ls = create_lsymbol fresh_name [] (Some ty) in
   (ls, create_param_decl ls)
 
-let rec return_list list_types =
+let rec return_list list_types type_subst =
   match list_types with
   | [] -> []
-  | hd :: tl -> create_constant hd :: return_list tl
+  | hd :: tl ->
+      create_constant (Ty.ty_inst type_subst hd) :: return_list tl type_subst
+
+let my_ls_app_inst ls ty =
+  match ls.ls_value, ty with
+    | Some _, None -> raise (PredicateSymbolExpected ls)
+    | None, Some _ -> raise (FunctionSymbolExpected ls)
+    | Some vty, Some ty -> Ty.ty_match Ty.Mtv.empty vty ty
+    | None, None -> Ty.Mtv.empty
 
 let rec build_decls cls x =
   match cls with
   | [] -> []
   | (cs, _) :: tl ->
-      let l = return_list cs.ls_args in
+      let type_subst = my_ls_app_inst cs x.t_ty in
+      let l = return_list cs.ls_args type_subst in
       let ht = t_equ x
-           (t_app_infer cs (List.map (fun x -> t_app_infer (fst x) []) l)) in
+           (t_app cs (List.map (fun x -> t_app_infer (fst x) []) l) x.t_ty) in
       let h = Decl.create_prsymbol (gen_ident "h") in
       let new_hyp = Decl.create_prop_decl Decl.Paxiom h ht in
       ((List.map snd l) @ [new_hyp]) :: build_decls tl x
-
-
 
 (* This tactic acts on a term of algebraic type. It introduces one
    new goal per constructor of the type and introduce corresponding
    variables. It also introduce the equality between the term and
    its destruction in the context.
  *)
-(* TODO does not work with polymorphic type *)
 let destruct_alg (x: term) : Task.task Trans.tlist =
   let ty = x.t_ty in
   let r = ref [] in
@@ -591,6 +611,11 @@ let () = wrap_and_register
     ~desc:"cut <term> [name] makes a cut with hypothesis 'name: term'"
     "cut"
     (Tformula (Topt ("as",Tstring Ttrans_l))) cut
+
+let () = wrap_and_register
+    ~desc:"cut <term> [name] makes an assert with hypothesis 'name: term'"
+    "assert"
+    (Tformula (Topt ("as",Tstring Ttrans_l))) assert_tac
 
 let () = wrap_and_register
     ~desc:"exists <term> substitutes the variable quantified by exists with term"
