@@ -397,10 +397,8 @@ module Translate = struct
       ML.Tapp (its.its_ts.ts_name, args)
 
   let pvty pv =
-    if pv.pv_ghost then
-      ML.mk_var (pv_name pv) ML.tunit true
-    else
-      let (vs, vs_ty) = vsty pv.pv_vs in
+    if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
+    else let (vs, vs_ty) = vsty pv.pv_vs in
       ML.mk_var vs vs_ty false
 
   let for_direction = function

@@ -98,6 +98,15 @@ let get_model_trace_string ~labels =
   | [_; t_str] -> t_str
   | _ -> ""
 
+(* functions for detecting optional and named arguments *)
+let optional_arg = create_label "(optional arg)"
+let named_arg = create_label "(named arg)"
+
+let is_optional ~labels =
+  Slab.mem optional_arg labels
+
+let is_named ~labels =
+  Slab.mem named_arg labels
 
 (** Identifiers *)
 

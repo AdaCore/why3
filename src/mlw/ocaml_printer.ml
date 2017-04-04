@@ -62,7 +62,7 @@ module Print = struct
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
-  let forget_id vs = forget_id iprinter vs
+  let forget_id id = forget_id iprinter id
   let _forget_ids = List.iter forget_id
   let forget_var (id, _, _) = forget_id id
   let forget_vars = List.iter forget_var
@@ -79,13 +79,16 @@ module Print = struct
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
+  let forget_fields fl =
+    List.iter (fun (_, id, _) -> forget_id id) fl
+
   let print_ident fmt id =
     let s = id_unique iprinter id in
     fprintf fmt "%s" s
 
   let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
-      Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
+    Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
       false info.info_current_mo
 
   let print_qident ~sanitizer info fmt id =
@@ -160,8 +163,17 @@ module Print = struct
             (print_list comma (print_ty ~paren:false info)) tl
             (print_lident info) ts
 
+  let print_vsty_opt info fmt v ty =
+    fprintf fmt "?(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
+
+  let print_vsty_named info fmt v ty =
+    fprintf fmt "~(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
+
   let print_vsty info fmt (v, ty, _) =
-    fprintf fmt "%a:@ %a" print_ident v (print_ty ~paren:false info) ty
+    let labels = v.id_label in
+    if is_optional ~labels then print_vsty_opt info fmt v ty
+    else if is_named ~labels then print_vsty_named info fmt v ty
+    else fprintf fmt "(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -170,7 +182,7 @@ module Print = struct
     | tvl  -> fprintf fmt "(%a)@ " (print_list comma print_tv_arg) tvl
 
   let print_vs_arg info fmt vs =
-    fprintf fmt "@[(%a)@]" (print_vsty info) vs
+    fprintf fmt "@[%a@]" (print_vsty info) vs
 
   let print_path =
     print_list dot pp_print_string (* point-free *)
@@ -237,7 +249,31 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
-  let rec print_apply ?(paren=false) info rs fmt pvl =
+  let rec print_apply_args info fmt = function
+    (* | [expr], pv :: _ when is_optional ~labels:(pv_name pv).id_label -> *)
+    (*   fprintf fmt "?%a:%a" (print_lident info) (pv_name pv) *)
+    (*     (print_expr ~paren info) expr; *)
+    (* | [expr], pv :: _ when is_named ~labels:(pv_name pv).id_label -> *)
+    (*   fprintf fmt "~%a:%a" (print_lident info) (pv_name pv) *)
+    (*     (print_expr ~paren info) expr; *)
+    | [expr], _ :: _  ->
+      fprintf fmt "%a" (print_expr ~paren:true info) expr;
+    (* | expr :: exprl, pv :: pvl *)
+    (*   when is_optional ~labels:(pv_name pv).id_label -> *)
+    (*   fprintf fmt "?%a:%a " (print_lident info) (pv_name pv) *)
+    (*     (print_expr ~paren info) expr; *)
+    (*   print_apply_args info fmt (exprl, pvl) *)
+    (* | expr :: exprl, pv :: pvl *)
+    (*   when is_named ~labels:(pv_name pv).id_label -> *)
+    (*   fprintf fmt "~%a:%a " (print_lident info) (pv_name pv) *)
+    (*     (print_expr ~paren info) expr; *)
+    (*   print_apply_args info fmt (exprl, pvl) *)
+    | expr :: exprl, _ :: pvl ->
+      fprintf fmt "%a " (print_expr ~paren:true info) expr;
+      print_apply_args info fmt (exprl, pvl)
+    | ([], _) | (_ :: _, []) -> assert false
+
+  and print_apply ?(paren=false) info rs fmt pvl =
     let isfield =
       match rs.rs_field with
       | None   -> false
@@ -286,7 +322,8 @@ module Print = struct
     | _, None, tl ->
       fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
         (print_lident info) rs.rs_name
-        (print_list space (print_expr ~paren:true info)) tl
+        (print_apply_args info) (tl, rs.rs_cty.cty_args)
+        (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
@@ -410,7 +447,8 @@ module Print = struct
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
-      (print_pat info) p (print_expr info) e
+      (print_pat info) p (print_expr info) e;
+    forget_pat p
 
   and print_raise ~paren info xs fmt e_opt =
     match query_syntax info.info_syn xs.xs_name, e_opt with
@@ -457,7 +495,8 @@ module Print = struct
       | Some (Drecord fl) ->
         fprintf fmt " = %s{@\n%a@\n}"
           (if its.its_private then "private " else "")
-          (print_list newline print_field) fl
+          (print_list newline print_field) fl;
+        (* forget_fields fl *)
       | Some (Dalias ty) ->
         fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in
