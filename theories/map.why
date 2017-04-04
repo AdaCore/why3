@@ -120,6 +120,14 @@ theory Occ
     forall v: 'a, m: map int 'a, l u: int.
     l < u -> m[u-1] = v -> occ v m l u = 1 + occ v m l (u-1)
 
+  lemma occ_left_no_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[l] <> v -> occ v m l u = occ v m (l+1) u
+
+  lemma occ_left_add:
+    forall v: 'a, m: map int 'a, l u: int.
+    l < u -> m[l] = v -> occ v m l u = 1 + occ v m (l+1) u
+
   lemma occ_bounds:
     forall v: 'a, m: map int 'a, l u: int.
     l <= u -> 0 <= occ v m l u <= u - l
