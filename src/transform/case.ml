@@ -497,6 +497,21 @@ let destruct pr : Task.task Trans.tlist =
     | _ -> [[d]]) None
 
 
+let or_intro (left: bool) : Task.task Trans.trans =
+  Trans.decl (fun d ->
+    match d.d_node with
+    | Dprop (Pgoal, pr, t) ->
+      begin
+        match t.t_node with
+        | Tbinop (Tor, t1, t2) ->
+          if left then
+            [create_prop_decl Pgoal pr t1]
+          else
+            [create_prop_decl Pgoal pr t2]
+        | _ -> [d]
+      end
+    | _ -> [d]) None
+
 (* TODO to be done ... *)
 open Ident
 open Ty
@@ -590,6 +605,14 @@ let unfold unf h =
               [new_decl]
         end
       | _ -> [d]) None
+
+let () = wrap_and_register ~desc:"left transform a goal of the form A \\/ B into A"
+    "left"
+    (Ttrans) (or_intro true)
+
+let () = wrap_and_register ~desc:"right transform a goal of the form A \\/ B into B"
+    "right"
+    (Ttrans) (or_intro false)
 
 let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
     "unfold"
