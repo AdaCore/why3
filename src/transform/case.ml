@@ -606,6 +606,22 @@ let unfold unf h =
         end
       | _ -> [d]) None
 
+let clear_but (l: prsymbol list) =
+  Trans.decl
+    (fun d ->
+      match d.d_node with
+      | Dprop (Paxiom, pr, _t) when List.mem pr l ->
+        [d]
+      | Dprop (Paxiom, _pr, _t) ->
+        []
+      | _ -> [d]) None
+
+(* TODO give a list of hypothesis *)
+let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
+    "clear_but"
+    (Tprsymbol Ttrans) (fun x -> clear_but [x])
+
+
 let () = wrap_and_register ~desc:"left transform a goal of the form A \\/ B into A"
     "left"
     (Ttrans) (or_intro true)
