@@ -596,10 +596,6 @@ theory FoldLeft
     forall l1"induction" l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
     fold_left f acc (l1++l2) = fold_left f (fold_left f acc l1) l2
 
-  (* lemma fold_left_step: *)
-  (*   forall l: list 'a, f: 'b -> 'a -> 'b, acc : 'b, x: 'a. *)
-  (*   f (fold_left f acc l) x = fold_left f acc (Cons x l) *)
-
 end
 
 theory FoldRight
@@ -611,6 +607,12 @@ theory FoldRight
     | Nil      -> acc
     | Cons x r -> f x (fold_right f r acc)
     end
+
+  use import Append
+
+  lemma fold_right_append:
+    forall l1"induction" l2: list 'a, f: 'a -> 'b -> 'b, acc : 'b.
+    fold_right f (l1++l2) acc = fold_right f l1 (fold_right f l2 acc)
 
 end
 
