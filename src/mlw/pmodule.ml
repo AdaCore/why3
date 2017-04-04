@@ -637,7 +637,7 @@ let clone_type_decl inst cl tdl kn =
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
             raise (BadInstance id);
-          if not (its_pure s && its_pure s') then raise (BadInstance id);
+          (* if not (its_pure s && its_pure s') then raise (BadInstance id); *)
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = begin match pd'.pd_node with
             | PDtype [d'] -> d'
