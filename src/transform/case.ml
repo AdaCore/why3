@@ -548,8 +548,8 @@ let t_replace_app unf ls_defn t =
       t_subst mvs tls
   | _ -> t
 
-let t_ls_replace ls ls_defn t =
-  t_replace_app ls ls_defn (t_map (t_replace_app ls ls_defn) t)
+let rec t_ls_replace ls ls_defn t =
+  t_replace_app ls ls_defn (t_map (t_ls_replace ls ls_defn) t)
 
 let unfold unf h =
   let r = ref None in
