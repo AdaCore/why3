@@ -688,7 +688,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           init_and_send_file file
       end
       else
-        P.notify (Message (Open_File_Error ("Not a file: " ^ f)))
+        P.notify (Message (Open_File_Error ("File not found: " ^ f)))
     else
       P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
 
@@ -737,7 +737,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         end
       else
         begin
-          P.notify (Message (Open_File_Error ("Not a file: " ^ f)));
+          P.notify (Message (Open_File_Error ("File not found: " ^ f)));
           false
         end)
     with

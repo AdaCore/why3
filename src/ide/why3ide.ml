@@ -454,8 +454,10 @@ let message_zone =
 (**** Message-zone printing functions *****)
 
 (* Function used to print stuff on the message_zone *)
-let print_message s =
-  message_zone#buffer#set_text s
+let print_message fmt =
+  Format.kasprintf
+    message_zone#buffer#set_text
+    fmt
 
 let add_to_msg_zone s =
   let s = message_zone#buffer#get_text () ^ "\n" ^ s in
@@ -878,21 +880,21 @@ let open_session: GMenu.menu_item =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)   -> print_message s
-  | Transf_error (_id, s)  -> print_message s
-  | Strat_error (_id, s)   -> print_message s
-  | Replay_Info s          -> print_message s
-  | Query_Info (_id, s)    -> print_message s
-  | Query_Error (_id, s)   -> print_message s
-  | Help s                 -> print_message s
-  | Information s          -> print_message s
+  | Proof_error (_id, s)   -> print_message "%s" s
+  | Transf_error (_id, s)  -> print_message "%s" s
+  | Strat_error (_id, s)   -> print_message "%s" s
+  | Replay_Info s          -> print_message "%s" s
+  | Query_Info (_id, s)    -> print_message "%s" s
+  | Query_Error (_id, s)   -> print_message "%s" s
+  | Help s                 -> print_message "%s" s
+  | Information s          -> print_message "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
-  | Open_File_Error s      -> print_message s
+  | Open_File_Error s      -> print_message "%s" s
   | Error s                ->
       if Debug.test_flag debug then
-        print_message s
+        print_message "%s" s
       else
-        print_message "Request failed."
+        print_message "%s" "Request failed. You can get details using --debug ide_info"
 
 
 (***********************)
@@ -968,17 +970,18 @@ let treat_notification n = match n with
   | Initialized g_info            ->
     (* TODO: treat other *)
     init_completion g_info.provers g_info.transformations g_info.commands;
-  | Saved                         -> (* TODO *)
-    print_message "got a Saved notification not yet supported\n"
+  | Saved                         ->
+    print_message "Session saved."
   | Message (msg)                 -> treat_message_notification msg
-  | Dead _s                        -> (* TODO *)
-    print_message "got a Dead notification not yet supported\n"
   | Task (_id, s)                  ->
     (* TODO: check that the id is the current one *)
     task_view#source_buffer#set_text s;
     (* scroll to end of text *)
     task_view#scroll_to_mark `INSERT
-  | File_contents _ -> assert false (* This IDE never requests file contents *)
+  | File_contents _
+  | Dead _ ->
+    print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
+
 
 (***********************)
 (* start the interface *)
