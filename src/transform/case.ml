@@ -616,6 +616,49 @@ let clear_but (l: prsymbol list) =
         []
       | _ -> [d]) None
 
+
+let subst to_subst =
+  let found_eq =
+    fold (fun d acc ->
+      match d.d_node with
+      | Dprop (Paxiom, pr, t) ->
+          let acc = (match t.t_node with
+          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+              (* Allow to rewrite from the right *)
+              begin
+                match t1.t_node, t2.t_node with
+                | Tapp (ls, []), _ when ls_equal ls to_subst ->
+                    Some (pr, t1, t2)
+                | _, Tapp (ls, []) when ls_equal ls to_subst ->
+                    Some (pr, t2, t1)
+                | _ -> acc
+              end
+          | _ -> acc) in
+          acc
+      | _ -> acc) None in
+  let subst found_eq =
+    match found_eq with
+    | None -> raise (Arg_trans "subst") (* TODO change exception *)
+    | Some (pr_eq, t1, t2) ->
+      begin
+        Trans.decl (fun d ->
+          match d.d_node with
+          (* Remove equality over which we subst *)
+          | Dprop (Paxiom, pr, _t) when pr_equal pr pr_eq  ->
+            []
+          (* Replace in all hypothesis *)
+          | Dprop (kind, pr, t) ->
+            [create_prop_decl kind pr (t_replace t1 t2 t)]
+          (* TODO should replace every occurences of t1 everywhere *)
+          | _ -> [d]) None
+      end
+  in
+  Trans.bind found_eq subst
+
+let () = wrap_and_register ~desc:"remove a literal using an equality on it"
+    "subst"
+    (Tlsymbol Ttrans) subst
+
 (* TODO give a list of hypothesis *)
 let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
     "clear_but"
