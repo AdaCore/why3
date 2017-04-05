@@ -217,6 +217,21 @@ module TestExtraction
     for i = 0 to 10 do r := !r + i done;
     !r
 
+  (** optional and named arguments *)
+
+  use import option.Option
+
+  let opt_f x "ocaml:named" y "ocaml:named" = x+y
+  let constant opt_a = opt_f 40 2
+  let opt_g x "ocaml:optional" y "ocaml:named" =
+     match x with None -> y | Some x -> x + y end
+  let constant opt_b = opt_g None 42
+  let constant opt_c = opt_g (Some 40) 2
+
+  (* FIXME: partial application with named arguments not yet supported *)
+  let opt_h () = fun y -> opt_f 40 y
+  let opt_i () = opt_h () 2
+
   (** test the execution of the extracted code *)
 
   use import ocaml.Pervasives
