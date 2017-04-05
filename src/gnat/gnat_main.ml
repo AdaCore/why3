@@ -239,6 +239,7 @@ let _ =
    in
    Sys.set_signal Sys.sigint (Sys.Signal_handle save_session_and_exit);
 
+   begin
    try
      Util.init_timing ();
      Gnat_sched.init ();
@@ -271,3 +272,15 @@ let _ =
     with e ->
        let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
        Gnat_util.abort_with_message ~internal:true s
+   end;
+   (* Dump profiling data (when compiled with profiling enabled) to file whose
+      name is based on the processed .mlw file; otherwise profile data from
+      several compilation would be written to a single gmon.out file and
+      overwrite each other. When compiled with profiling disabled it has no
+      visible effect. Note: we set the filename just before the program exit
+      to not interfere with profiling of provers.
+   *)
+   let basename =
+     Filename.chop_extension
+       (Filename.basename Gnat_config.filename) in
+   Unix.putenv "GMON_OUT_PREFIX" (basename ^ "_gnatwhy3_gmon.out")
