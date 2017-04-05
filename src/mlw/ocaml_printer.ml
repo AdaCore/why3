@@ -56,6 +56,7 @@ module Print = struct
     List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
     Hstr.mem h
 
+  (* FIXME? use different printers for record fields, types, etc. *)
   let iprinter, aprinter =
     let isanitize = sanitizer char_to_alpha char_to_alnumus in
     let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
@@ -78,9 +79,6 @@ module Print = struct
     | Papp (_, pl) | Ptuple pl -> List.iter forget_pat pl
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
-
-  let forget_fields fl =
-    List.iter (fun (_, id, _) -> forget_id id) fl
 
   let print_ident fmt id =
     let s = id_unique iprinter id in
@@ -164,11 +162,11 @@ module Print = struct
             (print_lident info) ts
 
   let print_vsty_opt info fmt id ty =
-    fprintf fmt "?(%a:@ %a)" (print_lident info) id
+    fprintf fmt "?%s:(%a:@ %a)" id.id_string (print_lident info) id
       (print_ty ~paren:false info) ty
 
   let print_vsty_named info fmt id ty =
-    fprintf fmt "~(%a:@ %a)" (print_lident info) id
+    fprintf fmt "~%s:(%a:@ %a)" id.id_string (print_lident info) id
       (print_ty ~paren:false info) ty
 
   let print_vsty info fmt (id, ty, _) =
@@ -252,30 +250,20 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
-  (* FIXME: horrible code! Do list cursors instead ? *)
   let rec print_apply_args info fmt = function
-    | [expr], pv :: _ when is_optional ~labels:(pv_name pv).id_label ->
-      fprintf fmt "?%a:%a" (print_lident info) (pv_name pv)
-        (print_expr ~paren:true info) expr;
-    | [expr], pv :: _ when is_named ~labels:(pv_name pv).id_label ->
-      fprintf fmt "~%a:%a" (print_lident info) (pv_name pv)
-        (print_expr ~paren:true info) expr;
-    | [expr], _ :: _  ->
-      fprintf fmt "%a" (print_expr ~paren:true info) expr;
-    | expr :: exprl, pv :: pvl
-      when is_optional ~labels:(pv_name pv).id_label ->
-      fprintf fmt "?%a:%a " (print_lident info) (pv_name pv)
-        (print_expr ~paren:true info) expr;
+    | expr :: exprl, pv :: pvl ->
+      if is_optional ~labels:(pv_name pv).id_label then
+        fprintf fmt "?%s:%a" (pv_name pv).id_string
+          (print_expr ~paren:true info) expr
+      else if is_named ~labels:(pv_name pv).id_label then
+        fprintf fmt "~%s:%a" (pv_name pv).id_string
+          (print_expr ~paren:true info) expr
+      else
+        fprintf fmt "%a" (print_expr ~paren:true info) expr;
+      if exprl <> [] then fprintf fmt "@ ";
       print_apply_args info fmt (exprl, pvl)
-    | expr :: exprl, pv :: pvl
-      when is_named ~labels:(pv_name pv).id_label ->
-      fprintf fmt "~%a:%a " (print_lident info) (pv_name pv)
-        (print_expr ~paren:true info) expr;
-      print_apply_args info fmt (exprl, pvl)
-    | expr :: exprl, _ :: pvl ->
-      fprintf fmt "%a " (print_expr ~paren:true info) expr;
-      print_apply_args info fmt (exprl, pvl)
-    | ([], _) | (_ :: _, []) -> assert false
+    | [], _ -> ()
+    | _, [] -> assert false
 
   and print_apply ?(paren=false) info rs fmt pvl =
     let isfield =
@@ -499,8 +487,7 @@ module Print = struct
       | Some (Drecord fl) ->
         fprintf fmt " = %s{@\n%a@\n}"
           (if its.its_private then "private " else "")
-          (print_list newline print_field) fl;
-        (* forget_fields fl *)
+          (print_list newline print_field) fl
       | Some (Dalias ty) ->
         fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in

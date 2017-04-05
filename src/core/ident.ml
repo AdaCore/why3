@@ -99,8 +99,8 @@ let get_model_trace_string ~labels =
   | _ -> ""
 
 (* functions for detecting optional and named arguments *)
-let optional_arg = create_label "(optional arg)"
-let named_arg = create_label "(named arg)"
+let optional_arg = create_label "ocaml:optional"
+let named_arg = create_label "ocaml:named"
 
 let is_optional ~labels =
   Slab.mem optional_arg labels
