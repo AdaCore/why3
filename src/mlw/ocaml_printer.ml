@@ -163,17 +163,20 @@ module Print = struct
             (print_list comma (print_ty ~paren:false info)) tl
             (print_lident info) ts
 
-  let print_vsty_opt info fmt v ty =
-    fprintf fmt "?(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
+  let print_vsty_opt info fmt id ty =
+    fprintf fmt "?(%a:@ %a)" (print_lident info) id
+      (print_ty ~paren:false info) ty
 
-  let print_vsty_named info fmt v ty =
-    fprintf fmt "~(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
+  let print_vsty_named info fmt id ty =
+    fprintf fmt "~(%a:@ %a)" (print_lident info) id
+      (print_ty ~paren:false info) ty
 
-  let print_vsty info fmt (v, ty, _) =
-    let labels = v.id_label in
-    if is_optional ~labels then print_vsty_opt info fmt v ty
-    else if is_named ~labels then print_vsty_named info fmt v ty
-    else fprintf fmt "(%a:@ %a)" print_ident v (print_ty ~paren:false info) ty
+  let print_vsty info fmt (id, ty, _) =
+    let labels = id.id_label in
+    if is_optional ~labels then print_vsty_opt info fmt id ty
+    else if is_named ~labels then print_vsty_named info fmt id ty
+    else fprintf fmt "(%a:@ %a)" (print_lident info) id
+        (print_ty ~paren:false info) ty
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -209,9 +212,9 @@ module Print = struct
     | Pwild ->
        fprintf fmt "_"
     | Pident id ->
-       print_ident fmt id
+       (print_lident info) fmt id
     | Pas (p, id) ->
-       fprintf fmt "%a as %a" (print_pat info) p print_ident id
+       fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
     | Por (p1, p2) ->
        fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
     | Ptuple pl ->
@@ -249,25 +252,26 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
+  (* FIXME: horrible code! Do list cursors instead ? *)
   let rec print_apply_args info fmt = function
-    (* | [expr], pv :: _ when is_optional ~labels:(pv_name pv).id_label -> *)
-    (*   fprintf fmt "?%a:%a" (print_lident info) (pv_name pv) *)
-    (*     (print_expr ~paren info) expr; *)
-    (* | [expr], pv :: _ when is_named ~labels:(pv_name pv).id_label -> *)
-    (*   fprintf fmt "~%a:%a" (print_lident info) (pv_name pv) *)
-    (*     (print_expr ~paren info) expr; *)
+    | [expr], pv :: _ when is_optional ~labels:(pv_name pv).id_label ->
+      fprintf fmt "?%a:%a" (print_lident info) (pv_name pv)
+        (print_expr ~paren:true info) expr;
+    | [expr], pv :: _ when is_named ~labels:(pv_name pv).id_label ->
+      fprintf fmt "~%a:%a" (print_lident info) (pv_name pv)
+        (print_expr ~paren:true info) expr;
     | [expr], _ :: _  ->
       fprintf fmt "%a" (print_expr ~paren:true info) expr;
-    (* | expr :: exprl, pv :: pvl *)
-    (*   when is_optional ~labels:(pv_name pv).id_label -> *)
-    (*   fprintf fmt "?%a:%a " (print_lident info) (pv_name pv) *)
-    (*     (print_expr ~paren info) expr; *)
-    (*   print_apply_args info fmt (exprl, pvl) *)
-    (* | expr :: exprl, pv :: pvl *)
-    (*   when is_named ~labels:(pv_name pv).id_label -> *)
-    (*   fprintf fmt "~%a:%a " (print_lident info) (pv_name pv) *)
-    (*     (print_expr ~paren info) expr; *)
-    (*   print_apply_args info fmt (exprl, pvl) *)
+    | expr :: exprl, pv :: pvl
+      when is_optional ~labels:(pv_name pv).id_label ->
+      fprintf fmt "?%a:%a " (print_lident info) (pv_name pv)
+        (print_expr ~paren:true info) expr;
+      print_apply_args info fmt (exprl, pvl)
+    | expr :: exprl, pv :: pvl
+      when is_named ~labels:(pv_name pv).id_label ->
+      fprintf fmt "~%a:%a " (print_lident info) (pv_name pv)
+        (print_expr ~paren:true info) expr;
+      print_apply_args info fmt (exprl, pvl)
     | expr :: exprl, _ :: pvl ->
       fprintf fmt "%a " (print_expr ~paren:true info) expr;
       print_apply_args info fmt (exprl, pvl)
@@ -300,7 +304,7 @@ module Print = struct
       fprintf fmt "@[(%a)@]"
         (print_list comma (print_expr info)) tl
     | _, None, [t1] when isfield ->
-      fprintf fmt "%a.%a" (print_expr info) t1 print_ident rs.rs_name
+      fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
     | _, None, tl when isconstructor () ->
       let pjl = get_record info rs in
       begin match pjl, tl with
@@ -390,8 +394,8 @@ module Print = struct
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
         fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
-          print_ident (pv_name rho) print_ident rs.rs_name
-          print_ident (pv_name pv) in
+          (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
+          (print_lident info) (pv_name pv) in
       begin match al with
       | [] -> assert false | [a] -> assign fmt a
       | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
@@ -486,7 +490,7 @@ module Print = struct
                (print_list star (print_ty ~paren:false info)) l in
     let print_field fmt (is_mutable, id, ty) =
       fprintf fmt "%s%a: %a;" (if is_mutable then "mutable " else "")
-        print_ident id (print_ty ~paren:false info) ty in
+        (print_lident info) id (print_ty ~paren:false info) ty in
     let print_def fmt = function
       | None ->
         ()
@@ -512,10 +516,10 @@ module Print = struct
       print_list_next newline (print_type_decl info) fmt dl;
       fprintf fmt "@\n"
     | Dexn (xs, None) ->
-       fprintf fmt "exception %a@\n" print_ident xs.xs_name
+       fprintf fmt "exception %a@\n" (print_uident info) xs.xs_name
     | Dexn (xs, Some t)->
       fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
-        print_ident xs.xs_name (print_ty ~paren:true info) t
+        (print_uident info) xs.xs_name (print_ty ~paren:true info) t
     | Dclone _ ->
       assert false (*TODO*)
 
