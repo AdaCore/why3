@@ -304,6 +304,7 @@ let print_msg fmt m =
   | Help _s                -> fprintf fmt "help"
   | Information s          -> fprintf fmt "info %s" s
   | Task_Monitor _         -> fprintf fmt "task montor"
+  | Parse_Or_Type_Error s  -> fprintf fmt "parse_or_type_error:\n %s" s
   | Error s                -> fprintf fmt "%s" s
   | Open_File_Error s        -> fprintf fmt "%s" s
 
@@ -334,25 +335,25 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     try cont_from_session_dir cont f; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Error s)); false
+        P.notify (Message (Parse_Or_Type_Error s)); false
 
   let cont_from_file cont f =
     try cont_from_file cont f; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Error s)); false
+        P.notify (Message (Parse_Or_Type_Error s)); false
 
   let reload_files cont ~use_shapes =
     try reload_files cont ~use_shapes; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Error s)); false
+        P.notify (Message (Parse_Or_Type_Error s)); false
 
   let add_file c ?format fname =
     try add_file c ?format fname; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Error s)); false
+        P.notify (Message (Parse_Or_Type_Error s)); false
 
   let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
@@ -715,9 +716,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       }
     in
     try (
-      if (Sys.file_exists f) then
+      if Sys.file_exists f then
         begin
-          if (Sys.is_directory f) then
+          if Sys.is_directory f then
             begin
               let b = cont_from_session_dir d.cont f in
               if b then

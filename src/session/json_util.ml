@@ -85,14 +85,15 @@ let convert_update u =
 
 let convert_notification_constructor n =
   match n with
-  | New_node _    -> String "New_node"
-  | Node_change _ -> String "Node_change"
-  | Remove _      -> String "Remove"
-  | Initialized _ -> String "Initialized"
-  | Saved         -> String "Saved"
-  | Message _     -> String "Message"
-  | Dead _        -> String "Dead"
-  | Task _        -> String "Task"
+  | New_node _      -> String "New_node"
+  | Node_change _   -> String "Node_change"
+  | Remove _        -> String "Remove"
+  | Initialized _   -> String "Initialized"
+  | Saved           -> String "Saved"
+  | Message _       -> String "Message"
+  | Dead _          -> String "Dead"
+  | Task _          -> String "Task"
+  | File_contents _ -> String "File_contents"
 
 let convert_node_type_string nt =
   match nt with
@@ -115,6 +116,7 @@ let convert_request_constructor (r: ide_request) =
   | Open_session_req _   -> String "Open_session_req"
   | Add_file_req _       -> String "Add_file_req"
   | Set_max_tasks_req _  -> String "Set_max_tasks_req"
+  | Get_file_contents _  -> String "Get_file_contents"
   | Get_task _           -> String "Get_task"
   | Remove_subtree _     -> String "Remove_subtree"
   | Copy_paste _         -> String "Copy_paste"
@@ -130,44 +132,47 @@ let print_request_to_json (r: ide_request): Json_base.value =
   match r with
   | Command_req (nid, s) ->
       Obj ["ide_request", cc r;
-             "node_ID", Int nid;
-             "command", String s]
+           "node_ID", Int nid;
+           "command", String s]
   | Prove_req (nid, p, l) ->
       Obj ["ide_request", cc r;
-             "node_ID", Int nid;
-             "prover", String p;
-             "limit", convert_limit l]
+           "node_ID", Int nid;
+           "prover", String p;
+           "limit", convert_limit l]
   | Transform_req (nid, tr, args) ->
       Obj ["ide_request", cc r;
-             "node_ID", Int nid;
-             "transformation", String tr;
-             "arguments", Array (List.map (fun x -> String x) args)]
+           "node_ID", Int nid;
+           "transformation", String tr;
+           "arguments", Array (List.map (fun x -> String x) args)]
   | Strategy_req (nid, str) ->
       Obj ["ide_request", cc r;
-             "node_ID", Int nid;
-             "strategy", String str]
+           "node_ID", Int nid;
+           "strategy", String str]
   | Open_session_req f ->
       Obj ["ide_request", cc r;
-             "file", String f]
+           "file", String f]
   | Add_file_req f ->
       Obj ["ide_request", cc r;
-             "file", String f]
+           "file", String f]
   | Set_max_tasks_req n ->
       Obj ["ide_request", cc r;
-             "tasks", Int n]
+           "tasks", Int n]
   | Get_task n ->
       Obj ["ide_request", cc r;
-             "node_ID", Int n]
+           "node_ID", Int n]
+  | Get_file_contents s ->
+      Obj ["ide_request", cc r;
+           "file", String s]
   | Remove_subtree n ->
       Obj ["ide_request", cc r;
-             "node_ID", Int n]
+           "node_ID", Int n]
   | Copy_paste (from_id, to_id) ->
       Obj ["ide_request", cc r;
-             "node_ID", Int from_id;
-             "node_ID", Int to_id]
+           "node_ID", Int from_id;
+           "node_ID", Int to_id]
   | Copy_detached from_id ->
       Obj ["ide_request", cc r;
-             "node_ID", Int from_id]
+           "node_ID", Int from_id]
   | Get_Session_Tree_req ->
       Obj ["ide_request", cc r]
   | Save_req ->
@@ -181,17 +186,18 @@ let print_request_to_json (r: ide_request): Json_base.value =
 
 let convert_constructor_message (m: message_notification) =
   match m with
-  | Proof_error _     -> String "Proof_error"
-  | Transf_error _    -> String "Transf_error"
-  | Strat_error _     -> String "Strat_error"
-  | Replay_Info _     -> String "Replay_Info"
-  | Query_Info _      -> String "Query_Info"
-  | Query_Error _     -> String "Query_Error"
-  | Help _            -> String "Help"
-  | Information _     -> String "Information"
-  | Task_Monitor _    -> String "Task_Monitor"
-  | Error _           -> String "Error"
-  | Open_File_Error _ -> String "Open_File_Error"
+  | Proof_error _         -> String "Proof_error"
+  | Transf_error _        -> String "Transf_error"
+  | Strat_error _         -> String "Strat_error"
+  | Replay_Info _         -> String "Replay_Info"
+  | Query_Info _          -> String "Query_Info"
+  | Query_Error _         -> String "Query_Error"
+  | Help _                -> String "Help"
+  | Information _         -> String "Information"
+  | Task_Monitor _        -> String "Task_Monitor"
+  | Parse_Or_Type_Error _ -> String "Parse_Or_Type_Error"
+  | Error _               -> String "Error"
+  | Open_File_Error _     -> String "Open_File_Error"
 
 
 let convert_message (m: message_notification) =
@@ -199,75 +205,82 @@ let convert_message (m: message_notification) =
   match m with
   | Proof_error (nid, s) ->
       Obj ["mess_notif", cc m;
-             "node_ID", Int nid;
-             "error", String s]
+           "node_ID", Int nid;
+           "error", String s]
   | Transf_error (nid, s) ->
       Obj ["mess_notif", cc m;
-             "node_ID", Int nid;
-             "error", String s]
+           "node_ID", Int nid;
+           "error", String s]
   | Strat_error (nid, s) ->
       Obj ["mess_notif", cc m;
-             "node_ID", Int nid;
-             "error", String s]
+           "node_ID", Int nid;
+           "error", String s]
   | Replay_Info s ->
       Obj ["mess_notif", cc m;
-             "replay_info", String s]
+           "replay_info", String s]
   | Query_Info (nid, s) ->
       Obj ["mess_notif", cc m;
-             "node_ID", Int nid;
-             "qinfo", String s]
+           "node_ID", Int nid;
+           "qinfo", String s]
   | Query_Error (nid, s) ->
       Obj ["mess_notif", cc m;
-             "node_ID", Int nid;
-             "qerror", String s]
+           "node_ID", Int nid;
+           "qerror", String s]
   | Help s ->
       Obj ["mess_notif", cc m;
-             "qhelp", String s]
+           "qhelp", String s]
   | Information s ->
       Obj ["mess_notif", cc m;
-             "information", String s]
+           "information", String s]
   | Task_Monitor (n, k, p) ->
       Obj ["mess_notif", cc m;
-             "monitor", Array [Int n; Int k; Int p]]
+           "monitor", Array [Int n; Int k; Int p]]
+  | Parse_Or_Type_Error s ->
+      Obj ["mess_notif", cc m;
+           "error", String s]
   | Error s ->
       Obj ["mess_notif", cc m;
-             "error", String s]
+           "error", String s]
   | Open_File_Error s ->
       Obj ["mess_notif", cc m;
-             "open_error", String s]
+           "open_error", String s]
 
 let print_notification_to_json (n: notification): Json_base.value =
   let cc = convert_notification_constructor in
   match n with
   | New_node (nid, parent, node_type, name, detached) ->
       Obj ["notification", cc n;
-             "node_ID", Int nid;
-             "parent_ID", Int parent;
-             "node_type", convert_node_type node_type;
-             "name", String name;
-             "detached", Bool detached]
+           "node_ID", Int nid;
+           "parent_ID", Int parent;
+           "node_type", convert_node_type node_type;
+           "name", String name;
+           "detached", Bool detached]
   | Node_change (nid, update) ->
       Obj ["notification", cc n;
-             "node_ID", Int nid;
-             "update", convert_update update]
+           "node_ID", Int nid;
+           "update", convert_update update]
   | Remove nid ->
       Obj ["notification", cc n;
-             "node_ID", Int nid]
+           "node_ID", Int nid]
   | Initialized infos ->
       Obj ["notification", cc n;
-             "infos", convert_infos infos]
+           "infos", convert_infos infos]
   | Saved ->
       Obj ["notification", cc n]
   | Message m ->
       Obj ["notification", cc n;
-             "message", convert_message m]
+           "message", convert_message m]
   | Dead s ->
       Obj ["notification", cc n;
-             "message", String s]
+           "message", String s]
   | Task (nid, s) ->
       Obj ["notification", cc n;
-             "node_ID", Int nid;
-             "task", String s]
+           "node_ID", Int nid;
+           "task", String s]
+  | File_contents (f, s) ->
+      Obj ["notification", cc n;
+           "file", String f;
+           "content", String s]
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" Json_base.print (print_notification_to_json n)

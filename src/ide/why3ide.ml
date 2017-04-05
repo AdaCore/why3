@@ -898,6 +898,7 @@ let treat_message_notification msg = match msg with
   | Information s          -> print_message "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s      -> print_message "%s" s
+  | Parse_Or_Type_Error s  -> print_message "%s" s
   | Error s                ->
       if Debug.test_flag debug then
         print_message "%s" s
