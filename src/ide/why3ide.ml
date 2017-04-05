@@ -943,13 +943,17 @@ let treat_notification n = match n with
             (image_of_pa_status ~obsolete:obs pa)
         end);
       (* Moving cursor on first unproved goal around *)
-      let node = get_first_unproven_goal_around ~proved:proved
-        ~children:children ~get_parent:get_parent ~is_goal:is_goal id in
-      match node with
-      | None -> ()
-      | Some node ->
-          let iter = (get_node_row node)#iter in
-          goals_view#selection#select_iter iter
+      match get_selected_row_references () with
+      | [] -> ()
+      | r :: _ ->
+        if get_node_id (r #iter) = id then
+        let node = get_first_unproven_goal_around ~proved:proved
+            ~children:children ~get_parent:get_parent ~is_goal:is_goal id in
+        match node with
+        | None -> ()
+        | Some node ->
+            let iter = (get_node_row node)#iter in
+            goals_view#selection#select_iter iter
     end
   | New_node (id, parent_id, typ, name, detached) ->
     begin (try
