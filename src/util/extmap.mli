@@ -67,6 +67,12 @@ module type S =
         and of [m2]. The presence of each such binding, and the corresponding
         value, is determined with the function [f]. *)
 
+    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
+    (** [union f m1 m2] computes a map whose keys is a subset of keys
+        of [m1] and of [m2]. If a binding is present in [m1] (resp. [m2])
+        and not in [m2] (resp. [m1]) the same binding is present in
+        the result. The function [f] is called only in ambiguous cases. *)
+
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     (** Total ordering between maps.  The first argument is a total ordering
         used to compare data associated with equal keys in the two maps. *)
@@ -165,12 +171,6 @@ module type S =
         [match (try f (Some (find x m)) with Not_found -> f None) with
           | None -> m
           | Some v -> add x v] *)
-
-    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
-    (** [union f m1 m2] computes a map whose keys is a subset of keys
-        of [m1] and of [m2]. If a binding is present in [m1] (resp. [m2])
-        and not in [m2] (resp. [m1]) the same binding is present in
-        the result. The function [f] is called only in ambiguous cases. *)
 
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     (** [inter f m1 m2] computes a map whose keys is a subset of

@@ -3,5 +3,7 @@
        | "'" lident          ; type variable
        | "()"		     ; empty tuple type
        | "(" type ("," type)+ ")" ; tuple type
-       | "(" type ")"        ; parentheses %
+       | "(" type ")"        ; parentheses
+       | "<" "range" integer integer ">" ; range type
+       | "<" "float" integer integer ">" ; float type %
 \end{syntax}

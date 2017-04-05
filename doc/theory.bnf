@@ -1,5 +1,5 @@
 \begin{syntax}
-  theory ::= "theory" uident label* decl* "end"
+  theory ::= "theory" uident-nq label* decl* "end"
   \
   decl ::= "type" type-decl ("with" type-decl)* ;
     | "constant" constant-decl ;
@@ -7,29 +7,29 @@
     | "predicate" predicate-decl ("with" logic-decl)* ;
     | "inductive" inductive-decl ("with" inductive-decl)* ;
     | "coinductive" inductive-decl ("with" inductive-decl)* ;
-    | "axiom" ident ":" formula 	   ;
-    | "lemma" ident ":" formula 	   ;
-    | "goal"  ident ":" formula 	   ;
+    | "axiom" ident-nq ":" formula 	   ;
+    | "lemma" ident-nq ":" formula 	   ;
+    | "goal"  ident-nq ":" formula 	   ;
     | "use" imp-exp tqualid ("as" uident)?     ;
     | "clone" imp-exp tqualid ("as" uident)? subst? ;
-    | "namespace" "import"? uident decl* "end" ;
+    | "namespace" "import"? uident-nq decl* "end" ;
   \
   logic-decl ::= function-decl ;
     | predicate-decl
   \
-  constant-decl ::= lident label* ":" type ;
-    | lident label* ":" type "=" term
+  constant-decl ::= lident-nq label* ":" type ;
+    | lident-nq label* ":" type "=" term
   \
-  function-decl ::= lident label* type-param* ":" type ;
-    | lident label* type-param* ":" type "=" term
+  function-decl ::= lident-nq label* type-param* ":" type ;
+    | lident-nq label* type-param* ":" type "=" term
   \
-  predicate-decl ::= lident label* type-param* ;
-    | lident label* type-param* "=" formula
+  predicate-decl ::= lident-nq label* type-param* ;
+    | lident-nq label* type-param* "=" formula
   \
-  inductive-decl ::= lident label* type-param* "=" ;
+  inductive-decl ::= lident-nq label* type-param* "=" ;
                      "|"? ind-case ("|" ind-case)* ;
   \
-  ind-case ::= ident label* ":" formula ;
+  ind-case ::= ident-nq label* ":" formula ;
   \
   imp-exp ::= ("import" | "export")?
   \
@@ -43,6 +43,6 @@
     | "goal"  qualid			   ;
   \
   tqualid ::= uident | ident ("." ident)* "." uident ;
-  \ 
-  type-decl ::= lident label* ("'" lident label*)* type-defn; %
+  \
+  type-decl ::= lident-nq label* ("'" lident-nq label*)* type-defn; %
 \end{syntax}

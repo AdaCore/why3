@@ -16,8 +16,17 @@
   point support will leave them uninterpreted.
 *)
 
+(** {2 Rounding Modes} *)
+
 theory RoundingMode
   type mode = RNE | RNA | RTP | RTN | RTZ
+  (** {h <ul>
+     <li>RNE : Round Nearest ties to Even
+     <li>RNA : Round Nearest ties to Away
+     <li>RTP : Round Towards Positive
+     <li>RTN : Round Towards Negative
+     <li>RTZ : Round Towards Zero
+     </ul} *)
 
   predicate to_nearest (m:mode) = m = RNE \/ m = RNA
 end
@@ -32,31 +41,24 @@ theory GenericFloat
   use import real.RealInfix
   use export RoundingMode
 
-  (*********************************************************************)
-  (* {2 PART I - PUBLIC INTERFACE}                                     *)
-  (*********************************************************************)
+  (** {2 Part I - Public Interface}   *)
 
-  (* the number of bits in the exponent.  *)
   constant eb : int
-  (* the number of bits in the significand, including the hidden bit. *)
+  (** the number of bits in the exponent.  *)
+
   constant sb : int
+  (** the number of bits in the significand, including the hidden bit. *)
 
   axiom eb_gt_1: 1 < eb
   axiom sb_gt_1: 1 < sb
 
-  (* {3 Sorts} *)
+  (** {3 Sorts} *)
 
   type t
 
-  (* RNE : Round Nearest Ties To Even
-     RNA : Round Nearest Ties To Away
-     RTP : Round Toward Positive
-     RTN : Round Toward Negative
-     RTZ : Round Toward Zero *)
+  (** {3 Constructors and Constants} *)
 
-  (* {3 Constructors and Constants} *)
-
-  constant zeroF     : t   (* +0.0 *)
+  constant zeroF     : t   (** +0.0 *)
   (* exp_bias = 2^(sb - 1) - 1 *)
   (* max_finite_exp = 2^sb - 2 - exp_bias = exp_bias *)
   (* max_significand = (2^eb + 2^eb - 1) * 2^(1-eb) *)
@@ -64,7 +66,7 @@ theory GenericFloat
   (* [m;x] = ( 1 + m * 2^(1-eb) ) * 2^( x - exp_bias ) *)
   (* max_value = [2^(eb-1); 2^sb - 2] *)
 
-  (* {3 Operators} *)
+  (** {3 Operators} *)
 
   function abs      t   : t
   function neg      t   : t   (* fp.neg *)
@@ -110,7 +112,7 @@ theory GenericFloat
   predicate (.>)  (x:t) (y:t) = gt x y
   predicate (.=)  (x:t) (y:t) = eq x y
 
-  (* {3 Classification of numbers} *)
+  (** {3 Classification of numbers} *)
 
   predicate is_normal    t
   predicate is_subnormal t
@@ -120,7 +122,7 @@ theory GenericFloat
   predicate is_positive  t
   predicate is_negative  t
 
-  (* helper predicate for zeros, normals and subnormals. not defined
+  (** helper predicate for zeros, normals and subnormals. not defined
      so that the axiomatisation below can use it without talking about
      subnormals *)
   predicate is_finite    t
@@ -136,7 +138,7 @@ theory GenericFloat
   axiom is_not_finite: forall x:t.
     not (is_finite x) <-> (is_infinite x \/ is_nan x)
 
-  (* {3 Conversions from other sorts} *)
+  (** {3 Conversions from other sorts} *)
 
   (* from bitvec binary interchange                           *)
   (*   partly done with from_binary (for literals only)       *)
@@ -146,25 +148,23 @@ theory GenericFloat
   (* from unsigned integer bitvector - see Float_BV_Converter *)
   (* from signed integer bitvector                            *)
 
-  (* {3 Conversions to other sorts} *)
+  (** {3 Conversions to other sorts} *)
 
   (* to unsigned integer bitvector   - see Float_BV_Converter *)
   (* to signed integer bitvector                              *)
   (* to real *)
   function to_real   t    : real
 
-  (*********************************************************************)
-  (* {2 PART II - PRIVATE AXIOMATISATION}                              *)
-  (*********************************************************************)
+  (** {2 Part II - Private Axiomatisation} *)
 
-  (* {3 Constructors and Constants} *)
+  (** {3 Constructors and Constants} *)
   axiom zeroF_is_positive : is_positive zeroF
   axiom zeroF_is_zero     : is_zero zeroF
 
   axiom zero_to_real : forall x [is_zero x].
     is_zero x <-> is_finite x /\ to_real x = 0.0
 
-  (* {3 Conversions from other sorts} *)
+  (** {3 Conversions from other sorts} *)
 
   (* with mathematical int *)
   (* note that these conversions do not feature in SMTLIB *)
@@ -177,7 +177,7 @@ theory GenericFloat
   (* also note that this function never yields a subnormal, or a NaN, or -0 *)
   function of_int (m:mode) (x:int) : t
 
-  (* {3 Conversions to other sorts} *)
+  (** {3 Conversions to other sorts} *)
 
   (* Intended semantics for to_int are the same as (_ fp.to_sbv) with a    *)
   (* suitably sized bitvector. Safe minimum sizes are given below:         *)
@@ -193,7 +193,7 @@ theory GenericFloat
 
   axiom zero_of_int : forall m. zeroF = of_int m 0
 
-  (* {3 Arithmetic} *)
+  (** {3 Arithmetic} *)
 
   (* The intended meaning for round is the rounding for floating point as  *)
   (* described on p17 of IEEE-754. For results where the corresponding     *)
@@ -355,7 +355,7 @@ theory GenericFloat
   predicate product_sign (z x y: t) =
     (same_sign x y -> is_positive z) /\ (diff_sign x y -> is_negative z)
 
-  (** overflow *)
+  (** {3 Overflow} *)
 
   (* This predicate is used to tell what is the result of a rounding
      in case of overflow in the axioms specifying add/sub/mul and fma
@@ -774,6 +774,8 @@ theory GenericFloat
     is_finite (roundToIntegral m x)
 end
 
+(** {2 Conversions to/from bitvectors} *)
+
 theory Float_BV_Converter
   use bv.BV8
   use bv.BV16
@@ -828,6 +830,8 @@ theory Float_BV_Converter
     to_real (of_ubv64 m x) = round m (FromInt.from_int (BV64.t'int x))
 end
 
+(** {2 Standard simple precision floats (32 bits)} *)
+
 theory Float32
   use int.Int
   use import real.Real
@@ -861,6 +865,8 @@ theory Float32
       x - 0x1p-23 * Abs.abs(x) - 0x1p-149 <= round m x <= x + 0x1p-23 * Abs.abs(x) + 0x1p-149
 end
 
+(** {2 Standard double precision floats (64 bits)} *)
+
 theory Float64
   use int.Int
   use import real.Real
@@ -893,6 +899,8 @@ theory Float64
       no_overflow m x ->
       x - 0x1p-52 * Abs.abs(x) - 0x1p-1074 <= round m x <= x + 0x1p-52 * Abs.abs(x) + 0x1p-1074
 end
+
+(** {2 Conversions between float formats} *)
 
 theory FloatConverter
 
