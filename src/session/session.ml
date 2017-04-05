@@ -71,8 +71,10 @@ module Pos = struct
 end
 
 module Mpos = Extmap.Make(Pos)
+(*
 module Spos = Extset.MakeOfMap(Mpos)
 module Hpos = Exthtbl.Make(Pos)
+*)
 
 type meta_args = meta_arg list
 

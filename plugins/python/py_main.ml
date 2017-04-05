@@ -349,7 +349,7 @@ let read_channel env path file c =
   Debug.dprintf debug "%s parsed successfully.@." file;
   let file = Filename.basename file in
   let file = Filename.chop_extension file in
-  let name = String.capitalize file in
+  let name = Strings.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
   let inc = Mlw_typing.open_file env path in
   let loc = Why3.Loc.user_position file 0 0 0 in
