@@ -238,6 +238,7 @@ let treat_notification fmt n =
   | Message (msg)                 -> treat_message_notification fmt msg
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
+  | File_contents _ -> assert false (* TODO *)
   | Task (id, s)                  ->
     try
       let node = Hnode.find nodes id in

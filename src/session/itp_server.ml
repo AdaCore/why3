@@ -47,6 +47,19 @@ let unproven_goals_below_file cont file =
     let theories = file.file_theories in
     List.fold_left (unproven_goals_below_th cont) [] theories
 
+let unproven_goals_below_id cont id =
+  match id  with
+  | APn pnid   -> [pnid]
+  | APa panid  ->
+     let ses = cont.controller_session in
+     [get_proof_attempt_parent ses panid]
+  | ATn tn     ->
+     List.rev (unproven_goals_below_tn cont [] tn)
+  | AFile file ->
+     List.rev (unproven_goals_below_file cont file)
+  | ATh th     ->
+     List.rev (unproven_goals_below_th cont [] th)
+
 
 (****************)
 (* Command list *)
@@ -396,59 +409,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
                        sd_provers = provers;
                        cont = c }
 
-  (* ------------ init controller ------------ *)
-
-  (* Init cont on file or directory. It is called only when an
-     Open_session_req is requested *)
-  let init_cont f =
-    let d = get_server_data () in
-    let prover_list = get_prover_list d.config in
-    let transformation_list = List.map fst (list_transforms ()) in
-    let strategies_list =
-      let l = strategies d.cont.controller_env d.config loaded_strategies in
-      List.map (fun (a,_,_,_) -> a) l
-    in
-    let infos =
-      {
-        provers = prover_list;
-        transformations = transformation_list;
-        strategies = strategies_list;
-        commands =
-          List.map (fun (c,_,_) -> c) commands
-      }
-    in
-    try (
-      if (Sys.file_exists f) then
-      begin
-        if (Sys.is_directory f) then
-        begin
-          let b = cont_from_session_dir d.cont f in
-          if b then
-            P.notify (Initialized infos);
-          b
-        end
-        else
-        begin
-          let b = cont_from_file d.cont f in
-          if b then
-            P.notify (Initialized infos);
-          b
-        end
-      end
-      else
-        begin
-          P.notify (Message (Open_File_Error ("Not a file: " ^ f)));
-          false
-        end)
-    with
-      | NotADirectory f ->
-          P.notify (Message (Open_File_Error ("Not a directory: " ^ f))); false
-      | BadFileName f ->
-          P.notify (Message (Open_File_Error ("Bad file name: " ^ f))); false
-      | e ->
-          Format.eprintf "%a@." Exn_printer.exn_printer e;
-          P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
-          exit 1
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -733,6 +693,63 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
 
 
+  (* ------------ init controller ------------ *)
+
+  (* Init cont on file or directory. It is called only when an
+     Open_session_req is requested *)
+  let init_cont f =
+    let d = get_server_data () in
+    let prover_list = get_prover_list d.config in
+    let transformation_list = List.map fst (list_transforms ()) in
+    let strategies_list =
+      let l = strategies d.cont.controller_env d.config loaded_strategies in
+      List.map (fun (a,_,_,_) -> a) l
+    in
+    let infos =
+      {
+        provers = prover_list;
+        transformations = transformation_list;
+        strategies = strategies_list;
+        commands =
+          List.map (fun (c,_,_) -> c) commands
+      }
+    in
+    try (
+      if (Sys.file_exists f) then
+        begin
+          if (Sys.is_directory f) then
+            begin
+              let b = cont_from_session_dir d.cont f in
+              if b then
+                P.notify (Initialized infos);
+              b
+            end
+          else
+            begin
+              let b = cont_from_file d.cont f in
+              if b then
+                begin
+                  add_file_to_session d.cont f;
+                  P.notify (Initialized infos);
+                end;
+              b
+            end
+        end
+      else
+        begin
+          P.notify (Message (Open_File_Error ("Not a file: " ^ f)));
+          false
+        end)
+    with
+      | NotADirectory f ->
+          P.notify (Message (Open_File_Error ("Not a directory: " ^ f))); false
+      | BadFileName f ->
+          P.notify (Message (Open_File_Error ("Bad file name: " ^ f))); false
+      | e ->
+          Format.eprintf "%a@." Exn_printer.exn_printer e;
+          P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
+          exit 1
+
   (* ----------------- Schedule proof attempt -------------------- *)
 
   (* Callback of a proof_attempt *)
@@ -766,22 +783,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
-    let goals =
-      match any_from_node_ID nid with
-      | APn pnid   -> [pnid]
-      | APa panid  ->
-          let ses = d.cont.controller_session in
-          [get_proof_attempt_parent ses panid]
-      | ATn tn     ->
-        List.rev (unproven_goals_below_tn d.cont [] tn)
-      | AFile file ->
-        List.rev (unproven_goals_below_file d.cont file)
-      | ATh th     ->
-        List.rev (unproven_goals_below_th d.cont [] th)
-    in
+    let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     List.iter (fun id -> C.schedule_proof_attempt d.cont id prover
                 ~limit ~callback ~notification:notify_change_proved)
-      goals
+      unproven_goals
 
   (* ----------------- Schedule transformation -------------------- *)
 
@@ -819,23 +824,21 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   let run_strategy_on_task nid s =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-      let l = strategies d.cont.controller_env d.config loaded_strategies in
-      let st = List.filter (fun (_,c,_,_) -> c=s) l in
-      begin
-        match st with
-        | [(n,_,_,st)] ->
-          Format.printf "running strategy '%s'@." n;
-          let callback sts =
-            Format.printf "Strategy status: %a@." print_strategy_status sts
-          in
-          let callback_pa = callback_update_tree_proof d.cont in
-          let callback_tr st = callback_update_tree_transform st in
-          C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved
-        | _ -> Format.printf "Strategy '%s' not found@." s
-      end
-    | _ -> ()
+    let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
+    let l = strategies d.cont.controller_env d.config loaded_strategies in
+    let st = List.filter (fun (_,c,_,_) -> c=s) l in
+    match st with
+    | [(n,_,_,st)] ->
+       Format.printf "running strategy '%s'@." n;
+       let callback sts =
+         Format.printf "Strategy status: %a@." print_strategy_status sts
+       in
+       let callback_pa = callback_update_tree_proof d.cont in
+       let callback_tr st = callback_update_tree_transform st in
+       List.iter (fun id ->
+                  C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved)
+                 unproven_goals
+    | _ -> Format.printf "Strategy '%s' not found@." s
 
   (* ----------------- Save session --------------------- *)
   let save_session () =
