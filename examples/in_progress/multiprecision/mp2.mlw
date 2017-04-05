@@ -147,12 +147,12 @@ module N
 
   (** {2 Comparisons} *)
 
-    let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
+  let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
     variant  { x2 - x1 }
     ensures  { 0 <= value_sub x x1 x2 }
   = if x2 <= x1 then () else
       begin
-        assert { value_sub x x1 x2 = l2i (Map.get x x1) + radix * value_sub x (x1+1) x2};
+        value_sub_head x x1 x2;
         value_sub_lower_bound x (x1+1) x2
       end
 
@@ -162,7 +162,9 @@ module N
     ensures  { value_sub x x1 x2 < power radix (x2 - x1) }
   = if x1 = x2 then () else
       begin
-      assert { value_sub x x1 x2 <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
+      value_sub_tail x x1 (x2-1);
+      assert { value_sub x x1 x2 
+               <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
       value_sub_upper_bound x x1 (x2-1)
       end
 
@@ -190,10 +192,10 @@ module N
 
   (** [compare_same_size] compares [x[0..sz-1]] and [y[0..sz-1]] as unsigned integers. It corresponds to [GMPN_CMP]. *)
   let compare_same_size (x y:t) (sz:int32) : int32
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv y (sz) }
-    ensures { result = compare_int (value_sub_shift x (sz))
-              (value_sub_shift y (sz))
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv y sz }
+    ensures { result = compare_int (value_sub_shift x sz)
+              (value_sub_shift y sz)
               }
   =
    let i = ref sz in
@@ -225,8 +227,8 @@ module N
        then begin
             value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+p2i sz);
             value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+p2i sz);
-            assert { compare_int (value_sub_shift x (sz))
-                       (value_sub_shift y (sz))
+            assert { compare_int (value_sub_shift x sz)
+                       (value_sub_shift y sz)
                    = compare_int (value_sub_shift x k) (value_sub_shift y k) };
             value_sub_tail (pelts x) x.offset (x.offset+k-1);
             value_sub_tail (pelts y) y.offset (y.offset+k-1);
@@ -269,9 +271,9 @@ module N
 
    (* [is_zero] checks if [x[0..sz-1]] is zero. It corresponds to [mpn_zero_p]. *)
    let is_zero (x:t) (sz:int32) : int32
-     requires { valid_ptr_itv x (sz) }
+     requires { valid_ptr_itv x sz }
      ensures { 0 <= Int32.to_int result <= 1 }
-     ensures { Int32.to_int result = 1 <-> value_sub_shift x (sz) = 0 }
+     ensures { Int32.to_int result = 1 <-> value_sub_shift x sz = 0 }
    =
      let i = ref sz in
      let uzero = Limb.of_int 0 in
@@ -302,8 +304,8 @@ module N
 
   (** [zero r sz] sets [(r,sz)] to zero. Corresponds to [mpn_zero]. *)
   let zero (r:t) (sz:int32) : unit
-    requires { valid_ptr_itv r (sz) }
-    ensures { value_sub_shift r (sz) = 0 }
+    requires { valid_ptr_itv r sz }
+    ensures { value_sub_shift r sz = 0 }
   =
     let i = ref (Int32.of_int 0) in
     let lzero = Limb.of_int 0 in
@@ -323,11 +325,11 @@ module N
       have size [sz]. This corresponds to the function [mpn_add_1] *)
   (* r and x must be separated. This is enforced by Why3 regions in typing *)
   let add_limb (r x:t) (y:limb) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
     requires { sz > 0 } (* ? GMP does the same for 0 and 1*)
-    ensures { value_sub_shift r (sz) + (power radix (sz)) * result =
-              value_sub_shift x (sz) + y }
+    ensures { value_sub_shift r sz + (power radix sz) * result =
+              value_sub_shift x sz + y }
     ensures { 0 <= result <= 1 }
     writes { r.data.contents.elts }
   =
@@ -393,12 +395,12 @@ module N
       Returns the carry, either [0] or [1]. Corresponds to the function [mpn_add_n]. *)
 
   let add_limbs (r x y:t) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv y (sz) }
-    requires { valid_ptr_itv r (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv y sz }
+    requires { valid_ptr_itv r sz }
     ensures { 0 <= result <= 1 }
-    ensures { value_sub_shift r (sz) + (power radix (sz)) * result =
-            value_sub_shift x (sz) + value_sub_shift y (sz) }
+    ensures { value_sub_shift r sz + (power radix sz) * result =
+            value_sub_shift x sz + value_sub_shift y sz }
     writes { r.data.contents.elts }
     =
     let limb_zero = Limb.of_int 0 in
@@ -583,11 +585,11 @@ module N
       the result to [(r, sz)]. Returns borrow, either 0 or
       1. Corresponds to [mpn_sub_1]. *)
   let sub_limb (r x:t) (y:limb) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
     requires { 0 < sz }
-    ensures { value_sub_shift r (sz) - power radix (sz) * result
-              = value_sub_shift x (sz) - y }
+    ensures { value_sub_shift r sz - power radix sz * result
+              = value_sub_shift x sz - y }
     ensures { 0 <= result <= 1 }
     writes { r.data.contents.elts }
   =
@@ -653,12 +655,12 @@ module N
       writes the result to [(r, sz)]. Returns borrow, either 0 or
       1. Corresponds to [mpn_sub_n]. *)
   let sub_limbs (r x y:t) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv y (sz) }
-    requires { valid_ptr_itv r (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv y sz }
+    requires { valid_ptr_itv r sz }
     ensures { 0 <= result <= 1 }
-    ensures { value_sub_shift r (sz) - power radix (sz) * result
-              = value_sub_shift x (sz) - value_sub_shift y (sz) }
+    ensures { value_sub_shift r sz - power radix sz * result
+              = value_sub_shift x sz - value_sub_shift y sz }
     writes { r.data.contents.elts }
   =
     let limb_zero = Limb.of_int 0 in
@@ -815,10 +817,10 @@ module N
     writes the n least significant limbs in [r], and returns the most
     significant limb. It corresponds to [mpn_mul_1]. *)
   let mul_limb (r x:t) (y:limb) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
-    ensures { value_sub_shift r (sz) + (power radix (sz)) * result
-                = value_sub_shift x (sz) * y }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
+    ensures { value_sub_shift r sz + (power radix sz) * result
+                = value_sub_shift x sz * y }
     writes { r.data.contents.elts }
   =
     let limb_zero = Limb.of_int 0 in
@@ -887,11 +889,11 @@ module N
       Returns the most significant limb of the product plus the carry
       of the addition. Corresponds to [mpn_addmul_1].*)
   let addmul_limb (r x:t) (y:limb) (sz:int32):limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
-    ensures { value_sub_shift r (sz) + (power radix (sz)) * result
-            = value_sub_shift (old r) (sz)
-              + value_sub_shift x (sz) * y }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
+    ensures { value_sub_shift r sz + (power radix sz) * result
+            = value_sub_shift (old r) sz
+              + value_sub_shift x sz * y }
     writes { r.data.contents.elts }
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
@@ -1009,12 +1011,12 @@ module N
   [x] or [y]. Corresponds to [mpn_mul_n].  *)
   let mul_limbs (r x y:t) (sz:int32) : unit
     requires { sz > 0 }
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv y (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv y sz }
     requires { valid_ptr_itv r (sz +  sz) }
     writes { r.data.contents.elts }
     ensures { value_sub_shift r (sz + sz)
-              = value_sub_shift x (sz) * value_sub_shift y (sz) }
+              = value_sub_shift x sz * value_sub_shift y sz }
   =
     zero r sz;
     let limb_zero = Limb.of_int 0 in
@@ -1027,7 +1029,7 @@ module N
       invariant { 0 <= !i <= sz }
       invariant { value_sub_shift r (!i + sz)
                     + (power radix (!i + sz)) * !c
-                  = value_sub_shift x (sz)
+                  = value_sub_shift x sz
                       * value_sub_shift y (!i) }
       invariant { (!rp).offset = r.offset + !i }
       invariant { plength !rp = plength r }
@@ -1044,9 +1046,9 @@ module N
              = value_sub_shift r (k + sz) };
       ly := get_ofs y !i;
       let c' =  addmul_limb !rp x !ly sz in
-      assert { value_sub_shift !rp (sz) + power radix (sz) * c'
-              = value_sub_shift (!rp at StartLoop) (sz)
-                + value_sub_shift x (sz) * !ly };
+      assert { value_sub_shift !rp sz + power radix sz * c'
+              = value_sub_shift (!rp at StartLoop) sz
+                + value_sub_shift x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
                 r.offset (!rp).offset
                 by (!rp).offset = r.offset + !i
@@ -1068,13 +1070,13 @@ module N
       value_sub_tail (pelts y) y.offset (y.offset + k);
       value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
       assert { value_sub (pelts r) (r.offset+k) (r.offset+k+sz)
-               = value_sub_shift !rp (sz) };
+               = value_sub_shift !rp sz };
       assert { value_sub_shift r (!i + sz)
                     + (power radix (!i + sz)) * !c
-                  = value_sub_shift x (sz)
+                  = value_sub_shift x sz
                       * value_sub_shift y (!i)
                by
-                 power radix (k + sz) = power radix k * power radix (sz)
+                 power radix (k + sz) = power radix k * power radix sz
                so
                  value_sub_shift (r at StartLoop) k
                  + (power radix k) * value_sub (pelts r at StartLoop)
@@ -1087,100 +1089,100 @@ module N
                     + (power radix (k + sz)) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
+                    + (power radix k) * value_sub_shift !rp sz
                     + (power radix (k + sz)) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz)) * res
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz)) * res
-                    + (power radix k) * (power radix (sz)) * radix * !c
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz) * res
+                    + (power radix k) * (power radix sz) * radix * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz))
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz)
                              * (res + radix * !c)
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz))
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz)
                              * (c' + (!c at StartLoop))
                = value_sub_shift r k + (power radix k)
-                    * (value_sub_shift !rp (sz)
-                      + power radix (sz) * c'
-                      + (power radix (sz)) * (!c at StartLoop))
+                    * (value_sub_shift !rp sz
+                      + power radix sz * c'
+                      + (power radix sz) * (!c at StartLoop))
                = value_sub_shift r k + (power radix k)
-                    * (value_sub_shift (!rp at StartLoop) (sz)
-                       + value_sub_shift x (sz) * !ly
-                       + (power radix (sz)) * (!c at StartLoop))
+                    * (value_sub_shift (!rp at StartLoop) sz
+                       + value_sub_shift x sz * !ly
+                       + (power radix sz) * (!c at StartLoop))
                = value_sub_shift r k
-                 + power radix k * (value_sub_shift (!rp at StartLoop) (sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop)))
+                 + power radix k * (value_sub_shift (!rp at StartLoop) sz)
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop)))
                = value_sub_shift (r at StartLoop) k
-                 + power radix k * (value_sub_shift (!rp at StartLoop) (sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop)))
+                 + power radix k * (value_sub_shift (!rp at StartLoop) sz)
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop)))
                = value_sub_shift (r at StartLoop) k
                  + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
                                               (r.offset+k+ sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop)))
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop)))
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop)))
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop)))
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * value_sub_shift x (sz) * !ly
-                 + power radix k * power radix (sz) * ((!c at StartLoop))
+                 + power radix k * value_sub_shift x sz * !ly
+                 + power radix k * power radix sz * ((!c at StartLoop))
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * power radix (sz) * ((!c at StartLoop))
-                 + power radix k * value_sub_shift x (sz) * !ly
+                 + power radix k * power radix sz * ((!c at StartLoop))
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (r at StartLoop) (k + sz)
                  + power radix (k + sz) * ((!c at StartLoop))
-                 + power radix k * value_sub_shift x (sz) * !ly
-               = value_sub_shift x (sz) * value_sub_shift y k
-                + power radix k * value_sub_shift x (sz) * !ly
-               = value_sub_shift x (sz) *
+                 + power radix k * value_sub_shift x sz * !ly
+               = value_sub_shift x sz * value_sub_shift y k
+                + power radix k * value_sub_shift x sz * !ly
+               = value_sub_shift x sz *
                  (value_sub_shift y k + power radix k * !ly)
-               = value_sub_shift x (sz) * value_sub_shift y (!i)
+               = value_sub_shift x sz * value_sub_shift y (!i)
              };
       rp := C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
     value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sz);
     value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sz);
-    assert { 0 <= value_sub_shift x (sz) < power radix (sz) };
-    assert { 0 <= value_sub_shift y (sz) < power radix (sz) };
+    assert { 0 <= value_sub_shift x sz < power radix sz };
+    assert { 0 <= value_sub_shift y sz < power radix sz };
     prod_compat_strict_r (value_sub_shift y (p2i sz)) (power radix (p2i sz))
                          (power radix (p2i sz));
     assert { !c = 0 by
-             0 < power radix (sz)
+             0 < power radix sz
              so
              value_sub_shift r (sz + sz)
                     + (power radix (sz + sz)) * !c
-                  = value_sub_shift x (sz)
-                      * value_sub_shift y (sz)
+                  = value_sub_shift x sz
+                      * value_sub_shift y sz
              so
              (power radix (sz + sz))*(!c) <=
-                    value_sub_shift x (sz)
-                    * value_sub_shift y (sz)
-                    <= (power radix (sz)) * value_sub_shift y (sz)
-                    < (power radix (sz))*(power radix (sz))
+                    value_sub_shift x sz
+                    * value_sub_shift y sz
+                    <= (power radix sz) * value_sub_shift y sz
+                    < (power radix sz)*(power radix sz)
              so
              (power radix (sz + sz))*(!c) <
-                    (power radix (sz))*(power radix (sz))  }
+                    (power radix sz)*(power radix sz)  }
 
  let addmul_limbs (r x y:t) (sz:int32) : limb
     requires { sz > 0 }
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv y (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv y sz }
     requires { valid_ptr_itv r (sz +  sz) }
     writes { r.data.contents.elts }
     ensures { value_sub_shift r (sz + sz)
                 + power radix (sz + sz) * result
               = value_sub_shift (old r) (sz + sz)
-                + value_sub_shift x (sz) * value_sub_shift y (sz) }
+                + value_sub_shift x sz * value_sub_shift y sz }
   =
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
@@ -1201,7 +1203,7 @@ module N
       invariant { value_sub_shift r (!i + sz)
                     + (power radix (!i + sz)) * !c
                   = value_sub_shift (old r) (!i + sz)
-                    + value_sub_shift x (sz) * value_sub_shift y (!i) }
+                    + value_sub_shift x sz * value_sub_shift y (!i) }
       invariant { (!rp).offset = r.offset + !i }
       invariant { r.data = (!rp).data }
       invariant { 0 <= !c <= 1 }
@@ -1218,9 +1220,9 @@ module N
              = value_sub_shift r (k + sz) };
       ly := get_ofs y !i;
       let c' =  addmul_limb !rp x !ly sz in
-      assert { value_sub_shift !rp (sz) + power radix (sz) * c'
-              = value_sub_shift (!rp at StartLoop) (sz)
-                + value_sub_shift x (sz) * !ly };
+      assert { value_sub_shift !rp sz + power radix sz * c'
+              = value_sub_shift (!rp at StartLoop) sz
+                + value_sub_shift x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
                 r.offset (!rp).offset
                 by (!rp).offset = r.offset + !i
@@ -1236,7 +1238,7 @@ module N
       value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
                         r.offset  (r.offset + p2i !i) res;
       set_ofs !rp sz res;
-      assert { value_sub_shift !rp (sz) = value_sub_shift (!rp at BeforeCarry) (sz) };
+      assert { value_sub_shift !rp sz = value_sub_shift (!rp at BeforeCarry) sz };
       c:= carry;
       i := Int32.(+) !i one;
       assert { value_sub_shift r k = value_sub_shift (r at BeforeCarry) k
@@ -1246,14 +1248,14 @@ module N
       old_tail_shift (k+p2i sz);
       value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
       assert { value_sub (pelts r) (r.offset+k) (r.offset+k+sz)
-               = value_sub_shift !rp (sz) };
+               = value_sub_shift !rp sz };
       assert { value_sub_shift r (!i + sz)
                     + (power radix (!i + sz)) * !c
                   = value_sub_shift (old r) (!i + sz)
-                    + value_sub_shift x (sz)
+                    + value_sub_shift x sz
                       * value_sub_shift y (!i)
                by
-                 power radix (k + sz) = power radix k * power radix (sz)
+                 power radix (k + sz) = power radix k * power radix sz
                so
                  value_sub_shift (r at StartLoop) k
                  + (power radix k) * value_sub (pelts r at StartLoop)
@@ -1264,9 +1266,9 @@ module N
                   + power radix (k+sz) * !lr
                   by !lr = (pelts (old r))[r.offset + k + sz])
                so
-                  value_sub_shift !rp (sz) + (power radix (sz)) * c' =
-                  value_sub_shift (!rp at StartLoop) (sz)
-                  + value_sub_shift x (sz) * !ly
+                  value_sub_shift !rp sz + (power radix sz) * c' =
+                  value_sub_shift (!rp at StartLoop) sz
+                  + value_sub_shift x sz * !ly
                so
                  value_sub_shift r (!i + sz)
                     + (power radix (!i + sz)) * !c
@@ -1274,81 +1276,81 @@ module N
                     + (power radix (k + sz)) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
+                    + (power radix k) * value_sub_shift !rp sz
                     + (power radix (k + sz)) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz)) * res
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz) * res
                     + (power radix (!i + sz)) * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz)) * res
-                    + (power radix k) * (power radix (sz)) * radix * !c
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz) * res
+                    + (power radix k) * (power radix sz) * radix * !c
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz))
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz)
                              * (res + radix * !c)
                = value_sub_shift r k
-                    + (power radix k) * value_sub_shift !rp (sz)
-                    + (power radix k) * (power radix (sz))
+                    + (power radix k) * value_sub_shift !rp sz
+                    + (power radix k) * (power radix sz)
                              * (c' + (!c at StartLoop) + !lr)
                = value_sub_shift r k + (power radix k)
-                    * (value_sub_shift !rp (sz)
-                      + power radix (sz) * (c'+ (!c at StartLoop) + !lr))
+                    * (value_sub_shift !rp sz
+                      + power radix sz * (c'+ (!c at StartLoop) + !lr))
                = value_sub_shift r k + (power radix k)
-                    * (value_sub_shift !rp (sz)
-                      + power radix (sz) * c'
-                      + power radix (sz) * ((!c at StartLoop) + !lr))
+                    * (value_sub_shift !rp sz
+                      + power radix sz * c'
+                      + power radix sz * ((!c at StartLoop) + !lr))
                = value_sub_shift r k + (power radix k)
-                    * (value_sub_shift (!rp at StartLoop) (sz)
-                       + value_sub_shift x (sz) * !ly
-                       + (power radix (sz)) * ((!c at StartLoop) + !lr))
+                    * (value_sub_shift (!rp at StartLoop) sz
+                       + value_sub_shift x sz * !ly
+                       + (power radix sz) * ((!c at StartLoop) + !lr))
                = value_sub_shift r k
-                 + power radix k * (value_sub_shift (!rp at StartLoop) (sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop) + !lr))
+                 + power radix k * (value_sub_shift (!rp at StartLoop) sz)
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop) + !lr))
                = value_sub_shift (r at StartLoop) k
-                 + power radix k * (value_sub_shift (!rp at StartLoop) (sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop) + !lr))
+                 + power radix k * (value_sub_shift (!rp at StartLoop) sz)
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop) + !lr))
                = value_sub_shift (r at StartLoop) k
                  + power radix k * (value_sub (pelts r at StartLoop) (r.offset+k)
                                               (r.offset+k+ sz))
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop) + !lr))
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop) + !lr))
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * (value_sub_shift x (sz) * !ly
-                    + (power radix (sz)) * ((!c at StartLoop) + !lr))
+                 + power radix k * (value_sub_shift x sz * !ly
+                    + (power radix sz) * ((!c at StartLoop) + !lr))
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * value_sub_shift x (sz) * !ly
-                 + power radix k * power radix (sz) * ((!c at StartLoop) + !lr)
+                 + power radix k * value_sub_shift x sz * !ly
+                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
                = value_sub_shift (r at StartLoop) (k + sz)
-                 + power radix k * power radix (sz) * ((!c at StartLoop) + !lr)
-                 + power radix k * value_sub_shift x (sz) * !ly
+                 + power radix k * power radix sz * ((!c at StartLoop) + !lr)
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (r at StartLoop) (k + sz)
                  + power radix (k + sz) * ((!c at StartLoop) + !lr)
-                 + power radix k * value_sub_shift x (sz) * !ly
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (r at StartLoop) (k + sz)
                  + power radix (k + sz) * ((!c at StartLoop))
                  + power radix (k + sz) * !lr
-                 + power radix k * value_sub_shift x (sz) * !ly
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (old r) (k+sz)
-                 + value_sub_shift x (sz) * value_sub_shift y k
+                 + value_sub_shift x sz * value_sub_shift y k
                  + power radix (k + sz) * !lr
-                 + power radix k * value_sub_shift x (sz) * !ly
-               = value_sub_shift (old r) (k+sz)
-                 + power radix (k + sz) * !lr
-                 + value_sub_shift x (sz) * value_sub_shift y k
-                 + power radix k * value_sub_shift x (sz) * !ly
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (old r) (k+sz)
                  + power radix (k + sz) * !lr
-                 + value_sub_shift x (sz) * (value_sub_shift y k + power radix k * !ly)
+                 + value_sub_shift x sz * value_sub_shift y k
+                 + power radix k * value_sub_shift x sz * !ly
                = value_sub_shift (old r) (k+sz)
                  + power radix (k + sz) * !lr
-                 + value_sub_shift x (sz) * value_sub_shift y (!i)
+                 + value_sub_shift x sz * (value_sub_shift y k + power radix k * !ly)
+               = value_sub_shift (old r) (k+sz)
+                 + power radix (k + sz) * !lr
+                 + value_sub_shift x sz * value_sub_shift y (!i)
                = value_sub_shift (old r) (!i +sz)
-                 + value_sub_shift x (sz) * value_sub_shift y (!i)
+                 + value_sub_shift x sz * value_sub_shift y (!i)
              };
       rp := C.incr !rp one;
     done;
@@ -1631,11 +1633,11 @@ module N
   (*TODO overlapping allowed if r >= x*)
   let lshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { 0 < cnt < Limb.length }
-    requires { valid_ptr_itv r (sz) }
-    requires { valid_ptr_itv x (sz) }
+    requires { valid_ptr_itv r sz }
+    requires { valid_ptr_itv x sz }
     requires { 0 < sz }
-    ensures { value_sub_shift r (sz) + (power radix (sz)) * result =
-              value_sub_shift x (sz) * (power 2 (cnt)) }
+    ensures { value_sub_shift r sz + (power radix sz) * result =
+              value_sub_shift x sz * (power 2 (cnt)) }
   =
     let limb_zero = Limb.of_int 0 in
     let zero = Int32.of_int 0 in
@@ -1752,8 +1754,8 @@ module N
    };
    done;
    assert { !high + radix * value_sub (pelts r) (r.offset + 1) (r.offset + sz)
-                  + (power radix (sz)) * retval
-                = value_sub_shift !xp (sz)
+                  + (power radix sz) * retval
+                = value_sub_shift !xp sz
                   * (power 2 (cnt)) };
    value_sub_head (pelts r) r.offset (r.offset + p2i sz);
    value_sub_update_no_change (pelts r) r.offset (r.offset+1)
@@ -1766,12 +1768,12 @@ module N
       bits of [(x, sz)]. Corresponds to [mpn_rshift]. *)
   (*TODO overlapping allowed if r <= x*)
   let rshift (r x:t) (sz:int32) (cnt:limb) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
     requires { 0 < cnt < Limb.length }
     requires { 0 < sz }
-    ensures { result + radix * value_sub_shift r (sz)
-              = value_sub_shift x (sz) * (power 2 (Limb.length - cnt)) }
+    ensures { result + radix * value_sub_shift r sz
+              = value_sub_shift x sz * (power 2 (Limb.length - cnt)) }
   =
     let tnc = Limb.(-) (Limb.of_int Limb.length) cnt in
     let zero = Int32.of_int 0 in
@@ -1863,16 +1865,16 @@ module N
     label EndLoop in
     assert { retval + radix * (value_sub_shift r (msb)
                   + (power radix (msb)) * !low)
-             = value_sub_shift x (sz) * (power 2 (tnc)) };
+             = value_sub_shift x sz * (power 2 (tnc)) };
     value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
     assert { (!rp).offset = r.offset + msb };
     value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
     C.set !rp !low;
-    assert { value_sub_shift r (sz)
+    assert { value_sub_shift r sz
            = value_sub_shift r (msb) + power radix (msb) * !low
-           by value_sub_shift r (sz)
+           by value_sub_shift r sz
               = value_sub_shift r (msb) + power radix (msb) * (pelts r)[r.offset + msb] };
-    assert { value_sub_shift r (sz)
+    assert { value_sub_shift r sz
            = value_sub_shift (r at EndLoop) (msb)
              + power radix (msb) * !low
            by
@@ -2187,11 +2189,11 @@ module N
     [mpn_divmod_1]. *)
 (* TODO develop further decimal points (qxn) *)
 let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv q (sz) }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv q sz }
     requires { 0 < sz }
     requires { 0 < y }
-    ensures { value_sub_shift x (sz)
+    ensures { value_sub_shift x sz
               = value_sub_shift q sz * y + result }
     ensures { result < y }
   =
@@ -2358,14 +2360,14 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let ghost res = lsr !r (Limb.of_int32 clz) in
     assert { !r = res * mult
              so
-             mult * value_sub_shift x (sz)
-              = value_sub_shift q (sz) * ry + !r
-              = value_sub_shift q (sz) * y * mult + !r
-              = value_sub_shift q (sz) * y * mult + res * mult
-              = (value_sub_shift q (sz) * y + res) * mult
+             mult * value_sub_shift x sz
+              = value_sub_shift q sz * ry + !r
+              = value_sub_shift q sz * y * mult + !r
+              = value_sub_shift q sz * y * mult + res * mult
+              = (value_sub_shift q sz * y + res) * mult
             so
-            value_sub_shift x (sz)
-              = value_sub_shift q (sz) * y + res };
+            value_sub_shift x sz
+              = value_sub_shift q sz * y + res };
     lsr !r (Limb.of_int32 clz)
 
   predicate reciprocal_3by2 (v dh dl:limb) =
@@ -3021,11 +3023,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       Returns the most significant limb of the product plus the borrow
       of the substraction. Corresponds to [mpn_submul_1].*)
   let submul_limb (r x:t) (y:limb) (sz:int32):limb
-    requires { valid_ptr_itv x (sz) }
-    requires { valid_ptr_itv r (sz) }
-    ensures { value_sub_shift r (sz) - (power radix (sz)) * result
-            = value_sub_shift (old r) (sz)
-              - value_sub_shift x (sz) * y }
+    requires { valid_ptr_itv x sz }
+    requires { valid_ptr_itv r sz }
+    ensures { value_sub_shift r sz - (power radix sz) * result
+            = value_sub_shift (old r) sz
+              - value_sub_shift x sz * y }
     writes { r.data.contents.elts }
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
@@ -3140,7 +3142,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
 
   (* [(x,sz)] is normalized if its most significant bit is set. *)
   predicate normalized (x:t) (sz:int32) =
-    valid_ptr_itv x (sz)
+    valid_ptr_itv x sz
     /\ (pelts x)[x.offset + sz - 1] >= div radix 2
 
   let div_sb_qr (q x y:t) (sx sy:int32) : limb
