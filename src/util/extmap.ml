@@ -11,10 +11,11 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* This file originates from the OCaml v 3.12 Standard Library.
-   It was extended and modified for the needs of the Why3 project.
-   It is distributed under the terms of its initial license, which
-   is provided in the file OCAML-LICENSE. *)
+(* This file originates from the OCaml v 3.12 Standard Library. Since
+   then it has been adapted to OCaml 4.04 Standard Library. It was
+   extended and modified for the needs of the Why3 project. It is
+   distributed under the terms of its initial license, which is
+   provided in the file OCAML-LICENSE. *)
 
 module type S =
   sig
@@ -27,7 +28,8 @@ module type S =
     val singleton: key -> 'a -> 'a t
     val remove: key -> 'a t -> 'a t
     val merge:
-      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+          (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val union: (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val iter: (key -> 'a -> unit) -> 'a t -> unit
@@ -48,7 +50,6 @@ module type S =
 
     (** Added into why stdlib version *)
     val change : ('a option -> 'a option) -> key -> 'a t -> 'a t
-    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
     val inter : (key -> 'a -> 'b -> 'c option) -> 'a t -> 'b t -> 'c t
     val diff : (key -> 'a -> 'b -> 'a option) -> 'a t -> 'b t -> 'a t
     val submap : (key -> 'a -> 'b -> bool) -> 'a t -> 'b t -> bool
@@ -90,9 +91,9 @@ module type S =
     val next_ge_enum : key -> 'a enumeration -> 'a enumeration
   end
 
-  module type OrderedType = Map.OrderedType
+module type OrderedType = Map.OrderedType
+module Make(Ord: OrderedType) = struct
 
-  module Make(Ord: OrderedType) = struct
     type key = Ord.t
 
     type 'a t =
@@ -146,14 +147,16 @@ module type S =
     let rec add x data = function
         Empty ->
           Node(Empty, x, data, Empty, 1)
-      | Node(l, v, d, r, h) ->
+      | Node(l, v, d, r, h) as m ->
           let c = Ord.compare x v in
           if c = 0 then
-            Node(l, x, data, r, h)
+            if d == data then m else Node(l, x, data, r, h)
           else if c < 0 then
-            bal (add x data l) v d r
+            let ll = add x data l in
+            if l == ll then m else bal ll v d r
           else
-            bal l v d (add x data r)
+            let rr = add x data r in
+            if r == rr then m else bal l v d rr
 
     let rec find x = function
         Empty ->
@@ -166,23 +169,23 @@ module type S =
     let rec mem x = function
         Empty ->
           false
-      | Node(l, v, _d, r, _) ->
+      | Node(l, v, _, r, _) ->
           let c = Ord.compare x v in
           c = 0 || mem x (if c < 0 then l else r)
 
     let rec min_binding = function
         Empty -> raise Not_found
-      | Node(Empty, x, d, _r, _) -> (x, d)
-      | Node(l, _x, _d, _r, _) -> min_binding l
+      | Node(Empty, x, d, _, _) -> (x, d)
+      | Node(l, _, _, _, _) -> min_binding l
 
     let rec max_binding = function
         Empty -> raise Not_found
-      | Node(_l, x, d, Empty, _) -> (x, d)
-      | Node(_l, _x, _d, r, _) -> max_binding r
+      | Node(_, x, d, Empty, _) -> (x, d)
+      | Node(_, _, _, r, _) -> max_binding r
 
     let rec remove_min_binding = function
         Empty -> invalid_arg "Map.remove_min_elt"
-      | Node(Empty, _x, _d, r, _) -> r
+      | Node(Empty, _, _, r, _) -> r
       | Node(l, x, d, r, _) -> bal (remove_min_binding l) x d r
 
     let merge t1 t2 =
@@ -198,14 +201,13 @@ module type S =
     let rec remove x = function
         Empty ->
           Empty
-      | Node(l, v, d, r, _h) ->
+      | (Node(l, v, d, r, _) as t) ->
           let c = Ord.compare x v in
-          if c = 0 then
-            merge l r
+          if c = 0 then merge l r
           else if c < 0 then
-            bal (remove x l) v d r
+            let ll = remove x l in if l == ll then t else bal ll v d r
           else
-            bal l v d (remove x r)
+            let rr = remove x r in if r == rr then t else bal l v d rr
 
     let rec iter f = function
         Empty -> ()
@@ -244,28 +246,31 @@ module type S =
         Empty -> false
       | Node(l, v, d, r, _) -> p v d || exists p l || exists p r
 
-    let filter p s =
-      let rec filt accu = function
-        | Empty -> accu
-        | Node(l, v, d, r, _) ->
-            filt (filt (if p v d then add v d accu else accu) l) r in
-      filt Empty s
+    (* Beware: those two functions assume that the added k is *strictly*
+       smaller (or bigger) than all the present keys in the tree; it
+       does not test for equality with the current min (or max) key.
 
-    let partition p s =
-      let rec part (t, f as accu) = function
-        | Empty -> accu
-        | Node(l, v, d, r, _) ->
-            part (part (if p v d then (add v d t, f)
-              else (t, add v d f)) l) r in
-      part (Empty, Empty) s
+       Indeed, they are only used during the "join" operation which
+       respects this precondition.
+    *)
+
+    let rec add_min_binding k v = function
+      | Empty -> singleton k v
+      | Node (l, x, d, r, _) ->
+        bal (add_min_binding k v l) x d r
+
+    let rec add_max_binding k v = function
+      | Empty -> singleton k v
+      | Node (l, x, d, r, _) ->
+        bal l x d (add_max_binding k v r)
 
     (* Same as create and bal, but no assumptions are made on the
        relative heights of l and r. *)
 
     let rec join l v d r =
       match (l, r) with
-        (Empty, _) -> add v d r
-      | (_, Empty) -> add v d l
+        (Empty, _) -> add_min_binding v d r
+      | (_, Empty) -> add_max_binding v d l
       | (Node(ll, lv, ld, lr, lh), Node(rl, rv, rd, rr, rh)) ->
           if lh > rh + 2 then bal ll lv ld (join lr v d r) else
           if rh > lh + 2 then bal (join l v d rl) rv rd rr else
@@ -305,11 +310,49 @@ module type S =
       | (Node (l1, v1, d1, r1, h1), _) when h1 >= height s2 ->
           let (l2, d2, r2) = split v1 s2 in
           concat_or_join (merge f l1 l2) v1 (f v1 (Some d1) d2) (merge f r1 r2)
-      | (_, Node (l2, v2, d2, r2, _h2)) ->
+      | (_, Node (l2, v2, d2, r2, _)) ->
           let (l1, d1, r1) = split v2 s1 in
           concat_or_join (merge f l1 l2) v2 (f v2 d1 (Some d2)) (merge f r1 r2)
       | _ ->
           assert false
+
+    let rec union f s1 s2 =
+      match (s1, s2) with
+      | (Empty, s) | (s, Empty) -> s
+      | (Node (l1, v1, d1, r1, h1), Node (l2, v2, d2, r2, h2)) ->
+          if h1 >= h2 then
+            let (l2, d2, r2) = split v1 s2 in
+            let l = union f l1 l2 and r = union f r1 r2 in
+            match d2 with
+            | None -> join l v1 d1 r
+            | Some d2 -> concat_or_join l v1 (f v1 d1 d2) r
+          else
+            let (l1, d1, r1) = split v2 s1 in
+            let l = union f l1 l2 and r = union f r1 r2 in
+            match d1 with
+            | None -> join l v2 d2 r
+            | Some d1 -> concat_or_join l v2 (f v2 d1 d2) r
+
+    let rec filter p = function
+        Empty -> Empty
+      | Node(l, v, d, r, _) as t ->
+          (* call [p] in the expected left-to-right order *)
+          let l' = filter p l in
+          let pvd = p v d in
+          let r' = filter p r in
+          if pvd then if l==l' && r==r' then t else join l' v d r'
+          else concat l' r'
+
+    let rec partition p = function
+        Empty -> (Empty, Empty)
+      | Node(l, v, d, r, _) ->
+          (* call [p] in the expected left-to-right order *)
+          let (lt, lf) = partition p l in
+          let pvd = p v d in
+          let (rt, rf) = partition p r in
+          if pvd
+          then (join lt v d rt, concat lf rf)
+          else (concat lt rt, join lf v d rf)
 
     type 'a enumeration = End | More of key * 'a * 'a t * 'a enumeration
 
@@ -390,35 +433,6 @@ module type S =
           else
             bal l v d (change f x r)
 
-    let rec union f s1 s2 =
-      match (s1, s2) with
-        (Empty, t2) -> t2
-      | (t1, Empty) -> t1
-      | (Node(l1, v1, d1, r1, h1), Node(l2, v2, d2, r2, h2)) ->
-          if h1 >= h2 then
-            if h2 = 1 then
-              change (function None -> Some d2 | Some d1 -> f v2 d1 d2) v2 s1
-            else begin
-              let (l2, d2, r2) = split v1 s2 in
-              match d2 with
-                | None -> join (union f l1 l2) v1 d1 (union f r1 r2)
-                | Some d2 ->
-                  concat_or_join (union f l1 l2) v1 (f v1 d1 d2)
-                    (union f r1 r2)
-            end
-          else
-            if h1 = 1 then
-              change (function None -> Some d1 | Some d2 -> f v1 d1 d2) v1 s2
-            else begin
-              let (l1, d1, r1) = split v2 s1 in
-              match d1 with
-                | None -> join (union f l1 l2) v2 d2 (union f r1 r2)
-                | Some d1 ->
-                  concat_or_join (union f l1 l2) v2 (f v2 d1 d2)
-                    (union f r1 r2)
-            end
-
-
     let rec inter f s1 s2 =
       match (s1, s2) with
       | (Empty, _) | (_, Empty) -> Empty
@@ -428,7 +442,6 @@ module type S =
               concat (inter f l1 l2) (inter f r1 r2)
           | (l2, Some d2, r2) ->
               concat_or_join (inter f l1 l2) v1 (f v1 d1 d2) (inter f r1 r2)
-
 
     let rec diff f s1 s2 =
       match (s1, s2) with
