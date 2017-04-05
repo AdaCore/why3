@@ -1,5 +1,26 @@
 
 
+module TestAutoFocus
+
+  use import int.Int
+
+
+  goal g0: 0=0 /\ 1=1
+  (* "split" should mode you to the first subgoal
+     "compute" should then move you to the second goal
+     "compute" should then move you to the next goal
+   *)
+
+  goal g1: 2+2 = 4
+  (* "compute" should move you to the next goal *)
+
+  goal g2: 2+3 = 4
+  (* "compute" should move you to the subgoal 5=4 *)
+
+
+end
+
+
 module Power
 
   use import int.Int

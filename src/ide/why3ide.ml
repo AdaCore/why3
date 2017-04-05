@@ -455,9 +455,17 @@ let message_zone =
 
 (* Function used to print stuff on the message_zone *)
 let print_message fmt =
+  (* Format.kasprintf is not available in Ocaml 4.02.3 :-(
   Format.kasprintf
     message_zone#buffer#set_text
     fmt
+   *)
+  Format.kfprintf
+    (fun _ -> let s = flush_str_formatter () in
+              message_zone#buffer#set_text s)
+    str_formatter
+    fmt
+
 
 let add_to_msg_zone s =
   let s = message_zone#buffer#get_text () ^ "\n" ^ s in
@@ -926,65 +934,71 @@ let get_parent node =
   | None -> None
   | Some parent -> Some (get_node_id parent)
 
+let if_selected_alone id f =
+  match get_selected_row_references () with
+  | [r] ->
+     let i = get_node_id r#iter in
+     if i = id || Some i = get_parent id  then f id
+  | _ -> ()
+
 let treat_notification n = match n with
   | Node_change (id, uinfo)        ->
-    begin
-      (match uinfo with
-      | Proved b ->
-        begin
+     begin
+       match uinfo with
+       | Proved b ->
           Hint.replace node_id_proved id b;
           set_status_column (get_node_row id)#iter
-        end
-      | Proof_status_change (pa, obs, l) ->
-        begin
+       | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
           goals_model#set ~row:r#iter ~column:status_column
-            (image_of_pa_status ~obsolete:obs pa)
-        end);
-      (* Moving cursor on first unproved goal around *)
-      match get_selected_row_references () with
-      | [] -> ()
-      | r :: _ ->
-        if get_node_id (r #iter) = id then
-        let node = get_first_unproven_goal_around ~proved:proved
-            ~children:children ~get_parent:get_parent ~is_goal:is_goal id in
+                          (image_of_pa_status ~obsolete:obs pa)
+     end;
+     (* Moving cursor on first unproved goal around *)
+     if_selected_alone
+       id
+       (fun _ ->
+        let node =
+          get_first_unproven_goal_around
+            ~proved:proved
+            ~children:children ~get_parent:get_parent ~is_goal:is_goal id
+        in
         match node with
         | None -> ()
         | Some node ->
-            let iter = (get_node_row node)#iter in
-            goals_view#selection#select_iter iter
-    end
+           let iter = (get_node_row node)#iter in
+           goals_view#selection#select_iter iter)
+
   | New_node (id, parent_id, typ, name, detached) ->
-    begin (try
-        let parent = get_node_row parent_id in
-        ignore (new_node ~parent id name typ false detached)
-      with Not_found ->
-        ignore (new_node id name typ false detached))
-    end
+     begin
+       try
+         let parent = get_node_row parent_id in
+         ignore (new_node ~parent id name typ false detached)
+       with Not_found ->
+         ignore (new_node id name typ false detached)
+     end
   | Remove id                     ->
-    let n = get_node_row id in
-    begin
-      ignore (goals_model#remove(n#iter));
-      Hint.remove node_id_to_gtree id;
-      Hint.remove node_id_type id;
-      Hint.remove node_id_proved id;
-      Hint.remove node_id_pa id
-    end
+     let n = get_node_row id in
+     ignore (goals_model#remove(n#iter));
+     Hint.remove node_id_to_gtree id;
+     Hint.remove node_id_type id;
+     Hint.remove node_id_proved id;
+     Hint.remove node_id_pa id
   | Initialized g_info            ->
-    (* TODO: treat other *)
-    init_completion g_info.provers g_info.transformations g_info.commands;
+     (* TODO: treat other *)
+     init_completion g_info.provers g_info.transformations g_info.commands;
   | Saved                         ->
-    print_message "Session saved."
+     print_message "Session saved."
   | Message (msg)                 -> treat_message_notification msg
-  | Task (_id, s)                  ->
-    (* TODO: check that the id is the current one *)
-    task_view#source_buffer#set_text s;
-    (* scroll to end of text *)
-    task_view#scroll_to_mark `INSERT
+  | Task (id, s)                  ->
+     if_selected_alone
+       id
+       (fun _ -> task_view#source_buffer#set_text s;
+                 (* scroll to end of text *)
+                 task_view#scroll_to_mark `INSERT)
   | File_contents _
   | Dead _ ->
-    print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
+     print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
 
 
 (***********************)
