@@ -101,6 +101,25 @@ let file_proved c f =
   else
     List.for_all (fun th -> th_proved c th) f.file_theories
 
+let any_proved cont any : bool =
+  match any with
+  | AFile file -> file_proved cont file
+  | ATh th -> th_proved cont th
+  | ATn tn -> tn_proved cont tn
+  | APn pn -> pn_proved cont pn
+  | APa pa ->
+      begin
+        let pa = get_proof_attempt_node cont.controller_session pa in
+        match pa.proof_state with
+        | None -> false
+        | Some pa ->
+          begin
+            match pa.Call_provers.pr_answer with
+            | Call_provers.Valid -> true
+            | _ -> false
+          end
+      end
+
 (* Update the result of the theory according to its children *)
 let update_theory_proof_state notification ps th =
   let goals = theory_goals th in
@@ -152,7 +171,7 @@ and update_proof notification c id =
 (* [update_proof_node c id b] Update the whole proof_state
    of c according to the result (id, b) *)
 let update_proof_node notification c id b =
-  if (Hpn.mem c.proof_state.pn_state id) then
+  if Hpn.mem c.proof_state.pn_state id then
   begin
     let b' = Hpn.find_def c.proof_state.pn_state false id in
     if b != b' then
@@ -172,7 +191,7 @@ let update_proof_node notification c id b =
 (* [update_trans_node c id b] Update the proof_state of c to take the result of
    (id,b). Then propagates it to its parents *)
 let update_trans_node notification c id b =
-  if (Htn.mem c.proof_state.tn_state id) then
+  if Htn.mem c.proof_state.tn_state id then
   begin
     let b' = Htn.find_def c.proof_state.tn_state false id in
     if b != b' then
@@ -214,6 +233,15 @@ let reload_theory_proof_state c th =
   let proved = List.for_all (reload_goal_proof_state ps c) goals in
   Hid.replace ps.th_state (theory_name th)
     proved
+
+(* Get children of any without proofattempts *)
+let get_undetached_children_no_pa s any : any list =
+  match any with
+  | AFile f -> List.map (fun th -> ATh th) f.file_theories
+  | ATh th  -> List.map (fun g -> APn g) (theory_goals th)
+  | ATn tn  -> List.map (fun pn -> APn pn) (get_sub_tasks s tn)
+  | APn pn  -> List.map (fun tn -> ATn tn) (get_transformations s pn)
+  | APa pa -> []
 
 (* printing *)
 

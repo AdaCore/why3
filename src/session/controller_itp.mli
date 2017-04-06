@@ -89,6 +89,7 @@ val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool
 val th_proved: controller -> Session_itp.theory -> bool
 val file_proved: controller -> Session_itp.file -> bool
+val any_proved: controller -> any -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
@@ -144,6 +145,8 @@ val reload_files : controller -> use_shapes:bool -> unit
 val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont] *)
+
+val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
 module Make(S : Scheduler) : sig
 

@@ -283,6 +283,7 @@ let print_request fmt r =
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
+  | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
   | Get_task _nid                   -> fprintf fmt "get task"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
@@ -313,6 +314,7 @@ let print_notify fmt n =
   | Node_change (_ni, _nf)             -> fprintf fmt "node change"
   | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
   | Remove _ni                         -> fprintf fmt "remove"
+  | Next_Unproven_Node_Id (_ni, _nj)   -> fprintf fmt "next unproven node_id"
   | Initialized _gi                    -> fprintf fmt "initialized"
   | Saved                              -> fprintf fmt "saved"
   | Message msg                        ->
@@ -529,7 +531,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | ATn tn     -> node_ID_from_tn tn
     | APn pn     -> node_ID_from_pn pn
     | APa pan    -> node_ID_from_pan pan
-
 
   let get_prover p =
     let d = get_server_data () in
@@ -871,7 +872,28 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     (* TODO make replay print *)
     C.replay ~use_steps:false d.cont ~callback:callback ~remove_obsolete:false
 
+  (* ----------------- locate next unproven node -------------------- *)
+
+  let notify_first_unproven_node d ni =
+    let any = any_from_node_ID ni in
+      let unproven_any =
+        get_first_unproven_goal_around
+          ~proved:(Controller_itp.any_proved d.cont)
+          ~children:(get_undetached_children_no_pa d.cont.controller_session)
+          ~get_parent:(get_any_parent d.cont.controller_session)
+          ~is_goal:(fun any -> match any with | APn _ -> true | _ -> false)
+          ~is_pa:(fun any -> match any with | APa _ -> true | _ -> false)
+          any in
+      begin
+        match unproven_any with
+        | None -> () (* If no node is found we don't tell IDE to move *)
+        | Some any ->
+            P.notify (Next_Unproven_Node_Id (ni, node_ID_from_any any))
+      end
+
+
   (* ----------------- treat_request -------------------- *)
+
 
   let get_proof_node_id nid =
     try
@@ -898,6 +920,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
     | Get_Session_Tree_req         -> resend_the_tree ()
+    | Get_first_unproven_node ni   ->
+      notify_first_unproven_node d ni
     | Remove_subtree nid           ->
         let n = any_from_node_ID nid in
         begin

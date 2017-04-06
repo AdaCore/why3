@@ -53,3 +53,11 @@ val interp: (string * string * 'a) list ->
     Whyconf.config ->
       Controller_itp.controller ->
         Session_itp.proofNodeID option -> string -> command
+
+
+val get_first_unproven_goal_around:
+    proved:('a -> bool) ->
+      children:('a -> 'a list) ->
+        get_parent:('a -> 'a option) ->
+          is_goal:('a -> bool) ->
+            is_pa:('a -> bool) -> 'a -> 'a option

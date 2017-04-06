@@ -64,6 +64,9 @@ type notification =
   (* inform that the data of the given node changed *)
   | Remove       of node_ID
   (* the given node was removed *)
+  | Next_Unproven_Node_Id of node_ID * node_ID
+  (* Next_Unproven_Node_Id (asked_id, next_unproved_id). Returns a node and the
+     next unproven node from this node *)
   | Initialized  of global_information
   (* initial global data *)
   | Saved
@@ -78,18 +81,19 @@ type notification =
   (* contents of the file *)
 
 type ide_request =
-  | Command_req       of node_ID * string
-  | Prove_req         of node_ID * prover * Call_provers.resource_limit
-  | Transform_req     of node_ID * transformation * string list
-  | Strategy_req      of node_ID * strategy
-  | Open_session_req  of string
-  | Add_file_req      of string
-  | Set_max_tasks_req of int
-  | Get_file_contents of string
-  | Get_task          of node_ID
-  | Remove_subtree    of node_ID
-  | Copy_paste        of node_ID * node_ID
-  | Copy_detached     of node_ID
+  | Command_req             of node_ID * string
+  | Prove_req               of node_ID * prover * Call_provers.resource_limit
+  | Transform_req           of node_ID * transformation * string list
+  | Strategy_req            of node_ID * strategy
+  | Open_session_req        of string
+  | Add_file_req            of string
+  | Set_max_tasks_req       of int
+  | Get_file_contents       of string
+  | Get_task                of node_ID
+  | Remove_subtree          of node_ID
+  | Copy_paste              of node_ID * node_ID
+  | Copy_detached           of node_ID
+  | Get_first_unproven_node of node_ID
   | Get_Session_Tree_req
   | Save_req
   | Reload_req

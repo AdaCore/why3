@@ -939,7 +939,7 @@ let if_selected_alone id f =
   match get_selected_row_references () with
   | [r] ->
      let i = get_node_id r#iter in
-     if i = id || Some i = get_parent id  then f id
+     if i = id || Some i = get_parent id then f id
   | _ -> ()
 
 let treat_notification n = match n with
@@ -947,29 +947,22 @@ let treat_notification n = match n with
      begin
        match uinfo with
        | Proved b ->
-          Hint.replace node_id_proved id b;
-          set_status_column (get_node_row id)#iter
+           Hint.replace node_id_proved id b;
+           set_status_column (get_node_row id)#iter;
+           (* Trying to move cursor on first unproven goal around on all cases
+              but not when proofAttempt is updated because ad hoc debugging. *)
+           send_request (Get_first_unproven_node id)
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
           goals_model#set ~row:r#iter ~column:status_column
                           (image_of_pa_status ~obsolete:obs pa)
-     end;
-     (* Moving cursor on first unproved goal around *)
-     if_selected_alone
-       id
-       (fun _ ->
-        let node =
-          get_first_unproven_goal_around
-            ~proved:proved
-            ~children:children ~get_parent:get_parent ~is_goal:is_goal id
-        in
-        match node with
-        | None -> ()
-        | Some node ->
-           let iter = (get_node_row node)#iter in
-           goals_view#selection#select_iter iter)
-
+     end
+  | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
+      if_selected_alone asked_id
+          (fun _ ->
+            let iter = (get_node_row next_unproved_id)#iter in
+            goals_view#selection#select_iter iter)
   | New_node (id, parent_id, typ, name, detached) ->
      begin
        try
