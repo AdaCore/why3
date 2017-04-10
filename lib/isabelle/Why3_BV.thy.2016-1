@@ -365,8 +365,6 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc tqtaxiom using to_uint_bounds [of i] by auto
-
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
 why3_vc to_uint_zeros by simp
@@ -562,8 +560,6 @@ why3_vc Nth_bv_is_nth
 why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
-
-why3_vc tqtaxiom using to_uint_bounds [of i] by auto
 
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
@@ -761,8 +757,6 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc tqtaxiom using to_uint_bounds [of i] by auto
-
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
 why3_vc to_uint_zeros by simp
@@ -959,8 +953,6 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc tqtaxiom using to_uint_bounds [of i] by auto
-
 why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
 why3_vc to_uint_zeros by simp
@@ -1039,27 +1031,14 @@ why3_vc eq_sub_bv_def
 why3_end
 
 
-definition rliteral_8 :: "'a::len0 word" where
-  "rliteral_8 = 2 ^ 8 - 1"
-
-definition rliteral_16 :: "'a::len0 word" where
-  "rliteral_16 = 2 ^ 16 - 1"
-
-definition rliteral_32 :: "'a::len0 word" where
-  "rliteral_32 = 2 ^ 32 - 1"
-
-
 why3_open "bv/BVConverter_32_64.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_32
-
-why3_vc rliteral_axiom by (simp add: rliteral_32_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_32_def)
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1071,13 +1050,10 @@ why3_open "bv/BVConverter_16_64.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_16
-
-why3_vc rliteral_axiom by (simp add: rliteral_16_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_16_def)
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1089,13 +1065,10 @@ why3_open "bv/BVConverter_8_64.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_8
-
-why3_vc rliteral_axiom by (simp add: rliteral_8_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_8_def)
+  by (simp add: BV64.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1107,13 +1080,10 @@ why3_open "bv/BVConverter_16_32.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_16
-
-why3_vc rliteral_axiom by (simp add: rliteral_16_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_16_def)
+  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1125,13 +1095,10 @@ why3_open "bv/BVConverter_8_32.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_8
-
-why3_vc rliteral_axiom by (simp add: rliteral_8_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_8_def)
+  by (simp add: BV32.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
@@ -1143,13 +1110,10 @@ why3_open "bv/BVConverter_8_16.xml"
   constants
     toBig = ucast
     toSmall = ucast
-    rliteral = rliteral_8
-
-why3_vc rliteral_axiom by (simp add: rliteral_8_def)
 
 why3_vc toSmall_to_uint
   using assms
-  by (simp add: BV16.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial rliteral_8_def)
+  by (simp add: BV16.ule_def ucast_def uint_word_of_int mod_pos_pos_trivial)
 
 why3_vc toBig_to_uint
   by (simp add: uint_up_ucast is_up)
