@@ -206,12 +206,6 @@ Definition nan_bf: binary_float sb emax -> binary_float sb emax -> bool * nan_pl
 Qed.
 
 (* Why3 goal *)
-Notation abs := (Babs sb emax pair).
-
-(* Why3 goal *)
-Notation neg := (Bopp sb emax pair).
-
-(* Why3 goal *)
 Notation add := (Bplus sb emax _ Hemax' nan_bf).
 
 (* Why3 goal *)
@@ -222,6 +216,12 @@ Notation mul := (Bmult sb emax _ Hemax' nan_bf).
 
 (* Why3 goal *)
 Notation div := (Bdiv sb emax _ Hemax' nan_bf).
+
+(* Why3 goal *)
+Notation abs := (Babs sb emax pair).
+
+(* Why3 goal *)
+Notation neg := (Bopp sb emax pair).
 
 (* Why3 goal *)
 Definition fma: mode -> t -> t -> t -> t.
@@ -4560,3 +4560,4 @@ Lemma roundToIntegral_is_finite : forall (m:mode) (x:t), (is_finite x) ->
 intros m x h1.
 apply roundToIntegral_finite, h1.
 Qed.
+

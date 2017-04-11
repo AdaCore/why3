@@ -55,6 +55,8 @@ theory GenericFloat
   (** {3 Sorts} *)
 
   type t
+  (** abstract type to denote floating-point numbers, including the special values
+      for infinities and NaNs *)
 
   (** {3 Constructors and Constants} *)
 
@@ -68,49 +70,54 @@ theory GenericFloat
 
   (** {3 Operators} *)
 
-  function abs      t   : t
-  function neg      t   : t   (* fp.neg *)
+  function add mode t t : t
+  function sub mode t t : t
+  function mul mode t t : t
+  function div mode t t : t
+    (** The four basic operations, rounded in the given mode *)
 
-  function add mode t t : t   (* fp.add *)
-  function sub mode t t : t   (* fp.sub *)
-  function mul mode t t : t   (* fp.mul *)
-  function div mode t t : t   (* fp.div *)
+  function abs         t   : t   (** Absolute value *)
+  function neg         t   : t   (** Opposite *)
+  function fma  mode t t t : t   (** Fused multiply-add: x * y + z *)
+  function sqrt mode   t   : t   (** Square root *)
 
   function (.-_) (x:t)   : t = neg x
   function (.+)  (x y:t) : t = add RNE x y
   function (.-)  (x y:t) : t = sub RNE x y
   function (.*)  (x y:t) : t = mul RNE x y
   function (./)  (x y:t) : t = div RNE x y
-
-  function fma  mode t t t : t (* x * y + z *)
-
-  function sqrt mode t   : t
+    (** Notations for operations in the default mode RNE *)
 
   function roundToIntegral mode t : t
+    (** Rounding to an integer *)
 
-  (* Min & Max *)
-  (* Note that we have to follow IEEE-754 and SMTLIB here. Two things to *)
-  (* note in particular:                                                 *)
-  (*    1) m?n(-0, 0) is either 0 or -0, there is a choice               *)
-  (*    2) if either argument is NaN then the other argument is returned *)
   function min       t t : t
   function max       t t : t
+  (** Minimum and Maximum
+      Note that we have to follow IEEE-754 and SMTLIB here. Two things to
+     note in particular:
+     1) min(-0, 0) is either 0 or -0, there is a choice
+
+     2) if either argument is NaN then the other argument is returned
+
+   *)
 
   (** {3 Comparisons} *)
 
-  predicate le t t (* fp.leq *)
-  predicate lt t t (* fp.lt  *)
-
-  predicate ge (x:t) (y:t) = le y x (* fp.geq *)
-  predicate gt (x:t) (y:t) = lt y x (* fp.gt  *)
-
-  predicate eq t t  (* fp.eq, NOT SMTLIB = *)
+  predicate le t t
+  predicate lt t t
+  predicate ge (x:t) (y:t) = le y x
+  predicate gt (x:t) (y:t) = lt y x
+  predicate eq t t
+  (** equality on floats, different from = since not (eq NaN NaN) *)
 
   predicate (.<=) (x:t) (y:t) = le x y
   predicate (.<)  (x:t) (y:t) = lt x y
   predicate (.>=) (x:t) (y:t) = ge x y
   predicate (.>)  (x:t) (y:t) = gt x y
   predicate (.=)  (x:t) (y:t) = eq x y
+  (** Notations *)
+
 
   (** {3 Classification of numbers} *)
 
@@ -137,6 +144,8 @@ theory GenericFloat
 
   axiom is_not_finite: forall x:t.
     not (is_finite x) <-> (is_infinite x \/ is_nan x)
+
+
 
   (** {3 Conversions from other sorts} *)
 
