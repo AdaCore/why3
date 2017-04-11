@@ -1,6 +1,3 @@
-
-
-
 open Format
 open Session_itp
 
@@ -9,7 +6,8 @@ exception Noprogress
 let () = Exn_printer.register
     (fun fmt e ->
       match e with
-      | Noprogress -> Format.fprintf fmt "The transformation made no progress.\n"
+      | Noprogress ->
+          Format.fprintf fmt "The transformation made no progress.\n"
       | _ -> raise e)
 
 (** State of a proof *)
@@ -25,14 +23,17 @@ type proof_attempt_status =
 
 let print_status fmt st =
   match st with
-  | Unedited -> fprintf fmt "Unedited"
-  | JustEdited -> fprintf fmt "JustEdited"
-  | Interrupted -> fprintf fmt "Interrupted"
-  | Scheduled -> fprintf fmt "Scheduled"
-  | Running -> fprintf fmt "Running"
-  | Done r -> fprintf fmt "Done(%a)" Call_provers.print_prover_result r
-  | InternalFailure e -> fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
-  | Uninstalled pr -> fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
+  | Unedited          -> fprintf fmt "Unedited"
+  | JustEdited        -> fprintf fmt "JustEdited"
+  | Interrupted       -> fprintf fmt "Interrupted"
+  | Scheduled         -> fprintf fmt "Scheduled"
+  | Running           -> fprintf fmt "Running"
+  | Done r            ->
+      fprintf fmt "Done(%a)" Call_provers.print_prover_result r
+  | InternalFailure e ->
+      fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
+  | Uninstalled pr    ->
+      fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
 
 type transformation_status =
   | TSscheduled | TSdone of transID | TSfailed of (proofNodeID * exn)
@@ -47,7 +48,8 @@ type strategy_status = STSgoto of proofNodeID * int | STShalt
 
 let print_strategy_status fmt st =
   match st with
-  | STSgoto(id,n) -> fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
+  | STSgoto(id,n) ->
+      fprintf fmt "goto step %d in proofNode %a" n print_proofNodeID id
   | STShalt -> fprintf fmt "halt"
 
 
@@ -65,10 +67,11 @@ let init_proof_state () =
    pn_state = Hpn.create 42}
 
 type controller =
-  { mutable controller_session : Session_itp.session;
-    proof_state : proof_state;
-    controller_env : Env.env;
-    controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+  { mutable controller_session: Session_itp.session;
+    proof_state: proof_state;
+    controller_env: Env.env;
+    controller_provers:
+      (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
 let clear_proof_state c =
@@ -267,15 +270,19 @@ module PSession = struct
     | Session -> "", Hstr.fold (fun _ f -> n (File f)) (get_files s) []
     | File f ->
        f.file_name,
-       List.fold_right (fun th -> n (Theory th)) f.file_detached_theories
-                       (List.fold_right (fun th -> n (Theory th)) f.file_theories [])
+       List.fold_right
+          (fun th -> n (Theory th))
+          f.file_detached_theories
+          (List.fold_right (fun th -> n (Theory th)) f.file_theories [])
     | Theory th ->
        let id = theory_name th in
        let name = id.Ident.id_string in
        let name = if th_proved x.tcont th then name^"!" else name^"?" in
        name,
-       List.fold_right (fun g -> n (Goal g)) (theory_goals th)
-                       (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
+       List.fold_right
+         (fun g -> n (Goal g))
+         (theory_goals th)
+         (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
@@ -287,11 +294,11 @@ module PSession = struct
                        (List.fold_right (fun g -> n (ProofAttempt g)) pas [])
     | ProofAttempt pa ->
        Pp.sprintf_wnl "%a%s%s"
-                      Whyconf.print_prover pa.prover
-                      (match pa.Session_itp.proof_state with
-                       | Some { Call_provers.pr_answer = Call_provers.Valid} -> ""
-                       | _ -> "?")
-                      (if pa.proof_obsolete then "O" else ""), []
+          Whyconf.print_prover pa.prover
+          (match pa.Session_itp.proof_state with
+          | Some { Call_provers.pr_answer = Call_provers.Valid} -> ""
+          | _ -> "?")
+          (if pa.proof_obsolete then "O" else ""), []
     | Transf id ->
        let name = get_transf_name s id in
        let name = if tn_proved x.tcont id then name^"!" else name^"?" in
@@ -357,7 +364,8 @@ let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
 
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
-  c.controller_session <- empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
+  c.controller_session <-
+    empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
   Stdlib.Hstr.iter (merge_file old_ses c ~use_shapes) (get_files old_ses)
 
 let add_file c ?format fname =
@@ -410,8 +418,9 @@ let dummy_result =
 let build_prover_call c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
-    Whyconf.get_complete_command config_pr
-          ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+    Whyconf.get_complete_command
+      config_pr
+      ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let task = Session_itp.get_task c.controller_session id in
   let tables = Session_itp.get_tables c.controller_session id in
   let call =
@@ -425,7 +434,8 @@ let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,callback,started,call) as c = Queue.pop prover_tasks_in_progress in
+    let (ses,id,pr,callback,started,call) as c =
+      Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
     | Call_provers.ProverStarted ->
@@ -482,7 +492,8 @@ let run_timeout_handler () =
 
 let schedule_proof_attempt_r c id pr ~limit ~callback =
   let panid =
-    graft_proof_attempt c.controller_session id pr ~timelimit:limit.Call_provers.limit_time
+    graft_proof_attempt c.controller_session id pr
+      ~timelimit:limit.Call_provers.limit_time
   in
   Queue.add (c,id,pr,limit,callback panid) scheduled_proof_attempts;
   callback panid Scheduled;
@@ -491,8 +502,10 @@ let schedule_proof_attempt_r c id pr ~limit ~callback =
 let schedule_proof_attempt c id pr ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
-    | Done pr -> update_proof_node notification c id (pr.Call_provers.pr_answer == Call_provers.Valid)
-    | Interrupted | InternalFailure _ -> update_proof_node notification c id false
+    | Done pr -> update_proof_node notification c id
+          (pr.Call_provers.pr_answer == Call_provers.Valid)
+    | Interrupted | InternalFailure _ ->
+        update_proof_node notification c id false
     | _ -> ())
   in
   schedule_proof_attempt_r c id pr ~limit:limit ~callback
@@ -505,7 +518,8 @@ let schedule_transformation_r c id name args ~callback =
     | Some tables -> tables in
     begin
       try
-        let subtasks = Trans.apply_transform_args name c.controller_env args tables task in
+        let subtasks =
+          Trans.apply_transform_args name c.controller_env args tables task in
         (* if result is same as input task, consider it as a failure *)
         begin
           match subtasks with
@@ -541,7 +555,8 @@ let schedule_transformation c id name args ~callback ~notification =
 
 open Strategy
 
-let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback ~notification =
+let run_strategy_on_goal
+    c id strat ~callback_pa ~callback_tr ~callback ~notification =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -595,12 +610,14 @@ let run_strategy_on_goal c id strat ~callback_pa ~callback_tr ~callback ~notific
   in
   exec_strategy 0 strat id
 
-let schedule_pa_with_same_arguments c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
+let schedule_pa_with_same_arguments
+    c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
   let prover = pa.prover in
   let limit = pa.limit in
   schedule_proof_attempt c pn prover ~limit ~callback ~notification
 
-let schedule_tr_with_same_arguments c (tr: transID) (pn: proofNodeID) ~callback ~notification =
+let schedule_tr_with_same_arguments
+    c (tr: transID) (pn: proofNodeID) ~callback ~notification =
   let s = c.controller_session in
   let args = get_transf_args s tr in
   let name = get_transf_name s tr in
@@ -625,7 +642,8 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
       let from_tr_list = get_transformations s from_pn in
       let callback x st = callback_tr st;
         match st with
-        | TSdone tid -> copy_paste c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
+        | TSdone tid ->
+          copy_paste c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
         | _ -> ()
       in
       List.iter (fun x -> schedule_tr_with_same_arguments c x to_pn
@@ -649,7 +667,8 @@ let copy_detached ~copy c from_any =
       | None -> raise BadCopyDetached
       | Some parent ->
           copy ~parent (APn pn_id);
-          copy_structure ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
+          copy_structure
+            ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
     end
   | _ -> raise BadCopyDetached (* Only goal can be detached *)
 
@@ -694,7 +713,8 @@ let print_report fmt (r: report) =
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
     fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %d, Result: %a@."
-      (Obj.magic id) Whyconf.print_prover pr rl.Call_provers.limit_time print_report report
+      (Obj.magic id) Whyconf.print_prover pr
+      rl.Call_provers.limit_time print_report report
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
@@ -764,7 +784,9 @@ let replay ~remove_obsolete ~use_steps c ~callback =
     in
     replay_proof_attempt c pr limit id
       ~callback:(fun s ->
-        counting s count; craft_report s report id pr limit pa; update_node pa s;
+        counting s count;
+        craft_report s report id pr limit pa;
+        update_node pa s;
         update_uninstalled c remove_obsolete id s pr;
         if !count = 0 then callback !report) in
 

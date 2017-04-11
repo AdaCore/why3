@@ -264,7 +264,8 @@ let is_detached (s: session) (a: any) =
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
     let pn = get_proofNode s pn_id in
-    pn.proofn_task = None || List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
+    pn.proofn_task = None ||
+    List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
   | APn pn     ->
     let pn = get_proofNode s pn in
     pn.proofn_task = None
@@ -328,7 +329,8 @@ let fold_all_any_of_theory s f acc th =
   f acc (ATh th)
 
 let fold_all_any_of_file s f acc file =
-  let acc = List.fold_left (fold_all_any_of_theory s f) acc file.file_theories in
+  let acc =
+    List.fold_left (fold_all_any_of_theory s f) acc file.file_theories in
   f acc (AFile file)
 
 let fold_all_any s f acc any =
@@ -363,7 +365,8 @@ let remove_subtree s (n: any) ~notification : unit =
   match n with
   | APn _pn -> raise RemoveError
   | ATh _th -> raise RemoveError
-  | _ -> ignore (fold_all_any s (fun acc x -> remove s x; notification x; acc) [] n)
+  | _ ->
+    ignore (fold_all_any s (fun acc x -> remove s x; notification x; acc) [] n)
 
 let rec fold_all_sub_goals_of_proofn s f acc pnid =
   let pn = get_proofNode s pnid in
@@ -446,7 +449,8 @@ and print_trans_node s fmt id =
   let name = tn.transf_name in
   let l = tn.transf_subtasks in
   let parent = (get_proofNode s tn.transf_parent).proofn_name.id_string in
-  fprintf fmt "@[<hv 1> Trans %s;@ args %a;@ parent %s;@ [%a]@]" name (Pp.print_list Pp.colon pp_print_string) args parent
+  fprintf fmt "@[<hv 1> Trans %s;@ args %a;@ parent %s;@ [%a]@]"
+    name (Pp.print_list Pp.colon pp_print_string) args parent
     (Pp.print_list Pp.semi (print_proof_node s)) l
 
 let print_theory s fmt th : unit =
@@ -555,8 +559,10 @@ let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
   let pn = get_proofNode s pn_id in
   let new_pn_id = gen_proofNodeID s in
   let parent = pn.proofn_parent in
-  let new_goal_name = Ident.id_register (Ident.id_clone pn.proofn_name) in
-  let _new_pn = mk_proof_node_no_task s new_goal_name parent new_pn_id pn.proofn_checksum pn.proofn_shape in
+  let new_goal = Ident.id_register (Ident.id_clone pn.proofn_name) in
+  let checksum = pn.proofn_checksum in
+  let shape = pn.proofn_shape in
+  let _ = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape in
   graft_detached_proof_on_parent s new_pn_id parent;
   new_pn_id
 
@@ -565,7 +571,8 @@ let _mk_proof_node_task (s : session) (t : Task.task)
   let name,_,_ = Termcode.goal_expl_task ~root:false t in
   mk_proof_node ~version:s.session_shape_version s name t parent node_id
 
-let mk_transf_proof_node (s : session) (parent_name : string) (tid : transID) (index : int) (t : Task.task) =
+let mk_transf_proof_node (s : session) (parent_name : string)
+    (tid : transID) (index : int) (t : Task.task) =
   let id = gen_proofNodeID s in
   let gid,_expl,_ = Termcode.goal_expl_task ~root:false t in
 (*  let expl = match expl with
@@ -606,8 +613,10 @@ let rec copy_structure ~notification s from_any to_any : unit =
     (get_proofNode s to_id).proofn_transformations <- new_transformations;
     Hprover.iter (fun _k old_pa ->
       let old_pa = get_proof_attempt_node s old_pa in
-      let pa_id = add_proof_attempt s old_pa.prover old_pa.limit None true None to_id in
-      notification ~parent:to_any (APa pa_id)) (get_proofNode s from_id).proofn_attempts
+      let pa_id =
+        add_proof_attempt s old_pa.prover old_pa.limit None true None to_id in
+      notification ~parent:to_any (APa pa_id))
+      (get_proofNode s from_id).proofn_attempts
   | ATn from_tn, ATn to_tn ->
     let sub_tasks = get_sub_tasks s from_tn in
     let new_sub_tasks =

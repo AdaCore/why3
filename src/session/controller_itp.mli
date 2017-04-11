@@ -229,18 +229,20 @@ val replay_print:
 
 (* TODO replay for manual proofs ? *)
 val replay:
-    remove_obsolete:bool -> (** If true, removes obsolete attempt in all cases. Otherwise
-                                keep it in some cases: for example prover is not installed *)
+    remove_obsolete:bool ->
+    (** If true, removes obsolete attempt in all cases. Otherwise keep it in
+        some cases: for example when prover is not installed *)
     use_steps:bool -> (** Replay use recorded number of proof steps if true *)
     controller ->
     callback:
       ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
             -> unit) ->
     unit
-(** This function reruns all the proofs of the session, and reports for all proofs the current
-    result and new one (does change the session state and if remove_obsolete is true also remove
-    obsolete proofs that could not be replayed). When finished, call the callback with the reports
-    which are 4-uples [(goalID, prover, limits, report)] *)
+(** This function reruns all the proofs of the session, and reports for all
+    proofs the current result and new one (does change the session state and if
+    remove_obsolete is true also remove obsolete proofs that could not be
+    replayed). When finished, call the callback with the reports which are
+    4-uples [(goalID, prover, limits, report)] *)
 
 
 end
