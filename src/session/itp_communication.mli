@@ -78,7 +78,7 @@ type notification =
   | Task         of node_ID * string
   (* the node_ID's task *)
   | File_contents of string * string
-  (* contents of the file *)
+  (* File_contents (name, contents) *)
 
 type ide_request =
   | Command_req             of node_ID * string

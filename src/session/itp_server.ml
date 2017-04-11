@@ -413,6 +413,22 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
                        cont = c }
 
 
+  (**********************)
+  (* Read and send file *)
+  (**********************)
+
+  let read_and_send f =
+    try
+      let d = get_server_data() in
+      let fn = Sysutil.absolutize_filename
+          (Session_itp.get_dir d.cont.controller_session) f in
+      let s = Sysutil.file_contents fn in
+      P.notify (File_contents (f, s))
+    with Invalid_argument s ->
+      P.notify (Message (Error s))
+
+
+
   (* -----------------------------------   ------------------------------------- *)
 
   let get_node_type (node: any) =
@@ -556,6 +572,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let node_detached = get_node_detached node in
       add_node_to_table node new_id;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+      if node_type = NFile then
+        read_and_send node_name;
       get_node_proved new_id node;
       new_id
 
@@ -948,11 +966,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         in
         C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
-       begin try let s = Sysutil.file_contents f in
-                 P.notify (File_contents(f,s))
-             with Invalid_argument s ->
-               P.notify (Message (Error s))
-       end
+        read_and_send f
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
     | Command_req (nid, cmd)       ->
@@ -969,7 +983,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
             P.notify (Message (Information ("Unknown command: "^s)))
       end
     | Add_file_req f ->
-      add_file_to_session d.cont f
+      add_file_to_session d.cont f;
+      let f = Sysutil.relativize_filename
+          (Session_itp.get_dir d.cont.controller_session) f in
+      read_and_send f
     | Open_session_req file_or_dir_name      ->
       begin
         let b = init_cont file_or_dir_name in

@@ -385,6 +385,7 @@ let clear_tree_and_table goals_model =
   Hint.clear node_id_detached
 
 
+
 (**************)
 (* Menu items *)
 (**************)
@@ -408,18 +409,30 @@ let reload_menu_item : GMenu.menu_item =
       send_request Reload_req)
 
 (* vpan222 contains:
-   2.2.2.1 a view of the current task
+   2.2.2.1 a notebook containing view of the current task, source code etc
    2.2.2.2 a vertiacal pan which contains
      2.2.2.2.1 the input field to type commands
      2.2.2.2.2 a scrolled window to hold the output of the commands
  *)
 
+(*************************************)
+(*    notebook on the right 2.2.2.1  *)
+(*************************************)
+
+let notebook = GPack.notebook ~packing:vpan222#add ()
+
+let task_page,scrolled_task_view =
+  let label = GMisc.label ~text:"Task" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
 let scrolled_task_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
-    ~packing:vpan222#add ()
+    ~packing:scrolled_task_view#add ()
 
+(* Showing current task *)
 let task_view =
   GSourceView2.source_view
     ~editable:false
@@ -427,6 +440,44 @@ let task_view =
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add
     ()
+
+let source_view_table = Hstr.create 14
+
+let create_source_view =
+  let n = ref 1 in
+  let create_source_view f content =
+    if not (Hstr.mem source_view_table f) then
+      begin
+        let source_page, scrolled_source_view =
+          let label = GMisc.label ~text:f () in
+          !n, GPack.vbox ~homogeneous:false ~packing:
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () in
+        let scrolled_source_view =
+          GBin.scrolled_window
+            ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+            ~shadow_type:`ETCHED_OUT
+            ~packing:scrolled_source_view#add () in
+        let source_view =
+          GSourceView2.source_view
+            ~auto_indent:true
+            ~insert_spaces_instead_of_tabs:true ~tab_width:2
+            ~show_line_numbers:true
+            ~right_margin_position:80 ~show_right_margin:true
+            (* ~smart_home_end:true *)
+            ~editable:true
+            ~packing:scrolled_source_view#add
+            () in
+        Hstr.add source_view_table f (source_page, source_view);
+        n := !n + 1;
+        source_view#source_buffer#set_text content;
+        Gconfig.add_modifiable_mono_font_view source_view#misc;
+        source_view#source_buffer#set_language why_lang;
+        Gconfig.set_fonts ()
+      end in
+  create_source_view
+
+(* End of notebook *)
+
 
 let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
 
@@ -990,7 +1041,14 @@ let treat_notification n = match n with
        (fun _ -> task_view#source_buffer#set_text s;
                  (* scroll to end of text *)
                  task_view#scroll_to_mark `INSERT)
-  | File_contents _
+  | File_contents (file_name, content) ->
+    begin
+      try
+        let (_, sc_view) = Hstr.find source_view_table file_name in
+        sc_view#source_buffer#set_text content
+      with
+      | Not_found -> create_source_view file_name content
+    end
   | Dead _ ->
      print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
 
