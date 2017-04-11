@@ -21,10 +21,10 @@ Require Import ZArith.
 Require Import Fourier.
 Require Import real.Truncate.
 
-Implicit Arguments B754_zero [[prec] [emax]].
-Implicit Arguments B754_infinity [[prec] [emax]].
-Implicit Arguments B754_nan [[prec] [emax]].
-Implicit Arguments B754_finite [[prec] [emax]].
+Arguments B754_zero {prec} {emax}.
+Arguments B754_infinity {prec} {emax}.
+Arguments B754_nan {prec} {emax}.
+Arguments B754_finite {prec} {emax}.
 
 (* Why3 assumption *)
 Inductive mode :=
@@ -52,7 +52,7 @@ Defined.
 
 Coercion mode_to_IEEE : mode >-> Fappli_IEEE.mode.
 
-Variable eb_pos sb_pos : positive.
+Axiom eb_pos sb_pos : positive.
 
 (* Why3 goal *)
 Definition eb: Z.
@@ -64,8 +64,8 @@ Definition sb: Z.
   exact (Z.pos sb_pos).
 Defined.
 
-Hypothesis Heb : Zlt_bool 1 eb = true.
-Hypotheses Hsbb : Zlt_bool 1 sb = true.
+Axiom Heb : Zlt_bool 1 eb = true.
+Axiom Hsbb : Zlt_bool 1 sb = true.
 
 (* Why3 goal *)
 Lemma eb_gt_1 : (1%Z < eb)%Z.
@@ -95,13 +95,13 @@ Definition zeroF: t.
   exact (B754_zero false).
 Defined.
 
-Let emin := (3 - emax - sb)%Z.
+Definition emin := (3 - emax - sb)%Z.
 Notation fexp := (FLT_exp emin sb).
 
 Lemma Hsb : Zlt_bool 0 sb = true. auto with zarith. Qed.
 Lemma Hsb': (0 < sb)%Z. unfold sb; auto with zarith. Qed.
 
-Hypothesis Hemax : Zlt_bool sb emax = true. (* put as assumption in theory ? *)
+Axiom Hemax : Zlt_bool sb emax = true. (* put as assumption in theory ? *)
 
 Lemma Hemax': (sb < emax)%Z.
   rewrite Zlt_is_lt_bool.
@@ -328,7 +328,6 @@ Lemma lt_le: forall {x y}, lt x y -> le x y.
 Qed.
 
 Lemma eq_zero_iff: forall {x}, eq zeroF x <-> x = zeroF \/ x = neg zeroF.
-  Print binary_float.
   intro; unfold eq; destruct x ; destruct b; simpl.
   split; auto.
   split; auto.

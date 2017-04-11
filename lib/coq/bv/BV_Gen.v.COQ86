@@ -716,18 +716,17 @@ Lemma twos_complement_extensionality : forall {m} (v v' : Bvector m),
   apply Vector.case0 with (v := v'); trivial.
   revert v h H.
   apply Vector.caseS with (v := v'); intros.
+  assert (tmp : forall {n} v v', 
+       twos_complement (S n) (false :: v) <> twos_complement (S n) (true :: v')).
+    intros n1 v0 v'0 H1.
+    assert ((twos_complement (S n1) (true :: v'0) >= 0)%Z).
+    rewrite <- H1; apply twos_complement_pos.
+    assert ((twos_complement (S n1) (true :: v'0) < 0)%Z).
+    apply twos_complement_neg.
+    easy.
   case h, h0; intros.
   inversion H.
   apply bvec_to_nat_extensionality; simpl; omega.
-  Lemma tmp : forall {n} v v', twos_complement (S n) (false :: v) <> twos_complement (S n) (true :: v').
-    intros.
-    intro.
-    assert ((twos_complement (S n) (true :: v') >= 0)%Z).
-    rewrite <- H; apply twos_complement_pos.
-    assert ((twos_complement (S n) (true :: v') < 0)%Z).
-    apply twos_complement_neg.
-    easy.
-  Qed.
   assert (twos_complement (S n0) (false :: v) <>
           twos_complement (S n0) (true :: t0)).
   apply tmp.
@@ -1596,7 +1595,7 @@ Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
   apply to_uint_bounds.
   unfold nth.
   rewrite (nth_high x (to_uint i)); auto.
-  Lemma tmmp: forall x i, to_uint i >= size -> lsr_bv x i = zeros_aux.
+  assert (tmmp: forall x i, to_uint i >= size -> lsr_bv x i = zeros_aux).
     intros.
     apply Extensionality_aux; unfold eq_aux; intros.
     unfold lsr_bv, zeros_aux.
@@ -1605,7 +1604,6 @@ Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
     unfold size in H; auto with zarith.
     easy.
     auto with zarith.
-  Qed.
   rewrite tmmp by auto.
   split; intro.
   assert False by easy; auto.
@@ -1705,55 +1703,55 @@ Lemma mask_succ :
   apply to_uint_sub.
 Qed.
 
+Definition add_aux {l} (v w : Vector.t bool l) : Vector.t bool l :=
+     nat_to_bvec l (Z.to_nat (mod1 
+        (Z.of_nat (bvec_to_nat l v) + Z.of_nat (bvec_to_nat l w))
+        (Pow2int.pow2 (Z.of_nat l)))).
+
 Lemma mask_succ_tmp :
   forall n,
     add (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z)
     = bw_or (lsl (sub (lsl (of_int 1%Z) (Z.of_nat n)) (of_int 1%Z)) (Z.of_nat 1)) (of_int 1%Z).
   intro.
 
-  Lemma add_and_or :
+  assert (add_and_or :
     forall v, nth v 0 = false ->
-              add v (of_int 1) = bw_or v (of_int 1).
-    Definition add_aux {l} (v w : Vector.t bool l) : Vector.t bool l.
-      exact (nat_to_bvec l (Z.to_nat (mod1 (Z.of_nat (bvec_to_nat l v) + Z.of_nat (bvec_to_nat l w)) (Pow2int.pow2 (Z.of_nat l))))).
-    Defined.
-    Lemma add_is_add_aux : forall v w, add v w = add_aux v w.
-      auto.
-    Qed.
-    Lemma add_and_or_aux :
+              add v (of_int 1) = bw_or v (of_int 1)).
+  assert (add_is_add_aux : forall v w, add v w = add_aux v w) by auto.
+  assert (add_and_or_aux :
       forall {l} v, @nth_aux l v 0 = false ->
                     add_aux v (nat_to_bvec l 1)
-                    = Vector.map2 (fun x y => x || y) v (nat_to_bvec l 1).
+                    = Vector.map2 (fun x y => x || y) v (nat_to_bvec l 1)).
       destruct v; auto.
       intro.
       assert (h = false) as hf by auto; rewrite hf.
       simpl.
       unfold add_aux.
       change (
-          nat_to_bvec (S n)
+          nat_to_bvec (S n0)
                       (Z.to_nat
                          (mod1
-                            (Z.of_nat (2 * (bvec_to_nat n v)) +
-                             Z.of_nat (1 + 2 * (bvec_to_nat n (nat_to_bvec n 0))))
-                            (Pow2int.pow2 (Z.of_nat (S n))))) =
-          true :: Vector.map2 (fun x y : bool => x || y) v (nat_to_bvec n 0)).
+                            (Z.of_nat (2 * (bvec_to_nat n0 v)) +
+                             Z.of_nat (1 + 2 * (bvec_to_nat n0 (nat_to_bvec n0 0))))
+                            (Pow2int.pow2 (Z.of_nat (S n0))))) =
+          true :: Vector.map2 (fun x y : bool => x || y) v (nat_to_bvec n0 0)).
       rewrite <-Nat_to_bvec_zeros, bvec_to_nat_zeros.
       change (Z.of_nat (1 + 2 * 0)) with 1.
-      set (mod1 (Z.of_nat (2 * bvec_to_nat n v) + 1)
-           (Pow2int.pow2 (Z.of_nat (S n)))).
+      set (mod1 (Z.of_nat (2 * bvec_to_nat n0 v) + 1)
+           (Pow2int.pow2 (Z.of_nat (S n0)))).
       simpl nat_to_bvec.
       rewrite Z2Nat.id by (apply mod1_nat, Z.lt_le_pred, max_int_nat).
-      assert (Z.odd z = true).
-      subst z.
-      rewrite Zodd_mod, mod1_is_mod by auto with zarith.
-      rewrite Nat2Z.inj_succ, <- Z.add_1_r, Pow2int.Power_s by auto with zarith.
-      rewrite Int.Comm1, (mod_mod_mult _ 2 _)by auto with zarith.
-      rewrite <-Zodd_mod, Int.Comm, Nat2Z.inj_mul, Z.odd_add_mul_2; trivial.
+      assert (H0: Z.odd z = true).
+        subst z.
+        rewrite Zodd_mod, mod1_is_mod by auto with zarith.
+        rewrite Nat2Z.inj_succ, <- Z.add_1_r, Pow2int.Power_s by auto with zarith.
+        rewrite Int.Comm1, (mod_mod_mult _ 2 _)by auto with zarith.
+        rewrite <-Zodd_mod, Int.Comm, Nat2Z.inj_mul, Z.odd_add_mul_2; trivial.
       rewrite H0.
-      cut (nat_to_bvec n (Div2.div2 (Z.to_nat z))
-           = Vector.map2 (fun x y : bool => x || y) v (Vector.const false n)).
+      cut (nat_to_bvec n0 (Div2.div2 (Z.to_nat z))
+           = Vector.map2 (fun x y : bool => x || y) v (Vector.const false n0)).
       intro t; rewrite t; trivial.
-      case (Z_lt_le_dec (Z.of_nat (2 * bvec_to_nat n v) + 1) (Pow2int.pow2 (Z.of_nat (S n)))); intro.
+      case (Z_lt_le_dec (Z.of_nat (2 * bvec_to_nat n0 v) + 1) (Pow2int.pow2 (Z.of_nat (S n0)))); intro.
       subst z.
       revert H0.
       rewrite mod1_out by auto with zarith.
@@ -1762,25 +1760,24 @@ Lemma mask_succ_tmp :
       rewrite <-Nat2Z.inj_succ, Nat2Z.id.
       rewrite Z.odd_succ, <-even_is_even in H0.
       rewrite <-(Div2.even_div2 _ H0), Div2.div2_double.
-      Lemma nat_to_bvec_bvec_to_nat:
-        forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v.
+      assert (nat_to_bvec_bvec_to_nat:
+        forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v).
         intros; apply bvec_to_nat_extensionality.
         apply bvec_to_nat_nat_to_bvec.
         apply Z.lt_le_pred.
-        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l) - 1); [apply max_int_nat|auto with zarith]).
+        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l0) - 1); 
+             [apply max_int_nat|auto with zarith]).
         apply inj_lt, bvec_to_nat_range.
-      Qed.
       rewrite nat_to_bvec_bvec_to_nat.
-      Lemma tmp2:
+      assert (tmp2:
         forall {l} v,
-          Vector.map2 (fun x y : bool => x || y) v (Vector.const false l) = v.
-        induction v; auto.
+          Vector.map2 (fun x y : bool => x || y) v (Vector.const false l) = v).
+        induction v0; auto.
         simpl.
         rewrite orb_false_r.
-        rewrite IHv; trivial.
-      Qed.
+        rewrite IHv0; trivial.
       symmetry; apply tmp2.
-      absurd (Z.of_nat (bvec_to_nat n v) < Pow2int.pow2 (Z.of_nat n)).
+      absurd (Z.of_nat (bvec_to_nat n0 v) < Pow2int.pow2 (Z.of_nat n0)).
       apply Zle_not_lt.
       rewrite Nat2Z.inj_succ in l.
       rewrite <- Z.add_1_r, Pow2int.Power_s in l by auto with zarith.
@@ -1794,15 +1791,13 @@ Lemma mask_succ_tmp :
       rewrite Z2Nat.inj_lt, Nat2Z.id.
       apply (bvec_to_nat_range v).
       auto with zarith.
-      transitivity (Pow2int.pow2 (Z.of_nat n) - 1).
+      transitivity (Pow2int.pow2 (Z.of_nat n0) - 1).
       apply max_int_nat.
       auto with zarith.
-    Qed.
     intros.
     rewrite add_is_add_aux.
     apply add_and_or_aux.
     trivial.
-  Qed.
   simpl.
   apply add_and_or.
   intros; apply Lsl_nth_low; auto with zarith.
