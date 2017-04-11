@@ -289,6 +289,7 @@ let print_request fmt r =
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
   | Get_Session_Tree_req            -> fprintf fmt "get session tree"
+  | Save_file_req _                 -> fprintf fmt "save file"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
   | Replay_req                      -> fprintf fmt "replay"
@@ -306,8 +307,9 @@ let print_msg fmt m =
   | Information s          -> fprintf fmt "info %s" s
   | Task_Monitor _         -> fprintf fmt "task montor"
   | Parse_Or_Type_Error s  -> fprintf fmt "parse_or_type_error:\n %s" s
+  | File_Saved s           -> fprintf fmt "file saved %s" s
   | Error s                -> fprintf fmt "%s" s
-  | Open_File_Error s        -> fprintf fmt "%s" s
+  | Open_File_Error s      -> fprintf fmt "%s" s
 
 let print_notify fmt n =
   match n with
@@ -413,9 +415,9 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
                        cont = c }
 
 
-  (**********************)
-  (* Read and send file *)
-  (**********************)
+  (*********************)
+  (* File input/output *)
+  (*********************)
 
   let read_and_send f =
     try
@@ -424,6 +426,18 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           (Session_itp.get_dir d.cont.controller_session) f in
       let s = Sysutil.file_contents fn in
       P.notify (File_contents (f, s))
+    with Invalid_argument s ->
+      P.notify (Message (Error s))
+
+  let save_file f file_content =
+    try
+      let d = get_server_data() in
+      let fn = Sysutil.absolutize_filename
+          (Session_itp.get_dir d.cont.controller_session) f in
+      let oc = open_out fn in
+      Printf.fprintf oc "%s\n" file_content; (* TODO replace this *)
+      close_out oc;
+      P.notify (Message (File_Saved f))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
@@ -967,6 +981,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
+    | Save_file_req (name, text)   ->
+        save_file name text;
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
     | Command_req (nid, cmd)       ->

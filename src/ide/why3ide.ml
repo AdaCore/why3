@@ -408,6 +408,7 @@ let reload_menu_item : GMenu.menu_item =
       clear_tree_and_table goals_model;
       send_request Reload_req)
 
+
 (* vpan222 contains:
    2.2.2.1 a notebook containing view of the current task, source code etc
    2.2.2.2 a vertiacal pan which contains
@@ -441,7 +442,8 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-let source_view_table = Hstr.create 14
+let source_view_table : (int * GSourceView2.source_view) Hstr.t =
+  Hstr.create 14
 
 let create_source_view =
   let n = ref 1 in
@@ -886,6 +888,19 @@ let (_ : GMenu.menu_item) =
   exp_factory#add_item ~key:GdkKeysyms._D
     ~callback:detached_copy "Detached copy"
 
+let save_sources () =
+  Hstr.iter
+    (fun k (_n, (s: GSourceView2.source_view)) ->
+      let text_to_save = s#source_buffer#get_text () in
+      send_request (Save_file_req (k, text_to_save))
+    )
+    source_view_table
+
+(* TODO replace this with menu items *)
+let (_ : GMenu.menu_item) =
+  exp_factory#add_item ~key:GdkKeysyms._X "Save files"
+    ~callback:(fun () -> save_sources ())
+
 (*********************************)
 (* add a new file in the project *)
 (*********************************)
@@ -950,6 +965,7 @@ let treat_message_notification msg = match msg with
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s      -> print_message "%s" s
   | Parse_Or_Type_Error s  -> print_message "%s" s
+  | File_Saved s           -> print_message "%s was saved" s
   | Error s                ->
       if Debug.test_flag debug then
         print_message "%s" s

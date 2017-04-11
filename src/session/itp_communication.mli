@@ -38,6 +38,8 @@ type message_notification =
   (* A file was read or reloaded and now contains a parsing or typing error *)
   | Parse_Or_Type_Error   of string
   (* An error happened that could not be identified in server *)
+  | File_Saved            of string
+  (* [File_Saved f] f was saved *)
   | Error                 of string
   | Open_File_Error       of string
 
@@ -78,7 +80,7 @@ type notification =
   | Task         of node_ID * string
   (* the node_ID's task *)
   | File_contents of string * string
-  (* File_contents (name, contents) *)
+  (* File_contents (filename, contents) *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -93,6 +95,8 @@ type ide_request =
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Copy_detached           of node_ID
+  | Save_file_req           of string * string
+  (* Save_file_req (filename, content_of_file). Save the file *)
   | Get_first_unproven_node of node_ID
   | Get_Session_Tree_req
   | Save_req

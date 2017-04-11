@@ -33,6 +33,7 @@ type message_notification =
   | Information           of string
   | Task_Monitor          of int * int * int
   | Parse_Or_Type_Error   of string
+  | File_Saved            of string
   | Error                 of string
   | Open_File_Error       of string
 
@@ -88,6 +89,7 @@ type ide_request =
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Copy_detached           of node_ID
+  | Save_file_req           of string * string
   | Get_first_unproven_node of node_ID
   | Get_Session_Tree_req
   | Save_req
