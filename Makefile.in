@@ -896,7 +896,7 @@ ifeq (@enable_coq_support@,yes)
 ifeq (@enable_coq_libs@,yes)
 
 
-COQVERSIONSPECIFIC=bv/BV_Gen.v
+COQVERSIONSPECIFIC=
 
 COQVERSIONSPECIFICTARGETS=$(addprefix lib/coq/, $(COQVERSIONSPECIFIC))
 COQVERSIONSPECIFICSOURCES=$(addsuffix .@coq_compat_version@, $(COQVERSIONSPECIFICTARGETS))
@@ -942,7 +942,11 @@ COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 COQLIBS_SEQ_FILES = Seq
 COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
 
+ifeq (@coq_compat_version@,COQ84)
+COQLIBS_BV_FILES = Pow2int
+else
 COQLIBS_BV_FILES = Pow2int BV_Gen
+endif
 COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
