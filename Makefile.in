@@ -1036,6 +1036,9 @@ COQLIBS_SEQ = $(addprefix lib/coq/seq/, $(COQLIBS_SEQ_FILES))
 COQLIBS_BV_FILES = Pow2int BV_Gen
 COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
+COQLIBS_SPARK_FILES = SPARK_Integer_Arithmetic SPARK_Raising_Order
+COQLIBS_SPARK = $(addprefix lib/coq/spark/, $(COQLIBS_SPARK_FILES))
+
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
@@ -1045,7 +1048,7 @@ COQLIBS_IEEEFLOAT_FILES = GenericFloat
 COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_SEQ) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_SPARK) lib/coq/SPARK
 
 drivers/coq-realizations.aux: Makefile
 	$(SHOW) 'Generate $@'
