@@ -8,7 +8,10 @@ Require int.Abs.
 Require int.EuclideanDivision.
 Require bv.Pow2int.
 
-Parameter last_bit : nat.
+Local Parameter last_bit : nat.
+(* Important notice: do not remove 'Local' above, otherwise 'why3 realize' will
+   assume it comes from Why3 and will remove it. We use 'Parameter' instead of
+  'Variable' to avoid a Coq warning *)
 
 Definition size_nat: nat := S last_bit.
 
@@ -204,7 +207,6 @@ intros.
 unfold nth.
 rewrite nth_aux_out_of_bound; auto with zarith.
 Qed.
-
 
 Definition zeros_aux {l} : Vector.t bool l.
   exact (Vector.const false l).
@@ -716,7 +718,7 @@ Lemma twos_complement_extensionality : forall {m} (v v' : Bvector m),
   apply Vector.case0 with (v := v'); trivial.
   revert v h H.
   apply Vector.caseS with (v := v'); intros.
-  assert (tmp : forall {n} v v', 
+  assert (tmp : forall {n} v v',
        twos_complement (S n) (false :: v) <> twos_complement (S n) (true :: v')).
     intros n1 v0 v'0 H1.
     assert ((twos_complement (S n1) (true :: v'0) >= 0)%Z).
@@ -1704,7 +1706,7 @@ Lemma mask_succ :
 Qed.
 
 Definition add_aux {l} (v w : Vector.t bool l) : Vector.t bool l :=
-     nat_to_bvec l (Z.to_nat (mod1 
+     nat_to_bvec l (Z.to_nat (mod1
         (Z.of_nat (bvec_to_nat l v) + Z.of_nat (bvec_to_nat l w))
         (Pow2int.pow2 (Z.of_nat l)))).
 
@@ -1765,7 +1767,7 @@ Lemma mask_succ_tmp :
         intros; apply bvec_to_nat_extensionality.
         apply bvec_to_nat_nat_to_bvec.
         apply Z.lt_le_pred.
-        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l0) - 1); 
+        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l0) - 1);
              [apply max_int_nat|auto with zarith]).
         apply inj_lt, bvec_to_nat_range.
       rewrite nat_to_bvec_bvec_to_nat.
@@ -2011,3 +2013,4 @@ Lemma Extensionality : forall (x:t) (y:t), (eq_sub x y 0%Z size) -> (x = y).
   intros x y.
   apply Extensionality_aux.
 Qed.
+

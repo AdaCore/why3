@@ -52,7 +52,10 @@ Defined.
 
 Coercion mode_to_IEEE : mode >-> Fappli_IEEE.mode.
 
-Axiom eb_pos sb_pos : positive.
+Local Axiom eb_pos sb_pos : positive.
+(* Important notice: do not remove 'Local' above, otherwise 'why3 realize' will
+   assume it comes from Why3 and will remove it. We use 'Axiom' instead of
+  'Hypothesis' to avoid a Coq warning *)
 
 (* Why3 goal *)
 Definition eb: Z.
@@ -64,8 +67,8 @@ Definition sb: Z.
   exact (Z.pos sb_pos).
 Defined.
 
-Axiom Heb : Zlt_bool 1 eb = true.
-Axiom Hsbb : Zlt_bool 1 sb = true.
+Local Axiom Heb : Zlt_bool 1 eb = true.
+Local Axiom Hsbb : Zlt_bool 1 sb = true.
 
 (* Why3 goal *)
 Lemma eb_gt_1 : (1%Z < eb)%Z.
@@ -101,7 +104,7 @@ Notation fexp := (FLT_exp emin sb).
 Lemma Hsb : Zlt_bool 0 sb = true. auto with zarith. Qed.
 Lemma Hsb': (0 < sb)%Z. unfold sb; auto with zarith. Qed.
 
-Axiom Hemax : Zlt_bool sb emax = true. (* put as assumption in theory ? *)
+Local Axiom Hemax : Zlt_bool sb emax = true. (* put as assumption in theory ? *)
 
 Lemma Hemax': (sb < emax)%Z.
   rewrite Zlt_is_lt_bool.
