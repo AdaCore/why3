@@ -85,15 +85,16 @@ let convert_update u =
 
 let convert_notification_constructor n =
   match n with
-  | New_node _      -> String "New_node"
-  | Node_change _   -> String "Node_change"
-  | Remove _        -> String "Remove"
-  | Initialized _   -> String "Initialized"
-  | Saved           -> String "Saved"
-  | Message _       -> String "Message"
-  | Dead _          -> String "Dead"
-  | Task _          -> String "Task"
-  | File_contents _ -> String "File_contents"
+  | New_node _                   -> String "New_node"
+  | Node_change _                -> String "Node_change"
+  | Remove _                     -> String "Remove"
+  | Next_Unproven_Node_Id (_, _) -> String "Next_Unproven_Node_Id"
+  | Initialized _                -> String "Initialized"
+  | Saved                        -> String "Saved"
+  | Message _                    -> String "Message"
+  | Dead _                       -> String "Dead"
+  | Task _                       -> String "Task"
+  | File_contents _              -> String "File_contents"
 
 let convert_node_type_string nt =
   match nt with
@@ -109,23 +110,24 @@ let convert_node_type nt =
 
 let convert_request_constructor (r: ide_request) =
   match r with
-  | Command_req _        -> String "Command_req"
-  | Prove_req _          -> String "Prove_req"
-  | Transform_req _      -> String "Transform_req"
-  | Strategy_req _       -> String "Strategy_req"
-  | Open_session_req _   -> String "Open_session_req"
-  | Add_file_req _       -> String "Add_file_req"
-  | Set_max_tasks_req _  -> String "Set_max_tasks_req"
-  | Get_file_contents _  -> String "Get_file_contents"
-  | Get_task _           -> String "Get_task"
-  | Remove_subtree _     -> String "Remove_subtree"
-  | Copy_paste _         -> String "Copy_paste"
-  | Copy_detached _      -> String "Copy_detached"
-  | Get_Session_Tree_req -> String "Get_Session_Tree_req"
-  | Save_req             -> String "Save_req"
-  | Reload_req           -> String "Reload_req"
-  | Replay_req           -> String "Replay_req"
-  | Exit_req             -> String "Exit_req"
+  | Command_req _             -> String "Command_req"
+  | Prove_req _               -> String "Prove_req"
+  | Transform_req _           -> String "Transform_req"
+  | Strategy_req _            -> String "Strategy_req"
+  | Open_session_req _        -> String "Open_session_req"
+  | Add_file_req _            -> String "Add_file_req"
+  | Set_max_tasks_req _       -> String "Set_max_tasks_req"
+  | Get_file_contents _       -> String "Get_file_contents"
+  | Get_task _                -> String "Get_task"
+  | Remove_subtree _          -> String "Remove_subtree"
+  | Copy_paste _              -> String "Copy_paste"
+  | Copy_detached _           -> String "Copy_detached"
+  | Get_first_unproven_node _ -> String "Get_first_unproven_node"
+  | Get_Session_Tree_req      -> String "Get_Session_Tree_req"
+  | Save_req                  -> String "Save_req"
+  | Reload_req                -> String "Reload_req"
+  | Replay_req                -> String "Replay_req"
+  | Exit_req                  -> String "Exit_req"
 
 let print_request_to_json (r: ide_request): Json_base.value =
   let cc = convert_request_constructor in
@@ -173,6 +175,9 @@ let print_request_to_json (r: ide_request): Json_base.value =
   | Copy_detached from_id ->
       Obj ["ide_request", cc r;
            "node_ID", Int from_id]
+  | Get_first_unproven_node id ->
+      Obj ["ide_request", cc r;
+           "node_ID", Int id]
   | Get_Session_Tree_req ->
       Obj ["ide_request", cc r]
   | Save_req ->
@@ -262,6 +267,10 @@ let print_notification_to_json (n: notification): Json_base.value =
   | Remove nid ->
       Obj ["notification", cc n;
            "node_ID", Int nid]
+  | Next_Unproven_Node_Id (from_id, unproved_id) ->
+      Obj ["notification", cc n;
+           "node_ID", Int from_id;
+           "node_ID", Int unproved_id]
   | Initialized infos ->
       Obj ["notification", cc n;
            "infos", convert_infos infos]

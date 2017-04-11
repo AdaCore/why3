@@ -110,7 +110,7 @@ let any_proved cont any : bool =
   | APa pa ->
       begin
         let pa = get_proof_attempt_node cont.controller_session pa in
-        match pa.proof_state with
+        match pa.Session_itp.proof_state with
         | None -> false
         | Some pa ->
           begin
@@ -241,7 +241,7 @@ let get_undetached_children_no_pa s any : any list =
   | ATh th  -> List.map (fun g -> APn g) (theory_goals th)
   | ATn tn  -> List.map (fun pn -> APn pn) (get_sub_tasks s tn)
   | APn pn  -> List.map (fun tn -> ATn tn) (get_transformations s pn)
-  | APa pa -> []
+  | APa _ -> []
 
 (* printing *)
 
