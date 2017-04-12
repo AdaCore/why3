@@ -1,4 +1,9 @@
-open Format
+
+
+
+(* TODO: all occurences of Format.eprintf in this file should be
+   replaced by proper server notifications *)
+
 open Session_itp
 
 exception NotADirectory of string
@@ -16,13 +21,13 @@ let cont_from_session_dir cont dir =
     end
   else
     begin
-      eprintf "'%s' does not exist. \
+      Format.eprintf "[session server info] '%s' does not exist. \
                Creating directory of that name for the project@." dir;
       Unix.mkdir dir 0o777
     end;
   (* we load the session *)
   let ses,use_shapes = load_session dir in
-  eprintf "using shapes: %a@." pp_print_bool use_shapes;
+  Format.eprintf "[session server info] using shapes: %b@." use_shapes;
   (* create the controller *)
   Controller_itp.init_controller ses cont;
   (* update the session *)
@@ -51,7 +56,7 @@ let list_transforms () =
 let list_transforms_query _cont _args =
   let l = list_transforms () in
   let print_trans_desc fmt (x,r) =
-    fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
+    Format.fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
   in
   Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
     (List.sort sort_pair l)
@@ -116,10 +121,9 @@ type query =
 let help_on_queries fmt commands =
   let l = List.rev_map (fun (c,h,_) -> (c,h)) commands in
   let l = List.sort sort_pair l in
-  let p fmt (c,help) = fprintf fmt "%20s : %s" c help in
+  let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
 
-(* TODO remove reference to eprintf in this *)
 let strategies env config loaded_strategies =
   match !loaded_strategies with
     | [] ->
@@ -132,11 +136,11 @@ let strategies env config loaded_strategies =
               let code = st.Whyconf.strategy_code in
               let code = Strategy_parser.parse2 env config code in
               let shortcut = st.Whyconf.strategy_shortcut in
-              Format.eprintf "[Why3shell] Strategy '%s' loaded.@." name;
+              Format.eprintf "[session server info] Strategy '%s' loaded.@." name;
               (name, shortcut, st.Whyconf.strategy_desc, code) :: acc
             with Strategy_parser.SyntaxError msg ->
               Format.eprintf
-                "[Why3shell warning] Loading strategy '%s' failed: %s@." name msg;
+                "[session server warning] Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
           strategies
@@ -157,7 +161,7 @@ let return_prover name config =
   (** all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    (*Format.eprintf "Prover corresponding to %s has not been found@." name;*)
+    Format.eprintf "Prover corresponding to %s has not been found@." name;
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))

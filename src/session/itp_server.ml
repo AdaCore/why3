@@ -434,9 +434,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
       let d = get_server_data() in
       let fn = Sysutil.absolutize_filename
           (Session_itp.get_dir d.cont.controller_session) f in
-      let oc = open_out fn in
-      Printf.fprintf oc "%s\n" file_content; (* TODO replace this *)
-      close_out oc;
+      Sysutil.write_file fn file_content;
       P.notify (Message (File_Saved f))
     with Invalid_argument s ->
       P.notify (Message (Error s))
@@ -856,6 +854,8 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   (* ----------------- run strategy -------------------- *)
 
+  let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
+
   let run_strategy_on_task nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
@@ -863,16 +863,16 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     let st = List.filter (fun (_,c,_,_) -> c=s) l in
     match st with
     | [(n,_,_,st)] ->
-       Format.printf "running strategy '%s'@." n;
+        Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
        let callback sts =
-         Format.printf "Strategy status: %a@." print_strategy_status sts
+         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
        in
        let callback_pa = callback_update_tree_proof d.cont in
        let callback_tr st = callback_update_tree_transform st in
        List.iter (fun id ->
                   C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved)
                  unproven_goals
-    | _ -> Format.printf "Strategy '%s' not found@." s
+    | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
   (* ----------------- Save session --------------------- *)
   let save_session () =

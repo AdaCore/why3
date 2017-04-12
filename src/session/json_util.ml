@@ -116,6 +116,7 @@ let convert_request_constructor (r: ide_request) =
   | Strategy_req _            -> String "Strategy_req"
   | Open_session_req _        -> String "Open_session_req"
   | Add_file_req _            -> String "Add_file_req"
+  | Save_file_req _           -> String "Save_file_req"
   | Set_max_tasks_req _       -> String "Set_max_tasks_req"
   | Get_file_contents _       -> String "Get_file_contents"
   | Get_task _                -> String "Get_task"
@@ -154,6 +155,9 @@ let print_request_to_json (r: ide_request): Json_base.value =
       Obj ["ide_request", cc r;
            "file", String f]
   | Add_file_req f ->
+      Obj ["ide_request", cc r;
+           "file", String f]
+  | Save_file_req (f,_) ->
       Obj ["ide_request", cc r;
            "file", String f]
   | Set_max_tasks_req n ->
@@ -203,7 +207,7 @@ let convert_constructor_message (m: message_notification) =
   | Parse_Or_Type_Error _ -> String "Parse_Or_Type_Error"
   | Error _               -> String "Error"
   | Open_File_Error _     -> String "Open_File_Error"
-
+  | File_Saved _          -> String "File_Saved"
 
 let convert_message (m: message_notification) =
   let cc = convert_constructor_message in
@@ -249,6 +253,9 @@ let convert_message (m: message_notification) =
   | Open_File_Error s ->
       Obj ["mess_notif", cc m;
            "open_error", String s]
+  | File_Saved s ->
+      Obj ["mess_notif", cc m;
+           "information", String s]
 
 let print_notification_to_json (n: notification): Json_base.value =
   let cc = convert_notification_constructor in
@@ -525,8 +532,7 @@ let parse_message j =
   | _ -> raise NotMessage
 
 
-
-exception NotNotification
+exception NotNotification of string
 
 let parse_notification constr l =
   match constr, l with
@@ -551,13 +557,19 @@ let parse_notification constr l =
   | "Task", ["node_ID", Int nid;
              "task", String s] ->
        Task (nid, s)
-  | _ -> raise NotNotification
+  | "Next_Unproven_Node_Id", [ "node_ID", Int nid1;
+                               "node_ID", Int nid2 ] ->
+     Next_Unproven_Node_Id (nid1, nid2)
+  | "File_contents", [ "file", String f;
+                       "content", String s ] ->
+     File_contents(f,s)
+  | s, _ -> raise (NotNotification ("<from parse_notification> " ^ s))
 
 let parse_notification_json j =
   match j with
   | Obj (("notification", String constr) :: l) ->
       parse_notification constr l
-  | _ -> raise NotNotification
+  | _ -> raise (NotNotification "<from parse_notification_json>")
 
 let parse_json_object (s: string) =
   let lb = Lexing.from_string s in

@@ -833,9 +833,12 @@ let on_selected_row r =
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     (fun () ->
-      match get_selected_row_references () with
-        | [r] -> on_selected_row r
-        | _ -> ())
+     begin
+       match get_selected_row_references () with
+       | [r] -> on_selected_row r
+       | _ -> ()
+     end (* ;
+     command_entry#misc#grab_focus () *))
 
 let remove_item: GMenu.menu_item =
   file_factory#add_item "Remove"
@@ -1009,7 +1012,11 @@ let if_selected_alone id f =
      if i = id || Some i = get_parent id then f id
   | _ -> ()
 
-let treat_notification n = match n with
+let treat_notification n =
+  (* temporary: this should be better executed each time
+     one clicks on the tree view *)
+  command_entry#misc#grab_focus ();
+  match n with
   | Node_change (id, uinfo)        ->
      begin
        match uinfo with
@@ -1032,6 +1039,11 @@ let treat_notification n = match n with
             goals_view#selection#select_iter iter)
   | New_node (id, parent_id, typ, name, detached) ->
      begin
+       let name =
+         if typ = NGoal then
+           List.hd (Strings.rev_split '.' name)
+         else name
+       in
        try
          let parent = get_node_row parent_id in
          ignore (new_node ~parent id name typ false detached)

@@ -539,7 +539,9 @@ let interpNotif (n: notification) =
       TaskList.onclick_do_something (string_of_int nid);
       sendRequest (Get_task (string_of_int nid))
   | File_contents (_f,_s) ->
-     assert false (* TODO *)
+     PE.error_print_msg "Notification File_contents not handled yet"
+  | Next_Unproven_Node_Id (_nid1,_nid2) ->
+     PE.error_print_msg "Notification Next_Unproven_Node_Id not handled yet"
   | Task (nid, task) ->
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->

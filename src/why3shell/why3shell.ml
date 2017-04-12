@@ -102,6 +102,7 @@ let treat_message_notification fmt msg = match msg with
   | Replay_Info s          -> fprintf fmt "%s@." s
   | Query_Info (_id, s)    -> fprintf fmt "%s@." s
   | Query_Error (_id, s)   -> fprintf fmt "%s@." s
+  | File_Saved s           -> fprintf fmt "%s@." s
   | Help s                 -> fprintf fmt "%s@. Additionally for shell:\n\
 goto n -> focuse on n\n\
 ng -> next node\n\
