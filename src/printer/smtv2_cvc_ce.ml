@@ -59,7 +59,7 @@ let ident_printer () =
       "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
-      "rotate_right"; "bvredor"; "bvredand";
+      "rotate_right";
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
@@ -106,7 +106,10 @@ let ident_printer () =
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
-      "map"; "bv"; "subset"; "union"; "default"
+      "map"; "bv"; "subset"; "union"; "default";
+
+      (* floats *)
+      "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -115,6 +118,7 @@ let ident_printer () =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  info_rliteral   : syntax_map;
   mutable info_model : S.t;
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
@@ -176,6 +180,21 @@ let collect_model_ls info ls =
       add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
 
+let number_format = {
+  Number.long_int_support = true;
+  Number.extra_leading_zeros_support = false;
+  Number.dec_int_support = Number.Number_default;
+  Number.hex_int_support = Number.Number_unsupported;
+  Number.oct_int_support = Number.Number_unsupported;
+  Number.bin_int_support = Number.Number_unsupported;
+  Number.def_int_support = Number.Number_unsupported;
+  Number.dec_real_support = Number.Number_unsupported;
+  Number.hex_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
+  Number.def_real_support = Number.Number_unsupported;
+}
+
 (** expr *)
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
@@ -187,21 +206,24 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = false;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } -> ts
+        | _ -> assert false (* impossible *) in
+      (* look for syntax literal ts in driver *)
+      begin match query_syntax info.info_rliteral ts.ts_name, c with
+        | Some st, Number.ConstInt c ->
+          syntax_range_literal st fmt c
+        | Some st, Number.ConstReal c ->
+          let fp = match ts.ts_def with
+            | Float fp -> fp
+            | _ -> assert false in
+          syntax_float_literal st fp fmt c
+        | None, _ -> Number.print number_format fmt c
+        (* TODO/FIXME: we must assert here that the type is either
+            ty_int or ty_real, otherwise it makes no sense to print
+            the literal. Do we ensure that preserved literal types
+            are exactly those that have a dedicated syntax? *)
+      end
   | Tvar v ->
       print_var info fmt v
   | Tapp (ls, tl) ->
@@ -210,9 +232,9 @@ let rec print_term info fmt t =
       match tl with
       | [ { t_node = Tconst _} ] ->
         begin
-          (match query_converter info.info_converters ls with
+          match query_converter info.info_converters ls with
           | None -> raise Exit
-          | Some s -> syntax_arguments s (print_term info) fmt tl);
+          | Some s -> syntax_arguments s (print_term info) fmt tl;
         end
       | _ -> raise Exit
     with Exit ->
@@ -421,7 +443,7 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_type_decl info fmt ts =
-  if ts.ts_def <> None then () else
+  if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   fprintf fmt "(declare-sort %a %i)@\n@\n"
     (print_ident info) ts.ts_name (List.length ts.ts_args)
@@ -623,6 +645,7 @@ let print_task args ?old:_ fmt task =
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_converters = Printer.get_converter_map task;
+    info_rliteral = Printer.get_rliteral_map task;
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;
