@@ -126,6 +126,71 @@ Note that the syntax for type
 expressions notably differs from the usual ML syntax (\eg the
 type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
 
+
+\subsection{Formulas}
+
+The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
+The various constructs have the following priorities and
+associativities, from lowest to greatest priority:
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+    construct & associativity \\
+    \hline\hline
+    \texttt{if then else} / \texttt{let in} & -- \\
+    label & -- \\
+    \texttt{->} / \texttt{<->} & right \\
+    \texttt{by} / \texttt{so} & right \\
+    \verb!\/! / \verb!||! & right \\
+    \verb|/\| / \verb!&&! & right \\
+    \texttt{not}  & -- \\
+    infix level 1 & left \\
+    infix level 2 & left \\
+    infix level 3 & left \\
+    infix level 4 & left \\
+    prefix        & --   \\
+    \hline
+  \end{tabular}
+\end{center}
+Note that infix symbols of level 1 include equality (\texttt{=}) and
+disequality (\texttt{<>}).
+
+\begin{figure}
+  \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
+  \caption{Syntax for formulas.}
+\label{fig:bnf:formula}
+\end{figure}
+
+Notice that there are two symbols for the conjunction: \verb|/\|
+and \verb|&&|, and similarly for disjunction. They are logically
+equivalent, but may be treated slightly differently by some
+transformations. For instance, \texttt{split} transforms the goal
+\verb|A /\ B| into subgoals \verb|A| and \verb|B|, whereas it transforms
+\verb|A && B| into subgoals \verb|A| and \verb|A -> B|. Similarly, it
+transforms \verb!not (A || B)! into subgoals \verb|not A| and
+\verb|not ((not A) /\ B)|.
+The \texttt{by}/\texttt{so} connectives are proof indications. They are
+logically equivalent to their first argument, but may affect the result
+of some transformations. For instance, the \texttt{split\_goal}
+transformations interpret those connectives as introduction of logical cuts
+ (see~\ref{tech:trans:split} for details).
+
+\subsection{Theories}
+
+The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
+
+\begin{figure}
+  \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
+  \caption{Syntax for theories (part 1).}
+\label{fig:bnf:theorya}
+\end{figure}
+
+\begin{figure}
+  \begin{center}\framebox{\input{./theory2_bnf.tex}}\end{center}
+  \caption{Syntax for theories (part 2).}
+\label{fig:bnf:theoryb}
+\end{figure}
+
 \subsubsection{Algebraic types}
 
 TO BE COMPLETED
@@ -220,70 +285,6 @@ axiom fliteral42_axiom : f'real fliteral42 = 0.5 /\ f'isFinite fliteral42
 
 This type is used in the standard library in the theories
 \texttt{ieee\_float.Float32} and \texttt{ieee\_float.Float64}.
-
-\subsection{Formulas}
-
-The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
-The various constructs have the following priorities and
-associativities, from lowest to greatest priority:
-\begin{center}
-  \begin{tabular}{|l|l|}
-    \hline
-    construct & associativity \\
-    \hline\hline
-    \texttt{if then else} / \texttt{let in} & -- \\
-    label & -- \\
-    \texttt{->} / \texttt{<->} & right \\
-    \texttt{by} / \texttt{so} & right \\
-    \verb!\/! / \verb!||! & right \\
-    \verb|/\| / \verb!&&! & right \\
-    \texttt{not}  & -- \\
-    infix level 1 & left \\
-    infix level 2 & left \\
-    infix level 3 & left \\
-    infix level 4 & left \\
-    prefix        & --   \\
-    \hline
-  \end{tabular}
-\end{center}
-Note that infix symbols of level 1 include equality (\texttt{=}) and
-disequality (\texttt{<>}).
-
-\begin{figure}
-  \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
-  \caption{Syntax for formulas.}
-\label{fig:bnf:formula}
-\end{figure}
-
-Notice that there are two symbols for the conjunction: \verb|/\|
-and \verb|&&|, and similarly for disjunction. They are logically
-equivalent, but may be treated slightly differently by some
-transformations. For instance, \texttt{split} transforms the goal
-\verb|A /\ B| into subgoals \verb|A| and \verb|B|, whereas it transforms
-\verb|A && B| into subgoals \verb|A| and \verb|A -> B|. Similarly, it
-transforms \verb!not (A || B)! into subgoals \verb|not A| and
-\verb|not ((not A) /\ B)|.
-The \texttt{by}/\texttt{so} connectives are proof indications. They are
-logically equivalent to their first argument, but may affect the result
-of some transformations. For instance, the \texttt{split\_goal}
-transformations interpret those connectives as introduction of logical cuts
- (see~\ref{tech:trans:split} for details).
-
-\subsection{Theories}
-
-The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
-
-\begin{figure}
-  \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
-  \caption{Syntax for theories (part 1).}
-\label{fig:bnf:theorya}
-\end{figure}
-
-\begin{figure}
-  \begin{center}\framebox{\input{./theory2_bnf.tex}}\end{center}
-  \caption{Syntax for theories (part 2).}
-\label{fig:bnf:theoryb}
-\end{figure}
 
 \subsection{Files}
 
