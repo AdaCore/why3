@@ -297,17 +297,26 @@ let cols = new GTree.column_list
 let name_column = cols#add Gobject.Data.string
 let node_id_column = cols#add Gobject.Data.int
 let status_column = cols#add Gobject.Data.gobject
+let time_column = cols#add Gobject.Data.string
 
 let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
 let view_name_column = GTree.view_column ~title:"Theories/Goals" ()
 let () =
   view_name_column#pack name_renderer;
   view_name_column#add_attribute name_renderer "text" name_column;
-  view_name_column#set_sizing `AUTOSIZE
+(*  view_name_column#set_sizing `AUTOSIZE; *)
+  view_name_column#set_resizable true;
+  view_name_column#set_max_width 500
 
 let status_renderer = GTree.cell_renderer_pixbuf [ ]
 let view_status_column = GTree.view_column ~title:"Status"
-    ~renderer:(status_renderer, ["pixbuf", status_column])()
+    ~renderer:(status_renderer, ["pixbuf", status_column])
+    ()
+
+let view_time_column =
+  let renderer = GTree.cell_renderer_text [`XALIGN 0.] in
+  GTree.view_column ~title:"Time"
+    ~renderer:(renderer, ["text", time_column]) ()
 
 let goals_model,goals_view =
   Debug.dprintf debug "[GUI] Creating tree model...@?";
@@ -319,11 +328,12 @@ let goals_model,goals_view =
  *)
   ignore (view#append_column view_name_column);
   ignore (view#append_column view_status_column);
-(*
-  ignore (view#append_column view_status_column);
   ignore (view#append_column view_time_column);
-*)
-  Debug.dprintf debug " done@.";
+  view_status_column#set_resizable false;
+  view_status_column#set_visible true;
+  view_time_column#set_resizable false;
+  view_time_column#set_visible true;
+  Debug.dprintf debug "[GTK IDE] done@.";
   model,view
 
 
@@ -826,7 +836,7 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         send_request (Get_task id)
-    | _ -> task_view#source_buffer#set_text ""
+    | _ ->  send_request (Get_task id)
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
@@ -1013,10 +1023,7 @@ let if_selected_alone id f =
   | _ -> ()
 
 let treat_notification n =
-  (* temporary: this should be better executed each time
-     one clicks on the tree view *)
-  command_entry#misc#grab_focus ();
-  match n with
+  begin match n with
   | Node_change (id, uinfo)        ->
      begin
        match uinfo with
@@ -1079,6 +1086,11 @@ let treat_notification n =
     end
   | Dead _ ->
      print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
+  end;
+  (* temporary: this should be better executed each time
+     one clicks on the tree view *)
+(*  command_entry#misc#grab_focus () *)
+  ()
 
 
 (***********************)

@@ -551,16 +551,16 @@ let interpNotif (n: notification) =
   | Message m ->
     begin
       match m with
-      | Proof_error (nid, s) ->
+      | Proof_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Proof error on selected node: \"%s\"" s)
-      | Transf_error (nid, s) ->
+      | Transf_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Transformation error on selected node: \"%s\"" s)
-      | Strat_error (nid, s) ->
+      | Strat_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Strategy error on selected node: \"%s\"" s)
-      | Query_Error (nid, s) ->
+      | Query_Error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Query error on selected node: \"%s\"" s)
       | Query_Info (nid, s) -> PE.error_print_msg s

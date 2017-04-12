@@ -1361,7 +1361,9 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
 (************************)
 
 module Mprover = Whyconf.Mprover
+(* dead code
 module Sprover = Whyconf.Sprover
+*)
 module PHprover = Whyconf.Hprover
 
 open Format

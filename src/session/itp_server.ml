@@ -459,7 +459,12 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | ATh th ->
       (theory_name th).Ident.id_string
     | ATn tn ->
-      get_transf_name d.cont.controller_session tn
+       let name = get_transf_name d.cont.controller_session tn in
+       let args = get_transf_args d.cont.controller_session tn in
+       let full = String.concat " " (name :: args) in
+       if String.length full >= 40 then
+         String.sub full 0 40 ^ " ..."
+       else full
     | APn pn ->
       (get_proof_name d.cont.controller_session pn).Ident.id_string
     | APa pa ->
@@ -692,15 +697,19 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | ATh t ->
        P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string))
     | APa pid ->
-       let parid = get_proof_attempt_parent  d.cont.controller_session pid in
+       let pa = get_proof_attempt_node  d.cont.controller_session pid in
+       let parid = pa.parent in
+       let name = Pp.string_of Whyconf.print_prover pa.prover in
        let s = task_of_id d parid in
-       P.notify (Task (nid,s))
+       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n"))
     | AFile f ->
        P.notify (Task (nid, "File " ^ f.file_name))
     | ATn tid ->
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
-       P.notify (Task (nid, "Transformation " ^ String.concat " " (name :: args)))
+       let parid = get_trans_parent d.cont.controller_session tid in
+       let s = task_of_id d parid in
+       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n"))
 
   (* -------------------- *)
 
