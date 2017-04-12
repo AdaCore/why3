@@ -547,6 +547,7 @@ let show_about_window () =
                 "Sylvie Boldo";
                 "Martin Clochard";
                 "Simon Cruanes";
+                "Sylvain Dailler";
                 "Clément Fumex";
                 "Leon Gondelman";
                 "David Hauzar";
@@ -561,7 +562,7 @@ let show_about_window () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2016 Inria, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2017 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr"
       ~website_label:"http://why3.lri.fr"
