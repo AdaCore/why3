@@ -1093,6 +1093,29 @@ let treat_notification n =
   ()
 
 
+
+(*************)
+(* Help menu *)
+(*************)
+
+
+let help_menu = factory#add_submenu "_Help"
+let help_factory = new GMenu.factory help_menu ~accel_group
+
+let (_ : GMenu.image_menu_item) =
+  help_factory#add_image_item
+    ~label:"Legend"
+    ~callback:show_legend_window
+    ()
+
+let (_ : GMenu.image_menu_item) =
+  help_factory#add_image_item
+    ~label:"About"
+    ~callback:show_about_window
+    ()
+
+
+
 (***********************)
 (* start the interface *)
 (***********************)
