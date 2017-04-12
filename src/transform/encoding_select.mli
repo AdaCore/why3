@@ -9,3 +9,16 @@
 (*                                                                  *)
 (********************************************************************)
 
+
+(*
+
+These modules are used only for their side-effects at load time
+
+Do not remove these from the .mli, it would trigger the new warning 60
+of OCaml 4.04
+
+*)
+
+module Kept : sig end
+module Lskept : sig end
+module Lsinst : sig end

@@ -55,6 +55,8 @@ let print_ident_path fmt ip =
     ip.ip_theory
     (Pp.print_list Pp.dot Pp.string) ip.ip_qualid
 
+(* dead code
+
 let compare_ident_path x y =
   let c = Lists.compare String.compare x.ip_library y.ip_library in
   if c <> 0 then -c else (* in order to be bottom up *)
@@ -71,9 +73,9 @@ module Pos = struct
 end
 
 module Mpos = Extmap.Make(Pos)
-(*
 module Spos = Extset.MakeOfMap(Mpos)
 module Hpos = Exthtbl.Make(Pos)
+
 *)
 
 type meta_args = meta_arg list
