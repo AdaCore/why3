@@ -2036,7 +2036,6 @@ MORE_DIST = configure install-sh doc/manual.pdf
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
-	rm -rf distrib/$(EXTRANAME)/ distrib/$(EXTRANAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
 	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
