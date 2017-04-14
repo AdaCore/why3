@@ -96,3 +96,4 @@ type ide_request =
   | Reload_req
   | Replay_req
   | Exit_req
+  | Interrupt_req

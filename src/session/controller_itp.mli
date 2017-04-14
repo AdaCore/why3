@@ -159,6 +159,10 @@ val register_observer : (int -> int -> int -> unit) -> unit
     tasks, scheduled tasks, and running taks, each time these numbers
     change *)
 
+val interrupt : unit -> unit
+(** discards all scheduled proof attempts or transformations, including
+    the one already running *)
+
 val schedule_proof_attempt :
   controller ->
   proofNodeID ->

@@ -232,6 +232,7 @@ type command =
   | Transform    of string * Trans.gentrans * string list
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
+  | Interrupt
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -250,6 +251,7 @@ let interp_others commands config cmd args =
             | _ -> "1"
           in
           Strategies s
+      | "interrupt" -> Interrupt
       | "help" ->
           let text = Pp.sprintf
                           "Please type a command among the following (automatic completion available)@\n\

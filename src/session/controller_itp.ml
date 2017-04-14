@@ -506,6 +506,20 @@ let timeout_handler () =
   !observer scheduled (waiting_or_running - running) running;
   true
 
+let interrupt () =
+  while not (Queue.is_empty prover_tasks_in_progress) do
+    let (_ses,_id,_pr,callback,_started,_call) =
+      Queue.pop prover_tasks_in_progress in
+    (* TODO: apply some Call_provers.interrupt_call call *)
+    callback Interrupted
+  done;
+  number_of_running_provers := 0;
+  while not (Queue.is_empty scheduled_proof_attempts) do
+    let (_c,_id,_pr,_limit,callback) = Queue.pop scheduled_proof_attempts in
+    callback Interrupted
+  done;
+  !observer 0 0 0
+
 let run_timeout_handler () =
   if not !timeout_handler_running then
     begin
@@ -593,7 +607,8 @@ let run_strategy_on_goal
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
               callback STShalt
-           | Interrupted | InternalFailure _
+           | Interrupted | InternalFailure _ ->
+              callback STShalt
            | Done _ ->
               (* proof did not succeed, goto to next step *)
               callback (STSgoto (g,pc+1));

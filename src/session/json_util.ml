@@ -129,6 +129,7 @@ let convert_request_constructor (r: ide_request) =
   | Reload_req                -> String "Reload_req"
   | Replay_req                -> String "Replay_req"
   | Exit_req                  -> String "Exit_req"
+  | Interrupt_req             -> String "Interrupt_req"
 
 let print_request_to_json (r: ide_request): Json_base.value =
   let cc = convert_request_constructor in
@@ -191,6 +192,8 @@ let print_request_to_json (r: ide_request): Json_base.value =
   | Replay_req ->
       Obj ["ide_request", cc r]
   | Exit_req ->
+      Obj ["ide_request", cc r]
+  | Interrupt_req ->
       Obj ["ide_request", cc r]
 
 let convert_constructor_message (m: message_notification) =

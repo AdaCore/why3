@@ -686,7 +686,7 @@ let image_of_pa_status ~obsolete pa =
   match pa with
   | Controller_itp.Unedited -> !image_scheduled (* TODO !image_unedited *)
   | Controller_itp.JustEdited -> !image_scheduled (* TODO !image_edited *)
-  | Controller_itp.Interrupted -> !image_scheduled (* TODO !image_interrrupted *)
+  | Controller_itp.Interrupted -> !image_undone
   | Controller_itp.Scheduled -> !image_scheduled
   | Controller_itp.Running -> !image_running
   | Controller_itp.InternalFailure _e -> !image_failure

@@ -294,6 +294,7 @@ let print_request fmt r =
   | Reload_req                      -> fprintf fmt "reload"
   | Replay_req                      -> fprintf fmt "replay"
   | Exit_req                        -> fprintf fmt "exit"
+  | Interrupt_req                   -> fprintf fmt "interrupt"
 
 let print_msg fmt m =
   match m with
@@ -1020,6 +1021,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         save_file name text;
     | Get_task nid                 -> send_task nid
     | Replay_req                   -> replay_session (); resend_the_tree ()
+    | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
@@ -1028,6 +1030,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        -> schedule_proof_attempt nid p limit
         | Strategies st           -> run_strategy_on_task nid st
+        | Interrupt               -> C.interrupt ()
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
