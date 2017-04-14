@@ -366,7 +366,13 @@ let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <-
     empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
-  Stdlib.Hstr.iter (merge_file old_ses c ~use_shapes) (get_files old_ses)
+  try
+    Stdlib.Hstr.iter
+      (fun f -> merge_file old_ses c ~use_shapes f)
+      (get_files old_ses)
+  with e ->
+    c.controller_session <- old_ses;
+    raise e
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in

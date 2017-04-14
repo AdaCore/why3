@@ -340,10 +340,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     { config : Whyconf.config;
       task_driver : Driver.driver;
       sd_provers : Whyconf.config_prover Whyconf.Mprover.t;
-      (* true if the controller is in a correct state *)
-      mutable cont_status: bool;
-      (* Session file used in the first correct state of the controller *)
-      mutable init_file: string option;
       cont : Controller_itp.controller;
     }
 
@@ -386,40 +382,35 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     let d = get_server_data () in
     let s = d.cont.controller_session in
     let files = Session_itp.get_files s in
-    Stdlib.Hstr.iter (fun _ f -> read_and_send f.file_name) files
+    Stdlib.Hstr.iter (fun _ f ->
+                      Format.eprintf "File : %s@." f.file_name;
+                      read_and_send f.file_name) files
 
   (* Manipulations of files that handle errors and update the status of the
      controller in server data. *)
   let cont_from_session_dir cont f =
-    let d = get_server_data () in
-    try cont_from_session_dir cont f; d.cont_status <- true; true with
+    try cont_from_session_dir cont f; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
         P.notify (Message (Parse_Or_Type_Error s));
-        d.cont_status <- false;
         load_files_session ();
         false
 
   let cont_from_file cont f =
-    let d = get_server_data () in
-    (* Tries to reload even if controller is not correct to regenerate a
-       correct one. *)
-    try cont_from_file cont f; d.cont_status <- true; true with
+    try cont_from_file cont f; true with
     | e ->
         let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
         P.notify (Message (Parse_Or_Type_Error s));
-        d.cont_status <- false;
+        load_files_session ();
         false
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    let d = get_server_data () in
-    try reload_files cont ~use_shapes; d.cont_status <- true; true with
+    try reload_files cont ~use_shapes; true with
     | e ->
       let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
       P.notify (Message (Parse_Or_Type_Error s));
-      d.cont_status <- false;
       false
 
   let add_file c ?format fname =
@@ -463,9 +454,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
                      { config = config;
                        task_driver = task_driver;
                        sd_provers = provers;
-  (* controller is not initialized with a session -> incorrect state *)
-                       cont_status = false;
-                       init_file = None;
                        cont = c }
 
 
@@ -823,28 +811,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
           P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
           exit 1
 
-  (* Safe reload_files that do not make inconsistent server_data. If
-     reload_files fail, stable_cont is set to false and we know the
-     controller is in bad state *)
-  let reload_files cont ~use_shapes =
-    let d = get_server_data () in
-    (* First try to regenerate the controller with same arguments as its last
-       correct generation *)
-    if not d.cont_status then
-      begin
-        match d.init_file with
-        | None -> P.notify (Message (Error "You have to successfully open a \
-session at least once before reloading")); false
-        | Some f ->
-          let b = init_cont f in
-          if b then
-            reload_files cont ~use_shapes
-          else
-            false (* Eventually print debug here *)
-      end
-    else
-      reload_files cont ~use_shapes
-
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
@@ -959,10 +925,8 @@ session at least once before reloading")); false
     clear_tables ();
     (* Calling reload_files breaks the controller if it fails *)
     let b = reload_files d.cont ~use_shapes:true in
-    if b then
-      init_and_send_the_tree ()
-    else
-      d.cont_status <- false
+    if b then init_and_send_the_tree ()
+
 
   let replay_session () : unit =
     let d = get_server_data () in
@@ -1071,7 +1035,6 @@ session at least once before reloading")); false
       read_and_send f
     | Open_session_req file_or_dir_name ->
         let b = init_cont file_or_dir_name in
-        d.init_file <- Some file_or_dir_name;
         if b then
           reload_session ()
         else
