@@ -285,7 +285,7 @@ let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
 *)
 
 
-(* view for the session tree *)
+(** {2 view for the session tree} *)
 let scrolled_session_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -293,30 +293,55 @@ let scrolled_session_view =
     ~packing:scrollview#add
     ()
 
+(** {3 the model for tree view} *)
+
 let cols = new GTree.column_list
-let name_column = cols#add Gobject.Data.string
+(* first column: unique id of the object *)
 let node_id_column = cols#add Gobject.Data.int
+(* second column: an icon identifying the object: file,theory, goal, transformation *)
+let icon_column = cols#add Gobject.Data.gobject
+(* third column: name of the object *)
+let name_column = cols#add Gobject.Data.string
+(* fourth column: icon status for the object: proved/unproved, unknown, timeout, etc. *)
 let status_column = cols#add Gobject.Data.gobject
+(* fifth column: extra status info: time, obsolete status, limits *)
 let time_column = cols#add Gobject.Data.string
 
-let name_renderer = GTree.cell_renderer_text [`XALIGN 0.]
-let view_name_column = GTree.view_column ~title:"Theories/Goals" ()
-let () =
-  view_name_column#pack name_renderer;
-  view_name_column#add_attribute name_renderer "text" name_column;
-(*  view_name_column#set_sizing `AUTOSIZE; *)
-  view_name_column#set_resizable true;
-  view_name_column#set_max_width 500
+(* first view column: icon and name *)
+let view_name_column =
+  let v = GTree.view_column ~title:"Theories/Goals" () in
+  (* icon attribute *)
+  let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
+  v#pack icon_renderer ;
+  v#add_attribute icon_renderer "pixbuf" icon_column;
+  let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] in
+  v#pack name_renderer;
+  v#add_attribute name_renderer "text" name_column;
+(*  v#set_sizing `AUTOSIZE; *)
+  v#set_resizable true;
+  v#set_max_width 500;
+  v
 
-let status_renderer = GTree.cell_renderer_pixbuf [ ]
-let view_status_column = GTree.view_column ~title:"Status"
-    ~renderer:(status_renderer, ["pixbuf", status_column])
-    ()
+(* second view column: status *)
+
+let view_status_column =
+  let status_renderer = GTree.cell_renderer_pixbuf [ ] in
+  let v = GTree.view_column ~title:"Status"
+                            ~renderer:(status_renderer, ["pixbuf", status_column])
+                            ()
+  in
+  v#set_resizable false;
+  v#set_visible true;
+  v
 
 let view_time_column =
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] in
-  GTree.view_column ~title:"Time"
-    ~renderer:(renderer, ["text", time_column]) ()
+  let v = GTree.view_column ~title:"Time"
+                            ~renderer:(renderer, ["text", time_column]) ()
+  in
+  v#set_resizable false;
+  v#set_visible true;
+  v
 
 let goals_model,goals_view =
   Debug.dprintf debug "[GUI] Creating tree model...@?";
@@ -325,14 +350,11 @@ let goals_model,goals_view =
 (*
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
   let () = view#set_rules_hint true in
- *)
+*)
+  let () = view#set_enable_search false in
   ignore (view#append_column view_name_column);
   ignore (view#append_column view_status_column);
   ignore (view#append_column view_time_column);
-  view_status_column#set_resizable false;
-  view_status_column#set_visible true;
-  view_time_column#set_resizable false;
-  view_time_column#set_visible true;
   Debug.dprintf debug "[GTK IDE] done@.";
   model,view
 
@@ -399,6 +421,35 @@ let clear_tree_and_table goals_model =
 (**************)
 (* Menu items *)
 (**************)
+
+
+let (_ : GMenu.image_menu_item) =
+  file_factory#add_image_item ~label:"_Preferences" ~callback:
+    (fun () ->
+      Gconfig.preferences gconfig;
+(* TODO:
+      begin
+        match !current_env_session with
+          | None -> ()
+          | Some e ->
+              Session.update_env_session_config e gconfig.config;
+              Session.unload_provers e
+      end;
+      recreate_gui ();
+(*
+      Mprover.iter
+        (fun p pi ->
+          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
+            pi.editor)
+        (Whyconf.get_provers gconfig.config);
+*)
+
+      let nb = gconfig.session_nb_processes in
+      S.set_max_tasks nb
+*)
+    ())
+    ()
+
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
     ~callback:(fun () -> send_request Save_req)
@@ -703,6 +754,13 @@ let new_node ?parent ?(collapse=false) id name typ proved detached =
     in
     goals_model#set ~row:iter ~column:name_column name;
     goals_model#set ~row:iter ~column:node_id_column id;
+    goals_model#set ~row:iter ~column:icon_column
+      (match typ with
+         | NGoal -> !image_goal
+         | NRoot | NFile -> !image_file
+         | NTheory -> !image_theory
+         | NTransformation -> !image_transf
+         | NProofAttempt -> !image_prover);
     let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
     (* By default expand_path when creating a new node *)
     if not collapse then goals_view#expand_to_path (goals_model#get_path iter);
