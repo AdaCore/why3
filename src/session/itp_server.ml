@@ -313,7 +313,12 @@ let print_msg fmt m =
 
 let print_notify fmt n =
   match n with
-  | Node_change (_ni, _nf)             -> fprintf fmt "node change"
+  | Node_change (ni, nf)               ->
+      begin
+        match nf with
+        | Proved b -> fprintf fmt "node change %d Proved %b" ni b
+        | _        -> fprintf fmt "node change %d" ni
+      end
   | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
   | Remove _ni                         -> fprintf fmt "remove"
   | Next_Unproven_Node_Id (_ni, _nj)   -> fprintf fmt "next unproven node_id"

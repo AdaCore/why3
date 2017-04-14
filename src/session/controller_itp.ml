@@ -208,19 +208,30 @@ let update_trans_node notification c id b =
      notification (ATn id) b);
   propagate_proof notification c (get_trans_parent c.controller_session id)
 
+(** TODO make the whole reloading of proof_state more efficient and natural *)
+
+(* Note that f has side effect on the elements of l. We want this effect to
+   happen. That's why we cannot use List.for_all (respectively List.exists)
+   directly (List.for_all stops on first element that evaluates to false) *)
+let for_all_se f l =
+  List.for_all (fun b -> b) (List.map f l)
+
+let exists_se f l =
+  List.exists (fun b -> b) (List.map f l)
+
 (* init proof state after reload *)
 let rec reload_goal_proof_state ps c g =
   let ses = c.controller_session in
   let tr_list = get_transformations ses g in
   let pa_list = get_proof_attempts ses g in
-  let proved = List.exists (reload_trans_proof_state ps c) tr_list in
-  let proved = List.exists reload_pa_proof_state pa_list || proved in
+  let proved = exists_se (reload_trans_proof_state ps c) tr_list in
+  let proved = exists_se reload_pa_proof_state pa_list || proved in
   Hpn.replace c.proof_state.pn_state g proved;
   proved
 
 and reload_trans_proof_state ps c tr =
   let proof_list = get_sub_tasks c.controller_session tr in
-  let proved = List.for_all (reload_goal_proof_state ps c) proof_list in
+  let proved = for_all_se (reload_goal_proof_state ps c) proof_list in
   Htn.replace c.proof_state.tn_state tr proved;
   proved
 
@@ -233,9 +244,18 @@ and reload_pa_proof_state pa =
 let reload_theory_proof_state c th =
   let ps = c.proof_state in
   let goals = theory_goals th in
-  let proved = List.for_all (reload_goal_proof_state ps c) goals in
-  Hid.replace ps.th_state (theory_name th)
-    proved
+  let proved = for_all_se (reload_goal_proof_state ps c) goals in
+  Hid.replace ps.th_state (theory_name th) proved
+
+(* to be called after reload *)
+let reload_file_proof_state c f =
+  List.iter (reload_theory_proof_state c) f.file_theories
+
+(* to be called after reload *)
+let reload_session_proof_state c =
+  Stdlib.Hstr.iter
+    (fun _ f -> reload_file_proof_state c f)
+    (get_files c.controller_session)
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
@@ -357,10 +377,7 @@ let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
   merge_file_section
     c.controller_session ~use_shapes ~old_ses ~old_theories
     ~env:c.controller_env file_name new_theories format;
-  Stdlib.Hstr.iter
-    (fun _ f -> List.iter (reload_theory_proof_state c) f.file_theories)
-    (get_files c.controller_session)
-
+  reload_session_proof_state c
 
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
