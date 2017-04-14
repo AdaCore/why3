@@ -424,10 +424,9 @@ let clear_tree_and_table goals_model =
 
 
 let (_ : GMenu.image_menu_item) =
-  file_factory#add_image_item ~label:"_Preferences" ~callback:
-    (fun () ->
-      Gconfig.preferences gconfig;
-(* TODO:
+  let callback () =
+    Gconfig.preferences gconfig;
+    (* TODO:
       begin
         match !current_env_session with
           | None -> ()
@@ -442,13 +441,12 @@ let (_ : GMenu.image_menu_item) =
           Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
             pi.editor)
         (Whyconf.get_provers gconfig.config);
-*)
-
-      let nb = gconfig.session_nb_processes in
-      S.set_max_tasks nb
-*)
-    ())
-    ()
+     *)
+     *)
+    let nb = gconfig.session_nb_processes in
+    send_request (Set_max_tasks_req nb)
+  in
+  file_factory#add_image_item ~label:"_Preferences" ~callback ()
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
@@ -551,7 +549,7 @@ let hbox22221 =
 let monitor =
   GMisc.label
     ~text:"  0/0/0"
-    ~width:80
+    ~width:100
     ~xalign:0.0
     ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
