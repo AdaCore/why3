@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -32,6 +32,7 @@ type th_rule =
   | Rsyntaxfs  of qualid * string * bool
   | Rsyntaxps  of qualid * string * bool
   | Rconverter of qualid * string * bool
+  | Rliteral   of qualid * string * bool
   | Rremovepr  of qualid
   | Rremoveall
   | Rmeta      of string * metarg list

@@ -692,12 +692,12 @@ module Translate = struct
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
     begin match s.its_def, itd.itd_constructors, itd.itd_fields with
-      | None, [], [] ->
+      | NoDef, [], [] ->
         ML.mk_its_defn id args is_private None
-      | None, cl, [] ->
+      | NoDef, cl, [] ->
         let cl = ddata_constructs cl in
         ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
-      | None, _, pjl ->
+      | NoDef, _, pjl ->
         let p e = not (rs_ghost e) in
         let pjl = filter_ghost_params p drecord_fields pjl in
         begin match pjl with
@@ -706,8 +706,10 @@ module Translate = struct
             ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
           | pjl -> ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
         end
-      | Some t, _, _ ->
+      | Alias t, _, _ ->
          ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
+      | Range _, _, _ -> assert false (* TODO *)
+      | Float _, _, _ -> assert false (* TODO *)
     end
 
   exception ExtractionVal of rsymbol

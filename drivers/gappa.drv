@@ -30,6 +30,7 @@ theory BuiltIn
   syntax type int   "int"
   syntax type real  "real"
   syntax predicate (=)  "dummy"
+  meta "eliminate_algebraic" "keep_enums"
 end
 
 theory int.Int
@@ -159,6 +160,42 @@ theory floating_point.Double
 
   syntax function round "float<ieee_64,%1>(%2)"
   meta "instantiate:auto" prop Bounded_value
+
+end
+
+theory ieee_float.RoundingMode
+
+  syntax function RNE "ne"
+  syntax function RTZ "zr"
+  syntax function RTP "up"
+  syntax function RTN "dn"
+  syntax function RNA "na"
+
+end
+
+theory ieee_float.GenericFloat
+
+  meta "instantiate : auto" prop zero_to_real
+  meta "instantiate : auto" prop is_finite
+  meta "instantiate : auto" prop lt_finite
+  meta "instantiate : auto" prop le_finite
+  meta "instantiate : auto" prop neg_finite
+  meta "instantiate : auto" prop add_finite
+  meta "instantiate : auto" prop sub_finite
+  meta "instantiate : auto" prop mul_finite
+  meta "instantiate : auto" prop div_finite
+
+end
+
+theory ieee_float.Float32
+
+  syntax function round "float<ieee_32,%1>(%2)"
+
+end
+
+theory ieee_float.Float64
+
+  syntax function round "float<ieee_64,%1>(%2)"
 
 end
 

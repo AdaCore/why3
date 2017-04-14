@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -40,27 +40,31 @@ let do_parsing model =
     Warning.emit
       ~loc:(get_position lexbuf)
       "Error@ during@ lexing@ of@ smtlib@ model:@ unexpected character";
-    []
+    Stdlib.Mstr.empty
   | Parse_smtv2_model_parser.Error ->
     begin
       let loc = get_position lexbuf in
       Warning.emit ~loc:loc "Error@ during@ parsing@ of@ smtlib@ model";
-      []
+      Stdlib.Mstr.empty
     end
+
+let do_parsing model =
+  let m = do_parsing model in
+  Collect_data_model.create_list m
 
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)
 (* For Alt-ergo the output is not the same and we
    match on "I don't know". But we also need to begin
    parsing on a fresh new line ".*" ensures it *)
-let parse input =
+let parse : raw_model_parser = function input ->
   try
     let r = Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
     ignore (Str.search_forward r input 0);
     let match_end = Str.match_end () in
-    let model_string =
-      String.sub input match_end ((String.length input) - match_end) in
-
+    let nr = Str.regexp "^)" in
+    let res = Str.search_backward nr input (String.length input) in
+    let model_string = String.sub input match_end (res + 1 - match_end) in
     do_parsing model_string
   with
   | Not_found -> []

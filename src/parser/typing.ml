@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -289,8 +289,10 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dterm tuc gvars at denv e23) in
       chain loc (dterm tuc gvars at denv e1) op1 e23
-  | Ptree.Tconst c ->
-      DTconst c
+  | Ptree.Tconst (Number.ConstInt _ as c) ->
+      DTconst (c, ty_int)
+  | Ptree.Tconst (Number.ConstReal _ as c) ->
+      DTconst (c, ty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm tuc gvars at denv e1 in
@@ -365,7 +367,12 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm tuc gvars at denv e1, Slab.singleton lab)
   | Ptree.Tcast (e1, ty) ->
-      DTcast (dterm tuc gvars at denv e1, ty_of_pty tuc ty))
+    (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
+      let e1 = dterm tuc gvars at denv e1 in
+      let ty = ty_of_pty tuc ty in
+      match e1.dt_node with
+      | DTconst (c,_) -> DTconst (c, ty)
+      | _ -> DTcast (e1, ty))
 
 (** typing program expressions *)
 
@@ -874,6 +881,8 @@ let add_types muc tdl =
             let invl = List.map type_inv d.td_inv in
             let itd = create_plain_record_decl ~priv ~mut id args fl invl in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
+    | TDrange _ -> assert false (* TODO *)
+    | TDfloat _ -> assert false (* TODO *)
 
   and parse ~loc ~alias ~alg pty =
     let rec down = function

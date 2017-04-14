@@ -120,6 +120,8 @@ theory BV_Gen
   axiom Nth_zeros:
     forall n:int. nth zeros n = False
 
+  val constant one : t
+
   val constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size -> nth ones n = True
@@ -241,13 +243,12 @@ theory BV_Gen
   axiom to_uint_of_int :
     forall i. 0 <= i < two_power_size -> to_uint (of_int i) = i
 
-  constant size_bv : t = of_int size
+  constant size_bv : t
 
-  axiom Of_int_zeros:
-    zeros = of_int 0
-
-  axiom Of_int_ones:
-    ones = of_int max_int
+  axiom to_uint_size_bv : to_uint size_bv = size
+  axiom to_uint_zeros   : to_uint zeros = 0
+  axiom to_uint_one     : to_uint one = 1
+  axiom to_uint_ones    : to_uint ones = max_int
 
   (* comparison operators *)
 
@@ -360,7 +361,7 @@ theory BV_Gen
 
   axiom nth_bv_def:
     forall x i.
-      nth_bv x i = not (bw_and (lsr_bv x i) (of_int 1) = zeros)
+      nth_bv x i = not (bw_and (lsr_bv x i) one = zeros)
 
   axiom Nth_bv_is_nth:
     forall x i.
@@ -375,7 +376,7 @@ theory BV_Gen
   predicate eq_sub_bv t t t t
 
   axiom eq_sub_bv_def: forall a b i n.
-    let mask = lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i in
+    let mask = lsl_bv (sub (lsl_bv one n) one) i in
       eq_sub_bv a b i n = (bw_and b mask = bw_and a mask)
 
   predicate eq_sub (a b:t) (i n:int) =
@@ -400,12 +401,17 @@ end
 theory BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
-  constant max_int        : int = 0xFFFF_FFFF_FFFF_FFFF
+
+  use int.Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
 
   clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -415,12 +421,17 @@ end
 theory BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
-  constant max_int        : int = 0xFFFF_FFFF
+
+  use int.Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF_FFFF >
 
   clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -430,12 +441,17 @@ end
 theory BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
-  constant max_int : int = 0xFFFF
+
+  use int.Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF >
 
   clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -445,12 +461,17 @@ end
 theory BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
-  constant max_int        : int = 0xFF
+
+  use int.Int (* needed to use range types *)
+
+  type t = < range 0 0xFF >
 
   clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant max_int = max_int,
+    constant max_int = t'maxInt,
     goal size_pos,
     goal two_power_size_val,
     goal max_int_val
@@ -488,82 +509,82 @@ theory BVConverter_32_64
   use BV32
   use BV64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV32.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF_FFFF:BV64.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV64.t,
     type smallBV = BV32.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV32.to_uint,
-    function to_uint_big = BV64.to_uint
+    function to_uint_small = BV32.t'int,
+    function to_uint_big = BV64.t'int
 end
 
 theory BVConverter_16_64
   use BV16
   use BV64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV16.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFFFF:BV64.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV64.t,
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV16.to_uint,
-    function to_uint_big = BV64.to_uint
+    function to_uint_small = BV16.t'int,
+    function to_uint_big = BV64.t'int
 end
 
 theory BVConverter_8_64
   use BV8
   use BV64
 
-  predicate in_range (b : BV64.t) = BV64.ule b (BV64.of_int BV8.max_int)
+  predicate in_range (b : BV64.t) = BV64.ule b (0xFF:BV64.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV64.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV8.to_uint,
-    function to_uint_big = BV64.to_uint
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV64.t'int
 end
 
 theory BVConverter_16_32
   use BV16
   use BV32
 
-  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV16.max_int)
+  predicate in_range (b : BV32.t) = BV32.ule b (0xFFFF:BV32.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV32.t,
     type smallBV = BV16.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV16.to_uint,
-    function to_uint_big = BV32.to_uint
+    function to_uint_small = BV16.t'int,
+    function to_uint_big = BV32.t'int
 end
 
 theory BVConverter_8_32
   use BV8
   use BV32
 
-  predicate in_range (b : BV32.t) = BV32.ule b (BV32.of_int BV8.max_int)
+  predicate in_range (b : BV32.t) = BV32.ule b (0xFF:BV32.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV32.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV8.to_uint,
-    function to_uint_big = BV32.to_uint
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV32.t'int
 end
 
 theory BVConverter_8_16
   use BV8
   use BV16
 
-  predicate in_range (b : BV16.t) = BV16.ule b (BV16.of_int BV8.max_int)
+  predicate in_range (b : BV16.t) = BV16.ule b (0xFF:BV16.t)
 
   clone export BVConverter_Gen with
     type bigBV = BV16.t,
     type smallBV = BV8.t,
     predicate in_small_range = in_range,
-    function to_uint_small = BV8.to_uint,
-    function to_uint_big = BV16.to_uint
+    function to_uint_small = BV8.t'int,
+    function to_uint_big = BV16.t'int
 end

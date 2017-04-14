@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -690,10 +690,10 @@ let e_assign pls e0 e1 = on_value (e_assign_real pls e0) e1
 
 (* numeric constants *)
 
-let e_const t =
+let e_from_t t =
   mk_expr (Elogic t) (VTvalue (ity_of_ty_opt t.t_ty)) false eff_empty syms_empty
 
-let e_const c = e_const (t_const c)
+let e_const c ity = e_from_t (t_const c (ty_of_ity ity))
 
 (* boolean expressions *)
 

@@ -1,0 +1,108 @@
+theory A
+
+  use ieee_float.Float32
+  use ieee_float.Float64
+
+  lemma ebsb32 : Float32.t'eb = 8  /\ Float32.t'sb = 24
+  lemma ebsb64 : Float64.t'eb = 11 /\ Float64.t'sb = 53
+
+  goal a : (0.000000000000000000000000000000000000007346836890042368275170461510179868906534397169301663256398154650103540092009879458601062651723623275756835937500:Float32.t) <> (0.0:Float32.t)
+
+end
+
+module M603_018
+  use import ieee_float.Float32
+
+  constant x : t = zeroF
+  constant y : t = 1.0
+  constant z : t = y ./ (2.0:t)
+  constant t : t = (x .+ y) ./ (2.0:t)
+
+  let triplet (x y z : t)
+    requires { x .<= z /\ z .<= y }
+    requires { .-(1.0:t) .<= x /\ x .<= (10.0:t) }
+    requires { y .= x .+ (1.0:t) }
+    requires { roundToIntegral RTN z = x }
+    requires { roundToIntegral RTP z = y }
+  =
+    let t = (x .+ y) ./ (2.0:t) in
+    assert { roundToIntegral RTN x .= x };
+    assert { roundToIntegral RTN y .= y };
+    assert { roundToIntegral RTN z .= x };
+    assert { roundToIntegral RTN t .= x };
+
+    assert { roundToIntegral RTP x .= x };
+    assert { roundToIntegral RTP y .= y };
+    assert { roundToIntegral RTP z .= y };
+    assert { roundToIntegral RTP t .= y };
+
+    assert { x .<= z /\ z .<= y };
+    assert { x .<= t /\ t .<= y };
+    ()
+
+  goal G1: roundToIntegral RTN x .= x
+  goal G2: roundToIntegral RTN y .= y
+  goal G3: roundToIntegral RTN z .= x
+  goal G4: roundToIntegral RTN t .= x
+
+  goal G5: roundToIntegral RTP x .= x
+  goal G6: roundToIntegral RTP y .= y
+  goal G7: roundToIntegral RTP z .= y
+  goal G8: roundToIntegral RTP t .= y
+
+  goal G9: x .<= z /\ z .<= y
+  goal G10: x .<= t /\ t .<= y
+
+end
+
+module M121_039_nonlinear
+
+  use import ieee_float.Float32
+
+  constant max : t = 340282346638528859811704183484516925440.0
+  constant min : t = .- max
+
+  constant one : t = 1.0
+
+  predicate in_range (x :t) = min .<= x .<= max
+
+  predicate axiom_mult (a b y : t) =
+     if a .<= b /\ y .<= zeroF then a .* y .>= b .* y else false
+
+  let test (a x y:t)
+    requires { zeroF .<= a .<= one }
+    requires { .- one .<= x .<= one }
+    requires { .- one .<= y .<= one }
+    requires { x .> zeroF /\ y .< zeroF /\ x .+ y .>= zeroF }
+    ensures  { result .>= zeroF /\ result .<= (2.0:t) }
+  =
+    assert { axiom_mult a one y };
+
+    assert { a .>= zeroF };
+    assert { a .<= one };
+    assert { x .> zeroF };
+    assert { y .<= zeroF };
+    assert { y .* a .<= zeroF };
+    assert { y .* a .>= y .* one };
+    assert { x .+ y .* a .>= x .+ y };
+    assert { x .+ y .>= zeroF };
+    assert { x .+ y .* a .>= zeroF };
+
+    x .+ y .* a
+
+end
+
+module LB09_025_conversion
+
+  use import ieee_float.Float32
+  use import int.Int
+
+  let fti x
+    requires { x .>= of_int RNE (-2147483648) /\ x .+ (of_int RNE 1) .<= of_int RNE 2147483647 }
+    ensures  { of_int RNE result .>= x .- (of_int RNE 1) }
+    ensures  { of_int RNE result .<= x .+ (of_int RNE 1) }
+    ensures  { result = to_int RNE x }
+  =
+    to_int RNE x
+
+end

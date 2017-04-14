@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,6 +26,7 @@ let abstraction (keep : lsymbol -> bool) =
     | Tnot _ | Tbinop _ ->
         t_map abstract t
     | _ ->
+        let t = t_label Slab.empty t in
         let (ls, tabs) = try Hterm.find term_table t with Not_found ->
           let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
           let tabs = t_app ls [] t.t_ty in

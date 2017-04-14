@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -33,10 +33,16 @@ val tv_of_string : string -> tvsymbol
 
 (** {2 Type symbols and types} *)
 
+type 'a type_def =
+  | NoDef
+  | Alias of 'a
+  | Range of Number.int_range
+  | Float of Number.float_format
+
 type tysymbol = private {
-  ts_name : ident;
-  ts_args : tvsymbol list;
-  ts_def  : ty option;
+  ts_name      : ident;
+  ts_args      : tvsymbol list;
+  ts_def       : ty type_def;
 }
 
 and ty = private {
@@ -70,11 +76,23 @@ val ty_hash : ty -> int
 exception BadTypeArity of tysymbol * int
 exception DuplicateTypeVar of tvsymbol
 exception UnboundTypeVar of tvsymbol
+exception IllegalTypeParameters
+exception BadFloatSpec
+exception EmptyRange
 
-val create_tysymbol : preid -> tvsymbol list -> ty option -> tysymbol
+val create_tysymbol : preid -> tvsymbol list -> ty type_def -> tysymbol
 
 val ty_var : tvsymbol -> ty
 val ty_app : tysymbol -> ty list -> ty
+
+(** {2 Type definition utilities} *)
+
+val type_def_map : ('a -> 'a) -> 'a type_def -> 'a type_def
+val type_def_fold : ('a -> 'b -> 'a) -> 'a -> 'b type_def -> 'a
+
+val is_alias_type_def : 'a type_def -> bool
+val is_range_type_def : 'a type_def -> bool
+val is_float_type_def : 'a type_def -> bool
 
 (** {2 Generic traversal functions} *)
 

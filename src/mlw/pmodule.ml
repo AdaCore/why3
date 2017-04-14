@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -621,13 +621,16 @@ let clone_type_decl inst cl tdl kn =
       List.iter2 (cl_save_rs cl) d.itd_fields itd.itd_fields;
       Hits.add htd s (Some itd) in
     (* alias *)
-    if s.its_def <> None then begin
+    match s.its_def with
+    | Alias ty ->
       if cloned then raise (CannotInstantiate id);
-      let def = conv_ity alg (Opt.get s.its_def) in
+      let def = conv_ity alg ty in
       let itd = create_alias_decl id' ts.ts_args def in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
-    end else
+    | Range _ -> assert false (* TODO *)
+    | Float _ -> assert false (* TODO *)
+    | NoDef ->
     (* abstract *)
     if s.its_private && cloned then begin
       (* FIXME: currently, we cannot refine a block of mutual types *)

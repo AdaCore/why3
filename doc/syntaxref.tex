@@ -24,11 +24,22 @@ In the following, strings are referred to with the non-terminal
 
 \subsection{Identifiers}
 
-The syntax distinguishes lowercase and
-uppercase identifiers and, similarly, lowercase and uppercase
-qualified identifiers.
+Identifiers are non-empty sequences of characters among letters,
+digits, the underscore character and the quote character. They cannot
+start with a digit or a quote.
 
 \begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
+
+The syntax distinguishes identifiers that start with a lowercase or an
+uppercase letter (resp. \nonterm{lident}{} and \nonterm{uident}{}), and
+similarly, lowercase and uppercase qualified identifiers.
+
+The restricted classes of identifiers denoted by \nonterm{lident-nq}{}
+and \nonterm{uident-nq}{} correspond to identifiers where the quote
+character cannot be followed by a letter. Identifiers where a quote is
+followed by a letter are reserved and cannot be used as identifier for
+declarations introduced by the user (see Section~\ref{sec:rangetypes}).
+
 
 \subsection{Constants}
 The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
@@ -115,6 +126,7 @@ Note that the syntax for type
 expressions notably differs from the usual ML syntax (\eg the
 type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
 
+
 \subsection{Formulas}
 
 The syntax for formulas is given Figure~\ref{fig:bnf:formula}.
@@ -178,6 +190,101 @@ The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bn
   \caption{Syntax for theories (part 2).}
 \label{fig:bnf:theoryb}
 \end{figure}
+
+\subsubsection{Algebraic types}
+
+TO BE COMPLETED
+
+\subsubsection{Record types}
+
+TO BE COMPLETED
+
+\subsubsection{Range types}
+\label{sec:rangetypes}
+
+A declaration of the form \texttt{type r = < range \textit{a b} >}
+defines a type that projects into the integer range
+\texttt{[\textit{a,b}]}. Note that in order to make such a declaration
+the theory \texttt{int.Int} must be imported.
+
+Why3 let you cast an integer literal in a range type
+(e.g. \texttt{(42:r)}) and will check at typing that the literal is in
+range. Defining such a range type $r$ automatically introduces the
+following:
+\begin{whycode}
+  function  r'int r : int
+  constant  r'maxInt : int
+  constant  r'minInt : int
+\end{whycode}
+The function \texttt{r'int} projects a term of type \texttt{r} to its
+integer value. The two constants represent the high bound and low
+bound of the range respectively.
+
+Unless specified otherwise with the meta \texttt{"keep:literal"} on
+\texttt{r}, the transformation \emph{eliminate\_literal} introduces an
+axiom
+\begin{whycode}
+axiom r'axiom : forall i:r. r'minInt <= r'int i <= r'maxInt
+\end{whycode}
+and replaces all casts of the form \texttt{(42:r)} with a constant and
+an axiom as in:
+\begin{whycode}
+constant rliteral7 : r
+axiom rliteral7_axiom : r'int rliteral7 = 42
+\end{whycode}
+
+This type is used in the standard library in the theories
+\texttt{bv.BV8}, \texttt{bv.BV16}, \texttt{bv.BV32}, \texttt{bv.BV64}.
+
+
+\subsubsection{Floating-point Types}
+
+A declaration of the form \texttt{type f = < float \textit{eb sb} >}
+defines a type of floating-point numbers as specified by the IEEE-754
+standard~\cite{ieee754}. Here the literal \texttt{\textit{eb}}
+represents the number of bits in the exponent and the literal
+\texttt{\textit{sb}} the number of bits in the significand (including
+the hidden bit). Note that in order to make such a declaration the
+theory \texttt{real.Real} must be imported.
+
+Why3 let you cast a real literal in a float type
+(e.g. \texttt{(0.5:f)}) and will check at typing that the literal is
+representable in the format. Note that Why3 do not implicitly round a
+real literal when casting to a float type, it refuses the cast if the
+literal is not representable.
+
+Defining such a type \texttt{f} automatically introduces the following:
+\begin{whycode}
+  predicate f'isFinite f
+  function  f'real f : real
+  constant  f'eb : int
+  constant  f'sb : int
+\end{whycode}
+As specified by the IEEE standard, float formats includes infinite
+values and also a special NaN value (Not-a-Number) to represent
+results of undefined operations such as $0/0$.  The predicate
+\texttt{f'isFinite} indicates whether its argument is neither infinite
+nor NaN. The function \texttt{f'real} projects a finite term of type
+\texttt{f} to its real value, its result is not specified for non finite
+terms.
+
+Unless specified otherwise with the meta \texttt{"keep:literal"} on
+\texttt{f}, the transformation \emph{eliminate\_literal} will
+introduce an axiom
+\begin{whycode}
+axiom f'axiom :
+  forall x:f. f'isFinite x -> -. max_real <=. f'real x <=. max_real
+\end{whycode}
+where \texttt{max\_real} is the value of the biggest finite float in
+the specified format. The transformation also replaces all casts of
+the form \texttt{(0.5:f)} with a constant and an axiom as in:
+\begin{whycode}
+constant fliteral42 : f
+axiom fliteral42_axiom : f'real fliteral42 = 0.5 /\ f'isFinite fliteral42
+\end{whycode}
+
+This type is used in the standard library in the theories
+\texttt{ieee\_float.Float32} and \texttt{ieee\_float.Float64}.
 
 \subsection{Files}
 
@@ -288,7 +395,7 @@ right, lazily.
 % \begin{flushleft}\ttfamily
 %   while $c$ do invariant \{ $I$ \} $e$ done
 % \end{flushleft}
-% it iterates the loop body $e$ until the condition $c$ becomes false. 
+% it iterates the loop body $e$ until the condition $c$ becomes false.
 % \begin{eqnarray*}
 %   WP(\texttt{while} \ldots, Q) &=& I \land \\
 % && \forall \vec{w} (c \land I \rightarrow WP(e,I)) \land (\neg c \land I \rightarrow Q)

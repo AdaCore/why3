@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,6 +77,9 @@ val register_meta_excl :
 
 val lookup_meta : string -> meta
 val list_metas  : unit -> meta list
+
+val meta_range : meta
+val meta_float : meta
 
 (** {2 Theories} *)
 

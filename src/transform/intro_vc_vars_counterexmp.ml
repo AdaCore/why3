@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,6 +13,7 @@ open Decl
 open Ty
 open Term
 open Ident
+open Intro_projections_counterexmp
 
 (** For see intro_vc_vars_counterexmp.mli for detailed description
     of this transformation. *)
@@ -131,11 +132,12 @@ let rec do_intro info vc_loc vc_map vc_var t =
       match info.vc_loc with
       | None -> []
       | Some loc ->
+
 	  (* variable inside the term T that triggers VC. If the variable
 	     should be in counterexample, introduce new constant in location
 	     loc with all labels necessary for collecting it for counterexample
 	     and make it equal to the variable *)
-	  if Slab.exists is_counterexample_label ls.id_label then
+          if Slab.exists is_counterexample_label ls.id_label then
 	    let const_label = if info.vc_pre_or_post then
 	      model_trace_for_postcondition ~labels:ls.id_label
 	    else
@@ -155,7 +157,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
 	    else
 	      begin
 		Hprid.add vc_map id_new true;
-		Intro_projections_counterexmp.intro_const_equal_to_term
+		intro_const_equal_to_term
 		  ~term:t ~id_new:id_new ~axiom_name
 	      end
 	  else
@@ -290,14 +292,20 @@ let rec intros info vc_loc vc_map vc_var f =
 	(d :: l @ decl, goal)
       else
         (d :: decl, goal)
-  | _ -> remove_positive_foralls vc_var f
+  | _ ->
+      let (dl, goal) = remove_positive_foralls vc_var f in
+      if info.vc_inside then
+        let l = do_intro info vc_loc vc_map vc_var f in
+        (l @ dl, goal)
+      else
+        (dl,goal)
 
 let do_intro_vc_vars_counterexmp info vc_loc pr t =
   (* TODO initial guess on number of counter-examples to print *)
   let vc_map = Hprid.create 100 in
   let vc_var = Hvs.create 100 in
   let tvs = t_ty_freevars Stv.empty t in
-  let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] None in
+  let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] NoDef in
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in

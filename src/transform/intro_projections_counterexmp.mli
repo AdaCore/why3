@@ -1,13 +1,25 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
+
+
+(* Handling of labels *)
+
+val model_trace_regexp: Str.regexp
+  (* The term labeled with "model_trace:name" will be in counterexample with
+     name "name" *)
+
+val label_starts_with: Str.regexp -> Ident.label -> bool
+
+val get_label: Ident.Slab.t -> Str.regexp -> Ident.Slab.elt
+
 
 val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
  (**

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -115,14 +115,16 @@ let load_driver env file extra_files =
         add_syntax ps.ls_name s b
     | Rconverter _ ->
         Loc.errorm "Syntax converter cannot be used in pure theories"
+    | Rliteral _ ->
+        Loc.errorm "Syntax literal cannot be used in pure theories"
     | Rremovepr (q) ->
-      ignore (find_pr th q)
+        ignore (find_pr th q)
     | Rremoveall ->
-      let it key _ = match (Mid.find key th.th_known).Decl.d_node with
-        | Decl.Dprop (_,symb,_) -> ignore symb
-        | _ -> ()
-      in
-      Mid.iter it th.th_local
+        let it key _ = match (Mid.find key th.th_known).Decl.d_node with
+          | Decl.Dprop (_,symb,_) -> ignore symb
+          | _ -> ()
+        in
+        Mid.iter it th.th_local
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->

@@ -4,9 +4,9 @@ unknown "Error: \\(.*\\)$" "\\1"
 fail "Syntax error: \\(.*\\)$" "\\1"
 time "why3cpulimit time : %s s"
 
-(* À discuter *)
 transformation "eliminate_non_struct_recursion"
 transformation "eliminate_if"
+transformation "eliminate_literal"
 transformation "eliminate_non_lambda_set_epsilon"
 
 transformation "eliminate_projections"

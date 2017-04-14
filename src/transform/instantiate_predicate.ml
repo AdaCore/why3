@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,9 +14,24 @@ open Term
 open Ty
 
 let instantiate_prop expr args values =
-  let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
-  let (mt,mv) = List.fold_left2 add (Mtv.empty, Mvs.empty) args values in
-  t_ty_subst mt mv expr
+  let add mt x = ty_match mt x.vs_ty (t_type (Mvs.find x values)) in
+  let mt = List.fold_left add Mtv.empty args in
+  t_ty_subst mt values expr
+
+exception Mismatch
+
+let rec find_instantiation mv trigger expr =
+  match trigger.t_node, expr.t_node with
+  | Tvar v, _ ->
+    begin
+      match Mvs.find v mv with
+      | w -> if t_equal w expr then mv else raise Mismatch
+      | exception Not_found -> Mvs.add v expr mv
+    end
+  | Tapp (ts,ta), Tapp (es,ea) when ls_equal ts es ->
+      assert (List.length ta = List.length ea);
+      List.fold_left2 find_instantiation mv ta ea
+  | _, _ -> raise Mismatch
 
 (** [trans spr task_hd ((lpr, past), task)] looks in [task_hd] for terms
     that can instantiate axioms of [lpr] and does so in [task]; [lpr] is
@@ -27,17 +42,34 @@ let trans spr task_hd (((lpr, past), task) as current) =
 
   let rec scan_term ((past, task) as current) t =
     let current =
-      if t.t_ty = None || Sterm.mem t past then current else
-      (
-        Sterm.add t past,
-        List.fold_right (fun (quant, e) task ->
-          try
-            let ax = instantiate_prop e quant [t] in
-            let pr = create_prsymbol (Ident.id_fresh "auto_instance") in
-            Task.add_decl task (create_prop_decl Paxiom pr ax)
-          with TypeMismatch _ -> task
-        ) lpr task
-      ) in
+      if t.t_ty = None && match t.t_node with Tapp _ -> false | _ -> true
+      then current
+      else if Sterm.mem t past then current
+      else
+        List.fold_right (fun (quant, triggers, e) task ->
+          let add vs current =
+            try
+              let ax = instantiate_prop e quant vs in
+              let (past, task) = scan_term current ax in
+              let pr = create_prsymbol (Ident.id_fresh "auto_instance") in
+              (past, Task.add_decl task (create_prop_decl Paxiom pr ax))
+            with TypeMismatch _ | Not_found -> current in
+          match triggers, quant with
+          | [], [q] ->
+              if t.t_ty = None then task
+              else add (Mvs.singleton q t) task
+          | [], _ -> task
+          | _, _ ->
+              List.fold_left (fun task tr ->
+                  match tr with
+                  | [tr] ->
+                    begin
+                      try add (find_instantiation Mvs.empty tr t) task
+                      with Mismatch -> task
+                    end
+                  | _ -> task
+                ) task triggers
+        ) lpr (Sterm.add t past, task) in
     match t.t_node with
     | Tapp _
     | Tbinop _
@@ -52,10 +84,8 @@ let trans spr task_hd (((lpr, past), task) as current) =
         let lpr = if not (Spr.mem pr spr) then lpr else
           match expr.t_node with
           | Tquant (Tforall,q_expr) ->
-              let (quant, _, expr) = t_open_quant q_expr in
-              assert (List.length quant = 1);
-              (quant, expr) :: lpr
-          | _ -> assert false in
+              t_open_quant q_expr :: lpr
+          | _ -> lpr in
         ((lpr, past), task)
     | _ -> current in
   (current, Task.add_tdecl task task_hd.Task.task_decl)

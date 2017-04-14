@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -137,7 +137,6 @@ let print_pat = print_pat_node 0
 let print_vsty fmt v =
   fprintf fmt "%a:@,%a" print_vs v print_ty v.vs_ty
 
-let print_const = Pretty.print_const
 let print_quant = Pretty.print_quant
 let print_binop = Pretty.print_binop
 
@@ -174,7 +173,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      print_const fmt c
+      Number.print_constant fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
@@ -247,14 +246,22 @@ let print_constr fmt (cs,pjl) =
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl fmt ts = match ts.ts_def with
-  | None ->
+  | NoDef ->
       fprintf fmt "@[<hov 2>type %a%a%a@]@\n@\n"
         print_ts ts print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
-  | Some ty ->
+  | Alias ty ->
       fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n@\n"
         print_ts ts print_ident_labels ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args print_ty ty
+  | Range _ir -> (* TODO *)
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <range ...>@]@\n@\n"
+        print_ts ts print_ident_labels ts.ts_name
+        (print_list nothing print_tv_arg) ts.ts_args
+  | Float _fp -> (* TODO *)
+      fprintf fmt "@[<hov 2>type %a%a%a =@ <float ...>@]@\n@\n"
+        print_ts ts print_ident_labels ts.ts_name
+        (print_list nothing print_tv_arg) ts.ts_args
 
 let print_type_decl fmt ts =
   if not (query_remove ts.ts_name) then

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -146,6 +146,12 @@ let register_meta      ~desc s al = register_meta ~desc s al false
 let lookup_meta s = Hstr.find_exn meta_table (UnknownMeta s) s
 
 let list_metas () = Hstr.fold (fun _ v acc -> v::acc) meta_table []
+
+let meta_range = register_meta "range_type" [MTtysymbol; MTlsymbol]
+    ~desc:"Projection@ of@ a@ range@ type."
+
+let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
+    ~desc:"Projection@ and@ finiteness@ of@ a@ floating-point@ type."
 
 (** Theory *)
 
@@ -387,24 +393,9 @@ let add_symbol add id v uc =
       uc_export = add true  id.id_string v e0 :: ste }
   | _ -> assert false
 
-let add_data uc (ts,csl) =
-  let add_proj uc = function
-    | Some pj -> add_symbol add_ls pj.ls_name pj uc
-    | None -> uc in
-  let add_constr uc (fs,pl) =
-    let uc = add_symbol add_ls fs.ls_name fs uc in
-    List.fold_left add_proj uc pl in
-  let uc = add_symbol add_ts ts.ts_name ts uc in
-  List.fold_left add_constr uc csl
-
-let add_logic uc (ls,_) = add_symbol add_ls ls.ls_name ls uc
-
-let add_ind uc (ps,la) =
-  let uc = add_symbol add_ls ps.ls_name ps uc in
-  let add uc (pr,_) = add_symbol add_pr pr.pr_name pr uc in
-  List.fold_left add uc la
-
-let add_prop uc (_,pr,_) = add_symbol add_pr pr.pr_name pr uc
+let add_symbol_ts uc ts = add_symbol add_ts ts.ts_name ts uc
+let add_symbol_ls uc ls = add_symbol add_ls ls.ls_name ls uc
+let add_symbol_pr uc pr = add_symbol add_pr pr.pr_name pr uc
 
 let create_decl d = mk_tdecl (Decl d)
 
@@ -417,7 +408,7 @@ let warn_dubious_axiom uc k p syms =
         (fun id ->
           if Sid.mem id uc.uc_local then
           match (Ident.Mid.find id uc.uc_known).d_node with
-          | Dtype { ts_def = None } | Dparam _ -> raise Exit
+          | Dtype { ts_def = NoDef } | Dparam _ -> raise Exit
           | _ -> ())
         syms;
       Warning.emit ?loc:p.id_loc
@@ -433,16 +424,35 @@ let should_be_conservative id =
 let add_decl uc d =
   let uc = add_tdecl uc (create_decl d) in
   match d.d_node with
-    | Dtype ts  -> add_symbol add_ts ts.ts_name ts uc
-    | Ddata dl  -> List.fold_left add_data uc dl
-    | Dparam ls -> add_symbol add_ls ls.ls_name ls uc
-    | Dlogic dl -> List.fold_left add_logic uc dl
-    | Dind (_, dl) -> List.fold_left add_ind uc dl
-    | Dprop ((k,pr,_) as p) ->
+  | Dtype ts  ->
+      add_symbol_ts uc ts
+  | Ddata dl  ->
+      let add_field uc = function
+        | Some pj -> add_symbol_ls uc pj
+        | None -> uc in
+      let add_constr uc (cs,pl) =
+        let uc = add_symbol_ls uc cs in
+        List.fold_left add_field uc pl in
+      let add_data uc (ts,csl) =
+        let uc = add_symbol_ts uc ts in
+        List.fold_left add_constr uc csl in
+      List.fold_left add_data uc dl
+  | Dparam ls ->
+      add_symbol_ls uc ls
+  | Dlogic dl ->
+      let add_logic uc (ls,_) = add_symbol_ls uc ls in
+      List.fold_left add_logic uc dl
+  | Dind (_, dl) ->
+      let add_ind uc (ps,la) =
+        let uc = add_symbol_ls uc ps in
+        let add uc (pr,_) = add_symbol_pr uc pr in
+        List.fold_left add uc la in
+      List.fold_left add_ind uc dl
+  | Dprop (k,pr,_) ->
       if should_be_conservative uc.uc_name &&
          should_be_conservative pr.pr_name
       then warn_dubious_axiom uc k pr.pr_name d.d_syms;
-      add_prop uc p
+      add_symbol_pr uc pr
 
 (** Declaration constructors + add_decl *)
 
@@ -516,12 +526,25 @@ let rec sm_trans_ty tym tsm ty = match ty.ty_node with
 let cl_trans_ty cl ty = sm_trans_ty cl.ty_table cl.ts_table ty
 
 let cl_find_ts cl ts =
-  if not (Sid.mem ts.ts_name cl.cl_local) then ts else
+  if not (Sid.mem ts.ts_name cl.cl_local) then
+    match ts.ts_def with
+      | Alias ty ->
+          let td = cl_trans_ty cl ty in
+          if ty_equal td ty then ts else
+          let id = id_clone ts.ts_name in
+          create_tysymbol id ts.ts_args (Alias td)
+      | NoDef | Range _ | Float _ -> ts
+  else
   try Mts.find ts cl.ts_table with Not_found -> raise EmptyDecl
 
 let cl_clone_ts cl ts =
   (* cl_clone_ts is only called for local non-instantiated symbols *)
-  let td' = Opt.map (cl_trans_ty cl) ts.ts_def in
+  let td' =
+    match ts.ts_def with
+    | Alias t -> Alias (cl_trans_ty cl t)
+    | NoDef -> NoDef
+    | Range _ -> assert false (* TODO *)
+    | Float _ -> assert false (* TODO *) in
   let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
   cl.ts_table <- Mts.add ts ts' cl.ts_table;
   ts'
@@ -595,7 +618,7 @@ let cl_init th inst =
 
 let cl_type cl inst ts =
   if Mts.mem ts inst.inst_ts || Mts.mem ts inst.inst_ty then
-    if ts.ts_def = None then raise EmptyDecl
+    if ts.ts_def = NoDef then raise EmptyDecl
     else raise (CannotInstantiate ts.ts_name);
   create_ty_decl (cl_clone_ts cl ts)
 
@@ -686,7 +709,7 @@ let warn_clone_not_abstract loc th =
     List.iter (fun d -> match d.td_node with
       | Decl d ->
         begin match d.d_node with
-        | Dtype { ts_def = None }
+        | Dtype { ts_def = NoDef }
         | Dparam _ -> raise Exit
         | Dprop(Paxiom, _,_) -> raise Exit
         | _ -> ()

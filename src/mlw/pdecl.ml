@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,7 +48,7 @@ let its_recursive s =
   not s.its_nonfree && not s.its_private &&
   not s.its_mutable && not s.its_fragile &&
   s.its_mfields = [] && s.its_regions = [] &&
-  s.its_reg_flg = [] && s.its_def = None &&
+  s.its_reg_flg = [] && s.its_def = NoDef &&
   List.for_all (fun x -> x.its_frozen &&
     x.its_exposed && not x.its_liable &&
     x.its_fixed && x.its_visible) s.its_arg_flg
@@ -269,7 +269,7 @@ let get_syms node pure =
   | PDtype dl ->
       let syms_itd syms d =
         (* the syms of the invariants are already in [pure] *)
-        let syms = Opt.fold syms_ity syms d.itd_its.its_def in
+        let syms = type_def_fold syms_ity syms d.itd_its.its_def in
         let add_fd syms s = syms_ity syms s.rs_cty.cty_result in
         let add_cs syms s = syms_pvl syms s.rs_cty.cty_args in
         let syms = List.fold_left add_fd syms d.itd_fields in
@@ -296,7 +296,7 @@ let create_type_decl dl =
   if dl = [] then invalid_arg "Pdecl.create_type_decl";
   let add_itd ({itd_its = s} as itd) (abst,defn,rest) =
     match itd.itd_fields, itd.itd_constructors with
-    | [], [] when s.its_def <> None ->
+    | [], [] when s.its_def <> NoDef ->
         abst, defn, create_ty_decl s.its_ts :: rest
     | fl, _ when itd.itd_invariant <> [] ->
         let {id_string = nm; id_loc = loc} = s.its_ts.ts_name in
@@ -567,19 +567,21 @@ let print_its_defn fst fmt itd =
     (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
   let print_defn fmt () =
     match s.its_def, itd.itd_fields, itd.itd_constructors with
-    | Some ity, _, _ -> fprintf fmt " = %a" print_ity ity
-    | _, [], [] when not s.its_mutable -> ()
-    | _, fl, [] -> fprintf fmt " = private%s { %a }"
+    | Alias ity, _, _ -> fprintf fmt " = %a" print_ity ity
+    | NoDef, [], [] when not s.its_mutable -> ()
+    | NoDef, fl, [] -> fprintf fmt " = private%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
-    | _, fl, [{rs_name = {id_string = n}}]
+    | NoDef, fl, [{rs_name = {id_string = n}}]
       when n = "mk " ^ s.its_ts.ts_name.id_string -> fprintf fmt " =%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
-    | _, fl, cl ->
+    | NoDef, fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
-        fprintf fmt " =%a" (Pp.print_list Pp.nothing (print_constr mf)) cl in
+        fprintf fmt " =%a" (Pp.print_list Pp.nothing (print_constr mf)) cl
+    | Range _, _, _ -> assert false (* TODO *)
+    | Float _, _, _ -> assert false (* TODO *) in
   let print_inv fmt f = fprintf fmt
     "@\n@  invariant { %a }" Pretty.print_term f in
   fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"
