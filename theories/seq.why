@@ -168,6 +168,11 @@ theory ToList
     forall s: seq 'a, i: int. 0 <= i < length s ->
     ListNth.nth i (to_list s) = Some s[i]
 
+  let rec lemma to_list_def_cons (s: seq 'a) (x: 'a)
+    variant { length s }
+    ensures { to_list (cons x s) = Cons x (to_list s) }
+  = assert { (cons x s)[1 ..] == s }
+
 end
 
 theory OfList
@@ -208,6 +213,11 @@ theory OfList
     length (of_list (l1 ++ l2)) = L.length l1 + L.length l2
 
   meta coercion function of_list
+
+  use import ToList
+
+  lemma convolution_to_of_list: forall l: list 'a.
+    to_list (of_list l) = l
 
 end
 
