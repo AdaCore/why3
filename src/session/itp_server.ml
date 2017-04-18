@@ -591,6 +591,29 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | APn pn     -> node_ID_from_pn pn
     | APa pan    -> node_ID_from_pan pan
 
+  let remove_any_node_ID any =
+    match any with
+    | AFile file ->
+        let nid = Hstr.find file_to_node_ID file.file_name in
+        Hint.remove model_any nid;
+        Hstr.remove file_to_node_ID file.file_name
+    | ATh th     ->
+        let nid = Ident.Hid.find th_to_node_ID (theory_name th) in
+        Hint.remove model_any nid;
+        Ident.Hid.remove th_to_node_ID (theory_name th)
+    | ATn tn     ->
+        let nid = Htn.find tn_to_node_ID tn in
+        Hint.remove model_any nid;
+        Htn.remove tn_to_node_ID tn
+    | APn pn     ->
+        let nid = Hpn.find pn_to_node_ID pn in
+        Hint.remove model_any nid;
+        Hpn.remove pn_to_node_ID pn
+    | APa pa     ->
+        let nid = Hpan.find pan_to_node_ID pa in
+        Hint.remove model_any nid;
+        Hpan.remove pan_to_node_ID pa
+
   let get_prover p =
     let d = get_server_data () in
     match return_prover p d.config with
@@ -994,9 +1017,13 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         let n = any_from_node_ID nid in
         begin
         try
-          Session_itp.remove_subtree d.cont.controller_session n ~notification:(fun x ->
-            let nid = node_ID_from_any x in
-            P.notify (Remove nid))
+          Controller_itp.remove_subtree d.cont n
+            ~node_change:(fun x b -> let nid = node_ID_from_any x in
+                            P.notify (Node_change (nid, Proved b)))
+            ~removed:(fun x ->
+                        let nid = node_ID_from_any x in
+                        remove_any_node_ID x;
+                        P.notify (Remove nid))
         with RemoveError -> (* TODO send an error instead of information *)
           P.notify (Message (Information "Cannot remove a proof node or theory"))
         end

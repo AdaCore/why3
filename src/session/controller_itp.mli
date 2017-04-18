@@ -148,6 +148,12 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
+val remove_subtree:
+  controller ->
+  any ->
+  removed:(any -> unit) ->
+  node_change:(any -> bool -> unit) -> unit
+
 module Make(S : Scheduler) : sig
 
 val set_max_tasks : int -> unit

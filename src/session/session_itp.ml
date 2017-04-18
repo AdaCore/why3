@@ -355,12 +355,12 @@ let remove_subtree s (n: any) ~notification : unit =
     let remove_theory _s (_th: theory) =
       (* Not in any table *)
       () in
-  match n with
-  | ATn tn -> remove_transformation s tn
-  | APa pa -> remove_proof_attempt_pa s pa
-  | AFile f -> remove_file s f
-  | APn pn -> remove_proof_node s pn
-  | ATh th -> remove_theory s th
+    match n with
+    | ATn tn -> remove_transformation s tn
+    | APa pa -> remove_proof_attempt_pa s pa
+    | AFile f -> remove_file s f
+    | APn pn -> remove_proof_node s pn
+    | ATh th -> remove_theory s th
   in
   match n with
   | APn _pn -> raise RemoveError

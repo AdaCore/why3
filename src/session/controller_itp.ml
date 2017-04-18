@@ -123,6 +123,14 @@ let any_proved cont any : bool =
           end
       end
 
+let remove_any_proof_state cont any : unit =
+  match any with
+  | AFile _file -> ()
+  | ATh th     -> Hid.remove cont.proof_state.th_state (theory_name th)
+  | APn pn     -> Hpn.remove cont.proof_state.pn_state pn
+  | ATn tn     -> Htn.remove cont.proof_state.tn_state tn
+  | APa _pa     -> ()
+
 (* Update the result of the theory according to its children *)
 let update_theory_proof_state notification ps th =
   let goals = theory_goals th in
@@ -220,18 +228,18 @@ let exists_se f l =
   List.exists (fun b -> b) (List.map f l)
 
 (* init proof state after reload *)
-let rec reload_goal_proof_state ps c g =
+let rec reload_goal_proof_state c g =
   let ses = c.controller_session in
   let tr_list = get_transformations ses g in
   let pa_list = get_proof_attempts ses g in
-  let proved = exists_se (reload_trans_proof_state ps c) tr_list in
+  let proved = exists_se (reload_trans_proof_state c) tr_list in
   let proved = exists_se reload_pa_proof_state pa_list || proved in
   Hpn.replace c.proof_state.pn_state g proved;
   proved
 
-and reload_trans_proof_state ps c tr =
+and reload_trans_proof_state c tr =
   let proof_list = get_sub_tasks c.controller_session tr in
-  let proved = for_all_se (reload_goal_proof_state ps c) proof_list in
+  let proved = for_all_se (reload_goal_proof_state c) proof_list in
   Htn.replace c.proof_state.tn_state tr proved;
   proved
 
@@ -244,7 +252,7 @@ and reload_pa_proof_state pa =
 let reload_theory_proof_state c th =
   let ps = c.proof_state in
   let goals = theory_goals th in
-  let proved = for_all_se (reload_goal_proof_state ps c) goals in
+  let proved = for_all_se (reload_goal_proof_state c) goals in
   Hid.replace ps.th_state (theory_name th) proved
 
 (* to be called after reload *)
@@ -395,13 +403,33 @@ let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
   add_file_section ~use_shapes:false c.controller_session fname theories format
 
-
+(* Update the proof_state according to new false state and then remove
+   the subtree *)
+let remove_subtree c (n: any) ~removed ~node_change =
+  let removed = (fun x -> removed x; remove_any_proof_state c x) in
+  let parent = get_any_parent c.controller_session n in
+  match n with
+  | ATn _ | APa _ ->
+    Session_itp.remove_subtree c.controller_session n ~notification:removed;
+    (match parent with
+      | Some (APn parent) ->
+        (* If proof_state of the parent is actually changed update the branch
+           otherwise do nothing *)
+        let tr_list = get_transformations c.controller_session parent in
+        let pa_list = get_proof_attempts c.controller_session parent in
+        let proved = List.exists (tn_proved c) tr_list in
+        let proved = List.exists reload_pa_proof_state pa_list || proved in
+        if proved then
+          ()
+        else
+          update_proof_node node_change c parent false
+    | _ -> assert false)
+  | _ -> ()
 
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: prio:int -> (unit -> bool) -> unit
 end
-
 
 module Make(S : Scheduler) = struct
 
