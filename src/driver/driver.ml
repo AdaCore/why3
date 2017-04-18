@@ -295,16 +295,18 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
   | task -> update task
 
-let add_cntexample_meta task cntexample =
+let add_cntexample_meta ~ce_prover task cntexample =
   if not (cntexample) then task
   else
     let cnt_meta = lookup_meta "get_counterexmp" in
     let g,task = Task.task_separate_goal task in
     let task = Task.add_meta task cnt_meta [] in
-    Task.add_tdecl task g
+    let ce_meta_prover = lookup_meta "counterexmp_prover" in
+    let task = Task.add_meta task ce_meta_prover [MAstr ce_prover] in
+      Task.add_tdecl task g
 
-let prepare_task ~cntexample drv task =
-  let task = add_cntexample_meta task cntexample in
+let prepare_task ~cntexample ?(ce_prover="cvc4_ce") drv task =
+  let task = add_cntexample_meta ~ce_prover task cntexample in
   let lookup_transform t =
     let stat_name = "gnatwhy3.transformations." ^ t in
     stat_name, lookup_transform t drv.drv_env in
@@ -331,8 +333,8 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) drv fmt task =
-  let task = prepare_task ~cntexample drv task in
+let print_task ?old ?(cntexample=false) ?(ce_prover="cvc4_ce") drv fmt task =
+  let task = prepare_task ~cntexample ~ce_prover drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
 
@@ -365,9 +367,9 @@ let prove_task_prepared ~command ~limit ?old ?inplace drv task =
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?(cntexample=false) ?old
+let prove_task ~command ~limit ?(cntexample=false) ?(ce_prover="cvc4_ce") ?old
                ?inplace drv task =
-  let task = prepare_task ~cntexample drv task in
+  let task = prepare_task ~cntexample ~ce_prover  drv task in
   prove_task_prepared ~command ~limit ?old ?inplace drv task
 
 (* exception report *)

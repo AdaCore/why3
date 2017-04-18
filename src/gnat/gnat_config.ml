@@ -53,6 +53,7 @@ let opt_parallel = ref 1
 let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
 let opt_ce_mode = ref false
+let opt_ce_prover = ref "cvc4_ce"
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_subp : string option ref = ref None
@@ -200,7 +201,9 @@ let options = Arg.align [
    "--why3-conf", Arg.String set_why3_conf,
           " Specify additionnal configuration file";
    "--counterexample", Arg.String set_ce_mode,
-          "on if the counterexample for unproved VC should be get, off elsewhere";
+          " on if the counterexample for unproved VC should be get, off elsewhere";
+   "--ce_prover", Arg.Set_string opt_ce_prover,
+          " Give a specific prover for counterexamples"
 ]
 
 let () = Arg.parse options set_filename usage_msg
@@ -265,7 +268,7 @@ let compute_base_provers config str_list =
     (* the prover for counterexample generation *)
     let base_prover_ce =
       if !opt_ce_mode then
-        Some (filter_prover "cvc4_ce")
+        Some (filter_prover !opt_ce_prover)
       else
         None in
     base_provers, base_prover_ce

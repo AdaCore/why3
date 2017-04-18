@@ -482,7 +482,7 @@ let print_info_model cntexample fmt info =
   else
     Stdlib.Mstr.empty
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
+let print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f = match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>;; %s@\n(assert@ %a)@]@\n@\n"
         pr.pr_name.id_string (* FIXME? collisions *)
@@ -497,7 +497,7 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
-      (*if cntexample then fprintf fmt "@[(push)@]@\n"; (* z3 specific stuff *)*)
+      if cntexample && z3_ce then fprintf fmt "@[(push)@]@\n";
       fprintf fmt "@[(check-sat)@]@\n";
       let model_list = print_info_model cntexample fmt info in
 
@@ -529,8 +529,7 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample args info fmt d =
-  match d.d_node with
+let print_decl vc_loc cntexample z3_ce args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
@@ -546,7 +545,7 @@ let print_decl vc_loc cntexample args info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc cntexample args info fmt k pr f
+      print_prop_decl vc_loc cntexample z3_ce args info fmt k pr f
 
 let set_produce_models fmt cntexample =
   if cntexample then
@@ -554,6 +553,8 @@ let set_produce_models fmt cntexample =
 
 let print_task args ?old:_ fmt task =
   let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  (* Specific case for z3 prover because printing is not the same *)
+  let z3_ce = cntexample && Prepare_for_counterexmp.get_ce_prover task = "z3_ce" in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
@@ -572,7 +573,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample args info fmt d
+            begin try print_decl vc_loc cntexample z3_ce args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

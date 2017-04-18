@@ -22,6 +22,19 @@ let get_counterexmp task =
   let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
   not (Theory.Stdecl.is_empty ce_meta.tds_set)
 
+let meta_counterexmp_prover =
+  Theory.register_meta_excl "counterexmp_prover" [Theory.MTstring]
+  ~desc:"Contain@ name@ of@ prover@ for@ counterexamples."
+
+let get_ce_prover task =
+  let meta = Task.find_meta_tds task meta_counterexmp_prover in
+  try (
+    match (Theory.Stdecl.choose meta.tds_set).Theory.td_node with
+    | Theory.Meta (_, [Theory.MAstr s]) -> s
+    | _ -> "cvc4_ce"
+   )
+  with Not_found -> "cvc4_ce"
+
 let prepare_for_counterexmp2 env task =
   if not (get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)

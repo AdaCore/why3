@@ -706,11 +706,13 @@ let add_to_stat prover pr stat =
       let check = get_objective goal in
       let task = Session.goal_task goal in
       let dr = prover.Session.prover_driver in
+      let ce_prover =
+        prover.Session.prover_config.Whyconf.prover.Whyconf.prover_name in
       let vc_fn = vc_name check prover in
       GM.add goal_map goal vc_fn;
       with_fmt_channel vc_fn
         (fun fmt ->
-          Driver.print_task ~cntexample dr fmt task)
+          Driver.print_task ~cntexample ~ce_prover dr fmt task)
 
    let compute_trace =
      let rec compute_trace acc f =

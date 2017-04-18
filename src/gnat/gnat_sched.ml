@@ -50,12 +50,14 @@ let run_goal ~cntexample ?limit prover g =
           | None -> Gnat_config.limit ~prover
           | Some x -> x in
         None, false, limit in
+  let ce_prover =
+    prover.Session.prover_config.Whyconf.prover.Whyconf.prover_name in
   let id =
     Driver.prove_task
       ~command:(Whyconf.get_complete_command base_prover
       ~with_steps:(limit.Call_provers.limit_steps <>
                    Call_provers.empty_limit.Call_provers.limit_steps))
-      ~cntexample ~limit ?old ~inplace driver (Session.goal_task g) in
+      ~cntexample ~ce_prover ~limit ?old ~inplace driver (Session.goal_task g) in
   let entry = { goal = g; prover = prover; cntexample = cntexample } in
   state.num <- state.num + 1;
   Intmap.add state.map id entry
