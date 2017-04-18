@@ -198,6 +198,7 @@ and refine_variable_value (table: correspondence_table) key v =
 let convert_to_indice t =
   match t with
   | Integer i -> i
+  | Bitvector bv -> bv
   | _ -> raise Not_value
 
 let rec convert_array_value (a: array) : Model_parser.model_array =
