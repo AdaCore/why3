@@ -330,7 +330,7 @@ module Print = struct
     | Lrec (rdef) ->
       let print_one fst fmt = function
         | { rec_sym = rs1; rec_args = args; rec_exp = e; rec_res = res } ->
-          fprintf fmt "@[<hov 2>%s %a@ %a :@ %a@ =@ %a@]"
+          fprintf fmt "@[<hov 2>%s %a @[%a@] :@ %a@ =@ %a@]"
             (if fst then "let rec" else "and")
             (print_lident info) rs1.rs_name
             (print_list space (print_vs_arg info)) args
