@@ -14,8 +14,11 @@
 
 #include <stdbool.h>
 
+typedef enum { REQ_RUN, REQ_INTERRUPT } request_type;
+
 typedef struct {
   int key;
+  request_type req_type;
   char* id;
   int timeout;
   int memlimit;
