@@ -29,8 +29,8 @@ module C
   val p2i (n:int32):int
     ensures { result = Int32.to_int n }
 
-  val predicate is_null (p:ptr 'a) : bool
-    ensures { result <-> plength p = 0 }
+  (*val predicate is_null (p:ptr 'a) : bool
+    ensures { result <-> plength p = 0 }*)
 
   val null () : ptr 'a
     ensures { plength result = 0 }
@@ -68,11 +68,11 @@ module C
   predicate valid_ptr_shift (p:ptr 'a) (i:int) =
     0 <= p.offset + i < plength p
 
-  predicate valid_ptr_itv (p:ptr 'a) (sz:int) =
+  predicate valid (p:ptr 'a) (sz:int) =
     in_bounds sz /\ 0 <= sz /\ 0 <= p.offset /\ p.offset + sz <= plength p
 
   let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
-    requires { valid_ptr_itv p sz }
+    requires { valid p sz }
     ensures { forall i. 0 <= i < sz -> valid_ptr_shift p i }
   = ()
 
