@@ -104,3 +104,6 @@ type ide_request =
   | Replay_req
   | Exit_req
   | Interrupt_req
+
+(* Return true if the request modify the session *)
+val modify_session: ide_request -> bool

@@ -92,9 +92,16 @@ module Protocol_why3ide = struct
 
 end
 
+(* True when session differs from the saved session *)
+let session_needs_saving = ref false
+
 let get_notified = Protocol_why3ide.get_notified
 
-let send_request = Protocol_why3ide.send_request
+let send_request r =
+  (* If request changes the session then session needs saving *)
+  if modify_session r then
+    session_needs_saving := true;
+  Protocol_why3ide.send_request r
 
 (****************************************)
 (* server instance on the GTK scheduler *)
@@ -200,7 +207,7 @@ let try_convert s =
 (* Graphical elements *)
 (**********************)
 
-let main_window =
+let main_window : GWindow.window =
   let w = GWindow.window
             ~allow_grow:true ~allow_shrink:true
             ~width:gconfig.window_width
@@ -241,13 +248,32 @@ let accel_group = factory#accel_group
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
-let exit_function ~destroy () =
-  (* will this be treated before gmain quit ?!? *)
+let quit_on_saved = ref false
+
+(* Exit brutally without asking anything *)
+let exit_function_unsafe () =
   send_request Exit_req;
-  ignore(destroy); GMain.quit ()
+  GMain.quit ()
+
+(* Ask if the user wants to save session before exit *)
+let exit_function_safe () =
+  if not !session_needs_saving then exit_function_unsafe () else
+  let answer =
+    GToolbox.question_box
+      ~title:"Why3 saving session"
+      ~buttons:["Yes"; "No"; "Cancel"]
+      "Do you want to save the session?"
+  in
+  begin
+    match answer with
+    | 1 -> send_request Save_req; quit_on_saved := true
+    | 2 -> exit_function_unsafe ()
+    | _ -> ()
+  end
 
 let (_ : GtkSignal.id) = main_window#connect#destroy
-  ~callback:(exit_function ~destroy:true)
+  ~callback:exit_function_safe
+
 
 (* 1.2 "View" menu
 
@@ -457,7 +483,7 @@ let (replay_menu_item : GMenu.menu_item) =
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
-    ~callback:(exit_function ~destroy:false)
+    ~callback:exit_function_safe
 
 (* TODO key stroked to be decided *)
 let reload_menu_item : GMenu.menu_item =
@@ -1124,7 +1150,10 @@ let treat_notification n =
      (* TODO: treat other *)
      init_completion g_info.provers g_info.transformations g_info.commands;
   | Saved                         ->
-     print_message "Session saved."
+      session_needs_saving := false;
+      print_message "Session saved.";
+      if !quit_on_saved = true then
+        exit_function_safe ()
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s)                  ->
      if_selected_alone

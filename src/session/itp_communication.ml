@@ -97,3 +97,15 @@ type ide_request =
   | Replay_req
   | Exit_req
   | Interrupt_req
+
+(* Return true if the request modify the session *)
+let modify_session (r: ide_request) =
+  match r with
+  | Command_req _ | Prove_req _ | Transform_req _ | Strategy_req _
+  | Add_file_req _ | Remove_subtree _ | Copy_paste _ | Copy_detached _
+  | Replay_req -> true
+
+  | Open_session_req _ | Set_max_tasks_req _ | Get_file_contents _
+  | Get_task _ | Save_file_req _ | Get_first_unproven_node _
+  | Get_Session_Tree_req | Save_req | Reload_req | Exit_req
+  | Interrupt_req -> false
