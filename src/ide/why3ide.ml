@@ -255,21 +255,40 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
+(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab) *)
+let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
+  Hstr.create 14
+
+let save_sources () =
+  Hstr.iter
+    (fun k (_n, (s: GSourceView2.source_view), b, _l) ->
+      if !b then
+        let text_to_save = s#source_buffer#get_text () in
+        send_request (Save_file_req (k, text_to_save))
+    )
+    source_view_table
+
+(* True if some files need saving *)
+let files_need_saving () =
+  Hstr.fold (fun _k (_, _, b, _) acc -> !b || acc) source_view_table false
+
 (* Ask if the user wants to save session before exit *)
 let exit_function_safe () =
-  if not !session_needs_saving then exit_function_unsafe () else
-  let answer =
-    GToolbox.question_box
-      ~title:"Why3 saving session"
-      ~buttons:["Yes"; "No"; "Cancel"]
-      "Do you want to save the session?"
-  in
-  begin
-    match answer with
-    | 1 -> send_request Save_req; quit_on_saved := true
-    | 2 -> exit_function_unsafe ()
-    | _ -> ()
-  end
+  if not !session_needs_saving && not (files_need_saving ()) then
+    exit_function_unsafe ()
+  else
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving session and files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save the session and unsaved files?"
+    in
+    begin
+      match answer with
+      | 1 -> save_sources(); send_request Save_req; quit_on_saved := true
+      | 2 -> exit_function_unsafe ()
+      | _ -> ()
+    end
 
 let (_ : GtkSignal.id) = main_window#connect#destroy
   ~callback:exit_function_safe
@@ -527,18 +546,28 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-let source_view_table : (int * GSourceView2.source_view) Hstr.t =
-  Hstr.create 14
+(* Update name of the tab when the label changes so that it has a * as prefix *)
+let update_label_change (label: GMisc.label) =
+  let s = label#text in
+  if not (Strings.has_prefix "*" s) then
+    label#set_text ("*" ^ s)
+
+(* Update name of the tab when the label is saved. Removes * prefix *)
+let update_label_saved (label: GMisc.label) =
+  let s = label#text in
+  if (Strings.has_prefix "*" s) then
+    label#set_text (String.sub s 1 (String.length s - 1))
 
 let create_source_view =
   let n = ref 1 in
   let create_source_view f content =
     if not (Hstr.mem source_view_table f) then
       begin
+        let label = GMisc.label ~text:f () in
         let source_page, scrolled_source_view =
-          let label = GMisc.label ~text:f () in
           !n, GPack.vbox ~homogeneous:false ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () in
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+        in
         let scrolled_source_view =
           GBin.scrolled_window
             ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
@@ -554,9 +583,21 @@ let create_source_view =
             ~editable:true
             ~packing:scrolled_source_view#add
             () in
-        Hstr.add source_view_table f (source_page, source_view);
+        let has_changed = ref false in
+        Hstr.add source_view_table f (source_page, source_view, has_changed, label);
         n := !n + 1;
         source_view#source_buffer#set_text content;
+        (* At initialization, file has not changed. When it changes, changes the
+           name of the tab and update has_changed boolean. *)
+        let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
+          ~callback:(fun () ->
+            try
+              let _source_page, _source_view, has_changed, label =
+                Hstr.find source_view_table f in
+              update_label_change label;
+              has_changed := true;
+              ()
+            with Not_found -> () ) in
         Gconfig.add_modifiable_mono_font_view source_view#misc;
         source_view#source_buffer#set_language why_lang;
         Gconfig.set_fonts ()
@@ -983,14 +1024,6 @@ let (_ : GMenu.menu_item) =
   exp_factory#add_item ~key:GdkKeysyms._D
     ~callback:detached_copy "Detached copy"
 
-let save_sources () =
-  Hstr.iter
-    (fun k (_n, (s: GSourceView2.source_view)) ->
-      let text_to_save = s#source_buffer#get_text () in
-      send_request (Save_file_req (k, text_to_save))
-    )
-    source_view_table
-
 (* TODO replace this with menu items *)
 let (_ : GMenu.menu_item) =
   exp_factory#add_item ~key:GdkKeysyms._X "Save files"
@@ -1060,7 +1093,17 @@ let treat_message_notification msg = match msg with
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s      -> print_message "%s" s
   | Parse_Or_Type_Error s  -> print_message "%s" s
-  | File_Saved s           -> print_message "%s was saved" s
+  | File_Saved f           ->
+    begin
+      try
+        let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
+        b := false;
+        update_label_saved l;
+        print_message "%s was saved" f
+      with
+      | Not_found ->
+          print_message "Please report: %s was not found in ide but was saved in session" f
+    end
   | Error s                ->
       if Debug.test_flag debug then
         print_message "%s" s
@@ -1164,8 +1207,10 @@ let treat_notification n =
   | File_contents (file_name, content) ->
     begin
       try
-        let (_, sc_view) = Hstr.find source_view_table file_name in
-        sc_view#source_buffer#set_text content
+        let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
+        sc_view#source_buffer#set_text content;
+        update_label_saved l;
+        b := false;
       with
       | Not_found -> create_source_view file_name content
     end
