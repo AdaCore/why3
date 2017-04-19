@@ -331,7 +331,7 @@ module N
     ensures { value_sub_shift r sz + (power radix sz) * result =
               value_sub_shift x sz + y }
     ensures { 0 <= result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
     let c = ref y in
@@ -401,7 +401,7 @@ module N
     ensures { 0 <= result <= 1 }
     ensures { value_sub_shift r sz + (power radix sz) * result =
             value_sub_shift x sz + value_sub_shift y sz }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     =
     let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
@@ -463,7 +463,7 @@ module N
     ensures { value_sub_shift r sx + (power radix sx) * result =
               value_sub_shift x sx + value_sub_shift y sy }
     ensures { 0 <= result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
  =
     let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
@@ -591,7 +591,7 @@ module N
     ensures { value_sub_shift r sz - power radix sz * result
               = value_sub_shift x sz - y }
     ensures { 0 <= result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
     let b = ref y in
@@ -661,7 +661,7 @@ module N
     ensures { 0 <= result <= 1 }
     ensures { value_sub_shift r sz - power radix sz * result
               = value_sub_shift x sz - value_sub_shift y sz }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
@@ -725,7 +725,7 @@ module N
     ensures { value_sub_shift r sx  - power radix sx * result
               = value_sub_shift x sx - value_sub_shift y sy }
     ensures { 0 <= result <= 1 }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
@@ -821,7 +821,7 @@ module N
     requires { valid r sz }
     ensures { value_sub_shift r sz + (power radix sz) * result
                 = value_sub_shift x sz * y }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
   =
     let limb_zero = Limb.of_int 0 in
     let lx = ref limb_zero in
@@ -894,7 +894,7 @@ module N
     ensures { value_sub_shift r sz + (power radix sz) * result
             = value_sub_shift (old r) sz
               + value_sub_shift x sz * y }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
   =
@@ -1014,7 +1014,7 @@ module N
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r (sz +  sz) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (sz + sz)
               = value_sub_shift x sz * value_sub_shift y sz }
   =
@@ -1178,7 +1178,7 @@ module N
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r (sz +  sz) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (sz + sz)
                 + power radix (sz + sz) * result
               = value_sub_shift (old r) (sz + sz)
@@ -1364,7 +1364,7 @@ module N
     requires { valid x sx }
     requires { valid y sy }
     requires { valid r (sy + sx) }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { value_sub_shift r (sy + sx)
               = value_sub_shift x sx * value_sub_shift y sy }
   =
@@ -1868,8 +1868,10 @@ module N
              = value_sub_shift x sz * (power 2 (tnc)) };
     value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
     assert { (!rp).offset = r.offset + msb };
-    value_sub_shift_no_change (pelts r) r.offset (p2i sz) (p2i sz) !low;
+    value_sub_shift_no_change (pelts r) r.offset 
+                              (r.offset + p2i msb) (r.offset + p2i msb) !low;
     C.set !rp !low;
+    assert { pelts r = Map.set (pelts (r at EndLoop)) (r.offset + msb) !low};
     assert { value_sub_shift r sz
            = value_sub_shift r msb + power radix msb * !low
            by value_sub_shift r sz
@@ -1878,7 +1880,7 @@ module N
            = value_sub_shift (r at EndLoop) msb
              + power radix msb * !low
            by
-           value_sub_shift r msb = value_sub_shift (r at EndLoop) msb
+           value_sub_shift (r at EndLoop) msb = value_sub_shift r msb
            };
     retval
 
@@ -3028,7 +3030,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value_sub_shift r sz - (power radix sz) * result
             = value_sub_shift (old r) sz
               - value_sub_shift x sz * y }
-    writes { r.data.contents.elts }
+    writes { r.data.elts }
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
 =
@@ -3456,7 +3458,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
          assert { !x1 = dh };
         end;
         label SubMax in
-        let ghost xc = copy (x.data.contents) in
+        let ghost xc = copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
         let b = submul_limb xd y !ql sy in
         begin
@@ -3942,7 +3944,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         label SubProd in
         value_sub_concat (pelts x) x.offset xd.offset
                            (x.offset + p2i sy + k - 1);
-        let ghost xc = copy (x.data.contents) in
+        let ghost xc = copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
         let cy = submul_limb xd y !ql (Int32.(-) sy two) in
         label PostSub in
@@ -4268,7 +4270,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                          >= - !ql * vly > - vy
                    };
           end;
-          let ghost xc = copy (x.data.contents) in
+          let ghost xc = copy (x.data) in
           assert { forall j. x.offset <= j < x.offset + !i
                           -> (pelts x)[j] = xc.elts[j]
                    by
