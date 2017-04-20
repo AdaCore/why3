@@ -101,13 +101,13 @@ let is_fragile_projection ls =
    A cap is either a committed value, a pin (a non-committed
    record with a breakable invariant), a constructible value
    (characterized by the set of possible constructors), or
-   a record with an unbreakable invariant. *)
+   a non-free record with an unbreakable invariant. *)
 
 type cap =
   | V                   (* valid *)
   | P of int            (* pin *)
   | C of cap list Mls.t (* algebraic type *)
-  | R of cap Mls.t      (* record with an unbreakable invariant *)
+  | R of cap Mls.t      (* non-free unbreakable record *)
 
 type pin = {
   p_leaf   : term;                  (* term we can be reached from *)
@@ -254,11 +254,10 @@ let cap_of_term kn uf pins caps t =
     | V, _ -> unroll t pjl0, V
     | P n, (pj,t0)::pjl ->
         let n = get_index uf n in
-        begin match Mint.find_opt n pins with
-        | Some pin ->
-            let v, c = Mls.find pj pin.p_fields in
-            unwind (t_label_copy t0 (t_var v)) c pjl
-        | None -> unroll t pjl0, V end
+        if n = 0 then unroll t pjl0, V
+        else let pin = Mint.find n pins in
+          let v, c = Mls.find pj pin.p_fields in
+          unwind (t_label_copy t0 (t_var v)) c pjl
     | C css, (pj,t0)::pjl when Mls.cardinal css = 1 ->
         let cs, fl = Mls.choose css in
         let c = apply_projection kn pj cs fl in
@@ -363,6 +362,91 @@ let cap_of_term kn uf pins caps t =
   in
   down caps [] t
 
+let find_term_fields kn cs t =
+  let fdl = find_constructor_fields kn cs in
+  let sbs = oty_match Mtv.empty cs.ls_value t.t_ty in
+  let add_pat ty (pl,pll) =
+    let pw = pat_wild (ty_inst sbs ty) in
+    let pv = pat_var (create_vsymbol (id_fresh "v") pw.pat_ty) in
+    pw :: pl, (pv :: pl) :: List.map (fun pl -> pw :: pl) pll in
+  let _, pll = List.fold_right add_pat cs.ls_args ([],[]) in
+  let conv t pl = function
+    | Some pj -> t_app_infer pj [t]
+    | None ->
+        let p = pat_app cs pl (t_type t) in
+        let v = Svs.choose p.pat_vars in
+        t_case_close t [p, t_var v] in
+  List.map2 (conv t) pll fdl
+
+let cap_equality kn uf pins f t1 c1 t2 c2 =
+  let rec commit t c fl uf = match c with
+    | V -> fl, uf
+    | P n ->
+        let n = get_index uf n in
+        if n = 0 then fl, uf else
+        let p = Mint.find n pins in
+        let uf = Mint.add n 0 uf in
+        let add pj (v,c) (fl,uf) =
+          let tv = t_var v in
+          let t = t_app_infer pj [t] in
+          let fl, uf = commit tv c fl uf in
+          t_equ tv t :: fl, uf in
+        Mls.fold add p.p_fields (fl,uf)
+    | C css when (fst (Mls.choose css)).ls_constr = 1 ->
+        (* css cannot be empty and has at most one elt *)
+        let cs, cl = Mls.choose css in
+        let tl = find_term_fields kn cs t in
+        let add t c (fl, uf) = commit t c fl uf in
+        List.fold_right2 add tl cl (fl, uf)
+    | C _css ->
+        assert false (* TODO *)
+    | R pjs ->
+        let add pj c (fl,uf) =
+          commit (t_app_infer pj [t]) c fl uf in
+        Mls.fold add pjs (fl,uf)
+  in
+  let rec down t1 c1 t2 c2 fl uf = match c1, c2 with
+    | V, _ -> commit t2 c2 fl uf
+    | _, V -> commit t1 c1 fl uf
+    | P n1, P n2 ->
+        let n1 = get_index uf n1 in
+        let n2 = get_index uf n2 in
+        if n1 = n2 then fl, uf else
+        if n1 = 0 then commit t2 (mkP n2) fl uf else
+        if n2 = 0 then commit t1 (mkP n1) fl uf else
+        let p1 = Mint.find n1 pins in
+        let p2 = Mint.find n2 pins in
+        let uf = if n1 < n2 then
+          Mint.add n2 n1 uf else Mint.add n1 n2 uf in
+        let add _pj (v1,c1) (v2,c2) (fl,uf) =
+          let t1 = t_var v1 and t2 = t_var v2 in
+          let fl, uf = down t1 c1 t2 c2 fl uf in
+          t_equ t1 t2 :: fl, uf in
+        Mls.fold2_inter add p1.p_fields p2.p_fields (fl,uf)
+    | C css1, C css2 when (fst (Mls.choose css1)).ls_constr = 1 ->
+        (* css1 and css2 cannot be empty and have at most one elt *)
+        let cs, cl1 = Mls.choose css1 in
+        let _,  cl2 = Mls.choose css2 in
+        let tl1 = find_term_fields kn cs t1 in
+        let tl2 = find_term_fields kn cs t2 in
+        let rec add tl1 cl1 tl2 cl2 acc = match tl1,cl1,tl2,cl2 with
+          | t1::tl1, c1::cl1, t2::tl2, c2::cl2 ->
+              let fl, uf = add tl1 cl1 tl2 cl2 acc in
+              down t1 c1 t2 c2 fl uf
+          | _ -> acc in
+        add tl1 cl1 tl2 cl2 (fl,uf)
+    | C _css1, C _css2 ->
+        assert false (* TODO *)
+    | R pjs1, R pjs2 ->
+        let add pj c1 c2 (fl,uf) =
+          let t1 = t_app_infer pj [t1] in
+          let t2 = t_app_infer pj [t2] in
+          down t1 c1 t2 c2 fl uf in
+        Mls.fold2_inter add pjs1 pjs2 (fl,uf)
+    | _ -> assert false (* never *) in
+  let fl, uf = down t1 c1 t2 c2 [] uf in
+  t_and_l (f :: fl), uf
+
 let uf_inter uf1 uf2 =
   let uf1 = Mint.map (get_index uf1) uf1 in
   let uf2 = Mint.map (get_index uf2) uf2 in
@@ -390,7 +474,10 @@ let uf_inter uf1 uf2 =
 let rec track kn uf pins caps pos f = match f.t_node with
   | Tvar _ | Tconst _ | Teps _ -> assert false (* never *)
   | Tapp (ls,[t1;t2]) when not pos && ls_equal ls ps_equ ->
-      assert false (* TODO *)
+      let t1, c1 = cap_of_term kn uf pins caps t1 in
+      let t2, c2 = cap_of_term kn uf pins caps t2 in
+      let f = t_label_copy f (t_equ t1 t2) in
+      cap_equality kn uf pins f t1 c1 t2 c2
   | _ when Slab.mem stop_split f.t_label ->
       fst (cap_of_term kn uf pins caps f), uf
   | Tapp _ ->
