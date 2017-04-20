@@ -295,6 +295,12 @@ module ToList
     forall a: array 'a, l u: int. l < u ->
     to_list a l u = Cons a[l] (to_list a (l+1) u)
 
+  use import list.Append
+
+  lemma to_list_append:
+    forall a: array 'a, l m u: int. l <= m <= u ->
+    to_list a l m ++ to_list a m u = to_list a l u
+
   val to_list (a: array 'a) (l u: int) : list 'a
     requires { 0 <= l && u <= length a }
     ensures  { result = to_list a l u }
