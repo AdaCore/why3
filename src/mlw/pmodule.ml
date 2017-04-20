@@ -774,8 +774,16 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let reads = Spv.union reads (Mpv.domain olds) in
   let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
-    Mreg.add (clone_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
+    let reg' = Mreg.find_def reg reg cl.rn_table in
+    let smf_reg' = Spv.of_list reg'.reg_its.its_mfields in
+    let smf_reg = Spv.of_list reg.reg_its.its_mfields in
+    let smf_diff = Spv.diff smf_reg' smf_reg in
+    let fs = Spv.fold add_fd fs Spv.empty in
+    Mreg.add (clone_reg cl reg) (Spv.union fs smf_diff) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
+  (* Mreg.iter (fun rho spv -> Format.eprintf "rho:%a@." print_reg rho; *)
+  (*             Spv.iter (fun pv -> Format.eprintf "pv:%a@." print_pv pv) spv) *)
+  (*   writes; *)
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
