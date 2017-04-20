@@ -163,7 +163,7 @@ module N
   = if x1 = x2 then () else
       begin
       value_sub_tail x x1 (x2-1);
-      assert { value_sub x x1 x2 
+      assert { value_sub x x1 x2
                <= value_sub x x1 (x2-1) + power radix (x2-x1-1) * (radix - 1) };
       value_sub_upper_bound x x1 (x2-1)
       end
@@ -1868,7 +1868,7 @@ module N
              = value_sub_shift x sz * (power 2 (tnc)) };
     value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
     assert { (!rp).offset = r.offset + msb };
-    value_sub_shift_no_change (pelts r) r.offset 
+    value_sub_shift_no_change (pelts r) r.offset
                               (r.offset + p2i msb) (r.offset + p2i msb) !low;
     C.set !rp !low;
     assert { pelts r = Map.set (pelts (r at EndLoop)) (r.offset + msb) !low};
