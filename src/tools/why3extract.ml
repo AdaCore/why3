@@ -39,7 +39,8 @@ let opt_rec_single = ref Single
 type flat_modular = Flat | Modular
 let opt_modu_flat = ref Flat
 
-let is_uppercase c = c = Char.uppercase_ascii c
+(* Replace with Char.uppercase_ascii after migration to OCaml 4.04+ *)
+let is_uppercase c = c = Char.uppercase c
 
 let add_opt_file x =
   let invalid_path () = Format.eprintf "invalid path: %s@." x; exit 1 in
