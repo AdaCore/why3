@@ -58,12 +58,7 @@ module BinarySort
       (* !left is the place where to insert value v
          so we move a[!left..k) one position to the right *)
       'L:
-      for l = k downto !left + 1 do
-        invariant { forall i. l <  i <= k        -> a[i] = (at a 'L)[i - 1] }
-        invariant { forall i. 0 <= i <= l        -> a[i] = (at a 'L)[i]     }
-        invariant { forall i. k <  i <  length a -> a[i] = (at a 'L)[i]     }
-        a[l] <- a[l - 1]
-      done;
+      self_blit a !left (!left + 1) (k - !left);
       a[!left] <- v;
       assert { permut_sub (at a 'L) a !left (k + 1) };
       assert { permut_sub (at a 'L) a 0 (length a) };
