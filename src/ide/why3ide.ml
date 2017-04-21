@@ -10,6 +10,7 @@ open Itp_server
 external reset_gc : unit -> unit = "ml_reset_gc"
 
 let debug = Debug.lookup_flag "ide_info"
+let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
 (***************************)
 (* Debugging Json protocol *)
@@ -107,13 +108,37 @@ let send_request r =
 (* server instance on the GTK scheduler *)
 (****************************************)
 
+(*
+   The gtk scheduler is catching all exceptions avoiding the printing of the
+   backtrace that is normally done by debug option stack_trace. To recover this
+   behavior we catch exceptions ourselves. If "stack_trace" is on, we exit on
+   first exception and print backtrace on standard output otherwise we raise
+   the exception again (with information on error output).
+*)
+let backtrace_and_exit f () =
+  try f () with
+  | e ->
+      if Debug.test_flag debug_stack_trace then
+        begin
+          Printexc.print_backtrace stdout;
+          exit 1
+        end
+      else
+        begin
+          Format.eprintf "Following exception %a was catched by Labelgtk."
+            Exn_printer.exn_printer e;
+          Format.eprintf "This should not happen. Please report. @.";
+          raise e
+        end
+
 module S = struct
+
     let idle ~prio f =
-      let (_ : GMain.Idle.id) = GMain.Idle.add ~prio f in ()
+      let (_ : GMain.Idle.id) = GMain.Idle.add ~prio (backtrace_and_exit f) in ()
 
     let timeout ~ms f =
-      let (_ : GMain.Timeout.id) = GMain.Timeout.add ~ms ~callback:f in
-      ()
+      let (_ : GMain.Timeout.id) =
+        GMain.Timeout.add ~ms ~callback:(backtrace_and_exit f) in ()
 end
 
 module Server = Itp_server.Make (S) (Protocol_why3ide)
