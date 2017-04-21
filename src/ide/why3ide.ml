@@ -522,20 +522,42 @@ let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._S "_Save session"
     ~callback:(fun () -> send_request Save_req)
 
-let (replay_menu_item : GMenu.menu_item) =
+let replay_menu_item : GMenu.menu_item =
   file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
     ~callback:exit_function_safe
 
+let exist_modified_sources () =
+  Hstr.fold
+    (fun _ (_, _, b, _) acc -> !b || acc)
+    source_view_table
+    false
+
+let reload_unsafe () =
+  (* Clearing the tree *)
+  clear_tree_and_table goals_model;
+  send_request Reload_req
+
+(* Same as reload_safe but propose to save edited sources before reload *)
+let reload_safe () =
+  if exist_modified_sources () then
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving source files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save unsaved source files before reload? \n Modifications that are not saved will be cleared by reload."
+    in
+    match answer with
+    | 1 -> save_sources (); reload_unsafe ()
+    | 2 -> reload_unsafe ()
+    | _ -> ()
+
 (* TODO key stroked to be decided *)
 let reload_menu_item : GMenu.menu_item =
   file_factory#add_item ~key:GdkKeysyms._E "r_Eload session"
-    ~callback:(fun () ->
-      (* Clearing the tree *)
-      clear_tree_and_table goals_model;
-      send_request Reload_req)
+    ~callback:reload_safe
 
 
 (* vpan222 contains:
