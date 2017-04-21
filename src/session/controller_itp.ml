@@ -839,7 +839,8 @@ let replay ~remove_obsolete ~use_steps c ~callback =
     (fun _ _ -> count := !count + 1) session;
 
   (* Replaying function *)
-  let replay_pa id pa =
+  let replay_pa pa =
+    let id = pa.parent in
     let pr = pa.prover in
     (* If use_steps, we give only steps as a limit *)
     let limit =
@@ -858,6 +859,6 @@ let replay ~remove_obsolete ~use_steps c ~callback =
 
   (* Calling replay on all the proof_attempts of the session *)
   Session_itp.session_iter_proof_attempt
-    (fun id pa -> replay_pa id pa) session
+    (fun _ pa -> replay_pa pa) session
 
 end

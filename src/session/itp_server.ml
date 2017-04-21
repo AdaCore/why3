@@ -1047,7 +1047,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
     | Save_file_req (name, text)   ->
         save_file name text;
     | Get_task nid                 -> send_task nid
-    | Replay_req                   -> replay_session (); resend_the_tree ()
+    | Replay_req                   -> replay_session (); reload_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
