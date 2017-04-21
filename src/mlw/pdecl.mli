@@ -66,6 +66,9 @@ val create_rec_variant_decl :
 val create_alias_decl : preid -> tvsymbol list -> ity -> its_defn
 (** [create_alias_decl id args def] creates a new alias type declaration. *)
 
+val create_range_decl : preid -> Number.int_range -> its_defn
+(** [create_range_decl id ir] creates a new range type declaration. *)
+
 (** {2 Module declarations} *)
 
 type pdecl = private {
@@ -82,7 +85,8 @@ and pdecl_node = private
   | PDexn  of xsymbol
   | PDpure
 
-val create_type_decl : its_defn list -> pdecl
+val create_type_decl :
+  its_defn list -> pdecl * (Theory.meta * Theory.meta_arg list) list
 
 val create_let_decl : let_defn -> pdecl
 

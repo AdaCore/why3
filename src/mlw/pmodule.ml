@@ -327,7 +327,9 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  close_module (add_pdecl_raw uc (create_type_decl [td]))
+  let d,metas = create_type_decl [td] in
+  assert (metas = []);
+  close_module (add_pdecl_raw uc d)
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -925,7 +927,11 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
-      add_pdecl ~vc:false uc (create_type_decl tdl)
+        let d,metas = create_type_decl tdl in
+      List.fold_left
+        (fun uc (m,a) -> add_meta uc m a)
+        (add_pdecl ~vc:false uc d)
+        metas
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);

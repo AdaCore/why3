@@ -129,6 +129,9 @@ val create_rec_itysymbol : preid -> tvsymbol list -> itysymbol
 val create_alias_itysymbol : preid -> tvsymbol list -> ity -> itysymbol
 (** [create_alias_itysymbol id args def] creates a new type alias. *)
 
+val create_range_itysymbol : preid -> Number.int_range -> itysymbol
+(** [create_range_itysymbol id r] creates a new range type. *)
+
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
 
