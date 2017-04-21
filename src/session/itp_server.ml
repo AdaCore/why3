@@ -60,38 +60,6 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
-
-(****************)
-(* Command list *)
-(****************)
-let commands =
-  [
-    "list-transforms", "list available transformations", Qnotask list_transforms_query;
-    "list-provers", "list available provers", Qnotask list_provers;
-(*
-    "list-strategies", "list available strategies", list_strategies;
-*)
-    "print", "<s> print the declaration where s was defined", Qtask print_id;
-    "search", "<s> print some declarations where s appear", Qtask search_id;
-(*
-    "r", "reload the session (test only)", test_reload;
-    "rp", "replay", test_replay;
-    "s", "save the current session", test_save_session;
-    "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
-    "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
-    "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);
-    "gd", "go to the goal down",  then_print (move_to_goal_ret_p zipper_down);
-    "gr", "go to the goal right",  then_print (move_to_goal_ret_p zipper_right);
-    "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left)
- *)
-  ]
-
-let commands_table = Stdlib.Hstr.create 17
-let () =
-  List.iter
-    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
-    commands
-
 (*******************)
 (* Strategies list *)
 (*******************)
@@ -341,6 +309,42 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
   module C = Controller_itp.Make(S)
 
   let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
+
+
+(****************)
+(* Command list *)
+(****************)
+
+ let interrupt_query _cont _args = C.interrupt (); "interrupted"
+
+let commands =
+  [
+    "list-transforms", "list available transformations", Qnotask list_transforms_query;
+    "list-provers", "list available provers", Qnotask list_provers;
+(*
+    "list-strategies", "list available strategies", list_strategies;
+*)
+    "print", "<s> print the declaration where s was defined", Qtask print_id;
+    "search", "<s> print some declarations where s appear", Qtask search_id;
+    "interrupt", "interrupt all scheduled or running proof tasks", Qnotask interrupt_query;
+(*
+    "r", "reload the session (test only)", test_reload;
+    "rp", "replay", test_replay;
+    "s", "save the current session", test_save_session;
+    "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
+    "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
+    "gu", "go to the goal up",  then_print (move_to_goal_ret_p zipper_up);
+    "gd", "go to the goal down",  then_print (move_to_goal_ret_p zipper_down);
+    "gr", "go to the goal right",  then_print (move_to_goal_ret_p zipper_right);
+    "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left)
+ *)
+  ]
+
+let commands_table = Stdlib.Hstr.create 17
+let () =
+  List.iter
+    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
+    commands
 
   type server_data =
     { config : Whyconf.config;
@@ -1057,7 +1061,6 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        -> schedule_proof_attempt nid p limit
         | Strategies st           -> run_strategy_on_task nid st
-        | Interrupt               -> C.interrupt ()
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

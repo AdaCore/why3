@@ -210,15 +210,6 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
-type report =
-  | Result of Call_provers.prover_result * Call_provers.prover_result
-        (** Result(new_result,old_result) *)
-  | CallFailed of exn
-  | Prover_not_installed
-  | Edited_file_absent of string
-  | No_former_result of Call_provers.prover_result
-(** Type for the reporting of a replayed call *)
-
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
     notification:(any -> bool -> unit) ->
@@ -229,6 +220,15 @@ val copy_paste:
 val copy_detached:
     copy:(parent:any -> any -> unit) ->
     controller -> any -> unit
+
+type report =
+  | Result of Call_provers.prover_result * Call_provers.prover_result
+        (** Result(new_result,old_result) *)
+  | CallFailed of exn
+  | Prover_not_installed
+  | Edited_file_absent of string
+  | No_former_result of Call_provers.prover_result
+(** Type for the reporting of a replayed call *)
 
 (* Callback for the report printing of replay
    TODO to be removed when we have a better way to print the result of replay *)
