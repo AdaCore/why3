@@ -1,7 +1,5 @@
 
 
-(* TODO copy of why3js_ocaml.... *)
-
 open Why3
 open Itp_communication
 
