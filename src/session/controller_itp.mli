@@ -210,6 +210,12 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
+val clean_session:
+  controller ->
+  remove:(any -> unit) ->
+  node_change:(any -> bool -> unit) -> unit
+(** Remove proof_attempts that are not valid from the session *)
+
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
     notification:(any -> bool -> unit) ->

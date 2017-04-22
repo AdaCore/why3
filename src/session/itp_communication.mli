@@ -99,6 +99,7 @@ type ide_request =
   (* Save_file_req (filename, content_of_file). Save the file *)
   | Get_first_unproven_node of node_ID
   | Get_Session_Tree_req
+  | Clean_req
   | Save_req
   | Reload_req
   | Replay_req

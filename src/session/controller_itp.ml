@@ -689,6 +689,26 @@ let schedule_tr_with_same_arguments
   let name = get_transf_name s tr in
   schedule_transformation c pn name args ~callback ~notification
 
+let clean_session c ~remove ~node_change =
+  let is_valid (pa: proof_attempt_node) : bool =
+    match pa.Session_itp.proof_state with
+    | None -> false
+    | Some pr ->
+      begin
+        match pr.Call_provers.pr_answer with
+        | Call_provers.Valid -> true
+        | _ -> false
+      end
+  in
+  let s = c.controller_session in
+  Session_itp.session_iter_proof_attempt
+    (fun _ pa ->
+      let pnid = pa.parent in
+      Hprover.iter (fun _ paid ->
+        if (not (is_valid (get_proof_attempt_node s paid))) then
+          remove_subtree c ~removed:remove ~node_change (APa paid))
+        (get_proof_attempt_ids s pnid)) s
+
 exception BadCopyPaste
 
 (* Reproduce the transformation made on node on an other one *)

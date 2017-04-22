@@ -525,6 +525,10 @@ let (_ : GMenu.menu_item) =
 let replay_menu_item : GMenu.menu_item =
   file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
 
+let clean_menu_item : GMenu.menu_item =
+  file_factory#add_item ~key:GdkKeysyms._L "C_Lean all"
+    ~callback:(fun _ -> send_request Clean_req)
+
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
     ~callback:exit_function_safe

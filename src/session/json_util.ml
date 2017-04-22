@@ -125,6 +125,7 @@ let convert_request_constructor (r: ide_request) =
   | Copy_detached _           -> String "Copy_detached"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
   | Get_Session_Tree_req      -> String "Get_Session_Tree_req"
+  | Clean_req                 -> String "Clean_req"
   | Save_req                  -> String "Save_req"
   | Reload_req                -> String "Reload_req"
   | Replay_req                -> String "Replay_req"
@@ -184,6 +185,8 @@ let print_request_to_json (r: ide_request): Json_base.value =
       Obj ["ide_request", cc r;
            "node_ID", Int id]
   | Get_Session_Tree_req ->
+      Obj ["ide_request", cc r]
+  | Clean_req ->
       Obj ["ide_request", cc r]
   | Save_req ->
       Obj ["ide_request", cc r]
@@ -318,9 +321,9 @@ exception NotProver
 let parse_prover_from_json (j: Json_base.value) =
   match j with
   | Obj ["prover_name", String pn;
-           "prover_version", String pv;
-           "prover_altern", String pa] ->
-            {Whyconf.prover_name = pn; prover_version = pv; prover_altern = pa}
+         "prover_version", String pv;
+         "prover_altern", String pa] ->
+           {Whyconf.prover_name = pn; prover_version = pv; prover_altern = pa}
   | _ -> raise NotProver
 
 exception NotLimit
@@ -328,9 +331,9 @@ exception NotLimit
 let parse_limit_from_json (j: Json_base.value) =
   match j with
   | Obj ["limit_time", Int t;
-           "limit_mem", Int m;
-           "limit_steps", Int s] ->
-             {limit_time = t; limit_mem = m; limit_steps = s}
+         "limit_mem", Int m;
+         "limit_steps", Int s] ->
+           {limit_time = t; limit_mem = m; limit_steps = s}
   | _ -> raise NotLimit
 
 exception NotRequest of string
@@ -371,6 +374,8 @@ let parse_request (constr: string) l =
     Copy_detached n
   | "Get_Session_Tree_req", [] ->
     Get_Session_Tree_req
+  | "Clean_req" , [] ->
+    Clean_req
   | "Save_req", [] ->
     Save_req
   | "Reload_req", [] ->

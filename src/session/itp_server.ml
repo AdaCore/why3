@@ -258,6 +258,7 @@ let print_request fmt r =
   | Copy_detached _                 -> fprintf fmt "copy detached"
   | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_file_req _                 -> fprintf fmt "save file"
+  | Clean_req                       -> fprintf fmt "clean"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
   | Replay_req                      -> fprintf fmt "replay"
@@ -937,6 +938,20 @@ let () =
                  unproven_goals
     | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
+
+  (* ----------------- Clean session -------------------- *)
+  let clean_session () =
+    let d = get_server_data () in
+    let node_change x b =
+      let nid = node_ID_from_any x in
+      P.notify (Node_change (nid, Proved b)) in
+    let remove x =
+      let nid = node_ID_from_any x in
+      remove_any_node_ID x;
+      P.notify (Remove nid) in
+    C.clean_session d.cont ~remove ~node_change
+
+
   (* ----------------- Save session --------------------- *)
   let save_session () =
     let d = get_server_data () in
@@ -1012,6 +1027,7 @@ let () =
       end
     | Transform_req (nid, t, args) -> apply_transform nid t args
     | Strategy_req (nid, st)       -> run_strategy_on_task nid st
+    | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
     | Get_Session_Tree_req         -> resend_the_tree ()
