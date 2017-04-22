@@ -156,6 +156,9 @@ val remove_transformation : session -> transID -> unit
 (** [remove_transformation s id] removes the transformation [id]
     from the session [s] *)
 
+val mark_obsolete: session -> proofAttemptID -> unit
+(** [mark_obsolete s id] marks [id] as obsolete in [s] *)
+
 val save_session : session -> unit
 (** [save_session s] Save the session [s] *)
 

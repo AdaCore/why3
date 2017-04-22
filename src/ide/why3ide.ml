@@ -1031,6 +1031,13 @@ let remove_item: GMenu.menu_item =
       | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
       | _ -> print_message "Select only one node to perform this action")
 
+let mark_obsolete_item: GMenu.menu_item =
+  file_factory#add_item "Mark obsolete"
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] -> let id = get_node_id r#iter in send_request (Mark_obsolete_req id)
+      | _ -> print_message "Select only one node to perform this action")
+
 (*************************************)
 (* Commands of the Experimental menu *)
 (*************************************)
@@ -1214,6 +1221,12 @@ let treat_notification n =
           Hint.replace node_id_pa id (pa, obs, l);
           goals_model#set ~row:r#iter ~column:status_column
                           (image_of_pa_status ~obsolete:obs pa)
+       | Obsolete b ->
+          let r = get_node_row id in
+          let (pa, _obs, l) = Hint.find node_id_pa id in
+          Hint.replace node_id_pa id (pa, b, l);
+          goals_model#set ~row:r#iter ~column:status_column
+                          (image_of_pa_status ~obsolete:b pa)
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id

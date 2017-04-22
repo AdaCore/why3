@@ -216,6 +216,11 @@ val clean_session:
   node_change:(any -> bool -> unit) -> unit
 (** Remove proof_attempts that are not valid from the session *)
 
+val mark_as_obsolete:
+  node_change:(any -> bool -> unit) ->
+  node_obsolete:(any -> bool -> unit) ->
+  controller -> any -> unit
+
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
     notification:(any -> bool -> unit) ->

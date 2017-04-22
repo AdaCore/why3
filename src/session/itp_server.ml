@@ -258,6 +258,7 @@ let print_request fmt r =
   | Copy_detached _                 -> fprintf fmt "copy detached"
   | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_file_req _                 -> fprintf fmt "save file"
+  | Mark_obsolete_req _             -> fprintf fmt "mark obsolete"
   | Clean_req                       -> fprintf fmt "clean"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
@@ -983,6 +984,18 @@ let () =
     (* TODO make replay print *)
     C.replay ~use_steps:false d.cont ~callback:callback ~remove_obsolete:false
 
+  (* ---------------- Mark obsolete ------------------ *)
+  let mark_obsolete n =
+    let d = get_server_data () in
+    let any = any_from_node_ID n in
+    let node_change x b =
+      let nid = node_ID_from_any x in
+      P.notify (Node_change (nid, Proved b)) in
+    let node_obsolete x b =
+      let nid = node_ID_from_any x in
+      P.notify (Node_change (nid, Obsolete b)) in
+    C.mark_as_obsolete ~node_obsolete ~node_change d.cont any
+
   (* ----------------- locate next unproven node -------------------- *)
 
   let notify_first_unproven_node d ni =
@@ -1064,6 +1077,7 @@ let () =
         C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
+    | Mark_obsolete_req n          -> mark_obsolete n
     | Save_file_req (name, text)   ->
         save_file name text;
     | Get_task nid                 -> send_task nid

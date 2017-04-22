@@ -57,6 +57,7 @@ type update_info =
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
       * Call_provers.resource_limit
+  | Obsolete of bool
 
 type notification =
   | New_node     of node_ID * node_ID * node_type * string * bool
@@ -98,6 +99,7 @@ type ide_request =
   | Save_file_req           of string * string
   (* Save_file_req (filename, content_of_file). Save the file *)
   | Get_first_unproven_node of node_ID
+  | Mark_obsolete_req       of node_ID
   | Get_Session_Tree_req
   | Clean_req
   | Save_req

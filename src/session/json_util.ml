@@ -82,6 +82,9 @@ let convert_update u =
              "proof_attempt", convert_proof_attempt pas;
              "obsolete", Bool b;
              "limit", convert_limit l]
+  | Obsolete b ->
+      Obj ["update_info", String "Obsolete";
+           "obsolete", Bool b]
 
 let convert_notification_constructor n =
   match n with
@@ -125,6 +128,7 @@ let convert_request_constructor (r: ide_request) =
   | Copy_detached _           -> String "Copy_detached"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
   | Get_Session_Tree_req      -> String "Get_Session_Tree_req"
+  | Mark_obsolete_req _       -> String "Mark_obsolete_req"
   | Clean_req                 -> String "Clean_req"
   | Save_req                  -> String "Save_req"
   | Reload_req                -> String "Reload_req"
@@ -186,6 +190,9 @@ let print_request_to_json (r: ide_request): Json_base.value =
            "node_ID", Int id]
   | Get_Session_Tree_req ->
       Obj ["ide_request", cc r]
+  | Mark_obsolete_req n ->
+      Obj ["ide_request", cc r;
+           "node_ID", Int n]
   | Clean_req ->
       Obj ["ide_request", cc r]
   | Save_req ->
@@ -374,6 +381,8 @@ let parse_request (constr: string) l =
     Copy_detached n
   | "Get_Session_Tree_req", [] ->
     Get_Session_Tree_req
+  | "Mark_obsolete_req", ["node_ID", Int n] ->
+    Mark_obsolete_req n
   | "Clean_req" , [] ->
     Clean_req
   | "Save_req", [] ->
@@ -483,6 +492,9 @@ let parse_update j =
            "obsolete", Bool b;
            "limit", l] ->
     Proof_status_change (parse_proof_attempt pas, b, parse_limit_from_json l)
+  | Obj ["update_info", String "Obsolete";
+         "obsolete", Bool b] ->
+    Obsolete b
   | _ -> raise NotUpdate
 
 exception NotInfos

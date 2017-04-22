@@ -297,6 +297,10 @@ let remove_proof_attempt_pa s (id: proofAttemptID) =
   let prover = pa.prover in
   remove_proof_attempt s pn prover
 
+let mark_obsolete s (id: proofAttemptID) =
+  let pa = get_proof_attempt_node s id in
+  pa.proof_obsolete <- true
+
 (* Iterations functions on the session tree *)
 
 let rec fold_all_any_of_transn s f acc trid =

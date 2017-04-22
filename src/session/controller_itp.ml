@@ -709,6 +709,19 @@ let clean_session c ~remove ~node_change =
           remove_subtree c ~removed:remove ~node_change (APa paid))
         (get_proof_attempt_ids s pnid)) s
 
+let mark_as_obsolete ~node_change ~node_obsolete c any =
+  let s = c.controller_session in
+  match any with
+  | APa n ->
+    let parent = get_proof_attempt_parent s n in
+    Session_itp.mark_obsolete s n;
+    node_obsolete any true;
+    let b = reload_goal_proof_state c parent in
+    node_change (APn parent) b;
+    update_proof_node node_change c parent b
+  | _ -> ()
+
+
 exception BadCopyPaste
 
 (* Reproduce the transformation made on node on an other one *)
