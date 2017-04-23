@@ -38,6 +38,9 @@ let create_alias_decl id args ity =
 let create_range_decl id ir =
   mk_itd (create_range_itysymbol id ir) [] [] []
 
+let create_float_decl id fp =
+  mk_itd (create_float_itysymbol id fp) [] [] []
+
 let check_field stv f =
   let loc = f.pv_vs.vs_name.id_loc in
   let ftv = ity_freevars Stv.empty f.pv_ity in
@@ -330,7 +333,32 @@ let create_type_decl dl =
              in
              let minInt_decl = create_logic_decl [make_ls_defn lsminInt [] t] in
              abst, defn, td :: pjd :: maxInt_decl :: minInt_decl :: rest, meta :: metas
-          | Float _ -> assert false (* TODO *)
+          | Float fmt ->
+             let ts = s.its_ts in
+             let td = create_ty_decl ts in
+             let nm = ts.ts_name.id_string ^ "'real" in
+             let id = id_derive nm ts.ts_name in
+             let pj = create_fsymbol id [ty_app ts []] ty_real in
+             let pjd = create_param_decl pj in
+             let nm = ts.ts_name.id_string ^ "'isFinite" in
+             let id = id_derive nm ts.ts_name in
+             let iF = create_psymbol id [ty_app ts []] in
+             let iFd = create_param_decl iF in
+             let meta = Theory.(meta_float,[MAts ts; MAls pj; MAls iF]) in
+             (* create exponent digits attribute *)
+             let nm = ts.ts_name.id_string ^ "'eb" in
+             let id = id_derive nm ts.ts_name in
+             let ls = create_fsymbol id [] ty_int  in
+             let t = t_nat_const fmt.Number.fp_exponent_digits in
+             let eb_decl = create_logic_decl [make_ls_defn ls [] t] in
+             (* create significand digits attribute *)
+             let nm = ts.ts_name.id_string ^ "'sb" in
+             let id = id_derive nm ts.ts_name in
+             let ls = create_fsymbol id [] ty_int  in
+             let t = t_nat_const fmt.Number.fp_significand_digits in
+             let sb_decl = create_logic_decl [make_ls_defn ls [] t] in
+             abst, defn, td :: pjd :: iFd :: eb_decl :: sb_decl :: rest,
+             meta :: metas
           | NoDef -> assert false
         end
     | fl, _ when itd.itd_invariant <> [] ->

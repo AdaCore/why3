@@ -285,9 +285,11 @@ theory GenericFloat
 
   axiom eq_refl: forall x. is_finite x -> x .= x
 
-  axiom eq_sym: forall x y. x .= y -> y .= x
+  axiom eq_sym "W:non_conservative_extension:N" :
+    forall x y. x .= y -> y .= x
 
-  axiom eq_trans: forall x y z. x .= y -> y .= z -> x .= z
+  axiom eq_trans "W:non_conservative_extension:N":
+    forall x y z. x .= y -> y .= z -> x .= z
 
   axiom eq_zero: zeroF .= (.- zeroF)
 

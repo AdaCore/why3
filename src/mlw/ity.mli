@@ -132,6 +132,9 @@ val create_alias_itysymbol : preid -> tvsymbol list -> ity -> itysymbol
 val create_range_itysymbol : preid -> Number.int_range -> itysymbol
 (** [create_range_itysymbol id r] creates a new range type. *)
 
+val create_float_itysymbol : preid -> Number.float_format -> itysymbol
+(** [create_float_itysymbol id f] creates a new float type. *)
+
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)
 

@@ -636,6 +636,11 @@ let create_range_itysymbol id ir =
   mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
     ~aflg:[] ~rflg:[] ~def:(Range ir)
 
+let create_float_itysymbol id fp =
+  let ts = create_tysymbol id [] (Float fp) in
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
+    ~aflg:[] ~rflg:[] ~def:(Float fp)
+
 let fields_of_invariant ftv flds invl =
   if invl = [] then Mpv.empty, flds else
   let fvs = Mpv.fold (fun v _ s -> Svs.add v.pv_vs s) flds Svs.empty in

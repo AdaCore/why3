@@ -69,6 +69,9 @@ val create_alias_decl : preid -> tvsymbol list -> ity -> its_defn
 val create_range_decl : preid -> Number.int_range -> its_defn
 (** [create_range_decl id ir] creates a new range type declaration. *)
 
+val create_float_decl : preid -> Number.float_format -> its_defn
+(** [create_float_decl id fp] creates a new float type declaration. *)
+
 (** {2 Module declarations} *)
 
 type pdecl = private {

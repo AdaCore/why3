@@ -894,9 +894,13 @@ let add_types muc tdl =
                   Number.ir_upper = hi } in
        let itd = create_range_decl id ir in
        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
-    | TDfloat _ ->
+    | TDfloat (eb,sb) ->
        check_public ~loc d "Float";
-       assert false (* TODO *)
+       let fp = { Number.fp_exponent_digits = eb;
+                  Number.fp_significand_digits = sb } in
+       let itd = create_float_decl id fp in
+       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+
 
   and parse ~loc ~alias ~alg pty =
     let rec down = function
