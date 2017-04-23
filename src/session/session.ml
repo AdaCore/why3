@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -55,6 +55,8 @@ let print_ident_path fmt ip =
     ip.ip_theory
     (Pp.print_list Pp.dot Pp.string) ip.ip_qualid
 
+(* dead code
+
 let compare_ident_path x y =
   let c = Lists.compare String.compare x.ip_library y.ip_library in
   if c <> 0 then -c else (* in order to be bottom up *)
@@ -73,6 +75,8 @@ end
 module Mpos = Extmap.Make(Pos)
 module Spos = Extset.MakeOfMap(Mpos)
 module Hpos = Exthtbl.Make(Pos)
+
+*)
 
 type meta_args = meta_arg list
 
@@ -1361,7 +1365,7 @@ and load_metas ctxt mg a =
             let tvs = Util.foldi (fun l _ ->
               (create_tvsymbol (Ident.id_fresh "a"))::l)
               [] 0 arity in
-            let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs None in
+            let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs NoDef in
             Hint.add hts intid ts;
             let idpos_ts = Mts.add ts pos idpos.idpos_ts in
             { idpos with idpos_ts = idpos_ts }

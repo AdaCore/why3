@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,7 +27,7 @@
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
 %token BLACKLIST
-%token MODULE EXCEPTION VAL CONVERTER
+%token MODULE EXCEPTION VAL CONVERTER LITERAL
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
 %token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
@@ -89,6 +89,7 @@ trule:
 | syntax FUNCTION  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
 | syntax PREDICATE qualid STRING { Rsyntaxps  ($3, $4, $1) }
 | syntax CONVERTER qualid STRING { Rconverter ($3, $4, $1) }
+| syntax LITERAL   qualid STRING { Rliteral   ($3, $4, $1) }
 | REMOVE PROP qualid             { Rremovepr  ($3) }
 | REMOVE ALL                     { Rremoveall }
 | META ident meta_args           { Rmeta      ($2, $3) }

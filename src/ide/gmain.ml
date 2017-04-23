@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -585,9 +585,10 @@ let goal_task_text g =
     task_text (S.goal_task g)
 
 let file_contents f =
-  try
-    Sysutil.file_contents f
-  with Invalid_argument s -> s
+  let s = try Sysutil.file_contents f
+          with Invalid_argument s -> s
+  in try_convert s
+
 
 let update_tabs a =
   let task_text =

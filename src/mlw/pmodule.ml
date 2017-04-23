@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -327,7 +327,9 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  close_module (add_pdecl_raw uc (create_type_decl [td]))
+  let d,metas = create_type_decl [td] in
+  assert (metas = []);
+  close_module (add_pdecl_raw uc d)
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -621,13 +623,16 @@ let clone_type_decl inst cl tdl kn =
       List.iter2 (cl_save_rs cl) d.itd_fields itd.itd_fields;
       Hits.add htd s (Some itd) in
     (* alias *)
-    if s.its_def <> None then begin
+    match s.its_def with
+    | Alias ty ->
       if cloned then raise (CannotInstantiate id);
-      let def = conv_ity alg (Opt.get s.its_def) in
+      let def = conv_ity alg ty in
       let itd = create_alias_decl id' ts.ts_args def in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
-    end else
+    | Range _ -> assert false (* TODO *)
+    | Float _ -> assert false (* TODO *)
+    | NoDef ->
     (* abstract *)
     if s.its_private && cloned then begin
       (* FIXME: currently, we cannot refine a block of mutual types *)
@@ -930,7 +935,11 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
-      add_pdecl ~vc:false uc (create_type_decl tdl)
+        let d,metas = create_type_decl tdl in
+      List.fold_left
+        (fun uc (m,a) -> add_meta uc m a)
+        (add_pdecl ~vc:false uc d)
+        metas
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);

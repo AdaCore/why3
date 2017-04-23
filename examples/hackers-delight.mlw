@@ -10,9 +10,9 @@ theory Utils
 
   use import bv.BV32
 
-  let constant one : t = of_int 1
-  let constant two : t = of_int 2
-  let constant lastbit : t = of_int 31
+  let constant one : t = 1
+  let constant two : t = 2
+  let constant lastbit : t = sub size_bv one
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
@@ -21,14 +21,14 @@ theory Utils
       1-bit in a bitvector (p.82) *)
 
   let function count (bv : t) : t =
-    let x = sub bv (bw_and (lsr_bv bv one) (of_int 0x55555555)) in
-    let x = add (bw_and x (of_int 0x33333333))
-                (bw_and (lsr_bv x (of_int 2)) (of_int (0x33333333))) in
-    let x = bw_and (add x (lsr_bv x (of_int 4)))
-                   (of_int 0x0F0F0F0F) in
-    let x = add x (lsr_bv x (of_int 8)) in
-    let x = add x (lsr_bv x (of_int 16)) in
-    bw_and x (of_int 0x0000003F)
+    let x = sub bv (bw_and (lsr_bv bv one) (0x55555555:t)) in
+    let x = add (bw_and x (0x33333333:t))
+                (bw_and (lsr_bv x two) (0x33333333:t)) in
+    let x = bw_and (add x (lsr_bv x (4:t)))
+                   (0x0F0F0F0F:t) in
+    let x = add x (lsr_bv x (8:t)) in
+    let x = add x (lsr_bv x (16:t)) in
+    bw_and x (0x0000003F:t)
 
   (** We then define the associated notion of distance, namely
       "Hamming distance", that counts the number of bits that differ
@@ -77,7 +77,7 @@ module Utils_Spec
 
   let rec lemma countSpec_Aux (bv : t) : unit
   variant {bv with ult}
-  ensures {to_uint (count bv) = NumOf.numof (nth bv) 0 32}
+  ensures {t'int (count bv) = NumOf.numof (nth bv) 0 32}
   =
     if BuiltIn.(=) bv zeros then ()
     else
@@ -98,7 +98,7 @@ module Utils_Spec
   (** With these lemmas, we can now prove the correctness property of
   count: *)
 
-  lemma countSpec: forall b. to_uint (count b) = NumOf.numof
+  lemma countSpec: forall b. t'int (count b) = NumOf.numof
         (nth b) 0 32
 
   (** {6 hammingD correctness } *)
@@ -107,7 +107,7 @@ module Utils_Spec
 
   (** The correctness property can be express as the following: *)
   let lemma hamming_spec (a b : t) : unit
-  ensures {to_uint (hammingD a b) = NumOf.numof (nth_diff a b) 0 32}
+  ensures {t'int (hammingD a b) = NumOf.numof (nth_diff a b) 0 32}
   =
    assert { forall i. 0 <= i < 32 -> nth (bw_xor a b) i <-> (nth_diff a b i) }
 
@@ -128,7 +128,7 @@ module Utils_Spec
     numof_or p q a (b-1)
 
   let lemma triangleInequalityInt (a b c : t) : unit
-    ensures {to_uint (hammingD a b) + to_uint (hammingD b c) >= to_uint (hammingD a c)}
+    ensures {t'int (hammingD a b) + t'int (hammingD b c) >= t'int (hammingD a c)}
   =
     assert {numof (fun_or (nth_diff a b) (nth_diff b c)) 0 32 >= numof (nth_diff a c) 0 32
              by
@@ -197,11 +197,11 @@ module Hackers_delight
     bw_xor bv (lsr_bv bv one)
 
   function fromGray (gr : t) : t =
-    let b = bw_xor gr (lsr_bv gr (of_int 1)) in
-    let b = bw_xor b (lsr_bv b (of_int 2)) in
-    let b = bw_xor b (lsr_bv b (of_int 4)) in
-    let b = bw_xor b (lsr_bv b (of_int 8)) in
-      bw_xor b (lsr_bv b (of_int 16))
+    let b = bw_xor gr (lsr_bv gr one) in
+    let b = bw_xor b (lsr_bv b (2:t)) in
+    let b = bw_xor b (lsr_bv b (4:t)) in
+    let b = bw_xor b (lsr_bv b (8:t)) in
+      bw_xor b (lsr_bv b (16:t))
 
   (** Which define an isomorphism. *)
 
@@ -260,13 +260,13 @@ module Hackers_delight
     bw_not( bw_or x y ) = bw_and (bw_not x) (bw_not y)
 
   lemma DM3: forall x.
-    bw_not( add x (of_int 1) ) = sub (bw_not x) (of_int 1)
+    bw_not (add x one) = sub (bw_not x) one
 
   lemma DM4: forall x.
-    bw_not( sub x (of_int 1) ) = add (bw_not x) (of_int 1)
+    bw_not( sub x one) = add (bw_not x) one
 
   lemma DM5: forall x.
-    bw_not( neg x ) = sub x (of_int 1)
+    bw_not( neg x ) = sub x one
 
   lemma DM6: forall x y.
     bw_not( bw_xor x y ) = bw_xor (bw_not x) y
@@ -278,7 +278,7 @@ module Hackers_delight
     bw_not( sub x y ) = add (bw_not x) y
 
   lemma DMtest: forall x.
-    zeros = bw_not( bw_or x (neg( add x (of_int 1))))
+    zeros = bw_not( bw_or x (neg(add x one)))
 
   (** {6 Addition Combined with Logical Operations (p.16)} *)
 
@@ -342,16 +342,16 @@ module Hackers_delight
   (** shift right and arithmetic shift right (p.20)*)
 
   lemma SR1: forall x n. ult n size_bv ->
-    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (of_int 31) )) (sub (of_int 31) n))
+    bw_or (lsr_bv x n) (lsl_bv (neg( lsr_bv x (31:t) )) (sub (31:t) n))
   = asr_bv x n
 
   (** rotate vs shift (p.37)*)
 
   lemma RS_left: forall x.
-    bw_or (lsl_bv x (of_int 1)) (lsr_bv x (of_int 31)) = rotate_left_bv x one
+    bw_or (lsl_bv x one) (lsr_bv x (31:t)) = rotate_left_bv x one
 
   lemma RS_right: forall x.
-    bw_or (lsr_bv x (of_int 1)) (lsl_bv x (of_int 31)) = rotate_right_bv x one
+    bw_or (lsr_bv x one) (lsl_bv x (31:t)) = rotate_right_bv x one
 
   (** {6 bound propagation (p.73)} *)
 

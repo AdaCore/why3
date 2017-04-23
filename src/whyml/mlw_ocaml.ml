@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -199,9 +199,10 @@ module Translate = struct
         []
 
   let type_decl info ts = match ts.ts_def with
-    | None ->
+    | NoDef | Range _ | Float _ ->
+        (* FIXME: how should we extract Range and Float? *)
         ML.Dabstract
-    | Some ty ->
+    | Alias ty ->
         ML.Dalias (type_ info ty)
 
   let type_args = List.map (fun tv -> tv.tv_name)

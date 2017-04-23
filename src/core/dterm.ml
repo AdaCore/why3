@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -73,8 +73,6 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
       List.iter2 dty_unify dl1 dl2
   | _ -> raise Exit
 
-let dty_int  = Duty ty_int
-let dty_real = Duty ty_real
 let dty_bool = Duty ty_bool
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
@@ -175,7 +173,7 @@ type dterm = {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant
+  | DTconst of Number.constant * ty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -367,10 +365,8 @@ let dterm tuc ?loc node =
         mk_dty (Some dty)
     | DTgvar vs ->
         mk_dty (Some (dty_of_ty vs.vs_ty))
-    | DTconst (Number.ConstInt _) ->
-        mk_dty (Some dty_int)
-    | DTconst (Number.ConstReal _) ->
-        mk_dty (Some dty_real)
+    | DTconst (_,ty) ->
+        mk_dty (Some (dty_of_ty ty))
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
        let swap, dtl =
          match dtl with
@@ -580,8 +576,8 @@ and try_term strict keep_loc uloc env prop dty node =
       t_var (Mstr.find_exn (UnboundVar n) n env)
   | DTgvar vs ->
       t_var vs
-  | DTconst c ->
-      t_const c
+  | DTconst (c,ty) ->
+      t_const c ty
   | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
       if prop then t_true else t_bool_true
   | DTapp (ls,[]) when ls_equal ls fs_bool_false ->

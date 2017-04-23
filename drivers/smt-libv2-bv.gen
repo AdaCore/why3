@@ -48,8 +48,10 @@ theory bv.BV_Gen
   remove prop to_uint_bounds
   remove prop to_int_extensionality
 
-  remove prop Of_int_zeros
-  remove prop Of_int_ones
+  remove prop to_uint_size_bv
+  remove prop to_uint_zeros
+  remove prop to_uint_ones
+  remove prop to_uint_one
 
   remove prop to_uint_add
   remove prop to_uint_add_bounded
@@ -76,40 +78,60 @@ theory bv.BV_Gen
 end
 
 theory bv.BV64
+  meta "literal:keep" type t
+
+  syntax literal t "#x%16x"
   syntax type t "(_ BitVec 64)"
 
   syntax function zeros "#x0000000000000000"
-  syntax function ones "#xFFFFFFFFFFFFFFFF"
+  syntax function one   "#x0000000000000001"
+  syntax function ones  "#xFFFFFFFFFFFFFFFF"
+  syntax function size_bv "(_ bv64 64)"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
 end
 
 theory bv.BV32
+  meta "literal:keep" type t
+
+  syntax literal t "#x%8x"
   syntax type t "(_ BitVec 32)"
 
   syntax function zeros "#x00000000"
-  syntax function ones "#xFFFFFFFF"
+  syntax function one   "#x00000001"
+  syntax function ones  "#xFFFFFFFF"
+  syntax function size_bv "(_ bv32 32)"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
 
 theory bv.BV16
+  meta "literal:keep" type t
+
+  syntax literal t "#x%4x"
   syntax type t "(_ BitVec 16)"
 
   syntax function zeros "#x0000"
-  syntax function ones "#xFFFF"
+  syntax function one   "#x0001"
+  syntax function ones  "#xFFFF"
+  syntax function size_bv "(_ bv16 16)"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
 
 theory bv.BV8
+  meta "literal:keep" type t
+
+  syntax literal t (* "#b%8b"  *) "#x%2x"
   syntax type t "(_ BitVec 8)"
 
   syntax function zeros "#x00"
-  syntax function ones "#xFF"
+  syntax function one   "#x01"
+  syntax function ones  "#xFF"
+  syntax function size_bv "(_ bv8 8)"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"

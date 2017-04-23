@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,3 +58,4 @@ Lemma Monotonic : forall (x:Z) (y:Z), (x <= y)%Z ->
   ((Reals.Raxioms.IZR x) <= (Reals.Raxioms.IZR y))%R.
 exact (IZR_le).
 Qed.
+

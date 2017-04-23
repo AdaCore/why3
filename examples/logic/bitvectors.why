@@ -45,8 +45,8 @@ theory TestBV
   goal g5aa : asr b0111 2 = b0001
   goal g5bb : asr ones 31 = ones
 
-  goal g6a : to_uint b11100 = 28
-  goal g6b : to_uint ones = 0xFFFFFFFF
+  goal g6a : t'int b11100 = 28
+  goal g6b : t'int ones = 0xFFFFFFFF
 
   goal g7a : to_int b11100 = 28
   goal g7b : to_int ones = -1
@@ -57,8 +57,8 @@ theory TestBV
   goal g8aa : nth b0110 2 = True
   goal g8bb : nth b0110 3 = False
 
-  goal gtt : to_uint (lsl_bv (of_int 3) (of_int 30)) > 0 (* = 0xC0000000 *)
-  goal gttt : to_uint (lsl (of_int 3) 30) > 0 (* = 0xC0000000 *)
+  goal gtt : t'int (lsl_bv (of_int 3) (of_int 30)) > 0 (* = 0xC0000000 *)
+  goal gttt : t'int (lsl (of_int 3) 30) > 0 (* = 0xC0000000 *)
 
   goal not_not : forall v:t. bw_not (bw_not v) = v
 

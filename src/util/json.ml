@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -44,3 +44,21 @@ let map_bindings key_to_str value_pr fmt map_bindings =
   else
     Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
       (print_map_binding key_to_str value_pr) fmt map_bindings
+
+type json =
+  | Int of int
+  | Float of float
+  | Bool of bool
+  | String of string
+  | List of json list
+  | Record of json Stdlib.Mstr.t
+
+let rec print_json fmt j =
+  match j with
+  | Int i -> int fmt i
+  | Float f -> float fmt f
+  | Bool b -> bool fmt b
+  | String s -> string fmt s
+  | List l -> list print_json fmt l
+  | Record r ->
+    map_bindings (fun x -> x) print_json fmt (Stdlib.Mstr.bindings r)

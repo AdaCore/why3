@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -185,7 +185,7 @@ let create_constructor ~constr id s fl =
   let exn = Invalid_argument "Expr.create_constructor" in
   let fs = List.fold_right (Spv.add_new exn) fl Spv.empty in
   if List.exists (fun f -> not (Spv.mem f fs)) s.its_mfields ||
-    s.its_private || s.its_def <> None || constr < 1 ||
+    s.its_private || s.its_def <> NoDef || constr < 1 ||
     (s.its_mutable && constr > 1) then raise exn;
   let argl = List.map (fun a -> a.pv_vs.vs_ty) fl in
   let tyl = List.map ity_var s.its_ts.ts_args in
@@ -543,7 +543,10 @@ let rec raw_of_expr prop e = match e.e_node with
         effect-hiding construction, Etry, is forbidden. *)
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> t_var v.pv_vs
-  | Econst n -> t_const n
+  | Econst (Number.ConstInt _ as c)->
+      t_const c ty_int
+  | Econst (Number.ConstReal _ as c)->
+      t_const c ty_real
   | Epure t -> t
   | Eghost e -> pure_of_expr prop e
   | Eexec (_,{cty_post = []}) -> raise Exit
@@ -600,7 +603,10 @@ let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> post_of_term res (t_var v.pv_vs)
-  | Econst n -> post_of_term res (t_const n)
+  | Econst (Number.ConstInt _ as c)->
+      post_of_term res (t_const c ty_int)
+  | Econst (Number.ConstReal _ as c)->
+      post_of_term res (t_const c ty_real)
   | Epure t -> post_of_term res t
   | Eghost e -> post_of_expr res e
   | Eexec (_,c) ->
@@ -1263,7 +1269,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Econst c -> print_const fmt c
+  | Econst c -> Number.print_constant fmt c
   | Eexec (c,_) -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -114,10 +114,10 @@
 
 (* Tokens *)
 
-%token <string> LIDENT UIDENT
+%token <string> LIDENT LIDENT_QUOTE UIDENT UIDENT_QUOTE
 %token <Number.integer_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Number.real_constant> FLOAT
+%token <Number.real_constant> REAL
 %token <string> STRING
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
@@ -125,9 +125,9 @@
 (* keywords *)
 
 %token AS AXIOM BY CLONE COINDUCTIVE CONSTANT
-%token ELSE END EPSILON EXISTS EXPORT FALSE FORALL FUNCTION
+%token ELSE END EPSILON EXISTS EXPORT FALSE FLOAT FORALL FUNCTION
 %token GOAL IF IMPORT IN INDUCTIVE LEMMA
-%token LET MATCH META NOT PREDICATE SCOPE
+%token LET MATCH META NOT PREDICATE RANGE SCOPE
 %token SO THEN THEORY TRUE TYPE USE WITH
 
 (* program keywords *)
@@ -143,7 +143,7 @@
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LTGT
+%token DOT DOTDOT EQUAL LT GT LTGT
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -171,7 +171,7 @@
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
-%right EQUAL LTGT OP1
+%right EQUAL LTGT LT GT OP1
 %nonassoc AT OLD
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
@@ -201,8 +201,8 @@ mlw_module:
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
-| THEORY labels(uident)  { Typing.open_module $2 }
-| MODULE labels(uident)  { Typing.open_module $2 }
+| THEORY labels(uident_nq)  { Typing.open_module $2 }
+| MODULE labels(uident_nq)  { Typing.open_module $2 }
 
 scope_head:
 | SCOPE boption(IMPORT) uident
@@ -279,14 +279,14 @@ pure_decl:
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
 | INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
 | COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM labels(ident) COLON term            { Dprop (Decl.Paxiom, $2, $4) }
-| LEMMA labels(ident) COLON term            { Dprop (Decl.Plemma, $2, $4) }
-| GOAL  labels(ident) COLON term            { Dprop (Decl.Pgoal, $2, $4) }
+| AXIOM labels(ident_nq) COLON term         { Dprop (Decl.Paxiom, $2, $4) }
+| LEMMA labels(ident_nq) COLON term         { Dprop (Decl.Plemma, $2, $4) }
+| GOAL  labels(ident_nq) COLON term         { Dprop (Decl.Pgoal, $2, $4) }
 
 (* Type declarations *)
 
 type_decl:
-| labels(lident) ty_var* typedefn invariant*
+| labels(lident_nq) ty_var* typedefn invariant*
   { let (vis, mut), def = $3 in
     { td_ident = $1; td_params = $2;
       td_vis = vis; td_mut = mut;
@@ -305,6 +305,13 @@ typedefn:
     { $2, TDrecord $4 }
 | EQUAL vis_mut ty
     { $2, TDalias $3 }
+(* FIXME: allow negative bounds *)
+| EQUAL LT RANGE INTEGER INTEGER GT
+    { (Public, false),
+      TDrange (Number.compute_int $4, Number.compute_int $5) }
+| EQUAL LT FLOAT INTEGER INTEGER GT
+    { (Public, false),
+      TDfloat (small_integer $4, small_integer $5) }
 
 vis_mut:
 | (* epsilon *)     { Public, false }
@@ -318,10 +325,10 @@ abstract:
 | ABSTRACT          { Abstract }
 
 type_field:
-| labels(lident) cast
+| labels(lident_nq) cast
   { { f_ident = $1; f_mutable = false; f_ghost = false;
       f_pty = $2; f_loc = floc $startpos $endpos } }
-| field_modifiers labels(lident) cast
+| field_modifiers labels(lident_nq) cast
   { { f_ident = $2; f_mutable = fst $1; f_ghost = snd $1;
       f_pty = $3; f_loc = floc $startpos $endpos } }
 
@@ -332,7 +339,7 @@ field_modifiers:
 | MUTABLE GHOST { true,  true  }
 
 type_case:
-| labels(uident) params { floc $startpos $endpos, $1, $2 }
+| labels(uident_nq) params { floc $startpos $endpos, $1, $2 }
 
 (* Logic declarations *)
 
@@ -368,7 +375,7 @@ ind_defn:
 | EQUAL bar_list1(ind_case) { $2 }
 
 ind_case:
-| labels(ident) COLON term  { floc $startpos $endpos, $1, $3 }
+| labels(ident_nq) COLON term  { floc $startpos $endpos, $1, $3 }
 
 (* Type expressions *)
 
@@ -481,11 +488,11 @@ binder_vars_head:
       | _ -> Loc.error ~loc:(floc $startpos $endpos) Error }
 
 binder_var:
-| labels(lident)  { floc $startpos $endpos, Some $1 }
-| anon_binder     { $1 }
+| labels(lident_nq) { floc $startpos $endpos, Some $1 }
+| anon_binder       { $1 }
 
 anon_binder:
-| UNDERSCORE      { floc $startpos $endpos, None }
+| UNDERSCORE        { floc $startpos $endpos, None }
 
 (* Logical terms *)
 
@@ -530,7 +537,7 @@ term_:
       | _ -> Tmatch (def, [pat, $6]) }
 | LET labels(lident_op_id) EQUAL term IN term
     { Tlet ($2, $4, $6) }
-| LET labels(lident) mk_term(lam_defn) IN term
+| LET labels(lident_nq) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
 | LET labels(lident_op_id) mk_term(lam_defn) IN term
     { Tlet ($2, $3, $5) }
@@ -615,7 +622,7 @@ quant:
 
 numeral:
 | INTEGER { Number.ConstInt $1 }
-| FLOAT   { Number.ConstReal $1 }
+| REAL    { Number.ConstReal $1 }
 
 (* Program declarations *)
 
@@ -624,8 +631,8 @@ prog_decl:
 | LET ghost kind labels(lident_rich) mk_expr(fun_defn) { Dlet ($4, $2, $3, $5) }
 | LET ghost kind labels(lident_rich) const_defn        { Dlet ($4, $2, $3, $5) }
 | LET REC with_list1(rec_defn)                         { Drec $3 }
-| EXCEPTION labels(uident)            { Dexn ($2, PTtuple [], Ity.MaskVisible) }
-| EXCEPTION labels(uident) return     { Dexn ($2, fst $3, snd $3) }
+| EXCEPTION labels(uident_nq)         { Dexn ($2, PTtuple [], Ity.MaskVisible) }
+| EXCEPTION labels(uident_nq) return  { Dexn ($2, fst $3, snd $3) }
 
 ghost:
 | (* epsilon *) { false }
@@ -736,7 +743,7 @@ expr_:
       | _ -> Ematch (def, [pat, $8]) }
 | LET ghost kind labels(lident_op_id) EQUAL seq_expr IN seq_expr
     { Elet ($4, $2, $3, $6, $8) }
-| LET ghost kind labels(lident) mk_expr(fun_defn) IN seq_expr
+| LET ghost kind labels(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
 | LET ghost kind labels(lident_op_id) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
@@ -756,7 +763,7 @@ expr_:
     { Emark ($2, $4) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
     { let inv, var = $4 in Ewhile ($2, inv, var, $5) }
-| FOR lident EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
+| FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
     { Efor ($2, $4, $5, $6, $8, $9) }
 | ABSURD
     { Eabsurd }
@@ -927,14 +934,14 @@ pat_conj_:
 pat_uni_:
 | pat_arg_                              { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(pat_uni_) AS ghost labels(lident)
+| mk_pat(pat_uni_) AS ghost labels(lident_nq)
                                         { Pas ($1,$4,$3) }
 | mk_pat(pat_uni_) cast                 { Pcast ($1,$2) }
 
 pat_arg_:
 | pat_arg_shared_                       { $1 }
-| labels(lident)                        { Pvar ($1,false) }
-| GHOST labels(lident)                  { Pvar ($2,true) }
+| labels(lident_nq)                     { Pvar ($1,false) }
+| GHOST labels(lident_nq)               { Pvar ($2,true) }
 
 pat_arg_shared_:
 | UNDERSCORE                            { Pwild }
@@ -959,13 +966,13 @@ let_pat_conj_:
 let_pat_uni_:
 | let_pat_arg_                          { $1 }
 | uqualid pat_arg+                      { Papp ($1,$2) }
-| mk_pat(let_pat_uni_) AS ghost labels(lident)
+| mk_pat(let_pat_uni_) AS ghost labels(lident_nq)
                                         { Pas ($1,$4,$3) }
 | mk_pat(let_pat_uni_) cast             { Pcast ($1,$2) }
 
 let_pat_arg_:
 | pat_arg_shared_ { $1 }
-| labels(lident)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
+| labels(lident_nq)  { Ptuple [{pat_desc = Pvar ($1,false); pat_loc = $1.id_loc}] }
 
 (* Idents *)
 
@@ -973,23 +980,40 @@ ident:
 | uident { $1 }
 | lident { $1 }
 
+ident_nq:
+| uident_nq { $1 }
+| lident_nq { $1 }
+
 uident:
-| UIDENT        { mk_id $1 $startpos $endpos }
+| UIDENT          { mk_id $1 $startpos $endpos }
+| UIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+
+uident_nq:
+| UIDENT          { mk_id $1 $startpos $endpos }
+| UIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
 
 lident:
-| LIDENT        { mk_id $1 $startpos $endpos }
+| LIDENT          { mk_id $1 $startpos $endpos }
+| LIDENT_QUOTE    { mk_id $1 $startpos $endpos }
+
+lident_nq:
+| LIDENT          { mk_id $1 $startpos $endpos }
+| lident_keyword  { mk_id $1 $startpos $endpos }
+| LIDENT_QUOTE    { let loc = floc $startpos($1) $endpos($1) in
+                    Loc.errorm ~loc "Symbol %s cannot be user-defined" $1 }
+
+lident_keyword:
+| RANGE           { "range" }
+| FLOAT           { "float" }
 
 quote_lident:
 | QUOTE_LIDENT  { mk_id $1 $startpos $endpos }
 
 (* Idents + symbolic operation names *)
 
-ident_rich:
-| uident        { $1 }
-| lident_rich   { $1 }
-
 lident_rich:
-| lident        { $1 }
+| lident_nq     { $1 }
 | lident_op_id  { $1 }
 
 lident_op_id:
@@ -1013,6 +1037,8 @@ op_symbol:
 | OP2 { $1 }
 | OP3 { $1 }
 | OP4 { $1 }
+| LT  { "<" }
+| GT  { ">" }
 
 %inline oppref:
 | o = OPPREF { mk_id (prefix o)  $startpos $endpos }
@@ -1024,6 +1050,8 @@ prefix_op:
 | o = OP1   { mk_id (infix o)    $startpos $endpos }
 | EQUAL     { mk_id (infix "=")  $startpos $endpos }
 | LTGT      { mk_id (infix "<>") $startpos $endpos }
+| LT        { mk_id (infix "<")  $startpos $endpos }
+| GT        { mk_id (infix ">")  $startpos $endpos }
 
 %inline infix_op_234:
 | o = OP2   { mk_id (infix o)    $startpos $endpos }
@@ -1033,12 +1061,18 @@ prefix_op:
 (* Qualified idents *)
 
 qualid:
-| ident_rich              { Qident $1 }
-| uqualid DOT ident_rich  { Qdot ($1, $3) }
+| uident                    { Qident $1 }
+| lident                    { Qident $1 }
+| lident_op_id              { Qident $1 }
+| uqualid DOT uident        { Qdot ($1, $3) }
+| uqualid DOT lident        { Qdot ($1, $3) }
+| uqualid DOT lident_op_id  { Qdot ($1, $3) }
 
 lqualid_rich:
-| lident_rich             { Qident $1 }
-| uqualid DOT lident_rich { Qdot ($1, $3) }
+| lident                    { Qident $1 }
+| lident_op_id              { Qident $1 }
+| uqualid DOT lident        { Qdot ($1, $3) }
+| uqualid DOT lident_op_id  { Qdot ($1, $3) }
 
 lqualid:
 | lident              { Qident $1 }

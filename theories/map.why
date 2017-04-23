@@ -195,14 +195,14 @@ theory MapInjection
   (** [surjective a n] is true when [a] is a surjection
       from [(0..n-1)] to [(0..n-1)] *)
 
-  predicate range (a: map int int) (n: int) =
+  predicate range' (a: map int int) (n: int) =
     forall i: int. 0 <= i < n -> 0 <= a[i] < n
-  (** [range a n] is true when [a] maps the domain
+  (** [range' a n] is true when [a] maps the domain
       [(0..n-1)] into [(0..n-1)] *)
 
   lemma injective_surjective:
     forall a: map int int, n: int.
-    injective a n -> range a n -> surjective a n
+    injective a n -> range' a n -> surjective a n
   (** main lemma: an injection on [(0..n-1)] that
       ranges into [(0..n-1)] is also a surjection *)
 

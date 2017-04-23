@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -289,8 +289,10 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dterm tuc gvars at denv e23) in
       chain loc (dterm tuc gvars at denv e1) op1 e23
-  | Ptree.Tconst c ->
-      DTconst c
+  | Ptree.Tconst (Number.ConstInt _ as c) ->
+      DTconst (c, ty_int)
+  | Ptree.Tconst (Number.ConstReal _ as c) ->
+      DTconst (c, ty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm tuc gvars at denv e1 in
@@ -365,7 +367,12 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm tuc gvars at denv e1, Slab.singleton lab)
   | Ptree.Tcast (e1, ty) ->
-      DTcast (dterm tuc gvars at denv e1, ty_of_pty tuc ty))
+    (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
+      let e1 = dterm tuc gvars at denv e1 in
+      let ty = ty_of_pty tuc ty in
+      match e1.dt_node with
+      | DTconst (c,_) -> DTconst (c, ty)
+      | _ -> DTcast (e1, ty))
 
 (** typing program expressions *)
 
@@ -779,6 +786,14 @@ let type_term_pure muc lvm denv e =
 let type_fmla_pure muc lvm denv e =
   Dterm.fmla ~strict:true ~keep_loc:true (type_pure muc lvm denv e)
 
+let check_public ~loc d name =
+  if d.td_vis <> Public || d.td_mut then
+    Loc.errorm ~loc
+               "%s types cannot be abstract, private, or mutable"
+               name;
+  if d.td_inv <> [] then
+    Loc.errorm ~loc "%s types cannot have invariants" name
+
 let add_types muc tdl =
   let add m ({td_ident = {id_str = x}; td_loc = loc} as d) =
     Mstr.add_new (Loc.Located (loc, ClashSymbol x)) x d m in
@@ -790,20 +805,14 @@ let add_types muc tdl =
     let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
     match d.td_def with
     | TDalias pty ->
-        if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-          "Alias types cannot be abstract, private, or mutable";
-        if d.td_inv <> [] then Loc.errorm ~loc
-          "Alias types cannot have invariants";
-        let alias = Sstr.add x alias in
-        let ity = parse ~loc ~alias ~alg pty in
-        if not (Hstr.mem htd x) then
-        let itd = create_alias_decl id args ity in
-        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+       check_public ~loc d "Alias";
+       let alias = Sstr.add x alias in
+       let ity = parse ~loc ~alias ~alg pty in
+       if not (Hstr.mem htd x) then
+         let itd = create_alias_decl id args ity in
+         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDalgebraic csl ->
-        if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-          "Algebraic types cannot be abstract, private, or mutable";
-        if d.td_inv <> [] then Loc.errorm ~loc
-          "Algebraic types cannot have invariants";
+       check_public ~loc d "Algebraic";
         let hfd = Hstr.create 5 in
         let alias = Sstr.empty in
         let alg = Mstr.add x (id,args) alg in
@@ -857,10 +866,7 @@ let add_types muc tdl =
 (*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
-            if d.td_vis <> Public || d.td_mut then Loc.errorm ~loc
-              "Recursive types cannot be abstract, private, or mutable";
-            if d.td_inv <> [] then Loc.errorm ~loc
-              "Recursive types cannot have invariants";
+           check_public ~loc d "Recursive";
             let get_fd (mut, fd) = if mut then Loc.errorm ~loc
               "Recursive types cannot have mutable fields" else fd in
             Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
@@ -873,7 +879,28 @@ let add_types muc tdl =
             let type_inv f = type_fmla_pure muc gvars Dterm.denv_empty f in
             let invl = List.map type_inv d.td_inv in
             let itd = create_plain_record_decl ~priv ~mut id args fl invl in
-            Hstr.add hts x itd.itd_its; Hstr.add htd x itd end
+            Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+        end
+    | TDrange (lo,hi) ->
+       check_public ~loc d "Range";
+(*
+        let alias = Sstr.add x alias in
+        let ity = parse ~loc ~alias ~alg pty in
+        if not (Hstr.mem htd x) then
+        let itd = create_alias_decl id args ity in
+        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+ *)
+       let ir = { Number.ir_lower = lo;
+                  Number.ir_upper = hi } in
+       let itd = create_range_decl id ir in
+       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+    | TDfloat (eb,sb) ->
+       check_public ~loc d "Float";
+       let fp = { Number.fp_exponent_digits = eb;
+                  Number.fp_significand_digits = sb } in
+       let itd = create_float_decl id fp in
+       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+
 
   and parse ~loc ~alias ~alg pty =
     let rec down = function
@@ -905,7 +932,11 @@ let add_types muc tdl =
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
-  add_pdecl ~vc:true muc (create_type_decl tdl)
+  let d,metas = create_type_decl tdl in
+  List.fold_left
+    (fun uc (m,a) -> add_meta uc m a)
+    (add_pdecl ~vc:true muc d)
+    metas
 
 let tyl_of_params {muc_theory = tuc} pl =
   let ty_of_param (loc,_,gh,ty) =
