@@ -180,10 +180,10 @@ module matrix.Matrix
 
   (* syntax exception OutOfBounds "Why3__Matrix.OutOfBounds" *) (* FIXME *)
 
-  syntax val get           "%1.(%2).(%3)"
-  syntax val set           "%1.(%2).(%3) <- %4"
+  syntax val get           "%1.(Z.to_int %2).(Z.to_int %3)"
+  syntax val set           "%1.(Z.to_int %2).(Z.to_int %3) <- %4"
   syntax val rows          "Z.of_int (Array.length %1)"
-  syntax val columns       "Z.of_int (.Array.length %1.(0))"
+  syntax val columns       "Z.of_int (Array.length %1.(0))"
   syntax val defensive_get "%1.(Z.to_int %2).(Z.to_int %3)"
   syntax val defensive_set "%1.(Z.to_int %2).(Z.to_int %3) <- %4"
   syntax val make          "Array.make_matrix (Z.to_int %1) (Z.to_int %2) %3"
