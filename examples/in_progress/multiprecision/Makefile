@@ -2,7 +2,7 @@ all: why3 extract
 why3:
 	make -C ../../..
 extract: why3
-	why3 extract -D c -D mp.drv -o build -L . -T mp2.N
+	why3 extract -D c -D mp.drv -o build/N.c -L . mp2.N
 tests: extract check-gmp
 	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -lgmp -o tests
 why3addbench: extract check-gmp

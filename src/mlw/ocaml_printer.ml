@@ -74,7 +74,7 @@ module Print = struct
 
   let rec forget_pat = function
     | Pwild -> ()
-    | Pident id -> forget_id id
+    | Pvar {vs_name=id} -> forget_id id
     | Papp (_, pl) | Ptuple pl -> List.iter forget_pat pl
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
@@ -196,7 +196,7 @@ module Print = struct
   let rec print_pat info fmt = function
     | Pwild ->
        fprintf fmt "_"
-    | Pident id ->
+    | Pvar {vs_name=id} ->
        print_ident fmt id
     | Pas (p, id) ->
        fprintf fmt "%a as %a" (print_pat info) p print_ident id
@@ -229,6 +229,7 @@ module Print = struct
 
   let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
+  (* FIXME put these in Compile*)
   let is_true e = match e.e_node with
     | Eapp (s, []) -> rs_equal s rs_true
     | _ -> false

@@ -258,21 +258,21 @@ module mach.c.C
   syntax type ptr "%1 *"
   syntax type bool "int" (* ? *)
 
-  syntax val malloc "malloc(%1 * sizeof(%v0))"
+  syntax val malloc "malloc((%1) * sizeof(%v0))"
   syntax val free   "free(%1)"
-  syntax val realloc "realloc(%1, %2 * sizeof(%v0))"
+  syntax val realloc "realloc(%1, (%2) * sizeof(%v0))"
 
   (* syntax val is_null "(%1) == NULL" *)
   syntax val is_not_null "(%1) != NULL"
   syntax val null "NULL"
 
-  syntax val incr "%1+%2"
+  syntax val incr "%1+(%2)"
 
   syntax val get "*(%1)"
-  syntax val get_ofs "*(%1+%2)"
+  syntax val get_ofs "*(%1+(%2))"
 
   syntax val set "*(%1) = %2"
-  syntax val set_ofs "*(%1+%2) = %3"
+  syntax val set_ofs "*(%1+(%2)) = %3"
 
   syntax val p2i "%1"
   syntax converter p2i "%1"

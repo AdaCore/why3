@@ -88,17 +88,17 @@ module C = struct
     | Sblock (d,s) -> d = [] && one_stmt s
     | _ -> false
 
-  (** [assignify id] transforms a statement that computes a value into
-     a statement that assigns that value to id *)
-  let rec assignify id = function
+  (** [assignify v] transforms a statement that computes a value into
+     a statement that assigns that value to v *)
+  let rec assignify v = function
     | Snop -> raise NotAValue
-    | Sexpr e -> Sexpr (Ebinop (Bassign, Evar id, e))
-    | Sblock (ds, s) -> Sblock (ds, assignify id s)
-    | Sseq (s1, s2) when not (is_nop s2) -> Sseq (s1, assignify id s2)
-    | Sseq (s1,_) -> assignify id s1
-    | Sif (c,t,e) -> Sif (c, assignify id t, assignify id e)
-    | Swhile (c,s) -> Swhile (c, assignify id s) (* can this be a value ?*)
-    | Sfor (e0,e1,e2,s) -> Sfor (e0,e1,e2, assignify id s)
+    | Sexpr e -> Sexpr (Ebinop (Bassign, v, e))
+    | Sblock (ds, s) -> Sblock (ds, assignify v s)
+    | Sseq (s1, s2) when not (is_nop s2) -> Sseq (s1, assignify v s2)
+    | Sseq (s1,_) -> assignify v s1
+    | Sif (c,t,e) -> Sif (c, assignify v t, assignify v e)
+    | Swhile (c,s) -> Swhile (c, assignify v s) (* can this be a value ?*)
+    | Sfor (e0,e1,e2,s) -> Sfor (e0,e1,e2, assignify v s)
     | Sbreak -> raise NotAValue
     | Sreturn _ -> raise NotAValue
 
@@ -288,6 +288,19 @@ module C = struct
       Sreturn (Ecall(fname, params@args))
     | _ -> raise (Unsupported "tuple pattern matching with too complex def")
 
+  let rec stmt_of_list (l: stmt list) : stmt =
+    match l with
+    | [] -> Snop
+    | [s] -> s
+    | h::t -> Sseq (h, stmt_of_list t)
+
+  let simplify_expr (d,s) : expr =
+    match (d,s) with
+    | [], Sexpr e -> e
+ (*   | [], Sreturn e -> assert false
+    | [], Snop -> assert false
+    | [], Sblock _ -> assert false *)
+    | _ -> assert false
 end
 
 type info = Pdriver.printer_args = private {
@@ -629,7 +642,7 @@ module Translate = struct
                 (pv_name pv).id_string;
               C.propagate_in_block (pv_name pv) se (expr info env e)
             | d,s ->
-              let initblock = d, C.assignify (pv_name pv) s in
+              let initblock = d, C.assignify (C.Evar (pv_name pv)) s in
               [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
               C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
         end
@@ -648,7 +661,7 @@ module Translate = struct
 	     | cdef, cs ->
 		let cid = id_register (id_fresh "cond") in (* ? *)
 		C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
-		C.Sseq (C.assignify cid cs,
+		C.Sseq (C.assignify (C.Evar cid) cs,
                         C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
        (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
@@ -805,8 +818,11 @@ module Translate = struct
 			 let s = C.elim_nop s in
 			 let s = C.elim_empty_blocks s in
 			 [C.Dfun (fname, (rtype,params), (d,s))]
-                | _ -> raise (Unsupported
-                                "Non-function with no syntax in toplevel let")
+                      | _ ->
+                         raise
+                           (Unsupported
+                              "Non-function with no syntax
+                               in toplevel let")
 	        end
         with Unsupported s -> Format.printf "Unsupported : %s@." s; []
       end
@@ -843,6 +859,437 @@ module Translate = struct
 end
 (*TODO simplifications : propagate constants, collapse blocks with only a statement and no def*)
 
+module MLToC = struct
+
+  open Pdecl
+  open Ity
+  open Ty
+  open Expr
+  open Term
+  open Printer
+  open Pmodule
+  open Compile.ML
+  open C
+
+  let rec ty_of_mlty info = function
+    | Tvar tv ->
+      begin match query_syntax info.syntax tv.tv_name
+        with
+        | Some s -> C.Tsyntax (s, [])
+        | None -> C.Tnamed (tv.tv_name)
+      end
+    | Tapp (id, tl) ->
+       begin match query_syntax info.syntax id
+        with
+        | Some s -> C.Tsyntax (s, List.map (ty_of_mlty info) tl)
+        | None -> C.Tnosyntax
+       end
+    | Ttuple _ -> raise (Unsupported "type tuple")
+
+  let rec ty_of_ty info ty = (*FIXME try to use only ML tys*)
+    match ty.ty_node with
+    | Tyvar v ->
+      begin match query_syntax info.syntax v.tv_name
+        with
+        | Some s -> C.Tsyntax (s, [])
+        | None -> C.Tnamed (v.tv_name)
+      end
+    | Tyapp (ts, tl) ->
+       begin match query_syntax info.syntax ts.ts_name
+        with
+        | Some s -> C.Tsyntax (s, List.map (ty_of_ty info) tl)
+        | None -> C.Tnosyntax
+       end
+
+  let ity_of_expr e = match e.e_ity with
+    | I i -> i
+    | _ -> assert false
+
+  let pv_name pv = pv.pv_vs.vs_name
+
+  type syntax_env = { in_unguarded_loop : bool;
+                      computes_return_value : bool;
+		      returns_tuple: bool * ident list;
+                      breaks : Sid.t;
+                      returns : Sid.t; }
+
+
+  let is_true e = match e.e_node with
+    | Eapp (s, []) -> rs_equal s rs_true
+    | _ -> false
+
+  let is_false e = match e.e_node with
+    | Eapp (s, []) -> rs_equal s rs_false
+    | _ -> false
+
+  let is_unit = function
+    | I i -> ity_equal i Ity.ity_unit
+    | C _ -> false
+
+  let return_or_expr env (e:C.expr) =
+    if env.computes_return_value
+    then Sreturn e
+    else Sexpr e
+
+  let rec expr info env (e:Compile.ML.expr) : C.body =
+    assert (not e.e_effect.eff_ghost);
+    match e.e_node with
+    | Eblock [] ->
+       if env.computes_return_value
+       then C.([], Sreturn(Enothing))
+       else C.([], Snop)
+    | Eblock [_] -> assert false
+    | Eblock l ->
+       let env_not_tail = { env with computes_return_value = false } in
+       let rec aux = function
+         | [] ->
+            if env.computes_return_value
+            then C.([], Sreturn(Enothing))
+            else C.([], Snop)
+         | h::t -> ([], C.Sseq (C.Sblock (expr info env_not_tail h),
+                                C.Sblock (aux t)))
+       in
+       aux l
+    | Eapp (rs, []) when rs_equal rs rs_true ->
+       ([],return_or_expr env (C.Econst (Cint "1")))
+    | Eapp (rs, []) when rs_equal rs rs_false ->
+       ([],return_or_expr env (C.Econst (Cint "0")))
+    | Evar pv ->
+       let e = C.Evar (pv_name pv) in
+       ([], return_or_expr env e)
+    | Econst ic ->
+      let n = Number.compute_int ic in
+      let e = C.(Econst (Cint (BigInt.to_string n))) in
+      ([], return_or_expr env e)
+    | Eapp (rs, el) ->
+       if is_rs_tuple rs && env.computes_return_value
+	 then begin
+	     match env.returns_tuple with
+	     | true, rl ->
+		let args =
+                  List.filter
+                    (fun e ->
+                      assert (not e.e_effect.eff_ghost);
+                      match e.e_ity with
+                      | I i when ity_equal i Ity.ity_unit -> false
+                      | _ -> true)
+		    el
+                in
+		assert (List.length rl = List.length args);
+                let env_f = { env with computes_return_value=false } in
+		C.([],
+		   List.fold_right2
+                     (fun res arg acc ->
+                       let d,s = expr info env_f arg in
+                       let s = assignify (Eunop(Ustar,Evar(res))) s in
+		       Sseq(Sblock(d,s),
+			    acc))
+		     rl args (Sreturn(Enothing)))
+	     | _ -> assert false
+	   end
+       else
+	   let e =
+             match
+               (query_syntax info.syntax rs.rs_name,
+                query_syntax info.converter rs.rs_name) with
+               | _, Some s
+               | Some s, _ ->
+                 begin
+                   try
+                     let _ =
+                       Str.search_forward
+                         (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0 in
+                     let env_f = { env
+                                 with computes_return_value = false } in
+                     let params =
+		       List.map
+                         (fun e ->
+                           (simplify_expr (expr info env_f e),
+                            ty_of_ty info (ty_of_ity (ity_of_expr e))))
+		         el in
+		     let rty = ty_of_ity (match e.e_ity with
+                                           | C _ -> assert false
+                                           | I i -> i) in
+		     let rtyargs = match rty.ty_node with
+		       | Tyvar _ -> [||]
+		       | Tyapp (_,args) ->
+                         Array.of_list (List.map (ty_of_ty info) args)
+		     in
+		     C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
+                               Mid.mem rs.rs_name info.converter)
+                   with Not_found ->
+		     let args =
+                       List.filter
+                         (fun e ->
+                           assert (not e.e_effect.eff_ghost);
+                           match e.e_ity with
+                           | I i when ity_equal i Ity.ity_unit -> false
+                           | _ -> true)
+		         el
+                     in
+                     if args=[]
+                     then C.(Esyntax(s, Tnosyntax, [||], [], true)) (*constant*)
+                     else
+                       (*function defined in the prelude *)
+                       let env_f =
+                         { env with computes_return_value = false } in
+		     C.(Ecall(Esyntax(s, Tnosyntax, [||], [], true),
+			      List.map
+                                (fun e ->
+                                  simplify_expr (expr info env_f e))
+                                el))
+                 end
+               | _ ->
+                  let args =
+                    List.filter
+                      (fun e ->
+                        assert (not e.e_effect.eff_ghost);
+                        match e.e_ity with
+                        | I i when ity_equal i Ity.ity_unit -> false
+                        | _ -> true)
+		      el in
+                  let env_f =
+                    { env with computes_return_value = false } in
+		 C.(Ecall(Evar(rs.rs_name), List.map
+                                (fun e ->
+                                  simplify_expr (expr info env_f e))
+                                args))
+         in
+	   C.([],
+              if env.computes_return_value
+	      then
+                if (ity_equal rs.rs_cty.cty_result Ity.ity_unit)
+                then Sseq(Sexpr e, Sreturn Enothing)
+                else Sreturn e
+              else Sexpr e)
+    | Elet (ld,e) ->
+       begin match ld with
+       | Lvar (pv,le) -> (* not a block *)
+          begin
+          match le.e_node with
+          | Econst ic ->
+            let n = Number.compute_int ic in
+            let ce = C.(Econst (Cint (BigInt.to_string n))) in
+	    Format.printf "propagate constant %s for var %s@."
+			  (BigInt.to_string n) (pv_name pv).id_string;
+            C.propagate_in_block (pv_name pv) ce (expr info env e)
+          | Eapp (rs,_) when Mid.mem rs.rs_name info.converter ->
+            begin match expr info {env with computes_return_value = false} le
+              with
+            | [], C.Sexpr(se) ->
+              C.propagate_in_block (pv_name pv) se (expr info env e)
+            | _ -> assert false
+            end
+          | _->
+            let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
+            match expr info {env with computes_return_value = false} le with
+            | [], C.Sexpr((C.Esyntax(_,_,_,_,b) as se))
+                when b (* converter *) ->
+              Format.printf "propagate converter for var %s@."
+                (pv_name pv).id_string;
+              C.propagate_in_block (pv_name pv) se (expr info env e)
+            | d,s ->
+              let initblock = d, C.assignify (Evar (pv_name pv)) s in
+              [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
+              C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
+          end
+      | Lsym _ -> raise (Unsupported "LDsym")
+      | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
+       end
+    | Eif (cond, th, el) ->
+       let c = expr info {env with computes_return_value = false} cond in
+       let t = expr info env th in
+       let e = expr info env el in
+       begin match c with
+	     | [], C.Sexpr c ->
+		if is_false th && is_true el
+		then C.([], Sexpr(Eunop(Unot, c)))
+		else [], C.Sif(c,C.Sblock t, C.Sblock e)
+	     | cdef, cs ->
+		let cid = id_register (id_fresh "cond") in (* ? *)
+		C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
+		C.Sseq (C.assignify (Evar cid) cs,
+                        C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
+       (* TODO detect empty branches and replace with Snop, detect and/or*)
+       end
+    | Ewhile (c,b) ->
+       Format.printf "while@.";
+      let cd, cs = expr info {env with computes_return_value = false} c in
+      (* this is needed so that the extracted expression has all
+         needed variables in its scope *)
+      let cd, cs = C.flatten_defs cd cs in
+      let cd = C.group_defs_by_type cd in
+      let env' = { computes_return_value = false;
+                   in_unguarded_loop = true;
+		   returns_tuple = env.returns_tuple;
+                   returns = env.returns;
+                   breaks =
+                     if env.in_unguarded_loop
+                     then Sid.empty else env.breaks } in
+      let b = expr info  env' b in
+      begin match cs with
+      | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
+      | _ ->
+        begin match C.get_last_expr cs with
+        | C.Snop, e -> cd, C.(Swhile(e, C.Sblock b))
+        | s,e -> cd, C.(Swhile(Econst (Cint "1"),
+                     Sseq(s,
+                          Sseq(Sif(Eunop(Unot, e), Sbreak, Snop),
+                               C.Sblock b))))
+        end
+      end
+    | Etry (b,xl) ->
+      Format.printf "TRY@.";
+      let is_while = match b.e_node with Ewhile _ -> true | _-> false in
+      let breaks, returns = List.fold_left
+        (fun (bs,rs) (xs, pvsl, r) ->
+          let id = xs.xs_name in
+          match pvsl, r.e_node with
+          | [pv], Evar pv' when pv_equal pv pv' && env.computes_return_value ->
+            (bs, Sid.add id rs)
+          | [], (Eblock []) when is_unit r.e_ity && is_while ->
+            (Sid.add id bs, rs)
+          |_ -> raise (Unsupported "non break/return exception in try"))
+        (Sid.empty, env.returns) xl
+      in
+      let env' = { computes_return_value = env.computes_return_value;
+                   in_unguarded_loop = false;
+		   returns_tuple = env.returns_tuple;
+                   breaks = breaks;
+                   returns = returns;
+                 } in
+      expr info env' b
+    | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
+      Format.printf "BREAK@.";
+      ([], C.Sbreak)
+    | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
+      Format.printf "RETURN@.";
+      expr info {env with computes_return_value = true} r
+    | Eraise (xs, None) -> assert false (* nothing to pass to return *)
+    | Eraise _ -> raise (Unsupported "non break/return exception raised")
+    | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
+    | Ematch (e1, [Ptuple rets,e2])
+         when List.for_all
+                (function Pvar _ -> true |_-> false)
+                rets
+      ->
+      let rets, defs = List.fold_right
+        (fun p (r, d)-> match p with
+        | Pvar vs -> (C.(Eunop(Uaddr,Evar vs.vs_name))::r,
+		        C.Ddecl(ty_of_ty info vs.vs_ty,
+                                [vs.vs_name, C.Enothing])::d)
+        | _ -> assert false )
+        rets ([], []) in
+      let d,s = expr info {env with computes_return_value = false} e1 in
+      let s' = C.add_to_last_call rets s in
+      let b = expr info env e2 in
+      d@defs, C.(Sseq(s', Sblock b))
+    | Ematch _ -> raise (Unsupported "pattern matching")
+    | Eabsurd -> assert false
+    | Eassign _ -> raise (Unsupported "assign")
+    | Ehole -> assert false
+    | Efun _ -> raise (Unsupported "higher order")
+
+  let translate_decl (info:info) (d:decl) : C.definition option
+    =
+    match d with
+    | Dlet (Lsym(rs, ty, vl, e)) ->
+       if rs_ghost rs
+       then begin Format.printf "is ghost@."; None end
+       else
+         begin try
+           let params =
+             List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
+                      (List.filter (fun (id, ty, gh) -> not gh) vl) in
+	   let env = { computes_return_value = true;
+		       in_unguarded_loop = false;
+		       returns_tuple = false, [];
+		       returns = Sid.empty;
+		       breaks = Sid.empty; } in
+	   let rity = rs.rs_cty.cty_result in
+	   let is_simple_tuple ity =
+	     let arity_zero = function
+	       | Ityapp(_,a,r) -> a = [] && r = []
+	       | Ityreg { reg_args = a; reg_regs = r } ->
+                  a = [] && r = []
+	       | Ityvar _ -> true
+	     in
+	     (match ity.ity_node with
+	      | Ityapp ({its_ts = s},_,_)
+                | Ityreg { reg_its = {its_ts = s}; }
+		-> is_ts_tuple s
+	      | _ -> false)
+	     && (ity_fold
+                   (fun acc ity ->
+                     acc && arity_zero ity.ity_node) true ity)
+	   in
+	   (* FIXME is it necessary to have arity 0 in regions ?*)
+	   let rtype =
+	     if ity_equal rity Ity.ity_unit
+	     then C.Tvoid
+	     else ty_of_ty info (ty_of_ity rity) in
+	   let env, rtype, params = match rtype with
+	     | C.Tnosyntax when is_simple_tuple rity ->
+		(* instead of returning a tuple, return
+			      void and assign the result to addresses
+			      passed as parameters *)
+		let returns =
+		  let f ity b acc =
+		    if b.its_visible
+		    then (C.Tptr(ty_of_ty info (ty_of_ity ity)),
+			  id_register (id_fresh "result"))::acc
+		    else acc
+		  in
+		  match rity.ity_node with
+		  | Ityapp(s, tl,_)
+		    | Ityreg { reg_its = s; reg_args = tl } ->
+		     List.fold_right2 f tl s.its_arg_flg []
+		  | Ityvar _ -> assert false
+		in
+		{env with returns_tuple = true, List.map snd returns},
+		C.Tvoid,
+		returns@params
+	     | _ -> env, rtype, params
+	   in
+	   let d,s = expr info env e in
+           (*TODO check if we want this flatten*)
+	   let d,s = C.flatten_defs d s in
+           let d = C.group_defs_by_type d in
+	   let s = C.elim_nop s in
+	   let s = C.elim_empty_blocks s in
+	   Some
+             (C.Dfun (rs.rs_name, (rtype,params), (d,s)))
+           with  Unsupported s ->
+             Format.printf "Unsupported : %s@." s; None
+         end
+    | Dtype [{its_name=id; its_def=idef}] ->
+      Format.printf "PDtype %s@." id.id_string;
+      begin
+        match idef with
+        | Some (Dalias ty) -> Some (C.Dtypedef (ty_of_mlty info ty, id))
+        | Some _ -> raise (Unsupported "Ddata/Drecord")
+        | None ->
+          begin match query_syntax info.syntax id with
+          | Some _ -> None
+          | None ->
+            raise (Unsupported "type declaration without syntax or alias")
+          end
+      end
+
+    | _ -> None (*TODO exn ? *)
+
+  let translate_decl (info:info) (d:Compile.ML.decl) : C.definition option
+    =
+    let decide_print id = query_syntax info.syntax id = None in
+    match Compile.ML.get_decl_name d with
+    | [id] when decide_print id -> translate_decl info d
+    | [_] -> None
+    | _ -> raise (Unsupported "no name or recursive defs")
+
+
+end
+
+
 let fg ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
   match fname with
@@ -856,4 +1303,14 @@ let pr args ?old ?fname ~flat m fmt _d =
   with Print.Unprinted s -> (Format.printf "Could not print: %s@." s;
 		       Format.fprintf fmt "/* Dummy file */@.")
 
-let () = Pdriver.register_printer "c" ~desc:"printer for C code" fg pr
+let print_decl args ?old ?fname ~flat m fmt d =
+  ignore old;
+  ignore fname;
+  ignore flat; (*FIXME*)
+  let cds = MLToC.translate_decl args d in
+  match cds with
+  | None -> ()
+  | Some cd -> Format.fprintf fmt "%a@." Print.print_def cd
+
+let () =
+  Pdriver.register_printer "c" ~desc:"printer for C code" fg print_decl

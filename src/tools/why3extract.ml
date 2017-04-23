@@ -146,6 +146,9 @@ let print_mdecls ?fname m mdecls =
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
     let flat = opt_modu_flat = Flat in
+    List.iter
+      (fun s -> fprintf fmt "%s@." s)
+      pargs.Pdriver.prelude;
     List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
     if cout <> stdout then close_out cout end
 

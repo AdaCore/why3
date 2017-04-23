@@ -61,7 +61,7 @@ module ML = struct
 
   type pat =
     | Pwild
-    | Pident  of ident
+    | Pvar    of vsymbol
     | Papp    of lsymbol * pat list
     | Ptuple  of pat list
     | Por     of pat * pat
@@ -185,7 +185,7 @@ module ML = struct
     List.iter (iter_deps_pat f) patl
 
   and iter_deps_pat f = function
-    | Pwild | Pident _ -> ()
+    | Pwild | Pvar _ -> ()
     | Papp (ls, patl) ->
       f ls.ls_name;
       iter_deps_pat_list f patl
@@ -353,7 +353,7 @@ module Translate = struct
     | Pvar vs when (restore_pv vs).pv_ghost ->
       ML.Pwild
     | Pvar vs ->
-      ML.Pident vs.vs_name
+      ML.Pvar vs
     | Por (p1, p2) ->
       ML.Por (pat p1, pat p2)
     | Pas (p, vs) when (restore_pv vs).pv_ghost ->
@@ -534,7 +534,7 @@ module Translate = struct
 
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
-    assert (not eff.eff_ghost);
+    (* assert (not eff.eff_ghost); *) (*FIXME add this back*)
     match e.e_node with
     | Econst c ->
       let c = match c with Number.ConstInt c -> c | _ -> assert false in
