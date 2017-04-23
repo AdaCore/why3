@@ -493,8 +493,8 @@ let ity_app_raw sbs id s tl rl = match s.its_def with
       ity_reg (mk_reg id s tl rl)
   | Alias ity -> ity_full_inst sbs ity
   | NoDef -> ity_app_unsafe s tl rl
-  | Range _ -> assert false (* TODO *)
-  | Float _ -> assert false (* TODO *)
+  | Range _ -> ity_app_unsafe s tl rl
+  | Float _ -> ity_app_unsafe s tl rl
 
 let create_region_raw sbs id s tl rl =
   match (ity_app_raw sbs id s tl rl).ity_node with
