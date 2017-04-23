@@ -29,7 +29,7 @@ theory BuiltIn
   syntax type real  "Real"
   syntax predicate (=)  "(= %1 %2)"
   meta "encoding:ignore_polymorphism_ls" predicate (=)
-  meta "encoding : kept" type int
+  meta "encoding:kept" type int
 end
 
 theory algebra.OrderedUnitaryCommutativeRing
@@ -96,7 +96,7 @@ theory real.Real
 
   prelude ";;; SMT-LIB2: real arithmetic"
 
-  meta "encoding : kept" type real
+  meta "encoding:kept" type real
 
   syntax function zero "0.0"
   syntax function one  "1.0"
@@ -146,7 +146,7 @@ theory real.Truncate
 end
 
 theory Bool
-   meta "encoding : kept" type bool
+   meta "encoding:kept" type bool
    meta "eliminate_algebraic" "no_inversion"
 
    syntax type     bool  "Bool"
@@ -168,7 +168,7 @@ end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
-  meta "encoding : lskept" function ite
+  meta "encoding:lskept" function ite
   meta "encoding:ignore_polymorphism_ls" function ite
 
   remove allprops
@@ -180,21 +180,18 @@ theory map.Map
 
   syntax function get   "(select %1 %2)"
   syntax function set   "(store %1 %2 %3)"
-  meta "encoding : lskept" function get
-  meta "encoding : lskept" function set
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
   meta "encoding:ignore_polymorphism_ls" function get
   meta "encoding:ignore_polymorphism_ls" function ([])
   meta "encoding:ignore_polymorphism_ls" function set
   meta "encoding:ignore_polymorphism_ls" function ([<-])
 
-  meta "encoding:ignore_polymorphism_pr" prop Select_eq
-  meta "encoding:ignore_polymorphism_pr" prop Select_neq
-
   remove allprops
 end
 
 theory map.Const
-  meta "encoding : lskept" function const
+  meta "encoding:lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
 
 end

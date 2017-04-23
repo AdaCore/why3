@@ -221,7 +221,8 @@ theory BV_Gen
   axiom max_int_val : max_int = two_power_size - 1
 
   val function to_int t : int
-  val function to_uint t : int
+  function to_uint t : int
+  val to_uint (x:t) : int  ensures { result = to_uint x }
   val function of_int int : t
 
   axiom to_uint_extensionality :
@@ -389,7 +390,8 @@ theory BV_Gen
   predicate (==) (v1 v2 : t) =
     eq_sub v1 v2 0 size
 
-  axiom Extensionality: forall x y : t [x == y]. x == y -> x = y
+  axiom Extensionality "W:non_conservative_extension:N" :
+    forall x y : t [x == y]. x == y -> x = y
 
   val eq (v1 v2 : t) : bool
     ensures { result <-> v1 = v2 }
