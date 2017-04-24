@@ -575,6 +575,8 @@ let reload_safe () =
     | 1 -> save_sources (); reload_unsafe ()
     | 2 -> reload_unsafe ()
     | _ -> ()
+  else
+    reload_unsafe ()
 
 (* TODO key stroked to be decided *)
 let reload_menu_item : GMenu.menu_item =
