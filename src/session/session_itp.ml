@@ -6,6 +6,8 @@ let debug = Debug.register_info_flag "session_itp"
     ~desc:"Pring@ debugging@ messages@ about@ Why3@ session@ \
            creation,@ reading@ and@ writing."
 
+let debug_stack_trace = Debug.lookup_flag "stack_trace"
+
 type transID = int
 type proofNodeID = int
 type proofAttemptID = int
@@ -647,12 +649,20 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
 
 
 let update_proof_attempt s id pr st =
-  let n = get_proofNode s id in
-  let pa = Hprover.find n.proofn_attempts pr in
-  let pa = get_proof_attempt_node s pa in
-  pa.proof_state <- Some st;
-  pa.proof_obsolete <- false
-
+  try
+    let n = get_proofNode s id in
+    let pa = Hprover.find n.proofn_attempts pr in
+    let pa = get_proof_attempt_node s pa in
+    pa.proof_state <- Some st;
+    pa.proof_obsolete <- false
+  with
+  | BadID ->
+      (* We still want to know that this expression raised an error when
+         examining with stack_trace *)
+      if Debug.test_flag debug_stack_trace then
+        raise BadID
+      else
+        ()
 
 (****************************)
 (*     session opening      *)
