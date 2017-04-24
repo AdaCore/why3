@@ -67,6 +67,7 @@ let empty_spec = {
   sp_xpost   = [];
   sp_reads   = [];
   sp_writes  = [];
+  sp_alias   = [];
   sp_variant = [];
   sp_checkrw = false;
   sp_diverge = false;
