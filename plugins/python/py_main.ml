@@ -288,32 +288,31 @@ and block env ~loc = function
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
   | Ddef (id, idl, sp, bl) :: sl ->
-    let lam = def (id, idl, sp, bl) in
+    (* f(x1,...,xn): body ==>
+      let f x1 ... xn =
+        let x1 = ref x1 in ... let xn = ref xn in
+        try body with Return x -> x *)
+    let env' = List.fold_left add_var empty_env idl in
+    let body = block env' ~loc:id.id_loc bl in
+    let body = if not (has_returnl bl) then body else
+      let loc = id.id_loc in
+      mk_expr ~loc (Etry (body, return_handler ~loc)) in
+    let local bl id =
+      let loc = id.id_loc in
+      let ref = mk_ref ~loc (mk_var ~loc id) in
+      mk_expr ~loc (Elet (id, false, Expr.RKnone, ref, bl)) in
+    let body = List.fold_left local body idl in
+    let param id = id.id_loc, Some id, false, None in
+    let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
-    if block_has_call id bl then mk_expr ~loc (Erec ([id, false, Expr.RKnone, assert false, assert false, assert false, assert false, assert false], s))
-    else mk_expr ~loc (Efun (assert false, None, assert false, assert false, s))
+    let e = if block_has_call id bl then
+      Erec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body], s)
+    else
+      let e = Efun (params, None, Ity.MaskVisible, sp, body) in
+      Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
+    mk_expr ~loc e
   | (Dimport _ | Py_ast.Dlogic _) :: sl ->
     block env ~loc sl
-
-(* f(x1,...,xn): body
-
-   let f x1 ... xn =
-     let x1 = ref x1 in ... let xn = ref xn in
-     try body with Return x -> x *)
-and def (id, idl, sp, bl) =
-  let loc = id.id_loc in
-  let env = empty_env in
-  let env = List.fold_left add_var env idl in
-  let body = block env ~loc bl in
-  let body = if has_returnl bl then
-      mk_expr ~loc (Etry (body, return_handler ~loc)) else body in
-  let local bl id =
-    let loc = id.id_loc in
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc (mk_var ~loc id), bl)) in
-  let body = List.fold_left local body idl in
-  let param id = id.id_loc, Some id, false, None in
-  let params = if idl = [] then no_params ~loc else List.map param idl in
-  params, None, body, sp
 
 let fresh_type_var =
   let r = ref 0 in
@@ -323,22 +322,22 @@ let fresh_type_var =
 let logic_param id =
   id.id_loc, Some id, false, fresh_type_var id.id_loc
 
-let logic inc = function
+let logic = function
   | Py_ast.Dlogic (func, id, idl) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
               ld_type = if func then Some (fresh_type_var id.id_loc) else None;
               ld_def = None } in
-    assert false
-    (*inc.new_decl id.id_loc (Dlogic [d])*)
+    Typing.add_decl id.id_loc (Dlogic [d])
   | _ -> ()
 
-let translate ~loc inc dl =
-  List.iter (logic inc) dl;
-  let fd = (no_params ~loc, None, block empty_env ~loc dl, empty_spec) in
-  let main = assert false (*Dfun (mk_id ~loc "main", Gnone, fd)*) in
-  assert false (*inc.new_pdecl loc main*)
+let translate ~loc dl =
+  List.iter logic dl;
+  let bl = block empty_env ~loc dl in
+  let fd = Efun (no_params ~loc, None, Ity.MaskVisible, empty_spec, bl) in
+  let main = Dlet (mk_id ~loc "main", false, Expr.RKnone, mk_expr ~loc fd) in
+  Typing.add_decl loc main
 
 let read_channel env path file c =
   let f = Py_lexer.parse file c in
@@ -347,28 +346,25 @@ let read_channel env path file c =
   let file = Filename.chop_extension file in
   let name = Strings.capitalize file in
   Debug.dprintf debug "building module %s.@." name;
-  let inc = Typing.open_file env path in
-  let loc = Why3.Loc.user_position file 0 0 0 in
-  assert false (*
-  inc.open_module (mk_id ~loc name);
+  Typing.open_file env path;
+  let loc = Loc.user_position file 0 0 0 in
+  Typing.open_module (mk_id ~loc name);
   let use_import (f, m) =
-    let q = Qdot (Qident (mk_id ~loc f), mk_id ~loc m) in
-    let use = {use_theory = q; use_import = Some (true, m) }, None in
-    inc.use_clone loc use in
+    let m = mk_id ~loc m in
+    Typing.open_scope loc m;
+    Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_id ~loc f), m)));
+    Typing.close_scope loc ~import:true in
   List.iter use_import
     ["int", "Int"; "ref", "Refint"; "python", "Python"];
-  translate ~loc inc f;
-  inc.close_module ();
-  let mm, _ as res = Mlw_typing.close_file () in
+  translate ~loc f;
+  Typing.close_module loc;
+  let mm = Typing.close_file () in
   if path = [] && Debug.test_flag debug then begin
     let add_m _ m modm = Ident.Mid.add m.mod_theory.Theory.th_name m modm in
-    let modm = Mstr.fold add_m mm Ident.Mid.empty in
-    let print_m _ m = Format.eprintf
-      "@[<hov 2>module %a@\n%a@]@\nend@\n@." Pretty.print_th m.mod_theory
-      (Pp.print_list Pp.newline2 Mlw_pretty.print_pdecl) m.mod_decls in
-    Ident.Mid.iter print_m modm
+    let print_m _ m = Pmodule.print_module Format.err_formatter m in
+    Ident.Mid.iter print_m (Mstr.fold add_m mm Ident.Mid.empty)
   end;
-  res *)
+  mm
 
 let () =
   Env.register_format mlw_language "python" ["py"] read_channel

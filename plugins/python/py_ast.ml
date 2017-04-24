@@ -24,7 +24,7 @@ type binop =
 
 type expr = {
   expr_desc: expr_desc;
-  expr_loc : Why3.Loc.position;
+  expr_loc : Loc.position;
 }
 
 and expr_desc =
