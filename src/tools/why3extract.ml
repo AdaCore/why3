@@ -328,6 +328,10 @@ let () =
         | None -> stdout
         | Some file -> open_out file in
       let fmt = formatter_of_out_channel cout in
+      (* print driver prelude *)
+      let print_prelude = List.iter (fun s -> fprintf fmt "%s@." s) in
+      print_prelude pargs.Pdriver.prelude;
+      Ident.Mid.iter (fun _ p -> print_prelude p) pargs.Pdriver.thprelude;
       let extract fmt id =
         let pm = find_module_id mm id in
         let m = translate_module pm in
