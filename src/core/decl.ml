@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -412,7 +412,7 @@ let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
 
 let create_ty_decl ts =
-  let syms = Opt.fold syms_ty Sid.empty ts.ts_def in
+  let syms = type_def_fold syms_ty Sid.empty ts.ts_def in
   let news = Sid.singleton ts.ts_name in
   mk_decl (Dtype ts) syms news
 
@@ -453,7 +453,7 @@ let create_data_decl tdl =
   let check_decl (syms,news) (ts,cl) =
     let cll = List.length cl in
     if cl = [] then raise (EmptyAlgDecl ts);
-    if ts.ts_def <> None then raise (IllegalTypeAlias ts);
+    if ts.ts_def <> NoDef then raise (IllegalTypeAlias ts);
     let news = news_id news ts.ts_name in
     let pjs = List.fold_left (fun s (_,pl) ->
       List.fold_left (Opt.fold Sls.add_left) s pl) Sls.empty cl in
@@ -715,7 +715,7 @@ let check_foundness kn d =
   | _ -> ()
 
 let rec ts_extract_pos kn sts ts =
-  assert (ts.ts_def = None);
+  assert (not (is_alias_type_def ts.ts_def));
   if ts_equal ts ts_func then [false;true] else
   if Sts.mem ts sts then List.map Util.ttrue ts.ts_args else
   match find_constructors kn ts with

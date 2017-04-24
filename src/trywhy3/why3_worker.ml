@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -106,7 +106,7 @@ module Task =
     let clear_warnings () = warnings := []
     let () =
       Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
-                        let _, a,b,c = Loc.get loc in
+                        let _, a,b,_c = Loc.get loc in
                         warnings := ((a-1,b), msg) :: !warnings)
 
 

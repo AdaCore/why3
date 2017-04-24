@@ -152,7 +152,6 @@ why3.conf
 /src/coq-tactic/.why3-vo-*
 
 # Coq
-/lib/coq/bv/BV_Gen.v
 
 # PVS
 .pvscontext
@@ -200,6 +199,8 @@ pvsbin/
 /src/util/config.ml
 /src/util/lexlib.ml
 /src/util/rc.ml
+/src/util/json_parser.mli
+/src/util/json_parser.ml
 
 # /src/session
 /src/session/xml.ml
@@ -216,6 +217,13 @@ pvsbin/
 /plugins/tptp/tptp_parser.conflicts
 /plugins/parser/dimacs.ml
 
+# /plugins/python/
+/plugins/python/py_lexer.ml
+/plugins/python/py_parser.ml
+/plugins/python/py_parser.mli
+/plugins/python/test/
+/plugins/python/py_parser.conflicts
+
 # /drivers
 /drivers/coq-realizations.aux
 /drivers/pvs-realizations.aux
@@ -228,6 +236,8 @@ pvsbin/
 /tests/test-and/
 /tests/test-extraction/*
 !/tests/test-extraction/main.ml
+/tests/python/*/why3session.xml
+/tests/python/*/why3shapes.gz
 
 # /examples/
 /examples/in_progress/course/
@@ -288,6 +298,7 @@ pvsbin/
 /modules/pqueue/
 /modules/mach/array/
 /modules/mach/int/
+/modules/python/
 
 # Try Why3
 /src/trywhy3/trywhy3.byte
@@ -304,8 +315,12 @@ pvsbin/
 /src/trywhy3/index.html
 /src/trywhy3/ace-builds/
 /src/trywhy3/*.png
-/src/trywhy3/alt-ergo-1.00-private-2015-01-29
+/src/trywhy3/alt-ergo*
 /src/trywhy3/fontawesome/
+
+# IDE
+/src/ide/fontawesome
+/src/ide/ace-builds
 
 # jessie3
 /src/jessie/config.log

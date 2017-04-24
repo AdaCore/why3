@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -45,7 +45,7 @@ let meta_monomorphic_types_only =
 
 let check_ts ign_ts ts =
   ts.Ty.ts_args <> [] &&
-  ts.Ty.ts_def = None &&
+  ts.Ty.ts_def = Ty.NoDef &&
   not (Ty.Sts.mem ts ign_ts)
 
 let check_ls ign_ls ls =

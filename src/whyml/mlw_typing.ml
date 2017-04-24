@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -484,7 +484,8 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
       let e1, ch = if chainable_op uc denv op2
         then get_chain e12 ch else e12, ch in
       make_chain "q1 " "q2 " (dexpr lenv denv e1) ch
-  | Ptree.Econst c -> DEconst c
+  | Ptree.Econst (Number.ConstInt _ as c) -> DEconst (c, ity_int)
+  | Ptree.Econst (Number.ConstReal _ as c) -> DEconst (c, ity_real)
   | Ptree.Erecord [] -> raise Decl.EmptyRecord
   | Ptree.Erecord ((q,_)::_ as fl) ->
       let prog_val cs pj = function
@@ -624,7 +625,12 @@ let rec dexpr ({uc = uc} as lenv) denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr lenv denv e1, Slab.singleton lab)
   | Ptree.Ecast (e1, pty) ->
-      DEcast (dexpr lenv denv e1, ity_of_pty uc pty))
+      (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
+      let e1 = dexpr lenv denv e1 in
+      let ity = ity_of_pty uc pty in
+      match e1.de_node with
+      | DEconst (c, _) -> DEconst (c, ity)
+      | _ -> DEcast (e1, ity))
 
 and drec_defn ~top lenv denv fdl =
   let prep (id, gh, (bl, pty, e, sp)) =
@@ -683,7 +689,7 @@ let look_for_loc tdl s =
   let look loc d =
     let loc = look_id loc d.td_ident in
     match d.td_def with
-      | TDabstract | TDalias _ -> loc
+      | TDabstract | TDalias _ | TDrange _ | TDfloat _ -> loc
       | TDalgebraic csl -> List.fold_left look_cs loc csl
       | TDrecord fl -> List.fold_left look_fl loc fl
   in
@@ -713,7 +719,8 @@ let add_types ~wp uc tdl =
           | PTtyapp (q,tyl) -> List.fold_left check (ts_seen seen q) tyl
           | PTtuple tyl -> List.fold_left check seen tyl in
         let seen = match d.td_def with
-          | TDabstract | TDalgebraic _ | TDrecord _ -> seen
+          | TDabstract | TDrange _ | TDfloat _ | TDalgebraic _ | TDrecord _ ->
+              seen
           | TDalias ty -> check (Mstr.add x false seen) ty in
         Mstr.add x true seen in
   ignore (Mstr.fold cyc_visit def Mstr.empty);
@@ -741,7 +748,7 @@ let add_types ~wp uc tdl =
       let imp =
         let td = Mstr.find x def in
         match td.td_def with
-        | TDabstract -> false
+        | TDabstract | TDrange _ | TDfloat _ -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
             let check (_,_,gh,ty) = gh || check ty in
@@ -780,7 +787,7 @@ let add_types ~wp uc tdl =
       let mut =
         let td = Mstr.find x def in
         match td.td_def with
-        | TDabstract -> false
+        | TDabstract | TDrange _ | TDfloat _ -> false
         | TDalias ty -> check ty
         | TDalgebraic csl ->
             let check (_,_,_,ty) = check ty in
@@ -860,7 +867,7 @@ let add_types ~wp uc tdl =
               ~abst ~priv ~inv:false ~ghost_reg vl rl (Some def))
         | TDalias ty ->
             let def = ty_of_ity (parse ty) in
-            TS (create_tysymbol id vl (Some def))
+            TS (create_tysymbol id vl (Alias def))
         | TDalgebraic csl when Hstr.find mutables x ->
             let projs = Hstr.create 5 in
             let nogh = ref Sreg.empty in
@@ -925,7 +932,15 @@ let add_types ~wp uc tdl =
         | TDalgebraic _ | TDrecord _ when Hstr.find impures x ->
             PT (create_itysymbol id ~abst ~priv ~inv:false vl [] None)
         | TDalgebraic _ | TDrecord _ | TDabstract ->
-            TS (create_tysymbol id vl None)
+            TS (create_tysymbol id vl NoDef)
+        | TDrange (lo,hi) ->
+            let ir = { Number.ir_lower = lo;
+                       Number.ir_upper = hi } in
+            TS (Loc.try2 ~loc:d.td_loc create_tysymbol id vl (Range ir))
+        | TDfloat (eb,sb) ->
+            let fp = { Number.fp_exponent_digits = eb;
+                       Number.fp_significand_digits = sb } in
+            TS (Loc.try2 ~loc:d.td_loc create_tysymbol id vl (Float fp))
       in
       Hstr.add tysymbols x (Some ts);
       ts
@@ -968,7 +983,7 @@ let add_types ~wp uc tdl =
           parse ty
     in
     match d.td_def with
-      | TDabstract ->
+      | TDabstract | TDrange _ | TDfloat _ ->
           ts :: abstr, algeb, alias
       | TDalias _ ->
           abstr, algeb, ts :: alias
@@ -1037,9 +1052,33 @@ let add_types ~wp uc tdl =
 
   (* add type declarations *)
 
+  let add_pure_type_decl uc ts =
+    let uc = add_decl_with_tuples uc (Decl.create_ty_decl ts) in
+    match ts.ts_def with
+    | NoDef | Alias _ -> uc
+    | Range _ ->
+        (* FIXME: "t'to_int" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'int" in
+        let id = id_derive nm ts.ts_name in
+        let pj = create_fsymbol id [ty_app ts []] ty_int in
+        let uc = add_decl uc (Decl.create_param_decl pj) in
+        add_meta uc meta_range [MAts ts; MAls pj]
+    | Float _ ->
+        (* FIXME: "t'to_real" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'real" in
+        let id = id_derive nm ts.ts_name in
+        let pj = create_fsymbol id [ty_app ts []] ty_real in
+        let uc = add_decl uc (Decl.create_param_decl pj) in
+        (* FIXME: "t'is_finite" is probably better *)
+        let nm = ts.ts_name.id_string ^ "'isFinite" in
+        let id = id_derive nm ts.ts_name in
+        let iF = Term.create_psymbol id [ty_app ts []] in
+        let uc = add_decl uc (Decl.create_param_decl iF) in
+        add_meta uc meta_float [MAts ts; MAls pj; MAls iF]
+  in
   let add_type_decl uc = function
     | PT ts -> add_pdecl_with_tuples ~wp uc (create_ty_decl ts)
-    | TS ts -> add_decl_with_tuples uc (Decl.create_ty_decl ts)
+    | TS ts -> add_pure_type_decl uc ts
   in
   let add_invariant uc d = if d.td_inv = [] then uc else
     add_type_invariant d.td_loc uc d.td_ident d.td_params d.td_inv in

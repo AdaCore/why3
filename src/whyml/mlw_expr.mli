@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -232,7 +232,7 @@ val fs_void : lsymbol
 val t_void : term
 val e_void : expr
 
-val e_const : Number.constant -> expr
+val e_const : Number.constant -> ity -> expr
 val e_lazy_and : expr -> expr -> expr
 val e_lazy_or : expr -> expr -> expr
 val e_not : expr -> expr

@@ -244,6 +244,9 @@ definition eq_sub_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a wor
   eq_sub_bv_defn: "eq_sub_bv a b i n =
     (b AND (mask (unat n) << unat i) = a AND (mask (unat n) << unat i))"
 
+definition size_bv :: "'a::len word" where
+  "size_bv = of_nat LENGTH('a)"
+
 type_synonym word8 = "8 word"
 
 why3_open "bv/BV8.xml"
@@ -272,10 +275,12 @@ why3_open "bv/BV8.xml"
     rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
-    to_uint=uint
+    tqtint=uint
     to_int=sint
     of_int=of_int
     eq_sub_bv=eq_sub_bv
+    size_bv=size_bv
+    one=one_class.one
   types
     t=word8
 
@@ -360,9 +365,13 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc Of_int_zeros by simp
+why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
-why3_vc Of_int_ones by (simp add: max_word_eq)
+why3_vc to_uint_zeros by simp
+
+why3_vc to_uint_one by simp
+
+why3_vc to_uint_ones by (simp add: max_word_eq)
 
 why3_vc to_uint_add
   by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
@@ -462,10 +471,12 @@ why3_open "bv/BV16.xml"
     rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
-    to_uint=uint
+    tqtint=uint
     to_int=sint
     of_int=of_int
     eq_sub_bv=eq_sub_bv
+    size_bv=size_bv
+    one=one_class.one
   types
     t=word16
 
@@ -550,9 +561,13 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc Of_int_zeros by simp
+why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
-why3_vc Of_int_ones by (simp add: max_word_eq)
+why3_vc to_uint_zeros by simp
+
+why3_vc to_uint_one by simp
+
+why3_vc to_uint_ones by (simp add: max_word_eq)
 
 why3_vc to_uint_add
   by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
@@ -652,10 +667,12 @@ why3_open "bv/BV32.xml"
     rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
-    to_uint=uint
+    tqtint=uint
     to_int=sint
     of_int=of_int
     eq_sub_bv=eq_sub_bv
+    size_bv=size_bv
+    one=one_class.one
   types
     t=word32
 
@@ -740,9 +757,13 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc Of_int_zeros by simp
+why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
-why3_vc Of_int_ones by (simp add: max_word_eq)
+why3_vc to_uint_zeros by simp
+
+why3_vc to_uint_one by simp
+
+why3_vc to_uint_ones by (simp add: max_word_eq)
 
 why3_vc to_uint_add
   by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)
@@ -842,10 +863,12 @@ why3_open "bv/BV64.xml"
     rotate_right_bv=rotate_right_bv
     nth=bv_nth
     nth_bv=nth_bv
-    to_uint=uint
+    tqtint=uint
     to_int=sint
     of_int=of_int
     eq_sub_bv=eq_sub_bv
+    size_bv=size_bv
+    one=one_class.one
   types
     t=word64
 
@@ -930,9 +953,13 @@ why3_vc Nth_bv_is_nth2
   using assms
   by (simp add: bv_nth_def unat_def to_uint_of_int uint_in_range_def)
 
-why3_vc Of_int_zeros by simp
+why3_vc to_uint_size_bv by (simp add: size_bv_def)
 
-why3_vc Of_int_ones by (simp add: max_word_eq)
+why3_vc to_uint_zeros by simp
+
+why3_vc to_uint_one by simp
+
+why3_vc to_uint_ones by (simp add: max_word_eq)
 
 why3_vc to_uint_add
   by (simp add: uint_word_arith_bintrs bintrunc_mod2p emod_def)

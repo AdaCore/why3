@@ -217,6 +217,21 @@ module TestExtraction
     for i = 0 to 10 do r := !r + i done;
     !r
 
+  (** optional and named arguments *)
+
+  use import option.Option
+
+  let opt_f x "ocaml:named" y "ocaml:named" = x+y
+  let constant opt_a = opt_f 40 2
+  let opt_g x "ocaml:optional" y "ocaml:named" =
+     match x with None -> y | Some x -> x + y end
+  let constant opt_b = opt_g None 42
+  let constant opt_c = opt_g (Some 40) 2
+
+  (* FIXME: partial application with named arguments not yet supported *)
+  let opt_h () = fun y -> opt_f 40 y
+  let opt_i () = opt_h () 2
+
   (** test the execution of the extracted code *)
 
   use import ocaml.Pervasives
@@ -244,9 +259,29 @@ module TestExtraction
   let test2 () raises { AssertFailure }
   = ocaml_assert (of_int 1 + of_int 1 = of_int 2)
 
+  (* testing proxy-variables inlining mechanism inside a lambda *)
+  let test3 () raises { AssertFailure }
+  = let i = ref (of_int 42) in
+    let c = Cons !i in
+    i := (of_int 0);
+    let c = c Nil in
+    ocaml_assert (match c with Cons x _ -> x = of_int 42 | _ -> true end)
+
+  (* testing proxy-variables inlining with conflicting effects *)
+  let test4 () raises { AssertFailure }
+  = let f (x y: int63) raises { AssertFailure }
+    = ocaml_assert (y = of_int 42);
+      x + y in
+    let i = ref (of_int 42) in
+    let res = f (i := of_int 0; !i) !i in
+    ocaml_assert (!i = of_int 0);
+    ocaml_assert (res = of_int 42)
+
   let main () raises { AssertFailure } =
     test1 ();
     test2 ();
+    test3 ();
+    test4 ();
     test_parallel_assign ()
 
 end

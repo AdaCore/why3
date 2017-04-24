@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -39,7 +39,8 @@ let opt_rec_single = ref Single
 type flat_modular = Flat | Modular
 let opt_modu_flat = ref Flat
 
-let is_uppercase c = c = Char.uppercase_ascii c
+(* Replace with Char.uppercase_ascii after migration to OCaml 4.04+ *)
+let is_uppercase c = c = Char.uppercase c
 
 let add_opt_file x =
   let invalid_path () = Format.eprintf "invalid path: %s@." x; exit 1 in
@@ -307,7 +308,7 @@ let flat_extraction mm = function
       Mstr.add s m mm in
     Mstr.fold do_m mmf mm
   | Module (path, m) ->
-    let m = find_module_path mm path m in
+    let m = find_module_path mm path m in (* FIXME: catch Not_found here *)
     let m = translate_module m in
     Ident.Mid.iter (fun id _ -> visit mm id) m.ML.mod_known;
     mm
@@ -330,6 +331,10 @@ let () =
         | None -> stdout
         | Some file -> open_out file in
       let fmt = formatter_of_out_channel cout in
+      (* print driver prelude *)
+      let print_prelude = List.iter (fun s -> fprintf fmt "%s@." s) in
+      print_prelude pargs.Pdriver.prelude;
+      Ident.Mid.iter (fun _ p -> print_prelude p) pargs.Pdriver.thprelude;
       let extract fmt id =
         let pm = find_module_id mm id in
         let m = translate_module pm in

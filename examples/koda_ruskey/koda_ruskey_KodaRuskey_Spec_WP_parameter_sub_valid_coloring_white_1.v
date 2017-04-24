@@ -310,7 +310,7 @@ Axiom white_white : forall (f:forest) (c:(map.Map.map Z color)) (i:Z),
   (white_forest f c) -> (white_forest f (map.Map.set c i White)).
 
 Require Import Why3.
-Ltac ae := why3 "alt-ergo" timelimit 3.
+Ltac ae := why3 "Alt-Ergo,1.30," timelimit 3; admit.
 
 (* Why3 goal *)
 Theorem WP_parameter_sub_valid_coloring_white : forall (f0:forest) (i:Z)
@@ -374,5 +374,5 @@ trivial.
 ae.
 
 
-Qed.
+Admitted.
 

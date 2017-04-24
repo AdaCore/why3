@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -170,6 +170,9 @@ module type S =
 
     val remove_left: t -> elt -> t
     (** [remove_left s x] is the same as [remove x s]. *)
+
+    val print: (Format.formatter -> elt -> unit) ->
+               Format.formatter -> t -> unit
   end
 
 module MakeOfMap (M : Extmap.S) : S with module M = M

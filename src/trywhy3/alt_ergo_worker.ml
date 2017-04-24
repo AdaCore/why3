@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -40,7 +40,7 @@ let run_alt_ergo_on_task text =
   match Why_typing.split_goals ltd with
   | [d] ->
     let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
-    SAT.reset_steps ();
+    SAT.reset_refs ();
     let stat = ref (Invalid "no answer from Alt-Ergo") in
     let f s = stat := s in
     begin

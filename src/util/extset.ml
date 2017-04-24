@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -50,6 +50,7 @@ module type S = sig
   val contains: t -> elt -> bool
   val add_left: t -> elt -> t
   val remove_left: t -> elt -> t
+  val print: (Format.formatter -> elt -> unit) -> Format.formatter -> t -> unit
 end
 
 module MakeOfMap (M: Extmap.S) = struct
@@ -97,6 +98,12 @@ module MakeOfMap (M: Extmap.S) = struct
   let contains = M.contains
   let add_left s e = M.add e () s
   let remove_left s e = M.remove e s
+  let print print_elt fmt s =
+    if is_empty s then Format.fprintf fmt "{}" else begin
+      Format.fprintf fmt "@[<hov 2>{ ";
+      Pp.print_iter1 iter Pp.comma print_elt fmt s;
+      Format.fprintf fmt "}@]"
+    end
 end
 
 module type OrderedType = Set.OrderedType

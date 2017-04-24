@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -35,6 +35,12 @@ let mk_itd s f c i = {
 let create_alias_decl id args ity =
   mk_itd (create_alias_itysymbol id args ity) [] [] []
 
+let create_range_decl id ir =
+  mk_itd (create_range_itysymbol id ir) [] [] []
+
+let create_float_decl id fp =
+  mk_itd (create_float_itysymbol id fp) [] [] []
+
 let check_field stv f =
   let loc = f.pv_vs.vs_name.id_loc in
   let ftv = ity_freevars Stv.empty f.pv_ity in
@@ -48,7 +54,7 @@ let its_recursive s =
   not s.its_nonfree && not s.its_private &&
   not s.its_mutable && not s.its_fragile &&
   s.its_mfields = [] && s.its_regions = [] &&
-  s.its_reg_flg = [] && s.its_def = None &&
+  s.its_reg_flg = [] && s.its_def = NoDef &&
   List.for_all (fun x -> x.its_frozen &&
     x.its_exposed && not x.its_liable &&
     x.its_fixed && x.its_visible) s.its_arg_flg
@@ -269,7 +275,7 @@ let get_syms node pure =
   | PDtype dl ->
       let syms_itd syms d =
         (* the syms of the invariants are already in [pure] *)
-        let syms = Opt.fold syms_ity syms d.itd_its.its_def in
+        let syms = type_def_fold syms_ity syms d.itd_its.its_def in
         let add_fd syms s = syms_ity syms s.rs_cty.cty_result in
         let add_cs syms s = syms_pvl syms s.rs_cty.cty_args in
         let syms = List.fold_left add_fd syms d.itd_fields in
@@ -294,10 +300,67 @@ let mk_decl = let r = ref 0 in fun node pure ->
 
 let create_type_decl dl =
   if dl = [] then invalid_arg "Pdecl.create_type_decl";
-  let add_itd ({itd_its = s} as itd) (abst,defn,rest) =
+  let add_itd ({itd_its = s} as itd) (abst,defn,rest,metas) =
     match itd.itd_fields, itd.itd_constructors with
-    | [], [] when s.its_def <> None ->
-        abst, defn, create_ty_decl s.its_ts :: rest
+    | [], [] when s.its_def <> NoDef ->
+        begin
+          match s.its_def with
+          | Alias _ -> abst, defn, create_ty_decl s.its_ts :: rest, metas
+          | Range ir ->
+             let ts = s.its_ts in
+             let td = create_ty_decl ts in
+             let nm = ts.ts_name.id_string ^ "'int" in
+             let id = id_derive nm ts.ts_name in
+             let pj = create_fsymbol id [ty_app ts []] ty_int in
+             let pjd = create_param_decl pj in
+             let meta = Theory.(meta_range,[MAts ts; MAls pj]) in
+             (* create max attribute *)
+             let nm = ts.ts_name.id_string ^ "'maxInt" in
+             let id = id_derive nm ts.ts_name in
+             let lsmaxInt = create_fsymbol id [] ty_int  in
+             let t =
+               t_const Number.(ConstInt (int_const_dec (BigInt.to_string ir.ir_upper)))
+                       ty_int
+             in
+             let maxInt_decl = create_logic_decl [make_ls_defn lsmaxInt [] t] in
+             (* create min attribute *)
+             let nm = ts.ts_name.id_string ^ "'minInt" in
+             let id = id_derive nm ts.ts_name in
+             let lsminInt = create_fsymbol id [] ty_int  in
+             let t =
+               t_const Number.(ConstInt (int_const_dec (BigInt.to_string ir.ir_lower)))
+                       ty_int
+             in
+             let minInt_decl = create_logic_decl [make_ls_defn lsminInt [] t] in
+             abst, defn, td :: pjd :: maxInt_decl :: minInt_decl :: rest, meta :: metas
+          | Float fmt ->
+             let ts = s.its_ts in
+             let td = create_ty_decl ts in
+             let nm = ts.ts_name.id_string ^ "'real" in
+             let id = id_derive nm ts.ts_name in
+             let pj = create_fsymbol id [ty_app ts []] ty_real in
+             let pjd = create_param_decl pj in
+             let nm = ts.ts_name.id_string ^ "'isFinite" in
+             let id = id_derive nm ts.ts_name in
+             let iF = create_psymbol id [ty_app ts []] in
+             let iFd = create_param_decl iF in
+             let meta = Theory.(meta_float,[MAts ts; MAls pj; MAls iF]) in
+             (* create exponent digits attribute *)
+             let nm = ts.ts_name.id_string ^ "'eb" in
+             let id = id_derive nm ts.ts_name in
+             let ls = create_fsymbol id [] ty_int  in
+             let t = t_nat_const fmt.Number.fp_exponent_digits in
+             let eb_decl = create_logic_decl [make_ls_defn ls [] t] in
+             (* create significand digits attribute *)
+             let nm = ts.ts_name.id_string ^ "'sb" in
+             let id = id_derive nm ts.ts_name in
+             let ls = create_fsymbol id [] ty_int  in
+             let t = t_nat_const fmt.Number.fp_significand_digits in
+             let sb_decl = create_logic_decl [make_ls_defn ls [] t] in
+             abst, defn, td :: pjd :: iFd :: eb_decl :: sb_decl :: rest,
+             meta :: metas
+          | NoDef -> assert false
+        end
     | fl, _ when itd.itd_invariant <> [] ->
         let {id_string = nm; id_loc = loc} = s.its_ts.ts_name in
         let u = create_vsymbol (id_fresh "self")
@@ -313,13 +376,13 @@ let create_type_decl dl =
         let inv = t_subst sbs (t_and_simp_l itd.itd_invariant) in
         let inv = t_forall_close [u] [] inv in
         let inv = create_prop_decl Paxiom pr inv in
-        create_ty_decl s.its_ts :: abst, defn, proj @ inv :: rest
+        create_ty_decl s.its_ts :: abst, defn, proj @ inv :: rest, metas
     | fl, [] ->
         let get_ld s ldd = match s.rs_logic with
           | RLls s -> create_param_decl s :: ldd
           | _ -> assert false in
         let rest = List.fold_right get_ld fl rest in
-        create_ty_decl s.its_ts :: abst, defn, rest
+        create_ty_decl s.its_ts :: abst, defn, rest, metas
     | fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
@@ -329,10 +392,11 @@ let create_type_decl dl =
         let get_cs s = match s.rs_logic with
           | RLls cs -> cs, List.map get_pj s.rs_cty.cty_args
           | _ -> assert false in
-        abst, (s.its_ts, List.map get_cs cl) :: defn, rest in
-  let abst,defn,rest = List.fold_right add_itd dl ([],[],[]) in
+        abst, (s.its_ts, List.map get_cs cl) :: defn, rest, metas
+  in
+  let abst,defn,rest,metas = List.fold_right add_itd dl ([],[],[],[]) in
   let defn = if defn = [] then [] else [create_data_decl defn] in
-  mk_decl (PDtype dl) (abst @ defn @ rest)
+  mk_decl (PDtype dl) (abst @ defn @ rest), metas
 
 (* TODO: share with Eliminate_definition *)
 let rec t_insert hd t = match t.t_node with
@@ -567,19 +631,21 @@ let print_its_defn fst fmt itd =
     (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
   let print_defn fmt () =
     match s.its_def, itd.itd_fields, itd.itd_constructors with
-    | Some ity, _, _ -> fprintf fmt " = %a" print_ity ity
-    | _, [], [] when not s.its_mutable -> ()
-    | _, fl, [] -> fprintf fmt " = private%s { %a }"
+    | Alias ity, _, _ -> fprintf fmt " = %a" print_ity ity
+    | NoDef, [], [] when not s.its_mutable -> ()
+    | NoDef, fl, [] -> fprintf fmt " = private%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
-    | _, fl, [{rs_name = {id_string = n}}]
+    | NoDef, fl, [{rs_name = {id_string = n}}]
       when n = "mk " ^ s.its_ts.ts_name.id_string -> fprintf fmt " =%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
-    | _, fl, cl ->
+    | NoDef, fl, cl ->
         let add s f = Mpv.add (Opt.get f.rs_field) f s in
         let mf = List.fold_left add Mpv.empty fl in
-        fprintf fmt " =%a" (Pp.print_list Pp.nothing (print_constr mf)) cl in
+        fprintf fmt " =%a" (Pp.print_list Pp.nothing (print_constr mf)) cl
+    | Range _, _, _ -> assert false (* TODO *)
+    | Float _, _, _ -> assert false (* TODO *) in
   let print_inv fmt f = fprintf fmt
     "@\n@  invariant { %a }" Pretty.print_term f in
   fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"

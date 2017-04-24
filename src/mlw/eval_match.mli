@@ -9,4 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
+val track : Pdecl.known_map -> Term.term -> Term.term
+
 val eval_match : Pdecl.known_map -> Term.term -> Term.term

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,7 +25,7 @@ type itysymbol = private {
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
-  its_def     : ity option;     (** type alias *)
+  its_def     : ity type_def;   (** type definition *)
 }
 
 and its_flag = private {
@@ -128,6 +128,12 @@ val create_rec_itysymbol : preid -> tvsymbol list -> itysymbol
 
 val create_alias_itysymbol : preid -> tvsymbol list -> ity -> itysymbol
 (** [create_alias_itysymbol id args def] creates a new type alias. *)
+
+val create_range_itysymbol : preid -> Number.int_range -> itysymbol
+(** [create_range_itysymbol id r] creates a new range type. *)
+
+val create_float_itysymbol : preid -> Number.float_format -> itysymbol
+(** [create_float_itysymbol id f] creates a new float type. *)
 
 val restore_its : tysymbol -> itysymbol
 (** raises [Not_found] if the argument is not a [its_ts] *)

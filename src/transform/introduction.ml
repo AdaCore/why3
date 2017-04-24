@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -108,7 +108,7 @@ let rec intros kn pr f =
 
 let intros ?known_map pr f =
   let tvs = t_ty_freevars Stv.empty f in
-  let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] None in
+  let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] NoDef in
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in

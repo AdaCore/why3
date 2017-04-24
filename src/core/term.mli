@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -67,6 +67,7 @@ exception BadArity of lsymbol * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 exception ConstructorExpected of lsymbol
+exception InvalidLiteralType of ty
 
 (** {2 Patterns} *)
 
@@ -201,7 +202,7 @@ val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
 val t_var : vsymbol -> term
-val t_const : Number.constant -> term
+val t_const : Number.constant -> ty -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term

@@ -28,7 +28,7 @@ theory Parity
   use import int.ComputerDivision
 
   lemma even_mod2 :
-    forall n:int. even n <-> div n 2 = 0
+    forall n:int. even n <-> mod n 2 = 0
 
 end
 

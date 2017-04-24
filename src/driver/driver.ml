@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -162,6 +162,9 @@ let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
       Mid.iter it th.th_local
     | Rconverter (q,s,b) ->
         let cs = syntax_converter (find_ls th q) s b in
+        add_meta th cs meta
+    | Rliteral (q,s,b) ->
+        let cs = syntax_literal (find_ts th q) s b in
         add_meta th cs meta
     | Rmeta (s,al) ->
         let rec ty_of_pty = function

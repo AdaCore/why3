@@ -6,8 +6,8 @@ open Test
 let (=) = Z.equal
 
 let b42 = Z.of_int 42
-let () = assert (test_int    () = b42)
-let () = assert (test_int63  () = b42)
+let () = assert (test_int     () = b42)
+let () = assert (test_int63   () = b42)
 
 let () = assert (test_ref     () = b42)
 let () = assert (test_array   () = b42)

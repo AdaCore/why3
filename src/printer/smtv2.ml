@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -72,7 +72,10 @@ let ident_printer () =
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
-      "map"; "bv"; "subset"; "union"; "default"
+      "map"; "bv"; "subset"; "union"; "default";
+
+(* floats *)
+      "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
@@ -81,6 +84,7 @@ let ident_printer () =
 type info = {
   info_syn        : syntax_map;
   info_converters : converter_map;
+  info_rliteral   : syntax_map;
   mutable info_model : S.t;
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
@@ -131,12 +135,30 @@ let print_typed_var info fmt vs =
 let print_var_list info fmt vsl =
   print_list space (print_typed_var info) fmt vsl
 
+let model_projected_label = Ident.create_label "model_projected"
+
 let collect_model_ls info ls =
-  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+  if ls.ls_args = [] && (Slab.mem model_label ls.ls_name.id_label ||
+  Slab.mem model_projected_label ls.ls_name.id_label) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
       (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+
+let number_format = {
+  Number.long_int_support = true;
+  Number.extra_leading_zeros_support = false;
+  Number.dec_int_support = Number.Number_default;
+  Number.hex_int_support = Number.Number_unsupported;
+  Number.oct_int_support = Number.Number_unsupported;
+  Number.bin_int_support = Number.Number_unsupported;
+  Number.def_int_support = Number.Number_unsupported;
+  Number.dec_real_support = Number.Number_unsupported;
+  Number.hex_real_support = Number.Number_unsupported;
+  Number.frac_real_support = Number.Number_custom
+    (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
+  Number.def_real_support = Number.Number_unsupported;
+}
 
 (** expr *)
 let rec print_term info fmt t =
@@ -149,21 +171,24 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = false;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      let ts = match t.t_ty with
+        | Some { ty_node = Tyapp (ts, []) } -> ts
+        | _ -> assert false (* impossible *) in
+      (* look for syntax literal ts in driver *)
+      begin match query_syntax info.info_rliteral ts.ts_name, c with
+        | Some st, Number.ConstInt c ->
+          syntax_range_literal st fmt c
+        | Some st, Number.ConstReal c ->
+          let fp = match ts.ts_def with
+            | Float fp -> fp
+            | _ -> assert false in
+          syntax_float_literal st fp fmt c
+        | None, _ -> Number.print number_format fmt c
+        (* TODO/FIXME: we must assert here that the type is either
+            ty_int or ty_real, otherwise it makes no sense to print
+            the literal. Do we ensure that preserved literal types
+            are exactly those that have a dedicated syntax? *)
+      end
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
     (* let's check if a converter applies *)
@@ -375,7 +400,7 @@ and print_triggers info fmt = function
     (print_triggers info) l
 
 let print_type_decl info fmt ts =
-  if ts.ts_def <> None then () else
+  if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
   fprintf fmt "(declare-sort %a %i)@\n@\n"
     (print_ident info) ts.ts_name (List.length ts.ts_args)
@@ -404,20 +429,15 @@ let print_info_model cntexample fmt info =
   let info_model = info.info_model in
   if not (S.is_empty info_model) && cntexample then
     begin
-	  (*
-            fprintf fmt "@[(get-value (%a))@]@\n"
-            (Pp.print_list Pp.space (print_fmla info_copy)) model_list;*)
-      fprintf fmt "@[(get-value (";
-
+      fprintf fmt "@[(get-model ";
       let model_map =
 	S.fold (fun f acc ->
           fprintf str_formatter "%a" (print_fmla info) f;
           let s = flush_str_formatter () in
-          fprintf fmt "%s " s;
 	  Stdlib.Mstr.add s f acc)
 	info_model
 	Stdlib.Mstr.empty in
-      fprintf fmt "))@]@\n";
+      fprintf fmt ")@]@\n";
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -442,12 +462,9 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
       info.info_in_goal <- true;
       fprintf fmt "  @[(not@ %a))@]@\n" (print_fmla info) f;
       info.info_in_goal <- false;
+      (*if cntexample then fprintf fmt "@[(push)@]@\n"; (* z3 specific stuff *)*)
       fprintf fmt "@[(check-sat)@]@\n";
       let model_list = print_info_model cntexample fmt info in
-      if cntexample then begin
-	(* (get-info :reason-unknown) *)
-	fprintf fmt "@[(get-info :reason-unknown)@]@\n";
-      end;
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
@@ -477,20 +494,21 @@ let print_data_decl info fmt (ts,cl) =
     (print_ident info) ts.ts_name
     (print_list space (print_constructor_decl info)) cl
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc cntexample args info fmt d =
+  match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-      (print_list space (print_data_decl info)) dl
+      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+        (print_list space (print_data_decl info)) dl
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smtv2: inductive definition are not supported"
+      "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f
@@ -506,6 +524,7 @@ let print_task args ?old:_ fmt task =
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_converters = Printer.get_converter_map task;
+    info_rliteral = Printer.get_rliteral_map task;
     info_model = S.empty;
     info_in_goal = false;
     info_vc_term = vc_info;

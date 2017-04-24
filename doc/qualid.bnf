@@ -5,9 +5,11 @@
   \
   alpha ::= lalpha | ualpha
   \
-  lident ::= lalpha (alpha | digit | "'")*
+  suffix ::= (alpha | digit | "'")*
   \
-  uident ::= ualpha (alpha | digit | "'")*
+  lident ::= lalpha suffix
+  \
+  uident ::= ualpha suffix
   \
   ident ::= lident | uident
   \
@@ -15,5 +17,17 @@
   \
   uqualid ::= uident | uqualid "." uident
   \
-  qualid ::= ident | uqualid "." ident ;%
+  qualid ::= ident | uqualid "." ident
+  \
+  digit-or-us ::= "0"-"9" | "_"
+  \
+  alpha-no-us ::= "a"-"z" | "A"-"Z"
+  \
+  suffix-nq ::= (alpha-no-us | "'"* digit-or-us)* "'"*
+  \
+  lident-nq ::= lalpha suffix-nq
+  \
+  uident-nq ::= ualpha suffix-nq
+  \
+  ident-nq ::= lident-nq | uident-nq  ;%
 \end{syntax}

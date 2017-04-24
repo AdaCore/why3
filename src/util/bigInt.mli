@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,8 +58,12 @@ val min : t -> t -> t
 val max : t -> t -> t
 val abs : t -> t
 
+(** number of digits  *)
+val num_digits : t -> int
+
 (** power of small integers. Second arg must be non-negative *)
 val pow_int_pos : int -> int -> t
+val pow_int_pos_bigint : int -> t -> t
 
 (** conversions *)
 val of_string : string -> t

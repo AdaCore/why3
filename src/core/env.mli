@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -151,7 +151,7 @@ val locate_library : env -> pathname -> filename
 (** [locate_library env path] returns the location of the library
     file specified by [path].
 
-    This is a low-level function that allows to accees a library file
+    This is a low-level function that allows to access a library file
     without parsing it. Do not use it without a good reason.
 
     @raise LibraryNotFound [path] if the library file was not found

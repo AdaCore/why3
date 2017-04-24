@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -327,7 +327,9 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  close_module (add_pdecl_raw uc (create_type_decl [td]))
+  let d,metas = create_type_decl [td] in
+  assert (metas = []);
+  close_module (add_pdecl_raw uc d)
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -575,13 +577,36 @@ let cl_save_rs cl s s' =
   | RLnone, RLnone -> ()
   | _ -> assert false
 
-(*
+(* Mário: recovered this commented function *)
 let ls_of_rs rs = match rs.rs_logic with
   | RLls ls -> ls
   | _ -> assert false
-*)
 
-let clone_type_decl inst cl tdl =
+let clone_type_record cl s d s' d' =
+  let id = s.its_ts.ts_name in
+  let fields' = Hstr.create 16 in
+  let add_field' ({rs_field = pj'} as rs') =
+    let pj' = Opt.get pj' in
+    Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
+  List.iter add_field' d'.itd_fields;
+  (* check if fields from former type are also declared in the new type *)
+  let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
+    let pj_str = pj.pv_vs.vs_name.id_string in
+    let pj_ity = clone_ity cl pj.pv_ity in
+    let pj_ght = pj.pv_ghost in
+    let rs' = try Hstr.find fields' pj_str
+      with Not_found -> raise (BadInstance id) in
+    let pj' = Opt.get rs'.rs_field in
+    let pj'_ity = pj'.pv_ity in
+    let pj'_ght = pj'.pv_ghost in
+    if not (ity_equal pj_ity pj'_ity && pj_ght = pj'_ght) then
+      raise (BadInstance id);
+    let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
+    cl.ls_table <- Mls.add ls ls' cl.ls_table in (* TODO? : populate rs_table *)
+  List.iter match_pj d.itd_fields;
+  cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
+
+let clone_type_decl inst cl tdl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let htd = Hits.create 5 in
@@ -598,28 +623,40 @@ let clone_type_decl inst cl tdl =
       List.iter2 (cl_save_rs cl) d.itd_fields itd.itd_fields;
       Hits.add htd s (Some itd) in
     (* alias *)
-    if s.its_def <> None then begin
+    match s.its_def with
+    | Alias ty ->
       if cloned then raise (CannotInstantiate id);
-      let def = conv_ity alg (Opt.get s.its_def) in
+      let def = conv_ity alg ty in
       let itd = create_alias_decl id' ts.ts_args def in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
-    end else
+    | Range _ -> assert false (* TODO *)
+    | Float _ -> assert false (* TODO *)
+    | NoDef ->
     (* abstract *)
     if s.its_private && cloned then begin
-      assert (List.length tdl = 1);
+      (* FIXME: currently, we cannot refine a block of mutual types *)
+      if List.length tdl <> 1 then raise (CannotInstantiate id);
+        (* FIXME: better error messsage *)
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
             raise (BadInstance id);
-          if not (its_pure s && its_pure s') then raise (BadInstance id);
-          (* TODO: accept refinement of private records *)
-          cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
+          (* if not (its_pure s && its_pure s') then raise (BadInstance id); *)
+          let pd' = Mid.find s'.its_ts.ts_name kn in
+          let d' = begin match pd'.pd_node with
+            | PDtype [d'] -> d'
+            | PDtype _ ->
+              (* FIXME: we could refine with mutual types *)
+              raise (BadInstance id)
+            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
+          end in
+          clone_type_record cl s d s' d'
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity ->
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                    its_pure s && ity_immutable ity) then raise (BadInstance id);
+                  its_pure s && ity_immutable ity) then raise (BadInstance id);
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
@@ -742,8 +779,16 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let reads = Spv.union reads (Mpv.domain olds) in
   let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
-    Mreg.add (clone_reg cl reg) (Spv.fold add_fd fs Spv.empty) m in
+    let reg' = Mreg.find_def reg reg cl.rn_table in
+    let smf_reg' = Spv.of_list reg'.reg_its.its_mfields in
+    let smf_reg = Spv.of_list reg.reg_its.its_mfields in
+    let smf_diff = Spv.diff smf_reg' smf_reg in
+    let fs = Spv.fold add_fd fs Spv.empty in
+    Mreg.add (clone_reg cl reg) (Spv.union fs smf_diff) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
+  (* Mreg.iter (fun rho spv -> Format.eprintf "rho:%a@." print_reg rho; *)
+  (*             Spv.iter (fun pv -> Format.eprintf "pv:%a@." print_pv pv) spv) *)
+  (*   writes; *)
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
@@ -888,10 +933,15 @@ let add_vc uc (its, f) =
 
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
-      let tdl, vcl = clone_type_decl inst cl tdl in
+      let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
-      add_pdecl ~vc:false uc (create_type_decl tdl)
+        let d,metas = create_type_decl tdl in
+      List.fold_left
+        (fun uc (m,a) -> add_meta uc m a)
+        (add_pdecl ~vc:false uc d)
+        metas
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
+      (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);
       let kind = match rs.rs_logic with
         | RLnone -> RKnone

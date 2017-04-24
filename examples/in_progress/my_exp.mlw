@@ -1,0 +1,38 @@
+
+module ExpOld
+
+end
+
+module Exp
+
+  use import ieee_float.Float64
+  use import real.Abs
+  use import real.ExpLog
+  use import real.Real
+
+  val ( +. ) (x y : t) : t
+    requires {t'isFinite x}
+    requires {t'isFinite y}
+    requires {"expl:no_overflow" t'isFinite (x .+ y)}
+    ensures  {result = x .+ y}
+
+  val ( *. ) (x y : t) : t
+    requires {t'isFinite x}
+    requires {t'isFinite y}
+    requires {"expl:no_overflow" t'isFinite (x .* y)}
+    ensures  {result = x .* y}
+
+  let my_exp (x: t) : t
+    requires { t'isFinite x}
+    requires { .- (1.0:t) .<= x .<= (1.0:t)}
+    requires {abs (t'real x) <= 1.0}
+    ensures { abs (t'real result - exp (t'real x)) <= 0x1p-4} (* 1 * 2 ^ - 4 *)
+  =
+    assert {
+     let x = t'real x in
+       abs(0.9890365552 + 1.130258690*x +
+           0.5540440796*x*x - exp(x)) <= 0x0.FFFFp-4};
+    (0x1.FA62FFD643D6Ep-1:t) +. (0x1.2158A22D91DE9p0:t) *. x +.
+    (0x1.1BABAA64D94DBp-1:t) *. x *. x
+
+end

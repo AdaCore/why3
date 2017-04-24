@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -281,7 +281,7 @@ let ident_shape ~push id acc =
   id_string_shape ~push id.Ident.id_string acc
 
 let const_shape ~push acc c =
-  Format.fprintf Format.str_formatter "%a" Pretty.print_const c;
+  Format.fprintf Format.str_formatter "%a" Number.print_constant c;
   push (Format.flush_str_formatter ()) acc
 
 let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
@@ -456,10 +456,15 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
+  let _integer_constant b c =
+    Number.print_integer_constant Format.str_formatter c;
+    let s = Format.flush_str_formatter () in
+    string b s
+
   let const b c =
-      Format.fprintf Format.str_formatter "%a" Pretty.print_const c;
-      let s = Format.flush_str_formatter () in
-      string b s
+    Number.print_constant Format.str_formatter c;
+    let s = Format.flush_str_formatter () in
+    string b s
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -519,7 +524,11 @@ module Checksum = struct
   let tysymbol b ts =
     ident b ts.Ty.ts_name;
     list tvsymbol b ts.Ty.ts_args;
-    option ty b ts.Ty.ts_def
+    match ts.Ty.ts_def with
+    | Ty.NoDef   -> char b 'n'
+    | Ty.Alias x -> char b 's'; ty b x
+    | Ty.Range _ -> char b 'r' (* FIXME *)
+    | Ty.Float _ -> char b 'f' (* FIXME *)
 
   let lsymbol b ls =
     ident b ls.ls_name;
@@ -527,7 +536,7 @@ module Checksum = struct
     option ty b ls.ls_value;
     int b ls.ls_constr
 
-  (* start: T D R L I P (C M) *)
+  (* start: T G F D R L I P (C M) *)
   let decl b d = match d.Decl.d_node with
     | Decl.Dtype ts ->
         char b 'T'; tysymbol b ts

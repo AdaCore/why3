@@ -439,8 +439,10 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
   let k = match e.e_node with
     | Evar v ->
         Klet (res, t_lab (t_var v.pv_vs), t_true)
-    | Econst c ->
-        Klet (res, t_lab (t_const c), t_true)
+    | Econst (Number.ConstInt _ as c)->
+        Klet (res, t_lab (t_const c ty_int), t_true)
+    | Econst (Number.ConstReal _ as c)->
+        Klet (res, t_lab (t_const c ty_real), t_true)
     | Eexec (ce, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
         (* [ VC(ce) (if ce is a lambda executed in-place)
            | STOP pre

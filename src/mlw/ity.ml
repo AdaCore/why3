@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,7 +26,7 @@ type itysymbol = {
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
-  its_def     : ity option;     (** type alias *)
+  its_def     : ity type_def;   (** type definition *)
 }
 
 and its_flag = {
@@ -485,14 +485,16 @@ let reg_freeze sbs reg = reg_match sbs reg (ity_reg reg)
 (* raw type constructors *)
 
 let ity_app_raw sbs id s tl rl = match s.its_def with
-  | Some { ity_node = Ityreg r } ->
+  | Alias { ity_node = Ityreg r } ->
       let tl = List.map (ity_full_inst sbs) r.reg_args in
       let rl = List.map (ity_full_inst sbs) r.reg_regs in
       ity_reg (mk_reg id r.reg_its tl rl)
-  | None when s.its_mutable ->
+  | NoDef when s.its_mutable ->
       ity_reg (mk_reg id s tl rl)
-  | Some ity -> ity_full_inst sbs ity
-  | None -> ity_app_unsafe s tl rl
+  | Alias ity -> ity_full_inst sbs ity
+  | NoDef -> ity_app_unsafe s tl rl
+  | Range _ -> ity_app_unsafe s tl rl
+  | Float _ -> ity_app_unsafe s tl rl
 
 let create_region_raw sbs id s tl rl =
   match (ity_app_raw sbs id s tl rl).ity_node with
@@ -500,12 +502,14 @@ let create_region_raw sbs id s tl rl =
   | _ -> invalid_arg "Ity.create_region"
 
 let ity_app_pure_raw sbs s tl rl = match s.its_def with
-  | Some { ity_node = Ityreg r } ->
+  | Alias { ity_node = Ityreg r } ->
       let tl = List.map (ity_full_inst sbs) r.reg_args in
       let rl = List.map (ity_full_inst sbs) r.reg_regs in
       ity_app_unsafe r.reg_its tl rl
-  | Some ity -> ity_full_inst sbs ity
-  | None -> ity_app_unsafe s tl rl
+  | Alias ity -> ity_full_inst sbs ity
+  | NoDef -> ity_app_unsafe s tl rl
+  | Range _ -> assert (tl = [] && rl = []); ity_app_unsafe s tl rl
+  | Float _ -> assert false (* TODO *)
 
 (* smart type constructors *)
 
@@ -546,7 +550,7 @@ let its_inst_regs fresh_reg s tl =
 
 let its_match_smart fresh_reg s tl rl =
   if rl <> [] then its_match_regs s tl rl, rl else
-  if s.its_regions = [] && s.its_def = None
+  if s.its_regions = [] && s.its_def = NoDef
   then (its_check_args s tl; isb_empty, [])
   else its_inst_regs fresh_reg s tl
 
@@ -605,19 +609,19 @@ let mk_flg ~frz ~exp ~lbl ~fxd ~vis = {
   its_fixed  = fxd; its_visible = vis }
 
 let its_of_ts ts priv =
-  assert (ts.ts_def = None);
+  assert (ts.ts_def = NoDef);
   let flg = mk_flg ~frz:priv ~exp:true ~lbl:priv ~fxd:true ~vis:true in
   mk_its ~ts ~nfr:priv ~priv ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:None
+    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
 
 let create_rec_itysymbol id args =
-  let ts = create_tysymbol id args None in
+  let ts = create_tysymbol id args NoDef in
   let flg = mk_flg ~frz:true ~exp:true ~lbl:false ~fxd:true ~vis:true in
   mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:None
+    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
 
 let create_alias_itysymbol id args def =
-  let ts = create_tysymbol id args (Some (ty_of_ity def)) in
+  let ts = create_tysymbol id args (Alias (ty_of_ity def)) in
   let mut, ity = match def.ity_node with (* ignore the top region *)
     | Ityreg r -> true, ity_app_pure r.reg_its r.reg_args r.reg_regs
     | _ -> false, def in
@@ -625,7 +629,17 @@ let create_alias_itysymbol id args def =
   let flg = mk_flg ~frz:true ~exp:true ~lbl:false ~fxd:true ~vis:true in
   mk_its ~ts ~nfr:false ~priv:false ~mut ~frg:false ~mfld:[] ~regs
     ~aflg:(List.map (fun _ -> flg) args)
-    ~rflg:(List.map (fun _ -> flg) regs) ~def:(Some def)
+    ~rflg:(List.map (fun _ -> flg) regs) ~def:(Alias def)
+
+let create_range_itysymbol id ir =
+  let ts = create_tysymbol id [] (Range ir) in
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
+    ~aflg:[] ~rflg:[] ~def:(Range ir)
+
+let create_float_itysymbol id fp =
+  let ts = create_tysymbol id [] (Float fp) in
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
+    ~aflg:[] ~rflg:[] ~def:(Float fp)
 
 let fields_of_invariant ftv flds invl =
   if invl = [] then Mpv.empty, flds else
@@ -703,7 +717,7 @@ let fields_of_invariant ftv flds invl =
 
 let create_plain_record_itysymbol ~priv ~mut id args flds invl =
   let sargs = Stv.of_list args in
-  let ts = create_tysymbol id args None in
+  let ts = create_tysymbol id args NoDef in
   let fmut, ffix = Mpv.partition (fun _ m -> m) flds in
   let flbl, fout = fields_of_invariant sargs flds invl in
   let fvis = Mpv.filter (fun f _ -> not f.pv_ghost) flds in
@@ -740,7 +754,7 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
     ~lbl:(Stv.mem v albl) ~fxd:(Stv.mem v afxd) ~vis:(Stv.mem v avis) in
   let reg_flag r = mk_flg  ~frz:(Sreg.mem r rfrz) ~exp:(Sreg.mem r rexp)
     ~lbl:(Sreg.mem r rlbl) ~fxd:(Sreg.mem r rfxd) ~vis:(Sreg.mem r rvis) in
-  mk_its ~ts ~nfr ~priv ~mut ~frg ~mfld:(Mpv.keys fmut) ~regs ~def:None
+  mk_its ~ts ~nfr ~priv ~mut ~frg ~mfld:(Mpv.keys fmut) ~regs ~def:NoDef
     ~aflg:(List.map arg_flag args) ~rflg:(List.map reg_flag regs)
 
 let create_plain_variant_itysymbol id args flds =

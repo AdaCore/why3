@@ -168,39 +168,64 @@ theory ToList
     forall s: seq 'a, i: int. 0 <= i < length s ->
     ListNth.nth i (to_list s) = Some s[i]
 
+  let rec lemma to_list_def_cons (s: seq 'a) (x: 'a)
+    variant { length s }
+    ensures { to_list (cons x s) = Cons x (to_list s) }
+  = assert { (cons x s)[1 ..] == s }
+
 end
 
 theory OfList
   use import int.Int
   use import option.Option
-  use import Seq
   use import list.List
   use import list.Length as L
   use import list.Nth
+  use import Seq
   use import list.Append
 
-  function of_list (l: list 'a) : seq 'a = match l with
+  let rec function of_list (l: list 'a) : seq 'a = match l with
     | Nil -> empty
     | Cons x r -> cons x (of_list r)
     end
-  meta coercion function of_list
 
   lemma length_of_list:
-    forall l: list 'a. length l = L.length l
+    forall l: list 'a. length (of_list l) = L.length l
+
+  predicate point_wise (s: seq 'a) (l: list 'a) =
+    forall i. 0 <= i < L.length l -> Some (get s i) = nth i l
 
   lemma elts_seq_of_list: forall l: list 'a.
-    forall i. 0 <= i < length l -> Some (get l i) = nth i l
+    point_wise (of_list l) l
+
+  lemma is_of_list: forall l: list 'a, s: seq 'a.
+    L.length l = length s -> point_wise s l -> s == of_list l
 
   let rec lemma of_list_app (l1 l2: list 'a)
-    ensures { l1 ++ l2 == Seq.(++) l1 l2 }
+    ensures { of_list (l1 ++ l2) == Seq.(++) (of_list l1) (of_list l2) }
     variant { l1 }
   = match l1 with
     | Nil -> ()
     | Cons _ r -> of_list_app r l2
     end
 
-  lemma of_list_app_length:
-    forall l1 l2: list 'a. length (l1 ++ l2) = length l1 + length l2
+  lemma of_list_app_length: forall l1"induction" l2: list 'a.
+    length (of_list (l1 ++ l2)) = L.length l1 + L.length l2
+
+  let rec lemma of_list_snoc (l: list 'a) (x: 'a)
+    variant { l }
+    ensures { of_list (l ++ Cons x Nil) == snoc (of_list l) x }
+  = match l with
+    | Nil -> assert { snoc empty x = cons x empty }
+    | Cons _ r -> of_list_snoc r x;
+    end
+
+  meta coercion function of_list
+
+  use import ToList
+
+  lemma convolution_to_of_list: forall l: list 'a.
+    to_list (of_list l) = l
 
 end
 
