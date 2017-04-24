@@ -228,6 +228,76 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
+(*******************)
+(* Graphical tools *)
+(*******************)
+
+(* Elements needed for usage of graphical elements *)
+
+(* [quit_on_saved] set to true by exit function to delay quiting after Saved
+   notification is received *)
+let quit_on_saved = ref false
+
+(* Exit brutally without asking anything *)
+let exit_function_unsafe () =
+  send_request Exit_req;
+  GMain.quit ()
+
+(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab):
+   - tab_page is a unique number for each pages of the notebook
+   - source_view is the graphical element inside a tab
+   - has_been_modified is a reference to a boolean stating if the current tab
+     source has been modified
+   - label_of_tab is the mutable title of the tab
+*)
+let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
+  Hstr.create 14
+
+(* Saving function for sources *)
+let save_sources () =
+  Hstr.iter
+    (fun k (_n, (s: GSourceView2.source_view), b, _l) ->
+      if !b then
+        let text_to_save = s#source_buffer#get_text () in
+        send_request (Save_file_req (k, text_to_save))
+    )
+    source_view_table
+
+(* True if there exist a file which needs saving *)
+let files_need_saving () =
+  Hstr.fold (fun _k (_, _, b, _) acc -> !b || acc) source_view_table false
+
+(* Ask if the user wants to save session before exit. Exit is then delayed until
+   the [Saved] notification is received *)
+let exit_function_safe () =
+  if not !session_needs_saving && not (files_need_saving ()) then
+    exit_function_unsafe ()
+  else
+    let answer =
+      GToolbox.question_box
+        ~title:"Why3 saving session and files"
+        ~buttons:["Yes"; "No"; "Cancel"]
+        "Do you want to save the session and unsaved files?"
+    in
+    begin
+      match answer with
+      | 1 -> save_sources(); send_request Save_req; quit_on_saved := true
+      | 2 -> exit_function_unsafe ()
+      | _ -> ()
+    end
+
+(* Update name of the tab when the label changes so that it has a * as prefix *)
+let update_label_change (label: GMisc.label) =
+  let s = label#text in
+  if not (Strings.has_prefix "*" s) then
+    label#set_text ("*" ^ s)
+
+(* Update name of the tab when the label is saved. Removes * prefix *)
+let update_label_saved (label: GMisc.label) =
+  let s = label#text in
+  if (Strings.has_prefix "*" s) then
+    label#set_text (String.sub s 1 (String.length s - 1))
+
 (**********************)
 (* Graphical elements *)
 (**********************)
@@ -250,8 +320,8 @@ let main_window : GWindow.window =
   in w
 
 (* the main window contains a vertical box, containing:
-   1. the menu
-   2. an horizontal box
+   1. the menu [menubar]
+   2. an horizontal box [hb]
  *)
 
 let vbox = GPack.vbox ~packing:main_window#add ()
@@ -273,51 +343,8 @@ let accel_group = factory#accel_group
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 
-let quit_on_saved = ref false
-
-(* Exit brutally without asking anything *)
-let exit_function_unsafe () =
-  send_request Exit_req;
-  GMain.quit ()
-
-(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab) *)
-let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
-  Hstr.create 14
-
-let save_sources () =
-  Hstr.iter
-    (fun k (_n, (s: GSourceView2.source_view), b, _l) ->
-      if !b then
-        let text_to_save = s#source_buffer#get_text () in
-        send_request (Save_file_req (k, text_to_save))
-    )
-    source_view_table
-
-(* True if some files need saving *)
-let files_need_saving () =
-  Hstr.fold (fun _k (_, _, b, _) acc -> !b || acc) source_view_table false
-
-(* Ask if the user wants to save session before exit *)
-let exit_function_safe () =
-  if not !session_needs_saving && not (files_need_saving ()) then
-    exit_function_unsafe ()
-  else
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving session and files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save the session and unsaved files?"
-    in
-    begin
-      match answer with
-      | 1 -> save_sources(); send_request Save_req; quit_on_saved := true
-      | 2 -> exit_function_unsafe ()
-      | _ -> ()
-    end
-
 let (_ : GtkSignal.id) = main_window#connect#destroy
   ~callback:exit_function_safe
-
 
 (* 1.2 "View" menu
 
@@ -327,9 +354,9 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
 
 (* 2. horizontal box contains:
    2.1 TODO: a tool box ?
-   2.2 a horizontal paned containing:
-     2.2.1 a scrolled window to hold the tree view of the session
-     2.2.2 a vertical paned containing
+   2.2 a horizontal paned [hp] containing:
+     2.2.1 a scrolled window to hold the tree view of the session [scrolledview]
+     2.2.2 a vertical paned containing [vpan222]
 *)
 
 let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
@@ -348,13 +375,6 @@ let scrollview =
        gconfig.tree_width <- w)
   in sv
 
-let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
-
-(*  the scrolled window 2.2.1 contains a GTK tree
-
-*)
-
-
 (** {2 view for the session tree} *)
 let scrolled_session_view =
   GBin.scrolled_window
@@ -362,6 +382,13 @@ let scrolled_session_view =
     ~shadow_type:`ETCHED_OUT
     ~packing:scrollview#add
     ()
+
+(* Vertical pan *)
+let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
+
+(*  the scrolled window 2.2.1 [scrolled_session_view] contains a GTK tree
+
+*)
 
 (** {3 the model for tree view} *)
 
@@ -393,7 +420,6 @@ let view_name_column =
   v
 
 (* second view column: status *)
-
 let view_status_column =
   let status_renderer = GTree.cell_renderer_pixbuf [ ] in
   let v = GTree.view_column ~title:"Status"
@@ -487,11 +513,9 @@ let clear_tree_and_table goals_model =
   Hint.clear node_id_detached
 
 
-
 (**************)
 (* Menu items *)
 (**************)
-
 
 let (_ : GMenu.image_menu_item) =
   let callback () =
@@ -533,12 +557,6 @@ let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
     ~callback:exit_function_safe
 
-let exist_modified_sources () =
-  Hstr.fold
-    (fun _ (_, _, b, _) acc -> !b || acc)
-    source_view_table
-    false
-
 let reload_unsafe () =
   (* Clearing the tree *)
   clear_tree_and_table goals_model;
@@ -546,7 +564,7 @@ let reload_unsafe () =
 
 (* Same as reload_safe but propose to save edited sources before reload *)
 let reload_safe () =
-  if exist_modified_sources () then
+  if files_need_saving () then
     let answer =
       GToolbox.question_box
         ~title:"Why3 saving source files"
@@ -566,17 +584,21 @@ let reload_menu_item : GMenu.menu_item =
 
 (* vpan222 contains:
    2.2.2.1 a notebook containing view of the current task, source code etc
-   2.2.2.2 a vertiacal pan which contains
+   2.2.2.2 a vertical pan which contains [vbox2222]
      2.2.2.2.1 the input field to type commands
      2.2.2.2.2 a scrolled window to hold the output of the commands
  *)
 
-(*************************************)
-(*    notebook on the right 2.2.2.1  *)
-(*************************************)
+(***********************************)
+(*    notebook on the top 2.2.2.1  *)
+(***********************************)
 
+(* notebook is composed of a Task page and several source files pages *)
 let notebook = GPack.notebook ~packing:vpan222#add ()
 
+(********************************)
+(* Task view (part of notebook) *)
+(********************************)
 let task_page,scrolled_task_view =
   let label = GMisc.label ~text:"Task" () in
   0, GPack.vbox ~homogeneous:false ~packing:
@@ -597,20 +619,12 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-(* Update name of the tab when the label changes so that it has a * as prefix *)
-let update_label_change (label: GMisc.label) =
-  let s = label#text in
-  if not (Strings.has_prefix "*" s) then
-    label#set_text ("*" ^ s)
-
-(* Update name of the tab when the label is saved. Removes * prefix *)
-let update_label_saved (label: GMisc.label) =
-  let s = label#text in
-  if (Strings.has_prefix "*" s) then
-    label#set_text (String.sub s 1 (String.length s - 1))
-
+(* Creating a page for source code view *)
 let create_source_view =
+  (* Counter for pages *)
   let n = ref 1 in
+  (* Create a page with tabname [f] and buffer equal to [content] in the
+     notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
     if not (Hstr.mem source_view_table f) then
       begin
@@ -654,12 +668,19 @@ let create_source_view =
         Gconfig.set_fonts ()
       end in
   create_source_view
-
 (* End of notebook *)
 
-
+(*
+  2.2.2.2 a vertical pan which contains [vbox2222]
+    2.2.2.2.1 the input field to type commands [hbox22221]
+    2.2.2.2.2 a scrolled window to hold the output of the commands [message_zone]
+*)
 let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
 
+(* 2.2.2.2.1 Horizontal box [hbox22221]
+     [monitor] number of scheduled/running provers
+     [command_entry] Commands to run on the session
+*)
 let hbox22221 =
   GPack.hbox
     ~packing:(vbox2222#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
@@ -673,6 +694,7 @@ let monitor =
 
 let command_entry = GEdit.entry ~packing:hbox22221#add ()
 
+(* Part 2.2.2.2.2 contains message returned by the IDE/server *)
 let message_zone =
   let sv = GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
@@ -685,17 +707,11 @@ let message_zone =
 
 (* Function used to print stuff on the message_zone *)
 let print_message fmt =
-  (* Format.kasprintf is not available in Ocaml 4.02.3 :-(
-  Format.kasprintf
-    message_zone#buffer#set_text
-    fmt
-   *)
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               message_zone#buffer#set_text s)
     str_formatter
     fmt
-
 
 let add_to_msg_zone s =
   let s = message_zone#buffer#get_text () ^ "\n" ^ s in
