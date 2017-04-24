@@ -829,7 +829,7 @@ let clone_ppat cl sm pp mask =
 
 let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
-  | Econst c -> e_const c
+  | Econst c -> e_const c e.e_ity
   | Eexec (c,_) -> e_exec (clone_cexp cl sm c)
   | Eassign asl ->
       let conv (r,f,v) =

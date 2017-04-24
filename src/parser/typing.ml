@@ -618,7 +618,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst c -> DEconst c
+  | Ptree.Econst (Number.ConstInt _ as c) -> DEconst(c, dity_int)
+  | Ptree.Econst (Number.ConstReal _ as c) -> DEconst(c, dity_real)
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in
@@ -747,7 +748,12 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr muc denv e1, Slab.singleton lab)
   | Ptree.Ecast (e1, pty) ->
-      DEcast (dexpr muc denv e1, ity_of_pty muc pty))
+      let e1 = dexpr muc denv e1 in
+      let ity = ity_of_pty muc pty in
+      let dity = dity_of_ity ity in
+      match e1.de_node with
+      | DEconst (c, _) -> DEconst (c, dity)
+      | _ -> DEcast (e1, ity))
 
 and drec_defn muc denv fdl =
   let prep (id, gh, kind, bl, pty, msk, sp, e) =

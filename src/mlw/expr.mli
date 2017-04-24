@@ -190,7 +190,7 @@ val c_any : cty -> cexp
 
 val e_var : pvsymbol -> expr
 
-val e_const : Number.constant -> expr
+val e_const : Number.constant -> ity -> expr
 val e_nat_const : int -> expr
 
 val e_exec : cexp -> expr

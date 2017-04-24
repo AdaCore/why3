@@ -463,14 +463,12 @@ let e_var ({pv_ity = ity; pv_ghost = ghost} as v) =
   let eff = eff_ghostify ghost (eff_read_single v) in
   mk_expr (Evar v) ity MaskVisible eff
 
-let e_const c =
-  let ity = match c with
-    | Number.ConstInt  _ -> ity_int
-    | Number.ConstReal _ -> ity_real in
+let e_const c ity =
+  Term.check_literal c (ty_of_ity ity);
   mk_expr (Econst c) ity MaskVisible eff_empty
 
 let e_nat_const n =
-  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else

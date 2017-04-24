@@ -201,6 +201,8 @@ val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
+val check_literal : Number.constant -> ty -> unit
+
 val t_var : vsymbol -> term
 val t_const : Number.constant -> ty -> term
 val t_if : term -> term -> term -> term

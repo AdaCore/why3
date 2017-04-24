@@ -826,12 +826,14 @@ let t_nat_const n =
 
 exception InvalidLiteralType of ty
 
-let t_const c ty =
+let check_literal c ty =
   let ts = match ty.ty_node with
     | Tyapp (ts,[]) -> ts
     | _ -> raise (InvalidLiteralType ty) in
-  begin match c with
+  match c with
     | Number.ConstInt c when not (ts_equal ts ts_int) ->
+       Format.eprintf "check literal %a of type %s@."
+                      Number.print_integer_constant c ts.ts_name.id_string;
         begin match ts.ts_def with
           | Range ir -> Number.check_range c ir
           | _ -> raise (InvalidLiteralType ty)
@@ -842,8 +844,8 @@ let t_const c ty =
           | _ -> raise (InvalidLiteralType ty)
         end
     | _ -> ()
-  end;
-  t_const c ty
+
+let t_const c ty = check_literal c ty; t_const c ty
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
@@ -1675,4 +1677,3 @@ module TermTF = struct
   let tr_fold fnT fnF = tr_fold (t_selecti fnT fnF)
   let tr_map_fold fnT fnF = tr_map_fold (t_selecti fnT fnF)
 end
-

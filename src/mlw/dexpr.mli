@@ -23,7 +23,11 @@ val dity_fresh : unit -> dity
 
 val dity_of_ity : ity -> dity
 
+val dity_int : dity
+val dity_real : dity
+
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
+
 
 (** Patterns *)
 
@@ -92,7 +96,7 @@ and dexpr_node =
   | DEpv of pvsymbol
   | DErs of rsymbol
   | DEls of lsymbol
-  | DEconst of Number.constant
+  | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * mask * dspec later * dexpr
   | DEany of dbinder list * mask * dspec later * dity
