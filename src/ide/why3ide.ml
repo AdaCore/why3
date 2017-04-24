@@ -346,6 +346,9 @@ let file_factory = new GMenu.factory file_menu ~accel_group
 let (_ : GtkSignal.id) = main_window#connect#destroy
   ~callback:exit_function_safe
 
+let (_ : GtkSignal.id) = main_window#event#connect#delete
+  ~callback:(fun _ -> exit_function_safe (); true)
+
 (* 1.2 "View" menu
 
    the entries in that menu are defined later
