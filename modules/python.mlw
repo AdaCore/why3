@@ -21,10 +21,10 @@ module Python
   type list 'a = Array.array 'a
 
   function ([]) (l: list 'a) (i: int) : 'a =
-    Array.get l i
+    Array.([]) l i
 
   function ([<-]) (l: list 'a) (i: int) (v: 'a) : list 'a =
-    Array.set l i v
+    Array.([<-]) l i v
 
   function len (l: list 'a) : int =
     Array.length l
@@ -77,15 +77,13 @@ module Python
   lemma mod_sign:
     forall x y:int. y <> 0 -> if y < 0 then mod x y <= 0 else mod x y >= 0
 
-  let (//) (x y: int) : int
+  val (//) (x y: int) : int
     requires { y <> 0 }
     ensures  { result = div x y }
-  = div x y
 
-  let (%) (x y: int) : int
+  val (%) (x y: int) : int
     requires { y <> 0 }
     ensures  { result = mod x y }
-  = mod x y
 
   (* random.randint *)
   val randint (l u: int) : int
