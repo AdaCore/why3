@@ -98,7 +98,7 @@ val get_any_parent: session -> any -> any option
 (* Answers true if a node is in a detached subtree *)
 val is_detached: session -> any -> bool
 
-exception BadCopyDetached
+exception BadCopyDetached of string
 
 (** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
 val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID

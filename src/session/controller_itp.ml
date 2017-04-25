@@ -763,13 +763,14 @@ let copy_detached ~copy c from_any =
       let pn_id = copy_proof_node_as_detached c.controller_session from_pn in
       let parent = get_any_parent c.controller_session from_any in
       match parent with
-      | None -> raise BadCopyDetached
+      | None -> raise (BadCopyDetached "copy_detached no parent")
       | Some parent ->
           copy ~parent (APn pn_id);
           copy_structure
             ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
     end
-  | _ -> raise BadCopyDetached (* Only goal can be detached *)
+  (* Only goal can be detached *)
+  | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
 
 
 let replay_proof_attempt c pr limit (id: proofNodeID) ~callback =

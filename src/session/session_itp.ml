@@ -568,7 +568,7 @@ let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
   let new_goal = Ident.id_register (Ident.id_clone pn.proofn_name) in
   let checksum = pn.proofn_checksum in
   let shape = pn.proofn_shape in
-  let _ = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape in
+  let (_: unit) = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape in
   graft_detached_proof_on_parent s new_pn_id parent;
   new_pn_id
 
@@ -602,7 +602,7 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
   Hint.add s.trans_table node_id tn;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
 
-exception BadCopyDetached
+exception BadCopyDetached of string
 
 let rec copy_structure ~notification s from_any to_any : unit =
   match from_any, to_any with
@@ -637,7 +637,7 @@ let rec copy_structure ~notification s from_any to_any : unit =
         pn_id) sub_tasks in
     let tr = get_transfNode s to_tn in
     tr.transf_detached_subtasks <- new_sub_tasks
-  | _ -> raise BadCopyDetached
+  | _ -> raise (BadCopyDetached "copy_structure")
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
     (args : string list) (tl : Task.task list) =
