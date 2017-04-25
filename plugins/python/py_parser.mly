@@ -76,10 +76,10 @@
 %nonassoc IN
 %nonassoc DOT ELSE
 %right ARROW LRARROW
-%left OR
-%left AND
+%right OR
+%right AND
 %nonassoc NOT
-%left CMP
+%right CMP
 %left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc unary_minus prec_prefix_op
@@ -276,16 +276,18 @@ term: t = mk_term(term_) { t }
 term_:
 | term_arg_
     { match $1 with (* break the infix relation chain *)
-      | Tinfix (l,o,r) -> Tinnfix (l,o,r) | d -> d }
+      | Tinfix (l,o,r) -> Tinnfix (l,o,r)
+      | Tbinop (l,o,r) -> Tbinnop (l,o,r)
+      | d -> d }
 | NOT term
     { Tnot $2 }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
-| l = term ; o = infix_op ; r = term
+| l = term ; o = infix_op_1 ; r = term
     { Tinfix (l, o, r) }
-| l = term ; o = div_mod_op ; r = term
+| l = term ; o = infix_op_234 ; r = term
     { Tidapp (Qident o, [l; r]) }
 | IF term THEN term ELSE term
     { Tif ($2, $4, $6) }
@@ -324,12 +326,9 @@ term_sub_:
 | OR      { Dterm.DTor }
 | AND     { Dterm.DTand }
 
-%inline infix_op:
-| PLUS   { mk_id (infix "+") $startpos $endpos }
-| MINUS  { mk_id (infix "-") $startpos $endpos }
-| TIMES  { mk_id (infix "*") $startpos $endpos }
+%inline infix_op_1:
 | c=CMP  { let op = match c with
-          | Beq -> "="
+          | Beq  -> "="
           | Bneq -> "<>"
           | Blt  -> "<"
           | Ble  -> "<="
@@ -341,9 +340,12 @@ term_sub_:
 %inline prefix_op:
 | MINUS { mk_id (prefix "-")  $startpos $endpos }
 
-%inline div_mod_op:
-| DIV  { mk_id "div" $startpos $endpos }
-| MOD  { mk_id "mod" $startpos $endpos }
+%inline infix_op_234:
+| DIV    { mk_id "div" $startpos $endpos }
+| MOD    { mk_id "mod" $startpos $endpos }
+| PLUS   { mk_id (infix "+") $startpos $endpos }
+| MINUS  { mk_id (infix "-") $startpos $endpos }
+| TIMES  { mk_id (infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
