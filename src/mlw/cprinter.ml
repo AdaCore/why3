@@ -687,7 +687,7 @@ module Translate = struct
           match pvsl, r.e_node with
           | [pv], Evar pv' when pv_equal pv pv' && env.computes_return_value ->
             (bs, Sid.add id rs)
-          | [], _ when is_e_void r && is_while ->
+          | [], _ (*when is_e_void r && is_while*) (*FIXME*) ->
             (Sid.add id bs, rs)
           |_ -> raise (Unsupported "non break/return exception in try"))
         exm (Sid.empty, env.returns)
