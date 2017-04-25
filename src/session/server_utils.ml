@@ -5,6 +5,7 @@
    replaced by proper server notifications *)
 
 open Session_itp
+open Itp_communication
 
 exception NotADirectory of string
 exception BadFileName of string
@@ -13,11 +14,23 @@ exception BadFileName of string
 (* Creation of the controller *)
 (******************************)
 
-let cont_from_session_dir cont dir =
+(* [cont_from_session]: returns an option to a boolean which returns None in
+   case of failure, true if nothing is left to do and false if sessions was
+   loaded but [f] should still be added to the session as a file. *)
+let cont_from_session ~notify cont f : bool option =
+  (* If a file is given, find the corresponding directory *)
+  let dir = try (Filename.chop_extension f) with
+  | Invalid_argument _ -> f in
   (* create project directory if needed *)
   if Sys.file_exists dir then
     begin
-      if not (Sys.is_directory dir) then raise (NotADirectory dir)
+      (* Case of user giving a file that gets chopped to an other file *)
+      if not (Sys.is_directory dir) then
+        begin
+          let s = "Not a directory: " ^ dir in
+          Format.eprintf "%s@." s;
+          exit 1
+        end
     end
   else
     begin
@@ -31,13 +44,21 @@ let cont_from_session_dir cont dir =
   (* create the controller *)
   Controller_itp.init_controller ses cont;
   (* update the session *)
-  Controller_itp.reload_files cont ~use_shapes
+  try (Controller_itp.reload_files cont ~use_shapes;
+    (* Check if the initial file given was a file or not. If it was, we return
+       that it should be added to the session.  *)
+    if Sys.file_exists f && not (Sys.is_directory f) then
+      Some false
+    else
+      Some true) with
+  | e ->
+    begin
+      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+      notify (Message (Parse_Or_Type_Error s));
+      None
+    end
 
-(* If we have a file we chop it and return new session based on the directory *)
-let cont_from_file cont f =
-  let dir = try (Filename.chop_extension f) with
-  | Invalid_argument _ -> raise (BadFileName f) in
-  cont_from_session_dir cont dir
+
 
 
 (******************)

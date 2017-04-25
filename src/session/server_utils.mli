@@ -3,14 +3,10 @@ exception BadFileName of string
 
 (** Controller initialization *)
 
-(* Init the given controller with the session in directory given *)
-val cont_from_session_dir: Controller_itp.controller -> string -> unit
-
-(* Init the controller with the session located in a directory with the name of
-   the file without extension *)
-val cont_from_file: Controller_itp.controller -> string -> unit
-
-
+(* Init the given controller with the session in file/directory given *)
+val cont_from_session:
+    notify:(Itp_communication.notification -> unit) ->
+      Controller_itp.controller -> string -> bool option
 
 (** Simple queries *)
 

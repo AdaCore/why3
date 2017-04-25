@@ -1300,7 +1300,8 @@ let treat_notification n =
       | Not_found -> create_source_view file_name content
     end
   | Dead _ ->
-     print_message "Serveur sent an unexpected notification '%a'. Please report." print_notify n
+     print_message "Serveur sent an unexpected notification '%a'. Please report."
+        print_notify n
   end;
   (* temporary: this should be better executed each time
      one clicks on the tree view *)

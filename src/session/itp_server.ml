@@ -398,24 +398,6 @@ let () =
                       Format.eprintf "File : %s@." f.file_name;
                       read_and_send f.file_name) files
 
-  (* Manipulations of files that handle errors and update the status of the
-     controller in server data. *)
-  let cont_from_session_dir cont f =
-    try cont_from_session_dir cont f; true with
-    | e ->
-        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Parse_Or_Type_Error s));
-        load_files_session ();
-        false
-
-  let cont_from_file cont f =
-    try cont_from_file cont f; true with
-    | e ->
-        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Parse_Or_Type_Error s));
-        load_files_session ();
-        false
-
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
@@ -467,11 +449,6 @@ let () =
                        task_driver = task_driver;
                        sd_provers = provers;
                        cont = c }
-
-
-
-
-
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -810,42 +787,20 @@ let () =
           List.map (fun (c,_,_) -> c) commands
       }
     in
-    try (
-      if Sys.file_exists f then
-        begin
-          if Sys.is_directory f then
-            begin
-              let b = cont_from_session_dir d.cont f in
-              if b then
-                P.notify (Initialized infos);
-              b
-            end
-          else
-            begin
-              let b = cont_from_file d.cont f in
-              if b then
-                begin
-                  add_file_to_session d.cont f;
-                  P.notify (Initialized infos);
-                end;
-              b
-            end
-        end
-      else
-        begin
-          P.notify (Message (Open_File_Error ("File not found: " ^ f)));
-          false
-        end)
-    with
-      | NotADirectory f ->
-          P.notify (Message (Open_File_Error ("Not a directory: " ^ f))); false
-      | BadFileName f ->
-          P.notify (Message (Open_File_Error ("Bad file name: " ^ f))); false
-      | e ->
-          Format.eprintf "%a@." Exn_printer.exn_printer e;
-          P.notify (Dead (Pp.string_of Exn_printer.exn_printer e));
-          exit 1
-
+    match cont_from_session ~notify:P.notify d.cont f with
+    | Some false ->
+      begin
+        add_file_to_session d.cont f;
+        P.notify (Initialized infos);
+        true
+      end
+    | Some true ->
+        P.notify (Initialized infos);
+        true
+    | None ->
+        (* Even if it fails we want to load source files *)
+        load_files_session ();
+        false
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
