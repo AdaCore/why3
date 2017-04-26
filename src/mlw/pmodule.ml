@@ -286,9 +286,9 @@ let add_pdecl_no_logic uc d =
   | PDexn xs -> add_symbol add_xs xs.xs_name xs uc
   | PDpure -> uc
 
-let add_pdecl_raw uc d =
+let add_pdecl_raw ?(warn=true) uc d =
   let uc = add_pdecl_no_logic uc d in
-  let th = List.fold_left add_decl uc.muc_theory d.pd_pure in
+  let th = List.fold_left (add_decl ~warn) uc.muc_theory d.pd_pure in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)
@@ -329,7 +329,7 @@ let unit_module =
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
   let d,metas = create_type_decl [td] in
   assert (metas = []);
-  close_module (add_pdecl_raw uc d)
+  close_module (add_pdecl_raw ~warn:false uc d)
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -345,14 +345,14 @@ let add_use uc d = Sid.fold (fun id uc ->
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
 
-let add_pdecl ~vc uc d =
+let add_pdecl ?(warn=true) ~vc uc d =
   let uc = add_use uc d in
   let dl = if vc then Vc.vc uc.muc_env uc.muc_known d else [] in
   (* verification conditions must not add additional dependencies
      on built-in theories like TupleN or HighOrd. Also, we expect
      int.Int or any other library theory to be in the context:
      importing them automatically seems to be too invasive. *)
-  add_pdecl_raw (List.fold_left add_pdecl_raw uc dl) d
+  add_pdecl_raw ~warn (List.fold_left (add_pdecl_raw ~warn) uc dl) d
 
 (** {2 Cloning} *)
 
@@ -527,7 +527,7 @@ let clone_decl inst cl uc d = match d.d_node with
       uc
   | Dparam ls ->
       let d = create_param_decl (clone_ls cl ls) in
-      add_pdecl ~vc:false uc (create_pure_decl d)
+      add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
   | Dlogic ldl ->
       List.iter (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
@@ -535,7 +535,7 @@ let clone_decl inst cl uc d = match d.d_node with
       let get_logic (_,ld) =
         Opt.get (ls_defn_of_axiom (clone_fmla cl (ls_defn_axiom ld))) in
       let d = create_logic_decl (List.map get_logic ldl) in
-      add_pdecl ~vc:false uc (create_pure_decl d)
+      add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
   | Dind (s, idl) ->
       let lls = List.map (fun (ls,_) ->
         if Mls.mem ls inst.mi_ls then raise (CannotInstantiate ls.ls_name);
@@ -547,7 +547,7 @@ let clone_decl inst cl uc d = match d.d_node with
         pr', clone_fmla cl f in
       let get_ind ls (_,la) = ls, List.map get_case la in
       let d = create_ind_decl s (List.map2 get_ind lls idl) in
-      add_pdecl ~vc:false uc (create_pure_decl d)
+      add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
   | Dprop (k,pr,f) ->
       let skip, k' = match k, Mpr.find_opt pr inst.mi_pk with
         | Pgoal, _ -> true, Pgoal
@@ -559,7 +559,7 @@ let clone_decl inst cl uc d = match d.d_node with
       let pr' = create_prsymbol (id_clone pr.pr_name) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
       let d = create_prop_decl k' pr' (clone_fmla cl f) in
-      add_pdecl ~vc:false uc (create_pure_decl d)
+      add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
 
 let cl_save_ls cl s s' =
   cl.ls_table <- Mls.add_new (CannotInstantiate s.ls_name) s s' cl.ls_table
@@ -929,7 +929,7 @@ let add_vc uc (its, f) =
   let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
   let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
-  add_pdecl ~vc:false uc d
+  add_pdecl ~warn:false ~vc:false uc d
 
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
@@ -938,7 +938,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         let d,metas = create_type_decl tdl in
       List.fold_left
         (fun uc (m,a) -> add_meta uc m a)
-        (add_pdecl ~vc:false uc d)
+        (add_pdecl ~warn:false ~vc:false uc d)
         metas
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
@@ -967,7 +967,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       (* FIXME check effects of cexp/ld wrt rs *)
       (* FIXME add correspondance for "let lemma" to cl.pr_table *)
       let dl = Vc.vc uc.muc_env uc.muc_known (create_let_decl ld) in
-      List.fold_left add_pdecl_raw uc dl
+      List.fold_left (add_pdecl_raw ~warn:false) uc dl
   | PDlet ld ->
       begin match ld with
         | LDvar ({pv_vs=vs}, _) when Mvs.mem vs inst.mi_pv ->
@@ -990,7 +990,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       cl.rn_table <- Mreg.set_union cl.rn_table frz;
       let sm, ld = clone_let_defn cl (sm_of_cl cl) ld in
       cl.pv_table <- sm.sm_pv; cl.rs_table <- sm.sm_rs;
-      add_pdecl ~vc:false uc (create_let_decl ld)
+      add_pdecl ~warn:false ~vc:false uc (create_let_decl ld)
   | PDexn ({xs_name = id} as xs) when Mxs.mem xs inst.mi_xs ->
       let xs' = Mxs.find xs inst.mi_xs in
       begin try let ity = clone_ity cl xs.xs_ity in
@@ -1004,7 +1004,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let ity = clone_ity cl xs.xs_ity in
       let xs' = create_xsymbol id ~mask:xs.xs_mask ity in
       cl.xs_table <- Mxs.add xs xs' cl.xs_table;
-      add_pdecl ~vc:false uc (create_exn_decl xs')
+      add_pdecl ~warn:false ~vc:false uc (create_exn_decl xs')
   | PDpure ->
       List.fold_left (clone_decl inst cl) uc d.pd_pure
 

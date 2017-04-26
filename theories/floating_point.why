@@ -104,7 +104,7 @@ theory GenFloat
 
   predicate no_overflow (m:mode) (x:real) = abs (round m x) <= max
 
-  axiom Bounded_real_no_overflow "W:non_conservative_extension:N":
+  axiom Bounded_real_no_overflow :
     forall m:mode, x:real. abs x <= max -> no_overflow m x
 
   axiom Round_monotonic :
