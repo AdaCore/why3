@@ -934,10 +934,12 @@ let () =
 
   let replay_session () : unit =
     let d = get_server_data () in
-    let callback = fun lr ->
+    let callback = callback_update_tree_proof d.cont in
+    let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false d.cont ~callback:callback ~remove_obsolete:false
+    C.replay ~use_steps:false ~remove_obsolete:false d.cont
+             ~callback ~notification:notify_change_proved ~final_callback
 
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
@@ -1036,7 +1038,7 @@ let () =
     | Save_file_req (name, text)   ->
         save_file name text;
     | Get_task nid                 -> send_task nid
-    | Replay_req                   -> replay_session (); reload_session ()
+    | Replay_req                   -> replay_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin

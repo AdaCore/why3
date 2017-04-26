@@ -573,7 +573,7 @@ let schedule_proof_attempt c id pr ~limit ~callback ~notification =
         update_proof_node notification c id false
     | _ -> ())
   in
-  schedule_proof_attempt_r c id pr ~limit:limit ~callback
+  schedule_proof_attempt_r c id pr ~limit ~callback
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
@@ -773,21 +773,19 @@ let copy_detached ~copy c from_any =
   | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
 
 
-let replay_proof_attempt c pr limit (id: proofNodeID) ~callback =
-
+let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
      to check more things before giving the attempt to the scheduler *)
   if not (Hprover.mem c.controller_provers pr) then
-    callback (Uninstalled pr)
+    callback id (Uninstalled pr)
   else
-    (Queue.add (c, id, pr, limit, callback) scheduled_proof_attempts;
-     callback Scheduled;
-     run_timeout_handler ())
+    schedule_proof_attempt c parid pr ~limit ~callback ~notification
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   (** Result(new_result,old_result) *)
   | CallFailed of exn
+  | Replay_interrupted
   | Prover_not_installed
   | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
@@ -799,8 +797,10 @@ let print_report fmt (r: report) =
     Format.fprintf fmt "new_result = %a, old_result = %a@."
       Call_provers.print_prover_result new_r
       Call_provers.print_prover_result old_r
-  | CallFailed _ ->
-    Format.fprintf fmt "Callfailed@."
+  | CallFailed e ->
+    Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
+  | Replay_interrupted ->
+    Format.fprintf fmt "Interrupted@."
   | Prover_not_installed ->
     Format.fprintf fmt "Prover not installed@."
   | Edited_file_absent _ ->
@@ -818,21 +818,25 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ~remove_obsolete ~use_steps c ~callback =
+let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback =
 
   (* === Side functions used by replay === *)
   let counting s count =
     match s with
-    | Interrupted -> count := !count - 1
-    | Done _ -> count := !count - 1
-    | InternalFailure _ -> count := !count - 1
+    | Scheduled | Running -> ()
+    | Unedited | JustEdited -> assert false
+    | Interrupted
+    | Done _
+    | InternalFailure _
     | Uninstalled _ -> count := !count - 1
-    | _ -> () in
+  in
 
   let craft_report s r id pr limits pa =
     match s with
-    | Interrupted -> assert false
-(* Never happen r := (id, pr, limits, CallFailed (User_interrupt)) :: !r *)
+    | Scheduled | Running -> ()
+    | Unedited | JustEdited -> assert false
+    | Interrupted ->
+       r := (id, pr, limits, Replay_interrupted ) :: !r
     | Done new_r ->
         (match pa.Session_itp.proof_state with
         | None -> (r := (id, pr, limits, No_former_result new_r) :: !r)
@@ -840,9 +844,10 @@ let replay ~remove_obsolete ~use_steps c ~callback =
     | InternalFailure e ->
         r := (id, pr, limits, CallFailed (e)) :: !r
     | Uninstalled _ -> r := (id, pr, limits, Prover_not_installed) :: !r;
-    | _ -> () in
+  in
 
-  let update_node pa s =
+(*
+  let update_node pa s callback =
     match s with
     | Done new_r ->
         (pa.Session_itp.proof_state <- Some new_r;
@@ -851,7 +856,8 @@ let replay ~remove_obsolete ~use_steps c ~callback =
         pa.proof_obsolete <- true
     | Uninstalled _ ->
         pa.proof_obsolete <- true
-    | _ -> () in
+    | _ -> assert false in
+ *)
 
   let update_uninstalled c remove_obsolete id s pr =
     match s with
@@ -873,8 +879,8 @@ let replay ~remove_obsolete ~use_steps c ~callback =
     (fun _ _ -> count := !count + 1) session;
 
   (* Replaying function *)
-  let replay_pa pa =
-    let id = pa.parent in
+  let replay_pa id pa =
+    let parid = pa.parent in
     let pr = pa.prover in
     (* If use_steps, we give only steps as a limit *)
     let limit =
@@ -883,16 +889,19 @@ let replay ~remove_obsolete ~use_steps c ~callback =
       else
         pa.limit
     in
-    replay_proof_attempt c pr limit id
-      ~callback:(fun s ->
+    replay_proof_attempt c pr limit parid id
+      ~callback:(fun id s ->
         counting s count;
-        craft_report s report id pr limit pa;
-        update_node pa s;
-        update_uninstalled c remove_obsolete id s pr;
-        if !count = 0 then callback !report) in
+        craft_report s report parid pr limit pa;
+(*
+        update_node pa s ~callback ~notification;
+ *)
+        update_uninstalled c remove_obsolete parid s pr;
+        callback id s;
+        if !count = 0 then final_callback !report)
+      ~notification in
 
   (* Calling replay on all the proof_attempts of the session *)
-  Session_itp.session_iter_proof_attempt
-    (fun _ pa -> replay_pa pa) session
+  Session_itp.session_iter_proof_attempt replay_pa session
 
 end

@@ -236,6 +236,7 @@ type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
         (** Result(new_result,old_result) *)
   | CallFailed of exn
+  | Replay_interrupted
   | Prover_not_installed
   | Edited_file_absent of string
   | No_former_result of Call_provers.prover_result
@@ -255,7 +256,9 @@ val replay:
         some cases: for example when prover is not installed *)
     use_steps:bool -> (** Replay use recorded number of proof steps if true *)
     controller ->
-    callback:
+    callback:(proofAttemptID -> proof_attempt_status -> unit) ->
+    notification:(any -> bool -> unit) ->
+    final_callback:
       ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
             -> unit) ->
     unit

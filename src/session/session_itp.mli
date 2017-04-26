@@ -65,7 +65,7 @@ type proof_attempt_node = {
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
-val session_iter_proof_attempt: (proofNodeID -> proof_attempt_node -> unit) -> session -> unit
+val session_iter_proof_attempt: (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit
 
 (* [is_below s a b] true if a is below b in the session tree *)
 val is_below: session -> any -> any -> bool
