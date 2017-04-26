@@ -1699,7 +1699,7 @@ clean::
 
 CLEANDIRS += src/trywhy3
 
-src/ide/why3_js.cmo: src/ide/why3_js.ml
+src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
 	$(JSOCAMLCW) $(BFLAGS) -c $<
 
 src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
