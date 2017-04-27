@@ -821,8 +821,7 @@ module Translate = struct
                       | _ ->
                          raise
                            (Unsupported
-                              "Non-function with no syntax
-                               in toplevel let")
+                              "Non-function with no syntax in toplevel let")
 	        end
         with Unsupported s -> Format.printf "Unsupported : %s@." s; []
       end
@@ -831,8 +830,9 @@ module Translate = struct
       Format.printf "PDtype %s@." id.id_string;
       begin
         match its.its_ts.ts_def with
-        | Some def -> [C.Dtypedef (ty_of_ty info def, id)]
-        | None ->
+        | Alias def -> [C.Dtypedef (ty_of_ty info def, id)]
+        | Range _ | Float _ -> raise (Unsupported "range types")
+        | NoDef ->
           begin match query_syntax info.syntax id with
           | Some _ -> []
           | None ->
@@ -940,13 +940,14 @@ module MLToC = struct
        else C.([], Snop)
     | Eblock [_] -> assert false
     | Eblock l ->
-       let env_not_tail = { env with computes_return_value = false } in
+       let env_f = { env with computes_return_value = false } in
        let rec aux = function
          | [] ->
             if env.computes_return_value
             then C.([], Sreturn(Enothing))
             else C.([], Snop)
-         | h::t -> ([], C.Sseq (C.Sblock (expr info env_not_tail h),
+         | [s] -> ([], C.Sblock (expr info env s))
+         | h::t -> ([], C.Sseq (C.Sblock (expr info env_f h),
                                 C.Sblock (aux t)))
        in
        aux l
@@ -954,10 +955,10 @@ module MLToC = struct
        ([],return_or_expr env (C.Econst (Cint "1")))
     | Eapp (rs, []) when rs_equal rs rs_false ->
        ([],return_or_expr env (C.Econst (Cint "0")))
-    | Evar pv ->
+    | Compile.ML.Evar pv ->
        let e = C.Evar (pv_name pv) in
        ([], return_or_expr env e)
-    | Econst ic ->
+    | Compile.ML.Econst ic ->
       let n = Number.compute_int ic in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
@@ -1067,7 +1068,7 @@ module MLToC = struct
        | Lvar (pv,le) -> (* not a block *)
           begin
           match le.e_node with
-          | Econst ic ->
+          | Compile.ML.Econst ic ->
             let n = Number.compute_int ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
 	    Format.printf "propagate constant %s for var %s@."
@@ -1145,7 +1146,8 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
-          | [pv], Evar pv' when pv_equal pv pv' && env.computes_return_value ->
+          | [pv], Compile.ML.Evar pv'
+            when pv_equal pv pv' && env.computes_return_value ->
             (bs, Sid.add id rs)
           | [], (Eblock []) when is_unit r.e_ity && is_while ->
             (Sid.add id bs, rs)
@@ -1187,7 +1189,7 @@ module MLToC = struct
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
     | Eassign _ -> raise (Unsupported "assign")
-    | Ehole -> assert false
+    | Ehole | Eignore _ -> assert false
     | Efun _ -> raise (Unsupported "higher order")
 
   let translate_decl (info:info) (d:decl) : C.definition option
