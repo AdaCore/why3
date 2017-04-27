@@ -559,6 +559,7 @@ module Translate = struct
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
+      (* FIXME: ghost functions *)
       let args = params cty.cty_args in
       let ef = expr info ef in
       let ein = expr info ein in
@@ -567,6 +568,7 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
+      (* FIXME: Capp expression is ghost *)
       (* partial application of constructor *)
       let eta_app = mk_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
@@ -577,6 +579,7 @@ module Translate = struct
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
+      (* FIXME?: Capp expression is ghost *)
       let pvl = app pvl rs_app.rs_cty.cty_args in
       let eapp =
         ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
@@ -586,6 +589,7 @@ module Translate = struct
       let ml_letrec = ML.Elet (ML.Lsym (rsf, res, args, eapp), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
+      (* FIXME: ghost functions *)
       let ein = expr info ein in
       let rdefl =
         List.map (fun rdef -> match rdef with
