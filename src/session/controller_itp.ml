@@ -408,23 +408,29 @@ let add_file c ?format fname =
 let remove_subtree c (n: any) ~removed ~node_change =
   let removed = (fun x -> removed x; remove_any_proof_state c x) in
   let parent = get_any_parent c.controller_session n in
-  match n with
-  | ATn _ | APa _ ->
-    Session_itp.remove_subtree c.controller_session n ~notification:removed;
-    (match parent with
-      | Some (APn parent) ->
-        (* If proof_state of the parent is actually changed update the branch
-           otherwise do nothing *)
-        let tr_list = get_transformations c.controller_session parent in
-        let pa_list = get_proof_attempts c.controller_session parent in
-        let proved = List.exists (tn_proved c) tr_list in
-        let proved = List.exists reload_pa_proof_state pa_list || proved in
-        if proved then
-          ()
-        else
-          update_proof_node node_change c parent false
-    | _ -> assert false)
-  | _ -> ()
+  (* Note that this line can raise RemoveError when called on inappropriate
+     node (attached theory / goals) *)
+  Session_itp.remove_subtree c.controller_session n ~notification:removed;
+  (match parent with
+  | Some (APn parent) ->
+      (* If proof_state of the parent is actually changed update the branch
+         otherwise do nothing *)
+      let tr_list = get_transformations c.controller_session parent in
+      let pa_list = get_proof_attempts c.controller_session parent in
+      let proved = List.exists (tn_proved c) tr_list in
+      let proved = List.exists reload_pa_proof_state pa_list || proved in
+      if proved then
+        ()
+      else
+        update_proof_node node_change c parent false
+  | Some _ ->
+      (* This case corresponds to removal of detached node. We don't need to
+         update the proof_state *)
+      ()
+  | None ->
+      (* Cannot remove root. Note that this should already have failed in call
+         to Session_itp.remove_subtree *)
+      raise RemoveError)
 
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit

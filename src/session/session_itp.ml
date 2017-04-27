@@ -369,10 +369,10 @@ let remove_subtree s (n: any) ~notification : unit =
     | ATh th -> remove_theory s th
   in
   match n with
-  | APn _pn -> raise RemoveError
-  | ATh _th -> raise RemoveError
+  | APn _pn when not (is_detached s n) -> raise RemoveError
+  | ATh _th when not (is_detached s n) -> raise RemoveError
   | _ ->
-    ignore (fold_all_any s (fun acc x -> remove s x; notification x; acc) [] n)
+    fold_all_any s (fun _ x -> remove s x; notification x) () n
 
 let rec fold_all_sub_goals_of_proofn s f acc pnid =
   let pn = get_proofNode s pnid in
@@ -568,7 +568,7 @@ let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
   let new_goal = Ident.id_register (Ident.id_clone pn.proofn_name) in
   let checksum = pn.proofn_checksum in
   let shape = pn.proofn_shape in
-  let (_: unit) = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape in
+  let _: unit = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape in
   graft_detached_proof_on_parent s new_pn_id parent;
   new_pn_id
 

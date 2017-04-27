@@ -1015,7 +1015,7 @@ let () =
                         remove_any_node_ID x;
                         P.notify (Remove nid))
         with RemoveError -> (* TODO send an error instead of information *)
-          P.notify (Message (Information "Cannot remove a proof node or theory"))
+          P.notify (Message (Information "Cannot remove attached proof nodes or theories"))
         end
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
