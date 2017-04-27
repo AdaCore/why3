@@ -347,11 +347,11 @@ module Translate = struct
     in
     filter2_ghost_params_cps l (fun x -> x)
 
-  let rec filter_ghost_rdef def = function
+  let rec filter_out_ghost_rdef = function
     | [] -> []
     | { rec_sym = rs; rec_rsym = rrs } :: l
-      when rs_ghost rs || rs_ghost rrs -> filter_ghost_rdef def l
-    | rdef :: l -> def rdef :: filter_ghost_rdef def l
+      when rs_ghost rs || rs_ghost rrs -> filter_out_ghost_rdef l
+    | rdef :: l -> rdef :: filter_out_ghost_rdef l
 
   let rec pat p =
     match p.pat_node with
@@ -558,6 +558,8 @@ module Translate = struct
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (ML.I e.e_ity) eff
+    | Elet (LDsym (rs, _), ein) when rs_ghost rs ->
+      expr info ein
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
       let args = params cty.cty_args in
       let ef = expr info ef in
@@ -586,18 +588,17 @@ module Translate = struct
       let ml_letrec = ML.Elet (ML.Lsym (rsf, res, args, eapp), ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
-      let ein = expr info ein in
-      let rdefl =
-        List.map (fun rdef -> match rdef with
-          | {rec_sym = rs1; rec_rsym = rs2;
-             rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
+      let rdefl = filter_out_ghost_rdef rdefl in
+      let def = function
+        | {rec_sym = rs1; rec_rsym = rs2;
+           rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
             let res  = ity rs1.rs_cty.cty_result in
             let args = params cty.cty_args in let ef = expr info ef in
             { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
               ML.rec_args = args; ML.rec_exp  = ef ; ML.rec_res  = res }
-          | _ -> assert false) rdefl
-      in
-      let ml_letrec = ML.Elet (ML.Lrec rdefl, ein) in
+        | _ -> assert false in
+      let rdefl = List.map def rdefl in
+      let ml_letrec = ML.Elet (ML.Lrec rdefl, expr info ein) in
       ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
@@ -733,6 +734,7 @@ module Translate = struct
       let res  = ity cty.cty_result in
       [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
     | PDlet (LDrec rl) ->
+      let rl = filter_out_ghost_rdef rl in
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
         let e = match e.c_node with Cfun e -> e | _ -> assert false in
         let args = params rs1.rs_cty.cty_args in
@@ -740,8 +742,7 @@ module Translate = struct
         { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
           ML.rec_args = args; ML.rec_exp  = expr info e;
           ML.rec_res  = res } in
-      let rec_def = filter_ghost_rdef def rl in
-      [ML.Dlet (ML.Lrec rec_def)]
+      if rl = [] then [] else [ML.Dlet (ML.Lrec (List.map def rl))]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar _) ->
       []
     | PDtype itl ->
