@@ -598,8 +598,10 @@ module Translate = struct
               ML.rec_args = args; ML.rec_exp  = ef ; ML.rec_res  = res }
         | _ -> assert false in
       let rdefl = List.map def rdefl in
-      let ml_letrec = ML.Elet (ML.Lrec rdefl, expr info ein) in
-      ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+      if rdefl <> [] then
+        let ml_letrec = ML.Elet (ML.Lrec rdefl, expr info ein) in
+        ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+      else expr info ein
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
     | Eexec ({c_node = Capp (rs, _)}, _) when is_empty_record info rs ->
