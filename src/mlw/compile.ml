@@ -539,7 +539,7 @@ module Translate = struct
 
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
-    (* assert (not eff.eff_ghost); *) (*FIXME add this back*)
+    assert (not eff.eff_ghost);
     match e.e_node with
     | Econst c ->
       let c = match c with Number.ConstInt c -> c | _ -> assert false in
