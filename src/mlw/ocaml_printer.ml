@@ -327,7 +327,7 @@ module Print = struct
         (print_list_pre space (print_vs_arg info)) args
         (print_ty info) res (print_expr info) ef;
       forget_vars args
-    | Lrec (rdef) ->
+    | Lrec rdef ->
       let print_one fst fmt = function
         | { rec_sym = rs1; rec_args = args; rec_exp = e; rec_res = res } ->
           fprintf fmt "@[<hov 2>%s %a @[%a@] :@ %a@ =@ %a@]"
