@@ -634,6 +634,14 @@ module Translate = struct
       let pl = List.map (ebranch info) pl in
       ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
     | Eassert _ -> ML.mk_unit
+    | Eif (e1, e2, e3) when e_ghost e3 ->
+      let e1 = expr info e1 in
+      let e2 = expr info e2 in
+      ML.mk_expr (ML.Eif (e1, e2, ML.mk_unit)) (ML.I e.e_ity) eff
+    | Eif (e1, e2, e3) when e_ghost e2 ->
+      let e1 = expr info e1 in
+      let e3 = expr info e3 in
+      ML.mk_expr (ML.Eif (e1, ML.mk_unit, e3)) (ML.I e.e_ity) eff
     | Eif (e1, e2, e3) ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
