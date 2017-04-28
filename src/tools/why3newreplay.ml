@@ -25,9 +25,6 @@ let display_warning ?loc msg =
 
 let () = Warning.set_hook display_warning
 
-
-module S = Session_itp
-
 let debug = Debug.register_info_flag
     ~desc:"of@ the@ progression@ of@ a@ replay"
     "replay"
@@ -35,17 +32,22 @@ let debug = Debug.register_info_flag
 let () = Debug.set_flag debug
 
 let opt_file = ref None
+(*
 let opt_stats = ref true
+*)
 let opt_force = ref false
 let opt_obsolete_only = ref false
 let opt_use_steps = ref false
+(*
 let opt_bench = ref false
+*)
 let opt_provers = ref []
 
 
 
 (** {2 Smoke detector} *)
 
+(*
 type smoke_detector =
   | SD_None (** No smoke detector *)
   | SD_Top  (** Negation added at the top of the goals *)
@@ -60,6 +62,7 @@ let set_opt_smoke = function
   | "top" ->  opt_smoke := SD_Top
   | "deep" ->  opt_smoke := SD_Deep
   | _ -> assert false
+ *)
 
 let usage_msg = Format.sprintf
   "Usage: %s [options] [<file.why>|<project directory>]"
@@ -86,6 +89,7 @@ let option_list = [
    Arg.String (fun s ->
      opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
    " same as -P");
+(*
   ("--smoke-detector",
    Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
    " try to detect if the context is self-contradicting") ;
@@ -94,6 +98,7 @@ let option_list = [
   ("--no-stats",
    Arg.Clear opt_stats,
    " do not print statistics") ;
+*)
   ("-q",
    Arg.Unit (fun () -> Debug.unset_flag debug),
    " run quietly");
@@ -120,6 +125,7 @@ let found_upgraded_prover = ref false
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
 let () =
+  C.set_max_tasks (Whyconf.running_provers_max (Whyconf.get_main config));
   C.register_observer
     (fun w s r ->
       if Debug.test_flag debug then
@@ -127,7 +133,7 @@ let () =
 
 let print_result = Call_provers.print_prover_result
 
-let main_loop = Unix_scheduler.Unix_scheduler.main_loop
+module S = Session_itp
 
 let project_dir =
   try
@@ -227,7 +233,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
         printf "(replay OK%s%s)@."
           (if found_obs then ", obsolete session" else "")
           (if !found_upgraded_prover then ", upgraded prover" else "");
-        if !opt_stats && n<m then print_statistics cont files;
+        if true (* !opt_stats *) && n<m then print_statistics cont files;
         Debug.dprintf debug "Everything replayed OK.@.";
         if !opt_force || found_obs || !found_upgraded_prover then save ();
         exit 0
@@ -356,17 +362,17 @@ let () =
            Exn_printer.exn_printer e)
       provers;
     let ses,use_shapes = S.load_session project_dir in
-    let found_obs = true (* TODO *) in
-    let some_merge_miss = false (* TODO *) in
     Controller_itp.init_controller ses cont;
     (* update the session *)
-    begin try
+    let found_obs, some_merge_miss =
+      try
         Controller_itp.reload_files cont ~use_shapes;
+        true, false (* TODO *)
       with
       | e ->
          Format.eprintf "%a@." Exn_printer.exn_printer e;
          exit 1
-    end;
+    in
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs
     then
@@ -381,21 +387,14 @@ let () =
     let sched =
       M.init (Whyconf.running_provers_max (Whyconf.get_main config))
     in
+ *)
     if found_obs then eprintf "[Warning] session is obsolete@.";
     if some_merge_miss then eprintf "[Warning] some goals were missed during merge@.";
- *)
-    let () = add_to_check_no_smoke some_merge_miss found_obs cont in
-    main_loop (fun _ -> ());
+    add_to_check_no_smoke some_merge_miss found_obs cont;
+    Unix_scheduler.Unix_scheduler.main_loop (fun _ -> ());
     eprintf "main replayer loop exited unexpectedly@.";
     exit 1
   with
-(*
-    | S.OutdatedSession ->
-      eprintf "The session database '%s' is outdated, cannot replay@."
-        project_dir;
-      eprintf "Aborting...@.";
-      exit 1
- *)
     | e when not (Debug.test_flag Debug.stack_trace) ->
       eprintf "Error while opening session with database '%s' : %a@."
         project_dir

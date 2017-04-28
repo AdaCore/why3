@@ -93,7 +93,14 @@ val any_proved: controller -> any -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
-val reload_files : controller -> use_shapes:bool -> unit
+
+(*
+
+  - TODO: the presence of obsolete goals should be returned somehow by
+    that function, as the presence of unmatch old theories or goals
+
+ *)
+val reload_files : controller -> use_shapes:bool -> unit  (* (bool * bool) see above *)
 (** reload the files of the given session:
 
   - each file is parsed again and theories/goals extracted from it. If
@@ -137,9 +144,6 @@ val reload_files : controller -> use_shapes:bool -> unit
       proof attempts and transformations, but no task is associated to
       it, neither to its subgoals.
 
-  - TODO: the presence of obsolete goals should be returned somehow by
-    that function, as the presence of unmatch old theories or goals
-
 *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
@@ -162,12 +166,12 @@ val set_max_tasks : int -> unit
 
 val register_observer : (int -> int -> int -> unit) -> unit
 (** records a hook that will be called with the number of waiting
-    tasks, scheduled tasks, and running taks, each time these numbers
+    tasks, scheduled tasks, and running tasks, each time these numbers
     change *)
 
 val interrupt : unit -> unit
 (** discards all scheduled proof attempts or transformations, including
-    the one already running *)
+    the ones already running *)
 
 val schedule_proof_attempt :
   controller ->
