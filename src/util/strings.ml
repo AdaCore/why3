@@ -9,13 +9,18 @@
 (*                                                                  *)
 (********************************************************************)
 
+(* Replace with Char.uppercase_ascii as soon as we can assume
+  OCaml version at least 4.03.0  *)
+let char_is_uppercase c = c = Char.uppercase c
 
 let create = String.create
 let copy = String.copy
 let set = String.set
 
+
 let capitalize = String.capitalize
 let uncapitalize = String.uncapitalize
+
 
 let rev_split c s =
   let rec aux acc i =
