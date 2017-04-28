@@ -249,7 +249,6 @@ val replay_print:
       (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list ->
         unit
 
-(* TODO replay for manual proofs ? *)
 val replay:
     remove_obsolete:bool ->
     (** If true, removes obsolete attempt in all cases. Otherwise keep it in

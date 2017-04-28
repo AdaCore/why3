@@ -852,19 +852,6 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
     | Uninstalled _ -> r := (id, pr, limits, Prover_not_installed) :: !r;
   in
 
-(*
-  let update_node pa s callback =
-    match s with
-    | Done new_r ->
-        (pa.Session_itp.proof_state <- Some new_r;
-         pa.proof_obsolete <- false)
-    | InternalFailure _ ->
-        pa.proof_obsolete <- true
-    | Uninstalled _ ->
-        pa.proof_obsolete <- true
-    | _ -> assert false in
- *)
-
   let update_uninstalled c remove_obsolete id s pr =
     match s with
     | Uninstalled _ ->
@@ -899,9 +886,6 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
       ~callback:(fun id s ->
         counting s count;
         craft_report s report parid pr limit pa;
-(*
-        update_node pa s ~callback ~notification;
- *)
         update_uninstalled c remove_obsolete parid s pr;
         callback id s;
         if !count = 0 then final_callback !report)
