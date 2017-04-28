@@ -995,6 +995,7 @@ uident_nq:
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
+| lident_keyword  { mk_id $1 $startpos $endpos }
 | LIDENT_QUOTE    { mk_id $1 $startpos $endpos }
 
 lident_nq:
