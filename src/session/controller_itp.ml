@@ -460,18 +460,6 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-(*
-let dummy_result =
-  {
-    pr_answer = Call_provers.Unknown ("I'm dumb", None);
-    pr_status = Unix.WEXITED 0;
-    pr_output = "";
-    pr_time   = 3.14;
-    pr_steps  = 42;
-    pr_model  = Model_parser.default_model;
-}
- *)
-
 let build_prover_call c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
@@ -826,30 +814,24 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
 
 let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback =
 
-  (* === Side functions used by replay === *)
-  let counting s count =
-    match s with
-    | Scheduled | Running -> ()
-    | Unedited | JustEdited -> assert false
-    | Interrupted
-    | Done _
-    | InternalFailure _
-    | Uninstalled _ -> count := !count - 1
-  in
-
-  let craft_report s r id pr limits pa =
+  let craft_report count s r id pr limits pa =
     match s with
     | Scheduled | Running -> ()
     | Unedited | JustEdited -> assert false
     | Interrupted ->
+       decr count;
        r := (id, pr, limits, Replay_interrupted ) :: !r
     | Done new_r ->
+       decr count;
         (match pa.Session_itp.proof_state with
         | None -> (r := (id, pr, limits, No_former_result new_r) :: !r)
         | Some old_r -> r := (id, pr, limits, Result (new_r, old_r)) :: !r)
     | InternalFailure e ->
+       decr count;
         r := (id, pr, limits, CallFailed (e)) :: !r
-    | Uninstalled _ -> r := (id, pr, limits, Prover_not_installed) :: !r;
+    | Uninstalled _ ->
+       decr count;
+       r := (id, pr, limits, Prover_not_installed) :: !r;
   in
 
   let update_uninstalled c remove_obsolete id s pr =
@@ -869,7 +851,7 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
   (* TODO count the number of node in a more efficient way *)
   (* Counting the number of proof_attempt to print report only once *)
   Session_itp.session_iter_proof_attempt
-    (fun _ _ -> count := !count + 1) session;
+    (fun _ _ -> incr count) session;
 
   (* Replaying function *)
   let replay_pa id pa =
@@ -880,12 +862,11 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
       if use_steps then
         Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
       else
-        pa.limit
+        Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
     in
     replay_proof_attempt c pr limit parid id
       ~callback:(fun id s ->
-        counting s count;
-        craft_report s report parid pr limit pa;
+        craft_report count s report parid pr limit pa;
         update_uninstalled c remove_obsolete parid s pr;
         callback id s;
         if !count = 0 then final_callback !report)
