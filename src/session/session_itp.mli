@@ -129,11 +129,11 @@ val merge_file_section :
     theory *)
 
 val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  timelimit:int -> proofAttemptID
-(** [graft_proof_attempt s id pr t] adds a proof attempt with prover
-    [pr] and timelimit [t] in the session [s] as a child of the task
+  limit:Call_provers.resource_limit -> proofAttemptID
+(** [graft_proof_attempt s id pr l] adds a proof attempt with prover
+    [pr] and limits [l] in the session [s] as a child of the task
     [id]. If there already a proof attempt with the same prover, it
-    updates it with the new timelimit. It returns the id of the
+    updates it with the limits. It returns the id of the
     generated proof attempt. *)
 
 val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->

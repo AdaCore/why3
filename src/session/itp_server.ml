@@ -938,7 +938,7 @@ let () =
     let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false ~remove_obsolete:false d.cont
+    C.replay ~use_steps:false ~obsolete_only:true d.cont
              ~callback ~notification:notify_change_proved ~final_callback
 
   (* ---------------- Mark obsolete ------------------ *)

@@ -551,8 +551,7 @@ let run_timeout_handler () =
 
 let schedule_proof_attempt_r c id pr ~limit ~callback =
   let panid =
-    graft_proof_attempt c.controller_session id pr
-      ~timelimit:limit.Call_provers.limit_time
+    graft_proof_attempt c.controller_session id pr ~limit
   in
   Queue.add (c,id,pr,limit,callback panid) scheduled_proof_attempts;
   callback panid Scheduled;
@@ -812,7 +811,8 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback =
+let replay ?(obsolete_only=true) ?(use_steps=false)
+           c ~callback ~notification ~final_callback =
 
   let craft_report count s r id pr limits pa =
     match s with
@@ -834,15 +834,6 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
        r := (id, pr, limits, Prover_not_installed) :: !r;
   in
 
-  let update_uninstalled c remove_obsolete id s pr =
-    match s with
-    | Uninstalled _ ->
-        if remove_obsolete then
-          remove_proof_attempt c.controller_session id pr
-        else
-          ()
-    | _ -> () in
-
   (* === replay === *)
   let session = c.controller_session in
   let count = ref 0 in
@@ -851,26 +842,28 @@ let replay ~remove_obsolete ~use_steps c ~callback ~notification ~final_callback
   (* TODO count the number of node in a more efficient way *)
   (* Counting the number of proof_attempt to print report only once *)
   Session_itp.session_iter_proof_attempt
-    (fun _ _ -> incr count) session;
+    (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) session;
 
   (* Replaying function *)
   let replay_pa id pa =
-    let parid = pa.parent in
-    let pr = pa.prover in
-    (* If use_steps, we give only steps as a limit *)
-    let limit =
-      if use_steps then
-        Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
-      else
-        Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
-    in
-    replay_proof_attempt c pr limit parid id
-      ~callback:(fun id s ->
-        craft_report count s report parid pr limit pa;
-        update_uninstalled c remove_obsolete parid s pr;
-        callback id s;
-        if !count = 0 then final_callback !report)
-      ~notification in
+    if pa.proof_obsolete || not obsolete_only then
+      begin
+        let parid = pa.parent in
+        let pr = pa.prover in
+        (* If use_steps, we give only steps as a limit *)
+        let limit =
+          if use_steps then
+            Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
+          else
+            Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
+        in
+        replay_proof_attempt c pr limit parid id
+                             ~callback:(fun id s ->
+                                        craft_report count s report parid pr limit pa;
+                                        callback id s;
+                                        if !count = 0 then final_callback !report)
+                             ~notification
+      end in
 
   (* Calling replay on all the proof_attempts of the session *)
   Session_itp.session_iter_proof_attempt replay_pa session

@@ -199,17 +199,17 @@ let parse_prover_name config name args :
       if (List.length args > 2) then None else
       match args with
       | [] ->
-        let default_limit = Call_provers.{limit_time = Whyconf.timelimit main;
-                                          limit_mem = Whyconf.memlimit main;
-                                          limit_steps = 0} in
+        let default_limit = Call_provers.{empty_limit with
+                                          limit_time = Whyconf.timelimit main;
+                                          limit_mem = Whyconf.memlimit main} in
           Some (prover_config, default_limit)
       | [timeout] -> Some (prover_config,
                            Call_provers.{empty_limit with
                                          limit_time = int_of_string timeout})
       | [timeout; oom ] ->
-        Some (prover_config, Call_provers.{limit_time = int_of_string timeout;
-                                           limit_mem = int_of_string oom;
-                                           limit_steps = 0})
+        Some (prover_config, Call_provers.{empty_limit with
+                                           limit_time = int_of_string timeout;
+                                           limit_mem = int_of_string oom})
       | _ -> None
     end
 

@@ -561,7 +561,7 @@ let interpNotif (n: notification) =
       | Query_Error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Query error on selected node: \"%s\"" s)
-      | Query_Info (nid, s) -> PE.error_print_msg s
+      | Query_Info (_nid, s) -> PE.error_print_msg s
       | Help s -> PE.error_print_msg s
       | Information s -> PE.error_print_msg s
       | Error s ->
@@ -579,6 +579,7 @@ let interpNotif (n: notification) =
   | Node_change (nid, up) ->
     begin
       match up with
+      | Obsolete _ -> assert false (* TODO *)
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
       | Proof_status_change (c, _obsolete, _rl) ->

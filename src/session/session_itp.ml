@@ -515,10 +515,7 @@ let add_proof_attempt session prover limit state obsolete edit parentID =
   id
 
 let graft_proof_attempt (s : session) (id : proofNodeID) (pr : Whyconf.prover)
-    ~timelimit =
-  let limit = { Call_provers.limit_time  = timelimit;
-                Call_provers.limit_mem   = 0;
-                Call_provers.limit_steps = -1; } in
+    ~limit =
   add_proof_attempt s pr limit None false None id
 
 
