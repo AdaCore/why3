@@ -119,6 +119,12 @@ let found_upgraded_prover = ref false
 
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
+let () =
+  C.register_observer
+    (fun w s r ->
+      if Debug.test_flag debug then
+        Printf.eprintf "Progress: %d/%d/%d                       \r%!" w s r)
+
 let print_result = Call_provers.print_prover_result
 
 let main_loop = Unix_scheduler.Unix_scheduler.main_loop
@@ -241,7 +247,6 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   let notification _any _bool = () in
   if !opt_provers = [] then
     let () =
-      Format.printf "starting the replay...@.";
       C.replay ~obsolete_only:false ~use_steps:!opt_use_steps ~callback ~notification ~final_callback cont
     in ()
   else
@@ -338,10 +343,30 @@ let () =
   try
     Debug.dprintf debug "Opening session...@?";
     let cont = Controller_itp.create_controller env in
+    let provers = Whyconf.get_provers config in
+    Whyconf.Mprover.iter
+      (fun _ p ->
+       try
+         let d = Driver.load_driver cont.Controller_itp.controller_env p.Whyconf.driver [] in
+         Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
+       with e ->
+         Format.eprintf
+           "error loading driver for prover %a: %a@."
+           Whyconf.print_prover p.Whyconf.prover
+           Exn_printer.exn_printer e)
+      provers;
     let ses,use_shapes = S.load_session project_dir in
     let found_obs = true (* TODO *) in
     let some_merge_miss = false (* TODO *) in
     Controller_itp.init_controller ses cont;
+    (* update the session *)
+    begin try
+        Controller_itp.reload_files cont ~use_shapes;
+      with
+      | e ->
+         Format.eprintf "%a@." Exn_printer.exn_printer e;
+         exit 1
+    end;
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not found_obs
     then
