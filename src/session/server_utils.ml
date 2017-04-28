@@ -140,7 +140,7 @@ type query =
   | Qtask of (Controller_itp.controller -> Task.name_tables -> string list -> string)
 
 let help_on_queries fmt commands =
-  let l = List.rev_map (fun (c,h,_) -> (c,h)) commands in
+  let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
@@ -258,7 +258,7 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-let interp_others commands config cmd args =
+let interp_others commands_table config cmd args =
   match parse_prover_name config cmd args with
   | Some (prover_config, limit) ->
       Prove (prover_config, limit)
@@ -280,16 +280,16 @@ let interp_others commands config cmd args =
                            @ <query> [arguments]@\n\
                            @ auto [auto level]@\n\
                            @\n\
-                           Available queries are:@\n@[%a@]" help_on_queries commands
+                           Available queries are:@\n@[%a@]" help_on_queries commands_table
           in
           Help_message text
       | _ ->
           Other (cmd, args)
 
-let interp commands commands_table config cont id s =
+let interp commands_table config cont id s =
   let cmd,args = split_args s in
   try
-    let f = Stdlib.Hstr.find commands_table cmd in
+    let (_,f) = Stdlib.Hstr.find commands_table cmd in
     match f,id with
     | Qnotask f, _ -> Query (f cont args)
     | Qtask _, None -> QError "please select a goal first"
@@ -306,7 +306,7 @@ let interp commands commands_table config cont id s =
       let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
       Transform (cmd,t,args)
     with Trans.UnknownTrans _ ->
-      interp_others commands config cmd args
+      interp_others commands_table config cmd args
 
 
 (***********************)

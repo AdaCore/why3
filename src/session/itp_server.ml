@@ -317,21 +317,30 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 (* Command list *)
 (****************)
 
- let interrupt_query _cont _args = C.interrupt (); "interrupted"
+let interrupt_query _cont _args = C.interrupt (); "interrupted"
 
-let commands =
-  [
-    "list-transforms", "list available transformations", Qnotask list_transforms_query;
-    "list-provers", "list available provers", Qnotask list_provers;
+let commands_table = Stdlib.Hstr.create 17
+
+let register_command c d f = Stdlib.Hstr.add commands_table c (d,f)
+
+let () =
+  List.iter (fun (c,d,f) -> register_command c d f)
+    [
+    "interrupt", "interrupt all scheduled or running proof tasks",
+    Qnotask interrupt_query;
+    "list-transforms", "list available transformations",
+    Qnotask list_transforms_query;
+    "list-provers", "list available provers",
+    Qnotask list_provers;
 (*
     "list-strategies", "list available strategies", list_strategies;
 *)
-    "print", "<s> print the declaration where s was defined", Qtask print_id;
-    "search", "<s> print some declarations where s appear", Qtask search_id;
-    "interrupt", "interrupt all scheduled or running proof tasks", Qnotask interrupt_query;
+    "print", "<id> print the declaration where <id> was defined",
+    Qtask print_id;
+    "search", "<is> print declarations where <id> appears",
+    Qtask search_id;
 (*
     "r", "reload the session (test only)", test_reload;
-    "rp", "replay", test_replay;
     "s", "save the current session", test_save_session;
     "ng", "go to the next goal", then_print (move_to_goal_ret_p next_node);
     "pg", "go to the prev goal", then_print (move_to_goal_ret_p prev_node);
@@ -341,12 +350,6 @@ let commands =
     "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left)
  *)
   ]
-
-let commands_table = Stdlib.Hstr.create 17
-let () =
-  List.iter
-    (fun (c,_,f) -> Stdlib.Hstr.add commands_table c f)
-    commands
 
   type server_data =
     { config : Whyconf.config;
@@ -784,7 +787,7 @@ let () =
         transformations = transformation_list;
         strategies = strategies_list;
         commands =
-          List.map (fun (c,_,_) -> c) commands
+          Hstr.fold (fun c _ acc -> c :: acc) commands_table []
       }
     in
     match cont_from_session ~notify:P.notify d.cont f with
@@ -941,6 +944,9 @@ let () =
     C.replay ~use_steps:false ~obsolete_only:true d.cont
              ~callback ~notification:notify_change_proved ~final_callback
 
+  let () = register_command "replay" "replay obsolete proofs"
+    (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
+
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
     let d = get_server_data () in
@@ -1043,7 +1049,7 @@ let () =
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
-        match (interp commands commands_table d.config d.cont snid cmd) with
+        match (interp commands_table d.config d.cont snid cmd) with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        -> schedule_proof_attempt nid p limit

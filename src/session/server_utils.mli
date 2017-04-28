@@ -26,7 +26,7 @@ val search_id: 'a -> Task.name_tables -> string list -> string
 val list_provers: Controller_itp.controller -> _ -> string
 val list_transforms: unit -> (string * Pp.formatted) list
 val list_transforms_query: _ -> _ -> string
-val help_on_queries: Format.formatter -> (string * string * 'a) list -> unit
+(* val help_on_queries: Format.formatter -> (string * string * 'a) list -> unit *)
 val strategies: Env.env -> Whyconf.config ->
   (string * string * string * Strategy.instruction array) list ref ->
     (string * string * string * Strategy.instruction array) list
@@ -44,8 +44,8 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-val interp: (string * string * 'a) list ->
-  query Stdlib.Hstr.t ->
+val interp:
+  (string * query) Stdlib.Hstr.t ->
     Whyconf.config ->
       Controller_itp.controller ->
         Session_itp.proofNodeID option -> string -> command
