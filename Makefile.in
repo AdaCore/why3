@@ -502,7 +502,7 @@ install_no_local::
 TOOLSGENERATED = src/tools/why3wc.ml
 
 TOOLS_BIN = why3config why3execute why3extract why3prove \
-	    why3realize why3replay why3wc
+	    why3realize why3replay why3wc why3newreplay
 
 TOOLS_FILES = main $(TOOLS_BIN)
 
@@ -534,6 +534,8 @@ bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
 bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
 bin/why3replay.opt: lib/why3/why3.cmxa src/tools/why3replay.cmx
 bin/why3replay.byte: lib/why3/why3.cma src/tools/why3replay.cmo
+bin/why3newreplay.opt: lib/why3/why3.cmxa src/tools/unix_scheduler.cmx src/tools/why3newreplay.cmx
+bin/why3newreplay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/why3newreplay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -869,14 +871,14 @@ install_local:: bin/why3session
 
 SHELL_FILES = unix_scheduler why3shell
 
-SHELLMODULES = $(addprefix src/why3shell/, $(SHELL_FILES))
+SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
 
 SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
 SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
 SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
 
-$(SHELLDEP): DEPFLAGS += -I src/why3shell
-$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/why3shell
+$(SHELLDEP): DEPFLAGS += -I src/tools
+$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 
 # build targets
 
@@ -898,8 +900,6 @@ ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 endif
 
 depend: $(SHELLDEP)
-
-CLEANDIRS += src/why3shell
 
 clean_old_install::
 	rm -f $(BINDIR)/why3shell$(EXE)
