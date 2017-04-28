@@ -832,8 +832,6 @@ let check_literal c ty =
     | _ -> raise (InvalidLiteralType ty) in
   match c with
     | Number.ConstInt c when not (ts_equal ts ts_int) ->
-       Format.eprintf "check literal %a of type %s@."
-                      Number.print_integer_constant c ts.ts_name.id_string;
         begin match ts.ts_def with
           | Range ir -> Number.check_range c ir
           | _ -> raise (InvalidLiteralType ty)

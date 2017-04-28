@@ -541,10 +541,7 @@ let rec raw_of_expr prop e = match e.e_node with
         effect-hiding construction, Etry, is forbidden. *)
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> t_var v.pv_vs
-  | Econst (Number.ConstInt _ as c)->
-      t_const c ty_int
-  | Econst (Number.ConstReal _ as c)->
-      t_const c ty_real
+  | Econst c -> t_const c (ty_of_ity e.e_ity)
   | Epure t -> t
   | Eghost e -> pure_of_expr prop e
   | Eexec (_,{cty_post = []}) -> raise Exit

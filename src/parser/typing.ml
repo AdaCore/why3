@@ -366,13 +366,13 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       DTuloc (dterm tuc gvars at denv e1, uloc)
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm tuc gvars at denv e1, Slab.singleton lab)
-  | Ptree.Tcast (e1, ty) ->
-    (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
-      let e1 = dterm tuc gvars at denv e1 in
-      let ty = ty_of_pty tuc ty in
-      match e1.dt_node with
-      | DTconst (c,_) -> DTconst (c, ty)
-      | _ -> DTcast (e1, ty))
+  | Ptree.Tcast ({term_desc = Ptree.Tconst c}, pty) ->
+      let ty = ty_of_pty tuc pty in
+      DTconst (c, ty)
+  | Ptree.Tcast (e1, pty) ->
+      let d1 = dterm tuc gvars at denv e1 in
+      let ty = ty_of_pty tuc pty in
+      DTcast (d1, ty))
 
 (** typing program expressions *)
 
@@ -586,7 +586,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None -> qualid_app loc q el)
     | _ -> qualid_app loc q el
   in
-  Dexpr.dexpr ~loc (match desc with
+  Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
   | Ptree.Eidapp (q, el) ->
@@ -747,13 +747,14 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr muc denv e1, Slab.singleton lab)
-  | Ptree.Ecast (e1, pty) ->
-      let e1 = dexpr muc denv e1 in
+  | Ptree.Ecast ({expr_desc = Ptree.Econst c},pty) ->
       let ity = ity_of_pty muc pty in
-      let dity = dity_of_ity ity in
-      match e1.de_node with
-      | DEconst (c, _) -> DEconst (c, dity)
-      | _ -> DEcast (e1, ity))
+      DEconst (c, dity_of_ity ity)
+  | Ptree.Ecast (e1,pty) ->
+      let d1 = dexpr muc denv e1 in
+      let ity = ity_of_pty muc pty in
+      DEcast (d1, ity)
+  end
 
 and drec_defn muc denv fdl =
   let prep (id, gh, kind, bl, pty, msk, sp, e) =
