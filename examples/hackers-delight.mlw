@@ -10,9 +10,9 @@ theory Utils
 
   use import bv.BV32
 
-  let constant one : t = (1:bool)
+  let constant one : t = (1:t)
   let constant two : t = (2:t)
-  let constant lastbit : t = sub size_bv one
+  let constant lastbit : t = (31:t)
 
   function max (x y : t) : t = (if ult x y then y else x)
   function min (x y : t) : t = (if ult x y then x else y)
