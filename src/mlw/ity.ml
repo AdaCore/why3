@@ -509,7 +509,7 @@ let ity_app_pure_raw sbs s tl rl = match s.its_def with
   | Alias ity -> ity_full_inst sbs ity
   | NoDef -> ity_app_unsafe s tl rl
   | Range _ -> assert (tl = [] && rl = []); ity_app_unsafe s tl rl
-  | Float _ -> assert false (* TODO *)
+  | Float _ -> assert (tl = [] && rl = []); ity_app_unsafe s tl rl
 
 (* smart type constructors *)
 
