@@ -282,6 +282,17 @@ let print_msg fmt m =
   | Error s                -> fprintf fmt "%s" s
   | Open_File_Error s      -> fprintf fmt "%s" s
 
+(* TODO ad hoc printing. Should reuse print_loc. *)
+let print_loc fmt (loc: Loc.position) =
+  let (f,l,b,e) = Loc.get loc in
+   fprintf fmt "File \"%s\", line %d, characters %d-%d" f l b e
+
+let print_list_loc fmt l =
+  Pp.print_list
+    (fun _fmt () -> ())
+    (fun fmt (loc, _c) -> Format.fprintf fmt "(%a, color)" print_loc loc)
+    fmt l
+
 let print_notify fmt n =
   match n with
   | Node_change (ni, nf)               ->
@@ -299,7 +310,9 @@ let print_notify fmt n =
       print_msg fmt msg
   | Dead s                             -> fprintf fmt "dead :%s" s
   | File_contents (_f, _s)             -> fprintf fmt "file contents"
-  | Task (_ni, _s)                     -> fprintf fmt "task"
+  | Task (ni, _s, list_loc)            ->
+      fprintf fmt "task for node_ID %d which contains a list of loc %a"
+        ni print_list_loc list_loc
 
 module type Protocol = sig
   val get_requests : unit -> ide_request list
@@ -366,6 +379,72 @@ let () =
        Format.eprintf "[ITP server] not yet initialized@.";
        exit 1
     | Some x -> x
+
+(*******************************)
+(* Compute color for locations *)
+(*******************************)
+
+(* This section is used to get colored source as a function of the task *)
+
+
+(* These functions append stuff to a list which will then be passed to the
+   Task notification. *)
+let color_loc list ~color ~loc =
+  let d = get_server_data () in
+  let (f,l,b,e) = Loc.get loc in
+  let f = Sysutil.relativize_filename
+    (Session_itp.get_dir d.cont.controller_session) f in
+  let loc = Loc.user_position f l b e in
+  list := (loc, color) :: !list
+
+let rec color_locs list ~color formula =
+  let b = ref false in
+  Opt.iter (fun loc -> color_loc list ~color ~loc; b := true) formula.Term.t_loc;
+  Term.t_fold (fun b subf -> color_locs list ~color subf || b) !b formula
+
+let rec color_t_locs list f =
+  let premise_tag = function
+    | { Term.t_node = Term.Tnot _; t_loc = None } -> Neg_premise_color
+    | _ -> Premise_color
+  in
+  match f.Term.t_node with
+    | Term.Tbinop (Term.Timplies,f1,f2) ->
+        let b = color_locs list ~color:(premise_tag f1) f1 in
+        color_t_locs list f2 || b
+    | Term.Tlet (t,fb) ->
+        let _,f1 = Term.t_open_bound fb in
+        let b = color_locs list ~color:(premise_tag t) t in
+        color_t_locs list f1 || b
+    | Term.Tquant (Term.Tforall,fq) ->
+        let _,_,f1 = Term.t_open_quant fq in
+        color_t_locs list f1
+    | _ ->
+        color_locs list ~color:Goal_color f
+
+exception No_loc_on_goal
+
+let color_goal list loc =
+  match loc with
+  | None -> raise No_loc_on_goal
+  | Some loc -> color_loc list ~color:Goal_color ~loc
+
+let get_locations list (task: Task.task) =
+  let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
+  color_goal list goal_id.Ident.id_loc;
+  match task with
+    | Some
+        { Task.task_decl =
+            { Theory.td_node =
+                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
+        if not (color_t_locs list f) then
+          Opt.iter (fun loc -> color_loc list ~color:Goal_color ~loc) goal_id.Ident.id_loc
+    | _ ->
+        assert false
+
+let get_locations t =
+  let l = ref [] in
+  get_locations l t;
+  !l
 
   (*********************)
   (* File input/output *)
@@ -715,36 +794,39 @@ let () =
       get_node_proved node_id any in
     iter_the_files send_node root_node
 
+
   (* -- send the task -- *)
   let task_of_id d id =
     let task = get_task d.cont.controller_session id in
     let tables = get_tables d.cont.controller_session id in
+    (* This function also send source locations associated to the task *)
+    let loc_color_list = get_locations task in
     Pp.string_of
       (Driver.print_task ~cntexample:false ?name_table:tables d.task_driver)
-      task
+      task, loc_color_list
 
   let send_task nid =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-       let s = task_of_id d id in
-       P.notify (Task (nid,s))
+       let s, list_loc = task_of_id d id in
+       P.notify (Task (nid, s, list_loc))
     | ATh t ->
-       P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string))
+       P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
     | APa pid ->
        let pa = get_proof_attempt_node  d.cont.controller_session pid in
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s = task_of_id d parid in
-       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n"))
+       let s, list_loc = task_of_id d parid in
+       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
     | AFile f ->
-       P.notify (Task (nid, "File " ^ f.file_name))
+       P.notify (Task (nid, "File " ^ f.file_name, []))
     | ATn tid ->
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
-       let s = task_of_id d parid in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n"))
+       let s, list_loc = task_of_id d parid in
+       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 

@@ -540,7 +540,7 @@ let interpNotif (n: notification) =
      PE.error_print_msg "Notification File_contents not handled yet"
   | Next_Unproven_Node_Id (_nid1,_nid2) ->
      PE.error_print_msg "Notification Next_Unproven_Node_Id not handled yet"
-  | Task (nid, task) ->
+  | Task (nid, task, _list_loc) -> (* TODO add color on sources *)
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->
       TaskList.remove_node (string_of_int nid)

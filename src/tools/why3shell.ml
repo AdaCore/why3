@@ -242,7 +242,8 @@ let treat_notification fmt n =
     fprintf fmt "got a Dead notification not yet supported@."
   | File_contents _ -> assert false (* TODO *)
   | Next_Unproven_Node_Id _ -> assert false (* TODO *)
-  | Task (id, s)                  ->
+  | Task (id, s, _list_loc)       ->
+    (* coloring the source is useless in shell *)
     try
       let node = Hnode.find nodes id in
       node.node_task <- Some s;

@@ -228,6 +228,38 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
+(****************************)
+(* Color handling in source *)
+(****************************)
+
+(* For each view, we have to recreate the tags *)
+let create_colors v =
+  let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
+
+  let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
+
+  let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
+
+  let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+      ~name:"error_tag" [`BACKGROUND gconfig.error_color] in
+  let _ : GText.tag = premise_tag v in
+  let _ : GText.tag = neg_premise_tag v in
+  let _ : GText.tag = goal_tag v in
+  let _ : GText.tag = error_tag v in
+  ()
+
+(* Erase all the source location tags in a source file *)
+let erase_color_loc (v:GSourceView2.source_view) =
+  let buf = v#buffer in
+  buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
+
+
 (*******************)
 (* Graphical tools *)
 (*******************)
@@ -252,6 +284,15 @@ let exit_function_unsafe () =
 *)
 let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
   Hstr.create 14
+
+(* The corresponding file does not have a source view *)
+exception Nosourceview of string
+
+(* This returns the source_view of a file *)
+let get_source_view (file: string) : GSourceView2.source_view =
+  match Hstr.find source_view_table file with
+  | (_, v, _, _) -> v
+  | exception Not_found -> raise (Nosourceview file)
 
 (* Saving function for sources *)
 let save_sources () =
@@ -670,6 +711,9 @@ let create_source_view =
             with Not_found -> () ) in
         Gconfig.add_modifiable_mono_font_view source_view#misc;
         source_view#source_buffer#set_language why_lang;
+        (* We have to create the tags for background colors for each view.
+           They are not reusable from the other views.  *)
+        create_colors source_view;
         Gconfig.set_fonts ()
       end in
   create_source_view
@@ -816,6 +860,46 @@ let () =
 let (_ : GtkSignal.id) =
   replay_menu_item#connect#activate
     ~callback:(fun () -> send_request Replay_req)
+
+(********************)
+(* Locations colors *)
+(********************)
+
+(* This apply a background [color] on a location given by its file view [v] line
+   [l] beginning char [b] and end char [e]. *)
+let color_loc (v:GSourceView2.source_view) ~color l b e =
+  let buf = v#buffer in
+  let top = buf#start_iter in
+  let start = top#forward_lines (l-1) in
+  let start = start#forward_chars b in
+  let stop = start#forward_chars (e-b) in
+  buf#apply_tag_by_name ~start ~stop color
+
+let convert_color (color: color): string =
+  match color with
+  | Neg_premise_color -> "neg_premise_tag"
+  | Premise_color -> "premise_tag"
+  | Goal_color -> "goal_tag"
+
+(* Add a color tag on the right locations on the correct file.
+   If the file was not open yet, nothing is done *)
+let color_loc ~color loc =
+  let f, l, b, e = Loc.get loc in
+  try
+    let v: GSourceView2.source_view = get_source_view f in
+    let color = convert_color color in
+    color_loc ~color v l b e
+  with
+  | Nosourceview _ ->
+      (* If the file is not present do nothing *)
+      ()
+
+(* Erase the colors and apply the colors given by l (which come from the task)
+   to appropriate source files *)
+let apply_loc_on_source (l: (Loc.position * color) list) =
+  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
+  List.iter (fun (loc, color) ->
+    color_loc ~color loc) l
 
 (**************************)
 (* Graphical proof status *)
@@ -1031,7 +1115,7 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         send_request (Get_task id)
-    | _ ->  send_request (Get_task id)
+    | _ -> send_request (Get_task id)
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
@@ -1283,10 +1367,11 @@ let treat_notification n =
       if !quit_on_saved = true then
         exit_function_safe ()
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s)                  ->
+  | Task (id, s, list_loc)        ->
      if_selected_alone
        id
        (fun _ -> task_view#source_buffer#set_text s;
+                 apply_loc_on_source list_loc;
                  (* scroll to end of text *)
                  task_view#scroll_to_mark `INSERT)
   | File_contents (file_name, content) ->

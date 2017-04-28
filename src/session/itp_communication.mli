@@ -51,6 +51,14 @@ type node_type =
   | NGoal
   | NProofAttempt
 
+(* Used to give colors to the parts of the source code that corresponds to the
+   following property in the current task. For example, the code corresponding
+   to the goal of the task will have Goal_color in the source code. *)
+type color =
+  | Neg_premise_color
+  | Premise_color
+  | Goal_color
+
 type update_info =
   | Proved of bool
   | Proof_status_change of
@@ -78,8 +86,10 @@ type notification =
   (* an informative message, can be an error message *)
   | Dead         of string
   (* server exited *)
-  | Task         of node_ID * string
-  (* the node_ID's task *)
+  | Task         of node_ID * string * (Loc.position * color) list
+  (* the node_ID's task together with information that allows to color the
+     source code corresponding to different part of the task (premise, goal,
+     etc) *)
   | File_contents of string * string
   (* File_contents (filename, contents) *)
 

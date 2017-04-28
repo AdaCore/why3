@@ -270,6 +270,59 @@ let convert_message (m: message_notification) =
       Obj ["mess_notif", cc m;
            "information", String s]
 
+let convert_color (color: color) : Json_base.value =
+  Json_base.String (
+    match color with
+    | Neg_premise_color -> "Neg_premise_color"
+    | Premise_color -> "Premise_color"
+    | Goal_color -> "Goal_color")
+
+let convert_loc (loc: Loc.position) : Json_base.value =
+  let (file, line, col1, col2) = Loc.get loc in
+  Json_base.Obj ["file", Json_base.String file;
+                 "line", Json_base.Int line;
+                 "col1", Json_base.Int col1;
+                 "col2", Json_base.Int col2]
+
+let convert_loc_color (loc,color: Loc.position * color) : Json_base.value =
+  let loc = convert_loc loc in
+  let color = convert_color color in
+  Json_base.Obj ["loc", loc; "color", color]
+
+let convert_list_loc (l: (Loc.position * color) list) : Json_base.value =
+  let list_of_loc = List.map convert_loc_color l in
+  Json_base.Array list_of_loc
+
+exception Notcolor
+
+let parse_color (j: Json_base.value) : color =
+  match j with
+  | String "Neg_premise_color" -> Neg_premise_color
+  | String "Premise_color"     -> Premise_color
+  | String "Goal_color"        -> Goal_color
+  | _ -> raise Notcolor
+
+exception Notposition
+
+let parse_loc (j: Json_base.value) : Loc.position =
+  match j with
+  | Obj ["file", String file;
+         "line", Int line;
+         "col1", Int col1;
+         "col2", Int col2] ->
+    Loc.user_position file line col1 col2
+  | _ -> raise Notposition
+
+let parse_loc_color (j: Json_base.value): Loc.position * color =
+  match j with
+  | Obj ["loc", loc; "color", color] -> (parse_loc loc, parse_color color)
+  | _ -> raise Notposition
+
+let parse_list_loc (j: Json_base.value): (Loc.position * color) list =
+  match j with
+  | Array l -> List.map parse_loc_color l
+  | _ -> raise Notposition
+
 let print_notification_to_json (n: notification): Json_base.value =
   let cc = convert_notification_constructor in
   match n with
@@ -302,10 +355,11 @@ let print_notification_to_json (n: notification): Json_base.value =
   | Dead s ->
       Obj ["notification", cc n;
            "message", String s]
-  | Task (nid, s) ->
+  | Task (nid, s, list_loc) ->
       Obj ["notification", cc n;
            "node_ID", Int nid;
-           "task", String s]
+           "task", String s;
+           "list_loc", convert_list_loc list_loc]
   | File_contents (f, s) ->
       Obj ["notification", cc n;
            "file", String f;
@@ -575,8 +629,9 @@ let parse_notification constr l =
   | "Dead", ["message", String s] ->
       Dead s
   | "Task", ["node_ID", Int nid;
-             "task", String s] ->
-       Task (nid, s)
+             "task", String s;
+             "loc_list", l] ->
+       Task (nid, s, parse_list_loc l)
   | "Next_Unproven_Node_Id", [ "node_ID", Int nid1;
                                "node_ID", Int nid2 ] ->
      Next_Unproven_Node_Id (nid1, nid2)
