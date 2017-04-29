@@ -9,4 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val track : Pdecl.known_map -> Term.term -> Term.term
+val inspect : Pdecl.known_map -> Term.term list -> Term.term list
+
+val inject : Pdecl.known_map -> Term.term -> Term.term
