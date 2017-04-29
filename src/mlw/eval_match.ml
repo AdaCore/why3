@@ -150,7 +150,8 @@ let rec get_index uf n =
     should NEVER use a projection with a fragile instantiated value type.
 *)
 
-let add_var kn pins v =
+let add_var kn pins vl v =
+  let rv = ref vl in
   let rp = ref pins in
   let rec down ty = match ty.ty_node with
     | Tyvar _ -> V
@@ -166,6 +167,7 @@ let add_var kn pins v =
             let ty = Ty.ty_inst sbs vf.pv_vs.vs_ty in
             let nm = bn ^ "_" ^ f.rs_name.id_string in
             let v = create_vsymbol (id_fresh nm) ty in
+            rv := v :: !rv;
             let mv = Mvs.add vf.pv_vs (t_var v) mv in
             Mls.add (ls_of_rs f) (v, down ty) m, mv in
           let pjs, mv = List.fold_left add_field
@@ -188,7 +190,7 @@ let add_var kn pins v =
           mkC (List.fold_left add_constr Mls.empty d.itd_constructors)
   in
   let c = down v.vs_ty in
-  (* do not inline *) c, !rp
+  (* do not inline *) c, !rp, !rv
 
 let cap_valid uf c =
   let rec down = function
@@ -519,14 +521,14 @@ let rec track kn uf pins caps pos f = match f.t_node with
       let valid = match q with
         | Tforall -> not pos
         | Texists -> pos in
-      let caps, pins =
-        if valid then caps, pins else
-        let add (caps, pins) v =
-          let c, pins = add_var kn pins v in
-          add_cap v c caps, pins in
-        List.fold_left add (caps, pins) vl in
+      let caps, pins, vl =
+        if valid then caps, pins, vl else
+        let add v (caps, pins, vl) =
+          let c, pins, vl = add_var kn pins vl v in
+          add_cap v c caps, pins, v::vl in
+        List.fold_right add vl (caps, pins, []) in
       let f0, uf = track kn uf pins caps pos f0 in
-      let f0 = t_quant q (t_close_quant vl tt f0) in
+      let f0 = t_quant_close_simp q vl tt f0 in
       t_label_copy f f0, uf
   | Tbinop (Tand,f1,f2) ->
       let f1, uf1 = track kn uf  pins caps pos f1 in
