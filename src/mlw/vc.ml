@@ -107,7 +107,7 @@ let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
 let expl_variant   = Ident.create_label "expl:variant decrease"
-let _expl_type_inv  = Ident.create_label "expl:type invariant"
+let expl_type_inv  = Ident.create_label "expl:type invariant"
 
 let lab_has_expl lab =
   Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
@@ -184,6 +184,17 @@ let sp_let v t sp rd =
   if pv_is_unit v then t_subst_single v.pv_vs t_void sp else
   if Spv.mem v rd then sp_and (t_equ (t_var v.pv_vs) t) sp else
   t_let_close_simp v.pv_vs t sp
+
+(* affected program variables *)
+
+let ity_affected wr ity =
+  Util.any ity_rch_fold (Mreg.contains wr) ity
+
+let pv_affected wr v = ity_affected wr v.pv_ity
+
+let pvs_affected wr pvs =
+  if Mreg.is_empty wr then Spv.empty
+  else Spv.filter (pv_affected wr) pvs
 
 (* variant decrease preconditions *)
 
@@ -422,6 +433,13 @@ let k_havoc eff k =
 let complete_xpost cty {eff_raises = xss} skip =
   Mxs.set_union (Mxs.set_inter cty.cty_xpost xss)
     (Mxs.map (fun () -> []) (Mxs.set_diff xss skip))
+
+let inv_of_pvs {known_map = kn} loc pvs =
+  let rec expl f = match f.t_node with
+    | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
+    | _ -> t_map expl (t_label ?loc Slab.empty f) in
+  let tl = List.map (fun v -> t_var v.pv_vs) (Spv.elements pvs) in
+  List.map expl (Typeinv.inspect kn tl)
 
 (* translate the expression [e] into a k-expression:
    [lps] stores the variants of outer recursive functions
@@ -707,14 +725,27 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
     let v, xq = wp_of_post expl_xpost xs.xs_ity ql in
     (new_exn env, v), xq) xq in
   let xmap = Mxs.set_union (Mxs.map fst xq) xmap in
-  let k = Kseq (k_expr env lps e res xmap, 0, Kstop q) in
-  let k = Mxs.fold (fun _ ((i,_), xq) k ->
-    Kseq (k, i, Kstop xq)) xq k in
+  let rds = List.fold_right Spv.add cty.cty_args cty.cty_effect.eff_reads in
+  let aff = pvs_affected cty.cty_effect.eff_covers rds in
+  let pinv = inv_of_pvs env e.e_loc rds in
+  let qinv = inv_of_pvs env e.e_loc aff in
+  let add_qinv res q =
+    let k = Kstop q in
+    let check f k = Kpar (Kstop f, Kseq (Kval ([], f), 0, k)) in
+    (* any write in e can potentially produce a broken result *)
+    let k = if Mreg.is_empty e.e_effect.eff_writes then k else
+      let rinv = inv_of_pvs env e.e_loc (Spv.singleton res) in
+      List.fold_right check rinv k in
+    List.fold_right check qinv k in
+  let k = Kseq (k_expr env lps e res xmap, 0, add_qinv res q) in
+  let k = Mxs.fold (fun _ ((i,r), xq) k ->
+    Kseq (k, i, add_qinv r xq)) xq k in
   (* move the postconditions under the VCgen tag *)
   let k = if Slab.mem sp_label e.e_label then Ktag (SP, k) else
           if Slab.mem wp_label e.e_label then Ktag (WP, k) else k in
   let k = bind_oldies oldies (bind_oldies cty.cty_oldies k) in
-  Kseq (Kval (cty.cty_args, sp_of_pre cty.cty_pre), 0, k)
+  let p = List.fold_right sp_and pinv (sp_of_pre cty.cty_pre) in
+  Kseq (Kval (cty.cty_args, p), 0, k)
 
 and k_rec env lps rdl =
   let k_rd {rec_fun = c; rec_varl = varl} =
@@ -848,15 +879,6 @@ let reflow vc_wp k =
 (* a "destination map" maps program variables (pre-effect state)
    to fresh vsymbols (post-effect state) *)
 
-let ity_affected wr ity =
-  Util.any ity_rch_fold (Mreg.contains wr) ity
-
-let pv_affected wr v = ity_affected wr v.pv_ity
-
-let pvs_affected wr pvs =
-  if Mreg.is_empty wr then Spv.empty
-  else Spv.filter (pv_affected wr) pvs
-
 let dst_of_wp wr wp =
   if Mreg.is_empty wr then Mpv.empty else
   let clone_affected v _ =
@@ -920,9 +942,11 @@ let name_regions kn wr dst =
 let cons_t_simp nt t fl =
   if t_equal nt t then fl else t_equ nt t :: fl
 
+(*
 let sensitive itd {pv_vs = f} =
   not itd.itd_its.its_private &&
   List.exists (fun i -> t_v_occurs f i > 0) itd.itd_invariant
+*)
 
 let rec havoc kn wr regs t ity fl =
   if not (ity_affected wr ity) then t, fl else
@@ -938,20 +962,12 @@ let rec havoc kn wr regs t ity fl =
         match Mpv.find_opt fd wfs with
         | Some None -> fl
         | Some (Some {pv_vs = v}) ->
-            if sensitive itd fd then begin
-              Warning.emit "invariant-breaking updates are not yet supported";
-              fl (* TODO: strong invariants *)
-            end else
             let nt = fs_app (ls_of_rs rs) [nt] v.vs_ty in
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
             let t, fl = havoc kn wr regs (t_var v) ity fl in
             cons_t_simp nt t fl
         | None ->
             let ity = ity_full_inst isb rs.rs_cty.cty_result in
-            if ity_affected wr ity && sensitive itd fd then begin
-              Warning.emit "invariant-breaking updates are not yet supported";
-              fl (* TODO: strong invariants *)
-            end else
             let ls = ls_of_rs rs and ty = Some (ty_of_ity ity) in
             let t = t_app ls [t] ty and nt = t_app ls [nt] ty in
             let t, fl = havoc kn wr regs t ity fl in
@@ -1286,6 +1302,7 @@ let mk_vc_decl kn id f =
     Slab.add (Ident.create_label ("expl:VC for " ^ nm)) label in
   let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
+  let f = Typeinv.inject kn f in
   let f = if Debug.test_flag no_eval then f else
     Eval_match.eval_match kn f in
   create_pure_decl (create_prop_decl Pgoal pr f)
