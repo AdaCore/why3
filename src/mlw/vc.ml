@@ -441,6 +441,9 @@ let inv_of_pvs {known_map = kn} loc pvs =
   let tl = List.map (fun v -> t_var v.pv_vs) (Spv.elements pvs) in
   List.map expl (Typeinv.inspect kn tl)
 
+let assume_inv inv k = Kseq (Kval ([], inv), 0, k)
+let assert_inv inv k = Kpar (Kstop inv, assume_inv inv k)
+
 (* translate the expression [e] into a k-expression:
    [lps] stores the variants of outer recursive functions
    [res] names the result of the normal execution of [e]
@@ -472,9 +475,22 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
               let d = decrease env loc lab expl_variant ovl nvl in
               wp_and d (wp_of_pre loc lab pl), renew_oldies oldies
           | pl -> wp_of_pre loc lab pl, (oldies, Mvs.empty) in
+        let trusted = match ce.c_node with
+          | (Capp ({rs_logic = RLls ls}, _) | Cpur (ls, _))
+            when ce.c_cty.cty_args = [] (* fully applied *) ->
+              Typeinv.is_trusted_constructor env.known_map ls ||
+              Typeinv.is_trusted_projection env.known_map ls e.e_ity
+          | _ -> false in
+        let rds = cty.cty_effect.eff_reads in
+        let aff = pvs_affected cty.cty_effect.eff_covers rds in
+        let qinv = inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
           let sp = sp_of_post loc lab expl v ql in
           let sp = t_subst sbs sp (* rename oldies *) in
+          let sp = if trusted then sp else
+            let rinv = inv_of_pvs env e.e_loc (Spv.singleton v) in
+            let sp = List.fold_right sp_and rinv sp in
+            List.fold_right sp_and qinv sp in
           match term_of_post ~prop:false v.pv_vs sp with
           | Some (t, sp) -> Klet (v, t_lab t, sp)
           | None -> Kval ([v], sp) in
@@ -492,6 +508,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
         let k = if pre = [] then k else Kpar (Kstop p, k) in
+        let k = if trusted then k else
+          let pinv = inv_of_pvs env e.e_loc rds in
+          List.fold_right assert_inv pinv k in
         begin match ce.c_node with
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
           | _ -> k end
@@ -729,14 +748,14 @@ and k_fun env lps ?(oldies=Mpv.empty) ?(xmap=Mxs.empty) cty e =
   let aff = pvs_affected cty.cty_effect.eff_covers rds in
   let pinv = inv_of_pvs env e.e_loc rds in
   let qinv = inv_of_pvs env e.e_loc aff in
-  let add_qinv res q =
-    let k = Kstop q in
-    let check f k = Kpar (Kstop f, Kseq (Kval ([], f), 0, k)) in
-    (* any write in e can potentially produce a broken result *)
-    let k = if Mreg.is_empty e.e_effect.eff_writes then k else
-      let rinv = inv_of_pvs env e.e_loc (Spv.singleton res) in
-      List.fold_right check rinv k in
-    List.fold_right check qinv k in
+  let add_qinv v q =
+    (* any write in e can potentially produce a broken result.
+       In absence of writes, the result cannot be broken, but
+       we prefer to add the redundant commits and let them be
+       eliminated by Typeinv.inject later. *)
+    let rinv = inv_of_pvs env e.e_loc (Spv.singleton v) in
+    let k = List.fold_right assert_inv rinv (Kstop q) in
+    List.fold_right assert_inv qinv k in
   let k = Kseq (k_expr env lps e res xmap, 0, add_qinv res q) in
   let k = Mxs.fold (fun _ ((i,r), xq) k ->
     Kseq (k, i, add_qinv r xq)) xq k in

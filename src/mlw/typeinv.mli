@@ -9,6 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
+val is_trusted_constructor : Pdecl.known_map -> Term.lsymbol -> bool
+val is_trusted_projection  : Pdecl.known_map -> Term.lsymbol -> Ity.ity -> bool
+
 val inspect : Pdecl.known_map -> Term.term list -> Term.term list
 
 val inject : Pdecl.known_map -> Term.term -> Term.term

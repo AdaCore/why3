@@ -29,20 +29,27 @@ let its_solid s =
   List.for_all (fun f -> f.its_frozen) s.its_arg_flg &&
   List.for_all (fun f -> f.its_frozen) s.its_reg_flg
 
-let is_fragile_constructor ls =
+let is_trusted_constructor _kn ls =
   ls.ls_constr > 0 &&
   match (Opt.get ls.ls_value).ty_node with
   | Tyapp (s,_) -> not (its_solid (restore_its s))
   | _ -> assert false
 
-let is_fragile_projection ls =
+let is_trusted_projection kn ls ity =
   ls.ls_constr = 0 &&
   try let rs = restore_rs ls in
       if rs.rs_field = None then false else
       match (List.hd rs.rs_cty.cty_args).pv_ity.ity_node with
-      | Ityreg {reg_its = s} | Ityapp (s,_,_) -> not (its_solid s)
+      | Ityreg {reg_its = s} | Ityapp (s,_,_) ->
+          not (its_solid s) &&
+          (* we don't trust projections of sum types that produce
+             fragile values, since they may break cap_of_term *)
+          (not (ity_fragile ity) ||
+            List.length (Eval_match.ts_constructors kn s.its_ts) <= 1)
       | _ -> assert false
   with Not_found -> false
+
+let t_ity t = ity_of_ty_pure (Opt.get t.t_ty)
 
 (* Integer-indexed "pins" represent individual values whose
    invariant may be broken. Fresh pins are assigned to values
@@ -236,9 +243,9 @@ let inspect kn tl =
         let c1 = down caps pjl t1 in
         let c2 = down caps pjl t2 in
         ignore (cap_join c1 c2); V
-    | Tapp (ls,[t1]) when is_fragile_projection ls ->
+    | Tapp (ls,[t1]) when is_trusted_projection kn ls (t_ity t) ->
         down caps (ls::pjl) t1
-    | Tapp (ls,tl) when is_fragile_constructor ls ->
+    | Tapp (ls,tl) when is_trusted_constructor kn ls ->
         begin match pjl with
         | pj::pjl ->
             let fdl = Eval_match.cs_fields kn ls in
@@ -455,9 +462,9 @@ let cap_of_term kn uf pins caps t =
         let t2, c2 = down caps pjl t2 in
         ignore (cap_join uf c1 c2);
         t_label_copy t (t_equ t1 t2), V
-    | Tapp (ls,[t1]) when is_fragile_projection ls ->
+    | Tapp (ls,[t1]) when is_trusted_projection kn ls (t_ity t) ->
         down caps ((ls,t)::pjl) t1
-    | Tapp (ls,tl) when is_fragile_constructor ls ->
+    | Tapp (ls,tl) when is_trusted_constructor kn ls ->
         begin match pjl with
         | (pj,t0)::pjl ->
             let fdl = Eval_match.cs_fields kn ls in
