@@ -49,7 +49,9 @@ let is_trusted_projection kn ls ity =
       | _ -> assert false
   with Not_found -> false
 
-let t_ity t = ity_of_ty_pure (Opt.get t.t_ty)
+let is_trusted_projection_t kn ls t = match t.t_ty with
+  | Some ty -> is_trusted_projection kn ls (ity_of_ty_pure ty)
+  | None -> false
 
 (* Integer-indexed "pins" represent individual values whose
    invariant may be broken. Fresh pins are assigned to values
@@ -243,7 +245,7 @@ let inspect kn tl =
         let c1 = down caps pjl t1 in
         let c2 = down caps pjl t2 in
         ignore (cap_join c1 c2); V
-    | Tapp (ls,[t1]) when is_trusted_projection kn ls (t_ity t) ->
+    | Tapp (ls,[t1]) when is_trusted_projection_t kn ls t ->
         down caps (ls::pjl) t1
     | Tapp (ls,tl) when is_trusted_constructor kn ls ->
         begin match pjl with
@@ -293,7 +295,7 @@ let inspect kn tl =
         ignore (down caps [] f); V
     | Ttrue | Tfalse -> V
   in
-  let add_term t = cap_valid (down Mvs.empty [] t) in
+  let add_term t = ignore (down Mvs.empty [] t) in
   List.iter add_term tl;
   let commit pin =
     let f = ps_app ls_valid [pin.p_leaf] in
@@ -462,7 +464,7 @@ let cap_of_term kn uf pins caps t =
         let t2, c2 = down caps pjl t2 in
         ignore (cap_join uf c1 c2);
         t_label_copy t (t_equ t1 t2), V
-    | Tapp (ls,[t1]) when is_trusted_projection kn ls (t_ity t) ->
+    | Tapp (ls,[t1]) when is_trusted_projection_t kn ls t ->
         down caps ((ls,t)::pjl) t1
     | Tapp (ls,tl) when is_trusted_constructor kn ls ->
         begin match pjl with

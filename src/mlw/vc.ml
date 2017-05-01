@@ -434,15 +434,24 @@ let complete_xpost cty {eff_raises = xss} skip =
   Mxs.set_union (Mxs.set_inter cty.cty_xpost xss)
     (Mxs.map (fun () -> []) (Mxs.set_diff xss skip))
 
-let inv_of_pvs {known_map = kn} loc pvs =
-  let rec expl f = match f.t_node with
-    | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
-    | _ -> t_map expl (t_label ?loc Slab.empty f) in
-  let tl = List.map (fun v -> t_var v.pv_vs) (Spv.elements pvs) in
-  List.map expl (Typeinv.inspect kn tl)
+let rec explain_inv loc f = match f.t_node with
+  | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
+  | _ -> t_map (explain_inv loc) (t_label ?loc Slab.empty f)
+
+let inv_of_pvs =
+  let a = create_tvsymbol (id_fresh "a") in
+  let ps_dummy = create_psymbol (id_fresh "dummy") [ty_var a] in
+  let mk_dummy v = ps_app ps_dummy [t_var v.pv_vs] in
+  fun {known_map = kn} loc pvs ->
+    let tl = List.map mk_dummy (Spv.elements pvs) in
+    List.map (explain_inv loc) (Typeinv.inspect kn tl)
 
 let assume_inv inv k = Kseq (Kval ([], inv), 0, k)
 let assert_inv inv k = Kpar (Kstop inv, assume_inv inv k)
+
+let inv_of_pure {known_map = kn} loc fl k =
+  let add f k = assert_inv (explain_inv loc f) k in
+  List.fold_right add (Typeinv.inspect kn fl) k
 
 (* translate the expression [e] into a k-expression:
    [lps] stores the variants of outer recursive functions
@@ -483,14 +492,15 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           | _ -> false in
         let rds = cty.cty_effect.eff_reads in
         let aff = pvs_affected cty.cty_effect.eff_covers rds in
-        let qinv = inv_of_pvs env e.e_loc aff in
+        let pinv = if trusted then [] else inv_of_pvs env e.e_loc rds in
+        let qinv = if trusted then [] else inv_of_pvs env e.e_loc aff in
         let k_of_post expl v ql =
           let sp = sp_of_post loc lab expl v ql in
           let sp = t_subst sbs sp (* rename oldies *) in
-          let sp = if trusted then sp else
-            let rinv = inv_of_pvs env e.e_loc (Spv.singleton v) in
-            let sp = List.fold_right sp_and rinv sp in
-            List.fold_right sp_and qinv sp in
+          let rinv = if trusted then [] else
+            inv_of_pvs env e.e_loc (Spv.singleton v) in
+          let sp = List.fold_right sp_and rinv sp in
+          let sp = List.fold_right sp_and qinv sp in
           match term_of_post ~prop:false v.pv_vs sp with
           | Some (t, sp) -> Klet (v, t_lab t, sp)
           | None -> Kval ([v], sp) in
@@ -508,9 +518,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
         let k = if pre = [] then k else Kpar (Kstop p, k) in
-        let k = if trusted then k else
-          let pinv = inv_of_pvs env e.e_loc rds in
-          List.fold_right assert_inv pinv k in
+        let k = List.fold_right assert_inv pinv k in
         begin match ce.c_node with
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
           | _ -> k end
@@ -667,19 +675,23 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         Kseq (k_expr env lps e0 v xmap, 0, Kcont i)
     | Eassert (Assert, f) ->
         let f = vc_expl None lab expl_assert f in
-        Kseq (Kcut f, 0, k_unit res)
+        let k = Kseq (Kcut f, 0, k_unit res) in
+        inv_of_pure env e.e_loc [f] k
     | Eassert (Assume, f) ->
         let f = vc_expl None lab expl_assume f in
-        Kval ([res], f)
+        let k = Kval ([res], f) in
+        inv_of_pure env e.e_loc [f] k
     | Eassert (Check, f) ->
         let f = vc_expl None lab expl_check f in
-        Kpar (Kstop f, k_unit res)
+        let k = Kpar (Kstop f, k_unit res) in
+        inv_of_pure env e.e_loc [f] k
     | Eghost e0 ->
         k_expr env lps e0 res xmap
     | Epure t ->
         let t = if t.t_ty <> None then t_lab t else
           t_if_simp (t_lab t) t_bool_true t_bool_false in
-        Klet (res, t, t_true)
+        let k = Klet (res, t, t_true) in
+        inv_of_pure env e.e_loc [t] k
     | Eabsurd ->
         Kstop (vc_expl loc lab expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
