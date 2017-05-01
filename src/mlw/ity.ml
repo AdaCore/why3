@@ -345,7 +345,8 @@ let ity_r_frozen s ity =
 
 (** detect fragile types *)
 
-let rec ity_fragile liable () ity = match ity.ity_node with
+let rec ity_fragile liquid_vars liable () ity =
+  match ity.ity_node with
   | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl}
   | Ityapp (s,tl,rl) ->
       (* can we be broken? *)
@@ -357,15 +358,18 @@ let rec ity_fragile liable () ity = match ity.ity_node with
       (* reachable frozen components cannot be broken *)
       let fn () x t =
         if x.its_exposed && not x.its_frozen then
-          ity_fragile (liable || x.its_liable) () t in
+          ity_fragile liquid_vars (liable || x.its_liable) () t in
       its_fold fn () s tl rl
+  | Ityvar (_, false) when liquid_vars && liable ->
+      (* non-pure type variables are considered liquid *)
+      raise Exit
   | Ityvar _ -> ()
 
-let ity_liquid ity =
-  try ity_fragile true () ity; false with Exit -> true
+let ity_liquid liquid_vars ity =
+  try ity_fragile liquid_vars true () ity; false with Exit -> true
 
-let ity_fragile ity =
-  try ity_fragile false () ity; false with Exit -> true
+let ity_fragile liquid_vars ity =
+  try ity_fragile liquid_vars false () ity; false with Exit -> true
 
 (* traversal functions on non-ghost regions *)
 
@@ -675,7 +679,7 @@ let fields_of_invariant ftv flds invl =
         => known regions cannot appear in the added fields
            in a refining type (no field aliases)
       cannot have its own invariant broken
-      commits fields on construction and freezes the non-liables
+      commits fields on construction and freezes the liable fields
       cannot have broken type parameters or broken liable fields
       however, a mutable region can break a non-liable field
         => not fragile, but can have fragile non-liable fields
@@ -696,6 +700,9 @@ let fields_of_invariant ftv flds invl =
       can be broken from a liable reachable non-frozen component
       can have broken compontents (reachable and non-frozen)
         => fragile if has a liable mutable/liquid field
+      can have a mutable fragile snapshot field, undetectable
+        from type parameters or regions, breakable by assignment
+        => fragile if has a non-liable mutable fragile field
 
     free mutable, free immutable non-recursive:
       afrz, aexp, albl, afxd, avis are computed from the known fields
@@ -740,9 +747,10 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
       (nfr && not (Sreg.subset rexp rfrz)) in
   let frg = if priv || (nfr && not mut) then false else
     if nfr && mut then (* non-free mutable *)
-      Mpv.exists (fun f m -> m || ity_liquid f.pv_ity) flbl
+      Mpv.exists (fun f m -> m || ity_liquid true f.pv_ity) flbl ||
+      Mpv.exists (fun f m -> m && ity_fragile true f.pv_ity) fout
     else (* free: can have undetectable broken fields *)
-      Mpv.exists (fun f _ -> ity_fragile f.pv_ity) fout in
+      Mpv.exists (fun f _ -> ity_fragile true f.pv_ity) flds in
   let afrz = if priv then sargs else if nfr && not mut
                                 then collect ity_rch_vars flds Stv.empty
                                 else collect ity_frz_vars flds Stv.empty in
@@ -761,6 +769,8 @@ let create_plain_variant_itysymbol id args flds =
   let flds = List.fold_left (fun acc flds ->
     Mpv.set_union acc (Mpv.map Util.ffalse flds)) Mpv.empty flds in
   create_plain_record_itysymbol ~priv:false ~mut:false id args flds []
+
+let ity_fragile ity = ity_fragile false ity
 
 (** pvsymbol creation *)
 
