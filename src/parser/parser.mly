@@ -908,6 +908,7 @@ ret_arg:
 | lqualid                               { PTtyapp ($1, []), Ity.MaskVisible }
 | quote_lident                          { PTtyvar $1, Ity.MaskVisible }
 | LEFTPAR RIGHTPAR                      { PTtuple [], Ity.MaskVisible }
+| LEFTBRC ty RIGHTBRC                   { PTpure  $2, Ity.MaskVisible }
 | LEFTPAR ret_sub RIGHTPAR              { PTparen (fst $2), snd $2 }
 | LEFTPAR comma_list2(ret_sub) RIGHTPAR { PTtuple (List.map fst $2),
                                     Ity.MaskTuple (List.map snd $2) }
