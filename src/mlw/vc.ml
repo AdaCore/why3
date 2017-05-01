@@ -499,11 +499,10 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           let sp = t_subst sbs sp (* rename oldies *) in
           let rinv = if trusted then [] else
             inv_of_pvs env e.e_loc (Spv.singleton v) in
-          let sp = List.fold_right sp_and rinv sp in
-          let sp = List.fold_right sp_and qinv sp in
           match term_of_post ~prop:false v.pv_vs sp with
-          | Some (t, sp) -> Klet (v, t_lab t, sp)
-          | None -> Kval ([v], sp) in
+          | Some (t, sp) ->
+              Klet (v, t_lab t, List.fold_right sp_and rinv sp)
+          | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
         let k = k_of_post expl_post res cty.cty_post in
         (* in abstract blocks, exceptions without postconditions
            escape from the block into the outer code. Otherwise,
@@ -515,6 +514,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = Mxs.fold2_inter (fun _ ql (i,v) k ->
           let xk = k_of_post expl_xpost v ql in
           Kpar(k, Kseq (xk, 0, Kcont i))) xq xmap k in
+        let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
         let k = if pre = [] then k else Kpar (Kstop p, k) in
