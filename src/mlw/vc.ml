@@ -101,6 +101,7 @@ let expl_xpost     = Ident.create_label "expl:exceptional postcondition"
 let expl_assume    = Ident.create_label "expl:assumption"
 let expl_assert    = Ident.create_label "expl:assertion"
 let expl_check     = Ident.create_label "expl:check"
+let expl_lemma     = Ident.create_label "expl:lemma"
 let expl_absurd    = Ident.create_label "expl:unreachable point"
 let expl_for_bound = Ident.create_label "expl:loop bounds"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
@@ -583,6 +584,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           let p = Kval (cty.cty_args, sp_of_pre cty.cty_pre) in
           let ax = Kseq (p, 0, bind_oldies cty.cty_oldies (Kstop q)) in
           Kseq (Kaxiom (k_havoc eff ax), 0, k) in
+        let add_axiom cty q k =
+          let pinv = inv_of_pvs env e.e_loc (cty_reads cty) in
+          List.fold_right assert_inv pinv (add_axiom cty q k) in
         let add_rs sm s c (vl,k) = match s.rs_logic with
           | RLls _ -> assert false (* not applicable *)
           | RLnone -> vl, k
@@ -1269,6 +1273,7 @@ let rec sp_expr kn k rdm dst = match k with
       t_true, Mint.singleton i (t_true, Mpv.empty), Mint.find i rdm
   | Kaxiom k ->
       let f = wp_expr kn k Mint.empty in
+      let f = vc_expl None Slab.empty expl_lemma f in
       let rd = t_freepvs (Mint.find 0 rdm) f in
       t_true, Mint.singleton 0 (f, Mpv.empty), rd
   | Ktag (Out out, k) ->
@@ -1318,7 +1323,9 @@ and wp_expr kn k q = match k with
   | Kcont i ->
       Mint.find i q
   | Kaxiom k ->
-      sp_implies (wp_expr kn k Mint.empty) (Mint.find 0 q)
+      let f = wp_expr kn k Mint.empty in
+      let f = vc_expl None Slab.empty expl_lemma f in
+      sp_implies f (Mint.find 0 q)
   | Ktag (Out out, k) ->
       wp_expr kn k (Mint.set_inter q out)
   | Ktag (SP, k) ->
