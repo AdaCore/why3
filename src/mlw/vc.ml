@@ -438,13 +438,18 @@ let rec explain_inv loc f = match f.t_node with
   | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
   | _ -> t_map (explain_inv loc) (t_label ?loc Slab.empty f)
 
-let inv_of_pvs =
+let inv_of_pvs, inv_of_loop =
   let a = create_tvsymbol (id_fresh "a") in
   let ps_dummy = create_psymbol (id_fresh "dummy") [ty_var a] in
   let mk_dummy v = ps_app ps_dummy [t_var v.pv_vs] in
-  fun {known_map = kn} loc pvs ->
-    let tl = List.map mk_dummy (Spv.elements pvs) in
-    List.map (explain_inv loc) (Typeinv.inspect kn tl)
+  let add_varl fl (t,_) = ps_app ps_dummy [t] :: fl in
+  (fun {known_map = kn} loc pvs ->
+    let fl = List.map mk_dummy (Spv.elements pvs) in
+    List.map (explain_inv loc) (Typeinv.inspect kn fl)),
+  (fun {known_map = kn} loc fl varl ->
+    let fl = List.fold_left add_varl fl varl in
+    List.map (explain_inv loc) (Typeinv.inspect kn fl))
+
 
 let assume_inv inv k = Kseq (Kval ([], inv), 0, k)
 let assert_inv inv k = Kpar (Kstop inv, assume_inv inv k)
@@ -706,10 +711,14 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
           let oldies, ovarl = oldify_variant varl in
           let d = decrease env loc lab expl_loop_vari ovarl varl in
           wp_and d keep, oldies in
-        let k = Kseq (k_expr env lps e1 res xmap, 0, Kstop keep) in
+        let iinv = inv_of_loop env e.e_loc invl varl in
+        let j = List.fold_right assert_inv iinv (Kstop init) in
+        let k = List.fold_right assert_inv iinv (Kstop keep) in
+        let k = Kseq (k_expr env lps e1 res xmap, 0, k) in
         let k = var_or_proxy e0 (fun v -> Kif (v, k, k_unit res)) in
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
-        Kpar (Kstop init, k_havoc e.e_effect k)
+        let k = List.fold_right assume_inv iinv k in
+        Kpar (j, k_havoc e.e_effect k)
     | Efor (v, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
         let a = t_var a and b = t_var b in
         let i = t_var v.pv_vs and one = t_nat_const 1 in
@@ -726,10 +735,14 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let init = t_subst_single v.pv_vs a init in
         let keep = t_subst_single v.pv_vs i_pl_1 keep in
         let last = t_subst_single v.pv_vs b_pl_1 prev in
-        let k = Kseq (k_expr env lps e1 res xmap, 0, Kstop keep) in
+        let iinv = inv_of_loop env e.e_loc invl [] in
+        let j = List.fold_right assert_inv iinv (Kstop init) in
+        let k = List.fold_right assert_inv iinv (Kstop keep) in
+        let k = Kseq (k_expr env lps e1 res xmap, 0, k) in
         let k = Kseq (Kval ([v], sp_and bounds prev), 0, k) in
         let k = Kpar (k, Kval ([res], last)) in
-        let k = Kpar (Kstop init, k_havoc e.e_effect k) in
+        let k = List.fold_right assume_inv iinv k in
+        let k = Kpar (j, k_havoc e.e_effect k) in
         if Slab.mem lf_label e.e_label then (* "liberal for"
           [ ASSUME a <= b ;
             [ STOP inv[a]
