@@ -860,7 +860,7 @@ let reflow vc_wp k =
         k, Mint.singleton i true
     | Kaxiom k ->
         let k, _ = mark vc_tag k in
-        k, Mint.singleton 0 true
+        Kaxiom k, Mint.singleton 0 true
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
         (* A switch from SP to WP is only sound when the kode
@@ -989,12 +989,6 @@ let name_regions kn wr dst =
 
 let cons_t_simp nt t fl =
   if t_equal nt t then fl else t_equ nt t :: fl
-
-(*
-let sensitive itd {pv_vs = f} =
-  not itd.itd_its.its_private &&
-  List.exists (fun i -> t_v_occurs f i > 0) itd.itd_invariant
-*)
 
 let rec havoc kn wr regs t ity fl =
   if not (ity_affected wr ity) then t, fl else
