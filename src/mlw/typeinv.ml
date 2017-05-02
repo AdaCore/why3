@@ -196,7 +196,9 @@ let inspect kn tl =
     | _ -> assert false
   in
   let rec add_pat caps c p =
-    match p.pat_node with
+    if isV c then
+      Mvs.set_union caps (Mvs.map (fun () -> V) p.pat_vars)
+    else match p.pat_node with
     | Pwild -> caps
     | Pvar v -> Mvs.add v c caps
     | Papp (cs,pl) -> begin match c with
@@ -204,7 +206,7 @@ let inspect kn tl =
             | Some cl -> List.fold_left2 add_pat caps cl pl
             | None -> caps (* impossible branch *) end
         | _ -> assert false (* can never happen *) end
-    | Por _ -> cap_valid c; caps
+    | Por (p,_) -> cap_valid c; add_pat caps V p
     | Pas (p,v) -> Mvs.add v c (add_pat caps c p)
   in
   let rec unwind c pjl0 = match c, pjl0 with
