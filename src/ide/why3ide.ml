@@ -390,12 +390,6 @@ let (_ : GtkSignal.id) = main_window#connect#destroy
 let (_ : GtkSignal.id) = main_window#event#connect#delete
   ~callback:(fun _ -> exit_function_safe (); true)
 
-(* 1.2 "View" menu
-
-   the entries in that menu are defined later
-
-*)
-
 (* 2. horizontal box contains:
    2.1 TODO: a tool box ?
    2.2 a horizontal paned [hp] containing:
@@ -561,7 +555,7 @@ let clear_tree_and_table goals_model =
 (* Menu items *)
 (**************)
 
-let (_ : GMenu.image_menu_item) =
+let () =
   let callback () =
     Gconfig.preferences gconfig;
     (* TODO:
@@ -584,18 +578,13 @@ let (_ : GMenu.image_menu_item) =
     let nb = gconfig.session_nb_processes in
     send_request (Set_max_tasks_req nb)
   in
-  file_factory#add_image_item ~label:"_Preferences" ~callback ()
+  let i = file_factory#add_image_item ~label:"_Preferences" ~callback () in
+  i#misc#set_tooltip_markup "Open Preferences Window"
 
-let (_ : GMenu.menu_item) =
-  file_factory#add_item ~key:GdkKeysyms._S "_Save session"
-    ~callback:(fun () -> send_request Save_req)
-
-let replay_menu_item : GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._R "_Replay all"
-
-let clean_menu_item : GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._L "C_Lean all"
-    ~callback:(fun _ -> send_request Clean_req)
+let () =
+  let i = file_factory#add_item "_Save session"
+    ~callback:(fun () -> send_request Save_req) in
+  i#misc#set_tooltip_markup "Save the current proof session on disk"
 
 let (_ : GMenu.menu_item) =
   file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
@@ -857,10 +846,6 @@ let () =
   Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
   send_request (Set_max_tasks_req n)
 
-let (_ : GtkSignal.id) =
-  replay_menu_item#connect#activate
-    ~callback:(fun () -> send_request Replay_req)
-
 (********************)
 (* Locations colors *)
 (********************)
@@ -992,9 +977,9 @@ let new_node ?parent ?(collapse=false) id name typ proved detached =
   else
     Hint.find node_id_to_gtree id
 
-(*******************************)
-(* commands of the "View" menu *)
-(*******************************)
+(*******************)
+(* The "View" menu *)
+(*******************)
 
 let view_menu = factory#add_submenu "_View"
 let view_factory = new GMenu.factory view_menu ~accel_group
@@ -1129,15 +1114,36 @@ let (_ : GtkSignal.id) =
      end (* ;
      command_entry#misc#grab_focus () *))
 
+
+(****************)
+(* Tools menu  *)
+(****************)
+
+let tools_menu = factory#add_submenu "_Tools"
+let tools_factory = new GMenu.factory tools_menu ~accel_group
+
+let replay_menu_item : GMenu.menu_item =
+  tools_factory#add_item ~key:GdkKeysyms._R "_Replay obsolete"
+let () = replay_menu_item#misc#set_tooltip_markup "Replay all obsolete proofs"
+let (_ : GtkSignal.id) =
+  replay_menu_item#connect#activate
+    ~callback:(fun () -> send_request Replay_req)
+
+
+let clean_menu_item : GMenu.menu_item =
+  tools_factory#add_item "Clean"
+    ~callback:(fun _ -> send_request Clean_req)
+let () = clean_menu_item#misc#set_tooltip_markup "Remove unsuccessful proofs or transformations that are below a proved goal"
+
 let remove_item: GMenu.menu_item =
-  file_factory#add_item "Remove"
+  tools_factory#add_item "Remove"
     ~callback:(fun () ->
       match get_selected_row_references () with
       | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
       | _ -> print_message "Select only one node to perform this action")
 
 let mark_obsolete_item: GMenu.menu_item =
-  file_factory#add_item "Mark obsolete"
+  tools_factory#add_item "Mark obsolete"
     ~callback:(fun () ->
       match get_selected_row_references () with
       | [r] -> let id = get_node_id r#iter in send_request (Mark_obsolete_req id)
@@ -1227,10 +1233,11 @@ let select_file ~request =
   d#destroy ()
 
 let open_item: GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._A "_Add file"
+  file_factory#add_item "_Add file in session"
     ~callback:(fun () ->
       select_file ~request:(fun f -> send_request (Add_file_req f)))
 
+(* what is it for ?
 let open_session: GMenu.menu_item =
   file_factory#add_item ~key:GdkKeysyms._O "Open session"
     ~callback:(fun () ->
@@ -1238,6 +1245,7 @@ let open_session: GMenu.menu_item =
         (* Clearing the ide tree *)
         clear_tree_and_table goals_model;
         send_request (Open_session_req f)))
+ *)
 
 (*************************)
 (* Notification Handling *)
