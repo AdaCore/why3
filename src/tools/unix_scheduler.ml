@@ -45,18 +45,22 @@ module Unix_scheduler = struct
 
      let prompt_delay = ref 0
      let print_prompt = ref true
-     let prompt = ref "> "
+     let prompt_string = ref "> "
 
      (* [main_loop interp] starts the scheduler. On idle, standard input is
         read.  When a complete line is read from stdin, it is passed
         as a string to the function [interp] *)
-     let main_loop interp =
+     let main_loop ?prompt interp =
+       begin match prompt with
+       | None -> ()
+       | Some s -> prompt_string := s
+       end;
        try
          while true do
            if !print_prompt then begin
              prompt_delay := !prompt_delay + 1;
-             if !prompt_delay = 1 then begin
-               Format.printf "%s@?" !prompt;
+             if !prompt_string <> "" && !prompt_delay = 1 then begin
+               Format.printf "%s@?" !prompt_string;
                prompt_delay := 0;
                print_prompt := false;
              end
@@ -87,7 +91,8 @@ module Unix_scheduler = struct
                    | (_,t,_) :: _ -> t -. time
                    (* or the time left until the next timeout otherwise *)
                  in
-                 let a,_,_ = Unix.select [Unix.stdin] [] [] delay in
+                 let a,_,_ = Unix.select
+                               (if !prompt_string <> "" then [Unix.stdin] else []) [] [] delay in
                  match a with
                  | [_] ->
                     let n = Unix.read Unix.stdin buf 0 256 in

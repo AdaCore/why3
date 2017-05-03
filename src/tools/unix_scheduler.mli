@@ -15,6 +15,6 @@ module Unix_scheduler : sig
     registered at the same time. Functions registered with higher
     priority will be called first. *)
 
-    val main_loop: (string -> 'a) -> unit
+    val main_loop: ?prompt:string -> (string -> 'a) -> unit
 
 end

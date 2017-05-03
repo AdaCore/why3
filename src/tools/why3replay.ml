@@ -391,7 +391,7 @@ let () =
     if found_obs then eprintf "[Warning] session is obsolete@.";
     if some_merge_miss then eprintf "[Warning] some goals were missed during merge@.";
     add_to_check_no_smoke some_merge_miss found_obs cont;
-    Unix_scheduler.Unix_scheduler.main_loop (fun _ -> ());
+    Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ());
     eprintf "main replayer loop exited unexpectedly@.";
     exit 1
   with
