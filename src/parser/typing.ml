@@ -939,11 +939,9 @@ let add_types muc tdl =
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
-  let d,metas = create_type_decl tdl in
-  List.fold_left
-    (fun uc (m,a) -> add_meta uc m a)
-    (add_pdecl ~vc:true muc d)
-    metas
+  let d = create_type_decl tdl in
+  add_pdecl ~vc:true muc d
+
 
 let tyl_of_params {muc_theory = tuc} pl =
   let ty_of_param (loc,_,gh,ty) =

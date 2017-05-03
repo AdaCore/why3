@@ -77,6 +77,7 @@ val create_float_decl : preid -> Number.float_format -> its_defn
 type pdecl = private {
   pd_node : pdecl_node;
   pd_pure : Decl.decl list;
+  pd_metas : (Theory.meta * Theory.meta_arg list) list;
   pd_syms : Sid.t;
   pd_news : Sid.t;
   pd_tag  : int;
@@ -89,7 +90,7 @@ and pdecl_node = private
   | PDpure
 
 val create_type_decl :
-  its_defn list -> pdecl * (Theory.meta * Theory.meta_arg list) list
+  its_defn list -> pdecl
 
 val create_let_decl : let_defn -> pdecl
 

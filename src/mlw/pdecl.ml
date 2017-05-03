@@ -133,6 +133,7 @@ let create_rec_variant_decl s csl =
 type pdecl = {
   pd_node : pdecl_node;
   pd_pure : decl list;
+  pd_metas : (Theory.meta * Theory.meta_arg list) list;
   pd_syms : Sid.t;
   pd_news : Sid.t;
   pd_tag  : int;
@@ -292,11 +293,13 @@ let get_syms node pure =
   | PDexn xs -> syms_ity syms xs.xs_ity
   | PDpure -> syms
 
-let mk_decl = let r = ref 0 in fun node pure ->
-  { pd_node = node; pd_pure = pure;
+let mk_decl_metas = let r = ref 0 in fun metas node pure ->
+  { pd_node = node; pd_pure = pure; pd_metas = metas;
     pd_syms = get_syms node pure;
     pd_news = get_news node pure;
     pd_tag  = (incr r; !r) }
+
+let mk_decl = mk_decl_metas []
 
 let create_type_decl dl =
   if dl = [] then invalid_arg "Pdecl.create_type_decl";
@@ -396,7 +399,7 @@ let create_type_decl dl =
   in
   let abst,defn,rest,metas = List.fold_right add_itd dl ([],[],[],[]) in
   let defn = if defn = [] then [] else [create_data_decl defn] in
-  mk_decl (PDtype dl) (abst @ defn @ rest), metas
+  mk_decl_metas metas (PDtype dl) (abst @ defn @ rest)
 
 (* TODO: share with Eliminate_definition *)
 let rec t_insert hd t = match t.t_node with

@@ -289,6 +289,7 @@ let add_pdecl_no_logic uc d =
 let add_pdecl_raw ?(warn=true) uc d =
   let uc = add_pdecl_no_logic uc d in
   let th = List.fold_left (add_decl ~warn) uc.muc_theory d.pd_pure in
+  let th = List.fold_left (fun th (m,l) -> Theory.add_meta th m l) th d.pd_metas in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)
@@ -327,8 +328,7 @@ let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  let d,metas = create_type_decl [td] in
-  assert (metas = []);
+  let d = create_type_decl [td] in
   close_module (add_pdecl_raw ~warn:false uc d)
 
 let create_module env ?(path=[]) n =
@@ -932,11 +932,8 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
-        let d,metas = create_type_decl tdl in
-      List.fold_left
-        (fun uc (m,a) -> add_meta uc m a)
-        (add_pdecl ~warn:false ~vc:false uc d)
-        metas
+        let d = create_type_decl tdl in
+        add_pdecl ~warn:false ~vc:false uc d
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);
@@ -1003,7 +1000,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       add_pdecl ~warn:false ~vc:false uc (create_exn_decl xs')
   | PDpure ->
-      List.fold_left (clone_decl inst cl) uc d.pd_pure
+      let uc = List.fold_left (clone_decl inst cl) uc d.pd_pure in
+      assert (d.pd_metas = []); (* FIXME! *)
+      uc
 
 let theory_add_clone = Theory.add_clone_internal ()
 
