@@ -189,9 +189,18 @@ let () =
   Gconfig.init ()
 
 
+
+
+
+
+
+
+
+
 (********************************)
 (* Source language highlighting *)
 (********************************)
+
 
 let (why_lang, any_lang) =
   let main = Whyconf.get_main gconfig.config in
@@ -228,6 +237,11 @@ let try_convert s =
         s
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
+
+
+
+
+
 (****************************)
 (* Color handling in source *)
 (****************************)
@@ -258,6 +272,11 @@ let erase_color_loc (v:GSourceView2.source_view) =
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
+
+
+
+
+
 
 
 (*******************)
@@ -339,9 +358,24 @@ let update_label_saved (label: GMisc.label) =
   if (Strings.has_prefix "*" s) then
     label#set_text (String.sub s 1 (String.length s - 1))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 (**********************)
 (* Graphical elements *)
 (**********************)
+
 
 let main_window : GWindow.window =
   let w = GWindow.window
@@ -379,16 +413,120 @@ let factory = new GMenu.factory menubar
 
 let accel_group = factory#accel_group
 
-(* 1.1 "File" menu *)
+let create_menu_item (factory:GMenu.menu GMenu.factory)
+                     ?key label tooltip =
+  let i = factory#add_item ?key label in
+  i#misc#set_tooltip_markup tooltip;
+  i
+
+let connect_menu_item i ~callback =
+  let (_ : GtkSignal.id) = i#connect#activate ~callback in ()
+
+(* 1.1 "File" menu items *)
 
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
+let menu_add_file =
+  create_menu_item file_factory "_Add file to session"
+                   "Insert another file in the current session"
+let menu_preferences =
+  create_menu_item file_factory "_Preferences"
+                   "Open Preferences Window"
+let menu_refresh =
+  create_menu_item file_factory ~key:GdkKeysyms._R "_Refresh session"
+                   "Refresh the proof session with updated source files."
+let menu_save_session =
+  create_menu_item file_factory "_Save session"
+                   "Save the current proof session on disk"
+let menu_quit =
+  create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
+                   "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
 
-let (_ : GtkSignal.id) = main_window#connect#destroy
-  ~callback:exit_function_safe
+(* 1.2 "Tools" menu items *)
 
-let (_ : GtkSignal.id) = main_window#event#connect#delete
-  ~callback:(fun _ -> exit_function_safe (); true)
+let tools_menu = factory#add_submenu "_Tools"
+let tools_factory = new GMenu.factory tools_menu ~accel_group
+
+let replay_menu_item =
+  create_menu_item tools_factory ~key:GdkKeysyms._R "_Replay obsolete"
+                   "Replay all obsolete proofs"
+let clean_menu_item =
+  create_menu_item tools_factory  "Clean"
+                   "Remove unsuccessful proofs or transformations that are below a proved goal"
+
+let remove_item =
+  create_menu_item tools_factory "Remove"
+                   "Remove the selected proof attempts or transformations"
+
+let mark_obsolete_item =
+  create_menu_item tools_factory "Mark obsolete"
+                   "Mark all proof nodes below the current selected nodes as obsolete"
+
+
+(* 1.3 "View" menu items *)
+
+
+
+(****************************)
+(* actions of the interface *)
+(****************************)
+
+
+
+
+
+
+
+
+
+(***********************************)
+(* connection of actions to signals *)
+(***********************************)
+
+(* File menu signals *)
+
+let () =
+  let callback () =
+    Gconfig.preferences gconfig;
+    (* TODO:
+      begin
+        match !current_env_session with
+          | None -> ()
+          | Some e ->
+              Session.update_env_session_config e gconfig.config;
+              Session.unload_provers e
+      end;
+      recreate_gui ();
+(*
+      Mprover.iter
+        (fun p pi ->
+          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
+            pi.editor)
+        (Whyconf.get_provers gconfig.config);
+     *)
+     *)
+    let nb = gconfig.session_nb_processes in
+    send_request (Set_max_tasks_req nb)
+  in
+  connect_menu_item menu_preferences ~callback
+
+let () =
+  connect_menu_item
+    menu_save_session
+    ~callback:(fun () -> send_request Save_req)
+
+let () =
+  connect_menu_item
+    menu_quit
+    ~callback:exit_function_safe
+
+let (_ : GtkSignal.id) =
+  main_window#connect#destroy
+    ~callback:exit_function_safe
+
+let (_ : GtkSignal.id) =
+  main_window#event#connect#delete
+    ~callback:(fun _ -> exit_function_safe (); true)
 
 (* 2. horizontal box contains:
    2.1 TODO: a tool box ?
@@ -555,40 +693,6 @@ let clear_tree_and_table goals_model =
 (* Menu items *)
 (**************)
 
-let () =
-  let callback () =
-    Gconfig.preferences gconfig;
-    (* TODO:
-      begin
-        match !current_env_session with
-          | None -> ()
-          | Some e ->
-              Session.update_env_session_config e gconfig.config;
-              Session.unload_provers e
-      end;
-      recreate_gui ();
-(*
-      Mprover.iter
-        (fun p pi ->
-          Debug.dprintf debug "editor for %a : %s@." Whyconf.print_prover p
-            pi.editor)
-        (Whyconf.get_provers gconfig.config);
-     *)
-     *)
-    let nb = gconfig.session_nb_processes in
-    send_request (Set_max_tasks_req nb)
-  in
-  let i = file_factory#add_image_item ~label:"_Preferences" ~callback () in
-  i#misc#set_tooltip_markup "Open Preferences Window"
-
-let () =
-  let i = file_factory#add_item "_Save session"
-    ~callback:(fun () -> send_request Save_req) in
-  i#misc#set_tooltip_markup "Save the current proof session on disk"
-
-let (_ : GMenu.menu_item) =
-  file_factory#add_item ~key:GdkKeysyms._Q "_Quit"
-    ~callback:exit_function_safe
 
 let reload_unsafe () =
   (* Clearing the tree *)
@@ -602,7 +706,7 @@ let reload_safe () =
       GToolbox.question_box
         ~title:"Why3 saving source files"
         ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save unsaved source files before reload? \n Modifications that are not saved will be cleared by reload."
+        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
     in
     match answer with
     | 1 -> save_sources (); reload_unsafe ()
@@ -611,10 +715,7 @@ let reload_safe () =
   else
     reload_unsafe ()
 
-(* TODO key stroked to be decided *)
-let reload_menu_item : GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._E "r_Eload session"
-    ~callback:reload_safe
+let () = connect_menu_item menu_refresh ~callback:reload_safe
 
 
 (* vpan222 contains:
@@ -1036,6 +1137,9 @@ let () =
   task_view#source_buffer#set_language why_lang;
   Gconfig.set_fonts ()
 
+
+
+
 (******************)
 (*    actions     *)
 (******************)
@@ -1115,39 +1219,34 @@ let (_ : GtkSignal.id) =
      command_entry#misc#grab_focus () *))
 
 
-(****************)
-(* Tools menu  *)
-(****************)
-
-let tools_menu = factory#add_submenu "_Tools"
-let tools_factory = new GMenu.factory tools_menu ~accel_group
-
-let replay_menu_item : GMenu.menu_item =
-  tools_factory#add_item ~key:GdkKeysyms._R "_Replay obsolete"
-let () = replay_menu_item#misc#set_tooltip_markup "Replay all obsolete proofs"
-let (_ : GtkSignal.id) =
-  replay_menu_item#connect#activate
-    ~callback:(fun () -> send_request Replay_req)
 
 
-let clean_menu_item : GMenu.menu_item =
-  tools_factory#add_item "Clean"
-    ~callback:(fun _ -> send_request Clean_req)
-let () = clean_menu_item#misc#set_tooltip_markup "Remove unsuccessful proofs or transformations that are below a proved goal"
 
-let remove_item: GMenu.menu_item =
-  tools_factory#add_item "Remove"
+(***********************)
+(* Tools menu signals  *)
+(***********************)
+
+let () =
+  connect_menu_item
+    replay_menu_item
+    ~callback:(fun () -> send_request Replay_req);
+  connect_menu_item
+    clean_menu_item
+    ~callback:(fun _ -> send_request Clean_req);
+  connect_menu_item
+    remove_item
     ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
-      | _ -> print_message "Select only one node to perform this action")
-
-let mark_obsolete_item: GMenu.menu_item =
-  tools_factory#add_item "Mark obsolete"
+               match get_selected_row_references () with
+               | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
+               | _ -> print_message "Select only one node to perform this action");
+  connect_menu_item
+    mark_obsolete_item
     ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] -> let id = get_node_id r#iter in send_request (Mark_obsolete_req id)
-      | _ -> print_message "Select only one node to perform this action")
+               match get_selected_row_references () with
+               | [r] -> let id = get_node_id r#iter in send_request (Mark_obsolete_req id)
+               | _ -> print_message "Select only one node to perform this action")
+
+
 
 (*************************************)
 (* Commands of the Experimental menu *)
@@ -1232,9 +1331,8 @@ let select_file ~request =
   end ;
   d#destroy ()
 
-let open_item: GMenu.menu_item =
-  file_factory#add_item "_Add file in session"
-    ~callback:(fun () ->
+let (_ : GtkSignal.id) =
+  menu_add_file#connect#activate ~callback:(fun () ->
       select_file ~request:(fun f -> send_request (Add_file_req f)))
 
 (* what is it for ?
