@@ -345,12 +345,19 @@ let on_tagged_pr t task =
 (* Printing tasks *)
 type id_decl = (Decl.decl list) Ident.Mid.t
 
-type name_tables = {
+type names_table = {
     namespace : namespace;
     known_map : known_map;
     printer : ident_printer;
 (* Associate an id to a list of declarations in which it is used *)
     id_decl : id_decl;
+  }
+
+let empty_names_table = {
+    namespace = empty_ns;
+    known_map = Mid.empty;
+    printer = create_ident_printer [];
+    id_decl = Mid.empty;
   }
 
 exception Bad_name_table of string
@@ -367,7 +374,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | NotExclusiveMeta m ->
       Format.fprintf fmt "Metaproperty '%s' is not exclusive" m.meta_name
   | Bad_name_table s ->
-      Format.fprintf fmt "Name table associated to task was not generated in %s" s
+      Format.fprintf fmt "Names table associated to task was not generated in %s" s
   | _ -> raise exn)
 
 (* task1 : prefix

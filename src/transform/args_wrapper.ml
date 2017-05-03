@@ -50,7 +50,7 @@ type symb =
   | Pr of prsymbol
 
 (* [add_unsafe s id tables] Add (s, id) to tables without any checking. *)
-let add_unsafe (s: string) (id: symb) (tables: name_tables) : name_tables =
+let add_unsafe (s: string) (id: symb) (tables: names_table) : names_table =
   match id with
   | Ts ty ->
       {tables with
@@ -66,7 +66,7 @@ let add_unsafe (s: string) (id: symb) (tables: name_tables) : name_tables =
 }
 
 (* Adds symbols that are introduced to a constructor *)
-let constructor_add (cl: constructor list) tables : name_tables =
+let constructor_add (cl: constructor list) tables : names_table =
   List.fold_left
     (fun tables ((ls, cl): constructor) ->
       let tables = List.fold_left
@@ -139,7 +139,7 @@ let rec add_id tables d t =
 
 (* [add d printer tables] Adds all new declaration of symbol inside d to tables.
   It uses printer to give them a unique name and also register these new names in printer *)
-let add (d: decl) (tables: name_tables): name_tables =
+let add (d: decl) (tables: names_table): names_table =
   match d.d_node with
   | Dtype ty ->
       (* only current symbol is new in the declaration (see create_ty_decl) *)
@@ -188,7 +188,7 @@ let add (d: decl) (tables: name_tables): name_tables =
       let tables = add_unsafe s (Pr pr) tables in
       add_id tables d t
 
-let build_name_tables task : name_tables =
+let build_name_tables task : names_table =
   let pr = fresh_printer () in
   let km = Task.task_known task in
   let empty_decls = Ident.Mid.empty in
@@ -339,7 +339,7 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
     | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
 
-let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> name_tables -> task -> b =
+let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> names_table -> task -> b =
   fun t f l env tables task ->
     match t, l with
     | Ttrans, _-> apply f task
@@ -410,7 +410,7 @@ let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
 let wrap   : type a. (a, task) trans_typ -> a -> trans_with_args =
   fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
-let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> Task.name_tables -> b trans =
+let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> Task.names_table -> b trans =
   fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
 let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =

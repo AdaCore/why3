@@ -435,8 +435,8 @@ let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   let tables = match args.name_table with
-  | None -> raise (Bad_name_table "why3printer")
-  | Some tables -> tables in
+    | None -> empty_names_table (* raise (Bad_name_table "Why3printer.print_task")*)
+    | Some tables -> tables in
   print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
   print_th_prelude task fmt args.th_prelude;
@@ -462,8 +462,8 @@ let print_sequent args ?old:_ fmt task =
   info := {info_syn = Discriminate.get_syntax_map task;
     itp = true};
   let tables = match args.name_table with
-  | None -> raise (Bad_name_table "why3printer")
-  | Some tables -> tables in
+    | None -> empty_names_table (* raise (Bad_name_table "Why3printer.print_sequent") *)
+    | Some tables -> tables in
   (* let tables = build_name_tables task in *)
   let ut = Task.used_symbols (Task.used_theories task) in
   let ld = Task.local_decls task ut in

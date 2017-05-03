@@ -68,49 +68,49 @@ let loaded_strategies = ref []
 (****** Exception handling *********)
 
 let print_term s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_term tables fmt t
 
 let print_type s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_ty tables fmt t
 
 let print_ts s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_ts tables fmt t
 
 let print_ls s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_ls tables fmt t
 
 let print_tv s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_tv tables fmt t
 
 let print_vsty s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_forget_vsty tables fmt t
 
 let print_pr s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_pr tables fmt t
 
 let print_pat s id fmt t =
-  let tables = match (Session_itp.get_tables s id) with
+  let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_name_tables (Session_itp.get_task s id)
   | Some tables -> tables in
   Why3printer.print_pat tables fmt t
@@ -798,7 +798,7 @@ let get_locations t =
   (* -- send the task -- *)
   let task_of_id d id =
     let task = get_task d.cont.controller_session id in
-    let tables = get_tables d.cont.controller_session id in
+    let tables = get_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = get_locations task in
     Pp.string_of

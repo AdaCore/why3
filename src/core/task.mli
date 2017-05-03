@@ -129,13 +129,15 @@ val on_tagged_pr : meta -> task -> Spr.t
 (** Printing tasks *)
 type id_decl = (Decl.decl list) Ident.Mid.t
 
-type name_tables = {
+type names_table = {
     namespace : namespace;
     known_map : known_map;
     printer : ident_printer;
-(* Associate an id to a list of declarations in which it is used *)
+    (* Associate an id to a list of declarations in which it is used *)
     id_decl : id_decl;
   }
+
+val empty_names_table : names_table
 
 (** Exceptions *)
 

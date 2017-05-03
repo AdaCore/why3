@@ -1604,9 +1604,6 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
-        -I src/ide
-
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
         -syntax camlp4o -I src/trywhy3 \
 	-I $(ALTERGODIR)/src/util \
@@ -1697,6 +1694,16 @@ clean::
 
 CLEANDIRS += src/trywhy3
 
+
+#########
+# why3webserver and full web/js interface
+#########
+
+ifeq (@HASJSOFOCAML,yes)
+
+JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+        -I src/ide
+
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
 	$(JSOCAMLCW) $(BFLAGS) -c $<
 
@@ -1709,6 +1716,7 @@ src/ide/why3_js.js: src/ide/why3_js.byte
 opt: lib/why3/why3.cma bin/why3webserver.opt src/ide/why3_js.js
 byte: lib/why3/why3.cma bin/why3webserver.byte src/ide/why3_js.js
 
+endif
 
 ########
 # bench

@@ -11,7 +11,7 @@ exception Arg_hyp_not_found of string
 (** Pre-processing of tasks, to build unique names for all declared
     identifiers of a task.*)
 
-val build_name_tables : Task.task -> Task.name_tables
+val build_name_tables : Task.task -> Task.names_table
 
 type (_, _) trans_typ =
   | Ttrans    : (task Trans.trans, task) trans_typ

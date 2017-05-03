@@ -164,8 +164,8 @@ val named : string -> 'a trans -> 'a trans
 
 *)
 
-type trans_with_args = string list -> Env.env -> Task.name_tables -> task trans
-type trans_with_args_l = string list -> Env.env -> Task.name_tables -> task tlist
+type trans_with_args = string list -> Env.env -> Task.names_table -> task trans
+type trans_with_args_l = string list -> Env.env -> Task.names_table -> task tlist
 
 val list_transforms_with_args   : unit -> (string * Pp.formatted) list
 val list_transforms_with_args_l : unit -> (string * Pp.formatted) list
@@ -188,5 +188,5 @@ val list_trans : unit -> string list
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly.*)
 
-val apply_transform_args : string -> Env.env -> string list -> Task.name_tables -> task -> task list
+val apply_transform_args : string -> Env.env -> string list -> Task.names_table -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)

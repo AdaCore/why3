@@ -42,7 +42,7 @@ type proof_attempt_node = {
 type proof_node = {
   proofn_name                    : Ident.ident;
   proofn_task                    : Task.task;
-  proofn_table                   : Task.name_tables option;
+  proofn_table                   : Task.names_table option;
   proofn_parent                  : proof_parent;
   proofn_checksum                : Termcode.checksum option;
   proofn_shape                   : Termcode.shape;
@@ -207,7 +207,7 @@ let get_task (s:session) (id:proofNodeID) =
   let node = get_proofNode s id in
   node.proofn_task
 
-let get_tables (s: session) (id: proofNodeID) =
+let get_table (s: session) (id: proofNodeID) =
   let node = get_proofNode s id in
   node.proofn_table
 
@@ -1157,7 +1157,7 @@ let add_registered_transformation s env old_tr goal_id =
     Debug.dprintf debug "[merge_theory] trans not found@.";
     let task = goal.proofn_task in
     let tables = match goal.proofn_table with
-    | None -> raise (Task.Bad_name_table "add_registered_transformation")
+    | None -> raise (Task.Bad_name_table "Session_itp.add_registered_transformation")
     | Some tables -> tables in
     let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args tables task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals

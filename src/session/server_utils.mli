@@ -17,11 +17,11 @@ exception Number_of_arguments
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
-  | Qtask of (Controller_itp.controller -> Task.name_tables -> string list -> string)
+  | Qtask of (Controller_itp.controller -> Task.names_table -> string list -> string)
 
 
-val print_id: 'a -> Task.name_tables -> string list -> string
-val search_id: 'a -> Task.name_tables -> string list -> string
+val print_id: 'a -> Task.names_table -> string list -> string
+val search_id: 'a -> Task.names_table -> string list -> string
 
 val list_provers: Controller_itp.controller -> _ -> string
 val list_transforms: unit -> (string * Pp.formatted) list

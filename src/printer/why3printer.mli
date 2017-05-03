@@ -30,12 +30,12 @@
 
 *)
 
-val print_ls   : Task.name_tables -> Format.formatter -> Term.lsymbol  -> unit
-val print_tv   : Task.name_tables -> Format.formatter -> Ty.tvsymbol   -> unit
-val print_ts   : Task.name_tables -> Format.formatter -> Ty.tysymbol   -> unit
-val print_forget_vsty : Task.name_tables -> Format.formatter -> Term.vsymbol  -> unit
-val print_pr   : Task.name_tables -> Format.formatter -> Decl.prsymbol -> unit
-val print_pat  : Task.name_tables -> Format.formatter -> Term.pattern  -> unit
-val print_ty   : Task.name_tables -> Format.formatter -> Ty.ty         -> unit
-val print_term : Task.name_tables -> Format.formatter -> Term.term     -> unit
-val print_decl : Task.name_tables -> Format.formatter -> Decl.decl     -> unit
+val print_ls   : Task.names_table -> Format.formatter -> Term.lsymbol  -> unit
+val print_tv   : Task.names_table -> Format.formatter -> Ty.tvsymbol   -> unit
+val print_ts   : Task.names_table -> Format.formatter -> Ty.tysymbol   -> unit
+val print_forget_vsty : Task.names_table -> Format.formatter -> Term.vsymbol  -> unit
+val print_pr   : Task.names_table -> Format.formatter -> Decl.prsymbol -> unit
+val print_pat  : Task.names_table -> Format.formatter -> Term.pattern  -> unit
+val print_ty   : Task.names_table -> Format.formatter -> Ty.ty         -> unit
+val print_term : Task.names_table -> Format.formatter -> Term.term     -> unit
+val print_decl : Task.names_table -> Format.formatter -> Decl.decl     -> unit

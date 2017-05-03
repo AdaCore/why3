@@ -137,7 +137,7 @@ let search_id _cont task args =
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
-  | Qtask of (Controller_itp.controller -> Task.name_tables -> string list -> string)
+  | Qtask of (Controller_itp.controller -> Task.names_table -> string list -> string)
 
 let help_on_queries fmt commands =
   let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
@@ -294,10 +294,10 @@ let interp commands_table config cont id s =
     | Qnotask f, _ -> Query (f cont args)
     | Qtask _, None -> QError "please select a goal first"
     | Qtask f, Some id ->
-       let tables = match Session_itp.get_tables cont.Controller_itp.controller_session id with
-       | None -> raise (Task.Bad_name_table "interp")
-       | Some tables -> tables in
-       let s = try Query (f cont tables args) with
+       let table = match Session_itp.get_table cont.Controller_itp.controller_session id with
+       | None -> raise (Task.Bad_name_table "Server_utils.interp")
+       | Some table -> table in
+       let s = try Query (f cont table args) with
        | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
        | Number_of_arguments -> QError "Bad number of arguments"
        in s

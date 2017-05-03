@@ -335,8 +335,8 @@ let list_transforms_l () =
 
 (** transformations with arguments *)
 
-type trans_with_args = string list -> Env.env -> Task.name_tables -> task trans
-type trans_with_args_l = string list -> Env.env -> Task.name_tables -> task tlist
+type trans_with_args = string list -> Env.env -> Task.names_table -> task trans
+type trans_with_args_l = string list -> Env.env -> Task.names_table -> task tlist
 
 let transforms_with_args = Hstr.create 17
 let transforms_with_args_l = Hstr.create 17
