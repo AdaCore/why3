@@ -85,7 +85,7 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 1000; ++iter) {
+          for (int iter = 0; iter != 10000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
             for (int i = 0; i != 10000; ++i)
@@ -128,8 +128,8 @@ int main () {
 		      (int) an, (int) bn, (int) rn);
 	      printf ("a: "); mpn_dump (ap, an);
 	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("c:    %016lx\n", c); 
-	      printf ("refc: %016lx\n", refc); 
+	      printf ("c:    %016lx\n", c);
+	      printf ("refc: %016lx\n", refc);
 	      abort();
 	    }
 #endif
@@ -150,7 +150,7 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 100; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
             for (int i = 0; i != 10000; ++i)
@@ -206,7 +206,7 @@ int main () {
 
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 100; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
             for (int i = 0; i != 10000; ++i)
