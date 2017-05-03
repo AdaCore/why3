@@ -502,7 +502,7 @@ install_no_local::
 TOOLSGENERATED = src/tools/why3wc.ml
 
 TOOLS_BIN = why3config why3execute why3extract why3prove \
-	    why3realize why3replay why3wc why3newreplay
+	    why3realize why3replay why3wc
 
 TOOLS_FILES = main $(TOOLS_BIN)
 
@@ -532,10 +532,8 @@ bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
 bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
-bin/why3replay.opt: lib/why3/why3.cmxa src/tools/why3replay.cmx
-bin/why3replay.byte: lib/why3/why3.cma src/tools/why3replay.cmo
-bin/why3newreplay.opt: lib/why3/why3.cmxa src/tools/unix_scheduler.cmx src/tools/why3newreplay.cmx
-bin/why3newreplay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/why3newreplay.cmo
+bin/why3replay.opt: lib/why3/why3.cmxa src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
+bin/why3replay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
