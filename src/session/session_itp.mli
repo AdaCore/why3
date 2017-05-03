@@ -182,3 +182,6 @@ val remove_subtree: session -> any -> notification:(any -> unit) -> unit
     session s then call the notification function (used to notify the ide.
 
     If called on a theory or proof node, raise RemoveError *)
+
+val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
+(** [fold_all_any s f acc any] folds on all the subnodes of any *)
