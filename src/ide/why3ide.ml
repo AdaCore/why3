@@ -619,8 +619,8 @@ let goals_model,goals_view =
   Debug.dprintf debug "[GUI] Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrolled_session_view#add () in
-(*
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
+(*
   let () = view#set_rules_hint true in
 *)
   let () = view#set_enable_search false in
@@ -1177,15 +1177,13 @@ let clear_command_entry () = command_entry#set_text ""
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
-  (* TODO: treat multiple rows *)
   let rows = get_selected_row_references () in
-  let id = if List.length rows > 0 then
-      get_node_id ((List.hd rows)#iter)
-    else
-      (* If no nodes are in the tree send command on default root node *)
-      root_node
+  let ids =
+    match rows with
+      | [] -> [root_node]
+      | _ -> List.map (fun n -> get_node_id n#iter) rows
   in
-  send_request (Command_req (id, cmd));
+  List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
   clear_command_entry ()
 
 let (_ : GtkSignal.id) =
