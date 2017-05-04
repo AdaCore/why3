@@ -334,7 +334,7 @@ module Random63
   = random_bool s
 
   let random_int63 (n: int63) : int63
-    requires { 0 < n }
+    requires { 0 < n } (* FIXME: n should be less than 2^30 *)
     ensures  { s.state = next (old s.state) }
     ensures  { result = get_int s.state n }
     ensures  { 0 <= result < n }
