@@ -1235,13 +1235,17 @@ let () =
     remove_item
     ~callback:(fun () ->
                match get_selected_row_references () with
-               | [r] -> let id = get_node_id r#iter in send_request (Remove_subtree id)
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Remove_subtree id)
                | _ -> print_message "Select only one node to perform this action");
   connect_menu_item
     mark_obsolete_item
     ~callback:(fun () ->
                match get_selected_row_references () with
-               | [r] -> let id = get_node_id r#iter in send_request (Mark_obsolete_req id)
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Mark_obsolete_req id)
                | _ -> print_message "Select only one node to perform this action")
 
 
