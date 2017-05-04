@@ -312,6 +312,8 @@ type info = Pdriver.printer_args = private {
   converter   : Printer.syntax_map;
 }
 
+let debug = false
+
 module Print = struct
 
   open C
@@ -368,7 +370,7 @@ module Print = struct
     | Bassign -> fprintf fmt "="
 
   and print_expr ~paren fmt = function
-    | Enothing -> Format.printf "enothing"; ()
+    | Enothing -> if debug then Format.printf "enothing"; ()
     | Eunop(u,e) -> fprintf fmt (protect_on paren "%a %a")
       print_unop u (print_expr ~paren:true) e
     | Ebinop(b,e1,e2) ->
@@ -409,7 +411,7 @@ module Print = struct
     | id,e -> fprintf fmt "%a = %a" print_ident id (print_expr ~paren:false) e
 
   let rec print_stmt ~braces fmt = function
-    | Snop -> Format.printf "snop"; ()
+    | Snop -> if debug then Format.printf "snop"; ()
     | Sexpr e -> fprintf fmt "%a;" (print_expr ~paren:false) e;
     | Sblock ([] ,s) when (not braces || (one_stmt s && not (is_nop s))) ->
       (print_stmt ~braces:false) fmt s
@@ -478,7 +480,7 @@ module Print = struct
     fprintf fmt "@[<v>%a@]@." (print_list newline print_def) ast
 
 end
-
+(*
 module Translate = struct
   open Pdecl
   open Ity
@@ -512,7 +514,8 @@ module Translate = struct
                       returns : Sid.t; }
 
   let rec expr info env (e:expr) : C.body =
-    if e_ghost e then (Format.printf "translating ghost expr@."; C.([], Snop))
+    if e_ghost e 
+    then (if debug then Format.printf "translating ghost expr@."; C.([], Snop))
     else if is_e_void e then
       if env.computes_return_value
       then C.([], Sreturn(Enothing))
@@ -608,7 +611,7 @@ module Translate = struct
     | Elet (ld,e) ->
       begin match ld with
       | LDvar (pv,le) ->
-        (*Format.printf "let %s@." pv.pv_vs.vs_name.id_string;*)
+        (*if debug then Format.printf "let %s@." pv.pv_vs.vs_name.id_string;*)
         if pv.pv_ghost
         (*TODO check it's actually unused *)
         then expr info env e
@@ -622,7 +625,7 @@ module Translate = struct
           | Econst (Number.ConstInt ic) ->
             let n = Number.compute_int ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
-	    Format.printf "propagate constant %s for var %s@."
+	    if debug then Format.printf "propagate constant %s for var %s@."
 			  (BigInt.to_string n) (pv_name pv).id_string;
             C.propagate_in_block (pv_name pv) ce (expr info env e)
           | Eexec ({c_node = Capp(rs,_); _},_)
@@ -638,7 +641,7 @@ module Translate = struct
             match expr info {env with computes_return_value = false} le with
             | [], C.Sexpr((C.Esyntax(_,_,_,_,b) as se))
                 when b (* converter *) ->
-              Format.printf "propagate converter for var %s@."
+              if debug then Format.printf "propagate converter for var %s@."
                 (pv_name pv).id_string;
               C.propagate_in_block (pv_name pv) se (expr info env e)
             | d,s ->
@@ -666,7 +669,7 @@ module Translate = struct
        (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
     | Ewhile (c,_,_,b) ->
-      Format.printf "while@.";
+      if debug then Format.printf "while@.";
       let cd, cs = expr info {env with computes_return_value = false} c in
       (* this is needed so that the extracted expression has all
          needed variables in its scope *)
@@ -692,7 +695,7 @@ module Translate = struct
         end
       end
     | Etry (b, exm) ->
-      Format.printf "TRY@.";
+      if debug then Format.printf "TRY@.";
       let is_while = match b.e_node with Ewhile _ -> true | _-> false in
       let breaks,returns = Mxs.fold
         (fun xs (pvsl,r) (bs,rs) ->
@@ -700,7 +703,7 @@ module Translate = struct
           match pvsl, r.e_node with
           | [pv], Evar pv' when pv_equal pv pv' && env.computes_return_value ->
             (bs, Sid.add id rs)
-          | [], _ (*when is_e_void r && is_while*) (*FIXME*) ->
+          | [], _ when is_e_void r && is_while (*FIXME*) ->
             (Sid.add id bs, rs)
           |_ -> raise (Unsupported "non break/return exception in try"))
         exm (Sid.empty, env.returns)
@@ -713,10 +716,10 @@ module Translate = struct
                  } in
       expr info env' b
     | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
-      Format.printf "BREAK@.";
+      if debug then Format.printf "BREAK@.";
       ([], C.Sbreak)
     | Eraise (xs,r) when Sid.mem xs.xs_name env.returns ->
-      Format.printf "RETURN@.";
+      if debug then Format.printf "RETURN@.";
       expr info {env with computes_return_value = true} r
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
@@ -745,13 +748,13 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDsym (rs, ce)) ->
       let fname = rs.rs_name in
-      Format.printf "PDlet rsymbol %s@." fname.id_string;
+      if debug then Format.printf "PDlet rsymbol %s@." fname.id_string;
       if rs_ghost rs
-      then begin Format.printf "is ghost@."; [] end
+      then begin if debug then Format.printf "is ghost@."; [] end
       else
       begin try
               if Mid.mem fname info.syntax
-              then (Format.printf "has syntax@."; [])
+              then (if debug then Format.printf "has syntax@."; [])
               else
                 let params = List.map
 		  (fun pv -> ty_of_ty info pv.pv_vs.vs_ty, pv_name pv)
@@ -827,7 +830,7 @@ module Translate = struct
       end
     | PDtype [{itd_its = its}] ->
       let id = its.its_ts.ts_name in
-      Format.printf "PDtype %s@." id.id_string;
+      if debug then Format.printf "PDtype %s@." id.id_string;
       begin
         match its.its_ts.ts_def with
         | Alias def -> [C.Dtypedef (ty_of_ty info def, id)]
@@ -857,6 +860,7 @@ module Translate = struct
     | Unsupported s ->
       Format.printf "Failed because of unsupported construct: %s@." s; []
 end
+*)
 (*TODO simplifications : propagate constants, collapse blocks with only a statement and no def*)
 
 module MLToC = struct
@@ -1071,7 +1075,7 @@ module MLToC = struct
           | Compile.ML.Econst ic ->
             let n = Number.compute_int ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
-	    Format.printf "propagate constant %s for var %s@."
+	    if debug then Format.printf "propagate constant %s for var %s@."
 			  (BigInt.to_string n) (pv_name pv).id_string;
             C.propagate_in_block (pv_name pv) ce (expr info env e)
           | Eapp (rs,_) when Mid.mem rs.rs_name info.converter ->
@@ -1086,7 +1090,7 @@ module MLToC = struct
             match expr info {env with computes_return_value = false} le with
             | [], C.Sexpr((C.Esyntax(_,_,_,_,b) as se))
                 when b (* converter *) ->
-              Format.printf "propagate converter for var %s@."
+              if debug then Format.printf "propagate converter for var %s@."
                 (pv_name pv).id_string;
               C.propagate_in_block (pv_name pv) se (expr info env e)
             | d,s ->
@@ -1114,7 +1118,7 @@ module MLToC = struct
        (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
     | Ewhile (c,b) ->
-       Format.printf "while@.";
+       if debug then Format.printf "while@.";
       let cd, cs = expr info {env with computes_return_value = false} c in
       (* this is needed so that the extracted expression has all
          needed variables in its scope *)
@@ -1140,7 +1144,7 @@ module MLToC = struct
         end
       end
     | Etry (b,xl) ->
-      Format.printf "TRY@.";
+      if debug then Format.printf "TRY@.";
       let is_while = match b.e_node with Ewhile _ -> true | _-> false in
       let breaks, returns = List.fold_left
         (fun (bs,rs) (xs, pvsl, r) ->
@@ -1162,10 +1166,10 @@ module MLToC = struct
                  } in
       expr info env' b
     | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
-      Format.printf "BREAK@.";
+      if debug then Format.printf "BREAK@.";
       ([], C.Sbreak)
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
-      Format.printf "RETURN@.";
+      if debug then Format.printf "RETURN@.";
       expr info {env with computes_return_value = true} r
     | Eraise (xs, None) -> assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
@@ -1197,7 +1201,7 @@ module MLToC = struct
     match d with
     | Dlet (Lsym(rs, ty, vl, e)) ->
        if rs_ghost rs
-       then begin Format.printf "is ghost@."; None end
+       then begin if debug then Format.printf "is ghost@."; None end
        else
          begin try
            let params =
@@ -1265,7 +1269,7 @@ module MLToC = struct
              Format.printf "Unsupported : %s@." s; None
          end
     | Dtype [{its_name=id; its_def=idef}] ->
-      Format.printf "PDtype %s@." id.id_string;
+      if debug then Format.printf "PDtype %s@." id.id_string;
       begin
         match idef with
         | Some (Dalias ty) -> Some (C.Dtypedef (ty_of_mlty info ty, id))
@@ -1297,14 +1301,14 @@ let fg ?fname m =
   match fname with
   | None -> n ^ ".c"
   | Some f -> f ^ "__" ^ n ^ ".c"
-
+(*
 let pr args ?old ?fname ~flat m fmt _d =
   ignore(old);
   let ast = Translate.translate args m in
   try Print.print_file fmt args ast
   with Print.Unprinted s -> (Format.printf "Could not print: %s@." s;
 		       Format.fprintf fmt "/* Dummy file */@.")
-
+*)
 let print_decl args ?old ?fname ~flat m fmt d =
   ignore old;
   ignore fname;

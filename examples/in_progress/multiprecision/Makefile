@@ -5,6 +5,7 @@ extract: why3
 	why3 extract -D c -D mp.drv -o build/N.c -L . mp2.N
 tests: extract check-gmp
 	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -lgmp -o tests
+	./tests
 why3addbench: extract check-gmp
 	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3addbench
 why3mulbench: extract check-gmp
@@ -30,8 +31,7 @@ data: alltests
 
 plots: data
 	./divplot
-	./fullrelative
-	./relative_noextremes
+	./divrelative
 	./mulrelative
 	./addrelative
 

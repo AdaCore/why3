@@ -33,14 +33,21 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 #endif
 
 
+#ifdef BENCH
+#define RANDOM mpn_random2
+#else
+#define RANDOM mpn_random
+#endif
+
+
 void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
   //printf ("an %d bn %d\n", an, bn);
-  mpn_random2 (ap, an + 1);
-  mpn_random2 (bp, bn + 1);
+  RANDOM (ap, an + 1);
+  RANDOM (bp, bn + 1);
   while (bp[bn-1] == 0)
     {
       //printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
-      mpn_random2 (bp, bn + 1);
+      RANDOM (bp, bn + 1);
     };
 }
 
@@ -85,7 +92,7 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 10000; ++iter) {
+          for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
             for (int i = 0; i != 10000; ++i)
@@ -153,7 +160,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 10000; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 
@@ -209,7 +216,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 10000; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 
