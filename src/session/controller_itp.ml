@@ -695,7 +695,7 @@ let is_valid (pa: proof_attempt_node) : bool =
 let is_running (pa: proof_attempt_node) : bool =
   match pa.Session_itp.proof_state with
   | None -> true
-  | Some pr -> false
+  | Some _pr -> false
 
 let clean_session c ~remove ~node_change =
   let s = c.controller_session in

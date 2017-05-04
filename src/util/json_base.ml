@@ -58,21 +58,57 @@ let map_bindings key_to_str value_pr fmt map_bindings =
     Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
       (print_map_binding key_to_str value_pr) fmt map_bindings
 
-type value =
-  | Obj of (string * value) list
-  | Array of value list
+(* Convert a list of bindings into a map *)
+let convert_record l =
+  List.fold_left (fun m (k, x) -> Stdlib.Mstr.add k x m) Stdlib.Mstr.empty l
+
+type json =
+  | Record of json Stdlib.Mstr.t
+  | List of json list
   | String of string
   | Int of int
   | Float of float
   | Bool of bool
   | Null
 
-let rec print fmt v =
+let rec print_json fmt v =
   match v with
-  | Obj l -> if l <> [] then map_bindings (fun s -> s) print fmt l else fprintf fmt "{null}"
-  | Array l -> if l <> [] then list print fmt l else fprintf fmt "[null]"
+  | Record r -> map_bindings (fun x -> x) print_json fmt (Stdlib.Mstr.bindings r)
+  | List l -> list print_json fmt l
   | String s -> string fmt s
   | Int i -> int fmt i
   | Float f -> float fmt f
   | Bool b -> bool fmt b
   | Null -> fprintf fmt "null"
+
+
+(* Get json fields. Return Not_found if no fields or field missing *)
+let get_field j s =
+  match j with
+  | Record r -> Stdlib.Mstr.find s r
+  | _ -> raise Not_found
+
+let get_string j =
+  match j with
+  | String s -> s
+  | _ -> raise Not_found
+
+let get_int j =
+  match j with
+  | Int n -> n
+  | _ -> raise Not_found
+
+let get_list j =
+  match j with
+  | List l -> l
+  | _ -> raise Not_found
+
+let get_float j =
+  match j with
+  | Float f -> f
+  | _ -> raise Not_found
+
+let get_bool j =
+  match j with
+  | Bool b -> b
+  | _ -> raise Not_found

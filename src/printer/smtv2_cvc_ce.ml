@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,7 +24,7 @@ let debug = Debug.register_info_flag "smtv2_printer"
   ~desc:"Print@ debugging@ messages@ about@ printing@ \
          the@ input@ of@ smtv2."
 
-(** SMTLIB tokens taken from CVC4: src/parser/smt2/Smt2.g *)
+(** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
      "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
@@ -63,18 +63,52 @@ let ident_printer () =
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
-      (* Other stuff that Why3 seems to need *)
+      (** the new floating point theory - updated to the 2014-05-27 standard *)
+      "FloatingPoint"; "fp";
+      "Float16"; "Float32"; "Float64"; "Float128";
+      "RoundingMode";
+      "roundNearestTiesToEven"; "RNE";
+      "roundNearestTiesToAway"; "RNA";
+      "roundTowardPositive";    "RTP";
+      "roundTowardNegative";    "RTN";
+      "roundTowardZero";        "RTZ";
+      "NaN"; "+oo"; "-oo"; "+zero"; "-zero";
+      "fp.abs"; "fp.neg"; "fp.add"; "fp.sub"; "fp.mul"; "fp.div";
+      "fp.fma"; "fp.sqrt"; "fp.rem"; "fp.roundToIntegral"; "fp.min"; "fp.max";
+      "fp.leq"; "fp.lt"; "fp.geq"; "fp.gt"; "fp.eq";
+      "fp.isNormal"; "fp.isSubnormal"; "fp.isZero";
+      "fp.isInfinite"; "fp.isNaN";
+      "fp.isNegative"; "fp.isPositive";
+      "to_fp"; "to_fp_unsigned";
+      "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
+
+      (** the new proposed string theory *)
+      "String";
+      "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
+      "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
+      "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
+      "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
+      "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+
+      (** the new proposed set theory *)
+      "union"; "intersection"; "setminus"; "subset"; "member";
+      "singleton"; "insert";
+
+      (** built-in sorts *)
+      "Bool"; "Int"; "Real"; "BitVec"; "Array";
+
+      (** Other stuff that Why3 seems to need *)
       "DECIMAL"; "NUMERAL"; "par"; "STRING";
       "unsat";"sat";
-      "Bool"; "true"; "false";
-      "Array";"const";
+      "true"; "false";
+      "const";
       "abs";
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
       (* From Z3 *)
       "map"; "bv"; "subset"; "union"; "default";
 
-(* floats *)
+      (* floats *)
       "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
@@ -104,7 +138,8 @@ let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
 (** type *)
-let rec print_type info fmt ty = match ty.ty_node with
+let rec print_type info fmt ty =
+  match ty.ty_node with
   | Tyvar _ -> unsupported "smt : you must encode the polymorphism"
   | Tyapp (ts, l) ->
      begin match query_syntax info.info_syn ts.ts_name, l with
@@ -189,15 +224,17 @@ let rec print_term info fmt t =
             the literal. Do we ensure that preserved literal types
             are exactly those that have a dedicated syntax? *)
       end
-  | Tvar v -> print_var info fmt v
+  | Tvar v ->
+      print_var info fmt v
   | Tapp (ls, tl) ->
     (* let's check if a converter applies *)
     begin try
       match tl with
       | [ { t_node = Tconst _} ] ->
-        begin match query_converter info.info_converters ls with
-        | None -> raise Exit
-        | Some s -> syntax_arguments s (print_term info) fmt tl
+        begin
+          match query_converter info.info_converters ls with
+          | None -> raise Exit
+          | Some s -> syntax_arguments s (print_term info) fmt tl;
         end
       | _ -> raise Exit
     with Exit ->
@@ -222,12 +259,13 @@ let rec print_term info fmt t =
 		(*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		()
 	    end;
-	    fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
+            fprintf fmt "@[%a@]" (print_ident info) ls.ls_name
           | _ ->
-	    fprintf fmt "@[(%a@ %a)@]"
-	      (print_ident info) ls.ls_name
-              (print_list space (print_term info)) tl
-        end end
+              fprintf fmt "@[(%a@ %a)@]"
+	        (print_ident info) ls.ls_name
+                (print_list space (print_term info)) tl
+        end
+    end
   | Tlet (t1, tb) ->
       let v, t2 = t_open_bound tb in
       fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
@@ -235,7 +273,8 @@ let rec print_term info fmt t =
       forget_var info v
   | Tif (f1,t1,t2) ->
       fprintf fmt "@[(ite %a@ %a@ %a)@]"
-        (print_fmla info) f1 (print_term info) t1 (print_term info) t2
+        (print_fmla info) f1 (print_term info) t1
+        (print_term info) t2
   | Tcase(t, bl) ->
     let ty = t_type t in
     begin
@@ -270,7 +309,8 @@ and print_fmla info fmt f =
   let () = match f.t_node with
   | Tapp ({ ls_name = id }, []) ->
       print_ident info fmt id
-  | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
+  | Tapp (ls, tl) -> begin
+      match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
         (print_type info) f fmt tl
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
@@ -278,7 +318,8 @@ and print_fmla info fmt f =
           | _ -> fprintf fmt "(%a@ %a)"
               (print_ident info) ls.ls_name
               (print_list space (print_term info)) tl
-        end end
+      end
+  end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "forall" | Texists -> "exists" in
       let vl, tl, f = t_open_quant fq in
@@ -297,7 +338,8 @@ and print_fmla info fmt f =
           (print_triggers info) tl;
       List.iter (forget_var info) vl
   | Tbinop (Tand, f1, f2) ->
-      fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
+      fprintf fmt "@[(and@ %a@ %a)@]" (print_fmla info) f1
+        (print_fmla info) f2
   | Tbinop (Tor, f1, f2) ->
       fprintf fmt "@[(or@ %a@ %a)@]" (print_fmla info) f1 (print_fmla info) f2
   | Tbinop (Timplies, f1, f2) ->
@@ -317,7 +359,7 @@ and print_fmla info fmt f =
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
       fprintf fmt "@[(let ((%a %a))@ %a)@]" (print_var info) v
-        (print_term info) t1 (print_fmla info) f2;
+        (print_term  info) t1 (print_fmla info) f2;
       forget_var info v
   | Tcase(t, bl) ->
     let ty = t_type t in
@@ -472,44 +514,122 @@ let print_prop_decl vc_loc cntexample args info fmt k pr f = match k with
 				queried_terms = model_list; }
   | Plemma| Pskip -> assert false
 
-
-let print_constructor_decl info fmt (ls,args) =
+let print_constructor_decl global_stuff add_stuff nb_cons info fmt (ls,args) =
+  nb_cons := !nb_cons + 1;
+  let _ = flush_str_formatter () in
+  fprintf str_formatter "%a" (print_ident info) ls.ls_name;
+  let ls_ls_name = flush_str_formatter () in
+  begin
   match args with
-  | [] -> fprintf fmt "(%a)" (print_ident info) ls.ls_name
+  | [] -> fprintf fmt "(%s)" ls_ls_name
   | _ ->
-     fprintf fmt "@[(%a@ " (print_ident info) ls.ls_name;
+     fprintf fmt "@[(%s___@ " ls_ls_name;
      let _ =
        List.fold_left2
          (fun i ty pr ->
-          begin match pr with
-          | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
-          | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
-          end;
-          fprintf fmt " %a)" (print_type info) ty;
-          succ i) 1 ls.ls_args args
+          if ty_equal ty ty_bool then
+            begin
+              begin match pr with
+              | Some pr ->
+                  let _ = flush_str_formatter () in
+                  fprintf str_formatter "%a" (print_ident info) pr.ls_name;
+                  let s = flush_str_formatter () in
+                  add_stuff := "(_ BitVec 1)" :: !add_stuff;
+                  global_stuff := s :: !global_stuff;
+                  fprintf fmt "(%s___" s
+              | None ->
+                  let _ = flush_str_formatter () in
+                  fprintf str_formatter "%a_proj_%d" (print_ident info) ls.ls_name i;
+                  let s = flush_str_formatter () in
+                  global_stuff := s :: !global_stuff;
+                  add_stuff := "(_ BitVec 1)" :: !add_stuff;
+                  fprintf fmt "(%s___" s
+              end;
+              fprintf fmt " (_ BitVec 1))";
+              succ i
+            end
+          else
+            begin
+              begin match pr with
+              | Some pr -> fprintf fmt "(%a" (print_ident info) pr.ls_name
+              | None -> fprintf fmt "(%a_proj_%d" (print_ident info) ls.ls_name i
+              end;
+              let _ = fprintf str_formatter "%a" (print_type info) ty in
+              let type_name = flush_str_formatter () in
+              add_stuff := type_name :: !add_stuff;
+              fprintf fmt " %s)" type_name;
+              succ i
+            end)
+              1 ls.ls_args args
      in
-     fprintf fmt ")@]"
+     fprintf fmt ")@]";
+  end;
+  try
+    add_stuff := List.rev !add_stuff;
+    add_stuff := ls_ls_name :: !add_stuff
+  with _ -> ()
 
-let print_data_decl info fmt (ts,cl) =
-  fprintf fmt "@[(%a@ %a)@]"
-    (print_ident info) ts.ts_name
-    (print_list space (print_constructor_decl info)) cl
+let print_data_decl global_stuff add_stuff nb_cons info fmt (ts,cl) =
+  let _ = flush_str_formatter () in
+  fprintf str_formatter "%a" (print_ident info) ts.ts_name;
+  let s = flush_str_formatter () in
+  fprintf fmt "@[(%s@ %a)@]"
+    s
+    (print_list space (print_constructor_decl global_stuff add_stuff nb_cons info)) cl;
+  global_stuff := s :: !global_stuff;
+  add_stuff := s :: !add_stuff
 
-let print_decl vc_loc cntexample args info fmt d =
-  match d.d_node with
+let print_saved_projections fmt l =
+  match l with
+  | [] -> ()
+  | [_hd] -> ()
+  | type_name :: constructors ->
+      List.iter (fun c ->
+        fprintf fmt "@[<hov 2>\n(define-fun %s ((a %s)) Bool (= (%s___ a) #b1))@]"
+          c type_name c) constructors
+
+let print_arg fmt (a, b) =
+  if b = "(_ BitVec 1)" then
+    fprintf fmt "(%s Bool)" a
+  else
+    fprintf fmt "(%s %s)" a b
+
+let print_saved_constructors nb_cons fmt l =
+  if List.length l <= nb_cons + 1 then () else
+  match l with
+  | [] -> ()
+  | [_hd] -> ()
+  | _hd :: _hd1 :: [] -> ()
+  | type_name :: constructor_name :: type_lists ->
+    let args_lists =
+      let a = ref 0 in
+      List.map (fun x -> a := !a + 1; ("a" ^ string_of_int !a, x)) type_lists in
+    fprintf fmt
+      "@[<hov 2>\n(define-fun %s (%a) %s (%s___ %a))@]" constructor_name
+      (Pp.print_list space print_arg) args_lists type_name constructor_name
+      (Pp.print_list space (fun fmt (n, t) -> fprintf fmt "%s"
+        (if t = "(_ BitVec 1)" then "(ite "^n^" #b1 #b0)" else n)
+         )) args_lists
+
+let print_decl vc_loc cntexample args info fmt d = match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
   | Ddata [(ts,_)] when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Ddata dl ->
-      fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
-        (print_list space (print_data_decl info)) dl
+    let global_stuff = ref [] in
+    let add_stuff = ref [] in
+    let nb_cons = ref 0 in
+    fprintf fmt "@[(declare-datatypes ()@ (%a))@]@\n"
+      (print_list space (print_data_decl global_stuff add_stuff nb_cons info)) dl;
+    print_saved_projections fmt !global_stuff;
+    print_saved_constructors !nb_cons fmt !add_stuff
   | Dparam ls ->
       collect_model_ls info ls;
       print_param_decl info fmt ls
   | Dlogic dl ->
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
-      "smtv2: inductive definitions are not supported"
+      "smtv2 : inductive definition are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
       print_prop_decl vc_loc cntexample args info fmt k pr f
@@ -545,5 +665,5 @@ let print_task args ?old:_ fmt task =
   print_decls task;
   pp_print_flush fmt ()
 
-let () = register_printer "smtv2" print_task
+let () = register_printer "smtv2_cvc_ce" print_task
   ~desc:"Printer@ for@ the@ SMTlib@ version@ 2@ format."

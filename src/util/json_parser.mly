@@ -4,7 +4,7 @@ by Yaron Minsky, Anil Madhavapeddy, and Jason Hickey. Their 'unlicence' allows
 it. *)
 (****************************************************************************)
 (* A JSON text can actually be any JSON value *)
-%start <Json_base.value> value
+%start <Json_base.json> value
 %token <int> INT
 %token <float> FLOAT
 %token <string> STRING
@@ -23,15 +23,16 @@ json_object:
 | EOF { Json_base.Null }
 | LEFTBRC RIGHTBRC { Json_base.Null }
 (* Left recursive rule are more efficient *)
-| LEFTBRC members RIGHTBRC { Json_base.Obj (List.rev $2) }
+| LEFTBRC members RIGHTBRC {
+  Json_base.Record (Json_base.convert_record (List.rev $2)) }
 
 members:
 | json_pair { [ $1 ] }
 | members COMMA json_pair { $3 :: $1 }
 
 array:
-| LEFTSQ RIGHTSQ { Json_base.Array [] }
-| LEFTSQ elements RIGHTSQ { Json_base.Array (List.rev $2) }
+| LEFTSQ RIGHTSQ { Json_base.List [] }
+| LEFTSQ elements RIGHTSQ { Json_base.List (List.rev $2) }
 
 elements:
 | value { [$1] }

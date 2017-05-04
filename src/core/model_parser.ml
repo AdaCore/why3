@@ -30,16 +30,22 @@ let debug = Debug.register_info_flag "model_parser"
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Boolean of bool
  | Array of model_array
+ | Record of model_record
  | Bitvector of string
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : model_value;
+  arr_index_key : string; (* Even array indices can exceed MAX_INT with Z3 *)
   arr_index_value : model_value;
 }
 and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
+}
+and model_record = {
+  discrs : model_value list;
+  fields : model_value list;
 }
 
 let array_create_constant ~value =
@@ -61,37 +67,69 @@ let array_add_element ~array ~index ~value =
     arr_indices = arr_index::array.arr_indices;
   }
 
-let rec print_indices fmt indices =
-  match indices with
-  | [] -> ()
-  | index::tail ->
-    fprintf fmt "%a => " print_model_value index.arr_index_key;
-    print_model_value fmt index.arr_index_value;
-    fprintf fmt ", ";
-    print_indices fmt tail
-and
-print_array fmt arr =
-  fprintf fmt "(";
-  print_indices fmt arr.arr_indices;
-  fprintf fmt "others => ";
-  print_model_value fmt arr.arr_others;
-  fprintf fmt ")"
-and
-print_model_value_sanit sanit_print fmt value =
-  (* Prints model value. *)
+let rec convert_model_value value : Json_base.json =
   match value with
-  | Integer s -> sanit_print fmt s
+  | Integer s ->
+      let m = Mstr.add "type" (Json_base.String "Integer") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
   | Decimal (int_part, fract_part) ->
-    sanit_print fmt (int_part^"."^fract_part)
-  | Unparsed s -> sanit_print fmt s
+      let m = Mstr.add "type" (Json_base.String "Float") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String (int_part^"."^fract_part)) m in
+      Json_base.Record m
+  | Unparsed s ->
+      let m = Mstr.add "type" (Json_base.String "Unparsed") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
+  | Bitvector v ->
+      let m = Mstr.add "type" (Json_base.String "Bv") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String v) m in
+      Json_base.Record m
+  | Boolean b ->
+      let m = Mstr.add "type" (Json_base.String "Boolean") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.Bool b) m in
+      Json_base.Record m
   | Array a ->
-    print_array str_formatter a;
-    sanit_print fmt (flush_str_formatter ())
-  | Bitvector v -> sanit_print fmt v
-and
-print_model_value fmt value =
-  print_model_value_sanit (fun fmt s -> fprintf fmt "%s" s) fmt value
+      let l = convert_array a in
+      let m = Mstr.add "type" (Json_base.String "Array") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (Json_base.List l) m in
+      Json_base.Record m
+  | Record r ->
+      convert_record r
 
+and convert_array a =
+  let m_others =
+    Mstr.add "others" (convert_model_value a.arr_others)  Stdlib.Mstr.empty in
+  convert_indices a.arr_indices @ [Json_base.Record m_others]
+
+and convert_indices indices =
+  match indices with
+  | [] -> []
+  | index :: tail ->
+    let m = Mstr.add "indice" (Json_base.String index.arr_index_key) Stdlib.Mstr.empty in
+    let m = Mstr.add "value" (convert_model_value index.arr_index_value) m in
+    Json_base.Record m :: convert_indices tail
+
+and convert_record r =
+  let m = Mstr.add "type" (Json_base.String "Record") Stdlib.Mstr.empty in
+  let fields = convert_fields r.fields in
+  let discrs = convert_discrs r.discrs in
+  let m_field_discr = Mstr.add "Field" fields Stdlib.Mstr.empty in
+  let m_field_discr = Mstr.add "Discr" discrs m_field_discr in
+  let m = Mstr.add "val" (Json_base.Record m_field_discr) m in
+  Json_base.Record m
+
+and convert_fields fields =
+  Json_base.List (List.map convert_model_value fields)
+
+and convert_discrs discrs =
+  Json_base.List (List.map convert_model_value discrs)
+
+let print_model_value_sanit fmt v =
+  let v = convert_model_value v in
+  Json_base.print_json fmt v
+
+let print_model_value = print_model_value_sanit
 
 (*
 ***************************************************************
@@ -324,7 +362,7 @@ let interleave_with_source
 *)
 let print_model_element_json me_name_to_str fmt me =
   let print_value fmt =
-    fprintf fmt "%a" (print_model_value_sanit Json_base.string) me.me_value in
+    fprintf fmt "%a" print_model_value_sanit me.me_value in
   let print_kind fmt =
     match me.me_name.men_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"

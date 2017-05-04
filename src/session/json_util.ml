@@ -6,15 +6,17 @@ open Json_base
 (* TODO match exceptions and complete some cases *)
 
 let convert_prover_to_json (p: Whyconf.prover) =
-  Obj ["prover_name", String p.Whyconf.prover_name;
-         "prover_version", String p.Whyconf.prover_version;
-         "prover_altern", String p.Whyconf.prover_altern]
+  Record (convert_record
+    ["prover_name", String p.Whyconf.prover_name;
+     "prover_version", String p.Whyconf.prover_version;
+     "prover_altern", String p.Whyconf.prover_altern])
 
 let convert_infos (i: global_information) =
-  Obj ["provers", Array (List.map (fun x -> String x) i.provers);
-         "transformations", Array (List.map (fun x -> String x) i.transformations);
-         "strategies", Array (List.map (fun x -> String x) i.strategies);
-         "commands", Array (List.map (fun x -> String x) i.commands)]
+  Record (convert_record
+    ["provers", List (List.map (fun x -> String x) i.provers);
+     "transformations", List (List.map (fun x -> String x) i.transformations);
+     "strategies", List (List.map (fun x -> String x) i.strategies);
+     "commands", List (List.map (fun x -> String x) i.commands)])
 
 let convert_prover_answer (pa: prover_answer) =
   match pa with
@@ -28,9 +30,10 @@ let convert_prover_answer (pa: prover_answer) =
   | HighFailure       -> String "HighFailure"
 
 let convert_limit (l: Call_provers.resource_limit) =
-  Obj ["limit_time", Int l.Call_provers.limit_time;
-         "limit_mem", Int l.Call_provers.limit_mem;
-         "limit_steps", Int l.Call_provers.limit_steps]
+  Record (convert_record
+    ["limit_time", Int l.Call_provers.limit_time;
+     "limit_mem", Int l.Call_provers.limit_mem;
+     "limit_steps", Int l.Call_provers.limit_steps])
 
 let convert_unix_process (ps: Unix.process_status) =
   match ps with
@@ -43,48 +46,49 @@ let convert_model (m: Model_parser.model) =
 
 (* TODO pr_model should have a different format *)
 let convert_proof_result (pr: prover_result) =
-  Obj ["pr_answer", convert_prover_answer pr.pr_answer;
-         "pr_status", convert_unix_process pr.pr_status;
-         "pr_output", String pr.pr_output;
-         "pr_time", Float pr.pr_time;
-         "pr_steps", Int pr.pr_steps;
-         "pr_model", convert_model pr.pr_model]
+  Record (convert_record
+    ["pr_answer", convert_prover_answer pr.pr_answer;
+     "pr_status", convert_unix_process pr.pr_status;
+     "pr_output", String pr.pr_output;
+     "pr_time", Float pr.pr_time;
+     "pr_steps", Int pr.pr_steps;
+     "pr_model", convert_model pr.pr_model])
 
 let convert_proof_attempt (pas: proof_attempt_status) =
-  match pas with
+  Record (match pas with
   | Unedited ->
-      Obj ["proof_attempt", String "Unedited"]
+      convert_record ["proof_attempt", String "Unedited"]
   | JustEdited ->
-      Obj ["proof_attempt", String "JustEdited"]
+      convert_record ["proof_attempt", String "JustEdited"]
   | Interrupted ->
-      Obj ["proof_attempt", String "Interrupted"]
+      convert_record ["proof_attempt", String "Interrupted"]
   | Scheduled ->
-      Obj ["proof_attempt", String "Scheduled"]
+      convert_record ["proof_attempt", String "Scheduled"]
   | Running ->
-      Obj ["proof_attempt", String "Running"]
+      convert_record ["proof_attempt", String "Running"]
   | Done pr ->
-      Obj ["proof_attempt", String "Done";
-             "prover_result", convert_proof_result pr]
+      convert_record ["proof_attempt", String "Done";
+                      "prover_result", convert_proof_result pr]
   | Controller_itp.InternalFailure e ->
-      Obj ["proof_attempt", String "InternalFailure";
-             "exception", String (Pp.string_of Exn_printer.exn_printer e)]
+      convert_record ["proof_attempt", String "InternalFailure";
+                      "exception", String (Pp.string_of Exn_printer.exn_printer e)]
   | Uninstalled p ->
-      Obj ["proof_attempt", String "Uninstalled";
-             "prover", convert_prover_to_json p]
+      convert_record ["proof_attempt", String "Uninstalled";
+                      "prover", convert_prover_to_json p])
 
 let convert_update u =
-  match u with
+  Record (match u with
   | Proved b ->
-      Obj ["update_info", String "Proved";
+      convert_record ["update_info", String "Proved";
              "proved", Bool b]
   | Proof_status_change (pas, b, l) ->
-      Obj ["update_info", String "Proof_status_change";
+      convert_record ["update_info", String "Proof_status_change";
              "proof_attempt", convert_proof_attempt pas;
              "obsolete", Bool b;
              "limit", convert_limit l]
   | Obsolete b ->
-      Obj ["update_info", String "Obsolete";
-           "obsolete", Bool b]
+      convert_record ["update_info", String "Obsolete";
+           "obsolete", Bool b])
 
 let convert_notification_constructor n =
   match n with
@@ -136,75 +140,76 @@ let convert_request_constructor (r: ide_request) =
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
 
-let print_request_to_json (r: ide_request): Json_base.value =
+let print_request_to_json (r: ide_request): Json_base.json =
   let cc = convert_request_constructor in
+  Record (
   match r with
   | Command_req (nid, s) ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "command", String s]
   | Prove_req (nid, p, l) ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "prover", String p;
            "limit", convert_limit l]
   | Transform_req (nid, tr, args) ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "transformation", String tr;
-           "arguments", Array (List.map (fun x -> String x) args)]
+           "arguments", List (List.map (fun x -> String x) args)]
   | Strategy_req (nid, str) ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "strategy", String str]
   | Open_session_req f ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "file", String f]
   | Add_file_req f ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "file", String f]
   | Save_file_req (f,_) ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "file", String f]
   | Set_max_tasks_req n ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "tasks", Int n]
   | Get_task n ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int n]
   | Get_file_contents s ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "file", String s]
   | Remove_subtree n ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int n]
   | Copy_paste (from_id, to_id) ->
-      Obj ["ide_request", cc r;
-           "node_ID", Int from_id;
-           "node_ID", Int to_id]
+      convert_record ["ide_request", cc r;
+           "node_ID1", Int from_id;
+           "node_ID2", Int to_id]
   | Copy_detached from_id ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int from_id]
   | Get_first_unproven_node id ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int id]
   | Get_Session_Tree_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Mark_obsolete_req n ->
-      Obj ["ide_request", cc r;
+      convert_record ["ide_request", cc r;
            "node_ID", Int n]
   | Clean_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Save_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Reload_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Replay_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Exit_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r]
   | Interrupt_req ->
-      Obj ["ide_request", cc r]
+      convert_record ["ide_request", cc r])
 
 let convert_constructor_message (m: message_notification) =
   match m with
@@ -224,78 +229,78 @@ let convert_constructor_message (m: message_notification) =
 
 let convert_message (m: message_notification) =
   let cc = convert_constructor_message in
-  match m with
+  Record (match m with
   | Proof_error (nid, s) ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "error", String s]
   | Transf_error (nid, s) ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "error", String s]
   | Strat_error (nid, s) ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "error", String s]
   | Replay_Info s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "replay_info", String s]
   | Query_Info (nid, s) ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "qinfo", String s]
   | Query_Error (nid, s) ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "qerror", String s]
   | Help s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "qhelp", String s]
   | Information s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "information", String s]
   | Task_Monitor (n, k, p) ->
-      Obj ["mess_notif", cc m;
-           "monitor", Array [Int n; Int k; Int p]]
+      convert_record ["mess_notif", cc m;
+           "monitor", List [Int n; Int k; Int p]]
   | Parse_Or_Type_Error s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "error", String s]
   | Error s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "error", String s]
   | Open_File_Error s ->
-      Obj ["mess_notif", cc m;
+      convert_record ["mess_notif", cc m;
            "open_error", String s]
   | File_Saved s ->
-      Obj ["mess_notif", cc m;
-           "information", String s]
+      convert_record ["mess_notif", cc m;
+           "information", String s])
 
-let convert_color (color: color) : Json_base.value =
+let convert_color (color: color) : Json_base.json =
   Json_base.String (
     match color with
     | Neg_premise_color -> "Neg_premise_color"
     | Premise_color -> "Premise_color"
     | Goal_color -> "Goal_color")
 
-let convert_loc (loc: Loc.position) : Json_base.value =
+let convert_loc (loc: Loc.position) : Json_base.json =
   let (file, line, col1, col2) = Loc.get loc in
-  Json_base.Obj ["file", Json_base.String file;
-                 "line", Json_base.Int line;
-                 "col1", Json_base.Int col1;
-                 "col2", Json_base.Int col2]
+  Record (convert_record ["file", Json_base.String file;
+                          "line", Json_base.Int line;
+                          "col1", Json_base.Int col1;
+                          "col2", Json_base.Int col2])
 
-let convert_loc_color (loc,color: Loc.position * color) : Json_base.value =
+let convert_loc_color (loc,color: Loc.position * color) : Json_base.json =
   let loc = convert_loc loc in
   let color = convert_color color in
-  Json_base.Obj ["loc", loc; "color", color]
+  Record (convert_record ["loc", loc; "color", color])
 
-let convert_list_loc (l: (Loc.position * color) list) : Json_base.value =
+let convert_list_loc (l: (Loc.position * color) list) : json =
   let list_of_loc = List.map convert_loc_color l in
-  Json_base.Array list_of_loc
+  List list_of_loc
 
 exception Notcolor
 
-let parse_color (j: Json_base.value) : color =
+let parse_color (j: json) : color =
   match j with
   | String "Neg_premise_color" -> Neg_premise_color
   | String "Premise_color"     -> Premise_color
@@ -304,72 +309,74 @@ let parse_color (j: Json_base.value) : color =
 
 exception Notposition
 
-let parse_loc (j: Json_base.value) : Loc.position =
-  match j with
-  | Obj ["file", String file;
-         "line", Int line;
-         "col1", Int col1;
-         "col2", Int col2] ->
+let parse_loc (j: json) : Loc.position =
+  try
+    let file = get_string (get_field j "file") in
+    let line = get_int (get_field j "line") in
+    let col1 = get_int (get_field j "col1") in
+    let col2 = get_int (get_field j "col2") in
     Loc.user_position file line col1 col2
-  | _ -> raise Notposition
+  with
+    Not_found -> raise Notposition
 
-let parse_loc_color (j: Json_base.value): Loc.position * color =
+let parse_loc_color (j: json): Loc.position * color =
+  let loc = parse_loc j in
+  let color = parse_color j in
+  (loc, color)
+
+let parse_list_loc (j: json): (Loc.position * color) list =
   match j with
-  | Obj ["loc", loc; "color", color] -> (parse_loc loc, parse_color color)
+  | List l -> List.map parse_loc_color l
   | _ -> raise Notposition
 
-let parse_list_loc (j: Json_base.value): (Loc.position * color) list =
-  match j with
-  | Array l -> List.map parse_loc_color l
-  | _ -> raise Notposition
-
-let print_notification_to_json (n: notification): Json_base.value =
+let print_notification_to_json (n: notification): json =
   let cc = convert_notification_constructor in
+  Record (
   match n with
   | New_node (nid, parent, node_type, name, detached) ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "node_ID", Int nid;
            "parent_ID", Int parent;
            "node_type", convert_node_type node_type;
            "name", String name;
            "detached", Bool detached]
   | Node_change (nid, update) ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "node_ID", Int nid;
            "update", convert_update update]
   | Remove nid ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "node_ID", Int nid]
   | Next_Unproven_Node_Id (from_id, unproved_id) ->
-      Obj ["notification", cc n;
-           "node_ID", Int from_id;
-           "node_ID", Int unproved_id]
+      convert_record ["notification", cc n;
+           "node_ID1", Int from_id;
+           "node_ID2", Int unproved_id]
   | Initialized infos ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "infos", convert_infos infos]
   | Saved ->
-      Obj ["notification", cc n]
+      convert_record ["notification", cc n]
   | Message m ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "message", convert_message m]
   | Dead s ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "message", String s]
   | Task (nid, s, list_loc) ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "node_ID", Int nid;
            "task", String s;
            "list_loc", convert_list_loc list_loc]
   | File_contents (f, s) ->
-      Obj ["notification", cc n;
+      convert_record ["notification", cc n;
            "file", String f;
-           "content", String s]
+           "content", String s])
 
 let print_notification fmt (n: notification) =
-  Format.fprintf fmt "%a" Json_base.print (print_notification_to_json n)
+  Format.fprintf fmt "%a" print_json (print_notification_to_json n)
 
 let print_request fmt (r: ide_request) =
-  Format.fprintf fmt "%a" Json_base.print (print_request_to_json r)
+  Format.fprintf fmt "%a" print_json (print_request_to_json r)
 
 let print_list_notification fmt (nl: notification list) =
   Format.fprintf fmt "%a" (Json_base.list print_notification) nl
@@ -379,81 +386,107 @@ let print_list_request fmt (rl: ide_request list) =
 
 exception NotProver
 
-let parse_prover_from_json (j: Json_base.value) =
-  match j with
-  | Obj ["prover_name", String pn;
-         "prover_version", String pv;
-         "prover_altern", String pa] ->
-           {Whyconf.prover_name = pn; prover_version = pv; prover_altern = pa}
-  | _ -> raise NotProver
+let parse_prover_from_json (j: json) =
+  try
+    let pn = get_string (get_field j "prover_name") in
+    let pv = get_string (get_field j "prover_version") in
+    let pa = get_string (get_field j "prover_altern") in
+    {Whyconf.prover_name = pn; prover_version = pv; prover_altern = pa}
+  with Not_found -> raise NotProver
 
 exception NotLimit
 
-let parse_limit_from_json (j: Json_base.value) =
-  match j with
-  | Obj ["limit_time", Int t;
-         "limit_mem", Int m;
-         "limit_steps", Int s] ->
-           {limit_time = t; limit_mem = m; limit_steps = s}
-  | _ -> raise NotLimit
+let parse_limit_from_json (j: json) =
+  try
+    let t = get_int (get_field j "limit_time") in
+    let m = get_int (get_field j "limit_mem") in
+    let s = get_int (get_field j "limit_steps") in
+    {limit_time = t; limit_mem = m; limit_steps = s}
+  with Not_found -> raise NotLimit
 
 exception NotRequest of string
 
-let parse_request (constr: string) l =
-  match constr, l with
-  | "Command_req", ["node_ID", Int nid;
-                    "command", String s] ->
+let parse_request (constr: string) j =
+  match constr with
+  | "Command_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "command") in
     Command_req (nid, s)
-  | "Prove_req", ["node_ID", Int nid;
-                  "prover", String p;
-                  "limit", l] ->
+
+  | "Prove_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    let p = get_string (get_field j "prover") in
+    let l = get_field j "limit" in
     Prove_req (nid, p, parse_limit_from_json l)
-  | "Transform_req", ["node_ID", Int nid;
-                      "transformation", String tr;
-                      "arguments", Array args] ->
+
+  | "Transform_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    let tr = get_string (get_field j "transformation") in
+    let args = get_list (get_field j "arguments") in
     Transform_req (nid, tr,
                    List.map (fun x ->
                      match x with
                      | String t -> t
                      | _ -> raise (NotRequest "")) args)
-  | "Strategy_req", ["node_ID", Int nid;
-                     "strategy", String str] ->
+
+  | "Strategy_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    let str = get_string (get_field j "strategy") in
     Strategy_req (nid, str)
-  | "Open_session_req", ["file", String f] ->
+
+  | "Open_session_req" ->
+    let f = get_string (get_field j "file") in
     Open_session_req f
-  | "Add_file_req", ["file", String f] ->
+
+  | "Add_file_req" ->
+    let f = get_string (get_field j "file") in
     Add_file_req f
-  | "Set_max_tasks_req", ["tasks", Int n] ->
+
+  | "Set_max_tasks_req" ->
+    let n = get_int (get_field j "tasks") in
     Set_max_tasks_req n
-  | "Get_task", ["node_ID", Int n] ->
+
+  | "Get_task" ->
+    let n = get_int (get_field j "node_ID") in
     Get_task n
-  | "Remove_subtree", ["node_ID", Int n] ->
+
+  | "Remove_subtree" ->
+    let n = get_int (get_field j "node_ID") in
     Remove_subtree n
-  | "Copy_paste", ["node_ID", Int from_id; "node_ID", Int to_id] ->
+
+  | "Copy_paste" ->
+    let from_id = get_int (get_field j "node_ID1") in
+    let to_id = get_int (get_field j "node_ID2") in
     Copy_paste (from_id, to_id)
-  | "Copy_detached", ["node_ID", Int n] ->
+
+  | "Copy_detached" ->
+    let n = get_int (get_field j "node_ID") in
     Copy_detached n
-  | "Get_Session_Tree_req", [] ->
+
+  | "Get_Session_Tree_req" ->
     Get_Session_Tree_req
-  | "Mark_obsolete_req", ["node_ID", Int n] ->
+
+  | "Mark_obsolete_req" ->
+    let n = get_int (get_field j "node_ID") in
     Mark_obsolete_req n
-  | "Clean_req" , [] ->
+  | "Clean_req" ->
     Clean_req
-  | "Save_req", [] ->
+  | "Save_req" ->
     Save_req
-  | "Reload_req", [] ->
+  | "Reload_req" ->
     Reload_req
-  | "Replay_req", [] ->
+  | "Replay_req" ->
     Replay_req
-  | "Exit_req", [] ->
+  | "Exit_req" ->
     Exit_req
   | _ -> raise (NotRequest "")
 
-let parse_request_json (j: Json_base.value): ide_request =
-  match j with
-  | Obj (("ide_request", String constr) :: l) ->
-      parse_request constr l
-  | _ -> let s =Pp.string_of Json_base.print j in
+let parse_request_json (j: json): ide_request =
+  try
+    let constr = get_string (get_field j "ide_request") in
+    parse_request constr j
+  with
+  | _ -> let s =Pp.string_of print_json j in
     begin Format.eprintf "BEGIN \n %s \nEND\n@." s; raise (NotRequest s); end
 
 exception NotNodeType
@@ -494,156 +527,195 @@ let parse_unix_process j =
 exception NotProverResult
 
 let parse_prover_result j =
-  match j with
-  | Obj ["pr_answer", pr_answer;
-           "pr_status", pr_status_unix;
-           "pr_output", String pr_output;
-           "pr_time", Float pr_time;
-           "pr_steps", Int pr_steps;
-           "pr_model", String pr_model] ->
-     {pr_answer = parse_prover_answer pr_answer;
-      pr_status = parse_unix_process pr_status_unix;
-      pr_output = pr_output;
-      pr_time = pr_time;
-      pr_steps = pr_steps;
-      pr_model = Obj.magic pr_model} (* TODO pr_model is a string, should be model *)
+  try
+    let pr_answer = get_field j "pr_answer" in
+    let pr_status_unix = get_field j "pr_status" in
+    let pr_output = get_string (get_field j "pr_output") in
+    let pr_time = get_float (get_field j "pr_time") in
+    let pr_steps = get_int (get_field j "pr_steps") in
+    let pr_model = get_string (get_field j "pr_model") in
+    {pr_answer = parse_prover_answer pr_answer;
+     pr_status = parse_unix_process pr_status_unix;
+     pr_output = pr_output;
+     pr_time = pr_time;
+     pr_steps = pr_steps;
+     pr_model = Obj.magic pr_model} (* TODO pr_model is a string, should be model *)
+  with
   | _ -> raise NotProverResult
 
 exception NotProofAttempt
 
 let parse_proof_attempt j =
-  match j with
-  | Obj ["proof_attempt", String "Unedited"] ->
-      Unedited
-  | Obj ["proof_attempt", String "JustEdited"] ->
-      JustEdited
-  | Obj ["proof_attempt", String "Interrupted"] ->
-      Interrupted
-  | Obj ["proof_attempt", String "Scheduled"] ->
-      Scheduled
-  | Obj ["proof_attempt", String "Running"] ->
-      Running
-  | Obj ["proof_attempt", String "Done";
-             "prover_result", pr] ->
-       Done (parse_prover_result pr)
-  | Obj ["proof_attempt", String "InternalFailure";
-             "exception", _e] ->
-       raise NotProofAttempt (* TODO *)
-  | Obj ["proof_attempt", String "Uninstalled";
-             "prover", p] ->
-       Uninstalled (parse_prover_from_json p)
+  let s = get_string (get_field j "proof_attempt") in
+  match s with
+  | "Unedited" -> Unedited
+  | "JustEdited" -> JustEdited
+  | "Interrupted" -> Interrupted
+  | "Scheduled" -> Scheduled
+  | "Running" -> Running
+  | "Done" ->
+    let pr = get_field j "prover_result" in
+    Done (parse_prover_result pr)
+  | "InternalFailure" ->
+    raise NotProofAttempt (* TODO *)
+  | "Uninstalled" ->
+    let p = get_field j "prover" in
+    Uninstalled (parse_prover_from_json p)
   | _ -> raise NotProofAttempt
 
 exception NotUpdate
 
 let parse_update j =
-  match j with
-  | Obj ["update_info", String "Proved";
-           "proved", Bool b] ->
+  let update = get_string (get_field j "update_info") in
+  match update with
+  | "Proved" ->
+    let b = get_bool (get_field j "proved") in
     Proved b
-  | Obj ["update_info", String "Proof_status_change";
-           "proof_attempt", pas;
-           "obsolete", Bool b;
-           "limit", l] ->
+  | "Proof_status_change" ->
+    let pas = get_field j "proof_attempt" in
+    let b = get_bool (get_field j "obsolete") in
+    let l = get_field j "limit" in
     Proof_status_change (parse_proof_attempt pas, b, parse_limit_from_json l)
-  | Obj ["update_info", String "Obsolete";
-         "obsolete", Bool b] ->
+  | "Obsolete" ->
+    let b = get_bool (get_field j "obsolete") in
     Obsolete b
   | _ -> raise NotUpdate
 
 exception NotInfos
 
 let parse_infos j =
-  match j with
-  | Obj ["provers", Array pr;
-           "transformations", Array tr;
-           "strategies", Array str;
-           "commands", Array com] ->
-     {provers = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) pr;
-      transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
-      strategies = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) str;
-      commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
-  | _ -> raise NotInfos
+  try
+    let pr = get_list (get_field j "provers") in
+    let tr = get_list (get_field j "transformations") in
+    let str = get_list (get_field j "strategies") in
+    let com = get_list (get_field j "commands") in
+    {provers = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) pr;
+     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
+     strategies = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) str;
+     commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
+  with _ -> raise NotInfos
 
 exception NotMessage
 
-let parse_message constr l =
-  match constr, l with
-  |  "Proof_error", ["node_ID", Int nid;
-                    "error", String s] ->
-      Proof_error (nid, s)
-  | "Transf_error", ["node_ID", Int nid;
-                     "error", String s] ->
-      Transf_error (nid, s)
-  | "Strat_error", ["node_ID", Int nid;
-                    "error", String s] ->
-      Strat_error (nid, s)
-  | "Replay_Info", ["replay_info", String s] ->
-      Replay_Info s
-  | "Query_Info", ["node_ID", Int nid;
-             "qinfo", String s] ->
-       Query_Info (nid, s)
-  | "Query_Error", ["node_ID", Int nid;
-             "qerror", String s] ->
-      Query_Error (nid, s)
-  | "Help", ["qhelp", String s] ->
-      Help s
-  | "Information", ["information", String s] ->
-      Information s
-  | "Task_Monitor", ["monitor", Array [Int n; Int k; Int p]] ->
-      Task_Monitor (n, k, p)
-  | "Error", ["error", String s] ->
-      Error s
-  | "Open_File_Error", ["open_error", String s] ->
-      Open_File_Error s
+let parse_message constr j =
+  match constr with
+  | "Proof_error" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "error") in
+    Proof_error (nid, s)
+
+  | "Transf_error" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "error") in
+    Transf_error (nid, s)
+
+  | "Strat_error" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "error") in
+    Strat_error (nid, s)
+
+  | "Replay_Info" ->
+    let s = get_string (get_field j "replay_info") in
+    Replay_Info s
+  | "Query_Info" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "qinfo") in
+    Query_Info (nid, s)
+
+  | "Query_Error" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "qerror") in
+    Query_Error (nid, s)
+
+  | "Help" ->
+    let s = get_string (get_field j "qhelp") in
+    Help s
+
+  | "Information" ->
+    let s = get_string (get_field j "information") in
+    Information s
+
+  | "Task_Monitor" ->
+    let m = get_list (get_field j "monitor") in
+    begin
+      match m with
+      | Int n :: Int k :: Int p :: [] -> Task_Monitor (n, k, p)
+      | _ -> raise NotMessage
+    end
+
+  | "Error" ->
+    let s = get_string (get_field j "error") in
+    Error s
+
+  | "Open_File_Error" ->
+    let s = get_string (get_field j "open_error") in
+    Open_File_Error s
+
   | _ -> raise NotMessage
 
 
 let parse_message j =
-  match j with
-  | Obj (("mess_notif", String constr) :: l) ->
-      parse_message constr l
-  | _ -> raise NotMessage
-
+  let constr = get_string (get_field j "mess_notif") in
+  parse_message constr j
 
 exception NotNotification of string
 
-let parse_notification constr l =
-  match constr, l with
-  | "New_node", ["node_ID", Int nid;
-                 "parent_ID", Int parent;
-                 "node_type", node_type;
-                 "name", String name;
-                 "detached", Bool detached] ->
-      New_node (nid, parent, parse_node_type_from_json node_type, name, detached)
-  | "Node_change", ["node_ID", Int nid;
-                    "update", update] ->
-      Node_change (nid, parse_update update)
-  | "Remove", ["node_ID", Int nid] ->
-      Remove nid
-  | "Initialized", ["infos", infos] ->
-      Initialized (parse_infos infos)
-  | "Saved", [] -> Saved
-  | "Message", ["message", m] ->
-      Message (parse_message m)
-  | "Dead", ["message", String s] ->
-      Dead s
-  | "Task", ["node_ID", Int nid;
-             "task", String s;
-             "loc_list", l] ->
-       Task (nid, s, parse_list_loc l)
-  | "Next_Unproven_Node_Id", [ "node_ID", Int nid1;
-                               "node_ID", Int nid2 ] ->
-     Next_Unproven_Node_Id (nid1, nid2)
-  | "File_contents", [ "file", String f;
-                       "content", String s ] ->
-     File_contents(f,s)
-  | s, _ -> raise (NotNotification ("<from parse_notification> " ^ s))
+let parse_notification constr j =
+  match constr with
+  | "New_node" ->
+    let nid = get_int (get_field j "node_ID") in
+    let parent = get_int (get_field j "parent_ID") in
+    let node_type = get_field j "node_type" in
+    let name = get_string (get_field j "name") in
+    let detached = get_bool (get_field j "detached") in
+    New_node (nid, parent, parse_node_type_from_json node_type, name, detached)
+
+  | "Node_change" ->
+    let nid = get_int (get_field j "node_ID") in
+    let update = get_field j "update" in
+    Node_change (nid, parse_update update)
+
+  | "Remove" ->
+    let nid = get_int (get_field j "node_ID") in
+    Remove nid
+
+  | "Initialized" ->
+    let infos = get_field j "infos" in
+    Initialized (parse_infos infos)
+
+  | "Saved" -> Saved
+
+  | "Message" ->
+    let m = get_field j "message" in
+    Message (parse_message m)
+
+  | "Dead" ->
+    let s = get_string (get_field j "message") in
+    Dead s
+
+  | "Task" ->
+    let nid = get_int (get_field j "node_ID") in
+    let s = get_string (get_field j "task") in
+    let l = get_field j "loc_list" in
+    Task (nid, s, parse_list_loc l)
+
+  | "Next_Unproven_Node_Id" ->
+    let nid1 = get_int (get_field j "node_ID1") in
+    let nid2 = get_int (get_field j "node_ID2") in
+    Next_Unproven_Node_Id (nid1, nid2)
+
+  | "File_contents" ->
+    let f = get_string (get_field j "file") in
+    let s = get_string (get_field j "content") in
+    File_contents(f,s)
+
+  | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 
 let parse_notification_json j =
-  match j with
-  | Obj (("notification", String constr) :: l) ->
-      parse_notification constr l
+  try
+    let constr = get_string (get_field j "notification") in
+    parse_notification constr j
+  with
   | _ -> raise (NotNotification "<from parse_notification_json>")
 
 let parse_json_object (s: string) =
@@ -663,12 +735,12 @@ let parse_request (s: string) : ide_request =
 let parse_list_notification (s: string): notification list =
   let json = parse_json_object s in
   match json with
-  | Array [Null] -> []
-  | Array l -> List.map parse_notification_json l
+  | List [Null] -> []
+  | List l -> List.map parse_notification_json l
   | _ -> []
 
 let parse_list_request (s: string): ide_request list =
   let json = parse_json_object s in
   match json with
-  | Array l -> List.map parse_request_json l
+  | List l -> List.map parse_request_json l
   | _ -> raise (NotRequest "Not list")
