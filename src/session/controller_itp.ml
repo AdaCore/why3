@@ -713,7 +713,7 @@ let mark_as_obsolete ~node_change ~node_obsolete c any =
     node_obsolete (APa n) true;
     let b = reload_goal_proof_state c parent in
     node_change (APn parent) b;
-    update_proof_node node_change c parent b
+    update_proof node_change c parent
   in
   let s = c.controller_session in
   fold_all_any s
