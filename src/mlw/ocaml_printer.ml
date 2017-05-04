@@ -299,11 +299,11 @@ module Print = struct
       | [], [] ->
         (print_uident info) fmt rs.rs_name
       | [], [t] ->
-        fprintf fmt "@[<hov 2>%a %a@]"
-          (print_uident info) rs.rs_name (print_expr info) t
+        fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+          (print_uident info) rs.rs_name (print_expr ~paren:true info) t
       | [], tl ->
-        fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-          (print_list comma (print_expr info)) tl
+        fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
+          rs.rs_name (print_list comma (print_expr info)) tl
       | pjl, tl ->
         let equal fmt () = fprintf fmt " = " in
         fprintf fmt "@[<hov 2>{ @[%a@] }@]"
@@ -322,9 +322,9 @@ module Print = struct
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         (print_lident info) (pv_name pv) (print_expr info) e;
     | Lsym (rs, res, args, ef) ->
-      fprintf fmt "@[<hov 2>let %a@[%a@] : %a@ =@ @[%a@]@]"
+      fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
         (print_lident info) rs.rs_name
-        (print_list_pre space (print_vs_arg info)) args
+        (print_list space (print_vs_arg info)) args
         (print_ty info) res (print_expr info) ef;
       forget_vars args
     | Lrec rdef ->
