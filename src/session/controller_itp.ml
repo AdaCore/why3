@@ -682,25 +682,32 @@ let schedule_tr_with_same_arguments
   let name = get_transf_name s tr in
   schedule_transformation c pn name args ~callback ~notification
 
+let is_valid (pa: proof_attempt_node) : bool =
+  match pa.Session_itp.proof_state with
+  | None -> false
+  | Some pr ->
+    begin
+      match pr.Call_provers.pr_answer with
+      | Call_provers.Valid -> true
+      | _ -> false
+    end
+
+let is_running (pa: proof_attempt_node) : bool =
+  match pa.Session_itp.proof_state with
+  | None -> true
+  | Some pr -> false
+
 let clean_session c ~remove ~node_change =
-  let is_valid (pa: proof_attempt_node) : bool =
-    match pa.Session_itp.proof_state with
-    | None -> false
-    | Some pr ->
-      begin
-        match pr.Call_provers.pr_answer with
-        | Call_provers.Valid -> true
-        | _ -> false
-      end
-  in
   let s = c.controller_session in
   Session_itp.session_iter_proof_attempt
     (fun _ pa ->
       let pnid = pa.parent in
       Hprover.iter (fun _ paid ->
-        if (not (is_valid (get_proof_attempt_node s paid))) then
+        let npa = get_proof_attempt_node s paid in
+        if (not (is_valid npa) && not (is_running npa)) then
           remove_subtree c ~removed:remove ~node_change (APa paid))
-        (get_proof_attempt_ids s pnid)) s
+        (get_proof_attempt_ids s pnid))
+    s
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)
