@@ -53,7 +53,7 @@ let print_map_binding key_to_str value_pr fmt binding =
 exception Bad_value
 
 let map_bindings key_to_str value_pr fmt map_bindings =
-  if map_bindings = [] then raise Bad_value
+  if map_bindings = [] then fprintf fmt "null"
   else
     Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
       (print_map_binding key_to_str value_pr) fmt map_bindings
