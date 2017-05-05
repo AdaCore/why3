@@ -349,6 +349,24 @@ let fold_all_any s f acc any =
 
 exception RemoveError
 
+(* Cannot remove a proof_attempt that was scheduled but did not finish yet.
+   It can be interrupted though. *)
+let removable_proof_attempt s pa =
+  let pa = get_proof_attempt_node s pa in
+  match pa.proof_state with
+  | None -> false
+  | Some _pr -> true
+
+let any_removable s any =
+  match any with
+  | APa pa -> removable_proof_attempt s pa
+  | _ -> true
+
+(* Check whether the subtree [n] contains an unremovable proof_attempt
+   (ie: scheduled or running) *)
+let check_removable s (n: any) =
+  fold_all_any s (fun acc any -> any_removable s any && acc) true n
+
 let remove_subtree s (n: any) ~notification : unit =
 
   let remove s (n: any) =
@@ -368,6 +386,11 @@ let remove_subtree s (n: any) ~notification : unit =
     | APn pn -> remove_proof_node s pn
     | ATh th -> remove_theory s th
   in
+
+  (* If a subtree cannot be removed then fail *)
+  if not (check_removable s n) then
+    raise RemoveError;
+
   match n with
   | APn _pn when not (is_detached s n) -> raise RemoveError
   | ATh _th when not (is_detached s n) -> raise RemoveError
