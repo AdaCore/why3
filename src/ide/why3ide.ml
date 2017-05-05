@@ -999,8 +999,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.Scheduled -> !image_scheduled
   | Controller_itp.Running -> !image_running
   | Controller_itp.InternalFailure _e -> !image_failure
-  | Controller_itp.Uninstalled _p -> !image_failure (* TODO !image_uninstalled *)
-(*  | None -> !image_undone*)
+  | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
     begin

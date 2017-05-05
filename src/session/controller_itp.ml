@@ -863,7 +863,10 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
       begin
         let parid = pa.parent in
         let pr = pa.prover in
-        (* If use_steps, we give only steps as a limit *)
+        (* TODO: if pr is not installed, lookup for a replacement policy
+         OR: delegate this work to the replay_proof_attempt function *)
+        (* If use_steps, we give only steps as a limit
+         TODO: steps should not be used if prover was replaced above *)
         let limit =
           if use_steps then
             Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}

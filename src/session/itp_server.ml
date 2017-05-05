@@ -903,7 +903,7 @@ let get_locations t =
           let parent = node_ID_from_pn parent_id in
           ignore (new_node ~parent (APa panid))
       end
-    | _  -> () (* TODO ? *)
+    | _  -> () (* TODO ? status like Uninstalled should not generate a Notification *)
     end;
     let limit = (get_proof_attempt_node cont.controller_session panid).limit in
     let new_status = Proof_status_change (pa_status, false, limit) in
