@@ -99,12 +99,9 @@ module Print = struct
       let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
       let s = sanitizer s in
       let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
-      if is_local_id info id then
-        fprintf fmt "%s" s
-      else begin
-        let fname = if lp = [] then info.info_fname else None in
-        let m = Strings.capitalize (module_name ?fname lp t) in
-        fprintf fmt "%s.%s" m s end
+      let fname = if lp = [] then info.info_fname else None in
+      let m = Strings.capitalize (module_name ?fname lp t) in
+      fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
