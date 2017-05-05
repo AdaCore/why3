@@ -81,9 +81,7 @@ module N
     then begin
       map_eq_shift x y xi yi sz 0;
       assert { forall i. 0 <= i < sz-1 ->
-                 0 <= 1+i < sz ->
-                 let j = 1+i in x[xi+j] = y[yi+j] ->
-                   x[xi+1+i] = y[yi+1+i]  };
+                 let j = 1+i in x[xi+j] = y[yi+j] };
       value_sub_frame_shift x y (xi+1) (yi+1) (sz-1)
       end
     else assert { 1+2 = 3 }
