@@ -199,11 +199,6 @@ module N
               }
   =
    let i = ref sz in
-   let zero = Int32.of_int 0 in
-   let uzero = Limb.of_int 0 in
-   let lx = ref uzero in
-   let ly = ref uzero in
-   let res = ref zero in
    try
      while Int32.(>=) !i (Int32.of_int 1) do
        variant { p2i !i }
@@ -221,9 +216,9 @@ module N
        i := Int32.(-) !i (Int32.of_int 1);
 
        assert { 0 <= !i < sz };
-       lx := get_ofs x !i;
-       ly := get_ofs y !i;
-       if (Limb.ne !lx !ly)
+       let lx = get_ofs x !i in
+       let ly = get_ofs y !i in
+       if (Limb.ne lx ly)
        then begin
             value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+p2i sz);
             value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+p2i sz);
@@ -232,40 +227,39 @@ module N
                    = compare_int (value_sub_shift x k) (value_sub_shift y k) };
             value_sub_tail (pelts x) x.offset (x.offset+k-1);
             value_sub_tail (pelts y) y.offset (y.offset+k-1);
-            if Limb.(>) !lx !ly
+            if Limb.(>) lx ly
             then begin
              value_sub_upper_bound (pelts y) y.offset (y.offset+k-1);
              value_sub_lower_bound (pelts x) x.offset (x.offset+k-1);
              assert { value_sub_shift x k - value_sub_shift y k =
-                      (l2i !lx - !ly) * (power radix (k-1))
+                      (l2i lx - ly) * (power radix (k-1))
                     - ((value_sub_shift y (k-1)) - (value_sub_shift x (k-1)))
                        };
-             assert { (!lx - !ly) * (power radix (k-1))
+             assert { (lx - ly) * (power radix (k-1))
                       >= power radix (k-1)
                       > ((value_sub_shift y (k-1)) - (value_sub_shift x (k-1)))
                        };
-             res := Int32.of_int 1
+             raise Return32 (Int32.of_int 1)
             end
             else begin
-             assert { !ly > !lx };
+             assert { ly > lx };
              value_sub_upper_bound (pelts x) x.offset (x.offset+k-1);
              value_sub_lower_bound (pelts y) y.offset (y.offset+k-1);
              assert { value_sub_shift y k - value_sub_shift x k =
-                    (!ly - !lx) * (power radix (k-1))
+                    (ly - lx) * (power radix (k-1))
                     - ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
                      };
-             assert { (!ly - !lx) * (power radix (k-1))
+             assert { (ly - lx) * (power radix (k-1))
                       >= power radix (k-1)
                       > ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
                      };
-            res := Int32.(-_) (Int32.of_int 1)
-            end;
-         raise Return32 !res;
+            raise Return32 (Int32.(-_) (Int32.of_int 1))
+            end
          end
        else ()
      done;
      value_sub_frame_shift (pelts x) (pelts y) x.offset y.offset (p2i sz);
-     zero
+     Int32.of_int 0
    with Return32 r -> r
    end
 
