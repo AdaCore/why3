@@ -61,15 +61,9 @@ module type Scheduler = sig
 
 end
 
-open Ident
-
 (** Correspondance between a node of the proof tree
     and its state (proved or not) *)
-type proof_state = {
-    th_state: bool Hid.t;
-    tn_state: bool Htn.t;
-    pn_state : bool Hpn.t;
-  }
+type proof_state
 
 type controller = private
   { mutable controller_session : Session_itp.session;
@@ -152,11 +146,14 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
+type notifier = any -> unit
+
 val remove_subtree:
   controller ->
   any ->
   removed:(any -> unit) ->
-  node_change:(any -> bool -> unit) -> unit
+  notification:notifier -> unit
+
 
 module Make(S : Scheduler) : sig
 
@@ -169,6 +166,12 @@ val register_observer : (int -> int -> int -> unit) -> unit
     tasks, scheduled tasks, and running tasks, each time these numbers
     change *)
 
+(* TODO
+val register_notifier : (any -> unit) -> unit
+(** records a hook that will be called each time a node change status *)
+ *)
+
+
 val interrupt : unit -> unit
 (** discards all scheduled proof attempts or transformations, including
     the ones already running *)
@@ -179,7 +182,7 @@ val schedule_proof_attempt :
   Whyconf.prover ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
-  notification:(any -> bool -> unit) -> unit
+  notification:notifier -> unit
 (** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
    proof attempt for a goal specified by [id] with the prover [p] with
    time limit [timelimit]; the function [callback] will be called each
@@ -193,7 +196,7 @@ val schedule_transformation :
   string ->
   string list ->
   callback:(transformation_status -> unit) ->
-  notification:(any -> bool -> unit) -> unit
+  notification:notifier -> unit
 (** [schedule_transformation c id cb] schedules a transformation for a
    goal specified by [id]; the function [cb] will be called each time
    the transformation status changes. Typically at Scheduled, then
@@ -206,7 +209,7 @@ val run_strategy_on_goal :
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
-  notification:(any -> bool -> unit) -> unit
+  notification:notifier -> unit
 (** [run_strategy_on_goal c id strat] executes asynchronously the
     strategy [strat] on the goal [id].  [callback_pa] is called for
     each proof attempted (as in [schedule_proof_attempt]) and
@@ -217,17 +220,16 @@ val run_strategy_on_goal :
 val clean_session:
   controller ->
   remove:(any -> unit) ->
-  node_change:(any -> bool -> unit) -> unit
+  notification:notifier -> unit
 (** Remove proof_attempts that are not valid from the session *)
 
 val mark_as_obsolete:
-  node_change:(any -> bool -> unit) ->
-  node_obsolete:(any -> bool -> unit) ->
+  notification:notifier ->
   controller -> any -> unit
 
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
-    notification:(any -> bool -> unit) ->
+    notification:notifier ->
     callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
     callback_tr:(transformation_status -> unit) ->
     controller -> any -> any -> unit
@@ -258,7 +260,7 @@ val replay:
     ?use_steps:bool ->
     controller ->
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->
-    notification:(any -> bool -> unit) ->
+    notification:notifier ->
     final_callback:
       ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
             -> unit) ->

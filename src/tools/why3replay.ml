@@ -250,7 +250,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
       end
   in
   let callback _paid _pastatus = () in
-  let notification _any _bool = () in
+  let notification _any = () in
   if !opt_provers = [] then
     let () =
       C.replay ~obsolete_only:false ~use_steps:!opt_use_steps ~callback ~notification ~final_callback cont

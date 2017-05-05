@@ -909,11 +909,16 @@ let get_locations t =
     let new_status = Proof_status_change (pa_status, false, limit) in
     P.notify (Node_change (node_ID_from_pan panid, new_status))
 
-  let notify_change_proved x b =
-    try (
+  let notify_change_proved c x =
+    try
       let node_ID = node_ID_from_any x in
-      P.notify (Node_change (node_ID, Proved b))
-     )
+      let b = any_proved c x in
+      P.notify (Node_change (node_ID, Proved b));
+      match x with
+      | APa pa ->
+         let obs = (get_proof_attempt_node c.controller_session pa).proof_obsolete in
+         P.notify (Node_change (node_ID, Obsolete obs))
+      | _ -> ()
     with Not_found -> ()
 
   let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
@@ -922,7 +927,7 @@ let get_locations t =
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     List.iter (fun id -> C.schedule_proof_attempt d.cont id prover
-                ~limit ~callback ~notification:notify_change_proved)
+                ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
   (* ----------------- Schedule transformation -------------------- *)
@@ -948,7 +953,7 @@ let get_locations t =
     match any_from_node_ID nid with
     | APn id ->
       let callback = callback_update_tree_transform in
-      C.schedule_transformation d.cont id t args ~callback ~notification:notify_change_proved
+      C.schedule_transformation d.cont id t args ~callback ~notification:(notify_change_proved d.cont)
     | APa panid ->
       let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
       let parent = node_ID_from_pn parent_id in
@@ -975,7 +980,7 @@ let get_locations t =
        let callback_pa = callback_update_tree_proof d.cont in
        let callback_tr st = callback_update_tree_transform st in
        List.iter (fun id ->
-                  C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:notify_change_proved)
+                  C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                  unproven_goals
     | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
@@ -983,14 +988,16 @@ let get_locations t =
   (* ----------------- Clean session -------------------- *)
   let clean_session () =
     let d = get_server_data () in
-    let node_change x b =
+(*
+    let notification x b =
       let nid = node_ID_from_any x in
       P.notify (Node_change (nid, Proved b)) in
+ *)
     let remove x =
       let nid = node_ID_from_any x in
       remove_any_node_ID x;
       P.notify (Remove nid) in
-    C.clean_session d.cont ~remove ~node_change
+    C.clean_session d.cont ~remove ~notification:(notify_change_proved d.cont)
 
 
   (* ----------------- Save session --------------------- *)
@@ -1024,7 +1031,7 @@ let get_locations t =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
     C.replay ~use_steps:false ~obsolete_only:true d.cont
-             ~callback ~notification:notify_change_proved ~final_callback
+             ~callback ~notification:(notify_change_proved d.cont) ~final_callback
 
   let () = register_command "replay" "replay obsolete proofs"
     (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
@@ -1033,13 +1040,12 @@ let get_locations t =
   let mark_obsolete n =
     let d = get_server_data () in
     let any = any_from_node_ID n in
-    let node_change x b =
-      let nid = node_ID_from_any x in
-      P.notify (Node_change (nid, Proved b)) in
+(*
     let node_obsolete x b =
       let nid = node_ID_from_any x in
       P.notify (Node_change (nid, Obsolete b)) in
-    C.mark_as_obsolete ~node_obsolete ~node_change d.cont any
+ *)
+    C.mark_as_obsolete (* ~node_obsolete *) ~notification:(notify_change_proved d.cont) d.cont any
 
   (* ----------------- locate next unproven node -------------------- *)
 
@@ -1096,8 +1102,7 @@ let get_locations t =
         begin
         try
           Controller_itp.remove_subtree d.cont n
-            ~node_change:(fun x b -> let nid = node_ID_from_any x in
-                            P.notify (Node_change (nid, Proved b)))
+            ~notification:(notify_change_proved d.cont)
             ~removed:(fun x ->
                         let nid = node_ID_from_any x in
                         remove_any_node_ID x;
@@ -1108,7 +1113,7 @@ let get_locations t =
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
         let to_any = any_from_node_ID to_id in
-        C.copy_paste ~notification:notify_change_proved
+        C.copy_paste ~notification:(notify_change_proved d.cont)
           ~callback_pa:(callback_update_tree_proof d.cont)
           ~callback_tr:(callback_update_tree_transform)
           d.cont from_any to_any
