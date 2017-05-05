@@ -599,7 +599,7 @@ let clone_type_record cl s d s' d' =
     let pj' = Opt.get rs'.rs_field in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
-    if not (ity_equal pj_ity pj'_ity && pj_ght = pj'_ght) then
+    if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
       raise (BadInstance id);
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
