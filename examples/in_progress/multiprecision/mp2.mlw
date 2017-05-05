@@ -124,7 +124,9 @@ module N
   = assert { MapEq.map_eq_sub x (Map.set x i v) n i };
     assert { MapEq.map_eq_sub x (Map.set x i v) (i+1) m };
     value_sub_concat x n i m;
-    value_sub_concat (Map.set x i v) n i m
+    value_sub_concat (Map.set x i v) n i m;
+    value_sub_head x i m;
+    value_sub_head (Map.set x i v) i m
 
   let rec lemma value_zero (x:map int limb) (n m:int)
     requires { MapEq.map_eq_sub x (Const.const Limb.zero_unsigned) n m }
@@ -3709,6 +3711,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  so power radix (sx - sy - !i)
                     = radix * power radix (sx - sy - k)
                  so radix * power radix !i = power radix k
+                 so (power radix !i * power radix sy
+                      = power radix (sy + k - 1)
+                      by !i + sy = sy + k - 1
+                      so power radix !i * power radix sy
+                         = power radix (!i + sy))
                  so (value_sub_shift !qp (sx - sy - !i)
                       + qh * power radix (sx - sy - !i))
                       * vy * power radix !i
