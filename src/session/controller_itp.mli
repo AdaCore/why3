@@ -219,9 +219,9 @@ val run_strategy_on_goal :
 
 val clean_session:
   controller ->
-  remove:(any -> unit) ->
-  notification:notifier -> unit
-(** Remove proof_attempts that are not valid from the session *)
+  remove:(any -> unit) -> unit
+(** Remove proof_attempts below proved goals, although thet are either obsoloete or not valid
+ *)
 
 val mark_as_obsolete:
   notification:notifier ->

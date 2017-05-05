@@ -988,16 +988,11 @@ let get_locations t =
   (* ----------------- Clean session -------------------- *)
   let clean_session () =
     let d = get_server_data () in
-(*
-    let notification x b =
-      let nid = node_ID_from_any x in
-      P.notify (Node_change (nid, Proved b)) in
- *)
     let remove x =
       let nid = node_ID_from_any x in
       remove_any_node_ID x;
       P.notify (Remove nid) in
-    C.clean_session d.cont ~remove ~notification:(notify_change_proved d.cont)
+    C.clean_session d.cont ~remove
 
 
   (* ----------------- Save session --------------------- *)

@@ -118,18 +118,20 @@ let send_request r =
 let backtrace_and_exit f () =
   try f () with
   | e ->
-      if Debug.test_flag debug_stack_trace then
-        begin
-          Printexc.print_backtrace stdout;
-          exit 1
-        end
-      else
-        begin
-          Format.eprintf "Following exception %a was catched by Labelgtk."
-            Exn_printer.exn_printer e;
-          Format.eprintf "This should not happen. Please report. @.";
-          raise e
-        end
+     if Debug.test_flag debug_stack_trace then
+       begin
+         Printexc.print_backtrace stderr;
+         Format.eprintf "exception '%a' was raised in a LablGtk callback.@."
+                        Exn_printer.exn_printer e;
+         exit 1
+       end
+     else
+       begin
+         Format.eprintf "exception '%a' was raised in a LablGtk callback.@."
+                        Exn_printer.exn_printer e;
+         Format.eprintf "This should not happen. Please report. @.";
+         raise e
+       end
 
 module S = struct
 

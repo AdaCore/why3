@@ -4,104 +4,77 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="0"/>
-<prover id="4" name="Z3" version="4.4.2" timelimit="5" steplimit="1" memlimit="0"/>
-<prover id="5" name="Alt-Ergo" version="1.00.prv" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC4" version="1.5-prerelease" timelimit="5" steplimit="1" memlimit="0"/>
-<prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="1" memlimit="0"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5-prerelease" timelimit="5" steplimit="1" memlimit="0"/>
+<prover id="5" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="4000"/>
+<prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../dijkstra.mlw">
-<theory name="DijkstraShortestPath" sum="b2e1a99eaf977a9e81675c568e5a1442">
+<theory name="DijkstraShortestPath" sum="fdfb1e7d5300d63de3b73e892fde1aaf">
  <goal name="WP_parameter relax">
- <transf name="split_goal_wp" >
-  <goal name="WP_parameter relax.0">
-  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter relax.1">
-  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
-  </goal>
-  <goal name="WP_parameter relax.2">
-  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter relax.3">
-  <proof prover="0"><result status="valid" time="0.03" steps="2"/></proof>
-  </goal>
- </transf>
+ <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="Length_nonneg">
  <transf name="induction_pr" >
   <goal name="Length_nonneg.0">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="Length_nonneg.1">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="Path_inversion">
- <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="5"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
  <goal name="Path_shortest_path">
  <transf name="introduce_premises" >
   <goal name="Path_shortest_path.0">
-  <transf name="cut" arg1="(0 &lt;= d)">
+  <transf name="induction" arg1="d" arg2="0">
    <goal name="Path_shortest_path.0.0">
-   <transf name="induction" arg1="d" arg2="0">
-    <goal name="Path_shortest_path.0.0.0">
-    <transf name="exists" arg1="0">
-     <goal name="Path_shortest_path.0.0.0.0">
-     <proof prover="3" steplimit="-1"><result status="valid" time="0.00" steps="7"/></proof>
-     </goal>
-    </transf>
-    </goal>
-    <goal name="Path_shortest_path.0.0.1">
-    <proof prover="3" steplimit="-1"><result status="valid" time="0.00" steps="7"/></proof>
-    </goal>
-   </transf>
+   <proof prover="7"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="Path_shortest_path.0.1">
-   <proof prover="3" steplimit="-1"><result status="valid" time="0.00" steps="3"/></proof>
+   <proof prover="7"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="Main_lemma">
- <proof prover="2" timelimit="5"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.38" steps="937"/></proof>
+ <proof prover="3" timelimit="5"><result status="valid" time="0.08"/></proof>
  </goal>
  <goal name="Completeness_lemma">
  <transf name="induction_pr" >
   <goal name="Completeness_lemma.0">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="Completeness_lemma.1">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="inside_or_exit">
  <transf name="induction_pr" >
   <goal name="inside_or_exit.0">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="inside_or_exit.1">
-  <proof prover="4"><result status="timeout" time="5.00"/></proof>
   <transf name="introduce_premises" >
    <goal name="inside_or_exit.1.0">
    <transf name="case" arg1="(mem z s)">
     <goal name="inside_or_exit.1.0.0">
-    <proof prover="4"><result status="valid" time="0.01"/></proof>
+    <proof prover="7"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="inside_or_exit.1.0.1">
-    <proof prover="4"><result status="timeout" time="5.00"/></proof>
     <transf name="instantiate" arg1="H1" arg2="src">
      <goal name="inside_or_exit.1.0.1.0">
      <transf name="instantiate" arg1="H" arg2="y">
       <goal name="inside_or_exit.1.0.1.0.0">
       <transf name="instantiate" arg1="H" arg2="d1">
        <goal name="inside_or_exit.1.0.1.0.0.0">
-       <proof prover="4"><result status="valid" time="0.02"/></proof>
+       <proof prover="7"><result status="valid" time="0.02"/></proof>
        </goal>
       </transf>
       </goal>
@@ -119,32 +92,32 @@
  <transf name="split_goal_wp" >
   <goal name="WP_parameter shortest_path_code.0">
   <proof prover="1"><result status="valid" time="0.20"/></proof>
-  <proof prover="3"><result status="valid" time="0.08" steps="325"/></proof>
-  <proof prover="7"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="325"/></proof>
+  <proof prover="6"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.1">
   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
-  <proof prover="7"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.2">
-  <proof prover="3"><result status="valid" time="0.02" steps="45"/></proof>
-  <proof prover="7"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.3">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.4">
   <proof prover="0" timelimit="15"><result status="valid" time="0.05" steps="67"/></proof>
   <proof prover="1"><result status="valid" time="0.07"/></proof>
-  <proof prover="2" timelimit="15"><result status="valid" time="0.26"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="66"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="66"/></proof>
+  <proof prover="3" timelimit="15"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.5">
   <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.6">
   <transf name="inline_goal" >
@@ -152,31 +125,31 @@
    <transf name="split_goal_wp" >
     <goal name="WP_parameter shortest_path_code.6.0.0">
     <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
-    <proof prover="3"><result status="valid" time="0.01" steps="26"/></proof>
+    <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.1">
     <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
-    <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
+    <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.2">
     <proof prover="0" timelimit="30"><result status="valid" time="0.02" steps="26"/></proof>
-    <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
+    <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.3">
     <proof prover="0" timelimit="30"><result status="valid" time="0.01" steps="26"/></proof>
-    <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
+    <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.4">
     <proof prover="0" timelimit="30"><result status="valid" time="0.02" steps="63"/></proof>
-    <proof prover="3"><result status="valid" time="0.02" steps="42"/></proof>
+    <proof prover="2"><result status="valid" time="0.02" steps="42"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.5">
     <proof prover="0" timelimit="30"><result status="valid" time="0.05" steps="205"/></proof>
-    <proof prover="3"><result status="valid" time="0.04" steps="156"/></proof>
+    <proof prover="2"><result status="valid" time="0.04" steps="156"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.6.0.6">
     <proof prover="0" timelimit="30"><result status="valid" time="0.08" steps="31"/></proof>
-    <proof prover="3"><result status="valid" time="0.02" steps="35"/></proof>
+    <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
     </goal>
    </transf>
    </goal>
@@ -186,21 +159,20 @@
   <transf name="split_goal_wp" >
    <goal name="WP_parameter shortest_path_code.7.0">
    <proof prover="0"><result status="valid" time="0.03" steps="91"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="85"/></proof>
+   <proof prover="2"><result status="valid" time="0.02" steps="85"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter shortest_path_code.8">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.9">
-  <proof prover="3"><result status="timeout" time="4.98"/></proof>
-  <proof prover="7"><result status="valid" time="0.23"/></proof>
+  <proof prover="6"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.10">
   <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="40"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.11">
   <transf name="inline_goal" >
@@ -208,56 +180,55 @@
    <transf name="split_goal_wp" >
     <goal name="WP_parameter shortest_path_code.11.0.0">
     <proof prover="0"><result status="valid" time="0.04" steps="86"/></proof>
-    <proof prover="3"><result status="valid" time="0.06" steps="118"/></proof>
+    <proof prover="2"><result status="valid" time="0.06" steps="118"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.1">
     <proof prover="1" timelimit="10"><result status="valid" time="0.84"/></proof>
-    <proof prover="3"><result status="valid" time="1.04" steps="3505"/></proof>
+    <proof prover="2"><result status="valid" time="1.04" steps="3505"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.2">
     <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
-    <proof prover="3"><result status="valid" time="0.00" steps="25"/></proof>
+    <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.3">
     <proof prover="1" timelimit="10"><result status="valid" time="2.90"/></proof>
-    <proof prover="3"><result status="timeout" time="5.00"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.4">
     <proof prover="0"><result status="valid" time="0.16" steps="337"/></proof>
-    <proof prover="3"><result status="valid" time="0.12" steps="470"/></proof>
+    <proof prover="2"><result status="valid" time="0.12" steps="470"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.5">
     <proof prover="0"><result status="valid" time="0.12" steps="156"/></proof>
-    <proof prover="3"><result status="valid" time="0.10" steps="377"/></proof>
+    <proof prover="2"><result status="valid" time="0.10" steps="377"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.11.0.6">
     <transf name="introduce_premises" >
      <goal name="WP_parameter shortest_path_code.11.0.6.0">
      <transf name="destruct" arg1="H22">
       <goal name="WP_parameter shortest_path_code.11.0.6.0.0">
-      <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="40"/></proof>
+      <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="40"/></proof>
       </goal>
       <goal name="WP_parameter shortest_path_code.11.0.6.0.1">
       <transf name="destruct" arg1="H">
        <goal name="WP_parameter shortest_path_code.11.0.6.0.1.0">
-       <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="41"/></proof>
+       <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="41"/></proof>
        </goal>
        <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1">
        <transf name="destruct" arg1="H">
         <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0">
         <transf name="destruct" arg1="H23">
          <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0.0">
-         <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="29"/></proof>
+         <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="29"/></proof>
          </goal>
          <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0.1">
          <transf name="destruct" arg1="H12">
           <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0.1.0">
           <transf name="case" arg1="(v = v1)">
            <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0.1.0.0">
-           <proof prover="3" steplimit="-1"><result status="valid" time="2.10" steps="6846"/></proof>
+           <proof prover="2" steplimit="-1"><result status="valid" time="2.10" steps="6846"/></proof>
            </goal>
            <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.0.1.0.1">
-           <proof prover="3" steplimit="-1"><result status="valid" time="0.03" steps="43"/></proof>
+           <proof prover="2" steplimit="-1"><result status="valid" time="0.03" steps="43"/></proof>
            </goal>
           </transf>
           <transf name="destruct" arg1="H3">
@@ -274,7 +245,7 @@
         </transf>
         </goal>
         <goal name="WP_parameter shortest_path_code.11.0.6.0.1.1.1">
-        <proof prover="3" steplimit="-1"><result status="valid" time="1.81" steps="5948"/></proof>
+        <proof prover="2" steplimit="-1"><result status="valid" time="1.81" steps="5948"/></proof>
         </goal>
        </transf>
        </goal>
@@ -296,15 +267,12 @@
     <transf name="split_goal_wp" >
      <goal name="WP_parameter shortest_path_code.12.0.0.0">
      <proof prover="1"><result status="valid" time="0.08"/></proof>
-     <proof prover="3"><result status="timeout" time="5.00"/></proof>
-     <proof prover="6"><result status="valid" time="0.07"/></proof>
-     <proof prover="7"><result status="valid" time="2.18"/></proof>
+     <proof prover="4"><result status="valid" time="0.07"/></proof>
+     <proof prover="6"><result status="valid" time="2.18"/></proof>
      </goal>
      <goal name="WP_parameter shortest_path_code.12.0.0.1">
      <proof prover="1"><result status="valid" time="0.78"/></proof>
-     <proof prover="3"><result status="timeout" time="5.00"/></proof>
-     <proof prover="4"><result status="timeout" time="5.00"/></proof>
-     <proof prover="6"><result status="valid" time="1.27"/></proof>
+     <proof prover="4"><result status="valid" time="1.27"/></proof>
      </goal>
     </transf>
     </goal>
@@ -314,18 +282,17 @@
   </goal>
   <goal name="WP_parameter shortest_path_code.13">
   <proof prover="0"><result status="valid" time="0.03" steps="40"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="62"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.14">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.15">
-  <proof prover="3"><result status="valid" time="0.15" steps="557"/></proof>
-  <proof prover="7"><result status="valid" time="0.17"/></proof>
+  <proof prover="2"><result status="valid" time="0.15" steps="557"/></proof>
+  <proof prover="6"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.16">
-  <proof prover="3"><result status="timeout" time="4.99"/></proof>
   <transf name="introduce_premises" >
    <goal name="WP_parameter shortest_path_code.16.0">
    <transf name="cut" arg1="(is_empty su)">
@@ -334,7 +301,6 @@
      <goal name="WP_parameter shortest_path_code.16.0.0.0">
      <transf name="cut" arg1="(mem src visited)">
       <goal name="WP_parameter shortest_path_code.16.0.0.0.0">
-      <proof prover="3" steplimit="-1"><result status="timeout" time="5.00"/></proof>
       <transf name="instantiate" arg1="inside_or_exit" arg2="visited">
        <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0">
        <transf name="instantiate" arg1="inside_or_exit" arg2="src">
@@ -343,13 +309,11 @@
          <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0">
          <transf name="instantiate" arg1="inside_or_exit" arg2="dx">
           <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0">
-          <proof prover="3" steplimit="-1"><result status="timeout" time="5.00"/></proof>
           <transf name="cut" arg1="(mem x visited \/ (exists y:vertex. exists z: vertex. exists dy:int. mem y visited /\ not mem z visited /\ mem z (g_succ y) /\ path src y dy /\ ((dy + weight y z) &lt;= dx)))">
            <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0">
-           <proof prover="3" steplimit="-1"><result status="timeout" time="5.00"/></proof>
            <transf name="destruct" arg1="h">
             <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0.0">
-            <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="25"/></proof>
+            <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="25"/></proof>
             </goal>
             <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0.1">
             <transf name="destruct" arg1="h">
@@ -360,10 +324,10 @@
                <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0.1.0.0.0">
                <transf name="cut" arg1="(mem z q)">
                 <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0.1.0.0.0.0">
-                <proof prover="3" steplimit="-1"><result status="valid" time="0.58" steps="1955"/></proof>
+                <proof prover="2" steplimit="-1"><result status="valid" time="0.58" steps="1955"/></proof>
                 </goal>
                 <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.0.1.0.0.0.1">
-                <proof prover="3" steplimit="-1"><result status="valid" time="3.13" steps="7298"/></proof>
+                <proof prover="2" steplimit="-1"><result status="valid" time="3.13" steps="7298"/></proof>
                 </goal>
                </transf>
                </goal>
@@ -376,7 +340,7 @@
            </transf>
            </goal>
            <goal name="WP_parameter shortest_path_code.16.0.0.0.0.0.0.0.0.1">
-           <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="68"/></proof>
+           <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="68"/></proof>
            </goal>
           </transf>
           </goal>
@@ -389,17 +353,17 @@
       </transf>
       </goal>
       <goal name="WP_parameter shortest_path_code.16.0.0.0.1">
-      <proof prover="3" steplimit="-1"><result status="valid" time="0.02" steps="54"/></proof>
+      <proof prover="2" steplimit="-1"><result status="valid" time="0.02" steps="54"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="WP_parameter shortest_path_code.16.0.0.1">
-     <proof prover="3" steplimit="-1"><result status="valid" time="0.12" steps="558"/></proof>
+     <proof prover="2" steplimit="-1"><result status="valid" time="0.12" steps="558"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="WP_parameter shortest_path_code.16.0.1">
-    <proof prover="3" steplimit="-1"><result status="valid" time="0.01" steps="22"/></proof>
+    <proof prover="2" steplimit="-1"><result status="valid" time="0.01" steps="22"/></proof>
     </goal>
    </transf>
    </goal>
@@ -407,15 +371,15 @@
   </goal>
   <goal name="WP_parameter shortest_path_code.17">
   <proof prover="0"><result status="valid" time="0.07" steps="73"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="69"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.18">
   <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.19">
-  <proof prover="3"><result status="valid" time="0.19" steps="482"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.19" steps="482"/></proof>
+  <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
