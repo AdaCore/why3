@@ -624,9 +624,9 @@ let goals_model,goals_view =
   let () = view#set_rules_hint true in
 *)
   let () = view#set_enable_search false in
-  ignore (view#append_column view_name_column);
-  ignore (view#append_column view_status_column);
-  ignore (view#append_column view_time_column);
+  let _: int = view#append_column view_name_column in
+  let _: int = view#append_column view_status_column in
+  let _: int = view#append_column view_time_column in
   Debug.dprintf debug "[GTK IDE] done@.";
   model,view
 
@@ -1154,6 +1154,7 @@ let rec update_status_column_from_iter cont iter =
   | Some p -> update_status_column_from_iter cont p
   | None -> ()
 
+(* TODO Unused functions. Map these to a key or remove it *)
 let move_current_row_selection_up () =
   let current_view = List.hd (goals_view#selection#get_selected_rows) in
   ignore (GTree.Path.up current_view);
@@ -1205,18 +1206,34 @@ let on_selected_row r =
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
+let has_right_click = ref false
+
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     (fun () ->
      begin
        match get_selected_row_references () with
-       | [r] -> on_selected_row r
+       | [r] -> on_selected_row r;
+           if !has_right_click then
+             (* TODO here show the menu *)
+             ();
+           has_right_click := false
+
        | _ -> ()
      end (* ;
-     command_entry#misc#grab_focus () *))
+     command_entry#misc#grab_focus () *) ; has_right_click := false)
 
-
-
+let _ =
+  (* This event is executed BEFORE the other connected event goals_view#selection#connect#after#changed above *)
+  (* We return false so that the second callback above is executed ? *)
+  goals_view#event#connect#button_press ~callback:(fun x ->
+    (match GdkEvent.Button.button x with
+    | 1 -> (* Left click *) ()
+    | 2 -> (* Middle click *) ()
+    | 3 -> (* Right click *)
+        has_right_click := true
+    | _ -> (* Error case TODO *) assert false);
+    Format.eprintf "TODO button number %d was clicked on the tree view@." (GdkEvent.Button.button x); false)
 
 
 (***********************)
