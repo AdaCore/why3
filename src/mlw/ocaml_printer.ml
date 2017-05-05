@@ -91,7 +91,7 @@ module Print = struct
 
   let print_qident ~sanitizer info fmt id =
     try
-      if info.flat then raise Not_found;
+      if info.flat || is_local_id info id then raise Not_found;
       let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
