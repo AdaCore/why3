@@ -289,7 +289,7 @@ let add_pdecl_no_logic uc d =
 let add_pdecl_raw ?(warn=true) uc d =
   let uc = add_pdecl_no_logic uc d in
   let th = List.fold_left (add_decl ~warn) uc.muc_theory d.pd_pure in
-  let th = List.fold_left (fun th (m,l) -> Theory.add_meta th m l) th d.pd_metas in
+  let th = List.fold_left (fun th (m,l) -> Theory.add_meta th m l) th d.pd_meta in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)
@@ -1004,7 +1004,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       add_pdecl ~warn:false ~vc:false uc (create_exn_decl xs')
   | PDpure ->
       let uc = List.fold_left (clone_decl inst cl) uc d.pd_pure in
-      assert (d.pd_metas = []); (* FIXME! *)
+      assert (d.pd_meta = []); (* pure decls do not produce metas *)
       uc
 
 let theory_add_clone = Theory.add_clone_internal ()
