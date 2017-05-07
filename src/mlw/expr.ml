@@ -210,6 +210,14 @@ let rs_of_ls ls =
   let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
+let ls_of_rs rs = match rs.rs_logic with
+  | RLls ls -> ls
+  | _ -> invalid_arg "Expr.ls_of_rs"
+
+let fd_of_rs rs = match rs.rs_field with
+  | Some fd -> fd
+  | _ -> invalid_arg "Expr.fd_of_rs"
+
 (** {2 Program patterns} *)
 
 type pat_ghost =

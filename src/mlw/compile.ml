@@ -414,7 +414,7 @@ module Translate = struct
     let not_g e = not (rs_ghost e) in
     let pjl = itd.itd_fields in
     let mfields = itd.itd_its.its_mfields in
-    let pv_equal_field rs = pv_equal (Opt.get rs.rs_field) in
+    let pv_equal_field rs = pv_equal (fd_of_rs rs) in
     let get_mutable rs = List.exists (pv_equal_field rs) mfields in
     match filter_ghost_params not_g get_mutable pjl with
     | [is_mutable] -> not is_mutable
@@ -695,7 +695,7 @@ module Translate = struct
           List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
     in
     let drecord_fields ({rs_cty = rsc} as rs) =
-      (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
+      (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields),
       rs.rs_name,
       ity rsc.cty_result
     in

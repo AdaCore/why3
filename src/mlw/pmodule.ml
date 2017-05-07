@@ -289,7 +289,8 @@ let add_pdecl_no_logic uc d =
 let add_pdecl_raw ?(warn=true) uc d =
   let uc = add_pdecl_no_logic uc d in
   let th = List.fold_left (add_decl ~warn) uc.muc_theory d.pd_pure in
-  let th = List.fold_left (fun th (m,l) -> Theory.add_meta th m l) th d.pd_meta in
+  let add_meta th (m,l) = Theory.add_meta th m l in
+  let th = List.fold_left add_meta th d.pd_meta in
   { uc with muc_theory = th }
 
 (** {2 Builtin symbols} *)
@@ -327,9 +328,9 @@ let tuple_module = Hint.memo 17 (fun n ->
 let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
   let uc = use_export uc (tuple_module 0) in
+  let add uc d = add_pdecl_raw ~warn:false uc d in
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
-  let d = create_type_decl [td] in
-  close_module (add_pdecl_raw ~warn:false uc d)
+  close_module (List.fold_left add uc (create_type_decl [td]))
 
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
@@ -628,26 +629,20 @@ let mk_record_invariant d s =
   let inv = t_subst sbs (t_and_simp_l d.itd_invariant) in
   t_forall_close [u] [] inv
 
-(* Mário: commented out this function *)
-let ls_of_rs rs = match rs.rs_logic with
-  | RLls ls -> ls
-  | _ -> assert false
-
 let clone_type_record cl s d s' d' =
   let id = s.its_ts.ts_name in
   let fields' = Hstr.create 16 in
-  let add_field' ({rs_field = pj'} as rs') =
-    let pj' = Opt.get pj' in
+  let add_field' rs' = let pj' = fd_of_rs rs' in
     Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
   List.iter add_field' d'.itd_fields;
   (* check if fields from former type are also declared in the new type *)
-  let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
+  let match_pj rs = let pj = fd_of_rs rs in
     let pj_str = pj.pv_vs.vs_name.id_string in
     let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
     let rs' = try Hstr.find fields' pj_str
       with Not_found -> raise (BadInstance id) in
-    let pj' = Opt.get rs'.rs_field in
+    let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
     if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
@@ -676,16 +671,16 @@ let clone_type_decl inst cl tdl kn =
       List.iter2 (cl_save_rs cl) d.itd_fields itd.itd_fields;
       Hits.add htd s (Some itd) in
     (* alias *)
-    match s.its_def with
-    | Alias ty ->
+    if s.its_def <> NoDef then begin
       if cloned then raise (CannotInstantiate id);
-      let def = conv_ity alg ty in
-      let itd = create_alias_decl id' ts.ts_args def in
+      let itd = match s.its_def with
+        | Alias ty -> create_alias_decl id' ts.ts_args (conv_ity alg ty)
+        | Range ir -> create_range_decl id' ir
+        | Float ff -> create_float_decl id' ff
+        | NoDef -> assert false (* never *) in
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
-    | Range _ -> assert false (* TODO *)
-    | Float _ -> assert false (* TODO *)
-    | NoDef ->
+    end else
     (* abstract *)
     if s.its_private && cloned then begin
       (* FIXME: currently, we cannot refine a block of mutual types *)
@@ -725,7 +720,7 @@ let clone_type_decl inst cl tdl kn =
                             d.itd_invariant = [] then begin
       if cloned then raise (CannotInstantiate id);
       let conv_fd m fd =
-        let v = Opt.get fd.rs_field in Mpv.add v (conv_pj v) m in
+        let v = fd_of_rs fd in Mpv.add v (conv_pj v) m in
       let fldm = List.fold_left conv_fd Mpv.empty d.itd_fields in
       let conv_pj pj = match Mpv.find_opt pj fldm with
         | Some pj' -> true, pj' | None -> false, conv_pj pj in
@@ -744,7 +739,7 @@ let clone_type_decl inst cl tdl kn =
     (* flat record *)
       if cloned then raise (CannotInstantiate id);
       let mfld = Spv.of_list s.its_mfields in
-      let pjl = List.map (fun fd -> Opt.get fd.rs_field) d.itd_fields in
+      let pjl = List.map fd_of_rs d.itd_fields in
       let fdl = List.map (fun v -> Spv.mem v mfld, conv_pj v) pjl in
       let inv =
         if d.itd_invariant = [] then [] else
@@ -953,8 +948,8 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
       let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
       if tdl = [] then List.fold_left add_vc uc vcl else
-        let d = create_type_decl tdl in
-        add_pdecl ~warn:false ~vc:false uc d
+        let add uc d = add_pdecl ~warn:false ~vc:false uc d in
+        List.fold_left add uc (create_type_decl tdl)
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       if c.c_node <> Cany then raise (BadInstance rs.rs_name);

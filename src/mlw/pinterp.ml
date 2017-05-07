@@ -503,7 +503,7 @@ let rec eval_expr env (e : expr) : result =
   | Eassign l ->
     List.iter
       (fun (pvs,rs,value) ->
-        let fld = Opt.get rs.rs_field in
+        let fld = fd_of_rs rs in
         let value = get_pvs env value in
         match get_pvs env pvs with
         | Vconstr(cstr,args) ->

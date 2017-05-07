@@ -17,9 +17,6 @@ open Ity
 open Expr
 open Pdecl
 
-let ls_of_rs s = match s.rs_logic with
-  RLls ls -> ls | _ -> assert false
-
 let ls_valid =
   let v = create_tvsymbol (id_fresh "a") in
   create_psymbol (id_fresh "valid") [ty_var v]
@@ -123,7 +120,7 @@ let add_gl_cap kn v =
         let sbs = ts_match_args s.its_ts tl in
         if s.its_nonfree then if s.its_fragile then (* breakable record *)
           let add_field m f =
-            let vf = Opt.get f.rs_field in
+            let vf = fd_of_rs f in
             let ty = Ty.ty_inst sbs vf.pv_vs.vs_ty in
             let leaf = fs_app (ls_of_rs f) [leaf] ty in
             Mls.add (ls_of_rs f) (down stem leaf ty) m in
@@ -134,13 +131,13 @@ let add_gl_cap kn v =
           mkP n
         else (* unbreakable record *)
           let add_field m f =
-            let vf = Opt.get f.rs_field in
+            let vf = fd_of_rs f in
             let ty = Ty.ty_inst sbs vf.pv_vs.vs_ty in
             let leaf = fs_app (ls_of_rs f) [leaf] ty in
             Mls.add (ls_of_rs f) (down stem leaf ty) m in
           mkR (List.fold_left add_field Mls.empty d.itd_fields)
         else if List.length d.itd_constructors == 1 then (* record type *)
-          let add_field m f = Mpv.add (Opt.get f.rs_field) (ls_of_rs f) m in
+          let add_field m f = Mpv.add (fd_of_rs f) (ls_of_rs f) m in
           let pjm = List.fold_left add_field Mpv.empty d.itd_fields in
           let add_constr m c =
             let inst f = Ty.ty_inst sbs f.pv_vs.vs_ty in
@@ -327,7 +324,7 @@ let add_var kn pins vl v =
         if s.its_nonfree then if s.its_fragile then (* breakable record *)
           let bn = v.vs_name.id_string in
           let add_field (m,mv) f =
-            let vf = Opt.get f.rs_field in
+            let vf = fd_of_rs f in
             let ty = Ty.ty_inst sbs vf.pv_vs.vs_ty in
             let nm = bn ^ "_" ^ f.rs_name.id_string in
             let v = create_vsymbol (id_fresh nm) ty in
@@ -343,7 +340,7 @@ let add_var kn pins vl v =
           mkP n
         else (* unbreakable record *)
           let add_field m f =
-            let vf = Opt.get f.rs_field in
+            let vf = fd_of_rs f in
             let ty = Ty.ty_inst sbs vf.pv_vs.vs_ty in
             Mls.add (ls_of_rs f) (down ty) m in
           mkR (List.fold_left add_field Mls.empty d.itd_fields)

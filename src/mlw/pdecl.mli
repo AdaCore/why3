@@ -91,7 +91,7 @@ and pdecl_node = private
 
 and meta_decl = Theory.meta * Theory.meta_arg list
 
-val create_type_decl : its_defn list -> pdecl
+val create_type_decl : its_defn list -> pdecl list
 
 val create_let_decl : let_defn -> pdecl
 

@@ -32,8 +32,6 @@ let no_eval = Debug.register_flag "vc_no_eval"
 let case_split = Ident.create_label "case_split"
 let add_case t = t_label_add case_split t
 
-let ls_of_rs s = match s.rs_logic with RLls ls -> ls | _ -> assert false
-
 let clone_vs v = create_vsymbol (id_clone v.vs_name) v.vs_ty
 let clone_pv v = clone_vs v.pv_vs
 
@@ -533,7 +531,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         if Sreg.is_empty cv then k_unit res else
         (* compute the write effect *)
         let add wr (r,f,v) =
-          let f = Opt.get f.rs_field in
+          let f = fd_of_rs f in
           let r = match r.pv_ity.ity_node with
             | Ityreg r -> r | _ -> assert false in
           Mreg.change (function
@@ -1000,7 +998,7 @@ let rec havoc kn wr regs t ity fl =
       let wfs = Mreg.find_def Mpv.empty r wr in
       let nt = Mreg.find r regs in
       let field rs fl =
-        let fd = Opt.get rs.rs_field in
+        let fd = fd_of_rs rs in
         match Mpv.find_opt fd wfs with
         | Some None -> fl
         | Some (Some {pv_vs = v}) ->
