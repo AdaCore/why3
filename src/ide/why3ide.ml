@@ -1462,6 +1462,10 @@ let treat_notification n =
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id
           (fun _ ->
+            (* Unselect the potentially selected goal to avoid having two tasks
+               selected at once when a prover successfully end. To continue the
+               proof, it is better to only have the new goal selected *)
+            goals_view#selection#unselect_all ();
             let iter = (get_node_row next_unproved_id)#iter in
             goals_view#selection#select_iter iter)
   | New_node (id, parent_id, typ, name, detached) ->
