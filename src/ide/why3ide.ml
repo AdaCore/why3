@@ -309,6 +309,11 @@ let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label
 (* The corresponding file does not have a source view *)
 exception Nosourceview of string
 
+let get_source_view_table (file:string) =
+  match Hstr.find source_view_table file with
+  | v -> v
+  | exception Not_found -> raise (Nosourceview file)
+
 (* This returns the source_view of a file *)
 let get_source_view (file: string) : GSourceView2.source_view =
   match Hstr.find source_view_table file with
@@ -969,12 +974,30 @@ let convert_color (color: color): string =
   | Premise_color -> "premise_tag"
   | Goal_color -> "goal_tag"
 
+let move_to_line ~yalign (v : GSourceView2.source_view) line =
+  let line = max 0 line in
+  let line = min line v#buffer#line_count in
+  let it = v#buffer#get_iter (`LINE line) in
+  v#buffer#place_cursor ~where:it;
+  let mark = `MARK (v#buffer#create_mark it) in
+  v#scroll_to_mark ~use_align:true ~yalign mark
+
+(* TODO Do we want an option to choose if we aggressivily switch to the correct
+   source location each time we receive locations with task or not *)
+let always_scroll = false
+
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   try
-    let v: GSourceView2.source_view = get_source_view f in
+    let (n, v, _, _) = get_source_view_table f in
+    if color = Goal_color then
+      begin
+        if always_scroll then
+          notebook#goto_page n;
+        move_to_line ~yalign:0.0 v l;
+      end;
     let color = convert_color color in
     color_loc ~color v l b e
   with
