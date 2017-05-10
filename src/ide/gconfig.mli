@@ -114,8 +114,10 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
+(*
 val uninstalled_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+ *)
 
 (*
 val unknown_prover :

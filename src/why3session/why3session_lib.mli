@@ -63,10 +63,12 @@ val filter_spec : spec_list
 val read_filter_spec : Whyconf.config -> filters * bool
 
 val theory_iter_proof_attempt_by_filter :
+  Controller_itp.controller ->
   filters ->
   (Session_itp.proof_attempt_node -> unit) -> Session_itp.theory -> unit
 
 val session_iter_proof_attempt_by_filter :
+  Controller_itp.controller ->
   filters ->
   (Session_itp.proof_attempt_node -> unit) -> Session_itp.session -> unit
 

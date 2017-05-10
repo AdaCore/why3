@@ -1125,6 +1125,7 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
 
+(*
 let uninstalled_prover c eS unknown =
   try
     Whyconf.get_prover_upgrade_policy c.config unknown
@@ -1234,7 +1235,7 @@ let uninstalled_prover c eS unknown =
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
     policy
-
+ *)
 
 
 (*
