@@ -247,7 +247,9 @@ let print_request fmt r =
   | Prove_req (_nid, prover, _rl)   -> fprintf fmt "prove with %s" prover
   | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
   | Strategy_req (_nid, st)         -> fprintf fmt "strategy %s" st
+(*
   | Open_session_req f              -> fprintf fmt "open session file %s" f
+*)
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
@@ -323,7 +325,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
-  let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
+let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
 
 (****************)
@@ -365,8 +367,7 @@ let () =
   ]
 
   type server_data =
-    { config : Whyconf.config;
-      task_driver : Driver.driver;
+    { task_driver : Driver.driver;
       cont : Controller_itp.controller;
     }
 
@@ -509,26 +510,6 @@ let get_locations t =
 
   let get_prover_list (config: Whyconf.config) =
     Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
-
-  let init_server config env =
-    let provers = Whyconf.get_provers config in
-    let c = create_controller env in
-    let task_driver = task_driver config env in
-    Whyconf.Mprover.iter
-      (fun _ p ->
-       try
-         let d = Driver.load_driver c.controller_env p.Whyconf.driver [] in
-         Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         Format.eprintf
-           "[ITP server] error loading driver for prover %a: %a@."
-           Whyconf.print_prover p.Whyconf.prover
-           Exn_printer.exn_printer e)
-      provers;
-    server_data := Some
-                     { config = config;
-                       task_driver = task_driver;
-                       cont = c }
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -679,7 +660,7 @@ let get_locations t =
 
   let get_prover p =
     let d = get_server_data () in
-    match return_prover p d.config with
+    match return_prover p d.cont.controller_config with
     | None -> raise (Bad_prover_name p)
     | Some c -> c
 
@@ -849,16 +830,22 @@ let get_locations t =
       P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
 
 
-  (* ------------ init controller ------------ *)
+  (* ------------ init server ------------ *)
 
-  (* Init cont on file or directory. It is called only when an
-     Open_session_req is requested *)
-  let init_cont f =
+  let init_server config env f =
+    Debug.dprintf debug "[ITP server] loading session %s@." f;
+    let ses,use_shapes = Session_itp.load_session f in
+    Debug.dprintf debug "[ITP server] creating controller@.";
+    let c = create_controller config env ses in
+    let task_driver = task_driver config env in
+    server_data := Some
+                     { task_driver = task_driver;
+                       cont = c };
     let d = get_server_data () in
-    let prover_list = get_prover_list d.config in
+    let prover_list = get_prover_list config in
     let transformation_list = List.map fst (list_transforms ()) in
     let strategies_list =
-      let l = strategies d.cont.controller_env d.config loaded_strategies in
+      let l = strategies d.cont.controller_env config loaded_strategies in
       List.map (fun (a,_,_,_) -> a) l
     in
     let infos =
@@ -870,20 +857,15 @@ let get_locations t =
           Hstr.fold (fun c _ acc -> c :: acc) commands_table []
       }
     in
-    match cont_from_session ~notify:P.notify d.cont f with
-    | Some false ->
-      begin
-        add_file_to_session d.cont f;
-        P.notify (Initialized infos);
-        true
-      end
-    | Some true ->
-        P.notify (Initialized infos);
-        true
-    | None ->
-        (* Even if it fails we want to load source files *)
-        load_files_session ();
-        false
+    Debug.dprintf debug "[ITP server] sending initialization infos@.";
+    P.notify (Initialized infos);
+    Debug.dprintf debug "[ITP server] reloading source files@.";
+    let b = reload_files d.cont ~use_shapes in
+    if b then
+      init_and_send_the_tree ()
+    else
+      load_files_session ()
+
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
@@ -919,12 +901,12 @@ let get_locations t =
       | _ -> ()
     with Not_found -> ()
 
-  let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
+  let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover
+    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover ~counterexmp
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
@@ -964,10 +946,10 @@ let get_locations t =
 
   let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
 
-  let run_strategy_on_task nid s =
+  let run_strategy_on_task ~counterexmp nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    let l = strategies d.cont.controller_env d.config loaded_strategies in
+    let l = strategies d.cont.controller_env d.cont.controller_config loaded_strategies in
     let st = List.filter (fun (_,c,_,_) -> c=s) l in
     match st with
     | [(n,_,_,st)] ->
@@ -978,7 +960,8 @@ let get_locations t =
        let callback_pa = callback_update_tree_proof d.cont in
        let callback_tr st = callback_update_tree_transform st in
        List.iter (fun id ->
-                  C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
+                  C.run_strategy_on_goal d.cont id st ~counterexmp
+                    ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                  unproven_goals
     | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
@@ -1072,6 +1055,7 @@ let get_locations t =
 
   let rec treat_request r =
     let d = get_server_data () in
+    let config = d.cont.controller_config in
     try (
     match r with
     | Prove_req (nid,p,limit)      ->
@@ -1080,10 +1064,14 @@ let get_locations t =
       in
       begin match p with
       | None -> ()
-      | Some p -> schedule_proof_attempt nid p limit
+      | Some p ->
+          let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
+          schedule_proof_attempt ~counterexmp nid p limit
       end
     | Transform_req (nid, t, args) -> apply_transform nid t args
-    | Strategy_req (nid, st)       -> run_strategy_on_task nid st
+    | Strategy_req (nid, st)       ->
+        let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
+        run_strategy_on_task ~counterexmp nid st
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
@@ -1129,11 +1117,15 @@ let get_locations t =
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
-        match (interp commands_table d.config d.cont snid cmd) with
+        match (interp commands_table d.cont.controller_config d.cont snid cmd) with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
-        | Prove (p, limit)        -> schedule_proof_attempt nid p limit
-        | Strategies st           -> run_strategy_on_task nid st
+        | Prove (p, limit)        ->
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
+            schedule_proof_attempt ~counterexmp nid p limit
+        | Strategies st           ->
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
+            run_strategy_on_task ~counterexmp nid st
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
@@ -1144,12 +1136,14 @@ let get_locations t =
       let f = Sysutil.relativize_filename
           (Session_itp.get_dir d.cont.controller_session) f in
       read_and_send f
+(*
     | Open_session_req file_or_dir_name ->
         let b = init_cont file_or_dir_name in
         if b then
           reload_session ()
         else
           () (* Eventually print debug here *)
+*)
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0
      )

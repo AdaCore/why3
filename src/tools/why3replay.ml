@@ -135,11 +135,6 @@ let print_result = Call_provers.print_prover_result
 
 module S = Session_itp
 
-let project_dir =
-  try
-    Server_utils.get_project_dir fname
-  with Not_found -> failwith "file does not exist"
-
 let goal_statistics cont (goals,n,m) g =
   if Controller_itp.pn_proved cont g then (goals,n+1,m+1) else (g::goals,n,m+1)
 
@@ -348,21 +343,8 @@ let run_as_bench env_session =
 let () =
   try
     Debug.dprintf debug "Opening session...@?";
-    let cont = Controller_itp.create_controller env in
-    let provers = Whyconf.get_provers config in
-    Whyconf.Mprover.iter
-      (fun _ p ->
-       try
-         let d = Driver.load_driver cont.Controller_itp.controller_env p.Whyconf.driver [] in
-         Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         Format.eprintf
-           "error loading driver for prover %a: %a@."
-           Whyconf.print_prover p.Whyconf.prover
-           Exn_printer.exn_printer e)
-      provers;
     let ses,use_shapes = S.load_session project_dir in
-    Controller_itp.init_controller ses cont;
+    let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
     let found_obs, some_merge_miss =
       try

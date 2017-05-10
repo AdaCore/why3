@@ -98,7 +98,9 @@ type ide_request =
   | Prove_req               of node_ID * prover * Call_provers.resource_limit
   | Transform_req           of node_ID * transformation * string list
   | Strategy_req            of node_ID * strategy
+(*
   | Open_session_req        of string
+ *)
   | Add_file_req            of string
   | Set_max_tasks_req       of int
   | Get_file_contents       of string

@@ -68,15 +68,17 @@ type proof_state
 type controller = private
   { mutable controller_session : Session_itp.session;
     proof_state : proof_state;
+    controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller: Env.env -> controller
-(** creates a controller with no prover and an empty session *)
+val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
+(** creates a controller for the given session.
+    The config and env is used to load the drivers for the provers. *)
 
-val init_controller: Session_itp.session -> controller -> unit
-(** adds a session to a controller *)
+(* TEMPORARY *)
+val set_session : controller -> Session_itp.session -> unit
 
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool
@@ -180,6 +182,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
+  counterexmp:bool ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
@@ -206,6 +209,7 @@ val run_strategy_on_goal :
   controller ->
   proofNodeID ->
   Strategy.t ->
+  counterexmp:bool ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->

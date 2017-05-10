@@ -182,7 +182,16 @@ let env, gconfig = try
     exit 1
 
 (* Initialization of config, provers, task_driver and controller in the server *)
-let () = Server.init_server gconfig.config env
+let () =
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:true files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage spec usage_str
+  in
+  Server.init_server gconfig.config env dir;
+  Queue.iter (fun f -> send_request (Add_file_req f)) files
 
 let () =
   Debug.dprintf debug "[GUI] Init the GTK interface...@?";
@@ -1576,9 +1585,6 @@ let (_ : GMenu.image_menu_item) =
 
 let () =
   S.timeout ~ms:100 (fun () -> List.iter treat_notification (get_notified ()); true);
-  let f = Queue.pop files in
-  send_request (Open_session_req f);
-  Queue.iter (fun f -> send_request (Add_file_req f)) files;
   (* temporary *)
   vpan222#set_position 500;
   goals_view#expand_all ();
