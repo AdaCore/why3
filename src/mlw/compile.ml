@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -920,9 +920,9 @@ module Transform = struct
       let e, spv = expr info subst e in
       let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
       mk (Etry (e, e_bl)), Spv.union spv spv_bl
-    | Eassign al ->
+    | Eassign al -> (* FIXME : produced superfolous let *)
       let assign e (_, _, pv) = mk_let subst pv e in
-      List.fold_left assign e al, Spv.empty
+      (* e *) List.fold_left assign e al, Spv.empty
     | Econst _ | Eabsurd | Ehole -> e, Spv.empty
     | Eignore e ->
       let e, spv = expr info subst e in
