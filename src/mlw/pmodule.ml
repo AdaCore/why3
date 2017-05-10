@@ -608,7 +608,46 @@ let clone_type_record cl s d s' d' =
   List.iter match_pj d.itd_fields;
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
-let _self_inv itd s =
+type smap = {
+  sm_vs : vsymbol Mvs.t;
+  sm_pv : pvsymbol Mvs.t;
+  sm_rs : rsymbol Mrs.t;
+}
+
+let sm_of_cl cl = {
+  sm_vs = Mvs.map (fun v -> v.pv_vs) cl.pv_table;
+  sm_pv = cl.pv_table;
+  sm_rs = cl.rs_table }
+
+let sm_save_vs sm v v' = {
+  sm_vs = Mvs.add v v'.pv_vs sm.sm_vs;
+  sm_pv = Mvs.add v v' sm.sm_pv;
+  sm_rs = sm.sm_rs }
+
+let sm_save_pv sm v v' = {
+  sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
+  sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
+  sm_rs = sm.sm_rs }
+
+let sm_save_rs cl sm s s' =
+  let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
+  match s.rs_logic, s'.rs_logic with
+  | RLls s, RLls s' -> cl_save_ls cl s s'; sm
+  | RLpv v, RLpv v' -> sm_save_pv sm v v'
+  | _ -> sm
+
+let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
+  (* non-instantiated global variables are not in sm *)
+
+let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
+  create_pvsymbol (id_clone vs.vs_name) ~ghost (clone_ity cl ity)
+
+let clone_invl cl sm invl =
+  List.map (fun t -> clone_term cl sm.sm_vs t) invl
+
+let self_inv cl itd s =
+  Mls.iter (fun k v -> Format.eprintf "k,v:%a,%a@."
+               Pretty.print_ls k Pretty.print_ls v) cl.ls_table;
   let u = create_vsymbol (id_fresh "self")
       (ty_app s.its_ts (List.map ty_var s.its_ts.ts_args)) in
   let t = [t_var u] in
@@ -620,13 +659,16 @@ let _self_inv itd s =
   let fl = itd.itd_fields in
   let _proj, sbs = List.fold_right get_ld fl ([],Mvs.empty) in
   let inv = t_subst sbs (t_and_simp_l itd.itd_invariant) in
-  t_forall_close [u] [] inv
+  let inv = t_forall_close [u] [] inv in
+  let inv = clone_invl cl (sm_of_cl cl) [inv] in
+  List.iter (Format.eprintf "inv2:%a@." Pretty.print_term) inv;
+  List.hd inv
 
 let clone_type_decl inst cl tdl kn =
   let def =
     List.fold_left (fun m d -> Mits.add d.itd_its d m) Mits.empty tdl in
   let htd = Hits.create 5 in
-  let vcs = ref ([] : (itysymbol * its_defn * term) list) in
+  let vcs = ref ([] : (itysymbol * term) list) in
   let rec visit alg ({its_ts = {ts_name = id} as ts} as s) d =
     if not (Hits.mem htd s) then
     let alg = Sits.add s alg in
@@ -667,12 +709,13 @@ let clone_type_decl inst cl tdl kn =
             | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
           end in
           clone_type_record cl s d s' d'; (* clone record fields *)
-          (* if d.itd_invariant <> [] && d'.itd_invariant <> [] then begin *)
-          (*   let d_inv = self_inv d s in *)
-          (*   let d'_inv = self_inv d' s' in *)
-          (*   let inv = t_implies_simp d'_inv d_inv in *)
-          (*   Format.eprintf "inv:%a@." Pretty.print_term inv; *)
-          (*   vcs := (d.itd_its, d, inv) :: !vcs (\* add VC for invariant *\) end *)
+          if d.itd_invariant <> [] && d'.itd_invariant <> [] then begin
+            let d_inv = self_inv cl d s in
+            let d'_inv = self_inv cl d' s' in
+            let inv = clone_invl cl (sm_of_cl cl) [t_implies_simp d'_inv d_inv] in
+            List.iter (Format.eprintf "inv:%a@." Pretty.print_term) inv;
+            List.iter (fun inv -> vcs := (d.itd_its, inv) :: !vcs) inv;
+            (* add VC for invariant *) end
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
           let stv = Stv.of_list ts.ts_args in
@@ -740,43 +783,6 @@ let clone_type_decl inst cl tdl kn =
   Lists.map_filter (fun d -> Hits.find htd d.itd_its) tdl,
   !vcs
 
-type smap = {
-  sm_vs : vsymbol Mvs.t;
-  sm_pv : pvsymbol Mvs.t;
-  sm_rs : rsymbol Mrs.t;
-}
-
-let sm_of_cl cl = {
-  sm_vs = Mvs.map (fun v -> v.pv_vs) cl.pv_table;
-  sm_pv = cl.pv_table;
-  sm_rs = cl.rs_table }
-
-let sm_save_vs sm v v' = {
-  sm_vs = Mvs.add v v'.pv_vs sm.sm_vs;
-  sm_pv = Mvs.add v v' sm.sm_pv;
-  sm_rs = sm.sm_rs }
-
-let sm_save_pv sm v v' = {
-  sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
-  sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
-  sm_rs = sm.sm_rs }
-
-let sm_save_rs cl sm s s' =
-  let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
-  match s.rs_logic, s'.rs_logic with
-  | RLls s, RLls s' -> cl_save_ls cl s s'; sm
-  | RLpv v, RLpv v' -> sm_save_pv sm v v'
-  | _ -> sm
-
-let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
-  (* non-instantiated global variables are not in sm *)
-
-let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
-  create_pvsymbol (id_clone vs.vs_name) ~ghost (clone_ity cl ity)
-
-let clone_invl cl sm invl =
-  List.map (fun t -> clone_term cl sm.sm_vs t) invl
-
 let clone_varl cl sm varl = List.map (fun (t,r) ->
   clone_term cl sm.sm_vs t, Opt.map (cl_find_ls cl) r) varl
 
@@ -788,6 +794,8 @@ let clone_cty cl sm ?(drop_decr=false) cty =
     sm_save_pv sm o o', Mpv.add o' (sm_find_pv sm_args n) olds in
   let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
   let pre = if drop_decr then List.tl cty.cty_pre else cty.cty_pre in
+  (* Mls.iter (fun k v -> Format.eprintf "k,v:%a,%a@." *)
+  (*              Pretty.print_ls k Pretty.print_ls v) cl.ls_table; *)
   let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
   let xpost = Mxs.fold (fun xs fl q ->
@@ -943,18 +951,12 @@ and clone_let_defn cl sm ld = match ld with
         sm_save_rs cl sm d.rec_sym d'.rec_sym) sm rdl rdl' in
       sm, ld
 
-let add_vc uc (its, td, f) =
+let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
   let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
   let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
-  (* let td = create_alias_decl (id_fresh nm) [] its in *)
-  let td = create_type_decl [td] in (* FIXME *)
-  let uc = add_pdecl_raw ~warn:false uc td in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
-  Format.eprintf "ici@.";
-  let res = add_pdecl ~warn:false ~vc:false uc d in
-  Format.eprintf "ici2@.";
-  res
+  add_pdecl ~warn:false ~vc:false uc d
 
 let clone_pdecl inst cl uc d = match d.pd_node with
   | PDtype tdl ->
