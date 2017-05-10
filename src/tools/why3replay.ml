@@ -137,7 +137,7 @@ module S = Session_itp
 
 let project_dir =
   try
-    Session.get_project_dir fname
+    Server_utils.get_project_dir fname
   with Not_found -> failwith "file does not exist"
 
 let goal_statistics cont (goals,n,m) g =

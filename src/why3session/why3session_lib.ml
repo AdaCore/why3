@@ -11,7 +11,7 @@
 
 open Why3
 
-module S = Session
+module S = Session_itp
 module C = Whyconf
 
 let verbose = Debug.register_info_flag "verbose"
@@ -72,14 +72,26 @@ let read_env_spec () =
   env,config,read_simple_spec ()
 
 let read_update_session ~allow_obsolete env config fname =
-  let project_dir = S.get_project_dir fname in
-  let session,use_shapes = S.read_session project_dir in
+  let project_dir = Server_utils.get_project_dir fname in
+  let session,use_shapes = S.load_session project_dir in
+(*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
     ~use_shapes_for_pairing_sub_goals:use_shapes
     (fun ?parent:_ () -> ())
   in
   S.update_session ~ctxt session env config
+ *)
+  let found_obs, some_merge_miss =
+    try
+      Controller_itp.reload_files cont ~use_shapes;
+      true, false (* TODO *)
+    with
+    | e ->
+       Format.eprintf "%a@." Exn_printer.exn_printer e;
+       exit 1
+  in
+  ()
 
 (** filter *)
 type filter_prover =

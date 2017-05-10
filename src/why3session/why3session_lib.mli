@@ -47,7 +47,7 @@ val read_env_spec : unit -> Env.env * Whyconf.config * bool
 val read_update_session :
   allow_obsolete:bool -> Env.env ->
   Whyconf.config -> string ->
-  unit Session.env_session * bool * bool
+  Controller_itp.controller * bool * bool
 
 (** {2 Spec for filtering } *)
 type filter_prover
@@ -64,10 +64,11 @@ val read_filter_spec : Whyconf.config -> filters * bool
 
 val theory_iter_proof_attempt_by_filter :
   filters ->
-  ('key Session.proof_attempt -> unit) -> 'key Session.theory -> unit
+  (Session_itp.proof_attempt_node -> unit) -> Session_itp.theory -> unit
+
 val session_iter_proof_attempt_by_filter :
   filters ->
-  ('key Session.proof_attempt -> unit) -> 'key Session.session -> unit
+  (Session_itp.proof_attempt_node -> unit) -> Session_itp.session -> unit
 
 
 (* quite ad-hoc *)

@@ -18,7 +18,7 @@ open Why3
 open Why3session_lib
 open Whyconf
 open Format
-open Session
+open Session_itp
 open Stdlib
 
 let opt_print_provers = ref false
@@ -352,9 +352,9 @@ let print_stats r0 r1 stats =
 
 
 let run_one stats r0 r1 fname =
-  let project_dir = Session.get_project_dir fname in
+  let project_dir = Server_utils.get_project_dir fname in
   if !opt_project_dir then printf "%s@." project_dir;
-  let session,_use_shapes = Session.read_session project_dir in
+  let session,_use_shapes = S.read_session project_dir in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."

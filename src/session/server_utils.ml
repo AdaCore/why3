@@ -10,6 +10,34 @@ open Itp_communication
 exception NotADirectory of string
 exception BadFileName of string
 
+
+let default_session_filename = "why3session.xml"
+
+let get_project_dir fname =
+  if not (Sys.file_exists fname) then raise Not_found;
+  let d =
+    if Sys.is_directory fname then fname
+    else if Filename.basename fname = default_session_filename then begin
+(*
+      Debug.dprintf debug "Info: found db file '%s'@." fname;
+*)
+      Filename.dirname fname
+    end
+    else
+      begin
+(*
+        Debug.dprintf debug "Info: found regular file '%s'@." fname;
+ *)
+        try Filename.chop_extension fname
+        with Invalid_argument _ -> fname (* ^".w3s" *)
+      end
+  in
+(*
+  Debug.dprintf debug "Info: using '%s' as directory for the project@." d;
+ *)
+  d
+
+
 (******************************)
 (* Creation of the controller *)
 (******************************)

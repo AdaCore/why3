@@ -14,7 +14,7 @@ open Why3session_lib
 open Format
 
 module Hprover = Whyconf.Hprover
-module S = Session
+module S = Session_itp
 
 let opt_style = ref 1
 let opt_output_dir = ref ""
@@ -123,7 +123,7 @@ let print_result_prov proofs prov fmt=
     let pr = S.PHprover.find proofs p in
     let s = pr.S.proof_state in
       match s with
-	| Session.Done res ->
+	| S.Done res ->
 	    begin
 	      match res.Call_provers.pr_answer with
 		| Call_provers.Valid ->
@@ -146,11 +146,11 @@ let print_result_prov proofs prov fmt=
                   fprintf fmt "& \\highfailure "
 
 	    end
-	| Session.InternalFailure _ -> fprintf fmt "& Internal Failure"
-	| Session.Interrupted -> fprintf fmt "& Not yet run"
-	| Session.Unedited -> fprintf fmt "& Not yet edited"
-	| Session.Scheduled | Session.Running
-	| Session.JustEdited -> assert false
+	| S.InternalFailure _ -> fprintf fmt "& Internal Failure"
+	| S.Interrupted -> fprintf fmt "& Not yet run"
+	| S.Unedited -> fprintf fmt "& Not yet edited"
+	| S.Scheduled | S.Running
+	| S.JustEdited -> assert false
   with Not_found -> fprintf fmt "& \\noresult") prov;
   fprintf fmt "\\\\ @."
 
@@ -460,8 +460,8 @@ let print_latex_statistics n table dir session =
 let table () = if !opt_longtable then "longtable" else "tabular"
 
 let run_one fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
+  let project_dir = S.get_project_dir fname in
+  let session,_use_shapes = S.read_session project_dir in
   let dir = if !opt_output_dir = "" then project_dir else
       !opt_output_dir
   in

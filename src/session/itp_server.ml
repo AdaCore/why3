@@ -367,7 +367,6 @@ let () =
   type server_data =
     { config : Whyconf.config;
       task_driver : Driver.driver;
-      sd_provers : Whyconf.config_prover Whyconf.Mprover.t;
       cont : Controller_itp.controller;
     }
 
@@ -529,7 +528,6 @@ let get_locations t =
     server_data := Some
                      { config = config;
                        task_driver = task_driver;
-                       sd_provers = provers;
                        cont = c }
 
   (* -----------------------------------   ------------------------------------- *)

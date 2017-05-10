@@ -11,7 +11,7 @@
 
 open Why3
 open Why3session_lib
-open Session
+open Session_itp
 open Format
 
 type filter_prover =

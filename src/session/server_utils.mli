@@ -1,5 +1,9 @@
+
+
 exception NotADirectory of string
 exception BadFileName of string
+
+val get_project_dir : string -> string
 
 (** Controller initialization *)
 

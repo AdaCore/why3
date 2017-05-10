@@ -14,7 +14,7 @@ open Why3
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
-module S = Session
+module S = Session_itp
 
 let output_dir = ref ""
 let opt_context = ref false
@@ -61,7 +61,7 @@ let spec =
   " use coqdoc to print Coq proofs") ::
   common_options
 
-open Session
+open Session_itp
 
 type context =
     (string ->
@@ -69,8 +69,8 @@ type context =
      -> unit, formatter, unit) format
 
 let run_file (context : context) print_session fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
+  let project_dir = S.get_project_dir fname in
+  let session,_use_shapes = S.read_session project_dir in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir
   in

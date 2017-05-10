@@ -211,9 +211,9 @@ LIB_WHYML = mlw_ty mlw_expr mlw_decl mlw_pretty mlw_wp mlw_module \
 	    mlw_dexpr mlw_typing mlw_driver mlw_exec mlw_ocaml \
 	    mlw_main mlw_interp
 
-LIB_SESSION = compress xml termcode session session_itp \
-              session_tools strategy strategy_parser controller_itp \
-	      session_scheduler server_utils itp_communication \
+LIB_SESSION = compress xml termcode session_itp \
+              strategy strategy_parser controller_itp \
+	      server_utils itp_communication \
 	      itp_server json_util
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
