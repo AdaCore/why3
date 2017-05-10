@@ -72,6 +72,7 @@ let init_proof_state () = {
 type controller =
   { mutable controller_session: Session_itp.session;
     proof_state: proof_state;
+    controller_config : Whyconf.config;
     controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
@@ -83,16 +84,17 @@ let clear_proof_state c =
   Htn.clear c.proof_state.tn_state;
   Hpn.clear c.proof_state.pn_state
 
-let create_controller env =
+let create_controller config env =
   {
     controller_session = Session_itp.dummy_session;
     proof_state = init_proof_state ();
+    controller_config = config;
     controller_env = env;
     controller_provers = Whyconf.Hprover.create 7;
   }
 
 let init_controller s c =
-  clear_proof_state (c);
+  clear_proof_state c;
   c.controller_session <- s
 
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid

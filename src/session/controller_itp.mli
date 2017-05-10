@@ -68,11 +68,12 @@ type proof_state
 type controller = private
   { mutable controller_session : Session_itp.session;
     proof_state : proof_state;
+    controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller: Env.env -> controller
+val create_controller: Whyconf.config -> Env.env -> controller
 (** creates a controller with no prover and an empty session *)
 
 val init_controller: Session_itp.session -> controller -> unit

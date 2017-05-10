@@ -348,7 +348,7 @@ let run_as_bench env_session =
 let () =
   try
     Debug.dprintf debug "Opening session...@?";
-    let cont = Controller_itp.create_controller env in
+    let cont = Controller_itp.create_controller config env in
     let provers = Whyconf.get_provers config in
     Whyconf.Mprover.iter
       (fun _ p ->

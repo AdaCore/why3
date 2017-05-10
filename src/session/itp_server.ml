@@ -365,9 +365,7 @@ let () =
   ]
 
   type server_data =
-    { config : Whyconf.config;
-      task_driver : Driver.driver;
-      sd_provers : Whyconf.config_prover Whyconf.Mprover.t;
+    { task_driver : Driver.driver;
       cont : Controller_itp.controller;
     }
 
@@ -513,7 +511,7 @@ let get_locations t =
 
   let init_server config env =
     let provers = Whyconf.get_provers config in
-    let c = create_controller env in
+    let c = create_controller config env in
     let task_driver = task_driver config env in
     Whyconf.Mprover.iter
       (fun _ p ->
@@ -527,9 +525,7 @@ let get_locations t =
            Exn_printer.exn_printer e)
       provers;
     server_data := Some
-                     { config = config;
-                       task_driver = task_driver;
-                       sd_provers = provers;
+                     { task_driver = task_driver;
                        cont = c }
 
   (* -----------------------------------   ------------------------------------- *)
@@ -681,7 +677,7 @@ let get_locations t =
 
   let get_prover p =
     let d = get_server_data () in
-    match return_prover p d.config with
+    match return_prover p d.cont.controller_config with
     | None -> raise (Bad_prover_name p)
     | Some c -> c
 
@@ -857,10 +853,11 @@ let get_locations t =
      Open_session_req is requested *)
   let init_cont f =
     let d = get_server_data () in
-    let prover_list = get_prover_list d.config in
+    let config = d.cont.controller_config in
+    let prover_list = get_prover_list config in
     let transformation_list = List.map fst (list_transforms ()) in
     let strategies_list =
-      let l = strategies d.cont.controller_env d.config loaded_strategies in
+      let l = strategies d.cont.controller_env config loaded_strategies in
       List.map (fun (a,_,_,_) -> a) l
     in
     let infos =
@@ -969,7 +966,7 @@ let get_locations t =
   let run_strategy_on_task ~counterexmp nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    let l = strategies d.cont.controller_env d.config loaded_strategies in
+    let l = strategies d.cont.controller_env d.cont.controller_config loaded_strategies in
     let st = List.filter (fun (_,c,_,_) -> c=s) l in
     match st with
     | [(n,_,_,st)] ->
@@ -1075,6 +1072,7 @@ let get_locations t =
 
   let rec treat_request r =
     let d = get_server_data () in
+    let config = d.cont.controller_config in
     try (
     match r with
     | Prove_req (nid,p,limit)      ->
@@ -1084,12 +1082,12 @@ let get_locations t =
       begin match p with
       | None -> ()
       | Some p ->
-          let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+          let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
           schedule_proof_attempt ~counterexmp nid p limit
       end
     | Transform_req (nid, t, args) -> apply_transform nid t args
     | Strategy_req (nid, st)       ->
-        let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+        let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
         run_strategy_on_task ~counterexmp nid st
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
@@ -1136,14 +1134,14 @@ let get_locations t =
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
-        match (interp commands_table d.config d.cont snid cmd) with
+        match (interp commands_table d.cont.controller_config d.cont snid cmd) with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
             schedule_proof_attempt ~counterexmp nid p limit
         | Strategies st           ->
-            let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
             run_strategy_on_task ~counterexmp nid st
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
