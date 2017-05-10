@@ -921,12 +921,12 @@ let get_locations t =
       | _ -> ()
     with Not_found -> ()
 
-  let schedule_proof_attempt nid (p: Whyconf.config_prover) limit =
+  let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover
+    List.iter (fun id -> C.schedule_proof_attempt d.cont id prover ~counterexmp
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
@@ -966,7 +966,7 @@ let get_locations t =
 
   let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
 
-  let run_strategy_on_task nid s =
+  let run_strategy_on_task ~counterexmp nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     let l = strategies d.cont.controller_env d.config loaded_strategies in
@@ -980,7 +980,8 @@ let get_locations t =
        let callback_pa = callback_update_tree_proof d.cont in
        let callback_tr st = callback_update_tree_transform st in
        List.iter (fun id ->
-                  C.run_strategy_on_goal d.cont id st ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
+                  C.run_strategy_on_goal d.cont id st ~counterexmp
+                    ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
                  unproven_goals
     | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
@@ -1082,10 +1083,14 @@ let get_locations t =
       in
       begin match p with
       | None -> ()
-      | Some p -> schedule_proof_attempt nid p limit
+      | Some p ->
+          let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+          schedule_proof_attempt ~counterexmp nid p limit
       end
     | Transform_req (nid, t, args) -> apply_transform nid t args
-    | Strategy_req (nid, st)       -> run_strategy_on_task nid st
+    | Strategy_req (nid, st)       ->
+        let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+        run_strategy_on_task ~counterexmp nid st
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
@@ -1134,8 +1139,12 @@ let get_locations t =
         match (interp commands_table d.config d.cont snid cmd) with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
-        | Prove (p, limit)        -> schedule_proof_attempt nid p limit
-        | Strategies st           -> run_strategy_on_task nid st
+        | Prove (p, limit)        ->
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+            schedule_proof_attempt ~counterexmp nid p limit
+        | Strategies st           ->
+            let counterexmp = Whyconf.cntexample (Whyconf.get_main d.config) in
+            run_strategy_on_task ~counterexmp nid st
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

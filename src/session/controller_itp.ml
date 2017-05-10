@@ -448,7 +448,7 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-let build_prover_call c id pr limit callback =
+let build_prover_call ~cntexample c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
     Whyconf.get_complete_command
@@ -457,7 +457,7 @@ let build_prover_call c id pr limit callback =
   let task = Session_itp.get_task c.controller_session id in
   let table = Session_itp.get_table c.controller_session id in
   let call =
-    Driver.prove_task ?old:None ~cntexample:true ~inplace:false ~command
+    Driver.prove_task ?old:None ~cntexample:cntexample ~inplace:false ~command
                       ~limit ?name_table:table driver task
   in
   let pa = (c.controller_session,id,pr,callback,false,call) in
@@ -499,9 +499,9 @@ let timeout_handler () =
     try
       for _i = Queue.length prover_tasks_in_progress
           to 3 * !max_number_of_running_provers do
-        let (c,id,pr,limit,callback) = Queue.pop scheduled_proof_attempts in
+        let (c,id,pr,limit,callback,cntexample) = Queue.pop scheduled_proof_attempts in
         try
-          build_prover_call c id pr limit callback
+          build_prover_call ~cntexample c id pr limit callback
         with e when not (Debug.test_flag Debug.stack_trace) ->
           (*Format.eprintf
             "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
@@ -525,7 +525,7 @@ let interrupt () =
   done;
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,callback) = Queue.pop scheduled_proof_attempts in
+    let (_c,_id,_pr,_limit,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
     callback Interrupted
   done;
   !observer 0 0 0
@@ -537,21 +537,21 @@ let run_timeout_handler () =
       S.timeout ~ms:125 timeout_handler;
     end
 
-let schedule_proof_attempt_r c id pr ~limit ~callback =
+let schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback =
   let panid =
     graft_proof_attempt c.controller_session id pr ~limit
   in
-  Queue.add (c,id,pr,limit,callback panid) scheduled_proof_attempts;
+  Queue.add (c,id,pr,limit,callback panid,counterexmp) scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
 
-let schedule_proof_attempt c id pr ~limit ~callback ~notification =
+let schedule_proof_attempt c id pr ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
     | Scheduled | Done _ -> update_goal_node notification c id
     | _ -> ())
   in
-  schedule_proof_attempt_r c id pr ~limit ~callback
+  schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
@@ -593,7 +593,7 @@ let schedule_transformation c id name args ~callback ~notification =
 open Strategy
 
 let run_strategy_on_goal
-    c id strat ~callback_pa ~callback_tr ~callback ~notification =
+    c id strat ~counterexmp ~callback_pa ~callback_tr ~callback ~notification =
   let rec exec_strategy pc strat g =
     if pc < 0 || pc >= Array.length strat then
       callback STShalt
@@ -621,7 +621,7 @@ let run_strategy_on_goal
          let limit = { Call_provers.empty_limit with
                        Call_provers.limit_time = timelimit;
                        limit_mem  = memlimit} in
-         schedule_proof_attempt c g p ~limit ~callback ~notification
+         schedule_proof_attempt c g p ~counterexmp ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
            callback_tr ntr;
@@ -708,7 +708,7 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
         raise BadCopyPaste
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
-      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn
+      List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn ~counterexmp:false
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
       let callback x st = callback_tr st;
@@ -751,7 +751,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
   if not (Hprover.mem c.controller_provers pr) then
     callback id (Uninstalled pr)
   else
-    schedule_proof_attempt c parid pr ~limit ~callback ~notification
+    schedule_proof_attempt c parid pr ~counterexmp:false ~limit ~callback ~notification
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result

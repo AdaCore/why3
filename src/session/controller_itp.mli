@@ -180,6 +180,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
+  counterexmp:bool ->
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
@@ -206,6 +207,7 @@ val run_strategy_on_goal :
   controller ->
   proofNodeID ->
   Strategy.t ->
+  counterexmp:bool ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
