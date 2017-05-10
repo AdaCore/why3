@@ -4,11 +4,45 @@
 (* TODO: all occurences of Format.eprintf in this file should be
    replaced by proper server notifications *)
 
-open Session_itp
-open Itp_communication
+let has_extension f =
+  try
+    let _ = Filename.chop_extension f in true
+  with Invalid_argument _ -> false
 
-exception NotADirectory of string
-exception BadFileName of string
+let get_session_dir ~allow_mkdir files =
+  if Queue.is_empty files then invalid_arg "no files given";
+  let first = Queue.pop files in
+  (* The remaining files in [files] are going to be open *)
+  let dir =
+    if Sys.file_exists first then
+      if Sys.is_directory first then
+        (* first is a directory *)
+        first
+      else
+        if Queue.is_empty files then
+          (* first was the only file *)
+          let d =
+            try Filename.chop_extension first
+            with Invalid_argument _ ->
+              invalid_arg ("'" ^ first ^ "' has no extension and is not a directory")
+          in
+          Queue.push first files; (* we need to open [first] *)
+          d
+        else
+          invalid_arg ("'" ^ first ^ "' is not a directory")
+    else
+      (* first does not exists *)
+      if has_extension first then
+        invalid_arg ("file not found: " ^ first)
+      else first
+  in
+  if not (Sys.file_exists dir) then
+    begin
+      if allow_mkdir then Unix.mkdir dir 0o777 else
+        invalid_arg ("session directory '" ^ dir ^ "' not found")
+    end;
+  dir
+
 
 (******************************)
 (* Creation of the controller *)
@@ -17,6 +51,7 @@ exception BadFileName of string
 (* [cont_from_session]: returns an option to a boolean which returns None in
    case of failure, true if nothing is left to do and false if sessions was
    loaded but [f] should still be added to the session as a file. *)
+(*
 let cont_from_session ~notify cont f : bool option =
   (* If a file is given, find the corresponding directory *)
   let dir = try (Filename.chop_extension f) with
@@ -41,8 +76,8 @@ let cont_from_session ~notify cont f : bool option =
   (* we load the session *)
   let ses,use_shapes = load_session dir in
   Format.eprintf "[session server info] using shapes: %b@." use_shapes;
-  (* create the controller *)
-  Controller_itp.init_controller ses cont;
+  (* temporary, this should not be donne like this ! *)
+  Controller_itp.set_session cont ses;
   (* update the session *)
   try (Controller_itp.reload_files cont ~use_shapes;
     (* Check if the initial file given was a file or not. If it was, we return
@@ -57,7 +92,7 @@ let cont_from_session ~notify cont f : bool option =
       notify (Message (Parse_Or_Type_Error s));
       None
     end
-
+*)
 
 
 

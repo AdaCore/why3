@@ -87,8 +87,6 @@ let config, base_config, env =
 
 module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 
-(* Initialize the server *)
-let () = Server.init_server config env
 
 (*************************)
 (* Notification Handling *)
@@ -356,8 +354,15 @@ let () =
   printf "Welcome to Why3 shell. Type 'help' for help.@.";
   let chout = open_out "why3shell.out" in
   let fmt = formatter_of_out_channel chout in
-  let f = Queue.pop files in send_request (Open_session_req f);
-  (*Queue.iter (fun f -> send_request (Add_file_req f)) files;*)
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:true files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage spec usage_str
+  in
+  Server.init_server config env dir;
+  Queue.iter (fun f -> send_request (Add_file_req f)) files;
   Unix_scheduler.timeout ~ms:100
     (fun () -> List.iter
         (fun n -> treat_notification fmt n) (get_notified ()); true);

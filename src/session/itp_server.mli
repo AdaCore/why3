@@ -15,12 +15,7 @@ end
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
-(*
-  val get_configs: unit -> Whyconf.config * Whyconf.config
- *)
-  (* Initialize server_data *)
-  val init_server: Whyconf.config -> Env.env -> unit
-
-  (* Nothing ! *)
+  (* Initialize server with the given config, env and filename for the session *)
+  val init_server: Whyconf.config -> Env.env -> string -> unit
 
 end

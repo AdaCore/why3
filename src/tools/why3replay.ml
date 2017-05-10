@@ -348,9 +348,8 @@ let run_as_bench env_session =
 let () =
   try
     Debug.dprintf debug "Opening session...@?";
-    let cont = Controller_itp.create_controller config env in
     let ses,use_shapes = S.load_session project_dir in
-    Controller_itp.init_controller ses cont;
+    let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
     let found_obs, some_merge_miss =
       try

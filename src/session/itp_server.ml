@@ -247,7 +247,9 @@ let print_request fmt r =
   | Prove_req (_nid, prover, _rl)   -> fprintf fmt "prove with %s" prover
   | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
   | Strategy_req (_nid, st)         -> fprintf fmt "strategy %s" st
+(*
   | Open_session_req f              -> fprintf fmt "open session file %s" f
+*)
   | Add_file_req f                  -> fprintf fmt "open file %s" f
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
@@ -323,7 +325,7 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
-  let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
+let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
 
 (****************)
@@ -508,13 +510,6 @@ let get_locations t =
 
   let get_prover_list (config: Whyconf.config) =
     Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
-
-  let init_server config env =
-    let c = create_controller config env in
-    let task_driver = task_driver config env in
-    server_data := Some
-                     { task_driver = task_driver;
-                       cont = c }
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -835,13 +830,18 @@ let get_locations t =
       P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
 
 
-  (* ------------ init controller ------------ *)
+  (* ------------ init server ------------ *)
 
-  (* Init cont on file or directory. It is called only when an
-     Open_session_req is requested *)
-  let init_cont f =
+  let init_server config env f =
+    Debug.dprintf debug "[ITP server] loading session %s@." f;
+    let ses,use_shapes = Session_itp.load_session f in
+    Debug.dprintf debug "[ITP server] creating controller@.";
+    let c = create_controller config env ses in
+    let task_driver = task_driver config env in
+    server_data := Some
+                     { task_driver = task_driver;
+                       cont = c };
     let d = get_server_data () in
-    let config = d.cont.controller_config in
     let prover_list = get_prover_list config in
     let transformation_list = List.map fst (list_transforms ()) in
     let strategies_list =
@@ -857,20 +857,15 @@ let get_locations t =
           Hstr.fold (fun c _ acc -> c :: acc) commands_table []
       }
     in
-    match cont_from_session ~notify:P.notify d.cont f with
-    | Some false ->
-      begin
-        add_file_to_session d.cont f;
-        P.notify (Initialized infos);
-        true
-      end
-    | Some true ->
-        P.notify (Initialized infos);
-        true
-    | None ->
-        (* Even if it fails we want to load source files *)
-        load_files_session ();
-        false
+    Debug.dprintf debug "[ITP server] sending initialization infos@.";
+    P.notify (Initialized infos);
+    Debug.dprintf debug "[ITP server] reloading source files@.";
+    let b = reload_files d.cont ~use_shapes in
+    if b then
+      init_and_send_the_tree ()
+    else
+      load_files_session ()
+
 
   (* ----------------- Schedule proof attempt -------------------- *)
 
@@ -1141,12 +1136,14 @@ let get_locations t =
       let f = Sysutil.relativize_filename
           (Session_itp.get_dir d.cont.controller_session) f in
       read_and_send f
+(*
     | Open_session_req file_or_dir_name ->
         let b = init_cont file_or_dir_name in
         if b then
           reload_session ()
         else
           () (* Eventually print debug here *)
+*)
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0
      )

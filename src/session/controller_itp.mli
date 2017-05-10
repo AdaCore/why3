@@ -73,12 +73,12 @@ type controller = private
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-val create_controller: Whyconf.config -> Env.env -> controller
-(** creates a controller with an empty session.
+val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
+(** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
 
-val init_controller: Session_itp.session -> controller -> unit
-(** adds a session to a controller *)
+(* TEMPORARY *)
+val set_session : controller -> Session_itp.session -> unit
 
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool

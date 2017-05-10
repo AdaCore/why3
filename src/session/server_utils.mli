@@ -1,12 +1,23 @@
-exception NotADirectory of string
+
+(*exception NotADirectory of string
 exception BadFileName of string
+ *)
 
-(** Controller initialization *)
+val get_session_dir : allow_mkdir:bool -> string Queue.t -> string
+(** [get_session_dir q] analyses the queue of filenames [q] and
+    returns the session directory from it.
 
-(* Init the given controller with the session in file/directory given *)
-val cont_from_session:
-    notify:(Itp_communication.notification -> unit) ->
-      Controller_itp.controller -> string -> bool option
+    That directory is created if it does not exists and [allow_mkdir]
+    is true.
+
+    raises [Invalid_arg s] with some appropriate explnation [s] if no
+    valid directory can be extracted.
+
+    The first element of queue [q] is removed if it is not a file to
+    load later in the session.
+
+ *)
+
 
 (** Simple queries *)
 
