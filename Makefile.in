@@ -1607,8 +1607,8 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
-        -syntax camlp4o -I src/trywhy3 \
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
+        -package ocplib-simplex -syntax camlp4o -I src/trywhy3 \
 	-I $(ALTERGODIR)/src/util \
 	-I $(ALTERGODIR)/src/structures \
 	-I $(ALTERGODIR)/src/parsing \
@@ -1677,7 +1677,7 @@ src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
-	$(JSOCAMLC) -I +ocplib-simplex $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) ocplibSimplex.cma $^
+	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
 src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
@@ -2163,7 +2163,6 @@ MORE_DIST = configure install-sh doc/manual.pdf
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
-	rm -rf distrib/$(EXTRANAME)/ distrib/$(EXTRANAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
 	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done

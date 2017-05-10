@@ -1,0 +1,67 @@
+
+(** Binary sort
+
+    Binary sort is a variant of insertion sort where binary search is used
+    to find the insertion point. This lowers the number of comparisons
+    (from N^2 to N log(N)) and thus is useful when comparisons are costly.
+
+    For instance, Binary sort is used as an ingredient in Java 8's
+    TimSort implementation (which is the library sort for Object[]).
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module BinarySort
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import array.Array
+  use import array.ArrayPermut
+
+  let lemma occ_shift (m1 m2: M.map int 'a) (mid k: int) (x: 'a) : unit
+    requires { 0 <= mid <= k }
+    requires { forall i. mid < i <= k -> M.get m2 i = M.get m1 (i - 1) }
+    requires { M.get m2 mid = M.get m1 k }
+    ensures  { M.Occ.occ x m1 mid (k+1) = M.Occ.occ x m2 mid (k+1) }
+  = for i = mid to Int.(-) k 1 do
+      invariant { M.Occ.occ x m1 mid i = M.Occ.occ x m2 (mid+1) (i+1) }
+      ()
+    done;
+    assert { M.Occ.occ (M.get m1 k) m1 mid (k+1) =
+             1 + M.Occ.occ (M.get m1 k) m1 mid k };
+    assert { M.Occ.occ (M.get m1 k) m2 mid (k+1) =
+             1 + M.Occ.occ (M.get m1 k) m2 (mid+1) (k+1) };
+    assert { M.Occ.occ x m1 mid (k+1) = M.Occ.occ x m2 mid (k+1)
+             by x = M.get m1 k \/ x <> M.get m1 k }
+
+  let binary_sort (a: array int) : unit
+    ensures { forall i j. 0 <= i <= j < length a -> a[i] <= a[j] }
+    ensures { permut_sub (old a) a 0 (length a) }
+  =
+    'Init:
+    for k = 1 to length a - 1 do
+      (* a[0..k-1) is sorted; insert a[k] *)
+      invariant { forall i j. 0 <= i <= j < k -> a[i] <= a[j] }
+      invariant { permut_sub (at a 'Init) a  0 (length a) }
+      let v = a[k] in
+      let left = ref 0 in
+      let right = ref k in
+      while !left < !right do
+        invariant { 0 <= !left <= !right <= k }
+        invariant { forall i. 0      <= i < !left -> a[i] <= v        }
+        invariant { forall i. !right <= i < k     ->         v < a[i] }
+        variant   { !right - !left }
+        let mid = !left + div (!right - !left) 2 in
+        if v < a[mid] then right := mid else left := mid + 1
+      done;
+      (* !left is the place where to insert value v
+         so we move a[!left..k) one position to the right *)
+      'L:
+      self_blit a !left (!left + 1) (k - !left);
+      a[!left] <- v;
+      assert { permut_sub (at a 'L) a !left (k + 1) };
+      assert { permut_sub (at a 'L) a 0 (length a) };
+    done
+
+end

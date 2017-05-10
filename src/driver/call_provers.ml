@@ -284,8 +284,18 @@ let actualcommand command limit file =
   args, !use_stdin, !on_timelimit
 
 let actualcommand ~cleanup ~inplace command limit file =
-  try actualcommand command limit file
+  try
+    let (cmd, _,_) as x =
+      actualcommand command limit file
+    in
+    Debug.dprintf debug "@[<hv 2>Call_provers: actual command is:@ @[%a@]@]@."
+                  (Pp.print_list Pp.space pp_print_string) cmd;
+    x
   with e ->
+    Debug.dprintf
+      debug
+      "@[<hv 2>Call_provers: failed to build an actual corresponding to@ %s@]@."
+      command;
     if cleanup then Sys.remove file;
     if inplace then Sys.rename (backup_file file) file;
     raise e
@@ -441,8 +451,6 @@ let call_editor ~command fin =
   let command, use_stdin, _ =
     actualcommand ~cleanup:false ~inplace:false command empty_limit fin in
   let exec = List.hd command in
-  Debug.dprintf debug "@[<hov 2>Call_provers: editor command is: %a@]@."
-    (Pp.print_list Pp.space pp_print_string) command;
   let argarray = Array.of_list command in
   let fd_in =
     if use_stdin then Unix.openfile fin [Unix.O_RDONLY] 0 else Unix.stdin in
