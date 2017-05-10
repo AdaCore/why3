@@ -74,7 +74,8 @@ type controller = private
   }
 
 val create_controller: Whyconf.config -> Env.env -> controller
-(** creates a controller with no prover and an empty session *)
+(** creates a controller with an empty session.
+    The config and env is used to load the drivers for the provers. *)
 
 val init_controller: Session_itp.session -> controller -> unit
 (** adds a session to a controller *)

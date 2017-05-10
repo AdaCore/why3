@@ -85,13 +85,29 @@ let clear_proof_state c =
   Hpn.clear c.proof_state.pn_state
 
 let create_controller config env =
-  {
-    controller_session = Session_itp.dummy_session;
-    proof_state = init_proof_state ();
-    controller_config = config;
-    controller_env = env;
-    controller_provers = Whyconf.Hprover.create 7;
-  }
+  let c =
+    {
+      controller_session = Session_itp.dummy_session;
+      proof_state = init_proof_state ();
+      controller_config = config;
+      controller_env = env;
+      controller_provers = Whyconf.Hprover.create 7;
+    }
+  in
+  let provers = Whyconf.get_provers config in
+  Whyconf.Mprover.iter
+    (fun _ p ->
+     try
+       let d = Driver.load_driver env p.Whyconf.driver [] in
+       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
+     with e ->
+       Format.eprintf
+         "[Controller_itp] error while loading driver for prover %a: %a@."
+         Whyconf.print_prover p.Whyconf.prover
+         Exn_printer.exn_printer e)
+    provers;
+  c
+
 
 let init_controller s c =
   clear_proof_state c;

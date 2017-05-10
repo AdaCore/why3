@@ -510,20 +510,8 @@ let get_locations t =
     Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
 
   let init_server config env =
-    let provers = Whyconf.get_provers config in
     let c = create_controller config env in
     let task_driver = task_driver config env in
-    Whyconf.Mprover.iter
-      (fun _ p ->
-       try
-         let d = Driver.load_driver c.controller_env p.Whyconf.driver [] in
-         Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         Format.eprintf
-           "[ITP server] error loading driver for prover %a: %a@."
-           Whyconf.print_prover p.Whyconf.prover
-           Exn_printer.exn_printer e)
-      provers;
     server_data := Some
                      { task_driver = task_driver;
                        cont = c }

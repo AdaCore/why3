@@ -349,18 +349,6 @@ let () =
   try
     Debug.dprintf debug "Opening session...@?";
     let cont = Controller_itp.create_controller config env in
-    let provers = Whyconf.get_provers config in
-    Whyconf.Mprover.iter
-      (fun _ p ->
-       try
-         let d = Driver.load_driver cont.Controller_itp.controller_env p.Whyconf.driver [] in
-         Whyconf.Hprover.add cont.Controller_itp.controller_provers p.Whyconf.prover (p,d)
-       with e ->
-         Format.eprintf
-           "error loading driver for prover %a: %a@."
-           Whyconf.print_prover p.Whyconf.prover
-           Exn_printer.exn_printer e)
-      provers;
     let ses,use_shapes = S.load_session project_dir in
     Controller_itp.init_controller ses cont;
     (* update the session *)
