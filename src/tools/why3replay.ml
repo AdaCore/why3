@@ -31,7 +31,7 @@ let debug = Debug.register_info_flag
 
 let () = Debug.set_flag debug
 
-let opt_file = ref None
+let files = Queue.create ()
 (*
 let opt_stats = ref true
 *)
@@ -106,19 +106,10 @@ let option_list = [
    Arg.Unit (fun () -> Debug.unset_flag debug),
    " same as -q") ]
 
-let add_opt_file f = match !opt_file with
-  | Some _ ->
-      raise (Arg.Bad "only one parameter")
-  | None ->
-      opt_file := Some f
+let add_file f = Queue.push f files
 
 let config, _, env =
-  Whyconf.Args.initialize option_list add_opt_file usage_msg
-
-let fname =
-  match !opt_file with
-  | None -> Whyconf.Args.exit_with_usage option_list usage_msg
-  | Some f -> f
+  Whyconf.Args.initialize option_list add_file usage_msg
 
 let found_upgraded_prover = ref false
 
@@ -341,9 +332,18 @@ let run_as_bench env_session =
 
 
 let () =
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:false files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage option_list usage_msg
+  in
+  if not (Queue.is_empty files) then
+    Whyconf.Args.exit_with_usage option_list usage_msg;
   try
-    Debug.dprintf debug "Opening session...@?";
-    let ses,use_shapes = S.load_session project_dir in
+    Debug.dprintf debug "Opening session '%s'...@?" dir;
+    let ses,use_shapes = S.load_session dir in
     let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
     let found_obs, some_merge_miss =
@@ -379,7 +379,7 @@ let () =
   with
     | e when not (Debug.test_flag Debug.stack_trace) ->
       eprintf "Error while opening session with database '%s' : %a@."
-        project_dir
+        dir
         Exn_printer.exn_printer e;
       eprintf "Aborting...@.";
       exit 1
