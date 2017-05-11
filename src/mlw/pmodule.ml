@@ -577,37 +577,6 @@ let cl_save_rs cl s s' =
   | RLnone, RLnone -> ()
   | _ -> assert false
 
-(* Mário: commented out this function *)
-let ls_of_rs rs = match rs.rs_logic with
-  | RLls ls -> ls
-  | _ -> assert false
-
-let clone_type_record cl s d s' d' =
-  let id = s.its_ts.ts_name in
-  let fields' = Hstr.create 16 in
-  let add_field' ({rs_field = pj'} as rs') =
-    let pj' = Opt.get pj' in
-    Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
-  List.iter add_field' d'.itd_fields;
-  (* check if fields from former type are also declared in the new type *)
-  let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
-    let pj_str = pj.pv_vs.vs_name.id_string in
-    let pj_ity = clone_ity cl pj.pv_ity in
-    let pj_ght = pj.pv_ghost in
-    let rs' = try Hstr.find fields' pj_str
-      with Not_found -> raise (BadInstance id) in
-    let pj' = Opt.get rs'.rs_field in
-    let pj'_ity = pj'.pv_ity in
-    let pj'_ght = pj'.pv_ghost in
-    if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
-      raise (BadInstance id);
-    let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
-    cl.ls_table <- Mls.add ls ls' cl.ls_table;
-    cl.rs_table <- Mrs.add rs rs' cl.rs_table;
-    cl.fd_table <- Mpv.add pj pj' cl.fd_table in
-  List.iter match_pj d.itd_fields;
-  cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
-
 type smap = {
   sm_vs : vsymbol Mvs.t;
   sm_pv : pvsymbol Mvs.t;
@@ -645,7 +614,7 @@ let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
 let clone_invl cl sm invl =
   List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
-let self_inv cl itd s =
+let mk_record_invariant cl d s =
   Mls.iter (fun k v -> Format.eprintf "k,v:%a,%a@."
                Pretty.print_ls k Pretty.print_ls v) cl.ls_table;
   let u = create_vsymbol (id_fresh "self")
@@ -656,13 +625,44 @@ let self_inv cl itd s =
       create_param_decl s :: ldd,
       Mvs.add v.pv_vs (t_app_infer s t) sbs
     | _ -> assert false in
-  let fl = itd.itd_fields in
+  let fl = d.itd_fields in
   let _proj, sbs = List.fold_right get_ld fl ([],Mvs.empty) in
-  let inv = t_subst sbs (t_and_simp_l itd.itd_invariant) in
-  let inv = t_forall_close [u] [] inv in
-  let inv = clone_invl cl (sm_of_cl cl) [inv] in
-  List.iter (Format.eprintf "inv2:%a@." Pretty.print_term) inv;
-  List.hd inv
+  let inv = t_subst sbs (t_and_simp_l d.itd_invariant) in
+  t_forall_close [u] [] inv
+
+let clone_record_invariant d_inv d'_inv cl =
+  clone_invl cl (sm_of_cl cl) [t_implies_simp d'_inv d_inv]
+
+(* Mário: commented out this function *)
+let ls_of_rs rs = match rs.rs_logic with
+  | RLls ls -> ls
+  | _ -> assert false
+
+let clone_type_record cl s d s' d' =
+  let id = s.its_ts.ts_name in
+  let fields' = Hstr.create 16 in
+  let add_field' ({rs_field = pj'} as rs') =
+    let pj' = Opt.get pj' in
+    Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
+  List.iter add_field' d'.itd_fields;
+  (* check if fields from former type are also declared in the new type *)
+  let match_pj ({rs_field = pj} as rs) = let pj = Opt.get pj in
+    let pj_str = pj.pv_vs.vs_name.id_string in
+    let pj_ity = clone_ity cl pj.pv_ity in
+    let pj_ght = pj.pv_ghost in
+    let rs' = try Hstr.find fields' pj_str
+      with Not_found -> raise (BadInstance id) in
+    let pj' = Opt.get rs'.rs_field in
+    let pj'_ity = pj'.pv_ity in
+    let pj'_ght = pj'.pv_ghost in
+    if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
+      raise (BadInstance id);
+    let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
+    cl.ls_table <- Mls.add ls ls' cl.ls_table;
+    cl.rs_table <- Mrs.add rs rs' cl.rs_table;
+    cl.fd_table <- Mpv.add pj pj' cl.fd_table in
+  List.iter match_pj d.itd_fields;
+  cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
 let clone_type_decl inst cl tdl kn =
   let def =
@@ -709,13 +709,12 @@ let clone_type_decl inst cl tdl kn =
             | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
           end in
           clone_type_record cl s d s' d'; (* clone record fields *)
-          if d.itd_invariant <> [] && d'.itd_invariant <> [] then begin
-            let d_inv = self_inv cl d s in
-            let d'_inv = self_inv cl d' s' in
-            let inv = clone_invl cl (sm_of_cl cl) [t_implies_simp d'_inv d_inv] in
-            List.iter (Format.eprintf "inv:%a@." Pretty.print_term) inv;
-            List.iter (fun inv -> vcs := (d.itd_its, inv) :: !vcs) inv;
-            (* add VC for invariant *) end
+          (* generate and add VC for type invariant implication *)
+          if d.itd_invariant <> [] && d'.itd_invariant <> [] then
+            let d_inv = mk_record_invariant cl d s in
+            let d'_inv = mk_record_invariant cl d' s' in
+            let inv = clone_record_invariant d_inv d'_inv cl in
+            List.iter (fun inv -> vcs := (d.itd_its, inv) :: !vcs) inv (* hd ? *)
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
           let stv = Stv.of_list ts.ts_args in
