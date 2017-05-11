@@ -614,9 +614,7 @@ let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
 let clone_invl cl sm invl =
   List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
-let mk_record_invariant cl d s =
-  Mls.iter (fun k v -> Format.eprintf "k,v:%a,%a@."
-               Pretty.print_ls k Pretty.print_ls v) cl.ls_table;
+let mk_record_invariant d s =
   let u = create_vsymbol (id_fresh "self")
       (ty_app s.its_ts (List.map ty_var s.its_ts.ts_args)) in
   let t = [t_var u] in
@@ -629,9 +627,6 @@ let mk_record_invariant cl d s =
   let _proj, sbs = List.fold_right get_ld fl ([],Mvs.empty) in
   let inv = t_subst sbs (t_and_simp_l d.itd_invariant) in
   t_forall_close [u] [] inv
-
-let clone_record_invariant d_inv d'_inv cl =
-  clone_invl cl (sm_of_cl cl) [t_implies_simp d'_inv d_inv]
 
 (* Mário: commented out this function *)
 let ls_of_rs rs = match rs.rs_logic with
@@ -710,10 +705,9 @@ let clone_type_decl inst cl tdl kn =
           end in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
-          if d.itd_invariant <> [] && d'.itd_invariant <> [] then
-            let d_inv = mk_record_invariant cl d s in
-            let d'_inv = mk_record_invariant cl d' s' in
-            let inv = clone_record_invariant d_inv d'_inv cl in
+          if d.itd_invariant <> [] then
+            let d_inv = mk_record_invariant d s in
+            let inv = clone_invl cl (sm_of_cl cl) [d_inv] in
             List.iter (fun inv -> vcs := (d.itd_its, inv) :: !vcs) inv (* hd ? *)
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
@@ -793,8 +787,6 @@ let clone_cty cl sm ?(drop_decr=false) cty =
     sm_save_pv sm o o', Mpv.add o' (sm_find_pv sm_args n) olds in
   let sm_olds, olds = Mpv.fold add_old cty.cty_oldies (sm_args, Mpv.empty) in
   let pre = if drop_decr then List.tl cty.cty_pre else cty.cty_pre in
-  (* Mls.iter (fun k v -> Format.eprintf "k,v:%a,%a@." *)
-  (*              Pretty.print_ls k Pretty.print_ls v) cl.ls_table; *)
   let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
   let xpost = Mxs.fold (fun xs fl q ->
