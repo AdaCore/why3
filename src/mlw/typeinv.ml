@@ -323,7 +323,7 @@ let add_var kn pins vl v =
         let s = restore_its s in
         if its_solid s then V else
         let d = find_its_defn kn s in
-        let sbs = ts_match_args s.its_ts tl in
+        let sbs = Ty.ts_match_args s.its_ts tl in
         if s.its_nonfree then if s.its_fragile then (* breakable record *)
           let bn = v.vs_name.id_string in
           let add_field (m,mv) f =
@@ -425,20 +425,13 @@ let cap_of_term kn uf pins caps t =
         unwind (t_label_copy t0 t) c pjl
     | C css, (pj,t0)::pjl ->
         let ty = Opt.get t.t_ty in
+        let sbs = Ty.ty_match_args ty in
         let v0 = create_vsymbol (id_fresh "q") (Opt.get t0.t_ty) in
         let t0 = t_label_copy t0 (t_var v0) and p0 = pat_var v0 in
-        let bb = match Mls.choose css with
-          | {ls_constr = len}, _ when len > Mls.cardinal css ->
-              let v = create_vsymbol (id_fresh "q") ty in
-              [t_close_branch (pat_var v) (unroll (t_var v) pjl0)]
-          | _ -> [] in
-        let sbs = match ty.ty_node with
-          | Tyapp (ts,tl) -> ts_match_args ts tl
-          | _ -> assert false in
         let add_branch cs fdl fl (bl, cj) =
           let mk_pat fd_ty fd = match fd with
             | Some ls when ls_equal pj ls -> p0
-            | _ -> pat_wild (ty_inst sbs fd_ty) in
+            | _ -> pat_wild (Ty.ty_inst sbs fd_ty) in
           let pl = List.map2 mk_pat cs.ls_args fdl in
           let c = Eval_match.select_field pj fdl fl in
           let t0, c = unwind t0 c pjl in
@@ -449,6 +442,11 @@ let cap_of_term kn uf pins caps t =
           match Mls.find_opt cs css with
           | Some fl -> add_branch cs fdl fl acc
           | None -> acc in
+        let bb = match Mls.choose css with
+          | {ls_constr = len}, _ when len > Mls.cardinal css ->
+              let v = create_vsymbol (id_fresh "q") ty in
+              [t_close_branch (pat_var v) (unroll (t_var v) pjl0)]
+          | _ -> [] in
         let bl, c = List.fold_right add_branch csl (bb, None) in
         t_case t bl, Opt.get c
     | R pjs, (pj,t0)::pjl ->
@@ -527,20 +525,21 @@ let cap_of_term kn uf pins caps t =
   down caps [] t
 
 let find_term_fields kn cs t =
+  let ty = Opt.get t.t_ty in
+  let sbs = Ty.ty_match_args ty in
   let fdl = Eval_match.cs_fields kn cs in
-  let sbs = oty_match Mtv.empty cs.ls_value t.t_ty in
   let add_pat ty (pl,pll) =
-    let pw = pat_wild (ty_inst sbs ty) in
+    let pw = pat_wild (Ty.ty_inst sbs ty) in
     let pv = pat_var (create_vsymbol (id_fresh "v") pw.pat_ty) in
     pw :: pl, (pv :: pl) :: List.map (fun pl -> pw :: pl) pll in
   let _, pll = List.fold_right add_pat cs.ls_args ([],[]) in
-  let conv t pl = function
+  let conv pl = function
     | Some pj -> t_app_infer pj [t]
     | None ->
-        let p = pat_app cs pl (t_type t) in
+        let p = pat_app cs pl ty in
         let v = Svs.choose p.pat_vars in
         t_case_close t [p, t_var v] in
-  List.map2 (conv t) pll fdl
+  List.map2 conv pll fdl
 
 let cap_equality kn uf pins f t1 c1 t2 c2 =
   let rec commit t c fl uf = match c with
@@ -562,11 +561,24 @@ let cap_equality kn uf pins f t1 c1 t2 c2 =
         let tl = find_term_fields kn cs t in
         let add t c (fl, uf) = commit t c fl uf in
         List.fold_right2 add tl cl (fl, uf)
-    | C _css ->
-        assert false (* TODO *)
+    | C css ->
+        let ty = Opt.get t.t_ty in
+        let sbs = Ty.ty_match_args ty in
+        let branch cs cl bl =
+          let add ty c (pl,fl,uf) =
+            let v = create_vsymbol (id_fresh "v") (ty_inst sbs ty) in
+            let fl', uf = commit (t_var v) c fl uf in
+            let p = if fl' == fl then pat_wild v.vs_ty else pat_var v in
+            p::pl, fl', uf in
+          let pl, fl, _ = List.fold_right2 add cs.ls_args cl ([],[],uf) in
+          t_close_branch (pat_app cs pl ty) (t_and_l fl) :: bl in
+        let bb = match Mls.choose css with
+          | {ls_constr = len}, _ when len > Mls.cardinal css ->
+              [t_close_branch (pat_wild ty) t_true]
+          | _ -> [] in
+        t_case t (Mls.fold branch css bb) :: fl, uf
     | R pjs ->
-        let add pj c (fl,uf) =
-          commit (t_app_infer pj [t]) c fl uf in
+        let add pj c (fl,uf) = commit (t_app_infer pj [t]) c fl uf in
         Mls.fold add pjs (fl,uf)
   in
   let rec down t1 c1 t2 c2 fl uf = match c1, c2 with

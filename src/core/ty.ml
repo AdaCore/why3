@@ -205,6 +205,10 @@ let ts_match_args s tl =
   try List.fold_right2 Mtv.add s.ts_args tl Mtv.empty
   with Invalid_argument _ -> raise (BadTypeArity (s, List.length tl))
 
+let ty_match_args ty = match ty.ty_node with
+  | Tyapp (s,tl) -> ts_match_args s tl
+  | _ -> invalid_arg "Ty.ty_match_args"
+
 let ty_app s tl = match s.ts_def with
   | Alias ty ->
       ty_full_inst (ts_match_args s tl) ty
