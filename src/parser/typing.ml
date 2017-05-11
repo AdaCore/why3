@@ -795,9 +795,7 @@ let type_fmla_pure muc lvm denv e =
 
 let check_public ~loc d name =
   if d.td_vis <> Public || d.td_mut then
-    Loc.errorm ~loc
-               "%s types cannot be abstract, private, or mutable"
-               name;
+    Loc.errorm ~loc "%s types cannot be abstract, private, or mutable" name;
   if d.td_inv <> [] then
     Loc.errorm ~loc "%s types cannot have invariants" name
 
@@ -812,14 +810,14 @@ let add_types muc tdl =
     let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
     match d.td_def with
     | TDalias pty ->
-       check_public ~loc d "Alias";
-       let alias = Sstr.add x alias in
-       let ity = parse ~loc ~alias ~alg pty in
-       if not (Hstr.mem htd x) then
-         let itd = create_alias_decl id args ity in
-         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+        check_public ~loc d "Alias";
+        let alias = Sstr.add x alias in
+        let ity = parse ~loc ~alias ~alg pty in
+        if not (Hstr.mem htd x) then
+          let itd = create_alias_decl id args ity in
+          Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDalgebraic csl ->
-       check_public ~loc d "Algebraic";
+        check_public ~loc d "Algebraic";
         let hfd = Hstr.create 5 in
         let alias = Sstr.empty in
         let alg = Mstr.add x (id,args) alg in
@@ -873,7 +871,7 @@ let add_types muc tdl =
 (*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
-           check_public ~loc d "Recursive";
+            check_public ~loc d "Recursive";
             let get_fd (mut, fd) = if mut then Loc.errorm ~loc
               "Recursive types cannot have mutable fields" else fd in
             Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
@@ -889,25 +887,17 @@ let add_types muc tdl =
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd
         end
     | TDrange (lo,hi) ->
-       check_public ~loc d "Range";
-(*
-        let alias = Sstr.add x alias in
-        let ity = parse ~loc ~alias ~alg pty in
-        if not (Hstr.mem htd x) then
-        let itd = create_alias_decl id args ity in
+        check_public ~loc d "Range";
+        let ir = { Number.ir_lower = lo;
+                   Number.ir_upper = hi } in
+        let itd = create_range_decl id ir in
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
- *)
-       let ir = { Number.ir_lower = lo;
-                  Number.ir_upper = hi } in
-       let itd = create_range_decl id ir in
-       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDfloat (eb,sb) ->
-       check_public ~loc d "Float";
-       let fp = { Number.fp_exponent_digits = eb;
-                  Number.fp_significand_digits = sb } in
-       let itd = create_float_decl id fp in
-       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
-
+        check_public ~loc d "Floating-point";
+        let fp = { Number.fp_exponent_digits = eb;
+                   Number.fp_significand_digits = sb } in
+        let itd = create_float_decl id fp in
+        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
 
   and parse ~loc ~alias ~alg pty =
     let rec down = function
