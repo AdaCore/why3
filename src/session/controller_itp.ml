@@ -110,8 +110,6 @@ let create_controller config env ses =
     provers;
   c
 
-let set_session cont ses = cont.controller_session <- ses
-
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
 let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
 let th_proved c th  =

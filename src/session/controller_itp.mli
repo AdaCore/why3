@@ -77,9 +77,6 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 (** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
 
-(* TEMPORARY *)
-val set_session : controller -> Session_itp.session -> unit
-
 (** Used to find if a proof/trans node or theory is proved or not *)
 val tn_proved: controller -> Session_itp.transID -> bool
 val pn_proved: controller -> Session_itp.proofNodeID -> bool
