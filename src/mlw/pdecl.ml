@@ -304,13 +304,14 @@ let mk_decl_meta = let r = ref 0 in fun meta node pure ->
 
 let mk_decl = mk_decl_meta []
 
-let close_record_invariant ts fl itd =
+let axiom_of_invariant itd =
+  let ts = itd.itd_its.its_ts in
   let ty = ty_app ts (List.map ty_var ts.ts_args) in
   let u = create_vsymbol (id_fresh "self") ty in
   let tl = [t_var u] in
   let add_fd sbs s = let pj = ls_of_rs s in
     Mvs.add (fd_of_rs s).pv_vs (t_app pj tl pj.ls_value) sbs in
-  let sbs = List.fold_left add_fd Mvs.empty fl in
+  let sbs = List.fold_left add_fd Mvs.empty itd.itd_fields in
   let inv = t_subst sbs (t_and_simp_l itd.itd_invariant) in
   t_forall_close [u] [] inv
 
@@ -362,7 +363,7 @@ let create_type_decl dl =
         let meta = Theory.(meta_float, [MAts ts; MAls pj_ls; MAls iF_ls]) in
         mk_decl_meta [meta] (PDtype [itd]) pure
     | fl, _, NoDef when itd.itd_invariant <> [] ->
-        let inv = close_record_invariant ts fl itd in
+        let inv = axiom_of_invariant itd in
         let pr = create_prsymbol (id_derive (nm ^ "'invariant") id) in
         let ax = create_prop_decl Paxiom pr inv in
         let add_fd s dl = create_param_decl (ls_of_rs s) :: dl in

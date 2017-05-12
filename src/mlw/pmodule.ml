@@ -669,33 +669,28 @@ let clone_type_decl inst cl tdl kn =
     end else
     (* abstract *)
     if s.its_private && cloned then begin
-      (* FIXME: currently, we cannot refine a block of mutual types *)
-      if List.length tdl <> 1 then raise (CannotInstantiate id);
-        (* FIXME: better error messsage *)
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
             raise (BadInstance id);
           let pd' = Mid.find s'.its_ts.ts_name kn in
-          let d' = begin match pd'.pd_node with
+          let d' = match pd'.pd_node with
             | PDtype [d'] -> d'
-            | PDtype _ -> (* FIXME: we could refine with mutual types *)
-              raise (BadInstance id)
-            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
-          end in
+            (* FIXME: we could refine with mutual types *)
+            | PDtype _ -> raise (BadInstance id)
+            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id) in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
-          begin match d.itd_invariant, d'.itd_invariant with
-          | [], _ -> ()
-          | _, [] -> raise (BadInstance id) (* TODO? also reject the *)
-                                            (* trivial invariant ? *)
-          | _ ->
-            let inv = close_record_invariant s.its_ts d.itd_fields d in
-            let inv = clone_invl cl (sm_of_cl cl) [inv] in
+          if d.itd_invariant <> [] then begin
+            let inv = axiom_of_invariant d in
+            let invl = clone_invl cl (sm_of_cl cl) [inv] in
             let add_vc inv = vcs := (d.itd_its, inv) :: !vcs in
-            List.iter add_vc inv end
+            List.iter add_vc invl end
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
+          (* TODO: clone_type_record, axiom_of_invariant *)
+          (* TODO: should we only allow cloning into ity for
+             private types with no fields and no invariant? *)
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
                   its_pure s && ity_immutable ity) then raise (BadInstance id);
@@ -740,6 +735,7 @@ let clone_type_decl inst cl tdl kn =
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
     end
+
   and conv_ity alg ity =
     let rec down ity = match ity.ity_node with
       | Ityreg {reg_its = s; reg_args = tl}
