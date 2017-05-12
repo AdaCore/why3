@@ -700,10 +700,14 @@ let clone_type_decl inst cl tdl kn =
           end in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
-          if d.itd_invariant <> [] then
-            let d_inv = mk_record_invariant d s in
+          begin match d.itd_invariant, d'.itd_invariant with
+          | [], _ -> ()
+          | _, [] -> raise (BadInstance id) (* TODO? also reject the *)
+                                            (* trivial invariant ? *)
+          | _ -> let d_inv = mk_record_invariant d s in
             let inv = clone_invl cl (sm_of_cl cl) [d_inv] in
-            List.iter (fun inv -> vcs := (d.itd_its, inv) :: !vcs) inv (* hd ? *)
+            let add_vc inv = vcs := (d.itd_its, inv) :: !vcs in
+            List.iter add_vc inv end
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
           let stv = Stv.of_list ts.ts_args in
@@ -713,7 +717,6 @@ let clone_type_decl inst cl tdl kn =
       | None -> assert false end end;
       Hits.add htd s None;
       (* TODO: check typing conditions for refined record type *)
-      (* TODO: add a VC for invariants (if any) *)
     end else
     (* variant *)
     if not s.its_mutable && d.itd_constructors <> [] &&
@@ -751,7 +754,6 @@ let clone_type_decl inst cl tdl kn =
       cl.ts_table <- Mts.add ts itd.itd_its cl.ts_table;
       save_itd itd
     end
-
   and conv_ity alg ity =
     let rec down ity = match ity.ity_node with
       | Ityreg {reg_its = s; reg_args = tl}
