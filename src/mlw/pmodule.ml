@@ -615,20 +615,6 @@ let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
 let clone_invl cl sm invl =
   List.map (fun t -> clone_term cl sm.sm_vs t) invl
 
-let mk_record_invariant d s =
-  let u = create_vsymbol (id_fresh "self")
-      (ty_app s.its_ts (List.map ty_var s.its_ts.ts_args)) in
-  let t = [t_var u] in
-  let get_ld s (ldd,sbs) = match s.rs_logic, s.rs_field with
-    | RLls s, Some v ->
-      create_param_decl s :: ldd,
-      Mvs.add v.pv_vs (t_app_infer s t) sbs
-    | _ -> assert false in
-  let fl = d.itd_fields in
-  let _proj, sbs = List.fold_right get_ld fl ([],Mvs.empty) in
-  let inv = t_subst sbs (t_and_simp_l d.itd_invariant) in
-  t_forall_close [u] [] inv
-
 let clone_type_record cl s d s' d' =
   let id = s.its_ts.ts_name in
   let fields' = Hstr.create 16 in
@@ -693,8 +679,7 @@ let clone_type_decl inst cl tdl kn =
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = begin match pd'.pd_node with
             | PDtype [d'] -> d'
-            | PDtype _ ->
-              (* FIXME: we could refine with mutual types *)
+            | PDtype _ -> (* FIXME: we could refine with mutual types *)
               raise (BadInstance id)
             | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id)
           end in
@@ -704,8 +689,9 @@ let clone_type_decl inst cl tdl kn =
           | [], _ -> ()
           | _, [] -> raise (BadInstance id) (* TODO? also reject the *)
                                             (* trivial invariant ? *)
-          | _ -> let d_inv = mk_record_invariant d s in
-            let inv = clone_invl cl (sm_of_cl cl) [d_inv] in
+          | _ ->
+            let inv = close_record_invariant s.its_ts d.itd_fields d in
+            let inv = clone_invl cl (sm_of_cl cl) [inv] in
             let add_vc inv = vcs := (d.itd_its, inv) :: !vcs in
             List.iter add_vc inv end
       | None -> begin match Mts.find_opt ts inst.mi_ty with

@@ -91,6 +91,10 @@ and pdecl_node = private
 
 and meta_decl = Theory.meta * Theory.meta_arg list
 
+val close_record_invariant : tysymbol -> rsymbol list -> its_defn -> term
+(** [close_record_invariant ts fl itd] universally closes a record invariant
+    with a variable 'self', of the record type, with respect to the list [fl]. *)
+
 val create_type_decl : its_defn list -> pdecl list
 
 val create_let_decl : let_defn -> pdecl
