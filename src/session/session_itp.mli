@@ -16,8 +16,6 @@ unique identifiers of type [proofNodeId]
 
 type session
 
-val dummy_session: session
-
 type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
 type transID

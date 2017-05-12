@@ -89,20 +89,6 @@ type session = {
   session_prover_ids            : int Hprover.t;
 }
 
-let dummy_session =
-  {
-   proofAttempt_table    = Hint.create 23;
-   next_proofAttemptID   = 0;
-   proofNode_table       = Hint.create 23;
-   next_proofNodeID      = 0;
-   trans_table           = Hint.create 23;
-   next_transID          = 0;
-   session_dir           = "";
-   session_files         = Hstr.create 23;
-   session_shape_version = 0;
-   session_prover_ids    = Hprover.create 23;
- }
-
 let theory_parent s th =
   Hstr.find s.session_files th.theory_parent_name
 

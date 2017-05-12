@@ -1,9 +1,4 @@
 
-
-
-(* TODO: all occurences of Format.eprintf in this file should be
-   replaced by proper server notifications *)
-
 let has_extension f =
   try
     let _ = Filename.chop_extension f in true
