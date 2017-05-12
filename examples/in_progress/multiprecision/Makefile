@@ -4,20 +4,20 @@ why3:
 extract: why3
 	why3 extract -D c -D mp.drv -o build/N.c -L . mp2.N
 tests: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -lgmp -o tests
+	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o tests
 	./tests
 why3addbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3addbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o why3addbench
 why3mulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3mulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o why3mulbench
 why3divbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -lgmp -o why3divbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o why3divbench
 gmpaddbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -lgmp -o gmpaddbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o gmpaddbench
 gmpmulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -lgmp -o gmpmulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o gmpmulbench
 gmpdivbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -lgmp -o gmpdivbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -lgmp -o gmpdivbench
 
 alltests: tests why3addbench why3mulbench why3divbench gmpaddbench gmpmulbench gmpdivbench
 
@@ -39,4 +39,6 @@ check-gmp:
 ifndef GMP_DIR
 	$(error GMP_DIR is undefined)
 endif
-
+ifndef GMP_LIB
+	$(error GMP_LIB is undefined)
+endif
