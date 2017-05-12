@@ -4,11 +4,12 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.6" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../../../modules/array.mlw">
-<theory name="Array" sum="324e125dff69cfce0eefc07a77b17b42">
+<file name="../../../modules/array.mlw" expanded="true">
+<theory name="Array" sum="285c467dea3cde7aa3a3c699222d37ee">
  <goal name="WP_parameter defensive_get" expl="VC for defensive_get">
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
@@ -20,6 +21,9 @@
  <goal name="WP_parameter fill" expl="VC for fill">
  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
  <proof prover="4"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="WP_parameter self_blit" expl="VC for self_blit">
+ <proof prover="2"><result status="valid" time="0.10" steps="148"/></proof>
  </goal>
 </theory>
 <theory name="IntArraySorted" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -53,7 +57,10 @@
 </theory>
 <theory name="NumOfEq" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ToList" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ToList" sum="b7bcfe4954496ee8ce9bf8d36ab68113">
+ <goal name="WP_parameter to_list_append" expl="VC for to_list_append">
+ <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+ </goal>
 </theory>
 <theory name="ToSeq" sum="972d3973679c1b19bf79339fb847c382">
  <goal name="WP_parameter to_seq_length" expl="VC for to_seq_length">
