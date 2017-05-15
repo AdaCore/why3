@@ -1,0 +1,43 @@
+
+(** Build a tree of logarithmic height from an array, in linear time,
+    while preserving the order of elements
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+module TreeOfArray
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import int.Power
+  use import array.Array
+  use import array.ToList
+  use import bintree.Tree
+  use import bintree.Size
+  use import bintree.Inorder
+  use import bintree.Height
+
+  let rec tree_of_array_aux (a: array 'a) (lo hi: int) : tree 'a
+    requires { 0 <= lo <= hi <= length a }
+    variant  { hi - lo }
+    ensures  { let n = hi - lo in
+               size result = n && inorder result = to_list a lo hi &&
+               (n > 0 ->
+                  let h = height result in power 2 (h-1) <= n < power 2 h) }
+  =
+    if hi = lo then
+      Empty
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let left = tree_of_array_aux a lo mid in
+      let right = tree_of_array_aux a (mid + 1) hi in
+      Node left a[mid] right
+
+  let tree_of_array (a: array 'a) : tree 'a
+    ensures { inorder result = to_list a 0 (length a) }
+    ensures { size result > 0 -> let h = height result in
+                power 2 (h-1) <= size result < power 2 h }
+  =
+    tree_of_array_aux a 0 (length a)
+
+end
