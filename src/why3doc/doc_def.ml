@@ -74,6 +74,6 @@ let pp_locate fmt id =
   | None -> raise Not_found
   | Some _loc ->
     let lp, _, _ =
-      try Mlw_module.restore_path id with Not_found -> Theory.restore_path id
+      try Pmodule.restore_path id with Not_found -> Theory.restore_path id
     in
     Format.fprintf fmt "%a#%a" pp_url lp pp_anchor id

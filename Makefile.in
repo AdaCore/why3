@@ -1458,9 +1458,8 @@ $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
 # build targets
 
-# TODO
-#byte: bin/why3doc.byte
-#opt:  bin/why3doc.opt
+byte: bin/why3doc.byte
+opt:  bin/why3doc.opt
 
 bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
 	$(SHOW) 'Linking  $@'
@@ -1487,8 +1486,7 @@ clean_old_install::
 install_no_local::
 	$(INSTALL) bin/why3doc.@OCAMLBEST@ $(TOOLDIR)/why3doc$(EXE)
 
-# TODO
-#install_local:: bin/why3doc
+install_local:: bin/why3doc
 
 #########
 # trywhy3
