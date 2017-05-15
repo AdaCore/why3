@@ -22,6 +22,8 @@ val uncapitalize : string -> string
 
 (** {2 Other useful functions on strings} *)
 
+val char_is_uppercase : char -> bool
+
 val rev_split : char -> string -> string list
 
 val split : char -> string -> string list

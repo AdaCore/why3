@@ -210,6 +210,14 @@ let rs_of_ls ls =
   let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff_empty ity in
   mk_rs ls.ls_name c (RLls ls) None
 
+let ls_of_rs rs = match rs.rs_logic with
+  | RLls ls -> ls
+  | _ -> invalid_arg "Expr.ls_of_rs"
+
+let fd_of_rs rs = match rs.rs_field with
+  | Some fd -> fd
+  | _ -> invalid_arg "Expr.fd_of_rs"
+
 (** {2 Program patterns} *)
 
 type pat_ghost =
@@ -463,14 +471,12 @@ let e_var ({pv_ity = ity; pv_ghost = ghost} as v) =
   let eff = eff_ghostify ghost (eff_read_single v) in
   mk_expr (Evar v) ity MaskVisible eff
 
-let e_const c =
-  let ity = match c with
-    | Number.ConstInt  _ -> ity_int
-    | Number.ConstReal _ -> ity_real in
+let e_const c ity =
+  Term.check_literal c (ty_of_ity ity);
   mk_expr (Econst c) ity MaskVisible eff_empty
 
 let e_nat_const n =
-  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n)))
+  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else
@@ -543,10 +549,7 @@ let rec raw_of_expr prop e = match e.e_node with
         effect-hiding construction, Etry, is forbidden. *)
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> t_var v.pv_vs
-  | Econst (Number.ConstInt _ as c)->
-      t_const c ty_int
-  | Econst (Number.ConstReal _ as c)->
-      t_const c ty_real
+  | Econst c -> t_const c (ty_of_ity e.e_ity)
   | Epure t -> t
   | Eghost e -> pure_of_expr prop e
   | Eexec (_,{cty_post = []}) -> raise Exit

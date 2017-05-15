@@ -91,7 +91,7 @@ module Print = struct
 
   let print_qident ~sanitizer info fmt id =
     try
-      if info.flat then raise Not_found;
+      if info.flat || is_local_id info id then raise Not_found;
       let lp, t, q =
         try Pmodule.restore_path id
         with Not_found -> Theory.restore_path id in
@@ -99,12 +99,9 @@ module Print = struct
       let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
       let s = sanitizer s in
       let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
-      if is_local_id info id then
-        fprintf fmt "%s" s
-      else begin
-        let fname = if lp = [] then info.info_fname else None in
-        let m = Strings.capitalize (module_name ?fname lp t) in
-        fprintf fmt "%s.%s" m s end
+      let fname = if lp = [] then info.info_fname else None in
+      let m = Strings.capitalize (module_name ?fname lp t) in
+      fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
@@ -300,11 +297,11 @@ module Print = struct
       | [], [] ->
         (print_uident info) fmt rs.rs_name
       | [], [t] ->
-        fprintf fmt "@[<hov 2>%a %a@]"
-          (print_uident info) rs.rs_name (print_expr info) t
+        fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+          (print_uident info) rs.rs_name (print_expr ~paren:true info) t
       | [], tl ->
-        fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-          (print_list comma (print_expr info)) tl
+        fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
+          rs.rs_name (print_list comma (print_expr info)) tl
       | pjl, tl ->
         let equal fmt () = fprintf fmt " = " in
         fprintf fmt "@[<hov 2>{ @[%a@] }@]"
@@ -323,9 +320,9 @@ module Print = struct
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         (print_lident info) (pv_name pv) (print_expr info) e;
     | Lsym (rs, res, args, ef) ->
-      fprintf fmt "@[<hov 2>let %a@[%a@] : %a@ =@ @[%a@]@]"
+      fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
         (print_lident info) rs.rs_name
-        (print_list_pre space (print_vs_arg info)) args
+        (print_list space (print_vs_arg info)) args
         (print_ty info) res (print_expr info) ef;
       forget_vars args
     | Lrec rdef ->

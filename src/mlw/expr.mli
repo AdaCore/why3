@@ -65,6 +65,12 @@ val restore_rs : lsymbol -> rsymbol
 
 val rs_ghost : rsymbol -> bool
 
+val ls_of_rs : rsymbol -> lsymbol
+(** raises [Invalid_argument] is [rs_logic] is not an [RLls] *)
+
+val fd_of_rs : rsymbol -> pvsymbol
+(** raises [Invalid_argument] is [rs_field] is [None] *)
+
 (** {2 Program patterns} *)
 
 type pat_ghost =
@@ -190,7 +196,7 @@ val c_any : cty -> cexp
 
 val e_var : pvsymbol -> expr
 
-val e_const : Number.constant -> expr
+val e_const : Number.constant -> ity -> expr
 val e_nat_const : int -> expr
 
 val e_exec : cexp -> expr

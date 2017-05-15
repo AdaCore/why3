@@ -9,6 +9,13 @@
 (*                                                                  *)
 (********************************************************************)
 
-val track : Pdecl.known_map -> Term.term -> Term.term
+open Ty
+open Term
+open Pdecl
 
-val eval_match : Pdecl.known_map -> Term.term -> Term.term
+val ts_constructors : known_map -> tysymbol -> Decl.constructor list
+val ty_constructors : known_map -> ty -> Decl.constructor list
+val cs_fields : known_map -> lsymbol -> lsymbol option list
+val select_field : lsymbol -> lsymbol option list -> 'a list -> 'a
+
+val eval_match : known_map -> term -> term

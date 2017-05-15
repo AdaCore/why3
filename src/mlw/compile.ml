@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -414,7 +414,7 @@ module Translate = struct
     let not_g e = not (rs_ghost e) in
     let pjl = itd.itd_fields in
     let mfields = itd.itd_its.its_mfields in
-    let pv_equal_field rs = pv_equal (Opt.get rs.rs_field) in
+    let pv_equal_field rs = pv_equal (fd_of_rs rs) in
     let get_mutable rs = List.exists (pv_equal_field rs) mfields in
     match filter_ghost_params not_g get_mutable pjl with
     | [is_mutable] -> not is_mutable
@@ -695,7 +695,7 @@ module Translate = struct
           List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
     in
     let drecord_fields ({rs_cty = rsc} as rs) =
-      (List.exists (pv_equal (Opt.get rs.rs_field)) s.its_mfields),
+      (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields),
       rs.rs_name,
       ity rsc.cty_result
     in
@@ -920,9 +920,9 @@ module Transform = struct
       let e, spv = expr info subst e in
       let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
       mk (Etry (e, e_bl)), Spv.union spv spv_bl
-    | Eassign al ->
+    | Eassign al -> (* FIXME : produced superfolous let *)
       let assign e (_, _, pv) = mk_let subst pv e in
-      List.fold_left assign e al, Spv.empty
+      (* e *) List.fold_left assign e al, Spv.empty
     | Econst _ | Eabsurd | Ehole -> e, Spv.empty
     | Eignore e ->
       let e, spv = expr info subst e in

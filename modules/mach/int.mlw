@@ -291,6 +291,8 @@ module Int63
 
   let constant zero = of_int 0
   let constant one = of_int 1
+  let constant max_int = of_int max_int63
+  let constant min_int = of_int min_int63
 
 (*  use bv.BV63
 
@@ -345,6 +347,65 @@ module MinMax63
   let max (x y: int63) : int63
     ensures { result = if to_int x >= to_int y then x else y }
   = if x >= y then x else y
+
+end
+
+
+(** {2 Mutable states of pseudo-random generators}
+
+  Basically a reference containing a pure generator. *)
+
+module State63
+
+  use import int.Int
+  use import Int63
+  use export random.Generator
+
+  type state = abstract { mutable state: generator }
+
+  val create (seed: int63) : state
+    ensures { result.state = create seed }
+
+  val init (s: state) (seed: int63) : unit writes {s}
+    ensures { s.state = create seed }
+
+  val self_init (s: state) : unit writes {s}
+
+  val random_bool (s: state) : bool writes {s}
+    ensures { s.state = next (old s.state) }
+    ensures { result = get_bool s.state }
+
+  val random_int63 (s: state) (n: int63) : int63 writes {s}
+    requires { 0 < n }
+    ensures  { s.state = next (old s.state) }
+    ensures  { result = get_int s.state n }
+    ensures  { 0 <= result < n }
+
+end
+
+(** {2 A global pseudo-random generator} *)
+
+module Random63
+
+  use import int.Int
+  use import Int63
+  use import State63
+
+  val s: state
+
+  let init (seed: int63) ensures { s.state = create seed } = init s seed
+
+  let self_init () = self_init s
+
+  let random_bool ()
+    writes { s }
+  = random_bool s
+
+  let random_int63 (n: int63) : int63
+    requires { 0 < n } (* FIXME: n should be less than 2^30 *)
+    writes   { s }
+    ensures  { 0 <= result < n }
+  = random_int63 s n
 
 end
 

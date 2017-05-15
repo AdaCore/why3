@@ -366,13 +366,13 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       DTuloc (dterm tuc gvars at denv e1, uloc)
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm tuc gvars at denv e1, Slab.singleton lab)
-  | Ptree.Tcast (e1, ty) ->
-    (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
-      let e1 = dterm tuc gvars at denv e1 in
-      let ty = ty_of_pty tuc ty in
-      match e1.dt_node with
-      | DTconst (c,_) -> DTconst (c, ty)
-      | _ -> DTcast (e1, ty))
+  | Ptree.Tcast ({term_desc = Ptree.Tconst c}, pty) ->
+      let ty = ty_of_pty tuc pty in
+      DTconst (c, ty)
+  | Ptree.Tcast (e1, pty) ->
+      let d1 = dterm tuc gvars at denv e1 in
+      let ty = ty_of_pty tuc pty in
+      DTcast (d1, ty))
 
 (** typing program expressions *)
 
@@ -599,7 +599,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None -> qualid_app loc q el)
     | _ -> qualid_app loc q el
   in
-  Dexpr.dexpr ~loc (match desc with
+  Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
   | Ptree.Eidapp (q, el) ->
@@ -631,7 +631,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst c -> DEconst c
+  | Ptree.Econst (Number.ConstInt _ as c) -> DEconst(c, dity_int)
+  | Ptree.Econst (Number.ConstReal _ as c) -> DEconst(c, dity_real)
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in
@@ -761,8 +762,14 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr muc denv e1, Slab.singleton lab)
-  | Ptree.Ecast (e1, pty) ->
-      DEcast (dexpr muc denv e1, ity_of_pty muc pty))
+  | Ptree.Ecast ({expr_desc = Ptree.Econst c},pty) ->
+      let ity = ity_of_pty muc pty in
+      DEconst (c, dity_of_ity ity)
+  | Ptree.Ecast (e1,pty) ->
+      let d1 = dexpr muc denv e1 in
+      let ity = ity_of_pty muc pty in
+      DEcast (d1, ity)
+  end
 
 and drec_defn muc denv fdl =
   let prep (id, gh, kind, bl, pty, msk, sp, e) =
@@ -803,9 +810,7 @@ let type_fmla_pure muc lvm denv e =
 
 let check_public ~loc d name =
   if d.td_vis <> Public || d.td_mut then
-    Loc.errorm ~loc
-               "%s types cannot be abstract, private, or mutable"
-               name;
+    Loc.errorm ~loc "%s types cannot be abstract, private, or mutable" name;
   if d.td_inv <> [] then
     Loc.errorm ~loc "%s types cannot have invariants" name
 
@@ -820,14 +825,14 @@ let add_types muc tdl =
     let args = List.map (fun id -> tv_of_string id.id_str) d.td_params in
     match d.td_def with
     | TDalias pty ->
-       check_public ~loc d "Alias";
-       let alias = Sstr.add x alias in
-       let ity = parse ~loc ~alias ~alg pty in
-       if not (Hstr.mem htd x) then
-         let itd = create_alias_decl id args ity in
-         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
+        check_public ~loc d "Alias";
+        let alias = Sstr.add x alias in
+        let ity = parse ~loc ~alias ~alg pty in
+        if not (Hstr.mem htd x) then
+          let itd = create_alias_decl id args ity in
+          Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDalgebraic csl ->
-       check_public ~loc d "Algebraic";
+        check_public ~loc d "Algebraic";
         let hfd = Hstr.create 5 in
         let alias = Sstr.empty in
         let alg = Mstr.add x (id,args) alg in
@@ -881,7 +886,7 @@ let add_types muc tdl =
 (*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
-           check_public ~loc d "Recursive";
+            check_public ~loc d "Recursive";
             let get_fd (mut, fd) = if mut then Loc.errorm ~loc
               "Recursive types cannot have mutable fields" else fd in
             Hstr.add htd x (create_rec_record_decl s (List.map get_fd fl))
@@ -897,25 +902,17 @@ let add_types muc tdl =
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd
         end
     | TDrange (lo,hi) ->
-       check_public ~loc d "Range";
-(*
-        let alias = Sstr.add x alias in
-        let ity = parse ~loc ~alias ~alg pty in
-        if not (Hstr.mem htd x) then
-        let itd = create_alias_decl id args ity in
+        check_public ~loc d "Range";
+        let ir = { Number.ir_lower = lo;
+                   Number.ir_upper = hi } in
+        let itd = create_range_decl id ir in
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
- *)
-       let ir = { Number.ir_lower = lo;
-                  Number.ir_upper = hi } in
-       let itd = create_range_decl id ir in
-       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDfloat (eb,sb) ->
-       check_public ~loc d "Float";
-       let fp = { Number.fp_exponent_digits = eb;
-                  Number.fp_significand_digits = sb } in
-       let itd = create_float_decl id fp in
-       Hstr.add hts x itd.itd_its; Hstr.add htd x itd
-
+        check_public ~loc d "Floating-point";
+        let fp = { Number.fp_exponent_digits = eb;
+                   Number.fp_significand_digits = sb } in
+        let itd = create_float_decl id fp in
+        Hstr.add hts x itd.itd_its; Hstr.add htd x itd
 
   and parse ~loc ~alias ~alg pty =
     let rec down = function
@@ -947,11 +944,9 @@ let add_types muc tdl =
 
   Mstr.iter (visit ~alias:Mstr.empty ~alg:Mstr.empty) def;
   let tdl = List.map (fun d -> Hstr.find htd d.td_ident.id_str) tdl in
-  let d,metas = create_type_decl tdl in
-  List.fold_left
-    (fun uc (m,a) -> add_meta uc m a)
-    (add_pdecl ~vc:true muc d)
-    metas
+  let add muc d = add_pdecl ~vc:true muc d in
+  List.fold_left add muc (create_type_decl tdl)
+
 
 let tyl_of_params {muc_theory = tuc} pl =
   let ty_of_param (loc,_,gh,ty) =

@@ -224,8 +224,10 @@ let dity_real = Dapp (its_real, [], [])
 let dity_bool = Dapp (its_bool, [], [])
 let dity_unit = Dapp (its_unit, [], [])
 
+(*
 let dvty_int  = [], dity_int
 let dvty_real = [], dity_real
+*)
 let dvty_bool = [], dity_bool
 let dvty_unit = [], dity_unit
 
@@ -404,7 +406,7 @@ and dexpr_node =
   | DEpv of pvsymbol
   | DErs of rsymbol
   | DEls of lsymbol
-  | DEconst of Number.constant
+  | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * mask * dspec later * dexpr
   | DEany of dbinder list * mask * dspec later * dity
@@ -642,10 +644,7 @@ let dexpr ?loc node =
         specialize_rs rs
     | DEls ls ->
         specialize_ls ls
-    | DEconst (Number.ConstInt _) ->
-        dvty_int
-    | DEconst (Number.ConstReal _) ->
-        dvty_real
+    | DEconst (_, ity) -> [],ity
     | DEapp ({de_dvty = (arg::argl, res)}, de2) ->
         dexpr_expected_type de2 arg;
         argl, res
@@ -1183,8 +1182,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_var (get_pv env n)
   | DEpv v ->
       e_var v
-  | DEconst c ->
-      e_const c
+  | DEconst(c,dity) ->
+     e_const c (ity_of_dity dity)
   | DEapp ({de_dvty = ([],_)} as de1, de2) ->
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in

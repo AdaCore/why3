@@ -915,6 +915,7 @@ ret_arg:
 | lqualid                               { PTtyapp ($1, []), Ity.MaskVisible }
 | quote_lident                          { PTtyvar $1, Ity.MaskVisible }
 | LEFTPAR RIGHTPAR                      { PTtuple [], Ity.MaskVisible }
+| LEFTBRC ty RIGHTBRC                   { PTpure  $2, Ity.MaskVisible }
 | LEFTPAR ret_sub RIGHTPAR              { PTparen (fst $2), snd $2 }
 | LEFTPAR comma_list2(ret_sub) RIGHTPAR { PTtuple (List.map fst $2),
                                     Ity.MaskTuple (List.map snd $2) }
@@ -1002,6 +1003,7 @@ uident_nq:
 
 lident:
 | LIDENT          { mk_id $1 $startpos $endpos }
+| lident_keyword  { mk_id $1 $startpos $endpos }
 | LIDENT_QUOTE    { mk_id $1 $startpos $endpos }
 
 lident_nq:

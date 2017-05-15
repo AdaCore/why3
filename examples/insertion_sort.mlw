@@ -12,7 +12,7 @@ module InsertionSort
 
   let insertion_sort (a: array int)
     ensures { sorted a /\ permut_all (old a) a }
-  = for i = 1 to length a - 1 do
+  = "vc:liberal_for" for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
       invariant { sorted_sub a 0 i /\ permut_all (old a) a }
       let v = a[i] in
@@ -90,7 +90,7 @@ module InsertionSortGen
 
   let insertion_sort (a: array elt)
     ensures { sorted a /\ permut_all (old a) a }
-  = for i = 1 to length a - 1 do
+  = "vc:liberal_for" for i = 1 to length a - 1 do
       (* a[0..i[ is sorted; now insert a[i] *)
       invariant { sorted_sub a 0 i /\ permut_all (old a) a }
       let v = a[i] in

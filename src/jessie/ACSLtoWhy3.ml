@@ -275,6 +275,7 @@ let array_type : Ity.itysymbol =
 let array_get : Term.lsymbol = find array_module "mixfix []"
 let array_length : Term.lsymbol = find array_module "length"
 let array_get_fun : Expr.rsymbol = find_rs array_module "mixfix []"
+let array_set_fun : Expr.rsymbol = find_rs array_module "mixfix []<-"
 
 
 (*********)
@@ -290,10 +291,9 @@ let mlw_int64_type = Ity.ity_app int64_type [] []
 (* helpers *)
 
 let de_app e1 e2 = Dexpr.dexpr(Dexpr.DEapp(e1,e2))
-
 let de_app1 rs e1 = de_app (Dexpr.dexpr(Dexpr.DErs rs)) e1
-
 let de_app2 rs e1 e2 = de_app (de_app1 rs e1) e2
+let de_app3 rs e1 e2 e3 = de_app (de_app2 rs e1 e2) e3
 
 let e_void = Dexpr.dexpr (Dexpr.DErs (Expr.rs_tuple 0))
 let e_true = Dexpr.dexpr Dexpr.DEtrue
@@ -454,9 +454,9 @@ let get_lvar lv =
 let program_vars = Hashtbl.create 257
 
 let create_var v is_mutable =
-(*
+(**)
   Self.result "create local program variable %s (%d), mutable = %b" v.vname v.vid is_mutable;
- *)
+ (**)
   Hashtbl.add program_vars v.vid is_mutable
 
 let global_vars : (int,Ity.pvsymbol) Hashtbl.t = Hashtbl.create 257
@@ -466,7 +466,7 @@ let create_global_var v pvs =
   Self.result "create global program variable %s (%d), mutable = true" v.vname v.vid;
  *)
   Hashtbl.add global_vars v.vid pvs;
-  Hashtbl.add program_vars v.vid true
+  Hashtbl.add program_vars v.vid false
 
 let pr_de fmt e =
   match e with
@@ -1221,6 +1221,12 @@ let assignment denv (lhost,offset) e _loc =
       Self.not_yet_implemented "assignment Var/Field"
     | Var _ , Index _ ->
       Self.not_yet_implemented "assignment Var/Index"
+    | Mem({enode = BinOp((PlusPI|IndexPI),t,i,_ty)}), NoOffset ->
+      (* t[i] = e -> Array.set t i e *)
+      let t = expr denv t in
+      let i = expr denv i in
+      let i = de_app1 bv32_to_int_fun i in
+      de_app3 array_set_fun t i e
     | Mem _, _ ->
       Self.not_yet_implemented "assignment Mem"
 

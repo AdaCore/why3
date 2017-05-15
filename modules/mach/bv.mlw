@@ -30,11 +30,6 @@ module BVCheck_Gen
   predicate uge t t
   predicate ugt t t
 
-  val int_check (a:int) : t
-    requires { 0 <= a < two_power_size }
-    ensures  { to_uint result = a }
-    ensures  { result = of_int a }
-
   val add_check (a b:t) : t
     requires { 0 <= to_uint a + to_uint b < two_power_size }
     ensures  { to_uint result = to_uint a + to_uint b }

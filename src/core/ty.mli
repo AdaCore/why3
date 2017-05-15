@@ -128,6 +128,7 @@ val ty_match : ty Mtv.t -> ty -> ty -> ty Mtv.t
 *)
 
 val ts_match_args : tysymbol -> ty list -> ty Mtv.t
+val ty_match_args : ty -> ty Mtv.t
 
 val ty_inst  : ty Mtv.t -> ty -> ty
 val ty_freevars : Stv.t -> ty -> Stv.t

@@ -11,8 +11,20 @@ int f(int t[]) {
   return t[0];
 }
 
+int *u;
+
+/*@ requires \valid(u+(0..10));
+  @ // assigns u[..];
+  @ // ensures u[0] == \old(u[0]);
+  @ ensures u[1] == 42;
+  @*/
+void h(void) {
+  u[1] = 42;
+}
+
 /*@ requires \valid(t+(0..10));
-  @ ensures t[0] == \old(t[0]);
+  @ // assigns t[..];
+  @ // ensures t[0] == \old(t[0]);
   @ ensures t[1] == 42;
   @*/
 void g(int t[]) {
