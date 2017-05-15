@@ -652,67 +652,78 @@ and save_trans ctxt fmt t =
   fprintf fmt "@]@\n</transf>"
 
 and save_metas ctxt fmt _ m =
+  let ts_ids = Ident.create_ident_printer [] in
+  let ls_ids = Ident.create_ident_printer [] in
+  let pr_ids = Ident.create_ident_printer [] in
   fprintf fmt "@\n@[<hov 1><metas%a>"
     (save_bool_def "expanded" false) m.metas_expanded;
   let save_pos fmt pos =
-    fprintf fmt "ip_theory=\"%a\">" save_string pos.ip_theory;
-    List.iter (fprintf fmt "@\n@[<hov 1><ip_library@ name=\"%a\"/>@]" save_string)
+    fprintf fmt "ip_theory=\"%a\">@]" save_string pos.ip_theory;
+    List.iter (fprintf fmt "@,@[<hov 1><ip_library@ name=\"%a\"/>@]" save_string)
       pos.ip_library;
-    List.iter (fprintf fmt "@\n@[<hov 1><ip_qualid@ name=\"%a\"/>@]" save_string)
+    List.iter (fprintf fmt "@,@[<hov 1><ip_qualid@ name=\"%a\"/>@]" save_string)
       pos.ip_qualid;
   in
   let save_ts_pos fmt ts pos =
-    fprintf fmt "@\n@[<hov 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ \
-    id=\"%i\"@ %a@]@\n</ts_pos>"
+    fprintf fmt "@\n@[<v 1>@[<hov 1><ts_pos@ name=\"%a\"@ arity=\"%i\"@ id=\"%a\"@ %a@]@\n</ts_pos>"
       save_string ts.ts_name.id_string (List.length ts.ts_args)
-      (ts_hash ts) save_pos pos in
+      save_string (Ident.id_unique ts_ids ts.ts_name)
+      save_pos pos
+  in
   let save_ls_pos fmt ls pos =
     (* TODO: add the signature? *)
-    fprintf fmt "@\n@[<hov 1><ls_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</ls_pos>"
+    fprintf fmt "@\n@[<v 1>@[<hov 1><ls_pos@ name=\"%a\"@ id=\"%a\"@ %a@]@\n</ls_pos>"
       save_string ls.ls_name.id_string
-      (ls_hash ls) save_pos pos
+      save_string (Ident.id_unique ls_ids ls.ls_name)
+      save_pos pos
   in
   let save_pr_pos fmt pr pos =
-    fprintf fmt "@\n@[<hov 1><pr_pos@ name=\"%a\"@ id=\"%i\"@ %a@]@\n</pr_pos>"
+    fprintf fmt "@\n@[<v 1>@[<hov 1><pr_pos@ name=\"%a\"@ id=\"%a\"@ %a@]@\n</pr_pos>"
       save_string pr.pr_name.id_string
-      (pr_hash pr) save_pos pos
+      save_string (Ident.id_unique pr_ids pr.pr_name)
+      save_pos pos
   in
   Mts.iter (save_ts_pos fmt) m.metas_idpos.idpos_ts;
   Mls.iter (save_ls_pos fmt) m.metas_idpos.idpos_ls;
   Mpr.iter (save_pr_pos fmt) m.metas_idpos.idpos_pr;
+  let rec save_ty ty =
+    match ty.ty_node with
+    | Tyvar tv ->
+      fprintf fmt "@\n@[<hov 1><ty_var@ id=\"%i\"/>@]" (tv_hash tv)
+    | Tyapp (ts,l) ->
+      fprintf fmt "@\n@[<hov 1><ty_app@ id=\"%a\"/>"
+        save_string (Ident.id_unique ts_ids ts.ts_name);
+      List.iter save_ty l;
+      fprintf fmt "@]@\n</ty_app>"
+  in
+  let save_args s l =
+    fprintf fmt "@\n@[<hov 1><meta@ name=\"%a\">" save_string s;
+    let save_meta_arg = function
+      | MAty ty ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_ty/>";
+        save_ty ty;
+        fprintf fmt "@]@\n</meta_arg_ty>"
+      | MAts ts ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_ts@ id=\"%a\"/>@]"
+          save_string (Ident.id_unique ts_ids ts.ts_name)
+      | MAls ls ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_ls@ id=\"%a\"/>@]"
+          save_string (Ident.id_unique ls_ids ls.ls_name)
+      | MApr pr ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_pr@ id=\"%a\"/>@]"
+          save_string (Ident.id_unique pr_ids pr.pr_name)
+      | MAstr s ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_str@ val=\"%s\"/>@]" s
+      | MAint i ->
+        fprintf fmt "@\n@[<hov 1><meta_arg_int@ val=\"%i\"/>@]" i
+    in
+    List.iter save_meta_arg l;
+    fprintf fmt "@]@\n</meta>"
+  in
   Mstr.iter (fun s smeta_args ->
-    Smeta_args.iter (save_meta_args fmt s) smeta_args) m.metas_added;
+    Smeta_args.iter (save_args s) smeta_args) m.metas_added;
   save_goal ctxt fmt m.metas_goal;
   fprintf fmt "@]@\n</metas>"
-
-and save_meta_args fmt s l =
-  fprintf fmt "@\n@[<hov 1><meta@ name=\"%a\">" save_string s;
-  let save_meta_arg fmt = function
-    | MAty ty -> fprintf fmt "@\n@[<hov 1><meta_arg_ty/>";
-      save_ty fmt ty;
-      fprintf fmt "@]@\n</meta_arg_ty>"
-    | MAts ts ->
-      fprintf fmt "@\n@[<hov 1><meta_arg_ts@ id=\"%i\"/>@]" (ts_hash ts)
-    | MAls ls ->
-      fprintf fmt "@\n@[<hov 1><meta_arg_ls@ id=\"%i\"/>@]" (ls_hash ls)
-    | MApr pr ->
-      fprintf fmt "@\n@[<hov 1><meta_arg_pr@ id=\"%i\"/>@]" (pr_hash pr)
-    | MAstr s ->
-      fprintf fmt "@\n@[<hov 1><meta_arg_str@ val=\"%s\"/>@]" s
-    | MAint i ->
-      fprintf fmt "@\n@[<hov 1><meta_arg_int@ val=\"%i\"/>@]" i
-  in
-  List.iter (save_meta_arg fmt) l;
-  fprintf fmt "@]@\n</meta>"
-
-and save_ty fmt ty =
-  match ty.ty_node with
-  | Tyvar tv ->
-    fprintf fmt "@\n@[<hov 1><ty_var@ id=\"%i\"/>@]" (tv_hash tv)
-  | Tyapp (ts,l) ->
-    fprintf fmt "@\n@[<hov 1><ty_app@ id=\"%i\"/>" (ts_hash ts);
-    List.iter (save_ty fmt) l;
-    fprintf fmt "@]@\n</ty_app>"
 
 module CombinedTheoryChecksum = struct
 
@@ -1338,15 +1349,15 @@ and load_proof_or_transf ctxt mg a =
           s
 
 and load_metas ctxt mg a =
-  let hts = Hint.create 10 in
-  let hls = Hint.create 10 in
-  let hpr = Hint.create 10 in
+  let hts = Hstr.create 10 in
+  let hls = Hstr.create 10 in
+  let hpr = Hstr.create 10 in
   let idpos, metas_args, goal =
     List.fold_left (fun (idpos, metas, goal) a ->
       match a.Xml.name with
       | "ts_pos" | "ls_pos" | "pr_pos" ->
         let name = string_attribute "name" a in
-        let intid = int_attribute "id" a in
+        let strid = string_attribute "id" a in
         let library, qualid =
           List.fold_left (fun (library,qualid) a ->
             match a.Xml.name with
@@ -1366,18 +1377,18 @@ and load_metas ctxt mg a =
               (create_tvsymbol (Ident.id_fresh "a"))::l)
               [] 0 arity in
             let ts = Ty.create_tysymbol (Ident.id_fresh name) tvs NoDef in
-            Hint.add hts intid ts;
+            Hstr.add hts strid ts;
             let idpos_ts = Mts.add ts pos idpos.idpos_ts in
             { idpos with idpos_ts = idpos_ts }
           | "ls_pos" ->
             (* TODO signature? *)
             let ls = Term.create_lsymbol (Ident.id_fresh name) [] None in
-            Hint.add hls intid ls;
+            Hstr.add hls strid ls;
             let idpos_ls = Mls.add ls pos idpos.idpos_ls in
             { idpos with idpos_ls = idpos_ls }
           | "pr_pos" ->
             let pr = Decl.create_prsymbol (Ident.id_fresh name) in
-            Hint.add hpr intid pr;
+            Hstr.add hpr strid pr;
             let idpos_pr = Mpr.add pr pos idpos.idpos_pr in
             { idpos with idpos_pr = idpos_pr }
           | _ -> assert false
@@ -1396,8 +1407,8 @@ and load_metas ctxt mg a =
       match a.Xml.name with
       | "ty_var" -> newtv (int_attribute "id" a)
       | "ty_app" ->
-        let intid = int_attribute "id" a in
-        let ts = Hint.find hts intid in
+        let strid = string_attribute "id" a in
+        let ts = Hstr.find hts strid in
         Ty.ty_app ts (List.map aux a.Xml.elements)
     | _ ->
       raise (LoadError(a,"Unexpected element")) in
@@ -1411,16 +1422,16 @@ and load_metas ctxt mg a =
     | "meta_arg_str" -> MAstr (string_attribute "val" a)
     | "meta_arg_int" -> MAint (int_attribute "val" a)
     | "meta_arg_ts" ->
-      let intid = int_attribute "id" a in
-      let ts = Hint.find hts intid in
+      let strid = string_attribute "id" a in
+      let ts = Hstr.find hts strid in
       MAts ts
     | "meta_arg_ls" ->
-      let intid = int_attribute "id" a in
-      let ls = Hint.find hls intid in
+      let strid = string_attribute "id" a in
+      let ls = Hstr.find hls strid in
       MAls ls
     | "meta_arg_pr" ->
-      let intid = int_attribute "id" a in
-      let pr = Hint.find hpr intid in
+      let strid = string_attribute "id" a in
+      let pr = Hstr.find hpr strid in
       MApr pr
     | _ ->
       raise (LoadError(a,"Unexpected element"))
