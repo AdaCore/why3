@@ -28,6 +28,7 @@ module Array
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
+
   exception OutOfBounds
 
   let defensive_get (a: array 'a) (i: int)
@@ -292,19 +293,20 @@ module NumOf
   use import Array
   use int.NumOf as N
 
-  (** the number of a[i] such that [l <= i < u] and [pr i a[i]] *)
+  (** the number of [a[i]] such that [l <= i < u] and [pr i a[i]] *)
   function numof (pr: int -> 'a -> bool) (a: array 'a) (l u: int) : int =
     N.numof (fun i -> pr i a[i]) l u
 
 end
 
-(** the number of a[i] such that [l <= i < u] and [a[i] = v] *)
 module NumOfEq
   use import Array
   use int.NumOf as N
 
+  (** the number of [a[i]] such that [l <= i < u] and [a[i] = v] *)
   function numof (a: array 'a) (v: 'a) (l u: int) : int =
     N.numof (fun i -> a[i] = v) l u
+
 end
 
 module ToList
