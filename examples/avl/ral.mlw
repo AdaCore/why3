@@ -16,8 +16,8 @@ module RAL
 
   (** Remaining parameters. A fully concrete implementation would
       have to provide an explicit positive integer. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
+  val constant balancing : int
+    ensures { result > 0 }
 
   (** Use the integer monoid in order to measure sequence of elements
       by their length. *)
@@ -104,8 +104,7 @@ module RAL
     predicate selected = selected,
     val selected_part = selected_part,
     goal selection_empty,
-    constant balancing = balancing,
-    goal balancing_positive,
+    val balancing = balancing,
     type D.t = D.t,
     function D.measure = D.measure,
     val D.measure = D.measure,

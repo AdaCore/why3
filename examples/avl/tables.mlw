@@ -20,8 +20,8 @@ module MapBase
   (** {3 Implementation parameters} *)
 
   (** The level of balancing is left abstract. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
+  val constant balancing : int
+    ensures { result > 0 }
 
   (** Stored elements are identified by totally ordered keys *)
   scope D type t 'a end scope K type t end
@@ -138,8 +138,7 @@ module MapBase
     predicate selected = selected,
     val selected_part = selected_part,
     goal selection_empty,
-    constant balancing = balancing,
-    goal balancing_positive,
+    val balancing = balancing,
     type D.t = D.t,
     function D.measure = D.measure,
     val D.measure = D.measure,

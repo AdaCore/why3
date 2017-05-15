@@ -17,8 +17,8 @@ module PQueue
   (** {2 Implementation parameters} *)
 
   (** Balancing level is kept abstract. *)
-  constant balancing : int
-  axiom balancing_positive : balancing > 0
+  val constant balancing : int
+    ensures { result > 0 }
 
   (** The Elements of the priority queue are indexed by totally ordered keys.
       Moreover, this order can be effectively decided. *)
@@ -227,8 +227,7 @@ module PQueue
     predicate selected = selected,
     val selected_part = selected_part,
     goal selection_empty,
-    constant balancing = balancing,
-    goal balancing_positive,
+    val balancing = balancing,
     type D.t = D.t,
     function D.measure = D.measure,
     val D.measure = D.measure,
