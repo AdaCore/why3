@@ -61,11 +61,12 @@ module Compiler_logic
        so we cannot define it in function of (wp 'a) arguments only. *)
   function seq_wp
     (l1:int) (w1:wp_trans 'a) (w2:wp_trans ('a,machine_state)) : wp_trans 'a =
-    \x p q ms. w1 x p (w2 (x,ms) (p+l1) q) ms
+    fun x p q ms -> w1 x p (w2 (x,ms) (p+l1) q) ms
 
   lemma seq_wp_lemma : forall l1,w1: wp_trans 'a,w2 x p q ms.
       seq_wp l1 w1 w2 x p q ms = w1 x p (w2 (x,ms) (p+l1) q) ms
-  meta rewrite prop seq_wp_lemma
+
+  meta rewrite lemma seq_wp_lemma
 
   (* Code combinator for sequence, with wp. *)
   let (~) (s1 : wp 'a) (s2 : wp ('a, machine_state)) : wp 'a
@@ -82,13 +83,13 @@ module Compiler_logic
     res
 
   function fork_wp (w:wp_trans 'a) (cond:pre 'a) : wp_trans 'a =
-    \x p q ms. (not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms)
+    fun x p q ms -> if cond x p ms then w x p q ms else q ms
 
   lemma fork_wp_lemma: forall w:wp_trans 'a,cond x p q ms.
     fork_wp w cond x p q ms =
       ((not cond x p ms -> q ms) /\ (cond x p ms -> w x p q ms))
 
-  meta rewrite prop fork_wp_lemma
+  meta rewrite lemma fork_wp_lemma
 
   (* Code combinator for conditional execution.
      Similar to WP calculus for (if cond then s). *)
@@ -101,13 +102,13 @@ module Compiler_logic
 
   (* WP transformer for hoare triples. *)
   function towp_wp (pr:pre 'a) (ps:post 'a) : wp_trans 'a =
-    \x p q ms. pr x p ms && (forall ms'. ps x p ms ms' -> q ms')
+    fun x p q ms -> pr x p ms && (forall ms'. ps x p ms ms' -> q ms')
 
   lemma towp_wp_lemma:
     forall pr ps, x:'a, p q ms. towp_wp pr ps x p q ms =
       (pr x p ms && (forall ms'. ps x p ms ms' -> q ms'))
 
-  meta rewrite prop towp_wp_lemma
+  meta rewrite lemma towp_wp_lemma
 
   (* Unwrap code with hoare triple into code with wp.
      Analogous to procedure call/abstract block. *)
@@ -127,7 +128,7 @@ module Compiler_logic
     ensures  { result.code.length = c.wcode.length /\ hl_correctness result}
   = { code = c.wcode ; pre = pre; post = post }
 
-  function trivial_pre : pre 'a = \_ p ms. let VMS p' _ _ = ms in p = p'
+  function trivial_pre : pre 'a = fun _ p ms -> let VMS p' _ _ = ms in p = p'
   meta rewrite_def function trivial_pre
 
   (* Accessibility predicate. *)
@@ -139,11 +140,11 @@ module Compiler_logic
      or preserve the invariant and "decrease" according to
      a well-founded relation. *)
   function loop_progress (inv post:pre 'a) (var:post 'a) : post 'a =
-    \x p ms ms'. (inv x p ms' /\ var x p ms' ms) \/ post x p ms'
+    fun x p ms ms' -> (inv x p ms' /\ var x p ms' ms) \/ post x p ms'
   meta rewrite_def function loop_progress
 
   function forget_old (post:pre 'a) : post 'a =
-    \x p _. post x p
+    fun x p _ -> post x p
   meta rewrite_def function forget_old
 
   (* Variant of hoare triplet introduction rule for looping code.

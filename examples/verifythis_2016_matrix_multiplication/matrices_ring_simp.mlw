@@ -6,7 +6,7 @@ module Symb
   use import matrices.Matrix
   use import matrices.MatrixArithmetic
 
-  namespace LOCAL
+  scope LOCAL
 
     type mono = {
       m_prod : list int;
@@ -237,7 +237,7 @@ module Symb
       requires { l_vld f r k m1.m_prod /\ l_vld f k c m2.m_prod }
       ensures { result = m_mul m1 m2 /\ l_vld f r c result.m_prod }
       ensures { m_mdl f result = mul (m_mdl f m1) (m_mdl f m2) }
-    = { m_pos = (m1.m_pos = m2.m_pos);
+    = { m_pos = (if m1.m_pos then m2.m_pos else not m2.m_pos);
         m_prod = cat_ok f r k c m1.m_prod m2.m_prod }
 
     function m_distribute (m:mono) (l:list mono) : list mono = match l with
@@ -327,10 +327,10 @@ module Symb
   meta rewrite_def function e_mdl
 
   function extends (f:int -> mat int) (c:int) (v:mat int) : int -> mat int =
-    \n. if n <> c then f n else v
+    fun n -> if n <> c then f n else v
   lemma extends_rw : forall f c v n.
     extends f c v n = if n <> c then f n else v
-  meta rewrite prop extends_rw
+  meta rewrite lemma extends_rw
 
   let ghost symb_env () : env
     ensures { result.ev_c --> 0 }

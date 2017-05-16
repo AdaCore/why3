@@ -21,19 +21,19 @@ module MatrixMultiplication
                  not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
                  tar.elts[i][j] = (old tar).elts[i][j] }
   =
-   'I:
+   label I in
    for i = tar_r to tar_r + dr - 1 do
      invariant { forall i j. 0 <= i < tar.rows -> 0 <= j < tar.columns ->
                  not (tar_r <= i < tar_r + dr /\ tar_c <= j < tar_c + dc) ->
-                 tar.elts[i][j] = (at tar 'I).elts[i][j] }
+                 tar.elts[i][j] = (tar at I).elts[i][j] }
      invariant { forall i' j'. tar_r <= i' < i -> tar_c <= j' < tar_c + dc ->
                  tar.elts[i'][j'] =
                  src.elts[i' + (src_r - tar_r)][j' + (src_c - tar_c)] }
-     'L:
+     label L in
      for j = tar_c to tar_c + dc - 1 do
        invariant { forall i' j'. 0 <= i' < tar.rows -> 0 <= j' < tar.columns ->
                    (i' <> i \/ not (tar_c <= j' < tar_c + dc)) ->
-                   tar.elts[i'][j'] = (at tar 'L).elts[i'][j']}
+                   tar.elts[i'][j'] = (tar at L).elts[i'][j']}
        invariant { forall j'. tar_c <= j' < j -> tar.elts[i][j'] =
                    src.elts[i + (src_r - tar_r)][j' + (src_c - tar_c)] }
        set tar i j (get src (i + (src_r - tar_r)) (j + (src_c - tar_c)))
@@ -41,7 +41,7 @@ module MatrixMultiplication
    done
 
   function mdl (m: matrix 'a) : mat 'a =
-    create m.rows m.columns (\i j. get m i j)
+    create m.rows m.columns (fun i j -> get m i j)
 
   (*** Very technical: Why3 refuses calls to logic functions
     in programs when the function signature contains impure types
@@ -93,10 +93,10 @@ module MatrixMultiplication
     for i = 0 to a.rows - 1 do
       invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
                    res.elts[i'][j'] = a.elts[i'][j'] + b.elts[i'][j'] }
-     'L:
+      label L in
       for j = 0 to a.columns - 1 do
         invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
-                      res.elts[i'][j'] = (at res 'L).elts[i'][j'] }
+                      res.elts[i'][j'] = (res at L).elts[i'][j'] }
         invariant { forall j'.  0 <= j' < j ->
                       res.elts[i][j'] = a.elts[i][j'] + b.elts[i][j'] }
         set res i j (get a i j + get b i j)
@@ -122,10 +122,10 @@ module MatrixMultiplication
     for i = 0 to a.rows - 1 do
       invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
                    res.elts[i'][j'] = a.elts[i'][j'] - b.elts[i'][j'] }
-     'L:
+      label L in
       for j = 0 to a.columns - 1 do
         invariant { forall i' j'. 0 <= i' < i -> 0 <= j' < a.columns ->
-                      res.elts[i'][j'] = (at res 'L).elts[i'][j'] }
+                      res.elts[i'][j'] = (res at L).elts[i'][j'] }
         invariant { forall j'.  0 <= j' < j ->
                       res.elts[i][j'] = a.elts[i][j'] - b.elts[i][j'] }
         set res i j (get a i j - get b i j)
@@ -157,18 +157,18 @@ module MatrixMultiplication
         rs.elts[i0][j0] = mul_cell a.mdl b.mdl i0 j0 }
       invariant { forall i0 j0. i <= i0 < r /\ 0 <= j0 < c ->
                     rs.elts[i0][j0] = 0 }
-      'M:
+      label M in
       for j = 0 to c - 1 do
         invariant { forall i0 j0.
           0 <= i0 < r /\ 0 <= j0 < c /\ (i0 <> i \/ j0 >= j) ->
-            rs.elts[i0][j0] = (at rs 'M).elts[i0][j0] }
+            rs.elts[i0][j0] = (rs at M).elts[i0][j0] }
         invariant { forall j0. 0 <= j0 < j ->
                       rs.elts[i][j0] = mul_cell a.mdl b.mdl i j0 }
-        'I:
+        label I in
         for k = 0 to m - 1 do
           invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\
                         (i0 <> i \/ j0 <> j) ->
-                           rs.elts[i0][j0] = (at rs 'I).elts[i0][j0] }
+                           rs.elts[i0][j0] = (rs at I).elts[i0][j0] }
           invariant { rs.elts[i][j] = sum 0 k (mul_atom a.mdl b.mdl i j) }
           set rs i j (get rs i j + get a i k * get b k j)
         done
@@ -191,17 +191,17 @@ module MatrixMultiplication
                     rs.elts[i0][j0] = mul_cell a.mdl b.mdl i0 j0 }
       invariant { forall i0 j0. i <= i0 < r /\ 0 <= j0 < c ->
                     rs.elts[i0][j0] = 0 }
-      'M:
+      label M in
       for k = 0 to m - 1 do
         invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\ i0 <> i ->
-                      rs.elts[i0][j0] = (at rs 'M).elts[i0][j0] }
+                      rs.elts[i0][j0] = (rs at M).elts[i0][j0] }
         invariant { forall j0. 0 <= j0 < c ->
                       rs.elts[i][j0] = sum 0 k (mul_atom a.mdl b.mdl i j0) }
-        'I:
+        label I in
         for j = 0 to c - 1 do
           invariant { forall i0 j0.
             0 <= i0 < r /\ 0 <= j0 < c /\ (i0 <> i \/ j0 >= j) ->
-              rs.elts[i0][j0] = (at rs 'I).elts[i0][j0] }
+              rs.elts[i0][j0] = (rs at I).elts[i0][j0] }
           invariant { forall j0. 0 <= j0 < j ->
               rs.elts[i][j0] = sum 0 (k+1) (mul_atom a.mdl b.mdl i j0) }
           set rs i j (get rs i j + get a i k * get b k j)
@@ -276,7 +276,7 @@ module MatrixMultiplication
     ensures { result.mdl.F.rows = a.mdl.F.rows }
     ensures { result.mdl.F.cols = b.mdl.F.cols }
     variant { a.mdl.F.rows + a.mdl.F.cols + b.mdl.F.cols + 3 * flag, flag }
-  = let cut_off = abstract ensures { result >= 1 } 42 end in
+  = let cut_off = begin ensures { result >= 1 } 42 end in
     let (rw, md, cl)= (a.rows, a.columns, b.columns) in
     assert { rw = a.mdl.F.rows /\ md = a.mdl.F.cols /\ cl = b.mdl.F.cols };
     if rw <= cut_off || md <= cut_off || cl <= cut_off
@@ -308,7 +308,7 @@ module MatrixMultiplication
       let ghost gm12 = block gm 0 qr qc qc in
       let ghost gm21 = block gm qr qr 0 qc in
       let ghost gm22 = block gm qr qr qc qc in
-      let (m11, m12, m21, m22) = abstract
+      let (m11, m12, m21, m22) = begin
         ensures { let (m11, m12, m21, m22) = result in
               mdl m11 = mdl gm11 /\ mdl m12 = mdl gm12 /\
               mdl m21 = mdl gm21 /\ mdl m22 = mdl gm22 }
