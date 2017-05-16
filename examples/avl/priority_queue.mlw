@@ -257,9 +257,9 @@ module PQueue
   }
 
   (** Convert a list to a bag. *)
-  constant empty_bag : 'a -> int = \_:'a. 0
+  constant empty_bag : 'a -> int = fun _ -> 0
   function add_bag (x:'a) (f:'a -> int) : 'a -> int =
-    \y:'a. if y = x then f y + 1 else f y
+    fun y -> if y = x then f y + 1 else f y
 
   function as_bag (l:list 'a) : 'a -> int = match l with
     | Nil -> empty_bag
