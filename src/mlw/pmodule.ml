@@ -935,15 +935,18 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         let add uc d = add_pdecl ~warn:false ~vc:false uc d in
         List.fold_left add uc (create_type_decl tdl)
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
-      (* refine only [val] symbols *)
-      if c.c_node <> Cany then raise (BadInstance rs.rs_name);
+    (* refine only [val] symbols *)
+      let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
+        | Cany -> c.c_cty
+        | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
+        | _ -> raise (BadInstance rs.rs_name) in
       let kind = match rs.rs_logic with
         | RLnone -> RKnone
         | RLpv _ -> raise (BadInstance rs.rs_name)
         | RLls ls when ls.ls_value = None -> RKpred
         | RLls _ -> RKfunc
         | RLlemma -> RKlemma in
-      let cty = clone_cty cl (sm_of_cl cl) c.c_cty in
+      let cty = clone_cty cl (sm_of_cl cl) cty in
       let rs' = Mrs.find rs inst.mi_rs in
       (* arity and types will be checked when refinement VC is generated *)
       begin match rs.rs_logic, rs'.rs_logic with
