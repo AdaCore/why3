@@ -935,7 +935,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         let add uc d = add_pdecl ~warn:false ~vc:false uc d in
         List.fold_left add uc (create_type_decl tdl)
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
-    (* refine only [val] symbols *)
+      (* refine only [val] symbols *)
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
         | Cany -> c.c_cty
         | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
