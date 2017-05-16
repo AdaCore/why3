@@ -288,6 +288,9 @@ module OCamlMergesort
     ensures { sorted result /\ permut result l }
   =
     let n = length l in
-    if n < 2 then l else sort n l
+    if n < 2 then begin
+      assert { sorted l by match l with
+               Nil | Cons _ Nil -> sorted l | _ -> false end }; l end
+    else sort n l
 
 end
