@@ -26,9 +26,9 @@ module BagSpec
   use import Bag
 
   type t 'a = private {
-    mutable size: int;
-    mutable contents: bag 'a;
-  }
+          mutable size: int;
+    ghost mutable contents: bag 'a;
+  } invariant { 0 <= size }
 
   val create () : t 'a
     ensures { result.size = 0 }
@@ -52,39 +52,40 @@ module ResizableArraySpec
   use import map.Map
   use map.Const
 
-  type rarray 'a = private { mutable length: int; mutable data: map int 'a }
+  type rarray 'a = private {
+    ghost mutable len: int;
+    ghost mutable data: map int 'a;
+  } invariant { 0 <= len }
 
   function ([]) (r: rarray 'a) (i: int) : 'a = Map.get r.data i
 
   val function ([<-]) (r: rarray 'a) (i: int) (v: 'a) : rarray 'a
-    ensures { result.length = r.length }
+    ensures { result.len = r.len }
     ensures { result.data = Map.set r.data i v }
 
- (***
- val length (r: rarray 'a) : int
-    ensures { result = r.length }
-*)
+  val length (r: rarray 'a) : int
+    ensures { result = r.len }
 
   val make (len: int) (dummy: 'a) : rarray 'a
     requires { 0 <= len }
-    ensures  { result.length = len }
+    ensures  { result.len = len }
     ensures  { result.data = Const.const dummy }
 
   val ([]) (r: rarray 'a) (i: int) : 'a
-    requires { 0 <= i < r.length }
+    requires { 0 <= i < r.len }
     ensures  { result = r[i] }
 
   val ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
-    requires { 0 <= i < r.length }
+    requires { 0 <= i < r.len }
     writes   { r.data }
     ensures  { r = (old r)[i <- v] }
 
   val resize (r: rarray 'a) (len: int) : unit
     requires { 0 <= len }
-    writes   { r.length, r.data }
-    ensures  { r.length = len }
+    writes   { r.len, r.data }
+    ensures  { r.len = len }
     ensures  { forall i: int.
-               0 <= i < old r.length -> i < len -> r[i] = (old r)[i] }
+               0 <= i < old r.len -> i < len -> r[i] = (old r)[i] }
 
 end
 
@@ -105,9 +106,8 @@ module BagImpl
                   data:     rarray (Null.t 'a);
     mutable ghost contents: bag 'a;
   }
-  invariant { 0 <= size = data.length }
-  invariant { forall i: int. 0 <= i < size ->
-                not (Null.is_null data[i]) }
+  invariant { 0 <= size = data.len }
+  invariant { forall i: int. 0 <= i < size -> not (Null.is_null data[i]) }
   invariant { forall x: 'a. contents x = numof data x 0 size }
 
   let create () : t 'a
@@ -158,6 +158,12 @@ module BagImpl
              numof t.data v i n = numof (old t.data) v (i+1) (n+1) };
     assert { forall v: 'a.
              numof t.data v 0 n = numof t.data v 0 i + numof t.data v i n }
+
+  clone BagSpec with
+    type t = t,
+    val create = create,
+    val clear = clear,
+    val add = add
 
 end
 
