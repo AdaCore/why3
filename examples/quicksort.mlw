@@ -79,7 +79,7 @@ module Shuffle "Knuth shuffle"
   let shuffle (a: array int) : unit
     writes  { a, Random.s }
     ensures { permut_all (old a) a }
-  = for i = 1 to length a - 1 do
+  = "vc:liberal_for" for i = 1 to length a - 1 do
       invariant { permut_all (old a) a }
       swap a i (Random.random_int (i+1))
     done
