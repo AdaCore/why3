@@ -14,9 +14,12 @@ module Decrease1
   predicate decrease1 (a: array int) =
     forall i: int. 0 <= i < length a - 1 -> a[i+1] >= a[i] - 1
 
-  lemma decrease1_induction:
-    forall a: array int. decrease1 a ->
-    forall i j: int. 0 <= i <= j < length a -> a[j] >= a[i] + i - j
+  let rec lemma decrease1_induction (a: array int) (i j: int) : unit
+    requires { decrease1 a }
+    requires { 0 <= i <= j < length a }
+    ensures  { a[j] >= a[i] + i - j }
+    variant  { j - i }
+  = if i < j then decrease1_induction a (i+1) j
 
   exception Found
 
