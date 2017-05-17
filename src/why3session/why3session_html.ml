@@ -117,7 +117,7 @@ struct
 
 let print_results fmt provers proofs =
   List.iter (fun p ->
-    fprintf fmt "<td bgcolor=\"#";
+    fprintf fmt "<td style=\"background-color:#";
     begin
       try
         let pr = S.PHprover.find proofs p in
@@ -167,27 +167,27 @@ let rec num_lines acc tr =
   let rec print_transf fmt depth max_depth provers tr =
     fprintf fmt "<tr>";
     for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
+    fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (Opt.inhabited tr.S.transf_verified)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" tr.transf_name ;
     for _i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
-      fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
+      fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    fprintf fmt "<td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
+    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
     let (_:bool) = List.fold_left
-      (fun is_first g ->
-        print_goal fmt is_first (depth+1) max_depth provers g;
-        false)
-      true tr.transf_goals
+      (fun needs_tr g ->
+        print_goal fmt needs_tr (depth+1) max_depth provers g;
+        true)
+      false tr.transf_goals
     in ()
 
-  and print_goal fmt is_first depth max_depth provers g =
-    if not is_first then fprintf fmt "<tr>";
+  and print_goal fmt needs_tr depth max_depth provers g =
+    if needs_tr then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
+    fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (Opt.inhabited (S.goal_verified g))
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
@@ -214,21 +214,21 @@ let rec num_lines acc tr =
         String.concat "." ([fn]@l@[t])
       with Not_found -> fn ^ "." ^ th.theory_name.Ident.id_string
     in
-    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": "
+    fprintf fmt "<h2><span style=\"color:#%a\">Theory \"%s\": "
       (color_of_status ~dark:true) (Opt.inhabited th.S.theory_verified)
       name;
     begin match th.S.theory_verified with
     | Some t -> fprintf fmt "fully verified in %.02f s" t
     | None -> fprintf fmt "not fully verified"
     end;
-    fprintf fmt "</font></h2>@\n";
+    fprintf fmt "</span></h2>@\n";
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
     (* fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>"; *)
     List.iter
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
-    fprintf fmt "</td></tr>@\n";
+    fprintf fmt "</tr>@\n";
     List.iter (print_goal fmt true 1 depth provers) th.theory_goals;
     fprintf fmt "</table>@\n"
 
@@ -246,18 +246,19 @@ let rec num_lines acc tr =
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html\
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+  let context : context = "<!DOCTYPE html \
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-<title>Why3 session of %s</title>\
-</head>\
-<body>\
-%a\
-</body>\
-</html>\
-"
+\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+\n<head>\
+\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+\n  <title>Why3 session of %s</title>\
+\n</head>\
+\n<body>\
+\n%a\
+\n</body>\
+\n</html>\
+\n"
 
   let run_one = run_file context print_session
 
@@ -314,18 +315,19 @@ struct
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html\
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+  let context : context = "<!DOCTYPE html \
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-<title>Why3 session of %s</title>\
-</head>\
-<body>\
-%a\
-</body>\
-</html>\
-"
+\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+\n<head>\
+\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+\n  <title>Why3 session of %s</title>\
+\n</head>\
+\n<body>\
+\n%a\
+\n</body>\
+\n</html>\
+\n"
 
   let run_one = run_file context print_session
 
