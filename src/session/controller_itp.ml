@@ -563,7 +563,7 @@ let schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback =
 let schedule_proof_attempt c id pr ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
-    | Scheduled | Done _ -> update_goal_node notification c id
+    | Scheduled | Running | Done _ -> update_goal_node notification c id
     | _ -> ())
   in
   schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback

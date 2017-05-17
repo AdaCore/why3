@@ -534,7 +534,7 @@ let graft_proof_attempt (s : session) (id : proofNodeID) (pr : Whyconf.prover)
   try
     let id = Hprover.find pn.proofn_attempts pr in
     let pa = Hint.find s.proofAttempt_table id in
-    let pa = { pa with limit = limit; proof_obsolete = true } in
+    let pa = { pa with limit = limit; proof_state = None; proof_obsolete = false } in
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->
@@ -672,9 +672,10 @@ let update_proof_attempt s id pr st =
     let n = get_proofNode s id in
     let pa = Hprover.find n.proofn_attempts pr in
     let pa = get_proof_attempt_node s pa in
-    pa.proof_state <- Some st
+    pa.proof_state <- Some st;
+    pa.proof_obsolete <- false
   with
-  | BadID when not (Debug.test_flag debug_stack_trace) -> ()
+  | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
 
 (****************************)
 (*     session opening      *)
