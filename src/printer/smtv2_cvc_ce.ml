@@ -63,7 +63,7 @@ let ident_printer () =
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
-      (** the new floating point theory - updated to the 2014-05-27 standard *)
+      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
       "Float16"; "Float32"; "Float64"; "Float128";
       "RoundingMode";
@@ -82,7 +82,7 @@ let ident_printer () =
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
 
-      (** the new proposed string theory *)
+      (* the new proposed string theory *)
       "String";
       "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
       "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
@@ -90,14 +90,14 @@ let ident_printer () =
       "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
       "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
 
-      (** the new proposed set theory *)
+      (* the new proposed set theory *)
       "union"; "intersection"; "setminus"; "subset"; "member";
       "singleton"; "insert";
 
-      (** built-in sorts *)
+      (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
 
-      (** Other stuff that Why3 seems to need *)
+      (* Other stuff that Why3 seems to need *)
       "DECIMAL"; "NUMERAL"; "par"; "STRING";
       "unsat";"sat";
       "true"; "false";
