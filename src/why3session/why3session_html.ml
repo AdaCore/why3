@@ -117,7 +117,7 @@ struct
 
 let print_results fmt provers proofs =
   List.iter (fun p ->
-    fprintf fmt "<td bgcolor=\"#";
+    fprintf fmt "<td style=\"background-color:#";
     begin
       try
         let pr = S.PHprover.find proofs p in
@@ -167,13 +167,13 @@ let rec num_lines acc tr =
   let rec print_transf fmt depth max_depth provers tr =
     fprintf fmt "<tr>";
     for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
+    fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (Opt.inhabited tr.S.transf_verified)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     fprintf fmt "%s</td>" tr.transf_name ;
     for _i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
-      fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
+      fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
     fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
@@ -187,7 +187,7 @@ let rec num_lines acc tr =
   and print_goal fmt needs_tr depth max_depth provers g =
     if needs_tr then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
-    fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
+    fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (Opt.inhabited g.S.goal_verified)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
@@ -214,14 +214,14 @@ let rec num_lines acc tr =
         String.concat "." ([fn]@l@[t])
       with Not_found -> fn ^ "." ^ th.theory_name.Ident.id_string
     in
-    fprintf fmt "<h2><font color=\"#%a\">Theory \"%s\": "
+    fprintf fmt "<h2><span style=\"color:#%a\">Theory \"%s\": "
       (color_of_status ~dark:true) (Opt.inhabited th.S.theory_verified)
       name;
     begin match th.S.theory_verified with
     | Some t -> fprintf fmt "fully verified in %.02f s" t
     | None -> fprintf fmt "not fully verified"
     end;
-    fprintf fmt "</font></h2>@\n";
+    fprintf fmt "</span></h2>@\n";
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
     (* fprintf fmt "<table border=\"1\"><tr><td>Obligations</td>"; *)
