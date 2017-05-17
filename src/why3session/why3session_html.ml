@@ -228,7 +228,7 @@ let rec num_lines acc tr =
     List.iter
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
-    fprintf fmt "</td></tr>@\n";
+    fprintf fmt "</tr>@\n";
     List.iter (print_goal fmt true 1 depth provers) th.theory_goals;
     fprintf fmt "</table>@\n"
 
