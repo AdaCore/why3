@@ -77,7 +77,7 @@ let model_vc_term_label = Ident.create_label "model_vc"
   (* This label identifies the term that triggers the VC. *)
 
 let add_model_element (el: term) info_model =
-(** Add element el (term) to info_model.
+ (* Add element el (term) to info_model.
     If an element with the same hash (the same set of labels + the same
     location) as the element el already exists in info_model, replace it with el.
 
