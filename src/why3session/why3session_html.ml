@@ -246,18 +246,19 @@ let rec num_lines acc tr =
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html\
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+  let context : context = "<!DOCTYPE html \
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-<title>Why3 session of %s</title>\
-</head>\
-<body>\
-%a\
-</body>\
-</html>\
-"
+\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+\n<head>\
+\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+\n  <title>Why3 session of %s</title>\
+\n</head>\
+\n<body>\
+\n%a\
+\n</body>\
+\n</html>\
+\n"
 
   let run_one = run_file context print_session
 
@@ -314,18 +315,19 @@ struct
          print_file) s.session_files
 
 
-  let context : context = "<!DOCTYPE html\
-PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\
+  let context : context = "<!DOCTYPE html \
+PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\
-<html xmlns=\"http://www.w3.org/1999/xhtml\">\
-<head>\
-<title>Why3 session of %s</title>\
-</head>\
-<body>\
-%a\
-</body>\
-</html>\
-"
+\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\
+\n<head>\
+\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+\n  <title>Why3 session of %s</title>\
+\n</head>\
+\n<body>\
+\n%a\
+\n</body>\
+\n</html>\
+\n"
 
   let run_one = run_file context print_session
 
