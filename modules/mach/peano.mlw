@@ -6,17 +6,13 @@ module Peano
   use import int.Int
 
   type t = abstract { v: int }
+  meta coercion function v
 
   val to_int (x: t) : int
     ensures { result = x.v }
 
-  val zero (): t
+  val constant zero : t
     ensures { result.v = 0 }
-  (* FIXME: should be a constant
-
-     val function zero : t
-       ensures { result.v = 0 }
-  *)
 
   val succ (x: t) : t
     ensures { result.v = x.v + 1 }
