@@ -176,16 +176,16 @@ let rec num_lines acc tr =
       fprintf fmt "<td bgcolor=\"#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    fprintf fmt "<td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
+    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
     let (_:bool) = List.fold_left
-      (fun is_first g ->
-        print_goal fmt is_first (depth+1) max_depth provers g;
-        false)
-      true tr.transf_goals
+      (fun needs_tr g ->
+        print_goal fmt needs_tr (depth+1) max_depth provers g;
+        true)
+      false tr.transf_goals
     in ()
 
-  and print_goal fmt is_first depth max_depth provers g =
-    if not is_first then fprintf fmt "<tr>";
+  and print_goal fmt needs_tr depth max_depth provers g =
+    if needs_tr then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
     fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (Opt.inhabited g.S.goal_verified)
