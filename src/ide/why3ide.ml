@@ -1265,7 +1265,17 @@ let _ =
     | 1 -> (* Left click *) ()
     | 2 -> (* Middle click *) ()
     | 3 -> (* Right click *)
-        has_right_click := true
+        has_right_click := true;
+        GToolbox.popup_menu ~entries:[
+                              `I("Choix 1.1",(fun () -> Format.eprintf "Popup menu: choix 1.1 active@."));
+                              `I("Choix 1.2",(fun () -> Format.eprintf "Popup menu: choix 1.2 active@."));
+                              `S;
+                              `I("Choix 2.1",(fun () -> Format.eprintf "Popup menu: choix 2.1 active@."));
+                              `I("Choix 2.2",(fun () -> Format.eprintf "Popup menu: choix 2.2 active@."));
+                              `I("Choix 2.3",(fun () -> Format.eprintf "Popup menu: choix 2.3 active@."));
+                            ]
+                            ~button:1 ~time:0l
+
     | _ -> (* Error case TODO *) assert false);
     Format.eprintf "TODO button number %d was clicked on the tree view@." (GdkEvent.Button.button x); false)
 
