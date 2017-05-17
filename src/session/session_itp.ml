@@ -1295,7 +1295,7 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
-let make_theory_section ~use_shapes ?merge (s:session) parent_name (th:Theory.theory)
+let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
   : theory =
   let add_goal parent goal id =
     let name,_expl,task = Termcode.goal_expl_task ~root:true goal in
@@ -1312,21 +1312,21 @@ let make_theory_section ~use_shapes ?merge (s:session) parent_name (th:Theory.th
   List.iter2 (add_goal parent) tasks goalsID;
   begin
     match merge with
-    | Some (old_s, old_th, env) ->
+    | Some (old_s, old_th, env, use_shapes) ->
       merge_theory ~use_shapes env old_s old_th s theory
     | _ -> ()
   end;
   theory
 
 (* add a why file to a session *)
-let add_file_section ~use_shapes (s:session) (fn:string)
+let add_file_section (s:session) (fn:string)
     (theories:Theory.theory list) format : unit =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   if Hstr.mem s.session_files fn then
     Debug.dprintf debug "[session] file %s already in database@." fn
   else
     begin
-      let theories = List.map (make_theory_section ~use_shapes s fn) theories in
+      let theories = List.map (make_theory_section s fn) theories in
       let f = { file_name = fn;
                 file_format = format;
                 file_theories = theories;
@@ -1356,10 +1356,10 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
           (* if we found one, we remove it from the table and merge it *)
           let old_th = Hstr.find old_th_table theory_name in
           Hstr.remove old_th_table theory_name;
-          make_theory_section ~use_shapes ~merge:(old_ses,old_th,env) s fn th
+          make_theory_section ~merge:(old_ses,old_th,env,use_shapes) s fn th
         with Not_found ->
           (* if no theory was found we make a new theory section *)
-          make_theory_section ~use_shapes s fn th
+          make_theory_section s fn th
       in
       let theories = List.map add_theory theories in
       (* we save the remaining, detached *)

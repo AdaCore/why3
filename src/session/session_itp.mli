@@ -108,9 +108,9 @@ val empty_session : ?shape_version:int -> string -> session
     argument *)
 
 val add_file_section :
-  use_shapes:bool -> session -> string -> (Theory.theory list) ->
+  session -> string -> (Theory.theory list) ->
   Env.fformat option -> unit
-(** [add_file_section ~merge:(old_s,old_ths,env) s fn ths] adds a new
+(** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
     theory nodes generated are computed using [Task.split_theory]. *)

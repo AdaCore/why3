@@ -404,7 +404,7 @@ let reload_files (c : controller) ~use_shapes =
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
-  add_file_section ~use_shapes:false c.controller_session fname theories format
+  add_file_section c.controller_session fname theories format
 
 (* Update the proof_state according to new false state and then remove
    the subtree *)
