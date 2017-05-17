@@ -53,7 +53,7 @@ val get_files : session -> file Stdlib.Hstr.t
 val get_dir : session -> string
 val get_shape_version : session -> int
 
-type proof_attempt_node = {
+type proof_attempt_node = private {
   parent              : proofNodeID;
   prover              : Whyconf.prover;
   limit               : Call_provers.resource_limit;

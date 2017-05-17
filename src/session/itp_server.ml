@@ -301,7 +301,10 @@ let print_notify fmt n =
       begin
         match nf with
         | Proved b -> fprintf fmt "node change %d Proved %b" ni b
-        | _        -> fprintf fmt "node change %d" ni
+        | Obsolete b -> fprintf fmt "node change %d Obsolete %b" ni b
+        | Proof_status_change(st,b,_lim) ->
+           fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
+                   ni Controller_itp.print_status st b
       end
   | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
   | Remove _ni                         -> fprintf fmt "remove"

@@ -261,7 +261,7 @@ let is_detached (s: session) (a: any) =
     let pa = get_proof_attempt_node s pa in
     let pn_id = pa.parent in
     let pn = get_proofNode s pn_id in
-    pa.proof_obsolete || pn.proofn_task = None
+    pn.proofn_task = None
 
 (* Remove elements of the session tree *)
 
@@ -399,15 +399,19 @@ let rec fold_all_sub_goals_of_proofn s f acc pnid =
 let fold_all_sub_goals_of_theory s f acc th =
   List.fold_left (fold_all_sub_goals_of_proofn s f) acc th.theory_goals
 
+(*
 let theory_iter_proofn s f th =
   fold_all_sub_goals_of_theory s (fun _ -> f) () th
+*)
 
+(*
 let theory_iter_proof_attempt s f th =
   theory_iter_proofn s
     (fun pn -> Hprover.iter (fun _ pan ->
                              let pan = get_proof_attempt_node s pan in
                              f pan)
          pn.proofn_attempts) th
+*)
 
 (**************)
 (* Copy/Paste *)
@@ -505,27 +509,36 @@ let empty_session ?shape_version dir =
 (* proof node/attempt/transformation manipulation *)
 (**************************************************)
 
+exception AlreadyExist
+
 let add_proof_attempt session prover limit state obsolete edit parentID =
-  let pa = { parent = parentID;
-             prover = prover;
-             limit = limit;
-             proof_state = state;
-             proof_obsolete = obsolete;
-             proof_script = edit } in
   let pn = get_proofNode session parentID in
-  let id =
-    try Hprover.find pn.proofn_attempts pa.prover
-    with Not_found ->
-      let id = gen_proofAttemptID session in
-      Hprover.add pn.proofn_attempts pa.prover id;
-      id
-  in
-  Hint.replace session.proofAttempt_table id pa;
-  id
+  try
+    let _ = Hprover.find pn.proofn_attempts prover in
+    raise AlreadyExist
+  with Not_found ->
+    let id = gen_proofAttemptID session in
+    let pa = { parent = parentID;
+               prover = prover;
+               limit = limit;
+               proof_state = state;
+               proof_obsolete = obsolete;
+               proof_script = edit } in
+    Hprover.add pn.proofn_attempts prover id;
+    Hint.replace session.proofAttempt_table id pa;
+    id
 
 let graft_proof_attempt (s : session) (id : proofNodeID) (pr : Whyconf.prover)
     ~limit =
-  add_proof_attempt s pr limit None false None id
+  let pn = get_proofNode s id in
+  try
+    let id = Hprover.find pn.proofn_attempts pr in
+    let pa = Hint.find s.proofAttempt_table id in
+    let pa = { pa with limit = limit; proof_obsolete = true } in
+    Hint.replace s.proofAttempt_table id pa;
+    id
+  with Not_found ->
+    add_proof_attempt s pr limit None false None id
 
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
@@ -659,16 +672,9 @@ let update_proof_attempt s id pr st =
     let n = get_proofNode s id in
     let pa = Hprover.find n.proofn_attempts pr in
     let pa = get_proof_attempt_node s pa in
-    pa.proof_state <- Some st;
-    pa.proof_obsolete <- false
+    pa.proof_state <- Some st
   with
-  | BadID ->
-      (* We still want to know that this expression raised an error when
-         examining with stack_trace *)
-      if Debug.test_flag debug_stack_trace then
-        raise BadID
-      else
-        ()
+  | BadID when not (Debug.test_flag debug_stack_trace) -> ()
 
 (****************************)
 (*     session opening      *)
@@ -1146,9 +1152,9 @@ let save_detached_theory parent_name old_s detached_theory s =
     theory_parent_name = parent_name;
     theory_detached_goals = [] }
 
-let merge_proof new_s obsolete new_goal _ old_pa_n =
+let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
-  let obsolete = obsolete || old_pa.proof_obsolete in
+  let obsolete = goal_obsolete || old_pa.proof_obsolete in
   found_obsolete := obsolete || !found_obsolete;
   ignore (add_proof_attempt new_s old_pa.prover old_pa.limit
     old_pa.proof_state obsolete old_pa.proof_script
@@ -1171,10 +1177,10 @@ let add_registered_transformation s env old_tr goal_id =
     let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args tables task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
-let rec merge_goal ~use_shapes env new_s old_s obsolete old_goal new_goal_id =
+let rec merge_goal ~use_shapes env new_s old_s ~goal_obsolete old_goal new_goal_id =
   Hprover.iter (fun k pa ->
                 let pa = get_proof_attempt_node old_s pa in
-                merge_proof new_s obsolete new_goal_id k pa)
+                merge_proof new_s ~goal_obsolete new_goal_id k pa)
                old_goal.proofn_attempts;
   List.iter
     (merge_trans ~use_shapes env old_s new_s new_goal_id)
@@ -1207,9 +1213,9 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     AssoGoals.associate ~use_shapes old_subtasks new_subtasks
   in
   List.iter (function
-      | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->
+      | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal ~use_shapes env new_s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
+        merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,s), None) ->
         Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( : %s @."
           (get_proofNode s id).proofn_name.Ident.id_string;
@@ -1232,6 +1238,12 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
        let pn = get_proofNode old_s id in
        Hstr.add old_goals_table pn.proofn_name.Ident.id_string id)
     old_th.theory_goals;
+  let to_checksum = CombinedTheoryChecksum.compute s th in
+  let same_theory_checksum =
+    match old_th.theory_checksum with
+    | None -> false
+    | Some c -> Termcode.equal_checksum c to_checksum
+  in
   let new_goals = ref [] in
   (* merge goals *)
   List.iter
@@ -1247,14 +1259,14 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
            | None, _ -> assert false
            | Some _, None ->
              Debug.dprintf debug "[merge_theory] goal has no checksum@.";
-             true
+             not same_theory_checksum
            | Some s1, Some s2 ->
              Debug.dprintf debug "[merge_theory] goal has checksum@.";
              not (Termcode.equal_checksum s1 s2)
          in
          if goal_obsolete then
            found_obsolete := true;
-         merge_goal ~use_shapes env s old_s goal_obsolete old_goal ng_id
+         merge_goal ~use_shapes env s old_s ~goal_obsolete old_goal ng_id
        with
        | Not_found ->
          (* if no goal of matching name is found store it to look for
@@ -1268,30 +1280,16 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
     AssoGoals.associate ~use_shapes detached_goals !new_goals
   in
   List.iter (function
-      | ((new_goal_id,_), Some ((old_goal_id,_), obsolete)) ->
+      | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
-        merge_goal ~use_shapes env s old_s obsolete (get_proofNode old_s old_goal_id) new_goal_id
+        merge_goal ~use_shapes env s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | (_, None) ->
         Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( @.";
         found_missed_goals_in_theory := true)
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th);
-  (* set goals as non obsolete if no goals was missed and the theory
-     checksum match with the previous one *)
-  if not !found_missed_goals_in_theory then begin
-    let to_checksum = CombinedTheoryChecksum.compute s th in
-    let same_checksum =
-      match old_th.theory_checksum with
-      | None -> false
-      | Some c -> Termcode.equal_checksum c to_checksum
-    in
-    if same_checksum then
-      (* we set all_goals as non obsolete *)
-      let set_non_obsolete pan = pan.proof_obsolete <-false in
-      theory_iter_proof_attempt s set_non_obsolete th
-  end
+  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th)
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
