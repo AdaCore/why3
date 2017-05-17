@@ -133,7 +133,7 @@ let backtrace_and_exit f () =
          raise e
        end
 
-module S = struct
+module Scheduler = struct
 
     let idle ~prio f =
       let (_ : GMain.Idle.id) = GMain.Idle.add ~prio (backtrace_and_exit f) in ()
@@ -143,7 +143,7 @@ module S = struct
         GMain.Timeout.add ~ms ~callback:(backtrace_and_exit f) in ()
 end
 
-module Server = Itp_server.Make (S) (Protocol_why3ide)
+module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 
 (************************)
 (* parsing command line *)
@@ -1468,6 +1468,41 @@ let if_selected_alone id f =
      if i = id || Some i = get_parent id then f id
   | _ -> ()
 
+module S = Session_itp
+module C = Controller_itp
+
+let set_status_and_time_column row pa obsolete l =
+  goals_model#set ~row:row#iter ~column:status_column
+                  (image_of_pa_status ~obsolete pa);
+  let t = match pa with
+    | C.Done r ->
+       let time = r.Call_provers.pr_time in
+       let steps = r.Call_provers.pr_steps in
+       let s =
+         if gconfig.show_time_limit then
+           Format.sprintf "%.2f [%d.0]" time
+                          (l.Call_provers.limit_time)
+         else
+           Format.sprintf "%.2f" time
+       in
+       if steps >= 0 then
+	 Format.sprintf "%s (steps: %d)" s steps
+       else
+	 s
+    | C.Unedited -> "(proof script not yet edited)"
+    | C.JustEdited -> "(proof script edited, replay needed)"
+    | C.InternalFailure _ -> "(internal failure)"
+    | C.Interrupted -> "(interrupted)"
+    | C.Uninstalled _ -> "(uninstalled prover)"
+    | C.Scheduled
+    | C.Running ->
+       Format.sprintf "[limit=%d sec., %d M]"
+                      (l.Call_provers.limit_time)
+                      (l.Call_provers.limit_mem)
+  in
+  let t = if obsolete then t ^ " (obsolete)" else t in
+  goals_model#set ~row:row#iter ~column:time_column t
+
 let treat_notification n =
   begin match n with
   | Node_change (id, uinfo)        ->
@@ -1482,14 +1517,12 @@ let treat_notification n =
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
-          goals_model#set ~row:r#iter ~column:status_column
-                          (image_of_pa_status ~obsolete:obs pa)
+          set_status_and_time_column r pa obs l
        | Obsolete b ->
           let r = get_node_row id in
-          let (pa, _obs, l) = Hint.find node_id_pa id in
+          let (pa, _, l) = Hint.find node_id_pa id in
           Hint.replace node_id_pa id (pa, b, l);
-          goals_model#set ~row:r#iter ~column:status_column
-                          (image_of_pa_status ~obsolete:b pa)
+          set_status_and_time_column r pa b l
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id
@@ -1584,7 +1617,7 @@ let (_ : GMenu.image_menu_item) =
 (***********************)
 
 let () =
-  S.timeout ~ms:100 (fun () -> List.iter treat_notification (get_notified ()); true);
+  Scheduler.timeout ~ms:100 (fun () -> List.iter treat_notification (get_notified ()); true);
   (* temporary *)
   vpan222#set_position 500;
   goals_view#expand_all ();
