@@ -1251,6 +1251,8 @@ module N
                by
                  power radix (k + sz) = power radix k * power radix sz
                so
+                 power radix (!i + sz) = power radix k * power radix sz * radix
+               so
                  value_sub_shift (r at StartLoop) k
                  + (power radix k) * value_sub (pelts r at StartLoop)
                                    (r.offset + k) (r.offset + k + sz)
