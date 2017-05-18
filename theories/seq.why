@@ -136,7 +136,7 @@ theory FreeMonoid
   (* Monoidal properties/simplification. *)
 
   let lemma associative (s1 s2 s3:seq 'a)
-    ensures { (s1 ++ s2) ++ s3 = s1 ++ (s2 ++ s3) }
+    ensures { s1 ++ (s2 ++ s3) = (s1 ++ s2) ++ s3 }
   = if not (s1 ++ s2) ++ s3 == s1 ++ (s2 ++ s3) then absurd
   meta rewrite axiom associative
 
@@ -159,6 +159,12 @@ theory FreeMonoid
     ensures { snoc s x = s ++ singleton x }
   = if not snoc s x == s ++ singleton x then absurd
   meta rewrite axiom snoc_def
+
+  let lemma double_sub_sequence (s:seq 'a) (i j k l:int)
+    requires { 0 <= i <= j <= length s }
+    requires { 0 <= k <= l <= j - i }
+    ensures { s[i .. j][k .. l] = s[k+i .. l+i] }
+  = if not s[i .. j][k .. l] == s[k+i .. l+i] then absurd
 
   (* Inverting cons/snoc/catenation *)
 
