@@ -517,7 +517,7 @@ module Steps_conversion : sig
 end = struct
 
   let convert_data =
-    ["cvc4", { add = 10000; mult = 25 };
+    ["cvc4", { add = 15000; mult = 35 };
      "z3",   { add = 450000; mult = 800 }]
 
   let starts_with a b =
