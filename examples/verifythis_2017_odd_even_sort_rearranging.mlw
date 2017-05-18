@@ -23,32 +23,23 @@ let ghost function array_max (a:array int) : int
   done;
   !m
 
-let ghost function aux (a:int -> int) (m i:int)
-  = i * (m - Map.get a i)
+function aux (a:int -> int) (m i:int) : int = i * (m - Map.get a i)
 
 lemma aux_pos :
   forall a m i. 0 <= i < length a -> a[i] <= m -> aux a.elts m i >= 0
 
-let ghost function entropy (a:array int) (m:int) : int
-=  sum (aux a.elts m) 0 (length a)
+function entropy (a:array int) (m:int) : int = sum (aux a.elts m) 0 (length a)
 
 let lemma decompose_entropy (a:int -> int) (i j m n:int)
   requires { 0 <= i < j < n }
   ensures  { sum (aux a m) 0 n
              = sum (aux a m) 0 i + sum (aux a m) (j+1) n
                + sum (aux a m) (i+1) j + aux a m i + aux a m j }
-=  assert { sum (aux a m) 0 n
-            = sum (aux a m) 0 i + sum (aux a m) (j+1) n
-              + sum (aux a m) (i+1) j + aux a m i + aux a m j
-           by sum (aux a m) i (j+1)
-              = sum (aux a m) i (i+1) + sum (aux a m) (i+1) j
-                + sum (aux a m) j (j+1)
-           so sum (aux a m) i (i+1) = aux a m i
-           so sum (aux a m) j (j+1) = aux a m j
-           so sum (aux a m) 0 n
-              = sum (aux a m) 0 i + sum (aux a m) i (j+1) + sum (aux a m) (j+1) n
-              = sum (aux a m) 0 i + aux a m i + sum (aux a m) (i+1) j
-                + aux a m j + sum (aux a m) (j+1) n }
+=  let decomp (i j k: int)
+     requires { 0 <= i <= j <= k <= n }
+     ensures  { sum (aux a m) i k = sum (aux a m) i j + sum (aux a m) j k }
+   = () in
+   decomp 0 i n; decomp i (j+1) n; decomp i j (j+1); decomp i (i+1) j
 
 let lemma inst_ext (a1 a2: int -> int) (a b m:int)
   requires { forall i. a <= i < b -> Map.get a1 i = Map.get a2 i }
@@ -81,13 +72,10 @@ let my_swap (a:array int) (i j:int) (ghost m:int)
               = (m - a[j]) * i + (m - a[i]) * j
               = aux a1 m i + aux a1 m j
            };
-  inst_ext a1 a2 0 i m;
-  inst_ext a1 a2 (i+1) j m;
-  inst_ext a1 a2 (j+1) a.length m
+  inst_ext a1 a2 0 i m; inst_ext a1 a2 (i+1) j m; inst_ext a1 a2 (j+1) a.length m
 
 let rec lemma local_order_implies_sort_sub (a:array int) (i j:int)
-  requires { forall k. i <= k < j - 1
-                    -> a[k] <= a[k+1] }
+  requires { forall k. i <= k < j - 1 -> a[k] <= a[k+1] }
   requires { 0 <= i <= j <= length a }
   ensures  { sorted_sub a i j }
   variant  { j - i }
@@ -95,11 +83,7 @@ let rec lemma local_order_implies_sort_sub (a:array int) (i j:int)
   then begin
     local_order_implies_sort_sub a (i+1) j;
     assert { forall k l. i <= k <= l < j -> a[k] <= a[l]
-             by
-               "case_split"
-                  k = l
-                  \/ (i=k<l so a[i] <= a[i+1] <= a[l])
-                  \/  i+1 <= k < j };
+             by k = l \/  i = k < l \/  i+1 <= k < j };
     end
 
 let odd_even_sort (a: array int)
@@ -145,5 +129,4 @@ let odd_even_sort (a: array int)
       then begin my_swap a !i (!i+1) m; ok := false end;
       i := !i + 2
     done;
-(*    assert { !ok -> forall j. 0 <= j < length a - 1 -> a[j] <= a[j+1] };*)
   done;
