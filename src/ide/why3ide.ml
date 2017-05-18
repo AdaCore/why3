@@ -1250,7 +1250,22 @@ let (_ : GtkSignal.id) =
        | [r] -> on_selected_row r;
            if !has_right_click then
              (* TODO here show the menu *)
-             ();
+             GToolbox.popup_menu ~entries:[
+                              `I("Mark Obsolete",
+                                 (* TODO add a mark_obsolete function *)
+                                 (fun () ->
+                                   match get_selected_row_references () with
+                                   | [r] ->
+                                       let id = get_node_id r#iter in
+                                       send_request (Mark_obsolete_req id)
+                                   | _ -> print_message "Select only one node to perform this action"));
+                              `I("Choix 1.2",(fun () -> Format.eprintf "Popup menu: choix 1.2 active@."));
+                              `S;
+                              `I("Choix 2.1",(fun () -> Format.eprintf "Popup menu: choix 2.1 active@."));
+                              `I("Choix 2.2",(fun () -> Format.eprintf "Popup menu: choix 2.2 active@."));
+                              `I("Choix 2.3",(fun () -> Format.eprintf "Popup menu: choix 2.3 active@."));
+                            ]
+                            ~button:1 ~time:0l;
            has_right_click := false
 
        | _ -> ()
@@ -1265,16 +1280,7 @@ let _ =
     | 1 -> (* Left click *) ()
     | 2 -> (* Middle click *) ()
     | 3 -> (* Right click *)
-        has_right_click := true;
-        GToolbox.popup_menu ~entries:[
-                              `I("Choix 1.1",(fun () -> Format.eprintf "Popup menu: choix 1.1 active@."));
-                              `I("Choix 1.2",(fun () -> Format.eprintf "Popup menu: choix 1.2 active@."));
-                              `S;
-                              `I("Choix 2.1",(fun () -> Format.eprintf "Popup menu: choix 2.1 active@."));
-                              `I("Choix 2.2",(fun () -> Format.eprintf "Popup menu: choix 2.2 active@."));
-                              `I("Choix 2.3",(fun () -> Format.eprintf "Popup menu: choix 2.3 active@."));
-                            ]
-                            ~button:1 ~time:0l
+        has_right_click := true
 
     | _ -> (* Error case TODO *) assert false);
     Format.eprintf "TODO button number %d was clicked on the tree view@." (GdkEvent.Button.button x); false)
