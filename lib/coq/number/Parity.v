@@ -123,3 +123,14 @@ intros k.
 now exists k.
 Qed.
 
+(* Why3 goal *)
+Lemma even_mod2 : forall (n:Z), (even n) <->
+  ((ZArith.BinInt.Z.rem n 2%Z) = 0%Z).
+Proof.
+intros n.
+rewrite even_is_Zeven.
+rewrite <- Zeven_bool_iff.
+rewrite Zquot.Zeven_rem.
+now rewrite Z.eqb_eq.
+Qed.
+
