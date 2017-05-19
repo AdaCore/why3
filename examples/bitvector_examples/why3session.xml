@@ -2,38 +2,25 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" expanded="true">
-<theory name="Test_proofinuse" sum="679bad1f3c0a1d208aa42f5230a05ded">
- <goal name="WP_parameter shift_is_div" expl="VC for shift_is_div">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter shift_is_div.1" expl="1. assertion">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter shift_is_div.2" expl="2. assertion">
-  <proof prover="1"><result status="valid" time="0.04" steps="74"/></proof>
-  </goal>
-  <goal name="WP_parameter shift_is_div.3" expl="3. assertion">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="WP_parameter shift_is_div.4" expl="4. assertion">
-  <proof prover="1"><result status="valid" time="0.04" steps="77"/></proof>
-  </goal>
- </transf>
+<theory name="Test_proofinuse" sum="e3a11246443d7b689cd9c8be317e39f8">
+ <goal name="VC shift_is_div" expl="VC for shift_is_div">
+ <proof prover="1" timelimit="1"><result status="valid" time="0.11" steps="111"/></proof>
  </goal>
- <goal name="WP_parameter mask" expl="VC for mask">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <goal name="VC mask" expl="VC for mask">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter testVariant" expl="VC for testVariant">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC testVariant" expl="VC for testVariant">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="ttt">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" sum="dbcaf63a9aedfbd58bdf246c54a2e1cb">
+<theory name="Hackers_delight" sum="fe8bafff177ba380df14adb45fdae8fe">
  <goal name="DM1">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -92,69 +79,69 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight_mod" sum="108a6a7f9efeb83b34abd33cf91e7663">
- <goal name="WP_parameter dm1" expl="VC for dm1">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+<theory name="Hackers_delight_mod" sum="527615b2b501acdcd047ac19278071fb">
+ <goal name="VC dm1" expl="VC for dm1">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter dm2" expl="VC for dm2">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC dm2" expl="VC for dm2">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter dm3" expl="VC for dm3">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC dm3" expl="VC for dm3">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter dm4" expl="VC for dm4">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
+ <goal name="VC dm4" expl="VC for dm4">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter dm5" expl="VC for dm5">
- <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <goal name="VC dm5" expl="VC for dm5">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter dm6" expl="VC for dm6">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <goal name="VC dm6" expl="VC for dm6">
+ <proof prover="2" timelimit="1"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter dm7" expl="VC for dm7">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC dm7" expl="VC for dm7">
+ <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="WP_parameter dm8" expl="VC for dm8">
- <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <goal name="VC dm8" expl="VC for dm8">
+ <proof prover="2" timelimit="1"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter dmtest" expl="VC for dmtest">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC dmtest" expl="VC for dmtest">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="WP_parameter ie1" expl="VC for ie1">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC ie1" expl="VC for ie1">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter ie2" expl="VC for ie2">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <goal name="VC ie2" expl="VC for ie2">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="WP_parameter ie3" expl="VC for ie3">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <goal name="VC ie3" expl="VC for ie3">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter ie4" expl="VC for ie4">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <goal name="VC ie4" expl="VC for ie4">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter sr1" expl="VC for sr1">
- <proof prover="2"><result status="valid" time="0.06"/></proof>
+ <goal name="VC sr1" expl="VC for sr1">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="WP_parameter rs_left" expl="VC for rs_left">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC rs_left" expl="VC for rs_left">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter rs_right" expl="VC for rs_right">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC rs_right" expl="VC for rs_right">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter bp1" expl="VC for bp1">
- <proof prover="2"><result status="valid" time="0.08"/></proof>
+ <goal name="VC bp1" expl="VC for bp1">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="WP_parameter bp1&apos;" expl="VC for bp1&apos;">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC bp1&apos;" expl="VC for bp1&apos;">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter bp2" expl="VC for bp2">
- <proof prover="2"><result status="valid" time="0.08"/></proof>
+ <goal name="VC bp2" expl="VC for bp2">
+ <proof prover="0"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter bp3" expl="VC for bp3">
- <proof prover="2"><result status="valid" time="0.07"/></proof>
+ <goal name="VC bp3" expl="VC for bp3">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Test_imperial_violet" sum="44cb7399eb1b0f0cf93ab6cdfae9c56d">
+<theory name="Test_imperial_violet" sum="9cba028e6ff8bf04fb7ecda33e431e6e">
  <goal name="bv32_bounds_bv">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -170,11 +157,42 @@
  <goal name="bv32_bounds">
  <proof prover="1"><result status="valid" time="0.03" steps="72"/></proof>
  </goal>
- <goal name="WP_parameter add" expl="VC for add">
- <proof prover="4"><result status="valid" time="0.25"/></proof>
+ <goal name="VC add" expl="VC for add">
+ <transf name="split_goal_wp">
+  <goal name="VC add.1" expl="1. array creation size">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.2" expl="2. loop bounds">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.3" expl="3. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add.4" expl="4. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add.5" expl="5. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.6" expl="6. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.7" expl="7. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.8" expl="8. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC add.9" expl="9. loop invariant preservation">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.51" steps="254"/></proof>
+  </goal>
+  <goal name="VC add.10" expl="10. postcondition">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
-<theory name="Test_from_bitvector_example" sum="3eb2acd0c9abe9f6be6c2d2c04e62c12">
+<theory name="Test_from_bitvector_example" sum="a35ae98bb0af12b63bd8294127aeeb0a">
  <goal name="Test1">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -193,32 +211,32 @@
  <goal name="Test6">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="WP_parameter lsr31" expl="VC for lsr31">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr31" expl="VC for lsr31">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr30" expl="VC for lsr30">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr30" expl="VC for lsr30">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr29" expl="VC for lsr29">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr29" expl="VC for lsr29">
+ <proof prover="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="WP_parameter lsr28" expl="VC for lsr28">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr28" expl="VC for lsr28">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr27" expl="VC for lsr27">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr27" expl="VC for lsr27">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr26" expl="VC for lsr26">
- <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <goal name="VC lsr26" expl="VC for lsr26">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr20" expl="VC for lsr20">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr20" expl="VC for lsr20">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr13" expl="VC for lsr13">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr13" expl="VC for lsr13">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter lsr8" expl="VC for lsr8">
- <proof prover="2"><result status="valid" time="0.04"/></proof>
+ <goal name="VC lsr8" expl="VC for lsr8">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="to_int_0x00000001">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
