@@ -129,8 +129,8 @@ fi
 make bench &> $OUT
 if test "$?" != "0" ; then
     echo "Make bench FAILED" >> $REPORT
-    cat $OUT >> $REPORT
-    SUBJECT="$SUBJECT make bench failed"
+    tail -20 $OUT >> $REPORT
+    SUBJECT="$SUBJECT make bench failed,"
     # we do not notify yet, we try the examples also
     # notify
 else
