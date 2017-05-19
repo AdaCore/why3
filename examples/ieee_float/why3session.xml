@@ -9,7 +9,7 @@
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../ieee_float.mlw" expanded="true">
-<theory name="A" sum="763d6fbd523a80b8e6b4593a898a6c22" expanded="true">
+<theory name="A" sum="48c8d108a86ab8b4c79ec7491cfe6354" expanded="true">
  <goal name="ebsb32" expanded="true">
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  <proof prover="2"><result status="valid" time="0.05" steps="78"/></proof>
@@ -26,26 +26,26 @@
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="M603_018" sum="c1f81e18bfb6e6c677b49d1d9f51b22c" expanded="true">
- <goal name="WP_parameter triplet" expl="VC for triplet">
+<theory name="M603_018" sum="44b31db83ce2d23dd4c2cbdb77947371" expanded="true">
+ <goal name="VC triplet" expl="VC for triplet">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter triplet.1" expl="1. assertion">
+  <goal name="VC triplet.1" expl="1. assertion">
   <proof prover="3"><result status="valid" time="1.05"/></proof>
   <proof prover="4"><result status="valid" time="2.65"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.2" expl="2. assertion">
-  <proof prover="2"><result status="valid" time="4.95" steps="10731"/></proof>
+  <goal name="VC triplet.2" expl="2. assertion">
+  <proof prover="2"><result status="valid" time="4.95" steps="10733"/></proof>
   <proof prover="3"><result status="valid" time="1.86"/></proof>
   <proof prover="4"><result status="valid" time="0.79"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.3" expl="3. assertion">
+  <goal name="VC triplet.3" expl="3. assertion">
   <proof prover="0"><result status="valid" time="0.64"/></proof>
   <proof prover="1"><result status="valid" time="0.21"/></proof>
   <proof prover="2"><result status="valid" time="0.08" steps="161"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.22"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.4" expl="4. assertion">
+  <goal name="VC triplet.4" expl="4. assertion">
   <proof prover="0"><result status="outofmemory" time="4.61"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
@@ -53,17 +53,17 @@
   <proof prover="4"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.5" expl="5. assertion">
+  <goal name="VC triplet.5" expl="5. assertion">
   <proof prover="0"><result status="valid" time="0.64"/></proof>
   <proof prover="1"><result status="valid" time="0.29"/></proof>
   <proof prover="2"><result status="valid" time="1.13" steps="2244"/></proof>
   <proof prover="3"><result status="valid" time="0.62"/></proof>
   <proof prover="5"><result status="valid" time="0.30"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.6" expl="6. assertion">
+  <goal name="VC triplet.6" expl="6. assertion">
   <proof prover="3"><result status="valid" time="2.34"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.7" expl="7. assertion">
+  <goal name="VC triplet.7" expl="7. assertion">
   <proof prover="0"><result status="valid" time="0.64"/></proof>
   <proof prover="1"><result status="valid" time="0.28"/></proof>
   <proof prover="2"><result status="valid" time="0.08" steps="184"/></proof>
@@ -71,7 +71,7 @@
   <proof prover="4"><result status="valid" time="0.14"/></proof>
   <proof prover="5"><result status="valid" time="0.29"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.8" expl="8. assertion">
+  <goal name="VC triplet.8" expl="8. assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
@@ -79,15 +79,15 @@
   <proof prover="4"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.9" expl="9. assertion">
+  <goal name="VC triplet.9" expl="9. assertion">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="94"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.12"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter triplet.10" expl="10. assertion">
+  <goal name="VC triplet.10" expl="10. assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.01"/></proof>
@@ -146,99 +146,99 @@
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="M121_039_nonlinear" sum="419f288237e908f28fe9898d1fbeb90a" expanded="true">
- <goal name="WP_parameter test" expl="VC for test" expanded="true">
+<theory name="M121_039_nonlinear" sum="c02f213417aeb7b1be2861bd7a5eb39f" expanded="true">
+ <goal name="VC test" expl="VC for test" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter test.1" expl="1. assertion">
+  <goal name="VC test.1" expl="1. assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter test.2" expl="2. assertion">
+  <goal name="VC test.2" expl="2. assertion">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter test.3" expl="3. assertion">
+  <goal name="VC test.3" expl="3. assertion">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter test.4" expl="4. assertion">
+  <goal name="VC test.4" expl="4. assertion">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="87"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter test.5" expl="5. assertion">
+  <goal name="VC test.5" expl="5. assertion">
   <proof prover="0"><result status="valid" time="0.15"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="88"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter test.6" expl="6. assertion" expanded="true">
+  <goal name="VC test.6" expl="6. assertion" expanded="true">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
   <proof prover="3"><result status="valid" time="0.58"/></proof>
   </goal>
-  <goal name="WP_parameter test.7" expl="7. assertion" expanded="true">
+  <goal name="VC test.7" expl="7. assertion" expanded="true">
   <proof prover="0"><result status="outofmemory" time="4.57"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter test.8" expl="8. assertion" expanded="true">
+  <goal name="VC test.8" expl="8. assertion" expanded="true">
   <proof prover="0"><result status="outofmemory" time="4.43"/></proof>
   <proof prover="2"><result status="timeout" time="5.01"/></proof>
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter test.9" expl="9. assertion">
+  <goal name="VC test.9" expl="9. assertion">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.04" steps="91"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter test.10" expl="10. assertion">
+  <goal name="VC test.10" expl="10. assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="valid" time="0.17"/></proof>
   <proof prover="2"><result status="timeout" time="5.01"/></proof>
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   <proof prover="5"><result status="valid" time="0.19"/></proof>
   </goal>
-  <goal name="WP_parameter test.11" expl="11. postcondition">
+  <goal name="VC test.11" expl="11. postcondition">
   <proof prover="0"><result status="outofmemory" time="4.39"/></proof>
-  <proof prover="1"><result status="unknown" time="4.96"/></proof>
+  <proof prover="1"><result status="unknown" time="9.88"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
   <proof prover="3"><result status="valid" time="4.32"/></proof>
-  <proof prover="5"><result status="unknown" time="4.98"/></proof>
+  <proof prover="5"><result status="unknown" time="9.84"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="LB09_025_conversion" sum="28457788671e9639392ac3a0fb62e20b" expanded="true">
- <goal name="WP_parameter fti" expl="VC for fti" expanded="true">
+<theory name="LB09_025_conversion" sum="e37934a097957d67aab9959d430b17b3" expanded="true">
+ <goal name="VC fti" expl="VC for fti" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter fti.1" expl="1. postcondition" expanded="true">
+  <goal name="VC fti.1" expl="1. postcondition" expanded="true">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.01"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter fti.2" expl="2. postcondition" expanded="true">
+  <goal name="VC fti.2" expl="2. postcondition" expanded="true">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="timeout" time="5.00"/></proof>
   <proof prover="2"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="WP_parameter fti.3" expl="3. postcondition">
+  <goal name="VC fti.3" expl="3. postcondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="0.03" steps="73"/></proof>
