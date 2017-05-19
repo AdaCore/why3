@@ -208,7 +208,7 @@ module NQueens63
     requires { n >= 0 }
     ensures  { true }
   =
-     let solutions = ref (P.zero ()) in
+     let solutions = ref P.zero in
      let board = Array63.make n (of_int 0) in
      count_bt_queens solutions board n (of_int 0);
      !solutions
