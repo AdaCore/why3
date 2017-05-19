@@ -1237,6 +1237,13 @@ let load_option attr g =
 
 let load_ident elt =
   let name = string_attribute "name" elt in
+  (* temporary hack to update sessions from WhyML 0.8x *)
+  let name =
+    if String.length name >= 13 &&
+         String.sub name 0 13 = "WP_parameter " then
+      "VC " ^ String.sub name 13 (String.length name - 13)
+    else name
+  in
   let label = List.fold_left
     (fun acc label ->
       match label with
