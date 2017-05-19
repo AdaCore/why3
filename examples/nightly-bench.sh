@@ -18,7 +18,7 @@ DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
 DATE=`date --utc +%Y-%m-%d`
 
-SUBJECT="Why3 nightly bench:"
+SUBJECT="Why3 NEW SYSTEM nightly bench:"
 
 notify() {
     if test "$REPORTBYMAIL" == "no"; then
@@ -131,7 +131,8 @@ if test "$?" != "0" ; then
     echo "Make bench FAILED" >> $REPORT
     cat $OUT >> $REPORT
     SUBJECT="$SUBJECT make bench failed"
-    notify
+    # we do not notify yet, we try the examples also
+    # notify
 else
     echo "Make bench succeeded. " >> $REPORT
 fi
