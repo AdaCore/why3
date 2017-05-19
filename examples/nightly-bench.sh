@@ -11,7 +11,7 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/../why3-reports
+REPORTDIR=$PWD/../why3-new-reports
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
