@@ -21,29 +21,31 @@ Existing Instance tree_WhyType.
 (* Why3 assumption *)
 Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
-  | Leaf => (cons d nil)
-  | (Node l r) => (List.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
+  | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
+  | (Node l r) => (Init.Datatypes.app (depths (d + 1%Z)%Z
+      l) (depths (d + 1%Z)%Z r))
   end.
 
 Axiom depths_head : forall (t:tree) (d:Z), match (depths d
   t) with
-  | (cons x _) => (d <= x)%Z
-  | nil => False
+  | (Init.Datatypes.cons x _) => (d <= x)%Z
+  | Init.Datatypes.nil => False
   end.
 
 Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
-  (s2:(list Z)), ((List.app (depths d t1) s1) = (List.app (depths d
-  t2) s2)) -> ((t1 = t2) /\ (s1 = s2)).
+  (s2:(list Z)), ((Init.Datatypes.app (depths d
+  t1) s1) = (Init.Datatypes.app (depths d t2) s2)) -> ((t1 = t2) /\
+  (s1 = s2)).
 
 Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z))
-  (s2:(list Z)), ((List.app (depths d1 t) s1) = (List.app (depths d2
-  t) s2)) -> (d1 = d2).
+  (s2:(list Z)), ((Init.Datatypes.app (depths d1
+  t) s1) = (Init.Datatypes.app (depths d2 t) s2)) -> (d1 = d2).
 
 Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
   t) = (depths d2 t)) -> (d1 = d2).
 
 Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z)
-  (s1:(list Z)), ((List.app (depths d1 t1) s1) = (depths d2 t2)) ->
+  (s1:(list Z)), ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) ->
   (d2 <= d1)%Z.
 
 Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
@@ -57,8 +59,8 @@ Definition lex (x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type): Prop :=
       | (s2, d2) => ((list.Length.length s1) < (list.Length.length s2))%Z \/
           (((list.Length.length s1) = (list.Length.length s2)) /\ match (s1,
           s2) with
-          | ((cons h1 _), (cons h2 _)) => ((d2 < d1)%Z /\ (d1 <= h1)%Z) /\
-              (h1 = h2)
+          | ((Init.Datatypes.cons h1 _), (Init.Datatypes.cons h2 _)) =>
+              (d2 < d1)%Z /\ ((d1 <= h1)%Z /\ (h1 = h2))
           | _ => False
           end)
       end
@@ -76,9 +78,9 @@ Qed.
 
 
 (* Why3 goal *)
-Theorem WP_parameter_harness2 : forall (result:tree), ~ ((depths 0%Z
-  result) = (cons 1%Z (cons 3%Z (cons 2%Z (cons 2%Z nil))))).
-(* Why3 intros result. *)
+Theorem VC_harness2 : forall (result:tree), ~ ((depths 0%Z
+  result) = (Init.Datatypes.cons 1%Z (Init.Datatypes.cons 3%Z (Init.Datatypes.cons 2%Z (Init.Datatypes.cons 2%Z Init.Datatypes.nil))))).
+
 intuition.
 destruct result; simpl in H.
 discriminate H.
@@ -127,5 +129,4 @@ do 4 (rewrite Append.Append_length).
 omega.
 
 Qed.
-
 
