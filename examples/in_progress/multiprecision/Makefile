@@ -30,10 +30,10 @@ data: alltests
 	./gmpdivbench > bench/gmpdiv
 
 plots: data
-	./divplot
-	./divrelative
-	./mulrelative
-	./addrelative
+	./divplot &
+	./divrelative &
+	./mulrelative &
+	./addrelative &
 
 check-gmp:
 ifndef GMP_DIR

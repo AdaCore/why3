@@ -95,7 +95,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 10000; ++i)
+            for (int i = 0; i != 100000; ++i)
               {
 #endif
 
@@ -160,7 +160,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 1000; ++i)
+            for (int i = 0; i != 10000; ++i)
               {
 #endif
 
@@ -216,7 +216,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 1000; ++i)
+            for (int i = 0; i != 10000; ++i)
               {
 #endif
 
