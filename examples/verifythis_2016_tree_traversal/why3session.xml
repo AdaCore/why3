@@ -3,17 +3,13 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="CVC4" version="1.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2016_tree_traversal.mlw" expanded="true">
+<file name="../verifythis_2016_tree_traversal.mlw">
 <theory name="Memory" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="TreeShape" sum="daaf44a61b4bc5177e4ee0166732d9ed">
  <goal name="VC ext_set" expl="VC for ext_set">
- <proof prover="4"><result status="valid" time="0.76" steps="1107"/></proof>
+ <proof prover="4"><result status="valid" time="1.23" steps="1112"/></proof>
  </goal>
  <goal name="VC ext_cur" expl="VC for ext_cur">
  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
@@ -22,12 +18,11 @@
  <proof prover="4"><result status="valid" time="0.03" steps="267"/></proof>
  </goal>
  <goal name="VC not_below" expl="VC for not_below">
- <proof prover="4"><result status="valid" time="1.64" steps="8504"/></proof>
+ <proof prover="4"><result status="valid" time="2.76" steps="8496"/></proof>
  </goal>
 </theory>
 <theory name="Recursive" sum="bcc287160a9626e39f38a472515e0288">
  <goal name="VC markTree" expl="VC for markTree">
- <proof prover="4"><result status="timeout" time="4.99"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC markTree.1" expl="1. exceptional postcondition">
   <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
@@ -115,7 +110,6 @@
   </goal>
   <goal name="VC markTree.29" expl="29. postcondition">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
-  <proof prover="4"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC markTree.30" expl="30. precondition">
   <proof prover="4"><result status="valid" time="0.02" steps="84"/></proof>
@@ -166,7 +160,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="462"/></proof>
   </goal>
   <goal name="VC markTree.46" expl="46. postcondition">
-  <proof prover="4"><result status="valid" time="0.63" steps="1798"/></proof>
+  <proof prover="4"><result status="valid" time="0.93" steps="1798"/></proof>
   </goal>
   <goal name="VC markTree.47" expl="47. postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="36"/></proof>
@@ -246,7 +240,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Iterative" sum="742450e844cfeecccdbe31b7a296c0f4" expanded="true">
+<theory name="Iterative" sum="9280666ae503194a95905a10848c39e7">
  <goal name="VC stack_size_pos" expl="VC for stack_size_pos">
  <proof prover="4"><result status="valid" time="0.07" steps="162"/></proof>
  </goal>
@@ -254,11 +248,10 @@
  <proof prover="4"><result status="valid" time="0.03" steps="90"/></proof>
  </goal>
  <goal name="VC closing" expl="VC for closing">
- <proof prover="4"><result status="valid" time="0.28" steps="622"/></proof>
+ <proof prover="4"><result status="valid" time="0.53" steps="622"/></proof>
  </goal>
- <goal name="VC continuing" expl="VC for continuing" expanded="true">
- <proof prover="4"><result status="timeout" time="5.00"/></proof>
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC continuing" expl="VC for continuing">
+ <transf name="split_goal_wp">
   <goal name="VC continuing.1" expl="1. unreachable point">
   <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
@@ -266,21 +259,16 @@
   <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC continuing.3" expl="3. precondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="78"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
-  <goal name="VC continuing.4" expl="4. assertion" expanded="true">
-  <proof prover="2" timelimit="15"><undone/></proof>
-  <proof prover="3"><undone/></proof>
-  <proof prover="4"><result status="timeout" time="4.99"/></proof>
-  <proof prover="5"><undone/></proof>
-  <proof prover="6"><undone/></proof>
-  <proof prover="7"><result status="highfailure" time="0.02"/></proof>
+  <goal name="VC continuing.4" expl="4. assertion">
+  <proof prover="4" timelimit="1"><result status="valid" time="0.10" steps="292"/></proof>
   </goal>
   <goal name="VC continuing.5" expl="5. precondition">
   <proof prover="4"><result status="valid" time="0.03" steps="52"/></proof>
   </goal>
   <goal name="VC continuing.6" expl="6. precondition">
-  <proof prover="4"><result status="valid" time="0.33" steps="922"/></proof>
+  <proof prover="4"><result status="valid" time="0.30" steps="922"/></proof>
   </goal>
   <goal name="VC continuing.7" expl="7. postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="19"/></proof>
@@ -289,7 +277,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="VC continuing.9" expl="9. precondition">
-  <proof prover="4"><result status="valid" time="0.25" steps="447"/></proof>
+  <proof prover="4"><result status="valid" time="0.43" steps="447"/></proof>
   </goal>
   <goal name="VC continuing.10" expl="10. precondition">
   <proof prover="4"><result status="valid" time="0.02" steps="14"/></proof>
@@ -313,7 +301,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="65"/></proof>
   </goal>
   <goal name="VC continuing.17" expl="17. precondition">
-  <proof prover="4"><result status="valid" time="0.33" steps="439"/></proof>
+  <proof prover="4"><result status="valid" time="0.52" steps="439"/></proof>
   </goal>
   <goal name="VC continuing.18" expl="18. precondition">
   <proof prover="4"><result status="valid" time="0.02" steps="15"/></proof>
@@ -322,13 +310,13 @@
   <proof prover="4"><result status="valid" time="0.07" steps="170"/></proof>
   </goal>
   <goal name="VC continuing.20" expl="20. precondition">
-  <proof prover="4"><result status="valid" time="0.40" steps="1037"/></proof>
+  <proof prover="4"><result status="valid" time="0.70" steps="1037"/></proof>
   </goal>
   <goal name="VC continuing.21" expl="21. precondition">
-  <proof prover="4"><result status="valid" time="0.17" steps="342"/></proof>
+  <proof prover="4"><result status="valid" time="0.34" steps="342"/></proof>
   </goal>
   <goal name="VC continuing.22" expl="22. precondition">
-  <proof prover="4"><result status="valid" time="0.18" steps="347"/></proof>
+  <proof prover="4"><result status="valid" time="0.30" steps="347"/></proof>
   </goal>
   <goal name="VC continuing.23" expl="23. postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
@@ -337,13 +325,13 @@
   <proof prover="4"><result status="valid" time="0.04" steps="57"/></proof>
   </goal>
   <goal name="VC continuing.25" expl="25. assertion">
-  <proof prover="4"><result status="valid" time="0.72" steps="1292"/></proof>
+  <proof prover="4"><result status="valid" time="1.14" steps="1292"/></proof>
   </goal>
   <goal name="VC continuing.26" expl="26. precondition">
   <proof prover="4"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
   <goal name="VC continuing.27" expl="27. precondition">
-  <proof prover="4"><result status="valid" time="1.31" steps="2528"/></proof>
+  <proof prover="4"><result status="valid" time="1.99" steps="2528"/></proof>
   </goal>
   <goal name="VC continuing.28" expl="28. postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="18"/></proof>
@@ -360,7 +348,7 @@
  </transf>
  </goal>
  <goal name="VC markTree" expl="VC for markTree">
- <proof prover="4"><result status="valid" time="2.26" steps="2611"/></proof>
+ <proof prover="4"><result status="valid" time="2.74" steps="2713"/></proof>
  </goal>
 </theory>
 </file>
