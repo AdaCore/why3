@@ -40,16 +40,8 @@ module MatrixMultiplication
      done;
    done
 
-  function mdl (m: matrix 'a) : mat 'a =
-    create m.rows m.columns (fun i j -> get m i j)
-
-  (*** Very technical: Why3 refuses calls to logic functions
-    in programs when the function signature contains impure types
-    (e.g like matrix 'a). However, this is safe for the particular
-    case of functions that project an impure type to a pure one, so we
-    assume it is possible. *)
-  val ghost mdl (m:matrix 'a) : mat 'a
-    ensures { result = mdl m }
+  let ghost function mdl (m: matrix 'a) : mat {'a} =
+    create m.rows m.columns m.elts
 
   type with_symb = {
     phy : matrix int;
@@ -77,8 +69,8 @@ module MatrixMultiplication
     requires { 0 <= c <= c + dc <= a.mdl.F.cols }
     ensures { let rm = result.phy.mdl in
       rm = block a.mdl r dr c dc /\ rm.F.rows = dr /\ rm.F.cols = dc }
-    ensures { result.sym ---> symb_mat result.phy.mdl (old env.ev_c) }
-    ensures { env.ev_f --> old (extends env.ev_f env.ev_c result.phy.mdl) }
+    ensures { result.sym --> symb_mat result.phy.mdl (old env.ev_c) }
+    ensures { env.ev_f --> extends (old env.ev_f) (old env.ev_c) result.phy.mdl }
     ensures { env.ev_c --> old env.ev_c + 1 }
     ensures { with_symb_vld env result }
   = let m = block a r dr c dc in
@@ -109,7 +101,7 @@ module MatrixMultiplication
     requires { a.phy.mdl === b.phy.mdl }
     requires { with_symb_vld env a /\ with_symb_vld env b }
     ensures { result.phy.mdl = add a.phy.mdl b.phy.mdl }
-    ensures { result.sym ---> symb_add a.sym b.sym }
+    ensures { result.sym --> symb_add a.sym b.sym }
     ensures { with_symb_vld env result }
   = { phy = add a.phy b.phy;
       sym = ghost symb_add env a.sym b.sym }
@@ -138,7 +130,7 @@ module MatrixMultiplication
     requires { a.phy.mdl === b.phy.mdl }
     requires { with_symb_vld env a /\ with_symb_vld env b }
     ensures { result.phy.mdl = sub a.phy.mdl b.phy.mdl }
-    ensures { result.sym ---> symb_sub a.sym b.sym }
+    ensures { result.sym --> symb_sub a.sym b.sym }
     ensures { with_symb_vld env result }
   = { phy = sub a.phy b.phy;
       sym = ghost symb_sub env a.sym b.sym }
@@ -169,7 +161,7 @@ module MatrixMultiplication
           invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\
                         (i0 <> i \/ j0 <> j) ->
                            rs.elts[i0][j0] = (rs at I).elts[i0][j0] }
-          invariant { rs.elts[i][j] = sum 0 k (mul_atom a.mdl b.mdl i j) }
+          invariant { rs.elts[i][j] = sum (mul_atom a.mdl b.mdl i j) 0 k }
           set rs i j (get rs i j + get a i k * get b k j)
         done
       done;
@@ -196,14 +188,14 @@ module MatrixMultiplication
         invariant { forall i0 j0. 0 <= i0 < r /\ 0 <= j0 < c /\ i0 <> i ->
                       rs.elts[i0][j0] = (rs at M).elts[i0][j0] }
         invariant { forall j0. 0 <= j0 < c ->
-                      rs.elts[i][j0] = sum 0 k (mul_atom a.mdl b.mdl i j0) }
+                      rs.elts[i][j0] = sum (mul_atom a.mdl b.mdl i j0) 0 k }
         label I in
         for j = 0 to c - 1 do
           invariant { forall i0 j0.
             0 <= i0 < r /\ 0 <= j0 < c /\ (i0 <> i \/ j0 >= j) ->
               rs.elts[i0][j0] = (rs at I).elts[i0][j0] }
           invariant { forall j0. 0 <= j0 < j ->
-              rs.elts[i][j0] = sum 0 (k+1) (mul_atom a.mdl b.mdl i j0) }
+              rs.elts[i][j0] = sum (mul_atom a.mdl b.mdl i j0) 0 (k+1) }
           set rs i j (get rs i j + get a i k * get b k j)
         done;
       done;
@@ -319,7 +311,7 @@ module MatrixMultiplication
           requires { b.phy.mdl.F.rows = qm /\ b.phy.mdl.F.cols = qc }
           ensures { with_symb_vld e result }
           ensures { result.phy.mdl = mul a.phy.mdl b.phy.mdl }
-          ensures { result.sym ---> symb_mul a.sym b.sym }
+          ensures { result.sym --> symb_mul a.sym b.sym }
         = let ghost flag = if qr = 1 || qm = 1 || qc = 1 then 0 else 1 in
           let r = strassen a.phy b.phy flag in
           { phy = r; sym = ghost symb_mul e a.sym b.sym }
