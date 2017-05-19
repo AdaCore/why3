@@ -4,15 +4,10 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Yices" version="1.0.38" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tree_height.mlw" expanded="true">
-<theory name="HeightCPS" sum="56143ea961123bc30fc2b184c2952c02" expanded="true">
+<theory name="HeightCPS" sum="1596efb5a30759311de415509f281b2a" expanded="true">
  <goal name="VC height_cps" expl="VC for height_cps">
  <proof prover="6"><result status="valid" time="0.00" steps="26"/></proof>
  </goal>
@@ -20,46 +15,11 @@
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="height_cps_correct" expanded="true">
- <transf name="induction_ty_lex" expanded="true">
-  <goal name="height_cps_correct.1" expl="1." expanded="true">
-  <proof prover="0"><result status="unknown" time="0.00"/></proof>
-  <proof prover="1"><result status="unknown" time="0.01"/></proof>
-  <proof prover="2"><result status="unknown" time="0.02"/></proof>
-  <proof prover="3" timelimit="5"><internalfailure reason="Why3.Printer.UnknownPrinter(&quot;tptp-fof&quot;)"/></proof>
-  <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="unknown" time="0.01"/></proof>
-  <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00"/></proof>
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="height_cps_correct.1.1" expl="1." expanded="true">
-   <transf name="compute_in_goal" expanded="true">
-    <goal name="height_cps_correct.1.1.1" expl="1." expanded="true">
-    <proof prover="1"><result status="unknown" time="0.02"/></proof>
-    <proof prover="2"><result status="unknown" time="0.35"/></proof>
-    <proof prover="3" timelimit="5"><internalfailure reason="Why3.Printer.UnknownPrinter(&quot;tptp-fof&quot;)"/></proof>
-    <proof prover="5"><result status="timeout" time="5.00"/></proof>
-    <proof prover="6"><result status="timeout" time="5.01"/></proof>
-    <proof prover="7"><result status="unknown" time="1.91"/></proof>
-    <proof prover="8"><result status="timeout" time="5.00"/></proof>
-    </goal>
-   </transf>
-   </goal>
-   <goal name="height_cps_correct.1.2" expl="2." expanded="true">
-   <transf name="compute_in_goal" expanded="true">
-    <goal name="height_cps_correct.1.2.1" expl="1.">
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
- </transf>
  </goal>
  <goal name="height1_correct" expanded="true">
- <proof prover="0"><result status="unknown" time="0.01"/></proof>
- <proof prover="6"><result status="unknown" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Iteration" sum="d6b56da2821d62a146b19c957c33171b">
+<theory name="Iteration" sum="afade23b6e0721562d822b490670f598" expanded="true">
  <goal name="VC is_id" expl="VC for is_id">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -76,29 +36,121 @@
  <goal name="helper1">
  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="sizew_nonneg">
- <proof prover="3"><internalfailure reason="Why3.Printer.UnknownPrinter(&quot;tptp-fof&quot;)"/></proof>
- <proof prover="6"><result status="unknown" time="0.01"/></proof>
+ <goal name="sizew_nonneg" expanded="true">
  </goal>
  <goal name="VC height1" expl="VC for height1">
- <proof prover="6"><result status="unknown" time="0.23"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="VC height1.1" expl="1. loop invariant init">
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC height1.2" expl="2. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.00" steps="13"/></proof>
+  </goal>
+  <goal name="VC height1.3" expl="3. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC height1.4" expl="4. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC height1.5" expl="5. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC height1.6" expl="6. unreachable point">
+  <proof prover="6"><result status="valid" time="0.01" steps="33"/></proof>
+  </goal>
+  <goal name="VC height1.7" expl="7. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC height1.8" expl="8. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="VC height1.9" expl="9. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC height1.10" expl="10. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+  <goal name="VC height1.11" expl="11. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC height1.12" expl="12. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="31"/></proof>
+  </goal>
+  <goal name="VC height1.13" expl="13. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC height1.14" expl="14. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="30"/></proof>
+  </goal>
+  <goal name="VC height1.15" expl="15. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC height1.16" expl="16. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="41"/></proof>
+  </goal>
+  <goal name="VC height1.17" expl="17. loop variant decrease">
+  <proof prover="6"><result status="valid" time="0.00" steps="14"/></proof>
+  </goal>
+  <goal name="VC height1.18" expl="18. loop invariant preservation">
+  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC height1.19" expl="19. unreachable point">
+  <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC height1.20" expl="20. postcondition">
+  <transf name="inline_all">
+   <goal name="VC height1.20.1" expl="1. postcondition">
+   <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
-<theory name="HeightStack" sum="16545e1df7b824b57b76b29138cbebef">
+<theory name="HeightStack" sum="664e0716691fa3052904de966df117f7">
  <goal name="sizes_nonneg">
  <transf name="induction_ty_lex">
   <goal name="sizes_nonneg.1" expl="1.">
-  <proof prover="3"><internalfailure reason="Why3.Printer.UnknownPrinter(&quot;tptp-fof&quot;)"/></proof>
-  <proof prover="4" obsolete="true"><result status="valid" time="0.23"/></proof>
-  <proof prover="6"><result status="unknown" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.23"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC height_stack" expl="VC for height_stack">
- <proof prover="6"><result status="timeout" time="5.02"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="VC height_stack.1" expl="1. variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="36"/></proof>
+  </goal>
+  <goal name="VC height_stack.2" expl="2. precondition">
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC height_stack.3" expl="3. variant decrease">
+  <proof prover="6"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="VC height_stack.4" expl="4. precondition">
+  <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC height_stack.5" expl="5. postcondition">
+  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC height_stack.6" expl="6. postcondition">
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="6"><result status="timeout" time="4.96"/></proof>
+  </goal>
+  <goal name="VC height_stack.7" expl="7. postcondition">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="6"><result status="timeout" time="4.95"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="VC height1" expl="VC for height1">
- <proof prover="6"><result status="unknown" time="0.03"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="VC height1.1" expl="1. precondition">
+  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
+  </goal>
+  <goal name="VC height1.2" expl="2. postcondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>
