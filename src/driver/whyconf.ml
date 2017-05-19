@@ -750,6 +750,8 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_prover_config config prover =
+  Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
 let get_policies config = config.provers_upgrade_policy
 let get_prover_upgrade_policy config p =
