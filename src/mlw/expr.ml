@@ -571,15 +571,13 @@ let rec raw_of_expr prop e = match e.e_node with
       pure_of_expr prop e
   | Eif (e0,e1,e2) when is_e_false e1 && is_e_true e2 ->
       t_not (pure_of_expr true e0)
-  | Eif (e0,e1,e2) when is_e_false e2 ->
+  | Eif (e0,e1,e2) when prop && is_e_false e2 ->
       t_and (pure_of_expr true e0) (pure_of_expr true e1)
-  | Eif (e0,e1,e2) when is_e_true e1 ->
+  | Eif (e0,e1,e2) when prop && is_e_true e1 ->
       t_or (pure_of_expr true e0) (pure_of_expr true e2)
   | Eif (e0,e1,e2) ->
-      let prop = prop || ity_equal e.e_ity ity_bool in
       t_if (pure_of_expr true e0) (pure_of_expr prop e1) (pure_of_expr prop e2)
   | Ecase (d,bl) ->
-      let prop = prop || ity_equal e.e_ity ity_bool in
       let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
       t_case (pure_of_expr false d) (List.map conv bl)
   | Etry _ | Eraise _ | Eabsurd -> raise Exit
