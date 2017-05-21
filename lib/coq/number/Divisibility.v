@@ -22,12 +22,21 @@ Require number.Parity.
 (* Hack so that Why3 does not override the notation below.
 
 (* Why3 assumption *)
-Definition divides (d:Z) (n:Z): Prop := exists q:Z, (n = (q * d)%Z).
+Definition divides (d:Z) (n:Z): Prop := ((d = 0%Z) -> (n = 0%Z)) /\
+  ((~ (d = 0%Z)) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
 
 *)
 
 Require Import Znumtheory.
 Notation divides := Zdivide (only parsing).
+
+(* Why3 goal *)
+Lemma divides_spec : forall (d:Z) (n:Z), (divides d n) <-> exists q:Z,
+  (n = (q * d)%Z).
+Proof.
+intros d n.
+easy.
+Qed.
 
 (* Why3 goal *)
 Lemma divides_refl : forall (n:Z), (divides n n).

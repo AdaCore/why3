@@ -18,9 +18,6 @@ Require int.Abs.
 Require int.ComputerDivision.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-(* Why3 assumption *)
 Definition even (n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
 
 (* Why3 assumption *)

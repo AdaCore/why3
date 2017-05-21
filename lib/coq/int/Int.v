@@ -15,22 +15,27 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 comment *)
+(* prefix_mn is replaced with (-x)%Z by the coq driver *)
+
+(* Why3 comment *)
+(* infix_pl is replaced with (x + x1)%Z by the coq driver *)
+
+(* Why3 comment *)
+(* infix_as is replaced with (x * x1)%Z by the coq driver *)
+
+(* Why3 comment *)
 (* infix_ls is replaced with (x < x1)%Z by the coq driver *)
+
+(* Why3 goal *)
+Lemma infix_mn_def : forall (x:Z) (y:Z), ((x - y)%Z = (x + (-y)%Z)%Z).
+reflexivity.
+Qed.
 
 (* Why3 goal *)
 Lemma infix_lseq_def : forall (x:Z) (y:Z), (x <= y)%Z <-> ((x < y)%Z \/
   (x = y)).
 exact Zle_lt_or_eq_iff.
 Qed.
-
-(* Why3 comment *)
-(* infix_pl is replaced with (x + x1)%Z by the coq driver *)
-
-(* Why3 comment *)
-(* prefix_mn is replaced with (-x)%Z by the coq driver *)
-
-(* Why3 comment *)
-(* infix_as is replaced with (x * x1)%Z by the coq driver *)
 
 (* Why3 goal *)
 Lemma Assoc : forall (x:Z) (y:Z) (z:Z),
@@ -94,11 +99,6 @@ Lemma Mul_distr_r : forall (x:Z) (y:Z) (z:Z),
 Proof.
 intros x y z.
 apply Zmult_plus_distr_l.
-Qed.
-
-(* Why3 goal *)
-Lemma infix_mn_def : forall (x:Z) (y:Z), ((x - y)%Z = (x + (-y)%Z)%Z).
-reflexivity.
 Qed.
 
 (* Why3 goal *)
