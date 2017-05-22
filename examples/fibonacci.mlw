@@ -301,12 +301,19 @@ module FibonacciLogarithmic
   = if n = 0 then
       (1, 0)
     else begin
+      assert { 0 <= div n 2 };
       let a, b = logfib (div n 2) in
       let c = a + b in
       if mod n 2 = 0 then
-        (a*a + b*b, b*(a + c))
+        begin
+        assert { 2 * (div n 2) = (div n 2) + (div n 2) };
+        (a*a+ b*b, b*(a + c))
+        end
       else
+        begin
+        assert { 2 * (div n 2) + 1 = (div n 2) + (div n 2) + 1 };
         (b*(a + c), c*c + b*b)
+        end
     end
 
   (* by induction, we easily prove that
