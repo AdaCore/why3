@@ -111,8 +111,10 @@ let expl_type_inv  = Ident.create_label "expl:type invariant"
 let lab_has_expl lab =
   Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
 
+let annot_labels = Slab.add stop_split (Slab.singleton annot_label)
+
 let vc_expl loc lab expl f =
-  let lab = Slab.add stop_split (Slab.union lab f.t_label) in
+  let lab = Slab.union annot_labels (Slab.union lab f.t_label) in
   let lab = if lab_has_expl lab then lab else Slab.add expl lab in
   t_label ?loc:(if loc = None then f.t_loc else loc) lab f
 
@@ -148,7 +150,7 @@ let sp_case t bl =
   if List.for_all isfalse bl then t_false else add_case (t_case t bl)
 
 let can_simp wp = match wp.t_node with
-  | Ttrue -> not (Slab.mem stop_split wp.t_label)
+  | Ttrue -> not (Slab.mem annot_label wp.t_label)
   | _ -> false
 
 let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
@@ -270,7 +272,8 @@ let wp_of_post expl ity ql =
 
 let push_stop loc lab expl f =
   let rec push f = match f.t_node with
-    | Tbinop (Tand,g,h) when not (Slab.mem stop_split f.t_label) ->
+    | Tbinop (Tand,g,h)
+      when not (Slab.mem annot_label f.t_label) ->
         t_label_copy f (t_and (push g) (push h))
     | _ -> vc_expl loc lab expl f in
   push f

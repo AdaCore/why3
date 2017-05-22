@@ -676,7 +676,7 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let t2, c2 = cap_of_term kn uf pins caps t2 in
       let f = t_label_copy f (t_equ t1 t2) in
       cap_equality kn uf pins f t1 c1 t2 c2
-  | _ when Slab.mem stop_split f.t_label ->
+  | _ when Slab.mem annot_label f.t_label ->
       fst (cap_of_term kn uf pins caps f), uf
   | Tapp _ ->
       fst (cap_of_term kn uf pins caps f), uf

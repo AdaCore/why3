@@ -1241,6 +1241,8 @@ let clone_post_result q = match q.t_node with
   | Teps bf -> t_clone_bound_id bf
   | _ -> invalid_arg "Ity.clone_post_result"
 
+let annot_label = Ident.create_label "vc:annotation"
+
 type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
