@@ -404,6 +404,8 @@ val clone_post_result : post -> preid
 
 val create_post : vsymbol -> term -> post
 
+val annot_label : label
+
 type cty = private {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
