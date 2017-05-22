@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-OBJ=euler001__Euler001
+OBJ=euler001
 
 ML  = $(addsuffix .ml, $(OBJ))
 CMO = $(addsuffix .cmo, $(OBJ))
@@ -45,7 +45,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(ML): ../euler001.mlw
-	$(WHY3) extract -D ocaml32 ../euler001.mlw -o .
+	$(WHY3) extract -D ocaml64 $< -o $@
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
@@ -59,4 +59,3 @@ $(ML): ../euler001.mlw
 clean::
 	rm -f $(ML) *.cm[xio] *.o *.annot $(MAIN).opt $(MAIN).byte
 	rm -f why3__*.ml* euler001__*.ml* int__*.ml*
-
