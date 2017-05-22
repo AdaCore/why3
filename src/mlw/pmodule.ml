@@ -803,13 +803,6 @@ let sm_save_olds sm c c' =
   let add_old o n sm = sm_save_pv sm o (Mpv.find (sm_find_pv sm n) revs) in
   Mpv.fold add_old c.cty_oldies sm
 
-let rs_kind s = match s.rs_logic with
-  | RLnone -> RKnone
-  | RLpv _ -> RKlocal
-  | RLls { ls_value = None } -> RKpred
-  | RLls _ -> RKfunc
-  | RLlemma -> RKlemma
-
 let clone_ppat cl sm pp mask =
   let rec conv_pat p = match p.pat_node with
     | Term.Pwild -> PPwild

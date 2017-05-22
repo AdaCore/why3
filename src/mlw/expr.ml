@@ -65,6 +65,12 @@ type rs_kind =
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
 
+let rs_kind s = match s.rs_logic with
+  | RLnone  -> RKnone
+  | RLpv _  -> RKlocal
+  | RLls ls -> if ls.ls_value = None then RKpred else RKfunc
+  | RLlemma -> RKlemma
+
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
 
 let check_effects ?loc c =
@@ -539,6 +545,13 @@ let rec pure_of_post prop v h = match h.t_node with
       t, t_label_copy h (t_and_simp f g)
   | _ -> raise Exit
 
+let pure_of_post prop v h = match v.vs_ty.ty_node, h.t_node with
+  | Tyapp (ts,_), Tquant (Tforall,_) when ts_equal ts ts_func ->
+      let t = t_label_copy h (t_eps_close v h) in
+      if not (t_is_lambda t) then raise Exit else
+      (if prop then fmla_of_term t else t), t_true
+  | _ -> pure_of_post prop v h
+
 let term_of_post ~prop v h =
   try Some (pure_of_post prop v h) with Exit -> None
 
@@ -600,6 +613,10 @@ let post_of_term res t =
   | Some _, None   -> loca (t_iff_simp (f_of_t res) t)
   | None,   Some _ -> loca (t_iff_simp res (f_of_t t))
 
+let post_of_term res t = match t.t_node with
+  | Teps bf when t_is_lambda t -> t_open_bound_with res bf
+  | _ -> post_of_term res t
+
 let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
@@ -646,6 +663,20 @@ let local_post_of_expr e =
       [create_post res (post_of_term (t_var res) t)] with Exit ->
   try [create_post res (post_of_expr (t_var res) e)] with Exit -> []
 
+(* we do not compute implicit post-conditions for let-functions,
+    as this would be equivalent to auto-inlining of the generated
+    logical function definition. FIXME: Should we make exception
+    for local let-functions? We do have a mapping definition in
+    the antecedents of WP, but provers must perform beta-reduction
+    to apply it: auto-inlining might be really helpful here. *)
+let c_cty_enrich ghost kind c =
+  let cty = c_cty_ghostify ghost c in
+  match c with
+  | {c_node = Cfun e; c_cty = {cty_post = []}}
+    when (kind = RKnone (*|| kind = RKlocal*)) ->
+      cty_add_post cty (local_post_of_expr e)
+  | _ -> cty
+
 let post_of_expr res e =
   ty_equal_check (ty_of_ity e.e_ity)
     (match res.t_ty with Some ty -> ty | None -> ty_bool);
@@ -668,18 +699,7 @@ let let_var id ?(ghost=false) e =
   LDvar (v,e), v
 
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
-  let cty = c_cty_ghostify ghost c in
-  (* we do not compute implicit post-conditions for let-functions,
-     as this would be equivalent to auto-inlining of the generated
-     logical function definition. FIXME: Should we make exception
-     for local let-functions? We do have a mapping definition in
-     the antecedents of WP, but provers must perform beta-reduction
-     to apply it: auto-inlining might be really helpful here. *)
-  let cty = match c with
-    | {c_node = Cfun e; c_cty = {cty_post = []}}
-      when (kind = RKnone (*|| kind = RKlocal*)) ->
-        cty_add_post cty (local_post_of_expr e)
-    | _ -> cty in
+  let cty = c_cty_enrich ghost kind c in
   let s = create_rsymbol id ~kind cty in
   LDsym (s,c), s
 
@@ -708,10 +728,7 @@ let e_let ld e =
 (* callable expressions *)
 
 let e_exec c =
-  let cty = match c with
-    | {c_node = Cfun e; c_cty = {cty_post = []} as cty} ->
-        cty_exec (cty_add_post cty (local_post_of_expr e))
-    | _ -> cty_exec c.c_cty in
+  let cty = cty_exec (c_cty_enrich false RKnone c) in
   mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask cty.cty_effect
 
 let c_any c = mk_cexp Cany c
@@ -965,14 +982,15 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Elet (LDvar (v,d),e) ->
       let d = e_rs_subst sm d in
       ity_equal_check d.e_ity v.pv_ity;
-      if mask_ghost d.e_mask && not v.pv_ghost then Loc.errorm
-        "Expr.let_rec: ghost status mismatch";
+      if mask_ghost d.e_mask && not v.pv_ghost then
+        Loc.errorm "Expr.let_rec: ghost status mismatch";
       e_let (LDvar (v,d)) (e_rs_subst sm e)
   | Elet (LDsym (s,d),e) ->
       let d = c_rs_subst sm d in
-      if c_ghost d && not (rs_ghost s) then Loc.errorm
-        "Expr.let_rec: ghost status mismatch";
-      let ns = rs_dup s d.c_cty in
+      if c_ghost d && not (rs_ghost s) then
+        Loc.errorm "Expr.let_rec: ghost status mismatch";
+      let cty = c_cty_enrich (rs_ghost s) (rs_kind s) d in
+      let ns = rs_dup s cty in
       e_let (LDsym (ns,d)) (e_rs_subst (Mrs.add s ns sm) e)
   | Elet (LDrec fdl,e) ->
       let ndl = List.map (fun fd ->
