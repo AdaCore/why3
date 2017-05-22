@@ -2,6 +2,14 @@ open Stdlib
 
 type variable = string
 
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
+
 type array =
   | Const of term
   | Store of array * term * term
@@ -9,6 +17,7 @@ type array =
 and term =
   | Integer of string
   | Decimal of (string * string)
+  | Float of float_type
   | Other of string
   | Array of array
   | Bitvector of string
@@ -31,6 +40,15 @@ type definition =
    associated definition (complex stuff) *)
 type correspondence_table = (bool * definition) Mstr.t
 
+let print_float fmt f =
+  match f with
+  | Plus_infinity -> Format.fprintf fmt "Plus_infinity"
+  | Minus_infinity -> Format.fprintf fmt "Minus_infinity"
+  | Plus_zero -> Format.fprintf fmt "Plus_zero"
+  | Minus_zero -> Format.fprintf fmt "Minus_zero"
+  | Not_a_number -> Format.fprintf fmt "NaN"
+  | Float_value (b, eb, sb) -> Format.fprintf fmt "(%s, %s, %s)" b eb sb
+
 let rec print_array fmt a =
   match a with
   | Const t -> Format.fprintf fmt "CONST : %a" print_term t
@@ -43,6 +61,7 @@ and print_term fmt t =
   match t with
   | Integer s -> Format.fprintf fmt "Integer: %s" s
   | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
+  | Float f -> Format.fprintf fmt "Float: %a" print_float f
   | Other s -> Format.fprintf fmt "Other: %s" s
   | Array a -> Format.fprintf fmt "Array: %a" print_array a
   | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv
@@ -113,7 +132,7 @@ and make_local vars_lists t =
     let t3 = make_local vars_lists t3 in
     let t4 = make_local vars_lists t4 in
     Ite (t1, t2, t3, t4)
-  | Integer _ | Decimal _ | Other _ -> t
+  | Integer _ | Decimal _ | Float _ | Other _ -> t
   | Bitvector _ -> t
   | Cvc4_Variable _ -> raise Bad_local_variable
   | Boolean _ -> t
@@ -148,7 +167,7 @@ let build_record_discr lgen =
 
 let rec subst var value t =
   match t with
-  | Integer _ | Decimal _ | Other _ | Bitvector _ | Boolean _ ->
+  | Integer _ | Decimal _ | Float _ | Other _ | Bitvector _ | Boolean _ ->
       t
   | Array a -> Array (subst_array var value a)
   | Cvc4_Variable _ -> raise Bad_local_variable

@@ -32,6 +32,8 @@
 %token ARRAY_LAMBDA
 %token TRUE FALSE
 %token LET
+%token AND LE GE NOT
+%token <Smt2_model_defs.float_type> FLOAT_VALUE
 %token <string> COMMENT
 %token <string> BITVECTOR_VALUE
 %token BITVECTOR_TYPE
@@ -93,6 +95,9 @@ smt_term:
 | array     { Smt2_model_defs.Array $1     }
 | bitvector { Smt2_model_defs.Bitvector $1 }
 | boolean   { Smt2_model_defs.Boolean $1   }
+(* z3 sometimes answer with boolean expressions for some reason ? *)
+| boolean_expression { Smt2_model_defs.Other "" }
+| FLOAT_VALUE { Smt2_model_defs.Float $1 }
 (* ite (= ?a ?b) ?c ?d *)
 | LPAREN ITE ps pair_equal ps smt_term ps smt_term RPAREN
     {  match $4 with
@@ -130,9 +135,16 @@ list_let:
 
 (* Condition of an if-then-else. We are only interested in equality case *)
 pair_equal:
+| LPAREN AND SPACE list_pair_equal RPAREN { None }
 | LPAREN EQUAL ps smt_term ps smt_term RPAREN { Some ($4, $6) }
 | application { None }
 | name { None }
+(* ITE containing boolean expressions cannot be dealt with for counterex *)
+| LPAREN NOT SPACE smt_term RPAREN { None }
+
+list_pair_equal:
+| { }
+| pair_equal ps list_pair_equal { }
 
 list_smt_term:
 | smt_term { [$1] }
@@ -174,6 +186,15 @@ name:
 | ATOM { $1 }
 (* Should not happen in relevant part of the model (ad hoc) *)
 | BITVECTOR_TYPE { "" }
+
+(* Z3 specific boolean expression. This should maybe be used in the future as
+   it may give some information on the counterexample. *)
+boolean_expression:
+| LPAREN ps FORALL SPACE LPAREN ps args_lists RPAREN ps smt_term ps RPAREN {  }
+| LPAREN NOT SPACE smt_term RPAREN { }
+| LPAREN LE SPACE smt_term SPACE smt_term RPAREN { }
+| LPAREN GE SPACE smt_term SPACE smt_term RPAREN { }
+| LPAREN AND ps list_smt_term RPAREN { }
 
 integer:
 | INT_STR { $1 }
