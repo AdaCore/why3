@@ -255,7 +255,7 @@ theory PowerInt
 
   clone export int.Exponentiation with
     type t = real, constant one = Real.one, function (*) = Real.(*),
-    goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r
 
   lemma Pow_ge_one:
     forall x:real, n:int. 0 <= n /\ 1.0 <=. x -> 1.0 <=. power x n
