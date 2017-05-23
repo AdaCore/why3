@@ -283,6 +283,7 @@ type command =
   | Transform    of string * Trans.gentrans * string list
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
+  | Edit         of Whyconf.config_prover
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -291,7 +292,10 @@ type command =
 let interp_others commands_table config cmd args =
   match parse_prover_name config cmd args with
   | Some (prover_config, limit) ->
-      Prove (prover_config, limit)
+      if prover_config.Whyconf.interactive then
+        Edit (prover_config)
+      else
+        Prove (prover_config, limit)
   | None ->
       match cmd with
       | "auto" ->

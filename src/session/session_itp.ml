@@ -263,6 +263,31 @@ let is_detached (s: session) (a: any) =
     let pn = get_proofNode s pn_id in
     pn.proofn_task = None
 
+let rec get_encapsulating_theory s any =
+  match any with
+  | AFile _f -> assert (false)
+  | ATh th -> th
+  | ATn tn ->
+      let pn_id = get_trans_parent s tn in
+      get_encapsulating_theory s (APn pn_id)
+  | APn pn ->
+      (match get_proof_parent s pn with
+      | Theory th -> th
+      | Trans tn -> get_encapsulating_theory s (ATn tn)
+      )
+  | APa pa ->
+      let pn = get_proof_attempt_parent s pa in
+      get_encapsulating_theory s (APn pn)
+
+let get_encapsulating_file s any =
+  match any with
+  | AFile f -> f
+  | ATh th -> theory_parent s th
+  | _ ->
+      let th = get_encapsulating_theory s any in
+      theory_parent s th
+
+
 (* Remove elements of the session tree *)
 
 let remove_transformation (s : session) (id : transID) =
@@ -528,17 +553,20 @@ let add_proof_attempt session prover limit state obsolete edit parentID =
     Hint.replace session.proofAttempt_table id pa;
     id
 
-let graft_proof_attempt (s : session) (id : proofNodeID) (pr : Whyconf.prover)
+let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.prover)
     ~limit =
   let pn = get_proofNode s id in
   try
     let id = Hprover.find pn.proofn_attempts pr in
     let pa = Hint.find s.proofAttempt_table id in
-    let pa = { pa with limit = limit; proof_state = None; proof_obsolete = false } in
+    let pa = { pa with limit = limit;
+               proof_state = None;
+               proof_obsolete = false;
+               proof_script = file } in
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->
-    add_proof_attempt s pr limit None false None id
+    add_proof_attempt s pr limit None false file id
 
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
@@ -1480,6 +1508,11 @@ let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfreq
     (opt pp_print_int "steplimit") steplimit
     mostfrequent_memlimit
 
+let save_option_def name fmt opt =
+  match opt with
+  | None -> ()
+  | Some s -> fprintf fmt "@ %s=\"%s\"" name s
+
 let save_bool_def name def fmt b =
   if b <> def then fprintf fmt "@ %s=\"%b\"" name b
 
@@ -1512,12 +1545,13 @@ let save_status fmt s =
 
 let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
-    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a>"
+    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a>"
     id
     (save_int_def "timelimit" tl) (a.limit.Call_provers.limit_time)
     (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
     (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
-    (save_bool_def "obsolete" false) a.proof_obsolete;
+    (save_bool_def "obsolete" false) a.proof_obsolete
+    (save_option_def "proof_script") a.proof_script;
   save_status fmt a.proof_state;
   fprintf fmt "</proof>@]"
 

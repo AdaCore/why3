@@ -1,6 +1,11 @@
 open Format
 open Session_itp
 
+
+let debug_sched = Debug.register_info_flag "scheduler"
+  ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
+         and@ transformation@ applications."
+
 exception Noprogress
 
 let () = Exn_printer.register
@@ -567,6 +572,135 @@ let schedule_proof_attempt c id pr ~counterexmp ~limit ~callback ~notification =
     | _ -> ())
   in
   schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback
+
+(* create the path to a file for saving the external proof script *)
+let create_file_rel_path c pr pn =
+  let config = c.controller_config in
+  let c_env = c.controller_env in
+  let session = c.controller_session in
+  let prover_conf = Whyconf.get_prover_config config pr in
+  let driver = prover_conf.Whyconf.driver in
+  let driver = Driver.load_driver c_env driver prover_conf.Whyconf.extra_drivers in
+  let task = Session_itp.get_task session pn in
+  let session_dir = Session_itp.get_dir session in
+  let th = get_encapsulating_theory session (APn pn) in
+  let th_name = (Session_itp.theory_name th).Ident.id_string in
+  let f = get_encapsulating_file session (ATh th) in
+  let fn = f.file_name in
+  let file = Driver.file_of_task driver fn th_name task in
+  let file = Filename.concat session_dir file in
+  let file = Sysutil.uniquify file in
+  let file = Sysutil.relativize_filename session_dir file in
+  file
+
+let update_edit_external_proof c pn ?panid pr =
+  let config = c.controller_config in
+  let c_env = c.controller_env in
+  let session = c.controller_session in
+  let prover_conf = Whyconf.get_prover_config config pr in
+  let driver = prover_conf.Whyconf.driver in
+  let driver = Driver.load_driver c_env driver prover_conf.Whyconf.extra_drivers in
+  let task = Session_itp.get_task session pn in
+  let session_dir = Session_itp.get_dir session in
+  let file =
+    match panid with
+    | None ->
+        create_file_rel_path c pr pn
+    | Some panid ->
+        let pa = get_proof_attempt_node session panid in
+        Opt.get pa.proof_script
+  in
+  let file = Filename.concat session_dir file in
+  let old =
+    if Sys.file_exists file
+    then
+      begin
+        let backup = file ^ ".bak" in
+        if Sys.file_exists backup
+        then Sys.remove backup;
+        Sys.rename file backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out file in
+  let fmt = formatter_of_out_channel ch in
+  (* Name table is only used in ITP printing *)
+  Driver.print_task ~cntexample:false ?old driver fmt task;
+  Opt.iter close_in old;
+  close_out ch;
+  file
+
+(* TODO
+let schedule_from_spark =
+  graft_proof_attempt with file given
+  schedule_edition
+*)
+
+exception Editor_not_found
+
+let schedule_edition c id pr ?file ~callback ~notification =
+  Debug.dprintf debug_sched "[Sched] Scheduling an edition@.";
+  let config = c.controller_config in
+  let session = c.controller_session in
+  let prover_conf = Whyconf.get_prover_config config pr in
+  let session_dir = Session_itp.get_dir session in
+  (* Notification node *)
+  let callback panid s = callback panid s;
+    match s with
+    | Scheduled | Running | Done _ -> update_goal_node notification c id
+    | _ -> ()
+  in
+
+  let limit = Call_provers.empty_limit in
+  let editor =
+    match prover_conf.Whyconf.editor with
+    | "" -> None
+    | s ->
+        try
+          let ed = Whyconf.editor_by_id config s in
+          Some (String.concat " "(ed.Whyconf.editor_command ::
+                                  ed.Whyconf.editor_options))
+        with Not_found -> None
+  in
+  let proof_attempts_id = get_proof_attempt_ids session id in
+  let panid =
+    try Some (Hprover.find proof_attempts_id pr) with
+    | _ -> None
+  in
+  (* make sure to actually create the file and the proof attempt *)
+  let panid, file =
+    match panid, file with
+    | None, None ->
+        let file = update_edit_external_proof c id pr in
+        let filename = Sysutil.relativize_filename session_dir file in
+        let panid = graft_proof_attempt c.controller_session id pr ~file:filename ~limit in
+        panid, file
+    | None, Some file ->
+        let panid = graft_proof_attempt c.controller_session id pr ~file ~limit in
+        let file = update_edit_external_proof c id ~panid pr in
+        panid, file
+    | Some panid, _ ->
+        let file = update_edit_external_proof c id ~panid pr in
+        panid, file
+  in
+
+  Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
+    (Session_itp.get_proof_name session id).Ident.id_string
+    (match editor with None -> "" | Some s -> s) file;
+  match editor with
+  | None ->
+      begin
+        raise Editor_not_found
+      end
+  | Some editor ->
+      begin
+        let call = Call_provers.call_editor ~command:editor file in
+        callback panid Running;
+        Queue.add (c.controller_session,id,pr,callback panid,false,call) prover_tasks_in_progress;
+        run_timeout_handler ()
+      end;
+  ()
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =

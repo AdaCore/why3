@@ -97,6 +97,11 @@ val get_any_parent: session -> any -> any option
 (* Answers true if a node is in a detached subtree *)
 val is_detached: session -> any -> bool
 
+(* get the parent theory/file of a proof node *)
+val get_encapsulating_theory: session -> any -> theory
+val get_encapsulating_file: session -> any -> file
+
+
 exception BadCopyDetached of string
 
 (** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
@@ -127,13 +132,16 @@ val merge_file_section :
     proof_attempts and transformations to the goals of the new
     theory *)
 
-val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  limit:Call_provers.resource_limit -> proofAttemptID
-(** [graft_proof_attempt s id pr l] adds a proof attempt with prover
+val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
+  Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
+(** [graft_proof_attempt s id pr file l] adds a proof attempt with prover
     [pr] and limits [l] in the session [s] as a child of the task
     [id]. If there already a proof attempt with the same prover, it
     updates it with the limits. It returns the id of the
-    generated proof attempt. *)
+    generated proof attempt.
+    For manual proofs, it has the same behaviour except that it adds a
+    proof_script field equal to [file].
+*)
 
 val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
   Call_provers.prover_result -> unit

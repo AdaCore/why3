@@ -98,6 +98,7 @@ type ide_request =
   | Prove_req               of node_ID * prover * Call_provers.resource_limit
   | Transform_req           of node_ID * transformation * string list
   | Strategy_req            of node_ID * strategy
+  | Edit_req                of node_ID * prover
 (*
   | Open_session_req        of string
  *)

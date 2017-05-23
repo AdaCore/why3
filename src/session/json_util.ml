@@ -121,6 +121,7 @@ let convert_request_constructor (r: ide_request) =
   | Prove_req _               -> String "Prove_req"
   | Transform_req _           -> String "Transform_req"
   | Strategy_req _            -> String "Strategy_req"
+  | Edit_req _                -> String "Edit_req"
 (*
   | Open_session_req _        -> String "Open_session_req"
 *)
@@ -164,6 +165,10 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "strategy", String str]
+  | Edit_req (nid, prover) ->
+      convert_record ["ide_request", cc r;
+                      "node_ID", Int nid;
+                      "prover", String prover]
 (*
   | Open_session_req f ->
       convert_record ["ide_request", cc r;
@@ -438,6 +443,10 @@ let parse_request (constr: string) j =
     let str = get_string (get_field j "strategy") in
     Strategy_req (nid, str)
 
+  | "Edit_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    let p = get_string (get_field j "prover") in
+    Edit_req (nid, p)
 (*
   | "Open_session_req" ->
     let f = get_string (get_field j "file") in

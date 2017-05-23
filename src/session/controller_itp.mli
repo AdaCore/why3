@@ -183,12 +183,26 @@ val schedule_proof_attempt :
   limit:Call_provers.resource_limit ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
-(** [schedule_proof_attempt s id p ~timelimit ~callback] schedules a
+(** [schedule_proof_attempt c id p ~timelimit ~callback ~notification] schedules a
    proof attempt for a goal specified by [id] with the prover [p] with
    time limit [timelimit]; the function [callback] will be called each
    time the proof attempt status changes. Typically at Scheduled, then
    Running, then Done. If there is already a proof attempt with [p] it
    is updated. *)
+
+val schedule_edition :
+  controller ->
+  proofNodeID ->
+  Whyconf.prover ->
+  ?file: string ->
+  callback:(proofAttemptID -> proof_attempt_status -> unit) ->
+  notification:notifier -> unit
+(** [schedule_edition c id pr ?file ~callback ~notification] runs
+    the editor for prover [pr] on proofnode [id] on a file automatically
+    generated in [file] (or created path). It will runs callback each time
+    the proof status changes and notification will be called each time a
+    change is made to the proof_state (in the whole proof tree of the session)
+*)
 
 val schedule_transformation :
   controller ->

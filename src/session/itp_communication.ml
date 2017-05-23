@@ -92,6 +92,7 @@ type ide_request =
   | Prove_req               of node_ID * prover * Call_provers.resource_limit
   | Transform_req           of node_ID * transformation * string list
   | Strategy_req            of node_ID * strategy
+  | Edit_req                of node_ID * prover
 (*
   | Open_session_req        of string
  *)
@@ -118,7 +119,7 @@ let modify_session (r: ide_request) =
   match r with
   | Command_req _ | Prove_req _ | Transform_req _ | Strategy_req _
   | Add_file_req _ | Remove_subtree _ | Copy_paste _ | Copy_detached _
-  | Replay_req | Clean_req | Mark_obsolete_req _ -> true
+  | Replay_req | Clean_req | Mark_obsolete_req _ | Edit_req _ -> true
 
   (*| Open_session_req _ *)
   | Set_max_tasks_req _ | Get_file_contents _
