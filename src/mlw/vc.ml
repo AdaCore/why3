@@ -52,8 +52,10 @@ let proxy_of_expr =
 
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
+let kp_label = Ident.create_label "vc:keep_precondition"
 
-let vc_labels = Slab.add sp_label (Slab.add wp_label Slab.empty)
+let vc_labels = Slab.add kp_label
+  (Slab.add sp_label (Slab.add wp_label Slab.empty))
 
 (* VCgen environment *)
 
@@ -529,7 +531,10 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
-        let k = if pre = [] then k else Kpar (Kstop p, k) in
+        let k = if pre = [] then k else
+          if Slab.mem kp_label e.e_label
+            then Kseq (Kcut p, 0, k)
+            else Kpar (Kstop p, k) in
         let k = List.fold_right assert_inv pinv k in
         begin match ce.c_node with
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
