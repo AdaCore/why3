@@ -6,7 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" expanded="true">
-<theory name="Test_proofinuse" sum="e3a11246443d7b689cd9c8be317e39f8">
+<theory name="Test_proofinuse" sum="3d8c813c16bfe39e1ebc7795ba216b68">
  <goal name="VC shift_is_div" expl="VC for shift_is_div">
  <proof prover="1" timelimit="1"><result status="valid" time="0.11" steps="111"/></proof>
  </goal>
@@ -20,7 +20,7 @@
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" sum="fe8bafff177ba380df14adb45fdae8fe">
+<theory name="Hackers_delight" sum="041513d729f25a9829ccf37998908999">
  <goal name="DM1">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -79,7 +79,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight_mod" sum="527615b2b501acdcd047ac19278071fb">
+<theory name="Hackers_delight_mod" sum="314d43f81abd2e8ef023a2e67dbc4103">
  <goal name="VC dm1" expl="VC for dm1">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -141,7 +141,7 @@
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Test_imperial_violet" sum="9cba028e6ff8bf04fb7ecda33e431e6e">
+<theory name="Test_imperial_violet" sum="5d131d7f925510a25cf8bd5fa3d623d2">
  <goal name="bv32_bounds_bv">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -162,14 +162,14 @@
   <goal name="VC add.1" expl="1. array creation size">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC add.2" expl="2. loop bounds">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <goal name="VC add.2" expl="2. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC add.3" expl="3. loop invariant init">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC add.4" expl="4. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="VC add.4" expl="4. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC add.5" expl="5. index in array bounds">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -177,22 +177,22 @@
   <goal name="VC add.6" expl="6. index in array bounds">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC add.7" expl="7. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC add.8" expl="8. loop invariant preservation">
+  <goal name="VC add.7" expl="7. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="VC add.9" expl="9. loop invariant preservation">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.51" steps="254"/></proof>
+  <goal name="VC add.8" expl="8. loop invariant preservation">
+  <proof prover="1" timelimit="1"><result status="valid" time="1.10" steps="647"/></proof>
+  </goal>
+  <goal name="VC add.9" expl="9. postcondition">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC add.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Test_from_bitvector_example" sum="a35ae98bb0af12b63bd8294127aeeb0a">
+<theory name="Test_from_bitvector_example" sum="0fa4262a9f3e0cb284583810b9d600ff">
  <goal name="Test1">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>

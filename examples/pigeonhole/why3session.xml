@@ -4,38 +4,38 @@
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../pigeonhole.mlw" expanded="true">
-<theory name="Pigeonhole" sum="92cffedf714740733b74d1318be766af" expanded="true">
+<theory name="Pigeonhole" sum="ca412a9d8c85adae968e7adaeaad2744" expanded="true">
  <goal name="VC below" expl="VC for below" expanded="true">
  <proof prover="1"><result status="valid" time="0.02" steps="85"/></proof>
  </goal>
  <goal name="VC pigeonhole" expl="VC for pigeonhole" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC pigeonhole.1" expl="1. loop bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="VC pigeonhole.1" expl="1. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="VC pigeonhole.2" expl="2. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC pigeonhole.3" expl="3. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC pigeonhole.3" expl="3. postcondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC pigeonhole.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="VC pigeonhole.4" expl="4. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
   <goal name="VC pigeonhole.5" expl="5. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="62"/></proof>
   </goal>
-  <goal name="VC pigeonhole.6" expl="6. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="57"/></proof>
+  <goal name="VC pigeonhole.6" expl="6. precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC pigeonhole.7" expl="7. precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="VC pigeonhole.7" expl="7. assertion">
+  <proof prover="1"><result status="valid" time="0.00" steps="33"/></proof>
   </goal>
-  <goal name="VC pigeonhole.8" expl="8. assertion">
-  <proof prover="1"><result status="valid" time="0.00" steps="32"/></proof>
+  <goal name="VC pigeonhole.8" expl="8. unreachable point">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC pigeonhole.9" expl="9. unreachable point">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="VC pigeonhole.9" expl="9. out of loop bounds">
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>
  </goal>

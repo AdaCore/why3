@@ -11,7 +11,7 @@
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../hackers-delight.mlw" expanded="true">
-<theory name="Utils" sum="64594dbb34442cbedbefba55bb980d5a">
+<theory name="Utils" sum="bc30bd24e534b5311a00817d04a9fb76">
  <goal name="VC one" expl="VC for one">
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -25,7 +25,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Utils_Spec" sum="c762b40e892254317e70b85c2f78ad12">
+<theory name="Utils_Spec" sum="6345ccfa2883bdeaaf4ded7d4c84b2c3">
  <goal name="countZero">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -35,16 +35,16 @@
  <goal name="countStep">
  <transf name="split_goal_wp">
   <goal name="countStep.1" expl="1.">
-  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="4.00"/></proof>
+  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.25"/></proof>
   </goal>
   <goal name="countStep.2" expl="2.">
   <proof prover="4"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="countStep.3" expl="3.">
-  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.94"/></proof>
+  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.35"/></proof>
   </goal>
   <goal name="countStep.4" expl="4.">
-  <proof prover="4"><result status="valid" time="0.45"/></proof>
+  <proof prover="4"><result status="valid" time="0.26"/></proof>
   </goal>
  </transf>
  </goal>
@@ -56,7 +56,7 @@
   <goal name="VC countSpec_Aux.1" expl="1. variant decrease">
   <transf name="split_goal_wp">
    <goal name="VC countSpec_Aux.1.1" expl="1. variant decrease">
-   <proof prover="7"><result status="valid" time="0.33" steps="237"/></proof>
+   <proof prover="7"><result status="valid" time="0.19" steps="237"/></proof>
    </goal>
   </transf>
   </goal>
@@ -77,7 +77,7 @@
   </transf>
   </goal>
   <goal name="VC countSpec_Aux.3" expl="3. postcondition">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.61"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.32"/></proof>
   </goal>
  </transf>
  </goal>
@@ -109,13 +109,13 @@
   <goal name="VC triangleInequalityInt.1" expl="1. assertion">
   <transf name="split_goal_wp">
    <goal name="VC triangleInequalityInt.1.1" expl="1. VC for triangleInequalityInt">
-   <proof prover="5"><result status="valid" time="0.91"/></proof>
+   <proof prover="5"><result status="valid" time="0.50"/></proof>
    <proof prover="7"><result status="valid" time="0.17" steps="217"/></proof>
    </goal>
    <goal name="VC triangleInequalityInt.1.2" expl="2. VC for triangleInequalityInt">
    <proof prover="5"><result status="valid" time="0.21"/></proof>
-   <proof prover="7"><result status="valid" time="0.70" steps="280"/></proof>
-   <proof prover="8"><result status="valid" time="0.95"/></proof>
+   <proof prover="7"><result status="valid" time="0.32" steps="280"/></proof>
+   <proof prover="8"><result status="valid" time="0.58"/></proof>
    <proof prover="9"><result status="valid" time="0.64"/></proof>
    </goal>
   </transf>
@@ -126,15 +126,15 @@
  </transf>
  </goal>
  <goal name="triangleInequality">
- <proof prover="0"><result status="valid" time="0.55" steps="637"/></proof>
+ <proof prover="0"><result status="valid" time="0.55" steps="635"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" sum="7696378314ab14595555f7fee9f70833">
+<theory name="Hackers_delight" sum="92cc02f880dedae78a62eb1e0bdf1e09">
  <goal name="VC ascii" expl="VC for ascii">
  <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="asciiProp">
- <proof prover="1"><result status="valid" time="1.14"/></proof>
+ <proof prover="1"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="iso">
  <proof prover="1"><result status="valid" time="0.43"/></proof>
@@ -143,7 +143,7 @@
  <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>
  <goal name="nthGray">
- <proof prover="7"><result status="valid" time="0.45" steps="375"/></proof>
+ <proof prover="7"><result status="valid" time="0.45" steps="446"/></proof>
  </goal>
  <goal name="lastNthGray">
  <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -185,7 +185,7 @@
  <proof prover="1"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="Ac">
- <proof prover="7"><result status="valid" time="0.67" steps="465"/></proof>
+ <proof prover="7"><result status="valid" time="0.40" steps="465"/></proof>
  </goal>
  <goal name="Ad">
  <proof prover="1"><result status="valid" time="0.06"/></proof>

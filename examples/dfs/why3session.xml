@@ -6,25 +6,25 @@
 <prover id="13" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="18" name="Z3" version="4.3.2" timelimit="15" steplimit="0" memlimit="1000"/>
 <file name="../dfs.mlw" expanded="true">
-<theory name="DFS" sum="cdb9707509e7905f47e21dafd737aaf0" expanded="true">
+<theory name="DFS" sum="6e7b9a196c63eb3bb3914836cad9abbb" expanded="true">
  <goal name="VC null" expl="VC for null" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC root" expl="VC for root" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC set" expl="VC for set" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
+ <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="VC dfs" expl="VC for dfs" expanded="true">
- <proof prover="0"><result status="valid" time="0.36" steps="1459"/></proof>
+ <proof prover="0"><result status="valid" time="0.36" steps="1412"/></proof>
  </goal>
  <goal name="reformulation">
  <transf name="induction_pr">
   <goal name="reformulation.1" expl="1.">
   <transf name="simplify_trivial_quantification">
    <goal name="reformulation.1.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
    <proof prover="13"><result status="valid" time="0.00" steps="3"/></proof>
    </goal>
   </transf>
@@ -32,7 +32,7 @@
   <goal name="reformulation.2" expl="2.">
   <transf name="simplify_trivial_quantification">
    <goal name="reformulation.2.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
+   <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
    <proof prover="18"><result status="valid" time="0.00"/></proof>
    </goal>
   </transf>
@@ -40,7 +40,7 @@
  </transf>
  </goal>
  <goal name="VC traverse" expl="VC for traverse" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="55"/></proof>
  </goal>
 </theory>
 </file>

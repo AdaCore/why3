@@ -4,62 +4,62 @@
 <why3session shape_version="4">
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2015_relaxed_prefix.mlw" expanded="true">
-<theory name="RelaxedPrefix" sum="f49762ab5773025a160cd5aac68fc031" expanded="true">
+<theory name="RelaxedPrefix" sum="dbc73d21b1e625935a433b12a3abd8c0" expanded="true">
  <goal name="VC is_relaxed_prefix" expl="VC for is_relaxed_prefix" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC is_relaxed_prefix.1" expl="1. loop bounds">
+  <goal name="VC is_relaxed_prefix.1" expl="1. loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.2" expl="2. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.3" expl="3. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.4" expl="4. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC is_relaxed_prefix.5" expl="5. loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC is_relaxed_prefix.5" expl="5. index in array bounds">
+  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.6" expl="6. index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC is_relaxed_prefix.7" expl="7. index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC is_relaxed_prefix.7" expl="7. assertion">
+  <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
   </goal>
-  <goal name="VC is_relaxed_prefix.8" expl="8. assertion">
-  <proof prover="2"><result status="valid" time="0.00" steps="24"/></proof>
+  <goal name="VC is_relaxed_prefix.8" expl="8. postcondition">
+  <proof prover="2"><result status="valid" time="0.03" steps="129"/></proof>
   </goal>
-  <goal name="VC is_relaxed_prefix.9" expl="9. postcondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="128"/></proof>
+  <goal name="VC is_relaxed_prefix.9" expl="9. loop invariant preservation">
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.10" expl="10. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.11" expl="11. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.12" expl="12. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="69"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.13" expl="13. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.01" steps="65"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.14" expl="14. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.15" expl="15. loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.16" expl="16. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="198"/></proof>
   </goal>
-  <goal name="VC is_relaxed_prefix.17" expl="17. loop invariant preservation">
-  <proof prover="2"><result status="valid" time="0.04" steps="176"/></proof>
+  <goal name="VC is_relaxed_prefix.17" expl="17. postcondition">
+  <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
   <goal name="VC is_relaxed_prefix.18" expl="18. postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>

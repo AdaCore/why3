@@ -7,7 +7,7 @@
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../kmp.mlw" expanded="true">
-<theory name="KnuthMorrisPratt" sum="9ebb3f725b3626f95bec46b3d0e68fbc" expanded="true">
+<theory name="KnuthMorrisPratt" sum="992003785c920e9f6d507a64c4e4f98d" expanded="true">
  <goal name="matches_empty">
  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
@@ -54,13 +54,13 @@
   <proof prover="6"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC initnext.4" expl="4. loop invariant init">
-  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC initnext.5" expl="5. loop invariant init">
-  <proof prover="6"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="VC initnext.6" expl="6. loop invariant init">
-  <proof prover="6"><result status="valid" time="0.00" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
   <goal name="VC initnext.7" expl="7. index in array bounds">
   <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
@@ -78,13 +78,13 @@
   <proof prover="6"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC initnext.12" expl="12. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC initnext.13" expl="13. loop invariant preservation">
-  <proof prover="7"><result status="valid" time="3.02"/></proof>
+  <proof prover="7"><result status="valid" time="3.80"/></proof>
   </goal>
   <goal name="VC initnext.14" expl="14. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.23" steps="374"/></proof>
+  <proof prover="6"><result status="valid" time="0.45" steps="617"/></proof>
   </goal>
   <goal name="VC initnext.15" expl="15. index in array bounds">
   <proof prover="6"><result status="valid" time="0.00" steps="15"/></proof>
@@ -96,29 +96,29 @@
   <proof prover="6"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
   <goal name="VC initnext.18" expl="18. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="VC initnext.19" expl="19. loop invariant preservation" expanded="true">
   </goal>
   <goal name="VC initnext.20" expl="20. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.17" steps="331"/></proof>
+  <proof prover="6"><result status="valid" time="0.38" steps="583"/></proof>
   </goal>
   <goal name="VC initnext.21" expl="21. index in array bounds">
   <proof prover="6"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="VC initnext.22" expl="22. loop variant decrease">
-  <proof prover="6"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC initnext.23" expl="23. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.01" steps="56"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="54"/></proof>
   </goal>
   <goal name="VC initnext.24" expl="24. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.03" steps="104"/></proof>
+  <proof prover="6"><result status="valid" time="0.03" steps="79"/></proof>
   </goal>
   <goal name="VC initnext.25" expl="25. loop invariant preservation" expanded="true">
   </goal>
   <goal name="VC initnext.26" expl="26. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.00" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="29"/></proof>
   </goal>
   <goal name="VC initnext.27" expl="27. postcondition">
   <proof prover="6"><result status="valid" time="0.01" steps="20"/></proof>
@@ -137,10 +137,10 @@
   <proof prover="6"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="VC kmp.3" expl="3. loop invariant init">
-  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC kmp.4" expl="4. loop invariant init">
-  <proof prover="6"><result status="valid" time="0.00" steps="3"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC kmp.5" expl="5. index in array bounds">
   <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
@@ -155,10 +155,10 @@
   <proof prover="6"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
   <goal name="VC kmp.9" expl="9. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.00" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
   <goal name="VC kmp.10" expl="10. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="VC kmp.11" expl="11. loop variant decrease">
   <proof prover="6"><result status="valid" time="0.00" steps="13"/></proof>
@@ -167,10 +167,10 @@
   <proof prover="6"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC kmp.13" expl="13. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.00" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
   <goal name="VC kmp.14" expl="14. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="VC kmp.15" expl="15. index in array bounds">
   <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
@@ -182,7 +182,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
   <goal name="VC kmp.18" expl="18. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.02" steps="102"/></proof>
+  <proof prover="6"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
   <goal name="VC kmp.19" expl="19. loop invariant preservation" expanded="true">
   </goal>
