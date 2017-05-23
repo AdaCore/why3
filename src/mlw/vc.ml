@@ -260,14 +260,14 @@ let renew_oldies o2v =
 (* convert user specifications into goals (wp) and premises (sp) *)
 
 let wp_of_inv loc lab expl pl =
-  t_and_l (List.map (vc_expl loc lab expl) pl)
+  t_and_asym_l (List.map (vc_expl loc lab expl) pl)
 
 let wp_of_pre loc lab pl = wp_of_inv loc lab expl_pre pl
 
 let wp_of_post expl ity ql =
   let v = res_of_post ity ql in let t = t_var v.pv_vs in
   let make q = vc_expl None Slab.empty expl (open_post_with t q) in
-  v, t_and_l (List.map make ql)
+  v, t_and_asym_l (List.map make ql)
 
 let push_stop loc lab expl f =
   let rec push f = match f.t_node with

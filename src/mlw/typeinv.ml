@@ -333,7 +333,7 @@ let add_var kn pins vl v =
             Mls.add (ls_of_rs f) (v, down ty) m, mv in
           let pjs, mv = List.fold_left add_field
                             (Mls.empty, Mvs.empty) d.itd_fields in
-          let inv = t_ty_subst sbs mv (t_and_l d.itd_invariant) in
+          let inv = t_ty_subst sbs mv (t_and_asym_l d.itd_invariant) in
           let pin = {p_vars = pjs; p_inv = inv} in
           let n = new_index () in
           rp := Mint.add n pin !rp;
