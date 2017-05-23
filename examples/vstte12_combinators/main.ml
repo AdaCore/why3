@@ -13,8 +13,8 @@ let input =
 
 let input_term =
   if input = "go" then
-    let i = Vstte12_combinators__Combinators.i in
-    Vstte12_combinators__Combinators.App(i,i)
+    let i = Vstte12_combinators.i in
+    Vstte12_combinators.App(i,i)
   else
     try Parse.parse_term input
     with _ ->
@@ -24,6 +24,6 @@ let input_term =
       end
 
 let () =
-  let a = Vstte12_combinators__Combinators.reduction input_term in
+  let a = Vstte12_combinators.reduction input_term in
   printf "The normal form of %a is %a@."
     Parse.pr input_term Parse.pr a

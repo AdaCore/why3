@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
@@ -40,28 +40,19 @@
  <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="eval_p3">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="4000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="4000"><result status="valid" time="0.02"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
  <proof prover="4" memlimit="4000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="CPS" sum="82b26c2ca649503f06c24e2173e94eca">
- <goal name="cps_correct_expr">
- <transf name="induction_ty_lex">
-  <goal name="cps_correct_expr.1" expl="1.">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
- </transf>
+<theory name="CPS" sum="fca777f79915177c4b0efbae84734823">
+ <goal name="VC eval_1" expl="VC for eval_1">
+ <proof prover="7"><result status="valid" time="0.01" steps="46"/></proof>
  </goal>
- <goal name="cps_correct">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- <proof prover="1" memlimit="4000"><result status="valid" time="0.00"/></proof>
- <proof prover="2" memlimit="4000"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="3"/></proof>
- <proof prover="4" memlimit="4000"><result status="valid" time="0.01"/></proof>
+ <goal name="VC interpret_1" expl="VC for interpret_1">
+ <proof prover="7"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="Defunctionalization" sum="f5bf46667f77325130e49decc8994e61">
@@ -119,17 +110,17 @@
  <proof prover="7"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="SemWithError" sum="b86f86d1abcb9f97e04b692072fcf03b" expanded="true">
- <goal name="cps_correct_expr" expanded="true">
- <transf name="induction_ty_lex" expanded="true">
-  <goal name="cps_correct_expr.1" expl="1." expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+<theory name="SemWithError" sum="b86f86d1abcb9f97e04b692072fcf03b">
+ <goal name="cps_correct_expr">
+ <transf name="induction_ty_lex">
+  <goal name="cps_correct_expr.1" expl="1.">
+  <transf name="split_goal_wp">
    <goal name="cps_correct_expr.1.1" expl="1.">
    <proof prover="3"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
-   <goal name="cps_correct_expr.1.2" expl="2." expanded="true">
-   <transf name="introduce_premises" expanded="true">
-    <goal name="cps_correct_expr.1.2.1" expl="1." expanded="true">
+   <goal name="cps_correct_expr.1.2" expl="2.">
+   <transf name="introduce_premises">
+    <goal name="cps_correct_expr.1.2.1" expl="1.">
     <proof prover="8"><result status="valid" time="0.84"/></proof>
     </goal>
    </transf>
@@ -139,7 +130,7 @@
  </transf>
  </goal>
  <goal name="cps_correct">
- <proof prover="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="4"/></proof>
