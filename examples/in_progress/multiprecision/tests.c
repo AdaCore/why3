@@ -34,9 +34,9 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 
 
 #ifdef BENCH
-#define RANDOM mpn_random2
-#else
 #define RANDOM mpn_random
+#else
+#define RANDOM mpn_random2
 #endif
 
 
@@ -68,7 +68,7 @@ int main () {
   //gmp_randseed_ui(rands, 42);
 
   /* Re-interpret reps argument as a size argument.  */
-  max_n = 20;
+  max_n = 40;
 
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
@@ -95,7 +95,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 100000; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 
@@ -160,7 +160,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 10000; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 
@@ -216,7 +216,7 @@ int main () {
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 10000; ++i)
+            for (int i = 0; i != 1000; ++i)
               {
 #endif
 
