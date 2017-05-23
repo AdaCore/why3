@@ -9,8 +9,9 @@ module HeightCPS
   use import bintree.Tree
   use import bintree.Height
 
-  let rec function height_cps (t: tree 'a) (k: int -> 'b) : 'b
+  let rec height_cps (t: tree 'a) (k: int -> 'b) : 'b
     variant { t }
+    ensures { result = k (height t) }
   = match t with
     | Empty -> k 0
     | Node l _ r ->
@@ -19,13 +20,9 @@ module HeightCPS
         k (1 + max hl hr)))
     end
 
-  let function height1 (t: tree 'a) : int = height_cps t (fun h -> h)
-
-  lemma height_cps_correct:
-    forall t: tree 'a, k: int -> 'b. height_cps t k = k (height t)
-
-  lemma height1_correct:
-    forall t: tree 'a. height1 t = height t
+  let height (t: tree 'a) : int
+    ensures { result = height t }
+  = height_cps t (fun h -> h)
 
 end
 
