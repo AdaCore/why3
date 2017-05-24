@@ -561,8 +561,7 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
     let pa = Hint.find s.proofAttempt_table id in
     let pa = { pa with limit = limit;
                proof_state = None;
-               proof_obsolete = false;
-               proof_script = file } in
+               proof_obsolete = false} in
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->
@@ -695,13 +694,13 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
   tid
 
 
-let update_proof_attempt s id pr st =
+let update_proof_attempt ?(obsolete=false) s id pr st =
   try
     let n = get_proofNode s id in
     let pa = Hprover.find n.proofn_attempts pr in
     let pa = get_proof_attempt_node s pa in
     pa.proof_state <- Some st;
-    pa.proof_obsolete <- false
+    pa.proof_obsolete <- obsolete
   with
   | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
 

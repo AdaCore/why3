@@ -143,10 +143,13 @@ val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
     proof_script field equal to [file].
 *)
 
-val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  Call_provers.prover_result -> unit
-(** [update_proof_attempt s id pr st] update the status of the
-    corresponding proof attempt with [st]. *)
+val update_proof_attempt : ?obsolete:bool -> session -> proofNodeID ->
+  Whyconf.prover -> Call_provers.prover_result -> unit
+(** [update_proof_attempt ?obsolete s id pr st] update the status of the
+    corresponding proof attempt with [st].
+    If [obsolete] is set to true, it marks the proof_attempt obsolete
+    direclty (useful for interactive prover).
+*)
 
 val graft_transf : session -> proofNodeID -> string -> string list ->
   Task.task list -> transID

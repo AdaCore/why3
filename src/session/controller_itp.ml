@@ -468,7 +468,7 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-let build_prover_call ~cntexample c id pr limit callback =
+let build_prover_call ?proof_script ~cntexample c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
     Whyconf.get_complete_command
@@ -477,17 +477,17 @@ let build_prover_call ~cntexample c id pr limit callback =
   let task = Session_itp.get_task c.controller_session id in
   let table = Session_itp.get_table c.controller_session id in
   let call =
-    Driver.prove_task ?old:None ~cntexample:cntexample ~inplace:false ~command
+    Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
                       ~limit ?name_table:table driver task
   in
-  let pa = (c.controller_session,id,pr,callback,false,call) in
+  let pa = (c.controller_session,id,pr,proof_script,callback,false,call) in
   Queue.push pa prover_tasks_in_progress
 
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,callback,started,call) as c =
+    let (ses,id,pr,pr_script,callback,started,call) as c =
       Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
@@ -495,11 +495,17 @@ let timeout_handler () =
        assert (not started);
        callback Running;
        incr number_of_running_provers;
-       Queue.add (ses,id,pr,callback,true,call) q
-    | Call_provers.ProverFinished res ->
+       Queue.add (ses,id,pr,pr_script,callback,true,call) q
+    | Call_provers.ProverFinished res when pr_script = None ->
        if started then decr number_of_running_provers;
        (* update the session *)
        update_proof_attempt ses id pr res;
+       (* inform the callback *)
+       callback (Done res)
+    | Call_provers.ProverFinished res (* when pr_script <> None *) ->
+       if started then decr number_of_running_provers;
+       (* update the session *)
+       update_proof_attempt ~obsolete:true ses id pr res;
        (* inform the callback *)
        callback (Done res)
     | Call_provers.ProverInterrupted ->
@@ -519,9 +525,9 @@ let timeout_handler () =
     try
       for _i = Queue.length prover_tasks_in_progress
           to 3 * !max_number_of_running_provers do
-        let (c,id,pr,limit,callback,cntexample) = Queue.pop scheduled_proof_attempts in
+        let (c,id,pr,limit,proof_script,callback,cntexample) = Queue.pop scheduled_proof_attempts in
         try
-          build_prover_call ~cntexample c id pr limit callback
+          build_prover_call ?proof_script ~cntexample c id pr limit callback
         with e when not (Debug.test_flag Debug.stack_trace) ->
           (*Format.eprintf
             "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
@@ -538,14 +544,14 @@ let timeout_handler () =
 
 let interrupt () =
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (_ses,_id,_pr,callback,_started,_call) =
+    let (_ses,_id,_pr,_proof_script,callback,_started,_call) =
       Queue.pop prover_tasks_in_progress in
     (* TODO: apply some Call_provers.interrupt_call call *)
     callback Interrupted
   done;
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
+    let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
     callback Interrupted
   done;
   !observer 0 0 0
@@ -557,22 +563,26 @@ let run_timeout_handler () =
       S.timeout ~ms:125 timeout_handler;
     end
 
-let schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback =
+let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback =
   let panid =
     graft_proof_attempt c.controller_session id pr ~limit
   in
-  Queue.add (c,id,pr,limit,callback panid,counterexmp) scheduled_proof_attempts;
+  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp) scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
 
-let schedule_proof_attempt c id pr ~counterexmp ~limit ~callback ~notification =
+let schedule_proof_attempt ?proof_script c id pr ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
     | Scheduled | Running | Done _ -> update_goal_node notification c id
     | _ -> ())
   in
-  schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback
+  (* proof_script is specific to interactive manual provers *)
+  let session_dir = Session_itp.get_dir c.controller_session in
+  let proof_script = Opt.map (Sysutil.absolutize_filename session_dir) proof_script in
+  schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
 
+(* TODO to be simplified *)
 (* create the path to a file for saving the external proof script *)
 let create_file_rel_path c pr pn =
   let config = c.controller_config in
@@ -631,12 +641,6 @@ let update_edit_external_proof c pn ?panid pr =
   close_out ch;
   file
 
-(* TODO
-let schedule_from_spark =
-  graft_proof_attempt with file given
-  schedule_edition
-*)
-
 exception Editor_not_found
 
 let schedule_edition c id pr ?file ~callback ~notification =
@@ -653,15 +657,16 @@ let schedule_edition c id pr ?file ~callback ~notification =
   in
 
   let limit = Call_provers.empty_limit in
+  (* Make sure editor exists. Fails otherwise *)
   let editor =
     match prover_conf.Whyconf.editor with
-    | "" -> None
+    | "" -> raise Editor_not_found
     | s ->
         try
           let ed = Whyconf.editor_by_id config s in
-          Some (String.concat " "(ed.Whyconf.editor_command ::
-                                  ed.Whyconf.editor_options))
-        with Not_found -> None
+          String.concat " "(ed.Whyconf.editor_command ::
+                            ed.Whyconf.editor_options)
+        with Not_found -> raise Editor_not_found
   in
   let proof_attempts_id = get_proof_attempt_ids session id in
   let panid =
@@ -687,20 +692,14 @@ let schedule_edition c id pr ?file ~callback ~notification =
 
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
     (Session_itp.get_proof_name session id).Ident.id_string
-    (match editor with None -> "" | Some s -> s) file;
-  match editor with
-  | None ->
-      begin
-        raise Editor_not_found
-      end
-  | Some editor ->
-      begin
-        let call = Call_provers.call_editor ~command:editor file in
-        callback panid Running;
-        Queue.add (c.controller_session,id,pr,callback panid,false,call) prover_tasks_in_progress;
-        run_timeout_handler ()
-      end;
-  ()
+    editor file;
+  let call = Call_provers.call_editor ~command:editor file in
+  callback panid Running;
+  let file = Sysutil.relativize_filename session_dir file in
+  Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call)
+    prover_tasks_in_progress;
+  run_timeout_handler ()
+
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
@@ -894,13 +893,13 @@ let copy_detached ~copy c from_any =
   | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
 
 
-let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
+let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
      to check more things before giving the attempt to the scheduler *)
   if not (Hprover.mem c.controller_provers pr) then
     callback id (Uninstalled pr)
   else
-    schedule_proof_attempt c parid pr ~counterexmp:false ~limit ~callback ~notification
+    schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
@@ -988,7 +987,8 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
           else
             Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
         in
-        replay_proof_attempt c pr limit parid id
+        let proof_script = pa.proof_script in
+        replay_proof_attempt ?proof_script c pr limit parid id
                              ~callback:(fun id s ->
                                         craft_report count s report parid pr limit pa;
                                         callback id s;

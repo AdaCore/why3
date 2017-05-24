@@ -176,6 +176,7 @@ val interrupt : unit -> unit
     the ones already running *)
 
 val schedule_proof_attempt :
+  ?proof_script:string ->
   controller ->
   proofNodeID ->
   Whyconf.prover ->
