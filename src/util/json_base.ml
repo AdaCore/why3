@@ -49,9 +49,6 @@ let print_map_binding key_to_str value_pr fmt binding =
   let (key, value) = binding in
   print_json_field (key_to_str key) value_pr fmt value
 
-(* TODO document this exception *)
-exception Bad_value
-
 let map_bindings key_to_str value_pr fmt map_bindings =
   if map_bindings = [] then fprintf fmt "null"
   else
