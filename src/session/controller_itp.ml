@@ -585,14 +585,8 @@ let schedule_proof_attempt ?proof_script c id pr ~counterexmp ~limit ~callback ~
 (* TODO to be simplified *)
 (* create the path to a file for saving the external proof script *)
 let create_file_rel_path c pr pn =
-  let config = c.controller_config in
-  let c_env = c.controller_env in
   let session = c.controller_session in
-  let prover_conf = Whyconf.get_prover_config config pr in
-  let driver = prover_conf.Whyconf.driver in
-  let driver = Whyconf.load_driver
-                 (Whyconf.get_main config)
-                 c_env driver prover_conf.Whyconf.extra_drivers in
+  let driver = snd (Hprover.find c.controller_provers pr) in
   let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
@@ -606,14 +600,8 @@ let create_file_rel_path c pr pn =
   file
 
 let update_edit_external_proof c pn ?panid pr =
-  let config = c.controller_config in
-  let c_env = c.controller_env in
   let session = c.controller_session in
-  let prover_conf = Whyconf.get_prover_config config pr in
-  let driver = prover_conf.Whyconf.driver in
-  let driver = Whyconf.load_driver
-                 (Whyconf.get_main config)
-                 c_env driver prover_conf.Whyconf.extra_drivers in
+  let driver = snd (Hprover.find c.controller_provers pr) in
   let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let file =
