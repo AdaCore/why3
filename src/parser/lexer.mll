@@ -245,6 +245,8 @@ rule token = parse
 
   let parse_term lb = Parser.term_eof token lb
 
+  let parse_list_ident lb = Parser.ident_comma_list token lb
+
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
     Loc.with_location (logic_file token) lb;

@@ -1903,10 +1903,11 @@ let load_prover eS prover =
     let r = match r with
       | None -> None
       | Some pr ->
-        let dr = Driver.load_driver eS.env
-          pr.Whyconf.driver pr.Whyconf.extra_drivers in
-        Some { prover_config = pr;
-               prover_driver = dr}
+         let dr = Whyconf.load_driver (Whyconf.get_main eS.whyconf)
+                    eS.env
+                    pr.Whyconf.driver pr.Whyconf.extra_drivers in
+         Some { prover_config = pr;
+                prover_driver = dr}
     in
     PHprover.add eS.loaded_provers prover r;
     r

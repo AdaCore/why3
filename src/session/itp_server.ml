@@ -247,6 +247,7 @@ let print_request fmt r =
   | Prove_req (_nid, prover, _rl)   -> fprintf fmt "prove with %s" prover
   | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
   | Strategy_req (_nid, st)         -> fprintf fmt "strategy %s" st
+  | Edit_req (_nid, prover)         -> fprintf fmt "edit with %s" prover
 (*
   | Open_session_req f              -> fprintf fmt "open session file %s" f
 *)
@@ -301,7 +302,10 @@ let print_notify fmt n =
       begin
         match nf with
         | Proved b -> fprintf fmt "node change %d Proved %b" ni b
-        | _        -> fprintf fmt "node change %d" ni
+        | Obsolete b -> fprintf fmt "node change %d Obsolete %b" ni b
+        | Proof_status_change(st,b,_lim) ->
+           fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
+                   ni Controller_itp.print_status st b
       end
   | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
   | Remove _ni                         -> fprintf fmt "remove"
@@ -498,10 +502,8 @@ let get_locations t =
   let task_driver config env =
     try
       let main = Whyconf.get_main config in
-      let d = Filename.concat (Whyconf.datadir main)
-                              (Filename.concat "drivers" "why3_itp.drv")
-      in
-      let d = Driver.load_driver env d [] in
+      let d = "why3_itp" in
+      let d = Whyconf.load_driver main env d [] in
       Debug.dprintf debug "[ITP server] driver for task printing loaded@.";
       d
     with e ->
@@ -910,6 +912,34 @@ let get_locations t =
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
+  let callback_edition cont panid pa_status =
+    let ses = cont.controller_session in
+    begin match pa_status with
+    | Running ->
+      begin
+        try
+          ignore (node_ID_from_pan panid)
+        with Not_found ->
+          let parent_id = get_proof_attempt_parent ses panid in
+          let parent = node_ID_from_pn parent_id in
+          ignore (new_node ~parent (APa panid))
+      end
+    | _  -> ()
+    end;
+    let limit = (get_proof_attempt_node cont.controller_session panid).limit in
+    let new_status = Proof_status_change (pa_status, false, limit) in
+    P.notify (Node_change (node_ID_from_pan panid, new_status))
+
+  let schedule_edition (nid: node_ID) (p: Whyconf.config_prover) =
+    let d = get_server_data () in
+    let prover = p.Whyconf.prover in
+    let callback = callback_edition d.cont in
+    match any_from_node_ID nid with
+    | APn id ->
+        C.schedule_edition d.cont id prover ?file:None
+          ~callback ~notification:(notify_change_proved d.cont)
+    | _ -> ()
+
   (* ----------------- Schedule transformation -------------------- *)
 
   (* Callback of a transformation *)
@@ -1072,6 +1102,15 @@ let get_locations t =
     | Strategy_req (nid, st)       ->
         let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
         run_strategy_on_task ~counterexmp nid st
+    | Edit_req (nid, p)            ->
+      let p = try Some (get_prover p) with
+      | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))); None
+      in
+      begin match p with
+      | None -> ()
+      | Some p ->
+          schedule_edition nid p
+      end
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
@@ -1126,6 +1165,8 @@ let get_locations t =
         | Strategies st           ->
             let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
             run_strategy_on_task ~counterexmp nid st
+        | Edit p                  ->
+            schedule_edition nid p
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
@@ -1147,10 +1188,11 @@ let get_locations t =
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0
      )
-    with e -> P.notify (Message (Error (Pp.string_of
-      (fun fmt (r,e) -> Format.fprintf fmt
-          "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
-    print_request r Exn_printer.exn_printer e ) (r, e))))
+    with e when not (Debug.test_flag Debug.stack_trace)->
+      P.notify (Message (Error (Pp.string_of
+          (fun fmt (r,e) -> Format.fprintf fmt
+             "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
+             print_request r Exn_printer.exn_printer e ) (r, e))))
 
   let treat_requests () : bool =
     List.iter treat_request (P.get_requests ());

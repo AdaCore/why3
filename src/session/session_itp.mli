@@ -16,8 +16,6 @@ unique identifiers of type [proofNodeId]
 
 type session
 
-val dummy_session: session
-
 type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
 type transID
@@ -55,7 +53,7 @@ val get_files : session -> file Stdlib.Hstr.t
 val get_dir : session -> string
 val get_shape_version : session -> int
 
-type proof_attempt_node = {
+type proof_attempt_node = private {
   parent              : proofNodeID;
   prover              : Whyconf.prover;
   limit               : Call_provers.resource_limit;
@@ -102,6 +100,11 @@ val get_any_parent: session -> any -> any option
 (* Answers true if a node is in a detached subtree *)
 val is_detached: session -> any -> bool
 
+(* get the parent theory/file of a proof node *)
+val get_encapsulating_theory: session -> any -> theory
+val get_encapsulating_file: session -> any -> file
+
+
 exception BadCopyDetached of string
 
 (** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
@@ -113,9 +116,9 @@ val empty_session : ?shape_version:int -> string -> session
     argument *)
 
 val add_file_section :
-  use_shapes:bool -> session -> string -> (Theory.theory list) ->
+  session -> string -> (Theory.theory list) ->
   Env.fformat option -> unit
-(** [add_file_section ~merge:(old_s,old_ths,env) s fn ths] adds a new
+(** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
     theory nodes generated are computed using [Task.split_theory]. *)
@@ -132,18 +135,24 @@ val merge_file_section :
     proof_attempts and transformations to the goals of the new
     theory *)
 
-val graft_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  limit:Call_provers.resource_limit -> proofAttemptID
-(** [graft_proof_attempt s id pr l] adds a proof attempt with prover
+val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
+  Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
+(** [graft_proof_attempt s id pr file l] adds a proof attempt with prover
     [pr] and limits [l] in the session [s] as a child of the task
     [id]. If there already a proof attempt with the same prover, it
     updates it with the limits. It returns the id of the
-    generated proof attempt. *)
+    generated proof attempt.
+    For manual proofs, it has the same behaviour except that it adds a
+    proof_script field equal to [file].
+*)
 
-val update_proof_attempt : session -> proofNodeID -> Whyconf.prover ->
-  Call_provers.prover_result -> unit
-(** [update_proof_attempt s id pr st] update the status of the
-    corresponding proof attempt with [st]. *)
+val update_proof_attempt : ?obsolete:bool -> session -> proofNodeID ->
+  Whyconf.prover -> Call_provers.prover_result -> unit
+(** [update_proof_attempt ?obsolete s id pr st] update the status of the
+    corresponding proof attempt with [st].
+    If [obsolete] is set to true, it marks the proof_attempt obsolete
+    direclty (useful for interactive prover).
+*)
 
 val graft_transf : session -> proofNodeID -> string -> string list ->
   Task.task list -> transID

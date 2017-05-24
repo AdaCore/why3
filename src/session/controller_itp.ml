@@ -1,6 +1,11 @@
 open Format
 open Session_itp
 
+
+let debug_sched = Debug.register_info_flag "scheduler"
+  ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
+         and@ transformation@ applications."
+
 exception Noprogress
 
 let () = Exn_printer.register
@@ -100,7 +105,7 @@ let create_controller config env ses =
   Whyconf.Mprover.iter
     (fun _ p ->
      try
-       let d = Driver.load_driver env p.Whyconf.driver [] in
+       let d = Whyconf.load_driver (Whyconf.get_main config) env p.Whyconf.driver [] in
        Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
      with e ->
        Format.eprintf
@@ -109,8 +114,6 @@ let create_controller config env ses =
          Exn_printer.exn_printer e)
     provers;
   c
-
-let set_session cont ses = cont.controller_session <- ses
 
 let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
 let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
@@ -406,7 +409,7 @@ let reload_files (c : controller) ~use_shapes =
 
 let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
-  add_file_section ~use_shapes:false c.controller_session fname theories format
+  add_file_section c.controller_session fname theories format
 
 (* Update the proof_state according to new false state and then remove
    the subtree *)
@@ -465,7 +468,7 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-let build_prover_call ~cntexample c id pr limit callback =
+let build_prover_call ?proof_script ~cntexample c id pr limit callback =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
   let command =
     Whyconf.get_complete_command
@@ -474,17 +477,17 @@ let build_prover_call ~cntexample c id pr limit callback =
   let task = Session_itp.get_task c.controller_session id in
   let table = Session_itp.get_table c.controller_session id in
   let call =
-    Driver.prove_task ?old:None ~cntexample:cntexample ~inplace:false ~command
+    Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
                       ~limit ?name_table:table driver task
   in
-  let pa = (c.controller_session,id,pr,callback,false,call) in
+  let pa = (c.controller_session,id,pr,proof_script,callback,false,call) in
   Queue.push pa prover_tasks_in_progress
 
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,callback,started,call) as c =
+    let (ses,id,pr,pr_script,callback,started,call) as c =
       Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
@@ -492,11 +495,17 @@ let timeout_handler () =
        assert (not started);
        callback Running;
        incr number_of_running_provers;
-       Queue.add (ses,id,pr,callback,true,call) q
-    | Call_provers.ProverFinished res ->
+       Queue.add (ses,id,pr,pr_script,callback,true,call) q
+    | Call_provers.ProverFinished res when pr_script = None ->
        if started then decr number_of_running_provers;
        (* update the session *)
        update_proof_attempt ses id pr res;
+       (* inform the callback *)
+       callback (Done res)
+    | Call_provers.ProverFinished res (* when pr_script <> None *) ->
+       if started then decr number_of_running_provers;
+       (* update the session *)
+       update_proof_attempt ~obsolete:true ses id pr res;
        (* inform the callback *)
        callback (Done res)
     | Call_provers.ProverInterrupted ->
@@ -516,9 +525,9 @@ let timeout_handler () =
     try
       for _i = Queue.length prover_tasks_in_progress
           to 3 * !max_number_of_running_provers do
-        let (c,id,pr,limit,callback,cntexample) = Queue.pop scheduled_proof_attempts in
+        let (c,id,pr,limit,proof_script,callback,cntexample) = Queue.pop scheduled_proof_attempts in
         try
-          build_prover_call ~cntexample c id pr limit callback
+          build_prover_call ?proof_script ~cntexample c id pr limit callback
         with e when not (Debug.test_flag Debug.stack_trace) ->
           (*Format.eprintf
             "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
@@ -535,14 +544,14 @@ let timeout_handler () =
 
 let interrupt () =
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (_ses,_id,_pr,callback,_started,_call) =
+    let (_ses,_id,_pr,_proof_script,callback,_started,_call) =
       Queue.pop prover_tasks_in_progress in
     (* TODO: apply some Call_provers.interrupt_call call *)
     callback Interrupted
   done;
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
+    let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
     callback Interrupted
   done;
   !observer 0 0 0
@@ -554,21 +563,135 @@ let run_timeout_handler () =
       S.timeout ~ms:125 timeout_handler;
     end
 
-let schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback =
+let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback =
   let panid =
     graft_proof_attempt c.controller_session id pr ~limit
   in
-  Queue.add (c,id,pr,limit,callback panid,counterexmp) scheduled_proof_attempts;
+  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp) scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
 
-let schedule_proof_attempt c id pr ~counterexmp ~limit ~callback ~notification =
+let schedule_proof_attempt ?proof_script c id pr ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
-    | Scheduled | Done _ -> update_goal_node notification c id
+    | Scheduled | Running | Done _ -> update_goal_node notification c id
     | _ -> ())
   in
-  schedule_proof_attempt_r c id pr ~counterexmp ~limit ~callback
+  (* proof_script is specific to interactive manual provers *)
+  let session_dir = Session_itp.get_dir c.controller_session in
+  let proof_script = Opt.map (Sysutil.absolutize_filename session_dir) proof_script in
+  schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
+
+(* TODO to be simplified *)
+(* create the path to a file for saving the external proof script *)
+let create_file_rel_path c pr pn =
+  let session = c.controller_session in
+  let driver = snd (Hprover.find c.controller_provers pr) in
+  let task = Session_itp.get_task session pn in
+  let session_dir = Session_itp.get_dir session in
+  let th = get_encapsulating_theory session (APn pn) in
+  let th_name = (Session_itp.theory_name th).Ident.id_string in
+  let f = get_encapsulating_file session (ATh th) in
+  let fn = f.file_name in
+  let file = Driver.file_of_task driver fn th_name task in
+  let file = Filename.concat session_dir file in
+  let file = Sysutil.uniquify file in
+  let file = Sysutil.relativize_filename session_dir file in
+  file
+
+let update_edit_external_proof c pn ?panid pr =
+  let session = c.controller_session in
+  let driver = snd (Hprover.find c.controller_provers pr) in
+  let task = Session_itp.get_task session pn in
+  let session_dir = Session_itp.get_dir session in
+  let file =
+    match panid with
+    | None ->
+        create_file_rel_path c pr pn
+    | Some panid ->
+        let pa = get_proof_attempt_node session panid in
+        Opt.get pa.proof_script
+  in
+  let file = Filename.concat session_dir file in
+  let old =
+    if Sys.file_exists file
+    then
+      begin
+        let backup = file ^ ".bak" in
+        if Sys.file_exists backup
+        then Sys.remove backup;
+        Sys.rename file backup;
+        Some(open_in backup)
+      end
+    else None
+  in
+  let ch = open_out file in
+  let fmt = formatter_of_out_channel ch in
+  (* Name table is only used in ITP printing *)
+  Driver.print_task ~cntexample:false ?old driver fmt task;
+  Opt.iter close_in old;
+  close_out ch;
+  file
+
+exception Editor_not_found
+
+let schedule_edition c id pr ?file ~callback ~notification =
+  Debug.dprintf debug_sched "[Sched] Scheduling an edition@.";
+  let config = c.controller_config in
+  let session = c.controller_session in
+  let prover_conf = Whyconf.get_prover_config config pr in
+  let session_dir = Session_itp.get_dir session in
+  (* Notification node *)
+  let callback panid s = callback panid s;
+    match s with
+    | Scheduled | Running | Done _ -> update_goal_node notification c id
+    | _ -> ()
+  in
+
+  let limit = Call_provers.empty_limit in
+  (* Make sure editor exists. Fails otherwise *)
+  let editor =
+    match prover_conf.Whyconf.editor with
+    | "" -> raise Editor_not_found
+    | s ->
+        try
+          let ed = Whyconf.editor_by_id config s in
+          String.concat " "(ed.Whyconf.editor_command ::
+                            ed.Whyconf.editor_options)
+        with Not_found -> raise Editor_not_found
+  in
+  let proof_attempts_id = get_proof_attempt_ids session id in
+  let panid =
+    try Some (Hprover.find proof_attempts_id pr) with
+    | _ -> None
+  in
+  (* make sure to actually create the file and the proof attempt *)
+  let panid, file =
+    match panid, file with
+    | None, None ->
+        let file = update_edit_external_proof c id pr in
+        let filename = Sysutil.relativize_filename session_dir file in
+        let panid = graft_proof_attempt c.controller_session id pr ~file:filename ~limit in
+        panid, file
+    | None, Some file ->
+        let panid = graft_proof_attempt c.controller_session id pr ~file ~limit in
+        let file = update_edit_external_proof c id ~panid pr in
+        panid, file
+    | Some panid, _ ->
+        let file = update_edit_external_proof c id ~panid pr in
+        panid, file
+  in
+
+  Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
+    (Session_itp.get_proof_name session id).Ident.id_string
+    editor file;
+  let call = Call_provers.call_editor ~command:editor file in
+  callback panid Running;
+  let file = Sysutil.relativize_filename session_dir file in
+  Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call)
+    prover_tasks_in_progress;
+  run_timeout_handler ()
+
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
@@ -762,13 +885,13 @@ let copy_detached ~copy c from_any =
   | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
 
 
-let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
+let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
      to check more things before giving the attempt to the scheduler *)
   if not (Hprover.mem c.controller_provers pr) then
     callback id (Uninstalled pr)
   else
-    schedule_proof_attempt c parid pr ~counterexmp:false ~limit ~callback ~notification
+    schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
@@ -856,7 +979,8 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
           else
             Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
         in
-        replay_proof_attempt c pr limit parid id
+        let proof_script = pa.proof_script in
+        replay_proof_attempt ?proof_script c pr limit parid id
                              ~callback:(fun id s ->
                                         craft_report count s report parid pr limit pa;
                                         callback id s;

@@ -3,12 +3,13 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="36" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="36" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="1.30" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../koda_ruskey.mlw">
+<file name="../koda_ruskey.mlw" expanded="true">
 <theory name="KodaRuskey_Spec" sum="8e518d6f01f787c2ba93abeff13d48b2">
  <goal name="size_forest_nonneg">
  <transf name="induction_ty_lex">
@@ -25,7 +26,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Lemmas" sum="69586628d3c613c629b078044197f281">
+<theory name="Lemmas" sum="3c7358ff49ab0c33420397550d3b9052">
  <goal name="mem_app">
  <transf name="induction_ty_lex">
   <goal name="mem_app.1" expl="1.">
@@ -202,10 +203,10 @@
   <proof prover="7"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="sub_not_nil.2" expl="2.">
-  <proof prover="0" timelimit="6"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.76"/></proof>
   </goal>
   <goal name="sub_not_nil.3" expl="3.">
-  <proof prover="7"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="0" timelimit="6"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
@@ -215,10 +216,10 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="sub_empty.2" expl="2.">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="sub_empty.3" expl="3.">
-  <proof prover="0"><result status="valid" time="1.13"/></proof>
+  <proof prover="1"><result status="valid" time="3.23"/></proof>
   </goal>
  </transf>
  </goal>
@@ -228,14 +229,14 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
   <goal name="sub_mem.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="sub_mem.3" expl="3.">
   <transf name="simplify_trivial_quantification">
-   <goal name="sub_mem.3.1" expl="1.">
+   <goal name="sub_mem.2.1" expl="1.">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="sub_mem.3" expl="3.">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
@@ -245,14 +246,14 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="sub_weaken1.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="sub_weaken1.3" expl="3.">
   <transf name="induction_ty_lex">
-   <goal name="sub_weaken1.3.1" expl="1.">
-   <proof prover="7" timelimit="5"><result status="valid" time="0.71" steps="908"/></proof>
+   <goal name="sub_weaken1.2.1" expl="1.">
+   <proof prover="7" timelimit="5"><result status="valid" time="0.02" steps="48"/></proof>
    </goal>
   </transf>
+  </goal>
+  <goal name="sub_weaken1.3" expl="3.">
+  <proof prover="0"><result status="valid" time="1.33"/></proof>
   </goal>
  </transf>
  </goal>
@@ -262,17 +263,22 @@
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="sub_weaken2.2" expl="2.">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="58"/></proof>
-  </goal>
-  <goal name="sub_weaken2.3" expl="3.">
   <transf name="induction_ty_lex">
-   <goal name="sub_weaken2.3.1" expl="1.">
+   <goal name="sub_weaken2.2.1" expl="1.">
    <transf name="split_goal_wp">
-    <goal name="sub_weaken2.3.1.1" expl="1.">
+    <goal name="sub_weaken2.2.1.1" expl="1.">
     <proof prover="6"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="sub_weaken2.3.1.2" expl="2.">
-    <proof prover="0"><result status="valid" time="0.20"/></proof>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sub_weaken2.3" expl="3.">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="sub_weaken2.3.1" expl="1.">
+   <transf name="introduce_premises">
+    <goal name="sub_weaken2.3.1.1" expl="1.">
+    <proof prover="1" timelimit="30" memlimit="4000"><result status="valid" time="0.88"/></proof>
     </goal>
    </transf>
    </goal>
@@ -286,10 +292,10 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="not_mem_st.2" expl="2.">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="not_mem_st.3" expl="3.">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="87"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="88"/></proof>
   </goal>
  </transf>
  </goal>
@@ -299,10 +305,10 @@
   <proof prover="7" timelimit="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="sub_frame.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="sub_frame.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
  </transf>
  </goal>
@@ -312,10 +318,10 @@
   <proof prover="7" timelimit="5" steplimit="-1"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="sub_no_rep.2" expl="2.">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="sub_no_rep.3" expl="3.">
-  <proof prover="0"><result status="valid" time="0.13"/></proof>
+  <proof prover="0"><result status="valid" time="0.16"/></proof>
   </goal>
  </transf>
  </goal>
@@ -331,14 +337,14 @@
   <goal name="sub_no_rep2.2" expl="2.">
   <transf name="split_goal_wp">
    <goal name="sub_no_rep2.2.1" expl="1.">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sub_no_rep2.3" expl="3.">
   <transf name="split_goal_wp">
    <goal name="sub_no_rep2.3.1" expl="1.">
-   <proof prover="0"><result status="valid" time="1.74"/></proof>
+   <proof prover="0"><result status="valid" time="1.09"/></proof>
    </goal>
   </transf>
   </goal>
@@ -422,9 +428,24 @@
   <goal name="sub_valid_coloring.2" expl="2.">
   <transf name="introduce_premises">
    <goal name="sub_valid_coloring.2.1" expl="1.">
-   <transf name="compute_in_goal">
+   <transf name="simplify_trivial_quantification">
     <goal name="sub_valid_coloring.2.1.1" expl="1.">
-    <proof prover="0" timelimit="6"><result status="valid" time="0.10"/></proof>
+    <transf name="compute_in_goal">
+     <goal name="sub_valid_coloring.2.1.1.1" expl="1.">
+     <transf name="split_goal_wp">
+      <goal name="sub_valid_coloring.2.1.1.1.1" expl="1.">
+      <proof prover="7" timelimit="5"><result status="valid" time="0.04" steps="98"/></proof>
+      </goal>
+      <goal name="sub_valid_coloring.2.1.1.1.2" expl="2.">
+      <proof prover="0" timelimit="6"><result status="valid" time="0.18"/></proof>
+      </goal>
+      <goal name="sub_valid_coloring.2.1.1.1.3" expl="3.">
+      <proof prover="0"><result status="valid" time="0.20"/></proof>
+      <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -433,22 +454,21 @@
   <goal name="sub_valid_coloring.3" expl="3.">
   <transf name="introduce_premises">
    <goal name="sub_valid_coloring.3.1" expl="1.">
-   <transf name="simplify_trivial_quantification">
+   <transf name="compute_in_goal">
     <goal name="sub_valid_coloring.3.1.1" expl="1.">
-    <transf name="compute_in_goal">
+    <transf name="split_goal_wp">
      <goal name="sub_valid_coloring.3.1.1.1" expl="1.">
-     <transf name="split_goal_wp">
+     <transf name="introduce_premises">
       <goal name="sub_valid_coloring.3.1.1.1.1" expl="1.">
-      <proof prover="4" edited="koda_ruskey_Lemmas_sub_valid_coloring_1.v"><result status="valid" time="4.50"/></proof>
-      </goal>
-      <goal name="sub_valid_coloring.3.1.1.1.2" expl="2.">
-      <proof prover="0" timelimit="6"><result status="valid" time="0.04"/></proof>
-      <proof prover="7"><result status="valid" time="0.01" steps="57"/></proof>
-      </goal>
-      <goal name="sub_valid_coloring.3.1.1.1.3" expl="3.">
-      <proof prover="7"><result status="valid" time="0.28" steps="537"/></proof>
+      <proof prover="3" timelimit="30" memlimit="4000"><result status="valid" time="12.19"/></proof>
       </goal>
      </transf>
+     </goal>
+     <goal name="sub_valid_coloring.3.1.1.2" expl="2.">
+     <proof prover="1" timelimit="1"><result status="valid" time="0.03"/></proof>
+     </goal>
+     <goal name="sub_valid_coloring.3.1.1.3" expl="3.">
+     <proof prover="7" timelimit="1"><result status="valid" time="0.18" steps="326"/></proof>
      </goal>
     </transf>
     </goal>
@@ -464,10 +484,10 @@
   <proof prover="7" timelimit="26"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="sub_Cons_N.2" expl="2.">
-  <proof prover="0" timelimit="26"><result status="valid" time="0.08"/></proof>
+  <proof prover="0" timelimit="26"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="sub_Cons_N.3" expl="3.">
-  <proof prover="0" timelimit="26"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" timelimit="26"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
@@ -792,7 +812,6 @@
      </goal>
      <goal name="WP_parameter enum.49.1.1.2" expl="2. VC for enum">
      <proof prover="0" timelimit="16"><result status="valid" time="10.18"/></proof>
-     <proof prover="7" timelimit="16"><result status="timeout" time="17.66"/></proof>
      </goal>
      <goal name="WP_parameter enum.49.1.1.3" expl="3. VC for enum">
      <proof prover="0" timelimit="16"><result status="valid" time="0.35"/></proof>

@@ -15,7 +15,6 @@ open Stdlib
 open Whyconf
 open Theory
 open Task
-open Driver
 
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
@@ -151,13 +150,7 @@ let option_list = [
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
-let main = Whyconf.get_main config
-
-let driver_file s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat (Whyconf.datadir main) (Filename.concat "drivers" (s ^ ".drv"))
-
-let opt_driver = ref (match List.rev_map driver_file !opt_driver with
+let opt_driver = ref (match !opt_driver with
   | f::ef -> Some (f, ef)
   | [] -> None)
 
@@ -244,7 +237,6 @@ let output_task drv fname _tname th task dir =
   let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
   let ext = String.sub dest i (String.length dest - i) in
   let cout = open_out (Filename.concat dir (name ^ ext)) in
-  (* Name tables not necessary outside of ITP *)
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
@@ -260,7 +252,6 @@ let output_task_prepared drv fname _tname th task dir =
   let ext = String.sub dest i (String.length dest - i) in
   let cout = open_out (Filename.concat dir (name ^ ext)) in
   (* TODO print the counterexample *)
-  (* Name tables not necessary outside ITP *)
   let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) task in
   close_out cout
 
@@ -277,7 +268,6 @@ let output_theory drv fname _tname th task dir =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
-  (* Name table is not necessary outside ITP *)
   Driver.print_task ?old drv (formatter_of_out_channel cout) task;
   close_out cout
 
@@ -288,7 +278,6 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
                    limit_mem = memlimit } in
   match !opt_output, !opt_command with
     | None, Some command ->
-        (* Name tables not necessary outside ITP *)
         let call =
           Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv task in
         let res = Call_provers.wait_on_call call in
@@ -296,7 +285,6 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
           (task_goal task).Decl.pr_name.Ident.id_string
           Call_provers.print_prover_result res
     | None, None ->
-        (* Name tables not necessary outside ITP *)
         Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
@@ -392,7 +380,7 @@ let do_input env drv = function
 
 let () =
   try
-    let load (f,ef) = load_driver env f ef in
+    let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->
