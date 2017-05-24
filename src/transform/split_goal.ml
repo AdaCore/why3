@@ -19,7 +19,7 @@ type split = {
   byso_split : bool;
   side_split : bool;
   stop_split : bool;
-  asym_split : bool;
+  intro_mode : bool;
   comp_match : known_map option;
 }
 
@@ -203,6 +203,9 @@ let rec split_core sp f =
   | _ when sp.stop_split && stop f ->
       let df = drop_byso f in
       ret !+(unstop f) !+(unstop df) f df Unit false false
+  | Tbinop (Tiff,_,_) | Tif _ | Tcase _ | Tquant _ when sp.intro_mode ->
+      let df = drop_byso f in
+      ret !+f !+df f df Unit false false
   | Ttrue -> ret Unit (Zero f) f f Unit false false
   | Tfalse -> ret (Zero f) Unit f f Unit false false
   | Tapp _ -> let uf = !+f in ret uf uf f f Unit false false
@@ -224,7 +227,7 @@ let rec split_core sp f =
       let (&&&) = alias2 f1 f2 t_and in
       let sf1 = rc f1 and sf2 = rc f2 in
       let fwd = sf1.fwd &&& sf2.fwd and bwd = sf1.bwd &&& sf2.bwd in
-      let asym = sp.asym_split && asym f1 in
+      let asym = not sp.intro_mode && asym f1 in
       let nf2, cn2 = ncaset [] sf2 in
       let sd = if asym then [sf1.side] else [] in
       let dp = nf2::sd in
@@ -249,7 +252,7 @@ let rec split_core sp f =
       let (>->) = alias2 f1 f2 t_implies in
       let sf1 = rc f1 and sf2 = rc f2 in
       let fwd = sf1.bwd >-> sf2.fwd and bwd = sf1.fwd >-> sf2.bwd in
-      let asym = sp.asym_split && asym f1 in
+      let asym = not sp.intro_mode && asym f1 in
       let sd = [sf1.side] in
       let neg1 = nclose sf1.pos in
       let neg2 = if not asym then sf2.neg else
@@ -266,7 +269,7 @@ let rec split_core sp f =
       let (|||) = alias2 f1 f2 t_or in
       let sf1 = rc f1 and sf2 = rc f2 in
       let fwd = sf1.fwd ||| sf2.fwd and bwd = sf1.bwd ||| sf2.bwd in
-      let asym = sp.asym_split && asym f1 in
+      let asym = not sp.intro_mode && asym f1 in
       let sd = if asym then [sf2.side] else [] in
       let pf2, cp2 = pcaset [] sf2 in
       let dp = sf2.pos::sd in
@@ -425,7 +428,7 @@ let full_split kn = {
   byso_split = false;
   side_split = true;
   stop_split = false;
-  asym_split = true;
+  intro_mode = false;
   comp_match = kn;
 }
 
@@ -433,7 +436,7 @@ let right_split kn = { (full_split kn) with right_only = true }
 let full_proof  kn = { (full_split kn) with stop_split = true;
                                             byso_split = true }
 let right_proof kn = { (full_proof kn) with right_only = true }
-let full_intro  kn = { (full_split kn) with asym_split = false;
+let full_intro  kn = { (full_split kn) with intro_mode = true;
                                             stop_split = true }
 let right_intro kn = { (full_intro kn) with right_only = true }
 
@@ -471,7 +474,7 @@ let split_axiom sp pr f =
   let make_prop f =
     let pr = create_prsymbol (id_clone pr.pr_name) in
     create_prop_decl Paxiom pr f in
-  let sp = { sp with asym_split = false; byso_split = false } in
+  let sp = { sp with intro_mode = true; byso_split = false } in
   match split_pos sp f with
     | [f] -> [create_prop_decl Paxiom pr f]
     | fl  -> List.map make_prop fl
