@@ -3,9 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="7" name="Vampire" version="0.6" timelimit="3" steplimit="0" memlimit="0"/>
+<prover id="7" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="0"/>
@@ -21,7 +22,7 @@
  <goal name="not_isfib_2_2">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
- <proof prover="7" timelimit="5"><result status="valid" time="0.03"/></proof>
+ <proof prover="7"><result status="valid" time="0.03"/></proof>
  <proof prover="8" memlimit="0"><result status="valid" time="0.01" steps="4"/></proof>
  <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -430,21 +431,28 @@
  </transf>
  </goal>
 </theory>
-<theory name="Mat22" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Mat22" sum="cc41e6488bdd64071b3c815e4f5356d3">
+ <goal name="Monoid.Assoc">
+ <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
+ </goal>
+ <goal name="Monoid.Unit_def_l">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="Monoid.Unit_def_r">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
 </theory>
-<theory name="FibonacciLogarithmic" sum="b47fef62882561569b783ece5a6bfae1">
+<theory name="FibonacciLogarithmic" sum="1463e67fce33079e4726bf939886c65a">
  <goal name="WP_parameter logfib" expl="VC for logfib">
  <transf name="split_goal_wp">
   <goal name="WP_parameter logfib.1" expl="1. postcondition">
-  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
-  <proof prover="7"><result status="valid" time="0.00"/></proof>
-  <proof prover="8" memlimit="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter logfib.2" expl="2. variant decrease">
-  <proof prover="8"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter logfib.3" expl="3. precondition">
-  <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="WP_parameter logfib.4" expl="4. postcondition">
   <proof prover="0" edited="fibonacci_WP_FibonacciLogarithmic_WP_parameter_logfib_1.v"><result status="valid" time="0.47"/></proof>
@@ -455,26 +463,25 @@
  <proof prover="0" edited="fibonacci_WP_FibonacciLogarithmic_fib_m_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="WP_parameter fibo" expl="VC for fibo">
- <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
- <proof prover="8" memlimit="0"><result status="valid" time="0.00" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
  <goal name="WP_parameter test0" expl="VC for test0">
- <proof prover="8"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter test1" expl="VC for test1">
- <proof prover="8"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter test7" expl="VC for test7">
- <proof prover="8"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter test42" expl="VC for test42">
- <proof prover="8"><result status="valid" time="0.02" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter test2014" expl="VC for test2014">
- <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
 </file>

@@ -105,7 +105,7 @@ let create_controller config env ses =
   Whyconf.Mprover.iter
     (fun _ p ->
      try
-       let d = Driver.load_driver env p.Whyconf.driver [] in
+       let d = Whyconf.load_driver (Whyconf.get_main config) env p.Whyconf.driver [] in
        Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
      with e ->
        Format.eprintf
@@ -590,7 +590,9 @@ let create_file_rel_path c pr pn =
   let session = c.controller_session in
   let prover_conf = Whyconf.get_prover_config config pr in
   let driver = prover_conf.Whyconf.driver in
-  let driver = Driver.load_driver c_env driver prover_conf.Whyconf.extra_drivers in
+  let driver = Whyconf.load_driver
+                 (Whyconf.get_main config)
+                 c_env driver prover_conf.Whyconf.extra_drivers in
   let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
@@ -609,7 +611,9 @@ let update_edit_external_proof c pn ?panid pr =
   let session = c.controller_session in
   let prover_conf = Whyconf.get_prover_config config pr in
   let driver = prover_conf.Whyconf.driver in
-  let driver = Driver.load_driver c_env driver prover_conf.Whyconf.extra_drivers in
+  let driver = Whyconf.load_driver
+                 (Whyconf.get_main config)
+                 c_env driver prover_conf.Whyconf.extra_drivers in
   let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let file =

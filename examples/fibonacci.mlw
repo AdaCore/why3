@@ -271,11 +271,9 @@ theory Mat22 "2x2 integer matrices"
     a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
     }
 
-  (* holds, but not useful *)
-  (* clone algebra.Assoc with type t = t, function op = mult, lemma Assoc *)
-
   clone export
-    int.Exponentiation with type t = t, function one = id, function (*) = mult
+    int.Exponentiation with type t = t, function one = id, function (*) = mult,
+    goal Monoid.Assoc, goal Monoid.Unit_def_l, goal Monoid.Unit_def_r
 
 end
 

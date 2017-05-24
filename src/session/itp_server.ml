@@ -502,10 +502,8 @@ let get_locations t =
   let task_driver config env =
     try
       let main = Whyconf.get_main config in
-      let d = Filename.concat (Whyconf.datadir main)
-                              (Filename.concat "drivers" "why3_itp.drv")
-      in
-      let d = Driver.load_driver env d [] in
+      let d = "why3_itp" in
+      let d = Whyconf.load_driver main env d [] in
       Debug.dprintf debug "[ITP server] driver for task printing loaded@.";
       d
     with e ->
