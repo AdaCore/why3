@@ -431,19 +431,15 @@ let rec fold_all_sub_goals_of_proofn s f acc pnid =
 let fold_all_sub_goals_of_theory s f acc th =
   List.fold_left (fold_all_sub_goals_of_proofn s f) acc th.theory_goals
 
-(*
 let theory_iter_proofn s f th =
   fold_all_sub_goals_of_theory s (fun _ -> f) () th
-*)
 
-(*
 let theory_iter_proof_attempt s f th =
   theory_iter_proofn s
     (fun pn -> Hprover.iter (fun _ pan ->
                              let pan = get_proof_attempt_node s pan in
                              f pan)
          pn.proofn_attempts) th
-*)
 
 (**************)
 (* Copy/Paste *)

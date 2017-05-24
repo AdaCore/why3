@@ -296,3 +296,11 @@ let ask_yn_nonblock ~callback =
             Buffer.clear b;
             true
       end
+
+
+let get_used_provers session =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.session_iter_proof_attempt
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+     session;
+  !sprover

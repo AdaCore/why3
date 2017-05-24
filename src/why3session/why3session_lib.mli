@@ -88,3 +88,7 @@ val ask_yn : unit -> bool
 val ask_yn_nonblock : callback:(bool -> unit) -> (unit -> bool)
 (** call the callback when an answer have been given,
     return true if it must be retried *)
+
+(**)
+
+val get_used_provers : Session_itp.session -> Whyconf.Sprover.t
