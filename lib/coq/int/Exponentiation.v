@@ -102,9 +102,10 @@ apply natlike_ind.
 now rewrite Zmult_0_r, 2!Power_0.
 intros m Hm IHm.
 replace (n * Zsucc m)%Z with (n * m + n)%Z by ring.
-rewrite Power_sum by auto with zarith.
+unfold Zsucc.
+rewrite 2!Power_sum by auto with zarith.
 rewrite IHm.
-now rewrite Comm, <- Power_s.
+now rewrite Power_1.
 Qed.
 
 (* Why3 goal *)

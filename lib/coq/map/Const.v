@@ -16,20 +16,7 @@ Require BuiltIn.
 Require HighOrd.
 Require map.Map.
 
-(* Why3 goal *)
-Definition const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (a -> b).
-Proof.
-intros a a_WT b b_WT v.
-intros i.
-exact v.
-Defined.
-
-(* Why3 goal *)
-Lemma const_def : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (v:b), forall (us:a), (((const v: (a -> b)) us) = v).
-Proof.
-intros a a_WT b b_WT b1 a1.
-reflexivity.
-Qed.
+(* Why3 assumption *)
+Definition const {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}
+  (v:b): (a -> b) := fun (us:a) => v.
 

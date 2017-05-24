@@ -158,12 +158,20 @@ exact (fun x => orb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
+Lemma union_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
+  (s2:(a -> bool)) (x:a), (((union s1 s2) x) = true) <-> (((s1 x) = true) \/
+  ((s2 x) = true)).
+Proof.
+intros a a_WT s1 s2 x.
+apply Bool.orb_true_iff.
+Qed.
+
+(* Why3 goal *)
 Lemma union_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
   (s2:(a -> bool)), forall (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/
   (mem x s2)).
 Proof.
-intros a a_WT s1 s2 x.
-apply Bool.orb_true_iff.
+exact @union_def.
 Qed.
 
 (* Why3 goal *)
@@ -175,12 +183,20 @@ exact (fun x => andb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
+Lemma inter_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
+  (s2:(a -> bool)) (x:a), (((inter s1 s2) x) = true) <-> (((s1 x) = true) /\
+  ((s2 x) = true)).
+Proof.
+intros a a_WT s1 s2 x.
+apply Bool.andb_true_iff.
+Qed.
+
+(* Why3 goal *)
 Lemma inter_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
   (s2:(a -> bool)), forall (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\
   (mem x s2)).
 Proof.
-intros a a_WT s1 s2 x.
-apply Bool.andb_true_iff.
+exact @inter_def.
 Qed.
 
 (* Why3 goal *)
@@ -192,15 +208,23 @@ exact (fun x => andb (s1 x) (negb (s2 x))).
 Defined.
 
 (* Why3 goal *)
-Lemma diff_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
-  (s2:(a -> bool)), forall (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\
-  ~ (mem x s2)).
+Lemma diff_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
+  (s2:(a -> bool)) (x:a), (((diff s1 s2) x) = true) <-> (((s1 x) = true) /\
+  ~ ((s2 x) = true)).
 Proof.
 intros a a_WT s1 s2 x.
 unfold mem, diff.
 rewrite Bool.not_true_iff_false.
 rewrite <- Bool.negb_true_iff.
 apply Bool.andb_true_iff.
+Qed.
+
+(* Why3 goal *)
+Lemma diff_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
+  (s2:(a -> bool)), forall (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\
+  ~ (mem x s2)).
+Proof.
+exact @diff_def.
 Qed.
 
 (* Why3 goal *)
@@ -222,7 +246,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma complement_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(a ->
-  bool)), forall (x:a), (((complement s) x) = true) <-> ~ ((s x) = true).
+  bool)) (x:a), (((complement s) x) = true) <-> ~ ((s x) = true).
 Proof.
 intros a a_WT s x.
 unfold complement.
