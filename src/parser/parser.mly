@@ -1065,7 +1065,7 @@ sident:
 
 (* Parsing of a list *)
 ident_comma_list:
-| LEFTSQ comma_list1(ident) RIGHTSQ EOF { $2 }
+| comma_list1(ident) EOF { $1 }
 
 (* Labels and position markers *)
 

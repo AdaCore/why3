@@ -721,7 +721,7 @@ let () = wrap_and_register
     (Tprsymbol Ttrans) remove
 
 let () = wrap_and_register
-    ~desc:"remove_list <prop list>: removes a list of hypothesis when given their names. Example syntax: remove_list [a,b,c] ."
+    ~desc:"remove_list <prop list>: removes a list of hypothesis when given their names. Example syntax: remove_list a,b,c "
      "remove_list"
      (Tprlist Ttrans) remove_list
 
