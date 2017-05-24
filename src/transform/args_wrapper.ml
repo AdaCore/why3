@@ -376,7 +376,10 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Tprlist t', s :: tail ->
       let pr_list = parse_list_ident s in
       let pr_list =
-        List.map (fun id -> try find_pr id.Ptree.id_str tables with | Not_found -> raise (Arg_hyp_not_found s) ) pr_list in
+        List.map (fun id ->
+                    try find_pr id.Ptree.id_str tables with
+                    | Not_found -> raise (Arg_hyp_not_found s))
+                 pr_list in
       wrap_to_store t' (f pr_list) tail env tables task
     | Tlsymbol t', s :: tail ->
       let pr = try (find_ls s tables) with
