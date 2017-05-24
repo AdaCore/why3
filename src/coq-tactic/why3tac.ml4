@@ -207,7 +207,7 @@ let get_prover s =
         else
           raise (Whyconf.ProverAmbiguity (wc,fp,provers))
     in
-    let drv = Driver.load_driver env cp.driver cp.extra_drivers in
+    let drv = Whyconf.load_driver main env cp.driver cp.extra_drivers in
     Hashtbl.add provers s (cp, drv);
     cp, drv
 
