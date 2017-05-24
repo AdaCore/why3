@@ -114,6 +114,17 @@ let remove_task_decl (name: Ident.ident) : task trans =
 let remove name =
   remove_task_decl name.pr_name
 
+(* from task [delta, name1, name2, ... namen |- G] build the task [delta |- G] *)
+let remove_list name_list =
+  Trans.decl
+    (fun d ->
+      match d.d_node with
+      | Dprop (Paxiom, pr, _) when
+          (List.exists (fun x -> Ident.id_equal pr.pr_name x.pr_name) name_list) ->
+        []
+      | _ -> [d])
+    None
+
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
 let instantiate (pr: Decl.prsymbol) t =
@@ -708,6 +719,11 @@ let () = wrap_and_register
     ~desc:"remove <prop> removes hypothesis named prop"
     "remove"
     (Tprsymbol Ttrans) remove
+
+let () = wrap_and_register
+    ~desc:"remove_list <prop list>: removes a list of hypothesis when given their names. Example syntax: remove_list [a,b,c] ."
+     "remove_list"
+     (Tprlist Ttrans) remove_list
 
 let () = wrap_and_register
     ~desc:"instantiate <prop> <term> generates a new hypothesis with first quantified variables of prop replaced with term "
