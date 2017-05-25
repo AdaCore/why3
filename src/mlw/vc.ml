@@ -639,7 +639,8 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k2 = k_expr env lps e2 res xmap in
         let kk v =
           if s then try
-            if ity_fragile e.e_ity then raise Exit;
+            if not (ity_equal e.e_ity ity_bool) ||
+              ity_fragile e.e_ity then raise Exit;
             let t1, f1, k1 = term_of_kode res k1 in
             let t2, f2, k2 = term_of_kode res k2 in
             let test = t_equ (t_var v.pv_vs) t_bool_true in
@@ -656,7 +657,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let bl = List.map branch bl in
         let kk v =
           if s then try
-            if ity_fragile e.e_ity then raise Exit;
+            if true || ity_fragile e.e_ity then raise Exit;
             let add_br (p,k) (bl,tl,fl) =
               let t, f, k = term_of_kode res k in
               let tl = t_close_branch p t :: tl in
