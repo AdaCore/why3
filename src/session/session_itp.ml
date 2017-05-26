@@ -1553,7 +1553,7 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
     (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
     (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
     (save_bool_def "obsolete" false) a.proof_obsolete
-    (save_option_def "proof_script") a.proof_script;
+    (save_option_def "edited") a.proof_script;
   save_status fmt a.proof_state;
   fprintf fmt "</proof>@]"
 
