@@ -22,6 +22,17 @@ val dty_fresh : unit -> dty
 
 val dty_of_ty : ty -> dty
 
+val dty_var : tvsymbol -> dty
+val dty_app : tysymbol -> dty list -> dty
+
+val dty_match : dty -> ty  -> unit (* raises Exit on failure *)
+val dty_unify : dty -> dty -> unit (* raises Exit on failure *)
+
+val dty_bool : dty
+
+val dty_fold : (tysymbol -> 'a list -> 'a) ->
+               (tvsymbol -> 'a) -> (int -> 'a) -> dty -> 'a
+
 (** Patterns, terms, and formulas *)
 
 type dpattern = private {

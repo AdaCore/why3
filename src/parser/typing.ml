@@ -739,8 +739,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
   | Ptree.Eabsurd -> DEabsurd
-  | Ptree.Eassert (ak, lexpr) ->
-      DEassert (ak, dassert muc lexpr)
+  | Ptree.Epure t ->
+      let get_term lvm old = type_term muc lvm old t in
+      let gvars _at q = try match find_prog_symbol muc q with
+        | PV v -> Some v | _ -> None with _ -> None in
+      let get_dty pure_denv =
+        let dt = dterm muc.muc_theory gvars None pure_denv t in
+        match dt.dt_dty with Some dty -> dty | None -> dty_bool in
+      DEpure (get_term, denv_pure denv get_dty)
+  | Ptree.Eassert (ak, f) ->
+      DEassert (ak, dassert muc f)
   | Ptree.Emark (id, e1) ->
       DEmark (create_user_id id, dexpr muc denv e1)
   | Ptree.Enamed (Lpos uloc, e1) ->

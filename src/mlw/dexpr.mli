@@ -23,11 +23,12 @@ val dity_fresh : unit -> dity
 
 val dity_of_ity : ity -> dity
 
-val dity_int : dity
+val dity_int  : dity
 val dity_real : dity
+val dity_bool : dity
+val dity_unit : dity
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
-
 
 (** Patterns *)
 
@@ -114,7 +115,7 @@ and dexpr_node =
   | DEraise of xsymbol * dexpr
   | DEghost of dexpr
   | DEassert of assertion_kind * term later
-  | DEpure of term later
+  | DEpure of term later * dity
   | DEabsurd
   | DEtrue
   | DEfalse
@@ -149,6 +150,8 @@ val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
 val denv_get_opt : denv -> string -> dexpr_node option
 
 val denv_contents : denv -> (Ty.Stv.t option * dvty) Mstr.t
+
+val denv_pure : denv -> (Dterm.denv -> Dterm.dty) -> dity
 
 (** Constructors *)
 

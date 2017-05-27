@@ -153,7 +153,7 @@
 
 (* program symbols *)
 
-%token AMPAMP BARBAR LEFTBRC RIGHTBRC SEMICOLON
+%token AMPAMP BARBAR LEFTBRC RIGHTBRC LEFTPURE RIGHTPURE SEMICOLON
 
 (* Precedences *)
 
@@ -811,6 +811,7 @@ expr_sub:
 | LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
+| LEFTPURE term RIGHTPURE                           { Epure $2 }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }

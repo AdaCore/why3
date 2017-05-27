@@ -29,6 +29,36 @@ let dty_fresh = let i = ref 0 in fun () -> Dvar (ref (Dind (incr i; !i)))
 
 let dty_of_ty ty = Duty ty
 
+let dty_var tv = Duty (ty_var tv)
+
+let rec dty_app ts dtl =
+  try
+    let tl = List.map (function Duty ty -> ty | _ -> raise Exit) dtl in
+    Duty (ty_app ts tl)
+  with Exit -> match ts.ts_def with
+    | Alias ty ->
+        let sbs = try List.fold_right2 Mtv.add ts.ts_args dtl Mtv.empty with
+          | Invalid_argument _ -> raise (BadTypeArity (ts, List.length dtl)) in
+        let rec inst ty = match ty.ty_node with
+          | Tyapp (ts,tl) -> dty_app ts (List.map inst tl)
+          | Tyvar v -> Mtv.find v sbs in
+        inst ty
+    | NoDef | Range _ | Float _ ->
+        if List.length ts.ts_args <> List.length dtl then
+          raise (BadTypeArity (ts, List.length dtl));
+        Dapp (ts, dtl)
+
+let dty_fold fnS fnV fnI dty =
+  let rec on_ty ty = match ty.ty_node with
+    | Tyapp (s, tl) -> fnS s (List.map on_ty tl)
+    | Tyvar v -> fnV v in
+  let rec on_dty = function
+    | Dvar { contents = Dind i } -> fnI i
+    | Dvar { contents = Dval dty } -> on_dty dty
+    | Dapp (s, dtl) -> fnS s (List.map on_dty dtl)
+    | Duty ty -> on_ty ty in
+  on_dty dty
+
 exception UndefinedTypeVar of tvsymbol
 
 let rec ty_of_dty ~strict = function
