@@ -238,8 +238,8 @@ let treat_notification fmt n =
   | Message (msg)                 -> treat_message_notification fmt msg
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."
-  | File_contents _ -> assert false (* TODO *)
-  | Next_Unproven_Node_Id _ -> assert false (* TODO *)
+  | File_contents _ -> fprintf fmt "got a File_contents notification not yet supported@." (* TODO *)
+  | Next_Unproven_Node_Id _ -> fprintf fmt "got a Next_Unproven_Node_Id notification not yet supported@." (* TODO *)
   | Task (id, s, _list_loc)       ->
     (* coloring the source is useless in shell *)
     try
