@@ -233,7 +233,7 @@ let iter_proof_attempt_by_filter cont iter filters f =
     (fun a -> Controller_itp.pn_proved cont a.S.parent) in
   (* verified *)
   let f = three_value f filters.verified
-    (fun p -> match p.S.proof_state with Some Call_provers.{ pr_answer = Valid } ->
+    (fun p -> match p.S.proof_state with Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
                                       true | _ -> false) in
   (* status *)
   let f = if filters.status = [] then f else
