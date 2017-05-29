@@ -100,6 +100,8 @@ type ide_request =
   | Set_max_tasks_req       of int
   | Get_file_contents       of string
   | Get_task                of node_ID
+  | Focus_req               of node_ID
+  | Unfocus_req
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Copy_detached           of node_ID
@@ -125,4 +127,4 @@ let modify_session (r: ide_request) =
   | Set_max_tasks_req _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
   | Get_Session_Tree_req | Save_req | Reload_req | Exit_req
-  | Interrupt_req -> false
+  | Interrupt_req | Focus_req _ | Unfocus_req -> false

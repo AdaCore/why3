@@ -106,6 +106,9 @@ type ide_request =
   | Set_max_tasks_req       of int
   | Get_file_contents       of string
   | Get_task                of node_ID
+  | Focus_req               of node_ID
+  (* Focus on a node. The server only sends info about descendants of this ID *)
+  | Unfocus_req
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Copy_detached           of node_ID

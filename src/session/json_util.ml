@@ -129,6 +129,8 @@ let convert_request_constructor (r: ide_request) =
   | Save_file_req _           -> String "Save_file_req"
   | Set_max_tasks_req _       -> String "Set_max_tasks_req"
   | Get_file_contents _       -> String "Get_file_contents"
+  | Focus_req _               -> String "Focus_req"
+  | Unfocus_req               -> String "Unfocus_req"
   | Get_task _                -> String "Get_task"
   | Remove_subtree _          -> String "Remove_subtree"
   | Copy_paste _              -> String "Copy_paste"
@@ -202,6 +204,11 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Get_first_unproven_node id ->
       convert_record ["ide_request", cc r;
            "node_ID", Int id]
+  | Focus_req id ->
+      convert_record ["ide_request", cc r;
+                      "node_ID", Int id]
+  | Unfocus_req ->
+      convert_record ["ide_request", cc r]
   | Get_Session_Tree_req ->
       convert_record ["ide_request", cc r]
   | Mark_obsolete_req n ->
@@ -452,6 +459,13 @@ let parse_request (constr: string) j =
     let f = get_string (get_field j "file") in
     Open_session_req f
 *)
+  | "Focus_req" ->
+    let nid = get_int (get_field j "node_ID") in
+    Focus_req nid
+
+  | "Unfocus_req" ->
+    Unfocus_req
+
   | "Add_file_req" ->
     let f = get_string (get_field j "file") in
     Add_file_req f

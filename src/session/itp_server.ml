@@ -256,6 +256,8 @@ let print_request fmt r =
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
   | Get_task _nid                   -> fprintf fmt "get task"
+  | Focus_req _nid                  -> fprintf fmt "focus"
+  | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
@@ -325,7 +327,7 @@ module type Protocol = sig
   val notify : notification -> unit
 end
 
-module Make (S:Controller_itp.Scheduler) (P:Protocol) = struct
+module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
 
   module C = Controller_itp.Make(S)
 
@@ -383,6 +385,79 @@ let () =
        Format.eprintf "[ITP server] not yet initialized@.";
        exit 1
     | Some x -> x
+
+(* fresh gives new fresh "names" for node_ID using a counter.
+   reset resets the counter so that we can regenerate node_IDs as if session
+   was fresh *)
+  let reset, fresh =
+    let count = ref 0 in
+    (fun () ->
+      count := 0),
+    fun () ->
+      count := !count + 1;
+      !count
+
+  let model_any : any Hint.t = Hint.create 17
+
+  let any_from_node_ID (nid:node_ID) : any = Hint.find model_any nid
+
+  let pan_to_node_ID  : node_ID Hpan.t = Hpan.create 17
+  let pn_to_node_ID   : node_ID Hpn.t = Hpn.create 17
+  let tn_to_node_ID   : node_ID Htn.t = Htn.create 17
+  let th_to_node_ID   : node_ID Ident.Hid.t = Ident.Hid.create 7
+  let file_to_node_ID : node_ID Hstr.t = Hstr.create 3
+
+  let node_ID_from_pan  pan  = Hpan.find pan_to_node_ID pan
+  let node_ID_from_pn   pn   = Hpn.find pn_to_node_ID pn
+  let node_ID_from_tn   tn   = Htn.find tn_to_node_ID tn
+  let node_ID_from_th   th   = Ident.Hid.find th_to_node_ID (theory_name th)
+  let node_ID_from_file file = Hstr.find file_to_node_ID (file.file_name)
+
+  let node_ID_from_any  any  =
+    match any with
+    | AFile file -> node_ID_from_file file
+    | ATh th     -> node_ID_from_th th
+    | ATn tn     -> node_ID_from_tn tn
+    | APn pn     -> node_ID_from_pn pn
+    | APa pan    -> node_ID_from_pan pan
+
+  let remove_any_node_ID any =
+    match any with
+    | AFile file ->
+        let nid = Hstr.find file_to_node_ID file.file_name in
+        Hint.remove model_any nid;
+        Hstr.remove file_to_node_ID file.file_name
+    | ATh th     ->
+        let nid = Ident.Hid.find th_to_node_ID (theory_name th) in
+        Hint.remove model_any nid;
+        Ident.Hid.remove th_to_node_ID (theory_name th)
+    | ATn tn     ->
+        let nid = Htn.find tn_to_node_ID tn in
+        Hint.remove model_any nid;
+        Htn.remove tn_to_node_ID tn
+    | APn pn     ->
+        let nid = Hpn.find pn_to_node_ID pn in
+        Hint.remove model_any nid;
+        Hpn.remove pn_to_node_ID pn
+    | APa pa     ->
+        let nid = Hpan.find pan_to_node_ID pa in
+        Hint.remove model_any nid;
+        Hpan.remove pan_to_node_ID pa
+
+  let get_prover p =
+    let d = get_server_data () in
+    match return_prover p d.cont.controller_config with
+    | None -> raise (Bad_prover_name p)
+    | Some c -> c
+
+  let add_node_to_table node new_id =
+    match node with
+    | AFile file -> Hstr.add file_to_node_ID file.file_name new_id
+    | ATh th     -> Ident.Hid.add th_to_node_ID (theory_name th) new_id
+    | ATn tn     -> Htn.add tn_to_node_ID tn new_id
+    | APn pn     -> Hpn.add pn_to_node_ID pn new_id
+    | APa pan    -> Hpan.add pan_to_node_ID pan new_id
+
 
 (*******************************)
 (* Compute color for locations *)
@@ -449,6 +524,44 @@ let get_locations t =
   let l = ref [] in
   get_locations l t;
   !l
+
+let get_modified_node n =
+  match n with
+  | New_node (nid, _, _, _, _) -> Some nid
+  | Node_change  (nid, _) -> Some nid
+  | Remove nid -> Some nid
+  | Next_Unproven_Node_Id (_, nid) -> Some nid
+  | Initialized _ -> None
+  | Saved -> None
+  | Message _ -> None
+  | Dead _ -> None
+  | Task (nid, _, _) -> Some nid
+  | File_contents _ -> None
+
+(* Focus on a node *)
+let focused_node = ref None
+
+(* TODO *)
+module P = struct
+
+  let get_requests = Pr.get_requests
+
+  let notify n =
+    let d = get_server_data() in
+    let s = d.cont.controller_session in
+    match !focused_node with
+    | None -> Pr.notify n
+    | Some f_node ->
+        let updated_node = get_modified_node n in
+        match updated_node with
+        | None -> Pr.notify n
+        | Some nid when
+            let any = any_from_node_ID nid in
+            Session_itp.is_below s any f_node ->
+              Pr.notify n
+        | _ -> ()
+
+end
 
   (*********************)
   (* File input/output *)
@@ -601,78 +714,6 @@ let get_locations t =
         (NProofAttempt (pr, pa.proof_obsolete)),
         {name; proved}
 *)
-
-(* fresh gives new fresh "names" for node_ID using a counter.
-   reset resets the counter so that we can regenerate node_IDs as if session
-   was fresh *)
-  let reset, fresh =
-    let count = ref 0 in
-    (fun () ->
-      count := 0),
-    fun () ->
-      count := !count + 1;
-      !count
-
-  let model_any : any Hint.t = Hint.create 17
-
-  let any_from_node_ID (nid:node_ID) : any = Hint.find model_any nid
-
-  let pan_to_node_ID  : node_ID Hpan.t = Hpan.create 17
-  let pn_to_node_ID   : node_ID Hpn.t = Hpn.create 17
-  let tn_to_node_ID   : node_ID Htn.t = Htn.create 17
-  let th_to_node_ID   : node_ID Ident.Hid.t = Ident.Hid.create 7
-  let file_to_node_ID : node_ID Hstr.t = Hstr.create 3
-
-  let node_ID_from_pan  pan  = Hpan.find pan_to_node_ID pan
-  let node_ID_from_pn   pn   = Hpn.find pn_to_node_ID pn
-  let node_ID_from_tn   tn   = Htn.find tn_to_node_ID tn
-  let node_ID_from_th   th   = Ident.Hid.find th_to_node_ID (theory_name th)
-  let node_ID_from_file file = Hstr.find file_to_node_ID (file.file_name)
-
-  let node_ID_from_any  any  =
-    match any with
-    | AFile file -> node_ID_from_file file
-    | ATh th     -> node_ID_from_th th
-    | ATn tn     -> node_ID_from_tn tn
-    | APn pn     -> node_ID_from_pn pn
-    | APa pan    -> node_ID_from_pan pan
-
-  let remove_any_node_ID any =
-    match any with
-    | AFile file ->
-        let nid = Hstr.find file_to_node_ID file.file_name in
-        Hint.remove model_any nid;
-        Hstr.remove file_to_node_ID file.file_name
-    | ATh th     ->
-        let nid = Ident.Hid.find th_to_node_ID (theory_name th) in
-        Hint.remove model_any nid;
-        Ident.Hid.remove th_to_node_ID (theory_name th)
-    | ATn tn     ->
-        let nid = Htn.find tn_to_node_ID tn in
-        Hint.remove model_any nid;
-        Htn.remove tn_to_node_ID tn
-    | APn pn     ->
-        let nid = Hpn.find pn_to_node_ID pn in
-        Hint.remove model_any nid;
-        Hpn.remove pn_to_node_ID pn
-    | APa pa     ->
-        let nid = Hpan.find pan_to_node_ID pa in
-        Hint.remove model_any nid;
-        Hpan.remove pan_to_node_ID pa
-
-  let get_prover p =
-    let d = get_server_data () in
-    match return_prover p d.cont.controller_config with
-    | None -> raise (Bad_prover_name p)
-    | Some c -> c
-
-  let add_node_to_table node new_id =
-    match node with
-    | AFile file -> Hstr.add file_to_node_ID file.file_name new_id
-    | ATh th     -> Ident.Hid.add th_to_node_ID (theory_name th) new_id
-    | ATn tn     -> Htn.add tn_to_node_ID tn new_id
-    | APn pn     -> Hpn.add pn_to_node_ID pn new_id
-    | APa pan    -> Hpan.add pan_to_node_ID pan new_id
 
   (* Create a new node in the_tree, update the tables and send a
      notification about it *)
@@ -1117,6 +1158,11 @@ let get_locations t =
     | Get_Session_Tree_req         -> resend_the_tree ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
+    | Focus_req nid ->
+        let any = any_from_node_ID nid in
+        focused_node := Some any
+    | Unfocus_req ->
+        focused_node := None
     | Remove_subtree nid           ->
         let n = any_from_node_ID nid in
         begin
