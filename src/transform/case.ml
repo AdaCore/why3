@@ -1,5 +1,7 @@
 open Trans
 open Term
+open Ident
+open Ty
 open Decl
 open Theory
 open Task
@@ -16,7 +18,7 @@ exception Cannot_infer_type of string
 let debug_matching = Debug.register_info_flag "print_match"
   ~desc:"Print@ terms@ that@ were@ not@ successfully@ matched@ by@ ITP@ tactic@ apply."
 
-let rec dup n x = if n = 0 then [] else x::(dup (n-1) x)
+(* let rec dup n x = if n = 0 then [] else x::(dup (n-1) x) *)
 
 let gen_ident = Ident.id_fresh
 
@@ -509,12 +511,6 @@ let or_intro (left: bool) : Task.task Trans.trans =
       end
     | _ -> [d]) None
 
-(* TODO to be done ... *)
-open Ident
-open Ty
-open Term
-open Decl
-
 (* TODO temporary for intros *)
 let rec intros n pr f =
   if n = 0 then [create_prop_decl Pgoal pr f] else
@@ -715,9 +711,9 @@ let () = wrap_and_register
     ~desc:"apply <prop> applies prop to the goal" "apply"
     (Tprsymbol Ttrans_l) apply
 
-let () = wrap_and_register
-    ~desc:"duplicate <int> duplicates the goal int times" "duplicate"
-    (Tint Ttrans_l) (fun x -> Trans.store (dup x))
+(* let () = wrap_and_register *)
+(*     ~desc:"duplicate <int> duplicates the goal int times" "duplicate" *)
+(*     (Tint Ttrans_l) (fun x -> Trans.store (dup x)) *)
 
 let () = wrap_and_register
     ~desc:"use_th <theory> imports the theory" "use_th"

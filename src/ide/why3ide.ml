@@ -200,14 +200,6 @@ let () =
   Gconfig.init ()
 
 
-
-
-
-
-
-
-
-
 (********************************)
 (* Source language highlighting *)
 (********************************)
@@ -249,10 +241,6 @@ let try_convert s =
     with Glib.Convert.Error _ as e -> Printexc.to_string e
 
 
-
-
-
-
 (****************************)
 (* Color handling in source *)
 (****************************)
@@ -283,10 +271,6 @@ let erase_color_loc (v:GSourceView2.source_view) =
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter
-
-
-
-
 
 
 
@@ -373,19 +357,6 @@ let update_label_saved (label: GMisc.label) =
   let s = label#text in
   if (Strings.has_prefix "*" s) then
     label#set_text (String.sub s 1 (String.length s - 1))
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 (**********************)
