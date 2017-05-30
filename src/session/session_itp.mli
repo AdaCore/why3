@@ -37,6 +37,7 @@ type file = private {
   file_detached_theories : theory list;
 }
 
+(* Any proof node of the tree *)
 type any =
   | AFile of file
   | ATh of theory
@@ -44,14 +45,21 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
+(** Session / File *)
+
+(* Get all the files in the session *)
+val get_files : session -> file Stdlib.Hstr.t
+(* Get a single file in the session using its name *)
+val get_file: session -> string -> file
+(* Get directory containing the session *)
+val get_dir : session -> string
+val get_shape_version : session -> int
+
+(** Theory *)
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
 val theory_detached_goals : theory -> proofNodeID list
 val theory_parent : session -> theory -> file
-
-val get_files : session -> file Stdlib.Hstr.t
-val get_dir : session -> string
-val get_shape_version : session -> int
 
 type proof_attempt_node = private {
   parent              : proofNodeID;

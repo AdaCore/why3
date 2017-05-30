@@ -154,6 +154,7 @@ let get_theories s =
  *)
 
 let get_files s = s.session_files
+let get_file s name = Hstr.find s.session_files name
 let get_dir s = s.session_dir
 
 let get_shape_version s = s.session_shape_version

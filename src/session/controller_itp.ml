@@ -459,7 +459,6 @@ let set_max_tasks n =
   max_number_of_running_provers := n;
   Prove_client.set_max_running_provers n
 
-
 let number_of_running_provers = ref 0
 
 let observer = ref (fun _ _ _ -> ())

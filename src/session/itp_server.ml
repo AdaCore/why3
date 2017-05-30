@@ -857,20 +857,23 @@ end
      path from the session directory to the file. *)
   let add_file_to_session cont f =
     let fn = Sysutil.relativize_filename
-      (Session_itp.get_dir cont.controller_session) f in
-    let files = get_files cont.controller_session in
-    if (not (Stdlib.Hstr.mem files fn)) then
-      if (Sys.file_exists f) then
-      begin
-        let b = add_file cont f in
-        if b then
-          let file = Stdlib.Hstr.find files fn in
-          init_and_send_file file
-      end
-      else
-        P.notify (Message (Open_File_Error ("File not found: " ^ f)))
-    else
-      P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
+      (get_dir cont.controller_session) f in
+    let fn_exists =
+      try Some (get_file cont.controller_session fn)
+      with | Not_found -> None
+    in
+    match fn_exists with
+    | None ->
+        if (Sys.file_exists f) then
+          begin
+            let b = add_file cont f in
+            if b then
+              let file = get_file cont.controller_session fn in
+              init_and_send_file file
+          end
+        else
+          P.notify (Message (Open_File_Error ("File not found: " ^ f)))
+    | Some _ -> P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
 
 
   (* ------------ init server ------------ *)
