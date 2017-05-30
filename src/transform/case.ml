@@ -100,20 +100,6 @@ let exists_aux g x =
 let exists x =
   Trans.goal (fun _ g -> exists_aux g x)
 
-(* Return a new task with hypothesis name removed *)
-let remove_task_decl (name: Ident.ident) : task trans =
-  Trans.decl
-    (fun d ->
-     match d.d_node with
-    | Dprop (Paxiom, pr, _) when (Ident.id_equal pr.pr_name name) ->
-       []
-    | _ -> [d])
-    None
-
-(* from task [delta, name:A |- G]  build the task [delta |- G] *)
-let remove name =
-  remove_task_decl name.pr_name
-
 (* from task [delta, name1, name2, ... namen |- G] build the task [delta |- G] *)
 let remove_list name_list =
   Trans.decl
@@ -716,13 +702,8 @@ let () = wrap_and_register
     (Tterm Ttrans) exists
 
 let () = wrap_and_register
-    ~desc:"remove <prop> removes hypothesis named prop"
-    "remove"
-    (Tprsymbol Ttrans) remove
-
-let () = wrap_and_register
-    ~desc:"remove_list <prop list>: removes a list of hypothesis when given their names. Example syntax: remove_list a,b,c "
-     "remove_list"
+    ~desc:"remove <prop list>: removes a list of hypothesis given by their names separated with ','. Example: remove_list a,b,c "
+     "remove"
      (Tprlist Ttrans) remove_list
 
 let () = wrap_and_register
