@@ -603,6 +603,7 @@ let unfold unf h =
         end
       | _ -> [d]) None
 
+(* from task [delta, name1, name2, ... namen |- G] build the task [name1, name2, ... namen |- G] *)
 let clear_but (l: prsymbol list) =
   Trans.decl
     (fun d ->
@@ -656,10 +657,9 @@ let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
     (Tlsymbol Ttrans) subst
 
-(* TODO give a list of hypothesis *)
 let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
     "clear_but"
-    (Tprsymbol Ttrans) (fun x -> clear_but [x])
+    (Tprlist Ttrans) clear_but
 
 
 let () = wrap_and_register ~desc:"left transform a goal of the form A \\/ B into A"
