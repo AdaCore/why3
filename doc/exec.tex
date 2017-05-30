@@ -71,14 +71,126 @@ files \texttt{max\_sum.ml} and \texttt{main.ml}:
 \begin{verbatim}
 > ocamlbuild -pkg zarith main.native
 \end{verbatim}
-Since Why3's type
+Since \why's type
 \texttt{int} is translated to OCaml arbitrary precision integers using
 the \texttt{ZArith} library, we have to pass option \texttt{-pkg
   zarith} to \texttt{ocamlbuild}. In order to get extracted code that
-uses OCaml's native integers instead, one has to use Why3's types for
+uses OCaml's native integers instead, one has to use \why's types for
 63-bit integers from libraries \texttt{mach.int.Int63} and
 \texttt{mach.array.Array63}.
 
+\paragraph{Extraction starting point} The \texttt{extract} command accepts three
+different targets for extraction: a \whyml file, a module, or a symbol
+(function, type, exception). To extract all the symbols from every module of a
+file named \texttt{f.mlw}, one should write
+\begin{verbatim}
+> why3 extract -D <driver> f.mlw
+\end{verbatim}
+To extract only the symbols from module \texttt{M} of file \texttt{f.mlw}, one
+should write
+\begin{verbatim}
+> why3 extract -D <driver> -L <dir> f.M
+\end{verbatim}
+To extract only the symbol \texttt{s} (a function, a type, or an exception) from
+module \texttt{M} of file \texttt{f.mlw}, one should write
+\begin{verbatim}
+> why3 extract -D <driver> -L <dir> f.M.s
+\end{verbatim}
+Note the use of~\texttt{-L <dir>}, for both extraction of a module and a symbol,
+in order to state the location of file \texttt{f.mlw}.
+
+\paragraph{Options}
+\begin{description}
+\item[\texttt{-{}-flat}] performs a flat extraction, \emph{i.e.}, everything is
+  extracted into a single file. This is the default behavior. The \texttt{-o}
+  option should be given the name of a file or, if omitted, the result of
+  extraction is printed to the standard output.
+\item[\texttt{-{}-modular}] each module is extracted in its own, separated
+  file. The \texttt{-o} option cannot be omitted, and it should be given the
+  name of an existing directory. This directory will be populated with the
+  resulting OCaml files.
+\item[\texttt{-{}-recursive}] recursively extracts all the dependencies of the
+  chosen entry point. This option is valid for both \texttt{modular} and
+  \texttt{flat} options.
+\end{description}
+
+\paragraph{Examples}
+We discuss different uses of the \texttt{extract} command though some examples.
+Consider the program in Figure~\ref{fig:NQueens2} on
+page~\pageref{fig:NQueens2}, where function \texttt{queens} computes a solution for
+the \texttt{N}-Queens problem. If we are only interested in extracting this
+function, we can proceed as follows:
+\begin{verbatim}
+> why3 extract -D ocaml64 -L . queens.NQueens.queens -o queens.ml
+\end{verbatim}
+Here we assume the program is contained in a file \texttt{queens.mlw} and that
+we invoke \texttt{extract} from the directory where this file is stored. File
+\texttt{queens.ml} now contains the following OCaml code:
+\begin{whycode}
+let queens (board: Z.t array) (n: Z.t) : unit =
+  bt_queens board n (Z.of_string "0")
+\end{whycode}
+This code cannot be type-checked by the OCaml compiler, as it depends on
+function \texttt{bt\_queens} whose definition is not given. In order to obtain a
+\emph{correct} OCaml implementation, we perform a recursive extraction:
+\begin{verbatim}
+> why3 extraction --recursive -D ocaml64 -L . \
+    queens.NQueens.queens -o queens.ml
+\end{verbatim}
+File \texttt{queens.ml} contents is updated to the code shown in
+Figure~\ref{fig:extract-queens}.
+\begin{figure}
+\begin{whycode}
+exception Solution
+
+exception Inconsistent of Z.t
+
+let check_is_consistent (board: Z.t array) (pos: Z.t) : bool =
+  begin try
+    begin
+      let rec for_loop_to (q: Z.t) : unit =
+        if Z.leq q (Z.sub pos (Z.of_string "1"))
+        then begin
+          begin
+            let bq = board.(Z.to_int q) in
+            let bpos = board.(Z.to_int pos) in
+            begin
+              if Z.equal bq bpos then begin raise (Inconsistent q) end;
+              if Z.equal (Z.sub bq bpos) (Z.sub pos q)
+              then begin
+                raise (Inconsistent q) end;
+              if Z.equal (Z.sub bpos bq) (Z.sub pos q)
+              then begin
+                raise (Inconsistent q) end
+            end; for_loop_to (Z.add q (Z.of_string "1"))
+          end end in
+      for_loop_to (Z.of_string "0"); true
+    end with
+  | Inconsistent q -> false
+  end
+
+let rec bt_queens (board: Z.t array) (n: Z.t) (pos: Z.t) : unit =
+  begin
+    if Z.equal pos n then begin raise Solution end;
+    let rec for_loop_to1 (i: Z.t) : unit =
+      if Z.leq i (Z.sub n (Z.of_string "1"))
+      then begin
+        begin
+          board.(Z.to_int pos) <- i;
+          if check_is_consistent board pos
+          then begin
+            bt_queens board n (Z.add pos (Z.of_string "1")) end;
+          for_loop_to1 (Z.add i (Z.of_string "1"))
+        end end in
+    for_loop_to1 (Z.of_string "0")
+  end
+
+let queens (board: Z.t array) (n: Z.t) : unit =
+  bt_queens board n (Z.of_string "0")
+\end{whycode}
+\label{fig:extract-queens}
+\caption{Recursive extraction of \texttt{queens} function.}
+\end{figure}
 
 %%% Local Variables:
 %%% mode: latex
