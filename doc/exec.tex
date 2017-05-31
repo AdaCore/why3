@@ -115,82 +115,56 @@ in order to state the location of file \texttt{f.mlw}.
 \end{description}
 
 \paragraph{Examples}
-We discuss different uses of the \texttt{extract} command though some examples.
-Consider the program in Figure~\ref{fig:NQueens2} on
-page~\pageref{fig:NQueens2}, where function \texttt{queens} computes a solution for
-the \texttt{N}-Queens problem. If we are only interested in extracting this
-function, we can proceed as follows:
+We illustrate different ways of using the \texttt{extract} command though some
+examples. Consider the program in Figure~\ref{fig:AQueue} on
+page~\pageref{fig:AQueue}. If we are only interested in extracting function
+\texttt{aenqueue}, we can proceed as follows:
 \begin{verbatim}
-> why3 extract -D ocaml64 -L . queens.NQueens.queens -o queens.ml
+> why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 \end{verbatim}
-Here we assume the program is contained in a file \texttt{queens.mlw} and that
+Here we assume that file \texttt{aqueue.mlw} contains this program, and that
 we invoke \texttt{extract} from the directory where this file is stored. File
-\texttt{queens.ml} now contains the following OCaml code:
+\texttt{aqueue.ml} now contains the following OCaml code:
 \begin{whycode}
-let queens (board: Z.t array) (n: Z.t) : unit =
-  bt_queens board n (Z.of_string "0")
+let enqueue (x: 'a) (q: 'a queue) : 'a queue =
+create (q.front) (q.lenf) (x :: (q.rear))
+       (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
-This code cannot be type-checked by the OCaml compiler, as it depends on
-function \texttt{bt\_queens} whose definition is not given. In order to obtain a
-\emph{correct} OCaml implementation, we perform a recursive extraction:
+Choosing a function symbol as the entry point of extraction allows us to focus
+only on specific parts of the program. However, the generated code cannot be
+type-checked by the OCaml compiler, as it depends on function \texttt{create}
+and on type \texttt{'a queue}, whose definitions are not given. In order to
+obtain a \emph{correct} OCaml implementation, we can perform a recursive
+extraction:
 \begin{verbatim}
 > why3 extraction --recursive -D ocaml64 -L . \
-    queens.NQueens.queens -o queens.ml
+    aqueue.AmortizedQueue.enqueue -o aqueue.ml
 \end{verbatim}
-File \texttt{queens.ml} contents is updated to the code shown in
-Figure~\ref{fig:extract-queens}.
-\begin{figure}
+This updates the contents of file \texttt{aqueue.ml} as follows:
+%\begin{figure}
 \begin{whycode}
-exception Solution
+type 'a queue = {
+  front: 'a list;
+  lenf: Z.t;
+  rear: 'a list;
+  lenr: Z.t;
+  }
 
-exception Inconsistent of Z.t
+let create (f: 'a list) (lf: Z.t) (r: 'a list) (lr: Z.t) : 'a queue =
+  if Z.geq lf lr
+  then
+    { front = f; lenf = lf; rear = r; lenr = lr }
+  else
+    let f1 = List.append f (List.rev r) in
+    { front = f1; lenf = Z.add lf lr; rear = []; lenr = (Z.of_string "0") }
 
-let check_is_consistent (board: Z.t array) (pos: Z.t) : bool =
-  begin try
-    begin
-      let rec for_loop_to (q: Z.t) : unit =
-        if Z.leq q (Z.sub pos (Z.of_string "1"))
-        then begin
-          begin
-            let bq = board.(Z.to_int q) in
-            let bpos = board.(Z.to_int pos) in
-            begin
-              if Z.equal bq bpos then begin raise (Inconsistent q) end;
-              if Z.equal (Z.sub bq bpos) (Z.sub pos q)
-              then begin
-                raise (Inconsistent q) end;
-              if Z.equal (Z.sub bpos bq) (Z.sub pos q)
-              then begin
-                raise (Inconsistent q) end
-            end; for_loop_to (Z.add q (Z.of_string "1"))
-          end end in
-      for_loop_to (Z.of_string "0"); true
-    end with
-  | Inconsistent q -> false
-  end
-
-let rec bt_queens (board: Z.t array) (n: Z.t) (pos: Z.t) : unit =
-  begin
-    if Z.equal pos n then begin raise Solution end;
-    let rec for_loop_to1 (i: Z.t) : unit =
-      if Z.leq i (Z.sub n (Z.of_string "1"))
-      then begin
-        begin
-          board.(Z.to_int pos) <- i;
-          if check_is_consistent board pos
-          then begin
-            bt_queens board n (Z.add pos (Z.of_string "1")) end;
-          for_loop_to1 (Z.add i (Z.of_string "1"))
-        end end in
-    for_loop_to1 (Z.of_string "0")
-  end
-
-let queens (board: Z.t array) (n: Z.t) : unit =
-  bt_queens board n (Z.of_string "0")
+let enqueue (x: 'a) (q: 'a queue) : 'a queue =
+  create (q.front) (q.lenf) (x :: (q.rear))
+    (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
-\label{fig:extract-queens}
-\caption{Recursive extraction of \texttt{queens} function.}
-\end{figure}
+% \label{fig:extract-queens}
+% \caption{Recursive extraction of \texttt{queens} function.}
+% \end{figure}
 
 %%% Local Variables:
 %%% mode: latex
