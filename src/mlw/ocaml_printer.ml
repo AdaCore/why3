@@ -315,7 +315,7 @@ module Print = struct
         (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
-    Stv.iter (fun tv -> fprintf fmt "%a" print_tv tv) s
+    Stv.iter (fun tv -> fprintf fmt "%a " print_tv tv) s
 
   and print_fun_type_args info fmt (args, s, res) =
     if Stv.is_empty s then
@@ -327,8 +327,8 @@ module Print = struct
       let id_args = List.map (fun (id, _, _) -> id) args in
       fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->"
         print_svar s
-        (print_list arrow (print_ty info)) ty_args
-        (print_ty info) res
+        (print_list arrow (print_ty ~paren:true info)) ty_args
+        (print_ty ~paren:true info) res
         (print_list space (print_lident info)) id_args
 
   and print_let_def info fmt = function

@@ -109,7 +109,7 @@ module ML = struct
     rec_args : var list;
     rec_exp  : expr;
     rec_res  : ty;
-    rec_svar : Stv.t;
+    rec_svar : Stv.t; (* set of type variables *)
   }
 
   type is_mutable = bool
