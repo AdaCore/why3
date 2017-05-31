@@ -29,7 +29,6 @@ open Ident
 open Ity
 open Ty
 open Term
-open Stdlib
 
 let clean_name fname =
   (* TODO: replace with Filename.remove_extension
@@ -53,13 +52,6 @@ module ML = struct
     | Tvar    of tvsymbol
     | Tapp    of ident * ty list
     | Ttuple  of ty list
-
-  module Vvar = MakeMSHW (struct
-    type t = tvsymbol
-    let tag tvs = tvs.tv_name.id_tag
-  end)
-
-  module Svar = Vvar.S
 
   type is_ghost = bool
 
@@ -117,7 +109,7 @@ module ML = struct
     rec_args : var list;
     rec_exp  : expr;
     rec_res  : ty;
-    rec_svar : Svar.t;
+    rec_svar : Stv.t;
   }
 
   type is_mutable = bool
@@ -527,7 +519,7 @@ module Translate = struct
     let for_rec_def = {
       ML.rec_sym  = for_rs;   ML.rec_args = args;
       ML.rec_rsym = for_rs;   ML.rec_exp  = for_expr;
-      ML.rec_res  = ML.tunit; ML.rec_svar = ML.Svar.empty;
+      ML.rec_res  = ML.tunit; ML.rec_svar = Stv.empty;
     } in
     let for_let = ML.Elet (ML.Lrec [for_rec_def], for_call_expr) in
     ML.mk_expr for_let ML.ity_unit eff
@@ -548,7 +540,7 @@ module Translate = struct
 
   (* build the set of type variables from functions arguments *)
   let rec add_tvar acc = function
-    | ML.Tvar tv -> ML.Svar.add tv acc
+    | ML.Tvar tv -> Stv.add tv acc
     | ML.Tapp (_, tyl) | ML.Ttuple tyl ->
       List.fold_left add_tvar acc tyl
 
@@ -611,7 +603,7 @@ module Translate = struct
           let args = params cty.cty_args in
           let svar =
             let args' = List.map (fun (_, ty, _) -> ty) args in
-            let svar  = List.fold_left add_tvar ML.Svar.empty args' in
+            let svar  = List.fold_left add_tvar Stv.empty args' in
             add_tvar svar res in
           let ef = expr info ef in
           { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
@@ -772,7 +764,7 @@ module Translate = struct
         let res  = ity rs1.rs_cty.cty_result in
         let svar =
           let args' = List.map (fun (_, ty, _) -> ty) args in
-          let svar  = List.fold_left add_tvar ML.Svar.empty args' in
+          let svar  = List.fold_left add_tvar Stv.empty args' in
           add_tvar svar res in
         { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
           ML.rec_args = args; ML.rec_exp  = expr info e;

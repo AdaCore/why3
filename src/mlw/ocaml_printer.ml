@@ -315,17 +315,17 @@ module Print = struct
         (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
-    Svar.iter (fun tv -> fprintf fmt "%a" print_tv tv) s
+    Stv.iter (fun tv -> fprintf fmt "%a" print_tv tv) s
 
   and print_fun_type_args info fmt (args, s, res) =
-    if Svar.is_empty s then
-      fprintf fmt "@[%a@] :@ %a@ =@"
+    if Stv.is_empty s then
+      fprintf fmt "@[%a@] :@ %a@ ="
         (print_list space (print_vs_arg info)) args
         (print_ty info) res
     else
       let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
-      fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->@\n"
+      fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->"
         print_svar s
         (print_list arrow (print_ty info)) ty_args
         (print_ty info) res
@@ -345,7 +345,7 @@ module Print = struct
       let print_one fst fmt = function
         | { rec_sym = rs1; rec_args = args; rec_exp = e;
             rec_res = res; rec_svar = s } ->
-          fprintf fmt "@[<hov 2>%s %a @[%a@] %a@]"
+          fprintf fmt "@[<hov 2>%s %a @[%a@]@ %a@]"
             (if fst then "let rec" else "and")
             (print_lident info) rs1.rs_name
             (print_fun_type_args info) (args, s, res)
