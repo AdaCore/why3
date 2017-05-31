@@ -91,7 +91,7 @@ intros a a_WT a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7.
 destruct h1 as (h11,h12).
 destruct h12 as (ha,(hb,(hc,(hd,he)))).
 red. repeat split.
-(* eq_sub *) 
+(* eq_sub *)
 red. intros. apply he; omega.
 assumption. assumption. omega. omega. assumption.
 (* permut *)
@@ -205,4 +205,3 @@ omega.
 (* eq_sub *)
 red. intros. apply he; omega.
 Qed.
-

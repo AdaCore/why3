@@ -322,7 +322,7 @@ module ToList
   use import list.Append
 
   let rec lemma to_list_append (a: array 'a) (l m u: int)
-    requires { l <= m <= u }
+    requires { 0 <= l <= m <= u <= a.length }
     variant  { m - l }
     ensures  { to_list a l m ++ to_list a m u = to_list a l u }
   = if l < m then to_list_append a (l+1) m u
