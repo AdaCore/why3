@@ -7,7 +7,7 @@
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../binomial_heap.mlw" expanded="true">
-<theory name="BinomialHeap" sum="45554a82ba10188a7d3dfa00cfdf7286" expanded="true">
+<theory name="BinomialHeap" sum="a4b20c3f0b661937cb05ebc19298c2ba" expanded="true">
  <goal name="VC size_nonnneg" expl="VC for size_nonnneg">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -109,7 +109,7 @@
  <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
  <goal name="VC is_empty" expl="VC for is_empty">
- <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
  <goal name="VC get_min" expl="VC for get_min" expanded="true">
  <transf name="split_goal_wp" expanded="true">
@@ -117,16 +117,16 @@
   <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC get_min.2" expl="2. variant decrease">
-  <proof prover="3"><result status="valid" time="0.01" steps="35"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="VC get_min.3" expl="3. precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
   <goal name="VC get_min.4" expl="4. postcondition">
-  <proof prover="3"><result status="valid" time="0.05" steps="267"/></proof>
+  <proof prover="3"><result status="valid" time="0.05" steps="268"/></proof>
   </goal>
   <goal name="VC get_min.5" expl="5. postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="66"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="68"/></proof>
   </goal>
   <goal name="VC get_min.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.17"/></proof>

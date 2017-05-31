@@ -8,7 +8,7 @@
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../sum_of_digits.mlw" expanded="true">
-<theory name="Euler290" sum="9282e7d7121070be02eea80861c44f65" expanded="true">
+<theory name="Euler290" sum="d988319e386fa68be71dd86a48252769" expanded="true">
  <goal name="Base">
  <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
  <proof prover="4" timelimit="10"><result status="valid" time="0.01" steps="5"/></proof>
@@ -21,8 +21,8 @@
  </goal>
  <goal name="VC sd" expl="VC for sd">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
- <proof prover="2"><result status="valid" time="0.04" steps="19"/></proof>
- <proof prover="5"><result status="valid" time="0.44"/></proof>
+ <proof prover="2"><result status="valid" time="0.04" steps="25"/></proof>
+ <proof prover="5"><result status="valid" time="0.90"/></proof>
  </goal>
  <goal name="VC f" expl="VC for f">
  <transf name="split_goal_wp">
@@ -40,7 +40,7 @@
   </goal>
   <goal name="VC f.4" expl="4. postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC f.5" expl="5. loop invariant init">
   <proof prover="1"><result status="valid" time="0.03"/></proof>

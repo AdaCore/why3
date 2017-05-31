@@ -7,9 +7,9 @@
 <prover id="8" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../gcd.mlw" expanded="true">
-<theory name="EuclideanAlgorithm" sum="06c09424aee65c6f411f277cd3f59aaf">
+<theory name="EuclideanAlgorithm" sum="b19fdaf810947d1effcb1fb33e3d7e49">
  <goal name="VC euclid" expl="VC for euclid">
- <proof prover="8"><result status="valid" time="4.32"/></proof>
+ <proof prover="8"><result status="valid" time="8.35"/></proof>
  </goal>
 </theory>
 <theory name="EuclideanAlgorithmIterative" sum="4841a879f96158e78cf1e196ec0e2c3b">
@@ -17,7 +17,7 @@
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="BinaryGcd" sum="a78066797db663add80796b90f60375c" expanded="true">
+<theory name="BinaryGcd" sum="bd104d3dd00bc2d7a3faa1d20c49e676" expanded="true">
  <goal name="even1">
  <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
  </goal>
@@ -101,44 +101,13 @@
   <goal name="VC binary_gcd.18" expl="18. precondition">
   <proof prover="9"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC binary_gcd.19" expl="19. postcondition">
-  <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
-  </goal>
-  <goal name="VC binary_gcd.20" expl="20. postcondition">
-  <proof prover="9"><result status="valid" time="0.01" steps="16"/></proof>
-  </goal>
-  <goal name="VC binary_gcd.21" expl="21. postcondition" expanded="true">
-  </goal>
-  <goal name="VC binary_gcd.22" expl="22. postcondition" expanded="true">
+  <goal name="VC binary_gcd.19" expl="19. postcondition" expanded="true">
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithm31" sum="9daace546ea2d1640762b559418142ef">
- <goal name="VC euclid" expl="VC for euclid">
- <transf name="split_goal_wp">
-  <goal name="VC euclid.1" expl="1. integer overflow">
-  <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
-  </goal>
-  <goal name="VC euclid.2" expl="2. division by zero">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
-  <goal name="VC euclid.3" expl="3. integer overflow">
-  <proof prover="9"><result status="valid" time="0.04" steps="49"/></proof>
-  </goal>
-  <goal name="VC euclid.4" expl="4. variant decrease">
-  <proof prover="9"><result status="valid" time="0.05" steps="54"/></proof>
-  </goal>
-  <goal name="VC euclid.5" expl="5. precondition">
-  <proof prover="9"><result status="valid" time="0.00" steps="15"/></proof>
-  </goal>
-  <goal name="VC euclid.6" expl="6. postcondition">
-  <proof prover="9"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="VC euclid.7" expl="7. postcondition">
-  <proof prover="9"><result status="valid" time="0.02" steps="29"/></proof>
-  </goal>
- </transf>
+<theory name="EuclideanAlgorithm63" sum="f64eaee885c2c0c2efa1917cecd2eaf2" expanded="true">
+ <goal name="VC euclid" expl="VC for euclid" expanded="true">
  </goal>
 </theory>
 </file>

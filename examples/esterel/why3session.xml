@@ -6,12 +6,12 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="4000" memlimit="4000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="4000" memlimit="4000"/>
 <file name="../esterel.mlw" expanded="true">
-<theory name="Esterel" sum="1b203f09cfa5ce87bbfdb875a8522626" expanded="true">
+<theory name="Esterel" sum="fa333b2c6770e50cc56ebdc816c82165" expanded="true">
  <goal name="VC union" expl="VC for union">
- <proof prover="1"><result status="valid" time="0.16" steps="197"/></proof>
+ <proof prover="1"><result status="valid" time="0.16" steps="268"/></proof>
  </goal>
  <goal name="VC intersection" expl="VC for intersection">
- <proof prover="1"><result status="valid" time="0.18" steps="175"/></proof>
+ <proof prover="1"><result status="valid" time="0.18" steps="194"/></proof>
  </goal>
  <goal name="VC aboveMin" expl="VC for aboveMin">
  <transf name="split_goal_wp">
@@ -23,13 +23,13 @@
   </goal>
   <goal name="VC aboveMin.3" expl="3. assertion">
   <proof prover="0"><result status="valid" time="0.22"/></proof>
-  <proof prover="2"><result status="valid" time="0.52"/></proof>
+  <proof prover="2"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="VC aboveMin.4" expl="4. assertion">
-  <proof prover="0"><result status="valid" time="0.42"/></proof>
+  <proof prover="0"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC aboveMin.5" expl="5. precondition">
-  <proof prover="1"><result status="valid" time="0.30" steps="303"/></proof>
+  <proof prover="1"><result status="valid" time="0.30" steps="305"/></proof>
   </goal>
   <goal name="VC aboveMin.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -52,11 +52,10 @@
   </goal>
   <goal name="VC maxUnion.3" expl="3. assertion">
   <proof prover="0"><result status="valid" time="0.25"/></proof>
-  <proof prover="2"><result status="valid" time="0.60"/></proof>
+  <proof prover="2"><result status="valid" time="0.40"/></proof>
   </goal>
   <goal name="VC maxUnion.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.27"/></proof>
-  <proof prover="1"><result status="valid" time="1.54" steps="1796"/></proof>
+  <proof prover="1"><result status="valid" time="1.54" steps="2018"/></proof>
   </goal>
   <goal name="VC maxUnion.5" expl="5. postcondition">
   <transf name="split_goal_wp">
@@ -64,8 +63,8 @@
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="VC maxUnion.5.2" expl="2. postcondition">
-   <proof prover="0"><result status="valid" time="0.34"/></proof>
-   <proof prover="1"><result status="valid" time="0.52" steps="531"/></proof>
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.28" steps="334"/></proof>
    </goal>
   </transf>
   </goal>
