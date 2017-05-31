@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require list.List.
 Require list.Length.
 Require int.Int.
@@ -10,25 +11,27 @@ Require map.Map.
 Require map.Const.
 Require list.Append.
 
-(* Why3 assumption *)
-Definition unit := unit.
-
 Axiom set : forall (a:Type), Type.
 Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Existing Instance set_WhyType.
 
 Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
 
-(* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
-  a)): Prop := forall (x:a), (mem x s1) <-> (mem x s2).
+Parameter infix_eqeq: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
+  Prop.
+
+Axiom infix_eqeq_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (infix_eqeq s1 s2) <-> forall (x:a), (mem x s1) <-> (mem x
+  s2).
 
 Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
 
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:(set a)) (s2:(set
-  a)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
+Parameter subset: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
+  Prop.
+
+Axiom subset_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), (subset s1 s2) <-> forall (x:a), (mem x s1) -> (mem x s2).
 
 Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (subset s s).
@@ -37,27 +40,25 @@ Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)) (s3:(set a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1
   s3)).
 
+Parameter is_empty: forall {a:Type} {a_WT:WhyType a}, (set a) -> Prop.
+
+Axiom is_empty_spec : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+  (is_empty s) <-> forall (x:a), ~ (mem x s).
+
 Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
 
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:(set a)): Prop :=
-  forall (x:a), ~ (mem x s).
-
-Axiom empty_def1 : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
+Axiom empty_def : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
   a))).
-
-Axiom mem_empty : forall {a:Type} {a_WT:WhyType a}, forall (x:a), ~ (mem x
-  (empty : (set a))).
 
 Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
-Axiom add_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a),
-  forall (s:(set a)), (mem x (add y s)) <-> ((x = y) \/ (mem x s)).
+Axiom add_spec : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set a)),
+  forall (y:a), (mem y (add x s)) <-> ((y = x) \/ (mem y s)).
 
 Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
 
-Axiom remove_def1 : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (y:a)
-  (s:(set a)), (mem x (remove y s)) <-> ((~ (x = y)) /\ (mem x s)).
+Axiom remove_spec : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
+  a)), forall (y:a), (mem y (remove x s)) <-> ((~ (y = x)) /\ (mem y s)).
 
 Axiom add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
   a)), (mem x s) -> ((add x (remove x s)) = s).
@@ -71,27 +72,30 @@ Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
 Parameter union: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
   a).
 
-Axiom union_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)) (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
+Axiom union_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), forall (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x
+  s2)).
 
 Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
   a).
 
-Axiom inter_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)) (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
+Axiom inter_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), forall (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x
+  s2)).
 
 Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
   a).
 
-Axiom diff_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)) (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
+Axiom diff_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
+  (s2:(set a)), forall (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem
+  x s2)).
 
 Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
   (s2:(set a)), (subset (diff s1 s2) s1).
 
 Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
 
-Axiom choose_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
+Axiom choose_spec : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
   (~ (is_empty s)) -> (mem (choose s) s).
 
 Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (set a) -> Z.
@@ -136,7 +140,7 @@ Axiom edges_def : forall (x:vertex) (y:vertex), (mem (x, y) edges) -> ((mem x
 
 Parameter s: vertex.
 
-Axiom s_in_graph : (mem s vertices).
+Axiom s_def : (mem s vertices).
 
 Axiom vertices_cardinal_pos : (0%Z < (cardinal vertices))%Z.
 
@@ -287,6 +291,14 @@ Definition add1 (x:t) (y:t): t :=
   end.
 
 (* Why3 assumption *)
+Definition eq (x:t) (y:t): Prop := match (x,
+  y) with
+  | (Infinite, Infinite) => True
+  | ((Finite x1), (Finite y1)) => (x1 = y1)
+  | (_, _) => False
+  end.
+
+(* Why3 assumption *)
 Definition lt (x:t) (y:t): Prop :=
   match x with
   | Infinite => False
@@ -298,7 +310,7 @@ Definition lt (x:t) (y:t): Prop :=
   end.
 
 (* Why3 assumption *)
-Definition le (x:t) (y:t): Prop := (lt x y) \/ (x = y).
+Definition le (x:t) (y:t): Prop := (lt x y) \/ (eq x y).
 
 Axiom Refl : forall (x:t), (le x x).
 
@@ -321,16 +333,59 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-(* Why3 assumption *)
-Definition t1 (a:Type) := (ref (set a)).
+Axiom t1 : Type.
+Parameter t1_WhyType : WhyType t1.
+Existing Instance t1_WhyType.
+
+Parameter contents1: t1 -> (set (vertex* vertex)%type).
+
+Parameter is_empty1: t1 -> Prop.
+
+Axiom is_empty_spec1 : forall (s1:t1), (is_empty1 s1) <-> (is_empty
+  (contents1 s1)).
+
+Parameter mem1: (vertex* vertex)%type -> t1 -> Prop.
+
+Axiom mem_spec : forall (x:(vertex* vertex)%type) (s1:t1), (mem1 x s1) <->
+  (mem x (contents1 s1)).
+
+Parameter cardinal2: t1 -> Z.
+
+Axiom cardinal_spec : forall (s1:t1),
+  ((cardinal2 s1) = (cardinal (contents1 s1))).
+
+Axiom t2 : forall (a:Type), Type.
+Parameter t2_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t2 a).
+Existing Instance t2_WhyType.
+
+Parameter contents2: forall {a:Type} {a_WT:WhyType a}, (t2 a) -> (vertex ->
+  a).
+
+Parameter create: forall {a:Type} {a_WT:WhyType a}, a -> (t2 a).
+
+Axiom create_spec : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
+  ((contents2 (create x)) = (map.Const.const x: (vertex -> a))).
+
+Parameter mixfix_lbrb: forall {a:Type} {a_WT:WhyType a}, (t2 a) -> vertex ->
+  a.
+
+Axiom mixfix_lbrb_spec : forall {a:Type} {a_WT:WhyType a}, forall (m:(t2 a))
+  (k:vertex), ((mixfix_lbrb m k) = ((contents2 m) k)).
+
+Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (t2 a) ->
+  vertex -> a -> (t2 a).
+
+Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a}, forall (m:(t2
+  a)) (k:vertex) (v:a), ((contents2 (mixfix_lblsmnrb m k
+  v)) = (map.Map.set (contents2 m) k v)).
 
 (* Why3 assumption *)
-Definition distmap := (map.Map.map vertex t).
+Definition distmap := (t2 t).
 
 (* Why3 assumption *)
-Definition inv1 (m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
+Definition inv1 (m:(t2 t)) (pass:Z) (via:(set (vertex*
   vertex)%type)): Prop := forall (v:vertex), (mem v vertices) ->
-  match (map.Map.get m
+  match (mixfix_lbrb m
   v) with
   | (Finite n) => (exists l:(list vertex), (path s l v) /\ ((path_weight l
       v) = n)) /\ ((forall (l:(list vertex)), (path s l v) ->
@@ -345,9 +400,9 @@ Definition inv1 (m:(map.Map.map vertex t)) (pass:Z) (via:(set (vertex*
   end.
 
 (* Why3 assumption *)
-Definition inv2 (m:(map.Map.map vertex t)) (via:(set (vertex*
-  vertex)%type)): Prop := forall (u:vertex) (v:vertex), (mem (u, v) via) ->
-  (le (map.Map.get m v) (add1 (map.Map.get m u) (Finite (weight u v)))).
+Definition inv2 (m:(t2 t)) (via:(set (vertex* vertex)%type)): Prop :=
+  forall (u:vertex) (v:vertex), (mem (u, v) via) -> (le (mixfix_lbrb m v)
+  (add1 (mixfix_lbrb m u) (Finite (weight u v)))).
 
 Require Import Why3.
 Ltac ae := why3 "alt-ergo" timelimit 60; admit.
@@ -356,9 +411,10 @@ Ltac Z3 := why3 "z3" timelimit 10; admit.
 Require Import list.Length.
 
 (* Why3 goal *)
-Theorem key_lemma_2 : forall (m:(map.Map.map vertex t)), (inv1 m
-  (cardinal vertices) (empty : (set (vertex* vertex)%type))) -> ((inv2 m
-  edges) -> forall (v:vertex), ~ (negative_cycle v)).
+Theorem key_lemma_2 : forall (m:(t2 t)), (inv1 m (cardinal vertices)
+  (empty : (set (vertex* vertex)%type))) -> ((inv2 m edges) ->
+  forall (v:vertex), ~ (negative_cycle v)).
+Proof.
 (* Why3 intros m h1 h2 v. *)
 intros m hinv1. unfold inv2. intros hinv2.
 intros v (hv, ((l1, h1), (l2, (h2a, h2b)))).
@@ -366,14 +422,14 @@ assert
   (H: forall n: Z, (0 <= n)%Z ->
       forall vi: vertex, forall l: list vertex, (length l <= n)%Z ->
       path v l vi ->
-      le (Map.get m vi) (add1 (Map.get m v) (Finite (path_weight l vi)))).
+      le (mixfix_lbrb m vi) (add1 (mixfix_lbrb m v) (Finite (path_weight l vi)))).
 intros n hn; pattern n; apply natlike_ind. 3: auto.
 intros vi l; destruct l.
 simpl.
 intros _ hpath. assert (vi = v) by ae. subst vi.
 unfold le, add1.
 right; ae.
-intros h _. 
+intros h _.
 absurd ((length (cons v0 l) <= 0)%Z); auto.
 unfold length; fold @length.
 generalize (Length_nonnegative l).
@@ -391,14 +447,14 @@ assert (hl': (length l' <= n)%Z) by omega.
 generalize (IH y l' hl' y1).
 generalize (hinv2 y vi y2); clear hinv2.
 unfold le, add1.
-destruct (Map.get m vi); destruct (Map.get m v); destruct (Map.get m y); ae.
+destruct (mixfix_lbrb m vi); destruct (mixfix_lbrb m v); destruct (mixfix_lbrb m y); ae.
 assert (hl2a: (0 <= length l2)%Z).
   generalize (Length_nonnegative l2). omega.
 assert (hl2b: (length l2 <= length l2)%Z) by omega.
 generalize (H (length l2) hl2a v l2 hl2b h2a); clear H hl2a hl2b.
-unfold le, add1; destruct (Map.get m v) as [] _eqn.
+unfold le, add1; destruct (mixfix_lbrb m v) as [] _eqn.
 ae.
-absurd (Map.get m v = Infinite); auto.
+absurd (mixfix_lbrb m v = Infinite); auto.
 ae.
 Admitted.
 
