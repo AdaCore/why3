@@ -171,7 +171,7 @@ module Print = struct
     if is_optional ~labels then print_vsty_opt info fmt id ty
     else if is_named ~labels then print_vsty_named info fmt id ty
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
-        (print_ty ~paren:false info) ty
+      (print_ty ~paren:false info) ty
 
   let print_tv_arg = print_tv
   let print_tv_args fmt = function
@@ -198,8 +198,8 @@ module Print = struct
   let get_record info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
     | Some {pd_node = PDtype itdl} ->
-      let itd = List.find (fun {itd_constructors=constr} ->
-          List.exists (rs_equal rs) constr) itdl in
+      let eq_rs {itd_constructors=constr} = List.exists (rs_equal rs) constr in
+      let itd = List.find eq_rs itdl in
       List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
@@ -314,6 +314,23 @@ module Print = struct
         (print_apply_args info) (tl, rs.rs_cty.cty_args)
         (* (print_list space (print_expr ~paren:true info)) tl *)
 
+  and print_svar fmt s =
+    Svar.iter (fun tv -> fprintf fmt "%a" print_tv tv) s
+
+  and print_fun_type_args info fmt (args, s, res) =
+    if Svar.is_empty s then
+      fprintf fmt "@[%a@] :@ %a@ =@"
+        (print_list space (print_vs_arg info)) args
+        (print_ty info) res
+    else
+      let ty_args = List.map (fun (_, ty, _) -> ty) args in
+      let id_args = List.map (fun (id, _, _) -> id) args in
+      fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->@\n"
+        print_svar s
+        (print_list arrow (print_ty info)) ty_args
+        (print_ty info) res
+        (print_list space (print_lident info)) id_args
+
   and print_let_def info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
@@ -326,12 +343,13 @@ module Print = struct
       forget_vars args
     | Lrec rdef ->
       let print_one fst fmt = function
-        | { rec_sym = rs1; rec_args = args; rec_exp = e; rec_res = res } ->
-          fprintf fmt "@[<hov 2>%s %a @[%a@] :@ %a@ =@ %a@]"
+        | { rec_sym = rs1; rec_args = args; rec_exp = e;
+            rec_res = res; rec_svar = s } ->
+          fprintf fmt "@[<hov 2>%s %a @[%a@] %a@]"
             (if fst then "let rec" else "and")
             (print_lident info) rs1.rs_name
-            (print_list space (print_vs_arg info)) args
-            (print_ty info) res (print_expr info) e;
+            (print_fun_type_args info) (args, s, res)
+            (print_expr info) e;
           forget_vars args
       in
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
