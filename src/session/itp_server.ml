@@ -504,7 +504,14 @@ exception No_loc_on_goal
 
 let color_goal list loc =
   match loc with
-  | None -> raise No_loc_on_goal
+  | None ->
+      (* This case can happen when after some transformations: for example, in
+         an assert, the new goal asserted is not tagged with locations *)
+      (* This error is harmless but we want to detect it when debugging. *)
+      if Debug.test_flag Debug.stack_trace then
+        raise No_loc_on_goal
+      else
+        ()
   | Some loc -> color_loc list ~color:Goal_color ~loc
 
 let get_locations list (task: Task.task) =
