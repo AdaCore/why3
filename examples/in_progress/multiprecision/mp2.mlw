@@ -2561,7 +2561,10 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   uh <= dm
                   so
                   k * uh <= k * dm
-                  so (k * dm <= d * dm by k <= d /\ 0 <= dm)
+                  so (k * dm <= d * dm
+                     by k <= d /\ 0 <= dm
+                     so "case_split" (k = d \/ dm = 0 \/
+                                     (k < d /\ dm > 0 so k * dm < d * dm)))
                   so k * uh <= d * dm
                   so
                   bbd * um <= bbd * (radix - 1)
