@@ -14,7 +14,7 @@ module BubbleSort
   let bubble_sort (a: array int)
     ensures { permut_all (old a) a }
     ensures { sorted a }
-  = for i = length a - 1 downto 1 do
+  = "vc:liberal_for" for i = length a - 1 downto 1 do
       invariant { permut_all (old a) a }
       invariant { sorted_sub a i (length a) }
       invariant { forall k1 k2: int.

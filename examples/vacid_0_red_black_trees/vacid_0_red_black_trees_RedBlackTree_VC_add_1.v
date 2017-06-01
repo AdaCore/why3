@@ -7,10 +7,6 @@ Require int.Int.
 (* Why3 assumption *)
 Definition unit := unit.
 
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
 (* Why3 assumption *)
 Definition key := Z.
 
@@ -166,40 +162,31 @@ Axiom almost_rbtree_rbtree_black : forall (x:Z) (v:Z) (l:tree) (r:tree)
   (n:Z), (almost_rbtree n (Node Black l x v r)) -> (rbtree n (Node Black l x
   v r)).
 
-
-
 (* Why3 goal *)
-Theorem WP_parameter_add : forall (t:tree) (k:Z) (v:Z), ((bst t) /\
-  exists n:Z, (rbtree n t)) -> (((bst t) /\ exists n:Z, (rbtree n t)) ->
-  forall (result:tree), ((bst result) /\ ((forall (n:Z), (rbtree n t) ->
-  (match result with
-  | Leaf => (n = 0%Z)
-  | (Node Red l _ _ r) => (rbtree n l) /\ (rbtree n r)
-  | (Node Black l _ _ r) => (rbtree (n - 1%Z)%Z l) /\ (rbtree (n - 1%Z)%Z r)
-  end /\
-  (match t with
-  | (Node Red _ _ _ _) => False
-  | (Leaf|(Node Black _ _ _ _)) => True
-  end -> (rbtree n result)))) /\ ((memt result k v) /\ forall (k':Z) (v':Z),
-  ((memt result k' v') \/ (((k' = k) -> (v' = v)) /\ ((~ (k' = k)) -> (memt t
-  k' v')))) -> ((memt result k' v') /\ (((k' = k) /\ (v' = v)) \/
-  ((~ (k' = k)) /\ (memt t k' v'))))))) -> forall (x:color) (x1:tree) (x2:Z)
-  (x3:Z) (x4:tree), (result = (Node x x1 x2 x3 x4)) -> exists n:Z, (rbtree n
-  (Node Black x1 x2 x3 x4))).
-intros t k v (h1,(n,h2)) _ result (h5,(h6,(h7,h8))) c x1 x2
-        x3 x4 h9.
+Theorem VC_add : forall (t:tree) (k:Z) (v:Z), ((bst t) /\ exists n:Z, (rbtree
+  n t)) -> forall (o:tree), ((bst o) /\ ((forall (n:Z), (rbtree n t) ->
+  ((almost_rbtree n o) /\ ((is_not_red t) -> (rbtree n o)))) /\ ((memt o k
+  v) /\ forall (k':Z) (v':Z), ((memt o k' v') \/ (((k' = k) -> (v' = v)) /\
+  ((~ (k' = k)) -> (memt t k' v')))) -> ((memt o k' v') /\ (((k' = k) /\
+  (v' = v)) \/ ((~ (k' = k)) /\ (memt t k' v'))))))) -> forall (result:tree),
+  (exists x:color, (exists x1:tree, (exists x2:Z, (exists x3:Z,
+  (exists x4:tree, (o = (Node x x1 x2 x3 x4)) /\ (result = (Node Black x1 x2
+  x3 x4))))))) -> exists n:Z, (rbtree n result).
+intros t k v (h1,(n,h2)) o (h3,(h4,(h5,h6))) result
+(x,(x1,(x2,(x3,(x4,(h7,h8)))))).
+
 subst.
 intuition.
-generalize (h6 n h2); clear h6.
+generalize (h4 n h2); clear h4.
 intros.
-destruct c; intuition.
+destruct x; intuition.
 (* c = Red *)
 exists (n+1)%Z; intuition.
 simpl rbtree. replace (n+1-1)%Z with n by omega.
-intuition.
+simpl in H0. intuition.
+
 (* c = Black *)
 exists n; intuition.
-simpl rbtree. 
-intuition.
+
 Qed.
 

@@ -79,8 +79,6 @@
         pp_print_string fmt s
     end
 
-  type empty_line = PrevEmpty | CurrEmpty | NotEmpty
-
 }
 
 let op_char_1 = ['=' '<' '>' '~']
@@ -108,45 +106,73 @@ let space = [' ' '\t']
 let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
 let special = ['\'' '"' '<' '>' '&']
 
-rule scan fmt empty = parse
+rule scan fmt empty delayed = parse
   | "(*)" as s
           { pp_print_string fmt s;
-            scan fmt NotEmpty lexbuf }
+            scan fmt false delayed lexbuf }
   | space* "(***"
           { comment fmt false lexbuf;
-            scan fmt empty lexbuf }
+            scan fmt empty delayed lexbuf }
   | space* "(**"
-          { pp_print_string fmt "</pre>\n";
-            if empty <> PrevEmpty then
-              pp_print_string fmt "<div class=\"info\">";
+          { pp_print_string fmt "</pre>\n<div class=\"info\">";
+            if delayed <> "" then pp_print_string fmt delayed;
             doc fmt false [] lexbuf;
-            if empty <> PrevEmpty then pp_print_string fmt "</div>";
-            pp_print_string fmt "<pre>";
-            scan fmt CurrEmpty lexbuf }
+            pp_print_string fmt "</div>";
+            scan_isolated fmt empty false "" lexbuf }
   | "(**)"
           { pp_print_string fmt "<span class=\"comment\">(**)</span>";
-            scan fmt NotEmpty lexbuf }
+            scan fmt false delayed lexbuf }
   | "(*"
           { pp_print_string fmt "<span class=\"comment\">(*";
             comment fmt true lexbuf;
             pp_print_string fmt "</span>";
-            scan fmt NotEmpty lexbuf }
-  | eof   { () }
+            scan fmt false delayed lexbuf }
+  | eof   { if delayed <> "" then
+              fprintf fmt "</pre>\n<div class=\"info\">%s</div>" delayed }
   | ident as s
           { print_ident fmt lexbuf s;
-            scan fmt NotEmpty lexbuf }
+            scan fmt false delayed lexbuf }
   | space* '\n'
           { newline lexbuf;
-            if empty <> PrevEmpty then pp_print_char fmt '\n';
-            let e = if empty = NotEmpty then CurrEmpty else PrevEmpty in
-            scan fmt e lexbuf }
+            match empty, delayed with
+            | false, d ->
+              pp_print_char fmt '\n';
+              scan fmt true d lexbuf
+            | true, "" ->
+              pp_print_char fmt '\n';
+              scan_isolated fmt true true "" lexbuf
+            | true, s ->
+              fprintf fmt "</pre>\n<div class=\"info\">%s</div>" s;
+              scan_isolated fmt true false "" lexbuf }
   | '"'   { pp_print_string fmt "&quot;";
             string fmt true lexbuf;
-            scan fmt NotEmpty lexbuf }
+            scan fmt false delayed lexbuf }
   | "'\"'"
   | _ as s
           { pp_print_string fmt s;
-            scan fmt NotEmpty lexbuf }
+            scan fmt false delayed lexbuf }
+
+and scan_isolated fmt empty in_pre delayed = parse
+  | space* "(***"
+          { comment fmt false lexbuf;
+            scan_isolated fmt empty in_pre delayed lexbuf }
+  | space* "(**"
+          { doc str_formatter false [] lexbuf;
+            let d = delayed ^ flush_str_formatter () in
+            scan_isolated fmt false in_pre d lexbuf }
+  | eof   { if in_pre then pp_print_string fmt "</pre>\n";
+            if delayed <> "" then pp_print_string fmt delayed }
+  | space* '\n'
+          { newline lexbuf;
+            match empty, delayed with
+            | false, d | true, ("" as d) ->
+              scan_isolated fmt true in_pre d lexbuf
+            | true, d ->
+              if in_pre then pp_print_string fmt "</pre>\n";
+              pp_print_string fmt d;
+              scan_isolated fmt true false "" lexbuf }
+  | ""    { if not in_pre then pp_print_string fmt "<pre>";
+            scan fmt empty delayed lexbuf }
 
 and scan_embedded fmt depth = parse
   | '['   { pp_print_char fmt '[';
@@ -232,7 +258,7 @@ and doc fmt block headings = parse
               | [] -> brace headings
               | n :: r ->
                 if n >= 1 then begin
-                  fprintf fmt "</h%d>" n;
+                  fprintf fmt "</h%d>\n" n;
                   doc fmt (r <> []) r lexbuf
                 end else brace r
            }
@@ -293,9 +319,9 @@ and skip_comment = parse
     lb.Lexing.lex_curr_p <-
       { lb.Lexing.lex_curr_p with Lexing.pos_fname = fname };
     (* output *)
-    pp_print_string fmt "<div class=\"why3doc\">\n<pre>";
-    scan fmt PrevEmpty lb;
-    pp_print_string fmt "</pre>\n</div>\n";
+    pp_print_string fmt "<div class=\"why3doc\">\n";
+    scan_isolated fmt true false "" lb;
+    pp_print_string fmt "\n</div>\n";
     close_in cin
 
   let extract_header fname =

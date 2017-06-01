@@ -8,21 +8,12 @@
     representations for sets/map-like structures, as it can be used
     both for elements and key-value pairs. *)
 
-(** {2 Logical type with key} *)
-theory KeyType
+(** {2 Keyed type.} *)
+module KeyType
 
   type t 'a
   type key
-  function key (t 'a) : key
-
-end
-
-(** {2 Program type with key} *)
-module ProgramKeyType
-
-  clone export KeyType
-
-  val get_key (t:t 'a) : key ensures { key t = result }
+  val function key (t:t 'a) : key
 
 end
 

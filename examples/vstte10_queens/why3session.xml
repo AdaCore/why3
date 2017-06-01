@@ -5,8 +5,8 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="3.2" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vstte10_queens.mlw" expanded="true">
-<theory name="NQueens" sum="409b3951ae957384bbb25de0839f6b15" expanded="true">
+<file name="../vstte10_queens.mlw">
+<theory name="NQueens" sum="409b3951ae957384bbb25de0839f6b15">
  <goal name="eq_board_set">
  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
@@ -22,14 +22,14 @@
  <goal name="consistent_row_eq">
  <proof prover="4" timelimit="20" memlimit="0"><result status="valid" time="0.06" steps="32"/></proof>
  </goal>
- <goal name="VC check_is_consistent" expl="VC for check_is_consistent" expanded="true">
+ <goal name="VC check_is_consistent" expl="VC for check_is_consistent">
  <proof prover="4"><result status="valid" time="0.02" steps="62"/></proof>
  </goal>
  <goal name="solution_eq_board">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="VC bt_queens" expl="VC for bt_queens" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC bt_queens" expl="VC for bt_queens">
+ <transf name="split_goal_wp">
   <goal name="VC bt_queens.1" expl="1. exceptional postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
@@ -65,34 +65,34 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC queens" expl="VC for queens" expanded="true">
+ <goal name="VC queens" expl="VC for queens">
  <proof prover="4"><result status="valid" time="0.00" steps="24"/></proof>
  </goal>
- <goal name="VC test8" expl="VC for test8" expanded="true">
+ <goal name="VC test8" expl="VC for test8">
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="VC count_bt_queens" expl="VC for count_bt_queens" expanded="true">
+ <goal name="VC count_bt_queens" expl="VC for count_bt_queens">
  <proof prover="4"><result status="valid" time="1.26" steps="438"/></proof>
  </goal>
- <goal name="VC count_queens" expl="VC for count_queens" expanded="true">
+ <goal name="VC count_queens" expl="VC for count_queens">
  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="VC test_count_8" expl="VC for test_count_8" expanded="true">
+ <goal name="VC test_count_8" expl="VC for test_count_8">
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="NQueens63" sum="8c5fcf08811dad3a40f6c343ffc3660e" expanded="true">
- <goal name="VC check_is_consistent" expl="VC for check_is_consistent" expanded="true">
- <proof prover="4"><result status="valid" time="0.09" steps="287"/></proof>
+<theory name="NQueens63" sum="f24f3b3dc68d0ed81eb0335f1c75deea">
+ <goal name="VC check_is_consistent" expl="VC for check_is_consistent">
+ <proof prover="4"><result status="valid" time="0.36" steps="1142"/></proof>
  </goal>
- <goal name="VC count_bt_queens" expl="VC for count_bt_queens" expanded="true">
- <proof prover="4"><result status="valid" time="0.32" steps="1264"/></proof>
+ <goal name="VC count_bt_queens" expl="VC for count_bt_queens">
+ <proof prover="4"><result status="valid" time="0.94" steps="4297"/></proof>
  </goal>
- <goal name="VC count_queens" expl="VC for count_queens" expanded="true">
- <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="VC count_queens" expl="VC for count_queens">
+ <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
  </goal>
- <goal name="VC test_count_8" expl="VC for test_count_8" expanded="true">
- <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
+ <goal name="VC test_count_8" expl="VC for test_count_8">
+ <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
 </theory>
 </file>

@@ -410,17 +410,17 @@ module Select = struct
       | _ -> failwith "bad literal in the goal clause" in
     let l0 = List.fold_left add_literal Sexpr.empty goal_clause in
 
-    (** explore one more step *)
+    (* explore one more step *)
     let rec one_step cur =
       let step = Sexpr.fold explore cur [cur;cur] in
       Format.eprintf "one step made !@.";
       step
 
-    (** explores the neighbours of [vertex] *)
+    (* explores the neighbours of [vertex] *)
     and explore vertex l = match l with [_next_cur;cur] ->
 
-      (** [changed] indicates whether a vertex has been added;
-          [v] is a vertex *)
+      (* [changed] indicates whether a vertex has been added;
+         [v] is a vertex *)
       let find_odd v ((acc,_changed) as old) =
         if Sexpr.mem v acc then old else
           let count = GC.fold_pred
@@ -442,7 +442,7 @@ module Select = struct
 
       | _ -> assert false (*only not to have warnings on non-exhaustive match*)
 
-    (** iterates [one_step] until an exception is raised *)
+    (* iterates [one_step] until an exception is raised *)
     and control cur acc =
       let next_acc = try
         let next_step = one_step cur in

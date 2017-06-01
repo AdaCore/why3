@@ -44,8 +44,9 @@ module Computable
 
   (** Comparison is computable. *)
   val compare (x y:t) : int
-    ensures { (result > 0 <-> lt y x) /\
-      (result < 0 <-> lt x y) /\ (result = 0 <-> eq x y) }
+    ensures { result > 0 <-> lt y x }
+    ensures { result < 0 <-> lt x y }
+    ensures { result = 0 <-> eq x y }
 
 end
 

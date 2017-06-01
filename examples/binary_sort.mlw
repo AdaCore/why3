@@ -40,7 +40,7 @@ module BinarySort
     ensures { permut_sub (old a) a 0 (length a) }
   =
     label Init in
-    for k = 1 to length a - 1 do
+    "vc:liberal_for" for k = 1 to length a - 1 do
       (* a[0..k-1) is sorted; insert a[k] *)
       invariant { forall i j. 0 <= i <= j < k -> a[i] <= a[j] }
       invariant { permut_sub (a at Init) a  0 (length a) }

@@ -277,8 +277,8 @@ module Make(O: OBSERVER) : sig
         'valid' *)
 
   val check_all:
-    ?release:bool -> (** Can all the goals be released at the end? def: false *)
-    use_steps:bool -> (** Replay use recorded number of proof steps *)
+    ?release:bool -> (* Can all the goals be released at the end? def: false *)
+    use_steps:bool -> (* Replay use recorded number of proof steps *)
     ?filter:(O.key proof_attempt -> bool) ->
     O.key env_session -> t ->
     callback:

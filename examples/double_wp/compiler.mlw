@@ -20,7 +20,7 @@ module Compile_aexpr
   (* Compilation scheme: the generated code for arithmetic expressions
      put the result of the expression on the stack. *)
   function aexpr_post (a:aexpr) (len:pos) : post 'a =
-    \_ p ms ms'. let VMS _ s m = ms in ms' = VMS (p+len) (push (aeval m a) s) m
+    fun _ p ms ms' -> let VMS _ s m = ms in ms' = VMS (p+len) (push (aeval m a) s) m
   meta rewrite_def function aexpr_post
 
   let rec compile_aexpr (a:aexpr) :  hl 'a
@@ -64,13 +64,13 @@ module Compile_bexpr
   (* Compilation scheme: the generated code perform a jump
      iff the boolean expression evaluate to cond. *)
   function bexpr_post (b:bexpr) (cond: bool) (out_t:ofs) (out_f:ofs) : post 'a =
-    \_ p ms ms'. let VMS _ s m = ms in if beval m b = cond
+    fun _ p ms ms' -> let VMS _ s m = ms in if beval m b = cond
         then ms' = VMS (p + out_t) s m
         else ms' = VMS (p + out_f) s m
   meta rewrite_def function bexpr_post
 
   function exec_cond (b1:bexpr) (cond:bool) : pre 'a =
-    \_ _ ms. let VMS _ _ m = ms in beval m b1 = cond
+    fun _ _ ms -> let VMS _ _ m = ms in beval m b1 = cond
   meta rewrite_def function exec_cond
 
   let rec compile_bexpr (b:bexpr) (cond:bool) (ofs:ofs) :  hl 'a
@@ -126,32 +126,32 @@ module Compile_com
   (* As we specify only terminating behavior, we have to require
      that the source program terminates in the initial conditions. *)
   function com_pre (cmd:com) : pre 'a =
-    \_ p ms. let VMS p' _ m = ms in p = p' /\ exists m'. ceval m cmd m'
+    fun _ p ms -> let VMS p' _ m = ms in p = p' /\ exists m'. ceval m cmd m'
   meta rewrite_def function com_pre
 
   function com_post (cmd:com) (len:pos) : post 'a =
-    \_ _ ms ms'. let VMS p s m = ms in let VMS p' s' m' = ms' in
+    fun _ _ ms ms' -> let VMS p s m = ms in let VMS p' s' m' = ms' in
       p' = p + len /\ s' = s /\ ceval m cmd m'
   meta rewrite_def function com_post
 
   function exec_cond_old (b1:bexpr) (cond:bool) : pre ('a,machine_state) =
-    \x _ _. let VMS _ _ m = snd x in beval m b1 = cond
+    fun x _ _ -> let VMS _ _ m = snd x in beval m b1 = cond
   meta rewrite_def function exec_cond_old
 
   (* Invariant for loop compilation: any intermediate state
      would evaluate to the same final state as the initial state. *)
   function loop_invariant (c:com) : pre ('a,machine_state) =
-    \x p msi. let VMS _ s0 m0 = snd x in let VMS pi si mi = msi in
+    fun x p msi -> let VMS _ s0 m0 = snd x in let VMS pi si mi = msi in
       pi = p /\ s0 = si /\ exists mf. ceval m0 c mf /\ ceval mi c mf
   meta rewrite_def function loop_invariant
 
   function loop_post (c : com) (len: pos) : pre ('a,machine_state) =
-    \x p msf. let VMS _ s0 m0 = snd x in let VMS pf sf mf = msf in
+    fun x p msf -> let VMS _ s0 m0 = snd x in let VMS pf sf mf = msf in
       pf = p + len /\ s0 = sf /\ ceval m0 c mf
   meta rewrite_def function loop_post
 
   function loop_variant (c:com) (test:bexpr) : post 'a =
-    \_ _ msj msi. let VMS pj sj mj = msj in let VMS pi si mi = msi in
+    fun _ _ msj msi -> let VMS pj sj mj = msj in let VMS pi si mi = msi in
        pj = pi /\ sj = si /\ ceval mi c mj /\ beval mi test
   meta rewrite_def function loop_variant
 

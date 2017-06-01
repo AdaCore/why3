@@ -23,14 +23,11 @@ Definition unit := unit.
 
 Require Import Interval.Interval_tactic.
 
-
 (* Why3 goal *)
-Theorem WP_parameter_my_cosine : forall (x:floating_point.SingleFormat.single),
+Theorem VC_my_cosine : forall (x:floating_point.SingleFormat.single),
   ((Reals.Rbasic_fun.Rabs (floating_point.Single.value x)) <= (1 / 32)%R)%R ->
   ((Reals.Rbasic_fun.Rabs ((1%R - (((floating_point.Single.value x) * (floating_point.Single.value x))%R * (05 / 10)%R)%R)%R - (Reals.Rtrigo_def.cos (floating_point.Single.value x)))%R) <= (1 / 16777216)%R)%R.
-(* Why3 intros x h1. *)
-(* YOU MAY EDIT THE PROOF BELOW *)
-intros x H.
+intros x h1.
 interval with (i_bisect_diff (Single.value x)).
 Qed.
 

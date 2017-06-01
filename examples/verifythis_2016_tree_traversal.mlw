@@ -597,7 +597,8 @@ module Iterative
         if is_null f.pleft && is_null f.pright
         then begin
           st := s;
-          assert { f.tleft = Empty /\ f.tright = Empty };
+          assert { match f.tleft, f.tright with
+            Empty, Empty  -> true | _ -> false end };
           closing t f.tree stop f.memo0 scur st
         end else begin
           let f = { f with memo1 = scur } in

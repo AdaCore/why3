@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require map.Map.
 Require map.Occ.
@@ -10,84 +11,70 @@ Require map.MapInjection.
 (* Why3 assumption *)
 Definition unit := unit.
 
-(* Why3 assumption *)
-Inductive array (a:Type) :=
-  | mk_array : Z -> (map.Map.map Z a) -> array a.
-Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
+Axiom array : forall (a:Type), Type.
+Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
+  WhyType (array a).
 Existing Instance array_WhyType.
-Implicit Arguments mk_array [[a]].
+
+Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+
+Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+
+Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
+  a)), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
-  match v with
-  | (mk_array x x1) => x1
-  end.
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
+  ((elts a1) i).
 
-(* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
-  match v with
-  | (mk_array x x1) => x
-  end.
+Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
+  Z -> a -> (array a).
 
-(* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  (map.Map.get (elts a1) i).
+Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
+  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
+  v)) = (map.Map.set (elts a1) i v)).
 
-(* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
-
-(* Why3 assumption *)
-Inductive sparse_array
-  (a:Type) :=
-  | mk_sparse_array : (array a) -> (array Z) -> (array Z) -> Z -> a ->
-      sparse_array a.
-Axiom sparse_array_WhyType : forall (a:Type) {a_WT:WhyType a},
+Axiom sparse_array : forall (a:Type), Type.
+Parameter sparse_array_WhyType : forall (a:Type) {a_WT:WhyType a},
   WhyType (sparse_array a).
 Existing Instance sparse_array_WhyType.
-Implicit Arguments mk_sparse_array [[a]].
 
-(* Why3 assumption *)
-Definition def {a:Type} {a_WT:WhyType a} (v:(sparse_array a)): a :=
-  match v with
-  | (mk_sparse_array x x1 x2 x3 x4) => x4
-  end.
+Parameter values: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) ->
+  (array a).
 
-(* Why3 assumption *)
-Definition card {a:Type} {a_WT:WhyType a} (v:(sparse_array a)): Z :=
-  match v with
-  | (mk_sparse_array x x1 x2 x3 x4) => x3
-  end.
+Parameter index: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> (array
+  Z).
 
-(* Why3 assumption *)
-Definition back {a:Type} {a_WT:WhyType a} (v:(sparse_array a)): (array Z) :=
-  match v with
-  | (mk_sparse_array x x1 x2 x3 x4) => x2
-  end.
+Parameter back: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> (array
+  Z).
 
-(* Why3 assumption *)
-Definition index {a:Type} {a_WT:WhyType a} (v:(sparse_array a)): (array Z) :=
-  match v with
-  | (mk_sparse_array x x1 x2 x3 x4) => x1
-  end.
+Parameter card: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> Z.
 
-(* Why3 assumption *)
-Definition values {a:Type} {a_WT:WhyType a} (v:(sparse_array a)): (array
-  a) := match v with
-  | (mk_sparse_array x x1 x2 x3 x4) => x
-  end.
+Parameter def: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> a.
+
+Axiom sparse_array'invariant : forall {a:Type} {a_WT:WhyType a},
+  forall (self:(sparse_array a)), ((0%Z <= (card self))%Z /\
+  (((card self) <= (length (values self)))%Z /\
+  ((length (values self)) <= 1000%Z)%Z)) /\
+  ((((length (values self)) = (length (index self))) /\
+  ((length (index self)) = (length (back self)))) /\ forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < (card self))%Z) -> (((0%Z <= (mixfix_lbrb (back self)
+  i))%Z /\ ((mixfix_lbrb (back self) i) < (length (values self)))%Z) /\
+  ((mixfix_lbrb (index self) (mixfix_lbrb (back self) i)) = i))).
 
 (* Why3 assumption *)
 Definition is_elt {a:Type} {a_WT:WhyType a} (a1:(sparse_array a))
-  (i:Z): Prop := ((0%Z <= (get (index a1) i))%Z /\ ((get (index a1)
-  i) < (card a1))%Z) /\ ((get (back a1) (get (index a1) i)) = i).
+  (i:Z): Prop := ((0%Z <= (mixfix_lbrb (index a1) i))%Z /\
+  ((mixfix_lbrb (index a1) i) < (card a1))%Z) /\ ((mixfix_lbrb (back a1)
+  (mixfix_lbrb (index a1) i)) = i).
 
 Parameter value: forall {a:Type} {a_WT:WhyType a}, (sparse_array a) -> Z ->
   a.
 
 Axiom value_def : forall {a:Type} {a_WT:WhyType a}, forall (a1:(sparse_array
-  a)) (i:Z), ((is_elt a1 i) -> ((value a1 i) = (get (values a1) i))) /\
-  ((~ (is_elt a1 i)) -> ((value a1 i) = (def a1))).
+  a)) (i:Z), ((is_elt a1 i) -> ((value a1 i) = (mixfix_lbrb (values a1)
+  i))) /\ ((~ (is_elt a1 i)) -> ((value a1 i) = (def a1))).
 
 (* Why3 assumption *)
 Definition length1 {a:Type} {a_WT:WhyType a} (a1:(sparse_array a)): Z :=
@@ -103,10 +90,11 @@ Theorem permutation : forall {a:Type} {a_WT:WhyType a},
   ((length (values a1)) <= 1000%Z)%Z)) /\
   ((((length (values a1)) = (length (index a1))) /\
   ((length (index a1)) = (length (back a1)))) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < (card a1))%Z) -> (((0%Z <= (get (back a1) i))%Z /\
-  ((get (back a1) i) < (length (values a1)))%Z) /\ ((get (index a1)
-  (get (back a1) i)) = i)))) -> (((card a1) = (length1 a1)) -> forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < (length1 a1))%Z) -> (is_elt a1 i)).
+  ((0%Z <= i)%Z /\ (i < (card a1))%Z) -> (((0%Z <= (mixfix_lbrb (back a1)
+  i))%Z /\ ((mixfix_lbrb (back a1) i) < (length (values a1)))%Z) /\
+  ((mixfix_lbrb (index a1) (mixfix_lbrb (back a1) i)) = i)))) ->
+  (((card a1) = (length1 a1)) -> forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (length1 a1))%Z) -> (is_elt a1 i)).
 (* Why3 intros a a_WT a1 ((h1,(h2,h3)),((h4,h5),h6)) h7 i (h8,h9). *)
 intros a _a a1.
 destruct a1 as ((n0, a_values), (n1, a_index), (n2, a_back), a_card, a_def); simpl.

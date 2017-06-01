@@ -2,96 +2,25 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.3.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../coincidence_count.mlw" expanded="true">
-<theory name="CoincidenceCount" sum="17b09e5c8a51c7635f8c46ed79d78cff" expanded="true">
+<theory name="CoincidenceCount" sum="40619067d27b67fafc68245658b265cc" expanded="true">
  <goal name="drop_left">
- <proof prover="2"><result status="valid" time="0.15" steps="486"/></proof>
+ <proof prover="2"><result status="valid" time="0.15" steps="337"/></proof>
+ <proof prover="3"><result status="valid" time="0.06" steps="344"/></proof>
  </goal>
  <goal name="not_mem_inter_r">
- <proof prover="1"><result status="valid" time="1.02" steps="585"/></proof>
+ <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
  </goal>
  <goal name="not_mem_inter_l">
- <proof prover="1"><result status="valid" time="1.01" steps="585"/></proof>
+ <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
+ <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
  </goal>
- <goal name="WP_parameter coincidence_count" expl="VC for coincidence_count" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter coincidence_count.1" expl="1. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.2" expl="2. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.3" expl="3. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.4" expl="4. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.5" expl="5. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.6" expl="6. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.7" expl="7. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.8" expl="8. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.19" steps="375"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.9" expl="9. loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.10" expl="10. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.11" expl="11. index in array bounds">
-  <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.12" expl="12. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.13" expl="13. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.14" expl="14. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="1.29" steps="376"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.15" expl="15. loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.16" expl="16. assertion">
-  <proof prover="0"><result status="valid" time="2.19"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.17" expl="17. assertion">
-  <transf name="inline_goal">
-   <goal name="WP_parameter coincidence_count.17.1" expl="1. assertion">
-   <proof prover="1"><result status="valid" time="0.69" steps="302"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="WP_parameter coincidence_count.18" expl="18. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.19" expl="19. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.70" steps="167"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.21" expl="21. loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.22" expl="22. postcondition">
-  <proof prover="1"><result status="valid" time="0.08" steps="109"/></proof>
-  </goal>
-  <goal name="WP_parameter coincidence_count.23" expl="23. postcondition">
-  <proof prover="1"><result status="valid" time="0.08" steps="108"/></proof>
-  </goal>
- </transf>
+ <goal name="VC coincidence_count" expl="VC for coincidence_count" expanded="true">
+ <proof prover="3"><result status="valid" time="0.62" steps="2573"/></proof>
  </goal>
 </theory>
 </file>

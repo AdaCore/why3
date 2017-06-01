@@ -3,42 +3,40 @@ module Sum_extended
   use import int.Int
   use import int.Sum
 
-  function addf (f g:int -> int) : int -> int = \x. f x + g x
+  function addf (f g:int -> int) : int -> int = fun x -> f x + g x
 
-  function smulf (l:int) (f:int -> int) : int -> int = \x. l * f x
+  function smulf (f:int -> int) (l:int) : int -> int = fun x -> l * f x
 
-  let rec lemma sum_mult (a b l:int) (f:int -> int) : unit
-    ensures { sum a b ( smulf l f) = l * sum a b f }
+  let rec lemma sum_mult (f:int -> int) (a b l:int) : unit
+    ensures { sum (smulf f l) a b = l * sum f a b }
     variant { b - a }
-  = if b > a then sum_mult a (b-1) l f
+  = if b > a then sum_mult f a (b-1) l
 
 
-  let rec lemma sum_add (a b:int) (f g:int -> int) : unit
-    ensures { sum a b (addf f g) = sum a b f + sum a b g }
+  let rec lemma sum_add (f g:int -> int) (a b:int) : unit
+    ensures { sum (addf f g) a b = sum f a b + sum g a b }
     variant { b - a }
-  = if b > a then sum_add a (b-1) f g
+  = if b > a then sum_add f g a (b-1)
 
 
-  function sumf (a b:int) (f:int -> int -> int) : int -> int = \x. sum a b (f x)
+  function sumf (f:int -> int -> int) (a b:int) : int -> int = fun x -> sum (f x) a b
 
   let rec lemma fubini (f1 f2: int -> int -> int) (a b c d: int) : unit
     requires { forall x y. a <= x < b /\ c <= y < d -> f1 x y = f2 y x }
-    ensures  { sum a b (sumf c d f1) = sum c d (sumf a b f2) }
+    ensures  { sum (sumf f1 c d) a b = sum (sumf f2 a b) c d }
     variant  { b - a }
   = if b <= a
-    then assert { forall x. sumf a b f2 x = 0 }
+    then assert { forall x. sumf f2 a b x = 0 }
     else begin
       fubini f1 f2 a (b-1) c d;
-      assert { let ha = addf (sumf a (b-1) f2) (f1 (b-1)) in
-        sum c d (sumf a b f2) = sum c d ha
-        by forall y. c <= y < d -> sumf a b f2 y = ha y }
+      assert { let ha = addf (sumf f2 a (b-1)) (f1 (b-1)) in
+        sum (sumf f2 a b) c d = sum ha c d
+        by forall y. c <= y < d -> sumf f2 a b y = ha y }
     end
 
-   let ghost sum_ext (a b: int) (f g: int -> int) : unit
+   let ghost sum_ext (f g: int -> int) (a b: int) : unit
      requires {forall i. a <= i < b -> f i = g i }
-     ensures  { sum a b f  = sum a b g }
+     ensures  { sum f a b  = sum g a b }
    = ()
-
-
 
 end
