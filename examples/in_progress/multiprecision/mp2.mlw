@@ -2548,8 +2548,14 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
             so cr < m
             by (
                 let bbd = radix * radix - d in
-                bbd > 0 so
-                if uh <= dh - 1
+                bbd > 0 /\ bbd <= m /\ q0 * radix <= m
+                so (bbd * bbd <= bbd * m
+                    by "case_split"
+                    (bbd = m \/ (bbd < m so bbd * bbd < bbd * m)))
+                so (d*(radix * q0) <= d * m
+                    by "case_split"
+                    (radix * q0 = m \/ (radix * q0 < m so d > 0 so d * (radix * q0) < d * m)))
+                so if uh <= dh - 1
                 then
                   let dm = dh - 1 in
                   uh <= dm
@@ -2606,6 +2612,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   so
                   (um <= dl - 1
                   by um + radix * uh < dl + radix * dh)
+                  so (radix * radix - d) * um <= (radix * radix - d) * (dl - 1)
                   so
                   ( radix * radix * cr
                     < radix * radix * m
@@ -2709,7 +2716,13 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                              < radix * radix * radix + 1
                              <= d * (radix + 1))
                         so (let a = div (radix * radix * radix - 1) d in
-                           a < radix + 1 by  a * d < (radix + 1) * d)
+                            a < radix + 1
+                            by d > 0
+                            so (forall x y z. x * z < y * z /\ z > 0 -> x < y)
+                            so (forall x y. x * d < y * d -> x < y)
+                            so let r = radix + 1 in
+                               a * d < r * d
+                               so a < r)
                         so v = div (radix * radix * radix - 1) d - radix
                                  < radix + 1 - radix = 1
                         so v = 0
