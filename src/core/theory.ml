@@ -313,7 +313,6 @@ let close_scope uc ~import =
   match uc.uc_prefix, uc.uc_import, uc.uc_export with
   | s :: prf, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
-      let _  = if import then merge_ns true  e0 e1 else e1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with uc_prefix = prf; uc_import = i1::sti; uc_export = e1::ste; }
