@@ -2,191 +2,64 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../imp.why" expanded="true">
-<theory name="Imp" sum="5b7f48232493468c9e3f22d1ebe7e7f5">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../imp.why">
+<theory name="Imp" sum="2d3400b438aea0519cb1313c5cfda33e">
  <goal name="ceval_deterministic_aux">
  <transf name="induction_pr">
   <goal name="ceval_deterministic_aux.1" expl="1.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.1.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.1.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="41"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.2" expl="2.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.2.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.2.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
+   <proof prover="0"><result status="valid" time="0.33" steps="473"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.3" expl="3.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.3.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.3" expl="3.">
-   <proof prover="0"><result status="valid" time="0.11"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.03" steps="22"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.3.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.03" steps="24"/></proof>
+   <proof prover="0"><result status="valid" time="0.23" steps="391"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.4" expl="4.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.4.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.03" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.4" expl="4.">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.03" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.4.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.03" steps="25"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="157"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.5" expl="5.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.5.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.5" expl="5.">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.5.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="153"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.6" expl="6.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.6.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.03" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.03" steps="22"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.6.7" expl="7.">
-   <proof prover="2"><result status="valid" time="0.03" steps="21"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="50"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="ceval_deterministic_aux.7" expl="7.">
-  <transf name="inversion_pr">
+  <transf name="simplify_trivial_quantification_in_goal">
    <goal name="ceval_deterministic_aux.7.1" expl="1.">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.2" expl="2.">
-   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.3" expl="3.">
-   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.4" expl="4.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.5" expl="5.">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.6" expl="6.">
-   <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-   </goal>
-   <goal name="ceval_deterministic_aux.7.7" expl="7.">
-   <proof prover="0"><result status="valid" time="0.08"/></proof>
+   <proof prover="0"><result status="valid" time="0.28" steps="444"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="ceval_deterministic">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
 </theory>
 </file>
