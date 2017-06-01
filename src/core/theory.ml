@@ -394,7 +394,14 @@ let add_symbol add id v uc =
   | _ -> assert false
 
 let add_symbol_ts uc ts = add_symbol add_ts ts.ts_name ts uc
-let add_symbol_ls uc ls = add_symbol add_ls ls.ls_name ls uc
+
+let add_symbol_ls uc ({ls_name = id} as ls) =
+  let {id_string = nm; id_loc = loc} = id in
+  if (nm = "infix =" || nm = "infix <>") &&
+      uc.uc_path <> ["why3";"BuiltIn"] then
+    Loc.errorm ?loc "Logical equality cannot be redefined";
+  add_symbol add_ls id ls uc
+
 let add_symbol_pr uc pr = add_symbol add_pr pr.pr_name pr uc
 
 let create_decl d = mk_tdecl (Decl d)
@@ -414,7 +421,8 @@ let warn_dubious_axiom uc k p syms =
           | _ -> ())
         syms;
       Warning.emit ?loc:p.id_loc
-        "@[axiom %s does not contain any local abstract symbol@ (contains: @[%a@])@]" p.id_string
+        "@[axiom %s does not contain any local abstract symbol@ \
+          (contains: @[%a@])@]" p.id_string
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
     with Exit -> ()
 
