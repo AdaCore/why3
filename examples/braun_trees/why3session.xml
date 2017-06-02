@@ -2,9 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../braun_trees.mlw" expanded="true">
-<theory name="BraunHeaps" sum="320a27ff6d5b9e231da1e9f9dee7818c" expanded="true">
+<theory name="BraunHeaps" sum="d55c672dc562dbea343cabfcc2fc8ad9" expanded="true">
  <goal name="VC le_root" expl="VC for le_root">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -23,8 +24,8 @@
  <goal name="VC extract" expl="VC for extract">
  <proof prover="1"><result status="valid" time="0.97" steps="2514"/></proof>
  </goal>
- <goal name="VC replace_min" expl="VC for replace_min" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC replace_min" expl="VC for replace_min">
+ <transf name="split_goal_wp">
   <goal name="VC replace_min.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="127"/></proof>
   </goal>
@@ -75,8 +76,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC merge" expl="VC for merge" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC merge" expl="VC for merge">
+ <transf name="split_goal_wp">
   <goal name="VC merge.1" expl="1. variant decrease">
   <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
@@ -134,27 +135,27 @@
  <proof prover="1"><result status="valid" time="0.02" steps="144"/></proof>
  </goal>
  <goal name="VC size_height" expl="VC for size_height">
- <proof prover="1"><result status="valid" time="0.12" steps="613"/></proof>
+ <proof prover="1" timelimit="5"><result status="valid" time="0.12" steps="613"/></proof>
  </goal>
- <goal name="VC inv_height" expl="VC for inv_height" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC inv_height" expl="VC for inv_height">
+ <transf name="split_goal_wp">
   <goal name="VC inv_height.1" expl="1. assertion">
-  <proof prover="1"><result status="valid" time="0.07" steps="260"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.07" steps="260"/></proof>
   </goal>
   <goal name="VC inv_height.2" expl="2. variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="35"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="VC inv_height.3" expl="3. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="VC inv_height.4" expl="4. variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="38"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
   <goal name="VC inv_height.5" expl="5. precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="VC inv_height.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="4.97" steps="860"/></proof>
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>
