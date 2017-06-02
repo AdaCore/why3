@@ -862,23 +862,24 @@ let alias_of_dspec dsp ity =
     | Ityreg { reg_its = s; reg_args = l; reg_regs = r } -> (* FIXME ? *)
       ity_app s (List.map (subst reg ity2) l) (List.map (subst reg ity2) r)
   in
-  let add_alias (ity, regs) (t, rt) =
-    (* FIXME conflicts *)
+  let add_alias (ity, regs, conflicts) (t, rt) =
     match (effect_of_term t, effect_of_term rt) with
     | (_, ({ity_node = Ityreg reg} as nity), _),
       (v, ({ity_node = Ityreg rreg}), _) ->
       if v.pv_vs.vs_name.id_string = "result"
       then
-        (subst rreg nity ity, Sreg.add reg regs)
+        if Sreg.mem rreg conflicts
+        then Loc.errorm ?loc:rt.t_loc "aliasing conflict" (* FIXME *)
+        else (subst rreg nity ity, Sreg.add reg regs, Sreg.add rreg conflicts)
       else Loc.errorm ?loc:rt.t_loc "result expected" (* FIXME ? *)
     | (_, {ity_node = Ityreg _}, _), _ ->
       Loc.errorm ?loc:rt.t_loc "mutable expression expected"
     | _ ->
       Loc.errorm ?loc:t.t_loc "mutable expression expected" in
-  let ity, regs =
+  let ity, regs, _conflicts =
     List.fold_left
       add_alias
-      (ity, Sreg.empty)
+      (ity, Sreg.empty, Sreg.empty)
       dsp.ds_alias in
   let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in
   (* FIXME ? *)

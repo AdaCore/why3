@@ -1067,8 +1067,10 @@ module N
                     + (power radix (!i + sz)) * !c
                   = value x sz
                       * value y !i
-               by
-                 power radix (k + sz) = power radix k * power radix sz
+               by (value !rp sz + power radix sz * c'
+                  = value (!rp at StartLoop) sz + value x sz * !ly
+                  by value !rp sz = value (!rp at BeforeCarry) sz)
+               so power radix (k + sz) = power radix k * power radix sz
                so
                  value (r at StartLoop) k
                  + (power radix k) * value_sub (pelts r at StartLoop)
@@ -1419,8 +1421,10 @@ module N
                     + (power radix (!i + sx)) * !c
                   = value x sx
                       * value y !i
-               by
-                 power radix (k + sx) = power radix k * power radix sx
+               by (value !rp sx + power radix sx * c'
+                   = value (!rp at StartLoop) sx + value x sx * !ly
+                   by value !rp sx = value (!rp at BeforeCarry) sx)
+               so power radix (k + sx) = power radix k * power radix sx
                so
                  value (r at StartLoop) k
                  + (power radix k) * value_sub (pelts r at StartLoop)
@@ -1751,10 +1755,10 @@ module N
                   + (power radix sz) * retval
                 = value !xp sz
                   * (power 2 (cnt)) };
-   value_sub_head (pelts r) r.offset (r.offset + p2i sz);
    value_sub_update_no_change (pelts r) r.offset (r.offset+1)
                               (r.offset + p2i sz) !high;
    C.set r !high;
+   value_sub_head (pelts r) r.offset (r.offset + p2i sz);
    retval
 
   (** [rshift r x sz cnt] shifts [(x,sz)] [cnt] bits to the right and
@@ -3288,6 +3292,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                  so vy >= dh * power radix (sy - 1)
                  so 2 * vy >= 2 * dh * power radix (sy - 1)
                  so 2 * dh >= radix
+                 so 2 * dh * power radix (sy - 1) >= radix * power radix (sy - 1)
                  so 2 * vy >= radix * power radix (sy - 1) = power radix sy
                  so value (xd at PreAdjust) sy < 2 * vy
                  so value (xd at PreAdjust) sy - vy < vy };
@@ -5394,7 +5399,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
              by power radix !i = 1 };
     C.set_ofs x one !rh;
     C.set x !rl;
-    assert { value x 2 = !rl + radix * !rh };
+    assert { value x 2 = !rl + radix * !rh
+             by (pelts x)[x.offset] = !rl
+                /\ (pelts x)[x.offset + 1] = !rh};
     !qh
 
   let copy (r x:t) (sz:int32) : unit
