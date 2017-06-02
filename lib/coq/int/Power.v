@@ -82,12 +82,21 @@ apply Power_mult ; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_mult2 : forall (x:Z) (y:Z) (n:Z), (0%Z <= n)%Z ->
-  ((power (x * y)%Z n) = ((power x n) * (power y n))%Z).
+Lemma Power_comm1 : forall (x:Z) (y:Z), ((x * y)%Z = (y * x)%Z) ->
+  forall (n:Z), (0%Z <= n)%Z -> (((power x n) * y)%Z = (y * (power x n))%Z).
 Proof.
-intros x y n Hn.
+intros x y h1 n h2.
+auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma Power_comm2 : forall (x:Z) (y:Z), ((x * y)%Z = (y * x)%Z) ->
+  forall (n:Z), (0%Z <= n)%Z -> ((power (x * y)%Z n) = ((power x
+  n) * (power y n))%Z).
+Proof.
+intros x y h1 n h2.
 rewrite 3!power_is_exponentiation ; auto with zarith.
-apply Power_mult2 ; auto with zarith.
+apply Power_comm2 ; auto with zarith.
 Qed.
 
 (* Why3 goal *)
