@@ -14,6 +14,8 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
+Require int.Abs.
+Require int.ComputerDivision.
 
 (* Why3 assumption *)
 Definition even (n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
@@ -121,5 +123,16 @@ Lemma odd_2k1 : forall (k:Z), (odd ((2%Z * k)%Z + 1%Z)%Z).
 Proof.
 intros k.
 now exists k.
+Qed.
+
+(* Why3 goal *)
+Lemma even_mod2 : forall (n:Z), (even n) <->
+  ((ZArith.BinInt.Z.rem n 2%Z) = 0%Z).
+Proof.
+intros n.
+rewrite even_is_Zeven.
+rewrite <- Zeven_bool_iff.
+rewrite Zquot.Zeven_rem.
+now rewrite Z.eqb_eq.
 Qed.
 

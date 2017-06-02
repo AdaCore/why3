@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,7 +10,7 @@
 <prover id="9" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitvector.why" expanded="true">
-<theory name="BitVector" sum="d28eacb18daec312a94869cf046a4a41">
+<theory name="BitVector" sum="b2cd28e32ab19383fab97d17f1c06340">
  <goal name="Nth_bw_xor_v1true">
  <proof prover="2"><result status="valid" time="0.08" steps="85"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -31,7 +32,7 @@
  <proof prover="6"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="to_nat_of_zero2">
- <proof prover="1" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="0.48"/></proof>
+ <proof prover="1" edited="bitvector_BitVector_to_nat_of_zero2_1.v"><result status="valid" time="0.27"/></proof>
  </goal>
  <goal name="to_nat_of_zero">
  <proof prover="1" timelimit="30" edited="bitvector_BitVector_to_nat_of_zero_1.v"><result status="valid" time="1.01"/></proof>
@@ -76,13 +77,19 @@
  <proof prover="2"><result status="valid" time="0.33" steps="94"/></proof>
  </goal>
 </theory>
-<theory name="BV32" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="BV32" sum="aca7c0cfc347d6aa55e9170b1e60b820" expanded="true">
+ <goal name="size_positive">
+ <proof prover="0"><result status="valid" time="0.01" steps="65"/></proof>
+ </goal>
 </theory>
-<theory name="BV64" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="BV64" sum="0b730c9c3adbbeb86d176c0a5e901d00" expanded="true">
+ <goal name="size_positive">
+ <proof prover="0"><result status="valid" time="0.01" steps="65"/></proof>
+ </goal>
 </theory>
 <theory name="BV32_64" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="TestBv32" sum="fbb6835562fff27fbb68db392fbf344b">
+<theory name="TestBv32" sum="b190969d7fef326d2a90129cfd540796" expanded="true">
  <goal name="Test1">
  <proof prover="2"><result status="valid" time="0.06" steps="72"/></proof>
  <proof prover="3" timelimit="3"><result status="valid" time="0.07"/></proof>
@@ -135,10 +142,10 @@
  <proof prover="6" timelimit="120"><result status="valid" time="84.22"/></proof>
  </goal>
  <goal name="to_nat_0x00000003">
- <proof prover="6" timelimit="120"><result status="valid" time="77.09"/></proof>
+ <proof prover="6" timelimit="120"><result status="valid" time="62.48"/></proof>
  </goal>
  <goal name="to_nat_0x00000007">
- <proof prover="6" timelimit="60" memlimit="4000"><result status="valid" time="63.29"/></proof>
+ <proof prover="6" timelimit="60" memlimit="4000"><result status="valid" time="54.25"/></proof>
  </goal>
  <goal name="to_nat_0x0000000F">
  <proof prover="6" timelimit="120"><result status="valid" time="46.07"/></proof>
@@ -147,13 +154,13 @@
  <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="38.43"/></proof>
  </goal>
  <goal name="to_nat_0x0000003F">
- <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="38.26"/></proof>
+ <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="31.33"/></proof>
  </goal>
  <goal name="to_nat_0x0000007F">
- <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="31.80"/></proof>
+ <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="25.66"/></proof>
  </goal>
  <goal name="to_nat_0x000000FF">
- <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="24.52"/></proof>
+ <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="21.04"/></proof>
  </goal>
  <goal name="to_nat_0x000001FF">
  <proof prover="6" timelimit="30" memlimit="4000"><result status="valid" time="17.53"/></proof>
@@ -186,7 +193,7 @@
  <proof prover="6"><result status="valid" time="1.77"/></proof>
  </goal>
  <goal name="to_nat_0x0007FFFF">
- <proof prover="6"><result status="valid" time="1.56"/></proof>
+ <proof prover="6"><result status="valid" time="1.26"/></proof>
  </goal>
  <goal name="to_nat_0x000FFFFF">
  <proof prover="6"><result status="valid" time="0.89"/></proof>

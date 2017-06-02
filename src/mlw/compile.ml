@@ -109,6 +109,7 @@ module ML = struct
     rec_args : var list;
     rec_exp  : expr;
     rec_res  : ty;
+    rec_svar : Stv.t; (* set of type variables *)
   }
 
   type is_mutable = bool
@@ -514,11 +515,11 @@ module Translate = struct
       let for_call      = ML.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff in
     let pv_name pv = pv.pv_vs.vs_name in
-    let args = [ pv_name  i_pv, ty_int, false ] in
+    let args = [ pv_name i_pv, ty_int, false ] in
     let for_rec_def = {
-      ML.rec_sym  = for_rs; ML.rec_args = args;
-      ML.rec_rsym = for_rs; ML.rec_exp  = for_expr;
-      ML.rec_res  = ML.tunit;
+      ML.rec_sym  = for_rs;   ML.rec_args = args;
+      ML.rec_rsym = for_rs;   ML.rec_exp  = for_expr;
+      ML.rec_res  = ML.tunit; ML.rec_svar = Stv.empty;
     } in
     let for_let = ML.Elet (ML.Lrec [for_rec_def], for_call_expr) in
     ML.mk_expr for_let ML.ity_unit eff
@@ -536,6 +537,12 @@ module Translate = struct
     mk_for le_rs plus_rs i_pv from_pv to_pv body eff
 
   exception ExtractionAny
+
+  (* build the set of type variables from functions arguments *)
+  let rec add_tvar acc = function
+    | ML.Tvar tv -> Stv.add tv acc
+    | ML.Tapp (_, tyl) | ML.Ttuple tyl ->
+      List.fold_left add_tvar acc tyl
 
   (* expressions *)
   let rec expr info ({e_effect = eff} as e) =
@@ -592,10 +599,16 @@ module Translate = struct
       let def = function
         | {rec_sym = rs1; rec_rsym = rs2;
            rec_fun = {c_node = Cfun ef; c_cty = cty}} ->
-            let res  = ity rs1.rs_cty.cty_result in
-            let args = params cty.cty_args in let ef = expr info ef in
-            { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-              ML.rec_args = args; ML.rec_exp  = ef ; ML.rec_res  = res }
+          let res  = ity rs1.rs_cty.cty_result in
+          let args = params cty.cty_args in
+          let svar =
+            let args' = List.map (fun (_, ty, _) -> ty) args in
+            let svar  = List.fold_left add_tvar Stv.empty args' in
+            add_tvar svar res in
+          let ef = expr info ef in
+          { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
+            ML.rec_args = args; ML.rec_exp  = ef ;
+            ML.rec_res  = res;  ML.rec_svar = svar; }
         | _ -> assert false in
       let rdefl = List.map def rdefl in
       if rdefl <> [] then
@@ -749,9 +762,13 @@ module Translate = struct
         let e = match e.c_node with Cfun e -> e | _ -> assert false in
         let args = params rs1.rs_cty.cty_args in
         let res  = ity rs1.rs_cty.cty_result in
+        let svar =
+          let args' = List.map (fun (_, ty, _) -> ty) args in
+          let svar  = List.fold_left add_tvar Stv.empty args' in
+          add_tvar svar res in
         { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
           ML.rec_args = args; ML.rec_exp  = expr info e;
-          ML.rec_res  = res } in
+          ML.rec_res  = res;  ML.rec_svar = svar; } in
       if rl = [] then [] else [ML.Dlet (ML.Lrec (List.map def rl))]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar _) ->
       []

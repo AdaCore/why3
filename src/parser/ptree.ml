@@ -140,6 +140,7 @@ and expr_desc =
   | Enot of expr
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
+  | Epure of term
   | Eraise of qualid * expr option
   | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr

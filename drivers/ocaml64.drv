@@ -307,8 +307,8 @@ module mach.int.Refint63
   syntax val ( *= ) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r * v))"
 end
 module mach.int.MinMax63
-  syntax val min "Pervasives.min"
-  syntax val max "Pervasives.max"
+  syntax val min "Pervasives.min %1 %2"
+  syntax val max "Pervasives.max %1 %2"
 end
 
 module mach.array.Array63

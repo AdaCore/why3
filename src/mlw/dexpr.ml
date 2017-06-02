@@ -126,25 +126,27 @@ let rec dity_unify_weak d1 d2 = match d1,d2 with
       List.iter2 dity_unify_weak dl1 dl2
   | _ -> raise Exit
 
+let dity_app_fresh s dl =
+  let mv = List.fold_right2 Mtv.add s.its_ts.ts_args dl Mtv.empty in
+  let hr = Hreg.create 3 in
+  let rec ity_inst ity = match ity.ity_node with
+    | Ityreg r -> reg_inst r
+    | Ityvar (v, false) -> Mtv.find v mv
+    | Ityvar (v, true) -> dity_pur (Mtv.find v mv)
+    | Ityapp (s,tl,rl) -> app_map ity_inst s tl rl
+  and reg_inst ({reg_its = s; reg_args = tl; reg_regs = rl} as r) =
+    try Hreg.find hr r with Not_found ->
+    let d = dity_reg (app_map ity_inst s tl rl) in
+    Hreg.replace hr r d; d in
+  Dapp (s, dl, List.map reg_inst s.its_regions)
+
 let rec dity_refresh = function
   | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
   | Durg (d,_) -> dity_refresh d
   | Dutv _ as d -> d
   | Dvar {contents = Dtvs _} -> dity_fresh ()
   | Dapp (s,dl,_) ->
-      let dl = List.map dity_refresh dl in
-      let mv = List.fold_right2 Mtv.add s.its_ts.ts_args dl Mtv.empty in
-      let hr = Hreg.create 3 in
-      let rec ity_inst ity = match ity.ity_node with
-        | Ityreg r -> reg_inst r
-        | Ityvar (v, false) -> Mtv.find v mv
-        | Ityvar (v, true) -> dity_pur (Mtv.find v mv)
-        | Ityapp (s,tl,rl) -> app_map ity_inst s tl rl
-      and reg_inst ({reg_its = s; reg_args = tl; reg_regs = rl} as r) =
-        try Hreg.find hr r with Not_found ->
-        let d = dity_reg (app_map ity_inst s tl rl) in
-        Hreg.replace hr r d; d in
-      let d = Dapp (s, dl, List.map reg_inst s.its_regions) in
+      let d = dity_app_fresh s (List.map dity_refresh dl) in
       if its_immutable s then d else dity_reg d
 
 let rec dity_unify_asym d1 d2 = match d1,d2 with
@@ -424,7 +426,7 @@ and dexpr_node =
   | DEraise of xsymbol * dexpr
   | DEghost of dexpr
   | DEassert of assertion_kind * term later
-  | DEpure of term later
+  | DEpure of term later * dity
   | DEabsurd
   | DEtrue
   | DEfalse
@@ -536,6 +538,28 @@ let denv_get denv n =
 
 let denv_get_opt denv n =
   Opt.map (mk_node n) (Mstr.find_opt n denv.locals)
+
+let denv_pure denv get_dty =
+  let ht = Htv.create 3 in
+  let hi = Hint.create 3 in
+  let rec fold = function
+    | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
+    | Durg (d,_) -> fold d
+    | Dvar {contents = Dtvs v} as d ->
+        begin try fst (Htv.find ht v) with Not_found ->
+        let f = Dterm.dty_fresh () in Htv.add ht v (f,d); f end
+    | Dapp (s,dl,_) -> Dterm.dty_app s.its_ts (List.map fold dl)
+    | Dutv v -> Dterm.dty_var v in
+  let pure_denv = Mstr.mapi (fun n (_, dvty) ->
+    Dterm.DTvar (n, fold (dity_of_dvty dvty))) denv.locals in
+  let dty = get_dty pure_denv in
+  Htv.iter (fun v (f,_) ->
+    try Dterm.dty_match f (ty_var v) with Exit -> ()) ht;
+  let fnS s dl = dity_app_fresh (restore_its s) dl in
+  let fnV v = try snd (Htv.find ht v) with Not_found -> Dutv v in
+  let fnI i = try Hint.find hi i with Not_found ->
+    let d = dity_fresh () in Hint.add hi i d; d in
+  dity_pur (Dterm.dty_fold fnS fnV fnI dty)
 
 (** Unification tools *)
 
@@ -728,7 +752,8 @@ let dexpr ?loc node =
         de.de_dvty
     | DEassert _ ->
         dvty_unit
-    | DEpure _
+    | DEpure (_, dity) ->
+        [], dity
     | DEabsurd ->
         [], dity_fresh ()
     | DEtrue
@@ -1309,7 +1334,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_ghostify true (expr uloc {env with ghs = true} de)
   | DEassert (ak,f) ->
       e_assert ak (create_assert (get_later env f))
-  | DEpure t ->
+  | DEpure (t, _) ->
       e_pure (get_later env t)
   | DEabsurd ->
       e_absurd (ity_of_dity res)

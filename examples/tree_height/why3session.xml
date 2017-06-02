@@ -4,19 +4,16 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Vampire" version="0.6" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tree_height.mlw" expanded="true">
-<theory name="HeightCPS" sum="1596efb5a30759311de415509f281b2a" expanded="true">
+<theory name="HeightCPS" sum="2f25229264d604069c9ccec3e12b820b" expanded="true">
  <goal name="VC height_cps" expl="VC for height_cps">
- <proof prover="6"><result status="valid" time="0.00" steps="26"/></proof>
+ <proof prover="6"><result status="valid" time="0.00" steps="46"/></proof>
  </goal>
- <goal name="VC height1" expl="VC for height1">
- <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="height_cps_correct" expanded="true">
- </goal>
- <goal name="height1_correct" expanded="true">
+ <goal name="VC height" expl="VC for height" expanded="true">
+ <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
 <theory name="Iteration" sum="afade23b6e0721562d822b490670f598" expanded="true">
@@ -37,6 +34,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="sizew_nonneg" expanded="true">
+ <proof prover="2"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="VC height1" expl="VC for height1">
  <transf name="split_goal_wp">
@@ -134,11 +132,9 @@
   </goal>
   <goal name="VC height_stack.6" expl="6. postcondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="timeout" time="4.96"/></proof>
   </goal>
   <goal name="VC height_stack.7" expl="7. postcondition">
   <proof prover="1"><result status="valid" time="0.10"/></proof>
-  <proof prover="6"><result status="timeout" time="4.95"/></proof>
   </goal>
  </transf>
  </goal>

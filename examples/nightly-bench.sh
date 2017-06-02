@@ -11,14 +11,14 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/../why3-reports
+REPORTDIR=$PWD/../why3-new-reports
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
 DATE=`date --utc +%Y-%m-%d`
 
-SUBJECT="Why3 nightly bench:"
+SUBJECT="Why3 NEW SYSTEM nightly bench:"
 
 notify() {
     if test "$REPORTBYMAIL" == "no"; then
@@ -129,9 +129,10 @@ fi
 make bench &> $OUT
 if test "$?" != "0" ; then
     echo "Make bench FAILED" >> $REPORT
-    cat $OUT >> $REPORT
-    SUBJECT="$SUBJECT make bench failed"
-    notify
+    tail -20 $OUT >> $REPORT
+    SUBJECT="$SUBJECT make bench failed,"
+    # we do not notify yet, we try the examples also
+    # notify
 else
     echo "Make bench succeeded. " >> $REPORT
 fi

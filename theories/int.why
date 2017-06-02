@@ -245,7 +245,7 @@ theory Exponentiation
   constant one : t
   function (*) t t : t
 
-  clone export algebra.CommutativeMonoid
+  clone export algebra.Monoid
     with type t = t, constant unit = one, function op = (*)
 
   (* TODO: implement with let rec once let cloning is done *)
@@ -293,7 +293,7 @@ theory Power
   clone export Exponentiation with
     type t = int, constant one = one,
     function (*) = (*), function power = power,
-    goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
+    goal Assoc, goal Unit_def_l, goal Unit_def_r
 
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0

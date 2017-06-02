@@ -52,9 +52,9 @@ let proxy_of_expr =
 
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
-let lf_label = Ident.create_label "vc:liberal_for"
+let kp_label = Ident.create_label "vc:keep_precondition"
 
-let vc_labels = Slab.add lf_label
+let vc_labels = Slab.add kp_label
   (Slab.add sp_label (Slab.add wp_label Slab.empty))
 
 (* VCgen environment *)
@@ -102,6 +102,7 @@ let expl_check     = Ident.create_label "expl:check"
 let expl_lemma     = Ident.create_label "expl:lemma"
 let expl_absurd    = Ident.create_label "expl:unreachable point"
 let expl_for_bound = Ident.create_label "expl:loop bounds"
+let expl_off_bound = Ident.create_label "expl:out of loop bounds"
 let expl_loop_init = Ident.create_label "expl:loop invariant init"
 let expl_loop_keep = Ident.create_label "expl:loop invariant preservation"
 let expl_loop_vari = Ident.create_label "expl:loop variant decrease"
@@ -111,8 +112,10 @@ let expl_type_inv  = Ident.create_label "expl:type invariant"
 let lab_has_expl lab =
   Slab.exists (fun l -> Strings.has_prefix "expl:" l.lab_string) lab
 
+let annot_labels = Slab.add stop_split (Slab.singleton annot_label)
+
 let vc_expl loc lab expl f =
-  let lab = Slab.add stop_split (Slab.union lab f.t_label) in
+  let lab = Slab.union annot_labels (Slab.union lab f.t_label) in
   let lab = if lab_has_expl lab then lab else Slab.add expl lab in
   t_label ?loc:(if loc = None then f.t_loc else loc) lab f
 
@@ -148,7 +151,7 @@ let sp_case t bl =
   if List.for_all isfalse bl then t_false else add_case (t_case t bl)
 
 let can_simp wp = match wp.t_node with
-  | Ttrue -> not (Slab.mem stop_split wp.t_label)
+  | Ttrue -> not (Slab.mem annot_label wp.t_label)
   | _ -> false
 
 let wp_and wp1 wp2 = match wp1.t_node, wp2.t_node with
@@ -259,18 +262,19 @@ let renew_oldies o2v =
 (* convert user specifications into goals (wp) and premises (sp) *)
 
 let wp_of_inv loc lab expl pl =
-  t_and_l (List.map (vc_expl loc lab expl) pl)
+  t_and_asym_l (List.map (vc_expl loc lab expl) pl)
 
 let wp_of_pre loc lab pl = wp_of_inv loc lab expl_pre pl
 
 let wp_of_post expl ity ql =
   let v = res_of_post ity ql in let t = t_var v.pv_vs in
   let make q = vc_expl None Slab.empty expl (open_post_with t q) in
-  v, t_and_l (List.map make ql)
+  v, t_and_asym_l (List.map make ql)
 
 let push_stop loc lab expl f =
   let rec push f = match f.t_node with
-    | Tbinop (Tand,g,h) when not (Slab.mem stop_split f.t_label) ->
+    | Tbinop (Tand,g,h)
+      when not (Slab.mem annot_label f.t_label) ->
         t_label_copy f (t_and (push g) (push h))
     | _ -> vc_expl loc lab expl f in
   push f
@@ -312,7 +316,7 @@ let cty_enrich_post c = match c with
 
 (* k-expressions: simplified code *)
 
-type ktag = WP | SP | Out of bool Mint.t | Push of bool
+type ktag = WP | SP | Out of bool Mint.t | Push of bool | Off of label
 
 type kode =
   | Kseq   of kode * int * kode           (* 0: sequence, N: try-with *)
@@ -375,6 +379,8 @@ let rec k_print fmt k = match k with
       (Pp.print_list Pp.space Pp.int) (Mint.keys out) k_print k
   | Ktag (Push cl, k) -> Format.fprintf fmt "@[<hov 4>PUSH %s %a@]"
       (if cl then "CLOSED" else "OPEN") k_print k
+  | Ktag (Off lab, k) -> Format.fprintf fmt "@[<hov 4>OFF %s %a@]"
+      lab.lab_string k_print k
 
 (* check if a pure k-expression can be converted to a term.
    We need this for simple conjuctions, disjuctions, and
@@ -433,6 +439,11 @@ let complete_xpost cty {eff_raises = xss} skip =
   Mxs.set_union (Mxs.set_inter cty.cty_xpost xss)
     (Mxs.map (fun () -> []) (Mxs.set_diff xss skip))
 
+let wp_solder expl wp =
+  if can_simp wp then wp else
+  let wp = t_label_add stop_split wp in
+  if lab_has_expl wp.t_label then wp else t_label_add expl wp
+
 let rec explain_inv loc f = match f.t_node with
   | Tapp _ -> vc_expl loc Slab.empty expl_type_inv f
   | _ -> t_map (explain_inv loc) (t_label ?loc Slab.empty f)
@@ -448,7 +459,6 @@ let inv_of_pvs, inv_of_loop =
   (fun {known_map = kn} loc fl varl ->
     let fl = List.fold_left add_varl fl varl in
     List.map (explain_inv loc) (Typeinv.inspect kn fl))
-
 
 let assume_inv inv k = Kseq (Kval ([], inv), 0, k)
 let assert_inv inv k = Kpar (Kstop inv, assume_inv inv k)
@@ -521,7 +531,10 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = List.fold_right assume_inv qinv k in
         (* oldies and havoc are common for all outcomes *)
         let k = bind_oldies oldies (k_havoc e.e_effect k) in
-        let k = if pre = [] then k else Kpar (Kstop p, k) in
+        let k = if pre = [] then k else
+          if Slab.mem kp_label e.e_label
+            then Kseq (Kcut p, 0, k)
+            else Kpar (Kstop p, k) in
         let k = List.fold_right assert_inv pinv k in
         begin match ce.c_node with
           | Cfun e -> Kpar (k_fun env lps ~xmap ce.c_cty e, k)
@@ -626,7 +639,8 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k2 = k_expr env lps e2 res xmap in
         let kk v =
           if s then try
-            if ity_fragile e.e_ity then raise Exit;
+            if not (ity_equal e.e_ity ity_bool) ||
+              ity_fragile e.e_ity then raise Exit;
             let t1, f1, k1 = term_of_kode res k1 in
             let t2, f2, k2 = term_of_kode res k2 in
             let test = t_equ (t_var v.pv_vs) t_bool_true in
@@ -643,7 +657,7 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let bl = List.map branch bl in
         let kk v =
           if s then try
-            if ity_fragile e.e_ity then raise Exit;
+            if true || ity_fragile e.e_ity then raise Exit;
             let add_br (p,k) (bl,tl,fl) =
               let t, f, k = term_of_kode res k in
               let tl = t_close_branch p t :: tl in
@@ -745,20 +759,14 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
         let k = Kpar (j, k_havoc e.e_effect k) in
-        if Slab.mem lf_label e.e_label then (* "liberal for"
-          [ ASSUME a <= b ;
-            [ STOP inv[a]
-            | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
-                      | ASSUME inv[b+1] ] ]
-          | ASSUME a > b ] *)
-          Kpar (Kseq (Kval ([], expl_bounds (ps_app le [a; b])), 0, k),
-                   Kval ([res], expl_bounds (ps_app gt [a; b])))
-        else (* "strict for"
-          [ STOP a <= b+1
-          | STOP inv[a]
-          | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
-                    | ASSUME inv[b+1] ] ] *)
-          Kpar (Kstop (expl_bounds (ps_app le [a; b_pl_1])), k)
+        (* [ ASSUME a <= b+1 ;
+             [ STOP inv[a]
+             | HAVOC ; [ ASSUME a <= v <= b /\ inv[v] ; e1 ; STOP inv[v+1]
+                       | ASSUME inv[b+1] ] ]
+           | ASSUME a > b+1 ] *)
+        Kpar (Kseq (Kval ([], expl_bounds (ps_app le [a; b_pl_1])), 0, k),
+           Kseq (Kval ([res], expl_bounds (ps_app gt [a; b_pl_1])), 0,
+                 Ktag (Off expl_off_bound, Kcont 0)))
   in
   if Slab.mem sp_label e.e_label then Ktag (SP, k) else
   if Slab.mem wp_label e.e_label then Ktag (WP, k) else k
@@ -857,8 +865,11 @@ let reflow vc_wp k =
     | Kcont i ->
         k, Mint.singleton i true
     | Kaxiom k ->
-        let k, _ = mark vc_tag k in
+        let k, _ = mark WP k in
         Kaxiom k, Mint.singleton 0 true
+    | Ktag ((Off _) as tag, k) ->
+        let k, out = mark tag k in
+        Ktag (tag, k), out
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
         (* A switch from SP to WP is only sound when the kode
@@ -912,6 +923,8 @@ let reflow vc_wp k =
         begin match Mint.find_opt 0 q with
         | Some (q, _) -> Kseq (Kaxiom k, 0, q)
         | None -> Kaxiom k end
+    | Ktag ((Off _) as tag, k) ->
+        Ktag (tag, push k q)
     | Ktag ((WP|SP|Out _) as tag, k) ->
         Ktag (tag, push k Mint.empty)
     | Ktag (Push _, _) ->
@@ -1268,6 +1281,9 @@ let rec sp_expr kn k rdm dst = match k with
       let f = vc_expl None Slab.empty expl_lemma f in
       let rd = t_freepvs (Mint.find 0 rdm) f in
       t_true, Mint.singleton 0 (f, Mpv.empty), rd
+  | Ktag (Off expl, k) ->
+      let wp, sp, rd = sp_expr kn k rdm dst in
+      wp_solder expl wp, sp, rd
   | Ktag (Out out, k) ->
       sp_expr kn k (Mint.set_inter rdm out) dst
   | Ktag (WP, k) ->
@@ -1318,6 +1334,8 @@ and wp_expr kn k q = match k with
       let f = wp_expr kn k Mint.empty in
       let f = vc_expl None Slab.empty expl_lemma f in
       sp_implies f (Mint.find 0 q)
+  | Ktag (Off expl, k) ->
+      wp_solder expl (wp_expr kn k q)
   | Ktag (Out out, k) ->
       wp_expr kn k (Mint.set_inter q out)
   | Ktag (SP, k) ->

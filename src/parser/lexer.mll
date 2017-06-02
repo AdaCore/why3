@@ -183,6 +183,10 @@ rule token = parse
       { LEFTBRC }
   | "}"
       { RIGHTBRC }
+  | "{|"
+      { LEFTPURE }
+  | "|}"
+      { RIGHTPURE }
   | ":"
       { COLON }
   | ";"

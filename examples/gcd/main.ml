@@ -4,7 +4,7 @@ open Format
 
 let () =
   printf "%d@."
-    (Gcd__EuclideanAlgorithm31.euclid (int_of_string  Sys.argv.(1)) (int_of_string  Sys.argv.(2)))
+    (EuclideanAlgorithm63.euclid (int_of_string  Sys.argv.(1)) (int_of_string  Sys.argv.(2)))
 
 (*
 let usage () =

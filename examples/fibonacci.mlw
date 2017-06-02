@@ -271,13 +271,10 @@ theory Mat22 "2x2 integer matrices"
     a21 = x.a21 * y.a11 + x.a22 * y.a21; a22 = x.a21 * y.a12 + x.a22 * y.a22;
     }
 
-  (* holds, but not useful *)
-  (* clone algebra.Assoc with type t = t, function op = mult, lemma Assoc *)
-
   clone export
     int.Exponentiation with
       type t = t, function one = id, function (*) = mult,
-      goal Assoc, goal Comm, goal Unit_def_l, goal Unit_def_r
+      goal Assoc, goal Unit_def_l, goal Unit_def_r
 
 end
 
@@ -304,12 +301,19 @@ module FibonacciLogarithmic
   = if n = 0 then
       (1, 0)
     else begin
+      assert { 0 <= div n 2 };
       let a, b = logfib (div n 2) in
       let c = a + b in
       if mod n 2 = 0 then
-        (a*a + b*b, b*(a + c))
+        begin
+        assert { 2 * (div n 2) = (div n 2) + (div n 2) };
+        (a*a+ b*b, b*(a + c))
+        end
       else
+        begin
+        assert { 2 * (div n 2) + 1 = (div n 2) + (div n 2) + 1 };
         (b*(a + c), c*c + b*b)
+        end
     end
 
   (* by induction, we easily prove that

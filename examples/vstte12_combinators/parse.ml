@@ -1,6 +1,6 @@
 
 open Format
-open Vstte12_combinators__Combinators
+open Vstte12_combinators
 
 let rec pr fmt t =
   match t with
@@ -14,7 +14,7 @@ let rec parse_term s i =
   match String.get s i with
     | 'S' -> S, i+1
     | 'K' -> K, i+1
-    | 'I' -> Vstte12_combinators__Combinators.i, i+1
+    | 'I' -> Vstte12_combinators.i, i+1
     | '(' ->
       let t1,i1 = parse_term s (i+1) in
       begin
@@ -36,4 +36,3 @@ let parse_term s =
     if i <> String.length s then raise SyntaxError;
     t
   with _ -> raise SyntaxError
-

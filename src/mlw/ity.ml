@@ -1241,6 +1241,8 @@ let clone_post_result q = match q.t_node with
   | Teps bf -> t_clone_bound_id bf
   | _ -> invalid_arg "Ity.clone_post_result"
 
+let annot_label = Ident.create_label "vc:annotation"
+
 type cty = {
   cty_args   : pvsymbol list;
   cty_pre    : pre list;
@@ -1674,18 +1676,18 @@ let print_spec args pre post xpost oldies eff fmt ity =
     forget_var v in
   let print_xpost fmt (xs,ql) =
     Pp.print_list Pp.nothing (print_xpost xs) fmt ql in
-  fprintf fmt "@[<hov 4>%a%a@]"
+  fprintf fmt "@[<hov 4>@[%a@]%a@]"
     (Pp.print_list_pre Pp.space print_pvty) args
     (Pp.print_option print_result) ity;
   if eff.eff_oneway then pp_print_string fmt " diverges";
   let reads = List.fold_right Spv.remove args eff.eff_reads in
-  if not (Spv.is_empty reads) then fprintf fmt "@\nreads  { %a }"
+  if not (Spv.is_empty reads) then fprintf fmt "@\nreads  { @[%a@] }"
     (Pp.print_list Pp.comma print_pv) (Spv.elements reads);
-  if not (Mreg.is_empty eff.eff_writes) then fprintf fmt "@\nwrites { %a }"
+  if not (Mreg.is_empty eff.eff_writes) then fprintf fmt "@\nwrites { @[%a@] }"
     (Pp.print_list Pp.comma print_write) (Mreg.bindings eff.eff_writes);
-  if not (Mreg.is_empty eff.eff_covers) then fprintf fmt "@\ncovers { %a }"
+  if not (Mreg.is_empty eff.eff_covers) then fprintf fmt "@\ncovers { @[%a@] }"
     (Pp.print_list Pp.comma print_region) (Sreg.elements eff.eff_covers);
-  if not (Mreg.is_empty eff.eff_resets) then fprintf fmt "@\nresets { %a }"
+  if not (Mreg.is_empty eff.eff_resets) then fprintf fmt "@\nresets { @[%a@] }"
     (Pp.print_list Pp.comma print_region) (Sreg.elements eff.eff_resets);
   Pp.print_list Pp.nothing print_pre fmt pre;
   Pp.print_list Pp.nothing print_old fmt (Mpv.bindings oldies);

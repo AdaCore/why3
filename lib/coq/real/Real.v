@@ -15,22 +15,23 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 comment *)
-(* infix_ls is replaced with (x < x1)%R by the coq driver *)
-
-(* Why3 goal *)
-Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
-  (x = y)).
-reflexivity.
-Qed.
+(* prefix_mn is replaced with (-x)%R by the coq driver *)
 
 (* Why3 comment *)
 (* infix_pl is replaced with (x + x1)%R by the coq driver *)
 
 (* Why3 comment *)
-(* prefix_mn is replaced with (-x)%R by the coq driver *)
+(* infix_as is replaced with (x * x1)%R by the coq driver *)
 
 (* Why3 comment *)
-(* infix_as is replaced with (x * x1)%R by the coq driver *)
+(* infix_ls is replaced with (x < x1)%R by the coq driver *)
+
+(* Why3 goal *)
+Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
+  (x = y)).
+Proof.
+reflexivity.
+Qed.
 
 (* Why3 goal *)
 Lemma Assoc : forall (x:R) (y:R) (z:R),
@@ -93,11 +94,6 @@ apply Rmult_plus_distr_r.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_mn_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
-reflexivity.
-Qed.
-
-(* Why3 goal *)
 Lemma Comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R).
 Proof.
 exact Rmult_comm.
@@ -122,12 +118,20 @@ Qed.
 (* Why3 goal *)
 Lemma Inverse : forall (x:R), (~ (x = 0%R)) ->
   ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
+Proof.
 exact Rinv_r.
+Qed.
+
+(* Why3 goal *)
+Lemma infix_mn_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
+Proof.
+reflexivity.
 Qed.
 
 (* Why3 goal *)
 Lemma infix_sl_def : forall (x:R) (y:R),
   ((x / y)%R = (x * (Reals.Rdefinitions.Rinv y))%R).
+Proof.
 reflexivity.
 Qed.
 

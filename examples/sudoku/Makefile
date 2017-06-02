@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN = map__Map sudoku__Grid sudoku__TheClassicalSudokuGrid sudoku__Solver
+GEN =sudoku
 OBJ=$(GEN)
 
 GENML = $(addsuffix .ml, $(GEN))
@@ -47,7 +47,7 @@ $(MAIN).opt: $(CMX) $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(GENML): ../sudoku.mlw
-	$(WHY3) extract -D ocaml32 ../sudoku.mlw -o .
+	$(WHY3) extract -D ocaml64 --recursive -o $@ -L .. sudoku.Test
 
 # javascript
 

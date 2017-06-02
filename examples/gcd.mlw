@@ -93,6 +93,7 @@ end
     Note that we assume parameters u, v to be nonnegative.
     Otherwise, for u = v = min_int, the gcd could not be represented. *)
 
+(* does not work with extraction driver ocaml64
 module EuclideanAlgorithm31
 
   use import mach.int.Int31
@@ -104,6 +105,24 @@ module EuclideanAlgorithm31
     ensures  { to_int result = gcd (to_int u) (to_int v) }
   =
     if Int31.eq v (of_int 0) then
+      u
+    else
+      euclid v (u % v)
+
+end
+*)
+
+module EuclideanAlgorithm63
+
+  use import mach.int.Int63
+  use import number.Gcd
+
+  let rec euclid (u v: int63) : int63
+    variant  { to_int v }
+    requires { to_int u >= 0 /\ to_int v >= 0 }
+    ensures  { to_int result = gcd (to_int u) (to_int v) }
+  =
+    if Int63.eq v (of_int 0) then
       u
     else
       euclid v (u % v)

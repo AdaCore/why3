@@ -185,7 +185,6 @@ let close_scope uc ~import =
                 muc_import = sti; muc_export = ste; }
   | Uscope (s,_,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
-      let _  = if import then merge_ns true  e0 e1 else e1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with
@@ -802,13 +801,6 @@ let sm_save_olds sm c c' =
   let revs = Mpv.fold (fun o n m -> Mpv.add n o m) c'.cty_oldies Mpv.empty in
   let add_old o n sm = sm_save_pv sm o (Mpv.find (sm_find_pv sm n) revs) in
   Mpv.fold add_old c.cty_oldies sm
-
-let rs_kind s = match s.rs_logic with
-  | RLnone -> RKnone
-  | RLpv _ -> RKlocal
-  | RLls { ls_value = None } -> RKpred
-  | RLls _ -> RKfunc
-  | RLlemma -> RKlemma
 
 let clone_ppat cl sm pp mask =
   let rec conv_pat p = match p.pat_node with

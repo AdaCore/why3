@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN=gcd__EuclideanAlgorithm31
+GEN=euclideanAlgorithm63
 OBJ=$(GEN)
 
 GENML = $(addsuffix .ml, $(GEN))
@@ -44,7 +44,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(GENML): ../gcd.mlw
-	$(WHY3) extract -D ocaml32 $< -o .
+	$(WHY3) extract -D ocaml64 -L .. -o $@ gcd.EuclideanAlgorithm63
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<
@@ -78,4 +78,3 @@ $(JSMAIN).byte: $(ML) jsmain.ml
 
 clean::
 	rm -f *.cm[io] $(NAME).byte $(NAME).js
-

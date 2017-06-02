@@ -20,7 +20,7 @@ ifeq ($(BENCH),yes)
 endif
 
 MAIN=main
-GEN=vstte12_combinators__Combinators
+GEN=vstte12_combinators
 OBJ=$(GEN) parse
 
 GENML = $(addsuffix .ml, $(GEN))
@@ -44,7 +44,7 @@ $(MAIN).opt: $(CMX)  $(MAIN).cmx
 $(MAIN).cmx: $(CMX)
 
 $(GENML): ../vstte12_combinators.mlw
-	$(WHY3) extract -D ocaml32 ../vstte12_combinators.mlw -o .
+	$(WHY3) extract -D ocaml64 -o $@ $<
 
 %.cmx: %.ml
 	$(OCAMLOPT) $(INCLUDE) -annot -c $<

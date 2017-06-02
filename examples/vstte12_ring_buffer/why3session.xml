@@ -8,7 +8,7 @@
 <prover id="6" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_ring_buffer.mlw" expanded="true">
-<theory name="RingBuffer" sum="43e2ae3cfea47b465734c4bcbc933b34" expanded="true">
+<theory name="RingBuffer" sum="2590f744db0cd5d8a359eb09d0d379b5" expanded="true">
  <goal name="VC create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.00" steps="24"/></proof>
  </goal>
@@ -19,7 +19,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="55"/></proof>
  </goal>
  <goal name="VC push" expl="VC for push">
- <proof prover="4"><result status="valid" time="0.21" steps="609"/></proof>
+ <proof prover="4"><result status="valid" time="0.21" steps="476"/></proof>
  </goal>
  <goal name="VC head" expl="VC for head">
  <transf name="split_goal_wp">
@@ -272,10 +272,6 @@
      <ip_library name="list"/>
      <ip_qualid name="Length_nil"/>
     </pr_pos>
-    <pr_pos name="set_def" id="set_def" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set_def"/>
-    </pr_pos>
     <pr_pos name="nth_none_1" id="nth_none_1" ip_theory="NthLength">
      <ip_library name="list"/>
      <ip_qualid name="nth_none_1"/>
@@ -466,9 +462,6 @@
      <meta_arg_pr id="Length_nil"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="set_def"/>
-    </meta>
-    <meta name="remove_prop">
      <meta_arg_pr id="nth_none_1"/>
     </meta>
     <meta name="remove_prop">
@@ -573,7 +566,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="37cabf63fed1fd889b4b186f971177b9">
+<theory name="Harness" sum="acf2a669918b823e4b6a5ff963511f19">
  <goal name="VC harness" expl="VC for harness">
  <proof prover="4"><result status="valid" time="0.12" steps="570"/></proof>
  </goal>
@@ -584,7 +577,7 @@
  <proof prover="4"><result status="valid" time="0.08" steps="499"/></proof>
  </goal>
 </theory>
-<theory name="RingBufferSeq" sum="464c5af9b6ef30bc9fb21b0b3be8de1c">
+<theory name="RingBufferSeq" sum="6cfae23c273e779701015b15c9dbe9a3">
  <goal name="VC create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
  </goal>
@@ -595,24 +588,24 @@
  <proof prover="4"><result status="valid" time="0.01" steps="66"/></proof>
  </goal>
  <goal name="VC push" expl="VC for push">
- <proof prover="4"><result status="valid" time="0.12" steps="411"/></proof>
+ <proof prover="4"><result status="valid" time="0.12" steps="332"/></proof>
  </goal>
  <goal name="VC head" expl="VC for head">
  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
  </goal>
  <goal name="VC pop" expl="VC for pop">
- <proof prover="4"><result status="valid" time="0.04" steps="239"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="287"/></proof>
  </goal>
 </theory>
-<theory name="HarnessSeq" sum="f5ae8cb92580f1d76c4948f97b8d3868">
+<theory name="HarnessSeq" sum="264e4b716a14871114c638f9c3537d62">
  <goal name="VC harness" expl="VC for harness">
- <proof prover="4"><result status="valid" time="3.51" steps="1372"/></proof>
+ <proof prover="4"><result status="valid" time="5.74" steps="2274"/></proof>
  </goal>
  <goal name="VC harness2" expl="VC for harness2">
- <proof prover="6"><result status="valid" time="0.15"/></proof>
+ <proof prover="6"><result status="valid" time="0.86"/></proof>
  </goal>
  <goal name="VC test" expl="VC for test">
- <proof prover="4"><result status="valid" time="2.37" steps="1509"/></proof>
+ <proof prover="4"><result status="valid" time="3.98" steps="2107"/></proof>
  </goal>
 </theory>
 </file>

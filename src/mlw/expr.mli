@@ -45,6 +45,8 @@ type rs_kind =
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
 
+val rs_kind : rsymbol -> rs_kind
+
 val create_rsymbol : preid -> ?ghost:bool -> ?kind:rs_kind -> cty -> rsymbol
 (** If [?kind] is supplied and is not [RKnone], then [cty]
     must have no effects except for resets which are ignored.
