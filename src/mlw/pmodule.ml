@@ -41,37 +41,38 @@ let empty_ns = {
 
 let ns_replace eq chk x vo vn =
   if not chk then vn else
-  if eq vo vn then vn else
+  if eq vo vn then vo else
   raise (ClashSymbol x)
 
-let psym_equal p1 p2 = match p1,p2 with
-  | PV p1, PV p2 -> pv_equal p1 p2
-  | RS p1, RS p2 -> rs_equal p1 p2
-  | _, _ -> false
+let merge_ts = ns_replace its_equal
+let merge_xs = ns_replace xs_equal
 
-let rec merge_ns chk ns1 ns2 =
-  if ns1 == ns2 then ns1 else
-  let join eq x n o = Some (ns_replace eq chk x o n) in
-  let ns_union eq m1 m2 =
-    if m1 == m2 then m1 else Mstr.union (join eq) m1 m2 in
-  let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_ts = ns_union its_equal ns1.ns_ts ns2.ns_ts;
-    ns_ps = ns_union psym_equal ns1.ns_ps ns2.ns_ps;
-    ns_xs = ns_union xs_equal ns1.ns_xs ns2.ns_xs;
-    ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
+let merge_ps chk x vo vn = match vo, vn with
+  | _ when not chk -> vn
+  | PV v1, PV v2 when pv_equal v1 v2 -> vo
+  | RS r1, RS r2 when rs_equal r1 r2 -> vo
+  | _ -> raise (ClashSymbol x)
 
-let add_ns chk x ns m = Mstr.change (function
-  | Some os -> Some (merge_ns chk ns os)
-  | None    -> Some ns) x m
+let rec merge_ns chk _ no nn =
+  if no == nn then no else
+  let union merge o n =
+    let merge x vo vn = Some (merge chk x vo vn) in
+    if o == n then o else Mstr.union merge o n in
+  { ns_ts = union merge_ts no.ns_ts nn.ns_ts;
+    ns_ps = union merge_ps no.ns_ps nn.ns_ps;
+    ns_xs = union merge_xs no.ns_xs nn.ns_xs;
+    ns_ns = union merge_ns no.ns_ns nn.ns_ns }
 
-let ns_add eq chk x vn m = Mstr.change (function
-  | Some vo -> Some (ns_replace eq chk x vo vn)
+let ns_add merge chk x vn m = Mstr.change (function
+  | Some vo -> Some (merge chk x vo vn)
   | None    -> Some vn) x m
 
-let add_xs chk x xs ns = { ns with ns_xs = ns_add xs_equal   chk x xs ns.ns_xs }
-let add_ts chk x ts ns = { ns with ns_ts = ns_add its_equal  chk x ts ns.ns_ts }
-let add_ps chk x ps ns = { ns with ns_ps = ns_add psym_equal chk x ps ns.ns_ps }
-let add_ns chk x nn ns = { ns with ns_ns = add_ns            chk x nn ns.ns_ns }
+let add_ts chk x ts ns = { ns with ns_ts = ns_add merge_ts chk x ts ns.ns_ts }
+let add_ps chk x ps ns = { ns with ns_ps = ns_add merge_ps chk x ps ns.ns_ps }
+let add_xs chk x xs ns = { ns with ns_xs = ns_add merge_xs chk x xs ns.ns_xs }
+let add_ns chk x nn ns = { ns with ns_ns = ns_add merge_ns chk x nn ns.ns_ns }
+
+let merge_ns chk nn no = merge_ns chk "" no nn (* swap arguments *)
 
 let rec ns_find get_map ns = function
   | []   -> assert false
