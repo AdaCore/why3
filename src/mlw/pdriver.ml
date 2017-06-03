@@ -164,11 +164,12 @@ let load_driver env file extra_files =
     try match ns_find_prog_symbol m.mod_export q with
     | PV pv -> pv.Ity.pv_vs.vs_name
     | RS rs -> rs.Expr.rs_name
-    with Not_found -> raise (Loc.Located (loc, UnknownVal (!qualid,q)))
+    | OO _ -> raise Not_found (* TODO: proper error message *)
+    with Not_found -> Loc.error ~loc (UnknownVal (!qualid,q))
   in
   let find_xs m (loc,q) =
     try ns_find_xs m.mod_export q
-    with Not_found -> raise (Loc.Located (loc, UnknownExn (!qualid,q)))
+    with Not_found -> Loc.error ~loc (UnknownExn (!qualid,q))
   in
   let add_local_module loc m = function
     | MRexception (q,s) ->

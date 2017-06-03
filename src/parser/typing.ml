@@ -96,7 +96,10 @@ let find_xsymbol_ns ns q =
 let find_prog_symbol_ns ns p =
   let get_id_ps = function
     | PV pv -> pv.pv_vs.vs_name
-    | RS rs -> rs.rs_name in
+    | RS rs -> rs.rs_name
+      (* FIXME: this is incorrect, but we cannot
+        know the correct symbol at this stage *)
+    | OO ss -> (Srs.choose ss).rs_name in
   find_qualid get_id_ps ns_find_prog_symbol ns p
 
 let get_namespace muc = List.hd muc.Pmodule.muc_import
@@ -550,7 +553,7 @@ let dbinder muc (_,id,gh,pty) = dbinder muc id gh pty
 (* expressions *)
 
 let is_reusable de = match de.de_node with
-  | DEvar _ | DEpv _ -> true | _ -> false
+  | DEvar _ | DEsym _ -> true | _ -> false
 
 let mk_var n de =
   Dexpr.dexpr ?loc:de.de_loc (DEvar (n, de.de_dvty))
@@ -574,8 +577,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let qualid_app loc q el =
-    let e = try match find_prog_symbol muc q with
-      | PV pv -> DEpv pv | RS rs -> DErs rs with
+    let e = try DEsym (find_prog_symbol muc q) with
       | _ -> DEls (find_lsymbol muc.muc_theory q) in
     expr_app loc e el
   in
@@ -594,7 +596,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eapply (e1, e2) ->
       DEapp (dexpr muc denv e1, dexpr muc denv e2)
   | Ptree.Etuple el ->
-      let e = DErs (rs_tuple (List.length el)) in
+      let e = DEsym (RS (rs_tuple (List.length el))) in
       expr_app loc e (List.map (dexpr muc denv) el)
   | Ptree.Einfix (e1, op1, e23)
   | Ptree.Einnfix (e1, op1, e23) ->
@@ -627,18 +629,18 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None -> Loc.error ~loc (Decl.RecordFieldMissing (ls_of_rs pj))
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
-      expr_app loc (DErs cs) fl
+      expr_app loc (DEsym (RS cs)) fl
   | Ptree.Eupdate (e1, fl) ->
       let e1 = dexpr muc denv e1 in
       let re = is_reusable e1 in
       let v = if re then e1 else mk_var "q " e1 in
       let get_val _ pj = function
         | None ->
-            let pj = Dexpr.dexpr ~loc (DErs pj) in
+            let pj = Dexpr.dexpr ~loc (DEsym (RS pj)) in
             Dexpr.dexpr ~loc (DEapp (pj, v))
         | Some e -> dexpr muc denv e in
       let cs,fl = parse_record ~loc muc get_val fl in
-      let d = expr_app loc (DErs cs) fl in
+      let d = expr_app loc (DEsym (RS cs)) fl in
       if re then d else mk_let ~loc "q " e1 d
   | Ptree.Elet (id, gh, kind, e1, e2) ->
       let e1 = update_any kind e1 in
@@ -720,7 +722,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let e1 = match e1 with
         | Some e1 -> dexpr muc denv e1
         | None when ity_equal xs.xs_ity ity_unit ->
-            Dexpr.dexpr ~loc (DErs rs_void)
+            Dexpr.dexpr ~loc (DEsym (RS rs_void))
         | _ -> Loc.errorm ~loc "exception argument expected" in
       DEraise (xs, e1)
   | Ptree.Etry (e1, cl) ->
@@ -1085,6 +1087,8 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
             Loc.errorm ~loc:(qloc q) "program constant expected"
         | RS _, PV _ ->
             Loc.errorm ~loc:(qloc q) "program function expected"
+        | OO _, _ | _, OO _ ->
+            Loc.errorm ~loc:(qloc q) "ambiguous notation"
         end
     | CSxsym (p,q) ->
         let xs1 = find_xsymbol_ns m.mod_export p in

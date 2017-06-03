@@ -1142,10 +1142,12 @@ let print_rs fmt ({rs_name = {id_string = nm}} as s) =
   if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
   if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
   match extract_op s.rs_name, s.rs_logic with
-  | Some s, _ ->
-      let s = if Strings.has_prefix "*" s then " " ^ s else s in
-      let s = if Strings.has_suffix "*" s then s ^ " " else s in
-      fprintf fmt "(%s)" s
+  | Some x, _ ->
+      fprintf fmt "(%s%s%s)"
+        (if Strings.has_prefix "*" x then " " else "")
+        x
+        (if List.length s.rs_cty.cty_args = 1 then "_" else
+         if Strings.has_suffix "*" x then " " else "")
   | _, RLnone | _, RLlemma ->
       pp_print_string fmt (id_unique sprinter s.rs_name)
   | _, RLpv v -> print_pv fmt v

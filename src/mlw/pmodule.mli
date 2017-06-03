@@ -24,6 +24,7 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
+  | OO of Srs.t
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
@@ -32,15 +33,23 @@ type namespace = {
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
-val ns_find_its : namespace -> string list -> itysymbol
-
 val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
+val ns_find_its : namespace -> string list -> itysymbol
 val ns_find_pv  : namespace -> string list -> pvsymbol
 val ns_find_rs  : namespace -> string list -> rsymbol
 val ns_find_xs  : namespace -> string list -> xsymbol
-
 val ns_find_ns  : namespace -> string list -> namespace
+
+type overload =
+  | UnOp    (* t -> t *)
+  | BinOp   (* t -> t -> t *)
+  | BinRel  (* t -> t -> bool *)
+  | NoOver  (* none of the above *)
+
+val overload_of_rs : rsymbol -> overload
+
+exception IncompatibleNotation of string
 
 (** {2 Module} *)
 

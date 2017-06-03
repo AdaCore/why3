@@ -24,6 +24,7 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
+  | OO of Srs.t
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
@@ -47,7 +48,34 @@ let ns_replace eq chk x vo vn =
 let merge_ts = ns_replace its_equal
 let merge_xs = ns_replace xs_equal
 
+type overload =
+  | UnOp    (* t -> t *)
+  | BinOp   (* t -> t -> t *)
+  | BinRel  (* t -> t -> bool *)
+  | NoOver  (* none of the above *)
+
+let overload_of_rs {rs_cty = cty} =
+  if cty.cty_effect.eff_ghost then NoOver else
+  if cty.cty_mask <> MaskVisible then NoOver else
+  match cty.cty_args with
+  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
+               ity_equal cty.cty_result ity_bool &&
+               not a.pv_ghost && not b.pv_ghost -> BinRel
+  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
+               ity_equal cty.cty_result a.pv_ity &&
+               not a.pv_ghost && not b.pv_ghost -> BinOp
+  | [a]   when ity_equal cty.cty_result a.pv_ity &&
+               not a.pv_ghost -> UnOp
+  | _ -> NoOver
+
+exception IncompatibleNotation of string
+
 let merge_ps chk x vo vn = match vo, vn with
+  | OO s1, OO s2 ->
+      let o1 = overload_of_rs (Srs.choose s1) in
+      let o2 = overload_of_rs (Srs.choose s2) in
+      if o1 <> o2 then raise (IncompatibleNotation x);
+      OO (Srs.union s1 s2)
   | _ when not chk -> vn
   | PV v1, PV v2 when pv_equal v1 v2 -> vo
   | RS r1, RS r2 when rs_equal r1 r2 -> vo
@@ -79,10 +107,18 @@ let rec ns_find get_map ns = function
   | [a]  -> Mstr.find a (get_map ns)
   | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
-let ns_find_prog_symbol = ns_find (fun ns -> ns.ns_ps)
-let ns_find_ns          = ns_find (fun ns -> ns.ns_ns)
-let ns_find_xs          = ns_find (fun ns -> ns.ns_xs)
-let ns_find_its         = ns_find (fun ns -> ns.ns_ts)
+let ns_find_its = ns_find (fun ns -> ns.ns_ts)
+let ns_find_xs  = ns_find (fun ns -> ns.ns_xs)
+let ns_find_ns  = ns_find (fun ns -> ns.ns_ns)
+
+let ns_find_prog_symbol ns s =
+  let ps = ns_find (fun ns -> ns.ns_ps) ns s in
+  match ps with
+  | RS _ | PV _ -> ps
+  | OO ss ->
+      let rs1 = Expr.Srs.min_elt ss in
+      let rs2 = Expr.Srs.max_elt ss in
+      if Expr.rs_equal rs1 rs2 then RS rs1 else ps
 
 let ns_find_pv ns s = match ns_find_prog_symbol ns s with
   | PV pv -> pv | _ -> raise Not_found
@@ -1127,7 +1163,20 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
+let get_rs_name nm =
+  if nm = "mixfix []" then "([])" else
+  if nm = "mixfix []<-" then "([]<-)" else
+  if nm = "mixfix [<-]" then "([<-])" else
+  if nm = "mixfix [_..]" then "([_..])" else
+  if nm = "mixfix [.._]" then "([.._])" else
+  if nm = "mixfix [_.._]" then "([_.._])" else
+  try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
+  try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
+  nm
+
 let () = Exn_printer.register (fun fmt e -> match e with
+  | IncompatibleNotation nm -> Format.fprintf fmt
+      "Incombatible type signatures for notation '%s'" (get_rs_name nm)
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
   | _ -> raise e)

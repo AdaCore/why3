@@ -14,6 +14,7 @@ open Ident
 open Term
 open Ity
 open Expr
+open Pmodule
 
 (** Program types *)
 
@@ -94,8 +95,7 @@ type dexpr = private {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEpv of pvsymbol
-  | DErs of rsymbol
+  | DEsym of prog_symbol
   | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr

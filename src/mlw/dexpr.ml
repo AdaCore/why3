@@ -15,6 +15,7 @@ open Ty
 open Term
 open Ity
 open Expr
+open Pmodule
 
 (** Program types *)
 
@@ -404,8 +405,7 @@ type dexpr = {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEpv of pvsymbol
-  | DErs of rsymbol
+  | DEsym of prog_symbol
   | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
@@ -508,7 +508,7 @@ let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
-    | DEvar _ | DErs _ | DEls _ | DEfun _ | DEany _ -> true
+    | DEvar _ | DEsym _ | DEls _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
   then denv_add_poly denv id dvty
@@ -661,10 +661,18 @@ let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
         dvty
-    | DEpv pv ->
+    | DEsym (PV pv) ->
         [], specialize_pv pv
-    | DErs rs ->
+    | DEsym (RS rs) ->
         specialize_rs rs
+    | DEsym (OO ss) ->
+        let dt = dity_fresh () in
+        let ot = overload_of_rs (Srs.choose ss) in
+        begin match ot with
+        | UnOp   -> [dt], dt
+        | BinOp  -> [dt;dt], dt
+        | BinRel -> [dt;dt], dity_bool
+        | NoOver -> assert false end
     | DEls ls ->
         specialize_ls ls
     | DEconst (_, ity) -> [],ity
@@ -1109,6 +1117,21 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
     let gh = env.ghs || env.lgh || rs_ghost s || all_ghost al lpl in
     apply c_app gh s al lpl in
+  let c_oop s lpl =
+    let al = (Srs.choose s).rs_cty.cty_args in
+    let al = List.map (fun _ -> false) al in
+    let gh = env.ghs || env.lgh || all_ghost al lpl in
+    let loc = Opt.get_def de0.de_loc uloc in
+    let app s vl al res =
+      let app s cl = try Expr.c_app s vl al res :: cl with
+        (* TODO: are there other valid exceptions here? *)
+        | TypeMismatch _ -> cl in
+      match Srs.fold app s [] with
+      | [c] -> c
+      | [] -> Loc.errorm ?loc "No suitable symbol found"
+      (* TODO: show types or locations for ambiguity *)
+      | _cl -> Loc.errorm ?loc "Ambiguous notation" in
+    apply app gh s al lpl in
   let c_pur s lpl =
     apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
   let proxy c =
@@ -1122,7 +1145,8 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       c_app s (LD ld :: lpl) in
   match de0.de_node with
   | DEvar (n,_) -> c_app (get_rs env n) lpl
-  | DErs s -> c_app s lpl
+  | DEsym (RS s) -> c_app s lpl
+  | DEsym (OO s) -> c_oop s lpl
   | DEls s -> c_pur s lpl
   | DEapp (de1,de2) ->
       let e2 = e_ghostify env.cgh (expr uloc env de2) in
@@ -1152,7 +1176,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       cexp uloc env de (LD ld :: lpl)
   | DEmark _ ->
       Loc.errorm "Marks are not allowed over higher-order expressions"
-  | DEpv _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
+  | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
   | DEassign _ | DEwhile _ | DEfor _ | DEtry _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
   | DEcast _ | DEuloc _ | DElabel _ -> assert false (* already stripped *)
@@ -1161,7 +1185,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   match de0.de_node with
   | DEvar (n,_) when argl = [] ->
       e_var (get_pv env n)
-  | DEpv v ->
+  | DEsym (PV v) ->
       e_var v
   | DEconst(c,dity) ->
      e_const c (ity_of_dity dity)
@@ -1169,7 +1193,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in
       e_app rs_func_app [e1; e2] [] (ity_of_dity res)
-  | DEvar _ | DErs _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
+  | DEvar _ | DEsym _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
       let cgh,ldl,c = try_cexp uloc env de0 [] in
       let e = e_ghostify cgh (e_exec c) in
       List.fold_left e_let_check e ldl
