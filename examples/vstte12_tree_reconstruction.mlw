@@ -18,10 +18,11 @@ module Tree
   type tree = Leaf | Node tree tree
 
   (* the list of leaf depths for tree t, if root is at depth d *)
-  function depths (d: int) (t: tree) : list int = match t with
+  let rec function depths (d: int) (t: tree) : list int =
+    match t with
     | Leaf -> Cons d Nil
     | Node l r -> depths (d+1) l ++ depths (d+1) r
-  end
+    end
 
   (* lemmas on depths *)
 

@@ -1,7 +1,6 @@
 
 module Bag
 
-  use BuiltIn
   use import int.Int
 
   type bag 'a = 'a -> int
@@ -13,10 +12,10 @@ module Bag
     fun _ -> 0
 
   let ghost function add (e: 'a) (b: bag 'a): bag 'a =
-    fun x -> if BuiltIn.(=) x e then b x + 1 else b x
+    fun x -> if pure {x = e} then b x + 1 else b x
 
   let ghost function remove (e: 'a) (b: bag 'a): bag 'a =
-    fun x -> if BuiltIn.(=) x e then b x - 1 else b x
+    fun x -> if pure {x = e} then b x - 1 else b x
 
 end
 

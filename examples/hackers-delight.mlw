@@ -43,7 +43,6 @@ end
 *)
 
 module Utils_Spec
-  use BuiltIn
   use import int.Int
   use import int.NumOf
   use import bv.BV32
@@ -79,8 +78,7 @@ module Utils_Spec
   variant {bv with ult}
   ensures {t'int (count bv) = NumOf.numof (nth bv) 0 32}
   =
-    if BuiltIn.(=) bv zeros then ()
-    else
+    if pure { bv <> zeros } then
     begin
       countSpec_Aux (lsr_bv bv one);
       assert {
@@ -92,7 +90,7 @@ module Utils_Spec
                   NumOf.numof f 0 32 - x = NumOf.numof f (0+1) 32 &&
                   NumOf.numof f (0+1) (31+1) = NumOf.numof h 0 31 &&
                   NumOf.numof g 0 (32-1) = NumOf.numof g 0 32
-           }
+      }
     end
 
   (** With these lemmas, we can now prove the correctness property of

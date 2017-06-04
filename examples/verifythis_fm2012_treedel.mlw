@@ -105,10 +105,11 @@ module Treedel
     | Top
     | Left (zipper 'a) 'a (tree 'a)
 
-  function zip (t: tree 'a) (z: zipper 'a) : tree 'a = match z with
+  let rec function zip (t: tree 'a) (z: zipper 'a) : tree 'a
+  = match z with
     | Top -> t
     | Left z x r -> zip (Node t x r) z
-  end
+    end
 
   lemma inorder_zip:
      forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
