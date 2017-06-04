@@ -70,16 +70,35 @@ let overload_of_rs {rs_cty = cty} =
 
 exception IncompatibleNotation of string
 
-let merge_ps chk x vo vn = match vo, vn with
-  | OO s1, OO s2 ->
-      let o1 = overload_of_rs (Srs.choose s1) in
-      let o2 = overload_of_rs (Srs.choose s2) in
-      if o1 <> o2 then raise (IncompatibleNotation x);
-      OO (Srs.union s1 s2)
-  | _ when not chk -> vn
-  | PV v1, PV v2 when pv_equal v1 v2 -> vo
-  | RS r1, RS r2 when rs_equal r1 r2 -> vo
-  | _ -> raise (ClashSymbol x)
+let merge_ps chk x vo vn =
+  let fsty rs = (List.hd rs.rs_cty.cty_args).pv_ity in
+  if chk then match vo, vn with (* export namespace *)
+    (* currently, we have no way to export notation *)
+    | _, OO _ | OO _, _ -> assert false
+    | PV v1, PV v2 when pv_equal v1 v2 -> vo
+    | RS r1, RS r2 when rs_equal r1 r2 -> vo
+    | _ -> raise (ClashSymbol x)
+  else match vo, vn with (* import namespace *)
+    (* once again, no way to export notation *)
+    | _, OO _ -> assert false
+    (* but we can merge two compatible symbols *)
+    | RS r1, RS r2 when not (rs_equal r1 r2) ->
+        let o1 = overload_of_rs r1 in
+        let o2 = overload_of_rs r2 in
+        if o1 <> o2 || o2 = NoOver then vn else
+        if fsty r1 == fsty r2 then vn else
+        OO (Srs.add r2 (Srs.singleton r1))
+    (* or add a compatible symbol to notation *)
+    | OO s1, RS r2 ->
+        let o1 = overload_of_rs (Srs.choose s1) in
+        let o2 = overload_of_rs r2 in
+        if o1 <> o2 || o2 = NoOver then vn else
+        let ty = fsty r2 in
+        let confl r = fsty r != ty in
+        let s1 = Srs.filter confl s1 in
+        if Srs.is_empty s1 then vn else
+        OO (Srs.add r2 s1)
+    | _ -> vn
 
 let rec merge_ns chk _ no nn =
   if no == nn then no else
