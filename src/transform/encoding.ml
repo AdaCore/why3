@@ -31,7 +31,7 @@ let meta_enco_kept = register_meta_excl "enco_kept" [MTstring]
   ~desc:"Specify@ the@ type@ protection@ transformation:@;  \
     @[\
       - @[<hov 2>twin: use@ conversion@ functions@ between@ the@ kept@ types@ \
-            and@ the@ universal@ type@]@\
+            and@ the@ universal@ type@]\
     @]"
 
 let meta_enco_poly = register_meta_excl "enco_poly" [MTstring]
