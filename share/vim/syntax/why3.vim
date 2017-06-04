@@ -100,7 +100,7 @@ syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
 
 syn keyword  whySpec     absurd assert assume check diverges ensures invariant
-syn keyword  whySpec     raises reads requires returns variant writes at old
+syn keyword  whySpec     pure raises reads requires returns variant writes at old
 
 syn match    whyConstructor  "(\s*)"
 syn match    whyConstructor  "\u\(\w\|'\)*\>"

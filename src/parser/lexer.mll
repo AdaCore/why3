@@ -83,6 +83,7 @@
         "mutable", MUTABLE;
         "old", OLD;
         "private", PRIVATE;
+        "pure", PURE;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
@@ -182,10 +183,6 @@ rule token = parse
       { LEFTBRC }
   | "}"
       { RIGHTBRC }
-  | "{|"
-      { LEFTPURE }
-  | "|}"
-      { RIGHTPURE }
   | ":"
       { COLON }
   | ";"

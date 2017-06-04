@@ -135,7 +135,7 @@
 %token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN CHECK
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
-%token PRIVATE RAISE RAISES READS REC REQUIRES RETURNS
+%token PRIVATE PURE RAISE RAISES READS REC REQUIRES RETURNS
 %token TO TRY VAL VARIANT WHILE WRITES
 
 (* symbols *)
@@ -153,7 +153,7 @@
 
 (* program symbols *)
 
-%token AMPAMP BARBAR LEFTBRC RIGHTBRC LEFTPURE RIGHTPURE SEMICOLON
+%token AMPAMP BARBAR LEFTBRC RIGHTBRC SEMICOLON
 
 (* Precedences *)
 
@@ -811,7 +811,7 @@ expr_sub:
 | LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
-| LEFTPURE term RIGHTPURE                           { Epure $2 }
+| PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
