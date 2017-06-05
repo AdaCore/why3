@@ -393,6 +393,9 @@ type dspec = ity -> dspec_final
      must have this type. All vsymbols in the exceptional postcondition
      clauses must have the type of the corresponding exception. *)
 
+let old_mark = "'Old"
+let old_mark_id = id_fresh old_mark
+
 (** Expressions *)
 
 type dinvariant = term list
@@ -413,8 +416,8 @@ and dexpr_node =
   | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
-  | DEfun of dbinder list * mask * dspec later * dexpr
-  | DEany of dbinder list * mask * dspec later * dity
+  | DEfun of dbinder list * dity * mask * dspec later * dexpr
+  | DEany of dbinder list * dity * mask * dspec later
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -434,8 +437,8 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEmark of preid * dexpr
-  | DEcast of dexpr * ity
+  | DEcast of dexpr * dity
+  | DEmark of preid * dity * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
@@ -443,8 +446,8 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * mask * dspec later * variant list later * dexpr
+and dfun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * mask * dspec later * variant list later * dexpr
 
 (** Environment *)
 
@@ -617,9 +620,9 @@ let drec_defn denv0 prel =
   let parse (id,gh,pk,bl,res,msk,pre) =
     let dsp, dvl, de = pre (denv_add_args denv1 bl) in
     dexpr_expected_type de res;
-    (id,gh,pk,bl,msk,dsp,dvl,de) in
+    (id,gh,pk,bl,res,msk,dsp,dvl,de) in
   let fdl = List.map parse prel in
-  let add denv (id,_,_,bl,_,_,_,{de_dvty = dvty}) =
+  let add denv (id,_,_,bl,res,_,_,_,_) =
     (* just in case we linked some polymorphic type var to the outer context *)
     let check tv = if is_frozen denv0.frozen tv then Loc.errorm ?loc:id.pre_loc
       "This function is expected to be polymorphic in type variable %a"
@@ -629,7 +632,7 @@ let drec_defn denv0 prel =
     | Some (None, _) | None -> assert false
     end;
     let argl = List.map (fun (_,_,t) -> t) bl in
-    denv_add_poly denv id (argl, dity_of_dvty dvty) in
+    denv_add_poly denv id (argl, res) in
   List.fold_left add denv0 fdl, { fds = fdl }
 
 (** Constructors *)
@@ -713,9 +716,10 @@ let dexpr ?loc node =
         end;
         dexpr_expected_type de2 a;
         [], r
-    | DEfun (bl,_,_,de) ->
-        List.map (fun (_,_,t) -> t) bl, dity_of_dvty de.de_dvty
-    | DEany (bl,_,_,res) ->
+    | DEfun (bl,res,_,_,de) ->
+        dexpr_expected_type de res;
+        List.map (fun (_,_,t) -> t) bl, res
+    | DEany (bl,res,_,_) ->
         List.map (fun (_,_,t) -> t) bl, res
     | DElet (_,de)
     | DErec (_,de) ->
@@ -785,10 +789,10 @@ let dexpr ?loc node =
     | DEtrue
     | DEfalse ->
         dvty_bool
-    | DEcast (de,ity) ->
-        dexpr_expected_type de (dity_of_ity ity);
+    | DEcast (de,dity)
+    | DEmark (_,dity,de) ->
+        dexpr_expected_type de dity;
         de.de_dvty
-    | DEmark (_,de)
     | DEuloc (de,_)
     | DElabel (de,_) ->
         de.de_dvty in
@@ -1017,7 +1021,7 @@ let rebase_old {pvm = pvm} preold old fvs =
     if not (Mvs.mem o fvs) then sbs else match preold with
       | Some preold ->
           Mvs.add o (t_var (find_old pvm preold v).pv_vs) sbs
-      | None -> raise (UnboundLabel "0") in
+      | None -> raise (UnboundLabel old_mark) in
   Hpv.fold rebase old Mvs.empty
 
 let rebase_pre env preold old pl =
@@ -1052,14 +1056,17 @@ let add_pv_map ({pvm = pvm} as env) vm =
 
 let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 
+let add_xsymbol ({xsm = xsm} as env) xs =
+  { env with xsm = Mstr.add xs.xs_name.id_string xs xsm }
+
 (** Abstract values *)
 
 let cty_of_spec env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
-  let preold = Mstr.find_opt "0" env.old in
-  let env, old = add_label env "0" in
+  let preold = Mstr.find_opt old_mark env.old in
+  let env, old = add_label env old_mark in
   let dsp = get_later env dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_ghostify env.ghs eff in
@@ -1187,13 +1194,13 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       (* if we were not in the ghost context until now, then
          we must ghostify the let-definitions down from here *)
       cexp uloc {env with ghs = true; cgh = env.cgh || not env.ghs} de lpl
-  | DEfun (bl,msk,dsp,de) ->
+  | DEfun (bl,_,msk,dsp,de) ->
       let dvl _ _ _ = [] in
       let env = {env with ghs = env.ghs || env.lgh} in
       let c, dsp, _ = lambda uloc env (binders env.ghs bl) msk dsp dvl de in
       check_fun env.inr None dsp c;
       proxy c
-  | DEany (bl,msk,dsp,dity) ->
+  | DEany (bl,dity,msk,dsp) ->
       let env = {env with ghs = env.ghs || env.lgh} in
       proxy (c_any (cty_of_spec env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
@@ -1361,12 +1368,19 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_false
   | DEexn (id,dity,mask,de) ->
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
-      let env = { env with xsm = Mstr.add id.pre_name xs env.xsm } in
-      e_exn xs (expr uloc env de)
-  | DEmark ({pre_name = l},de) ->
-      let env, old = add_label env l in
+      e_exn xs (expr uloc (add_xsymbol env xs) de)
+  | DEmark (id,dity,de) ->
+      let xs = create_xsymbol id (ity_of_dity dity) in
+      let env, old = add_label env id.pre_name in
+      let e = expr uloc (add_xsymbol env xs) de in
+      let e = if Sxs.mem xs e.e_effect.eff_raises then
+        let v = create_pvsymbol (id_fresh "result") xs.xs_ity in
+        (* FIXME? We assume that the generated exception will not
+           be catched inside e. Otherwise, it will not appear in
+           the effect and we will not declare the exception here. *)
+        e_exn xs (e_try e (Mxs.singleton xs ([v], e_var v))) else e in
       let put _ (ld,_) e = e_let ld e in
-      Hpv.fold put old (expr uloc env de)
+      Hpv.fold put old e
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 
@@ -1386,10 +1400,10 @@ and sym_defn uloc env (id,gh,kind,de) =
   ld::ldl, add_rsymbol env s
 
 and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
-  let step1 env (id, gh, kind, bl, mask, dsp, dvl, ({de_dvty = dvty} as de)) =
+  let step1 env (id, gh, kind, bl, res, mask, dsp, dvl, de) =
     let ghost = env.ghs || gh || kind = RKlemma in
     let pvl = binders ghost bl in
-    let ity = Loc.try1 ?loc:de.de_loc ity_of_dity (dity_of_dvty dvty) in
+    let ity = Loc.try1 ?loc:de.de_loc ity_of_dity res in
     let cty = create_cty ~mask pvl [] [] Mxs.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
@@ -1421,9 +1435,23 @@ and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
 
 and lambda uloc env pvl mask dsp dvl de =
   let env = add_binders env pvl in
-  let preold = Mstr.find_opt "0" env.old in
-  let env, old = add_label env "0" in
-  let e = expr uloc env de in
+  let preold = Mstr.find_opt old_mark env.old in
+  let env, old = add_label env old_mark in
+  let ity = ity_of_dity (dity_of_dvty de.de_dvty) in
+  let xs = create_xsymbol old_mark_id ~mask ity in
+  let e = expr uloc (add_xsymbol env xs) de in
+  let e = if Sxs.mem xs e.e_effect.eff_raises then
+    let mk_res n m ity =
+      create_pvsymbol (id_fresh n) ~ghost:(mask_ghost m) ity in
+    let vl = match mask, xs.xs_ity.ity_node with
+      | MaskTuple ml, Ityapp (_, tyl, _) ->
+          List.map2 (mk_res "r") ml tyl
+      | _ -> [mk_res "result" mask ity] in
+    let el = match vl with
+      | [v] -> e_var v | _ -> e_tuple (List.map e_var vl) in
+    (* exception 'Old cannot be catched in the surface language,
+       so we only declare the exception when 'Old is raised *)
+    e_exn xs (e_try e (Mxs.singleton xs (vl, el))) else e in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in
@@ -1437,7 +1465,7 @@ let rec_defn ?(keep_loc=true) drdf =
   fst (rec_defn uloc env_empty drdf)
 
 let rec mask_of_fun de = match de.de_node with
-  | DEfun (_,msk,_,_) -> msk
+  | DEfun (_,_,msk,_,_) -> msk
   | DEghost de | DEcast (de,_)
   | DEuloc (de,_) | DElabel (de,_) -> mask_of_fun de
   | _ -> MaskGhost (* a safe default for checking *)

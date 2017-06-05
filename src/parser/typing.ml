@@ -665,14 +665,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DErec (rd, dexpr muc denv e1)
   | Ptree.Efun (bl, pty, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
-      let e = match pty with
-        | Some pty -> { e with expr_desc = Ecast (e, pty) }
-        | None -> e in
       let ds = match sp.sp_variant with
         | ({term_loc = loc},_)::_ ->
             Loc.errorm ~loc "unexpected 'variant' clause"
         | _ -> dspec muc sp in
-      DEfun (bl, msk, ds, dexpr muc (denv_add_args denv bl) e)
+      let denv = denv_add_args denv bl in
+      let dity = match pty with
+        | Some pty -> dity_of_ity (ity_of_pty muc pty)
+        | None -> dity_fresh () in
+      let denv = denv_add_exn denv old_mark_id dity in
+      DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->
       let pl = List.map (dparam muc) pl in
       let ds = match sp.sp_variant with
@@ -684,7 +686,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | RKlemma, None -> ity_unit
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
-      DEany (pl, msk, ds, dity_of_ity ity)
+      DEany (pl, dity_of_ity ity, msk, ds)
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr muc denv e1 in
       let branch (pp, e) =
@@ -772,7 +774,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eassert (ak, f) ->
       DEassert (ak, dassert muc f)
   | Ptree.Emark (id, e1) ->
-      DEmark (create_user_id id, dexpr muc denv e1)
+      let dity = dity_fresh () in
+      let id = create_user_id id in
+      let denv = denv_add_exn denv id dity in
+      DEmark (id, dity, dexpr muc denv e1)
   | Ptree.Enamed (Lpos uloc, e1) ->
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Enamed (Lstr lab, e1) ->
@@ -783,7 +788,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Ecast (e1, pty) ->
       let d1 = dexpr muc denv e1 in
       let ity = ity_of_pty muc pty in
-      DEcast (d1, ity)
+      DEcast (d1, dity_of_ity ity)
   end
 
 and drec_defn muc denv fdl =
@@ -793,6 +798,7 @@ and drec_defn muc denv fdl =
       | Some pty -> dity_of_ity (ity_of_pty muc pty)
       | None -> dity_fresh () in
     let pre denv =
+      let denv = denv_add_exn denv old_mark_id dity in
       let dv = dvariant muc sp.sp_variant in
       dspec muc sp, dv, dexpr muc denv e in
     create_user_id id, gh, kind, bl, dity, msk, pre in

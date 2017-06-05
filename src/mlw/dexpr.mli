@@ -58,6 +58,9 @@ type dbinder = preid option * ghost * dity
 
 exception UnboundLabel of string
 
+val old_mark    : string
+val old_mark_id : preid
+
 type register_old = pvsymbol -> string -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
       a registrar function. The label string must be ["0"] for [old]. *)
@@ -103,8 +106,8 @@ and dexpr_node =
   | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
-  | DEfun of dbinder list * mask * dspec later * dexpr
-  | DEany of dbinder list * mask * dspec later * dity
+  | DEfun of dbinder list * dity * mask * dspec later * dexpr
+  | DEany of dbinder list * dity * mask * dspec later
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -124,8 +127,8 @@ and dexpr_node =
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEmark of preid * dexpr
-  | DEcast of dexpr * ity
+  | DEcast of dexpr * dity
+  | DEmark of preid * dity * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
@@ -133,8 +136,8 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = private { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * mask * dspec later * variant list later * dexpr
+and dfun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * mask * dspec later * variant list later * dexpr
 
 (** Environment *)
 

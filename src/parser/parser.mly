@@ -135,8 +135,8 @@
 %token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN CHECK
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
-%token PRIVATE PURE RAISE RAISES READS REC REQUIRES RETURNS
-%token TO TRY VAL VARIANT WHILE WRITES
+%token PRIVATE PURE RAISE RAISES READS REC REQUIRES
+%token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES
 
 (* symbols *)
 
@@ -509,7 +509,7 @@ term_:
 | NOT term
     { Tnot $2 }
 | OLD term
-    { Tat ($2, mk_id "0" $startpos($1) $endpos($1)) }
+    { Tat ($2, mk_id Dexpr.old_mark $startpos($1) $endpos($1)) }
 | term AT uident
     { Tat ($1, $3) }
 | prefix_op term %prec prec_prefix_op
@@ -775,6 +775,8 @@ expr_:
     { Eraise ($2, $3) }
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
+| RETURN expr_arg?
+    { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, $4) }
 | GHOST expr

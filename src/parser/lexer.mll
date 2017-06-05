@@ -89,6 +89,7 @@
         "reads", READS;
         "rec", REC;
         "requires", REQUIRES;
+        "return", RETURN;
         "returns", RETURNS;
         "to", TO;
         "try", TRY;

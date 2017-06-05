@@ -984,7 +984,7 @@ let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
 
 let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
-  | Eexn (xs,e) -> e_exn xs e
+  | Eexn (xs,e) -> e_exn xs (e_rs_subst sm e)
   | Eghost e -> e_ghostify true (e_rs_subst sm e)
   | Eexec (c,_) -> e_exec (c_rs_subst sm c)
   | Elet (LDvar (v,d),e) ->
