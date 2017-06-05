@@ -873,11 +873,9 @@ let xs_equal : xsymbol -> xsymbol -> bool = (==)
 let xs_hash xs = id_hash xs.xs_name
 let xs_compare xs1 xs2 = id_compare xs1.xs_name xs2.xs_name
 
+let freeze_xs xs s = ity_freeze s xs.xs_ity
+
 let create_xsymbol id ?(mask=MaskVisible) ity =
-  if not (ity_closed ity) then Loc.errorm ?loc:id.pre_loc
-    "Exception %s has a polymorphic type" id.pre_name;
-  if not ity.ity_imm then Loc.errorm ?loc:id.pre_loc
-    "The type of exception %s has mutable components" id.pre_name;
   mask_check (Invalid_argument "Ity.create_xsymbol") ity mask;
   { xs_name = id_register id; xs_ity = ity; xs_mask = mask_reduce mask }
 
@@ -1284,13 +1282,16 @@ let spec_t_fold fn_t acc pre post xpost =
   let acc = fn_l (fn_l acc pre) post in
   Mxs.fold (fun _ l a -> fn_l a l) xpost acc
 
-let check_tvs reads result pre post xpost =
-  (* every type variable in spec comes either from a known vsymbol
-     or from the result type. We need this to ensure that we always
-     can do a full instantiation. TODO: do we really need this? *)
+let check_tvs reads raises result pre post xpost =
+  (* each type variable in spec comes either from a known vsymbol
+     or from the external exception, or from the result type.
+     We need this to ensure that we can do a full instantiation.
+     TODO: do we really need this? *)
   let add_pv v s = ity_freevars s v.pv_ity in
   let tvs = ity_freevars Stv.empty result in
   let tvs = Spv.fold add_pv reads tvs in
+  let add_xs xs s = ity_freevars s xs.xs_ity in
+  let tvs = Sxs.fold add_xs raises tvs in
   let check_tvs () t =
     let ttv = t_ty_freevars Stv.empty t in
     if not (Stv.subset ttv tvs) then Loc.error ?loc:t.t_loc
@@ -1331,7 +1332,8 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
   let effect = eff_read_pre preads effect in
   let xreads = Spv.diff effect.eff_reads sarg in
   let freeze = Spv.fold freeze_pv xreads isb_empty in
-  check_tvs effect.eff_reads result pre post xpost;
+  let freeze = Sxs.fold freeze_xs effect.eff_raises freeze in
+  check_tvs effect.eff_reads effect.eff_raises result pre post xpost;
   (* remove exceptions whose postcondition is False *)
   let is_false q = match open_post q with
     | _, {t_node = Tfalse} -> true | _ -> false in
@@ -1354,6 +1356,8 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
      as ghost, to keep the type signature consistent. *)
   let rknown = read_regs effect.eff_reads in
   let vknown = ity_rch_regs rknown result in
+  let add_xs xs s = ity_rch_regs s xs.xs_ity in
+  let vknown = Sxs.fold add_xs raises vknown in
   let effect = reset_taints { effect with
     eff_writes = Mreg.set_inter effect.eff_writes rknown;
     eff_covers = Mreg.set_inter effect.eff_covers rknown;
@@ -1511,14 +1515,14 @@ let cty_read_post c pvs =
 let cty_add_pre pre c = if pre = [] then c else begin check_pre pre;
   let c = cty_read_pre (List.fold_left t_freepvs Spv.empty pre) c in
   let rd = List.fold_right Spv.add c.cty_args c.cty_effect.eff_reads in
-  check_tvs rd c.cty_result pre [] Mxs.empty;
+  check_tvs rd c.cty_effect.eff_raises c.cty_result pre [] Mxs.empty;
   { c with cty_pre = pre @ c.cty_pre } end
 
 let cty_add_post c post = if post = [] then c else begin
   check_post (Invalid_argument "Ity.cty_add_post") c.cty_result post;
   let c = cty_read_post c (List.fold_left t_freepvs Spv.empty post) in
   let rd = List.fold_right Spv.add c.cty_args c.cty_effect.eff_reads in
-  check_tvs rd c.cty_result [] post Mxs.empty;
+  check_tvs rd c.cty_effect.eff_raises c.cty_result [] post Mxs.empty;
   { c with cty_post = post @ c.cty_post } end
 
 (** pretty-printing *)
