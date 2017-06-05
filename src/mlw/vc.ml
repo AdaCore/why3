@@ -706,7 +706,8 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let f = vc_expl None lab expl_check f in
         let k = Kpar (Kstop f, k_unit res) in
         inv_of_pure env e.e_loc [f] k
-    | Eghost e0 ->
+    | Eghost e0
+    | Eexn (_,e0) ->
         k_expr env lps e0 res xmap
     | Epure t ->
         let t = if t.t_ty <> None then t_lab t else

@@ -134,6 +134,7 @@ and expr_node =
   | Efor    of pvsymbol * for_bounds * invariant list * expr
   | Etry    of expr * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
+  | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
   | Epure   of term
@@ -223,6 +224,10 @@ val e_false : expr
 
 val is_e_true  : expr -> bool
 val is_e_false : expr -> bool
+
+exception ExceptionLeak of xsymbol
+
+val e_exn : xsymbol -> expr -> expr
 
 val e_raise : xsymbol -> expr -> ity -> expr
 

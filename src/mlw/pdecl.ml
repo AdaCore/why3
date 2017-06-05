@@ -215,6 +215,9 @@ let get_syms node pure =
               let del_rd syms rd = Sid.remove rd.rec_sym.rs_name syms in
               List.fold_left del_rd esms rdl in
         syms_let_defn (Sid.union syms esms) ld
+    | Eexn (xs, e) ->
+        let esms = syms_expr Sid.empty e in
+        Sid.union syms (Sid.remove xs.xs_name esms)
     | Efor (i,_,invl,e) ->
         syms_pv (syms_tl (syms_expr syms e) invl) i
     | Ewhile (d,invl,varl,e) ->

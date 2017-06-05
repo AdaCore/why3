@@ -447,6 +447,13 @@ module Print = struct
       fprintf fmt
         "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
+    | Eexn (xs, None, e) ->
+      fprintf fmt "@[<hv>let exception %a in@\n%a@]"
+        (print_uident info) xs.xs_name (print_expr info) e
+    | Eexn (xs, Some t, e) ->
+      fprintf fmt "@[<hv>let exception %a of %a in@\n%a@]"
+        (print_uident info) xs.xs_name (print_ty ~paren:true info) t
+        (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
     (* | Enot _ -> (\* TODO *\) assert false *)
     (* | Ebinop _ -> (\* TODO *\) assert false *)
@@ -556,9 +563,3 @@ let fg ?fname m =
 
 let () = Pdriver.register_printer "ocaml"
   ~desc:"printer for OCaml code" fg print_decl
-
-(*
- * Local Variables:
- * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
- * End:
- *)

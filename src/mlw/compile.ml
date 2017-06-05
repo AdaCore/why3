@@ -93,6 +93,7 @@ module ML = struct
     (* For loop for Why3's type int *)
     | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
     | Eraise  of xsymbol * expr option
+    | Eexn    of xsymbol * ty option * expr
     | Etry    of expr * (xsymbol * pvsymbol list * expr) list
     | Eignore of expr
     | Eabsurd
@@ -233,6 +234,11 @@ module ML = struct
       f xs.xs_name
     | Eraise (xs, Some e) ->
       f xs.xs_name;
+      iter_deps_expr f e
+    | Eexn (_xs, None, e) -> (* FIXME? How come we never do binding here? *)
+      iter_deps_expr f e
+    | Eexn (_xs, Some ty, e) -> (* FIXME? How come we never do binding here? *)
+      iter_deps_ty f ty;
       iter_deps_expr f e
     | Etry (e, xbranchl) ->
       iter_deps_expr f e;
@@ -687,6 +693,11 @@ module Translate = struct
         | e -> Some e
       in
       ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) eff
+    | Eexn (xs, e1) ->
+      let e1 = expr info e1 in
+      let ty = if ity_equal xs.xs_ity ity_unit
+        then None else Some (ity xs.xs_ity) in
+      ML.mk_expr (ML.Eexn (xs, ty, e1)) (ML.I e.e_ity) eff
     | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
     (*   assert false (\*TODO*\) *)
     | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
@@ -913,6 +924,9 @@ module Transform = struct
       let e2, s2 = expr info subst e2 in
       let e3, s3 = expr info subst e3 in
       mk (Eif (e1, e2, e3)), Spv.union (Spv.union s1 s2) s3
+    | Eexn (xs, ty, e1) ->
+      let e1, s1 = expr info subst e1 in
+      mk (Eexn (xs, ty, e1)), s1
     | Ematch (e, bl) ->
       let e, spv = expr info subst e in
       let e_bl, spv_bl = mk_list_eb bl (branch info subst) in
@@ -987,9 +1001,3 @@ module Transform = struct
     { m with mod_decl = mod_decl; mod_known = mod_known }
 
 end
-
-(*
- * Local Variables:
- * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
- * End:
- *)

@@ -1631,6 +1631,8 @@ let forget_pv v = forget_var v.pv_vs
 
 let print_xs fmt xs = pp_print_string fmt (id_unique xprinter xs.xs_name)
 
+let forget_xs xs = forget_id xprinter xs.xs_name
+
 exception FoundPrefix of pvsymbol list
 
 let unknown = create_pvsymbol (id_fresh "?") ity_unit

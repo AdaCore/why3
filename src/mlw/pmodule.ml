@@ -636,23 +636,30 @@ let cl_save_rs cl s s' =
 type smap = {
   sm_vs : vsymbol Mvs.t;
   sm_pv : pvsymbol Mvs.t;
+  sm_xs : xsymbol Mxs.t;
   sm_rs : rsymbol Mrs.t;
 }
 
 let sm_of_cl cl = {
   sm_vs = Mvs.map (fun v -> v.pv_vs) cl.pv_table;
   sm_pv = cl.pv_table;
+  sm_xs = cl.xs_table;
   sm_rs = cl.rs_table }
 
 let sm_save_vs sm v v' = {
   sm_vs = Mvs.add v v'.pv_vs sm.sm_vs;
   sm_pv = Mvs.add v v' sm.sm_pv;
+  sm_xs = sm.sm_xs;
   sm_rs = sm.sm_rs }
 
 let sm_save_pv sm v v' = {
   sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
   sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
+  sm_xs = sm.sm_xs;
   sm_rs = sm.sm_rs }
+
+let sm_save_xs sm s s' =
+  { sm with sm_xs = Mxs.add s s' sm.sm_xs }
 
 let sm_save_rs cl sm s s' =
   let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
@@ -663,6 +670,10 @@ let sm_save_rs cl sm s s' =
 
 let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
   (* non-instantiated global variables are not in sm *)
+
+let sm_find_xs sm xs = Mxs.find_def xs xs sm.sm_xs
+
+let sm_find_rs sm rs = Mrs.find_def rs rs sm.sm_rs
 
 let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
   create_pvsymbol (id_clone vs.vs_name) ~ghost (clone_ity cl ity)
@@ -824,7 +835,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
   let xpost = Mxs.fold (fun xs fl q ->
-    let xs = cl_find_xs cl xs in
+    let xs = sm_find_xs sm xs in
     let fl = clone_invl cl sm_olds fl in
     Mxs.add xs fl q) cty.cty_xpost Mxs.empty in
   let add_read v s = Spv.add (sm_find_pv sm_args v) s in
@@ -844,7 +855,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
-  let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
+  let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
@@ -904,10 +915,13 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
-        Mxs.add (cl_find_xs cl xs) (vl', clone_expr cl sm e) m in
+        Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
       e_try (clone_expr cl sm d) (Mxs.fold conv_br xl Mxs.empty)
   | Eraise (xs, e) ->
-      e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+      e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+  | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->
+      let xs' = create_xsymbol (id_clone id) ~mask (clone_ity cl ity) in
+      e_exn xs' (clone_expr cl (sm_save_xs sm xs xs') e)
   | Eassert (k, f) ->
       e_assert k (clone_term cl sm.sm_vs f)
   | Eghost e ->
@@ -921,7 +935,7 @@ and clone_cexp cl sm c = match c.c_node with
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
       let res = clone_ity cl c.c_cty.cty_result in
-      c_app (Mrs.find_def s s sm.sm_rs) vl al res
+      c_app (sm_find_rs sm s) vl al res
   | Cpur (s,vl) ->
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in

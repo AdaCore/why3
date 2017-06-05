@@ -326,6 +326,7 @@ and expr_node =
   | Efor    of pvsymbol * for_bounds * invariant list * expr
   | Etry    of expr * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
+  | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
   | Epure   of term
@@ -385,7 +386,7 @@ let e_fold fn acc e = match e.e_node with
   | Evar _ | Econst _ | Eexec _ | Eassign _
   | Eassert _ | Epure _ | Eabsurd -> acc
   | Eraise (_,e) | Efor (_,_,_,e) | Eghost e
-  | Elet ((LDsym _|LDrec _), e) -> fn acc e
+  | Elet ((LDsym _|LDrec _), e) | Eexn (_,e) -> fn acc e
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
   | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
@@ -564,7 +565,7 @@ let rec raw_of_expr prop e = match e.e_node with
   | Evar v -> t_var v.pv_vs
   | Econst c -> t_const c (ty_of_ity e.e_ity)
   | Epure t -> t
-  | Eghost e -> pure_of_expr prop e
+  | Eghost e | Eexn (_,e) -> pure_of_expr prop e
   | Eexec (_,{cty_post = []}) -> raise Exit
   | Eexec (_,{cty_post = q::_}) ->
       let v, h = open_post q in
@@ -626,7 +627,7 @@ let rec post_of_expr res e = match e.e_node with
   | Econst (Number.ConstReal _ as c)->
       post_of_term res (t_const c ty_real)
   | Epure t -> post_of_term res t
-  | Eghost e -> post_of_expr res e
+  | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->
       let conv q = open_post_with res q in
       copy_labels e (t_and_l (List.map conv c.cty_post))
@@ -957,6 +958,12 @@ let e_raise xs e ity =
   let eff = try_effect [e] eff_union_seq e.e_effect eff in
   mk_expr (Eraise (xs,e)) ity MaskVisible eff
 
+exception ExceptionLeak of xsymbol
+
+let e_exn xs e =
+  if Sxs.mem xs e.e_effect.eff_raises then raise (ExceptionLeak xs);
+  mk_expr (Eexn (xs,e)) e.e_ity e.e_mask e.e_effect
+
 (* snapshots, assertions, "any" *)
 
 let e_pure t =
@@ -977,6 +984,7 @@ let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
 
 let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
+  | Eexn (xs,e) -> e_exn xs e
   | Eghost e -> e_ghostify true (e_rs_subst sm e)
   | Eexec (c,_) -> e_exec (c_rs_subst sm c)
   | Elet (LDvar (v,d),e) ->
@@ -1333,6 +1341,10 @@ and print_enode pri fmt e = match e.e_node with
         print_pv pv print_pv pvfrom
         (if dir = To then "to" else "downto") print_pv pvto
         print_invariant inv print_expr e
+  | Eexn (xs, e) ->
+      fprintf fmt (protect_on (pri > 0) "exception %a@ in@\n%a")
+        print_xs xs print_expr e;
+      forget_xs xs
   | Eraise (xs,e) when is_e_void e ->
       fprintf fmt "raise %a" print_xs xs
   | Eraise (xs,e) ->
@@ -1409,4 +1421,6 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Function %a is not a constructor" print_rs s
   | FieldExpected s -> fprintf fmt
       "Function %a is not a mutable field" print_rs s
+  | ExceptionLeak xs -> fprintf fmt
+      "Uncatched local exception %a" print_xs xs
   | _ -> raise e)
