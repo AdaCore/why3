@@ -486,9 +486,13 @@ let dpost muc ql lvm old ity =
         v, Loc.try3 ~loc type_fmla muc lvm old f in
   List.map dpost ql
 
-let dxpost muc ql lvm old =
+let dxpost muc ql lvm xsm old =
   let add_exn (q,pf) m =
-    let xs = find_xsymbol muc q in
+    let xs = match q with
+      | Qident i ->
+          begin try Mstr.find i.id_str xsm with
+          | Not_found -> find_xsymbol muc q end
+      | _ -> find_xsymbol muc q in
     Mxs.change (fun l -> match pf, l with
       | Some pf, Some l -> Some (pf :: l)
       | Some pf, None   -> Some (pf :: [])
@@ -519,23 +523,23 @@ let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
   | s -> Loc.errorm ~loc:(qloc q) "Not an order relation: %a" Pretty.print_ls s
 
-let dvariant muc varl lvm old =
+let dvariant muc varl lvm _xsm old =
   let dvar t = type_term muc lvm old t in
   let dvar (t,q) = dvar t, Opt.map (find_variant_ls muc) q in
   List.map dvar varl
 
-let dspec muc sp lvm old ity = {
+let dspec muc sp lvm xsm old ity = {
   ds_pre     = dpre muc sp.sp_pre lvm old;
   ds_post    = dpost muc sp.sp_post lvm old ity;
-  ds_xpost   = dxpost muc sp.sp_xpost lvm old;
+  ds_xpost   = dxpost muc sp.sp_xpost lvm xsm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge; }
 
-let dassert muc f lvm old = type_fmla muc lvm old f
+let dassert muc f lvm _xsm old = type_fmla muc lvm old f
 
-let dinvariant muc f lvm old = dpre muc f lvm old
+let dinvariant muc f lvm _xsm old = dpre muc f lvm old
 
 (* abstract values *)
 
@@ -587,6 +591,12 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some d -> expr_app loc d el
         | None -> qualid_app loc q el)
     | _ -> qualid_app loc q el
+  in
+  let find_dxsymbol q = match q with
+    | Qident {id_str = n} ->
+        (try denv_get_exn denv n with _
+        -> DEgexn (find_xsymbol muc q))
+    | _ -> DEgexn (find_xsymbol muc q)
   in
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
@@ -718,21 +728,25 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         dexpr muc denv e1, find_record_field muc q, dexpr muc denv e2 in
       DEassign (List.map mk_assign asl)
   | Ptree.Eraise (q, e1) ->
-      let xs = find_xsymbol muc q in
+      let xs = find_dxsymbol q in
+      let mb_unit = match xs with
+        | DEgexn xs -> ity_equal xs.xs_ity ity_unit
+        | DElexn _ -> true in
       let e1 = match e1 with
         | Some e1 -> dexpr muc denv e1
-        | None when ity_equal xs.xs_ity ity_unit ->
-            Dexpr.dexpr ~loc (DEsym (RS rs_void))
+        | None when mb_unit -> Dexpr.dexpr ~loc (DEsym (RS rs_void))
         | _ -> Loc.errorm ~loc "exception argument expected" in
       DEraise (xs, e1)
   | Ptree.Etry (e1, cl) ->
       let e1 = dexpr muc denv e1 in
       let branch (q, pp, e) =
-        let xs = find_xsymbol muc q in
+        let xs = find_dxsymbol q in
+        let mb_unit = match xs with
+          | DEgexn xs -> ity_equal xs.xs_ity ity_unit
+          | DElexn _ -> true in
         let pp = match pp with
           | Some pp -> dpattern muc pp
-          | None when ity_equal xs.xs_ity ity_unit ->
-              Dexpr.dpattern ~loc (DPapp (rs_void, []))
+          | None when mb_unit -> Dexpr.dpattern ~loc (DPapp (rs_void, []))
           | _ -> Loc.errorm ~loc "exception argument expected" in
         let denv = denv_add_pat denv pp in
         let e = dexpr muc denv e in
@@ -740,9 +754,15 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEtry (e1, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
-  | Ptree.Eabsurd -> DEabsurd
+  | Ptree.Eexn (id, pty, mask, e1) ->
+      let id = create_user_id id in
+      let dity = dity_of_ity (ity_of_pty muc pty) in
+      let denv = denv_add_exn denv id dity in
+      DEexn (id, dity, mask, dexpr muc denv e1)
+  | Ptree.Eabsurd ->
+      DEabsurd
   | Ptree.Epure t ->
-      let get_term lvm old = type_term muc lvm old t in
+      let get_term lvm _xsm old = type_term muc lvm old t in
       let gvars _at q = try match find_prog_symbol muc q with
         | PV v -> Some v | _ -> None with _ -> None in
       let get_dty pure_denv =
@@ -757,10 +777,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr muc denv e1, Slab.singleton lab)
-  | Ptree.Ecast ({expr_desc = Ptree.Econst c},pty) ->
+  | Ptree.Ecast ({expr_desc = Ptree.Econst c}, pty) ->
       let ity = ity_of_pty muc pty in
       DEconst (c, dity_of_ity ity)
-  | Ptree.Ecast (e1,pty) ->
+  | Ptree.Ecast (e1, pty) ->
       let d1 = dexpr muc denv e1 in
       let ity = ity_of_pty muc pty in
       DEcast (d1, ity)

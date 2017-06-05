@@ -141,6 +141,7 @@ and expr_desc =
   | Eabsurd
   | Epure of term
   | Eraise of qualid * expr option
+  | Eexn of ident * pty * Ity.mask * expr
   | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)

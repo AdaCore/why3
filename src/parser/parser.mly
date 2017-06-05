@@ -160,7 +160,7 @@
 %nonassoc IN
 %nonassoc below_SEMI
 %nonassoc SEMICOLON
-%nonassoc LET VAL
+%nonassoc LET VAL EXCEPTION
 %nonassoc prec_no_else
 %nonassoc DOT ELSE GHOST
 %nonassoc prec_named
@@ -759,6 +759,10 @@ expr_:
     { Ematch ($2, $4) }
 | MATCH comma_list2(expr) WITH match_cases(seq_expr) END
     { Ematch (mk_expr (Etuple $2) $startpos($2) $endpos($2), $4) }
+| EXCEPTION labels(uident) IN seq_expr
+    { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
+| EXCEPTION labels(uident) return IN seq_expr
+    { Eexn ($2, fst $3, snd $3, $5) }
 | LABEL labels(uident) IN seq_expr
     { Emark ($2, $4) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE

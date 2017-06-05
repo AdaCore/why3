@@ -62,7 +62,7 @@ type register_old = pvsymbol -> string -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
       a registrar function. The label string must be ["0"] for [old]. *)
 
-type 'a later = pvsymbol Mstr.t -> register_old -> 'a
+type 'a later = pvsymbol Mstr.t -> xsymbol Mstr.t -> register_old -> 'a
   (** Specification terms are parsed and typechecked after the program
       expressions, when the types of locally bound program variables are
       already established. *)
@@ -86,6 +86,10 @@ type dspec = ity -> dspec_final
 (** Expressions *)
 
 type dinvariant = term list
+
+type dxsymbol =
+  | DElexn of string * dity
+  | DEgexn of xsymbol
 
 type dexpr = private {
   de_node : dexpr_node;
@@ -111,9 +115,10 @@ and dexpr_node =
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
-  | DEraise of xsymbol * dexpr
+  | DEtry of dexpr * (dxsymbol * dpattern * dexpr) list
+  | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
+  | DEexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEabsurd
@@ -145,9 +150,15 @@ val denv_add_args : denv -> dbinder list -> denv
 
 val denv_add_pat : denv -> dpattern -> denv
 
+val denv_add_exn : denv -> preid -> dity -> denv
+
 val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
 
 val denv_get_opt : denv -> string -> dexpr_node option
+
+val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
+
+val denv_get_exn_opt : denv -> string -> dxsymbol option
 
 val denv_contents : denv -> (Ty.Stv.t option * dvty) Mstr.t
 
