@@ -376,6 +376,10 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
       if re then d else mk_let tuc ~loc "q " e1 d
   | Ptree.Tat (e1, l) ->
       DTlabel (dterm tuc gvars (Some l.id_str) denv e1, Slab.empty)
+  | Ptree.Tscope (q, e1) ->
+      let tuc = Theory.open_scope tuc "dummy" in
+      let tuc = Theory.import_scope tuc (string_list_of_qualid q) in
+      DTlabel (dterm tuc gvars at denv e1, Slab.empty)
   | Ptree.Tnamed (Lpos uloc, e1) ->
       DTuloc (dterm tuc gvars at denv e1, uloc)
   | Ptree.Tnamed (Lstr lab, e1) ->
@@ -781,6 +785,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let id = create_user_id id in
       let denv = denv_add_exn denv id dity in
       DEmark (id, dity, dexpr muc denv e1)
+  | Ptree.Escope (q, e1) ->
+      let muc = open_scope muc "dummy" in
+      let muc = import_scope muc (string_list_of_qualid q) in
+      DElabel (dexpr muc denv e1, Slab.empty)
   | Ptree.Enamed (Lpos uloc, e1) ->
       DEuloc (dexpr muc denv e1, uloc)
   | Ptree.Enamed (Lstr lab, e1) ->

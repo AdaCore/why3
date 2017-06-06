@@ -574,13 +574,17 @@ term_dot_:
 | o = oppref ; a = term_dot { Tidapp (Qident o, [a]) }
 | term_sub_                 { $1 }
 
-term_sub_:
-| term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
+term_block:
 | LEFTPAR term RIGHTPAR                             { $2.term_desc }
 | LEFTPAR RIGHTPAR                                  { Ttuple [] }
 | LEFTPAR comma_list2(term) RIGHTPAR                { Ttuple $2 }
 | LEFTBRC field_list1(term) RIGHTBRC                { Trecord $2 }
 | LEFTBRC term_arg WITH field_list1(term) RIGHTBRC  { Tupdate ($2,$4) }
+
+term_sub_:
+| term_block                                        { $1 }
+| uqualid DOT mk_term(term_block)                   { Tscope ($1, $3) }
+| term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
@@ -803,7 +807,7 @@ expr_dot_:
 | o = oppref ; a = expr_dot { Eidapp (Qident o, [a]) }
 | expr_sub                  { $1 }
 
-expr_sub:
+expr_block:
 | BEGIN single_spec spec seq_expr END
     { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
 | BEGIN single_spec spec END
@@ -816,8 +820,12 @@ expr_sub:
 | LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
-| PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
+
+expr_sub:
+| expr_block                                        { $1 }
+| uqualid DOT mk_expr(expr_block)                   { Escope ($1, $3) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
+| PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ expr LARROW expr RIGHTSQ
