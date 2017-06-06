@@ -92,7 +92,7 @@ syn keyword  whyKeyword  then type with
 syn keyword  whyKeyword  abstract any
 syn keyword  whyKeyword  exception fun ghost label
 syn keyword  whyKeyword  model mutable private
-syn keyword  whyKeyword  raise rec val while
+syn keyword  whyKeyword  raise rec return val while
 
 syn keyword  whyBoolean  true false
 
