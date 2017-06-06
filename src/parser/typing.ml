@@ -675,7 +675,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | _ -> dspec muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
-      let denv = denv_add_exn denv old_mark_id dity in
+      let denv = if bl = [] then denv else
+        denv_add_exn denv old_mark_id dity in
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->
       let pl = List.map (dparam muc) pl in

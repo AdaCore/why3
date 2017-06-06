@@ -1109,6 +1109,21 @@ type let_prexix =
   | LD of let_defn
   | EA of expr
 
+let vl_of_mask id mask ity =
+  let mk_res m t = create_pvsymbol id ~ghost:(mask_ghost m) t in
+  if ity_equal ity ity_unit then [] else
+  match mask, ity.ity_node with
+  | MaskTuple ml, Ityapp (_,tl,_) -> List.map2 mk_res ml tl
+  | _ -> [mk_res mask ity]
+
+let t_of_vl = function
+  | [] -> t_void | [v] -> t_var v.pv_vs
+  | vl -> t_tuple (List.map (fun v -> t_var v.pv_vs) vl)
+
+let e_of_vl = function
+  | [] -> e_void | [v] -> e_var v
+  | vl -> e_tuple (List.map e_var vl)
+
 let rec expr uloc env ({de_loc = loc} as de) =
   let uloc, labs, de = strip uloc Slab.empty de in
   let env = {env with lgh = false; cgh = false} in
@@ -1331,21 +1346,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
             List.map2 conv_simple pl (List.combine tyl ghl), e
         | bl ->
             let mask = if env.ghs then MaskGhost else xs.xs_mask in
-            let id = id_fresh "q" in
-            let vl = match mask with
-              | _ when ity_equal xs.xs_ity ity_unit -> []
-              | MaskGhost -> [create_pvsymbol id ~ghost:true xs.xs_ity]
-              | MaskVisible -> [create_pvsymbol id ~ghost:false xs.xs_ity]
-              | MaskTuple ml ->
-                  let mk_var ity m =
-                    create_pvsymbol id ~ghost:(mask_ghost m) ity in
-                  let tyl = match xs.xs_ity.ity_node with (* tuple *)
-                    | Ityapp (_,tyl,_) -> tyl | _ -> assert false in
-                  List.map2 mk_var tyl ml in
-            let t, e = match vl with
-              | [] -> t_void, e_void | [v] -> t_var v.pv_vs, e_var v
-              | vl -> t_tuple (List.map (fun v -> t_var v.pv_vs) vl),
-                      e_tuple (List.map e_var vl) in
+            let vl = vl_of_mask (id_fresh "q") mask xs.xs_ity in
+            let t = t_of_vl vl and e = e_of_vl vl in
             let pl = List.rev_map (fun (p,_) -> [p.pp_pat]) bl in
             let bl = if Pattern.is_exhaustive [t] pl then bl else
               let _,pp = create_prog_pattern PPwild xs.xs_ity mask in
@@ -1437,21 +1439,14 @@ and lambda uloc env pvl mask dsp dvl de =
   let env = add_binders env pvl in
   let preold = Mstr.find_opt old_mark env.old in
   let env, old = add_label env old_mark in
-  let ity = ity_of_dity (dity_of_dvty de.de_dvty) in
-  let xs = create_xsymbol old_mark_id ~mask ity in
-  let e = expr uloc (add_xsymbol env xs) de in
-  let e = if Sxs.mem xs e.e_effect.eff_raises then
-    let mk_res n m ity =
-      create_pvsymbol (id_fresh n) ~ghost:(mask_ghost m) ity in
-    let vl = match mask, xs.xs_ity.ity_node with
-      | MaskTuple ml, Ityapp (_, tyl, _) ->
-          List.map2 (mk_res "r") ml tyl
-      | _ -> [mk_res "result" mask ity] in
-    let el = match vl with
-      | [v] -> e_var v | _ -> e_tuple (List.map e_var vl) in
-    (* exception 'Old cannot be catched in the surface language,
-       so we only declare the exception when 'Old is raised *)
-    e_exn xs (e_try e (Mxs.singleton xs (vl, el))) else e in
+  let e = if pvl = [] then expr uloc env de else
+    let ity = ity_of_dity (dity_of_dvty de.de_dvty) in
+    let xs = create_xsymbol old_mark_id ~mask ity in
+    let e = expr uloc (add_xsymbol env xs) de in
+    if not (Sxs.mem xs e.e_effect.eff_raises) then e else
+    let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
+    let branches = Mxs.singleton xs (vl, e_of_vl vl) in
+    e_exn xs (e_try e branches) in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in
