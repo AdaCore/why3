@@ -190,7 +190,7 @@ let extract_to =
 
 let rec use_iter f l =
   List.iter
-    (function Uuse t -> f t | Uscope (_,_,l) -> use_iter f l | _ -> ()) l
+    (function Uuse t -> f t | Uscope (_,l) -> use_iter f l | _ -> ()) l
 
 let rec do_extract_module ?fname m =
   let extract_use m' =

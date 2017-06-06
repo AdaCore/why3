@@ -320,6 +320,13 @@ let close_scope uc ~import =
   | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
+let import_scope uc ql = match uc.uc_import with
+  | i1 :: sti ->
+      let e0 = ns_find_ns i1 ql in
+      let i1 = merge_ns false e0 i1 in
+      { uc with uc_import = i1::sti }
+  | _ -> assert false
+
 (* Base constructors *)
 
 let known_ty kn ty =

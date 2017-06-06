@@ -161,7 +161,7 @@ and mod_unit =
   | Uuse   of pmodule
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
-  | Uscope of string * bool * mod_unit list
+  | Uscope of string * mod_unit list
 
 and mod_inst = {
   mi_mod : pmodule;
@@ -228,7 +228,7 @@ let close_module, restore_module =
 let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
       muc_theory = Theory.open_scope uc.muc_theory s;
-      muc_units  = [Uscope (s, false, uc.muc_units)];
+      muc_units  = [Uscope (s, uc.muc_units)];
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
@@ -236,18 +236,25 @@ let open_scope uc s = match uc.muc_import with
 let close_scope uc ~import =
   let th = Theory.close_scope uc.muc_theory ~import in
   match List.rev uc.muc_units, uc.muc_import, uc.muc_export with
-  | [Uscope (_,_,ul1)], _ :: sti, _ :: ste -> (* empty scope *)
+  | [Uscope (_,ul1)], _ :: sti, _ :: ste -> (* empty scope *)
       { uc with muc_theory = th;  muc_units  = ul1;
                 muc_import = sti; muc_export = ste; }
-  | Uscope (s,_,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
+  | Uscope (s,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with
           muc_theory = th;
-          muc_units  = Uscope (s, import, ul0) :: ul1;
+          muc_units  = Uscope (s,ul0) :: ul1;
           muc_import = i1 :: sti;
           muc_export = e1 :: ste; }
+  | _ -> assert false
+
+let import_scope uc ql = match uc.muc_import with
+  | i1 :: sti ->
+      let th = Theory.import_scope uc.muc_theory ql in
+      let i1 = merge_ns false (ns_find_ns i1 ql) i1 in
+      { uc with muc_theory = th; muc_import = i1::sti }
   | _ -> assert false
 
 let use_export uc ({mod_theory = mth} as m) =
@@ -1105,7 +1112,7 @@ let clone_export uc m inst =
           | MApr pr -> MApr (cl_find_pr cl pr)
           | a -> a) al)
         with Not_found -> uc end
-    | Uscope (n,_import,ul) ->
+    | Uscope (n,ul) ->
         let uc = open_scope uc n in
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
@@ -1183,14 +1190,13 @@ let rec print_unit fmt = function
       print_mname mi.mi_mod
   | Umeta (m,al) -> Format.fprintf fmt "@[<hov 2>meta %s %a@]"
       m.meta_name (Pp.print_list Pp.comma Pretty.print_meta_arg) al
-  | Uscope (s,i,[Uuse m]) -> Format.fprintf fmt "use%s %a%s"
-      (if i then " import" else "") print_mname m
+  | Uscope (s,[Uuse m]) -> Format.fprintf fmt "use %a%s" print_mname m
       (if s = m.mod_theory.th_name.id_string then "" else " as " ^ s)
-  | Uscope (s,i,[Uclone mi]) -> Format.fprintf fmt "clone%s %a%s with ..."
-      (if i then " import" else "") print_mname mi.mi_mod
+  | Uscope (s,[Uclone mi]) -> Format.fprintf fmt "clone %a%s with ..."
+      print_mname mi.mi_mod
       (if s = mi.mi_mod.mod_theory.th_name.id_string then "" else " as " ^ s)
-  | Uscope (s,i,ul) -> Format.fprintf fmt "@[<hov 2>scope%s %s@\n%a@]@\nend"
-      (if i then " import" else "") s (Pp.print_list Pp.newline2 print_unit) ul
+  | Uscope (s,ul) -> Format.fprintf fmt "@[<hov 2>scope %s@\n%a@]@\nend"
+      s (Pp.print_list Pp.newline2 print_unit) ul
 
 let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string

@@ -797,7 +797,7 @@ module Translate = struct
   (* unit module declarations *)
   let rec mdecl pids info = function
     | Udecl pd -> pdecl pids info pd
-    | Uscope (_, _, l) -> List.concat (List.map (mdecl pids info) l)
+    | Uscope (_, l) -> List.concat (List.map (mdecl pids info) l)
     | Uuse _ | Uclone _ | Umeta _ -> []
 
   let abstract_or_alias_type itd =
@@ -811,7 +811,7 @@ module Translate = struct
   let rec empty_munit = function
     | Udecl pd -> empty_pdecl pd
     | Uclone mi -> List.for_all empty_munit mi.mi_mod.mod_units
-    | Uscope (_, _, l) -> List.for_all empty_munit l
+    | Uscope (_, l) -> List.for_all empty_munit l
     | Uuse _ | Umeta _ -> true
 
   let is_empty_clone mi =

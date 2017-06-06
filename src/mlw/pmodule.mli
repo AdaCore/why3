@@ -67,7 +67,7 @@ and mod_unit =
   | Uuse   of pmodule
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
-  | Uscope of string * bool * mod_unit list
+  | Uscope of string * mod_unit list
 
 and mod_inst = {
   mi_mod : pmodule;
@@ -99,8 +99,9 @@ type pmodule_uc = private {
 val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
 val close_module  : pmodule_uc -> pmodule
 
-val open_scope  : pmodule_uc -> string -> pmodule_uc
-val close_scope : pmodule_uc -> import:bool -> pmodule_uc
+val open_scope   : pmodule_uc -> string -> pmodule_uc
+val close_scope  : pmodule_uc -> import:bool -> pmodule_uc
+val import_scope : pmodule_uc -> string list -> pmodule_uc
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, module,
