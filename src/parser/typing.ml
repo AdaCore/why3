@@ -131,6 +131,13 @@ let ty_of_pty tuc pty =
   in
   get_ty pty
 
+let dty_of_pty tuc pty =
+  Dterm.dty_of_ty (ty_of_pty tuc pty)
+
+let dty_of_opt tuc = function
+  | Some pty -> dty_of_pty tuc pty
+  | None -> Dterm.dty_fresh ()
+
 let ity_of_pty muc pty =
   let rec get_ity = function
     | PTtyvar {id_str = x} ->
@@ -149,6 +156,13 @@ let ity_of_pty muc pty =
         get_ity ty
   in
   get_ity pty
+
+let dity_of_pty muc pty =
+  Dexpr.dity_of_ity (ity_of_pty muc pty)
+
+let dity_of_opt muc = function
+  | Some pty -> dity_of_pty muc pty
+  | None -> Dexpr.dity_fresh ()
 
 (** typing using destructive type variables
 
@@ -191,16 +205,13 @@ let rec dpattern tuc { pat_desc = desc; pat_loc = loc } =
         DPapp (cs,fl)
     | Ptree.Pas (p, x, false) -> DPas (dpattern tuc p, create_user_id x)
     | Ptree.Por (p, q) -> DPor (dpattern tuc p, dpattern tuc q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern tuc p, ty_of_pty tuc ty)
+    | Ptree.Pcast (p, ty) -> DPcast (dpattern tuc p, dty_of_pty tuc ty)
     | Ptree.Pvar (_, true) | Ptree.Pas (_, _, true) -> Loc.errorm ~loc
         "ghost variables are only allowed in programs")
 
 let quant_var tuc (loc, id, gh, ty) =
   if gh then Loc.errorm ~loc "ghost variables are only allowed in programs";
-  let ty = match ty with
-    | Some ty -> dty_of_ty (ty_of_pty tuc ty)
-    | None    -> dty_fresh () in
-  Opt.map create_user_id id, ty, Some loc
+  Opt.map create_user_id id, dty_of_opt tuc ty, Some loc
 
 let loc_cutoff loc13 loc23 loc2 =
   let f,l,b,e = Loc.get loc13 in
@@ -293,9 +304,9 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
             apply loc de1 op1 (dterm tuc gvars at denv e23) in
       chain loc (dterm tuc gvars at denv e1) op1 e23
   | Ptree.Tconst (Number.ConstInt _ as c) ->
-      DTconst (c, ty_int)
+      DTconst (c, dty_int)
   | Ptree.Tconst (Number.ConstReal _ as c) ->
-      DTconst (c, ty_real)
+      DTconst (c, dty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm tuc gvars at denv e1 in
@@ -370,12 +381,10 @@ let rec dterm tuc gvars at denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tnamed (Lstr lab, e1) ->
       DTlabel (dterm tuc gvars at denv e1, Slab.singleton lab)
   | Ptree.Tcast ({term_desc = Ptree.Tconst c}, pty) ->
-      let ty = ty_of_pty tuc pty in
-      DTconst (c, ty)
+      DTconst (c, dty_of_pty tuc pty)
   | Ptree.Tcast (e1, pty) ->
       let d1 = dterm tuc gvars at denv e1 in
-      let ty = ty_of_pty tuc pty in
-      DTcast (d1, ty))
+      DTcast (d1, dty_of_pty tuc pty))
 
 (** typing program expressions *)
 
@@ -435,7 +444,7 @@ let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
         DPapp (cs,fl)
     | Ptree.Ptuple pl ->
         DPapp (rs_tuple (List.length pl), List.map (dpattern muc) pl)
-    | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, ity_of_pty muc pty)
+    | Ptree.Pcast (p, pty) -> DPcast (dpattern muc p, dity_of_pty muc pty)
     | Ptree.Pas (p, x, gh) -> DPas (dpattern muc p, create_user_id x, gh)
     | Ptree.Por (p, q) -> DPor (dpattern muc p, dpattern muc q))
 
@@ -543,16 +552,11 @@ let dinvariant muc f lvm _xsm old = dpre muc f lvm old
 
 (* abstract values *)
 
-let dbinder muc id gh pty =
-  let id = Opt.map create_user_id id in
-  let dity = match pty with
-    | Some pty -> dity_of_ity (ity_of_pty muc pty)
-    | None -> dity_fresh () in
-  id, gh, dity
+let dparam muc (_,id,gh,pty) =
+  Opt.map create_user_id id, gh, dity_of_pty muc pty
 
-let dparam muc (_,id,gh,pty) = dbinder muc id gh (Some pty)
-
-let dbinder muc (_,id,gh,pty) = dbinder muc id gh pty
+let dbinder muc (_,id,gh,opt) =
+  Opt.map create_user_id id, gh, dity_of_opt muc opt
 
 (* expressions *)
 
@@ -669,10 +673,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | ({term_loc = loc},_)::_ ->
             Loc.errorm ~loc "unexpected 'variant' clause"
         | _ -> dspec muc sp in
+      let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
-      let dity = match pty with
-        | Some pty -> dity_of_ity (ity_of_pty muc pty)
-        | None -> dity_fresh () in
       let denv = denv_add_exn denv old_mark_id dity in
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->
@@ -758,7 +760,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEghost (dexpr muc denv e1)
   | Ptree.Eexn (id, pty, mask, e1) ->
       let id = create_user_id id in
-      let dity = dity_of_ity (ity_of_pty muc pty) in
+      let dity = dity_of_pty muc pty in
       let denv = denv_add_exn denv id dity in
       DEexn (id, dity, mask, dexpr muc denv e1)
   | Ptree.Eabsurd ->
@@ -783,21 +785,18 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Enamed (Lstr lab, e1) ->
       DElabel (dexpr muc denv e1, Slab.singleton lab)
   | Ptree.Ecast ({expr_desc = Ptree.Econst c}, pty) ->
-      let ity = ity_of_pty muc pty in
-      DEconst (c, dity_of_ity ity)
+      DEconst (c, dity_of_pty muc pty)
   | Ptree.Ecast (e1, pty) ->
       let d1 = dexpr muc denv e1 in
-      let ity = ity_of_pty muc pty in
-      DEcast (d1, dity_of_ity ity)
+      DEcast (d1, dity_of_pty muc pty)
   end
 
 and drec_defn muc denv fdl =
   let prep (id, gh, kind, bl, pty, msk, sp, e) =
     let bl = List.map (dbinder muc) bl in
-    let dity = match pty with
-      | Some pty -> dity_of_ity (ity_of_pty muc pty)
-      | None -> dity_fresh () in
+    let dity = dity_of_opt muc pty in
     let pre denv =
+      let denv = denv_add_args denv bl in
       let denv = denv_add_exn denv old_mark_id dity in
       let dv = dvariant muc sp.sp_variant in
       dspec muc sp, dv, dexpr muc denv e in

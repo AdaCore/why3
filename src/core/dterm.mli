@@ -28,6 +28,8 @@ val dty_app : tysymbol -> dty list -> dty
 val dty_match : dty -> ty  -> unit (* raises Exit on failure *)
 val dty_unify : dty -> dty -> unit (* raises Exit on failure *)
 
+val dty_int  : dty
+val dty_real : dty
 val dty_bool : dty
 
 val dty_fold : (tysymbol -> 'a list -> 'a) ->
@@ -48,7 +50,7 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
-  | DPcast of dpattern * ty
+  | DPcast of dpattern * dty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
@@ -67,7 +69,7 @@ type dterm = private {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * ty
+  | DTconst of Number.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -79,7 +81,7 @@ and dterm_node =
   | DTnot of dterm
   | DTtrue
   | DTfalse
-  | DTcast of dterm * ty
+  | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
   | DTlabel of dterm * Slab.t
 

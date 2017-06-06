@@ -46,7 +46,7 @@ type dpattern_node =
   | DPapp  of rsymbol * dpattern list
   | DPas   of dpattern * preid * bool
   | DPor   of dpattern * dpattern
-  | DPcast of dpattern * ity
+  | DPcast of dpattern * dity
 
 (** Binders *)
 

@@ -362,7 +362,7 @@ type dpattern_node =
   | DPapp  of rsymbol * dpattern list
   | DPas   of dpattern * preid * bool
   | DPor   of dpattern * dpattern
-  | DPcast of dpattern * ity
+  | DPcast of dpattern * dity
 
 (** Specifications *)
 
@@ -618,7 +618,7 @@ let drec_defn denv0 prel =
     denv_add_rec denv denv0.frozen id (argl,res) in
   let denv1 = List.fold_left add denv0 prel in
   let parse (id,gh,pk,bl,res,msk,pre) =
-    let dsp, dvl, de = pre (denv_add_args denv1 bl) in
+    let dsp, dvl, de = pre denv1 in
     dexpr_expected_type de res;
     (id,gh,pk,bl,res,msk,dsp,dvl,de) in
   let fdl = List.map parse prel in
@@ -668,8 +668,8 @@ let dpattern ?loc node =
         let { dp_pat = pat; dp_dity = dity; dp_vars = vars } = dp in
         let vars = Mstr.add_new (Dterm.DuplicateVar n) n dity vars in
         mk_dpat (PPas (pat, id, gh)) dity vars
-    | DPcast (dp, ity) ->
-        dpat_expected_type dp (dity_of_ity ity);
+    | DPcast (dp, dity) ->
+        dpat_expected_type dp dity;
         dp
   in
   Loc.try1 ?loc dpat node
