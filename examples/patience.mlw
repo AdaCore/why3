@@ -85,30 +85,26 @@ module PigeonHole
     requires { n > m >= 0 }
     variant  { m }
     ensures  { not (injective f n m) }
-  = try
+  =
       for i = 0 to n-1 do
         invariant { forall k. 0 <= k < i -> f k <> m-1 }
-        if f i = m-1 then
-          begin
+        if f i = m-1 then begin
           (* we have found index i such that f i = m-1 *)
           for j = i+1 to n-1 do
             invariant { forall k. i < k < j -> f k <> m-1 }
-            if f j = m-1 then raise Found
+          (* we know that f i = f j = m-1 hence we are done *)
+            if f j = m-1 then return
           done;
           (* we know that for all k <> i, f k <> m-1 *)
           let g = shift f i in
           assert { range g (n-1) (m-1) };
           pigeon_hole (n-1) (m-1) g;
-          raise Found;
-          end
+          return
+        end
       done;
       (* we know that for all k, f k <> m-1 *)
       assert { range f n (m-1) };
       pigeon_hole n (m-1) f
-   with Found ->
-     (* we know that f i = f j = m-1 hence we are done *)
-     ()
-   end
 
 end
 
@@ -328,7 +324,7 @@ module PatienceAbstract
     ensures  { s.values = (old s).values[(old s).num_elts <- c] }
   =
     let ghost pred = ref (-1) in
-    try
+  try
     for i = 0 to s.num_stacks - 1 do
       invariant { if i=0 then !pred = -1 else
         let stack_im1 = s.stacks[i-1] in
@@ -343,19 +339,15 @@ module PatienceAbstract
       let stack_i = s.stacks[i] in
       let stack_i_size = s.stack_sizes[i] in
       let top_stack_i = stack_i[stack_i_size - 1] in
-      if c <= s.values[top_stack_i] then
-         raise (Return i)
-      else
-         begin
-           assert { 0 <= top_stack_i < s.num_elts };
-           assert { let (is,ip) = s.positions[top_stack_i] in
-             0 <= is < s.num_stacks &&
-             0 <= ip < s.stack_sizes[is] &&
-             s.stacks[is][ip] = top_stack_i &&
-             is = i /\ ip = stack_i_size - 1
-           };
-           pred := top_stack_i
-         end
+      if c <= s.values[top_stack_i] then raise (Return i);
+      assert { 0 <= top_stack_i < s.num_elts };
+      assert { let (is,ip) = s.positions[top_stack_i] in
+        0 <= is < s.num_stacks &&
+        0 <= ip < s.stack_sizes[is] &&
+        s.stacks[is][ip] = top_stack_i &&
+        is = i /\ ip = stack_i_size - 1
+      };
+      pred := top_stack_i
     done;
     (* we add a new stack *)
     let idx = s.num_elts in

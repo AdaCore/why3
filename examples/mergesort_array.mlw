@@ -228,9 +228,6 @@ module NaturalMergesort
     done;
     !i
 
-  exception Break
-  exception Return
-
   let natural_mergesort (a: array elt) : unit
     ensures { sorted a }
     ensures { permut_all (old a) a }
@@ -238,14 +235,12 @@ module NaturalMergesort
     if n >= 2 then
     let tmp = Array.copy a in
     let ghost first_run = ref 0 in
-    try
     while true do
       invariant { 0 <= !first_run <= n && sorted_sub a 0 !first_run }
       invariant { permut_all (old a) a }
       variant   { n - !first_run }
       label L in
       let lo = ref 0 in
-      try
       while !lo < n - 1 do
         invariant { 0 <= !lo <= n }
         invariant { !first_run at L <= !first_run <= n }
@@ -254,7 +249,7 @@ module NaturalMergesort
         invariant { permut_all (a at L) a }
         variant   { n - !lo }
         let mid = find_run a !lo in
-        if mid = n then begin if !lo = 0 then raise Return; raise Break end;
+        if mid = n then begin if !lo = 0 then return; raise L end;
         let hi = find_run a mid in
         label M in
         merge_using tmp a !lo mid hi;
@@ -263,9 +258,7 @@ module NaturalMergesort
         ghost if !lo = 0 then first_run := hi;
         lo := hi;
       done
-      with Break -> () end
     done
-    with Return -> () end
 
 
   (** an alternative implementation suggested by Martin Clochard,
@@ -283,26 +276,24 @@ module NaturalMergesort
     ensures  { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
     variant  { k }
   = let n = length a in
-    if lo >= n-1 then n else
-    try
-      let mid = ref (find_run a lo) in
-      if !mid = n then raise Break;
-      for i = 0 to k-1 do
-        invariant { lo + i < !mid < n }
-        invariant { sorted_sub a lo !mid }
-        invariant { permut_sub (old a) a lo (length a) }
-        invariant { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
-        let hi = naturalrec tmp a !mid i in
-        assert { permut_sub (old a) a lo (length a) };
-        label M in
-        merge_using tmp a lo !mid hi;
-        assert { permut_sub (a at M) a lo hi };
-        assert { permut_sub (a at M) a lo (length a) };
-        mid := hi;
-        if !mid = n then raise Break
-      done;
-      !mid
-    with Break -> n end
+    if lo >= n-1 then return n;
+    let mid = ref (find_run a lo) in
+    if !mid = n then return n;
+    for i = 0 to k-1 do
+      invariant { lo + i < !mid < n }
+      invariant { sorted_sub a lo !mid }
+      invariant { permut_sub (old a) a lo (length a) }
+      invariant { forall j: int. 0 <= j < lo -> a[j] = (old a)[j] }
+      let hi = naturalrec tmp a !mid i in
+      assert { permut_sub (old a) a lo (length a) };
+      label M in
+      merge_using tmp a lo !mid hi;
+      assert { permut_sub (a at M) a lo hi };
+      assert { permut_sub (a at M) a lo (length a) };
+      mid := hi;
+      if !mid = n then return n
+    done;
+    !mid
 
   let natural_mergesort2 (a: array elt) : unit
     ensures { sorted a }

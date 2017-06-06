@@ -59,30 +59,24 @@ module AddListImp
 use import SumList
 use import ref.Ref
 
-exception Break
-
 let sum (l: list or_integer_float) : (int, real) =
     returns { si, sf -> si = add_int l /\ sf = add_real l }
   let si = ref 0 in
   let sf = ref 0.0 in
   let ll = ref l in
-  try
-    while True do
+  while True do
     invariant { !si + add_int !ll = add_int l /\
-                !sf +. add_real !ll = add_real l
-              }
+                !sf +. add_real !ll = add_real l }
     variant { !ll }
      match !ll with
-     | Nil -> raise Break
+     | Nil -> return (!si, !sf)
      | Cons (Integer n) t ->
          si := !si + n; ll := t
      | Cons (Real x) t ->
          sf := !sf +. x; ll := t
      end
-   done;
-   absurd
-  with Break -> (!si, !sf)
-  end
+  done;
+  absurd
 
 
 let main () =
