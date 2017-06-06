@@ -127,14 +127,14 @@ we invoke \texttt{extract} from the directory where this file is stored. File
 \texttt{aqueue.ml} now contains the following OCaml code:
 \begin{whycode}
 let enqueue (x: 'a) (q: 'a queue) : 'a queue =
-create (q.front) (q.lenf) (x :: (q.rear))
-       (Z.add (q.lenr) (Z.of_string "1"))
+  create (q.front) (q.lenf) (x :: (q.rear))
+    (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
 Choosing a function symbol as the entry point of extraction allows us to focus
 only on specific parts of the program. However, the generated code cannot be
 type-checked by the OCaml compiler, as it depends on function \texttt{create}
 and on type \texttt{'a queue}, whose definitions are not given. In order to
-obtain a \emph{correct} OCaml implementation, we can perform a recursive
+obtain a \emph{complete} OCaml implementation, we can perform a recursive
 extraction:
 \begin{verbatim}
 > why3 extraction --recursive -D ocaml64 -L . \
@@ -162,6 +162,9 @@ let enqueue (x: 'a) (q: 'a queue) : 'a queue =
   create (q.front) (q.lenf) (x :: (q.rear))
     (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
+This new version of the code is now accepted by the OCaml compiler.
+
+Let us now consider the
 % \label{fig:extract-queens}
 % \caption{Recursive extraction of \texttt{queens} function.}
 % \end{figure}
