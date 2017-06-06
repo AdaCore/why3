@@ -18,10 +18,11 @@ let atom = [^'('')'' ''\t''\n']
 let space = [' ''\t''\n''\r']
 let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
+let hexa_num = ( num | ['a' - 'f'] | ['A' - 'F'])+
 let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
-let float_num = '#'('b' | 'x') num
+let float_num = '#'('b' | 'x') hexa_num
 
 
 rule token = parse
