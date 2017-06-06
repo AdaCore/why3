@@ -253,7 +253,7 @@ module BoundedIntegers
   use int.Sum
 
   function sum (a: array int63) (lo hi: int) : int =
-    Sum.sum (fun i -> to_int a[i]) lo hi
+    Sum.sum (fun i -> (a[i] : int)) lo hi
 
   let maximum_subarray (a: array int63) (ghost lo hi: ref int): int63
     requires { "no overflow" forall l h. 0 <= l <= h <= length a ->
@@ -276,7 +276,7 @@ module BoundedIntegers
       if !s < zero then begin s := a[!i]; l := to_int !i end
       else begin assert { sum a !l (!i + 1) <= max_int }; s += a[!i] end;
       if !s > !ms then begin
-        ms := !s; lo := !l; hi := Int.(+) (to_int !i) 1 end;
+        ms := !s; lo := !l; hi := to_int !i + 1 end;
       incr i
     done;
     !ms

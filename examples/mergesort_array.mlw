@@ -102,16 +102,15 @@ module TopDownMergesort
     ensures { sorted_sub a l r }
     ensures { permut_sub (old a) a l r }
     variant { r - l }
-  = if l < r-1 then begin
-      let m = l + (r - l) / 2 in
-      assert { l <= m < r };
-      mergesort_rec a tmp l m;
-      assert { permut_sub (old a) a l r };
-      label M in
-      mergesort_rec a tmp m r;
-      assert { permut_sub (a at M) a l r };
-      merge_using tmp a l m r;
-    end
+  = if l >= r-1 then return;
+    let m = l + (r - l) / 2 in
+    assert { l <= m < r };
+    mergesort_rec a tmp l m;
+    assert { permut_sub (old a) a l r };
+    label M in
+    mergesort_rec a tmp m r;
+    assert { permut_sub (a at M) a l r };
+    merge_using tmp a l m r
 
   let mergesort (a: array elt) : unit
     ensures { sorted a }
@@ -232,7 +231,7 @@ module NaturalMergesort
     ensures { sorted a }
     ensures { permut_all (old a) a }
   = let n = length a in
-    if n >= 2 then
+    if n <= 1 then return;
     let tmp = Array.copy a in
     let ghost first_run = ref 0 in
     while true do
