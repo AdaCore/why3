@@ -100,8 +100,8 @@ module Print = struct
       let s = sanitizer s in
       let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
       let fname = if lp = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname lp t) in
-      fprintf fmt "%s.%s" m s
+        let m = Strings.capitalize (module_name ?fname lp t) in
+        fprintf fmt "%s.%s" m s
     with Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
@@ -325,7 +325,7 @@ module Print = struct
     else
       let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
-      fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->"
+      fprintf fmt ": @[@[%a@]. @[%a@] ->@ %a@ =@ @[fun @[%a@]@ ->@]@]"
         print_svar s
         (print_list arrow (print_ty ~paren:true info)) ty_args
         (print_ty ~paren:true info) res
@@ -533,28 +533,34 @@ module Print = struct
       assert false (*TODO*)
 
   let print_decl info fmt decl =
+    (* avoids printing the same decl for mutually recursive decls *)
+    let memo = Hashtbl.create 64 in
     let decl_name = get_decl_name decl in
     let decide_print id =
-      if query_syntax info.info_syn id = None then begin
-        print_decl info fmt decl;
+      if query_syntax info.info_syn id = None &&
+         not (Hashtbl.mem memo decl) then begin
+        Hashtbl.add memo decl (); print_decl info fmt decl;
         fprintf fmt "@." end in
     List.iter decide_print decl_name
 
 end
 
-let print_decl pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d =
-  ignore (old);
-  let info = {
-    info_syn          = pargs.Pdriver.syntax;
-    info_convert      = pargs.Pdriver.converter;
-    info_current_th   = th;
-    info_current_mo   = Some m;
-    info_th_known_map = th.th_known;
-    info_mo_known_map = m.mod_known;
-    info_fname        = Opt.map Compile.clean_name fname;
-    flat              = flat;
-  } in
-  Print.print_decl info fmt d
+let print_decl =
+  let memo = Hashtbl.create 16 in
+  fun pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d ->
+    ignore (old);
+    let info = {
+      info_syn          = pargs.Pdriver.syntax;
+      info_convert      = pargs.Pdriver.converter;
+      info_current_th   = th;
+      info_current_mo   = Some m;
+      info_th_known_map = th.th_known;
+      info_mo_known_map = m.mod_known;
+      info_fname        = Opt.map Compile.clean_name fname;
+      flat              = flat;
+    } in
+    if not (Hashtbl.mem memo d) then begin
+      Hashtbl.add memo d (); Print.print_decl info fmt d end
 
 let fg ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in

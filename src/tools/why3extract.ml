@@ -150,15 +150,12 @@ let print_mdecls ?fname m mdecls =
     if cout <> stdout then close_out cout end
 
 let find_module_path mm path m = match path with
-  | [] ->
-    Mstr.find m mm
-  | path ->
-    let mm = Env.read_library Pmodule.mlw_language env path in
+  | [] -> Mstr.find m mm
+  | path -> let mm = Env.read_library Pmodule.mlw_language env path in
     Mstr.find m mm
 
 let find_module_id mm id =
-  let (path, m, _) = Pmodule.restore_path id in
-  find_module_path mm path m
+  let (path, m, _) = Pmodule.restore_path id in find_module_path mm path m
 
 let translate_module =
   let memo = Ident.Hid.create 16 in
@@ -286,9 +283,9 @@ let rec visit mm id =
     with Not_found -> ()
   end
 
-let visit mm id =
-  if opt_rec_single = Recursive then visit mm id
-  else toextract := id :: !toextract
+(* let visit mm id = *)
+(*   if opt_rec_single = Recursive then visit mm id *)
+(*   else toextract := id :: !toextract *)
 
 let flat_extraction mm = function
   | File fname ->
@@ -299,8 +296,6 @@ let flat_extraction mm = function
         eprintf "multiple module '%s'; use -L . instead@." s;
         exit 1
       end;
-      let tm = translate_module m in
-      Ident.Mid.iter (fun id _ -> visit mm id) tm.ML.mod_known;
       Mstr.add s m mm in
     Mstr.fold do_m mmf mm
   | Module (path, m) ->
@@ -322,6 +317,9 @@ let () =
       Queue.iter do_modular opt_queue
     | Flat ->
       let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
+      let visit_m _ m = let tm = translate_module m in
+        Ident.Mid.iter (fun id _ -> visit mm id) tm.ML.mod_known in
+      Mstr.iter visit_m mm;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let cout = match opt_output with
         | None -> stdout
