@@ -5478,7 +5478,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         C.set_ofs nx sx limb_zero;
         value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
         label Div2_ns in
-        let  _qh = divmod_2 q nx y (Int32.(+) sx one) in
+        let ghost _qh = divmod_2 q nx y (Int32.(+) sx one) in
         copy r nx sy;
         assert { value x sx
                  = value q (sx - sy + 1) * value y sy
@@ -5518,7 +5518,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         ()
       end
       else begin
-        let  _c = lshift ny y sy (Limb.of_int32 clz) in
+        let ghost _c = lshift ny y sy (Limb.of_int32 clz) in
         begin
           ensures { normalized ny sy }
           ensures { value ny sy = power 2 clz * value y sy }
@@ -5584,8 +5584,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
         end;
         label Div2_s in
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-        let _qh = divmod_2 q nx ny (Int32.(+) sx one) in
-        let _l = rshift r nx sy (Limb.of_int32 clz) in
+        let ghost _qh = divmod_2 q nx ny (Int32.(+) sx one) in
+        let ghost _l = rshift r nx sy (Limb.of_int32 clz) in
         begin ensures { value nx 2 = p * value r 2 }
           assert { _l = 0
                  by
@@ -5712,7 +5712,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           C.set_ofs nx sx limb_zero;
           value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
           label Div_ns in
-          let _qh = div_sb_qr q nx y (Int32.(+) sx one) sy in
+          let ghost _qh = div_sb_qr q nx y (Int32.(+) sx one) sy in
           copy r nx sy;
           assert { value x sx
                    = value q (sx - sy + 1) * value y sy
@@ -5830,8 +5830,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           end;
           label Div_s in
           (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-          let _qh = div_sb_qr q nx ny (Int32.(+) sx one) sy in
-          let _l = rshift r nx sy (Limb.of_int32 clz) in
+          let ghost _qh = div_sb_qr q nx ny (Int32.(+) sx one) sy in
+          let ghost _l = rshift r nx sy (Limb.of_int32 clz) in
           begin ensures { value nx sy = p * value r sy }
             assert { _l = 0
                    by

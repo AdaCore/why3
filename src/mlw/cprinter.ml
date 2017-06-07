@@ -1193,7 +1193,12 @@ module MLToC = struct
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
     | Eassign _ -> raise (Unsupported "assign")
-    | Ehole | Eignore _ -> assert false
+    | Ehole -> assert false
+    | Eignore e ->
+       [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
+              if env.computes_return_value
+              then C.Sreturn(Enothing)
+              else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
 
   let translate_decl (info:info) (d:decl) : C.definition option
