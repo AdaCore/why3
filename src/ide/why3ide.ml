@@ -457,6 +457,8 @@ let unfocus_item =
   create_menu_item tools_factory "Unfocus"
     "Unfocus"
 
+
+
 (* 1.3 "View" menu items *)
 
 
@@ -871,6 +873,9 @@ let update_monitor =
     (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
 
 
+
+
+
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -893,23 +898,7 @@ let match_function s iter =
     true
   with Not_found -> false
 
-let init_completion provers transformations commands =
-  (* add the names of all the the transformations *)
-  List.iter add_completion_entry transformations;
-  (* add the name of the commands *)
-  List.iter add_completion_entry commands;
-  (* todo: add queries *)
-
-  (* add provers *)
-  List.iter add_completion_entry provers;
-
-  add_completion_entry "auto";
-  add_completion_entry "auto 2";
-
-  command_entry_completion#set_text_column completion_col;
-  command_entry_completion#set_match_func match_function;
-
-  command_entry#set_completion command_entry_completion
+(* see also init_compeltion below *)
 
 (*********************)
 (* Terminal history  *)
@@ -1225,30 +1214,14 @@ let (_ : GtkSignal.id) =
     (fun () ->
      begin
        match get_selected_row_references () with
-       | [r] -> on_selected_row r;
-           if !has_right_click then
-             (* TODO here show the menu *)
-             tools_menu#popup ~button:1 ~time:0l;
-(*
-             GToolbox.popup_menu ~entries:[
-                              `I("Mark Obsolete",
-                                 (* TODO add a mark_obsolete function *)
-                                 (fun () ->
-                                   match get_selected_row_references () with
-                                   | [r] ->
-                                       let id = get_node_id r#iter in
-                                       send_request (Mark_obsolete_req id)
-                                   | _ -> print_message "Select only one node to perform this action"));
-                              `I("Choix 1.2",(fun () -> Format.eprintf "Popup menu: choix 1.2 active@."));
-                              `S;
-                              `I("Choix 2.1",(fun () -> Format.eprintf "Popup menu: choix 2.1 active@."));
-                              `I("Choix 2.2",(fun () -> Format.eprintf "Popup menu: choix 2.2 active@."));
-                              `I("Choix 2.3",(fun () -> Format.eprintf "Popup menu: choix 2.3 active@."));
-                            ]
-                            ~button:1 ~time:0l;
-*)
-           has_right_click := false
-
+       | [r] ->
+          on_selected_row r;
+          if !has_right_click then
+            begin
+              tools_menu#popup ~button:3 ~time:0l;
+              Debug.dprintf debug "[IDE INFO] after tools_menu#popup@.";
+              has_right_click := false
+            end
        | _ -> ()
      end (* ;
      command_entry#misc#grab_focus () *) ; has_right_click := false)
@@ -1256,16 +1229,20 @@ let (_ : GtkSignal.id) =
 let _ =
   (* This event is executed BEFORE the other connected event goals_view#selection#connect#after#changed above *)
   (* We return false so that the second callback above is executed ? *)
-  goals_view#event#connect#button_press ~callback:(fun x ->
-    (match GdkEvent.Button.button x with
-    | 1 -> (* Left click *) ()
-    | 2 -> (* Middle click *) ()
-    | 3 -> (* Right click *)
-        has_right_click := true
-
-    | _ -> (* Error case TODO *) assert false);
-    Format.eprintf "TODO button number %d was clicked on the tree view@." (GdkEvent.Button.button x); false)
-
+  let callback ev =
+    let n = GdkEvent.Button.button ev in
+    begin
+      match n with
+      | 1 -> (* Left click *) ()
+      | 2 -> (* Middle click *) ()
+      | 3 -> (* Right click *)
+         has_right_click := true
+      | _ -> (* Error case TODO *) assert false
+     end;
+    Debug.dprintf debug "[IDE INFO] button number %d was clicked on the tree view@." n;
+    false
+  in
+  goals_view#event#connect#button_press ~callback
 
 (***********************)
 (* Tools menu signals  *)
@@ -1516,6 +1493,73 @@ let set_status_and_time_column row pa obsolete l =
   in
   let t = if obsolete then t ^ " (obsolete)" else t in
   goals_model#set ~row:row#iter ~column:time_column t
+
+
+
+(*****************************)
+(* tools submenu for provers *)
+(*****************************)
+
+let provers_factory =
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
+  new GMenu.factory tools_submenu_provers
+
+let add_submenu_prover prover =
+(*
+  let provers =
+    C.Mprover.fold
+      (fun k p acc ->
+       let pr = p.prover in
+       if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
+       then acc
+       else C.Mprover.add k p acc)
+        provers C.Mprover.empty
+  in
+  C.Mprover.iter
+    (fun p _ ->
+ *)
+  let n = (*Pp.string_of_wnl Whyconf.print_prover *) prover in
+  let (_ : GMenu.image_menu_item) =
+    provers_factory#add_image_item ~label:n
+                                   ~callback:(fun () ->
+                                              Debug.dprintf debug "[IDE INFO] interp command '%s'@." n;
+                                              interp n;
+                                              (* send_request (Command_req (id, n)) *)
+)
+                                   ()
+  in
+(* prover button, obsolete
+  let b = GButton.button ~packing:provers_box#add ~label:n () in
+  b#misc#set_tooltip_markup
+    (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goal(s)</b>"
+                    C.print_prover p);
+  let (_ : GtkSignal.id) =
+    b#connect#pressed
+      ~callback:(fun () -> prover_on_selected_goals p)
+  in
+ *)
+  ()
+
+
+let init_completion provers transformations commands =
+  (* add the names of all the the transformations *)
+  List.iter add_completion_entry transformations;
+  (* add the name of the commands *)
+  List.iter add_completion_entry commands;
+  (* todo: add queries *)
+
+  (* add provers *)
+  List.iter add_completion_entry provers;
+  List.iter add_submenu_prover provers;
+
+  add_completion_entry "auto";
+  add_completion_entry "auto 2";
+
+  command_entry_completion#set_text_column completion_col;
+  command_entry_completion#set_match_func match_function;
+
+  command_entry#set_completion command_entry_completion
 
 let treat_notification n =
   begin match n with
