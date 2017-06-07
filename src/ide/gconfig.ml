@@ -360,11 +360,13 @@ let image ?size f =
     Filename.concat (datadir main)
       (Filename.concat "images" (f^".png"))
   in
+  try (
   match size with
     | None ->
         GdkPixbuf.from_file n
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
+  ) with _ -> !image_default
 
 let iconname_default = ref ""
 let iconname_undone = ref ""
