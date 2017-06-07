@@ -224,7 +224,7 @@ type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 
 type printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
-  Pmodule.pmodule -> Compile.ML.decl Pp.pp
+  Pmodule.pmodule -> Mltree.decl Pp.pp
 
 type reg_printer = Pp.formatted * filename_generator * printer
 

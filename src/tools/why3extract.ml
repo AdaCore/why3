@@ -183,7 +183,7 @@ let extract_to =
         if not (Ident.Hid.mem memo name) then begin
           Ident.Hid.add memo name ();
           let mdecls = match decl with
-            | None   -> (translate_module m).ML.mod_decl
+            | None   -> (translate_module m).Mltree.mod_decl
             | Some d -> Translate.pdecl_m m d in
           print_mdecls ?fname m mdecls
         end
@@ -271,7 +271,7 @@ let toextract = ref []
 let find_decl mm id =
   let m = find_module_id mm id in
   let m = translate_module m in
-  Ident.Mid.find id m.ML.mod_known
+  Ident.Mid.find id m.Mltree.mod_known
 
 let rec visit mm id =
   if not (Ident.Hid.mem visited id) then begin
@@ -301,7 +301,7 @@ let flat_extraction mm = function
   | Module (path, m) ->
     let m = find_module_path mm path m in (* FIXME: catch Not_found here *)
     let m = translate_module m in
-    Ident.Mid.iter (fun id _ -> visit mm id) m.ML.mod_known;
+    Ident.Mid.iter (fun id _ -> visit mm id) m.Mltree.mod_known;
     mm
   | Symbol (path, m, s) ->
     let m = find_module_path mm path m in
@@ -318,7 +318,7 @@ let () =
     | Flat ->
       let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
       let visit_m _ m = let tm = translate_module m in
-        Ident.Mid.iter (fun id _ -> visit mm id) tm.ML.mod_known in
+        Ident.Mid.iter (fun id _ -> visit mm id) tm.Mltree.mod_known in
       Mstr.iter visit_m mm;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let cout = match opt_output with
@@ -332,7 +332,7 @@ let () =
       let extract fmt id =
         let pm = find_module_id mm id in
         let m = translate_module pm in
-        let d = Ident.Mid.find id m.ML.mod_known in
+        let d = Ident.Mid.find id m.Mltree.mod_known in
         pr pargs ~flat:true pm fmt d in
       List.iter (extract fmt) (List.rev !toextract);
       if cout <> stdout then close_out cout

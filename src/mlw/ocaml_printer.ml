@@ -38,7 +38,8 @@ type info = {
 
 module Print = struct
 
-  open ML
+  open Mltree
+  open Compile.ML
 
   let ocaml_keywords =
     ["and"; "as"; "assert"; "asr"; "begin";
