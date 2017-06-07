@@ -10,7 +10,7 @@ let root_node : node_ID = 0
 
 type global_information =
     {
-     provers         : prover list;
+     provers         : (string * prover) list;
      transformations : transformation list;
      strategies      : strategy list;
      commands        : string list;

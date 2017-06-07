@@ -1505,7 +1505,7 @@ let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
   new GMenu.factory tools_submenu_provers
 
-let add_submenu_prover prover =
+let add_submenu_prover (shortcut,prover) =
 (*
   let provers =
     C.Mprover.fold
@@ -1519,16 +1519,16 @@ let add_submenu_prover prover =
   C.Mprover.iter
     (fun p _ ->
  *)
-  let n = (*Pp.string_of_wnl Whyconf.print_prover *) prover in
-  let (_ : GMenu.image_menu_item) =
-    provers_factory#add_image_item ~label:n
-                                   ~callback:(fun () ->
-                                              Debug.dprintf debug "[IDE INFO] interp command '%s'@." n;
-                                              interp n;
-                                              (* send_request (Command_req (id, n)) *)
-)
-                                   ()
+  let  i = create_menu_item
+             provers_factory
+             prover
+             ("run prover " ^ prover ^ " on selected goal (shortcut: " ^ shortcut ^ ")")
   in
+  let callback () =
+    Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
+    interp shortcut
+  in
+  connect_menu_item i ~callback
 (* prover button, obsolete
   let b = GButton.button ~packing:provers_box#add ~label:n () in
   b#misc#set_tooltip_markup
@@ -1539,7 +1539,6 @@ let add_submenu_prover prover =
       ~callback:(fun () -> prover_on_selected_goals p)
   in
  *)
-  ()
 
 
 let init_completion provers transformations commands =
@@ -1550,8 +1549,16 @@ let init_completion provers transformations commands =
   (* todo: add queries *)
 
   (* add provers *)
-  List.iter add_completion_entry provers;
-  List.iter add_submenu_prover provers;
+  let all_strings =
+    List.fold_left (fun acc (s,p) ->  s :: p :: acc) [] provers
+  in
+  List.iter add_completion_entry all_strings;
+  let provers_sorted =
+    List.sort (fun (_,p1) (_,p2) ->
+               String.compare (Strings.lowercase p1) (Strings.lowercase p2))
+              provers
+  in
+  List.iter add_submenu_prover provers_sorted;
 
   add_completion_entry "auto";
   add_completion_entry "auto 2";

@@ -11,7 +11,7 @@ val root_node : node_ID
    shared with the IDE through communication *)
 type global_information =
     {
-     provers         : prover list;
+     provers         : (string * prover) list;
      transformations : transformation list;
      strategies      : strategy list;
      commands        : string list

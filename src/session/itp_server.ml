@@ -630,8 +630,6 @@ end
       Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
       exit 1
 
-  let get_prover_list (config: Whyconf.config) =
-    Mstr.fold (fun x _ acc -> x :: acc) (Whyconf.get_prover_shortcuts config) []
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -895,7 +893,11 @@ end
                      { task_driver = task_driver;
                        cont = c };
     let d = get_server_data () in
-    let prover_list = get_prover_list config in
+    let prover_list =
+      Mstr.fold (fun x p acc ->
+                 let n = Pp.sprintf "%a" Whyconf.print_prover p in
+                 (x,n) :: acc) (Whyconf.get_prover_shortcuts config) []
+    in
     let transformation_list = List.map fst (list_transforms ()) in
     let strategies_list =
       let l = strategies d.cont.controller_env config loaded_strategies in
