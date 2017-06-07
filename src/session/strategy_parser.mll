@@ -141,7 +141,7 @@ rule scan code = parse
 
 {
 
-  let parse2 env conf s =
+  let parse env conf s =
     let code = create_code env conf in
     scan code (Lexing.from_string s);
     let label = Array.make code.temp 0 in
@@ -154,22 +154,5 @@ rule scan code = parse
       | Itransform (t, n) -> Itransform (t, label.(n))
       | Igoto n -> Igoto label.(n) in
     Array.map solve (Array.sub code.instr 0 code.next)
-
-(*
-    let code = create_code env in
-    scan code (Lexing.from_string s);
-    let label = Array.make code.temp 0 in
-    let fill name lab = match lab.defined with
-      | None -> error "label '%s' is undefined" name
-      | Some n -> label.(lab.temporary) <- n in
-    Hashtbl.iter fill code.labels;
-    let solve = function
-      | Icall_prover _ as i -> i
-      | Itransform (t, n) -> Itransform (t, label.(n))
-      | Igoto n -> Igoto label.(n) in
-    Array.map solve (Array.sub code.instr 0 code.next)
-*)
-
-  let parse env s = parse2 env.Session.env env.Session.whyconf s
 
 }

@@ -187,7 +187,7 @@ let strategies env config loaded_strategies =
             let name = st.Whyconf.strategy_name in
             try
               let code = st.Whyconf.strategy_code in
-              let code = Strategy_parser.parse2 env config code in
+              let code = Strategy_parser.parse env config code in
               let shortcut = st.Whyconf.strategy_shortcut in
               Format.eprintf "[session server info] Strategy '%s' loaded.@." name;
               (name, shortcut, st.Whyconf.strategy_desc, code) :: acc

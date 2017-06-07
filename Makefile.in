@@ -2061,7 +2061,7 @@ clean::
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
 # same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
-src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
+src/tools/why3extract.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
