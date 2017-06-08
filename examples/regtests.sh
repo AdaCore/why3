@@ -67,6 +67,7 @@ echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
 echo ""
 run_dir .
 run_dir double_wp "-L double_wp"
+run_dir avl "-L avl"
 echo ""
 
 echo "Score on ported programs : $success/$total"
@@ -78,7 +79,6 @@ run_dir to_port
 run_dir foveoos11-cm
 run_dir WP_revisited
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
-run_dir avl "-L avl"
 echo ""
 
 echo "=== Standard Library ==="
