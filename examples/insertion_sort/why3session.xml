@@ -2,11 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="36" steplimit="0" memlimit="1000"/>
 <file name="../insertion_sort.mlw" expanded="true">
-<theory name="InsertionSort" sum="0ff7000b58975d960a0cfedb21e74cdc" expanded="true">
- <goal name="VC insertion_sort" expl="VC for insertion_sort" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+<theory name="InsertionSort" sum="cdd336989bf33b7c22065e15316b5bb4" expanded="true">
+ <goal name="VC insertion_sort" expl="VC for insertion_sort">
+ <transf name="split_goal_wp">
   <goal name="VC insertion_sort.1" expl="1. loop invariant init">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
@@ -17,13 +18,13 @@
   <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC insertion_sort.4" expl="4. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.06" steps="132"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="130"/></proof>
   </goal>
   <goal name="VC insertion_sort.5" expl="5. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="VC insertion_sort.6" expl="6. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC insertion_sort.7" expl="7. index in array bounds">
   <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
@@ -35,7 +36,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC insertion_sort.10" expl="10. assertion">
-  <proof prover="3"><result status="valid" time="0.01" steps="37"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC insertion_sort.11" expl="11. loop variant decrease">
   <proof prover="3"><result status="valid" time="0.00" steps="17"/></proof>
@@ -44,13 +45,13 @@
   <proof prover="3"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
   <goal name="VC insertion_sort.13" expl="13. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.22" steps="264"/></proof>
+  <proof prover="3"><result status="valid" time="0.22" steps="256"/></proof>
   </goal>
   <goal name="VC insertion_sort.14" expl="14. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.13" steps="194"/></proof>
+  <proof prover="3"><result status="valid" time="0.13" steps="184"/></proof>
   </goal>
   <goal name="VC insertion_sort.15" expl="15. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.03" steps="83"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="101"/></proof>
   </goal>
   <goal name="VC insertion_sort.16" expl="16. assertion">
   <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
@@ -59,7 +60,7 @@
   <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC insertion_sort.18" expl="18. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.13" steps="254"/></proof>
+  <proof prover="3"><result status="valid" time="0.13" steps="163"/></proof>
   </goal>
   <goal name="VC insertion_sort.19" expl="19. postcondition">
   <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
@@ -69,19 +70,80 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC test1" expl="VC for test1" expanded="true">
+ <goal name="VC test1" expl="VC for test1">
  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
- <goal name="VC test2" expl="VC for test2" expanded="true">
+ <goal name="VC test2" expl="VC for test2">
  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
  </goal>
- <goal name="VC bench" expl="VC for bench" expanded="true">
+ <goal name="VC bench" expl="VC for bench">
  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
  </goal>
 </theory>
-<theory name="InsertionSortGen" sum="50a9cb1ad6d5481b25700b8f407f3dc5" expanded="true">
- <goal name="VC insertion_sort" expl="VC for insertion_sort" expanded="true">
- <proof prover="3"><result status="valid" time="2.54" steps="3264"/></proof>
+<theory name="InsertionSortGen" sum="494ddd8f911bb14871302a6165580d0d" expanded="true">
+ <goal name="VC insertion_sort" expl="VC for insertion_sort">
+ <transf name="split_goal_wp">
+  <goal name="VC insertion_sort.1" expl="1. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.2" expl="2. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.3" expl="3. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.4" expl="4. loop invariant init">
+  <proof prover="3" timelimit="1"><result status="valid" time="0.04" steps="130"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.5" expl="5. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.6" expl="6. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.7" expl="7. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.8" expl="8. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.9" expl="9. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.10" expl="10. assertion">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.11" expl="11. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.12" expl="12. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.13" expl="13. loop invariant preservation">
+  <proof prover="3" timelimit="1"><result status="valid" time="0.12" steps="254"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.14" expl="14. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.15" expl="15. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.16" expl="16. assertion">
+  <proof prover="3" timelimit="1"><result status="valid" time="0.01" steps="37"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.17" expl="17. index in array bounds">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.18" expl="18. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.19" expl="19. postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insertion_sort.20" expl="20. postcondition">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

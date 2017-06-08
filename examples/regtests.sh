@@ -64,6 +64,7 @@ run_dir () {
 }
 
 echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
+echo ""
 run_dir .
 run_dir double_wp "-L double_wp"
 echo ""
@@ -72,6 +73,7 @@ echo "Score on ported programs : $success/$total"
 echo ""
 
 echo "=== Programs that remain to be ported ==="
+echo ""
 run_dir to_port
 run_dir foveoos11-cm
 run_dir WP_revisited
@@ -80,24 +82,29 @@ run_dir avl "-L avl"
 echo ""
 
 echo "=== Standard Library ==="
+echo ""
 run_dir stdlib
 echo ""
 
 echo "=== Tests ==="
+echo ""
 # there's no session there...
 # run_dir tests
 run_dir tests-provers
 echo ""
 
 echo "=== Check Builtin translation ==="
+echo ""
 run_dir check-builtin
 echo ""
 
 echo "=== BTS ==="
+echo ""
 run_dir bts
 echo ""
 
 echo "=== Logic ==="
+echo ""
 run_dir logic
 run_dir bitvectors "-L bitvectors"
 echo ""
