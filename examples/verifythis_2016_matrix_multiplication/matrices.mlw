@@ -156,14 +156,14 @@ module MatrixArithmetic
     fun x y -> get a x y + get b x y
 
   function add (a b: mat int) : mat int =
-    create (rows a) a.cols (add2f a b)
+    create a.rows a.cols (add2f a b)
 
   (* Matrix additive inverse *)
   function opp2f (a: mat int) : int -> int -> int =
     fun x y -> - get a x y
 
   function opp (a: mat int) : mat int =
-    create (rows a) a.cols (opp2f a)
+    create a.rows a.cols (opp2f a)
 
   function sub (a b: mat int) : mat int =
     add a (opp b)
@@ -176,7 +176,7 @@ module MatrixArithmetic
     fun i j -> sum (mul_atom a b i j) 0 a.cols
 
   function mul (a b: mat int) : mat int =
-    create (rows a) b.cols (mul_cell a b)
+    create a.rows b.cols (mul_cell a b)
 
   lemma zero_neutral:
     forall a. add a (zero a.rows a.cols) =  a
