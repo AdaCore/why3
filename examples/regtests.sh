@@ -69,6 +69,7 @@ run_dir double_wp "-L double_wp"
 echo ""
 
 echo "Score on ported programs : $success/$total"
+echo ""
 
 echo "=== Programs that remain to be ported ==="
 run_dir to_port
