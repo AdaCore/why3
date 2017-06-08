@@ -1317,7 +1317,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEfor (id,de_from,dir,de_to,dinv,de) ->
       let e_from = expr uloc env de_from in
       let e_to = expr uloc env de_to in
-      let v = create_pvsymbol id ity_int in
+      let v = create_pvsymbol id e_from.e_ity in
       let env = add_pvsymbol env v in
       let i = if ity_equal v.pv_ity ity_int then v else
         create_pvsymbol id ~ghost:true ity_int in
