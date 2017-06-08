@@ -1,8 +1,30 @@
+#if defined(TEST_GMP) || defined(TEST_WHY3) || defined(TEST_MINIGMP)
+#define BENCH
+#else
+#define COMPARE
+#ifdef COMPARE_MINI
+#define TEST_MINIGMP
+#else
+#define TEST_GMP
+#endif
+#define TEST_WHY3
+#define TEST_ADD
+#define TEST_MUL
+#define TEST_DIV
+#endif
+
+#ifdef TEST_MINIGMP
+#include "mini-gmp.c"
+#else
 #include <gmp.h>
+#endif
+
+#include "mt19937-64.c"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <time.h>
 
 uint64_t add(uint64_t * r3, uint64_t * x4, uint64_t * y3, int32_t sx, int32_t
              sy);
@@ -21,34 +43,16 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
   printf("\n");
 }
 
-#if defined(TEST_GMP) || defined(TEST_WHY3)
-#define BENCH
-#else
-#define COMPARE
-#define TEST_GMP
-#define TEST_WHY3
-#define TEST_ADD
-#define TEST_MUL
-#define TEST_DIV
-#endif
-
-
-#ifdef BENCH
-#define RANDOM mpn_random
-#else
-#define RANDOM mpn_random2
-#endif
 
 
 void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
-  //printf ("an %d bn %d\n", an, bn);
-  RANDOM (ap, an + 1);
-  RANDOM (bp, bn + 1);
-  while (bp[bn-1] == 0)
-    {
-      //printf("an = %d, bn = %d, aborted\n", (int)an, (int)bn);
-      RANDOM (bp, bn + 1);
-    };
+  for (int i = 0; i <= an; i++)
+    ap[i] = genrand64_int64();
+  for (int i = 0; i <= bn; i++)
+    bp[i] = genrand64_int64();
+  while (bp[bn-1]==0)
+    bp[bn-1] = genrand64_int64();
+  return;
 }
 
 int main () {
@@ -66,9 +70,10 @@ int main () {
 
   //gmp_randinit_default(rands);
   //gmp_randseed_ui(rands, 42);
-
   /* Re-interpret reps argument as a size argument.  */
-  max_n = 40;
+
+  init_genrand64((unsigned long long)time(NULL));
+  max_n = 20;
 
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
@@ -99,7 +104,7 @@ int main () {
               {
 #endif
 
-#ifdef TEST_GMP
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
             c = mpn_add (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
@@ -163,8 +168,7 @@ int main () {
             for (int i = 0; i != 1000; ++i)
               {
 #endif
-
-#ifdef TEST_GMP
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
             mpn_mul (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
@@ -210,18 +214,26 @@ int main () {
       for (bn = 1; bn <= an; bn += 1)
 	{
 	  init_valid (ap, bp, an, bn);
+#ifdef TEST_MINIGMP
+          mpn_copyi(refr, ap, an);
+#endif
 
 #ifdef BENCH
           elapsed = 0;
           for (int iter = 0; iter != 1000; ++iter) {
             init_valid (ap, bp, an, bn);
+#ifdef TEST_MINIGMP
+            mpn_copyi(refr, ap, an);
+#endif
             gettimeofday(&begin, NULL);
             for (int i = 0; i != 1000; ++i)
               {
 #endif
-
 #ifdef TEST_GMP
-                mpn_tdiv_qr (refq, refr, 0, ap, an, bp, bn);
+                mpn_tdiv_qr(refq, refr, 0, ap, an, bp, bn);
+#endif
+#ifdef TEST_MINIGMP
+                mpn_div_qr (refq, refr, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
                 tdiv_qr(rq, rr, ap, bp, an, bn);

@@ -5673,7 +5673,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     so value q (sx - 1) >= 0
                     so value nx 2 >= 0
                     so (value q (sx - 1) + power radix (sx - 1) * _qh)
-                       >= 0
+                        >= 0
                     so (value q (sx - 1) + power radix (sx - 1) * _qh)
                          * value ny 2
                        + value nx 2
@@ -5756,7 +5756,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           ()
         end
         else begin
-          let _c = lshift ny y sy (Limb.of_int32 clz) in
+          let ghost _c = lshift ny y sy (Limb.of_int32 clz) in
           begin
             ensures { normalized ny sy }
             ensures { value ny sy
