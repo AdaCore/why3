@@ -4,10 +4,11 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2017_tree_buffer.mlw" expanded="true">
-<theory name="Spec" sum="6ee3c869c821f40375f941acf3f4e979" expanded="true">
+<theory name="Spec" sum="a61f8dffbebe0fc4def47faa56eced85" expanded="true">
  <goal name="VC take" expl="VC for take">
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -31,19 +32,22 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC take_lemma.3" expl="3. postcondition" expanded="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC take_lemma.4" expl="4. postcondition" expanded="true">
-  <proof prover="0" edited="challenge4-Spec-VC_take_lemma_1.why"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="3"><result status="valid" time="0.55"/></proof>
-  </goal>
-  <goal name="VC take_lemma.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  <transf name="split_goal_wp" expanded="true">
+   <goal name="VC take_lemma.3.1" expl="1. postcondition" expanded="true">
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   </goal>
+   <goal name="VC take_lemma.3.2" expl="2. postcondition">
+   <proof prover="4"><result status="valid" time="0.74"/></proof>
+   </goal>
+   <goal name="VC take_lemma.3.3" expl="3. postcondition">
+   <proof prover="0" timelimit="1"><result status="valid" time="0.01" steps="34"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Caterpillar" sum="d6399528441e626a8feb931a13ff73d7">
+<theory name="Caterpillar" sum="1f16fc36f2856a0d29063461ca670e54">
  <goal name="VC cat_empty" expl="VC for cat_empty">
  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
@@ -90,10 +94,7 @@
   </transf>
   </goal>
   <goal name="VC cat_add.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
-  </goal>
-  <goal name="VC cat_add.4" expl="4. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
@@ -129,7 +130,6 @@
    </goal>
    <goal name="VC rt_add.1.4" expl="4. VC for rt_add">
    <proof prover="1"><result status="valid" time="0.82"/></proof>
-   <proof prover="2"><result status="timeout" time="5.00"/></proof>
    </goal>
   </transf>
   </goal>
