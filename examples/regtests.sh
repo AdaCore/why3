@@ -63,6 +63,21 @@ run_dir () {
     shapes="$shapes $1/*/why3shapes.*"
 }
 
+echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
+run_dir .
+run_dir double_wp "-L double_wp"
+echo ""
+
+echo "Score on ported programs : $success/$total"
+
+echo "=== Programs that remain to be ported ==="
+run_dir to_port
+run_dir foveoos11-cm
+run_dir WP_revisited
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
+run_dir avl "-L avl"
+echo ""
+
 echo "=== Standard Library ==="
 run_dir stdlib
 echo ""
@@ -86,14 +101,6 @@ run_dir logic
 run_dir bitvectors "-L bitvectors"
 echo ""
 
-echo "=== Programs ==="
-run_dir .
-run_dir foveoos11-cm
-run_dir WP_revisited
-run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
-run_dir avl "-L avl"
-run_dir double_wp "-L double_wp"
-echo ""
 
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`
