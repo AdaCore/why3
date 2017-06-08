@@ -1249,6 +1249,14 @@ let close_scope loc ~import =
     let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
     slice.muc <- Some muc
 
+let import_scope loc q =
+  assert (not (Stack.is_empty state));
+  let slice = Stack.top state in
+  let muc = top_muc_on_demand loc slice in
+  if Debug.test_noflag debug_parse_only then
+    let muc = Loc.try2 ~loc import_scope muc (string_list_of_qualid q) in
+    slice.muc <- Some muc
+
 let add_decl loc d =
   assert (not (Stack.is_empty state));
   let slice = Stack.top state in

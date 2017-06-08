@@ -177,7 +177,7 @@
 %left OP3
 %left OP4
 %nonassoc prec_prefix_op
-%nonassoc INTEGER REAL
+%nonassoc INTEGER REAL (* stronger than MINUS *)
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
@@ -210,6 +210,8 @@ scope_head:
 module_decl:
 | scope_head module_decl* END
     { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
+| IMPORT uqualid
+    { Typing.import_scope (floc $startpos $endpos) $2 }
 | d = pure_decl | d = prog_decl | d = meta_decl
     { Typing.add_decl (floc $startpos $endpos) d }
 | use_clone { () }
