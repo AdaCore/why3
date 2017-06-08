@@ -589,9 +589,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let qualid_app loc q el =
-    let e = try DEsym (find_prog_symbol muc q) with
-      | _ -> DEls (find_lsymbol muc.muc_theory q) in
-    expr_app loc e el
+    expr_app loc (DEsym (find_prog_symbol muc q)) el
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->
@@ -599,6 +597,19 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some d -> expr_app loc d el
         | None -> qualid_app loc q el)
     | _ -> qualid_app loc q el
+  in
+  let qualid_app_pure loc q el =
+    let e = match find_global_pv muc q with
+      | None -> DEls_pure (find_lsymbol muc.muc_theory q)
+      | Some v -> DEpv_pure v in
+    expr_app loc e el
+  in
+  let qualid_app_pure loc q el = match q with
+    | Qident {id_str = n} ->
+        (match denv_get_pure_opt denv n with
+        | Some d -> expr_app loc d el
+        | None -> qualid_app_pure loc q el)
+    | _ -> qualid_app_pure loc q el
   in
   let find_dxsymbol q = match q with
     | Qident {id_str = n} ->
@@ -609,6 +620,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
+  | Ptree.Eidpur q ->
+      qualid_app_pure loc q []
   | Ptree.Eidapp (q, el) ->
       qualid_app loc q (List.map (dexpr muc denv) el)
   | Ptree.Eapply (e1, e2) ->

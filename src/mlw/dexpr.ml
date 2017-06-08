@@ -330,10 +330,7 @@ let spec_ity hv hr frz ity =
     | Ityapp (s,tl,rl) -> app_map dity s tl rl in
   dity ity
 
-let specialize_pv {pv_ity = ity} =
-  spec_ity (Htv.create 3) (Hreg.create 3) (ity_freeze isb_empty ity) ity
-
-let specialize_xs {xs_ity = ity} =
+let specialize_single ity =
   spec_ity (Htv.create 3) (Hreg.create 3) (ity_freeze isb_empty ity) ity
 
 let specialize_rs {rs_cty = cty} =
@@ -413,7 +410,6 @@ type dexpr = {
 and dexpr_node =
   | DEvar of string * dvty
   | DEsym of prog_symbol
-  | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
@@ -434,6 +430,9 @@ and dexpr_node =
   | DEexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
+  | DEvar_pure of string * dvty
+  | DEpv_pure of pvsymbol
+  | DEls_pure of lsymbol
   | DEabsurd
   | DEtrue
   | DEfalse
@@ -525,7 +524,7 @@ let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DElabel (de,_) -> is_value de
-    | DEvar _ | DEsym _ | DEls _ | DEfun _ | DEany _ -> true
+    | DEvar _ | DEsym _ | DEls_pure _ | DEfun _ | DEany _ -> true
     | _ -> false in
   if is_value de
   then denv_add_poly denv id dvty
@@ -554,6 +553,16 @@ let denv_get denv n =
 
 let denv_get_opt denv n =
   Opt.map (mk_node n) (Mstr.find_opt n denv.locals)
+
+let mk_node_pure n = function
+  | _, Some tvs, dvty -> DEvar_pure (n, specialize_scheme tvs dvty)
+  | _, None,     dvty -> DEvar_pure (n, dvty)
+
+let denv_get_pure denv n =
+  mk_node_pure n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
+
+let denv_get_pure_opt denv n =
+  Opt.map (mk_node_pure n) (Mstr.find_opt n denv.locals)
 
 exception UnboundExn of string
 
@@ -682,15 +691,19 @@ let dpattern ?loc node =
   Loc.try1 ?loc dpat node
 
 let specialize_dxs = function
-  | DEgexn xs -> specialize_xs xs
+  | DEgexn xs -> specialize_single xs.xs_ity
   | DElexn (_,dity) -> dity
 
 let dexpr ?loc node =
   let get_dvty = function
     | DEvar (_,dvty) ->
         dvty
+    | DEvar_pure (_,dvty) ->
+        let dt = dity_fresh () in
+        dity_unify_asym dt (dity_of_dvty dvty);
+        [], dt
     | DEsym (PV pv) ->
-        [], specialize_pv pv
+        [], specialize_single pv.pv_ity
     | DEsym (RS rs) ->
         specialize_rs rs
     | DEsym (OO ss) ->
@@ -701,8 +714,10 @@ let dexpr ?loc node =
         | BinOp  -> [dt;dt], dt
         | BinRel -> [dt;dt], dity_bool
         | NoOver -> assert false end
-    | DEls ls ->
+    | DEls_pure ls ->
         specialize_ls ls
+    | DEpv_pure pv ->
+        [], specialize_single (ity_purify pv.pv_ity)
     | DEconst (_, ity) -> [],ity
     | DEapp ({de_dvty = (arg::argl, res)}, de2) ->
         dexpr_expected_type de2 arg;
@@ -1224,7 +1239,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   | DEvar (n,_) -> c_app (get_rs env n) lpl
   | DEsym (RS s) -> c_app s lpl
   | DEsym (OO s) -> c_oop s lpl
-  | DEls s -> c_pur s lpl
+  | DEls_pure s  -> c_pur s lpl
   | DEapp (de1,de2) ->
       let e2 = e_ghostify env.cgh (expr uloc env de2) in
       cexp uloc env de1 (EA e2 :: lpl)
@@ -1257,6 +1272,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       cexp uloc env de (LD (LL old) :: lpl)
+  | DEvar_pure _ | DEpv_pure _
   | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
   | DEassign _ | DEwhile _ | DEfor _ | DEtry _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
@@ -1266,15 +1282,19 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   match de0.de_node with
   | DEvar (n,_) when argl = [] ->
       e_var (get_pv env n)
+  | DEvar_pure (n,_) ->
+      e_pure (t_var (get_pv env n).pv_vs)
   | DEsym (PV v) ->
       e_var v
+  | DEpv_pure v ->
+      e_pure (t_var v.pv_vs)
   | DEconst (c,dity) ->
       e_const c (ity_of_dity dity)
   | DEapp ({de_dvty = ([],_)} as de1, de2) ->
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in
       e_app rs_func_app [e1; e2] [] (ity_of_dity res)
-  | DEvar _ | DEsym _ | DEls _ | DEapp _ | DEfun _ | DEany _ ->
+  | DEvar _ | DEsym _ | DEls_pure _ | DEapp _ | DEfun _ | DEany _ ->
       let cgh,ldl,c = try_cexp uloc env de0 [] in
       let e = e_ghostify cgh (e_exec c) in
       List.fold_left put_header e ldl

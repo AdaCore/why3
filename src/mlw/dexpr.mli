@@ -103,7 +103,6 @@ type dexpr = private {
 and dexpr_node =
   | DEvar of string * dvty
   | DEsym of prog_symbol
-  | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
@@ -124,6 +123,9 @@ and dexpr_node =
   | DEexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
+  | DEvar_pure of string * dvty
+  | DEpv_pure of pvsymbol
+  | DEls_pure of lsymbol
   | DEabsurd
   | DEtrue
   | DEfalse
@@ -158,11 +160,12 @@ val denv_add_for_index : denv -> preid -> dvty -> denv
 val denv_add_exn : denv -> preid -> dity -> denv
 
 val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
-
 val denv_get_opt : denv -> string -> dexpr_node option
 
-val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
+val denv_get_pure : denv -> string -> dexpr_node (** raises UnboundVar *)
+val denv_get_pure_opt : denv -> string -> dexpr_node option
 
+val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
 val denv_get_exn_opt : denv -> string -> dxsymbol option
 
 val denv_names : denv -> Sstr.t

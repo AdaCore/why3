@@ -835,9 +835,14 @@ expr_block:
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
 
+expr_pure:
+| LEFTBRC qualid RIGHTBRC                           { Eidpur $2 }
+
 expr_sub:
 | expr_block                                        { $1 }
+| expr_pure                                         { $1 }
 | uqualid DOT mk_expr(expr_block)                   { Escope ($1, $3) }
+| expr_dot DOT mk_expr(expr_pure)                   { Eapply ($3, $1) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_arg LEFTSQ expr RIGHTSQ
