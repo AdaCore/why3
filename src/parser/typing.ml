@@ -781,10 +781,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eassert (ak, f) ->
       DEassert (ak, dassert muc f)
   | Ptree.Emark (id, e1) ->
-      let dity = dity_fresh () in
       let id = create_user_id id in
-      let denv = denv_add_exn denv id dity in
-      DEmark (id, dity, dexpr muc denv e1)
+      DEmark (id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in

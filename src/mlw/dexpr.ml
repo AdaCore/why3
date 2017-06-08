@@ -438,7 +438,7 @@ and dexpr_node =
   | DEtrue
   | DEfalse
   | DEcast of dexpr * dity
-  | DEmark of preid * dity * dexpr
+  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
@@ -797,10 +797,10 @@ let dexpr ?loc node =
     | DEtrue
     | DEfalse ->
         dvty_bool
-    | DEcast (de,dity)
-    | DEmark (_,dity,de) ->
+    | DEcast (de,dity) ->
         dexpr_expected_type de dity;
         de.de_dvty
+    | DEmark (_,de)
     | DEuloc (de,_)
     | DElabel (de,_) ->
         de.de_dvty in
@@ -1254,7 +1254,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   | DEexn (id,dity,mask,de) ->
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
       cexp uloc (add_xsymbol env xs) de (LD (LX xs) :: lpl)
-  | DEmark (id,_,de) ->
+  | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       cexp uloc env de (LD (LL old) :: lpl)
   | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
@@ -1398,18 +1398,10 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEexn (id,dity,mask,de) ->
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
       e_exn xs (expr uloc (add_xsymbol env xs) de)
-  | DEmark (id,dity,de) ->
-      let xs = create_xsymbol id (ity_of_dity dity) in
+  | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
-      let e = expr uloc (add_xsymbol env xs) de in
-      let e = if Sxs.mem xs e.e_effect.eff_raises then
-        let v = create_pvsymbol (id_fresh "result") xs.xs_ity in
-        (* FIXME? We assume that the generated exception will not
-           be catched inside e. Otherwise, it will not appear in
-           the effect and we will not declare the exception here. *)
-        e_exn xs (e_try e (Mxs.singleton xs ([v], e_var v))) else e in
       let put _ (ld,_) e = e_let ld e in
-      Hpv.fold put old e
+      Hpv.fold put old (expr uloc env de)
   | DEcast _ | DEuloc _ | DElabel _ ->
       assert false (* already stripped *)
 

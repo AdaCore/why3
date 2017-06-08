@@ -128,7 +128,7 @@ and dexpr_node =
   | DEtrue
   | DEfalse
   | DEcast of dexpr * dity
-  | DEmark of preid * dity * dexpr
+  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
