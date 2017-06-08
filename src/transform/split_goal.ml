@@ -238,7 +238,7 @@ let rec split_core sp f =
       let fwd = sf1.fwd &&& sf2.fwd and bwd = sf1.bwd &&& sf2.bwd in
       let asym = sp.asym_split && asym f1 in
       let nf2, cn2 = ncaset [] sf2 in
-      let sd = if asym then [sf1.side] else [] in
+      let sd = if asym then [sf2.side] else [] in
       let dp = nf2::sd in
       let nf1, cn1 = ncaset dp sf1 in
       let neg = bimap cpy (&&&) nf1 nf2 in
@@ -264,7 +264,7 @@ let rec split_core sp f =
       let sf1 = split_core sp1 f1 and sf2 = split_core sp2 f2 in
       let fwd = sf1.bwd >-> sf2.fwd and bwd = sf1.fwd >-> sf2.bwd in
       let asym = sp.asym_split && asym f1 in
-      let sd = [sf1.side] in
+      let sd = [sf2.side] in
       let neg1 = nclose sf1.pos in
       let neg2 = if not asym then sf2.neg else
         let nf1 = ncase (sf2.neg::sd) sf1 in
