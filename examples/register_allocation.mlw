@@ -77,7 +77,7 @@ module Spec
     variant { c1 }
   = match c1 with
     | Nil        -> ()
-    | Cons i1 l1 -> exec_append l1 c2 (exec i1 s)
+    | Cons i1 l1 -> exec_append l1 c2 ({exec} i1 s)
     end
 
   (** specification of the forthcoming compilation:
@@ -138,7 +138,7 @@ module DWP
     requires { hcode_ok hc }
     ensures { wcode_ok result }
     ensures { result.trans --> to_wp hc.post }
-  = { wcode = hc.hcode; trans = to_wp hc.post }
+  = { wcode = hc.hcode; trans = {to_wp} hc.post }
 
   let wrap (wc: wcode) (ghost pst: post) : hcode
     requires { wcode_ok wc }
@@ -151,19 +151,19 @@ module DWP
     requires { wcode_ok w1 /\ wcode_ok w2 }
     ensures { wcode_ok result }
     ensures { result.trans --> rcompose w2.trans w1.trans }
-  = { wcode = w1.wcode ++ w2.wcode; trans = rcompose w2.trans w1.trans }
+  = { wcode = w1.wcode ++ w2.wcode; trans = {rcompose} w2.trans w1.trans }
 
   let cons (i: instr) (w: wcode) : wcode
     requires { wcode_ok w }
     ensures { wcode_ok result }
     ensures { result.trans --> rcompose w.trans (rcompose (exec i)) }
   = { wcode = Cons i w.wcode;
-      trans = rcompose w.trans (rcompose (exec_closure i)) }
+      trans = pure { rcompose w.trans (rcompose (exec_closure i)) } }
 
   let nil () : wcode
     ensures { wcode_ok result }
     ensures { result.trans --> fun q -> q }
-  = { wcode = Nil; trans = id }
+  = { wcode = Nil; trans = {id} }
 
 end
 
@@ -188,7 +188,7 @@ module InfinityOfRegisters
       | Eneg e -> $ compile e r -- cons (Ineg r) (nil ())
       | Eadd e1 e2 ->
           $ compile e1 r -- $ compile e2 (r + 1) -- cons (Iadd (r+1) r) (nil ())
-      end) (expr_post e r)
+      end) ({expr_post} e r)
 
   (* To recover usual specification. *)
   let ghost recover (e: expr) (r: register) (h: hcode) : unit
@@ -236,7 +236,7 @@ module FiniteNumberOfRegisters
             $ compile e1 (k - 2) -- $ compile e2 (k - 1) --
             cons (Iadd (k - 2) (k - 1)) (
             cons (Ipop (k - 2)) (nil ())))
-      end) (expr_post e r)
+      end) ({expr_post} e r)
 
 end
 
@@ -304,6 +304,6 @@ module OptimalNumberOfRegisters
               cons (Ipop (k - 2)) (nil ())))
           else
             $ compile (Eadd e2 e1) r (* compile e2 first *)
-      end) (expr_post e r)
+      end) ({expr_post} e r)
 
 end

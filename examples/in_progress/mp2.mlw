@@ -159,7 +159,7 @@ module N
      variant {m - n}
    =
      if n < m then
-       l2i x[n] + radix * value_sub x (n+1) m
+       {l2i} x[n] + {radix} * value_sub x (n+1) m
        else 0
 
   function value (x:t) : int =
@@ -340,7 +340,7 @@ module N
                 p2i !i <= k < p2i sz ->
                 (pelts x)[x.offset+k] = (pelts y)[y.offset+k] /\
                 (pelts x)[p2i !i+x.offset+j] = (pelts y)[p2i !i+y.offset+j] };
-       value_sub_frame_shift (pelts x) (pelts y) (p2i !i+x.offset) (p2i !i+y.offset) ((p2i sz) - (p2i !i));
+       value_sub_frame_shift x.{pelts} y.{pelts} (p2i !i+x.offset) (p2i !i+y.offset) ((p2i sz) - (p2i !i));
        let ghost k = p2i !i in
        i := Int32.(-) !i (Int32.of_int 1);
 
@@ -349,17 +349,17 @@ module N
        ly := get_ofs y !i;
        if (UInt32.ne !lx !ly)
        then begin
-            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+ p2i sz);
-            value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+ p2i sz);
+            value_sub_concat x.{pelts} x.offset (x.offset+k) (x.offset+ p2i sz);
+            value_sub_concat y.{pelts} y.offset (y.offset+k) (y.offset+ p2i sz);
             assert { compare_int (value_sub_shift x (p2i sz))
                        (value_sub_shift y (p2i sz))
                    = compare_int (value_sub_shift x k) (value_sub_shift y k) };
-            value_sub_tail (pelts x) x.offset (x.offset+k-1);
-            value_sub_tail (pelts y) y.offset (y.offset+k-1);
+            value_sub_tail x.{pelts} x.offset (x.offset+k-1);
+            value_sub_tail y.{pelts} y.offset (y.offset+k-1);
             if UInt32.(>) !lx !ly
             then begin
-             value_sub_upper_bound (pelts y) y.offset (y.offset+k-1);
-             value_sub_lower_bound (pelts x) x.offset (x.offset+k-1);
+             value_sub_upper_bound y.{pelts} y.offset (y.offset+k-1);
+             value_sub_lower_bound x.{pelts} x.offset (x.offset+k-1);
              assert { value_sub_shift x k - value_sub_shift y k =
                       (l2i !lx - l2i !ly) * (power radix (k-1))
                     - ((value_sub_shift y (k-1)) - (value_sub_shift x (k-1)))
@@ -372,8 +372,8 @@ module N
             end
             else begin
              assert { l2i !ly > l2i !lx };
-             value_sub_upper_bound (pelts x) x.offset (x.offset+k-1);
-             value_sub_lower_bound (pelts y) y.offset (y.offset+k-1);
+             value_sub_upper_bound x.{pelts} x.offset (x.offset+k-1);
+             value_sub_lower_bound y.{pelts} y.offset (y.offset+k-1);
              assert { value_sub_shift y k - value_sub_shift x k =
                     (l2i !ly - l2i !lx) * (power radix (k-1))
                     - ((value_sub_shift x (k-1)) - (value_sub_shift y (k-1)))
@@ -388,7 +388,7 @@ module N
          end
        else ()
      done;
-     value_sub_frame_shift (pelts x) (pelts y) x.offset y.offset (p2i sz);
+     value_sub_frame_shift x.{pelts} y.{pelts} x.offset y.offset (p2i sz);
      zero
    with Break32 r -> r
    end
@@ -413,9 +413,9 @@ module N
          lx := get_ofs x !i;
          if (UInt32.ne !lx uzero)
          then begin
-           value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
-           value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
-           value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
+           value_sub_concat x.{pelts} x.offset (x.offset+k) (x.offset + p2i sz);
+           value_sub_lower_bound_tight x.{pelts} x.offset (x.offset+k);
+           value_sub_lower_bound x.{pelts} (x.offset+k) (x.offset + p2i sz);
            raise Break32 (Int32.of_int 0)
          end
          else begin
@@ -438,7 +438,7 @@ module N
       variant { p2i sz - p2i !i }
       invariant { value_sub_shift r (p2i !i) = 0 }
       set_ofs r !i lzero;
-      value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
+      value_sub_tail r.{pelts} r.offset (r.offset + p2i !i);
       i := Int32.(+) !i (Int32.of_int 1);
     done
 
@@ -478,9 +478,9 @@ module N
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      let ghost m = power radix k in
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
+      let ghost m = power {radix} k in
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c
              = value_sub_shift x (p2i !i) + l2i y
              by
@@ -513,8 +513,8 @@ module N
                   value_sub_shift x (p2i !i) + l2i y };
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
     done;
     !c
     end
@@ -553,9 +553,9 @@ module N
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
+      value_sub_tail y.{pelts} y.offset (y.offset + k);
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
                 value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i)
               by
@@ -615,9 +615,9 @@ module N
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
+      value_sub_tail y.{pelts} y.offset (y.offset + k);
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
                 value_sub_shift x (p2i !i) + value_sub_shift y (p2i !i)
               by
@@ -656,8 +656,8 @@ module N
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
                 value_sub_shift x (p2i !i) + value_sub_shift y (p2i sy)
               by
@@ -704,7 +704,7 @@ module N
       let rl, rh = Limb.mul_double !lx y in
       let res, carry = Limb.add_with_carry rl !c limb_zero in
       label BeforeWrite in
-      value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) res;
+      value_sub_shift_no_change r.{pelts} r.offset (p2i !i) (p2i !i) res;
       set_ofs r !i res;
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
                   value_sub_shift x (p2i !i) * l2i y };
@@ -723,8 +723,8 @@ module N
       c := Limb.(+) rh carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
       assert { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
                value_sub_shift x (p2i !i) * l2i y
                by
@@ -788,9 +788,9 @@ module N
       assert { l2i !lr = l2i (pelts (old r))[r.offset+ p2i !i] };
       let rl, rh = Limb.mul_double !lx y in
       let res, carry = Limb.add3 !lr rl !c in
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_update (pelts r) (r.offset + p2i !i) r.offset (r.offset + p2i !i +1) res;
+      value_sub_tail r.{pelts} r.offset (r.offset + k);
+      value_sub_tail x.{pelts} x.offset (x.offset + k);
+      value_sub_update r.{pelts} (r.offset + p2i !i) r.offset (r.offset + p2i !i +1) res;
       set_ofs r !i res;
       assert { forall j. (p2i !i + 1) <= j < p2i sz ->
                (pelts (old r))[r.offset+j] = (pelts r)[r.offset+j]
@@ -904,7 +904,7 @@ module N
       variant { p2i sz - p2i !i }
       label StartLoop in
       let ghost k = p2i !i in
-      value_sub_concat (pelts r) r.offset (r.offset + k)
+      value_sub_concat r.{pelts} r.offset (r.offset + k)
                        (r.offset + k + p2i sz);
       assert { value_sub_shift r k
              + (power radix k) * value_sub (pelts r) (r.offset + k)
@@ -925,16 +925,16 @@ module N
                          = (pelts r at StartLoop)[j]) };
       let (res, carry) = add_with_carry c' limb_zero !c in
       label BeforeCarry in
-      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
+      value_sub_update_no_change r.{pelts} ((!rp).offset + p2i sz)
                         r.offset  (r.offset + p2i !i) res;
       set_ofs !rp sz res;
       c:= carry;
       i := Int32.(+) !i one;
       assert { value_sub_shift r k = value_sub_shift (r at BeforeCarry) k
              = value_sub_shift (r at StartLoop) k};
-      value_sub_tail (pelts r) r.offset (r.offset + p2i sz + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
+      value_sub_tail r.{pelts} r.offset (r.offset + p2i sz + k);
+      value_sub_tail y.{pelts} y.offset (y.offset + k);
+      value_sub_concat r.{pelts} r.offset (r.offset + k) (r.offset + k + p2i sz);
       assert { value_sub (pelts r) (r.offset+k) (r.offset+k+p2i sz)
                = value_sub_shift !rp (p2i sz) };
       assert { value_sub_shift r (p2i !i + p2i sz)
@@ -1015,13 +1015,14 @@ module N
              };
       rp := M.incr !rp one;
     done;
-    value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
-    value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sz);
-    value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sz);
+    value_sub_lower_bound r.{pelts} r.offset (r.offset + p2i sz + p2i sz);
+    value_sub_upper_bound x.{pelts} x.offset (x.offset + p2i sz);
+    value_sub_upper_bound y.{pelts} y.offset (y.offset + p2i sz);
     assert { 0 <= value_sub_shift x (p2i sz) < power radix (p2i sz) };
     assert { 0 <= value_sub_shift y (p2i sz) < power radix (p2i sz) };
-    prod_compat_strict_r (value_sub_shift y (p2i sz)) (power radix (p2i sz))
-                         (power radix (p2i sz));
+    prod_compat_strict_r ({value_sub_shift} y (p2i sz))
+                         (power {radix} (p2i sz))
+                         (power {radix} (p2i sz));
     assert { l2i !c = 0 by
              0 < power radix (p2i sz)
              so
@@ -1078,7 +1079,7 @@ module N
       variant { p2i sz - p2i !i }
       label StartLoop in
       let ghost k = p2i !i in
-      value_sub_concat (pelts r) r.offset (r.offset + k)
+      value_sub_concat r.{pelts} r.offset (r.offset + k)
                        (r.offset + k + p2i sz);
       assert { value_sub_shift r k
              + (power radix k) * value_sub (pelts r) (r.offset + k)
@@ -1101,18 +1102,18 @@ module N
       assert { l2i !lr = l2i (pelts (old r))[r.offset+ p2i !i + p2i sz] };
       let (res, carry) = add_with_carry c' !lr !c in
       label BeforeCarry in
-      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
-                        r.offset  (r.offset + p2i !i) res;
+      value_sub_update_no_change r.{pelts} ((!rp).offset + p2i sz)
+                        r.offset (r.offset + p2i !i) res;
       set_ofs !rp sz res;
       assert { value_sub_shift !rp (p2i sz) = value_sub_shift (!rp at BeforeCarry) (p2i sz) };
       c:= carry;
       i := Int32.(+) !i one;
       assert { value_sub_shift r k = value_sub_shift (r at BeforeCarry) k
              = value_sub_shift (r at StartLoop) k};
-      value_sub_tail (pelts r) r.offset (r.offset + p2i sz + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
+      value_sub_tail r.{pelts} r.offset (r.offset + p2i sz + k);
+      value_sub_tail y.{pelts} y.offset (y.offset + k);
       old_tail_shift (k+p2i sz);
-      value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
+      value_sub_concat r.{pelts} r.offset (r.offset + k) (r.offset + k + p2i sz);
       assert { value_sub (pelts r) (r.offset+k) (r.offset+k+p2i sz)
                = value_sub_shift !rp (p2i sz) };
       assert { value_sub_shift r (p2i !i + p2i sz)
@@ -1254,7 +1255,7 @@ module N
       variant { p2i sy - p2i !i }
       label StartLoop in
       let ghost k = p2i !i in
-      value_sub_concat (pelts r) r.offset (r.offset + k)
+      value_sub_concat r.{pelts} r.offset (r.offset + k)
                        (r.offset + k + p2i sx);
       assert { value_sub_shift r k
              + (power radix k) * value_sub (pelts r) (r.offset + k)
@@ -1275,16 +1276,16 @@ module N
                          = (pelts r at StartLoop)[j]) };
       let (res, carry) = add_with_carry c' limb_zero !c in
       label BeforeCarry in
-      value_sub_update_no_change (pelts r) ((!rp).offset + p2i sx)
-                        r.offset  (r.offset + p2i !i) res;
+      value_sub_update_no_change r.{pelts} ((!rp).offset + p2i sx)
+                        r.offset (r.offset + p2i !i) res;
       set_ofs !rp sx res;
       c:= carry;
       i := Int32.(+) !i one;
       assert { value_sub_shift r k = value_sub_shift (r at BeforeCarry) k
              = value_sub_shift (r at StartLoop) k};
-      value_sub_tail (pelts r) r.offset (r.offset + p2i sx + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sx);
+      value_sub_tail r.{pelts} r.offset (r.offset + p2i sx + k);
+      value_sub_tail y.{pelts} y.offset (y.offset + k);
+      value_sub_concat r.{pelts} r.offset (r.offset + k) (r.offset + k + p2i sx);
       assert { value_sub (pelts r) (r.offset+k) (r.offset+k+p2i sx)
                = value_sub_shift !rp (p2i sx) };
       assert { value_sub_shift r (p2i !i + p2i sx)
@@ -1365,13 +1366,14 @@ module N
              };
       rp := M.incr !rp one;
     done;
-    value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sy + p2i sx);
-    value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sx);
-    value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy);
+    value_sub_lower_bound r.{pelts} r.offset (r.offset + p2i sy + p2i sx);
+    value_sub_upper_bound x.{pelts} x.offset (x.offset + p2i sx);
+    value_sub_upper_bound y.{pelts} y.offset (y.offset + p2i sy);
     assert { 0 <= value_sub_shift x (p2i sx) < power radix (p2i sx) };
     assert { 0 <= value_sub_shift y (p2i sy) < power radix (p2i sy) };
-    prod_compat_strict_r (value_sub_shift y (p2i sy)) (power radix (p2i sy))
-                         (power radix (p2i sx));
+    prod_compat_strict_r ({value_sub_shift} y (p2i sy))
+                         (power {radix} (p2i sy))
+                         (power {radix} (p2i sx));
     assert { l2i !c = 0 by
              0 < power radix (p2i sx)
              so

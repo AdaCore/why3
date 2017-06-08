@@ -236,7 +236,7 @@ module Interleaving
     (* shared variables *)
     let a = ref a0 in
     let b = ref b0 in
-    let ghost d = gcd a0 b0 in
+    let ghost d = {gcd} a0 b0 in
     (* two threads *)
     let th1 = create_thread () in
     let th2 = create_thread () in

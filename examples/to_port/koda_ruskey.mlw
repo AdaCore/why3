@@ -215,7 +215,7 @@ module Lemmas
   = match st with
     | Nil -> ()
     | Cons E st' -> inverse_inverse st' c1 c2 c3
-    | Cons f st' -> if even_forest f then () else inverse_inverse st' c1 c2 c3
+    | Cons f st' -> if {even_forest} f then () else inverse_inverse st' c1 c2 c3
     end
 
   inductive sub stack forest coloring =
