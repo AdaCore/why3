@@ -143,7 +143,7 @@
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LT GT LTGT
+%token DOT DOTDOT EQUAL LT GT LTGT MINUS
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -174,10 +174,11 @@
 %nonassoc AT OLD
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
-%left OP2
+%left OP2 MINUS
 %left OP3
 %left OP4
 %nonassoc prec_prefix_op
+%nonassoc INTEGER REAL
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
@@ -513,6 +514,12 @@ term_:
     { Tat ($1, $3) }
 | prefix_op term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_term (Tconst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+| MINUS REAL
+    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_term (Tconst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op_1 ; r = term
@@ -689,6 +696,12 @@ expr_:
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_expr (Econst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+| MINUS REAL
+    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_expr (Econst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
 | l = expr ; o = infix_op_1 ; r = expr
     { Einfix (l,o,r) }
 | l = expr ; o = infix_op_234 ; r = expr
@@ -1039,7 +1052,9 @@ lident_op_id:
 lident_op:
 | op_symbol               { infix $1 }
 | op_symbol UNDERSCORE    { prefix $1 }
+| MINUS     UNDERSCORE    { prefix "-" }
 | EQUAL                   { infix "=" }
+| MINUS                   { infix "-" }
 | OPPREF                  { prefix $1 }
 | LEFTSQ RIGHTSQ          { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
@@ -1061,6 +1076,7 @@ op_symbol:
 
 prefix_op:
 | op_symbol { mk_id (prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (prefix "-") $startpos $endpos }
 
 %inline infix_op_1:
 | o = OP1   { mk_id (infix o)    $startpos $endpos }
@@ -1073,6 +1089,7 @@ prefix_op:
 | o = OP2   { mk_id (infix o)    $startpos $endpos }
 | o = OP3   { mk_id (infix o)    $startpos $endpos }
 | o = OP4   { mk_id (infix o)    $startpos $endpos }
+| MINUS     { mk_id (infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 
