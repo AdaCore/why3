@@ -408,9 +408,11 @@ let add_use uc d = Sid.fold (fun id uc ->
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
 
+let mk_vc uc d = Vc.vc uc.muc_env uc.muc_known uc.muc_theory d
+
 let add_pdecl ?(warn=true) ~vc uc d =
   let uc = add_use uc d in
-  let dl = if vc then Vc.vc uc.muc_env uc.muc_known d else [] in
+  let dl = if vc then mk_vc uc d else [] in
   (* verification conditions must not add additional dependencies
      on built-in theories like TupleN or HighOrd. Also, we expect
      int.Int or any other library theory to be in the context:
@@ -912,12 +914,14 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
   | Ewhile (c,invl,varl,e) ->
       e_while (clone_expr cl sm c) (clone_invl cl sm invl)
               (clone_varl cl sm varl) (clone_expr cl sm e)
-  | Efor (i, (f,dir,t), invl, e) ->
-      let i' = clone_pv cl i in
-      let ism = sm_save_pv sm i i' in
-      e_for i'
+  | Efor (v, (f,dir,t), i, invl, e) ->
+      let v' = clone_pv cl v in
+      let ism = sm_save_pv sm v v' in
+      let i' = if pv_equal v i then v' else clone_pv cl i in
+      let ism = if pv_equal v i then ism else sm_save_pv ism i i' in
+      e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
-        (clone_invl cl ism invl) (clone_expr cl ism e)
+        i' (clone_invl cl ism invl) (clone_expr cl ism e)
   | Etry (d, xl) ->
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
@@ -1032,7 +1036,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       (* FIXME check ghost status and mask of cexp/ld wrt rs *)
       (* FIXME check effects of cexp/ld wrt rs *)
       (* FIXME add correspondance for "let lemma" to cl.pr_table *)
-      let dl = Vc.vc uc.muc_env uc.muc_known (create_let_decl ld) in
+      let dl = mk_vc uc (create_let_decl ld) in
       List.fold_left (add_pdecl_raw ~warn:false) uc dl
   | PDlet ld ->
       begin match ld with

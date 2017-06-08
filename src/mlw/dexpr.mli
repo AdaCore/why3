@@ -153,6 +153,8 @@ val denv_add_args : denv -> dbinder list -> denv
 
 val denv_add_pat : denv -> dpattern -> denv
 
+val denv_add_for_index : denv -> preid -> dvty -> denv
+
 val denv_add_exn : denv -> preid -> dity -> denv
 
 val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
@@ -163,7 +165,7 @@ val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
 
 val denv_get_exn_opt : denv -> string -> dxsymbol option
 
-val denv_contents : denv -> (Ty.Stv.t option * dvty) Mstr.t
+val denv_names : denv -> Sstr.t
 
 val denv_pure : denv -> (Dterm.denv -> Dterm.dty) -> dity
 

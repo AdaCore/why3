@@ -131,7 +131,7 @@ and expr_node =
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
-  | Efor    of pvsymbol * for_bounds * invariant list * expr
+  | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
   | Etry    of expr * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
@@ -237,8 +237,8 @@ val e_case : expr -> (prog_pattern * expr) list -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 
-val e_for : pvsymbol ->
-  expr -> for_direction -> expr -> invariant list -> expr -> expr
+val e_for : pvsymbol -> expr -> for_direction -> expr ->
+              pvsymbol -> invariant list -> expr -> expr
 
 val e_assert : assertion_kind -> term -> expr
 

@@ -594,7 +594,7 @@ let rec eval_expr env (e : expr) : result =
         end
       | r -> r
     end
-  | Efor(pvs,(pvs1,dir,pvs2),_inv,e1) ->
+  | Efor(pvs,(pvs1,dir,pvs2),_i,_inv,e1) ->
     begin
       try
         let a = big_int_of_value (get_pvs env pvs1) in

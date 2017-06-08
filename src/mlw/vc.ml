@@ -61,6 +61,7 @@ let vc_labels = Slab.add kp_label
 
 type vc_env = {
   known_map : Pdecl.known_map;
+  ts_ranges : lsymbol Mts.t;
   ps_int_le : lsymbol;
   ps_int_ge : lsymbol;
   ps_int_lt : lsymbol;
@@ -70,8 +71,9 @@ type vc_env = {
   exn_count : int ref;
 }
 
-let mk_env {Theory.th_export = ns} kn = {
+let mk_env {Theory.th_export = ns} kn tuc = {
   known_map = kn;
+  ts_ranges = tuc.Theory.uc_ranges;
   ps_int_le = Theory.ns_find_ls ns ["infix <="];
   ps_int_ge = Theory.ns_find_ls ns ["infix >="];
   ps_int_lt = Theory.ns_find_ls ns ["infix <"];
@@ -89,7 +91,7 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
 (* FIXME: cannot verify int.why because of a cyclic dependency.
    int.Int is used for the "for" loops and for integer variants.
    We should be able to extract the necessary lsymbols from kn. *)
-let mk_env env kn = mk_env (Env.read_theory env ["int"] "Int") kn
+let mk_env env kn tuc = mk_env (Env.read_theory env ["int"] "Int") kn tuc
 
 (* explanation labels *)
 
@@ -736,9 +738,16 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let k = Kseq (Kval ([], prev), 0, bind_oldies oldies k) in
         let k = List.fold_right assume_inv iinv k in
         Kpar (j, k_havoc e.e_effect k)
-    | Efor (v, ({pv_vs = a}, d, {pv_vs = b}), invl, e1) ->
-        let a = t_var a and b = t_var b in
-        let i = t_var v.pv_vs and one = t_nat_const 1 in
+    | Efor (vx, (a, d, b), vi, invl, e1) ->
+        let int_of_pv = match vx.pv_vs.vs_ty.ty_node with
+          | Tyapp (s,_) when ts_equal s ts_int ->
+              fun v -> t_var v.pv_vs
+          | Tyapp (s,_) ->
+              let s = Mts.find s env.ts_ranges in
+              fun v -> fs_app s [t_var v.pv_vs] ty_int
+          | Tyvar _ -> assert false (* never *) in
+        let a = int_of_pv a and i = t_var vi.pv_vs in
+        let b = int_of_pv b and one = t_nat_const 1 in
         let init = wp_of_inv None lab expl_loop_init invl in
         let prev = sp_of_inv None lab expl_loop_init invl in
         let keep = wp_of_inv None lab expl_loop_keep invl in
@@ -749,14 +758,20 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         let expl_bounds f = vc_expl loc lab expl_for_bound f in
         let i_pl_1 = fs_app pl [i; one] ty_int in
         let b_pl_1 = fs_app pl [b; one] ty_int in
-        let init = t_subst_single v.pv_vs a init in
-        let keep = t_subst_single v.pv_vs i_pl_1 keep in
-        let last = t_subst_single v.pv_vs b_pl_1 prev in
+        let init = t_subst_single vi.pv_vs a init in
+        let keep = t_subst_single vi.pv_vs i_pl_1 keep in
+        let last = t_subst_single vi.pv_vs b_pl_1 prev in
         let iinv = inv_of_loop env e.e_loc invl [] in
         let j = List.fold_right assert_inv iinv (Kstop init) in
         let k = List.fold_right assert_inv iinv (Kstop keep) in
         let k = Kseq (k_expr env lps e1 res xmap, 0, k) in
-        let k = Kseq (Kval ([v], sp_and bounds prev), 0, k) in
+        let k =
+          if pv_equal vx vi then
+            Kseq (Kval ([vx], sp_and bounds prev), 0, k)
+          else
+            Kseq (Kval ([vx], t_true), 0,
+            Kseq (Klet (vi, int_of_pv vx, sp_and bounds prev), 0, k))
+        in
         let k = Kpar (k, Kval ([res], last)) in
         let k = List.fold_right assume_inv iinv k in
         let k = Kpar (j, k_havoc e.e_effect k) in
@@ -1369,13 +1384,13 @@ let mk_vc_decl kn id f =
     Eval_match.eval_match kn f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
-let vc env kn d = match d.pd_node with
+let vc env kn tuc d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
-      let env = mk_env env kn in
+      let env = mk_env env kn tuc in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       [mk_vc_decl kn s.rs_name f]
   | PDlet (LDrec rdl) ->
-      let env = mk_env env kn in
+      let env = mk_env env kn tuc in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
       List.map2 (fun rd f -> mk_vc_decl kn rd.rec_sym.rs_name f) rdl fl
   | _ -> []

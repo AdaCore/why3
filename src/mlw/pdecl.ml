@@ -218,8 +218,8 @@ let get_syms node pure =
     | Eexn (xs, e) ->
         let esms = syms_expr Sid.empty e in
         Sid.union syms (Sid.remove xs.xs_name esms)
-    | Efor (i,_,invl,e) ->
-        syms_pv (syms_tl (syms_expr syms e) invl) i
+    | Efor (v,_,i,invl,e) ->
+        syms_pv (syms_pv (syms_tl (syms_expr syms e) invl) i) v
     | Ewhile (d,invl,varl,e) ->
         let syms = syms_varl (syms_expr syms e) varl in
         syms_tl (syms_eity syms d) invl

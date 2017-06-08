@@ -323,7 +323,7 @@ and expr_node =
   | Eif     of expr * expr * expr
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
-  | Efor    of pvsymbol * for_bounds * invariant list * expr
+  | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
   | Etry    of expr * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
@@ -385,7 +385,7 @@ let c_ghost c = c.c_cty.cty_effect.eff_ghost
 let e_fold fn acc e = match e.e_node with
   | Evar _ | Econst _ | Eexec _ | Eassign _
   | Eassert _ | Epure _ | Eabsurd -> acc
-  | Eraise (_,e) | Efor (_,_,_,e) | Eghost e
+  | Eraise (_,e) | Efor (_,_,_,_,e) | Eghost e
   | Elet ((LDsym _|LDrec _), e) | Eexn (_,e) -> fn acc e
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
@@ -860,25 +860,37 @@ let e_not e = e_if e e_false e_true
 
 (* loops *)
 
-let e_for_raw v ((f,_,t) as bounds) inv e =
-  ity_equal_check v.pv_ity ity_int;
-  ity_equal_check f.pv_ity ity_int;
-  ity_equal_check t.pv_ity ity_int;
+let e_for_raw v ((f,_,t) as bounds) i inv e =
+  ity_equal_check f.pv_ity v.pv_ity;
+  ity_equal_check t.pv_ity v.pv_ity;
+  ity_equal_check i.pv_ity ity_int;
   ity_equal_check e.e_ity ity_unit;
+  if not (pv_equal v i) then begin
+    if not i.pv_ghost then Loc.errorm
+      "The internal for-loop index mush be ghost";
+    let check f = if t_v_occurs v.pv_vs f > 0 then Loc.errorm
+      "The external for-loop index cannot occur in the invariant" in
+    List.iter check inv;
+    match v.pv_ity.ity_node with
+    | Ityapp ({its_def = Range _},_,_) -> ()
+    | _ when ity_equal v.pv_ity ity_int -> ()
+    | _ -> Loc.errorm "For-loop bounds must have an integer type"
+  end;
   let vars = List.fold_left t_freepvs Spv.empty inv in
   let ghost = v.pv_ghost || f.pv_ghost || t.pv_ghost in
   let eff = try_effect [e] eff_read_pre vars e.e_effect in
   let eff = try_effect [e] eff_ghostify ghost eff in
   ignore (try_effect [e] eff_union_seq eff eff);
   let eff = eff_bind_single v eff in
+  let eff = eff_bind_single i eff in
   let eff = eff_read_single_pre t eff in
   let eff = eff_read_single_pre f eff in
-  mk_expr (Efor (v,bounds,inv,e)) e.e_ity MaskVisible eff
+  mk_expr (Efor (v,bounds,i,inv,e)) e.e_ity MaskVisible eff
 
-let e_for v f dir t inv e =
+let e_for v f dir t i inv e =
   let hd, t = mk_proxy false t [] in
   let hd, f = mk_proxy false f hd in
-  let_head hd (e_for_raw v (f,dir,t) inv e)
+  let_head hd (e_for_raw v (f,dir,t) i inv e)
 
 let e_while d inv vl e =
   ity_equal_check d.e_ity ity_bool;
@@ -1011,7 +1023,7 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
       let sm = List.fold_left2 add sm fdl nfdl in
       e_let (LDrec nfdl) (e_rs_subst sm e)
   | Eif (c,d,e) -> e_if (e_rs_subst sm c) (e_rs_subst sm d) (e_rs_subst sm e)
-  | Efor (v,b,inv,e) -> e_for_raw v b inv (e_rs_subst sm e)
+  | Efor (v,b,i,inv,e) -> e_for_raw v b i inv (e_rs_subst sm e)
   | Ewhile (d,inv,vl,e) -> e_while (e_rs_subst sm d) inv vl (e_rs_subst sm e)
   | Eraise (xs,d) -> e_raise xs (e_rs_subst sm d) e.e_ity
   | Ecase (d,bl) -> e_case (e_rs_subst sm d)
@@ -1336,9 +1348,11 @@ and print_enode pri fmt e = match e.e_node with
   | Ewhile (d,inv,varl,e) ->
       fprintf fmt "@[<hov 2>while %a do%a%a@\n%a@]@\ndone"
         print_expr d print_invariant inv print_variant varl print_expr e
-  | Efor (pv,(pvfrom,dir,pvto),inv,e) ->
-      fprintf fmt "@[<hov 2>for %a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
-        print_pv pv print_pv pvfrom
+  | Efor (pv,(pvfrom,dir,pvto),i,inv,e) ->
+      let print_i fmt i =
+        if not (pv_equal pv i) then fprintf fmt "(%a)" print_pv i in
+      fprintf fmt "@[<hov 2>for %a%a =@ %a@ %s@ %a@ %ado@\n%a@]@\ndone"
+        print_pv pv print_i i print_pv pvfrom
         (if dir = To then "to" else "downto") print_pv pvto
         print_invariant inv print_expr e
   | Eexn (xs, e) ->

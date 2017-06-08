@@ -730,7 +730,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let eto = dexpr muc denv eto in
       let inv = dinvariant muc inv in
       let id = create_user_id id in
-      let denv = denv_add_var denv id (dity_of_ity ity_int) in
+      let denv = denv_add_for_index denv id efrom.de_dvty in
       DEfor (id, efrom, dir, eto, inv, dexpr muc denv e1)
   | Ptree.Eassign asl ->
       let mk_assign (e1,q,e2) =

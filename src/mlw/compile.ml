@@ -553,10 +553,10 @@ module Translate = struct
       let e1 = expr info e1 in
       let e2 = expr info e2 in
       ML.mk_expr (Mltree.Ewhile (e1, e2)) (Mltree.I e.e_ity) eff
-    | Efor (pv1, (pv2, To, pv3), _, efor) ->
+    | Efor (pv1, (pv2, To, pv3), _, _, efor) ->
       let efor = expr info efor in
       mk_for_to info pv1 pv2 pv3 efor eff
-    | Efor (pv1, (pv2, DownTo, pv3), _, efor) ->
+    | Efor (pv1, (pv2, DownTo, pv3), _, _, efor) ->
       let efor = expr info efor in
       mk_for_downto info pv1 pv2 pv3 efor eff
     | Eghost _ -> assert false

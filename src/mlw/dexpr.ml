@@ -453,11 +453,11 @@ and dfun_defn = preid * ghost * rs_kind * dbinder list *
 
 type denv = {
   frozen : dity list;
-  locals : (Stv.t option * dvty) Mstr.t;
+  locals : (bool * Stv.t option * dvty) Mstr.t;
   excpts : dxsymbol Mstr.t
 }
 
-let denv_contents d = d.locals
+let denv_names d = Mstr.domain d.locals
 
 let denv_empty = { frozen = []; locals = Mstr.empty; excpts = Mstr.empty }
 
@@ -487,19 +487,19 @@ let denv_add_exn { frozen = fz; locals = ls; excpts = xs } id dity =
   { frozen = freeze_dvty fz ([], dity); locals = ls; excpts = xs }
 
 let denv_add_mono { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (None, dvty) ls in
+  let ls = Mstr.add id.pre_name (false, None, dvty) ls in
   { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
 
 let denv_add_poly { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (Some (free_vars fz dvty), dvty) ls in
+  let ls = Mstr.add id.pre_name (false, Some (free_vars fz dvty), dvty) ls in
   { frozen = fz; locals = ls; excpts = xs }
 
 let denv_add_rec_mono { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (Some Stv.empty, dvty) ls in
+  let ls = Mstr.add id.pre_name (false, Some Stv.empty, dvty) ls in
   { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
 
 let denv_add_rec_poly { frozen = fz; locals = ls; excpts = xs } fz0 id dvty =
-  let ls = Mstr.add id.pre_name (Some (free_vars fz0 dvty), dvty) ls in
+  let ls = Mstr.add id.pre_name (false, Some (free_vars fz0 dvty), dvty) ls in
   { frozen = fz; locals = ls; excpts = xs }
 
 let denv_add_rec denv fz0 id ((argl,res) as dvty) =
@@ -515,6 +515,12 @@ let denv_add_rec denv fz0 id ((argl,res) as dvty) =
 
 let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
 
+let denv_add_for_index denv id dvty =
+  let dvty = [], dity_of_dvty dvty in
+  let { frozen = fz; locals = ls; excpts = xs } = denv in
+  let ls = Mstr.add id.pre_name (true, None, dvty) ls in
+  { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
+
 let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
   if fst dvty = [] then denv_add_mono denv id dvty else
   let rec is_value de = match de.de_node with
@@ -529,19 +535,19 @@ let denv_add_args { frozen = fz; locals = ls; excpts = xs } bl =
   let l = List.fold_left (fun l (_,_,t) -> t::l) fz bl in
   let add s (id,_,t) = match id with
     | Some {pre_name = n} ->
-        Mstr.add_new (Dterm.DuplicateVar n) n (None, ([],t)) s
+        Mstr.add_new (Dterm.DuplicateVar n) n (false, None, ([],t)) s
     | None -> s in
   let s = List.fold_left add Mstr.empty bl in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
 let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp =
   let l = Mstr.fold (fun _ t l -> t::l) dp.dp_vars fz in
-  let s = Mstr.map (fun t -> None, ([], t)) dp.dp_vars in
+  let s = Mstr.map (fun t -> false, None, ([], t)) dp.dp_vars in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
 let mk_node n = function
-  | Some tvs, dvty -> DEvar (n, specialize_scheme tvs dvty)
-  | None,     dvty -> DEvar (n, dvty)
+  | _, Some tvs, dvty -> DEvar (n, specialize_scheme tvs dvty)
+  | _, None,     dvty -> DEvar (n, dvty)
 
 let denv_get denv n =
   mk_node n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
@@ -566,9 +572,10 @@ let denv_pure denv get_dty =
         let f = Dterm.dty_fresh () in Htv.add ht v (f,d); f end
     | Dapp (s,dl,_) -> Dterm.dty_app s.its_ts (List.map fold dl)
     | Dutv v -> Dterm.dty_var v in
-  let pure_denv = Mstr.mapi (fun n (_, dvty) ->
-    Dterm.DTvar (n, fold (dity_of_dvty dvty))) denv.locals in
-  let dty = get_dty pure_denv in
+  let add n (idx, _, dvty) =
+    let dity = if idx then dity_int else dity_of_dvty dvty in
+    Dterm.DTvar (n, fold dity) in
+  let dty = get_dty (Mstr.mapi add denv.locals) in
   Htv.iter (fun v (f,_) ->
     try Dterm.dty_match f (ty_var v) with Exit -> ()) ht;
   let fnS s dl = dity_app_fresh (restore_its s) dl in
@@ -628,8 +635,8 @@ let drec_defn denv0 prel =
       "This function is expected to be polymorphic in type variable %a"
       Pretty.print_tv tv in
     begin match Mstr.find_opt id.pre_name denv1.locals with
-    | Some (Some tvs, _) -> Stv.iter check tvs
-    | Some (None, _) | None -> assert false
+    | Some (_, Some tvs, _) -> Stv.iter check tvs
+    | Some (_, None, _) | None -> assert false
     end;
     let argl = List.map (fun (_,_,t) -> t) bl in
     denv_add_poly denv id (argl, res) in
@@ -761,8 +768,9 @@ let dexpr ?loc node =
         dexpr_expected_type de2 dity_unit;
         dvty_unit
     | DEfor (_,de_from,_,de_to,_,de) ->
-        dexpr_expected_type de_from dity_int;
-        dexpr_expected_type de_to dity_int;
+        let bty = dity_fresh () in
+        dexpr_expected_type de_from bty;
+        dexpr_expected_type de_to bty;
         dexpr_expected_type de dity_unit;
         dvty_unit
     | DEtry (_,[]) ->
@@ -970,6 +978,7 @@ type env = {
   pvm : pvsymbol Mstr.t;
   xsm : xsymbol Mstr.t;
   old : (pvsymbol Mstr.t * (let_defn * pvsymbol) Hpv.t) Mstr.t;
+  idx : pvsymbol Mpv.t; (* external-to-internal loop indexes *)
   ghs : bool; (* we are under DEghost or in a ghost function *)
   lgh : bool; (* we are under let ghost c = <cexp> *)
   cgh : bool; (* we are under DEghost in a cexp *)
@@ -981,6 +990,7 @@ let env_empty = {
   pvm = Mstr.empty;
   xsm = Mstr.empty;
   old = Mstr.empty;
+  idx = Mpv.empty;
   ghs = false;
   lgh = false;
   cgh = false;
@@ -1010,7 +1020,10 @@ let find_old pvm (ovm,old) v =
 let register_old env v l =
   find_old env.pvm (Mstr.find_exn (UnboundLabel l) l env.old) v
 
-let get_later env later = later env.pvm env.xsm (register_old env)
+let get_later env later =
+  let pvm = if Mpv.is_empty env.idx then env.pvm else
+    Mstr.map (fun v -> Mpv.find_def v v env.idx) env.pvm in
+  later pvm env.xsm (register_old env)
 
 let add_label ({pvm = pvm; old = old} as env) l =
   let ht = Hpv.create 3 in
@@ -1306,9 +1319,13 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e_to = expr uloc env de_to in
       let v = create_pvsymbol id ity_int in
       let env = add_pvsymbol env v in
+      let i = if ity_equal v.pv_ity ity_int then v else
+        create_pvsymbol id ~ghost:true ity_int in
+      let env = if pv_equal i v then env else
+        { env with idx = Mpv.add v i env.idx } in
       let e = expr uloc env de in
       let inv = get_later env dinv in
-      e_for v e_from dir e_to (create_invariant inv) e
+      e_for v e_from dir e_to i (create_invariant inv) e
   | DEtry (de1,bl) ->
       let e1 = expr uloc env de1 in
       let add_branch m (xs,dp,de) =

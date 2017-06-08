@@ -499,7 +499,7 @@ let get_var denv v =
       ev, is_mutable
     with Not_found ->
       let l =
-        Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv) []
+        Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
       in
       Self.result "denv contains @[[%a]@]"
                   (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -1135,7 +1135,7 @@ and lval denv (host,offset) =
           get_var denv v
         with e ->
           let l =
-            Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv) []
+            Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
           in
           Self.result "denv contains @[[%a]@]"
                 (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -1474,7 +1474,7 @@ let fundecl denv_global fdec =
  *)
 (*
   let l =
-    Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv_global) []
+    Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv_global) []
   in
   Self.result "denv_global contains @[[%a]@]"
               (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -1482,7 +1482,7 @@ let fundecl denv_global fdec =
   let denv,def = Dexpr.drec_defn denv_global [predef] in
 (*
   let l =
-    Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv) []
+    Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
   in
   Self.result "denv contains @[[%a]@]"
               (Pp.print_list Pp.semi Format.pp_print_string) l;
@@ -1558,7 +1558,7 @@ let global (theories,lemmas,denv,functions) g =
      let denv = Dexpr.denv_add_let denv dlet_defn in
      Self.result "global var %s done" vi.vname;
      let l =
-       Stdlib.Mstr.fold (fun s (_a,_b) acc -> s :: acc) (Dexpr.denv_contents denv) []
+       Stdlib.Sstr.fold (fun s acc -> s :: acc) (Dexpr.denv_names denv) []
      in
      Self.result "denv contains @[[%a]@]"
                  (Pp.print_list Pp.semi Format.pp_print_string) l;

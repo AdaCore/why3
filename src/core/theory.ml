@@ -157,14 +157,15 @@ let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
 (** Theory *)
 
 type theory = {
-  th_name   : ident;        (* theory name *)
-  th_path   : string list;  (* environment qualifiers *)
-  th_decls  : tdecl list;   (* theory declarations *)
-  th_crcmap : Coercion.t;   (* implicit coercions *)
-  th_export : namespace;    (* exported namespace *)
-  th_known  : known_map;    (* known identifiers *)
-  th_local  : Sid.t;        (* locally declared idents *)
-  th_used   : Sid.t;        (* used theories *)
+  th_name   : ident;          (* theory name *)
+  th_path   : string list;    (* environment qualifiers *)
+  th_decls  : tdecl list;     (* theory declarations *)
+  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_crcmap : Coercion.t;     (* implicit coercions *)
+  th_export : namespace;      (* exported namespace *)
+  th_known  : known_map;      (* known identifiers *)
+  th_local  : Sid.t;          (* locally declared idents *)
+  th_used   : Sid.t;          (* used theories *)
 }
 
 and tdecl = {
@@ -264,6 +265,7 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_ranges : lsymbol Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -280,6 +282,7 @@ let empty_theory n p = {
   uc_name   = id_register n;
   uc_path   = p;
   uc_decls  = [];
+  uc_ranges = Mts.empty;
   uc_crcmap = Coercion.empty;
   uc_prefix = [];
   uc_import = [empty_ns];
@@ -294,6 +297,7 @@ let close_theory uc = match uc.uc_export with
     { th_name   = uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
+      th_ranges = uc.uc_ranges;
       th_crcmap = uc.uc_crcmap;
       th_export = e;
       th_known  = uc.uc_known;
@@ -348,7 +352,10 @@ let known_meta kn al =
   in
   List.iter check al
 
+(* FIXME: proper description *)
 let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
+
+exception RangeConflict of tysymbol
 
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
@@ -362,11 +369,20 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
+  | Meta (m,([MAts ts; MAls ls] as al)) when meta_equal m meta_range ->
+      known_meta uc.uc_known al;
+      let add b = match b with
+        | None -> Some ls
+        | Some s when ls_equal s ls -> b
+        | _ -> raise (RangeConflict ts) in
+      { uc with uc_ranges = Mts.change add ts uc.uc_ranges;
+                uc_decls = td :: uc.uc_decls }
   | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
       known_meta uc.uc_known al;
-      (* FIXME: shouldn't we add the meta to the theory? *)
-      { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls }
-  | Meta (_,al) -> known_meta uc.uc_known al;
+      { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls;
+                uc_decls = td :: uc.uc_decls }
+  | Meta (_,al) ->
+      known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
 (** Declarations *)
@@ -487,10 +503,13 @@ let create_use th = mk_tdecl (Use th)
 
 let use_export uc th =
   let uc = add_tdecl uc (create_use th) in
+  let comb ts s1 s2 = if ls_equal s1 s2 then Some s1
+                      else raise (RangeConflict ts) in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
       uc_export = merge_ns true  th.th_export e0 :: ste;
+      uc_ranges = Mts.union comb uc.uc_ranges th.th_ranges;
       uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
@@ -942,5 +961,8 @@ let () = Exn_printer.register
       Format.fprintf fmt "Metaproperty %s expects a %a argument but \
         is applied to %a"
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
+  | RangeConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for range type %s"
+        ts.ts_name.id_string
   | _ -> raise exn
   end
