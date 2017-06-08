@@ -296,12 +296,12 @@ and print_tnode pri fmt t = match t.t_node with
       fprintf fmt "false"
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
     when Slab.mem Term.asym_split f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a so@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
     when Slab.mem Term.asym_split f2.t_label ->
-      fprintf fmt (protect_on (pri > 2) "@[<hov 1>%a by@ %a@]")
-        (print_lterm 3) f1 (print_lterm 2) f2
+      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
+        (print_lterm 2) f1 (print_lterm 1) f2
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_split f1.t_label in
       let p = prio_binop b in

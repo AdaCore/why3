@@ -165,8 +165,7 @@
 %nonassoc DOT ELSE GHOST
 %nonassoc prec_named
 %nonassoc COLON (* weaker than -> because of t: a -> b *)
-%right ARROW LRARROW
-%right BY SO
+%right ARROW LRARROW BY SO
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
