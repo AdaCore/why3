@@ -458,6 +458,27 @@ let print_task args ?old:_ fmt task =
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."
 
+let rec print_term_intro tables fmt t =
+  match t.t_node with
+  | Tquant(Tforall,fq) ->
+      let vl,_tl,f = t_open_quant fq in
+      fprintf fmt "%a@\n@\n%a"
+              (print_list newline (print_vsty tables)) vl
+              (print_term_intro tables) f
+  | Tbinop(Timplies,f1,f2) ->
+      fprintf fmt "%a@\n@\n%a"
+              (print_term tables) f1
+              (print_term_intro tables) f2
+  | _ -> print_term tables fmt t
+
+(* do not forget these local names, they might be used by the itp *)
+(*      List.iter (forget_var tables) vl*)
+
+let print_goal tables fmt d =
+   match d.d_node with
+   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]" (print_term_intro tables) f
+   | _ -> assert false
+
 let print_sequent args ?old:_ fmt task =
   info := {info_syn = Discriminate.get_syntax_map task;
     itp = true};
@@ -467,8 +488,17 @@ let print_sequent args ?old:_ fmt task =
   (* let tables = build_name_tables task in *)
   let ut = Task.used_symbols (Task.used_theories task) in
   let ld = Task.local_decls task ut in
-  fprintf fmt "@[<v 0>%a@]"
-    (Pp.print_list Pp.newline (print_decl tables)) ld
+  let rec aux fmt l =
+    match l with
+      | [] -> assert false
+      | [g] ->
+         fprintf fmt "______________________________________@\n@\n";
+         print_goal tables fmt g
+      | d :: r ->
+         fprintf fmt "@[%a@]@\n" (print_decl tables) d;
+         aux fmt r
+  in
+  fprintf fmt "@[<v 0>%a@]" aux ld
 
 let () = register_printer "why3_itp" print_sequent
   ~desc:"Print@ the@ goal@ in@ a@ format@ dedicated@ to@ ITP."
