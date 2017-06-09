@@ -837,6 +837,7 @@ expr_block:
 
 expr_pure:
 | LEFTBRC qualid RIGHTBRC                           { Eidpur $2 }
+| uqualid DOT LEFTBRC ident_rich RIGHTBRC           { Eidpur (Qdot ($1, $4)) }
 
 expr_sub:
 | expr_block                                        { $1 }
@@ -1047,6 +1048,11 @@ quote_lident:
 
 (* Idents + symbolic operation names *)
 
+ident_rich:
+| uident        { $1 }
+| lident        { $1 }
+| lident_op_id  { $1 }
+
 lident_rich:
 | lident_nq     { $1 }
 | lident_op_id  { $1 }
@@ -1100,12 +1106,8 @@ prefix_op:
 (* Qualified idents *)
 
 qualid:
-| uident                    { Qident $1 }
-| lident                    { Qident $1 }
-| lident_op_id              { Qident $1 }
-| uqualid DOT uident        { Qdot ($1, $3) }
-| uqualid DOT lident        { Qdot ($1, $3) }
-| uqualid DOT lident_op_id  { Qdot ($1, $3) }
+| ident_rich                { Qident $1 }
+| uqualid DOT ident_rich    { Qdot ($1, $3) }
 
 lqualid_rich:
 | lident                    { Qident $1 }
