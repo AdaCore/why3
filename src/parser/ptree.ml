@@ -142,6 +142,7 @@ and expr_desc =
   | Ematch of expr * (pattern * expr) list
   | Eabsurd
   | Epure of term
+  | Eidpur of qualid
   | Eraise of qualid * expr option
   | Eexn of ident * pty * Ity.mask * expr
   | Etry of expr * (qualid * pattern option * expr) list

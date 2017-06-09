@@ -1222,9 +1222,10 @@ let ambig_ls s =
 
 let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
-let print_apply pri print s id fmt vl = match extract_op id, vl with
+let print_capp pri ({rs_name = id} as s) fmt vl =
+  match extract_op id, vl with
   | _, [] ->
-      print fmt s
+      print_rs fmt s
   | Some o, [t1] when tight_op o ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
   | Some o, [t1] when String.get id.id_string 0 = 'p' ->
@@ -1249,11 +1250,29 @@ let print_apply pri print s id fmt vl = match extract_op id, vl with
         print_pv t1 print_pv t2 print_pv t3
   | _, tl ->
       fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print s (Pp.print_list Pp.space print_pv) tl
+        print_rs s (Pp.print_list Pp.space print_pv) tl
 
-let print_capp pri s fmt vl = print_apply pri print_rs s s.rs_name fmt vl
-
-let print_cpur pri s fmt vl = print_apply pri print_ls s s.ls_name fmt vl
+let print_cpur pri ({ls_name = id} as s) fmt vl =
+  let op = match extract_op id, vl with
+    | Some o, [_] when tight_op o -> Some o
+    | Some o, [_] when String.get id.id_string 0 = 'p' -> Some (o ^ "_")
+    | Some o, [_;_] -> Some o
+    | _, [_;_] when id.id_string = "mixfix []" -> Some "[]"
+    | _, [_;_;_] when id.id_string = "mixfix [<-]" -> Some "[<-]"
+    | _, [_;_;_] when id.id_string = "mixfix []<-" -> Some "[]<-"
+    | _, [_;_] when id.id_string = "mixfix [_..]" -> Some "[_..]"
+    | _, [_;_] when id.id_string = "mixfix [.._]" -> Some "[.._]"
+    | _, [_;_;_] when id.id_string = "mixfix [_.._]" -> Some "[_.._]"
+    | _ -> None in
+  match op, vl with
+  | None, [] ->
+      fprintf fmt "{%a}" print_ls s
+  | None, tl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{%a}@ %a@]")
+        print_ls s (Pp.print_list Pp.space print_pv) tl
+  | Some o, tl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{(%s)}@ %a@]")
+        o (Pp.print_list Pp.space print_pv) tl
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
 

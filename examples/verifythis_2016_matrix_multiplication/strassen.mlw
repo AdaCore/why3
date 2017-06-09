@@ -41,7 +41,7 @@ module MatrixMultiplication
    done
 
   let ghost function mdl (m: matrix 'a) : mat {'a} =
-    create m.rows m.columns m.elts
+    {create} m.rows m.columns m.elts
 
   type with_symb = {
     phy : matrix int;

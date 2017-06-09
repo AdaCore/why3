@@ -40,11 +40,11 @@ end
 
 
 module Compiler
-  
+
   use export list.Append
   use import Expr
   use import StackMachine
-  
+
   function compile (e:expr) : list asm =
     match e with
     | Cte n -> Cons (Push n) Nil
@@ -57,19 +57,19 @@ module Compiler
     variant { e }
     ensures { compute s (compile e ++ r) = compute (Cons (eval_expr e) s) r }
   = match e with
-    | Cte n -> 
+    | Cte n ->
       assert { compile e ++ r = Cons (Push n) r }
     | Plus e1 e2 ->
-      soundness_gen e1 s (compile e2 ++ Cons Add r);
-      soundness_gen e2 (Cons (eval_expr e1) s) (Cons Add r)
+      soundness_gen e1 s ({compile} e2 ++ Cons Add r);
+      soundness_gen e2 (Cons ({eval_expr} e1) s) (Cons Add r)
     | Minus e1 e2 ->
-      soundness_gen e1 s (compile e2 ++ Cons Sub r);
-      soundness_gen e2 (Cons (eval_expr e1) s) (Cons Sub r)
+      soundness_gen e1 s ({compile} e2 ++ Cons Sub r);
+      soundness_gen e2 (Cons ({eval_expr} e1) s) (Cons Sub r)
     | Mult e1 e2 ->
-      soundness_gen e1 s (compile e2 ++ Cons Mul r);
-      soundness_gen e2 (Cons (eval_expr e1) s) (Cons Mul r)
+      soundness_gen e1 s ({compile} e2 ++ Cons Mul r);
+      soundness_gen e2 (Cons ({eval_expr} e1) s) (Cons Mul r)
     end
-  
+
   let lemma soundness (e:expr)
     ensures { compute Nil (compile e) = (Cons (eval_expr e) Nil) }
   =

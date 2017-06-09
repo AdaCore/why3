@@ -2,16 +2,17 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../mergesort_list.mlw">
-<theory name="Elt" sum="403e014472ba93c4b824751bd7b01ef2">
+<file name="../mergesort_list.mlw" expanded="true">
+<theory name="Elt" sum="403e014472ba93c4b824751bd7b01ef2" expanded="true">
  <goal name="Transitive.Trans">
  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="Merge" sum="f9c17c7e1de58560fc454d31e0d93ed2">
+<theory name="Merge" sum="f924d65c20a03d709b97b371c8333eeb" expanded="true">
  <goal name="VC merge" expl="VC for merge">
  <transf name="split_goal_wp">
   <goal name="VC merge.1" expl="1. variant decrease">
@@ -48,26 +49,26 @@
   <goal name="VC merge.6" expl="6. postcondition">
   <transf name="split_goal_wp">
    <goal name="VC merge.6.1" expl="1. postcondition">
-   <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
    <goal name="VC merge.6.2" expl="2. postcondition">
-   <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="10"/></proof>
    </goal>
    <goal name="VC merge.6.3" expl="3. postcondition">
-   <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
    <goal name="VC merge.6.4" expl="4. postcondition">
-   <proof prover="4"><result status="valid" time="0.04" steps="159"/></proof>
+   <proof prover="4"><result status="valid" time="0.00" steps="160"/></proof>
    </goal>
    <goal name="VC merge.6.5" expl="5. postcondition">
-   <proof prover="4"><result status="valid" time="3.55" steps="2986"/></proof>
+   <proof prover="4"><result status="valid" time="2.58" steps="3024"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EfficientMerge" sum="d0c3450decf8289ab31a8ac260c98f4b">
+<theory name="EfficientMerge" sum="6eb8d1c442be735442860239d61f2bbc" expanded="true">
  <goal name="sorted_reverse_cons">
  <proof prover="4"><result status="valid" time="0.29" steps="913"/></proof>
  </goal>
@@ -80,10 +81,10 @@
   <proof prover="4"><result status="valid" time="0.10" steps="407"/></proof>
   </goal>
   <goal name="VC merge_aux.3" expl="3. precondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="184"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="242"/></proof>
   </goal>
   <goal name="VC merge_aux.4" expl="4. precondition">
-  <proof prover="4"><result status="valid" time="0.42" steps="1704"/></proof>
+  <proof prover="4"><result status="valid" time="0.42" steps="2237"/></proof>
   </goal>
   <goal name="VC merge_aux.5" expl="5. variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
@@ -95,13 +96,13 @@
   <proof prover="4"><result status="valid" time="0.04" steps="249"/></proof>
   </goal>
   <goal name="VC merge_aux.8" expl="8. precondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="187"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="265"/></proof>
   </goal>
   <goal name="VC merge_aux.9" expl="9. postcondition">
   <proof prover="4"><result status="valid" time="0.21" steps="1268"/></proof>
   </goal>
   <goal name="VC merge_aux.10" expl="10. postcondition">
-  <proof prover="4"><result status="valid" time="4.06" steps="6049"/></proof>
+  <proof prover="4"><result status="valid" time="2.78" steps="6071"/></proof>
   </goal>
  </transf>
  </goal>
@@ -109,7 +110,7 @@
  <proof prover="4"><result status="valid" time="0.04" steps="129"/></proof>
  </goal>
 </theory>
-<theory name="Mergesort" sum="99588774bad710dd6b1479b3d74a50dd">
+<theory name="Mergesort" sum="414695c46338bdb5ecfa31009cede75d" expanded="true">
  <goal name="VC split" expl="VC for split">
  <transf name="split_goal_wp">
   <goal name="VC split.1" expl="1. variant decrease">
@@ -119,22 +120,12 @@
   <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="VC split.3" expl="3. postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="20"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.88"/></proof>
   </goal>
-  <goal name="VC split.4" expl="4. postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC split.4.1" expl="1. VC for split">
-   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
-   </goal>
-   <goal name="VC split.4.2" expl="2. VC for split">
-   <proof prover="1"><result status="valid" time="1.24"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC split.5" expl="5. precondition">
+  <goal name="VC split.4" expl="4. precondition">
   <proof prover="4"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="VC split.6" expl="6. postcondition">
+  <goal name="VC split.5" expl="5. postcondition">
   <proof prover="4"><result status="valid" time="0.04" steps="135"/></proof>
   </goal>
  </transf>
@@ -143,7 +134,7 @@
  <proof prover="4"><result status="valid" time="0.58" steps="1098"/></proof>
  </goal>
 </theory>
-<theory name="OCamlMergesort" sum="204bcc57c7f05bfe18249a6a6f36cdcf">
+<theory name="OCamlMergesort" sum="966dd2d841fe70657e8048f013049038" expanded="true">
  <goal name="sorted_reverse_cons">
  <proof prover="4"><result status="valid" time="0.34" steps="913"/></proof>
  </goal>
@@ -159,10 +150,10 @@
   <proof prover="4"><result status="valid" time="0.09" steps="407"/></proof>
   </goal>
   <goal name="VC rev_merge.3" expl="3. precondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="187"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="242"/></proof>
   </goal>
   <goal name="VC rev_merge.4" expl="4. precondition">
-  <proof prover="4"><result status="valid" time="0.57" steps="1700"/></proof>
+  <proof prover="4"><result status="valid" time="0.57" steps="2242"/></proof>
   </goal>
   <goal name="VC rev_merge.5" expl="5. variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
@@ -171,16 +162,16 @@
   <proof prover="4"><result status="valid" time="0.13" steps="416"/></proof>
   </goal>
   <goal name="VC rev_merge.7" expl="7. precondition">
-  <proof prover="4"><result status="valid" time="0.07" steps="247"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="249"/></proof>
   </goal>
   <goal name="VC rev_merge.8" expl="8. precondition">
-  <proof prover="4"><result status="valid" time="0.05" steps="190"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="265"/></proof>
   </goal>
   <goal name="VC rev_merge.9" expl="9. postcondition">
   <proof prover="4"><result status="valid" time="0.03" steps="166"/></proof>
   </goal>
   <goal name="VC rev_merge.10" expl="10. postcondition">
-  <proof prover="4"><result status="valid" time="3.54" steps="5273"/></proof>
+  <proof prover="4"><result status="valid" time="2.48" steps="5274"/></proof>
   </goal>
  </transf>
  </goal>
@@ -199,10 +190,10 @@
   <proof prover="4"><result status="valid" time="0.10" steps="382"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.3" expl="3. precondition">
-  <proof prover="4"><result status="valid" time="0.06" steps="278"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="306"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.4" expl="4. precondition">
-  <proof prover="4"><result status="valid" time="0.08" steps="285"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="340"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.5" expl="5. variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
@@ -211,10 +202,10 @@
   <proof prover="4"><result status="valid" time="0.10" steps="377"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.7" expl="7. precondition">
-  <proof prover="4"><result status="valid" time="0.07" steps="278"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="558"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.8" expl="8. precondition">
-  <proof prover="4"><result status="valid" time="0.07" steps="272"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="323"/></proof>
   </goal>
   <goal name="VC rev_merge_rev.9" expl="9. postcondition">
   <proof prover="4"><result status="valid" time="0.56" steps="2185"/></proof>
@@ -222,19 +213,19 @@
   <goal name="VC rev_merge_rev.10" expl="10. postcondition">
   <transf name="split_goal_wp">
    <goal name="VC rev_merge_rev.10.1" expl="1. postcondition">
-   <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
    <goal name="VC rev_merge_rev.10.2" expl="2. postcondition">
-   <proof prover="4"><result status="valid" time="0.17" steps="154"/></proof>
+   <proof prover="4"><result status="valid" time="0.10" steps="157"/></proof>
    </goal>
    <goal name="VC rev_merge_rev.10.3" expl="3. postcondition">
-   <proof prover="4"><result status="valid" time="0.09" steps="120"/></proof>
+   <proof prover="4"><result status="valid" time="0.08" steps="122"/></proof>
    </goal>
    <goal name="VC rev_merge_rev.10.4" expl="4. postcondition">
-   <proof prover="4"><result status="valid" time="0.10" steps="165"/></proof>
+   <proof prover="4"><result status="valid" time="0.17" steps="165"/></proof>
    </goal>
    <goal name="VC rev_merge_rev.10.5" expl="5. postcondition">
-   <proof prover="4"><result status="valid" time="0.24" steps="224"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="224"/></proof>
    </goal>
   </transf>
   </goal>
@@ -294,7 +285,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="VC sort.15" expl="15. precondition">
-  <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="VC sort.16" expl="16. postcondition">
   <proof prover="4"><result status="valid" time="0.08" steps="510"/></proof>
@@ -302,22 +293,31 @@
   <goal name="VC sort.17" expl="17. postcondition">
   <transf name="split_goal_wp">
    <goal name="VC sort.17.1" expl="1. postcondition">
-   <proof prover="4"><result status="valid" time="0.41" steps="998"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="195"/></proof>
    </goal>
    <goal name="VC sort.17.2" expl="2. postcondition">
-   <proof prover="4"><result status="valid" time="3.00" steps="994"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="90"/></proof>
    </goal>
    <goal name="VC sort.17.3" expl="3. postcondition">
-   <proof prover="1"><result status="valid" time="3.12"/></proof>
+   <proof prover="4"><result status="valid" time="1.94" steps="1304"/></proof>
    </goal>
    <goal name="VC sort.17.4" expl="4. postcondition">
-   <proof prover="4"><result status="valid" time="4.16" steps="1324"/></proof>
+   <proof prover="4"><result status="valid" time="2.76" steps="812"/></proof>
    </goal>
    <goal name="VC sort.17.5" expl="5. postcondition">
-   <proof prover="1"><result status="valid" time="3.00"/></proof>
+   <proof prover="4"><result status="valid" time="2.48" steps="557"/></proof>
    </goal>
    <goal name="VC sort.17.6" expl="6. postcondition">
-   <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
+   <proof prover="4"><result status="valid" time="2.62" steps="1641"/></proof>
+   </goal>
+   <goal name="VC sort.17.7" expl="7. postcondition">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.68"/></proof>
+   </goal>
+   <goal name="VC sort.17.8" expl="8. postcondition">
+   <proof prover="0"><result status="valid" time="5.61"/></proof>
+   </goal>
+   <goal name="VC sort.17.9" expl="9. postcondition">
+   <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
   </transf>
   </goal>
@@ -365,32 +365,41 @@
   <proof prover="4"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="VC rev_sort.14" expl="14. precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC rev_sort.15" expl="15. precondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC rev_sort.16" expl="16. postcondition">
-  <proof prover="4"><result status="valid" time="4.41" steps="14782"/></proof>
+  <proof prover="4"><result status="valid" time="4.41" steps="14781"/></proof>
   </goal>
   <goal name="VC rev_sort.17" expl="17. postcondition">
   <transf name="split_goal_wp">
    <goal name="VC rev_sort.17.1" expl="1. postcondition">
-   <proof prover="4"><result status="valid" time="0.52" steps="1009"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="200"/></proof>
    </goal>
    <goal name="VC rev_sort.17.2" expl="2. postcondition">
-   <proof prover="5"><result status="valid" time="1.38"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="92"/></proof>
    </goal>
    <goal name="VC rev_sort.17.3" expl="3. postcondition">
-   <proof prover="1"><result status="valid" time="3.12"/></proof>
+   <proof prover="4"><result status="valid" time="2.42" steps="822"/></proof>
    </goal>
    <goal name="VC rev_sort.17.4" expl="4. postcondition">
-   <proof prover="5"><result status="valid" time="1.36"/></proof>
+   <proof prover="4"><result status="valid" time="2.44" steps="819"/></proof>
    </goal>
    <goal name="VC rev_sort.17.5" expl="5. postcondition">
-   <proof prover="1"><result status="valid" time="3.08"/></proof>
+   <proof prover="0"><result status="valid" time="1.66"/></proof>
    </goal>
    <goal name="VC rev_sort.17.6" expl="6. postcondition">
+   <proof prover="4"><result status="valid" time="2.76" steps="1136"/></proof>
+   </goal>
+   <goal name="VC rev_sort.17.7" expl="7. postcondition">
+   <proof prover="0"><result status="valid" time="1.75"/></proof>
+   </goal>
+   <goal name="VC rev_sort.17.8" expl="8. postcondition">
+   <proof prover="0"><result status="valid" time="1.76"/></proof>
+   </goal>
+   <goal name="VC rev_sort.17.9" expl="9. postcondition">
    <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
   </transf>
@@ -426,10 +435,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
   <goal name="VC mergesort.3" expl="3. postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="VC mergesort.4" expl="4. postcondition">
-  <proof prover="4"><result status="valid" time="0.02" steps="18"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
  </transf>
  </goal>

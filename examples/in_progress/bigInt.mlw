@@ -222,7 +222,7 @@ module N
             res := one;
             raise Break
           end;
-        acc := !acc + power base (to_int !i) * to_int x[!i];
+        acc := !acc + power {base} (to_int !i) * to_int x[!i];
       done;
       raise Break
     with Break -> !res

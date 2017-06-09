@@ -38,7 +38,7 @@ module SimplePrioriyQueue
   let create (n: int) (dummy: elt) : t
     requires { 0 <= n }
     ensures  {result. size = 0 }
-  = { elems = Array.make n dummy; size = 0; h = 0; bag = empty_bag }
+  = { elems = Array.make n dummy; size = 0; h = 0; bag = {empty_bag} }
 
   predicate is_empty (q: t) = q.size = 0
 
@@ -54,7 +54,7 @@ module SimplePrioriyQueue
     else if priority x > priority q.elems[q.h] then
       q.h <- q.size;
     q.size <- q.size + 1;
-    q.bag <- add x q.bag
+    q.bag <- {add} x q.bag
 
   let highest (q: t) : elt
     requires { not (is_empty q) }
@@ -82,7 +82,7 @@ module SimplePrioriyQueue
         if p > !m then begin q.h <- i; m := p end
       done
     end;
-    q.bag <- diff q.bag (singleton r);
+    q.bag <- pure { diff q.bag (singleton r) };
     r
 
 end
