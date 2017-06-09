@@ -589,7 +589,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let qualid_app loc q el =
-    expr_app loc (DEsym (find_prog_symbol muc q)) el
+    let e = try DEsym (find_prog_symbol muc q) with
+      | _ -> DEls_pure (find_lsymbol muc.muc_theory q) in
+    expr_app loc e el
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->
@@ -600,8 +602,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   in
   let qualid_app_pure loc q el =
     let e = match find_global_pv muc q with
-      | None -> DEls_pure (find_lsymbol muc.muc_theory q)
-      | Some v -> DEpv_pure v in
+      | Some v -> DEpv_pure v
+      | None -> DEls_pure (find_lsymbol muc.muc_theory q) in
     expr_app loc e el
   in
   let qualid_app_pure loc q el = match q with
