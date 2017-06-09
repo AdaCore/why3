@@ -524,9 +524,9 @@ let rec tr_positive p = match kind_of_term p with
   | _ ->
       raise NotArithConstant
 
-let const_of_big_int is_negative b =
+let const_of_big_int is_neg b =
   Term.t_const
-    (Number.(ConstInt { ic_negative = is_negative ;
+    (Number.(ConstInt { ic_negative = is_neg ;
          ic_abs = Number.int_const_dec (Big_int.string_of_big_int b) }))
     ty_int
 

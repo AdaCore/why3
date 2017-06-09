@@ -37,6 +37,11 @@ type constant =
   | ConstInt  of integer_constant
   | ConstReal of real_constant
 
+let is_negative c =
+  match c with
+  | ConstInt i -> i.ic_negative
+  | ConstReal r -> r.rc_negative
+
 exception InvalidConstantLiteral of int * string
 let invalid_constant_literal n s = raise (InvalidConstantLiteral(n,s))
 

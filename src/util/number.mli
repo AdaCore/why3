@@ -39,6 +39,8 @@ type constant =
   | ConstInt  of integer_constant
   | ConstReal of real_constant
 
+val is_negative : constant -> bool
+
 val int_const_dec : string -> integer_literal
 val int_const_hex : string -> integer_literal
 val int_const_oct : string -> integer_literal
