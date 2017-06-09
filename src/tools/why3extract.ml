@@ -273,19 +273,16 @@ let find_decl mm id =
   let m = translate_module m in
   Ident.Mid.find id m.Mltree.mod_known
 
-let rec visit_mem mm id =
+let rec visit mm id =
   if not (Ident.Hid.mem visited id) then begin
     try
       let d = find_decl mm id in
       Ident.Hid.add visited id ();
-      ML.iter_deps (visit_mem mm) d;
+      if opt_rec_single = Recursive then
+        ML.iter_deps (visit mm) d;
       toextract := id :: !toextract
     with Not_found -> ()
   end
-
-let visit mm id =
-  if opt_rec_single = Recursive then visit_mem mm id
-  else toextract := id :: !toextract
 
 let flat_extraction mm = function
   | File fname ->
@@ -318,7 +315,7 @@ let () =
     | Flat ->
       let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
       let visit_m _ m = let tm = translate_module m in
-        Ident.Mid.iter (fun id _ -> visit_mem mm id) tm.Mltree.mod_known in
+        Ident.Mid.iter (fun id _ -> visit mm id) tm.Mltree.mod_known in
       Mstr.iter visit_m mm;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let cout = match opt_output with
