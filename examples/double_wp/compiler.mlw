@@ -34,7 +34,7 @@ module Compile_aexpr
       | Asub a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --  $ isubf ()
       | Amul a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --  $ imulf ()
       end in
-      hoare {trivial_pre} c ({aexpr_post} a c.wcode.length)
+      hoare trivial_pre c (aexpr_post a c.wcode.length)
 
   (* Check that the above specification indeed implies the
      natural one. *)
@@ -83,7 +83,7 @@ module Compile_bexpr
     | Bfalse     -> $ if cond then inil () else ibranchf ofs
     | Bnot b1    -> $ compile_bexpr b1 (not cond) ofs
     | Band b1 b2 ->
-      let c2  = $ compile_bexpr b2 cond ofs % {exec_cond} b1 true in
+      let c2  = $ compile_bexpr b2 cond ofs % exec_cond b1 true in
       let ofs = if cond then length c2.wcode else ofs + length c2.wcode in
       $ compile_bexpr b1 false ofs -- c2
     | Beq a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --
@@ -91,9 +91,8 @@ module Compile_bexpr
     | Ble a1 a2 -> $ compile_aexpr a1 -- $ compile_aexpr a2 --
                    $ if cond then iblef ofs else ibgtf ofs
     end in
-    let ghost post =
-      {bexpr_post} b cond (c.wcode.length + ofs) c.wcode.length in
-    hoare {trivial_pre} c post
+    let ghost post = bexpr_post b cond (c.wcode.length + ofs) c.wcode.length in
+    hoare trivial_pre c post
 
   (* Check that the above specification implies the natural one. *)
   let compile_bexpr_natural (b:bexpr) (cond:bool) (ofs:ofs) : code
@@ -147,11 +146,11 @@ module Compile_com
   meta rewrite_def function loop_invariant
 
   function loop_variant (c:com) (test:bexpr) : post 'a =
-    fun _ _ msj msi -> let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
+    fun _ _ msj msi -> let VMS pj sj mj = msj in let VMS pi si mi = msi in
        ceval mi c mj /\ beval mi test
   lemma loop_variant_lemma : forall c test,x:'a,p msj msi.
     loop_variant c test x p msj msi =
-      let VMS _pj _sj mj = msj in let VMS _pi _si mi = msi in
+      let VMS pj sj mj = msj in let VMS pi si mi = msi in
       ceval mi c mj /\ beval mi test
   meta rewrite lemma loop_variant_lemma
 
@@ -175,20 +174,20 @@ module Compile_com
     | Cif cond cmd1 cmd2 -> let code_false = compile_com cmd2 in
       let code_true = $ compile_com cmd1 -- $ ibranchf code_false.code.length in
       $ compile_bexpr cond false code_true.wcode.length --
-      (code_true % {exec_cond} cond true) --
-      ($ code_false % {exec_cond_old} cond false)
+      (code_true % exec_cond cond true) --
+      ($ code_false % exec_cond_old cond false)
     | Cwhile test body  ->
       let code_body = compile_com body in
       let body_length = length code_body.code + 1 in
       let code_test = compile_bexpr test false body_length in
       let ofs = length code_test.code + body_length in
       let wp_while = $ code_test --
-          ($ code_body -- $ ibranchf (- ofs)) % {exec_cond} test true in
-      let ghost inv = {loop_invariant} cmd in
-      let ghost var = {loop_variant} body test in
-      $ inil () -- make_loop wp_while inv ({exec_cond} test true) var
+          ($ code_body -- $ ibranchf (- ofs)) % exec_cond test true in
+      let ghost inv = loop_invariant cmd in
+      let ghost var = loop_variant body test in
+      $ inil () -- make_loop wp_while inv (exec_cond test true) var
     end in
-    hoare ({com_pre} cmd) res ({com_post} cmd res.wcode.length)
+    hoare (com_pre cmd) res (com_post cmd res.wcode.length)
 
   (* Get back to natural specification for the compiler. *)
   let compile_com_natural (com: com) : code

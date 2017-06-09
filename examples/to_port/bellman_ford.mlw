@@ -210,7 +210,7 @@ module BellmanFord
       while not (S.is_empty es) do
         invariant { subset es.S.contents edges /\ inv1 m i (diff edges es.S.contents) }
         variant   { S.cardinal es }
-        let ghost via = pure { diff edges es.S.contents } in
+        let ghost via = diff edges es.S.contents in
         let (u, v) = S.choose_and_remove es in
         relax m u v i via
       done;

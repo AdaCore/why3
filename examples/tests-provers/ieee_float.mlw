@@ -25,7 +25,7 @@ module M603_018
     requires { roundToIntegral RTN z = x }
     requires { roundToIntegral RTP z = y }
   =
-    let t = pure {(x .+ y) ./ (2.0:t)} in
+    let t = (x .+ y) ./ (2.0:t) in
     assert { roundToIntegral RTN x .= x };
     assert { roundToIntegral RTN y .= y };
     assert { roundToIntegral RTN z .= x };
@@ -86,7 +86,7 @@ module M121_039_nonlinear
     assert { x .+ y .* a .>= x .+ y };
     assert { x .+ y .>= zeroF };
     assert { x .+ y .* a .>= zeroF };
-    pure { x .+ y .* a }
+    x .+ y .* a
 
 end
 
@@ -101,6 +101,6 @@ module LB09_025_conversion
     ensures  { of_int RNE result .<= x .+ (of_int RNE 1) }
     ensures  { result = to_int RNE x }
   =
-    {to_int} RNE x
+    to_int RNE x
 
 end

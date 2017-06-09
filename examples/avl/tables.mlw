@@ -135,7 +135,7 @@ module MapBase
     requires { selection_possible () s /\ domain s k }
     ensures { forall i. 0 <= i < length s /\ CO.eq s[i].key k -> result = s[i] }
   = let j = ref 0 in
-    while not {CO.eq} s[!j].key k do
+    while not CO.eq s[!j].key k do
       invariant { 0 <= !j < length s }
       invariant { CO.le s[!j].key k }
       variant { length s - !j }

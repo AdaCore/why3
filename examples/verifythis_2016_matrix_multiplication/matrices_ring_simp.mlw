@@ -34,7 +34,7 @@ module Symb
     = match l with
       | Nil -> absurd
       | Cons _ Nil -> ()
-      | Cons x q -> l_mdl_ok f ({cols} (f x)) c q
+      | Cons x q -> l_mdl_ok f (cols (f x)) c q
       end
     function m_mdl (f:int -> mat int) (m:mono) : mat int =
       let m0 = l_mdl f m.m_prod in
@@ -118,11 +118,11 @@ module Symb
       requires { r >= 0 /\ c >= 0 }
       ensures { result = m_collapse l m /\ lm_vld f r c result }
       ensures { lm_mdl f r c result = add (lm_mdl f r c l) (m_mdl f m) }
-    = let res = pure { m_collapse l m } in
+    = let res = m_collapse l m in
       match l with
       | Nil -> ()
       | Cons x q ->
-        if not x.m_pos && m.m_pos && {l_compare} m.m_prod x.m_prod = 0
+        if not x.m_pos && m.m_pos && l_compare m.m_prod x.m_prod = 0
         then begin
           l_compare_zero m.m_prod x.m_prod;
           assert { lm_mdl f r c q =
@@ -185,7 +185,7 @@ module Symb
     = match l with
       | Nil -> (acc, Nil)
       | Cons y q ->
-        if {m_lower} x y then (acc, l)
+        if m_lower x y then (acc, l)
         else lm_dump_ok f r c x (m_collapse_ok f r c acc y) q
       end
 
@@ -226,7 +226,7 @@ module Symb
     = match l1, l2 with
       | Nil, _ | _, Nil -> absurd
       | Cons x Nil, _ -> Cons x l2
-      | Cons x q, _ -> Cons x (cat_ok f ({cols} (f x)) k c q l2)
+      | Cons x q, _ -> Cons x (cat_ok f (cols (f x)) k c q l2)
       end
 
     function m_mul (m1 m2:mono) : mono =
@@ -328,7 +328,7 @@ module Symb
 
   let ghost symb_env () : env
     ensures { result.ev_c --> 0 }
-  = { ev_f = {LOCAL.empty}; ev_c = 0 }
+  = { ev_f = LOCAL.empty; ev_c = 0 }
 
   function symb_mat (m:mat int) (n:int) : expr =
     { e_rows = m.rows; e_cols = m.cols;
@@ -341,8 +341,8 @@ module Symb
     ensures { result --> symb_mat m (old env.ev_c) }
     ensures { e_vld env result }
   = let id = env.ev_c in
-    env.ev_f <- {extends} env.ev_f id m; env.ev_c <- id + 1;
-    {symb_mat} m id
+    env.ev_f <- extends env.ev_f id m; env.ev_c <- id + 1;
+    symb_mat m id
 
   function symb_opp (e:expr) : expr =
     { e_rows = e.e_rows; e_cols = e.e_cols; e_body = LOCAL.lm_opp e.e_body }

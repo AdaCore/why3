@@ -328,7 +328,7 @@ module InPlaceRevSeq
   = if length pM > 0 then begin
       let h = pM[0] in
       let t = pM[1 .. ] in
-      if {mem} h t then
+      if mem h t then
          (* absurd case *)
          let (l1,l2) = mem_decomp h t in
          list_seg_sublistl next (cons h l1) l2 p h;

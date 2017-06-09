@@ -23,7 +23,7 @@ module VM_instr_spec
     ensures { result.pre --> pre }
     ensures { result.post --> ifun_post f }
     ensures { result.code --> code_f }
-  = let res = { pre = pre; code = code_f; post = {ifun_post} f } in
+  = let res = { pre = pre; code = code_f; post = ifun_post f } in
     assert { forall x p ms. res.pre x p ms ->
       not (exists ms' : machine_state. res.post x p ms ms' /\
         contextual_irrelevance res.code p ms ms') ->
@@ -43,9 +43,7 @@ module VM_instr_spec
     ensures { result.pre --> trivial_pre }
     ensures { result.post --> iconst_post n }
     ensures { result.code.length --> 1 }
-  = hoare {trivial_pre}
-          ($ ifunf {trivial_pre} n.iconst n.{iconst_fun})
-          n.{iconst_post}
+  = hoare trivial_pre ($ ifunf trivial_pre n.iconst n.iconst_fun) n.iconst_post
 
   (* Ivar spec *)
   function ivar_post (x:id) : post 'a =
@@ -60,9 +58,7 @@ module VM_instr_spec
     ensures { result.pre --> trivial_pre }
     ensures { result.post --> ivar_post x }
     ensures { result.code.length --> 1 }
-  = hoare {trivial_pre}
-          ($ ifunf {trivial_pre} x.ivar x.{ivar_fun})
-          x.{ivar_post}
+  = hoare trivial_pre ($ ifunf trivial_pre x.ivar x.ivar_fun) x.ivar_post
 
   (* Binary arithmetic operators specification (Iadd, Isub, Imul)
      via a generic builder. *)
@@ -91,9 +87,7 @@ module VM_instr_spec
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> ibinop_post op }
     ensures { result.code.length --> code_b.length }
-  = hoare {ibinop_pre}
-          ($ ifunf {ibinop_pre} code_b op.{ibinop_fun})
-          op.{ibinop_post}
+  = hoare ibinop_pre ($ ifunf ibinop_pre code_b op.ibinop_fun) op.ibinop_post
 
   constant plus : binop = fun x y -> x + y
   meta rewrite_def function plus
@@ -108,19 +102,19 @@ module VM_instr_spec
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> ibinop_post plus }
     ensures { result.code.length --> 1 }
-  = create_binop iadd {plus}
+  = create_binop iadd plus
 
   let isubf () : hl 'a
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> ibinop_post sub }
     ensures { result.code.length --> 1 }
-  = create_binop isub {sub}
+  = create_binop isub sub
 
   let imulf () : hl 'a
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> ibinop_post mul }
     ensures { result.code.length --> 1 }
-  = create_binop imul {mul}
+  = create_binop imul mul
 
   (* Inil spec *)
   function inil_post : post 'a =
@@ -131,7 +125,7 @@ module VM_instr_spec
     ensures { result.pre --> trivial_pre }
     ensures { result.post --> inil_post }
     ensures { result.code.length --> 0 }
-  = { pre = {trivial_pre}; code = Nil; post = {inil_post} }
+  = { pre = trivial_pre; code = Nil; post = inil_post }
 
   (* Ibranch specification *)
   function ibranch_post (ofs: ofs) : post 'a =
@@ -146,8 +140,8 @@ module VM_instr_spec
     ensures { result.pre --> trivial_pre }
     ensures { result.post --> ibranch_post ofs }
     ensures { result.code.length --> 1 }
-  = let cf = $ ifunf {trivial_pre} ofs.ibranch ofs.{ibranch_fun} in
-    hoare {trivial_pre} cf ofs.{ibranch_post}
+  = let cf = $ ifunf trivial_pre (ibranch ofs) (ibranch_fun ofs) in
+    hoare trivial_pre cf (ibranch_post ofs)
 
   (* Conditional jump specification via a generic builder. *)
   type cond = int -> int -> bool
@@ -173,8 +167,8 @@ module VM_instr_spec
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> icjump_post cond ofs }
     ensures { result.code.length --> code_cd.length }
-  = let c = $ ifunf {ibinop_pre} code_cd ({icjump_fun} cond ofs) in
-    hoare {ibinop_pre} c ({icjump_post} cond ofs)
+  = let c = $ ifunf ibinop_pre code_cd (icjump_fun cond ofs) in
+    hoare ibinop_pre c (icjump_post cond ofs)
 
   (*  binary Boolean operators specification (Ibeq, Ibne, Ible, Ibgt) *)
   constant beq : cond = fun x y -> x = y
@@ -193,25 +187,25 @@ module VM_instr_spec
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> icjump_post beq ofs }
     ensures { result.code.length --> 1 }
-  = create_cjump (ibeq ofs) {beq} ofs
+  = create_cjump (ibeq ofs) beq ofs
 
   let ibnef (ofs:ofs) : hl 'a
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> icjump_post bne ofs }
     ensures { result.code.length --> 1 }
-  = create_cjump (ibne ofs) {bne} ofs
+  = create_cjump (ibne ofs) bne ofs
 
   let iblef (ofs:ofs) : hl 'a
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> icjump_post ble ofs }
     ensures { result.code.length --> 1 }
-  = create_cjump (ible ofs) {ble} ofs
+  = create_cjump (ible ofs) ble ofs
 
   let ibgtf (ofs:ofs) : hl 'a
     ensures { result.pre --> ibinop_pre }
     ensures { result.post --> icjump_post bgt ofs }
     ensures { result.code.length --> 1 }
-  = create_cjump (ibgt ofs) {bgt} ofs
+  = create_cjump (ibgt ofs) bgt ofs
 
   (* Isetvar specification *)
   constant isetvar_pre : pre 'a =
@@ -234,7 +228,7 @@ module VM_instr_spec
     ensures { result.pre --> isetvar_pre }
     ensures { result.post --> isetvar_post x }
     ensures { result.code.length --> 1 }
-  = let c = $ ifunf {isetvar_pre} x.isetvar x.{isetvar_fun} in
-    hoare {isetvar_pre} c x.{isetvar_post}
+  = let c = $ ifunf isetvar_pre (isetvar x) (isetvar_fun x) in
+    hoare isetvar_pre c (isetvar_post x)
 
 end

@@ -72,8 +72,8 @@ module PrefixSumRec
     variant { right-left }
     ensures { phase1 left right a0 a' } =
     if right > left + 1 then begin
-       phase1_frame ({go_left} left right) left a0 a a';
-       phase1_frame ({go_right} left right) right a0 a a'
+       phase1_frame (go_left left right) left a0 a a';
+       phase1_frame (go_right left right) right a0 a a'
     end
 
   (** frame lemma for "phase1" on third argument.
@@ -86,8 +86,8 @@ module PrefixSumRec
     variant { right-left }
     ensures { phase1 left right a0' a } =
     if right > left + 1 then begin
-       phase1_frame2 ({go_left} left right) left a0 a0' a;
-       phase1_frame2 ({go_right} left right) right a0 a0' a
+       phase1_frame2 (go_left left right) left a0 a0' a;
+       phase1_frame2 (go_right left right) right a0 a0' a
     end
 
 
