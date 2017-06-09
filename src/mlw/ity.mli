@@ -491,6 +491,7 @@ val cty_add_post : cty -> post list -> cty
 
 val forget_reg : region -> unit   (* flush id_unique for a region *)
 val forget_pv  : pvsymbol -> unit (* flush for a program variable *)
+val forget_xs  : xsymbol -> unit  (* flush for a local exception *)
 val forget_cty : cty -> unit      (* forget arguments and oldies *)
 
 val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)

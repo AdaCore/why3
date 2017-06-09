@@ -84,14 +84,15 @@ val meta_float : meta
 (** {2 Theories} *)
 
 type theory = private {
-  th_name   : ident;        (* theory name *)
-  th_path   : string list;  (* environment qualifiers *)
-  th_decls  : tdecl list;   (* theory declarations *)
-  th_crcmap : Coercion.t;   (* implicit coercions *)
-  th_export : namespace;    (* exported namespace *)
-  th_known  : known_map;    (* known identifiers *)
-  th_local  : Sid.t;        (* locally declared idents *)
-  th_used   : Sid.t;        (* used theories *)
+  th_name   : ident;          (* theory name *)
+  th_path   : string list;    (* environment qualifiers *)
+  th_decls  : tdecl list;     (* theory declarations *)
+  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_crcmap : Coercion.t;     (* implicit coercions *)
+  th_export : namespace;      (* exported namespace *)
+  th_known  : known_map;      (* known identifiers *)
+  th_local  : Sid.t;          (* locally declared idents *)
+  th_used   : Sid.t;          (* used theories *)
 }
 
 and tdecl = private {
@@ -125,6 +126,7 @@ type theory_uc = private {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_ranges : lsymbol Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -137,8 +139,9 @@ type theory_uc = private {
 val create_theory : ?path:string list -> preid -> theory_uc
 val close_theory  : theory_uc -> theory
 
-val open_scope  : theory_uc -> string -> theory_uc
-val close_scope : theory_uc -> import:bool -> theory_uc
+val open_scope   : theory_uc -> string -> theory_uc
+val close_scope  : theory_uc -> import:bool -> theory_uc
+val import_scope : theory_uc -> string list -> theory_uc
 
 val get_namespace : theory_uc -> namespace
 
@@ -230,3 +233,5 @@ exception KnownMeta of meta
 exception UnknownMeta of string
 exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
+
+exception RangeConflict of tysymbol

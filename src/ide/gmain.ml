@@ -863,14 +863,6 @@ let project_dir =
   else
     fname
 
-let () =
-  if not (Sys.file_exists project_dir) then
-    begin
-      Debug.dprintf debug "[GUI] '%s' does not exist. \
-        Creating directory of that name for the project@." project_dir;
-      Unix.mkdir project_dir 0o777
-    end
-
 let info_window ?(callback=(fun () -> ())) mt s =
   let buttons = match mt with
     | `INFO -> GWindow.Buttons.close
@@ -1338,13 +1330,20 @@ let save_session () =
     session_needs_saving := false;
   end
 
+let quit_save () =
+  save_session (); GMain.quit ()
+
+(* override GMain.quit to remove an empty session directory *)
+let quit_no_save () =
+  begin try Unix.rmdir project_dir with _ -> () end;
+  GMain.quit ()
 
 let exit_function ~destroy () =
   (* do not save automatically anymore Gconfig.save_config (); *)
-  if not !session_needs_saving then GMain.quit () else
+  if not !session_needs_saving then quit_no_save () else
   match (Gconfig.config ()).saving_policy with
-    | 0 -> save_session (); GMain.quit ()
-    | 1 -> GMain.quit ()
+    | 0 -> quit_save ()
+    | 1 -> quit_no_save ()
     | 2 ->
         let answer =
           GToolbox.question_box
@@ -1354,13 +1353,13 @@ let exit_function ~destroy () =
         in
         begin
           match answer with
-            | 1 -> save_session (); GMain.quit ()
-            | 2 -> GMain.quit ()
-            | _ -> if destroy then GMain.quit () else ()
+            | 1 -> quit_save ()
+            | 2 -> quit_no_save ()
+            | _ -> if destroy then quit_no_save ()
         end
     | _ ->
         eprintf "unexpected value for saving_policy@.";
-        GMain.quit ()
+        quit_no_save ()
 
 (*************)
 (* View menu *)

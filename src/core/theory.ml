@@ -39,29 +39,30 @@ let ns_replace eq chk x vo vn =
   if eq vo vn then vo else
   raise (ClashSymbol x)
 
-let rec merge_ns chk ns1 ns2 =
-  if ns1 == ns2 then ns1 else
-  let join eq x n o = Some (ns_replace eq chk x o n) in
-  let ns_union eq m1 m2 =
-    if m1 == m2 then m1 else Mstr.union (join eq) m1 m2 in
-  let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_ts = ns_union ts_equal ns1.ns_ts ns2.ns_ts;
-    ns_ls = ns_union ls_equal ns1.ns_ls ns2.ns_ls;
-    ns_pr = ns_union pr_equal ns1.ns_pr ns2.ns_pr;
-    ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
+let merge_ts = ns_replace ts_equal
+let merge_ls = ns_replace ls_equal
+let merge_pr = ns_replace pr_equal
 
-let add_ns chk x ns m = Mstr.change (function
-  | Some os -> Some (merge_ns chk ns os)
-  | None    -> Some ns) x m
+let rec merge_ns chk _ no nn =
+  if no == nn then no else
+  let union merge o n =
+    let merge x vo vn = Some (merge chk x vo vn) in
+    if o == n then o else Mstr.union merge o n in
+  { ns_ts = union merge_ts no.ns_ts nn.ns_ts;
+    ns_ls = union merge_ls no.ns_ls nn.ns_ls;
+    ns_pr = union merge_pr no.ns_pr nn.ns_pr;
+    ns_ns = union merge_ns no.ns_ns nn.ns_ns }
 
-let ns_add eq chk x vn m = Mstr.change (function
-  | Some vo -> Some (ns_replace eq chk x vo vn)
+let ns_add merge chk x vn m = Mstr.change (function
+  | Some vo -> Some (merge chk x vo vn)
   | None    -> Some vn) x m
 
-let add_ts chk x ts ns = { ns with ns_ts = ns_add ts_equal chk x ts ns.ns_ts }
-let add_ls chk x ls ns = { ns with ns_ls = ns_add ls_equal chk x ls ns.ns_ls }
-let add_pr chk x pf ns = { ns with ns_pr = ns_add pr_equal chk x pf ns.ns_pr }
-let add_ns chk x nn ns = { ns with ns_ns = add_ns          chk x nn ns.ns_ns }
+let add_ts chk x ts ns = { ns with ns_ts = ns_add merge_ts chk x ts ns.ns_ts }
+let add_ls chk x ps ns = { ns with ns_ls = ns_add merge_ls chk x ps ns.ns_ls }
+let add_pr chk x xs ns = { ns with ns_pr = ns_add merge_pr chk x xs ns.ns_pr }
+let add_ns chk x nn ns = { ns with ns_ns = ns_add merge_ns chk x nn ns.ns_ns }
+
+let merge_ns chk nn no = merge_ns chk "" no nn (* swap arguments *)
 
 let rec ns_find get_map ns = function
   | []   -> assert false
@@ -156,14 +157,15 @@ let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
 (** Theory *)
 
 type theory = {
-  th_name   : ident;        (* theory name *)
-  th_path   : string list;  (* environment qualifiers *)
-  th_decls  : tdecl list;   (* theory declarations *)
-  th_crcmap : Coercion.t;   (* implicit coercions *)
-  th_export : namespace;    (* exported namespace *)
-  th_known  : known_map;    (* known identifiers *)
-  th_local  : Sid.t;        (* locally declared idents *)
-  th_used   : Sid.t;        (* used theories *)
+  th_name   : ident;          (* theory name *)
+  th_path   : string list;    (* environment qualifiers *)
+  th_decls  : tdecl list;     (* theory declarations *)
+  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_crcmap : Coercion.t;     (* implicit coercions *)
+  th_export : namespace;      (* exported namespace *)
+  th_known  : known_map;      (* known identifiers *)
+  th_local  : Sid.t;          (* locally declared idents *)
+  th_used   : Sid.t;          (* used theories *)
 }
 
 and tdecl = {
@@ -263,6 +265,7 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
+  uc_ranges : lsymbol Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -279,6 +282,7 @@ let empty_theory n p = {
   uc_name   = id_register n;
   uc_path   = p;
   uc_decls  = [];
+  uc_ranges = Mts.empty;
   uc_crcmap = Coercion.empty;
   uc_prefix = [];
   uc_import = [empty_ns];
@@ -293,6 +297,7 @@ let close_theory uc = match uc.uc_export with
     { th_name   = uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
+      th_ranges = uc.uc_ranges;
       th_crcmap = uc.uc_crcmap;
       th_export = e;
       th_known  = uc.uc_known;
@@ -319,6 +324,13 @@ let close_scope uc ~import =
   | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
+let import_scope uc ql = match uc.uc_import with
+  | i1 :: sti ->
+      let e0 = ns_find_ns i1 ql in
+      let i1 = merge_ns false e0 i1 in
+      { uc with uc_import = i1::sti }
+  | _ -> assert false
+
 (* Base constructors *)
 
 let known_ty kn ty =
@@ -340,7 +352,10 @@ let known_meta kn al =
   in
   List.iter check al
 
+(* FIXME: proper description *)
 let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
+
+exception RangeConflict of tysymbol
 
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
@@ -354,11 +369,20 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
+  | Meta (m,([MAts ts; MAls ls] as al)) when meta_equal m meta_range ->
+      known_meta uc.uc_known al;
+      let add b = match b with
+        | None -> Some ls
+        | Some s when ls_equal s ls -> b
+        | _ -> raise (RangeConflict ts) in
+      { uc with uc_ranges = Mts.change add ts uc.uc_ranges;
+                uc_decls = td :: uc.uc_decls }
   | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
       known_meta uc.uc_known al;
-      (* FIXME: shouldn't we add the meta to the theory? *)
-      { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls }
-  | Meta (_,al) -> known_meta uc.uc_known al;
+      { uc with uc_crcmap = Coercion.add uc.uc_crcmap ls;
+                uc_decls = td :: uc.uc_decls }
+  | Meta (_,al) ->
+      known_meta uc.uc_known al;
       { uc with uc_decls = td :: uc.uc_decls }
 
 (** Declarations *)
@@ -479,10 +503,13 @@ let create_use th = mk_tdecl (Use th)
 
 let use_export uc th =
   let uc = add_tdecl uc (create_use th) in
+  let comb ts s1 s2 = if ls_equal s1 s2 then Some s1
+                      else raise (RangeConflict ts) in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
       uc_export = merge_ns true  th.th_export e0 :: ste;
+      uc_ranges = Mts.union comb uc.uc_ranges th.th_ranges;
       uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
@@ -934,5 +961,8 @@ let () = Exn_printer.register
       Format.fprintf fmt "Metaproperty %s expects a %a argument but \
         is applied to %a"
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
+  | RangeConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for range type %s"
+        ts.ts_name.id_string
   | _ -> raise exn
   end

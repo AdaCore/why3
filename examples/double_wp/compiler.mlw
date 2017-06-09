@@ -24,8 +24,8 @@ module Compile_aexpr
   meta rewrite_def function aexpr_post
 
   let rec compile_aexpr (a:aexpr) :  hl 'a
-    ensures { result <% (trivial_pre,aexpr_post a result.code.length) }
-    ensures { hl_correctness result }
+    ensures { result.pre --> trivial_pre }
+    ensures { result.post --> aexpr_post a result.code.length }
     variant { a }
     = let c = match a with
       | Anum n     -> $ iconstf n
@@ -74,9 +74,9 @@ module Compile_bexpr
   meta rewrite_def function exec_cond
 
   let rec compile_bexpr (b:bexpr) (cond:bool) (ofs:ofs) :  hl 'a
-    ensures { let len = result.code.length in
-      result <% (trivial_pre,bexpr_post b cond (len + ofs) len) }
-    ensures { hl_correctness result }
+    ensures { result.pre --> trivial_pre }
+    ensures { result.post --> let len = result.code.length in
+      bexpr_post b cond (len + ofs) len }
     variant { b }
   = let c = match b with
     | Btrue      -> $ if cond then ibranchf ofs else inil ()
@@ -164,9 +164,8 @@ module Compile_com
       (forall pk sk mk. var (VMS pk sk mk) (VMS pi si mi) -> mk = mj)
 
   let rec compile_com (cmd: com) : hl 'a
-    ensures  { hl_correctness result }
-    ensures  { let len = result.code.length in
-      result <% (com_pre cmd,com_post cmd len) }
+    ensures { result.pre --> com_pre cmd }
+    ensures { result.post --> let len = result.code.length in com_post cmd len }
     variant  { cmd }
   = let res = match cmd with
     | Cskip              -> $ inil ()

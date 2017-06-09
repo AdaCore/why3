@@ -872,7 +872,7 @@ module MLToC = struct
   open Term
   open Printer
   open Pmodule
-  open Compile.ML
+  open Mltree
   open C
 
   let rec ty_of_mlty info = function
@@ -935,7 +935,7 @@ module MLToC = struct
     then Sreturn e
     else Sexpr e
 
-  let rec expr info env (e:Compile.ML.expr) : C.body =
+  let rec expr info env (e:Mltree.expr) : C.body =
     assert (not e.e_effect.eff_ghost);
     match e.e_node with
     | Eblock [] ->
@@ -959,10 +959,10 @@ module MLToC = struct
        ([],return_or_expr env (C.Econst (Cint "1")))
     | Eapp (rs, []) when rs_equal rs rs_false ->
        ([],return_or_expr env (C.Econst (Cint "0")))
-    | Compile.ML.Evar pv ->
+    | Evar pv ->
        let e = C.Evar (pv_name pv) in
        ([], return_or_expr env e)
-    | Compile.ML.Econst ic ->
+    | Econst ic ->
       let n = Number.compute_int ic in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
@@ -1072,7 +1072,7 @@ module MLToC = struct
        | Lvar (pv,le) -> (* not a block *)
           begin
           match le.e_node with
-          | Compile.ML.Econst ic ->
+          | Econst ic ->
             let n = Number.compute_int ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
 	    if debug then Format.printf "propagate constant %s for var %s@."
@@ -1150,7 +1150,7 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
-          | [pv], Compile.ML.Evar pv'
+          | [pv], Evar pv'
             when pv_equal pv pv' && env.computes_return_value ->
             (bs, Sid.add id rs)
           | [], (Eblock []) when is_unit r.e_ity && is_while ->
@@ -1194,6 +1194,7 @@ module MLToC = struct
     | Eabsurd -> assert false
     | Eassign _ -> raise (Unsupported "assign")
     | Ehole -> assert false
+    | Eexn _ -> raise (Unsupported "exception")
     | Eignore e ->
        [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
               if env.computes_return_value
@@ -1278,18 +1279,25 @@ module MLToC = struct
       begin
         match idef with
         | Some (Dalias ty) -> Some (C.Dtypedef (ty_of_mlty info ty, id))
-        | Some _ -> raise (Unsupported "Ddata/Drecord")
+        | Some _ -> if debug then Format.printf "Ddata/Drecord@.";
+                    None (*FIXME unsupported*)
         | None ->
           begin match query_syntax info.syntax id with
           | Some _ -> None
           | None ->
-            raise (Unsupported "type declaration without syntax or alias")
+             if debug
+             then
+               Format.printf
+                 "type declaration without syntax or alias: %s@."
+                 id.id_string;
+             None (*FIXME*)
+               (* raise (Unsupported ("type declaration without syntax or alias: "^id.id_string)) *)
           end
       end
 
     | _ -> None (*TODO exn ? *)
 
-  let translate_decl (info:info) (d:Compile.ML.decl) : C.definition option
+  let translate_decl (info:info) (d:Mltree.decl) : C.definition option
     =
     let decide_print id = query_syntax info.syntax id = None in
     match Compile.ML.get_decl_name d with

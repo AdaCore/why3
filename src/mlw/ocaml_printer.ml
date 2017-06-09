@@ -38,7 +38,8 @@ type info = {
 
 module Print = struct
 
-  open ML
+  open Mltree
+  open Compile.ML
 
   let ocaml_keywords =
     ["and"; "as"; "assert"; "asr"; "begin";
@@ -208,7 +209,7 @@ module Print = struct
        fprintf fmt "_"
     | Pvar {vs_name=id} ->
        (print_lident info) fmt id
-    | Pas (p, id) ->
+    | Pas (p, {vs_name=id}) ->
        fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
     | Por (p1, p2) ->
        fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
@@ -326,7 +327,7 @@ module Print = struct
     else
       let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
-      fprintf fmt ": @[%a@]. @[%a@] ->@ %a@ =@ fun @[%a@]@ ->"
+      fprintf fmt ": @[@[%a@]. @[%a@] ->@ %a@ =@ @[fun @[%a@]@ ->@]@]"
         print_svar s
         (print_list arrow (print_ty ~paren:true info)) ty_args
         (print_ty ~paren:true info) res
@@ -417,7 +418,7 @@ module Print = struct
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt (protect_on paren
-        "@[<hv>@[<hov 2>if@ %a@]@ then@;<1 2>@[%a@]@;<1 0>else@;<1 2>@[%a@]@]")
+        "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
         (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
       fprintf fmt "()"
@@ -448,6 +449,13 @@ module Print = struct
       fprintf fmt
         "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
         (print_expr info) e (print_list newline (print_xbranch info)) bl
+    | Eexn (xs, None, e) ->
+      fprintf fmt "@[<hv>let exception %a in@\n%a@]"
+        (print_uident info) xs.xs_name (print_expr info) e
+    | Eexn (xs, Some t, e) ->
+      fprintf fmt "@[<hv>let exception %a of %a in@\n%a@]"
+        (print_uident info) xs.xs_name (print_ty ~paren:true info) t
+        (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
     (* | Enot _ -> (\* TODO *\) assert false *)
     (* | Ebinop _ -> (\* TODO *\) assert false *)
@@ -527,28 +535,34 @@ module Print = struct
       assert false (*TODO*)
 
   let print_decl info fmt decl =
+    (* avoids printing the same decl for mutually recursive decls *)
+    let memo = Hashtbl.create 64 in
     let decl_name = get_decl_name decl in
     let decide_print id =
-      if query_syntax info.info_syn id = None then begin
-        print_decl info fmt decl;
+      if query_syntax info.info_syn id = None &&
+         not (Hashtbl.mem memo decl) then begin
+        Hashtbl.add memo decl (); print_decl info fmt decl;
         fprintf fmt "@." end in
     List.iter decide_print decl_name
 
 end
 
-let print_decl pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d =
-  ignore (old);
-  let info = {
-    info_syn          = pargs.Pdriver.syntax;
-    info_convert      = pargs.Pdriver.converter;
-    info_current_th   = th;
-    info_current_mo   = Some m;
-    info_th_known_map = th.th_known;
-    info_mo_known_map = m.mod_known;
-    info_fname        = Opt.map Compile.clean_name fname;
-    flat              = flat;
-  } in
-  Print.print_decl info fmt d
+let print_decl =
+  let memo = Hashtbl.create 16 in
+  fun pargs ?old ?fname ~flat ({mod_theory = th} as m) fmt d ->
+    ignore (old);
+    let info = {
+      info_syn          = pargs.Pdriver.syntax;
+      info_convert      = pargs.Pdriver.converter;
+      info_current_th   = th;
+      info_current_mo   = Some m;
+      info_th_known_map = th.th_known;
+      info_mo_known_map = m.mod_known;
+      info_fname        = Opt.map Compile.clean_name fname;
+      flat              = flat;
+    } in
+    if not (Hashtbl.mem memo d) then begin
+      Hashtbl.add memo d (); Print.print_decl info fmt d end
 
 let fg ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
@@ -557,9 +571,3 @@ let fg ?fname m =
 
 let () = Pdriver.register_printer "ocaml"
   ~desc:"printer for OCaml code" fg print_decl
-
-(*
- * Local Variables:
- * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
- * End:
- *)

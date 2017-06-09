@@ -92,16 +92,15 @@ syn keyword  whyKeyword  then type with
 syn keyword  whyKeyword  abstract any
 syn keyword  whyKeyword  exception fun ghost label
 syn keyword  whyKeyword  model mutable private
-syn keyword  whyKeyword  raise rec val while
+syn keyword  whyKeyword  raise rec return val while
 
 syn keyword  whyBoolean  true false
 
 syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
 
-syn keyword  whySpec     absurd alias assert assume check diverges ensures
-syn keyword  whySpec     invariant raises reads requires returns variant writes
-syn keyword  whySpec     at old
+syn keyword  whySpec     absurd alias assert assume check diverges ensures invariant
+syn keyword  whySpec     pure raises reads requires returns variant writes at old
 
 syn match    whyConstructor  "(\s*)"
 syn match    whyConstructor  "\u\(\w\|'\)*\>"

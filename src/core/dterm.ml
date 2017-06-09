@@ -103,6 +103,8 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
       List.iter2 dty_unify dl1 dl2
   | _ -> raise Exit
 
+let dty_int  = Duty ty_int
+let dty_real = Duty ty_real
 let dty_bool = Duty ty_bool
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
@@ -184,7 +186,7 @@ and dpattern_node =
   | DPapp of lsymbol * dpattern list
   | DPor of dpattern * dpattern
   | DPas of dpattern * preid
-  | DPcast of dpattern * ty
+  | DPcast of dpattern * dty
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
@@ -203,7 +205,7 @@ type dterm = {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * ty
+  | DTconst of Number.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -215,7 +217,7 @@ and dterm_node =
   | DTnot of dterm
   | DTtrue
   | DTfalse
-  | DTcast of dterm * ty
+  | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
   | DTlabel of dterm * Slab.t
 
@@ -317,8 +319,7 @@ let dpattern ?loc node =
         dp1.dp_dty, Mstr.union join dp1.dp_vars dp2.dp_vars
     | DPas (dp,{pre_name = n}) ->
         dp.dp_dty, Mstr.add_new (DuplicateVar n) n dp.dp_dty dp.dp_vars
-    | DPcast (dp,ty) ->
-        let dty = dty_of_ty ty in
+    | DPcast (dp,dty) ->
         dpat_expected_type dp dty;
         dty, dp.dp_vars in
   let dty, vars = Loc.try1 ?loc get_dty node in
@@ -395,8 +396,8 @@ let dterm tuc ?loc node =
         mk_dty (Some dty)
     | DTgvar vs ->
         mk_dty (Some (dty_of_ty vs.vs_ty))
-    | DTconst (_,ty) ->
-        mk_dty (Some (dty_of_ty ty))
+    | DTconst (_,dty) ->
+        mk_dty (Some dty)
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
        let swap, dtl =
          match dtl with
@@ -490,8 +491,7 @@ let dterm tuc ?loc node =
            there is no need to count these constructs as "formulas" which
            require explicit if-then-else conversion to bool *)
         mk_dty (Some dty_bool)
-    | DTcast (dt,ty) ->
-        let dty = dty_of_ty ty in
+    | DTcast (dt,dty) ->
         dterm_expected_dterm tuc dt dty
     | DTuloc (dt,_)
     | DTlabel (dt,_) ->
@@ -606,8 +606,8 @@ and try_term strict keep_loc uloc env prop dty node =
       t_var (Mstr.find_exn (UnboundVar n) n env)
   | DTgvar vs ->
       t_var vs
-  | DTconst (c,ty) ->
-      t_const c ty
+  | DTconst (c,dty) ->
+      t_const c (term_ty_of_dty ~strict dty)
   | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
       if prop then t_true else t_bool_true
   | DTapp (ls,[]) when ls_equal ls fs_bool_false ->

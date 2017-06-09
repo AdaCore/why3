@@ -11,4 +11,4 @@
 
 open Pdecl
 
-val vc : Env.env -> known_map -> pdecl -> pdecl list
+val vc : Env.env -> known_map -> Theory.theory_uc -> pdecl -> pdecl list

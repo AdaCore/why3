@@ -10,9 +10,6 @@
 (********************************************************************)
 
 (*
-  - suggest a command line to compile the extracted code
-    (for instance in a comment)
-
   - extract file f.mlw into OCaml file f.ml, with sub-modules
 
   - "use (im|ex)port" -> "open"
@@ -45,108 +42,8 @@ let module_name ?fname path t =
   fname ^ "__" ^ t
 
 module ML = struct
-
   open Expr
-
-  type ty =
-    | Tvar    of tvsymbol
-    | Tapp    of ident * ty list
-    | Ttuple  of ty list
-
-  type is_ghost = bool
-
-  type var = ident * ty * is_ghost
-
-  type for_direction = To | DownTo
-
-  type pat =
-    | Pwild
-    | Pvar    of vsymbol
-    | Papp    of lsymbol * pat list
-    | Ptuple  of pat list
-    | Por     of pat * pat
-    | Pas     of pat * ident
-
-  type is_rec = bool
-
-  type binop = Band | Bor | Beq
-
-  type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
-
-  type expr = {
-    e_node   : expr_node;
-    e_ity    : ity;
-    e_effect : effect;
-  }
-
-  and expr_node =
-    | Econst  of Number.integer_constant
-    | Evar    of pvsymbol
-    | Eapp    of rsymbol * expr list
-    | Efun    of var list * expr
-    | Elet    of let_def * expr
-    | Eif     of expr * expr * expr
-    | Eassign of (pvsymbol * rsymbol * pvsymbol) list
-    | Ematch  of expr * (pat * expr) list
-    | Eblock  of expr list
-    | Ewhile  of expr * expr
-    (* For loop for Why3's type int *)
-    | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
-    | Eraise  of xsymbol * expr option
-    | Etry    of expr * (xsymbol * pvsymbol list * expr) list
-    | Eignore of expr
-    | Eabsurd
-    | Ehole
-
-  and let_def =
-    | Lvar of pvsymbol * expr
-    | Lsym of rsymbol * ty * var list * expr
-    | Lrec of rdef list
-
-  and rdef = {
-    rec_sym  : rsymbol; (* exported *)
-    rec_rsym : rsymbol; (* internal *)
-    rec_args : var list;
-    rec_exp  : expr;
-    rec_res  : ty;
-    rec_svar : Stv.t; (* set of type variables *)
-  }
-
-  type is_mutable = bool
-
-  type typedef =
-    | Ddata     of (ident * ty list) list
-    | Drecord   of (is_mutable * ident * ty) list
-    | Dalias    of ty
-
-  type its_defn = {
-    its_name    : ident;
-    its_args    : tvsymbol list;
-    its_private : bool;
-    its_def     : typedef option;
-  }
-
-  type decl =
-    | Dtype   of its_defn list
-    | Dlet    of let_def
-    | Dexn    of xsymbol * ty option
-    | Dclone  of ident * decl list
-(*
-    | Dfunctor of ident * (ident * decl list) list * decl list
-*)
-
-  type known_map = decl Mid.t
-
-  type from_module = {
-    from_mod: Pmodule.pmodule option;
-    from_km : Pdecl.known_map;
-  }
-
-  type pmodule = {
-    mod_from  : from_module;
-    mod_decl  : decl list;
-    mod_known : known_map;
-  }
+  open Mltree
 
   let get_decl_name = function
     | Dtype itdefl -> List.map (fun {its_name = id} -> id) itdefl
@@ -234,6 +131,11 @@ module ML = struct
     | Eraise (xs, Some e) ->
       f xs.xs_name;
       iter_deps_expr f e
+    | Eexn (_xs, None, e) -> (* FIXME? How come we never do binding here? *)
+      iter_deps_expr f e
+    | Eexn (_xs, Some ty, e) -> (* FIXME? How come we never do binding here? *)
+      iter_deps_ty f ty;
+      iter_deps_expr f e
     | Etry (e, xbranchl) ->
       iter_deps_expr f e;
       List.iter (iter_deps_xbranch f) xbranchl
@@ -304,6 +206,7 @@ module ML = struct
 
 end
 
+
 (** Translation from Mlw to ML *)
 
 module Translate = struct
@@ -319,34 +222,20 @@ module Translate = struct
   let rec type_ ty =
     match ty.ty_node with
     | Tyvar tvs ->
-       ML.Tvar tvs
+       Mltree.Tvar tvs
     | Tyapp (ts, tyl) when is_ts_tuple ts ->
-       ML.Ttuple (List.map type_ tyl)
+       Mltree.Ttuple (List.map type_ tyl)
     | Tyapp (ts, tyl) ->
-       ML.Tapp (ts.ts_name, List.map type_ tyl)
+       Mltree.Tapp (ts.ts_name, List.map type_ tyl)
 
   let vsty vs =
     vs.vs_name, type_ vs.vs_ty
-
-  let type_args = (* point-free *)
-    List.map (fun x -> x.tv_name)
 
   let rec filter_ghost_params p def = function
     | [] -> []
     | pv :: l ->
       if p pv then def pv :: (filter_ghost_params p def l)
       else filter_ghost_params p def l
-
-  let filter2_ghost_params p def al l =
-    let rec filter2_ghost_params_cps l k =
-      match l with
-      | []  -> k []
-      | [e] -> k (if p e then [def e] else [al e])
-      | e :: r ->
-        filter2_ghost_params_cps r
-          (fun fr -> k (if p e then (def e) :: fr else fr))
-    in
-    filter2_ghost_params_cps l (fun x -> x)
 
   let rec filter_out_ghost_rdef = function
     | [] -> []
@@ -357,25 +246,25 @@ module Translate = struct
   let rec pat p =
     match p.pat_node with
     | Pwild ->
-      ML.Pwild
+      Mltree.Pwild
     | Pvar vs when (restore_pv vs).pv_ghost ->
-      ML.Pwild
+      Mltree.Pwild
     | Pvar vs ->
-      ML.Pvar vs
+      Mltree.Pvar vs
     | Por (p1, p2) ->
-      ML.Por (pat p1, pat p2)
+      Mltree.Por (pat p1, pat p2)
     | Pas (p, vs) when (restore_pv vs).pv_ghost ->
       pat p
     | Pas (p, vs) ->
-      ML.Pas (pat p, vs.vs_name)
+      Mltree.Pas (pat p, vs)
     | Papp (ls, pl) when is_fs_tuple ls ->
-      ML.Ptuple (List.map pat pl)
+      Mltree.Ptuple (List.map pat pl)
     | Papp (ls, pl) ->
       let rs = restore_rs ls in
       let args = rs.rs_cty.cty_args in
       let mk acc pv pp = if not pv.pv_ghost then pat pp :: acc else acc in
       let pat_pl = List.fold_left2 mk [] args pl in
-      ML.Papp (ls, List.rev pat_pl)
+      Mltree.Papp (ls, List.rev pat_pl)
 
   (** programs *)
 
@@ -385,26 +274,26 @@ module Translate = struct
   let rec ity t =
     match t.ity_node with
     | Ityvar (tvs, _) ->
-      ML.Tvar tvs
+      Mltree.Tvar tvs
     | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
-      ML.Ttuple (List.map ity itl)
+      Mltree.Ttuple (List.map ity itl)
     | Ityapp ({its_ts = ts}, itl, _) ->
-      ML.Tapp (ts.ts_name, List.map ity itl)
+      Mltree.Tapp (ts.ts_name, List.map ity itl)
     | Ityreg {reg_its = its; reg_args = args} ->
       let args = List.map ity args in
-      ML.Tapp (its.its_ts.ts_name, args)
+      Mltree.Tapp (its.its_ts.ts_name, args)
 
   let pvty pv =
     if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
     else let (vs, vs_ty) = vsty pv.pv_vs in
       ML.mk_var vs vs_ty false
 
-  let for_direction = function
-    | To -> ML.To
-    | DownTo -> ML.DownTo
+  (* let for_direction = function *)
+  (*   | To -> Mltree.To *)
+  (*   | DownTo -> Mltree.DownTo *)
 
   let isconstructor info rs =
-    match Mid.find_opt rs.rs_name info.ML.from_km with
+    match Mid.find_opt rs.rs_name info.Mltree.from_km with
     | Some {pd_node = PDtype its} ->
       let is_constructor its =
         List.exists (rs_equal rs) its.itd_constructors in
@@ -422,7 +311,7 @@ module Translate = struct
     | _ -> false
 
   let get_record_itd info rs =
-    match Mid.find_opt rs.rs_name info.ML.from_km with
+    match Mid.find_opt rs.rs_name info.Mltree.from_km with
     | Some {pd_node = PDtype itdl} ->
       let f pjl_constr = List.exists (rs_equal rs) pjl_constr in
       let itd = match rs.rs_field with
@@ -450,15 +339,15 @@ module Translate = struct
       let def pv = pv_name pv, ity pv.pv_ity, pv.pv_ghost in
       filter_ghost_params pv_not_ghost def cty_app.cty_args in
     let args =
-      let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+      let def pv = ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty in
       let args = filter_ghost_params pv_not_ghost def pvl in
       let extra_args =
         (* FIXME : ghost status in this extra arguments *)
         List.map def cty_app.cty_args in
       args @ extra_args in
-    let eapp =
-      ML.mk_expr (ML.Eapp (rsc, args)) (ML.C cty_app) cty_app.cty_effect in
-    ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C cty_app) cty_app.cty_effect
+    let eapp = ML.mk_expr (Mltree.Eapp (rsc, args)) (Mltree.C cty_app)
+                                                    cty_app.cty_effect in
+    ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C cty_app) cty_app.cty_effect
 
   (* function arguments *)
   let filter_params args =
@@ -481,67 +370,67 @@ module Translate = struct
     in loop (pvl, cty_args)
 
   let app pvl cty_args =
-    let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) eff_empty in
+    let def pv = ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty in
     filter_params_cty pv_not_ghost def pvl cty_args
 
   let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body_expr eff =
     let i_expr, from_expr, to_expr =
       let int_ity = ML.ity_int in let eff_e = eff_empty in
-      ML.mk_expr (ML.Evar i_pv)     int_ity eff_e,
-      ML.mk_expr (ML.Evar from_pv)  int_ity eff_e,
-      ML.mk_expr (ML.Evar to_pv)    int_ity eff_e in
+      ML.mk_expr (Mltree.Evar i_pv)    int_ity eff_e,
+      ML.mk_expr (Mltree.Evar from_pv) int_ity eff_e,
+      ML.mk_expr (Mltree.Evar to_pv)   int_ity eff_e in
     let for_rs    =
       let for_id  = id_fresh "for_loop_to" in
       let for_cty = create_cty [i_pv] [] [] Mxs.empty
                                Mpv.empty eff ity_unit in
       create_rsymbol for_id for_cty in
     let for_expr =
-      let test = ML.mk_expr (ML.Eapp (op_b_rs, [i_expr; to_expr]))
-                            (ML.I ity_bool) eff_empty in
+      let test = ML.mk_expr (Mltree.Eapp (op_b_rs, [i_expr; to_expr]))
+                            (Mltree.I ity_bool) eff_empty in
       let next_expr =
         let one_const = Number.int_const_dec "1" in
         let one_expr  =
-          ML.mk_expr (ML.Econst one_const) ML.ity_int eff_empty in
-        let i_op_one = ML.Eapp (op_a_rs, [i_expr; one_expr]) in
+          ML.mk_expr (Mltree.Econst one_const) ML.ity_int eff_empty in
+        let i_op_one = Mltree.Eapp (op_a_rs, [i_expr; one_expr]) in
         ML.mk_expr i_op_one ML.ity_int eff_empty in
        let rec_call  =
-        ML.mk_expr (ML.Eapp (for_rs, [next_expr]))
+        ML.mk_expr (Mltree.Eapp (for_rs, [next_expr]))
                     ML.ity_unit eff in
       let seq_expr =
         ML.mk_expr (ML.eseq body_expr rec_call) ML.ity_unit eff in
-      ML.mk_expr (ML.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
+      ML.mk_expr (Mltree.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit eff in
     let ty_int = ity ity_int in
     let for_call_expr   =
-      let for_call      = ML.Eapp (for_rs, [from_expr]) in
+      let for_call      = Mltree.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff in
     let pv_name pv = pv.pv_vs.vs_name in
     let args = [ pv_name i_pv, ty_int, false ] in
     let for_rec_def = {
-      ML.rec_sym  = for_rs;   ML.rec_args = args;
-      ML.rec_rsym = for_rs;   ML.rec_exp  = for_expr;
-      ML.rec_res  = ML.tunit; ML.rec_svar = Stv.empty;
+      Mltree.rec_sym  = for_rs;   Mltree.rec_args = args;
+      Mltree.rec_rsym = for_rs;   Mltree.rec_exp  = for_expr;
+      Mltree.rec_res  = ML.tunit; Mltree.rec_svar = Stv.empty;
     } in
-    let for_let = ML.Elet (ML.Lrec [for_rec_def], for_call_expr) in
+    let for_let = Mltree.Elet (Mltree.Lrec [for_rec_def], for_call_expr) in
     ML.mk_expr for_let ML.ity_unit eff
 
   let mk_for_downto info i_pv from_pv to_pv body eff =
     let ge_rs, minus_rs =
-      let ns = (Opt.get info.ML.from_mod).mod_export in
+      let ns = (Opt.get info.Mltree.from_mod).mod_export in
       ns_find_rs ns ["Int"; "infix >="], ns_find_rs ns ["Int"; "infix -"] in
     mk_for ge_rs minus_rs i_pv from_pv to_pv body eff
 
   let mk_for_to info i_pv from_pv to_pv body eff =
     let le_rs, plus_rs =
-      let ns = (Opt.get info.ML.from_mod).mod_export in
+      let ns = (Opt.get info.Mltree.from_mod).mod_export in
       ns_find_rs ns ["Int"; "infix <="], ns_find_rs ns ["Int"; "infix +"] in
     mk_for le_rs plus_rs i_pv from_pv to_pv body eff
 
-  exception ExtractionAny
+  (* exception ExtractionAny *)
 
   (* build the set of type variables from functions arguments *)
   let rec add_tvar acc = function
-    | ML.Tvar tv -> Stv.add tv acc
-    | ML.Tapp (_, tyl) | ML.Ttuple tyl ->
+    | Mltree.Tvar tv -> Stv.add tv acc
+    | Mltree.Tapp (_, tyl) | Mltree.Ttuple tyl ->
       List.fold_left add_tvar acc tyl
 
   (* expressions *)
@@ -550,9 +439,9 @@ module Translate = struct
     match e.e_node with
     | Econst c ->
       let c = match c with Number.ConstInt c -> c | _ -> assert false in
-      ML.mk_expr (ML.Econst c) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Econst c) (Mltree.I e.e_ity) eff
     | Evar pv ->
-      ML.mk_expr (ML.Evar pv) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Evar pv) (Mltree.I e.e_ity) eff
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
       expr info e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
@@ -561,10 +450,10 @@ module Translate = struct
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
       if eff_pure e1.e_effect then expr info e2
       else let e1 = ML.mk_ignore (expr info e1) in
-        ML.mk_expr (ML.eseq e1 (expr info e2)) (ML.I e.e_ity) eff
+        ML.mk_expr (ML.eseq e1 (expr info e2)) (Mltree.I e.e_ity) eff
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
-      ML.mk_expr ml_let (ML.I e.e_ity) eff
+      ML.mk_expr ml_let (Mltree.I e.e_ity) eff
     | Elet (LDsym (rs, _), ein) when rs_ghost rs ->
       expr info ein
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
@@ -572,8 +461,8 @@ module Translate = struct
       let ef = expr info ef in
       let ein = expr info ein in
       let res = ity cty.cty_result in
-      let ml_letrec = ML.Elet (ML.Lsym (rs, res, args, ef), ein) in
-      ML.mk_expr ml_letrec (ML.I e.e_ity) eff
+      let ml_letrec = Mltree.Elet (Mltree.Lsym (rs, res, args, ef), ein) in
+      ML.mk_expr ml_letrec (Mltree.I e.e_ity) eff
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app ->
       (* partial application of constructor *)
@@ -582,18 +471,18 @@ module Translate = struct
       let mk_func pv f = ity_func pv.pv_ity f in
       let func = List.fold_right mk_func cty.cty_args cty.cty_result in
       let res = ity func in
-      let ml_letrec = ML.Elet (ML.Lsym (rsf, res, [], eta_app), ein) in
-      ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+      let ml_letrec = Mltree.Elet (Mltree.Lsym (rsf, res, [], eta_app), ein) in
+      ML.mk_expr ml_letrec (Mltree.I e.e_ity) e.e_effect
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
       let pvl = app pvl rs_app.rs_cty.cty_args in
       let eapp =
-        ML.mk_expr (ML.Eapp (rs_app, pvl)) (ML.C cty) cty.cty_effect in
+        ML.mk_expr (Mltree.Eapp (rs_app, pvl)) (Mltree.C cty) cty.cty_effect in
       let ein  = expr info ein in
       let res  = ity cty.cty_result in
       let args = params cty.cty_args in
-      let ml_letrec = ML.Elet (ML.Lsym (rsf, res, args, eapp), ein) in
-      ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+      let ml_letrec = Mltree.Elet (Mltree.Lsym (rsf, res, args, eapp), ein) in
+      ML.mk_expr ml_letrec (Mltree.I e.e_ity) e.e_effect
     | Elet (LDrec rdefl, ein) ->
       let rdefl = filter_out_ghost_rdef rdefl in
       let def = function
@@ -606,14 +495,14 @@ module Translate = struct
             let svar  = List.fold_left add_tvar Stv.empty args' in
             add_tvar svar res in
           let ef = expr info ef in
-          { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-            ML.rec_args = args; ML.rec_exp  = ef ;
-            ML.rec_res  = res;  ML.rec_svar = svar; }
+          { Mltree.rec_sym  = rs1;  Mltree.rec_rsym = rs2;
+            Mltree.rec_args = args; Mltree.rec_exp  = ef ;
+            Mltree.rec_res  = res;  Mltree.rec_svar = svar; }
         | _ -> assert false in
       let rdefl = List.map def rdefl in
       if rdefl <> [] then
-        let ml_letrec = ML.Elet (ML.Lrec rdefl, expr info ein) in
-        ML.mk_expr ml_letrec (ML.I e.e_ity) e.e_effect
+        let ml_letrec = Mltree.Elet (Mltree.Lrec rdefl, expr info ein) in
+        ML.mk_expr ml_letrec (Mltree.I e.e_ity) e.e_effect
       else expr info ein
     | Eexec ({c_node = Capp (rs, [])}, _) when is_rs_tuple rs ->
       ML.mk_unit
@@ -629,64 +518,69 @@ module Translate = struct
       let pvl = app pvl rs.rs_cty.cty_args in
       begin match pvl with
       | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
-      | _ -> ML.mk_expr (ML.Eapp (rs, pvl)) (ML.I e.e_ity) eff end
+      | _ -> ML.mk_expr (Mltree.Eapp (rs, pvl)) (Mltree.I e.e_ity) eff end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
       (* abstract block *)
       expr info e
     | Eexec ({c_node = Cfun e; c_cty = cty}, _) ->
       let args = params cty.cty_args in
-      ML.mk_expr (ML.Efun (args, expr info e)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Efun (args, expr info e)) (Mltree.I e.e_ity) eff
     | Eexec ({c_node = Cany}, _) -> (* raise ExtractionAny *)
       ML.mk_hole
     | Eabsurd ->
-      ML.mk_expr ML.Eabsurd (ML.I e.e_ity) eff
+      ML.mk_expr Mltree.Eabsurd (Mltree.I e.e_ity) eff
     | Ecase (e1, _) when e_ghost e1 ->
       ML.mk_unit
     | Ecase (e1, pl) ->
       let e1 = expr info e1 in
       let pl = List.map (ebranch info) pl in
-      ML.mk_expr (ML.Ematch (e1, pl)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Ematch (e1, pl)) (Mltree.I e.e_ity) eff
     | Eassert _ -> ML.mk_unit
     | Eif (e1, e2, e3) when e_ghost e3 ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
-      ML.mk_expr (ML.Eif (e1, e2, ML.mk_unit)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Eif (e1, e2, ML.mk_unit)) (Mltree.I e.e_ity) eff
     | Eif (e1, e2, e3) when e_ghost e2 ->
       let e1 = expr info e1 in
       let e3 = expr info e3 in
-      ML.mk_expr (ML.Eif (e1, ML.mk_unit, e3)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Eif (e1, ML.mk_unit, e3)) (Mltree.I e.e_ity) eff
     | Eif (e1, e2, e3) ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
       let e3 = expr info e3 in
-      ML.mk_expr (ML.Eif (e1, e2, e3)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Eif (e1, e2, e3)) (Mltree.I e.e_ity) eff
     | Ewhile (e1, _, _, e2) ->
       let e1 = expr info e1 in
       let e2 = expr info e2 in
-      ML.mk_expr (ML.Ewhile (e1, e2)) (ML.I e.e_ity) eff
-    | Efor (pv1, (pv2, To, pv3), _, efor) ->
+      ML.mk_expr (Mltree.Ewhile (e1, e2)) (Mltree.I e.e_ity) eff
+    | Efor (pv1, (pv2, To, pv3), _, _, efor) ->
       let efor = expr info efor in
       mk_for_to info pv1 pv2 pv3 efor eff
-    | Efor (pv1, (pv2, DownTo, pv3), _, efor) ->
+    | Efor (pv1, (pv2, DownTo, pv3), _, _, efor) ->
       let efor = expr info efor in
       mk_for_downto info pv1 pv2 pv3 efor eff
     | Eghost _ -> assert false
     | Eassign al ->
-      ML.mk_expr (ML.Eassign al) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Eassign al) (Mltree.I e.e_ity) eff
     | Epure _ -> (* assert false (\*TODO*\) *) ML.mk_hole
     | Etry (etry, pvl_e_map) ->
       let etry = expr info etry in
       let bl   =
         let bl_map = Mxs.bindings pvl_e_map in
         List.map (fun (xs, (pvl, e)) -> xs, pvl, expr info e) bl_map in
-      ML.mk_expr (ML.Etry (etry, bl)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Etry (etry, bl)) (Mltree.I e.e_ity) eff
     | Eraise (xs, ex) ->
       let ex =
         match expr info ex with
-        | {ML.e_node = ML.Eblock []} -> None
+        | {Mltree.e_node = Mltree.Eblock []} -> None
         | e -> Some e
       in
-      ML.mk_expr (ML.Eraise (xs, ex)) (ML.I e.e_ity) eff
+      ML.mk_expr (Mltree.Eraise (xs, ex)) (Mltree.I e.e_ity) eff
+    | Eexn (xs, e1) ->
+      let e1 = expr info e1 in
+      let ty = if ity_equal xs.xs_ity ity_unit
+        then None else Some (ity xs.xs_ity) in
+      ML.mk_expr (Mltree.Eexn (xs, ty, e1)) (Mltree.I e.e_ity) eff
     | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
     (*   assert false (\*TODO*\) *)
     | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
@@ -694,9 +588,6 @@ module Translate = struct
 
   and ebranch info ({pp_pat = p}, e) =
     (pat p, expr info e)
-
-  let its_args ts = ts.its_ts.ts_args
-  let itd_name td = td.itd_its.its_ts.ts_name
 
   (* type declarations/definitions *)
   let tdef itd =
@@ -720,23 +611,24 @@ module Translate = struct
         ML.mk_its_defn id args is_private None
       | NoDef, cl, [] ->
         let cl = ddata_constructs cl in
-        ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
+        ML.mk_its_defn id args is_private (Some (Mltree.Ddata cl))
       | NoDef, _, pjl ->
         let p e = not (rs_ghost e) in
         let pjl = filter_ghost_params p drecord_fields pjl in
         begin match pjl with
-          | [] -> ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit))
+          | [] -> ML.mk_its_defn id args is_private
+                    (Some (Mltree.Dalias ML.tunit))
           | [_, _, ty_pj] when is_optimizable_record_itd itd ->
-            ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
-          | pjl -> ML.mk_its_defn id args is_private (Some (ML.Drecord pjl))
+            ML.mk_its_defn id args is_private (Some (Mltree.Dalias ty_pj))
+          | pjl -> ML.mk_its_defn id args is_private (Some (Mltree.Drecord pjl))
         end
       | Alias t, _, _ ->
-         ML.mk_its_defn id args is_private (Some (ML.Dalias (ity t)))
+         ML.mk_its_defn id args is_private (Some (Mltree.Dalias (ity t)))
       | Range _, _, _ -> assert false (* TODO *)
       | Float _, _, _ -> assert false (* TODO *)
     end
 
-  exception ExtractionVal of rsymbol
+  (* exception ExtractionVal of rsymbol *)
 
   let is_val = function
     | Eexec ({c_node = Cany}, _) -> true
@@ -755,7 +647,7 @@ module Translate = struct
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
       let args = params cty.cty_args in
       let res  = ity cty.cty_result in
-      [ML.Dlet (ML.Lsym (rs, res, args, expr info e))]
+      [Mltree.Dlet (Mltree.Lsym (rs, res, args, expr info e))]
     | PDlet (LDrec rl) ->
       let rl = filter_out_ghost_rdef rl in
       let def {rec_fun = e; rec_sym = rs1; rec_rsym = rs2} =
@@ -766,27 +658,27 @@ module Translate = struct
           let args' = List.map (fun (_, ty, _) -> ty) args in
           let svar  = List.fold_left add_tvar Stv.empty args' in
           add_tvar svar res in
-        { ML.rec_sym  = rs1;  ML.rec_rsym = rs2;
-          ML.rec_args = args; ML.rec_exp  = expr info e;
-          ML.rec_res  = res;  ML.rec_svar = svar; } in
-      if rl = [] then [] else [ML.Dlet (ML.Lrec (List.map def rl))]
+        { Mltree.rec_sym  = rs1;  Mltree.rec_rsym = rs2;
+          Mltree.rec_args = args; Mltree.rec_exp  = expr info e;
+          Mltree.rec_res  = res;  Mltree.rec_svar = svar; } in
+      if rl = [] then [] else [Mltree.Dlet (Mltree.Lrec (List.map def rl))]
     | PDlet (LDsym _) | PDpure | PDlet (LDvar _) ->
       []
     | PDtype itl ->
       let itsd = List.map tdef itl in
-      [ML.Dtype itsd]
+      [Mltree.Dtype itsd]
     | PDexn xs ->
-      if ity_equal xs.xs_ity ity_unit then [ML.Dexn (xs, None)]
-      else [ML.Dexn (xs, Some (ity xs.xs_ity))]
+      if ity_equal xs.xs_ity ity_unit then [Mltree.Dexn (xs, None)]
+      else [Mltree.Dexn (xs, Some (ity xs.xs_ity))]
 
   let pdecl_m m pd =
-    let info = { ML.from_mod = Some m; ML.from_km  = m.mod_known; } in
+    let info = { Mltree.from_mod = Some m; Mltree.from_km  = m.mod_known; } in
     pdecl Sid.empty info pd
 
   (* unit module declarations *)
   let rec mdecl pids info = function
     | Udecl pd -> pdecl pids info pd
-    | Uscope (_, _, l) -> List.concat (List.map (mdecl pids info) l)
+    | Uscope (_, l) -> List.concat (List.map (mdecl pids info) l)
     | Uuse _ | Uclone _ | Umeta _ -> []
 
   let abstract_or_alias_type itd =
@@ -800,7 +692,7 @@ module Translate = struct
   let rec empty_munit = function
     | Udecl pd -> empty_pdecl pd
     | Uclone mi -> List.for_all empty_munit mi.mi_mod.mod_units
-    | Uscope (_, _, l) -> List.for_all empty_munit l
+    | Uscope (_, l) -> List.for_all empty_munit l
     | Uuse _ | Umeta _ -> true
 
   let is_empty_clone mi =
@@ -825,14 +717,14 @@ module Translate = struct
     Format.printf "param %s@." id.id_string;
     let dl =
       List.concat (List.map (mdecl Sid.empty from) mi.mi_mod.mod_units) in
-    ML.Dclone (id, dl)
+    Mltree.Dclone (id, dl)
 
   let ids_of_params pids mi =
     Mid.fold (fun id _ pids -> Sid.add id pids) mi.mi_mod.mod_known pids
 
   (* modules *)
   let module_ m =
-    let from = { ML.from_mod = Some m; ML.from_km = m.mod_known; } in
+    let from = { Mltree.from_mod = Some m; Mltree.from_km = m.mod_known; } in
     let params = find_params m.mod_units in
     let pids = List.fold_left ids_of_params Sid.empty params in
     let mod_decl = List.concat (List.map (mdecl pids from) m.mod_units) in
@@ -840,16 +732,19 @@ module Translate = struct
     let add known_map decl =
       let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
-    let mod_known = List.fold_left add Mid.empty mod_decl in
-    { ML.mod_from = from; ML.mod_decl = mod_decl; ML.mod_known = mod_known }
+    let mod_known = List.fold_left add Mid.empty mod_decl in {
+      Mltree.mod_from = from;
+      Mltree.mod_decl = mod_decl;
+      Mltree.mod_known = mod_known
+    }
 
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | ExtractionAny ->
-      Format.fprintf fmt "Cannot extract an undefined node"
-    | ExtractionVal rs ->
-      Format.fprintf fmt "Function %a cannot be extracted"
-        print_rs rs
-    | _ -> raise e)
+  (* let () = Exn_printer.register (fun fmt e -> match e with *)
+  (*   | ExtractionAny -> *)
+  (*     Format.fprintf fmt "Cannot extract an undefined node" *)
+  (*   | ExtractionVal rs -> *)
+  (*     Format.fprintf fmt "Function %a cannot be extracted" *)
+  (*       print_rs rs *)
+  (*   | _ -> raise e) *)
 
 end
 
@@ -857,7 +752,7 @@ end
 
 module Transform = struct
 
-  open ML
+  open Mltree
 
   let no_reads_writes_conflict spv spv_mreg =
     let is_not_write {pv_ity = ity} = match ity.ity_node with
@@ -865,7 +760,7 @@ module Transform = struct
         | _ -> true in
     Spv.for_all is_not_write spv
 
-  type subst = expr Mpv.t
+  (* type subst = expr Mpv.t *)
 
   let mk_list_eb ebl f =
     let mk_acc e (e_acc, s_acc) =
@@ -913,6 +808,9 @@ module Transform = struct
       let e2, s2 = expr info subst e2 in
       let e3, s3 = expr info subst e3 in
       mk (Eif (e1, e2, e3)), Spv.union (Spv.union s1 s2) s3
+    | Eexn (xs, ty, e1) ->
+      let e1, s1 = expr info subst e1 in
+      mk (Eexn (xs, ty, e1)), s1
     | Ematch (e, bl) ->
       let e, spv = expr info subst e in
       let e_bl, spv_bl = mk_list_eb bl (branch info subst) in
@@ -981,15 +879,9 @@ module Transform = struct
   let module_ m =
     let mod_decl = List.map (pdecl m.mod_from) m.mod_decl in
     let add known_map decl =
-      let idl = get_decl_name decl in
+      let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add Mid.empty mod_decl in
     { m with mod_decl = mod_decl; mod_known = mod_known }
 
 end
-
-(*
- * Local Variables:
- * compile-command: "make -C ../.. -j3 bin/why3extract.opt"
- * End:
- *)

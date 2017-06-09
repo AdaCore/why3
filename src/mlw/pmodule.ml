@@ -24,6 +24,7 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
+  | OO of Srs.t
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
@@ -41,47 +42,102 @@ let empty_ns = {
 
 let ns_replace eq chk x vo vn =
   if not chk then vn else
-  if eq vo vn then vn else
+  if eq vo vn then vo else
   raise (ClashSymbol x)
 
-let psym_equal p1 p2 = match p1,p2 with
-  | PV p1, PV p2 -> pv_equal p1 p2
-  | RS p1, RS p2 -> rs_equal p1 p2
-  | _, _ -> false
+let merge_ts = ns_replace its_equal
+let merge_xs = ns_replace xs_equal
 
-let rec merge_ns chk ns1 ns2 =
-  if ns1 == ns2 then ns1 else
-  let join eq x n o = Some (ns_replace eq chk x o n) in
-  let ns_union eq m1 m2 =
-    if m1 == m2 then m1 else Mstr.union (join eq) m1 m2 in
-  let fusion _ ns1 ns2 = Some (merge_ns chk ns1 ns2) in
-  { ns_ts = ns_union its_equal ns1.ns_ts ns2.ns_ts;
-    ns_ps = ns_union psym_equal ns1.ns_ps ns2.ns_ps;
-    ns_xs = ns_union xs_equal ns1.ns_xs ns2.ns_xs;
-    ns_ns = Mstr.union fusion ns1.ns_ns ns2.ns_ns; }
+type overload =
+  | UnOp    (* t -> t *)
+  | BinOp   (* t -> t -> t *)
+  | BinRel  (* t -> t -> bool *)
+  | NoOver  (* none of the above *)
 
-let add_ns chk x ns m = Mstr.change (function
-  | Some os -> Some (merge_ns chk ns os)
-  | None    -> Some ns) x m
+let overload_of_rs {rs_cty = cty} =
+  if cty.cty_effect.eff_ghost then NoOver else
+  if cty.cty_mask <> MaskVisible then NoOver else
+  match cty.cty_args with
+  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
+               ity_equal cty.cty_result ity_bool &&
+               not a.pv_ghost && not b.pv_ghost -> BinRel
+  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
+               ity_equal cty.cty_result a.pv_ity &&
+               not a.pv_ghost && not b.pv_ghost -> BinOp
+  | [a]   when ity_equal cty.cty_result a.pv_ity &&
+               not a.pv_ghost -> UnOp
+  | _ -> NoOver
 
-let ns_add eq chk x vn m = Mstr.change (function
-  | Some vo -> Some (ns_replace eq chk x vo vn)
+exception IncompatibleNotation of string
+
+let merge_ps chk x vo vn =
+  let fsty rs = (List.hd rs.rs_cty.cty_args).pv_ity in
+  if chk then match vo, vn with (* export namespace *)
+    (* currently, we have no way to export notation *)
+    | _, OO _ | OO _, _ -> assert false
+    | PV v1, PV v2 when pv_equal v1 v2 -> vo
+    | RS r1, RS r2 when rs_equal r1 r2 -> vo
+    | _ -> raise (ClashSymbol x)
+  else match vo, vn with (* import namespace *)
+    (* once again, no way to export notation *)
+    | _, OO _ -> assert false
+    (* but we can merge two compatible symbols *)
+    | RS r1, RS r2 when not (rs_equal r1 r2) ->
+        let o1 = overload_of_rs r1 in
+        let o2 = overload_of_rs r2 in
+        if o1 <> o2 || o2 = NoOver then vn else
+        if fsty r1 == fsty r2 then vn else
+        OO (Srs.add r2 (Srs.singleton r1))
+    (* or add a compatible symbol to notation *)
+    | OO s1, RS r2 ->
+        let o1 = overload_of_rs (Srs.choose s1) in
+        let o2 = overload_of_rs r2 in
+        if o1 <> o2 || o2 = NoOver then vn else
+        let ty = fsty r2 in
+        let confl r = fsty r != ty in
+        let s1 = Srs.filter confl s1 in
+        if Srs.is_empty s1 then vn else
+        OO (Srs.add r2 s1)
+    | _ -> vn
+
+let rec merge_ns chk _ no nn =
+  if no == nn then no else
+  let union merge o n =
+    let merge x vo vn = Some (merge chk x vo vn) in
+    if o == n then o else Mstr.union merge o n in
+  { ns_ts = union merge_ts no.ns_ts nn.ns_ts;
+    ns_ps = union merge_ps no.ns_ps nn.ns_ps;
+    ns_xs = union merge_xs no.ns_xs nn.ns_xs;
+    ns_ns = union merge_ns no.ns_ns nn.ns_ns }
+
+let ns_add merge chk x vn m = Mstr.change (function
+  | Some vo -> Some (merge chk x vo vn)
   | None    -> Some vn) x m
 
-let add_xs chk x xs ns = { ns with ns_xs = ns_add xs_equal   chk x xs ns.ns_xs }
-let add_ts chk x ts ns = { ns with ns_ts = ns_add its_equal  chk x ts ns.ns_ts }
-let add_ps chk x ps ns = { ns with ns_ps = ns_add psym_equal chk x ps ns.ns_ps }
-let add_ns chk x nn ns = { ns with ns_ns = add_ns            chk x nn ns.ns_ns }
+let add_ts chk x ts ns = { ns with ns_ts = ns_add merge_ts chk x ts ns.ns_ts }
+let add_ps chk x ps ns = { ns with ns_ps = ns_add merge_ps chk x ps ns.ns_ps }
+let add_xs chk x xs ns = { ns with ns_xs = ns_add merge_xs chk x xs ns.ns_xs }
+let add_ns chk x nn ns = { ns with ns_ns = ns_add merge_ns chk x nn ns.ns_ns }
+
+let merge_ns chk nn no = merge_ns chk "" no nn (* swap arguments *)
 
 let rec ns_find get_map ns = function
   | []   -> assert false
   | [a]  -> Mstr.find a (get_map ns)
   | a::l -> ns_find get_map (Mstr.find a ns.ns_ns) l
 
-let ns_find_prog_symbol = ns_find (fun ns -> ns.ns_ps)
-let ns_find_ns          = ns_find (fun ns -> ns.ns_ns)
-let ns_find_xs          = ns_find (fun ns -> ns.ns_xs)
-let ns_find_its         = ns_find (fun ns -> ns.ns_ts)
+let ns_find_its = ns_find (fun ns -> ns.ns_ts)
+let ns_find_xs  = ns_find (fun ns -> ns.ns_xs)
+let ns_find_ns  = ns_find (fun ns -> ns.ns_ns)
+
+let ns_find_prog_symbol ns s =
+  let ps = ns_find (fun ns -> ns.ns_ps) ns s in
+  match ps with
+  | RS _ | PV _ -> ps
+  | OO ss ->
+      let rs1 = Expr.Srs.min_elt ss in
+      let rs2 = Expr.Srs.max_elt ss in
+      if Expr.rs_equal rs1 rs2 then RS rs1 else ps
 
 let ns_find_pv ns s = match ns_find_prog_symbol ns s with
   | PV pv -> pv | _ -> raise Not_found
@@ -105,7 +161,7 @@ and mod_unit =
   | Uuse   of pmodule
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
-  | Uscope of string * bool * mod_unit list
+  | Uscope of string * mod_unit list
 
 and mod_inst = {
   mi_mod : pmodule;
@@ -172,7 +228,7 @@ let close_module, restore_module =
 let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
       muc_theory = Theory.open_scope uc.muc_theory s;
-      muc_units  = [Uscope (s, false, uc.muc_units)];
+      muc_units  = [Uscope (s, uc.muc_units)];
       muc_import =       ns :: uc.muc_import;
       muc_export = empty_ns :: uc.muc_export; }
   | [] -> assert false
@@ -180,18 +236,25 @@ let open_scope uc s = match uc.muc_import with
 let close_scope uc ~import =
   let th = Theory.close_scope uc.muc_theory ~import in
   match List.rev uc.muc_units, uc.muc_import, uc.muc_export with
-  | [Uscope (_,_,ul1)], _ :: sti, _ :: ste -> (* empty scope *)
+  | [Uscope (_,ul1)], _ :: sti, _ :: ste -> (* empty scope *)
       { uc with muc_theory = th;  muc_units  = ul1;
                 muc_import = sti; muc_export = ste; }
-  | Uscope (s,_,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
+  | Uscope (s,ul1) :: ul0, _ :: i1 :: sti, e0 :: e1 :: ste ->
       let i1 = if import then merge_ns false e0 i1 else i1 in
       let i1 = add_ns false s e0 i1 in
       let e1 = add_ns true  s e0 e1 in
       { uc with
           muc_theory = th;
-          muc_units  = Uscope (s, import, ul0) :: ul1;
+          muc_units  = Uscope (s,ul0) :: ul1;
           muc_import = i1 :: sti;
           muc_export = e1 :: ste; }
+  | _ -> assert false
+
+let import_scope uc ql = match uc.muc_import with
+  | i1 :: sti ->
+      let th = Theory.import_scope uc.muc_theory ql in
+      let i1 = merge_ns false (ns_find_ns i1 ql) i1 in
+      { uc with muc_theory = th; muc_import = i1::sti }
   | _ -> assert false
 
 let use_export uc ({mod_theory = mth} as m) =
@@ -345,9 +408,11 @@ let add_use uc d = Sid.fold (fun id uc ->
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
 
+let mk_vc uc d = Vc.vc uc.muc_env uc.muc_known uc.muc_theory d
+
 let add_pdecl ?(warn=true) ~vc uc d =
   let uc = add_use uc d in
-  let dl = if vc then Vc.vc uc.muc_env uc.muc_known d else [] in
+  let dl = if vc then mk_vc uc d else [] in
   (* verification conditions must not add additional dependencies
      on built-in theories like TupleN or HighOrd. Also, we expect
      int.Int or any other library theory to be in the context:
@@ -580,23 +645,30 @@ let cl_save_rs cl s s' =
 type smap = {
   sm_vs : vsymbol Mvs.t;
   sm_pv : pvsymbol Mvs.t;
+  sm_xs : xsymbol Mxs.t;
   sm_rs : rsymbol Mrs.t;
 }
 
 let sm_of_cl cl = {
   sm_vs = Mvs.map (fun v -> v.pv_vs) cl.pv_table;
   sm_pv = cl.pv_table;
+  sm_xs = cl.xs_table;
   sm_rs = cl.rs_table }
 
 let sm_save_vs sm v v' = {
   sm_vs = Mvs.add v v'.pv_vs sm.sm_vs;
   sm_pv = Mvs.add v v' sm.sm_pv;
+  sm_xs = sm.sm_xs;
   sm_rs = sm.sm_rs }
 
 let sm_save_pv sm v v' = {
   sm_vs = Mvs.add v.pv_vs v'.pv_vs sm.sm_vs;
   sm_pv = Mvs.add v.pv_vs v' sm.sm_pv;
+  sm_xs = sm.sm_xs;
   sm_rs = sm.sm_rs }
+
+let sm_save_xs sm s s' =
+  { sm with sm_xs = Mxs.add s s' sm.sm_xs }
 
 let sm_save_rs cl sm s s' =
   let sm = { sm with sm_rs = Mrs.add s s' sm.sm_rs } in
@@ -607,6 +679,10 @@ let sm_save_rs cl sm s s' =
 
 let sm_find_pv sm v = Mvs.find_def v v.pv_vs sm.sm_pv
   (* non-instantiated global variables are not in sm *)
+
+let sm_find_xs sm xs = Mxs.find_def xs xs sm.sm_xs
+
+let sm_find_rs sm rs = Mrs.find_def rs rs sm.sm_rs
 
 let clone_pv cl {pv_vs = vs; pv_ity = ity; pv_ghost = ghost} =
   create_pvsymbol (id_clone vs.vs_name) ~ghost (clone_ity cl ity)
@@ -768,7 +844,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let pre = clone_invl cl sm_args pre in
   let post = clone_invl cl sm_olds cty.cty_post in
   let xpost = Mxs.fold (fun xs fl q ->
-    let xs = cl_find_xs cl xs in
+    let xs = sm_find_xs sm xs in
     let fl = clone_invl cl sm_olds fl in
     Mxs.add xs fl q) cty.cty_xpost Mxs.empty in
   let add_read v s = Spv.add (sm_find_pv sm_args v) s in
@@ -788,7 +864,7 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
   let eff = eff_reset (eff_write reads writes) resets in
-  let add_raise xs eff = eff_raise eff (cl_find_xs cl xs) in
+  let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
@@ -838,20 +914,25 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
   | Ewhile (c,invl,varl,e) ->
       e_while (clone_expr cl sm c) (clone_invl cl sm invl)
               (clone_varl cl sm varl) (clone_expr cl sm e)
-  | Efor (i, (f,dir,t), invl, e) ->
-      let i' = clone_pv cl i in
-      let ism = sm_save_pv sm i i' in
-      e_for i'
+  | Efor (v, (f,dir,t), i, invl, e) ->
+      let v' = clone_pv cl v in
+      let ism = sm_save_pv sm v v' in
+      let i' = if pv_equal v i then v' else clone_pv cl i in
+      let ism = if pv_equal v i then ism else sm_save_pv ism i i' in
+      e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
-        (clone_invl cl ism invl) (clone_expr cl ism e)
+        i' (clone_invl cl ism invl) (clone_expr cl ism e)
   | Etry (d, xl) ->
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
-        Mxs.add (cl_find_xs cl xs) (vl', clone_expr cl sm e) m in
+        Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
       e_try (clone_expr cl sm d) (Mxs.fold conv_br xl Mxs.empty)
   | Eraise (xs, e) ->
-      e_raise (cl_find_xs cl xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+      e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+  | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->
+      let xs' = create_xsymbol (id_clone id) ~mask (clone_ity cl ity) in
+      e_exn xs' (clone_expr cl (sm_save_xs sm xs xs') e)
   | Eassert (k, f) ->
       e_assert k (clone_term cl sm.sm_vs f)
   | Eghost e ->
@@ -865,7 +946,7 @@ and clone_cexp cl sm c = match c.c_node with
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
       let res = clone_ity cl c.c_cty.cty_result in
-      c_app (Mrs.find_def s s sm.sm_rs) vl al res
+      c_app (sm_find_rs sm s) vl al res
   | Cpur (s,vl) ->
       let vl = List.map (fun v -> sm_find_pv sm v) vl in
       let al = List.map (fun v -> clone_ity cl v.pv_ity) c.c_cty.cty_args in
@@ -955,7 +1036,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       (* FIXME check ghost status and mask of cexp/ld wrt rs *)
       (* FIXME check effects of cexp/ld wrt rs *)
       (* FIXME add correspondance for "let lemma" to cl.pr_table *)
-      let dl = Vc.vc uc.muc_env uc.muc_known (create_let_decl ld) in
+      let dl = mk_vc uc (create_let_decl ld) in
       List.fold_left (add_pdecl_raw ~warn:false) uc dl
   | PDlet ld ->
       begin match ld with
@@ -1035,7 +1116,7 @@ let clone_export uc m inst =
           | MApr pr -> MApr (cl_find_pr cl pr)
           | a -> a) al)
         with Not_found -> uc end
-    | Uscope (n,_import,ul) ->
+    | Uscope (n,ul) ->
         let uc = open_scope uc n in
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
@@ -1113,20 +1194,32 @@ let rec print_unit fmt = function
       print_mname mi.mi_mod
   | Umeta (m,al) -> Format.fprintf fmt "@[<hov 2>meta %s %a@]"
       m.meta_name (Pp.print_list Pp.comma Pretty.print_meta_arg) al
-  | Uscope (s,i,[Uuse m]) -> Format.fprintf fmt "use%s %a%s"
-      (if i then " import" else "") print_mname m
+  | Uscope (s,[Uuse m]) -> Format.fprintf fmt "use %a%s" print_mname m
       (if s = m.mod_theory.th_name.id_string then "" else " as " ^ s)
-  | Uscope (s,i,[Uclone mi]) -> Format.fprintf fmt "clone%s %a%s with ..."
-      (if i then " import" else "") print_mname mi.mi_mod
+  | Uscope (s,[Uclone mi]) -> Format.fprintf fmt "clone %a%s with ..."
+      print_mname mi.mi_mod
       (if s = mi.mi_mod.mod_theory.th_name.id_string then "" else " as " ^ s)
-  | Uscope (s,i,ul) -> Format.fprintf fmt "@[<hov 2>scope%s %s@\n%a@]@\nend"
-      (if i then " import" else "") s (Pp.print_list Pp.newline2 print_unit) ul
+  | Uscope (s,ul) -> Format.fprintf fmt "@[<hov 2>scope %s@\n%a@]@\nend"
+      s (Pp.print_list Pp.newline2 print_unit) ul
 
 let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
+let get_rs_name nm =
+  if nm = "mixfix []" then "([])" else
+  if nm = "mixfix []<-" then "([]<-)" else
+  if nm = "mixfix [<-]" then "([<-])" else
+  if nm = "mixfix [_..]" then "([_..])" else
+  if nm = "mixfix [.._]" then "([.._])" else
+  if nm = "mixfix [_.._]" then "([_.._])" else
+  try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
+  try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
+  nm
+
 let () = Exn_printer.register (fun fmt e -> match e with
+  | IncompatibleNotation nm -> Format.fprintf fmt
+      "Incombatible type signatures for notation '%s'" (get_rs_name nm)
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
   | _ -> raise e)

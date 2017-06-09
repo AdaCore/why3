@@ -594,7 +594,7 @@ let rec eval_expr env (e : expr) : result =
         end
       | r -> r
     end
-  | Efor(pvs,(pvs1,dir,pvs2),_inv,e1) ->
+  | Efor(pvs,(pvs1,dir,pvs2),_i,_inv,e1) ->
     begin
       try
         let a = big_int_of_value (get_pvs env pvs1) in
@@ -642,6 +642,7 @@ let rec eval_expr env (e : expr) : result =
         | Normal t -> Excep(xs,t)
         | _ -> r
     end
+  | Eexn(_,e1) -> eval_expr env e1
   | Eassert(_,_t) -> Normal Vvoid (* TODO *)
     (* TODO: do not eval t if no assertion check *)
 (*
@@ -816,10 +817,3 @@ let eval_global_symbol env m fmt rs =
   with Not_found ->
     eprintf "Symbol '%s' has no definition.@." rs.rs_name.Ident.id_string;
     exit 1
-
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3execute.byte"
-End:
-*)

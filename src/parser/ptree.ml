@@ -85,6 +85,7 @@ and term_desc =
   | Ttuple of term list
   | Trecord of (qualid * term) list
   | Tupdate of term * (qualid * term) list
+  | Tscope of qualid * term
   | Tat of term * ident
 
 (*s Program expressions *)
@@ -142,6 +143,7 @@ and expr_desc =
   | Eabsurd
   | Epure of term
   | Eraise of qualid * expr option
+  | Eexn of ident * pty * Ity.mask * expr
   | Etry of expr * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
@@ -150,6 +152,7 @@ and expr_desc =
   | Ecast of expr * pty
   | Eghost of expr
   | Enamed of label * expr
+  | Escope of qualid * expr
 
 and fundef = ident * ghost * Expr.rs_kind *
   binder list * pty option * Ity.mask * spec * expr

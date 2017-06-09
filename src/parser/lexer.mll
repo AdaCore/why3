@@ -84,11 +84,13 @@
         "mutable", MUTABLE;
         "old", OLD;
         "private", PRIVATE;
+        "pure", PURE;
         "raise", RAISE;
         "raises", RAISES;
         "reads", READS;
         "rec", REC;
         "requires", REQUIRES;
+        "return", RETURN;
         "returns", RETURNS;
         "to", TO;
         "try", TRY;
@@ -183,10 +185,6 @@ rule token = parse
       { LEFTBRC }
   | "}"
       { RIGHTBRC }
-  | "{|"
-      { LEFTPURE }
-  | "|}"
-      { RIGHTPURE }
   | ":"
       { COLON }
   | ";"
@@ -221,6 +219,8 @@ rule token = parse
       { TILDE }
   | "="
       { EQUAL }
+  | "-"
+      { MINUS }
   | "["
       { LEFTSQ }
   | "]"

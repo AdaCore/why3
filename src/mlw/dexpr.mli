@@ -14,6 +14,7 @@ open Ident
 open Term
 open Ity
 open Expr
+open Pmodule
 
 (** Program types *)
 
@@ -45,7 +46,7 @@ type dpattern_node =
   | DPapp  of rsymbol * dpattern list
   | DPas   of dpattern * preid * bool
   | DPor   of dpattern * dpattern
-  | DPcast of dpattern * ity
+  | DPcast of dpattern * dity
 
 (** Binders *)
 
@@ -57,11 +58,14 @@ type dbinder = preid option * ghost * dity
 
 exception UnboundLabel of string
 
+val old_mark    : string
+val old_mark_id : preid
+
 type register_old = pvsymbol -> string -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
       a registrar function. The label string must be ["0"] for [old]. *)
 
-type 'a later = pvsymbol Mstr.t -> register_old -> 'a
+type 'a later = pvsymbol Mstr.t -> xsymbol Mstr.t -> register_old -> 'a
   (** Specification terms are parsed and typechecked after the program
       expressions, when the types of locally bound program variables are
       already established. *)
@@ -87,6 +91,10 @@ type dspec = ity -> dspec_final
 
 type dinvariant = term list
 
+type dxsymbol =
+  | DElexn of string * dity
+  | DEgexn of xsymbol
+
 type dexpr = private {
   de_node : dexpr_node;
   de_dvty : dvty;
@@ -95,13 +103,12 @@ type dexpr = private {
 
 and dexpr_node =
   | DEvar of string * dvty
-  | DEpv of pvsymbol
-  | DErs of rsymbol
+  | DEsym of prog_symbol
   | DEls of lsymbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
-  | DEfun of dbinder list * mask * dspec later * dexpr
-  | DEany of dbinder list * mask * dspec later * dity
+  | DEfun of dbinder list * dity * mask * dspec later * dexpr
+  | DEany of dbinder list * dity * mask * dspec later
   | DElet of dlet_defn * dexpr
   | DErec of drec_defn * dexpr
   | DEnot of dexpr
@@ -112,16 +119,17 @@ and dexpr_node =
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * (xsymbol * dpattern * dexpr) list
-  | DEraise of xsymbol * dexpr
+  | DEtry of dexpr * (dxsymbol * dpattern * dexpr) list
+  | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
+  | DEexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEabsurd
   | DEtrue
   | DEfalse
-  | DEmark of preid * dexpr
-  | DEcast of dexpr * ity
+  | DEcast of dexpr * dity
+  | DEmark of preid * dity * dexpr
   | DEuloc of dexpr * Loc.position
   | DElabel of dexpr * Slab.t
 
@@ -129,8 +137,8 @@ and dlet_defn = preid * ghost * rs_kind * dexpr
 
 and drec_defn = private { fds : dfun_defn list }
 
-and dfun_defn = preid * ghost * rs_kind *
-  dbinder list * mask * dspec later * variant list later * dexpr
+and dfun_defn = preid * ghost * rs_kind * dbinder list *
+  dity * mask * dspec later * variant list later * dexpr
 
 (** Environment *)
 
@@ -146,11 +154,19 @@ val denv_add_args : denv -> dbinder list -> denv
 
 val denv_add_pat : denv -> dpattern -> denv
 
+val denv_add_for_index : denv -> preid -> dvty -> denv
+
+val denv_add_exn : denv -> preid -> dity -> denv
+
 val denv_get : denv -> string -> dexpr_node (** raises UnboundVar *)
 
 val denv_get_opt : denv -> string -> dexpr_node option
 
-val denv_contents : denv -> (Ty.Stv.t option * dvty) Mstr.t
+val denv_get_exn : denv -> string -> dxsymbol (** raises Not_found *)
+
+val denv_get_exn_opt : denv -> string -> dxsymbol option
+
+val denv_names : denv -> Sstr.t
 
 val denv_pure : denv -> (Dterm.denv -> Dterm.dty) -> dity
 

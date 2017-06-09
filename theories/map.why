@@ -11,7 +11,7 @@ theory Map
   let function get (f: map 'a 'b) (x: 'a) : 'b = f x
 
   let ghost function set (f: map 'a 'b) (x: 'a) (v: 'b) : map 'a 'b =
-    fun y -> if y = x then v else f y
+    fun y -> if pure {y = x} then v else f y
 
   (** syntactic sugar *)
   let function ([]) (f: map 'a 'b) (x: 'a) : 'b = f x

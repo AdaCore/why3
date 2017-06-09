@@ -24,6 +24,7 @@ open Pdecl
 type prog_symbol =
   | PV of pvsymbol
   | RS of rsymbol
+  | OO of Srs.t
 
 type namespace = {
   ns_ts : itysymbol   Mstr.t;  (* type symbols *)
@@ -32,15 +33,23 @@ type namespace = {
   ns_ns : namespace   Mstr.t;  (* inner namespaces *)
 }
 
-val ns_find_its : namespace -> string list -> itysymbol
-
 val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
+val ns_find_its : namespace -> string list -> itysymbol
 val ns_find_pv  : namespace -> string list -> pvsymbol
 val ns_find_rs  : namespace -> string list -> rsymbol
 val ns_find_xs  : namespace -> string list -> xsymbol
-
 val ns_find_ns  : namespace -> string list -> namespace
+
+type overload =
+  | UnOp    (* t -> t *)
+  | BinOp   (* t -> t -> t *)
+  | BinRel  (* t -> t -> bool *)
+  | NoOver  (* none of the above *)
+
+val overload_of_rs : rsymbol -> overload
+
+exception IncompatibleNotation of string
 
 (** {2 Module} *)
 
@@ -58,7 +67,7 @@ and mod_unit =
   | Uuse   of pmodule
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
-  | Uscope of string * bool * mod_unit list
+  | Uscope of string * mod_unit list
 
 and mod_inst = {
   mi_mod : pmodule;
@@ -90,8 +99,9 @@ type pmodule_uc = private {
 val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
 val close_module  : pmodule_uc -> pmodule
 
-val open_scope  : pmodule_uc -> string -> pmodule_uc
-val close_scope : pmodule_uc -> import:bool -> pmodule_uc
+val open_scope   : pmodule_uc -> string -> pmodule_uc
+val close_scope  : pmodule_uc -> import:bool -> pmodule_uc
+val import_scope : pmodule_uc -> string list -> pmodule_uc
 
 val restore_path : ident -> string list * string * string list
 (** [restore_path id] returns the triple (library path, module,

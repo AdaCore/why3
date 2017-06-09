@@ -137,15 +137,15 @@
 %token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN CHECK
 %token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
-%token PRIVATE RAISE RAISES READS REC REQUIRES RETURNS
-%token TO TRY VAL VARIANT WHILE WRITES ALIAS
+%token PRIVATE PURE RAISE RAISES READS REC REQUIRES
+%token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES ALIAS
 
 (* symbols *)
 
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LT GT LTGT
+%token DOT DOTDOT EQUAL LT GT LTGT MINUS
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -156,21 +156,19 @@
 
 (* program symbols *)
 
-%token AMPAMP BARBAR LEFTBRC RIGHTBRC LEFTPURE RIGHTPURE SEMICOLON
+%token AMPAMP BARBAR LEFTBRC RIGHTBRC SEMICOLON
 
 (* Precedences *)
 
 %nonassoc IN
 %nonassoc below_SEMI
 %nonassoc SEMICOLON
-%nonassoc LET VAL
+%nonassoc LET VAL EXCEPTION
 %nonassoc prec_no_else
 %nonassoc DOT ELSE GHOST
 %nonassoc prec_named
-%nonassoc COLON
-
-%right ARROW LRARROW
-%right BY SO
+%nonassoc COLON (* weaker than -> because of t: a -> b *)
+%right ARROW LRARROW BY SO
 %right OR BARBAR
 %right AND AMPAMP
 %nonassoc NOT
@@ -178,10 +176,11 @@
 %nonassoc AT OLD
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
-%left OP2
+%left OP2 MINUS
 %left OP3
 %left OP4
 %nonassoc prec_prefix_op
+%nonassoc INTEGER REAL
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
@@ -512,11 +511,17 @@ term_:
 | NOT term
     { Tnot $2 }
 | OLD term
-    { Tat ($2, mk_id "0" $startpos($1) $endpos($1)) }
+    { Tat ($2, mk_id Dexpr.old_mark $startpos($1) $endpos($1)) }
 | term AT uident
     { Tat ($1, $3) }
 | prefix_op term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_term (Tconst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+| MINUS REAL
+    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_term (Tconst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op_1 ; r = term
@@ -578,13 +583,17 @@ term_dot_:
 | o = oppref ; a = term_dot { Tidapp (Qident o, [a]) }
 | term_sub_                 { $1 }
 
-term_sub_:
-| term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
+term_block:
 | LEFTPAR term RIGHTPAR                             { $2.term_desc }
 | LEFTPAR RIGHTPAR                                  { Ttuple [] }
 | LEFTPAR comma_list2(term) RIGHTPAR                { Ttuple $2 }
 | LEFTBRC field_list1(term) RIGHTBRC                { Trecord $2 }
 | LEFTBRC term_arg WITH field_list1(term) RIGHTBRC  { Tupdate ($2,$4) }
+
+term_sub_:
+| term_block                                        { $1 }
+| uqualid DOT mk_term(term_block)                   { Tscope ($1, $3) }
+| term_dot DOT lqualid_rich                         { Tidapp ($3,[$1]) }
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
@@ -689,6 +698,12 @@ expr_:
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_expr (Econst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+| MINUS REAL
+    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
+        [mk_expr (Econst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
 | l = expr ; o = infix_op_1 ; r = expr
     { Einfix (l,o,r) }
 | l = expr ; o = infix_op_234 ; r = expr
@@ -762,6 +777,10 @@ expr_:
     { Ematch ($2, $4) }
 | MATCH comma_list2(expr) WITH match_cases(seq_expr) END
     { Ematch (mk_expr (Etuple $2) $startpos($2) $endpos($2), $4) }
+| EXCEPTION labels(uident) IN seq_expr
+    { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
+| EXCEPTION labels(uident) return IN seq_expr
+    { Eexn ($2, fst $3, snd $3, $5) }
 | LABEL labels(uident) IN seq_expr
     { Emark ($2, $4) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
@@ -774,6 +793,8 @@ expr_:
     { Eraise ($2, $3) }
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
+| RETURN expr_arg?
+    { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, $4) }
 | GHOST expr
@@ -801,7 +822,7 @@ expr_dot_:
 | o = oppref ; a = expr_dot { Eidapp (Qident o, [a]) }
 | expr_sub                  { $1 }
 
-expr_sub:
+expr_block:
 | BEGIN single_spec spec seq_expr END
     { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
 | BEGIN single_spec spec END
@@ -814,8 +835,12 @@ expr_sub:
 | LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
-| LEFTPURE term RIGHTPURE                           { Epure $2 }
+
+expr_sub:
+| expr_block                                        { $1 }
+| uqualid DOT mk_expr(expr_block)                   { Escope ($1, $3) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
+| PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_arg LEFTSQ expr RIGHTSQ
     { Eidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | expr_arg LEFTSQ expr LARROW expr RIGHTSQ
@@ -1033,7 +1058,9 @@ lident_op_id:
 lident_op:
 | op_symbol               { infix $1 }
 | op_symbol UNDERSCORE    { prefix $1 }
+| MINUS     UNDERSCORE    { prefix "-" }
 | EQUAL                   { infix "=" }
+| MINUS                   { infix "-" }
 | OPPREF                  { prefix $1 }
 | LEFTSQ RIGHTSQ          { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
@@ -1055,6 +1082,7 @@ op_symbol:
 
 prefix_op:
 | op_symbol { mk_id (prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (prefix "-") $startpos $endpos }
 
 %inline infix_op_1:
 | o = OP1   { mk_id (infix o)    $startpos $endpos }
@@ -1067,6 +1095,7 @@ prefix_op:
 | o = OP2   { mk_id (infix o)    $startpos $endpos }
 | o = OP3   { mk_id (infix o)    $startpos $endpos }
 | o = OP4   { mk_id (infix o)    $startpos $endpos }
+| MINUS     { mk_id (infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 
