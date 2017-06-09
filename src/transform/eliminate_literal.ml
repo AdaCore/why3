@@ -58,8 +58,8 @@ let elim le_int le_real neg_real type_kept kn
                && not (Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in
       let ir = match ts.ts_def with Range ir -> ir | _ -> assert false in
-      let lo = Number.int_const_dec (BigInt.to_string ir.Number.ir_lower) in
-      let hi = Number.int_const_dec (BigInt.to_string ir.Number.ir_upper) in
+      let lo = ir.Number.ir_lower in
+      let hi = ir.Number.ir_upper in
       let ty_decl = create_ty_decl ts in
       let ls_decl = create_param_decl to_int in
       let pr = create_prsymbol (id_fresh (ts.ts_name.id_string ^ "'axiom")) in
@@ -98,9 +98,11 @@ let elim le_int le_real neg_real type_kept kn
       let m_string = Format.flush_str_formatter () in
       Number.print_in_base 10 None Format.str_formatter e;
       let e_string = Format.flush_str_formatter () in
+      let e_val = Number.real_const_hex m_string "" (Some e_string) in
       let max_term = t_const
-          (Number.ConstReal
-             (Number.real_const_hex m_string "" (Some e_string))) ty_real in
+          Number.(ConstReal { rc_negative = false ; rc_abs = e_val })
+          ty_real
+      in
       (* compose axiom *)
       let f = t_and (t_app le_real [t_app neg_real [max_term] (Some ty_real); v_term] None)
           (t_app le_real [v_term; max_term] None) in

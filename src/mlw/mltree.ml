@@ -36,7 +36,7 @@ type expr = {
 }
 
 and expr_node =
-  | Econst  of Number.integer_constant
+  | Econst  of Number.integer_literal
   | Evar    of pvsymbol
   | Eapp    of rsymbol * expr list
   | Efun    of var list * expr

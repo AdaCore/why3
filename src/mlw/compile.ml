@@ -438,8 +438,11 @@ module Translate = struct
     assert (not eff.eff_ghost);
     match e.e_node with
     | Econst c ->
-      let c = match c with Number.ConstInt c -> c | _ -> assert false in
-      ML.mk_expr (Mltree.Econst c) (Mltree.I e.e_ity) eff
+      let c = match c with
+          Number.ConstInt c -> c | _ -> assert false in
+      if c.Number.ic_negative then
+        failwith "negative integer literals not yet supported";
+      ML.mk_expr (Mltree.Econst c.Number.ic_abs) (Mltree.I e.e_ity) eff
     | Evar pv ->
       ML.mk_expr (Mltree.Evar pv) (Mltree.I e.e_ity) eff
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->

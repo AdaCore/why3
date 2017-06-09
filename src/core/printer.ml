@@ -267,7 +267,7 @@ let syntax_range_literal s fmt c =
       else
         None
     in
-    let v = Number.compute_int c in
+    let v = Number.compute_int_literal c in
     Number.print_in_base base digits fmt v
   in
   global_substitute_fmt opt_search_forward_literal_format f s fmt

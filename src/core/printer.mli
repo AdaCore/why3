@@ -103,10 +103,10 @@ val syntax_arguments_typed :
      the list l using the template templ and the printer print_arg *)
 
 val syntax_range_literal :
-  string -> Number.integer_constant Pp.pp
+  string -> Number.integer_literal Pp.pp
 
 val syntax_float_literal :
-  string -> Number.float_format -> Number.real_constant Pp.pp
+  string -> Number.float_format -> Number.real_literal Pp.pp
 
 (** {2 pretty-printing transformations (useful for caching)} *)
 

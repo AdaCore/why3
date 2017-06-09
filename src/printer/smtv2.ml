@@ -148,11 +148,13 @@ let collect_model_ls info ls =
 let number_format = {
   Number.long_int_support = true;
   Number.extra_leading_zeros_support = false;
+  Number.negative_int_support = Number.Number_default;
   Number.dec_int_support = Number.Number_default;
   Number.hex_int_support = Number.Number_unsupported;
   Number.oct_int_support = Number.Number_unsupported;
   Number.bin_int_support = Number.Number_unsupported;
   Number.def_int_support = Number.Number_unsupported;
+  Number.negative_real_support = Number.Number_default;
   Number.dec_real_support = Number.Number_unsupported;
   Number.hex_real_support = Number.Number_unsupported;
   Number.frac_real_support = Number.Number_custom
@@ -177,12 +179,16 @@ let rec print_term info fmt t =
       (* look for syntax literal ts in driver *)
       begin match query_syntax info.info_rliteral ts.ts_name, c with
         | Some st, Number.ConstInt c ->
-          syntax_range_literal st fmt c
+           if c.Number.ic_negative then
+             failwith "not supported yet: syntax literal for negative integer literals";
+          syntax_range_literal st fmt c.Number.ic_abs
         | Some st, Number.ConstReal c ->
+           if c.Number.rc_negative then
+             failwith "not supported yet: syntax literal for negative float literals";
           let fp = match ts.ts_def with
             | Float fp -> fp
             | _ -> assert false in
-          syntax_float_literal st fp fmt c
+          syntax_float_literal st fp fmt c.Number.rc_abs
         | None, _ -> Number.print number_format fmt c
         (* TODO/FIXME: we must assert here that the type is either
             ty_int or ty_real, otherwise it makes no sense to print
