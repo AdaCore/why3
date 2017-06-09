@@ -41,9 +41,9 @@ module N
 
   lemma limb_max_bound: 1 <= max_uint64
 
-  function l2i (x:limb) : int = Limb.to_int x
+  let ghost function l2i (x:limb) : int = Limb.to_int x
 
-  function p2i (i:int32) : int = Int32.to_int i
+  let ghost function p2i (i:int32) : int = Int32.to_int i
 
   exception Break
   exception Return32 int32
@@ -182,7 +182,7 @@ module N
   use import mach.c.C
   type t = ptr limb
 
-  function value (x:t) (sz:int) : int =
+  let ghost function value (x:t) (sz:int) : int =
      value_sub (pelts x) x.offset (x.offset + sz)
 
   function compare_int (x y:int) : int =
@@ -1616,12 +1616,14 @@ module N
     let ghost q = power 2 (Limb.length - p2i r) in
     assert { p * x <= radix - p
              by
-             p * q = radix
+             p * q = radix 
              so mod radix p = mod (q * p) p = 0
              so mod (p * x) p = 0
-             so p * x < radix
-             so mod (radix - p) p = mod (p * (-1) + radix) p
-                = mod radix p = 0
+             so p * x < radix = p * q
+             so (x < q by p > 0)
+             so radix - p = p * (q - 1)
+             so x <= q - 1
+             so p * x <= p * (q - 1)
            };
     r
 
@@ -3382,7 +3384,14 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    * vy * power radix !i
                    + value x sx
                 so sx = sy + !i
-                so (pelts x)[x.offset + sy + !i - 1] = !x1
+                so x.offset + sy + !i - 1 = !xp.offset + 1
+                so (pelts x)[x.offset + sy + !i - 1] =
+                   (pelts x)[!xp.offset + 1]= !x1
+                so value x sx
+                   = value x (sx - 1)
+                     + power radix (sx -1) * (pelts x)[x.offset + sx - 1]
+                   = value x (sy + !i - 1)
+                     + power radix (sy + !i - 1) * (pelts x)[x.offset + sy + !i - 1]
                 so value x (sy + !i - 1)
                   + power radix (sy + !i - 1) * !x1
                   = value x sx

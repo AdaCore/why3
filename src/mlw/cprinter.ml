@@ -1279,19 +1279,12 @@ module MLToC = struct
       begin
         match idef with
         | Some (Dalias ty) -> Some (C.Dtypedef (ty_of_mlty info ty, id))
-        | Some _ -> if debug then Format.printf "Ddata/Drecord@.";
-                    None (*FIXME unsupported*)
+        | Some _ -> raise (Unsupported "Ddata/Drecord@.")
         | None ->
           begin match query_syntax info.syntax id with
           | Some _ -> None
           | None ->
-             if debug
-             then
-               Format.printf
-                 "type declaration without syntax or alias: %s@."
-                 id.id_string;
-             None (*FIXME*)
-               (* raise (Unsupported ("type declaration without syntax or alias: "^id.id_string)) *)
+             raise (Unsupported ("type declaration without syntax or alias: "^id.id_string))
           end
       end
 

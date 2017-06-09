@@ -20,10 +20,10 @@ module C
   }
   (*invariant { in_us_bounds data.length, offset }*)
 
-  function plength (p:ptr 'a) : int
+  let ghost function plength (p:ptr 'a) : int
   = p.data.length
 
-  function pelts (p:ptr 'a) : int -> 'a
+  let ghost function pelts (p:ptr 'a) : int -> 'a
   = p.data.elts
 
   val p2i (n:int32):int
