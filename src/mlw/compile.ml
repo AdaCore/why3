@@ -206,7 +206,6 @@ module ML = struct
 
 end
 
-
 (** Translation from Mlw to ML *)
 
 module Translate = struct
@@ -346,8 +345,9 @@ module Translate = struct
         List.map def cty_app.cty_args in
       args @ extra_args in
     let eapp = ML.mk_expr (Mltree.Eapp (rsc, args)) (Mltree.C cty_app)
-                                                    cty_app.cty_effect in
-    ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C cty_app) cty_app.cty_effect
+        cty_app.cty_effect in
+    ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C cty_app)
+      cty_app.cty_effect
 
   (* function arguments *)
   let filter_params args =
