@@ -175,7 +175,7 @@
 %left OP3
 %left OP4
 %nonassoc prec_prefix_op
-%nonassoc INTEGER REAL
+%nonassoc INTEGER REAL (* stronger than MINUS *)
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
@@ -208,6 +208,8 @@ scope_head:
 module_decl:
 | scope_head module_decl* END
     { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
+| IMPORT uqualid
+    { Typing.import_scope (floc $startpos $endpos) $2 }
 | d = pure_decl | d = prog_decl | d = meta_decl
     { Typing.add_decl (floc $startpos $endpos) d }
 | use_clone { () }
@@ -831,9 +833,15 @@ expr_block:
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
 
+expr_pure:
+| LEFTBRC qualid RIGHTBRC                           { Eidpur $2 }
+| uqualid DOT LEFTBRC ident_rich RIGHTBRC           { Eidpur (Qdot ($1, $4)) }
+
 expr_sub:
 | expr_block                                        { $1 }
+| expr_pure                                         { $1 }
 | uqualid DOT mk_expr(expr_block)                   { Escope ($1, $3) }
+| expr_dot DOT mk_expr(expr_pure)                   { Eapply ($3, $1) }
 | expr_dot DOT lqualid_rich                         { Eidapp ($3, [$1]) }
 | PURE LEFTBRC term RIGHTBRC                        { Epure $3 }
 | expr_arg LEFTSQ expr RIGHTSQ
@@ -1038,6 +1046,11 @@ quote_lident:
 
 (* Idents + symbolic operation names *)
 
+ident_rich:
+| uident        { $1 }
+| lident        { $1 }
+| lident_op_id  { $1 }
+
 lident_rich:
 | lident_nq     { $1 }
 | lident_op_id  { $1 }
@@ -1091,12 +1104,8 @@ prefix_op:
 (* Qualified idents *)
 
 qualid:
-| uident                    { Qident $1 }
-| lident                    { Qident $1 }
-| lident_op_id              { Qident $1 }
-| uqualid DOT uident        { Qdot ($1, $3) }
-| uqualid DOT lident        { Qdot ($1, $3) }
-| uqualid DOT lident_op_id  { Qdot ($1, $3) }
+| ident_rich                { Qident $1 }
+| uqualid DOT ident_rich    { Qdot ($1, $3) }
 
 lqualid_rich:
 | lident                    { Qident $1 }

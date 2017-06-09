@@ -12,11 +12,11 @@
  <goal name="VC height_cps" expl="VC for height_cps">
  <proof prover="6"><result status="valid" time="0.00" steps="46"/></proof>
  </goal>
- <goal name="VC height" expl="VC for height" expanded="true">
+ <goal name="VC height" expl="VC for height">
  <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="Iteration" sum="afade23b6e0721562d822b490670f598" expanded="true">
+<theory name="Iteration" sum="5f18df8a033a043182231f18342f705d" expanded="true">
  <goal name="VC is_id" expl="VC for is_id">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -33,7 +33,7 @@
  <goal name="helper1">
  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
- <goal name="sizew_nonneg" expanded="true">
+ <goal name="sizew_nonneg">
  <proof prover="2"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="VC height1" expl="VC for height1">
@@ -105,7 +105,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="HeightStack" sum="664e0716691fa3052904de966df117f7">
+<theory name="HeightStack" sum="0574d29049467f5598663f7d3cdc1067" expanded="true">
  <goal name="sizes_nonneg">
  <transf name="induction_ty_lex">
   <goal name="sizes_nonneg.1" expl="1.">
@@ -128,13 +128,7 @@
   <proof prover="6"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
   <goal name="VC height_stack.5" expl="5. postcondition">
-  <proof prover="6"><result status="valid" time="0.01" steps="26"/></proof>
-  </goal>
-  <goal name="VC height_stack.6" expl="6. postcondition">
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="VC height_stack.7" expl="7. postcondition">
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
   </goal>
  </transf>
  </goal>

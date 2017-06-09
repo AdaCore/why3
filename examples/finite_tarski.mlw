@@ -13,14 +13,16 @@ module Tarski
   use import set.Fset
   clone export relations.PartialOrder
 
-  constant a : set t
+  val constant a : set t
 
-  constant e : t
+  val constant e : t
   axiom minimality: mem e a /\ forall x. mem x a -> rel e x
 
-  function f t : t
+  val function f t : t
   axiom range: forall x. mem x a -> mem (f x) a
   axiom monotone: forall x y. mem x a -> mem y a -> rel x y -> rel (f x) (f y)
+
+  val (=) (a b: t) : bool ensures { result <-> a = b }
 
   predicate fixpoint (x:t) = mem x a /\ f x = x
 

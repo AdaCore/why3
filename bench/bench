@@ -198,6 +198,7 @@ goods examples/tests-provers
 goods examples/check-builtin
 goods examples/logic
 goods examples
+goods examples/to_port
 goods examples/foveoos11-cm
 goods examples/WP_revisited
 goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
@@ -233,13 +234,13 @@ execute examples/quicksort.mlw Test.bench
 execute examples/conjugate.mlw Test.bench
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw Harness.bench
-execute examples/knuth_prime_numbers.mlw PrimeNumbers.bench
+# execute examples/knuth_prime_numbers.mlw PrimeNumbers.bench
 execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
 execute examples/verifythis_fm2012_LRS.mlw LRS_test.bench
-execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
+# execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
@@ -250,7 +251,7 @@ echo ""
 
 echo "=== Checking extraction to OCaml ==="
 extract_and_run examples/euler001 euler001.ml 1000000
-extract_and_run examples/gcd gcd.ml 6 15
+# extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
 extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml

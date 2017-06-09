@@ -589,9 +589,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let qualid_app loc q el =
-    let e = try DEsym (find_prog_symbol muc q) with
-      | _ -> DEls (find_lsymbol muc.muc_theory q) in
-    expr_app loc e el
+    expr_app loc (DEsym (find_prog_symbol muc q)) el
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->
@@ -599,6 +597,19 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | Some d -> expr_app loc d el
         | None -> qualid_app loc q el)
     | _ -> qualid_app loc q el
+  in
+  let qualid_app_pure loc q el =
+    let e = match find_global_pv muc q with
+      | None -> DEls_pure (find_lsymbol muc.muc_theory q)
+      | Some v -> DEpv_pure v in
+    expr_app loc e el
+  in
+  let qualid_app_pure loc q el = match q with
+    | Qident {id_str = n} ->
+        (match denv_get_pure_opt denv n with
+        | Some d -> expr_app loc d el
+        | None -> qualid_app_pure loc q el)
+    | _ -> qualid_app_pure loc q el
   in
   let find_dxsymbol q = match q with
     | Qident {id_str = n} ->
@@ -609,6 +620,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
+  | Ptree.Eidpur q ->
+      qualid_app_pure loc q []
   | Ptree.Eidapp (q, el) ->
       qualid_app loc q (List.map (dexpr muc denv) el)
   | Ptree.Eapply (e1, e2) ->
@@ -781,10 +794,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Eassert (ak, f) ->
       DEassert (ak, dassert muc f)
   | Ptree.Emark (id, e1) ->
-      let dity = dity_fresh () in
       let id = create_user_id id in
-      let denv = denv_add_exn denv id dity in
-      DEmark (id, dity, dexpr muc denv e1)
+      DEmark (id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
@@ -1246,6 +1257,14 @@ let close_scope loc ~import =
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
     let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
+    slice.muc <- Some muc
+
+let import_scope loc q =
+  assert (not (Stack.is_empty state));
+  let slice = Stack.top state in
+  let muc = top_muc_on_demand loc slice in
+  if Debug.test_noflag debug_parse_only then
+    let muc = Loc.try2 ~loc import_scope muc (string_list_of_qualid q) in
     slice.muc <- Some muc
 
 let add_decl loc d =

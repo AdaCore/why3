@@ -96,7 +96,7 @@ module PigeonHole
             if f j = m-1 then return
           done;
           (* we know that for all k <> i, f k <> m-1 *)
-          let g = shift f i in
+          let g = pure { shift f i } in
           assert { range g (n-1) (m-1) };
           pigeon_hole (n-1) (m-1) g;
           return

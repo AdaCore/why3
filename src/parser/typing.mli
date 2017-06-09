@@ -25,4 +25,6 @@ val open_scope : Loc.position -> Ptree.ident -> unit
 
 val close_scope : Loc.position -> import:bool -> unit
 
+val import_scope : Loc.position -> Ptree.qualid -> unit
+
 val add_decl : Loc.position -> Ptree.decl -> unit

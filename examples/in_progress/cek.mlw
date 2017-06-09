@@ -79,7 +79,7 @@ let lemma ground_app (t1 t2 : term)
   requires { ground (App t1 t2) }
   ensures  { ground t1 }
   ensures  { ground t2 }
-= ground_rec_app t1 t2 no_bound
+= ground_rec_app t1 t2 {no_bound}
 
 
 (* substitution of [x] by [s] in [t].
