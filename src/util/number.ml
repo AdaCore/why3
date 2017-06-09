@@ -306,7 +306,7 @@ let print_int_constant support fmt i =
 
 let print_real_constant support fmt r =
   if r.rc_negative then
-    check_support support.negative_real_support (Some "-%a")
+    check_support support.negative_real_support (Some "(- %a)")
                   (fun def n -> fprintf fmt def (print_real_literal support) n)
                   (fun _ -> assert false)
                   r.rc_abs
