@@ -227,20 +227,20 @@ execute examples/fibonacci.mlw FibonacciLogarithmic.bench
 # fails: cannot evaluate condition a=b (how to do it?)
 # execute examples/same_fringe.mlw SameFringe.test5
 execute examples/same_fringe.mlw Test.test1
-execute examples/vstte12_combinators.mlw Combinators.test_SKK
+execute examples/to_port/vstte12_combinators.mlw Combinators.test_SKK
 execute examples/selection_sort.mlw SelectionSort.bench
 execute examples/insertion_sort.mlw InsertionSort.bench
 execute examples/quicksort.mlw Test.bench
 execute examples/conjugate.mlw Test.bench
 # fails: needs support for "val" without code (how to do it?)
 # examples/vacid_0_sparse_array.mlw Harness.bench
-# execute examples/knuth_prime_numbers.mlw PrimeNumbers.bench
+execute examples/to_port/knuth_prime_numbers.mlw PrimeNumbers.bench
 execute examples/vstte10_max_sum.mlw TestCase.test_case
 execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
 execute examples/verifythis_fm2012_LRS.mlw LRS_test.bench
-# execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
+execute examples/to_port/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
@@ -251,9 +251,11 @@ echo ""
 
 echo "=== Checking extraction to OCaml ==="
 extract_and_run examples/euler001 euler001.ml 1000000
+# needs to port
 # extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
+# needs to port
+# extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml
 extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 echo ""
