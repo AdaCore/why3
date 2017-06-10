@@ -273,13 +273,12 @@ let find_decl mm id =
   let m = translate_module m in
   Ident.Mid.find id m.Mltree.mod_known
 
-let rec visit mm id =
+let rec visit ~recurs mm id =
   if not (Ident.Hid.mem visited id) then begin
     try
       let d = find_decl mm id in
       Ident.Hid.add visited id ();
-      if opt_rec_single = Recursive then
-        ML.iter_deps (visit mm) d;
+      if recurs then ML.iter_deps (visit ~recurs mm) d;
       toextract := id :: !toextract
     with Not_found -> ()
   end
@@ -298,13 +297,15 @@ let flat_extraction mm = function
   | Module (path, ms) ->
     let m = find_module_path mm path ms in (* FIXME: catch Not_found here *)
     let m_t = translate_module m in
-    Ident.Mid.iter (fun id _ -> visit mm id) m_t.Mltree.mod_known;
+    let recurs = opt_rec_single = Recursive in
+    Ident.Mid.iter (fun id _ -> visit ~recurs mm id) m_t.Mltree.mod_known;
     Mstr.add ms m mm
   | Symbol (path, ms, s) ->
     let m = find_module_path mm path ms in
     let ns = m.mod_export in
     let id = find_symbol_id ns s in
-    visit mm id;
+    let recurs = opt_rec_single = Recursive in
+    visit ~recurs mm id;
     Mstr.add ms m mm
 
 let () =
@@ -315,7 +316,8 @@ let () =
     | Flat ->
       let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
       let visit_m _ m = let tm = translate_module m in
-        Ident.Mid.iter (fun id _ -> visit mm id) tm.Mltree.mod_known in
+        let visit_id id _ = visit ~recurs:true mm id in
+        Ident.Mid.iter visit_id tm.Mltree.mod_known in
       Mstr.iter visit_m mm;
       let (_fg, pargs, pr) = Pdriver.lookup_printer opt_driver in
       let cout = match opt_output with

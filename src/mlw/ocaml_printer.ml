@@ -327,7 +327,7 @@ module Print = struct
     else
       let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
-      fprintf fmt ": @[@[%a@]. @[%a@] ->@ %a@ =@ @[fun @[%a@]@ ->@]@]"
+      fprintf fmt ": @[@[%a@]. @[%a ->@ %a@] =@ @[fun @[%a@]@ ->@]@]"
         print_svar s
         (print_list arrow (print_ty ~paren:true info)) ty_args
         (print_ty ~paren:true info) res
