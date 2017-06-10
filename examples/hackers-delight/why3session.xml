@@ -11,7 +11,7 @@
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../hackers-delight.mlw" expanded="true">
-<theory name="Utils" sum="bc30bd24e534b5311a00817d04a9fb76">
+<theory name="Utils" sum="759e6c31fa7148d8f0c7cee6a5b5eb0b">
  <goal name="VC one" expl="VC for one">
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -25,7 +25,7 @@
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Utils_Spec" sum="5c30c8b3fe01ee8eecd7195fb9ef1238">
+<theory name="Utils_Spec" sum="dbc71727502f591ca45632f67564ff19">
  <goal name="countZero">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
  </goal>
@@ -35,13 +35,13 @@
  <goal name="countStep">
  <transf name="split_goal_wp">
   <goal name="countStep.1" expl="1.">
-  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.25"/></proof>
+  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.58"/></proof>
   </goal>
   <goal name="countStep.2" expl="2.">
   <proof prover="4"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="countStep.3" expl="3.">
-  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.35"/></proof>
+  <proof prover="1" timelimit="10" memlimit="4000"><result status="valid" time="2.80"/></proof>
   </goal>
   <goal name="countStep.4" expl="4.">
   <proof prover="4"><result status="valid" time="0.26"/></proof>
@@ -72,7 +72,7 @@
    <proof prover="7" timelimit="1"><result status="valid" time="0.90" steps="543"/></proof>
    </goal>
    <goal name="VC countSpec_Aux.2.4" expl="4. assertion">
-   <proof prover="5"><result status="valid" time="3.06"/></proof>
+   <proof prover="5"><result status="valid" time="3.66"/></proof>
    </goal>
   </transf>
   </goal>
@@ -129,7 +129,7 @@
  <proof prover="0"><result status="valid" time="0.55" steps="635"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" sum="92cc02f880dedae78a62eb1e0bdf1e09">
+<theory name="Hackers_delight" sum="50b093a8591ef666e3746f02184ecaa9">
  <goal name="VC ascii" expl="VC for ascii">
  <proof prover="1"><result status="valid" time="0.09"/></proof>
  </goal>

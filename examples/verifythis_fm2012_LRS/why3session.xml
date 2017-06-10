@@ -65,7 +65,7 @@
  <proof prover="12" timelimit="5" memlimit="4000"><result status="valid" time="0.02" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" sum="b9df1f42d9172a0fb301350c6e7f5cde">
+<theory name="SuffixSort" sum="5b3a3b34c99886e09950e9570087b99a">
  <goal name="VC compare" expl="VC for compare">
  <transf name="split_goal_wp">
   <goal name="VC compare.1" expl="1. precondition">
@@ -152,7 +152,7 @@
   <proof prover="12"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="13"><result status="valid" time="0.03"/></proof>
   <proof prover="14"><result status="valid" time="0.02"/></proof>
-  <proof prover="15"><result status="valid" time="0.42"/></proof>
+  <proof prover="15"><result status="valid" time="0.57"/></proof>
   </goal>
   <goal name="VC sort.2" expl="2. loop invariant init">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -237,8 +237,9 @@
   </goal>
   <goal name="VC sort.14" expl="14. index in array bounds">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="12"><result status="valid" time="0.00" steps="17"/></proof>
-  <proof prover="13"><result status="valid" time="0.03"/></proof>
+  <proof prover="11"><result status="valid" time="0.42"/></proof>
+  <proof prover="12"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="13"><result status="valid" time="0.00"/></proof>
   <proof prover="14"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC sort.15" expl="15. index in array bounds">
@@ -249,9 +250,8 @@
   </goal>
   <goal name="VC sort.16" expl="16. index in array bounds">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.42"/></proof>
-  <proof prover="12"><result status="valid" time="0.01" steps="17"/></proof>
-  <proof prover="13"><result status="valid" time="0.00"/></proof>
+  <proof prover="12"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="13"><result status="valid" time="0.03"/></proof>
   <proof prover="14"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC sort.17" expl="17. index in array bounds">
@@ -275,11 +275,11 @@
   <proof prover="12"><result status="valid" time="0.02" steps="32"/></proof>
   <proof prover="13"><result status="valid" time="0.04"/></proof>
   <proof prover="14"><result status="valid" time="0.02"/></proof>
-  <proof prover="15"><result status="valid" time="0.81"/></proof>
+  <proof prover="15"><result status="valid" time="1.03"/></proof>
   </goal>
   <goal name="VC sort.21" expl="21. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.20"/></proof>
-  <proof prover="13"><result status="valid" time="0.50"/></proof>
+  <proof prover="13"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="VC sort.22" expl="22. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.22"/></proof>
@@ -287,14 +287,14 @@
   <proof prover="14"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC sort.23" expl="23. loop invariant preservation">
-  <proof prover="12"><result status="valid" time="5.27" steps="350"/></proof>
-  <proof prover="14"><result status="valid" time="0.21"/></proof>
+  <proof prover="12"><result status="valid" time="7.42" steps="350"/></proof>
+  <proof prover="14"><result status="valid" time="0.47"/></proof>
   </goal>
   <goal name="VC sort.24" expl="24. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.65" steps="679"/></proof>
   </goal>
   <goal name="VC sort.25" expl="25. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.50" steps="575"/></proof>
+  <proof prover="1"><result status="valid" time="0.72" steps="575"/></proof>
   </goal>
   <goal name="VC sort.26" expl="26. assertion">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -388,7 +388,7 @@
   <proof prover="12"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="13"><result status="valid" time="0.02"/></proof>
   <proof prover="14"><result status="valid" time="0.03"/></proof>
-  <proof prover="15"><result status="valid" time="0.94"/></proof>
+  <proof prover="15"><result status="valid" time="1.19"/></proof>
   </goal>
   <goal name="VC create.4" expl="4. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -408,12 +408,12 @@
   <proof prover="12"><result status="valid" time="0.01" steps="79"/></proof>
   <proof prover="13"><result status="valid" time="0.03"/></proof>
   <proof prover="14"><result status="valid" time="0.18"/></proof>
-  <proof prover="15"><result status="valid" time="1.45"/></proof>
+  <proof prover="15"><result status="valid" time="1.85"/></proof>
   </goal>
   <goal name="VC create.7" expl="7. precondition">
-  <proof prover="3"><result status="valid" time="1.73"/></proof>
+  <proof prover="3"><result status="valid" time="2.24"/></proof>
   <proof prover="13"><result status="valid" time="0.03"/></proof>
-  <proof prover="14"><result status="valid" time="0.48"/></proof>
+  <proof prover="14"><result status="valid" time="0.74"/></proof>
   </goal>
   <goal name="VC create.8" expl="8. postcondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
@@ -552,7 +552,7 @@
   <proof prover="14"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC lrs.11" expl="11. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="2.06"/></proof>
+  <proof prover="3"><result status="valid" time="2.53"/></proof>
   </goal>
   <goal name="VC lrs.12" expl="12. loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -576,16 +576,16 @@
   <proof prover="14"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC lrs.15" expl="15. loop invariant preservation">
-  <proof prover="3"><result status="valid" time="3.40"/></proof>
+  <proof prover="3"><result status="valid" time="4.34"/></proof>
   </goal>
   <goal name="VC lrs.16" expl="16. assertion">
-  <proof prover="3"><result status="valid" time="1.04"/></proof>
+  <proof prover="3"><result status="valid" time="1.25"/></proof>
   <proof prover="12"><result status="valid" time="0.02" steps="125"/></proof>
   <proof prover="13"><result status="valid" time="0.04"/></proof>
   <proof prover="14"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC lrs.17" expl="17. assertion">
-  <proof prover="13"><result status="valid" time="1.62"/></proof>
+  <proof prover="13"><result status="valid" time="2.18"/></proof>
   </goal>
   <goal name="VC lrs.18" expl="18. postcondition">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -611,7 +611,7 @@
   <proof prover="15"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC lrs.21" expl="21. postcondition">
-  <proof prover="0"><result status="valid" time="9.34"/></proof>
+  <proof prover="0"><result status="valid" time="16.48"/></proof>
   </goal>
   <goal name="VC lrs.22" expl="22. out of loop bounds">
   <proof prover="3"><result status="valid" time="0.02"/></proof>

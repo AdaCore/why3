@@ -13,7 +13,7 @@
 <prover id="8" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitwalker.mlw" expanded="true">
-<theory name="Bitwalker" sum="9e2086079d345ddc6500bd6ac11fac30" expanded="true">
+<theory name="Bitwalker" sum="9a21253dfd6ca71d98a38f9ddae88193" expanded="true">
  <goal name="nth64">
  <proof prover="0"><result status="valid" time="0.10" steps="93"/></proof>
  </goal>
@@ -195,7 +195,7 @@
   </goal>
   <goal name="VC peek.15" expl="15. loop variant decrease">
   <proof prover="0"><result status="valid" time="0.06" steps="99"/></proof>
-  <proof prover="3"><result status="valid" time="2.42"/></proof>
+  <proof prover="3"><result status="valid" time="2.77"/></proof>
   </goal>
   <goal name="VC peek.16" expl="16. loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.04" steps="99"/></proof>
@@ -311,8 +311,8 @@
   </goal>
   <goal name="VC poke.2" expl="2. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="85"/></proof>
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC poke.3" expl="3. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="87"/></proof>
@@ -322,24 +322,20 @@
   <goal name="VC poke.4" expl="4. postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="89"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
-  <proof prover="6"><result status="valid" time="0.07"/></proof>
-  <proof prover="10"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC poke.5" expl="5. postcondition">
-  <proof prover="0"><result status="valid" time="0.06" steps="88"/></proof>
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
-  <proof prover="6"><result status="valid" time="0.08"/></proof>
-  <proof prover="10"><result status="valid" time="0.11"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="88"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC poke.6" expl="6. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC poke.7" expl="7. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="86"/></proof>
-  <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC poke.8" expl="8. postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="88"/></proof>
@@ -349,15 +345,19 @@
   <goal name="VC poke.9" expl="9. postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="89"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="6"><result status="valid" time="0.07"/></proof>
+  <proof prover="10"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC poke.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.04" steps="90"/></proof>
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="90"/></proof>
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  <proof prover="10"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC poke.11" expl="11. postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="92"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC poke.12" expl="12. precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="136"/></proof>
@@ -459,7 +459,7 @@
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC poke.34" expl="34. postcondition">
-  <proof prover="3"><result status="valid" time="2.66"/></proof>
+  <proof prover="3"><result status="valid" time="3.18"/></proof>
   </goal>
  </transf>
  </goal>
@@ -553,7 +553,7 @@
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC pokethenpeek.9" expl="9. assertion">
-  <proof prover="7" timelimit="5"><result status="valid" time="0.93" steps="678"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="1.14" steps="678"/></proof>
   <proof prover="8"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC pokethenpeek.10" expl="10. postcondition">

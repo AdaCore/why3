@@ -5,7 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../specs.mlw">
-<theory name="VM_instr_spec" sum="17c08329fc66ca05a14a3a537fb64283">
+<theory name="VM_instr_spec" sum="a2d376bbabfff098d8d58fcfaf7df286">
  <goal name="VC ifunf" expl="VC for ifunf">
  <transf name="split_goal_wp">
   <goal name="VC ifunf.1" expl="1. precondition">
@@ -54,7 +54,7 @@
  <goal name="VC ivarf" expl="VC for ivarf">
  <transf name="split_goal_wp">
   <goal name="VC ivarf.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="1.24"/></proof>
+  <proof prover="1"><result status="valid" time="0.85"/></proof>
   </goal>
   <goal name="VC ivarf.2" expl="2. precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="30"/></proof>
@@ -141,7 +141,7 @@
  <goal name="VC ibranchf" expl="VC for ibranchf">
  <transf name="split_goal_wp">
   <goal name="VC ibranchf.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="3.63"/></proof>
+  <proof prover="1"><result status="valid" time="4.68"/></proof>
   </goal>
   <goal name="VC ibranchf.2" expl="2. precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
