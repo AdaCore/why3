@@ -161,3 +161,34 @@ let eliminate_literal env =
 let () =
   Trans.register_env_transform "eliminate_literal" eliminate_literal
     ~desc:"Eliminate@ unsupported@ literals."
+
+
+
+(* simple transformation that just replace negative constants by application
+   of 'prefix -' to positive constant *)
+
+open Number
+
+let rec replace_negative_constants neg_int neg_real t =
+  match t.t_ty, t.t_node with
+  | (Some ty), (Tconst (ConstInt c)) ->
+     if c.ic_negative && ty_equal ty ty_int then
+       t_app neg_int
+             [t_const (ConstInt { c with ic_negative = false }) ty_int]
+             (Some ty_int)
+     else t
+
+  | _ -> t_map (replace_negative_constants neg_int neg_real) t
+
+let eliminate_negative_constants env =
+  (* FIXME: int.Int should be imported in the task *)
+  let th = Env.read_theory env ["int"] "Int" in
+  let neg_int = ns_find_ls th.th_export ["prefix -"] in
+  let th = Env.read_theory env ["real"] "Real" in
+  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  Trans.rewrite (replace_negative_constants neg_int neg_real) None
+
+let () =
+  Trans.register_env_transform "eliminate_negative_constants"
+                               eliminate_negative_constants
+                               ~desc:"Eliminate@ negative@ constants"
