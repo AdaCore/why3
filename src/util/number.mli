@@ -111,7 +111,8 @@ val print : number_support -> formatter -> constant -> unit
 val print_in_base : int -> int option -> formatter -> BigInt.t -> unit
 (** [print_in_base radix digits fmt i] prints the value of [i] in base
     [radix]. If digits is not [None] adds leading 0s to have [digits]
-    characters. *)
+    characters.
+    REQUIRES [i] non-negative *)
 
 (** Range checking *)
 

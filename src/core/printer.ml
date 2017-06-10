@@ -254,6 +254,7 @@ let syntax_arguments_typed =
 
 let syntax_range_literal s fmt c =
   let f s b e fmt =
+    let v = Number.compute_int_literal c.Number.ic_abs in
     let base = match s.[e-1] with
       | 'x' -> 16
       | 'd' -> 10
@@ -267,8 +268,20 @@ let syntax_range_literal s fmt c =
       else
         None
     in
-    let v = Number.compute_int_literal c in
-    Number.print_in_base base digits fmt v
+    if base = 10 then begin
+        if c.Number.ic_negative then fprintf fmt "-";
+        Number.print_in_base base digits fmt v
+      end
+    else
+      let v =
+        if c.Number.ic_negative then
+          match digits with
+            | Some d ->
+               BigInt.sub (BigInt.pow_int_pos base d) v
+            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
+        else v
+      in
+      Number.print_in_base base digits fmt v
   in
   global_substitute_fmt opt_search_forward_literal_format f s fmt
 

@@ -351,7 +351,7 @@ let rec print_in_base_aux radix digits fmt i =
     fprintf fmt "%c" (char_of_int (to_int i))
   end
   else
-    let d,m = computer_div_mod i radix in
+    let d,m = euclidean_div_mod i radix in
     let digits = Opt.map ((+) (-1)) digits in
     print_in_base_aux radix digits fmt d;
     fprintf fmt "%c" (char_of_int (to_int m))

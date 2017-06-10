@@ -214,9 +214,7 @@ let rec print_term info fmt t =
       (* look for syntax literal ts in driver *)
       begin match query_syntax info.info_rliteral ts.ts_name, c with
         | Some st, Number.ConstInt c ->
-           if c.Number.ic_negative then
-             failwith "not supported yet: syntax literal for negative integer literals";
-          syntax_range_literal st fmt c.Number.ic_abs
+          syntax_range_literal st fmt c
         | Some st, Number.ConstReal c ->
            if c.Number.rc_negative then
              failwith "not supported yet: syntax literal for negative real literals";
