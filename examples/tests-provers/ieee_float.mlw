@@ -25,7 +25,7 @@ module M603_018
     requires { roundToIntegral RTN z = x }
     requires { roundToIntegral RTP z = y }
   =
-    let t = (x .+ y) ./ (2.0:t) in
+    let ghost t = (x .+ y) ./ (2.0:t) in
     assert { roundToIntegral RTN x .= x };
     assert { roundToIntegral RTN y .= y };
     assert { roundToIntegral RTN z .= x };

@@ -156,7 +156,7 @@ module Compiler_logic
                           (ghost var:post {'a}) : wp 'a
     ensures { result.wp --> loop_wp c.wp inv cont var }
     ensures { result.wcode.length --> c.wcode.length }
-  = let wpt = loop_wp c.wp inv cont var in
+  = let ghost wpt = loop_wp c.wp inv cont var in
     assert { forall x p q ms0. wpt x p q ms0 ->
       forall ms. inv x p ms -> acc (var x p) ms ->
         exists ms'. contextual_irrelevance c.wcode p ms ms' /\ q ms'

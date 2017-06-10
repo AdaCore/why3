@@ -999,6 +999,7 @@ type env = {
   lgh : bool; (* we are under let ghost c = <cexp> *)
   cgh : bool; (* we are under DEghost in a cexp *)
   inr : bool; (* we are inside a recursive function *)
+  ugh : bool; (* suppress the warning on Cpur *)
 }
 
 let env_empty = {
@@ -1011,6 +1012,7 @@ let env_empty = {
   lgh = false;
   cgh = false;
   inr = false;
+  ugh = false;
 }
 
 exception UnboundLabel of string
@@ -1146,7 +1148,11 @@ let put_header e = function
 
 type let_prefix =
   | LD of header
-  | EA of expr
+  | DA of env * dexpr
+
+type let_postfix =
+  | HD of header
+  | EA of bool * expr
 
 let vl_of_mask id mask ity =
   let mk_res m t = create_pvsymbol id ~ghost:(mask_ghost m) t in
@@ -1180,40 +1186,42 @@ and cexp uloc env ({de_loc = loc} as de) lpl =
 and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   let rec drop vl al = match vl, al with
     | _::vl, _::al -> drop vl al | _ -> al in
-  let rec all_ghost al lpl = match al, lpl with
-    | gh :: al, EA {e_mask = m} :: lpl ->
-        (not gh && mask_ghost m) || all_ghost al lpl
-    | _::_, LD _ :: lpl -> all_ghost al lpl
-    | _, _ -> false in
-  let rec proxy_args ghost al lpl = match al, lpl with
-    | _ :: al, EA ({e_node = Evar v} as e) :: lpl
+  let rec eval_args ghost plp al lpl = match al, lpl with
+    | gh::al, DA (env, de) :: lpl ->
+        let env = {env with ugh = env.ugh || ghost || gh} in
+        let e = e_ghostify env.cgh (expr uloc env de) in
+        let ghost = ghost || (not gh && mask_ghost e.e_mask) in
+        eval_args ghost (EA (gh, e) :: plp) al lpl
+    | al, LD hd :: lpl ->
+        eval_args ghost (HD hd :: plp) al lpl
+    | [], _::_ -> assert false (* ill-typed *)
+    | _, [] -> ghost, plp in
+  let rec proxy_args ghost ldl vl = function
+    | EA (_, ({e_node = Evar v} as e)) :: plp
       when Slab.is_empty e.e_label ->
-        let hd, vl = proxy_args ghost al lpl in
-        hd, v::vl
-    | gh :: al, EA e :: lpl ->
-        let hd, vl = proxy_args ghost al lpl in
+        proxy_args ghost ldl (v::vl) plp
+    | EA (gh, e) :: plp ->
         let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
         let ld, v = let_var ~ghost:(ghost || gh) id e in
-        LS ld :: hd, v::vl
-    | al, LD ld :: lpl ->
-        let hd, vl = proxy_args ghost al lpl in
-        ld::hd, vl
-    | [], _::_ ->
-        assert false (* would be ill-typed *)
-    | _, [] ->
-        [], [] in
-  let apply app ghost s al lpl =
-    let ldl, vl = proxy_args ghost al lpl in
+        proxy_args ghost (LS ld :: ldl) (v::vl) plp
+    | HD hd :: plp ->
+        proxy_args ghost (hd :: ldl) vl plp
+    | [] -> ldl, vl in
+  let apply app gh s al lpl =
+    let gh, plp = eval_args gh [] al lpl in
+    let ldl, vl = proxy_args gh [] [] plp in
     let argl = List.map ity_of_dity (drop vl argl) in
     env.cgh, ldl, app s vl argl (ity_of_dity res) in
   let c_app s lpl =
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
-    let gh = env.ghs || env.lgh || rs_ghost s || all_ghost al lpl in
-    apply c_app gh s al lpl in
+    apply c_app (env.ghs || env.lgh || rs_ghost s) s al lpl in
+  let c_pur s lpl =
+    let loc = Opt.get_def de0.de_loc uloc in
+    if not (env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
+      "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
+    apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
     let rs = Srs.choose s in
-    let al = List.map Util.ffalse rs.rs_cty.cty_args in
-    let gh = env.ghs || env.lgh || all_ghost al lpl in
     let loc = Opt.get_def de0.de_loc uloc in
     let app s vl al res =
       let nomatch s =
@@ -1251,12 +1259,11 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       | [] when nomatch s -> Loc.errorm ?loc
             "No suitable match found for notation %a" print_rs rs
       | _ -> Loc.errorm ?loc "Ambiguous notation: %a" print_rs rs in
-    apply app gh s al lpl in
-  let c_pur s lpl =
-    apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
+    let al = List.map Util.ffalse rs.rs_cty.cty_args in
+    apply app (env.ghs || env.lgh) s al lpl in
   let proxy c =
     try
-      let ld_of_lp = function LD ld -> ld | EA _ -> raise Exit in
+      let ld_of_lp = function LD ld -> ld | DA _ -> raise Exit in
       env.cgh, List.map ld_of_lp lpl, c
     with Exit ->
       let loc = Opt.get_def de0.de_loc uloc in
@@ -1264,21 +1271,22 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let ld, s = let_sym id ~ghost:(env.ghs || env.lgh) c in
       c_app s (LD (LS ld) :: lpl) in
   match de0.de_node with
-  | DEvar (n,_) -> c_app (get_rs env n) lpl
+  | DEvar (n,_)  -> c_app (get_rs env n) lpl
   | DEsym (RS s) -> c_app s lpl
   | DEsym (OO s) -> c_oop s lpl
   | DEls_pure s  -> c_pur s lpl
   | DEapp (de1,de2) ->
-      let e2 = e_ghostify env.cgh (expr uloc env de2) in
-      cexp uloc env de1 (EA e2 :: lpl)
+      cexp uloc env de1 (DA (env, de2) :: lpl)
   | DEghost de ->
       (* if we were not in the ghost context until now, then
          we must ghostify the let-definitions down from here *)
-      cexp uloc {env with ghs = true; cgh = env.cgh || not env.ghs} de lpl
+      let cgh = env.cgh || not env.ghs in
+      cexp uloc {env with ghs = true; cgh} de lpl
   | DEfun (bl,_,msk,dsp,de) ->
       let dvl _ _ _ = [] in
       let env = {env with ghs = env.ghs || env.lgh} in
-      let c, dsp, _ = lambda uloc env (binders env.ghs bl) msk dsp dvl de in
+      let bl = binders env.ghs bl in
+      let c, dsp, _ = lambda uloc env bl msk dsp dvl de in
       check_fun env.inr None dsp c;
       proxy c
   | DEany (bl,dity,msk,dsp) ->
@@ -1320,7 +1328,8 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       e_const c (ity_of_dity dity)
   | DEapp ({de_dvty = ([],_)} as de1, de2) ->
       let e1 = expr uloc env de1 in
-      let e2 = expr uloc env de2 in
+      let ugh = env.ugh || e1.e_mask = MaskGhost in
+      let e2 = expr uloc {env with ugh} de2 in
       e_app rs_func_app [e1; e2] [] (ity_of_dity res)
   | DEvar _ | DEsym _ | DEls_pure _ | DEapp _ | DEfun _ | DEany _ ->
       let cgh,ldl,c = try_cexp uloc env de0 [] in
@@ -1364,15 +1373,20 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
         (pp, e_absurd (ity_of_dity res)) :: bl end in
       e_case e1 (List.rev bl)
   | DEassign al ->
-      let conv (de1,f,de2) = expr uloc env de1, f, expr uloc env de2 in
+      let conv (de1,f,de2) =
+        let e1 = expr uloc {env with ugh = false} de1 in
+        let ugh = rs_ghost f || e1.e_mask = MaskGhost in
+        e1, f, expr uloc {env with ugh} de2 in
       e_assign (List.map conv al)
   | DEwhile (de1,dinv,dvarl,de2) ->
+      let env = {env with ugh = false} in
       let e1 = expr uloc env de1 in
       let e2 = expr uloc env de2 in
       let inv = get_later env dinv in
       let varl = get_later env dvarl in
       e_while e1 (create_invariant inv) varl e2
   | DEfor (id,de_from,dir,de_to,dinv,de) ->
+      let env = {env with ugh = false} in
       let e_from = expr uloc env de_from in
       let e_to = expr uloc env de_to in
       let v = create_pvsymbol id e_from.e_ity in
@@ -1430,7 +1444,9 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
             vl, e_case e (List.rev bl) in
       e_try e1 (Mxs.mapi mk_branch xsm)
   | DEraise (xs,de) ->
-      e_raise (get_xs env xs) (expr uloc env de) (ity_of_dity res)
+      let {xs_mask = mask} as xs = get_xs env xs in
+      let env = {env with ugh = mask = MaskGhost} in
+      e_raise xs (expr uloc env de) (ity_of_dity res)
   | DEghost de ->
       e_ghostify true (expr uloc {env with ghs = true} de)
   | DEassert (ak,f) ->
@@ -1458,17 +1474,18 @@ and var_defn uloc env (id,gh,kind,de) =
     | RKlemma -> Loc.errorm ?loc:id.pre_loc
         "Lemma-functions must have parameters"
     | RKfunc | RKpred | RKlocal | RKnone ->
-        e_ghostify env.cgh (expr uloc env de) in
+        let e = expr uloc {env with ugh = gh} de in
+        e_ghostify env.cgh e in
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
   ld, add_pvsymbol env v
 
 and sym_defn uloc env (id,gh,kind,de) =
   let lgh = env.ghs || gh || kind = RKlemma in
-  let cgh, ldl, c = cexp uloc {env with lgh = lgh} de [] in
+  let cgh, ldl, c = cexp uloc {env with lgh; ugh = false} de [] in
   let ld, s = let_sym id ~ghost:(lgh || cgh) ~kind c in
   LS ld :: ldl, add_rsymbol env s
 
-and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
+and rec_defn uloc ({inr = inr} as env0) {fds = dfdl} =
   let step1 env (id, gh, kind, bl, res, mask, dsp, dvl, de) =
     let ghost = env.ghs || gh || kind = RKlemma in
     let pvl = binders ghost bl in
@@ -1476,7 +1493,8 @@ and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
     let cty = create_cty ~mask pvl [] [] Mxs.empty Mpv.empty eff_empty ity in
     let rs = create_rsymbol id ~ghost ~kind:RKnone cty in
     add_rsymbol env rs, (rs, kind, mask, dsp, dvl, de) in
-  let env, fdl = Lists.map_fold_left step1 {env with inr = true} dfdl in
+  let env = {env0 with inr = true; ugh = false} in
+  let env, fdl = Lists.map_fold_left step1 env dfdl in
   let step2 (rs, kind, mask, dsp, dvl, de) (fdl,dspl) =
     let env = {env with ghs = env.ghs || rs_ghost rs} in
     let {rs_name = {id_string = nm; id_loc = loc}; rs_cty = c} = rs in
@@ -1500,10 +1518,11 @@ and rec_defn uloc ({inr = inr} as env) {fds = dfdl} =
   let add_fd env {rec_sym = s; rec_rsym = rs; rec_fun = c} dsp =
     Loc.try4 ?loc:rs.rs_name.id_loc check_fun inr (Some rs) dsp c;
     add_rsymbol env s in
-  ld, List.fold_left2 add_fd env rdl dspl
+  ld, List.fold_left2 add_fd env0 rdl dspl
 
 and lambda uloc env pvl mask dsp dvl de =
-  let env = add_binders env pvl in
+  let ugh = env.ugh || mask = MaskGhost in
+  let env = add_binders {env with ugh} pvl in
   let preold = Mstr.find_opt old_mark env.old in
   let env, old = add_label env old_mark in
   let e = if pvl = [] then expr uloc env de else
@@ -1550,7 +1569,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
       fst (let_sym id ~ghost ~kind c)
   | (RKfunc | RKpred), ([], _) ->
       (* FIXME: let ghost constant c = <effectful> *)
-      let e = expr uloc env_empty de in
+      let e = expr uloc {env_empty with ugh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
       let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
@@ -1565,7 +1584,7 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
          into an axiom. *)
       fst (let_sym id ~ghost ~kind c)
   | RKnone, ([], _) ->
-      let e = expr uloc env_empty de in
+      let e = expr uloc {env_empty with ugh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Variable %s must be explicitly marked ghost" nm;
       fst (let_var id ~ghost e)
