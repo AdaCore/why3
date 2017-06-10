@@ -50,3 +50,14 @@ module Float
    goal g : Float32.lt (-1.0:Float32.t) x
 
 end
+
+
+module M
+
+  use import int.Int
+
+  let constant x = -42
+
+  let f (y:int) = y + x
+
+end

@@ -73,6 +73,17 @@ let int_const_bin s =
   check_integer_literal 2 is_bin s;
   IConstBin s
 
+let int_const_of_int n =
+  let neg,a =
+    if n >= 0 then
+      false,n
+    else
+      true,-n
+  in
+  assert (a >= 0);
+  let a = int_const_dec (string_of_int a) in
+  {ic_negative = neg ;ic_abs = a}
+
 let const_of_big_int n =
   let neg,a =
     if BigInt.ge n BigInt.zero then

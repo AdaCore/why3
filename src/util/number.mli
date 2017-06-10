@@ -50,6 +50,7 @@ val int_const_bin : string -> integer_literal
     InvalidConstantLiteral(base,s) is raised if [s] contains invalid
     characters for the given base. *)
 
+val int_const_of_int : int -> integer_constant
 val const_of_big_int : BigInt.t -> constant
 
 val real_const_dec : string -> string -> string option -> real_literal
@@ -57,10 +58,6 @@ val real_const_hex : string -> string -> string option -> real_literal
 
 (** Pretty-printing *)
 
-(* see which are used
-val print_integer_literal : formatter -> integer_literal -> unit
-val print_real_literal : formatter -> real_literal -> unit
-*)
 val print_constant : formatter -> constant -> unit
 
 (** Pretty-printing with conversion *)
