@@ -1211,19 +1211,46 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     let gh = env.ghs || env.lgh || rs_ghost s || all_ghost al lpl in
     apply c_app gh s al lpl in
   let c_oop s lpl =
-    let al = (Srs.choose s).rs_cty.cty_args in
-    let al = List.map (fun _ -> false) al in
+    let rs = Srs.choose s in
+    let al = List.map Util.ffalse rs.rs_cty.cty_args in
     let gh = env.ghs || env.lgh || all_ghost al lpl in
     let loc = Opt.get_def de0.de_loc uloc in
     let app s vl al res =
+      let nomatch s =
+        let ty = match vl, al with
+          | v::_, _ -> v.pv_vs.vs_ty
+          | _, a::_ -> ty_of_ity a
+          | _ -> assert false in
+        (* this check can be cheated upon if the user names his type
+           variables "'xi", but since we only do it for a better error
+           message, we do not care all that much *)
+        let tvm = ty_v_fold (fun m ({tv_name = id} as v) ->
+          if id.id_string = "xi" then m else (* freeze v *)
+          let ts = create_tysymbol (id_clone id) [] NoDef in
+          Mtv.add v (ty_app ts []) m) Mtv.empty ty in
+        let occur_check v ty = not (ty_v_any (tv_equal v) ty) in
+        let rec unify m ty1 ty2 = match ty1.ty_node, ty2.ty_node with
+          | Tyvar v1, Tyvar v2 when tv_equal v1 v2 -> m
+          | Tyvar v1, _ when Mtv.mem v1 m -> unify m (Mtv.find v1 m) ty2
+          | _, Tyvar v2 when Mtv.mem v2 m -> unify m ty1 (Mtv.find v2 m)
+          | Tyvar v1, _ when occur_check v1 ty2 -> Mtv.add v1 ty2 m
+          | _, Tyvar v2 when occur_check v2 ty1 -> Mtv.add v2 ty1 m
+          | Tyapp (s1, tl1), Tyapp (s2, tl2) when ts_equal s1 s2 ->
+              List.fold_left2 unify m tl1 tl2
+          | _ -> raise Exit in
+        let nomatch rs =
+          let ity = (List.hd rs.rs_cty.cty_args).pv_ity in
+          try ignore (unify tvm ty (ty_of_ity ity)); false
+          with Exit -> true in
+        Srs.for_all nomatch s in
       let app s cl = try Expr.c_app s vl al res :: cl with
         (* TODO: are there other valid exceptions here? *)
         | TypeMismatch _ -> cl in
       match Srs.fold app s [] with
       | [c] -> c
-      | [] -> Loc.errorm ?loc "No suitable symbol found"
-      (* TODO: show types or locations for ambiguity *)
-      | _cl -> Loc.errorm ?loc "Ambiguous notation" in
+      | [] when nomatch s -> Loc.errorm ?loc
+            "No suitable match found for notation %a" print_rs rs
+      | _ -> Loc.errorm ?loc "Ambiguous notation: %a" print_rs rs in
     apply app gh s al lpl in
   let c_pur s lpl =
     apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
