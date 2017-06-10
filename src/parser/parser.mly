@@ -48,6 +48,12 @@
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
+  let mk_int_const neg lit =
+    Number.{ ic_negative = neg ; ic_abs = lit}
+
+  let mk_real_const neg lit =
+    Number.{ rc_negative = neg ; rc_abs = lit}
+
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
 
   let get_op s e = Qident (mk_id (mixfix "[]") s e)
@@ -94,14 +100,6 @@
     { e with expr_desc = Emark (init, e) }
 *)
 
-  let small_integer i =
-    try match i with
-      | Number.IConstDec s -> int_of_string s
-      | Number.IConstHex s -> int_of_string ("0x"^s)
-      | Number.IConstOct s -> int_of_string ("0o"^s)
-      | Number.IConstBin s -> int_of_string ("0b"^s)
-    with Failure _ -> raise Error
-
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -115,9 +113,9 @@
 (* Tokens *)
 
 %token <string> LIDENT LIDENT_QUOTE UIDENT UIDENT_QUOTE
-%token <Number.integer_constant> INTEGER
+%token <Number.integer_literal> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Number.real_constant> REAL
+%token <Number.real_literal> REAL
 %token <string> STRING
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
@@ -269,7 +267,7 @@ meta_arg:
 | LEMMA     qualid  { Mlm $2 }
 | GOAL      qualid  { Mgl $2 }
 | STRING            { Mstr $1 }
-| INTEGER           { Mint (small_integer $1) }
+| INTEGER           { Mint (Number.to_small_integer $1) }
 
 (* Theory declarations *)
 
@@ -307,12 +305,16 @@ typedefn:
 | EQUAL vis_mut ty
     { $2, TDalias $3 }
 (* FIXME: allow negative bounds *)
-| EQUAL LT RANGE INTEGER INTEGER GT
+| EQUAL LT RANGE int_constant int_constant GT
     { (Public, false),
-      TDrange (Number.compute_int $4, Number.compute_int $5) }
+      TDrange ($4,$5) }
 | EQUAL LT FLOAT INTEGER INTEGER GT
     { (Public, false),
-      TDfloat (small_integer $4, small_integer $5) }
+      TDfloat (Number.to_small_integer $4, Number.to_small_integer $5) }
+
+int_constant:
+| INTEGER       { mk_int_const false $1 }
+| MINUS INTEGER { mk_int_const true $2 }
 
 vis_mut:
 | (* epsilon *)     { Public, false }
@@ -516,11 +518,9 @@ term_:
 | prefix_op term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
 | MINUS INTEGER
-    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
-        [mk_term (Tconst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+    { Tconst (Number.ConstInt (mk_int_const true $2)) }
 | MINUS REAL
-    { Tidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
-        [mk_term (Tconst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
+    { Tconst (Number.ConstReal (mk_real_const true $2)) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op_1 ; r = term
@@ -632,8 +632,8 @@ quant:
 | EXISTS  { Dterm.DTexists }
 
 numeral:
-| INTEGER { Number.ConstInt $1 }
-| REAL    { Number.ConstReal $1 }
+| INTEGER { Number.ConstInt (mk_int_const false $1) }
+| REAL    { Number.ConstReal (mk_real_const false $1) }
 
 (* Program declarations *)
 
@@ -698,11 +698,9 @@ expr_:
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
 | MINUS INTEGER
-    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
-        [mk_expr (Econst (Number.ConstInt $2)) $startpos($2) $endpos($2)]) }
+    { Econst (Number.ConstInt (mk_int_const true $2)) }
 | MINUS REAL
-    { Eidapp (Qident (mk_id (prefix "-") $startpos($1) $endpos($1)),
-        [mk_expr (Econst (Number.ConstReal $2)) $startpos($2) $endpos($2)]) }
+    { Econst (Number.ConstReal (mk_real_const true $2)) }
 | l = expr ; o = infix_op_1 ; r = expr
     { Einfix (l,o,r) }
 | l = expr ; o = infix_op_234 ; r = expr

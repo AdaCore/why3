@@ -280,8 +280,9 @@ module Print = struct
     | Some s, _, [{e_node = Econst _}] ->
       let print_constant fmt e = match e.e_node with
         | Econst c ->
-          let s = BigInt.to_string (Number.compute_int c) in
-          fprintf fmt "%s" s
+          let s = BigInt.to_string (Number.compute_int_constant c) in
+          if c.Number.ic_negative then fprintf fmt "(%s)" s
+          else fprintf fmt "%s" s
         | _ -> assert false in
       syntax_arguments s print_constant fmt pvl
     | _, Some s, _ ->
@@ -359,7 +360,7 @@ module Print = struct
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
-      let n = Number.compute_int c in
+      let n = Number.compute_int_constant c in
       fprintf fmt "(Z.of_string \"%s\")" (BigInt.to_string n)
     | Evar pvs ->
       (print_lident info) fmt (pv_name pvs)
@@ -385,8 +386,9 @@ module Print = struct
         | Some s, [{e_node = Econst _}] ->
           let print_constant fmt e = begin match e.e_node with
             | Econst c ->
-              let s = BigInt.to_string (Number.compute_int c) in
-              fprintf fmt "%s" s
+              let s = BigInt.to_string (Number.compute_int_constant c) in
+              if c.Number.ic_negative then fprintf fmt "(%s)" s
+              else fprintf fmt "%s" s
             | _ -> assert false end in
           syntax_arguments s print_constant fmt pvl
         | _ ->

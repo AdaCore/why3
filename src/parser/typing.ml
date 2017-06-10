@@ -945,8 +945,7 @@ let add_types muc tdl =
         end
     | TDrange (lo,hi) ->
         check_public ~loc d "Range";
-        let ir = { Number.ir_lower = lo;
-                   Number.ir_upper = hi } in
+        let ir = Number.create_range lo hi in
         let itd = create_range_decl id ir in
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDfloat (eb,sb) ->

@@ -483,7 +483,11 @@ let e_const c ity =
   mk_expr (Econst c) ity MaskVisible eff_empty
 
 let e_nat_const n =
-  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ity_int
+  assert (n >= 0);
+  let a =
+    Number.{ ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
+  in
+  e_const (Number.ConstInt a) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else

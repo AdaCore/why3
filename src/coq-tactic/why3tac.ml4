@@ -524,25 +524,26 @@ let rec tr_positive p = match kind_of_term p with
   | _ ->
       raise NotArithConstant
 
-let const_of_big_int b =
+let const_of_big_int is_neg b =
   Term.t_const
-    (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
+    (Number.(ConstInt { ic_negative = is_neg ;
+         ic_abs = Number.int_const_dec (Big_int.string_of_big_int b) }))
     ty_int
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant dep t = match kind_of_term t with
   | Construct _ when is_global coq_Z0 t -> Term.t_nat_const 0
   | App (f, [|a|]) when is_global coq_Zpos f ->
-      const_of_big_int (tr_positive a)
+      const_of_big_int false (tr_positive a)
   | App (f, [|a|]) when is_global coq_Zneg f ->
-      let t = const_of_big_int (tr_positive a) in
-      let fs = why_constant_int dep ["prefix -"] in
-      Term.fs_app fs [t] Ty.ty_int
+      const_of_big_int true (tr_positive a)
   | Const _ when is_global coq_R0 t ->
-      Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
+      Term.t_const (Number.(ConstReal { rc_negative = false ;
+        rc_abs = real_const_dec "0" "0" None }))
         ty_real
   | Const _ when is_global coq_R1 t ->
-      Term.t_const (Number.ConstReal (Number.real_const_dec "1" "0" None))
+      Term.t_const (Number.(ConstReal { rc_negative = false ;
+        rc_abs = real_const_dec "1" "0" None}))
         ty_real
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)

@@ -456,11 +456,6 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-  let _integer_constant b c =
-    Number.print_integer_constant Format.str_formatter c;
-    let s = Format.flush_str_formatter () in
-    string b s
-
   let const b c =
     Number.print_constant Format.str_formatter c;
     let s = Format.flush_str_formatter () in
