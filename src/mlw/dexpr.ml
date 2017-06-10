@@ -431,8 +431,8 @@ and dexpr_node =
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEvar_pure of string * dvty
+  | DEls_pure of lsymbol * bool
   | DEpv_pure of pvsymbol
-  | DEls_pure of lsymbol
   | DEabsurd
   | DEtrue
   | DEfalse
@@ -715,7 +715,7 @@ let dexpr ?loc node =
           | FixedRes ity -> dity_of_ity ity
           | NoOver -> assert false (* impossible *) in
         List.map (fun _ -> dt) rs.rs_cty.cty_args, res
-    | DEls_pure ls ->
+    | DEls_pure (ls,_) ->
         specialize_ls ls
     | DEpv_pure pv ->
         [], specialize_single (ity_purify pv.pv_ity)
@@ -1215,9 +1215,9 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   let c_app s lpl =
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
     apply c_app (env.ghs || env.lgh || rs_ghost s) s al lpl in
-  let c_pur s lpl =
+  let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
-    if not (env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
+    if not (ugh || env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
       "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
     apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
@@ -1271,10 +1271,10 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let ld, s = let_sym id ~ghost:(env.ghs || env.lgh) c in
       c_app s (LD (LS ld) :: lpl) in
   match de0.de_node with
-  | DEvar (n,_)  -> c_app (get_rs env n) lpl
-  | DEsym (RS s) -> c_app s lpl
-  | DEsym (OO s) -> c_oop s lpl
-  | DEls_pure s  -> c_pur s lpl
+  | DEvar (n,_) -> c_app (get_rs env n) lpl
+  | DEsym (RS rs) -> c_app rs lpl
+  | DEsym (OO ss) -> c_oop ss lpl
+  | DEls_pure (ls,ugh) -> c_pur ugh ls lpl
   | DEapp (de1,de2) ->
       cexp uloc env de1 (DA (env, de2) :: lpl)
   | DEghost de ->

@@ -124,8 +124,8 @@ and dexpr_node =
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEvar_pure of string * dvty
+  | DEls_pure of lsymbol * bool
   | DEpv_pure of pvsymbol
-  | DEls_pure of lsymbol
   | DEabsurd
   | DEtrue
   | DEfalse
