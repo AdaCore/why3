@@ -1527,6 +1527,7 @@ and lambda uloc env pvl mask dsp dvl de =
   let env, old = add_label env old_mark in
   let e = if pvl = [] then expr uloc env de else
     let ity = ity_of_dity (dity_of_dvty de.de_dvty) in
+    let mask = if env.ghs then MaskGhost else mask in
     let xs = create_xsymbol old_mark_id ~mask ity in
     let e = expr uloc (add_xsymbol env xs) de in
     if not (Sxs.mem xs e.e_effect.eff_raises) then e else

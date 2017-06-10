@@ -877,6 +877,7 @@ let freeze_xs xs s = ity_freeze s xs.xs_ity
 
 let create_xsymbol id ?(mask=MaskVisible) ity =
   mask_check (Invalid_argument "Ity.create_xsymbol") ity mask;
+  let mask = if ity_equal ity ity_unit then MaskVisible else mask in
   { xs_name = id_register id; xs_ity = ity; xs_mask = mask_reduce mask }
 
 module Exn = MakeMSH (struct

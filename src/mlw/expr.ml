@@ -916,7 +916,8 @@ let e_case e bl =
     | (_,d)::_ -> d.e_ity
     | [] -> invalid_arg "Expr.e_case" in
   List.iter (fun (p,d) ->
-    if mask_spill e.e_mask p.pp_mask then
+    if not (ity_equal e.e_ity ity_unit) &&
+        mask_spill e.e_mask p.pp_mask then
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check d.e_ity ity;
     ity_equal_check e.e_ity p.pp_ity) bl;
@@ -969,7 +970,8 @@ let e_try e xl =
 
 let e_raise xs e ity =
   ity_equal_check e.e_ity xs.xs_ity;
-  let ghost = mask_spill e.e_mask xs.xs_mask in
+  let ghost = not (ity_equal e.e_ity ity_unit) &&
+                mask_spill e.e_mask xs.xs_mask in
   let eff = eff_ghostify ghost (eff_raise eff_empty xs) in
   let eff = try_effect [e] eff_union_seq e.e_effect eff in
   mk_expr (Eraise (xs,e)) ity MaskVisible eff
