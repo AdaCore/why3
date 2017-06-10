@@ -564,7 +564,8 @@ module Translate = struct
     | Eassign al ->
       ML.mk_expr (Mltree.Eassign al) (Mltree.I e.e_ity) eff
     | Epure _ -> (* assert false (\*TODO*\) *) ML.mk_hole
-    | Etry (etry, pvl_e_map) ->
+    | Etry (etry, case, pvl_e_map) ->
+      assert (not case); (* TODO *)
       let etry = expr info etry in
       let bl   =
         let bl_map = Mxs.bindings pvl_e_map in

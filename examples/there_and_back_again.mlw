@@ -92,7 +92,7 @@ module Palindrome
 
   let palindrome (x: list elt) : bool
     ensures { result=True <-> pal x (length x) }
-  = try  let _ = palindrome_rec x x in True
-    with Exit -> False end
+  = match palindrome_rec x x with _ -> True
+    | exception Exit -> False end
 
 end

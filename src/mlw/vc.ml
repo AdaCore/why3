@@ -23,6 +23,9 @@ open Pdecl
 let debug = Debug.register_info_flag "vc_debug"
   ~desc:"Print@ details@ of@ verification@ conditions@ generation."
 
+let debug_reflow = Debug.register_info_flag "vc_reflow"
+  ~desc:"Debug@ elimination@ of@ the@ dead@ code@ in@ VC."
+
 let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
 
@@ -474,14 +477,18 @@ let inv_of_pure {known_map = kn} loc fl k =
    [res] names the result of the normal execution of [e]
    [xmap] maps every raised exception to a pair [i,xres]:
    - [i] is a positive int assigned at the catching site
-   - [xres] names the value carried by the exception *)
-let rec k_expr env lps ({e_loc = loc} as e) res xmap =
+   - [xres] names the value carried by the exception
+   [case_xmap] is used for match-with-exceptions *)
+let rec k_expr env lps e res ?case_xmap xmap =
+  let loc = e.e_loc in
   let lab = Slab.diff e.e_label vc_labels in
   let t_lab t = t_label ?loc lab t in
-  let var_or_proxy e k = match e.e_node with
+  let var_or_proxy_case xmap e k =
+    match e.e_node with
     | Evar v -> k v
     | _ -> let v = proxy_of_expr e in
-        Kseq (k_expr env lps e v xmap, 0, k v) in
+           Kseq (k_expr env lps e v xmap, 0, k v) in
+  let var_or_proxy = var_or_proxy_case xmap in
   let k = match e.e_node with
     | Evar v ->
         Klet (res, t_lab (t_var v.pv_vs), t_true)
@@ -580,9 +587,11 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
         Kseq (k_expr env lps e0 v xmap, 0, k)
     | Ecase (e0, [{pp_pat = {pat_node = Pvar v}}, e1]) ->
         let k = k_expr env lps e1 res xmap in
+        let xmap = Opt.get_def xmap case_xmap in
         Kseq (k_expr env lps e0 (restore_pv v) xmap, 0, k)
     | Ecase (e0, [pp, e1]) when Svs.is_empty pp.pp_pat.pat_vars ->
         let k = k_expr env lps e1 res xmap in
+        let xmap = Opt.get_def xmap case_xmap in
         Kseq (k_expr env lps e0 (proxy_of_expr e0) xmap, 0, k)
     | Elet ((LDsym _| LDrec _) as ld, e1) ->
         let k = k_expr env lps e1 res xmap in
@@ -671,8 +680,9 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
             Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f))
           with Exit -> Ktag (SP, Kcase (v, bl))
           else Kcase (v, bl) in
-        var_or_proxy e0 kk
-    | Etry (e0, bl) ->
+        let xmap = Opt.get_def xmap case_xmap in
+        var_or_proxy_case xmap e0 kk
+    | Etry (e0, case, bl) ->
         (* try-with is just another semicolon *)
         let branch xs (vl,e) (xl,xm) =
           let i = new_exn env in
@@ -687,8 +697,10 @@ let rec k_expr env lps ({e_loc = loc} as e) res xmap =
                 let pl = List.map (fun v -> pat_var v.pv_vs) vl in
                 v, Kcase (v, [pat_app cs pl v.pv_vs.vs_ty, xk]) in
           (i,xk)::xl, Mxs.add xs (i,v) xm in
-        let xl, xmap = Mxs.fold branch bl ([], xmap) in
-        let k = k_expr env lps e0 res xmap in
+        let xl, cxmap = Mxs.fold branch bl ([], xmap) in
+        let case_xmap, xmap =
+          if case then Some cxmap, xmap else None, cxmap in
+        let k = k_expr env lps e0 res ?case_xmap xmap in
         (* catched xsymbols are converted to unique integers,
            so that we can now serialise the "with" clauses
            and avoid capturing the wrong exceptions *)
@@ -1362,9 +1374,11 @@ and wp_expr kn k q = match k with
 (** VCgen *)
 
 let vc_kode {known_map = kn} vc_wp k =
-  let k = reflow vc_wp k in
   if Debug.test_flag debug then
     Format.eprintf "K @[%a@]@\n" k_print k;
+  let k = reflow vc_wp k in
+  if Debug.test_flag debug_reflow then
+    Format.eprintf "R @[%a@]@\n" k_print k;
   wp_expr kn k Mint.empty
 
 let vc_fun env vc_wp cty e =

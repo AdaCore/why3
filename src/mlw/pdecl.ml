@@ -234,7 +234,7 @@ let get_syms node pure =
         let add_branch syms (p,e) =
           syms_pat (syms_expr syms e) p.pp_pat in
         List.fold_left add_branch (syms_eity syms d) bl
-    | Etry (d,xl) ->
+    | Etry (d,_,xl) ->
         let add_branch xs (vl,e) syms =
           syms_xs xs (syms_pvl (syms_expr syms e) vl) in
         Mxs.fold add_branch xl (syms_expr syms d)

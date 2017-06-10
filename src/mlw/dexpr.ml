@@ -424,7 +424,7 @@ and dexpr_node =
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * (dxsymbol * dpattern * dexpr) list
+  | DEtry of dexpr * bool * (dxsymbol * dpattern * dexpr) list
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
@@ -789,9 +789,9 @@ let dexpr ?loc node =
         dexpr_expected_type de_to bty;
         dexpr_expected_type de dity_unit;
         dvty_unit
-    | DEtry (_,[]) ->
+    | DEtry (_,_,[]) ->
         invalid_arg "Dexpr.dexpr: empty branch list in DEtry"
-    | DEtry (de,bl) ->
+    | DEtry (de,_,bl) ->
         let res = dity_fresh () in
         dexpr_expected_type de res;
         List.iter (fun (xs,dp,de) ->
@@ -1398,7 +1398,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
       let e = expr uloc env de in
       let inv = get_later env dinv in
       e_for v e_from dir e_to i (create_invariant inv) e
-  | DEtry (de1,bl) ->
+  | DEtry (de1,case,bl) ->
       let e1 = expr uloc env de1 in
       let add_branch m (xs,dp,de) =
         let xs = get_xs env xs in
@@ -1442,7 +1442,7 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
               let _,pp = create_prog_pattern PPwild xs.xs_ity mask in
               (pp, e_raise xs e (ity_of_dity res)) :: bl in
             vl, e_case e (List.rev bl) in
-      e_try e1 (Mxs.mapi mk_branch xsm)
+      e_try e1 ~case (Mxs.mapi mk_branch xsm)
   | DEraise (xs,de) ->
       let {xs_mask = mask} as xs = get_xs env xs in
       let env = {env with ugh = mask = MaskGhost} in
@@ -1533,7 +1533,7 @@ and lambda uloc env pvl mask dsp dvl de =
     if not (Sxs.mem xs e.e_effect.eff_raises) then e else
     let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
     let branches = Mxs.singleton xs (vl, e_of_vl vl) in
-    e_exn xs (e_try e branches) in
+    e_exn xs (e_try e ~case:false branches) in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in

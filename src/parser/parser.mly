@@ -608,7 +608,10 @@ field_list1(X):
 | fl = semicolon_list1(separated_pair(lqualid, EQUAL, X)) { fl }
 
 match_cases(X):
-| cl = bar_list1(separated_pair(pattern, ARROW, X)) { cl }
+| cl = bar_list1(match_case(X)) { cl }
+
+match_case(X):
+| mc = separated_pair(pattern, ARROW, X) { mc }
 
 quant_vars:
 | binder_var+ cast? { List.map (fun (l,i) -> l, i, false, $2) $1 }
@@ -770,10 +773,17 @@ expr_:
     { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
     { Elet ($4, $2, $3, $5, $7) }
-| MATCH seq_expr WITH match_cases(seq_expr) END
-    { Ematch ($2, $4) }
-| MATCH comma_list2(expr) WITH match_cases(seq_expr) END
-    { Ematch (mk_expr (Etuple $2) $startpos($2) $endpos($2), $4) }
+| MATCH seq_expr WITH ext_match_cases END
+    { let bl, xl = $4 in
+      if xl = [] then Ematch ($2, bl) else
+      if bl = [] then Etry ($2, false, xl) else
+      Etry (mk_expr (Ematch ($2, bl)) $startpos $endpos, true, xl) }
+| MATCH comma_list2(expr) WITH ext_match_cases END
+    { let e = mk_expr (Etuple $2) $startpos($2) $endpos($2) in
+      let bl, xl = $4 in
+      if xl = [] then Ematch (e, bl) else
+      if bl = [] then Etry (e, false, xl) else
+      Etry (mk_expr (Ematch (e, bl)) $startpos $endpos, true, xl) }
 | EXCEPTION labels(uident) IN seq_expr
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
 | EXCEPTION labels(uident) return IN seq_expr
@@ -793,7 +803,7 @@ expr_:
 | RETURN expr_arg?
     { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
-    { Etry ($2, $4) }
+    { Etry ($2, false, $4) }
 | GHOST expr
     { Eghost $2 }
 | assertion_kind LEFTBRC term RIGHTBRC
@@ -862,6 +872,17 @@ loop_annotation:
     { let inv, var = $2 in $1 :: inv, var }
 | variant loop_annotation
     { let inv, var = $2 in inv, variant_union $1 var }
+
+ext_match_cases:
+| ioption(BAR) ext_match_cases1  { $2 }
+
+ext_match_cases1:
+| match_case(seq_expr)  ext_match_cases0  { let bl,xl = $2 in $1::bl, xl }
+| EXCEPTION exn_handler ext_match_cases0  { let bl,xl = $3 in bl, $2::xl }
+
+ext_match_cases0:
+| (* epsilon *)         { [], [] }
+| BAR ext_match_cases1  { $2 }
 
 exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }

@@ -776,7 +776,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None when mb_unit -> Dexpr.dexpr ~loc (DEsym (RS rs_void))
         | _ -> Loc.errorm ~loc "exception argument expected" in
       DEraise (xs, e1)
-  | Ptree.Etry (e1, cl) ->
+  | Ptree.Etry (e1, case, cl) ->
       let e1 = dexpr muc denv e1 in
       let branch (q, pp, e) =
         let xs = find_dxsymbol q in
@@ -790,7 +790,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         let denv = denv_add_pat denv pp in
         let e = dexpr muc denv e in
         xs, pp, e in
-      DEtry (e1, List.map branch cl)
+      DEtry (e1, case, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
   | Ptree.Eexn (id, pty, mask, e1) ->

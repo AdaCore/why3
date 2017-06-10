@@ -921,12 +921,12 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         i' (clone_invl cl ism invl) (clone_expr cl ism e)
-  | Etry (d, xl) ->
+  | Etry (d, case, xl) ->
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
         Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
-      e_try (clone_expr cl sm d) (Mxs.fold conv_br xl Mxs.empty)
+      e_try (clone_expr cl sm d) ~case (Mxs.fold conv_br xl Mxs.empty)
   | Eraise (xs, e) ->
       e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->

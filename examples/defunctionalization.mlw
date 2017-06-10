@@ -984,10 +984,9 @@ let rec itere (e:expr) : int
   diverges (* termination could be proved but that's not the point *)
   ensures { eval_0 e = result }
   =
-  try
-    let e' = reduce e in
-    itere e'
-  with Stuck ->
+  match reduce e with
+  | e' -> itere e'
+  | exception Stuck ->
      match e with
      | Cte n -> n
      | _ -> absurd
@@ -1010,10 +1009,9 @@ let refocus c e
 let rec itere_opt (c:context) (e:expr) : int
   diverges
   ensures { result = eval_0 (recompose c e) }
-= try
-    let (c,r) = refocus c e in
-    itere_opt c (contract r)
-  with Stuck ->
+= match refocus c e with
+  | c, r -> itere_opt c (contract r)
+  | exception Stuck ->
      assert { is_empty_context c };
      match e with
      | Cte n -> n

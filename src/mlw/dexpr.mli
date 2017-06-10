@@ -117,7 +117,7 @@ and dexpr_node =
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * (dxsymbol * dpattern * dexpr) list
+  | DEtry of dexpr * bool * (dxsymbol * dpattern * dexpr) list
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
