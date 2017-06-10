@@ -708,12 +708,13 @@ let dexpr ?loc node =
         specialize_rs rs
     | DEsym (OO ss) ->
         let dt = dity_fresh () in
-        let ot = overload_of_rs (Srs.choose ss) in
-        begin match ot with
-        | UnOp   -> [dt], dt
-        | BinOp  -> [dt;dt], dt
-        | BinRel -> [dt;dt], dity_bool
-        | NoOver -> assert false end
+        let rs = Srs.choose ss in
+        let ot = overload_of_rs rs in
+        let res = match ot with
+          | SameType -> dt
+          | FixedRes ity -> dity_of_ity ity
+          | NoOver -> assert false (* impossible *) in
+        List.map (fun _ -> dt) rs.rs_cty.cty_args, res
     | DEls_pure ls ->
         specialize_ls ls
     | DEpv_pure pv ->

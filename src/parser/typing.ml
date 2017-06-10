@@ -108,8 +108,17 @@ let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
 
-let find_rsymbol muc q = match find_prog_symbol muc q with RS rs -> rs
-  | _ -> Loc.errorm ~loc:(qloc q) "program symbol expected"
+let find_special muc test nm q =
+  match find_prog_symbol muc q with
+  | RS s when test s -> s
+  | OO ss ->
+      begin match Srs.elements (Srs.filter test ss) with
+      | [s] -> s
+      | _::_ -> Loc.errorm ~loc:(qloc q)
+                          "Ambiguous %s notation: %a" nm print_qualid q
+      | [] -> Loc.errorm ~loc:(qloc q) "Not a %s: %a" nm print_qualid q
+      end
+  | _ ->      Loc.errorm ~loc:(qloc q) "Not a %s: %a" nm print_qualid q
 
 (** Parsing types *)
 
@@ -397,8 +406,8 @@ open Dexpr
 (* records *)
 
 let find_record_field muc q =
-  match find_prog_symbol muc q with RS ({rs_field = Some _} as s) -> s
-  | _ -> Loc.errorm ~loc:(qloc q) "Not a record field: %a" print_qualid q
+  let test rs = rs.rs_field <> None in
+  find_special muc test "record field" q
 
 let find_record_field2 muc (q,e) = find_record_field muc q, e
 
@@ -434,12 +443,18 @@ let parse_record ~loc muc get_val fl =
 
 (* patterns *)
 
+let find_constructor muc q =
+  let test rs = match rs.rs_logic with
+    | RLls {ls_constr = c} -> c > 0
+    | _ -> false in
+  find_special muc test "constructor" q
+
 let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
   Dexpr.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
     | Ptree.Pvar (x, gh) -> DPvar (create_user_id x, gh)
     | Ptree.Papp (q, pl) ->
-        DPapp (find_rsymbol muc q, List.map (fun p -> dpattern muc p) pl)
+        DPapp (find_constructor muc q, List.map (dpattern muc) pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
           | Some p -> dpattern muc p
