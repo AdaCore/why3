@@ -181,12 +181,10 @@ let rec print_term info fmt t =
         | Some st, Number.ConstInt c ->
           syntax_range_literal st fmt c
         | Some st, Number.ConstReal c ->
-           if c.Number.rc_negative then
-             failwith "not supported yet: syntax literal for negative float literals";
           let fp = match ts.ts_def with
             | Float fp -> fp
             | _ -> assert false in
-          syntax_float_literal st fp fmt c.Number.rc_abs
+          syntax_float_literal st fp fmt c
         | None, _ -> Number.print number_format fmt c
         (* TODO/FIXME: we must assert here that the type is either
             ty_int or ty_real, otherwise it makes no sense to print

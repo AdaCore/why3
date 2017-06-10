@@ -106,7 +106,7 @@ val syntax_range_literal :
   string -> Number.integer_constant Pp.pp
 
 val syntax_float_literal :
-  string -> Number.float_format -> Number.real_literal Pp.pp
+  string -> Number.float_format -> Number.real_constant Pp.pp
 
 (** {2 pretty-printing transformations (useful for caching)} *)
 

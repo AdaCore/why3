@@ -1,5 +1,5 @@
 
-module M
+module Range
 
   use import int.Int
 
@@ -37,5 +37,16 @@ module M
 
   goal wg : word'int wm17 < 0
 
+
+end
+
+
+module Float
+
+  use import ieee_float.Float32
+
+  let constant x = (-0.125:Float32.t)
+
+   goal g : Float32.lt (-1.0:Float32.t) x
 
 end

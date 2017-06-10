@@ -300,9 +300,10 @@ let syntax_float_literal s fp fmt c =
       else
         None
     in
-    let e,m = Number.compute_float c fp in
+    let e,m = Number.compute_float c.Number.rc_abs fp in
+    let sg = if c.Number.rc_negative then BigInt.one else BigInt.zero in
     match s.[b] with
-    | 's' -> Number.print_in_base base digits fmt BigInt.zero
+    | 's' -> Number.print_in_base base digits fmt sg
     | 'e' -> Number.print_in_base base digits fmt e
     | 'm' -> Number.print_in_base base digits fmt m
     | _ -> assert false
