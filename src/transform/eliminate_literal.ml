@@ -177,7 +177,12 @@ let rec replace_negative_constants neg_int neg_real t =
              [t_const (ConstInt { c with ic_negative = false }) ty_int]
              (Some ty_int)
      else t
-
+  | (Some ty), (Tconst (ConstReal c)) ->
+     if c.rc_negative && ty_equal ty ty_real then
+       t_app neg_real
+             [t_const (ConstReal { c with rc_negative = false }) ty_real]
+             (Some ty_real)
+     else t
   | _ -> t_map (replace_negative_constants neg_int neg_real) t
 
 let eliminate_negative_constants env =
