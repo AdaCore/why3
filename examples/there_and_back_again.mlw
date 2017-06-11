@@ -23,15 +23,15 @@ module Convolution
   let rec convolution_rec (x y: list 'a) : (list ('a, 'a), list 'a)
     variant  { x }
     requires { length x <= length y }
-    ensures  { let (r, ys) = result in exists y0: list 'a.
+    ensures  { let r, ys = result in exists y0: list 'a.
                y = y0 ++ ys && length y0 = length x &&
                r = combine x (reverse y0) }
   = match x with
     | Nil ->
-        (Nil, y)
+        Nil, y
     | Cons x0 xs ->
         match convolution_rec xs y with
-        | r, Cons y0 ys -> (Cons (x0, y0) r, ys)
+        | r, Cons y0 ys -> Cons (x0, y0) r, ys
         | _ -> absurd end
     end
 

@@ -257,7 +257,7 @@ module BinomialHeap
     requires { inv k h }
     requires { h <> Nil }
     variant  { h }
-    ensures  { let (t, h') = result in
+    ensures  { let t, h' = result in
                heaps (Cons t Nil) && heaps h' && inv k h' &&
                le_roots t.elem h && binomial_tree t &&
                forall x. occ x h = occ x (Cons t Nil) + occ x h' }
@@ -266,10 +266,10 @@ module BinomialHeap
     | Nil ->
         absurd
     | Cons t Nil ->
-        (t, Nil)
+        t, Nil
     | Cons t tl ->
-        let (t', tl') = extract_min_tree (rank t + 1) tl in
-        if le t.elem t'.elem then (t, tl) else (t', Cons t tl')
+        let t', tl' = extract_min_tree (rank t + 1) tl in
+        if le t.elem t'.elem then t, tl else t', Cons t tl'
     end
 
   let rec extract_min (h: heap) : (elt, heap)
@@ -277,13 +277,13 @@ module BinomialHeap
     requires { inv 0 h }
     requires { h <> Nil }
     variant  { h }
-    ensures  { let (e, h') = result in
+    ensures  { let e, h' = result in
                heaps h' && inv 0 h' &&
                occ e h' = occ e h - 1 &&
                forall x. x <> e -> occ x h' = occ x h }
     =
-    let (t, h') = extract_min_tree 0 h in
-    (t.elem, merge 0 (reverse t.children) h')
+    let t, h' = extract_min_tree 0 h in
+    t.elem, merge 0 (reverse t.children) h'
 
   (** Complexity analysis. *)
 

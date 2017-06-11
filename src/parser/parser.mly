@@ -155,12 +155,16 @@
 
 (* Precedences *)
 
-%nonassoc IN
 %nonassoc below_SEMI
 %nonassoc SEMICOLON
 %nonassoc LET VAL EXCEPTION
 %nonassoc prec_no_else
-%nonassoc DOT ELSE GHOST
+%nonassoc DOT ELSE RETURN
+%nonassoc below_LARROW
+%nonassoc LARROW
+%nonassoc below_COMMA
+%nonassoc COMMA
+%nonassoc GHOST
 %nonassoc prec_named
 %nonassoc COLON (* weaker than -> because of t: a -> b *)
 %right ARROW LRARROW BY SO
@@ -169,8 +173,6 @@
 %nonassoc NOT
 %right EQUAL LTGT LT GT OP1
 %nonassoc AT OLD
-%nonassoc LARROW
-%nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
 %left OP2 MINUS
 %left OP3
 %left OP4
@@ -501,31 +503,40 @@ anon_binder:
 
 mk_term(X): d = X { mk_term d $startpos $endpos }
 
-term: t = mk_term(term_) { t }
+term:
+| single_term %prec below_COMMA   { $1 }
+| single_term COMMA term_
+    { mk_term (Ttuple ($1::$3)) $startpos $endpos }
 
 term_:
+| single_term %prec below_COMMA   { [$1] }
+| single_term COMMA term_         { $1::$3 }
+
+single_term: t = mk_term(single_term_) { t }
+
+single_term_:
 | term_arg_
     { match $1 with (* break the infix relation chain *)
       | Tinfix (l,o,r) -> Tinnfix (l,o,r)
       | Tbinop (l,o,r) -> Tbinnop (l,o,r)
       | d -> d }
-| NOT term
+| NOT single_term
     { Tnot $2 }
-| OLD term
+| OLD single_term
     { Tat ($2, mk_id Dexpr.old_mark $startpos($1) $endpos($1)) }
-| term AT uident
+| single_term AT uident
     { Tat ($1, $3) }
-| prefix_op term %prec prec_prefix_op
+| prefix_op single_term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
 | MINUS INTEGER
     { Tconst (Number.ConstInt (mk_int_const true $2)) }
 | MINUS REAL
     { Tconst (Number.ConstReal (mk_real_const true $2)) }
-| l = term ; o = bin_op ; r = term
+| l = single_term ; o = bin_op ; r = single_term
     { Tbinop (l, o, r) }
-| l = term ; o = infix_op_1 ; r = term
+| l = single_term ; o = infix_op_1 ; r = single_term
     { Tinfix (l, o, r) }
-| l = term ; o = infix_op_234 ; r = term
+| l = single_term ; o = infix_op_234 ; r = single_term
     { Tidapp (Qident o, [l; r]) }
 | term_arg located(term_arg)+ (* FIXME/TODO: "term term_arg" *)
     { let join f (a,_,e) = mk_term (Tapply (f,a)) $startpos e in
@@ -550,17 +561,15 @@ term_:
     { Tlet ($2, $3, $5) }
 | MATCH term WITH match_cases(term) END
     { Tmatch ($2, $4) }
-| MATCH comma_list2(term) WITH match_cases(term) END
-    { Tmatch (mk_term (Ttuple $2) $startpos($2) $endpos($2), $4) }
 | quant comma_list1(quant_vars) triggers DOT term
     { Tquant ($1, List.concat $2, $3, $5) }
 | FUN binders ARROW term
     { Tquant (Dterm.DTlambda, $2, [], $4) }
 | EPSILON
     { Loc.errorm "Epsilon terms are currently not supported in WhyML" }
-| label term %prec prec_named
+| label single_term %prec prec_named
     { Tnamed ($1, $2) }
-| term cast
+| single_term cast
     { Tcast ($1, $2) }
 
 lam_defn:
@@ -583,9 +592,10 @@ term_dot_:
 | term_sub_                 { $1 }
 
 term_block:
+| BEGIN term END                                    { $2.term_desc }
 | LEFTPAR term RIGHTPAR                             { $2.term_desc }
+| BEGIN END                                         { Ttuple [] }
 | LEFTPAR RIGHTPAR                                  { Ttuple [] }
-| LEFTPAR comma_list2(term) RIGHTPAR                { Ttuple $2 }
 | LEFTBRC field_list1(term) RIGHTBRC                { Trecord $2 }
 | LEFTBRC term_arg WITH field_list1(term) RIGHTBRC  { Tupdate ($2,$4) }
 
@@ -617,8 +627,8 @@ quant_vars:
 | binder_var+ cast? { List.map (fun (l,i) -> l, i, false, $2) $1 }
 
 triggers:
-| (* epsilon *)                                                 { [] }
-| LEFTSQ separated_nonempty_list(BAR,comma_list1(term)) RIGHTSQ { $2 }
+| (* epsilon *)                                                         { [] }
+| LEFTSQ separated_nonempty_list(BAR,comma_list1(single_term)) RIGHTSQ  { $2 }
 
 %inline bin_op:
 | ARROW   { Dterm.DTimplies }
@@ -682,39 +692,13 @@ const_defn:
 mk_expr(X): d = X { mk_expr d $startpos $endpos }
 
 seq_expr:
-| expr %prec below_SEMI   { $1 }
-| expr SEMICOLON          { $1 }
-| expr SEMICOLON seq_expr { mk_expr (Esequence ($1, $3)) $startpos $endpos }
+| assign_expr %prec below_SEMI    { $1 }
+| assign_expr SEMICOLON           { $1 }
+| assign_expr SEMICOLON seq_expr
+    { mk_expr (Esequence ($1, $3)) $startpos $endpos }
 
-expr: e = mk_expr(expr_) { e }
-
-expr_:
-| expr_arg_
-    { match $1 with (* break the infix relation chain *)
-      | Einfix (l,o,r) -> Einnfix (l,o,r) | d -> d }
-| expr AMPAMP expr
-    { Eand ($1, $3) }
-| expr BARBAR expr
-    { Eor ($1, $3) }
-| NOT expr
-    { Enot $2 }
-| prefix_op expr %prec prec_prefix_op
-    { Eidapp (Qident $1, [$2]) }
-| MINUS INTEGER
-    { Econst (Number.ConstInt (mk_int_const true $2)) }
-| MINUS REAL
-    { Econst (Number.ConstReal (mk_real_const true $2)) }
-| l = expr ; o = infix_op_1 ; r = expr
-    { Einfix (l,o,r) }
-| l = expr ; o = infix_op_234 ; r = expr
-    { Eidapp (Qident o, [l;r]) }
-| expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
-    { let join f (a,_,e) = mk_expr (Eapply (f,a)) $startpos e in
-      (List.fold_left join $1 $2).expr_desc }
-| IF seq_expr THEN expr ELSE expr
-    { Eif ($2, $4, $6) }
-| IF seq_expr THEN expr %prec prec_no_else
-    { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
+assign_expr:
+| expr %prec below_LARROW         { $1 }
 | expr LARROW expr
     { let loc = floc $startpos $endpos in
       let rec down ll rl = match ll, rl with
@@ -726,12 +710,52 @@ expr_:
             "Invalid left expression in an assignment"
         | [], [] -> []
         | _ -> Loc.errorm ~loc "Invalid parallel assignment" in
-      match $1.expr_desc, $3.expr_desc with
+      let d = match $1.expr_desc, $3.expr_desc with
         | Eidapp (Qident id, [e1;e2]), _ when id.id_str = mixfix "[]" ->
             Eidapp (Qident {id with id_str = mixfix "[]<-"}, [e1;e2;$3])
         | Etuple ll, Etuple rl -> Eassign (down ll rl)
         | Etuple _, _ -> Loc.errorm ~loc "Invalid parallel assignment"
-        | _, _ -> Eassign (down [$1] [$3]) }
+        | _, _ -> Eassign (down [$1] [$3]) in
+      { expr_desc = d; expr_loc = loc } }
+
+expr:
+| single_expr %prec below_COMMA   { $1 }
+| single_expr COMMA expr_
+    { mk_expr (Etuple ($1::$3)) $startpos $endpos }
+
+expr_:
+| single_expr %prec below_COMMA   { [$1] }
+| single_expr COMMA expr_         { $1::$3 }
+
+single_expr: e = mk_expr(single_expr_)  { e }
+
+single_expr_:
+| expr_arg_
+    { match $1 with (* break the infix relation chain *)
+      | Einfix (l,o,r) -> Einnfix (l,o,r) | d -> d }
+| single_expr AMPAMP single_expr
+    { Eand ($1, $3) }
+| single_expr BARBAR single_expr
+    { Eor ($1, $3) }
+| NOT single_expr
+    { Enot $2 }
+| prefix_op single_expr %prec prec_prefix_op
+    { Eidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Econst (Number.ConstInt (mk_int_const true $2)) }
+| MINUS REAL
+    { Econst (Number.ConstReal (mk_real_const true $2)) }
+| l = single_expr ; o = infix_op_1 ; r = single_expr
+    { Einfix (l,o,r) }
+| l = single_expr ; o = infix_op_234 ; r = single_expr
+    { Eidapp (Qident o, [l;r]) }
+| expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
+    { let join f (a,_,e) = mk_expr (Eapply (f,a)) $startpos e in
+      (List.fold_left join $1 $2).expr_desc }
+| IF seq_expr THEN assign_expr ELSE assign_expr
+    { Eif ($2, $4, $6) }
+| IF seq_expr THEN assign_expr %prec prec_no_else
+    { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
     { let re_pat pat d = { pat with pat_desc = d } in
       let rec ghostify pat = match pat.pat_desc with
@@ -778,12 +802,6 @@ expr_:
       if xl = [] then Ematch ($2, bl) else
       if bl = [] then Etry ($2, false, xl) else
       Etry (mk_expr (Ematch ($2, bl)) $startpos $endpos, true, xl) }
-| MATCH comma_list2(expr) WITH ext_match_cases END
-    { let e = mk_expr (Etuple $2) $startpos($2) $endpos($2) in
-      let bl, xl = $4 in
-      if xl = [] then Ematch (e, bl) else
-      if bl = [] then Etry (e, false, xl) else
-      Etry (mk_expr (Ematch (e, bl)) $startpos $endpos, true, xl) }
 | EXCEPTION labels(uident) IN seq_expr
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
 | EXCEPTION labels(uident) return IN seq_expr
@@ -800,17 +818,17 @@ expr_:
     { Eraise ($2, $3) }
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
-| RETURN expr_arg?
+| RETURN ioption(assign_expr)
     { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, false, $4) }
-| GHOST expr
+| GHOST single_expr
     { Eghost $2 }
 | assertion_kind LEFTBRC term RIGHTBRC
     { Eassert ($1, $3) }
-| label expr %prec prec_named
+| label single_expr %prec prec_named
     { Enamed ($1, $2) }
-| expr cast
+| single_expr cast
     { Ecast ($1, $2) }
 
 expr_arg: e = mk_expr(expr_arg_) { e }
@@ -839,7 +857,6 @@ expr_block:
 | LEFTPAR seq_expr RIGHTPAR                         { $2.expr_desc }
 | BEGIN END                                         { Etuple [] }
 | LEFTPAR RIGHTPAR                                  { Etuple [] }
-| LEFTPAR comma_list2(expr) RIGHTPAR                { Etuple $2 }
 | LEFTBRC field_list1(expr) RIGHTBRC                { Erecord $2 }
 | LEFTBRC expr_arg WITH field_list1(expr) RIGHTBRC  { Eupdate ($2, $4) }
 
@@ -913,7 +930,7 @@ single_spec:
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | READS  LEFTBRC comma_list0(lqualid) RIGHTBRC
     { { empty_spec with sp_reads = $3; sp_checkrw = true } }
-| WRITES LEFTBRC comma_list0(term) RIGHTBRC
+| WRITES LEFTBRC comma_list0(single_term) RIGHTBRC
     { { empty_spec with sp_writes = $3; sp_checkrw = true } }
 | RAISES LEFTBRC comma_list1(xsymbol) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
@@ -943,7 +960,7 @@ variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }
 
 single_variant:
-| term preceded(WITH,lqualid)? { $1, $2 }
+| single_term preceded(WITH,lqualid)?  { $1, $2 }
 
 ret_opt:
 | (* epsilon *)     { None, Ity.MaskVisible }

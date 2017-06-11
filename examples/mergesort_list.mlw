@@ -88,7 +88,7 @@ module Mergesort
 
   let split (l0: list 'a) : (list 'a, list 'a)
     requires { length l0 >= 2 }
-    ensures  { let (l1, l2) = result in
+    ensures  { let l1, l2 = result in
       1 <= length l1 /\ 1 <= length l2 /\ permut l0 (l1 ++ l2) }
   = let rec split_aux (l1 l2 l: list 'a) : (list 'a, list 'a)
       requires { length l2 = length l1 \/ length l2 = length l1 + 1 }
@@ -97,7 +97,7 @@ module Mergesort
         permut (r1 ++ r2) (l1 ++ (l2 ++ l)) }
       variant { length l }
     = match l with
-      | Nil -> (l1, l2)
+      | Nil -> l1, l2
       | Cons x r -> split_aux l2 (Cons x l1) r
       end
     in

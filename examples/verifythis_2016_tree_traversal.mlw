@@ -375,9 +375,9 @@ module Recursive
       let ghost _c = !x in
       let _lf = get_acc Left !x in
       let _rg = get_acc Right !x in
-      let (lf, rg) = ghost match t with
+      let lf, rg = ghost match t with
         | Empty -> absurd
-        | Node l _ r -> (l, r)
+        | Node l _ r -> l, r
         end in
       (ghost not_below mem0 lf rg _c !z);
       bloc mem0 GoLeft;

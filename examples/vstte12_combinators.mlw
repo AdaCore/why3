@@ -103,7 +103,7 @@ module Combinators
     if not (eq t1 i) then raise BenchFailure;
     let t2 = reduction (App (App (App (App K K) K) K) K) in
     if not (eq t2 K) then raise BenchFailure;
-    (t1, t2)
+    t1, t2
 
   (* an irreducible term is a value *)
 
