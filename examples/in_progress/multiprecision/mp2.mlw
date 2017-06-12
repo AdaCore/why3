@@ -41,9 +41,9 @@ module N
 
   lemma limb_max_bound: 1 <= max_uint64
 
-  let ghost function l2i (x:limb) : int = Limb.to_int x
+  function l2i (x:limb) : int = Limb.to_int x
 
-  let ghost function p2i (i:int32) : int = Int32.to_int i
+  function p2i (i:int32) : int = Int32.to_int i
 
   exception Break
   exception Return32 int32
@@ -182,7 +182,7 @@ module N
   use import mach.c.C
   type t = ptr limb
 
-  let ghost function value (x:t) (sz:int) : int =
+  function value (x:t) (sz:int) : int =
      value_sub (pelts x) x.offset (x.offset + sz)
 
   function compare_int (x y:int) : int =
@@ -1556,8 +1556,8 @@ module N
     else
     begin
     let (r:limb,d:limb) = lsld x cnt in
-    let p = power 2 (l2i cnt) in
-    let q = power 2 (Limb.length - l2i cnt) in
+    let ghost p = power 2 (l2i cnt) in
+    let ghost q = power 2 (Limb.length - l2i cnt) in
     assert { p > 0 /\ q > 0 };
     assert { radix = p * q by
                 radix = power 2 Limb.length = power 2 (cnt + (Limb.length - cnt))
