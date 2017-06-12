@@ -1795,7 +1795,7 @@ let add_transformation ?(init=notify) ?(notify=notify) ~keygen env_session trans
   let next_subgoal task =
     incr i;
     let gid,expl,_ = Termcode.goal_expl_task ~root:false task in
-    let expl = string_of_int !i ^ ". " ^ expl in
+    (*    let expl = string_of_int !i ^ ". " ^ expl in *)
     (* Format.eprintf "parent_goal_name = %s@." parent_goal_name; *)
     let goal_name = parent_goal_name ^ "." ^ string_of_int !i in
     let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
