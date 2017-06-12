@@ -565,6 +565,11 @@ let dspec muc sp lvm xsm old ity = {
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge; }
 
+let dspec_no_variant muc sp = match sp.sp_variant with
+  | ({term_loc = loc},_)::_ ->
+      Loc.errorm ~loc "unexpected 'variant' clause"
+  | _ -> dspec muc sp
+
 let dassert muc f lvm _xsm old = type_fmla muc lvm old f
 
 let dinvariant muc f lvm _xsm old = dpre muc f lvm old
@@ -703,10 +708,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DErec (rd, dexpr muc denv e1)
   | Ptree.Efun (bl, pty, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
-      let ds = match sp.sp_variant with
-        | ({term_loc = loc},_)::_ ->
-            Loc.errorm ~loc "unexpected 'variant' clause"
-        | _ -> dspec muc sp in
+      let ds = dspec_no_variant muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
       let denv = if bl = [] then denv else
@@ -714,10 +716,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->
       let pl = List.map (dparam muc) pl in
-      let ds = match sp.sp_variant with
-        | ({term_loc = loc},_)::_ ->
-            Loc.errorm ~loc "unexpected 'variant' clause"
-        | _ -> dspec muc sp in
+      let ds = dspec_no_variant muc sp in
       let ity = match kind, pty with
         | _, Some pty -> ity_of_pty muc pty
         | RKlemma, None -> ity_unit
