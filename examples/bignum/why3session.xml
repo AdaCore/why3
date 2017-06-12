@@ -5,21 +5,21 @@
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../bignum.mlw">
-<theory name="BigNum" sum="cf395b347f7215e18d58f74c8b3507a5">
+<theory name="BigNum" sum="1fae80aec7dd5e698e2707bddfd6c28b">
  <goal name="WP_parameter nonneg" expl="VC for nonneg">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter nonneg.1" expl="1. postcondition">
+  <goal name="WP_parameter nonneg.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter nonneg.2" expl="2. variant decrease">
+  <goal name="WP_parameter nonneg.2" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter nonneg.3" expl="3. precondition">
+  <goal name="WP_parameter nonneg.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter nonneg.4" expl="4. postcondition">
+  <goal name="WP_parameter nonneg.4" expl="postcondition">
   <transf name="compute_in_goal">
-   <goal name="WP_parameter nonneg.4.1" expl="1. postcondition">
+   <goal name="WP_parameter nonneg.4.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="5.21" steps="114"/></proof>
    </goal>
   </transf>
@@ -28,18 +28,18 @@
  </goal>
  <goal name="WP_parameter msd" expl="VC for msd">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter msd.1" expl="1. postcondition">
+  <goal name="WP_parameter msd.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter msd.2" expl="2. variant decrease">
+  <goal name="WP_parameter msd.2" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter msd.3" expl="3. precondition">
+  <goal name="WP_parameter msd.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter msd.4" expl="4. postcondition">
+  <goal name="WP_parameter msd.4" expl="postcondition">
   <transf name="compute_in_goal">
-   <goal name="WP_parameter msd.4.1" expl="1. postcondition">
+   <goal name="WP_parameter msd.4.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="1.62" steps="80"/></proof>
    </goal>
   </transf>
@@ -48,100 +48,100 @@
  </goal>
  <goal name="WP_parameter add_digit" expl="VC for add_digit">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter add_digit.1" expl="1. postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="WP_parameter add_digit.1" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.2" expl="2. postcondition">
+  <goal name="WP_parameter add_digit.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.3" expl="3. postcondition">
+  <goal name="WP_parameter add_digit.3" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.4" expl="4. postcondition">
+  <goal name="WP_parameter add_digit.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.5" expl="5. variant decrease">
+  <goal name="WP_parameter add_digit.5" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.6" expl="6. precondition">
+  <goal name="WP_parameter add_digit.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.7" expl="7. precondition">
+  <goal name="WP_parameter add_digit.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter add_digit.8" expl="8. postcondition">
+  <goal name="WP_parameter add_digit.8" expl="postcondition">
   <transf name="compute_in_goal">
-   <goal name="WP_parameter add_digit.8.1" expl="1. postcondition">
+   <goal name="WP_parameter add_digit.8.1" expl="postcondition">
    <proof prover="0"><result status="timeout" time="5.99"/></proof>
    <proof prover="1"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter add_digit.9" expl="9. postcondition">
+  <goal name="WP_parameter add_digit.9" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter add_cin" expl="VC for add_cin">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter add_cin.1" expl="1. precondition">
+  <goal name="WP_parameter add_cin.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.2" expl="2. precondition">
+  <goal name="WP_parameter add_cin.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.3" expl="3. postcondition">
+  <goal name="WP_parameter add_cin.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.4" expl="4. postcondition">
+  <goal name="WP_parameter add_cin.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.5" expl="5. precondition">
+  <goal name="WP_parameter add_cin.5" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.6" expl="6. precondition">
+  <goal name="WP_parameter add_cin.6" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.7" expl="7. postcondition">
+  <goal name="WP_parameter add_cin.7" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.8" expl="8. postcondition">
+  <goal name="WP_parameter add_cin.8" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.9" expl="9. precondition">
+  <goal name="WP_parameter add_cin.9" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.10" expl="10. precondition">
+  <goal name="WP_parameter add_cin.10" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.11" expl="11. postcondition">
+  <goal name="WP_parameter add_cin.11" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.12" expl="12. postcondition">
+  <goal name="WP_parameter add_cin.12" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.13" expl="13. variant decrease">
+  <goal name="WP_parameter add_cin.13" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.14" expl="14. precondition">
+  <goal name="WP_parameter add_cin.14" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.15" expl="15. postcondition">
+  <goal name="WP_parameter add_cin.15" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.16" expl="16. postcondition">
+  <goal name="WP_parameter add_cin.16" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.17" expl="17. variant decrease">
+  <goal name="WP_parameter add_cin.17" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.18" expl="18. precondition">
+  <goal name="WP_parameter add_cin.18" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.19" expl="19. postcondition">
+  <goal name="WP_parameter add_cin.19" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter add_cin.20" expl="20. postcondition">
+  <goal name="WP_parameter add_cin.20" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
  </transf>

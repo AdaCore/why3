@@ -9,180 +9,180 @@
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../vstte10_max_sum.mlw" expanded="true">
-<theory name="MaxAndSum" sum="c80f95b1a0f72356242a41253e98d247">
+<theory name="MaxAndSum" sum="7397f8f0dde6f2882fa28c98cb72d6c0">
  <goal name="WP_parameter max_sum" expl="VC for max_sum">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter max_sum.1" expl="1. postcondition">
+  <goal name="WP_parameter max_sum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.2" expl="2. loop invariant init">
+  <goal name="WP_parameter max_sum.2" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.3" expl="3. index in array bounds">
+  <goal name="WP_parameter max_sum.3" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.4" expl="4. index in array bounds">
+  <goal name="WP_parameter max_sum.4" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.5" expl="5. index in array bounds">
+  <goal name="WP_parameter max_sum.5" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.6" expl="6. loop invariant preservation">
+  <goal name="WP_parameter max_sum.6" expl="loop invariant preservation">
   <proof prover="1" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"><result status="valid" time="0.29"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.7" expl="7. index in array bounds">
+  <goal name="WP_parameter max_sum.7" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.8" expl="8. loop invariant preservation">
+  <goal name="WP_parameter max_sum.8" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.9" expl="9. postcondition">
+  <goal name="WP_parameter max_sum.9" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="MaxAndSum2" sum="3975f4d1eeb1131a6ff4f73cf7761941">
+<theory name="MaxAndSum2" sum="7191fcda1be0a817ff8f59fb9a8509fe">
  <goal name="WP_parameter max_sum" expl="VC for max_sum">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter max_sum.1" expl="1. postcondition">
+  <goal name="WP_parameter max_sum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.2" expl="2. loop invariant init">
+  <goal name="WP_parameter max_sum.2" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.3" expl="3. index in array bounds">
+  <goal name="WP_parameter max_sum.3" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.4" expl="4. index in array bounds">
+  <goal name="WP_parameter max_sum.4" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.5" expl="5. index in array bounds">
+  <goal name="WP_parameter max_sum.5" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.6" expl="6. loop invariant preservation">
+  <goal name="WP_parameter max_sum.6" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter max_sum.6.1" expl="1. VC for max_sum">
+   <goal name="WP_parameter max_sum.6.1" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
-   <goal name="WP_parameter max_sum.6.2" expl="2. VC for max_sum">
+   <goal name="WP_parameter max_sum.6.2" expl="VC for max_sum">
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter max_sum.6.3" expl="3. VC for max_sum">
+   <goal name="WP_parameter max_sum.6.3" expl="VC for max_sum">
    <proof prover="1" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v"><result status="valid" time="0.30"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter max_sum.7" expl="7. index in array bounds">
+  <goal name="WP_parameter max_sum.7" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter max_sum.8" expl="8. loop invariant preservation">
+  <goal name="WP_parameter max_sum.8" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter max_sum.8.1" expl="1. VC for max_sum">
+   <goal name="WP_parameter max_sum.8.1" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
    </goal>
-   <goal name="WP_parameter max_sum.8.2" expl="2. VC for max_sum">
+   <goal name="WP_parameter max_sum.8.2" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.04" steps="50"/></proof>
    <proof prover="2" timelimit="5"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter max_sum.8.3" expl="3. VC for max_sum">
+   <goal name="WP_parameter max_sum.8.3" expl="VC for max_sum">
    <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter max_sum.9" expl="9. postcondition">
+  <goal name="WP_parameter max_sum.9" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   <proof prover="2" memlimit="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="TestCase" sum="2b13db7f8ed454f7dc5c5f8d87398f12" expanded="true">
+<theory name="TestCase" sum="3d78adee685a0e25321d299a05515b44" expanded="true">
  <goal name="WP_parameter test" expl="VC for test">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter test.1" expl="1. array creation size">
+  <goal name="WP_parameter test.1" expl="array creation size">
   <proof prover="0" timelimit="10"><result status="valid" time="0.02" steps="0"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.2" expl="2. index in array bounds">
+  <goal name="WP_parameter test.2" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter test.3" expl="3. index in array bounds">
+  <goal name="WP_parameter test.3" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="6"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.4" expl="4. index in array bounds">
+  <goal name="WP_parameter test.4" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="9"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.5" expl="5. index in array bounds">
+  <goal name="WP_parameter test.5" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.02" steps="12"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.6" expl="6. index in array bounds">
+  <goal name="WP_parameter test.6" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.02" steps="15"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.7" expl="7. index in array bounds">
+  <goal name="WP_parameter test.7" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.02" steps="18"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.8" expl="8. index in array bounds">
+  <goal name="WP_parameter test.8" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="21"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.9" expl="9. index in array bounds">
+  <goal name="WP_parameter test.9" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.03" steps="24"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.10" expl="10. index in array bounds">
+  <goal name="WP_parameter test.10" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.03" steps="27"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.11" expl="11. index in array bounds">
+  <goal name="WP_parameter test.11" expl="index in array bounds">
   <proof prover="0" timelimit="10"><result status="valid" time="0.03" steps="30"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.12" expl="12. precondition">
+  <goal name="WP_parameter test.12" expl="precondition">
   <proof prover="0" timelimit="10"><result status="valid" time="0.09" steps="35"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test.13" expl="13. assertion">
+  <goal name="WP_parameter test.13" expl="assertion">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   <proof prover="3"><result status="valid" time="0.14"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter test.14" expl="14. assertion">
+  <goal name="WP_parameter test.14" expl="assertion">
   <proof prover="0" timelimit="10"><result status="valid" time="0.22" steps="66"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   </goal>
