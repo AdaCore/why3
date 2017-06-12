@@ -49,24 +49,27 @@ let merge_ts = ns_replace its_equal
 let merge_xs = ns_replace xs_equal
 
 type overload =
-  | UnOp    (* t -> t *)
-  | BinOp   (* t -> t -> t *)
-  | BinRel  (* t -> t -> bool *)
-  | NoOver  (* none of the above *)
+  | FixedRes of ity (* t -> t -> ... -> T *)
+  | SameType        (* t -> t -> ... -> t *)
+  | NoOver          (* neither *)
 
 let overload_of_rs {rs_cty = cty} =
   if cty.cty_effect.eff_ghost then NoOver else
   if cty.cty_mask <> MaskVisible then NoOver else
+  let same_type ity a = not a.pv_ghost && ity_equal a.pv_ity ity in
   match cty.cty_args with
-  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
-               ity_equal cty.cty_result ity_bool &&
-               not a.pv_ghost && not b.pv_ghost -> BinRel
-  | [a;b] when ity_equal a.pv_ity b.pv_ity &&
-               ity_equal cty.cty_result a.pv_ity &&
-               not a.pv_ghost && not b.pv_ghost -> BinOp
-  | [a]   when ity_equal cty.cty_result a.pv_ity &&
-               not a.pv_ghost -> UnOp
+  | a::al when not a.pv_ghost && List.for_all (same_type a.pv_ity) al ->
+      let res = cty.cty_result in
+      if ity_equal res a.pv_ity then SameType else
+      if ity_closed res && ity_immutable res then FixedRes res else NoOver
   | _ -> NoOver
+
+let same_overload r1 r2 =
+  List.length r1.rs_cty.cty_args = List.length r2.rs_cty.cty_args &&
+  match overload_of_rs r1, overload_of_rs r2 with
+  | SameType, SameType -> true
+  | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
+  | _ -> false (* two NoOver's are not the same *)
 
 exception IncompatibleNotation of string
 
@@ -83,18 +86,14 @@ let merge_ps chk x vo vn =
     | _, OO _ -> assert false
     (* but we can merge two compatible symbols *)
     | RS r1, RS r2 when not (rs_equal r1 r2) ->
-        let o1 = overload_of_rs r1 in
-        let o2 = overload_of_rs r2 in
-        if o1 <> o2 || o2 = NoOver then vn else
-        if fsty r1 == fsty r2 then vn else
+        if not (same_overload r1 r2) then vn else
+        if ity_equal (fsty r1) (fsty r2) then vn else
         OO (Srs.add r2 (Srs.singleton r1))
     (* or add a compatible symbol to notation *)
     | OO s1, RS r2 ->
-        let o1 = overload_of_rs (Srs.choose s1) in
-        let o2 = overload_of_rs r2 in
-        if o1 <> o2 || o2 = NoOver then vn else
-        let ty = fsty r2 in
-        let confl r = fsty r != ty in
+        let r1 = Srs.choose s1 and ty = fsty r2 in
+        if not (same_overload r1 r2) then vn else
+        let confl r = not (ity_equal (fsty r) ty) in
         let s1 = Srs.filter confl s1 in
         if Srs.is_empty s1 then vn else
         OO (Srs.add r2 s1)
@@ -922,12 +921,12 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         i' (clone_invl cl ism invl) (clone_expr cl ism e)
-  | Etry (d, xl) ->
+  | Etry (d, case, xl) ->
       let conv_br xs (vl, e) m =
         let vl' = List.map (clone_pv cl) vl in
         let sm = List.fold_left2 sm_save_pv sm vl vl' in
         Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
-      e_try (clone_expr cl sm d) (Mxs.fold conv_br xl Mxs.empty)
+      e_try (clone_expr cl sm d) ~case (Mxs.fold conv_br xl Mxs.empty)
   | Eraise (xs, e) ->
       e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
   | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->

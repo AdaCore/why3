@@ -52,13 +52,13 @@ module SwapInt32
 
   let swap (a b: int32) : (int32, int32)
     requires { in_bounds a /\ in_bounds b }
-    ensures  { let (x,y) = result in
+    returns  { x,y ->
                to_int x = to_int b /\ to_int y = to_int a }
   =
     let a = a + b in
     let b = a - b in
     let a = a - b in
-    (a, b)
+    a, b
 
   (* then rephrased with mutable variables *)
 

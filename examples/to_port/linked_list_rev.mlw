@@ -21,6 +21,7 @@ module InPlaceRev
   use import list.List
   use list.Quant
   use import list.Append
+  use import list.Mem
   use import list.Length
   use export list.Reverse
 
@@ -28,9 +29,6 @@ module InPlaceRev
 
   val function eq_loc (l1 l2:loc) : bool
     ensures { result <-> l1 = l2 }
-
-  let function mem (x:loc) (l:list loc) : bool =
-    Quant.for_some (eq_loc x) l
 
   val constant null : loc
 
@@ -154,9 +152,11 @@ module InPlaceRev
       variant   { !pM }
         match !pM with
         | Nil -> absurd
-        | Cons _ t ->
-          l1pM := !l1pM ++ Cons !p Nil;
-          pM := t
+        | Cons h t ->
+          pM := t;
+          assert { disjoint !l1pM !pM };
+          assert { not (mem h !pM) };
+          l1pM := !l1pM ++ Cons h Nil;
         end;
         p := acc next !p
     done;
@@ -202,8 +202,8 @@ module InPlaceRevSeq
   use import int.Int
   use map.Map
   use import seq.Seq
+  use import seq.Mem
   use import seq.Reverse
-  use import ref.Ref
 
   type loc
 
@@ -211,9 +211,6 @@ module InPlaceRevSeq
 
   val function eq_loc (l1 l2:loc) : bool
     ensures { result <-> l1 = l2 }
-
-  predicate mem (x: loc) (s: seq loc) =
-    exists i. 0 <= i < length s /\ eq_loc s[i] x
 
   predicate disjoint (s1: seq 'a) (s2: seq 'a) =
     (* forall x:'a. not (mem x s1 /\ mem x s2) *)
@@ -238,6 +235,8 @@ module InPlaceRevSeq
       assert { s == cons s[0] s[1 .. ] };
       let (s1, s2) = mem_decomp x s[1 .. ] in (cons s[0] s1, s2)
     end
+
+  use import ref.Ref
 
   type memory 'a = ref (Map.map loc 'a)
 
@@ -328,7 +327,7 @@ module InPlaceRevSeq
   = if length pM > 0 then begin
       let h = pM[0] in
       let t = pM[1 .. ] in
-      if {mem} h t then
+      if mem h t then
          (* absurd case *)
          let (l1,l2) = mem_decomp h t in
          list_seg_sublistl next (cons h l1) l2 p h;

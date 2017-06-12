@@ -388,7 +388,7 @@ module Translate = struct
       let test = ML.mk_expr (Mltree.Eapp (op_b_rs, [i_expr; to_expr]))
                             (Mltree.I ity_bool) eff_empty in
       let next_expr =
-        let one_const = Number.int_const_dec "1" in
+        let one_const = Number.int_const_of_int 1 in
         let one_expr  =
           ML.mk_expr (Mltree.Econst one_const) ML.ity_int eff_empty in
         let i_op_one = Mltree.Eapp (op_a_rs, [i_expr; one_expr]) in
@@ -438,7 +438,8 @@ module Translate = struct
     assert (not eff.eff_ghost);
     match e.e_node with
     | Econst c ->
-      let c = match c with Number.ConstInt c -> c | _ -> assert false in
+      let c = match c with
+          Number.ConstInt c -> c | _ -> assert false in
       ML.mk_expr (Mltree.Econst c) (Mltree.I e.e_ity) eff
     | Evar pv ->
       ML.mk_expr (Mltree.Evar pv) (Mltree.I e.e_ity) eff
@@ -563,7 +564,8 @@ module Translate = struct
     | Eassign al ->
       ML.mk_expr (Mltree.Eassign al) (Mltree.I e.e_ity) eff
     | Epure _ -> (* assert false (\*TODO*\) *) ML.mk_hole
-    | Etry (etry, pvl_e_map) ->
+    | Etry (etry, case, pvl_e_map) ->
+      assert (not case); (* TODO *)
       let etry = expr info etry in
       let bl   =
         let bl_map = Mxs.bindings pvl_e_map in

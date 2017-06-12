@@ -57,7 +57,8 @@ module Esterel
     let res = bw_or a.bv (neg a.bv) in
     assert { eq_sub_bv res zeros zeros p_bv };
     assert { eq_sub_bv res ones p_bv (sub size_bv p_bv) };
-    { bv = res; mdl = pure {interval p size} }
+    { bv = res;
+      mdl = interval p size }
 
 
   let maxUnion (a b : s) : s  (* operator [(a|b)&(a|-a)&(b|-b)] *)
@@ -72,8 +73,8 @@ module Esterel
     in
     assert {
       forall x. mem x res.mdl ->
-        let (y,z) =
-          if mem x a.mdl then (x,min_elt b.mdl) else (min_elt a.mdl,x)
+        let y,z =
+          if mem x a.mdl then x, min_elt b.mdl else min_elt a.mdl, x
         in
           mem y a.mdl /\ mem z b.mdl /\ x = max y z };
     res

@@ -145,7 +145,7 @@ module Zeckendorf
 
   let greatest_fib (x: int) : (int, int)
     requires { 0 < x }
-    ensures  { let (k, fk) = result in
+    ensures  { let k, fk = result in
                2 <= k /\ 1 <= fk = fib k <= x < fib (k + 1) }
   =
     let a = ref 1 in
@@ -160,7 +160,7 @@ module Zeckendorf
       b := f;
       k := !k + 1
    done;
-   (!k, !a)
+   !k, !a
 
   let zeckendorf (n: int) : list int
     requires { 0 <= n }
@@ -175,7 +175,7 @@ module Zeckendorf
       invariant { !x + sum !l = n }
       invariant { match !l with Nil -> true | Cons k _ -> !x < fib (k-1) end }
       variant   { !x }
-      let (k, fk) = greatest_fib !x in
+      let k, fk = greatest_fib !x in
       x := !x - fk;
       l := Cons k !l
     done;
@@ -239,19 +239,19 @@ module Zeckendorf
       requires { wf k lc }
       requires { k >= 2 /\ lc <> Nil }
       requires { 0 <= acc = sum lb - sum lc < fib (k-1) }
-      returns { (x,p) -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
-      returns { (x,p) -> wf k p /\ x >= k /\ lc = snoc p x }
+      returns { x,p -> fib x <= sum lb = acc + fib x + sum p < fib (x+1) }
+      returns { x,p -> wf k p /\ x >= k /\ lc = snoc p x }
       variant { lc }
     = match lc with
       | Nil -> absurd
-      | Cons x Nil -> (x,Nil)
-      | Cons x q -> let (y,p) = decomp (x+2) (acc+fib x) q lb in (y,Cons x p)
+      | Cons x Nil -> x,Nil
+      | Cons x q -> let y,p = decomp (x+2) (acc+fib x) q lb in y,Cons x p
       end in
     match l1 , l2 with
     | Nil , Nil -> ()
     | Nil , l | l , Nil -> let _ = decomp 2 0 l l in absurd
-    | _ , _ -> let (_,q1) = decomp 2 0 l1 l1 in
-      let (_,q2) = decomp 2 0 l2 l2 in
+    | _ , _ -> let _,q1 = decomp 2 0 l1 l1 in
+      let _,q2 = decomp 2 0 l2 l2 in
       zeckendorf_unique q1 q2
     end
 
@@ -299,7 +299,7 @@ module FibonacciLogarithmic
     ensures  { let a, b = result in
       power m1110 n = { a11 = a+b; a12 = b; a21 = b; a22 = a } }
   = if n = 0 then
-      (1, 0)
+      1, 0
     else begin
       assert { 0 <= div n 2 };
       let a, b = logfib (div n 2) in
@@ -307,12 +307,12 @@ module FibonacciLogarithmic
       if mod n 2 = 0 then
         begin
         assert { 2 * (div n 2) = (div n 2) + (div n 2) };
-        (a*a+ b*b, b*(a + c))
+        a*a+ b*b, b*(a + c)
         end
       else
         begin
         assert { 2 * (div n 2) + 1 = (div n 2) + (div n 2) + 1 };
-        (b*(a + c), c*c + b*b)
+        b*(a + c), c*c + b*b
         end
     end
 

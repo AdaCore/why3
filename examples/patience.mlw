@@ -96,7 +96,7 @@ module PigeonHole
             if f j = m-1 then return
           done;
           (* we know that for all k <> i, f k <> m-1 *)
-          let g = pure { shift f i } in
+          let g = shift f i in
           assert { range g (n-1) (m-1) };
           pigeon_hole (n-1) (m-1) g;
           return
@@ -267,7 +267,7 @@ module PatienceAbstract
            0 <= s.stacks[i][j] < s.num_elts)
          (** contents of stacks are valid card indexes *)
   /\ (forall i. 0 <= i < s.num_elts ->
-       let (is,ip) = s.positions[i] in
+       let is,ip = s.positions[i] in
        0 <= is < s.num_stacks &&
        let st = s.stacks[is] in
          0 <= ip < s.stack_sizes[is] &&
@@ -296,7 +296,7 @@ module PatienceAbstract
        (** the predecessor is a valid index or [-1] *)
        pred < i /\
        (** predecessor is always a smaller index *)
-       let (is,_ip) = s.positions[i] in
+       let is,_ip = s.positions[i] in
        if pred < 0 then is = 0
          (** if predecessor is [-1] then [i] is in leftmost stack *)
        else
@@ -304,7 +304,7 @@ module PatienceAbstract
          (** if predecessor is not [-1], it denotes a card with smaller value... *)
          is > 0 &&
          (** ...the card is not on the leftmost stack... *)
-         let (ps,_pp) = s.positions[pred] in
+         let ps,_pp = s.positions[pred] in
          ps = is - 1)
          (** ...and predecessor is in the stack on the immediate left *)
 
@@ -333,7 +333,7 @@ module PatienceAbstract
         !pred = top_stack_im1 /\
         c > s.values[!pred]  /\
         0 <= !pred < s.num_elts /\
-        let (ps,_pp) = s.positions[!pred] in
+        let ps,_pp = s.positions[!pred] in
         ps = i - 1
       }
       let stack_i = s.stacks[i] in
@@ -341,7 +341,7 @@ module PatienceAbstract
       let top_stack_i = stack_i[stack_i_size - 1] in
       if c <= s.values[top_stack_i] then raise (Return i);
       assert { 0 <= top_stack_i < s.num_elts };
-      assert { let (is,ip) = s.positions[top_stack_i] in
+      assert { let is,ip = s.positions[top_stack_i] in
         0 <= is < s.num_stacks &&
         0 <= ip < s.stack_sizes[is] &&
         s.stacks[is][ip] = top_stack_i &&
@@ -359,7 +359,7 @@ module PatienceAbstract
     s.num_stacks <- s.num_stacks + 1;
     s.stack_sizes <- s.stack_sizes[i <- 1];
     s.stacks <- s.stacks[i <- new_stack_i];
-    s.positions <- s.positions[idx <- (i,0)];
+    s.positions <- s.positions[idx <- i,0];
     s.preds <- s.preds[idx <- !pred]
   with Return i ->
          let stack_i = s.stacks[i] in
@@ -372,7 +372,7 @@ module PatienceAbstract
          (* s.num_stacks unchanged *)
          s.stack_sizes <- s.stack_sizes[i <- stack_i_size + 1];
          s.stacks <- s.stacks[i <- new_stack_i];
-         s.positions <- s.positions[idx <- (i,stack_i_size)];
+         s.positions <- s.positions[idx <- i,stack_i_size];
          s.preds <- s.preds[idx <- !pred];
   end
 
@@ -471,7 +471,7 @@ module PatienceAbstract
     for i = ns-1 downto 0 do
        invariant { -1 <= !idx < s.num_elts }
        invariant { i >= 0 -> !idx >= 0 &&
-         let (is,_) = s.positions[!idx] in is = i }
+         let is,_ = s.positions[!idx] in is = i }
        invariant { i+1 < ns -> !idx < !seq[i+1] }
        invariant { 0 <= i < ns-1 -> s.values[!idx] < s.values[!seq[i+1]] }
        invariant { forall j. i < j < ns -> 0 <= !seq[j] < s.num_elts }
@@ -496,7 +496,7 @@ module PatienceAbstract
         increasing_subsequence sigma input /\ sigma.seqlen > s.num_stacks ->
         let f = fun i ->
           let si = sigma.seqval[i] in
-          let (stack_i,_) = s.positions[si] in
+          let stack_i,_ = s.positions[si] in
           stack_i
         in range f sigma.seqlen s.num_stacks &&
            not (injective f sigma.seqlen s.num_stacks)
@@ -509,8 +509,8 @@ module PatienceAbstract
           0 <= i < j < sigma.seqlen &&
           let si = sigma.seqval[i] in
           let sj = sigma.seqval[j] in
-          let (stack_i,_pi) = s.positions[si] in
-          let (stack_j,_pj) = s.positions[sj] in
+          let stack_i,_pi = s.positions[si] in
+          let stack_j,_pj = s.positions[sj] in
           stack_i = stack_j
     };
     assert { (* contradiction from non-injectivity *)
@@ -520,8 +520,8 @@ module PatienceAbstract
           0 <= i < j < sigma.seqlen ->
           let si = sigma.seqval[i] in
           let sj = sigma.seqval[j] in
-          let (stack_i,pi) = s.positions[si] in
-          let (stack_j,pj) = s.positions[sj] in
+          let stack_i,pi = s.positions[si] in
+          let stack_j,pj = s.positions[sj] in
           stack_i = stack_j ->
           si < sj && pi < pj && s.values[si] < s.values[sj]
     };
@@ -596,7 +596,7 @@ module PatienceFull
         !pred = top_stack_im1 /\
         c > state.values[!pred]  /\
         0 <= !pred < state.num_elts /\
-        let (ps,_pp) = state.positions[!pred] in
+        let ps,_pp = state.positions[!pred] in
         ps = !i - 1
       }
       invariant { old_stacks = rev_append !acc !rem_stacks }
@@ -626,7 +626,7 @@ module PatienceFull
              let ghost stack_i_size = state.stack_sizes[!i] in
              let ghost top_stack_i = stack_i[stack_i_size - 1] in
              assert { 0 <= top_stack_i < state.num_elts };
-             assert { let (is,ip) = state.positions[top_stack_i] in
+             assert { let is,ip = state.positions[top_stack_i] in
                0 <= is < state.num_stacks &&
                0 <= ip < state.stack_sizes[is] &&
                state.stacks[is][ip] = top_stack_i &&
@@ -648,7 +648,7 @@ module PatienceFull
     state.num_stacks <- state.num_stacks + 1;
     state.stack_sizes <- state.stack_sizes[i <- 1];
     state.stacks <- state.stacks[i <- new_stack_i];
-    state.positions <- state.positions[idx <- (i,0)];
+    state.positions <- state.positions[idx <- i,0];
     state.preds <- state.preds[idx <- !pred];
     (* we put card [c] in a new stack *)
     rev_append (Cons (Cons c Nil) !acc) Nil
@@ -665,7 +665,7 @@ module PatienceFull
          (* state.num_stacks unchanged *)
          state.stack_sizes <- state.stack_sizes[!i <- stack_i_size + 1];
          state.stacks <- state.stacks[!i <- new_stack_i];
-         state.positions <- state.positions[idx <- (!i,stack_i_size)];
+         state.positions <- state.positions[idx <- !i,stack_i_size];
          state.preds <- state.preds[idx <- !pred];
          (* card is placed on the leftmost stack where its card
             value is no greater than the topmost card on that
@@ -824,7 +824,7 @@ module PatienceFull
     for i = ns-1 downto 0 do
        invariant { -1 <= !idx < state.num_elts }
        invariant { i >= 0 -> !idx >= 0 &&
-         let (is,_) = state.positions[!idx] in is = i }
+         let is,_ = state.positions[!idx] in is = i }
        invariant { i+1 < ns -> !idx < !seq[i+1] }
        invariant { 0 <= i < ns-1 -> state.values[!idx] < state.values[!seq[i+1]] }
        invariant { forall j. i < j < ns -> 0 <= !seq[j] < state.num_elts }
@@ -848,7 +848,7 @@ module PatienceFull
         increasing_subsequence sigma input /\ sigma.seqlen > state.num_stacks ->
         let f = fun i ->
           let si = sigma.seqval[i] in
-          let (stack_i,_) = state.positions[si] in
+          let stack_i,_ = state.positions[si] in
           stack_i
         in range f sigma.seqlen state.num_stacks &&
            not (injective f sigma.seqlen state.num_stacks)
@@ -860,8 +860,8 @@ module PatienceFull
           0 <= i < j < sigma.seqlen &&
           let si = sigma.seqval[i] in
           let sj = sigma.seqval[j] in
-          let (stack_i,_pi) = state.positions[si] in
-          let (stack_j,_pj) = state.positions[sj] in
+          let stack_i,_pi = state.positions[si] in
+          let stack_j,_pj = state.positions[sj] in
           stack_i = stack_j
     };
     assert { (* contradiction from non-injectivity *)
@@ -871,8 +871,8 @@ module PatienceFull
           0 <= i < j < sigma.seqlen ->
           let si = sigma.seqval[i] in
           let sj = sigma.seqval[j] in
-          let (stack_i,pi) = state.positions[si] in
-          let (stack_j,pj) = state.positions[sj] in
+          let stack_i,pi = state.positions[si] in
+          let stack_j,pj = state.positions[sj] in
           stack_i = stack_j ->
           si < sj && pi < pj && state.values[si] < state.values[sj]
     };

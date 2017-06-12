@@ -196,7 +196,7 @@ module LinearProbing
         assert { eq a[j] dummy };
         a[j] <- x;
         assert { numofd a 0 (j+1) = numofd (a at L) 0 (j+1) - 1 };
-        l := Map.set !l x.{keym} j
+        l := Map.set !l (keym x) j
       end
     done;
     h.loc <- !l;
@@ -219,8 +219,8 @@ module LinearProbing
       assert { numofd h.data 0 (i+1) =
                numofd (h.data at L) 0 (i+1) - 1 }
     end;
-    ghost h.view <- Map.set h.view x.{keym} True;
-    ghost h.loc <- Map.set h.loc x.{keym} i
+    ghost (h.view <- Map.set h.view (keym x) True);
+    ghost (h.loc <- Map.set h.loc (keym x) i)
 
   let copy (h: t) : t
     ensures { result.view = h.view }
@@ -295,7 +295,7 @@ module LinearProbing
         ghost numof_update a1 a 0 j n;
         let ghost a2 = Array.copy a in
         ghost NumOfDummy.numof_eq a a2 0 n;
-        ghost loc := Map.set !loc xi.{keym} j;
+        ghost loc := Map.set !loc (keym xi) j;
         a[i] <- dummy;
         ghost numof_update a a2 0 i n;
         delete a loc view f0 i i
@@ -313,11 +313,11 @@ module LinearProbing
       h.data[j] <- dummy;
       assert { numofd h.data 0 (j+1) =
                numofd (h.data at L) 0 (j+1) + 1 };
-      ghost h.view <- Map.set h.view x.{keym} False;
+      ghost (h.view <- Map.set h.view (keym x) False);
       let l = ref h.loc in
       let f0 = find_dummy h.data j (next n j) in
       delete h.data l h.view f0 j j;
-      ghost h.loc <- !l;
+      ghost (h.loc <- !l);
       h.size <- h.size - 1;
     end
 

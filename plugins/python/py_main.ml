@@ -45,7 +45,7 @@ let deref_id ~loc id =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
 let constant ~loc s =
-  mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
+  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec s})))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =
@@ -225,7 +225,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     let var = List.map (fun (t, o) -> deref env t, o) var in
     let loop = mk_expr ~loc
       (Ewhile (expr env e, inv, var, block env ~loc s)) in
-    if has_breakl s then mk_expr ~loc (Etry (loop, break_handler ~loc))
+    if has_breakl s then mk_expr ~loc (Etry (loop, false, break_handler ~loc))
     else loop
   | Py_ast.Sbreak ->
     mk_expr ~loc (Eraise (break ~loc, None))
@@ -297,7 +297,7 @@ and block env ~loc = function
     let body = block env' ~loc:id.id_loc bl in
     let body = if not (has_returnl bl) then body else
       let loc = id.id_loc in
-      mk_expr ~loc (Etry (body, return_handler ~loc)) in
+      mk_expr ~loc (Etry (body, false, return_handler ~loc)) in
     let local bl id =
       let loc = id.id_loc in
       let ref = mk_ref ~loc (mk_var ~loc id) in

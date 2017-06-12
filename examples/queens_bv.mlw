@@ -181,19 +181,19 @@ module Bits "the 1-bits of an integer, as a set of integers"
     ensures { result.mdl = remove size (succ a.mdl) }
   =
     { bv = lsl_bv a.bv (1:BV32.t);
-      mdl = pure { remove size (succ a.mdl) } }
+      mdl = ghost remove size (succ a.mdl) }
 
   let div2 (a: t) : t
     ensures { result.mdl = pred a.mdl }
   =
     { bv = lsr_bv a.bv (1:BV32.t);
-      mdl = pure { pred a.mdl } }
+      mdl = ghost pred a.mdl }
 
   let diff (a b: t) : t
     ensures { result.mdl = diff a.mdl b.mdl }
   =
     { bv = bw_and a.bv (bw_not b.bv);
-      mdl = pure { diff a.mdl b.mdl } }
+      mdl = ghost diff a.mdl b.mdl }
 
   predicate bits_interval_is_zeros_bv (a:BV32.t) (i:BV32.t) (n:BV32.t) =
     eq_sub_bv a zeros i n
@@ -221,14 +221,14 @@ module Bits "the 1-bits of an integer, as a set of integers"
     assert {bits_interval_is_zeros_bv res (add n_bv (1:BV32.t)) (sub (31:BV32.t) n_bv )};
     assert {bits_interval_is_zeros res (n + 1) (31 - n)};
     { bv = res;
-      mdl = pure { singleton n } }
+      mdl = singleton n }
 
   let below (n: BV32.t) : t
     requires { BV32.ule n (32:BV32.t) }
     ensures  { result.mdl = interval 0 (t'int n) }
   =
     { bv = bw_not (lsl_bv ones n);
-      mdl = pure { interval 0 (t'int n) } }
+      mdl = ghost interval 0 (t'int n) }
 
 end
 

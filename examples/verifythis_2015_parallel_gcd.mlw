@@ -236,7 +236,7 @@ module Interleaving
     (* shared variables *)
     let a = ref a0 in
     let b = ref b0 in
-    let ghost d = {gcd} a0 b0 in
+    let ghost d = gcd a0 b0 in
     (* two threads *)
     let th1 = create_thread () in
     let th2 = create_thread () in
@@ -246,19 +246,19 @@ module Interleaving
                 !a + !b
                 ,
                 (* progress in one of the two threads *)
-                if !a = !b
+                begin if !a = !b
                 then prog_index th2 !a + prog_index th1 !b
                 else if !a < !b
                 then prog_index th2 !a
-                else prog_index th1 !b
+                else prog_index th1 !b end
                 ,
                 (* no progress in both threads, but the scheduler
                    switches to the non-progressing thread *)
-                if progress_thread th1 !a !b
+                begin if progress_thread th1 !a !b
                 then if !scheduled then 1 else 0
                 else if progress_thread th2 !b !a
                 then if !scheduled then 0 else 1
-                else 0
+                else 0 end
                 ,
                 (* the scheduler is still running the non-progressing thread *)
                 !timer }

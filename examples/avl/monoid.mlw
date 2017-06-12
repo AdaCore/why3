@@ -46,14 +46,14 @@ module MonoidSumDef
 
   let rec ghost function agg (f:'a -> t) (s:seq 'a) : M.t
     variant { length s }
-  = if pure { length s = 0 } then {zero} else {op} (f s[0]) (agg f s[1 ..])
+  = if length s = 0 then zero else op (f s[0]) (agg f s[1 ..])
 
   lemma agg_sing_core : forall s:seq 'a. length s = 1 -> s[1 ..] == empty
 
   let rec lemma agg_cat (f:'a -> t) (s1 s2:seq 'a)
     ensures { agg f (s1++s2) = op (agg f s1) (agg f s2) }
     variant { length s1 }
-  = if pure { length s1 <> 0 } then let s3 = s1[1 ..] in agg_cat f s3 s2
+  = if length s1 <> 0 then let s3 = s1[1 ..] in agg_cat f s3 s2
 
   clone MonoidSum as MS with type M.t = M.t,
     constant M.zero = M.zero,

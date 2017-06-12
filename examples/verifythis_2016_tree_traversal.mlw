@@ -184,7 +184,7 @@ module TreeShape
     requires { ext (footprint t) memo1 memo.accessor }
     requires { is_tree memo1 t c p }
     ensures { is_tree memo.accessor t c p }
-  = ext_set ({footprint} t) memo1 (get_all_accs ()) t c p
+  = ext_set (footprint t) memo1 (get_all_accs ()) t c p
 
   (** The tree model corresponding to a given pointer is unique. *)
   let rec ghost unicity (memo:pmem) (t1 t2:treel) (c p1 p2:loc) : unit
@@ -375,9 +375,9 @@ module Recursive
       let ghost _c = !x in
       let _lf = get_acc Left !x in
       let _rg = get_acc Right !x in
-      let (lf, rg) = ghost match t with
+      let lf, rg = ghost match t with
         | Empty -> absurd
-        | Node l _ r -> (l, r)
+        | Node l _ r -> l, r
         end in
       (ghost not_below mem0 lf rg _c !z);
       bloc mem0 GoLeft;
@@ -603,14 +603,14 @@ module Iterative
         end else begin
           let f = { f with memo1 = scur } in
           st := Running s (pc+1) f;
-          ext_set ({footprint} f.tleft) f.memo0.pointers scur.pointers
+          ext_set (footprint f.tleft) f.memo0.pointers scur.pointers
                   f.tleft f.pleft f.memo0.cursor;
           opening t f.tleft stop scur st;
         end
       else if pc = 2 then begin
         let f = { f with memo3 = scur } in
         st := Running s (pc+1) f;
-        ext_set ({footprint} f.tright) f.memo0.pointers scur.pointers
+        ext_set (footprint f.tright) f.memo0.pointers scur.pointers
                 f.tright f.pright f.memo0.cursor;
         opening t f.tright stop scur st;
       end else if pc = 4 then begin

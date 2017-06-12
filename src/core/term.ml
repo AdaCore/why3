@@ -822,7 +822,13 @@ let fs_app fs tl ty = t_app fs tl (Some ty)
 let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
-  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ty_int
+  assert (n >= 0);
+  let a =
+    Number.{ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
+  in
+  t_const (Number.ConstInt a) ty_int
+
+let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 
 exception InvalidLiteralType of ty
 
@@ -831,14 +837,14 @@ let check_literal c ty =
     | Tyapp (ts,[]) -> ts
     | _ -> raise (InvalidLiteralType ty) in
   match c with
-    | Number.ConstInt c when not (ts_equal ts ts_int) ->
+    | Number.ConstInt n when not (ts_equal ts ts_int) ->
         begin match ts.ts_def with
-          | Range ir -> Number.check_range c ir
+          | Range ir -> Number.(check_range n ir)
           | _ -> raise (InvalidLiteralType ty)
         end
-    | Number.ConstReal c when not (ts_equal ts ts_real) ->
+    | Number.ConstReal x when not (ts_equal ts ts_real) ->
         begin match ts.ts_def with
-          | Float fp -> Number.check_float c fp
+          | Float fp -> Number.(check_float x.Number.rc_abs fp)
           | _ -> raise (InvalidLiteralType ty)
         end
     | _ -> ()

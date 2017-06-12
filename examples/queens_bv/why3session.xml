@@ -24,7 +24,7 @@
 </theory>
 <theory name="BitsSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bits" sum="87e182bfbd8df1300a1f247906476a38">
+<theory name="Bits" sum="90da96dc263483b3015e6d72b0e81a95">
  <goal name="VC empty" expl="VC for empty">
  <proof prover="0"><result status="valid" time="0.03" steps="95"/></proof>
  </goal>
@@ -110,14 +110,14 @@
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="9bd4639de27d4cd7b8ae9f864cb83e12">
+<theory name="NQueensBits" sum="24c8a38b28708f4efc8d9109d2534301">
  <goal name="VC t" expl="VC for t">
  <transf name="split_goal_wp">
   <goal name="VC t.1" expl="1. assertion">
   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="0.82" steps="537"/></proof>
   </goal>
   <goal name="VC t.2" expl="2. loop invariant init">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  <proof prover="3"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC t.3" expl="3. loop invariant init">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -177,7 +177,7 @@
    <proof prover="9"><result status="valid" time="0.31"/></proof>
    </goal>
    <goal name="VC t.20.2" expl="2. assertion">
-   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="4.39" steps="1615"/></proof>
+   <proof prover="2" timelimit="10" memlimit="4000"><result status="valid" time="5.11" steps="1615"/></proof>
    </goal>
   </transf>
   </goal>
@@ -232,10 +232,10 @@
   <proof prover="3"><result status="valid" time="2.30"/></proof>
   </goal>
   <goal name="VC t.34" expl="34. precondition">
-  <proof prover="3"><result status="valid" time="2.40"/></proof>
+  <proof prover="3"><result status="valid" time="2.90"/></proof>
   </goal>
   <goal name="VC t.35" expl="35. precondition">
-  <proof prover="3"><result status="valid" time="3.25"/></proof>
+  <proof prover="3"><result status="valid" time="3.90"/></proof>
   </goal>
   <goal name="VC t.36" expl="36. assertion">
   <proof prover="3"><result status="valid" time="3.00"/></proof>
@@ -282,27 +282,27 @@
    <proof prover="2"><result status="valid" time="0.24" steps="164"/></proof>
    </goal>
    <goal name="VC t.46.2" expl="2. loop invariant preservation">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="9.38"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="13.62"/></proof>
    </goal>
    <goal name="VC t.46.3" expl="3. loop invariant preservation">
-   <proof prover="3" timelimit="1"><result status="valid" time="0.63"/></proof>
+   <proof prover="3" timelimit="1"><result status="valid" time="0.81"/></proof>
    </goal>
    <goal name="VC t.46.4" expl="4. loop invariant preservation">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.62"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="3.06"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC t.47" expl="47. loop invariant preservation">
   <transf name="split_goal_wp">
    <goal name="VC t.47.1" expl="1. loop invariant preservation">
-   <proof prover="3"><result status="valid" time="0.75"/></proof>
+   <proof prover="3"><result status="valid" time="1.03"/></proof>
    </goal>
    <goal name="VC t.47.2" expl="2. loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="VC t.47.3" expl="3. loop invariant preservation">
-   <proof prover="3" timelimit="60"><result status="valid" time="21.29"/></proof>
-   <proof prover="6" timelimit="60"><result status="valid" time="17.05"/></proof>
+   <proof prover="3" timelimit="60"><result status="valid" time="26.22"/></proof>
+   <proof prover="6" timelimit="60"><result status="valid" time="20.31"/></proof>
    </goal>
   </transf>
   </goal>
@@ -389,7 +389,7 @@
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC queens.12" expl="12. postcondition">
-  <proof prover="3"><result status="valid" time="0.70"/></proof>
+  <proof prover="3"><result status="valid" time="1.11"/></proof>
   </goal>
  </transf>
  </goal>

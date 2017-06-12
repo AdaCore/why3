@@ -145,7 +145,7 @@ and expr_desc =
   | Eidpur of qualid
   | Eraise of qualid * expr option
   | Eexn of ident * pty * Ity.mask * expr
-  | Etry of expr * (qualid * pattern option * expr) list
+  | Etry of expr * bool * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
   | Eassert of Expr.assertion_kind * term
@@ -172,7 +172,7 @@ type type_def =
   | TDalias     of pty
   | TDalgebraic of (Loc.position * ident * param list) list
   | TDrecord    of field list
-  | TDrange     of BigInt.t * BigInt.t
+  | TDrange     of Number.integer_constant * Number.integer_constant
   | TDfloat     of int * int
 
 type visibility = Public | Private | Abstract (* = Private + ghost fields *)

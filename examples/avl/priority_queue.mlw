@@ -216,7 +216,7 @@ module PQueue
   use import seq.Occ
 
   let ghost function to_bag (s:seq 'a) : 'a -> int =
-    fun x -> pure { occ x s 0 (length s) }
+    fun x -> occ x s 0 (length s)
 
   let lemma to_bag_mem (x:'a) (s:seq 'a)
     ensures { s.to_bag x > 0 <-> exists i. 0 <= i < length s /\ s[i] = x}
@@ -278,7 +278,7 @@ module PQueue
     ensures { forall d. 0 <= t.bag d <= t.card }
     ensures { t.card >= 0 /\ (t.card > 0 -> t.bag t.minimum > 0) }
     ensures { forall d. 0 < t.bag d -> CO.le t.minimum.key d.key }
-  = if pure { t.m.card > 0 }
+  = if t.m.card > 0
     then let r0 = Sel.default_split () in
       let _ = Sel.split r0 () t in
       ()

@@ -116,18 +116,18 @@ module Puzzle12
       match balance (balls[0] + balls[8]) (balls[9] + balls[10]) with
       | Equal -> (* 0,8 = 9,10 *)
          match balance balls[0] balls[11] with
-         | Right -> (11, False) | _ -> (11, True) end
+         | Right -> 11, False | _ -> 11, True end
       | Right -> (* 0,8 < 9,10 *)
          match balance balls[9] balls[10] with
-         | Equal -> (8, True)
-         | Right -> (10,  False)
-         | Left  -> (9, False)
+         | Equal -> 8, True
+         | Right -> 10,  False
+         | Left  -> 9, False
          end
       | Left -> (* 0,8 > 9,10 *)
          match balance balls[9] balls[10] with
-         | Equal -> (8, False)
-         | Right -> (9,  True)
-         | Left  -> (10, True)
+         | Equal -> 8, False
+         | Right -> 9,  True
+         | Left  -> 10, True
          end
       end
    | Right -> (* 0,1,2,3 < 4,5,6,7 *)
@@ -135,20 +135,20 @@ module Puzzle12
                     (balls[2] + balls[5] + balls[8]) with
       | Equal -> (* 0,1,4 = 2,5,8 *)
          match balance balls[6] balls[7] with
-         | Equal -> (3, True)
-         | Right -> (7, False)
-         | Left -> (6, False)
+         | Equal -> 3, True
+         | Right -> 7, False
+         | Left -> 6, False
          end
       | Right -> (* 0,1,4 < 2,5,8 *)
          match balance balls[0] balls[1] with
-         | Equal -> (5, False)
-         | Right -> (0, True)
-         | Left -> (1, True)
+         | Equal -> 5, False
+         | Right -> 0, True
+         | Left -> 1, True
          end
       | Left -> (* 0,1,4 > 2,5,8 *)
          match balance balls[4] balls[8] with
-         | Equal -> (2, True)
-         | _     -> (4, False)
+         | Equal -> 2, True
+         | _     -> 4, False
          end
       end
    | Left -> (* 0,1,2,3 > 4,5,6,7 *)
@@ -156,21 +156,21 @@ module Puzzle12
                     (balls[2] + balls[5] + balls[8]) with
       | Equal -> (* 0,1,4 = 2,5,8 *)
          match balance balls[6] balls[7] with
-         | Equal -> (3, False)
-         | Right -> (6, True)
-         | Left -> (7, True)
+         | Equal -> 3, False
+         | Right -> 6, True
+         | Left -> 7, True
          end
       | Right -> (* 0,1,4 < 2,5,8 *)
          match balance balls[2] balls[5] with
-         | Equal -> (4, True)
-         | Right -> (5, False)
-         | Left -> (2, False)
+         | Equal -> 4, True
+         | Right -> 5, False
+         | Left -> 2, False
          end
       | Left -> (* 0,1,4 > 2,5,8 *)
          match balance balls[0] balls[1] with
-         | Equal -> (5, True)
-         | Right -> (1, False)
-         | Left -> (0, False)
+         | Equal -> 5, True
+         | Right -> 1, False
+         | Left -> 0, False
          end
       end
     end

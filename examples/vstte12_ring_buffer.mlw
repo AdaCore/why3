@@ -55,7 +55,7 @@ module RingBuffer
     writes  { b.len, b.sequence }
     ensures { length b = 0 }
     ensures { b.sequence = Nil }
-  = ghost b.sequence <- Nil;
+  = ghost (b.sequence <- Nil);
     b.len <- 0
 
   let push (b: buffer 'a) (x: 'a) : unit
@@ -63,7 +63,7 @@ module RingBuffer
     writes   { b.data.elts, b.len, b.sequence }
     ensures  { length b = (old (length b)) + 1 }
     ensures  { b.sequence = (old b.sequence) ++ Cons x Nil }
-  = ghost b.sequence <- b.sequence ++ Cons x Nil;
+  = ghost (b.sequence <- b.sequence ++ Cons x Nil);
     let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
@@ -188,7 +188,7 @@ module RingBufferSeq
     writes  { b.len, b.sequence }
     ensures { length b = 0 }
     ensures { b.sequence = S.empty }
-  = ghost b.sequence <- S.empty;
+  = ghost (b.sequence <- S.empty);
     b.len <- 0
 
   let push (b: buffer 'a) (x: 'a) : unit
@@ -196,7 +196,7 @@ module RingBufferSeq
     writes   { b.data.elts, b.len, b.sequence }
     ensures  { length b = (old (length b)) + 1 }
     ensures  { b.sequence = S.snoc (old b.sequence) x }
-  = ghost b.sequence <- S.snoc b.sequence x;
+  = ghost (b.sequence <- S.snoc b.sequence x);
     let i = b.first + b.len in
     let n = Array.length b.data in
     b.data[if i >= n then i - n else i] <- x;
@@ -213,7 +213,7 @@ module RingBufferSeq
     ensures  { length b = (old (length b)) - 1 }
     ensures  { result = S.get (old b.sequence) 0 }
     ensures  { b.sequence = (old b.sequence)[1 ..] }
-  = ghost b.sequence <- b.sequence[1 ..];
+  = ghost (b.sequence <- b.sequence[1 ..]);
     let r = b.data[b.first] in
     b.len <- b.len - 1;
     let n = Array.length b.data in

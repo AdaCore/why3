@@ -120,7 +120,7 @@ module Challenge3
     while not !is_sorted do
       invariant { permut_all (old a) a }
       invariant { !is_sorted -> sorted a }
-      variant   { if !is_sorted then 0 else 1, inversions a }
+      variant   { (if !is_sorted then 0 else 1), inversions a }
       is_sorted := true;
       let i = ref 1 in
       let ghost half_i = ref 0 in

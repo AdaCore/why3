@@ -42,10 +42,9 @@ val ns_find_xs  : namespace -> string list -> xsymbol
 val ns_find_ns  : namespace -> string list -> namespace
 
 type overload =
-  | UnOp    (* t -> t *)
-  | BinOp   (* t -> t -> t *)
-  | BinRel  (* t -> t -> bool *)
-  | NoOver  (* none of the above *)
+  | FixedRes of ity (* t -> t -> ... -> T *)
+  | SameType        (* t -> t -> ... -> t *)
+  | NoOver          (* neither *)
 
 val overload_of_rs : rsymbol -> overload
 

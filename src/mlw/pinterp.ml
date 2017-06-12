@@ -136,7 +136,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int i
+    | Number.ConstInt i -> Number.compute_int_constant i
     | _ -> raise NotNum
 
 let big_int_of_value v =
@@ -617,10 +617,20 @@ let rec eval_expr env (e : expr) : result =
       with
           NotNum -> Irred e
     end
-  | Etry(e1,el) ->
+  | Etry(e1,case,el) ->
     begin
-      let r = eval_expr env e1 in
+      let e0,ebl =
+        if not case then e1,[]
+        else match e1.e_node with
+        | Ecase(e0,ebl) -> e0,ebl
+        | _ -> assert false
+      in
+      let r = eval_expr env e0 in
       match r with
+        | Normal t when case ->
+          begin try exec_match env t ebl
+            with Undetermined -> Irred e1
+          end
         | Excep(ex,t) ->
           begin
             match Mxs.find ex el with

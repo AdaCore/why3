@@ -108,8 +108,17 @@ let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
 
-let find_rsymbol muc q = match find_prog_symbol muc q with RS rs -> rs
-  | _ -> Loc.errorm ~loc:(qloc q) "program symbol expected"
+let find_special muc test nm q =
+  match find_prog_symbol muc q with
+  | RS s when test s -> s
+  | OO ss ->
+      begin match Srs.elements (Srs.filter test ss) with
+      | [s] -> s
+      | _::_ -> Loc.errorm ~loc:(qloc q)
+                          "Ambiguous %s notation: %a" nm print_qualid q
+      | [] -> Loc.errorm ~loc:(qloc q) "Not a %s: %a" nm print_qualid q
+      end
+  | _ ->      Loc.errorm ~loc:(qloc q) "Not a %s: %a" nm print_qualid q
 
 (** Parsing types *)
 
@@ -397,8 +406,8 @@ open Dexpr
 (* records *)
 
 let find_record_field muc q =
-  match find_prog_symbol muc q with RS ({rs_field = Some _} as s) -> s
-  | _ -> Loc.errorm ~loc:(qloc q) "Not a record field: %a" print_qualid q
+  let test rs = rs.rs_field <> None in
+  find_special muc test "record field" q
 
 let find_record_field2 muc (q,e) = find_record_field muc q, e
 
@@ -434,12 +443,18 @@ let parse_record ~loc muc get_val fl =
 
 (* patterns *)
 
+let find_constructor muc q =
+  let test rs = match rs.rs_logic with
+    | RLls {ls_constr = c} -> c > 0
+    | _ -> false in
+  find_special muc test "constructor" q
+
 let rec dpattern muc { pat_desc = desc; pat_loc = loc } =
   Dexpr.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
     | Ptree.Pvar (x, gh) -> DPvar (create_user_id x, gh)
     | Ptree.Papp (q, pl) ->
-        DPapp (find_rsymbol muc q, List.map (fun p -> dpattern muc p) pl)
+        DPapp (find_constructor muc q, List.map (dpattern muc) pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
           | Some p -> dpattern muc p
@@ -602,7 +617,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let qualid_app loc q el =
-    expr_app loc (DEsym (find_prog_symbol muc q)) el
+    let e = try DEsym (find_prog_symbol muc q) with
+      | _ -> DEls_pure (find_lsymbol muc.muc_theory q, false) in
+    expr_app loc e el
   in
   let qualid_app loc q el = match q with
     | Qident {id_str = n} ->
@@ -613,8 +630,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   in
   let qualid_app_pure loc q el =
     let e = match find_global_pv muc q with
-      | None -> DEls_pure (find_lsymbol muc.muc_theory q)
-      | Some v -> DEpv_pure v in
+      | Some v -> DEpv_pure v
+      | None -> DEls_pure (find_lsymbol muc.muc_theory q, true) in
     expr_app loc e el
   in
   let qualid_app_pure loc q el = match q with
@@ -774,7 +791,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | None when mb_unit -> Dexpr.dexpr ~loc (DEsym (RS rs_void))
         | _ -> Loc.errorm ~loc "exception argument expected" in
       DEraise (xs, e1)
-  | Ptree.Etry (e1, cl) ->
+  | Ptree.Etry (e1, case, cl) ->
       let e1 = dexpr muc denv e1 in
       let branch (q, pp, e) =
         let xs = find_dxsymbol q in
@@ -788,7 +805,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         let denv = denv_add_pat denv pp in
         let e = dexpr muc denv e in
         xs, pp, e in
-      DEtry (e1, List.map branch cl)
+      DEtry (e1, case, List.map branch cl)
   | Ptree.Eghost e1 ->
       DEghost (dexpr muc denv e1)
   | Ptree.Eexn (id, pty, mask, e1) ->
@@ -958,8 +975,7 @@ let add_types muc tdl =
         end
     | TDrange (lo,hi) ->
         check_public ~loc d "Range";
-        let ir = { Number.ir_lower = lo;
-                   Number.ir_upper = hi } in
+        let ir = Number.create_range lo hi in
         let itd = create_range_decl id ir in
         Hstr.add hts x itd.itd_its; Hstr.add htd x itd
     | TDfloat (eb,sb) ->

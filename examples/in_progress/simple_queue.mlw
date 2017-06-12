@@ -102,6 +102,6 @@ module SimpleQueue
 *)
     q.data[q.n] <- x;
     q.n <- q.n + 1;
-    ghost q.contents <- q.contents ++ Cons x Nil
+    ghost (q.contents <- q.contents ++ Cons x Nil)
 
 end

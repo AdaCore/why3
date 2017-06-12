@@ -262,6 +262,7 @@ and print_tnode _opl opr info fmt t = match t.t_node with
       let number_format = {
           Number.long_int_support = true;
           Number.extra_leading_zeros_support = true;
+          Number.negative_int_support = Number.Number_custom "(-%a)%%Z";
           Number.dec_int_support =
             if info.ssreflect then Number.Number_custom "%s%%:Z"
             else Number.Number_custom "%s%%Z";
@@ -269,6 +270,7 @@ and print_tnode _opl opr info fmt t = match t.t_node with
           Number.oct_int_support = Number.Number_unsupported;
           Number.bin_int_support = Number.Number_unsupported;
           Number.def_int_support = Number.Number_unsupported;
+          Number.negative_real_support = Number.Number_custom "(-%a)%%R";
           Number.dec_real_support = Number.Number_unsupported;
           Number.hex_real_support = Number.Number_unsupported;
           Number.frac_real_support = Number.Number_custom

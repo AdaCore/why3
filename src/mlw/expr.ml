@@ -324,7 +324,7 @@ and expr_node =
   | Ecase   of expr * (prog_pattern * expr) list
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
-  | Etry    of expr * (pvsymbol list * expr) Mxs.t
+  | Etry    of expr * bool * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
@@ -390,7 +390,7 @@ let e_fold fn acc e = match e.e_node with
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
   | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
-  | Etry (d,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
+  | Etry (d,_,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
 
 exception FoundExpr of Loc.position option * expr
 
@@ -483,7 +483,11 @@ let e_const c ity =
   mk_expr (Econst c) ity MaskVisible eff_empty
 
 let e_nat_const n =
-  e_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ity_int
+  assert (n >= 0);
+  let a =
+    Number.{ ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
+  in
+  e_const (Number.ConstInt a) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else
@@ -912,7 +916,8 @@ let e_case e bl =
     | (_,d)::_ -> d.e_ity
     | [] -> invalid_arg "Expr.e_case" in
   List.iter (fun (p,d) ->
-    if mask_spill e.e_mask p.pp_mask then
+    if not (ity_equal e.e_ity ity_unit) &&
+        mask_spill e.e_mask p.pp_mask then
       Loc.errorm "Non-ghost pattern in a ghost position";
     ity_equal_check d.e_ity ity;
     ity_equal_check e.e_ity p.pp_ity) bl;
@@ -937,7 +942,7 @@ let e_case e bl =
   let eff = try_effect (e::dl) eff_ghostify ghost eff in
   mk_expr (Ecase (e,bl)) ity mask eff
 
-let e_try e xl =
+let e_try e ~case xl =
   let get_mask = function
     | [] -> ity_unit, MaskVisible
     | [v] -> v.pv_ity, mask_of_pv v
@@ -950,22 +955,30 @@ let e_try e xl =
     ity_equal_check ity xs.xs_ity;
     ity_equal_check d.e_ity e.e_ity) xl;
   let ghost = e.e_effect.eff_ghost in
+  let e0, bl = if not case then e, [] else
+    match e.e_node with Ecase (e,bl) -> e,bl
+    | _ -> invalid_arg "Expr.e_try" in
   let eeff = Mxs.fold (fun xs _ eff ->
-    eff_catch eff xs) xl e.e_effect in
+    eff_catch eff xs) xl e0.e_effect in
   let dl = Mxs.fold (fun _ (_,d) l -> d::l) xl [] in
   let add_mask mask d = mask_union mask d.e_mask in
   let mask = List.fold_left add_mask e.e_mask dl in
+  let bldl = List.map snd bl @ dl in
+  let xeff = List.fold_left (fun eff (p,d) ->
+    let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
+    eff_union_par eff (eff_bind pvs d.e_effect)) eff_empty bl in
   let xeff = Mxs.fold (fun _ (vl,d) eff ->
     let add s v = Spv.add_new (Invalid_argument "Expr.e_try") v s in
     let deff = eff_bind (List.fold_left add Spv.empty vl) d.e_effect in
-    try_effect dl eff_union_par eff deff) xl eff_empty in
-  let eff = try_effect (e::dl) eff_union_seq eeff xeff in
-  let eff = try_effect (e::dl) eff_ghostify ghost eff in
-  mk_expr (Etry (e,xl)) e.e_ity mask eff
+    try_effect bldl eff_union_par eff deff) xl xeff in
+  let eff = try_effect (e0::bldl) eff_union_seq eeff xeff in
+  let eff = try_effect (e0::bldl) eff_ghostify ghost eff in
+  mk_expr (Etry (e,case,xl)) e.e_ity mask eff
 
 let e_raise xs e ity =
   ity_equal_check e.e_ity xs.xs_ity;
-  let ghost = mask_spill e.e_mask xs.xs_mask in
+  let ghost = not (ity_equal e.e_ity ity_unit) &&
+                mask_spill e.e_mask xs.xs_mask in
   let eff = eff_ghostify ghost (eff_raise eff_empty xs) in
   let eff = try_effect [e] eff_union_seq e.e_effect eff in
   mk_expr (Eraise (xs,e)) ity MaskVisible eff
@@ -1028,7 +1041,7 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Eraise (xs,d) -> e_raise xs (e_rs_subst sm d) e.e_ity
   | Ecase (d,bl) -> e_case (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
-  | Etry (d,xl) -> e_try (e_rs_subst sm d)
+  | Etry (d,case,xl) -> e_try (e_rs_subst sm d) ~case
       (Mxs.map (fun (v,e) -> v, e_rs_subst sm e) xl))
 
 and c_rs_subst sm ({c_node = n; c_cty = c} as d) = match n with
@@ -1382,10 +1395,15 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "raise %a" print_xs xs
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
-  | Etry (e,bl) ->
-      let bl = Mxs.bindings bl in
-      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend"
-        print_expr e (Pp.print_list Pp.newline print_xbranch) bl
+  | Etry ({e_node = Ecase (e,bl)},true,xl) ->
+      let xl = Mxs.bindings xl in
+      fprintf fmt "match %a with@\n@[<hov>%a@\n%a@]@\nend"
+        print_expr e (Pp.print_list Pp.newline print_branch) bl
+        (Pp.print_list Pp.newline (print_xbranch true)) xl
+  | Etry (e,_,xl) ->
+      let xl = Mxs.bindings xl in
+      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend" print_expr e
+        (Pp.print_list Pp.newline (print_xbranch false)) xl
   | Eabsurd ->
       fprintf fmt "absurd"
   | Eassert (Assert,f) ->
@@ -1403,12 +1421,13 @@ and print_branch fmt ({pp_pat = p},e) =
   fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_expr e;
   Svs.iter forget_var p.pat_vars
 
-and print_xbranch fmt (xs,(vl,e)) =
+and print_xbranch case fmt (xs,(vl,e)) =
   let pvs = Spv.inter (Spv.of_list vl) e.e_effect.eff_reads in
   let print_var fmt v =
     if Spv.mem v pvs then fprintf fmt " %a" print_pv v
     else pp_print_string fmt " _" in
-  fprintf fmt "@[<hov 4>| %a%a ->@ %a@]" print_xs xs
+  fprintf fmt "@[<hov 4>| %s%a%a ->@ %a@]"
+    (if case then "exception " else "") print_xs xs
     (Pp.print_list Pp.nothing print_var) vl print_expr e;
   Spv.iter forget_pv pvs
 

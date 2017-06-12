@@ -5,7 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../compiler.mlw">
-<theory name="Compile_aexpr" sum="7a1cf2d7c9649ee4ca61e169e4b8b119">
+<theory name="Compile_aexpr" sum="cb57dd980047541f82f3f518cfe318c0">
  <goal name="VC compile_aexpr" expl="VC for compile_aexpr">
  <transf name="split_goal_wp">
   <goal name="VC compile_aexpr.1" expl="1. variant decrease">
@@ -117,7 +117,7 @@
  <proof prover="0"><result status="valid" time="0.05" steps="87"/></proof>
  </goal>
 </theory>
-<theory name="Compile_bexpr" sum="ae61494125bf6c6b968f3b73fbff5399">
+<theory name="Compile_bexpr" sum="a7fd6ae40e56d340c5b107b12044e210">
  <goal name="VC compile_bexpr" expl="VC for compile_bexpr">
  <transf name="split_goal_wp">
   <goal name="VC compile_bexpr.1" expl="1. variant decrease">
@@ -330,7 +330,7 @@
  <proof prover="0"><result status="valid" time="0.08" steps="151"/></proof>
  </goal>
 </theory>
-<theory name="Compile_com" sum="89613ca260a5fc035680d112c088fa0d">
+<theory name="Compile_com" sum="769d7248aaa2b38bcbfedc7da9d07dad">
  <goal name="loop_variant_lemma">
  <proof prover="0"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
@@ -382,14 +382,14 @@
    <goal name="loop_variant_acc.3.6" expl="6.">
    <transf name="simplify_trivial_quantification_in_goal">
     <goal name="loop_variant_acc.3.6.1" expl="1.">
-    <proof prover="1"><result status="valid" time="2.55"/></proof>
+    <proof prover="1"><result status="valid" time="1.90"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="loop_variant_acc.3.7" expl="7.">
    <transf name="simplify_trivial_quantification_in_goal">
     <goal name="loop_variant_acc.3.7.1" expl="1.">
-    <proof prover="0"><result status="valid" time="0.09" steps="110"/></proof>
+    <proof prover="0"><result status="valid" time="0.09" steps="109"/></proof>
     </goal>
    </transf>
    </goal>
@@ -470,7 +470,7 @@
        <proof prover="0"><result status="valid" time="0.11" steps="33"/></proof>
        </goal>
        <goal name="VC compile_com.6.3.1.1.1.6" expl="6. VC for compile_com">
-       <proof prover="0"><result status="valid" time="0.21" steps="33"/></proof>
+       <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
        </goal>
        <goal name="VC compile_com.6.3.1.1.1.7" expl="7. VC for compile_com">
        <proof prover="0"><result status="valid" time="0.10" steps="34"/></proof>
@@ -543,7 +543,7 @@
        <proof prover="0"><result status="valid" time="0.12" steps="55"/></proof>
        </goal>
        <goal name="VC compile_com.6.5.1.1.1.13" expl="13. VC for compile_com">
-       <proof prover="0"><result status="valid" time="0.81" steps="605"/></proof>
+       <proof prover="0"><result status="valid" time="0.61" steps="605"/></proof>
        </goal>
        <goal name="VC compile_com.6.5.1.1.1.14" expl="14. VC for compile_com">
        <proof prover="0"><result status="valid" time="0.12" steps="61"/></proof>
@@ -604,10 +604,10 @@
   </transf>
   </goal>
   <goal name="VC compile_com.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
   </goal>
   <goal name="VC compile_com.8" expl="8. postcondition">
-  <proof prover="0"><result status="valid" time="0.22" steps="11"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
   </goal>
  </transf>
  </goal>

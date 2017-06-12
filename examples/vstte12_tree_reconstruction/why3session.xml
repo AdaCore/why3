@@ -7,7 +7,11 @@
 <prover id="5" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_tree_reconstruction.mlw" expanded="true">
-<theory name="Tree" sum="29ec6bca61c2eb01c53689a1c783adf7">
+<theory name="Tree" sum="d4afd8fd1322d8d78d7de8637f4e5856">
+ <goal name="VC depths" expl="VC for depths">
+ <transf name="split_goal_wp">
+ </transf>
+ </goal>
  <goal name="depths_head">
  <transf name="induction_ty_lex">
   <goal name="depths_head.1" expl="1.">
@@ -88,20 +92,19 @@
  <proof prover="2"><result status="valid" time="0.05" steps="249"/></proof>
  </goal>
 </theory>
-<theory name="ZipperBased" sum="52a1d639be2b96a70893bf3e1937c0fd" expanded="true">
- <goal name="forest_depths_append" expanded="true">
+<theory name="ZipperBased" sum="52a1d639be2b96a70893bf3e1937c0fd">
+ <goal name="forest_depths_append">
  <proof prover="5" timelimit="10" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
  </goal>
- <goal name="g_append" expanded="true">
+ <goal name="g_append">
  <proof prover="5" timelimit="20" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
- <goal name="right_nil" expanded="true">
+ <goal name="right_nil">
  <proof prover="5" timelimit="29" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="2.67"/></proof>
  </goal>
- <goal name="main_lemma" expanded="true">
+ <goal name="main_lemma">
  <proof prover="2"><result status="valid" time="0.02" steps="107"/></proof>
- <metas
-  expanded="true">
+ <metas>
   <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
    <ip_library name="why3"/>
    <ip_library name="BuiltIn"/>
@@ -549,9 +552,9 @@
   <meta name="remove_type">
    <meta_arg_ts id="unit"/>
   </meta>
-  <goal name="main_lemma" expanded="true">
-  <transf name="eliminate_builtin" expanded="true">
-   <goal name="main_lemma.1" expl="1." expanded="true">
+  <goal name="main_lemma">
+  <transf name="eliminate_builtin">
+   <goal name="main_lemma.1" expl="1.">
    <proof prover="2"><result status="valid" time="0.02" steps="37"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
@@ -559,8 +562,8 @@
   </goal>
  </metas>
  </goal>
- <goal name="VC tc" expl="VC for tc" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC tc" expl="VC for tc">
+ <transf name="split_goal_wp">
   <goal name="VC tc.1" expl="1. exceptional postcondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
