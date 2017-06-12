@@ -76,7 +76,7 @@ let goal_expl_task ~root task =
   let info =
     match info with
       | Some i -> i
-      | None -> gid.Ident.id_string
+      | None -> ""
   in
   gid, info, task
 

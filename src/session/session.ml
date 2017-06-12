@@ -523,15 +523,19 @@ exception NoTask
 let goal_task g = Opt.get_exn NoTask g.goal_task
 let goal_task_option g = g.goal_task
 
-let goal_expl g =
+let goal_expl_lazy g =
   match g.goal_expl with
-  | Some s -> assert (s <> ""); s
+  | Some s -> s
   | None ->
-     let s =
-       try let _,_,l = restore_path g.goal_name in
-           String.concat "." l
-       with Not_found -> g.goal_name.Ident.id_string
-     in assert (s <> ""); g.goal_expl <- Some s; s
+      let _name,expl,_task = Termcode.goal_expl_task ~root:false (goal_task g) in
+      g.goal_expl <- Some expl; expl
+
+let goal_expl_or_name g =
+  let s = goal_expl_lazy g in
+  if s <> "" then s else
+    try let _,_,l = restore_path g.goal_name in
+        String.concat "." l
+    with Not_found -> g.goal_name.Ident.id_string
 
 (************************)
 (* saving state on disk *)
@@ -1057,9 +1061,8 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
   let sum = Some (Termcode.task_checksum ~version t) in
   (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
   let shape = Termcode.t_shape_task ~version ~expl t in
-  let expl = if expl = "" then None else Some expl in
   let goal = { goal_name = name;
-               goal_expl = expl;
+               goal_expl = Some expl;
                goal_parent = parent;
                goal_task = Some t ;
                goal_checksum = sum;
@@ -1888,7 +1891,7 @@ let add_registered_metas ~keygen env added0 g =
     let metas = raw_add_metas ~keygen ~expanded:true g added idpos in
     let goal =
       raw_add_task ~version:env.session.session_shape_version
-        ~keygen ~expanded:true (Parent_metas metas) g.goal_name (goal_expl g) task
+        ~keygen ~expanded:true (Parent_metas metas) g.goal_name (goal_expl_lazy g) task
     in
     metas.metas_goal <- goal;
     metas
@@ -2330,7 +2333,7 @@ let rec recover_sub_tasks ~theories env_session task g =
   *)
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
-  let expl = goal_expl g in
+  let expl = goal_expl_lazy g in
   let shape = Termcode.t_shape_task ~version ~expl task in
   if not ((match g.goal_checksum with
           | None -> false
@@ -2434,7 +2437,7 @@ and merge_metas_aux ~ctxt ~theories env to_goal _ from_metas =
   let to_goal =
     raw_add_task ~version:env.session.session_shape_version
       ~keygen:ctxt.keygen (Parent_metas to_metas) ~expanded:true
-      to_goal.goal_name (goal_expl to_goal) task
+      to_goal.goal_name (goal_expl_lazy to_goal) task
   in
   to_metas.metas_goal <- to_goal;
   Debug.dprintf debug "[Reload] metas done@\n";
@@ -2560,7 +2563,7 @@ let merge_file ~ctxt ~theories env from_f to_f =
 
 let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
-  let expl = goal_expl g in
+  let expl = goal_expl_lazy g in
   g.goal_shape <- Termcode.t_shape_task ~expl t;
   g.goal_checksum <- Some (Termcode.task_checksum t);
   if release then release_task g;
@@ -2727,7 +2730,7 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
     raw_add_task ~version:env.session.session_shape_version
       ~keygen ~expanded:true (Parent_metas to_metas)
       from_metas.metas_goal.goal_name
-      (goal_expl from_metas.metas_goal) task
+      (goal_expl_lazy from_metas.metas_goal) task
   in
   to_metas.metas_goal <- to_goal;
   add_goal_to_parent ~keygen env from_metas.metas_goal to_goal;

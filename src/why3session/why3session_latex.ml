@@ -190,7 +190,7 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	  if depth > 0 then fprintf fmt " & "
       end;
     if (depth <= 1) then
-      fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
+      fprintf fmt "\\explanation{%s} " (protect (S.goal_expl_or_name g))
     else
       fprintf fmt " " ;
     let proofs = S.goal_external_proofs g in
@@ -243,13 +243,13 @@ let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
   let proofs = S.goal_external_proofs g in
   if S.PHprover.length proofs > 0 then
     begin
-      style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+      style_2_row fmt depth prov subgoal (protect (S.goal_expl_or_name g));
       print_result_prov proofs prov fmt
     end
  else
     if (*depth = 0*) true then
       begin
-        style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+        style_2_row fmt depth prov subgoal (protect (S.goal_expl_or_name g));
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
           (List.length prov)
       end;

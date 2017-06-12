@@ -191,7 +191,7 @@ let rec num_lines acc tr =
       (color_of_status ~dark:false) (Opt.inhabited (S.goal_verified g))
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    fprintf fmt "%s</td>" (S.goal_expl g);
+    fprintf fmt "%s</td>" (S.goal_expl_or_name g);
 (*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
     print_results fmt provers (goal_external_proofs g);
     fprintf fmt "</tr>@\n";
