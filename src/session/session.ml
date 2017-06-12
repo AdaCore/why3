@@ -527,8 +527,11 @@ let goal_expl_lazy g =
   match g.goal_expl with
   | Some s -> s
   | None ->
-      let _name,expl,_task = Termcode.goal_expl_task ~root:false (goal_task g) in
-      g.goal_expl <- Some expl; expl
+     match g.goal_task with
+     | Some t ->
+        let _name,expl,_task = Termcode.goal_expl_task ~root:false t in
+        g.goal_expl <- Some expl; expl
+     | None -> ""
 
 let goal_expl_or_name g =
   let s = goal_expl_lazy g in
