@@ -139,12 +139,10 @@ let posid_of_idpos idpos =
   posid
 *)
 
-type expl = string option
-
 type 'a goal =
   { mutable goal_key  : 'a;
     goal_name : Ident.ident;
-    goal_expl : expl;
+    mutable goal_expl : string option;
     goal_parent : 'a goal_parent;
     mutable goal_checksum : Tc.checksum option;
     mutable goal_shape : Tc.shape;
@@ -521,9 +519,11 @@ let goal_expl g =
   match g.goal_expl with
   | Some s -> s
   | None ->
-    try let _,_,l = restore_path g.goal_name in
-        String.concat "." l
-    with Not_found -> g.goal_name.Ident.id_string
+     let s =
+       try let _,_,l = restore_path g.goal_name in
+           String.concat "." l
+       with Not_found -> g.goal_name.Ident.id_string
+     in g.goal_expl <- Some s; s
 
 (************************)
 (* saving state on disk *)
@@ -817,7 +817,9 @@ let save fname shfname _config session =
   *)
   fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
+(*
   Tc.reset_dict ();
+*)
   let prover_ids = session.session_prover_ids in
   let provers =
     PHprover.fold (get_prover_to_save prover_ids)
@@ -1046,9 +1048,9 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
   let key = keygen ~parent:parent_key () in
   let sum = Some (Termcode.task_checksum ~version t) in
   (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
-  let shape = Termcode.t_shape_task ~version t in
+  let shape = Termcode.t_shape_task ~version ~expl t in
   let goal = { goal_name = name;
-               goal_expl = expl;
+               goal_expl = Some expl;
                goal_parent = parent;
                goal_task = Some t ;
                goal_checksum = sum;
@@ -1644,7 +1646,9 @@ let read_session_with_keys ~keygen dir =
   (* If the xml is present we read it, otherwise we consider it empty *)
     if Sys.file_exists xml_filename then
       try
+(*
         Tc.reset_dict ();
+*)
         let xml,use_shapes = read_file_session_and_shapes dir xml_filename in
         try
           load_session ~keygen session xml.Xml.content;
@@ -1776,11 +1780,7 @@ let add_transformation ?(init=notify) ?(notify=notify) ~keygen env_session trans
   let next_subgoal task =
     incr i;
     let gid,expl,_ = Termcode.goal_expl_task ~root:false task in
-    let expl = match expl with
-      | None -> string_of_int !i ^ "."
-      | Some e -> string_of_int !i ^ ". " ^ e
-    in
-    let expl = Some expl in
+    let expl = string_of_int !i ^ ". " ^ expl in
     (* Format.eprintf "parent_goal_name = %s@." parent_goal_name; *)
     let goal_name = parent_goal_name ^ "." ^ string_of_int !i in
     let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
@@ -1879,7 +1879,7 @@ let add_registered_metas ~keygen env added0 g =
     let metas = raw_add_metas ~keygen ~expanded:true g added idpos in
     let goal =
       raw_add_task ~version:env.session.session_shape_version
-        ~keygen ~expanded:true (Parent_metas metas) g.goal_name g.goal_expl task
+        ~keygen ~expanded:true (Parent_metas metas) g.goal_name (goal_expl g) task
     in
     metas.metas_goal <- goal;
     metas
@@ -2321,7 +2321,8 @@ let rec recover_sub_tasks ~theories env_session task g =
   *)
   let version = env_session.session.session_shape_version in
   let sum = Termcode.task_checksum ~version task in
-  let shape = Termcode.t_shape_task ~version task in
+  let expl = goal_expl g in
+  let shape = Termcode.t_shape_task ~version ~expl task in
   if not ((match g.goal_checksum with
           | None -> false
           | Some s -> Termcode.equal_checksum sum s) &&
@@ -2424,7 +2425,7 @@ and merge_metas_aux ~ctxt ~theories env to_goal _ from_metas =
   let to_goal =
     raw_add_task ~version:env.session.session_shape_version
       ~keygen:ctxt.keygen (Parent_metas to_metas) ~expanded:true
-      to_goal.goal_name to_goal.goal_expl task
+      to_goal.goal_name (goal_expl to_goal) task
   in
   to_metas.metas_goal <- to_goal;
   Debug.dprintf debug "[Reload] metas done@\n";
@@ -2550,7 +2551,8 @@ let merge_file ~ctxt ~theories env from_f to_f =
 
 let rec recompute_all_shapes_goal ~release g =
   let t = goal_task g in
-  g.goal_shape <- Termcode.t_shape_task t;
+  let expl = goal_expl g in
+  g.goal_shape <- Termcode.t_shape_task ~expl t;
   g.goal_checksum <- Some (Termcode.task_checksum t);
   if release then release_task g;
   iter_goal
@@ -2716,7 +2718,7 @@ and add_metas_to_goal ~keygen env to_goal from_metas =
     raw_add_task ~version:env.session.session_shape_version
       ~keygen ~expanded:true (Parent_metas to_metas)
       from_metas.metas_goal.goal_name
-      from_metas.metas_goal.goal_expl task
+      (goal_expl from_metas.metas_goal) task
   in
   to_metas.metas_goal <- to_goal;
   add_goal_to_parent ~keygen env from_metas.metas_goal to_goal;

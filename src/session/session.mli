@@ -37,12 +37,6 @@ type proof_attempt_status =
     | Done of Call_provers.prover_result (** external proof done *)
     | InternalFailure of exn (** external proof aborted by internal error *)
 
-type expl
-(** An explanation gives hint about how the goal has been produced.
-    Allow to reattach proof_attempt to goal when the source file has been
-    modified.
-*)
-
 type task_option
 (** The task can be removed and later reconstructible *)
 
@@ -78,7 +72,7 @@ type idpos = {
 type 'a goal = private
     { mutable goal_key  : 'a;
       goal_name : Ident.ident; (** ident of the task *)
-      goal_expl : expl;
+      mutable goal_expl : string option;
       goal_parent : 'a goal_parent;
       mutable goal_checksum : Termcode.checksum option;  (** checksum of the task *)
       mutable goal_shape : Termcode.shape;  (** shape of the task *)
