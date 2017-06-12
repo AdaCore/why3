@@ -240,6 +240,14 @@ type 'a env_session =
       mutable files : Theory.theory Stdlib.Mstr.t Stdlib.Mstr.t;
       session : 'a session}
 
+let goal_key g = g.goal_key
+let goal_name g = g.goal_name
+let goal_verified g = g.goal_verified
+let goal_external_proofs g = g.goal_external_proofs
+let goal_transformations g = g.goal_transformations
+let goal_metas g = g.goal_metas
+let goal_expanded g = g.goal_expanded
+
 let update_env_session_config e c = e.whyconf <- c
 
 (*************************)
@@ -517,13 +525,13 @@ let goal_task_option g = g.goal_task
 
 let goal_expl g =
   match g.goal_expl with
-  | Some s -> s
+  | Some s -> assert (s <> ""); s
   | None ->
      let s =
        try let _,_,l = restore_path g.goal_name in
            String.concat "." l
        with Not_found -> g.goal_name.Ident.id_string
-     in g.goal_expl <- Some s; s
+     in assert (s <> ""); g.goal_expl <- Some s; s
 
 (************************)
 (* saving state on disk *)
@@ -880,7 +888,7 @@ let proof_verified a =
                Call_provers.pr_time = t } -> Some t
       | _ -> None
 
-let goal_verified g =
+let check_goal_verified g =
   let acc = ref None in
   let accumulate v =
     match v with
@@ -917,7 +925,7 @@ let check_theory_proved notify t =
   end
 
 let rec check_goal_proved notify g =
-  let b = goal_verified g in
+  let b = check_goal_verified g in
   if g.goal_verified <> b then begin
     g.goal_verified <- b;
     notify (Goal g);
@@ -1049,8 +1057,9 @@ let raw_add_task ~version ~(keygen:'a keygen) ~(expanded:bool) parent name expl 
   let sum = Some (Termcode.task_checksum ~version t) in
   (* let shape = Termcode.t_shape_buf ~version (Task.task_goal_fmla t) in *)
   let shape = Termcode.t_shape_task ~version ~expl t in
+  let expl = if expl = "" then None else Some expl in
   let goal = { goal_name = name;
-               goal_expl = Some expl;
+               goal_expl = expl;
                goal_parent = parent;
                goal_task = Some t ;
                goal_checksum = sum;
