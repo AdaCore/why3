@@ -101,9 +101,9 @@ and interpret_result pa pas =
    | Session.Done r ->
      let goal = pa.Session.proof_parent in
      let answer = r.Call_provers.pr_answer in
-     if answer = Call_provers.HighFailure &&
-        not Gnat_config.counterexamples then
-       Gnat_report.add_warning r.Call_provers.pr_output;
+     if answer = Call_provers.HighFailure && Gnat_config.debug &&
+         not (Gnat_config.is_ce_prover pa.Session.proof_prover) then
+           Gnat_report.add_warning r.Call_provers.pr_output;
      handle_vc_result goal (answer = Call_provers.Valid)
    | _ ->
          ()

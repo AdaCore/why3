@@ -17,6 +17,11 @@ val prover_ce : Session.loaded_prover option
    None if counterexample should not be generated
 *)
 
+val is_ce_prover : Whyconf.prover -> bool
+(* check if the prover in argument is the prover for counter examples. returns
+ * false if no prover is selected for counterexamples, or counterexamples are
+ * off *)
+
 val counterexamples : bool
 (* Reflects the value of the option --counterexample, default off
    Counter examples are also disabled when CVC4 is not found *)

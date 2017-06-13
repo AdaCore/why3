@@ -604,4 +604,11 @@ let is_selected_prover p =
       g.Session.prover_config.Whyconf.prover = p) provers)
   with Not_found -> None
 
+let is_ce_prover p =
+  counterexamples &&
+  match prover_ce with
+  | None -> false
+  | Some cep ->
+      cep.Session.prover_config.Whyconf.prover = p
+
 let replay = !opt_replay
