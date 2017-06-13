@@ -135,7 +135,8 @@ let flat_case t bl =
   Pattern.compile_bare ~mk_case ~mk_let [t] (List.map mk_b bl)
 
 let rec eval_match kn stop env t =
-  let stop = stop || Slab.mem Ity.annot_label t.t_label in
+  let stop = stop || t.t_ty <> None ||
+             Slab.mem Ity.annot_label t.t_label in
   let eval env t = eval_match kn stop env t in
   t_label_copy t (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
