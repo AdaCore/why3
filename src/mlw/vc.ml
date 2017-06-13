@@ -55,10 +55,11 @@ let proxy_of_expr =
 
 let sp_label = Ident.create_label "vc:sp"
 let wp_label = Ident.create_label "vc:wp"
+let wb_label = Ident.create_label "vc:white_box"
 let kp_label = Ident.create_label "vc:keep_precondition"
 
-let vc_labels = Slab.add kp_label
-  (Slab.add sp_label (Slab.add wp_label Slab.empty))
+let vc_labels = Slab.add kp_label (Slab.add wb_label
+  (Slab.add sp_label (Slab.add wp_label Slab.empty)))
 
 (* VCgen environment *)
 
@@ -494,6 +495,47 @@ let rec k_expr env lps e res ?case_xmap xmap =
         Klet (res, t_lab (t_var v.pv_vs), t_true)
     | Econst c ->
         Klet (res, t_lab (t_const c (ty_of_ity e.e_ity)), t_true)
+    | Eexec ({c_node = Cfun e1; c_cty = {cty_args = []} as cty}, _)
+      when Slab.mem wb_label e.e_label ->
+        (* white-box blocks do not hide their contents from the external
+           computation. Instead, their pre and post are simply added as
+           assertions at the beginning and the end of the expression.
+           All preconditions are thus preserved (as with kp_label).
+           White-box blocks do not force type invariants. *)
+        let k_of_post expl v ql =
+          let make = let t = t_var v.pv_vs in fun q ->
+            vc_expl None lab expl (open_post_with t q) in
+          let sp = t_and_asym_l (List.map make ql) in
+          let k = match sp.t_node with
+            | Tfalse -> Kstop sp | _ -> Kcut sp in
+          inv_of_pure env loc [sp] k in
+        (* normal pre- and postcondition *)
+        let pre = wp_of_pre None lab cty.cty_pre in
+        let pre = inv_of_pure env loc [pre] (Kcut pre) in
+        let post = k_of_post expl_post res cty.cty_post in
+        (* handle exceptions that pass through *)
+        let xs_pass = e.e_effect.eff_raises in
+        let xq_pass = Mxs.set_inter cty.cty_xpost xs_pass in
+        let xq_pass = Mxs.inter (fun _ ql (i,v) ->
+          let xq = k_of_post expl_xpost v ql in
+          Some ((i,v), Kseq (xq, 0, Kcont i))) xq_pass xmap in
+        (* each exception raised in e1 but not in e is hidden
+           due to an exceptional postcondition False in xpost *)
+        let bot = Kstop (vc_expl loc lab expl_absurd t_false) in
+        let xs_lost = Sxs.diff e1.e_effect.eff_raises xs_pass in
+        let xq_lost = Mxs.set_inter cty.cty_xpost xs_lost in
+        let xq_lost = Mxs.mapi (fun xs ql ->
+          let v = res_of_post xs.xs_ity ql in
+          let xq = k_of_post expl_xpost v ql in
+          (new_exn env, v), Kseq (xq, 0, bot)) xq_lost in
+        (* complete xmap with new indices, then handle e1 *)
+        let xmap = Mxs.set_union (Mxs.map fst xq_lost) xmap in
+        let k = Kseq (k_expr env lps e1 res xmap, 0, post) in
+        let add_xq _ ((i,_), xq) k = Kseq (k, i, xq) in
+        let k = Mxs.fold add_xq xq_lost k in
+        let k = Mxs.fold add_xq xq_pass k in
+        let k = bind_oldies cty.cty_oldies k in
+        if cty.cty_pre = [] then k else Kseq (pre, 0, k)
     | Eexec (ce, ({cty_pre = pre; cty_oldies = oldies} as cty)) ->
         (* [ VC(ce) (if ce is a lambda executed in-place)
            | STOP pre

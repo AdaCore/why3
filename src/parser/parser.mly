@@ -160,6 +160,8 @@
 %nonassoc LET VAL EXCEPTION
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
+%nonassoc prec_no_spec
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES DIVERGES VARIANT
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
@@ -692,10 +694,17 @@ const_defn:
 mk_expr(X): d = X { mk_expr d $startpos $endpos }
 
 seq_expr:
-| assign_expr %prec below_SEMI    { $1 }
-| assign_expr SEMICOLON           { $1 }
-| assign_expr SEMICOLON seq_expr
+| contract_expr %prec below_SEMI  { $1 }
+| contract_expr SEMICOLON         { $1 }
+| contract_expr SEMICOLON seq_expr
     { mk_expr (Esequence ($1, $3)) $startpos $endpos }
+
+contract_expr:
+| assign_expr %prec prec_no_spec  { $1 }
+| assign_expr single_spec spec
+    { let d = Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $1) in
+      let d = Enamed (Lstr Vc.wb_label, mk_expr d $startpos $endpos) in
+      mk_expr d $startpos $endpos }
 
 assign_expr:
 | expr %prec below_LARROW         { $1 }
@@ -720,12 +729,12 @@ assign_expr:
 
 expr:
 | single_expr %prec below_COMMA   { $1 }
-| single_expr COMMA expr_
+| single_expr COMMA expr_list1
     { mk_expr (Etuple ($1::$3)) $startpos $endpos }
 
-expr_:
+expr_list1:
 | single_expr %prec below_COMMA   { [$1] }
-| single_expr COMMA expr_         { $1::$3 }
+| single_expr COMMA expr_list1    { $1::$3 }
 
 single_expr: e = mk_expr(single_expr_)  { e }
 
@@ -752,9 +761,9 @@ single_expr_:
 | expr_arg located(expr_arg)+ (* FIXME/TODO: "expr expr_arg" *)
     { let join f (a,_,e) = mk_expr (Eapply (f,a)) $startpos e in
       (List.fold_left join $1 $2).expr_desc }
-| IF seq_expr THEN assign_expr ELSE assign_expr
+| IF seq_expr THEN contract_expr ELSE contract_expr
     { Eif ($2, $4, $6) }
-| IF seq_expr THEN assign_expr %prec prec_no_else
+| IF seq_expr THEN contract_expr %prec prec_no_else
     { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
     { let re_pat pat d = { pat with pat_desc = d } in
@@ -818,7 +827,7 @@ single_expr_:
     { Eraise ($2, $3) }
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
-| RETURN ioption(assign_expr)
+| RETURN ioption(contract_expr)
     { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, false, $4) }
@@ -916,8 +925,8 @@ for_direction:
 (* Specification *)
 
 spec:
-| (* epsilon *)     { empty_spec }
-| single_spec spec  { spec_union $1 $2 }
+| (* epsilon *) %prec prec_no_spec  { empty_spec }
+| single_spec spec                  { spec_union $1 $2 }
 
 single_spec:
 | REQUIRES LEFTBRC term RIGHTBRC
