@@ -734,7 +734,26 @@ let e_let ld e =
 
 let e_exec c =
   let cty = cty_exec (c_cty_enrich false RKnone c) in
-  mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask cty.cty_effect
+  (* abstract blocks and white-box blocks can escape into the outer
+     VC context. Therefore we should assume the full effect of the
+     underlying expression rather than the filtered effect of c,
+     as produced by create_cty. However, we still want to remove
+     the exceptions whose post-condition is False: this is handy,
+     and we can handle it correctly in VC. We can safely ignore
+     the function-to-mapping conversions, as they cannot appear
+     as white-box blocks, and abstract blocks can only escape
+     via exceptions, which functions-as-mappings do not raise. *)
+  let eff = match c.c_cty.cty_args, c.c_node with
+    | [], Cfun e ->
+        let x_lost = Sxs.diff e.e_effect.eff_raises
+                          cty.cty_effect.eff_raises in
+        let eff = Sxs.fold (fun xs eff ->
+          eff_catch eff xs) x_lost e.e_effect in
+        let eff = if cty.cty_effect.eff_ghost then
+          try_effect [e] eff_ghostify true eff else eff in
+        eff_union_par cty.cty_effect eff
+    | _ -> cty.cty_effect in
+  mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask eff
 
 let c_any c = mk_cexp Cany c
 
