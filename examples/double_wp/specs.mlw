@@ -23,12 +23,7 @@ module VM_instr_spec
     ensures { result.pre --> pre }
     ensures { result.post --> ifun_post f }
     ensures { result.code --> code_f }
-  = let res = { pre = pre; code = code_f; post = ifun_post f } in
-    assert { forall x p ms. res.pre x p ms ->
-      not (exists ms' : machine_state. res.post x p ms ms' /\
-        contextual_irrelevance res.code p ms ms') ->
-        contextual_irrelevance res.code p ms (f ms) && false };
-    res
+  = { pre = pre; code = code_f; post = ifun_post f }
 
   (* Iconst spec *)
   function iconst_post (n:int) : post 'a =
