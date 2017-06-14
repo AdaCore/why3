@@ -2,70 +2,69 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../optimal_replay.mlw" expanded="true">
-<theory name="OptimalReplay" sum="51d6887fdfe4034bfe77baf9d12fec8f" expanded="true">
+<theory name="OptimalReplay" sum="0fe8b6704f3105b24268f927bae24f8e" expanded="true">
  <goal name="VC n" expl="VC for n">
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC distance" expl="VC for distance" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="VC distance.1" expl="1. array creation size">
-  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
   <goal name="VC distance.2" expl="2. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
   <goal name="VC distance.3" expl="3. array creation size">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC distance.4" expl="4. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC distance.5" expl="5. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
   <goal name="VC distance.6" expl="6. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
   <goal name="VC distance.7" expl="7. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="VC distance.8" expl="8. loop invariant init">
-  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="VC distance.9" expl="9. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC distance.10" expl="10. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="VC distance.11" expl="11. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="VC distance.12" expl="12. loop variant decrease">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC distance.13" expl="13. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
   <goal name="VC distance.14" expl="14. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC distance.15" expl="15. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="VC distance.16" expl="16. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="VC distance.17" expl="17. index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="VC distance.18" expl="18. loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -81,10 +80,10 @@
    <goal name="VC distance.20.1" expl="1. loop invariant preservation" expanded="true">
    <transf name="split_goal_wp" expanded="true">
     <goal name="VC distance.20.1.1" expl="1. loop invariant preservation">
-    <proof prover="0" timelimit="36"><result status="valid" time="9.21" steps="2946"/></proof>
+    <proof prover="4" timelimit="36"><result status="valid" time="0.58" steps="860"/></proof>
     </goal>
     <goal name="VC distance.20.1.2" expl="2. loop invariant preservation" expanded="true">
-    <proof prover="1"><result status="valid" time="4.04"/></proof>
+    <proof prover="1"><result status="valid" time="3.16"/></proof>
     <metas
      expanded="true">
      <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
@@ -423,7 +422,7 @@
      <goal name="VC distance.20.1.2" expl="2. loop invariant preservation" expanded="true">
      <transf name="eliminate_builtin" expanded="true">
       <goal name="VC distance.20.1.2.1" expl="1. loop invariant preservation" expanded="true">
-      <proof prover="1"><result status="valid" time="1.94"/></proof>
+      <proof prover="1"><result status="valid" time="1.50"/></proof>
       </goal>
      </transf>
      </goal>
@@ -437,10 +436,10 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC distance.22" expl="22. assertion">
-  <proof prover="0" timelimit="36"><result status="valid" time="0.00" steps="17"/></proof>
+  <proof prover="4" timelimit="36"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
   <goal name="VC distance.23" expl="23. out of loop bounds">
-  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
  </transf>
  </goal>
