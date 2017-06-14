@@ -164,7 +164,7 @@
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES DIVERGES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
