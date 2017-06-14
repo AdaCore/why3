@@ -1004,8 +1004,8 @@ let check_aliases recu c =
         external local exception %a" print_xs (Sxs.choose sxs)
     else Loc.errorm "The type of this function contains an alias" in
   (* we allow the value in a non-recursive function to contain
-     regions coming the function's arguments, but not from the
-     context. It is sometimes useful to write a function around
+     regions coming the function's arguments or from the context.
+     It is safe and sometimes useful to write a function around
      a constructor or a projection. For recursive functions, we
      impose the full non-alias discipline, to ensure the safety
      of region polymorphism (see add_rec_mono). We do not track
@@ -1017,7 +1017,7 @@ let check_aliases recu c =
     Mreg.union report regs frz.isb_reg in
   let add_arg regs v = add_ity regs v.pv_ity in
   let regs = List.fold_left add_arg rds_regs c.cty_args in
-  ignore (add_ity (if recu then regs else rds_regs) c.cty_result)
+  if recu then ignore (add_ity regs c.cty_result)
 
 let check_fun inr rsym dsp e =
   let c,e = match e with
