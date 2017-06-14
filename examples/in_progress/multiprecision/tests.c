@@ -267,12 +267,12 @@ int main () {
           rn = an - bn + 1;
           if (mpn_cmp (refq, rq, rn))
 	    {
-          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+          printf ("ERROR, an = %d, bn = %d, qn = %d\n",
             (int) an, (int) bn, (int) rn);
           printf ("a: "); mpn_dump (ap, an);
           printf ("b: "); mpn_dump (bp, bn);
-          printf ("r:   "); mpn_dump (rq, rn);
-          printf ("ref: "); mpn_dump (refq, rn);
+          printf ("q:   "); mpn_dump (rq, rn);
+          printf ("refq: "); mpn_dump (refq, rn);
           abort();
         }
 #endif

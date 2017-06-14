@@ -4,28 +4,28 @@ why3:
 extract: why3
 	why3 extract -D c -D mp.drv -o build/N.c -L . mp2.N
 tests: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o tests
-	gcc -O3 -Wall -g -std=gnu99 -DCOMPARE_MINI tests.c build/N.c -I$(GMP_DIR) -fno-tree-vectorize -o minitests
+	gcc -O2 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o tests
+	gcc -O2 -Wall -g -std=gnu99 -DCOMPARE_MINI tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o minitests
 	./tests
 	./minitests
 why3addbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o why3addbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o why3addbench
 why3mulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o why3mulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o why3mulbench
 why3divbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o why3divbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_WHY3 -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o why3divbench
 gmpaddbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o gmpaddbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o gmpaddbench
 gmpmulbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o gmpmulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o gmpmulbench
 gmpdivbench: extract check-gmp
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fno-tree-vectorize -lgmp -o gmpdivbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_GMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o gmpdivbench
 minigmpaddbench: extract
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -fno-tree-vectorize -o minigmpaddbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_ADD tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o minigmpaddbench
 minigmpmulbench: extract
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -fno-tree-vectorize -o minigmpmulbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_MUL tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o minigmpmulbench
 minigmpdivbench: extract
-	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -fno-tree-vectorize -o minigmpdivbench
+	gcc -O3 -Wall -g -std=gnu99 -DTEST_MINIGMP -DTEST_DIV tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o minigmpdivbench
 
 
 alltests: tests why3addbench why3mulbench why3divbench gmpaddbench gmpmulbench gmpdivbench minigmpaddbench minigmpmulbench minigmpdivbench
