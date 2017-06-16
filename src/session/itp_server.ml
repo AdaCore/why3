@@ -553,6 +553,14 @@ module P = struct
 
   let get_requests = Pr.get_requests
 
+  (* true if nid is below f_node or does not exists (in which case the
+     notification is a remove). false if not below.  *)
+  let is_below s nid f_node =
+    let any = try Some (any_from_node_ID nid) with _ -> None in
+    match any with
+    | None -> true
+    | Some any -> Session_itp.is_below s any f_node
+
   let notify n =
     let d = get_server_data() in
     let s = d.cont.controller_session in
@@ -562,10 +570,8 @@ module P = struct
         let updated_node = get_modified_node n in
         match updated_node with
         | None -> Pr.notify n
-        | Some nid when
-            let any = any_from_node_ID nid in
-            Session_itp.is_below s any f_node ->
-              Pr.notify n
+        | Some nid when is_below s nid f_node ->
+            Pr.notify n
         | _ -> ()
 
 end
