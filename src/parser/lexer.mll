@@ -217,8 +217,6 @@ rule token = parse
       { GT }
   | "<>"
       { LTGT }
-  | "~"
-      { TILDE }
   | "="
       { EQUAL }
   | "-"

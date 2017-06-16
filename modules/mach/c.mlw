@@ -39,7 +39,7 @@ module C
     requires { p.offset + ofs <= plength p }
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
-    alias { p.data ~ result.data }
+    alias { p.data with result.data }
 
   val get (p:ptr 'a) : 'a
     requires { 0 <= p.offset < plength p }

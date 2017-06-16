@@ -543,21 +543,18 @@ let dreads muc rl lvm =
 
 let dwrites muc wl lvm =
   let old _ _ = Loc.errorm
-    "`at' and `old' cannot be used in the `writes' clause" in
+    "`at' and `old' cannot be used in a `writes' clause" in
   let dwrites t = type_term muc lvm old t in
   List.map dwrites wl
 
 let dalias muc al lvm ity =
   let old _ _ = Loc.errorm
-      "`at' and `old' cannot be used in the `alias' clause" in
+    "`at' and `old' cannot be used in an `alias' clause" in
   let dalias (t1,t2) =
-    (type_term muc lvm old t1,
-     (* result only allowed on the right *)
-     let v = create_pvsymbol (id_fresh "result") ity in
-     let lvm = Mstr.add "result" v lvm in
-     type_term muc lvm old t2) in
+    let v = create_pvsymbol (id_fresh "result") ity in
+    let lvm = Mstr.add "result" v lvm in
+    type_term muc lvm old t1, type_term muc lvm old t2 in
   List.map dalias al
-
 
 let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
@@ -721,10 +718,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DErec (rd, dexpr muc denv e1)
   | Ptree.Efun (bl, pty, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
-      let ds = match sp.sp_alias with
-        | ({term_loc = loc},_)::_ ->
-          Loc.errorm ~loc "unexpected 'alias' clause"
-        | _ -> dspec_no_variant muc sp in
+      let ds = dspec_no_variant muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
       DEfun (bl, dity, msk, ds, dexpr muc denv e)

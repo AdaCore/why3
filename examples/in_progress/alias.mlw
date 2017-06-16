@@ -7,7 +7,7 @@ module Test
 
   val c (x:t) : t
     ensures { x.f = result.f }
-    alias { x.f ~ result.f }
+    alias { x.f with result.f }
 
   let test () =
     let x = { f = 42 } in
@@ -43,7 +43,7 @@ module A
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     ensures { result.offset = p.offset + Int32.to_int ofs }
     ensures { result.data = p.data }
-    alias { p.data ~ result.data }
+    alias { p.data with result.data }
 
   val malloc (sz:uint32) : ptr 'a
     ensures { plength result = UInt32.to_int sz }

@@ -197,8 +197,8 @@ module N
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
     let i = ref zero in
-    let xp = ref x in
-    let rp = ref r in
+    let xp = ref (C.incr x zero) in
+    let rp = ref (C.incr r zero) in
     while (Int32.(<) !i sz) do
       variant { p2i sz - p2i !i }
       invariant { 0 <= !i <= sz }
@@ -210,8 +210,8 @@ module N
       invariant { !xp.offset = x.offset + !i }
       invariant { !rp.offset = r.offset + !i }
       C.set !rp (C.get !xp);
-      rp := C.incr !rp one;
-      xp := C.incr !xp one;
+      rp.contents <- C.incr !rp one;
+      xp.contents <- C.incr !xp one;
       i := Int32.(+) !i one;
     done
 
@@ -220,9 +220,7 @@ module N
   let compare_same_size (x y:t) (sz:int32) : int32
     requires { valid x sz }
     requires { valid y sz }
-    ensures { result = compare_int (value x sz)
-              (value y sz)
-              }
+    ensures { result = compare_int (value x sz) (value y sz) }
   =
    let i = ref sz in
    try
@@ -1349,7 +1347,7 @@ module N
     zero r sz;
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
-    let rp = ref r in
+    let rp = ref (C.incr r (Int32.of_int 0)) in
     let ly = ref limb_zero in
     let c = ref limb_zero in
     let i = ref (Int32.of_int 0) in
@@ -1477,7 +1475,7 @@ module N
                  (value y k + power radix k * !ly)
                = value x sz * value y !i
              };
-      rp := C.incr !rp one;
+      rp.contents <- C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
     value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sz);
@@ -1516,7 +1514,7 @@ module N
   =
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
-    let rp = ref r in
+    let rp = ref (C.incr r (Int32.of_int 0)) in
     let ly = ref limb_zero in
     let lr = ref limb_zero in
     let c = ref limb_zero in
@@ -1684,7 +1682,7 @@ module N
                = value (old r) (!i +sz)
                  + value x sz * value y !i
              };
-      rp := C.incr !rp one;
+      rp.contents <- C.incr !rp one;
     done;
     !c
 
@@ -1703,7 +1701,7 @@ module N
     zero r sx;
     let limb_zero = Limb.of_int 0 in
     let one = Int32.of_int 1 in
-    let rp = ref r in
+    let rp = ref (C.incr r (Int32.of_int 0)) in
     let ly = ref limb_zero in
     let c = ref limb_zero in
     let i = ref (Int32.of_int 0) in
@@ -1831,7 +1829,7 @@ module N
                  (value y k + power radix k * !ly)
                = value x sx * value y !i
              };
-      rp := C.incr !rp one;
+      rp.contents <- C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sy + p2i sx);
     value_sub_upper_bound (pelts x) x.offset (x.offset + p2i sx);
@@ -2003,7 +2001,7 @@ module N
       invariant { pelts !xp = pelts x }
       invariant { !high <= radix - power 2 (cnt) }
       label StartLoop in
-      xp := C.incr !xp minus_one;
+      xp.contents <- C.incr !xp minus_one;
       low := C.get !xp;
       let l,h = lsld_ext !low cnt in
       assert { !high + h < radix  };
@@ -2011,7 +2009,7 @@ module N
       value_sub_update_no_change (pelts r) (!rp).offset (r.offset + 1 + p2i !i)
                                  (r.offset + p2i sz) v;
       C.set !rp (Limb.(+) !high h);
-      rp := C.incr !rp minus_one;
+      rp.contents <- C.incr !rp minus_one;
       high := l;
       let ghost k = p2i !i in
       i := Int32.(-) !i one;
@@ -2116,8 +2114,8 @@ module N
     let zero = Int32.of_int 0 in
     let one = Int32.of_int 1 in
     let msb = Int32.(-) sz one in
-    let xp = ref x in
-    let rp = ref r in
+    let xp = ref (C.incr x zero) in
+    let rp = ref (C.incr r zero) in
     let high = ref (C.get !xp) in
     let retval, h = lsld_ext !high tnc in
     let low = ref h in
@@ -2137,7 +2135,7 @@ module N
       invariant { !low < power 2 (tnc) }
       label StartLoop in
       let ghost k = p2i !i in
-      xp := C.incr !xp one;
+      xp.contents <- C.incr !xp one;
       high := C.get !xp;
       let l,h = lsld_ext !high tnc in
       assert { !low + l < radix };
@@ -2145,7 +2143,7 @@ module N
       value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) v;
       C.set !rp (Limb.(+) !low l);
       assert { value r k = value (r at StartLoop) k };
-      rp := C.incr !rp one;
+      rp.contents <- C.incr !rp one;
       low := h;
       i := Int32.(+) !i one;
       value_sub_tail (pelts r) r.offset (r.offset + k);
@@ -2638,8 +2636,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
                                  (q.offset + p2i sz) qu;
       C.set !qp qu;
-      xp := C.incr !xp minus_one;
-      qp := C.incr !qp minus_one;
+      xp.contents <- C.incr !xp minus_one;
+      qp.contents <- C.incr !qp minus_one;
       i := Int32.(-) !i one;
       value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
       value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
@@ -3759,7 +3757,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       let ghost k = p2i !i in
       i := Int32.(-) !i one;
       let ghost s = p2i sy + p2i !i - 1 in
-      xp := C.incr !xp minus_one;
+      xp.contents <- C.incr !xp minus_one;
       let xd = C.incr !xp mdn in
       let nx0 = C.get_ofs !xp one in
       if (Limb.(=) !x1 dh && Limb.(=) nx0 dl) (* unlikely *)
@@ -3928,7 +3926,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                };
         value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
         x1 := C.get_ofs !xp one;
-        qp := C.incr !qp minus_one;
+        qp.contents <- C.incr !qp minus_one;
         value_sub_update_no_change (pelts q) (!qp).offset
                             ((!qp).offset + 1)
                             ((!qp).offset + p2i sx - p2i sy - p2i !i)
@@ -4781,7 +4779,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                    = value (xd at SubProd) sy
                      + power radix sy * (!x1 at StartLoop)
                      - !ql * vy };
-          qp := C.incr !qp minus_one;
+          qp.contents <- C.incr !qp minus_one;
           value_sub_update_no_change (pelts q) (!qp).offset
                             ((!qp).offset + 1)
                             ((!qp).offset + p2i sx - p2i sy - p2i !i)
@@ -5082,7 +5080,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                };
         end
         else begin
-          qp := C.incr !qp minus_one;
+          qp.contents <- C.incr !qp minus_one;
           value_sub_update_no_change (pelts q) (!qp).offset
                             ((!qp).offset + 1)
                             ((!qp).offset + p2i sx - p2i sy - p2i !i)
@@ -5615,7 +5613,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       invariant { !rl + radix * !rh < dl + radix * dh }
       label StartLoop in
       let ghost k = p2i !i in
-      xp := C.incr !xp minus_one;
+      xp.contents <- C.incr !xp minus_one;
       lx := C.get !xp;
       label Got in
       let (qu, r0, r1) = div3by2_inv !rh !rl !lx dh dl dinv in

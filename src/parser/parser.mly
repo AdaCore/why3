@@ -130,11 +130,11 @@
 
 (* program keywords *)
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN BREAK CHECK
-%token CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
-%token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
+%token ABSTRACT ABSURD ALIAS ANY ASSERT ASSUME AT BEGIN BREAK
+%token CHECK CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION
+%token FOR FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
 %token PRIVATE PURE RAISE RAISES READS REC REQUIRES
-%token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES ALIAS
+%token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES
 
 (* symbols *)
 
@@ -145,7 +145,6 @@
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
-%token TILDE
 %token UNDERSCORE
 
 %token EOF
@@ -162,7 +161,8 @@
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS
+%nonassoc WRITES ALIAS DIVERGES VARIANT
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
@@ -988,7 +988,7 @@ single_spec:
 | WRITES LEFTBRC comma_list0(single_term) RIGHTBRC
     { { empty_spec with sp_writes = $3; sp_checkrw = true } }
 | ALIAS LEFTBRC comma_list0(alias_pair) RIGHTBRC
-	{ { empty_spec with sp_alias = $3 } } (* FIXME checkrw ? *)
+    { { empty_spec with sp_alias = $3; sp_checkrw = true } }
 | RAISES LEFTBRC comma_list1(xsymbol) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | DIVERGES
@@ -996,7 +996,8 @@ single_spec:
 | variant
     { { empty_spec with sp_variant = $1 } }
 
-%inline alias_pair: term TILDE term { ($1,$3) }
+alias_pair:
+| term WITH term  { $1, $3 }
 
 ensures:
 | term

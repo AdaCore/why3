@@ -856,15 +856,7 @@ let create_assert = to_fmla
 let create_invariant pl = List.map to_fmla pl
 
 let create_post ity ql = List.map (fun (v,f) ->
-  try
-    ity_equal_check ity v.pv_ity;
-    Ity.create_post v.pv_vs (to_fmla f)
-  with TypeMismatch _ ->
-    let ty = ty_of_ity ity in
-    ty_equal_check ty (ty_of_ity v.pv_ity);
-    let preid = Ident.id_clone v.pv_vs.vs_name in
-    Ity.create_post (create_vsymbol preid ty) (to_fmla f)
-  ) ql
+  ity_equal_check ity v.pv_ity; Ity.create_post v.pv_vs (to_fmla f)) ql
 
 let create_xpost xql = Mxs.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
 
@@ -910,38 +902,61 @@ let effect_of_dspec dsp =
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
 
-let alias_of_dspec dsp ity =
-  let rec subst reg ity2 ity =
+let handle_alias dsp ity =
+  let effect_of_term t =
+    let v, ity, fd = effect_of_term t in
+    v, match fd with
+      | Some {rs_cty={cty_args=[arg]; cty_result=res; cty_freeze=frz}} ->
+          ity_full_inst (ity_match frz arg.pv_ity ity) res
+      | _ -> ity in
+  let add_alias isb (t1, t2) =
+    let v1, ity1 = effect_of_term t1 in
+    let v2, ity2 = effect_of_term t2 in
+    let is_res1 = v1.pv_vs.vs_name.id_string = "result" in
+    let is_res2 = v2.pv_vs.vs_name.id_string = "result" in
+    if is_res1 && is_res2 then Loc.errorm ?loc:t1.t_loc
+      "Only one term in an `alias' clause can refer to `result'";
+    if not is_res1 && not is_res2 then Loc.errorm ?loc:t1.t_loc
+      "One term in an `alias' clause must refer to `result'";
+    if match ity1.ity_node with Ityreg _ -> false | _ -> true then
+      Loc.errorm ?loc:t1.t_loc "mutable expression expected";
+    if match ity2.ity_node with Ityreg _ -> false | _ -> true then
+      Loc.errorm ?loc:t2.t_loc "mutable expression expected";
+    let isb = if is_res1 then ity_match isb ity1 ity2
+                         else ity_match isb ity2 ity1 in
+    let check_var v ity = match ity.ity_node with
+      | Ityvar (u, false) -> tv_equal u v | _ -> false in
+    let check_pur v ity = match ity.ity_node with
+      | Ityvar (u, true)  -> tv_equal u v | _ -> false in
+    if not (Mtv.for_all check_var isb.isb_var &&
+            Mtv.for_all check_pur isb.isb_pur) then
+      Loc.errorm ?loc:t1.t_loc "illegal `alias' clause"; (* FIXME: errmsg *)
+    isb in
+  let rec subst isb ity =
+    let subst = subst isb in
     match ity.ity_node with
-    | Ityreg r when reg_equal r reg -> ity2
-    | Ityapp (s, l, r) ->
-      ity_app s (List.map (subst reg ity2) l) (List.map (subst reg ity2) r)
-    | Ityvar _ -> ity
-    | Ityreg { reg_its = s; reg_args = l; reg_regs = r } -> (* FIXME ? *)
-      ity_app s (List.map (subst reg ity2) l) (List.map (subst reg ity2) r)
-  in
-  let add_alias (ity, regs, conflicts) (t, rt) =
-    match (effect_of_term t, effect_of_term rt) with
-    | (_, ({ity_node = Ityreg reg} as nity), _),
-      (v, ({ity_node = Ityreg rreg}), _) ->
-      if v.pv_vs.vs_name.id_string = "result"
-      then
-        if Sreg.mem rreg conflicts
-        then Loc.errorm ?loc:rt.t_loc "aliasing conflict" (* FIXME *)
-        else (subst rreg nity ity, Sreg.add reg regs, Sreg.add rreg conflicts)
-      else Loc.errorm ?loc:rt.t_loc "result expected" (* FIXME ? *)
-    | (_, {ity_node = Ityreg _}, _), _ ->
-      Loc.errorm ?loc:rt.t_loc "mutable expression expected"
-    | _ ->
-      Loc.errorm ?loc:t.t_loc "mutable expression expected" in
-  let ity, regs, _conflicts =
-    List.fold_left
-      add_alias
-      (ity, Sreg.empty, Sreg.empty)
-      dsp.ds_alias in
-  let regs = Sreg.fold (fun r acc -> reg_freeregs acc r) regs regs in
-  (* FIXME ? *)
-  ity, regs
+    | Ityreg r when Mreg.mem r isb.isb_reg ->
+        Mreg.find r isb.isb_reg
+    | Ityreg { reg_its = s; reg_args = tl; reg_regs = rl } ->
+        ity_app s (List.map subst tl) (List.map subst rl)
+    | Ityapp (s, tl, rl) ->
+        ity_app_pure s (List.map subst tl) (List.map subst rl)
+    | Ityvar _ -> ity in
+  let isb = List.fold_left add_alias isb_empty dsp.ds_alias in
+  let res = subst isb ity in
+  let update (v,t) =
+    ity_equal_check ity v.pv_ity;
+    let id = id_clone v.pv_vs.vs_name in
+    let nv = create_pvsymbol id ~ghost:v.pv_ghost res in
+    nv, t_subst_single v.pv_vs (t_var nv.pv_vs) t in
+  let post = List.map update dsp.ds_post in
+  let freeze _ reg frz  = ity_freeze frz reg in
+  let frz = Mreg.fold freeze isb.isb_reg isb_empty in
+  { dsp with ds_post = post }, res, frz.isb_reg
+
+let handle_alias dsp ity =
+  if dsp.ds_alias = [] then dsp, ity, Mreg.empty
+                       else handle_alias dsp ity
 
 (* TODO: add warnings for empty postconditions (anywhere)
     and empty exceptional postconditions (toplevel). *)
@@ -1137,20 +1152,19 @@ let add_xsymbol ({xsm = xsm} as env) xs =
 
 (** Abstract values *)
 
-let cty_of_spec env bl mask dspl dity =
+let cty_of_spec env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
   let preold = Mstr.find_opt old_mark env.old in
   let env, old = add_label env old_mark in
-  let dsp = get_later env dspl ity in
-  let ity, regs = alias_of_dspec dsp ity in
-  let dsp = get_later env dspl ity in (* FIXME ? *)
+  let dsp = get_later env dsp ity in
+  let dsp, ity, frz = handle_alias dsp ity in
   let _, eff = effect_of_dspec dsp in
   let eff = eff_ghostify env.ghs eff in
   let eff = eff_reset_overwritten eff in
-  let res = Sreg.diff (ity_freeregs Sreg.empty ity) regs in
-  let eff = eff_reset eff res in
+  let rst = ity_freeregs Sreg.empty ity in
+  let eff = eff_reset eff (Mreg.set_diff rst frz) in
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
