@@ -951,7 +951,7 @@ let convert_color (color: color): string =
   | Goal_color -> "goal_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
-  let line = max 0 line in
+  let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
   v#buffer#place_cursor ~where:it;
