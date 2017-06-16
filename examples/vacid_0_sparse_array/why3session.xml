@@ -7,7 +7,7 @@
 <prover id="3" name="Z3" version="3.2" timelimit="17" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vacid_0_sparse_array.mlw" expanded="true">
-<theory name="SparseArray" sum="f180fa00de7bc39519572aca507e77f8" expanded="true">
+<theory name="SparseArray" sum="cac56dfa9319d99030b2e9f73c24eb70" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="5"><result status="valid" time="0.02" steps="11"/></proof>
  </goal>
@@ -17,63 +17,63 @@
  <goal name="WP_parameter get" expl="VC for get">
  <proof prover="5"><result status="valid" time="0.07" steps="22"/></proof>
  </goal>
- <goal name="permutation">
+ <goal name="permutation" expl="">
  <proof prover="0" edited="vacid_0_sparse_array_2_SparseArray_permutation_1.v"><result status="valid" time="0.64"/></proof>
  </goal>
  <goal name="WP_parameter set" expl="VC for set">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter set.1" expl="1. index in array bounds">
+  <goal name="WP_parameter set.1" expl="index in array bounds">
   <proof prover="5" timelimit="17"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter set.2" expl="2. type invariant">
+  <goal name="WP_parameter set.2" expl="type invariant">
   <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter set.3" expl="3. type invariant">
+  <goal name="WP_parameter set.3" expl="type invariant">
   <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter set.4" expl="4. precondition">
+  <goal name="WP_parameter set.4" expl="precondition">
   <proof prover="5"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter set.5" expl="5. assertion">
+  <goal name="WP_parameter set.5" expl="assertion">
   <proof prover="1" timelimit="5"><result status="valid" time="0.09"/></proof>
   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="unknown" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter set.6" expl="6. index in array bounds">
+  <goal name="WP_parameter set.6" expl="index in array bounds">
   <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter set.7" expl="7. index in array bounds">
+  <goal name="WP_parameter set.7" expl="index in array bounds">
   <proof prover="5"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter set.8" expl="8. type invariant">
+  <goal name="WP_parameter set.8" expl="type invariant">
   <proof prover="1"><result status="valid" time="0.05"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter set.9" expl="9. type invariant">
+  <goal name="WP_parameter set.9" expl="type invariant">
   <proof prover="5"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter set.10" expl="10. type invariant">
+  <goal name="WP_parameter set.10" expl="type invariant">
   <proof prover="5"><result status="valid" time="0.04" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter set.11" expl="11. postcondition">
+  <goal name="WP_parameter set.11" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter set.11.1" expl="1. VC for set">
+   <goal name="WP_parameter set.11.1" expl="VC for set">
    <proof prover="5" timelimit="17"><result status="valid" time="0.10" steps="41"/></proof>
    </goal>
-   <goal name="WP_parameter set.11.2" expl="2. VC for set">
+   <goal name="WP_parameter set.11.2" expl="VC for set">
    <proof prover="1"><result status="valid" time="0.52"/></proof>
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    <proof prover="5" timelimit="17"><result status="unknown" time="1.12"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter set.12" expl="12. postcondition">
+  <goal name="WP_parameter set.12" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.17" steps="56"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="a4766a15c155e10c8525ab932ec189a0" expanded="true">
+<theory name="Harness" sum="6bca708f2c2e05e2faa2819e1cf71b23" expanded="true">
  <goal name="WP_parameter harness" expl="VC for harness">
  <proof prover="5"><result status="valid" time="0.39" steps="249"/></proof>
  </goal>

@@ -12,14 +12,14 @@
 <prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="11" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../fibonacci.mlw" expanded="true">
-<theory name="FibonacciTest" sum="039ab6528f220dfe0fc1771500be60d0">
- <goal name="isfib_2_1">
+<theory name="FibonacciTest" sum="4c479fa43892b7cb3c00591a914a8d47">
+ <goal name="isfib_2_1" expl="">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="isfib_6_8">
+ <goal name="isfib_6_8" expl="">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="not_isfib_2_2">
+ <goal name="not_isfib_2_2" expl="">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  <proof prover="7"><result status="valid" time="0.03"/></proof>
@@ -27,38 +27,38 @@
  <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLinear" sum="604c0590380ecd1d00d878d89bd719dc">
+<theory name="FibonacciLinear" sum="7ea87ff256cdd54a5c83a7ac463a5cd4">
  <goal name="WP_parameter fib" expl="VC for fib">
  <proof prover="2" memlimit="0"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="FibRecGhost" sum="67203f0a3e99c39a0c6a694581c5d420">
+<theory name="FibRecGhost" sum="364932ff63d5b673494ff17fe9d3eea9">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter fib_aux.1" expl="1. postcondition">
+  <goal name="WP_parameter fib_aux.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="7"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.2" expl="2. variant decrease">
+  <goal name="WP_parameter fib_aux.2" expl="variant decrease">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="7"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.3" expl="3. precondition">
+  <goal name="WP_parameter fib_aux.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.00" steps="7"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.4" expl="4. precondition">
+  <goal name="WP_parameter fib_aux.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.5" expl="5. postcondition">
+  <goal name="WP_parameter fib_aux.5" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -68,19 +68,19 @@
  </goal>
  <goal name="WP_parameter fib" expl="VC for fib">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter fib.1" expl="1. precondition">
+  <goal name="WP_parameter fib.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="3"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib.2" expl="2. precondition">
+  <goal name="WP_parameter fib.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="3"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib.3" expl="3. postcondition">
+  <goal name="WP_parameter fib.3" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
@@ -101,30 +101,30 @@
  <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="FibRecNoGhost" sum="04200b117d3d6a351d25d8f799284931">
+<theory name="FibRecNoGhost" sum="070c28fb369f273df69ca4cd3d8280b0">
  <goal name="WP_parameter fib_aux" expl="VC for fib_aux">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter fib_aux.1" expl="1. postcondition">
+  <goal name="WP_parameter fib_aux.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.2" expl="2. variant decrease">
+  <goal name="WP_parameter fib_aux.2" expl="variant decrease">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="7"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.3" expl="3. precondition">
+  <goal name="WP_parameter fib_aux.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.00" steps="7"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.4" expl="4. precondition">
+  <goal name="WP_parameter fib_aux.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib_aux.5" expl="5. postcondition">
+  <goal name="WP_parameter fib_aux.5" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   <proof prover="9"><result status="valid" time="0.06"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.01"/></proof>
@@ -133,17 +133,17 @@
  </goal>
  <goal name="WP_parameter fib" expl="VC for fib">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter fib.1" expl="1. precondition">
+  <goal name="WP_parameter fib.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib.2" expl="2. precondition">
+  <goal name="WP_parameter fib.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="8" memlimit="4000"><result status="valid" time="0.01" steps="3"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter fib.3" expl="3. postcondition">
+  <goal name="WP_parameter fib.3" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="11" timelimit="5" memlimit="4000"><result status="valid" time="0.00"/></proof>
@@ -151,27 +151,27 @@
  </transf>
  </goal>
 </theory>
-<theory name="SmallestFibAbove" sum="81daf7f61e5e5d40ba220201897341b8">
+<theory name="SmallestFibAbove" sum="4bb9fe06e1479bb7ba8cf980c53ef19b">
  <goal name="WP_parameter smallest_fib_above" expl="VC for smallest_fib_above">
  <proof prover="11"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Zeckendorf" sum="d3fca28f37276662c5b97aa1dff5b10f">
+<theory name="Zeckendorf" sum="19ac8b1df550f16a0aa52c84e6cc308e">
  <goal name="WP_parameter fib_nonneg" expl="VC for fib_nonneg">
  <proof prover="8" timelimit="6"><result status="valid" time="0.03" steps="12"/></proof>
  </goal>
  <goal name="WP_parameter fib_increasing" expl="VC for fib_increasing">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter fib_increasing.1" expl="1. variant decrease">
+  <goal name="WP_parameter fib_increasing.1" expl="variant decrease">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter fib_increasing.2" expl="2. precondition">
+  <goal name="WP_parameter fib_increasing.2" expl="precondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter fib_increasing.3" expl="3. postcondition">
+  <goal name="WP_parameter fib_increasing.3" expl="postcondition">
   <proof prover="11"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fib_increasing.4" expl="4. postcondition">
+  <goal name="WP_parameter fib_increasing.4" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
@@ -181,45 +181,45 @@
  </goal>
  <goal name="WP_parameter zeckendorf" expl="VC for zeckendorf">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter zeckendorf.1" expl="1. loop invariant init">
+  <goal name="WP_parameter zeckendorf.1" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="4"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.2" expl="2. loop invariant init">
+  <goal name="WP_parameter zeckendorf.2" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="5"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.3" expl="3. loop invariant init">
+  <goal name="WP_parameter zeckendorf.3" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="4"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.4" expl="4. precondition">
+  <goal name="WP_parameter zeckendorf.4" expl="precondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.00" steps="9"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.5" expl="5. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf.5" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.07" steps="16"/></proof>
   <proof prover="11"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.6" expl="6. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf.6" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.05" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.7" expl="7. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf.7" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="11"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.8" expl="8. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf.8" expl="loop invariant preservation">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.9" expl="9. loop variant decrease">
+  <goal name="WP_parameter zeckendorf.9" expl="loop variant decrease">
   <proof prover="8" timelimit="6"><result status="valid" time="0.03" steps="16"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.10" expl="10. postcondition">
+  <goal name="WP_parameter zeckendorf.10" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.01" steps="9"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf.11" expl="11. postcondition">
+  <goal name="WP_parameter zeckendorf.11" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.01" steps="9"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
@@ -227,116 +227,116 @@
  </goal>
  <goal name="WP_parameter zeckendorf_fast" expl="VC for zeckendorf_fast">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter zeckendorf_fast.1" expl="1. postcondition">
+  <goal name="WP_parameter zeckendorf_fast.1" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.2" expl="2. postcondition">
+  <goal name="WP_parameter zeckendorf_fast.2" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.3" expl="3. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.3" expl="loop invariant init">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.4" expl="4. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.4" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.5" expl="5. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.5" expl="loop invariant preservation">
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.6" expl="6. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.6" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.7" expl="7. loop variant decrease">
+  <goal name="WP_parameter zeckendorf_fast.7" expl="loop variant decrease">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.8" expl="8. assertion">
+  <goal name="WP_parameter zeckendorf_fast.8" expl="assertion">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.9" expl="9. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.9" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.10" expl="10. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.10" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.11" expl="11. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.11" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.12" expl="12. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.12" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.13" expl="13. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.13" expl="loop invariant init">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.14" expl="14. loop invariant init">
+  <goal name="WP_parameter zeckendorf_fast.14" expl="loop invariant init">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.15" expl="15. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.15" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter zeckendorf_fast.15.1" expl="1. VC for zeckendorf_fast">
+   <goal name="WP_parameter zeckendorf_fast.15.1" expl="VC for zeckendorf_fast">
    <proof prover="11"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter zeckendorf_fast.15.2" expl="2. VC for zeckendorf_fast">
+   <goal name="WP_parameter zeckendorf_fast.15.2" expl="VC for zeckendorf_fast">
    <proof prover="11"><result status="valid" time="0.00"/></proof>
    </goal>
-   <goal name="WP_parameter zeckendorf_fast.15.3" expl="3. VC for zeckendorf_fast">
+   <goal name="WP_parameter zeckendorf_fast.15.3" expl="VC for zeckendorf_fast">
    <proof prover="8" timelimit="6"><result status="valid" time="0.04" steps="33"/></proof>
    </goal>
-   <goal name="WP_parameter zeckendorf_fast.15.4" expl="4. VC for zeckendorf_fast">
+   <goal name="WP_parameter zeckendorf_fast.15.4" expl="VC for zeckendorf_fast">
    <proof prover="11"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter zeckendorf_fast.15.5" expl="5. VC for zeckendorf_fast">
+   <goal name="WP_parameter zeckendorf_fast.15.5" expl="VC for zeckendorf_fast">
    <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="32"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.16" expl="16. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.16" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="32"/></proof>
   <proof prover="11" timelimit="3"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.17" expl="17. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.17" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.18" expl="18. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.18" expl="loop invariant preservation">
   <proof prover="9" timelimit="6" memlimit="1000"><result status="valid" time="0.17"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.19" expl="19. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.19" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.20" expl="20. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.20" expl="loop invariant preservation">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.21" expl="21. loop variant decrease">
+  <goal name="WP_parameter zeckendorf_fast.21" expl="loop variant decrease">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.22" expl="22. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.22" expl="loop invariant preservation">
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.23" expl="23. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.23" expl="loop invariant preservation">
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.24" expl="24. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.24" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="30"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.25" expl="25. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.25" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.01" steps="30"/></proof>
   <proof prover="11"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.26" expl="26. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.26" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="30"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.27" expl="27. loop invariant preservation">
+  <goal name="WP_parameter zeckendorf_fast.27" expl="loop invariant preservation">
   <proof prover="8" timelimit="6"><result status="valid" time="0.09" steps="98"/></proof>
   <proof prover="11"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.28" expl="28. loop variant decrease">
+  <goal name="WP_parameter zeckendorf_fast.28" expl="loop variant decrease">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.29" expl="29. postcondition">
+  <goal name="WP_parameter zeckendorf_fast.29" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="26"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_fast.30" expl="30. postcondition">
+  <goal name="WP_parameter zeckendorf_fast.30" expl="postcondition">
   <proof prover="8" timelimit="6"><result status="valid" time="0.02" steps="26"/></proof>
   <proof prover="11"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -344,122 +344,122 @@
  </goal>
  <goal name="WP_parameter zeckendorf_unique" expl="VC for zeckendorf_unique">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter zeckendorf_unique.1" expl="1. unreachable point">
+  <goal name="WP_parameter zeckendorf_unique.1" expl="unreachable point">
   <proof prover="8"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.2" expl="2. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.2" expl="postcondition">
   <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.3" expl="3. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.3" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.4" expl="4. variant decrease">
+  <goal name="WP_parameter zeckendorf_unique.4" expl="variant decrease">
   <proof prover="8"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.5" expl="5. precondition">
+  <goal name="WP_parameter zeckendorf_unique.5" expl="precondition">
   <proof prover="8"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.6" expl="6. precondition">
+  <goal name="WP_parameter zeckendorf_unique.6" expl="precondition">
   <proof prover="8"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.7" expl="7. precondition">
+  <goal name="WP_parameter zeckendorf_unique.7" expl="precondition">
   <proof prover="9" memlimit="1000"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.8" expl="8. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.8" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.9" expl="9. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.9" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.05" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.10" expl="10. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.10" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.11" expl="11. precondition">
+  <goal name="WP_parameter zeckendorf_unique.11" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.12" expl="12. precondition">
+  <goal name="WP_parameter zeckendorf_unique.12" expl="precondition">
   <proof prover="8"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.13" expl="13. precondition">
+  <goal name="WP_parameter zeckendorf_unique.13" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.14" expl="14. unreachable point">
+  <goal name="WP_parameter zeckendorf_unique.14" expl="unreachable point">
   <proof prover="8"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.15" expl="15. precondition">
+  <goal name="WP_parameter zeckendorf_unique.15" expl="precondition">
   <proof prover="8"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.16" expl="16. precondition">
+  <goal name="WP_parameter zeckendorf_unique.16" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.17" expl="17. precondition">
+  <goal name="WP_parameter zeckendorf_unique.17" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.18" expl="18. unreachable point">
+  <goal name="WP_parameter zeckendorf_unique.18" expl="unreachable point">
   <proof prover="8"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.19" expl="19. precondition">
+  <goal name="WP_parameter zeckendorf_unique.19" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.20" expl="20. precondition">
+  <goal name="WP_parameter zeckendorf_unique.20" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.21" expl="21. precondition">
+  <goal name="WP_parameter zeckendorf_unique.21" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.22" expl="22. precondition">
+  <goal name="WP_parameter zeckendorf_unique.22" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.23" expl="23. precondition">
+  <goal name="WP_parameter zeckendorf_unique.23" expl="precondition">
   <proof prover="8"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.24" expl="24. precondition">
+  <goal name="WP_parameter zeckendorf_unique.24" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.25" expl="25. variant decrease">
+  <goal name="WP_parameter zeckendorf_unique.25" expl="variant decrease">
   <proof prover="8"><result status="valid" time="0.04" steps="56"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.26" expl="26. precondition">
+  <goal name="WP_parameter zeckendorf_unique.26" expl="precondition">
   <proof prover="8"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.27" expl="27. precondition">
+  <goal name="WP_parameter zeckendorf_unique.27" expl="precondition">
   <proof prover="8"><result status="valid" time="0.04" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter zeckendorf_unique.28" expl="28. postcondition">
+  <goal name="WP_parameter zeckendorf_unique.28" expl="postcondition">
   <proof prover="8"><result status="valid" time="0.03" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Mat22" sum="cc41e6488bdd64071b3c815e4f5356d3">
- <goal name="Monoid.Assoc">
+<theory name="Mat22" sum="f9f8bb3f8c40424a9637b70539497d11">
+ <goal name="Monoid.Assoc" expl="">
  <proof prover="1"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Monoid.Unit_def_l">
+ <goal name="Monoid.Unit_def_l" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="Monoid.Unit_def_r">
+ <goal name="Monoid.Unit_def_r" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLogarithmic" sum="1463e67fce33079e4726bf939886c65a">
+<theory name="FibonacciLogarithmic" sum="86110d7a411b6691bf6c2b80e6051309">
  <goal name="WP_parameter logfib" expl="VC for logfib">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter logfib.1" expl="1. postcondition">
+  <goal name="WP_parameter logfib.1" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter logfib.2" expl="2. variant decrease">
+  <goal name="WP_parameter logfib.2" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter logfib.3" expl="3. precondition">
+  <goal name="WP_parameter logfib.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter logfib.4" expl="4. postcondition">
+  <goal name="WP_parameter logfib.4" expl="postcondition">
   <proof prover="0" edited="fibonacci_WP_FibonacciLogarithmic_WP_parameter_logfib_1.v"><result status="valid" time="0.47"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="fib_m">
+ <goal name="fib_m" expl="">
  <proof prover="0" edited="fibonacci_WP_FibonacciLogarithmic_fib_m_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="WP_parameter fibo" expl="VC for fibo">

@@ -5,22 +5,22 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="2" steplimit="0" memlimit="0"/>
 <file name="../avl.mlw">
-<theory name="SelectionTypes" sum="8ee3f641805a143e052f3881ea88fc8c">
- <goal name="rebuild_aternative_def">
+<theory name="SelectionTypes" sum="524429d11c4ad874e40c019262594465">
+ <goal name="rebuild_aternative_def" expl="">
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.07" steps="88"/></proof>
  </goal>
 </theory>
-<theory name="AVL" sum="14e0e79e1c62330bf7a8042003faef03">
- <goal name="M.M.assoc">
+<theory name="AVL" sum="b73997428ccb586bd42fd89fda00c186">
+ <goal name="M.M.assoc" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="M.M.neutral">
+ <goal name="M.M.neutral" expl="">
  <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
  <goal name="WP_parameter real_height_nonnegative" expl="VC for real_height_nonnegative">
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.02" steps="28"/></proof>
  </goal>
- <goal name="rotation_preserve_model">
+ <goal name="rotation_preserve_model" expl="">
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
  <goal name="WP_parameter height" expl="VC for height">
@@ -39,116 +39,116 @@
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.04" steps="63"/></proof>
  </goal>
  <goal name="WP_parameter is_empty" expl="VC for is_empty">
- <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.13" steps="68"/></proof>
+ <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.02" steps="68"/></proof>
  </goal>
  <goal name="WP_parameter view" expl="VC for view">
  <proof prover="1" timelimit="2" memlimit="0"><result status="valid" time="0.07" steps="257"/></proof>
  </goal>
  <goal name="WP_parameter balance" expl="VC for balance">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter balance.1" expl="1. precondition">
+  <goal name="WP_parameter balance.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter balance.2" expl="2. precondition">
+  <goal name="WP_parameter balance.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter balance.3" expl="3. precondition">
+  <goal name="WP_parameter balance.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter balance.4" expl="4. unreachable point">
+  <goal name="WP_parameter balance.4" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter balance.5" expl="5. precondition">
+  <goal name="WP_parameter balance.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter balance.6" expl="6. precondition">
+  <goal name="WP_parameter balance.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter balance.7" expl="7. precondition">
+  <goal name="WP_parameter balance.7" expl="precondition">
   <proof prover="1"><result status="valid" time="0.04" steps="83"/></proof>
   </goal>
-  <goal name="WP_parameter balance.8" expl="8. precondition">
+  <goal name="WP_parameter balance.8" expl="precondition">
   <proof prover="1"><result status="valid" time="0.06" steps="125"/></proof>
   </goal>
-  <goal name="WP_parameter balance.9" expl="9. postcondition">
+  <goal name="WP_parameter balance.9" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
-  <goal name="WP_parameter balance.10" expl="10. postcondition">
+  <goal name="WP_parameter balance.10" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.14" steps="209"/></proof>
   </goal>
-  <goal name="WP_parameter balance.11" expl="11. precondition">
+  <goal name="WP_parameter balance.11" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter balance.12" expl="12. unreachable point">
+  <goal name="WP_parameter balance.12" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.03" steps="83"/></proof>
   </goal>
-  <goal name="WP_parameter balance.13" expl="13. precondition">
+  <goal name="WP_parameter balance.13" expl="precondition">
   <proof prover="1"><result status="valid" time="0.16" steps="341"/></proof>
   </goal>
-  <goal name="WP_parameter balance.14" expl="14. precondition">
+  <goal name="WP_parameter balance.14" expl="precondition">
   <proof prover="1"><result status="valid" time="0.33" steps="504"/></proof>
   </goal>
-  <goal name="WP_parameter balance.15" expl="15. precondition">
+  <goal name="WP_parameter balance.15" expl="precondition">
   <proof prover="1"><result status="valid" time="0.54" steps="883"/></proof>
   </goal>
-  <goal name="WP_parameter balance.16" expl="16. postcondition">
-  <proof prover="1"><result status="valid" time="0.16" steps="313"/></proof>
+  <goal name="WP_parameter balance.16" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.18" steps="313"/></proof>
   </goal>
-  <goal name="WP_parameter balance.17" expl="17. postcondition">
-  <proof prover="1"><result status="valid" time="0.70" steps="986"/></proof>
+  <goal name="WP_parameter balance.17" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.86" steps="986"/></proof>
   </goal>
-  <goal name="WP_parameter balance.18" expl="18. precondition">
+  <goal name="WP_parameter balance.18" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter balance.19" expl="19. unreachable point">
+  <goal name="WP_parameter balance.19" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter balance.20" expl="20. precondition">
+  <goal name="WP_parameter balance.20" expl="precondition">
   <proof prover="1"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter balance.21" expl="21. precondition">
+  <goal name="WP_parameter balance.21" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter balance.22" expl="22. precondition">
+  <goal name="WP_parameter balance.22" expl="precondition">
   <proof prover="1"><result status="valid" time="0.05" steps="84"/></proof>
   </goal>
-  <goal name="WP_parameter balance.23" expl="23. precondition">
+  <goal name="WP_parameter balance.23" expl="precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="128"/></proof>
   </goal>
-  <goal name="WP_parameter balance.24" expl="24. postcondition">
+  <goal name="WP_parameter balance.24" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
-  <goal name="WP_parameter balance.25" expl="25. postcondition">
+  <goal name="WP_parameter balance.25" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.14" steps="195"/></proof>
   </goal>
-  <goal name="WP_parameter balance.26" expl="26. precondition">
+  <goal name="WP_parameter balance.26" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter balance.27" expl="27. unreachable point">
+  <goal name="WP_parameter balance.27" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.03" steps="108"/></proof>
   </goal>
-  <goal name="WP_parameter balance.28" expl="28. precondition">
+  <goal name="WP_parameter balance.28" expl="precondition">
   <proof prover="1"><result status="valid" time="0.18" steps="342"/></proof>
   </goal>
-  <goal name="WP_parameter balance.29" expl="29. precondition">
+  <goal name="WP_parameter balance.29" expl="precondition">
   <proof prover="1"><result status="valid" time="0.35" steps="495"/></proof>
   </goal>
-  <goal name="WP_parameter balance.30" expl="30. precondition">
-  <proof prover="1"><result status="valid" time="0.53" steps="877"/></proof>
+  <goal name="WP_parameter balance.30" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.53" steps="798"/></proof>
   </goal>
-  <goal name="WP_parameter balance.31" expl="31. postcondition">
-  <proof prover="1"><result status="valid" time="0.18" steps="336"/></proof>
+  <goal name="WP_parameter balance.31" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.16" steps="336"/></proof>
   </goal>
-  <goal name="WP_parameter balance.32" expl="32. postcondition">
-  <proof prover="1"><result status="valid" time="0.86" steps="979"/></proof>
+  <goal name="WP_parameter balance.32" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.70" steps="979"/></proof>
   </goal>
-  <goal name="WP_parameter balance.33" expl="33. precondition">
+  <goal name="WP_parameter balance.33" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter balance.34" expl="34. postcondition">
+  <goal name="WP_parameter balance.34" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter balance.35" expl="35. postcondition">
+  <goal name="WP_parameter balance.35" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
  </transf>
@@ -197,152 +197,152 @@
  </goal>
  <goal name="WP_parameter insert" expl="VC for insert">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter insert.1" expl="1. precondition">
+  <goal name="WP_parameter insert.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter insert.2" expl="2. postcondition">
+  <goal name="WP_parameter insert.2" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter insert.3" expl="3. postcondition">
+  <goal name="WP_parameter insert.3" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
-  <goal name="WP_parameter insert.4" expl="4. postcondition">
+  <goal name="WP_parameter insert.4" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter insert.5" expl="5. precondition">
+  <goal name="WP_parameter insert.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter insert.6" expl="6. precondition">
+  <goal name="WP_parameter insert.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter insert.7" expl="7. precondition">
+  <goal name="WP_parameter insert.7" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter insert.8" expl="8. precondition">
+  <goal name="WP_parameter insert.8" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter insert.9" expl="9. variant decrease">
+  <goal name="WP_parameter insert.9" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.04" steps="113"/></proof>
   </goal>
-  <goal name="WP_parameter insert.10" expl="10. precondition">
+  <goal name="WP_parameter insert.10" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter insert.11" expl="11. precondition">
+  <goal name="WP_parameter insert.11" expl="precondition">
   <proof prover="1"><result status="valid" time="0.10" steps="123"/></proof>
   </goal>
-  <goal name="WP_parameter insert.12" expl="12. postcondition">
+  <goal name="WP_parameter insert.12" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03" steps="54"/></proof>
   </goal>
-  <goal name="WP_parameter insert.13" expl="13. postcondition">
-  <proof prover="1"><result status="valid" time="1.90" steps="1031"/></proof>
+  <goal name="WP_parameter insert.13" expl="postcondition">
+  <proof prover="1"><result status="valid" time="2.20" steps="1058"/></proof>
   </goal>
-  <goal name="WP_parameter insert.14" expl="14. postcondition">
+  <goal name="WP_parameter insert.14" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.34" steps="333"/></proof>
   </goal>
-  <goal name="WP_parameter insert.15" expl="15. variant decrease">
+  <goal name="WP_parameter insert.15" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.10" steps="135"/></proof>
   </goal>
-  <goal name="WP_parameter insert.16" expl="16. precondition">
+  <goal name="WP_parameter insert.16" expl="precondition">
   <proof prover="1"><result status="valid" time="0.04" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter insert.17" expl="17. precondition">
+  <goal name="WP_parameter insert.17" expl="precondition">
   <proof prover="1"><result status="valid" time="0.23" steps="140"/></proof>
   </goal>
-  <goal name="WP_parameter insert.18" expl="18. postcondition">
+  <goal name="WP_parameter insert.18" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03" steps="54"/></proof>
   </goal>
-  <goal name="WP_parameter insert.19" expl="19. postcondition">
+  <goal name="WP_parameter insert.19" expl="postcondition">
   <proof prover="1"><result status="valid" time="1.90" steps="983"/></proof>
   </goal>
-  <goal name="WP_parameter insert.20" expl="20. postcondition">
+  <goal name="WP_parameter insert.20" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.40" steps="339"/></proof>
   </goal>
-  <goal name="WP_parameter insert.21" expl="21. precondition">
+  <goal name="WP_parameter insert.21" expl="precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="85"/></proof>
   </goal>
-  <goal name="WP_parameter insert.22" expl="22. postcondition">
+  <goal name="WP_parameter insert.22" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter insert.23" expl="23. postcondition">
+  <goal name="WP_parameter insert.23" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.08" steps="119"/></proof>
   </goal>
-  <goal name="WP_parameter insert.24" expl="24. postcondition">
+  <goal name="WP_parameter insert.24" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.16" steps="154"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter remove" expl="VC for remove">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter remove.1" expl="1. precondition">
+  <goal name="WP_parameter remove.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter remove.2" expl="2. postcondition">
+  <goal name="WP_parameter remove.2" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter remove.3" expl="3. postcondition">
+  <goal name="WP_parameter remove.3" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter remove.4" expl="4. postcondition">
+  <goal name="WP_parameter remove.4" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter remove.5" expl="5. precondition">
+  <goal name="WP_parameter remove.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter remove.6" expl="6. precondition">
+  <goal name="WP_parameter remove.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter remove.7" expl="7. precondition">
+  <goal name="WP_parameter remove.7" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter remove.8" expl="8. precondition">
+  <goal name="WP_parameter remove.8" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter remove.9" expl="9. variant decrease">
+  <goal name="WP_parameter remove.9" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.05" steps="113"/></proof>
   </goal>
-  <goal name="WP_parameter remove.10" expl="10. precondition">
+  <goal name="WP_parameter remove.10" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter remove.11" expl="11. precondition">
+  <goal name="WP_parameter remove.11" expl="precondition">
   <proof prover="1"><result status="valid" time="0.10" steps="123"/></proof>
   </goal>
-  <goal name="WP_parameter remove.12" expl="12. postcondition">
+  <goal name="WP_parameter remove.12" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter remove.13" expl="13. postcondition">
+  <goal name="WP_parameter remove.13" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.69" steps="545"/></proof>
   </goal>
-  <goal name="WP_parameter remove.14" expl="14. postcondition">
+  <goal name="WP_parameter remove.14" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.32" steps="331"/></proof>
   </goal>
-  <goal name="WP_parameter remove.15" expl="15. variant decrease">
+  <goal name="WP_parameter remove.15" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.11" steps="135"/></proof>
   </goal>
-  <goal name="WP_parameter remove.16" expl="16. precondition">
+  <goal name="WP_parameter remove.16" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter remove.17" expl="17. precondition">
+  <goal name="WP_parameter remove.17" expl="precondition">
   <proof prover="1"><result status="valid" time="0.22" steps="140"/></proof>
   </goal>
-  <goal name="WP_parameter remove.18" expl="18. postcondition">
+  <goal name="WP_parameter remove.18" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter remove.19" expl="19. postcondition">
+  <goal name="WP_parameter remove.19" expl="postcondition">
   <proof prover="1"><result status="valid" time="1.72" steps="807"/></proof>
   </goal>
-  <goal name="WP_parameter remove.20" expl="20. postcondition">
+  <goal name="WP_parameter remove.20" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.37" steps="329"/></proof>
   </goal>
-  <goal name="WP_parameter remove.21" expl="21. precondition">
+  <goal name="WP_parameter remove.21" expl="precondition">
   <proof prover="1"><result status="valid" time="0.08" steps="85"/></proof>
   </goal>
-  <goal name="WP_parameter remove.22" expl="22. postcondition">
+  <goal name="WP_parameter remove.22" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter remove.23" expl="23. postcondition">
+  <goal name="WP_parameter remove.23" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.08" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter remove.24" expl="24. postcondition">
+  <goal name="WP_parameter remove.24" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.10" steps="161"/></proof>
   </goal>
  </transf>
@@ -352,64 +352,64 @@
  </goal>
  <goal name="WP_parameter extract" expl="VC for extract">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter extract.1" expl="1. precondition">
+  <goal name="WP_parameter extract.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter extract.2" expl="2. postcondition">
+  <goal name="WP_parameter extract.2" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter extract.3" expl="3. postcondition">
+  <goal name="WP_parameter extract.3" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter extract.4" expl="4. precondition">
+  <goal name="WP_parameter extract.4" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter extract.5" expl="5. precondition">
+  <goal name="WP_parameter extract.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter extract.6" expl="6. precondition">
+  <goal name="WP_parameter extract.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter extract.7" expl="7. precondition">
+  <goal name="WP_parameter extract.7" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter extract.8" expl="8. variant decrease">
+  <goal name="WP_parameter extract.8" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.05" steps="113"/></proof>
   </goal>
-  <goal name="WP_parameter extract.9" expl="9. precondition">
+  <goal name="WP_parameter extract.9" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter extract.10" expl="10. precondition">
+  <goal name="WP_parameter extract.10" expl="precondition">
   <proof prover="1"><result status="valid" time="0.10" steps="137"/></proof>
   </goal>
-  <goal name="WP_parameter extract.11" expl="11. postcondition">
+  <goal name="WP_parameter extract.11" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.36" steps="439"/></proof>
   </goal>
-  <goal name="WP_parameter extract.12" expl="12. postcondition">
+  <goal name="WP_parameter extract.12" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.54" steps="446"/></proof>
   </goal>
-  <goal name="WP_parameter extract.13" expl="13. variant decrease">
+  <goal name="WP_parameter extract.13" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.11" steps="135"/></proof>
   </goal>
-  <goal name="WP_parameter extract.14" expl="14. precondition">
+  <goal name="WP_parameter extract.14" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter extract.15" expl="15. precondition">
+  <goal name="WP_parameter extract.15" expl="precondition">
   <proof prover="1"><result status="valid" time="0.19" steps="164"/></proof>
   </goal>
-  <goal name="WP_parameter extract.16" expl="16. postcondition">
+  <goal name="WP_parameter extract.16" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.54" steps="714"/></proof>
   </goal>
-  <goal name="WP_parameter extract.17" expl="17. postcondition">
+  <goal name="WP_parameter extract.17" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.54" steps="525"/></proof>
   </goal>
-  <goal name="WP_parameter extract.18" expl="18. precondition">
+  <goal name="WP_parameter extract.18" expl="precondition">
   <proof prover="1"><result status="valid" time="0.05" steps="85"/></proof>
   </goal>
-  <goal name="WP_parameter extract.19" expl="19. postcondition">
+  <goal name="WP_parameter extract.19" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.05" steps="107"/></proof>
   </goal>
-  <goal name="WP_parameter extract.20" expl="20. postcondition">
+  <goal name="WP_parameter extract.20" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.12" steps="163"/></proof>
   </goal>
  </transf>

@@ -578,7 +578,8 @@ let mk_proof_node ~version (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   let tables = Args_wrapper.build_name_tables t in
   let sum = Some (Termcode.task_checksum ~version t) in
-  let shape = Termcode.t_shape_task ~version t in
+  let _,expl,_ = Termcode.goal_expl_task ~root:false (* FIXME ! *) t in
+  let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
              proofn_task = t;
              proofn_table = Some tables;
@@ -1090,7 +1091,9 @@ let load_session (dir : string) =
     (* If the xml is present we read it, otherwise we consider it empty *)
     if Sys.file_exists file then
       try
+(*
         Termcode.reset_dict ();
+*)
         let xml,use_shapes =
           read_file_session_and_shapes dir file in
         try
@@ -1635,7 +1638,9 @@ let save fname shfname session =
   fprintf fmt "<!DOCTYPE why3session PUBLIC \"-//Why3//proof session v5//EN\"@ \"http://why3.lri.fr/why3session.dtd\">@\n";
   fprintf fmt "@[<v 0><why3session shape_version=\"%d\">"
     session.session_shape_version;
+(*
   Termcode.reset_dict ();
+*)
   let prover_ids = session.session_prover_ids in
   let provers =
     PHprover.fold (get_prover_to_save prover_ids)

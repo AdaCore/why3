@@ -7,7 +7,7 @@
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <file name="../vstte10_search_list.mlw" expanded="true">
-<theory name="SearchingALinkedList" sum="d01fee945a0531c45bdbebfe60b3a805" expanded="true">
+<theory name="SearchingALinkedList" sum="4dd8be00c116bbba028072d4bc7f71c8" expanded="true">
  <goal name="WP_parameter search" expl="VC for search">
  <proof prover="5"><result status="valid" time="0.07" steps="367"/></proof>
  </goal>
@@ -28,49 +28,49 @@
  </goal>
  <goal name="WP_parameter search_loop" expl="VC for search_loop">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter search_loop.1" expl="1. loop invariant init">
+  <goal name="WP_parameter search_loop.1" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.2" expl="2. precondition">
+  <goal name="WP_parameter search_loop.2" expl="precondition">
   <proof prover="1" timelimit="20"><result status="valid" time="0.01"/></proof>
   <proof prover="5" timelimit="5"><result status="valid" time="0.01" steps="3"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.3" expl="3. precondition">
+  <goal name="WP_parameter search_loop.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.4" expl="4. loop invariant preservation">
+  <goal name="WP_parameter search_loop.4" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter search_loop.4.1" expl="1. VC for search_loop">
+   <goal name="WP_parameter search_loop.4.1" expl="VC for search_loop">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.01" steps="10"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.2" expl="2. VC for search_loop">
+   <goal name="WP_parameter search_loop.4.2" expl="VC for search_loop">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    <proof prover="5"><result status="valid" time="0.02" steps="17"/></proof>
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.3" expl="3. VC for search_loop">
+   <goal name="WP_parameter search_loop.4.3" expl="VC for search_loop">
    <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"><result status="valid" time="0.36"/></proof>
    </goal>
-   <goal name="WP_parameter search_loop.4.4" expl="4. VC for search_loop">
+   <goal name="WP_parameter search_loop.4.4" expl="VC for search_loop">
    <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_4.v"><result status="valid" time="0.55"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter search_loop.5" expl="5. loop variant decrease">
+  <goal name="WP_parameter search_loop.5" expl="loop variant decrease">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.6" expl="6. postcondition">
+  <goal name="WP_parameter search_loop.6" expl="postcondition">
   <proof prover="0" edited="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_1.v"><result status="valid" time="0.44"/></proof>
   </goal>
-  <goal name="WP_parameter search_loop.7" expl="7. postcondition">
+  <goal name="WP_parameter search_loop.7" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="34"/></proof>
   <proof prover="6"><result status="valid" time="0.02"/></proof>

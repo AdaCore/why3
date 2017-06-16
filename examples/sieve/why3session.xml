@@ -8,147 +8,147 @@
 <prover id="4" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../sieve.mlw" expanded="true">
-<theory name="Sieve" sum="a3fc383ce2ea2023cf0da48f1f4c958a" expanded="true">
+<theory name="Sieve" sum="c8eb4b09de225fbf54f20389d4c03f34" expanded="true">
  <goal name="WP_parameter incr" expl="VC for incr">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter sieve" expl="VC for sieve" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter sieve.1" expl="1. array creation size">
+  <goal name="WP_parameter sieve.1" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.2" expl="2. index in array bounds">
+  <goal name="WP_parameter sieve.2" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.3" expl="3. index in array bounds">
+  <goal name="WP_parameter sieve.3" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.4" expl="4. loop invariant init">
+  <goal name="WP_parameter sieve.4" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.5" expl="5. loop invariant init">
+  <goal name="WP_parameter sieve.5" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.6" expl="6. type invariant">
+  <goal name="WP_parameter sieve.6" expl="type invariant">
   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.7" expl="7. index in array bounds">
+  <goal name="WP_parameter sieve.7" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.8" expl="8. loop invariant init">
+  <goal name="WP_parameter sieve.8" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.9" expl="9. loop invariant init">
+  <goal name="WP_parameter sieve.9" expl="loop invariant init">
   <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.10" expl="10. type invariant">
+  <goal name="WP_parameter sieve.10" expl="type invariant">
   <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.11" expl="11. index in array bounds">
+  <goal name="WP_parameter sieve.11" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.12" expl="12. loop invariant preservation">
+  <goal name="WP_parameter sieve.12" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sieve.12.1" expl="1. VC for sieve">
+   <goal name="WP_parameter sieve.12.1" expl="VC for sieve">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.12.2" expl="2. VC for sieve">
+   <goal name="WP_parameter sieve.12.2" expl="VC for sieve">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.12.3" expl="3. VC for sieve">
+   <goal name="WP_parameter sieve.12.3" expl="VC for sieve">
    <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sieve.13" expl="13. loop invariant preservation">
+  <goal name="WP_parameter sieve.13" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.37" steps="92"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.14" expl="14. loop variant decrease">
+  <goal name="WP_parameter sieve.14" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.15" expl="15. assertion">
+  <goal name="WP_parameter sieve.15" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sieve.15.1" expl="1. assertion">
-   <proof prover="0"><result status="valid" time="0.52" steps="83"/></proof>
+   <goal name="WP_parameter sieve.15.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.68" steps="83"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.15.2" expl="2. assertion">
+   <goal name="WP_parameter sieve.15.2" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.15.3" expl="3. assertion">
+   <goal name="WP_parameter sieve.15.3" expl="assertion">
    <proof prover="0"><result status="valid" time="0.84" steps="83"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.15.4" expl="4. assertion">
+   <goal name="WP_parameter sieve.15.4" expl="assertion">
    <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.15.5" expl="5. assertion">
+   <goal name="WP_parameter sieve.15.5" expl="assertion">
    <proof prover="0"><result status="valid" time="0.05" steps="65"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sieve.16" expl="16. loop invariant preservation">
+  <goal name="WP_parameter sieve.16" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.17" expl="17. loop invariant preservation">
+  <goal name="WP_parameter sieve.17" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sieve.17.1" expl="1. loop invariant preservation">
+   <goal name="WP_parameter sieve.17.1" expl="loop invariant preservation">
    <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.17.2" expl="2. loop invariant preservation">
+   <goal name="WP_parameter sieve.17.2" expl="loop invariant preservation">
    <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sieve.18" expl="18. loop variant decrease">
+  <goal name="WP_parameter sieve.18" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.19" expl="19. assertion">
+  <goal name="WP_parameter sieve.19" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sieve.19.1" expl="1. assertion">
+   <goal name="WP_parameter sieve.19.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.19.2" expl="2. assertion">
+   <goal name="WP_parameter sieve.19.2" expl="assertion">
    <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.19.3" expl="3. assertion">
+   <goal name="WP_parameter sieve.19.3" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.19.4" expl="4. assertion">
+   <goal name="WP_parameter sieve.19.4" expl="assertion">
    <proof prover="0"><result status="valid" time="0.14" steps="74"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.19.5" expl="5. assertion">
+   <goal name="WP_parameter sieve.19.5" expl="assertion">
    <proof prover="0"><result status="valid" time="0.06" steps="3"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.19.6" expl="6. assertion">
+   <goal name="WP_parameter sieve.19.6" expl="assertion">
    <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sieve.20" expl="20. loop invariant preservation">
+  <goal name="WP_parameter sieve.20" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.21" expl="21. loop invariant preservation">
+  <goal name="WP_parameter sieve.21" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.22" expl="22. loop variant decrease">
+  <goal name="WP_parameter sieve.22" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.23" expl="23. assertion">
+  <goal name="WP_parameter sieve.23" expl="assertion">
   <proof prover="1"><result status="valid" time="0.68"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.24" expl="24. assertion">
+  <goal name="WP_parameter sieve.24" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter sieve.24.1" expl="1. assertion">
+   <goal name="WP_parameter sieve.24.1" expl="assertion">
    <proof prover="5"><result status="valid" time="0.08"/></proof>
    </goal>
-   <goal name="WP_parameter sieve.24.2" expl="2. assertion">
+   <goal name="WP_parameter sieve.24.2" expl="assertion">
    <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter sieve.25" expl="25. type invariant">
+  <goal name="WP_parameter sieve.25" expl="type invariant">
   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter sieve.26" expl="26. postcondition">
+  <goal name="WP_parameter sieve.26" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
  </transf>

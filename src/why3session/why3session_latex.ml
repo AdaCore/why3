@@ -51,7 +51,7 @@ let rec transf_depth tr =
 and goal_depth g =
   S.PHstr.fold
     (fun _st tr depth -> max depth (1 + transf_depth tr))
-    g.S.goal_transformations 0
+    (S.goal_transformations g) 0
 
 let theory_depth t =
   List.fold_left (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
@@ -190,10 +190,10 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 	  if depth > 0 then fprintf fmt " & "
       end;
     if (depth <= 1) then
-      fprintf fmt "\\explanation{%s} " (protect (S.goal_expl g))
+      fprintf fmt "\\explanation{%s} " (protect (S.goal_user_name g))
     else
       fprintf fmt " " ;
-    let proofs = g.S.goal_external_proofs in
+    let proofs = S.goal_external_proofs g in
       if (S.PHprover.length proofs) > 0 then
 	begin
 	  if depth_max <= 1 then
@@ -214,7 +214,7 @@ let rec goal_latex_stat fmt prov depth depth_max subgoal g =
 		fprintf fmt "& " done;
 	  print_result_prov proofs prov fmt;
 	end;
-      let tr = g.S.goal_transformations in
+      let tr = S.goal_transformations g in
 	if S.PHstr.length tr > 0 then
 	  if S.PHprover.length proofs > 0 then
 	    fprintf fmt "\\cline{%d-%d}@." (depth + 2) column;
@@ -240,20 +240,20 @@ let style_2_row fmt ?(transf=false) depth prov subgoal expl=
     fprintf fmt "\\subgoal{%s}{%d} " expl (subgoal + 1)
 
 let rec goal_latex2_stat fmt prov depth depth_max subgoal g =
-  let proofs = g.S.goal_external_proofs in
+  let proofs = S.goal_external_proofs g in
   if S.PHprover.length proofs > 0 then
     begin
-      style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+      style_2_row fmt depth prov subgoal (protect (S.goal_user_name g));
       print_result_prov proofs prov fmt
     end
  else
     if (*depth = 0*) true then
       begin
-        style_2_row fmt depth prov subgoal (protect (S.goal_expl g));
+        style_2_row fmt depth prov subgoal (protect (S.goal_user_name g));
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
           (List.length prov)
       end;
-  let tr = g.S.goal_transformations in
+  let tr = S.goal_transformations g in
   if S.PHstr.length tr > 0 then
     begin
       S.PHstr.iter (fun _st tr ->
@@ -352,7 +352,7 @@ let standalone_goal_latex_stat n _table dir g =
     provers [] in
   let provers = List.sort Whyconf.Prover.compare provers in
   let depth = goal_depth g in
-  let name = g.S.goal_name.Ident.id_string in
+  let name = (S.goal_name g).Ident.id_string in
   let ch = open_out (Filename.concat dir(name^".tex")) in
   let fmt = formatter_of_out_channel ch in
   latex_tabular_goal n fmt depth provers g;
@@ -405,7 +405,7 @@ let element_latex_stat_theory th n table dir e =
     | g :: r ->
       try
         let goals =
-          List.map (fun g -> (g.S.goal_name.Ident.id_string,g))
+          List.map (fun g -> (S.goal_name g).Ident.id_string,g)
             th.S.theory_goals
         in
         let g = List.assoc g goals in

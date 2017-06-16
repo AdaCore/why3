@@ -4,17 +4,17 @@
 <why3session shape_version="4">
 <prover id="2" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../ral.mlw">
-<theory name="RAL" sum="c7ad4c6b81728dbd18a1c23ee5747ec2">
- <goal name="M.assoc">
+<theory name="RAL" sum="19714b392bd8e5e1cf08fdb09f06643c">
+ <goal name="M.assoc" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="M.neutral">
+ <goal name="M.neutral" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="M.M.assoc">
+ <goal name="M.M.assoc" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="M.M.neutral">
+ <goal name="M.M.neutral" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
  <goal name="M.WP_parameter zero" expl="VC for zero">
@@ -32,22 +32,22 @@
  <goal name="WP_parameter selected_part" expl="VC for selected_part">
  <proof prover="2"><result status="valid" time="0.04" steps="87"/></proof>
  </goal>
- <goal name="Sel.M.assoc">
+ <goal name="Sel.M.assoc" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Sel.M.neutral">
+ <goal name="Sel.M.neutral" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Sel.M.sum_def_nil">
+ <goal name="Sel.M.sum_def_nil" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Sel.M.sum_def_cons">
+ <goal name="Sel.M.sum_def_cons" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="Sel.balancing_positive">
+ <goal name="Sel.balancing_positive" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.02" steps="1"/></proof>
  </goal>
- <goal name="Sel.selection_empty">
+ <goal name="Sel.selection_empty" expl="">
  <proof prover="2" timelimit="3"><result status="valid" time="0.04" steps="16"/></proof>
  </goal>
  <goal name="Sel.WP_parameter avl  AVL  M zero" expl="VC for avl  AVL  M zero">
@@ -97,16 +97,16 @@
  </goal>
  <goal name="WP_parameter set" expl="VC for set">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter set.1" expl="1. precondition">
+  <goal name="WP_parameter set.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter set.2" expl="2. postcondition">
+  <goal name="WP_parameter set.2" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.12" steps="80"/></proof>
   </goal>
-  <goal name="WP_parameter set.3" expl="3. postcondition">
+  <goal name="WP_parameter set.3" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.34" steps="534"/></proof>
   </goal>
-  <goal name="WP_parameter set.4" expl="4. postcondition">
+  <goal name="WP_parameter set.4" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.04" steps="43"/></proof>
   </goal>
  </transf>
@@ -128,59 +128,59 @@
  </goal>
  <goal name="WP_parameter harness" expl="VC for harness">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter harness.1" expl="1. precondition">
+  <goal name="WP_parameter harness.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter harness.2" expl="2. precondition">
+  <goal name="WP_parameter harness.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter harness.3" expl="3. precondition">
+  <goal name="WP_parameter harness.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter harness.4" expl="4. precondition">
+  <goal name="WP_parameter harness.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter harness.5" expl="5. check">
+  <goal name="WP_parameter harness.5" expl="check">
   <proof prover="2"><result status="valid" time="0.07" steps="133"/></proof>
   </goal>
-  <goal name="WP_parameter harness.6" expl="6. check">
+  <goal name="WP_parameter harness.6" expl="check">
   <proof prover="2"><result status="valid" time="0.07" steps="131"/></proof>
   </goal>
-  <goal name="WP_parameter harness.7" expl="7. precondition">
+  <goal name="WP_parameter harness.7" expl="precondition">
   <proof prover="2"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter harness.8" expl="8. precondition">
+  <goal name="WP_parameter harness.8" expl="precondition">
   <proof prover="2"><result status="valid" time="0.03" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter harness.9" expl="9. check">
+  <goal name="WP_parameter harness.9" expl="check">
   <proof prover="2"><result status="valid" time="0.04" steps="169"/></proof>
   </goal>
-  <goal name="WP_parameter harness.10" expl="10. check">
+  <goal name="WP_parameter harness.10" expl="check">
   <proof prover="2"><result status="valid" time="0.06" steps="199"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter harness2" expl="VC for harness2">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter harness2.1" expl="1. precondition">
+  <goal name="WP_parameter harness2.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.2" expl="2. precondition">
+  <goal name="WP_parameter harness2.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.3" expl="3. precondition">
+  <goal name="WP_parameter harness2.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.4" expl="4. unreachable point">
+  <goal name="WP_parameter harness2.4" expl="unreachable point">
   <proof prover="2"><result status="valid" time="0.04" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.5" expl="5. check">
+  <goal name="WP_parameter harness2.5" expl="check">
   <proof prover="2"><result status="valid" time="0.05" steps="59"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.6" expl="6. precondition">
+  <goal name="WP_parameter harness2.6" expl="precondition">
   <proof prover="2"><result status="valid" time="0.05" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter harness2.7" expl="7. check">
+  <goal name="WP_parameter harness2.7" expl="check">
   <proof prover="2"><result status="valid" time="0.16" steps="108"/></proof>
   </goal>
  </transf>

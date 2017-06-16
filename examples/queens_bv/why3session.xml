@@ -12,18 +12,18 @@
 <file name="../queens_bv.mlw" expanded="true">
 <theory name="S" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Solution" sum="2e973f69aee4c2a67dde9c425f0bf46c">
- <goal name="partial_solution_eq_prefix">
+<theory name="Solution" sum="38908f3094a225b166c79d4eb99410d9">
+ <goal name="partial_solution_eq_prefix" expl="">
  <proof prover="0"><result status="valid" time="0.03" steps="44"/></proof>
  </goal>
- <goal name="no_duplicate">
+ <goal name="no_duplicate" expl="">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  <proof prover="3"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>
 <theory name="BitsSpec" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
-<theory name="Bits" sum="517eef28011295e9c71fcbfc0783f152" expanded="true">
+<theory name="Bits" sum="c7eb0274e6ab92c1b6f4ede6f845cc8d" expanded="true">
  <goal name="WP_parameter empty" expl="VC for empty">
  <proof prover="0"><result status="valid" time="0.03" steps="80"/></proof>
  </goal>
@@ -38,18 +38,18 @@
  </goal>
  <goal name="WP_parameter mul2" expl="VC for mul2" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter mul2.1" expl="1. type invariant" expanded="true">
+  <goal name="WP_parameter mul2.1" expl="type invariant" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter mul2.1.1" expl="1. type invariant">
+   <goal name="WP_parameter mul2.1.1" expl="type invariant">
    <proof prover="0"><result status="valid" time="0.20" steps="196"/></proof>
    </goal>
-   <goal name="WP_parameter mul2.1.2" expl="2. type invariant">
+   <goal name="WP_parameter mul2.1.2" expl="type invariant">
    <proof prover="3"><result status="valid" time="0.07"/></proof>
    </goal>
-   <goal name="WP_parameter mul2.1.3" expl="3. type invariant">
+   <goal name="WP_parameter mul2.1.3" expl="type invariant">
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="WP_parameter mul2.1.4" expl="4. type invariant" expanded="true">
+   <goal name="WP_parameter mul2.1.4" expl="type invariant" expanded="true">
    <proof prover="4"><result status="valid" time="0.48" steps="537"/></proof>
    <proof prover="6"><result status="valid" time="0.14"/></proof>
    </goal>
@@ -65,41 +65,41 @@
  </goal>
  <goal name="WP_parameter rightmost_bit_trick" expl="VC for rightmost_bit_trick">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter rightmost_bit_trick.1" expl="1. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.1" expl="assertion">
   <proof prover="6"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.2" expl="2. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.2" expl="assertion">
   <proof prover="0"><result status="valid" time="0.16" steps="168"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.3" expl="3. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.3" expl="assertion">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.4" expl="4. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.4" expl="assertion">
   <proof prover="0"><result status="valid" time="0.16" steps="174"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.5" expl="5. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.5" expl="assertion">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.6" expl="6. assertion">
+  <goal name="WP_parameter rightmost_bit_trick.6" expl="assertion">
   <proof prover="0"><result status="valid" time="0.56" steps="343"/></proof>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.7" expl="7. type invariant">
+  <goal name="WP_parameter rightmost_bit_trick.7" expl="type invariant">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter rightmost_bit_trick.7.1" expl="1. type invariant">
+   <goal name="WP_parameter rightmost_bit_trick.7.1" expl="type invariant">
    <proof prover="0"><result status="valid" time="0.11" steps="171"/></proof>
    </goal>
-   <goal name="WP_parameter rightmost_bit_trick.7.2" expl="2. type invariant">
+   <goal name="WP_parameter rightmost_bit_trick.7.2" expl="type invariant">
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter rightmost_bit_trick.7.3" expl="3. type invariant">
+   <goal name="WP_parameter rightmost_bit_trick.7.3" expl="type invariant">
    <proof prover="3"><result status="valid" time="0.12"/></proof>
    </goal>
-   <goal name="WP_parameter rightmost_bit_trick.7.4" expl="4. type invariant">
+   <goal name="WP_parameter rightmost_bit_trick.7.4" expl="type invariant">
    <proof prover="0"><result status="valid" time="0.52" steps="561"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter rightmost_bit_trick.8" expl="8. postcondition">
+  <goal name="WP_parameter rightmost_bit_trick.8" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
@@ -108,297 +108,297 @@
  <proof prover="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="NQueensBits" sum="34708829662773747304331545b33f94" expanded="true">
+<theory name="NQueensBits" sum="2be670165d9d6896c34e43ee7d9c2b66" expanded="true">
  <goal name="WP_parameter t" expl="VC for t" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter t.1" expl="1. assertion">
+  <goal name="WP_parameter t.1" expl="assertion">
   <proof prover="2"><result status="valid" time="0.93" steps="679"/></proof>
   <proof prover="5"><result status="valid" time="0.32" steps="344"/></proof>
   </goal>
-  <goal name="WP_parameter t.2" expl="2. loop invariant init">
+  <goal name="WP_parameter t.2" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter t.3" expl="3. loop invariant init">
+  <goal name="WP_parameter t.3" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter t.4" expl="4. loop invariant init">
+  <goal name="WP_parameter t.4" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter t.5" expl="5. loop invariant init">
+  <goal name="WP_parameter t.5" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter t.6" expl="6. loop invariant init">
+  <goal name="WP_parameter t.6" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter t.7" expl="7. loop invariant init">
+  <goal name="WP_parameter t.7" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter t.8" expl="8. loop invariant init">
+  <goal name="WP_parameter t.8" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter t.9" expl="9. loop invariant init">
+  <goal name="WP_parameter t.9" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter t.10" expl="10. loop invariant init">
+  <goal name="WP_parameter t.10" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter t.11" expl="11. loop invariant init">
+  <goal name="WP_parameter t.11" expl="loop invariant init">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter t.12" expl="12. type invariant">
+  <goal name="WP_parameter t.12" expl="type invariant">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter t.13" expl="13. type invariant">
+  <goal name="WP_parameter t.13" expl="type invariant">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.14" expl="14. precondition">
+  <goal name="WP_parameter t.14" expl="precondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter t.15" expl="15. assertion">
+  <goal name="WP_parameter t.15" expl="assertion">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter t.16" expl="16. assertion">
+  <goal name="WP_parameter t.16" expl="assertion">
   <proof prover="3"><result status="valid" time="0.45"/></proof>
   </goal>
-  <goal name="WP_parameter t.17" expl="17. assertion">
+  <goal name="WP_parameter t.17" expl="assertion">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter t.18" expl="18. assertion">
+  <goal name="WP_parameter t.18" expl="assertion">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="WP_parameter t.19" expl="19. assertion">
+  <goal name="WP_parameter t.19" expl="assertion">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter t.20" expl="20. assertion">
+  <goal name="WP_parameter t.20" expl="assertion">
   <proof prover="3"><result status="valid" time="0.70"/></proof>
   </goal>
-  <goal name="WP_parameter t.21" expl="21. precondition">
+  <goal name="WP_parameter t.21" expl="precondition">
   <proof prover="3"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter t.22" expl="22. assertion">
+  <goal name="WP_parameter t.22" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t.22.1" expl="1. assertion">
+   <goal name="WP_parameter t.22.1" expl="assertion">
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
-   <goal name="WP_parameter t.22.2" expl="2. assertion">
+   <goal name="WP_parameter t.22.2" expl="assertion">
    <proof prover="3"><result status="valid" time="5.80"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t.23" expl="23. precondition">
+  <goal name="WP_parameter t.23" expl="precondition">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter t.24" expl="24. assertion">
+  <goal name="WP_parameter t.24" expl="assertion">
   <proof prover="3"><result status="valid" time="1.46"/></proof>
   </goal>
-  <goal name="WP_parameter t.25" expl="25. precondition">
+  <goal name="WP_parameter t.25" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.26" expl="26. precondition">
+  <goal name="WP_parameter t.26" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.27" expl="27. precondition">
+  <goal name="WP_parameter t.27" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.28" expl="28. precondition">
+  <goal name="WP_parameter t.28" expl="precondition">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter t.29" expl="29. variant decrease">
+  <goal name="WP_parameter t.29" expl="variant decrease">
   <proof prover="3"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter t.30" expl="30. precondition">
+  <goal name="WP_parameter t.30" expl="precondition">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter t.31" expl="31. precondition">
+  <goal name="WP_parameter t.31" expl="precondition">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter t.32" expl="32. precondition">
+  <goal name="WP_parameter t.32" expl="precondition">
   <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="WP_parameter t.33" expl="33. precondition">
+  <goal name="WP_parameter t.33" expl="precondition">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter t.34" expl="34. precondition">
+  <goal name="WP_parameter t.34" expl="precondition">
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
-  <goal name="WP_parameter t.35" expl="35. precondition">
+  <goal name="WP_parameter t.35" expl="precondition">
   <proof prover="3"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter t.36" expl="36. precondition">
+  <goal name="WP_parameter t.36" expl="precondition">
   <proof prover="3"><result status="valid" time="0.34"/></proof>
   </goal>
-  <goal name="WP_parameter t.37" expl="37. precondition">
+  <goal name="WP_parameter t.37" expl="precondition">
   <proof prover="3"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter t.38" expl="38. assertion">
+  <goal name="WP_parameter t.38" expl="assertion">
   <proof prover="3"><result status="valid" time="0.84"/></proof>
   </goal>
-  <goal name="WP_parameter t.39" expl="39. type invariant">
+  <goal name="WP_parameter t.39" expl="type invariant">
   <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="WP_parameter t.40" expl="40. precondition">
+  <goal name="WP_parameter t.40" expl="precondition">
   <proof prover="3"><result status="valid" time="0.15"/></proof>
   </goal>
-  <goal name="WP_parameter t.41" expl="41. precondition">
+  <goal name="WP_parameter t.41" expl="precondition">
   <proof prover="3"><result status="valid" time="0.21"/></proof>
   </goal>
-  <goal name="WP_parameter t.42" expl="42. loop invariant preservation">
+  <goal name="WP_parameter t.42" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.17"/></proof>
   </goal>
-  <goal name="WP_parameter t.43" expl="43. loop invariant preservation">
+  <goal name="WP_parameter t.43" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.15"/></proof>
   </goal>
-  <goal name="WP_parameter t.44" expl="44. loop invariant preservation">
+  <goal name="WP_parameter t.44" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.45" expl="45. loop invariant preservation">
+  <goal name="WP_parameter t.45" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.16"/></proof>
   </goal>
-  <goal name="WP_parameter t.46" expl="46. loop invariant preservation">
+  <goal name="WP_parameter t.46" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.15"/></proof>
   </goal>
-  <goal name="WP_parameter t.47" expl="47. loop invariant preservation">
+  <goal name="WP_parameter t.47" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.20"/></proof>
   </goal>
-  <goal name="WP_parameter t.48" expl="48. loop invariant preservation">
+  <goal name="WP_parameter t.48" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t.48.1" expl="1. loop invariant preservation">
+   <goal name="WP_parameter t.48.1" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.15"/></proof>
    </goal>
-   <goal name="WP_parameter t.48.2" expl="2. loop invariant preservation">
+   <goal name="WP_parameter t.48.2" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="2.64"/></proof>
    </goal>
-   <goal name="WP_parameter t.48.3" expl="3. loop invariant preservation">
+   <goal name="WP_parameter t.48.3" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.29"/></proof>
    </goal>
-   <goal name="WP_parameter t.48.4" expl="4. loop invariant preservation">
+   <goal name="WP_parameter t.48.4" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.79"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t.49" expl="49. loop invariant preservation">
+  <goal name="WP_parameter t.49" expl="loop invariant preservation">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t.49.1" expl="1. loop invariant preservation">
+   <goal name="WP_parameter t.49.1" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.44"/></proof>
    </goal>
-   <goal name="WP_parameter t.49.2" expl="2. loop invariant preservation">
+   <goal name="WP_parameter t.49.2" expl="loop invariant preservation">
    <proof prover="3"><result status="valid" time="0.11"/></proof>
    </goal>
-   <goal name="WP_parameter t.49.3" expl="3. loop invariant preservation">
+   <goal name="WP_parameter t.49.3" expl="loop invariant preservation">
    <proof prover="3" timelimit="60"><result status="valid" time="32.21"/></proof>
    <proof prover="6" timelimit="60"><result status="valid" time="6.44"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t.50" expl="50. loop invariant preservation">
+  <goal name="WP_parameter t.50" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter t.51" expl="51. loop invariant preservation">
+  <goal name="WP_parameter t.51" expl="loop invariant preservation">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter t.52" expl="52. loop variant decrease">
+  <goal name="WP_parameter t.52" expl="loop variant decrease">
   <proof prover="3"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="WP_parameter t.53" expl="53. assertion">
+  <goal name="WP_parameter t.53" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter t.53.1" expl="1. assertion">
+   <goal name="WP_parameter t.53.1" expl="assertion">
    <proof prover="3"><result status="valid" time="0.09"/></proof>
    </goal>
-   <goal name="WP_parameter t.53.2" expl="2. assertion">
+   <goal name="WP_parameter t.53.2" expl="assertion">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter t.53.3" expl="3. assertion">
+   <goal name="WP_parameter t.53.3" expl="assertion">
    <proof prover="3"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter t.54" expl="54. postcondition">
+  <goal name="WP_parameter t.54" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter t.55" expl="55. postcondition">
+  <goal name="WP_parameter t.55" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter t.56" expl="56. postcondition">
+  <goal name="WP_parameter t.56" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter t.57" expl="57. postcondition">
+  <goal name="WP_parameter t.57" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter t.58" expl="58. postcondition">
+  <goal name="WP_parameter t.58" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter t.59" expl="59. postcondition">
+  <goal name="WP_parameter t.59" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter t.60" expl="60. postcondition">
+  <goal name="WP_parameter t.60" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter t.61" expl="61. postcondition">
+  <goal name="WP_parameter t.61" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter t.62" expl="62. postcondition">
+  <goal name="WP_parameter t.62" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.18" steps="101"/></proof>
   </goal>
-  <goal name="WP_parameter t.63" expl="63. postcondition">
+  <goal name="WP_parameter t.63" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.19" steps="137"/></proof>
   </goal>
-  <goal name="WP_parameter t.64" expl="64. postcondition">
+  <goal name="WP_parameter t.64" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter t.65" expl="65. postcondition">
+  <goal name="WP_parameter t.65" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter queens" expl="VC for queens">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter queens.1" expl="1. precondition">
+  <goal name="WP_parameter queens.1" expl="precondition">
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter queens.2" expl="2. precondition">
+  <goal name="WP_parameter queens.2" expl="precondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter queens.3" expl="3. precondition">
+  <goal name="WP_parameter queens.3" expl="precondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter queens.4" expl="4. precondition">
+  <goal name="WP_parameter queens.4" expl="precondition">
   <proof prover="3"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter queens.5" expl="5. precondition">
+  <goal name="WP_parameter queens.5" expl="precondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter queens.6" expl="6. precondition">
+  <goal name="WP_parameter queens.6" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter queens.7" expl="7. precondition">
+  <goal name="WP_parameter queens.7" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter queens.8" expl="8. precondition">
+  <goal name="WP_parameter queens.8" expl="precondition">
   <proof prover="3"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter queens.9" expl="9. precondition">
+  <goal name="WP_parameter queens.9" expl="precondition">
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
-  <goal name="WP_parameter queens.10" expl="10. postcondition">
+  <goal name="WP_parameter queens.10" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter queens.11" expl="11. postcondition">
+  <goal name="WP_parameter queens.11" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="WP_parameter queens.12" expl="12. postcondition">
+  <goal name="WP_parameter queens.12" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.87"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter test8" expl="VC for test8">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter test8.1" expl="1. precondition">
+  <goal name="WP_parameter test8.1" expl="precondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter test8.2" expl="2. precondition">
+  <goal name="WP_parameter test8.2" expl="precondition">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter test8.3" expl="3. precondition">
+  <goal name="WP_parameter test8.3" expl="precondition">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
  </transf>

@@ -11,7 +11,7 @@
 <prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tower_of_hanoi.mlw" expanded="true">
-<theory name="Hanoi" sum="8f70f8350db5205f1c0751c0fc2dc1e4" expanded="true">
+<theory name="Hanoi" sum="18042f60bdb522c5569130b84dfcf168" expanded="true">
  <goal name="WP_parameter move" expl="VC for move">
  <proof prover="5"><result status="valid" time="0.17"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
@@ -20,99 +20,99 @@
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter hanoi_rec.1" expl="1. variant decrease">
+  <goal name="WP_parameter hanoi_rec.1" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.53"/></proof>
   <proof prover="7"><result status="valid" time="0.67"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.21"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.2" expl="2. precondition">
+  <goal name="WP_parameter hanoi_rec.2" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.3" expl="3. precondition">
+  <goal name="WP_parameter hanoi_rec.3" expl="precondition">
   <proof prover="5"><result status="valid" time="0.22"/></proof>
-  <proof prover="7"><result status="valid" time="0.41"/></proof>
+  <proof prover="7"><result status="valid" time="1.05"/></proof>
   <proof prover="8"><result status="valid" time="0.04" steps="26"/></proof>
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.4" expl="4. precondition">
+  <goal name="WP_parameter hanoi_rec.4" expl="precondition">
   <proof prover="5"><result status="valid" time="0.13"/></proof>
   <proof prover="7"><result status="valid" time="1.34"/></proof>
   <proof prover="8"><result status="valid" time="0.10" steps="52"/></proof>
   <proof prover="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.5" expl="5. precondition">
+  <goal name="WP_parameter hanoi_rec.5" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.6" expl="6. precondition">
+  <goal name="WP_parameter hanoi_rec.6" expl="precondition">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.03" steps="45"/></proof>
   <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.7" expl="7. variant decrease">
+  <goal name="WP_parameter hanoi_rec.7" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.55"/></proof>
   <proof prover="7"><result status="valid" time="1.24"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.25"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.8" expl="8. precondition">
+  <goal name="WP_parameter hanoi_rec.8" expl="precondition">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.9" expl="9. precondition">
+  <goal name="WP_parameter hanoi_rec.9" expl="precondition">
   <proof prover="5"><result status="valid" time="1.98"/></proof>
   <proof prover="7"><result status="valid" time="1.00"/></proof>
   <proof prover="8"><result status="valid" time="0.10" steps="58"/></proof>
   <proof prover="10"><result status="valid" time="1.79"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.10" expl="10. precondition">
+  <goal name="WP_parameter hanoi_rec.10" expl="precondition">
   <proof prover="1"><result status="valid" time="0.06"/></proof>
   <proof prover="7"><result status="valid" time="1.14"/></proof>
   <proof prover="10"><result status="valid" time="2.18"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.11" expl="11. postcondition">
+  <goal name="WP_parameter hanoi_rec.11" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.12" expl="12. postcondition">
+  <goal name="WP_parameter hanoi_rec.12" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.08"/></proof>
   <proof prover="8"><result status="valid" time="0.02" steps="24"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.13" expl="13. postcondition">
+  <goal name="WP_parameter hanoi_rec.13" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="23"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.14" expl="14. postcondition">
+  <goal name="WP_parameter hanoi_rec.14" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="12"/></proof>
   <proof prover="9"><result status="valid" time="0.00"/></proof>
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.15" expl="15. postcondition">
+  <goal name="WP_parameter hanoi_rec.15" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="7"/></proof>
@@ -129,8 +129,8 @@
  <proof prover="10"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Tower_of_Hanoi" sum="ce367139615d1043fcc961b0a7a4f035" expanded="true">
- <goal name="RevSorted.Transitive.Trans">
+<theory name="Tower_of_Hanoi" sum="820ff21151b61a7a0f9ac57d313682ea" expanded="true">
+ <goal name="RevSorted.Transitive.Trans" expl="">
  <proof prover="6"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
  <goal name="WP_parameter move" expl="VC for move">
@@ -141,7 +141,7 @@
  </goal>
  <goal name="WP_parameter hanoi_rec" expl="VC for hanoi_rec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter hanoi_rec.1" expl="1. variant decrease">
+  <goal name="WP_parameter hanoi_rec.1" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.67"/></proof>
@@ -150,14 +150,14 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.66"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.2" expl="2. precondition">
+  <goal name="WP_parameter hanoi_rec.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.63"/></proof>
   <proof prover="7"><result status="valid" time="0.43"/></proof>
   <proof prover="8"><result status="valid" time="0.03" steps="162"/></proof>
   <proof prover="10"><result status="valid" time="0.33"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.3" expl="3. precondition">
+  <goal name="WP_parameter hanoi_rec.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="2.63"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
@@ -165,18 +165,18 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.14"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.4" expl="4. precondition">
+  <goal name="WP_parameter hanoi_rec.4" expl="precondition">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
   <proof prover="5"><result status="valid" time="0.22"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   <proof prover="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.5" expl="5. precondition">
+  <goal name="WP_parameter hanoi_rec.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.6" expl="6. precondition">
+  <goal name="WP_parameter hanoi_rec.6" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.05"/></proof>
@@ -185,13 +185,13 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.7" expl="7. precondition">
+  <goal name="WP_parameter hanoi_rec.7" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.16"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.8" expl="8. variant decrease">
+  <goal name="WP_parameter hanoi_rec.8" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="7"><result status="valid" time="2.04"/></proof>
@@ -199,7 +199,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.9" expl="9. precondition">
+  <goal name="WP_parameter hanoi_rec.9" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
@@ -208,7 +208,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.10" expl="10. precondition">
+  <goal name="WP_parameter hanoi_rec.10" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
@@ -217,18 +217,18 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.11" expl="11. precondition">
+  <goal name="WP_parameter hanoi_rec.11" expl="precondition">
   <proof prover="1"><result status="valid" time="0.25"/></proof>
   <proof prover="5"><result status="valid" time="0.20"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.12" expl="12. precondition">
+  <goal name="WP_parameter hanoi_rec.12" expl="precondition">
   <proof prover="1"><result status="valid" time="0.24"/></proof>
   <proof prover="7"><result status="valid" time="1.80"/></proof>
   <proof prover="10"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.13" expl="13. postcondition">
+  <goal name="WP_parameter hanoi_rec.13" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
@@ -237,7 +237,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.14" expl="14. postcondition">
+  <goal name="WP_parameter hanoi_rec.14" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.35"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.75"/></proof>
@@ -245,7 +245,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="32"/></proof>
   <proof prover="10"><result status="valid" time="0.23"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.15" expl="15. postcondition">
+  <goal name="WP_parameter hanoi_rec.15" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.05"/></proof>
@@ -254,20 +254,20 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.16" expl="16. unreachable point">
+  <goal name="WP_parameter hanoi_rec.16" expl="unreachable point">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="15"/></proof>
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.17" expl="17. postcondition">
+  <goal name="WP_parameter hanoi_rec.17" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   <proof prover="8"><result status="valid" time="0.05" steps="90"/></proof>
   <proof prover="9"><result status="valid" time="0.03"/></proof>
   <proof prover="10"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter hanoi_rec.18" expl="18. postcondition">
+  <goal name="WP_parameter hanoi_rec.18" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   <proof prover="8"><result status="valid" time="0.04" steps="97"/></proof>
@@ -278,7 +278,7 @@
  </goal>
  <goal name="WP_parameter tower_of_hanoi" expl="VC for tower_of_hanoi">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter tower_of_hanoi.1" expl="1. precondition">
+  <goal name="WP_parameter tower_of_hanoi.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.05"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
@@ -287,7 +287,7 @@
   <proof prover="9"><result status="valid" time="0.03"/></proof>
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter tower_of_hanoi.2" expl="2. precondition">
+  <goal name="WP_parameter tower_of_hanoi.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.12"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
@@ -296,7 +296,7 @@
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter tower_of_hanoi.3" expl="3. precondition">
+  <goal name="WP_parameter tower_of_hanoi.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
@@ -305,7 +305,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter tower_of_hanoi.4" expl="4. precondition">
+  <goal name="WP_parameter tower_of_hanoi.4" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
@@ -314,7 +314,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter tower_of_hanoi.5" expl="5. postcondition">
+  <goal name="WP_parameter tower_of_hanoi.5" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
@@ -323,7 +323,7 @@
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter tower_of_hanoi.6" expl="6. postcondition">
+  <goal name="WP_parameter tower_of_hanoi.6" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   <proof prover="5"><result status="valid" time="0.03"/></proof>
