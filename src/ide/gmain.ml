@@ -750,7 +750,7 @@ let notify any =
   (* name is set by notify since upgrade policy may update the prover name *)
   goals_model#set ~row:row#iter ~column:name_column
     (match any with
-      | S.Goal g -> S.goal_expl_or_name g
+      | S.Goal g -> S.goal_user_name g
       | S.Theory th -> th.S.theory_name.Ident.id_string
       | S.File f -> Filename.basename f.S.file_name
       | S.Proof_attempt a ->

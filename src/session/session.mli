@@ -318,8 +318,8 @@ val goal_task : 'key goal -> Task.task
 val goal_task_option : 'key goal -> Task.task option
 (** Return the task of a goal. *)
 
-val goal_expl_or_name : 'key goal -> string
-(** Return the explication of a goal, or its name if no explanation *)
+val goal_user_name : 'key goal -> string
+(** Return a user-friendly name for a goal, derived from its name, its number in a sequence of sub-goals, and/or its explanation *)
 
 val proof_verified : 'key proof_attempt -> float option
 (** Return [Some t] if the proof is not obsolete and the result is
