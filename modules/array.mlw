@@ -92,23 +92,23 @@ module Array
       (0 <= i < ofs2 \/ ofs2 + len <= i < length a) -> a[i] = old a[i] }
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a[i] = old a[ofs1 + i - ofs2] }
-  = label Init in
+  =
     if ofs1 <= ofs2 then (* from right to left *)
       for k = len - 1 downto 0 do
         invariant  { forall i:int.
           (0 <= i <= ofs2 + k \/ ofs2 + len <= i < length a) ->
-          a[i] = (a at Init)[i] }
+          a[i] = (old a)[i] }
         invariant  { forall i:int.
-          ofs2 + k < i < ofs2 + len -> a[i] = (a at Init)[ofs1 + i - ofs2] }
+          ofs2 + k < i < ofs2 + len -> a[i] = (old a)[ofs1 + i - ofs2] }
         a[ofs2 + k] <- a[ofs1 + k]
       done
     else (* from left to right *)
       for k = 0 to len - 1 do
         invariant  { forall i:int.
           (0 <= i < ofs2 \/ ofs2 + k <= i < length a) ->
-          a[i] = (a at Init)[i] }
+          a[i] = (old a)[i] }
         invariant  { forall i:int.
-          ofs2 <= i < ofs2 + k -> a[i] = (a at Init)[ofs1 + i - ofs2] }
+          ofs2 <= i < ofs2 + k -> a[i] = (old a)[ofs1 + i - ofs2] }
         a[ofs2 + k] <- a[ofs1 + k]
       done
 

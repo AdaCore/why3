@@ -58,12 +58,11 @@ type dbinder = preid option * ghost * dity
 
 exception UnboundLabel of string
 
-val old_mark    : string
-val old_mark_id : preid
+val old_mark : string
 
 type register_old = pvsymbol -> string -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
-      a registrar function. The label string must be ["0"] for [old]. *)
+      a registrar function. The label string must be ["'Old"] for [old]. *)
 
 type 'a later = pvsymbol Mstr.t -> xsymbol Mstr.t -> register_old -> 'a
   (** Specification terms are parsed and typechecked after the program
@@ -122,6 +121,7 @@ and dexpr_node =
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
+  | DEoptexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEvar_pure of string * dvty

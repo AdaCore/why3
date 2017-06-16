@@ -91,7 +91,7 @@ syn keyword  whyKeyword  let meta
 syn keyword  whyKeyword  not predicate so
 syn keyword  whyKeyword  then type with
 
-syn keyword  whyKeyword  abstract any
+syn keyword  whyKeyword  abstract any break continue
 syn keyword  whyKeyword  exception fun ghost label
 syn keyword  whyKeyword  model mutable private
 syn keyword  whyKeyword  raise rec return val while

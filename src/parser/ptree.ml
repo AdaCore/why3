@@ -145,6 +145,7 @@ and expr_desc =
   | Eidpur of qualid
   | Eraise of qualid * expr option
   | Eexn of ident * pty * Ity.mask * expr
+  | Eoptexn of ident * Ity.mask * expr
   | Etry of expr * bool * (qualid * pattern option * expr) list
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
   (* annotations *)
