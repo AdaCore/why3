@@ -2,7 +2,7 @@ all: why3 extract
 why3:
 	make -C ../../..
 extract: why3
-	why3 extract -D c -D mp.drv -o build/N.c -L . mp2.N
+	why3 extract -D c -o build/N.c -L . mp2.N
 tests: extract check-gmp
 	gcc -O2 -Wall -g -std=gnu99 tests.c build/N.c -I$(GMP_DIR) -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o tests
 	gcc -O2 -Wall -g -std=gnu99 -DCOMPARE_MINI tests.c build/N.c -I$(GMP_DIR) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o minitests

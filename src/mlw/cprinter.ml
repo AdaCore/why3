@@ -914,7 +914,9 @@ module MLToC = struct
     =
     let decide_print id = query_syntax info.syntax id = None in
     match Compile.ML.get_decl_name d with
-    | [id] when decide_print id -> translate_decl info d
+    | [id] when decide_print id ->
+       if debug then Format.printf "print %s@." id.id_string;
+       translate_decl info d
     | [_] -> None
     | _ -> raise (Unsupported "no name or recursive defs")
 
