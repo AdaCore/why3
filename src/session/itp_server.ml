@@ -1171,8 +1171,13 @@ end
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
     | Focus_req nid ->
+        let d = get_server_data () in
+        let s = d.cont.controller_session in
         let any = any_from_node_ID nid in
-        focused_node := Some any
+        (match any with
+        | APa pa ->
+          focused_node := Some (APn (Session_itp.get_proof_attempt_parent s pa))
+        | _ -> focused_node := Some any)
     | Unfocus_req ->
         focused_node := None
     | Remove_subtree nid           ->
