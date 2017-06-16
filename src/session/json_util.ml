@@ -247,6 +247,13 @@ let convert_constructor_message (m: message_notification) =
   | Open_File_Error _     -> String "Open_File_Error"
   | File_Saved _          -> String "File_Saved"
 
+let convert_loc (loc: Loc.position) : Json_base.json =
+  let (file, line, col1, col2) = Loc.get loc in
+  Record (convert_record ["file", Json_base.String file;
+                          "line", Json_base.Int line;
+                          "col1", Json_base.Int col1;
+                          "col2", Json_base.Int col2])
+
 let convert_message (m: message_notification) =
   let cc = convert_constructor_message in
   Record (match m with
@@ -282,9 +289,10 @@ let convert_message (m: message_notification) =
   | Task_Monitor (n, k, p) ->
       convert_record ["mess_notif", cc m;
            "monitor", List [Int n; Int k; Int p]]
-  | Parse_Or_Type_Error s ->
+  | Parse_Or_Type_Error (loc, s) ->
       convert_record ["mess_notif", cc m;
-           "error", String s]
+                      "loc", convert_loc loc;
+                      "error", String s]
   | Error s ->
       convert_record ["mess_notif", cc m;
            "error", String s]
@@ -301,13 +309,6 @@ let convert_color (color: color) : Json_base.json =
     | Neg_premise_color -> "Neg_premise_color"
     | Premise_color -> "Premise_color"
     | Goal_color -> "Goal_color")
-
-let convert_loc (loc: Loc.position) : Json_base.json =
-  let (file, line, col1, col2) = Loc.get loc in
-  Record (convert_record ["file", Json_base.String file;
-                          "line", Json_base.Int line;
-                          "col1", Json_base.Int col1;
-                          "col2", Json_base.Int col2])
 
 let convert_loc_color (loc,color: Loc.position * color) : Json_base.json =
   let loc = convert_loc loc in
@@ -685,6 +686,11 @@ let parse_message constr j =
   | "Open_File_Error" ->
     let s = get_string (get_field j "open_error") in
     Open_File_Error s
+
+  | "Parse_Or_Type_Error" ->
+    let loc = parse_loc (get_field j "loc") in
+    let error = get_string (get_field j "error") in
+    Parse_Or_Type_Error (loc, error)
 
   | _ -> raise NotMessage
 

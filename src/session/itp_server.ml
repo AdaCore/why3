@@ -273,19 +273,19 @@ let print_request fmt r =
 
 let print_msg fmt m =
   match m with
-  | Proof_error (_ids, s)  -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, s) -> fprintf fmt "transf error %s" s
-  | Strat_error (_ids, s)  -> fprintf fmt "start error %s" s
-  | Replay_Info s          -> fprintf fmt "replay info %s" s
-  | Query_Info (_ids, s)   -> fprintf fmt "query info %s" s
-  | Query_Error (_ids, s)  -> fprintf fmt "query error %s" s
-  | Help _s                -> fprintf fmt "help"
-  | Information s          -> fprintf fmt "info %s" s
-  | Task_Monitor _         -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error s  -> fprintf fmt "parse_or_type_error:\n %s" s
-  | File_Saved s           -> fprintf fmt "file saved %s" s
-  | Error s                -> fprintf fmt "%s" s
-  | Open_File_Error s      -> fprintf fmt "%s" s
+  | Proof_error (_ids, s)      -> fprintf fmt "proof error %s" s
+  | Transf_error (_ids, s)     -> fprintf fmt "transf error %s" s
+  | Strat_error (_ids, s)      -> fprintf fmt "start error %s" s
+  | Replay_Info s              -> fprintf fmt "replay info %s" s
+  | Query_Info (_ids, s)       -> fprintf fmt "query info %s" s
+  | Query_Error (_ids, s)      -> fprintf fmt "query error %s" s
+  | Help _s                    -> fprintf fmt "help"
+  | Information s              -> fprintf fmt "info %s" s
+  | Task_Monitor _             -> fprintf fmt "task montor"
+  | Parse_Or_Type_Error (_, s) -> fprintf fmt "parse_or_type_error:\n %s" s
+  | File_Saved s               -> fprintf fmt "file saved %s" s
+  | Error s                    -> fprintf fmt "%s" s
+  | Open_File_Error s          -> fprintf fmt "%s" s
 
 (* TODO ad hoc printing. Should reuse print_loc. *)
 let print_loc fmt (loc: Loc.position) =
@@ -610,20 +610,38 @@ end
                       Format.eprintf "File : %s@." f.file_name;
                       read_and_send f.file_name) files
 
+  let relativize_location s loc =
+    let f, l, b, e = Loc.get loc in
+    let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
+    Loc.user_position f l b e
+
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
     try reload_files cont ~use_shapes; true with
+    | Loc.Located (loc, e) ->
+      let loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a at %a@."
+          Exn_printer.exn_printer e Pretty.print_loc loc in
+      P.notify (Message (Parse_Or_Type_Error (loc, s)));
+      false
     | e ->
       let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      P.notify (Message (Parse_Or_Type_Error s));
+      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
       false
 
-  let add_file c ?format fname =
-    try add_file c ?format fname; true with
+  let add_file cont ?format fname =
+    try add_file cont ?format fname; true with
+    | Loc.Located (loc, e) ->
+      let loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a at %a@."
+          Exn_printer.exn_printer e Pretty.print_loc loc in
+      P.notify (Message (Parse_Or_Type_Error (loc, s)));
+      false
     | e ->
-        let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-        P.notify (Message (Parse_Or_Type_Error s)); false
+      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
+      false
 
   let task_driver config env =
     try

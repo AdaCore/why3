@@ -1394,18 +1394,23 @@ let open_session: GMenu.menu_item =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)   -> print_message "%s" s
-  | Transf_error (_id, s)  -> print_message "%s" s
-  | Strat_error (_id, s)   -> print_message "%s" s
-  | Replay_Info s          -> print_message "%s" s
-  | Query_Info (_id, s)    -> print_message "%s" s
-  | Query_Error (_id, s)   -> print_message "%s" s
-  | Help s                 -> print_message "%s" s
-  | Information s          -> print_message "%s" s
-  | Task_Monitor (t, s, r) -> update_monitor t s r
-  | Open_File_Error s      -> print_message "%s" s
-  | Parse_Or_Type_Error s  -> print_message "%s" s
-  | File_Saved f           ->
+  | Proof_error (_id, s)         -> print_message "%s" s
+  | Transf_error (_id, s)        -> print_message "%s" s
+  | Strat_error (_id, s)         -> print_message "%s" s
+  | Replay_Info s                -> print_message "%s" s
+  | Query_Info (_id, s)          -> print_message "%s" s
+  | Query_Error (_id, s)         -> print_message "%s" s
+  | Help s                       -> print_message "%s" s
+  | Information s                -> print_message "%s" s
+  | Task_Monitor (t, s, r)       -> update_monitor t s r
+  | Open_File_Error s            -> print_message "%s" s
+  | Parse_Or_Type_Error (loc, s) ->
+    begin
+      (* TODO find a new color *)
+      color_loc ~color:Goal_color loc;
+      print_message "%s" s
+    end
+  | File_Saved f                 ->
     begin
       try
         let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
@@ -1413,10 +1418,10 @@ let treat_message_notification msg = match msg with
         update_label_saved l;
         print_message "%s was saved" f
       with
-      | Not_found ->
+      | Not_found                ->
           print_message "Please report: %s was not found in ide but was saved in session" f
     end
-  | Error s                ->
+  | Error s                      ->
       if Debug.test_flag debug then
         print_message "%s" s
       else
