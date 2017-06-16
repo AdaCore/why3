@@ -751,10 +751,32 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
+(* TODO is it necessary ?
+let pr_output_page,scrolled_pr_output_view =
+  let label = GMisc.label ~text:"Prover output" () in
+  1, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_pr_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT
+    ~packing:scrolled_pr_output_view#add ()
+
+(* Showing prover output *)
+let prover_output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~cursor_visible:true
+    ~show_line_numbers:true
+    ~packing:scrolled_pr_output_view#add
+    ()
+*)
+
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 1 in
+  let n = ref 2 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -1203,6 +1225,25 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         send_request (Get_task id)
+    | NProofAttempt ->
+      let (pa, _obs, _l) = Hint.find node_id_pa id in
+      (match pa with
+      | Controller_itp.Done pr ->
+          task_view#source_buffer#set_text pr.Call_provers.pr_output
+      | Controller_itp.Unedited ->
+          task_view#source_buffer#set_text "Unedited"
+      | Controller_itp.JustEdited ->
+          task_view#source_buffer#set_text "Just edited"
+      | Controller_itp.Interrupted ->
+          task_view#source_buffer#set_text "Interrupted"
+      | Controller_itp.Scheduled ->
+          task_view#source_buffer#set_text "Scheduled"
+      | Controller_itp.Running ->
+          task_view#source_buffer#set_text "Running"
+      | Controller_itp.InternalFailure _e ->
+          task_view#source_buffer#set_text "Internal failure"
+      | Controller_itp.Uninstalled _p ->
+          task_view#source_buffer#set_text "Uninstalled")
     | _ -> send_request (Get_task id)
   with
     | Not_found -> task_view#source_buffer#set_text ""
@@ -1579,11 +1620,11 @@ let treat_notification n =
      begin
        match uinfo with
        | Proved b ->
-           Hint.replace node_id_proved id b;
-           set_status_column (get_node_row id)#iter;
-           (* Trying to move cursor on first unproven goal around on all cases
-              but not when proofAttempt is updated because ad hoc debugging. *)
-           send_request (Get_first_unproven_node id)
+          Hint.replace node_id_proved id b;
+          set_status_column (get_node_row id)#iter;
+          (* Trying to move cursor on first unproven goal around on all cases
+             but not when proofAttempt is updated because ad hoc debugging. *)
+          send_request (Get_first_unproven_node id)
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
