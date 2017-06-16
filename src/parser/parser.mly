@@ -94,11 +94,9 @@
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
   }
 
-(* dead code
-  let add_init_mark e =
-    let init = { id_str = "Init"; id_lab = []; id_loc = e.expr_loc } in
-    { e with expr_desc = Emark (init, e) }
-*)
+  let break_id    = "'Break"
+  let continue_id = "'Continue"
+  let return_id   = "'Return"
 
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
@@ -130,8 +128,8 @@
 
 (* program keywords *)
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN CHECK
-%token DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
+%token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN BREAK CHECK
+%token CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
 %token PRIVATE PURE RAISE RAISES READS REC REQUIRES
 %token RETURN RETURNS TO TRY VAL VARIANT WHILE WRITES
@@ -675,11 +673,15 @@ kind:
 
 rec_defn:
 | ghost kind labels(lident_rich) binders ret_opt spec EQUAL spec seq_expr
-    { $3, $1, $2, $4, fst $5, snd $5, spec_union $6 $8, $9 }
+    { let id = mk_id return_id $startpos($7) $endpos($7) in
+      let e = { $9 with expr_desc = Eoptexn (id, snd $5, $9) } in
+      $3, $1, $2, $4, fst $5, snd $5, spec_union $6 $8, e }
 
 fun_defn:
 | binders ret_opt spec EQUAL spec seq_expr
-    { Efun ($1, fst $2, snd $2, spec_union $3 $5, $6) }
+    { let id = mk_id return_id $startpos($4) $endpos($4) in
+      let e = { $6 with expr_desc = Eoptexn (id, snd $2, $6) } in
+      Efun ($1, fst $2, snd $2, spec_union $3 $5, e) }
 
 val_defn:
 | params ret_opt spec
@@ -801,7 +803,9 @@ single_expr_:
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
-    { Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, $6) }
+    { let id = mk_id return_id $startpos($4) $endpos($4) in
+      let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
+      Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
 | ANY return spec
     { Eany ([], Expr.RKnone, Some (fst $2), snd $2, $3) }
 | VAL ghost kind labels(lident_rich) mk_expr(val_defn) IN seq_expr
@@ -815,12 +819,40 @@ single_expr_:
     { Eexn ($2, PTtuple [], Ity.MaskVisible, $4) }
 | EXCEPTION labels(uident) return IN seq_expr
     { Eexn ($2, fst $3, snd $3, $5) }
-| LABEL labels(uident) IN seq_expr
-    { Emark ($2, $4) }
+| LABEL id = labels(uident) IN e = seq_expr
+    { let cont e =
+        let id = { id with id_str = id.id_str ^ continue_id } in
+        { e with expr_desc = Eoptexn (id, Ity.MaskVisible, e) } in
+      let rec over_loop e = { e with expr_desc = over_loop_desc e }
+      and over_loop_desc e = match e.expr_desc with
+        | Escope (q, e1) -> Escope (q, over_loop e1)
+        | Enamed (l, e1) -> Enamed (l, over_loop e1)
+        | Ecast (e1, t) -> Ecast (over_loop e1, t)
+        | Eghost e1 -> Eghost (over_loop e1)
+        | Esequence (e1, e2) -> Esequence (over_loop e1, e2)
+        | Eoptexn (id, mask, e1) -> Eoptexn (id, mask, over_loop e1)
+        | Ewhile (e1, inv, var, e2) ->
+            let e = { e with expr_desc = Ewhile (e1, inv, var, cont e2) } in
+            let id = { id with id_str = id.id_str ^ break_id } in
+            Eoptexn (id, Ity.MaskVisible, e)
+        | Efor (id, ef, dir, et, inv, e1) ->
+            let e = { e with expr_desc = Efor (id,ef,dir,et,inv,cont e1) } in
+            let id = { id with id_str = id.id_str ^ break_id } in
+            Eoptexn (id, Ity.MaskVisible, e)
+        | d -> d in
+      Emark (id, over_loop e) }
 | WHILE seq_expr DO loop_annotation seq_expr DONE
-    { let inv, var = $4 in Ewhile ($2, inv, var, $5) }
+    { let id_b = mk_id break_id $startpos($3) $endpos($3) in
+      let id_c = mk_id continue_id $startpos($3) $endpos($3) in
+      let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
+      let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
+      Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR lident_nq EQUAL seq_expr for_direction seq_expr DO invariant* seq_expr DONE
-    { Efor ($2, $4, $5, $6, $8, $9) }
+    { let id_b = mk_id break_id $startpos($7) $endpos($7) in
+      let id_c = mk_id continue_id $startpos($7) $endpos($7) in
+      let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
+      let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
+      Eoptexn (id_b, Ity.MaskVisible, e) }
 | ABSURD
     { Eabsurd }
 | RAISE uqualid expr_arg?
@@ -828,7 +860,18 @@ single_expr_:
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
 | RETURN ioption(contract_expr)
-    { Eraise (Qident (mk_id Dexpr.old_mark $startpos($1) $endpos($1)), $2) }
+    { let id = mk_id return_id $startpos($1) $endpos($1) in
+      Eraise (Qident id, $2) }
+| BREAK ioption(uident)
+    { let id = match $2 with
+        | Some id -> { id with id_str = id.id_str ^ break_id }
+        | None -> mk_id break_id $startpos($1) $endpos($1) in
+      Eraise (Qident id, None) }
+| CONTINUE ioption(uident)
+    { let id = match $2 with
+        | Some id -> { id with id_str = id.id_str ^ continue_id }
+        | None -> mk_id continue_id $startpos($1) $endpos($1) in
+      Eraise (Qident id, None) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Etry ($2, false, $4) }
 | GHOST single_expr

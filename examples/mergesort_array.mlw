@@ -240,7 +240,6 @@ module NaturalMergesort
       variant   { n - !first_run }
       label L in
       let lo = ref 0 in
-      exception Break in try
       while !lo < n - 1 do
         invariant { 0 <= !lo <= n }
         invariant { !first_run at L <= !first_run <= n }
@@ -249,7 +248,7 @@ module NaturalMergesort
         invariant { permut_all (a at L) a }
         variant   { n - !lo }
         let mid = find_run a !lo in
-        if mid = n then begin if !lo = 0 then return; raise Break end;
+        if mid = n then begin if !lo = 0 then return; break end;
         let hi = find_run a mid in
         label M in
         merge_using tmp a !lo mid hi;
@@ -258,7 +257,6 @@ module NaturalMergesort
         ghost if !lo = 0 then first_run := hi;
         lo := hi;
       done
-      with Break -> () end
     done
 
 

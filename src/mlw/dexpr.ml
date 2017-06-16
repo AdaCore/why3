@@ -391,7 +391,6 @@ type dspec = ity -> dspec_final
      clauses must have the type of the corresponding exception. *)
 
 let old_mark = "'Old"
-let old_mark_id = id_fresh old_mark
 
 (** Expressions *)
 
@@ -428,6 +427,7 @@ and dexpr_node =
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
+  | DEoptexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
   | DEvar_pure of string * dvty
@@ -813,6 +813,9 @@ let dexpr ?loc node =
     | DEtrue
     | DEfalse ->
         dvty_bool
+    | DEoptexn (_,dity,_,de) ->
+        dexpr_expected_type de dity;
+        [], dity
     | DEcast (de,dity) ->
         dexpr_expected_type de dity;
         de.de_dvty
@@ -1303,12 +1306,13 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let ld, env = rec_defn uloc env drdf in
       cexp uloc env de (LD (LS ld) :: lpl)
   | DEexn (id,dity,mask,de) ->
+      let mask = if env.ghs then MaskGhost else mask in
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
       cexp uloc (add_xsymbol env xs) de (LD (LX xs) :: lpl)
   | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       cexp uloc env de (LD (LL old) :: lpl)
-  | DEvar_pure _ | DEpv_pure _
+  | DEvar_pure _ | DEpv_pure _ | DEoptexn _
   | DEsym _ | DEconst _ | DEnot _ | DEand _ | DEor _ | DEif _ | DEcase _
   | DEassign _ | DEwhile _ | DEfor _ | DEtry _ | DEraise _ | DEassert _
   | DEpure _ | DEabsurd | DEtrue | DEfalse -> assert false (* expr-only *)
@@ -1460,8 +1464,17 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
   | DEfalse ->
       e_false
   | DEexn (id,dity,mask,de) ->
+      let mask = if env.ghs then MaskGhost else mask in
       let xs = create_xsymbol id ~mask (ity_of_dity dity) in
       e_exn xs (expr uloc (add_xsymbol env xs) de)
+  | DEoptexn (id,dity,mask,de) ->
+      let mask = if env.ghs then MaskGhost else mask in
+      let xs = create_xsymbol id ~mask (ity_of_dity dity) in
+      let e = expr uloc (add_xsymbol env xs) de in
+      if not (Sxs.mem xs e.e_effect.eff_raises) then e else
+      let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
+      let branches = Mxs.singleton xs (vl, e_of_vl vl) in
+      e_exn xs (e_try e ~case:false branches)
   | DEmark (id,de) ->
       let env, old = add_label env id.pre_name in
       let put _ (ld,_) e = e_let ld e in
@@ -1525,15 +1538,7 @@ and lambda uloc env pvl mask dsp dvl de =
   let env = add_binders {env with ugh} pvl in
   let preold = Mstr.find_opt old_mark env.old in
   let env, old = add_label env old_mark in
-  let e = if pvl = [] then expr uloc env de else
-    let ity = ity_of_dity (dity_of_dvty de.de_dvty) in
-    let mask = if env.ghs then MaskGhost else mask in
-    let xs = create_xsymbol old_mark_id ~mask ity in
-    let e = expr uloc (add_xsymbol env xs) de in
-    if not (Sxs.mem xs e.e_effect.eff_raises) then e else
-    let vl = vl_of_mask (id_fresh "r") mask xs.xs_ity in
-    let branches = Mxs.singleton xs (vl, e_of_vl vl) in
-    e_exn xs (e_try e ~case:false branches) in
+  let e = expr uloc env de in
   let dsp = get_later env dsp e.e_ity in
   let dvl = get_later env dvl in
   let dvl = rebase_variant env preold old dvl in

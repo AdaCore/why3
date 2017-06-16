@@ -711,8 +711,6 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let ds = dspec_no_variant muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
-      let denv = if bl = [] then denv else
-        denv_add_exn denv old_mark_id dity in
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, msk, sp) ->
       let pl = List.map (dparam muc) pl in
@@ -809,9 +807,13 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEpure (get_term, denv_pure denv get_dty)
   | Ptree.Eassert (ak, f) ->
       DEassert (ak, dassert muc f)
-  | Ptree.Emark (id, e1) ->
+  | Ptree.Eoptexn (id, mask, e1) ->
+      let dity = dity_fresh () in
       let id = create_user_id id in
-      DEmark (id, dexpr muc denv e1)
+      let denv = denv_add_exn denv id dity in
+      DEoptexn (id, dity, mask, dexpr muc denv e1)
+  | Ptree.Emark (id, e1) ->
+      DEmark (create_user_id id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
       let muc = open_scope muc "dummy" in
       let muc = import_scope muc (string_list_of_qualid q) in
@@ -833,7 +835,6 @@ and drec_defn muc denv fdl =
     let dity = dity_of_opt muc pty in
     let pre denv =
       let denv = denv_add_args denv bl in
-      let denv = denv_add_exn denv old_mark_id dity in
       let dv = dvariant muc sp.sp_variant in
       dspec muc sp, dv, dexpr muc denv e in
     create_user_id id, gh, kind, bl, dity, msk, pre in
