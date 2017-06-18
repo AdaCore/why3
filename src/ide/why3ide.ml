@@ -751,10 +751,32 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
+(* TODO is it necessary ?
+let pr_output_page,scrolled_pr_output_view =
+  let label = GMisc.label ~text:"Prover output" () in
+  1, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_pr_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT
+    ~packing:scrolled_pr_output_view#add ()
+
+(* Showing prover output *)
+let prover_output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~cursor_visible:true
+    ~show_line_numbers:true
+    ~packing:scrolled_pr_output_view#add
+    ()
+*)
+
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 1 in
+  let n = ref 2 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -951,7 +973,7 @@ let convert_color (color: color): string =
   | Goal_color -> "goal_tag"
 
 let move_to_line ~yalign (v : GSourceView2.source_view) line =
-  let line = max 0 line in
+  let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
   v#buffer#place_cursor ~where:it;
@@ -1203,6 +1225,25 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         send_request (Get_task id)
+    | NProofAttempt ->
+      let (pa, _obs, _l) = Hint.find node_id_pa id in
+      (match pa with
+      | Controller_itp.Done pr ->
+          task_view#source_buffer#set_text pr.Call_provers.pr_output
+      | Controller_itp.Unedited ->
+          task_view#source_buffer#set_text "Unedited"
+      | Controller_itp.JustEdited ->
+          task_view#source_buffer#set_text "Just edited"
+      | Controller_itp.Interrupted ->
+          task_view#source_buffer#set_text "Interrupted"
+      | Controller_itp.Scheduled ->
+          task_view#source_buffer#set_text "Scheduled"
+      | Controller_itp.Running ->
+          task_view#source_buffer#set_text "Running"
+      | Controller_itp.InternalFailure _e ->
+          task_view#source_buffer#set_text "Internal failure"
+      | Controller_itp.Uninstalled _p ->
+          task_view#source_buffer#set_text "Uninstalled")
     | _ -> send_request (Get_task id)
   with
     | Not_found -> task_view#source_buffer#set_text ""
@@ -1394,18 +1435,23 @@ let open_session: GMenu.menu_item =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)   -> print_message "%s" s
-  | Transf_error (_id, s)  -> print_message "%s" s
-  | Strat_error (_id, s)   -> print_message "%s" s
-  | Replay_Info s          -> print_message "%s" s
-  | Query_Info (_id, s)    -> print_message "%s" s
-  | Query_Error (_id, s)   -> print_message "%s" s
-  | Help s                 -> print_message "%s" s
-  | Information s          -> print_message "%s" s
-  | Task_Monitor (t, s, r) -> update_monitor t s r
-  | Open_File_Error s      -> print_message "%s" s
-  | Parse_Or_Type_Error s  -> print_message "%s" s
-  | File_Saved f           ->
+  | Proof_error (_id, s)         -> print_message "%s" s
+  | Transf_error (_id, s)        -> print_message "%s" s
+  | Strat_error (_id, s)         -> print_message "%s" s
+  | Replay_Info s                -> print_message "%s" s
+  | Query_Info (_id, s)          -> print_message "%s" s
+  | Query_Error (_id, s)         -> print_message "%s" s
+  | Help s                       -> print_message "%s" s
+  | Information s                -> print_message "%s" s
+  | Task_Monitor (t, s, r)       -> update_monitor t s r
+  | Open_File_Error s            -> print_message "%s" s
+  | Parse_Or_Type_Error (loc, s) ->
+    begin
+      (* TODO find a new color *)
+      color_loc ~color:Goal_color loc;
+      print_message "%s" s
+    end
+  | File_Saved f                 ->
     begin
       try
         let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
@@ -1413,10 +1459,10 @@ let treat_message_notification msg = match msg with
         update_label_saved l;
         print_message "%s was saved" f
       with
-      | Not_found ->
+      | Not_found                ->
           print_message "Please report: %s was not found in ide but was saved in session" f
     end
-  | Error s                ->
+  | Error s                      ->
       if Debug.test_flag debug then
         print_message "%s" s
       else
@@ -1574,11 +1620,11 @@ let treat_notification n =
      begin
        match uinfo with
        | Proved b ->
-           Hint.replace node_id_proved id b;
-           set_status_column (get_node_row id)#iter;
-           (* Trying to move cursor on first unproven goal around on all cases
-              but not when proofAttempt is updated because ad hoc debugging. *)
-           send_request (Get_first_unproven_node id)
+          Hint.replace node_id_proved id b;
+          set_status_column (get_node_row id)#iter;
+          (* Trying to move cursor on first unproven goal around on all cases
+             but not when proofAttempt is updated because ad hoc debugging. *)
+          send_request (Get_first_unproven_node id)
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);

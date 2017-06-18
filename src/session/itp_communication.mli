@@ -33,13 +33,13 @@ type message_notification =
   | Help                  of string
   (* General information *)
   | Information           of string
-  (* Number               of task scheduled, running, etc *)
+  (* Number of task scheduled, running, etc *)
   | Task_Monitor          of int * int * int
   (* A file was read or reloaded and now contains a parsing or typing error *)
-  | Parse_Or_Type_Error   of string
-  (* An error happened that could not be identified in server *)
-  | File_Saved            of string
+  | Parse_Or_Type_Error   of Loc.position * string
   (* [File_Saved f] f was saved *)
+  | File_Saved            of string
+  (* An error happened that could not be identified in server *)
   | Error                 of string
   | Open_File_Error       of string
 
