@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="36" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="1.30" timelimit="36" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.5.0" timelimit="36" steplimit="0" memlimit="1000"/>
-<file name="../inverse_in_place.mlw">
-<theory name="InverseInPlace" sum="660caea84b9e3058ec49435502b49ccf">
+<prover id="0" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../inverse_in_place.mlw" expanded="true">
+<theory name="InverseInPlace" sum="70993067b797741dd2709d8ca290b068" expanded="true">
  <goal name="VC prefix ~" expl="VC for prefix ~">
  <proof prover="5"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -15,84 +15,84 @@
  </goal>
  <goal name="VC inverse_in_place" expl="VC for inverse_in_place">
  <transf name="split_goal_wp">
-  <goal name="VC inverse_in_place.1" expl="1. loop bounds">
-  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="VC inverse_in_place.1" expl="1. loop invariant init">
+  <proof prover="5"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC inverse_in_place.2" expl="2. loop invariant init">
-  <proof prover="5"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.3" expl="3. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.4" expl="4. index in array bounds">
+  <goal name="VC inverse_in_place.2" expl="2. index in array bounds">
   <proof prover="5"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC inverse_in_place.5" expl="5. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.6" expl="6. loop invariant init">
-  <proof prover="5"><result status="valid" time="0.04" steps="108"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.22"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.8" expl="8. loop invariant init">
-  <proof prover="5"><result status="valid" time="1.13" steps="1381"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.9" expl="9. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.01" steps="22"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.10" expl="10. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.00" steps="26"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.11" expl="11. loop variant decrease">
-  <proof prover="5"><result status="valid" time="7.20" steps="4093"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.12" expl="12. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.45" steps="703"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.13" expl="13. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.88"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.14" expl="14. loop invariant preservation">
-  <proof prover="6"><result status="valid" time="0.34"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.15" expl="15. assertion">
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.16" expl="16. assertion">
-  <proof prover="5"><result status="valid" time="0.01" steps="24"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.17" expl="17. index in array bounds">
-  <proof prover="5"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.18" expl="18. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="4.49" steps="4276"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.19" expl="19. assertion">
-  <proof prover="5"><result status="valid" time="0.00" steps="16"/></proof>
-  </goal>
-  <goal name="VC inverse_in_place.20" expl="20. index in array bounds">
+  <goal name="VC inverse_in_place.3" expl="3. index in array bounds">
   <proof prover="5"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC inverse_in_place.21" expl="21. loop invariant preservation">
-  <proof prover="5"><result status="valid" time="1.09" steps="1378"/></proof>
+  <goal name="VC inverse_in_place.4" expl="4. index in array bounds">
+  <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.5" expl="5. loop invariant init">
+  <proof prover="5"><result status="valid" time="0.04" steps="110"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.6" expl="6. loop invariant init">
+  <proof prover="5"><result status="valid" time="0.08" steps="130"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.7" expl="7. loop invariant init">
+  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.8" expl="8. index in array bounds">
+  <proof prover="5"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.9" expl="9. index in array bounds">
+  <proof prover="5"><result status="valid" time="0.00" steps="27"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.10" expl="10. loop variant decrease">
+  <proof prover="0"><result status="valid" time="0.64"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.11" expl="11. loop invariant preservation">
+  <proof prover="5"><result status="valid" time="0.66" steps="884"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.12" expl="12. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.13" expl="13. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.33"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.14" expl="14. assertion">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.15" expl="15. assertion">
+  <proof prover="5"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.16" expl="16. index in array bounds">
+  <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.17" expl="17. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.18" expl="18. assertion">
+  <proof prover="5"><result status="valid" time="0.00" steps="17"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.19" expl="19. index in array bounds">
+  <proof prover="5"><result status="valid" time="0.00" steps="9"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.20" expl="20. loop invariant preservation">
+  <proof prover="5"><result status="valid" time="1.30" steps="1532"/></proof>
+  </goal>
+  <goal name="VC inverse_in_place.21" expl="21. postcondition">
+  <proof prover="5"><result status="valid" time="0.02" steps="73"/></proof>
   </goal>
   <goal name="VC inverse_in_place.22" expl="22. postcondition">
-  <proof prover="5"><result status="valid" time="0.02" steps="72"/></proof>
+  <proof prover="5"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC inverse_in_place.23" expl="23. postcondition">
-  <proof prover="5"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC inverse_in_place.23" expl="23. out of loop bounds">
+  <proof prover="5"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="2641609908c81a8888bf7cbb6b4322c2">
+<theory name="Harness" sum="3e1122f699bfe5623073b068b9d15a26" expanded="true">
  <goal name="VC test1" expl="VC for test1">
- <proof prover="5"><result status="valid" time="0.02" steps="54"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="51"/></proof>
  </goal>
  <goal name="VC test2" expl="VC for test2">
- <proof prover="5"><result status="valid" time="0.02" steps="54"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="51"/></proof>
  </goal>
 </theory>
 </file>
