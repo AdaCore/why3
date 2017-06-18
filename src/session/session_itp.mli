@@ -98,6 +98,7 @@ val get_transf_args : session -> transID -> string list
 val get_transf_name : session -> transID -> string
 
 val get_proof_name : session -> proofNodeID -> Ident.ident
+val get_proof_expl : session -> proofNodeID -> string
 
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID

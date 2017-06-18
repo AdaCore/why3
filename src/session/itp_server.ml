@@ -656,7 +656,9 @@ end
          String.sub full 0 40 ^ " ..."
        else full
     | APn pn ->
-      (get_proof_name d.cont.controller_session pn).Ident.id_string
+       let expl = get_proof_expl d.cont.controller_session pn in
+       if expl <> "" then expl else
+         (get_proof_name d.cont.controller_session pn).Ident.id_string
     | APa pa ->
       let pa = get_proof_attempt_node d.cont.controller_session pa in
       Pp.string_of Whyconf.print_prover pa.prover
@@ -1094,6 +1096,9 @@ end
 
   let () = register_command "replay" "replay obsolete proofs"
     (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
+
+  let () = register_command "clean" "remove unsuccessful proof attempts that are below proved goals"
+    (Qnotask (fun _cont _args ->  clean_session (); "Cleaning in progress"))
 
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =

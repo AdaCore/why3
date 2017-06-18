@@ -46,6 +46,7 @@ type proof_attempt_node = {
 
 type proof_node = {
   proofn_name                    : Ident.ident;
+  proofn_expl                    : string;
   proofn_task                    : Task.task;
   proofn_table                   : Task.names_table option;
   proofn_parent                  : proof_parent;
@@ -239,6 +240,9 @@ let get_transf_name (s : session) (id : transID) =
 
 let get_proof_name (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_name
+
+let get_proof_expl (s : session) (id : proofNodeID) =
+  (get_proofNode s id).proofn_expl
 
 let get_proof_parent (s : session) (id : proofNodeID) =
   (get_proofNode s id).proofn_parent
@@ -574,13 +578,13 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
 
 (* [mk_proof_node s n t p id] register in the session [s] a proof node
    of proofNodeID [id] of parent [p] of task [t] *)
-let mk_proof_node ~version (s : session) (n : Ident.ident) (t : Task.task)
+let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   let tables = Args_wrapper.build_name_tables t in
   let sum = Some (Termcode.task_checksum ~version t) in
-  let _,expl,_ = Termcode.goal_expl_task ~root:false (* FIXME ! *) t in
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
+             proofn_expl = expl;
              proofn_task = t;
              proofn_table = Some tables;
              proofn_parent = parent;
@@ -593,6 +597,7 @@ let mk_proof_node ~version (s : session) (n : Ident.ident) (t : Task.task)
 let mk_proof_node_no_task (s : session) (n : Ident.ident)
     (parent : proof_parent) (node_id : proofNodeID) sum shape =
   let pn = { proofn_name = n;
+             proofn_expl = "";
              proofn_task = None;
              proofn_table = None;
              proofn_parent = parent;
@@ -631,15 +636,11 @@ let _mk_proof_node_task (s : session) (t : Task.task)
 let mk_transf_proof_node (s : session) (parent_name : string)
     (tid : transID) (index : int) (t : Task.task) =
   let id = gen_proofNodeID s in
-  let gid,_expl,_ = Termcode.goal_expl_task ~root:false t in
-(*  let expl = match expl with
-    | None -> string_of_int index ^ "."
-    | Some e -> string_of_int index ^ ". " ^ e
-  in
-    let expl = Some expl in *)
+  let gid,expl,_ = Termcode.goal_expl_task ~root:false t in
   let goal_name = parent_name ^ "." ^ string_of_int index in
   let goal_name = Ident.id_register (Ident.id_derive goal_name gid) in
-  mk_proof_node ~version:s.session_shape_version s goal_name t (Trans tid) id;
+  mk_proof_node ~version:s.session_shape_version ~expl
+                s goal_name t (Trans tid) id;
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
@@ -1331,8 +1332,9 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
 let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
   : theory =
   let add_goal parent goal id =
-    let name,_expl,task = Termcode.goal_expl_task ~root:true goal in
-    mk_proof_node ~version:s.session_shape_version s name task parent id;
+    let name,expl,task = Termcode.goal_expl_task ~root:true goal in
+    mk_proof_node ~version:s.session_shape_version ~expl
+                  s name task parent id;
   in
   let tasks = List.rev (Task.split_theory th None None) in
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
@@ -1657,7 +1659,8 @@ let save fname shfname session =
   Hstr.iter (save_file session ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
-  close_out ch
+  close_out ch;
+  Compress.Compress_z.close_out chsh
 
 
 let save_session (s : session) =
