@@ -2,15 +2,9 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require map.Map.
-
-(* Why3 assumption *)
-Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
@@ -25,40 +19,29 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
   | (mk_ref x) => x
   end.
 
-(* Why3 assumption *)
-Inductive array (a:Type) :=
-  | mk_array : Z -> (map.Map.map Z a) -> array a.
-Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
+Axiom array : forall (a:Type), Type.
+Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
+  WhyType (array a).
 Existing Instance array_WhyType.
-Implicit Arguments mk_array [[a]].
+
+Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+
+Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+
+Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
+  a)), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
-  match v with
-  | (mk_array x x1) => x1
-  end.
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
+  ((elts a1) i).
 
-(* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
-  match v with
-  | (mk_array x x1) => x
-  end.
+Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
+  Z -> a -> (array a).
 
-(* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  (map.Map.get (elts a1) i).
-
-(* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
-
-Parameter make: forall {a:Type} {a_WT:WhyType a}, Z -> a -> (array a).
-
-Axiom make_length : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (v:a),
-  ((length (make n v)) = n).
-
-Axiom make_elts : forall {a:Type} {a_WT:WhyType a}, forall (n:Z) (i:Z) (v:a),
-  ((get (make n v) i) = v).
+Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
+  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
+  v)) = (map.Map.set (elts a1) i v)).
 
 Axiom char : Type.
 Parameter char_WhyType : WhyType char.
@@ -68,8 +51,8 @@ Existing Instance char_WhyType.
 Definition matches (a1:(array char)) (i1:Z) (a2:(array char)) (i2:Z)
   (n:Z): Prop := ((0%Z <= i1)%Z /\ (i1 <= ((length a1) - n)%Z)%Z) /\
   (((0%Z <= i2)%Z /\ (i2 <= ((length a2) - n)%Z)%Z) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((get a1 (i1 + i)%Z) = (get a2
-  (i2 + i)%Z))).
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((mixfix_lbrb a1
+  (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z))).
 
 Axiom matches_empty : forall (a1:(array char)) (a2:(array char)) (i1:Z)
   (i2:Z), ((0%Z <= i1)%Z /\ (i1 <= (length a1))%Z) -> (((0%Z <= i2)%Z /\
@@ -78,17 +61,18 @@ Axiom matches_empty : forall (a1:(array char)) (a2:(array char)) (i1:Z)
 Axiom matches_right_extension : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (n:Z), (matches a1 i1 a2 i2 n) ->
   ((i1 <= (((length a1) - n)%Z - 1%Z)%Z)%Z ->
-  ((i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z -> (((get a1 (i1 + n)%Z) = (get a2
-  (i2 + n)%Z)) -> (matches a1 i1 a2 i2 (n + 1%Z)%Z)))).
+  ((i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z -> (((mixfix_lbrb a1
+  (i1 + n)%Z) = (mixfix_lbrb a2 (i2 + n)%Z)) -> (matches a1 i1 a2 i2
+  (n + 1%Z)%Z)))).
 
 Axiom matches_contradiction_at_first : forall (a1:(array char)) (a2:(array
-  char)) (i1:Z) (i2:Z) (n:Z), (0%Z < n)%Z -> ((~ ((get a1 i1) = (get a2
-  i2))) -> ~ (matches a1 i1 a2 i2 n)).
+  char)) (i1:Z) (i2:Z) (n:Z), (0%Z < n)%Z -> ((~ ((mixfix_lbrb a1
+  i1) = (mixfix_lbrb a2 i2))) -> ~ (matches a1 i1 a2 i2 n)).
 
 Axiom matches_contradiction_at_i : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (i:Z) (n:Z), (0%Z < n)%Z -> (((0%Z <= i)%Z /\ (i < n)%Z) ->
-  ((~ ((get a1 (i1 + i)%Z) = (get a2 (i2 + i)%Z))) -> ~ (matches a1 i1 a2 i2
-  n))).
+  ((~ ((mixfix_lbrb a1 (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z))) ->
+  ~ (matches a1 i1 a2 i2 n))).
 
 Axiom matches_right_weakening : forall (a1:(array char)) (a2:(array char))
   (i1:Z) (i2:Z) (n:Z) (n':Z), (matches a1 i1 a2 i2 n) -> ((n' < n)%Z ->
@@ -125,41 +109,51 @@ Axiom next_1_0 : forall (p:(array char)), (1%Z <= (length p))%Z -> (is_next p
   1%Z 0%Z).
 
 (* Why3 goal *)
-Theorem WP_parameter_initnext : forall (p:Z) (p1:(map.Map.map Z char)),
-  let p2 := (mk_array p p1) in (((0%Z <= p)%Z /\ (1%Z <= p)%Z) ->
-  ((0%Z <= p)%Z -> forall (next:Z) (next1:(map.Map.map Z Z)),
-  ((0%Z <= next)%Z /\ ((next = p) /\ forall (i:Z), ((map.Map.get next1
-  i) = 0%Z))) -> ((1%Z < p)%Z -> (((0%Z <= 1%Z)%Z /\ (1%Z < next)%Z) ->
-  forall (next2:(map.Map.map Z Z)), ((0%Z <= next)%Z /\
-  (next2 = (map.Map.set next1 1%Z 0%Z))) -> forall (j:Z) (i:Z)
-  (next3:(map.Map.map Z Z)), (((0%Z <= j)%Z /\ ((j < i)%Z /\ (i <= p)%Z)) /\
-  ((matches p2 (i - j)%Z p2 0%Z j) /\ ((forall (z:Z), (((j + 1%Z)%Z < z)%Z /\
-  (z < (i + 1%Z)%Z)%Z) -> ~ (matches p2 ((i + 1%Z)%Z - z)%Z p2 0%Z z)) /\
-  forall (k:Z), ((0%Z < k)%Z /\ (k <= i)%Z) -> (is_next p2 k
-  (map.Map.get next3 k))))) -> ((i < (p - 1%Z)%Z)%Z -> (((0%Z <= j)%Z /\
-  (j < p)%Z) -> (((0%Z <= i)%Z /\ (i < p)%Z) -> (((map.Map.get p1
-  i) = (map.Map.get p1 j)) -> forall (i1:Z), (i1 = (i + 1%Z)%Z) ->
-  forall (j1:Z), (j1 = (j + 1%Z)%Z) -> (((0%Z <= next)%Z /\ ((0%Z <= i1)%Z /\
-  (i1 < next)%Z)) -> forall (next4:(map.Map.map Z Z)), ((0%Z <= next)%Z /\
-  (next4 = (map.Map.set next3 i1 j1))) -> forall (z:Z),
-  (((j1 + 1%Z)%Z < z)%Z /\ (z < (i1 + 1%Z)%Z)%Z) -> ~ (matches p2
-  ((i1 + 1%Z)%Z - z)%Z p2 0%Z z)))))))))).
+Theorem VC_initnext : forall (p:(array char)), (1%Z <= (length p))%Z ->
+  let m := (length p) in forall (next:(array Z)), ((forall (i:Z),
+  ((0%Z <= i)%Z /\ (i < m)%Z) -> ((mixfix_lbrb next i) = 0%Z)) /\
+  ((length next) = m)) -> ((1%Z < m)%Z -> forall (next1:(array Z)),
+  ((length next1) = (length next)) ->
+  (((elts next1) = (map.Map.set (elts next) 1%Z 0%Z)) -> forall (j:Z) (i:Z)
+  (next2:(array Z)), ((length next2) = (length next1)) -> ((((0%Z <= j)%Z /\
+  ((j < i)%Z /\ (i <= m)%Z)) /\ ((matches p (i - j)%Z p 0%Z j) /\
+  ((forall (z:Z), (((j + 1%Z)%Z < z)%Z /\ (z < (i + 1%Z)%Z)%Z) -> ~ (matches
+  p ((i + 1%Z)%Z - z)%Z p 0%Z z)) /\ forall (k:Z), ((0%Z < k)%Z /\
+  (k <= i)%Z) -> (is_next p k (mixfix_lbrb next2 k))))) ->
+  ((i < (m - 1%Z)%Z)%Z -> ((~ ((mixfix_lbrb p i) = (mixfix_lbrb p j))) ->
+  ((j = 0%Z) -> forall (i1:Z), (i1 = (i + 1%Z)%Z) -> forall (next3:(array
+  Z)), ((length next3) = (length next2)) ->
+  (((elts next3) = (map.Map.set (elts next2) i1 0%Z)) -> (((0%Z <= j)%Z /\
+  ((j < i1)%Z /\ (i1 <= m)%Z)) -> ((matches p (i1 - j)%Z p 0%Z j) ->
+  forall (z:Z), (((j + 1%Z)%Z < z)%Z /\ (z < (i1 + 1%Z)%Z)%Z) -> ~ (matches p
+  ((i1 + 1%Z)%Z - z)%Z p 0%Z z)))))))))).
+intros p h1 m next (h2,h3) h4 next1 h5 h6 j i next2 h7
+((h8,(h9,h10)),(h11,(h12,h13))) h14 h15 h16 i1 h17 next3 h18 h19
+(h20,(h21,h22)) h23 z (h24,h25).
+(*
 intros n p1.
 intro p3. unfold p3. clear p3.
 intros (_,hn) _ next next1 _ _ _ _ _.
 intros j i next4 ((hj,hi),(h0,(h1,h2))).
-intros hi' _ _ eq.
+intros hi' _ _ neq j0. subst j.
 intros i1 hi1; subst i1.
-intros j1 hji1; subst j1.
 intros _ _ _ z hz.
-red; intro h. unfold matches, length, get in h. simpl in h.
+*)
+red; intro h. unfold matches in h. simpl in h.
 destruct h as (hy1, (hy2, hy3)).
 
-apply h1 with (z-1)%Z.
+assert (case: (z = 2 \/ 2 < z)%Z) by omega. destruct case.
+subst.
+absurd (elts p i = elts p 0%Z); auto.
+generalize (hy3 0%Z).
+ring_simplify (i + 1 + 1 - 2 + 0)%Z.
+intuition.
+
+apply h12 with (z-1)%Z.
 omega.
-red; unfold length, get; simpl.
+red; simpl.
 repeat split; try omega.
-intros.
+intros; subst i1.
 replace (i + 1 - (z - 1) + i0)%Z with (i + 1 + 1 - z + i0)%Z by omega.
 apply hy3.
 omega.
