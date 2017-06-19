@@ -2147,7 +2147,7 @@ module N
       low := h;
       i := Int32.(+) !i one;
       value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts r) x.offset (x.offset + p2i !i);
+      value_sub_tail (pelts x) x.offset (x.offset + p2i !i);
       assert { retval + radix * (value r !i
                  + (power radix !i) * !low)
                  = value x (1 + !i) * (power 2 (tnc))
