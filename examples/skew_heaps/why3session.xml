@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../skew_heaps.mlw">
+<theory name="Heap" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="SkewHeaps" sum="0b41b041605e75e7e354f929251ef33c">
+ <goal name="VC root_is_min" expl="VC for root_is_min">
+ <proof prover="1"><result status="valid" time="0.65" steps="1358"/></proof>
+ </goal>
+ <goal name="VC empty" expl="VC for empty">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="VC get_min" expl="VC for get_min">
+ <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+ </goal>
+ <goal name="VC merge" expl="VC for merge">
+ <proof prover="1"><result status="valid" time="0.77" steps="2278"/></proof>
+ </goal>
+ <goal name="VC add" expl="VC for add">
+ <proof prover="1"><result status="valid" time="0.02" steps="86"/></proof>
+ </goal>
+ <goal name="VC remove_min" expl="VC for remove_min">
+ <proof prover="1"><result status="valid" time="0.02" steps="144"/></proof>
+ </goal>
+</theory>
+<theory name="HeapSort" sum="057d0771055c9e0238b33e20c60558a0">
+ <goal name="VC heapsort" expl="VC for heapsort">
+ <transf name="split_goal_wp">
+  <goal name="VC heapsort.1" expl="1. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  </goal>
+  <goal name="VC heapsort.2" expl="2. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.08" steps="74"/></proof>
+  </goal>
+  <goal name="VC heapsort.3" expl="3. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="VC heapsort.4" expl="4. precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC heapsort.5" expl="5. assertion">
+  <proof prover="1"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="VC heapsort.6" expl="6. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="VC heapsort.7" expl="7. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.04" steps="45"/></proof>
+  </goal>
+  <goal name="VC heapsort.8" expl="8. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC heapsort.9" expl="9. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="VC heapsort.10" expl="10. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC heapsort.11" expl="11. loop invariant init">
+  <proof prover="1"><result status="valid" time="0.02" steps="42"/></proof>
+  </goal>
+  <goal name="VC heapsort.12" expl="12. precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC heapsort.13" expl="13. index in array bounds">
+  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC heapsort.14" expl="14. precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC heapsort.15" expl="15. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.06" steps="116"/></proof>
+  </goal>
+  <goal name="VC heapsort.16" expl="16. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="VC heapsort.17" expl="17. loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC heapsort.18" expl="18. loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.14" steps="342"/></proof>
+  </goal>
+  <goal name="VC heapsort.19" expl="19. postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="VC heapsort.20" expl="20. postcondition">
+  <proof prover="1"><result status="valid" time="0.03" steps="53"/></proof>
+  </goal>
+  <goal name="VC heapsort.21" expl="21. out of loop bounds">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC heapsort.22" expl="22. out of loop bounds">
+  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
