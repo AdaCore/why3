@@ -24,7 +24,7 @@
  <goal name="matches_right_weakening">
  <proof prover="6"><result status="valid" time="0.00" steps="17"/></proof>
  </goal>
- <goal name="matches_left_weakening">
+ <goal name="matches_left_weakening" expanded="true">
  <proof prover="0" edited="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="matches_sym">
@@ -37,8 +37,8 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="next_is_maximal">
- <proof prover="0" edited="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"><result status="valid" time="0.20"/></proof>
+ <goal name="next_is_maximal" expanded="true">
+ <proof prover="0" edited="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"><result status="valid" time="0.38"/></proof>
  </goal>
  <goal name="next_1_0">
  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
@@ -131,8 +131,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC kmp" expl="VC for kmp" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="VC kmp" expl="VC for kmp">
+ <transf name="split_goal_wp">
   <goal name="VC kmp.1" expl="1. precondition">
   <proof prover="6"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
@@ -187,10 +187,9 @@
   <goal name="VC kmp.18" expl="18. loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
-  <goal name="VC kmp.19" expl="19. loop invariant preservation" expanded="true">
+  <goal name="VC kmp.19" expl="19. loop invariant preservation">
   <proof prover="4"><result status="valid" time="10.46" steps="634"/></proof>
-  <metas
-   expanded="true">
+  <metas>
    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
     <ip_library name="why3"/>
     <ip_library name="BuiltIn"/>
@@ -584,9 +583,9 @@
    <meta name="remove_type">
     <meta_arg_ts id="map"/>
    </meta>
-   <goal name="VC kmp.19" expl="19. loop invariant preservation" expanded="true">
-   <transf name="eliminate_builtin" expanded="true">
-    <goal name="VC kmp.19.1" expl="1. loop invariant preservation" expanded="true">
+   <goal name="VC kmp.19" expl="19. loop invariant preservation">
+   <transf name="eliminate_builtin">
+    <goal name="VC kmp.19.1" expl="1. loop invariant preservation">
     <proof prover="6" timelimit="30"><result status="valid" time="0.02" steps="68"/></proof>
     <proof prover="7" timelimit="1"><result status="valid" time="0.02"/></proof>
     </goal>
@@ -596,7 +595,6 @@
   </goal>
   <goal name="VC kmp.20" expl="20. postcondition">
   <proof prover="6"><result status="valid" time="0.02" steps="71"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
