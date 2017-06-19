@@ -542,15 +542,10 @@ theory FoldLeft
   use import Seq
   use import int.Int
 
-  function fold ('b -> 'a -> 'b) 'b (seq 'a) int : 'b
-
-  axiom fold_stop: forall f: 'b -> 'a -> 'b, acc: 'b, s: seq 'a, i: int.
-    i >= length s -> fold f acc s i = acc
-  axiom fold_loop: forall f: 'b -> 'a -> 'b, acc: 'b, s: seq 'a, i: int.
-    i < length s -> fold f acc s i = fold f (f acc s[i]) s (i+1)
-
-  function fold_left (f: 'b -> 'a -> 'b) (acc: 'b) (s: seq 'a) : 'b =
-    fold f acc s 0
+  let rec function fold_left (f: 'a -> 'b -> 'a) (acc: 'a) (s: seq 'b) : 'a
+    variant { length s }
+  = if length s = 0 then acc
+    else fold_left f (f acc s[0]) s[1 ..]
 
   use import list.List
   use import OfList
