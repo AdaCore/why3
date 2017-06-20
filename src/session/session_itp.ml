@@ -98,18 +98,6 @@ type session = {
 let theory_parent s th =
   Hstr.find s.session_files th.theory_parent_name
 
-(* TODO replace *)
-let init_Hpn (s : session) (h: 'a Hpn.t) (d: 'a) : unit =
-  Hint.iter (fun k _pn -> Hpn.replace h k d) s.proofNode_table
-
-let init_Htn (s : session) (h: 'a Htn.t) (d: 'a) : unit =
-  Hint.iter (fun k _pn -> Htn.replace h k d) s.trans_table
-
-(*
-let _session_iter_proofNode f s =
-  Hint.iter f s.proofNode_table
-*)
-
 let session_iter_proof_attempt f s =
   Hint.iter f s.proofAttempt_table
 

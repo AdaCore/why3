@@ -124,9 +124,9 @@ let th_proved c th  =
     Hid.find_def c.proof_state.th_state false (theory_name th)
 let file_proved c f =
   if f.file_theories = [] then
-    true
+    Stdlib.Hstr.find_def c.proof_state.file_state true f.file_name
   else
-    List.for_all (fun th -> th_proved c th) f.file_theories
+    Stdlib.Hstr.find_def c.proof_state.file_state false f.file_name
 
 let any_proved cont any : bool =
   match any with
@@ -239,9 +239,11 @@ let update_file_node notification c f =
   let ps = c.proof_state in
   let ths = f.file_theories in
   let proved = List.for_all (th_proved c) ths in
+  Format.eprintf "[TEMP] notify file status is now proved = %b@." proved;
   if proved <> file_proved c f then
     begin
       Stdlib.Hstr.replace ps.file_state f.file_name proved;
+      Format.eprintf "[TEMP]notify file status change@.";
       notification (AFile f);
     end
 
@@ -252,6 +254,7 @@ let update_theory_node notification c th =
   if proved <> th_proved c th then
     begin
       Hid.replace ps.th_state (theory_name th) proved;
+      Format.eprintf "[TEMP]notify theory status change@.";
       notification (ATh th);
       update_file_node notification c (theory_parent c.controller_session th)
     end

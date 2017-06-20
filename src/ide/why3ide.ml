@@ -50,24 +50,22 @@ module Protocol_why3ide = struct
       ~desc:"Print@ debugging@ messages@ about@ Why3Ide@ protocol@"
 
   let print_request_debug r =
-    Debug.dprintf debug_proto "[request]";
-    Debug.dprintf debug_proto "%a@." print_request r;
+    Debug.dprintf debug_proto "[IDE proto] request %a@." print_request r;
     Debug.dprintf debug_json "%a@." print_request_json r
 
   let print_msg_debug m =
-    Debug.dprintf debug_proto "[message]";
-    Debug.dprintf debug_proto "%a@." print_msg m
+    Debug.dprintf debug_proto "[IDE proto] message %a@." print_msg m
 
   let print_notify_debug n =
-    Debug.dprintf debug_proto "[notification]";
-    Debug.dprintf debug_proto "%a@." print_notify n;
+    Debug.dprintf debug_proto "[IDE proto] handling notification %a@." print_notify n;
     Debug.dprintf debug_json "%a@." print_notification_json n
 
   let list_requests: ide_request list ref = ref []
 
   let get_requests () =
-    if List.length !list_requests > 0 then
-      Debug.dprintf debug_proto "get requests@.";
+    let n = List.length !list_requests in
+    if n > 0 then
+      Debug.dprintf debug_proto "[IDE proto] got %d newrequests@." n;
     let l = List.rev !list_requests in
     list_requests := [];
     l
@@ -79,12 +77,14 @@ module Protocol_why3ide = struct
   let notification_list: notification list ref = ref []
 
   let notify n =
+(* too early, print when handling notifications
     print_notify_debug n;
-    notification_list := n :: !notification_list
+ *)    notification_list := n :: !notification_list
 
   let get_notified () =
-    if List.length !notification_list > 0 then
-      Debug.dprintf debug_proto "get notified@.";
+    let n = List.length !notification_list in
+    if n > 0 then
+      Debug.dprintf debug_proto "[IDE proto] got %d new notifications@." n;
     let l = List.rev !notification_list in
     notification_list := [];
     l
@@ -1549,13 +1549,6 @@ let new_node ?parent (* ?(collapse=false) *) id name typ detached =
          | NTransformation -> !image_transf
          | NProofAttempt -> !image_prover);
     let path = goals_model#get_path iter in
-(*
-    if not proved then
-      begin
-        Debug.dprintf debug "Expanding row for unproved node %d@." id;
-        goals_view#expand_to_path path;
-      end;
- *)
     let new_ref = goals_model#get_row_reference path in
     Hint.add node_id_to_gtree id new_ref;
     set_status_and_time_column new_ref;

@@ -25,9 +25,6 @@ module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID
 module Hpan: Exthtbl.S with type key = proofAttemptID
 
-val init_Hpn: session ->'a Hpn.t -> 'a -> unit
-val init_Htn: session ->'a Htn.t -> 'a -> unit
-
 type theory
 
 type file = private {

@@ -980,7 +980,9 @@ end
          let obs = (get_proof_attempt_node c.controller_session pa).proof_obsolete in
          P.notify (Node_change (node_ID, Obsolete obs))
       | _ -> ()
-    with Not_found -> ()
+    with Not_found ->
+      Format.eprintf "Anomaly: Itp_server.notify_change_proved@.";
+      exit 1
 
   let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
     let d = get_server_data () in
