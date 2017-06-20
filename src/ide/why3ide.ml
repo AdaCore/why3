@@ -74,14 +74,12 @@ module Protocol_why3ide = struct
 
   let send_request r =
     print_request_debug r;
-    Debug.dprintf debug_proto "@.";
     list_requests := r :: !list_requests
 
   let notification_list: notification list ref = ref []
 
   let notify n =
     print_notify_debug n;
-    Debug.dprintf debug_proto "@.";
     notification_list := n :: !notification_list
 
   let get_notified () =
@@ -641,7 +639,11 @@ let node_id_pa : pa_status Hint.t = Hint.create 17
 let node_id_detached : bool Hint.t = Hint.create 17
 
 let get_node_type id = Hint.find node_id_type id
-let get_node_proved id = Hint.find node_id_proved id
+
+let get_node_proved id =
+  try Hint.find node_id_proved id
+  with Not_found -> false
+
 let get_node_id_pa id = Hint.find node_id_pa id
 
 let get_obs (pa_st: pa_status) = match pa_st with
@@ -1010,95 +1012,6 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
   List.iter (fun (loc, color) ->
     color_loc ~color loc) l
 
-(**************************)
-(* Graphical proof status *)
-(**************************)
-
-let image_of_pa_status ~obsolete pa =
-  match pa with
-  | Controller_itp.Unedited -> !image_scheduled (* TODO !image_unedited *)
-  | Controller_itp.JustEdited -> !image_scheduled (* TODO !image_edited *)
-  | Controller_itp.Interrupted -> !image_undone
-  | Controller_itp.Scheduled -> !image_scheduled
-  | Controller_itp.Running -> !image_running
-  | Controller_itp.InternalFailure _e -> !image_failure
-  | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
-  | Controller_itp.Done r ->
-    let pr_answer = r.Call_provers.pr_answer in
-    begin
-      match pr_answer with
-      | Call_provers.Valid ->
-        if obsolete then !image_valid_obs else !image_valid
-      | Call_provers.Invalid ->
-        if obsolete then !image_invalid_obs else !image_invalid
-      | Call_provers.Timeout ->
-        if obsolete then !image_timeout_obs else !image_timeout
-      | Call_provers.OutOfMemory ->
-        if obsolete then !image_outofmemory_obs else !image_outofmemory
-      | Call_provers.StepLimitExceeded ->
-        if obsolete then !image_steplimitexceeded_obs
-        else !image_steplimitexceeded
-      | Call_provers.Unknown _ ->
-        if obsolete then !image_unknown_obs else !image_unknown
-      | Call_provers.Failure _ ->
-        if obsolete then !image_failure_obs else !image_failure
-      | Call_provers.HighFailure ->
-        if obsolete then !image_failure_obs else !image_failure
-    end
-
-let set_status_column iter =
-  let id = get_node_id iter in
-  let proved = get_node_proved id in
-  let detached = get_node_detached id in
-  let image = match get_node_type id with
-    | NRoot -> assert false
-    | NFile
-    | NTheory
-    | NTransformation
-    | NGoal ->
-      if detached then
-        !image_valid_obs
-      else
-        if proved
-        then !image_valid
-        else !image_unknown
-    | NProofAttempt ->
-      let pa = get_node_proof_attempt id in
-      let obs = get_node_obs id in
-      image_of_pa_status ~obsolete:obs pa
-  in
-  goals_model#set ~row:iter ~column:status_column image
-
-let new_node ?parent ?(collapse=false) id name typ proved detached =
-  if not (Hint.mem node_id_to_gtree id) then begin
-    Hint.add node_id_type id typ;
-    Hint.add node_id_proved id proved;
-    Hint.add node_id_detached id detached;
-    (* The tree does not have a root by default so the task is a forest with
-       several root files *)
-    let iter =
-      match parent with
-      | None -> goals_model#append ()
-      | Some p -> goals_model#append ~parent:p#iter ()
-    in
-    goals_model#set ~row:iter ~column:name_column name;
-    goals_model#set ~row:iter ~column:node_id_column id;
-    goals_model#set ~row:iter ~column:icon_column
-      (match typ with
-         | NGoal -> !image_goal
-         | NRoot | NFile -> !image_file
-         | NTheory -> !image_theory
-         | NTransformation -> !image_transf
-         | NProofAttempt -> !image_prover);
-    let new_ref = goals_model#get_row_reference (goals_model#get_path iter) in
-    (* By default expand_path when creating a new node *)
-    if not collapse then goals_view#expand_to_path (goals_model#get_path iter);
-    Hint.add node_id_to_gtree id new_ref;
-    set_status_column iter;
-    new_ref
-  end
-  else
-    Hint.find node_id_to_gtree id
 
 (*******************)
 (* The "View" menu *)
@@ -1171,11 +1084,13 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
+(* unused
 let rec update_status_column_from_iter cont iter =
   set_status_column iter;
   match goals_model#iter_parent iter with
   | Some p -> update_status_column_from_iter cont p
   | None -> ()
+*)
 
 (* TODO Unused functions. Map these to a key or remove it *)
 let move_current_row_selection_up () =
@@ -1505,41 +1420,149 @@ let if_selected_alone id f =
      if i = id || Some i = get_parent id then f id
   | _ -> ()
 
+
+(**************************)
+(* Graphical proof status *)
+(**************************)
+
+let image_of_pa_status ~obsolete pa =
+  match pa with
+  | Controller_itp.Unedited -> !image_scheduled (* TODO !image_unedited *)
+  | Controller_itp.JustEdited -> !image_scheduled (* TODO !image_edited *)
+  | Controller_itp.Interrupted -> !image_undone
+  | Controller_itp.Scheduled -> !image_scheduled
+  | Controller_itp.Running -> !image_running
+  | Controller_itp.InternalFailure _e -> !image_failure
+  | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
+  | Controller_itp.Done r ->
+    let pr_answer = r.Call_provers.pr_answer in
+    begin
+      match pr_answer with
+      | Call_provers.Valid ->
+        if obsolete then !image_valid_obs else !image_valid
+      | Call_provers.Invalid ->
+        if obsolete then !image_invalid_obs else !image_invalid
+      | Call_provers.Timeout ->
+        if obsolete then !image_timeout_obs else !image_timeout
+      | Call_provers.OutOfMemory ->
+        if obsolete then !image_outofmemory_obs else !image_outofmemory
+      | Call_provers.StepLimitExceeded ->
+        if obsolete then !image_steplimitexceeded_obs
+        else !image_steplimitexceeded
+      | Call_provers.Unknown _ ->
+        if obsolete then !image_unknown_obs else !image_unknown
+      | Call_provers.Failure _ ->
+        if obsolete then !image_failure_obs else !image_failure
+      | Call_provers.HighFailure ->
+        if obsolete then !image_failure_obs else !image_failure
+    end
+
+
 module S = Session_itp
 module C = Controller_itp
 
-let set_status_and_time_column row pa obsolete l =
-  goals_model#set ~row:row#iter ~column:status_column
-                  (image_of_pa_status ~obsolete pa);
-  let t = match pa with
-    | C.Done r ->
-       let time = r.Call_provers.pr_time in
-       let steps = r.Call_provers.pr_steps in
-       let s =
-         if gconfig.show_time_limit then
-           Format.sprintf "%.2f [%d.0]" time
-                          (l.Call_provers.limit_time)
-         else
-           Format.sprintf "%.2f" time
-       in
-       if steps >= 0 then
-	 Format.sprintf "%s (steps: %d)" s steps
-       else
-	 s
-    | C.Unedited -> "(proof script not yet edited)"
-    | C.JustEdited -> "(proof script edited, replay needed)"
-    | C.InternalFailure _ -> "(internal failure)"
-    | C.Interrupted -> "(interrupted)"
-    | C.Uninstalled _ -> "(uninstalled prover)"
-    | C.Scheduled
-    | C.Running ->
-       Format.sprintf "[limit=%d sec., %d M]"
-                      (l.Call_provers.limit_time)
-                      (l.Call_provers.limit_mem)
-  in
-  let t = if obsolete then t ^ " (obsolete)" else t in
-  goals_model#set ~row:row#iter ~column:time_column t
 
+let set_status_and_time_column ?limit row =
+  let id = get_node_id row#iter in
+  let proved = get_node_proved id in
+  let detached = get_node_detached id in
+  let image = match get_node_type id with
+    | NRoot -> assert false
+    | NFile
+    | NTheory
+    | NTransformation
+    | NGoal ->
+      if detached then
+        !image_valid_obs
+      else
+        if proved
+        then begin
+            Debug.dprintf debug "Collapsing row for proved node %d@." id;
+            goals_view#collapse_row (goals_model#get_path row#iter);
+            !image_valid
+          end
+        else begin
+            (* goals_view#expand_row (goals_model#get_path row#iter); *)
+            !image_unknown
+          end
+    | NProofAttempt ->
+      let pa = get_node_proof_attempt id in
+      let obs = get_node_obs id in
+      let t = match pa with
+        | C.Done r ->
+           let time = r.Call_provers.pr_time in
+           let steps = r.Call_provers.pr_steps in
+           let s =
+             if gconfig.show_time_limit then
+               match limit with
+                 | Some l ->
+                    Format.sprintf "%.2f [%d.0]" time
+                                   (l.Call_provers.limit_time)
+                 | None ->
+                    Format.sprintf "%.2f" time
+             else
+               Format.sprintf "%.2f" time
+           in
+           if steps >= 0 then
+	     Format.sprintf "%s (steps: %d)" s steps
+           else
+	     s
+        | C.Unedited -> "(proof script not yet edited)"
+        | C.JustEdited -> "(proof script edited, replay needed)"
+        | C.InternalFailure _ -> "(internal failure)"
+        | C.Interrupted -> "(interrupted)"
+        | C.Uninstalled _ -> "(uninstalled prover)"
+        | C.Scheduled
+        | C.Running ->
+           match limit with
+             | Some l ->
+                Format.sprintf "[limit=%d sec., %d M]"
+                               (l.Call_provers.limit_time)
+                               (l.Call_provers.limit_mem)
+             | None -> ""
+      in
+      let t = if obs then t ^ " (obsolete)" else t in
+      goals_model#set ~row:row#iter ~column:time_column t;
+      image_of_pa_status ~obsolete:obs pa
+  in
+  goals_model#set ~row:row#iter ~column:status_column image
+
+
+let new_node ?parent (* ?(collapse=false) *) id name typ detached =
+  if not (Hint.mem node_id_to_gtree id) then begin
+    Hint.add node_id_type id typ;
+    Hint.add node_id_detached id detached;
+    (* The tree does not have a root by default so the task is a forest with
+       several root files *)
+    let iter =
+      match parent with
+      | None -> goals_model#append ()
+      | Some p -> goals_model#append ~parent:p#iter ()
+    in
+    goals_model#set ~row:iter ~column:name_column name;
+    goals_model#set ~row:iter ~column:node_id_column id;
+    goals_model#set ~row:iter ~column:icon_column
+      (match typ with
+         | NGoal -> !image_goal
+         | NRoot | NFile -> !image_file
+         | NTheory -> !image_theory
+         | NTransformation -> !image_transf
+         | NProofAttempt -> !image_prover);
+    let path = goals_model#get_path iter in
+(*
+    if not proved then
+      begin
+        Debug.dprintf debug "Expanding row for unproved node %d@." id;
+        goals_view#expand_to_path path;
+      end;
+ *)
+    let new_ref = goals_model#get_row_reference path in
+    Hint.add node_id_to_gtree id new_ref;
+    set_status_and_time_column new_ref;
+    new_ref
+  end
+  else
+    Hint.find node_id_to_gtree id
 
 
 (*****************************)
@@ -1615,25 +1638,48 @@ let init_completion provers transformations commands =
   command_entry#set_completion command_entry_completion
 
 let treat_notification n =
+  Protocol_why3ide.print_notify_debug n;
   begin match n with
   | Node_change (id, uinfo)        ->
      begin
        match uinfo with
        | Proved b ->
-          Hint.replace node_id_proved id b;
-          set_status_column (get_node_row id)#iter;
-          (* Trying to move cursor on first unproven goal around on all cases
-             but not when proofAttempt is updated because ad hoc debugging. *)
-          send_request (Get_first_unproven_node id)
+          let old =
+            try
+              let o = Hint.find node_id_proved id in
+              Hint.replace node_id_proved id b;
+              o
+            with Not_found ->
+              Hint.add node_id_proved id b;
+              (* new node, then expand it if not proved *)
+              not b
+          in
+          if old <> b then begin
+              set_status_and_time_column (get_node_row id);
+              if not b then
+                begin
+                  try
+                    let row = Hint.find node_id_to_gtree id in
+                    let path = row#path in
+                    Debug.dprintf debug "Expanding row for unproved node %d@." id;
+                    goals_view#expand_to_path path
+                  with Not_found ->
+                    Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
+                end
+              else
+                (* Trying to move cursor on first unproven goal around on all cases
+              but not when proofAttempt is updated because ad hoc debugging. *)
+                send_request (Get_first_unproven_node id)
+            end
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
-          set_status_and_time_column r pa obs l
+          set_status_and_time_column ~limit:l r
        | Obsolete b ->
           let r = get_node_row id in
           let (pa, _, l) = Hint.find node_id_pa id in
           Hint.replace node_id_pa id (pa, b, l);
-          set_status_and_time_column r pa b l
+          set_status_and_time_column ~limit:l r
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id
@@ -1653,9 +1699,9 @@ let treat_notification n =
        in
        try
          let parent = get_node_row parent_id in
-         ignore (new_node ~parent id name typ false detached)
+         ignore (new_node ~parent id name typ detached)
        with Not_found ->
-         ignore (new_node id name typ false detached)
+         ignore (new_node id name typ detached)
      end
   | Remove id                     ->
      let n = get_node_row id in
