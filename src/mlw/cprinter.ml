@@ -485,13 +485,11 @@ end
 
 module MLToC = struct
 
-  open Pdecl
   open Ity
   open Ty
   open Expr
   open Term
   open Printer
-  open Pmodule
   open Mltree
   open C
 
@@ -579,10 +577,10 @@ module MLToC = struct
        ([],return_or_expr env (C.Econst (Cint "1")))
     | Eapp (rs, []) when rs_equal rs rs_false ->
        ([],return_or_expr env (C.Econst (Cint "0")))
-    | Evar pv ->
+    | Mltree.Evar pv ->
        let e = C.Evar (pv_name pv) in
        ([], return_or_expr env e)
-    | Econst ic ->
+    | Mltree.Econst ic ->
       let n = Number.compute_int_constant ic in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
@@ -601,7 +599,7 @@ module MLToC = struct
 		    el
                 in
 		assert (List.length rl = List.length args);
-                let env_f = { env with computes_return_value=false } in
+                let env_f = { env with computes_return_value = false } in
 		C.([],
 		   List.fold_right2
                      (fun res arg acc ->
@@ -624,8 +622,8 @@ module MLToC = struct
                      let _ =
                        Str.search_forward
                          (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0 in
-                     let env_f = { env
-                                 with computes_return_value = false } in
+                     let env_f =
+                       { env with computes_return_value = false } in
                      let params =
 		       List.map
                          (fun e ->
@@ -692,7 +690,7 @@ module MLToC = struct
        | Lvar (pv,le) -> (* not a block *)
           begin
           match le.e_node with
-          | Econst ic ->
+          | Mltree.Econst ic ->
             let n = Number.compute_int_constant ic in
             let ce = C.(Econst (Cint (BigInt.to_string n))) in
 	    if debug then Format.printf "propagate constant %s for var %s@."
@@ -770,7 +768,7 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
-          | [pv], Evar pv'
+          | [pv], Mltree.Evar pv'
             when pv_equal pv pv' && env.computes_return_value ->
             (bs, Sid.add id rs)
           | [], (Eblock []) when is_unit r.e_ity && is_while ->
@@ -791,7 +789,7 @@ module MLToC = struct
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
       if debug then Format.printf "RETURN@.";
       expr info {env with computes_return_value = true} r
-    | Eraise (xs, None) -> assert false (* nothing to pass to return *)
+    | Eraise (_, None) -> assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
     | Efor _ -> raise (Unsupported "for loops")  (*TODO*)
     | Ematch (e1, [Ptuple rets,e2])
@@ -812,6 +810,28 @@ module MLToC = struct
       d@defs, C.(Sseq(s', Sblock b))
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
+    | Eassign ([pv, ({rs_field = Some _} as rs), v]) ->
+       let t =
+         match (query_syntax info.syntax rs.rs_name,
+                      query_syntax info.converter rs.rs_name) with
+         | _, Some s | Some s, _ ->
+            let _ =
+              try
+                Str.search_forward
+                  (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
+              with Not_found -> raise (Unsupported "assign field format")  in
+            let params = [ C.Evar pv.pv_vs.vs_name,
+                           ty_of_ty info (ty_of_ity pv.pv_ity) ] in
+            let rty = ty_of_ity rs.rs_cty.cty_result in
+            let rtyargs = match rty.ty_node with
+	      | Tyvar _ -> [||]
+	      | Tyapp (_,args) ->
+                 Array.of_list (List.map (ty_of_ty info) args)
+	    in
+            C.Esyntax(s,ty_of_ty info rty, rtyargs, params,
+                      Mid.mem rs.rs_name info.converter)
+         | None, None -> raise (Unsupported ("assign not in driver")) in
+       [], C.(Sexpr(Ebinop(Bassign, t, C.Evar v.pv_vs.vs_name)))
     | Eassign _ -> raise (Unsupported "assign")
     | Ehole -> assert false
     | Eexn _ -> raise (Unsupported "exception")
@@ -825,14 +845,14 @@ module MLToC = struct
   let translate_decl (info:info) (d:decl) : C.definition option
     =
     match d with
-    | Dlet (Lsym(rs, ty, vl, e)) ->
+    | Dlet (Lsym(rs, _, vl, e)) ->
        if rs_ghost rs
        then begin if debug then Format.printf "is ghost@."; None end
        else
          begin try
            let params =
              List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
-                      (List.filter (fun (id, ty, gh) -> not gh) vl) in
+                      (List.filter (fun (_,_, gh) -> not gh) vl) in
 	   let env = { computes_return_value = true;
 		       in_unguarded_loop = false;
 		       returns_tuple = false, [];
@@ -941,6 +961,7 @@ let print_decl args ?old ?fname ~flat m fmt d =
   ignore old;
   ignore fname;
   ignore flat; (*FIXME*)
+  ignore m;
   let cds = MLToC.translate_decl args d in
   match cds with
   | None -> ()
