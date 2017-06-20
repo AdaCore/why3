@@ -547,9 +547,10 @@ let init () =
    let session_dir =
      let project_dir =
       try Session.get_project_dir Gnat_config.filename
-      with Not_found ->
-      Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not compute session file for %s" Gnat_config.filename)
+      with | e when Debug.test_flag Debug.stack_trace -> raise e
+      | Not_found ->
+        Gnat_util.abort_with_message ~internal:true
+          (Pp.sprintf "could not compute session file for %s" Gnat_config.filename)
      in
      match Gnat_config.proof_dir with
      | None -> project_dir

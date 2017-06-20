@@ -80,7 +80,8 @@ let parse_loc =
    fun l ->
    try
      List.rev (parse_loc_list [] ~first:true l)
-   with Failure s ->
+   with e when Debug.test_flag Debug.stack_trace -> raise e
+   | Failure s ->
           Gnat_util.abort_with_message ~internal:true
             ("failure when parsing location list: " ^ s)
 

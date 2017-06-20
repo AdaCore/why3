@@ -219,7 +219,8 @@ let read_label s =
        | ["GP_Pretty_Ada"; msg] ->
            begin try
              Some (Gp_Pretty_Ada (int_of_string msg))
-           with Failure _ ->
+           with e when Debug.test_flag Debug.stack_trace -> raise e
+           | Failure _ ->
              let s =
                Format.sprintf "GP_Pretty_Ada: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
@@ -227,20 +228,23 @@ let read_label s =
        | ["GP_Id"; msg] ->
            begin try
              Some (Gp_VC_Id (int_of_string msg))
-           with Failure _ ->
+           with e when Debug.test_flag Debug.stack_trace -> raise e
+           | Failure _ ->
              let s = Format.sprintf "GP_VC_Id: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
        | "GP_Sloc" :: rest ->
            begin try Some (Gp_Sloc (Gnat_loc.parse_loc rest))
-           with Failure _ ->
+           with e when Debug.test_flag Debug.stack_trace -> raise e
+           | Failure _ ->
              let s = Format.sprintf "GP_Sloc: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end
        | ["GP_Subp" ; file ; line ] ->
            begin try
              Some (Gp_Subp (Gnat_loc.mk_loc_line file (int_of_string line)))
-           with Failure _ ->
+           with e when Debug.test_flag Debug.stack_trace -> raise e
+           | Failure _ ->
              let s = Format.sprintf "GP_Subp: cannot parse string: %s" s in
               Gnat_util.abort_with_message ~internal:true s
            end

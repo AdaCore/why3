@@ -269,7 +269,8 @@ let _ =
      | Gnat_config.No_WP ->
         (* we should never get here *)
         ()
-    with e ->
+    with e when Debug.test_flag Debug.stack_trace -> raise e
+    | e ->
        let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
        Gnat_util.abort_with_message ~internal:true s
    end;
