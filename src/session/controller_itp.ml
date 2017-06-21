@@ -800,21 +800,27 @@ let schedule_tr_with_same_arguments
   let name = get_transf_name s tr in
   schedule_transformation c pn name args ~callback ~notification
 
-
-
 let clean_session c ~remove =
   let s = c.controller_session in
-  Session_itp.session_iter_proof_attempt
-    (fun id pa ->
-      if pn_proved c pa.parent then
-        match pa.Session_itp.proof_state with
-        | None -> ()
-        | Some pr ->
+  (* This function is applied on leafs first for the case of removes *)
+  Session_itp.fold_all_session s
+    (fun () any ->
+      (match any with
+      | APa pa ->
+        let pa = Session_itp.get_proof_attempt_node c.controller_session pa in
+        if pn_proved c pa.parent then
+          (match pa.Session_itp.proof_state with
+          | None -> ()
+          | Some pr ->
            if pa.Session_itp.proof_obsolete ||
                 Call_provers.(pr.pr_answer <> Valid)
            then
-             remove_subtree c ~removed:remove ~notification:(fun _ -> ()) (APa id))
-    s
+             remove_subtree c ~removed:remove ~notification:(fun _ -> ()) any)
+      | ATn tn ->
+        let pn = get_trans_parent c.controller_session tn in
+        if pn_proved c pn && not (tn_proved c tn) then
+          remove_subtree c ~removed:remove ~notification:(fun _ -> ()) (ATn tn)
+      | _ -> ())) ()
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)

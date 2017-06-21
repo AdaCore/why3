@@ -358,6 +358,10 @@ let fold_all_any s f acc any =
   | ATn tn -> fold_all_any_of_transn s f acc tn
   | APa _ -> f acc any
 
+let fold_all_session s f acc =
+  let files = get_files s in
+  Hstr.fold (fun _key file acc -> fold_all_any s f acc (AFile file)) files acc
+
 exception RemoveError
 
 (* Cannot remove a proof_attempt that was scheduled but did not finish yet.

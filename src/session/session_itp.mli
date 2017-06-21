@@ -204,3 +204,6 @@ val remove_subtree: session -> any -> notification:(any -> unit) -> unit
 
 val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
 (** [fold_all_any s f acc any] folds on all the subnodes of any *)
+
+val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
+(** [fold_all_session s f acc] folds on the whole session *)
