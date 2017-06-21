@@ -334,23 +334,26 @@ module ToSeq
   use import Array
   use seq.Seq as S
 
-  let rec function to_seq (a: array 'a) (l u: int) : S.seq 'a
+  let rec function to_seq_sub (a: array 'a) (l u: int) : S.seq 'a
     requires { l >= 0 /\ u <= a.length }
     variant { u - l }
-  = if u <= l then S.empty else S.cons a[l] (to_seq a (l+1) u)
+  = if u <= l then S.empty else S.cons a[l] (to_seq_sub a (l+1) u)
 
   let rec lemma to_seq_length
     (a: array 'a) (l u: int)
     requires { 0 <= l <= u <= length a }
     variant  { u - l }
-    ensures  { S.length (to_seq a l u) = u - l }
+    ensures  { S.length (to_seq_sub a l u) = u - l }
   = if l < u then to_seq_length a (l+1) u
 
   let rec lemma to_seq_nth
     (a: array 'a) (l i u: int)
     requires { 0 <= l <= i < u <= length a }
     variant  { i - l }
-    ensures  { S.get (to_seq a l u) (i - l) = a[i] }
+    ensures  { S.get (to_seq_sub a l u) (i - l) = a[i] }
   = if l < i then to_seq_nth a (l+1) i u
+
+  let function to_seq (a: array 'a) : S.seq 'a = to_seq_sub a 0 (length a)
+  meta coercion function to_seq
 
 end

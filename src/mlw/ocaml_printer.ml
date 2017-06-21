@@ -137,6 +137,8 @@ module Print = struct
       print_tv fmt tv
     | Ttuple [] ->
       fprintf fmt "unit"
+    | Ttuple [t] ->
+      print_ty ~paren info fmt t
     | Ttuple tl ->
       fprintf fmt (protect_on paren "@[%a@]")
         (print_list star (print_ty ~paren:true info)) tl

@@ -33,6 +33,7 @@ type expr = {
   e_node   : expr_node;
   e_ity    : ity;
   e_effect : effect;
+  e_label  : Slab.t;
 }
 
 and expr_node =
