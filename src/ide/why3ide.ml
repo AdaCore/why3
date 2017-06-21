@@ -753,28 +753,6 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-(* TODO is it necessary ?
-let pr_output_page,scrolled_pr_output_view =
-  let label = GMisc.label ~text:"Prover output" () in
-  1, GPack.vbox ~homogeneous:false ~packing:
-    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-
-let scrolled_pr_output_view =
-  GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT
-    ~packing:scrolled_pr_output_view#add ()
-
-(* Showing prover output *)
-let prover_output_view =
-  GSourceView2.source_view
-    ~editable:false
-    ~cursor_visible:true
-    ~show_line_numbers:true
-    ~packing:scrolled_pr_output_view#add
-    ()
-*)
-
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
