@@ -139,6 +139,7 @@ let parse_line_spec s =
          invalid parameter number, must be \
          2 or 4")
   with
+   | e when Debug.test_flag Debug.stack_trace -> raise e
    | Failure "int_of_string" ->
       Gnat_util.abort_with_message ~internal:true
       ("limit-line: incorrect line specification -\
@@ -192,6 +193,10 @@ let options = Arg.align [
           " Enable debug mode; also deactivates why3server";
    "--debug-server", Arg.Set opt_debug,
           " Enable debug mode and keep why3server activated";
+   "--debug-stack-trace", Arg.Tuple [Arg.Set opt_debug;
+            Arg.Unit (fun () -> Debug.set_flag Debug.stack_trace;
+                                Printexc.record_backtrace true)],
+          " Enable debug mode; and gives stack_trace on any exception raised";
    "--standalone", Arg.Set opt_standalone,
           " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
@@ -273,6 +278,7 @@ let compute_base_provers config str_list =
         None in
     base_provers, base_prover_ce
   with
+  | e when Debug.test_flag Debug.stack_trace -> raise e
   | Not_found ->
     Gnat_util.abort_with_message ~internal:false
       "Default prover not installed or not configured."
@@ -313,7 +319,8 @@ let provers, prover_ce, config, env =
              (Whyconf.set_provers ~shortcuts gnatprove_config provers)
              editors
         end
-     with Rc.CannotOpen (f,s) ->
+     with e when Debug.test_flag Debug.stack_trace -> raise e
+     | Rc.CannotOpen (f,s) ->
        Gnat_util.abort_with_message ~internal:true
          (Format.sprintf "cannot read file %s: %s" f s)
   in
@@ -339,7 +346,8 @@ let provers, prover_ce, config, env =
       let driver_file = find_driver_file base_prover.Whyconf.driver in
       Driver.load_driver_absolute
         env driver_file base_prover.Whyconf.extra_drivers
-    with e ->
+    with e when Debug.test_flag Debug.stack_trace -> raise e
+    | e ->
       let s =
         Pp.sprintf "Failed to load driver for prover: %a"
              Exn_printer.exn_printer e in
