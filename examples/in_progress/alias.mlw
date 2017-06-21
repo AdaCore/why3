@@ -1,5 +1,25 @@
 
 module Test
+  use import ref.Ref
+  use import mach.int.UInt32
+  use import mach.c.C
+
+  let a () : unit diverges =
+    let zero = Int32.of_int 0 in
+    let r = ref 0 in
+    let rr = ref r in
+    let x = ref (ref 0) in
+    x := !x;
+    !x := 42;
+    let p = malloc (UInt32.of_int 2) in
+    c_assert (is_not_null p);
+    let b = ref p in
+    b := !b;
+    let c = get p in
+    let d = get !b in
+(*    b := incr p zero;*)
+    ()
+    
 
   type t = {
      mutable f : int;
@@ -7,7 +27,7 @@ module Test
 
   val c (x:t) : t
     ensures { x.f = result.f }
-    alias { x.f with result.f }
+    alias { x with result }
 
   let test () =
     let x = { f = 42 } in
@@ -19,6 +39,34 @@ module Test
 
 end
 
+module Refptr
+  use import mach.int.Int32
+  use import mach.c.C
+
+  type refp = { mutable pcontents "model_trace:" : ptr int }
+
+  function (!!) (x: refp) : ptr int
+  = x.pcontents
+
+  let refp (v: ptr int) : refp
+    requires { valid v 0 }
+    ensures { result.pcontents.data = v.data }
+    ensures { result.pcontents.offset = v.offset }
+  (*  alias   { result.contents.data with v.data } *) (* ? *)
+  = { pcontents = incr v (Int32.of_int 0) }
+
+  let (!!) (x:refp) : ptr int
+  ensures { result = !!x }
+    = x.pcontents
+
+  val (::=) (r: refp) (v: ptr int) : unit
+  writes { r }
+  ensures { !!r.data = v.data }
+  ensures { !!r.offset = v.offset }
+  (*= r.pcontents <- incr v (Int32.of_int 0)*)
+
+
+end
 
 
 module A
@@ -26,62 +74,29 @@ module A
   use import map.Map
   use import mach.int.Int32
   use import mach.int.UInt32
+  use import mach.c.C
   use import array.Array
   use import int.Int
+  use import Refptr
 
-  type ptr 'a = private {
-    mutable data : array 'a;
-    offset : int ;
-  }
-
-  function plength (p:ptr 'a) : int
-  = p.data.length
-
-  function pelts (p:ptr 'a) : int -> 'a
-  = p.data.elts
-
-  val incr (p:ptr 'a) (ofs:int32) : ptr 'a
-    ensures { result.offset = p.offset + Int32.to_int ofs }
-    ensures { result.data = p.data }
-    alias { p.data with result.data }
-
-  val malloc (sz:uint32) : ptr 'a
-    ensures { plength result = UInt32.to_int sz }
-    ensures { result.offset = 0 }
-
-  val get (p:ptr 'a) : 'a
-    requires { 0 <= p.offset < plength p }
-    ensures { result = (p.data)[p.offset] }
-
-  let get_ofs (p:ptr 'a) (ofs:int32) : 'a
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { result = (p.data)[p.offset + Int32.to_int ofs] }
-  = get (incr p ofs)
-
-  val set (p:ptr 'a) (v:'a) : unit
-    requires { 0 <= p.offset < plength p }
-    ensures { pelts p = Map.set (pelts (old p)) p.offset v }
-    writes { p.data.elts }
-
-  let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { pelts p = Map.set (pelts (old p))
-              (p.offset + Int32.to_int ofs) v }
-    writes { p.data.elts }
-  =
-    set (incr p ofs) v
 
   let test () : unit
+  diverges
   =
     let zero = Int32.of_int 0 in
     let three = UInt32.of_int 3 in
     let p = malloc three in
+    c_assert (is_not_null p);
     let q = incr p zero in
     set p 42;
     let x = get q in
     assert { x = 42 };
     set q 27;
     let y = get p in
-    assert { y = 27 }
-
+    let s = refp p in
+  (*  s ::= !!s;
+    s ::= incr !!s zero;*) (*illegal alias*)
+    let z = get !!s in
+    assert { y = 27 = z }
 end
+

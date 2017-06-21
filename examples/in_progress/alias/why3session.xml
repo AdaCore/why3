@@ -2,71 +2,55 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../alias.mlw" expanded="true">
-<theory name="Test" sum="4f615f42994e005c74bb48e590b6e1d2">
+<theory name="Test" sum="73a4a499b6e864d023c0c31e982c1a8f" expanded="true">
+ <goal name="VC a" expl="VC for a">
+ <proof prover="0"><result status="valid" time="0.03" steps="88"/></proof>
+ <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+ </goal>
  <goal name="VC test" expl="VC for test">
  <transf name="split_goal_wp">
   <goal name="VC test.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="73"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC test.2" expl="2. assertion">
-  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="74"/></proof>
+  <proof prover="1" obsolete="true"><result status="valid" time="0.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="A" sum="52efc6362ddeccc17cada1f302ec1654">
- <goal name="VC get_ofs" expl="VC for get_ofs">
- <transf name="split_goal_wp">
-  <goal name="VC get_ofs.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+<theory name="Refptr" sum="7417fd2e4b28d8e56ebe64fea5a04573" expanded="true">
+ <goal name="VC refp" expl="VC for refp" expanded="true">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="1"/></proof>
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="VC refp.1" expl="1. integer overflow">
+  <proof prover="0"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
-  <goal name="VC get_ofs.2" expl="2. postcondition">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <goal name="VC refp.2" expl="2. precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
- </transf>
- </goal>
- <goal name="VC set_ofs" expl="VC for set_ofs">
- <transf name="split_goal_wp">
-  <goal name="VC set_ofs.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="VC refp.3" expl="3. postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
-  <goal name="VC set_ofs.2" expl="2. postcondition">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <goal name="VC refp.4" expl="4. postcondition">
+  <proof prover="0"><result status="valid" time="0.00" steps="76"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC test" expl="VC for test">
- <transf name="split_goal_wp">
-  <goal name="VC test.1" expl="1. integer overflow">
-  <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
-  </goal>
-  <goal name="VC test.2" expl="2. integer overflow">
-  <proof prover="0"><result status="valid" time="0.02" steps="73"/></proof>
-  </goal>
-  <goal name="VC test.3" expl="3. precondition">
-  <proof prover="0"><result status="valid" time="0.03" steps="77"/></proof>
-  </goal>
-  <goal name="VC test.4" expl="4. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="84"/></proof>
-  </goal>
-  <goal name="VC test.5" expl="5. assertion">
-  <proof prover="0"><result status="valid" time="0.02" steps="84"/></proof>
-  </goal>
-  <goal name="VC test.6" expl="6. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="85"/></proof>
-  </goal>
-  <goal name="VC test.7" expl="7. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="88"/></proof>
-  </goal>
-  <goal name="VC test.8" expl="8. assertion">
-  <proof prover="0"><result status="valid" time="0.02" steps="88"/></proof>
-  </goal>
- </transf>
+ <goal name="VC prefix !!" expl="VC for prefix !!" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="72"/></proof>
+ </goal>
+</theory>
+<theory name="A" sum="1980f35d92d038b4fe30befcdc0ef1d5" expanded="true">
+ <goal name="VC test" expl="VC for test" expanded="true">
+ <proof prover="0"><result status="valid" time="0.08" steps="297"/></proof>
  </goal>
 </theory>
 </file>
