@@ -1516,10 +1516,10 @@ let set_status_and_time_column ?limit row =
         | C.Running ->
            match limit with
              | Some l ->
-                Format.sprintf "[limit=%d sec., %d M]"
+                Format.sprintf "(scheduled?) [limit=%d sec., %d M]"
                                (l.Call_provers.limit_time)
                                (l.Call_provers.limit_mem)
-             | None -> ""
+             | None -> "(scheduled?) [no limit known]"
       in
       let t = if obs then t ^ " (obsolete)" else t in
       goals_model#set ~row:row#iter ~column:time_column t;
@@ -1668,11 +1668,13 @@ let treat_notification n =
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
           set_status_and_time_column ~limit:l r
+(*
        | Obsolete b ->
           let r = get_node_row id in
           let (pa, _, l) = Hint.find node_id_pa id in
           Hint.replace node_id_pa id (pa, b, l);
           set_status_and_time_column ~limit:l r
+*)
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id

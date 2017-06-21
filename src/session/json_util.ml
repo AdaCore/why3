@@ -90,9 +90,12 @@ let convert_update u =
              "proof_attempt", convert_proof_attempt pas;
              "obsolete", Bool b;
              "limit", convert_limit l]
+(*
   | Obsolete b ->
       convert_record ["update_info", String "Obsolete";
-           "obsolete", Bool b])
+           "obsolete", Bool b]
+*)
+         )
 
 let convert_notification_constructor n =
   match n with
@@ -609,9 +612,11 @@ let parse_update j =
     let b = get_bool (get_field j "obsolete") in
     let l = get_field j "limit" in
     Proof_status_change (parse_proof_attempt pas, b, parse_limit_from_json l)
+(*
   | "Obsolete" ->
     let b = get_bool (get_field j "obsolete") in
     Obsolete b
+*)
   | _ -> raise NotUpdate
 
 exception NotInfos

@@ -59,7 +59,6 @@ type update_info =
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
       * Call_provers.resource_limit
-  | Obsolete of bool
 
 type notification =
   | New_node     of node_ID * node_ID * node_type * string * bool

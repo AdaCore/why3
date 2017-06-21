@@ -558,6 +558,12 @@ let show_legend_window () =
   i "   Valid but obsolete result\n";
   ib image_unknown_obs;
   i "   Answer not conclusive and obsolete\n";
+  ib image_timeout_obs;
+  i "   Time limit reached, obsolete\n";
+  ib image_outofmemory_obs;
+  i "   Out of memory, obsolete\n";
+  ib image_steplimitexceeded_obs;
+  i "   Step limit exceeded, obsolete\n";
   ib image_invalid_obs;
   i "   Prover disproved goal, but obsolete\n";
   ib image_failure_obs;

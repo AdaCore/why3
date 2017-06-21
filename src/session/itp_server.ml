@@ -304,7 +304,9 @@ let print_notify fmt n =
       begin
         match nf with
         | Proved b -> fprintf fmt "node change %d Proved %b" ni b
+(*
         | Obsolete b -> fprintf fmt "node change %d Obsolete %b" ni b
+*)
         | Proof_status_change(st,b,_lim) ->
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
@@ -705,16 +707,15 @@ end
       P.notify (Node_change (new_id, Proved (pn_proved cont pn)))
     | APa pa ->
       let pa = get_proof_attempt_node cont.controller_session pa in
-      let is_obsolete = pa.proof_obsolete in
-      let resource_limit = pa.limit in
-      begin
+      let obs = pa.proof_obsolete in
+      let limit = pa.limit in
+      let res =
         match pa.Session_itp.proof_state with
-        | Some pa ->
-            P.notify (Node_change (
-                       new_id, Proof_status_change
-                                (Done pa, is_obsolete, resource_limit)))
-        | _ -> ()
-      end
+        | Some pa -> Done pa
+        | _ -> InternalFailure Not_found
+      in
+      P.notify (Node_change (new_id, Proof_status_change(res, obs, limit)))
+
 
 (*
   let get_info_and_type ses (node: any) =
@@ -977,8 +978,14 @@ end
       P.notify (Node_change (node_ID, Proved b));
       match x with
       | APa pa ->
-         let obs = (get_proof_attempt_node c.controller_session pa).proof_obsolete in
-         P.notify (Node_change (node_ID, Obsolete obs))
+         let pa = get_proof_attempt_node c.controller_session pa in
+         let res = match pa.Session_itp.proof_state with
+           | None -> InternalFailure Not_found
+           | Some r -> Done r
+         in
+         let obs = pa.proof_obsolete in
+         let limit = pa.limit in
+         P.notify (Node_change (node_ID, Proof_status_change(res, obs, limit)))
       | _ -> ()
     with Not_found ->
       Format.eprintf "Anomaly: Itp_server.notify_change_proved@.";
