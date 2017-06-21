@@ -1,5 +1,6 @@
 #!/bin/sh
 
+dir=`dirname $0`
 
 case "$1" in
   "-update-oracle")
@@ -14,7 +15,7 @@ esac
 
 run_cvc4_15 () {
   echo -n "  $1... "
-  why3prove -P "CVC4,1.5-prerelease" --get-ce $1 > $1.out
+  $dir/../bin/why3prove.opt -P "CVC4,1.5-prerelease" --get-ce $1 > $1.out
   if cmp $1.oracle $1.out > /dev/null 2>&1 ; then
      echo "ok"
   else
@@ -33,6 +34,6 @@ run_cvc4_15 () {
 
 
 
-for f in bench/ce/*.mlw; do
+for f in $dir/ce/*.mlw; do
     run_cvc4_15 $f
 done
