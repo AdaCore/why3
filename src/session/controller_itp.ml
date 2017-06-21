@@ -160,11 +160,14 @@ let remove_any_proof_state cont any : unit =
 
 
 
-(** TODO make the whole reloading of proof_state more efficient and natural *)
+(** TODO : REMOVE the following, it should be handle by session
+
+make the whole reloading of proof_state more efficient and natural *)
 
 (* Note that f has side effect on the elements of l. We want this effect to
    happen. That's why we cannot use List.for_all (respectively List.exists)
    directly (List.for_all stops on first element that evaluates to false) *)
+
 let for_all_se f l =
   List.for_all (fun b -> b) (List.map f l)
 
@@ -197,17 +200,22 @@ let reload_theory_proof_state c th =
   let ps = c.proof_state in
   let goals = theory_goals th in
   let proved = for_all_se (reload_goal_proof_state c) goals in
-  Hid.replace ps.th_state (theory_name th) proved
+  Hid.replace ps.th_state (theory_name th) proved;
+  proved
 
 (* to be called after reload *)
 let reload_file_proof_state c f =
-  List.iter (reload_theory_proof_state c) f.file_theories
+  let ps = c.proof_state in
+  let proved = for_all_se (reload_theory_proof_state c) f.file_theories in
+  Stdlib.Hstr.replace ps.file_state f.file_name proved
 
 (* to be called after reload *)
 let reload_session_proof_state c =
   Stdlib.Hstr.iter
     (fun _ f -> reload_file_proof_state c f)
     (get_files c.controller_session)
+
+(*==========  cut ================*)
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
@@ -405,6 +413,7 @@ let reload_files (c : controller) ~use_shapes =
     Stdlib.Hstr.iter
       (fun f -> merge_file old_ses c ~use_shapes f)
       (get_files old_ses);
+    (* TODO: remove that, it should be handle by session *)
     reload_session_proof_state c
   with e ->
     c.controller_session <- old_ses;
@@ -424,16 +433,7 @@ let remove_subtree c (n: any) ~removed ~notification =
   Session_itp.remove_subtree c.controller_session n ~notification:removed;
   (match parent with
   | Some (APn parent) ->
-      (* If proof_state of the parent is actually changed update the branch
-         otherwise do nothing *)
-      let tr_list = get_transformations c.controller_session parent in
-      let pa_list = get_proof_attempts c.controller_session parent in
-      let proved = List.exists (tn_proved c) tr_list in
-      let proved = List.exists reload_pa_proof_state pa_list || proved in
-      if proved then
-        ()
-      else
-        update_goal_node notification c parent
+       update_goal_node notification c parent
   | Some _ ->
       (* This case corresponds to removal of detached node. We don't need to
          update the proof_state *)
