@@ -682,9 +682,9 @@ end
          String.sub full 0 40 ^ " ..."
        else full
     | APn pn ->
+       let name = (get_proof_name d.cont.controller_session pn).Ident.id_string in
        let expl = get_proof_expl d.cont.controller_session pn in
-       if expl <> "" then expl else
-         (get_proof_name d.cont.controller_session pn).Ident.id_string
+       if expl = "" then name else name ^ " [" ^ expl ^ "]"
     | APa pa ->
       let pa = get_proof_attempt_node d.cont.controller_session pa in
       Pp.string_of Whyconf.print_prover pa.prover
