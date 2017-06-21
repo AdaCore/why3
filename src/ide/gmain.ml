@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -534,7 +534,7 @@ let get_selected_row_references () =
 
 let row_expanded b iter _path =
   session_needs_saving := true;
-  let expand_g g = goals_view#expand_row g.S.goal_key#path in
+  let expand_g g = goals_view#expand_row (S.goal_key g)#path in
   let expand_tr _ tr = goals_view#expand_row tr.S.transf_key#path in
   let expand_m _ m = goals_view#expand_row m.S.metas_key#path in
   match get_any_from_iter iter with
@@ -545,8 +545,8 @@ let row_expanded b iter _path =
     | S.Goal g ->
         S.set_goal_expanded g b;
         if b then begin
-          Session.PHstr.iter expand_tr g.S.goal_transformations;
-          Session.Mmetas_args.iter expand_m g.S.goal_metas
+          Session.PHstr.iter expand_tr (S.goal_transformations g);
+          Session.Mmetas_args.iter expand_m (S.goal_metas g)
         end
     | S.Transf tr ->
         S.set_transf_expanded tr b;
@@ -739,7 +739,7 @@ let notify any =
   session_needs_saving := true;
   let row,expanded =
     match any with
-      | S.Goal g -> g.S.goal_key, g.S.goal_expanded
+      | S.Goal g -> (S.goal_key g), (S.goal_expanded g)
       | S.Theory t -> t.S.theory_key, t.S.theory_expanded
       | S.File f -> f.S.file_key, f.S.file_expanded
       | S.Proof_attempt a -> a.S.proof_key,false
@@ -750,7 +750,7 @@ let notify any =
   (* name is set by notify since upgrade policy may update the prover name *)
   goals_model#set ~row:row#iter ~column:name_column
     (match any with
-      | S.Goal g -> S.goal_expl g
+      | S.Goal g -> S.goal_user_name g
       | S.Theory th -> th.S.theory_name.Ident.id_string
       | S.File f -> Filename.basename f.S.file_name
       | S.Proof_attempt a ->
@@ -770,7 +770,7 @@ let notify any =
     goals_view#collapse_row row#path;
   match any with
     | S.Goal g ->
-        set_row_status row g.S.goal_verified
+        set_row_status row (S.goal_verified g)
     | S.Theory th ->
         set_row_status row th.S.theory_verified
     | S.File file ->
@@ -1409,8 +1409,8 @@ let (_ : GMenu.image_menu_item) =
     ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
 
 let rec collapse_verified = function
-  | S.Goal g when Opt.inhabited g.S.goal_verified ->
-    let row = g.S.goal_key in
+  | S.Goal g when Opt.inhabited (S.goal_verified g) ->
+    let row = S.goal_key g in
     goals_view#collapse_row row#path
   | S.Theory th when Opt.inhabited th.S.theory_verified ->
     let row = th.S.theory_key in

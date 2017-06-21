@@ -6,7 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="4000" memlimit="4000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="4000" memlimit="4000"/>
 <file name="../esterel.mlw" expanded="true">
-<theory name="Esterel" sum="9f8fa8eee909c60475c4373c5616d837" expanded="true">
+<theory name="Esterel" sum="b19d4a8155e22de658d327c897e57757" expanded="true">
  <goal name="WP_parameter union" expl="VC for union" expanded="true">
  <proof prover="1"><result status="valid" time="0.16" steps="220"/></proof>
  </goal>
@@ -15,20 +15,20 @@
  </goal>
  <goal name="WP_parameter aboveMin" expl="VC for aboveMin" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter aboveMin.1" expl="1. assertion" expanded="true">
+  <goal name="WP_parameter aboveMin.1" expl="assertion" expanded="true">
   <proof prover="1"><result status="valid" time="0.15" steps="225"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.2" expl="2. assertion" expanded="true">
+  <goal name="WP_parameter aboveMin.2" expl="assertion" expanded="true">
   <proof prover="0"><result status="valid" time="0.22"/></proof>
   <proof prover="3"><result status="valid" time="0.28"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.3" expl="3. assertion" expanded="true">
+  <goal name="WP_parameter aboveMin.3" expl="assertion" expanded="true">
   <proof prover="0"><result status="valid" time="0.42"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.4" expl="4. type invariant" expanded="true">
+  <goal name="WP_parameter aboveMin.4" expl="type invariant" expanded="true">
   <proof prover="1"><result status="valid" time="0.30" steps="336"/></proof>
   </goal>
-  <goal name="WP_parameter aboveMin.5" expl="5. postcondition" expanded="true">
+  <goal name="WP_parameter aboveMin.5" expl="postcondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -37,30 +37,30 @@
  </goal>
  <goal name="WP_parameter maxUnion" expl="VC for maxUnion" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter maxUnion.1" expl="1. precondition" expanded="true">
+  <goal name="WP_parameter maxUnion.1" expl="precondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.01" steps="72"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.2" expl="2. precondition" expanded="true">
+  <goal name="WP_parameter maxUnion.2" expl="precondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.02" steps="73"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.3" expl="3. assertion" expanded="true">
+  <goal name="WP_parameter maxUnion.3" expl="assertion" expanded="true">
   <proof prover="0"><result status="valid" time="0.13"/></proof>
   <proof prover="3"><result status="valid" time="0.33"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.4" expl="4. postcondition" expanded="true">
+  <goal name="WP_parameter maxUnion.4" expl="postcondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.14"/></proof>
   <proof prover="1"><result status="valid" time="1.27" steps="1464"/></proof>
   </goal>
-  <goal name="WP_parameter maxUnion.5" expl="5. postcondition" expanded="true">
+  <goal name="WP_parameter maxUnion.5" expl="postcondition" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter maxUnion.5.1" expl="1. postcondition" expanded="true">
+   <goal name="WP_parameter maxUnion.5.1" expl="postcondition" expanded="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter maxUnion.5.2" expl="2. postcondition" expanded="true">
+   <goal name="WP_parameter maxUnion.5.2" expl="postcondition" expanded="true">
    <proof prover="0"><result status="valid" time="0.16"/></proof>
    <proof prover="1"><result status="valid" time="0.23" steps="388"/></proof>
    </goal>

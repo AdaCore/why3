@@ -10,14 +10,14 @@ let manual_attempt_of_goal goal =
   match Gnat_config.manual_prover with
   | None -> None
   | Some p ->
-        PHprover.find_opt goal.goal_external_proofs
+        PHprover.find_opt (Session.goal_external_proofs goal)
           p.Session.prover_config.Whyconf.prover
 
 let is_new_manual_proof goal =
   manual_attempt_of_goal goal = None
 
 let rec find_goal_theory goal =
-  match goal.goal_parent with
+  match goal_parent goal with
   | Parent_theory th -> th
   | Parent_transf tr -> find_goal_theory tr.transf_parent
   | Parent_metas meta -> find_goal_theory meta.metas_parent

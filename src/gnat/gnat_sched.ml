@@ -39,7 +39,7 @@ let run_goal ~cntexample ?limit prover g =
   let driver = prover.Session.prover_driver in
   let old, inplace, limit =
     match (base_prover.Whyconf.interactive,
-           Session.PHprover.find_opt g.Session.goal_external_proofs
+           Session.PHprover.find_opt (Session.goal_external_proofs g)
                                      base_prover.Whyconf.prover) with
     | true, Some { Session.proof_edited_as = Some fn } ->
        Some fn, true, Call_provers.empty_limit
@@ -78,7 +78,7 @@ let handle_finished_call callback entry res =
     else res in
   let pas = Session.Done res in
   let edit =
-    match Session.PHprover.find_opt g.Session.goal_external_proofs prover with
+    match Session.PHprover.find_opt (Session.goal_external_proofs g) prover with
     | Some pa -> pa.Session.proof_edited_as
     | _ -> None in
   let pa =

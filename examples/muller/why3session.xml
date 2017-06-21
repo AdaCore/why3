@@ -6,81 +6,81 @@
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../muller.mlw" expanded="true">
-<theory name="Muller" sum="f9c0e7f73098dd225f02eaeb679d901e" expanded="true">
+<theory name="Muller" sum="74aee6577ae8a2c6c1fc8a8d72743c57" expanded="true">
  <goal name="WP_parameter compact" expl="VC for compact" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter compact.1" expl="1. array creation size">
+  <goal name="WP_parameter compact.1" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="2"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter compact.2" expl="2. loop invariant init">
+  <goal name="WP_parameter compact.2" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="6"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter compact.3" expl="3. index in array bounds">
+  <goal name="WP_parameter compact.3" expl="index in array bounds">
   <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter compact.4" expl="4. index in array bounds">
+  <goal name="WP_parameter compact.4" expl="index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter compact.5" expl="5. type invariant">
+  <goal name="WP_parameter compact.5" expl="type invariant">
   <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compact.6" expl="6. index in array bounds">
+  <goal name="WP_parameter compact.6" expl="index in array bounds">
   <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter compact.7" expl="7. loop invariant preservation">
+  <goal name="WP_parameter compact.7" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter compact.8" expl="8. loop invariant preservation">
+  <goal name="WP_parameter compact.8" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter compact.9" expl="9. loop invariant init">
+  <goal name="WP_parameter compact.9" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="6"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter compact.10" expl="10. index in array bounds">
+  <goal name="WP_parameter compact.10" expl="index in array bounds">
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.00" steps="7"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter compact.11" expl="11. loop invariant preservation">
+  <goal name="WP_parameter compact.11" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.03" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter compact.12" expl="12. loop invariant preservation">
+  <goal name="WP_parameter compact.12" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter compact.13" expl="13. array creation size">
+  <goal name="WP_parameter compact.13" expl="array creation size">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="5"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter compact.14" expl="14. loop invariant init">
+  <goal name="WP_parameter compact.14" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.00" steps="13"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter compact.15" expl="15. index in array bounds">
+  <goal name="WP_parameter compact.15" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="4" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="13"/></proof>
   <proof prover="5"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter compact.16" expl="16. index in array bounds">
+  <goal name="WP_parameter compact.16" expl="index in array bounds">
   <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter compact.17" expl="17. type invariant">
+  <goal name="WP_parameter compact.17" expl="type invariant">
   <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter compact.18" expl="18. index in array bounds">
+  <goal name="WP_parameter compact.18" expl="index in array bounds">
   <proof prover="4" timelimit="30"><result status="valid" time="15.26" steps="6306"/></proof>
   <proof prover="5" timelimit="30" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter compact.19" expl="19. loop invariant preservation">
+  <goal name="WP_parameter compact.19" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter compact.20" expl="20. loop invariant preservation">
+  <goal name="WP_parameter compact.20" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.06" steps="63"/></proof>
   </goal>
  </transf>

@@ -337,7 +337,8 @@ let provers, prover_ce, config, env =
   let prover_driver base_prover =
     try
       let driver_file = find_driver_file base_prover.Whyconf.driver in
-      Driver.load_driver env driver_file base_prover.Whyconf.extra_drivers
+      Driver.load_driver_absolute
+        env driver_file base_prover.Whyconf.extra_drivers
     with e ->
       let s =
         Pp.sprintf "Failed to load driver for prover: %a"

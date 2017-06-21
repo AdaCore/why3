@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -200,8 +200,7 @@ let rec print_term info defs fmt t = match t.t_node with
       let number_format = {
           Number.long_int_support = true;
           Number.extra_leading_zeros_support = true;
-          Number.dec_int_support = Number.Number_custom
-            "<num val=\"%s\"><type name=\"Int.int\"/></num>";
+          Number.dec_int_support = Number.Number_default;
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;
           Number.bin_int_support = Number.Number_unsupported;
@@ -223,7 +222,12 @@ let rec print_term info defs fmt t = match t.t_node with
                  </app>"));
           Number.def_real_support = Number.Number_unsupported;
         } in
-      Number.print number_format fmt c
+      begin match c with
+        | Number.ConstInt _ ->
+            fprintf fmt "<num val=\"%a\">%a</num>"
+              (Number.print number_format) c (print_ty info) (t_type t)
+        | _ -> Number.print number_format fmt c
+      end
   | Tif (f, t1, t2) ->
       print_app print_const (print_term info defs) fmt ("HOL.If", [f; t1; t2])
   | Tlet (t1, tb) ->

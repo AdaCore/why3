@@ -1,0 +1,89 @@
+
+(* Approximated cosine *)
+
+module M
+
+  use import real.RealInfix
+  use import real.Abs
+  use import real.Trigonometry
+  use import floating_point.Rounding
+  use import floating_point.Single
+
+  val single_of_real_exact (x: real) : single
+    ensures { value result = x }
+
+  val add (x y: single) : single
+    requires { "expl:floating-point overflow"
+               no_overflow NearestTiesToEven ((value x) +. (value y)) }
+    ensures  { value result = round NearestTiesToEven ((value x) +. (value y))}
+
+  val sub (x y: single) : single
+    requires { "expl:floating-point overflow"
+               no_overflow NearestTiesToEven ((value x) -. (value y)) }
+    ensures  { value result = round NearestTiesToEven ((value x) -. (value y))}
+
+  val mul (x y: single) : single
+    requires { "expl:floating-point overflow"
+               no_overflow NearestTiesToEven ((value x) *. (value y)) }
+    ensures  { value result = round NearestTiesToEven ((value x) *. (value y))}
+
+  let my_cosine (x:single) : single
+    requires { abs (value x) <=. 0x1p-5 }
+    ensures { abs (value result -. cos (value x)) <=. 0x1p-23 }
+  = assert {
+      abs (1.0 -. (value x) *. (value x) *. 0.5 -. cos (value x)) <=. 0x1p-24
+    };
+    sub (single_of_real_exact 1.0) (mul (mul x x) (single_of_real_exact 0.5))
+
+end
+
+
+
+module IEEEfloat
+
+  use import real.RealInfix
+  use import real.Abs
+  use import real.Trigonometry
+  use import ieee_float.Float32
+
+  val add (x y: t) : t
+    requires { "expl:floating-point overflow" t'isFinite (x .+ y) }
+    ensures  { result = x .+ y }
+
+  val sub (x y: t) : t
+    requires { "expl:floating-point overflow" t'isFinite (x .- y)}
+    ensures  { result = x .- y }
+
+  val mul (x y: t) : t
+    requires { "expl:floating-point overflow" t'isFinite (x .* y)}
+    ensures  { result = x .* y }
+
+  let my_cosine (x:t) : t
+    requires { Float32.abs x .<= (0x1p-5:t) }
+    ensures  { Abs.abs (t'real result -. cos (t'real x)) <=. 0x1p-23 }
+  = assert { Abs.abs (t'real x) <=. 0x1p-5 };
+    assert {
+      Abs.abs (1.0 -. (t'real x) *. (t'real x) *. 0.5 -. cos (t'real x)) <=. 0x1p-24
+    };
+    sub (1.0:t) (mul (mul x x) (0.5:t))
+
+end
+
+
+module Combined
+
+  use import real.RealInfix
+  use import real.Abs
+  use import real.Trigonometry
+  use import mach.float.Single
+
+  let my_cosine (x:t) : t
+    requires { abs x .<= (0x1p-5:t) }
+    ensures  { Abs.abs (t'real result -. cos (t'real x)) <=. 0x1p-23 }
+  = assert { Abs.abs (t'real x) <=. 0x1p-5 };
+    assert {
+      Abs.abs (1.0 -. (t'real x) *. (t'real x) *. 0.5 -. cos (t'real x)) <=. 0x1p-24
+    };
+    sub (1.0:t) (mul (mul x x) (0.5:t))
+
+end

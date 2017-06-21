@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -207,7 +207,7 @@ let get_prover s =
         else
           raise (Whyconf.ProverAmbiguity (wc,fp,provers))
     in
-    let drv = Driver.load_driver env cp.driver cp.extra_drivers in
+    let drv = Whyconf.load_driver main env cp.driver cp.extra_drivers in
     Hashtbl.add provers s (cp, drv);
     cp, drv
 

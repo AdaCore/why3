@@ -10,124 +10,124 @@
 </theory>
 <theory name="HashTable" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="MaxMatrixMemo" sum="60d6a7dda5b713ca659b3a4deef37b09" expanded="true">
- <goal name="sum_ind">
+<theory name="MaxMatrixMemo" sum="3434c1e888aeb4a9f1c0ba242635acd1" expanded="true">
+ <goal name="sum_ind" expl="">
  <proof prover="4" timelimit="47" memlimit="0"><result status="valid" time="0.15" steps="45"/></proof>
  </goal>
  <goal name="WP_parameter maximum" expl="VC for maximum" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter maximum.1" expl="1. postcondition">
+  <goal name="WP_parameter maximum.1" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.2" expl="2. assertion">
+  <goal name="WP_parameter maximum.2" expl="assertion">
   <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.3" expl="3. postcondition">
+  <goal name="WP_parameter maximum.3" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.4" expl="4. loop invariant init">
+  <goal name="WP_parameter maximum.4" expl="loop invariant init">
   <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.5" expl="5. variant decrease">
+  <goal name="WP_parameter maximum.5" expl="variant decrease">
   <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.6" expl="6. precondition">
+  <goal name="WP_parameter maximum.6" expl="precondition">
   <proof prover="4"><result status="valid" time="0.03" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.7" expl="7. loop invariant preservation" expanded="true">
+  <goal name="WP_parameter maximum.7" expl="loop invariant preservation" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter maximum.7.1" expl="1. VC for maximum">
+   <goal name="WP_parameter maximum.7.1" expl="VC for maximum">
    <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter maximum.7.2" expl="2. VC for maximum" expanded="true">
+   <goal name="WP_parameter maximum.7.2" expl="VC for maximum" expanded="true">
    <proof prover="2"><result status="valid" time="0.78"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maximum.8" expl="8. loop invariant preservation">
+  <goal name="WP_parameter maximum.8" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="4.41"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.9" expl="9. loop invariant preservation">
+  <goal name="WP_parameter maximum.9" expl="loop invariant preservation">
   <proof prover="4"><result status="valid" time="0.07" steps="74"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.10" expl="10. assertion">
+  <goal name="WP_parameter maximum.10" expl="assertion">
   <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter maximum.11" expl="11. postcondition">
+  <goal name="WP_parameter maximum.11" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter memo" expl="VC for memo">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter memo.1" expl="1. postcondition">
+  <goal name="WP_parameter memo.1" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter memo.1.1" expl="1. VC for memo">
+   <goal name="WP_parameter memo.1.1" expl="VC for memo">
    <proof prover="4"><result status="valid" time="0.02" steps="13"/></proof>
    </goal>
-   <goal name="WP_parameter memo.1.2" expl="2. VC for memo">
+   <goal name="WP_parameter memo.1.2" expl="VC for memo">
    <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.00" steps="5"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter memo.2" expl="2. variant decrease">
+  <goal name="WP_parameter memo.2" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="2" timelimit="5"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter memo.3" expl="3. precondition">
+  <goal name="WP_parameter memo.3" expl="precondition">
   <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter memo.4" expl="4. postcondition">
+  <goal name="WP_parameter memo.4" expl="postcondition">
   <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.04" steps="29"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter maxmat" expl="VC for maxmat">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter maxmat.1" expl="1. assertion">
+  <goal name="WP_parameter maxmat.1" expl="assertion">
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter maxmat.2" expl="2. precondition">
+  <goal name="WP_parameter maxmat.2" expl="precondition">
   <transf name="inline_goal">
-   <goal name="WP_parameter maxmat.2.1" expl="1. precondition">
+   <goal name="WP_parameter maxmat.2.1" expl="precondition">
    <transf name="split_goal_wp">
-    <goal name="WP_parameter maxmat.2.1.1" expl="1. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.1" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.00" steps="2"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.2" expl="2. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.2" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="2"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.3" expl="3. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.3" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="3"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.4" expl="4. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.4" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="4"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.5" expl="5. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.5" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.00" steps="4"/></proof>
     </goal>
-    <goal name="WP_parameter maxmat.2.1.6" expl="6. VC for maxmat">
+    <goal name="WP_parameter maxmat.2.1.6" expl="VC for maxmat">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="6"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maxmat.3" expl="3. postcondition">
+  <goal name="WP_parameter maxmat.3" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter maxmat.3.1" expl="1. postcondition">
+   <goal name="WP_parameter maxmat.3.1" expl="postcondition">
    <transf name="inline_goal">
-    <goal name="WP_parameter maxmat.3.1.1" expl="1. postcondition">
+    <goal name="WP_parameter maxmat.3.1.1" expl="postcondition">
     <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.10" steps="8"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter maxmat.4" expl="4. postcondition">
+  <goal name="WP_parameter maxmat.4" expl="postcondition">
   <transf name="inline_goal">
-   <goal name="WP_parameter maxmat.4.1" expl="1. postcondition">
+   <goal name="WP_parameter maxmat.4.1" expl="postcondition">
    <proof prover="4" timelimit="30" memlimit="0"><result status="valid" time="0.01" steps="36"/></proof>
    </goal>
   </transf>

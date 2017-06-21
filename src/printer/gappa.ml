@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -390,7 +390,7 @@ let split_hyp defs truths pr acc f =
     | _ -> if pos then (pr,f)::acc else (pr, t_not f)::acc in
   split acc true f
 
-let prepare defs truths acc d =
+let prepare defs ints truths acc d =
   match d.d_node with
   | Dtype _ -> acc
   | Ddata dl ->
@@ -403,6 +403,8 @@ let prepare defs truths acc d =
         | _ -> idx
         ) 0 dl in ()) dl;
     acc
+  | Dparam ({ ls_args = []; ls_value = Some ty; } as ls) when Ty.ty_equal ty Ty.ty_int ->
+    ints := ls::!ints; acc
   | Dparam _ | Dlogic _ -> acc
   | Dind _ ->
       unsupportedDecl d
@@ -484,6 +486,9 @@ let print_hyp info defs fmt (pr,f) =
   fprintf fmt "# hypothesis '%a'@\n" print_ident pr.pr_name;
   fprintf fmt "%a ->@\n" (print_fmla info defs) f
 
+let print_ints fmt ls =
+  fprintf fmt "@FIX(%a,0) ->@\n" print_ident ls.ls_name
+
 let print_task args ?old:_ fmt task =
   forget_all ident_printer;
   let info = get_info args.env task in
@@ -491,6 +496,7 @@ let print_task args ?old:_ fmt task =
   print_th_prelude task fmt args.th_prelude;
   try
     let defs = Hid.create 17 in
+    let ints = ref [] in
     (* get hypotheses and simplify them *)
     let hyps =
       let truths = Hid.create 17 in
@@ -504,7 +510,7 @@ let print_task args ?old:_ fmt task =
         let nb = Hid.length truths in
         if nb > old_nb then iter nb hyps
         else hyps in
-      let hyps = List.fold_left (prepare defs truths) [] (Task.task_decls task) in
+      let hyps = List.fold_left (prepare defs ints truths) [] (Task.task_decls task) in
       iter (Hid.length truths) (List.rev hyps) in
     (* extract equations and keep the needed ones *)
     let (eqs, hyps) = List.fold_left (filter_hyp defs) ([],[]) hyps in
@@ -520,8 +526,9 @@ let print_task args ?old:_ fmt task =
     match List.rev hyps with
     | [] -> fprintf fmt "{ 1 in [0,0] }@\n"
     | (_,goal) :: hyps ->
-      fprintf fmt "@[<v 2>{ %a%a%a }@]@\n%a"
+      fprintf fmt "@[<v 2>{ %a%a%a%a }@]@\n%a"
         (print_list nothing print_bool) bools
+        (print_list nothing print_ints) (!ints)
         (print_list nothing (print_hyp info defs)) hyps
         (print_fmla info defs) (t_not_simp goal)
         (print_list_delim

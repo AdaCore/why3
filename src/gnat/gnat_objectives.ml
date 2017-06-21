@@ -50,14 +50,15 @@ let get_session () =
 module GoalHash = struct
    (* module to provide hashing and fast equality on goals *)
    type t = goal
-   let equal a b = a.Session.goal_key = b.Session.goal_key
-   let hash a = a.Session.goal_key
+   let equal a b = Session.goal_key a = Session.goal_key b
+   let hash = Session.goal_key
 end
 
 module GoalCmp = struct
    (* module to provide comparison goals *)
   type t = goal
-  let compare a b = Pervasives.compare a.Session.goal_key b.Session.goal_key
+  let compare a b =
+    Pervasives.compare (Session.goal_key a) (Session.goal_key b)
 end
 
 module GoalMap = Hashtbl.Make (GoalHash)
@@ -219,7 +220,7 @@ let strategy =
        Gnat_split_disj.split_disj_name]
 
 let parent_transform_name goal =
-   match goal.Session.goal_parent with
+   match Session.goal_parent goal with
    | Session.Parent_transf t -> t.Session.transf_name
    | _ -> assert false
 
@@ -252,14 +253,14 @@ let get_first_transform_of_goal g =
      gnatprove was run on this file, there is only one transformation. *)
   try
     Session.PHstr.iter (fun k _ -> raise (Found_Trans k))
-    g.Session.goal_transformations;
+      (Session.goal_transformations g);
     assert false
   with Found_Trans s -> s
 
 let find_next_transformation goal =
   (* the "then" branch corresponds to the "normal" case where only gnatprove
      was applied *)
-  if Session.PHstr.is_empty goal.Session.goal_transformations then
+  if Session.PHstr.is_empty (Session.goal_transformations goal) then
       try next_transform (parent_transform_name goal)
       with Not_found ->
         Gnat_util.abort_with_message ~internal:true
@@ -273,7 +274,7 @@ let is_full_split_goal goal =
       transformation is part of the strategy, we check if it is the last one.
       Otherwise, the goal is fully split if there are no transformations
       applied to it (that we could follow) *)
-  if not (Session.PHstr.is_empty goal.Session.goal_transformations) then false
+  if not (Session.PHstr.is_empty (Session.goal_transformations goal)) then false
   else
     let s = parent_transform_name goal in
     not (List.mem s strategy) || s = last_transform
@@ -281,7 +282,7 @@ let is_full_split_goal goal =
 let has_already_been_applied trans goal =
    (* check whether the goal has already been split by the given
       transformation *)
-   Session.PHstr.mem goal.Session.goal_transformations trans
+   Session.PHstr.mem (Session.goal_transformations goal) trans
 
 let further_split goal =
    (* check which was the last transformation applied to the goal and
@@ -294,7 +295,7 @@ let further_split goal =
    let rec split trans =
      if has_already_been_applied trans goal then
          let transf =
-            Session.PHstr.find goal.Session.goal_transformations trans in
+            Session.PHstr.find (Session.goal_transformations goal) trans in
            transf.Session.transf_goals
      else
          let transf =
@@ -513,7 +514,7 @@ let apply_split_goal_if_needed g =
    (* before doing any proofs, we apply "split" to all "main goals" (see
       iter_main_goals). This function applies that transformation, but only
       when needed. *)
-   if Session.PHstr.mem g.Session.goal_transformations first_transform
+   if Session.PHstr.mem (Session.goal_transformations g) first_transform
    then ()
    else
       ignore
@@ -626,7 +627,7 @@ module Save_VCs = struct
       | false, Session.Done
          ({ Call_provers.pr_answer = Call_provers.Valid } as pr) ->
           raise (Found (prover, pr))
-      | _ -> ()) goal.Session.goal_external_proofs;
+      | _ -> ()) (Session.goal_external_proofs goal);
     raise Exit
   with Found (prover, pr) -> prover, pr
 
@@ -652,7 +653,7 @@ let add_to_stat prover pr stat =
 
 
    let rec extract_stat_goal stat goal =
-     assert (goal.Session.goal_verified <> None);
+     assert (Session.goal_verified goal <> None);
      try
        let prover, pr = find_successful_proof goal in
        add_to_stat prover pr stat
@@ -663,7 +664,7 @@ let add_to_stat prover pr stat =
              List.iter (extract_stat_goal stat) tr.Session.transf_goals;
           (* need to exit here so once we found a transformation that proves
            * the goal, don't try further *)
-           raise Exit) goal.Session.goal_transformations;
+           raise Exit) (Session.goal_transformations goal);
        with Exit -> ()
 
    let extract_stats (obj : objective) =
@@ -764,7 +765,7 @@ let add_to_stat prover pr stat =
          match pa.Session.proof_obsolete, pa.Session.proof_state with
          | false, Session.Done pr ->
            Mstr.add pr_name (proof_result_to_json pr) acc
-         | _, _ -> acc) g.Session.goal_external_proofs s in
+         | _, _ -> acc) (Session.goal_external_proofs g) s in
      Json.Record r
 
    and proof_result_to_json r =
@@ -781,7 +782,7 @@ let add_to_stat prover pr stat =
      let map =
        Session.PHstr.fold (fun tf_name tf acc ->
            Mstr.add tf_name (transformation_to_json tf) acc)
-         g.Session.goal_transformations
+         (Session.goal_transformations g)
          Mstr.empty
      in
      Json.Record map
@@ -793,7 +794,7 @@ end
 open Save_VCs
 
 let goal_has_splits goal =
-  not (Session.PHstr.is_empty goal.Session.goal_transformations)
+  not (Session.PHstr.is_empty (Session.goal_transformations goal))
 
 let schedule_goal_with_prover ~cntexample g p =
 (* actually schedule the goal, i.e., call the prover. This function returns
@@ -861,7 +862,7 @@ let session_proved_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
    try
      GoalSet.iter
-       (fun x -> if x.Session.goal_verified = None then raise Exit)
+       (fun x -> if Session.goal_verified x = None then raise Exit)
        obj_rec.toplevel;
      true
    with Exit -> false
@@ -909,7 +910,7 @@ let select_appropriate_proof_attempt obj_rec pa =
 let session_find_unproved_pa obj =
   let obj_rec = Gnat_expl.HCheck.find explmap obj in
   let rec aux goal =
-    if goal.Session.goal_verified <> None then ()
+    if Session.goal_verified goal <> None then ()
     else begin
       Session.iter_goal nothing (Session.iter_transf aux) nothing goal;
       Session.iter_goal (fun pa ->
@@ -944,15 +945,15 @@ let for_some_transformation pred map =
 
 let rec is_obsolete_verified goal =
   (* Check if a goal is or was verified, including using obsolete proofs *)
-  goal.Session.goal_verified <> None ||
-  for_some_proof_attempt is_valid_pa goal.Session.goal_external_proofs ||
+  Session.goal_verified goal <> None ||
+  for_some_proof_attempt is_valid_pa (Session.goal_external_proofs goal) ||
     for_some_transformation
     (fun tf -> List.for_all is_obsolete_verified tf.Session.transf_goals)
-    goal.Session.goal_transformations
+    (Session.goal_transformations goal)
 
 let rec replay_transf tf =
   let tf_proves_goal =
-    List.for_all (fun g -> g.Session.goal_verified <> None)
+    List.for_all (fun g -> Session.goal_verified g <> None)
       tf.Session.transf_goals
   in
   if tf_proves_goal then List.iter replay_goal tf.Session.transf_goals

@@ -3,6 +3,8 @@
     | "=" type                                       ; alias type
     | "=" "|"? type-case ("|" type-case)*            ; algebraic type
     | "=" "{" record-field (";" record-field)* "}"   ; record type
+    | "<" "range" integer integer ">"                ; range type
+    | "<" "float" integer integer ">"                ; float type
   \
   type-case ::= uident label* type-param*
   \

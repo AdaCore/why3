@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="4000"/>
+<prover id="1" name="Gappa" version="1.2.0" timelimit="2" steplimit="0" memlimit="4000"/>
+<prover id="2" name="MetiTarski" version="2.4" timelimit="12" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Coq" version="8.6" timelimit="2" steplimit="0" memlimit="4000"/>
+<prover id="4" name="Z3" version="4.4.1" timelimit="2" steplimit="0" memlimit="4000"/>
+<prover id="5" name="Alt-Ergo" version="1.30" alternative="alt" timelimit="2" steplimit="0" memlimit="4000"/>
+<file name="../my_cosine.mlw" expanded="true">
+<theory name="M" sum="e6984a9af2ab6c45ac0e8af4e992df4e" expanded="true">
+ <goal name="WP_parameter my_cosine" expl="VC for my_cosine">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter my_cosine.1" expl="1. assertion">
+  <proof prover="2" timelimit="5" memlimit="1000"><result status="valid" time="0.17"/></proof>
+  <proof prover="3" timelimit="5" memlimit="1000" edited="my_cosine_M_WP_parameter_my_cosine_1.v"><result status="valid" time="1.79"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.2" expl="2. floating-point overflow">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.3" expl="3. floating-point overflow">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.4" expl="4. floating-point overflow">
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.5" expl="5. postcondition">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="IEEEfloat" sum="c893577268cab3bfe222359ad1fe8705" expanded="true">
+ <goal name="WP_parameter my_cosine" expl="VC for my_cosine" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter my_cosine.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.99" steps="1636"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.2" expl="2. assertion">
+  <proof prover="3" edited="my_cosine_IEEEfloat_WP_parameter_my_cosine_1.v"><result status="valid" time="1.87"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.3" expl="3. floating-point overflow">
+  <proof prover="0"><result status="valid" time="1.49" steps="2000"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.4" expl="4. floating-point overflow">
+  <proof prover="0"><result status="valid" time="0.24" steps="312"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.5" expl="5. floating-point overflow">
+  <proof prover="0"><result status="timeout" time="1.99"/></proof>
+  <proof prover="1" timelimit="12" obsolete="true"><result status="unknown" time="0.01"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.19"/></proof>
+  <proof prover="4"><result status="timeout" time="2.00"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.6" expl="6. postcondition" expanded="true">
+  <proof prover="0"><result status="timeout" time="1.98"/></proof>
+  <proof prover="1"><result status="unknown" time="0.02"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.16"/></proof>
+  <proof prover="4"><result status="timeout" time="2.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Combined" sum="08dfc24481780ce0dd81f93fbcf0e3b2" expanded="true">
+ <goal name="WP_parameter my_cosine" expl="VC for my_cosine" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter my_cosine.1" expl="1. assertion">
+  <proof prover="0"><result status="valid" time="0.51" steps="1636"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.2" expl="2. assertion">
+  <proof prover="3" edited="my_cosine_Combined_WP_parameter_my_cosine_1.v"><result status="valid" time="1.50"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.3" expl="3. precondition">
+  <proof prover="0"><result status="valid" time="1.63" steps="2019"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.4" expl="4. precondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="160"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.5" expl="5. precondition">
+  <proof prover="0"><result status="valid" time="0.26" steps="350"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.6" expl="6. precondition">
+  <proof prover="0"><result status="valid" time="0.15" steps="236"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.7" expl="7. precondition" expanded="true">
+  <proof prover="0"><result status="timeout" time="1.98"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.8" expl="8. precondition" expanded="true">
+  <proof prover="0"><result status="timeout" time="3.99"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>
+  </goal>
+  <goal name="WP_parameter my_cosine.9" expl="9. postcondition" expanded="true">
+  <proof prover="0"><result status="timeout" time="2.00"/></proof>
+  <proof prover="1"><result status="unknown" time="0.02"/></proof>
+  <proof prover="4" obsolete="true"><result status="timeout" time="2.00"/></proof>
+  <proof prover="5" obsolete="true"><result status="timeout" time="2.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

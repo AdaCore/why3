@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -263,3 +263,11 @@ module Args : sig
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
 end
+
+
+(** Loading drivers with relative names *)
+
+val load_driver : main -> Env.env -> string -> string list -> Driver.driver
+(** wrapper for loading a driver from a file that may be relative to the datadir.
+    See [Driver.load_driver_absolute]
+*)

@@ -6,48 +6,48 @@
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../zeros.mlw" expanded="true">
-<theory name="SetZeros" sum="fd74c5b783f39057550c1e31088ce2c1" expanded="true">
+<theory name="SetZeros" sum="819e6a67353271f1483270fd4a7fcaea" expanded="true">
  <goal name="WP_parameter set_zeros" expl="VC for set_zeros">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter set_zeros.1" expl="1. postcondition">
+  <goal name="WP_parameter set_zeros.1" expl="postcondition">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.2" expl="2. loop invariant init">
+  <goal name="WP_parameter set_zeros.2" expl="loop invariant init">
   <proof prover="3" memlimit="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.3" expl="3. type invariant">
+  <goal name="WP_parameter set_zeros.3" expl="type invariant">
   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.4" expl="4. index in array bounds">
+  <goal name="WP_parameter set_zeros.4" expl="index in array bounds">
   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.5" expl="5. loop invariant preservation">
+  <goal name="WP_parameter set_zeros.5" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.6" expl="6. type invariant">
+  <goal name="WP_parameter set_zeros.6" expl="type invariant">
   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="WP_parameter set_zeros.7" expl="7. postcondition">
+  <goal name="WP_parameter set_zeros.7" expl="postcondition">
   <proof prover="3" memlimit="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter harness" expl="VC for harness">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter harness.1" expl="1. array creation size">
+  <goal name="WP_parameter harness.1" expl="array creation size">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
-  <goal name="WP_parameter harness.2" expl="2. assertion">
+  <goal name="WP_parameter harness.2" expl="assertion">
   <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter harness.3" expl="3. assertion">
+  <goal name="WP_parameter harness.3" expl="assertion">
   <proof prover="3" memlimit="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="AllZeros" sum="42d8a037367497a55ccf85aac418b2cf" expanded="true">
+<theory name="AllZeros" sum="f9c562f8e5ab39cd515f9e0f7825898c" expanded="true">
  <goal name="WP_parameter all_zeros1" expl="VC for all_zeros1">
  <proof prover="3" timelimit="6"><result status="valid" time="0.02" steps="104"/></proof>
  </goal>

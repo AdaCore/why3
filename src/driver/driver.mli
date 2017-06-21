@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,10 +15,10 @@
 
 type driver
 
-val load_driver :  Env.env -> string -> string list -> driver
+val load_driver_absolute :  Env.env -> string -> string list -> driver
 (** loads a driver from a file
     @param env    environment to interpret theories
-    @param string driver file name
+    @param string driver file name (absolute path name)
     @param string list additional driver files containing only theories
 *)
 

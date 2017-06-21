@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../binary_sort.mlw" expanded="true">
+<theory name="BinarySort" sum="511f87d74df1b785aefbf2e7aac4ff00" expanded="true">
+ <goal name="WP_parameter occ_shift" expl="VC for occ_shift" expanded="true">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter occ_shift.1" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.2" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.3" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.4" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.5" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.6" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.06" steps="83"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.7" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.8" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.24"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.9" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.50"/></proof>
+  </goal>
+  <goal name="WP_parameter occ_shift.10" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter binary_sort" expl="VC for binary_sort">
+ <transf name="split_goal_wp">
+  <goal name="WP_parameter binary_sort.1" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.2" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.3" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.4" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.5" expl="type invariant">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.6" expl="index in array bounds">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.7" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.8" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.9" expl="loop invariant init">
+  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.10" expl="index in array bounds">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.11" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.01" steps="50"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.12" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.13" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.14" expl="loop variant decrease">
+  <proof prover="1"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.15" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.16" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.02" steps="69"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.17" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.18" expl="loop variant decrease">
+  <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.19" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.20" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.21" expl="index in array bounds">
+  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.22" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.57" steps="174"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.23" expl="assertion">
+  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.24" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.12" steps="203"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.25" expl="loop invariant preservation">
+  <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.26" expl="type invariant">
+  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.27" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter binary_sort.28" expl="postcondition">
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

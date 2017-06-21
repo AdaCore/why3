@@ -1,16 +1,16 @@
 \begin{syntax}
-  module ::= "module" uident label* mdecl* "end"
+  module ::= "module" uident-nq label* mdecl* "end"
   \
   mdecl ::= decl                                ; theory declaration
     | "type" mtype-decl ("with" mtype-decl)*    ; mutable types
-    | "type" lident ("'" lident)* invariant+    ; added invariant
-    | "let" "ghost"? lident label* pgm-defn     ;
+    | "type" lident-nq ("'" lident-nq)* invariant+    ; added invariant
+    | "let" "ghost"? lident-nq label* pgm-defn     ;
     | "let" "rec" rec-defn                      ;
-    | "val" "ghost"? lident label* pgm-decl     ;
-    | "exception" lident label* type?           ;
-    | "namespace" "import"? uident mdecl* "end" ;
+    | "val" "ghost"? lident-nq label* pgm-decl     ;
+    | "exception" lident-nq label* type?           ;
+    | "namespace" "import"? uident-nq mdecl* "end" ;
   \
-  mtype-decl ::= lident label* ("'" lident label*)* ;
+  mtype-decl ::= lident-nq label* ("'" lident-nq label*)* ;
                               mtype-defn            ;
   \
   mtype-defn ::=                                    ; abstract type
@@ -19,7 +19,7 @@
     | "=" "{" mrecord-field (";" mrecord-field)* "}" ; record type
           invariant*
   \
-  mrecord-field ::= "ghost"? "mutable"? lident label* ":" type
+  mrecord-field ::= "ghost"? "mutable"? lident-nq label* ":" type
   \
   pgm-defn ::= fun-body ;
     | "=" "fun" binder+ spec* "->" spec* expr ;

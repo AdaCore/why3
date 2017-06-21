@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -330,7 +330,7 @@ let find_prover eS a =
             let g = a.proof_parent in
             begin
               try
-                let _ = PHprover.find g.goal_external_proofs new_p in
+                let _ = PHprover.find (goal_external_proofs g) new_p in
                 (* yes, then we do nothing *)
                 None
               with Not_found ->
@@ -350,7 +350,7 @@ let find_prover eS a =
             let g = a.proof_parent in
             begin
               try
-                let _ = PHprover.find g.goal_external_proofs new_p in
+                let _ = PHprover.find (goal_external_proofs g) new_p in
                 (* yes, then we do nothing *)
                 None
               with Not_found ->
@@ -534,7 +534,7 @@ let run_external_proof eS eT ?(cntexample=false) ?callback a =
 let prover_on_goal eS eT ?callback ?(cntexample=false) ~limit p g =
   let a =
     try
-      let a = PHprover.find g.goal_external_proofs p in
+      let a = PHprover.find (goal_external_proofs g) p in
       set_timelimit (limit.Call_provers.limit_time) a;
       set_memlimit (limit.Call_provers.limit_mem) a;
       a
@@ -610,7 +610,7 @@ type report =
   | No_former_result of Call_provers.prover_result
 
 let push_report report (g,p,limits,r) =
-  (g.goal_name,p,limits,r)::report
+  (goal_name g,p,limits,r)::report
 
 let check_external_proof ~use_steps eS eT todo a =
   let callback a ap limits old s =
@@ -636,9 +636,9 @@ let check_external_proof ~use_steps eS eT todo a =
 
 let rec goal_iter_proof_attempt_with_release ~release f g =
   let iter g = goal_iter_proof_attempt_with_release ~release f g in
-  PHprover.iter (fun _ a -> f a) g.goal_external_proofs;
-  PHstr.iter (fun _ t -> List.iter iter t.transf_goals) g.goal_transformations;
-  Mmetas_args.iter (fun _ t -> iter t.metas_goal) g.goal_metas;
+  PHprover.iter (fun _ a -> f a) (goal_external_proofs g);
+  PHstr.iter (fun _ t -> List.iter iter t.transf_goals) (goal_transformations g);
+  Mmetas_args.iter (fun _ t -> iter t.metas_goal) (goal_metas g);
   if release then release_task g
 
 let check_all ?(release=false) ~use_steps ?filter eS eT ~callback =
@@ -734,7 +734,7 @@ let rec play_on_goal_and_children eS eT ~limit todo l g =
         | None, Done { Call_provers.pr_answer = Call_provers.Valid } ->
             Call_provers.limit_max limit pa.proof_limit, true
         | _ -> acc)
-      g.goal_external_proofs (limit, false) in
+      (goal_external_proofs g) (limit, false) in
   let callback _key status =
     if not (running status) then Todo._done todo () in
   if auto_proved then begin
@@ -833,7 +833,7 @@ let edit_proof_v3 ~cntexample eS sched ~default_editor callback a =
     in
     let file = update_edit_external_proof ~cntexample eS a in
     Debug.dprintf debug "[Editing] goal %s with command '%s' on file %s@."
-      a.proof_parent.goal_name.Ident.id_string editor file;
+      (goal_name a.proof_parent).Ident.id_string editor file;
     schedule_edition sched editor file (fun res -> callback a res)
 
 let edit_proof ~cntexample eS sched ~default_editor a =
@@ -894,7 +894,7 @@ let proof_removable a =
 
 
 let rec clean = function
-  | Goal g when Opt.inhabited g.goal_verified ->
+  | Goal g when Opt.inhabited (goal_verified g) ->
     iter_goal
       (fun a -> if proof_removable a then remove_proof_attempt a)
       (fun t ->

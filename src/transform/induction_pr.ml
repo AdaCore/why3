@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -35,12 +35,24 @@ and context_node =
 exception Ind_not_found
 
 let make_context node term =
- {c_node = node ; c_label = term.t_label; c_loc = term.t_loc }
+ { c_node = node; c_label = term.t_label; c_loc = term.t_loc }
 
 
 let make_context_ctx node context =
- {c_node = node ; c_label = context.c_label; c_loc = context.c_loc }
+ { c_node = node; c_label = context.c_label; c_loc = context.c_loc }
 
+(* Locate induction term in [t]: either leftmost inductive on
+   the implication chain, or the one labeled with [label].
+   If found, return [ctx, (ls,argl,cl), rhs] where:
+     [ctx] is the context in which term is found
+       (leftmost part of the context at top, e.g term with hole)
+     [ls] is the inductive symbol
+     [argl] are the argument with which the inductive symbol is
+       instantiated
+     [cl] are the inductive symbol clauses
+     [rhs] is the part of the term 'right' to the induction term
+     ([t] is decomposed as ctx[ls(argl) -> rhs])
+   If not found, raise Ind_not_found *)
 let locate kn label t =
   let rec locate_inductive find_any t = match t.t_node with
     | Tlet (t1, tb) ->
@@ -50,7 +62,7 @@ let locate kn label t =
     | Tquant(Tforall, tq) ->
       let vsl, _, t1 = t_open_quant tq in
       let ctx, ind, goal = locate_inductive find_any t1 in
-      make_context ( Cforall (vsl, ctx)) t, ind, goal
+      make_context (Cforall (vsl, ctx)) t, ind, goal
     | Tbinop (Timplies, lhs, rhs) ->
       let locate_rhs find_any =
         let ctx, ind, goal = locate_inductive find_any rhs in
@@ -66,13 +78,13 @@ let locate kn label t =
                   let cl = List.assq ls dl in
                   if find_any && not (slab ()) then
                     (* take first labeled inductive in rhs if any.
-                       Otherwise, take lhs*)
+                       Otherwise, take lhs *)
                     try
                       locate_rhs false
                     with Ind_not_found ->
                       make_context Hole t, (ls, argl, cl), rhs
                   else
-                    (*here a label has been found*)
+                    (* here a label has been found *)
                     make_context Hole t, (ls, argl, cl), rhs
                 | Dind _ | Dlogic _ | Dparam _ | Ddata _ -> locate_rhs find_any
                 | Dtype _ | Dprop _ -> assert false
@@ -82,6 +94,40 @@ let locate kn label t =
     | _  -> raise Ind_not_found
   in locate_inductive true t
 
+(* Find arguments of the inductive that are unchanged
+   within recursion. *)
+type 'a matching =
+  | Any
+  | Equal of 'a
+  | Nothing
+
+let matching eq a b = match a with
+  | Any -> Equal b
+  | Equal a when eq a b -> Equal a
+  | _ -> Nothing
+
+(* Identify parameters of an inductive declaration. *)
+let parameters ls cl =
+  let rec explore l t =
+    let l = match t.t_node with
+    | Tapp (ls2, args) when ls_equal ls ls2 ->
+      List.map2 (matching t_equal) l args
+    | _ -> l
+    in
+    t_fold explore l t
+  in
+  let clause l (_,c) =
+    List.map (function Nothing -> Nothing | _ -> Any) (explore l c)
+  in
+  let l = List.map (fun _ -> Any) ls.ls_args in
+  let l = List.fold_left clause l cl in
+  List.map (function Nothing -> false | _ -> true) l
+
+(* Partition [ctx] into two contexts,
+   the first one containing the part independent on [vsi]
+   and the second one containing the part that depends on [vsi].
+   input [ctx] is taken as a term with hole,
+   and outputs are in reverse order (e.g zippers) *)
 let partition ctx vsi =
   let rec aux ctx vsi_acc cindep cdep = match ctx.c_node with
     | Hole -> cindep, cdep
@@ -116,13 +162,13 @@ let partition ctx vsi =
   let hole = make_context_ctx Hole ctx in
   aux ctx vsi hole hole
 
-
-
+(* Add equalities between clause variables and parameters. *)
 let introduce_equalities vsi paraml argl goal =
   let goal =
     List.fold_left2 (fun g p a -> t_implies (t_equ a p) g) goal paraml argl in
   t_forall_close (Mvs.keys vsi) [] goal
 
+(* Zip term within context. *)
 let rec zip ctx goal = match ctx.c_node with
   | Hole -> goal
   | Cimplies (t, ctx2)  ->
@@ -133,7 +179,7 @@ let rec zip ctx goal = match ctx.c_node with
     zip ctx2 (t_label ?loc:ctx.c_loc ctx.c_label (t_let_close vs t goal))
 
 
-
+(* Replace clause by the associated inductive case. *)
 let substitute_clause induct vsi ls argl goal c =
   let sigma = ls_arg_inst ls argl in
   let c = t_ty_subst sigma Mvs.empty c in
@@ -144,7 +190,7 @@ let substitute_clause induct vsi ls argl goal c =
           if induct && List.for_all2
             (fun a b -> Opt.equal ty_equal a.t_ty b.t_ty) argl paraml
           then t_and t (t2 ())
-          (* in case of polymorphic recursion we do not generate IHs *)
+          (* FIXME: in case of polymorphic recursion we do not generate IHs *)
           else t
         else t2 ()
     | _  -> t_map (subst keepi) t in
@@ -164,7 +210,9 @@ let substitute_clause induct vsi ls argl goal c =
 
 let induction_l label induct kn t =
   let (ctx, (ls, argl, cl), goal) = locate kn label t in
-  let vsi = t_vars (t_app_infer ls argl) in
+  let fold vsi p t = if p then vsi else t_freevars vsi t in
+  let vsi = List.fold_left2 fold Mvs.empty (parameters ls cl) argl in
+  (*let vsi = t_vars (t_app_infer ls argl) in*)
   let cindep, cdep = partition ctx vsi in
   let goal = zip cdep goal in
   List.map (fun (_,c) ->

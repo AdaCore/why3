@@ -91,7 +91,7 @@ module Array
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2] }
 
-  val self_blit (a: array ~'a) (ofs1: int) (ofs2: int) (len: int) : unit
+  let self_blit (a: array ~'a) (ofs1: int) (ofs2: int) (len: int) : unit
     writes {a}
     requires { 0 <= ofs1 /\ 0 <= len /\ ofs1 + len <= length a }
     requires { 0 <= ofs2 /\             ofs2 + len <= length a }
@@ -99,6 +99,25 @@ module Array
       (0 <= i < ofs2 \/ ofs2 + len <= i < length a) -> a[i] = (old a)[i] }
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a[i] = (old a)[ofs1 + i - ofs2] }
+  = 'Init:
+    if ofs1 <= ofs2 then (* from right to left *)
+      for k = len - 1 downto 0 do
+        invariant  { forall i:int.
+          (0 <= i <= ofs2 + k \/ ofs2 + len <= i < length a) ->
+          a[i] = (at a 'Init)[i] }
+        invariant  { forall i:int.
+          ofs2 + k < i < ofs2 + len -> a[i] = (at a 'Init)[ofs1 + i - ofs2] }
+        a[ofs2 + k] <- a[ofs1 + k]
+      done
+    else (* from left to right *)
+      for k = 0 to len - 1 do
+        invariant  { forall i:int.
+          (0 <= i < ofs2 \/ ofs2 + k <= i < length a) ->
+          a[i] = (at a 'Init)[i] }
+        invariant  { forall i:int.
+          ofs2 <= i < ofs2 + k -> a[i] = (at a 'Init)[ofs1 + i - ofs2] }
+        a[ofs2 + k] <- a[ofs1 + k]
+      done
 
   (*** TODO?
      - concat : 'a array list -> 'a array
@@ -294,6 +313,14 @@ module ToList
   axiom to_list_cons:
     forall a: array 'a, l u: int. l < u ->
     to_list a l u = Cons a[l] (to_list a (l+1) u)
+
+  use import list.Append
+
+  let rec lemma to_list_append (a: array 'a) (l m u: int)
+    requires { l <= m <= u }
+    variant  { m - l }
+    ensures  { to_list a l m ++ to_list a m u = to_list a l u }
+  = if l < m then to_list_append a (l+1) m u
 
   val to_list (a: array 'a) (l u: int) : list 'a
     requires { 0 <= l && u <= length a }

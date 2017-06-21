@@ -7,82 +7,82 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.6" timelimit="20" steplimit="0" memlimit="1000"/>
 <file name="../there_and_back_again.mlw" expanded="true">
-<theory name="Convolution" sum="c04f401f3346b5c81c2c50964a553449" expanded="true">
+<theory name="Convolution" sum="7b8e5bc0e40791e86a2505c86830564b" expanded="true">
  <goal name="WP_parameter convolution_rec" expl="VC for convolution_rec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter convolution_rec.1" expl="1. postcondition">
+  <goal name="WP_parameter convolution_rec.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter convolution_rec.2" expl="2. variant decrease">
+  <goal name="WP_parameter convolution_rec.2" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter convolution_rec.3" expl="3. precondition">
+  <goal name="WP_parameter convolution_rec.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter convolution_rec.4" expl="4. postcondition">
+  <goal name="WP_parameter convolution_rec.4" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="WP_parameter convolution_rec.5" expl="5. unreachable point">
+  <goal name="WP_parameter convolution_rec.5" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter convolution" expl="VC for convolution">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter convolution.1" expl="1. precondition">
+  <goal name="WP_parameter convolution.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter convolution.2" expl="2. postcondition">
+  <goal name="WP_parameter convolution.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Palindrome" sum="9df381045d072ead2dc0abe2dbdadbdf" expanded="true">
+<theory name="Palindrome" sum="db070974f9ac497be8f75da62c5d4014" expanded="true">
  <goal name="WP_parameter palindrome_rec" expl="VC for palindrome_rec">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter palindrome_rec.1" expl="1. postcondition">
+  <goal name="WP_parameter palindrome_rec.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.2" expl="2. postcondition">
+  <goal name="WP_parameter palindrome_rec.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.3" expl="3. postcondition">
+  <goal name="WP_parameter palindrome_rec.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.25" steps="189"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.4" expl="4. postcondition">
+  <goal name="WP_parameter palindrome_rec.4" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.5" expl="5. unreachable point">
+  <goal name="WP_parameter palindrome_rec.5" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.6" expl="6. variant decrease">
+  <goal name="WP_parameter palindrome_rec.6" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.06" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.7" expl="7. precondition">
+  <goal name="WP_parameter palindrome_rec.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.8" expl="8. assertion">
+  <goal name="WP_parameter palindrome_rec.8" expl="assertion">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.9" expl="9. postcondition">
+  <goal name="WP_parameter palindrome_rec.9" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.10" expl="10. postcondition">
+  <goal name="WP_parameter palindrome_rec.10" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="58"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.11" expl="11. exceptional postcondition">
+  <goal name="WP_parameter palindrome_rec.11" expl="exceptional postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="113"/></proof>
   <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.12" expl="12. unreachable point">
+  <goal name="WP_parameter palindrome_rec.12" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.13" expl="13. exceptional postcondition">
+  <goal name="WP_parameter palindrome_rec.13" expl="exceptional postcondition">
   <proof prover="4" edited="there_and_back_again_Palindrome_WP_parameter_palindrome_rec_2.v"><result status="valid" time="0.51"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome_rec.14" expl="14. unreachable point">
+  <goal name="WP_parameter palindrome_rec.14" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -90,13 +90,13 @@
  </goal>
  <goal name="WP_parameter palindrome" expl="VC for palindrome">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter palindrome.1" expl="1. precondition">
+  <goal name="WP_parameter palindrome.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome.2" expl="2. postcondition">
+  <goal name="WP_parameter palindrome.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter palindrome.3" expl="3. postcondition">
+  <goal name="WP_parameter palindrome.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>

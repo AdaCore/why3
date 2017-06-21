@@ -111,10 +111,10 @@ and interpret_result pa pas =
 and create_manual_or_schedule obj goal =
   match Gnat_config.manual_prover with
   | Some _ when Gnat_objectives.goal_has_splits goal &&
-                goal.Session.goal_verified = None ->
+                Session.goal_verified goal = None ->
                   handle_vc_result goal false
   | Some p when Gnat_manual.is_new_manual_proof goal &&
-                goal.Session.goal_verified = None ->
+                Session.goal_verified goal = None ->
                   let _ = Gnat_manual.create_prover_file goal obj p in
                   ()
   | _ -> schedule_goal goal
@@ -128,12 +128,12 @@ and schedule_goal (g : Gnat_objectives.goal) =
          * goal already attempted with identical options
    *)
    if (Gnat_config.manual_prover <> None
-       && g.Session.goal_verified = None) then begin
+       && Session.goal_verified g = None) then begin
       actually_schedule_goal g
    (* then implement reproving logic *)
    end else begin
       (* Maybe the goal is already proved *)
-      if g.Session.goal_verified <> None then begin
+      if Session.goal_verified g <> None then begin
          handle_vc_result g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_objectives.all_provers_tried g then begin

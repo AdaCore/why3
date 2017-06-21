@@ -8,74 +8,74 @@
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../binary_sqrt.mlw" expanded="true">
-<theory name="BinarySqrt" sum="77fef8e995729374a1ce4e7237bca6a2" expanded="true">
+<theory name="BinarySqrt" sum="9ce354fc5ea5258e85043aee351a1947" expanded="true">
  <goal name="WP_parameter sqrt" expl="VC for sqrt" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter sqrt.1" expl="1. postcondition">
+  <goal name="WP_parameter sqrt.1" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.2" expl="2. assertion">
+  <goal name="WP_parameter sqrt.2" expl="assertion">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.3" expl="3. assertion">
+  <goal name="WP_parameter sqrt.3" expl="assertion">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.4" expl="4. assertion">
+  <goal name="WP_parameter sqrt.4" expl="assertion">
   <proof prover="5"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.5" expl="5. assertion">
+  <goal name="WP_parameter sqrt.5" expl="assertion">
   <proof prover="5"><result status="valid" time="0.03" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.6" expl="6. assertion">
+  <goal name="WP_parameter sqrt.6" expl="assertion">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   <proof prover="7" timelimit="30"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.7" expl="7. variant decrease">
+  <goal name="WP_parameter sqrt.7" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.06" steps="33"/></proof>
   <proof prover="6"><result status="valid" time="0.04"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.8" expl="8. precondition">
+  <goal name="WP_parameter sqrt.8" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.9" expl="9. precondition">
+  <goal name="WP_parameter sqrt.9" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.10" expl="10. precondition">
+  <goal name="WP_parameter sqrt.10" expl="precondition">
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt.11" expl="11. postcondition">
+  <goal name="WP_parameter sqrt.11" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.20" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter sqrt_main" expl="VC for sqrt_main" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter sqrt_main.1" expl="1. precondition">
+  <goal name="WP_parameter sqrt_main.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt_main.2" expl="2. precondition">
+  <goal name="WP_parameter sqrt_main.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.00" steps="4"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt_main.3" expl="3. precondition">
+  <goal name="WP_parameter sqrt_main.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.00" steps="4"/></proof>
   <proof prover="6"><result status="valid" time="0.00"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter sqrt_main.4" expl="4. postcondition">
+  <goal name="WP_parameter sqrt_main.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="5"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="6"><result status="valid" time="0.01"/></proof>

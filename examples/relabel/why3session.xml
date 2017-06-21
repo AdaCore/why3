@@ -4,11 +4,11 @@
 <why3session shape_version="4">
 <prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="60" steplimit="0" memlimit="0"/>
 <file name="../relabel.mlw" expanded="true">
-<theory name="Relabel" sum="c15b7e75d79b8907db0e5bc10b7356ec" expanded="true">
- <goal name="labels_Leaf">
+<theory name="Relabel" sum="bccf512f9fb80d7e3965cb6183924837" expanded="true">
+ <goal name="labels_Leaf" expl="">
  <proof prover="2"><result status="valid" time="0.03" steps="45"/></proof>
  </goal>
- <goal name="labels_Node">
+ <goal name="labels_Node" expl="">
  <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
  </goal>
  <goal name="WP_parameter fresh" expl="VC for fresh">
@@ -16,17 +16,17 @@
  </goal>
  <goal name="WP_parameter relabel" expl="VC for relabel">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter relabel.1" expl="1. postcondition">
+  <goal name="WP_parameter relabel.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.02" steps="94"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.2" expl="2. variant decrease">
+  <goal name="WP_parameter relabel.2" expl="variant decrease">
   <proof prover="2" timelimit="5" memlimit="4000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.3" expl="3. variant decrease">
+  <goal name="WP_parameter relabel.3" expl="variant decrease">
   <proof prover="2" timelimit="5" memlimit="4000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter relabel.4" expl="4. postcondition">
-  <proof prover="2"><result status="valid" time="6.64" steps="23632"/></proof>
+  <goal name="WP_parameter relabel.4" expl="postcondition">
+  <proof prover="2"><result status="valid" time="5.56" steps="19690"/></proof>
   </goal>
  </transf>
  </goal>

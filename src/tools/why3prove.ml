@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,7 +15,6 @@ open Stdlib
 open Whyconf
 open Theory
 open Task
-open Driver
 
 let usage_msg = sprintf
   "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
@@ -151,11 +150,7 @@ let option_list = [
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
 
-let driver_file s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
-
-let opt_driver = ref (match List.rev_map driver_file !opt_driver with
+let opt_driver = ref (match !opt_driver with
   | f::ef -> Some (f, ef)
   | [] -> None)
 
@@ -385,7 +380,7 @@ let do_input env drv = function
 
 let () =
   try
-    let load (f,ef) = load_driver env f ef in
+    let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue
   with e when not (Debug.test_flag Debug.stack_trace) ->

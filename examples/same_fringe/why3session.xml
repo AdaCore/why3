@@ -5,39 +5,39 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../same_fringe.mlw" expanded="true">
-<theory name="SameFringe" sum="7aba67478ad55ab5a65bef38c5e411fd" expanded="true">
+<theory name="SameFringe" sum="fc921a406e41a700c989c36ca592bf47" expanded="true">
  <goal name="WP_parameter enum" expl="VC for enum">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter enum.1" expl="1. postcondition">
+  <goal name="WP_parameter enum.1" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter enum.2" expl="2. variant decrease">
+  <goal name="WP_parameter enum.2" expl="variant decrease">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter enum.3" expl="3. postcondition">
+  <goal name="WP_parameter enum.3" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.05" steps="40"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter eq_enum" expl="VC for eq_enum">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter eq_enum.1" expl="1. postcondition">
+  <goal name="WP_parameter eq_enum.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.2" expl="2. postcondition">
+  <goal name="WP_parameter eq_enum.2" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.3" expl="3. variant decrease">
+  <goal name="WP_parameter eq_enum.3" expl="variant decrease">
   <proof prover="3" timelimit="10"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.4" expl="4. postcondition">
+  <goal name="WP_parameter eq_enum.4" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.5" expl="5. postcondition">
+  <goal name="WP_parameter eq_enum.5" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter eq_enum.6" expl="6. postcondition">
+  <goal name="WP_parameter eq_enum.6" expl="postcondition">
   <proof prover="3" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
  </transf>
@@ -67,7 +67,7 @@
  <proof prover="3" memlimit="4000"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="fb32280419454357f1773e7d0ede665e" expanded="true">
+<theory name="Test" sum="ba469fc9c156e6469744432ec1df6cef" expanded="true">
  <goal name="WP_parameter test1" expl="VC for test1">
  <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>

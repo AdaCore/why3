@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -190,10 +190,6 @@ let read_auto_detection_data main =
         Loc.errorm "Syntax error in provers-detection-data.conf@."
     | Not_found ->
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
-
-(* dead code
-let provers_found = ref 0
-*)
 
 let read_editors main =
   let filename = Filename.concat (Whyconf.datadir main)
@@ -403,7 +399,7 @@ let generate_auto_strategies config =
     (add_strategy
        (add_strategy (add_strategy config inline) split) auto1) auto2
 
-let detect_exec env main data acc exec_name =
+let detect_exec env data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in
   match s with
   | None -> acc
@@ -482,9 +478,9 @@ let detect_exec env main data acc exec_name =
       {prover  = prover;
        command = c;
        command_steps = c_steps;
-       driver  = Filename.concat (datadir main) data.prover_driver;
+       driver  = data.prover_driver;
        editor  = data.prover_editor;
-       in_place      = data.prover_in_place;
+       in_place  = data.prover_in_place;
        interactive   = (match data.kind with ITP -> true | ATP -> false);
        extra_options = [];
        extra_drivers = [];
@@ -514,8 +510,8 @@ let detect_exec env main data acc exec_name =
     else (unknown_version env exec_name data.prover_id prover_config priority;
           acc)
 
-let detect_prover env main acc data =
-  List.fold_left (detect_exec env main data) acc data.execs
+let detect_prover env acc data =
+  List.fold_left (detect_exec env data) acc data.execs
 
 (** add the prover unknown *)
 let detect_unknown env detected =
@@ -543,7 +539,7 @@ let convert_shortcuts env =
 let run_auto_detection config =
   let main = get_main config in
   let l,env = read_auto_detection_data main in
-  let detected = List.fold_left (detect_prover env main) Mprover.empty l in
+  let detected = List.fold_left (detect_prover env) Mprover.empty l in
   let length_detected = Mprover.cardinal detected in
   let detected = detect_unknown env detected in
   let length_unsupported_version =
@@ -597,7 +593,7 @@ let add_prover_binary config id path =
   let l = List.filter (fun p -> p.prover_id = id) l in
   if l = [] then Loc.errorm "Unknown prover id: %s" id;
   let detected = List.fold_left
-    (fun acc data -> detect_exec env main data acc path) Mprover.empty l in
+    (fun acc data -> detect_exec env data acc path) Mprover.empty l in
   let detected = detect_unknown env detected in
   if Mprover.is_empty detected then
     Loc.errorm "File %s does not correspond to the prover id %s" path id;

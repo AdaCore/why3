@@ -7,14 +7,14 @@
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../sum_of_digits.mlw" expanded="true">
-<theory name="Euler290" sum="18226cdd8c439a37143a6081d0907d85" expanded="true">
- <goal name="Base">
- <proof prover="4" timelimit="10"><result status="valid" time="0.01" steps="10"/></proof>
+<theory name="Euler290" sum="c10df07cf9c0b00877454e7d2b02e8f5" expanded="true">
+ <goal name="Base" expl="">
+ <proof prover="4" timelimit="10"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="Empty">
+ <goal name="Empty" expl="">
  <proof prover="4" timelimit="10"><result status="valid" time="0.07" steps="71"/></proof>
  </goal>
- <goal name="Induc" expanded="true">
+ <goal name="Induc" expl="" expanded="true">
  </goal>
  <goal name="WP_parameter sd" expl="VC for sd">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -22,55 +22,55 @@
  </goal>
  <goal name="WP_parameter f" expl="VC for f">
  <transf name="split_goal_wp">
-  <goal name="WP_parameter f.1" expl="1. assertion">
+  <goal name="WP_parameter f.1" expl="assertion">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter f.2" expl="2. assertion">
+  <goal name="WP_parameter f.2" expl="assertion">
   <proof prover="1"><result status="valid" time="2.70"/></proof>
   </goal>
-  <goal name="WP_parameter f.3" expl="3. precondition">
+  <goal name="WP_parameter f.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter f.4" expl="4. postcondition">
+  <goal name="WP_parameter f.4" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter f.5" expl="5. postcondition">
+  <goal name="WP_parameter f.5" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter f.6" expl="6. loop invariant init">
+  <goal name="WP_parameter f.6" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter f.7" expl="7. variant decrease">
+  <goal name="WP_parameter f.7" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter f.8" expl="8. precondition">
+  <goal name="WP_parameter f.8" expl="precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter f.9" expl="9. assertion">
+  <goal name="WP_parameter f.9" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="WP_parameter f.9.1" expl="1. VC for f">
+   <goal name="WP_parameter f.9.1" expl="VC for f">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
-   <proof prover="4"><result status="valid" time="0.16" steps="38"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
-   <goal name="WP_parameter f.9.2" expl="2. VC for f">
+   <goal name="WP_parameter f.9.2" expl="VC for f">
    <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="4"><result status="valid" time="0.07" steps="26"/></proof>
+   <proof prover="4"><result status="valid" time="0.07" steps="13"/></proof>
    </goal>
-   <goal name="WP_parameter f.9.3" expl="3. VC for f">
+   <goal name="WP_parameter f.9.3" expl="VC for f">
    <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter f.10" expl="10. loop invariant preservation">
+  <goal name="WP_parameter f.10" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter f.11" expl="11. postcondition">
+  <goal name="WP_parameter f.11" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>

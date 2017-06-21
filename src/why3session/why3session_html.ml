@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -97,7 +97,7 @@ struct
   and goal_depth g =
     S.PHstr.fold
       (fun _st tr depth -> max depth (1 + transf_depth tr))
-      g.S.goal_transformations 1
+      (S.goal_transformations g) 1
 
   let theory_depth t =
     List.fold_left
@@ -161,7 +161,7 @@ let rec num_lines acc tr =
   List.fold_left
     (fun acc g -> 1 +
       PHstr.fold (fun _ tr acc -> 1 + num_lines acc tr)
-      g.goal_transformations acc)
+      (goal_transformations g) acc)
     acc tr.transf_goals
 
   let rec print_transf fmt depth max_depth provers tr =
@@ -188,16 +188,16 @@ let rec num_lines acc tr =
     if not is_first then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
     fprintf fmt "<td bgcolor=\"#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false) (Opt.inhabited g.S.goal_verified)
+      (color_of_status ~dark:false) (Opt.inhabited (S.goal_verified g))
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    fprintf fmt "%s</td>" (S.goal_expl g);
+    fprintf fmt "%s</td>" (S.goal_user_name g);
 (*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
-    print_results fmt provers g.goal_external_proofs;
+    print_results fmt provers (goal_external_proofs g);
     fprintf fmt "</tr>@\n";
     PHstr.iter
       (fun _ tr -> print_transf fmt depth max_depth provers tr)
-      g.goal_transformations
+      (goal_transformations g)
 
   let print_theory fn fmt th =
     let depth = theory_depth th in
@@ -290,13 +290,13 @@ struct
 
   and print_goal fmt g =
     fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
-      g.goal_name.Ident.id_string
+      (goal_name g).Ident.id_string
       (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
          Pp.nothing print_proof_attempt)
-      g.goal_external_proofs
+      (goal_external_proofs g)
       (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
          Pp.nothing print_transf)
-      g.goal_transformations
+      (goal_transformations g)
 
   let print_theory fmt th =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"

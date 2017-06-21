@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -213,7 +213,7 @@ let iter_proof_attempt_by_filter iter filters f session =
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
   (* verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
+    (fun a -> Opt.inhabited (S.goal_verified a.S.proof_parent)) in
   (* verified *)
   let f = three_value f filters.verified
     (fun p -> Opt.inhabited (S.proof_verified p)) in
