@@ -257,8 +257,7 @@ module Array63
     requires { 0 <= ofs /\ 0 <= len }
     requires { ofs + len <= a.length }
     ensures  { result.length = len }
-    ensures  { forall i:int. 0 <= i < len ->
-               result[i] = a[ofs + i] }
+    ensures  { forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
 
   val copy (a: array 'a) : array 'a
     ensures  { result.length = a.length }
