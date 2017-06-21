@@ -2547,166 +2547,233 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     let r = ref limb_zero in
     (*normalize divisor*)
     let clz = count_leading_zeros y in
-    let ghost mult = power 2 (p2i clz) in
-    let ry = lsl y (Limb.of_int32 clz) in
-    assert { ry = mult * y };
-    let ghost tlum = power 2 (Limb.length - p2i clz) in
-    assert { tlum * mult = radix };
-    let v = invert_limb ry in
-    while (Int32.(>=) !i zero) do
-      variant { p2i !i }
-      invariant { -1 <= !i <= msb }
-      invariant { (!qp).offset = q.offset + !i }
-      invariant { (!xp).offset = x.offset + !i }
-      invariant { plength !qp = plength q }
-      invariant { plength !xp = plength x }
-      invariant { pelts !qp = pelts q }
-      invariant { pelts !xp = pelts x }
-      invariant { !r < ry }
-      invariant { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
-                  = value_sub (pelts q) (q.offset + !i + 1)
-                                        (q.offset + sz)
-                    * ry
-                    + !r }
-      invariant { !r <= radix - mult }
-      invariant { mod (!r) mult = 0 }
-      assert { !i >= 0 };
-      label StartLoop in
-      let ghost k = p2i !i in
-      lx := C.get !xp;
-      (*TODO lshift in place would simplify things*)
-      let l,h = lsld_ext !lx (Limb.of_int32 clz) in
-      mod_mult mult (l2i y) 0;
-      assert { !r + h < ry
-               by
-               let drm = div (!r) mult in
-               let dym = div (ry) mult in
-               mod (!r) mult = 0
-               so !r = mult * drm
-               so mod (ry) mult
-                  = mod (mult * (y) + 0) mult
-                  = mod 0 mult
-                  = 0
-               so ry = mult * dym
-               so !r < ry
-               so 0 < ry - !r
-                    = mult * dym - mult * drm
-                    = mult * (dym - drm)
-               so mult > 0
-               so dym - drm > 0
-               so dym >= drm + 1
-               so h < mult
-               so !r + h = mult * drm + h
-                  < mult * drm + mult
-                  = mult * (drm + 1)
-                  <= mult * dym = l2i ry };
-      assert { !r + h < radix by
-               !r + h < ry < radix };
-      let (qu,rem) = div2by1_inv (Limb.(+) !r h) l ry v in
-      mod_mult mult (l2i y * l2i qu) (l2i rem);
-      mod_mult mult (tlum * (l2i !r + l2i h)) (l2i l);
-      assert { mod (rem) mult = 0
-               by
-               ry * qu + rem
-               = (radix * (!r + h) + l)
+    if (Int32.(>) clz zero)
+    then begin
+      let ghost mult = power 2 (p2i clz) in
+      let ry = lsl y (Limb.of_int32 clz) in
+      assert { ry = mult * y };
+      let ghost tlum = power 2 (Limb.length - p2i clz) in
+      assert { tlum * mult = radix };
+      let v = invert_limb ry in
+      while (Int32.(>=) !i zero) do
+        variant   { p2i !i }
+        invariant { -1 <= !i <= msb }
+        invariant { (!qp).offset = q.offset + !i }
+        invariant { (!xp).offset = x.offset + !i }
+        invariant { plength !qp = plength q }
+        invariant { plength !xp = plength x }
+        invariant { pelts !qp = pelts q }
+        invariant { pelts !xp = pelts x }
+        invariant { !r < ry }
+        invariant { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * ry
+                      + !r }
+        invariant { !r <= radix - mult }
+        invariant { mod (!r) mult = 0 }
+        assert { !i >= 0 };
+        label StartLoop in
+        let ghost k = p2i !i in
+        lx := C.get !xp;
+        (*TODO lshift in place would simplify things*)
+        let l,h = lsld_ext !lx (Limb.of_int32 clz) in
+        mod_mult mult (l2i y) 0;
+        assert { !r + h < ry
+                 by
+                 let drm = div (!r) mult in
+                 let dym = div (ry) mult in
+                 mod (!r) mult = 0
+                 so !r = mult * drm
+                 so mod (ry) mult
+                    = mod (mult * (y) + 0) mult
+                    = mod 0 mult
+                    = 0
+                 so ry = mult * dym
+                 so !r < ry
+                 so 0 < ry - !r
+                      = mult * dym - mult * drm
+                      = mult * (dym - drm)
+                 so mult > 0
+                 so dym - drm > 0
+                 so dym >= drm + 1
+                 so h < mult
+                 so !r + h = mult * drm + h
+                    < mult * drm + mult
+                    = mult * (drm + 1)
+                    <= mult * dym = l2i ry };
+        assert { !r + h < radix by
+                 !r + h < ry < radix };
+        let (qu,rem) = div2by1_inv (Limb.(+) !r h) l ry v in
+        mod_mult mult (l2i y * l2i qu) (l2i rem);
+        mod_mult mult (tlum * (l2i !r + l2i h)) (l2i l);
+        assert { mod (rem) mult = 0
+                 by
+                 ry * qu + rem
+                 = (radix * (!r + h) + l)
+                 so
+                 mult * y * qu + rem
+                 = (mult * tlum * (!r + h) + l)
+                 so mod (mult * y * qu + rem) mult
+                    = mod (mult * tlum * (!r + h) + l) mult
+                 so mult > 0
+                 so mod (mult * (y * qu) + rem) mult
+                    = mod (rem) mult
+                 so mod (mult * tlum * (!r + h) + l) mult
+                    = mod (l) mult
+                    = 0
+                 };
+        let ghost mer = div (l2i rem) mult in
+        assert { rem <= radix - mult
+                 by
+                 mod (rem) mult = 0
+                 so mult * mer = l2i rem < radix = mult * tlum
+                 so mult > 0
+                 so 0 < mult * tlum - mult * mer = mult * (tlum - mer)
+                 so tlum - mer > 0
+                 so mer < tlum
+                 so rem = mult * mer <= mult * (tlum - 1) = radix - mult
+                 };
+        r:=rem;
+        value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
+                                   (q.offset + p2i sz) qu;
+        C.set !qp qu;
+        xp.contents <- C.incr !xp minus_one;
+        qp.contents <- C.incr !qp minus_one;
+        i := Int32.(-) !i one;
+        value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
+        value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
+        assert { mult * value_sub (pelts x) (x.offset + !i + 1)
+                                            (x.offset + sz)
+                = value_sub (pelts q) (q.offset + !i + 1) (q.offset + sz)
+                      * ry
+                      + !r
+                by
+                (pelts q)[q.offset + k] = qu
+                so
+                (pelts x)[x.offset + k] = !lx
+                so
+                l + radix * h = !lx * mult
+                so
+                mult * value_sub (pelts x) (x.offset + !i + 1)
+                                           (x.offset + sz)
+                = mult * value_sub (pelts x) (x.offset + k) (x.offset + sz)
+                = mult * ((pelts x)[x.offset + k]
+                  + radix * value_sub (pelts x) (x.offset + k + 1)
+                                                (x.offset + sz))
+                = mult * !lx
+                  + mult * radix * value_sub (pelts x) (x.offset + k + 1)
+                                                       (x.offset + sz)
+                = l + radix * h
+                  + mult * radix * value_sub (pelts x) (x.offset + k + 1)
+                                                       (x.offset + sz)
+                = l + radix * h
+                  + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                           (q.offset + sz)
+                          * ry
+                          + (!r at StartLoop))
+                = l + radix * h + radix * (!r at StartLoop)
+                  + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                           (q.offset + sz)
+                             * ry)
+                = l + radix * (h + (!r at StartLoop))
+                  + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                           (q.offset + sz)
+                             * ry)
+                = qu * ry + !r
+                  + radix * value_sub (pelts q) (q.offset + k + 1)
+                                           (q.offset + sz)
+                          * ry
+                = (pelts q)[q.offset + k] * ry + !r
+                  + radix * value_sub (pelts q) (q.offset + k + 1)
+                                           (q.offset + sz)
+                          * ry
+                = ry * ((pelts q)[q.offset + k]
+                           + radix * value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz))
+                  + !r
+                = ry * value_sub (pelts q) (q.offset + !i + 1)
+                                              (q.offset + sz)
+                  + !r
+              }
+      done;
+      let ghost res = lsr !r (Limb.of_int32 clz) in
+      assert { !r = res * mult
                so
-               mult * y * qu + rem
-               = (mult * tlum * (!r + h) + l)
-               so mod (mult * y * qu + rem) mult
-                  = mod (mult * tlum * (!r + h) + l) mult
-               so mult > 0
-               so mod (mult * (y * qu) + rem) mult
-                  = mod (rem) mult
-               so mod (mult * tlum * (!r + h) + l) mult
-                  = mod (l) mult
-                  = 0
-               };
-      let ghost mer = div (l2i rem) mult in
-      assert { rem <= radix - mult
-               by
-               mod (rem) mult = 0
-               so mult * mer = l2i rem < radix = mult * tlum
-               so mult > 0
-               so 0 < mult * tlum - mult * mer = mult * (tlum - mer)
-               so tlum - mer > 0
-               so mer < tlum
-               so rem = mult * mer <= mult * (tlum - 1) = radix - mult
-               };
-      r:=rem;
-      value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
-                                 (q.offset + p2i sz) qu;
-      C.set !qp qu;
-      xp.contents <- C.incr !xp minus_one;
-      qp.contents <- C.incr !qp minus_one;
-      i := Int32.(-) !i one;
-      value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
-      value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
-      assert { mult * value_sub (pelts x) (x.offset + !i + 1)
-                                          (x.offset + sz)
-              = value_sub (pelts q) (q.offset + !i + 1) (q.offset + sz)
-                    * ry
-                    + !r
-              by
-              (pelts q)[q.offset + k] = qu
+               mult * value x sz
+                = value q sz * ry + !r
+                = value q sz * y * mult + !r
+                = value q sz * y * mult + res * mult
+                = (value q sz * y + res) * mult
               so
-              (pelts x)[x.offset + k] = !lx
-              so
-              l + radix * h = !lx * mult
-              so
-              mult * value_sub (pelts x) (x.offset + !i + 1)
-                                         (x.offset + sz)
-              = mult * value_sub (pelts x) (x.offset + k) (x.offset + sz)
-              = mult * ((pelts x)[x.offset + k]
-                + radix * value_sub (pelts x) (x.offset + k + 1)
-                                              (x.offset + sz))
-              = mult * !lx
-                + mult * radix * value_sub (pelts x) (x.offset + k + 1)
-                                                     (x.offset + sz)
-              = l + radix * h
-                + mult * radix * value_sub (pelts x) (x.offset + k + 1)
-                                                     (x.offset + sz)
-              = l + radix * h
-                + radix * (value_sub (pelts q) (q.offset + k + 1)
-                                         (q.offset + sz)
-                        * ry
-                        + (!r at StartLoop))
-              = l + radix * h + radix * (!r at StartLoop)
-                + radix * (value_sub (pelts q) (q.offset + k + 1)
-                                         (q.offset + sz)
-                           * ry)
-              = l + radix * (h + (!r at StartLoop))
-                + radix * (value_sub (pelts q) (q.offset + k + 1)
-                                         (q.offset + sz)
-                           * ry)
-              = qu * ry + !r
-                + radix * value_sub (pelts q) (q.offset + k + 1)
-                                         (q.offset + sz)
-                        * ry
-              = (pelts q)[q.offset + k] * ry + !r
-                + radix * value_sub (pelts q) (q.offset + k + 1)
-                                         (q.offset + sz)
-                        * ry
-              = ry * ((pelts q)[q.offset + k]
-                         + radix * value_sub (pelts q) (q.offset + k + 1)
-                                                       (q.offset + sz))
-                + !r
-              = ry * value_sub (pelts q) (q.offset + !i + 1)
-                                            (q.offset + sz)
-                + !r
-            }
-    done;
-    let ghost res = lsr !r (Limb.of_int32 clz) in
-    assert { !r = res * mult
-             so
-             mult * value x sz
-              = value q sz * ry + !r
-              = value q sz * y * mult + !r
-              = value q sz * y * mult + res * mult
-              = (value q sz * y + res) * mult
-            so
-            value x sz
-              = value q sz * y + res };
-    lsr !r (Limb.of_int32 clz)
+              value x sz
+                = value q sz * y + res };
+      lsr !r (Limb.of_int32 clz) end
+    else begin
+      let v = invert_limb y in
+      while (Int32.(>=) !i zero) do
+        variant   { p2i !i }
+        invariant { -1 <= !i <= msb }
+        invariant { (!qp).offset = q.offset + !i }
+        invariant { (!xp).offset = x.offset + !i }
+        invariant { plength !qp = plength q }
+        invariant { plength !xp = plength x }
+        invariant { pelts !qp = pelts q }
+        invariant { pelts !xp = pelts x }
+        invariant { !r < y }
+        invariant { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r }
+        assert { !i >= 0 };
+        label StartLoop in
+        let ghost k = p2i !i in
+        lx := C.get !xp;
+        let (qu, rem) = div2by1_inv !r !lx y v in
+        r := rem;
+        value_sub_update_no_change (pelts q) (!qp).offset (q.offset + 1 + p2i !i)
+                                   (q.offset + p2i sz) qu;
+        C.set !qp qu;
+        xp.contents <- C.incr !xp minus_one;
+        qp.contents <- C.incr !qp minus_one;
+        i := Int32.(-) !i one;
+        value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
+        value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
+        assert { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r
+                 by (pelts q)[q.offset + k] = qu
+                 so (pelts x)[x.offset + k] = !lx
+                 so value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+                    = value_sub (pelts x) (x.offset + k) (x.offset + sz)
+                    = !lx + radix * value_sub (pelts x) (x.offset + k + 1)
+                                                        (x.offset + sz)
+                    = !lx + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y + (!r at StartLoop))
+                    = !lx + radix * (!r at StartLoop)
+                          + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y)
+                    = qu * y + !r
+                          + radix * (value_sub (pelts q) (q.offset + k + 1)
+                                                         (q.offset + sz)
+                                     * y)
+                    = (qu + radix * value_sub (pelts q) (q.offset + k + 1)
+                                                        (q.offset + sz))
+                      * y
+                      + !r
+                    = value_sub (pelts q) (q.offset + !i + 1)
+                                          (q.offset + sz)
+                      * y
+                      + !r };
+      done;
+      !r
+    end
+
 
   predicate reciprocal_3by2 (v dh dl:limb) =
     v = div (radix*radix*radix -1) (dl + radix * dh) - radix
