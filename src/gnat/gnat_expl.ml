@@ -362,7 +362,6 @@ module CheckCmp = struct
 end
 
 module MCheck = Extmap.Make(CheckCmp)
-module SCheck = Extset.Make(CheckCmp)
 module HCheck = Hashtbl.Make (struct
    type t = check
    let equal = check_equal

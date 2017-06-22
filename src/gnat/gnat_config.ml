@@ -24,8 +24,6 @@ let rec file_concat l =
   | [x;y] -> Filename.concat x y
   | x :: xs -> Filename.concat x (file_concat xs)
 
-let spark_config_dir =
-  file_concat [spark_prefix; "share"; "spark"; "config"]
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
 
 let spark_loadpath =
@@ -60,7 +58,6 @@ let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
 let opt_replay = ref false
-let opt_benchmark = ref false
 
 let opt_prepare_shared = ref false
 
@@ -185,8 +182,6 @@ let options = Arg.align [
           " Use prover given in argument instead of Alt-Ergo";
    "--replay", Arg.Set opt_replay,
           " Do not try new proofs, only replay existing proofs";
-   "--benchmark", Arg.Set opt_benchmark,
-          " Load fake why3.conf instead of real one";
    "--socket", Arg.String set_socket_name,
           " The name of the socket to be used";
    "--debug", Arg.Tuple [Arg.Set opt_debug; Arg.Set opt_standalone],
@@ -213,11 +208,7 @@ let options = Arg.align [
 
 let () = Arg.parse options set_filename usage_msg
 
-let gnatprove_why3conf_file () =
-  if !opt_benchmark then
-    file_concat [spark_config_dir; "why3.conf.fake"]
-  else
-    file_concat [spark_config_dir; "why3.conf"]
+let gnatprove_why3conf_file () = "why3.conf"
 
 let merge_opt_keep_first _ v1 v2 =
   match v1, v2 with
