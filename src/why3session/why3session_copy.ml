@@ -132,15 +132,15 @@ let run_one ~action env config filters pk fname =
         | Some prover ->
       (* If such a prover already exists on the goal *)
           let exists =
-            (PHprover.mem pr.proof_parent.goal_external_proofs prover) in
+            (PHprover.mem (goal_external_proofs pr.proof_parent) prover) in
           let replace = not exists || match !opt_replace with
             | Always -> true | Never -> false
             | Interactive ->
               interactive
-                (PHprover.find pr.proof_parent.goal_external_proofs prover)
+                (PHprover.find (goal_external_proofs pr.proof_parent) prover)
             | Not_valid ->
               let rm =
-                PHprover.find pr.proof_parent.goal_external_proofs prover
+                PHprover.find (goal_external_proofs pr.proof_parent) prover
               in
               not (Opt.inhabited (proof_verified rm))
           in

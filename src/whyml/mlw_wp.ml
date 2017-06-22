@@ -1426,7 +1426,7 @@ end = struct
         { base with now =
             { subst_vars = vars;
               subst_regions = regs };
-            marked = false;
+            marked = marked;
         },
         List.map2 t_and_simp fl1 fl2
 

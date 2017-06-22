@@ -159,13 +159,13 @@ let rec stats_of_goal ~root prefix_name stats goal =
                   acc
             end
           | _ -> acc)
-      goal.goal_external_proofs
+      (goal_external_proofs goal)
       []
   in
   List.iter (update_perf_stats stats) proof_list;
-  PHstr.iter (stats_of_transf prefix_name stats) goal.goal_transformations;
-  if not (Opt.inhabited goal.goal_verified) then
-    let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
+  PHstr.iter (stats_of_transf prefix_name stats) (goal_transformations goal);
+  if not (Opt.inhabited (goal_verified goal)) then
+    let goal_name = prefix_name ^ (goal_name goal).Ident.id_string in
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
     begin
@@ -175,7 +175,7 @@ let rec stats_of_goal ~root prefix_name stats goal =
         stats.nb_proved_sub_goals <- stats.nb_proved_sub_goals + 1;
       match proof_list with
       | [ (prover, _) ] ->
-        let goal_name = prefix_name ^ goal.goal_name.Ident.id_string in
+        let goal_name = prefix_name ^ (goal_name goal).Ident.id_string in
         stats.only_one_proof <-
           Sstr.add
           (goal_name ^ ": " ^ (string_of_prover prover))
@@ -217,7 +217,7 @@ let rec stats2_of_goal ~nb_proofs g : 'a goal_stat =
                   acc
             end
           | _ -> acc)
-      g.goal_external_proofs
+      (goal_external_proofs g)
       []
   in
   let l =
@@ -226,11 +226,11 @@ let rec stats2_of_goal ~nb_proofs g : 'a goal_stat =
         match stats2_of_transf ~nb_proofs tr with
           | [] -> acc
           | r -> (tr,List.rev r)::acc)
-      g.goal_transformations
+      (goal_transformations g)
       []
   in
   if match nb_proofs with
-    | 0 -> not (Opt.inhabited g.goal_verified)
+    | 0 -> not (Opt.inhabited (goal_verified g))
     | 1 -> List.length proof_list = 1
     | _ -> assert false
       then Yes(proof_list,l) else No(l)
@@ -249,7 +249,7 @@ let print_res ~time fmt (p,t) =
 
 let rec print_goal_stats ~time depth (g,l) =
   for _i=1 to depth do printf "  " done;
-  printf "+-- goal %s" g.goal_name.Ident.id_string;
+  printf "+-- goal %s" (goal_name g).Ident.id_string;
   match l with
     | No l ->
       printf "@\n";

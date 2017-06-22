@@ -137,6 +137,16 @@ else
     echo "Make bench succeeded. " >> $REPORT
 fi
 
+# run regression bench for counterexamples
+bench/ce-bench &> $OUT
+if test "$?" != "0" ; then
+    echo "Counterexample regression tests FAILED" >> $REPORT
+    cat $OUT >> $REPORT
+    SUBJECT="$SUBJECT (CE regression failed)"
+else
+    echo "Counterexample regression tests succeeded. " >> $REPORT
+fi
+
 
 # replay proofs
 examples/regtests.sh &> $OUT

@@ -73,17 +73,13 @@ let opt_output =
     exit 1
   | Some d -> d
 
-let driver_file s =
-  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat Config.datadir (Filename.concat "drivers" (s ^ ".drv"))
-
 let opt_driver =
-  try match List.rev_map driver_file !opt_driver with
+  try match !opt_driver with
   | [] ->
     eprintf "Realization driver (-D) is required.@.";
     exit 1
   | f::ef ->
-    Driver.load_driver env f ef
+    Whyconf.load_driver (Whyconf.get_main config) env f ef
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
