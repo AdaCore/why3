@@ -184,6 +184,7 @@ type type_decl = {
   td_vis    : visibility; (* records only *)
   td_mut    : bool;       (* records or abstract types *)
   td_inv    : invariant;  (* records only *)
+  td_wit    : (qualid * expr) list;
   td_def    : type_def;
 }
 

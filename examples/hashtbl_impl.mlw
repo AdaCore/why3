@@ -50,6 +50,7 @@ module HashtblImpl
     invariant {
       forall i: int. 0 <= i < length data -> good_hash data i }
     invariant { forall k: key, v: 'a. good_data k v view data }
+    by { size = 0; data = make 1 Nil; view = Const.const None }
 
   let create (n: int) : t 'a
     requires { 1 <= n }
