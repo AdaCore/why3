@@ -12,7 +12,7 @@
 <prover id="7" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../defunctionalization.mlw" expanded="true">
-<theory name="Expr" sum="806c12d4403bd9222cb5ec7de53e16e5">
+<theory name="Expr" sum="b037f23193f1153198522cc346013536">
  <goal name="VC p0" expl="VC for p0">
  <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -29,7 +29,7 @@
  <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="DirectSem" sum="8a9bbf89be9ee6cdbabf7acdd7bd0b1f">
+<theory name="DirectSem" sum="dafce60352b695431885f6bd8e6e4cfe">
  <goal name="VC eval_0" expl="VC for eval_0">
  <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -39,7 +39,7 @@
  <goal name="VC test" expl="VC for test">
  <proof prover="7"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="eval_p3">
+ <goal name="eval_p3" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1" memlimit="4000"><result status="valid" time="0.00"/></proof>
  <proof prover="2" memlimit="4000"><result status="valid" time="0.02"/></proof>
@@ -47,7 +47,7 @@
  <proof prover="4" memlimit="4000"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="CPS" sum="fca777f79915177c4b0efbae84734823">
+<theory name="CPS" sum="9398ce9e1ab85d2a502b691382849f0a">
  <goal name="VC eval_1" expl="VC for eval_1">
  <proof prover="7"><result status="valid" time="0.01" steps="46"/></proof>
  </goal>
@@ -55,17 +55,17 @@
  <proof prover="7"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization" sum="f5bf46667f77325130e49decc8994e61">
- <goal name="size_e_pos">
+<theory name="Defunctionalization" sum="fa5a9a22c9062bde23fe275f85574ae6">
+ <goal name="size_e_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_e_pos.1" expl="1.">
+  <goal name="size_e_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.04" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_c_pos">
+ <goal name="size_c_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1.">
+  <goal name="size_c_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
  </transf>
@@ -83,19 +83,19 @@
  <proof prover="7"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="Defunctionalization2" sum="1ae50e29b78cebd4b83add8b50c6c1b9">
+<theory name="Defunctionalization2" sum="fc61c5789c2bc65687eefeef4811cc89">
  <goal name="VC continue_2" expl="VC for continue_2">
  <proof prover="7"><result status="valid" time="0.01" steps="107"/></proof>
  </goal>
  <goal name="VC eval_2" expl="VC for eval_2">
  <transf name="split_goal_wp">
-  <goal name="VC eval_2.1" expl="1. variant decrease">
+  <goal name="VC eval_2.1" expl="variant decrease">
   <proof prover="7"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC eval_2.2" expl="2. variant decrease">
+  <goal name="VC eval_2.2" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC eval_2.3" expl="3. postcondition">
+  <goal name="VC eval_2.3" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.00" steps="49"/></proof>
   </goal>
  </transf>
@@ -107,17 +107,17 @@
  <proof prover="7"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="SemWithError" sum="f788ff531e8c29e783e8622c79efd2b2">
- <goal name="cps_correct_expr">
+<theory name="SemWithError" sum="9a05267f2b2a40cd0b4ffdd9abb1c480">
+ <goal name="cps_correct_expr" expl="">
  <transf name="induction_ty_lex">
-  <goal name="cps_correct_expr.1" expl="1.">
+  <goal name="cps_correct_expr.1" expl="">
   <transf name="split_goal_wp">
-   <goal name="cps_correct_expr.1.1" expl="1.">
+   <goal name="cps_correct_expr.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
-   <goal name="cps_correct_expr.1.2" expl="2.">
+   <goal name="cps_correct_expr.1.2" expl="">
    <transf name="introduce_premises">
-    <goal name="cps_correct_expr.1.2.1" expl="1.">
+    <goal name="cps_correct_expr.1.2.1" expl="">
     <proof prover="8"><result status="valid" time="0.84"/></proof>
     </goal>
    </transf>
@@ -126,31 +126,31 @@
   </goal>
  </transf>
  </goal>
- <goal name="cps_correct">
+ <goal name="cps_correct" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="4"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="cps2_correct_expr_aux">
+ <goal name="cps2_correct_expr_aux" expl="">
  <proof prover="3"><result status="valid" time="0.02" steps="2"/></proof>
  </goal>
- <goal name="cps2_correct_expr">
+ <goal name="cps2_correct_expr" expl="">
  <transf name="induction_ty_lex">
-  <goal name="cps2_correct_expr.1" expl="1.">
+  <goal name="cps2_correct_expr.1" expl="">
   <transf name="split_goal_wp">
-   <goal name="cps2_correct_expr.1.1" expl="1.">
+   <goal name="cps2_correct_expr.1.1" expl="">
    <proof prover="3"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
-   <goal name="cps2_correct_expr.1.2" expl="2.">
+   <goal name="cps2_correct_expr.1.2" expl="">
    <proof prover="1" timelimit="6"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="cps2_correct">
+ <goal name="cps2_correct" expl="">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="18"/></proof>
@@ -158,43 +158,43 @@
  </goal>
  <goal name="VC cps3_correct_expr" expl="VC for cps3_correct_expr">
  <transf name="split_goal_wp">
-  <goal name="VC cps3_correct_expr.1" expl="1. variant decrease">
+  <goal name="VC cps3_correct_expr.1" expl="variant decrease">
   <proof prover="7"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.2" expl="2. variant decrease">
+  <goal name="VC cps3_correct_expr.2" expl="variant decrease">
   <proof prover="7"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.3" expl="3. assertion">
+  <goal name="VC cps3_correct_expr.3" expl="assertion">
   <proof prover="7"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.4" expl="4. postcondition">
+  <goal name="VC cps3_correct_expr.4" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="VC cps3_correct_expr.4.1" expl="1. postcondition">
+   <goal name="VC cps3_correct_expr.4.1" expl="postcondition">
    <proof prover="7" timelimit="1"><result status="valid" time="0.01" steps="63"/></proof>
    </goal>
-   <goal name="VC cps3_correct_expr.4.2" expl="2. postcondition">
+   <goal name="VC cps3_correct_expr.4.2" expl="postcondition">
    <proof prover="8" timelimit="1"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="cps3_correct">
+ <goal name="cps3_correct" expl="">
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.03" steps="10"/></proof>
  <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="size_e_pos">
+ <goal name="size_e_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_e_pos.1" expl="1.">
+  <goal name="size_e_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_c_pos">
+ <goal name="size_c_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1.">
+  <goal name="size_c_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.03" steps="15"/></proof>
   </goal>
  </transf>
@@ -212,7 +212,7 @@
  <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
 </theory>
-<theory name="ReductionSemantics" sum="15be8583204c6ed0a3ea83deeb164c25">
+<theory name="ReductionSemantics" sum="ffe898ffd7951d0b0d7253c674d154dc">
  <goal name="VC contract" expl="VC for contract">
  <proof prover="7"><result status="valid" time="0.01" steps="44"/></proof>
  </goal>
@@ -222,9 +222,9 @@
  <goal name="VC recompose_values" expl="VC for recompose_values">
  <proof prover="7"><result status="valid" time="0.04" steps="445"/></proof>
  </goal>
- <goal name="size_c_pos">
+ <goal name="size_c_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1.">
+  <goal name="size_c_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
  </transf>
@@ -249,19 +249,19 @@
  </goal>
  <goal name="VC itere_opt" expl="VC for itere_opt">
  <transf name="split_goal_wp">
-  <goal name="VC itere_opt.1" expl="1. precondition">
+  <goal name="VC itere_opt.1" expl="precondition">
   <proof prover="7"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC itere_opt.2" expl="2. postcondition">
+  <goal name="VC itere_opt.2" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC itere_opt.3" expl="3. assertion">
+  <goal name="VC itere_opt.3" expl="assertion">
   <proof prover="7"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC itere_opt.4" expl="4. unreachable point">
+  <goal name="VC itere_opt.4" expl="unreachable point">
   <proof prover="7"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC itere_opt.5" expl="5. postcondition">
+  <goal name="VC itere_opt.5" expl="postcondition">
   <proof prover="6"><result status="valid" time="0.55"/></proof>
   </goal>
  </transf>
@@ -282,10 +282,10 @@
  <proof prover="7"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="RWithError" sum="b06c96afc6649d4980932257e8e75eda">
- <goal name="size_c_pos">
+<theory name="RWithError" sum="06390aae910df4a0f6fa37e6490fc6e9">
+ <goal name="size_c_pos" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_c_pos.1" expl="1.">
+  <goal name="size_c_pos.1" expl="">
   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
  </transf>

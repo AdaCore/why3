@@ -5,19 +5,19 @@
 <prover id="3" name="CVC4" version="1.4" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="1.30" timelimit="11" steplimit="0" memlimit="1000"/>
 <file name="../insertion_sort_list.mlw" expanded="true">
-<theory name="InsertionSort" sum="8b130bd9023de8633ec29768c02a85ca" expanded="true">
- <goal name="Transitive.Trans" expanded="true">
+<theory name="InsertionSort" sum="b792970350f87ff6d41ca3f49c6eed13" expanded="true">
+ <goal name="Transitive.Trans" expl="" expanded="true">
  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
  <goal name="VC insert" expl="VC for insert" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC insert.1" expl="1. variant decrease">
+  <goal name="VC insert.1" expl="variant decrease">
   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC insert.2" expl="2. precondition">
+  <goal name="VC insert.2" expl="precondition">
   <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC insert.3" expl="3. postcondition" expanded="true">
+  <goal name="VC insert.3" expl="postcondition" expanded="true">
   <metas
    expanded="true">
    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
@@ -511,16 +511,16 @@
    <meta name="remove_type">
     <meta_arg_ts id="unit"/>
    </meta>
-   <goal name="VC insert.3" expl="3. postcondition" expanded="true">
+   <goal name="VC insert.3" expl="postcondition" expanded="true">
    <transf name="eliminate_builtin" expanded="true">
-    <goal name="VC insert.3.1" expl="1. postcondition" expanded="true">
+    <goal name="VC insert.3.1" expl="postcondition" expanded="true">
     <proof prover="4"><result status="valid" time="0.84" steps="3700"/></proof>
     </goal>
    </transf>
    </goal>
   </metas>
   </goal>
-  <goal name="VC insert.4" expl="4. postcondition" expanded="true">
+  <goal name="VC insert.4" expl="postcondition" expanded="true">
   <proof prover="3"><result status="valid" time="0.34"/></proof>
   </goal>
  </transf>

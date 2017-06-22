@@ -8,27 +8,27 @@
 <prover id="3" name="Z3" version="4.5.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../largest_prime_factor.mlw" expanded="true">
-<theory name="PrimeFactor" sum="c6d584b1ee2564a358e7d0abca7d5848" expanded="true">
+<theory name="PrimeFactor" sum="effa6bb8c5c6055b7646d3f17e44dbf4" expanded="true">
  <goal name="VC smallest_divisor" expl="VC for smallest_divisor">
  <transf name="split_goal_wp">
-  <goal name="VC smallest_divisor.1" expl="1. assertion">
+  <goal name="VC smallest_divisor.1" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="VC smallest_divisor.1.1" expl="1. assertion">
+   <goal name="VC smallest_divisor.1.1" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="25"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.2" expl="2. assertion">
+   <goal name="VC smallest_divisor.1.2" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.3" expl="3. assertion">
+   <goal name="VC smallest_divisor.1.3" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="28"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.4" expl="4. assertion">
+   <goal name="VC smallest_divisor.1.4" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="14"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.5" expl="5. assertion">
+   <goal name="VC smallest_divisor.1.5" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="20"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.6" expl="6. assertion">
+   <goal name="VC smallest_divisor.1.6" expl="assertion">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    <metas>
     <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
@@ -990,9 +990,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="unit"/>
     </meta>
-    <goal name="VC smallest_divisor.1.6" expl="6. assertion">
+    <goal name="VC smallest_divisor.1.6" expl="assertion">
     <transf name="eliminate_builtin">
-     <goal name="VC smallest_divisor.1.6.1" expl="1. assertion">
+     <goal name="VC smallest_divisor.1.6.1" expl="assertion">
      <proof prover="2"><result status="valid" time="0.03"/></proof>
      <proof prover="3"><result status="valid" time="0.01"/></proof>
      </goal>
@@ -1000,124 +1000,124 @@
     </goal>
    </metas>
    </goal>
-   <goal name="VC smallest_divisor.1.7" expl="7. assertion">
+   <goal name="VC smallest_divisor.1.7" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="15"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.8" expl="8. assertion">
+   <goal name="VC smallest_divisor.1.8" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.06" steps="54"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.9" expl="9. assertion">
+   <goal name="VC smallest_divisor.1.9" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.00" steps="16"/></proof>
    </goal>
-   <goal name="VC smallest_divisor.1.10" expl="10. assertion">
+   <goal name="VC smallest_divisor.1.10" expl="assertion">
    <proof prover="7" timelimit="11"><result status="valid" time="0.02" steps="39"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC smallest_divisor.2" expl="2. check modulo by zero">
+  <goal name="VC smallest_divisor.2" expl="check modulo by zero">
   <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.3" expl="3. variant decrease">
+  <goal name="VC smallest_divisor.3" expl="variant decrease">
   <proof prover="7" timelimit="11"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.4" expl="4. precondition">
+  <goal name="VC smallest_divisor.4" expl="precondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.5" expl="5. precondition">
+  <goal name="VC smallest_divisor.5" expl="precondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.6" expl="6. precondition">
+  <goal name="VC smallest_divisor.6" expl="precondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.7" expl="7. postcondition">
+  <goal name="VC smallest_divisor.7" expl="postcondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.8" expl="8. postcondition">
+  <goal name="VC smallest_divisor.8" expl="postcondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.02" steps="43"/></proof>
   </goal>
-  <goal name="VC smallest_divisor.9" expl="9. postcondition">
+  <goal name="VC smallest_divisor.9" expl="postcondition">
   <proof prover="7" timelimit="11"><result status="valid" time="0.72" steps="202"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC largest_prime_factor" expl="VC for largest_prime_factor" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC largest_prime_factor.1" expl="1. precondition">
+  <goal name="VC largest_prime_factor.1" expl="precondition">
   <proof prover="7"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.2" expl="2. precondition">
+  <goal name="VC largest_prime_factor.2" expl="precondition">
   <proof prover="7"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.3" expl="3. precondition">
+  <goal name="VC largest_prime_factor.3" expl="precondition">
   <proof prover="7"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.4" expl="4. check division by zero">
+  <goal name="VC largest_prime_factor.4" expl="check division by zero">
   <proof prover="7"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.5" expl="5. assertion">
+  <goal name="VC largest_prime_factor.5" expl="assertion">
   <proof prover="7"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.6" expl="6. assertion">
+  <goal name="VC largest_prime_factor.6" expl="assertion">
   <proof prover="1"><result status="valid" time="0.88"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.7" expl="7. loop invariant init">
+  <goal name="VC largest_prime_factor.7" expl="loop invariant init">
   <proof prover="7"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.8" expl="8. loop invariant init">
+  <goal name="VC largest_prime_factor.8" expl="loop invariant init">
   <proof prover="7"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.9" expl="9. loop invariant init">
+  <goal name="VC largest_prime_factor.9" expl="loop invariant init">
   <proof prover="7"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.10" expl="10. loop invariant init">
+  <goal name="VC largest_prime_factor.10" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.56"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.11" expl="11. loop invariant init">
+  <goal name="VC largest_prime_factor.11" expl="loop invariant init">
   <proof prover="7"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.12" expl="12. loop invariant init">
+  <goal name="VC largest_prime_factor.12" expl="loop invariant init">
   <proof prover="7"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.13" expl="13. assertion">
+  <goal name="VC largest_prime_factor.13" expl="assertion">
   <proof prover="7"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.14" expl="14. precondition">
+  <goal name="VC largest_prime_factor.14" expl="precondition">
   <proof prover="7"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.15" expl="15. precondition">
+  <goal name="VC largest_prime_factor.15" expl="precondition">
   <proof prover="7"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.16" expl="16. precondition">
+  <goal name="VC largest_prime_factor.16" expl="precondition">
   <proof prover="7"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.17" expl="17. assertion">
-  <proof prover="1"><result status="valid" time="2.20"/></proof>
+  <goal name="VC largest_prime_factor.17" expl="assertion">
+  <proof prover="1"><result status="valid" time="1.67"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.18" expl="18. check division by zero">
+  <goal name="VC largest_prime_factor.18" expl="check division by zero">
   <proof prover="7"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.19" expl="19. assertion">
+  <goal name="VC largest_prime_factor.19" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="VC largest_prime_factor.19.1" expl="1. VC for largest_prime_factor">
+   <goal name="VC largest_prime_factor.19.1" expl="VC for largest_prime_factor">
    <proof prover="7" timelimit="11"><result status="valid" time="0.02" steps="44"/></proof>
    </goal>
-   <goal name="VC largest_prime_factor.19.2" expl="2. VC for largest_prime_factor">
+   <goal name="VC largest_prime_factor.19.2" expl="VC for largest_prime_factor">
    <proof prover="7" timelimit="11"><result status="valid" time="0.03" steps="50"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC largest_prime_factor.20" expl="20. assertion">
-  <proof prover="1"><result status="valid" time="7.89"/></proof>
+  <goal name="VC largest_prime_factor.20" expl="assertion">
+  <proof prover="1"><result status="valid" time="6.11"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.21" expl="21. loop variant decrease" expanded="true">
+  <goal name="VC largest_prime_factor.21" expl="loop variant decrease" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="VC largest_prime_factor.21.1" expl="1. VC for largest_prime_factor">
+   <goal name="VC largest_prime_factor.21.1" expl="VC for largest_prime_factor">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    <proof prover="1"><result status="valid" time="0.02"/></proof>
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    <proof prover="7" timelimit="11"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
-   <goal name="VC largest_prime_factor.21.2" expl="2. VC for largest_prime_factor" expanded="true">
+   <goal name="VC largest_prime_factor.21.2" expl="VC for largest_prime_factor" expanded="true">
    <proof prover="0"><result status="valid" time="0.07"/></proof>
    <metas
     expanded="true">
@@ -2101,9 +2101,9 @@
     <meta name="remove_type">
      <meta_arg_ts id="list"/>
     </meta>
-    <goal name="VC largest_prime_factor.21.2" expl="2. VC for largest_prime_factor" expanded="true">
+    <goal name="VC largest_prime_factor.21.2" expl="VC for largest_prime_factor" expanded="true">
     <transf name="eliminate_builtin" expanded="true">
-     <goal name="VC largest_prime_factor.21.2.1" expl="1. VC for largest_prime_factor" expanded="true">
+     <goal name="VC largest_prime_factor.21.2.1" expl="VC for largest_prime_factor" expanded="true">
      <proof prover="0"><result status="valid" time="0.07"/></proof>
      <proof prover="3"><result status="valid" time="0.19"/></proof>
      </goal>
@@ -2113,31 +2113,31 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC largest_prime_factor.22" expl="22. loop invariant preservation">
+  <goal name="VC largest_prime_factor.22" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.14" steps="79"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.23" expl="23. loop invariant preservation">
+  <goal name="VC largest_prime_factor.23" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.24" expl="24. loop invariant preservation">
+  <goal name="VC largest_prime_factor.24" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.02" steps="47"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.25" expl="25. loop invariant preservation">
+  <goal name="VC largest_prime_factor.25" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.26" expl="26. loop invariant preservation">
+  <goal name="VC largest_prime_factor.26" expl="loop invariant preservation">
   <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.27" expl="27. loop invariant preservation">
+  <goal name="VC largest_prime_factor.27" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.28" expl="28. postcondition">
+  <goal name="VC largest_prime_factor.28" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.29" expl="29. postcondition">
+  <goal name="VC largest_prime_factor.29" expl="postcondition">
   <proof prover="7"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC largest_prime_factor.30" expl="30. postcondition">
+  <goal name="VC largest_prime_factor.30" expl="postcondition">
   <proof prover="7"><result status="valid" time="2.56" steps="180"/></proof>
   </goal>
  </transf>

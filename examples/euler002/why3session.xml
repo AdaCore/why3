@@ -10,24 +10,24 @@
 <file name="../euler002.mlw" expanded="true">
 <theory name="FibSumEven" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="FibOnlyEven" sum="4cc73247b458d3d09551391b5344545e">
+<theory name="FibOnlyEven" sum="18fb29655c875df92ecb0b4d485a5684">
  <goal name="VC fib_even_3n" expl="VC for fib_even_3n">
  <transf name="split_goal_wp">
-  <goal name="VC fib_even_3n.1" expl="1. variant decrease">
+  <goal name="VC fib_even_3n.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC fib_even_3n.2" expl="2. precondition">
+  <goal name="VC fib_even_3n.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC fib_even_3n.3" expl="3. postcondition">
+  <goal name="VC fib_even_3n.3" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.21"/></proof>
   <metas>
    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
@@ -371,9 +371,9 @@
    <meta name="remove_type">
     <meta_arg_ts id="unit"/>
    </meta>
-   <goal name="VC fib_even_3n.3" expl="3. postcondition">
+   <goal name="VC fib_even_3n.3" expl="postcondition">
    <transf name="eliminate_builtin">
-    <goal name="VC fib_even_3n.3.1" expl="1. postcondition">
+    <goal name="VC fib_even_3n.3.1" expl="postcondition">
     <proof prover="1"><result status="valid" time="0.10"/></proof>
     <proof prover="2"><result status="valid" time="0.49"/></proof>
     <proof prover="4"><result status="valid" time="0.15"/></proof>
@@ -384,66 +384,66 @@
   </goal>
  </transf>
  </goal>
- <goal name="fib_even0">
+ <goal name="fib_even0" expl="">
  <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
- <goal name="fib_even1">
+ <goal name="fib_even1" expl="">
  <proof prover="1" timelimit="6"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="fib_evenn">
+ <goal name="fib_evenn" expl="">
  <proof prover="1" timelimit="6"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="Solve" sum="7d630f88a5541a4c56d5f07af13ed4e3" expanded="true">
+<theory name="Solve" sum="5cd75c151f3b01e3b99722d523005fee" expanded="true">
  <goal name="VC f" expl="VC for f" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC f.1" expl="1. loop invariant init">
+  <goal name="VC f.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC f.2" expl="2. loop invariant init">
+  <goal name="VC f.2" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC f.3" expl="3. loop invariant init">
+  <goal name="VC f.3" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC f.4" expl="4. loop invariant init">
+  <goal name="VC f.4" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC f.5" expl="5. loop invariant init">
+  <goal name="VC f.5" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC f.6" expl="6. loop invariant init">
+  <goal name="VC f.6" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC f.7" expl="7. loop invariant init">
+  <goal name="VC f.7" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC f.8" expl="8. loop invariant init">
+  <goal name="VC f.8" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC f.9" expl="9. loop variant decrease">
+  <goal name="VC f.9" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC f.10" expl="10. loop invariant preservation">
+  <goal name="VC f.10" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC f.11" expl="11. loop invariant preservation">
+  <goal name="VC f.11" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC f.12" expl="12. loop invariant preservation">
+  <goal name="VC f.12" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="VC f.13" expl="13. loop invariant preservation">
+  <goal name="VC f.13" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC f.14" expl="14. loop invariant preservation">
+  <goal name="VC f.14" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC f.15" expl="15. loop invariant preservation">
+  <goal name="VC f.15" expl="loop invariant preservation">
   <proof prover="0"><result status="timeout" time="4.99"/></proof>
   <proof prover="4" timelimit="1"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="VC f.16" expl="16. loop invariant preservation" expanded="true">
+  <goal name="VC f.16" expl="loop invariant preservation" expanded="true">
   <proof prover="2" timelimit="60"><result status="valid" time="10.04"/></proof>
   <metas
    expanded="true">
@@ -860,19 +860,19 @@
    <meta name="remove_type">
     <meta_arg_ts id="ref"/>
    </meta>
-   <goal name="VC f.16" expl="16. loop invariant preservation" expanded="true">
+   <goal name="VC f.16" expl="loop invariant preservation" expanded="true">
    <transf name="eliminate_builtin" expanded="true">
-    <goal name="VC f.16.1" expl="1. loop invariant preservation">
+    <goal name="VC f.16.1" expl="loop invariant preservation">
     <proof prover="2" timelimit="60"><result status="valid" time="0.91"/></proof>
     </goal>
    </transf>
    </goal>
   </metas>
   </goal>
-  <goal name="VC f.17" expl="17. loop invariant preservation">
+  <goal name="VC f.17" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC f.18" expl="18. postcondition">
+  <goal name="VC f.18" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   <proof prover="4"><result status="valid" time="0.01"/></proof>
   </goal>

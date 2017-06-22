@@ -5,44 +5,44 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../unraveling_a_card_trick.mlw" expanded="true">
-<theory name="GilbreathCardTrickPure" sum="4f80ec63b0cc2a73fdbb8b3884c24972" expanded="true">
- <goal name="shuffle_nil_nil_nil">
+<theory name="GilbreathCardTrickPure" sum="97f4d57607030ec2c6b15a087ebbc9f7" expanded="true">
+ <goal name="shuffle_nil_nil_nil" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="shuffle_sym">
+ <goal name="shuffle_sym" expl="">
  <transf name="induction_pr">
-  <goal name="shuffle_sym.1" expl="1.">
+  <goal name="shuffle_sym.1" expl="">
   <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="shuffle_sym.2" expl="2.">
+  <goal name="shuffle_sym.2" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="shuffle_sym.3" expl="3.">
+  <goal name="shuffle_sym.3" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="shuffle_sym.4" expl="4.">
+  <goal name="shuffle_sym.4" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="shuffle_length" expanded="true">
+ <goal name="shuffle_length" expl="" expanded="true">
  <transf name="induction_pr" expanded="true">
-  <goal name="shuffle_length.1" expl="1.">
+  <goal name="shuffle_length.1" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="shuffle_length.2" expl="2.">
+  <goal name="shuffle_length.2" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="shuffle_length.3" expl="3." expanded="true">
+  <goal name="shuffle_length.3" expl="" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="shuffle_length.4" expl="4." expanded="true">
+  <goal name="shuffle_length.4" expl="" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="GilbreathCardTrick" sum="b9e9444a9b101531b521cbdb014cfa87">
+<theory name="GilbreathCardTrick" sum="c633e7d045e5dba0c20e57011bae4a9a">
  <goal name="VC shuffle" expl="VC for shuffle">
  <proof prover="1"><result status="valid" time="2.17" steps="3619"/></proof>
  </goal>

@@ -5,59 +5,59 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../power.mlw" expanded="true">
-<theory name="FastExponentiation" sum="5d1f8538bcba3ee0dc589aff289e6694" expanded="true">
+<theory name="FastExponentiation" sum="4603c0c866922f7d56012a39e7673897" expanded="true">
  <goal name="VC fast_exp" expl="VC for fast_exp" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC fast_exp.1" expl="1. precondition">
+  <goal name="VC fast_exp.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC fast_exp.2" expl="2. variant decrease">
+  <goal name="VC fast_exp.2" expl="variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC fast_exp.3" expl="3. precondition">
+  <goal name="VC fast_exp.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC fast_exp.4" expl="4. precondition">
+  <goal name="VC fast_exp.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC fast_exp.5" expl="5. postcondition">
+  <goal name="VC fast_exp.5" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.42" steps="47"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC fast_exp_imperative" expl="VC for fast_exp_imperative" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC fast_exp_imperative.1" expl="1. loop invariant init">
+  <goal name="VC fast_exp_imperative.1" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.2" expl="2. precondition">
+  <goal name="VC fast_exp_imperative.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.3" expl="3. precondition">
+  <goal name="VC fast_exp_imperative.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.4" expl="4. assertion">
+  <goal name="VC fast_exp_imperative.4" expl="assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.5" expl="5. loop variant decrease">
+  <goal name="VC fast_exp_imperative.5" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.54" steps="11"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.6" expl="6. loop invariant preservation">
+  <goal name="VC fast_exp_imperative.6" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="1.12" steps="32"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.7" expl="7. precondition">
+  <goal name="VC fast_exp_imperative.7" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.8" expl="8. assertion">
+  <goal name="VC fast_exp_imperative.8" expl="assertion">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.9" expl="9. loop variant decrease">
+  <goal name="VC fast_exp_imperative.9" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.29" steps="22"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.10" expl="10. loop invariant preservation">
+  <goal name="VC fast_exp_imperative.10" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.25" steps="36"/></proof>
   </goal>
-  <goal name="VC fast_exp_imperative.11" expl="11. postcondition">
+  <goal name="VC fast_exp_imperative.11" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>

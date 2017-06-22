@@ -5,81 +5,81 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../specs.mlw">
-<theory name="VM_instr_spec" sum="eb61121de19a3bce4f33bac444dd60ff">
+<theory name="VM_instr_spec" sum="cec24082e8c460871ae2cc5333fbb91e">
  <goal name="VC ifunf" expl="VC for ifunf">
  <transf name="split_goal_wp">
-  <goal name="VC ifunf.1" expl="1. precondition">
+  <goal name="VC ifunf.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.25"/></proof>
   </goal>
-  <goal name="VC ifunf.2" expl="2. postcondition">
+  <goal name="VC ifunf.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="8"/></proof>
   </goal>
-  <goal name="VC ifunf.3" expl="3. postcondition">
+  <goal name="VC ifunf.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
-  <goal name="VC ifunf.4" expl="4. postcondition">
+  <goal name="VC ifunf.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC iconstf" expl="VC for iconstf">
  <transf name="split_goal_wp">
-  <goal name="VC iconstf.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.52"/></proof>
+  <goal name="VC iconstf.1" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.32"/></proof>
   </goal>
-  <goal name="VC iconstf.2" expl="2. precondition">
+  <goal name="VC iconstf.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
   </goal>
-  <goal name="VC iconstf.3" expl="3. postcondition">
+  <goal name="VC iconstf.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
-  <goal name="VC iconstf.4" expl="4. postcondition">
+  <goal name="VC iconstf.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
-  <goal name="VC iconstf.5" expl="5. postcondition">
+  <goal name="VC iconstf.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC ivarf" expl="VC for ivarf">
  <transf name="split_goal_wp">
-  <goal name="VC ivarf.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.85"/></proof>
+  <goal name="VC ivarf.1" expl="precondition">
+  <proof prover="1"><result status="valid" time="0.66"/></proof>
   </goal>
-  <goal name="VC ivarf.2" expl="2. precondition">
+  <goal name="VC ivarf.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="30"/></proof>
   </goal>
-  <goal name="VC ivarf.3" expl="3. postcondition">
+  <goal name="VC ivarf.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
-  <goal name="VC ivarf.4" expl="4. postcondition">
+  <goal name="VC ivarf.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
-  <goal name="VC ivarf.5" expl="5. postcondition">
+  <goal name="VC ivarf.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC create_binop" expl="VC for create_binop">
  <transf name="split_goal_wp">
-  <goal name="VC create_binop.1" expl="1. precondition">
+  <goal name="VC create_binop.1" expl="precondition">
   <transf name="compute_specified">
-   <goal name="VC create_binop.1.1" expl="1. precondition">
+   <goal name="VC create_binop.1.1" expl="precondition">
    <transf name="introduce_premises">
-    <goal name="VC create_binop.1.1.1" expl="1. precondition">
+    <goal name="VC create_binop.1.1.1" expl="precondition">
     <proof prover="0"><result status="valid" time="0.04" steps="90"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="VC create_binop.2" expl="2. precondition">
+  <goal name="VC create_binop.2" expl="precondition">
   <transf name="compute_specified">
-   <goal name="VC create_binop.2.1" expl="1. precondition">
+   <goal name="VC create_binop.2.1" expl="precondition">
    <transf name="introduce_premises">
-    <goal name="VC create_binop.2.1.1" expl="1. precondition">
+    <goal name="VC create_binop.2.1.1" expl="precondition">
     <transf name="compute_specified">
-     <goal name="VC create_binop.2.1.1.1" expl="1. precondition">
+     <goal name="VC create_binop.2.1.1.1" expl="precondition">
      <proof prover="0"><result status="valid" time="0.05" steps="140"/></proof>
      </goal>
     </transf>
@@ -88,13 +88,13 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC create_binop.3" expl="3. postcondition">
+  <goal name="VC create_binop.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
-  <goal name="VC create_binop.4" expl="4. postcondition">
+  <goal name="VC create_binop.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
-  <goal name="VC create_binop.5" expl="5. postcondition">
+  <goal name="VC create_binop.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
  </transf>
@@ -110,18 +110,18 @@
  </goal>
  <goal name="VC inil" expl="VC for inil">
  <transf name="split_goal_wp">
-  <goal name="VC inil.1" expl="1. precondition">
+  <goal name="VC inil.1" expl="precondition">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="VC inil.2" expl="2. postcondition">
+  <goal name="VC inil.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="VC inil.3" expl="3. postcondition">
+  <goal name="VC inil.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="VC inil.4" expl="4. postcondition">
+  <goal name="VC inil.4" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="VC inil.4.1" expl="1. postcondition">
+   <goal name="VC inil.4.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
    </goal>
   </transf>
@@ -130,19 +130,19 @@
  </goal>
  <goal name="VC ibranchf" expl="VC for ibranchf">
  <transf name="split_goal_wp">
-  <goal name="VC ibranchf.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="4.68"/></proof>
+  <goal name="VC ibranchf.1" expl="precondition">
+  <proof prover="1"><result status="valid" time="3.38"/></proof>
   </goal>
-  <goal name="VC ibranchf.2" expl="2. precondition">
+  <goal name="VC ibranchf.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
   </goal>
-  <goal name="VC ibranchf.3" expl="3. postcondition">
+  <goal name="VC ibranchf.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
-  <goal name="VC ibranchf.4" expl="4. postcondition">
+  <goal name="VC ibranchf.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="13"/></proof>
   </goal>
-  <goal name="VC ibranchf.5" expl="5. postcondition">
+  <goal name="VC ibranchf.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
  </transf>
