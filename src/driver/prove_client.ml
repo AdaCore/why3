@@ -19,24 +19,9 @@ let is_connected () = !socket <> None
 
 let client_connect socket_name =
   if !socket <> None then raise AlreadyConnected;
-  try
-    if Sys.os_type = "Win32" then raise Exit;
-    let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
+  if Sys.os_type = "Win32" then
+    let name = "\\\\.\\pipe\\" ^ socket_name in
     try
-      Unix.connect sock (Unix.ADDR_UNIX socket_name);
-      socket := Some sock
-    with
-    | Unix.Unix_error(err, func, arg) ->
-       Format.eprintf "socket connection failed: %s (%s,%s)@." (Unix.error_message err) func arg;
-       Format.eprintf "falling back to a named socket@.";
-       raise Exit
-    | e ->
-       Format.eprintf "Unix.connect failed for some unexpected reason: %s@\nAborting.@."
-                      (Printexc.to_string e);
-       exit 2
-  with Exit ->
-    try
-      let name = "\\\\.\\pipe\\" ^ socket_name in
       let sock = Unix.openfile name [Unix.O_RDWR] 0 in
       socket := Some sock
     with
@@ -44,6 +29,31 @@ let client_connect socket_name =
        Format.eprintf "opening named socket failed: %s (%s,%s)@." (Unix.error_message err) func arg;
     | e ->
        Format.eprintf "Unix.openfile failed for some unexpected reason: %s@\nAborting.@."
+                      (Printexc.to_string e);
+       exit 2
+  else
+    let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
+    try
+      Unix.connect sock (Unix.ADDR_UNIX socket_name);
+      socket := Some sock
+    with
+    | Unix.Unix_error(err, func, arg) ->
+       Format.eprintf "socket connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
+       Format.eprintf "falling back to a named socket@.";
+       let name = Filename.temp_file "why3" socket_name in
+       begin try
+           let sock = Unix.openfile name [Unix.O_RDWR] 0 in
+           socket := Some sock
+         with
+         | Unix.Unix_error(err, func, arg) ->
+            Format.eprintf "opening named socket failed: %s (%s,%s)@." (Unix.error_message err) func arg;
+         | e ->
+            Format.eprintf "Unix.openfile failed for some unexpected reason: %s@\nAborting.@."
+                           (Printexc.to_string e);
+            exit 2
+       end
+    | e ->
+       Format.eprintf "Unix.connect failed for some unexpected reason: %s@\nAborting.@."
                       (Printexc.to_string e);
        exit 2
 
