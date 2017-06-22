@@ -226,14 +226,21 @@ let shortcut_merge s1 s2 =
 
 let find_driver_file fn =
   (* Here we search for the driver file. The argument [fn] is the driver path
-     as returned by the Why3 API. If the path in the why3.conf file is
-     relative, why3 completes this with the path of the why3.conf file. We
-     first look into that location, and if the file is not there, we look
-     into the SPARK config dir *)
-  if Sys.file_exists fn then fn
-  else
-    let driver_file = Filename.basename fn in
-    file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
+     as returned by the Why3 API. It simply returns the path as is in the
+     configuration file. We first check if the path as is points to a file.
+     Then we try to find the file relative to the why3.conf file. If that also
+     fails, we look into the SPARK drivers dir *)
+  try
+    if Sys.file_exists fn then fn
+    else match !opt_why3_conf_file with
+    | Some f ->
+        let dir = Filename.dirname f in
+        let fn = Filename.concat dir fn in
+        if Sys.file_exists fn then fn else raise Exit
+    | None -> raise Exit
+  with Exit ->
+      let driver_file = Filename.basename fn in
+      file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
 
 let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
