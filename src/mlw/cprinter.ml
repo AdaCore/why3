@@ -37,6 +37,8 @@ module C = struct
     | Ecall of expr * expr list
     | Econst of constant
     | Evar of ident
+    | Elikely of expr (* __builtin_expect(e,1) *)
+    | Eunlikely of expr (* __builtin_expect(e,0) *)
     | Esize_expr of expr
     | Esize_type of ty
     | Eindex of expr * expr (* Array access *)
@@ -148,6 +150,8 @@ module C = struct
       Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l,b)
     | Enothing -> Enothing
     | Econst c -> Econst c
+    | Elikely e -> Elikely (propagate_in_expr id v e)
+    | Eunlikely e -> Eunlikely (propagate_in_expr id v e)
     | Esize_type ty -> Esize_type ty
 
   let rec propagate_in_stmt id v = function
@@ -388,6 +392,10 @@ module Print = struct
       (print_expr ~paren:true) e (print_list comma (print_expr ~paren:false)) l
     | Econst c -> print_const fmt c
     | Evar id -> print_ident fmt id
+    | Elikely e -> fprintf fmt (protect_on paren "__builtin_expect(%a,1)")
+                           (print_expr ~paren:true) e
+    | Eunlikely e -> fprintf fmt (protect_on paren "__builtin_expect(%a,0)")
+                           (print_expr ~paren:true) e
     | Esize_expr e ->
       fprintf fmt (protect_on paren "sizeof(%a)") (print_expr ~paren:false) e
     | Esize_type ty ->
@@ -552,6 +560,22 @@ module MLToC = struct
     if env.computes_return_value
     then Sreturn e
     else Sexpr e
+
+
+  let likely = create_label "ex:likely"
+  let unlikely = create_label "ex:unlikely"
+
+  let handle_likely lbl (e:C.expr) =
+    let lkl = Slab.mem likely lbl in
+    let ulk = Slab.mem unlikely lbl in
+    if lkl
+    then (if ulk then e else Elikely e)
+    else (if ulk then Eunlikely e else e)
+
+  let reverse_likely = function
+    | Elikely e -> Eunlikely e
+    | Eunlikely e -> Elikely e
+    | e -> e
 
   let rec expr info env (e:Mltree.expr) : C.body =
     assert (not e.e_effect.eff_ghost);
@@ -724,15 +748,17 @@ module MLToC = struct
        let t = expr info env th in
        let e = expr info env el in
        begin match c with
-	     | [], C.Sexpr c ->
-		if is_false th && is_true el
-		then C.([], Sexpr(Eunop(Unot, c)))
-		else [], C.Sif(c,C.Sblock t, C.Sblock e)
-	     | cdef, cs ->
-		let cid = id_register (id_fresh "cond") in (* ? *)
-		C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
-		C.Sseq (C.assignify (Evar cid) cs,
-                        C.Sif (C.Evar cid, C.Sblock t, C.Sblock e))
+       | [], C.Sexpr c ->
+          let c = handle_likely cond.e_label c in
+          if is_false th && is_true el
+	  then C.([], Sexpr(Eunop(Unot, c)))
+	  else [], C.Sif(c,C.Sblock t, C.Sblock e)
+       | cdef, cs ->
+	  let cid = id_register (id_fresh "cond") in (* ? *)
+	  C.Ddecl (C.Tsyntax ("int",[]), [cid, C.Enothing])::cdef,
+	  C.Sseq (C.assignify (Evar cid) cs,
+                  C.Sif ((handle_likely cond.e_label (C.Evar cid)),
+                         C.Sblock t, C.Sblock e))
        (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
     | Ewhile (c,b) ->
@@ -751,14 +777,16 @@ module MLToC = struct
                      then Sid.empty else env.breaks } in
       let b = expr info  env' b in
       begin match cs with
-      | C.Sexpr ce -> cd, C.Swhile (ce, C.Sblock b)
+      | C.Sexpr ce -> cd, C.Swhile (handle_likely c.e_label ce, C.Sblock b)
       | _ ->
         begin match C.get_last_expr cs with
-        | C.Snop, e -> cd, C.(Swhile(e, C.Sblock b))
-        | s,e -> cd, C.(Swhile(Econst (Cint "1"),
-                     Sseq(s,
-                          Sseq(Sif(Eunop(Unot, e), Sbreak, Snop),
-                               C.Sblock b))))
+        | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_label e, C.Sblock b))
+        | s,e ->
+           let brc = reverse_likely (handle_likely c.e_label (Eunop(Unot,e))) in
+           cd, C.(Swhile(Econst (Cint "1"),
+                         Sseq(s,
+                              Sseq(Sif(brc, Sbreak, Snop),
+                                   C.Sblock b))))
         end
       end
     | Etry (b,xl) ->
