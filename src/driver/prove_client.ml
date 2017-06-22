@@ -17,45 +17,27 @@ exception InvalidAnswer of string
 
 let is_connected () = !socket <> None
 
-let client_connect socket_name =
+let client_connect ~fail socket_name =
   if !socket <> None then raise AlreadyConnected;
-  if Sys.os_type = "Win32" then
-    let name = "\\\\.\\pipe\\" ^ socket_name in
-    try
-      let sock = Unix.openfile name [Unix.O_RDWR] 0 in
-      socket := Some sock
-    with
-    | Unix.Unix_error(err, func, arg) ->
-       Format.eprintf "opening named socket failed: %s (%s,%s)@." (Unix.error_message err) func arg;
-    | e ->
-       Format.eprintf "Unix.openfile failed for some unexpected reason: %s@\nAborting.@."
-                      (Printexc.to_string e);
-       exit 2
-  else
-    let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-    try
+  try
+    let sock =
+      if Sys.os_type = "Win32" then
+        let name = "\\\\.\\pipe\\" ^ socket_name in
+        Unix.openfile name [Unix.O_RDWR] 0
+      else
+      let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
       Unix.connect sock (Unix.ADDR_UNIX socket_name);
-      socket := Some sock
-    with
-    | Unix.Unix_error(err, func, arg) ->
-       Format.eprintf "socket connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
-       Format.eprintf "falling back to a named socket@.";
-       let name = Filename.temp_file "why3" socket_name in
-       begin try
-           let sock = Unix.openfile name [Unix.O_RDWR] 0 in
-           socket := Some sock
-         with
-         | Unix.Unix_error(err, func, arg) ->
-            Format.eprintf "opening named socket failed: %s (%s,%s)@." (Unix.error_message err) func arg;
-         | e ->
-            Format.eprintf "Unix.openfile failed for some unexpected reason: %s@\nAborting.@."
-                           (Printexc.to_string e);
-            exit 2
-       end
-    | e ->
-       Format.eprintf "Unix.connect failed for some unexpected reason: %s@\nAborting.@."
-                      (Printexc.to_string e);
-       exit 2
+      sock
+    in
+    socket := Some sock
+  with
+  | Unix.Unix_error(err, func, arg) when fail ->
+     Format.eprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
+     exit 2
+  | e when fail ->
+     Format.eprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
+                    (Printexc.to_string e);
+     exit 2
 
 let client_disconnect () =
   match !socket with
@@ -115,7 +97,7 @@ let recv_buf : Buffer.t = Buffer.create 1024
 let connect_external socket_name =
   if is_connected () then raise AlreadyConnected;
   Buffer.clear recv_buf;
-  client_connect socket_name
+  client_connect ~fail:true socket_name
 
 let connect_internal () =
   if is_connected () then raise AlreadyConnected;
@@ -133,11 +115,11 @@ let connect_internal () =
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =
-    if n <= 0 then client_connect socket_name else
-    try client_connect socket_name with _ ->
+    if n <= 0 then client_connect ~fail:true socket_name else
+    try client_connect ~fail:false socket_name with _ ->
       ignore (Unix.select [] [] [] d);
       try_connect (pred n) (d *. 4.0) in
-  try_connect 4 0.1; (* 0.1, 0.4, 1.6, 6.4 *)
+  try_connect 5 0.1; (* 0.1, 0.4, 1.6, 6.4, 25.6 *)
   at_exit (fun () -> (* only if succesfully connected *)
     (try client_disconnect () with NotConnected -> ());
     ignore (Unix.waitpid [] pid))
