@@ -19,12 +19,19 @@ module Test
     let d = get !b in
 (*    b := incr p zero;*)
     ()
-    
 
   type t = {
      mutable f : int;
   }
 
+  let t_alias (x:t) : t
+    alias { x with result }
+  = x
+(*
+  let f_alias (x:t) : t
+    alias { x with result } (* does not happen *)
+  = { f = x.f }
+*)
   val c (x:t) : t
     ensures { x.f = result.f }
     alias { x with result }

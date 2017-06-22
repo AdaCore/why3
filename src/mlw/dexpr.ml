@@ -965,6 +965,16 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   let bad_write weff eff = not (Mreg.submap (fun _ s1 s2 -> Spv.subset s1 s2)
                                            weff.eff_writes eff.eff_writes) in
   let bad_raise xeff eff = not (Sxs.subset xeff.eff_raises eff.eff_raises) in
+  let effect_of_term t =
+    let _v, ity, fd = effect_of_term t in
+    match fd with
+    | Some {rs_cty = {cty_args = [arg]; cty_result = res}} ->
+       ity_full_inst (ity_match isb_empty arg.pv_ity ity) res
+    | Some _ -> assert false
+    | None -> ity in
+  let bad_alias t1 t2 =
+    not (ity_equal (effect_of_term t1) (effect_of_term t2)) in
+  let e_bad_alias = List.exists (fun (t1, t2) -> bad_alias t1 t2) dsp.ds_alias in
   (* computed effect vs user effect *)
   let uwrl, ue = effect_of_dspec dsp in
   let ucty = create_cty ecty.cty_args ecty.cty_pre ecty.cty_post
@@ -989,6 +999,9 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
     print_xs (Sxs.choose (Sxs.diff ueff.eff_raises eeff.eff_raises));
   if check_ue && ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc
       "this@ expression@ does@ not@ diverge";
+  if check_ue && e_bad_alias then List.iter (fun (t1, t2) ->
+    if bad_alias t1 t2 then Loc.errorm ?loc:t1.t_loc (* FIXME better loc *)
+    "this@ alias@ does@ not@ happen@ in@ the@ expression@") dsp.ds_alias;
   (* check that every computed effect is listed *)
   if check_rw && bad_read eeff ueff then Loc.errorm ?loc
     "this@ expression@ depends@ on@ variable@ %a,@ \
