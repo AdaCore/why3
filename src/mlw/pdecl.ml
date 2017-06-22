@@ -88,13 +88,11 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
     [create_constructor ~constr:1 cid s fdl] in
   if witn <> [] then begin
     List.iter2 (fun fd ({e_loc = loc} as e) ->
-      Loc.try2 ?loc ity_equal_check e.e_ity fd.pv_ity;
       if e.e_effect.eff_oneway then Loc.errorm ?loc
         "This expression may not terminate, it cannot be a witness";
       if not (eff_pure e.e_effect) then Loc.errorm ?loc
         "This expression has side effects, it cannot be a witness";
-      if not fd.pv_ghost && mask_ghost e.e_mask then Loc.errorm ?loc
-        "Ghost witness for a non-ghost field %a" print_pv fd) fdl witn
+      Loc.try2 ?loc ity_equal_check e.e_ity fd.pv_ity) fdl witn
   end;
   mk_itd s pjl csl invl witn
 
