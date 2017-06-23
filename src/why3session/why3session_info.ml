@@ -142,8 +142,7 @@ let update_perf_stats stats ((_,t) as prover_and_time) =
 
 let string_of_prover p = Pp.string_of_wnl print_prover p
 
-let rec stats_of_goal ~root prefix_name stats cont goal =
-  let ses = cont.Controller_itp.controller_session in
+let rec stats_of_goal ~root prefix_name stats ses goal =
   if root
   then stats.nb_root_goals <- stats.nb_root_goals + 1
   else stats.nb_sub_goals <- stats.nb_sub_goals + 1;
@@ -163,9 +162,9 @@ let rec stats_of_goal ~root prefix_name stats cont goal =
       [] (get_proof_attempts ses goal)
   in
   List.iter (update_perf_stats stats) proof_list;
-  List.iter (stats_of_transf prefix_name stats cont) (get_transformations ses goal);
+  List.iter (stats_of_transf prefix_name stats ses) (get_transformations ses goal);
   let goal_name = prefix_name ^ (get_proof_name ses goal).Ident.id_string in
-  if not (Controller_itp.pn_proved cont goal) then
+  if not (pn_proved ses goal) then
     stats.no_proof <- Sstr.add goal_name stats.no_proof
   else
     begin
@@ -182,21 +181,20 @@ let rec stats_of_goal ~root prefix_name stats cont goal =
       | _ -> ()
     end
 
-and stats_of_transf prefix_name stats cont transf =
-  let ses = cont.Controller_itp.controller_session in
+and stats_of_transf prefix_name stats ses transf =
   let prefix_name = prefix_name ^ (get_transf_name ses transf) ^
                     (String.concat "" (get_transf_args ses transf)) ^ " / " in
-  List.iter (stats_of_goal ~root:false prefix_name stats cont) (get_sub_tasks ses transf)
+  List.iter (stats_of_goal ~root:false prefix_name stats ses) (get_sub_tasks ses transf)
 
-let stats_of_theory file stats cont theory =
+let stats_of_theory file stats ses theory =
   let goals = theory_goals theory in
-  let prefix_name = file.file_name ^ " / " ^ (theory_name theory).Ident.id_string
+  let prefix_name = file_name file ^ " / " ^ (theory_name theory).Ident.id_string
     ^  " / " in
-  List.iter (stats_of_goal ~root:true prefix_name stats cont) goals
+  List.iter (stats_of_goal ~root:true prefix_name stats ses) goals
 
-let stats_of_file stats cont _ file =
-  let theories = file.file_theories in
-  List.iter (stats_of_theory file stats cont) theories
+let stats_of_file stats ses _ file =
+  let theories = file_theories file in
+  List.iter (stats_of_theory file stats ses) theories
 
 
 
@@ -204,8 +202,7 @@ type goal_stat =
   | No of (transID * (proofNodeID * goal_stat) list) list
   | Yes of (prover * float) list * (transID * (proofNodeID * goal_stat) list) list
 
-let rec stats2_of_goal ~nb_proofs cont g : goal_stat =
-  let ses = cont.Controller_itp.controller_session in
+let rec stats2_of_goal ~nb_proofs ses g : goal_stat =
   let proof_list =
     List.fold_left
       (fun acc proof_attempt ->
@@ -224,22 +221,21 @@ let rec stats2_of_goal ~nb_proofs cont g : goal_stat =
   let l =
     List.fold_left
       (fun acc tr ->
-        match stats2_of_transf ~nb_proofs cont tr with
+        match stats2_of_transf ~nb_proofs ses tr with
           | [] -> acc
           | r -> (tr,List.rev r)::acc)
       [] (get_transformations ses g)
   in
   if match nb_proofs with
-    | 0 -> not (Controller_itp.pn_proved cont g)
+    | 0 -> not (pn_proved ses g)
     | 1 -> List.length proof_list = 1
     | _ -> assert false
       then Yes(proof_list,l) else No(l)
 
-and stats2_of_transf ~nb_proofs cont tr : (proofNodeID * goal_stat) list =
-  let ses = cont.Controller_itp.controller_session in
+and stats2_of_transf ~nb_proofs ses tr : (proofNodeID * goal_stat) list =
   List.fold_left
     (fun acc g ->
-      match stats2_of_goal ~nb_proofs cont g with
+      match stats2_of_goal ~nb_proofs ses g with
         | No [] -> acc
         | r -> (g,r)::acc)
     [] (get_sub_tasks ses tr)
@@ -271,10 +267,10 @@ and print_transf_stats ~time depth ses (tr,l) =
   printf "+-- transformation %s@\n" name;
   List.iter (print_goal_stats ~time (depth+1) ses) l
 
-let stats2_of_theory ~nb_proofs cont th =
+let stats2_of_theory ~nb_proofs ses th =
   List.fold_left
     (fun acc g ->
-      match stats2_of_goal ~nb_proofs cont g with
+      match stats2_of_goal ~nb_proofs ses g with
         | No [] -> acc
         | r -> (g,r)::acc)
     [] (theory_goals th)
@@ -283,25 +279,24 @@ let print_theory_stats ~time ses (th,r) =
   printf "  +-- theory %s@\n" (theory_name th).Ident.id_string;
   List.iter (print_goal_stats ~time 2 ses) r
 
-let stats2_of_file ~nb_proofs cont file =
+let stats2_of_file ~nb_proofs ses file =
   List.fold_left
     (fun acc th ->
-      match stats2_of_theory ~nb_proofs cont th with
+      match stats2_of_theory ~nb_proofs ses th with
         | [] -> acc
         | r -> (th,List.rev r)::acc)
-    [] file.file_theories
+    [] (file_theories file)
 
-let stats2_of_session ~nb_proofs cont acc =
-  let ses = cont.Controller_itp.controller_session in
+let stats2_of_session ~nb_proofs ses acc =
   Hstr.fold
     (fun _ f acc ->
-      match stats2_of_file ~nb_proofs cont f with
+      match stats2_of_file ~nb_proofs ses f with
         | [] -> acc
         | r -> (f,List.rev r)::acc)
     (get_files ses) acc
 
 let print_file_stats ~time ses (f,r) =
-  printf "+-- file %s@\n" f.file_name;
+  printf "+-- file %s@\n" (file_name f);
   List.iter (print_theory_stats ~time ses) r
 
 let print_session_stats ~time ses = List.iter (print_file_stats ~time ses)
@@ -355,10 +350,8 @@ let print_stats ses r0 r1 stats =
   printf "@]@\n"
 
 
-let run_one env config stats r0 r1 fname =
-  let cont,_,_ =
-    read_update_session ~allow_obsolete:false env config fname in
-  let ses = cont.Controller_itp.controller_session in
+let run_one stats r0 r1 fname =
+  let ses,_ = read_session fname in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."
@@ -383,9 +376,9 @@ let run_one env config stats r0 r1 fname =
   if !opt_stats_print || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
-      Hstr.iter (stats_of_file stats cont) (get_files ses);
-      r0 := stats2_of_session ~nb_proofs:0 cont !r0;
-      r1 := stats2_of_session ~nb_proofs:1 cont !r1
+      Hstr.iter (stats_of_file stats ses) (get_files ses);
+      r0 := stats2_of_session ~nb_proofs:0 ses !r0;
+      r1 := stats2_of_session ~nb_proofs:1 ses !r1
     end;
   if !opt_stats_print then
     begin
@@ -454,11 +447,11 @@ let print_hist stats =
 (****** run on all files  ******)
 
 let run () =
-  let env,config,should_exit1 = read_env_spec () in
+  let _env,_config,should_exit1 = read_env_spec () in
   if should_exit1 then exit 1;
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
-  iter_files (run_one env config stats r0 r1);
+  iter_files (run_one stats r0 r1);
   if !opt_hist_print then print_hist stats
 
 

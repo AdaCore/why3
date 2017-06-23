@@ -71,11 +71,14 @@ let read_env_spec () =
   let env = Env.create_env loadpath in
   env,config,read_simple_spec ()
 
-let read_update_session ~allow_obsolete env config fname =
+let read_session fname =
   let q = Queue.create () in
   Queue.push fname q;
   let project_dir = Server_utils.get_session_dir ~allow_mkdir:false q in
-  let session,use_shapes = S.load_session project_dir in
+  S.load_session project_dir
+
+let read_update_session ~allow_obsolete env config fname =
+  let session,use_shapes = read_session fname in
 (*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
@@ -94,6 +97,7 @@ let read_update_session ~allow_obsolete env config fname =
        Format.eprintf "%a@." Exn_printer.exn_printer e;
        exit 1
   in
+  if (found_obs || some_merge_miss) && not allow_obsolete then raise Exit;
   cont, found_obs, some_merge_miss
 
 (** filter *)
@@ -209,7 +213,7 @@ let read_filter_spec whyconf : filters * bool =
    status = !opt_status;
   },!should_exit
 
-let iter_proof_attempt_by_filter cont iter filters f =
+let iter_proof_attempt_by_filter ses iter filters f =
   (* provers *)
   let iter_provers a =
     if C.Sprover.mem a.S.prover filters.provers then f a in
@@ -230,7 +234,7 @@ let iter_proof_attempt_by_filter cont iter filters f =
  *)
   (* verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> Controller_itp.pn_proved cont a.S.parent) in
+    (fun a -> S.pn_proved ses a.S.parent) in
   (* verified *)
   let f = three_value f filters.verified
     (fun p -> match p.S.proof_state with Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
@@ -240,17 +244,17 @@ let iter_proof_attempt_by_filter cont iter filters f =
       (fun a -> match a.S.proof_state with
       | Some pr when List.mem pr.Call_provers.pr_answer filters.status -> f a
       | _ -> ()) in
-  iter f cont.Controller_itp.controller_session
+  iter f ses
 
-let theory_iter_proof_attempt_by_filter cont filters f th =
+let theory_iter_proof_attempt_by_filter s filters f th =
   iter_proof_attempt_by_filter
-    cont
+    s
     (fun f s -> S.theory_iter_proof_attempt s f)
     filters f th
 
-let session_iter_proof_attempt_by_filter cont filters f s =
+let session_iter_proof_attempt_by_filter s filters f =
   iter_proof_attempt_by_filter
-    cont
+    s
     (fun f _s ->
      S.session_iter_proof_attempt (fun _ x -> f x))
     filters f s

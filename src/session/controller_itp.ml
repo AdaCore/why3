@@ -58,44 +58,19 @@ let print_strategy_status fmt st =
   | STShalt -> fprintf fmt "halt"
 
 
-open Ident
-
-type proof_state = {
-    file_state: bool Stdlib.Hstr.t;
-    th_state: bool Hid.t;
-    tn_state: bool Htn.t;
-    pn_state : bool Hpn.t;
-  }
-
-let init_proof_state () = {
-    file_state = Stdlib.Hstr.create 3;
-    th_state = Hid.create 7;
-    tn_state = Htn.create 42;
-    pn_state = Hpn.create 42;
-  }
-
 type controller =
   { mutable controller_session: Session_itp.session;
-    proof_state: proof_state;
     controller_config : Whyconf.config;
     controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
   }
 
-(*
-let clear_proof_state c =
-  Stdlib.Hstr.clear c.proof_state.file_state;
-  Hid.clear c.proof_state.th_state;
-  Htn.clear c.proof_state.tn_state;
-  Hpn.clear c.proof_state.pn_state
-*)
 
 let create_controller config env ses =
   let c =
     {
       controller_session = ses;
-      proof_state = init_proof_state ();
       controller_config = config;
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
@@ -115,179 +90,17 @@ let create_controller config env ses =
     provers;
   c
 
-let tn_proved c tid = Htn.find_def c.proof_state.tn_state false tid
-let pn_proved c pid = Hpn.find_def c.proof_state.pn_state false pid
-let th_proved c th  =
-  if (theory_goals th = []) then
-    Hid.find_def c.proof_state.th_state true (theory_name th)
-  else
-    Hid.find_def c.proof_state.th_state false (theory_name th)
-let file_proved c f =
-  if f.file_theories = [] then
-    Stdlib.Hstr.find_def c.proof_state.file_state true f.file_name
-  else
-    Stdlib.Hstr.find_def c.proof_state.file_state false f.file_name
-
-let any_proved cont any : bool =
-  match any with
-  | AFile file -> file_proved cont file
-  | ATh th -> th_proved cont th
-  | ATn tn -> tn_proved cont tn
-  | APn pn -> pn_proved cont pn
-  | APa pa ->
-      begin
-        let pa = get_proof_attempt_node cont.controller_session pa in
-        match pa.Session_itp.proof_state with
-        | None -> false
-        | Some pa ->
-          begin
-            match pa.Call_provers.pr_answer with
-            | Call_provers.Valid -> true
-            | _ -> false
-          end
-      end
-
-let remove_any_proof_state cont any : unit =
-  match any with
-  | AFile _file -> ()
-  | ATh th     -> Hid.remove cont.proof_state.th_state (theory_name th)
-  | APn pn     -> Hpn.remove cont.proof_state.pn_state pn
-  | ATn tn     -> Htn.remove cont.proof_state.tn_state tn
-  | APa _pa     -> ()
-
-
-
-
-
-
-(** TODO : REMOVE the following, it should be handle by session
-
-make the whole reloading of proof_state more efficient and natural *)
-
-(* Note that f has side effect on the elements of l. We want this effect to
-   happen. That's why we cannot use List.for_all (respectively List.exists)
-   directly (List.for_all stops on first element that evaluates to false) *)
-
-let for_all_se f l =
-  List.for_all (fun b -> b) (List.map f l)
-
-let exists_se f l =
-  List.exists (fun b -> b) (List.map f l)
-
-(* init proof state after reload *)
-let rec reload_goal_proof_state c g =
-  let ses = c.controller_session in
-  let tr_list = get_transformations ses g in
-  let pa_list = get_proof_attempts ses g in
-  let proved = exists_se (reload_trans_proof_state c) tr_list in
-  let proved = exists_se reload_pa_proof_state pa_list || proved in
-  Hpn.replace c.proof_state.pn_state g proved;
-  proved
-
-and reload_trans_proof_state c tr =
-  let proof_list = get_sub_tasks c.controller_session tr in
-  let proved = for_all_se (reload_goal_proof_state c) proof_list in
-  Htn.replace c.proof_state.tn_state tr proved;
-  proved
-
-and reload_pa_proof_state pa =
-  match pa.proof_obsolete, pa.Session_itp.proof_state with
-  | false, Some pr when pr.Call_provers.pr_answer = Call_provers.Valid -> true
-  | _ -> false
-
-(* to be called after reload *)
-let reload_theory_proof_state c th =
-  let ps = c.proof_state in
-  let goals = theory_goals th in
-  let proved = for_all_se (reload_goal_proof_state c) goals in
-  Hid.replace ps.th_state (theory_name th) proved;
-  proved
-
-(* to be called after reload *)
-let reload_file_proof_state c f =
-  let ps = c.proof_state in
-  let proved = for_all_se (reload_theory_proof_state c) f.file_theories in
-  Stdlib.Hstr.replace ps.file_state f.file_name proved
-
-(* to be called after reload *)
-let reload_session_proof_state c =
-  Stdlib.Hstr.iter
-    (fun _ f -> reload_file_proof_state c f)
-    (get_files c.controller_session)
-
-(*==========  cut ================*)
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
   match any with
-  | AFile f -> List.map (fun th -> ATh th) f.file_theories
+  | AFile f -> List.map (fun th -> ATh th) (file_theories f)
   | ATh th  -> List.map (fun g -> APn g) (theory_goals th)
   | ATn tn  -> List.map (fun pn -> APn pn) (get_sub_tasks s tn)
   | APn pn  -> List.map (fun tn -> ATn tn) (get_transformations s pn)
   | APa _ -> []
 
 
-
-
-(* status update *)
-
-type notifier = any -> unit
-
-let pa_ok pa =
-  not pa.proof_obsolete &&
-    match pa.Session_itp.proof_state
-    with
-    | Some { Call_provers.pr_answer = Call_provers.Valid} -> true
-    | _ -> false
-
-(* [update_goal_node c id] update the proof status of node id
-   update is propagated to parents when required. *)
-
-let update_file_node notification c f =
-  let ps = c.proof_state in
-  let ths = f.file_theories in
-  let proved = List.for_all (th_proved c) ths in
-  if proved <> file_proved c f then
-    begin
-      Stdlib.Hstr.replace ps.file_state f.file_name proved;
-      notification (AFile f);
-    end
-
-let update_theory_node notification c th =
-  let ps = c.proof_state in
-  let goals = theory_goals th in
-  let proved = List.for_all (pn_proved c) goals in
-  if proved <> th_proved c th then
-    begin
-      Hid.replace ps.th_state (theory_name th) proved;
-      notification (ATh th);
-      update_file_node notification c (theory_parent c.controller_session th)
-    end
-
-let rec update_goal_node notification c id =
-  let ses = c.controller_session in
-  let tr_list = get_transformations ses id in
-  let pa_list = get_proof_attempts ses id in
-  let proved = List.exists (tn_proved c) tr_list || List.exists pa_ok pa_list in
-  if proved <> pn_proved c id then
-    begin
-      Hpn.replace c.proof_state.pn_state id proved;
-      notification (APn id);
-      match get_proof_parent ses id with
-      | Trans trans_id -> update_trans_node notification c trans_id
-      | Theory th -> update_theory_node notification c th
-    end
-
-and update_trans_node notification c trid =
-  let ses = c.controller_session in
-  let proof_list = get_sub_tasks ses trid in
-  let proved = List.for_all (pn_proved c) proof_list in
-  if proved <> tn_proved c trid then
-    begin
-      Htn.replace c.proof_state.tn_state trid proved;
-      notification (ATn trid);
-      update_goal_node notification c (get_trans_parent ses trid)
-    end
 
 
 (* printing *)
@@ -313,15 +126,15 @@ module PSession = struct
     match x.tkind with
     | Session -> "", Hstr.fold (fun _ f -> n (File f)) (get_files s) []
     | File f ->
-       f.file_name,
+       (file_name f),
        List.fold_right
           (fun th -> n (Theory th))
-          f.file_detached_theories
-          (List.fold_right (fun th -> n (Theory th)) f.file_theories [])
+          (file_detached_theories f)
+          (List.fold_right (fun th -> n (Theory th)) (file_theories f) [])
     | Theory th ->
        let id = theory_name th in
        let name = id.Ident.id_string in
-       let name = if th_proved x.tcont th then name^"!" else name^"?" in
+       let name = if th_proved s th then name^"!" else name^"?" in
        name,
        List.fold_right
          (fun g -> n (Goal g))
@@ -330,7 +143,7 @@ module PSession = struct
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
-       let name = if pn_proved x.tcont id then name^"!" else name^"?" in
+       let name = if pn_proved s id then name^"!" else name^"?" in
        let pas = get_proof_attempts s id in
        let trs = get_transformations s id in
        name,
@@ -345,7 +158,7 @@ module PSession = struct
           (if pa.proof_obsolete then "O" else ""), []
     | Transf id ->
        let name = get_transf_name s id in
-       let name = if tn_proved x.tcont id then name^"!" else name^"?" in
+       let name = if tn_proved s id then name^"!" else name^"?" in
        let sts = get_sub_tasks s id in
        let dsts = get_detached_sub_tasks s id in
        name,
@@ -389,9 +202,9 @@ let read_file env ?format fn =
     tasks associated to them *)
 
 let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
-  let format = file.file_format in
-  let old_theories = file.file_theories in
-  let file_name = Filename.concat (get_dir old_ses) file.file_name in
+  let format = file_format file in
+  let old_theories = file_theories file in
+  let file_name = Filename.concat (get_dir old_ses) (file_name file) in
   let new_theories =
     try
       read_file c.controller_env file_name ?format
@@ -410,8 +223,6 @@ let reload_files (c : controller) ~use_shapes =
     Stdlib.Hstr.iter
       (fun f -> merge_file old_ses c ~use_shapes f)
       (get_files old_ses);
-    (* TODO: remove that, it should be handle by session *)
-    reload_session_proof_state c
   with e ->
     c.controller_session <- old_ses;
     raise e
@@ -420,25 +231,6 @@ let add_file c ?format fname =
   let theories = read_file c.controller_env ?format fname in
   add_file_section c.controller_session fname theories format
 
-(* Update the proof_state according to new false state and then remove
-   the subtree *)
-let remove_subtree c (n: any) ~removed ~notification =
-  let removed = (fun x -> removed x; remove_any_proof_state c x) in
-  let parent = get_any_parent c.controller_session n in
-  (* Note that this line can raise RemoveError when called on inappropriate
-     node (attached theory / goals) *)
-  Session_itp.remove_subtree c.controller_session n ~notification:removed;
-  (match parent with
-  | Some (APn parent) ->
-       update_goal_node notification c parent
-  | Some _ ->
-      (* This case corresponds to removal of detached node. We don't need to
-         update the proof_state *)
-      ()
-  | None ->
-      (* Cannot remove root. Note that this should already have failed in call
-         to Session_itp.remove_subtree *)
-      raise RemoveError)
 
 module type Scheduler = sig
   val timeout: ms:int -> (unit -> bool) -> unit
@@ -566,19 +358,24 @@ let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
   let panid =
     graft_proof_attempt c.controller_session id pr ~limit
   in
-  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp) scheduled_proof_attempts;
+  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp)
+            scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
 
-let schedule_proof_attempt ?proof_script c id pr ~counterexmp ~limit ~callback ~notification =
+let schedule_proof_attempt ?proof_script c id pr
+                           ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
-    | Scheduled | Running | Done _ -> update_goal_node notification c id
+    | Scheduled | Running | Done _ ->
+                             update_goal_node notification c.controller_session id
     | _ -> ())
   in
   (* proof_script is specific to interactive manual provers *)
   let session_dir = Session_itp.get_dir c.controller_session in
-  let proof_script = Opt.map (Sysutil.absolutize_filename session_dir) proof_script in
+  let proof_script =
+    Opt.map (Sysutil.absolutize_filename session_dir) proof_script
+  in
   schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
 
 (* TODO to be simplified *)
@@ -591,7 +388,7 @@ let create_file_rel_path c pr pn =
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
   let f = get_encapsulating_file session (ATh th) in
-  let fn = f.file_name in
+  let fn = file_name f in
   let file = Driver.file_of_task driver fn th_name task in
   let file = Filename.concat session_dir file in
   let file = Sysutil.uniquify file in
@@ -643,7 +440,7 @@ let schedule_edition c id pr ?file ~callback ~notification =
   (* Notification node *)
   let callback panid s = callback panid s;
     match s with
-    | Scheduled | Running | Done _ -> update_goal_node notification c id
+    | Scheduled | Running | Done _ -> update_goal_node notification c.controller_session id
     | _ -> ()
   in
 
@@ -724,7 +521,7 @@ let schedule_transformation_r c id name args ~callback =
 
 let schedule_transformation c id name args ~callback ~notification =
   let callback s = callback s; (match s with
-      | TSdone tid -> update_trans_node notification c tid
+      | TSdone tid -> update_trans_node notification c.controller_session tid
       | TSfailed _e -> ()
       | _ -> ()) in
   schedule_transformation_r c id name args ~callback
@@ -800,43 +597,44 @@ let schedule_tr_with_same_arguments
   let name = get_transf_name s tr in
   schedule_transformation c pn name args ~callback ~notification
 
-let clean_session c ~remove =
+let clean_session c ~removed =
+  (* clean should not change proved status *)
+  let notification _ = assert false in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
   Session_itp.fold_all_session s
     (fun () any ->
       (match any with
       | APa pa ->
-        let pa = Session_itp.get_proof_attempt_node c.controller_session pa in
-        if pn_proved c pa.parent then
+        let pa = Session_itp.get_proof_attempt_node s pa in
+        if pn_proved s pa.parent then
           (match pa.Session_itp.proof_state with
           | None -> ()
           | Some pr ->
            if pa.Session_itp.proof_obsolete ||
                 Call_provers.(pr.pr_answer <> Valid)
            then
-             remove_subtree c ~removed:remove ~notification:(fun _ -> ()) any)
+             remove_subtree ~notification ~removed s any)
       | ATn tn ->
-        let pn = get_trans_parent c.controller_session tn in
-        if pn_proved c pn && not (tn_proved c tn) then
-          remove_subtree c ~removed:remove ~notification:(fun _ -> ()) (ATn tn)
+        let pn = get_trans_parent s tn in
+        if pn_proved s pn && not (tn_proved s tn) then
+          remove_subtree s ~notification ~removed (ATn tn)
       | _ -> ())) ()
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)
 let mark_as_obsolete ~notification c any =
+  let s = c.controller_session in
   (* Case for proof attempt only *)
-  let mark_as_obsolete_pa c n =
-    let s = c.controller_session in
+  let mark_as_obsolete_pa n =
     let parent = get_proof_attempt_parent s n in
     Session_itp.mark_obsolete s n;
     notification (APa n);
-    update_goal_node notification c parent
+    update_goal_node notification s parent
   in
-  let s = c.controller_session in
   fold_all_any s
     (fun () any -> match any with
-    | APa n -> mark_as_obsolete_pa c n
+    | APa n -> mark_as_obsolete_pa n
     | _ -> ()) () any
 
 exception BadCopyPaste

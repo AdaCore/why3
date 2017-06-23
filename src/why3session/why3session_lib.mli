@@ -44,6 +44,8 @@ val common_options : spec_list
 val read_env_spec : unit -> Env.env * Whyconf.config * bool
 (** read_simple_spec also *)
 
+val read_session : string -> Session_itp.session * bool
+
 val read_update_session :
   allow_obsolete:bool -> Env.env ->
   Whyconf.config -> string ->
@@ -63,14 +65,14 @@ val filter_spec : spec_list
 val read_filter_spec : Whyconf.config -> filters * bool
 
 val theory_iter_proof_attempt_by_filter :
-  Controller_itp.controller ->
+  Session_itp.session ->
   filters ->
   (Session_itp.proof_attempt_node -> unit) -> Session_itp.theory -> unit
 
 val session_iter_proof_attempt_by_filter :
-  Controller_itp.controller ->
+  Session_itp.session ->
   filters ->
-  (Session_itp.proof_attempt_node -> unit) -> Session_itp.session -> unit
+  (Session_itp.proof_attempt_node -> unit) ->  unit
 
 
 (* quite ad-hoc *)

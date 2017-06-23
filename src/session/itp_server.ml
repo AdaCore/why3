@@ -15,25 +15,28 @@ exception Bad_prover_name of string
    Else, return the concatenation of the reversed list of unproven
    goals below the transformation and acc *)
 let rec unproven_goals_below_tn cont acc tn =
-  if tn_proved cont tn then
+  let s = cont.controller_session in
+  if tn_proved s tn then
     acc                         (* we ignore "dead" goals *)
   else
-    let sub_tasks = get_sub_tasks cont.controller_session tn in
+    let sub_tasks = get_sub_tasks s tn in
     List.fold_left (unproven_goals_below_pn cont) acc sub_tasks
 
 (* Same as unproven_goals_below_tn; note that if goal is not proved
    and there is no transformation, goal is returned (else it is not) *)
 and unproven_goals_below_pn cont acc goal =
-  if pn_proved cont goal then
+  let s = cont.controller_session in
+  if pn_proved s goal then
     acc                         (* we ignore "dead" transformations *)
   else
-    match get_transformations cont.controller_session goal with
+    match get_transformations s goal with
     | [] -> goal :: acc
     | tns -> List.fold_left (unproven_goals_below_tn cont) acc tns
 
 (* Same as unproven_goals_below_tn *)
 let unproven_goals_below_th cont acc th =
-  if th_proved cont th then
+  let s = cont.controller_session in
+  if th_proved s th then
     acc
   else
     let goals = theory_goals th in
@@ -41,10 +44,11 @@ let unproven_goals_below_th cont acc th =
 
 (* Same as unproven_goals_below_tn *)
 let unproven_goals_below_file cont file =
-  if file_proved cont file then
+  let s = cont.controller_session in
+  if file_proved s file then
     []
   else
-    let theories = file.file_theories in
+    let theories = file_theories file in
     List.fold_left (unproven_goals_below_th cont) [] theories
 
 let unproven_goals_below_id cont id =
@@ -413,7 +417,7 @@ let () =
   let node_ID_from_pn   pn   = Hpn.find pn_to_node_ID pn
   let node_ID_from_tn   tn   = Htn.find tn_to_node_ID tn
   let node_ID_from_th   th   = Ident.Hid.find th_to_node_ID (theory_name th)
-  let node_ID_from_file file = Hstr.find file_to_node_ID (file.file_name)
+  let node_ID_from_file file = Hstr.find file_to_node_ID (file_name file)
 
   let node_ID_from_any  any  =
     match any with
@@ -426,9 +430,9 @@ let () =
   let remove_any_node_ID any =
     match any with
     | AFile file ->
-        let nid = Hstr.find file_to_node_ID file.file_name in
+        let nid = Hstr.find file_to_node_ID (file_name file) in
         Hint.remove model_any nid;
-        Hstr.remove file_to_node_ID file.file_name
+        Hstr.remove file_to_node_ID (file_name file)
     | ATh th     ->
         let nid = Ident.Hid.find th_to_node_ID (theory_name th) in
         Hint.remove model_any nid;
@@ -454,7 +458,7 @@ let () =
 
   let add_node_to_table node new_id =
     match node with
-    | AFile file -> Hstr.add file_to_node_ID file.file_name new_id
+    | AFile file -> Hstr.add file_to_node_ID (file_name file) new_id
     | ATh th     -> Ident.Hid.add th_to_node_ID (theory_name th) new_id
     | ATn tn     -> Htn.add tn_to_node_ID tn new_id
     | APn pn     -> Hpn.add pn_to_node_ID pn new_id
@@ -609,8 +613,8 @@ end
     let s = d.cont.controller_session in
     let files = Session_itp.get_files s in
     Stdlib.Hstr.iter (fun _ f ->
-                      Format.eprintf "File : %s@." f.file_name;
-                      read_and_send f.file_name) files
+                      Format.eprintf "File : %s@." (file_name f);
+                      read_and_send (file_name f)) files
 
   let relativize_location s loc =
     let f, l, b, e = Loc.get loc in
@@ -670,10 +674,8 @@ end
   let get_node_name (node: any) =
     let d = get_server_data () in
     match node with
-    | AFile file ->
-      file.file_name
-    | ATh th ->
-      (theory_name th).Ident.id_string
+    | AFile file -> file_name file
+    | ATh th -> (theory_name th).Ident.id_string
     | ATn tn ->
        let name = get_transf_name d.cont.controller_session tn in
        let args = get_transf_args d.cont.controller_session tn in
@@ -696,17 +698,18 @@ end
   let get_node_proved new_id (node: any) =
     let d = get_server_data () in
     let cont = d.cont in
+    let s = cont.controller_session in
     match node with
     | AFile file ->
-      P.notify (Node_change (new_id, Proved (file_proved cont file)))
+      P.notify (Node_change (new_id, Proved (file_proved s file)))
     | ATh th ->
-      P.notify (Node_change (new_id, Proved (th_proved cont th)))
+      P.notify (Node_change (new_id, Proved (th_proved s th)))
     | ATn tn ->
-      P.notify (Node_change (new_id, Proved (tn_proved cont tn)))
+      P.notify (Node_change (new_id, Proved (tn_proved s tn)))
     | APn pn ->
-      P.notify (Node_change (new_id, Proved (pn_proved cont pn)))
+      P.notify (Node_change (new_id, Proved (pn_proved s pn)))
     | APa pa ->
-      let pa = get_proof_attempt_node cont.controller_session pa in
+      let pa = get_proof_attempt_node s pa in
       let obs = pa.proof_obsolete in
       let limit = pa.limit in
       let res =
@@ -807,8 +810,7 @@ end
     (f: parent:node_ID -> any -> unit) parent file =
     f ~parent (AFile file);
     let nid = node_ID_from_file file in
-    List.iter (iter_subtree_from_theory f nid)
-      file.file_theories
+    List.iter (iter_subtree_from_theory f nid) (file_theories file)
 
   let iter_the_files (f: parent:node_ID -> any -> unit) parent : unit =
     let d = get_server_data () in
@@ -874,7 +876,7 @@ end
        let s, list_loc = task_of_id d parid in
        P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
     | AFile f ->
-       P.notify (Task (nid, "File " ^ f.file_name, []))
+       P.notify (Task (nid, "File " ^ file_name f, []))
     | ATn tid ->
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
@@ -974,7 +976,7 @@ end
   let notify_change_proved c x =
     try
       let node_ID = node_ID_from_any x in
-      let b = any_proved c x in
+      let b = any_proved c.controller_session x in
       P.notify (Node_change (node_ID, Proved b));
       match x with
       | APa pa ->
@@ -1087,11 +1089,11 @@ end
   (* ----------------- Clean session -------------------- *)
   let clean_session () =
     let d = get_server_data () in
-    let remove x =
+    let removed x =
       let nid = node_ID_from_any x in
       remove_any_node_ID x;
       P.notify (Remove nid) in
-    C.clean_session d.cont ~remove
+    C.clean_session d.cont ~removed
 
 
   (* ----------------- Save session --------------------- *)
@@ -1147,12 +1149,13 @@ end
   (* ----------------- locate next unproven node -------------------- *)
 
   let notify_first_unproven_node d ni =
+    let s = d.cont.controller_session in
     let any = any_from_node_ID ni in
       let unproven_any =
         get_first_unproven_goal_around
-          ~proved:(Controller_itp.any_proved d.cont)
-          ~children:(get_undetached_children_no_pa d.cont.controller_session)
-          ~get_parent:(get_any_parent d.cont.controller_session)
+          ~proved:(Session_itp.any_proved s)
+          ~children:(get_undetached_children_no_pa s)
+          ~get_parent:(get_any_parent s)
           ~is_goal:(fun any -> match any with | APn _ -> true | _ -> false)
           ~is_pa:(fun any -> match any with | APa _ -> true | _ -> false)
           any in
@@ -1222,7 +1225,7 @@ end
         let n = any_from_node_ID nid in
         begin
         try
-          Controller_itp.remove_subtree d.cont n
+          remove_subtree d.cont.controller_session n
             ~notification:(notify_change_proved d.cont)
             ~removed:(fun x ->
                         let nid = node_ID_from_any x in

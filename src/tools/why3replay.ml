@@ -126,34 +126,34 @@ let print_result = Call_provers.print_prover_result
 
 module S = Session_itp
 
-let goal_statistics cont (goals,n,m) g =
-  if Controller_itp.pn_proved cont g then (goals,n+1,m+1) else (g::goals,n,m+1)
+let goal_statistics ses (goals,n,m) g =
+  if S.pn_proved ses g then (goals,n+1,m+1) else (g::goals,n,m+1)
 
-let theory_statistics cont (ths,n,m) th =
+let theory_statistics ses (ths,n,m) th =
   let goals,n1,m1 =
-    List.fold_left (goal_statistics cont) ([],0,0) (Session_itp.theory_goals th) in
+    List.fold_left (goal_statistics ses) ([],0,0) (S.theory_goals th) in
   ((th,goals,n1,m1)::ths,n+n1,m+m1)
 
-let file_statistics cont _ f (files,n,m) =
+let file_statistics ses _ f (files,n,m) =
   let ths,n1,m1 =
-    List.fold_left (theory_statistics cont) ([],0,0) f.Session_itp.file_theories in
+    List.fold_left (theory_statistics ses) ([],0,0) (S.file_theories f) in
   ((f,ths,n1,m1)::files,n+n1,m+m1)
 
-let print_statistics cont files =
+let print_statistics ses files =
   let print_goal g =
     printf "         +--goal %s not proved@."
-           (Session_itp.get_proof_name cont.Controller_itp.controller_session g).Ident.id_string
+           (S.get_proof_name ses g).Ident.id_string
   in
   let print_theory (th,goals,n,m) =
     if n<m then begin
       printf "      +--theory %s: %d/%d@."
-        (Session_itp.theory_name th).Ident.id_string n m;
+        (S.theory_name th).Ident.id_string n m;
       List.iter print_goal (List.rev goals)
     end
   in
   let print_file (f,ths,n,m) =
     if n<m then begin
-      printf "   +--file %s: %d/%d@." f.S.file_name n m;
+      printf "   +--file %s: %d/%d@." (S.file_name f) n m;
       List.iter print_theory (List.rev ths)
     end
   in
@@ -198,7 +198,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   let final_callback report =
     Debug.dprintf debug "@.";
     let files,n,m =
-      Stdlib.Hstr.fold (file_statistics cont)
+      Stdlib.Hstr.fold (file_statistics session)
         (S.get_files session) ([],0,0)
     in
     let report =
@@ -219,7 +219,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
         printf "(replay OK%s%s)@."
           (if found_obs then ", obsolete session" else "")
           (if !found_upgraded_prover then ", upgraded prover" else "");
-        if true (* !opt_stats *) && n<m then print_statistics cont files;
+        if true (* !opt_stats *) && n<m then print_statistics session files;
         Debug.dprintf debug "Everything replayed OK.@.";
         if !opt_force || found_obs || !found_upgraded_prover then save ();
         exit 0
@@ -229,7 +229,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
       begin
         printf "(replay failed%s)@."
           (if some_merge_miss then ", with some merge miss" else "");
-        List.iter (print_report cont.Controller_itp.controller_session) report;
+        List.iter (print_report session) report;
         eprintf "Replay failed.@.";
         if !opt_force then save ();
         exit 1

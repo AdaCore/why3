@@ -15,7 +15,8 @@ unique identifiers of type [proofNodeId]
 *)
 
 type session
-
+type file
+type theory
 type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
 type transID
@@ -25,14 +26,6 @@ module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID
 module Hpan: Exthtbl.S with type key = proofAttemptID
 
-type theory
-
-type file = private {
-  file_name              : string;
-  file_format            : string option;
-  file_theories          : theory list;
-  file_detached_theories : theory list;
-}
 
 (* Any proof node of the tree *)
 type any =
@@ -42,7 +35,10 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
-(** Session / File *)
+type notifier = any -> unit
+
+
+(** Session *)
 
 (* Get all the files in the session *)
 val get_files : session -> file Stdlib.Hstr.t
@@ -51,6 +47,12 @@ val get_file: session -> string -> file
 (* Get directory containing the session *)
 val get_dir : session -> string
 val get_shape_version : session -> int
+
+(** File *)
+val file_name : file -> string
+val file_format : file -> string option
+val file_theories : file -> theory list
+val file_detached_theories : file -> theory list
 
 (** Theory *)
 val theory_name : theory -> Ident.ident
@@ -196,14 +198,37 @@ val load_session : string -> session * bool
 
 exception RemoveError
 
-val remove_subtree: session -> any -> notification:(any -> unit) -> unit
-(** [remove_subtree s a notification] remove the subtree originating from a in
-    session s then call the notification function (used to notify the ide.
+val remove_subtree: notification:notifier -> removed:notifier ->
+                    session -> any -> unit
+(** [remove_subtree s a ~removed ~notification] remove the subtree
+    originating from node [a] in session [s]. the notifier [removed] is
+    called on each removed node, and notifier [notification] on nodes
+    whose proved state changes.
 
-    If called on a theory or proof node, raise RemoveError *)
+    raises [RemoveError] when removal is forbidden, e.g. when called on
+    a theory, or a goal that is not detached
+ *)
 
 val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
 (** [fold_all_any s f acc any] folds on all the subnodes of any *)
 
 val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** [fold_all_session s f acc] folds on the whole session *)
+
+(* proved status *)
+
+val th_proved : session -> theory -> bool
+val pn_proved : session -> proofNodeID -> bool
+val tn_proved : session -> transID -> bool
+val file_proved : session -> file -> bool
+val any_proved : session -> any -> bool
+
+(* status update *)
+
+val update_goal_node : notifier -> session -> proofNodeID -> unit
+(** [updates the proved status of the given goal node. If necessary, propagates
+    the update to ancestors. [notifier] is called on all nodes whose status changes *)
+
+val update_trans_node : notifier -> session -> transID -> unit
+(** [updates the proved status of the given transformation node. If necessary, propagates
+    the update to ancestors. [notifier] is called on all nodes whose status changes *)

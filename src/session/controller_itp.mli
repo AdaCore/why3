@@ -61,13 +61,8 @@ module type Scheduler = sig
 
 end
 
-(** Correspondance between a node of the proof tree
-    and its state (proved or not) *)
-type proof_state
-
 type controller = private
   { mutable controller_session : Session_itp.session;
-    proof_state : proof_state;
     controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
@@ -76,13 +71,6 @@ type controller = private
 val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
 (** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
-
-(** Used to find if a proof/trans node or theory is proved or not *)
-val tn_proved: controller -> Session_itp.transID -> bool
-val pn_proved: controller -> Session_itp.proofNodeID -> bool
-val th_proved: controller -> Session_itp.theory -> bool
-val file_proved: controller -> Session_itp.file -> bool
-val any_proved: controller -> any -> bool
 
 val print_session : Format.formatter -> controller -> unit
 
@@ -144,14 +132,6 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
     [fname] and add the resulting theories to the session of [cont] *)
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
-
-type notifier = any -> unit
-
-val remove_subtree:
-  controller ->
-  any ->
-  removed:(any -> unit) ->
-  notification:notifier -> unit
 
 
 module Make(S : Scheduler) : sig
@@ -233,11 +213,10 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
-val clean_session:
-  controller ->
-  remove:(any -> unit) -> unit
-(** Remove proof_attempts below proved goals, although thet are either obsoloete or not valid
- *)
+val clean_session: controller -> removed:notifier -> unit
+(** Remove each proof attempt or transformation that are below proved
+    goals, that are either obsolete or not valid. The [removed]
+    notifier is called on each removed node.  *)
 
 val mark_as_obsolete:
   notification:notifier ->
