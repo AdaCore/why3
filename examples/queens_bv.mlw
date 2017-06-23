@@ -90,7 +90,7 @@ module BitsSpec
 
   constant size : int = 32
 
-  type t = {
+  type t = private {
     ghost mdl: set int;
   }
   invariant { forall i. mem i mdl -> 0 <= i < size }
