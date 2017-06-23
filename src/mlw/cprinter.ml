@@ -84,6 +84,14 @@ module C = struct
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
+  let is_true = function
+    | Sexpr(Econst(Cint "1")) -> true
+    | _ -> false
+
+  let is_false = function
+    | Sexpr(Econst(Cint "0")) -> true
+    | _ -> false
+
   let rec one_stmt = function
     | Snop -> true
     | Sexpr _ -> true
@@ -298,13 +306,40 @@ module C = struct
     | [s] -> s
     | h::t -> Sseq (h, stmt_of_list t)
 
+  let is_expr = function
+    | Sexpr _ -> true
+    | _ -> false
+
   let simplify_expr (d,s) : expr =
     match (d,s) with
     | [], Sexpr e -> e
- (*   | [], Sreturn e -> assert false
-    | [], Snop -> assert false
-    | [], Sblock _ -> assert false *)
-    | _ -> assert false
+    | _ -> raise (Invalid_argument "simplify_expr")
+
+  let rec simplify_cond (cd, cs) =
+    match cd,elim_empty_blocks(elim_nop cs) with
+    | [], Sexpr c -> ([], Sexpr c)
+    | ([], Sif (c', t', e') as b) ->
+       let _,t' = simplify_cond ([], t') in
+       let _,e' = simplify_cond ([], e') in
+       if is_false e' && is_expr t'(* c' && t' *)
+       then
+         let t' = simplify_expr ([],t') in
+         [], Sexpr(Ebinop(Band, c', t'))
+       else if is_true e' && is_expr t' (* !c' || t' *)
+       then
+         let t' = simplify_expr ([],t') in
+         [], Sexpr(Ebinop(Bor,Eunop(Unot,c'),t'))
+       else if is_true t' && is_expr e' (* c' || e' *)
+       then
+         let e' = simplify_expr ([],e') in
+         [], Sexpr(Ebinop(Bor,c',e'))
+       else if is_false t' && is_expr e' (* !c' && e' *)
+       then
+         let e' = simplify_expr ([],e') in
+         [], Sexpr(Ebinop(Band,Eunop(Unot,c'),e'))
+       else b
+    | d,s -> d, s
+
 end
 
 type info = Pdriver.printer_args = private {
@@ -744,10 +779,10 @@ module MLToC = struct
       | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
        end
     | Eif (cond, th, el) ->
-       let c = expr info {env with computes_return_value = false} cond in
+       let cd,cs = expr info {env with computes_return_value = false} cond in
        let t = expr info env th in
        let e = expr info env el in
-       begin match c with
+       begin match simplify_cond (cd, cs) with
        | [], C.Sexpr c ->
           let c = handle_likely cond.e_label c in
           if is_false th && is_true el
@@ -759,7 +794,6 @@ module MLToC = struct
 	  C.Sseq (C.assignify (Evar cid) cs,
                   C.Sif ((handle_likely cond.e_label (C.Evar cid)),
                          C.Sblock t, C.Sblock e))
-       (* TODO detect empty branches and replace with Snop, detect and/or*)
        end
     | Ewhile (c,b) ->
        if debug then Format.printf "while@.";
@@ -776,8 +810,8 @@ module MLToC = struct
                      if env.in_unguarded_loop
                      then Sid.empty else env.breaks } in
       let b = expr info  env' b in
-      begin match cs with
-      | C.Sexpr ce -> cd, C.Swhile (handle_likely c.e_label ce, C.Sblock b)
+      begin match (C.simplify_cond (cd,cs)) with
+      | cd, C.Sexpr ce -> cd, C.Swhile (handle_likely c.e_label ce, C.Sblock b)
       | _ ->
         begin match C.get_last_expr cs with
         | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_label e, C.Sblock b))
