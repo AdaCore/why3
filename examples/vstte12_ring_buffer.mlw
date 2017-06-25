@@ -32,6 +32,7 @@ module RingBuffer
       (0 <= first + i - size ->
          nth i sequence = Some data[first + i - size])
   }
+  by { first = 0; len = 0; data = make 1 (any 'a); sequence = Nil }
 
   (* total capacity of the buffer *)
   function size (b: buffer 'a) : int = Array.length b.data
@@ -165,6 +166,7 @@ module RingBufferSeq
       (0 <= first + i - size ->
          S.get sequence i = data[first + i - size])
   }
+  by { first = 0; len = 0; data = make 1 (any 'a); sequence = S.empty }
 
   (* total capacity of the buffer *)
   function size (b: buffer 'a) : int = Array.length b.data

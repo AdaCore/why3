@@ -8,7 +8,10 @@
 <prover id="6" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_ring_buffer.mlw" expanded="true">
-<theory name="RingBuffer" sum="cf1afa8caf43dc4f538c9078462662fe" expanded="true">
+<theory name="RingBuffer" sum="440c787407edb5055e7ccec38c6dd29c" expanded="true">
+ <goal name="VC buffer" expl="VC for buffer">
+ <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
+ </goal>
  <goal name="VC create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.00" steps="24"/></proof>
  </goal>
@@ -577,7 +580,10 @@
  <proof prover="4"><result status="valid" time="0.08" steps="499"/></proof>
  </goal>
 </theory>
-<theory name="RingBufferSeq" sum="2e16fc317b01f2605ce592d18305265a">
+<theory name="RingBufferSeq" sum="d5baed0f88a0b4cbc04d03e2e7c91df4">
+ <goal name="VC buffer" expl="VC for buffer">
+ <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
+ </goal>
  <goal name="VC create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
  </goal>

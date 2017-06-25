@@ -172,6 +172,8 @@ module AVL
     ghost m : m 'a;
   } invariant {
     balanced repr /\ m = seq_model repr /\ m.hgt = real_height repr
+  } by {
+    repr = Empty; m = { seq = empty; hgt = 0 }
   }
   meta coercion function m
 

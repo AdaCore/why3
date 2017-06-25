@@ -5,7 +5,10 @@
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tower_of_hanoi.mlw" expanded="true">
-<theory name="Hanoi" sum="ff68094fdd8f1e3a29decd895f45d1b6" expanded="true">
+<theory name="Hanoi" sum="934ecac9b836a8bb7eba7c149be18efc" expanded="true">
+ <goal name="VC tower" expl="VC for tower" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
  <goal name="VC move" expl="VC for move" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="VC move.1" expl="type invariant">
@@ -97,10 +100,13 @@
  </transf>
  </goal>
 </theory>
-<theory name="Tower_of_Hanoi" sum="d2a79fec40fb0761056b76192fa05ccc" expanded="true">
+<theory name="Tower_of_Hanoi" sum="f912cddeaa5714ba310fab811694e537" expanded="true">
  <goal name="RevSorted.Transitive.Trans" expl="">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  <proof prover="6"><result status="valid" time="0.01" steps="2"/></proof>
+ </goal>
+ <goal name="VC tower" expl="VC for tower" expanded="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC move" expl="VC for move" expanded="true">
  <transf name="split_goal_wp" expanded="true">

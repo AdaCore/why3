@@ -61,6 +61,7 @@ module DancingLinks
       represented by array indices *)
   type dll = { prev: array int; next: array int; ghost n: int }
     invariant { length prev = length next = n }
+    by { prev = make 0 0; next = make 0 0; n = 0 }
 
   (** node [i] is a valid node i.e. it has consistent neighbors *)
   predicate valid_in (l: dll) (i: int) =
