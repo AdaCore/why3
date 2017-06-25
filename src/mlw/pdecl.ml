@@ -92,7 +92,8 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
         "This expression may not terminate, it cannot be a witness";
       if not (eff_pure e.e_effect) then Loc.errorm ?loc
         "This expression has side effects, it cannot be a witness";
-      Loc.try2 ?loc ity_equal_check e.e_ity fd.pv_ity) fdl witn
+      let ety = ty_of_ity e.e_ity and fty = fd.pv_vs.vs_ty in
+      Loc.try2 ?loc ty_equal_check ety fty) fdl witn
   end;
   mk_itd s pjl csl invl witn
 
