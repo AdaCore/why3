@@ -1225,7 +1225,7 @@ end
         let n = any_from_node_ID nid in
         begin
         try
-          remove_subtree d.cont.controller_session n
+          Session_itp.remove_subtree d.cont.controller_session n
             ~notification:(notify_change_proved d.cont)
             ~removed:(fun x ->
                         let nid = node_ID_from_any x in

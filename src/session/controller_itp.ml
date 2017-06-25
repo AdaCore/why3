@@ -90,7 +90,7 @@ let create_controller config env ses =
     provers;
   c
 
-let remove_subtree = Session_itp.remove_subtree
+let remove_subtree c = Session_itp.remove_subtree c.controller_session
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
@@ -615,11 +615,11 @@ let clean_session c ~removed =
            if pa.Session_itp.proof_obsolete ||
                 Call_provers.(pr.pr_answer <> Valid)
            then
-             remove_subtree ~notification ~removed s any)
+             Session_itp.remove_subtree ~notification ~removed s any)
       | ATn tn ->
         let pn = get_trans_parent s tn in
         if pn_proved s pn && not (tn_proved s tn) then
-          remove_subtree s ~notification ~removed (ATn tn)
+          Session_itp.remove_subtree s ~notification ~removed (ATn tn)
       | _ -> ())) ()
 
 (* This function folds on any subelements of given node and tries to mark all

@@ -131,8 +131,8 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont] *)
 
-val remove_subtree: controller -> any -> removed:notifier ->
-  notification:notifier -> unit
+val remove_subtree: controller -> notification:notifier -> removed:notifier ->
+   any -> unit
 (** Mapping to Session_itp.remove_subtree. Used for code using Why3's API *)
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
