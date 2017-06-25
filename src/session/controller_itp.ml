@@ -90,6 +90,7 @@ let create_controller config env ses =
     provers;
   c
 
+let remove_subtree = Session_itp.remove_subtree
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
