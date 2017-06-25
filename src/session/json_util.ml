@@ -474,6 +474,10 @@ let parse_request (constr: string) j =
   | "Unfocus_req" ->
     Unfocus_req
 
+  | "Get_first_unproven_node" ->
+    let nid = get_int (get_field j "node_ID") in
+    Get_first_unproven_node nid
+
   | "Add_file_req" ->
     let f = get_string (get_field j "file") in
     Add_file_req f
