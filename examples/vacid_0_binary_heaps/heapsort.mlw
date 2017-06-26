@@ -12,10 +12,12 @@ use import array.Array
 use import array.IntArraySorted
 use import abstract_heap.AbstractHeap
 
-lemma Min_of_sorted:
-  forall a:M.map int int, i n :int.
-    0 <= i < n -> (M.sorted_sub a 0 n) ->
-      min_bag (elements a i n) = M.get a i
+let rec lemma min_of_sorted (a:M.map int int) (i n :int)
+   requires { 0 <= i < n }
+   requires { M.sorted_sub a 0 n }
+   variant  { n }
+   ensures  { min_bag (elements a i n) = M.get a i }
+ = if n > 0 && i < n - 1 then min_of_sorted a i (n-1)
 
 (* heap sort *)
 

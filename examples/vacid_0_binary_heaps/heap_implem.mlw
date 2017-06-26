@@ -10,9 +10,12 @@ use import bag_of_integers.Bag_integers
 use import elements.Elements
 use import heap.Heap
 
-lemma Is_heap_min:
-  forall a:map, n :int. n > 0 ->
-    is_heap_array a 0 n -> A.([]) a 0 = min_bag (model (a, n))
+let rec lemma is_heap_min (a:map) (n :int)
+  requires { n > 0 }
+  requires { is_heap_array a 0 n }
+  variant { n }
+  ensures { A.([]) a 0 = min_bag (model (a, n)) }
+= if n > 1 then is_heap_min a (n-1)
 
 use import ref.Ref
 
