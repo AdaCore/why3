@@ -6,7 +6,13 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../logic.mlw">
-<theory name="Compiler_logic" sum="1e34499ffffb0c2ecbb89014ad0e345a">
+<theory name="Compiler_logic" sum="597c541efd25a851253c429676f44981">
+ <goal name="VC hl" expl="VC for hl">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="VC wp" expl="VC for wp">
+ <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
+ </goal>
  <goal name="seq_wp_lemma" expl="">
  <proof prover="1"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
