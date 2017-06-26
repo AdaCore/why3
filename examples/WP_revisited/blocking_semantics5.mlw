@@ -391,9 +391,9 @@ lemma eval_type_term:
 lemma type_preservation :
   forall s1 s2:stmt, sigma1 sigma2:env, pi1 pi2:stack,
          sigmat:type_env, pit:type_stack.
-     type_stmt sigmat pit s1 /\
-     compatible_env sigma1 sigmat pi1 pit /\
-     one_step sigma1 pi1 s1 sigma2 pi2 s2 ->
+     type_stmt sigmat pit s1 ->
+     compatible_env sigma1 sigmat pi1 pit ->
+     ("induction" one_step sigma1 pi1 s1 sigma2 pi2 s2) ->
      type_stmt sigmat pit s2 /\
      compatible_env sigma2 sigmat pi2 pit
 
