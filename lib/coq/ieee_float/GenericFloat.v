@@ -32,10 +32,10 @@ Require Import ZArith.
 Require Import Fourier.
 Require Import real.Truncate.
 
-Arguments B754_zero {prec} {emax}.
-Arguments B754_infinity {prec} {emax}.
-Arguments B754_nan {prec} {emax}.
-Arguments B754_finite {prec} {emax}.
+Arguments B754_zero {prec} {emax} _.
+Arguments B754_infinity {prec} {emax} _.
+Arguments B754_nan {prec} {emax} _ _.
+Arguments B754_finite {prec} {emax} _ _ _ _.
 
 (* Why3 assumption *)
 Inductive mode :=
