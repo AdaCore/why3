@@ -26,31 +26,32 @@ let debug = Debug.register_info_flag "smtv2_printer"
 
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
-  let bls = (*["and";" benchmark";" distinct";"exists";"false";"flet";"forall";
-     "if then else";"iff";"implies";"ite";"let";"logic";"not";"or";
-     "sat";"theory";"true";"unknown";"unsat";"xor";
-     "assumption";"axioms";"definition";"extensions";"formula";
-     "funs";"extrafuns";"extrasorts";"extrapreds";"language";
-     "notes";"preds";"sorts";"status";"theory";"Int";"Real";"Bool";
-     "Array";"U";"select";"store"]*)
-    (* smtlib2 V2 p71 *)
-    [(* Base SMT-LIB tokens *)
-      "assert"; "check-sat"; "declare-fun"; "declare-sort"; "define-fun";
-      "define-sort"; "get-value"; "get-assignment"; "get-assertions";
-      "get-proof"; "get-unsat-core"; "exit"; "ite"; "let"; "!"; "_";
-      "set-logic"; "set-info"; "get-info"; "set-option"; "get-option";
-      "push"; "pop"; "as";
+  let bls =
+    [(* Base SMT-LIB commands, see page 43 *)
+      "assert"; "check-sat"; "check-sat-assuming"; "declare-const";
+      "declare-datatype"; "declare-datatypes"; "declare-fun"; "declare-sort";
+      "define-fun"; "define-fun-rec"; "define-funs-rec"; "define-sort";
+      "echo"; "exit";
+      "get-assignment"; "get-assertions";
+      "get-info"; "get-model"; "get-option"; "get-proof";
+      "get-unsat-assumptions"; "get-unsat-core"; "get-value";
+      "pop"; "push";
+      "reset"; "reset-assertions";
+      "set-info"; "set-logic";  "set-option";
 
-      (* extended commands *)
-      "declare-datatypes"; "get-model"; "echo"; "assert-rewrite";
+     (* Base SMT-LIB tokens, see page 22*)
+      "BINARY"; "DECIMAL"; "HEXADECIMAL"; "NUMERAL"; "STRING";
+      "_"; "!"; "as"; "let"; "exists"; "forall"; "match"; "par";
+
+     (* extended commands *)
+      "assert-rewrite";
       "assert-reduction"; "assert-propagation"; "declare-sorts";
-      "declare-funs"; "declare-preds"; "define"; "declare-const";
+      "declare-funs"; "declare-preds"; "define";
       "simplify";
 
-      (* attributes *)
-
-      (* operators, including theory symbols *)
-      "and"; "distinct"; "exists"; "forall"; "is_int"; "not"; "or"; "select";
+     (* operators, including theory symbols *)
+      "ite";
+      "and"; "distinct"; "is_int"; "not"; "or"; "select";
       "store"; "to_int"; "to_real"; "xor";
 
       "div"; "mod";
@@ -63,7 +64,7 @@ let ident_printer () =
 
       "cos"; "sin"; "tan"; "atan"; "pi";
 
-      (** the new floating point theory - updated to the 2014-05-27 standard *)
+     (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
       "Float16"; "Float32"; "Float64"; "Float128";
       "RoundingMode";
@@ -82,7 +83,7 @@ let ident_printer () =
       "to_fp"; "to_fp_unsigned";
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
 
-      (** the new proposed string theory *)
+     (* the new proposed string theory *)
       "String";
       "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
       "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
@@ -90,26 +91,22 @@ let ident_printer () =
       "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
       "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
 
-      (** the new proposed set theory *)
+     (* the new proposed set theory *)
       "union"; "intersection"; "setminus"; "subset"; "member";
       "singleton"; "insert";
 
-      (** built-in sorts *)
+     (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
 
-      (** Other stuff that Why3 seems to need *)
-      "DECIMAL"; "NUMERAL"; "par"; "STRING";
+     (* Other stuff that Why3 seems to need *)
       "unsat";"sat";
       "true"; "false";
       "const";
       "abs";
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
-      (* From Z3 *)
+     (* From Z3 *)
       "map"; "bv"; "subset"; "union"; "default";
-
-(* floats *)
-      "RNE"; "RNA"; "RTP"; "RTN"; "RTZ"
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
