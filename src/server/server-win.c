@@ -38,6 +38,7 @@
 #define READOP 0
 #define WRITEOP 1
 
+// constants to distinguish between events from sockets and processes
 #define SOCKET 0
 #define PROCESS 1
 
@@ -68,10 +69,16 @@ typedef struct {
    char* outfile;
 } t_proc, *pproc;
 
-pserver server_socket = NULL;
-int server_key = 0;
-plist clients = NULL;
-plist processes = NULL;
+// AFAIU, there is no connection queue or something like that, so we need to
+// create several socket instances to be able to process several clients that
+// would connect almost at the same time. The two variables below will be
+// allocated to arrays of equal length, holding the socket handle and the
+// "key" (used for IO Completion Port) for each socket instance.
+pserver* server_socket;
+int* server_key;
+
+plist clients;
+plist processes;
 char current_dir[MAX_PATH];
 
 int gen_key = 1;
@@ -94,9 +101,9 @@ int key_of_ms_key(ULONG_PTR ms) {
 
 void init();
 
-char* socket_name = NULL;
+char* socket_name;
 
-HANDLE completion_port = NULL;
+HANDLE completion_port;
 
 void shutdown_with_msg(char* msg);
 
@@ -105,8 +112,10 @@ void shutdown_with_msg(char* msg) {
   if (completion_port != NULL) {
     CloseHandle (completion_port);
   }
-  if (server_socket != NULL) {
-    CloseHandle (server_socket->handle);
+  for (int i = 0; i < parallel; i++) {
+     if (server_socket[i] != NULL) {
+       CloseHandle (server_socket[i]->handle);
+     }
   }
   if (clients != NULL) {
      for (int i = 0; i < list_length(clients); i++) {
@@ -167,7 +176,9 @@ void try_write(pclient client) {
    }
 }
 
-void create_server_socket () {
+// create a server socket and store it in the ith component of the
+// server_socket array
+void create_server_socket (int socket_num) {
    pserver server;
    int key = keygen();
    server = (pserver) malloc(sizeof(t_server));
@@ -189,8 +200,8 @@ void create_server_socket () {
    add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
    ZeroMemory(&server->connect, sizeof(OVERLAPPED));
    server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
-   server_socket = server;
-   server_key = key;
+   server_socket[socket_num] = server;
+   server_key[socket_num] = key;
    if (!ConnectNamedPipe(server->handle, (LPOVERLAPPED) &server->connect)) {
       DWORD err = GetLastError();
       if (err == ERROR_IO_PENDING) {
@@ -467,15 +478,18 @@ void do_read(pclient client) {
             (LPOVERLAPPED) &client->read);
 }
 
-void accept_client(int key) {
+// the server socket with [key] and whose handle is stored in the [socket_num]
+// component of the server_socket array, has received a client request. Handle
+// it and create a new server socket instance for this socket number
+void accept_client(int key, int socket_num) {
    pclient client = (pclient) malloc(sizeof(t_client));
-   client->handle = server_socket->handle;
+   client->handle = server_socket[socket_num]->handle;
    client->readbuf = init_readbuf(BUFSIZE);
    client->writebuf = init_writebuf(16);
    init_connect_data(&(client->read), READOP);
    init_connect_data(&(client->write), WRITEOP);
-   free(server_socket);
-   create_server_socket();
+   free(server_socket[socket_num]);
+   create_server_socket(socket_num);
    list_append(clients, key, (void*)client);
    do_read(client);
 }
@@ -622,8 +636,23 @@ void init() {
    clients = init_list(16);
    processes = init_list(16);
 
+   server_socket = (pserver*) malloc(parallel * sizeof(pserver));
+   server_key = (int*) malloc(parallel * sizeof(int));
+
    init_logging();
-   create_server_socket();
+   for (int i = 0; i < parallel; i++) {
+      create_server_socket(i);
+   }
+}
+
+// If the key in argument corresponds to a server socket, return the server
+// socket number, else return -1.
+int get_server_num (int key) {
+   for (int i=0; i < parallel; i++) {
+      if (server_key[i] == key)
+         return i;
+   }
+   return -1;
 }
 
 int main(int argc, char **argv) {
@@ -631,6 +660,7 @@ int main(int argc, char **argv) {
    ULONG_PTR mskey;
    int key;
    int kind;
+   int server_num;
    LPOVERLAPPED ov;
    p_conn_data conn;
    BOOL res;
@@ -654,13 +684,14 @@ int main(int argc, char **argv) {
       }
       key = key_of_ms_key(mskey);
       kind = kind_of_ms_key(mskey);
+      server_num = get_server_num(key);
       switch (kind) {
          case SOCKET:
-            if (key == server_key) {
+            if (server_num != -1) {
                if (!res && GetLastError () != ERROR_PIPE_CONNECTED) {
                   shutdown_with_msg("error connecting client");
                } else {
-                  accept_client(key);
+                  accept_client(key, server_num);
                }
                break;
             }
