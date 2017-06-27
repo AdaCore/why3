@@ -1,0 +1,132 @@
+module Intf
+
+  use import int.Int
+
+  type t = private {
+          size: int;        (* elements are 0,1,...,size-1 *)
+    ghost repr: int -> int;
+  } invariant {
+    0 <= size /\
+    forall i. 0 <= i < size -> 0 <= repr i < size
+  } by { size = 0; repr = fun i -> i }
+
+  val create (n: int) : t
+    requires { 0 <= n }
+    ensures  { result.size = n }
+    ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
+
+  val find (uf: t) (i: int) : int
+    requires { 0 <= i < uf.size }
+    ensures  { result = uf.repr i }
+
+end
+
+module Impl
+
+  use import int.Int
+  use map.Map
+  use import array.Array
+
+  inductive path (size: int) (link: array int) (x d y: int) =
+  | path_zero: forall size link x.
+               0 <= x < size -> link[x] = x -> path size link x 0 x
+  | path_succ: forall size link.
+               forall x d z. 0 <= x < size -> link[x] <> x ->
+               path size link link[x] d z -> path size link x (d+1) z
+
+  lemma path_dist_nonneg:
+    forall size link x d y. path size link x d y -> 0 <= d
+
+  lemma path_src:
+    forall size link x d y. path size link x d y -> 0 <= x < size
+
+  lemma path_dst:
+    forall size link x d y. path size link x d y -> 0 <= y < size
+
+  let rec lemma path_unique (size: int) (link: array int) (x d1 d2 y1 y2: int)
+    requires { length link = size }
+    requires { path size link x d1 y1 }
+    requires { path size link x d2 y2 }
+    variant  { d1 + d2 }
+    ensures  { d1 = d2 /\ y1 = y2 }
+  = if x <> link[x] then begin
+      path_unique size link link[x] (d1-1) (d2-1) y1 y2;
+    end
+
+  let rec lemma path_last (size: int) (link: array int) (x d y: int)
+    requires { length link = size }
+    requires { path size link x d y }
+    requires { link[y] <> y }
+    variant  { d }
+    ensures  { path size link x (d+1) y }
+  = if d > 0 then path_last size link link[x] (d-1) y
+
+  type t = {
+                  size: int;        (* elements are 0,1,...,size-1 *)
+                  link: array int;
+    ghost mutable repr: int -> int;
+    ghost mutable dist: int -> int;
+  } invariant {
+    0 <= size = length link /\
+    (forall i. 0 <= i < size -> 0 <= repr i < size) /\
+    (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
+  } by {
+    size = 0; link = Array.make 0 0; repr = (fun i -> i); dist = (fun i -> 0)
+  }
+
+  let create (n: int) : t
+    requires { 0 <= n }
+    ensures  { result.size = n }
+    ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
+  = let l = Array.make n 0 in
+    for i = 0 to n - 1 do
+      invariant { forall j. 0 <= j < i -> l[j] = j }
+      l[i] <- i
+    done;
+    { size = n; link = l; repr = (fun i -> i); dist = (fun i -> 0) }
+
+  let rec find (uf: t) (x: int) : int
+    requires { 0 <= x < uf.size }
+    (* writes   { uf.link, uf.dist } *)
+    variant  { uf.dist x }
+    ensures  { result = uf.repr x }
+    ensures  { path uf.size uf.link x (uf.dist x) result }
+  = let y = uf.link[x] in
+    if y <> x then begin
+      assert { path uf.size uf.link y (uf.dist x - 1) (uf.repr x) };
+      let r = find uf y in
+      (* TODO: path compression
+      uf.link[x] <- r;
+      uf.dist <- pure { Map.set uf.dist x 1 };
+      *)
+      r
+    end else
+      x
+
+  predicate same (repr: int -> int) (x y: int) =
+    repr x = repr y
+
+  let union (uf: t) (a b: int) : unit
+    requires { 0 <= a < uf.size }
+    requires { 0 <= b < uf.size }
+    ensures  { same uf.repr a b }
+    ensures  { forall x y:int. 0 <= x < uf.size -> 0 <= y < uf.size ->
+               same uf.repr x y <->
+                 same (old uf.repr) x y \/
+                 same (old uf.repr) x a /\ same (old uf.repr) b y \/
+                 same (old uf.repr) x b /\ same (old uf.repr) a y }
+  = let ra = find uf a in
+    let rb = find uf b in
+    if ra <> rb then begin
+      uf.link[ra] <- rb;
+      let oldr = uf.repr in
+      let oldd = uf.dist in
+      uf.repr <- (fun i -> if oldr i = ra then rb else oldr i);
+      uf.dist <-
+        pure { fun i -> if oldr i = ra then oldd i + 1 else oldd i };
+      assert { forall i. 0 <= i < uf.size ->
+               if oldr i = ra then path uf.size uf.link i (oldd i + 1) rb
+                              else path uf.size uf.link i (oldd i)     (oldr i)}
+    end
+
+end
