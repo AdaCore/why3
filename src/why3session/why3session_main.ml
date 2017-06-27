@@ -16,9 +16,9 @@ open Why3session_lib
 let cmds =
   [|
     Why3session_info.cmd;
+    Why3session_html.cmd;
 (*
     Why3session_latex.cmd;
-    Why3session_html.cmd;
     Why3session_csv.cmd;
     Why3session_copy.cmd_mod;
     Why3session_copy.cmd_copy;
