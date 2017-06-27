@@ -1001,7 +1001,7 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
       "this@ expression@ does@ not@ diverge";
   if check_ue && e_bad_alias then List.iter (fun (t1, t2) ->
     if bad_alias t1 t2 then Loc.errorm ?loc:t1.t_loc (* FIXME better loc *)
-    "this@ alias@ does@ not@ happen@ in@ the@ expression@") dsp.ds_alias;
+    "this@ alias@ does@ not@ happen@ in@ the@ expression") dsp.ds_alias;
   (* check that every computed effect is listed *)
   if check_rw && bad_read eeff ueff then Loc.errorm ?loc
     "this@ expression@ depends@ on@ variable@ %a,@ \

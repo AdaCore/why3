@@ -52,25 +52,28 @@ module Refptr
 
   type refp = { mutable pcontents "model_trace:" : ptr int }
 
-  function (!!) (x: refp) : ptr int
-  = x.pcontents
+ (* function (!!) (x: refp) : ptr int
+  = x.pcontents*)
 
   let refp (v: ptr int) : refp
     requires { valid v 0 }
     ensures { result.pcontents.data = v.data }
     ensures { result.pcontents.offset = v.offset }
-  (*  alias   { result.contents.data with v.data } *) (* ? *)
-  = { pcontents = incr v (Int32.of_int 0) }
+    alias   { result.pcontents.data with v.data } (* ? *)
+    = { pcontents = incr v (Int32.of_int 0) }
 
-  let (!!) (x:refp) : ptr int
-  ensures { result = !!x }
-    = x.pcontents
+  val function (!!) (x:refp) : ptr int
+    ensures { result.data = x.pcontents.data }
+    ensures { result.offset = x.pcontents.offset }
+    alias   { result.data with x.pcontents.data }
+  (*ensures { result = !!x } *) (* let ... = !!x => illegal alias when used*)
 
-  val (::=) (r: refp) (v: ptr int) : unit
-  writes { r }
-  ensures { !!r.data = v.data }
-  ensures { !!r.offset = v.offset }
-  (*= r.pcontents <- incr v (Int32.of_int 0)*)
+  let (::=) (r: refp) (v: ptr int) : unit
+    requires { valid v 0 }
+    writes { r }
+    ensures { !!r =  v }
+  = let _ = if true then r.pcontents.data else v.data in
+    r.pcontents <- incr v (Int32.of_int 0)
 
 
 end
@@ -91,6 +94,7 @@ module A
   diverges
   =
     let zero = Int32.of_int 0 in
+    let one = Int32.of_int 1 in
     let three = UInt32.of_int 3 in
     let p = malloc three in
     c_assert (is_not_null p);
@@ -101,9 +105,15 @@ module A
     set q 27;
     let y = get p in
     let s = refp p in
-  (*  s ::= !!s;
-    s ::= incr !!s zero;*) (*illegal alias*)
+    s.pcontents <- incr !!s zero;
+    s ::=  incr !!s zero;
     let z = get !!s in
-    assert { y = 27 = z }
+    assert { y = 27 = z };
+    set_ofs p one 33;
+    let a = get_ofs !!s one in
+    assert { a = 33 };
+    s ::= incr !!s one;
+    let b = get !!s in
+    assert { b = 33 };
 end
 
