@@ -2,9 +2,9 @@ module Intf
 
   use import int.Int
 
-  type t = private mutable {
-          size: int;        (* elements are 0,1,...,size-1 *)
-    ghost repr: int -> int;
+  type t = private {
+                  size: int;        (* elements are 0,1,...,size-1 *)
+    ghost mutable repr: int -> int;
   } invariant {
     0 <= size /\
     forall i. 0 <= i < size -> 0 <= repr i < size
@@ -25,6 +25,7 @@ module Intf
   val union (uf: t) (x y: int) : unit
     requires { 0 <= x < uf.size }
     requires { 0 <= y < uf.size }
+    writes   { uf.repr }
     ensures  { same uf.repr x y }
     ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
                same uf.repr i j <->
@@ -128,6 +129,7 @@ module Impl
   let union (uf: t) (x y: int) : unit
     requires { 0 <= x < uf.size }
     requires { 0 <= y < uf.size }
+    writes   { uf.link, uf.rank, uf.repr, uf.dist }
     ensures  { same uf.repr x y }
     ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
                same uf.repr i j <->
