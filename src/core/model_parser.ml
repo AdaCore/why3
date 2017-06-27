@@ -27,9 +27,18 @@ let debug = Debug.register_info_flag "model_parser"
 ****************************************************************
 *)
 
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
+
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record
@@ -67,14 +76,42 @@ let array_add_element ~array ~index ~value =
     arr_indices = arr_index::array.arr_indices;
   }
 
+let convert_float_value f =
+  match f with
+  | Plus_infinity ->
+      let m = Mstr.add "cons" (Json.String "Plus_infinity") Stdlib.Mstr.empty in
+      Json.Record m
+  | Minus_infinity ->
+      let m = Mstr.add "cons" (Json.String "Minus_infinity") Stdlib.Mstr.empty in
+      Json.Record m
+  | Plus_zero ->
+      let m = Mstr.add "cons" (Json.String "Plus_zero") Stdlib.Mstr.empty in
+      Json.Record m
+  | Minus_zero ->
+      let m = Mstr.add "cons" (Json.String "Minus_zero") Stdlib.Mstr.empty in
+      Json.Record m
+  | Not_a_number ->
+      let m = Mstr.add "cons" (Json.String "Not_a_number") Stdlib.Mstr.empty in
+      Json.Record m
+  | Float_value (b, eb, sb) ->
+      let m = Mstr.add "cons" (Json.String "Float_value") Stdlib.Mstr.empty in
+      let m = Mstr.add "sign" (Json.String b) m in
+      let m = Mstr.add "exponent" (Json.String eb) m in
+      let m = Mstr.add "significand" (Json.String sb) m in
+      Json.Record m
+
 let rec convert_model_value value : Json.json =
   match value with
   | Integer s ->
       let m = Mstr.add "type" (Json.String "Integer") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json.String s) m in
       Json.Record m
-  | Decimal (int_part, fract_part) ->
+  | Float f ->
       let m = Mstr.add "type" (Json.String "Float") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (convert_float_value f) m in
+      Json.Record m
+  | Decimal (int_part, fract_part) ->
+      let m = Mstr.add "type" (Json.String "Decimal") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json.String (int_part^"."^fract_part)) m in
       Json.Record m
   | Unparsed s ->

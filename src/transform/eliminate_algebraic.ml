@@ -74,7 +74,9 @@ type state = {
   keep_t : bool;                (* keep algebraic type definitions *)
   keep_e : bool;                (* keep monomorphic enumeration types *)
   keep_r : bool;                (* keep non-recursive records *)
-  no_ind : bool;                (* do not generate indexing funcitons *)
+  no_ind : bool;                (* do not generate indexing functions *)
+  no_inv : bool;                (* do not generate inversion axioms *)
+  no_sel : bool;                (* do not generate selector *)
 }
 
 let empty_state = {
@@ -87,6 +89,8 @@ let empty_state = {
   keep_e = false;
   keep_r = false;
   no_ind = false;
+  no_inv = false;
+  no_sel = false;
 }
 
 let uncompiled = "eliminate_algebraic: compile_match required"
@@ -185,6 +189,7 @@ and rewriteF kn state av sign f = match f.t_node with
         (rewriteF kn state Svs.empty) sign f
 
 let add_selector (state,task) ts ty csl =
+  if state.no_sel then state, task else
   (* declare the selector function *)
   let mt_id = id_derive ("match_" ^ ts.ts_name.id_string) ts.ts_name in
   let mt_ty = ty_var (create_tvsymbol (id_fresh "a")) in
@@ -299,7 +304,7 @@ let add_projections (state,task) _ts _ty csl =
   { state with pj_map = pjmap }, task
 
 let add_inversion (state,task) ts ty csl =
-  if state.keep_t then state, task else
+  if state.keep_t || state.no_inv then state, task else
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
@@ -430,10 +435,12 @@ let eliminate_match =
 
 let meta_elim = register_meta "eliminate_algebraic" [MTstring]
   ~desc:"@[<hov 2>Configure the 'eliminate_algebraic' transformation:@\n\
-    - keep_types: @[keep algebraic type definitions@]@\n\
-    - keep_enums: @[keep monomorphic enumeration types@]@\n\
-    - keep_recs:  @[keep non-recursive records@]@\n\
-    - no_index:   @[do not generate indexing functions@]@]"
+    - keep_types:   @[keep algebraic type definitions@]@\n\
+    - keep_enums:   @[keep monomorphic enumeration types@]@\n\
+    - keep_recs:    @[keep non-recursive records@]@\n\
+    - no_index:     @[do not generate indexing functions@]@\n\
+    - no_inversion: @[do not generate inversion axioms@]@\n\
+    - no_selector:  @[do not generate selector@]@]"
 
 let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
@@ -443,6 +450,8 @@ let eliminate_algebraic = Trans.compose compile_match
       | [MAstr "keep_enums"] -> { st with keep_e = true }
       | [MAstr "keep_recs"]  -> { st with keep_r = true }
       | [MAstr "no_index"]   -> { st with no_ind = true }
+      | [MAstr "no_inversion"] -> { st with no_inv = true }
+      | [MAstr "no_selector"]  -> { st with no_sel = true }
       | _ -> raise (Invalid_argument "meta eliminate_algebraic")
     in
     let st = List.fold_left check st ml in
