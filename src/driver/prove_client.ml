@@ -104,8 +104,10 @@ let connect_internal () =
   Buffer.clear recv_buf;
   let cwd = Unix.getcwd () in
   Unix.chdir (Filename.get_temp_dir_name ());
-  let socket_name = Filename.concat (Unix.getcwd ())
-    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
+  let socket_name = (* Filename.concat (Unix.getcwd ())
+    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") *)
+    Filename.temp_file "why3server" "sock"
+  in
   let exec = Filename.concat Config.libdir "why3server" in
   let pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
