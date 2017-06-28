@@ -278,6 +278,10 @@ let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
   Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
 
 let print_model_file fmt me_name_trans filename model_file =
+  (* Relativize does not work on nighly bench: using path_of_file instead. It
+     hides the local paths.  *)
+  let path = Sysutil.path_of_file filename in
+  let filename = List.hd (List.rev path) in
   fprintf fmt "File %s:" filename;
   IntMap.iter
     (fun line m_elements ->
@@ -296,7 +300,9 @@ let print_model
     ?(me_name_trans = why_name_trans)
     fmt
     model =
-  StringMap.iter (print_model_file fmt me_name_trans) model.model_files
+  (* Simple and easy way to print file sorted alphabetically *)
+  let l = StringMap.bindings model.model_files in
+  List.iter (fun (k, e) -> print_model_file fmt me_name_trans k e) l
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
