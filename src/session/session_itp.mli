@@ -70,8 +70,14 @@ type proof_attempt_node = private {
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
+val goal_iter_proof_attempt:
+    session -> (proof_attempt_node -> unit) -> proofNodeID -> unit
+
 val theory_iter_proof_attempt:
     session -> (proof_attempt_node -> unit) -> theory -> unit
+
+val file_iter_proof_attempt:
+    session -> (proof_attempt_node -> unit) -> file -> unit
 
 val session_iter_proof_attempt:
     (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit

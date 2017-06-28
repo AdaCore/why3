@@ -302,9 +302,47 @@ let ask_yn_nonblock ~callback =
       end
 
 
+let get_used_provers_goal session g =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.goal_iter_proof_attempt session
+    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    g;
+  !sprover
+
+let get_used_provers_theory session th =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.theory_iter_proof_attempt session
+    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    th;
+  !sprover
+
+let get_used_provers_file session f =
+  let sprover = ref Whyconf.Sprover.empty in
+  Session_itp.file_iter_proof_attempt session
+    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    f;
+  !sprover
+
 let get_used_provers session =
   let sprover = ref Whyconf.Sprover.empty in
   Session_itp.session_iter_proof_attempt
     (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
      session;
   !sprover
+
+
+let rec transf_depth s tr =
+  List.fold_left
+    (fun depth g -> max depth (goal_depth s g)) 0 (Session_itp.get_sub_tasks s tr)
+and goal_depth s g =
+  List.fold_left
+    (fun depth tr -> max depth (1 + transf_depth s tr))
+    1 (Session_itp.get_transformations s g)
+
+let theory_depth s t =
+  List.fold_left
+    (fun depth g -> max depth (goal_depth s g)) 0 (Session_itp.theory_goals t)
+
+let file_depth s f =
+  List.fold_left (fun depth t -> max depth (theory_depth s t)) 0
+    (Session_itp.file_theories f)

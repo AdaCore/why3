@@ -90,19 +90,6 @@ let run_file (context : context) print_session fname =
 module Table =
 struct
 
-
-  let rec transf_depth s tr =
-    List.fold_left
-      (fun depth g -> max depth (goal_depth s g)) 0 (get_sub_tasks s tr)
-  and goal_depth s g =
-    List.fold_left
-      (fun depth tr -> max depth (1 + transf_depth s tr))
-      1 (get_transformations s g)
-
-  let theory_depth s t =
-    List.fold_left
-      (fun depth g -> max depth (goal_depth s g)) 0 (theory_goals t)
-
   let provers_stats s provers theory =
     theory_iter_proof_attempt s (fun a ->
       Hprover.replace provers a.prover a.prover) theory
@@ -200,10 +187,9 @@ let rec num_lines s acc tr =
   let print_theory s fn fmt th =
     let depth = theory_depth s th in
     if depth > 0 then
-    let provers = Hprover.create 9 in
-    provers_stats s provers th;
+    let provers = get_used_provers_theory s th in
     let provers =
-      Hprover.fold (fun _ pr acc -> pr :: acc) provers []
+      Whyconf.Sprover.fold (fun pr acc -> pr :: acc) provers []
     in
     let provers = List.sort Whyconf.Prover.compare provers in
     let name =

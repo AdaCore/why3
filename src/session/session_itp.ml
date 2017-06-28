@@ -360,18 +360,35 @@ let rec fold_all_sub_goals_of_proofn s f acc pnid =
   in
   f acc pn
 
+let goal_iter_proof_attempt s f g =
+  fold_all_sub_goals_of_proofn
+    s
+    (fun _ pn -> Hprover.iter
+                 (fun _ pan ->
+                  let pan = get_proof_attempt_node s pan in
+                  f pan)
+                 pn.proofn_attempts) () g
+
 let fold_all_sub_goals_of_theory s f acc th =
   List.fold_left (fold_all_sub_goals_of_proofn s f) acc th.theory_goals
 
+(*
 let theory_iter_proofn s f th =
   fold_all_sub_goals_of_theory s (fun _ -> f) () th
+*)
 
 let theory_iter_proof_attempt s f th =
-  theory_iter_proofn s
-    (fun pn -> Hprover.iter (fun _ pan ->
+  fold_all_sub_goals_of_theory s
+    (fun _ pn -> Hprover.iter (fun _ pan ->
                              let pan = get_proof_attempt_node s pan in
                              f pan)
-         pn.proofn_attempts) th
+         pn.proofn_attempts) () th
+
+let file_iter_proof_attempt s f file =
+  List.iter
+    (theory_iter_proof_attempt s f)
+    (file_theories file)
+
 
 
 
