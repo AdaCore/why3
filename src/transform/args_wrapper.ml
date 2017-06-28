@@ -210,9 +210,9 @@ let build_name_tables task : names_table =
 (************* wrapper  *************)
 
 type symbol =
-  | Ttysymbol of Ty.tysymbol
-  | Tprsymbol of Decl.prsymbol
-  | Tlsymbol of Term.lsymbol
+  | Tstysymbol of Ty.tysymbol
+  | Tsprsymbol of Decl.prsymbol
+  | Tslsymbol of Term.lsymbol
 
 type (_, _) trans_typ =
   | Ttrans      : ((task trans), task) trans_typ
@@ -221,6 +221,10 @@ type (_, _) trans_typ =
   | Tenvtrans_l : (Env.env -> (task tlist), task list) trans_typ
   | Tint        : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
   | Tty         : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
+  | Ttysymbol   : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
+  | Tprsymbol   : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tprlist     : ('a, 'b) trans_typ -> ((Decl.prsymbol list -> 'a), 'b) trans_typ
+  | Tlsymbol    : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tsymbol     : ('a, 'b) trans_typ -> ((symbol -> 'a), 'b) trans_typ
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
@@ -240,11 +244,11 @@ let find_ls s tables =
   Mstr.find s tables.namespace.ns_ls
 
 let find_symbol s tables =
-  try Tprsymbol (find_pr s tables) with
+  try Tsprsymbol (find_pr s tables) with
         | Not_found ->
-          try Tlsymbol (find_ls s tables) with
+          try Tslsymbol (find_ls s tables) with
           | Not_found ->
-            try Ttysymbol (find_ts s tables) with
+            try Tstysymbol (find_ts s tables) with
             | Not_found -> raise (Arg_hyp_not_found s)
 
 
@@ -292,6 +296,10 @@ let trans_typ_tail: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
     match t with
     | Tint t      -> t
     | Tty t       -> t
+    | Ttysymbol t -> t
+    | Tprsymbol t -> t
+    | Tprlist t   -> t
+    | Tlsymbol t  -> t
     | Tsymbol t   -> t
     | Tlist t     -> t
     | Tterm t     -> t
@@ -310,6 +318,10 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Ttrans_l       -> Yes
     | Tint t         -> is_trans_typ_l t
     | Tty t          -> is_trans_typ_l t
+    | Ttysymbol t    -> is_trans_typ_l t
+    | Tprsymbol t    -> is_trans_typ_l t
+    | Tprlist t      -> is_trans_typ_l t
+    | Tlsymbol t     -> is_trans_typ_l t
     | Tsymbol t      -> is_trans_typ_l t
     | Tlist t        -> is_trans_typ_l t
     | Tterm t        -> is_trans_typ_l t
@@ -328,6 +340,10 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tenvtrans_l    -> "env transl"
     | Tint _         -> "integer"
     | Tty _          -> "type"
+    | Ttysymbol _    -> "type symbol"
+    | Tprsymbol _    -> "prop symbol"
+    | Tprlist _      -> "list of prop symbol"
+    | Tlsymbol _     -> "logic symbol"
     | Tsymbol _      -> "symbol"
     | Tlist _        -> "list of prop symbol"
     | Tterm _        -> "term"
@@ -346,6 +362,10 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Tenvtrans_l    -> "()"
     | Tint t         -> "integer -> " ^ print_type t
     | Tty t          -> "type -> " ^ print_type t
+    | Ttysymbol t    -> "type_symbol -> " ^ print_type t
+    | Tprsymbol t    -> "prop_symbol -> " ^ print_type t
+    | Tprlist t      -> "prop_symbol list -> " ^ print_type t
+    | Tlsymbol t     -> "logic_symbol -> " ^ print_type t
     | Tsymbol t      -> "symbol -> " ^ print_type t
     | Tlist t        -> "prop_symbol list -> " ^ print_type t
     | Tterm t        -> "term -> " ^ print_type t
@@ -373,6 +393,25 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Tty t', _s :: tail ->
       let ty = Ty.ty_int in (* TODO: parsing + typing of s *)
       wrap_to_store t' (f ty) tail env tables task
+    | Ttysymbol t', _s :: tail ->
+      let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
+      wrap_to_store t' (f tys) tail env tables task
+    | Tprsymbol t', s :: tail ->
+      let pr = try (find_pr s tables) with
+               | Not_found -> raise (Arg_hyp_not_found s) in
+      wrap_to_store t' (f pr) tail env tables task
+    | Tprlist t', s :: tail ->
+        let pr_list = parse_list_ident s in
+        let pr_list =
+        List.map (fun id ->
+                    try find_pr id.Ptree.id_str tables with
+                    | Not_found -> raise (Arg_hyp_not_found s))
+                 pr_list in
+        wrap_to_store t' (f pr_list) tail env tables task
+    | Tlsymbol t', s :: tail ->
+      let pr = try (find_ls s tables) with
+               | Not_found -> raise (Arg_hyp_not_found s) in
+      wrap_to_store t' (f pr) tail env tables task
     | Tsymbol t', s :: tail ->
       let symbol = find_symbol s tables in
       wrap_to_store t' (f symbol) tail env tables task
@@ -390,6 +429,10 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       begin match t' with
         | Tint t' ->
           let arg = Some (parse_int s') in
+          wrap_to_store t' (f arg) tail env tables task
+        | Tprsymbol t' ->
+          let arg = try Some (find_pr s' tables) with
+                    | Not_found -> raise (Arg_hyp_not_found s') in
           wrap_to_store t' (f arg) tail env tables task
         | Tsymbol t' ->
           let arg = Some (find_symbol s' tables) in

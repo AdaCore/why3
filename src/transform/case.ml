@@ -111,7 +111,7 @@ let remove_list name_list =
           (k != Pgoal &&
             List.exists
              (fun x -> match x with
-                       | Tprsymbol x -> Ident.id_equal pr.pr_name x.pr_name
+                       | Tsprsymbol x -> Ident.id_equal pr.pr_name x.pr_name
                        | _ -> false
              )
              name_list) ->
@@ -119,7 +119,7 @@ let remove_list name_list =
       | Dparam ls when
           (List.exists
              (fun x -> match x with
-                       | Tlsymbol x -> Ident.id_equal ls.ls_name x.ls_name
+                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
                        | _ -> false
              )
              name_list) ->
@@ -129,7 +129,7 @@ let remove_list name_list =
           List.exists
           (fun (ls, _) -> List.exists
              (fun x -> match x with
-                       | Tlsymbol x -> Ident.id_equal ls.ls_name x.ls_name
+                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
                        | _ -> false
              )
              name_list)
@@ -140,7 +140,7 @@ let remove_list name_list =
           List.exists
           (fun (ls, _) -> List.exists
              (fun x -> match x with
-                       | Tlsymbol x -> Ident.id_equal ls.ls_name x.ls_name
+                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
                        | _ -> false
              )
              name_list)
@@ -149,7 +149,7 @@ let remove_list name_list =
       | Dtype ty when
           (List.exists
              (fun x -> match x with
-                       | Ttysymbol x -> Ident.id_equal ty.ts_name x.ts_name
+                       | Tstysymbol x -> Ident.id_equal ty.ts_name x.ts_name
                        | _ -> false
              )
              name_list) ->
@@ -159,7 +159,7 @@ let remove_list name_list =
           List.exists
           (fun (ty, _) -> List.exists
              (fun x -> match x with
-                       | Ttysymbol x -> Ident.id_equal ty.ts_name x.ts_name
+                       | Tstysymbol x -> Ident.id_equal ty.ts_name x.ts_name
                        | _ -> false
              )
              name_list)
@@ -704,31 +704,13 @@ let subst to_subst =
   in
   Trans.bind found_eq subst
 
-exception Invalid_trans_arg of symbol
-
-let t_lsymbol x =
-  match x with
-  | Tlsymbol x -> x
-  | _ -> raise (Invalid_trans_arg x)
-
-let t_tsymbol x =
-  match x with
-  | Ttysymbol x -> x
-  | _ -> raise (Invalid_trans_arg x)
-
-let t_prsymbol x =
-  match x with
-  | Tprsymbol x -> x
-  | _ -> raise (Invalid_trans_arg x)
-
 let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
-    (Tsymbol Ttrans) (fun x -> subst (t_lsymbol x))
+    (Tlsymbol Ttrans) subst
 
 let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
     "clear_but"
-    (Tlist Ttrans) (fun l -> clear_but (List.map t_prsymbol l))
-
+    (Tprlist Ttrans) clear_but
 
 let () = wrap_and_register ~desc:"left transform a goal of the form A \\/ B into A"
     "left"
@@ -740,7 +722,7 @@ let () = wrap_and_register ~desc:"right transform a goal of the form A \\/ B int
 
 let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
     "unfold"
-    (Tsymbol (Tsymbol Ttrans)) (fun ls pr -> unfold (t_lsymbol ls) (t_prsymbol pr))
+    (Tlsymbol (Tprsymbol Ttrans)) unfold
 
 let () = wrap_and_register ~desc:"intros n"
     "intros"
@@ -777,11 +759,11 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"instantiate <prop> <term> generates a new hypothesis with first quantified variables of prop replaced with term "
     "instantiate"
-    (Tsymbol (Tterm Ttrans)) (fun x -> instantiate (t_prsymbol x))
+    (Tprsymbol (Tterm Ttrans)) instantiate
 
 let () = wrap_and_register
     ~desc:"apply <prop> applies prop to the goal" "apply"
-    (Tsymbol Ttrans_l) (fun x -> apply (t_prsymbol x))
+    (Tprsymbol Ttrans_l) apply
 
 (* let () = wrap_and_register *)
 (*     ~desc:"duplicate <int> duplicates the goal int times" "duplicate" *)
@@ -793,8 +775,8 @@ let () = wrap_and_register
 
 let _ = wrap_and_register
     ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" "rewrite"
-    (Toptbool ("<-",(Tsymbol (Topt ("in", Tsymbol Ttrans_l)))))
-    (fun b p opt -> rewrite b (t_prsymbol p) (Opt.map t_prsymbol opt))
+    (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite
+
   (* register_transform_with_args_l *)
   (*   ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" *)
   (*   "rewrite" *)
@@ -803,7 +785,7 @@ let _ = wrap_and_register
 let () = wrap_and_register
     ~desc:"replace <term1> <term2> <name> replaces occcurences of term1 by term2 in prop name"
     "replace"
-    (Tterm (Tterm (Tsymbol Ttrans_l))) (fun t1 t2 p -> replace t1 t2 (t_prsymbol p))
+    (Tterm (Tterm (Tprsymbol Ttrans_l))) replace
 
 let () = wrap_and_register
     ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
@@ -811,7 +793,7 @@ let () = wrap_and_register
     (Tterm (Tterm Tenvtrans_l)) induction
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor of hypothesis name"
-    "destruct" (Tsymbol Ttrans_l) (fun x -> destruct (t_prsymbol x))
+    "destruct" (Tprsymbol Ttrans_l) destruct
 
 let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type"
     "destruct_alg" (Tterm Ttrans_l) destruct_alg

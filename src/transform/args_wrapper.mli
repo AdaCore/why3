@@ -14,9 +14,9 @@ exception Arg_hyp_not_found of string
 val build_name_tables : Task.task -> Task.names_table
 
 type symbol =
-  | Ttysymbol of Ty.tysymbol
-  | Tprsymbol of Decl.prsymbol
-  | Tlsymbol of Term.lsymbol
+  | Tstysymbol of Ty.tysymbol
+  | Tsprsymbol of Decl.prsymbol
+  | Tslsymbol of Term.lsymbol
 
 type (_, _) trans_typ =
   | Ttrans      : ((task Trans.trans), task) trans_typ
@@ -25,6 +25,10 @@ type (_, _) trans_typ =
   | Tenvtrans_l : (Env.env -> (task Trans.tlist), task list) trans_typ
   | Tint        : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
   | Tty         : ('a, 'b) trans_typ -> ((Ty.ty -> 'a), 'b) trans_typ
+  | Ttysymbol   : ('a, 'b) trans_typ -> ((Ty.tysymbol -> 'a), 'b) trans_typ
+  | Tprsymbol   : ('a, 'b) trans_typ -> ((Decl.prsymbol -> 'a), 'b) trans_typ
+  | Tprlist     : ('a, 'b) trans_typ -> ((Decl.prsymbol list -> 'a), 'b) trans_typ
+  | Tlsymbol    : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tsymbol     : ('a, 'b) trans_typ -> ((symbol -> 'a), 'b) trans_typ
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
