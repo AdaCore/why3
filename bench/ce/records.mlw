@@ -1,0 +1,59 @@
+module M
+
+  use import ref.Ref
+  use import list.List
+  use import int.Int
+
+  (*****************************************
+   ** Getting counterexamples for records **
+   *****************************************)
+
+  (*** In all cases, records are decomposed using match eval ***)
+
+  type r = {f "model_trace:.field_f" :int; g:bool}
+
+  (* Projection functions *)
+  function projf_r_f "model_trace:.f" (x : r) : int
+  =
+  x.f
+  function projf_r_g "model_trace:.g" (x : r) : bool
+  =
+  x.g
+  meta "inline : no" function projf_r_f
+  meta "model_projection" function projf_r_f
+  meta "inline : no" function projf_r_g
+  meta "model_projection" function projf_r_g
+
+  let record_match_eval_test1 (x "model" "model_trace:x" : r) : int
+  ensures { "model_vc_post" result = 1 }
+  =
+  if x.g then
+    x.f
+  else
+    1
+
+  let record_match_eval_test2 (x "model_projected" : r ) : int
+  ensures { result = 1 }
+  =
+  x.f
+
+  let record_match_eval_test3 (x "model" "model_trace:x" : ref r) : unit
+  ensures { !x.g }
+  =
+  x := { !x with f = 6}
+
+  let record_match_eval_test4 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc_post" result.g }
+  =
+  x := { !x with f = 6 };
+  !x
+
+  val re "model_projected" : ref r
+
+  let test_record_match_eval_test5 (x "model" "model_trace:x" : ref r) : r
+  ensures { "model_vc_post" result = !re }
+  =
+  x := { !x with f = 6 };
+  !x
+
+end
