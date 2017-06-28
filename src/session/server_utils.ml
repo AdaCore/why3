@@ -146,11 +146,6 @@ let print_id s tables =
   in
   Pp.string_of (Why3printer.print_decl tables) d
 
-let print_id _cont task args =
-  match args with
-  | [s] -> print_id s task
-  | _ -> raise Number_of_arguments
-
 let search s tables =
   (*let tables = Args_wrapper.build_name_tables task in*)
   let id_decl = tables.Task.id_decl in
@@ -160,7 +155,13 @@ let search s tables =
     try Ident.Mid.find id id_decl with
     | Not_found -> raise Not_found (* Should not happen *)
   in
-  Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l
+  let s_id = print_id s tables in
+  s_id ^ (Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l)
+
+let print_id _cont task args =
+  match args with
+  | [s] -> print_id s task
+  | _ -> raise Number_of_arguments
 
 let search_id _cont task args =
   match args with
