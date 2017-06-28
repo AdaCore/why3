@@ -888,48 +888,57 @@ let string_attribute field r =
       field r.Xml.name;
     assert false
 
+let default_unknown_result =
+     {
+       Call_provers.pr_answer = Call_provers.Failure "";
+       Call_provers.pr_time = 0.0;
+       Call_provers.pr_output = "";
+       Call_provers.pr_status = Unix.WEXITED 0;
+       Call_provers.pr_steps = -1;
+       Call_provers.pr_model = Model_parser.default_model;
+     }
+
 let load_result r =
   match r.Xml.name with
   | "result" ->
-    let status = string_attribute "status" r in
-    let answer =
-      match status with
-      | "valid" -> Call_provers.Valid
-      | "invalid" -> Call_provers.Invalid
-      | "unknown" -> Call_provers.Unknown ("", None)
-      | "timeout" -> Call_provers.Timeout
-      | "outofmemory" -> Call_provers.OutOfMemory
-      | "failure" -> Call_provers.Failure ""
-      | "highfailure" -> Call_provers.HighFailure
-      | "steplimitexceeded" -> Call_provers.StepLimitExceeded
-      | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
-      | s ->
-        Warning.emit
-          "[Warning] Session.load_result: unexpected status '%s'@." s;
-        Call_provers.HighFailure
-    in
-    let time =
-      try float_of_string (List.assoc "time" r.Xml.attributes)
-      with Not_found -> 0.0
-    in
-    let steps =
-      try int_of_string (List.assoc "steps" r.Xml.attributes)
-      with Not_found -> -1
-    in
-    Some {
-      Call_provers.pr_answer = answer;
-      Call_provers.pr_time = time;
-      Call_provers.pr_output = "";
-      Call_provers.pr_status = Unix.WEXITED 0;
-      Call_provers.pr_steps = steps;
-      Call_provers.pr_model = Model_parser.default_model;
-    }
-  | "undone" -> None
-  | "unedited" -> None
+     let status = string_attribute "status" r in
+     let answer =
+       match status with
+       | "valid" -> Call_provers.Valid
+       | "invalid" -> Call_provers.Invalid
+       | "unknown" -> Call_provers.Unknown ("", None)
+       | "timeout" -> Call_provers.Timeout
+       | "outofmemory" -> Call_provers.OutOfMemory
+       | "failure" -> Call_provers.Failure ""
+       | "highfailure" -> Call_provers.HighFailure
+       | "steplimitexceeded" -> Call_provers.StepLimitExceeded
+       | "stepslimitexceeded" -> Call_provers.StepLimitExceeded
+       | s ->
+          Warning.emit
+            "[Warning] Session.load_result: unexpected status '%s'@." s;
+          Call_provers.HighFailure
+     in
+     let time =
+       try float_of_string (List.assoc "time" r.Xml.attributes)
+       with Not_found -> 0.0
+     in
+     let steps =
+       try int_of_string (List.assoc "steps" r.Xml.attributes)
+       with Not_found -> -1
+     in
+     {
+       Call_provers.pr_answer = answer;
+       Call_provers.pr_time = time;
+       Call_provers.pr_output = "";
+       Call_provers.pr_status = Unix.WEXITED 0;
+       Call_provers.pr_steps = steps;
+       Call_provers.pr_model = Model_parser.default_model;
+     }
+  | "undone" | "unedited" -> default_unknown_result
   | s ->
     Warning.emit "[Warning] Session.load_result: unexpected element '%s'@."
       s;
-    None
+    default_unknown_result
 
 let load_option attr g =
   try Some (List.assoc attr g.Xml.attributes)
@@ -993,7 +1002,7 @@ and load_proof_or_transf session old_provers pid a =
           let (p,timelimit,steplimit,memlimit) = Mint.find prover old_provers in
           let res = match a.Xml.elements with
             | [r] -> load_result r
-            | [] -> None
+            | [] -> default_unknown_result
             | _ ->
               Warning.emit "[Error] Too many result elements@.";
               raise (LoadError (a,"too many result elements"))
@@ -1008,7 +1017,7 @@ and load_proof_or_transf session old_provers pid a =
                         Call_provers.limit_mem   = memlimit;
                         Call_provers.limit_steps = steplimit; }
           in
-          ignore(add_proof_attempt session p limit res obsolete edit pid)
+          ignore(add_proof_attempt session p limit (Some res) obsolete edit pid)
         with Failure _ | Not_found ->
           Warning.emit "[Error] prover id not listed in header '%s'@." prover;
           raise (LoadError (a,"prover not listing in header"))
