@@ -75,12 +75,11 @@ static int cpipe[2];
 void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
-  int i;
   if (server_sock != -1) {
     close(server_sock);
   }
   if (clients != NULL) {
-     for (i = 0; i < list_length(clients); i++) {
+     for (int i = 0; i < list_length(clients); i++) {
        close(((pclient) clients->data[i])->fd);
      }
   }
@@ -102,8 +101,7 @@ void add_to_poll_list(int sock, short events) {
 }
 
 struct pollfd* poll_list_lookup(int fd) {
-  int i;
-  for (i = 0; i < poll_num; i++) {
+  for (int i = 0; i < poll_num; i++) {
     if (poll_list[i].fd == fd) {
       return poll_list+i;
     }
@@ -257,7 +255,6 @@ pid_t create_process(char* cmd,
                      int timelimit,
                      int memlimit) {
   struct rlimit res;
-  int i;
   char** unix_argv;
   int count = argc;
   // in the case of usestdin, the last argument is in fact not passed to
@@ -268,7 +265,7 @@ pid_t create_process(char* cmd,
   unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
   unix_argv[0] = cmd;
   unix_argv[count + 1] = NULL;
-  for (i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     unix_argv[i + 1] = argv[i];
   }
 
@@ -544,7 +541,6 @@ void schedule_new_jobs() {
 }
 
 int main(int argc, char **argv) {
-  int i;
   char ch;
   int res;
   struct pollfd* cur;
@@ -558,7 +554,7 @@ int main(int argc, char **argv) {
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
-    for (i = 0; i < poll_num; i++) {
+    for (int i = 0; i < poll_num; i++) {
       cur = (struct pollfd*) poll_list + i;
       if (cur->revents == 0) {
         continue;

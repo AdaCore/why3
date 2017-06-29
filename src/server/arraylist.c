@@ -33,8 +33,7 @@ bool list_is_empty(plist l) {
 }
 
 int list_lookup_index(plist l, int key) {
-  int i;
-  for (i = 0; i < l->len; i++) {
+  for (int i = 0; i < l->len; i++) {
     if (l->key[i] == key) {
        return i;
     }
