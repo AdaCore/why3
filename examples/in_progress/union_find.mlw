@@ -3,8 +3,8 @@ module Intf
   use import int.Int
 
   type t = private {
-          size: int;        (* elements are 0,1,...,size-1 *)
-    ghost repr: int -> int;
+                  size: int;        (* elements are 0,1,...,size-1 *)
+    ghost mutable repr: int -> int;
   } invariant {
     0 <= size /\
     forall i. 0 <= i < size -> 0 <= repr i < size
@@ -15,9 +15,23 @@ module Intf
     ensures  { result.size = n }
     ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
 
-  val find (uf: t) (i: int) : int
-    requires { 0 <= i < uf.size }
-    ensures  { result = uf.repr i }
+  val find (uf: t) (x: int) : int
+    requires { 0 <= x < uf.size }
+    ensures  { result = uf.repr x }
+
+  predicate same (repr: int -> int) (x y: int) =
+    repr x = repr y
+
+  val union (uf: t) (x y: int) : unit
+    requires { 0 <= x < uf.size }
+    requires { 0 <= y < uf.size }
+    writes   { uf.repr }
+    ensures  { same uf.repr x y }
+    ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
+               same uf.repr i j <->
+                 same (old uf.repr) i j \/
+                 same (old uf.repr) i x /\ same (old uf.repr) y j \/
+                 same (old uf.repr) i y /\ same (old uf.repr) x j }
 
 end
 
@@ -64,30 +78,34 @@ module Impl
   type t = {
                   size: int;        (* elements are 0,1,...,size-1 *)
                   link: array int;
+                  rank: array int;
     ghost mutable repr: int -> int;
     ghost mutable dist: int -> int;
   } invariant {
-    0 <= size = length link /\
+    0 <= size = length link = length rank /\
     (forall i. 0 <= i < size -> 0 <= repr i < size) /\
     (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
   } by {
-    size = 0; link = Array.make 0 0; repr = (fun i -> i); dist = (fun i -> 0)
+    size = 0; link = Array.make 0 0; rank = Array.make 0 0;
+    repr = (fun i -> i); dist = (fun i -> 0)
   }
 
   let create (n: int) : t
     requires { 0 <= n }
     ensures  { result.size = n }
     ensures  { forall i. 0 <= i < result.size -> result.repr i = i }
-  = let l = Array.make n 0 in
+  = let link = Array.make n 0 in
     for i = 0 to n - 1 do
-      invariant { forall j. 0 <= j < i -> l[j] = j }
-      l[i] <- i
+      invariant { forall j. 0 <= j < i -> link[j] = j }
+      link[i] <- i
     done;
-    { size = n; link = l; repr = (fun i -> i); dist = (fun i -> 0) }
+    let rank = Array.make n 0 in
+    { size = n; link = link; rank = rank;
+      repr = (fun i -> i); dist = (fun i -> 0) }
 
   let rec find (uf: t) (x: int) : int
     requires { 0 <= x < uf.size }
-    (* writes   { uf.link, uf.dist } *)
+    writes   { uf.link, uf.dist }
     variant  { uf.dist x }
     ensures  { result = uf.repr x }
     ensures  { path uf.size uf.link x (uf.dist x) result }
@@ -95,10 +113,12 @@ module Impl
     if y <> x then begin
       assert { path uf.size uf.link y (uf.dist x - 1) (uf.repr x) };
       let r = find uf y in
-      (* TODO: path compression
+      (* path compression *)
+      assert { x <> r };
       uf.link[x] <- r;
-      uf.dist <- pure { Map.set uf.dist x 1 };
-      *)
+      uf.dist <- pure { fun i -> if i = x then 1
+         else if exists d. path uf.size uf.link i d x then uf.dist i + 1
+         else uf.dist i };
       r
     end else
       x
@@ -106,27 +126,43 @@ module Impl
   predicate same (repr: int -> int) (x y: int) =
     repr x = repr y
 
-  let union (uf: t) (a b: int) : unit
-    requires { 0 <= a < uf.size }
-    requires { 0 <= b < uf.size }
-    ensures  { same uf.repr a b }
-    ensures  { forall x y:int. 0 <= x < uf.size -> 0 <= y < uf.size ->
-               same uf.repr x y <->
-                 same (old uf.repr) x y \/
-                 same (old uf.repr) x a /\ same (old uf.repr) b y \/
-                 same (old uf.repr) x b /\ same (old uf.repr) a y }
-  = let ra = find uf a in
-    let rb = find uf b in
-    if ra <> rb then begin
-      uf.link[ra] <- rb;
+  let union (uf: t) (x y: int) : unit
+    requires { 0 <= x < uf.size }
+    requires { 0 <= y < uf.size }
+    writes   { uf.link, uf.rank, uf.repr, uf.dist }
+    ensures  { same uf.repr x y }
+    ensures  { forall i j. 0 <= i < uf.size -> 0 <= j < uf.size ->
+               same uf.repr i j <->
+                 same (old uf.repr) i j \/
+                 same (old uf.repr) i x /\ same (old uf.repr) y j \/
+                 same (old uf.repr) i y /\ same (old uf.repr) x j }
+  = let rx = find uf x in
+    let ry = find uf y in
+    if rx <> ry then
       let oldr = uf.repr in
       let oldd = uf.dist in
-      uf.repr <- (fun i -> if oldr i = ra then rb else oldr i);
-      uf.dist <-
-        pure { fun i -> if oldr i = ra then oldd i + 1 else oldd i };
-      assert { forall i. 0 <= i < uf.size ->
-               if oldr i = ra then path uf.size uf.link i (oldd i + 1) rb
-                              else path uf.size uf.link i (oldd i)     (oldr i)}
-    end
+      if uf.rank[rx] <= uf.rank[ry] then begin
+        uf.link[rx] <- ry;
+        uf.repr <- (fun i -> if oldr i = rx then ry else oldr i);
+        uf.dist <-
+          pure { fun i -> if oldr i = rx then oldd i + 1 else oldd i };
+        assert { forall i. 0 <= i < uf.size ->
+             if oldr i = rx then path uf.size uf.link i (oldd i + 1) ry
+                            else path uf.size uf.link i (oldd i)     (oldr i)};
+        if uf.rank[rx] = uf.rank[ry] then
+          uf.rank[ry] <- uf.rank[ry] + 1
+      end else begin
+        uf.link[ry] <- rx;
+        uf.repr <- (fun i -> if oldr i = ry then rx else oldr i);
+        uf.dist <-
+          pure { fun i -> if oldr i = ry then oldd i + 1 else oldd i };
+
+      end
+
+  clone Intf with
+    type t = t,
+    val  create = create,
+    val  find = find,
+    val  union = union
 
 end
