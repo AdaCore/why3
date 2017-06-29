@@ -38,6 +38,8 @@ type (_, _) trans_typ =
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
   | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
+exception Unnecessary_arguments of string list
+
 (** wrap arguments of transformations, turning string arguments into
     arguments of proper types.  arguments of type term of formula are
     parsed and typed, name resolution using the given name_tables. *)

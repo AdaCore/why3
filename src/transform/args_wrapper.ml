@@ -375,13 +375,19 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
     | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
 
+exception Unnecessary_arguments of string list
+
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> names_table -> task -> b =
   fun t f l env tables task ->
     match t, l with
-    | Ttrans, _-> apply f task
-    | Ttrans_l, _ -> apply f task
-    | Tenvtrans, _ -> apply (f env) task
-    | Tenvtrans_l, _ -> apply (f env) task
+    | Ttrans, []-> apply f task
+    | Ttrans_l, [] -> apply f task
+    | Tenvtrans, [] -> apply (f env) task
+    | Tenvtrans_l, [] -> apply (f env) task
+    | Ttrans, _ -> raise (Unnecessary_arguments l)
+    | Ttrans_l, _ -> raise (Unnecessary_arguments l)
+    | Tenvtrans, _ -> raise (Unnecessary_arguments l)
+    | Tenvtrans_l, _ -> raise (Unnecessary_arguments l)
     | Tint t', s :: tail ->
       let arg = parse_int s in wrap_to_store t' (f arg) tail env tables task
     | Tformula t', s :: tail ->

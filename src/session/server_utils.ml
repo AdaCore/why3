@@ -340,8 +340,11 @@ let interp commands_table config cont id s =
        in s
   with Not_found ->
     try
-      let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
-      Transform (cmd,t,args)
+      if id = None then
+        QError ("Please select a valid node id")
+      else
+        let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
+        Transform (cmd,t,args)
     with Trans.UnknownTrans _ ->
       interp_others commands_table config cmd args
 

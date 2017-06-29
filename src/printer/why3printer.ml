@@ -101,10 +101,10 @@ let print_vsty tables fmt v =
 (** Forgetting function for stability of errors *)
 let print_forget_vsty tables fmt v =
   if (Ident.known_id tables.printer v.vs_name) then
-    fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
+    fprintf fmt "%a: %a" (print_vs tables) v (print_ty tables) v.vs_ty
   else
     begin
-      fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty;
+      fprintf fmt "%a: %a" (print_vs tables) v (print_ty tables) v.vs_ty;
       forget_var tables v
     end
 

@@ -200,7 +200,7 @@ let bypass_pretty s id =
       fprintf fmt "Ill-formed definition: symbols %a and %a are different"
         (print_ls s id) ls1 (print_ls s id) ls2
   | Decl.UnboundVar vs ->
-      fprintf fmt "Unbound variable: %a" (print_vsty s id) vs
+      fprintf fmt "Unbound variable:\n%a" (print_vsty s id) vs
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %s is defined twice" id.Ident.id_string
   | Decl.EmptyDecl ->
@@ -237,12 +237,13 @@ let get_exception_message ses id fmt e =
       Format.fprintf fmt "Following hypothesis was not found: %s \n" s
   | Args_wrapper.Arg_theory_not_found (s) ->
       Format.fprintf fmt "Theory not found: %s" s
-  | Loc.Located (loc, s) -> Format.fprintf fmt "Parsing error at %a: %a" Loc.report_position loc Exn_printer.exn_printer s
+  | Loc.Located (loc, s) ->
+      Format.fprintf fmt "Parsing error at %a: %a" Loc.report_position loc Exn_printer.exn_printer s
+  | Args_wrapper.Unnecessary_arguments l ->
+      Format.fprintf fmt "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+        (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l
   | e ->
       bypass_pretty ses id fmt e
-
-
-
 
 
 (* Debugging functions *)
