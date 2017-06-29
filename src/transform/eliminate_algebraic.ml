@@ -304,7 +304,7 @@ let add_projections (state,task) _ts _ty csl =
   { state with pj_map = pjmap }, task
 
 let add_inversion (state,task) ts ty csl =
-  if state.keep_t or state.no_inv then state, task else
+  if state.keep_t || state.no_inv then state, task else
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
