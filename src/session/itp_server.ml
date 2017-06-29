@@ -225,13 +225,13 @@ let get_exception_message ses id fmt e =
   match e with
   | Controller_itp.Noprogress ->
       Format.fprintf fmt "Transformation made no progress\n"
-  | Case.Arg_trans_type (s, ty1, ty2) ->
+  | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
       Format.fprintf fmt "Error in transformation %s during unification of the following terms:\n %a \n %a"
         s (print_type ses id) ty1 (print_type ses id) ty2
-  | Case.Arg_trans_term (s, t1, t2) ->
+  | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Format.fprintf fmt "Error in transformation %s during unification of following two terms:\n %a \n %a" s
         (print_term ses id) t1 (print_term ses id) t2
-  | Case.Arg_trans (s) ->
+  | Generic_arg_trans_utils.Arg_trans (s) ->
       Format.fprintf fmt "Error in transformation function: %s \n" s
   | Args_wrapper.Arg_hyp_not_found (s) ->
       Format.fprintf fmt "Following hypothesis was not found: %s \n" s
