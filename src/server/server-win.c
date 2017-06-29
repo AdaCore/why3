@@ -103,7 +103,6 @@ void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
   pproc proc;
-  int i;
   if (completion_port != NULL) {
     CloseHandle (completion_port);
   }
@@ -111,12 +110,12 @@ void shutdown_with_msg(char* msg) {
     CloseHandle (server_socket->handle);
   }
   if (clients != NULL) {
-     for (i = 0; i < list_length(clients); i++) {
+     for (int i = 0; i < list_length(clients); i++) {
        CloseHandle(((pclient) clients->data[i])->handle);
      }
   }
   if (processes != NULL) {
-     for (i = 0; i < list_length(processes); i++) {
+     for (int i = 0; i < list_length(processes); i++) {
        proc = processes->data[i];
        CloseHandle(proc->handle);
        CloseHandle(proc->job);
@@ -292,18 +291,16 @@ void run_request (prequest r) {
 
    /* Now take care of the arguments */
    {
-     int k;
-     for (k = 0; k < argcount; k++)
+     for (int k = 0; k < argcount; k++)
        {
          char *ca = r->args[k]; /* current arg */
-         int ca_index; /* index of the current character in ca */
          int need_quote = 1; /* set to 1 if quotes are needed */
 
          /* Should we quote the string ? */
          if (strlen(ca) > 0)
             need_quote = 0;
 
-         for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+         for (int ca_index = 0; ca_index < strlen(ca); ca_index++)
            {
              if (ca[ca_index] == ' ' || ca[ca_index] == '"')
                {
@@ -322,7 +319,7 @@ void run_request (prequest r) {
              /* Open the double quoted string */
              cmd[cl_index] = '"'; cl_index++;
 
-             for (ca_index = 0; ca_index < strlen(ca); ca_index++)
+             for (int ca_index = 0; ca_index < strlen(ca); ca_index++)
                {
 
                  /* We have a double in the argument. It should be escaped
@@ -333,8 +330,7 @@ void run_request (prequest r) {
                         They should be quoted.  */
                      if (ca_index > 0 && ca[ca_index - 1] == '\\')
                        {
-                         int j;
-                         for (j = ca_index - 1; j >= 0 && ca[j] == '\\' ;j--)
+                         for (int j = ca_index - 1; j >= 0 && ca[j] == '\\' ;j--)
                            {
                              cmd[cl_index] = '\\'; cl_index++;
                            }
@@ -352,8 +348,7 @@ void run_request (prequest r) {
                         They should be quoted.  */
                      if (ca[ca_index] == '\\' && ca_index + 1 == strlen(ca))
                        {
-                         int j;
-                         for (j = ca_index; j >= 0 && ca[j] == '\\' ;j--)
+                         for (int j = ca_index; j >= 0 && ca[j] == '\\' ;j--)
                            {
                              cmd[cl_index] = '\\'; cl_index++;
                            }
