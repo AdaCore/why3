@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<file name="../test_args_parsing.mlw">
+<theory name="Test" sum="8dec774bbde4869623e4ebbfa310d0c8">
+ <goal name="sqr_non_neg">
+ <transf name="assert" arg1="(exists x. x = 6.1)">
+  <goal name="sqr_non_neg.0">
+  <transf name="use_th" arg1="real.Real">
+   <goal name="sqr_non_neg.0.0">
+   <transf name="assert" arg1="(exists x. forall y. x = y + 5.3)">
+    <goal name="sqr_non_neg.0.0.0">
+    </goal>
+    <goal name="sqr_non_neg.0.0.1">
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="sqr_non_neg.1">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

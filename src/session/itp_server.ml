@@ -237,6 +237,7 @@ let get_exception_message ses id fmt e =
       Format.fprintf fmt "Following hypothesis was not found: %s \n" s
   | Args_wrapper.Arg_theory_not_found (s) ->
       Format.fprintf fmt "Theory not found: %s" s
+  | Loc.Located (loc, s) -> Format.fprintf fmt "Parsing error at %a: %a" Loc.report_position loc Exn_printer.exn_printer s
   | e ->
       bypass_pretty ses id fmt e
 
