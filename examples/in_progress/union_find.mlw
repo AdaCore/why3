@@ -7,7 +7,8 @@ module Intf
     ghost mutable repr: int -> int;
   } invariant {
     0 <= size /\
-    forall i. 0 <= i < size -> 0 <= repr i < size
+    (forall i. 0 <= i < size -> 0 <= repr i < size) /\
+    (forall i. 0 <= i < size -> repr (repr i) = repr i)
   } by { size = 0; repr = fun i -> i }
 
   val create (n: int) : t
@@ -113,9 +114,8 @@ module Impl
     if y <> x then begin
       assert { path uf.size uf.link y (uf.dist x - 1) (uf.repr x) };
       let r = find uf y in
-      (* path compression *)
       assert { x <> r };
-      uf.link[x] <- r;
+      uf.link[x] <- r; (* path compression *)
       uf.dist <- pure { fun i -> if i = x then 1
          else if exists d. path uf.size uf.link i d x then uf.dist i + 1
          else uf.dist i };

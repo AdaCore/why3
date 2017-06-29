@@ -156,6 +156,12 @@ theory Occ
     (forall i: int. l <= i < u -> m1[i] = m2[i]) -> occ v m1 l u = occ v m2 l u
     (* by induction on u *)
 
+  lemma occ_exchange :
+    forall m: map int 'a, l u i j: int, x y z: 'a.
+    l <= i < u -> l <= j < u ->
+    occ z m[i <- x][j <- y] l u =
+    occ z m[i <- y][j <- x] l u
+
 end
 
 theory MapPermut

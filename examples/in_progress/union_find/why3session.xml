@@ -114,8 +114,8 @@
  <goal name="VC create" expl="VC for create">
  <proof prover="0"><result status="valid" time="0.01" steps="98"/></proof>
  </goal>
- <goal name="VC find" expl="VC for find">
- <transf name="split_goal_wp">
+ <goal name="VC find" expl="VC for find" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
   <goal name="VC find.1" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
@@ -141,8 +141,8 @@
   <goal name="VC find.6" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="VC find.7" expl="type invariant">
-  <transf name="split_goal_wp">
+  <goal name="VC find.7" expl="type invariant" expanded="true">
+  <transf name="split_goal_wp" expanded="true">
    <goal name="VC find.7.1" expl="VC for find">
    <proof prover="0"><result status="valid" time="0.00" steps="31"/></proof>
    </goal>
