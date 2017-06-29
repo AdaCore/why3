@@ -630,7 +630,7 @@ end
     | Loc.Located (loc, e) ->
       let loc = relativize_location cont.controller_session loc in
       let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Pretty.print_loc loc in
+          Exn_printer.exn_printer e Loc.report_position loc in
       P.notify (Message (Parse_Or_Type_Error (loc, s)));
       false
     | e ->
@@ -643,7 +643,7 @@ end
     | Loc.Located (loc, e) ->
       let loc = relativize_location cont.controller_session loc in
       let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Pretty.print_loc loc in
+          Exn_printer.exn_printer e Loc.report_position loc in
       P.notify (Message (Parse_Or_Type_Error (loc, s)));
       false
     | e ->
