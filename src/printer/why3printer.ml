@@ -86,17 +86,12 @@ let rec print_ty_node inn tables fmt ty = match ty.ty_node with
       | Some s -> syntax_arguments s (print_ty_node false tables) fmt tl
       | None -> begin match tl with
           | [] -> print_ts tables fmt ts
-          | tl -> fprintf fmt (protect_on inn "%a@ %a")
+          | tl -> fprintf fmt (protect_on inn "@[%a@ %a@]")
               (print_ts tables) ts (print_list space (print_ty_node true tables)) tl
           end
       end
 
 let print_ty = print_ty_node false
-
-(*
-let print_vsty tables fmt v =
-  fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
- *)
 
 (** Forgetting function for stability of errors *)
 let print_forget_vsty tables fmt v =
@@ -145,10 +140,6 @@ let rec print_pat_node pri tables fmt p = match p.pat_node with
       end
 
 let print_pat = print_pat_node 0
-
-(*
-let print_const = Number.print_constant
- *)
 
 let print_vsty tables fmt v =
   fprintf fmt "%a:@,%a" (print_vs tables) v (print_ty tables) v.vs_ty
@@ -203,30 +194,30 @@ and print_tnode pri tables fmt t = match t.t_node with
       fprintf fmt (protect_on (pri > 0) "%a:%a")
         (print_app 5 fs tables) tl (print_ty tables) (t_type t)
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
         (print_term tables) f (print_term tables) t1 (print_term tables) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0) "@[let %a = %a in@ %a@]")
         (print_vs tables) v (print_lterm 4 tables) t1 (print_term tables) t2;
       forget_var tables v
   | Tcase (t1,bl) ->
-      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
+      fprintf fmt "@[match %a with@\n@[<hov>%a@]@\nend@]"
         (print_term tables) t1 (print_list newline (print_tbranch tables)) bl
   | Teps fb ->
       let vl,tl,e = t_open_lambda t in
       if vl = [] then begin
         let v,f = t_open_bound fb in
-        fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+        fprintf fmt (protect_on (pri > 0) "@[epsilon %a.@ %a@]")
           (print_vsty tables) v (print_term tables) f
       end else begin
-        fprintf fmt (protect_on (pri > 0) "\\ %a%a.@ %a")
+        fprintf fmt (protect_on (pri > 0) "@[\\ %a%a.@ %a@]")
           (print_list comma (print_vsty tables)) vl (print_tl tables) tl (print_term tables) e
       end;
       List.iter (forget_var tables) vl
   | Tquant (q,fq) ->
       let vl,tl,f = t_open_quant fq in
-      fprintf fmt (protect_on (pri > 0) "%a %a%a.@ %a") print_quant q
+      fprintf fmt (protect_on (pri > 0) "@[%a %a%a.@ %a@]") print_quant q
         (print_list comma (print_vsty tables)) vl (print_tl tables) tl (print_term tables) f;
       List.iter (forget_var tables) vl
   | Ttrue ->
@@ -236,7 +227,7 @@ and print_tnode pri tables fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "%a %a@ %a")
+      fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1) tables) f1 (print_binop ~asym) b (print_lterm p tables) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 4) "not %a") (print_lterm 4 tables) f
@@ -303,7 +294,7 @@ let print_data_decl first tables fmt d =
 let print_ls_type tables fmt = fprintf fmt " :@ %a" (print_ty tables)
 
 let print_ls_kind ~fst fmt ls =
-  if not !info.itp then
+(*  if not !info.itp then *)
     fprintf fmt "%s "
             (if fst then
                if ls.ls_value = None then "predicate" else "function"
@@ -353,7 +344,8 @@ let print_ind_decl s first tables fmt d =
     (print_ind_decl s first tables fmt d)
 
 let print_pkind fmt k =
-  if not !info.itp then fprintf fmt "%a " Pretty.print_pkind k
+(*  if not !info.itp then *)
+  fprintf fmt "%a " Pretty.print_pkind k
 
 let print_prop_decl tables fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a%a%a : %a@]@\n" print_pkind k
@@ -458,18 +450,27 @@ let print_task args ?old:_ fmt task =
 let () = register_printer "why3" print_task
   ~desc:"Printer@ for@ the@ logical@ format@ of@ Why3.@ Used@ for@ debugging."
 
+let print_local_var tables fmt v =
+  fprintf fmt "@[%a: %a@]" (print_vs tables) v (print_ty tables) v.vs_ty
+
 let rec print_term_intro tables fmt t =
   match t.t_node with
   | Tquant(Tforall,fq) ->
-      let vl,_tl,f = t_open_quant fq in
-      fprintf fmt "%a@\n@\n%a"
-              (print_list newline (print_vsty tables)) vl
-              (print_term_intro tables) f
+     let vl,_tl,f = t_open_quant fq in
+     fprintf fmt "%a@\n@\n%a"
+             (print_list newline2 (print_local_var tables)) vl
+             (print_term_intro tables) f
   | Tbinop(Timplies,f1,f2) ->
-      fprintf fmt "%a@\n@\n%a"
-              (print_term tables) f1
-              (print_term_intro tables) f2
-  | _ -> print_term tables fmt t
+     let id = create_prsymbol (id_fresh "H") in
+     fprintf fmt "%a: %a@\n@\n%a"
+             (print_pr tables) id
+             (print_term tables) f1
+             (print_term_intro tables) f2
+  | _ ->
+     let id = create_prsymbol (id_fresh "G") in
+     fprintf fmt "%a: %a@\n"
+             (print_pr tables) id
+             (print_term tables) t
 
 (* do not forget these local names, they might be used by the itp *)
 (*      List.iter (forget_var tables) vl*)
@@ -492,12 +493,13 @@ let print_sequent args ?old:_ fmt task =
     match l with
       | [] -> assert false
       | [g] ->
-         fprintf fmt "______________________________________@\n@\n";
+         fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
          print_goal tables fmt g
       | d :: r ->
          fprintf fmt "@[%a@]@\n" (print_decl tables) d;
          aux fmt r
   in
+  fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld
 
 let () = register_printer "why3_itp" print_sequent
