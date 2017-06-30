@@ -1,4 +1,6 @@
-(* Why3 driver for then internal interactive theorem prover *)
+(* Why3 driver for the internal interactive theorem prover
+   Note: we do not put syntax between parentheses, this is handle by the why3_itp printer
+   *)
 
 printer "why3_itp"
 filename "%f-%t-%g.why"
@@ -6,21 +8,21 @@ filename "%f-%t-%g.why"
 theory BuiltIn
   syntax type  int  "int"
   syntax type  real "real"
-  syntax predicate (=)  "(%1 = %2)"
+  syntax predicate (=)  "%1 = %2"
 end
 
 
 theory int.Int
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (-_) "(-%1)"
+  syntax function (+)  "%1 + %2"
+  syntax function (-)  "%1 - %2"
+  syntax function (*)  "%1 * %2"
+  syntax function (-_) "-%1"
 
-  syntax predicate (<=) "(%1 <= %2)"
-  syntax predicate (<)  "(%1 <  %2)"
-  syntax predicate (>=) "(%1 >= %2)"
-  syntax predicate (>)  "(%1 >  %2)"
+  syntax predicate (<=) "%1 <= %2"
+  syntax predicate (<)  "%1 <  %2"
+  syntax predicate (>=) "%1 >= %2"
+  syntax predicate (>)  "%1 >  %2"
 
 end
 
@@ -35,31 +37,31 @@ end
 
 theory ieee_float.GenericFloat
 
-  syntax function (.+) "(%1 .+ %2)"
-  syntax function (.-) "(%1 .- %2)"
-  syntax function (.*)  "(%1 .* %2)"
-  syntax function (.-_) "(.-%1)"
-  syntax function (./) "(%1 ./ %2)"
+  syntax function (.+) "%1 .+ %2"
+  syntax function (.-) "%1 .- %2"
+  syntax function (.*)  "%1 .* %2"
+  syntax function (.-_) ".-%1"
+  syntax function (./) "%1 ./ %2"
 
-  syntax predicate (.<=) "(%1 <= %2)"
-  syntax predicate (.<)  "(%1 <  %2)"
-  syntax predicate (.>=) "(%1 >= %2)"
-  syntax predicate (.>)  "(%1 >  %2)"
-  syntax predicate (.=)  "(%1 .= %2)"
+  syntax predicate (.<=) "%1 <= %2"
+  syntax predicate (.<)  "%1 <  %2"
+  syntax predicate (.>=) "%1 >= %2"
+  syntax predicate (.>)  "%1 >  %2"
+  syntax predicate (.=)  "%1 .= %2"
 
 end
 
 theory real.Real
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (-_) "(-%1)"
+  syntax function (+)  "%1 + %2"
+  syntax function (-)  "%1 - %2"
+  syntax function (*)  "%1 * %2"
+  syntax function (-_) "-%1"
 
-  syntax predicate (<=) "(%1 <= %2)"
-  syntax predicate (<)  "(%1 <  %2)"
-  syntax predicate (>=) "(%1 >= %2)"
-  syntax predicate (>)  "(%1 >  %2)"
+  syntax predicate (<=) "%1 <= %2"
+  syntax predicate (<)  "%1 <  %2"
+  syntax predicate (>=) "%1 >= %2"
+  syntax predicate (>)  "%1 >  %2"
 
 end
 
@@ -87,7 +89,7 @@ end
 
 theory list.List
 
-  syntax function Cons "(%1 :: %2)"
+  syntax function Cons "%1 :: %2"
   syntax function Nil  "[]"
 
 end

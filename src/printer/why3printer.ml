@@ -83,7 +83,7 @@ let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 let rec print_ty_node inn tables fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv tables fmt v
   | Tyapp (ts, tl) -> begin match query_syntax ts.ts_name with
-      | Some s -> syntax_arguments s (print_ty_node false tables) fmt tl
+      | Some s -> fprintf fmt (protect_on inn "%a") (syntax_arguments s (print_ty_node false tables)) tl
       | None -> begin match tl with
           | [] -> print_ts tables fmt ts
           | tl -> fprintf fmt (protect_on inn "@[%a@ %a@]")
@@ -131,7 +131,7 @@ let rec print_pat_node pri tables fmt p = match p.pat_node with
       fprintf fmt (protect_on (pri > 0) "%a | %a")
         (print_pat_node 0 tables) p (print_pat_node 0 tables) q
   | Papp (cs, pl) -> begin match query_syntax cs.ls_name with
-      | Some s -> syntax_arguments s (print_pat_node 0 tables) fmt pl
+      | Some s -> fprintf fmt (protect_on (pri > 0) "%a") (syntax_arguments s (print_pat_node 0 tables)) pl
       | None -> begin match pl with
           | [] -> print_cs tables fmt cs
           | pl -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
@@ -176,7 +176,7 @@ and print_lterm pri tables fmt t =
 
 and print_app pri fs tables fmt tl =
   match query_syntax fs.ls_name with
-    | Some s -> syntax_arguments s (print_term tables) fmt tl
+    | Some s -> fprintf fmt (protect_on (pri > 0) "%a") (syntax_arguments s (print_term tables)) tl
     | None -> begin match tl with
         | [] -> print_ls tables fmt fs
         | tl -> fprintf fmt (protect_on (pri > 5) "%a@ %a")
