@@ -1,3 +1,4 @@
+let debug = Debug.register_flag ~desc:"ITP server" "itp_server"
 
 let has_extension f =
   try
@@ -190,10 +191,10 @@ let strategies env config loaded_strategies =
               let code = st.Whyconf.strategy_code in
               let code = Strategy_parser.parse env config code in
               let shortcut = st.Whyconf.strategy_shortcut in
-              Format.eprintf "[session server info] Strategy '%s' loaded.@." name;
+              Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
               (name, shortcut, st.Whyconf.strategy_desc, code) :: acc
             with Strategy_parser.SyntaxError msg ->
-              Format.eprintf
+              Debug.dprintf debug
                 "[session server warning] Loading strategy '%s' failed: %s@." name msg;
               acc)
           []
@@ -215,7 +216,7 @@ let return_prover name config =
   (** all provers that have the name/version/altern name *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    Format.eprintf "Prover corresponding to %s has not been found@." name;
+    Debug.dprintf debug "Prover corresponding to %s has not been found@." name;
     None
   end else
     Some (snd (Whyconf.Mprover.choose provers))
