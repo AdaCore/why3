@@ -1141,39 +1141,33 @@ let on_selected_row r =
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
-let has_right_click = ref false
 
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     (fun () ->
+     Debug.dprintf debug "[IDE INFO] running callback of goals_view#selection#connect#after#changed@.";
      begin
        match get_selected_row_references () with
-       | [r] ->
-          on_selected_row r;
-          if !has_right_click then
-            begin
-              tools_menu#popup ~button:3 ~time:0l;
-              Debug.dprintf debug "[IDE INFO] after tools_menu#popup@.";
-              has_right_click := false
-            end
+       | [r] -> on_selected_row r;
        | _ -> ()
      end (* ;
-     command_entry#misc#grab_focus () *) ; has_right_click := false)
+     command_entry#misc#grab_focus () *))
 
-let _ =
-  (* This event is executed BEFORE the other connected event goals_view#selection#connect#after#changed above *)
-  (* We return false so that the second callback above is executed ? *)
+let (_ : GtkSignal.id) =
   let callback ev =
+    Debug.dprintf debug "[IDE INFO] running callback of goals_view#event#connect#button_press@.";
     let n = GdkEvent.Button.button ev in
     begin
+      Debug.dprintf debug "[IDE INFO] button number %d was clicked on the tree view@." n;
       match n with
       | 1 -> (* Left click *) ()
       | 2 -> (* Middle click *) ()
       | 3 -> (* Right click *)
-         has_right_click := true
+         Debug.dprintf debug "[IDE INFO] before tools_menu#popup@.";
+         tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+         Debug.dprintf debug "[IDE INFO] after tools_menu#popup@."
       | _ -> (* Error case TODO *) assert false
-     end;
-    Debug.dprintf debug "[IDE INFO] button number %d was clicked on the tree view@." n;
+    end;
     false
   in
   goals_view#event#connect#button_press ~callback
