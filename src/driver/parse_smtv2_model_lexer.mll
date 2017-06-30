@@ -18,8 +18,12 @@ let atom = [^'('')'' ''\t''\n']
 let space = [' ''\t''\n''\r']
 let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
+let hexa_num = ( num | ['a' - 'f'] | ['A' - 'F'])+
 let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
+let dummy = ('_''_''_')?
+let float_num = '#'('b' | 'x') hexa_num
+
 
 rule token = parse
   | '\n'
@@ -44,31 +48,44 @@ rule token = parse
   | "declare-fun" { DECLARE_FUN }
   | "declare-sort" { DECLARE_SORT } (* z3 declare functions *)
   | "forall" { FORALL } (* z3 cardinality *)
+  | "not" { NOT } (* Z3 specific *)
+  | "and" { AND } (* z3 specific in ite  *)
+  | "<=" { LE } (* z3 specific *)
+  | ">=" { GE } (* z3 specific *)
   | "declare-datatypes" { DECLARE_DATATYPES }
   | "let" { LET }
   | "true" { TRUE }
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "mk___split_fields"(opt_num as n) opt_num "___" {
+  | "mk___split_fields"(opt_num as n) dummy {
     match n with
     | "" -> MK_SPLIT_FIELD ("mk___split_fields",0)
-    | n -> MK_SPLIT_FIELD ("mk____split_fields"^n, int_of_string n) }
-  | "mk___rep"(opt_num as n) opt_num "___" {
+    | n -> MK_SPLIT_FIELD ("mk___split_fields"^n, int_of_string n) }
+  | "mk___rep"(opt_num as n) dummy {
     match n with
     | "" -> MK_REP ("mk___rep", 0)
     | n -> MK_REP ("mk___rep"^n, int_of_string n) }
-  | "mk___t"(opt_num as n) opt_num "___" {
+  | "mk___t"(opt_num as n) dummy {
     match n with
     | "" -> MK_T ("mk___t", 0)
     | n -> MK_T ("mk___t"^n, int_of_string n) }
-  | "mk___split_discrs"(opt_num as n) opt_num "___" {
+  | "mk___split_discrs"(opt_num as n) dummy {
     match n with
     | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
-    | n -> MK_SPLIT_DISCRS ("mk____split_discrs"^n, int_of_string n) }
-  | "mk" name "___" { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
-  | "(_ bv"(num as bv_value)" "num")" { BITVECTOR_VALUE bv_value }
-  | "(_ BitVec "num")" { BITVECTOR_TYPE }
+    | n -> MK_SPLIT_DISCRS ("mk___split_discrs"^n, int_of_string n) }
+  | "mk" name dummy { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
+  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
+  | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
+
+  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_zero }
+  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_zero }
+  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_infinity }
+  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_infinity }
+  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Not_a_number }
+  | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
+      { FLOAT_VALUE (Smt2_model_defs.Float_value (b, eb, sb)) }
+
   | num as integer
       { INT_STR (integer) }
   | '-'space*(num as integer) { MINUS_INT_STR ("-"^integer) }

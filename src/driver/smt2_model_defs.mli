@@ -1,8 +1,14 @@
-
-
 open Stdlib
 
 type variable = string
+
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
 
 type array =
   | Const of term
@@ -11,6 +17,7 @@ type array =
 and term =
   | Integer of string
   | Decimal of (string * string)
+  | Float of float_type
   | Other of string
   | Array of array
   | Bitvector of string

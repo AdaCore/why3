@@ -1,0 +1,8 @@
+theory ModelArray
+
+use import map.Map
+
+goal t1 : forall t "model" :map int int, i "model" : int.
+   get (set t 0 42) i = get t i
+
+end
