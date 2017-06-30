@@ -1312,16 +1312,6 @@ let (_ : GtkSignal.id) =
   menu_add_file#connect#activate ~callback:(fun () ->
       select_file ~request:(fun f -> send_request (Add_file_req f)))
 
-(* what is it for ?
-let open_session: GMenu.menu_item =
-  file_factory#add_item ~key:GdkKeysyms._O "Open session"
-    ~callback:(fun () ->
-      select_file ~request:(fun f ->
-        (* Clearing the ide tree *)
-        clear_tree_and_table goals_model;
-        send_request (Open_session_req f)))
- *)
-
 (*************************)
 (* Notification Handling *)
 (*************************)
