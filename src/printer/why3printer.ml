@@ -82,14 +82,21 @@ let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let rec print_ty_node inn tables fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv tables fmt v
-  | Tyapp (ts, tl) -> begin match query_syntax ts.ts_name with
-      | Some s -> fprintf fmt (protect_on inn "%a") (syntax_arguments s (print_ty_node false tables)) tl
-      | None -> begin match tl with
+  | Tyapp (ts, tl) -> begin
+      match query_syntax ts.ts_name with
+      | Some s -> begin
+          match tl with
+          | [] -> syntax_arguments s (print_ty_node false tables) fmt []
+          | tl ->
+             fprintf fmt (protect_on inn "%a") (syntax_arguments s (print_ty_node false tables)) tl
+        end
+      | None -> begin
+          match tl with
           | [] -> print_ts tables fmt ts
           | tl -> fprintf fmt (protect_on inn "@[%a@ %a@]")
-              (print_ts tables) ts (print_list space (print_ty_node true tables)) tl
-          end
-      end
+                          (print_ts tables) ts (print_list space (print_ty_node true tables)) tl
+        end
+    end
 
 let print_ty = print_ty_node false
 
@@ -171,15 +178,15 @@ let rec print_term tables fmt t = print_lterm 0 tables fmt t
 and print_lterm pri tables fmt t =
   if (Slab.is_empty t.t_label || not (Debug.test_flag debug_print_labels)) then
     print_tnode pri tables fmt t
-  else fprintf fmt (protect_on (pri > 0) "%a %a")
+  else fprintf fmt (protect_on (pri > 0) "@[%a@ %a@]")
       print_labels t.t_label (print_tnode 0 tables) t
 
 and print_app pri fs tables fmt tl =
   match query_syntax fs.ls_name with
-    | Some s -> fprintf fmt (protect_on (pri > 0) "%a") (syntax_arguments s (print_term tables)) tl
+    | Some s -> fprintf fmt (protect_on (pri > 0) "@[%a@]") (syntax_arguments s (print_term tables)) tl
     | None -> begin match tl with
         | [] -> print_ls tables fmt fs
-        | tl -> fprintf fmt (protect_on (pri > 5) "%a@ %a")
+        | tl -> fprintf fmt (protect_on (pri > 5) "@[%a@ %a@]")
             (print_ls tables) fs (print_list space (print_lterm 6 tables)) tl
         end
 
@@ -191,14 +198,14 @@ and print_tnode pri tables fmt t = match t.t_node with
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs tables fmt tl
   | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "%a:%a")
+      fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
         (print_app 5 fs tables) tl (print_ty tables) (t_type t)
   | Tif (f,t1,t2) ->
       fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
         (print_term tables) f (print_term tables) t1 (print_term tables) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "@[let %a = %a in@ %a@]")
+      fprintf fmt (protect_on (pri > 0) "@[@[<hv 0>let %a =@;<1 2>%a@;<1 0>in@]@ %a@]")
         (print_vs tables) v (print_lterm 4 tables) t1 (print_term tables) t2;
       forget_var tables v
   | Tcase (t1,bl) ->

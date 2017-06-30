@@ -1,4 +1,26 @@
 
+module TestTaskPrinting
+
+  use import int.Int
+
+  function averyveryveryveryveryverylongname int : int
+
+  goal g1: averyveryveryveryveryverylongname 1 + averyveryveryveryveryverylongname 2 +
+           averyveryveryveryveryverylongname 3 + averyveryveryveryveryverylongname 4 >= 0
+
+  goal g2: let x = 1 in x + 1 >= 0
+
+  goal g3: let x = 1 in averyveryveryveryveryverylongname x + averyveryveryveryveryverylongname 1 >= 0
+
+  goal g4: let x = averyveryveryveryveryverylongname 1 in averyveryveryveryveryverylongname x + 1 >= 0
+
+  goal g5: let x = averyveryveryveryveryverylongname 1 + averyveryveryveryveryverylongname 2
+           in averyveryveryveryveryverylongname x + 1 >= 0
+
+  goal g6: let x = averyveryveryveryveryverylongname 1 + averyveryveryveryveryverylongname 2
+           in averyveryveryveryveryverylongname x + averyveryveryveryveryverylongname 1 >= 0
+
+end
 
 module TestAutoFocus
 
