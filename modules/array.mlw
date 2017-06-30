@@ -21,11 +21,14 @@ module Array
 
   val ([]) (a: array 'a) (i: int) : 'a
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { result = a[i] }
+    ensures  { result = get a.elts i (*(forall k: int. (0 <= k < length a -> (k = i /\ result = get a.elts k) \/ k <> i) \/ k < 0 \/ k >= length a)*) }
 
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { (*a.elts = (old a.elts)[i <- v] /\*)
+	(forall k: int. ((0 <= k < a.length ->  (k <> i /\ get a.elts k = get (old a).elts k \/ (k = i /\ get a.elts k = v)))))
+	(*/\ get a.elts i = v*)
+	/\ length a = (old (length a))}
 
   (** unsafe get/set operations with no precondition *)
 
@@ -45,7 +48,7 @@ module Array
 
   val make (n: int) (v: 'a) : array 'a
     requires { "expl:array creation size" n >= 0 }
-    ensures { forall i:int. 0 <= i < n -> result[i] = v }
+    ensures { forall i:int. (0 <= i < n /\ result[i] = v) \/ 0 > i \/ i >= n }
     ensures { result.length = n }
 
   val append (a1: array 'a) (a2: array 'a) : array 'a
@@ -262,13 +265,14 @@ end
 module ArraySwap
 
   use import int.Int
+  use import map.Map
   use import Array
   use export ArrayExchange
 
   let swap (a:array 'a) (i:int) (j:int) : unit
     requires { 0 <= i < length a /\ 0 <= j < length a }
     writes   { a }
-    ensures  { exchange (old a) a i j }
+    ensures  { (forall k: int. k < 0 \/ k >= length a \/ (0 <= k < length a /\ (k = j /\ get a.elts k = get (old a).elts i \/ k = i /\ get a.elts k = get (old a).elts j \/ (not (k = i)) /\ (not (k = j)) /\ get a.elts k = get (old a.elts) k))) /\ length (old a) = length a }
   = let v = a[i] in
     a[i] <- a[j];
     a[j] <- v

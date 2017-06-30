@@ -69,3 +69,5 @@ val addps : env -> Term.lsymbol -> Term.vsymbol list -> Term.term -> env
 val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.term -> Term.term
 *)
+
+val t_replace_all : (Term.Mvs.key list * Term.term) Term.Mls.t -> Term.term -> Term.term

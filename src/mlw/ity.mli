@@ -496,6 +496,7 @@ val forget_cty : cty -> unit      (* forget arguments and oldies *)
 
 val print_its : Format.formatter -> itysymbol -> unit (* type symbol *)
 val print_reg : Format.formatter -> region -> unit    (* region *)
+val print_reg_name : Format.formatter -> region -> unit    (* region *)
 val print_ity : Format.formatter -> ity -> unit       (* individual type *)
 val print_ity_full : Format.formatter -> ity -> unit  (* type with regions *)
 

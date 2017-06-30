@@ -1,0 +1,21 @@
+module Tuple1
+
+	use import int.Int
+	use import ref.Ref
+
+	let b(x:int) : int
+	ensures { result = 20 }
+	=
+		let i = ref 0 in
+		let j = ref 0 in
+		i := 0;
+		j := 0;
+		while !i < 10 do
+			variant { 10 - !i }
+			let (a, b) = (!i + 1, !j + 2) in
+			i := a;
+			j := b;
+		done;
+		!j
+end
+

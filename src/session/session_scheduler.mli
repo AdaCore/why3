@@ -120,6 +120,15 @@ module Make(O: OBSERVER) : sig
         session, the file name must be given relatively to the session
         dir given to [open_session]
     *)
+  
+  val add_theories :
+    O.key env_session -> ?format:string -> string ->
+    Session.theory_loader ->
+    O.key Session.file
+    (** [add_theories es f t] adds the theories t as if they were read from the file
+     * with filename [f]. add_file should generally be used instead. This function is
+     * only useful to preprocess some of the theories. *)
+
 
 (** {2 Actions} *)
 

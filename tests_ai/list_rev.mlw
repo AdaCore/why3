@@ -1,0 +1,90 @@
+module ListRev
+	use import list.List
+	use import list.Length
+	use import int.Int
+	use import ref.Ref
+
+	val function length (l: list 'a) : int
+	ensures { result >= 0 }
+
+	let tl (l: list 'a) : list 'a
+	requires { l <> Nil }
+	ensures { length result = length l - 1 }
+	=
+	match l with
+	| Cons _ b -> b
+	| Nil -> absurd
+	end
+
+	let cons (a: 'a) (l: list 'a) : list 'a
+	ensures { length result = length l + 1 }
+	=
+	Cons a l
+
+	let hd(l: list 'a) : 'a
+	requires { length l > 0 }
+	=
+	match l with
+	| Cons a _ -> a
+	| Nil -> absurd
+	end
+
+	let cp(l: list 'a): list 'a
+	ensures { length result = length l } =
+	l
+
+	let eq_nil(l: list 'a)
+	ensures { result <-> length l <= 0 } =
+	match l with
+		| Nil -> true
+		| _ -> false
+		end
+
+	let nil (unit)
+	: list 'a
+	ensures { length result = 0 }
+	= Nil
+
+	let rev(l:(list 'a))
+	requires { true }
+	ensures { length result = length l } =
+	let b = ref (cp l) in
+	let a = ref (nil ()) in
+	assert { length !b >= 0 };
+	(*assert { length !b > 0 };
+		let mya = !a in
+		let myb = !b in
+		let myh = hd myb in
+		a := cons myh mya;
+		b := tl myb;
+		let mya = !a in
+		let myb = !b in
+		let myh = hd myb in
+		a := cons myh mya;
+		b := tl myb;
+	*)while not (eq_nil !b) do
+		variant {length !b }
+		let mya = !a in
+		let myb = !b in
+		let myh = hd myb in
+		a := cons myh mya;
+		b := tl myb;
+	done;(*
+	while true do variant { 0 } (); done;*)
+	!a
+
+
+
+	let seq (i: int) : list int 
+		ensures { i <= 0 \/ length result = i } =
+		let l = ref (nil ()) in
+		let k = ref i in
+		while !k > 0 do
+		variant { !k }
+			k := !k - 1;
+			l := cons !k !l; 
+		done;
+		!l
+
+
+end

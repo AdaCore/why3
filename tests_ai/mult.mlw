@@ -1,0 +1,16 @@
+module Mult1
+
+	use import int.Int
+	use import ref.Ref
+
+	let b(x:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := 2 * !i;
+		done;
+		!i
+
+end

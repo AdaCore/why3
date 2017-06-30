@@ -1,0 +1,201 @@
+
+module Test
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+
+	let basic(x:int): unit
+	=
+		let a = make x 2 in
+		while (true) do
+		variant { 0 }
+		invariant { forall w:int. 0 <= w < x -> a[w] = 2 }
+		()
+		done; ()
+
+	let b(x:int): unit
+	=
+		let a = make x 2 in
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 }
+		()
+		done; ()
+
+
+	let b2(x:int): unit
+	=
+		let a = make x 2 in
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { forall k: int. 0 <= k < length a -> (k > 1 -> a[k] = 2) }
+		()
+		done; ()
+		
+
+	let c(x:int): unit
+	requires { x >= 2 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ (forall k: int. (0 <= k <= 1 /\ a[k] = 42 *k) \/ k <> 0) }
+		()
+		done; ()
+
+	let d_basic(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { length a = x }
+		()
+		done; ()
+	let d(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		a[0] <- 0;
+		a[1] <- 42;
+		while (true) do
+		variant { 0 }
+		invariant { a[1] = 42 /\ (forall k: int. k = 2 -> a[k] = 1) }
+		()
+		done; ()
+	
+	let e(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		while (true) do
+		variant { 0 }
+		invariant { forall k: int. k = 0 -> (a[k] = 10 \/ a[k] = 1) }
+		a[0] <- 10;
+		()
+		done; ()
+	
+	let f(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (true) do
+		variant { 0 }
+		invariant { forall i: int. (i = 0 -> (a[i] = !k)) }
+		a[0] <- !k + 1;
+		incr k;
+		done; ()
+	
+	let cond(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7
+		else
+			a[0] <- 9;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 9 \/ a[0] = 7))) }
+		()
+		done; ()
+	
+	let cond2(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 1 in
+		if x >= 5 then
+			a[0] <- 7;
+		while (true) do
+		variant { 0 }
+		invariant { (forall k: int. (k = 0 -> (a[k] = 1 \/ a[0] = 7))) }
+		()
+		done; ()
+	
+	let init1(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = 8)) }
+		a[!k] <- 8;
+		incr k;
+		done; ()
+	
+	let init2(x:int): unit
+	requires { x >= 3 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = i)) }
+		a[!k] <- !k;
+		incr k;
+		done; ()
+	
+	let init3(x:int): unit
+	requires { x >= 10 }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < 4) do
+		variant { 0 }
+		invariant { forall i: int. (0 <= i < !k -> (a[i] = 8)) }
+		a[!k] <- 8;
+		incr k;
+		done; ()
+	
+	let init5 (x:int) (y:int) : array int
+	requires { x > y >= 0 }
+	ensures { forall i: int. (0 <= i < y -> result[i] = 1) /\ (y <= i < x -> result[i] = 2) }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { true }
+
+		if !k >= y then
+		a[!k] <- 42
+		else
+		a[!k] <- 43;
+		incr k;
+		done; a
+	
+	let init_non_lin(x:int): array int
+	requires { x >= 0 }
+	ensures { forall i: int. 0 <= i < x -> result[i] = i * i }
+	=
+		let a = make x 0 in
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { true }
+		a[!k] <- !k * !k;
+		incr k;
+		done; a
+	
+	let instantiation(n: int): unit
+		requires { n >= 0 }
+		=
+		let a = make n 10 in
+		let b = a[5] in
+		while true do
+			variant { 0 }
+			invariant { b = 10 }
+			()
+		done;
+		()
+	
+end
