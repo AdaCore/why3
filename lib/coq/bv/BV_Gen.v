@@ -850,6 +850,15 @@ Lemma bvec_to_nat_nat_to_bvec : forall {n} i, (Z.of_nat i <= Pow2int.pow2 (Z.of_
   rewrite pow2_is_even by omega; easy.
 Qed.
 
+Lemma nat_to_bvec_bvec_to_nat: forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v.
+  intros; apply bvec_to_nat_extensionality.
+  apply bvec_to_nat_nat_to_bvec.
+  apply Z.lt_le_pred.
+  rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l) - 1)%Z;
+    [apply max_int_nat|auto with zarith]).
+  apply inj_lt, bvec_to_nat_range.
+Qed.
+
 Lemma Nat_to_bvec_ones : forall {n}, Vector.const true n = nat_to_bvec n (Z.to_nat (Pow2int.pow2 (Z.of_nat n) - 1)).
   induction n.
   easy.
@@ -1775,12 +1784,7 @@ Lemma mask_succ_tmp :
       rewrite <-(Div2.even_div2 _ H0), Div2.div2_double.
       assert (nat_to_bvec_bvec_to_nat:
         forall {l} v, nat_to_bvec l (bvec_to_nat l v) = v).
-        intros; apply bvec_to_nat_extensionality.
-        apply bvec_to_nat_nat_to_bvec.
-        apply Z.lt_le_pred.
-        rewrite <-Z2Nat.id by (transitivity (Pow2int.pow2 (Z.of_nat l0) - 1);
-             [apply max_int_nat|auto with zarith]).
-        apply inj_lt, bvec_to_nat_range.
+        intros. apply nat_to_bvec_bvec_to_nat.
       rewrite nat_to_bvec_bvec_to_nat.
       assert (tmp2:
         forall {l} v,
