@@ -561,7 +561,7 @@ let run_strategy_on_goal
          schedule_proof_attempt c g p ~counterexmp ~limit ~callback ~notification
       | Itransform(trname,pcsuccess) ->
          let callback ntr =
-           callback_tr ntr;
+           callback_tr trname [] ntr;
            match ntr with
            | TSfailed _e -> (* transformation failed *)
               callback (STSgoto (g,pc+1));
@@ -596,6 +596,7 @@ let schedule_tr_with_same_arguments
   let s = c.controller_session in
   let args = get_transf_args s tr in
   let name = get_transf_name s tr in
+  let callback = callback name args in
   schedule_transformation c pn name args ~callback ~notification
 
 let clean_session c ~removed =
@@ -655,7 +656,7 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
       List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn ~counterexmp:false
           ~callback:callback_pa ~notification) from_pa_list;
       let from_tr_list = get_transformations s from_pn in
-      let callback x st = callback_tr st;
+      let callback x tr args st = callback_tr tr args st;
         match st with
         | TSdone tid ->
           copy_paste c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr

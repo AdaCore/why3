@@ -221,29 +221,29 @@ let bypass_pretty s id =
   | _ -> Format.fprintf fmt "Uncaught: %a" Exn_printer.exn_printer exn
   end
 
-let get_exception_message ses id fmt e =
+let get_exception_message ses id e =
   match e with
   | Controller_itp.Noprogress ->
-      Format.fprintf fmt "Transformation made no progress\n"
+      Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
-      Format.fprintf fmt "Error in transformation %s during unification of the following terms:\n %a \n %a"
-        s (print_type ses id) ty1 (print_type ses id) ty2
+      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
+        s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
-      Format.fprintf fmt "Error in transformation %s during unification of following two terms:\n %a \n %a" s
-        (print_term ses id) t1 (print_term ses id) t2
+      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a \n %a" s
+        (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans (s) ->
-      Format.fprintf fmt "Error in transformation function: %s \n" s
+      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_hyp_not_found (s) ->
-      Format.fprintf fmt "Following hypothesis was not found: %s \n" s
+      Pp.sprintf "Following hypothesis was not found: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_theory_not_found (s) ->
-      Format.fprintf fmt "Theory not found: %s" s
-  | Loc.Located (loc, s) ->
-      Format.fprintf fmt "Parsing error at %a: %a" Loc.report_position loc Exn_printer.exn_printer s
+      Pp.sprintf "Theory not found: %s" s, Loc.dummy_position, ""
+  | Args_wrapper.Arg_parse_type_error(loc, arg, e) ->
+      Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Args_wrapper.Unnecessary_arguments l ->
-      Format.fprintf fmt "First arguments were parsed and typed correcly but the last following are useless:\n%a"
-        (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l
+      Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+        (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | e ->
-      bypass_pretty ses id fmt e
+      (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 
 
 (* Debugging functions *)
@@ -279,19 +279,19 @@ let print_request fmt r =
 
 let print_msg fmt m =
   match m with
-  | Proof_error (_ids, s)      -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, s)     -> fprintf fmt "transf error %s" s
-  | Strat_error (_ids, s)      -> fprintf fmt "start error %s" s
-  | Replay_Info s              -> fprintf fmt "replay info %s" s
-  | Query_Info (_ids, s)       -> fprintf fmt "query info %s" s
-  | Query_Error (_ids, s)      -> fprintf fmt "query error %s" s
-  | Help _s                    -> fprintf fmt "help"
-  | Information s              -> fprintf fmt "info %s" s
-  | Task_Monitor _             -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error (_, s) -> fprintf fmt "parse_or_type_error:\n %s" s
-  | File_Saved s               -> fprintf fmt "file saved %s" s
-  | Error s                    -> fprintf fmt "%s" s
-  | Open_File_Error s          -> fprintf fmt "%s" s
+  | Proof_error (_ids, s)                    -> fprintf fmt "proof error %s" s
+  | Transf_error (_ids, _tr, _args, _loc, s) -> fprintf fmt "transf error %s" s
+  | Strat_error (_ids, s)                    -> fprintf fmt "start error %s" s
+  | Replay_Info s                            -> fprintf fmt "replay info %s" s
+  | Query_Info (_ids, s)                     -> fprintf fmt "query info %s" s
+  | Query_Error (_ids, s)                    -> fprintf fmt "query error %s" s
+  | Help _s                                  -> fprintf fmt "help"
+  | Information s                            -> fprintf fmt "info %s" s
+  | Task_Monitor _                           -> fprintf fmt "task montor"
+  | Parse_Or_Type_Error (_, s)               -> fprintf fmt "parse_or_type_error:\n %s" s
+  | File_Saved s                             -> fprintf fmt "file saved %s" s
+  | Error s                                  -> fprintf fmt "%s" s
+  | Open_File_Error s                        -> fprintf fmt "%s" s
 
 (* TODO ad hoc printing. Should reuse print_loc. *)
 let print_loc fmt (loc: Loc.position) =
@@ -1034,8 +1034,10 @@ end
 
   (* ----------------- Schedule transformation -------------------- *)
 
-  (* Callback of a transformation *)
-  let callback_update_tree_transform status =
+  (* Callback of a transformation.
+     This contains arguments of the transformation only for pretty printing of
+     errors*)
+  let callback_update_tree_transform tr args status =
     let d = get_server_data () in
     match status with
     | TSdone trans_id ->
@@ -1044,17 +1046,16 @@ end
       let nid = node_ID_from_pn id in
       init_and_send_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
-      let msg =
-        Pp.sprintf "%a" (get_exception_message d.cont.controller_session id) e
-      in
-      P.notify (Message (Transf_error (node_ID_from_pn id, msg)))
+      let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
+      let tr_applied = tr ^ " " ^ (List.fold_left (fun acc x -> x ^ " " ^ acc) "" args) in
+      P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg)))
     | _ -> ()
 
   let rec apply_transform nid t args =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-      let callback = callback_update_tree_transform in
+      let callback = callback_update_tree_transform t args in
       C.schedule_transformation d.cont id t args ~callback ~notification:(notify_change_proved d.cont)
     | APa panid ->
       let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
@@ -1080,7 +1081,7 @@ end
          Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
        in
        let callback_pa = callback_update_tree_proof d.cont in
-       let callback_tr st = callback_update_tree_transform st in
+       let callback_tr tr args st = callback_update_tree_transform tr args st in
        List.iter (fun id ->
                   C.run_strategy_on_goal d.cont id st ~counterexmp
                     ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))

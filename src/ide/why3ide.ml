@@ -1328,17 +1328,35 @@ let open_session: GMenu.menu_item =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)         -> print_message "%s" s
-  | Transf_error (_id, s)        -> print_message "%s" s
-  | Strat_error (_id, s)         -> print_message "%s" s
-  | Replay_Info s                -> print_message "%s" s
-  | Query_Info (_id, s)          -> print_message "%s" s
-  | Query_Error (_id, s)         -> print_message "%s" s
-  | Help s                       -> print_message "%s" s
-  | Information s                -> print_message "%s" s
-  | Task_Monitor (t, s, r)       -> update_monitor t s r
-  | Open_File_Error s            -> print_message "%s" s
-  | Parse_Or_Type_Error (loc, s) ->
+  | Proof_error (_id, s)                        -> print_message "%s" s
+  | Transf_error (_id, tr_name, arg, loc, msg) ->
+      if arg = "" then
+        print_message "%s\nTransformation failed: \n%s" msg tr_name
+      else
+        begin
+          let buf = message_zone#buffer in
+          (* Redefines the new tag for this buffer every time. I think this is
+             needed because we clear it often. *)
+          let _error = buf#create_tag
+              ~name:"error" [`BACKGROUND gconfig.neg_premise_color] in
+          print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s" tr_name arg msg;
+          let color = "error" in
+          let _, _, beg_char, end_char = Loc.get loc in
+          let start = buf#start_iter#forward_lines 3 in
+          buf#apply_tag_by_name
+            ~start:(start#forward_chars beg_char)
+            ~stop:(start#forward_chars end_char)
+            color
+        end
+  | Strat_error (_id, s)                        -> print_message "%s" s
+  | Replay_Info s                               -> print_message "%s" s
+  | Query_Info (_id, s)                         -> print_message "%s" s
+  | Query_Error (_id, s)                        -> print_message "%s" s
+  | Help s                                      -> print_message "%s" s
+  | Information s                               -> print_message "%s" s
+  | Task_Monitor (t, s, r)                      -> update_monitor t s r
+  | Open_File_Error s                           -> print_message "%s" s
+  | Parse_Or_Type_Error (loc, s)                ->
     begin
       (* TODO find a new color *)
       color_loc ~color:Goal_color loc;

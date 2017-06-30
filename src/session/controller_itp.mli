@@ -207,7 +207,7 @@ val run_strategy_on_goal :
   Strategy.t ->
   counterexmp:bool ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
-  callback_tr:(transformation_status -> unit) ->
+  callback_tr:(string -> string list -> transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
   notification:notifier -> unit
 (** [run_strategy_on_goal c id strat] executes asynchronously the
@@ -230,7 +230,7 @@ val mark_as_obsolete:
 val copy_paste:
     notification:notifier ->
     callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
-    callback_tr:(transformation_status -> unit) ->
+    callback_tr:(string -> string list -> transformation_status -> unit) ->
     controller -> any -> any -> unit
 
 val copy_detached:

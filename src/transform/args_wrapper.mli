@@ -38,6 +38,7 @@ type (_, _) trans_typ =
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
   | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
+exception Arg_parse_type_error of Loc.position * string * exn
 exception Unnecessary_arguments of string list
 
 (** wrap arguments of transformations, turning string arguments into

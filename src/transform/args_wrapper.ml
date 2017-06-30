@@ -260,15 +260,20 @@ let type_ptree ~as_fmla t tables =
   then Typing.type_fmla_in_namespace ns km (fun _ -> None) t
   else Typing.type_term_in_namespace ns km (fun _ -> None) t
 
+exception Arg_parse_type_error of Loc.position * string * exn
+
 let parse_and_type ~as_fmla s task =
-  let lb = Lexing.from_string s in
-  let t =
+  try
+    let lb = Lexing.from_string s in
+    let t =
       Lexer.parse_term lb
-  in
-  let t =
+    in
+    let t =
       type_ptree ~as_fmla:as_fmla t task
-  in
-  t
+    in
+    t
+  with
+  | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let parse_list_ident s =
   let lb = Lexing.from_string s in

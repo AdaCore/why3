@@ -94,14 +94,14 @@ module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 
 let treat_message_notification fmt msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)   -> fprintf fmt "%s@." s
-  | Transf_error (_id, s)  -> fprintf fmt "%s@." s
-  | Strat_error (_id, s)   -> fprintf fmt "%s@." s
-  | Replay_Info s          -> fprintf fmt "%s@." s
-  | Query_Info (_id, s)    -> fprintf fmt "%s@." s
-  | Query_Error (_id, s)   -> fprintf fmt "%s@." s
-  | File_Saved s           -> fprintf fmt "%s@." s
-  | Help s                 -> fprintf fmt "%s@. Additionally for shell:\n\
+  | Proof_error (_id, s)                        -> fprintf fmt "%s@." s
+  | Transf_error (_id, _tr_name, _arg, _loc, s) -> fprintf fmt "%s@." s
+  | Strat_error (_id, s)                        -> fprintf fmt "%s@." s
+  | Replay_Info s                               -> fprintf fmt "%s@." s
+  | Query_Info (_id, s)                         -> fprintf fmt "%s@." s
+  | Query_Error (_id, s)                        -> fprintf fmt "%s@." s
+  | File_Saved s                                -> fprintf fmt "%s@." s
+  | Help s                                      -> fprintf fmt "%s@. Additionally for shell:\n\
 goto n -> focuse on n\n\
 ng -> next node\n\
 g -> print the current task\n\

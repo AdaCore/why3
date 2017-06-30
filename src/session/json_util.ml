@@ -264,9 +264,12 @@ let convert_message (m: message_notification) =
       convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "error", String s]
-  | Transf_error (nid, s) ->
+  | Transf_error (nid, tr, arg, loc, s) ->
       convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
+           "tr_name", String tr;
+           "failing_arg", String arg;
+           "loc", convert_loc loc;
            "error", String s]
   | Strat_error (nid, s) ->
       convert_record ["mess_notif", cc m;
@@ -651,8 +654,11 @@ let parse_message constr j =
 
   | "Transf_error" ->
     let nid = get_int (get_field j "node_ID") in
+    let tr_name = get_string (get_field j "tr_name") in
+    let arg = get_string (get_field j "failing_arg") in
+    let loc = parse_loc (get_field j "loc") in
     let s = get_string (get_field j "error") in
-    Transf_error (nid, s)
+    Transf_error (nid, tr_name, arg, loc, s)
 
   | "Strat_error" ->
     let nid = get_int (get_field j "node_ID") in
