@@ -398,8 +398,7 @@ module Translate = struct
       ML.mk_expr (Mltree.Evar to_pv)   int_ity eff_e Slab.empty in
     let for_rs    =
       let for_id  = id_fresh "for_loop_to" in
-      let for_cty = create_cty [i_pv] [] [] Mxs.empty
-                               Mpv.empty eff ity_unit in
+      let for_cty = create_cty [i_pv] [] [] Mxs.empty Mpv.empty eff ity_unit in
       create_rsymbol for_id for_cty in
     let for_expr =
       let test =
@@ -420,8 +419,7 @@ module Translate = struct
       ML.mk_expr (Mltree.Eif (test, seq_expr, ML.mk_unit)) ML.ity_unit
         eff Slab.empty in
     let ty_int = mlty_of_ity MaskVisible ity_int in
-    let for_call_expr   =
-      let for_call      = Mltree.Eapp (for_rs, [from_expr]) in
+    let for_call_expr = let for_call = Mltree.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff Slab.empty in
     let pv_name pv = pv.pv_vs.vs_name in
     let args = [ pv_name i_pv, ty_int, false ] in
