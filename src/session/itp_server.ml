@@ -242,6 +242,8 @@ let get_exception_message ses id e =
   | Args_wrapper.Unnecessary_arguments l ->
       Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
+  | Args_wrapper.Arg_expected_none s ->
+      Pp.sprintf "An argument was expected of type %s" s, Loc.dummy_position, ""
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 
