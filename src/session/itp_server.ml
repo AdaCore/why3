@@ -555,8 +555,17 @@ let get_modified_node n =
   | Task (nid, _, _) -> Some nid
   | File_contents _ -> None
 
+type focus =
+  | Unfocused
+  | Focus_on of Session_itp.any
+  | Wait_focus
+
 (* Focus on a node *)
-let focused_node = ref None
+let focused_node = ref Unfocused
+let get_focused_label = ref None
+
+let register_label_detection (f: Task.task -> bool) =
+  get_focused_label := Some f
 
 (* TODO *)
 module P = struct
@@ -575,8 +584,9 @@ module P = struct
     let d = get_server_data() in
     let s = d.cont.controller_session in
     match !focused_node with
-    | None -> Pr.notify n
-    | Some f_node ->
+    | Wait_focus -> () (* Do not notify at all *)
+    | Unfocused -> Pr.notify n
+    | Focus_on f_node ->
         let updated_node = get_modified_node n in
         match updated_node with
         | None -> Pr.notify n
@@ -754,6 +764,24 @@ end
         {name; proved}
 *)
 
+  (* Focus on label: this is used to automatically focus on the first task
+     having a given property (label_detection) in the session tree. To change
+     the property, one need to call function register_label_detection. *)
+  let focus_on_label node =
+    match !get_focused_label with
+    | Some label_detection ->
+        let d = get_server_data () in
+        let session = d.cont.Controller_itp.controller_session in
+        (match node with
+        | APn pr_node ->
+            let task = Session_itp.get_task session pr_node in
+            let b = label_detection task in
+            if b then
+              (focused_node := Focus_on node;
+               get_focused_label := None)
+        | _ -> ())
+    | None -> ()
+
   (* Create a new node in the_tree, update the tables and send a
      notification about it *)
   let new_node ~parent node : node_ID =
@@ -763,6 +791,8 @@ end
       let node_name = get_node_name node in
       let node_detached = get_node_detached node in
       add_node_to_table node new_id;
+      (* Specific to auto-focus at initialization of itp_server *)
+      focus_on_label node;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
       if node_type = NFile then
         read_and_send node_name;
@@ -1222,10 +1252,10 @@ end
         let any = any_from_node_ID nid in
         (match any with
         | APa pa ->
-          focused_node := Some (APn (Session_itp.get_proof_attempt_parent s pa))
-        | _ -> focused_node := Some any)
+          focused_node := Focus_on (APn (Session_itp.get_proof_attempt_parent s pa))
+        | _ -> focused_node := Focus_on any)
     | Unfocus_req ->
-        focused_node := None
+        focused_node := Unfocused
     | Remove_subtree nid           ->
         let n = any_from_node_ID nid in
         begin
