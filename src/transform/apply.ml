@@ -223,44 +223,6 @@ let replace t1 t2 h =
       | _ -> [d]) None in
     Trans.par [g; ng]
 
-let subst to_subst =
-  let found_eq =
-    fold (fun d acc ->
-      match d.d_node with
-      | Dprop (Paxiom, pr, t) ->
-          let acc = (match t.t_node with
-          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
-              (* Allow to rewrite from the right *)
-              begin
-                match t1.t_node, t2.t_node with
-                | Tapp (ls, []), _ when ls_equal ls to_subst ->
-                    Some (pr, t1, t2)
-                | _, Tapp (ls, []) when ls_equal ls to_subst ->
-                    Some (pr, t2, t1)
-                | _ -> acc
-              end
-          | _ -> acc) in
-          acc
-      | _ -> acc) None in
-  let subst found_eq =
-    match found_eq with
-    | None -> raise (Arg_trans "subst") (* TODO change exception *)
-    | Some (pr_eq, t1, t2) ->
-      begin
-        Trans.decl (fun d ->
-          match d.d_node with
-          (* Remove equality over which we subst *)
-          | Dprop (Paxiom, pr, _t) when pr_equal pr pr_eq  ->
-            []
-          (* Replace in all hypothesis *)
-          | Dprop (kind, pr, t) ->
-            [create_prop_decl kind pr (t_replace t1 t2 t)]
-          (* TODO should replace every occurences of t1 everywhere *)
-          | _ -> [d]) None
-      end
-  in
-  Trans.bind found_eq subst
-
 let t_replace_app unf ls_defn t =
   let (vl, tls) = ls_defn in
   match t.t_node with
@@ -294,14 +256,169 @@ let unfold unf h =
         end
       | _ -> [d]) None
 
+let sort task =
+  let local_decls =
+    let ut = Task.used_symbols (Task.used_theories task) in
+    Task.local_decls task ut in
+  let l = ref [] in
+  Trans.decl
+    (fun d ->
+      match d.d_node with
+      | _ when not (List.exists (fun x -> Decl.d_equal x d) local_decls) ->
+          [d]
+      | Dprop (Paxiom, _, _)
+      | Dprop (Plemma, _, _)
+      | Dprop (Pskip, _, _) ->
+          (* This goes in the second group *)
+          l := !l @ [d];
+          []
+      | Dprop (Pgoal, _, _) ->
+          (* Last element, we concatenate the list of postponed elements *)
+          !l @ [d]
+      | _ -> [d]) None
 
-let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
-    "unfold"
-    (Tlsymbol (Tprsymbol Ttrans)) unfold
+(* TODO is sort really needed ? It looked like it was for subst in some example where I wanted to subst the definition of a logic constant into an equality and it would fail because the equality is defined before the logic definition. This may be solved by current implementation of subst: to be tested *)
+let sort =
+  Trans.store (fun task -> Trans.apply (sort task) task)
+
+let get_local task =
+  let ut = Task.used_symbols (Task.used_theories task) in
+  Task.local_decls task ut
+
+(* This function is used to find a specific ident in an equality:
+   (to_subst = term or term = to_subst) in order to subst and remove said
+   equality.
+   This function returns None if not found, Some (None, t1, t2) with t1 being
+   to_subst and t2 being term to substitute to if the equality found it a symbol
+   definition. If equality found is a a decl then it is returned:
+   Some (Some pr, t1, t2) *)
+let find_eq (to_subst: Term.lsymbol) =
+  fold (fun d acc ->
+    match d.d_node with
+    | Dprop (k, pr, t) when k != Pgoal ->
+        let acc = (match t.t_node with
+        | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+            (* Allow to rewrite from the right *)
+            begin
+              match t1.t_node, t2.t_node with
+              | Tapp (ls, []), _ when ls_equal ls to_subst ->
+                  Some (Some pr, t1, t2)
+              | _, Tapp (ls, []) when ls_equal ls to_subst ->
+                  Some (Some pr, t2, t1)
+              | _ -> acc
+            end
+        | _ -> acc) in
+        acc
+    | Dlogic [(ls, ld)] when ls_equal to_subst ls ->
+      (* Function without arguments *)
+      let vl, e = open_ls_defn ld in
+      if vl = [] then
+        Some (None, t_app_infer ls [], e)
+      else
+        acc
+    | _ -> acc) None
+
+(* This found any equality which at one side contains a single lsymbol and is
+   local. It gives same output as found_eq. *)
+let find_eq2 is_local_decl =
+    fold (fun d acc ->
+      match d.d_node with
+      | Dprop (k, pr, t) when k != Pgoal && is_local_decl d ->
+        begin
+          let acc = (match t.t_node with
+          | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+            (match t1.t_node, t2.t_node with
+            | Tapp (_, []), _ ->
+            (* t1 = t2. And t1 and t2 are constant litterals *)
+              Some (Some pr, t1, t2)
+            | _ -> acc)
+          | _ -> acc) in
+          acc
+        end
+      | Dlogic [(ls, ld)] when is_local_decl d ->
+        (* Function without arguments *)
+        let vl, e = open_ls_defn ld in
+        if vl = [] then
+          Some (None, t_app_infer ls [], e)
+        else
+          acc
+      | _ -> acc) None
+
+let subst_eq found_eq =
+  match found_eq with
+    | None -> raise (Arg_trans "subst_eq")
+    | Some (Some pr_eq, t1, t2) ->
+      begin
+        Trans.decl (fun d ->
+          match d.d_node with
+          (* Remove equality over which we subst *)
+          | Dprop (_k, pr, _t) when pr_equal pr pr_eq  ->
+            []
+          (* Replace in all hypothesis *)
+          | Dprop (kind, pr, t) ->
+            [create_prop_decl kind pr (t_replace t1 t2 t)]
+          (* TODO should replace every occurences of t1 in all constructs not only in Dprop... Dlogic etc *)
+          | _ -> [d]) None
+      end
+    | Some (None, t1, t2) ->
+      begin
+         Trans.decl (fun d ->
+           match d.d_node with
+           | Dlogic [(ls, _ld)] when try (t1 = Term.t_app_infer ls []) with _ -> false ->
+              []
+           (* Replace in all hypothesis *)
+           | Dprop (kind, pr, t) ->
+             [create_prop_decl kind pr (t_replace t1 t2 t)]
+           (* TODO should replace every occurences of t1 in all constructs not only in Dprop... Dlogic etc *)
+           | _ -> [d]) None
+       end
+
+let subst (to_subst: Term.lsymbol) =
+  Trans.bind (find_eq to_subst) subst_eq
+
+let subst_all (is_local_decl: Decl.decl -> bool) =
+   Trans.bind (find_eq2 is_local_decl) subst_eq
+
+let return_local_decl task =
+  let decl_list = get_local task in
+  let is_local_decl d = List.exists (fun x -> Decl.d_equal d x) decl_list in
+  is_local_decl
+
+let return_local_decl = Trans.store return_local_decl
+
+let subst_all = Trans.bind return_local_decl subst_all
+
+let rec repeat f task =
+  try
+    let new_task = Trans.apply f task in
+    (* TODO this is probably expansive. Use a checksum or an integer ? *)
+    if Task.task_equal new_task task then
+      raise Exit
+    else
+      repeat f new_task
+  with
+  | _ -> task
+
+let repeat f = Trans.store (repeat f)
 
 let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
     (Tlsymbol Ttrans) subst
+
+let subst_all = repeat subst_all
+
+let () =
+  wrap_and_register ~desc:"substitute all ident equalities and remove them"
+    "subst_all"
+    (Ttrans) subst_all
+
+let () = wrap_and_register ~desc:"sort declarations"
+    "sort"
+    (Ttrans) sort
+
+let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
+    "unfold"
+    (Tlsymbol (Tprsymbol Ttrans)) unfold
 
 let () = wrap_and_register
     ~desc:"replace <term1> <term2> <name> replaces occcurences of term1 by term2 in prop name"
