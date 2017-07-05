@@ -143,7 +143,7 @@ let add (d: decl) (tables: naming_table): naming_table =
       let s = id_unique tables.printer id in
       add_unsafe s (Pr pr) tables
 
-let build_name_tables task : naming_table =
+let build_naming_tables task : naming_table =
   let pr = fresh_printer () in
   let km = Task.task_known task in
   let tables = {
@@ -158,39 +158,6 @@ let build_name_tables task : naming_table =
     added by the user are renamed on the fly. *)
   let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
   List.fold_left (fun tables d -> add d tables) tables l
-
-(* searching ids in declarations *)
-
-let occurs_in_type id = ty_s_any (fun ts -> Ident.id_equal ts.Ty.ts_name id)
-
-let occurs_in_term id =
-  t_s_any (occurs_in_type id) (fun ls -> Ident.id_equal id ls.ls_name)
-
-let occurs_in_constructor _id _c = false
-
-let occurs_in_defn id (_,def) =
-  let (_vl,t) = open_ls_defn def in occurs_in_term id t
-
-let occurs_in_ind_decl id (_,clauses) =
-  List.exists (fun (_,t) -> occurs_in_term id t) clauses
-
-let occurs_in_decl d id =
-  match d.d_node with
-  | Dtype ts -> Ident.id_equal ts.Ty.ts_name id
-  | Ddata dl ->
-      List.exists
-        (fun ((_,c): data_decl) -> List.exists (occurs_in_constructor id) c)
-        dl
-  | Dparam _ls -> false
-  | Dlogic dl -> List.exists (occurs_in_defn id) dl
-  | Dind (_is, il) -> List.exists (occurs_in_ind_decl id) il
-  | Dprop (k, _, t) -> k = Paxiom && occurs_in_term id t
-
-let search km idl =
-  Mid.fold
-    (fun _id d acc ->
-     if List.for_all (occurs_in_decl d) idl then d :: acc else acc) km []
-
 
 (************* wrapper  *************)
 
@@ -238,7 +205,6 @@ let find_symbol s tables =
 
 
 let type_ptree ~as_fmla t tables =
-  (*let tables = build_name_tables task in*)
   let km = tables.known_map in
   let ns = tables.namespace in
   if as_fmla

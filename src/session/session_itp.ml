@@ -531,7 +531,7 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
    of proofNodeID [id] of parent [p] of task [t] *)
 let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
-  let tables = Args_wrapper.build_name_tables t in
+  let tables = Args_wrapper.build_naming_tables t in
   let sum = Some (Termcode.task_checksum ~version t) in
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;

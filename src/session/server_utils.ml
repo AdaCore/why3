@@ -147,13 +147,59 @@ let print_id s tables =
   in
   Pp.string_of (Why3printer.print_decl tables) d
 
+
+
+(* searching ids in declarations *)
+
+let occurs_in_type id = Ty.ty_s_any (fun ts -> Ident.id_equal ts.Ty.ts_name id)
+
+let occurs_in_term id =
+  Term.t_s_any (occurs_in_type id) (fun ls -> Ident.id_equal id ls.Term.ls_name)
+
+let occurs_in_constructor id (cs,projs) =
+  Ident.id_equal cs.Term.ls_name id ||
+    List.exists (function Some ls -> Ident.id_equal ls.Term.ls_name id | None -> false) projs
+
+let occurs_in_defn id (ls,def) =
+  Ident.id_equal ls.Term.ls_name id ||
+  let (_vl,t) = Decl.open_ls_defn def in occurs_in_term id t
+
+let occurs_in_ind_decl id (_,clauses) =
+  List.exists (fun (_,t) -> occurs_in_term id t) clauses
+
+let occurs_in_decl d id =
+  Decl.(match d.d_node with
+  | Decl.Dtype ts -> Ident.id_equal ts.Ty.ts_name id (* look through ts.ys_def *)
+  | Decl.Ddata dl ->
+      List.exists
+        (fun ((ts,c): data_decl) ->
+         Ident.id_equal ts.Ty.ts_name id || List.exists (occurs_in_constructor id) c)
+        dl
+  | Decl.Dparam ls -> Ident.id_equal ls.Term.ls_name id
+  | Decl.Dlogic dl -> List.exists (occurs_in_defn id) dl
+  | Decl.Dind (_, il) -> List.exists (occurs_in_ind_decl id) il
+  | Dprop ((Paxiom|Plemma), pr, t) -> Ident.id_equal pr.pr_name id || occurs_in_term id t
+  | Dprop _ -> false)
+
+let do_search km idl =
+  Ident.Mid.fold
+    (fun _ d acc ->
+     if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc) km Decl.Sdecl.empty
+
 let search s tables =
-  (*let tables = Args_wrapper.build_name_tables task in*)
-  let id = try find_any_id tables.Trans.namespace s with
-  | Not_found -> raise (Undefined_id s) in
-  let l = Args_wrapper.search tables.Trans.known_map [id] in
-  let s_id = print_id s tables in
-  s_id ^ (Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l)
+  let ids = List.rev_map
+              (fun s -> try find_any_id tables.Trans.namespace s
+                        with Not_found -> raise (Undefined_id s)) s
+  in
+  let l = do_search tables.Trans.known_map ids in
+  if Decl.Sdecl.is_empty l then
+       Pp.sprintf
+         "No declaration contain all the %d identifiers @[%a@]"
+         (List.length ids)
+         (Pp.print_list Pp.space (fun fmt id -> Pp.string fmt id.Ident.id_string))
+         ids
+    else let l = Decl.Sdecl.elements l in
+         Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l
 
 let print_id _cont task args =
   match args with
@@ -162,8 +208,8 @@ let print_id _cont task args =
 
 let search_id _cont task args =
   match args with
-  | [s] -> search s task
-  | _ -> raise Number_of_arguments
+  | [] -> raise Number_of_arguments
+  | _ -> search args task
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
