@@ -138,8 +138,8 @@ exception Number_of_arguments
 
 let print_id s tables =
   (* let tables = Args_wrapper.build_name_tables task in*)
-  let km = tables.Task.known_map in
-  let id = try find_any_id tables.Task.namespace s with
+  let km = tables.Trans.known_map in
+  let id = try find_any_id tables.Trans.namespace s with
   | Not_found -> raise (Undefined_id s) in
   let d =
     try Ident.Mid.find id km with
@@ -149,13 +149,9 @@ let print_id s tables =
 
 let search s tables =
   (*let tables = Args_wrapper.build_name_tables task in*)
-  let id_decl = tables.Task.id_decl in
-  let id = try find_any_id tables.Task.namespace s with
+  let id = try find_any_id tables.Trans.namespace s with
   | Not_found -> raise (Undefined_id s) in
-  let l =
-    try Ident.Mid.find id id_decl with
-    | Not_found -> raise Not_found (* Should not happen *)
-  in
+  let l = Args_wrapper.search tables.Trans.known_map [id] in
   let s_id = print_id s tables in
   s_id ^ (Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l)
 
@@ -171,7 +167,7 @@ let search_id _cont task args =
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
-  | Qtask of (Controller_itp.controller -> Task.names_table -> string list -> string)
+  | Qtask of (Controller_itp.controller -> Trans.naming_table -> string list -> string)
 
 let help_on_queries fmt commands =
   let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
@@ -333,7 +329,7 @@ let interp commands_table config cont id s =
     | Qtask _, None -> QError "please select a goal first"
     | Qtask f, Some id ->
        let table = match Session_itp.get_table cont.Controller_itp.controller_session id with
-       | None -> raise (Task.Bad_name_table "Server_utils.interp")
+       | None -> raise (Trans.Bad_name_table "Server_utils.interp")
        | Some table -> table in
        let s = try Query (f cont table args) with
        | Undefined_id s -> QError ("No existing id corresponding to " ^ s)

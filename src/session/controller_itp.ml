@@ -494,7 +494,7 @@ let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
     let task = get_task c.controller_session id in
     let table = match get_table c.controller_session id with
-    | None -> raise (Task.Bad_name_table "Controller_itp.schedule_transformation_r")
+    | None -> raise (Trans.Bad_name_table "Controller_itp.schedule_transformation_r")
     | Some table -> table in
     begin
       try

@@ -333,10 +333,26 @@ let list_transforms () =
 let list_transforms_l () =
   Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_l []
 
+
+
 (** transformations with arguments *)
 
-type trans_with_args = string list -> Env.env -> Task.names_table -> task trans
-type trans_with_args_l = string list -> Env.env -> Task.names_table -> task tlist
+type naming_table = {
+    namespace : namespace;
+    known_map : known_map;
+    printer : Ident.ident_printer;
+  }
+
+exception Bad_name_table of string
+
+let empty_naming_table = {
+    namespace = empty_ns;
+    known_map = Ident.Mid.empty;
+    printer = Ident.create_ident_printer [];
+  }
+
+type trans_with_args = string list -> Env.env -> naming_table -> task trans
+type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
 
 let transforms_with_args = Hstr.create 17
 let transforms_with_args_l = Hstr.create 17
@@ -452,4 +468,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | TransFailure (s,e) ->
       Format.fprintf fmt "Failure in transformation %s@\n%a" s
         Exn_printer.exn_printer e
+  | Bad_name_table s ->
+      Format.fprintf fmt "Names table associated to task was not generated in %s" s
   | e -> raise e)

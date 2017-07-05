@@ -50,7 +50,7 @@ type symb =
   | Pr of prsymbol
 
 (* [add_unsafe s id tables] Add (s, id) to tables without any checking. *)
-let add_unsafe (s: string) (id: symb) (tables: names_table) : names_table =
+let add_unsafe (s: string) (id: symb) (tables: naming_table) : naming_table =
   match id with
   | Ts ty ->
       {tables with
@@ -66,7 +66,7 @@ let add_unsafe (s: string) (id: symb) (tables: names_table) : names_table =
 }
 
 (* Adds symbols that are introduced to a constructor *)
-let constructor_add (cl: constructor list) tables : names_table =
+let constructor_add (cl: constructor list) tables : naming_table =
   List.fold_left
     (fun tables ((ls, cl): constructor) ->
       let tables = List.fold_left
@@ -93,53 +93,9 @@ let ind_decl_add il tables =
     il
     tables
 
-let rec insert l d =
-  match l with
-  | hd :: tl -> if hd == d then l else hd :: insert tl d
-  | [] -> [d]
-
-let add_decls_id id d tables =
-  let l = try (Ident.Mid.find id tables.id_decl) with
-  | Not_found -> [] in
-  {tables with id_decl = Ident.Mid.add id (insert l d) tables.id_decl}
-
-(* [add_id tables d t] To all identifiants id used in t, adds the associated
-   declaration d in the table.id_decl *)
-let rec add_id tables d t =
-  match t.t_node with
-  | Tvar _ -> tables
-  | Tconst _ | Ttrue | Tfalse -> tables
-  | Tapp (l, tl) ->
-      let tables = add_decls_id l.ls_name d tables in
-      List.fold_left (fun tables t -> add_id tables d t) tables tl
-  | Tlet (t, tb) ->
-      let tables = add_id tables d t in
-      let (_v1, t1) = t_open_bound tb in
-      add_id tables d t1
-  | Tcase (t, tbl) ->
-      let tables = add_id tables d t in
-      List.fold_left (fun tables ob ->
-        let (_pat, t) = t_open_branch ob in
-        add_id tables d t) tables tbl
-  | Teps (tb) ->
-      let (_v, t) = t_open_bound tb in
-      add_id tables d t
-  | Tquant (_, tq) ->
-      let (_vl, _, t) = t_open_quant tq in
-      add_id tables d t
-  | Tbinop (_, t1, t2) ->
-      let tables = add_id tables d t1 in
-      add_id tables d t2
-  | Tnot (t) ->
-      add_id tables d t
-  | Tif (t1, t2, t3) ->
-      let tables = add_id tables d t1 in
-      let tables = add_id tables d t2 in
-      add_id tables d t3
-
 (* [add d printer tables] Adds all new declaration of symbol inside d to tables.
   It uses printer to give them a unique name and also register these new names in printer *)
-let add (d: decl) (tables: names_table): names_table =
+let add (d: decl) (tables: naming_table): naming_table =
   match d.d_node with
   | Dtype ty ->
       (* only current symbol is new in the declaration (see create_ty_decl) *)
@@ -181,22 +137,19 @@ let add (d: decl) (tables: names_table): names_table =
           ind_decl_add tables ind)
         tables
         il
-  | Dprop (_, pr, t) ->
+  | Dprop (_, pr, _t) ->
       (* Only pr is new in Dprop (see create_prop_decl) *)
       let id = pr.pr_name in
       let s = id_unique tables.printer id in
-      let tables = add_unsafe s (Pr pr) tables in
-      add_id tables d t
+      add_unsafe s (Pr pr) tables
 
-let build_name_tables task : names_table =
+let build_name_tables task : naming_table =
   let pr = fresh_printer () in
   let km = Task.task_known task in
-  let empty_decls = Ident.Mid.empty in
   let tables = {
       namespace = empty_ns;
       known_map = km;
       printer = pr;
-      id_decl = empty_decls
   } in
 (*  We want conflicting names to be named as follows:
     names closer to the goal should be named with lowest
@@ -205,6 +158,38 @@ let build_name_tables task : names_table =
     added by the user are renamed on the fly. *)
   let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
   List.fold_left (fun tables d -> add d tables) tables l
+
+(* searching ids in declarations *)
+
+let occurs_in_type id = ty_s_any (fun ts -> Ident.id_equal ts.Ty.ts_name id)
+
+let occurs_in_term id =
+  t_s_any (occurs_in_type id) (fun ls -> Ident.id_equal id ls.ls_name)
+
+let occurs_in_constructor _id _c = false
+
+let occurs_in_defn id (_,def) =
+  let (_vl,t) = open_ls_defn def in occurs_in_term id t
+
+let occurs_in_ind_decl id (_,clauses) =
+  List.exists (fun (_,t) -> occurs_in_term id t) clauses
+
+let occurs_in_decl d id =
+  match d.d_node with
+  | Dtype ts -> Ident.id_equal ts.Ty.ts_name id
+  | Ddata dl ->
+      List.exists
+        (fun ((_,c): data_decl) -> List.exists (occurs_in_constructor id) c)
+        dl
+  | Dparam _ls -> false
+  | Dlogic dl -> List.exists (occurs_in_defn id) dl
+  | Dind (_is, il) -> List.exists (occurs_in_ind_decl id) il
+  | Dprop (k, _, t) -> k = Paxiom && occurs_in_term id t
+
+let search km idl =
+  Mid.fold
+    (fun _id d acc ->
+     if List.for_all (occurs_in_decl d) idl then d :: acc else acc) km []
 
 
 (************* wrapper  *************)
@@ -382,7 +367,7 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
 
 exception Unnecessary_arguments of string list
 
-let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> names_table -> task -> b =
+let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> naming_table -> task -> b =
   fun t f l env tables task ->
     match t, l with
     | Ttrans, []-> apply f task
@@ -476,7 +461,8 @@ let wrap_l : type a. (a, task list) trans_typ -> a -> trans_with_args_l =
 let wrap   : type a. (a, task) trans_typ -> a -> trans_with_args =
   fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
-let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> Task.names_table -> b trans =
+let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env ->
+                    Trans.naming_table -> b trans =
   fun t f l env tables -> Trans.store (wrap_to_store t f l env tables)
 
 let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =

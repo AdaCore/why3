@@ -19,7 +19,6 @@ open Term
 open Decl
 open Printer
 open Theory
-open Task
 
 (* Labels and locations can be printed by setting the appropriate flags *)
 let debug_print_labels = Debug.register_info_flag "print_labels"
@@ -28,7 +27,7 @@ let debug_print_labels = Debug.register_info_flag "print_labels"
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let id_unique tables id = id_unique_label tables.printer id
+let id_unique tables id = id_unique_label tables.Trans.printer id
 
 (*
 let forget_tvs () =
@@ -49,7 +48,7 @@ let print_tv tables fmt tv =
 let print_vs tables fmt vs =
   fprintf fmt "%s" (id_unique tables vs.vs_name)
 
-let forget_var tables vs = forget_id tables.printer vs.vs_name
+let forget_var tables vs = forget_id tables.Trans.printer vs.vs_name
 
 (* theory names always start with an upper case letter *)
 let print_th tables fmt th =
@@ -102,7 +101,7 @@ let print_ty = print_ty_node false
 
 (** Forgetting function for stability of errors *)
 let print_forget_vsty tables fmt v =
-  if (Ident.known_id tables.printer v.vs_name) then
+  if (Ident.known_id tables.Trans.printer v.vs_name) then
     fprintf fmt "%a: %a" (print_vs tables) v (print_ty tables) v.vs_ty
   else
     begin
@@ -434,7 +433,7 @@ let print_task args ?old:_ fmt task =
   (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
   (* forget_all (); *)
   let tables = match args.name_table with
-    | None -> empty_names_table (* raise (Bad_name_table "Why3printer.print_task")*)
+    | None -> Trans.empty_naming_table (* raise (Bad_name_table "Why3printer.print_task")*)
     | Some tables -> tables in
   print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
@@ -493,7 +492,7 @@ let print_sequent args ?old:_ fmt task =
   info := {info_syn = Discriminate.get_syntax_map task;
     itp = true};
   let tables = match args.name_table with
-    | None -> empty_names_table (* raise (Bad_name_table "Why3printer.print_sequent") *)
+    | None -> Trans.empty_naming_table (* raise (Bad_name_table "Why3printer.print_sequent") *)
     | Some tables -> tables in
   (* let tables = build_name_tables task in *)
   let ut = Task.used_symbols (Task.used_theories task) in

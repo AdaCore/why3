@@ -11,7 +11,11 @@ exception Arg_hyp_not_found of string
 (** Pre-processing of tasks, to build unique names for all declared
     identifiers of a task.*)
 
-val build_name_tables : Task.task -> Task.names_table
+val build_name_tables : Task.task -> Trans.naming_table
+
+val search : Decl.known_map -> Ident.ident list -> Decl.decl list
+(** [search km ids] returns the set of declarations from [km] that
+    contain all the identifiers [ids] *)
 
 type symbol =
   | Tstysymbol of Ty.tysymbol
