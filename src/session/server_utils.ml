@@ -126,10 +126,11 @@ let list_provers cont _args =
   Pp.sprintf "%a" (Pp.print_list Pp.newline Pp.string) l
 
 
-let find_any_id nt s =
-  try (Stdlib.Mstr.find s nt.Theory.ns_pr).Decl.pr_name with
-  | Not_found -> try (Stdlib.Mstr.find s nt.Theory.ns_ls).Term.ls_name with
-    | Not_found -> (Stdlib.Mstr.find s nt.Theory.ns_ts).Ty.ts_name
+let symbol_name s =
+  match s with
+  | Args_wrapper.Tstysymbol ts -> ts.Ty.ts_name
+  | Args_wrapper.Tsprsymbol pr -> pr.Decl.pr_name
+  | Args_wrapper.Tslsymbol ls -> ls.Term.ls_name
 
 (* The id you are trying to use is undefined *)
 exception Undefined_id of string
@@ -139,10 +140,10 @@ exception Number_of_arguments
 let print_id s tables =
   (* let tables = Args_wrapper.build_name_tables task in*)
   let km = tables.Trans.known_map in
-  let id = try find_any_id tables.Trans.namespace s with
+  let id = try Args_wrapper.find_symbol s tables with
   | Not_found -> raise (Undefined_id s) in
   let d =
-    try Ident.Mid.find id km with
+    try Ident.Mid.find (symbol_name id) km with
     | Not_found -> raise Not_found (* Should not happen *)
   in
   Pp.string_of (Why3printer.print_decl tables) d
@@ -188,8 +189,9 @@ let do_search km idl =
 
 let search s tables =
   let ids = List.rev_map
-              (fun s -> try find_any_id tables.Trans.namespace s
-                        with Not_found -> raise (Undefined_id s)) s
+              (fun s -> try symbol_name (Args_wrapper.find_symbol s tables)
+                        with Args_wrapper.Arg_parse_type_error _ |
+                             Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s)) s
   in
   let l = do_search tables.Trans.known_map ids in
   if Decl.Sdecl.is_empty l then

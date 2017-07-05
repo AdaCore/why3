@@ -60,7 +60,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let g, task = Task.task_separate_goal task in
   let g = term_decl g in
   let d = find_hypothesis name task in
-  if d = None then raise (Arg_hyp_not_found "apply");
+  if d = None then raise (Arg_error "apply");
   let d = Opt.get d in
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
@@ -160,7 +160,7 @@ let rewrite_in rev h h1 =
   (* Return instantiated premises and the hypothesis correctly rewritten *)
   let lp_new found_eq =
     match found_eq with
-    | None -> raise (Arg_hyp_not_found "rewrite")
+    | None -> raise (Arg_error "rewrite")
     | Some (lp, lv, t1, t2) ->
       fold (fun d acc ->
         match d.d_node with

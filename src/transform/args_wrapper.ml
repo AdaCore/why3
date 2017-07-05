@@ -21,7 +21,8 @@ exception Arg_parse_error of string * string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
-exception Arg_hyp_not_found of string
+exception Arg_qid_not_found of Ptree.qualid
+exception Arg_error of string
 
 let () = Exn_printer.register
     (fun fmt e ->
@@ -187,22 +188,22 @@ type (_, _) trans_typ =
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
   | Toptbool    : string * ('a, 'b) trans_typ -> (bool -> 'a, 'b) trans_typ
 
-let find_pr s tables =
-  Mstr.find s tables.namespace.ns_pr
+let find_pr q tables =
+  Theory.ns_find_pr tables.namespace (Typing.string_list_of_qualid q)
 
-let find_ts s tables =
-  Mstr.find s tables.namespace.ns_ts
+let find_ts q tables =
+  Theory.ns_find_ts tables.namespace (Typing.string_list_of_qualid q)
 
-let find_ls s tables =
-  Mstr.find s tables.namespace.ns_ls
+let find_ls q tables =
+  Theory.ns_find_ls tables.namespace (Typing.string_list_of_qualid q)
 
-let find_symbol s tables =
-  try Tsprsymbol (find_pr s tables) with
+let find_symbol q tables =
+  try Tsprsymbol (find_pr q tables) with
         | Not_found ->
-          try Tslsymbol (find_ls s tables) with
+          try Tslsymbol (find_ls q tables) with
           | Not_found ->
-            try Tstysymbol (find_ts s tables) with
-            | Not_found -> raise (Arg_hyp_not_found s)
+            try Tstysymbol (find_ts q tables) with
+            | Not_found -> raise (Arg_qid_not_found q)
 
 
 let type_ptree ~as_fmla t tables =
@@ -227,9 +228,26 @@ let parse_and_type ~as_fmla s task =
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
+let parse_qualid s =
+  try
+    let lb = Lexing.from_string s in
+    Lexer.parse_qualid lb
+  with
+  | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
+
+let parse_list_qualid s =
+  try
+    let lb = Lexing.from_string s in
+    Lexer.parse_list_qualid lb
+  with
+  | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
+
 let parse_list_ident s =
-  let lb = Lexing.from_string s in
-  Lexer.parse_list_ident lb
+  try
+    let lb = Lexing.from_string s in
+    Lexer.parse_list_ident lb
+  with
+  | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let parse_int s =
   try int_of_string s
@@ -363,65 +381,70 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       let tys = Ty.ts_int in (* TODO: parsing + typing of s *)
       wrap_to_store t' (f tys) tail env tables task
     | Tprsymbol t', s :: tail ->
-      let pr = try (find_pr s tables) with
-               | Not_found -> raise (Arg_hyp_not_found s) in
+       let q = parse_qualid s in
+       let pr = try (find_pr q tables) with
+                | Not_found -> raise (Arg_qid_not_found q) in
       wrap_to_store t' (f pr) tail env tables task
     | Tprlist t', s :: tail ->
-        let pr_list = parse_list_ident s in
+        let pr_list = parse_list_qualid s in
         let pr_list =
         List.map (fun id ->
-                    try find_pr id.Ptree.id_str tables with
-                    | Not_found -> raise (Arg_hyp_not_found s))
+                    try find_pr id tables with
+                    | Not_found -> raise (Arg_qid_not_found id))
                  pr_list in
         wrap_to_store t' (f pr_list) tail env tables task
     | Tlsymbol t', s :: tail ->
-      let pr = try (find_ls s tables) with
-               | Not_found -> raise (Arg_hyp_not_found s) in
+       let q = parse_qualid s in
+       let pr = try (find_ls q tables) with
+               | Not_found -> raise (Arg_qid_not_found q) in
       wrap_to_store t' (f pr) tail env tables task
     | Tsymbol t', s :: tail ->
-      let symbol = find_symbol s tables in
-      wrap_to_store t' (f symbol) tail env tables task
+       let q = parse_qualid s in
+       let symbol = find_symbol q tables in
+       wrap_to_store t' (f symbol) tail env tables task
     | Tlist t', s :: tail ->
-      let pr_list = parse_list_ident s in
-      let pr_list =
-        List.map (fun id -> find_symbol id.Ptree.id_str tables) pr_list in
-      wrap_to_store t' (f pr_list) tail env tables task
+       let pr_list = parse_list_qualid s in
+       let pr_list =
+         List.map (fun id -> find_symbol id tables) pr_list in
+       wrap_to_store t' (f pr_list) tail env tables task
     | Ttheory t', s :: tail ->
-      let th = parse_theory env s in
-      wrap_to_store t' (f th) tail env tables task
+       let th = parse_theory env s in
+       wrap_to_store t' (f th) tail env tables task
     | Tstring t', s :: tail ->
-      wrap_to_store t' (f s) tail env tables task
+       wrap_to_store t' (f s) tail env tables task
     | Tstringlist t', s :: tail ->
-      let list = List.map (fun id -> id.Ptree.id_str) (parse_list_ident s) in
-      wrap_to_store t' (f list) tail env tables task
+       let list = List.map (fun id -> id.Ptree.id_str) (parse_list_ident s) in
+       wrap_to_store t' (f list) tail env tables task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
-      begin match t' with
+       begin match t' with
         | Tint t' ->
           let arg = Some (parse_int s') in
           wrap_to_store t' (f arg) tail env tables task
         | Tprsymbol t' ->
-          let arg = try Some (find_pr s' tables) with
-                    | Not_found -> raise (Arg_hyp_not_found s') in
+           let q = parse_qualid s' in
+           let arg = try Some (find_pr q tables) with
+                    | Not_found -> raise (Arg_qid_not_found q) in
           wrap_to_store t' (f arg) tail env tables task
         | Tsymbol t' ->
-          let arg = Some (find_symbol s' tables) in
-          wrap_to_store t' (f arg) tail env tables task
+           let q = parse_qualid s' in
+           let arg = Some (find_symbol q tables) in
+           wrap_to_store t' (f arg) tail env tables task
         | Tformula t' ->
-          let arg = Some (parse_and_type ~as_fmla:true s' tables) in
-          wrap_to_store t' (f arg) tail env tables task
+           let arg = Some (parse_and_type ~as_fmla:true s' tables) in
+           wrap_to_store t' (f arg) tail env tables task
         | Tterm t' ->
-          let arg = Some (parse_and_type ~as_fmla:false s' tables) in
-          wrap_to_store t' (f arg) tail env tables task
+           let arg = Some (parse_and_type ~as_fmla:false s' tables) in
+           wrap_to_store t' (f arg) tail env tables task
         | Ttheory t' ->
-          let arg = Some (parse_theory env s') in
-          wrap_to_store t' (f arg) tail env tables task
+           let arg = Some (parse_theory env s') in
+           wrap_to_store t' (f arg) tail env tables task
         | Tstring t' ->
-          let arg = Some s' in
-          wrap_to_store t' (f arg) tail env tables task
+           let arg = Some s' in
+           wrap_to_store t' (f arg) tail env tables task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
-      end
+       end
     | Topt (_, t'), _ ->
-      wrap_to_store (trans_typ_tail t') (f None) l env tables task
+       wrap_to_store (trans_typ_tail t') (f None) l env tables task
     | Toptbool (optname, t'), s :: tail when s = optname ->
       wrap_to_store t' (f true) tail env tables task
     | Toptbool (_, t'), _ ->
@@ -447,3 +470,6 @@ let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_ty
       Trans.register_transform_with_args_l ~desc:(type_desc ^^ desc) name trans
     | No ->
       Trans.register_transform_with_args ~desc:(type_desc ^^ desc) name trans
+
+
+let find_symbol s tables = find_symbol (parse_qualid s) tables

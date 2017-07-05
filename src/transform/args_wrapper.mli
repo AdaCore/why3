@@ -5,7 +5,8 @@ exception Arg_parse_error of string * string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
-exception Arg_hyp_not_found of string
+exception Arg_qid_not_found of Ptree.qualid
+exception Arg_error of string
 
 
 (** Pre-processing of tasks, to build unique names for all declared
@@ -17,6 +18,8 @@ type symbol =
   | Tstysymbol of Ty.tysymbol
   | Tsprsymbol of Decl.prsymbol
   | Tslsymbol of Term.lsymbol
+
+val find_symbol : string -> Trans.naming_table -> symbol
 
 type (_, _) trans_typ =
   | Ttrans      : ((task Trans.trans), task) trans_typ

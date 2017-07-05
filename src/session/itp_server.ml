@@ -233,8 +233,10 @@ let get_exception_message ses id e =
         (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans (s) ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
-  | Args_wrapper.Arg_hyp_not_found (s) ->
-      Pp.sprintf "Following hypothesis was not found: %s \n" s, Loc.dummy_position, ""
+  | Args_wrapper.Arg_qid_not_found q ->
+      Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
+  | Args_wrapper.Arg_error s ->
+      Pp.sprintf "Transformation raised a general error: %s \n" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_theory_not_found (s) ->
       Pp.sprintf "Theory not found: %s" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_parse_type_error(loc, arg, e) ->
