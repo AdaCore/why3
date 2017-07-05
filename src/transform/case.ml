@@ -49,60 +49,78 @@ let exists_aux g x =
 let exists x =
   Trans.goal (fun _ g -> exists_aux g x)
 
-(* TODO temporary for intros *)
-let rec intros n pr f =
-  if n = 0 then [create_prop_decl Pgoal pr f] else
+(* TODO temporary *)
+let rec intros list_name pr f =
+  if list_name = [] then [create_prop_decl Pgoal pr f] else
   match f.t_node with
-  (* (f2 \/ True) => _ *)
-  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
-      when Slab.mem Term.asym_label f2.t_label ->
-        [create_prop_decl Pgoal pr f]
   | Tbinop (Timplies,f1,f2) ->
-      (* split f1 *)
       (* f is going to be removed, preserve its labels and location in f2  *)
       let f2 = t_label_copy f f2 in
-      let l = Split_goal.split_intro_right f1 in
-      List.fold_right
-        (fun f acc ->
-           let id = create_prsymbol (id_fresh "H") in
-           let d = create_prop_decl Paxiom id f in
-           d :: acc)
-        l
-        (intros (n-1) pr f2)
+      let name, tl =
+        match list_name with
+        | [] -> assert false
+        | "" :: tl -> "H", tl
+        | name :: tl -> name, tl
+      in
+      let id = create_prsymbol (id_fresh name) in
+      let d = create_prop_decl Paxiom id f1 in
+      d :: intros tl pr f2
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
-      let intro_var subst vs =
-        let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+      let intro_var name subst vs =
+        let ls = create_lsymbol name [] (Some vs.vs_ty) in
         Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
-      let subst, decl = intro_var Mvs.empty (List.hd vsl) in
-      if List.length vsl = 1 then
-        begin
-          let f = t_label_copy f (t_subst subst f_t) in
-          decl :: intros (n-1) pr f
-        end
+
+      (* TODO clarify this: We iterate on both the list of names given by the
+         user and the list of variables bounded by the forall. The two lists can
+         have different sizes and this solution is ugly. Should use a List
+         function instead.  *)
+      let rec subst_decls (subst, decls) list_name vsl =
+        match list_name, vsl with
+        | [], _ -> (subst, decls, vsl, [])
+        | _, [] -> (subst, decls, [], list_name)
+        | name :: list_name, var :: vsl ->
+            let name = if name = "" then id_clone var.vs_name else id_fresh name in
+            let subst, decl = intro_var name subst var in
+            subst_decls (subst, decl :: decls) list_name vsl
+      in
+
+      let subst, decls, vsl, list_name = subst_decls (Mvs.empty, []) list_name vsl in
+      if vsl = [] then
+        let f = t_label_copy f (t_subst subst f_t) in
+        (List.rev decls) @ intros list_name pr f
       else
         let f = t_quant Tforall
-            (t_close_quant (List.tl vsl) [] (t_subst subst f_t)) in
-        decl :: intros (n-1) pr f
+            (t_close_quant vsl [] (t_subst subst f_t)) in
+        (List.rev decls) @ intros list_name pr f
+
   | Tlet (t,fb) ->
       let vs,f = t_open_bound fb in
-      let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
+      let name =  List.hd list_name in
+      let ls = create_lsymbol (id_fresh name) [] (Some vs.vs_ty) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros (n-1) pr f
+      d :: intros (List.tl list_name) pr f
+  (* Intentionnaly do not fail when too many arguments are given *)
   | _ -> [create_prop_decl Pgoal pr f]
 
-let intros n pr f =
+let intros list_name pr f =
   let tvs = t_ty_freevars Stv.empty f in
   let mk_ts tv () = create_tysymbol (id_clone tv.tv_name) [] NoDef in
   let tvm = Mtv.mapi mk_ts tvs in
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
-  Mtv.values decls @ intros n pr (t_ty_subst subst Mvs.empty f)
+  Mtv.values decls @ intros list_name pr (t_ty_subst subst Mvs.empty f)
 
-let introduce_premises n = Trans.goal (intros n)
+(* TODO solve this inefficiency *)
+let rec create_list n = if n <= 0 then [] else "" :: create_list (n-1)
+
+(* TODO inefficient create_list *)
+let introduce_premises n = Trans.goal (intros (create_list n))
+
+let intros_list l = Trans.goal (intros l)
 
 let () = wrap_and_register
     ~desc:"case <term> [name] generates hypothesis 'name: term' in a first goal and 'name: ~ term' in a second one."
@@ -123,5 +141,9 @@ let () = wrap_and_register
     (Tterm Ttrans) exists
 
 let () = wrap_and_register ~desc:"intros n"
-    "intros"
+    "intros_n"
     (Tint Ttrans) introduce_premises
+
+let () = wrap_and_register ~desc:"intros a,b,c,v"
+    "intros"
+    (Tstringlist Ttrans) intros_list

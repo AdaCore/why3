@@ -181,6 +181,7 @@ type (_, _) trans_typ =
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Tstring     : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
+  | Tstringlist : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
   | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory     : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
@@ -282,6 +283,7 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tlist t        -> is_trans_typ_l t
     | Tterm t        -> is_trans_typ_l t
     | Tstring t      -> is_trans_typ_l t
+    | Tstringlist t  -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
     | Ttheory t      -> is_trans_typ_l t
     | Topt (_,t)     -> is_trans_typ_l t
@@ -304,6 +306,7 @@ let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tlist _        -> "list of prop symbol"
     | Tterm _        -> "term"
     | Tstring _      -> "string"
+    | Tstringlist _  -> "string list"
     | Tformula _     -> "formula"
     | Ttheory _      -> "theory"
     | Topt (s,_)     -> "opt [" ^ s ^ "]"
@@ -326,6 +329,7 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Tlist t        -> "prop_symbol list -> " ^ print_type t
     | Tterm t        -> "term -> " ^ print_type t
     | Tstring t      -> "string -> " ^ print_type t
+    | Tstringlist t  -> "string list -> " ^ print_type t
     | Tformula t     -> "formula -> " ^ print_type t
     | Ttheory t      -> "theory -> " ^ print_type t
     | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
@@ -387,6 +391,9 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f th) tail env tables task
     | Tstring t', s :: tail ->
       wrap_to_store t' (f s) tail env tables task
+    | Tstringlist t', s :: tail ->
+      let list = List.map (fun id -> id.Ptree.id_str) (parse_list_ident s) in
+      wrap_to_store t' (f list) tail env tables task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
       begin match t' with
         | Tint t' ->
