@@ -301,13 +301,14 @@ let prepare_task ~cntexample drv task =
   let task = update_task drv task in
   List.fold_left apply task transl
 
-let print_task_prepared ?old ?name_table drv fmt task =
+let print_task_prepared ?old ?name_table ?(do_intros=false) drv fmt task =
   let p = match drv.drv_printer with
     | None -> raise NoPrinter
     | Some p -> p
   in
   let printer_args = { Printer.env = drv.drv_env;
       name_table  = name_table;
+      do_intros   = do_intros;
       prelude     = drv.drv_prelude;
       th_prelude  = drv.drv_thprelude;
       blacklist   = drv.drv_blacklist;
@@ -317,9 +318,9 @@ let print_task_prepared ?old ?name_table drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) ?name_table drv fmt task =
+let print_task ?old ?(cntexample=false) ?(do_intros=false) ?name_table drv fmt task =
   let task = prepare_task ~cntexample drv task in
-  let _ = print_task_prepared ?old ?name_table drv fmt task in
+  let _ = print_task_prepared ?old ?name_table ~do_intros drv fmt task in
   ()
 
 let print_theory ?old ?name_table drv fmt th =

@@ -482,9 +482,11 @@ let rec print_term_intro tables fmt t =
 (* do not forget these local names, they might be used by the itp *)
 (*      List.iter (forget_var tables) vl*)
 
-let print_goal tables fmt d =
+let print_goal tables do_intros fmt d =
    match d.d_node with
-   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]" (print_term_intro tables) f
+   | Dprop (Pgoal,_pr,f) ->
+      if do_intros then fprintf fmt "@[%a@]" (print_term_intro tables) f
+      else fprintf fmt "@[%a@]" (print_term tables) f
    | _ -> assert false
 
 let print_sequent args ?old:_ fmt task =
@@ -501,7 +503,7 @@ let print_sequent args ?old:_ fmt task =
       | [] -> assert false
       | [g] ->
          fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
-         print_goal tables fmt g
+         print_goal tables args.do_intros fmt g
       | d :: r ->
          fprintf fmt "@[%a@]@\n" (print_decl tables) d;
          aux fmt r

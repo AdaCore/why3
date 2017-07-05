@@ -72,6 +72,7 @@ val get_int: json -> int
 val get_list: json -> json list
 val get_float: json -> float
 val get_bool: json -> bool
+val get_bool_opt: json -> bool -> bool
 
 (* To parse a json value, use file Json_parser and function json_object. See
    end of session/Json_util.ml for an example use.

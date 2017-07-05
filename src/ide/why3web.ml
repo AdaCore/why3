@@ -58,7 +58,8 @@ let interp_request args =
           Command_req (int_of_string n, com)
       | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
   | args when Strings.has_prefix "gettask_" args ->
-      Get_task (int_of_string (Strings.remove_prefix "gettask_" args))
+     let b = false (* TODO: allow user to customize printing with intros or not *) in
+     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),b)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =

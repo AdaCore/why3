@@ -99,7 +99,7 @@ type ide_request =
   | Add_file_req            of string
   | Set_max_tasks_req       of int
   | Get_file_contents       of string
-  | Get_task                of node_ID
+  | Get_task                of node_ID * bool
   | Focus_req               of node_ID
   | Unfocus_req
   | Remove_subtree          of node_ID

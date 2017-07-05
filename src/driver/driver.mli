@@ -46,6 +46,7 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   ?cntexample : bool ->
+  ?do_intros  : bool ->
   ?name_table: Task.names_table ->
   driver -> Format.formatter -> Task.task -> unit
 
@@ -70,6 +71,7 @@ val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
 val print_task_prepared :
   ?old       : in_channel ->
   ?name_table: Task.names_table ->
+  ?do_intros  : bool ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
 val prove_task_prepared :

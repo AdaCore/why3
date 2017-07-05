@@ -1117,7 +1117,8 @@ let on_selected_row r =
       if detached then
         task_view#source_buffer#set_text ""
       else
-        send_request (Get_task id)
+        let b = gconfig.intro_premises in
+        send_request (Get_task(id,b))
     | NProofAttempt ->
       let (pa, _obs, _l) = Hint.find node_id_pa id in
       (match pa with
@@ -1137,7 +1138,9 @@ let on_selected_row r =
           task_view#source_buffer#set_text "Internal failure"
       | Controller_itp.Uninstalled _p ->
           task_view#source_buffer#set_text "Uninstalled")
-    | _ -> send_request (Get_task id)
+    | _ ->
+       let b = gconfig.intro_premises in
+       send_request (Get_task(id,b))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 

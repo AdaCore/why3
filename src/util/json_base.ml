@@ -109,3 +109,8 @@ let get_bool j =
   match j with
   | Bool b -> b
   | _ -> raise Not_found
+
+let get_bool_opt j def =
+  match j with
+  | Bool b -> b
+  | _ -> def
