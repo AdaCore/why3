@@ -65,7 +65,7 @@ module Protocol_why3ide = struct
   let get_requests () =
     let n = List.length !list_requests in
     if n > 0 then
-      Debug.dprintf debug_proto "[IDE proto] got %d newrequests@." n;
+      Debug.dprintf debug_proto "[IDE proto] got %d new requests@." n;
     let l = List.rev !list_requests in
     list_requests := [];
     l
@@ -1642,11 +1642,10 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-              else
-                (* Trying to move cursor on first unproven goal around on all cases
-              but not when proofAttempt is updated because ad hoc debugging. *)
-                send_request (Get_first_unproven_node id)
-            end
+            end;
+              (* Trying to move cursor on first unproven goal around on all cases
+                 but not when proofAttempt is updated because ad hoc debugging. *)
+              send_request (Get_first_unproven_node id)
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
