@@ -1,0 +1,30 @@
+module Cursor
+
+  use import seq.Seq
+
+  type t 'a
+
+  predicate permitted (seq 'a) (t 'a)
+  predicate complete  (seq 'a) (t 'a)
+
+  type cursor 'a = private {
+    ghost mutable visited   : seq 'a;
+    ghost         collection: t 'a;
+  }
+
+  val create (t: t 'a) : cursor 'a
+    ensures { result.visited = empty }
+    ensures { result.collection = t }
+
+  val next (c: cursor 'a) : 'a
+    requires { not (complete c.visited c.collection) }
+    requires { permitted c.visited c.collection }
+    writes   { c.visited }
+    ensures  { c.visited = snoc (old c).visited result }
+    ensures  { permitted c.visited c.collection }
+
+  val has_next (c: cursor 'a) : bool
+    requires { permitted c.visited c.collection }
+    ensures  { result <-> not (complete c.visited c.collection) }
+
+end
