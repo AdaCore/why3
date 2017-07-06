@@ -17,17 +17,6 @@ open Ident
 open Theory
 open Decl
 
-let fresh_printer =
-  let bl = ["theory"; "type"; "function"; "predicate"; "inductive";
-            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-            "namespace"; "import"; "export"; "end";
-            "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
-            "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
-(*
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
- *)
-  fun () -> create_ident_printer bl (* ~sanitizer:isanitize *)
-
 exception Arg_parse_error of string * string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
@@ -49,11 +38,6 @@ let () = Exn_printer.register
       | _ -> raise e)
 
 open Stdlib
-
-let sanitizer x = x (*sanitizer char_to_lalpha char_to_lalpha x*)
-
-let id_unique printer id =
-  id_unique_label printer ~sanitizer:sanitizer id
 
 (* Use symb to encapsulate ids into correct categories of symbols *)
 type symb =
@@ -77,6 +61,8 @@ let add_unsafe (s: string) (id: symb) (tables: naming_table) : naming_table =
         namespace = {tables.namespace with ns_pr = Mstr.add s pr tables.namespace.ns_pr};
 }
 
+let id_unique tables id = id_unique_label tables.printer id
+
 (* Adds symbols that are introduced to a constructor *)
 let constructor_add (cl: constructor list) tables : naming_table =
   List.fold_left
@@ -86,11 +72,11 @@ let constructor_add (cl: constructor list) tables : naming_table =
             match cs with
             | Some cs ->
                 let id = cs.ls_name in
-                let s = id_unique tables.printer id in
+                let s = id_unique tables id in
                 add_unsafe s (Ls cs) tables
             | None -> tables) tables cl in
       let id = ls.ls_name in
-      let s = id_unique tables.printer id in
+      let s = id_unique tables id in
       add_unsafe s (Ls ls) tables)
     tables
     cl
@@ -100,7 +86,7 @@ let ind_decl_add il tables =
   List.fold_left
     (fun tables ((pr, _): prsymbol * term) ->
       let id = pr.pr_name in
-      let s = id_unique tables.printer id in
+      let s = id_unique tables id in
       add_unsafe s (Pr pr) tables)
     il
     tables
@@ -112,7 +98,7 @@ let add (d: decl) (tables: naming_table): naming_table =
   | Dtype ty ->
       (* only current symbol is new in the declaration (see create_ty_decl) *)
       let id = ty.ts_name in
-      let s = id_unique tables.printer id in
+      let s = id_unique tables id in
       add_unsafe s (Ts ty) tables
   | Ddata dl ->
       (* first part is new. Also only first part of each constructor seem new
@@ -120,7 +106,7 @@ let add (d: decl) (tables: naming_table): naming_table =
       List.fold_left
         (fun tables (dd: data_decl) ->
           let id = (fst dd).ts_name in
-          let s = id_unique tables.printer id in
+          let s = id_unique tables id in
           let tables = add_unsafe s (Ts (fst dd)) tables in
           constructor_add (snd dd) tables)
         tables
@@ -128,14 +114,14 @@ let add (d: decl) (tables: naming_table): naming_table =
   | Dparam ls ->
       (* Only one lsymbol which is new *)
       let id = ls.ls_name in
-      let s = id_unique tables.printer id in
+      let s = id_unique tables id in
       add_unsafe s (Ls ls) tables
   | Dlogic lsd ->
       (* Only first part of logic_decl is new (see create_logic) *)
       List.fold_left
         (fun tables ((ls,_): logic_decl) ->
           let id = ls.ls_name in
-          let s = id_unique tables.printer id in
+          let s = id_unique tables id in
           add_unsafe s (Ls ls) tables)
         tables
         lsd
@@ -144,7 +130,7 @@ let add (d: decl) (tables: naming_table): naming_table =
       List.fold_left
         (fun tables ((ls,ind): ind_decl) ->
           let id = ls.ls_name in
-          let s = id_unique tables.printer id in
+          let s = id_unique tables id in
           let tables = add_unsafe s (Ls ls) tables in
           ind_decl_add tables ind)
         tables
@@ -152,11 +138,12 @@ let add (d: decl) (tables: naming_table): naming_table =
   | Dprop (_, pr, _t) ->
       (* Only pr is new in Dprop (see create_prop_decl) *)
       let id = pr.pr_name in
-      let s = id_unique tables.printer id in
+      let s = id_unique tables id in
       add_unsafe s (Pr pr) tables
 
 let build_naming_tables task : naming_table =
-  let pr = fresh_printer () in
+  let sanitizer = sanitizer char_to_alpha char_to_alnumus in
+  let pr = create_ident_printer Pretty.why3_keywords ~sanitizer in
   let km = Task.task_known task in
   let tables = {
       namespace = empty_ns;
@@ -168,6 +155,7 @@ let build_naming_tables task : naming_table =
     disambiguation numbers.
     This only works for things defined in .why/.mlw because things
     added by the user are renamed on the fly. *)
+  (* TODO:imported theories should be added in the namespace too *)
   let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
   List.fold_left (fun tables d -> add d tables) tables l
 

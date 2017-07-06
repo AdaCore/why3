@@ -27,44 +27,24 @@ let debug_print_labels = Debug.register_info_flag "print_labels"
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let id_unique tables id = id_unique_label tables.Trans.printer id
-
-(*
-let forget_tvs () =
-  forget_all aprinter
-
-let _forget_all () =
-  forget_all iprinter;
-  forget_all aprinter;
-  forget_all tprinter;
-  forget_all pprinter
-*)
+let print_id tables fmt i =
+  fprintf fmt "'%s" (id_unique tables.Trans.printer i)
 
 (* type variables always start with a quote *)
 let print_tv tables fmt tv =
-  fprintf fmt "'%s" (id_unique tables tv.tv_name)
+  fprintf fmt "'%s" (id_unique tables.Trans.printer tv.tv_name)
 
-(* logic variables always start with a lower case letter *)
-let print_vs tables fmt vs =
-  fprintf fmt "%s" (id_unique tables vs.vs_name)
+let print_vs tables fmt vs = print_id tables fmt vs.vs_name
 
 let forget_var tables vs = forget_id tables.Trans.printer vs.vs_name
 
-(* theory names always start with an upper case letter *)
-let print_th tables fmt th =
-  fprintf fmt "%s" (id_unique tables th.th_name)
+let print_th tables fmt th = print_id tables fmt th.th_name
 
-let print_ts tables fmt ts =
-  fprintf fmt "%s" (id_unique tables ts.ts_name)
+let print_ts tables fmt ts = print_id tables fmt ts.ts_name
 
-let print_ls tables fmt ls =
-  fprintf fmt "%s" (id_unique tables ls.ls_name)
+let print_ls tables fmt ls = print_id tables fmt ls.ls_name
 
-let print_cs tables fmt ls =
-  fprintf fmt "%s" (id_unique tables ls.ls_name)
-
-let print_pr tables fmt pr =
-  fprintf fmt "%s" (id_unique tables pr.pr_name)
+let print_pr tables fmt pr = print_id tables fmt pr.pr_name
 
 (* info *)
 
@@ -139,9 +119,9 @@ let rec print_pat_node pri tables fmt p = match p.pat_node with
   | Papp (cs, pl) -> begin match query_syntax cs.ls_name with
       | Some s -> fprintf fmt (protect_on (pri > 0) "%a") (syntax_arguments s (print_pat_node 0 tables)) pl
       | None -> begin match pl with
-          | [] -> print_cs tables fmt cs
+          | [] -> print_ls tables fmt cs
           | pl -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
-              (print_cs tables) cs (print_list space (print_pat_node 2 tables)) pl
+              (print_ls tables) cs (print_list space (print_pat_node 2 tables)) pl
           end
       end
 
@@ -259,7 +239,7 @@ let print_constr tables fmt (cs,pjl) =
     | Some ls -> fprintf fmt "@ (%a:@,%a)" (print_ls tables) ls (print_ty tables) ty
     | None -> print_ty_arg tables fmt ty
   in
-  fprintf fmt "@[<hov 4>| %a%a%a@]" (print_cs tables) cs
+  fprintf fmt "@[<hov 4>| %a%a%a@]" (print_ls tables) cs
     print_ident_labels cs.ls_name
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
