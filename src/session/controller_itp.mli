@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2015   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,11 +9,14 @@
 (*                                                                  *)
 (********************************************************************)
 
+(** Controller to run provers and transformations asynchronously on goals of a session
+ *)
+
 open Session_itp
 
-exception Noprogress
 
-(** State of a proof *)
+(** {2 State of a proof or transformation in progress} *)
+
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
     | JustEdited (** edited but not run yet *)
@@ -36,6 +39,10 @@ val print_trans_status : Format.formatter -> transformation_status -> unit
 type strategy_status = STSgoto of proofNodeID * int | STShalt
 
 val print_strategy_status : Format.formatter -> strategy_status -> unit
+
+exception Noprogress
+
+(** {2 Signature for asynchronous schedulers} *)
 
 module type Scheduler = sig
 
@@ -60,6 +67,9 @@ module type Scheduler = sig
     priority will be called first. *)
 
 end
+
+
+(** {2 Controllers} *)
 
 type controller = private
   { mutable controller_session : Session_itp.session;
@@ -137,6 +147,8 @@ val remove_subtree: controller -> notification:notifier -> removed:notifier ->
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
+
+(** {2 Scheduled jobs} *)
 
 module Make(S : Scheduler) : sig
 

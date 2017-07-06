@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Term
 open Ident
 open Ty
@@ -127,23 +138,23 @@ let () = wrap_and_register
     "case"
     (Tformula (Topt ("as",Tstring Ttrans_l))) case
 
-let () = wrap_and_register ~desc:"left transform a goal of the form A \\/ B into A"
+let () = wrap_and_register ~desc:"left transform a disjunctive goal A \\/ B into A"
     "left"
     (Ttrans) (or_intro true)
 
-let () = wrap_and_register ~desc:"right transform a goal of the form A \\/ B into B"
+let () = wrap_and_register ~desc:"right transform a disjunctive goal A \\/ B into B"
     "right"
     (Ttrans) (or_intro false)
 
 let () = wrap_and_register
-    ~desc:"exists <term> substitutes the variable quantified by exists with term"
+    ~desc:"exists <term> substitutes the existentially quantified variable with the given term"
     "exists"
     (Tterm Ttrans) exists
 
-let () = wrap_and_register ~desc:"intros n"
+let () = wrap_and_register ~desc:"intros n introduces the first n quantified variables and hypotheses"
     "intros_n"
     (Tint Ttrans) introduce_premises
 
-let () = wrap_and_register ~desc:"intros a,b,c,v"
+let () = wrap_and_register ~desc:"intros id1,id2,...,idk introduces quantified variables and hypotheses using the given identifiers names"
     "intros"
-    (Tstringlist Ttrans) intros_list
+    (Tidentlist Ttrans) intros_list

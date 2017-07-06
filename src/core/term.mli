@@ -14,6 +14,8 @@
 open Ident
 open Ty
 
+(** {1 Terms and Formulas} *)
+
 (** {2 Variable symbols} *)
 
 type vsymbol = private {

@@ -1,9 +1,26 @@
-(****************************************************************************)
-(* This is extracted/adapted from the code found in the book Real World Ocaml
-by Yaron Minsky, Anil Madhavapeddy, and Jason Hickey. Their 'unlicence' allows
-it. *)
-(****************************************************************************)
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
+
+
+(*
+
+This is extracted/adapted from the code found in the book Real World
+Ocaml by Yaron Minsky, Anil Madhavapeddy, and Jason Hickey. Their
+'unlicence' allows it.
+
+*)
+
 (* A JSON text can actually be any JSON value *)
+
 %start <Json_base.json> value
 %token <int> INT
 %token <float> FLOAT

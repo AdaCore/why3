@@ -1,8 +1,17 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 
+(** Proof sessions *)
 
-
-(** {1 New Proof sessions ("Refectoire")} *)
 
 
 (** {2 upper level structure of sessions}
@@ -70,18 +79,6 @@ type proof_attempt_node = private {
   proof_script        : string option;  (* non empty for external ITP *)
 }
 
-val goal_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> proofNodeID -> unit
-
-val theory_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> theory -> unit
-
-val file_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> file -> unit
-
-val session_iter_proof_attempt:
-    (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit
-
 (* [is_below s a b] true if a is below b in the session tree *)
 val is_below: session -> any -> any -> bool
 
@@ -119,11 +116,30 @@ val get_encapsulating_theory: session -> any -> theory
 val get_encapsulating_file: session -> any -> file
 
 
-exception BadCopyDetached of string
+(** {2 iterators on sessions} *)
 
-(** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
-val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID
-val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
+val goal_iter_proof_attempt:
+    session -> (proof_attempt_node -> unit) -> proofNodeID -> unit
+
+val theory_iter_proof_attempt:
+    session -> (proof_attempt_node -> unit) -> theory -> unit
+
+val file_iter_proof_attempt:
+    session -> (proof_attempt_node -> unit) -> file -> unit
+
+val session_iter_proof_attempt:
+    (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit
+
+val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
+(** [fold_all_any s f acc any] folds on all the subnodes of any *)
+
+val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
+(** [fold_all_session s f acc] folds on the whole session *)
+
+
+(** {2 session operations} *)
+
+
 
 val empty_session : ?shape_version:int -> string -> session
 (** create an empty_session in the directory specified by the
@@ -202,6 +218,15 @@ val load_session : string -> session * bool
     cannot be read.
  *)
 
+(** {2 Copy and remove} *)
+
+exception BadCopyDetached of string
+
+(** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
+val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID
+val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
+
+
 exception RemoveError
 
 val remove_subtree: notification:notifier -> removed:notifier ->
@@ -215,13 +240,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
     a theory, or a goal that is not detached
  *)
 
-val fold_all_any: session -> ('a -> any -> 'a) -> 'a -> any -> 'a
-(** [fold_all_any s f acc any] folds on all the subnodes of any *)
-
-val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
-(** [fold_all_session s f acc] folds on the whole session *)
-
-(* proved status *)
+(** {2 proved status} *)
 
 val th_proved : session -> theory -> bool
 val pn_proved : session -> proofNodeID -> bool
@@ -229,12 +248,12 @@ val tn_proved : session -> transID -> bool
 val file_proved : session -> file -> bool
 val any_proved : session -> any -> bool
 
-(* status update *)
-
 val update_goal_node : notifier -> session -> proofNodeID -> unit
-(** [updates the proved status of the given goal node. If necessary, propagates
-    the update to ancestors. [notifier] is called on all nodes whose status changes *)
+(** updates the proved status of the given goal node. If necessary,
+    propagates the update to ancestors. [notifier] is called on all
+    nodes whose status changes. *)
 
 val update_trans_node : notifier -> session -> transID -> unit
-(** [updates the proved status of the given transformation node. If necessary, propagates
-    the update to ancestors. [notifier] is called on all nodes whose status changes *)
+(** updates the proved status of the given transformation node. If
+    necessary, propagates the update to ancestors. [notifier] is
+    called on all nodes whose status changes *)

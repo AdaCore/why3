@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Task
 open Ty
 open Term
@@ -172,6 +183,7 @@ type (_, _) trans_typ =
   | Ttrans_l    : ((task tlist), task list) trans_typ
   | Tenvtrans   : (Env.env -> (task trans), task) trans_typ
   | Tenvtrans_l : (Env.env -> (task tlist), task list) trans_typ
+  | Tstring     : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
   | Tint        : ('a, 'b) trans_typ -> ((int -> 'a), 'b) trans_typ
   | Tty         : ('a, 'b) trans_typ -> ((ty -> 'a), 'b) trans_typ
   | Ttysymbol   : ('a, 'b) trans_typ -> ((tysymbol -> 'a), 'b) trans_typ
@@ -180,9 +192,8 @@ type (_, _) trans_typ =
   | Tlsymbol    : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tsymbol     : ('a, 'b) trans_typ -> ((symbol -> 'a), 'b) trans_typ
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
+  | Tidentlist : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
-  | Tstring     : ('a, 'b) trans_typ -> ((string -> 'a), 'b) trans_typ
-  | Tstringlist : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
   | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory     : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
   | Topt        : string * ('a -> 'c, 'b) trans_typ -> (('a option -> 'c), 'b) trans_typ
@@ -292,6 +303,7 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tenvtrans_l    -> Yes
     | Ttrans_l       -> Yes
     | Tint t         -> is_trans_typ_l t
+    | Tstring t      -> is_trans_typ_l t
     | Tty t          -> is_trans_typ_l t
     | Ttysymbol t    -> is_trans_typ_l t
     | Tprsymbol t    -> is_trans_typ_l t
@@ -300,58 +312,57 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tsymbol t      -> is_trans_typ_l t
     | Tlist t        -> is_trans_typ_l t
     | Tterm t        -> is_trans_typ_l t
-    | Tstring t      -> is_trans_typ_l t
-    | Tstringlist t  -> is_trans_typ_l t
+    | Tidentlist t   -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
     | Ttheory t      -> is_trans_typ_l t
     | Topt (_,t)     -> is_trans_typ_l t
     | Toptbool (_,t) -> is_trans_typ_l t
 
-let string_of_trans_typ : type a b. (a, b) trans_typ -> string =
+let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
   fun t ->
     match t with
-    | Ttrans         -> "trans"
-    | Ttrans_l       -> "transl"
-    | Tenvtrans      -> "env trans"
-    | Tenvtrans_l    -> "env transl"
-    | Tint _         -> "integer"
-    | Tty _          -> "type"
-    | Ttysymbol _    -> "type symbol"
-    | Tprsymbol _    -> "prop symbol"
-    | Tprlist _      -> "list of prop symbol"
-    | Tlsymbol _     -> "logic symbol"
-    | Tsymbol _      -> "symbol"
-    | Tlist _        -> "list of prop symbol"
-    | Tterm _        -> "term"
+    | Ttrans         -> "task"
+    | Ttrans_l       -> "list task"
+    | Tenvtrans      -> "env -> task"
+    | Tenvtrans_l    -> "env -> list task"
+    | Tint _         -> "int"
     | Tstring _      -> "string"
-    | Tstringlist _  -> "string list"
+    | Tty _          -> "type"
+    | Ttysymbol _    -> "tysymbol"
+    | Tprsymbol _    -> "prsymbol"
+    | Tprlist _      -> "list prsymbol"
+    | Tlsymbol _     -> "lsymbol"
+    | Tsymbol _      -> "symbol"
+    | Tlist _        -> "list symbol"
+    | Tterm _        -> "term"
     | Tformula _     -> "formula"
+    | Tidentlist _   -> "list ident"
     | Ttheory _      -> "theory"
-    | Topt (s,_)     -> "opt [" ^ s ^ "]"
-    | Toptbool (s,_) -> "boolean opt [" ^ s ^ "]"
+    | Topt (s,t)     -> "?" ^ s ^ (string_of_trans_typ t)
+    | Toptbool (s,_) -> "?" ^ s ^ ":bool"
 
 let rec print_type : type a b. (a, b) trans_typ -> string =
   fun t ->
     match t with
-    | Ttrans         -> "()"
-    | Ttrans_l       -> "()"
-    | Tenvtrans      -> "()"
-    | Tenvtrans_l    -> "()"
+    | Ttrans         -> "task"
+    | Ttrans_l       -> "list task"
+    | Tenvtrans      -> "env -> task"
+    | Tenvtrans_l    -> "env -> list task"
     | Tint t         -> "integer -> " ^ print_type t
+    | Tstring t      -> "string -> " ^ print_type t
     | Tty t          -> "type -> " ^ print_type t
     | Ttysymbol t    -> "type_symbol -> " ^ print_type t
-    | Tprsymbol t    -> "prop_symbol -> " ^ print_type t
-    | Tprlist t      -> "prop_symbol list -> " ^ print_type t
-    | Tlsymbol t     -> "logic_symbol -> " ^ print_type t
+    | Tprsymbol t    -> "prsymbol -> " ^ print_type t
+    | Tprlist t      -> "list prsymbol -> " ^ print_type t
+    | Tlsymbol t     -> "lsymbol -> " ^ print_type t
     | Tsymbol t      -> "symbol -> " ^ print_type t
-    | Tlist t        -> "prop_symbol list -> " ^ print_type t
+    | Tlist t        -> "list symbol -> " ^ print_type t
     | Tterm t        -> "term -> " ^ print_type t
-    | Tstring t      -> "string -> " ^ print_type t
-    | Tstringlist t  -> "string list -> " ^ print_type t
     | Tformula t     -> "formula -> " ^ print_type t
+    | Tidentlist t    -> "list ident -> " ^ print_type t
     | Ttheory t      -> "theory -> " ^ print_type t
-    | Topt (s,t)     -> "opt [" ^ s ^ "] " ^ print_type t
-    | Toptbool (s,t) -> "opt [" ^ s ^ "] -> " ^ print_type t
+    | Topt (s,t)     -> "?" ^ s ^ ":" ^ print_type t
+    | Toptbool (s,t) -> "?" ^ s ^ ":bool -> " ^ print_type t
 
 exception Unnecessary_arguments of string list
 
@@ -368,6 +379,8 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Tenvtrans_l, _ -> raise (Unnecessary_arguments l)
     | Tint t', s :: tail ->
       let arg = parse_int s in wrap_to_store t' (f arg) tail env tables task
+    | Tstring t', s :: tail ->
+       wrap_to_store t' (f s) tail env tables task
     | Tformula t', s :: tail ->
       let te = parse_and_type ~as_fmla:true s tables in
       wrap_to_store t' (f te) tail env tables task
@@ -410,9 +423,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Ttheory t', s :: tail ->
        let th = parse_theory env s in
        wrap_to_store t' (f th) tail env tables task
-    | Tstring t', s :: tail ->
-       wrap_to_store t' (f s) tail env tables task
-    | Tstringlist t', s :: tail ->
+    | Tidentlist t', s :: tail ->
        let list = List.map (fun id -> id.Ptree.id_str) (parse_list_ident s) in
        wrap_to_store t' (f list) tail env tables task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
