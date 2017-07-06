@@ -9,7 +9,7 @@ module Cursor
 
   type cursor 'a = private {
     ghost mutable visited   : seq 'a;
-    ghost         collection: t 'a;
+    ghost         collection: {t 'a};
   }
 
   val create (t: t 'a) : cursor 'a
