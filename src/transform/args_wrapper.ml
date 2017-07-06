@@ -91,6 +91,8 @@ let ind_decl_add il tables =
     il
     tables
 
+
+
 (* [add d printer tables] Adds all new declaration of symbol inside d to tables.
   It uses printer to give them a unique name and also register these new names in printer *)
 let add (d: decl) (tables: naming_table): naming_table =
@@ -135,7 +137,7 @@ let add (d: decl) (tables: naming_table): naming_table =
           ind_decl_add tables ind)
         tables
         il
-  | Dprop (_, pr, _t) ->
+  | Dprop (_, pr, _) ->
       (* Only pr is new in Dprop (see create_prop_decl) *)
       let id = pr.pr_name in
       let s = id_unique tables id in

@@ -22,6 +22,15 @@ module TestTaskPrinting
 
 end
 
+module TestAutomaticIntro
+
+
+  use import int.Int
+
+  goal g : forall x:int. x > 0 -> forall y z:int. y = z -> x=y
+
+end
+
 
 module TestInfixSymbols
 

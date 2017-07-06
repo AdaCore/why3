@@ -407,13 +407,18 @@ let print_tdecls tables =
   Discriminate.on_syntax_map (fun sm -> Trans.fold (print_tdecl tables) (sm,[]))
 *)
 
-(* TODO print_task and print_sequent recompute a table every time they are called.
-    Do we want that? *)
+let empty_naming_table () =
+  let sanitizer = Ident.(sanitizer char_to_alpha char_to_alnumus) in
+  let pr = create_ident_printer Pretty.why3_keywords ~sanitizer in
+  Trans.{
+    namespace = empty_ns;
+    known_map = Ident.Mid.empty;
+    printer = pr;
+  }
+
 let print_task args ?old:_ fmt task =
-  (* In trans-based p-printing [forget_all] IST STRENG VERBOTEN *)
-  (* forget_all (); *)
   let tables = match args.name_table with
-    | None -> Trans.empty_naming_table (* raise (Bad_name_table "Why3printer.print_task")*)
+    | None -> empty_naming_table ()
     | Some tables -> tables in
   print_prelude fmt args.prelude;
   fprintf fmt "theory Task@\n";
@@ -471,9 +476,10 @@ let print_goal tables do_intros fmt d =
 let print_sequent args ?old:_ fmt task =
   info := {info_syn = Discriminate.get_syntax_map task;
     itp = true};
-  let tables = match args.name_table with
-    | None -> Trans.empty_naming_table (* raise (Bad_name_table "Why3printer.print_sequent") *)
-    | Some tables -> tables in
+  let tables,do_intros = match args.name_table with
+    | None -> empty_naming_table (), false
+    | Some tables -> tables,args.do_intros
+  in
   (* let tables = build_name_tables task in *)
   let ut = Task.used_symbols (Task.used_theories task) in
   let ld = Task.local_decls task ut in
@@ -482,7 +488,7 @@ let print_sequent args ?old:_ fmt task =
       | [] -> assert false
       | [g] ->
          fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
-         print_goal tables args.do_intros fmt g
+         print_goal tables do_intros fmt g
       | d :: r ->
          fprintf fmt "@[%a@]@\n" (print_decl tables) d;
          aux fmt r

@@ -187,8 +187,6 @@ type naming_table = {
 
 exception Bad_name_table of string
 
-val empty_naming_table : naming_table
-
 type trans_with_args = string list -> Env.env -> naming_table -> task trans
 type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
 
