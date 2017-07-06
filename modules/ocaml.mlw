@@ -30,6 +30,8 @@ module Pervasives
   val ocaml_assert (b: bool) : unit
     raises { AssertFailure }
 
+  exception Invalid_argument
+
 end
 
 module OCaml

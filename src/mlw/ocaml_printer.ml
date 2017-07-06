@@ -475,7 +475,7 @@ module Print = struct
   and print_raise ~paren info xs fmt e_opt =
     match query_syntax info.info_syn xs.xs_name, e_opt with
     | Some s, None ->
-      fprintf fmt "raise %s" s
+      fprintf fmt "raise (%s)" s
     | Some s, Some e ->
       fprintf fmt (protect_on paren "raise (%a)")
         (syntax_arguments s (print_expr info)) [e]
