@@ -735,12 +735,16 @@ let pa_ok pa =
 
 let update_file_node notification s f =
   let ths = f.file_theories in
-  let proved = List.for_all (th_proved s) ths in
-  if proved <> file_proved s f then
-    begin
-      Stdlib.Hstr.replace s.file_state f.file_name proved;
-      notification (AFile f);
-    end
+  if ths = [] then
+    (* No updates if ths is empty *)
+    ()
+  else
+    let proved = List.for_all (th_proved s) ths in
+    if proved <> file_proved s f then
+      begin
+        Stdlib.Hstr.replace s.file_state f.file_name proved;
+        notification (AFile f);
+      end
 
 let update_theory_node notification s th =
   let goals = theory_goals th in
@@ -1383,7 +1387,7 @@ let rec merge_goal ~use_shapes env new_s old_s ~goal_obsolete old_goal new_goal_
     old_goal.proofn_transformations;
   let new_goal_node = get_proofNode new_s new_goal_id in
   new_goal_node.proofn_transformations <- List.rev new_goal_node.proofn_transformations;
-  update_goal_node (fun _ ->()) new_s new_goal_id
+  update_goal_node (fun _ -> ()) new_s new_goal_id
 
 and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
@@ -1573,7 +1577,8 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
       theories, detached
     in
     f.file_theories <- theories;
-    f.file_detached_theories <- detached
+    f.file_detached_theories <- detached;
+    update_file_node (fun _ -> ()) s f
 
 (************************)
 (* saving state on disk *)
