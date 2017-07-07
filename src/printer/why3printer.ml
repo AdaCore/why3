@@ -28,7 +28,7 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
 let print_id tables fmt i =
-  fprintf fmt "'%s" (id_unique tables.Trans.printer i)
+  fprintf fmt "%s" (id_unique tables.Trans.printer i)
 
 (* type variables always start with a quote *)
 let print_tv tables fmt tv =
