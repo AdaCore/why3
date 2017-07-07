@@ -7,7 +7,7 @@
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../cursor.mlw">
-<theory name="TestCursor" sum="e772e274dbdfd5c9eda8c029056424ae">
+<theory name="TestCursor" sum="63faf1f80cd304815cdfad69cd7901e3">
  <goal name="VC sum" expl="VC for sum">
  <transf name="split_goal_wp">
   <goal name="VC sum.1" expl="loop invariant init">
@@ -20,12 +20,12 @@
   <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="VC sum.4" expl="precondition">
-  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="VC sum.5" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="8"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="6"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="VC sum.6" expl="loop invariant preservation">
   <proof prover="6"><result status="valid" time="0.00" steps="12"/></proof>
@@ -40,7 +40,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="ListCursor" sum="f9a15be57bd2185bad0402a9257c6866">
+<theory name="ListCursor" sum="98ec1f1e0527eca4c14a2ff349314fb9">
  <goal name="VC cursor" expl="VC for cursor">
  <proof prover="6"><result status="valid" time="0.01" steps="33"/></proof>
  </goal>
@@ -57,7 +57,7 @@
  <proof prover="6"><result status="valid" time="0.01" steps="51"/></proof>
  </goal>
  <goal name="Cursor.VC create" expl="VC for create">
- <proof prover="6"><result status="valid" time="0.01" steps="23"/></proof>
+ <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="Cursor.VC next" expl="VC for next">
  <proof prover="6"><result status="valid" time="0.03" steps="55"/></proof>

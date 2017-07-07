@@ -5,9 +5,8 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <file name="../verifythis_2017_odd_even_sort_rearranging.mlw" expanded="true">
-<theory name="Top" sum="1941a5615f96da9ddc59d4ea36788ed5" expanded="true">
+<theory name="Top" sum="3a7c0f6e31e4545816eb2db79a3bdb6e" expanded="true">
  <goal name="VC array_max" expl="VC for array_max">
  <transf name="split_goal_wp">
   <goal name="VC array_max.1" expl="postcondition">
@@ -52,7 +51,7 @@
  </transf>
  </goal>
  <goal name="aux_pos" expl="">
- <proof prover="1"><result status="valid" time="0.56"/></proof>
+ <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="VC decompose_entropy" expl="VC for decompose_entropy">
  <transf name="split_goal_wp">
@@ -921,12 +920,6 @@
      <meta_arg_ts id="ref"/>
     </meta>
     <goal name="VC my_swap.3.4" expl="VC for my_swap" expanded="true">
-    <transf name="eliminate_builtin" expanded="true">
-     <goal name="VC my_swap.3.4.1" expl="VC for my_swap" expanded="true">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
-     <proof prover="4"><result status="valid" time="0.02"/></proof>
-     </goal>
-    </transf>
     </goal>
    </metas>
    </goal>
