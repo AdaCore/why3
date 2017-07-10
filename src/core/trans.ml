@@ -335,6 +335,7 @@ let list_transforms_l () =
 
 
 
+
 (** transformations with arguments *)
 
 type naming_table = {
@@ -394,6 +395,22 @@ let lookup_trans env name =
       with UnknownTrans _ ->
         let t = lookup_transform_with_args_l name env in
         Trans_with_args_l t
+
+let lookup_trans_desc name =
+  try
+    let desc, _ = Hstr.find transforms name in
+    desc
+  with Not_found ->
+    try
+      let desc, _ = Hstr.find transforms_l name in
+      desc
+    with Not_found ->
+      try
+        let desc, _ = Hstr.find transforms_with_args name in
+        desc
+      with Not_found ->
+        let desc, _ = Hstr.find transforms_with_args_l name in
+        desc
 
 let list_trans () =
   let l =

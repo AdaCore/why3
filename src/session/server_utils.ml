@@ -359,8 +359,8 @@ let interp_others commands_table config id cmd args =
         else
           Prove (prover_config, limit)
   | None ->
-      match cmd with
-      | "auto" ->
+      match cmd, args with
+      | "auto", _ ->
           if id = None then
             QError ("Please select a valid node id")
           else
@@ -370,13 +370,23 @@ let interp_others commands_table config id cmd args =
               | _ -> "1"
             in
             Strategies s
-      | "help" ->
+      | "help", [trans] ->
+          let print_trans_desc fmt r =
+            Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
+          in
+          (try
+            let desc = Trans.lookup_trans_desc trans in
+            Help_message (Pp.string_of print_trans_desc desc)
+          with
+          | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
+      | "help", _ ->
           let text = Pp.sprintf
                           "Please type a command among the following (automatic completion available)@\n\
                            @\n\
                            @ <transformation name> [arguments]@\n\
                            @ <prover name> [<time limit> [<mem limit>]]@\n\
                            @ <query> [arguments]@\n\
+                           @ <help transformation_name> @\n\
                            @ auto [auto level]@\n\
                            @\n\
                            Available queries are:@\n@[%a@]" help_on_queries commands_table

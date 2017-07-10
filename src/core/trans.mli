@@ -206,6 +206,10 @@ type gentrans =
 
 val lookup_trans : Env.env -> string -> gentrans
 
+val lookup_trans_desc: string -> Pp.formatted
+(* Takes the name of a transformation (with args or not) and returns its
+   description. *)
+
 val list_trans : unit -> string list
 
 val apply_transform : string -> Env.env -> task -> task list
