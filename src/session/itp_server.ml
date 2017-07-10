@@ -242,8 +242,10 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a \n %a" s
         (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans (s) ->
+  | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
+      Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
@@ -294,19 +296,19 @@ let print_request fmt r =
 
 let print_msg fmt m =
   match m with
-  | Proof_error (_ids, s)                    -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, _tr, _args, _loc, s) -> fprintf fmt "transf error %s" s
-  | Strat_error (_ids, s)                    -> fprintf fmt "start error %s" s
-  | Replay_Info s                            -> fprintf fmt "replay info %s" s
-  | Query_Info (_ids, s)                     -> fprintf fmt "query info %s" s
-  | Query_Error (_ids, s)                    -> fprintf fmt "query error %s" s
-  | Help _s                                  -> fprintf fmt "help"
-  | Information s                            -> fprintf fmt "info %s" s
-  | Task_Monitor _                           -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error (_, s)               -> fprintf fmt "parse_or_type_error:\n %s" s
-  | File_Saved s                             -> fprintf fmt "file saved %s" s
-  | Error s                                  -> fprintf fmt "%s" s
-  | Open_File_Error s                        -> fprintf fmt "%s" s
+  | Proof_error (_ids, s)                        -> fprintf fmt "proof error %s" s
+  | Transf_error (_ids, _tr, _args, _loc, s, _d) -> fprintf fmt "transf error %s" s
+  | Strat_error (_ids, s)                        -> fprintf fmt "start error %s" s
+  | Replay_Info s                                -> fprintf fmt "replay info %s" s
+  | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
+  | Query_Error (_ids, s)                        -> fprintf fmt "query error %s" s
+  | Help _s                                      -> fprintf fmt "help"
+  | Information s                                -> fprintf fmt "info %s" s
+  | Task_Monitor _                               -> fprintf fmt "task montor"
+  | Parse_Or_Type_Error (_, s)                   -> fprintf fmt "parse_or_type_error:\n %s" s
+  | File_Saved s                                 -> fprintf fmt "file saved %s" s
+  | Error s                                      -> fprintf fmt "%s" s
+  | Open_File_Error s                            -> fprintf fmt "%s" s
 
 (* TODO ad hoc printing. Should reuse print_loc. *)
 let print_loc fmt (loc: Loc.position) =
@@ -1090,9 +1092,12 @@ end
       let nid = node_ID_from_pn id in
       init_and_send_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
+      let doc = try
+        Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
+      with | _ -> "" in
       let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
       let tr_applied = tr ^ " " ^ (List.fold_left (fun acc x -> x ^ " " ^ acc) "" args) in
-      P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg)))
+      P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
 
   let rec apply_transform nid t args =

@@ -1327,9 +1327,9 @@ let (_ : GtkSignal.id) =
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        -> print_message "%s" s
-  | Transf_error (_id, tr_name, arg, loc, msg) ->
+  | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
-        print_message "%s\nTransformation failed: \n%s" msg tr_name
+        print_message "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
       else
         begin
           let buf = message_zone#buffer in
@@ -1337,7 +1337,8 @@ let treat_message_notification msg = match msg with
              needed because we clear it often. *)
           let _error = buf#create_tag
               ~name:"error" [`BACKGROUND gconfig.neg_premise_color] in
-          print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s" tr_name arg msg;
+          print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
+            tr_name arg msg doc;
           let color = "error" in
           let _, _, beg_char, end_char = Loc.get loc in
           let start = buf#start_iter#forward_lines 3 in
