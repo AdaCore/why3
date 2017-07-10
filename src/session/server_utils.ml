@@ -348,22 +348,28 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-let interp_others commands_table config cmd args =
+let interp_others commands_table config id cmd args =
   match parse_prover_name config cmd args with
   | Some (prover_config, limit) ->
-      if prover_config.Whyconf.interactive then
-        Edit (prover_config)
+      if id = None then
+        QError ("Please select a valid node id")
       else
-        Prove (prover_config, limit)
+        if prover_config.Whyconf.interactive then
+          Edit (prover_config)
+        else
+          Prove (prover_config, limit)
   | None ->
       match cmd with
       | "auto" ->
-          let s =
-            match args with
-            | "2"::_ -> "2"
-            | _ -> "1"
-          in
-          Strategies s
+          if id = None then
+            QError ("Please select a valid node id")
+          else
+            let s =
+              match args with
+              | "2"::_ -> "2"
+              | _ -> "1"
+            in
+            Strategies s
       | "help" ->
           let text = Pp.sprintf
                           "Please type a command among the following (automatic completion available)@\n\
@@ -395,15 +401,18 @@ let interp commands_table config cont id s =
        | Number_of_arguments -> QError "Bad number of arguments"
        in s
   with Not_found ->
-    try
+    let t =
+      try Some (Trans.lookup_trans cont.Controller_itp.controller_env cmd) with
+      | Trans.UnknownTrans _ -> None
+    in
+    match t with
+    | Some t ->
       if id = None then
         QError ("Please select a valid node id")
       else
-        let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
         Transform (cmd,t,args)
-    with Trans.UnknownTrans _ ->
-      interp_others commands_table config cmd args
-
+    | None ->
+      interp_others commands_table config id cmd args
 
 (***********************)
 (* First Unproven goal *)
