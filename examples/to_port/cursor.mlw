@@ -139,70 +139,80 @@ module TestListCursor
 
 end
 
-(* (\** {2 Iteration over a mutable collection} *)
+(** {2 Iteration over a mutable collection}
 
-(*     here we choose an array of integers *\) *)
+    here we choose an array of integers *)
 
-(* module IntArrayCursor (\* : IterableList *\) *)
+module IntArrayCursor (* : IterableList *)
 
-(*   use import int.Int *)
-(*   use import array.Array *)
-(*   use import list.List *)
-(*   use import list.Reverse *)
-(*   use import array.ToList *)
+  use import int.Int
+  use import array.Array
+  use import list.List
+  use import list.Reverse
+  use import array.ToList
+  use import seq.Seq
 
-(*   type t = array int *)
-(*   type elt = int *)
+  type t 'a = array 'a
 
-(*   type cursor = { *)
-(*     mutable ghost done_: list elt; (\** already processed *\) *)
-(*     mutable ghost to_do: list elt; (\** yet to be processed *\) *)
-(*     mutable       index: int;      (\** index of next element *\) *)
-(*   } *)
+  val ghost constant a : {array 'a}
+    ensures { Array.length result = 0 }
 
-(*   predicate coherent (t: t) (c: cursor) = *)
-(*     0 <= c.index <= length t /\ *)
-(*     c.to_do = to_list t c.index (length t) /\ *)
-(*     c.done_ = reverse (to_list t 0 c.index) *)
+  type cursor 'a = {
+    mutable ghost visited: seq 'a;
+            ghost collection: {t 'a};
+    mutable       index: int;      (** index of next element *)
+  } invariant { 0 <= index <= Array.length collection /\
+                index = length visited /\
+                forall i. 0 <= i < index ->
+                  Array.([]) collection i = visited[i] }
+    by { visited = empty; collection = a; index = 0 }
 
-(*   let create (t: t) : cursor *)
-(*     ensures { result.done_ = Nil } *)
-(*     ensures { coherent t result } *)
-(*   = *)
-(*     { done_ = Nil; to_do = to_list t 0 (length t); index = 0; } *)
+  clone import cursor.Cursor with
+    type cursor = cursor,
+    type t = t
 
-(*   let has_next (t: t) (c: cursor) : bool *)
-(*     requires { coherent t c } *)
-(*     ensures  { result <-> c.to_do <> Nil } *)
-(*   = *)
-(*     c.index < length t *)
+  (* predicate permitted (v: seq int) (t: t) = *)
+  (*   length v <= length t /\ *)
+  (*   forall i. 0 <= i *)
 
-(*   let rec lemma reverse_cons (a: array int) (l u: int) *)
-(*     requires { l <= u } *)
-(*     ensures  { reverse (to_list a l (u+1)) = *)
-(*                Cons a[u] (reverse (to_list a l u)) } *)
-(*     variant  { u - l } *)
-(*   = if l < u then reverse_cons a (l+1) u *)
+  (* let create (t: t) : cursor *)
+  (*   ensures { result.done_ = Nil } *)
+  (*   ensures { coherent t result } *)
+  (* = *)
+  (*   { done_ = Nil; to_do = to_list t 0 (length t); index = 0; } *)
 
-(*   let next (t: t) (c: cursor) : elt *)
-(*     requires { c.to_do <> Nil } *)
-(*     requires { coherent t c } *)
-(*     writes   { c } *)
-(*     ensures  { match old c.to_do with *)
-(*                | Nil -> false *)
-(*                | Cons x l -> result = x /\ c.done_ = Cons x (old c.done_) /\ *)
-(*                              c.to_do = l end } *)
-(*     ensures  { coherent t c } *)
-(*   = *)
-(*     match c.to_do with *)
-(*     | Nil -> absurd *)
-(*     | Cons x r -> c.to_do <- r; c.done_ <- Cons x c.done_ *)
-(*     end; *)
-(*     let x = t[c.index] in *)
-(*     c.index <- c.index + 1; *)
-(*     x *)
+  (* let has_next (t: t) (c: cursor) : bool *)
+  (*   requires { coherent t c } *)
+  (*   ensures  { result <-> c.to_do <> Nil } *)
+  (* = *)
+  (*   c.index < length t *)
 
-(* end *)
+  (* let rec lemma reverse_cons (a: array int) (l u: int) *)
+  (*   requires { l <= u } *)
+  (*   ensures  { reverse (to_list a l (u+1)) = *)
+  (*              Cons a[u] (reverse (to_list a l u)) } *)
+  (*   variant  { u - l } *)
+  (* = if l < u then reverse_cons a (l+1) u *)
+
+  (* let next (t: t) (c: cursor) : elt *)
+  (*   requires { c.to_do <> Nil } *)
+  (*   requires { coherent t c } *)
+  (*   writes   { c } *)
+  (*   ensures  { match old c.to_do with *)
+  (*              | Nil -> false *)
+  (*              | Cons x l -> result = x /\ c.done_ = Cons x (old c.done_) /\ *)
+  (*                            c.to_do = l end } *)
+  (*   ensures  { coherent t c } *)
+  (* = *)
+  (*   match c.to_do with *)
+  (*   | Nil -> absurd *)
+  (*   | Cons x r -> c.to_do <- r; c.done_ <- Cons x c.done_ *)
+  (*   end; *)
+  (*   let x = t[c.index] in *)
+  (*   c.index <- c.index + 1; *)
+  (*   x *)
+
+end
 
 (* module TestArrayCursor *)
 
