@@ -520,7 +520,7 @@ module Translate = struct
          ML.Eapp (expr info e, [ML.enop])
       | Eapp (e, v, _) ->
           ML.Eapp (expr info e, [ML.Eident (pv_name v)])
-      | Elet ({ let_sym = lv; let_expr = e1 }, e2) when e1.e_ghost ->
+      | Elet ({ let_sym = _lv; let_expr = e1 }, e2) when e1.e_ghost ->
          (* TODO: remove superflous let *)
          (* ML.Elet (lv_name lv, ML.enop, *) expr info e2 (* ) *)
       | Elet ({ let_sym = LetV pv }, e2) when ity_equal pv.pv_ity ity_mark ->
