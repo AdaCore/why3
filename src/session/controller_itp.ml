@@ -12,10 +12,11 @@
 open Format
 open Session_itp
 
-
 let debug_sched = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
+
+let debug_call_prover = Debug.lookup_flag "call_prover"
 
 exception Noprogress
 
@@ -94,7 +95,7 @@ let create_controller config env ses =
        let d = Whyconf.load_driver (Whyconf.get_main config) env p.Whyconf.driver [] in
        Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
      with e ->
-       Format.eprintf
+       Debug.dprintf debug_call_prover
          "[Controller_itp] error while loading driver for prover %a: %a@."
          Whyconf.print_prover p.Whyconf.prover
          Exn_printer.exn_printer e)
