@@ -585,7 +585,8 @@ type focus =
 let focused_node = ref Unfocused
 let get_focused_label = ref None
 
-let register_label_detection (f: Task.task -> bool) =
+let focus_on_loading (f: Task.task -> bool) =
+  focused_node := Wait_focus;
   get_focused_label := Some f
 
 (* TODO *)

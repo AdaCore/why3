@@ -25,23 +25,10 @@ end
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
-  type focus =
-  | Unfocused
-  | Focus_on of Session_itp.any
-  | Wait_focus
-
-  (* This is used to externally assert the focused mode *)
-  val focused_node: focus ref
-
-  (* This function is used to change the registered function for label detection
-   and focusing. This is used for a feature which allows to focus automatically
-   on a node whose task contains a specific label. So, the registered function
-   typically returns true if the label is detected in the task and false
-   otherwise.
-   By default, no such functions are provided nor needed for classic behavior.
-  *)
-  val register_label_detection: (Task.task -> bool) -> unit
-
+  (* This function is used to change the registered function for
+     focus_on_loading. It focuses on the first goal that satisfies the given
+     predicate. *)
+  val focus_on_loading: (Task.task -> bool) -> unit
 
   (* Initialize server with the given config, env and filename for the session *)
   val init_server: Whyconf.config -> Env.env -> string -> unit
