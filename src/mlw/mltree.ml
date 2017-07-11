@@ -59,6 +59,7 @@ and expr_node =
 and let_def =
   | Lvar of pvsymbol * expr
   | Lsym of rsymbol * ty * var list * expr
+  | Lany of rsymbol * ty * var list
   | Lrec of rdef list
 
 and rdef = {
@@ -89,7 +90,7 @@ type decl =
   | Dlet    of let_def
   | Dexn    of xsymbol * ty option
   | Dclone  of ident * decl list
-  | Dmodule of string * decl list
+  | Dmodule of string * (string * decl list) list * decl list
 (*
     | Dfunctor of ident * (ident * decl list) list * decl list
 *)

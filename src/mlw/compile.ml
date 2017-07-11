@@ -50,13 +50,14 @@ module ML = struct
     | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
     | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
     | Dlet (Lsym ({rs_name=id}, _, _, _))
+    | Dlet (Lany ({rs_name=id}, _, _))
     | Dexn ({xs_name=id}, _) -> [id]
-    | Dmodule (_, dl) -> List.concat (List.map get_decl_name dl)
+    | Dmodule (_, _, dl) -> List.concat (List.map get_decl_name dl)
     | Dclone _ -> [] (* FIXME? *)
 
   let rec add_known_decl decl k_map id =
-    match decl with (* FIXME? keep this block *)
-    | Dmodule (_, dl) ->
+    match decl with
+    | Dmodule (_, _, dl) ->
       let add_decl k_map d =
         let idl = get_decl_name d in
         List.fold_left (add_known_decl d) k_map idl in
@@ -113,6 +114,10 @@ module ML = struct
       List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
       iter_deps_expr f e1;
       iter_deps_expr f e2
+    | Elet (Lany (_, ty_result, args), e2) ->
+      iter_deps_ty f ty_result;
+      List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
+      iter_deps_expr f e2
     | Elet ((Lrec rdef), e) ->
       List.iter
         (fun {rec_sym = rs; rec_args = args; rec_exp = e; rec_res = res} ->
@@ -157,6 +162,9 @@ module ML = struct
       iter_deps_ty f ty_result;
       iter_deps_args f args;
       iter_deps_expr f e
+    | Dlet (Lany (_rs, ty_result, args)) ->
+      iter_deps_ty f ty_result;
+      iter_deps_args f args
     | Dlet (Lrec rdef) ->
       List.iter
         (fun {rec_sym = rs; rec_args = args; rec_exp = e; rec_res = res} ->
@@ -165,7 +173,8 @@ module ML = struct
     | Dlet (Lvar (_, e)) -> iter_deps_expr f e
     | Dexn (_, None) -> ()
     | Dexn (_, Some ty) -> iter_deps_ty f ty
-    | Dclone (_, dl) | Dmodule (_, dl) -> List.iter (iter_deps f) dl
+    | Dclone (_, dl) | Dmodule (_, _, dl) -> (* FIXME: functor argument *)
+      List.iter (iter_deps f) dl
 
   let mk_expr e_node e_ity e_effect e_label =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect; e_label = e_label; }
@@ -254,9 +263,15 @@ module Translate = struct
 
   let rec filter_out_ghost_rdef = function
     | [] -> []
-    | { rec_sym = rs; rec_rsym = rrs } :: l
-      when rs_ghost rs || rs_ghost rrs -> filter_out_ghost_rdef l
-    | rdef :: l -> rdef :: filter_out_ghost_rdef l
+    | { rec_sym = rs; rec_rsym = rrs } :: _ when rs_ghost rs || rs_ghost rrs ->
+      (* filter_out_ghost_rdef l *)
+      [] (* FIXME: In a mutually recursive block of lemma functions only the
+                   first one is ghost. For now we delete the whole block as soon
+                   as we find a ghost definition. This only works in practice if
+                   the first function is declared as ghost, which is the case of
+                   lemma functions *)
+    | rdef :: l ->
+      rdef :: filter_out_ghost_rdef l
 
   let rec pat m p = match p.pat_node with
     | Pwild ->
@@ -700,8 +715,10 @@ module Translate = struct
     match pd.pd_node with
     | PDlet (LDsym (rs, _)) when rs_ghost rs ->
       []
-    | PDlet (LDsym (_rs, {c_node = Cany})) ->
-      []
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cany})) ->
+      let args = params cty.cty_args in
+      let res = mlty_of_ity cty.cty_mask cty.cty_result in
+      [Mltree.Dlet (Mltree.Lany (rs, res, args))]
       (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
       []
@@ -739,14 +756,6 @@ module Translate = struct
     let info = { Mltree.from_mod = Some m; Mltree.from_km = m.mod_known; } in
     pdecl Sid.empty info pd
 
-  (* unit module declarations *)
-  let rec mdecl pids info = function
-    | Udecl pd -> pdecl pids info pd
-    | Uscope (_, ([Uuse _] | [Uclone _])) -> []
-    | Uscope (s, dl) -> let dl = List.concat (List.map (mdecl pids info) dl) in
-      [Mltree.Dmodule (s, dl)]
-    | Uuse _ | Uclone _ | Umeta _ -> []
-
   let abstract_or_alias_type itd =
     itd.itd_fields = [] && itd.itd_constructors = []
 
@@ -777,6 +786,18 @@ module Translate = struct
       | Uclone mi when is_empty_clone mi -> mi :: params
       | _ -> params in
     List.fold_left add [] dl
+
+  (* unit module declarations *)
+  let rec mdecl pids info = function
+    | Udecl pd -> pdecl pids info pd
+    | Uscope (_, ([Uuse _] | [Uclone _])) -> []
+    | Uscope (s, dl) -> let dl = List.concat (List.map (mdecl pids info) dl) in
+      let filter_func_params (dl, params) = function
+        | Mltree.Dmodule (s, _args, mod_dl) -> dl, (s, mod_dl) :: params
+        | d -> d :: dl, params in
+      let dl, params = List.fold_left filter_func_params ([], []) dl in
+      [Mltree.Dmodule (s, List.rev params, List.rev dl)]
+    | Uuse _ | Uclone _ | Umeta _ -> []
 
   let make_param from mi =
     let id = mi.mi_mod.mod_theory.Theory.th_name in
@@ -926,6 +947,7 @@ module Transform = struct
     | Lsym (rs, res, args, e) ->
       let e, spv = expr info subst e in
       Lsym (rs, res, args, e), spv
+    | Lany _ as lany -> lany, Mpv.empty
     | Lrec rl ->
       let rdef, spv = mk_list_eb rl (rdef info subst) in
       Lrec rdef, spv
@@ -936,7 +958,8 @@ module Transform = struct
 
   let rec pdecl info = function
     | Dtype _ | Dexn _ | Dclone _ as d -> d
-    | Dmodule (id, dl) -> let dl = List.map (pdecl info) dl in Dmodule (id, dl)
+    | Dmodule (id, args, dl) ->
+      let dl = List.map (pdecl info) dl in Dmodule (id, args, dl)
     | Dlet def ->
       (* for top-level symbols we can forget the set of inlined variables *)
       let e, _ = let_def info Mpv.empty def in Dlet e

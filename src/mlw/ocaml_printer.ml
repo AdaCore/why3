@@ -72,7 +72,7 @@ module Print = struct
 
   let forget_let_defn = function
   | Lvar (v,_) -> forget_id v.pv_vs.vs_name
-  | Lsym (s,_,_,_) -> forget_rs s
+  | Lsym (s,_,_,_) | Lany (s,_,_) -> forget_rs s
   | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
   let rec forget_pat = function
@@ -346,7 +346,7 @@ module Print = struct
         (print_list space (print_lident info)) id_args
         (print_expr info) e
 
-  and print_let_def ?(top=false) info fmt = function
+  and print_let_def ?(top=false) ?(functor_arg=false) info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
         (if top then print_global_ident else print_ident) (pv_name pv)
@@ -370,6 +370,15 @@ module Print = struct
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
       print_list_next newline print_one fmt rdef;
       List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
+    | Lany (rs, res, args) when functor_arg ->
+      let print_ty_arg info fmt (_, ty, _) =
+        fprintf fmt "@[%a@]" (print_ty info) ty in
+      fprintf fmt "@[<hov 2>val %a : @[%a@] ->@ %a@]"
+        (if top then print_global_ident else print_ident) rs.rs_name
+        (print_list arrow (print_ty_arg info)) args
+        (print_ty info) res;
+      forget_vars args
+    | Lany _ -> () (* FIXME: test driver here *)
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
@@ -531,11 +540,11 @@ module Print = struct
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
       (if fst then "type" else "and") print_tv_args its.its_args
-      (print_lident info) its.its_name print_def its.its_def
+      print_ident its.its_name print_def its.its_def
 
-  let rec print_decl info fmt = function
+  let rec print_decl ?(functor_arg=false) info fmt = function
     | Dlet ldef ->
-      print_let_def info ~top:true fmt ldef
+      print_let_def info ~top:true ~functor_arg fmt ldef
     | Dtype dl ->
       print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
@@ -543,12 +552,21 @@ module Print = struct
     | Dexn (xs, Some t)->
       fprintf fmt "@[<hov 2>exception %a of %a@]"
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
-    | Dmodule (s, dl) ->
+    | Dmodule (s, args, dl) ->
       let info = { info with info_current_ph = s :: info.info_current_ph } in
-      fprintf fmt "module %s =@\n@[<hov 2>struct@\n%a@]@\nend"
-        s (print_list newline (print_decl info)) dl
-    | Dclone _ ->
-      assert false (*TODO*)
+      fprintf fmt "@[@[<hov 2>module %s%a@ =@ struct@ %a@]@ end@]" s
+        (print_functor_args info) args
+        (print_list newline (print_decl info)) dl
+    | Dclone _ -> assert false (*TODO*)
+
+  and print_functor_args info fmt args =
+    let print_sig info fmt dl =
+      fprintf fmt "sig@ %a@ end"
+        (print_list space (print_decl info ~functor_arg:true)) dl in
+    let print_pair fmt (s, dl) =
+      let info = { info with info_current_ph = s :: info.info_current_ph } in
+      fprintf fmt "(%s:@ %a)" s (print_sig info) dl in
+    fprintf fmt "@[%a@]" (print_list space print_pair) args
 
   let print_decl info fmt decl =
     (* avoids printing the same decl for mutually recursive decls *)
