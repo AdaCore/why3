@@ -81,10 +81,6 @@ module Print = struct
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
-  let print_ident fmt id =
-    let s = id_unique iprinter id in
-    fprintf fmt "%s" s
-
   let is_local_id info id = (* FIXME : take scopes into account *)
     Sid.mem id info.info_current_th.th_local ||
     Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
@@ -92,29 +88,40 @@ module Print = struct
 
   exception Local
 
-  let mk_s ~sanitizer ~sanitize q sep =
-    let s = String.concat sep q in
-    let s = if sanitize then
-        let s = Ident.sanitizer char_to_alpha char_to_alnumus s in sanitizer s
-      else s in
-    if is_ocaml_keyword s then s ^ "_renamed" else s (* FIXME *)
+  let rename s =
+    if is_ocaml_keyword s then s ^ "_renamed" else s
 
-  let print_qident ~sanitizer info fmt id =
+  (* used for global names only *)
+  let print_ident fmt id =
+    let s = id_unique iprinter id in
+    fprintf fmt "%s" s
+  let print_global_ident fmt id =
+    let s = rename id.id_string in
+    fprintf fmt "%s" s
+
+  let mk_path q =
+    let q = List.map rename q in
+    String.concat "." q
+
+  let print_qident ~sanitizer ?(path=([]:string list)) info fmt id =
     try if info.flat then raise Not_found;
       if is_local_id info id then raise Local;
+      assert (path = []);
       let p, t, q = try Pmodule.restore_path id with Not_found ->
         Theory.restore_path id in
-      let s = mk_s ~sanitizer ~sanitize:true q "__" in
+      let s = mk_path q in
       let fname = if p = [] then info.info_fname else None in
       let m = Strings.capitalize (module_name ?fname p t) in
       fprintf fmt "%s.%s" m s
     with
     | Not_found -> let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
-    | Local -> let _, _, q = try Pmodule.restore_path id with Not_found ->
+    | Local ->
+      let _, _, q = try Pmodule.restore_path id with Not_found ->
         Theory.restore_path id in
-      List.iter (fun q -> eprintf "%s. " q) q; eprintf "@.";
-      let s = mk_s ~sanitizer ~sanitize:false q "." in
+      (* TODO: remove prefix "path" from q *)
+      (* List.iter (fun q -> eprintf "%s. " q) q; eprintf "@."; *)
+      let s = mk_path q in
       fprintf fmt "%s" s
 
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
@@ -194,19 +201,6 @@ module Print = struct
 
   let print_vs_arg info fmt vs =
     fprintf fmt "@[%a@]" (print_vsty info) vs
-
-  let print_path =
-    print_list dot pp_print_string (* point-free *)
-
-  let print_path_id fmt = function
-    | [], id -> print_ident fmt id
-    | p, id  -> fprintf fmt "%a.%a" print_path p print_ident id
-
-  let print_theory_name fmt th =
-    print_path_id fmt (th.th_path, th.th_name)
-
-  let print_module_name fmt m =
-    print_theory_name fmt m.mod_theory
 
   let get_record info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
@@ -349,13 +343,14 @@ module Print = struct
         (print_list space (print_lident info)) id_args
         (print_expr info) e
 
-  and print_let_def info fmt = function
+  and print_let_def ?(top=false) info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
-        (print_lident info) (pv_name pv) (print_expr info) e;
+        (if top then print_global_ident else print_ident) (pv_name pv)
+        (print_expr info) e;
     | Lsym (rs, res, args, ef) ->
       fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
-        (print_lident info) rs.rs_name
+        (if top then print_global_ident else print_ident) rs.rs_name
         (print_list space (print_vs_arg info)) args
         (print_ty info) res (print_expr info) ef;
       forget_vars args
@@ -365,7 +360,7 @@ module Print = struct
             rec_res = res; rec_svar = s } ->
           fprintf fmt "@[<hov 2>%s %a %a@]"
             (if fst then "let rec" else "and")
-            (print_lident info) rs1.rs_name
+           (if top then print_global_ident else print_ident) rs1.rs_name
             (print_fun_type_args info) (args, s, res, e);
           forget_vars args
       in
@@ -537,7 +532,7 @@ module Print = struct
 
   let rec print_decl info fmt = function
     | Dlet ldef ->
-      print_let_def info fmt ldef
+      print_let_def info ~top:true fmt ldef
     | Dtype dl ->
       print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
