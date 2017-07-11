@@ -851,6 +851,10 @@ let message_zone =
   GText.view ~editable:false ~cursor_visible:false
     ~packing:sv#add ()
 
+(* Create a tag for errors in the message zone. *)
+let message_zone_error_tag = message_zone#buffer#create_tag
+  ~name:"error" [`BACKGROUND gconfig.neg_premise_color]
+
 (**** Message-zone printing functions *****)
 
 (* Function used to print stuff on the message_zone *)
@@ -1333,10 +1337,8 @@ let treat_message_notification msg = match msg with
       else
         begin
           let buf = message_zone#buffer in
-          (* Redefines the new tag for this buffer every time. I think this is
-             needed because we clear it often. *)
-          let _error = buf#create_tag
-              ~name:"error" [`BACKGROUND gconfig.neg_premise_color] in
+          (* remove all coloration in message_zone *)
+          buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
           print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
           let color = "error" in
