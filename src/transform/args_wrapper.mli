@@ -19,7 +19,7 @@ open Task
 
 (** {2 context for parsing/typing transformation arguments} *)
 
-exception Arg_parse_error of string * string
+exception Parse_error of string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string

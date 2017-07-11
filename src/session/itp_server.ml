@@ -250,15 +250,15 @@ let get_exception_message ses id e =
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
       Pp.sprintf "Transformation raised a general error: %s \n" s, Loc.dummy_position, ""
-  | Args_wrapper.Arg_theory_not_found (s) ->
+  | Args_wrapper.Arg_theory_not_found s ->
       Pp.sprintf "Theory not found: %s" s, Loc.dummy_position, ""
-  | Args_wrapper.Arg_parse_type_error(loc, arg, e) ->
+  | Args_wrapper.Arg_parse_type_error (loc, arg, e) ->
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Args_wrapper.Unnecessary_arguments l ->
       Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
-      Pp.sprintf "An argument was expected of type %s" s, Loc.dummy_position, ""
+      Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 

@@ -17,7 +17,7 @@ open Ident
 open Theory
 open Decl
 
-exception Arg_parse_error of string * string
+exception Parse_error of string
 exception Arg_expected of string * string
 exception Arg_theory_not_found of string
 exception Arg_expected_none of string
@@ -27,8 +27,8 @@ exception Arg_error of string
 let () = Exn_printer.register
     (fun fmt e ->
       match e with
-      | Arg_parse_error (s1, s2) ->
-          Format.fprintf fmt "Argument parsing error: %s \n %s" s2 s1
+      | Parse_error s ->
+          Format.fprintf fmt "Parsing error: %s" s
       | Arg_expected (ty, s) ->
           Format.fprintf fmt "Argument expected of type: %s\n Argument given: %s" ty s
       | Arg_theory_not_found s ->
@@ -250,9 +250,14 @@ let parse_list_ident s =
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
+let build_error s e =
+  let loc = Loc.user_position "" 0 0 (String.length s - 1) in
+  raise (Arg_parse_type_error (loc, s, e))
+
 let parse_int s =
   try int_of_string s
-  with Failure _ -> raise (Arg_parse_error (s,"int expected"))
+  with Failure _ ->
+    build_error s (Parse_error "int expected")
 
 let parse_theory env s =
   try
@@ -261,11 +266,13 @@ let parse_theory env s =
       | path::[name] ->
         let path = Strings.split '/' path in
         path, name
-      | _ -> raise (Arg_parse_error (s,"Ill-formed theory name"))
+      | _ ->
+          build_error s (Parse_error "Ill-formed theory name")
     in
     Env.read_theory env path name
   with
-    _ -> raise (Arg_theory_not_found s)
+    _ ->
+      build_error s (Parse_error "Theory not found")
 
 let trans_typ_tail: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
   fun t ->
