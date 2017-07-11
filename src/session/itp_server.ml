@@ -236,16 +236,21 @@ let get_exception_message ses id e =
   match e with
   | Controller_itp.Noprogress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
-      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
-        s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans s ->
+      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a \n %a" s
         (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
-  | Generic_arg_trans_utils.Arg_trans s ->
-      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_pattern (s, pa1, pa2) ->
+      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
+        s (print_pat ses id) pa1 (print_pat ses id) pa2, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
+      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
+        s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Cannot_infer_type s ->
+      Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_error s ->
@@ -259,6 +264,7 @@ let get_exception_message ses id e =
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
+
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 
