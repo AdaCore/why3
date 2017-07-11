@@ -33,7 +33,8 @@ type info = {
   info_th_known_map : Decl.known_map;
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
-  flat              : bool;
+  info_flat         : bool;
+  info_current_ph   : string list; (* current path *)
 }
 
 module Print = struct
@@ -81,7 +82,7 @@ module Print = struct
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
-  let is_local_id info id = (* FIXME : take scopes into account *)
+  let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
     Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
       false info.info_current_mo
@@ -92,21 +93,24 @@ module Print = struct
     if is_ocaml_keyword s then s ^ "_renamed" else s
 
   (* used for global names only *)
-  let print_ident fmt id =
-    let s = id_unique iprinter id in
+  let print_ident fmt id = let s = id_unique iprinter id in
     fprintf fmt "%s" s
-  let print_global_ident fmt id =
-    let s = rename id.id_string in
+
+  let print_global_ident fmt id = let s = rename id.id_string in
     fprintf fmt "%s" s
 
   let mk_path q =
     let q = List.map rename q in
     String.concat "." q
 
-  let print_qident ~sanitizer ?(path=([]:string list)) info fmt id =
-    try if info.flat then raise Not_found;
+  let rec remove_prefix acc current_path = match acc, current_path with
+    | [], _ | _, [] -> acc
+    | p1 :: _, p2 :: _ when p1 <> p2 -> acc
+    | _ :: r1, _ :: r2 -> remove_prefix r1 r2
+
+  let print_qident ~sanitizer info fmt id =
+    try if info.info_flat then raise Not_found;
       if is_local_id info id then raise Local;
-      assert (path = []);
       let p, t, q = try Pmodule.restore_path id with Not_found ->
         Theory.restore_path id in
       let s = mk_path q in
@@ -119,8 +123,7 @@ module Print = struct
     | Local ->
       let _, _, q = try Pmodule.restore_path id with Not_found ->
         Theory.restore_path id in
-      (* TODO: remove prefix "path" from q *)
-      (* List.iter (fun q -> eprintf "%s. " q) q; eprintf "@."; *)
+      let q = remove_prefix q (List.rev info.info_current_ph) in
       let s = mk_path q in
       fprintf fmt "%s" s
 
@@ -541,6 +544,7 @@ module Print = struct
       fprintf fmt "@[<hov 2>exception %a of %a@]"
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
     | Dmodule (s, dl) ->
+      let info = { info with info_current_ph = s :: info.info_current_ph } in
       fprintf fmt "module %s =@\n@[<hov 2>struct@\n%a@]@\nend"
         s (print_list newline (print_decl info)) dl
     | Dclone _ ->
@@ -571,7 +575,8 @@ let print_decl =
       info_th_known_map = th.th_known;
       info_mo_known_map = m.mod_known;
       info_fname        = Opt.map Compile.clean_name fname;
-      flat              = flat;
+      info_flat         = flat;
+      info_current_ph   = [];
     } in
     if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
       Print.print_decl info fmt d end
