@@ -45,16 +45,23 @@ module ML = struct
   open Expr
   open Mltree
 
-  let get_decl_name = function
+  let rec get_decl_name = function
     | Dtype itdefl -> List.map (fun {its_name = id} -> id) itdefl
     | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
     | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
     | Dlet (Lsym ({rs_name=id}, _, _, _))
     | Dexn ({xs_name=id}, _) -> [id]
+    | Dmodule (_, dl) -> List.concat (List.map get_decl_name dl)
     | Dclone _ -> [] (* FIXME? *)
 
-  let add_known_decl decl k_map id =
-    Mid.add id decl k_map
+  let rec add_known_decl decl k_map id =
+    match decl with (* FIXME? keep this block *)
+    | Dmodule (_, dl) ->
+      let add_decl k_map d =
+        let idl = get_decl_name d in
+        List.fold_left (add_known_decl d) k_map idl in
+      List.fold_left add_decl k_map dl
+    | _ -> Mid.add id decl k_map
 
   let rec iter_deps_ty f = function
     | Tvar _ -> ()
@@ -158,7 +165,7 @@ module ML = struct
     | Dlet (Lvar (_, e)) -> iter_deps_expr f e
     | Dexn (_, None) -> ()
     | Dexn (_, Some ty) -> iter_deps_ty f ty
-    | Dclone (_, dl) -> List.iter (iter_deps f) dl
+    | Dclone (_, dl) | Dmodule (_, dl) -> List.iter (iter_deps f) dl
 
   let mk_expr e_node e_ity e_effect e_label =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect; e_label = e_label; }
@@ -729,13 +736,15 @@ module Translate = struct
       else [Mltree.Dexn (xs, Some (mlty_of_ity xs.xs_mask xs.xs_ity))]
 
   let pdecl_m m pd =
-    let info = { Mltree.from_mod = Some m; Mltree.from_km  = m.mod_known; } in
+    let info = { Mltree.from_mod = Some m; Mltree.from_km = m.mod_known; } in
     pdecl Sid.empty info pd
 
   (* unit module declarations *)
   let rec mdecl pids info = function
     | Udecl pd -> pdecl pids info pd
-    | Uscope (_, l) -> List.concat (List.map (mdecl pids info) l)
+    | Uscope (_, ([Uuse _] | [Uclone _])) -> []
+    | Uscope (s, dl) -> let dl = List.concat (List.map (mdecl pids info) dl) in
+      [Mltree.Dmodule (s, dl)]
     | Uuse _ | Uclone _ | Umeta _ -> []
 
   let abstract_or_alias_type itd =
@@ -786,13 +795,12 @@ module Translate = struct
     let pids = List.fold_left ids_of_params Sid.empty params in
     let mod_decl = List.concat (List.map (mdecl pids from) m.mod_units) in
     let mod_decl = List.map (make_param from) params @ mod_decl in
-    let add known_map decl =
-      let idl = ML.get_decl_name decl in
+    let add_decl known_map decl = let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
-    let mod_known = List.fold_left add Mid.empty mod_decl in {
+    let mod_known = List.fold_left add_decl Mid.empty mod_decl in {
       Mltree.mod_from = from;
       Mltree.mod_decl = mod_decl;
-      Mltree.mod_known = mod_known
+      Mltree.mod_known = mod_known;
     }
 
   (* let () = Exn_printer.register (fun fmt e -> match e with *)
@@ -926,12 +934,12 @@ module Transform = struct
     let rec_exp, spv = expr info subst r.rec_exp in
     { r with rec_exp = rec_exp }, spv
 
-  let pdecl info = function
+  let rec pdecl info = function
     | Dtype _ | Dexn _ | Dclone _ as d -> d
+    | Dmodule (id, dl) -> let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->
       (* for top-level symbols we can forget the set of inlined variables *)
-      let e, _ = let_def info Mpv.empty def in
-      Dlet e
+      let e, _ = let_def info Mpv.empty def in Dlet e
 
   let module_ m =
     let mod_decl = List.map (pdecl m.mod_from) m.mod_decl in

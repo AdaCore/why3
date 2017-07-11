@@ -85,26 +85,36 @@ module Print = struct
     let s = id_unique iprinter id in
     fprintf fmt "%s" s
 
-  let is_local_id info id =
+  let is_local_id info id = (* FIXME : take scopes into account *)
     Sid.mem id info.info_current_th.th_local ||
     Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
       false info.info_current_mo
 
+  exception Local
+
+  let mk_s ~sanitizer ~sanitize q sep =
+    let s = String.concat sep q in
+    let s = if sanitize then
+        let s = Ident.sanitizer char_to_alpha char_to_alnumus s in sanitizer s
+      else s in
+    if is_ocaml_keyword s then s ^ "_renamed" else s (* FIXME *)
+
   let print_qident ~sanitizer info fmt id =
-    try
-      if info.flat || is_local_id info id then raise Not_found;
-      let lp, t, q =
-        try Pmodule.restore_path id
-        with Not_found -> Theory.restore_path id in
-      let s = String.concat "__" q in
-      let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
-      let s = sanitizer s in
-      let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
-      let fname = if lp = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname lp t) in
+    try if info.flat then raise Not_found;
+      if is_local_id info id then raise Local;
+      let p, t, q = try Pmodule.restore_path id with Not_found ->
+        Theory.restore_path id in
+      let s = mk_s ~sanitizer ~sanitize:true q "__" in
+      let fname = if p = [] then info.info_fname else None in
+      let m = Strings.capitalize (module_name ?fname p t) in
       fprintf fmt "%s.%s" m s
-    with Not_found ->
-      let s = id_unique ~sanitizer iprinter id in
+    with
+    | Not_found -> let s = id_unique ~sanitizer iprinter id in
+      fprintf fmt "%s" s
+    | Local -> let _, _, q = try Pmodule.restore_path id with Not_found ->
+        Theory.restore_path id in
+      List.iter (fun q -> eprintf "%s. " q) q; eprintf "@.";
+      let s = mk_s ~sanitizer ~sanitize:false q "." in
       fprintf fmt "%s" s
 
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
@@ -525,18 +535,19 @@ module Print = struct
       (if fst then "type" else "and") print_tv_args its.its_args
       (print_lident info) its.its_name print_def its.its_def
 
-  let print_decl info fmt = function
+  let rec print_decl info fmt = function
     | Dlet ldef ->
-      print_let_def info fmt ldef;
-      fprintf fmt "@\n"
+      print_let_def info fmt ldef
     | Dtype dl ->
-      print_list_next newline (print_type_decl info) fmt dl;
-      fprintf fmt "@\n"
+      print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
-       fprintf fmt "exception %a@\n" (print_uident info) xs.xs_name
+       fprintf fmt "exception %a" (print_uident info) xs.xs_name
     | Dexn (xs, Some t)->
-      fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
+      fprintf fmt "@[<hov 2>exception %a of %a@]"
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
+    | Dmodule (s, dl) ->
+      fprintf fmt "module %s =@\n@[<hov 2>struct@\n%a@]@\nend"
+        s (print_list newline (print_decl info)) dl
     | Dclone _ ->
       assert false (*TODO*)
 
@@ -567,8 +578,8 @@ let print_decl =
       info_fname        = Opt.map Compile.clean_name fname;
       flat              = flat;
     } in
-    if not (Hashtbl.mem memo d) then begin
-      Hashtbl.add memo d (); Print.print_decl info fmt d end
+    if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
+      Print.print_decl info fmt d end
 
 let fg ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in

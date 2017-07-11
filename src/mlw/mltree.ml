@@ -89,19 +89,22 @@ type decl =
   | Dlet    of let_def
   | Dexn    of xsymbol * ty option
   | Dclone  of ident * decl list
+  | Dmodule of string * decl list
 (*
     | Dfunctor of ident * (ident * decl list) list * decl list
 *)
 
-type known_map = decl Mid.t
+type namespace = (ident * decl list) list
 
 type from_module = {
   from_mod: Pmodule.pmodule option;
   from_km : Pdecl.known_map;
 }
 
+type known_map = decl Mid.t
+
 type pmodule = {
-  mod_from  : from_module;
-  mod_decl  : decl list;
-  mod_known : known_map;
+  mod_from  : from_module; (* information about original Why3 module *)
+  mod_decl  : decl list;   (* module declarations *)
+  mod_known : known_map;   (* known identifiers *)
 }
