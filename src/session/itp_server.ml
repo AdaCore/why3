@@ -82,53 +82,37 @@ let loaded_strategies = ref []
 
 (****** Exception handling *********)
 
-let print_term s id fmt t =
+let p s id =
   let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
   | Some tables -> tables in
-  Why3printer.print_term tables fmt t
+  let pr = tables.Trans.printer in
+  let apr = tables.Trans.aprinter in
+  (Pretty.create pr apr pr pr false)
+
+let print_term s id fmt t =
+  let module P = (val (p s id)) in P.print_term fmt t
 
 let print_type s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_ty tables fmt t
+  let module P = (val (p s id)) in P.print_ty fmt t
 
 let print_ts s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_ts tables fmt t
+  let module P = (val (p s id)) in P.print_ts fmt t
 
 let print_ls s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_ls tables fmt t
+  let module P = (val (p s id)) in P.print_ls fmt t
 
 let print_tv s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_tv tables fmt t
+  let module P = (val (p s id)) in P.print_tv fmt t
 
 let print_vsty s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_forget_vsty tables fmt t
+  let module P = (val (p s id)) in P.print_vsty fmt t
 
 let print_pr s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_pr tables fmt t
+  let module P = (val (p s id)) in P.print_pr fmt t
 
 let print_pat s id fmt t =
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
-  Why3printer.print_pat tables fmt t
+  let module P = (val (p s id)) in P.print_pat fmt t
 
 (* Exception reporting *)
 
@@ -912,9 +896,16 @@ end
     let tables = get_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = get_locations task in
-    Pp.string_of
-      (Driver.print_task ~cntexample:false ?name_table:tables ~do_intros d.task_driver)
-      task, loc_color_list
+    let task_text =
+      match tables with
+      | None -> assert false
+      | Some t ->
+         let pr = t.Trans.printer in
+         let apr = t.Trans.aprinter in
+         let module P = (val Pretty.create pr apr pr pr false) in
+         Pp.string_of P.print_sequent task
+    in
+    task_text, loc_color_list
 
   let send_task nid do_intros =
     let d = get_server_data () in

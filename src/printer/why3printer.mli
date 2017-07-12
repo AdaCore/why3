@@ -30,6 +30,7 @@
 
 *)
 
+(*
 val print_ls   : Trans.naming_table -> Format.formatter -> Term.lsymbol  -> unit
 val print_tv   : Trans.naming_table -> Format.formatter -> Ty.tvsymbol   -> unit
 val print_ts   : Trans.naming_table -> Format.formatter -> Ty.tysymbol   -> unit
@@ -39,3 +40,4 @@ val print_pat  : Trans.naming_table -> Format.formatter -> Term.pattern  -> unit
 val print_ty   : Trans.naming_table -> Format.formatter -> Ty.ty         -> unit
 val print_term : Trans.naming_table -> Format.formatter -> Term.term     -> unit
 val print_decl : Trans.naming_table -> Format.formatter -> Decl.decl     -> unit
+*)

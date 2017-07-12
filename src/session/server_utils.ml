@@ -157,7 +157,10 @@ let print_id s tables =
     try Ident.Mid.find (symbol_name id) km with
     | Not_found -> raise Not_found (* Should not happen *)
   in
-  Pp.string_of (Why3printer.print_decl tables) d
+  let pr = tables.Trans.printer in
+  let apr = tables.Trans.aprinter in
+  let module P = (val Pretty.create pr apr pr pr false) in
+  Pp.string_of P.print_decl d
 
 
 
@@ -212,7 +215,10 @@ let search s tables =
          (Pp.print_list Pp.space (fun fmt id -> Pp.string fmt id.Ident.id_string))
          ids
     else let l = Decl.Sdecl.elements l in
-         Pp.string_of (Pp.print_list Pp.newline2 (Why3printer.print_decl tables)) l
+         let pr = tables.Trans.printer in
+         let apr = tables.Trans.aprinter in
+         let module P = (val Pretty.create pr apr pr pr false) in
+         Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
 
 let print_id _cont task args =
   match args with

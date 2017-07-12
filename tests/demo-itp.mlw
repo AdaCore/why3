@@ -1,4 +1,12 @@
 
+
+module M
+  use import int.Int
+
+  function (++) (x:int) (y:int) : int  = x * y
+
+end
+
 module TestTaskPrinting
 
   use import int.Int
@@ -19,6 +27,16 @@ module TestTaskPrinting
 
   goal g6: let x = averyveryveryveryveryverylongname 1 + averyveryveryveryveryverylongname 2
            in averyveryveryveryveryverylongname x + averyveryveryveryveryverylongname 1 >= 0
+
+  function (+) (x:int) (y:int) : int  = x * y
+
+  goal g7: 2 + 3 = Int.(+) 3 3
+
+  use import M
+
+  function (++) (x:int) (y:int) : int  = x * y
+
+  goal g8: 2 ++ 3 = M.(++) 3 3
 
 end
 

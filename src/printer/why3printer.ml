@@ -80,6 +80,7 @@ let rec print_ty_node inn tables fmt ty = match ty.ty_node with
 let print_ty = print_ty_node false
 
 (** Forgetting function for stability of errors *)
+(*
 let print_forget_vsty tables fmt v =
   if (Ident.known_id tables.Trans.printer v.vs_name) then
     fprintf fmt "%a: %a" (print_vs tables) v (print_ty tables) v.vs_ty
@@ -88,7 +89,7 @@ let print_forget_vsty tables fmt v =
       fprintf fmt "%a: %a" (print_vs tables) v (print_ty tables) v.vs_ty;
       forget_var tables v
     end
-
+ *)
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -409,11 +410,14 @@ let print_tdecls tables =
 
 let empty_naming_table () =
   let sanitizer = Ident.(sanitizer char_to_alpha char_to_alnumus) in
+  let lsanitizer = Ident.(sanitizer char_to_lalpha char_to_alnumus) in
   let pr = create_ident_printer Pretty.why3_keywords ~sanitizer in
+  let apr = create_ident_printer Pretty.why3_keywords ~sanitizer:lsanitizer in
   Trans.{
     namespace = empty_ns;
     known_map = Ident.Mid.empty;
     printer = pr;
+    aprinter = apr;
   }
 
 let print_task args ?old:_ fmt task =

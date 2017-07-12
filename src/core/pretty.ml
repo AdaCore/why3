@@ -34,22 +34,20 @@ let debug_print_labels =
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-let iprinter,aprinter,tprinter,pprinter =
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  create_ident_printer why3_keywords ~sanitizer:isanitize,
-  create_ident_printer why3_keywords ~sanitizer:lsanitize,
-  create_ident_printer why3_keywords ~sanitizer:lsanitize,
-  create_ident_printer why3_keywords ~sanitizer:isanitize
+
+
+let create iprinter aprinter tprinter pprinter do_forget_all =
+  (module (struct
 
 let forget_tvs () =
-  forget_all aprinter
+  (* we always forget type variables between each declaration *)
+  (* if do_forget_all then *) forget_all aprinter
 
 let forget_all () =
-  forget_all iprinter;
-  forget_all aprinter;
-  forget_all tprinter;
-  forget_all pprinter
+  if do_forget_all then forget_all iprinter;
+  if do_forget_all then forget_all aprinter;
+  if do_forget_all then forget_all tprinter;
+  if do_forget_all then forget_all pprinter
 
 let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
 let print_labels = print_iter1 Slab.iter space print_label
@@ -507,6 +505,51 @@ let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
   fprintf fmt "@[<hov>%a@]@." P.print
     (NsTree.Namespace (name, th.th_export, th.th_known))
+
+
+(* print task under the form of a sequent, with only local context, for the IDE *)
+
+let print_goal fmt d =
+   match d.d_node with
+   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]@\n" print_term f
+   | _ -> assert false
+
+let print_sequent fmt task =
+  let ut = Task.used_symbols (Task.used_theories task) in
+  let ld = Task.local_decls task ut in
+  let rec aux fmt l =
+    match l with
+      | [] -> assert false
+      | [g] ->
+         fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
+         print_goal fmt g
+      | d :: r ->
+         fprintf fmt "@[%a@]@\n@\n" print_decl d;
+         aux fmt r
+  in
+  fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld
+
+
+
+
+            end) : Pretty_sig.Printer) (* end of the first class module *)
+
+
+
+module LegacyPrinter =
+  (val (let iprinter,aprinter,tprinter,pprinter =
+    let isanitize = sanitizer char_to_alpha char_to_alnumus in
+    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+    create_ident_printer why3_keywords ~sanitizer:isanitize,
+    create_ident_printer why3_keywords ~sanitizer:lsanitize,
+    create_ident_printer why3_keywords ~sanitizer:lsanitize,
+    create_ident_printer why3_keywords ~sanitizer:isanitize
+  in
+  create iprinter aprinter tprinter pprinter true))
+
+include LegacyPrinter
+
 
 (* Exception reporting *)
 

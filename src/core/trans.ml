@@ -342,6 +342,7 @@ type naming_table = {
     namespace : namespace;
     known_map : known_map;
     printer : Ident.ident_printer;
+    aprinter : Ident.ident_printer;
   }
 
 exception Bad_name_table of string
