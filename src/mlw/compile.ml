@@ -52,12 +52,11 @@ module ML = struct
     | Dlet (Lsym ({rs_name=id}, _, _, _))
     | Dlet (Lany ({rs_name=id}, _, _))
     | Dexn ({xs_name=id}, _) -> [id]
-    | Dmodule (_, _, dl) -> List.concat (List.map get_decl_name dl)
-    | Dclone _ -> [] (* FIXME? *)
+    | Dmodule (_, dl) -> List.concat (List.map get_decl_name dl)
 
   let rec add_known_decl decl k_map id =
     match decl with
-    | Dmodule (_, _, dl) ->
+    | Dmodule (_, dl) ->
       let add_decl k_map d =
         let idl = get_decl_name d in
         List.fold_left (add_known_decl d) k_map idl in
@@ -173,8 +172,7 @@ module ML = struct
     | Dlet (Lvar (_, e)) -> iter_deps_expr f e
     | Dexn (_, None) -> ()
     | Dexn (_, Some ty) -> iter_deps_ty f ty
-    | Dclone (_, dl) | Dmodule (_, _, dl) -> (* FIXME: functor argument *)
-      List.iter (iter_deps f) dl
+    | Dmodule (_, dl) -> List.iter (iter_deps f) dl
 
   let mk_expr e_node e_ity e_effect e_label =
     { e_node = e_node; e_ity = e_ity; e_effect = e_effect; e_label = e_label; }
@@ -786,20 +784,10 @@ module Translate = struct
   let rec mdecl pids info = function
     | Udecl pd -> pdecl pids info pd
     | Uscope (_, ([Uuse _] | [Uclone _])) -> []
-    | Uscope (s, dl) -> let dl = List.concat (List.map (mdecl pids info) dl) in
-      let filter_func_params (dl, params) = function
-        | Mltree.Dmodule (s, _args, mod_dl) -> dl, (s, mod_dl) :: params
-        | d -> d :: dl, params in
-      let dl, params = List.fold_left filter_func_params ([], []) dl in
-      [Mltree.Dmodule (s, List.rev params, List.rev dl)]
+    | Uscope (s, dl) ->
+      let dl = List.concat (List.map (mdecl pids info) dl) in
+      [Mltree.Dmodule (s, dl)]
     | Uuse _ | Uclone _ | Umeta _ -> []
-
-  let make_param from mi =
-    let id = mi.mi_mod.mod_theory.Theory.th_name in
-    Format.printf "param %s@." id.id_string;
-    let dl =
-      List.concat (List.map (mdecl Sid.empty from) mi.mi_mod.mod_units) in
-    Mltree.Dclone (id, dl)
 
   let ids_of_params pids mi =
     Mid.fold (fun id _ pids -> Sid.add id pids) mi.mi_mod.mod_known pids
@@ -810,7 +798,7 @@ module Translate = struct
     let params = find_params m.mod_units in
     let pids = List.fold_left ids_of_params Sid.empty params in
     let mod_decl = List.concat (List.map (mdecl pids from) m.mod_units) in
-    let mod_decl = List.map (make_param from) params @ mod_decl in
+    let mod_decl = mod_decl in
     let add_decl known_map decl = let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add_decl Mid.empty mod_decl in {
@@ -952,9 +940,9 @@ module Transform = struct
     { r with rec_exp = rec_exp }, spv
 
   let rec pdecl info = function
-    | Dtype _ | Dexn _ | Dclone _ as d -> d
-    | Dmodule (id, args, dl) ->
-      let dl = List.map (pdecl info) dl in Dmodule (id, args, dl)
+    | Dtype _ | Dexn _ as d -> d
+    | Dmodule (id, dl) ->
+      let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->
       (* for top-level symbols we can forget the set of inlined variables *)
       let e, _ = let_def info Mpv.empty def in Dlet e

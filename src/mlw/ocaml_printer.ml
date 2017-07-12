@@ -380,7 +380,7 @@ module Print = struct
         (print_list arrow (print_ty_arg info)) args
         (print_ty info) res;
       forget_vars args
-    | Lany _ -> () (* FIXME: test driver here *)
+    | Lany _ -> () (* FIXME: test driver here and fail if no driver *)
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
@@ -544,6 +544,25 @@ module Print = struct
       (if fst then "type" else "and") print_tv_args its.its_args
       (print_lident info) its.its_name print_def its.its_def
 
+  let rec is_signature_decl info = function
+    | Dtype _ -> true
+    | Dlet (Lany _) -> true
+    | Dlet _ -> false
+    | Dexn _ -> true
+    | Dmodule (_, dl) -> is_signature info dl
+
+  and is_signature info dl =
+    List.for_all (is_signature_decl info) dl
+
+  let extract_functor_args info dl =
+    let rec extract args = function
+      (* FIXME remove empty args? *)
+      (* | Dmodule (_, []) :: dl -> extract args dl *)
+      | Dmodule (x, dlx) :: dl when is_signature info dlx ->
+        extract ((x, dlx) :: args) dl
+      | dl -> List.rev args, dl in
+    extract [] dl
+
   let rec print_decl ?(functor_arg=false) info fmt = function
     | Dlet ldef ->
       print_let_def info ~functor_arg fmt ldef
@@ -554,12 +573,12 @@ module Print = struct
     | Dexn (xs, Some t)->
       fprintf fmt "@[<hov 2>exception %a of %a@]"
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
-    | Dmodule (s, args, dl) ->
+    | Dmodule (s, dl) ->
+      let args, dl = extract_functor_args info dl in
       let info = { info with info_current_ph = s :: info.info_current_ph } in
       fprintf fmt "@[@[<hov 2>module %s%a@ =@ struct@ %a@]@ end@]" s
         (print_functor_args info) args
         (print_list newline (print_decl info)) dl
-    | Dclone _ -> assert false (*TODO*)
 
   and print_functor_args info fmt args =
     let print_sig info fmt dl =

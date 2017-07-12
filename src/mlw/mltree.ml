@@ -89,11 +89,7 @@ type decl =
   | Dtype   of its_defn list
   | Dlet    of let_def
   | Dexn    of xsymbol * ty option
-  | Dclone  of ident * decl list
-  | Dmodule of string * (string * decl list) list * decl list
-(*
-    | Dfunctor of ident * (ident * decl list) list * decl list
-*)
+  | Dmodule of string * decl list
 
 type namespace = (ident * decl list) list
 
