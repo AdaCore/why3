@@ -284,6 +284,19 @@ module TestExtraction
     test4 ();
     test_parallel_assign ()
 
+  (* scopes *)
+
+  type ty = A | B | C
+
+  scope S
+    type ty = A | B | C
+    (* locally hides toplevel function foo: int -> int *)
+    let foo (x: bool) : bool = x
+    let test_foo () = foo true
+  end
+
+  let test_foo () = foo 42
+
 end
 
 (*

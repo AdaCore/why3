@@ -58,11 +58,14 @@ module Print = struct
     List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
     Hstr.mem h
 
-  (* FIXME? use different printers for record fields, types, etc. *)
-  let iprinter, aprinter =
+  (* iprinter: local names
+     aprinter: type variables
+     tprinter: toplevel definitions *)
+  let iprinter, aprinter, tprinter =
     let isanitize = sanitizer char_to_alpha char_to_alnumus in
     let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
+    create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
   let forget_id id = forget_id iprinter id
@@ -82,6 +85,24 @@ module Print = struct
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
+  let print_global_ident ~sanitizer fmt id =
+    let s = id_unique ~sanitizer tprinter id in
+    Ident.forget_id tprinter id;
+    fprintf fmt "%s" s
+
+  let print_path ~sanitizer fmt (q, id) =
+    assert (List.length q >= 1);
+    match Lists.chop_last q with
+    | [], _ -> print_global_ident ~sanitizer fmt id
+    | q, _  ->
+      fprintf fmt "%a.%a"
+        (print_list dot string) q (print_global_ident ~sanitizer) id
+
+  let rec remove_prefix acc current_path = match acc, current_path with
+    | [], _ | _, [] -> acc
+    | p1 :: _, p2 :: _ when p1 <> p2 -> acc
+    | _ :: r1, _ :: r2 -> remove_prefix r1 r2
+
   let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
     Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
@@ -89,43 +110,24 @@ module Print = struct
 
   exception Local
 
-  let rename s =
-    if is_ocaml_keyword s then s ^ "_renamed" else s
-
-  (* used for global names only *)
-  let print_ident fmt id = let s = id_unique iprinter id in
-    fprintf fmt "%s" s
-
-  let print_global_ident fmt id = let s = rename id.id_string in
-    fprintf fmt "%s" s
-
-  let mk_path q =
-    let q = List.map rename q in
-    String.concat "." q
-
-  let rec remove_prefix acc current_path = match acc, current_path with
-    | [], _ | _, [] -> acc
-    | p1 :: _, p2 :: _ when p1 <> p2 -> acc
-    | _ :: r1, _ :: r2 -> remove_prefix r1 r2
-
   let print_qident ~sanitizer info fmt id =
-    try if info.info_flat then raise Not_found;
+    try
+      if info.info_flat then raise Not_found;
       if is_local_id info id then raise Local;
-      let p, t, q = try Pmodule.restore_path id with Not_found ->
-        Theory.restore_path id in
-      let s = mk_path q in
+      let p, t, q =
+        try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
       let fname = if p = [] then info.info_fname else None in
       let m = Strings.capitalize (module_name ?fname p t) in
-      fprintf fmt "%s.%s" m s
+      fprintf fmt "%s.%a" m (print_path ~sanitizer) (q, id)
     with
-    | Not_found -> let s = id_unique ~sanitizer iprinter id in
+    | Not_found ->
+      let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
     | Local ->
-      let _, _, q = try Pmodule.restore_path id with Not_found ->
-        Theory.restore_path id in
+      let _, _, q =
+        try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
       let q = remove_prefix q (List.rev info.info_current_ph) in
-      let s = mk_path q in
-      fprintf fmt "%s" s
+      print_path ~sanitizer fmt (q, id)
 
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
   let print_uident = print_qident ~sanitizer:Strings.capitalize
@@ -346,14 +348,14 @@ module Print = struct
         (print_list space (print_lident info)) id_args
         (print_expr info) e
 
-  and print_let_def ?(top=false) ?(functor_arg=false) info fmt = function
+  and print_let_def ?(functor_arg=false) info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
-        (if top then print_global_ident else print_ident) (pv_name pv)
+        (print_lident info) (pv_name pv)
         (print_expr info) e;
     | Lsym (rs, res, args, ef) ->
       fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
-        (if top then print_global_ident else print_ident) rs.rs_name
+        (print_lident info) rs.rs_name
         (print_list space (print_vs_arg info)) args
         (print_ty info) res (print_expr info) ef;
       forget_vars args
@@ -363,7 +365,7 @@ module Print = struct
             rec_res = res; rec_svar = s } ->
           fprintf fmt "@[<hov 2>%s %a %a@]"
             (if fst then "let rec" else "and")
-           (if top then print_global_ident else print_ident) rs1.rs_name
+           (print_lident info) rs1.rs_name
             (print_fun_type_args info) (args, s, res, e);
           forget_vars args
       in
@@ -374,7 +376,7 @@ module Print = struct
       let print_ty_arg info fmt (_, ty, _) =
         fprintf fmt "@[%a@]" (print_ty info) ty in
       fprintf fmt "@[<hov 2>val %a : @[%a@] ->@ %a@]"
-        (if top then print_global_ident else print_ident) rs.rs_name
+        (print_lident info) rs.rs_name
         (print_list arrow (print_ty_arg info)) args
         (print_ty info) res;
       forget_vars args
@@ -540,11 +542,11 @@ module Print = struct
     in
     fprintf fmt "@[<hov 2>%s %a%a%a@]"
       (if fst then "type" else "and") print_tv_args its.its_args
-      print_ident its.its_name print_def its.its_def
+      (print_lident info) its.its_name print_def its.its_def
 
   let rec print_decl ?(functor_arg=false) info fmt = function
     | Dlet ldef ->
-      print_let_def info ~top:true ~functor_arg fmt ldef
+      print_let_def info ~functor_arg fmt ldef
     | Dtype dl ->
       print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->

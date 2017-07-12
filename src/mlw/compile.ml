@@ -263,13 +263,8 @@ module Translate = struct
 
   let rec filter_out_ghost_rdef = function
     | [] -> []
-    | { rec_sym = rs; rec_rsym = rrs } :: _ when rs_ghost rs || rs_ghost rrs ->
-      (* filter_out_ghost_rdef l *)
-      [] (* FIXME: In a mutually recursive block of lemma functions only the
-                   first one is ghost. For now we delete the whole block as soon
-                   as we find a ghost definition. This only works in practice if
-                   the first function is declared as ghost, which is the case of
-                   lemma functions *)
+    | { rec_sym = rs; rec_rsym = rrs } :: l when rs_ghost rs || rs_ghost rrs ->
+      filter_out_ghost_rdef l
     | rdef :: l ->
       rdef :: filter_out_ghost_rdef l
 
