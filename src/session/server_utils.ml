@@ -357,13 +357,10 @@ type command =
 let interp_others commands_table config id cmd args =
   match parse_prover_name config cmd args with
   | Some (prover_config, limit) ->
-      if id = None then
-        QError ("Please select a valid node id")
+      if prover_config.Whyconf.interactive then
+        Edit (prover_config)
       else
-        if prover_config.Whyconf.interactive then
-          Edit (prover_config)
-        else
-          Prove (prover_config, limit)
+        Prove (prover_config, limit)
   | None ->
       match cmd, args with
       | "auto", _ ->
