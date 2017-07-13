@@ -79,7 +79,13 @@ let destruct_alg (x: term) : Task.task Trans.tlist =
 (* Destruct the head term of an hypothesis if it is either
    conjunction, disjunction or exists *)
 let destruct pr : Task.task Trans.tlist =
-  Trans.decl_l (fun d ->
+  let new_decl = ref None in
+  (* This transformation destructs the hypothesis pr. In case pr is an
+     implication H : A -> B, the destruction creates two task (one with H
+     removed and one with H : B). It also fills new_decl with A.
+     The next transformation replace the first goal with A. *)
+  let tr_decl =
+    Trans.decl_l (fun d ->
     match d.d_node with
     | Dprop (Paxiom, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
       begin
@@ -96,6 +102,16 @@ let destruct pr : Task.task Trans.tlist =
           let new_pr2 = create_prsymbol (Ident.id_clone dpr.pr_name) in
           let new_decl2 = create_prop_decl Paxiom new_pr2 t2 in
           [[new_decl1];[new_decl2]]
+        | Tbinop (Timplies, t1, t2) ->
+          begin
+            let new_pr2 = create_prsymbol (Ident.id_clone dpr.pr_name) in
+            let new_decl2 = create_prop_decl Paxiom new_pr2 t2 in
+            new_decl := Some t1;
+            (* Creates a task with hypothesis removes (need to prove t1) and one
+               with hypothesis replaced by t2 (needs to prove current goal).
+               Example: "false -> false" *)
+            [] :: [[new_decl2]]
+          end
         | Tquant (Texists, tb) ->
           begin
             let (vsl, tr, te) = Term.t_open_quant tb in
@@ -117,8 +133,25 @@ let destruct pr : Task.task Trans.tlist =
           end
         | _ -> raise (Arg_trans ("destruct"))
       end
-    | _ -> [[d]]) None
-
+    | _ -> [[d]]) None in
+  Trans.store (fun task ->
+    let goal, task = Task.task_separate_goal task in
+    let new_tasks = Trans.apply tr_decl task in
+    match !new_decl with
+    | None ->
+      (* Normal destruct case (not implication): add goal back to tasks *)
+      List.map (fun task -> Task.add_tdecl task goal) new_tasks
+    | Some new_decl ->
+      match new_tasks with
+      (* Destruct case for an implication. The first goal should be new_decl,
+         the second one is unchanged. *)
+      | first_task :: second_task :: [] ->
+        let new_goal =
+          create_prop_decl Pgoal (create_prsymbol (gen_ident "G")) new_decl in
+        let first_goal = Task.add_decl first_task new_goal in
+        let second_goal = Task.add_tdecl second_task goal in
+        first_goal :: second_goal :: []
+      | _ -> assert false)
 
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
