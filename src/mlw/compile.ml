@@ -622,7 +622,12 @@ module Translate = struct
     (*   assert false (\*TODO*\) *)
 
   and ebranch info ({pp_pat = p; pp_mask = m}, e) =
-    (pat m p, expr info e)
+    if e.e_effect.eff_ghost then begin
+      (* if the [case] expression is not ghost but there is (at least) one ghost
+         branch, then it must be the case that all the branches return [unit]
+         and at least one of the non-ghost branches is effectful *)
+      assert (ity_equal e.e_ity ity_unit); (pat m p, ML.mk_unit) end
+    else (pat m p, expr info e)
 
   (* type declarations/definitions *)
   let tdef itd =
