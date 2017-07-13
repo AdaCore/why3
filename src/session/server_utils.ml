@@ -152,10 +152,13 @@ let print_id s tables =
   (* let tables = Args_wrapper.build_name_tables task in*)
   let km = tables.Trans.known_map in
   let id = try Args_wrapper.find_symbol s tables with
-  | Not_found -> raise (Undefined_id s) in
+  | Args_wrapper.Arg_parse_type_error _
+  | Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s) in
   let d =
     try Ident.Mid.find (symbol_name id) km with
     | Not_found -> raise Not_found (* Should not happen *)
+    | Args_wrapper.Arg_parse_type_error _
+    | Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s)
   in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in
