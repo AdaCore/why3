@@ -188,7 +188,8 @@ type (_, _) trans_typ =
   | Tlsymbol    : ('a, 'b) trans_typ -> ((Term.lsymbol -> 'a), 'b) trans_typ
   | Tsymbol     : ('a, 'b) trans_typ -> ((symbol -> 'a), 'b) trans_typ
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
-  | Tidentlist : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
+  | Tidentlist  : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
+  | Ttermlist   : ('a, 'b) trans_typ -> ((term list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory     : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
@@ -232,6 +233,19 @@ let parse_and_type ~as_fmla s task =
       type_ptree ~as_fmla:as_fmla t task
     in
     t
+  with
+  | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
+
+let parse_and_type_list ~as_fmla s task =
+  try
+    let lb = Lexing.from_string s in
+    let t_list =
+      Lexer.parse_term_list lb
+    in
+    let t_list =
+      List.map (fun t -> type_ptree ~as_fmla:as_fmla t task) t_list
+    in
+    t_list
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
@@ -316,6 +330,7 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tlist t        -> is_trans_typ_l t
     | Tterm t        -> is_trans_typ_l t
     | Tidentlist t   -> is_trans_typ_l t
+    | Ttermlist t    -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
     | Ttheory t      -> is_trans_typ_l t
     | Topt (_,t)     -> is_trans_typ_l t
@@ -340,6 +355,7 @@ let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tterm _        -> "term"
     | Tformula _     -> "formula"
     | Tidentlist _   -> "list ident"
+    | Ttermlist _    -> "list term"
     | Ttheory _      -> "theory"
     | Topt (s,t)     -> "?" ^ s ^ (string_of_trans_typ t)
     | Toptbool (s,_) -> "?" ^ s ^ ":bool"
@@ -362,7 +378,8 @@ let rec print_type : type a b. (a, b) trans_typ -> string =
     | Tlist t        -> "list symbol -> " ^ print_type t
     | Tterm t        -> "term -> " ^ print_type t
     | Tformula t     -> "formula -> " ^ print_type t
-    | Tidentlist t    -> "list ident -> " ^ print_type t
+    | Tidentlist t   -> "list ident -> " ^ print_type t
+    | Ttermlist t    -> "list term -> " ^ print_type t
     | Ttheory t      -> "theory -> " ^ print_type t
     | Topt (s,t)     -> "?" ^ s ^ ":" ^ print_type t
     | Toptbool (s,t) -> "?" ^ s ^ ":bool -> " ^ print_type t
@@ -429,6 +446,9 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Tidentlist t', s :: tail ->
        let list = List.map (fun id -> id.Ptree.id_str) (parse_list_ident s) in
        wrap_to_store t' (f list) tail env tables task
+    | Ttermlist t', s :: tail ->
+       let term_list = parse_and_type_list ~as_fmla:false s tables in
+       wrap_to_store t' (f term_list) tail env tables task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
        begin match t' with
         | Tint t' ->

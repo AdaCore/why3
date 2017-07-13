@@ -17,6 +17,7 @@ exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
+exception Unnecessary_terms of term list
 
 val gen_ident : ?label:Ident.Slab.t -> ?loc:Loc.position -> string -> Ident.preid
 
@@ -29,3 +30,7 @@ val subst_exist: term -> term -> term
 
 (* Transform the term (forall v, f) into f[x/v] *)
 val subst_forall: term -> term -> term
+
+(* TODO remove subst_forall and subst_exist *)
+(* Same as subst_forall with a list of term *)
+val subst_forall_list: term -> term list -> term

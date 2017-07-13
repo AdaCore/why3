@@ -245,6 +245,8 @@ rule token = parse
 
   let parse_term lb = Loc.with_location (Parser.term_eof token) lb
 
+  let parse_term_list lb = Loc.with_location (Parser.term_comma_list_eof token) lb
+
   let parse_qualid lb = Loc.with_location (Parser.qualid_eof token) lb
 
   let parse_list_ident lb = Loc.with_location (Parser.ident_comma_list_eof token) lb

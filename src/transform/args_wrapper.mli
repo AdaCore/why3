@@ -81,6 +81,8 @@ type (_, _) trans_typ =
   | Tidentlist : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
   (** transformation with a list of identifiers as argument. The identifiers do not need
       to exist in the task, typically they could be fresh symbols *)
+  | Ttermlist   : ('a, 'b) trans_typ -> ((Term.term list -> 'a), 'b) trans_typ
+  (** transformation with a list of terms as argument. *)
   | Tterm       : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
   (** transformation with a Why3 term as argument *)
   | Tformula    : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ

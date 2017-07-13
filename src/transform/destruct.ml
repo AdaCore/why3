@@ -155,13 +155,13 @@ let destruct pr : Task.task Trans.tlist =
 
 (* from task [delta, name:forall x.A |- G,
      build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
-let instantiate (pr: Decl.prsymbol) t =
+let instantiate (pr: Decl.prsymbol) lt =
   let r = ref [] in
   Trans.decl
     (fun d ->
       match d.d_node with
       | Dprop (pk, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
-          let t_subst = subst_forall ht t in
+          let t_subst = subst_forall_list ht lt in
           let new_pr = create_prsymbol (Ident.id_clone dpr.pr_name) in
           let new_decl = create_prop_decl pk new_pr t_subst in
           r := [new_decl];
@@ -169,11 +169,10 @@ let instantiate (pr: Decl.prsymbol) t =
       | Dprop (Pgoal, _, _) -> !r @ [d]
       | _ -> [d]) None
 
-
 let () = wrap_and_register
-    ~desc:"instantiate <prop> <term> generates a new hypothesis with first quantified variables of prop replaced with term "
+    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms"
     "instantiate"
-    (Tprsymbol (Tterm Ttrans)) instantiate
+    (Tprsymbol (Ttermlist Ttrans)) instantiate
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor of hypothesis name"
     "destruct" (Tprsymbol Ttrans_l) destruct
