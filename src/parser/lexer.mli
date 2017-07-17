@@ -11,6 +11,8 @@
 
 val parse_term : Lexing.lexbuf -> Ptree.term
 
+val parse_term_list: Lexing.lexbuf -> Ptree.term list
+
 val parse_qualid: Lexing.lexbuf -> Ptree.qualid
 
 val parse_list_qualid: Lexing.lexbuf -> Ptree.qualid list
