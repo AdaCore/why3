@@ -252,7 +252,6 @@ let get_exception_message ses id e =
            (fun fmt s -> Format.fprintf fmt "%a" (print_term ses id) s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
-
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
 
@@ -1098,7 +1097,7 @@ end
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
       with | _ -> "" in
       let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
-      let tr_applied = tr ^ " " ^ (List.fold_left (fun acc x -> x ^ " " ^ acc) "" args) in
+      let tr_applied = tr ^ " " ^ (List.fold_left (fun x acc -> x ^ " " ^ acc) "" args) in
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
 
