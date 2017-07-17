@@ -14,7 +14,6 @@
 
 open Session_itp
 
-
 (** {2 State of a proof or transformation in progress} *)
 
 type proof_attempt_status =
@@ -43,6 +42,9 @@ val print_strategy_status : Format.formatter -> strategy_status -> unit
 exception Noprogress
 
 (** {2 Signature for asynchronous schedulers} *)
+
+(** Default delay for the scheduler timeout *)
+val default_delay_ms: int
 
 module type Scheduler = sig
 

@@ -17,6 +17,8 @@ let debug_sched = Debug.register_info_flag "scheduler"
          and@ transformation@ applications."
 
 let debug_call_prover = Debug.lookup_flag "call_prover"
+let default_delay_ms = 100 (* 0.1 seconds *)
+
 
 exception Noprogress
 
@@ -364,7 +366,7 @@ let run_timeout_handler () =
   if not !timeout_handler_running then
     begin
       timeout_handler_running := true;
-      S.timeout ~ms:125 timeout_handler;
+      S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
 let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback =

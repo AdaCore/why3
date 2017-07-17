@@ -1370,7 +1370,7 @@ end
         end
 
   let _ =
-    S.timeout ~ms:100 treat_requests;
+    S.timeout ~ms:default_delay_ms treat_requests;
     (* S.idle ~prio:1 treat_requests; *)
     C.register_observer update_monitor
 

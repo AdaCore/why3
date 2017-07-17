@@ -1765,7 +1765,8 @@ let (_ : GMenu.image_menu_item) =
 (***********************)
 
 let () =
-  Scheduler.timeout ~ms:100 (fun () -> List.iter treat_notification (get_notified ()); true);
+  Scheduler.timeout ~ms:Controller_itp.default_delay_ms
+    (fun () -> List.iter treat_notification (get_notified ()); true);
   (* temporary *)
   vpan222#set_position 500;
   goals_view#expand_all ();
