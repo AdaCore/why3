@@ -781,7 +781,13 @@ and update_trans_node notification s trid =
       Htn.replace s.tn_state trid proved;
       notification (ATn trid);
       update_goal_node notification s (get_trans_parent s trid)
-    end
+    end;
+  (* Specific case in which we *always* need to call notification because
+     transformation are created with proved=true when they don't have subtasks.
+     This means they won't be updated in the next if so the parent goal will
+     never get updated. *)
+  if proof_list = [] then
+    update_goal_node notification s (get_trans_parent s trid)
 
 
 let update_any_node s notification a =
