@@ -40,7 +40,7 @@ let print_json_field key value_pr fmt value =
   fprintf fmt "%a:%a" string key value_pr value
 
 let list pr fmt l =
-  if l = [] then fprintf fmt "[null]"
+  if l = [] then fprintf fmt "[]"
   else
     Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.comma
       pr fmt l
@@ -50,7 +50,7 @@ let print_map_binding key_to_str value_pr fmt binding =
   print_json_field (key_to_str key) value_pr fmt value
 
 let map_bindings key_to_str value_pr fmt map_bindings =
-  if map_bindings = [] then fprintf fmt "null"
+  if map_bindings = [] then fprintf fmt "{}"
   else
     Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.comma
       (print_map_binding key_to_str value_pr) fmt map_bindings
