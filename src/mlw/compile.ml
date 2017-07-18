@@ -233,7 +233,7 @@ module Translate = struct
 
   (* remove ghost components from tuple, using mask *)
   let visible_of_mask m sl = match m with
-    | MaskGhost    -> assert false (* FIXME ? *)
+    | MaskGhost    -> assert false (* FIXME *)
     | MaskVisible  -> sl
     | MaskTuple ml ->
       let add_ity acc m ity = if mask_ghost m then acc else ity :: acc in
@@ -299,16 +299,19 @@ module Translate = struct
   (* individual types *)
   let mlty_of_ity mask t =
     let rec loop t = match t.ity_node with
-    | Ityvar (tvs, _) ->
-      Mltree.Tvar tvs
-    | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
-      let itl = List.rev (visible_of_mask mask itl) in
-      Mltree.Ttuple (List.map loop itl)
-    | Ityapp ({its_ts = ts}, itl, _) ->
-      Mltree.Tapp (ts.ts_name, List.map loop itl)
-    | Ityreg {reg_its = its; reg_args = args} ->
-      let args = List.map loop args in
-      Mltree.Tapp (its.its_ts.ts_name, args) in
+      | _ when mask_ghost mask ->
+        ML.tunit
+      | Ityvar (tvs, _) ->
+        Mltree.Tvar tvs
+      | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
+        let itl = List.rev (visible_of_mask mask itl) in
+        Mltree.Ttuple (List.map loop itl)
+      | Ityapp ({its_ts = ts}, itl, _) ->
+        let itl = List.rev (visible_of_mask mask itl) in
+        Mltree.Tapp (ts.ts_name, List.map loop itl)
+      | Ityreg {reg_its = its; reg_args = args} ->
+        let args = List.map loop args in
+        Mltree.Tapp (its.its_ts.ts_name, args) in
     loop t
 
   let pvty pv =
@@ -622,11 +625,13 @@ module Translate = struct
     (*   assert false (\*TODO*\) *)
 
   and ebranch info ({pp_pat = p; pp_mask = m}, e) =
-    if e.e_effect.eff_ghost then begin
-      (* if the [case] expression is not ghost but there is (at least) one ghost
-         branch, then it must be the case that all the branches return [unit]
-         and at least one of the non-ghost branches is effectful *)
-      assert (ity_equal e.e_ity ity_unit); (pat m p, ML.mk_unit) end
+    (* If the [case] expression is not ghost but there is (at least) one ghost
+       branch, then it must be the case that this is an effectful [case],
+       i.e., at least one of the non-ghost branches is effectful.  In extract
+       code, the onlye sound meaning for this [case] expression is to keep for
+       each branch the effectul sub-expression. This is similar to the case
+       of a [let x = e1 in e2] where [x] is a ghost [pvsymbol] *)
+    if e.e_effect.eff_ghost then (pat m p, ML.mk_unit)
     else (pat m p, expr info e)
 
   (* type declarations/definitions *)
@@ -678,7 +683,7 @@ module Translate = struct
   let rec fun_expr_of_mask mask e =
     let open Mltree in
     let mk_e e_node = { e with e_node = e_node } in
-    assert (mask <> MaskGhost);
+    (* assert (mask <> MaskGhost); *)
     match e.e_node with
     | Econst _ | Evar _   | Efun _ | Eassign _ | Ewhile _
     | Efor   _ | Eraise _ | Eexn _ | Eabsurd   | Ehole    -> e
@@ -720,9 +725,15 @@ module Translate = struct
       (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
       []
-    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e; c_cty = c_cty})) ->
       let args = params cty.cty_args in
+      let open Format in
+      let pr_mask fmt = function
+        | MaskVisible -> fprintf fmt "Visible@."
+        | MaskTuple _ -> fprintf fmt "Tuple@."
+        | MaskGhost   -> fprintf fmt "Ghost@." in
       let res = mlty_of_ity cty.cty_mask cty.cty_result in
+      eprintf "Mask of %s:%a@." rs.rs_name.id_string pr_mask c_cty.cty_mask;
       let e = expr info e in
       let e = fun_expr_of_mask cty.cty_mask e in
       [Mltree.Dlet (Mltree.Lsym (rs, res, args, e))]
@@ -803,7 +814,6 @@ module Translate = struct
     let params = find_params m.mod_units in
     let pids = List.fold_left ids_of_params Sid.empty params in
     let mod_decl = List.concat (List.map (mdecl pids from) m.mod_units) in
-    let mod_decl = mod_decl in
     let add_decl known_map decl = let idl = ML.get_decl_name decl in
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add_decl Mid.empty mod_decl in {

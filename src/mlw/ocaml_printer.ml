@@ -416,10 +416,10 @@ module Print = struct
             | _ -> assert false end in
           syntax_arguments s print_constant fmt pvl
         | _ ->
-      fprintf fmt (protect_on paren "%a")
-        (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+          fprintf fmt (protect_on paren "%a")
+            (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
-      fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@]@\nend")
+      fprintf fmt (protect_on paren "begin match @[%a@] with@ [<hov>%a@]@\nend")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
@@ -427,11 +427,11 @@ module Print = struct
           (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
           (print_lident info) (pv_name pv) in
       begin match al with
-      | [] -> assert false | [a] -> assign fmt a
-      | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
+        | [] -> assert false | [a] -> assign fmt a
+        | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
       fprintf fmt (protect_on paren
-        "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
+                     "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
       fprintf fmt (protect_on paren "not %a") (print_expr info ~paren:true) e1
@@ -443,7 +443,7 @@ module Print = struct
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt (protect_on paren
-        "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
+                     "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
         (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
       fprintf fmt "()"
@@ -482,9 +482,9 @@ module Print = struct
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
         (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
-    (* | Enot _ -> (\* TODO *\) assert false *)
-    (* | Ebinop _ -> (\* TODO *\) assert false *)
-    (* | Ecast _ -> (\* TODO *\) assert false *)
+  (* | Enot _ -> (\* TODO *\) assert false *)
+  (* | Ebinop _ -> (\* TODO *\) assert false *)
+  (* | Ecast _ -> (\* TODO *\) assert false *)
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
