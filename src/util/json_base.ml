@@ -37,7 +37,7 @@ let float fmt f = fprintf fmt "%f" f
 (* TODO check that you can print a floating point number like this in JSON *)
 
 let print_json_field key value_pr fmt value =
-  fprintf fmt "%a:%a" string key value_pr value
+  fprintf fmt "%a : %a " string key value_pr value
 
 let list pr fmt l =
   if l = [] then fprintf fmt "[]"
