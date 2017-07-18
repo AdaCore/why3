@@ -2,29 +2,88 @@ module Cursor
 
   use import seq.Seq
 
-  type t 'a
-
-  predicate permitted (seq 'a) (t 'a)
-  predicate complete  (seq 'a) (t 'a)
-
   type cursor 'a = private {
-    ghost mutable visited   : seq 'a;
-    ghost         collection: {t 'a};
+    ghost mutable visited : seq 'a;
   }
 
-  val create (t: t 'a) : cursor 'a
-    ensures { result.visited = empty }
-    ensures { result.collection = t }
+  predicate permitted (cursor 'a)
+  axiom permitted_empty: forall c: cursor 'a. c.visited = empty -> permitted c
+
+  predicate complete  (cursor 'a)
 
   val next (c: cursor 'a) : 'a
-    requires { not (complete c.visited c.collection) }
-    requires { permitted c.visited c.collection }
+    requires { not (complete c) }
+    requires { permitted c }
     writes   { c.visited }
     ensures  { c.visited = snoc (old c).visited result }
-    ensures  { permitted c.visited c.collection }
+    ensures  { permitted c }
 
   val has_next (c: cursor 'a) : bool
-    requires { permitted c.visited c.collection }
-    ensures  { result <-> not (complete c.visited c.collection) }
+    requires { permitted c }
+    ensures  { result <-> not (complete c) }
+
+end
+
+module CursorList
+
+  use import seq.Seq
+  use import seq.OfList
+  use import list.List
+  use import int.Int
+
+  type cursor 'a = private {
+    ghost mutable visited : seq 'a;
+    ghost         next    : list 'a;
+  }
+
+  predicate permitted (c: cursor 'a) =
+    length c.visited <= length c.next /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.next[i]
+
+  predicate complete  (c: cursor 'a) =
+    length c.visited = length c.next
+
+  val create (l: list 'a) : cursor 'a
+    ensures { permitted result }
+    ensures { result.visited = empty }
+    ensures { result.next = l }
+
+  clone import Cursor with
+    type cursor = cursor,
+    predicate permitted = permitted,
+    predicate complete  = complete,
+    goal permitted_empty
+
+end
+
+module CursorArray
+
+  use import array.Array
+  use import seq.Seq
+  use import seq.OfList
+  use import int.Int
+
+  type cursor 'a = private {
+    ghost mutable visited : seq 'a;
+    ghost         array   : array 'a;
+  }
+
+  predicate permitted (c: cursor 'a) =
+    length c.visited <= Array.length c.array /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = Array.([]) c.array i
+
+  predicate complete  (c: cursor 'a) =
+    length c.visited = Array.length c.array
+
+  val create (a: array 'a) : cursor 'a
+    ensures { permitted result }
+    ensures { result.visited = empty }
+    ensures { result.array = a }
+
+  clone import Cursor with
+    type cursor = cursor,
+    predicate permitted = permitted,
+    predicate complete  = complete,
+    goal permitted_empty
 
 end
