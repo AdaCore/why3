@@ -1,17 +1,4 @@
 
-(** Cursors
-
-   TO BE DISCUSSED
-   - a [coherent] predicate is also convenient for an immutable collection
-   - having [next] raising an exception imposes a try-with around the loop
-     it is simpler to have [next] with a precondition together with
-     an operation [has_next]
-
-  QUESTION: in IntListCursor, field to_do is no more ghost; will it be
-  allowed by refinement? otherwise, simply add a non-ghost field
-  identical to to_do
-*)
-
 module TestCursor
 
   use import int.Int
