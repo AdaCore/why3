@@ -306,18 +306,18 @@ module Print = struct
     | _, None, tl when isconstructor () ->
       let pjl = get_record info rs in
       begin match pjl, tl with
-      | [], [] ->
-        (print_uident info) fmt rs.rs_name
-      | [], [t] ->
-        fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
-          (print_uident info) rs.rs_name (print_expr ~paren:true info) t
-      | [], tl ->
-        fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
-          rs.rs_name (print_list comma (print_expr info)) tl
-      | pjl, tl ->
-        let equal fmt () = fprintf fmt " = " in
-        fprintf fmt "@[<hov 2>{ @[%a@] }@]"
-          (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
+        | [], [] ->
+          (print_uident info) fmt rs.rs_name
+        | [], [t] ->
+          fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+            (print_uident info) rs.rs_name (print_expr ~paren:true info) t
+        | [], tl ->
+          fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
+            rs.rs_name (print_list comma (print_expr info)) tl
+        | pjl, tl ->
+          let equal fmt () = fprintf fmt " = " in
+          fprintf fmt "@[<hov 2>{ @[%a@] }@]"
+            (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
       end
     | _, None, [] ->
       (print_lident info) fmt rs.rs_name
@@ -325,7 +325,7 @@ module Print = struct
       fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
         (print_lident info) rs.rs_name
         (print_apply_args info) (tl, rs.rs_cty.cty_args)
-        (* (print_list space (print_expr ~paren:true info)) tl *)
+  (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
     Stv.iter (fun tv -> fprintf fmt "%a " print_tv tv) s
@@ -365,7 +365,7 @@ module Print = struct
             rec_res = res; rec_svar = s } ->
           fprintf fmt "@[<hov 2>%s %a %a@]"
             (if fst then "let rec" else "and")
-           (print_lident info) rs1.rs_name
+            (print_lident info) rs1.rs_name
             (print_fun_type_args info) (args, s, res, e);
           forget_vars args
       in
@@ -419,7 +419,8 @@ module Print = struct
           fprintf fmt (protect_on paren "%a")
             (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
-      fprintf fmt (protect_on paren "begin match @[%a@] with@ [<hov>%a@]@\nend")
+      fprintf fmt
+        (protect_on paren "begin match @[%a@] with@ @[<hov>%a@]@\nend")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =

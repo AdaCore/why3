@@ -725,15 +725,15 @@ module Translate = struct
       (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
       []
-    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e; c_cty = c_cty})) ->
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e; c_cty = _c_cty})) ->
       let args = params cty.cty_args in
-      let open Format in
-      let pr_mask fmt = function
-        | MaskVisible -> fprintf fmt "Visible@."
-        | MaskTuple _ -> fprintf fmt "Tuple@."
-        | MaskGhost   -> fprintf fmt "Ghost@." in
+      (* let open Format in *)
+      (* let pr_mask fmt = function *)
+      (*   | MaskVisible -> fprintf fmt "Visible@." *)
+      (*   | MaskTuple _ -> fprintf fmt "Tuple@." *)
+      (*   | MaskGhost   -> fprintf fmt "Ghost@." in *)
       let res = mlty_of_ity cty.cty_mask cty.cty_result in
-      eprintf "Mask of %s:%a@." rs.rs_name.id_string pr_mask c_cty.cty_mask;
+      (* eprintf "Mask of %s:%a@." rs.rs_name.id_string pr_mask c_cty.cty_mask; *)
       let e = expr info e in
       let e = fun_expr_of_mask cty.cty_mask e in
       [Mltree.Dlet (Mltree.Lsym (rs, res, args, e))]
