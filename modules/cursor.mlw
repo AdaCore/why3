@@ -56,29 +56,30 @@ module ListCursor
 
 end
 
-module CursorArray
+module ArrayCursor
 
   use import array.Array
+  use import array.ToSeq
   use import seq.Seq
   use import seq.OfList
   use import int.Int
 
   type cursor 'a = private {
-    ghost mutable visited : seq 'a;
-    ghost         array   : array 'a;
+    ghost mutable visited    : seq 'a;
+    ghost         collection : seq 'a;
   }
 
   predicate permitted (c: cursor 'a) =
-    length c.visited <= Array.length c.array /\
-    forall i. 0 <= i < length c.visited -> c.visited[i] = Array.([]) c.array i
+    length c.visited <= length c.collection /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.collection[i]
 
   predicate complete  (c: cursor 'a) =
-    length c.visited = Array.length c.array
+    length c.visited = length c.collection
 
   val create (a: array 'a) : cursor 'a
     ensures { permitted result }
     ensures { result.visited = empty }
-    ensures { result.array = a }
+    ensures { result.collection = to_seq a }
 
   clone import Cursor as C with
     type cursor = cursor,
