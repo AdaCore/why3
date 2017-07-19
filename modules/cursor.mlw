@@ -24,7 +24,7 @@ module Cursor
 
 end
 
-module CursorList
+module ListCursor
 
   use import seq.Seq
   use import seq.OfList
@@ -32,23 +32,23 @@ module CursorList
   use import int.Int
 
   type cursor 'a = private {
-    ghost mutable visited : seq 'a;
-    ghost         next    : list 'a;
+    ghost mutable visited    : seq 'a;
+    ghost         collection : list 'a;
   }
 
   predicate permitted (c: cursor 'a) =
-    length c.visited <= length c.next /\
-    forall i. 0 <= i < length c.visited -> c.visited[i] = c.next[i]
+    length c.visited <= length c.collection /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.collection[i]
 
   predicate complete  (c: cursor 'a) =
-    length c.visited = length c.next
+    length c.visited = length c.collection
 
   val create (l: list 'a) : cursor 'a
     ensures { permitted result }
     ensures { result.visited = empty }
-    ensures { result.next = l }
+    ensures { result.collection = l }
 
-  clone import Cursor with
+  clone import Cursor as C with
     type cursor = cursor,
     predicate permitted = permitted,
     predicate complete  = complete,
@@ -80,7 +80,7 @@ module CursorArray
     ensures { result.visited = empty }
     ensures { result.array = a }
 
-  clone import Cursor with
+  clone import Cursor as C with
     type cursor = cursor,
     predicate permitted = permitted,
     predicate complete  = complete,

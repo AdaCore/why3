@@ -1,0 +1,272 @@
+
+(** Cursors
+
+   TO BE DISCUSSED
+   - a [coherent] predicate is also convenient for an immutable collection
+   - having [next] raising an exception imposes a try-with around the loop
+     it is simpler to have [next] with a precondition together with
+     an operation [has_next]
+
+  QUESTION: in IntListCursor, field to_do is no more ghost; will it be
+  allowed by refinement? otherwise, simply add a non-ghost field
+  identical to to_do
+*)
+
+module TestCursor
+
+  use import int.Int
+  use import int.Sum
+  use import seq.Seq
+  use import ref.Refint
+
+  use import cursor.Cursor
+
+  (** sums all the remaining elements in the cursor *)
+  let sum (c: cursor int) : int
+    requires { permitted c }
+    requires { c.visited = empty }
+    ensures  { result = sum (get c.visited) 0 (length c.visited) }
+    diverges
+  = let s = ref 0 in
+    while has_next c do
+      invariant { permitted c }
+      invariant { !s = sum (get c.visited) 0 (length c.visited) }
+      let x = next c in
+      s += x
+    done;
+    !s
+
+end
+
+(** {2 Iteration over an immuable collection}
+
+    here we choose a list *)
+
+module ListCursorImpl (* : IterableList *)
+
+  use import int.Int
+  use import list.List
+  use import seq.Seq
+  use import seq.OfList
+
+  type cursor 'a = {
+    mutable ghost visited    : seq 'a;
+            ghost collection : list 'a;
+    mutable       to_visit   : list 'a;
+  } invariant { visited ++ to_visit = collection }
+    by { visited = empty; collection = Nil; to_visit = Nil }
+
+  predicate permitted (c: cursor 'a) =
+    length c.visited <= length c.collection /\
+    forall i. 0 <= i < length c.visited -> c.visited[i] = c.collection[i]
+
+  predicate complete (c: cursor 'a) =
+    length c.visited = length c.collection
+
+  let lemma snoc_Cons (s: seq 'a) (l: list 'a) (x: 'a)
+    ensures { snoc s x ++ l == s ++ Cons x l }
+  = ()
+
+  let next (c: cursor 'a) : 'a
+    requires { not (complete c) }
+    writes   { c }
+    ensures  { c.visited = snoc (old c).visited result }
+    ensures  { match (old c).to_visit with
+               | Nil -> false
+               | Cons x r -> c.to_visit = r /\ x = result
+               end }
+  = match c.to_visit with
+    | Nil -> absurd
+    | Cons x r ->
+      let ghost v0 = c.visited in
+      c.visited <- snoc c.visited x; c.to_visit <- r;
+      snoc_Cons v0 r x;
+      assert { c.to_visit == c.collection [length c.visited ..] };
+      x
+    end
+
+  let has_next (c: cursor 'a) : bool
+    ensures { result <-> not (complete c) }
+  = match c.to_visit with (* could define a [val eq (l1 l2: list 'a) : bool] *)
+    | Nil -> false
+    | _   -> true
+    end
+
+  let create (t: list 'a) : cursor 'a
+    ensures { result.visited = empty }
+    ensures { result.collection = t }
+    ensures { result.to_visit = t }
+  = { visited = empty; collection = t; to_visit = t }
+
+  clone cursor.ListCursor with
+    type cursor = cursor,
+    val create = create,
+    val C.has_next = has_next,
+    val C.next = next
+
+end
+
+module TestListCursor
+
+  use import int.Int
+  use import int.Sum as S
+  use import list.List
+  use import list.Length
+  use import list.Sum
+  use import ref.Refint
+  use import seq.Seq
+  use import seq.OfList
+  use import cursor.ListCursor
+
+  let lemma aux2 (f g: int -> int) (a b c d: int)
+    requires { b - a = d - c }
+    requires { forall i. a <= i < b -> f i  = g i }
+    ensures  { S.sum f a b = S.sum g a b }
+  = ()
+
+  let lemma aux (s: seq int) (x: int)
+    ensures { let ss = cons x s in
+              S.sum (get ss) 0 (length ss) = x + S.sum (get s) 0 (length s) }
+  = let ss = cons x s in
+    assert { forall i. 0 <= i < length s -> get s i = get ss (i+1) }
+
+  lemma sum_of_list: forall l: list int.
+    sum l = S.sum (get (of_list l)) 0 (length l)
+
+  let list_sum (l: list int) : int
+    ensures { result = sum l }
+  = let s = ref 0 in
+    let c = create l in
+    while C.has_next c do
+      invariant { !s = S.sum (get c.visited) 0 (length c.visited) }
+      invariant { permitted c }
+      variant   { length l - length c.visited }
+      let x = C.next c in
+      s += x
+    done;
+    !s
+
+end
+
+(** {2 Iteration over a mutable collection}
+
+    here we choose an array of integers *)
+
+(* module IntArrayCursor (\* : IterableList *\) *)
+
+(*   use import int.Int *)
+(*   use import array.Array *)
+(*   use import list.List *)
+(*   use import list.Reverse *)
+(*   use import array.ToList *)
+(*   use import seq.Seq *)
+
+(*   type t 'a = array 'a *)
+
+(*   val ghost constant a : {array 'a} *)
+(*     ensures { Array.length result = 0 } *)
+
+(*   type cursor 'a = { *)
+(*     mutable ghost visited: seq 'a; *)
+(*             ghost collection: {t 'a}; *)
+(*     mutable       index: int;      (\** index of next element *\) *)
+(*   } invariant { 0 <= index <= Array.length collection /\ *)
+(*                 index = length visited /\ *)
+(*                 forall i. 0 <= i < index -> *)
+(*                   Array.([]) collection i = visited[i] } *)
+(*     by { visited = empty; collection = a; index = 0 } *)
+
+(*   clone import cursor.Cursor with *)
+(*     type cursor = cursor, *)
+(*     type t = t *)
+
+(*   (\* predicate permitted (v: seq int) (t: t) = *\) *)
+(*   (\*   length v <= length t /\ *\) *)
+(*   (\*   forall i. 0 <= i *\) *)
+
+(*   (\* let create (t: t) : cursor *\) *)
+(*   (\*   ensures { result.done_ = Nil } *\) *)
+(*   (\*   ensures { coherent t result } *\) *)
+(*   (\* = *\) *)
+(*   (\*   { done_ = Nil; to_do = to_list t 0 (length t); index = 0; } *\) *)
+
+(*   (\* let has_next (t: t) (c: cursor) : bool *\) *)
+(*   (\*   requires { coherent t c } *\) *)
+(*   (\*   ensures  { result <-> c.to_do <> Nil } *\) *)
+(*   (\* = *\) *)
+(*   (\*   c.index < length t *\) *)
+
+(*   (\* let rec lemma reverse_cons (a: array int) (l u: int) *\) *)
+(*   (\*   requires { l <= u } *\) *)
+(*   (\*   ensures  { reverse (to_list a l (u+1)) = *\) *)
+(*   (\*              Cons a[u] (reverse (to_list a l u)) } *\) *)
+(*   (\*   variant  { u - l } *\) *)
+(*   (\* = if l < u then reverse_cons a (l+1) u *\) *)
+
+(*   (\* let next (t: t) (c: cursor) : elt *\) *)
+(*   (\*   requires { c.to_do <> Nil } *\) *)
+(*   (\*   requires { coherent t c } *\) *)
+(*   (\*   writes   { c } *\) *)
+(*   (\*   ensures  { match old c.to_do with *\) *)
+(*   (\*              | Nil -> false *\) *)
+(*   (\*              | Cons x l -> result = x /\ c.done_ = Cons x (old c.done_) /\ *\) *)
+(*   (\*                            c.to_do = l end } *\) *)
+(*   (\*   ensures  { coherent t c } *\) *)
+(*   (\* = *\) *)
+(*   (\*   match c.to_do with *\) *)
+(*   (\*   | Nil -> absurd *\) *)
+(*   (\*   | Cons x r -> c.to_do <- r; c.done_ <- Cons x c.done_ *\) *)
+(*   (\*   end; *\) *)
+(*   (\*   let x = t[c.index] in *\) *)
+(*   (\*   c.index <- c.index + 1; *\) *)
+(*   (\*   x *\) *)
+
+(* end *)
+
+(* module TestArrayCursor *)
+
+(*   use import int.Int *)
+(*   use list.Sum as L *)
+(*   use list.Length as LL *)
+(*   use import array.Array *)
+(*   use import array.ArraySum *)
+(*   use import array.ToList *)
+(*   use import ref.Refint *)
+(*   use import IntArrayCursor *)
+
+(*   let rec lemma array_sum_array_to_list (a: array int) (l u: int) : unit *)
+(*     ensures { sum a l u = L.sum (to_list a l u) } variant { u-l } *)
+(*   = if l < u then array_sum_array_to_list a (l+1) u *)
+
+(*   let array_sum (a: array int) : int *)
+(*     ensures { result = sum a 0 (length a) } *)
+(*   = *)
+(*     let s = ref 0 in *)
+(*     let c = create a in *)
+(*     while has_next a c do *)
+(*       invariant { sum a 0 (length a) = !s + L.sum c.to_do } *)
+(*       invariant { coherent a c } *)
+(*       variant   { LL.length c.to_do } *)
+(*       let x = next a c in *)
+(*       s += x *)
+(*     done; *)
+(*     !s *)
+
+(*   let harness1 () : unit *)
+(*   = *)
+(*     let a = Array.make 42 0 in *)
+(*     let c = create a in *)
+(*     let x = next a c in *)
+(*     assert { x = 0 } *)
+
+(* (\* *)
+(*   let harness2 () : unit *)
+(*   = *)
+(*     let a = Array.make 42 0 in *)
+(*     let c = create a in *)
+(*     a[1] <- 17; *)
+(*     let x = next a c in *)
+(*     assert { x = 0 } *)
+(* *\) *)
+
+(* end *)
