@@ -420,7 +420,7 @@ module Print = struct
             (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
       fprintf fmt
-        (protect_on paren "begin match @[%a@] with@ @[<hov>%a@]@\nend")
+        (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
