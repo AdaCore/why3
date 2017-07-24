@@ -531,6 +531,7 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
     let pa = { pa with limit = limit;
                proof_state = None;
                proof_obsolete = false} in
+    Hprover.replace pn.proofn_attempts pr id;
     Hint.replace s.proofAttempt_table id pa;
     id
   with Not_found ->

@@ -382,8 +382,10 @@ let schedule_proof_attempt ?proof_script c id pr
                            ~counterexmp ~limit ~callback ~notification =
   let callback panid s = callback panid s;
     (match s with
-    | Scheduled | Running | Done _ ->
-                             update_goal_node notification c.controller_session id
+    | Scheduled | Running -> update_goal_node notification c.controller_session id
+    | Done res ->
+        update_proof_attempt ~obsolete:false c.controller_session id pr res;
+        update_goal_node notification c.controller_session id
     | _ -> ())
   in
   (* proof_script is specific to interactive manual provers *)
@@ -403,7 +405,10 @@ let create_file_rel_path c pr pn =
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
   let f = get_encapsulating_file session (ATh th) in
-  let fn = file_name f in
+  (* TODO trying to get the proper name of the file without any noise *)
+  let fn = Filename.chop_extension
+      (List.hd (List.rev (Sysutil.path_of_file
+                            (Sysutil.normalize_filename (file_name f))))) in
   let file = Driver.file_of_task driver fn th_name task in
   let file = Filename.concat session_dir file in
   let file = Sysutil.uniquify file in
@@ -444,6 +449,14 @@ let update_edit_external_proof c pn ?panid pr =
   close_out ch;
   file
 
+let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
+  (* The replay can be done on a different machine so we need
+     to check more things before giving the attempt to the scheduler *)
+  if not (Hprover.mem c.controller_provers pr) then
+    callback id (Uninstalled pr)
+  else
+    schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
+
 exception Editor_not_found
 
 let schedule_edition c id pr ?file ~callback ~notification =
@@ -452,12 +465,6 @@ let schedule_edition c id pr ?file ~callback ~notification =
   let session = c.controller_session in
   let prover_conf = Whyconf.get_prover_config config pr in
   let session_dir = Session_itp.get_dir session in
-  (* Notification node *)
-  let callback panid s = callback panid s;
-    match s with
-    | Scheduled | Running | Done _ -> update_goal_node notification c.controller_session id
-    | _ -> ()
-  in
 
   let limit = Call_provers.empty_limit in
   (* Make sure editor exists. Fails otherwise *)
@@ -467,8 +474,8 @@ let schedule_edition c id pr ?file ~callback ~notification =
     | s ->
         try
           let ed = Whyconf.editor_by_id config s in
-          String.concat " "(ed.Whyconf.editor_command ::
-                            ed.Whyconf.editor_options)
+          String.concat " " (ed.Whyconf.editor_command ::
+                             ed.Whyconf.editor_options)
         with Not_found -> raise Editor_not_found
   in
   let proof_attempts_id = get_proof_attempt_ids session id in
@@ -491,6 +498,17 @@ let schedule_edition c id pr ?file ~callback ~notification =
     | Some panid, _ ->
         let file = update_edit_external_proof c id ~panid pr in
         panid, file
+  in
+
+  (* Notification node *)
+  let callback panid s = callback panid s;
+    match s with
+    | Scheduled | Running -> update_goal_node notification c.controller_session id
+    | Done _ | Interrupted | InternalFailure _ ->
+        let file = Sysutil.relativize_filename session_dir file in
+        replay_proof_attempt ~proof_script:file c pr Call_provers.empty_limit id
+          panid ~callback ~notification
+    | _ -> ()
   in
 
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
@@ -702,15 +720,6 @@ let copy_detached ~copy c from_any =
     end
   (* Only goal can be detached *)
   | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
-
-
-let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
-  (* The replay can be done on a different machine so we need
-     to check more things before giving the attempt to the scheduler *)
-  if not (Hprover.mem c.controller_provers pr) then
-    callback id (Uninstalled pr)
-  else
-    schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
