@@ -193,14 +193,21 @@ val schedule_edition :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
+  no_edit: bool ->
+  do_check_proof: bool ->
   ?file: string ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
-(** [schedule_edition c id pr ?file ~callback ~notification] runs
-    the editor for prover [pr] on proofnode [id] on a file automatically
+(** [schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback
+      ~notification]
+    runs the editor for prover [pr] on proofnode [id] on a file automatically
     generated in [file] (or created path). It will runs callback each time
     the proof status changes and notification will be called each time a
-    change is made to the proof_state (in the whole proof tree of the session)
+    change is made to the proof_state (in the whole proof tree of the session).
+    If no_edit is true, the editor is not launched but the proofattempt is still
+    created.
+    If do_check_proof is true, the proof is replayed in the callback (it avoids
+    having obsolete proofs when exiting the ide).
 *)
 
 val schedule_transformation :

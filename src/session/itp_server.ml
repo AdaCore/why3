@@ -1075,7 +1075,7 @@ end
     let callback = callback_edition d.cont in
     match any_from_node_ID nid with
     | APn id ->
-        C.schedule_edition d.cont id prover ?file:None
+        C.schedule_edition d.cont id prover ~no_edit:false ~do_check_proof:false ?file:None
           ~callback ~notification:(notify_change_proved d.cont)
     | _ -> ()
 

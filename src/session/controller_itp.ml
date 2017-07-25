@@ -459,7 +459,7 @@ let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callb
 
 exception Editor_not_found
 
-let schedule_edition c id pr ?file ~callback ~notification =
+let schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback ~notification =
   Debug.dprintf debug_sched "[Sched] Scheduling an edition@.";
   let config = c.controller_config in
   let session = c.controller_session in
@@ -504,22 +504,38 @@ let schedule_edition c id pr ?file ~callback ~notification =
   let callback panid s = callback panid s;
     match s with
     | Scheduled | Running -> update_goal_node notification c.controller_session id
-    | Done _ | Interrupted | InternalFailure _ ->
-        let file = Sysutil.relativize_filename session_dir file in
-        replay_proof_attempt ~proof_script:file c pr Call_provers.empty_limit id
-          panid ~callback ~notification
+    | Done _ ->
+        (* TODO *)
+        if do_check_proof then
+          let file = Sysutil.relativize_filename session_dir file in
+          replay_proof_attempt ~proof_script:file c pr Call_provers.empty_limit id
+            panid ~callback ~notification
+    | Interrupted | InternalFailure _ ->
+        (* TODO *)
+        if do_check_proof then
+          let file = Sysutil.relativize_filename session_dir file in
+          replay_proof_attempt ~proof_script:file c pr Call_provers.empty_limit id
+            panid ~callback ~notification
     | _ -> ()
   in
 
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
     (Session_itp.get_proof_name session id).Ident.id_string
     editor file;
-  let call = Call_provers.call_editor ~command:editor file in
-  callback panid Running;
-  let file = Sysutil.relativize_filename session_dir file in
-  Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call)
-    prover_tasks_in_progress;
-  run_timeout_handler ()
+  if no_edit then
+    begin
+      callback panid Running;
+      callback panid Interrupted
+    end
+  else
+    begin
+      let call = Call_provers.call_editor ~command:editor file in
+      callback panid Running;
+      let file = Sysutil.relativize_filename session_dir file in
+      Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call)
+        prover_tasks_in_progress;
+      run_timeout_handler ()
+    end
 
 
 let schedule_transformation_r c id name args ~callback =
