@@ -267,10 +267,7 @@ let unfold unf h =
         end
       | _ -> [d]) None
 
-let sort task =
-  let local_decls =
-    let ut = Task.used_symbols (Task.used_theories task) in
-    Task.local_decls task ut in
+let sort local_decls =
   let l = ref [] in
   Trans.decl
     (fun d ->
@@ -290,7 +287,7 @@ let sort task =
 
 (* TODO is sort really needed ? It looked like it was for subst in some example where I wanted to subst the definition of a logic constant into an equality and it would fail because the equality is defined before the logic definition. This may be solved by current implementation of subst: to be tested *)
 let sort =
-  Trans.store (fun task -> Trans.apply (sort task) task)
+  Trans.bind get_local sort
 
 let get_local task =
   let ut = Task.used_symbols (Task.used_theories task) in

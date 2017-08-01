@@ -34,3 +34,6 @@ val subst_forall: term -> term -> term
 (* TODO remove subst_forall and subst_exist *)
 (* Same as subst_forall with a list of term *)
 val subst_forall_list: term -> term list -> term
+
+(* Returns the list of local declarations *)
+val get_local: Decl.decl list Trans.trans

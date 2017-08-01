@@ -76,3 +76,11 @@ let subst_forall_list t l =
   | Tquant (Tforall, tq) ->
       subst_quant_list Tforall tq l
   | _ -> raise (Arg_trans "subst_forall_list")
+
+(* Returns the list of local declarations as a transformation *)
+let get_local =
+  Trans.store (fun task ->
+    let local_decls =
+      let ut = Task.used_symbols (Task.used_theories task) in
+      Task.local_decls task ut in
+    local_decls)

@@ -114,15 +114,18 @@ let remove_list name_list =
     None
 
 (* from task [delta, name1, name2, ... namen |- G] build the task [name1, name2, ... namen |- G] *)
-let clear_but (l: prsymbol list) =
+let clear_but (l: prsymbol list) local_decls =
   Trans.decl
     (fun d ->
       match d.d_node with
       | Dprop (Paxiom, pr, _t) when List.mem pr l ->
         [d]
-      | Dprop (Paxiom, _pr, _t) ->
+      | Dprop (Paxiom, _pr, _t) when List.exists (fun x -> Decl.d_equal x d) local_decls ->
         []
       | _ -> [d]) None
+
+let clear_but (l: prsymbol list) =
+  Trans.bind get_local (clear_but l)
 
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
