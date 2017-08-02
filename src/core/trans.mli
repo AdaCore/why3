@@ -32,6 +32,7 @@ val identity_l : task tlist
 val singleton : 'a trans -> 'a tlist
 val return    : 'a -> 'a trans
 val bind      : 'a trans -> ('a -> 'b trans) -> 'b trans
+val bind_comp : ('a * task) trans -> ('a -> 'b trans) -> 'b trans
 
 val trace_goal : string -> task trans -> task trans
 
@@ -84,7 +85,6 @@ val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 val add_decls  : decl list -> task trans
 val add_tdecls : tdecl list -> task trans
 (** [add_decls ld t1] adds decls ld at the end of the task t1 (before the goal) *)
-
 
 (** {2 Dependent Transformations} *)
 

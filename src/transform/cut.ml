@@ -130,6 +130,47 @@ let clear_but (l: prsymbol list) =
 let use_th th =
   Trans.add_tdecls [Theory.create_use th]
 
+(* Equivalent of Coq pose (x := term). Adds a new constant of appropriate type
+   and an hypothesis x = term.
+   This function returns the declarations of hypothesis and constant. *)
+let pose (clear: bool) (name: string) (t: term) =
+  let ty = Term.t_type t in
+  let ls = Term.create_lsymbol (gen_ident name) [] (Some ty) in
+  let ls_term = Term.t_app_infer ls [] in
+  let new_constant = Decl.create_param_decl ls in
+  let pr = create_prsymbol (gen_ident "H") in
+  (* hyp = [pr : ls = t] *)
+  let hyp =
+    Decl.create_prop_decl Paxiom pr (Term.t_app_infer ps_equ [ls_term;t])
+  in
+  let trans_new_task =
+    if clear then
+      Trans.add_decls [new_constant]
+    else
+      Trans.add_decls [new_constant; hyp]
+  in
+  (* Note that sort is necessary *and* the complexity is probably the same as if
+     we use a function Trans.prepend_decl (which will be linear in the size of
+     the task. Sort should be too). *)
+  Trans.compose trans_new_task
+    (Trans.compose sort (Trans.store (fun task -> ((hyp, new_constant, ls_term), task))))
+
+(* Sometimes it is useful to hide part of a term (actually to pose a constant
+   equal to a term). It may also help provers to completely remove reference to
+   stuff *)
+let hide (clear: bool) (name: string) (t: term) =
+  let replace_all hyp new_constant ls_term =
+    Trans.decl (fun d ->
+      match d.d_node with
+      | _ when (Decl.d_equal d hyp || Decl.d_equal d new_constant) -> [d]
+      | Dprop (p, pr, t1) ->
+        let new_decl = create_prop_decl p pr (replace_in_term t ls_term t1) in
+        [new_decl]
+      | _ -> [d]) None
+  in
+  Trans.bind_comp (pose clear name t)
+     (fun (hyp,new_constant,ls_term) -> replace_all hyp new_constant ls_term)
+
 let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
     "clear_but"
     (Tprlist Ttrans) clear_but
@@ -152,3 +193,21 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"use_th <theory> imports the theory" "use_th"
     (Ttheory Ttrans) use_th
+
+let pose (name: string) (t: term) =
+  Trans.bind (pose false name t) (fun (_, task) -> Trans.store (fun _ -> task))
+
+let () = wrap_and_register
+    ~desc:"pose <name> <term> adds a new constant <name> equal to <term>"
+    "pose"
+    (Tstring (Tterm Ttrans)) pose
+
+let () = wrap_and_register
+    ~desc:"hide <name> <term> adds a new constant <name> equal to <term> and replace everywhere the term with the new constant."
+    "hide"
+    (Tstring (Tterm Ttrans)) (hide false)
+
+let () = wrap_and_register
+    ~desc:"hide and clear <name> <term> adds a new constant <name> which replaces all occurences of <term>."
+    "hide_and_clear"
+    (Tstring (Tterm Ttrans)) (hide true)

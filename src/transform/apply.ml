@@ -267,32 +267,6 @@ let unfold unf h =
         end
       | _ -> [d]) None
 
-let sort local_decls =
-  let l = ref [] in
-  Trans.decl
-    (fun d ->
-      match d.d_node with
-      | _ when not (List.exists (fun x -> Decl.d_equal x d) local_decls) ->
-          [d]
-      | Dprop (Paxiom, _, _)
-      | Dprop (Plemma, _, _)
-      | Dprop (Pskip, _, _) ->
-          (* This goes in the second group *)
-          l := !l @ [d];
-          []
-      | Dprop (Pgoal, _, _) ->
-          (* Last element, we concatenate the list of postponed elements *)
-          !l @ [d]
-      | _ -> [d]) None
-
-(* TODO is sort really needed ? It looked like it was for subst in some example where I wanted to subst the definition of a logic constant into an equality and it would fail because the equality is defined before the logic definition. This may be solved by current implementation of subst: to be tested *)
-let sort =
-  Trans.bind get_local sort
-
-let get_local task =
-  let ut = Task.used_symbols (Task.used_theories task) in
-  Task.local_decls task ut
-
 (* This function is used to find a specific ident in an equality:
    (to_subst = term or term = to_subst) in order to subst and remove said
    equality.
@@ -388,7 +362,7 @@ let subst_all (is_local_decl: Decl.decl -> bool) =
    Trans.bind (find_eq2 is_local_decl) subst_eq
 
 let return_local_decl task =
-  let decl_list = get_local task in
+  let decl_list = get_local_task task in
   let is_local_decl d = List.exists (fun x -> Decl.d_equal d x) decl_list in
   is_local_decl
 

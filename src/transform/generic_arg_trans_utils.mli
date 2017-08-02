@@ -37,3 +37,9 @@ val subst_forall_list: term -> term list -> term
 
 (* Returns the list of local declarations *)
 val get_local: Decl.decl list Trans.trans
+
+val get_local_task: Task.task -> Decl.decl list
+
+(* Returns same list of declarations but reorganized with constant/type
+   definitions defined before axioms *)
+val sort: Task.task Trans.trans

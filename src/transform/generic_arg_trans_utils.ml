@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Term
+open Decl
 
 exception Arg_trans of string
 exception Arg_trans_term of (string * term * term)
@@ -84,3 +85,34 @@ let get_local =
       let ut = Task.used_symbols (Task.used_theories task) in
       Task.local_decls task ut in
     local_decls)
+
+let get_local_task task =
+  let ut = Task.used_symbols (Task.used_theories task) in
+  Task.local_decls task ut
+
+
+let sort local_decls =
+  let l = ref [] in
+  Trans.decl
+    (fun d ->
+      match d.d_node with
+      | _ when not (List.exists (fun x -> Decl.d_equal x d) local_decls) ->
+          [d]
+      | Dprop (Paxiom, _, _)
+      | Dprop (Plemma, _, _)
+      | Dprop (Pskip, _, _) ->
+          (* This goes in the second group *)
+          l := !l @ [d];
+          []
+      | Dprop (Pgoal, _, _) ->
+          (* Last element, we concatenate the list of postponed elements *)
+          !l @ [d]
+      | _ -> [d]) None
+
+(* TODO is sort really needed ? It looked like it was for subst in some example
+   where I wanted to subst the definition of a logic constant into an equality
+   and it would fail because the equality is defined before the logic definition.
+   This may be solved by current implementation of subst: to be tested.
+*)
+let sort =
+  Trans.bind get_local sort

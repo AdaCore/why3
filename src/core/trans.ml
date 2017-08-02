@@ -55,6 +55,9 @@ let store fn = let tr = Wtask.memoize_option 63 fn in fun t -> match t with
 
 let bind f g = store (fun task -> g (f task) task)
 
+let bind_comp f g =
+  store (fun task -> let (ret, new_task) = f task in g ret new_task)
+
 let trace_goal msg tr =
   fun task ->
     begin match task with
