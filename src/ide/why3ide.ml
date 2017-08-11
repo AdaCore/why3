@@ -1133,7 +1133,7 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         let b = gconfig.intro_premises in
-        send_request (Get_task(id,b))
+        send_request (Get_task(id,b, true))
     | NProofAttempt ->
       let (pa, _obs, _l) = Hint.find node_id_pa id in
       (match pa with
@@ -1155,7 +1155,7 @@ let on_selected_row r =
           task_view#source_buffer#set_text "Uninstalled")
     | _ ->
        let b = gconfig.intro_premises in
-       send_request (Get_task(id,b))
+       send_request (Get_task(id,b,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 

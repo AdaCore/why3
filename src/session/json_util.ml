@@ -203,9 +203,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Set_max_tasks_req n ->
       convert_record ["ide_request", cc r;
            "tasks", Int n]
-  | Get_task(n,b) ->
+  | Get_task(n,b,loc) ->
       convert_record ["ide_request", cc r;
-           "node_ID", Int n; "do_intros", Bool b]
+           "node_ID", Int n; "do_intros", Bool b; "loc", Bool loc]
   | Get_file_contents s ->
       convert_record ["ide_request", cc r;
            "file", String s]
@@ -504,7 +504,8 @@ let parse_request (constr: string) j =
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in
     let b = get_bool_opt (get_field j "do_intros") false in
-    Get_task(n,b)
+    let loc = get_bool_opt (get_field j "loc") false in
+    Get_task(n,b,loc)
 
   | "Remove_subtree" ->
     let n = get_int (get_field j "node_ID") in

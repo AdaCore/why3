@@ -113,10 +113,11 @@ type ide_request =
   | Add_file_req            of string
   | Set_max_tasks_req       of int
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool
-  (** [Get_task(id,b)] requests for the text of the task in node [id],
+  | Get_task                of node_ID * bool * bool
+  (** [Get_task(id,b, loc)] requests for the text of the task in node [id],
       when [b] is true then quantified variables and hypotheses are
-      introduced as local definitions *)
+      introduced as local definitions, when [loc] is false the locations are not
+      returned *)
   | Focus_req               of node_ID
   (** Focus on a node. The server only sends info about descendants of this ID *)
   | Unfocus_req

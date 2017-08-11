@@ -349,7 +349,7 @@ let interp _chout fmt cmd =
     | ["goto"; n] when int_of_string n < !max_ID ->
         cur_id := int_of_string n;
         let b = false (* TODO: allow user to customize printing with intros or not *) in
-        send_request (Get_task(!cur_id,b));
+        send_request (Get_task(!cur_id,b,false));
         print_session fmt
     | _ ->
         begin
@@ -357,7 +357,7 @@ let interp _chout fmt cmd =
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" ->
              let b = false (* TODO: allow user to customize printing with intros or not *) in
-             send_request (Get_task(!cur_id,b))
+             send_request (Get_task(!cur_id,b,false))
           | "p" -> print_session fmt
           | _ -> send_request (Command_req (!cur_id, cmd))
         end

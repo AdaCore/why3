@@ -271,7 +271,7 @@ let print_request fmt r =
   | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b)                 -> fprintf fmt "get task(%d,%b)" nid b
+  | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Focus_req _nid                  -> fprintf fmt "focus"
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
@@ -894,11 +894,11 @@ end
     iter_the_files send_node root_node
 
   (* -- send the task -- *)
-  let task_of_id d id do_intros =
+  let task_of_id d id do_intros loc =
     let task = get_task d.cont.controller_session id in
     let tables = get_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
-    let loc_color_list = get_locations task in
+    let loc_color_list = if loc then get_locations task else [] in
     let task_text =
       match tables with
       | None -> assert false
@@ -910,11 +910,11 @@ end
     in
     task_text, loc_color_list
 
-  let send_task nid do_intros =
+  let send_task nid do_intros loc =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-       let s, list_loc = task_of_id d id do_intros in
+       let s, list_loc = task_of_id d id do_intros loc in
        P.notify (Task (nid, s, list_loc))
     | ATh t ->
        P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
@@ -922,7 +922,7 @@ end
        let pa = get_proof_attempt_node  d.cont.controller_session pid in
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s, list_loc = task_of_id d parid do_intros in
+       let s, list_loc = task_of_id d parid do_intros loc in
        P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
     | AFile f ->
        P.notify (Task (nid, "File " ^ file_name f, []))
@@ -930,7 +930,7 @@ end
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
-       let s, list_loc = task_of_id d parid do_intros in
+       let s, list_loc = task_of_id d parid do_intros loc in
        P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
@@ -1307,7 +1307,7 @@ end
     | Mark_obsolete_req n          -> mark_obsolete n
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b)              -> send_task nid b
+    | Get_task(nid,b, loc)         -> send_task nid b loc
     | Replay_req                   -> replay_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
