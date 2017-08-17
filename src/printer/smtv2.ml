@@ -62,7 +62,7 @@ let ident_printer () =
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
       "rotate_right"; "bvredor"; "bvredand";
 
-      "cos"; "sin"; "tan"; "atan"; "pi";
+      "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -99,14 +99,15 @@ let ident_printer () =
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
 
      (* Other stuff that Why3 seems to need *)
-      "unsat";"sat";
+      "unsat"; "sat";
       "true"; "false";
       "const";
       "abs";
       "BitVec"; "extract"; "bv2nat"; "nat2bv";
 
      (* From Z3 *)
-      "map"; "bv"; "subset"; "union"; "default";
+      "map"; "bv"; "default";
+      "difference";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in

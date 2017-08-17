@@ -12,6 +12,8 @@ prelude "(set-option :smt.macro-finder true)"
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
 import "smt-libv2-floats.gen"
+import "smt-libv2-gnatprove.gen"
+import "smt-libv2-floats-gnatprove.gen"
 import "discrimination.gen"
 
 (* Counterexamples: set model parser *)
@@ -46,28 +48,6 @@ steps ":rlimit-count *\\([0-9]+\\)" 1
 
 (* float literals  *)
 
-theory "_gnatprove_standard".Float32_next_prev
-  remove prop max_value
-
-  syntax function max_value "(fp #b0 #b11111110 #b11111111111111111111111)"
-end
-
-theory "_gnatprove_standard".Float64_next_prev
-  remove prop max_value
-
-  syntax function max_value "(fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)"
-end
-
-theory "_gnatprove_standard".Float32
-  syntax function one "(fb #b0 #b01111111 #b00000000000000000000000)"
-  remove allprops
-end
-
-theory "_gnatprove_standard".Float64
-  syntax function one "(fb #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000)"
-  remove allprops
-end
-
 theory ieee_float.Float64
 (* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
    syntax function to_int
@@ -79,10 +59,6 @@ theory ieee_float.Float32
   (* check the sign bit; if pos |%1| else |%1| - 2^129 *)
    syntax function to_int
      "(ite (= ((_ extract 128 128) ((_ fp.to_sbv 129) %1 %2)) #b0) (bv2int ((_ fp.to_sbv 129) %1 %2)) (- (bv2int ((_ fp.to_sbv 129) %1 %2)) (bv2int (bvshl (_ bv1 130) (_ bv129 130)))))"
-end
-
-theory real.Square
-  remove allprops
 end
 
 (* bitvector theories are not in smt-libv2.drv since cvc4 and z3 don't
@@ -107,40 +83,4 @@ end
 
 theory bv.BV8
   syntax function of_int "((_ int2bv 8) %1)"
-end
-
-(**********************************************************************
- ***                       gnat2why theories                        ***
- **********************************************************************)
-
-theory _gnatprove_standard_th.Integer
-   syntax function bool_eq "(= %1 %2)"
-   syntax function bool_ne "(not (= %1 %2))"
-   syntax function bool_lt "(< %1 %2)"
-   syntax function bool_le "(<= %1 %2)"
-   syntax function bool_gt "(> %1 %2)"
-   syntax function bool_ge "(>= %1 %2)"
-
-   remove allprops
-end
-
-theory _gnatprove_standard_th.Boolean_Func
-   syntax function bool_eq "(= %1 %2)"
-   remove allprops
-end
-
-theory ada__model_th.Discrete_Base_Theory
-   syntax function bool_eq "(= %1 %2)"
-   remove allprops
-end
-
-theory _gnatprove_standard.BVAda
-   syntax function bool_eq "(= %1 %2)"
-   syntax function bool_ne "(not (= %1 %2))"
-   syntax function bool_lt "(bvult %1 %2)"
-   syntax function bool_le "(bvule %1 %2)"
-   syntax function bool_gt "(bvugt %1 %2)"
-   syntax function bool_ge "(bvuge %1 %2)"
-
-   remove allprops
 end

@@ -1,5 +1,5 @@
 import "cvc4_15.drv"
-(* import "cvc4_gnatprove_floats.drv" *)
+import "smt-libv2-gnatprove.gen"
 
 theory ieee_float.GenericFloat
  remove prop le_special
@@ -19,57 +19,3 @@ end
 theory real.Square
  remove allprops
 end
-
-(**********************************************************************
- ***                       gnat2why theories                        ***
- **********************************************************************)
-
-theory _gnatprove_standard_th.Integer
-   syntax function bool_eq "(= %1 %2)"
-   syntax function bool_ne "(not (= %1 %2))"
-   syntax function bool_lt "(< %1 %2)"
-   syntax function bool_le "(<= %1 %2)"
-   syntax function bool_gt "(> %1 %2)"
-   syntax function bool_ge "(>= %1 %2)"
-
-   remove prop bool_eq_axiom
-   remove prop bool_ne_axiom
-   remove prop bool_lt_axiom
-   remove prop bool_int__le_axiom
-   remove prop bool_gt_axiom
-   remove prop bool_ge_axiom
-end
-
-theory _gnatprove_standard_th.Boolean_Func
-   syntax function bool_eq "(= %1 %2)"
-end
-
-theory ada__model_th.Discrete_Base_Theory
-  syntax function bool_eq "(= %1 %2)"
-end
-
-theory _gnatprove_standard.BVAda
-   syntax function bool_eq "(= %1 %2)"
-   syntax function bool_ne "(not (= %1 %2))"
-   syntax function bool_lt "(bvult %1 %2)"
-   syntax function bool_le "(bvule %1 %2)"
-   syntax function bool_gt "(bvugt %1 %2)"
-   syntax function bool_ge "(bvuge %1 %2)"
-
-   remove prop Power_0
-   remove prop Power_1
-   remove prop Power_s
-   remove prop Power_s_alt
-   remove prop Power_sum
-   remove prop Power_mult
-   remove prop Power_mult2
-end
-
-
-
-(*
-Local Variables:
-mode: why
-compile-command: "unset LANG; make -C .. bench"
-End:
-*)
