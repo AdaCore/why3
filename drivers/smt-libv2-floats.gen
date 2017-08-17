@@ -5,6 +5,8 @@ theory ieee_float.RoundingMode
    syntax function RTP "RTP"
    syntax function RTN "RTN"
    syntax function RTZ "RTZ"
+
+   syntax predicate to_nearest "(or (= %1 RNE) (= %1 RNA))"
 end
 
 theory ieee_float.GenericFloat
