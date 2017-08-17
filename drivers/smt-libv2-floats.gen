@@ -43,7 +43,12 @@ theory ieee_float.GenericFloat
    syntax predicate is_positive  "(fp.isPositive %1)"
    syntax predicate is_negative  "(fp.isNegative %1)"
 
-   syntax predicate is_finite "(not (or (fp.isInfinite %1) (fp.isNaN %1)))"
+   (* We could do this here, but we get slightly slimmer VCs and avoid
+      issues with Z3 if we do specialised versions of this for Float32 and
+      Float64 *)
+   (* The proposed fp.isFinite would fix all this. *)
+   (* syntax predicate is_finite "(not (or (fp.isInfinite %1) (fp.isNaN %1)))" *)
+   syntax predicate is_not_nan "(not (fp.isNaN %1))"
 
    syntax function to_real  "(fp.to_real %1)"
 
@@ -64,6 +69,10 @@ theory ieee_float.Float32
 
   syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
 
+  prelude "(define-fun fp.isFinite32 ((x Float32)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
+
+  syntax predicate t'isFinite "(fp.isFinite32 %1)"
+
   remove allprops
 end
 
@@ -74,6 +83,10 @@ theory ieee_float.Float64
   syntax literal t "(fp #b%s1b #b%e11b #b%m52b)"
 
   syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
+
+  prelude "(define-fun fp.isFinite64 ((x Float64)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
+
+  syntax predicate t'isFinite "(fp.isFinite64 %1)"
 
   remove allprops
 end
