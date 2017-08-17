@@ -2,36 +2,30 @@
 
 prelude ";;; SMT-LIB2 driver: bit-vectors, common part"
 
+theory bv.Pow2int
+  remove allprops
+end
+
 theory bv.BV_Gen
+  remove prop size_pos
+  remove prop nth_out_of_bound
+  remove prop Nth_zeros
+  remove prop Nth_ones
+
+  (** Bitwise operators *)
+
   syntax function bw_and "(bvand %1 %2)"
   syntax function bw_or "(bvor %1 %2)"
   syntax function bw_xor "(bvxor %1 %2)"
   syntax function bw_not "(bvnot %1)"
 
-  syntax function add "(bvadd %1 %2)"
-  syntax function sub "(bvsub %1 %2)"
-  syntax function neg "(bvneg %1)"
-  syntax function mul "(bvmul %1 %2)"
-  syntax function udiv "(bvudiv %1 %2)"
-  syntax function urem "(bvurem %1 %2)"
-
-  syntax function lsr_bv "(bvlshr %1 %2)"
-  syntax function lsl_bv "(bvshl %1 %2)"
-  syntax function asr_bv "(bvashr %1 %2)"
-  syntax predicate eq "(= %1 %2)"
-
-  (* Warning: we should NOT remove all the axioms using "allprops" *)
-
-  remove prop size_pos
-  remove prop nth_out_of_bound
-  remove prop Nth_zeros
-  remove prop Nth_ones
-  remove prop two_power_size_val
-  remove prop max_int_val
-  remove prop Nth_bw_or
   remove prop Nth_bw_and
+  remove prop Nth_bw_or
   remove prop Nth_bw_xor
   remove prop Nth_bw_not
+
+  (** Shift operators *)
+
   remove prop Lsr_nth_low
   remove prop Lsr_nth_high
   remove prop lsr_zeros
@@ -44,28 +38,25 @@ theory bv.BV_Gen
   remove prop Nth_rotate_left
   remove prop Nth_rotate_right
 
-  remove prop to_uint_extensionality
-  remove prop to_uint_bounds
-  remove prop to_int_extensionality
+  (* Conversions from/to integers *)
 
+  remove prop two_power_size_val
+  remove prop max_int_val
+
+  (* function to_int  - solver specific *)
+  (* function to_uint - solver specific *)
+  (* function of_int  - solver specific *)
+
+  remove prop to_uint_extensionality
+  remove prop to_int_extensionality
+  remove prop to_uint_bounds
+  remove prop to_uint_of_int
   remove prop to_uint_size_bv
   remove prop to_uint_zeros
   remove prop to_uint_ones
   remove prop to_uint_one
 
-  remove prop to_uint_add
-  remove prop to_uint_add_bounded
-  remove prop to_uint_sub
-  remove prop to_uint_sub_bounded
-  remove prop to_uint_neg
-  remove prop to_uint_mul
-  remove prop to_uint_mul_bounded
-  remove prop to_uint_udiv
-  remove prop to_uint_urem
-  remove prop to_uint_lsr
-  remove prop to_uint_lsl
-
-  remove prop Extensionality
+  (* comparison operators *)
 
   syntax predicate ult "(bvult %1 %2)"
   syntax predicate ule "(bvule %1 %2)"
@@ -75,6 +66,60 @@ theory bv.BV_Gen
   syntax predicate sle "(bvsle %1 %2)"
   syntax predicate sgt "(bvsgt %1 %2)"
   syntax predicate sge "(bvsge %1 %2)"
+
+  remove prop positive_is_ge_zeros
+
+  (** Arithmetic operators *)
+
+  syntax function add "(bvadd %1 %2)"
+  remove prop to_uint_add
+  remove prop to_uint_add_bounded
+
+  syntax function sub "(bvsub %1 %2)"
+  remove prop to_uint_sub
+  remove prop to_uint_sub_bounded
+
+  syntax function neg "(bvneg %1)"
+  remove prop to_uint_neg
+
+  syntax function mul "(bvmul %1 %2)"
+  remove prop to_uint_mul
+  remove prop to_uint_mul_bounded
+
+  syntax function udiv "(bvudiv %1 %2)"
+  remove prop to_uint_udiv
+
+  syntax function urem "(bvurem %1 %2)"
+  remove prop to_uint_urem
+
+  (** Bitvector alternatives for shifts, rotations and nth *)
+  syntax function lsr_bv "(bvlshr %1 %2)"
+  (* remove prop lsr_bv_is_lsr *)
+  remove prop to_uint_lsr
+
+  syntax function asr_bv "(bvashr %1 %2)"
+  (* remove prop asr_bv_is_asr *)
+
+  syntax function lsl_bv "(bvshl %1 %2)"
+  (* remove prop lsl_bv_is_lsl *)
+  remove prop to_uint_lsl
+
+  (** rotations *)
+
+  (* remove prop rotate_left_bv_is_rotate_left *)
+  (* remove prop rotate_right_bv_is_rotate_right *)
+
+  (** nth_bv *)
+
+  (* remove prop nth_bv_def *)
+  (* remove prop Nth_bv_is_nth *)
+  (* remove prop Nth_bv_is_nth2 *)
+
+  (* equality axioms *)
+
+  syntax predicate eq "(= %1 %2)"
+
+  remove prop Extensionality
 end
 
 theory bv.BV64
@@ -87,6 +132,8 @@ theory bv.BV64
   syntax function one   "#x0000000000000001"
   syntax function ones  "#xFFFFFFFFFFFFFFFF"
   syntax function size_bv "(_ bv64 64)"
+
+  syntax predicate is_signed_positive "(bvsge %1 (_ bv0 64))"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv64 64))) (bvlshr %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv64 64))) (bvshl %1 (bvsub (_ bv64 64) (bvurem %2 (_ bv64 64)))))"
@@ -103,6 +150,8 @@ theory bv.BV32
   syntax function ones  "#xFFFFFFFF"
   syntax function size_bv "(_ bv32 32)"
 
+  syntax predicate is_signed_positive "(bvsge %1 (_ bv0 32))"
+
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv32 32))) (bvlshr %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv32 32))) (bvshl %1 (bvsub (_ bv32 32) (bvurem %2 (_ bv32 32)))))"
 end
@@ -118,6 +167,8 @@ theory bv.BV16
   syntax function ones  "#xFFFF"
   syntax function size_bv "(_ bv16 16)"
 
+  syntax predicate is_signed_positive "(bvsge %1 (_ bv0 16))"
+
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv16 16))) (bvlshr %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv16 16))) (bvshl %1 (bvsub (_ bv16 16) (bvurem %2 (_ bv16 16)))))"
 end
@@ -132,6 +183,8 @@ theory bv.BV8
   syntax function one   "#x01"
   syntax function ones  "#xFF"
   syntax function size_bv "(_ bv8 8)"
+
+  syntax predicate is_signed_positive "(bvsge %1 (_ bv0 8))"
 
   syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv8 8))) (bvlshr %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
   syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv8 8))) (bvshl %1 (bvsub (_ bv8 8) (bvurem %2 (_ bv8 8)))))"
@@ -169,8 +222,4 @@ end
 theory bv.BVConverter_8_16
   syntax function toBig "((_ zero_extend 8) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
-end
-
-theory bv.Pow2int
-  remove allprops
 end

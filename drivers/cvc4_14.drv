@@ -16,6 +16,7 @@ prelude "(set-info :status unknown)"
 
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "cvc4_bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -61,5 +62,3 @@ theory int.EuclideanDivision
    remove prop Div_1
 end
 *)
-
-import "cvc4_bv.gen"

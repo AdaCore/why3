@@ -1,22 +1,29 @@
 (* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
    have the same name for the function to_int *)
 
+(* Further note that Z3's bv2int is actually bv2nat *)
+
 theory bv.BV_Gen
-  syntax function to_uint "(bv2nat %1)"
+  syntax function to_uint "(bv2int %1)"
+  remove allprops
 end
 
 theory bv.BV64
   syntax function of_int "((_ int2bv 64) %1)"
+  remove allprops
 end
 
 theory bv.BV32
   syntax function of_int "((_ int2bv 32) %1)"
+  remove allprops
 end
 
 theory bv.BV16
   syntax function of_int "((_ int2bv 16) %1)"
+  remove allprops
 end
 
 theory bv.BV8
   syntax function of_int "((_ int2bv 8) %1)"
+  remove allprops
 end
