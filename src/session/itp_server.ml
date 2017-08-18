@@ -965,7 +965,7 @@ end
 
   (* ------------ init server ------------ *)
 
-  let init_server ?(send_source=false) config env f =
+  let init_server ?(send_source=true) config env f =
     Debug.dprintf debug "[ITP server] loading session %s@." f;
     let ses,use_shapes = Session_itp.load_session f in
     Debug.dprintf debug "[ITP server] creating controller@.";
