@@ -393,6 +393,9 @@ let () =
   type server_data =
     { task_driver : Driver.driver;
       cont : Controller_itp.controller;
+      send_source: bool;
+      (* If true the server is parametered to send source mlw files as
+         notifications *)
     }
 
   let server_data = ref None
@@ -612,10 +615,11 @@ end
   let read_and_send f =
     try
       let d = get_server_data() in
-      let fn = Sysutil.absolutize_filename
-          (Session_itp.get_dir d.cont.controller_session) f in
-      let s = Sysutil.file_contents fn in
-      P.notify (File_contents (f, s))
+      if d.send_source then
+        let fn = Sysutil.absolutize_filename
+            (Session_itp.get_dir d.cont.controller_session) f in
+        let s = Sysutil.file_contents fn in
+        P.notify (File_contents (f, s))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
@@ -961,7 +965,7 @@ end
 
   (* ------------ init server ------------ *)
 
-  let init_server config env f =
+  let init_server ?(send_source=false) config env f =
     Debug.dprintf debug "[ITP server] loading session %s@." f;
     let ses,use_shapes = Session_itp.load_session f in
     Debug.dprintf debug "[ITP server] creating controller@.";
@@ -969,7 +973,9 @@ end
     let task_driver = task_driver config env in
     server_data := Some
                      { task_driver = task_driver;
-                       cont = c };
+                       cont = c;
+                       send_source = send_source;
+                     };
     let d = get_server_data () in
     let prover_list =
       Mstr.fold (fun x p acc ->

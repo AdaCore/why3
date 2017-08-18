@@ -30,7 +30,10 @@ module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
      predicate. *)
   val focus_on_loading: (Task.task -> bool) -> unit
 
-  (* Initialize server with the given config, env and filename for the session *)
-  val init_server: Whyconf.config -> Env.env -> string -> unit
+  (* Initialize server with the given config, env and filename for the session.
+     If send_source is set to true the source mlw files will be sent to the ide
+     as notifications. *)
+  val init_server:
+      ?send_source:bool -> Whyconf.config -> Env.env -> string -> unit
 
 end
