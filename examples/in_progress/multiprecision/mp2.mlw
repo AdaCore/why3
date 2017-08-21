@@ -1,3 +1,20 @@
+
+(** {2 An Efficient Library for Arbitrary-Precision Integer Library}
+
+    This code implements arbitrary-precision integers in the style of GMP.
+    Supported operations are addition, multiplication, division on non-negative integers,
+    and also comparisons and shifts.
+
+    For detailed info, see the paper ``How to Get an Efficient yet
+Verified Arbitrary-Precision Integer Library'' by Raphaël Rieu-Helft,
+Claude Marché and Guillaume Melquiond, published in VSTTE'2017
+proceedings, Springer LNCS.
+
+   Important note: this Why3 code currently requires the branch `mp' from the
+   {h <a href="https://gforge.inria.fr/scm/?group_id=2990">Why3 development git repository</a>}
+
+*)
+
 module N
 
   use import array.Array
@@ -8,6 +25,8 @@ module N
   use map.MapEq
   use map.Const
   use import int.Int
+
+  (** {3 complements to map standard library} *)
 
   predicate map_eq_sub_shift (x y:map int 'a) (xi yi sz:int) =
     forall i. 0 <= i < sz -> x[xi+i] = y[yi+i]
@@ -37,6 +56,8 @@ module N
   use import int.Int
   use import int.Power
 
+  (** {3 Long integers as arrays of libs} *)
+
   type limb = uint64
 
   lemma limb_max_bound: 1 <= max_uint64
@@ -55,7 +76,7 @@ module N
     ensures { c * a < c * b }
   = ()
 
-  (** {2 Integer value of a natural number} *)
+  (** {3 Integer value of a natural number} *)
 
   (** [value_sub x n m] denotes the integer represented by
      the digits x[n..m-1] with lsb at index n *)
@@ -146,7 +167,7 @@ module N
                value_sub (Map.set x (ofs+i) v) ofs (ofs+sz) }
   = value_sub_frame_shift x (Map.set x (ofs+i) v) ofs ofs sz
 
-  (** {2 Comparisons} *)
+  (** {3 Comparisons} *)
 
   let rec lemma value_sub_lower_bound (x:map int limb) (x1 x2:int)
     variant  { x2 - x1 }
@@ -336,7 +357,7 @@ module N
       i := Int32.(+) !i (Int32.of_int 1);
     done
 
-  (** {2 Addition} *)
+  (** {3 Addition} *)
 
   (** [add_limb r x y sz] adds to [x] the value of the limb [y],
       writes the result in [r] and returns the carry. [r] and [x]
@@ -1137,7 +1158,7 @@ module N
       end
     end
 
-    (** {2 Multiplication} *)
+    (** {3 Multiplication} *)
 
     (** [mul_limb r x y sz] multiplies [x[0..sz-1]] by the limb [y] and
     writes the n least significant limbs in [r], and returns the most
@@ -1798,7 +1819,7 @@ module N
     done;
     get_ofs !rp (Int32.(-) sx one);
 
-  (** {2 Logical operations} *)
+  (** {3 Logical operations} *)
 
   use import int.EuclideanDivision
 
@@ -2162,7 +2183,7 @@ module N
            };
     retval
 
-  (** {2 Division} *)
+  (** {3 Division} *)
 
   (** Based on Niels Möller and Torbjörn Granlund, “Improved
       division by invariant integers” 2010 *)
