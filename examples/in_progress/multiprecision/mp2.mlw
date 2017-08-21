@@ -13,7 +13,42 @@ proceedings, Springer LNCS.
    Important note: this Why3 code currently requires the branch `mp' from the
    {h <a href="https://gforge.inria.fr/scm/?group_id=2990">Why3 development git repository</a>}
 
+
+  {h <h3> Instructions for extraction to C and runnings tests</h2>}
+
+  Execute the {h <code> make </code>} command to extract and build the C file {h <code> N.c </code>} in the {h <code> build </code>} subdirectory.
+
+  C compilation requires some GMP headers (the {h <code> longlong.h </code>} and {h <code> config.h </code>} headers are used), so an installation of GMP with sources is required to compile it (see {h <a href="https://gmplib.org#DOWNLOAD">here</a>}).
+
+  The following commands test the library on random inputs and compare the results to GMP for verification:
+
+  {h <pre>
+    export GMP_DIR=/path/to/your/gmp/install
+    make tests
+  </pre>}
+
+  To execute the benchmarks, an installation of GMP with assembly
+  disabled is required.  First install GMP with assembly disabled in a
+  fresh directory:
+
+  {h <pre>
+    cd /path/to/gmp/sources
+    ./configure --disable-assembly --prefix=/where/to/install/gmp
+    make
+    make install
+  </pre>}
+
+  You are now ready to benchmark the library (gnuplot required to view the plots). The process takes a few minutes.
+  {h <pre>
+    export GMP_DIR=/path/to/gmp/sources
+    export GMP_LIB=/where/to/install/gmp/lib
+    export LD_LIBRARY_PATH=$GMP_LIB
+    make plots
+    </pre>}
+
 *)
+
+(** {2 The main Why3 module for non-negative integers} *)
 
 module N
 
