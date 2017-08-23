@@ -77,43 +77,7 @@ COQVER=`bin/why3 --list-provers | sed -n -e 's/  Coq (\(.*\))/\1/p'`
 if test "$COQVER" != "" ; then
 cat >> why3.conf <<EOF
 
-[uninstalled_prover policy0]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.4pl2"
-
-[uninstalled_prover policy1]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.4pl4"
-
-[uninstalled_prover policy2]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.4pl5"
-
-[uninstalled_prover policy3]
-alternative = ""
-name = "Coq"
-policy = "upgrade"
-target_alternative = ""
-target_name = "Coq"
-target_version = "$COQVER"
-version = "8.4pl6"
-
-[uninstalled_prover policy4]
+[uninstalled_prover coq85]
 alternative = ""
 name = "Coq"
 policy = "upgrade"
@@ -121,6 +85,15 @@ target_alternative = ""
 target_name = "Coq"
 target_version = "$COQVER"
 version = "8.5"
+
+[uninstalled_prover coq86]
+alternative = ""
+name = "Coq"
+policy = "upgrade"
+target_alternative = ""
+target_name = "Coq"
+target_version = "$COQVER"
+version = "8.6"
 
 EOF
 fi
