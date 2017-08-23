@@ -24,9 +24,9 @@ let rec collect_cases acc f =
   | Tbinop (Tand, f1, f2) ->
       let left = collect_cases [] f1 in
       let right = collect_cases [] f2 in
-      List.fold_left (fun acc x ->
-        List.fold_left (fun acc y ->
-          t_label_copy f (t_and x y) :: acc) acc right) acc left
+      List.fold_right (fun x acc ->
+        List.fold_right (fun y acc ->
+          t_label_copy f (t_and x y) :: acc) right acc) left acc
   | Tif (fif,fthen,felse) ->
       let left = collect_cases [] fthen in
       let right = collect_cases[] felse in
@@ -50,9 +50,9 @@ let rec split f =
   | Tbinop (Timplies, f1, f2) ->
       let right = split f2 in
       let cases = collect_cases [] f1 in
-      List.fold_left (fun acc case ->
-        List.fold_left (fun acc r ->
-          t_label_copy f (t_implies case r) :: acc) acc right) [] cases
+      List.fold_right (fun case acc ->
+        List.fold_right (fun r acc ->
+         t_label_copy f (t_implies case r) :: acc) right acc) cases []
 
 let split_goal pr f =
   let make_prop f = [create_prop_decl Pgoal pr f] in
