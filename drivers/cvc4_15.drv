@@ -1,6 +1,6 @@
 (** Why3 driver for CVC4 >= 1.5 *)
 
-prelude "(set-logic AUFBVDTLIRA)"
+prelude "(set-logic AUFBVDTNIRA)"
 (*
     A  : Array
     UF : Uninterpreted Function
@@ -15,7 +15,7 @@ prelude "(set-logic AUFBVDTLIRA)"
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-import "smt-libv2-cvc-ce.drv"
+import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
 import "discrimination.gen"
 

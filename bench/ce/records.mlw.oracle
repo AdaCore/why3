@@ -1,0 +1,62 @@
+ce/records.mlw M WP_parameter record_match_eval_test1 : Unknown (other)
+Counter-example model:File records.mlw:
+Line 27:
+x.field_f = {"type" : "Integer" , "val" : "0" }
+x.g = {"type" : "Boolean" ,
+"val" : true }
+Line 28:
+old x.g = {"type" : "Boolean" ,
+"val" : true }
+old x.field_f = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/records.mlw M WP_parameter record_match_eval_test2 : Unknown (other)
+Counter-example model:File records.mlw:
+Line 35:
+x.field_f = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/records.mlw M WP_parameter record_match_eval_test3 : Unknown (other)
+Counter-example model:File records.mlw:
+Line 40:
+x.g = {"type" : "Boolean" ,
+"val" : false }
+Line 43:
+x.field_f = {"type" : "Integer" , "val" : "6" }
+x.g = {"type" : "Boolean" ,
+"val" : false }
+
+ce/records.mlw M WP_parameter record_match_eval_test4 : Unknown (other)
+Counter-example model:File records.mlw:
+Line 45:
+x.g = {"type" : "Boolean" ,
+"val" : false }
+Line 48:
+x.field_f = {"type" : "Integer" , "val" : "6" }
+x.g = {"type" : "Boolean" ,
+"val" : false }
+
+ce/records.mlw M WP_parameter test_record_match_eval_test5 : Unknown (other)
+Counter-example model:File ref.mlw:
+Line 18:
+old re.field_f = {"type" : "Integer" ,
+"val" : "0" }
+old re.g = {"type" : "Boolean" ,
+"val" : false }
+x.field_f = {"type" : "Integer" ,
+"val" : "6" }
+x.g = {"type" : "Boolean" ,
+"val" : false }
+File records.mlw:
+Line 51:
+re.field_f = {"type" : "Integer" , "val" : "0" }
+re.g = {"type" : "Boolean" ,
+"val" : false }
+Line 53:
+x.g = {"type" : "Boolean" ,
+"val" : false }
+Line 56:
+x.field_f = {"type" : "Integer" , "val" : "6" }
+x.g = {"type" : "Boolean" ,
+"val" : false }
+

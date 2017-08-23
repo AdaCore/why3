@@ -1,0 +1,69 @@
+ce/int_overflow.mlw ModelInt test0 : Valid
+ce/int_overflow.mlw ModelInt test1 : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 9:
+x = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/int_overflow.mlw ModelInt test2 : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 14:
+x = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/int_overflow.mlw ModelInt test_overflow : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 18:
+x = {"type" : "Integer" , "val" : "65535" }
+y = {"type" : "Integer" ,
+"val" : "1" }
+
+ce/int_overflow.mlw ModelInt test_overflow2 : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 23:
+x = {"type" : "Integer" , "val" : "-2" }
+y = {"type" : "Integer" ,
+"val" : "-1" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int16 : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 30:
+x = {"type" : "Integer" , "val" : "-65536" }
+y = {"type" : "Integer" ,
+"val" : "-1" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int16_alt : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 35:
+x = {"type" : "Integer" , "val" : "-65536" }
+y = {"type" : "Integer" ,
+"val" : "-1" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int16_bis : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 40:
+x = {"type" : "Integer" , "val" : "32768" }
+y = {"type" : "Integer" ,
+"val" : "32768" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int32 : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 48:
+x = {"type" : "Integer" , "val" : "-2147483648" }
+y = {"type" : "Integer" ,
+"val" : "-1" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int32_bis : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 53:
+x = {"type" : "Integer" , "val" : "1073741824" }
+y = {"type" : "Integer" ,
+"val" : "1073741824" }
+
+ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline : Unknown (other)
+Counter-example model:File int_overflow.mlw:
+Line 58:
+x = {"type" : "Integer" , "val" : "1073741824" }
+y = {"type" : "Integer" ,
+"val" : "1073741824" }
+
