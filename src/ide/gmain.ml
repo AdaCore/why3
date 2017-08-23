@@ -1597,7 +1597,7 @@ let strategies () =
               let code = st.Whyconf.strategy_code in
               let code = Strategy_parser.parse (env_session()) code in
               let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
-              Format.eprintf "[GUI] Strategy '%s' loaded.@." name;
+              Debug.dprintf debug "[GUI] Strategy '%s' loaded.@." name;
               (name, st.Whyconf.strategy_desc, code, shortcut) :: acc
             with Strategy_parser.SyntaxError msg ->
               Format.eprintf
