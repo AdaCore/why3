@@ -1517,6 +1517,7 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 (* Tools menu *)
 (**************)
 
+let goals_accel_group = GtkData.AccelGroup.create ()
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
@@ -2309,13 +2310,13 @@ let () =
   let iter (name,desc,strat,k) =
     let desc = Scanf.format_from_string desc "" in
     let callback () = apply_strategy_on_selection strat in
-    let ii = submenu#add_image_item
-      ~label:(sanitize_markup name) ~callback ()
-    in
+    let ii = submenu#add_item ~callback (sanitize_markup name) in
     let name =
       match k with
         | None -> name
-        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+        | Some(s,k) ->
+          ii#add_accelerator ~group:goals_accel_group ~modi:[] k;
+          name ^ " (shortcut:" ^ s ^ ")"
     in
     ii#misc#set_tooltip_text (string_of_desc (name,desc))
   in
@@ -2379,19 +2380,13 @@ let () =
     if key = GdkKeysyms._p then begin run_default_prover (); true end else
     if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
     if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
-    (* strategy shortcuts *)
-    let rec iter l =
-      match l with
-        | [] -> false (* otherwise, use the default event handler *)
-        | (_,_,_,None) :: rem -> iter rem
-        | (_,_,s,Some(_,k)) :: rem ->
-          if key = k then begin apply_strategy_on_selection s; true end else
-            iter rem
-    in
-    iter (strategies ())
+    false (* otherwise, use the default event handler *)
   in
-  ignore (goals_view#event#connect#key_press ~callback)
-
+  ignore (goals_view#event#connect#key_press ~callback);
+  ignore (goals_view#event#connect#focus_in
+            ~callback:(fun _ -> w#add_accel_group goals_accel_group; true));
+  ignore (goals_view#event#connect#focus_out
+            ~callback:(fun _ -> GtkWindow.Window.remove_accel_group w#as_window goals_accel_group; true))
 
 (***************)
 (* Bind events *)
