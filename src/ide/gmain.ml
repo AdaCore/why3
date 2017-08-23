@@ -93,6 +93,7 @@ let (why_lang, any_lang) =
         exit 1
     | Some _ as l -> l in
   let any_lang filename =
+    if filename = "" then why_lang else
     match languages_manager#guess_language ~filename () with
     | None -> why_lang
     | Some _ as l -> l in
