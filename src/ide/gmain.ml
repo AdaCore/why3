@@ -2367,8 +2367,7 @@ let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in
   current_selected_row := Some ind;
   let a = get_any_from_row_reference r in
-  update_tabs a;
-  match a with
+  begin match a with
     | S.Goal g ->
       scroll_to_source_goal g
     | S.Theory th ->
@@ -2384,6 +2383,8 @@ let select_row r =
       scroll_to_source_goal tr.S.transf_parent
     | S.Metas m ->
       scroll_to_source_goal m.S.metas_parent
+  end;
+  update_tabs a
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =
