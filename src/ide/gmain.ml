@@ -1529,8 +1529,12 @@ let () = add_gui_item (fun () ->
 let add_tool_separator () =
   add_gui_item (fun () -> ignore(tools_factory#add_separator ()))
 
-let add_tool_item label callback =
-  add_gui_item (fun () -> ignore(tools_factory#add_image_item ~label ~callback ()))
+let add_tool_item ?key label callback =
+  add_gui_item (fun () ->
+    let item = tools_factory#add_item ~callback label in
+    match key with
+    | None -> ()
+    | Some k -> item#add_accelerator ~group:goals_accel_group ~modi:[] k)
 
 
 let split_strategy =
@@ -2178,9 +2182,9 @@ let edit_current_proof () =
 
 let () =
   add_tool_separator ();
-  add_tool_item "Edit current proof" edit_current_proof;
-  add_tool_item "Replay selection" replay_obsolete_proofs;
-  add_tool_item "Mark as obsolete" cancel_proofs;
+  add_tool_item ~key:GdkKeysyms._e "Edit current proof" edit_current_proof;
+  add_tool_item ~key:GdkKeysyms._r "Replay selection" replay_obsolete_proofs;
+  add_tool_item ~key:GdkKeysyms._o "Mark as obsolete" cancel_proofs;
   add_tool_item "Mark as archived" (set_archive_proofs true);
   add_tool_item "Remove from archive" (set_archive_proofs false)
 
@@ -2266,8 +2270,8 @@ let clean_selection () =
 
 let () =
   add_tool_separator ();
-  add_tool_item "Remove current proof" confirm_remove_selection;
-  add_tool_item "Clean selection" clean_selection
+  add_tool_item ~key:GdkKeysyms._x "Remove current proof" confirm_remove_selection;
+  add_tool_item ~key:GdkKeysyms._c "Clean selection" clean_selection
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Remove" () in
@@ -2374,12 +2378,7 @@ let () =
     prover_on_selected_goals pr.prover in
   let callback ev =
     let key = GdkEvent.Key.keyval ev in
-    if key = GdkKeysyms._c then begin clean_selection (); true end else
-    if key = GdkKeysyms._e then begin edit_current_proof (); true end else
-    if key = GdkKeysyms._o then begin cancel_proofs (); true end else
     if key = GdkKeysyms._p then begin run_default_prover (); true end else
-    if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
-    if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
     false (* otherwise, use the default event handler *)
   in
   ignore (goals_view#event#connect#key_press ~callback);
