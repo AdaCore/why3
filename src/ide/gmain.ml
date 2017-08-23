@@ -1695,7 +1695,7 @@ let () =
     let i = GMisc.image ~pixbuf:(!image_transf) () in
     let () = b#set_image i#coerce in
     let callback () = apply_strategy_on_selection strat in
-    let (_ : GtkSignal.id) = b#connect#pressed ~callback in
+    let (_ : GtkSignal.id) = b#connect#clicked ~callback in
     ()
   in
   List.iter iter (strategies ())
@@ -2191,7 +2191,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:edit_current_proof
+    b#connect#clicked ~callback:edit_current_proof
   in ()
 
 let () =
@@ -2202,7 +2202,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:replay_obsolete_proofs
+    b#connect#clicked ~callback:replay_obsolete_proofs
   in ()
 
 
@@ -2275,7 +2275,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:confirm_remove_selection
+    b#connect#clicked ~callback:confirm_remove_selection
   in ()
 
 let () =
@@ -2285,7 +2285,7 @@ associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:clean_selection
+    b#connect#clicked ~callback:clean_selection
   in ()
 
 let () =
@@ -2294,7 +2294,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_cancel) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:(fun () -> M.cancel_scheduled_proofs sched)
+    b#connect#clicked ~callback:(fun () -> M.cancel_scheduled_proofs sched)
   in ()
 
 (***)
@@ -2349,7 +2349,7 @@ let () =
            (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
               C.print_prover p);
          let (_ : GtkSignal.id) =
-           b#connect#pressed
+           b#connect#clicked
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
       provers
