@@ -1651,7 +1651,7 @@ let sanitize_markup x =
 let string_of_desc desc =
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
-  in Pp.string_of print_trans_desc desc
+  in escape_text (Pp.string_of print_trans_desc desc)
 
 let () =
   let transformations =
