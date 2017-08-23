@@ -1579,38 +1579,9 @@ let strategies () :
 let loaded_strategies = ref []
 
 let load_shortcut s =
-  if String.length s <> 1 then None else
-  try
-    let key = match String.get s 0 with
-      | 'a' -> GdkKeysyms._a
-      | 'b' -> GdkKeysyms._b
-      | 'c' -> GdkKeysyms._c
-      | 'd' -> GdkKeysyms._d
-      | 'e' -> GdkKeysyms._e
-      | 'f' -> GdkKeysyms._f
-      | 'g' -> GdkKeysyms._g
-      | 'h' -> GdkKeysyms._h
-      | 'i' -> GdkKeysyms._i
-      | 'j' -> GdkKeysyms._j
-      | 'k' -> GdkKeysyms._k
-      | 'l' -> GdkKeysyms._l
-      | 'm' -> GdkKeysyms._m
-      | 'n' -> GdkKeysyms._n
-      | 'o' -> GdkKeysyms._o
-      | 'p' -> GdkKeysyms._p
-      | 'q' -> GdkKeysyms._q
-      | 'r' -> GdkKeysyms._r
-      | 's' -> GdkKeysyms._s
-      | 't' -> GdkKeysyms._t
-      | 'u' -> GdkKeysyms._u
-      | 'v' -> GdkKeysyms._v
-      | 'w' -> GdkKeysyms._w
-      | 'x' -> GdkKeysyms._x
-      | 'y' -> GdkKeysyms._y
-      | 'z' -> GdkKeysyms._z
-      | _ -> raise Not_found
-    in Some(s,key)
-  with Not_found -> None
+  match GtkData.AccelGroup.parse s with
+  | (0,[]) -> None
+  | (key, modi) -> Some (GtkData.AccelGroup.name ~key ~modi, key, modi)
 
 let strategies () =
   match !loaded_strategies with
@@ -1694,7 +1665,7 @@ let () =
     let name =
       match k with
         | None -> name
-        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+        | Some (s,_,_) -> Printf.sprintf "%s (shortcut: %s)" name s
     in
     b#misc#set_tooltip_markup (string_of_desc (name,desc));
     let i = GMisc.image ~pixbuf:(!image_transf) () in
@@ -2318,9 +2289,9 @@ let () =
     let name =
       match k with
         | None -> name
-        | Some(s,k) ->
-          ii#add_accelerator ~group:goals_accel_group ~modi:[] k;
-          name ^ " (shortcut:" ^ s ^ ")"
+        | Some (s,key,modi) ->
+          ii#add_accelerator ~group:goals_accel_group ~modi key;
+          Printf.sprintf "%s (shortcut: %s)" name s
     in
     ii#misc#set_tooltip_text (string_of_desc (name,desc))
   in
