@@ -5,9 +5,6 @@ Require BuiltIn.
 Require int.Int.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-(* Why3 assumption *)
 Definition key := Z.
 
 (* Why3 assumption *)
@@ -169,24 +166,22 @@ Theorem VC_add : forall (t:tree) (k:Z) (v:Z), ((bst t) /\ exists n:Z, (rbtree
   v) /\ forall (k':Z) (v':Z), ((memt o k' v') \/ (((k' = k) -> (v' = v)) /\
   ((~ (k' = k)) -> (memt t k' v')))) -> ((memt o k' v') /\ (((k' = k) /\
   (v' = v)) \/ ((~ (k' = k)) /\ (memt t k' v'))))))) -> forall (result:tree),
-  (exists x:color, (exists x1:tree, (exists x2:Z, (exists x3:Z,
-  (exists x4:tree, (o = (Node x x1 x2 x3 x4)) /\ (result = (Node Black x1 x2
-  x3 x4))))))) -> exists n:Z, (rbtree n result).
-intros t k v (h1,(n,h2)) o (h3,(h4,(h5,h6))) result
-(x,(x1,(x2,(x3,(x4,(h7,h8)))))).
-
-subst.
-intuition.
-generalize (h4 n h2); clear h4.
-intros.
-destruct x; intuition.
+  match o with
+  | (Node x x1 x2 x3 x4) => (result = (Node Black x1 x2 x3 x4))
+  | Leaf => False
+  end -> exists n:Z, (rbtree n result).
+Proof.
+intros t k v (_,(n,h2)) o (_,(h4,_)).
+destruct o. easy.
+intros _ ->.
+specialize (h4 n h2).
+destruct c.
 (* c = Red *)
-exists (n+1)%Z; intuition.
-simpl rbtree. replace (n+1-1)%Z with n by omega.
-simpl in H0. intuition.
-
+exists (n+1)%Z.
+simpl.
+replace (n+1-1)%Z with n by ring.
+apply h4.
 (* c = Black *)
-exists n; intuition.
-
+now exists n.
 Qed.
 
