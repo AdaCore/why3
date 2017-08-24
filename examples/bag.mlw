@@ -105,9 +105,10 @@ module BagImpl
                   data:     rarray (Null.t 'a);
     mutable ghost contents: bag 'a;
   }
-  invariant { 0 <= size = data.len }
-  invariant { forall i: int. 0 <= i < size -> not (Null.is_null data[i]) }
-  invariant { forall x: 'a. contents x = numof data x 0 size }
+    invariant { 0 <= size = data.len }
+    invariant { forall i: int. 0 <= i < size -> not (Null.is_null data[i]) }
+    invariant { forall x: 'a. contents x = numof data x 0 size }
+    by { size = 0; data = R.make 0 (Null.create_null ()); contents = empty }
 
   let create () : t 'a
     ensures { result.size = 0 }
@@ -129,9 +130,13 @@ module BagImpl
     ensures { t.contents == Bag.add x (old t.contents) }
   =
     let n = t.size in
-    resize t.data (n + 1);
-    t.data[n] <- (Null.create x);
     t.size <- n + 1;
+    resize t.data (n + 1);
+    assert { forall v: 'a. t.contents v = numof t.data v 0 n by
+      forall i: int. 0 <= i < n -> (t.data[i].Null.v = Null.Value v
+                          <-> (old t.data)[i].Null.v = Null.Value v) };
+    t.data[n] <- Null.create x;
+    assert { forall v: 'a. t.contents v = numof t.data v 0 n };
     t.contents <- Bag.add x t.contents
 
   let get (t: t 'a) (i: int) : 'a
@@ -148,15 +153,16 @@ module BagImpl
   =
     let n = t.size - 1 in
     let ghost x = Null.get t.data[i] in
-    if i < n then t.data[i] <- t.data[n];
-    resize t.data n;
-    t.size <- n;
     t.contents <- Bag.remove x t.contents;
-    assert { forall v: 'a. numof t.data v 0 i = numof (old t.data) v 0 i };
-    assert { forall v: 'a.
-             numof t.data v i n = numof (old t.data) v (i+1) (n+1) };
-    assert { forall v: 'a.
-             numof t.data v 0 n = numof t.data v 0 i + numof t.data v i n }
+    if i < n then t.data[i] <- t.data[n];
+    assert { forall v: 'a. t.contents v = numof t.data v 0 n by
+      numof t.data v 0 n = numof (old t.data) v 0 i +
+                           numof (old t.data) v (i+1) (n+1) by
+        numof t.data v 0 i = numof (old t.data) v 0 i /\
+        numof t.data v i n = numof (old t.data) v (i+1) (n+1) by
+          numof t.data v (i+1) n = numof (old t.data) v (i+1) n };
+    resize t.data n;
+    t.size <- n
 
   clone BagSpec with
     type t = t,
