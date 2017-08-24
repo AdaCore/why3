@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="2.19" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="6" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.3" timelimit="6" steplimit="0" memlimit="1000"/>
@@ -21,10 +21,10 @@
  </transf>
  </goal>
  <goal name="first_last" expl="">
- <proof prover="0" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="0.30"/></proof>
+ <proof prover="5" edited="edit_distance_Word_first_last_1.v"><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="key_lemma_right" expl="">
- <proof prover="0" edited="edit_distance_Word_key_lemma_right_1.v"><result status="valid" time="0.31"/></proof>
+ <proof prover="5" edited="edit_distance_Word_key_lemma_right_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="dist_symetry" expl="">
  <transf name="induction_pr">
@@ -76,7 +76,7 @@
     <proof prover="8"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="min_dist_equal.1.2.2" expl="">
-    <proof prover="8"><result status="valid" time="1.16"/></proof>
+    <proof prover="8"><result status="valid" time="1.39"/></proof>
     </goal>
     <goal name="min_dist_equal.1.2.3" expl="">
     <proof prover="8"><result status="valid" time="1.03"/></proof>
@@ -93,7 +93,7 @@
  </transf>
  </goal>
  <goal name="min_dist_diff" expl="">
- <proof prover="0" edited="edit_distance_Word_min_dist_diff_1.v"><result status="valid" time="0.33"/></proof>
+ <proof prover="5" edited="edit_distance_Word_min_dist_diff_1.v"><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="min_dist_eps" expl="">
  <transf name="inline_goal">
@@ -139,7 +139,7 @@
 </theory>
 <theory name="EditDistance" sum="31e3d97050737973b223fb837f3ddb4c" expanded="true">
  <goal name="suffix_length" expl="" expanded="true">
- <proof prover="0" timelimit="5" memlimit="1000" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="0.41"/></proof>
+ <proof prover="5" timelimit="5" memlimit="1000" edited="edit_distance_WP_EditDistance_suffix_length_1.v"><result status="valid" time="0.41"/></proof>
  </goal>
  <goal name="VC distance" expl="VC for distance">
  <transf name="split_goal_wp">
@@ -159,13 +159,13 @@
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC distance.6" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC distance.7" expl="index in array bounds">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC distance.8" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC distance.9" expl="loop invariant init">
   <proof prover="1"><result status="valid" time="0.08" steps="232"/></proof>
