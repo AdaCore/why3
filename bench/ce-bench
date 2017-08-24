@@ -19,7 +19,7 @@ run_cvc4_15 () {
   ../bin/why3prove.opt -P "CVC4,1.5" --timelimit 1 --get-ce $1 | \
   # This ad hoc sed removes any timing information from counterexamples output.
   # Counterexamples in JSON format cannot match this regexp.
-  sed 's/ ([0-9]\+\.[0-9]\+s)//' > $1.out
+  sed 's/ ([0-9]\+\.[0-9]\+s)/ (time hidden)/' > $1.out
   if cmp $1.oracle $1.out > /dev/null 2>&1 ; then
      echo "ok"
   else
