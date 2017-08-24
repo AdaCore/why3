@@ -5,8 +5,8 @@
 <prover id="0" name="CVC4" version="1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="3" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="5" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.1" timelimit="120" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -17,7 +17,7 @@
 <file name="../knuth_prime_numbers.mlw" expanded="true">
 <theory name="PrimeNumbers" sum="e2a314751058a1b7fbec2e3e897e29da" expanded="true">
  <goal name="exists_prime" expl="">
- <proof prover="5" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.40"/></proof>
+ <proof prover="3" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers">
  <transf name="split_goal_wp">
@@ -58,7 +58,7 @@
   <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.11" expl="assertion">
-  <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.65"/></proof>
+  <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.65"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.12" expl="variant decrease">
   <proof prover="9"><result status="valid" time="0.02" steps="33"/></proof>
@@ -79,7 +79,7 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="33"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.15.2" expl="VC for prime_numbers">
-   <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_3.v"><result status="valid" time="0.42"/></proof>
+   <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_3.v"><result status="valid" time="0.42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -115,7 +115,7 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="32"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.23.2" expl="VC for prime_numbers">
-   <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="0.48"/></proof>
+   <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="0.48"/></proof>
    </goal>
   </transf>
   </goal>
@@ -138,7 +138,7 @@
   <proof prover="10"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.30" expl="assertion">
-  <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="1.12"/></proof>
+  <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="1.12"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.31" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.01" steps="33"/></proof>

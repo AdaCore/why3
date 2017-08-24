@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="1" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="3" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Vampire" version="0.6" timelimit="10" steplimit="0" memlimit="1000"/>
@@ -27,10 +27,10 @@
  <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
  <goal name="lt_node_lt" expl="">
- <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.30"/></proof>
+ <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="gt_node_gt" expl="">
- <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.25"/></proof>
+ <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.25"/></proof>
  </goal>
  <goal name="lt_left" expl="">
  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
@@ -1503,7 +1503,7 @@
    <goal name="WP_parameter add.2.2" expl="VC for add">
    <transf name="inline_goal">
     <goal name="WP_parameter add.2.2.1" expl="VC for add">
-    <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.32"/></proof>
+    <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.32"/></proof>
     </goal>
    </transf>
    </goal>
