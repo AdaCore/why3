@@ -308,7 +308,7 @@ let inspect kn tl =
 
 type pin_inject = {
   p_vars : (vsymbol * cap) Mls.t; (* temporary fields *)
-  p_inv  : term;                  (* instantiated invariant *)
+  p_inv  : term list;             (* instantiated invariant *)
 }
 
 let add_var kn pins vl v =
@@ -333,7 +333,7 @@ let add_var kn pins vl v =
             Mls.add (ls_of_rs f) (v, down ty) m, mv in
           let pjs, mv = List.fold_left add_field
                             (Mls.empty, Mvs.empty) d.itd_fields in
-          let inv = t_ty_subst sbs mv (t_and_asym_l d.itd_invariant) in
+          let inv = List.map (t_ty_subst sbs mv) d.itd_invariant in
           let pin = {p_vars = pjs; p_inv = inv} in
           let n = new_index () in
           rp := Mint.add n pin !rp;
@@ -656,7 +656,8 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let p = Mint.find n pins in
       let check _ (_,c) = assert (cap_valid uf c) in
       Mls.iter check p.p_vars;
-      t_label_copy f p.p_inv, uf
+      let inv = List.map (t_label_copy f) p.p_inv in
+      t_and_asym_l inv, uf
   | Tapp (ls,[t]) when not pos && ls_equal ls ls_valid ->
       let t, c = cap_of_term kn uf pins caps t in
       let n = match c with
