@@ -2099,6 +2099,16 @@ clean::
 	$(foreach d,$(CLEANDIRS),rm -f $(addprefix $(d)/*.,$(COMPILED_LIB_EXTS));)
 	$(foreach p,$(CLEANLIBS),rm -f $(addprefix $(p).,$(COMPILED_LIB_EXTS));)
 
+detect-unused:
+	@L1=$$(mktemp); \
+	L2=$$(mktemp); \
+	for d in `find examples/ -name 'why3session.xml' -printf '%h\n'`; do \
+	  sed -n -e 's/.*edited="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
+	  (cd $$d; git ls-files) | grep -v -e '^why3session.xml' -e '^why3shapes' -e '^[.]gitignore' -e '^Makefile' -e '[.]ml$$' -e '[.]html$$' | sed -e 's/[.]prf$$/.pvs/;s/[.]thy$$/.xml/' | sort -u > $$L2; \
+	  diff -u --label="$$d/why3session.xml" --label="$$d/" $$L1 $$L2 || echo; \
+	done; \
+	rm $$L1 $$L2
+
 ##################################################################
 # Building the Why3 platform with ocamlbuild (OCaml 3.10 needed) #
 ##################################################################
