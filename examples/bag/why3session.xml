@@ -27,7 +27,7 @@
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="BagImpl" sum="194aa6144048bf20bf8d3568a401d490" expanded="true">
+<theory name="BagImpl" sum="ef56e5d92f937d8facde6f12ff17b83b" expanded="true">
  <goal name="VC t" expl="VC for t">
  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
@@ -62,12 +62,18 @@
   <proof prover="4"><result status="valid" time="0.68" steps="1036"/></proof>
   </goal>
   <goal name="VC add.5" expl="type invariant">
-  <proof prover="4"><result status="valid" time="0.19" steps="273"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC add.6" expl="postcondition">
+  <goal name="VC add.6" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.02" steps="47"/></proof>
+  </goal>
+  <goal name="VC add.7" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.19" steps="251"/></proof>
+  </goal>
+  <goal name="VC add.8" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC add.7" expl="postcondition">
+  <goal name="VC add.9" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
@@ -103,7 +109,7 @@
    <goal name="VC remove.5.4" expl="VC for remove">
    <proof prover="4"><result status="valid" time="0.07" steps="160"/></proof>
    </goal>
-   <goal name="VC remove.5.5" expl="VC for remove">
+   <goal name="VC remove.5.5" expl="VC for remove" expanded="true">
    <proof prover="0"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
@@ -111,954 +117,936 @@
   <goal name="VC remove.6" expl="precondition">
   <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC remove.7" expl="type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="VC remove.7.1" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.00" steps="21"/></proof>
-   </goal>
-   <goal name="VC remove.7.2" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
-   </goal>
-   <goal name="VC remove.7.3" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.01" steps="87"/></proof>
-   </goal>
-   <goal name="VC remove.7.4" expl="VC for remove" expanded="true">
-   <proof prover="2"><result status="valid" time="0.53"/></proof>
-   <metas
-    expanded="true">
-    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="tuple0" ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="unit" ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="bag" arity="1" id="bag" ip_theory="Bag">
-     <ip_qualid name="bag"/>
-    </ts_pos>
-    <ts_pos name="map" arity="2" id="map" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="map"/>
-    </ts_pos>
-    <ts_pos name="null" arity="0" id="null" ip_theory="Null">
-     <ip_library name="null"/>
-     <ip_qualid name="null"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="infix =" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="infix @" ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
-    <ls_pos name="zero" id="zero" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="one" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="prefix -" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="infix +" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="infix *" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="infix &gt;" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="infix &gt;=" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="numof" id="numof" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof"/>
-    </ls_pos>
-    <ls_pos name="infix ==" id="infix ==" ip_theory="Bag">
-     <ip_qualid name="infix =="/>
-    </ls_pos>
-    <ls_pos name="empty" id="empty" ip_theory="Bag">
-     <ip_qualid name="empty"/>
-    </ls_pos>
-    <ls_pos name="add" id="add" ip_theory="Bag">
-     <ip_qualid name="add"/>
-    </ls_pos>
-    <ls_pos name="set" id="set" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix []" id="mixfix []" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix []"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="const" id="const" ip_theory="Const">
-     <ip_library name="map"/>
-     <ip_qualid name="const"/>
-    </ls_pos>
-    <ls_pos name="len" id="len" ip_theory="ResizableArraySpec">
-     <ip_qualid name="len"/>
-    </ls_pos>
-    <ls_pos name="data" id="data" ip_theory="ResizableArraySpec">
-     <ip_qualid name="data"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]1"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="v" id="v" ip_theory="Null">
-     <ip_library name="null"/>
-     <ip_qualid name="v"/>
-    </ls_pos>
-    <ls_pos name="size" id="size" ip_theory="BagImpl">
-     <ip_qualid name="size"/>
-    </ls_pos>
-    <ls_pos name="data" id="data1" ip_theory="BagImpl">
-     <ip_qualid name="data"/>
-    </ls_pos>
-    <ls_pos name="contents" id="contents" ip_theory="BagImpl">
-     <ip_qualid name="contents"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="Assoc" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="Unit_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="Unit_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="Inv_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="Inv_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="Assoc1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulAssoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulComm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="Unitary" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="Refl" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="Trans" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="Antisymm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="Total" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="numof_def" id="numof_def" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_def"/>
-    </pr_pos>
-    <pr_pos name="Numof_bounds" id="Numof_bounds" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_bounds"/>
-    </pr_pos>
-    <pr_pos name="Numof_append" id="Numof_append" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_append"/>
-    </pr_pos>
-    <pr_pos name="Numof_left_no_add" id="Numof_left_no_add"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_left_no_add"/>
-    </pr_pos>
-    <pr_pos name="Numof_left_add" id="Numof_left_add" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_left_add"/>
-    </pr_pos>
-    <pr_pos name="Empty" id="Empty" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Empty"/>
-    </pr_pos>
-    <pr_pos name="Full" id="Full" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Full"/>
-    </pr_pos>
-    <pr_pos name="numof_increasing" id="numof_increasing" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_increasing"/>
-    </pr_pos>
-    <pr_pos name="numof_strictly_increasing" id="numof_strictly_increasing"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_strictly_increasing"/>
-    </pr_pos>
-    <pr_pos name="numof_change_any" id="numof_change_any" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_change_any"/>
-    </pr_pos>
-    <pr_pos name="numof_change_some" id="numof_change_some"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_change_some"/>
-    </pr_pos>
-    <pr_pos name="rarray&apos;invariant" id="rarray&apos;invariant"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="rarray&apos;invariant"/>
-    </pr_pos>
-    <pr_pos name="mixfix [&lt;-]_spec" id="mixfix [&lt;-]_spec"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="mixfix [&lt;-]_spec"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix ="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix @"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="zero"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="one"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="prefix -"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix +"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix *"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &lt;"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &gt;"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &gt;="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="numof"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix =="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="empty"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="add"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="set"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix []"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="const"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="len"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="data"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="v"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="size"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="data1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="contents"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unitary"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="NonTrivialRing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Refl"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Trans"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Antisymm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Total"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="ZeroLessOne"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderAdd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderMult"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_def"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_bounds"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_append"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_left_no_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_left_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Empty"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Full"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_increasing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_strictly_increasing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_change_any"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_change_some"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="rarray&apos;invariant"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="mixfix [&lt;-]_spec"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="real"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="tuple0"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="unit"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="bag"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="map"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="null"/>
-    </meta>
-    <goal name="VC remove.7.4" expl="VC for remove" expanded="true">
-    <transf name="eliminate_builtin" expanded="true">
-     <goal name="VC remove.7.4.1" expl="VC for remove" expanded="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
-     <proof prover="4"><result status="valid" time="0.06" steps="247"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
-   </goal>
-  </transf>
+  <goal name="VC remove.7" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="VC remove.8" expl="postcondition">
+  <goal name="VC remove.8" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.02" steps="87"/></proof>
+  </goal>
+  <goal name="VC remove.9" expl="type invariant" expanded="true">
+  <proof prover="2"><result status="valid" time="0.53"/></proof>
+  <metas
+   expanded="true">
+   <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_library name="BuiltIn"/>
+    <ip_qualid name="real"/>
+   </ts_pos>
+   <ts_pos name="tuple0" arity="0" id="tuple0" ip_theory="Tuple0">
+    <ip_library name="why3"/>
+    <ip_library name="Tuple0"/>
+    <ip_qualid name="tuple0"/>
+   </ts_pos>
+   <ts_pos name="unit" arity="0" id="unit" ip_theory="Unit">
+    <ip_library name="why3"/>
+    <ip_library name="Unit"/>
+    <ip_qualid name="unit"/>
+   </ts_pos>
+   <ts_pos name="bag" arity="1" id="bag" ip_theory="Bag">
+    <ip_qualid name="bag"/>
+   </ts_pos>
+   <ts_pos name="map" arity="2" id="map" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="map"/>
+   </ts_pos>
+   <ts_pos name="null" arity="0" id="null" ip_theory="Null">
+    <ip_library name="null"/>
+    <ip_qualid name="null"/>
+   </ts_pos>
+   <ls_pos name="infix =" id="infix =" ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_library name="BuiltIn"/>
+    <ip_qualid name="infix ="/>
+   </ls_pos>
+   <ls_pos name="infix @" id="infix @" ip_theory="HighOrd">
+    <ip_library name="why3"/>
+    <ip_library name="HighOrd"/>
+    <ip_qualid name="infix @"/>
+   </ls_pos>
+   <ls_pos name="zero" id="zero" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="zero"/>
+   </ls_pos>
+   <ls_pos name="one" id="one" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="one"/>
+   </ls_pos>
+   <ls_pos name="prefix -" id="prefix -" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="prefix -"/>
+   </ls_pos>
+   <ls_pos name="infix +" id="infix +" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix +"/>
+   </ls_pos>
+   <ls_pos name="infix *" id="infix *" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix *"/>
+   </ls_pos>
+   <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &lt;"/>
+   </ls_pos>
+   <ls_pos name="infix &gt;" id="infix &gt;" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &gt;"/>
+   </ls_pos>
+   <ls_pos name="infix &gt;=" id="infix &gt;=" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &gt;="/>
+   </ls_pos>
+   <ls_pos name="numof" id="numof" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof"/>
+   </ls_pos>
+   <ls_pos name="infix ==" id="infix ==" ip_theory="Bag">
+    <ip_qualid name="infix =="/>
+   </ls_pos>
+   <ls_pos name="empty" id="empty" ip_theory="Bag">
+    <ip_qualid name="empty"/>
+   </ls_pos>
+   <ls_pos name="add" id="add" ip_theory="Bag">
+    <ip_qualid name="add"/>
+   </ls_pos>
+   <ls_pos name="set" id="set" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="set"/>
+   </ls_pos>
+   <ls_pos name="mixfix []" id="mixfix []" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix []"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="const" id="const" ip_theory="Const">
+    <ip_library name="map"/>
+    <ip_qualid name="const"/>
+   </ls_pos>
+   <ls_pos name="len" id="len" ip_theory="ResizableArraySpec">
+    <ip_qualid name="len"/>
+   </ls_pos>
+   <ls_pos name="data" id="data" ip_theory="ResizableArraySpec">
+    <ip_qualid name="data"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]1"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="v" id="v" ip_theory="Null">
+    <ip_library name="null"/>
+    <ip_qualid name="v"/>
+   </ls_pos>
+   <ls_pos name="size" id="size" ip_theory="BagImpl">
+    <ip_qualid name="size"/>
+   </ls_pos>
+   <ls_pos name="data" id="data1" ip_theory="BagImpl">
+    <ip_qualid name="data"/>
+   </ls_pos>
+   <ls_pos name="contents" id="contents" ip_theory="BagImpl">
+    <ip_qualid name="contents"/>
+   </ls_pos>
+   <pr_pos name="Assoc" id="Assoc" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_l" id="Unit_def_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unit_def_l"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_r" id="Unit_def_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unit_def_r"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_l" id="Inv_def_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Inv_def_l"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_r" id="Inv_def_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Inv_def_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="Comm" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Assoc" id="Assoc1" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="MulAssoc"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_l"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="Comm1" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="MulComm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Unitary" id="Unitary" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unitary"/>
+   </pr_pos>
+   <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="NonTrivialRing"/>
+   </pr_pos>
+   <pr_pos name="Refl" id="Refl" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Refl"/>
+   </pr_pos>
+   <pr_pos name="Trans" id="Trans" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Trans"/>
+   </pr_pos>
+   <pr_pos name="Antisymm" id="Antisymm" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Antisymm"/>
+   </pr_pos>
+   <pr_pos name="Total" id="Total" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Total"/>
+   </pr_pos>
+   <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="ZeroLessOne"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderAdd"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderMult"/>
+   </pr_pos>
+   <pr_pos name="numof_def" id="numof_def" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_def"/>
+   </pr_pos>
+   <pr_pos name="Numof_bounds" id="Numof_bounds" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_bounds"/>
+   </pr_pos>
+   <pr_pos name="Numof_append" id="Numof_append" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_append"/>
+   </pr_pos>
+   <pr_pos name="Numof_left_no_add" id="Numof_left_no_add" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_left_no_add"/>
+   </pr_pos>
+   <pr_pos name="Numof_left_add" id="Numof_left_add" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_left_add"/>
+   </pr_pos>
+   <pr_pos name="Empty" id="Empty" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Empty"/>
+   </pr_pos>
+   <pr_pos name="Full" id="Full" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Full"/>
+   </pr_pos>
+   <pr_pos name="numof_increasing" id="numof_increasing" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_increasing"/>
+   </pr_pos>
+   <pr_pos name="numof_strictly_increasing" id="numof_strictly_increasing"
+    ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_strictly_increasing"/>
+   </pr_pos>
+   <pr_pos name="numof_change_any" id="numof_change_any" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_change_any"/>
+   </pr_pos>
+   <pr_pos name="numof_change_some" id="numof_change_some" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_change_some"/>
+   </pr_pos>
+   <pr_pos name="rarray&apos;invariant" id="rarray&apos;invariant"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="rarray&apos;invariant"/>
+   </pr_pos>
+   <pr_pos name="mixfix [&lt;-]_spec" id="mixfix [&lt;-]_spec"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="mixfix [&lt;-]_spec"/>
+   </pr_pos>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix ="/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix @"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="zero"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="one"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="prefix -"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix +"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix *"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix &lt;"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix &gt;"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix &gt;="/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="numof"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix =="/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="empty"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="add"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="set"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix []"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix [&lt;-]"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="const"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="len"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="data"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix [&lt;-]1"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="v"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="size"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="data1"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="contents"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Assoc"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unit_def_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unit_def_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Inv_def_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Inv_def_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Comm"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Assoc1"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Mul_distr_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Mul_distr_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Comm1"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unitary"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="NonTrivialRing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Refl"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Trans"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Antisymm"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Total"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="ZeroLessOne"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="CompatOrderAdd"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="CompatOrderMult"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_def"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_bounds"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_append"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_left_no_add"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_left_add"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Empty"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Full"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_increasing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_strictly_increasing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_change_any"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_change_some"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="rarray&apos;invariant"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="mixfix [&lt;-]_spec"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="real"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="tuple0"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="unit"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="bag"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="map"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="null"/>
+   </meta>
+   <goal name="VC remove.9" expl="type invariant" expanded="true">
+   <transf name="eliminate_builtin" expanded="true">
+    <goal name="VC remove.9.1" expl="type invariant" expanded="true">
+    <proof prover="2"><result status="valid" time="0.02"/></proof>
+    <proof prover="4"><result status="valid" time="0.06" steps="247"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </metas>
+  </goal>
+  <goal name="VC remove.10" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC remove.9" expl="postcondition">
+  <goal name="VC remove.11" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC remove.10" expl="assertion">
+  <goal name="VC remove.12" expl="assertion">
   <proof prover="4"><result status="valid" time="0.27" steps="282"/></proof>
   </goal>
-  <goal name="VC remove.11" expl="precondition">
+  <goal name="VC remove.13" expl="precondition">
   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC remove.12" expl="type invariant" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="VC remove.12.1" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
-   </goal>
-   <goal name="VC remove.12.2" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
-   </goal>
-   <goal name="VC remove.12.3" expl="VC for remove">
-   <proof prover="4"><result status="valid" time="0.02" steps="49"/></proof>
-   </goal>
-   <goal name="VC remove.12.4" expl="VC for remove" expanded="true">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
-   <metas
-    expanded="true">
-    <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="tuple0" ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="unit" ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="bag" arity="1" id="bag" ip_theory="Bag">
-     <ip_qualid name="bag"/>
-    </ts_pos>
-    <ts_pos name="map" arity="2" id="map" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="map"/>
-    </ts_pos>
-    <ts_pos name="null" arity="0" id="null" ip_theory="Null">
-     <ip_library name="null"/>
-     <ip_qualid name="null"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="infix =" ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="infix @" id="infix @" ip_theory="HighOrd">
-     <ip_library name="why3"/>
-     <ip_library name="HighOrd"/>
-     <ip_qualid name="infix @"/>
-    </ls_pos>
-    <ls_pos name="zero" id="zero" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="one" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="prefix -" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="infix +" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="infix *" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="infix &gt;" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="numof" id="numof" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof"/>
-    </ls_pos>
-    <ls_pos name="infix ==" id="infix ==" ip_theory="Bag">
-     <ip_qualid name="infix =="/>
-    </ls_pos>
-    <ls_pos name="empty" id="empty" ip_theory="Bag">
-     <ip_qualid name="empty"/>
-    </ls_pos>
-    <ls_pos name="add" id="add" ip_theory="Bag">
-     <ip_qualid name="add"/>
-    </ls_pos>
-    <ls_pos name="set" id="set" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix []" id="mixfix []" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix []"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]" ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="const" id="const" ip_theory="Const">
-     <ip_library name="map"/>
-     <ip_qualid name="const"/>
-    </ls_pos>
-    <ls_pos name="len" id="len" ip_theory="ResizableArraySpec">
-     <ip_qualid name="len"/>
-    </ls_pos>
-    <ls_pos name="data" id="data" ip_theory="ResizableArraySpec">
-     <ip_qualid name="data"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]1"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="v" id="v" ip_theory="Null">
-     <ip_library name="null"/>
-     <ip_qualid name="v"/>
-    </ls_pos>
-    <ls_pos name="size" id="size" ip_theory="BagImpl">
-     <ip_qualid name="size"/>
-    </ls_pos>
-    <ls_pos name="data" id="data1" ip_theory="BagImpl">
-     <ip_qualid name="data"/>
-    </ls_pos>
-    <ls_pos name="contents" id="contents" ip_theory="BagImpl">
-     <ip_qualid name="contents"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="Assoc" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="Unit_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="Unit_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="Inv_def_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="Inv_def_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="Assoc1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulAssoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="Comm1" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="MulComm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="Unitary" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="Refl" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="Trans" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="Antisymm" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="Total" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="numof_def" id="numof_def" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_def"/>
-    </pr_pos>
-    <pr_pos name="Numof_bounds" id="Numof_bounds" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_bounds"/>
-    </pr_pos>
-    <pr_pos name="Numof_append" id="Numof_append" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_append"/>
-    </pr_pos>
-    <pr_pos name="Numof_left_no_add" id="Numof_left_no_add"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_left_no_add"/>
-    </pr_pos>
-    <pr_pos name="Numof_left_add" id="Numof_left_add" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Numof_left_add"/>
-    </pr_pos>
-    <pr_pos name="Empty" id="Empty" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Empty"/>
-    </pr_pos>
-    <pr_pos name="Full" id="Full" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="Full"/>
-    </pr_pos>
-    <pr_pos name="numof_increasing" id="numof_increasing" ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_increasing"/>
-    </pr_pos>
-    <pr_pos name="numof_strictly_increasing" id="numof_strictly_increasing"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_strictly_increasing"/>
-    </pr_pos>
-    <pr_pos name="numof_change_some" id="numof_change_some"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_change_some"/>
-    </pr_pos>
-    <pr_pos name="numof_change_equiv" id="numof_change_equiv"
-     ip_theory="NumOf">
-     <ip_library name="int"/>
-     <ip_qualid name="numof_change_equiv"/>
-    </pr_pos>
-    <pr_pos name="rarray&apos;invariant" id="rarray&apos;invariant"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="rarray&apos;invariant"/>
-    </pr_pos>
-    <pr_pos name="mixfix [&lt;-]_spec" id="mixfix [&lt;-]_spec"
-     ip_theory="ResizableArraySpec">
-     <ip_qualid name="mixfix [&lt;-]_spec"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix ="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix @"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="zero"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="one"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="prefix -"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix +"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix *"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &lt;"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix &gt;"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="numof"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="infix =="/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="empty"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="add"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="set"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix []"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="const"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="len"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="data"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="mixfix [&lt;-]1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="v"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="size"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="data1"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="contents"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unit_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Inv_def_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Assoc1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_l"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Mul_distr_r"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Comm1"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Unitary"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="NonTrivialRing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Refl"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Trans"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Antisymm"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Total"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="ZeroLessOne"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderAdd"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="CompatOrderMult"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_def"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_bounds"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_append"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_left_no_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Numof_left_add"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Empty"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="Full"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_increasing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_strictly_increasing"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_change_some"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="numof_change_equiv"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="rarray&apos;invariant"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="mixfix [&lt;-]_spec"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="real"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="tuple0"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="unit"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="bag"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="map"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="null"/>
-    </meta>
-    <goal name="VC remove.12.4" expl="VC for remove" expanded="true">
-    <transf name="eliminate_builtin" expanded="true">
-     <goal name="VC remove.12.4.1" expl="VC for remove" expanded="true">
-     <proof prover="2"><result status="valid" time="0.02"/></proof>
-     <proof prover="4"><result status="valid" time="0.21" steps="647"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
-   </goal>
-  </transf>
+  <goal name="VC remove.14" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="VC remove.13" expl="postcondition">
+  <goal name="VC remove.15" expl="type invariant">
+  <proof prover="4"><result status="valid" time="0.01" steps="49"/></proof>
+  </goal>
+  <goal name="VC remove.16" expl="type invariant" expanded="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <metas
+   expanded="true">
+   <ts_pos name="real" arity="0" id="real" ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_library name="BuiltIn"/>
+    <ip_qualid name="real"/>
+   </ts_pos>
+   <ts_pos name="tuple0" arity="0" id="tuple0" ip_theory="Tuple0">
+    <ip_library name="why3"/>
+    <ip_library name="Tuple0"/>
+    <ip_qualid name="tuple0"/>
+   </ts_pos>
+   <ts_pos name="unit" arity="0" id="unit" ip_theory="Unit">
+    <ip_library name="why3"/>
+    <ip_library name="Unit"/>
+    <ip_qualid name="unit"/>
+   </ts_pos>
+   <ts_pos name="bag" arity="1" id="bag" ip_theory="Bag">
+    <ip_qualid name="bag"/>
+   </ts_pos>
+   <ts_pos name="map" arity="2" id="map" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="map"/>
+   </ts_pos>
+   <ts_pos name="null" arity="0" id="null" ip_theory="Null">
+    <ip_library name="null"/>
+    <ip_qualid name="null"/>
+   </ts_pos>
+   <ls_pos name="infix =" id="infix =" ip_theory="BuiltIn">
+    <ip_library name="why3"/>
+    <ip_library name="BuiltIn"/>
+    <ip_qualid name="infix ="/>
+   </ls_pos>
+   <ls_pos name="infix @" id="infix @" ip_theory="HighOrd">
+    <ip_library name="why3"/>
+    <ip_library name="HighOrd"/>
+    <ip_qualid name="infix @"/>
+   </ls_pos>
+   <ls_pos name="zero" id="zero" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="zero"/>
+   </ls_pos>
+   <ls_pos name="one" id="one" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="one"/>
+   </ls_pos>
+   <ls_pos name="prefix -" id="prefix -" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="prefix -"/>
+   </ls_pos>
+   <ls_pos name="infix +" id="infix +" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix +"/>
+   </ls_pos>
+   <ls_pos name="infix *" id="infix *" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix *"/>
+   </ls_pos>
+   <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &lt;"/>
+   </ls_pos>
+   <ls_pos name="infix &gt;" id="infix &gt;" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &gt;"/>
+   </ls_pos>
+   <ls_pos name="numof" id="numof" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof"/>
+   </ls_pos>
+   <ls_pos name="infix ==" id="infix ==" ip_theory="Bag">
+    <ip_qualid name="infix =="/>
+   </ls_pos>
+   <ls_pos name="empty" id="empty" ip_theory="Bag">
+    <ip_qualid name="empty"/>
+   </ls_pos>
+   <ls_pos name="add" id="add" ip_theory="Bag">
+    <ip_qualid name="add"/>
+   </ls_pos>
+   <ls_pos name="set" id="set" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="set"/>
+   </ls_pos>
+   <ls_pos name="mixfix []" id="mixfix []" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix []"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]" ip_theory="Map">
+    <ip_library name="map"/>
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="const" id="const" ip_theory="Const">
+    <ip_library name="map"/>
+    <ip_qualid name="const"/>
+   </ls_pos>
+   <ls_pos name="len" id="len" ip_theory="ResizableArraySpec">
+    <ip_qualid name="len"/>
+   </ls_pos>
+   <ls_pos name="data" id="data" ip_theory="ResizableArraySpec">
+    <ip_qualid name="data"/>
+   </ls_pos>
+   <ls_pos name="mixfix [&lt;-]" id="mixfix [&lt;-]1"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="mixfix [&lt;-]"/>
+   </ls_pos>
+   <ls_pos name="v" id="v" ip_theory="Null">
+    <ip_library name="null"/>
+    <ip_qualid name="v"/>
+   </ls_pos>
+   <ls_pos name="size" id="size" ip_theory="BagImpl">
+    <ip_qualid name="size"/>
+   </ls_pos>
+   <ls_pos name="data" id="data1" ip_theory="BagImpl">
+    <ip_qualid name="data"/>
+   </ls_pos>
+   <ls_pos name="contents" id="contents" ip_theory="BagImpl">
+    <ip_qualid name="contents"/>
+   </ls_pos>
+   <pr_pos name="Assoc" id="Assoc" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_l" id="Unit_def_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unit_def_l"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_r" id="Unit_def_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unit_def_r"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_l" id="Inv_def_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Inv_def_l"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_r" id="Inv_def_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Inv_def_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="Comm" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Assoc" id="Assoc1" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="MulAssoc"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_l"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="Comm1" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="MulComm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Unitary" id="Unitary" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unitary"/>
+   </pr_pos>
+   <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="NonTrivialRing"/>
+   </pr_pos>
+   <pr_pos name="Refl" id="Refl" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Refl"/>
+   </pr_pos>
+   <pr_pos name="Trans" id="Trans" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Trans"/>
+   </pr_pos>
+   <pr_pos name="Antisymm" id="Antisymm" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Antisymm"/>
+   </pr_pos>
+   <pr_pos name="Total" id="Total" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Total"/>
+   </pr_pos>
+   <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="ZeroLessOne"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderAdd"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderMult"/>
+   </pr_pos>
+   <pr_pos name="numof_def" id="numof_def" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_def"/>
+   </pr_pos>
+   <pr_pos name="Numof_bounds" id="Numof_bounds" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_bounds"/>
+   </pr_pos>
+   <pr_pos name="Numof_append" id="Numof_append" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_append"/>
+   </pr_pos>
+   <pr_pos name="Numof_left_no_add" id="Numof_left_no_add" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_left_no_add"/>
+   </pr_pos>
+   <pr_pos name="Numof_left_add" id="Numof_left_add" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Numof_left_add"/>
+   </pr_pos>
+   <pr_pos name="Empty" id="Empty" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Empty"/>
+   </pr_pos>
+   <pr_pos name="Full" id="Full" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="Full"/>
+   </pr_pos>
+   <pr_pos name="numof_increasing" id="numof_increasing" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_increasing"/>
+   </pr_pos>
+   <pr_pos name="numof_strictly_increasing" id="numof_strictly_increasing"
+    ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_strictly_increasing"/>
+   </pr_pos>
+   <pr_pos name="numof_change_some" id="numof_change_some" ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_change_some"/>
+   </pr_pos>
+   <pr_pos name="numof_change_equiv" id="numof_change_equiv"
+    ip_theory="NumOf">
+    <ip_library name="int"/>
+    <ip_qualid name="numof_change_equiv"/>
+   </pr_pos>
+   <pr_pos name="rarray&apos;invariant" id="rarray&apos;invariant"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="rarray&apos;invariant"/>
+   </pr_pos>
+   <pr_pos name="mixfix [&lt;-]_spec" id="mixfix [&lt;-]_spec"
+    ip_theory="ResizableArraySpec">
+    <ip_qualid name="mixfix [&lt;-]_spec"/>
+   </pr_pos>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix ="/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix @"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="zero"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="one"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="prefix -"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix +"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix *"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix &lt;"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix &gt;"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="numof"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="infix =="/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="empty"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="add"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="set"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix []"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix [&lt;-]"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="const"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="len"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="data"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="mixfix [&lt;-]1"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="v"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="size"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="data1"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="contents"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Assoc"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unit_def_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unit_def_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Inv_def_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Inv_def_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Comm"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Assoc1"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Mul_distr_l"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Mul_distr_r"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Comm1"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Unitary"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="NonTrivialRing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Refl"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Trans"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Antisymm"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Total"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="ZeroLessOne"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="CompatOrderAdd"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="CompatOrderMult"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_def"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_bounds"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_append"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_left_no_add"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Numof_left_add"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Empty"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="Full"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_increasing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_strictly_increasing"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_change_some"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="numof_change_equiv"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="rarray&apos;invariant"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="mixfix [&lt;-]_spec"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="real"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="tuple0"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="unit"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="bag"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="map"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="null"/>
+   </meta>
+   <goal name="VC remove.16" expl="type invariant" expanded="true">
+   <transf name="eliminate_builtin" expanded="true">
+    <goal name="VC remove.16.1" expl="type invariant" expanded="true">
+    <proof prover="2"><result status="valid" time="0.03"/></proof>
+    <proof prover="4"><result status="valid" time="0.21" steps="647"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </metas>
+  </goal>
+  <goal name="VC remove.17" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC remove.14" expl="postcondition">
+  <goal name="VC remove.18" expl="postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
  </transf>
