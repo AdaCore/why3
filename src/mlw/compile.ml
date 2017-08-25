@@ -10,8 +10,6 @@
 (********************************************************************)
 
 (*
-  - extract file f.mlw into OCaml file f.ml, with sub-modules
-
   - "use (im|ex)port" -> "open"
     but OCaml's open is not transitive, so requires some extra work
     to figure out all the opens
@@ -299,7 +297,7 @@ module Translate = struct
   (* individual types *)
   let mlty_of_ity mask t =
     let rec loop t = match t.ity_node with
-    | _ when mask_ghost mask -> ML.tunit
+    | _ when mask_equal mask MaskGhost -> ML.tunit
     | Ityvar (tvs, _) ->
       Mltree.Tvar tvs
     | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
@@ -365,17 +363,14 @@ module Translate = struct
   let mk_eta_expansion rsc pvl cty_app =
     (* FIXME : effects and types of the expression in this situation *)
     let args_f =
-      let def pv =
-        pv_name pv, mlty_of_ity (mask_of_pv pv) pv.pv_ity, pv.pv_ghost in
+      let def pv = (pv_name pv, mlty_of_ity (mask_of_pv pv) pv.pv_ity,
+                    pv.pv_ghost) in
       filter_ghost_params pv_not_ghost def cty_app.cty_args in
     let args =
-      let def pv =
-        ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty Slab.empty in
+      let def pv = ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty
+          Slab.empty in
       let args = filter_ghost_params pv_not_ghost def pvl in
-      let extra_args =
-        (* FIXME : ghost status in this extra arguments *)
-        List.map def cty_app.cty_args in
-      args @ extra_args in
+      let extra_args = List.map def cty_app.cty_args in args @ extra_args in
     let eapp = ML.mk_expr (Mltree.Eapp (rsc, args)) (Mltree.C cty_app)
         cty_app.cty_effect Slab.empty in
     ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C cty_app)
@@ -479,12 +474,15 @@ module Translate = struct
     | Elet (LDvar (_, e1), e2) when e_ghost e1 ->
       expr info e2
     | Elet (LDvar (_, e1), e2) when e_ghost e2 ->
-      ML.mk_expr (ML.eseq (expr info e1) ML.mk_unit) ML.ity_unit eff lbl
+      (* sequences are transformed into [let o = e1 in e2] by A-normal form *)
+      (* FIXME? this is only the case when e1 is effectful ? *)
+      let e1 = expr info e1 in
+      ML.mk_expr e1.Mltree.e_node ML.ity_unit eff lbl
     | Elet (LDvar (pv, e1), e2)
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
       if eff_pure e1.e_effect then expr info e2
-      else let e1 = ML.mk_ignore (expr info e1) in
-        ML.mk_expr (ML.eseq e1 (expr info e2)) (Mltree.I e.e_ity) eff lbl
+      else let e1 = ML.mk_ignore (expr info e1) and e2 = expr info e2 in
+        ML.mk_expr (ML.eseq e1 e2) (Mltree.I e.e_ity) eff lbl
     | Elet (LDvar (pv, e1), e2) ->
       let ml_let = ML.mk_let_var pv (expr info e1) (expr info e2) in
       ML.mk_expr ml_let (Mltree.I e.e_ity) eff lbl
@@ -495,23 +493,21 @@ module Translate = struct
       let ef = expr info ef in
       let ein = expr info ein in
       let res = mlty_of_ity cty.cty_mask cty.cty_result in
-      let ml_letrec = Mltree.Elet (Mltree.Lsym (rs, res, args, ef), ein) in
-      ML.mk_expr ml_letrec (Mltree.I e.e_ity) eff lbl
+      let ml_letf = Mltree.Elet (Mltree.Lsym (rs, res, args, ef), ein) in
+      ML.mk_expr ml_letf (Mltree.I e.e_ity) eff lbl
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
-      when isconstructor info rs_app ->
-      (* partial application of constructor *)
+      when isconstructor info rs_app -> (* partial application of constructor *)
       let eta_app = mk_eta_expansion rs_app pvl cty in
       let ein = expr info ein in
       let mk_func pv f = ity_func pv.pv_ity f in
       let func = List.fold_right mk_func cty.cty_args cty.cty_result in
       let res = mlty_of_ity cty.cty_mask func in
-      let ml_letrec = Mltree.Elet (Mltree.Lsym (rsf, res, [], eta_app), ein) in
-      ML.mk_expr ml_letrec (Mltree.I e.e_ity) e.e_effect lbl
+      let ml_letf = Mltree.Elet (Mltree.Lsym (rsf, res, [], eta_app), ein) in
+      ML.mk_expr ml_letf (Mltree.I e.e_ity) e.e_effect lbl
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
       (* partial application *)
       let pvl = app pvl rs_app.rs_cty.cty_args in
-      let eapp =
-        ML.mk_expr (Mltree.Eapp (rs_app, pvl)) (Mltree.C cty)
+      let eapp = ML.mk_expr (Mltree.Eapp (rs_app, pvl)) (Mltree.C cty)
           cty.cty_effect Slab.empty in
       let ein  = expr info ein in
       let res  = mlty_of_ity cty.cty_mask cty.cty_result in
@@ -564,29 +560,34 @@ module Translate = struct
       ML.mk_hole
     | Eabsurd ->
       ML.mk_expr Mltree.Eabsurd (Mltree.I e.e_ity) eff lbl
-    | Ecase (e1, _) when e_ghost e1 ->
-      ML.mk_unit
+    | Ecase (e1, bl) when e_ghost e1 ->
+      (* if [e1] is ghost but the entire [match-with] expression doesn't,
+         it must be the case the first branch is irrefutable *)
+      begin match bl with
+      | [] -> assert false
+      | (_, e) :: _ -> expr info e
+      end
     | Ecase (e1, pl) ->
-      let e1 = expr info e1 in
-      let pl = List.map (ebranch info) pl in
+      let e1 = expr info e1 and pl = List.map (ebranch info) pl in
       ML.mk_expr (Mltree.Ematch (e1, pl)) (Mltree.I e.e_ity) eff lbl
     | Eassert _ -> ML.mk_unit
+    | Eif (e1, e2, e3) when e_ghost e1 ->
+      (* if [e1] is ghost but the entire [if-then-else] expression doesn't,
+         it must be the case one of the branches is [Eabsurd] *)
+      if e2.e_node = Eabsurd then expr info e3 else expr info e2
     | Eif (e1, e2, e3) when e_ghost e3 ->
-      let e1 = expr info e1 in
-      let e2 = expr info e2 in
+      let e1 = expr info e1 and e2 = expr info e2 in
       ML.mk_expr (Mltree.Eif (e1, e2, ML.mk_unit)) (Mltree.I e.e_ity) eff lbl
     | Eif (e1, e2, e3) when e_ghost e2 ->
-      let e1 = expr info e1 in
-      let e3 = expr info e3 in
+      let e1 = expr info e1 and e3 = expr info e3 in
       ML.mk_expr (Mltree.Eif (e1, ML.mk_unit, e3)) (Mltree.I e.e_ity) eff lbl
     | Eif (e1, e2, e3) ->
-      let e1 = expr info e1 in
-      let e2 = expr info e2 in
-      let e3 = expr info e3 in
+      let e1 = expr info e1 and e2 = expr info e2 and e3 = expr info e3 in
+      (* ML.e_if (expr info e1) (expr info e2) (expr info e3) e.e_ity eff
+  lbl --> TODO *)
       ML.mk_expr (Mltree.Eif (e1, e2, e3)) (Mltree.I e.e_ity) eff lbl
     | Ewhile (e1, _, _, e2) ->
-      let e1 = expr info e1 in
-      let e2 = expr info e2 in
+      let e1 = expr info e1 and e2 = expr info e2 in
       ML.mk_expr (Mltree.Ewhile (e1, e2)) (Mltree.I e.e_ity) eff lbl
     | Efor (pv1, (pv2, To, pv3), _, _, efor) ->
       let efor = expr info efor in
@@ -678,7 +679,7 @@ module Translate = struct
   let rec fun_expr_of_mask mask e =
     let open Mltree in
     let mk_e e_node = { e with e_node = e_node } in
-    assert (mask <> MaskGhost);
+    (* assert (mask <> MaskGhost); *)
     match e.e_node with
     | Econst _ | Evar _   | Efun _ | Eassign _ | Ewhile _
     | Efor   _ | Eraise _ | Eexn _ | Eabsurd   | Ehole    -> e

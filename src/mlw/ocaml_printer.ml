@@ -312,8 +312,9 @@ module Print = struct
           fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
             (print_uident info) rs.rs_name (print_expr ~paren:true info) t
         | [], tl ->
-          fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
-            rs.rs_name (print_list comma (print_expr info)) tl
+          fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]")
+            (print_uident info) rs.rs_name (print_list comma (print_expr info))
+            tl
         | pjl, tl ->
           let equal fmt () = fprintf fmt " = " in
           fprintf fmt "@[<hov 2>{ @[%a@] }@]"
@@ -432,7 +433,7 @@ module Print = struct
         | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
       fprintf fmt (protect_on paren
-                     "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
+        "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
       fprintf fmt (protect_on paren "not %a") (print_expr info ~paren:true) e1
@@ -444,7 +445,7 @@ module Print = struct
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt (protect_on paren
-                     "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
+        "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
         (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
       fprintf fmt "()"
