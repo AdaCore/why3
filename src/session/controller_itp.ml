@@ -405,10 +405,7 @@ let create_file_rel_path c pr pn =
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
   let f = get_encapsulating_file session (ATh th) in
-  (* TODO trying to get the proper name of the file without any noise *)
-  let fn = Filename.chop_extension
-      (List.hd (List.rev (Sysutil.path_of_file
-                            (Sysutil.normalize_filename (file_name f))))) in
+  let fn = Filename.chop_extension (Filename.basename (file_name f)) in
   let file = Driver.file_of_task driver fn th_name task in
   let file = Filename.concat session_dir file in
   let file = Sysutil.uniquify file in
