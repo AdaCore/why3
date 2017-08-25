@@ -1,5 +1,5 @@
-ce/ref.mlw M G : Unknown (other)
-ce/ref.mlw M WP_parameter test_post : Unknown (other)
+ce/ref.mlw M G: Unknown (other) (time hidden)
+ce/ref.mlw M VC test_post: Unknown (other) (time hidden)
 Counter-example model:File ref.mlw:
 Line 10:
 x = {"type" : "Integer" , "val" : "1" }
@@ -9,46 +9,28 @@ Line 11:
 old x = {"type" : "Integer" , "val" : "1" }
 old y = {"type" : "Integer" ,
 "val" : "0" }
-Line 13:
-y = {"type" : "Integer" ,
-"val" : "0" }
 
-ce/ref.mlw M WP_parameter incr : Unknown (other)
+ce/ref.mlw M VC incr: Unknown (other) (time hidden)
 Counter-example model:File ref.mlw:
 Line 18:
-y = {"type" : "Integer" , "val" : "-2" }
+y = {"type" : "Integer" , "val" : "0" }
 Line 20:
-x23 = {"type" : "Integer" , "val" : "0" }
-Line 21:
-x23 = {"type" : "Integer" , "val" : "2" }
-old x23 = {"type" : "Integer" ,
-"val" : "0" }
-y = {"type" : "Integer" ,
-"val" : "-1" }
-Line 24:
-y = {"type" : "Integer" , "val" : "-1" }
-Line 25:
-x23 = {"type" : "Integer" , "val" : "1" }
-Line 26:
 x23 = {"type" : "Integer" ,
-"val" : "2" }
+"val" : "0" }
+Line 21:
+old x23 = {"type" : "Integer" , "val" : "0" }
+old y = {"type" : "Integer" ,
+"val" : "-1" }
 
-ce/ref.mlw M WP_parameter test_loop : Unknown (other)
+ce/ref.mlw M VC test_loop: Unknown (other) (time hidden)
 Counter-example model:File ref.mlw:
+Line 18:
+y = {"type" : "Integer" , "val" : "-3" }
 Line 28:
 x = {"type" : "Integer" , "val" : "0" }
 Line 29:
-x = {"type" : "Integer" , "val" : "0" }
-old x = {"type" : "Integer" ,
-"val" : "0" }
-Line 31:
-x = {"type" : "Integer" , "val" : "-1" }
-y = {"type" : "Integer" ,
-"val" : "-3" }
-Line 32:
-x = {"type" : "Integer" , "val" : "0" }
-Line 33:
-x = {"type" : "Integer" , "val" : "0" }
+old x = {"type" : "Integer" , "val" : "0" }
+Line 35:
 x = {"type" : "Integer" ,
-"val" : "-1" }
+"val" : "0" }
 
