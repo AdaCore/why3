@@ -1594,7 +1594,7 @@ let add_submenu_prover (shortcut,prover) =
     (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goal(s)</b>"
                     C.print_prover p);
   let (_ : GtkSignal.id) =
-    b#connect#pressed
+    b#connect#clicked
       ~callback:(fun () -> prover_on_selected_goals p)
   in
  *)
