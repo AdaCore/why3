@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../tortoise_and_hare.mlw" expanded="true">
+<theory name="TortoiseAndHare" sum="0f115aa19db42adfa5a102e578b43dba" expanded="true">
+ <goal name="VC x0" expl="VC for x0">
+ <transf name="split_goal_wp">
+ </transf>
+ </goal>
+ <goal name="cycle_induction" expl="">
+ <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_cycle_induction_1.v"><result status="valid" time="0.36"/></proof>
+ </goal>
+ <goal name="VC tortoise_hare" expl="VC for tortoise_hare">
+ <transf name="split_goal_wp">
+  <goal name="VC tortoise_hare.1" expl="loop invariant init">
+  <proof prover="3"><result status="valid" time="0.02" steps="76"/></proof>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC tortoise_hare.2" expl="loop variant decrease">
+  <proof prover="1" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_1.v"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC tortoise_hare.3" expl="loop invariant preservation">
+  <proof prover="1" timelimit="10" memlimit="0" edited="tortoise_and_hare_WP_TortoiseAndHare_WP_parameter_tortoise_hare_2.v"><result status="valid" time="0.56"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

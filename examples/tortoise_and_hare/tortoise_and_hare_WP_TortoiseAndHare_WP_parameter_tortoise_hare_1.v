@@ -5,9 +5,6 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 
-(* Why3 assumption *)
-Definition unit := unit.
-
 Parameter iter: forall {a:Type} {a_WT:WhyType a}, (a -> a) -> Z -> a -> a.
 
 Axiom iter_def : forall {a:Type} {a_WT:WhyType a}, forall (f:(a -> a)) (k:Z)
@@ -86,20 +83,12 @@ Theorem VC_tortoise_hare : forall (hare:t) (tortoise:t), (exists t1:Z,
   (tortoise = hare)) -> ((~ (eq tortoise hare)) -> forall (tortoise1:t),
   (tortoise1 = (f tortoise)) -> forall (hare1:t), (hare1 = (f (f hare))) ->
   (rel tortoise1 tortoise))).
-intros hare tortoise (t1,((h1,h2),(h3,(h4,h5)))) h6 h7 tortoise1 h8 hare1 h9.
-
-Qed.
-
-(* Unused content named WP_parameter_tortoise_hare
-(* YOU MAY EDIT THE PROOF BELOW *)
-intuition.
-clear H2.
-destruct H as (i, (h1, (h2, (h3, h4)))).
-red.
+Proof.
+intros hare tortoise (i,((h1,h2),(h3,(h4,h5)))) h6 h7 tortoise1 h8 hare1 h9.
 exists i; intuition.
 subst.
-rewrite iter_s2 with (k := (i+1)%Z).
-apply f_equal.
+unfold x.
+rewrite iter_s with (k := (i+1)%Z).
 ring_simplify (i+1-1)%Z; auto.
 omega.
 assert (mu1: (mu <= 2*i+2)%Z) by omega.
@@ -108,24 +97,25 @@ generalize (dist_def (2*i+2) (i+1) mu1 mu2)%Z.
 intros (d1, (d2, d3)).
 clear mu1 mu2.
 assert (mu1: (mu <= 2*i)%Z) by omega.
-generalize (dist_def (2*i) i mu1 H3)%Z.
+generalize (dist_def (2*i) i mu1 H1)%Z.
 intros (d'1, (d'2, d'3)).
 apply Zle_lt_trans with (dist (2 * i) i - 1)%Z.
 apply d3.
 assert (case: (dist (2*i) i = 0 \/ dist (2*i) i > 0)%Z) by omega. destruct case.
-rewrite H4 in d'2.
+rewrite H2 in d'2.
 subst.
-absurd (iter i x0 = iter (2 * i) x0)%Z; auto.
+absurd (iter f i x0 = iter f (2 * i) x0)%Z; auto.
 symmetry.
 ring_simplify (2*i+0)%Z in d'2.
 auto.
 omega.
-rewrite iter_s2; try omega.
-rewrite iter_s2 with (k:=(i+1)%Z); try omega.
+unfold x.
+rewrite iter_s; try omega.
+rewrite iter_s with (k:=(i+1)%Z); try omega.
 apply f_equal.
 ring_simplify (i+1-1)%Z.
 ring_simplify (2 * i + 2 + (dist (2 * i) i - 1) - 1)%Z.
 auto.
 omega.
 Qed.
- *)
+
