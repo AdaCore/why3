@@ -33,7 +33,8 @@ type info = {
   info_th_known_map : Decl.known_map;
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
-  flat              : bool;
+  info_flat         : bool;
+  info_current_ph   : string list; (* current path *)
 }
 
 module Print = struct
@@ -57,11 +58,14 @@ module Print = struct
     List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
     Hstr.mem h
 
-  (* FIXME? use different printers for record fields, types, etc. *)
-  let iprinter, aprinter =
+  (* iprinter: local names
+     aprinter: type variables
+     tprinter: toplevel definitions *)
+  let iprinter, aprinter, tprinter =
     let isanitize = sanitizer char_to_alpha char_to_alnumus in
     let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
+    create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
 
   let forget_id id = forget_id iprinter id
@@ -71,7 +75,7 @@ module Print = struct
 
   let forget_let_defn = function
   | Lvar (v,_) -> forget_id v.pv_vs.vs_name
-  | Lsym (s,_,_,_) -> forget_rs s
+  | Lsym (s,_,_,_) | Lany (s,_,_) -> forget_rs s
   | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
   let rec forget_pat = function
@@ -81,31 +85,49 @@ module Print = struct
     | Por (p1, p2) -> forget_pat p1; forget_pat p2
     | Pas (p, _) -> forget_pat p
 
-  let print_ident fmt id =
-    let s = id_unique iprinter id in
+  let print_global_ident ~sanitizer fmt id =
+    let s = id_unique ~sanitizer tprinter id in
+    Ident.forget_id tprinter id;
     fprintf fmt "%s" s
+
+  let print_path ~sanitizer fmt (q, id) =
+    assert (List.length q >= 1);
+    match Lists.chop_last q with
+    | [], _ -> print_global_ident ~sanitizer fmt id
+    | q, _  ->
+      fprintf fmt "%a.%a"
+        (print_list dot string) q (print_global_ident ~sanitizer) id
+
+  let rec remove_prefix acc current_path = match acc, current_path with
+    | [], _ | _, [] -> acc
+    | p1 :: _, p2 :: _ when p1 <> p2 -> acc
+    | _ :: r1, _ :: r2 -> remove_prefix r1 r2
 
   let is_local_id info id =
     Sid.mem id info.info_current_th.th_local ||
     Opt.fold (fun _ m -> Sid.mem id m.Pmodule.mod_local)
       false info.info_current_mo
 
+  exception Local
+
   let print_qident ~sanitizer info fmt id =
     try
-      if info.flat || is_local_id info id then raise Not_found;
-      let lp, t, q =
-        try Pmodule.restore_path id
-        with Not_found -> Theory.restore_path id in
-      let s = String.concat "__" q in
-      let s = Ident.sanitizer char_to_alpha char_to_alnumus s in
-      let s = sanitizer s in
-      let s = if is_ocaml_keyword s then s ^ "_renamed" else s in (* FIXME *)
-      let fname = if lp = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname lp t) in
-      fprintf fmt "%s.%s" m s
-    with Not_found ->
+      if info.info_flat then raise Not_found;
+      if is_local_id info id then raise Local;
+      let p, t, q =
+        try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
+      let fname = if p = [] then info.info_fname else None in
+      let m = Strings.capitalize (module_name ?fname p t) in
+      fprintf fmt "%s.%a" m (print_path ~sanitizer) (q, id)
+    with
+    | Not_found ->
       let s = id_unique ~sanitizer iprinter id in
       fprintf fmt "%s" s
+    | Local ->
+      let _, _, q =
+        try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
+      let q = remove_prefix q (List.rev info.info_current_ph) in
+      print_path ~sanitizer fmt (q, id)
 
   let print_lident = print_qident ~sanitizer:Strings.uncapitalize
   let print_uident = print_qident ~sanitizer:Strings.capitalize
@@ -184,19 +206,6 @@ module Print = struct
 
   let print_vs_arg info fmt vs =
     fprintf fmt "@[%a@]" (print_vsty info) vs
-
-  let print_path =
-    print_list dot pp_print_string (* point-free *)
-
-  let print_path_id fmt = function
-    | [], id -> print_ident fmt id
-    | p, id  -> fprintf fmt "%a.%a" print_path p print_ident id
-
-  let print_theory_name fmt th =
-    print_path_id fmt (th.th_path, th.th_name)
-
-  let print_module_name fmt m =
-    print_theory_name fmt m.mod_theory
 
   let get_record info rs =
     match Mid.find_opt rs.rs_name info.info_mo_known_map with
@@ -297,18 +306,19 @@ module Print = struct
     | _, None, tl when isconstructor () ->
       let pjl = get_record info rs in
       begin match pjl, tl with
-      | [], [] ->
-        (print_uident info) fmt rs.rs_name
-      | [], [t] ->
-        fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
-          (print_uident info) rs.rs_name (print_expr ~paren:true info) t
-      | [], tl ->
-        fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]") (print_uident info)
-          rs.rs_name (print_list comma (print_expr info)) tl
-      | pjl, tl ->
-        let equal fmt () = fprintf fmt " = " in
-        fprintf fmt "@[<hov 2>{ @[%a@] }@]"
-          (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
+        | [], [] ->
+          (print_uident info) fmt rs.rs_name
+        | [], [t] ->
+          fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+            (print_uident info) rs.rs_name (print_expr ~paren:true info) t
+        | [], tl ->
+          fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]")
+            (print_uident info) rs.rs_name (print_list comma (print_expr info))
+            tl
+        | pjl, tl ->
+          let equal fmt () = fprintf fmt " = " in
+          fprintf fmt "@[<hov 2>{ @[%a@] }@]"
+            (print_list2 semi equal (print_rs info) (print_expr info)) (pjl, tl)
       end
     | _, None, [] ->
       (print_lident info) fmt rs.rs_name
@@ -316,7 +326,7 @@ module Print = struct
       fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
         (print_lident info) rs.rs_name
         (print_apply_args info) (tl, rs.rs_cty.cty_args)
-        (* (print_list space (print_expr ~paren:true info)) tl *)
+  (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
     Stv.iter (fun tv -> fprintf fmt "%a " print_tv tv) s
@@ -339,10 +349,11 @@ module Print = struct
         (print_list space (print_lident info)) id_args
         (print_expr info) e
 
-  and print_let_def info fmt = function
+  and print_let_def ?(functor_arg=false) info fmt = function
     | Lvar (pv, e) ->
       fprintf fmt "@[<hov 2>let %a =@ %a@]"
-        (print_lident info) (pv_name pv) (print_expr info) e;
+        (print_lident info) (pv_name pv)
+        (print_expr info) e;
     | Lsym (rs, res, args, ef) ->
       fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
         (print_lident info) rs.rs_name
@@ -362,6 +373,15 @@ module Print = struct
       List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
       print_list_next newline print_one fmt rdef;
       List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
+    | Lany (rs, res, args) when functor_arg ->
+      let print_ty_arg info fmt (_, ty, _) =
+        fprintf fmt "@[%a@]" (print_ty info) ty in
+      fprintf fmt "@[<hov 2>val %a : @[%a@] ->@ %a@]"
+        (print_lident info) rs.rs_name
+        (print_list arrow (print_ty_arg info)) args
+        (print_ty info) res;
+      forget_vars args
+    | Lany _ -> () (* FIXME: test driver here and fail if no driver *)
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
@@ -397,10 +417,11 @@ module Print = struct
             | _ -> assert false end in
           syntax_arguments s print_constant fmt pvl
         | _ ->
-      fprintf fmt (protect_on paren "%a")
-        (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+          fprintf fmt (protect_on paren "%a")
+            (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
     | Ematch (e, pl) ->
-      fprintf fmt (protect_on paren "begin match @[%a@] with@\n@[%a@]@\nend")
+      fprintf fmt
+        (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
         (print_expr info) e (print_list newline (print_branch info)) pl
     | Eassign al ->
       let assign fmt (rho, rs, pv) =
@@ -408,8 +429,8 @@ module Print = struct
           (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
           (print_lident info) (pv_name pv) in
       begin match al with
-      | [] -> assert false | [a] -> assign fmt a
-      | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
+        | [] -> assert false | [a] -> assign fmt a
+        | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
       fprintf fmt (protect_on paren
         "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
@@ -463,9 +484,9 @@ module Print = struct
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
         (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
-    (* | Enot _ -> (\* TODO *\) assert false *)
-    (* | Ebinop _ -> (\* TODO *\) assert false *)
-    (* | Ecast _ -> (\* TODO *\) assert false *)
+  (* | Enot _ -> (\* TODO *\) assert false *)
+  (* | Ebinop _ -> (\* TODO *\) assert false *)
+  (* | Ecast _ -> (\* TODO *\) assert false *)
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
@@ -475,7 +496,7 @@ module Print = struct
   and print_raise ~paren info xs fmt e_opt =
     match query_syntax info.info_syn xs.xs_name, e_opt with
     | Some s, None ->
-      fprintf fmt "raise %s" s
+      fprintf fmt "raise (%s)" s
     | Some s, Some e ->
       fprintf fmt (protect_on paren "raise (%a)")
         (syntax_arguments s (print_expr info)) [e]
@@ -525,20 +546,50 @@ module Print = struct
       (if fst then "type" else "and") print_tv_args its.its_args
       (print_lident info) its.its_name print_def its.its_def
 
-  let print_decl info fmt = function
+  let rec is_signature_decl info = function
+    | Dtype _ -> true
+    | Dlet (Lany _) -> true
+    | Dlet _ -> false
+    | Dexn _ -> true
+    | Dmodule (_, dl) -> is_signature info dl
+
+  and is_signature info dl =
+    List.for_all (is_signature_decl info) dl
+
+  let extract_functor_args info dl =
+    let rec extract args = function
+      (* FIXME remove empty args? *)
+      (* | Dmodule (_, []) :: dl -> extract args dl *)
+      | Dmodule (x, dlx) :: dl when is_signature info dlx ->
+        extract ((x, dlx) :: args) dl
+      | dl -> List.rev args, dl in
+    extract [] dl
+
+  let rec print_decl ?(functor_arg=false) info fmt = function
     | Dlet ldef ->
-      print_let_def info fmt ldef;
-      fprintf fmt "@\n"
+      print_let_def info ~functor_arg fmt ldef
     | Dtype dl ->
-      print_list_next newline (print_type_decl info) fmt dl;
-      fprintf fmt "@\n"
+      print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
-       fprintf fmt "exception %a@\n" (print_uident info) xs.xs_name
+       fprintf fmt "exception %a" (print_uident info) xs.xs_name
     | Dexn (xs, Some t)->
-      fprintf fmt "@[<hov 2>exception %a of %a@]@\n"
+      fprintf fmt "@[<hov 2>exception %a of %a@]"
         (print_uident info) xs.xs_name (print_ty ~paren:true info) t
-    | Dclone _ ->
-      assert false (*TODO*)
+    | Dmodule (s, dl) ->
+      let args, dl = extract_functor_args info dl in
+      let info = { info with info_current_ph = s :: info.info_current_ph } in
+      fprintf fmt "@[@[<hov 2>module %s%a@ =@ struct@ %a@]@ end@]" s
+        (print_functor_args info) args
+        (print_list newline (print_decl info)) dl
+
+  and print_functor_args info fmt args =
+    let print_sig info fmt dl =
+      fprintf fmt "sig@ %a@ end"
+        (print_list space (print_decl info ~functor_arg:true)) dl in
+    let print_pair fmt (s, dl) =
+      let info = { info with info_current_ph = s :: info.info_current_ph } in
+      fprintf fmt "(%s:@ %a)" s (print_sig info) dl in
+    fprintf fmt "@[%a@]" (print_list space print_pair) args
 
   let print_decl info fmt decl =
     (* avoids printing the same decl for mutually recursive decls *)
@@ -565,10 +616,11 @@ let print_decl =
       info_th_known_map = th.th_known;
       info_mo_known_map = m.mod_known;
       info_fname        = Opt.map Compile.clean_name fname;
-      flat              = flat;
+      info_flat         = flat;
+      info_current_ph   = [];
     } in
-    if not (Hashtbl.mem memo d) then begin
-      Hashtbl.add memo d (); Print.print_decl info fmt d end
+    if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
+      Print.print_decl info fmt d end
 
 let fg ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in

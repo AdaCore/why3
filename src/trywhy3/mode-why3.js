@@ -7,11 +7,13 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 var Why3HighlightRules = function() {
 
     var keywords = (
-        "and|as|assert|begin|do|done|downto|else|end|ensures|"  +
-        "exception|exists|for|forall|fun|function|goal|if|import|in|" +
-        "invariant|let|match|module|mutable|predicate|"  +
-        "rec|requires|then|theory|to|try|type|use|val|variant|" +
-        "while|with|diverges"
+      "abstract|axiom|by|clone|coinductive|constant|end|exception|" +
+      "export|function|goal|ghost|import|inductive|lemma|meta|mutable|" +
+      "module|namespace|predicate|private|so|theory|type|use|val|with|" +
+      "begin|do|done|downto|else|exists|for|forall|if|in|let|loop|match|" +
+      "raise|rec|then|to|try|while|absurd|assert|assume|diverges|ensures|" +
+      "check|invariant|raises|reads|requires|result|returns|self|variant|" +
+      "writes"
     );
 
     var builtinConstants = ("true|false");

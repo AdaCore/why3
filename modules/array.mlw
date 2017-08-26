@@ -343,15 +343,13 @@ module ToSeq
     variant { u - l }
   = if u <= l then S.empty else S.cons a[l] (to_seq_sub a (l+1) u)
 
-  let rec lemma to_seq_length
-    (a: array 'a) (l u: int)
+  let rec lemma to_seq_length (a: array 'a) (l u: int)
     requires { 0 <= l <= u <= length a }
     variant  { u - l }
     ensures  { S.length (to_seq_sub a l u) = u - l }
   = if l < u then to_seq_length a (l+1) u
 
-  let rec lemma to_seq_nth
-    (a: array 'a) (l i u: int)
+  let rec lemma to_seq_nth (a: array 'a) (l i u: int)
     requires { 0 <= l <= i < u <= length a }
     variant  { i - l }
     ensures  { S.get (to_seq_sub a l u) (i - l) = a[i] }

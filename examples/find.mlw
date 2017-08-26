@@ -1,0 +1,94 @@
+
+(*
+ C. A. R. Hoare.
+ Proof of a program: Find.
+ Commun. ACM, 14:39--45, January 1971.
+*)
+
+module FIND
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArrayPermut
+
+  val constant _N: int (* actually N in Hoare's notation *)
+  val constant f: int
+
+  axiom f_N_range: 1 <= f <= _N
+
+  predicate found (a: array int) =
+    forall p q:int. 1 <= p <= f <= q <= _N -> a[p] <= a[f] <= a[q]
+
+  predicate m_invariant (m: int) (a: array int) =
+    m <= f /\ forall p q:int. 1 <= p < m <= q <= _N -> a[p] <= a[q]
+
+  predicate n_invariant (n: int) (a: array int) =
+    f <= n /\ forall p q:int. 1 <= p <= n < q <= _N -> a[p] <= a[q]
+
+  predicate i_invariant (m n i q r: int) (a: array int) =
+    m <= i /\ (forall p:int. 1 <= p < i -> a[p] <= r) /\
+    (i <= n -> i <= q <= n /\ r <= a[q])
+
+  predicate j_invariant (m n j p r: int) (a: array int) =
+    j <= n /\ (forall q:int. j < q <= _N -> r <= a[q]) /\
+    (m <= j -> m <= p <= j /\ a[p] <= r)
+
+  predicate termination (i j i0 j0 r: int) (a:array int) =
+    (i > i0 /\ j < j0) \/ (i <= f <= j /\ a[f] = r)
+
+  let find (a: array int) =
+    requires { length a = _N+1 }
+    ensures  { found a /\ permut_all a (old a) }
+  let m = ref 1 in let n = ref _N in
+  while !m < !n do
+    invariant { m_invariant !m a /\ n_invariant !n a /\
+      permut_all a (old a) /\ 1 <= !m /\ !n <= _N }
+    variant { !n - !m }
+    let r = a[f] in let i = ref !m in let j = ref !n in
+    let ghost p = ref f in let ghost q = ref f in
+    while !i <= !j do
+      invariant { i_invariant !m !n !i !q r a /\ j_invariant !m !n !j !p r a /\
+        m_invariant !m a /\ n_invariant !n a /\ 0 <= !j /\ !i <= _N + 1 /\
+        termination !i !j !m !n r a /\ permut_all a (old a) }
+      variant { _N + 2 + !j - !i }
+      label L in
+      while a[!i] < r do
+        invariant { i_invariant !m !n !i !q r a /\
+          !i at L <= !i <= !n /\ termination !i !j !m !n r a }
+        variant { _N + 1 - !i }
+        i := !i + 1
+      done;
+
+      while r < a[!j] do
+        invariant { j_invariant !m !n !j !p r a /\
+          !j <= !j at L /\ !m <= !j /\ termination !i !j !m !n r a }
+        variant { !j }
+        j := !j - 1
+      done;
+
+      assert { a[!j] <= r <= a[!i] };
+
+      if !i <= !j then begin
+        let w = a[!i] in begin a[!i] <- a[!j]; a[!j] <- w end;
+        assert { exchange a (a at L) !i !j };
+        ghost begin
+          p := if !i < !j then !i else !j - 1;
+          q := if !i < !j then !j else !i + 1
+        end;
+        i := !i + 1;
+        j := !j - 1
+      end
+    done;
+
+    assert { !m < !i /\ !j < !n };
+
+    if f <= !j then
+      n := !j
+    else if !i <= f then
+      m := !i
+    else
+      begin n := f; m := f end
+  done
+
+end

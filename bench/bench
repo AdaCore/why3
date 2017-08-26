@@ -12,14 +12,15 @@ suffix=$1
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
+    echo "bench aborted due to the following errors:" > bench_errors
     for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	# running Why
 	if ! $pgm $2 $f > /dev/null 2> bench_error; then
 	    echo "FAILED!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
-            echo "invocation: $pgm $2 $f"
-            cat bench_error
+            echo "invocation: $pgm $2 $f" | tee -a bench_errors
+            cat bench_error | tee -a bench_errors
             ERROR=yes
 	elif test -s bench_error; then
             echo "warning!"
@@ -30,6 +31,8 @@ goods () {
     done
     rm bench_error
     if test -n "$ERROR"; then
+        cat bench_errors
+        rm bench_errors
         exit 1
     fi
 }

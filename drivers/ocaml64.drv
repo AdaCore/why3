@@ -348,9 +348,10 @@ module ocaml.Sys
 end
 
 module ocaml.Pervasives
-  syntax exception Exit      "Pervasives.Exit"
-  syntax exception Not_found "Not_found"
-  syntax val ocaml_assert    "assert (%1)"
+  syntax exception Exit             "Pervasives.Exit"
+  syntax exception Not_found        "Not_found"
+  syntax val ocaml_assert           "assert (%1)"
+  syntax exception Invalid_argument "Invalid_argument \"\""
 end
 
 module HighOrd

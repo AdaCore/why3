@@ -237,8 +237,8 @@ let print_location fmt m_element =
 **  Model definitions
 ***************************************************************
 *)
-module IntMap = Map.Make(struct type t  = int let compare = compare end)
-module StringMap = Map.Make(String)
+module IntMap = Stdlib.Mint
+module StringMap = Stdlib.Mstr
 
 type model_file = model_element list IntMap.t
 type model_files = model_file StringMap.t
@@ -278,6 +278,9 @@ let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
   Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
 
 let print_model_file fmt me_name_trans filename model_file =
+  (* Relativize does not work on nighly bench: using basename instead. It
+     hides the local paths.  *)
+  let filename = Filename.basename filename  in
   fprintf fmt "File %s:" filename;
   IntMap.iter
     (fun line m_elements ->
@@ -296,7 +299,11 @@ let print_model
     ?(me_name_trans = why_name_trans)
     fmt
     model =
-  StringMap.iter (print_model_file fmt me_name_trans) model.model_files
+  (* Simple and easy way to print file sorted alphabetically
+   FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
+   *)
+  let l = StringMap.bindings model.model_files in
+  List.iter (fun (k, e) -> print_model_file fmt me_name_trans k e) l
 
 let model_to_string
     ?(me_name_trans = why_name_trans)

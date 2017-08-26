@@ -146,7 +146,8 @@ let print_mdecls ?fname m mdecls =
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
     let flat = opt_modu_flat = Flat in
-    List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
+    let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
+    Pp.print_list Pp.newline pr_decl fmt mdecls;
     if cout <> stdout then close_out cout end
 
 let find_module_path mm path m = match path with
@@ -167,7 +168,7 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
-let not_extractable_theories = ["why3"; "map";]
+let not_extractable_theories = ["why3"; "map"; ]
 
 let is_not_extractable_theory =
   let h = Hstr.create 16 in
@@ -203,11 +204,6 @@ let rec do_extract_module ?fname m =
   | Single -> ()
   end;
   extract_to ?fname m
-
-(* let do_global_extract (_,p,t) = *)
-(*   let env = opt_driver.Pdriver.drv_env in *)
-(*   let m = read_module env p t in *)
-(*   do_extract_module m *)
 
 let do_extract_module_from fname mm m =
   try
@@ -311,10 +307,8 @@ let flat_extraction mm = function
 let () =
   try
     match opt_modu_flat with
-    | Modular ->
-      Queue.iter do_modular opt_queue
-    | Flat ->
-      let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
+    | Modular -> Queue.iter do_modular opt_queue
+    | Flat -> let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
       let visit_m _ m = let tm = translate_module m in
         let visit_id id _ = visit ~recurs:true mm id in
         Ident.Mid.iter visit_id tm.Mltree.mod_known in
@@ -340,14 +334,8 @@ let () =
       let idl = match opt_rec_single with
         | Single -> List.filter is_local idl
         | Recursive -> idl in
-      List.iter (extract fmt) idl;
+      Pp.print_list Pp.newline extract fmt idl;
       if cout <> stdout then close_out cout
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3extract.opt"
-End:
-*)

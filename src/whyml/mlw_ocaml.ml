@@ -498,6 +498,8 @@ module Translate = struct
     match e.e_node with
       | Elogic t ->
           term info t
+      | Evalue pv when pv.pv_ghost ->
+         ML.enop
       | Evalue pv ->
            ML.Eident (pv_name pv)
       | Earrow a ->
@@ -513,21 +515,14 @@ module Translate = struct
           let n = Number.compute_int (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
-(*
       | Eapp (e, v, _) when v.pv_ghost ->
-         (* ghost parameters are ignored *)
-         begin
-           match e.e_node with
-           | Eapp _ -> expr info e
-           | _ -> ML.Eapp (expr info e, [ML.enop])
-         end
- *)
+         (* ghost parameters are unit *)
+         ML.Eapp (expr info e, [ML.enop])
       | Eapp (e, v, _) ->
           ML.Eapp (expr info e, [ML.Eident (pv_name v)])
-      | Elet ({ let_sym = lv; let_expr = e1 }, e2) when e1.e_ghost ->
+      | Elet ({ let_sym = _lv; let_expr = e1 }, e2) when e1.e_ghost ->
          (* TODO: remove superflous let *)
-         ML.Elet (lv_name lv, ML.enop, expr info e2)
-
+         (* ML.Elet (lv_name lv, ML.enop, *) expr info e2 (* ) *)
       | Elet ({ let_sym = LetV pv }, e2) when ity_equal pv.pv_ity ity_mark ->
           expr info e2
       | Elet ({ let_sym = LetV pv; let_expr = e1 }, e2) when is_underscore pv ->

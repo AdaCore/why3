@@ -864,8 +864,8 @@ let clone_type_record cl s d s' d' =
     let pj_str = pj.pv_vs.vs_name.id_string in
     let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
-    let rs' = try Hstr.find fields' pj_str
-      with Not_found -> raise (BadInstance id) in
+    let rs' = try Hstr.find fields' pj_str with Not_found ->
+      raise (BadInstance id) in
     let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in

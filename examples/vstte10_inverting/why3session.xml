@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="20" steplimit="0" memlimit="0"/>
+<prover id="4" name="CVC4" version="1.4" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.3.2" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="4000"/>
+<file name="../vstte10_inverting.mlw" expanded="true">
+<theory name="InvertingAnInjection" sum="3c9647c6ede142327435246b29be781e" expanded="true">
+ <goal name="VC inverting" expl="VC for inverting">
+ <transf name="split_goal_wp">
+  <goal name="VC inverting.1" expl="loop invariant init">
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC inverting.2" expl="index in array bounds">
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC inverting.3" expl="index in array bounds">
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="26"/></proof>
+  </goal>
+  <goal name="VC inverting.4" expl="loop invariant preservation">
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
+  </goal>
+  <goal name="VC inverting.5" expl="postcondition">
+  <proof prover="6" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="VC inverting.6" expl="postcondition">
+  <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC inverting2" expl="VC for inverting2">
+ <transf name="split_goal_wp">
+  <goal name="VC inverting2.1" expl="array creation size">
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC inverting2.2" expl="loop invariant init">
+  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+  <goal name="VC inverting2.3" expl="index in array bounds">
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.00" steps="8"/></proof>
+  </goal>
+  <goal name="VC inverting2.4" expl="index in array bounds">
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="26"/></proof>
+  </goal>
+  <goal name="VC inverting2.5" expl="loop invariant preservation">
+  <proof prover="3" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="39"/></proof>
+  </goal>
+  <goal name="VC inverting2.6" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="VC inverting2.6.1" expl="VC for inverting2">
+   <proof prover="3" timelimit="10"><result status="valid" time="0.00" steps="6"/></proof>
+   </goal>
+   <goal name="VC inverting2.6.2" expl="VC for inverting2">
+   <proof prover="6" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="0.39"/></proof>
+   </goal>
+   <goal name="VC inverting2.6.3" expl="VC for inverting2">
+   <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
+   <proof prover="3" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="13"/></proof>
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   <proof prover="5"><result status="valid" time="0.00"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC inverting2.7" expl="postcondition">
+  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test" sum="e6aae483226c2076743282a707e6cc52" expanded="true">
+ <goal name="VC test" expl="VC for test">
+ <transf name="split_goal_wp">
+  <goal name="VC test.1" expl="array creation size">
+  <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
+  </goal>
+  <goal name="VC test.2" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="1"/></proof>
+  </goal>
+  <goal name="VC test.3" expl="index in array bounds">
+  <proof prover="3" timelimit="10"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="VC test.4" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+  </goal>
+  <goal name="VC test.5" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+  </goal>
+  <goal name="VC test.6" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC test.7" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="VC test.8" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
+  </goal>
+  <goal name="VC test.9" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
+  </goal>
+  <goal name="VC test.10" expl="index in array bounds">
+  <proof prover="3" timelimit="3"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC test.11" expl="index in array bounds">
+  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="VC test.12" expl="assertion">
+  <proof prover="3"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="VC test.13" expl="precondition">
+  <proof prover="3"><result status="valid" time="1.10" steps="132"/></proof>
+  </goal>
+  <goal name="VC test.14" expl="assertion">
+  <proof prover="3"><result status="valid" time="0.08" steps="61"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

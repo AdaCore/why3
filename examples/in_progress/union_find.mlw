@@ -42,12 +42,15 @@ module Impl
   use map.Map
   use import array.Array
 
+  (* there is a path from x to y of length at most d *)
   inductive path (size: int) (link: array int) (x d y: int) =
-  | path_zero: forall size link x.
-               0 <= x < size -> link[x] = x -> path size link x 0 x
+  | path_zero: forall size link x d.
+               0 <= x < size -> link[x] = x -> 0 <= d ->
+               path size link x d x
   | path_succ: forall size link.
                forall x d z. 0 <= x < size -> link[x] <> x ->
-               path size link link[x] d z -> path size link x (d+1) z
+               path size link link[x] d z ->
+               path size link x (d + 1) z
 
   lemma path_dist_nonneg:
     forall size link x d y. path size link x d y -> 0 <= d
@@ -63,7 +66,7 @@ module Impl
     requires { path size link x d1 y1 }
     requires { path size link x d2 y2 }
     variant  { d1 + d2 }
-    ensures  { d1 = d2 /\ y1 = y2 }
+    ensures  { y1 = y2 }
   = if x <> link[x] then begin
       path_unique size link link[x] (d1-1) (d2-1) y1 y2;
     end
@@ -71,10 +74,9 @@ module Impl
   let rec lemma path_last (size: int) (link: array int) (x d y: int)
     requires { length link = size }
     requires { path size link x d y }
-    requires { link[y] <> y }
     variant  { d }
-    ensures  { path size link x (d+1) y }
-  = if d > 0 then path_last size link link[x] (d-1) y
+    ensures  { link[y] = y }
+  = if x <> link[x] then path_last size link link[x] (d-1) y
 
   type t = {
                   size: int;        (* elements are 0,1,...,size-1 *)
@@ -85,6 +87,8 @@ module Impl
   } invariant {
     0 <= size = length link = length rank /\
     (forall i. 0 <= i < size -> 0 <= repr i < size) /\
+    (forall i. 0 <= i < size -> repr (repr i) = repr i) /\
+    (forall i. 0 <= i < size -> link[i] <> i -> dist link[i] < dist i) /\
     (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
   } by {
     size = 0; link = Array.make 0 0; rank = Array.make 0 0;
@@ -104,9 +108,32 @@ module Impl
     { size = n; link = link; rank = rank;
       repr = (fun i -> i); dist = (fun i -> 0) }
 
+  let rec lemma path_dist (size: int) (link: array int) (dist: int -> int)
+                          (x d y: int)
+    requires { length link = size }
+    requires { path size link x d y }
+    requires { forall i. 0 <= i < size -> link[i] <> i -> dist link[i] < dist i}
+    requires { x <> y }
+    variant  { d }
+    ensures  { dist y < dist x }
+  = if x <> link[x] && link[x] <> y then
+      path_dist size link dist link[x] (d-1) y
+
+  let rec lemma path_compression
+    (size: int) (link: array int) (x dx rx: int) (i di ri: int)
+    requires { length link = size }
+    requires { path size link x dx rx }
+    requires { x <> rx }
+    requires { path size link i di ri }
+    variant  { di }
+    ensures  { path size link[x <- rx] i di ri }
+  = if i = x then ()
+    else if link[i] = i then ()
+    else path_compression size link x dx rx link[i] (di-1) ri
+
   let rec find (uf: t) (x: int) : int
     requires { 0 <= x < uf.size }
-    writes   { uf.link, uf.dist }
+    writes   { uf.link(* , uf.dist *) }
     variant  { uf.dist x }
     ensures  { result = uf.repr x }
     ensures  { path uf.size uf.link x (uf.dist x) result }
@@ -116,9 +143,6 @@ module Impl
       let r = find uf y in
       assert { x <> r };
       uf.link[x] <- r; (* path compression *)
-      uf.dist <- pure { fun i -> if i = x then 1
-         else if exists d. path uf.size uf.link i d x then uf.dist i + 1
-         else uf.dist i };
       r
     end else
       x
@@ -144,8 +168,7 @@ module Impl
       if uf.rank[rx] <= uf.rank[ry] then begin
         uf.link[rx] <- ry;
         uf.repr <- (fun i -> if oldr i = rx then ry else oldr i);
-        uf.dist <-
-          pure { fun i -> if oldr i = rx then oldd i + 1 else oldd i };
+        uf.dist <- pure { fun i -> if oldr i = rx then oldd i + 1 else oldd i };
         assert { forall i. 0 <= i < uf.size ->
              if oldr i = rx then path uf.size uf.link i (oldd i + 1) ry
                             else path uf.size uf.link i (oldd i)     (oldr i)};

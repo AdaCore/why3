@@ -5,7 +5,7 @@ module Sys
   use import mach.int.Int63
 
   val constant max_array_length : int63
-  axiom non_neg_max_array_length : max_array_length >= 0
+  axiom non_neg_max_array_length : 0 <= max_array_length
 
 end
 
@@ -29,6 +29,8 @@ module Pervasives
 
   val ocaml_assert (b: bool) : unit
     raises { AssertFailure }
+
+  exception Invalid_argument
 
 end
 
