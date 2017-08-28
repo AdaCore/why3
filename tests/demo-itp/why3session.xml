@@ -2,9 +2,38 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.4.1" timelimit="5" steplimit="1" memlimit="0"/>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../demo-itp.mlw">
-<theory name="TestAutoFocus" sum="b9c97d5c8e378bea09fece0986d55347">
+<theory name="M" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="TestTaskPrinting" sum="01fbd777d08f356d2f390e335249eeb9">
+ <goal name="g1">
+ </goal>
+ <goal name="g2">
+ </goal>
+ <goal name="g3">
+ </goal>
+ <goal name="g4">
+ </goal>
+ <goal name="g5">
+ </goal>
+ <goal name="g6">
+ </goal>
+ <goal name="g7">
+ </goal>
+ <goal name="g8">
+ </goal>
+</theory>
+<theory name="TestAutomaticIntro" sum="6566463f1ee0314d808add53aa21307c">
+ <goal name="g">
+ </goal>
+</theory>
+<theory name="TestInfixSymbols" sum="1e2101112f2c37523da345d6bab356e6">
+ <goal name="g">
+ </goal>
+</theory>
+<theory name="TestAutoFocus" sum="bd282d677ea02bff5e05e03fd51a598a">
  <goal name="g0">
  </goal>
  <goal name="g1">
@@ -12,13 +41,20 @@
  <goal name="g2">
  </goal>
 </theory>
-<theory name="Power" sum="1c745a16ebe3e09577a4b58a87bd9d8b">
+<theory name="Power" sum="4cc6d21f246903f98feda68da4e48c65">
  <goal name="power_1">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="sqrt4_256">
  </goal>
- <goal name="power_sum">
+ <goal name="power_sum" proved="true">
+ <transf name="induction"  proved="true"arg1="n" arg2="0">
+  <goal name="power_sum.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="power_sum.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="11"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="power_0_left">
  </goal>

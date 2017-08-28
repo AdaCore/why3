@@ -78,6 +78,7 @@ type controller = private
     controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+    controller_tasks_for_print : (bool * Task.task * Trans.naming_table) Hpn.t;
   }
 
 val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
@@ -86,6 +87,11 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 
 val print_session : Format.formatter -> controller -> unit
 
+
+(* handling of task printing with intros *)
+
+val goal_task_to_print :
+  ?do_intros:bool -> controller -> proofNodeID -> Task.task * Trans.naming_table
 
 (*
 

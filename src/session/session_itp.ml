@@ -210,10 +210,6 @@ let get_task (s:session) (id:proofNodeID) =
   let node = get_proofNode s id in
   node.proofn_task
 
-let get_table (s: session) (id: proofNodeID) =
-  let node = get_proofNode s id in
-  node.proofn_table
-
 let get_transfNode (s : session) (id : transID) =
   try
     Hint.find s.trans_table id

@@ -85,7 +85,6 @@ val is_below: session -> any -> any -> bool
 type proof_parent = Trans of transID | Theory of theory
 
 val get_task : session -> proofNodeID -> Task.task
-val get_table : session -> proofNodeID -> Trans.naming_table option
 
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :

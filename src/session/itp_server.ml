@@ -83,9 +83,12 @@ let loaded_strategies = ref []
 (****** Exception handling *********)
 
 let p s id =
+(*
   let tables = match (Session_itp.get_table s id) with
   | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
   | Some tables -> tables in
+ *)
+  let _,tables = Controller_itp.goal_task_to_print s id in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in
   (Pretty.create pr apr pr pr false)
@@ -899,14 +902,17 @@ end
 
   (* -- send the task -- *)
   let task_of_id d id do_intros loc =
+    (*
     let task = get_task d.cont.controller_session id in
     let tables = get_table d.cont.controller_session id in
+     *)
+    let task,tables = goal_task_to_print ~do_intros d.cont id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
       match tables with
-      | None -> assert false
-      | Some t ->
+      (*| None -> assert false
+      | Some*) t ->
          let pr = t.Trans.printer in
          let apr = t.Trans.aprinter in
          let module P = (val Pretty.create pr apr pr pr false) in
@@ -1102,7 +1108,7 @@ end
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
       with | _ -> "" in
-      let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
+      let msg, loc, arg_opt = get_exception_message d.cont id e in
       let tr_applied = tr ^ " " ^ (List.fold_left (fun x acc -> x ^ " " ^ acc) "" args) in
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
