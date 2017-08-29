@@ -213,22 +213,22 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
   | _, [] ->
       print_ls fmt ls
   | Some s, [t1] when tight_op s ->
-      fprintf fmt (protect_on (pri > 8) "%s%a")
+      fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Some s, [t1] ->
-      fprintf fmt (protect_on (pri > 5) "%s %a")
+      fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
         s (print_lterm 6) t1
   | Some s, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %s@ %a@]")
+      fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
         (print_lterm 7) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a <- %a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, tl ->
-      fprintf fmt (protect_on (pri > 6) "@[<hov 1>%a@ %a@]")
+      fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
         print_ls ls (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
@@ -241,14 +241,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "%a:%a")
+      fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
         (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
         print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a%a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0)
+                              "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
         print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
@@ -286,7 +287,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_label f1.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
+      fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
