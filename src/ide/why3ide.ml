@@ -544,7 +544,7 @@ let scrolled_session_view =
   GBin.scrolled_window
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
-    ~packing:scrollview#add
+    ~packing:scrollview#add_with_viewport
     ()
 
 (* Vertical pan *)
