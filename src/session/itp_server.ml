@@ -654,7 +654,7 @@ end
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    try reload_files cont ~use_shapes; true with
+    try let _ = reload_files cont ~use_shapes in true with
     | Loc.Located (loc, e) ->
       let loc = relativize_location cont.controller_session loc in
       let s = Format.asprintf "%a at %a@."

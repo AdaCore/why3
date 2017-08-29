@@ -93,13 +93,7 @@ val print_session : Format.formatter -> controller -> unit
 val goal_task_to_print :
   ?do_intros:bool -> controller -> proofNodeID -> Task.task * Trans.naming_table
 
-(*
-
-  - TODO: the presence of obsolete goals should be returned somehow by
-    that function, as the presence of unmatch old theories or goals
-
- *)
-val reload_files : controller -> use_shapes:bool -> unit  (* (bool * bool) see above *)
+val reload_files : controller -> use_shapes:bool -> bool * bool
 (** reload the files of the given session:
 
   - each file is parsed again and theories/goals extracted from it. If

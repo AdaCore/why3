@@ -235,8 +235,12 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
         exit 1
       end
   in
-  let callback _paid _pastatus = () in
-  let notification _any = () in
+  let callback _paid _pastatus =
+    Debug.dprintf debug "[Replay] callback on node paid pastatus@."
+  in
+  let notification _any =
+    Debug.dprintf debug "[Replay] notified on node any@."
+  in
   if !opt_provers = [] then
     let () =
       C.replay ~obsolete_only:false ~use_steps:!opt_use_steps ~callback ~notification ~final_callback cont
@@ -346,17 +350,16 @@ let () =
     let ses,use_shapes = S.load_session dir in
     let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
-    let found_obs, some_merge_miss =
+    let found_obs, found_detached =
       try
         Controller_itp.reload_files cont ~use_shapes;
-        true, false (* TODO *)
       with
       | e ->
          Format.eprintf "%a@." Exn_printer.exn_printer e;
          exit 1
     in
     Debug.dprintf debug " done.@.";
-    if !opt_obsolete_only && not found_obs
+    if !opt_obsolete_only && not found_detached
     then
       begin
         eprintf "Session is not obsolete, hence not replayed@.";
@@ -371,9 +374,10 @@ let () =
     in
  *)
     if found_obs then eprintf "[Warning] session is obsolete@.";
-    if some_merge_miss then eprintf "[Warning] some goals were missed during merge@.";
-    add_to_check_no_smoke some_merge_miss found_obs cont;
-    Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ());
+    if found_detached then eprintf "[Warning] found detached goals ot theories or transformations@.";
+    add_to_check_no_smoke found_detached found_obs cont;
+    Debug.dprintf debug "[Replay] starting scheduler@.";
+    Unix_scheduler.Unix_scheduler.main_loop ~prompt:"scheduler> " (fun _ -> ());
     eprintf "main replayer loop exited unexpectedly@.";
     exit 1
   with
@@ -387,6 +391,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3newreplay.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3replay.opt"
 End:
 *)

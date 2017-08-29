@@ -217,60 +217,26 @@ let print_session fmt c =
 
 
 
-let read_file env ?format fn =
-  let theories = Env.read_file Env.base_language env ?format fn in
-  let ltheories =
-    Stdlib.Mstr.fold
-      (fun name th acc ->
-        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
-        let th_name =
-          Ident.id_register (Ident.id_derive name th.Theory.th_name) in
-         match th.Theory.th_name.Ident.id_loc with
-           | Some l -> (l,th_name,th)::acc
-           | None   -> (Loc.dummy_position,th_name,th)::acc)
-      theories []
-  in
-  let th =  List.sort
-      (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-      ltheories
-  in
-  List.map (fun (_,_,a) -> a) th
-
 
 (** reload files, associating old proof attempts and transformations
     to the new goals.  old theories and old goals for which we cannot
     find a corresponding new theory resp. old goal are kept, with
     tasks associated to them *)
 
-let merge_file (old_ses : session) (c : controller) ~use_shapes _ file =
-  let format = file_format file in
-  let old_theories = file_theories file in
-  let file_name = Filename.concat (get_dir old_ses) (file_name file) in
-  let new_theories =
-    try
-      read_file c.controller_env file_name ?format
-    with e -> (* TODO: filter only syntax error and typing errors *)
-      raise e
-  in
-  merge_file_section
-    c.controller_session ~use_shapes ~old_ses ~old_theories
-    ~env:c.controller_env file_name new_theories format
-
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <-
     empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
   try
-    Stdlib.Hstr.iter
-      (fun f -> merge_file old_ses c ~use_shapes f)
-      (get_files old_ses);
+    merge_files ~use_shapes c.controller_env c.controller_session old_ses
   with e ->
     c.controller_session <- old_ses;
     raise e
 
 let add_file c ?format fname =
-  let theories = read_file c.controller_env ?format fname in
-  add_file_section c.controller_session fname theories format
+  let theories = Session_itp.read_file c.controller_env ?format fname in
+  let (_ : file) = add_file_section c.controller_session fname theories format in
+  ()
 
 
 module type Scheduler = sig

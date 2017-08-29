@@ -90,8 +90,7 @@ let read_update_session ~allow_obsolete env config fname =
   let cont = Controller_itp.create_controller config env session in
   let found_obs, some_merge_miss =
     try
-      Controller_itp.reload_files cont ~use_shapes;
-      true, false (* TODO: take allow_obsolete, return values *)
+      Controller_itp.reload_files cont ~use_shapes
     with
     | e ->
        Format.eprintf "%a@." Exn_printer.exn_printer e;
