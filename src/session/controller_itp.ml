@@ -78,7 +78,6 @@ type controller =
     controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_tasks_for_print : (bool * Task.task * Trans.naming_table) Hpn.t;
   }
 
 
@@ -89,7 +88,6 @@ let create_controller config env ses =
       controller_config = config;
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
-      controller_tasks_for_print = Hpn.create 7;
     }
   in
   let provers = Whyconf.get_provers config in
@@ -117,31 +115,6 @@ let get_undetached_children_no_pa s any : any list =
   | APn pn  -> List.map (fun tn -> ATn tn) (get_transformations s pn)
   | APa _ -> []
 
-
-
-
-
-(* handling of task printing with intros *)
-
-let goal_task_to_print ?do_intros c n =
-  try
-    let (b,t,ta) = Hpn.find c.controller_tasks_for_print n in
-    match do_intros with
-    | None -> t,ta
-    | Some b' -> if b <> b' then raise Not_found; t,ta
-  with Not_found ->
-    let t = get_task c.controller_session n in
-    let do_intros =
-      match do_intros with
-      | None -> false
-      | Some b -> b
-    in
-    let t =
-      if do_intros then Trans.apply Introduction.introduce_premises t else t
-    in
-    let ta = Args_wrapper.build_naming_tables t in
-    Hpn.add c.controller_tasks_for_print n (do_intros,t,ta);
-    t,ta
 
 
 (* printing *)
@@ -272,8 +245,7 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback =
     Whyconf.get_complete_command
       config_pr
       ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
-  let task = Session_itp.get_task c.controller_session id in
-  (* let table = Session_itp.get_table c.controller_session id in *)
+  let task,_table = Session_itp.get_task c.controller_session id in
   let call =
     Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
                       ~limit (*?name_table:table*) driver task
@@ -392,7 +364,7 @@ let schedule_proof_attempt ?proof_script c id pr
 let create_file_rel_path c pr pn =
   let session = c.controller_session in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  let task = Session_itp.get_task session pn in
+  let task,_table = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
@@ -407,7 +379,7 @@ let create_file_rel_path c pr pn =
 let update_edit_external_proof c pn ?panid pr =
   let session = c.controller_session in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  let task = Session_itp.get_task session pn in
+  let task,_table = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let file =
     match panid with
@@ -535,7 +507,7 @@ let schedule_transformation_r c id name args ~callback =
     | None -> raise (Trans.Bad_name_table "Controller_itp.schedule_transformation_r")
     | Some table -> table in
  *)
-    let task,table = goal_task_to_print c id in
+    let task,table = get_task c.controller_session id in
     begin
       try
         let subtasks =

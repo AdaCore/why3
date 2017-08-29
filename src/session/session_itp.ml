@@ -57,8 +57,6 @@ type proof_attempt_node = {
 type proof_node = {
   proofn_name                    : Ident.ident;
   proofn_expl                    : string;
-  proofn_task                    : Task.task;
-  proofn_table                   : Trans.naming_table option;
   proofn_parent                  : proof_parent;
   proofn_checksum                : Termcode.checksum option;
   proofn_shape                   : Termcode.shape;
@@ -108,12 +106,17 @@ type session = {
   session_files                 : file Hstr.t;
   mutable session_shape_version : int;
   session_prover_ids            : int Hprover.t;
+  (* tasks *)
+  session_raw_tasks : Task.task Hpn.t;
+  session_tasks : (bool * Task.task * Trans.naming_table) Hpn.t;
   (* proved status *)
   file_state: bool Hstr.t;
   th_state: bool Ident.Hid.t;
   tn_state: bool Htn.t;
   pn_state : bool Hpn.t;
 }
+
+
 
 let theory_parent s th =
   Hstr.find s.session_files th.theory_parent_name
@@ -206,9 +209,28 @@ let get_proofNode (s : session) (id : proofNodeID) =
     Hint.find s.proofNode_table id
   with Not_found -> raise BadID
 
-let get_task (s:session) (id:proofNodeID) =
-  let node = get_proofNode s id in
-  node.proofn_task
+let get_raw_task s id =
+  Hpn.find s.session_raw_tasks id
+
+let get_task ?do_intros s n =
+  try
+    let (b,ti,ta) = Hpn.find s.session_tasks n in
+    match do_intros with
+    | None -> (ti,ta)
+    | Some b' -> if b <> b' then raise Not_found; (ti,ta)
+  with Not_found ->
+    let t = get_raw_task s n in
+    let do_intros =
+      match do_intros with
+      | None -> true
+      | Some b -> b
+    in
+    let ti =
+      if do_intros then Trans.apply Introduction.introduce_premises t else t
+    in
+    let ta = Args_wrapper.build_naming_tables ti in
+    Hpn.add s.session_tasks n (do_intros,ti,ta);
+    ti,ta
 
 let get_transfNode (s : session) (id : transID) =
   try
@@ -270,17 +292,17 @@ let is_detached (s: session) (a: any) =
      end
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
-    let pn = get_proofNode s pn_id in
-    pn.proofn_task = None ||
+    let _pn = get_proofNode s pn_id in
+    (* pn.proofn_task = None || *)
     List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
   | APn pn     ->
-    let pn = get_proofNode s pn in
-    pn.proofn_task = None
+    let _pn = get_proofNode s pn in
+    (* pn.proofn_task = None *) false
   | APa pa     ->
     let pa = get_proof_attempt_node s pa in
     let pn_id = pa.parent in
-    let pn = get_proofNode s pn_id in
-    pn.proofn_task = None
+    let _pn = get_proofNode s pn_id in
+    (* pn.proofn_task = None *) false
 
 let rec get_encapsulating_theory s any =
   match any with
@@ -492,10 +514,12 @@ let empty_session ?shape_version dir =
     session_files = Hstr.create 3;
     session_shape_version = shape_version;
     session_prover_ids = Hprover.create 7;
+    session_raw_tasks = Hpn.create 97;
+    session_tasks = Hpn.create 97;
     file_state = Hstr.create 3;
     th_state = Ident.Hid.create 7;
-    tn_state = Htn.create 42;
-    pn_state = Hpn.create 42;
+    tn_state = Htn.create 97;
+    pn_state = Hpn.create 97;
   }
 
 (**************************************************)
@@ -541,26 +565,25 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
    of proofNodeID [id] of parent [p] of task [t] *)
 let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
-  let tables = Args_wrapper.build_naming_tables t in
+  (* let tables = Args_wrapper.build_naming_tables t in *)
   let sum = Some (Termcode.task_checksum ~version t) in
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
              proofn_expl = expl;
-             proofn_task = t;
-             proofn_table = Some tables;
+             (* proofn_table = Some tables; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
              proofn_attempts = Hprover.create 7;
              proofn_transformations = [] } in
+  Hpn.add s.session_raw_tasks node_id t;
   Hint.add s.proofNode_table node_id pn
 
 let mk_proof_node_no_task (s : session) (n : Ident.ident)
     (parent : proof_parent) (node_id : proofNodeID) sum shape proved =
   let pn = { proofn_name = n;
              proofn_expl = "";
-             proofn_task = None;
-             proofn_table = None;
+             (* proofn_table = None; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -1376,10 +1399,7 @@ let add_registered_transformation s env old_tr goal_id =
     tr
   with Not_found ->
     Debug.dprintf debug "[merge_theory] trans not found@.";
-    let task = goal.proofn_task in
-    let tables = match goal.proofn_table with
-    | None -> raise (Trans.Bad_name_table "Session_itp.add_registered_transformation")
-    | Some tables -> tables in
+    let task,tables = get_task s goal_id in
     let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args tables task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 

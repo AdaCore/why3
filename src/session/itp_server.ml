@@ -88,7 +88,7 @@ let p s id =
   | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
   | Some tables -> tables in
  *)
-  let _,tables = Controller_itp.goal_task_to_print s id in
+  let _,tables = Session_itp.get_task s id in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in
   (Pretty.create pr apr pr pr false)
@@ -790,7 +790,7 @@ end
         let session = d.cont.Controller_itp.controller_session in
         (match node with
         | APn pr_node ->
-            let task = Session_itp.get_task session pr_node in
+            let task,_table = Session_itp.get_task session pr_node in
             let b = label_detection task in
             if b then
               (focused_node := Focus_on node;
@@ -906,7 +906,7 @@ end
     let task = get_task d.cont.controller_session id in
     let tables = get_table d.cont.controller_session id in
      *)
-    let task,tables = goal_task_to_print ~do_intros d.cont id in
+    let task,tables = get_task ~do_intros d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
@@ -1108,7 +1108,7 @@ end
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
       with | _ -> "" in
-      let msg, loc, arg_opt = get_exception_message d.cont id e in
+      let msg, loc, arg_opt = get_exception_message d.cont.controller_session id e in
       let tr_applied = tr ^ " " ^ (List.fold_left (fun x acc -> x ^ " " ^ acc) "" args) in
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
