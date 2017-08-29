@@ -443,28 +443,11 @@ let menu_quit =
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
 
-let replay_menu_item =
-  create_menu_item tools_factory ~key:GdkKeysyms._R "_Replay obsolete"
-                   "Replay all obsolete proofs"
-let clean_menu_item =
-  create_menu_item tools_factory  "Clean"
-                   "Remove unsuccessful proofs or transformations that are below a proved goal"
 
-let remove_item =
-  create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations"
-
-let mark_obsolete_item =
-  create_menu_item tools_factory "Mark obsolete"
-                   "Mark all proof nodes below the current selected nodes as obsolete"
-
-let focus_item =
-  create_menu_item tools_factory "Focus"
-    "Focus on proof node"
-
-let unfocus_item =
-  create_menu_item tools_factory "Unfocus"
-    "Unfocus"
+let provers_factory =
+  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  new GMenu.factory tools_submenu_provers
 
 
 
@@ -1190,52 +1173,6 @@ let (_ : GtkSignal.id) =
   in
   goals_view#event#connect#button_press ~callback
 
-(***********************)
-(* Tools menu signals  *)
-(***********************)
-
-let () =
-  connect_menu_item
-    replay_menu_item
-    ~callback:(fun () -> send_request Replay_req);
-  connect_menu_item
-    clean_menu_item
-    ~callback:(fun _ -> send_request Clean_req);
-  connect_menu_item
-    remove_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Remove_subtree id)
-               | _ -> print_message "Select only one node to perform this action");
-  connect_menu_item
-    mark_obsolete_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Mark_obsolete_req id)
-               | _ -> print_message "Select only one node to perform this action");
-  connect_menu_item
-    focus_item
-    ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] ->
-          let id = get_node_id r#iter in
-          send_request (Focus_req id);
-          (* TODO not efficient *)
-          clear_tree_and_table goals_model;
-          send_request (Get_Session_Tree_req);
-      | _ -> print_message "Select only one node to perform this action");
-  connect_menu_item
-    unfocus_item
-    ~callback:(fun () ->
-      send_request Unfocus_req;
-      (* TODO not efficient *)
-      clear_tree_and_table goals_model;
-      send_request (Get_Session_Tree_req))
-
 
 (*************************************)
 (* Commands of the Experimental menu *)
@@ -1555,29 +1492,24 @@ let new_node ?parent (* ?(collapse=false) *) id name typ detached =
     Hint.find node_id_to_gtree id
 
 
-(*****************************)
-(* tools submenu for provers *)
-(*****************************)
+(**************************************************)
+(* tools submenus for provers and transformations *)
+(**************************************************)
 
-let provers_factory =
-  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
-  let tools_submenu_provers = tools_factory#add_submenu "Provers" in
-  new GMenu.factory tools_submenu_provers
+let sanitize_markup x =
+  let remove = function
+    | '_' -> "__"
+    | c -> String.make 1 c in
+  Ident.sanitizer remove remove (Glib.Markup.escape_text x)
+
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
+
+
 
 let add_submenu_prover (shortcut,prover) =
-(*
-  let provers =
-    C.Mprover.fold
-      (fun k p acc ->
-       let pr = p.prover in
-       if List.mem (C.prover_parseable_format pr) gconfig.hidden_provers
-       then acc
-       else C.Mprover.add k p acc)
-        provers C.Mprover.empty
-  in
-  C.Mprover.iter
-    (fun p _ ->
- *)
   let  i = create_menu_item
              provers_factory
              prover
@@ -1588,16 +1520,7 @@ let add_submenu_prover (shortcut,prover) =
     interp shortcut
   in
   connect_menu_item i ~callback
-(* prover button, obsolete
-  let b = GButton.button ~packing:provers_box#add ~label:n () in
-  b#misc#set_tooltip_markup
-    (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goal(s)</b>"
-                    C.print_prover p);
-  let (_ : GtkSignal.id) =
-    b#connect#clicked
-      ~callback:(fun () -> prover_on_selected_goals p)
-  in
- *)
+
 
 
 let init_completion provers transformations commands =
@@ -1626,6 +1549,105 @@ let init_completion provers transformations commands =
   command_entry_completion#set_match_func match_function;
 
   command_entry#set_completion command_entry_completion
+
+
+let () =
+  let transformations = Server_utils.list_transforms () in
+  let add_submenu_transform name filter =
+    let submenu = tools_factory#add_submenu name in
+    let submenu = new GMenu.factory submenu ~accel_group in
+    let iter ((name,_) as desc) =
+      let callback () = interp name in
+      let i = create_menu_item submenu (sanitize_markup name) (string_of_desc desc) in
+      connect_menu_item i ~callback
+  in
+  let trans = List.filter filter transformations in
+  List.iter iter trans
+  in
+  add_submenu_transform
+    "transformations (a-e)"
+    (fun (x,_) -> x < "eliminate");
+  add_submenu_transform
+    "transformations (eliminate)"
+    (fun (x,_) -> x >= "eliminate" && x < "eliminatf");
+  add_submenu_transform
+    "transformations (e-r)"
+    (fun (x,_) -> x >= "eliminatf" && x < "s");
+  add_submenu_transform "transformations (s-z)"
+                        (fun (x,_) -> x >= "s");
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  ()
+
+(* complete the tools menu *)
+
+let replay_menu_item =
+  create_menu_item tools_factory "Replay obsolete"
+                   "Replay all obsolete proofs"
+
+let clean_menu_item =
+  create_menu_item tools_factory  "Clean"
+                   "Remove unsuccessful proofs or transformations that are below a proved goal"
+
+let remove_item =
+  create_menu_item tools_factory "Remove"
+                   "Remove the selected proof attempts or transformations"
+
+let mark_obsolete_item =
+  create_menu_item tools_factory "Mark obsolete"
+                   "Mark all proof nodes below the current selected nodes as obsolete"
+
+let focus_item =
+  create_menu_item tools_factory "Focus"
+    "Focus on proof node"
+
+let unfocus_item =
+  create_menu_item tools_factory "Unfocus"
+    "Unfocus"
+
+let () =
+  connect_menu_item
+    replay_menu_item
+    ~callback:(fun () -> send_request Replay_req);
+  connect_menu_item
+    clean_menu_item
+    ~callback:(fun _ -> send_request Clean_req);
+  connect_menu_item
+    remove_item
+    ~callback:(fun () ->
+               match get_selected_row_references () with
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Remove_subtree id)
+               | _ -> print_message "Select only one node to perform this action");
+  connect_menu_item
+    mark_obsolete_item
+    ~callback:(fun () ->
+               match get_selected_row_references () with
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Mark_obsolete_req id)
+               | _ -> print_message "Select only one node to perform this action");
+  connect_menu_item
+    focus_item
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Focus_req id);
+          (* TODO not efficient *)
+          clear_tree_and_table goals_model;
+          send_request (Get_Session_Tree_req);
+      | _ -> print_message "Select only one node to perform this action");
+  connect_menu_item
+    unfocus_item
+    ~callback:(fun () ->
+      send_request Unfocus_req;
+      (* TODO not efficient *)
+      clear_tree_and_table goals_model;
+      send_request (Get_Session_Tree_req))
+
+
+(* the command-line *)
 
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;

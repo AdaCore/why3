@@ -902,21 +902,14 @@ end
 
   (* -- send the task -- *)
   let task_of_id d id do_intros loc =
-    (*
-    let task = get_task d.cont.controller_session id in
-    let tables = get_table d.cont.controller_session id in
-     *)
     let task,tables = get_task ~do_intros d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
-      match tables with
-      (*| None -> assert false
-      | Some*) t ->
-         let pr = t.Trans.printer in
-         let apr = t.Trans.aprinter in
-         let module P = (val Pretty.create pr apr pr pr false) in
-         Pp.string_of P.print_sequent task
+      let pr = tables.Trans.printer in
+      let apr = tables.Trans.aprinter in
+      let module P = (val Pretty.create pr apr pr pr false) in
+      Pp.string_of P.print_sequent task
     in
     task_text, loc_color_list
 

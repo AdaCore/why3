@@ -48,13 +48,12 @@
  <goal name="sqrt4_256">
  </goal>
  <goal name="power_sum" proved="true">
- <transf name="induction"  proved="true"arg1="n" arg2="0">
+ <transf name="induction" proved="true" arg1="n" arg2="0">
   <goal name="power_sum.0" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="power_sum.1" proved="true">
   <proof prover="0"><result status="valid" time="0.16" steps="11"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
   </goal>
  </transf>
  </goal>

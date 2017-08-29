@@ -114,17 +114,18 @@ let cont_from_session ~notify cont f : bool option =
 let sort_pair (x,_) (y,_) = String.compare x y
 
 let list_transforms () =
+  let l =
     List.rev_append
       (List.rev_append (Trans.list_transforms ()) (Trans.list_transforms_l ()))
       (List.rev_append (Trans.list_transforms_with_args ()) (Trans.list_transforms_with_args_l ()))
+  in List.sort sort_pair l
 
 let list_transforms_query _cont _args =
   let l = list_transforms () in
   let print_trans_desc fmt (x,r) =
     Format.fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r
   in
-  Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc)
-    (List.sort sort_pair l)
+  Pp.string_of (Pp.print_list Pp.newline2 print_trans_desc) l
 
 let list_provers cont _args =
   let l =

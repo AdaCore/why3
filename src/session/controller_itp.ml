@@ -501,12 +501,7 @@ let schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback ~notificat
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
-(*
-    let task = get_task c.controller_session id in
-    let table = match get_table c.controller_session id with
-    | None -> raise (Trans.Bad_name_table "Controller_itp.schedule_transformation_r")
-    | Some table -> table in
- *)
+    (* TODO: use get_raw_task instead, and make only the needed intros *)
     let task,table = get_task c.controller_session id in
     begin
       try
