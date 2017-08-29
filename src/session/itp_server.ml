@@ -790,7 +790,7 @@ end
         let session = d.cont.Controller_itp.controller_session in
         (match node with
         | APn pr_node ->
-            let task,_table = Session_itp.get_task session pr_node in
+            let task,_table = Session_itp.get_task ~do_intros:false session pr_node in
             let b = label_detection task in
             if b then
               (focused_node := Focus_on node;
