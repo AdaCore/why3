@@ -119,6 +119,8 @@ type session = {
 
 
 let theory_parent s th =
+  Debug.dprintf debug "[Session_itp.theory_parent] th.parent_name = %s@."
+                th.theory_parent_name;
   Hstr.find s.session_files th.theory_parent_name
 
 let session_iter_proof_attempt f s =
@@ -778,7 +780,9 @@ let update_theory_node notification s th =
       notification (ATh th);
       try let p = theory_parent s th in
           update_file_node notification s p
-      with Not_found -> Format.eprintf "Session_itp.update_theory_node: parent missing@."; exit 1
+      with Not_found when not (Debug.test_flag Debug.stack_trace) ->
+        Format.eprintf "[Fatal] Session_itp.update_theory_node: parent missing@.";
+        assert false
     end
 
 let rec update_goal_node notification s id =
@@ -792,8 +796,10 @@ let rec update_goal_node notification s id =
       match get_proof_parent s id with
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
-      | exception Not_found ->
-                  Format.eprintf "Session_itp.update_goal_node: parent missing@."; exit 1
+      | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
+                  Format.eprintf "Session_itp.update_goal_node: parent missing@.";
+                  Printexc.print_backtrace stderr;
+                  assert false
     end
 
 and update_trans_node notification s trid =
@@ -1392,13 +1398,12 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
-    let tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
+    let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
         goal.proofn_transformations in
     (* NOTE: should not happen *)
-    Debug.dprintf debug "[merge_theory] trans found@.";
-    tr
+    Debug.dprintf debug "[merge_theory] transformation already present@.";
+    assert false
   with Not_found ->
-    Debug.dprintf debug "[merge_theory] trans not found@.";
     let task,tables = get_task s goal_id in
     let subgoals = Trans.apply_transform_args old_tr.transf_name env old_tr.transf_args tables task in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
@@ -1441,10 +1446,9 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
-        Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
         merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,s), None) ->
-        Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( : %s @."
+        Debug.dprintf debug "[merge_theory] missed subgoal: %s@."
           (get_proofNode s id).proofn_name.Ident.id_string;
         found_detached := true)
     associated;
@@ -1511,8 +1515,9 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         Debug.dprintf debug "[merge_theory] pairing paired one goal, yeah !@.";
         merge_goal ~use_shapes env s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
-      | (_, None) ->
-        Debug.dprintf debug "[merge_theory] pairing found missed sub goal :( @.";
+      | ((id,_), None) ->
+         Debug.dprintf debug "[merge_theory] pairing found missed sub goal: %s@."
+                       (get_proofNode s id).proofn_name.Ident.id_string;
         found_detached := true)
     associated;
   (* store the detached goals *)
@@ -1549,6 +1554,7 @@ let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
 let add_file_section (s:session) (fn:string)
     (theories:Theory.theory list) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
+  Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
     begin
       Debug.dprintf debug "[session] file %s already in database@." fn;
@@ -1571,6 +1577,7 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
   let f = add_file_section s fn [] format in
+  let fn = f.file_name in
   let theories,detached =
     let old_th_table = Hstr.create 7 in
     List.iter
