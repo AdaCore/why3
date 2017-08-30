@@ -1160,6 +1160,22 @@ end
     C.clean_session d.cont ~removed
 
 
+  let remove_node nid =
+    let d = get_server_data () in
+    let n = any_from_node_ID nid in
+    begin
+      try
+        Session_itp.remove_subtree
+          d.cont.controller_session n
+          ~notification:(notify_change_proved d.cont)
+          ~removed:(fun x ->
+                    let nid = node_ID_from_any x in
+                    remove_any_node_ID x;
+                    P.notify (Remove nid))
+      with RemoveError -> (* TODO send an error instead of information *)
+        P.notify (Message (Information "Cannot remove attached proof nodes or theories, and proof_attempt that did not yet return"))
+    end
+
   (* ----------------- Save session --------------------- *)
   let save_session () =
     let d = get_server_data () in
@@ -1197,7 +1213,16 @@ end
     (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
 
   let () = register_command "clean" "remove unsuccessful proof attempts that are below proved goals"
-    (Qnotask (fun _cont _args ->  clean_session (); "Cleaning in progress"))
+    (Qnotask (fun _cont _args ->  clean_session (); "Cleaning done"))
+
+(* TODO: should this remove the current selected node ?
+  let () = register_command
+             "remove_node" "removes a proof attempt or a transformation"
+             (Qnotask (fun _cont args ->
+                       match args with
+                       | [x]
+                       clean_session (); "Remove node done"))
+ *)
 
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
@@ -1285,19 +1310,7 @@ end
         | _ -> focused_node := Focus_on any)
     | Unfocus_req ->
         focused_node := Unfocused
-    | Remove_subtree nid           ->
-        let n = any_from_node_ID nid in
-        begin
-        try
-          Session_itp.remove_subtree d.cont.controller_session n
-            ~notification:(notify_change_proved d.cont)
-            ~removed:(fun x ->
-                        let nid = node_ID_from_any x in
-                        remove_any_node_ID x;
-                        P.notify (Remove nid))
-        with RemoveError -> (* TODO send an error instead of information *)
-          P.notify (Message (Information "Cannot remove attached proof nodes or theories, and proof_attempt that did not yet return"))
-        end
+    | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
         let to_any = any_from_node_ID to_id in
