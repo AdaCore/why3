@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_tree_reconstruction.mlw" expanded="true">
 <theory name="Tree" sum="94da36b854220cd722a2d451bd7b45a0">
@@ -74,10 +74,10 @@
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter build_rec.7" expl="exceptional postcondition">
-  <proof prover="5" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v"><result status="valid" time="0.50"/></proof>
+  <proof prover="0" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_3.v"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="WP_parameter build_rec.8" expl="exceptional postcondition">
-  <proof prover="5" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v"><result status="valid" time="0.37"/></proof>
+  <proof prover="0" edited="vstte12_tree_reconstruction_WP_TreeReconstruction_WP_parameter_build_rec_4.v"><result status="valid" time="0.37"/></proof>
   </goal>
  </transf>
  </goal>
@@ -99,15 +99,15 @@
  <goal name="WP_parameter harness" expl="VC for harness">
  <transf name="split_goal_wp">
   <goal name="WP_parameter harness.1" expl="postcondition">
-  <proof prover="5" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="0.31"/></proof>
+  <proof prover="0" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_3.v"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter harness.2" expl="VC for harness">
-  <proof prover="5" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v"><result status="valid" time="0.29"/></proof>
+  <proof prover="0" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness_4.v"><result status="valid" time="0.29"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter harness2" expl="VC for harness2">
- <proof prover="5" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"><result status="valid" time="0.38"/></proof>
+ <proof prover="0" edited="vstte12_tree_reconstruction_WP_Harness_WP_parameter_harness2_2.v"><result status="valid" time="0.38"/></proof>
  </goal>
 </theory>
 <theory name="ZipperBasedTermination" sum="68cebb9857482610e9524fbc061fb285">
@@ -133,13 +133,13 @@
 </theory>
 <theory name="ZipperBased" sum="3445bf6bce561868d94ea5facd4b83d1">
  <goal name="forest_depths_append" expl="">
- <proof prover="5" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
+ <proof prover="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="g_append" expl="">
- <proof prover="5" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="0.97"/></proof>
+ <proof prover="0" timelimit="20" edited="vstte12_tree_reconstruction_WP_ZipperBased_g_append_1.v"><result status="valid" time="0.97"/></proof>
  </goal>
  <goal name="right_nil" expl="">
- <proof prover="5" timelimit="29" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="2.67"/></proof>
+ <proof prover="0" timelimit="29" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="2.67"/></proof>
  </goal>
  <goal name="main_lemma" expl="">
  <proof prover="2"><result status="valid" time="0.02" steps="107"/></proof>
@@ -176,7 +176,7 @@
   <goal name="WP_parameter tc.9" expl="precondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter tc.9.1" expl="VC for tc">
-   <proof prover="2"><result status="valid" time="0.53" steps="539"/></proof>
+   <proof prover="2"><result status="valid" time="0.34" steps="539"/></proof>
    </goal>
    <goal name="WP_parameter tc.9.2" expl="VC for tc">
    <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
@@ -217,7 +217,7 @@
   <proof prover="3"><result status="valid" time="0.84"/></proof>
   </goal>
   <goal name="WP_parameter tc.19" expl="exceptional postcondition">
-  <proof prover="1"><result status="valid" time="3.40"/></proof>
+  <proof prover="1"><result status="valid" time="2.92"/></proof>
   <proof prover="3"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="WP_parameter tc.20" expl="variant decrease">

@@ -2,7 +2,6 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="1" name="Eprover" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -11,16 +10,17 @@
 <prover id="6" name="CVC3" version="2.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <file name="../generate_all_trees.mlw" expanded="true">
 <theory name="GenerateAllTrees" sum="74df2f00d9dca900f8ace0afd56f044e" expanded="true">
  <goal name="size_nonneg" expl="" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="0.29"/></proof>
+ <proof prover="9" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="0.29"/></proof>
  </goal>
  <goal name="size_left" expl="" expanded="true">
  <proof prover="7"><result status="valid" time="0.14"/></proof>
  </goal>
  <goal name="all_trees_0" expl="" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="0.31"/></proof>
+ <proof prover="9" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="tree_diff" expl="" expanded="true">
  <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.02" steps="9"/></proof>
@@ -52,9 +52,9 @@
   <goal name="WP_parameter combine.8" expl="postcondition" expanded="true">
   <transf name="split_goal_wp" expanded="true">
    <goal name="WP_parameter combine.8.1" expl="postcondition" expanded="true">
-   <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"><result status="valid" time="0.33"/></proof>
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="5"><result status="valid" time="0.09"/></proof>
+   <proof prover="9" edited="generate_all_trees_WP_GenerateAllTrees_WP_parameter_combine_2.v"><result status="valid" time="0.33"/></proof>
    </goal>
    <goal name="WP_parameter combine.8.2" expl="postcondition" expanded="true">
    <proof prover="8" timelimit="10" memlimit="0"><result status="valid" time="0.84" steps="1582"/></proof>
