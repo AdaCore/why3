@@ -83,11 +83,6 @@ let loaded_strategies = ref []
 (****** Exception handling *********)
 
 let p s id =
-(*
-  let tables = match (Session_itp.get_table s id) with
-  | None -> Args_wrapper.build_naming_tables (Session_itp.get_task s id)
-  | Some tables -> tables in
- *)
   let _,tables = Session_itp.get_task s id in
   let pr = tables.Trans.printer in
   let apr = tables.Trans.aprinter in

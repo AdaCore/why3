@@ -407,11 +407,6 @@ let interp commands_table config cont id s =
     | Qnotask f, _ -> Query (f cont args)
     | Qtask _, None -> QError "please select a goal first"
     | Qtask f, Some id ->
-(*
-       let table = match Session_itp.get_table cont.Controller_itp.controller_session id with
-       | None -> raise (Trans.Bad_name_table "Server_utils.interp")
-       | Some table -> table in
- *)
        let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
        let s = try Query (f cont table args) with
        | Undefined_id s -> QError ("No existing id corresponding to " ^ s)

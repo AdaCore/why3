@@ -245,7 +245,7 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback =
     Whyconf.get_complete_command
       config_pr
       ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
-  let task,_table = Session_itp.get_task c.controller_session id in
+  let task = Session_itp.get_raw_task c.controller_session id in
   let call =
     Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
                       ~limit (*?name_table:table*) driver task
@@ -364,7 +364,7 @@ let schedule_proof_attempt ?proof_script c id pr
 let create_file_rel_path c pr pn =
   let session = c.controller_session in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  let task,_table = Session_itp.get_task session pn in
+  let task = Session_itp.get_raw_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
@@ -379,7 +379,7 @@ let create_file_rel_path c pr pn =
 let update_edit_external_proof c pn ?panid pr =
   let session = c.controller_session in
   let driver = snd (Hprover.find c.controller_provers pr) in
-  let task,_table = Session_itp.get_task session pn in
+  let task = Session_itp.get_raw_task session pn in
   let session_dir = Session_itp.get_dir session in
   let file =
     match panid with
@@ -501,7 +501,8 @@ let schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback ~notificat
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
-    (* TODO: use get_raw_task instead, and make only the needed intros *)
+    (* TODO: use get_raw_task instead, and make only the needed intros
+       or alternatively, use 'revert' *)
     let task,table = get_task c.controller_session id in
     begin
       try
