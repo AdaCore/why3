@@ -377,7 +377,7 @@ let () =
     if found_detached then eprintf "[Warning] found detached goals ot theories or transformations@.";
     add_to_check_no_smoke found_detached found_obs cont;
     Debug.dprintf debug "[Replay] starting scheduler@.";
-    Unix_scheduler.Unix_scheduler.main_loop ~prompt:"scheduler> " (fun _ -> ());
+    Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ());
     eprintf "main replayer loop exited unexpectedly@.";
     exit 1
   with
