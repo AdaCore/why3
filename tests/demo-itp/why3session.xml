@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../demo-itp.mlw">
 <theory name="M" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
@@ -41,9 +41,17 @@
  <goal name="g2">
  </goal>
 </theory>
-<theory name="Power" sum="4cc6d21f246903f98feda68da4e48c65">
+<theory name="Power" sum="d556403292edd610f7e601c4df0535bb">
  <goal name="power_1" proved="true">
  <proof prover="1"><result status="valid" time="0.17"/></proof>
+ <transf name="replace" proved="true" arg1="1" arg2="0+1" arg3="power_1">
+  <goal name="power_1.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="power_1.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="sqrt4_256">
  </goal>
@@ -53,7 +61,8 @@
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="power_sum.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.16" steps="11"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.87" steps="15"/></proof>
+  <proof prover="1" timelimit="25"><undone/></proof>
   </goal>
  </transf>
  </goal>

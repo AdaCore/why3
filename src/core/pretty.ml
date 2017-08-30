@@ -523,7 +523,7 @@ let print_sequent fmt task =
       | [] -> assert false
       | [g] ->
          fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
-         print_goal fmt g
+         print_decl fmt g
       | d :: r ->
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
