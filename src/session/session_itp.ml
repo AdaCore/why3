@@ -108,7 +108,7 @@ type session = {
   session_prover_ids            : int Hprover.t;
   (* tasks *)
   session_raw_tasks : Task.task Hpn.t;
-  session_tasks : (bool * Task.task * Trans.naming_table) Hpn.t;
+  session_tasks : (Task.task * Trans.naming_table) Hpn.t;
   (* proved status *)
   file_state: bool Hstr.t;
   th_state: bool Ident.Hid.t;
@@ -214,24 +214,14 @@ let get_proofNode (s : session) (id : proofNodeID) =
 let get_raw_task s id =
   Hpn.find s.session_raw_tasks id
 
-let get_task ?do_intros s n =
+let get_task s n =
   try
-    let (b,ti,ta) = Hpn.find s.session_tasks n in
-    match do_intros with
-    | None -> (ti,ta)
-    | Some b' -> if b <> b' then raise Not_found; (ti,ta)
+    Hpn.find s.session_tasks n
   with Not_found ->
     let t = get_raw_task s n in
-    let do_intros =
-      match do_intros with
-      | None -> true
-      | Some b -> b
-    in
-    let ti =
-      if do_intros then Trans.apply Introduction.introduce_premises t else t
-    in
+    let ti = Trans.apply Introduction.introduce_premises t in
     let ta = Args_wrapper.build_naming_tables ti in
-    Hpn.add s.session_tasks n (do_intros,ti,ta);
+    Hpn.add s.session_tasks n (ti,ta);
     ti,ta
 
 let get_transfNode (s : session) (id : transID) =

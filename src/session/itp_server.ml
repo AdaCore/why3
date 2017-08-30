@@ -790,7 +790,7 @@ end
         let session = d.cont.Controller_itp.controller_session in
         (match node with
         | APn pr_node ->
-            let task,_table = Session_itp.get_task ~do_intros:false session pr_node in
+            let task = Session_itp.get_raw_task session pr_node in
             let b = label_detection task in
             if b then
               (focused_node := Focus_on node;
@@ -902,7 +902,13 @@ end
 
   (* -- send the task -- *)
   let task_of_id d id do_intros loc =
-    let task,tables = get_task ~do_intros d.cont.controller_session id in
+    let task,tables =
+      if do_intros then get_task d.cont.controller_session id
+      else
+        let task = get_raw_task d.cont.controller_session id in
+        let tables = Args_wrapper.build_naming_tables task in
+        task,tables
+    in
     (* This function also send source locations associated to the task *)
     let loc_color_list = if loc then get_locations task else [] in
     let task_text =
