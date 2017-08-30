@@ -325,9 +325,9 @@ let print_notify fmt n =
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
       end
-  | New_node (ni, _pni, _nt,  _nf, _d) -> fprintf fmt "new node %d" ni
+  | New_node (ni, pni, _nt,  _nf, _d) -> fprintf fmt "new node = %d, parent = %d" ni pni
   | Remove _ni                         -> fprintf fmt "remove"
-  | Next_Unproven_Node_Id (_ni, _nj)   -> fprintf fmt "next unproven node_id"
+  | Next_Unproven_Node_Id (ni, nj)   -> fprintf fmt "next unproven node_id from %d is %d" ni nj
   | Initialized _gi                    -> fprintf fmt "initialized"
   | Saved                              -> fprintf fmt "saved"
   | Message msg                        ->

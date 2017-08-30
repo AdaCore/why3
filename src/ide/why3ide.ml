@@ -1396,6 +1396,13 @@ module S = Session_itp
 module C = Controller_itp
 
 
+(* Returns true if the current row is an ancestor of the selected row *)
+let selected_ancestor row =
+  match get_selected_row_references () with
+  | [selected_row] ->
+      not (goals_model#is_ancestor ~iter:row#iter ~descendant:selected_row#iter)
+  | _ -> false
+
 let set_status_and_time_column ?limit row =
   let id = get_node_id row#iter in
   let proved = get_node_proved id in
@@ -1411,9 +1418,12 @@ let set_status_and_time_column ?limit row =
       else
         if proved
         then begin
-            Debug.dprintf debug "Collapsing row for proved node %d@." id;
-            goals_view#collapse_row (goals_model#get_path row#iter);
-            !image_valid
+          Debug.dprintf debug "Collapsing row for proved node %d@." id;
+          (* We should only collapse if it does not collapse the selected row
+             because collapsing unselects the focused row in this case. *)
+          if selected_ancestor row then
+             goals_view#collapse_row (goals_model#get_path row#iter);
+          !image_valid
           end
         else begin
             (* goals_view#expand_row (goals_model#get_path row#iter); *)
@@ -1678,10 +1688,10 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-            end;
-              (* Trying to move cursor on first unproven goal around on all cases
-                 but not when proofAttempt is updated because ad hoc debugging. *)
-              send_request (Get_first_unproven_node id)
+          end;
+          (* Trying to move cursor on first unproven goal around on all cases
+             but not when proofAttempt is updated because ad hoc debugging. *)
+          send_request (Get_first_unproven_node id)
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
