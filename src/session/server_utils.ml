@@ -358,7 +358,7 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-let interp_others commands_table config id cmd args =
+let interp_others commands_table config cmd args =
   match parse_prover_name config cmd args with
   | Some (prover_config, limit) ->
       if prover_config.Whyconf.interactive then
@@ -368,15 +368,12 @@ let interp_others commands_table config id cmd args =
   | None ->
       match cmd, args with
       | "auto", _ ->
-          if id = None then
-            QError ("Please select a valid node id")
-          else
-            let s =
-              match args with
-              | "2"::_ -> "2"
-              | _ -> "1"
-            in
-            Strategies s
+          let s =
+            match args with
+            | "2"::_ -> "2"
+            | _ -> "1"
+          in
+          Strategies s
       | "help", [trans] ->
           let print_trans_desc fmt r =
             Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
@@ -432,7 +429,7 @@ let interp commands_table config cont id s =
       else
         Transform (cmd,t,args)
     | None ->
-      interp_others commands_table config id cmd args
+      interp_others commands_table config cmd args
 
 (***********************)
 (* First Unproven goal *)
