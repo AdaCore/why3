@@ -14,6 +14,9 @@ module Peano
   val constant zero : t
     ensures { result.v = 0 }
 
+  val constant one : t
+    ensures { result.v = 1 }
+
   val succ (x: t) : t
     ensures { result.v = x.v + 1 }
 
@@ -74,4 +77,3 @@ module Peano
     ensures { result.v = min x.v y.v }
 
 end
-
