@@ -239,25 +239,89 @@ let register_observer = (:=) observer
 
 module Hprover = Whyconf.Hprover
 
-let build_prover_call ?proof_script ~cntexample c id pr limit callback =
+(* calling provers, with limits adaptation
+
+ *)
+
+
+(* to avoid corner cases when prover results are obtained very closely
+   to the time or mem limits, we adapt these limits when we replay a
+   proof *)
+
+let adapt_limits ~interactive ~use_steps limits a =
+  let t, m, s =
+    let timelimit = limits.Call_provers.limit_time in
+    let memlimit = limits.Call_provers.limit_mem in
+    match a.proof_state with
+    | Some { Call_provers.pr_answer = r;
+             Call_provers.pr_time = t;
+             Call_provers.pr_steps = s } ->
+       (* increased time limit is 1 + twice the previous running time,
+       but enforced to remain inside the interval [l,2l] where l is
+       the previous time limit *)
+       let t = truncate (1.0 +. 2.0 *. t) in
+       let increased_time = if interactive then t
+                            else max timelimit (min t (2 * timelimit)) in
+       (* increased mem limit is just 1.5 times the previous mem limit *)
+       let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
+       begin
+         match r with
+         | Call_provers.OutOfMemory -> increased_time, memlimit, 0
+         | Call_provers.Timeout -> timelimit, increased_mem, 0
+         | Call_provers.Valid ->
+            let steplimit =
+              if use_steps && not a.proof_obsolete then s else 0
+            in
+            increased_time, increased_mem, steplimit
+         | Call_provers.Unknown _
+         | Call_provers.StepLimitExceeded
+         | Call_provers.Invalid -> increased_time, increased_mem, 0
+         | Call_provers.Failure _
+         | Call_provers.HighFailure ->
+            (* correct ? failures are supposed to appear quickly anyway... *)
+            timelimit, memlimit, 0
+       end
+    | None when interactive -> 0, 0, 0
+    | None -> timelimit, memlimit, 0
+  in
+  { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
+
+let group_answer a =
+  match a with
+  | Call_provers.OutOfMemory
+  | Call_provers.Unknown _
+  | Call_provers.Timeout -> Call_provers.Timeout
+  | _ -> a
+
+let fuzzy_proof_time nres ores =
+  let ansold = ores.Call_provers.pr_answer in
+  let told = ores.Call_provers.pr_time in
+  let ansnew = nres.Call_provers.pr_answer in
+  let tnew = nres.Call_provers.pr_time in
+  if group_answer ansold = group_answer ansnew &&
+       tnew >= told *. 0.9 -. 0.1 && tnew <= told *. 1.1 +. 0.1
+  then { nres with Call_provers.pr_time = told }
+  else nres
+
+
+let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
   let (config_pr,driver) = Hprover.find c.controller_provers pr in
+  let with_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let command =
-    Whyconf.get_complete_command
-      config_pr
-      ~with_steps:Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+    Whyconf.get_complete_command config_pr ~with_steps in
   let task = Session_itp.get_raw_task c.controller_session id in
   let call =
     Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
                       ~limit (*?name_table:table*) driver task
   in
-  let pa = (c.controller_session,id,pr,proof_script,callback,false,call) in
+  let pa = (c.controller_session,id,pr,proof_script,callback,false,call,ores) in
   Queue.push pa prover_tasks_in_progress
 
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,pr_script,callback,started,call) as c =
+    let (ses,id,pr,pr_script,callback,started,call,ores) as c =
       Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
@@ -265,15 +329,17 @@ let timeout_handler () =
        assert (not started);
        callback Running;
        incr number_of_running_provers;
-       Queue.add (ses,id,pr,pr_script,callback,true,call) q
+       Queue.add (ses,id,pr,pr_script,callback,true,call,ores) q
     | Call_provers.ProverFinished res when pr_script = None ->
        if started then decr number_of_running_provers;
+       let res = Opt.fold fuzzy_proof_time res ores in
        (* update the session *)
        update_proof_attempt ses id pr res;
        (* inform the callback *)
        callback (Done res)
     | Call_provers.ProverFinished res (* when pr_script <> None *) ->
        if started then decr number_of_running_provers;
+       let res = Opt.fold fuzzy_proof_time res ores in
        (* update the session *)
        update_proof_attempt ~obsolete:true ses id pr res;
        (* inform the callback *)
@@ -295,9 +361,10 @@ let timeout_handler () =
     try
       for _i = Queue.length prover_tasks_in_progress
           to 3 * !max_number_of_running_provers do
-        let (c,id,pr,limit,proof_script,callback,cntexample) = Queue.pop scheduled_proof_attempts in
+        let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
+          Queue.pop scheduled_proof_attempts in
         try
-          build_prover_call ?proof_script ~cntexample c id pr limit callback
+          build_prover_call ?proof_script ~cntexample c id pr limit callback ores
         with e when not (Debug.test_flag Debug.stack_trace) ->
           (*Format.eprintf
             "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
@@ -314,14 +381,15 @@ let timeout_handler () =
 
 let interrupt () =
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (_ses,_id,_pr,_proof_script,callback,_started,_call) =
+    let (_ses,_id,_pr,_proof_script,callback,_started,_call,_ores) =
       Queue.pop prover_tasks_in_progress in
     (* TODO: apply some Call_provers.interrupt_call call *)
     callback Interrupted
   done;
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
-    let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample) = Queue.pop scheduled_proof_attempts in
+    let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample,_ores) =
+      Queue.pop scheduled_proof_attempts in
     callback Interrupted
   done;
   !observer 0 0 0
@@ -334,10 +402,22 @@ let run_timeout_handler () =
     end
 
 let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback =
-  let panid =
-    graft_proof_attempt c.controller_session id pr ~limit
+  let s = c.controller_session in
+  let limit,ores =
+    try
+      let h = get_proof_attempt_ids s id in
+      let pa = Hprover.find h pr in
+      let a = get_proof_attempt_node s pa in
+      let old_res = a.proof_state in
+      let config_pr,_ = Hprover.find c.controller_provers pr in
+      let interactive = config_pr.Whyconf.interactive in
+      let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
+      let limit = adapt_limits ~interactive ~use_steps limit a in
+      limit, old_res
+    with Not_found -> limit,None
   in
-  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp)
+  let panid = graft_proof_attempt ~limit s id pr in
+  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)
             scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
@@ -493,7 +573,7 @@ let schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback ~notificat
       let call = Call_provers.call_editor ~command:editor file in
       callback panid Running;
       let file = Sysutil.relativize_filename session_dir file in
-      Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call)
+      Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call,None)
         prover_tasks_in_progress;
       run_timeout_handler ()
     end
@@ -501,15 +581,6 @@ let schedule_edition c id pr ~no_edit ~do_check_proof ?file ~callback ~notificat
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
-    (* TODO: use get_raw_task instead, and make only the needed intros
-       or alternatively, use 'revert' *)
-(*
-    let task,table = get_task c.controller_session id in
- *)
- (*
-   let task = get_raw_task c.controller_session id in
-    let table = Args_wrapper.build_naming_tables task in
-  *)
     begin
       try
         let subtasks =
