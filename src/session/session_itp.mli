@@ -204,6 +204,10 @@ val update_proof_attempt : ?obsolete:bool -> session -> proofNodeID ->
     direclty (useful for interactive prover).
 *)
 
+val apply_trans_to_goal :
+  session -> Env.env -> string -> string list -> proofNodeID ->
+  Task.task * Task.task list
+
 val graft_transf : session -> proofNodeID -> string -> string list ->
   Task.task list -> transID
 (** [graft_transf s id name l tl] adds the transformation [name] as a

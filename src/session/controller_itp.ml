@@ -503,11 +503,21 @@ let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
     (* TODO: use get_raw_task instead, and make only the needed intros
        or alternatively, use 'revert' *)
+(*
     let task,table = get_task c.controller_session id in
+ *)
+ (*
+   let task = get_raw_task c.controller_session id in
+    let table = Args_wrapper.build_naming_tables task in
+  *)
     begin
       try
-        let subtasks =
+        let task, subtasks =
+          apply_trans_to_goal c.controller_session c.controller_env name args id
+        in
+(*
           Trans.apply_transform_args name c.controller_env args table task in
+ *)
         (* if result is same as input task, consider it as a failure *)
         begin
           match subtasks with
