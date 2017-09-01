@@ -330,13 +330,14 @@ let timeout_handler () =
        callback Running;
        incr number_of_running_provers;
        Queue.add (ses,id,pr,pr_script,callback,true,call,ores) q
-    | Call_provers.ProverFinished res when pr_script = None ->
+    | Call_provers.ProverFinished res ->
        if started then decr number_of_running_provers;
        let res = Opt.fold fuzzy_proof_time res ores in
        (* update the session *)
        update_proof_attempt ses id pr res;
        (* inform the callback *)
        callback (Done res)
+(*
     | Call_provers.ProverFinished res (* when pr_script <> None *) ->
        if started then decr number_of_running_provers;
        let res = Opt.fold fuzzy_proof_time res ores in
@@ -344,6 +345,7 @@ let timeout_handler () =
        update_proof_attempt ~obsolete:true ses id pr res;
        (* inform the callback *)
        callback (Done res)
+*)
     | Call_provers.ProverInterrupted ->
        if started then decr number_of_running_provers;
        (* inform the callback *)

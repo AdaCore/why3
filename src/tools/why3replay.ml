@@ -29,8 +29,6 @@ let debug = Debug.register_info_flag
     ~desc:"of@ the@ progression@ of@ a@ replay"
     "replay"
 
-let () = Debug.set_flag debug
-
 let files = Queue.create ()
 (*
 let opt_stats = ref true
