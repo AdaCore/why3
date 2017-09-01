@@ -792,6 +792,7 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
                              ~notification
       end in
 
+  if !count = 0 then final_callback !report else
   (* Calling replay on all the proof_attempts of the session *)
   Session_itp.session_iter_proof_attempt replay_pa session
 
