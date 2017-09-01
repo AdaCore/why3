@@ -1385,15 +1385,21 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
     old_pa.proof_state obsolete old_pa.proof_script
     new_goal)
 
-let apply_trans_to_goal s env name args id =
-  (* TODO: use get_raw_task instead, and make only the needed intros
-       or alternatively, use 'revert' *)
-  (*
-    let task,table = get_task c.controller_session id in
-   *)
+let apply_trans_to_goal ~allow_no_effect s env name args id =
+  let task, subtasks =
     let task = get_raw_task s id in
     let table = Args_wrapper.build_naming_tables task in
-    task, Trans.apply_transform_args name env args table task
+    try
+      task, Trans.apply_transform_args name env args table task
+    with _e ->
+      let task,table = get_task s id in
+      task, Trans.apply_transform_args name env args table task
+  in
+  match subtasks with
+  | [t'] when Task.task_equal t' task && not allow_no_effect ->
+     raise Exit
+  | _ -> subtasks
+
 
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
@@ -1404,7 +1410,9 @@ let add_registered_transformation s env old_tr goal_id =
     Debug.dprintf debug "[merge_theory] transformation already present@.";
     assert false
   with Not_found ->
-    let _,subgoals = apply_trans_to_goal s env old_tr.transf_name old_tr.transf_args goal_id in
+    let subgoals =
+      apply_trans_to_goal ~allow_no_effect:true s env old_tr.transf_name old_tr.transf_args goal_id
+    in
     graft_transf s goal_id old_tr.transf_name old_tr.transf_args subgoals
 
 let rec merge_goal ~use_shapes env new_s old_s ~goal_obsolete old_goal new_goal_id =

@@ -512,24 +512,19 @@ let schedule_transformation_r c id name args ~callback =
   *)
     begin
       try
-        let task, subtasks =
-          apply_trans_to_goal c.controller_session c.controller_env name args id
+        let subtasks =
+          apply_trans_to_goal ~allow_no_effect:false
+                              c.controller_session c.controller_env name args id
         in
-(*
-          Trans.apply_transform_args name c.controller_env args table task in
- *)
-        (* if result is same as input task, consider it as a failure *)
-        begin
-          match subtasks with
-          | [t'] when Task.task_equal t' task ->
-             callback (TSfailed (id, Noprogress))
-          | _ ->
-             let tid = graft_transf c.controller_session id name args subtasks in
-             callback (TSdone tid)
-        end
-      with e when not (Debug.test_flag Debug.stack_trace) ->
+        let tid = graft_transf c.controller_session id name args subtasks in
+        callback (TSdone tid)
+      with
+      | Exit ->
+         (* if result is same as input task, consider it as a failure *)
+         callback (TSfailed (id, Noprogress))
+      | e when not (Debug.test_flag Debug.stack_trace) ->
         (* Format.eprintf
-          "@[Exception raised in Trans.apply_transform %s:@ %a@.@]"
+          "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
         callback (TSfailed (id, e))
     end;

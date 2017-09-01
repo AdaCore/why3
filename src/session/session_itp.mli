@@ -205,8 +205,8 @@ val update_proof_attempt : ?obsolete:bool -> session -> proofNodeID ->
 *)
 
 val apply_trans_to_goal :
-  session -> Env.env -> string -> string list -> proofNodeID ->
-  Task.task * Task.task list
+  allow_no_effect:bool -> session -> Env.env -> string -> string list ->
+  proofNodeID -> Task.task list
 
 val graft_transf : session -> proofNodeID -> string -> string list ->
   Task.task list -> transID
