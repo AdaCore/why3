@@ -219,7 +219,7 @@ module ML = struct
     else mk_expr (Eignore e) ity_unit e.e_effect e.e_label
 
   let e_if e1 e2 e3 =
-    mk_expr (Mltree.Eif (e1, e2, e3)) e1.e_ity
+    mk_expr (Mltree.Eif (e1, e2, e3)) e2.e_ity
 
   let e_while e1 e2 =
     mk_expr (Mltree.Ewhile (e1, e2)) ity_unit
