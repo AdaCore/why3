@@ -168,7 +168,7 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
-let not_extractable_theories = ["why3"; "map"; ]
+let not_extractable_theories = ["why3"; "map"; "seq"; ]
 
 let is_not_extractable_theory =
   let h = Hstr.create 16 in
