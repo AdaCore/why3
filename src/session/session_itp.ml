@@ -28,7 +28,10 @@ type proofNodeID = int
 type proofAttemptID = int
 
 let print_proofNodeID fmt id =
-  Format.fprintf fmt "%d" id
+  Format.fprintf fmt "proofNodeID<%d>" id
+
+let print_proofAttemptID fmt id =
+  Format.fprintf fmt "proofAttemptID<%d>" id
 
 type theory = {
   theory_name                   : Ident.ident;

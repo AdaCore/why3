@@ -30,6 +30,7 @@ type proofNodeID
 val print_proofNodeID : Format.formatter -> proofNodeID -> unit
 type transID
 type proofAttemptID
+val print_proofAttemptID : Format.formatter -> proofAttemptID -> unit
 
 module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID

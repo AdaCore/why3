@@ -2,96 +2,96 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Coq" version="8.6.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../../../modules/array.mlw" expanded="true">
-<theory name="Array" sum="a4386c74c7fc0ab46ab3dd9d9d5cae40">
- <goal name="WP_parameter defensive_get" expl="VC for defensive_get">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1500"/>
+<prover id="1" name="Coq" version="8.6.1" timelimit="2" steplimit="0" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1500"/>
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1500"/>
+<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1500"/>
+<prover id="5" name="Z3" version="4.4.0" timelimit="6" steplimit="0" memlimit="1500"/>
+<file name="../../../modules/array.mlw">
+<theory name="Array" proved="true" sum="a4386c74c7fc0ab46ab3dd9d9d5cae40">
+ <goal name="WP_parameter defensive_get" expl="VC for defensive_get" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter defensive_set" expl="VC for defensive_set">
+ <goal name="WP_parameter defensive_set" expl="VC for defensive_set" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="WP_parameter fill" expl="VC for fill">
+ <goal name="WP_parameter fill" expl="VC for fill" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="WP_parameter self_blit" expl="VC for self_blit">
- <proof prover="2"><result status="valid" time="0.10" steps="148"/></proof>
+ <goal name="WP_parameter self_blit" expl="VC for self_blit" proved="true">
+ <proof prover="4"><result status="valid" time="0.10" steps="148"/></proof>
  </goal>
 </theory>
-<theory name="IntArraySorted" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="IntArraySorted" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Sorted" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Sorted" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ArrayEq" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ArrayEq" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ArrayExchange" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ArrayExchange" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="ArrayPermut" sum="4df642c6a5d352ea5ec0e76c805c8f49">
- <goal name="exchange_permut_sub" expl="">
- <proof prover="6" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.57"/></proof>
+ <goal name="exchange_permut_sub">
+ <proof prover="1" timelimit="4" obsolete="true" edited="array_ArrayPermut_exchange_permut_sub_1.v"><result status="valid" time="1.53"/></proof>
  </goal>
- <goal name="permut_sub_weakening" expl="">
- <proof prover="6" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.51"/></proof>
+ <goal name="permut_sub_weakening" proved="true">
+ <proof prover="1" edited="array_ArrayPermut_permut_sub_weakening_2.v"><result status="valid" time="0.50"/></proof>
  </goal>
- <goal name="exchange_permut_all" expl="">
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <goal name="exchange_permut_all" proved="true">
+ <proof prover="3"><result status="valid" time="0.06"/></proof>
  </goal>
 </theory>
-<theory name="ArraySwap" sum="06d39a3110fb087bb5e70d417c0a5852">
- <goal name="WP_parameter swap" expl="VC for swap">
+<theory name="ArraySwap" proved="true" sum="06d39a3110fb087bb5e70d417c0a5852">
+ <goal name="WP_parameter swap" expl="VC for swap" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="ArraySum" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="ArraySum" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="NumOf" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="NumOf" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="NumOfEq" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="NumOfEq" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="ToList" sum="5d0e7aa0809facf04c78e9c973566cb8">
- <goal name="WP_parameter to_list_append" expl="VC for to_list_append">
- <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+<theory name="ToList" proved="true" sum="5d0e7aa0809facf04c78e9c973566cb8">
+ <goal name="WP_parameter to_list_append" expl="VC for to_list_append" proved="true">
+ <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
-<theory name="ToSeq" sum="16189e2571a1238f4124921c02a79c14">
- <goal name="WP_parameter to_seq_length" expl="VC for to_seq_length">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter to_seq_length.1" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+<theory name="ToSeq" proved="true" sum="16189e2571a1238f4124921c02a79c14">
+ <goal name="WP_parameter to_seq_length" expl="VC for to_seq_length" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter to_seq_length.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_length.2" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="WP_parameter to_seq_length.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_length.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="WP_parameter to_seq_length.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_length.4" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="WP_parameter to_seq_length.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter to_seq_nth" expl="VC for to_seq_nth">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter to_seq_nth.1" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+ <goal name="WP_parameter to_seq_nth" expl="VC for to_seq_nth" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter to_seq_nth.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.2" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="WP_parameter to_seq_nth.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="WP_parameter to_seq_nth.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter to_seq_nth.4" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter to_seq_nth.3" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
