@@ -79,7 +79,7 @@ prequest parse_request(char* str_req, int len, int key) {
         parallel = parallel_arg;
       }
     }
-    if (strncmp(tmp, "interrupt", pos) == 0) {
+    else if (strncmp(tmp, "interrupt", pos) == 0) {
       free(tmp);
       req = (prequest) malloc(sizeof(request));
       req->key = key;

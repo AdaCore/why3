@@ -77,7 +77,7 @@ void parse_options(int argc, char **argv) {
      }
   }
   if (optind < argc) {
-    printf("extra arguments, stopping\n");
+    printf("extra arguments, stopping [opt_index=%d,argc=%d]\n",optind,argc);
     exit(1);
   }
   if (basename == NULL) {
@@ -85,4 +85,3 @@ void parse_options(int argc, char **argv) {
     exit(1);
   }
 }
-
