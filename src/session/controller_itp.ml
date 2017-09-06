@@ -446,6 +446,52 @@ let schedule_proof_attempt ?proof_script c id pr
   in
   schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
 
+
+(* replay *)
+
+
+let find_prover notification c goal_id pr =
+  if Hprover.mem c.controller_provers pr then Some pr else
+   match Whyconf.get_prover_upgrade_policy c.controller_config pr with
+   | exception Not_found -> None
+   | Whyconf.CPU_keep -> None
+   | Whyconf.CPU_upgrade new_pr ->
+      (* does a proof using new_pr already exists ? *)
+      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we modify the prover in-place *)
+          Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
+          Some new_pr
+        end
+   | Whyconf.CPU_duplicate _new_pr ->
+      assert false (* TODO *)
+(*
+      (* does a proof using new_p already exists ? *)
+      if Hprover.mem (goal_external_proofs parid) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we duplicate the proof_attempt *)
+          let new_a = copy_external_proof
+                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
+          in
+          Some new_pr
+        end
+*)
+
+let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
+  (* The replay can be done on a different machine so we need
+     to check more things before giving the attempt to the scheduler *)
+  match find_prover notification c parid pr with
+  | None -> callback id (Uninstalled pr)
+  | Some pr ->
+     schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
+
+
 (* TODO to be simplified *)
 (* create the path to a file for saving the external proof script *)
 let create_file_rel_path c pr pn =
@@ -496,14 +542,6 @@ let update_edit_external_proof c pn ?panid pr =
   Opt.iter close_in old;
   close_out ch;
   file
-
-let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callback ~notification =
-  (* The replay can be done on a different machine so we need
-     to check more things before giving the attempt to the scheduler *)
-  if not (Hprover.mem c.controller_provers pr) then
-    callback id (Uninstalled pr)
-  else
-    schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
 
 exception Editor_not_found
 

@@ -71,13 +71,13 @@ val theory_detached_goals : theory -> proofNodeID list
 val theory_parent : session -> theory -> file
 
 type proof_attempt_node = private {
-  parent              : proofNodeID;
-  prover              : Whyconf.prover;
-  limit               : Call_provers.resource_limit;
-  mutable proof_state : Call_provers.prover_result option;
+  parent                 : proofNodeID;
+  mutable prover         : Whyconf.prover;
+  limit                  : Call_provers.resource_limit;
+  mutable proof_state    : Call_provers.prover_result option;
   (* None means that there is a prover call in progress *)
-  mutable proof_obsolete      : bool;
-  proof_script        : string option;  (* non empty for external ITP *)
+  mutable proof_obsolete : bool;
+  proof_script           : string option;  (* non empty for external ITP *)
 }
 
 (* [is_below s a b] true if a is below b in the session tree *)
@@ -197,14 +197,6 @@ val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
     proof_script field equal to [file].
 *)
 
-val update_proof_attempt : ?obsolete:bool -> session -> proofNodeID ->
-  Whyconf.prover -> Call_provers.prover_result -> unit
-(** [update_proof_attempt ?obsolete s id pr st] update the status of the
-    corresponding proof attempt with [st].
-    If [obsolete] is set to true, it marks the proof_attempt obsolete
-    direclty (useful for interactive prover).
-*)
-
 val apply_trans_to_goal :
   allow_no_effect:bool -> session -> Env.env -> string -> string list ->
   proofNodeID -> Task.task list
@@ -286,3 +278,18 @@ val update_trans_node : notifier -> session -> transID -> unit
 (** updates the proved status of the given transformation node. If
     necessary, propagates the update to ancestors. [notifier] is
     called on all nodes whose status changes *)
+
+
+val update_proof_attempt : ?obsolete:bool (*-> notifier*) -> session -> proofNodeID ->
+  Whyconf.prover -> Call_provers.prover_result -> unit
+(** [update_proof_attempt ?obsolete s id pr st] update the status of the
+    corresponding proof attempt with [st].
+    If [obsolete] is set to true, it marks the proof_attempt obsolete
+    direclty (useful for interactive prover).
+*)
+
+val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyconf.prover -> unit
+(** [change_prover s id opr npr] changes the prover of the proof
+   attempt using prover [opr] by the new prover [npr]. Proof attempt
+   status is set to obsolete.
+ *)

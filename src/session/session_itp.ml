@@ -49,7 +49,7 @@ type proof_parent = Trans of transID | Theory of theory
 
 type proof_attempt_node = {
   parent                 : proofNodeID;
-  prover                 : Whyconf.prover;
+  mutable prover         : Whyconf.prover;
   limit                  : Call_provers.resource_limit;
   mutable proof_state    : Call_provers.prover_result option;
   (* None means that the call was not done or never returned *)
@@ -694,7 +694,6 @@ let update_proof_attempt ?(obsolete=false) s id pr st =
   | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
 
 
-
 (* proved status *)
 
 
@@ -823,6 +822,22 @@ let update_any_node s notification a =
   | APa _ -> assert false
   | AFile f -> update_file_node notification s f
   | ATh th -> update_theory_node notification s th
+
+
+let change_prover notification s id opr npr =
+  try
+    let n = get_proofNode s id in
+    let paid = Hprover.find n.proofn_attempts opr in
+    let pa = get_proof_attempt_node s paid in
+    Hprover.remove n.proofn_attempts opr;
+    pa.prover <- npr;
+    pa.proof_obsolete <- true;
+    Hprover.add n.proofn_attempts npr paid;
+    update_goal_node notification s id
+  with
+  | Not_found -> ()
+  | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
+
 
 
 (* Remove elements of the session tree *)
