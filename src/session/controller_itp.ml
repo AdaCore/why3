@@ -213,6 +213,7 @@ let add_file c ?format fname =
 
 
 module type Scheduler = sig
+  val multiplier: int
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: prio:int -> (unit -> bool) -> unit
 end
@@ -317,6 +318,12 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
   let pa = (c.controller_session,id,pr,proof_script,callback,false,call,ores) in
   Queue.push pa prover_tasks_in_progress
 
+let update_observer () =
+  let scheduled = Queue.length scheduled_proof_attempts in
+  let waiting_or_running = Queue.length prover_tasks_in_progress in
+  let running = !number_of_running_provers in
+  !observer scheduled (waiting_or_running - running) running
+
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
@@ -362,7 +369,7 @@ let timeout_handler () =
   begin
     try
       for _i = Queue.length prover_tasks_in_progress
-          to 3 * !max_number_of_running_provers do
+          to S.multiplier * !max_number_of_running_provers do
         let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
           Queue.pop scheduled_proof_attempts in
         try
@@ -375,10 +382,7 @@ let timeout_handler () =
       done
   with Queue.Empty -> ()
   end;
-  let scheduled = Queue.length scheduled_proof_attempts in
-  let waiting_or_running = Queue.length prover_tasks_in_progress in
-  let running = !number_of_running_provers in
-  !observer scheduled (waiting_or_running - running) running;
+  update_observer ();
   true
 
 let interrupt () =

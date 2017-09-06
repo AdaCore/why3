@@ -10,6 +10,8 @@
 (********************************************************************)
 
 
+val multiplier: int
+
 
 val main_loop : string option -> int ->
                 (Unix.sockaddr * string list -> string ->

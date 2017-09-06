@@ -11,6 +11,8 @@
 
 module Unix_scheduler : sig
 
+    val multiplier: int
+
     val timeout: ms:int -> (unit -> bool) -> unit
     (** [timeout ~ms f] registers the function [f] as a function to be
     called every [ms] milliseconds. The function is called repeatedly

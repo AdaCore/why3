@@ -144,6 +144,8 @@ let backtrace_and_exit f () =
 
 module Scheduler = struct
 
+    let multiplier = 3
+
     let idle ~prio f =
       let (_ : GMain.Idle.id) = GMain.Idle.add ~prio (backtrace_and_exit f) in ()
 

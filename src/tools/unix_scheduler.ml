@@ -11,6 +11,8 @@
 
 module Unix_scheduler = struct
 
+    let multiplier = 3
+
     (* the private list of functions to call on idle, sorted higher
        priority first. *)
     let idle_handler : (int * (unit -> bool)) list ref = ref []

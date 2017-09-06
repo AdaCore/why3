@@ -53,6 +53,11 @@ module type Scheduler = sig
     depending on some time constraints: after a given delay, or simply
     when there is no more tasks with higher priority. *)
 
+    val multiplier: int
+    (** Number of allowed task given to why3server is this number times the
+        number of allowed proc on the machine.
+    *)
+
     val timeout: ms:int -> (unit -> bool) -> unit
     (** [timeout ~ms f] registers the function [f] as a function to be
     called every [ms] milliseconds. The function is called repeatedly
