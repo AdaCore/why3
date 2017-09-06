@@ -137,6 +137,28 @@ let list_provers cont _args =
   let l = List.sort String.compare l in
   Pp.sprintf "%a" (Pp.print_list Pp.newline Pp.string) l
 
+let load_strategies cont =
+  let config = cont.Controller_itp.controller_config in
+  let env = cont.Controller_itp.controller_env in
+  let strategies = Whyconf.get_strategies config in
+  Stdlib.Mstr.iter
+    (fun _ st ->
+     let name = st.Whyconf.strategy_name in
+     try
+       let code = st.Whyconf.strategy_code in
+       let code = Strategy_parser.parse env config code in
+       let shortcut = st.Whyconf.strategy_shortcut in
+       Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
+       Stdlib.Hstr.add cont.Controller_itp.controller_strategies shortcut
+                       (name, st.Whyconf.strategy_desc, code)
+     with Strategy_parser.SyntaxError msg ->
+       Debug.dprintf debug
+                     "[session server warning] Loading strategy '%s' failed: %s@." name msg)
+    strategies
+
+let list_strategies cont =
+  Stdlib.Hstr.fold (fun s (a,_,_) acc -> (s,a)::acc) cont.Controller_itp.controller_strategies []
+
 
 let symbol_name s =
   match s with
@@ -244,33 +266,6 @@ let help_on_queries fmt commands =
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
   Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
 
-let strategies env config loaded_strategies =
-  match !loaded_strategies with
-    | [] ->
-      let strategies = Whyconf.get_strategies config in
-      let strategies =
-        Stdlib.Mstr.fold_left
-          (fun acc _ st ->
-            let name = st.Whyconf.strategy_name in
-            try
-              let code = st.Whyconf.strategy_code in
-              let code = Strategy_parser.parse env config code in
-              let shortcut = st.Whyconf.strategy_shortcut in
-              Debug.dprintf debug "[session server info] Strategy '%s' loaded.@." name;
-              (name, shortcut, st.Whyconf.strategy_desc, code) :: acc
-            with Strategy_parser.SyntaxError msg ->
-              Debug.dprintf debug
-                "[session server warning] Loading strategy '%s' failed: %s@." name msg;
-              acc)
-          []
-          strategies
-      in
-      let strategies = List.rev strategies in
-      loaded_strategies := strategies;
-      strategies
-    | l -> l
-
-
 (* Return the prover corresponding to given name. name is of the form
   | name
   | name, version
@@ -358,22 +353,18 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-let interp_others commands_table config cmd args =
-  match parse_prover_name config cmd args with
+let interp_others commands_table cont cmd args =
+  match parse_prover_name cont.Controller_itp.controller_config cmd args with
   | Some (prover_config, limit) ->
       if prover_config.Whyconf.interactive then
         Edit (prover_config)
       else
         Prove (prover_config, limit)
   | None ->
+     if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
+       Strategies cmd
+     else
       match cmd, args with
-      | "auto", _ ->
-          let s =
-            match args with
-            | "2"::_ -> "2"
-            | _ -> "1"
-          in
-          Strategies s
       | "help", [trans] ->
           let print_trans_desc fmt r =
             Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
@@ -388,10 +379,10 @@ let interp_others commands_table config cmd args =
                           "Please type a command among the following (automatic completion available)@\n\
                            @\n\
                            @ <transformation name> [arguments]@\n\
-                           @ <prover name> [<time limit> [<mem limit>]]@\n\
+                           @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
                            @ <query> [arguments]@\n\
-                           @ <help transformation_name> @\n\
-                           @ auto [auto level]@\n\
+                           @ <strategy shortcut>@\n\
+                           @ help <transformation_name> @\n\
                            @\n\
                            Available queries are:@\n@[%a@]" help_on_queries commands_table
           in
@@ -399,7 +390,7 @@ let interp_others commands_table config cmd args =
       | _ ->
           Other (cmd, args)
 
-let interp commands_table config cont id s =
+let interp commands_table cont id s =
   let cmd,args = split_args s in
   try
     let (_,f) = Stdlib.Hstr.find commands_table cmd in
@@ -424,7 +415,7 @@ let interp commands_table config cont id s =
       else
         Transform (cmd,t,args)
     | None ->
-      interp_others commands_table config cmd args
+      interp_others commands_table cont cmd args
 
 (***********************)
 (* First Unproven goal *)

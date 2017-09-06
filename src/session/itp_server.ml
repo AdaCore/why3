@@ -75,10 +75,6 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
-(*******************)
-(* Strategies list *)
-(*******************)
-let loaded_strategies = ref []
 
 (****** Exception handling *********)
 
@@ -982,11 +978,9 @@ end
                  let n = Pp.sprintf "%a" Whyconf.print_prover p in
                  (x,n) :: acc) (Whyconf.get_prover_shortcuts config) []
     in
+    load_strategies c;
     let transformation_list = List.map fst (list_transforms ()) in
-    let strategies_list =
-      let l = strategies d.cont.controller_env config loaded_strategies in
-      List.map (fun (a,_,_,_) -> a) l
-    in
+    let strategies_list = list_strategies c in
     let infos =
       {
         provers = prover_list;
@@ -1128,21 +1122,21 @@ end
   let run_strategy_on_task ~counterexmp nid s =
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
-    let l = strategies d.cont.controller_env d.cont.controller_config loaded_strategies in
-    let st = List.filter (fun (_,c,_,_) -> c=s) l in
-    match st with
-    | [(n,_,_,st)] ->
-        Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
-       let callback sts =
-         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
-       in
-       let callback_pa = callback_update_tree_proof d.cont in
-       let callback_tr tr args st = callback_update_tree_transform tr args st in
-       List.iter (fun id ->
-                  C.run_strategy_on_goal d.cont id st ~counterexmp
+    try
+      let (n,_,st) = Hstr.find d.cont.controller_strategies s in
+      Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
+      let callback sts =
+        Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
+      in
+      let callback_pa = callback_update_tree_proof d.cont in
+      let callback_tr tr args st = callback_update_tree_transform tr args st in
+      List.iter (fun id ->
+                 C.run_strategy_on_goal d.cont id st ~counterexmp
                     ~callback_pa ~callback_tr ~callback ~notification:(notify_change_proved d.cont))
-                 unproven_goals
-    | _ ->  Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
+                unproven_goals
+    with
+      Not_found ->
+      Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
 
   (* ----------------- Clean session -------------------- *)
@@ -1332,7 +1326,7 @@ end
     | Command_req (nid, cmd)       ->
       begin
         let snid = get_proof_node_id nid in
-        match (interp commands_table d.cont.controller_config d.cont snid cmd) with
+        match interp commands_table d.cont snid cmd with
         | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        ->

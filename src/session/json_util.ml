@@ -27,10 +27,14 @@ let convert_infos (i: global_information) =
     Record (convert_record ["prover_shorcut", String s;
                             "prover_name", String p])
   in
+  let convert_strategy (s,p) =
+    Record (convert_record ["strategy_shorcut", String s;
+                            "strategy_name", String p])
+  in
   Record (convert_record
     ["provers", List (List.map convert_prover i.provers);
      "transformations", List (List.map (fun x -> String x) i.transformations);
-     "strategies", List (List.map (fun x -> String x) i.strategies);
+     "strategies", List (List.map convert_strategy i.strategies);
      "commands", List (List.map (fun x -> String x) i.commands)])
 
 let convert_prover_answer (pa: prover_answer) =
@@ -653,7 +657,10 @@ let parse_infos j =
                                   get_string (get_field j "prover_name"))
                                with Not_found -> raise NotInfos) pr;
      transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
-     strategies = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) str;
+     strategies = List.map (fun j -> try
+                                 (get_string (get_field j "strategy_shortcut"),
+                                  get_string (get_field j "strategy_name"))
+                               with Not_found -> raise NotInfos) str;
      commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
   with _ -> raise NotInfos
 

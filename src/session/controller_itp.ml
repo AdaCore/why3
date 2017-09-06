@@ -78,6 +78,7 @@ type controller =
     controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+    controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
   }
 
 
@@ -88,6 +89,7 @@ let create_controller config env ses =
       controller_config = config;
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
+      controller_strategies = Stdlib.Hstr.create 7;
     }
   in
   let provers = Whyconf.get_provers config in

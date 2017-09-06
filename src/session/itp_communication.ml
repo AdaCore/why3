@@ -23,7 +23,7 @@ type global_information =
     {
      provers         : (string * prover) list;
      transformations : transformation list;
-     strategies      : strategy list;
+     strategies      : (string * strategy) list;
      commands        : string list;
      (* hidden_provers       : string list; *)
      (* session_time_limit   : int; *)

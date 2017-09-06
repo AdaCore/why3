@@ -446,6 +446,11 @@ let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
 
 
+let strategies_factory =
+  let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
+  let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
+  new GMenu.factory tools_submenu_strategies
+
 let provers_factory =
   let tools_submenu_provers = tools_factory#add_submenu "Provers" in
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
@@ -1511,7 +1516,7 @@ let new_node ?parent (* ?(collapse=false) *) id name typ detached =
 
 
 (**************************************************)
-(* tools submenus for provers and transformations *)
+(* tools submenus for strategies, provers and transformations *)
 (**************************************************)
 
 let sanitize_markup x =
@@ -1527,6 +1532,18 @@ let string_of_desc desc =
 
 
 
+let add_submenu_strategy (shortcut,strategy) =
+  let  i = create_menu_item
+             strategies_factory
+             strategy
+             ("run strategy " ^ strategy ^ " on selected goal (shortcut: " ^ shortcut ^ ")")
+  in
+  let callback () =
+    Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
+    interp shortcut
+  in
+  connect_menu_item i ~callback
+
 let add_submenu_prover (shortcut,prover) =
   let  i = create_menu_item
              provers_factory
@@ -1541,7 +1558,7 @@ let add_submenu_prover (shortcut,prover) =
 
 
 
-let init_completion provers transformations commands =
+let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
   List.iter add_completion_entry transformations;
   (* add the name of the commands *)
@@ -1560,8 +1577,7 @@ let init_completion provers transformations commands =
   in
   List.iter add_submenu_prover provers_sorted;
 
-  add_completion_entry "auto";
-  add_completion_entry "auto 2";
+  List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
   command_entry_completion#set_match_func match_function;
@@ -1578,9 +1594,9 @@ let () =
       let callback () = interp name in
       let i = create_menu_item submenu (sanitize_markup name) (string_of_desc desc) in
       connect_menu_item i ~callback
-  in
-  let trans = List.filter filter transformations in
-  List.iter iter trans
+    in
+    let trans = List.filter filter transformations in
+    List.iter iter trans
   in
   add_submenu_transform
     "transformations (a-e)"
@@ -1743,7 +1759,7 @@ let treat_notification n =
      Hint.remove node_id_pa id
   | Initialized g_info            ->
      (* TODO: treat other *)
-     init_completion g_info.provers g_info.transformations g_info.commands;
+     init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
       print_message "Session saved.";

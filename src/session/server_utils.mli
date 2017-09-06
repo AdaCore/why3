@@ -40,13 +40,13 @@ type query =
 val print_id: 'a -> Trans.naming_table -> string list -> string
 val search_id: 'a -> Trans.naming_table -> string list -> string
 
+val list_strategies : Controller_itp.controller -> (string * string) list
 val list_provers: Controller_itp.controller -> _ -> string
 val list_transforms: unit -> (string * Pp.formatted) list
 val list_transforms_query: _ -> _ -> string
 (* val help_on_queries: Format.formatter -> (string * string * 'a) list -> unit *)
-val strategies: Env.env -> Whyconf.config ->
-  (string * string * string * Strategy.instruction array) list ref ->
-    (string * string * string * Strategy.instruction array) list
+val load_strategies: Controller_itp.controller -> unit
+
 
 (** Command line parsing tools *)
 
@@ -64,9 +64,8 @@ type command =
 
 val interp:
   (string * query) Stdlib.Hstr.t ->
-    Whyconf.config ->
-      Controller_itp.controller ->
-        Session_itp.proofNodeID option -> string -> command
+  Controller_itp.controller ->
+  Session_itp.proofNodeID option -> string -> command
 
 
 val get_first_unproven_goal_around:

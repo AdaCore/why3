@@ -83,6 +83,7 @@ type controller = private
     controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+    controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
   }
 
 val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
