@@ -1015,12 +1015,12 @@ end
     | Scheduled ->
       begin
         try
-          ignore (node_ID_from_pan panid)
+          let _ : node_ID = node_ID_from_pan panid in ()
         (* TODO: do we notify here ? *)
         with Not_found ->
           let parent_id = get_proof_attempt_parent ses panid in
           let parent = node_ID_from_pn parent_id in
-          ignore (new_node ~parent (APa panid))
+          let _: node_ID = new_node ~parent (APa panid) in ()
       end
     | _  -> () (* TODO ? status like Uninstalled should not generate a Notification *)
     end;
