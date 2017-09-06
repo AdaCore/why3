@@ -426,13 +426,14 @@ let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
 
 let schedule_proof_attempt ?proof_script c id pr
                            ~counterexmp ~limit ~callback ~notification =
-  let callback panid s = callback panid s;
+  let callback panid s =
     (match s with
     | Scheduled | Running -> update_goal_node notification c.controller_session id
     | Done res ->
         update_proof_attempt ~obsolete:false c.controller_session id pr res;
         update_goal_node notification c.controller_session id
-    | _ -> ())
+    | _ -> ());
+    callback panid s
   in
   (* proof_script is specific to interactive manual provers *)
   let session_dir = Session_itp.get_dir c.controller_session in
