@@ -1456,14 +1456,20 @@ let set_status_and_time_column ?limit row =
         | C.InternalFailure _ -> "(internal failure)"
         | C.Interrupted -> "(interrupted)"
         | C.Uninstalled _ -> "(uninstalled prover)"
-        | C.Scheduled
-        | C.Running ->
-           match limit with
-             | Some l ->
-                Format.sprintf "(scheduled?) [limit=%d sec., %d M]"
+        | C.Scheduled -> "(scheduled)"
+        | C.Running -> "(running)"
+      in
+      let t = match pa with
+        | C.Scheduled | C.Running ->
+           begin
+             match limit with
+             | Some l -> t ^
+                Format.sprintf " [limit=%d sec., %d M]"
                                (l.Call_provers.limit_time)
                                (l.Call_provers.limit_mem)
-             | None -> "(scheduled?) [no limit known]"
+             | None -> t ^ " [no limit known]"
+           end
+        | _ -> t
       in
       let t = if obs then t ^ " (obsolete)" else t in
       goals_model#set ~row:row#iter ~column:time_column t;
