@@ -385,7 +385,7 @@ let () =
   ]
 
   type server_data =
-    { task_driver : Driver.driver;
+    { (* task_driver : Driver.driver; *)
       cont : Controller_itp.controller;
       send_source: bool;
       (* If true the server is parametered to send source mlw files as
@@ -670,6 +670,7 @@ end
       P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
       false
 
+(*
   let task_driver config env =
     try
       let main = Whyconf.get_main config in
@@ -680,7 +681,7 @@ end
     with e ->
       Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
       exit 1
-
+*)
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -966,9 +967,9 @@ end
     let ses,use_shapes = Session_itp.load_session f in
     Debug.dprintf debug "[ITP server] creating controller@.";
     let c = create_controller config env ses in
-    let task_driver = task_driver config env in
+    (* let task_driver = task_driver config env in*)
     server_data := Some
-                     { task_driver = task_driver;
+                     { (* task_driver = task_driver; *)
                        cont = c;
                        send_source = send_source;
                      };
