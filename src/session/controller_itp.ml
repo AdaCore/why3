@@ -252,10 +252,10 @@ module Hprover = Whyconf.Hprover
    proof *)
 
 let adapt_limits ~interactive ~use_steps limits a =
-  if use_steps then limits else
   let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
     let memlimit = limits.Call_provers.limit_mem in
+    let steplimit = limits.Call_provers.limit_steps in
     match a.proof_state with
     | Some { Call_provers.pr_answer = r;
              Call_provers.pr_time = t;
@@ -270,8 +270,8 @@ let adapt_limits ~interactive ~use_steps limits a =
        let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
        begin
          match r with
-         | Call_provers.OutOfMemory -> increased_time, memlimit, 0
-         | Call_provers.Timeout -> timelimit, increased_mem, 0
+         | Call_provers.OutOfMemory -> increased_time, memlimit, steplimit
+         | Call_provers.Timeout -> timelimit, increased_mem, steplimit
          | Call_provers.Valid ->
             let steplimit =
               if use_steps && not a.proof_obsolete then s else 0
@@ -279,14 +279,14 @@ let adapt_limits ~interactive ~use_steps limits a =
             increased_time, increased_mem, steplimit
          | Call_provers.Unknown _
          | Call_provers.StepLimitExceeded
-         | Call_provers.Invalid -> increased_time, increased_mem, 0
+         | Call_provers.Invalid -> increased_time, increased_mem, steplimit
          | Call_provers.Failure _
          | Call_provers.HighFailure ->
             (* correct ? failures are supposed to appear quickly anyway... *)
-            timelimit, memlimit, 0
+            timelimit, memlimit, steplimit
        end
     | None when interactive -> 0, 0, 0
-    | None -> timelimit, memlimit, 0
+    | None -> timelimit, memlimit, steplimit
   in
   { Call_provers.limit_time = t; limit_mem = m; limit_steps = s }
 
@@ -423,7 +423,7 @@ let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
       let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
       let limit = adapt_limits ~interactive ~use_steps limit a in
       limit, old_res
-    with _ (* Not_found or BadID *) -> limit,None
+    with Not_found | Session_itp.BadID -> limit,None
   in
   let panid = graft_proof_attempt ~limit s id pr in
   Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)

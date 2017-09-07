@@ -92,6 +92,9 @@ val get_task : session -> proofNodeID -> Task.task * Trans.naming_table
 val get_transformations : session -> proofNodeID -> transID list
 val get_proof_attempt_ids :
   session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
+
+exception BadID
+
 val get_proof_attempt_node : session -> proofAttemptID -> proof_attempt_node
 val get_proof_attempt_parent : session -> proofAttemptID -> proofNodeID
 val get_proof_attempts : session -> proofNodeID -> proof_attempt_node list
