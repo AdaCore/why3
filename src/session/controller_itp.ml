@@ -252,6 +252,7 @@ module Hprover = Whyconf.Hprover
    proof *)
 
 let adapt_limits ~interactive ~use_steps limits a =
+  if use_steps then limits else
   let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
     let memlimit = limits.Call_provers.limit_mem in
@@ -422,7 +423,7 @@ let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
       let use_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
       let limit = adapt_limits ~interactive ~use_steps limit a in
       limit, old_res
-    with Not_found -> limit,None
+    with _ (* Not_found or BadID *) -> limit,None
   in
   let panid = graft_proof_attempt ~limit s id pr in
   Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)
