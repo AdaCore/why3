@@ -648,16 +648,16 @@ else
                 ISABELLEVERSION=2016-1
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
-          2016*)
+          2017*)
 	        enable_isabelle_support=yes
-                ISABELLEVERSION=2016
+                ISABELLEVERSION=2017
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2016 or later; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2016)"
+	        AC_MSG_WARN(You need Isabelle 2016-1 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2016-1)"
                 ;;
         esac
     fi

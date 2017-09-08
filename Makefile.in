@@ -1198,7 +1198,7 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_Bool.thy Why3_BV.thy Why3_Int.thy Why3_List.thy Why3_Number.thy Why3_Set.thy
+ISABELLEVERSIONSPECIFIC=ROOT why3.ML Why3_BV.thy Why3_Number.thy Why3_Real.thy Why3_Set.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))

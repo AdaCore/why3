@@ -1,5 +1,9 @@
 signature WHY3 =
 sig
+  val add_why3_const: string * string -> theory -> theory
+  val add_why3_type: string * string -> theory -> theory
+  val add_why3_thm: string * thm list -> theory -> theory
+  val add_why3_def: string * thm list -> theory -> theory
   val setup: theory -> theory
 end
 
@@ -280,9 +284,11 @@ val add_why3_const = add_qualified add_const_raw (fn ctxt => fn cname =>
 val add_why3_type = add_qualified add_type_raw (fn ctxt => fn tyname =>
   fst (dest_Type (Proof_Context.read_type_name {proper = true, strict = false} ctxt tyname)));
 
-val add_why3_thm = add_qualified add_thm_raw Attrib.eval_thms;
+val add_why3_thm = add_qualified add_thm_raw (K I);
+val add_why3_thm_cmd = add_qualified add_thm_raw Attrib.eval_thms;
 
-val add_why3_def = add_qualified add_def_raw Attrib.eval_thms;
+val add_why3_def = add_qualified add_def_raw (K I);
+val add_why3_def_cmd = add_qualified add_def_raw Attrib.eval_thms;
 
 fun lookup_name kind sel tab s s' = (case Symtab.lookup tab s of
     NONE => error ("The theory " ^ s ^ " was not found")
@@ -877,13 +883,13 @@ val _ =
   Outer_Syntax.command @{command_keyword "why3_thms"}
     "associate Why3 axioms with theorems"
     (Parse.and_list1 (Parse.name --| Args.$$$ "=" -- Parse.thms1) >>
-       (Toplevel.theory o fold add_why3_thm));
+       (Toplevel.theory o fold add_why3_thm_cmd));
 
 val _ =
   Outer_Syntax.command @{command_keyword "why3_defs"}
     "associate Why3 definitions with definitions"
     (Parse.and_list1 (Parse.name --| Args.$$$ "=" -- Parse.thms1) >>
-       (Toplevel.theory o fold add_why3_def));
+       (Toplevel.theory o fold add_why3_def_cmd));
 
 val setup = Theory.at_end (fn thy =>
   let
