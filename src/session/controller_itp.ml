@@ -821,6 +821,17 @@ let copy_detached ~copy c from_any =
   (* Only goal can be detached *)
   | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
 
+
+
+
+
+
+
+
+(***************** {2 replay} ****************)
+
+
+
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   (** Result(new_result,old_result) *)
@@ -881,7 +892,6 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
        r := (id, pr, limits, Prover_not_installed) :: !r;
   in
 
-  (* === replay === *)
   let session = c.controller_session in
   let count = ref 0 in
   let report = ref [] in
@@ -919,5 +929,113 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
   if !count = 0 then final_callback !report else
   (* Calling replay on all the proof_attempts of the session *)
   Session_itp.session_iter_proof_attempt replay_pa session
+
+
+
+
+(*************** bisect **********)
+
+
+
+let debug = Debug.register_flag ~desc:"Task bisection" "bisect"
+
+let bisect_proof_attempt ~notification c pa_id =
+  let ses = c.controller_session in
+  let pa = get_proof_attempt_node ses pa_id in
+  let goal_id = pa.parent in
+  let prover = pa.prover in
+  let limit = { pa.limit with
+                Call_provers.limit_steps =
+                  Call_provers.empty_limit.Call_provers.limit_steps }
+  in
+  let timelimit = ref (-1) in
+  let set_timelimit res =
+    timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
+  let rec callback kont _pa_id = function
+    | Running | Scheduled -> ()
+    | Interrupted ->
+      Debug.dprintf debug "Bisecting interrupted.@."
+    | Unedited | JustEdited -> assert false
+    | Uninstalled _ -> assert false
+    | InternalFailure exn ->
+      (* Perhaps the test can be considered false in this case? *)
+      Debug.dprintf debug "Bisecting interrupted by an error %a.@."
+        Exn_printer.exn_printer exn
+    | Done res ->
+      let b = res.Call_provers.pr_answer = Call_provers.Valid in
+      Debug.dprintf debug "Bisecting: %a.@."
+        Call_provers.print_prover_result res;
+      if b then set_timelimit res;
+      match kont b with
+      | Eliminate_definition.BSdone rem ->
+         if Decl.Spr.is_empty rem.Eliminate_definition.rem_pr &&
+              Term.Sls.is_empty rem.Eliminate_definition.rem_ls &&
+                Ty.Sts.is_empty rem.Eliminate_definition.rem_ts
+         then
+           Debug.dprintf debug "Bisecting doesn't reduced the task.@."
+         else
+           begin
+             Debug.dprintf debug "Bisecting done.@.";
+             ()
+(*
+        begin try
+        let keygen = MA.keygen in
+        let notify = MA.notify in
+        let reml = List.map (fun (m,l) -> m.Theory.meta_name,l) reml in
+        let metas = S.add_registered_metas ~keygen ses reml pa.S.proof_parent in
+        let trans = S.add_registered_transformation ~keygen
+          ses "eliminate_builtin" metas.S.metas_goal in
+        let goal = List.hd trans.S.transf_goals in (* only one *)
+        let npa = S.copy_external_proof ~notify ~keygen ~obsolete:true
+          ~goal ~env_session:ses pa in
+        MA.init_any (S.Metas metas);
+        M.run_external_proof ses sched ~cntexample npa
+        with e ->
+          dprintf debug "Bisecting error:@\n%a@."
+            Exn_printer.exn_printer e end
+ *)
+           end
+      | Eliminate_definition.BSstep (rem,kont) ->
+
+         schedule_proof_attempt
+           c goal_id prover
+	  ~counterexmp:false
+          ~limit:{ limit with Call_provers.limit_time = !timelimit; }
+          ~callback:(callback kont)
+          ~notification
+  in
+  (* Run once the complete goal in order to verify its validity and
+     update the proof attempt *)
+  let first_callback pa_id = function
+    (* this pa_id can be different from the first pa_id *)
+    | Running | Scheduled -> ()
+    | Interrupted ->
+      Debug.dprintf debug "Bisecting interrupted.@."
+    | Unedited | JustEdited | Uninstalled _ -> assert false
+    | InternalFailure exn ->
+        Debug.dprintf debug "proof of the initial task interrupted by an error %a.@."
+          Exn_printer.exn_printer exn
+    | Done res ->
+      if res.Call_provers.pr_answer <> Call_provers.Valid
+      then Debug.dprintf debug "Initial task can't be proved.@."
+      else
+        let t = get_raw_task ses goal_id in
+        let r = Eliminate_definition.bisect_step t in
+        match r with
+        | Eliminate_definition.BSdone res ->
+          Debug.dprintf debug "Task can't be reduced.@."
+        | Eliminate_definition.BSstep (rem,kont) ->
+          set_timelimit res;
+          schedule_proof_attempt
+            c goal_id prover
+	    ~counterexmp:false
+            ~limit:{ limit with Call_provers.limit_time = !timelimit}
+            ~callback:(callback kont)
+            ~notification
+  in
+  Debug.dprintf debug "Bisecting with %a started.@."
+    Whyconf.print_prover prover;
+  schedule_proof_attempt
+    c goal_id prover ~counterexmp:false ~limit ~callback:first_callback ~notification
 
 end

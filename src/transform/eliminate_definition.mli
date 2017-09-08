@@ -25,15 +25,16 @@ val eliminate_mutual_recursion: Task.task Trans.trans
 
 (** bisection *)
 
-val bisect : (Task.task -> bool) ->
-  Task.task -> (Theory.meta * Theory.meta_arg list) list
+type rem = { rem_pr : Decl.Spr.t; rem_ls : Term.Sls.t; rem_ts : Ty.Sts.t }
+
+val bisect : (Task.task -> bool) -> Task.task -> rem
   (** [bisect test task] return metas that specify the symbols that
       can be removed without making the task invalid for
       the function test. *)
 
 type bisect_step =
-| BSdone of (Theory.meta * Theory.meta_arg list) list
-| BSstep of Task.task * (bool -> bisect_step)
+| BSdone of rem
+| BSstep of rem * (bool -> bisect_step)
 
 val bisect_step : Task.task -> bisect_step
 (** Same as before but doing it step by step *)

@@ -306,4 +306,7 @@ a list of 4-uples [(goalID, prover, limits, report)]
  *)
 
 
+val bisect_proof_attempt:
+  notification:notifier -> controller -> proofAttemptID -> unit
+
 end
