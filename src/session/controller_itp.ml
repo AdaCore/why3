@@ -412,7 +412,7 @@ let run_timeout_handler () =
 
 let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback =
   let s = c.controller_session in
-  let limit,ores =
+  let adaptlimit,ores =
     try
       let h = get_proof_attempt_ids s id in
       let pa = Hprover.find h pr in
@@ -426,7 +426,7 @@ let schedule_proof_attempt_r ?proof_script c id pr ~counterexmp ~limit ~callback
     with Not_found | Session_itp.BadID -> limit,None
   in
   let panid = graft_proof_attempt ~limit s id pr in
-  Queue.add (c,id,pr,limit,proof_script,callback panid,counterexmp,ores)
+  Queue.add (c,id,pr,adaptlimit,proof_script,callback panid,counterexmp,ores)
             scheduled_proof_attempts;
   callback panid Scheduled;
   run_timeout_handler ()
