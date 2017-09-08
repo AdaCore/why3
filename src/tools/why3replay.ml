@@ -40,7 +40,7 @@ let opt_use_steps = ref false
 let opt_bench = ref false
 *)
 let opt_provers = ref []
-
+let opt_verbose = ref true
 
 
 (** {2 Smoke detector} *)
@@ -98,10 +98,10 @@ let option_list = [
    " do not print statistics") ;
 *)
   ("-q",
-   Arg.Unit (fun () -> Debug.unset_flag debug),
+   Arg.Clear opt_verbose,
    " run quietly");
   ("--quiet",
-   Arg.Unit (fun () -> Debug.unset_flag debug),
+   Arg.Clear opt_verbose,
    " same as -q") ]
 
 let add_file f = Queue.push f files
@@ -240,6 +240,11 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   let notification _any =
     Debug.dprintf debug "[Replay] notified on node any@."
   in
+  let update_monitor w s r =
+    if !opt_verbose then
+      Format.eprintf "Progress: %d/%d/%d                       \r%!" w s r
+  in
+  C.register_observer update_monitor;
   if !opt_provers = [] then
     let () =
       C.replay ~obsolete_only:false ~use_steps:!opt_use_steps ~callback ~notification ~final_callback cont
