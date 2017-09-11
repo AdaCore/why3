@@ -716,7 +716,6 @@ module Translate = struct
       let args = params cty.cty_args in
       let res = mlty_of_ity cty.cty_mask cty.cty_result in
       [Mltree.Dlet (Mltree.Lany (rs, res, args))]
-      (* raise (ExtractionVal _rs) *)
     | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
       []
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->

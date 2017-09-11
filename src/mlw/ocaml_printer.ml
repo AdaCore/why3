@@ -259,6 +259,14 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
+  exception ExtractionVal of rsymbol
+
+  let val_in_drv info rs = (* we suppose [rs] refers to a [val] declaration *)
+    match query_syntax info.info_convert rs.rs_name,
+          query_syntax info.info_syn     rs.rs_name with
+    | None, None -> raise (ExtractionVal rs)
+    | _          -> ()
+
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
       if is_optional ~labels:(pv_name pv).id_label then
@@ -381,7 +389,7 @@ module Print = struct
         (print_list arrow (print_ty_arg info)) args
         (print_ty info) res;
       forget_vars args
-    | Lany _ -> () (* FIXME: test driver here and fail if no driver *)
+    | Lany (rs, _, _) -> val_in_drv info rs
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
@@ -601,6 +609,11 @@ module Print = struct
         Hashtbl.add memo decl (); print_decl info fmt decl;
         fprintf fmt "@." end in
     List.iter decide_print decl_name
+
+  let () = Exn_printer.register (fun fmt e -> match e with
+    | ExtractionVal rs -> Format.fprintf fmt
+        "Function %a cannot be extracted" Expr.print_rs rs
+    | _ -> raise e)
 
 end
 
