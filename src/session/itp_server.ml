@@ -592,16 +592,21 @@ module P = struct
   let notify n =
     let d = get_server_data() in
     let s = d.cont.controller_session in
-    match !focused_node with
-    | Wait_focus -> () (* Do not notify at all *)
-    | Unfocused -> Pr.notify n
-    | Focus_on f_nodes ->
-        let updated_node = get_modified_node n in
-        match updated_node with
-        | None -> Pr.notify n
-        | Some nid when is_below s nid f_nodes ->
-            Pr.notify n
-        | _ -> ()
+    match n with
+    | Initialized _ | Saved | Message _ | Dead _ -> Pr.notify n
+    | _ ->
+      begin
+        match !focused_node with
+        | Wait_focus -> () (* Do not notify at all *)
+        | Unfocused -> Pr.notify n
+        | Focus_on f_nodes ->
+            let updated_node = get_modified_node n in
+            match updated_node with
+            | None -> Pr.notify n
+            | Some nid when is_below s nid f_nodes ->
+                Pr.notify n
+            | _ -> ()
+      end
 
 end
 
