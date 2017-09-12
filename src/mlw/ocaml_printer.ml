@@ -259,13 +259,15 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
-  exception ExtractionVal of rsymbol
-
-  let val_in_drv info rs = (* we suppose [rs] refers to a [val] declaration *)
+  let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
+    (* here [rs] refers to a [val] declaration *)
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn     rs.rs_name with
-    | None, None -> raise (ExtractionVal rs)
-    | _          -> ()
+    | None, None when info.info_flat ->
+      (* FIXME? when extracting modularly, there are some functions we maybe do
+                not want to put in a drive, for instance mach.int.State63 *)
+      Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
+    | _ -> ()
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
@@ -389,7 +391,7 @@ module Print = struct
         (print_list arrow (print_ty_arg info)) args
         (print_ty info) res;
       forget_vars args
-    | Lany (rs, _, _) -> val_in_drv info rs
+    | Lany (rs, _, _) -> check_val_in_drv info rs
 
   and print_enode ?(paren=false) info fmt = function
     | Econst c ->
@@ -588,7 +590,7 @@ module Print = struct
       let info = { info with info_current_ph = s :: info.info_current_ph } in
       fprintf fmt "@[@[<hov 2>module %s%a@ =@ struct@ %a@]@ end@]" s
         (print_functor_args info) args
-        (print_list newline (print_decl info)) dl
+        (print_list newline2 (print_decl info)) dl
 
   and print_functor_args info fmt args =
     let print_sig info fmt dl =
@@ -609,11 +611,6 @@ module Print = struct
         Hashtbl.add memo decl (); print_decl info fmt decl;
         fprintf fmt "@." end in
     List.iter decide_print decl_name
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | ExtractionVal rs -> Format.fprintf fmt
-        "Function %a cannot be extracted" Expr.print_rs rs
-    | _ -> raise e)
 
 end
 
