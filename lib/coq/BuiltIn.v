@@ -20,6 +20,7 @@ Class WhyType T := {
 }.
 
 Notation int := Z.
+Notation IZR := IZR (only parsing).
 
 Global Instance int_WhyType : WhyType int.
 Proof.

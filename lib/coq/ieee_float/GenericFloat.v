@@ -859,7 +859,8 @@ Lemma max_int1 : (max_int = ((bv.Pow2int.pow2 (bv.Pow2int.pow2 (eb - 1%Z)%Z)) - 
 Qed.
 
 (* Why3 goal *)
-Lemma max_real_int : (max_real = (Reals.Raxioms.IZR max_int)).
+Lemma max_real_int : (max_real = (BuiltIn.IZR max_int)).
+Proof.
   unfold max_int.
   rewrite <-Z2R_IZR, Z2R_minus.
   change 2%Z with (radix_val radix2).
@@ -1129,7 +1130,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers : forall (m:mode) (i:Z), (in_safe_int_range
-  i) -> ((round m (Reals.Raxioms.IZR i)) = (Reals.Raxioms.IZR i)).
+  i) -> ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
@@ -3310,10 +3311,12 @@ Lemma Bmax_rep_int_is_int: is_int Bmax_rep_int.
 Qed.
 
 Lemma B754_zero_is_int : forall {b}, (is_int (B754_zero b)).
+Proof.
   split;auto.
   rewrite B754_zero_to_real.
   unfold is_intR.
-  rewrite <-FromInt.Zero, Floor_int; reflexivity.
+  change 0%R with (Z2R 0).
+  now rewrite Zfloor_Z2R.
 Qed.
 
 Lemma max_value_is_int : is_int max_value.
@@ -3362,7 +3365,8 @@ Lemma of_int_is_int : forall (m:mode) (x:Z), (in_int_range x) -> (is_int
 Qed.
 
 Lemma int_to_real_ : forall {m:mode} {x:t}, (is_int x) ->
-  ((to_real x) = (Reals.Raxioms.IZR (to_int m x))).
+  ((to_real x) = (BuiltIn.IZR (to_int m x))).
+Proof.
 intros m x h1.
 destruct h1.
 assert (is_intR (to_real x)) by assumption.
@@ -3376,7 +3380,6 @@ case m; rewrite <-Z2R_IZR;
    destruct valid_rnd_DN|
    destruct valid_rnd_ZR]; rewrite H0;
 rewrite Zrnd_Z2R; easy.
-
 apply Rabs_lt.
 rewrite Rminus_diag_eq.
 split; fourier.
@@ -3519,6 +3522,7 @@ Qed.
 (* Why3 goal *)
 Lemma roundToIntegral_is_int : forall (m:mode) (x:t), (is_finite x) ->
   (is_int (roundToIntegral m x)).
+Proof.
   intros m x h1.
   destruct x; try easy.
   + apply zeroF_is_int.
@@ -3526,7 +3530,8 @@ Lemma roundToIntegral_is_int : forall (m:mode) (x:t), (is_finite x) ->
     destruct Z.eq_dec.
     split;[apply h1|].
     simpl; unfold is_intR.
-    rewrite <-FromInt.Zero, Floor_int; reflexivity.
+    change 0 with (Z2R 0).
+    now rewrite Zfloor_Z2R.
     change (is_int (of_int RTZ (to_int m (B754_finite b m0 e e0)))).
     apply of_int_is_int.
     apply is_finite_to_int2.
@@ -3690,14 +3695,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma int_to_real : forall (m:mode) (x:t), (is_int x) ->
-  ((to_real x) = (Reals.Raxioms.IZR (to_int m x))).
+  ((to_real x) = (BuiltIn.IZR (to_int m x))).
+Proof.
 intros m x.
 apply int_to_real_.
 Qed.
 
 Lemma of_int_to_real : forall (m:mode) (x:Z), (no_overflow m
-  (Reals.Raxioms.IZR x)) -> ((to_real (of_int m x)) = (round m
-  (Reals.Raxioms.IZR x))).
+  (BuiltIn.IZR x)) -> ((to_real (of_int m x)) = (round m
+  (BuiltIn.IZR x))).
+Proof.
   intros m x h1.
   apply (of_int_correct h1).
 Qed.
@@ -3830,7 +3837,8 @@ Qed.
 (* Why3 goal *)
 Lemma ceil_to_real : forall (x:t), (is_finite x) ->
   ((to_real (roundToIntegral RTP
-  x)) = (Reals.Raxioms.IZR (real.Truncate.ceil (to_real x)))).
+  x)) = (BuiltIn.IZR (real.Truncate.ceil (to_real x)))).
+Proof.
   intros x h.
   rewrite to_real_roundToIntegral; auto.
   unfold to_int.
@@ -3882,7 +3890,8 @@ Qed.
 (* Why3 goal *)
 Lemma floor_to_real : forall (x:t), (is_finite x) ->
   ((to_real (roundToIntegral RTN
-  x)) = (Reals.Raxioms.IZR (real.Truncate.floor (to_real x)))).
+  x)) = (BuiltIn.IZR (real.Truncate.floor (to_real x)))).
+Proof.
   intros x h.
   rewrite to_real_roundToIntegral; auto.
   unfold to_int.
@@ -4151,49 +4160,50 @@ Qed.
 Lemma RTN_not_far_opp: forall x,
     is_finite x -> to_real x <= -/2 ->
     2 * to_real (roundToIntegral RTN x) <= to_real x <= to_real (roundToIntegral RTN x) / 2.
+Proof.
   intros x h h1.
   rewrite floor_to_real; auto.
   pose proof (Zfloor_lb (to_real x));
   pose proof (Zfloor_ub (to_real x)).
-  rewrite <-Z2R_IZR.
+  rewrite <- (Z2R_IZR (floor _)).
   split; try fourier.
   destruct (Rle_lt_dec (to_real x) (-1)); try fourier.
   assert (Z2R(floor (to_real x)) = -1).
   { assert (Z2R(floor(to_real x)) < Z2R 0) by (simpl Z2R; fourier).
     assert (Z2R(-2) < Z2R(floor(to_real x))) by (simpl Z2R; fourier).
     apply lt_Z2R in H1; apply lt_Z2R in H2.
-    replace (-1) with (Z2R(-1)) by auto; f_equal.
-    auto with zarith. }
+    now replace (floor (to_real x)) with (-1)%Z by omega. }
   fourier.
 Qed.
 
 Lemma RTP_not_far: forall x,
     is_finite x -> /2 <= to_real x ->
     to_real x / 2 <= to_real (roundToIntegral RTP x) <= 2 * to_real x.
+Proof.
   intros x h h1.
   rewrite ceil_to_real; auto.
   pose proof (ceil_lb (to_real x));
   pose proof (Zceil_ub (to_real x)).
-  rewrite <-Z2R_IZR.
+  rewrite <- (Z2R_IZR (ceil _)).
   split; try fourier.
   destruct (Rle_lt_dec 1 (to_real x) ); try fourier.
   assert (Z2R (ceil (to_real x)) = 1).
   { assert (Z2R 0 < Z2R(ceil(to_real x))) by (simpl Z2R; fourier).
     assert (Z2R(ceil(to_real x)) < Z2R(2)) by (simpl Z2R; fourier).
     apply lt_Z2R in H1; apply lt_Z2R in H2.
-    replace 1 with (Z2R 1) by auto; f_equal.
-    auto with zarith. }
+    now replace (ceil (to_real x)) with 1%Z by omega. }
   fourier.
 Qed.
 
 Lemma RTP_not_far_opp: forall x,
     is_finite x -> to_real x <= -1 ->
     2 * to_real x <= to_real (roundToIntegral RTP x) <= to_real x / 2.
+Proof.
   intros x h h1.
   rewrite ceil_to_real; auto.
   pose proof (ceil_lb (to_real x));
   pose proof (Zceil_ub (to_real x)).
-  rewrite <-Z2R_IZR.
+  rewrite <- (Z2R_IZR (ceil _)).
   split; try fourier.
   apply Rmult_le_reg_r with (r:=2); try fourier.
   replace (to_real x / 2 * 2) with (to_real x) by field.
@@ -4201,11 +4211,9 @@ Lemma RTP_not_far_opp: forall x,
   apply Rle_lt_trans with (r2:=(Z2R (ceil (to_real x)) - 1)); auto.
   assert (Z2R (ceil (to_real x)) <= -1).
   { pose proof (Rlt_le_trans _ _ _ H h1).
-    change 1 with (Z2R 1) in *.
-    rewrite <-Z2R_minus,<-Z2R_opp in H1.
-    apply lt_Z2R in H1.
-    rewrite <-Z2R_opp in *.
-    apply Z2R_le.
+    rewrite <- (Z2R_minus _ 1) in H1.
+    apply (lt_Z2R _ (-1)) in H1.
+    apply (Z2R_le _ (-1)).
     auto with zarith. }
   fourier.
 Qed.
@@ -4344,7 +4352,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            unfold to_int in h.
            rewrite H0 in *.
            simpl Z2R in *.
-           replace (_--1) with (to_real x+1) in * by ring.
+           replace (to_real x - -(1)) with (to_real x+1) in * by ring.
            pose proof (Rplus_lt_compat_r 1 _ _ r1).
            apply Rlt_le in H2.
            replace (-/2+1) with (5/10) in H2 by field.
@@ -4352,7 +4360,7 @@ Lemma eq_diff_floor_ceil: forall {x}, eq (sub RNE x (roundToIntegral RTN x)) (su
            apply (Round_monotonic RNE) in H2.
            rewrite Round_to_real in H2 by easy.
            rewrite half_to_real in H2.
-           assert false by fourier; easy. }
+           fourier. }
       * assert (floor (to_real x) = 0%Z) by
             (apply Zfloor_imp; simpl Z2R; split; fourier).
         assert (ceil (to_real x) = 0%Z) by
