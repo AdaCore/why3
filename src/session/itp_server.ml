@@ -560,9 +560,11 @@ let get_modified_node n =
   | Task (nid, _, _) -> Some nid
   | File_contents _ -> None
 
+
 type focus =
   | Unfocused
-  | Focus_on of Session_itp.any
+(* We can focus on several nodes at once *)
+  | Focus_on of Session_itp.any list
   | Wait_focus
 
 (* Focus on a node *)
@@ -580,11 +582,12 @@ module P = struct
 
   (* true if nid is below f_node or does not exists (in which case the
      notification is a remove). false if not below.  *)
-  let is_below s nid f_node =
+  let is_below s nid f_nodes =
     let any = try Some (any_from_node_ID nid) with _ -> None in
     match any with
     | None -> true
-    | Some any -> Session_itp.is_below s any f_node
+    | Some any ->
+        List.exists (Session_itp.is_below s any) f_nodes
 
   let notify n =
     let d = get_server_data() in
@@ -592,11 +595,11 @@ module P = struct
     match !focused_node with
     | Wait_focus -> () (* Do not notify at all *)
     | Unfocused -> Pr.notify n
-    | Focus_on f_node ->
+    | Focus_on f_nodes ->
         let updated_node = get_modified_node n in
         match updated_node with
         | None -> Pr.notify n
-        | Some nid when is_below s nid f_node ->
+        | Some nid when is_below s nid f_nodes ->
             Pr.notify n
         | _ -> ()
 
@@ -772,6 +775,11 @@ end
         {name; proved}
 *)
 
+  let add_focused_node node =
+    match !focused_node with
+    | Focus_on l -> focused_node := Focus_on (node :: l)
+    | _ -> focused_node := Focus_on [node]
+
   (* Focus on label: this is used to automatically focus on the first task
      having a given property (label_detection) in the session tree. To change
      the property, one need to call function register_label_detection. *)
@@ -785,8 +793,7 @@ end
             let task = Session_itp.get_raw_task session pr_node in
             let b = label_detection task in
             if b then
-              (focused_node := Focus_on node;
-               get_focused_label := None)
+              add_focused_node node
         | _ -> ())
     | None -> ()
 
@@ -996,7 +1003,13 @@ end
     Debug.dprintf debug "[ITP server] reloading source files@.";
     let b = reload_files d.cont ~use_shapes in
     if b then
-      init_and_send_the_tree ()
+      begin
+        (* Send the tree *)
+        init_and_send_the_tree ();
+        (* After initial sending, we don't check anymore that there is a need to
+           focus on a specific node. *)
+        get_focused_label := None
+      end
     else
       load_files_session ()
 
@@ -1296,8 +1309,8 @@ end
         let any = any_from_node_ID nid in
         (match any with
         | APa pa ->
-          focused_node := Focus_on (APn (Session_itp.get_proof_attempt_parent s pa))
-        | _ -> focused_node := Focus_on any)
+          focused_node := Focus_on [APn (Session_itp.get_proof_attempt_parent s pa)]
+        | _ -> focused_node := Focus_on [any])
     | Unfocus_req ->
         focused_node := Unfocused
     | Remove_subtree nid           -> remove_node nid
