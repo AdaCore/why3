@@ -1133,6 +1133,8 @@ let on_selected_row r =
           task_view#source_buffer#set_text "Unedited"
       | Controller_itp.JustEdited ->
           task_view#source_buffer#set_text "Just edited"
+      | Controller_itp.Detached ->
+          task_view#source_buffer#set_text "Detached"
       | Controller_itp.Interrupted ->
           task_view#source_buffer#set_text "Interrupted"
       | Controller_itp.Scheduled ->
@@ -1374,6 +1376,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.Scheduled -> !image_scheduled
   | Controller_itp.Running -> !image_running
   | Controller_itp.InternalFailure _e -> !image_failure
+  | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
@@ -1465,6 +1468,7 @@ let set_status_and_time_column ?limit row =
         | C.Uninstalled _ -> "(uninstalled prover)"
         | C.Scheduled -> "(scheduled)"
         | C.Running -> "(running)"
+        | C.Detached -> "(detached)"
       in
       let t = match pa with
         | C.Scheduled | C.Running ->

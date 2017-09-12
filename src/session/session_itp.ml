@@ -21,6 +21,8 @@ let debug = Debug.register_info_flag "session_itp"
     ~desc:"Pring@ debugging@ messages@ about@ Why3@ session@ \
            creation,@ reading@ and@ writing."
 
+let debug_merge = Debug.lookup_flag "session_pairing"
+
 let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
 type transID = int
@@ -37,6 +39,7 @@ type theory = {
   theory_name                   : Ident.ident;
   theory_goals                  : proofNodeID list;
   theory_parent_name            : string;
+  theory_is_detached            : bool;
   mutable theory_detached_goals : proofNodeID list;
   mutable theory_checksum       : Termcode.checksum option;
 }
@@ -79,13 +82,11 @@ type file = {
   file_name              : string;
   file_format            : string option;
   mutable file_theories          : theory list;
-  mutable file_detached_theories : theory list;
 }
 
 let file_name f = f.file_name
 let file_format f = f.file_format
 let file_theories f = f.file_theories
-let file_detached_theories f = f.file_detached_theories
 
 type any =
   | AFile of file
@@ -278,13 +279,14 @@ let get_detached_trans (_s: session) (_id: proofNodeID) =
 let is_detached (s: session) (a: any) =
   match a with
   | AFile _file -> false
-  | ATh th     ->
-     let parent_name = th.theory_parent_name in
+  | ATh th     -> th.theory_is_detached
+                  (*
+      let parent_name = th.theory_parent_name in
      begin
        try let parent = Hstr.find s.session_files parent_name in
            List.exists (fun x -> x = th) parent.file_detached_theories
        with Not_found -> true
-     end
+     end*)
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
     let _pn = get_proofNode s pn_id in
@@ -1122,6 +1124,7 @@ let load_theory session parent_name old_provers acc th =
         | _ -> goals) [] th.Xml.elements) in
     let mth = { theory_name = thname;
                 theory_checksum = checksum;
+                theory_is_detached = false;
                 theory_goals = goals;
                 theory_parent_name = parent_name;
                 theory_detached_goals = [] } in
@@ -1145,7 +1148,7 @@ let load_file session old_provers f =
     let mf = { file_name = fn;
                file_format = fmt;
                file_theories = ft;
-               file_detached_theories = [] } in
+             } in
     Hstr.add session.session_files fn mf;
     old_provers
   | "prover" ->
@@ -1395,6 +1398,7 @@ let save_detached_theory parent_name old_s detached_theory s =
     (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
   { theory_name = detached_theory.theory_name;
     theory_checksum = None;
+    theory_is_detached = true;
     theory_goals = goalsID;
     theory_parent_name = parent_name;
     theory_detached_goals = [] }
@@ -1566,6 +1570,7 @@ let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
   let theory = { theory_name = th.Theory.th_name;
                  theory_checksum = None;
+                 theory_is_detached = false;
                  theory_goals = goalsID;
                  theory_parent_name = parent_name;
                  theory_detached_goals = [] } in
@@ -1592,8 +1597,7 @@ let add_file_section (s:session) (fn:string)
   else
     let f = { file_name = fn;
               file_format = format;
-              file_theories = [];
-              file_detached_theories = [] }
+              file_theories = [] }
     in
     Hstr.add s.session_files fn f;
     let theories = List.map (make_theory_section s fn) theories in
@@ -1605,6 +1609,7 @@ let add_file_section (s:session) (fn:string)
 let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
+  Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
   let f = add_file_section s fn [] format in
   let fn = f.file_name in
   let theories,detached =
@@ -1613,15 +1618,18 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
       (fun th -> Hstr.add old_th_table th.theory_name.Ident.id_string th)
       old_theories;
     let add_theory (th: Theory.theory) =
+      (* look for a theory with same name *)
+      let theory_name = th.Theory.th_name.Ident.id_string in
       try
-        (* look for a theory with same name *)
-        let theory_name = th.Theory.th_name.Ident.id_string in
         (* if we found one, we remove it from the table and merge it *)
         let old_th = Hstr.find old_th_table theory_name in
+        Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory found: %s@." theory_name;
         Hstr.remove old_th_table theory_name;
         make_theory_section ~merge:(old_ses,old_th,env,use_shapes) s fn th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
+        found_detached := true;
+        Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
         make_theory_section s fn th
     in
     let theories = List.map add_theory theories in
@@ -1632,8 +1640,7 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
                      old_th_table [] in
     theories, detached
   in
-  f.file_theories <- theories;
-  f.file_detached_theories <- detached;
+  f.file_theories <- theories @ detached;
   update_file_node (fun _ -> ()) s f
 
 

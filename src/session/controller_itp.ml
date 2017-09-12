@@ -31,19 +31,21 @@ let () = Exn_printer.register
 
 (** State of a proof *)
 type proof_attempt_status =
-    | Unedited (** editor not yet run for interactive proof *)
-    | JustEdited (** edited but not run yet *)
-    | Interrupted (** external proof has never completed *)
-    | Scheduled (** external proof attempt is scheduled *)
-    | Running (** external proof attempt is in progress *)
-    | Done of Call_provers.prover_result (** external proof done *)
-    | InternalFailure of exn (** external proof aborted by internal error *)
-    | Uninstalled of Whyconf.prover (** prover is uninstalled *)
+  | Unedited (** editor not yet run for interactive proof *)
+  | JustEdited (** edited but not run yet *)
+  | Detached (** parent goal has no task, is detached *)
+  | Interrupted (** external proof has never completed *)
+  | Scheduled (** external proof attempt is scheduled *)
+  | Running (** external proof attempt is in progress *)
+  | Done of Call_provers.prover_result (** external proof done *)
+  | InternalFailure of exn (** external proof aborted by internal error *)
+  | Uninstalled of Whyconf.prover (** prover is uninstalled *)
 
 let print_status fmt st =
   match st with
   | Unedited          -> fprintf fmt "Unedited"
   | JustEdited        -> fprintf fmt "JustEdited"
+  | Detached          -> fprintf fmt "Detached"
   | Interrupted       -> fprintf fmt "Interrupted"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
@@ -143,10 +145,7 @@ module PSession = struct
     | Session -> "", Hstr.fold (fun _ f -> n (File f)) (get_files s) []
     | File f ->
        (file_name f),
-       List.fold_right
-          (fun th -> n (Theory th))
-          (file_detached_theories f)
-          (List.fold_right (fun th -> n (Theory th)) (file_theories f) [])
+       List.fold_right (fun th -> n (Theory th)) (file_theories f) []
     | Theory th ->
        let id = theory_name th in
        let name = id.Ident.id_string in
@@ -313,13 +312,16 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
   let with_steps = Call_provers.(limit.limit_steps <> empty_limit.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
-  let task = Session_itp.get_raw_task c.controller_session id in
-  let call =
-    Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
-                      ~limit (*?name_table:table*) driver task
-  in
-  let pa = (c.controller_session,id,pr,proof_script,callback,false,call,ores) in
-  Queue.push pa prover_tasks_in_progress
+  try
+    let task = Session_itp.get_raw_task c.controller_session id in
+    let call =
+      Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace:false ~command
+                        ~limit (*?name_table:table*) driver task
+    in
+    let pa = (c.controller_session,id,pr,proof_script,callback,false,call,ores) in
+    Queue.push pa prover_tasks_in_progress
+  with Not_found (* goal has no task, it is detached *) ->
+       callback Detached
 
 let update_observer () =
   let scheduled = Queue.length scheduled_proof_attempts in
@@ -492,7 +494,11 @@ let replay_proof_attempt ?proof_script c pr limit (parid: proofNodeID) id ~callb
   match find_prover notification c parid pr with
   | None -> callback id (Uninstalled pr)
   | Some pr ->
-     schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
+     try
+       let _ = get_raw_task c.controller_session parid in
+       schedule_proof_attempt ?proof_script c parid pr ~counterexmp:false ~limit ~callback ~notification
+     with Not_found ->
+       callback id Detached
 
 
 (* TODO to be simplified *)
@@ -683,7 +689,7 @@ let run_strategy_on_goal
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
               S.idle ~prio:0 run_next
-           | Unedited | JustEdited | Uninstalled _ ->
+           | Unedited | JustEdited | Detached | Uninstalled _ ->
                          (* should not happen *)
                          assert false
          in
@@ -890,6 +896,7 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
     | Uninstalled _ ->
        decr count;
        r := (id, pr, limits, Prover_not_installed) :: !r;
+    | Detached -> decr count
   in
 
   let session = c.controller_session in
@@ -956,7 +963,7 @@ let bisect_proof_attempt ~notification c pa_id =
     | Interrupted ->
       Debug.dprintf debug "Bisecting interrupted.@."
     | Unedited | JustEdited -> assert false
-    | Uninstalled _ -> assert false
+    | Detached | Uninstalled _ -> assert false
     | InternalFailure exn ->
       (* Perhaps the test can be considered false in this case? *)
       Debug.dprintf debug "Bisecting interrupted by an error %a.@."
@@ -995,7 +1002,7 @@ let bisect_proof_attempt ~notification c pa_id =
             Exn_printer.exn_printer e end
  *)
            end
-      | Eliminate_definition.BSstep (rem,kont) ->
+      | Eliminate_definition.BSstep (_rem,kont) ->
 
          schedule_proof_attempt
            c goal_id prover
@@ -1006,12 +1013,12 @@ let bisect_proof_attempt ~notification c pa_id =
   in
   (* Run once the complete goal in order to verify its validity and
      update the proof attempt *)
-  let first_callback pa_id = function
+  let first_callback _pa_id = function
     (* this pa_id can be different from the first pa_id *)
     | Running | Scheduled -> ()
     | Interrupted ->
       Debug.dprintf debug "Bisecting interrupted.@."
-    | Unedited | JustEdited | Uninstalled _ -> assert false
+    | Unedited | JustEdited | Detached | Uninstalled _ -> assert false
     | InternalFailure exn ->
         Debug.dprintf debug "proof of the initial task interrupted by an error %a.@."
           Exn_printer.exn_printer exn
@@ -1022,9 +1029,9 @@ let bisect_proof_attempt ~notification c pa_id =
         let t = get_raw_task ses goal_id in
         let r = Eliminate_definition.bisect_step t in
         match r with
-        | Eliminate_definition.BSdone res ->
+        | Eliminate_definition.BSdone _res ->
           Debug.dprintf debug "Task can't be reduced.@."
-        | Eliminate_definition.BSstep (rem,kont) ->
+        | Eliminate_definition.BSstep (_rem,kont) ->
           set_timelimit res;
           schedule_proof_attempt
             c goal_id prover

@@ -62,7 +62,6 @@ val get_shape_version : session -> int
 val file_name : file -> string
 val file_format : file -> string option
 val file_theories : file -> theory list
-val file_detached_theories : file -> theory list
 
 (** Theory *)
 val theory_name : theory -> Ident.ident

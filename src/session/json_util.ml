@@ -83,6 +83,8 @@ let convert_proof_attempt (pas: proof_attempt_status) =
       convert_record ["proof_attempt", String "Interrupted"]
   | Scheduled ->
       convert_record ["proof_attempt", String "Scheduled"]
+  | Detached ->
+      convert_record ["proof_attempt", String "Detached"]
   | Running ->
       convert_record ["proof_attempt", String "Running"]
   | Done pr ->

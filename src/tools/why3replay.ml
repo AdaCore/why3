@@ -378,7 +378,7 @@ let () =
     in
  *)
     if found_obs then eprintf "[Warning] session is obsolete@.";
-    if found_detached then eprintf "[Warning] found detached goals ot theories or transformations@.";
+    if found_detached then eprintf "[Warning] found detached goals or theories or transformations@.";
     add_to_check_no_smoke found_detached found_obs cont;
     Debug.dprintf debug "[Replay] starting scheduler@.";
     Unix_scheduler.Unix_scheduler.main_loop ~prompt:"" (fun _ -> ());

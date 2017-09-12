@@ -19,6 +19,7 @@ open Session_itp
 type proof_attempt_status =
     | Unedited (** editor not yet run for interactive proof *)
     | JustEdited (** edited but not run yet *)
+    | Detached (** parent goal has no task, is detached *)
     | Interrupted (** external proof has never completed *)
     | Scheduled (** external proof attempt is scheduled *)
     | Running (** external proof attempt is in progress *)
