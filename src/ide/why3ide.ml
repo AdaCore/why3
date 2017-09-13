@@ -1423,8 +1423,11 @@ let set_status_and_time_column ?limit row =
     | NTheory
     | NTransformation
     | NGoal ->
-      if detached then
-        !image_valid_obs
+       if detached then
+         begin
+           goals_model#set ~row:row#iter ~column:time_column "(detached)";
+           !image_valid_obs
+         end
       else
         if proved
         then begin
@@ -1483,6 +1486,7 @@ let set_status_and_time_column ?limit row =
         | _ -> t
       in
       let t = if obs then t ^ " (obsolete)" else t in
+      let t = if detached then t ^ " (detached)" else t in
       goals_model#set ~row:row#iter ~column:time_column t;
       image_of_pa_status ~obsolete:obs pa
   in

@@ -276,30 +276,23 @@ let get_trans_parent (s : session) (id : transID) =
 let get_detached_trans (_s: session) (_id: proofNodeID) =
   []
 
-let is_detached (s: session) (a: any) =
+let rec is_detached (s: session) (a: any) =
   match a with
   | AFile _file -> false
   | ATh th     -> th.theory_is_detached
-                  (*
-      let parent_name = th.theory_parent_name in
-     begin
-       try let parent = Hstr.find s.session_files parent_name in
-           List.exists (fun x -> x = th) parent.file_detached_theories
-       with Not_found -> true
-     end*)
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
-    let _pn = get_proofNode s pn_id in
-    (* pn.proofn_task = None || *)
+    is_detached s (APn pn_id) ||
     List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
   | APn pn     ->
-    let _pn = get_proofNode s pn in
-    (* pn.proofn_task = None *) false
+    begin
+      try let _ = get_raw_task s pn in false
+      with Not_found -> true
+    end
   | APa pa     ->
     let pa = get_proof_attempt_node s pa in
     let pn_id = pa.parent in
-    let _pn = get_proofNode s pn_id in
-    (* pn.proofn_task = None *) false
+    is_detached s (APn pn_id)
 
 let rec get_encapsulating_theory s any =
   match any with
@@ -1124,7 +1117,7 @@ let load_theory session parent_name old_provers acc th =
         | _ -> goals) [] th.Xml.elements) in
     let mth = { theory_name = thname;
                 theory_checksum = checksum;
-                theory_is_detached = false;
+                theory_is_detached = true;
                 theory_goals = goals;
                 theory_parent_name = parent_name;
                 theory_detached_goals = [] } in
@@ -1559,7 +1552,7 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
-let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
+let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theory)
   : theory =
   let add_goal parent goal id =
     let name,expl,task = Termcode.goal_expl_task ~root:true goal in
@@ -1570,7 +1563,7 @@ let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
   let theory = { theory_name = th.Theory.th_name;
                  theory_checksum = None;
-                 theory_is_detached = false;
+                 theory_is_detached = detached;
                  theory_goals = goalsID;
                  theory_parent_name = parent_name;
                  theory_detached_goals = [] } in
@@ -1579,7 +1572,7 @@ let make_theory_section ?merge (s:session) parent_name (th:Theory.theory)
   begin
     match merge with
     | Some (old_s, old_th, env, use_shapes) ->
-      merge_theory ~use_shapes env old_s old_th s theory
+       merge_theory ~use_shapes env old_s old_th s theory
     | _ -> ()
   end;
   theory
@@ -1600,7 +1593,7 @@ let add_file_section (s:session) (fn:string)
               file_theories = [] }
     in
     Hstr.add s.session_files fn f;
-    let theories = List.map (make_theory_section s fn) theories in
+    let theories = List.map (make_theory_section ~detached:false s fn) theories in
     f.file_theories <- theories;
     f
 
@@ -1625,12 +1618,12 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
         let old_th = Hstr.find old_th_table theory_name in
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory found: %s@." theory_name;
         Hstr.remove old_th_table theory_name;
-        make_theory_section ~merge:(old_ses,old_th,env,use_shapes) s fn th
+        make_theory_section ~detached:false ~merge:(old_ses,old_th,env,use_shapes) s fn th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
         found_detached := true;
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
-        make_theory_section s fn th
+        make_theory_section ~detached:false s fn th
     in
     let theories = List.map add_theory theories in
     (* we save the remaining, detached *)
