@@ -321,7 +321,7 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
       Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace ~command
                         ~limit driver task
     in
-    let pa = (c.controller_session,id,pr,proof_script,callback,false,call,ores) in
+    let pa = (c.controller_session,id,pr,callback,false,call,ores) in
     Queue.push pa prover_tasks_in_progress
   with Not_found (* goal has no task, it is detached *) ->
        callback Detached
@@ -336,7 +336,7 @@ let timeout_handler () =
   (* examine all the prover tasks in progress *)
   let q = Queue.create () in
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,pr_script,callback,started,call,ores) as c =
+    let (ses,id,pr,callback,started,call,ores) as c =
       Queue.pop prover_tasks_in_progress in
     match Call_provers.query_call call with
     | Call_provers.NoUpdates -> Queue.add c q
@@ -344,23 +344,14 @@ let timeout_handler () =
        assert (not started);
        callback Running;
        incr number_of_running_provers;
-       Queue.add (ses,id,pr,pr_script,callback,true,call,ores) q
+       Queue.add (ses,id,pr,callback,true,call,ores) q
     | Call_provers.ProverFinished res ->
        if started then decr number_of_running_provers;
        let res = Opt.fold fuzzy_proof_time res ores in
-       (* update the session *)
-       update_proof_attempt ses id pr res;
+       (* cannot update the session, we do not have a notifier *)
+       (* update_proof_attempt ses id pr res; *)
        (* inform the callback *)
        callback (Done res)
-(*
-    | Call_provers.ProverFinished res (* when pr_script <> None *) ->
-       if started then decr number_of_running_provers;
-       let res = Opt.fold fuzzy_proof_time res ores in
-       (* update the session *)
-       update_proof_attempt ~obsolete:true ses id pr res;
-       (* inform the callback *)
-       callback (Done res)
-*)
     | Call_provers.ProverInterrupted ->
        if started then decr number_of_running_provers;
        (* inform the callback *)
@@ -395,7 +386,7 @@ let timeout_handler () =
 
 let interrupt () =
   while not (Queue.is_empty prover_tasks_in_progress) do
-    let (_ses,_id,_pr,_proof_script,callback,_started,_call,_ores) =
+    let (_ses,_id,_pr,callback,_started,_call,_ores) =
       Queue.pop prover_tasks_in_progress in
     (* TODO: apply some Call_provers.interrupt_call call *)
     callback Interrupted
@@ -422,7 +413,7 @@ let schedule_proof_attempt c id pr
     (match s with
     | Scheduled | Running -> update_goal_node notification ses id
     | Done res ->
-        update_proof_attempt ~obsolete:false ses id pr res;
+        update_proof_attempt ~obsolete:false notification ses id pr res;
         update_goal_node notification ses id
     | _ -> ());
     callback panid s
@@ -565,42 +556,48 @@ let schedule_edition c id pr ~callback ~notification =
     match prover_conf.Whyconf.editor with
     | "" -> raise Editor_not_found
     | s ->
-        try
-          let ed = Whyconf.editor_by_id config s in
-          String.concat " " (ed.Whyconf.editor_command ::
-                             ed.Whyconf.editor_options)
-        with Not_found -> raise Editor_not_found
+       try
+         let ed = Whyconf.editor_by_id config s in
+         String.concat " " (ed.Whyconf.editor_command ::
+                              ed.Whyconf.editor_options)
+       with Not_found -> raise Editor_not_found
   in
   let proof_attempts_id = get_proof_attempt_ids session id in
   let panid =
     try Hprover.find proof_attempts_id pr
     with Not_found ->
-         let file = update_edit_external_proof c id pr in
-         let filename = Sysutil.relativize_filename session_dir file in
-         graft_proof_attempt c.controller_session id pr ~file:filename ~limit
+      let file = update_edit_external_proof c id pr in
+      let filename = Sysutil.relativize_filename session_dir file in
+      graft_proof_attempt session id pr ~file:filename ~limit
   in
-  let pa = get_proof_attempt_node c.controller_session panid in
-  let file = Opt.get pa.proof_script in
+  let pa = get_proof_attempt_node session panid in
   (* Notification node *)
   let callback panid s =
     begin
       match s with
       | Scheduled | Running ->
-                     update_goal_node notification c.controller_session id
-      | Done _ ->
-         update_goal_node notification c.controller_session id
+                     update_goal_node notification session id
+      | Done res ->
+         (* set obsolete to true since we do not know if the manual
+proof was completed or not *)
+         Debug.dprintf debug_sched
+                       "Setting status of %a under parent %a to obsolete@."
+                       print_proofAttemptID panid print_proofNodeID id;
+         update_proof_attempt ~obsolete:true notification session id pr res;
+         update_goal_node notification session id
       | Interrupted | InternalFailure _ -> ()
       | _ -> ()
     end;
     callback panid s
   in
+  let file = Opt.get pa.proof_script in
+  let file = Filename.concat session_dir file in
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
-    (Session_itp.get_proof_name session id).Ident.id_string
-    editor file;
+                (Session_itp.get_proof_name session id).Ident.id_string
+                editor file;
   let call = Call_provers.call_editor ~command:editor file in
   callback panid Running;
-  let file = Sysutil.relativize_filename session_dir file in
-  Queue.add (c.controller_session,id,pr,Some file,callback panid,false,call,None)
+  Queue.add (c.controller_session,id,pr,callback panid,false,call,None)
             prover_tasks_in_progress;
   run_timeout_handler ()
 

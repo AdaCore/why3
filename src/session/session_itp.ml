@@ -678,13 +678,14 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
   tid
 
 
-let update_proof_attempt ?(obsolete=false) s id pr st =
+let update_proof_attempt ?(obsolete=false) notifier s id pr st =
   try
     let n = get_proofNode s id in
-    let pa = Hprover.find n.proofn_attempts pr in
-    let pa = get_proof_attempt_node s pa in
+    let paid = Hprover.find n.proofn_attempts pr in
+    let pa = get_proof_attempt_node s paid in
     pa.proof_state <- Some st;
-    pa.proof_obsolete <- obsolete
+    pa.proof_obsolete <- obsolete;
+    notifier (APa paid)
   with
   | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
 

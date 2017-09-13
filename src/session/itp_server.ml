@@ -1026,22 +1026,19 @@ end
   (* Callback of a proof_attempt *)
   let callback_update_tree_proof cont panid pa_status =
     let ses = cont.controller_session in
-    begin match pa_status with
-    | Scheduled ->
-      begin
-        try
-          let _ : node_ID = node_ID_from_pan panid in ()
-        (* TODO: do we notify here ? *)
-        with Not_found ->
-          let parent_id = get_proof_attempt_parent ses panid in
-          let parent = node_ID_from_pn parent_id in
-          let _: node_ID = new_node ~parent (APa panid) in ()
-      end
-    | _  -> () (* TODO ? status like Uninstalled should not generate a Notification *)
-    end;
-    let limit = (get_proof_attempt_node cont.controller_session panid).limit in
-    let new_status = Proof_status_change (pa_status, false, limit) in
-    P.notify (Node_change (node_ID_from_pan panid, new_status))
+    let node_id =
+      try
+        node_ID_from_pan panid
+      with Not_found ->
+        let parent_id = get_proof_attempt_parent ses panid in
+        let parent = node_ID_from_pn parent_id in
+        new_node ~parent (APa panid)
+    in
+    let pa = get_proof_attempt_node ses panid in
+    let new_status =
+      Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)
+    in
+    P.notify (Node_change (node_id, new_status))
 
   let notify_change_proved c x =
     try
@@ -1056,6 +1053,8 @@ end
            | Some r -> Done r
          in
          let obs = pa.proof_obsolete in
+         Debug.dprintf debug
+                       "[Itp_server.notify_change_proved: obsolete = %b@." obs;
          let limit = pa.limit in
          P.notify (Node_change (node_ID, Proof_status_change(res, obs, limit)))
       | _ -> ()
@@ -1072,28 +1071,10 @@ end
                 ~limit ~callback ~notification:(notify_change_proved d.cont))
       unproven_goals
 
-  let callback_edition cont panid pa_status =
-    let ses = cont.controller_session in
-    begin match pa_status with
-    | Running ->
-      begin
-        try
-          ignore (node_ID_from_pan panid)
-        with Not_found ->
-          let parent_id = get_proof_attempt_parent ses panid in
-          let parent = node_ID_from_pn parent_id in
-          ignore (new_node ~parent (APa panid))
-      end
-    | _  -> ()
-    end;
-    let limit = (get_proof_attempt_node cont.controller_session panid).limit in
-    let new_status = Proof_status_change (pa_status, false, limit) in
-    P.notify (Node_change (node_ID_from_pan panid, new_status))
-
   let schedule_edition (nid: node_ID) (p: Whyconf.config_prover) =
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
-    let callback = callback_edition d.cont in
+    let callback = callback_update_tree_proof d.cont in
     match any_from_node_ID nid with
     | APn id ->
         C.schedule_edition d.cont id prover
