@@ -1075,11 +1075,20 @@ end
     let d = get_server_data () in
     let prover = p.Whyconf.prover in
     let callback = callback_update_tree_proof d.cont in
-    match any_from_node_ID nid with
-    | APn id ->
-        C.schedule_edition d.cont id prover
-          ~callback ~notification:(notify_change_proved d.cont)
-    | _ -> ()
+    try
+      let id =
+        match any_from_node_ID nid with
+        | APn id -> id
+        | APa panid -> get_proof_attempt_parent d.cont.controller_session panid
+        | _ -> raise Not_found
+      in
+      C.schedule_edition d.cont id prover
+                           ~callback ~notification:(notify_change_proved d.cont)
+    with Not_found ->
+      P.notify
+        (Message
+           (Information
+              "for edition please select either a goal or a proof attempt"))
 
   (* ----------------- Schedule transformation -------------------- *)
 
