@@ -12,6 +12,8 @@
 open Why3.Strings
 open Format
 
+let blocking = false
+
 let multiplier = 3
 
 let hexa_digit x =

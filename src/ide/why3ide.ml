@@ -144,6 +144,8 @@ let backtrace_and_exit f () =
 
 module Scheduler = struct
 
+    let blocking = false
+
     let multiplier = 3
 
     let idle ~prio f =

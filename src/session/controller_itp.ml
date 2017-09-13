@@ -210,6 +210,7 @@ let add_file c ?format fname =
 
 
 module type Scheduler = sig
+  val blocking: bool
   val multiplier: int
   val timeout: ms:int -> (unit -> bool) -> unit
   val idle: prio:int -> (unit -> bool) -> unit
@@ -338,7 +339,7 @@ let timeout_handler () =
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
-    let results = Call_provers.forward_results ~blocking:false (* TODO *) in
+    let results = Call_provers.forward_results ~blocking:S.blocking in
     while not (Queue.is_empty results) do
       let (call, prover_update) = Queue.pop results in
       let c = try Some (Hashtbl.find prover_tasks_in_progress call)

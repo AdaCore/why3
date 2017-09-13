@@ -56,6 +56,10 @@ module type Scheduler = sig
     depending on some time constraints: after a given delay, or simply
     when there is no more tasks with higher priority. *)
 
+    val blocking: bool
+    (** Set to true when the scheduler should wait for results of why3server
+        (script), false otherwise (ITP which needs reactive scheduling) *)
+
     val multiplier: int
     (** Number of allowed task given to why3server is this number times the
         number of allowed proc on the machine.

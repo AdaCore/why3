@@ -11,6 +11,9 @@
 
 module Unix_scheduler = struct
 
+    (* TODO temporary. This scheduler should be split *)
+    let blocking = false
+
     let multiplier = 3
 
     (* the private list of functions to call on idle, sorted higher
