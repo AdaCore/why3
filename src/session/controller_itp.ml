@@ -533,7 +533,8 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
        callback id Detached
 
 
-(* TODO to be simplified *)
+(*** { 2 edition of proof scripts} *)
+
 (* create the path to a file for saving the external proof script *)
 let create_file_rel_path c pr pn =
   let session = c.controller_session in
@@ -550,19 +551,20 @@ let create_file_rel_path c pr pn =
   let file = Sysutil.relativize_filename session_dir file in
   file
 
-let update_edit_external_proof c pn ?panid pr =
+let update_edit_external_proof c pn pr =
   let session = c.controller_session in
-  let driver = snd (Hprover.find c.controller_provers pr) in
-  let task = Session_itp.get_raw_task session pn in
-  let session_dir = Session_itp.get_dir session in
-  let file =
-    match panid with
-    | None ->
-        create_file_rel_path c pr pn
-    | Some panid ->
-        let pa = get_proof_attempt_node session panid in
-        Opt.get pa.proof_script
+  let proof_attempts_id = get_proof_attempt_ids session pn in
+  let panid =
+    try
+      Hprover.find proof_attempts_id pr
+    with Not_found ->
+      let file = create_file_rel_path c pr pn in
+      let limit = Call_provers.empty_limit in
+      graft_proof_attempt session pn pr ~file ~limit
   in
+  let pa = get_proof_attempt_node session panid in
+  let file = Opt.get pa.proof_script in
+  let session_dir = Session_itp.get_dir session in
   let file = Filename.concat session_dir file in
   let old =
     if Sys.file_exists file
@@ -578,10 +580,12 @@ let update_edit_external_proof c pn ?panid pr =
   in
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
+  let task = Session_itp.get_raw_task session pn in
+  let driver = snd (Hprover.find c.controller_provers pr) in
   Driver.print_task ~cntexample:false ?old driver fmt task;
   Opt.iter close_in old;
   close_out ch;
-  file
+  panid,file
 
 exception Editor_not_found
 
@@ -590,8 +594,6 @@ let schedule_edition c id pr ~callback ~notification =
   let config = c.controller_config in
   let session = c.controller_session in
   let prover_conf = Whyconf.get_prover_config config pr in
-  let session_dir = Session_itp.get_dir session in
-  let limit = Call_provers.empty_limit in
   (* Make sure editor exists. Fails otherwise *)
   let editor =
     match prover_conf.Whyconf.editor with
@@ -603,15 +605,7 @@ let schedule_edition c id pr ~callback ~notification =
                               ed.Whyconf.editor_options)
        with Not_found -> raise Editor_not_found
   in
-  let proof_attempts_id = get_proof_attempt_ids session id in
-  let panid =
-    try Hprover.find proof_attempts_id pr
-    with Not_found ->
-      let file = update_edit_external_proof c id pr in
-      let filename = Sysutil.relativize_filename session_dir file in
-      graft_proof_attempt session id pr ~file:filename ~limit
-  in
-  let pa = get_proof_attempt_node session panid in
+  let panid,file = update_edit_external_proof c id pr in
   (* Notification node *)
   let callback panid s =
     begin
@@ -631,8 +625,6 @@ let schedule_edition c id pr ~callback ~notification =
     end;
     callback panid s
   in
-  let file = Opt.get pa.proof_script in
-  let file = Filename.concat session_dir file in
   Debug.dprintf debug_sched "[Editing] goal %s with command '%s' on file %s@."
                 (Session_itp.get_proof_name session id).Ident.id_string
                 editor file;
@@ -650,6 +642,9 @@ let schedule_edition c id pr ~callback ~notification =
     end
 *)
 
+
+
+(*** { 2 transformations} *)
 
 let schedule_transformation_r c id name args ~callback =
   let apply_trans () =
