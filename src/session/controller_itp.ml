@@ -223,7 +223,12 @@ module Make(S : Scheduler) = struct
 
 let scheduled_proof_attempts = Queue.create ()
 
-let prover_tasks_in_progress = Queue.create ()
+let prover_tasks_in_progress = Hashtbl.create 17
+
+(* We need to separate tasks that are edited from proofattempt in progress
+   because we are not using why3server for the edited proofs and timeout_handler
+   rely on a loop on why3server's results. *)
+let prover_tasks_edited = Queue.create ()
 
 let timeout_handler_running = ref false
 
@@ -322,52 +327,85 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
                         ~limit driver task
     in
     let pa = (c.controller_session,id,pr,callback,false,call,ores) in
-    Queue.push pa prover_tasks_in_progress
+    Hashtbl.replace prover_tasks_in_progress call pa
   with Not_found (* goal has no task, it is detached *) ->
        callback Detached
 
 let update_observer () =
   let scheduled = Queue.length scheduled_proof_attempts in
-  let waiting_or_running = Queue.length prover_tasks_in_progress in
+  let waiting_or_running = Hashtbl.length prover_tasks_in_progress in
   let running = !number_of_running_provers in
   !observer scheduled (waiting_or_running - running) running
 
 let timeout_handler () =
   (* examine all the prover tasks in progress *)
+  (* When no tasks are there, probably no tasks were scheduled and the server
+     was not launched so getting results could fail. *)
+  if Hashtbl.length prover_tasks_in_progress != 0 then begin
+    let results = Call_provers.forward_results ~blocking:false (* TODO *) in
+    while not (Queue.is_empty results) do
+      let (call, prover_update) = Queue.pop results in
+      let c = try Some (Hashtbl.find prover_tasks_in_progress call)
+        with Not_found -> None in
+      match c with
+      | None -> () (* we do nothing. We probably received ProverStarted after
+                      ProverFinished because what is sent to and received from
+                      the server is not ordered. *)
+      | Some c ->
+      begin
+        let (ses,id,pr,callback,started,call,ores) = c in
+
+        match prover_update with
+        | Call_provers.NoUpdates -> ()
+        | Call_provers.ProverStarted ->
+            assert (not started);
+            callback Running;
+            incr number_of_running_provers;
+            Hashtbl.replace prover_tasks_in_progress call
+              (ses,id,pr,callback,true,call,ores)
+        | Call_provers.ProverFinished res ->
+            Hashtbl.remove prover_tasks_in_progress call;
+            if started then decr number_of_running_provers;
+            let res = Opt.fold fuzzy_proof_time res ores in
+            (* inform the callback *)
+            callback (Done res)
+        | Call_provers.ProverInterrupted ->
+            Hashtbl.remove prover_tasks_in_progress call;
+            if started then decr number_of_running_provers;
+            (* inform the callback *)
+            callback (Interrupted)
+        | Call_provers.InternalFailure exn ->
+            Hashtbl.remove prover_tasks_in_progress call;
+            if started then decr number_of_running_provers;
+            (* inform the callback *)
+            callback (InternalFailure (exn))
+      end
+    done
+  end;
+
+  (* Check for editor calls which are not finished *)
   let q = Queue.create () in
-  while not (Queue.is_empty prover_tasks_in_progress) do
-    let (ses,id,pr,callback,started,call,ores) as c =
-      Queue.pop prover_tasks_in_progress in
-    match Call_provers.query_call call with
+  while not (Queue.is_empty prover_tasks_edited) do
+    (* call is an EditorCall *)
+    let (_ses,_id,_pr,callback,_started,call,ores) as c =
+      Queue.pop prover_tasks_edited in
+    let prover_update = Call_provers.query_call call in
+    match prover_update with
     | Call_provers.NoUpdates -> Queue.add c q
-    | Call_provers.ProverStarted ->
-       assert (not started);
-       callback Running;
-       incr number_of_running_provers;
-       Queue.add (ses,id,pr,callback,true,call,ores) q
     | Call_provers.ProverFinished res ->
-       if started then decr number_of_running_provers;
        let res = Opt.fold fuzzy_proof_time res ores in
-       (* cannot update the session, we do not have a notifier *)
-       (* update_proof_attempt ses id pr res; *)
        (* inform the callback *)
        callback (Done res)
-    | Call_provers.ProverInterrupted ->
-       if started then decr number_of_running_provers;
-       (* inform the callback *)
-       callback (Interrupted)
-    | Call_provers.InternalFailure exn ->
-       if started then decr number_of_running_provers;
-       (* inform the callback *)
-       callback (InternalFailure (exn))
+    | _ -> assert (false) (* An edition can only return Noupdates or finished *)
   done;
-  Queue.transfer q prover_tasks_in_progress;
-  (* if the number of prover tasks is less than 3 times the maximum
+  Queue.transfer q prover_tasks_edited;
+
+  (* if the number of prover tasks is less than S.multiplier times the maximum
      number of running provers, then we heuristically decide to add
      more tasks *)
   begin
     try
-      for _i = Queue.length prover_tasks_in_progress
+      for _i = Hashtbl.length prover_tasks_in_progress
           to S.multiplier * !max_number_of_running_provers do
         let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
           Queue.pop scheduled_proof_attempts in
@@ -385,12 +423,18 @@ let timeout_handler () =
   true
 
 let interrupt () =
-  while not (Queue.is_empty prover_tasks_in_progress) do
+  (* Interrupt provers *)
+  Hashtbl.iter (fun _k e ->
+    let (_, _, _, callback, _, _, _) = e in callback Interrupted)
+    prover_tasks_in_progress;
+  Hashtbl.clear prover_tasks_in_progress;
+  (* Do not interrupt editors
+  while not (Queue.is_empty prover_tasks_edited) do
     let (_ses,_id,_pr,callback,_started,_call,_ores) =
-      Queue.pop prover_tasks_in_progress in
-    (* TODO: apply some Call_provers.interrupt_call call *)
+      Queue.pop prover_tasks_edited in
     callback Interrupted
   done;
+  *)
   number_of_running_provers := 0;
   while not (Queue.is_empty scheduled_proof_attempts) do
     let (_c,_id,_pr,_limit,_proof_script,callback,_cntexample,_ores) =
@@ -579,7 +623,7 @@ let schedule_edition c id pr ~callback ~notification =
                      update_goal_node notification session id
       | Done res ->
          (* set obsolete to true since we do not know if the manual
-proof was completed or not *)
+            proof was completed or not *)
          Debug.dprintf debug_sched
                        "Setting status of %a under parent %a to obsolete@."
                        print_proofAttemptID panid print_proofNodeID id;
@@ -598,8 +642,16 @@ proof was completed or not *)
   let call = Call_provers.call_editor ~command:editor file in
   callback panid Running;
   Queue.add (c.controller_session,id,pr,callback panid,false,call,None)
-            prover_tasks_in_progress;
+            prover_tasks_edited;
   run_timeout_handler ()
+
+(* TODO get back no_edit ???
+ if no_edit then
+    begin
+      callback panid Running;
+      callback panid Interrupted
+    end
+*)
 
 
 let schedule_transformation_r c id name args ~callback =

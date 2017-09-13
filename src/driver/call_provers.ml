@@ -405,6 +405,14 @@ let query_result_buffer id =
       Hashtbl.remove result_buffer id; r
   with Not_found -> NoUpdates
 
+let forward_results ~blocking =
+  get_new_results ~blocking;
+  let q = Queue.create () in
+  Hashtbl.iter (fun key element ->
+    Queue.push (ServerCall key, element) q) result_buffer;
+  Hashtbl.clear result_buffer;
+  q
+
 let editor_result ret = {
   pr_answer = Unknown ("", None);
   pr_status = ret;
