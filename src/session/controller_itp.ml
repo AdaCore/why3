@@ -31,8 +31,6 @@ let () = Exn_printer.register
 
 (** State of a proof *)
 type proof_attempt_status =
-  | Unedited (** editor not yet run for interactive proof *)
-  | JustEdited (** edited but not run yet *)
   | Detached (** parent goal has no task, is detached *)
   | Interrupted (** external proof has never completed *)
   | Scheduled (** external proof attempt is scheduled *)
@@ -43,8 +41,6 @@ type proof_attempt_status =
 
 let print_status fmt st =
   match st with
-  | Unedited          -> fprintf fmt "Unedited"
-  | JustEdited        -> fprintf fmt "JustEdited"
   | Detached          -> fprintf fmt "Detached"
   | Interrupted       -> fprintf fmt "Interrupted"
   | Scheduled         -> fprintf fmt "Scheduled"
@@ -710,7 +706,7 @@ let run_strategy_on_goal
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
               S.idle ~prio:0 run_next
-           | Unedited | JustEdited | Detached | Uninstalled _ ->
+           | Detached | Uninstalled _ ->
                          (* should not happen *)
                          assert false
          in
@@ -902,7 +898,6 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
   let craft_report count s r id pr limits pa =
     match s with
     | Scheduled | Running -> ()
-    | Unedited | JustEdited -> assert false
     | Interrupted ->
        decr count;
        r := (id, pr, limits, Replay_interrupted ) :: !r
@@ -982,7 +977,6 @@ let bisect_proof_attempt ~notification c pa_id =
     | Running | Scheduled -> ()
     | Interrupted ->
       Debug.dprintf debug "Bisecting interrupted.@."
-    | Unedited | JustEdited -> assert false
     | Detached | Uninstalled _ -> assert false
     | InternalFailure exn ->
       (* Perhaps the test can be considered false in this case? *)
@@ -1038,7 +1032,7 @@ let bisect_proof_attempt ~notification c pa_id =
     | Running | Scheduled -> ()
     | Interrupted ->
       Debug.dprintf debug "Bisecting interrupted.@."
-    | Unedited | JustEdited | Detached | Uninstalled _ -> assert false
+    | Detached | Uninstalled _ -> assert false
     | InternalFailure exn ->
         Debug.dprintf debug "proof of the initial task interrupted by an error %a.@."
           Exn_printer.exn_printer exn

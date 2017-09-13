@@ -75,10 +75,6 @@ let convert_proof_result (pr: prover_result) =
 
 let convert_proof_attempt (pas: proof_attempt_status) =
   Record (match pas with
-  | Unedited ->
-      convert_record ["proof_attempt", String "Unedited"]
-  | JustEdited ->
-      convert_record ["proof_attempt", String "JustEdited"]
   | Interrupted ->
       convert_record ["proof_attempt", String "Interrupted"]
   | Scheduled ->
@@ -615,8 +611,6 @@ exception NotProofAttempt
 let parse_proof_attempt j =
   let s = get_string (get_field j "proof_attempt") in
   match s with
-  | "Unedited" -> Unedited
-  | "JustEdited" -> JustEdited
   | "Interrupted" -> Interrupted
   | "Scheduled" -> Scheduled
   | "Running" -> Running

@@ -221,7 +221,6 @@ let run_one sched env config filters interactive_provers fname =
       | _, M.Starting -> ()
       | _, M.StatusChange (Running|Scheduled) -> ()
       | _, M.StatusChange (Interrupted) -> Todo.stop todo
-      | _, M.StatusChange (JustEdited|Unedited) -> assert false
       | _, M.MissingFile efname ->
         dprintf verbose
           "@[From@ file@ %s:@\nThe@ edited@ file@ %s@ for@ the@ proof@ of@ %a@ \
