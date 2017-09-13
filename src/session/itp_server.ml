@@ -254,7 +254,9 @@ let get_exception_message ses id e =
 let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
+(*
   | Prove_req (_nid, prover, _rl)   -> fprintf fmt "prove with %s" prover
+ *)
   | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
   | Strategy_req (_nid, st)         -> fprintf fmt "strategy %s" st
   | Edit_req (_nid, prover)         -> fprintf fmt "edit with %s" prover
@@ -341,7 +343,7 @@ end
 
 module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
 
-  module C = Controller_itp.Make(S)
+module C = Controller_itp.Make(S)
 
 let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 
@@ -1094,7 +1096,7 @@ end
     let callback = callback_edition d.cont in
     match any_from_node_ID nid with
     | APn id ->
-        C.schedule_edition d.cont id prover ~no_edit:false ~do_check_proof:false ?file:None
+        C.schedule_edition d.cont id prover
           ~callback ~notification:(notify_change_proved d.cont)
     | _ -> ()
 
@@ -1223,6 +1225,11 @@ end
   let () = register_command "clean" "remove unsuccessful proof attempts that are below proved goals"
     (Qnotask (fun _cont _args ->  clean_session (); "Cleaning done"))
 
+(*
+  let () = register_command "edit" "remove unsuccessful proof attempts that are below proved goals"
+    (Qtask (fun cont _table _args ->  schedule_editionn (); "Editor called"))
+ *)
+
 (* TODO: should this remove the current selected node ?
   let () = register_command
              "remove_node" "removes a proof attempt or a transformation"
@@ -1279,6 +1286,7 @@ end
     let config = d.cont.controller_config in
     try (
     match r with
+(*
     | Prove_req (nid,p,limit)      ->
       let p = try Some (get_prover p) with
       | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))); None
@@ -1289,6 +1297,7 @@ end
           let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
           schedule_proof_attempt ~counterexmp nid p limit
       end
+ *)
     | Transform_req (nid, t, args) -> apply_transform nid t args
     | Strategy_req (nid, st)       ->
         let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in

@@ -106,10 +106,21 @@ type notification =
 
 type ide_request =
   | Command_req             of node_ID * string
+(*
   | Prove_req               of node_ID * prover * Call_provers.resource_limit
+  (** request to run the given prover on the goal of the given node
+      id, with the given limits.  if the prover is an interactive one,
+      this requests for an edition of the proof script instead of
+      running the prover. Checking the validity of an interactive
+      proof must be done via a [Replay_req] request *)
+*)
   | Transform_req           of node_ID * transformation * string list
   | Strategy_req            of node_ID * strategy
   | Edit_req                of node_ID * prover
+  (** Request for edition of the proof script of the proof attempt
+      associated to the given node id. Works also for non-interactive
+      provers, it simply opens an editeor on the file sent to the
+      prover. *)
   | Add_file_req            of string
   | Set_max_tasks_req       of int
   | Get_file_contents       of string
@@ -125,7 +136,7 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Copy_detached           of node_ID
   | Save_file_req           of string * string
-  (** [Save_file_req(filename, content_of_file)] save the file *)
+  (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
   | Mark_obsolete_req       of node_ID
   | Get_Session_Tree_req
@@ -133,6 +144,11 @@ type ide_request =
   | Save_req
   | Reload_req
   | Replay_req
+  (** replay all the proof attempts whose result is obsolete. TODO
+      [priority high]: have a similar request with a node id as
+      argument, to replay only in the corresponding subtree. TODO
+      [priority low]: have a extra boolean argument to force replay
+      also of non-obsolete goals. *)
   | Exit_req
   | Interrupt_req
 

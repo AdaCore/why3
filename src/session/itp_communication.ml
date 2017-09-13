@@ -100,7 +100,9 @@ type notification =
 
 type ide_request =
   | Command_req             of node_ID * string
+(*
   | Prove_req               of node_ID * prover * Call_provers.resource_limit
+*)
   | Transform_req           of node_ID * transformation * string list
   | Strategy_req            of node_ID * strategy
   | Edit_req                of node_ID * prover
@@ -130,7 +132,7 @@ type ide_request =
 (* Return true if the request modify the session *)
 let modify_session (r: ide_request) =
   match r with
-  | Command_req _ | Prove_req _ | Transform_req _ | Strategy_req _
+  | Command_req _ (* | Prove_req _ *) | Transform_req _ | Strategy_req _
   | Add_file_req _ | Remove_subtree _ | Copy_paste _ | Copy_detached _
   | Replay_req | Clean_req | Mark_obsolete_req _ | Edit_req _ -> true
 

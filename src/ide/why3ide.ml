@@ -1622,6 +1622,10 @@ let () =
 
 (* complete the tools menu *)
 
+let edit_menu_item =
+  create_menu_item tools_factory "Edit"
+                   "View or edit proof script"
+
 let replay_menu_item =
   create_menu_item tools_factory "Replay obsolete"
                    "Replay all obsolete proofs"
@@ -1660,6 +1664,14 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Remove_subtree id)
+               | _ -> print_message "Select only one node to perform this action");
+  connect_menu_item
+    edit_menu_item
+    ~callback:(fun () ->
+               match get_selected_row_references () with
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Command_req (id,"edit"))
                | _ -> print_message "Select only one node to perform this action");
   connect_menu_item
     mark_obsolete_item
