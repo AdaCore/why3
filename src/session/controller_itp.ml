@@ -380,22 +380,26 @@ let timeout_handler () =
     done
   end;
 
-  (* Check for editor calls which are not finished *)
-  let q = Queue.create () in
-  while not (Queue.is_empty prover_tasks_edited) do
-    (* call is an EditorCall *)
-    let (_ses,_id,_pr,callback,_started,call,ores) as c =
-      Queue.pop prover_tasks_edited in
-    let prover_update = Call_provers.query_call call in
-    match prover_update with
-    | Call_provers.NoUpdates -> Queue.add c q
-    | Call_provers.ProverFinished res ->
-       let res = Opt.fold fuzzy_proof_time res ores in
-       (* inform the callback *)
-       callback (Done res)
-    | _ -> assert (false) (* An edition can only return Noupdates or finished *)
-  done;
-  Queue.transfer q prover_tasks_edited;
+  (* When blocking is activated, we are in script mode and we don't want editors
+     to be launched so we don't need to go in this loop. *)
+  if not S.blocking then begin
+    (* Check for editor calls which are not finished *)
+    let q = Queue.create () in
+    while not (Queue.is_empty prover_tasks_edited) do
+      (* call is an EditorCall *)
+      let (_ses,_id,_pr,callback,_started,call,ores) as c =
+        Queue.pop prover_tasks_edited in
+      let prover_update = Call_provers.query_call call in
+      match prover_update with
+      | Call_provers.NoUpdates -> Queue.add c q
+      | Call_provers.ProverFinished res ->
+          let res = Opt.fold fuzzy_proof_time res ores in
+          (* inform the callback *)
+          callback (Done res)
+      | _ -> assert (false) (* An edition can only return Noupdates or finished *)
+    done;
+    Queue.transfer q prover_tasks_edited;
+  end;
 
   (* if the number of prover tasks is less than S.multiplier times the maximum
      number of running provers, then we heuristically decide to add
