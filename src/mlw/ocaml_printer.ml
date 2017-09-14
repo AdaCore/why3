@@ -42,6 +42,20 @@ module Print = struct
   open Mltree
   open Compile.ML
 
+  (* extraction labels *)
+  let optional_arg = create_label "ocaml:optional"
+  let named_arg = create_label "ocaml:named"
+  let ocaml_remove = create_label "ocaml:remove"
+
+  let is_optional ~labels =
+    Slab.mem optional_arg labels
+
+  let is_named ~labels =
+    Slab.mem named_arg labels
+
+  let is_ocaml_remove ~labels =
+    Ident.Slab.mem ocaml_remove labels
+
   let ocaml_keywords =
     ["and"; "as"; "assert"; "asr"; "begin";
      "class"; "constraint"; "do"; "done"; "downto"; "else"; "end";
@@ -263,7 +277,7 @@ module Print = struct
     (* here [rs] refers to a [val] declaration *)
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn     rs.rs_name with
-    | None, None when info.info_flat ->
+    | None, None (* when info.info_flat *) ->
       (* FIXME? when extracting modularly, there are some functions we maybe do
                 not want to put in a drive, for instance mach.int.State63 *)
       Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
@@ -552,9 +566,11 @@ module Print = struct
       | Some (Dalias ty) ->
         fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
     in
-    fprintf fmt "@[<hov 2>%s %a%a%a@]"
-      (if fst then "type" else "and") print_tv_args its.its_args
-      (print_lident info) its.its_name print_def its.its_def
+    let labels = its.its_name.id_label in
+    if not (is_ocaml_remove ~labels) then
+      fprintf fmt "@[<hov 2>%s %a%a%a@]"
+        (if fst then "type" else "and") print_tv_args its.its_args
+        (print_lident info) its.its_name print_def its.its_def
 
   let rec is_signature_decl info = function
     | Dtype _ -> true
