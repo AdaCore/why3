@@ -641,16 +641,6 @@ let schedule_edition c id pr ~callback ~notification =
             prover_tasks_edited;
   run_timeout_handler ()
 
-(* TODO get back no_edit ???
- if no_edit then
-    begin
-      callback panid Running;
-      callback panid Interrupted
-    end
-*)
-
-
-
 (*** { 2 transformations} *)
 
 let schedule_transformation_r c id name args ~callback =
