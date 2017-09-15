@@ -555,17 +555,21 @@ let create_file_rel_path c pr pn =
   let file = Sysutil.relativize_filename session_dir file in
   file
 
-let update_edit_external_proof c pn pr =
+let prepare_edition c ?file pn pr ~notification =
   let session = c.controller_session in
   let proof_attempts_id = get_proof_attempt_ids session pn in
   let panid =
     try
       Hprover.find proof_attempts_id pr
     with Not_found ->
-      let file = create_file_rel_path c pr pn in
+      let file = match file with
+        | Some f -> f
+        | None -> create_file_rel_path c pr pn
+      in
       let limit = Call_provers.empty_limit in
       graft_proof_attempt session pn pr ~file ~limit
   in
+  update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
   let file = Opt.get pa.proof_script in
   let session_dir = Session_itp.get_dir session in
@@ -609,13 +613,11 @@ let schedule_edition c id pr ~callback ~notification =
                               ed.Whyconf.editor_options)
        with Not_found -> raise Editor_not_found
   in
-  let panid,file = update_edit_external_proof c id pr in
+  let panid,file = prepare_edition c id pr ~notification in
   (* Notification node *)
   let callback panid s =
     begin
       match s with
-      | Scheduled | Running ->
-                     update_goal_node notification session id
       | Done res ->
          (* set obsolete to true since we do not know if the manual
             proof was completed or not *)
@@ -624,6 +626,7 @@ let schedule_edition c id pr ~callback ~notification =
                        print_proofAttemptID panid print_proofNodeID id;
          update_proof_attempt ~obsolete:true notification session id pr res;
          update_goal_node notification session id
+      | Scheduled | Running -> ()
       | Interrupted | InternalFailure _ -> ()
       | _ -> ()
     end;
