@@ -200,7 +200,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		rec_logic gnat_split_conj gnat_split_disj \
 		eliminate_unused_hypo eliminate_literal
 
-LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 smtv2_cvc_ce coq\
+LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
@@ -2219,6 +2219,16 @@ clean::
 	rm -f $(GENERATED)
 	$(foreach d,$(CLEANDIRS),rm -f $(addprefix $(d)/*.,$(COMPILED_LIB_EXTS));)
 	$(foreach p,$(CLEANLIBS),rm -f $(addprefix $(p).,$(COMPILED_LIB_EXTS));)
+
+detect-unused:
+	@L1=$$(mktemp); \
+	L2=$$(mktemp); \
+	for d in `find examples/ -name 'why3session.xml' -printf '%h\n'`; do \
+	  sed -n -e 's/.*edited="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
+	  (cd $$d; git ls-files) | grep -v -e '^why3session.xml' -e '^why3shapes' -e '^[.]gitignore' -e '^Makefile' -e '[.]ml$$' -e '[.]html$$' | sed -e 's/[.]prf$$/.pvs/;s/[.]thy$$/.xml/' | sort -u > $$L2; \
+	  diff -u --label="$$d/why3session.xml" --label="$$d/" $$L1 $$L2 || echo; \
+	done; \
+	rm $$L1 $$L2
 
 ##################################################################
 # Building the Why3 platform with ocamlbuild (OCaml 3.10 needed) #

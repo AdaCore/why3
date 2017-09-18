@@ -93,6 +93,7 @@ let (why_lang, any_lang) =
         exit 1
     | Some _ as l -> l in
   let any_lang filename =
+    if filename = "" then why_lang else
     match languages_manager#guess_language ~filename () with
     | None -> why_lang
     | Some _ as l -> l in
@@ -1517,6 +1518,7 @@ let (_ : GMenu.check_menu_item) = view_factory#add_check_item
 (* Tools menu *)
 (**************)
 
+let goals_accel_group = GtkData.AccelGroup.create ()
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
@@ -1528,8 +1530,12 @@ let () = add_gui_item (fun () ->
 let add_tool_separator () =
   add_gui_item (fun () -> ignore(tools_factory#add_separator ()))
 
-let add_tool_item label callback =
-  add_gui_item (fun () -> ignore(tools_factory#add_image_item ~label ~callback ()))
+let add_tool_item ?key label callback =
+  add_gui_item (fun () ->
+    let item = tools_factory#add_item ~callback label in
+    match key with
+    | None -> ()
+    | Some k -> item#add_accelerator ~group:goals_accel_group ~modi:[] k)
 
 
 let split_strategy =
@@ -1574,38 +1580,9 @@ let strategies () :
 let loaded_strategies = ref []
 
 let load_shortcut s =
-  if String.length s <> 1 then None else
-  try
-    let key = match String.get s 0 with
-      | 'a' -> GdkKeysyms._a
-      | 'b' -> GdkKeysyms._b
-      | 'c' -> GdkKeysyms._c
-      | 'd' -> GdkKeysyms._d
-      | 'e' -> GdkKeysyms._e
-      | 'f' -> GdkKeysyms._f
-      | 'g' -> GdkKeysyms._g
-      | 'h' -> GdkKeysyms._h
-      | 'i' -> GdkKeysyms._i
-      | 'j' -> GdkKeysyms._j
-      | 'k' -> GdkKeysyms._k
-      | 'l' -> GdkKeysyms._l
-      | 'm' -> GdkKeysyms._m
-      | 'n' -> GdkKeysyms._n
-      | 'o' -> GdkKeysyms._o
-      | 'p' -> GdkKeysyms._p
-      | 'q' -> GdkKeysyms._q
-      | 'r' -> GdkKeysyms._r
-      | 's' -> GdkKeysyms._s
-      | 't' -> GdkKeysyms._t
-      | 'u' -> GdkKeysyms._u
-      | 'v' -> GdkKeysyms._v
-      | 'w' -> GdkKeysyms._w
-      | 'x' -> GdkKeysyms._x
-      | 'y' -> GdkKeysyms._y
-      | 'z' -> GdkKeysyms._z
-      | _ -> raise Not_found
-    in Some(s,key)
-  with Not_found -> None
+  match GtkData.AccelGroup.parse s with
+  | (0,[]) -> None
+  | (key, modi) -> Some (GtkData.AccelGroup.name ~key ~modi, key, modi)
 
 let strategies () =
   match !loaded_strategies with
@@ -1620,7 +1597,7 @@ let strategies () =
               let code = st.Whyconf.strategy_code in
               let code = Strategy_parser.parse (env_session()) code in
               let shortcut = load_shortcut st.Whyconf.strategy_shortcut in
-              Format.eprintf "[GUI] Strategy '%s' loaded.@." name;
+              Debug.dprintf debug "[GUI] Strategy '%s' loaded.@." name;
               (name, st.Whyconf.strategy_desc, code, shortcut) :: acc
             with Strategy_parser.SyntaxError msg ->
               Format.eprintf
@@ -1646,7 +1623,7 @@ let sanitize_markup x =
 let string_of_desc desc =
   let print_trans_desc fmt (x,r) =
     fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
-  in Pp.string_of print_trans_desc desc
+  in escape_text (Pp.string_of print_trans_desc desc)
 
 let () =
   let transformations =
@@ -1689,13 +1666,13 @@ let () =
     let name =
       match k with
         | None -> name
-        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+        | Some (s,_,_) -> Printf.sprintf "%s (shortcut: %s)" name s
     in
     b#misc#set_tooltip_markup (string_of_desc (name,desc));
     let i = GMisc.image ~pixbuf:(!image_transf) () in
     let () = b#set_image i#coerce in
     let callback () = apply_strategy_on_selection strat in
-    let (_ : GtkSignal.id) = b#connect#pressed ~callback in
+    let (_ : GtkSignal.id) = b#connect#clicked ~callback in
     ()
   in
   List.iter iter (strategies ())
@@ -2177,9 +2154,9 @@ let edit_current_proof () =
 
 let () =
   add_tool_separator ();
-  add_tool_item "Edit current proof" edit_current_proof;
-  add_tool_item "Replay selection" replay_obsolete_proofs;
-  add_tool_item "Mark as obsolete" cancel_proofs;
+  add_tool_item ~key:GdkKeysyms._e "Edit current proof" edit_current_proof;
+  add_tool_item ~key:GdkKeysyms._r "Replay selection" replay_obsolete_proofs;
+  add_tool_item ~key:GdkKeysyms._o "Mark as obsolete" cancel_proofs;
   add_tool_item "Mark as archived" (set_archive_proofs true);
   add_tool_item "Remove from archive" (set_archive_proofs false)
 
@@ -2191,7 +2168,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_editor) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:edit_current_proof
+    b#connect#clicked ~callback:edit_current_proof
   in ()
 
 let () =
@@ -2202,7 +2179,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_replay) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:replay_obsolete_proofs
+    b#connect#clicked ~callback:replay_obsolete_proofs
   in ()
 
 
@@ -2265,8 +2242,8 @@ let clean_selection () =
 
 let () =
   add_tool_separator ();
-  add_tool_item "Remove current proof" confirm_remove_selection;
-  add_tool_item "Clean selection" clean_selection
+  add_tool_item ~key:GdkKeysyms._x "Remove current proof" confirm_remove_selection;
+  add_tool_item ~key:GdkKeysyms._c "Clean selection" clean_selection
 
 let () =
   let b = GButton.button ~packing:tools_box#add ~label:"Remove" () in
@@ -2275,7 +2252,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_remove) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:confirm_remove_selection
+    b#connect#clicked ~callback:confirm_remove_selection
   in ()
 
 let () =
@@ -2285,7 +2262,7 @@ associated to proved goals";
   let i = GMisc.image ~pixbuf:(!image_cleaning) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:clean_selection
+    b#connect#clicked ~callback:clean_selection
   in ()
 
 let () =
@@ -2294,7 +2271,7 @@ let () =
   let i = GMisc.image ~pixbuf:(!image_cancel) () in
   let () = b#set_image i#coerce in
   let (_ : GtkSignal.id) =
-    b#connect#pressed ~callback:(fun () -> M.cancel_scheduled_proofs sched)
+    b#connect#clicked ~callback:(fun () -> M.cancel_scheduled_proofs sched)
   in ()
 
 (***)
@@ -2309,13 +2286,13 @@ let () =
   let iter (name,desc,strat,k) =
     let desc = Scanf.format_from_string desc "" in
     let callback () = apply_strategy_on_selection strat in
-    let ii = submenu#add_image_item
-      ~label:(sanitize_markup name) ~callback ()
-    in
+    let ii = submenu#add_item ~callback (sanitize_markup name) in
     let name =
       match k with
         | None -> name
-        | Some(s,_) -> name ^ " (shortcut:" ^ s ^ ")"
+        | Some (s,key,modi) ->
+          ii#add_accelerator ~group:goals_accel_group ~modi key;
+          Printf.sprintf "%s (shortcut: %s)" name s
     in
     ii#misc#set_tooltip_text (string_of_desc (name,desc))
   in
@@ -2349,7 +2326,7 @@ let () =
            (Pp.sprintf_wnl "Start <tt>%a</tt> on the <b>selected goals</b>"
               C.print_prover p);
          let (_ : GtkSignal.id) =
-           b#connect#pressed
+           b#connect#clicked
              ~callback:(fun () -> prover_on_selected_goals p)
          in ())
       provers
@@ -2373,25 +2350,14 @@ let () =
     prover_on_selected_goals pr.prover in
   let callback ev =
     let key = GdkEvent.Key.keyval ev in
-    if key = GdkKeysyms._c then begin clean_selection (); true end else
-    if key = GdkKeysyms._e then begin edit_current_proof (); true end else
-    if key = GdkKeysyms._o then begin cancel_proofs (); true end else
     if key = GdkKeysyms._p then begin run_default_prover (); true end else
-    if key = GdkKeysyms._r then begin replay_obsolete_proofs (); true end else
-    if key = GdkKeysyms._x then begin confirm_remove_selection (); true end else
-    (* strategy shortcuts *)
-    let rec iter l =
-      match l with
-        | [] -> false (* otherwise, use the default event handler *)
-        | (_,_,_,None) :: rem -> iter rem
-        | (_,_,s,Some(_,k)) :: rem ->
-          if key = k then begin apply_strategy_on_selection s; true end else
-            iter rem
-    in
-    iter (strategies ())
+    false (* otherwise, use the default event handler *)
   in
-  ignore (goals_view#event#connect#key_press ~callback)
-
+  ignore (goals_view#event#connect#key_press ~callback);
+  ignore (goals_view#event#connect#focus_in
+            ~callback:(fun _ -> w#add_accel_group goals_accel_group; true));
+  ignore (goals_view#event#connect#focus_out
+            ~callback:(fun _ -> GtkWindow.Window.remove_accel_group w#as_window goals_accel_group; true))
 
 (***************)
 (* Bind events *)
@@ -2402,8 +2368,7 @@ let select_row r =
   let ind = goals_model#get ~row:r#iter ~column:index_column in
   current_selected_row := Some ind;
   let a = get_any_from_row_reference r in
-  update_tabs a;
-  match a with
+  begin match a with
     | S.Goal g ->
       scroll_to_source_goal g
     | S.Theory th ->
@@ -2419,6 +2384,8 @@ let select_row r =
       scroll_to_source_goal tr.S.transf_parent
     | S.Metas m ->
       scroll_to_source_goal m.S.metas_parent
+  end;
+  update_tabs a
 
 (* row selection on tree view on the left *)
 let (_ : GtkSignal.id) =

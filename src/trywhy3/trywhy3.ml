@@ -305,6 +305,7 @@ module ContextMenu =
     let prove_menu_entry = getElement AsHtml.li "why3-prove-menu-entry"
     let prove100_menu_entry = getElement AsHtml.li "why3-prove100-menu-entry"
     let prove1000_menu_entry = getElement AsHtml.li "why3-prove1000-menu-entry"
+    let prove5000_menu_entry = getElement AsHtml.li "why3-prove5000-menu-entry"
     let clean_menu_entry = getElement AsHtml.li "why3-clean-menu-entry"
     let enabled = ref true
 
@@ -1043,6 +1044,8 @@ let () =
 			  Controller.(why3_transform (`Prove(100)) ignore));
   ContextMenu.(add_action prove1000_menu_entry
 			  Controller.(why3_transform (`Prove(1000)) ignore));
+  ContextMenu.(add_action prove5000_menu_entry
+			  Controller.(why3_transform (`Prove(5000)) ignore));
   ContextMenu.(add_action clean_menu_entry
 			  Controller.(why3_transform (`Clean) TaskList.clean_task));
   Dialogs.(set_onchange input_num_threads

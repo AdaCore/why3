@@ -1,0 +1,61 @@
+theory ModelInt
+
+use import int.Int
+
+(* PASS *)
+goal test0 : forall x "model":int. not (0 < x < 1)
+
+(* CE *)
+goal test1 : forall x "model":int. not (0 <= x <= 1)
+
+use import int.EuclideanDivision
+
+(* CE *)
+goal test2 : forall x "model":int. div x x = 1
+
+(* CE *)
+goal test_overflow:
+  forall x "model" y "model" :  int.
+     0 <= x <= 65535 /\ 0 <= y <= 65535 -> 0 <= x + y <= 65535
+
+(* CE *)
+goal test_overflow2:
+  forall x "model" y "model" :  int.
+     -2 <= x <= 65535 /\ -2 <= y <= 65535 -> -2 <= x + y <= 65535
+
+predicate is_int16 (x:int) = -65536 <= x <= 65535
+
+(* CE *)
+goal test_overflow_int16:
+  forall x "model" y "model" :  int.
+     is_int16 x /\ is_int16 y -> is_int16 (x + y)
+
+(* CE *)
+goal test_overflow_int16_alt:
+  forall x "model" y "model" :  int.
+      -65536 <= x <= 65535 /\ -65536 <= y <= 65535 -> -65536 <= x+y <= 65535
+
+(* CE *)
+goal test_overflow_int16_bis:
+  forall x "model" y "model" :  int.
+     is_int16 x /\ is_int16 y /\
+     ("model" 0 <= x) /\ (x <= y) -> is_int16 (x + y)
+
+predicate is_int32 (x:int) = -2147483648 <= x <= 2147483647
+
+(* CE *)
+goal test_overflow_int32:
+  forall x "model" y "model" :  int.
+     is_int32 x /\ is_int32 y -> is_int32 (x + y)
+
+(* CE *)
+goal test_overflow_int32_bis:
+  forall x "model" y "model" :  int.
+     is_int32 x /\ is_int32 y /\ 0 <= x <= y -> is_int32 (x + y)
+
+(* CE *)
+goal test_overflow_int32_bis_inline:
+  forall x "model" y "model" :  int.
+     -2147483648 <= x <= 2147483647 /\ -2147483648 <= y <= 2147483647 /\ 0 <= x <= y -> -2147483648 <= x + y <= 2147483647
+
+end

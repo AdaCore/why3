@@ -52,7 +52,9 @@ val copy_dir : string -> string -> unit
 val path_of_file : string -> string list
 (** [path_of_file filename] return the absolute path of [filename] *)
 
+(* unused ?
 val normalize_filename : string -> string
+ *)
 (** [normalize_filename filename] removes from [filename] occurrences of
     "." and ".." that denote respectively the current directory and
     parent directory, whenever possible *)

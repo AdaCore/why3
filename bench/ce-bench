@@ -1,0 +1,43 @@
+#!/bin/sh
+
+dir=`dirname $0`
+
+case "$1" in
+  "-update-oracle")
+        updateoracle=true;;
+  "")
+        updateoracle=false;;
+  *)
+        echo "$0: Unknown option '$1'"
+        exit 2
+esac
+
+cd $dir
+
+run_cvc4_15 () {
+  echo -n "  $1... "
+  ../bin/why3prove.opt -P "CVC4,1.5" --timelimit 1 --get-ce $1 | \
+  # This ad hoc sed removes any timing information from counterexamples output.
+  # Counterexamples in JSON format cannot match this regexp.
+  sed 's/ ([0-9]\+\.[0-9]\+s)//' > $1.out
+  if cmp $1.oracle $1.out > /dev/null 2>&1 ; then
+     echo "ok"
+  else
+     if $updateoracle; then
+        echo "Updating oracle for $1"
+        mv $1.out $1.oracle
+     else
+       echo "FAILED!"
+       echo "diff is the following:"
+       diff $1.oracle $1.out
+     fi
+  fi
+}
+
+
+
+
+
+for f in ce/*.mlw; do
+    run_cvc4_15 $f
+done
