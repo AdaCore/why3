@@ -100,7 +100,6 @@ type notification =
 
 type ide_request =
   | Command_req             of node_ID * string
-  | Transform_req           of node_ID * transformation * string list
   | Edit_req                of node_ID * prover
 (*
   | Open_session_req        of string
@@ -128,7 +127,7 @@ type ide_request =
 (* Return true if the request modify the session *)
 let modify_session (r: ide_request) =
   match r with
-  | Command_req _ | Transform_req _
+  | Command_req _
   | Add_file_req _ | Remove_subtree _ | Copy_paste _ | Copy_detached _
   | Replay_req | Clean_req | Mark_obsolete_req _ | Edit_req _ -> true
 

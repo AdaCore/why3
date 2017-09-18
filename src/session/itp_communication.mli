@@ -109,7 +109,6 @@ type ide_request =
   (* executes the given command on the given node. command is
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
-  | Transform_req           of node_ID * transformation * string list
   | Edit_req                of node_ID * prover
   (** Request for edition of the proof script of the proof attempt
       associated to the given node id. Works also for non-interactive

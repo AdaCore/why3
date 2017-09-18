@@ -254,7 +254,6 @@ let get_exception_message ses id e =
 let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
-  | Transform_req (_nid, tr, _args) -> fprintf fmt "transformation :%s" tr
   | Edit_req (_nid, prover)         -> fprintf fmt "edit with %s" prover
 (*
   | Open_session_req f              -> fprintf fmt "open session file %s" f
@@ -1267,12 +1266,11 @@ end
     with
       Not_found -> None
 
-  let rec treat_request r =
+  let treat_request r =
     let d = get_server_data () in
     let config = d.cont.controller_config in
     try (
     match r with
-    | Transform_req (nid, t, args) -> apply_transform nid t args
     | Edit_req (nid, p)            ->
       let p = try Some (get_prover p) with
       | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))); None
@@ -1326,7 +1324,7 @@ end
       begin
         let snid = get_proof_node_id nid in
         match interp commands_table d.cont snid cmd with
-        | Transform (s, _t, args) -> treat_request (Transform_req (nid, s, args))
+        | Transform (s, _t, args) -> apply_transform nid s args
         | Query s                 -> P.notify (Message (Query_Info (nid, s)))
         | Prove (p, limit)        ->
             let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
