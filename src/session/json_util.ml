@@ -138,11 +138,7 @@ let convert_node_type nt =
 let convert_request_constructor (r: ide_request) =
   match r with
   | Command_req _             -> String "Command_req"
-(*
-  | Prove_req _               -> String "Prove_req"
-*)
   | Transform_req _           -> String "Transform_req"
-  | Strategy_req _            -> String "Strategy_req"
   | Edit_req _                -> String "Edit_req"
 (*
   | Open_session_req _        -> String "Open_session_req"
@@ -175,22 +171,11 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "command", String s]
-(*
-  | Prove_req (nid, p, l) ->
-      convert_record ["ide_request", cc r;
-           "node_ID", Int nid;
-           "prover", String p;
-           "limit", convert_limit l]
-*)
   | Transform_req (nid, tr, args) ->
       convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "transformation", String tr;
            "arguments", List (List.map (fun x -> String x) args)]
-  | Strategy_req (nid, str) ->
-      convert_record ["ide_request", cc r;
-           "node_ID", Int nid;
-           "strategy", String str]
   | Edit_req (nid, prover) ->
       convert_record ["ide_request", cc r;
                       "node_ID", Int nid;
@@ -457,13 +442,6 @@ let parse_request (constr: string) j =
     let nid = get_int (get_field j "node_ID") in
     let s = get_string (get_field j "command") in
     Command_req (nid, s)
-(*
-  | "Prove_req" ->
-    let nid = get_int (get_field j "node_ID") in
-    let p = get_string (get_field j "prover") in
-    let l = get_field j "limit" in
-    Prove_req (nid, p, parse_limit_from_json l)
- *)
   | "Transform_req" ->
     let nid = get_int (get_field j "node_ID") in
     let tr = get_string (get_field j "transformation") in
@@ -473,12 +451,6 @@ let parse_request (constr: string) j =
                      match x with
                      | String t -> t
                      | _ -> raise (NotRequest "")) args)
-
-  | "Strategy_req" ->
-    let nid = get_int (get_field j "node_ID") in
-    let str = get_string (get_field j "strategy") in
-    Strategy_req (nid, str)
-
   | "Edit_req" ->
     let nid = get_int (get_field j "node_ID") in
     let p = get_string (get_field j "prover") in

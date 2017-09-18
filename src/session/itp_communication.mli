@@ -106,16 +106,10 @@ type notification =
 
 type ide_request =
   | Command_req             of node_ID * string
-(*
-  | Prove_req               of node_ID * prover * Call_provers.resource_limit
-  (** request to run the given prover on the goal of the given node
-      id, with the given limits.  if the prover is an interactive one,
-      this requests for an edition of the proof script instead of
-      running the prover. Checking the validity of an interactive
-      proof must be done via a [Replay_req] request *)
-*)
+  (* executes the given command on the given node. command is
+     interpreted by Server_utils.interp. This includes calling
+     provers, applying transformations, stategies.  *)
   | Transform_req           of node_ID * transformation * string list
-  | Strategy_req            of node_ID * strategy
   | Edit_req                of node_ID * prover
   (** Request for edition of the proof script of the proof attempt
       associated to the given node id. Works also for non-interactive
