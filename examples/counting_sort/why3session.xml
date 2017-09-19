@@ -6,7 +6,7 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../counting_sort.mlw" proved="true">
@@ -215,12 +215,12 @@
   <transf name="remove" proved="true" arg1="real,pred,tuple0,unit,ref,zero,one,(&gt;),( * ),set,([&lt;-]),([&lt;-]),sorted_sub,sorted,permut,(!),Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Numof_empty,Numof_right_add,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_some,numof_change_equiv,Select_eq,Select_neq,k_positive,eqlt">
    <goal name="WP_parameter counting_sort.59.0" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.55" steps="1229"/></proof>
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter counting_sort.60" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.26"/></proof>
+  <proof prover="4"><result status="valid" time="1.07"/></proof>
   </goal>
   <goal name="WP_parameter counting_sort.61" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
