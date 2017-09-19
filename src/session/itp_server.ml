@@ -971,10 +971,21 @@ end
                        send_source = send_source;
                      };
     let d = get_server_data () in
+    let shortcuts =
+      Mstr.fold
+        (fun s p acc -> Whyconf.Mprover.add p s acc)
+        (Whyconf.get_prover_shortcuts config) Whyconf.Mprover.empty
+    in
     let prover_list =
-      Mstr.fold (fun x p acc ->
-                 let n = Pp.sprintf "%a" Whyconf.print_prover p in
-                 (x,n) :: acc) (Whyconf.get_prover_shortcuts config) []
+      Whyconf.Mprover.fold
+        (fun pr _ acc ->
+         let s = try
+             Whyconf.Mprover.find pr shortcuts
+           with Not_found -> ""
+         in
+         let n = Pp.sprintf "%a" Whyconf.print_prover pr in
+         let p = Pp.sprintf "%a" Whyconf.print_prover_parseable_format pr in
+         (s,n,p) :: acc) (Whyconf.get_provers config) []
     in
     load_strategies c;
     let transformation_list = List.map fst (list_transforms ()) in

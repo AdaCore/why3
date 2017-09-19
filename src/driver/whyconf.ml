@@ -58,10 +58,12 @@ type prover =
       prover_altern : string;
     }
 
+let print_altern fmt s =
+  if s <> "" then Format.fprintf fmt " (%s)" s
+
 let print_prover fmt p =
-  Format.fprintf fmt "%s (%s%s%s)"
-    p.prover_name p.prover_version
-    (if p.prover_altern = "" then "" else " ") p.prover_altern
+  Format.fprintf fmt "%s %s%a"
+    p.prover_name p.prover_version print_altern p.prover_altern
 
 let prover_parseable_format p =
   Format.sprintf "%s,%s,%s"

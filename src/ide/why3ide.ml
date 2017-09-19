@@ -903,7 +903,7 @@ let add_completion_entry s =
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
   try
-    ignore (Str.search_forward (Str.regexp s) candidate 0);
+    ignore (Str.search_forward (Str.regexp_string_case_fold s) candidate 0);
     true
   with Not_found -> false
 
@@ -1533,12 +1533,13 @@ let string_of_desc desc =
   in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
 
 
+let pr_shortcut s = if s = "" then "" else "(shortcut: " ^ s ^ ")"
 
 let add_submenu_strategy (shortcut,strategy) =
   let  i = create_menu_item
              strategies_factory
              strategy
-             ("run strategy " ^ strategy ^ " on selected goal (shortcut: " ^ shortcut ^ ")")
+             ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
   let callback () =
     Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
@@ -1546,11 +1547,11 @@ let add_submenu_strategy (shortcut,strategy) =
   in
   connect_menu_item i ~callback
 
-let add_submenu_prover (shortcut,prover) =
+let add_submenu_prover (shortcut,prover,_) =
   let  i = create_menu_item
              provers_factory
              prover
-             ("run prover " ^ prover ^ " on selected goal (shortcut: " ^ shortcut ^ ")")
+             ("run prover " ^ prover ^ " on selected goal" ^ pr_shortcut shortcut)
   in
   let callback () =
     Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
@@ -1568,13 +1569,16 @@ let init_completion provers transformations strategies commands =
   (* todo: add queries *)
 
   (* add provers *)
+
   let all_strings =
-    List.fold_left (fun acc (s,p) ->  s :: p :: acc) [] provers
+    List.fold_left (fun acc (s,_,p) ->
+                    Debug.dprintf debug "string for completion: '%s' '%s'@." s p;
+                    if s = "" then p :: acc else s :: p :: acc) [] provers
   in
   List.iter add_completion_entry all_strings;
   let provers_sorted =
-    List.sort (fun (_,p1) (_,p2) ->
-               String.compare (Strings.lowercase p1) (Strings.lowercase p2))
+    List.sort (fun (_,h1,_) (_,h2,_) ->
+               String.compare (Strings.lowercase h1) (Strings.lowercase h2))
               provers
   in
   List.iter add_submenu_prover provers_sorted;

@@ -20,18 +20,19 @@ let root_node : node_ID = 0
 
 
 type global_information =
-    {
-     provers         : (string * prover) list;
-     transformations : transformation list;
-     strategies      : (string * strategy) list;
-     commands        : string list;
-     (* hidden_provers       : string list; *)
-     (* session_time_limit   : int; *)
-     (* session_mem_limit    : int; *)
+  {
+    provers         : (string * string * string) list;
+    (* (shortcut, human readable name, parseable name) *)
+    transformations : transformation list;
+    strategies      : (string * strategy) list;
+    commands        : string list;
+    (* hidden_provers       : string list; *)
+    (* session_time_limit   : int; *)
+    (* session_mem_limit    : int; *)
      (* session_nb_processes : int; *)
-     (* session_cntexample   : bool; *)
-     (* main_dir             : string *)
-    }
+    (* session_cntexample   : bool; *)
+    (* main_dir             : string *)
+  }
 
 type message_notification =
   | Proof_error           of node_ID * string

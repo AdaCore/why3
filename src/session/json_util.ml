@@ -23,9 +23,10 @@ let convert_prover_to_json (p: Whyconf.prover) =
      "prover_altern", String p.Whyconf.prover_altern])
 
 let convert_infos (i: global_information) =
-  let convert_prover (s,p) =
+  let convert_prover (s,h,p) =
     Record (convert_record ["prover_shorcut", String s;
-                            "prover_name", String p])
+                            "prover_name", String h;
+                            "prover_parseable_name", String p])
   in
   let convert_strategy (s,p) =
     Record (convert_record ["strategy_shorcut", String s;
@@ -589,7 +590,8 @@ let parse_infos j =
     let com = get_list (get_field j "commands") in
     {provers = List.map (fun j -> try
                                  (get_string (get_field j "prover_shortcut"),
-                                  get_string (get_field j "prover_name"))
+                                  get_string (get_field j "prover_name"),
+                                  get_string (get_field j "prover_parseable_name"))
                                with Not_found -> raise NotInfos) pr;
      transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
      strategies = List.map (fun j -> try
