@@ -547,6 +547,7 @@ exception NotProofAttempt
 let parse_proof_attempt j =
   let s = get_string (get_field j "proof_attempt") in
   match s with
+  | "Detached" -> Detached
   | "Interrupted" -> Interrupted
   | "Scheduled" -> Scheduled
   | "Running" -> Running
