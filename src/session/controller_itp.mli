@@ -145,6 +145,12 @@ val reload_files : controller -> use_shapes:bool -> bool * bool
       proof attempts and transformations, but no task is associated to
       it, neither to its subgoals.
 
+
+
+  [reload_files] It returns a pair of boolean (o, d): o true means there are
+    obsolete goals, d means there are missed objects (goals, transformations,
+    theories or files) that are now detached in the session returned.
+
 *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
