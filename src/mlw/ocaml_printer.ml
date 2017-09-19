@@ -469,7 +469,8 @@ module Print = struct
         (print_expr info) e1 (print_expr info) e2
     | Eif (e1, e2, e3) ->
       fprintf fmt (protect_on paren
-        "@[<hv>@[<hov 2>if@ %a@ then@ @[%a@]@]@;<1 0>else@;<1 2>@[%a@]@]")
+        "@[<hv>@[<hov 2>if@ %a@ then@ begin@ @[%a@] end@]\
+         @;<1 0>else@ begin@;<1 2>@[%a@] end@]")
         (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
     | Eblock [] ->
       fprintf fmt "()"
