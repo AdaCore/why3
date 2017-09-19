@@ -45,10 +45,10 @@ module SchorrWaite
 
   (** each (non-null) location holds four fields: two Boolean marks m and c
       and two pointers left and right *)
-  val m: ref (map loc bool)
-  val c: ref (map loc bool)
-  val left: ref (map loc loc)
-  val right: ref (map loc loc)
+  val ghost m: ref (map loc bool)
+  val ghost c: ref (map loc bool)
+  val ghost left: ref (map loc loc)
+  val ghost right: ref (map loc loc)
 
   val get_left (p: loc) : loc
     requires { p <> null }
