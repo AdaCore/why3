@@ -138,10 +138,6 @@ let convert_node_type nt =
 let convert_request_constructor (r: ide_request) =
   match r with
   | Command_req _             -> String "Command_req"
-  | Edit_req _                -> String "Edit_req"
-(*
-  | Open_session_req _        -> String "Open_session_req"
-*)
   | Add_file_req _            -> String "Add_file_req"
   | Save_file_req _           -> String "Save_file_req"
   | Set_max_tasks_req _       -> String "Set_max_tasks_req"
@@ -170,15 +166,6 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
            "node_ID", Int nid;
            "command", String s]
-  | Edit_req (nid, prover) ->
-      convert_record ["ide_request", cc r;
-                      "node_ID", Int nid;
-                      "prover", String prover]
-(*
-  | Open_session_req f ->
-      convert_record ["ide_request", cc r;
-           "file", String f]
-*)
   | Add_file_req f ->
       convert_record ["ide_request", cc r;
            "file", String f]
@@ -436,15 +423,6 @@ let parse_request (constr: string) j =
     let nid = get_int (get_field j "node_ID") in
     let s = get_string (get_field j "command") in
     Command_req (nid, s)
-  | "Edit_req" ->
-    let nid = get_int (get_field j "node_ID") in
-    let p = get_string (get_field j "prover") in
-    Edit_req (nid, p)
-(*
-  | "Open_session_req" ->
-    let f = get_string (get_field j "file") in
-    Open_session_req f
-*)
   | "Focus_req" ->
     let nid = get_int (get_field j "node_ID") in
     Focus_req nid

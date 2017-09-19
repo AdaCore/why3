@@ -109,11 +109,6 @@ type ide_request =
   (* executes the given command on the given node. command is
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
-  | Edit_req                of node_ID * prover
-  (** Request for edition of the proof script of the proof attempt
-      associated to the given node id. Works also for non-interactive
-      provers, it simply opens an editeor on the file sent to the
-      prover. *)
   | Add_file_req            of string
   | Set_max_tasks_req       of int
   | Get_file_contents       of string

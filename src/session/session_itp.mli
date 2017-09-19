@@ -76,8 +76,10 @@ type proof_attempt_node = private {
   mutable proof_state    : Call_provers.prover_result option;
   (* None means that there is a prover call in progress *)
   mutable proof_obsolete : bool;
-  proof_script           : string option;  (* non empty for external ITP *)
-}
+  mutable proof_script   : string option;  (* non empty for external ITP *)
+                            }
+
+val set_proof_script : proof_attempt_node -> string -> unit
 
 (* [is_below s a b] true if a is below b in the session tree *)
 val is_below: session -> any -> any -> bool

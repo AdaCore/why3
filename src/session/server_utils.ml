@@ -353,69 +353,79 @@ type command =
   | QError       of string
   | Other        of string * string list
 
-let interp_others commands_table cont cmd args =
-  match parse_prover_name cont.Controller_itp.controller_config cmd args with
-  | Some (prover_config, limit) ->
-      if prover_config.Whyconf.interactive then
-        Edit (prover_config)
-      else
-        Prove (prover_config, limit)
-  | None ->
-     if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
-       Strategies cmd
-     else
-      match cmd, args with
-      | "help", [trans] ->
-          let print_trans_desc fmt r =
-            Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
-          in
-          (try
-            let desc = Trans.lookup_trans_desc trans in
-            Help_message (Pp.string_of print_trans_desc desc)
-          with
-          | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
-      | "help", _ ->
-          let text = Pp.sprintf
-                          "Please type a command among the following (automatic completion available)@\n\
-                           @\n\
-                           @ <transformation name> [arguments]@\n\
-                           @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
-                           @ <query> [arguments]@\n\
-                           @ <strategy shortcut>@\n\
-                           @ help <transformation_name> @\n\
-                           @\n\
-                           Available queries are:@\n@[%a@]" help_on_queries commands_table
-          in
-          Help_message text
-      | _ ->
-          Other (cmd, args)
-
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   try
     let (_,f) = Stdlib.Hstr.find commands_table cmd in
     match f,id with
     | Qnotask f, _ -> Query (f cont args)
-    | Qtask _, None -> QError "please select a goal first"
-    | Qtask f, Some id ->
+    | Qtask f, Some (Session_itp.APn id) ->
        let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
        let s = try Query (f cont table args) with
        | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
        | Number_of_arguments -> QError "Bad number of arguments"
        in s
+    | Qtask _, _ -> QError "please select a goal first"
   with Not_found ->
-    let t =
-      try Some (Trans.lookup_trans cont.Controller_itp.controller_env cmd) with
-      | Trans.UnknownTrans _ -> None
-    in
-    match t with
-    | Some t ->
-      if id = None then
-        QError ("Please select a valid node id")
-      else
-        Transform (cmd,t,args)
-    | None ->
-      interp_others commands_table cont cmd args
+       try
+         let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
+         match id with
+         | Some (Session_itp.APn _id) -> Transform (cmd,t,args)
+         | _ -> QError ("Please select a goal node in the task tree")
+       with
+       | Trans.UnknownTrans _ ->
+          match parse_prover_name cont.Controller_itp.controller_config cmd args with
+          | Some (prover_config, limit) ->
+             if prover_config.Whyconf.interactive then
+               Edit (prover_config)
+             else
+               Prove (prover_config, limit)
+          | None ->
+             if Stdlib.Hstr.mem cont.Controller_itp.controller_strategies cmd then
+               Strategies cmd
+             else
+               match cmd, args with
+               | "edit", _ ->
+                  begin
+                    match id with
+                    | Some (Session_itp.APa id) ->
+                       let pa =
+                         Session_itp.get_proof_attempt_node
+                           cont.Controller_itp.controller_session id in
+                       begin try
+                           let p,_ = Whyconf.Hprover.find
+                                     cont.Controller_itp.controller_provers
+                                     pa.Session_itp.prover in
+                           Edit p
+                         with Not_found ->
+                              QError "prover not found"
+                       end
+                    | _ ->  QError ("Please select a proof node in the task tree")
+                  end
+               | "help", [trans] ->
+                  let print_trans_desc fmt r =
+                    Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
+                  in
+                  (try
+                      let desc = Trans.lookup_trans_desc trans in
+                      Help_message (Pp.string_of print_trans_desc desc)
+                    with
+                    | Not_found -> QError (Pp.sprintf "Transformation %s does not exists" trans))
+               | "help", _ ->
+                  let text = Pp.sprintf
+                               "Please type a command among the following (automatic completion available)@\n\
+                                @\n\
+                                @ <transformation name> [arguments]@\n\
+                                @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
+                                @ <query> [arguments]@\n\
+                                @ <strategy shortcut>@\n\
+                                @ help <transformation_name> @\n\
+                                @\n\
+                                Available queries are:@\n@[%a@]" help_on_queries commands_table
+                  in
+                  Help_message text
+               | _ ->
+                  Other (cmd, args)
 
 (***********************)
 (* First Unproven goal *)

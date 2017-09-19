@@ -57,8 +57,12 @@ type proof_attempt_node = {
   mutable proof_state    : Call_provers.prover_result option;
   (* None means that the call was not done or never returned *)
   mutable proof_obsolete : bool;
-  proof_script           : string option;  (* non empty for external ITP *)
+  mutable proof_script   : string option;  (* non empty for external ITP *)
 }
+
+let set_proof_script pa file =
+  assert (pa.proof_script = None);
+  pa.proof_script <- Some file
 
 type proof_node = {
   proofn_name                    : Ident.ident;

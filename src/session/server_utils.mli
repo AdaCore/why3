@@ -65,7 +65,7 @@ type command =
 val interp:
   (string * query) Stdlib.Hstr.t ->
   Controller_itp.controller ->
-  Session_itp.proofNodeID option -> string -> command
+  Session_itp.any option -> string -> command
 
 
 val get_first_unproven_goal_around:

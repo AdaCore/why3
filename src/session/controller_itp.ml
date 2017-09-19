@@ -568,7 +568,20 @@ let prepare_edition c ?file pn pr ~notification =
   let proof_attempts_id = get_proof_attempt_ids session pn in
   let panid =
     try
-      Hprover.find proof_attempts_id pr
+      let panid = Hprover.find proof_attempts_id pr in
+      (* if no proof script yet, we need to add one
+         it happens e.g when editing a file for an automatic prover
+       *)
+      let pa = get_proof_attempt_node session panid in
+      match pa.proof_script with
+      | None ->
+         let file = match file with
+           | Some f -> f
+           | None -> create_file_rel_path c pr pn
+         in
+         set_proof_script pa file;
+         panid
+      | Some _ -> panid
     with Not_found ->
       let file = match file with
         | Some f -> f
