@@ -1533,7 +1533,7 @@ let string_of_desc desc =
   in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
 
 
-let pr_shortcut s = if s = "" then "" else "(shortcut: " ^ s ^ ")"
+let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
 
 let add_submenu_strategy (shortcut,strategy) =
   let  i = create_menu_item

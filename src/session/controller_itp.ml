@@ -678,7 +678,7 @@ let schedule_transformation_r c id name args ~callback =
       | Exit ->
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, Noprogress))
-      | e when not (Debug.test_flag Debug.stack_trace) ->
+      | e (* when not (Debug.test_flag Debug.stack_trace) *) ->
         (* Format.eprintf
           "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
@@ -690,10 +690,14 @@ let schedule_transformation_r c id name args ~callback =
   callback TSscheduled
 
 let schedule_transformation c id name args ~callback ~notification =
-  let callback s = callback s; (match s with
-      | TSdone tid -> update_trans_node notification c.controller_session tid
-      | TSfailed _e -> ()
-      | _ -> ()) in
+  let callback s =
+    begin match s with
+          | TSdone tid -> update_trans_node notification c.controller_session tid
+          | TSfailed _e -> ()
+          | _ -> ()
+    end;
+    callback s
+  in
   schedule_transformation_r c id name args ~callback
 
 open Strategy
@@ -773,7 +777,7 @@ let proof_is_complete pa =
   | None -> false
   | Some pr ->
      not pa.Session_itp.proof_obsolete &&
-       Call_provers.(pr.pr_answer <> Valid)
+       Call_provers.(pr.pr_answer = Valid)
 
 let clean_session c ~removed =
   (* clean should not change proved status *)
@@ -977,17 +981,24 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
 
 let debug = Debug.register_flag ~desc:"Task bisection" "bisect"
 
-let create_rem_list rem =
-  let remove_ts acc ts = ts.Ty.ts_name.Ident.id_string :: acc in
-  let remove_ls acc ls = ls.Term.ls_name.Ident.id_string :: acc in
-  let remove_pr acc pr = pr.Decl.pr_name.Ident.id_string ::acc in
-  let acc = Ty.Sts.fold_left remove_ts [] rem.Eliminate_definition.rem_ts in
-  let acc = Term.Sls.fold_left remove_ls acc rem.Eliminate_definition.rem_ls in
-  let acc = Decl.Spr.fold_left remove_pr acc rem.Eliminate_definition.rem_pr in
-  acc
+let create_rem_list =
+  let b = Buffer.create 17 in
+  fun rem ->
+  Buffer.clear b;
+  let add pr id =
+    if Buffer.length b > 0 then Buffer.add_char b ',';
+    Buffer.add_string b (Pp.string_of pr id)
+  in
+  let remove_ts ts = add Pretty.print_ts ts in
+  let remove_ls ls = add Pretty.print_ls ls in
+  let remove_pr pr = add Pretty.print_pr pr in
+  Ty.Sts.iter remove_ts rem.Eliminate_definition.rem_ts;
+  Term.Sls.iter remove_ls rem.Eliminate_definition.rem_ls;
+  Decl.Spr.iter remove_pr rem.Eliminate_definition.rem_pr;
+  Buffer.contents b
 
 
-let bisect_proof_attempt ~notification c pa_id =
+let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_id =
   let ses = c.controller_session in
   let pa = get_proof_attempt_node ses pa_id in
   if not (proof_is_complete pa) then
@@ -1011,14 +1022,19 @@ let bisect_proof_attempt ~notification c pa_id =
       begin
         Debug.dprintf debug "Bisecting done.@.";
         (* apply again the transformation *)
-        let callback = function
+        let rem = create_rem_list rem in
+        let callback st =
+          callback_tr "remove" [rem] st;
+          begin match st with
           | TSscheduled -> ()
           | TSfailed _ -> assert false
           | TSdone trid ->
              match get_sub_tasks ses trid with
              | [pn] ->
                 let limit = { limit with Call_provers.limit_time = !timelimit; } in
-                let callback _paid = function
+                let callback paid st =
+                  callback_pa paid st;
+                  begin match st with
                   | Scheduled | Running -> ()
                   | Detached | Uninstalled _ -> assert false
                   | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
@@ -1029,13 +1045,15 @@ let bisect_proof_attempt ~notification c pa_id =
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
                      Debug.dprintf debug "Bisecting: %a.@."
-                                   Call_provers.print_prover_result res;
+                                   Call_provers.print_prover_result res
+                  end
                 in
                 schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
              | _ -> assert false
+          end
         in
-        let rem = create_rem_list rem in
-        schedule_transformation c goal_id "remove" rem ~callback ~notification
+        Debug.dprintf debug "To remove: %s@." rem;
+        schedule_transformation c goal_id "remove" [rem] ~callback ~notification
       end
   in
   let rec bisect_step rem kont =
@@ -1048,11 +1066,21 @@ let bisect_proof_attempt ~notification c pa_id =
           if result is some new rem, remove the previous transformation
            and recursively call bisect_step
      *)
-    let callback = function
-      | TSscheduled -> ()
-      | TSfailed _ -> (* may happen if removing a type or a lsymbol
-that is used later on. We do has if proof fails. *)
+    let rem = create_rem_list rem in
+    let callback st =
+      callback_tr "remove" [rem] st;
+      begin match st with
+      | TSscheduled ->
+         Debug.dprintf
+           debug
+           "[Bisect] transformation 'remove' scheduled@."
+      | TSfailed(_,exn) ->
+         (* may happen if removing a type or a lsymbol that is used
+later on. We do has if proof fails. *)
          begin
+           Debug.dprintf
+             debug
+             "[Bisect] transformation failed %a@." Exn_printer.exn_printer exn;
            match kont false with
            | Eliminate_definition.BSstep (rem,kont) ->
               bisect_step rem kont
@@ -1060,34 +1088,50 @@ that is used later on. We do has if proof fails. *)
               bisect_end rem
          end
       | TSdone trid ->
+         Debug.dprintf
+           debug
+           "[Bisect] transformation 'remove' succeeds@.";
          match get_sub_tasks ses trid with
          | [pn] ->
             let limit = { limit with Call_provers.limit_time = !timelimit; } in
-            let callback _paid = function
-              | Scheduled | Running -> ()
-              | Detached | Uninstalled _ -> assert false
+            let callback paid st =
+              callback_pa paid st;
+              begin match st with
+              | Scheduled ->
+                 Debug.dprintf
+                   debug "[Bisect] prover on subtask is scheduled@."
+              | Running ->
+                 Debug.dprintf
+                   debug "[Bisect] prover on subtask is running@.";
+              | Detached
+              | Uninstalled _ -> assert false
               | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
               | InternalFailure exn ->
                  (* Perhaps the test can be considered false in this case? *)
-                 Debug.dprintf debug "Bisecting interrupted by an error %a.@."
+                 Debug.dprintf debug "[Bisect] prover interrupted by an error: %a.@."
                                Exn_printer.exn_printer exn
               | Done res ->
+                 Debug.dprintf
+                   debug "[Bisect] prover on subtask returns %a@."
+                   Call_provers.print_prover_answer res.Call_provers.pr_answer;
                  let b = res.Call_provers.pr_answer = Call_provers.Valid in
-                 Debug.dprintf debug "Bisecting: %a.@."
-                               Call_provers.print_prover_result res;
                  if b then set_timelimit res;
                  match kont b with
                  | Eliminate_definition.BSstep (rem,kont) ->
-                    remove_transformation ses trid;
+                    Session_itp.remove_subtree ~notification ~removed ses (Session_itp.ATn trid);
                     bisect_step rem kont
                  | Eliminate_definition.BSdone rem ->
                     bisect_end rem
+              end
             in
+            Debug.dprintf
+              debug "[Bisect] running the prover on subtask@.";
             schedule_proof_attempt c pn prover ~counterexmp:false ~limit ~callback ~notification
          | _ -> assert false
+      end
     in
-    let rem = create_rem_list rem in
-    schedule_transformation c goal_id "remove" rem ~callback ~notification
+    Debug.dprintf debug "To remove: %s@." rem;
+    schedule_transformation c goal_id "remove" [rem] ~callback ~notification
   in
   Debug.dprintf debug "Bisecting with %a started.@."
                 Whyconf.print_prover prover;

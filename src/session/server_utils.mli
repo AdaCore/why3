@@ -57,6 +57,7 @@ type command =
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.config_prover
+  | Bisect
   | Help_message of string
   | Query        of string
   | QError       of string

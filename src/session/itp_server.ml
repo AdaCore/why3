@@ -1052,7 +1052,7 @@ end
          let limit = pa.limit in
          P.notify (Node_change (node_ID, Proof_status_change(res, obs, limit)))
       | _ -> ()
-    with Not_found ->
+    with Not_found when not (Debug.test_flag Debug.stack_trace)->
       Format.eprintf "Anomaly: Itp_server.notify_change_proved@.";
       exit 1
 
@@ -1120,6 +1120,33 @@ end
       (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
       ()
 
+  let removed x =
+    let nid = node_ID_from_any x in
+    remove_any_node_ID x;
+    P.notify (Remove nid)
+
+
+  let schedule_bisection (nid: node_ID) =
+    let d = get_server_data () in
+    try
+      let id =
+        match any_from_node_ID nid with
+        | APa panid -> panid
+        | _ -> raise Not_found
+      in
+      let callback_pa = callback_update_tree_proof d.cont in
+      let callback_tr tr args st = callback_update_tree_transform tr args st in
+      C.bisect_proof_attempt d.cont id
+                             ~callback_tr ~callback_pa
+                             ~notification:(notify_change_proved d.cont)
+                             ~removed
+    with Not_found ->
+      P.notify
+        (Message
+           (Information
+              "for bisection please select some proof attempt"))
+
+
   (* ----------------- run strategy -------------------- *)
 
   let debug_strat = Debug.register_flag "strategy_exec" ~desc:"Trace strategies execution"
@@ -1144,13 +1171,10 @@ end
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
 
+
   (* ----------------- Clean session -------------------- *)
   let clean_session () =
     let d = get_server_data () in
-    let removed x =
-      let nid = node_ID_from_any x in
-      remove_any_node_ID x;
-      P.notify (Remove nid) in
     C.clean_session d.cont ~removed
 
 
@@ -1162,10 +1186,7 @@ end
         Session_itp.remove_subtree
           d.cont.controller_session n
           ~notification:(notify_change_proved d.cont)
-          ~removed:(fun x ->
-                    let nid = node_ID_from_any x in
-                    remove_any_node_ID x;
-                    P.notify (Remove nid))
+          ~removed
       with RemoveError -> (* TODO send an error instead of information *)
         P.notify (Message (Information "Cannot remove attached proof nodes or theories, and proof_attempt that did not yet return"))
     end
@@ -1211,7 +1232,7 @@ end
 
 (*
   let () = register_command "edit" "remove unsuccessful proof attempts that are below proved goals"
-    (Qtask (fun cont _table _args ->  schedule_editionn (); "Editor called"))
+    (Qtask (fun cont _table _args ->  schedule_edition (); "Editor called"))
  *)
 
 (* TODO: should this remove the current selected node ?
@@ -1326,8 +1347,8 @@ end
         | Strategies st           ->
             let counterexmp = Whyconf.cntexample (Whyconf.get_main config) in
             run_strategy_on_task ~counterexmp nid st
-        | Edit p                  ->
-            schedule_edition nid p
+        | Edit p                  -> schedule_edition nid p
+        | Bisect                  -> schedule_bisection nid
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

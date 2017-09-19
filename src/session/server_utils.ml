@@ -348,6 +348,7 @@ type command =
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.config_prover
+  | Bisect
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -400,6 +401,12 @@ let interp commands_table cont id s =
                          with Not_found ->
                               QError "prover not found"
                        end
+                    | _ ->  QError ("Please select a proof node in the task tree")
+                  end
+               | "bisect", _ ->
+                  begin
+                    match id with
+                    | Some (Session_itp.APa _) -> Bisect
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
                | "help", [trans] ->

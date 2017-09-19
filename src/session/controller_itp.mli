@@ -316,6 +316,10 @@ a list of 4-uples [(goalID, prover, limits, report)]
 
 
 val bisect_proof_attempt:
-  notification:notifier -> controller -> proofAttemptID -> unit
+  callback_tr:(string -> string list -> transformation_status -> unit) ->
+  callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
+  notification:notifier ->
+  removed:notifier ->
+  controller -> proofAttemptID -> unit
 
 end
