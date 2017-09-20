@@ -1547,15 +1547,15 @@ let add_submenu_strategy (shortcut,strategy) =
   in
   connect_menu_item i ~callback
 
-let add_submenu_prover (shortcut,prover,_) =
+let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
   let  i = create_menu_item
              provers_factory
-             prover
-             ("run prover " ^ prover ^ " on selected goal" ^ pr_shortcut shortcut)
+             prover_name
+             ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
   in
   let callback () =
-    Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
-    interp shortcut
+    Debug.dprintf debug "[IDE INFO] interp command '%s'@." prover_parseable_name;
+    interp prover_parseable_name
   in
   connect_menu_item i ~callback
 
