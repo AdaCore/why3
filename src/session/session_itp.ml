@@ -1411,12 +1411,14 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task, subtasks =
-    let task = get_raw_task s id in
-    let table = Args_wrapper.build_naming_tables task in
+    let raw_task = get_raw_task s id in
+    let task,table = get_task s id in
     try
-      task, Trans.apply_transform_args name env args table task
-    with _e ->
-      let task,table = get_task s id in
+      raw_task, Trans.apply_transform_args name env args table raw_task
+    with Generic_arg_trans_utils.Arg_trans _ ->
+         task, Trans.apply_transform_args name env args table task
+       | e ->
+      Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised %a@." Exn_printer.exn_printer e;
       task, Trans.apply_transform_args name env args table task
   in
   match subtasks with
