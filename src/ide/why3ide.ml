@@ -1195,15 +1195,15 @@ let (_ : GtkSignal.id) =
     begin
       Debug.dprintf debug "[IDE INFO] button number %d was clicked on the tree view@." n;
       match n with
-      | 1 -> (* Left click *) ()
-      | 2 -> (* Middle click *) ()
+      | 1 -> (* Left click *) false
+      | 2 -> (* Middle click *) false
       | 3 -> (* Right click *)
          Debug.dprintf debug "[IDE INFO] before tools_menu#popup@.";
          tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
-         Debug.dprintf debug "[IDE INFO] after tools_menu#popup@."
+         Debug.dprintf debug "[IDE INFO] after tools_menu#popup@.";
+         true
       | _ -> (* Error case TODO *) assert false
-    end;
-    false
+    end
   in
   goals_view#event#connect#button_press ~callback
 
