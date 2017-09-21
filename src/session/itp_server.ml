@@ -1183,10 +1183,10 @@ end
     let n = any_from_node_ID nid in
     begin
       try
-        Session_itp.remove_subtree
-          d.cont.controller_session n
+        remove_subtree
           ~notification:(notify_change_proved d.cont)
           ~removed
+          d.cont n
       with RemoveError -> (* TODO send an error instead of information *)
         P.notify (Message (Information "Cannot remove attached proof nodes or theories, and proof_attempt that did not yet return"))
     end

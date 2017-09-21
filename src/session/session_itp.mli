@@ -146,7 +146,6 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-
 val empty_session : ?shape_version:int -> string -> session
 (** create an empty_session in the directory specified by the
     argument *)
@@ -164,20 +163,6 @@ val read_file :
 (* [read_file env ~format fn] parses the source file [fn], types it
    and extract its theories.  Parse errors and typing errors are
    signaled with exceptions.  *)
-
-(*
-val merge_file_section :
-  use_shapes:bool -> old_ses:session -> old_theories:theory list ->
-  env:Env.env -> session -> string -> Theory.theory list ->
-  Env.fformat option -> unit
-(** [merge_file_section ~old_s ~old_theories ~env ~pn_callpack s fn
-    ths] adds a new 'file' section in session [s], named [fn],
-    containing fresh theory subsections corresponding to theories
-    [ths]. For each theory whose name is identical to one theory of
-    old_ths, it is attempted to associate the old goals,
-    proof_attempts and transformations to the goals of the new
-    theory *)
-*)
 
 val merge_files :
   use_shapes:bool -> Env.env -> session -> session -> bool * bool
