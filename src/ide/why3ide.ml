@@ -453,6 +453,7 @@ let menu_quit =
 
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
+let tools_accel_group = GtkData.AccelGroup.create ()
 
 let strategies_factory =
   let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
@@ -1037,10 +1038,6 @@ let (_ : GMenu.menu_item) =
     view_factory#add_item ~key:GdkKeysyms._minus
       ~callback:reduce_fonts "Reduce font"
 
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._E
-    ~label:"Expand all" ~callback:(fun () -> goals_view#expand_all ()) ()
-
 let collapse_iter iter =
   let path = goals_model#get_path iter in
   goals_view#collapse_row path
@@ -1061,9 +1058,18 @@ let collapse_proven_goals () =
   | None -> ()
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
 
-let (_ : GMenu.image_menu_item) =
-  view_factory#add_image_item ~key:GdkKeysyms._C
-    ~label:"Collapse proven goals" ~callback:(fun () -> collapse_proven_goals ()) ()
+let () =
+  let i = view_factory#add_image_item
+            ~label:"Collapse proven goals"
+            ~callback:(fun () -> collapse_proven_goals ()) ()
+  in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
+  let i = view_factory#add_image_item
+            ~label:"Expand all"
+            ~callback:(fun () -> goals_view#expand_all ()) ()
+  in
+  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E
+
 
 let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
@@ -1232,17 +1238,11 @@ let detached_copy () =
     send_request (Copy_detached n)
   | _ -> ()
 
-let (_ : GMenu.menu_item) =
-  exp_factory#add_item ~key:GdkKeysyms._C
-    ~callback:copy "Copy"
+let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
 
-let (_ : GMenu.menu_item) =
-  exp_factory#add_item ~key:GdkKeysyms._V
-    ~callback:paste "Paste"
+let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
 
-let (_ : GMenu.menu_item) =
-  exp_factory#add_item ~key:GdkKeysyms._D
-    ~callback:detached_copy "Detached copy"
+let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:detached_copy "Detached copy"
 
 (*********************************)
 (* add a new file in the project *)
@@ -1551,8 +1551,6 @@ let string_of_desc desc =
 
 let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
 
-let tools_accel_group = GtkData.AccelGroup.create ()
-
 let load_shortcut s =
   match GtkData.AccelGroup.parse s with
   | (0,[]) -> None
@@ -1847,6 +1845,10 @@ let (_ : GMenu.image_menu_item) =
     ~callback:show_about_window
     ()
 
+(***********************************)
+(* accel group switching           *)
+(* when entering/leaving tree view *)
+(***********************************)
 
 let () =
   let (_:GtkSignal.id) =
