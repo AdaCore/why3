@@ -598,7 +598,7 @@ module Translate = struct
     | Eghost _ -> assert false
     | Eassign al ->
       ML.mk_expr (Mltree.Eassign al) (Mltree.I e.e_ity) eff lbl
-    | Epure _ -> (* assert false (\*TODO*\) *) ML.mk_hole
+    | Epure _ -> assert false
     | Etry (etry, case, pvl_e_map) ->
       assert (not case); (* TODO *)
       let etry = expr info etry in

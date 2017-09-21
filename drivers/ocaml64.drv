@@ -8,6 +8,11 @@ theory BuiltIn
   syntax predicate  (=)   "%1 = %2"
 end
 
+module HighOrd
+  syntax type (->) "%1 -> %2"
+  syntax val  (@)  "%1 %2"
+end
+
 theory option.Option
   syntax type     option "%1 option"
   syntax function None   "None"
@@ -356,6 +361,3 @@ module ocaml.Pervasives
   syntax val pred                   "pred %1"
 end
 
-module HighOrd
-  syntax type (->) "%1 -> %2"
-end

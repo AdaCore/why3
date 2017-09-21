@@ -178,13 +178,11 @@ module Print = struct
     | Ttuple tl ->
       fprintf fmt (protect_on paren "@[%a@]")
         (print_list star (print_ty ~paren:true info)) tl
-    | Tapp (ts, [t1; t2]) when id_equal ts ts_func.ts_name ->
-      fprintf fmt (protect_on paren "@[%a ->@ %a@]")
-        (print_ty ~paren:true info) t1 (print_ty info) t2
     | Tapp (ts, tl) ->
       match query_syntax info.info_syn ts with
       | Some s ->
-        syntax_arguments s (print_ty ~paren:true info) fmt tl
+          fprintf fmt (protect_on paren "%a")
+            (syntax_arguments s (print_ty ~paren:true info)) tl
       | None   ->
         match tl with
         | [] ->
@@ -298,7 +296,7 @@ module Print = struct
     | [], _ -> ()
     | _, [] -> assert false
 
-  and print_apply ?(paren=false) info rs fmt pvl =
+  and print_apply info rs fmt pvl =
     let isfield =
       match rs.rs_field with
       | None   -> false
@@ -333,10 +331,10 @@ module Print = struct
         | [], [] ->
           (print_uident info) fmt rs.rs_name
         | [], [t] ->
-          fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+          fprintf fmt "@[<hov 2>%a %a@]"
             (print_uident info) rs.rs_name (print_expr ~paren:true info) t
         | [], tl ->
-          fprintf fmt (protect_on paren "@[<hov 2>%a (%a)@]")
+          fprintf fmt "@[<hov 2>%a (%a)@]"
             (print_uident info) rs.rs_name (print_list comma (print_expr info))
             tl
         | pjl, tl ->
@@ -347,7 +345,7 @@ module Print = struct
     | _, None, [] ->
       (print_lident info) fmt rs.rs_name
     | _, None, tl ->
-      fprintf fmt (protect_on paren "@[<hov 2>%a %a@]")
+      fprintf fmt "@[<hov 2>%a %a@]"
         (print_lident info) rs.rs_name
         (print_apply_args info) (tl, rs.rs_cty.cty_args)
   (* (print_list space (print_expr ~paren:true info)) tl *)
@@ -424,9 +422,6 @@ module Print = struct
       fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
       fprintf fmt "false"
-    | Eapp (rs, [e1; e2]) when rs_equal rs rs_func_app ->
-      fprintf fmt (protect_on paren "@[<hov 1>%a %a@]")
-        (print_expr info) e1 (print_expr ~paren:true info) e2
     | Eapp (rs, [])  ->
       (* avoids parenthesis around values *)
       fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
