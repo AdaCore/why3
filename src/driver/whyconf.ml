@@ -66,8 +66,12 @@ let print_prover fmt p =
     p.prover_name p.prover_version print_altern p.prover_altern
 
 let prover_parseable_format p =
-  Format.sprintf "%s,%s,%s"
-    p.prover_name p.prover_version p.prover_altern
+  if p.prover_altern = "" then
+    Format.sprintf "%s,%s"
+                   p.prover_name p.prover_version
+  else
+    Format.sprintf "%s,%s,%s"
+                   p.prover_name p.prover_version p.prover_altern
 
 let print_prover_parseable_format fmt p =
   Format.pp_print_string fmt (prover_parseable_format p)
