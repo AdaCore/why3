@@ -1059,15 +1059,17 @@ let collapse_proven_goals () =
   | Some root_iter -> collapse_proven_goals_from_iter root_iter
 
 let () =
-  let i = view_factory#add_image_item
-            ~label:"Collapse proven goals"
-            ~callback:(fun () -> collapse_proven_goals ()) ()
+  let i = view_factory#add_item
+            "Collapse proven goals"
+            ~callback:(fun () -> collapse_proven_goals ())
   in
+  i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
   i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
-  let i = view_factory#add_image_item
-            ~label:"Expand all"
-            ~callback:(fun () -> goals_view#expand_all ()) ()
+  let i = view_factory#add_item
+            "Expand all"
+            ~callback:(fun () -> goals_view#expand_all ())
   in
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: Ctrl-E)";
   i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E
 
 
@@ -1645,33 +1647,33 @@ let () =
 
 let edit_menu_item =
   create_menu_item tools_factory "Edit"
-                   "View or edit proof script"
+                   "View or edit proof script (shortcut: e)"
 let () =
   edit_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._e
 
 let replay_menu_item =
   create_menu_item tools_factory "Replay obsolete"
-                   "Replay all obsolete proofs"
+                   "Replay all obsolete proofs (shortcut: r)"
 let () =
   replay_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._r
 
 let clean_menu_item =
   create_menu_item tools_factory  "Clean"
-                   "Remove unsuccessful proofs or transformations that are below a proved goal"
+                   "Remove unsuccessful proofs or transformations that are below a proved goal (shortcut: c)"
 let () =
   clean_menu_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._c
 
 
 let remove_item =
   create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations"
+                   "Remove the selected proof attempts or transformations (shortcut: x)"
 let () =
   remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._x
 
 
 let mark_obsolete_item =
   create_menu_item tools_factory "Mark obsolete"
-                   "Mark all proof nodes below the current selected nodes as obsolete"
+                   "Mark all proof nodes below the current selected nodes as obsolete (shortcut: o)"
 let () =
   mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
 
@@ -1846,17 +1848,16 @@ let treat_notification n =
 let help_menu = factory#add_submenu "_Help"
 let help_factory = new GMenu.factory help_menu ~accel_group
 
-let (_ : GMenu.image_menu_item) =
-  help_factory#add_image_item
-    ~label:"Legend"
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "Legend"
     ~callback:show_legend_window
-    ()
 
-let (_ : GMenu.image_menu_item) =
-  help_factory#add_image_item
-    ~label:"About"
+let (_ : GMenu.menu_item) =
+  help_factory#add_item
+    "About"
     ~callback:show_about_window
-    ()
+
 
 (***********************************)
 (* accel group switching           *)
