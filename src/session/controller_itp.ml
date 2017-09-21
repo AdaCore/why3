@@ -79,6 +79,7 @@ type controller =
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
     controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_running_proof_attempts : unit Hpan.t;
   }
 
 
@@ -90,6 +91,7 @@ let create_controller config env ses =
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
       controller_strategies = Stdlib.Hstr.create 7;
+      controller_running_proof_attempts = Hpan.create 17;
     }
   in
   let provers = Whyconf.get_provers config in
@@ -106,7 +108,27 @@ let create_controller config env ses =
     provers;
   c
 
-let remove_subtree c = Session_itp.remove_subtree c.controller_session
+
+(* Cannot remove a proof_attempt that was scheduled but did not finish yet.
+   It can be interrupted though. *)
+let removable_proof_attempt c pa =
+  try let () = Hpan.find c.controller_running_proof_attempts pa in false
+  with Not_found -> true
+
+let any_removable c any =
+  match any with
+  | APa pa -> removable_proof_attempt c pa
+  | _ -> true
+
+(* Check whether the subtree [n] contains an unremovable proof_attempt
+   (ie: scheduled or running) *)
+let check_removable c (n: any) =
+  fold_all_any c.controller_session (fun acc any -> acc && any_removable c any) true n
+
+
+let remove_subtree ~(notification:notifier) ~(removed:notifier) c (n: any) =
+  if check_removable c n then
+    Session_itp.remove_subtree ~notification ~removed c.controller_session n
 
 (* Get children of any without proofattempts *)
 let get_undetached_children_no_pa s any : any list =
@@ -465,16 +487,26 @@ let schedule_proof_attempt c id pr
                            ~counterexmp ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
-    begin match s with
-    | Scheduled | Running -> update_goal_node notification ses id
-    | Done res ->
-        update_proof_attempt ~obsolete:false notification ses id pr res;
-        update_goal_node notification ses id
-    | Detached
-    | InternalFailure _
-    | Uninstalled _
-    | Undone -> assert false
-    | Interrupted -> ()
+    begin
+      match s with
+      | Scheduled ->
+         Hpan.add c.controller_running_proof_attempts panid ();
+         update_goal_node notification ses id
+      | Running -> update_goal_node notification ses id
+      | Done res ->
+         Hpan.remove c.controller_running_proof_attempts panid;
+         update_proof_attempt ~obsolete:false notification ses id pr res;
+         update_goal_node notification ses id
+      | Interrupted ->
+         Hpan.remove c.controller_running_proof_attempts panid;
+         (* what to do ?
+         update_proof_attempt ~obsolete:false notification ses id pr res;
+          *)
+         update_goal_node notification ses id
+      | Detached
+      | InternalFailure _
+      | Uninstalled _
+      | Undone -> assert false
     end;
     callback panid s
   in
@@ -798,11 +830,11 @@ let clean_session c ~removed =
         let pa = Session_itp.get_proof_attempt_node s pa in
         if pn_proved s pa.parent then
           if not (proof_is_complete pa) then
-            Session_itp.remove_subtree ~notification ~removed s any
+            remove_subtree ~notification ~removed c any
       | ATn tn ->
         let pn = get_trans_parent s tn in
         if pn_proved s pn && not (tn_proved s tn) then
-          Session_itp.remove_subtree s ~notification ~removed (ATn tn)
+          remove_subtree ~notification ~removed c (ATn tn)
       | _ -> ())) ()
 
 (* This function folds on any subelements of given node and tries to mark all

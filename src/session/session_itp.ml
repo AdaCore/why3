@@ -869,24 +869,6 @@ let mark_obsolete s (id: proofAttemptID) =
 
 exception RemoveError
 
-(* Cannot remove a proof_attempt that was scheduled but did not finish yet.
-   It can be interrupted though. *)
-let removable_proof_attempt s pa =
-  let pa = get_proof_attempt_node s pa in
-  match pa.proof_state with
-  | None -> false
-  | Some _pr -> true
-
-let any_removable s any =
-  match any with
-  | APa pa -> removable_proof_attempt s pa
-  | _ -> true
-
-(* Check whether the subtree [n] contains an unremovable proof_attempt
-   (ie: scheduled or running) *)
-let check_removable s (n: any) =
-  fold_all_any s (fun acc any -> any_removable s any && acc) true n
-
 let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
   let remove (n: any) =
     match n with
@@ -896,8 +878,6 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
     | APn pn -> Hint.remove s.proofNode_table pn
     | ATh _th -> (* Not in any table *)  ()
   in
-  (* If a subtree cannot be removed then fail *)
-  if not (check_removable s n) then raise RemoveError;
   match n with
   | (APn _ | ATh _) when not (is_detached s n) ->
                raise RemoveError

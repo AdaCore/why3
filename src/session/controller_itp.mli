@@ -88,6 +88,7 @@ type controller = private
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
     controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_running_proof_attempts : unit Hpan.t;
   }
 
 val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
@@ -154,9 +155,11 @@ val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont] *)
 
-val remove_subtree: controller -> notification:notifier -> removed:notifier ->
-   any -> unit
-(** Mapping to Session_itp.remove_subtree. Used for code using Why3's API *)
+val remove_subtree: notification:notifier -> removed:notifier ->
+   controller -> any -> unit
+(** remove a subtree of the session, taking care of not removing any
+    proof attempt in progress. raise [RemoveError] if removal is not
+    possible. *)
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
