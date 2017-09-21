@@ -1553,10 +1553,15 @@ let string_of_desc desc =
 
 let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
 
-let load_shortcut s =
+let parse_shortcut_as_key s =
   match GtkData.AccelGroup.parse s with
-  | (0,[]) -> None
-  | (key, modi) -> Some (GtkData.AccelGroup.name ~key ~modi, key, modi)
+  | (0,[]) ->
+     Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s;
+     None
+  | (key, modi) ->
+     let name = GtkData.AccelGroup.name ~key ~modi in
+     Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name;
+     Some (name, key, modi)
 
 let add_submenu_strategy (shortcut,strategy) =
   let  i = create_menu_item
@@ -1565,7 +1570,7 @@ let add_submenu_strategy (shortcut,strategy) =
              ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
   Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
-          (load_shortcut shortcut);
+          (parse_shortcut_as_key shortcut);
   let callback () =
     Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
     interp shortcut
@@ -1578,6 +1583,8 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
              prover_name
              ("run prover " ^ prover_name ^ " on selected goal" ^ pr_shortcut shortcut)
   in
+  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
+          (parse_shortcut_as_key shortcut);
   let callback () =
     Debug.dprintf debug "[IDE INFO] interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name

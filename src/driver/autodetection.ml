@@ -348,10 +348,7 @@ let generate_auto_strategies config =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev = 1 then
-         let name =
-           p.Whyconf.prover_name ^ "," ^
-             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-         in name :: acc
+         let name = Whyconf.prover_parseable_format p in name :: acc
        else acc) prover_auto_levels []
   in
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
@@ -378,10 +375,7 @@ let generate_auto_strategies config =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev >= 1 && lev <= 2 then
-         let name =
-           p.Whyconf.prover_name ^ "," ^
-             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-         in name :: acc
+         let name = Whyconf.prover_parseable_format p in name :: acc
        else acc) prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
