@@ -454,7 +454,6 @@ let menu_quit =
 let tools_menu = factory#add_submenu "_Tools"
 let tools_factory = new GMenu.factory tools_menu ~accel_group
 
-
 let strategies_factory =
   let tools_submenu_strategies = tools_factory#add_submenu "Strategies" in
   let ( _ : GMenu.menu_item) = tools_factory#add_separator () in
@@ -1552,12 +1551,21 @@ let string_of_desc desc =
 
 let pr_shortcut s = if s = "" then "" else " (shortcut: " ^ s ^ ")"
 
+let tools_accel_group = GtkData.AccelGroup.create ()
+
+let load_shortcut s =
+  match GtkData.AccelGroup.parse s with
+  | (0,[]) -> None
+  | (key, modi) -> Some (GtkData.AccelGroup.name ~key ~modi, key, modi)
+
 let add_submenu_strategy (shortcut,strategy) =
   let  i = create_menu_item
              strategies_factory
              strategy
              ("run strategy " ^ strategy ^ " on selected goal" ^ pr_shortcut shortcut)
   in
+  Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
+          (load_shortcut shortcut);
   let callback () =
     Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
     interp shortcut
@@ -1838,6 +1846,19 @@ let (_ : GMenu.image_menu_item) =
     ~label:"About"
     ~callback:show_about_window
     ()
+
+
+let () =
+  let (_:GtkSignal.id) =
+    goals_view#event#connect#focus_in
+      ~callback:(fun _ -> main_window#add_accel_group tools_accel_group; true)
+  in
+  let (_:GtkSignal.id) =
+    goals_view#event#connect#focus_out
+      ~callback:(fun _ ->
+                 GtkWindow.Window.remove_accel_group main_window#as_window tools_accel_group; true)
+  in
+  ()
 
 
 
