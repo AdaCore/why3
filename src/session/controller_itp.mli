@@ -17,17 +17,14 @@ open Session_itp
 (** {2 State of a proof or transformation in progress} *)
 
 type proof_attempt_status =
-(*
-    | Unedited (** editor not yet run for interactive proof *)
-    | JustEdited (** edited but not run yet *)
- *)
+  | Undone   (** prover was never called *)
+  | Scheduled (** external proof attempt is scheduled *)
+  | Running (** external proof attempt is in progress *)
+  | Done of Call_provers.prover_result (** external proof done *)
+  | Interrupted (** external proof has never completed *)
   | Detached (** parent goal has no task, is detached *)
-    | Interrupted (** external proof has never completed *)
-    | Scheduled (** external proof attempt is scheduled *)
-    | Running (** external proof attempt is in progress *)
-    | Done of Call_provers.prover_result (** external proof done *)
-    | InternalFailure of exn (** external proof aborted by internal error *)
-    | Uninstalled of Whyconf.prover (** prover is uninstalled *)
+  | InternalFailure of exn (** external proof aborted by internal error *)
+  | Uninstalled of Whyconf.prover (** prover is uninstalled *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 

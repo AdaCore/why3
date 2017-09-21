@@ -31,22 +31,24 @@ let () = Exn_printer.register
 
 (** State of a proof *)
 type proof_attempt_status =
-  | Detached (** parent goal has no task, is detached *)
-  | Interrupted (** external proof has never completed *)
+  | Undone   (** prover was never called *)
   | Scheduled (** external proof attempt is scheduled *)
   | Running (** external proof attempt is in progress *)
   | Done of Call_provers.prover_result (** external proof done *)
+  | Interrupted (** external proof has never completed *)
+  | Detached (** parent goal has no task, is detached *)
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
 
 let print_status fmt st =
   match st with
-  | Detached          -> fprintf fmt "Detached"
-  | Interrupted       -> fprintf fmt "Interrupted"
+  | Undone            -> fprintf fmt "Undone"
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
   | Done r            ->
       fprintf fmt "Done(%a)" Call_provers.print_prover_result r
+  | Interrupted       -> fprintf fmt "Interrupted"
+  | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
       fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
   | Uninstalled pr    ->
@@ -463,12 +465,17 @@ let schedule_proof_attempt c id pr
                            ~counterexmp ~limit ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
-    (match s with
+    begin match s with
     | Scheduled | Running -> update_goal_node notification ses id
     | Done res ->
         update_proof_attempt ~obsolete:false notification ses id pr res;
         update_goal_node notification ses id
-    | _ -> ());
+    | Detached
+    | InternalFailure _
+    | Uninstalled _
+    | Undone -> assert false
+    | Interrupted -> ()
+    end;
     callback panid s
   in
   let adaptlimit,ores,proof_script =
@@ -639,6 +646,7 @@ let schedule_edition c id pr ~callback ~notification =
   let callback panid s =
     begin
       match s with
+      | Running -> ()
       | Done res ->
          (* set obsolete to true since we do not know if the manual
             proof was completed or not *)
@@ -647,9 +655,10 @@ let schedule_edition c id pr ~callback ~notification =
                        print_proofAttemptID panid print_proofNodeID id;
          update_proof_attempt ~obsolete:true notification session id pr res;
          update_goal_node notification session id
-      | Scheduled | Running -> ()
-      | Interrupted | InternalFailure _ -> ()
-      | _ -> ()
+      | Interrupted
+      | InternalFailure _ ->
+         update_goal_node notification session id
+      | Undone | Detached | Uninstalled _ | Scheduled -> assert false
     end;
     callback panid s
   in
@@ -664,7 +673,15 @@ let schedule_edition c id pr ~callback ~notification =
 
 (*** { 2 transformations} *)
 
-let schedule_transformation_r c id name args ~callback =
+let schedule_transformation c id name args ~callback ~notification =
+  let callback s =
+    begin match s with
+          | TSdone tid -> update_trans_node notification c.controller_session tid
+          | TSscheduled
+          | TSfailed _ -> ()
+    end;
+    callback s
+  in
   let apply_trans () =
     begin
       try
@@ -689,16 +706,6 @@ let schedule_transformation_r c id name args ~callback =
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
-let schedule_transformation c id name args ~callback ~notification =
-  let callback s =
-    begin match s with
-          | TSdone tid -> update_trans_node notification c.controller_session tid
-          | TSfailed _e -> ()
-          | _ -> ()
-    end;
-    callback s
-  in
-  schedule_transformation_r c id name args ~callback
 
 open Strategy
 
@@ -724,7 +731,7 @@ let run_strategy_on_goal
               callback (STSgoto (g,pc+1));
               let run_next () = exec_strategy (pc+1) strat g; false in
               S.idle ~prio:0 run_next
-           | Detached | Uninstalled _ ->
+           | Undone | Detached | Uninstalled _ ->
                          (* should not happen *)
                          assert false
          in
@@ -918,7 +925,7 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
   let craft_report count s r id pr limits pa =
     match s with
     | Scheduled | Running -> ()
-    | Interrupted ->
+    | Undone | Interrupted ->
        decr count;
        r := (id, pr, limits, Replay_interrupted ) :: !r
     | Done new_r ->
@@ -1037,7 +1044,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                   begin match st with
                   | Scheduled | Running -> ()
                   | Detached | Uninstalled _ -> assert false
-                  | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
+                  | Undone | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
                   | InternalFailure exn ->
                      (* Perhaps the test can be considered false in this case? *)
                      Debug.dprintf debug "Bisecting interrupted by an error %a.@."
@@ -1105,7 +1112,7 @@ later on. We do has if proof fails. *)
                    debug "[Bisect] prover on subtask is running@.";
               | Detached
               | Uninstalled _ -> assert false
-              | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
+              | Undone | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
               | InternalFailure exn ->
                  (* Perhaps the test can be considered false in this case? *)
                  Debug.dprintf debug "[Bisect] prover interrupted by an error: %a.@."

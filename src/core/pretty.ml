@@ -510,10 +510,12 @@ let print_namespace fmt name th =
 
 (* print task under the form of a sequent, with only local context, for the IDE *)
 
+(*
 let print_goal fmt d =
    match d.d_node with
    | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]@\n" print_term f
    | _ -> assert false
+*)
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in

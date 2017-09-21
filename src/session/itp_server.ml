@@ -730,7 +730,7 @@ end
       let res =
         match pa.Session_itp.proof_state with
         | Some pa -> Done pa
-        | _ -> InternalFailure Not_found
+        | _ -> Undone
       in
       P.notify (Node_change (new_id, Proof_status_change(res, obs, limit)))
 
@@ -1043,7 +1043,7 @@ end
       | APa pa ->
          let pa = get_proof_attempt_node c.controller_session pa in
          let res = match pa.Session_itp.proof_state with
-           | None -> InternalFailure Not_found
+           | None -> Undone
            | Some r -> Done r
          in
          let obs = pa.proof_obsolete in
