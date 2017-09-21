@@ -438,6 +438,13 @@ let menu_refresh =
 let menu_save_session =
   create_menu_item file_factory "_Save session"
                    "Save the current proof session on disk"
+let menu_save_files =
+  create_menu_item file_factory "_Save files"
+                   "Save the edited source files on disk"
+let menu_save_session_and_files =
+  create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
+                   "Save the the current proof session and the files"
+
 let menu_quit =
   create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
                    "Quit the interface. See the Preferences for setting the policy on automatic file saving at exit."
@@ -514,6 +521,17 @@ let () =
 
 let () =
   connect_menu_item
+    menu_save_session_and_files
+    ~callback:(fun () -> save_sources(); send_request Save_req)
+
+let () =
+  connect_menu_item
+    menu_save_files
+    ~callback:(fun () -> save_sources())
+
+
+let () =
+  connect_menu_item
     menu_quit
     ~callback:exit_function_safe
 
@@ -587,9 +605,9 @@ let view_name_column =
   let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] in
   v#pack name_renderer;
   v#add_attribute name_renderer "text" name_column;
-(*  v#set_sizing `AUTOSIZE; *)
+  (* v#set_sizing `AUTOSIZE; *)
   v#set_resizable true;
-  v#set_max_width 500;
+  (*  v#set_max_width 1000;*)
   v
 
 (* second view column: status *)
@@ -1227,11 +1245,6 @@ let (_ : GMenu.menu_item) =
   exp_factory#add_item ~key:GdkKeysyms._D
     ~callback:detached_copy "Detached copy"
 
-(* TODO replace this with menu items *)
-let (_ : GMenu.menu_item) =
-  exp_factory#add_item ~key:GdkKeysyms._X "Save files"
-    ~callback:(fun () -> save_sources ())
-
 (*********************************)
 (* add a new file in the project *)
 (*********************************)
@@ -1742,13 +1755,6 @@ let treat_notification n =
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
           set_status_and_time_column ~limit:l r
-(*
-       | Obsolete b ->
-          let r = get_node_row id in
-          let (pa, _, l) = Hint.find node_id_pa id in
-          Hint.replace node_id_pa id (pa, b, l);
-          set_status_and_time_column ~limit:l r
-*)
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id
@@ -1809,9 +1815,6 @@ let treat_notification n =
      print_message "Serveur sent an unexpected notification '%a'. Please report."
         print_notify n
   end;
-  (* temporary: this should be better executed each time
-     one clicks on the tree view *)
-(*  command_entry#misc#grab_focus () *)
   ()
 
 
@@ -1845,9 +1848,6 @@ let (_ : GMenu.image_menu_item) =
 let () =
   Scheduler.timeout ~ms:Controller_itp.default_delay_ms
     (fun () -> List.iter treat_notification (get_notified ()); true);
-  (* temporary *)
-  vpan222#set_position 500;
-  goals_view#expand_all ();
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
   message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
