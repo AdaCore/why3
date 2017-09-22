@@ -67,7 +67,7 @@ module Print = struct
      "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with";
      "raise";]
 
-  let is_ocaml_keyword =
+  let _is_ocaml_keyword =
     let h = Hstr.create 16 in
     List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
     Hstr.mem h
@@ -564,7 +564,7 @@ module Print = struct
     in
     let labels = its.its_name.id_label in
     if not (is_ocaml_remove ~labels) then
-      fprintf fmt "@[<hov 2>%s %a%a%a@]"
+      fprintf fmt "@[<hov 2>@[%s %a%a@]%a@]"
         (if fst then "type" else "and") print_tv_args its.its_args
         (print_lident info) its.its_name print_def its.its_def
 
