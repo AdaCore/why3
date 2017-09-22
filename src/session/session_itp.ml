@@ -1390,16 +1390,26 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
     new_goal)
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
+  let exception NoProgress in
   let task, subtasks =
     let raw_task = get_raw_task s id in
     let task,table = get_task s id in
     try
-      raw_task, Trans.apply_transform_args name env args table raw_task
-    with Generic_arg_trans_utils.Arg_trans _ ->
-         task, Trans.apply_transform_args name env args table task
-       | e ->
-      Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised %a@." Exn_printer.exn_printer e;
-      task, Trans.apply_transform_args name env args table task
+      match Trans.apply_transform_args name env args table raw_task with
+      | [t] when Task.task_equal t raw_task ->
+          Debug.dprintf debug "[apply_trans_to_goal] apply_transform on raw task made no progress@.";
+         raise NoProgress
+      | l -> raw_task, l
+    with
+    | Generic_arg_trans_utils.Arg_trans _
+    | NoProgress as e ->
+       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised exception %a@."
+                     Exn_printer.exn_printer e;
+       task, Trans.apply_transform_args name env args table task
+    | e ->
+       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised %a@."
+                     Exn_printer.exn_printer e;
+       task, Trans.apply_transform_args name env args table task
   in
   match subtasks with
   | [t'] when Task.task_equal t' task && not allow_no_effect ->

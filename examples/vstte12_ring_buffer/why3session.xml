@@ -9,7 +9,7 @@
 <prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_ring_buffer.mlw" proved="true">
-<theory name="RingBuffer" proved="true" sum="4377e4449a7bfd7fff86241bb4b129be">
+<theory name="RingBuffer" proved="true" sum="25d98fd88e17781f4c7a96d403466e0c">
  <goal name="WP_parameter create" expl="VC for create" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
@@ -146,12 +146,21 @@
    <proof prover="1"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="WP_parameter pop.5.6" expl="VC for pop" proved="true">
-   <transf name="cut" proved="true" arg1="(0 &lt;= ((b4 + (i+1)) - b2) -&gt; nth (i+1) b = Some (get1 b1 ((b4 + (i+1)) - b2)))">
+   <transf name="destruct" proved="true" arg1="H">
     <goal name="WP_parameter pop.5.6.0" expl="VC for pop" proved="true">
-    <proof prover="5"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="WP_parameter pop.5.6.1" proved="true">
-    <proof prover="5"><result status="valid" time="0.02"/></proof>
+    <transf name="destruct" proved="true" arg1="H">
+     <goal name="WP_parameter pop.5.6.0.0" expl="VC for pop" proved="true">
+     <transf name="destruct" proved="true" arg1="H">
+      <goal name="WP_parameter pop.5.6.0.0.0" expl="VC for pop" proved="true">
+      <transf name="instantiate" proved="true" arg1="H" arg2="i+1">
+       <goal name="WP_parameter pop.5.6.0.0.0.0" expl="VC for pop" proved="true">
+       <proof prover="5"><result status="valid" time="0.02"/></proof>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
