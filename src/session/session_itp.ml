@@ -1389,8 +1389,9 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
     old_pa.proof_state obsolete old_pa.proof_script
     new_goal)
 
+exception NoProgress
+
 let apply_trans_to_goal ~allow_no_effect s env name args id =
-  let exception NoProgress in
   let task, subtasks =
     let raw_task = get_raw_task s id in
     let task,table = get_task s id in
