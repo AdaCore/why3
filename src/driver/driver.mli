@@ -46,13 +46,10 @@ val call_on_buffer :
 val print_task :
   ?old       : in_channel ->
   ?cntexample : bool ->
-  ?do_intros  : bool ->
-  ?name_table: Trans.naming_table ->
   driver -> Format.formatter -> Task.task -> unit
 
 val print_theory :
   ?old       : in_channel ->
-  ?name_table: Trans.naming_table ->
   driver -> Format.formatter -> Theory.theory -> unit
   (** produce a realization of the given theory using the given driver *)
 
@@ -62,7 +59,6 @@ val prove_task :
   ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?name_table  : Trans.naming_table ->
   driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
@@ -70,8 +66,6 @@ val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
-  ?name_table: Trans.naming_table ->
-  ?do_intros  : bool ->
   driver -> Format.formatter -> Task.task -> Printer.printer_mapping
 
 val prove_task_prepared :
@@ -79,7 +73,6 @@ val prove_task_prepared :
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
-  ?name_table  : Trans.naming_table ->
   driver -> Task.task -> Call_provers.prover_call
 
 
