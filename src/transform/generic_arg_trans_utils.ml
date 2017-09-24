@@ -71,8 +71,22 @@ let subst_forall t x =
   | _ -> raise (Arg_trans "subst_forall")
 
 
+(* Squash forall x y. forall z into forall x y z. Squashing also removes
+   triggers.
+*)
+let squash_forall t =
+  let rec squash_forall_aux vl t =
+    match t.t_node with
+    | Tquant (Tforall, tq) ->
+      let (new_v, _, t) = t_open_quant tq in
+      squash_forall_aux (vl @ new_v) t
+    | _ -> t_forall (t_close_quant vl [] t)
+  in
+  squash_forall_aux [] t
+
 (* Same as subst_forall but l is a list of term *)
 let subst_forall_list t l =
+  let t = squash_forall t in
   match t.t_node with
   | Tquant (Tforall, tq) ->
       subst_quant_list Tforall tq l
