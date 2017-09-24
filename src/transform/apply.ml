@@ -339,8 +339,24 @@ let subst_eq found_eq =
           (* Replace in all hypothesis *)
           | Dprop (kind, pr, t) ->
             [create_prop_decl kind pr (t_replace t1 t2 t)]
-          (* TODO should replace every occurences of t1 in all constructs not only in Dprop... Dlogic etc *)
-          | _ -> [d]) None
+          | Dlogic ldecl_list ->
+            let ldecl_list =
+              List.map (fun (ls, ls_def) ->
+                let (vl, t) = open_ls_defn ls_def in
+                make_ls_defn ls vl (t_replace t1 t2 t)) ldecl_list
+            in
+            [create_logic_decl ldecl_list]
+
+          (* TODO unbelievably complex for something that simple... *)
+          | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
+            let ind_list: ind_decl list =
+              List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
+                let idl = List.map (fun (pr, t) -> (pr, t_replace t1 t2 t)) idl in
+                (ls, idl)) ind_list
+            in
+            [create_ind_decl is ind_list]
+
+          | Dtype _ | Ddata _ | Dparam _ -> [d]) None
       end
     | Some (None, t1, t2) ->
       begin
@@ -351,8 +367,25 @@ let subst_eq found_eq =
            (* Replace in all hypothesis *)
            | Dprop (kind, pr, t) ->
              [create_prop_decl kind pr (t_replace t1 t2 t)]
-           (* TODO should replace every occurences of t1 in all constructs not only in Dprop... Dlogic etc *)
-           | _ -> [d]) None
+
+          | Dlogic ldecl_list ->
+            let ldecl_list =
+              List.map (fun (ls, ls_def) ->
+                let (vl, t) = open_ls_defn ls_def in
+                make_ls_defn ls vl (t_replace t1 t2 t)) ldecl_list
+            in
+            [create_logic_decl ldecl_list]
+
+          (* TODO unbelievably complex for something that simple... *)
+          | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
+            let ind_list: ind_decl list =
+              List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
+                let idl = List.map (fun (pr, t) -> (pr, t_replace t1 t2 t)) idl in
+                (ls, idl)) ind_list
+            in
+            [create_ind_decl is ind_list]
+
+          | Dtype _ | Ddata _ | Dparam _ -> [d]) None
        end
 
 let subst (to_subst: Term.lsymbol) =
