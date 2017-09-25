@@ -227,6 +227,11 @@ module ML = struct
   let e_match e bl =
     mk_expr (Mltree.Ematch (e, bl))
 
+  let e_assign al ity eff lbl =
+    let rm_ghost (_, rs, _) = not (rs_ghost rs) in
+    let al = List.filter rm_ghost al in
+    if al = [] then e_unit else mk_expr (Mltree.Eassign al) ity eff lbl
+
   let e_absurd =
     mk_expr Eabsurd
 
@@ -487,7 +492,7 @@ module Translate = struct
 
   (* expressions *)
   let rec expr info ({e_effect = eff; e_label = lbl} as e) =
-    assert (not eff.eff_ghost);
+    assert (not (e_ghost e));
     match e.e_node with
     | Econst c ->
       let c = match c with Number.ConstInt c -> c | _ -> assert false in
@@ -597,7 +602,7 @@ module Translate = struct
       mk_for_downto info pv1 pv2 pv3 efor eff lbl
     | Eghost _ -> assert false
     | Eassign al ->
-      ML.mk_expr (Mltree.Eassign al) (Mltree.I e.e_ity) eff lbl
+      ML.e_assign al (Mltree.I e.e_ity) eff lbl
     | Epure _ -> assert false
     | Etry (etry, case, pvl_e_map) ->
       assert (not case); (* TODO *)
@@ -906,9 +911,9 @@ module Transform = struct
       let e, spv = expr info subst e in
       let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
       mk (Etry (e, e_bl)), Spv.union spv spv_bl
-    | Eassign al -> (* FIXME : produced superfolous let *)
-      let assign e (_, _, pv) = mk_let subst pv e in
-      (* e *) List.fold_left assign e al, Spv.empty
+    | Eassign _al -> (* FIXME : produced superfolous let *)
+      (* let assign e (_, _, pv) = mk_let subst pv e in *)
+      e, (* List.fold_left assign e al, *) Spv.empty
     | Econst _ | Eabsurd | Ehole -> e, Spv.empty
     | Eignore e ->
       let e, spv = expr info subst e in

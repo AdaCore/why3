@@ -275,7 +275,7 @@ module Print = struct
     (* here [rs] refers to a [val] declaration *)
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn     rs.rs_name with
-    | None, None (* when info.info_flat *) ->
+    | None, None when info.info_flat ->
       (* FIXME? when extracting modularly, there are some functions we maybe do
                 not want to put in a drive, for instance mach.int.State63 *)
       Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
