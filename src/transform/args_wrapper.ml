@@ -147,10 +147,10 @@ let build_naming_tables task : naming_table =
   (** FIXME: using sanitizer here breaks the printing of infix symbols
    because it replaces "infix +" by "infix_+", which forbids to
    parse transformation arguments containing "+" such as "cut 1+2=3" *)
-  let _isanitizer = sanitizer char_to_alpha char_to_alnumus in
+  let isanitizer = None (* Some (sanitizer char_to_alpha char_to_alnumus) *) in
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  let pr = create_ident_printer Pretty.why3_keywords (* ~sanitizer:isanitizer*) in
-  let apr = create_ident_printer [] ~sanitizer:lsanitize in
+  let pr = create_ident_printer Pretty.why3_keywords ?sanitizer:isanitizer in
+  let apr = create_ident_printer Pretty.why3_keywords ~sanitizer:lsanitize in
   let km = Task.task_known task in
   let tables = {
       namespace = empty_ns;
