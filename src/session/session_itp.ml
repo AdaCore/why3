@@ -879,7 +879,7 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
     | ATh _th -> (* Not in any table *)  ()
   in
   match n with
-  | (APn _ | ATh _) when not (is_detached s n) ->
+  | (AFile _ | APn _ | ATh _) when not (is_detached s n) ->
                raise RemoveError
   | _ ->
      let p = get_any_parent s n in
