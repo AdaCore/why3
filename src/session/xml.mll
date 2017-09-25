@@ -68,7 +68,7 @@ rule xml_prolog fixattrs = parse
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
     { xml_doctype fixattrs "1.0" "" lexbuf }
 | "<?xml" ([^'?']|'?'[^'>'])* "?>"
-    { Debug.dprintf debug "[Xml warning] prolog ignored@.";
+    { Debug.dprintf debug "prolog ignored@.";
       xml_doctype fixattrs "1.0" "" lexbuf }
 | _
     { parse_error "wrong prolog" }
@@ -99,25 +99,25 @@ and elements fixattrs group_stack element_stack = parse
       { match group_stack with
          | [] ->
              Debug.dprintf debug
-               "[Xml warning] unexpected closing Xml element `%s'@."
+               "unexpected closing Xml element `%s'@."
                celem;
              elements fixattrs group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
                Debug.dprintf debug
-                 "[Xml warning] Xml element `%s' closed by `%s'@."
+                 "Xml element `%s' closed by `%s'@."
                  elem celem;
              let e = mk_element elem att element_stack in
              elements fixattrs g (e::stack) lexbuf
        }
   | '<'
-      { Debug.dprintf debug "[Xml warning] unexpected '<'@.";
+      { Debug.dprintf debug "unexpected '<'@.";
         elements fixattrs group_stack element_stack lexbuf }
   | eof
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
-             Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
+             Debug.dprintf debug "unclosed Xml element `%s'@." elem;
              pop_all group_stack element_stack
       }
   | _ as c

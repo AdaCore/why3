@@ -388,7 +388,7 @@ let () =
   let get_server_data () =
     match !server_data with
     | None ->
-       Format.eprintf "[ITP server] not yet initialized@.";
+       Format.eprintf "not yet initialized@.";
        exit 1
     | Some x -> x
 
@@ -669,7 +669,7 @@ end
       let main = Whyconf.get_main config in
       let d = "why3_itp" in
       let d = Whyconf.load_driver main env d [] in
-      Debug.dprintf debug "[ITP server] driver for task printing loaded@.";
+      Debug.dprintf debug "driver for task printing loaded@.";
       d
     with e ->
       Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
@@ -960,9 +960,9 @@ end
   (* ------------ init server ------------ *)
 
   let init_server ?(send_source=true) config env f =
-    Debug.dprintf debug "[ITP server] loading session %s@." f;
+    Debug.dprintf debug "loading session %s@." f;
     let ses,use_shapes = Session_itp.load_session f in
-    Debug.dprintf debug "[ITP server] creating controller@.";
+    Debug.dprintf debug "creating controller@.";
     let c = create_controller config env ses in
     (* let task_driver = task_driver config env in*)
     server_data := Some
@@ -999,9 +999,9 @@ end
           Hstr.fold (fun c _ acc -> c :: acc) commands_table []
       }
     in
-    Debug.dprintf debug "[ITP server] sending initialization infos@.";
+    Debug.dprintf debug "sending initialization infos@.";
     P.notify (Initialized infos);
-    Debug.dprintf debug "[ITP server] reloading source files@.";
+    Debug.dprintf debug "reloading source files@.";
     let b = reload_files d.cont ~use_shapes in
     if b then
       begin

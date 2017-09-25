@@ -61,14 +61,14 @@ module Protocol_why3ide = struct
       ~desc:"Print@ debugging@ messages@ about@ Why3Ide@ protocol@"
 
   let print_request_debug r =
-    Debug.dprintf debug_proto "[IDE proto] request %a@." print_request r;
+    Debug.dprintf debug_proto "request %a@." print_request r;
     Debug.dprintf debug_json "%a@." print_request_json r
 
   let print_msg_debug m =
-    Debug.dprintf debug_proto "[IDE proto] message %a@." print_msg m
+    Debug.dprintf debug_proto "message %a@." print_msg m
 
   let print_notify_debug n =
-    Debug.dprintf debug_proto "[IDE proto] handling notification %a@." print_notify n;
+    Debug.dprintf debug_proto "handling notification %a@." print_notify n;
     Debug.dprintf debug_json "%a@." print_notification_json n
 
   let list_requests: ide_request list ref = ref []
@@ -76,7 +76,7 @@ module Protocol_why3ide = struct
   let get_requests () =
     let n = List.length !list_requests in
     if n > 0 then
-      Debug.dprintf debug_proto "[IDE proto] got %d new requests@." n;
+      Debug.dprintf debug_proto "got %d new requests@." n;
     let l = List.rev !list_requests in
     list_requests := [];
     l
@@ -95,7 +95,7 @@ module Protocol_why3ide = struct
   let get_notified () =
     let n = List.length !notification_list in
     if n > 0 then
-      Debug.dprintf debug_proto "[IDE proto] got %d new notifications@." n;
+      Debug.dprintf debug_proto "got %d new notifications@." n;
     let l = List.rev !notification_list in
     notification_list := [];
     l
@@ -207,7 +207,7 @@ let () =
   Queue.iter (fun f -> send_request (Add_file_req f)) files
 
 let () =
-  Debug.dprintf debug "[GUI] Init the GTK interface...@?";
+  Debug.dprintf debug "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
   Debug.dprintf debug " done.@.";
   Gconfig.init ()
@@ -631,7 +631,7 @@ let view_time_column =
   v
 
 let goals_model,goals_view =
-  Debug.dprintf debug "[GUI] Creating tree model...@?";
+  Debug.dprintf debug "Creating tree model...@?";
   let model = GTree.tree_store cols in
   let view = GTree.view ~model ~packing:scrolled_session_view#add () in
   let () = view#selection#set_mode (* `SINGLE *) `MULTIPLE in
@@ -642,7 +642,7 @@ let goals_model,goals_view =
   let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_status_column in
   let _: int = view#append_column view_time_column in
-  Debug.dprintf debug "[GTK IDE] done@.";
+  Debug.dprintf debug "done@.";
   model,view
 
 
@@ -954,7 +954,7 @@ let _ =
 
 let () =
   let n = gconfig.session_nb_processes in
-  Debug.dprintf debug "[IDE] setting max proof tasks to %d@." n;
+  Debug.dprintf debug "setting max proof tasks to %d@." n;
   send_request (Set_max_tasks_req n)
 
 (********************)
@@ -1180,7 +1180,7 @@ let on_selected_row r =
 let (_ : GtkSignal.id) =
   goals_view#selection#connect#after#changed ~callback:
     (fun () ->
-     Debug.dprintf debug "[IDE INFO] running callback of goals_view#selection#connect#after#changed@.";
+     Debug.dprintf debug "running callback of goals_view#selection#connect#after#changed@.";
      begin
        match get_selected_row_references () with
        | [r] -> on_selected_row r;
@@ -1190,17 +1190,17 @@ let (_ : GtkSignal.id) =
 
 let (_ : GtkSignal.id) =
   let callback ev =
-    Debug.dprintf debug "[IDE INFO] running callback of goals_view#event#connect#button_press@.";
+    Debug.dprintf debug "running callback of goals_view#event#connect#button_press@.";
     let n = GdkEvent.Button.button ev in
     begin
-      Debug.dprintf debug "[IDE INFO] button number %d was clicked on the tree view@." n;
+      Debug.dprintf debug "button number %d was clicked on the tree view@." n;
       match n with
       | 1 -> (* Left click *) false
       | 2 -> (* Middle click *) false
       | 3 -> (* Right click *)
-         Debug.dprintf debug "[IDE INFO] before tools_menu#popup@.";
+         Debug.dprintf debug "before tools_menu#popup@.";
          tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
-         Debug.dprintf debug "[IDE INFO] after tools_menu#popup@.";
+         Debug.dprintf debug "after tools_menu#popup@.";
          true
       | _ -> (* Error case TODO *) assert false
     end
@@ -1572,7 +1572,7 @@ let add_submenu_strategy (shortcut,strategy) =
   Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
           (parse_shortcut_as_key shortcut);
   let callback () =
-    Debug.dprintf debug "[IDE INFO] interp command '%s'@." shortcut;
+    Debug.dprintf debug "interp command '%s'@." shortcut;
     interp shortcut
   in
   connect_menu_item i ~callback
@@ -1586,7 +1586,7 @@ let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
   Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
           (parse_shortcut_as_key shortcut);
   let callback () =
-    Debug.dprintf debug "[IDE INFO] interp command '%s'@." prover_parseable_name;
+    Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
     interp prover_parseable_name
   in
   connect_menu_item i ~callback
