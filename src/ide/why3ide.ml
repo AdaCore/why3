@@ -1505,7 +1505,7 @@ let set_status_and_time_column ?limit row =
   goals_model#set ~row:row#iter ~column:status_column image
 
 
-let new_node ?parent (* ?(collapse=false) *) id name typ detached =
+let new_node ?parent id name typ detached =
   if not (Hint.mem node_id_to_gtree id) then begin
     Hint.add node_id_type id typ;
     Hint.add node_id_detached id detached;

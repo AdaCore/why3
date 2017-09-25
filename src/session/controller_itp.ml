@@ -1048,7 +1048,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                 Call_provers.limit_steps =
                   Call_provers.empty_limit.Call_provers.limit_steps }
   in
-  let timelimit = ref (-1) in
+  let timelimit = ref limit.Call_provers.limit_time in
   let set_timelimit res =
     timelimit := 1 + (int_of_float (floor res.Call_provers.pr_time)) in
   let bisect_end rem =
