@@ -152,8 +152,8 @@ let load_strategies cont =
        Stdlib.Hstr.add cont.Controller_itp.controller_strategies shortcut
                        (name, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
-       Debug.dprintf debug
-                     "[session server warning] Loading strategy '%s' failed: %s@." name msg)
+       Format.eprintf "[ERROR] Loading strategy '%s' failed: %s@." name msg;
+       exit 1)
     strategies
 
 let list_strategies cont =

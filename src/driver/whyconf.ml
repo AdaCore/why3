@@ -642,7 +642,7 @@ let parse_filter_prover s =
   (* reverse order *)
   match sl with
   | [name] -> mk_filter_prover name
-  | [version;name] -> mk_filter_prover ~version name
+  | [version;name] -> mk_filter_prover ~altern:"" ~version name
   | [altern;"";name] -> mk_filter_prover ~altern name
   | [altern;version;name] -> mk_filter_prover ~version ~altern name
   | _ -> raise (ParseFilterProver s)
