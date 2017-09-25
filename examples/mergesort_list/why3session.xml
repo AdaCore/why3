@@ -7,6 +7,7 @@
 <prover id="2" name="Z3" version="4.3.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../mergesort_list.mlw" proved="true">
 <theory name="Elt" proved="true" sum="84518d7f52d72813b9844e109c663213">
  <goal name="Trans" proved="true">
@@ -64,7 +65,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="EfficientMerge" proved="true" sum="f547408c5ba3d05004db6f9d48833281">
+<theory name="EfficientMerge" proved="true" sum="2015c9d93a74dcfbc92a8186a00ba3b6">
  <goal name="sorted_reverse_cons" proved="true">
  <proof prover="0"><result status="valid" time="0.26"/></proof>
  <proof prover="2" timelimit="6"><result status="valid" time="0.34"/></proof>
@@ -75,14 +76,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter merge_aux.1.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.10"/></proof>
-   <proof prover="1"><result status="valid" time="0.03"/></proof>
-   <proof prover="2" timelimit="6"><result status="valid" time="0.02"/></proof>
-   <proof prover="4"><result status="valid" time="0.08" steps="196"/></proof>
-   </goal>
-  </transf>
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter merge_aux.2" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="103"/></proof>
@@ -245,7 +239,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="OCamlMergesort" proved="true" sum="a5bcb81c19a088092f5295f1248202f8">
+<theory name="OCamlMergesort" proved="true" sum="52907827e0ab5839283d9166cbf7695b">
  <goal name="sorted_reverse_cons" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.24"/></proof>
  </goal>
@@ -322,11 +316,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.1" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter rev_merge_rev.1.0" expl="postcondition" proved="true">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.10"/></proof>
-   </goal>
-  </transf>
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter rev_merge_rev.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.21"/></proof>
