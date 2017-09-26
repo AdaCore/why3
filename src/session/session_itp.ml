@@ -1396,11 +1396,16 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
     let raw_task = get_raw_task s id in
     let task,table = get_task s id in
     try
-      match Trans.apply_transform_args name env args table raw_task with
-      | [t] when Task.task_equal t raw_task ->
+      let new_task_list = Trans.apply_transform_args name env args table raw_task in
+      (* If any generated task is equal to the former task, then we made no
+         progress because we need to prove more lemmas than before *)
+      if List.exists (fun t -> Task.task_equal t raw_task) new_task_list then
+        begin
           Debug.dprintf debug "[apply_trans_to_goal] apply_transform on raw task made no progress@.";
-         raise NoProgress
-      | l -> raw_task, l
+          raise NoProgress
+        end
+      else
+        raw_task, new_task_list
     with
     | Generic_arg_trans_utils.Arg_trans _
     | NoProgress as e ->
