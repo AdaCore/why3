@@ -240,37 +240,6 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-let output_task_prepared drv fname _tname th task dir =
-  let fname = Filename.basename fname in
-  let fname =
-    try Filename.chop_extension fname with _ -> fname in
-  let tname = th.th_name.Ident.id_string in
-  let dest = Driver.file_of_task drv fname tname task in
-  (* Uniquify the filename before the extension if it exists*)
-  let i = try String.rindex dest '.' with _ -> String.length dest in
-  let name = Ident.string_unique !fname_printer (String.sub dest 0 i) in
-  let ext = String.sub dest i (String.length dest - i) in
-  let cout = open_out (Filename.concat dir (name ^ ext)) in
-  (* TODO print the counterexample *)
-  let _counterexample = Driver.print_task_prepared drv (formatter_of_out_channel cout) task in
-  close_out cout
-
-let output_theory drv fname _tname th task dir =
-  let fname = Filename.basename fname in
-  let fname =
-    try Filename.chop_extension fname with _ -> fname in
-  let dest = Driver.file_of_theory drv fname th in
-  let file = Filename.concat dir dest in
-  let old =
-    if Sys.file_exists file then begin
-      let backup = file ^ ".bak" in
-      Sys.rename file backup;
-      Some (open_in backup)
-    end else None in
-  let cout = open_out file in
-  Driver.print_task ?old drv (formatter_of_out_channel cout) task;
-  close_out cout
-
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
