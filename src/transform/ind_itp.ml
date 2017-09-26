@@ -59,6 +59,12 @@ let induction x bound env =
   let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
   let one_int =
     Term.t_const (Number.ConstInt (Number.int_const_dec "1")) Ty.ty_int in
+  (* bound is optional and set to 0 if not given *)
+  let bound =
+    match bound with
+    | None -> Term.t_const (Number.ConstInt (Number.int_const_dec "0")) Ty.ty_int
+    | Some bound -> bound
+  in
 
   if (not (is_good_type x Ty.ty_int) || not (is_good_type bound Ty.ty_int)) then
     raise (Arg_trans "induction")
@@ -122,6 +128,6 @@ let induction x bound env =
   Trans.par [le_bound; ge_bound]
 
 let () = wrap_and_register
-    ~desc:"induction <term1> <term2> performs induction on int term1 from int term2"
+    ~desc:"induction <term1> [from] <term2> performs induction on int term1 from int term2. term2 is optional and default to 0."
     "induction"
-    (Tterm (Tterm Tenvtrans_l)) induction
+    (Tterm (Topt ("from", Tterm Tenvtrans_l))) induction

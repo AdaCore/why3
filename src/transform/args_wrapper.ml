@@ -475,6 +475,15 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
         | Tstring t' ->
            let arg = Some s' in
            wrap_to_store t' (f arg) tail env tables task
+        | Tprlist t' ->
+            let pr_list = parse_list_qualid s' in
+            let pr_list =
+              List.map (fun id ->
+                try find_pr id tables with
+                | Not_found -> raise (Arg_qid_not_found id))
+                pr_list in
+            let arg = Some pr_list in
+            wrap_to_store t' (f arg) tail env tables task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
        end
     | Topt (_, t'), _ ->

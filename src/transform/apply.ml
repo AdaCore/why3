@@ -219,8 +219,26 @@ let find_target_prop h : prsymbol trans =
 
 let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in (not rev) h)
 
-(* Replace occurences of t1 with t2 in h *)
-let replace t1 t2 h =
+(* This function is used to detect when we found the hypothesis/goal we want
+   to replace/unfold into. *)
+let detect_prop pr k h =
+  match h with
+  | None -> k = Pgoal
+  | Some h -> Ident.id_equal pr.pr_name h.pr_name && (k = Paxiom || k = Pgoal)
+
+let detect_prop_list pr k hl =
+  match hl with
+  | None -> k = Pgoal
+  | Some [] -> (* Should not be able to parse the empty list *)
+      raise (Arg_trans "replace")
+  | Some hl ->
+      ((List.exists (fun h -> Ident.id_equal pr.pr_name h.pr_name) hl)
+         && (k = Paxiom || k = Pgoal))
+
+(* Replace occurences of t1 with t2 in h. When h is None, the default is to
+   replace in the goal.
+*)
+let replace t1 t2 hl =
   if not (Ty.ty_equal (t_type t1) (t_type t2)) then
     raise (Arg_trans_term ("replace", t1, t2))
   else
@@ -229,10 +247,11 @@ let replace t1 t2 h =
     let ng = Trans.goal (fun _ _ -> [g]) in
     let g = Trans.decl (fun d ->
       match d.d_node with
-      | Dprop (p, pr, t) when (Ident.id_equal pr.pr_name h.pr_name && (p = Paxiom || p = Pgoal)) ->
+      | Dprop (p, pr, t) when detect_prop_list pr p hl ->
           [create_prop_decl p pr (replace true t1 t2 t)]
       | _ -> [d]) None in
     Trans.par [g; ng]
+
 
 let t_replace_app unf ls_defn t =
   let (vl, tls) = ls_defn in
@@ -247,7 +266,7 @@ let t_replace_app unf ls_defn t =
 let rec t_ls_replace ls ls_defn t =
   t_replace_app ls ls_defn (t_map (t_ls_replace ls ls_defn) t)
 
-let unfold unf h =
+let unfold unf hl =
   let r = ref None in
   Trans.decl
     (fun d ->
@@ -256,7 +275,7 @@ let unfold unf h =
       | Dlogic [(ls, ls_defn)] when ls_equal ls unf ->
           r := Some (open_ls_defn ls_defn);
           [d]
-      | Dprop (k, pr, t) when pr_equal h pr  ->
+      | Dprop (k, pr, t) when detect_prop_list pr k hl ->
         begin
           match !r with
           | None -> [d]
@@ -431,14 +450,14 @@ let () = wrap_and_register ~desc:"sort declarations"
     "sort"
     (Ttrans) sort
 
-let () = wrap_and_register ~desc:"unfold ls pr: unfold logic symbol ls in hypothesis pr. Experimental." (* TODO *)
+let () = wrap_and_register ~desc:"unfold ls [in] pr: unfold logic symbol ls in list of hypothesis pr. The argument in is optional: by default unfold in the goal." (* TODO *)
     "unfold"
-    (Tlsymbol (Tprsymbol Ttrans)) unfold
+    (Tlsymbol (Topt ("in", Tprlist Ttrans))) unfold
 
 let () = wrap_and_register
-    ~desc:"replace <term1> <term2> <name> replaces occcurences of term1 by term2 in prop name"
+    ~desc:"replace <term1> <term2> [in] <name list> replaces occcurences of term1 by term2 in prop name. If no list is given, replace in the goal."
     "replace"
-    (Tterm (Tterm (Tprsymbol Ttrans_l))) replace
+    (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l)))) replace
 
 let _ = wrap_and_register
     ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" "rewrite"
