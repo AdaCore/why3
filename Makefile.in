@@ -98,8 +98,8 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 WARNINGS = A-4-9-41-44-45-50-52@5@48
 
-OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w $(WARNINGS) -keep-locs -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -keep-locs -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
