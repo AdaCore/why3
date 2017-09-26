@@ -312,14 +312,6 @@ else
    fi
 fi
 
-# bin-annot
-case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*)
-        enable_bin_annot=no;;
-  *)
-        enable_bin_annot=yes;;
-esac
-
 # checking for rubber
 if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(RUBBER,rubber,rubber,no)
@@ -764,7 +756,6 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
 AC_SUBST(enable_profiling)
-AC_SUBST(enable_bin_annot)
 
 AC_SUBST(COQCAMLP)
 AC_SUBST(COQCAMLPLIB)
