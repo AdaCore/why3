@@ -3,596 +3,581 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../schorr_waite_via_recursion.mlw" expanded="true">
-<theory name="Memory" sum="d41d8cd98f00b204e9800998ecf8427e">
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../schorr_waite_via_recursion.mlw" proved="true">
+<theory name="Memory" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="GraphShape" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="GraphShape" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="SchorrWaite" sum="15beccdf3dc93d15080c2f9be6c45f45" expanded="true">
- <goal name="WP_parameter black" expl="VC for black">
+<theory name="SchorrWaite" proved="true" sum="dbec2578975dbab818418c72f7f9c9f5">
+ <goal name="WP_parameter black" expl="VC for black" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="WP_parameter schorr_waite" expl="VC for schorr_waite">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter schorr_waite.1" expl="exceptional postcondition">
+ <goal name="WP_parameter schorr_waite" expl="VC for schorr_waite" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter schorr_waite.0" expl="exceptional postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.2" expl="precondition">
+  <goal name="WP_parameter schorr_waite.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.3" expl="exceptional postcondition">
+  <goal name="WP_parameter schorr_waite.2" expl="exceptional postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.4" expl="precondition">
+  <goal name="WP_parameter schorr_waite.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.5" expl="precondition">
+  <goal name="WP_parameter schorr_waite.4" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.6" expl="precondition">
+  <goal name="WP_parameter schorr_waite.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.7" expl="precondition">
+  <goal name="WP_parameter schorr_waite.6" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.8" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.7" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.9" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.8" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.10" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.9" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.11" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.10" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.12" expl="precondition">
+  <goal name="WP_parameter schorr_waite.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.13" expl="precondition">
+  <goal name="WP_parameter schorr_waite.12" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.14" expl="precondition">
+  <goal name="WP_parameter schorr_waite.13" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.15" expl="precondition">
+  <goal name="WP_parameter schorr_waite.14" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.16" expl="precondition">
+  <goal name="WP_parameter schorr_waite.15" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.17" expl="precondition">
+  <goal name="WP_parameter schorr_waite.16" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.18" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.17" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.19" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.18" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.20" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.21" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.20" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.22" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.21" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.23" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.22" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.24" expl="precondition">
+  <goal name="WP_parameter schorr_waite.23" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.25" expl="precondition">
+  <goal name="WP_parameter schorr_waite.24" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.26" expl="precondition">
+  <goal name="WP_parameter schorr_waite.25" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.27" expl="precondition">
+  <goal name="WP_parameter schorr_waite.26" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.28" expl="precondition">
+  <goal name="WP_parameter schorr_waite.27" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.29" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.28" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.30" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.29" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.31" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.30" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.32" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.31" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.33" expl="precondition">
+  <goal name="WP_parameter schorr_waite.32" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.34" expl="precondition">
+  <goal name="WP_parameter schorr_waite.33" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.35" expl="precondition">
+  <goal name="WP_parameter schorr_waite.34" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.36" expl="precondition">
+  <goal name="WP_parameter schorr_waite.35" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.37" expl="precondition">
+  <goal name="WP_parameter schorr_waite.36" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.38" expl="precondition">
+  <goal name="WP_parameter schorr_waite.37" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.39" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.38" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.40" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.39" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.41" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.40" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.42" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.41" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.43" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.42" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.44" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.43" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.45" expl="precondition">
+  <goal name="WP_parameter schorr_waite.44" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.46" expl="precondition">
+  <goal name="WP_parameter schorr_waite.45" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.47" expl="precondition">
+  <goal name="WP_parameter schorr_waite.46" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.48" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.47" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.49" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.48" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.50" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.49" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.51" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.50" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.52" expl="precondition">
+  <goal name="WP_parameter schorr_waite.51" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.53" expl="precondition">
+  <goal name="WP_parameter schorr_waite.52" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.54" expl="precondition">
+  <goal name="WP_parameter schorr_waite.53" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.55" expl="precondition">
+  <goal name="WP_parameter schorr_waite.54" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.56" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.55" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.57" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.56" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.58" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.57" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.59" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.58" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.60" expl="precondition">
+  <goal name="WP_parameter schorr_waite.59" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.61" expl="precondition">
+  <goal name="WP_parameter schorr_waite.60" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.62" expl="precondition">
+  <goal name="WP_parameter schorr_waite.61" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.63" expl="precondition">
+  <goal name="WP_parameter schorr_waite.62" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.64" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.63" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.65" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.64" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.66" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.65" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.67" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.66" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.68" expl="precondition">
+  <goal name="WP_parameter schorr_waite.67" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.69" expl="precondition">
+  <goal name="WP_parameter schorr_waite.68" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.70" expl="precondition">
+  <goal name="WP_parameter schorr_waite.69" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.71" expl="precondition">
+  <goal name="WP_parameter schorr_waite.70" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.72" expl="precondition">
+  <goal name="WP_parameter schorr_waite.71" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.73" expl="precondition">
+  <goal name="WP_parameter schorr_waite.72" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.74" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.73" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.75" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.74" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.76" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.75" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.77" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.76" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="57"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.78" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.77" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.79" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.78" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.80" expl="precondition">
+  <goal name="WP_parameter schorr_waite.79" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.81" expl="precondition">
+  <goal name="WP_parameter schorr_waite.80" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.82" expl="precondition">
+  <goal name="WP_parameter schorr_waite.81" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.83" expl="precondition">
+  <goal name="WP_parameter schorr_waite.82" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.84" expl="precondition">
+  <goal name="WP_parameter schorr_waite.83" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.85" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.84" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.86" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.85" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.87" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.86" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.88" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.87" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.89" expl="precondition">
+  <goal name="WP_parameter schorr_waite.88" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.90" expl="precondition">
+  <goal name="WP_parameter schorr_waite.89" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.91" expl="precondition">
+  <goal name="WP_parameter schorr_waite.90" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.92" expl="precondition">
+  <goal name="WP_parameter schorr_waite.91" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.93" expl="precondition">
+  <goal name="WP_parameter schorr_waite.92" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.94" expl="precondition">
+  <goal name="WP_parameter schorr_waite.93" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.95" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.94" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.96" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.95" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.97" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.96" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.98" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.97" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="59"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.99" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.98" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.100" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.99" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.101" expl="precondition">
+  <goal name="WP_parameter schorr_waite.100" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.102" expl="precondition">
+  <goal name="WP_parameter schorr_waite.101" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.103" expl="precondition">
+  <goal name="WP_parameter schorr_waite.102" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.104" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.103" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.105" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.104" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.106" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.105" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.107" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.106" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.108" expl="precondition">
+  <goal name="WP_parameter schorr_waite.107" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.109" expl="precondition">
+  <goal name="WP_parameter schorr_waite.108" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.110" expl="precondition">
+  <goal name="WP_parameter schorr_waite.109" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.111" expl="precondition">
+  <goal name="WP_parameter schorr_waite.110" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.112" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.111" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.113" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.112" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.114" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.113" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.115" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.114" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.116" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.115" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.117" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.116" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.118" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.117" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.119" expl="precondition">
+  <goal name="WP_parameter schorr_waite.118" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.120" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.119" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.121" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.120" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.122" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.121" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.123" expl="precondition">
+  <goal name="WP_parameter schorr_waite.122" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.124" expl="assertion">
+  <goal name="WP_parameter schorr_waite.123" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.125" expl="precondition">
+  <goal name="WP_parameter schorr_waite.124" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.126" expl="variant decrease">
+  <goal name="WP_parameter schorr_waite.125" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="62"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.127" expl="precondition">
+  <goal name="WP_parameter schorr_waite.126" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10" steps="190"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.128" expl="precondition">
+  <goal name="WP_parameter schorr_waite.127" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.129" expl="precondition">
+  <goal name="WP_parameter schorr_waite.128" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.130" expl="precondition">
+  <goal name="WP_parameter schorr_waite.129" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05" steps="105"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.131" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.130" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05" steps="97"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.132" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.131" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.61" steps="503"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.133" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.132" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.57" steps="416"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.134" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.133" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="60"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.135" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.134" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.32" steps="383"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.136" expl="VC for schorr_waite">
+  <goal name="WP_parameter schorr_waite.135" expl="VC for schorr_waite" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.137" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.136" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="190"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.138" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.137" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.139" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.138" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.140" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.139" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.141" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.140" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.142" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.141" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.143" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.142" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.144" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.143" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.145" expl="loop invariant init">
+  <goal name="WP_parameter schorr_waite.144" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.146" expl="variant decrease">
+  <goal name="WP_parameter schorr_waite.145" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.24" steps="238"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.147" expl="precondition">
+  <goal name="WP_parameter schorr_waite.146" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.148" expl="precondition">
+  <goal name="WP_parameter schorr_waite.147" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.149" expl="precondition">
+  <goal name="WP_parameter schorr_waite.148" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="85"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.150" expl="precondition">
+  <goal name="WP_parameter schorr_waite.149" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="127"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.151" expl="assertion">
+  <goal name="WP_parameter schorr_waite.150" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.38" steps="248"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.152" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.151" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.41" steps="149"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.153" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.152" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="110"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.154" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.153" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.19" steps="332"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.155" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.154" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.12" steps="121"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.156" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.155" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.78" steps="571"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.157" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.156" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.24" steps="192"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.158" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.157" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.42" steps="357"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.159" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.158" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="2.93" steps="1262"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.160" expl="loop invariant preservation">
+  <goal name="WP_parameter schorr_waite.159" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="1.05" steps="704"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.161" expl="VC for schorr_waite">
+  <goal name="WP_parameter schorr_waite.160" expl="VC for schorr_waite" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.162" expl="variant decrease">
+  <goal name="WP_parameter schorr_waite.161" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.22" steps="245"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.163" expl="precondition">
+  <goal name="WP_parameter schorr_waite.162" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.164" expl="precondition">
+  <goal name="WP_parameter schorr_waite.163" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.165" expl="precondition">
+  <goal name="WP_parameter schorr_waite.164" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="84"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.166" expl="precondition">
+  <goal name="WP_parameter schorr_waite.165" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="127"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.167" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.166" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.19" steps="186"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.168" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.167" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.47" steps="396"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.169" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.168" expl="postcondition" proved="true">
   <proof prover="0" timelimit="20"><result status="valid" time="3.75" steps="2305"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.170" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.169" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10" steps="103"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.171" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.170" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.00" steps="667"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.172" expl="VC for schorr_waite">
+  <goal name="WP_parameter schorr_waite.171" expl="VC for schorr_waite" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.173" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.172" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.174" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.173" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.175" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.174" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="54"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.176" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.175" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.177" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.176" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.178" expl="VC for schorr_waite">
+  <goal name="WP_parameter schorr_waite.177" expl="VC for schorr_waite" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.179" expl="precondition">
+  <goal name="WP_parameter schorr_waite.178" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.180" expl="precondition">
+  <goal name="WP_parameter schorr_waite.179" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.181" expl="precondition">
+  <goal name="WP_parameter schorr_waite.180" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.182" expl="unreachable point">
+  <goal name="WP_parameter schorr_waite.181" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.183" expl="assertion">
-  <transf name="induction_pr">
-   <goal name="WP_parameter schorr_waite.183.1" expl="assertion">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter schorr_waite.183.1.1" expl="VC for schorr_waite">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="WP_parameter schorr_waite.183.1.1.1" expl="VC for schorr_waite">
-     <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+  <goal name="WP_parameter schorr_waite.182" expl="assertion" proved="true">
+  <transf name="induction_pr" proved="true" >
+   <goal name="WP_parameter schorr_waite.182.0" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="WP_parameter schorr_waite.183.2" expl="assertion">
-   <transf name="simplify_trivial_quantification_in_goal">
-    <goal name="WP_parameter schorr_waite.183.2.1" expl="VC for schorr_waite">
-    <transf name="simplify_trivial_quantification_in_goal">
-     <goal name="WP_parameter schorr_waite.183.2.1.1" expl="VC for schorr_waite">
-     <proof prover="0"><result status="valid" time="0.01" steps="64"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
+   <goal name="WP_parameter schorr_waite.182.1" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter schorr_waite.184" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.183" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.185" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.184" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter schorr_waite.186" expl="postcondition">
+  <goal name="WP_parameter schorr_waite.185" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
  </transf>

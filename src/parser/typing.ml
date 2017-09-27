@@ -88,12 +88,6 @@ let find_psymbol_ns ns q =
   if ls.ls_value = None then ls else
     Loc.error ~loc:(qloc q) (PredicateSymbolExpected ls)
 
-let find_prop     uc q = find_prop_ns     (get_namespace uc) q
-let find_tysymbol uc q = find_tysymbol_ns (get_namespace uc) q
-let find_lsymbol  uc q = find_lsymbol_ns  (get_namespace uc) q
-let find_fsymbol  uc q = find_fsymbol_ns  (get_namespace uc) q
-let find_psymbol  uc q = find_psymbol_ns  (get_namespace uc) q
-
 let find_namespace_ns ns q =
   find_qualid (fun _ -> Glob.dummy_id) ns_find_ns ns q
 
@@ -107,7 +101,7 @@ let ty_of_pty ?(noop=true) uc pty =
     | PTtyvar ({id_str = x}, _) ->
         ty_var (tv_of_string x)
     | PTtyapp (q, tyl) ->
-        let ts = find_tysymbol uc q in
+        let ts = find_tysymbol_ns uc q in
         let tyl = List.map get_ty tyl in
         Loc.try2 ~loc:(qloc q) ty_app ts tyl
     | PTtuple tyl ->
@@ -155,36 +149,36 @@ let create_user_id {id_str = n; id_lab = label; id_loc = loc} =
   let label,loc = List.fold_left get_labels (Slab.empty,loc) label in
   id_user ~label n loc
 
-let parse_record ~loc uc get_val fl =
-  let fl = List.map (fun (q,e) -> find_lsymbol uc q, e) fl in
-  let cs,pjl,flm = Loc.try2 ~loc parse_record (get_known uc) fl in
+let parse_record ~loc ns km get_val fl =
+  let fl = List.map (fun (q,e) -> find_lsymbol_ns ns q, e) fl in
+  let cs,pjl,flm = Loc.try2 ~loc parse_record km fl in
   let get_val pj = get_val cs pj (Mls.find_opt pj flm) in
   cs, List.map get_val pjl
 
-let rec dpattern uc { pat_desc = desc; pat_loc = loc } =
+let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
   Dterm.dpattern ~loc (match desc with
     | Ptree.Pwild -> DPwild
     | Ptree.Pvar x -> DPvar (create_user_id x)
     | Ptree.Papp (q,pl) ->
-        let pl = List.map (dpattern uc) pl in
-        DPapp (find_lsymbol uc q, pl)
+        let pl = List.map (dpattern ns km) pl in
+        DPapp (find_lsymbol_ns ns q, pl)
     | Ptree.Ptuple pl ->
-        let pl = List.map (dpattern uc) pl in
+        let pl = List.map (dpattern ns km) pl in
         DPapp (fs_tuple (List.length pl), pl)
     | Ptree.Prec fl ->
         let get_val _ _ = function
-          | Some p -> dpattern uc p
+          | Some p -> dpattern ns km p
           | None -> Dterm.dpattern DPwild in
-        let cs,fl = parse_record ~loc uc get_val fl in
+        let cs,fl = parse_record ~loc ns km get_val fl in
         DPapp (cs,fl)
-    | Ptree.Pas (p, x) -> DPas (dpattern uc p, create_user_id x)
-    | Ptree.Por (p, q) -> DPor (dpattern uc p, dpattern uc q)
-    | Ptree.Pcast (p, ty) -> DPcast (dpattern uc p, ty_of_pty uc ty))
+    | Ptree.Pas (p, x) -> DPas (dpattern ns km p, create_user_id x)
+    | Ptree.Por (p, q) -> DPor (dpattern ns km p, dpattern ns km q)
+    | Ptree.Pcast (p, ty) -> DPcast (dpattern ns km p, ty_of_pty ns ty))
 
-let quant_var uc (loc, id, gh, ty) =
+let quant_var ns (loc, id, gh, ty) =
   assert (not gh);
   let ty = match ty with
-    | Some ty -> dty_of_ty (ty_of_pty uc ty)
+    | Some ty -> dty_of_ty (ty_of_pty ns ty)
     | None    -> dty_fresh () in
   Opt.map create_user_id id, ty, Some loc
 
@@ -202,10 +196,10 @@ let mk_var n dt =
 let mk_let ~loc n dt node =
   DTlet (dt, id_user n loc, Dterm.dterm ~loc node)
 
-let chainable_op uc op =
+let chainable_op ns op =
   (* non-bool -> non-bool -> bool *)
   op.id_str = "infix =" || op.id_str = "infix <>" ||
-  match find_lsymbol uc (Qident op) with
+  match find_lsymbol_ns ns (Qident op) with
   | {ls_args = [ty1;ty2]; ls_value = ty} ->
       Opt.fold (fun _ ty -> ty_equal ty ty_bool) true ty
       && not (ty_equal ty1 ty_bool)
@@ -222,7 +216,7 @@ let mk_closure loc ls =
   let vl = Lists.mapi mk_v ls.ls_args in
   DTquant (DTlambda, vl, [], mk (DTapp (ls, List.map mk_t vl)))
 
-let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
+let rec dterm ns km gvars denv {term_desc = desc; term_loc = loc} =
   let func_app e el =
     List.fold_left (fun e1 (loc, e2) ->
       DTfapp (Dterm.dterm ~loc e1, e2)) e el
@@ -235,7 +229,7 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   let qualid_app q el = match gvars q with
     | Some vs -> func_app (DTgvar vs) el
     | None ->
-        let ls = find_lsymbol uc q in
+        let ls = find_lsymbol_ns ns q in
         apply_ls (qloc q) ls [] ls.ls_args el
   in
   let qualid_app q el = match q with
@@ -247,32 +241,32 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
   in
   let rec unfold_app e1 e2 el = match e1.term_desc with
     | Tapply (e11,e12) ->
-        let e12 = dterm uc gvars denv e12 in
+        let e12 = dterm ns km gvars denv e12 in
         unfold_app e11 e12 ((e1.term_loc, e2)::el)
     | Tident q ->
         qualid_app q ((e1.term_loc, e2)::el)
     | _ ->
-        func_app (DTfapp (dterm uc gvars denv e1, e2)) el
+        func_app (DTfapp (dterm ns km gvars denv e1, e2)) el
   in
   Dterm.dterm ~loc (match desc with
   | Ptree.Tident q ->
       qualid_app q []
   | Ptree.Tidapp (q, tl) ->
-      let tl = List.map (dterm uc gvars denv) tl in
-      DTapp (find_lsymbol uc q, tl)
+      let tl = List.map (dterm ns km gvars denv) tl in
+      DTapp (find_lsymbol_ns ns q, tl)
   | Ptree.Tapply (e1, e2) ->
-      unfold_app e1 (dterm uc gvars denv e2) []
+      unfold_app e1 (dterm ns km gvars denv e2) []
   | Ptree.Ttuple tl ->
-      let tl = List.map (dterm uc gvars denv) tl in
+      let tl = List.map (dterm ns km gvars denv) tl in
       DTapp (fs_tuple (List.length tl), tl)
   | Ptree.Tinfix (e12, op2, e3)
   | Ptree.Tinnfix (e12, op2, e3) ->
       let make_app de1 op de2 = if op.id_str = "infix <>" then
         let op = { op with id_str = "infix =" } in
-        let ls = find_lsymbol uc (Qident op) in
+        let ls = find_lsymbol_ns ns (Qident op) in
         DTnot (Dterm.dterm ~loc (DTapp (ls, [de1;de2])))
       else
-        DTapp (find_lsymbol uc (Qident op), [de1;de2])
+        DTapp (find_lsymbol_ns ns (Qident op), [de1;de2])
       in
       let rec make_chain de1 = function
         | [op,de2] ->
@@ -283,44 +277,44 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
             DTbinop (DTand, de12, de23)
         | [] -> assert false in
       let rec get_chain e12 acc = match e12.term_desc with
-        | Tinfix (e1, op1, e2) when chainable_op uc op1 ->
-            get_chain e1 ((op1, dterm uc gvars denv e2) :: acc)
+        | Tinfix (e1, op1, e2) when chainable_op ns op1 ->
+            get_chain e1 ((op1, dterm ns km gvars denv e2) :: acc)
         | _ -> e12, acc in
-      let ch = [op2, dterm uc gvars denv e3] in
-      let e1, ch = if chainable_op uc op2
+      let ch = [op2, dterm ns km gvars denv e3] in
+      let e1, ch = if chainable_op ns op2
         then get_chain e12 ch else e12, ch in
-      make_chain (dterm uc gvars denv e1) ch
+      make_chain (dterm ns km gvars denv e1) ch
   | Ptree.Tconst (Number.ConstInt _ as c) ->
       DTconst (c, ty_int)
   | Ptree.Tconst (Number.ConstReal _ as c) ->
       DTconst (c, ty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm ns km gvars denv e1 in
       let denv = denv_add_let denv e1 id in
-      let e2 = dterm uc gvars denv e2 in
+      let e2 = dterm ns km gvars denv e2 in
       DTlet (e1, id, e2)
   | Ptree.Tmatch (e1, bl) ->
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm ns km gvars denv e1 in
       let branch (p, e) =
-        let p = dpattern uc p in
+        let p = dpattern ns km p in
         let denv = denv_add_pat denv p in
-        p, dterm uc gvars denv e in
+        p, dterm ns km gvars denv e in
       DTcase (e1, List.map branch bl)
   | Ptree.Tif (e1, e2, e3) ->
-      let e1 = dterm uc gvars denv e1 in
-      let e2 = dterm uc gvars denv e2 in
-      let e3 = dterm uc gvars denv e3 in
+      let e1 = dterm ns km gvars denv e1 in
+      let e2 = dterm ns km gvars denv e2 in
+      let e3 = dterm ns km gvars denv e3 in
       DTif (e1, e2, e3)
   | Ptree.Ttrue ->
       DTtrue
   | Ptree.Tfalse ->
       DTfalse
   | Ptree.Tunop (Ptree.Tnot, e1) ->
-      DTnot (dterm uc gvars denv e1)
+      DTnot (dterm ns km gvars denv e1)
   | Ptree.Tbinop (e1, op, e2) ->
-      let e1 = dterm uc gvars denv e1 in
-      let e2 = dterm uc gvars denv e2 in
+      let e1 = dterm ns km gvars denv e1 in
+      let e2 = dterm ns km gvars denv e2 in
       let k op = DTbinop (op, e1, e2) in
       let et () =
         let loc = e2.dt_loc in
@@ -337,9 +331,9 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       | Ptree.Tso -> DTbinop (DTand, e1, et ())
       end
   | Ptree.Tquant (q, uqu, trl, e1) ->
-      let qvl = List.map (quant_var uc) uqu in
+      let qvl = List.map (quant_var ns) uqu in
       let denv = denv_add_quant denv qvl in
-      let dterm e = dterm uc gvars denv e in
+      let dterm e = dterm ns km gvars denv e in
       let trl = List.map (List.map dterm) trl in
       let e1 = dterm e1 in
       let q = match q with
@@ -355,43 +349,61 @@ let rec dterm uc gvars denv {term_desc = desc; term_loc = loc} =
       DTeps (id, dty, e1)
   | Ptree.Trecord fl ->
       let get_val cs pj = function
-        | Some e -> dterm uc gvars denv e
+        | Some e -> dterm ns km gvars denv e
         | None -> Loc.error ~loc (RecordFieldMissing (cs,pj)) in
-      let cs, fl = parse_record ~loc uc get_val fl in
+      let cs, fl = parse_record ~loc ns km get_val fl in
       DTapp (cs, fl)
   | Ptree.Tupdate (e1, fl) ->
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm ns km gvars denv e1 in
       let re = is_reusable e1 in
       let v = if re then e1 else mk_var "_q " e1 in
       let get_val _ pj = function
-        | Some e -> dterm uc gvars denv e
+        | Some e -> dterm ns km gvars denv e
         | None -> Dterm.dterm ~loc (DTapp (pj,[v])) in
-      let cs, fl = parse_record ~loc uc get_val fl in
+      let cs, fl = parse_record ~loc ns km get_val fl in
       let d = DTapp (cs, fl) in
       if re then d else mk_let ~loc "_q " e1 d
   | Ptree.Tnamed (Lpos uloc, e1) ->
-      DTuloc (dterm uc gvars denv e1, uloc)
+      DTuloc (dterm ns km gvars denv e1, uloc)
   | Ptree.Tnamed (Lstr lab, e1) ->
-      DTlabel (dterm uc gvars denv e1, Slab.singleton lab)
+      DTlabel (dterm ns km gvars denv e1, Slab.singleton lab)
   | Ptree.Tcast (e1, ty) ->
     (* FIXME: accepts and silently ignores double casts: ((0:ty1):ty2) *)
-      let e1 = dterm uc gvars denv e1 in
-      let ty = ty_of_pty uc ty in
+      let e1 = dterm ns km gvars denv e1 in
+      let ty = ty_of_pty ns ty in
       match e1.dt_node with
       | DTconst (c,_) -> DTconst (c, ty)
       | _ -> DTcast (e1, ty))
 
 (** Export for program parsing *)
 
-let type_term uc gvars t =
-  let t = dterm uc gvars denv_empty t in
+let type_term_in_namespace ns km gvars t =
+  let t = dterm ns km gvars denv_empty t in
   Dterm.term ~strict:true ~keep_loc:true t
 
-let type_fmla uc gvars f =
-  let f = dterm uc gvars denv_empty f in
+let type_term uc =
+  type_term_in_namespace (get_namespace uc) (get_known uc)
+
+let type_fmla_in_namespace ns km gvars f =
+  let f = dterm ns km gvars denv_empty f in
   Dterm.fmla ~strict:true ~keep_loc:true f
 
+let type_fmla uc =
+  type_fmla_in_namespace (get_namespace uc) (get_known uc)
+
 (** Typing declarations *)
+
+let find_prop     uc q = find_prop_ns     (get_namespace uc) q
+let find_tysymbol uc q = find_tysymbol_ns (get_namespace uc) q
+(*
+let find_lsymbol  uc q = find_lsymbol_ns  (get_namespace uc) q
+ *)
+let find_fsymbol  uc q = find_fsymbol_ns  (get_namespace uc) q
+let find_psymbol  uc q = find_psymbol_ns  (get_namespace uc) q
+
+let ty_of_pty ?noop uc = ty_of_pty ?noop (get_namespace uc)
+
+let dterm uc = dterm (get_namespace uc) (get_known uc)
 
 let tyl_of_params ?(noop=false) uc pl =
   let ty_of_param (loc,_,gh,ty) =

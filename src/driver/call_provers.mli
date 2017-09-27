@@ -142,7 +142,9 @@ val call_on_file :
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  string -> server_id
+  string -> prover_call
+(* inplace=true is used to make a save of the file on which the prover was
+   called. It is renamed as %f.save if the command [actualcommand] fails *)
 
 val call_on_buffer :
   command         : string ->
@@ -160,12 +162,23 @@ val call_on_buffer :
     @param res_parser : prover result parser
 
     @param filename : the suffix of the proof task's file, if the prover
-    doesn't accept stdin. *)
+    doesn't accept stdin.
+
+    @param inplace : it is used to make a save of the file on which the
+    prover was called. It is renamed as %f.save if inplace=true and the command
+    [actualcommand] fails *)
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
+
+
+val forward_results: blocking:bool -> (prover_call * prover_update) Queue.t
+(** returns new results that are given by why3server. *)
+
 
 val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates

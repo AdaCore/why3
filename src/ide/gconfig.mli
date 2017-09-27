@@ -31,7 +31,6 @@ type t =
       mutable goal_color : string;
       mutable error_color : string;
       mutable iconset : string;
-      mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       (* mutable altern_provers : prover option Mprover.t; *)
@@ -43,8 +42,8 @@ type t =
       mutable session_cntexample : bool;
     }
 
-val load_config : Whyconf.config -> Whyconf.config -> Why3.Env.env -> unit
-(** [load_config config original_config env] creates and saves IDE config *)
+val load_config : Whyconf.config -> Whyconf.config -> unit
+(** [load_config config original_config] creates and saves IDE config *)
 
 val init : unit -> unit
 
@@ -56,9 +55,15 @@ val config : unit -> t
 
 val get_main : unit -> Whyconf.main
 
-val incr_font_size : int -> int
-(** [incr_font_size n] increments current font size by [n] (can be negative)
-    and returns the new size *)
+(*******************)
+(*   font size     *)
+(*******************)
+
+val add_modifiable_sans_font_view : GObj.misc_ops -> unit
+val add_modifiable_mono_font_view : GObj.misc_ops -> unit
+val enlarge_fonts : unit -> unit
+val reduce_fonts : unit -> unit
+val set_fonts : unit -> unit
 
 (*****************)
 (* images, icons *)
@@ -109,8 +114,10 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
+(*
 val uninstalled_prover :
   t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+ *)
 
 (*
 val unknown_prover :

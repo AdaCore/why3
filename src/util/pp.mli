@@ -92,6 +92,7 @@ val simple_comma : formatter -> unit -> unit
 val semi : formatter -> unit -> unit
 val colon : formatter -> unit -> unit
 val underscore : formatter -> unit -> unit
+val slash : formatter -> unit -> unit
 val equal : formatter -> unit -> unit
 val arrow : formatter -> unit -> unit
 val lbrace : formatter -> unit -> unit

@@ -14,7 +14,7 @@ open Why3session_lib
 open Format
 
 module Hprover = Whyconf.Hprover
-module S = Session
+module S = Session_itp
 
 let orig_dir = Sys.getcwd ()
 
@@ -96,29 +96,29 @@ let spec =
 (** Normal *)
 
 let print_cell fmt pa =
-  match pa.Session.proof_state with
-  | Session.Done {Call_provers.pr_answer = Call_provers.Valid;
+  match pa.S.proof_state with
+  | S.Done {Call_provers.pr_answer = Call_provers.Valid;
                   pr_time = time} -> fprintf fmt "%f" time
   | _ -> fprintf fmt "%s" !opt_value_not_valid
 
 let rec print_line fmt provers a =
   begin match a with
-  | Session.Goal a ->
-    fprintf fmt "\"%s\"" (Session.goal_name a).Ident.id_string;
+  | S.Goal a ->
+    fprintf fmt "\"%s\"" a.S.goal_name.Ident.id_string;
     Whyconf.Sprover.iter (fun p ->
       try
-        let pa = Session.PHprover.find (Session.goal_external_proofs a) p in
+        let pa = S.PHprover.find a.S.goal_external_proofs p in
         fprintf fmt ",%a" print_cell pa
       with Not_found ->
         fprintf fmt ",") provers;
     fprintf fmt "\n@?" (* no @\n since we use Pp.wnl *)
   | _ -> () end;
-  Session.iter (print_line fmt provers) a
+  S.iter (print_line fmt provers) a
 
 let run_one_normal filter_provers fmt fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
-  let provers = Session.get_used_provers session in
+  let project_dir = S.get_project_dir fname in
+  let session,_use_shapes = S.read_session project_dir in
+  let provers = S.get_used_provers session in
   let provers =
     match filter_provers with
     | [] -> provers
@@ -130,7 +130,7 @@ let run_one_normal filter_provers fmt fname =
   fprintf fmt ",%a\n@?"
     (Pp.print_iter1 Whyconf.Sprover.iter Pp.comma (Pp.asd Whyconf.print_prover))
     provers;
-  Session.session_iter (print_line fmt provers) session
+  S.session_iter (print_line fmt provers) session
 
 
 let run_normal dir filter_provers =
@@ -157,19 +157,19 @@ let print_float_list =
   Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.semi Pp.float
 
 let grab_valid_time provers_time provers pa =
-  let prover = pa.Session.proof_prover in
+  let prover = pa.S.proof_prover in
   if Whyconf.Sprover.mem prover provers then
-    match pa.Session.proof_state with
-    | Session.Done {Call_provers.pr_answer = Call_provers.Valid;
+    match pa.S.proof_state with
+    | S.Done {Call_provers.pr_answer = Call_provers.Valid;
                     pr_time = time} ->
       let l = Whyconf.Hprover.find_def provers_time [] prover in
       Whyconf.Hprover.replace provers_time prover (time::l)
   | _ -> ()
 
 let run_one_by_time provers_time filter_provers fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
-  let provers = Session.get_used_provers session in
+  let project_dir = S.get_project_dir fname in
+  let session,_use_shapes = S.read_session project_dir in
+  let provers = S.get_used_provers session in
   let provers =
     match filter_provers with
     | [] -> provers
@@ -178,7 +178,7 @@ let run_one_by_time provers_time filter_provers fname =
         (fun p ->
           List.exists
           (fun f -> Whyconf.filter_prover f p) filter_provers) provers in
-  Session.session_iter_proof_attempt
+  S.session_iter_proof_attempt
     (grab_valid_time provers_time provers) session
 
 

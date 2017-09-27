@@ -2,92 +2,86 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2015_relaxed_prefix.mlw" expanded="true">
-<theory name="RelaxedPrefix" sum="48095cca57909d7f35a9bab56a06f62e" expanded="true">
- <goal name="WP_parameter is_relaxed_prefix" expl="VC for is_relaxed_prefix" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter is_relaxed_prefix.1" expl="postcondition" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.2" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../verifythis_2015_relaxed_prefix.mlw" proved="true">
+<theory name="RelaxedPrefix" proved="true" sum="8a725b47d5076fd3124de008d5d35aa6">
+ <goal name="WP_parameter is_relaxed_prefix" expl="VC for is_relaxed_prefix" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter is_relaxed_prefix.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.2" expl="loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.3" expl="loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.4" expl="loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.5" expl="loop invariant init" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.6" expl="assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter is_relaxed_prefix.6.1" expl="assertion" expanded="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="20"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter is_relaxed_prefix.5" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.7" expl="postcondition" expanded="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="44"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.6" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.8" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.7" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.9" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.10" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.11" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.03" steps="26"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.12" expl="index in array bounds" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.11" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.13" expl="index in array bounds" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.12" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.14" expl="assertion" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter is_relaxed_prefix.14.1" expl="assertion" expanded="true">
-   <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="49"/></proof>
-   </goal>
-  </transf>
+  <goal name="WP_parameter is_relaxed_prefix.13" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="51"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.15" expl="postcondition" expanded="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="108"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.14" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.02" steps="108"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.16" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.17" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.18" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.17" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.19" expl="loop invariant preservation" expanded="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.10" steps="50"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.18" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="50"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.20" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.19" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.21" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.22" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.23" expl="loop invariant preservation" expanded="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="115"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="115"/></proof>
   </goal>
-  <goal name="WP_parameter is_relaxed_prefix.24" expl="postcondition" expanded="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="35"/></proof>
+  <goal name="WP_parameter is_relaxed_prefix.23" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="35"/></proof>
   </goal>
  </transf>
  </goal>
