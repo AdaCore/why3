@@ -1,5 +1,5 @@
 open Why3
-open Why3.Json
+open Why3.Json_base
 
 type prover_stat =
   {
@@ -21,7 +21,7 @@ type result_info =
 type msg =
   { result        : bool;
     stats         : stats option;
-    check_tree    : Json.json;
+    check_tree    : Json_base.json;
     extra_info    : int option;
     tracefile     : string;
     cntexmp_model : Model_parser.model option;
@@ -143,7 +143,7 @@ let print_json_msg fmt (check, m) =
       (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
-    (print_json_field "check_tree" Json.print_json) m.check_tree
+    (print_json_field "check_tree" Json_base.print_json) m.check_tree
     print_stats m.stats
     print_trace_file m.tracefile
     print_cntexmp_model m.cntexmp_model

@@ -64,7 +64,7 @@ val prove_task :
   ?ce_prover   : string ->
   ?old         : string ->
   ?inplace     : bool ->
-  driver -> Task.task -> Call_provers.server_id
+  driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
 val prepare_task :
@@ -79,8 +79,7 @@ val prove_task_prepared :
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
-  driver -> Task.task -> Call_provers.server_id
-
+  driver -> Task.task -> Call_provers.prover_call
 
 (** Traverse all metas from a driver *)
 

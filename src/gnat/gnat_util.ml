@@ -1,4 +1,4 @@
-open Why3.Json
+open Why3.Json_base
 
 let abort_with_message ~internal s =
   Format.printf "{%a, %a, %a}"

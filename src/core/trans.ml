@@ -18,7 +18,7 @@ open Task
 
 let debug = Debug.register_info_flag "transform"
   ~desc:"Print@ debugging@ messages@ about@ application@ \
-         of@ proof@ task@ transformations."
+         of@ proof@ task@ to@ transformations."
 
 (** Task transformation *)
 

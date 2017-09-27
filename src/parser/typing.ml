@@ -343,9 +343,9 @@ let rec dterm ns km gvars denv {term_desc = desc; term_loc = loc} =
       DTquant (q, qvl, trl, e1)
   | Ptree.Teps ((x, ty), e1) ->
       let id = create_user_id x in
-      let dty = dty_of_ty (ty_of_pty uc ty) in
+      let dty = dty_of_ty (ty_of_pty ns ty) in
       let denv = denv_add_quant denv [(Some id, dty, None)] in
-      let e1 = dterm uc gvars denv e1 in
+      let e1 = dterm ns km gvars denv e1 in
       DTeps (id, dty, e1)
   | Ptree.Trecord fl ->
       let get_val cs pj = function

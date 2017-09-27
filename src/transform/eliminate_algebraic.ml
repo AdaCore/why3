@@ -304,7 +304,7 @@ let add_projections (state,task) _ts _ty csl =
   { state with pj_map = pjmap }, task
 
 let add_inversion (state,task) ts ty csl =
-  if state.keep_t or state.no_inv then state, task else
+  if state.keep_t || state.no_inv then state, task else
   (* add the inversion axiom *)
   let ax_id = ts.ts_name.id_string ^ "_inversion" in
   let ax_pr = create_prsymbol (id_derive ax_id ts.ts_name) in
@@ -452,12 +452,12 @@ let eliminate_algebraic = Trans.compose compile_match
   (Trans.on_meta meta_elim (fun ml ->
     let st = empty_state in
     let check st = function
-      | [MAstr "keep_types"]   -> { st with keep_t = true }
-      | [MAstr "keep_enums"]   -> { st with keep_e = true }
-      | [MAstr "keep_recs"]    -> { st with keep_r = true }
-      | [MAstr "no_index"]     -> { st with no_ind = true }
       | [MAstr "no_inversion"] -> { st with no_inv = true }
       | [MAstr "no_selector"]  -> { st with no_sel = true }
+      | [MAstr "keep_types"] -> { st with keep_t = true }
+      | [MAstr "keep_enums"] -> { st with keep_e = true }
+      | [MAstr "keep_recs"]  -> { st with keep_r = true }
+      | [MAstr "no_index"]   -> { st with no_ind = true }
       | [MAstr s] ->
          raise (
              Invalid_argument (

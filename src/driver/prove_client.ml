@@ -17,16 +17,27 @@ exception InvalidAnswer of string
 
 let is_connected () = !socket <> None
 
-let client_connect socket_name =
+let client_connect ~fail socket_name =
   if !socket <> None then raise AlreadyConnected;
-  if Sys.os_type = "Win32" then begin
-    let name = "\\\\.\\pipe\\" ^ socket_name in
-    socket := Some (Unix.openfile name [Unix.O_RDWR] 0)
-  end else begin
-    let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-    Unix.connect sock (Unix.ADDR_UNIX socket_name);
+  try
+    let sock =
+      if Sys.os_type = "Win32" then
+        let name = "\\\\.\\pipe\\" ^ socket_name in
+        Unix.openfile name [Unix.O_RDWR] 0
+      else
+      let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
+      Unix.connect sock (Unix.ADDR_UNIX socket_name);
+      sock
+    in
     socket := Some sock
-  end
+  with
+  | Unix.Unix_error(err, func, arg) when fail ->
+     Format.eprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
+     exit 2
+  | e when fail ->
+     Format.eprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
+                    (Printexc.to_string e);
+     exit 2
 
 let client_disconnect () =
   match !socket with
@@ -86,7 +97,7 @@ let recv_buf : Buffer.t = Buffer.create 1024
 let connect_external socket_name =
   if is_connected () then raise AlreadyConnected;
   Buffer.clear recv_buf;
-  client_connect socket_name
+  client_connect ~fail:true socket_name
 
 let connect_internal () =
   if is_connected () then raise AlreadyConnected;
@@ -106,7 +117,7 @@ let connect_internal () =
       "-j"; string_of_int !max_running_provers|]
     Unix.stdin Unix.stdout Unix.stderr
      *)
-  Unix.create_process exec
+    Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
@@ -115,11 +126,11 @@ let connect_internal () =
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =
-    if n <= 0 then client_connect socket_name else
-    try client_connect socket_name with _ ->
+    if n <= 0 then client_connect ~fail:true socket_name else
+    try client_connect ~fail:false socket_name with _ ->
       ignore (Unix.select [] [] [] d);
       try_connect (pred n) (d *. 4.0) in
-  try_connect 4 0.1; (* 0.1, 0.4, 1.6, 6.4 *)
+  try_connect 5 0.1; (* 0.1, 0.4, 1.6, 6.4, 25.6 *)
   at_exit (fun () -> (* only if succesfully connected *)
     (try client_disconnect () with NotConnected -> ());
     ignore (Unix.waitpid [] pid))

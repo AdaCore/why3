@@ -1,26 +1,23 @@
 open Why3
-open Session
 
-type goal = int Session.goal
-type attempt = int Session.proof_attempt
+type goal = Session_itp.proofNodeID
+type attempt = Session_itp.proofAttemptID
 
 let filename_limit = 246
 
-let manual_attempt_of_goal goal =
+let manual_attempt_of_goal s goal =
   match Gnat_config.manual_prover with
   | None -> None
   | Some p ->
-        PHprover.find_opt (Session.goal_external_proofs goal)
-          p.Session.prover_config.Whyconf.prover
+      let proof_attempts = Session_itp.get_proof_attempt_ids s goal in
+      Whyconf.Hprover.find_opt proof_attempts p
 
-let is_new_manual_proof goal =
-  manual_attempt_of_goal goal = None
+let is_new_manual_proof session goal =
+  manual_attempt_of_goal session goal = None
 
-let rec find_goal_theory goal =
-  match goal_parent goal with
-  | Parent_theory th -> th
-  | Parent_transf tr -> find_goal_theory tr.transf_parent
-  | Parent_metas meta -> find_goal_theory meta.metas_parent
+(* Returns the theory encapsulating the goal *)
+let find_goal_theory s goal =
+  Session_itp.get_encapsulating_theory s (Session_itp.APn goal)
 
 let get_file_extension filename =
   try
@@ -31,8 +28,7 @@ let get_file_extension filename =
   with
   | Invalid_argument _ -> ""
 
-let prover_files_dir proj prover =
-  let wc_prover = prover.Session.prover_config.Whyconf.prover in
+let prover_files_dir proj wc_prover =
   match Gnat_config.proof_dir with
   | None -> ""
   | Some dir ->
@@ -47,7 +43,6 @@ let prover_files_dir proj prover =
        Unix.mkdir punit_dir 0o750;
      Sysutil.relativize_filename (Sys.getcwd ()) punit_dir
 
-
 let resize_shape sh limit =
   let index = ref 0 in
   let sh_len = String.length sh in
@@ -60,17 +55,18 @@ let resize_shape sh limit =
   with
   | _ -> "")
 
-
-let compute_filename contain_dir theory goal expl prover =
+let compute_filename s contain_dir theory goal expl driver =
+  let th_name_no_sanit = (Session_itp.theory_name theory).Ident.id_string in
+  let task = Session_itp.get_raw_task s goal in
   let why_fn =
-    Driver.file_of_task prover.Session.prover_driver
-                        theory.theory_name.Ident.id_string
-                        theory.theory_parent.file_name
-                        (goal_task goal) in
+    Driver.file_of_task driver
+                        th_name_no_sanit
+                        (Session_itp.file_name (Session_itp.theory_parent s theory))
+                        task in
   let ext = get_file_extension why_fn in
   let thname = (Ident.sanitizer Ident.char_to_alnumus
                                 Ident.char_to_alnumus
-                                theory.theory_name.Ident.id_string) in
+                                th_name_no_sanit) in
   (* Remove __subprogram_def from theory name *)
   let thname = String.sub thname 0 ((String.length thname) - 16) in
 
@@ -91,16 +87,19 @@ let compute_filename contain_dir theory goal expl prover =
   done;
   !filename
 
-let create_prover_file goal expl prover =
-  let th = find_goal_theory goal in
-  let proj_name = Filename.basename
-                    (get_project_dir (Filename.basename
-                                        th.theory_parent.file_name)) in
+let create_prover_file c goal expl prover =
+  let s = c.Controller_itp.controller_session in
+  let driver = snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
+  let th = find_goal_theory s goal in
+  let proj_name = Filename.basename (Session_itp.get_dir s) in
   let filename =
-    compute_filename (prover_files_dir proj_name prover) th goal expl prover in
+    compute_filename s (prover_files_dir proj_name prover) th goal expl driver in
+  Sysutil.relativize_filename (Session_itp.get_dir s) filename
+(*
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
-  Driver.print_task prover.Session.prover_driver fmt (goal_task goal);
+  let task = Session_itp.get_task s goal in
+  Driver.print_task prover.Session.prover_driver fmt task;
   close_out cout;
   let pa = add_external_proof ~keygen:Gnat_sched.Keygen.keygen ~obsolete:false
                              ~archived:false ~limit:Call_provers.empty_limit
@@ -108,15 +107,17 @@ let create_prover_file goal expl prover =
                              prover.Session.prover_config.Whyconf.prover
                              Unedited in
   pa
+*)
 
 (* ??? maybe use a Buffer.t? Isn't there some code already doing this in Why3?
  * *)
-let editor_command prover fn =
+let editor_command (prover: Whyconf.prover) fn =
   (* this function loads the editor for a given prover, otherwise returns a
      default value *)
   let editor =
+    let config_prover = Whyconf.get_prover_config Gnat_config.config prover in
     try Whyconf.editor_by_id Gnat_config.config
-        prover.Session.prover_config.Whyconf.editor
+        config_prover.Whyconf.editor
     with Not_found ->
       { Whyconf.editor_name = "";
         editor_command = "";
@@ -128,13 +129,18 @@ let editor_command prover fn =
                   editor.Whyconf.editor_options in
   Gnat_config.actual_cmd fn cmd_line
 
-let manual_proof_info pa =
-  match pa.proof_edited_as with
+let manual_proof_info session pa =
+  let pa = Session_itp.get_proof_attempt_node session pa in
+  match pa.Session_itp.proof_script with
   | None -> None
   | Some fn ->
-      let base_prover = pa.Session.proof_prover in
+      let fn = Sysutil.absolutize_filename (Session_itp.get_dir session) fn in
+      let fn = Sysutil.relativize_filename (Filename.dirname Gnat_config.filename) fn in
+      (* TODO cannot use Sysutil.normalize_filename here which returns home/...
+         instead of /home/... *)
+      let base_prover = pa.Session_itp.prover in
       let real_prover =
         List.find (fun p ->
-          p.Session.prover_config.Whyconf.prover = base_prover)
+          p = base_prover)
         Gnat_config.provers in
       Some (fn, editor_command real_prover fn)

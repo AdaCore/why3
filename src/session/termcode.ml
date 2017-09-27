@@ -425,7 +425,6 @@ let rec t_shape ~version c m t =
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
 
-
 let t_shape_task ~version ~expl t =
   Buffer.clear shape_buffer;
   begin match version with

@@ -667,7 +667,7 @@ end
   let task_driver config env =
     try
       let main = Whyconf.get_main config in
-      let d = "why3_itp" in
+      let d = "spark" in (* TODO replace this *)
       let d = Whyconf.load_driver main env d [] in
       Debug.dprintf debug "driver for task printing loaded@.";
       d
@@ -1370,7 +1370,7 @@ end
     | Set_max_tasks_req i     -> C.set_max_tasks i
     | Exit_req                -> exit 0
      )
-    with e when not (Debug.test_flag Debug.stack_trace)->
+    with e when not (Debug.test_flag Debug.stack_trace) ->
       P.notify (Message (Error (Pp.string_of
           (fun fmt (r,e) -> Format.fprintf fmt
              "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"

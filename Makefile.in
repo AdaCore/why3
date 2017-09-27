@@ -608,25 +608,32 @@ clean::
 # GNATWhy3
 ########
 
-GNAT_FILES := gnat_util gnat_loc gnat_expl gnat_config \
-	      gnat_sched gnat_manual gnat_report gnat_objectives gnat_main
+GNAT_FILES := gnat_util gnat_loc gnat_expl gnat_config gnat_scheduler \
+	      gnat_manual gnat_report gnat_objectives gnat_main gnat_server
 
 GNATMODULES := $(addprefix src/gnat/, $(GNAT_FILES))
 
 GNATML  = $(addsuffix .ml,  $(GNATMODULES))
-GNATMLI = $(addsuffix .mli, $(filter-out %gnat_main, $(GNATMODULES)))
-GNATCMI = $(addsuffix .cmi, $(filter-out %gnat_main, $(GNATMODULES)))
-GNATCMO = $(addsuffix .cmo, $(GNATMODULES))
-GNATCMX = $(addsuffix .cmx, $(GNATMODULES))
+GNATMLI = $(addsuffix .mli, $(filter-out %gnat_main %gnat_server, $(GNATMODULES)))
+GNATCMI = $(addsuffix .cmi, $(filter-out %gnat_main %gnat_server, $(GNATMODULES)))
+GNATCMO = $(addsuffix .cmo, $(filter-out %gnat_server, $(GNATMODULES)))
+GNATCMX = $(addsuffix .cmx, $(filter-out %gnat_server, $(GNATMODULES)))
+GNATSERVCMO = $(addsuffix .cmo, $(filter-out %gnat_main, $(GNATMODULES)))
+GNATSERVCMX = $(addsuffix .cmx, $(filter-out %gnat_main, $(GNATMODULES)))
 $(GNATCMO) $(GNATCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
+$(GNATSERVCMO) $(GNATSERVCMX): INCLUDES += -I src/programs -I src/gnat -I src/util
 $(GNATCMX): $(GNATCMO)
 
 # build targets
 
-byte: bin/gnatwhy3.byte
-opt:  bin/gnatwhy3.opt
+byte: bin/gnatwhy3.byte bin/gnat_server.byte
+opt:  bin/gnatwhy3.opt bin/gnat_server.opt
 
 bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATCMX)
+	$(if $(QUIET), @echo 'Linking  $@' &&) \
+	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
+
+bin/gnat_server.opt: lib/why3/why3.cmxa $(GNATSERVCMX)
 	$(if $(QUIET), @echo 'Linking  $@' &&) \
 	    $(OCAMLOPT) $(OFLAGS) -o $@ $(EXTCMXA) $^
 
@@ -634,12 +641,20 @@ bin/gnatwhy3.byte: lib/why3/why3.cma $(GNATCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
+bin/gnat_server.byte: lib/why3/why3.cma $(GNATSERVCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 bin/gnatwhy3: bin/gnatwhy3.@OCAMLBEST@
 	ln -sf gnatwhy3.@OCAMLBEST@ $@
 
+bin/gnat_server: bin/gnat_server.@OCAMLBEST@
+	ln -sf gnat_server.@OCAMLBEST@ $@
+
 install_no_local::
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
+	cp -f bin/gnat_server.@OCAMLBEST@ $(BINDIR)/gnat_server$(EXE)
+
 
 include .depend.gnat
 $(GNATCMX): lib/why3/why3.cmxa
@@ -653,6 +668,7 @@ clean::
 	rm -f src/gnat/*.cm[iox] src/gnat/*.o
 	rm -f src/gnat/*.annot src/gnat/*~
 	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3
+	rm -f bin/gnat_server.byte bin/gnat_server.opt bin/gnat_server
 	rm -f .depend.gnat
 
 ##############
@@ -724,6 +740,7 @@ install_spark2014:
 	cp -f lib/why3server$(EXE) $(BINDIR)/why3server$(EXE)
 	cp -f lib/why3cpulimit$(EXE) $(BINDIR)/why3cpulimit$(EXE)
 	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
+	cp -f bin/gnat_server.@OCAMLBEST@ $(BINDIR)/gnat_server$(EXE)
 	cp -f bin/why3realize.@OCAMLBEST@ $(BINDIR)/why3realize$(EXE)
 	cp -f bin/why3config.@OCAMLBEST@ $(BINDIR)/why3config$(EXE)
 	cp -f share/provers-detection-data.conf $(DATADIR)/why3/

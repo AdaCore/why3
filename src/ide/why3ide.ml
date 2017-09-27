@@ -967,9 +967,16 @@ let color_loc (v:GSourceView2.source_view) ~color l b e =
   let buf = v#buffer in
   let top = buf#start_iter in
   let start = top#forward_lines (l-1) in
-  let start = start#forward_chars b in
-  let stop = start#forward_chars (e-b) in
-  buf#apply_tag_by_name ~start ~stop color
+  (* When coloring source for a language compiled to Why3 (SPARK),
+     locations may be less precise (not specifying columns). In this case
+     we want to color the whole line. *)
+  if b = 0 && e = 0 then
+    let stop = start#forward_lines 1 in
+    buf#apply_tag_by_name ~start ~stop color
+  else
+    let start = start#forward_chars b in
+    let stop = start#forward_chars (e-b) in
+    buf#apply_tag_by_name ~start ~stop color
 
 let convert_color (color: color): string =
   match color with

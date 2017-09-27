@@ -356,6 +356,21 @@ let to_filename fmt check =
   ) check.sloc;
   Format.fprintf fmt "%s" (reason_to_string check.reason)
 
+let search_labels =
+  let extract_wrap l =
+    match extract_check l with
+    | None -> []
+    | Some x -> [x] in
+  let search = Termcode.search_labels extract_wrap in
+  fun f ->
+    try
+    begin match search f with
+    | [] -> None
+    | [x] -> Some x
+    | _ -> assert false
+    end
+  with Exit -> None
+
 module CheckCmp = struct
    type t = check
    let compare = check_compare

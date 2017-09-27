@@ -107,7 +107,7 @@ type result_info =
        (string * string) option        (* for manual provers,
                                           pair of (vc_file, editor_cmd) *)
 
-val register : Gnat_expl.check -> Json.json -> result_info -> unit
+val register : Gnat_expl.check -> Json_base.json -> result_info -> unit
 (* [register check check_tree info] registers a proof result,
    represented by [info] for a given [check]. The [check_tree] is a
    json object encoding the session tree of the check. *)

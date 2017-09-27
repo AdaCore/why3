@@ -5,19 +5,19 @@ open Why3
 val config : Whyconf.config
 val env : Env.env
 
-val provers : Session.loaded_prover list
+val provers : Whyconf.prover list
 (* the provers, either the default prover, or as given by --prover *)
 
-val is_selected_prover : Whyconf.prover -> Session.loaded_prover option
+val is_selected_prover : Whyconf.prover -> Whyconf.prover option
 (* test if the given prover is a selected prover, i.e. in the [provers] list
    above *)
 
-val prover_ce : Session.loaded_prover option
+val prover_ce : Whyconf.prover option
 (* the prover for counterexamples generation
    None if counterexample should not be generated
 *)
 
-val is_ce_prover : Whyconf.prover -> bool
+val is_ce_prover : Session_itp.session -> Session_itp.proofAttemptID -> bool
 (* check if the prover in argument is the prover for counter examples. returns
  * false if no prover is selected for counterexamples, or counterexamples are
  * off *)
@@ -26,7 +26,7 @@ val counterexamples : bool
 (* Reflects the value of the option --counterexample, default off
    Counter examples are also disabled when CVC4 is not found *)
 
-val manual_prover : Session.loaded_prover option
+val manual_prover : Whyconf.prover option
 (* Currently, if a manual prover is provided, it must be the only one. So in
    when dealing with manual proof, it makes sense to speak of "the prover" *)
 

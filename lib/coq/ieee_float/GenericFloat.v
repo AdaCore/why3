@@ -4571,4 +4571,3 @@ Lemma roundToIntegral_is_finite : forall (m:mode) (x:t), (is_finite x) ->
 intros m x h1.
 apply roundToIntegral_finite, h1.
 Qed.
-

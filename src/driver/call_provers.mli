@@ -142,7 +142,7 @@ val call_on_file :
   res_parser      : prover_result_parser ->
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
-  string -> prover_call
+  string -> int
 (* inplace=true is used to make a save of the file on which the prover was
    called. It is renamed as %f.save if the command [actualcommand] fails *)
 

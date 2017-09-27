@@ -122,3 +122,6 @@ val extract_sloc : Ident.Slab.t -> Gnat_loc.loc option
 val get_extra_info : Task.task -> int option
 (* from a task node, extract the Gp_Pretty_Ada info that is contained in the
  * rightmost goal node, if any *)
+
+val search_labels: Why3.Term.term -> check option
+(* Search for check labels inside a term *)

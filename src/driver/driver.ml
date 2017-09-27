@@ -333,7 +333,8 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) ?(ce_prover="cvc4_ce") drv fmt task =
+let print_task ?old ?(cntexample=false) ?(ce_prover="cvc4_ce")
+    drv fmt task =
   let task = prepare_task ~cntexample ~ce_prover drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
@@ -365,11 +366,11 @@ let prove_task_prepared ~command ~limit ?old ?inplace drv task =
     call_on_buffer ~command ~limit
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
-  res
+  ServerCall res
 
 let prove_task ~command ~limit ?(cntexample=false) ?(ce_prover="cvc4_ce") ?old
                ?inplace drv task =
-  let task = prepare_task ~cntexample ~ce_prover  drv task in
+  let task = prepare_task ~cntexample ~ce_prover drv task in
   prove_task_prepared ~command ~limit ?old ?inplace drv task
 
 (* exception report *)
