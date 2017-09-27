@@ -312,14 +312,6 @@ else
    fi
 fi
 
-# bin-annot
-case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*)
-        enable_bin_annot=no;;
-  *)
-        enable_bin_annot=yes;;
-esac
-
 # checking for rubber
 if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(RUBBER,rubber,rubber,no)
@@ -539,8 +531,13 @@ if test "$enable_coq_support" = yes; then
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
-      8.6*|trunk)
+      8.6*)
          coq_compat_version="COQ86"
+         COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
+         AC_MSG_RESULT($COQVERSION)
+         ;;
+      8.7*)
+         coq_compat_version="COQ87"
          COQPPLIBS="$OCAMLLIB/unix.cma $OCAMLLIB/threads/threads.cma $COQLIB/grammar/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
          ;;
@@ -771,7 +768,6 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
 AC_SUBST(enable_profiling)
-AC_SUBST(enable_bin_annot)
 
 AC_SUBST(COQCAMLP)
 AC_SUBST(COQCAMLPLIB)

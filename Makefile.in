@@ -98,19 +98,14 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 WARNINGS = A-4-9-41-44-45-50-52@5@48
 
-OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w $(WARNINGS) -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
-endif
-
-ifeq (@enable_bin_annot@,yes)
-OFLAGS += -bin-annot
-BFLAGS += -bin-annot
 endif
 
 # see http://caml.inria.fr/mantis/view.php?id=4991
@@ -929,7 +924,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
+COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
 COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -958,6 +953,9 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
 
 ifeq (@coq_compat_version@,COQ86)
+COQRTAC += -I lib/coq-tactic
+endif
+ifeq (@coq_compat_version@,COQ87)
 COQRTAC += -I lib/coq-tactic
 endif
 

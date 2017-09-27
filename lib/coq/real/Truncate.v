@@ -24,7 +24,8 @@ Require Import Fourier.
 Notation truncate := Ztrunc.
 
 (* Why3 goal *)
-Lemma Truncate_int : forall (i:Z), ((truncate (Reals.Raxioms.IZR i)) = i).
+Lemma Truncate_int : forall (i:Z), ((truncate (BuiltIn.IZR i)) = i).
+Proof.
   intro i.
   rewrite <-Z2R_IZR.
   apply Ztrunc_Z2R.
@@ -32,8 +33,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_down_pos : forall (x:R), (0%R <= x)%R ->
-  (((Reals.Raxioms.IZR (truncate x)) <= x)%R /\
-  (x < (Reals.Raxioms.IZR ((truncate x) + 1%Z)%Z))%R).
+  (((BuiltIn.IZR (truncate x)) <= x)%R /\
+  (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R).
+Proof.
   intros x h.
   rewrite (Ztrunc_floor x h), <-Z2R_IZR, <-Z2R_IZR.
   split.
@@ -44,8 +46,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_up_neg : forall (x:R), (x <= 0%R)%R ->
-  (((Reals.Raxioms.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
-  (x <= (Reals.Raxioms.IZR (truncate x)))%R).
+  (((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
+  (x <= (BuiltIn.IZR (truncate x)))%R).
+Proof.
   intros x h.
   rewrite (Ztrunc_ceil x h), <-Z2R_IZR, <-Z2R_IZR.
   split;[|apply Zceil_ub].
@@ -61,10 +64,11 @@ Qed.
 
 (* Why3 goal *)
 Lemma Real_of_truncate : forall (x:R),
-  ((x - 1%R)%R <= (Reals.Raxioms.IZR (truncate x)))%R /\
-  ((Reals.Raxioms.IZR (truncate x)) <= (x + 1%R)%R)%R.
+  ((x - 1%R)%R <= (BuiltIn.IZR (truncate x)))%R /\
+  ((BuiltIn.IZR (truncate x)) <= (x + 1%R)%R)%R.
+Proof.
   intro x.
-  rewrite <-Z2R_IZR.
+  rewrite <- (Z2R_IZR (truncate x)).
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
     destruct (Req_dec (Z2R (Zfloor x)) x).
@@ -82,12 +86,14 @@ Qed.
 (* Why3 goal *)
 Lemma Truncate_monotonic : forall (x:R) (y:R), (x <= y)%R ->
   ((truncate x) <= (truncate y))%Z.
+Proof.
   apply Ztrunc_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Truncate_monotonic_int1 : forall (x:R) (i:Z),
-  (x <= (Reals.Raxioms.IZR i))%R -> ((truncate x) <= i)%Z.
+  (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
+Proof.
   intros x i h.
   rewrite <-Z2R_IZR in h.
   destruct (Rle_lt_dec x 0).
@@ -100,7 +106,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_monotonic_int2 : forall (x:R) (i:Z),
-  ((Reals.Raxioms.IZR i) <= x)%R -> (i <= (truncate x))%Z.
+  ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
+Proof.
   intros x i h.
   rewrite <-Z2R_IZR in h.
   destruct (Rle_lt_dec x 0).
@@ -118,20 +125,23 @@ Notation floor := Zfloor.
 Notation ceil := Zceil.
 
 (* Why3 goal *)
-Lemma Floor_int : forall (i:Z), ((floor (Reals.Raxioms.IZR i)) = i).
+Lemma Floor_int : forall (i:Z), ((floor (BuiltIn.IZR i)) = i).
+Proof.
   intro i; rewrite <-Z2R_IZR.
   apply Zfloor_Z2R.
 Qed.
 
 (* Why3 goal *)
-Lemma Ceil_int : forall (i:Z), ((ceil (Reals.Raxioms.IZR i)) = i).
+Lemma Ceil_int : forall (i:Z), ((ceil (BuiltIn.IZR i)) = i).
+Proof.
   intro i; rewrite <-Z2R_IZR.
   apply Zceil_Z2R.
 Qed.
 
 (* Why3 goal *)
-Lemma Floor_down : forall (x:R), ((Reals.Raxioms.IZR (floor x)) <= x)%R /\
-  (x < (Reals.Raxioms.IZR ((floor x) + 1%Z)%Z))%R.
+Lemma Floor_down : forall (x:R), ((BuiltIn.IZR (floor x)) <= x)%R /\
+  (x < (BuiltIn.IZR ((floor x) + 1%Z)%Z))%R.
+Proof.
   intro x.
   rewrite <-Z2R_IZR, <-Z2R_IZR; split.
   apply Zfloor_lb.
@@ -140,6 +150,7 @@ Lemma Floor_down : forall (x:R), ((Reals.Raxioms.IZR (floor x)) <= x)%R /\
 Qed.
 
 Lemma ceil_lb: forall x, ((Z2R (ceil x) - 1) < x).
+Proof.
   intro.
   case (Req_dec (Z2R (Zfloor x)) x); intro.
   rewrite <-H, Zceil_Z2R, H; simpl; fourier.
@@ -151,9 +162,9 @@ Lemma ceil_lb: forall x, ((Z2R (ceil x) - 1) < x).
 Qed.
 
 (* Why3 goal *)
-Lemma Ceil_up : forall (x:R),
-  ((Reals.Raxioms.IZR ((ceil x) - 1%Z)%Z) < x)%R /\
-  (x <= (Reals.Raxioms.IZR (ceil x)))%R.
+Lemma Ceil_up : forall (x:R), ((BuiltIn.IZR ((ceil x) - 1%Z)%Z) < x)%R /\
+  (x <= (BuiltIn.IZR (ceil x)))%R.
+Proof.
 intro x.
 rewrite <-Z2R_IZR, <-Z2R_IZR; split; [|apply Zceil_ub].
 rewrite Z2R_minus.
@@ -163,12 +174,14 @@ Qed.
 (* Why3 goal *)
 Lemma Floor_monotonic : forall (x:R) (y:R), (x <= y)%R ->
   ((floor x) <= (floor y))%Z.
+Proof.
   apply Zfloor_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Ceil_monotonic : forall (x:R) (y:R), (x <= y)%R ->
   ((ceil x) <= (ceil y))%Z.
+Proof.
   apply Zceil_le.
 Qed.
 
