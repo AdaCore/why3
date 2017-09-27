@@ -527,21 +527,22 @@ let local_decls task symbmap =
     | _ :: rest -> skip t rest
     | [] -> []
   in
-  let rec filter ((acc1,acc2) as acc) = function
+  let rec filter ((b,acc1,acc2) as acc) = function
     | { td_node = Meta (m,_) } :: rest
          when meta_equal m meta_introduced_hypotheses ->
-       filter (acc2 @ acc1, []) rest
+       filter (true, acc2 @ acc1, []) rest
     | { td_node = Decl d } :: rest ->
         let id = Sid.choose d.d_news in
         (try filter acc (skip (Mid.find id symbmap) rest)
          with Not_found ->
-              filter (acc1,d::acc2) rest)
+              filter (b,acc1,d::acc2) rest)
     | _ :: rest -> filter acc rest
-    | [] -> match acc1,acc2 with
+    | [] -> if b then List.rev acc1, List.rev acc2
+            else match acc1,acc2 with
             | [], g::r -> List.rev r, [g]
-            | _ -> List.rev acc1, List.rev acc2
+            | _ -> assert false
   in
-  filter ([],[]) (task_tdecls task)
+  filter (false,[],[]) (task_tdecls task)
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
