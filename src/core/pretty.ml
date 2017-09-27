@@ -34,7 +34,10 @@ let debug_print_labels =
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
 
-
+let meta_introduced_hypotheses =
+  register_meta
+    ~desc:"marks beginning of hypotheses introduced by introduce_premises"
+    "introduced_premises" []
 
 let create iprinter aprinter tprinter pprinter do_forget_all =
   (module (struct
@@ -517,22 +520,41 @@ let print_goal fmt d =
    | _ -> assert false
 *)
 
+let local_decls task symbmap =
+  let rec skip t = function
+    | { td_node = Clone (th,_) } :: rest
+      when id_equal t.th_name th.th_name -> rest
+    | _ :: rest -> skip t rest
+    | [] -> []
+  in
+  let rec filter ((acc1,acc2) as acc) = function
+    | { td_node = Meta (m,_) } :: rest
+         when meta_equal m meta_introduced_hypotheses ->
+       filter (acc2 @ acc1, []) rest
+    | { td_node = Decl d } :: rest ->
+        let id = Sid.choose d.d_news in
+        (try filter acc (skip (Mid.find id symbmap) rest)
+         with Not_found ->
+              filter (acc1,d::acc2) rest)
+    | _ :: rest -> filter acc rest
+    | [] -> List.rev acc1, List.rev acc2
+  in
+  filter ([],[]) (task_tdecls task)
+
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
-  let ld = Task.local_decls task ut in
+  let (ld1,ld2) = local_decls task ut in
   let rec aux fmt l =
     match l with
-      | [] -> assert false
-      | [g] ->
-         fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
-         print_decl fmt g
+      | [] -> ()
       | d :: r ->
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
   fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld
-
+  fprintf fmt "@[<v 0>%a@]" aux ld1;
+  fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld2;
 
 
 

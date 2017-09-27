@@ -14,6 +14,8 @@ val why3_keywords : string list
 
 include Pretty_sig.Printer
 
+val meta_introduced_hypotheses : Theory.meta
+
 val create  : Ident.ident_printer ->Ident.ident_printer ->
               Ident.ident_printer -> Ident.ident_printer ->
               bool -> (module Pretty_sig.Printer)
