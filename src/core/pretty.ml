@@ -537,7 +537,9 @@ let local_decls task symbmap =
          with Not_found ->
               filter (acc1,d::acc2) rest)
     | _ :: rest -> filter acc rest
-    | [] -> List.rev acc1, List.rev acc2
+    | [] -> match acc1,acc2 with
+            | [], g::r -> List.rev r, [g]
+            | _ -> List.rev acc1, List.rev acc2
   in
   filter ([],[]) (task_tdecls task)
 
