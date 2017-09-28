@@ -13,8 +13,7 @@ let formatter = ref Format.err_formatter
 
 exception UnknownFlag of string
 
-type flag = { flag_name : string;
-              mutable flag_value : bool }
+type flag = bool ref
 
 let flag_table = Hashtbl.create 17
 
@@ -26,7 +25,7 @@ let gen_register_flag (desc : Pp.formatted) s info =
   try
     fst3 (Hashtbl.find flag_table s)
   with Not_found ->
-    let flag = { flag_name = s; flag_value = false } in
+    let flag = ref false in
     Hashtbl.replace flag_table s (flag,info,desc);
     flag
 
@@ -34,7 +33,7 @@ let register_info_flag ~desc s = gen_register_flag desc s true
 let register_flag      ~desc s = gen_register_flag desc s false
 
 let list_flags () =
-  Hashtbl.fold (fun s (v,_,desc) acc -> (s,v,v.flag_value,desc)::acc) flag_table []
+  Hashtbl.fold (fun s (v,_,desc) acc -> (s,v,!v,desc)::acc) flag_table []
 
 let lookup_flag s =
   try fst3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
@@ -45,12 +44,12 @@ let is_info_flag s =
 let flag_desc s =
   try thd3 (Hashtbl.find flag_table s) with Not_found -> raise (UnknownFlag s)
 
-let test_flag s = s.flag_value
-let test_noflag s = not s.flag_value
+let test_flag s = !s
+let test_noflag s = not !s
 
-let set_flag s = s.flag_value <- true
-let unset_flag s = s.flag_value <- false
-let toggle_flag s = s.flag_value <- not s.flag_value
+let set_flag s = s := true
+let unset_flag s = s := false
+let toggle_flag s = s := not !s
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnknownFlag s -> Format.fprintf fmt "unknown debug flag `%s'@." s
@@ -77,11 +76,10 @@ let get_debug_formatter () = !formatter
 let () = set_debug_formatter Format.err_formatter
 
 let dprintf flag s =
-  if flag.flag_value then
+  if !flag then
     begin
-      if timestamp.flag_value then Format.fprintf !formatter "<%f,%s>"
-                                        (Unix.gettimeofday () -. time_start) flag.flag_name
-      else Format.fprintf !formatter "<%s>" flag.flag_name;
+      if !timestamp then Format.fprintf !formatter "<%f>"
+        (Unix.gettimeofday () -. time_start);
       Format.fprintf !formatter s
     end
   else Format.ifprintf !formatter s

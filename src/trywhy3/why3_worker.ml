@@ -106,7 +106,7 @@ module Task =
     let clear_warnings () = warnings := []
     let () =
       Warning.set_hook (fun ?(loc=(Loc.user_position "" 1 0 0)) msg ->
-                        let _, a,b,_ = Loc.get loc in
+                        let _, a,b,_c = Loc.get loc in
                         warnings := ((a-1,b), msg) :: !warnings)
 
 

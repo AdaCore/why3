@@ -33,9 +33,6 @@ val file_contents_buf : string -> Buffer.t
 (* put the content of a file in a formatter *)
 val file_contents_fmt : string -> Format.formatter -> unit
 
-(* [write_file f c] writes the content [c] into the file [f] *)
-val write_file : string -> string -> unit
-
 val open_temp_file :
   ?debug:bool -> (* don't remove the file *)
   string -> (string -> out_channel -> 'a) -> 'a

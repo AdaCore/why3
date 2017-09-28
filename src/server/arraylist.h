@@ -24,7 +24,7 @@ typedef struct {
   int capacity; // the capacity of the arrays key and data
 } t_list, *plist;
 // The idea is that each element in the list is a tuple (key, data), but it is
-// simpler to have two separate arrays for that
+// simpler to hahve two separate arrays for that
 
 // return a list of initial capacity <capacity>
 plist init_list(int capacity);

@@ -2,119 +2,460 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../dyck.mlw" proved="true">
-<theory name="Dyck" proved="true" sum="78a0d2ab2d4d91ce17a473e085b8c22e">
- <goal name="dyck_word_first" proved="true">
- <proof prover="0" timelimit="6"><result status="valid" time="0.02" steps="18"/></proof>
+<prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../dyck.mlw" expanded="true">
+<theory name="Dyck" sum="78a0d2ab2d4d91ce17a473e085b8c22e" expanded="true">
+ <goal name="dyck_word_first" expl="" expanded="true">
+ <proof prover="4" timelimit="6"><result status="valid" time="0.02" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="Check" proved="true" sum="47d6e488a35db55702374d4adc21a321">
- <goal name="WP_parameter same_prefix" expl="VC for same_prefix" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="59"/></proof>
+<theory name="Check" sum="69aab2124ecee4f90a14be433537619b" expanded="true">
+ <goal name="WP_parameter same_prefix" expl="VC for same_prefix">
+ <proof prover="4"><result status="valid" time="0.04" steps="59"/></proof>
  </goal>
- <goal name="WP_parameter is_dyck_rec" expl="VC for is_dyck_rec" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter is_dyck_rec.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+ <goal name="WP_parameter is_dyck_rec" expl="VC for is_dyck_rec" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter is_dyck_rec.1" expl="variant decrease">
+  <proof prover="4"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.1" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter is_dyck_rec.1.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <goal name="WP_parameter is_dyck_rec.2" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter is_dyck_rec.2.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.14"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.1.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.19" steps="196"/></proof>
+   <goal name="WP_parameter is_dyck_rec.2.2" expl="assertion">
+   <proof prover="4"><result status="valid" time="0.19" steps="196"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.1.2" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <goal name="WP_parameter is_dyck_rec.2.3" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.2" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="57"/></proof>
+  <goal name="WP_parameter is_dyck_rec.3" expl="variant decrease">
+  <proof prover="4"><result status="valid" time="0.05" steps="57"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.3" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter is_dyck_rec.3.0" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.15" steps="334"/></proof>
+  <goal name="WP_parameter is_dyck_rec.4" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter is_dyck_rec.4.1" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.15" steps="334"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.3.1" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
+   <goal name="WP_parameter is_dyck_rec.4.2" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.3.2" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.12" steps="112"/></proof>
+   <goal name="WP_parameter is_dyck_rec.4.3" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.12" steps="112"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.3.3" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="2"><result status="valid" time="0.32"/></proof>
+   <goal name="WP_parameter is_dyck_rec.4.4" expl="VC for is_dyck_rec">
+   <proof prover="1"><result status="valid" time="0.32"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.3.4" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.13" steps="278"/></proof>
+   <goal name="WP_parameter is_dyck_rec.4.5" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.13" steps="278"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.4" expl="exceptional postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  <goal name="WP_parameter is_dyck_rec.5" expl="exceptional postcondition">
+  <proof prover="0"><result status="valid" time="0.35"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.5" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.76"/></proof>
+  <goal name="WP_parameter is_dyck_rec.6" expl="exceptional postcondition">
+  <proof prover="1"><result status="valid" time="0.76"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.6" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.72"/></proof>
+  <goal name="WP_parameter is_dyck_rec.7" expl="exceptional postcondition">
+  <proof prover="1"><result status="valid" time="0.72"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.7" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter is_dyck_rec.7.0" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="WP_parameter is_dyck_rec.8" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter is_dyck_rec.8.1" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.7.1" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+   <goal name="WP_parameter is_dyck_rec.8.2" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.7.2" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+   <goal name="WP_parameter is_dyck_rec.8.3" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.7.3" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.60" steps="221"/></proof>
+   <goal name="WP_parameter is_dyck_rec.8.4" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.60" steps="221"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.7.4" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="52"/></proof>
+   <goal name="WP_parameter is_dyck_rec.8.5" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.02" steps="52"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter is_dyck_rec.8" expl="postcondition" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="WP_parameter is_dyck_rec.8.0" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="WP_parameter is_dyck_rec.9" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter is_dyck_rec.9.1" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.8.1" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+   <goal name="WP_parameter is_dyck_rec.9.2" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.8.2" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+   <goal name="WP_parameter is_dyck_rec.9.3" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.00" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.8.3" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
+   <goal name="WP_parameter is_dyck_rec.9.4" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
    </goal>
-   <goal name="WP_parameter is_dyck_rec.8.4" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+   <goal name="WP_parameter is_dyck_rec.9.5" expl="VC for is_dyck_rec">
+   <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter is_dyck" expl="VC for is_dyck" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter is_dyck.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
+ <goal name="WP_parameter is_dyck" expl="VC for is_dyck" expanded="true">
+ <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter is_dyck.1" expl="postcondition">
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter is_dyck.1" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.16"/></proof>
+  <goal name="WP_parameter is_dyck.2" expl="postcondition" expanded="true">
+  <metas
+   expanded="true">
+   <ts_pos name="word" arity="0" id="4262"
+    ip_theory="Dyck">
+    <ip_qualid name="word"/>
+   </ts_pos>
+   <ts_pos name="ref" arity="1" id="4283"
+    ip_theory="Ref">
+    <ip_library name="ref"/>
+    <ip_qualid name="ref"/>
+   </ts_pos>
+   <ls_pos name="zero" id="173"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="zero"/>
+   </ls_pos>
+   <ls_pos name="one" id="174"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="one"/>
+   </ls_pos>
+   <ls_pos name="infix &lt;" id="175"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &lt;"/>
+   </ls_pos>
+   <ls_pos name="infix &gt;" id="178"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &gt;"/>
+   </ls_pos>
+   <ls_pos name="infix &lt;=" id="187"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &lt;="/>
+   </ls_pos>
+   <ls_pos name="infix +" id="1344"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix +"/>
+   </ls_pos>
+   <ls_pos name="prefix -" id="1345"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="prefix -"/>
+   </ls_pos>
+   <ls_pos name="infix *" id="1346"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix *"/>
+   </ls_pos>
+   <ls_pos name="infix -" id="1394"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix -"/>
+   </ls_pos>
+   <ls_pos name="infix &gt;=" id="1414"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="infix &gt;="/>
+   </ls_pos>
+   <ls_pos name="length" id="2200"
+    ip_theory="Length">
+    <ip_library name="list"/>
+    <ip_qualid name="length"/>
+   </ls_pos>
+   <ls_pos name="prefix !" id="4289"
+    ip_theory="Ref">
+    <ip_library name="ref"/>
+    <ip_qualid name="prefix !"/>
+   </ls_pos>
+   <ls_pos name="fall" id="4432" ip_theory="Check">
+    <ip_qualid name="fall"/>
+   </ls_pos>
+   <pr_pos name="Assoc" id="1347"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_l" id="1354"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Unit_def_l"/>
+   </pr_pos>
+   <pr_pos name="Unit_def_r" id="1357"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Unit_def_r"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_l" id="1360"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Inv_def_l"/>
+   </pr_pos>
+   <pr_pos name="Inv_def_r" id="1363"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Inv_def_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="1366"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CommutativeGroup"/>
+    <ip_qualid name="Comm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Assoc" id="1371"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Assoc"/>
+    <ip_qualid name="Assoc"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_l" id="1378"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_l"/>
+   </pr_pos>
+   <pr_pos name="Mul_distr_r" id="1385"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Mul_distr_r"/>
+   </pr_pos>
+   <pr_pos name="Comm" id="1403"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Comm"/>
+    <ip_qualid name="Comm"/>
+   </pr_pos>
+   <pr_pos name="Unitary" id="1408"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Unitary"/>
+   </pr_pos>
+   <pr_pos name="NonTrivialRing" id="1411"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="NonTrivialRing"/>
+   </pr_pos>
+   <pr_pos name="Refl" id="1423"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Refl"/>
+   </pr_pos>
+   <pr_pos name="Trans" id="1426"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Trans"/>
+   </pr_pos>
+   <pr_pos name="Antisymm" id="1433"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Antisymm"/>
+   </pr_pos>
+   <pr_pos name="Total" id="1438"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="Total"/>
+   </pr_pos>
+   <pr_pos name="ZeroLessOne" id="1443"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="ZeroLessOne"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderAdd" id="1444"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderAdd"/>
+   </pr_pos>
+   <pr_pos name="CompatOrderMult" id="1451"
+    ip_theory="Int">
+    <ip_library name="int"/>
+    <ip_qualid name="CompatOrderMult"/>
+   </pr_pos>
+   <pr_pos name="Length_nonnegative" id="2210"
+    ip_theory="Length">
+    <ip_library name="list"/>
+    <ip_qualid name="Length_nonnegative"/>
+   </pr_pos>
+   <pr_pos name="Length_nil" id="2213"
+    ip_theory="Length">
+    <ip_library name="list"/>
+    <ip_qualid name="Length_nil"/>
+   </pr_pos>
+   <pr_pos name="Append_length" id="3617"
+    ip_theory="Append">
+    <ip_library name="list"/>
+    <ip_qualid name="Append_length"/>
+   </pr_pos>
+   <pr_pos name="mem_append" id="3622"
+    ip_theory="Append">
+    <ip_library name="list"/>
+    <ip_qualid name="mem_append"/>
+   </pr_pos>
+   <pr_pos name="mem_decomp" id="3629"
+    ip_theory="Append">
+    <ip_library name="list"/>
+    <ip_qualid name="mem_decomp"/>
+   </pr_pos>
+   <pr_pos name="dyck_word_first" id="4272"
+    ip_theory="Dyck">
+    <ip_qualid name="dyck_word_first"/>
+   </pr_pos>
+   <pr_pos name="same_prefix" id="4546"
+    ip_theory="Check">
+    <ip_qualid name="same_prefix"/>
+   </pr_pos>
+   <meta name="remove_logic">
+    <meta_arg_ls id="173"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="174"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="175"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="178"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="187"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1344"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1345"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1346"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1394"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="1414"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="2200"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4289"/>
+   </meta>
+   <meta name="remove_logic">
+    <meta_arg_ls id="4432"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1347"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1354"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1357"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1360"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1363"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1366"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1371"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1378"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1385"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1403"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1408"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1411"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1423"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1426"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1433"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1438"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1443"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1444"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="1451"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="2210"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="2213"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3617"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3622"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="3629"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="4272"/>
+   </meta>
+   <meta name="remove_prop">
+    <meta_arg_pr id="4546"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="4262"/>
+   </meta>
+   <meta name="remove_type">
+    <meta_arg_ts id="4283"/>
+   </meta>
+   <goal name="WP_parameter is_dyck.2" expl="postcondition" expanded="true">
+   <transf name="eliminate_builtin" expanded="true">
+    <goal name="WP_parameter is_dyck.2.1" expl="postcondition" expanded="true">
+    <proof prover="0"><result status="valid" time="0.91"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </metas>
   </goal>
-  <goal name="WP_parameter is_dyck.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter is_dyck.3" expl="postcondition" expanded="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

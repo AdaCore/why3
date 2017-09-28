@@ -12,7 +12,7 @@
 open Why3
 open Why3session_lib
 open Whyconf
-open Session_itp
+open Session
 open Format
 
 (**
@@ -76,16 +76,6 @@ type action =
   | CopyArchive
   | Mod
 
-let print_external_proof fmt p =
-  fprintf fmt "%a - %a (%i, %i, %i)%s%s"
-    Whyconf.print_prover p.prover
-    (Pp.print_option Call_provers.print_prover_result) p.proof_state
-    (p.limit.Call_provers.limit_time)
-    (p.limit.Call_provers.limit_steps)
-    (p.limit.Call_provers.limit_mem)
-    (if p.proof_obsolete then " obsolete" else "")
-    (if false (* p.proof_edited_as <> None*) then " edited" else "")
-
 let rec interactive to_remove =
   eprintf "Do you want to replace the external proof %a (y/n)@."
     print_external_proof to_remove;
@@ -102,17 +92,6 @@ type to_prover =
   | To_prover of prover
   | SameProver
 
-let unknown_to_known_provers provers pu =
-  Mprover.fold (fun pk _ (others,name,version) ->
-    match
-      pk.prover_name = pu.prover_name,
-      pk.prover_version = pu.prover_version,
-      pk.prover_altern = pu.prover_altern with
-        | false, _, _ -> pk::others, name, version
-        | _, false, _ -> others, pk::name, version
-        | _           -> others, name, pk::version
-  ) provers ([],[],[])
-
 let get_to_prover pk session config =
   match pk with
     | Some pk -> To_prover pk
@@ -124,7 +103,7 @@ let get_to_prover pk session config =
       let unknown_provers = Mprover.set_diff provers known_provers in
       let map pu () =
         let _,name,version =
-          unknown_to_known_provers known_provers pu in
+          Session_tools.unknown_to_known_provers known_provers pu in
         match name,version with
           | _,a::_ -> Some a
           | a::_,_ -> Some a
@@ -135,18 +114,17 @@ let get_to_prover pk session config =
 exception NoAlt
 
 let run_one ~action env config filters pk fname =
-  let cont,_,_ =
+  let env_session,_,_ =
     read_update_session ~allow_obsolete:!opt_force_obsolete env config fname in
-  let ses = cont.Controller_itp.controller_session in
-  let to_prover = get_to_prover pk ses config in
+  let to_prover = get_to_prover pk env_session.session config in
   let s = Stack.create () in
-  session_iter_proof_attempt_by_filter cont filters
-    (fun pr -> Stack.push pr s) ses;
+  session_iter_proof_attempt_by_filter filters
+    (fun pr -> Stack.push pr s) env_session.session;
   Stack.iter (fun pr ->
     try
       let prover = match to_prover with To_prover pk -> Some pk
         | Convert mprover ->
-          Some (Mprover.find_exn NoAlt pr.prover mprover)
+          Some (Mprover.find_exn NoAlt pr.proof_prover mprover)
         | SameProver -> None
       in
       let prn = match prover with
@@ -167,7 +145,7 @@ let run_one ~action env config filters pk fname =
               not (Opt.inhabited (proof_verified rm))
           in
           if not replace then raise Exit;
-          copy_external_proof ~keygen ~prover ~env_session:cont pr
+          copy_external_proof ~keygen ~prover ~env_session pr
       in
       if !tobe_obsolete then set_obsolete prn;
       begin match !tobe_archived with

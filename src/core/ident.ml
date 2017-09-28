@@ -98,25 +98,6 @@ let get_model_trace_string ~labels =
   | [_; t_str] -> t_str
   | _ -> ""
 
-(* Functions for working with ITP labels *)
-
-let is_name_label label =
-  Strings.has_prefix "name:" label.lab_string
-
-let get_name_label ~labels = Slab.choose (Slab.filter is_name_label labels)
-
-let get_element_name ~labels =
-  let name_label = get_name_label ~labels in
-  let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
-  match splitted1 with
-  | ["name"; content] ->
-    begin
-      content
-    end;
-  | [_] -> ""
-  | _ -> assert false
-
-
 
 (** Identifiers *)
 
@@ -219,12 +200,6 @@ let create_ident_printer ?(sanitizer = same) sl =
     sanitizer = sanitizer;
     blacklist = sl }
 
-let known_id printer id =
-  try
-    (let _ = Hid.find printer.values id in true)
-  with Not_found ->
-    false
-
 let id_unique printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id
@@ -233,22 +208,6 @@ let id_unique printer ?(sanitizer = same) id =
     let name = find_unique printer.indices name in
     Hid.replace printer.values id name;
     name
-
-let id_unique_label printer ?(sanitizer = same) id =
-  try
-    Hid.find printer.values id
-  with Not_found ->
-    let labels =  id.id_label in
-    if Slab.exists is_name_label labels then
-      let name = sanitizer (get_element_name ~labels) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
-    else
-      let name = sanitizer (printer.sanitizer id.id_string) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
 
 let string_unique printer s = find_unique printer.indices s
 

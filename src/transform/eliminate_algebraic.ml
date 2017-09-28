@@ -458,15 +458,7 @@ let eliminate_algebraic = Trans.compose compile_match
       | [MAstr "no_index"]     -> { st with no_ind = true }
       | [MAstr "no_inversion"] -> { st with no_inv = true }
       | [MAstr "no_selector"]  -> { st with no_sel = true }
-      | [MAstr s] ->
-         raise (
-             Invalid_argument (
-                 "meta eliminate_algebraic, arg = \"" ^ s ^ "\""))
-      | l ->
-         raise (
-             Invalid_argument (
-                 "meta eliminate_algebraic, nb arg = " ^
-                   string_of_int (List.length l) ^ ""))
+      | _ -> raise (Invalid_argument "meta eliminate_algebraic")
     in
     let st = List.fold_left check st ml in
     Trans.fold_map comp st init_task))

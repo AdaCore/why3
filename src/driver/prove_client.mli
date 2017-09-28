@@ -9,30 +9,16 @@
 (*                                                                  *)
 (********************************************************************)
 
+exception NotConnected
 exception AlreadyConnected
+exception InvalidAnswer of string
 
 val connect_external : string -> unit
-(** connects to an already running server, with the given socket name
-
-  raise AlreadyConnected if a server is already running
- *)
-
 val connect_internal : unit -> unit
-(** starts a new process for a server and connects to it
-
-   raise AlreadyConnected if a server is already running
- *)
-
-
-val is_connected : unit -> bool
-(** checks if a server is already running *)
-
-exception NotConnected
-(** all functions below will raise NotConnected if no server is running *)
 
 val disconnect : unit -> unit
 
-val set_max_running_provers : int -> unit
+val is_connected : unit -> bool
 
 val send_request :
   id:int ->
@@ -51,9 +37,9 @@ type final_answer = {
 }
 
 type answer =
-  | Started of int   (* the request with given id is running but not finished yet *)
+  | Started of int
   | Finished of final_answer
 
-exception InvalidAnswer of string
-
 val read_answers : blocking:bool -> answer list
+
+val set_max_running_provers : int -> unit

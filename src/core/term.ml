@@ -100,12 +100,11 @@ type pattern = {
 }
 
 and pattern_node =
-  | Pwild (* _ *)
-  | Pvar of vsymbol (* newly introduced variables *)
-  | Papp of lsymbol * pattern list (* application *)
-  | Por  of pattern * pattern (* | *)
+  | Pwild
+  | Pvar of vsymbol
+  | Papp of lsymbol * pattern list
+  | Por  of pattern * pattern
   | Pas  of pattern * vsymbol
-  (* naming a term recognized by pattern as a variable *)
 
 (* h-consing constructors for patterns *)
 
@@ -283,7 +282,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare trigger label t1 t2 =
+let t_compare t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -328,7 +327,7 @@ let t_compare trigger label t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      if label then comp_raise (Slab.compare t1.t_label t2.t_label) else ();
+      comp_raise (Slab.compare t1.t_label t2.t_label);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -377,7 +376,7 @@ let t_compare trigger label t1 t2 =
               let vml1 = (bv1, b1.bv_subst) :: vml1 in
               let vml2 = (bv2, b2.bv_subst) :: vml2 in
               let tr_cmp t1 t2 = t_compare bnd vml1 vml2 t1 t2; 0 in
-              if trigger then comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2) else ();
+              comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2);
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
@@ -403,11 +402,7 @@ let t_compare trigger label t1 t2 =
   try t_compare 0 [] [] t1 t2; 0
   with CompLT -> -1 | CompGT -> 1
 
-let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
-
-let t_equal_nt_nl t1 t2 = (t_compare false false t1 t2 = 0)
-
-let t_compare = t_compare true true
+let t_equal t1 t2 = (t_compare t1 t2 = 0)
 
 let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&

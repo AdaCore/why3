@@ -195,24 +195,15 @@ let () =
     eliminate_definition_if_poly
     ~desc:"Same@ as@ eliminate_definition@ but@ only@ if@ polymorphism@ appear."
 
-
-
-
-
-
-(***** {2 Bisection} ********)
-
-
-
-
+(** Bisect *)
 open Task
 open Theory
 
-type rem = { rem_pr : Spr.t; rem_ls : Sls.t; rem_ts : Sts.t }
-
 type bisect_step =
- | BSdone of rem
- | BSstep of rem * (bool -> bisect_step)
+ | BSdone of (Theory.meta * Theory.meta_arg list) list
+ | BSstep of task * (bool -> bisect_step)
+
+type rem = { rem_pr : Spr.t; rem_ls : Sls.t; rem_ts : Sts.t }
 
 let _print_rem fmt rem = Format.fprintf fmt
   "@[rem_pr:@[%a@]@\nrem_ls:@[%a@]@\nrem_ts:@[%a@]@\n"
@@ -220,7 +211,6 @@ let _print_rem fmt rem = Format.fprintf fmt
   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) rem.rem_ls
   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) rem.rem_ts
 
-(*
 let rec elim_task task rem =
   match task with
   | Some ({task_decl = {td_node = Decl decl}} as task) ->
@@ -231,7 +221,7 @@ let rec elim_task task rem =
   | Some task ->
     Task.add_tdecl (elim_task task.task_prev rem) task.task_decl
   | None      -> None
- *)
+
 
 let add_rem rem decl =
   let remove_ts rem ts =
@@ -254,6 +244,18 @@ let _union_rem rem1 rem2 =
     rem_pr = Spr.union rem1.rem_pr rem2.rem_pr;
   }
 
+let create_meta_rem_list rem =
+  let remove_ts acc ts =
+    (Printer.meta_remove_type, [Theory.MAts ts])::acc in
+  let remove_ls acc ls =
+    (Printer.meta_remove_logic, [Theory.MAls ls])::acc in
+  let remove_pr acc pr =
+    (Printer.meta_remove_prop, [Theory.MApr pr])::acc in
+  let acc = Sts.fold_left remove_ts [] rem.rem_ts in
+  let acc = Sls.fold_left remove_ls acc rem.rem_ls in
+  let acc = Spr.fold_left remove_pr acc rem.rem_pr in
+  acc
+
 let fold_sub f acc a i1 i2 =
   let acc = ref acc in
   for i=i1 to i2-1 do
@@ -265,7 +267,7 @@ let rec bisect_aux task a i1 i2 rem cont       (* lt i lk *) =
   (* Format.eprintf "i1: %i, i2: %i@\nrem:%a@." i1 i2 *)
   (*   print_rem rem; *)
   let call rem valid invalid =
-    try BSstep (rem,
+    try BSstep (elim_task task rem,
                 fun b -> if b then valid () else invalid ())
     with UnknownIdent _ -> invalid ()
   in
@@ -308,15 +310,13 @@ let bisect_step task0 =
   let empty_rem = {rem_ts = Sts.empty; rem_ls = Sls.empty;
                    rem_pr = Spr.empty} in
   bisect_aux task0 a 0 n empty_rem
-    (fun rem -> BSdone rem)
+    (fun rem -> BSdone (create_meta_rem_list rem))
 
-(*
 let bisect f task =
   let rec run = function
     | BSdone r -> r
-    | BSstep (rem,c) -> let t = elim_task task rem in run (c (f t)) in
+    | BSstep (t,c) -> run (c (f t)) in
   run (bisect_step task)
- *)
 
 (** catch exception for debug *)
 (* let bisect_step task0 = *)

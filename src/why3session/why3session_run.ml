@@ -9,11 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
 open Why3
 open Why3session_lib
 open Whyconf
-open Session_itp
+open Session
 open Format
 open Debug
 module Todo = Session_scheduler.Todo
@@ -221,6 +220,7 @@ let run_one sched env config filters interactive_provers fname =
       | _, M.Starting -> ()
       | _, M.StatusChange (Running|Scheduled) -> ()
       | _, M.StatusChange (Interrupted) -> Todo.stop todo
+      | _, M.StatusChange (JustEdited|Unedited) -> assert false
       | _, M.MissingFile efname ->
         dprintf verbose
           "@[From@ file@ %s:@\nThe@ edited@ file@ %s@ for@ the@ proof@ of@ %a@ \
@@ -363,4 +363,3 @@ let cmd =
     cmd_name     = "run";
     cmd_run      = run;
   }
- *)

@@ -14,8 +14,6 @@
 open Ident
 open Ty
 
-(** {1 Terms and Formulas} *)
-
 (** {2 Variable symbols} *)
 
 type vsymbol = private {
@@ -153,8 +151,6 @@ module Hterm : Exthtbl.S with type key = term
 val t_compare : term -> term -> int
 val t_equal : term -> term -> bool
 val t_hash : term -> int
-(* Equality modulo labels and triggers *)
-val t_equal_nt_nl : term -> term -> bool
 
 (** {2 Bindings} *)
 

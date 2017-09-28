@@ -93,25 +93,14 @@ let connect_internal () =
   Buffer.clear recv_buf;
   let cwd = Unix.getcwd () in
   Unix.chdir (Filename.get_temp_dir_name ());
-  let socket_name = (* Filename.concat (Unix.getcwd ())
-    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") *)
-    Filename.temp_file "why3server" "sock"
-  in
+  let socket_name = Filename.concat (Unix.getcwd ())
+    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") in
   let exec = "why3server" in
-  let pid =
-    (* use this version for debugging the C code
-    Unix.create_process "valgrind"
-    [|"/usr/bin/valgrind";exec; "--socket"; socket_name;
-      "--single-client";
-      "-j"; string_of_int !max_running_provers|]
-    Unix.stdin Unix.stdout Unix.stderr
-     *)
-  Unix.create_process exec
+  let pid = Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
-    Unix.stdin Unix.stdout Unix.stderr
-  in
+    Unix.stdin Unix.stdout Unix.stderr in
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =

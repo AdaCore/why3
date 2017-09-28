@@ -242,17 +242,6 @@ rule token = parse
       { raise (IllegalCharacter c) }
 
 {
-
-  let parse_term lb = Loc.with_location (Parser.term_eof token) lb
-
-  let parse_term_list lb = Loc.with_location (Parser.term_comma_list_eof token) lb
-
-  let parse_qualid lb = Loc.with_location (Parser.qualid_eof token) lb
-
-  let parse_list_ident lb = Loc.with_location (Parser.ident_comma_list_eof token) lb
-
-  let parse_list_qualid lb = Loc.with_location (Parser.qualid_comma_list_eof token) lb
-
   let parse_logic_file env path lb =
     open_file token (Lexing.from_string "") (Typing.open_file env path);
     Loc.with_location (logic_file token) lb;
@@ -269,5 +258,4 @@ rule token = parse
 
   let () = Env.register_format Env.base_language "why" ["why"] read_channel
     ~desc:"WhyML@ logical@ language"
-
 }

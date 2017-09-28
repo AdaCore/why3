@@ -62,11 +62,6 @@ let file_contents_buf f =
 
 let file_contents f = Buffer.contents (file_contents_buf f)
 
-let write_file f c =
-  let oc = open_out f in
-  output_string oc c;
-  close_out oc
-
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in
   try

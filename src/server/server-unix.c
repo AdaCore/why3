@@ -433,8 +433,6 @@ void handle_child_events() {
   }
 }
 
-/*@ requires r != NULL && r->req_type == REQ_RUN;
-  @*/
 void run_request (prequest r) {
   char* outfile;
   int out_descr;
@@ -466,20 +464,6 @@ void run_request (prequest r) {
   send_started_msg_to_client(client, r->id);
 }
 
-void remove_from_queue(pqueue p, char *id) {
-  // inefficient, but what else?
-  pqueue tmp = init_queue(p->capacity);
-  while (!queue_is_empty(p)) {
-    prequest r = queue_pop(p);
-    if (strcmp(r->id,id)) queue_push(tmp, r);
-  }
-  while (!queue_is_empty(tmp)) {
-    prequest r = queue_pop(tmp);
-    queue_push(p, r);
-  }
-  free_queue(tmp);
-}
-
 void handle_msg(pclient client, int key) {
   prequest r;
   char* buf;
@@ -499,22 +483,11 @@ void handle_msg(pclient client, int key) {
       break;
     r = parse_request(buf + old, cur - old, key);
     if (r) {
-      switch (r->req_type) {
-      case REQ_RUN:
-        if (list_length(processes) < parallel) {
-          run_request(r);
-          free_request(r);
-        } else {
-          queue_push(queue, (void*) r);
-        }
-        break;
-      case REQ_INTERRUPT:
-        // removes all occurrences of r->id from the queue
-        remove_from_queue(queue, r->id);
-        // kill all processes whose id is r->id;
-        // TODO kill_processes(processes, r->id);
+      if (list_length(processes) < parallel) {
+        run_request(r);
         free_request(r);
-        break;
+      } else {
+        queue_push(queue, (void*) r);
       }
     }
     //skip newline

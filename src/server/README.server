@@ -1,25 +1,10 @@
-
 This is a VC server for Why3. It implements the following functionalities:
-
 * wait for connections on a unix domain socket (unix) or named pipe
   (windows) for clients
-
 * clients can send requests for a process to spawn, including
-  timeout/memory limit. To process is not spawned immediately but put
-  in a queue od processes to be spawned. Process are spawned in
-  parallel up to some maximal number.
-
-* when a process is spawned, server sends a message to the client of the form 'S;id' to inform it that process 'id' has started.
-
-* when the process is terminated, either normally or by a ressource
-  limit reached, server sends back a detailed message containing the
-  output of the process, as well as the time taken and the exit code
-
-* clients can also request to change the maximal number of process
-  that can run in parallel
-
-* clients can also request to interrupt a process, killing it if it
-  already runs
+  timeout/memory limit
+* server will send back a filename containing the output of the process,
+  as well as the time taken and the exit code
 
 Command line options
 ====================
@@ -35,11 +20,8 @@ A client request is a single line which looks like this:
   commandkind;payload
 
 Where commandkind is a simple string and payload is a semicolon-separated
-list. There are currently four possible commands.
-
-1 Running a process
-
-The first command looks like this:
+list. There are currently three possible commands. The first command looks
+like this:
 
   run;id;timeout;memlimit;cmd;arg1;arg2;...;argn
 
@@ -77,8 +59,6 @@ Their meaning is the following:
   file     - the path to a file which contains the stdout and stderr of the
              executed program
 
-2 Running a process on sdtin
-
 The second command is very similar:
 
   runstdin;id;timeout;memlimit;cmd;arg1;arg2;...;argn;filename
@@ -88,8 +68,6 @@ difference that an extra filename is given as the last argument to the
 command. This filename is not passed to the command as a commandline argument,
 instead it is "piped" into the stdin of the command.
 
-3 Changing the maximal number of processes run in parallel
-
 The third commmand is like this:
 
   parallel;num
@@ -98,14 +76,6 @@ So the commandstring is "parallel". 'num' is a number greater or equal to 1.
 When this command is received, the server will allow to run up to 'num'
 processes in parallel from now on. Later 'parallel' commands can increase or
 decrease this number. There is no server answer to this command.
-
-4 Interrupt a process
-
-  interrupt;id
-
-  will stop the process of the given id, killing it if it was already running
-
-== notes ==
 
 There are two separate implementations on linux and windows, but both are
 very similar in structure and share some code (but should share much more).

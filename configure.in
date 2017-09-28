@@ -484,18 +484,6 @@ dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
-
-# js_of_ocaml
-
-JSOFOCAML=$(ocamlfind query js_of_ocaml)
-
-if test -z "$JSOFCAML"; then
-   HASJSOFOCAML=no
-   reason_jsofocaml=" (js_of_ocaml not found)"
-else
-   HASJSOFOCAML=yes
-fi
-
 # Coq
 
 enable_coq_support=yes
@@ -780,8 +768,6 @@ AC_SUBST(enable_ide)
 AC_SUBST(LABLGTK2LIB)
 AC_SUBST(LABLGTK2PKG)
 
-AC_SUBST(HASJSOFOCAML)
-
 AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_zarith)
@@ -872,8 +858,7 @@ echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "Components"
-echo "    GTK IDE                 : $enable_ide$reason_ide"
-echo "    Web IDE                 : $HASJSOFOCAML$reason_jsofocaml"
+echo "    IDE command             : $enable_ide$reason_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    MenhirLib support       : $enable_menhirLib$reason_menhirLib"

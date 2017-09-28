@@ -9,14 +9,4 @@
 (*                                                                  *)
 (********************************************************************)
 
-val parse_term : Lexing.lexbuf -> Ptree.term
-
-val parse_term_list: Lexing.lexbuf -> Ptree.term list
-
-val parse_qualid: Lexing.lexbuf -> Ptree.qualid
-
-val parse_list_qualid: Lexing.lexbuf -> Ptree.qualid list
-
-val parse_list_ident: Lexing.lexbuf -> Ptree.ident list
-
 val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit
