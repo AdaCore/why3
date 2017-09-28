@@ -642,7 +642,7 @@ language are:
 
 To examplify this basic programming language, we give below the
 default strategies that are attached to the default buttons of the
-IDE, assuming that the provers Alt-Ergo 1.01, CVC4 1.4 and Z3 4.4.1
+IDE, assuming that the provers Alt-Ergo 1.30, CVC4 1.5 and Z3 4.5.0
 were detected by the \verb|why3 config --detect| command
 \begin{description}
 \item[Split] is bound to the 1-line strategy
@@ -650,16 +650,26 @@ were detected by the \verb|why3 config --detect| command
 t split_goal_wp exit
 \end{verbatim}
 
+\item[Auto level 0] is bound to
+\begin{verbatim}
+c Z3,4.5.0, 1 1000
+c Alt-Ergo,1.30, 1 1000
+c CVC4,1.5, 1 1000
+\end{verbatim}
+  The three provers are tried for a time limit of 1 second and memory
+  limit of 1~Gb, each in turn. This is a perfect strategy for a first
+  attempt to discharge a new goal.
+
 \item[Auto level 1] is bound to
 \begin{verbatim}
 start:
-c Z3,4.4.1, 1 1000
-c Alt-Ergo,1.01, 1 1000
-c CVC4,1.4, 1 1000
+c Z3,4.5.0, 1 1000
+c Alt-Ergo,1.30, 1 1000
+c CVC4,1.5, 1 1000
 t split_goal_wp start
-c Z3,4.4.1, 10 4000
-c Alt-Ergo,1.01, 10 4000
-c CVC4,1.4, 10 4000
+c Z3,4.5.0, 10 4000
+c Alt-Ergo,1.30, 10 4000
+c CVC4,1.5, 10 4000
 \end{verbatim}
   The three provers are first tried for a time limit of 1 second and
   memory limit of 1~Gb, each in turn. If none of them succeed, a
@@ -670,17 +680,17 @@ c CVC4,1.4, 10 4000
 \item[Auto level 2] is bound to
 \begin{verbatim}
 start:
-c Z3,4.4.1, 1 1000
-c Eprover,1.8-001, 1 1000
+c Z3,4.5.0, 1 1000
+c Eprover,2.0, 1 1000
 c Spass,3.7, 1 1000
-c Alt-Ergo,1.01, 1 1000
-c CVC4,1.4, 1 1000
+c Alt-Ergo,1.30, 1 1000
+c CVC4,1.5, 1 1000
 t split_goal_wp start
-c Z3,4.4.1, 5 2000
-c Eprover,1.8-001, 5 2000
+c Z3,4.5.0, 5 2000
+c Eprover,2.0, 5 2000
 c Spass,3.7, 5 2000
-c Alt-Ergo,1.01, 5 2000
-c CVC4,1.4, 5 2000
+c Alt-Ergo,1.30, 5 2000
+c CVC4,1.5, 5 2000
 t introduce_premises afterintro
 afterintro:
 t inline_goal afterinline
@@ -688,12 +698,11 @@ g trylongertime
 afterinline:
 t split_goal_wp start
 trylongertime:
-c Z3,4.4.1, 30 4000
-c Eprover,1.8-001, 30 4000
+c Z3,4.5.0, 30 4000
+c Eprover,2.0, 30 4000
 c Spass,3.7, 30 4000
-c Alt-Ergo,1.01, 30 4000
-c CVC4,1.4, 30 4000
-
+c Alt-Ergo,1.30, 30 4000
+c CVC4,1.5, 30 4000
 \end{verbatim}
   Notice that now 5 provers are used.  The provers are first tried for
   a time limit of 1 second and memory limit of 1~Gb, each in turn. If
@@ -701,7 +710,7 @@ c CVC4,1.4, 30 4000
   the same strategy is retried on each sub-goals. If the split does
   not succeed, the prover are tried again with limits of 5 s and 2
   Gb. If all fail, we attempt the transformation of introduction of
-  premises in the context, followed by an inlining of the definiiions
+  premises in the context, followed by an inlining of the definitions
   in the goals. We then attempt a split again, if the split succeeds,
   we restart from the beginning, if it fails then provers are tried
   again with 30s and 4 Gb.
