@@ -363,7 +363,7 @@ let () =
          exit 1
     in
     Debug.dprintf debug " done.@.";
-    if !opt_obsolete_only && not found_detached
+    if !opt_obsolete_only && not (found_detached || found_obs)
     then
       begin
         eprintf "Session is not obsolete, hence not replayed@.";

@@ -7,115 +7,115 @@
 <prover id="2" name="Z3" version="4.3.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.3" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../inverse_in_place.mlw">
-<theory name="InverseInPlace" sum="5ac8c81dbf56dc5874bbb415ac4a2c4c">
- <goal name="is_permutation_inverse" expl="">
+<file name="../inverse_in_place.mlw" proved="true">
+<theory name="InverseInPlace" proved="true" sum="c2ab810a0020582a928fb620a26a9fa1">
+ <goal name="is_permutation_inverse" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
- <goal name="WP_parameter inverse_in_place" expl="VC for inverse_in_place">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter inverse_in_place.1" expl="postcondition">
+ <goal name="WP_parameter inverse_in_place" expl="VC for inverse_in_place" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter inverse_in_place.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.2" expl="postcondition">
+  <goal name="WP_parameter inverse_in_place.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.3" expl="loop invariant init">
+  <goal name="WP_parameter inverse_in_place.2" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.4" expl="type invariant">
+  <goal name="WP_parameter inverse_in_place.3" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.5" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.4" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.6" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.5" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.7" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.6" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.8" expl="loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter inverse_in_place.8.1" expl="VC for inverse_in_place">
+  <goal name="WP_parameter inverse_in_place.7" expl="loop invariant init" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter inverse_in_place.7.0" expl="VC for inverse_in_place" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.2" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.1" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.3" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.2" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.4" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.3" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.5" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.4" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.6" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.5" expl="VC for inverse_in_place" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.7" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.6" expl="VC for inverse_in_place" proved="true">
    <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.8" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.7" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="WP_parameter inverse_in_place.8.9" expl="VC for inverse_in_place">
+   <goal name="WP_parameter inverse_in_place.7.8" expl="VC for inverse_in_place" proved="true">
    <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.9" expl="loop invariant init">
+  <goal name="WP_parameter inverse_in_place.8" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.10" expl="loop invariant init">
+  <goal name="WP_parameter inverse_in_place.9" expl="loop invariant init" proved="true">
   <proof prover="0" timelimit="5" memlimit="4000"><result status="valid" time="0.68"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.11" expl="type invariant">
+  <goal name="WP_parameter inverse_in_place.10" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.12" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.11" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.13" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.12" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.14" expl="loop invariant preservation">
+  <goal name="WP_parameter inverse_in_place.13" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
-  <proof prover="4"><result status="valid" time="3.52"/></proof>
+  <proof prover="4"><result status="valid" time="2.79"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.15" expl="loop invariant preservation">
+  <goal name="WP_parameter inverse_in_place.14" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.46"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.16" expl="loop invariant preservation">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.16.1" expl="loop invariant preservation">
-   <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.16.1.1" expl="loop invariant preservation">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.16.1.1.1" expl="VC for inverse_in_place">
+  <goal name="WP_parameter inverse_in_place.15" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="WP_parameter inverse_in_place.15.0" expl="loop invariant preservation" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter inverse_in_place.15.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="WP_parameter inverse_in_place.15.0.0.0" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="1.28"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.2" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.1" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.71"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.3" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.2" expl="VC for inverse_in_place" proved="true">
      <proof prover="1"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.4" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.3" expl="VC for inverse_in_place" proved="true">
      <proof prover="1"><result status="valid" time="0.04"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.5" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.4" expl="VC for inverse_in_place" proved="true">
      <proof prover="3"><result status="valid" time="0.21" steps="75"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.6" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.5" expl="VC for inverse_in_place" proved="true">
      <proof prover="1"><result status="valid" time="0.05"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.7" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.6" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.68"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.16.1.1.8" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.15.0.0.7" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.93"/></proof>
      </goal>
     </transf>
@@ -124,51 +124,51 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.17" expl="loop variant decrease">
+  <goal name="WP_parameter inverse_in_place.16" expl="loop variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.18" expl="assertion">
+  <goal name="WP_parameter inverse_in_place.17" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.19" expl="assertion">
+  <goal name="WP_parameter inverse_in_place.18" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.20" expl="type invariant">
+  <goal name="WP_parameter inverse_in_place.19" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.21" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.20" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.22" expl="loop invariant preservation">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.22.1" expl="loop invariant preservation">
-   <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.22.1.1" expl="loop invariant preservation">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.22.1.1.1" expl="VC for inverse_in_place">
+  <goal name="WP_parameter inverse_in_place.21" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="WP_parameter inverse_in_place.21.0" expl="loop invariant preservation" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter inverse_in_place.21.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="WP_parameter inverse_in_place.21.0.0.0" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.74"/></proof>
      <proof prover="3"><result status="valid" time="2.66" steps="110"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.2" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.1" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.85"/></proof>
      <proof prover="3"><result status="valid" time="2.95" steps="118"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.3" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.2" expl="VC for inverse_in_place" proved="true">
      <proof prover="3"><result status="valid" time="1.85" steps="73"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.4" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.3" expl="VC for inverse_in_place" proved="true">
      <proof prover="4"><result status="valid" time="0.13"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.5" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.4" expl="VC for inverse_in_place" proved="true">
      <proof prover="3"><result status="valid" time="0.37" steps="113"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.6" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.5" expl="VC for inverse_in_place" proved="true">
      <proof prover="4"><result status="valid" time="0.41"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.7" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.6" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.58"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.22.1.1.8" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.21.0.0.7" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.61"/></proof>
      </goal>
     </transf>
@@ -177,42 +177,42 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.23" expl="assertion">
+  <goal name="WP_parameter inverse_in_place.22" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.24" expl="index in array bounds">
+  <goal name="WP_parameter inverse_in_place.23" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.25" expl="loop invariant preservation">
-  <transf name="introduce_premises">
-   <goal name="WP_parameter inverse_in_place.25.1" expl="loop invariant preservation">
-   <transf name="inline_goal">
-    <goal name="WP_parameter inverse_in_place.25.1.1" expl="loop invariant preservation">
-    <transf name="split_goal_wp">
-     <goal name="WP_parameter inverse_in_place.25.1.1.1" expl="VC for inverse_in_place">
+  <goal name="WP_parameter inverse_in_place.24" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="WP_parameter inverse_in_place.24.0" expl="loop invariant preservation" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="WP_parameter inverse_in_place.24.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="WP_parameter inverse_in_place.24.0.0.0" expl="VC for inverse_in_place" proved="true">
      <proof prover="3"><result status="valid" time="0.04" steps="33"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.2" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.1" expl="VC for inverse_in_place" proved="true">
      <proof prover="3"><result status="valid" time="0.18" steps="40"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.3" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.2" expl="VC for inverse_in_place" proved="true">
      <proof prover="4"><result status="valid" time="0.13"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.4" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.3" expl="VC for inverse_in_place" proved="true">
      <proof prover="4"><result status="valid" time="0.14"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.5" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.4" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.15"/></proof>
      <proof prover="3"><result status="valid" time="0.03" steps="36"/></proof>
      <proof prover="4"><result status="valid" time="0.06"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.6" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.5" expl="VC for inverse_in_place" proved="true">
      <proof prover="4"><result status="valid" time="0.24"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.7" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.6" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.54"/></proof>
      </goal>
-     <goal name="WP_parameter inverse_in_place.25.1.1.8" expl="VC for inverse_in_place">
+     <goal name="WP_parameter inverse_in_place.24.0.0.7" expl="VC for inverse_in_place" proved="true">
      <proof prover="0"><result status="valid" time="0.15"/></proof>
      </goal>
     </transf>
@@ -221,23 +221,23 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter inverse_in_place.26" expl="type invariant">
+  <goal name="WP_parameter inverse_in_place.25" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.27" expl="postcondition">
+  <goal name="WP_parameter inverse_in_place.26" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter inverse_in_place.28" expl="postcondition">
+  <goal name="WP_parameter inverse_in_place.27" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="ed5fcd093136ff61f06fcb963c1c5145">
- <goal name="WP_parameter test1" expl="VC for test1">
+<theory name="Harness" proved="true" sum="ed5fcd093136ff61f06fcb963c1c5145">
+ <goal name="WP_parameter test1" expl="VC for test1" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="43"/></proof>
  </goal>
- <goal name="WP_parameter test2" expl="VC for test2">
+ <goal name="WP_parameter test2" expl="VC for test2" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="43"/></proof>
  </goal>
 </theory>
