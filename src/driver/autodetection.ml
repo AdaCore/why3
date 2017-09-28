@@ -343,16 +343,21 @@ let generate_auto_strategies config =
       strategy_shortcut = "i";
       strategy_code = code }
   in
-  (* Auto level 1 *)
+  (* Auto level 0 and 1 *)
   let provers_level1 =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev = 1 then
-         let name =
-           p.Whyconf.prover_name ^ "," ^
-             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-         in name :: acc
+         let name = Whyconf.prover_parseable_format p in name :: acc
        else acc) prover_auto_levels []
+  in
+  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
+  let code = flush_str_formatter () in
+  let auto0 = {
+      strategy_name = "Auto level 0";
+      strategy_desc = "Automatic@ run@ of@ main@ provers";
+      strategy_shortcut = "0";
+      strategy_code = code }
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
@@ -370,10 +375,7 @@ let generate_auto_strategies config =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev >= 1 && lev <= 2 then
-         let name =
-           p.Whyconf.prover_name ^ "," ^
-             p.Whyconf.prover_version ^ "," ^ p.Whyconf.prover_altern
-         in name :: acc
+         let name = Whyconf.prover_parseable_format p in name :: acc
        else acc) prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
@@ -397,7 +399,10 @@ let generate_auto_strategies config =
   in
   add_strategy
     (add_strategy
-       (add_strategy (add_strategy config inline) split) auto1) auto2
+       (add_strategy
+          (add_strategy
+             (add_strategy config inline)
+             split) auto0) auto1) auto2
 
 let detect_exec env data acc exec_name =
   let s = ask_prover_version env exec_name data.version_switch in

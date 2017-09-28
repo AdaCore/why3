@@ -131,6 +131,10 @@ val get_provers : config -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
 
+val get_prover_config: config -> prover -> config_prover
+(** [get_prover_config config prover] get the prover config as stored in
+ the config. Raise Not_found if the prover does not exists in the config. *)
+
 val set_provers : config ->
   ?shortcuts:prover Mstr.t -> config_prover Mprover.t -> config
 (** [set_provers config provers] replace all the family prover by the
@@ -255,6 +259,7 @@ val set_family  : config -> string -> Rc.family  -> config
 (** Common command line options *)
 
 module Args : sig
+
   val initialize :
     ?extra_help : (Format.formatter -> unit -> unit) ->
     (string * Arg.spec * string) list ->
@@ -262,6 +267,7 @@ module Args : sig
     config * config * Env.env
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+
 end
 
 

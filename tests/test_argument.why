@@ -1,0 +1,10 @@
+
+theory Test
+   use import int.Int
+
+   constant x "name:TOTO": int
+
+   goal G: forall x "name:TOTO". forall y. x = y -> x = 2 * y
+
+
+end

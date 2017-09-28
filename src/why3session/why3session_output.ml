@@ -11,7 +11,7 @@
 
 open Why3
 open Why3session_lib
-open Session
+open Session_itp
 open Format
 
 (**
@@ -78,6 +78,7 @@ let run_one env config filters dir fname =
             let name = Ident.string_unique fname_printer name in
             let ext = String.sub dest i (String.length dest - i) in
             let cout = open_out (Filename.concat dir (name ^ ext)) in
+            (* Name table not necessary outside of ITP *)
             Driver.print_task lp.prover_driver
               (formatter_of_out_channel cout) task;
             close_out cout

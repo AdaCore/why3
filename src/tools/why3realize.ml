@@ -96,6 +96,7 @@ let do_global_theory (_tname,p,t) =
       Some (open_in backup)
     end else None in
   let cout = open_out file in
+  (* Name tables not necessary outside of ITP *)
   Driver.print_task ?old opt_driver (formatter_of_out_channel cout) task;
   close_out cout
 

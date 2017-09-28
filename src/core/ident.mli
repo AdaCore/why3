@@ -119,8 +119,17 @@ val id_unique :
 (** use ident_printer to generate a unique name for ident
     an optional sanitizer is applied over the printer's sanitizer *)
 
+val id_unique_label :
+  ident_printer -> ?sanitizer : (string -> string) -> ident -> string
+(** Do the same as id_unique except that it tries first to
+   use the "name:" label to generate the name instead of id.id_string *)
+
 val string_unique : ident_printer -> string -> string
 (** Uniquify string *)
+
+val known_id: ident_printer -> ident -> bool
+(** Returns true if the printer already knows the id.
+    false if it does not. *)
 
 val forget_id : ident_printer -> ident -> unit
 (** forget an ident *)

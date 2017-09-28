@@ -181,6 +181,15 @@ module DijkstraShortestPath
     ensures  { S.mem result (old !s) }
     ensures  { !s = S.remove result (old !s) }
 
+  (* Ad hoc lemma for former coq proof *)
+  lemma inside_or_exit:
+    forall s, src, v, d. S.mem src s -> path src v d ->
+      S.mem v s
+      \/
+      exists y. exists z. exists dy.
+        S.mem y s /\ not (S.mem z s) /\ S.mem z (g_succ y) /\
+        path src y dy /\ (dy + weight y z <= d)
+
   (* Algorithm's code. *)
 
   let shortest_path_code (src dst: vertex)

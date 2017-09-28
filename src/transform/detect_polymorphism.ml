@@ -54,18 +54,18 @@ let check_ls ign_ls ls =
     (Ty.oty_cons ls.Term.ls_args ls.Term.ls_value)
 
 let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
-  Debug.dprintf debug "[detect_polymorphism] |sts|=%d |sls|=%d |spr|=%d@."
+  Debug.dprintf debug "|sts|=%d |sls|=%d |spr|=%d@."
                 (Ty.Sts.cardinal ign_ts)
                 (Term.Sls.cardinal ign_ls)
                 (Spr.cardinal ign_pr);
-  Debug.dprintf debug "[detect_polymorphism] decl %a@."
+  Debug.dprintf debug "decl %a@."
                 Pretty.print_decl d;
   match d.d_node with
   | Dtype ts -> check_ts ign_ts ts
   | Ddata dl ->
      List.fold_left (fun acc (ts,_) -> acc || check_ts ign_ts ts) false dl
   | Dparam ls ->
-     Debug.dprintf debug "[detect_polymorphism] param %a@."
+     Debug.dprintf debug "param %a@."
                 Pretty.print_ls ls;
      check_ls ign_ls ls
   | Dlogic dl ->

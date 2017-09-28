@@ -58,14 +58,20 @@ type prover =
       prover_altern : string;
     }
 
+let print_altern fmt s =
+  if s <> "" then Format.fprintf fmt " (%s)" s
+
 let print_prover fmt p =
-  Format.fprintf fmt "%s (%s%s%s)"
-    p.prover_name p.prover_version
-    (if p.prover_altern = "" then "" else " ") p.prover_altern
+  Format.fprintf fmt "%s %s%a"
+    p.prover_name p.prover_version print_altern p.prover_altern
 
 let prover_parseable_format p =
-  Format.sprintf "%s,%s,%s"
-    p.prover_name p.prover_version p.prover_altern
+  if p.prover_altern = "" then
+    Format.sprintf "%s,%s"
+                   p.prover_name p.prover_version
+  else
+    Format.sprintf "%s,%s,%s"
+                   p.prover_name p.prover_version p.prover_altern
 
 let print_prover_parseable_format fmt p =
   Format.pp_print_string fmt (prover_parseable_format p)
@@ -646,7 +652,7 @@ let parse_filter_prover s =
   (* reverse order *)
   match sl with
   | [name] -> mk_filter_prover name
-  | [version;name] -> mk_filter_prover ~version name
+  | [version;name] -> mk_filter_prover ~altern:"" ~version name
   | [altern;"";name] -> mk_filter_prover ~altern name
   | [altern;version;name] -> mk_filter_prover ~version ~altern name
   | _ -> raise (ParseFilterProver s)
@@ -759,6 +765,8 @@ let save_config config =
 
 let get_main config = config.main
 let get_provers config = config.provers
+let get_prover_config config prover =
+  Mprover.find prover (get_provers config)
 let get_prover_shortcuts config = config.prover_shortcuts
 let get_policies config = config.provers_upgrade_policy
 let get_prover_upgrade_policy config p =
