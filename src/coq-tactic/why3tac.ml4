@@ -233,18 +233,6 @@ let get_prover s =
     Hashtbl.add provers s (cp, drv);
     cp, drv
 
-let print_constr fmt c = pp_with fmt (Termops.print_constr c)
-let print_tvm fmt m =
-  Idmap.iter (fun id tv -> match tv with
-    | None -> Format.fprintf fmt "%s->not FO@ " (string_of_id id)
-    | Some tv -> Format.fprintf fmt "%s->%a@ "
-                 (string_of_id id) Why3.Pretty.print_tv tv) m
-let print_bv fmt m =
-  Idmap.iter (fun id vs -> match vs with
-    | None -> Format.fprintf fmt "%s->not FO@ " (string_of_id id)
-    | Some vs -> Format.fprintf fmt "%s->%a@ "
-                 (string_of_id id) Why3.Pretty.print_vsty vs) m
-
 (* Coq constants *)
 
 let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"]
