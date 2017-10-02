@@ -5,240 +5,240 @@
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../counting_sort.mlw" expanded="true">
-<theory name="Spec" sum="01df6506e1c9644901ba5574a6a6d817">
+<theory name="Spec" sum="2431021609b0878e2404bd4e3d969c6c">
  <goal name="VC k" expl="VC for k">
  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC eqlt" expl="VC for eqlt">
- <proof prover="2"><result status="valid" time="0.76" steps="756"/></proof>
+ <proof prover="2"><result status="valid" time="0.76" steps="832"/></proof>
  </goal>
 </theory>
-<theory name="CountingSort" sum="1342db700761cd57a9db9968e55f5a10">
+<theory name="CountingSort" sum="ae273736e6f06931c00fd8aa24c42ad6">
  <goal name="VC counting_sort" expl="VC for counting_sort">
  <transf name="split_goal_wp">
-  <goal name="VC counting_sort.1" expl="1. array creation size">
+  <goal name="VC counting_sort.1" expl="array creation size">
   <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC counting_sort.2" expl="2. loop invariant init">
+  <goal name="VC counting_sort.2" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="VC counting_sort.3" expl="3. index in array bounds">
+  <goal name="VC counting_sort.3" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC counting_sort.4" expl="4. index in array bounds">
+  <goal name="VC counting_sort.4" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC counting_sort.5" expl="5. index in array bounds">
+  <goal name="VC counting_sort.5" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC counting_sort.6" expl="6. loop invariant preservation">
+  <goal name="VC counting_sort.6" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06" steps="88"/></proof>
   </goal>
-  <goal name="VC counting_sort.7" expl="7. loop invariant init">
+  <goal name="VC counting_sort.7" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.11" steps="175"/></proof>
   </goal>
-  <goal name="VC counting_sort.8" expl="8. loop invariant init">
+  <goal name="VC counting_sort.8" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC counting_sort.9" expl="9. loop invariant init">
+  <goal name="VC counting_sort.9" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC counting_sort.10" expl="10. loop invariant init">
+  <goal name="VC counting_sort.10" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC counting_sort.11" expl="11. index in array bounds">
+  <goal name="VC counting_sort.11" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC counting_sort.12" expl="12. loop invariant init">
+  <goal name="VC counting_sort.12" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC counting_sort.13" expl="13. loop invariant init">
+  <goal name="VC counting_sort.13" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC counting_sort.14" expl="14. loop invariant init">
+  <goal name="VC counting_sort.14" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC counting_sort.15" expl="15. loop invariant init">
+  <goal name="VC counting_sort.15" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC counting_sort.16" expl="16. loop invariant init">
+  <goal name="VC counting_sort.16" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.06" steps="153"/></proof>
   </goal>
-  <goal name="VC counting_sort.17" expl="17. index in array bounds">
+  <goal name="VC counting_sort.17" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.08" steps="164"/></proof>
   </goal>
-  <goal name="VC counting_sort.18" expl="18. loop invariant preservation">
+  <goal name="VC counting_sort.18" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC counting_sort.19" expl="19. loop invariant preservation">
+  <goal name="VC counting_sort.19" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04" steps="68"/></proof>
   </goal>
-  <goal name="VC counting_sort.20" expl="20. loop invariant preservation">
+  <goal name="VC counting_sort.20" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04" steps="76"/></proof>
   </goal>
-  <goal name="VC counting_sort.21" expl="21. loop invariant preservation">
+  <goal name="VC counting_sort.21" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="VC counting_sort.22" expl="22. loop invariant preservation">
-  <proof prover="7" timelimit="10" memlimit="4000"><result status="valid" time="1.16"/></proof>
+  <goal name="VC counting_sort.22" expl="loop invariant preservation">
+  <proof prover="7" timelimit="10" memlimit="4000"><result status="valid" time="1.38"/></proof>
   </goal>
-  <goal name="VC counting_sort.23" expl="23. loop invariant preservation">
+  <goal name="VC counting_sort.23" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.10" steps="202"/></proof>
   </goal>
-  <goal name="VC counting_sort.24" expl="24. loop invariant preservation">
+  <goal name="VC counting_sort.24" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="VC counting_sort.25" expl="25. loop invariant preservation">
+  <goal name="VC counting_sort.25" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="VC counting_sort.26" expl="26. loop invariant preservation">
+  <goal name="VC counting_sort.26" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC counting_sort.27" expl="27. out of loop bounds">
+  <goal name="VC counting_sort.27" expl="out of loop bounds">
   <proof prover="2"><result status="valid" time="0.75" steps="887"/></proof>
   </goal>
-  <goal name="VC counting_sort.28" expl="28. assertion">
+  <goal name="VC counting_sort.28" expl="assertion">
   <proof prover="2"><result status="valid" time="0.17" steps="220"/></proof>
   </goal>
-  <goal name="VC counting_sort.29" expl="29. postcondition">
+  <goal name="VC counting_sort.29" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC counting_sort.30" expl="30. out of loop bounds">
+  <goal name="VC counting_sort.30" expl="out of loop bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC counting_sort.31" expl="31. out of loop bounds">
+  <goal name="VC counting_sort.31" expl="out of loop bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="44"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="InPlaceCountingSort" sum="baa2cb256fe3bf6ca0fdc40adb59cd6c">
+<theory name="InPlaceCountingSort" sum="7b257803e567fd94e81e78948451846a">
  <goal name="VC in_place_counting_sort" expl="VC for in_place_counting_sort">
  <transf name="split_goal_wp">
-  <goal name="VC in_place_counting_sort.1" expl="1. array creation size">
+  <goal name="VC in_place_counting_sort.1" expl="array creation size">
   <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.2" expl="2. loop invariant init">
+  <goal name="VC in_place_counting_sort.2" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.3" expl="3. index in array bounds">
+  <goal name="VC in_place_counting_sort.3" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.4" expl="4. index in array bounds">
+  <goal name="VC in_place_counting_sort.4" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.5" expl="5. index in array bounds">
+  <goal name="VC in_place_counting_sort.5" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.6" expl="6. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.6" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.06" steps="86"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.7" expl="7. loop invariant init">
+  <goal name="VC in_place_counting_sort.7" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.11" steps="171"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.8" expl="8. loop invariant init">
+  <goal name="VC in_place_counting_sort.8" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.9" expl="9. loop invariant init">
+  <goal name="VC in_place_counting_sort.9" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.10" expl="10. loop invariant init">
+  <goal name="VC in_place_counting_sort.10" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.11" expl="11. index in array bounds">
+  <goal name="VC in_place_counting_sort.11" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.12" expl="12. loop invariant init">
+  <goal name="VC in_place_counting_sort.12" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.13" expl="13. loop invariant init">
+  <goal name="VC in_place_counting_sort.13" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.14" expl="14. loop invariant init">
+  <goal name="VC in_place_counting_sort.14" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.15" expl="15. loop invariant init">
+  <goal name="VC in_place_counting_sort.15" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.16" expl="16. loop invariant init">
+  <goal name="VC in_place_counting_sort.16" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.06" steps="151"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.17" expl="17. index in array bounds">
+  <goal name="VC in_place_counting_sort.17" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.11" steps="200"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.18" expl="18. assertion">
+  <goal name="VC in_place_counting_sort.18" expl="assertion">
   <proof prover="2"><result status="valid" time="0.06" steps="82"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.19" expl="19. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.19" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.20" expl="20. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.20" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.04" steps="72"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.21" expl="21. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.21" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.05" steps="81"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.22" expl="22. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.22" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.23" expl="23. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.23" expl="loop invariant preservation">
   <proof prover="7"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.24" expl="24. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.24" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.13" steps="232"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.25" expl="25. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.25" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.26" expl="26. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.26" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.27" expl="27. loop invariant preservation">
+  <goal name="VC in_place_counting_sort.27" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.28" expl="28. out of loop bounds">
-  <proof prover="2"><result status="valid" time="1.04" steps="875"/></proof>
+  <goal name="VC in_place_counting_sort.28" expl="out of loop bounds">
+  <proof prover="2"><result status="valid" time="0.71" steps="875"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.29" expl="29. assertion">
+  <goal name="VC in_place_counting_sort.29" expl="assertion">
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.30" expl="30. postcondition">
+  <goal name="VC in_place_counting_sort.30" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.31" expl="31. out of loop bounds">
+  <goal name="VC in_place_counting_sort.31" expl="out of loop bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC in_place_counting_sort.32" expl="32. out of loop bounds">
+  <goal name="VC in_place_counting_sort.32" expl="out of loop bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="28"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="b6fa894defe241662dfe4a6b4868105e">
+<theory name="Harness" sum="8f0c193d76bd81de0e10fd301ec85c10">
  <goal name="VC harness" expl="VC for harness">
  <transf name="split_goal_wp">
-  <goal name="VC harness.1" expl="1. array creation size">
+  <goal name="VC harness.1" expl="array creation size">
   <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC harness.2" expl="2. index in array bounds">
+  <goal name="VC harness.2" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC harness.3" expl="3. precondition">
+  <goal name="VC harness.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="36"/></proof>
   </goal>
-  <goal name="VC harness.4" expl="4. assertion">
+  <goal name="VC harness.4" expl="assertion">
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC harness.5" expl="5. assertion">
+  <goal name="VC harness.5" expl="assertion">
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC harness.6" expl="6. assertion">
+  <goal name="VC harness.6" expl="assertion">
   <proof prover="7"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="VC harness.7" expl="7. assertion">
+  <goal name="VC harness.7" expl="assertion">
   <proof prover="7"><result status="valid" time="0.08"/></proof>
   </goal>
-  <goal name="VC harness.8" expl="8. assertion">
+  <goal name="VC harness.8" expl="assertion">
   <proof prover="2"><result status="valid" time="0.14" steps="402"/></proof>
   </goal>
  </transf>

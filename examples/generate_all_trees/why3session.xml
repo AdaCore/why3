@@ -2,121 +2,121 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="1" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../generate_all_trees.mlw" expanded="true">
-<theory name="GenerateAllTrees" sum="8d1da43365cc37557a521a1725b8b720" expanded="true">
- <goal name="size_nonneg" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="0.29"/></proof>
+<theory name="GenerateAllTrees" sum="6ce6d98377369cf0ddd83f52e4bcaac8" expanded="true">
+ <goal name="size_nonneg" expl="" expanded="true">
+ <proof prover="1" edited="generate_all_trees_WP_GenerateAllTrees_size_nonneg_1.v"><result status="valid" time="0.29"/></proof>
  </goal>
- <goal name="size_left" expanded="true">
+ <goal name="size_left" expl="" expanded="true">
  <proof prover="7"><result status="valid" time="0.14"/></proof>
  </goal>
- <goal name="all_trees_0" expanded="true">
- <proof prover="0" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="0.31"/></proof>
+ <goal name="all_trees_0" expl="" expanded="true">
+ <proof prover="1" edited="generate_all_trees_WP_GenerateAllTrees_all_trees_0_1.v"><result status="valid" time="0.31"/></proof>
  </goal>
- <goal name="tree_diff" expanded="true">
+ <goal name="tree_diff" expl="" expanded="true">
  <proof prover="8"><result status="valid" time="0.02" steps="9"/></proof>
  </goal>
  <goal name="VC combine" expl="VC for combine" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC combine.1" expl="1. variant decrease" expanded="true">
+  <goal name="VC combine.1" expl="variant decrease" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="VC combine.2" expl="2. precondition" expanded="true">
+  <goal name="VC combine.2" expl="precondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.02" steps="131"/></proof>
   </goal>
-  <goal name="VC combine.3" expl="3. postcondition" expanded="true">
+  <goal name="VC combine.3" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.28" steps="1672"/></proof>
   </goal>
-  <goal name="VC combine.4" expl="4. postcondition" expanded="true">
+  <goal name="VC combine.4" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.92" steps="3792"/></proof>
   </goal>
-  <goal name="VC combine.5" expl="5. variant decrease" expanded="true">
+  <goal name="VC combine.5" expl="variant decrease" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="VC combine.6" expl="6. precondition" expanded="true">
+  <goal name="VC combine.6" expl="precondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.02" steps="102"/></proof>
   </goal>
-  <goal name="VC combine.7" expl="7. precondition" expanded="true">
+  <goal name="VC combine.7" expl="precondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC combine.8" expl="8. postcondition" expanded="true">
+  <goal name="VC combine.8" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.14" steps="1011"/></proof>
   </goal>
-  <goal name="VC combine.9" expl="9. postcondition" expanded="true">
+  <goal name="VC combine.9" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="1.27" steps="5789"/></proof>
   </goal>
-  <goal name="VC combine.10" expl="10. precondition" expanded="true">
+  <goal name="VC combine.10" expl="precondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC combine.11" expl="11. postcondition" expanded="true">
+  <goal name="VC combine.11" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC combine.12" expl="12. postcondition" expanded="true">
+  <goal name="VC combine.12" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="83"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC all_trees" expl="VC for all_trees" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC all_trees.1" expl="1. array creation size" expanded="true">
+  <goal name="VC all_trees.1" expl="array creation size" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC all_trees.2" expl="2. index in array bounds" expanded="true">
+  <goal name="VC all_trees.2" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC all_trees.3" expl="3. loop invariant init" expanded="true">
+  <goal name="VC all_trees.3" expl="loop invariant init" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC all_trees.4" expl="4. index in array bounds" expanded="true">
+  <goal name="VC all_trees.4" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC all_trees.5" expl="5. loop invariant init" expanded="true">
+  <goal name="VC all_trees.5" expl="loop invariant init" expanded="true">
   <proof prover="9"><result status="valid" time="0.02" steps="177"/></proof>
   </goal>
-  <goal name="VC all_trees.6" expl="6. loop invariant init" expanded="true">
+  <goal name="VC all_trees.6" expl="loop invariant init" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC all_trees.7" expl="7. loop invariant init" expanded="true">
+  <goal name="VC all_trees.7" expl="loop invariant init" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="140"/></proof>
   </goal>
-  <goal name="VC all_trees.8" expl="8. index in array bounds" expanded="true">
+  <goal name="VC all_trees.8" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC all_trees.9" expl="9. index in array bounds" expanded="true">
+  <goal name="VC all_trees.9" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC all_trees.10" expl="10. index in array bounds" expanded="true">
+  <goal name="VC all_trees.10" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC all_trees.11" expl="11. precondition" expanded="true">
+  <goal name="VC all_trees.11" expl="precondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC all_trees.12" expl="12. index in array bounds" expanded="true">
+  <goal name="VC all_trees.12" expl="index in array bounds" expanded="true">
   <proof prover="9"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC all_trees.13" expl="13. loop invariant preservation" expanded="true">
+  <goal name="VC all_trees.13" expl="loop invariant preservation" expanded="true">
   <proof prover="9"><result status="valid" time="0.04" steps="116"/></proof>
   </goal>
-  <goal name="VC all_trees.14" expl="14. loop invariant preservation" expanded="true">
+  <goal name="VC all_trees.14" expl="loop invariant preservation" expanded="true">
   <proof prover="9"><result status="valid" time="0.05" steps="230"/></proof>
   </goal>
-  <goal name="VC all_trees.15" expl="15. loop invariant preservation" expanded="true">
+  <goal name="VC all_trees.15" expl="loop invariant preservation" expanded="true">
   <proof prover="9"><result status="valid" time="3.88" steps="12588"/></proof>
   </goal>
-  <goal name="VC all_trees.16" expl="16. loop invariant preservation" expanded="true">
+  <goal name="VC all_trees.16" expl="loop invariant preservation" expanded="true">
   <proof prover="9"><result status="valid" time="0.02" steps="175"/></proof>
   </goal>
-  <goal name="VC all_trees.17" expl="17. loop invariant preservation" expanded="true">
+  <goal name="VC all_trees.17" expl="loop invariant preservation" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC all_trees.18" expl="18. postcondition" expanded="true">
+  <goal name="VC all_trees.18" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC all_trees.19" expl="19. postcondition" expanded="true">
+  <goal name="VC all_trees.19" expl="postcondition" expanded="true">
   <proof prover="9"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
  </transf>

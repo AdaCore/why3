@@ -2,10 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../vacid_0_sparse_array.mlw" expanded="true">
-<theory name="SparseArray" sum="549afd3ab706382e3916fec804ac2671" expanded="true">
+<theory name="SparseArray" sum="c4f44837fbb052f9a1a66bfb414dfc1e" expanded="true">
+ <goal name="VC sparse_array" expl="VC for sparse_array">
+ <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+ </goal>
  <goal name="VC create" expl="VC for create">
  <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
  </goal>
@@ -15,59 +18,52 @@
  <goal name="VC get" expl="VC for get">
  <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
- <goal name="permutation">
+ <goal name="permutation" expl="">
  <transf name="split_goal_wp">
-  <goal name="permutation.1" expl="1.">
-  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="permutation.1" expl="">
+  <proof prover="2"><result status="valid" time="0.00" steps="48"/></proof>
   </goal>
-  <goal name="permutation.2" expl="2.">
-  <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
+  <goal name="permutation.2" expl="">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="permutation.3" expl="3.">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="permutation.3" expl="">
+  <proof prover="2"><result status="valid" time="0.02" steps="61"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC set" expl="VC for set">
  <transf name="split_goal_wp">
-  <goal name="VC set.1" expl="1. index in array bounds">
+  <goal name="VC set.1" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC set.2" expl="2. type invariant">
+  <goal name="VC set.2" expl="type invariant">
   <proof prover="2"><result status="valid" time="0.08" steps="249"/></proof>
   </goal>
-  <goal name="VC set.3" expl="3. precondition">
+  <goal name="VC set.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC set.4" expl="4. assertion">
+  <goal name="VC set.4" expl="assertion">
   <proof prover="2"><result status="valid" time="0.08" steps="145"/></proof>
   </goal>
-  <goal name="VC set.5" expl="5. index in array bounds">
+  <goal name="VC set.5" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC set.6" expl="6. index in array bounds">
+  <goal name="VC set.6" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
-  <goal name="VC set.7" expl="7. type invariant">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="VC set.7" expl="type invariant">
+  <proof prover="2"><result status="valid" time="2.02" steps="2596"/></proof>
   </goal>
-  <goal name="VC set.8" expl="8. postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC set.8.1" expl="1. VC for set">
-   <proof prover="2"><result status="valid" time="0.04" steps="119"/></proof>
-   </goal>
-   <goal name="VC set.8.2" expl="2. VC for set">
-   <proof prover="2"><result status="valid" time="0.43" steps="527"/></proof>
-   </goal>
-  </transf>
+  <goal name="VC set.8" expl="postcondition">
+  <proof prover="2"><result status="valid" time="1.64" steps="1932"/></proof>
   </goal>
-  <goal name="VC set.9" expl="9. postcondition">
+  <goal name="VC set.9" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.06" steps="105"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Harness" sum="2eb3b69ff9e134fa8ed2deedc8c15672" expanded="true">
+<theory name="Harness" sum="c10828e8105c26fcbea7fd4e3eff95c9" expanded="true">
  <goal name="VC default" expl="VC for default">
  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
@@ -78,7 +74,7 @@
  <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
  <goal name="VC harness" expl="VC for harness">
- <proof prover="2"><result status="valid" time="0.61" steps="2246"/></proof>
+ <proof prover="2"><result status="valid" time="0.61" steps="2244"/></proof>
  </goal>
  <goal name="VC bench" expl="VC for bench">
  <proof prover="2"><result status="valid" time="0.02" steps="172"/></proof>

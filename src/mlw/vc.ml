@@ -1449,4 +1449,34 @@ let vc env kn tuc d = match d.pd_node with
       let env = mk_env env kn tuc in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
       List.map2 (fun rd f -> mk_vc_decl kn rd.rec_sym.rs_name f) rdl fl
+  | PDtype tdl ->
+      let add_witness d vcl =
+        let add_fd (mv,ldl) fd e =
+          let fd = fd_of_rs fd in
+          let id = id_clone fd.pv_vs.vs_name in
+          let ld, v = let_var id ~ghost:fd.pv_ghost e in
+          Mvs.add fd.pv_vs (t_var v.pv_vs) mv, ld::ldl in
+        let mv, ldl = List.fold_left2 add_fd
+          (Mvs.empty, []) d.itd_fields d.itd_witness in
+        let e = List.fold_right (fun f e ->
+          let f = vc_expl None Slab.empty expl_type_inv (t_subst mv f) in
+          let ld, _ = let_var (id_fresh "_") (e_assert Assert f) in
+          e_let ld e) d.itd_invariant e_void in
+        let e = List.fold_right e_let ldl e in
+        let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
+        let f = vc_fun (mk_env env kn tuc)
+          (Debug.test_noflag debug_sp) c.c_cty e in
+        mk_vc_decl kn d.itd_its.its_ts.ts_name f :: vcl in
+      let add_invariant d vcl =
+        let vs_of_rs fd = (fd_of_rs fd).pv_vs in
+        let vl = List.map vs_of_rs d.itd_fields in
+        let expl f = vc_expl None Slab.empty expl_type_inv f in
+        let f = t_and_asym_l (List.map expl d.itd_invariant) in
+        let f = t_exists_close_simp vl [] f in
+        mk_vc_decl kn d.itd_its.its_ts.ts_name f :: vcl in
+      let add_itd d vcl =
+        if d.itd_witness <> [] then add_witness d vcl else
+        if d.itd_invariant <> [] then add_invariant d vcl else
+        vcl in
+      List.fold_right add_itd tdl []
   | _ -> []

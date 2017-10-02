@@ -104,10 +104,10 @@ let print_cell fmt pa =
 let rec print_line fmt provers a =
   begin match a with
   | Session.Goal a ->
-    fprintf fmt "\"%s\"" a.Session.goal_name.Ident.id_string;
+    fprintf fmt "\"%s\"" (Session.goal_name a).Ident.id_string;
     Whyconf.Sprover.iter (fun p ->
       try
-        let pa = Session.PHprover.find a.Session.goal_external_proofs p in
+        let pa = Session.PHprover.find (Session.goal_external_proofs a) p in
         fprintf fmt ",%a" print_cell pa
       with Not_found ->
         fprintf fmt ",") provers;

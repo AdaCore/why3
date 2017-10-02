@@ -14,9 +14,19 @@
 **  Counter-example model values
 ****************************************************************
 *)
+
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
+
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record

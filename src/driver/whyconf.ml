@@ -396,8 +396,6 @@ let set_policies rc policy =
   in
   set_family rc "uninstalled_prover" family
 
-let absolute_filename = Sysutil.absolutize_filename
-
 exception DuplicateShortcut of string
 
 let add_prover_shortcuts acc prover shortcuts =
@@ -408,7 +406,7 @@ let add_prover_shortcuts acc prover shortcuts =
   ) acc shortcuts
 
 
-let load_prover dirname (provers,shortcuts) section =
+let load_prover (provers,shortcuts) section =
   try
     let name = get_string section "name" in
     let version = get_string ~default:"" section "version" in
@@ -423,7 +421,7 @@ let load_prover dirname (provers,shortcuts) section =
       { prover  = prover;
         command = get_string section "command";
 	command_steps = get_stringo section "command_steps";
-        driver  = absolute_filename dirname (get_string section "driver");
+        driver  = get_string section "driver";
         in_place = get_bool ~default:false section "in_place";
         editor  = get_string ~default:"" section "editor";
         interactive = get_bool ~default:false section "interactive";
@@ -524,7 +522,7 @@ let load_main dirname section =
     raise WrongMagicNumber;
   { libdir    = get_string ~default:default_main.libdir section "libdir";
     datadir   = get_string ~default:default_main.datadir section "datadir";
-    loadpath  = List.map (absolute_filename dirname)
+    loadpath  = List.map (Sysutil.absolutize_filename dirname)
       (get_stringl ~default:[] section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
     memlimit  = get_int ~default:default_main.memlimit section "memlimit";
@@ -550,7 +548,7 @@ let read_config_rc conf_file =
 exception ConfigFailure of string (* filename *) * string
 
 let get_dirname filename =
-  Filename.dirname (absolute_filename (Sys.getcwd ()) filename)
+  Filename.dirname (Sysutil.absolutize_filename (Sys.getcwd ()) filename)
 
 let get_config (filename,rc) =
   let dirname = get_dirname filename in
@@ -560,7 +558,7 @@ let get_config (filename,rc) =
       | Some main -> rc, load_main dirname main
   in
   let provers = get_simple_family rc "prover" in
-  let provers,shortcuts = List.fold_left (load_prover dirname)
+  let provers,shortcuts = List.fold_left load_prover
     (Mprover.empty,Mstr.empty) provers in
   let fam_shortcuts = get_simple_family rc "shortcut" in
   let shortcuts = List.fold_left load_shortcut shortcuts fam_shortcuts in
@@ -682,7 +680,7 @@ let merge_config config filename =
   let main = match get_section rc "main" with
     | None -> config.main
     | Some rc ->
-      let loadpath = (List.map (absolute_filename dirname)
+      let loadpath = (List.map (Sysutil.absolutize_filename dirname)
         (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
       let plugins =
         (get_stringl ~default:[] rc "plugin") @ config.main.plugins in
@@ -713,15 +711,14 @@ let merge_config config filename =
         if not (filter_prover fp p) then c
         else
           let opt = get_stringl ~default:[] section "option" in
-          let drv = List.map (absolute_filename dirname)
-            (get_stringl ~default:[] section "driver") in
+          let drv = get_stringl ~default:[] section "driver" in
           { c with
             extra_options = opt @ c.extra_options;
             extra_drivers = drv @ c.extra_drivers })
         provers
     ) config.provers prover_modifiers in
   let provers,shortcuts =
-    List.fold_left (load_prover dirname)
+    List.fold_left load_prover
       (provers,config.prover_shortcuts) (get_simple_family rc "prover") in
   (* modify editors *)
   let editor_modifiers = get_family rc "editor_modifiers" in
@@ -911,3 +908,15 @@ module Args = struct
     Arg.usage (align_options options) usage;
     exit 1
 end
+
+
+
+(** Loading drivers with relative names *)
+
+let absolute_driver_file main s =
+  if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
+  else Filename.concat main.datadir (Filename.concat "drivers" (s ^ ".drv"))
+
+let load_driver main env file extras =
+  let file = absolute_driver_file main file in
+  Driver.load_driver_absolute env file extras

@@ -8,73 +8,73 @@
 <theory name="Tree" sum="c05a159c0fca07eac9e3cabdb81061c8">
  <goal name="VC is_empty" expl="VC for is_empty">
  <transf name="split_goal_wp">
-  <goal name="VC is_empty.1" expl="1. postcondition">
+  <goal name="VC is_empty.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC is_empty.2" expl="2. postcondition">
+  <goal name="VC is_empty.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Size" sum="c95b1351eccb384b94186fb677a43958">
+<theory name="Size" sum="25151db6b3d3cc6174f10a3a39c2edef">
  <goal name="VC size" expl="VC for size">
  <transf name="split_goal_wp">
  </transf>
  </goal>
- <goal name="size_nonneg">
+ <goal name="size_nonneg" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_nonneg.1" expl="1.">
+  <goal name="size_nonneg.1" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="size_empty">
+ <goal name="size_empty" expl="">
  <transf name="induction_ty_lex">
-  <goal name="size_empty.1" expl="1.">
+  <goal name="size_empty.1" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Occ" sum="a6d05d1546b283b586705e7f9e1097ca">
- <goal name="occ_nonneg">
+<theory name="Occ" sum="e14989349e39a9623554727d87f4f045">
+ <goal name="occ_nonneg" expl="">
  <transf name="induction_ty_lex">
-  <goal name="occ_nonneg.1" expl="1.">
+  <goal name="occ_nonneg.1" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Height" sum="1f2ac4a274f28eeec0cb336c3f55ab24">
+<theory name="Height" sum="14f2c751c348b80453a8fea15102cb33">
  <goal name="VC height" expl="VC for height">
  <transf name="split_goal_wp">
  </transf>
  </goal>
- <goal name="height_nonneg">
+ <goal name="height_nonneg" expl="">
  <transf name="induction_ty_lex">
-  <goal name="height_nonneg.1" expl="1.">
+  <goal name="height_nonneg.1" expl="">
   <proof prover="1" timelimit="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Inorder" sum="075e0b87ec051cfa327032ae4acae32e">
+<theory name="Inorder" sum="4fca30ee436b71a9157f8610a88f8fd0">
  <goal name="VC inorder" expl="VC for inorder">
  <transf name="split_goal_wp">
  </transf>
  </goal>
 </theory>
-<theory name="Preorder" sum="075e0b87ec051cfa327032ae4acae32e">
+<theory name="Preorder" sum="4fca30ee436b71a9157f8610a88f8fd0">
  <goal name="VC preorder" expl="VC for preorder">
  <transf name="split_goal_wp">
  </transf>
  </goal>
 </theory>
-<theory name="InorderLength" sum="69257e9abe85c139ccf73e2b1d93a296">
- <goal name="inorder_length">
+<theory name="InorderLength" sum="f063cf6c9f0b5640a312165a548dda7a">
+ <goal name="inorder_length" expl="">
  <transf name="induction_ty_lex">
-  <goal name="inorder_length.1" expl="1.">
+  <goal name="inorder_length.1" expl="">
   <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
  </transf>

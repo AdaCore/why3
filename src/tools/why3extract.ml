@@ -146,10 +146,8 @@ let print_mdecls ?fname m mdecls =
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
     let flat = opt_modu_flat = Flat in
-    List.iter
-      (fun s -> fprintf fmt "%s@." s)
-      pargs.Pdriver.prelude;
-    List.iter (pr pargs ?old ?fname ~flat m fmt) mdecls;
+    let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
+    Pp.print_list Pp.newline pr_decl fmt mdecls;
     if cout <> stdout then close_out cout end
 
 let find_module_path mm path m = match path with
@@ -170,7 +168,7 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
-let not_extractable_theories = ["why3"; "map";]
+let not_extractable_theories = ["why3"; "map"; "seq"; ]
 
 let is_not_extractable_theory =
   let h = Hstr.create 16 in
@@ -207,11 +205,6 @@ let rec do_extract_module ?fname m =
   end;
   extract_to ?fname m
 
-(* let do_global_extract (_,p,t) = *)
-(*   let env = opt_driver.Pdriver.drv_env in *)
-(*   let m = read_module env p t in *)
-(*   do_extract_module m *)
-
 let do_extract_module_from fname mm m =
   try
     let m = Mstr.find m mm in do_extract_module ~fname m
@@ -240,10 +233,13 @@ let find_pmod m mlw_file fname =
     eprintf "Module '%s' not found in the file '%s'.@." m fname;
     exit 1
 
-let do_extract_symbol_from ?fname m str_symbol =
+let find_pdecl m s =
   let ns = m.mod_export in
-  let id = find_symbol_id ns str_symbol in
-  let decl = Ident.Mid.find id m.mod_known in
+  let id = find_symbol_id ns s in
+  Ident.Mid.find id m.mod_known
+
+let do_extract_symbol_from ?fname m str_symbol =
+  let decl = find_pdecl m str_symbol in
   extract_to ?fname ~decl m
 
 let read_mlw_file ?format env fname =
@@ -268,6 +264,11 @@ let do_modular target =
     let m = find_module_path mm path m in
     do_extract_symbol_from m s
 
+type extract_info = {
+  info_rec : bool;
+  info_id  : Ident.ident;
+}
+
 let visited = Ident.Hid.create 1024
 let toextract = ref []
 
@@ -277,12 +278,11 @@ let find_decl mm id =
   Ident.Mid.find id m.Mltree.mod_known
 
 let rec visit ~recurs mm id =
-  if not (Ident.Hid.mem visited id) then begin
-    try
+  if not (Ident.Hid.mem visited id) then begin try
       let d = find_decl mm id in
       Ident.Hid.add visited id ();
       if recurs then ML.iter_deps (visit ~recurs mm) d;
-      toextract := id :: !toextract
+      toextract := { info_rec = recurs; info_id = id } :: !toextract
     with Not_found -> ()
   end
 
@@ -309,16 +309,15 @@ let flat_extraction mm = function
     let id = find_symbol_id ns s in
     let recurs = opt_rec_single = Recursive in
     visit ~recurs mm id;
-    Mstr.add ms m mm
+    (* Mstr.add ms m  *)mm
 
 let () =
   try
     match opt_modu_flat with
-    | Modular ->
-      Queue.iter do_modular opt_queue
-    | Flat ->
-      let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
-      let visit_m _ m = let tm = translate_module m in
+    | Modular -> Queue.iter do_modular opt_queue
+    | Flat -> let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
+      let visit_m _ m =
+        let tm = translate_module m in
         let visit_id id _ = visit ~recurs:true mm id in
         Ident.Mid.iter visit_id tm.Mltree.mod_known in
       Mstr.iter visit_m mm;
@@ -328,29 +327,23 @@ let () =
         | Some file -> open_out file in
       let fmt = formatter_of_out_channel cout in
       (* print driver prelude *)
-      let print_prelude = List.iter (fun s -> fprintf fmt "%s@." s) in
+      let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
       print_prelude pargs.Pdriver.prelude;
       Ident.Mid.iter (fun _ p -> print_prelude p) pargs.Pdriver.thprelude;
-      let extract fmt id =
+      let extract fmt { info_id = id } =
         let pm = find_module_id mm id in
         let m = translate_module pm in
         let d = Ident.Mid.find id m.Mltree.mod_known in
         pr pargs ~flat:true pm fmt d in
       let idl = List.rev !toextract in
-      let is_local id =
+      let is_local { info_id = id; info_rec = r } =
         let (path, m, _) = Pmodule.restore_path id in
-        path = [] || Mstr.mem m mm in
+        path = [] || Mstr.mem m mm || not r in
       let idl = match opt_rec_single with
         | Single -> List.filter is_local idl
         | Recursive -> idl in
-      List.iter (extract fmt) idl;
+      Pp.print_list Pp.newline extract fmt idl;
       if cout <> stdout then close_out cout
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3extract.opt"
-End:
-*)

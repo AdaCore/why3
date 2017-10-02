@@ -359,26 +359,19 @@ module State63
 
   use import int.Int
   use import Int63
-  use export random.Generator
 
-  type state = abstract { mutable state: generator }
+  type state = private mutable { }
 
   val create (seed: int63) : state
-    ensures { result.state = create seed }
 
   val init (s: state) (seed: int63) : unit writes {s}
-    ensures { s.state = create seed }
 
   val self_init (s: state) : unit writes {s}
 
   val random_bool (s: state) : bool writes {s}
-    ensures { s.state = next (old s.state) }
-    ensures { result = get_bool s.state }
 
   val random_int63 (s: state) (n: int63) : int63 writes {s}
     requires { 0 < n }
-    ensures  { s.state = next (old s.state) }
-    ensures  { result = get_int s.state n }
     ensures  { 0 <= result < n }
 
 end
@@ -393,7 +386,7 @@ module Random63
 
   val s: state
 
-  let init (seed: int63) ensures { s.state = create seed } = init s seed
+  let init (seed: int63) = init s seed
 
   let self_init () = self_init s
 

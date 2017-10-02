@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="4000"/>
@@ -11,29 +11,29 @@
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../triangle_inequality.why" expanded="true">
-<theory name="CauchySchwarzInequality" sum="fc6324cd7780b591c5552fe8d4419278" expanded="true">
- <goal name="norm2_pos">
+<theory name="CauchySchwarzInequality" sum="fe28dcbe5c607f8d262f19f52615f771" expanded="true">
+ <goal name="norm2_pos" expl="">
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="p_expr">
+ <goal name="p_expr" expl="">
  <proof prover="7"><result status="valid" time="0.00"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="p_pos">
+ <goal name="p_pos" expl="">
  <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="mul_div_simpl">
+ <goal name="mul_div_simpl" expl="">
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="p_val_part">
+ <goal name="p_val_part" expl="">
  <metas>
   <ls_pos name="one" id="one" ip_theory="Real">
    <ip_library name="real"/>
@@ -271,9 +271,9 @@
   <meta name="remove_prop">
    <meta_arg_pr id="p_pos"/>
   </meta>
-  <goal name="p_val_part">
+  <goal name="p_val_part" expl="">
   <transf name="eliminate_builtin">
-   <goal name="p_val_part.1" expl="1.">
+   <goal name="p_val_part.1" expl="">
    <proof prover="1" timelimit="45"><result status="valid" time="52.45" steps="13"/></proof>
    <proof prover="5"><result status="valid" time="0.01"/></proof>
    <proof prover="8"><result status="valid" time="0.00"/></proof>
@@ -282,36 +282,36 @@
   </goal>
  </metas>
  </goal>
- <goal name="p_val_part_pos">
+ <goal name="p_val_part_pos" expl="">
  <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="p_val_part_pos_aux">
+ <goal name="p_val_part_pos_aux" expl="">
  <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
  <proof prover="11"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_non_null">
- <proof prover="0" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"><result status="valid" time="0.42"/></proof>
+ <goal name="CauchySchwarz_aux_non_null" expl="">
+ <proof prover="2" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"><result status="valid" time="0.42"/></proof>
  <proof prover="11"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="norm_null">
+ <goal name="norm_null" expl="">
  <proof prover="11"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_null">
+ <goal name="CauchySchwarz_aux_null" expl="">
  <proof prover="1"><result status="valid" time="0.06" steps="18"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.28"/></proof>
  <proof prover="8"><result status="valid" time="0.00"/></proof>
  <proof prover="11"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux">
+ <goal name="CauchySchwarz_aux" expl="">
  <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="norm_pos">
+ <goal name="norm_pos" expl="">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
@@ -319,25 +319,25 @@
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="sqr_le_sqrt">
+ <goal name="sqr_le_sqrt" expl="">
  <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
  <proof prover="11"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="CauchySchwarz">
- <proof prover="0" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="0.48"/></proof>
+ <goal name="CauchySchwarz" expl="">
+ <proof prover="2" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="0.48"/></proof>
  </goal>
 </theory>
-<theory name="TriangleInequality" sum="8fa7221d5f22643da2ecab76f0c85267" expanded="true">
- <goal name="triangle_aux">
+<theory name="TriangleInequality" sum="bd361513a47191de11baae161c72c830" expanded="true">
+ <goal name="triangle_aux" expl="">
  <proof prover="8"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="sqr_sqrt_le">
+ <goal name="sqr_sqrt_le" expl="">
  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="11"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="triangle">
- <proof prover="0" edited="triangle_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.40"/></proof>
+ <goal name="triangle" expl="">
+ <proof prover="2" edited="triangle_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
 </theory>
 </file>

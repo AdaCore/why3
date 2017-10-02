@@ -213,7 +213,7 @@ let iter_proof_attempt_by_filter iter filters f session =
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
   (* verified_goal *)
   let f = three_value f filters.verified_goal
-    (fun a -> Opt.inhabited a.S.proof_parent.S.goal_verified) in
+    (fun a -> Opt.inhabited (S.goal_verified a.S.proof_parent)) in
   (* verified *)
   let f = three_value f filters.verified
     (fun p -> Opt.inhabited (S.proof_verified p)) in

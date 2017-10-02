@@ -223,7 +223,7 @@ end
 
 theory real.FromInt
 
-  syntax function from_int "(Reals.Raxioms.IZR %1)"
+  syntax function from_int "(BuiltIn.IZR %1)"
 
   remove prop Zero
   remove prop One
@@ -275,6 +275,12 @@ theory real.PowerInt
   remove prop Power_1 (* already as powerRZ_1 *)
   (* remove prop Power_sum *) (* not the same as powerRZ_add *)
   (* remove prop Power_mult *)
+
+end
+
+theory real.PowerReal
+
+  syntax function pow "(Reals.Rpower.Rpower %1 %2)"
 
 end
 

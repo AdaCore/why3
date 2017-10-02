@@ -121,6 +121,7 @@ module MapBase
 
   (** Extra invariant: sequence sorted *)
   type t 'a = { field : Sel.t 'a } invariant { selection_possible () field }
+  by { field = Sel.empty () }
 
   type m 'a = {
     domn : K.t -> bool;

@@ -1,4 +1,4 @@
-
+(* Axiom of choice *)
 module Choice
 
   use import fn.Fun
@@ -8,14 +8,14 @@ module Choice
   function choice ('a -> bool) : 'a
   axiom choice_def : forall p,x:'a. p x -> p (choice p)
 
-  let choose (p:'a -> bool) : 'a
+  let ghost choose (p:{'a} -> bool) : {'a}
     requires { exists x. p x }
     ensures { p result }
-  = choice p
+  = {choice} p
 
-  let choose_if (p:'a -> bool) : option 'a
+  let ghost choose_if (p:{'a} -> bool) : option {'a}
     returns { None -> forall x. not p x
             | Some u -> p u }
-  = let u = choice p in if p u then Some u else None
+  = let u = {choice} p in if p u then Some u else None
 
 end

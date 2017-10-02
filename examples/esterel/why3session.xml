@@ -5,8 +5,12 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="4000" memlimit="4000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="4000" memlimit="4000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="4000" memlimit="4000"/>
+<prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../esterel.mlw" expanded="true">
-<theory name="Esterel" sum="a31e00167dd5443866ecf5e98e40791c" expanded="true">
+<theory name="Esterel" sum="8bc1462db75de50f42f00666686ab8c5" expanded="true">
+ <goal name="VC s" expl="VC for s">
+ <proof prover="3"><result status="valid" time="0.02"/></proof>
+ </goal>
  <goal name="VC union" expl="VC for union">
  <proof prover="1"><result status="valid" time="0.16" steps="268"/></proof>
  </goal>
@@ -15,23 +19,23 @@
  </goal>
  <goal name="VC aboveMin" expl="VC for aboveMin">
  <transf name="split_goal_wp">
-  <goal name="VC aboveMin.1" expl="1. precondition">
+  <goal name="VC aboveMin.1" expl="precondition">
   <proof prover="2" timelimit="1" steplimit="0" memlimit="1000"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC aboveMin.2" expl="2. assertion">
+  <goal name="VC aboveMin.2" expl="assertion">
   <proof prover="1"><result status="valid" time="0.15" steps="220"/></proof>
   </goal>
-  <goal name="VC aboveMin.3" expl="3. assertion">
+  <goal name="VC aboveMin.3" expl="assertion">
   <proof prover="0"><result status="valid" time="0.22"/></proof>
   <proof prover="2"><result status="valid" time="0.31"/></proof>
   </goal>
-  <goal name="VC aboveMin.4" expl="4. assertion">
+  <goal name="VC aboveMin.4" expl="assertion">
   <proof prover="0"><result status="valid" time="0.19"/></proof>
   </goal>
-  <goal name="VC aboveMin.5" expl="5. precondition">
+  <goal name="VC aboveMin.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.30" steps="305"/></proof>
   </goal>
-  <goal name="VC aboveMin.6" expl="6. postcondition">
+  <goal name="VC aboveMin.6" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02" steps="76"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -40,29 +44,29 @@
  </goal>
  <goal name="VC maxUnion" expl="VC for maxUnion">
  <transf name="split_goal_wp">
-  <goal name="VC maxUnion.1" expl="1. precondition">
+  <goal name="VC maxUnion.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC maxUnion.2" expl="2. precondition">
+  <goal name="VC maxUnion.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.01" steps="72"/></proof>
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC maxUnion.3" expl="3. assertion">
+  <goal name="VC maxUnion.3" expl="assertion">
   <proof prover="0"><result status="valid" time="0.25"/></proof>
   <proof prover="2"><result status="valid" time="0.40"/></proof>
   </goal>
-  <goal name="VC maxUnion.4" expl="4. postcondition">
-  <proof prover="1"><result status="valid" time="1.82" steps="2018"/></proof>
+  <goal name="VC maxUnion.4" expl="postcondition">
+  <proof prover="1"><result status="valid" time="1.41" steps="2018"/></proof>
   </goal>
-  <goal name="VC maxUnion.5" expl="5. postcondition">
+  <goal name="VC maxUnion.5" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="VC maxUnion.5.1" expl="1. postcondition">
+   <goal name="VC maxUnion.5.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="VC maxUnion.5.2" expl="2. postcondition">
+   <goal name="VC maxUnion.5.2" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
    <proof prover="1"><result status="valid" time="0.28" steps="334"/></proof>
    </goal>

@@ -41,6 +41,7 @@ module Compiler_logic
     (* (Total) correctness for hoare triple. *)
     invariant { forall x:'a,p ms. pre x p ms ->
       exists ms'. post x p ms ms' /\ contextual_irrelevance code p ms ms' }
+    by { code = Nil; pre = (fun _ _ _ -> false); post = fun _ _ _ _ -> true }
 
   (* Predicate transformer type. Same auxiliary variables as for
      Hoare triples. *)
@@ -51,6 +52,7 @@ module Compiler_logic
     (* Similar invariant for backward predicate transformers *)
     invariant { forall x:'a,p post ms. wp x p post ms ->
       exists ms'. post ms' /\ contextual_irrelevance wcode p ms ms' }
+    by { wcode = Nil; wp = fun _ _ _ _ -> false }
 
   (* WP combinator for sequence. Similar to the standard WP calculus
      for sequence. The initial machine state is memorized in auxiliary

@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Stdlib
 open Smt2_model_defs
 open Strings
@@ -8,7 +19,7 @@ exception Not_value
 let rec get_variables_term (table: correspondence_table) t =
   match t with
   | Variable _ | Function_Local_Variable _ | Boolean _ | Integer _
-  | Decimal _ | Other _ | Bitvector _ -> table
+  | Decimal _ | Float _ | Other _ | Bitvector _ -> table
   | Array a ->
     get_variables_array table a
   | Ite (t1, t2, t3, t4) ->
@@ -28,7 +39,6 @@ let rec get_variables_term (table: correspondence_table) t =
     List.fold_left (fun table t -> get_variables_term table t) table l
   | To_array t ->
     get_variables_term table t
-
 
 and get_variables_array table a =
    match a with
@@ -143,7 +153,7 @@ and refine_array table a =
    their value. *)
 and refine_function table term =
   match term with
-  | Integer _ | Decimal _ | Other _ | Bitvector _ | Boolean _ -> term
+  | Integer _ | Decimal _ | Float _ | Other _ | Bitvector _ | Boolean _ -> term
   | Cvc4_Variable v ->
     begin
       try (
@@ -192,12 +202,21 @@ and refine_variable_value (table: correspondence_table) key v =
     let tv = refine_definition table t in
     Mstr.add key (true, tv) table
 
+let convert_float (f: Smt2_model_defs.float_type) : Model_parser.float_type =
+  match f with
+  | Plus_infinity           -> Model_parser.Plus_infinity
+  | Minus_infinity          -> Model_parser.Minus_infinity
+  | Plus_zero               -> Model_parser.Plus_zero
+  | Minus_zero              -> Model_parser.Minus_zero
+  | Not_a_number            -> Model_parser.Not_a_number
+  | Float_value (b, eb, sb) -> Model_parser.Float_value (b, eb, sb)
 
 (* Conversion to value referenced as defined in model_parser.
    We assume that array indices fit into an integer *)
 let convert_to_indice t =
   match t with
   | Integer i -> i
+  | Bitvector bv -> bv
   | _ -> raise Not_value
 
 let rec convert_array_value (a: array) : Model_parser.model_array =
@@ -219,6 +238,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   match t with
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
+  | Float f -> Model_parser.Float (convert_float f)
   | Bitvector bv -> Model_parser.Bitvector bv
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
@@ -228,7 +248,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   | Cvc4_Variable _v -> Model_parser.Unparsed "!"
   (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
   | To_array t -> convert_to_model_value (Array (convert_z3_array t))
-  | _ -> raise Not_value
+  | Function_Local_Variable _ | Variable _ | Ite _ | Discr _ -> raise Not_value
 
 and convert_z3_array (t: term) : array =
 
@@ -368,12 +388,15 @@ let create_list (table: correspondence_table) =
     Mstr.fold (fun key v acc -> refine_variable_value acc key v) table table in
 
   (* Then converts all variables to raw_model_element *)
-  Mstr.fold (fun key value list_acc ->
-    let t = match value with
-    | (_, Term t) ->
-        Some t
-    | (_, Function ([], t)) ->
-        Some t
-    | _ -> None in
+  Mstr.fold
+    (fun key value list_acc ->
+      let t = match value with
+      | (_, Term t) ->
+          Some t
+      | (_, Function ([], t)) ->
+          Some t
+      | _ -> None in
       try (convert_to_model_element key t :: list_acc)
-      with Not_value -> list_acc) table []
+      with Not_value -> list_acc)
+    table
+    []

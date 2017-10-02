@@ -69,6 +69,7 @@ run_dir .
 run_dir double_wp "-L double_wp"
 run_dir avl "-L avl"
 run_dir foveoos11-cm
+run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 echo ""
 
 echo "Score on ported programs : $success/$total"
@@ -78,7 +79,6 @@ echo "=== Programs that remain to be ported ==="
 echo ""
 run_dir to_port
 run_dir WP_revisited
-run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 echo ""
 
 echo "=== Standard Library ==="

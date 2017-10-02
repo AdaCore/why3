@@ -63,6 +63,8 @@ module Caterpillar
     b.h = ch /\
     xs_len = length xs < ch /\
     forall len. 0 <= len <= ch -> take len (xs ++ ys) = take len b.xs
+  } by {
+    ch = 1; xs = Nil; xs_len = 0; ys = Nil; b = empty 1
   }
 
   (* for the three operations, the postcondition uses the default
@@ -126,6 +128,8 @@ module RealTime
     b.h = ch /\
     xs_len = length xs < ch /\
     forall len. 0 <= len <= ch -> take len (xs ++ ys) = take len b.xs
+  } by {
+    ch = 1; xs = Nil; xs_len = 0; ys = Nil; b = empty 1
   }
 
   (* garbage collection *)

@@ -74,3 +74,71 @@ module McCarthy91
     with Stop -> !n end
 
 end
+
+module McCarthy91Mach
+
+  use import int.Int
+  use import mach.int.Int63
+
+  function spec (x: int) : int = if x <= 100 then 91 else x-10
+
+  let rec f91 (n: int63) : int63
+    variant { 101 - n }
+    ensures { result = spec n }
+  = if n <= of_int 100 then
+      f91 (f91 (n + of_int 11))
+    else
+      n - of_int 10
+
+  use import mach.peano.Peano
+  use import mach.int.Refint63
+  use import int.Iter
+
+  let f91_nonrec (n0: int63) : int63
+    ensures { result = spec n0 }
+  = let e = ref one in
+    let n = ref n0 in
+    while gt !e zero do
+      invariant { !e >= 0 /\ iter spec !e !n = spec n0 }
+      variant   { 101 - !n + 10 * !e, !e:int }
+      if !n > Int63.of_int 100 then begin
+        n := !n - Int63.of_int 10;
+        e := pred !e
+      end else begin
+        n := !n + Int63.of_int 11;
+        e := succ !e
+      end
+    done;
+    !n
+
+  exception Stop
+
+  let f91_pseudorec (n0: int63) : int63
+    ensures { result = spec n0 }
+  = let e = ref one in
+    let n = ref n0 in
+    let bloc () : unit
+      requires { !e >= 0 }
+      ensures { !(old e) > 0 }
+      ensures { if !(old n) > 100 then !n = !(old n) - 10 /\ !e = !(old e) - 1
+        else !n = !(old n) + 11 /\ !e = !(old e) + 1 }
+      raises { Stop -> !e = !(old e) = 0 /\ !n = !(old n) }
+    = if not (gt !e zero) then raise Stop;
+      if !n > Int63.of_int 100 then begin
+        n := !n - Int63.of_int 10;
+        e := pred !e
+      end else begin
+        n := !n + Int63.of_int 11;
+        e := succ !e
+      end
+    in
+    let rec aux () : unit
+      requires { !e > 0 }
+      variant { 101 - !n }
+      ensures { !e = !(old e) - 1 /\ !n = spec !(old n) }
+      raises { Stop -> false }
+    = let u = !n in bloc (); if u <= Int63.of_int 100 then (aux (); aux ()) in
+    try aux (); bloc (); absurd
+    with Stop -> !n end
+
+end

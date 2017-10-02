@@ -197,7 +197,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		instantiate_predicate smoke_detector \
 		induction_pr prop_curry eliminate_literal
 
-LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 smtv2_cvc_ce coq\
+LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
@@ -822,7 +822,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
+COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
 COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -851,6 +851,9 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
 
 ifeq (@coq_compat_version@,COQ86)
+COQRTAC += -I lib/coq-tactic
+endif
+ifeq (@coq_compat_version@,COQ87)
 COQRTAC += -I lib/coq-tactic
 endif
 
@@ -2098,6 +2101,16 @@ clean::
 	rm -f $(GENERATED)
 	$(foreach d,$(CLEANDIRS),rm -f $(addprefix $(d)/*.,$(COMPILED_LIB_EXTS));)
 	$(foreach p,$(CLEANLIBS),rm -f $(addprefix $(p).,$(COMPILED_LIB_EXTS));)
+
+detect-unused:
+	@L1=$$(mktemp); \
+	L2=$$(mktemp); \
+	for d in `find examples/ -name 'why3session.xml' -printf '%h\n'`; do \
+	  sed -n -e 's/.*edited="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
+	  (cd $$d; git ls-files) | grep -v -e '^why3session.xml' -e '^why3shapes' -e '^[.]gitignore' -e '^Makefile' -e '[.]ml$$' -e '[.]html$$' | sed -e 's/[.]prf$$/.pvs/;s/[.]thy$$/.xml/' | sort -u > $$L2; \
+	  diff -u --label="$$d/why3session.xml" --label="$$d/" $$L1 $$L2 || echo; \
+	done; \
+	rm $$L1 $$L2
 
 ##################################################################
 # Building the Why3 platform with ocamlbuild (OCaml 3.10 needed) #

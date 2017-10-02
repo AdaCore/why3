@@ -2,6 +2,7 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 Require int.Abs.
 Require int.ComputerDivision.
@@ -9,44 +10,31 @@ Require option.Option.
 Require list.List.
 Require list.Mem.
 Require map.Map.
+Require map.Const.
 
-(* Why3 assumption *)
-Definition unit := unit.
-
-Axiom qtmark : Type.
-Parameter qtmark_WhyType : WhyType qtmark.
-Existing Instance qtmark_WhyType.
-
-(* Why3 assumption *)
-Inductive array (a:Type) :=
-  | mk_array : Z -> (map.Map.map Z a) -> array a.
-Axiom array_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
+Axiom array : forall (a:Type), Type.
+Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
+  WhyType (array a).
 Existing Instance array_WhyType.
-Implicit Arguments mk_array [[a]].
+
+Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+
+Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+
+Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
+  a)), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition elts {a:Type} {a_WT:WhyType a} (v:(array a)): (map.Map.map Z a) :=
-  match v with
-  | (mk_array x x1) => x1
-  end.
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
+  ((elts a1) i).
 
-(* Why3 assumption *)
-Definition length {a:Type} {a_WT:WhyType a} (v:(array a)): Z :=
-  match v with
-  | (mk_array x x1) => x
-  end.
+Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
+  Z -> a -> (array a).
 
-(* Why3 assumption *)
-Definition get {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  (map.Map.get (elts a1) i).
-
-(* Why3 assumption *)
-Definition set {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z) (v:a): (array
-  a) := (mk_array (length a1) (map.Map.set (elts a1) i v)).
-
-(* Why3 assumption *)
-Definition make {a:Type} {a_WT:WhyType a} (n:Z) (v:a): (array a) :=
-  (mk_array n (map.Map.const v: (map.Map.map Z a))).
+Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
+  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
+  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
+  v)) = (map.Map.set (elts a1) i v)).
 
 Axiom key : Type.
 Parameter key_WhyType : WhyType key.
@@ -54,79 +42,72 @@ Existing Instance key_WhyType.
 
 Parameter hash: key -> Z.
 
-Axiom hash_nonneg : forall (k:key), (0%Z <= (hash k))%Z.
+Axiom hash_spec : forall (us:key), (0%Z <= (hash us))%Z.
 
-(* Why3 assumption *)
-Definition bucket (k:key) (n:Z): Z := (ZArith.BinInt.Z.rem (hash k) n).
+Parameter bucket: key -> Z -> Z.
+
+Axiom bucket_def : forall (k:key) (n:Z), (0%Z < n)%Z -> ((bucket k
+  n) = (ZArith.BinInt.Z.rem (hash k) n)).
+
+Axiom bucket_spec : forall (k:key) (n:Z), (0%Z < n)%Z -> ((0%Z <= (bucket k
+  n))%Z /\ ((bucket k n) < n)%Z).
 
 Axiom bucket_bounds : forall (n:Z), (0%Z < n)%Z -> forall (k:key),
   (0%Z <= (bucket k n))%Z /\ ((bucket k n) < n)%Z.
 
 (* Why3 assumption *)
 Definition in_data {a:Type} {a_WT:WhyType a} (k:key) (v:a) (d:(array
-  (list (key* a)%type))): Prop := (list.Mem.mem (k, v) (get d (bucket k
-  (length d)))).
+  (list (key* a)%type))): Prop := (list.Mem.mem (k, v) (mixfix_lbrb d
+  (bucket k (length d)))).
 
 (* Why3 assumption *)
-Definition good_data {a:Type} {a_WT:WhyType a} (k:key) (v:a) (m:(map.Map.map
-  key (option a))) (d:(array (list (key* a)%type))): Prop := ((map.Map.get m
+Definition good_data {a:Type} {a_WT:WhyType a} (k:key) (v:a) (m:(key ->
+  (option a))) (d:(array (list (key* a)%type))): Prop := ((m
   k) = (Init.Datatypes.Some v)) <-> (in_data k v d).
 
 (* Why3 assumption *)
 Definition good_hash {a:Type} {a_WT:WhyType a} (d:(array (list (key*
-  a)%type))) (i:Z): Prop := forall (k:key) (v:a), (list.Mem.mem (k, v) (get d
-  i)) -> ((bucket k (length d)) = i).
+  a)%type))) (i:Z): Prop := forall (k:key) (v:a), (list.Mem.mem (k, v)
+  (mixfix_lbrb d i)) -> ((bucket k (length d)) = i).
 
-(* Why3 assumption *)
-Inductive t
-  (a:Type) :=
-  | mk_t : Z -> (array (list (key* a)%type)) -> (map.Map.map key
-      (option a)) -> t a.
-Axiom t_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t a).
+Axiom t : forall (a:Type), Type.
+Parameter t_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (t a).
 Existing Instance t_WhyType.
-Implicit Arguments mk_t [[a]].
 
-(* Why3 assumption *)
-Definition view {a:Type} {a_WT:WhyType a} (v:(t a)): (map.Map.map key
-  (option a)) := match v with
-  | (mk_t x x1 x2) => x2
-  end.
+Parameter size: forall {a:Type} {a_WT:WhyType a}, (t a) -> Z.
 
-(* Why3 assumption *)
-Definition data {a:Type} {a_WT:WhyType a} (v:(t a)): (array (list (key*
-  a)%type)) := match v with
-  | (mk_t x x1 x2) => x1
-  end.
+Parameter data: forall {a:Type} {a_WT:WhyType a}, (t a) -> (array (list (key*
+  a)%type)).
 
-(* Why3 assumption *)
-Definition size {a:Type} {a_WT:WhyType a} (v:(t a)): Z :=
-  match v with
-  | (mk_t x x1 x2) => x
-  end.
+Parameter view: forall {a:Type} {a_WT:WhyType a}, (t a) -> (key ->
+  (option a)).
+
+Axiom t'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(t a)),
+  (0%Z < (length (data self)))%Z /\ ((forall (i:Z), ((0%Z <= i)%Z /\
+  (i < (length (data self)))%Z) -> (good_hash (data self) i)) /\
+  forall (k:key) (v:a), (good_data k v (view self) (data self))).
 
 (* Why3 goal *)
-Theorem WP_parameter_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:Z)
-  (h1:(map.Map.map Z (list (key* a)%type))) (h2:(map.Map.map key (option a)))
-  (k:key), (((0%Z < h)%Z /\ ((forall (i:Z), ((0%Z <= i)%Z /\ (i < h)%Z) ->
-  (good_hash (mk_array h h1) i)) /\ forall (k1:key) (v:a), (good_data k1 v h2
-  (mk_array h h1)))) /\ (0%Z <= h)%Z) -> let i := (bucket k h) in
-  (((0%Z <= i)%Z /\ (i < h)%Z) -> let l := (map.Map.get h1 i) in
-  forall (result:(option a)),
-  match result with
+Theorem VC_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:(t a))
+  (h_view:(key -> (option a))) (h_data:(array (list (key* a)%type)))
+  (h_size:Z) (k:key), ((h_view = (view h)) /\ ((h_data = (data h)) /\
+  (h_size = (size h)))) -> let o := (length (data h)) in let i := (bucket k
+  o) in (((0%Z <= i)%Z /\ (i < o)%Z) -> let l := (mixfix_lbrb (data h) i) in
+  forall (o1:(option a)),
+  match o1 with
   | Init.Datatypes.None => forall (v:a), ~ (list.Mem.mem (k, v) l)
   | (Init.Datatypes.Some v) => (list.Mem.mem (k, v) l)
-  end -> ((result = Init.Datatypes.None) -> ((map.Map.get h2
+  end -> ((o1 = Init.Datatypes.None) -> (((view h)
   k) = Init.Datatypes.None))).
-(* Why3 intros a a_WT h h1 h2 k ((h1,(h2,h3)),h4) i (h5,h6) l result h7 h8. *)
-intros a a_WT rho rho1 rho2 k ((h1,(h2,h3)),h4) i (h5,h6) l result h7 h8.
+Proof.
+intros a a_WT h h_view h_data h_size k (h1,(h2,h3)) o i (h4,h5) l o1 h6 h7.
 subst i.
-subst result.
+rewrite h7 in h6.
 subst l.
-unfold good_data in h3.
-generalize (h3 k); clear h3; intro h3.
-destruct (Map.get rho2 k); intuition.
-generalize (h3 a0); clear h3; intro h3.
-generalize (h7 a0); clear h7; intro h7.
-intuition.
+destruct (t'invariant h) as [_ [_ h8]].
+unfold good_data in h8.
+specialize (h8 k).
+destruct (view h k); intuition.
+elim (h6 a0).
+now apply h8.
 Qed.
-

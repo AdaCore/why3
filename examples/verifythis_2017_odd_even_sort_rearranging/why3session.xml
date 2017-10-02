@@ -5,73 +5,72 @@
 <prover id="0" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <file name="../verifythis_2017_odd_even_sort_rearranging.mlw" expanded="true">
-<theory name="Top" sum="db83c1e8d530ace5fd3a0daa9f570f68" expanded="true">
+<theory name="Top" sum="3a7c0f6e31e4545816eb2db79a3bdb6e" expanded="true">
  <goal name="VC array_max" expl="VC for array_max">
  <transf name="split_goal_wp">
-  <goal name="VC array_max.1" expl="1. postcondition">
+  <goal name="VC array_max.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="2"/></proof>
   </goal>
-  <goal name="VC array_max.2" expl="2. index in array bounds">
+  <goal name="VC array_max.2" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC array_max.3" expl="3. loop invariant init">
+  <goal name="VC array_max.3" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC array_max.4" expl="4. loop invariant init">
+  <goal name="VC array_max.4" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC array_max.5" expl="5. index in array bounds">
+  <goal name="VC array_max.5" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC array_max.6" expl="6. index in array bounds">
+  <goal name="VC array_max.6" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC array_max.7" expl="7. loop variant decrease">
+  <goal name="VC array_max.7" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC array_max.8" expl="8. loop invariant preservation">
+  <goal name="VC array_max.8" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC array_max.9" expl="9. loop invariant preservation">
+  <goal name="VC array_max.9" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC array_max.10" expl="10. loop variant decrease">
+  <goal name="VC array_max.10" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC array_max.11" expl="11. loop invariant preservation">
+  <goal name="VC array_max.11" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC array_max.12" expl="12. loop invariant preservation">
+  <goal name="VC array_max.12" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC array_max.13" expl="13. postcondition">
+  <goal name="VC array_max.13" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="aux_pos">
- <proof prover="1"><result status="valid" time="0.56"/></proof>
+ <goal name="aux_pos" expl="">
+ <proof prover="1"><result status="valid" time="0.12"/></proof>
  </goal>
  <goal name="VC decompose_entropy" expl="VC for decompose_entropy">
  <transf name="split_goal_wp">
-  <goal name="VC decompose_entropy.1" expl="1. postcondition">
+  <goal name="VC decompose_entropy.1" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.2" expl="2. precondition">
+  <goal name="VC decompose_entropy.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.3" expl="3. precondition">
+  <goal name="VC decompose_entropy.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.4" expl="4. precondition">
+  <goal name="VC decompose_entropy.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.5" expl="5. precondition">
+  <goal name="VC decompose_entropy.5" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC decompose_entropy.6" expl="6. postcondition">
+  <goal name="VC decompose_entropy.6" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>
@@ -81,24 +80,24 @@
  </goal>
  <goal name="VC my_swap" expl="VC for my_swap" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC my_swap.1" expl="1. precondition">
+  <goal name="VC my_swap.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC my_swap.2" expl="2. precondition">
+  <goal name="VC my_swap.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC my_swap.3" expl="3. assertion" expanded="true">
+  <goal name="VC my_swap.3" expl="assertion" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="VC my_swap.3.1" expl="1. VC for my_swap">
+   <goal name="VC my_swap.3.1" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.03" steps="20"/></proof>
    </goal>
-   <goal name="VC my_swap.3.2" expl="2. VC for my_swap">
+   <goal name="VC my_swap.3.2" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
    </goal>
-   <goal name="VC my_swap.3.3" expl="3. VC for my_swap">
+   <goal name="VC my_swap.3.3" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="VC my_swap.3.4" expl="4. VC for my_swap" expanded="true">
+   <goal name="VC my_swap.3.4" expl="VC for my_swap" expanded="true">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
    <metas
     expanded="true">
@@ -920,262 +919,256 @@
     <meta name="remove_type">
      <meta_arg_ts id="ref"/>
     </meta>
-    <goal name="VC my_swap.3.4" expl="4. VC for my_swap" expanded="true">
-    <transf name="eliminate_builtin" expanded="true">
-     <goal name="VC my_swap.3.4.1" expl="1. VC for my_swap" expanded="true">
-     <proof prover="0"><result status="valid" time="0.08"/></proof>
-     <proof prover="4"><result status="valid" time="0.02"/></proof>
-     </goal>
-    </transf>
+    <goal name="VC my_swap.3.4" expl="VC for my_swap" expanded="true">
     </goal>
    </metas>
    </goal>
-   <goal name="VC my_swap.3.5" expl="5. VC for my_swap">
+   <goal name="VC my_swap.3.5" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC my_swap.4" expl="4. precondition">
+  <goal name="VC my_swap.4" expl="precondition">
   <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
-  <goal name="VC my_swap.5" expl="5. assertion">
+  <goal name="VC my_swap.5" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="VC my_swap.5.1" expl="1. VC for my_swap">
+   <goal name="VC my_swap.5.1" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.04" steps="16"/></proof>
    </goal>
-   <goal name="VC my_swap.5.2" expl="2. VC for my_swap">
+   <goal name="VC my_swap.5.2" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.03" steps="17"/></proof>
    </goal>
-   <goal name="VC my_swap.5.3" expl="3. VC for my_swap">
+   <goal name="VC my_swap.5.3" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
-   <goal name="VC my_swap.5.4" expl="4. VC for my_swap">
+   <goal name="VC my_swap.5.4" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.5" expl="5. VC for my_swap">
+   <goal name="VC my_swap.5.5" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.6" expl="6. VC for my_swap">
+   <goal name="VC my_swap.5.6" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="VC my_swap.5.7" expl="7. VC for my_swap">
+   <goal name="VC my_swap.5.7" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.04" steps="25"/></proof>
    </goal>
-   <goal name="VC my_swap.5.8" expl="8. VC for my_swap">
+   <goal name="VC my_swap.5.8" expl="VC for my_swap">
    <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC my_swap.6" expl="6. precondition">
+  <goal name="VC my_swap.6" expl="precondition">
   <proof prover="2"><result status="valid" time="0.34" steps="58"/></proof>
   </goal>
-  <goal name="VC my_swap.7" expl="7. precondition">
+  <goal name="VC my_swap.7" expl="precondition">
   <proof prover="2"><result status="valid" time="0.36" steps="56"/></proof>
   </goal>
-  <goal name="VC my_swap.8" expl="8. precondition">
+  <goal name="VC my_swap.8" expl="precondition">
   <proof prover="2"><result status="valid" time="3.00" steps="56"/></proof>
   </goal>
-  <goal name="VC my_swap.9" expl="9. postcondition">
+  <goal name="VC my_swap.9" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC my_swap.10" expl="10. postcondition">
+  <goal name="VC my_swap.10" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC local_order_implies_sort_sub" expl="VC for local_order_implies_sort_sub">
  <transf name="split_goal_wp">
-  <goal name="VC local_order_implies_sort_sub.1" expl="1. variant decrease">
+  <goal name="VC local_order_implies_sort_sub.1" expl="variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.2" expl="2. precondition">
+  <goal name="VC local_order_implies_sort_sub.2" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.3" expl="3. precondition">
+  <goal name="VC local_order_implies_sort_sub.3" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.4" expl="4. assertion">
+  <goal name="VC local_order_implies_sort_sub.4" expl="assertion">
   <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
-  <goal name="VC local_order_implies_sort_sub.5" expl="5. postcondition">
+  <goal name="VC local_order_implies_sort_sub.5" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC odd_even_sort" expl="VC for odd_even_sort">
  <transf name="split_goal_wp">
-  <goal name="VC odd_even_sort.1" expl="1. loop invariant init">
+  <goal name="VC odd_even_sort.1" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.2" expl="2. loop invariant init">
+  <goal name="VC odd_even_sort.2" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.3" expl="3. loop invariant init">
+  <goal name="VC odd_even_sort.3" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.4" expl="4. loop invariant init">
+  <goal name="VC odd_even_sort.4" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.5" expl="5. loop invariant init">
+  <goal name="VC odd_even_sort.5" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.6" expl="6. loop invariant init">
+  <goal name="VC odd_even_sort.6" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.7" expl="7. loop invariant init">
+  <goal name="VC odd_even_sort.7" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.8" expl="8. loop invariant init">
+  <goal name="VC odd_even_sort.8" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.9" expl="9. index in array bounds">
+  <goal name="VC odd_even_sort.9" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.10" expl="10. index in array bounds">
+  <goal name="VC odd_even_sort.10" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.11" expl="11. precondition">
+  <goal name="VC odd_even_sort.11" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.12" expl="12. precondition">
+  <goal name="VC odd_even_sort.12" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.13" expl="13. loop variant decrease">
+  <goal name="VC odd_even_sort.13" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.14" expl="14. loop invariant preservation">
+  <goal name="VC odd_even_sort.14" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.09" steps="259"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.15" expl="15. loop invariant preservation">
+  <goal name="VC odd_even_sort.15" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.16" expl="16. loop invariant preservation">
+  <goal name="VC odd_even_sort.16" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.17" expl="17. loop invariant preservation">
+  <goal name="VC odd_even_sort.17" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.18" expl="18. loop invariant preservation">
+  <goal name="VC odd_even_sort.18" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.19" expl="19. loop invariant preservation">
+  <goal name="VC odd_even_sort.19" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.20" expl="20. loop variant decrease">
+  <goal name="VC odd_even_sort.20" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.21" expl="21. loop invariant preservation">
+  <goal name="VC odd_even_sort.21" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.22" expl="22. loop invariant preservation">
+  <goal name="VC odd_even_sort.22" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.23" expl="23. loop invariant preservation">
+  <goal name="VC odd_even_sort.23" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.24" expl="24. loop invariant preservation">
+  <goal name="VC odd_even_sort.24" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.25" expl="25. loop invariant preservation">
+  <goal name="VC odd_even_sort.25" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.26" expl="26. loop invariant preservation">
+  <goal name="VC odd_even_sort.26" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.27" expl="27. loop invariant init">
+  <goal name="VC odd_even_sort.27" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.28" expl="28. loop invariant init">
+  <goal name="VC odd_even_sort.28" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.29" expl="29. loop invariant init">
+  <goal name="VC odd_even_sort.29" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.30" expl="30. loop invariant init">
+  <goal name="VC odd_even_sort.30" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.31" expl="31. loop invariant init">
+  <goal name="VC odd_even_sort.31" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.32" expl="32. loop invariant init">
+  <goal name="VC odd_even_sort.32" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.10" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.33" expl="33. loop invariant init">
+  <goal name="VC odd_even_sort.33" expl="loop invariant init">
   <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.34" expl="34. index in array bounds">
+  <goal name="VC odd_even_sort.34" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.35" expl="35. index in array bounds">
+  <goal name="VC odd_even_sort.35" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.36" expl="36. precondition">
+  <goal name="VC odd_even_sort.36" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.37" expl="37. precondition">
+  <goal name="VC odd_even_sort.37" expl="precondition">
   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.38" expl="38. loop variant decrease">
+  <goal name="VC odd_even_sort.38" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.39" expl="39. loop invariant preservation">
+  <goal name="VC odd_even_sort.39" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.26" steps="373"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.40" expl="40. loop invariant preservation">
+  <goal name="VC odd_even_sort.40" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.41" expl="41. loop invariant preservation">
+  <goal name="VC odd_even_sort.41" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.42" expl="42. loop invariant preservation">
+  <goal name="VC odd_even_sort.42" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.43" expl="43. loop invariant preservation">
+  <goal name="VC odd_even_sort.43" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.10" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.44" expl="44. loop invariant preservation">
+  <goal name="VC odd_even_sort.44" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.45" expl="45. loop invariant preservation">
+  <goal name="VC odd_even_sort.45" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.46" expl="46. loop variant decrease">
+  <goal name="VC odd_even_sort.46" expl="loop variant decrease">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.47" expl="47. loop invariant preservation">
+  <goal name="VC odd_even_sort.47" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.48" expl="48. loop invariant preservation">
+  <goal name="VC odd_even_sort.48" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.49" expl="49. loop invariant preservation">
+  <goal name="VC odd_even_sort.49" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.50" expl="50. loop invariant preservation">
+  <goal name="VC odd_even_sort.50" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.51" expl="51. loop invariant preservation">
+  <goal name="VC odd_even_sort.51" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.52" expl="52. loop invariant preservation">
+  <goal name="VC odd_even_sort.52" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.53" expl="53. loop invariant preservation">
+  <goal name="VC odd_even_sort.53" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.54" expl="54. loop variant decrease">
+  <goal name="VC odd_even_sort.54" expl="loop variant decrease">
   <proof prover="1"><result status="valid" time="0.29"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.55" expl="55. loop invariant preservation">
+  <goal name="VC odd_even_sort.55" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.56" expl="56. loop invariant preservation">
+  <goal name="VC odd_even_sort.56" expl="loop invariant preservation">
   <proof prover="2"><result status="valid" time="1.40" steps="1723"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.57" expl="57. postcondition">
+  <goal name="VC odd_even_sort.57" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC odd_even_sort.58" expl="58. postcondition">
+  <goal name="VC odd_even_sort.58" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>

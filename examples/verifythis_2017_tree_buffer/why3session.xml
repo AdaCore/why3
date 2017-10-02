@@ -8,7 +8,7 @@
 <prover id="3" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2017_tree_buffer.mlw" expanded="true">
-<theory name="Spec" sum="a61f8dffbebe0fc4def47faa56eced85" expanded="true">
+<theory name="Spec" sum="b1e122756a13d2122ef6ee57bcddef07" expanded="true">
  <goal name="VC take" expl="VC for take">
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -23,23 +23,23 @@
  </goal>
  <goal name="VC take_lemma" expl="VC for take_lemma" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC take_lemma.1" expl="1. variant decrease">
+  <goal name="VC take_lemma.1" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC take_lemma.2" expl="2. precondition" expanded="true">
+  <goal name="VC take_lemma.2" expl="precondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC take_lemma.3" expl="3. postcondition" expanded="true">
+  <goal name="VC take_lemma.3" expl="postcondition" expanded="true">
   <transf name="split_goal_wp" expanded="true">
-   <goal name="VC take_lemma.3.1" expl="1. postcondition" expanded="true">
+   <goal name="VC take_lemma.3.1" expl="postcondition" expanded="true">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC take_lemma.3.2" expl="2. postcondition">
+   <goal name="VC take_lemma.3.2" expl="postcondition">
    <proof prover="4"><result status="valid" time="0.74"/></proof>
    </goal>
-   <goal name="VC take_lemma.3.3" expl="3. postcondition">
+   <goal name="VC take_lemma.3.3" expl="postcondition">
    <proof prover="0" timelimit="1"><result status="valid" time="0.01" steps="34"/></proof>
    </goal>
   </transf>
@@ -47,44 +47,47 @@
  </transf>
  </goal>
 </theory>
-<theory name="Caterpillar" sum="1f16fc36f2856a0d29063461ca670e54">
+<theory name="Caterpillar" sum="1d67f8a5b1422e0c9043537b5ab5d545" expanded="true">
+ <goal name="VC cat" expl="VC for cat">
+ <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
  <goal name="VC cat_empty" expl="VC for cat_empty">
  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="VC cat_add" expl="VC for cat_add">
  <transf name="split_goal_wp">
-  <goal name="VC cat_add.1" expl="1. precondition">
+  <goal name="VC cat_add.1" expl="precondition">
   <transf name="split_goal_wp">
-   <goal name="VC cat_add.1.1" expl="1. VC for cat_add">
+   <goal name="VC cat_add.1.1" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
-   <goal name="VC cat_add.1.2" expl="2. VC for cat_add">
+   <goal name="VC cat_add.1.2" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
-   <goal name="VC cat_add.1.3" expl="3. VC for cat_add">
+   <goal name="VC cat_add.1.3" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
    </goal>
-   <goal name="VC cat_add.1.4" expl="4. VC for cat_add">
+   <goal name="VC cat_add.1.4" expl="VC for cat_add">
    <proof prover="1"><result status="valid" time="1.28"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC cat_add.2" expl="2. precondition">
+  <goal name="VC cat_add.2" expl="precondition">
   <transf name="split_goal_wp">
-   <goal name="VC cat_add.2.1" expl="1. VC for cat_add">
+   <goal name="VC cat_add.2.1" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
    </goal>
-   <goal name="VC cat_add.2.2" expl="2. VC for cat_add">
+   <goal name="VC cat_add.2.2" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
    </goal>
-   <goal name="VC cat_add.2.3" expl="3. VC for cat_add">
+   <goal name="VC cat_add.2.3" expl="VC for cat_add">
    <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
    </goal>
-   <goal name="VC cat_add.2.4" expl="4. VC for cat_add">
+   <goal name="VC cat_add.2.4" expl="VC for cat_add">
    <transf name="introduce_premises">
-    <goal name="VC cat_add.2.4.1" expl="1. VC for cat_add">
+    <goal name="VC cat_add.2.4.1" expl="VC for cat_add">
     <transf name="inline_goal">
-     <goal name="VC cat_add.2.4.1.1" expl="1. VC for cat_add">
+     <goal name="VC cat_add.2.4.1.1" expl="VC for cat_add">
      <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
      </goal>
     </transf>
@@ -93,7 +96,7 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC cat_add.3" expl="3. postcondition">
+  <goal name="VC cat_add.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
  </transf>
@@ -102,7 +105,10 @@
  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
 </theory>
-<theory name="RealTime" sum="a38f8885e33601501b90a525c4a51e33" expanded="true">
+<theory name="RealTime" sum="b99b5cbae9b2f754fab20d968a6639f3" expanded="true">
+ <goal name="VC rt" expl="VC for rt">
+ <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
  <goal name="VC de_allocate" expl="VC for de_allocate">
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -117,29 +123,29 @@
  </goal>
  <goal name="VC rt_add" expl="VC for rt_add">
  <transf name="split_goal_wp">
-  <goal name="VC rt_add.1" expl="1. precondition">
+  <goal name="VC rt_add.1" expl="precondition">
   <transf name="split_goal_wp">
-   <goal name="VC rt_add.1.1" expl="1. VC for rt_add">
+   <goal name="VC rt_add.1.1" expl="VC for rt_add">
    <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
    </goal>
-   <goal name="VC rt_add.1.2" expl="2. VC for rt_add">
+   <goal name="VC rt_add.1.2" expl="VC for rt_add">
    <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
    </goal>
-   <goal name="VC rt_add.1.3" expl="3. VC for rt_add">
+   <goal name="VC rt_add.1.3" expl="VC for rt_add">
    <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
    </goal>
-   <goal name="VC rt_add.1.4" expl="4. VC for rt_add">
+   <goal name="VC rt_add.1.4" expl="VC for rt_add">
    <proof prover="1"><result status="valid" time="0.82"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC rt_add.2" expl="2. postcondition">
+  <goal name="VC rt_add.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC rt_add.3" expl="3. precondition">
+  <goal name="VC rt_add.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="60"/></proof>
   </goal>
-  <goal name="VC rt_add.4" expl="4. postcondition">
+  <goal name="VC rt_add.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
  </transf>

@@ -290,12 +290,16 @@ pure_decl:
 (* Type declarations *)
 
 type_decl:
-| labels(lident_nq) ty_var* typedefn invariant*
+| labels(lident_nq) ty_var* typedefn invariant* type_witness
   { let (vis, mut), def = $3 in
     { td_ident = $1; td_params = $2;
       td_vis = vis; td_mut = mut;
-      td_inv = $4; td_def = def;
+      td_inv = $4; td_wit = $5; td_def = def;
       td_loc = floc $startpos $endpos } }
+
+type_witness:
+| (* epsilon *)                           { [] }
+| BY LEFTBRC field_list1(expr) RIGHTBRC   { $3 }
 
 ty_var:
 | labels(quote_lident) { $1 }

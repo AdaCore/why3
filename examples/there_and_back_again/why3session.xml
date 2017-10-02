@@ -2,23 +2,23 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../there_and_back_again.mlw" expanded="true">
-<theory name="Convolution" sum="7aaf8d9d20c73a42a0052eaff3677d36" expanded="true">
+<theory name="Convolution" sum="bc93b1c231fdd52f25a6d511083e5dc9" expanded="true">
  <goal name="VC convolution_rec" expl="VC for convolution_rec" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC convolution_rec.1" expl="1. variant decrease">
+  <goal name="VC convolution_rec.1" expl="variant decrease">
   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC convolution_rec.2" expl="2. precondition">
+  <goal name="VC convolution_rec.2" expl="precondition">
   <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC convolution_rec.3" expl="3. unreachable point">
+  <goal name="VC convolution_rec.3" expl="unreachable point">
   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC convolution_rec.4" expl="4. postcondition">
+  <goal name="VC convolution_rec.4" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
@@ -27,49 +27,49 @@
  <proof prover="3"><result status="valid" time="0.01" steps="34"/></proof>
  </goal>
 </theory>
-<theory name="Palindrome" sum="ff7472b3e21bc3ea07e0ea91f11d7593" expanded="true">
+<theory name="Palindrome" sum="7da8fe481fcf60f659c92942e15ecea5" expanded="true">
  <goal name="VC palindrome_rec" expl="VC for palindrome_rec" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC palindrome_rec.1" expl="1. postcondition">
+  <goal name="VC palindrome_rec.1" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.2" expl="2. postcondition">
+  <goal name="VC palindrome_rec.2" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.3" expl="3. postcondition">
+  <goal name="VC palindrome_rec.3" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.02" steps="100"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.4" expl="4. postcondition">
+  <goal name="VC palindrome_rec.4" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.5" expl="5. unreachable point">
+  <goal name="VC palindrome_rec.5" expl="unreachable point">
   <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.6" expl="6. variant decrease">
+  <goal name="VC palindrome_rec.6" expl="variant decrease">
   <proof prover="3"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.7" expl="7. precondition">
+  <goal name="VC palindrome_rec.7" expl="precondition">
   <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.8" expl="8. assertion">
+  <goal name="VC palindrome_rec.8" expl="assertion">
   <proof prover="3"><result status="valid" time="0.02" steps="74"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.9" expl="9. postcondition">
+  <goal name="VC palindrome_rec.9" expl="postcondition">
   <proof prover="3"><result status="valid" time="1.50" steps="2255"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.10" expl="10. postcondition">
+  <goal name="VC palindrome_rec.10" expl="postcondition">
   <proof prover="3"><result status="valid" time="0.01" steps="88"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.11" expl="11. exceptional postcondition">
+  <goal name="VC palindrome_rec.11" expl="exceptional postcondition">
   <proof prover="3"><result status="valid" time="0.02" steps="109"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.12" expl="12. unreachable point">
+  <goal name="VC palindrome_rec.12" expl="unreachable point">
   <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.13" expl="13. exceptional postcondition">
-  <proof prover="4" edited="there_and_back_again_Palindrome_VC_palindrome_rec_1.v"><result status="valid" time="0.51"/></proof>
+  <goal name="VC palindrome_rec.13" expl="exceptional postcondition">
+  <proof prover="0" edited="there_and_back_again_Palindrome_VC_palindrome_rec_1.v"><result status="valid" time="0.51"/></proof>
   </goal>
-  <goal name="VC palindrome_rec.14" expl="14. unreachable point">
+  <goal name="VC palindrome_rec.14" expl="unreachable point">
   <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
  </transf>

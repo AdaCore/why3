@@ -1,8 +1,25 @@
-
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Stdlib
 
 type variable = string
+
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
 
 type array =
   | Const of term
@@ -11,6 +28,7 @@ type array =
 and term =
   | Integer of string
   | Decimal of (string * string)
+  | Float of float_type
   | Other of string
   | Array of array
   | Bitvector of string

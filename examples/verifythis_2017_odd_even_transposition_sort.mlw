@@ -14,14 +14,13 @@ Author: Jean-Christophe Filliâtre (CNRS)
 module Challenge3
 
   use import int.Int
-  use import int.Sum
-  use import int.NumOf
   use import int.ComputerDivision
   use import ref.Refint
   use import array.Array
   use import array.IntArraySorted
   use import array.ArraySwap
   use import array.ArrayPermut
+  use import array.Inversions
 
   (* odd-sorted up to n exclusive *)
   predicate odd_sorted (a: array int) (n: int) =
@@ -44,72 +43,6 @@ module Challenge3
                   by i-1 = 2 * div (i-1) 2 \/
                      i-1 = 2 * div (i-1) 2 + 1 }
     done
-
-  (* to prove termination, we count the total number of inversions *)
-  predicate inversion (a: array int) (i j: int) =
-    a[i] > a[j]
-
-  function inversions_for (a: array int) (i: int) : int =
-    numof (inversion a i) i (length a)
-
-  function inversions (a: array int) : int =
-    sum (inversions_for a) 0 (length a)
-
-  (* the key lemma to prove termination: whenever we swap two consecutive
-     values that are ill-sorted, the total number of inversions decreases *)
-  let lemma exchange_inversion (a1 a2: array int) (i0: int)
-    requires { 0 <= i0 < length a1 - 1 }
-    requires { a1[i0] > a1[i0 + 1] }
-    requires { exchange a1 a2 i0 (i0 + 1) }
-    ensures  { inversions a2 < inversions a1 }
-  = assert { inversion a1 i0 (i0+1) };
-    assert { not (inversion a2 i0 (i0+1)) };
-    assert { forall i. 0 <= i < i0 ->
-             inversions_for a2 i = inversions_for a1 i
-             by numof (inversion a2 i) i (length a2)
-              = numof (inversion a2 i) i i0
-              + numof (inversion a2 i) i0 (i0+1)
-              + numof (inversion a2 i) (i0+1) (i0+2)
-              + numof (inversion a2 i) (i0+2) (length a2)
-             /\ numof (inversion a1 i) i (length a1)
-              = numof (inversion a1 i) i i0
-              + numof (inversion a1 i) i0 (i0+1)
-              + numof (inversion a1 i) (i0+1) (i0+2)
-              + numof (inversion a1 i) (i0+2) (length a1)
-             /\ numof (inversion a2 i) i0 (i0+1)
-                = numof (inversion a1 i) (i0+1) (i0+2)
-             /\ numof (inversion a2 i) (i0+1) (i0+2)
-                = numof (inversion a1 i) i0 (i0+1)
-             /\ numof (inversion a2 i) i i0 = numof (inversion a1 i) i i0
-             /\ numof (inversion a2 i) (i0+2) (length a2)
-                = numof (inversion a1 i) (i0+2) (length a1)
-              };
-    assert { forall i. i0 + 1 < i < length a1 ->
-             inversions_for a2 i = inversions_for a1 i };
-    assert { inversions_for a2 i0 = inversions_for a1 (i0+1)
-             by numof (inversion a1 (i0+1)) (i0+2) (length a1)
-              = numof (inversion a2 i0    ) (i0+2) (length a1) };
-    assert { 1 + inversions_for a2 (i0+1) = inversions_for a1 i0
-             by numof (inversion a1 i0) i0 (length a1)
-              = numof (inversion a1 i0) (i0+1) (length a1)
-              = 1 + numof (inversion a1 i0) (i0+2) (length a1) };
-    let sum_decomp (a: array int) (i j k: int)
-      requires { 0 <= i <= j <= k <= length a = length a1 }
-      ensures  { sum (inversions_for a) i k =
-                 sum (inversions_for a) i j + sum (inversions_for a) j k }
-    = () in
-    let decomp (a: array int)
-      requires { length a = length a1 }
-      ensures  { inversions a = sum (inversions_for a) 0 i0
-                              + inversions_for a i0
-                              + inversions_for a (i0+1)
-                              + sum (inversions_for a) (i0+2) (length a) }
-    = sum_decomp a 0 i0 (length a);
-      sum_decomp a i0 (i0+1) (length a);
-      sum_decomp a (i0+1) (i0+2) (length a);
-    in
-    decomp a1; decomp a2;
-    ()
 
   (* note: program variable "sorted" renamed into "is_sorted"
      (clash with library predicate "sorted" on arrays) *)

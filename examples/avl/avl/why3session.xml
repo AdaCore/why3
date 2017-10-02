@@ -4,7 +4,7 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../avl.mlw">
-<theory name="SelectionTypes" sum="279b33845b8d1c22b6e5c44ad46b1dfa">
+<theory name="SelectionTypes" sum="abd7a22ecdfcca31609e6de139c95c74">
  <goal name="VC option_to_seq" expl="VC for option_to_seq">
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
@@ -18,11 +18,11 @@
  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
-<theory name="AVL" sum="fbe4c9b252772ab5f1d75809246c2f5a">
- <goal name="M.M.assoc">
+<theory name="AVL" sum="c0b96d14d5a90bf2332d8dc606653492">
+ <goal name="M.M.assoc" expl="">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="M.M.neutral">
+ <goal name="M.M.neutral" expl="">
  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
  <goal name="VC balancing" expl="VC for balancing">
@@ -40,15 +40,18 @@
  <goal name="VC real_height_nonnegative" expl="VC for real_height_nonnegative">
  <proof prover="0"><result status="valid" time="0.01" steps="55"/></proof>
  </goal>
- <goal name="rotation_preserve_model">
+ <goal name="rotation_preserve_model" expl="">
  <transf name="split_goal_wp">
-  <goal name="rotation_preserve_model.1" expl="1.">
+  <goal name="rotation_preserve_model.1" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="89"/></proof>
   </goal>
-  <goal name="rotation_preserve_model.2" expl="2.">
+  <goal name="rotation_preserve_model.2" expl="">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
  </transf>
+ </goal>
+ <goal name="VC t" expl="VC for t">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="VC height" expl="VC for height">
  <proof prover="0"><result status="valid" time="0.02" steps="30"/></proof>
@@ -73,66 +76,66 @@
  </goal>
  <goal name="VC balance" expl="VC for balance">
  <transf name="split_goal_wp">
-  <goal name="VC balance.1" expl="1. precondition">
+  <goal name="VC balance.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="VC balance.2" expl="2. unreachable point">
+  <goal name="VC balance.2" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="VC balance.3" expl="3. precondition">
+  <goal name="VC balance.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="183"/></proof>
   </goal>
-  <goal name="VC balance.4" expl="4. precondition">
+  <goal name="VC balance.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.13" steps="243"/></proof>
   </goal>
-  <goal name="VC balance.5" expl="5. unreachable point">
+  <goal name="VC balance.5" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.07" steps="163"/></proof>
   </goal>
-  <goal name="VC balance.6" expl="6. precondition">
+  <goal name="VC balance.6" expl="precondition">
   <proof prover="0"><result status="valid" time="0.24" steps="599"/></proof>
   </goal>
-  <goal name="VC balance.7" expl="7. precondition">
+  <goal name="VC balance.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.31" steps="597"/></proof>
   </goal>
-  <goal name="VC balance.8" expl="8. precondition">
+  <goal name="VC balance.8" expl="precondition">
   <proof prover="0"><result status="valid" time="0.77" steps="2283"/></proof>
   </goal>
-  <goal name="VC balance.9" expl="9. unreachable point">
+  <goal name="VC balance.9" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
   </goal>
-  <goal name="VC balance.10" expl="10. precondition">
+  <goal name="VC balance.10" expl="precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="185"/></proof>
   </goal>
-  <goal name="VC balance.11" expl="11. precondition">
+  <goal name="VC balance.11" expl="precondition">
   <proof prover="0"><result status="valid" time="0.13" steps="247"/></proof>
   </goal>
-  <goal name="VC balance.12" expl="12. unreachable point">
+  <goal name="VC balance.12" expl="unreachable point">
   <proof prover="0"><result status="valid" time="0.09" steps="154"/></proof>
   </goal>
-  <goal name="VC balance.13" expl="13. precondition">
+  <goal name="VC balance.13" expl="precondition">
   <proof prover="0"><result status="valid" time="0.16" steps="309"/></proof>
   </goal>
-  <goal name="VC balance.14" expl="14. precondition">
+  <goal name="VC balance.14" expl="precondition">
   <proof prover="0"><result status="valid" time="0.39" steps="1048"/></proof>
   </goal>
-  <goal name="VC balance.15" expl="15. precondition">
+  <goal name="VC balance.15" expl="precondition">
   <proof prover="0"><result status="valid" time="0.45" steps="1642"/></proof>
   </goal>
-  <goal name="VC balance.16" expl="16. precondition">
+  <goal name="VC balance.16" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
   </goal>
-  <goal name="VC balance.17" expl="17. postcondition">
+  <goal name="VC balance.17" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.67" steps="3085"/></proof>
   </goal>
-  <goal name="VC balance.18" expl="18. postcondition">
+  <goal name="VC balance.18" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="VC balance.18.1" expl="1. postcondition">
+   <goal name="VC balance.18.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.59" steps="2453"/></proof>
    </goal>
-   <goal name="VC balance.18.2" expl="2. postcondition">
+   <goal name="VC balance.18.2" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.76" steps="3187"/></proof>
    </goal>
-   <goal name="VC balance.18.3" expl="3. postcondition">
+   <goal name="VC balance.18.3" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.05" steps="24"/></proof>
    </goal>
   </transf>
@@ -165,21 +168,21 @@
  </goal>
  <goal name="VC fuse" expl="VC for fuse">
  <transf name="split_goal_wp">
-  <goal name="VC fuse.1" expl="1. precondition">
+  <goal name="VC fuse.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.06" steps="178"/></proof>
   </goal>
-  <goal name="VC fuse.2" expl="2. precondition">
+  <goal name="VC fuse.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.22" steps="736"/></proof>
   </goal>
-  <goal name="VC fuse.3" expl="3. postcondition">
+  <goal name="VC fuse.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.14" steps="294"/></proof>
   </goal>
-  <goal name="VC fuse.4" expl="4. postcondition">
+  <goal name="VC fuse.4" expl="postcondition">
   <transf name="split_goal_wp">
-   <goal name="VC fuse.4.1" expl="1. postcondition">
+   <goal name="VC fuse.4.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.65" steps="2229"/></proof>
    </goal>
-   <goal name="VC fuse.4.2" expl="2. postcondition">
+   <goal name="VC fuse.4.2" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.40" steps="1118"/></proof>
    </goal>
   </transf>
@@ -194,28 +197,28 @@
  </goal>
  <goal name="VC join" expl="VC for join">
  <transf name="split_goal_wp">
-  <goal name="VC join.1" expl="1. precondition">
+  <goal name="VC join.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.20" steps="585"/></proof>
   </goal>
-  <goal name="VC join.2" expl="2. variant decrease">
+  <goal name="VC join.2" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.15" steps="278"/></proof>
   </goal>
-  <goal name="VC join.3" expl="3. precondition">
+  <goal name="VC join.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.22" steps="780"/></proof>
   </goal>
-  <goal name="VC join.4" expl="4. variant decrease">
+  <goal name="VC join.4" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.10" steps="189"/></proof>
   </goal>
-  <goal name="VC join.5" expl="5. precondition">
+  <goal name="VC join.5" expl="precondition">
   <proof prover="0"><result status="valid" time="0.23" steps="568"/></proof>
   </goal>
-  <goal name="VC join.6" expl="6. precondition">
+  <goal name="VC join.6" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="248"/></proof>
   </goal>
-  <goal name="VC join.7" expl="7. postcondition">
+  <goal name="VC join.7" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.20" steps="459"/></proof>
   </goal>
-  <goal name="VC join.8" expl="8. postcondition">
+  <goal name="VC join.8" expl="postcondition">
   <proof prover="0" timelimit="5"><result status="valid" time="1.98" steps="6116"/></proof>
   </goal>
  </transf>
@@ -228,134 +231,134 @@
  </goal>
  <goal name="VC insert" expl="VC for insert">
  <transf name="split_goal_wp">
-  <goal name="VC insert.1" expl="1. postcondition">
+  <goal name="VC insert.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
   </goal>
-  <goal name="VC insert.2" expl="2. postcondition">
+  <goal name="VC insert.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="161"/></proof>
   </goal>
-  <goal name="VC insert.3" expl="3. postcondition">
+  <goal name="VC insert.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="59"/></proof>
   </goal>
-  <goal name="VC insert.4" expl="4. precondition">
+  <goal name="VC insert.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="VC insert.5" expl="5. precondition">
+  <goal name="VC insert.5" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="VC insert.6" expl="6. variant decrease">
+  <goal name="VC insert.6" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.06" steps="240"/></proof>
   </goal>
-  <goal name="VC insert.7" expl="7. precondition">
+  <goal name="VC insert.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="64"/></proof>
   </goal>
-  <goal name="VC insert.8" expl="8. precondition">
+  <goal name="VC insert.8" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="178"/></proof>
   </goal>
-  <goal name="VC insert.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.09" steps="259"/></proof>
+  <goal name="VC insert.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.16" steps="259"/></proof>
   </goal>
-  <goal name="VC insert.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.26" steps="667"/></proof>
+  <goal name="VC insert.10" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.17" steps="667"/></proof>
   </goal>
-  <goal name="VC insert.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.36" steps="1079"/></proof>
+  <goal name="VC insert.11" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.43" steps="1079"/></proof>
   </goal>
-  <goal name="VC insert.12" expl="12. variant decrease">
+  <goal name="VC insert.12" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.08" steps="282"/></proof>
   </goal>
-  <goal name="VC insert.13" expl="13. precondition">
+  <goal name="VC insert.13" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="67"/></proof>
   </goal>
-  <goal name="VC insert.14" expl="14. precondition">
+  <goal name="VC insert.14" expl="precondition">
   <proof prover="0"><result status="valid" time="0.09" steps="178"/></proof>
   </goal>
-  <goal name="VC insert.15" expl="15. postcondition">
-  <proof prover="0"><result status="valid" time="0.16" steps="266"/></proof>
+  <goal name="VC insert.15" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.09" steps="266"/></proof>
   </goal>
-  <goal name="VC insert.16" expl="16. postcondition">
-  <proof prover="0"><result status="valid" time="0.17" steps="581"/></proof>
+  <goal name="VC insert.16" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.26" steps="581"/></proof>
   </goal>
-  <goal name="VC insert.17" expl="17. postcondition">
-  <proof prover="0"><result status="valid" time="0.43" steps="1015"/></proof>
+  <goal name="VC insert.17" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.36" steps="1015"/></proof>
   </goal>
-  <goal name="VC insert.18" expl="18. precondition">
+  <goal name="VC insert.18" expl="precondition">
   <proof prover="0"><result status="valid" time="0.13" steps="109"/></proof>
   </goal>
-  <goal name="VC insert.19" expl="19. postcondition">
+  <goal name="VC insert.19" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="VC insert.20" expl="20. postcondition">
+  <goal name="VC insert.20" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.09" steps="271"/></proof>
   </goal>
-  <goal name="VC insert.21" expl="21. postcondition">
+  <goal name="VC insert.21" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.11" steps="430"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC remove" expl="VC for remove">
  <transf name="split_goal_wp">
-  <goal name="VC remove.1" expl="1. postcondition">
+  <goal name="VC remove.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="VC remove.2" expl="2. postcondition">
+  <goal name="VC remove.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="90"/></proof>
   </goal>
-  <goal name="VC remove.3" expl="3. postcondition">
+  <goal name="VC remove.3" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
   </goal>
-  <goal name="VC remove.4" expl="4. precondition">
+  <goal name="VC remove.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="VC remove.5" expl="5. precondition">
+  <goal name="VC remove.5" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC remove.6" expl="6. variant decrease">
+  <goal name="VC remove.6" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.06" steps="240"/></proof>
   </goal>
-  <goal name="VC remove.7" expl="7. precondition">
+  <goal name="VC remove.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="64"/></proof>
   </goal>
-  <goal name="VC remove.8" expl="8. precondition">
+  <goal name="VC remove.8" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="190"/></proof>
   </goal>
-  <goal name="VC remove.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.18" steps="199"/></proof>
+  <goal name="VC remove.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="199"/></proof>
   </goal>
-  <goal name="VC remove.10" expl="10. postcondition">
-  <proof prover="0"><result status="valid" time="0.14" steps="525"/></proof>
+  <goal name="VC remove.10" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.23" steps="525"/></proof>
   </goal>
-  <goal name="VC remove.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.43" steps="1071"/></proof>
+  <goal name="VC remove.11" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.37" steps="1071"/></proof>
   </goal>
-  <goal name="VC remove.12" expl="12. variant decrease">
+  <goal name="VC remove.12" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.08" steps="282"/></proof>
   </goal>
-  <goal name="VC remove.13" expl="13. precondition">
+  <goal name="VC remove.13" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="67"/></proof>
   </goal>
-  <goal name="VC remove.14" expl="14. precondition">
+  <goal name="VC remove.14" expl="precondition">
   <proof prover="0"><result status="valid" time="0.08" steps="190"/></proof>
   </goal>
-  <goal name="VC remove.15" expl="15. postcondition">
+  <goal name="VC remove.15" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.12" steps="380"/></proof>
   </goal>
-  <goal name="VC remove.16" expl="16. postcondition">
-  <proof prover="0"><result status="valid" time="0.23" steps="682"/></proof>
+  <goal name="VC remove.16" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.14" steps="682"/></proof>
   </goal>
-  <goal name="VC remove.17" expl="17. postcondition">
-  <proof prover="0"><result status="valid" time="0.37" steps="1314"/></proof>
+  <goal name="VC remove.17" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.43" steps="1314"/></proof>
   </goal>
-  <goal name="VC remove.18" expl="18. precondition">
+  <goal name="VC remove.18" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="109"/></proof>
   </goal>
-  <goal name="VC remove.19" expl="19. postcondition">
+  <goal name="VC remove.19" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
   </goal>
-  <goal name="VC remove.20" expl="20. postcondition">
+  <goal name="VC remove.20" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.12" steps="304"/></proof>
   </goal>
-  <goal name="VC remove.21" expl="21. postcondition">
+  <goal name="VC remove.21" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.10" steps="497"/></proof>
   </goal>
  </transf>
@@ -365,101 +368,101 @@
  </goal>
  <goal name="VC extract" expl="VC for extract">
  <transf name="split_goal_wp">
-  <goal name="VC extract.1" expl="1. postcondition">
+  <goal name="VC extract.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.07" steps="129"/></proof>
   </goal>
-  <goal name="VC extract.2" expl="2. postcondition">
+  <goal name="VC extract.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="69"/></proof>
   </goal>
-  <goal name="VC extract.3" expl="3. precondition">
+  <goal name="VC extract.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.04" steps="47"/></proof>
   </goal>
-  <goal name="VC extract.4" expl="4. precondition">
+  <goal name="VC extract.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC extract.5" expl="5. variant decrease">
+  <goal name="VC extract.5" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.05" steps="240"/></proof>
   </goal>
-  <goal name="VC extract.6" expl="6. precondition">
+  <goal name="VC extract.6" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="64"/></proof>
   </goal>
-  <goal name="VC extract.7" expl="7. precondition">
+  <goal name="VC extract.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="204"/></proof>
   </goal>
-  <goal name="VC extract.8" expl="8. postcondition">
+  <goal name="VC extract.8" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.24" steps="537"/></proof>
   </goal>
-  <goal name="VC extract.9" expl="9. postcondition">
-  <proof prover="0"><result status="valid" time="0.50" steps="1584"/></proof>
+  <goal name="VC extract.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.49" steps="1584"/></proof>
   </goal>
-  <goal name="VC extract.10" expl="10. variant decrease">
+  <goal name="VC extract.10" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.06" steps="282"/></proof>
   </goal>
-  <goal name="VC extract.11" expl="11. precondition">
+  <goal name="VC extract.11" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
-  <goal name="VC extract.12" expl="12. precondition">
+  <goal name="VC extract.12" expl="precondition">
   <proof prover="0"><result status="valid" time="0.07" steps="204"/></proof>
   </goal>
-  <goal name="VC extract.13" expl="13. postcondition">
+  <goal name="VC extract.13" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.34" steps="860"/></proof>
   </goal>
-  <goal name="VC extract.14" expl="14. postcondition">
-  <proof prover="0"><result status="valid" time="0.81" steps="2464"/></proof>
+  <goal name="VC extract.14" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.82" steps="2464"/></proof>
   </goal>
-  <goal name="VC extract.15" expl="15. precondition">
+  <goal name="VC extract.15" expl="precondition">
   <proof prover="0"><result status="valid" time="0.13" steps="109"/></proof>
   </goal>
-  <goal name="VC extract.16" expl="16. postcondition">
+  <goal name="VC extract.16" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.11" steps="209"/></proof>
   </goal>
-  <goal name="VC extract.17" expl="17. postcondition">
+  <goal name="VC extract.17" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.22" steps="490"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC split" expl="VC for split">
  <transf name="split_goal_wp">
-  <goal name="VC split.1" expl="1. postcondition">
+  <goal name="VC split.1" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="129"/></proof>
   </goal>
-  <goal name="VC split.2" expl="2. postcondition">
+  <goal name="VC split.2" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.03" steps="38"/></proof>
   </goal>
-  <goal name="VC split.3" expl="3. precondition">
+  <goal name="VC split.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="VC split.4" expl="4. precondition">
+  <goal name="VC split.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="VC split.5" expl="5. variant decrease">
+  <goal name="VC split.5" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.07" steps="240"/></proof>
   </goal>
-  <goal name="VC split.6" expl="6. precondition">
+  <goal name="VC split.6" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="64"/></proof>
   </goal>
-  <goal name="VC split.7" expl="7. postcondition">
+  <goal name="VC split.7" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.19" steps="521"/></proof>
   </goal>
-  <goal name="VC split.8" expl="8. postcondition">
+  <goal name="VC split.8" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.08" steps="329"/></proof>
   </goal>
-  <goal name="VC split.9" expl="9. variant decrease">
+  <goal name="VC split.9" expl="variant decrease">
   <proof prover="0"><result status="valid" time="0.08" steps="282"/></proof>
   </goal>
-  <goal name="VC split.10" expl="10. precondition">
+  <goal name="VC split.10" expl="precondition">
   <proof prover="0"><result status="valid" time="0.10" steps="67"/></proof>
   </goal>
-  <goal name="VC split.11" expl="11. postcondition">
+  <goal name="VC split.11" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.19" steps="661"/></proof>
   </goal>
-  <goal name="VC split.12" expl="12. postcondition">
+  <goal name="VC split.12" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.10" steps="255"/></proof>
   </goal>
-  <goal name="VC split.13" expl="13. postcondition">
+  <goal name="VC split.13" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.08" steps="238"/></proof>
   </goal>
-  <goal name="VC split.14" expl="14. postcondition">
+  <goal name="VC split.14" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
   </goal>
  </transf>

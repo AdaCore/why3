@@ -258,3 +258,11 @@ module Args : sig
 
   val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
 end
+
+
+(** Loading drivers with relative names *)
+
+val load_driver : main -> Env.env -> string -> string list -> Driver.driver
+(** wrapper for loading a driver from a file that may be relative to the datadir.
+    See [Driver.load_driver_absolute]
+*)

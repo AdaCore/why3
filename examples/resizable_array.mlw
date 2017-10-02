@@ -52,6 +52,7 @@ module ResizableArrayImplem (* : ResizableArraySpec *)
     invariant { 0 <= length <= A.length data }
     invariant { forall i: int. length <= i < A.length data ->
                   A.([]) data i = dummy }
+    by { dummy = any 'a; length = 0; data = A.make 0 (any 'a) }
 
   function ([]) (r: rarray 'a) (i: int) : 'a = A.([]) r.data i
 

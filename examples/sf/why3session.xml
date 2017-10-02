@@ -6,7 +6,7 @@
 <prover id="4" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../sf.mlw" expanded="true">
-<theory name="HoareLogic" sum="5e8a370daefd0a3c1db008def8d9f816" expanded="true">
+<theory name="HoareLogic" sum="75c0d803374a5fdb43f60dac91a4911d" expanded="true">
  <goal name="VC slow_subtraction" expl="VC for slow_subtraction" expanded="true">
  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
@@ -16,25 +16,25 @@
  <goal name="VC slow_addition" expl="VC for slow_addition" expanded="true">
  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="even_noneg">
+ <goal name="even_noneg" expl="">
  <transf name="induction_pr">
-  <goal name="even_noneg.1" expl="1.">
+  <goal name="even_noneg.1" expl="">
   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
   <proof prover="7"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="even_noneg.2" expl="2.">
+  <goal name="even_noneg.2" expl="">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="even_not_odd">
+ <goal name="even_not_odd" expl="">
  <transf name="induction_pr">
-  <goal name="even_not_odd.1" expl="1.">
+  <goal name="even_not_odd.1" expl="">
   <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   <proof prover="7"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="even_not_odd.2" expl="2.">
+  <goal name="even_not_odd.2" expl="">
   <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
   <proof prover="4"><result status="valid" time="0.00"/></proof>
   </goal>
@@ -50,7 +50,7 @@
  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
 </theory>
-<theory name="MoreHoareLogic" sum="1f19c5cb7907db91164a5071ca016e67" expanded="true">
+<theory name="MoreHoareLogic" sum="29a6751487fcbffd209378ac86ea5937" expanded="true">
  <goal name="VC list_sum" expl="VC for list_sum" expanded="true">
  <proof prover="0"><result status="valid" time="0.02" steps="124"/></proof>
  </goal>

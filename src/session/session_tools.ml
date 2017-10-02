@@ -40,7 +40,7 @@ let convert_unknown_prover ~keygen env_session =
       let pks = Mprover.find_def [] pr.proof_prover unknown_provers in
       List.iter (fun pk ->
         (* If such a prover already exists we add nothing *)
-        if not (PHprover.mem pr.proof_parent.goal_external_proofs pk) then
+        if not (PHprover.mem (goal_external_proofs pr.proof_parent) pk) then
           ignore (copy_external_proof ~keygen ~prover:pk pr)
       ) pks;
     ) env_session.session
@@ -64,12 +64,12 @@ let transform_proof_attempt ?notify ~keygen env_session tr_name =
     remove_external_proof ?notify pr;
     let tr =
       try
-        PHstr.find g.goal_transformations tr_name
+        PHstr.find (goal_transformations g) tr_name
       with Not_found ->
         add_registered_transformation ~keygen env_session tr_name g
     in
     let add_pa sg =
-      if not (PHprover.mem sg.goal_external_proofs pr.proof_prover) then
+      if not (PHprover.mem (goal_external_proofs sg) pr.proof_prover) then
         ignore (copy_external_proof ~keygen ~goal:sg
                   ~attempt_status:Interrupted pr)
     in

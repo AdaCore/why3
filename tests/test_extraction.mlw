@@ -44,8 +44,10 @@ module TestExtraction
   use import int.Int
   use import mach.int.Int
 
-  val test_val (x: int) : int
-    ensures { result > x }
+  (* FIXME: this function is never used.
+            Use it somewhere and supply a driver? *)
+  (* val test_val (x: int) : int *)
+  (*   ensures { result > x } *)
 
   let function f_function (y: int) (x: int) : int
     requires { x >= 0 }
@@ -283,6 +285,19 @@ module TestExtraction
     test3 ();
     test4 ();
     test_parallel_assign ()
+
+  (* scopes *)
+
+  type ty = A | B | C
+
+  scope S
+    type ty = A | B | C
+    (* locally hides toplevel function foo: int -> int *)
+    let foo (x: bool) : bool = x
+    let test_foo () = foo true
+  end
+
+  let test_foo () = foo 42
 
 end
 

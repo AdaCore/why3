@@ -214,7 +214,7 @@ let project_dir =
   with Not_found -> failwith "file does not exist"
 
 let goal_statistics (goals,n,m) g =
-  if Opt.inhabited g.S.goal_verified then (goals,n+1,m+1) else (g::goals,n,m+1)
+  if Opt.inhabited (S.goal_verified g) then (goals,n+1,m+1) else (g::goals,n,m+1)
 
 let theory_statistics (ths,n,m) th =
   let goals,n1,m1 =
@@ -228,7 +228,7 @@ let file_statistics _ f (files,n,m) =
 
 let print_statistics files =
   let print_goal g =
-      printf "         +--goal %s not proved@." g.S.goal_name.Ident.id_string
+      printf "         +--goal %s not proved@." (S.goal_name g).Ident.id_string
   in
   let print_theory (th,goals,n,m) =
     if n<m then begin

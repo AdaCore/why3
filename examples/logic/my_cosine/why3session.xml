@@ -3,22 +3,22 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Gappa" version="1.3.0" timelimit="2" steplimit="0" memlimit="0"/>
-<prover id="2" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="3" steplimit="0" memlimit="0"/>
 <file name="../my_cosine.why" expanded="true">
-<theory name="CosineSingle" sum="634c17eefcf3f67f275f789fa56f57f0" expanded="true">
- <goal name="MethodError" expanded="true">
- <proof prover="2" edited="my_cosine_CosineSingle_MethodError_1.v"><result status="valid" time="2.13"/></proof>
+<theory name="CosineSingle" sum="f993602bc7dfd9a1a0a5ab763a7ed8f0" expanded="true">
+ <goal name="MethodError" expl="" expanded="true">
+ <proof prover="1" edited="my_cosine_CosineSingle_MethodError_1.v"><result status="valid" time="1.77"/></proof>
  <proof prover="3"><result status="valid" time="0.24"/></proof>
  </goal>
- <goal name="TotalErrorFullyExpanded" expanded="true">
+ <goal name="TotalErrorFullyExpanded" expl="" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="TotalErrorExpanded" expanded="true">
+ <goal name="TotalErrorExpanded" expl="" expanded="true">
  <proof prover="5"><result status="valid" time="0.05" steps="26"/></proof>
  </goal>
- <goal name="TotalError" expanded="true">
+ <goal name="TotalError" expl="" expanded="true">
  <proof prover="5" timelimit="10"><result status="valid" time="0.08" steps="28"/></proof>
  </goal>
 </theory>

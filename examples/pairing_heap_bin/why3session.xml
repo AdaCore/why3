@@ -9,29 +9,29 @@
 </theory>
 <theory name="HeapType" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Size" sum="2da946f0940152e7939a82c35a1e3c3b">
+<theory name="Size" sum="1323051c1bcaa113f6cee668a7febb2a">
  <goal name="VC size" expl="VC for size">
  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="VC size_nonneg" expl="VC for size_nonneg">
  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="size_empty">
+ <goal name="size_empty" expl="">
  <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
  </goal>
 </theory>
-<theory name="Occ" sum="eb534f334a1929c559e6b4caee0fec76" expanded="true">
+<theory name="Occ" sum="2b3693b8cf8f5c757a5f434cb8873e9e" expanded="true">
  <goal name="VC occ_nonneg" expl="VC for occ_nonneg" expanded="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="PairingHeap" sum="9b93a0b0efc0212f81f4aced70961470" expanded="true">
- <goal name="le_root_trans">
+<theory name="PairingHeap" sum="923c5a8ac7b0c838ae9ad0f42a95203b" expanded="true">
+ <goal name="le_root_trans" expl="">
  <proof prover="2"><result status="valid" time="0.00" steps="15"/></proof>
  </goal>
- <goal name="le_root_tree_trans">
+ <goal name="le_root_tree_trans" expl="">
  <transf name="induction_ty_lex">
-  <goal name="le_root_tree_trans.1" expl="1.">
+  <goal name="le_root_tree_trans.1" expl="">
   <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
  </transf>
@@ -42,7 +42,7 @@
  <goal name="VC mem_heap" expl="VC for mem_heap">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="root_is_minimum">
+ <goal name="root_is_minimum" expl="">
  <proof prover="2"><result status="valid" time="0.03" steps="129"/></proof>
  </goal>
  <goal name="VC empty" expl="VC for empty">

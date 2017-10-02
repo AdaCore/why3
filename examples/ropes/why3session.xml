@@ -8,23 +8,23 @@
 <prover id="6" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.5.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../ropes.mlw" expanded="true">
-<theory name="String" sum="adf80a8a029b51e023893ed17286d581">
+<theory name="String" sum="07d9d0f3e492f325ffbd6a5edfc0223d">
  <goal name="VC empty" expl="VC for empty">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="app_assoc">
+ <goal name="app_assoc" expl="">
  <proof prover="6"><result status="valid" time="0.01" steps="36"/></proof>
  </goal>
 </theory>
 <theory name="Sig" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Rope" sum="c687543107ce33546befd3453bbe0d1c" expanded="true">
+<theory name="Rope" sum="6cc9407af4c5cf302d9e4b43782622bc" expanded="true">
  <goal name="VC length" expl="VC for length">
  <proof prover="6"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="rope_length_is_string_length">
+ <goal name="rope_length_is_string_length" expl="">
  <transf name="induction_ty_lex">
-  <goal name="rope_length_is_string_length.1" expl="1.">
+  <goal name="rope_length_is_string_length.1" expl="">
   <proof prover="6"><result status="valid" time="0.01" steps="106"/></proof>
   </goal>
  </transf>
@@ -48,7 +48,7 @@
  <proof prover="6"><result status="valid" time="0.20" steps="885"/></proof>
  </goal>
 </theory>
-<theory name="Balance" sum="76f206b1f6d5eecc4a9c5eff294c3486" expanded="true">
+<theory name="Balance" sum="d5ce6c7fd31cb383c95ba06da0cfe897" expanded="true">
  <goal name="VC max" expl="VC for max">
  <proof prover="6"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
@@ -64,7 +64,7 @@
  <goal name="VC string_of_array_eq" expl="VC for string_of_array_eq">
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="string_of_array_frame">
+ <goal name="string_of_array_frame" expl="">
  <proof prover="6"><result status="valid" time="0.02" steps="67"/></proof>
  </goal>
  <goal name="VC string_of_array_concat_empty" expl="VC for string_of_array_concat_empty">
@@ -72,73 +72,73 @@
  </goal>
  <goal name="VC insert" expl="VC for insert" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC insert.1" expl="1. index in array bounds">
+  <goal name="VC insert.1" expl="index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC insert.2" expl="2. precondition">
+  <goal name="VC insert.2" expl="precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC insert.3" expl="3. precondition">
+  <goal name="VC insert.3" expl="precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC insert.4" expl="4. index in array bounds">
+  <goal name="VC insert.4" expl="index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC insert.5" expl="5. assertion">
+  <goal name="VC insert.5" expl="assertion">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="54"/></proof>
   </goal>
-  <goal name="VC insert.6" expl="6. postcondition">
+  <goal name="VC insert.6" expl="postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03" steps="88"/></proof>
   </goal>
-  <goal name="VC insert.7" expl="7. postcondition">
+  <goal name="VC insert.7" expl="postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC insert.8" expl="8. postcondition">
+  <goal name="VC insert.8" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.13"/></proof>
   </goal>
-  <goal name="VC insert.9" expl="9. index in array bounds">
+  <goal name="VC insert.9" expl="index in array bounds">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC insert.10" expl="10. assertion">
+  <goal name="VC insert.10" expl="assertion">
   <proof prover="5"><result status="valid" time="2.76"/></proof>
   </goal>
-  <goal name="VC insert.11" expl="11. assertion">
+  <goal name="VC insert.11" expl="assertion">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC insert.12" expl="12. variant decrease">
+  <goal name="VC insert.12" expl="variant decrease">
   <proof prover="6" timelimit="10"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC insert.13" expl="13. precondition">
+  <goal name="VC insert.13" expl="precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="VC insert.14" expl="14. precondition">
+  <goal name="VC insert.14" expl="precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC insert.15" expl="15. precondition">
+  <goal name="VC insert.15" expl="precondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.03" steps="92"/></proof>
   </goal>
-  <goal name="VC insert.16" expl="16. precondition">
+  <goal name="VC insert.16" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC insert.17" expl="17. assertion">
+  <goal name="VC insert.17" expl="assertion">
   <proof prover="2"><result status="valid" time="0.24"/></proof>
   </goal>
-  <goal name="VC insert.18" expl="18. postcondition">
+  <goal name="VC insert.18" expl="postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC insert.19" expl="19. postcondition">
+  <goal name="VC insert.19" expl="postcondition">
   <proof prover="6" timelimit="10"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
-  <goal name="VC insert.20" expl="20. postcondition">
+  <goal name="VC insert.20" expl="postcondition">
   <transf name="introduce_premises">
-   <goal name="VC insert.20.1" expl="1. postcondition">
+   <goal name="VC insert.20.1" expl="postcondition">
    <transf name="inline_goal">
-    <goal name="VC insert.20.1.1" expl="1. postcondition">
+    <goal name="VC insert.20.1.1" expl="postcondition">
     <transf name="split_goal_wp">
-     <goal name="VC insert.20.1.1.1" expl="1. VC for insert">
+     <goal name="VC insert.20.1.1.1" expl="VC for insert">
      <proof prover="5"><result status="valid" time="0.10"/></proof>
      </goal>
-     <goal name="VC insert.20.1.1.2" expl="2. VC for insert">
+     <goal name="VC insert.20.1.1.2" expl="VC for insert">
      <proof prover="0"><result status="valid" time="0.33"/></proof>
      </goal>
     </transf>

@@ -5,25 +5,25 @@
 <prover id="0" name="Gappa" version="1.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../my_cosine.mlw" expanded="true">
-<theory name="M" sum="77e0949adb9d875309f1ceb98d7337f8" expanded="true">
+<theory name="M" sum="f21832e957d99f4425123b0031e0e9b4" expanded="true">
  <goal name="VC my_cosine" expl="VC for my_cosine" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC my_cosine.1" expl="1. assertion" expanded="true">
+  <goal name="VC my_cosine.1" expl="assertion" expanded="true">
   <proof prover="2"><result status="valid" time="0.14"/></proof>
-  <proof prover="3" edited="my_cosine_M_VC_my_cosine_1.v"><result status="valid" time="2.24"/></proof>
+  <proof prover="4" edited="my_cosine_M_VC_my_cosine_1.v"><result status="valid" time="1.78"/></proof>
   </goal>
-  <goal name="VC my_cosine.2" expl="2. precondition">
+  <goal name="VC my_cosine.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC my_cosine.3" expl="3. precondition">
+  <goal name="VC my_cosine.3" expl="precondition">
   <proof prover="1"><result status="valid" time="0.05" steps="188"/></proof>
   </goal>
-  <goal name="VC my_cosine.4" expl="4. precondition">
+  <goal name="VC my_cosine.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="VC my_cosine.5" expl="5. postcondition">
+  <goal name="VC my_cosine.5" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>

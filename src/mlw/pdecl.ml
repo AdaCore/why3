@@ -23,23 +23,25 @@ type its_defn = {
   itd_fields       : rsymbol list;
   itd_constructors : rsymbol list;
   itd_invariant    : term list;
+  itd_witness      : expr list;
 }
 
-let mk_itd s f c i = {
+let mk_itd s f c i w = {
   itd_its = s;
   itd_fields = f;
   itd_constructors = c;
   itd_invariant = i;
+  itd_witness = w;
 }
 
 let create_alias_decl id args ity =
-  mk_itd (create_alias_itysymbol id args ity) [] [] []
+  mk_itd (create_alias_itysymbol id args ity) [] [] [] []
 
 let create_range_decl id ir =
-  mk_itd (create_range_itysymbol id ir) [] [] []
+  mk_itd (create_range_itysymbol id ir) [] [] [] []
 
 let create_float_decl id fp =
-  mk_itd (create_float_itysymbol id fp) [] [] []
+  mk_itd (create_float_itysymbol id fp) [] [] [] []
 
 let check_field stv f =
   let loc = f.pv_vs.vs_name.id_loc in
@@ -73,7 +75,7 @@ let create_semi_constructor id s fdl pjl invl =
   let c = create_cty fdl invl [q] Mxs.empty Mpv.empty eff ity in
   create_rsymbol id c
 
-let create_plain_record_decl ~priv ~mut id args fdl invl =
+let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
   let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
   let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
@@ -84,7 +86,16 @@ let create_plain_record_decl ~priv ~mut id args fdl invl =
   let csl = if priv then [] else if invl <> [] then
     [create_semi_constructor cid s fdl pjl invl] else
     [create_constructor ~constr:1 cid s fdl] in
-  mk_itd s pjl csl invl
+  if witn <> [] then begin
+    List.iter2 (fun fd ({e_loc = loc} as e) ->
+      if e.e_effect.eff_oneway then Loc.errorm ?loc
+        "This expression may not terminate, it cannot be a witness";
+      if not (eff_pure e.e_effect) then Loc.errorm ?loc
+        "This expression has side effects, it cannot be a witness";
+      let ety = ty_of_ity e.e_ity and fty = fd.pv_vs.vs_ty in
+      Loc.try2 ?loc ty_equal_check ety fty) fdl witn
+  end;
+  mk_itd s pjl csl invl witn
 
 let create_rec_record_decl s fdl =
   let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
@@ -94,7 +105,7 @@ let create_rec_record_decl s fdl =
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
   let pjl = List.map (create_projection s) fdl in
-  mk_itd s pjl [cs] []
+  mk_itd s pjl [cs] [] []
 
 let create_variant_decl exn get_its csl =
   (* named projections are the same in each constructor *)
@@ -114,7 +125,7 @@ let create_variant_decl exn get_its csl =
   (* and now we can create the type symbol and the constructors *)
   let s = get_its (List.map get_fds csl) and constr = List.length csl in
   let mk_cs (id, fdl) = create_constructor ~constr id s (List.map snd fdl) in
-  mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs csl) []
+  mk_itd s (List.map (create_projection s) pjl) (List.map mk_cs csl) [] []
 
 let create_plain_variant_decl id args csl =
   let exn = Invalid_argument "Pdecl.create_plain_variant_decl" in
@@ -284,6 +295,7 @@ let get_syms node pure =
         let add_fd syms s = syms_ity syms s.rs_cty.cty_result in
         let add_cs syms s = syms_pvl syms s.rs_cty.cty_args in
         let syms = List.fold_left add_fd syms d.itd_fields in
+        let syms = List.fold_left syms_expr syms d.itd_witness in
         List.fold_left add_cs syms d.itd_constructors in
       List.fold_left syms_itd syms dl
   | PDlet ld ->
@@ -563,26 +575,26 @@ open Theory
 
 let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
   | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
-      mk_decl (PDtype [mk_itd its_int  [] [] []]) [di],
-      mk_decl (PDtype [mk_itd its_real [] [] []]) [dr],
+      mk_decl (PDtype [mk_itd its_int  [] [] [] []]) [di],
+      mk_decl (PDtype [mk_itd its_real [] [] [] []]) [dr],
       mk_decl PDpure [de]
   | _ -> assert false
 
 let pd_func, pd_func_app = match highord_theory.th_decls with
   | [{td_node = Decl df}; {td_node = Decl da}] ->
-      mk_decl (PDtype [mk_itd its_func [] [] []]) [df],
+      mk_decl (PDtype [mk_itd its_func [] [] [] []]) [df],
       mk_decl (PDlet ld_func_app) [da]
   | _ -> assert false
 
 let pd_bool = match bool_theory.th_decls with
   | [{td_node = Decl db}] ->
-      mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] []]) [db]
+      mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] [] []]) [db]
   | _ -> assert false
 
 let pd_tuple = Stdlib.Hint.memo 17 (fun n ->
   match (tuple_theory n).th_decls with
   | [{td_node = Decl dt}] ->
-      mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] []]) [dt]
+      mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] [] []]) [dt]
   | _ -> assert false)
 
 (** {2 Known identifiers} *)

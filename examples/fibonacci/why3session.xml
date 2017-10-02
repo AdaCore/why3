@@ -7,27 +7,27 @@
 <prover id="5" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../fibonacci.mlw" expanded="true">
-<theory name="FibonacciTest" sum="9fccb254fa2218a4d5027f25371577ce">
- <goal name="isfib_2_1">
+<theory name="FibonacciTest" sum="42323cb52556269b6dab0c742eec2d71">
+ <goal name="isfib_2_1" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="isfib_6_8">
+ <goal name="isfib_6_8" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="not_isfib_2_2">
+ <goal name="not_isfib_2_2" expl="">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="9" timelimit="5"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLinear" sum="477dec7d3a1032ce41e6959cb270849b">
+<theory name="FibonacciLinear" sum="aaf9bf0c234c86c1decc2c0003f5e94e">
  <goal name="VC fib" expl="VC for fib">
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="FibRecGhost" sum="3534a72ab694e460197a46dfd750efa2">
+<theory name="FibRecGhost" sum="711563e545717a706ea69a551805833e">
  <goal name="VC fib_aux" expl="VC for fib_aux">
  <proof prover="5"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -41,7 +41,7 @@
  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
-<theory name="FibRecNoGhost" sum="679655005cb3dd998bfd2c1792f26bf2">
+<theory name="FibRecNoGhost" sum="56c776054667647c413b8fd56d248ed5">
  <goal name="VC fib_aux" expl="VC for fib_aux">
  <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -49,12 +49,12 @@
  <proof prover="5"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="SmallestFibAbove" sum="8284219ebdfce3c44f526740f5a083a2">
+<theory name="SmallestFibAbove" sum="c26b17bb2801358b5fa0a4ae06b7d431">
  <goal name="VC smallest_fib_above" expl="VC for smallest_fib_above">
  <proof prover="5"><result status="valid" time="0.12"/></proof>
  </goal>
 </theory>
-<theory name="Zeckendorf" sum="ded49788e228303bcb5c25257ccddedf">
+<theory name="Zeckendorf" sum="3ea0ac28f606df2ae37e2b908eaf204e">
  <goal name="VC fib_nonneg" expl="VC for fib_nonneg">
  <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
@@ -72,126 +72,126 @@
  </goal>
  <goal name="VC zeckendorf_unique" expl="VC for zeckendorf_unique">
  <transf name="split_goal_wp">
-  <goal name="VC zeckendorf_unique.1" expl="1. unreachable point">
+  <goal name="VC zeckendorf_unique.1" expl="unreachable point">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.2" expl="2. precondition">
+  <goal name="VC zeckendorf_unique.2" expl="precondition">
   <proof prover="9"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.3" expl="3. variant decrease">
+  <goal name="VC zeckendorf_unique.3" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.4" expl="4. precondition">
+  <goal name="VC zeckendorf_unique.4" expl="precondition">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.5" expl="5. precondition">
+  <goal name="VC zeckendorf_unique.5" expl="precondition">
   <proof prover="9"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.6" expl="6. precondition">
+  <goal name="VC zeckendorf_unique.6" expl="precondition">
   <proof prover="9"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.7" expl="7. postcondition">
+  <goal name="VC zeckendorf_unique.7" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.8" expl="8. postcondition">
+  <goal name="VC zeckendorf_unique.8" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.9" expl="9. precondition">
+  <goal name="VC zeckendorf_unique.9" expl="precondition">
   <proof prover="5"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.10" expl="10. precondition">
+  <goal name="VC zeckendorf_unique.10" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.11" expl="11. precondition">
+  <goal name="VC zeckendorf_unique.11" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.12" expl="12. unreachable point">
+  <goal name="VC zeckendorf_unique.12" expl="unreachable point">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.13" expl="13. precondition">
+  <goal name="VC zeckendorf_unique.13" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.14" expl="14. precondition">
+  <goal name="VC zeckendorf_unique.14" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.15" expl="15. precondition">
+  <goal name="VC zeckendorf_unique.15" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.16" expl="16. unreachable point">
+  <goal name="VC zeckendorf_unique.16" expl="unreachable point">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.17" expl="17. precondition">
+  <goal name="VC zeckendorf_unique.17" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.18" expl="18. precondition">
+  <goal name="VC zeckendorf_unique.18" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.19" expl="19. precondition">
+  <goal name="VC zeckendorf_unique.19" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.20" expl="20. precondition">
+  <goal name="VC zeckendorf_unique.20" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.21" expl="21. precondition">
+  <goal name="VC zeckendorf_unique.21" expl="precondition">
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.22" expl="22. precondition">
+  <goal name="VC zeckendorf_unique.22" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.23" expl="23. variant decrease">
+  <goal name="VC zeckendorf_unique.23" expl="variant decrease">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.24" expl="24. precondition">
+  <goal name="VC zeckendorf_unique.24" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.25" expl="25. precondition">
+  <goal name="VC zeckendorf_unique.25" expl="precondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC zeckendorf_unique.26" expl="26. postcondition">
+  <goal name="VC zeckendorf_unique.26" expl="postcondition">
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Mat22" sum="1f7a6624186307504d3ebbc4f00dd21a">
- <goal name="Assoc">
+<theory name="Mat22" sum="fb61df50faaff9adf15413b912fdbb37">
+ <goal name="Assoc" expl="">
  <proof prover="1"><result status="valid" time="0.03" steps="2"/></proof>
  </goal>
- <goal name="Unit_def_l">
+ <goal name="Unit_def_l" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="Unit_def_r">
+ <goal name="Unit_def_r" expl="">
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
-<theory name="FibonacciLogarithmic" sum="82f92a9ae937c6e26e61244170604014">
+<theory name="FibonacciLogarithmic" sum="ba681b68b380b8af7577d198843a78b9">
  <goal name="VC m1110" expl="VC for m1110">
  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
  <goal name="VC logfib" expl="VC for logfib">
  <transf name="split_goal_wp">
-  <goal name="VC logfib.1" expl="1. assertion">
+  <goal name="VC logfib.1" expl="assertion">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC logfib.2" expl="2. precondition">
+  <goal name="VC logfib.2" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC logfib.3" expl="3. variant decrease">
+  <goal name="VC logfib.3" expl="variant decrease">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC logfib.4" expl="4. precondition">
+  <goal name="VC logfib.4" expl="precondition">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC logfib.5" expl="5. precondition">
+  <goal name="VC logfib.5" expl="precondition">
   <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC logfib.6" expl="6. assertion">
+  <goal name="VC logfib.6" expl="assertion">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC logfib.7" expl="7. assertion">
+  <goal name="VC logfib.7" expl="assertion">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC logfib.8" expl="8. postcondition">
+  <goal name="VC logfib.8" expl="postcondition">
   <proof prover="1"><result status="valid" time="0.29" steps="81"/></proof>
   </goal>
  </transf>

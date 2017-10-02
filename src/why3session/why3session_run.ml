@@ -153,7 +153,7 @@ let print_res fname pa ps old_ps =
     print_attempt_status old_ps
 
 let print_proof_goal fmt pa =
-  pp_print_string fmt pa.proof_parent.goal_name.Ident.id_string
+  pp_print_string fmt (goal_name pa.proof_parent).Ident.id_string
 
 
 let same_result r1 r2 =
@@ -186,7 +186,7 @@ let is_successful env = (* means all goals proved*)
     let rec iter = function
         | File f -> file_iter iter f
         | Theory th -> theory_iter iter th
-        | Goal g -> if not (Opt.inhabited (g.goal_verified)) then raise Exit
+        | Goal g -> if not (Opt.inhabited (goal_verified g)) then raise Exit
         | Proof_attempt _ | Transf _ | Metas _ -> assert false in
     session_iter iter env.session;
     true

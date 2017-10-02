@@ -72,10 +72,16 @@ let goal_expl_task ~root task =
        then res
        else collect_expls gid.Ident.id_label)
   in
+  let info =
+    match info with
+      | Some i -> i
+      | None -> ""
+  in
   gid, info, task
 
 (* {2 ident dictionaries for shapes} *)
 
+(*
 let dict_table = Hashtbl.create 17
 let dict_count = ref 0
 let reverse_ident_table = Hashtbl.create 17
@@ -86,10 +92,11 @@ let reset_dict () =
   Hashtbl.clear reverse_ident_table;
   dict_count := 0;
   reverse_dict_count := 0
+ *)
 
 (* {3 direct table to read shapes from strings} *)
 
-
+(*
 let get_name s b i =
   try while !i < String.length s do
     match String.get s !i with
@@ -121,7 +128,9 @@ let get_num s n i =
     with Not_found ->
       invalid_arg
         ("Termcode.get_num: invalid ident number " ^ string_of_int !n)
+      *)
 
+(*
 let get_id s i =
   if !i >= String.length s then
     invalid_arg "Termcode.get_id: missing closing parenthesis";
@@ -136,7 +145,7 @@ let get_id s i =
       Buffer.add_char b c;
       incr i;
       get_name s b i
-
+*)
 
 (*
 let store_id s i =
@@ -184,7 +193,8 @@ let string_of_shape s = s
     raise e
 *)
 
-let shape_of_string s =
+let shape_of_string s = s
+(*
   try
   let l = String.length s in
   let r = Buffer.create l in
@@ -198,6 +208,7 @@ let shape_of_string s =
   with e ->
     Format.eprintf "Error while reading shape [%s]@." s;
     raise e
+ *)
 
 (* tests
 let _ = reset_dict () ; shape_of_string "a(b)cde(0)"
@@ -229,188 +240,218 @@ example:
 
 *)
 
-let vs_rename_alpha c h vs = incr c; Mvs.add vs !c h
+let tag_and = 'A'
+let tag_app = 'a'
+let tag_case = 'C'
+let tag_const = 'c'
+let tag_exists = 'E'
+let tag_eps = 'e'
+let tag_forall = 'F'
+let tag_false = 'f'
+let tag_impl = 'I'
+let tag_if = 'i'
+let tag_let = 'L'
+let tag_not = 'N'
+let tag_or = 'O'
+let tag_iff = 'q'
+let tag_true = 't'
+let tag_var = 'V'
+let tag_wild = 'w'
+let tag_as = 'z'
 
-let vl_rename_alpha c h vl = List.fold_left (vs_rename_alpha c) h vl
+let shape_buffer = Buffer.create 17
+
+let push s =
+  Buffer.add_string shape_buffer s;
+  if Buffer.length shape_buffer >= 256 then raise Exit
+
+let pushc c =
+  Buffer.add_char shape_buffer c;
+  if Buffer.length shape_buffer >= 256 then raise Exit
+
+let ident h id =
+  let x =
+    try Ident.Mid.find id !h
+    with Not_found ->
+      let s = id.Ident.id_string in
+      h := Ident.Mid.add id s !h; s
+  in
+  push x
+
+let vs_rename_alpha c h vs =
+  incr c;
+  let s = string_of_int !c in
+  h := Ident.Mid.add vs.vs_name s !h
+
+let vl_rename_alpha c h vl = List.iter (vs_rename_alpha c h) vl
 
 let rec pat_rename_alpha c h p = match p.pat_node with
   | Pvar v -> vs_rename_alpha c h v
-  | Pas (p, v) -> pat_rename_alpha c (vs_rename_alpha c h v) p
+  | Pas (p, v) -> vs_rename_alpha c h v; pat_rename_alpha c h p
   | Por (p, _) -> pat_rename_alpha c h p
-  | _ -> Term.pat_fold (pat_rename_alpha c) h p
+  | _ -> Term.pat_fold (fun () -> pat_rename_alpha c h) () p
 
-
-let tag_and = "A"
-let tag_app = "a"
-let tag_case = "C"
-let tag_const = "c"
-let tag_exists = "E"
-let tag_eps = "e"
-let tag_forall = "F"
-let tag_false = "f"
-let tag_impl = "I"
-let tag_if = "i"
-let tag_let = "L"
-let tag_not = "N"
-let tag_or = "O"
-let tag_iff = "q"
-let tag_true = "t"
-let tag_var = "V"
-let tag_wild = "w"
-let tag_as = "z"
-
-
-let id_string_shape ~push id acc =
-  push id acc
 (*
-  let l = String.length id in
-  if l <= 4 then push id acc else
-  (* sanity check *)
-  if (match String.get id 0 with
-      | '0'..'9' -> true
-      | _ ->
-        try
-          let (_:int) = String.index id ')' in
-          true
-        with Not_found -> false)
-    then push id acc
-    else push ")" (push id (push "(" acc))
+let id_string_shape id = push id
+
+let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
-let ident_shape ~push id acc =
-  id_string_shape ~push id.Ident.id_string acc
+open Number
 
-let const_shape ~push acc c =
-  Format.fprintf Format.str_formatter "%a" Number.print_constant c;
-  push (Format.flush_str_formatter ()) acc
+let integer_const_shape = function
+  | IConstDec s -> push s
+  | IConstHex s -> push "0x"; push s
+  | IConstOct s -> push "0o"; push s
+  | IConstBin s -> push "0b"; push s
 
-let rec pat_shape ~(push:string->'a->'a) c m (acc:'a) p : 'a =
+let real_const_shape = function
+  | RConstDec (i,f,None)   -> push i; push "."; push f
+  | RConstDec (i,f,Some e) -> push i; push "."; push f; push "e"; push e
+  | RConstHex (i,f,Some e) -> push "0x"; push i; push "."; push f; push "p"; push e
+  | RConstHex (i,f,None)   -> push "0x"; push i; push "."; push f
+
+let sign_shape is_negative =
+  if is_negative then pushc '-'
+
+let const_shape c =
+  match c with
+  | ConstInt c -> sign_shape c.ic_negative; integer_const_shape c.ic_abs
+  | ConstReal c -> sign_shape c.rc_negative; real_const_shape c.rc_abs
+
+
+let rec pat_shape c m p : 'a =
   match p.pat_node with
-    | Pwild -> push tag_wild acc
-    | Pvar _ -> push tag_var acc
+    | Pwild -> pushc tag_wild
+    | Pvar _ -> pushc tag_var
     | Papp (f, l) ->
-        List.fold_left (pat_shape ~push c m)
-          (ident_shape ~push f.ls_name (push tag_app acc))
-          l
-    | Pas (p, _) -> push tag_as (pat_shape ~push c m acc p)
+       pushc tag_app;
+       ident m f.ls_name;
+       List.iter (pat_shape c m) l
+    | Pas (p, _) -> pat_shape c m p; pushc tag_as
     | Por (p, q) ->
-        pat_shape ~push c m (push tag_or (pat_shape ~push c m acc q)) p
+       pat_shape c m q; pushc tag_or; pat_shape c m p
 
-let rec t_shape ~version ~(push:string->'a->'a) c m (acc:'a) t : 'a =
-  let fn = t_shape ~version ~push c m in
+let rec t_shape ~version c m t =
+  let fn = t_shape ~version c m in
   match t.t_node with
-    | Tconst c -> const_shape ~push (push tag_const acc) c
-    | Tvar v ->
-        let x =
-          try string_of_int (Mvs.find v m)
-          with Not_found -> v.vs_name.Ident.id_string
-        in
-        push x (push tag_var acc)
+    | Tconst c -> pushc tag_const; const_shape c
+    | Tvar v -> pushc tag_var; ident m v.vs_name
     | Tapp (s,l) ->
-        List.fold_left fn
-          (ident_shape ~push s.ls_name (push tag_app acc))
-          l
+       pushc tag_app;
+       ident m s.ls_name;
+       List.iter fn l
     | Tif (f,t1,t2) ->
       begin match version with
-      | SV1 | SV2 -> fn (fn (fn (push tag_if acc) f) t1) t2
-      | SV3 -> fn (fn (fn (push tag_if acc) t2) t1) f
+      | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
+      | SV3 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
-        let br_shape acc b =
+        let br_shape b =
           let p,t2 = t_open_branch b in
           match version with
           | SV1 | SV2 ->
-            let acc = pat_shape ~push c m acc p in
-            let m = pat_rename_alpha c m p in
-            t_shape ~version ~push c m acc t2
+            pat_shape c m p;
+            pat_rename_alpha c m p;
+            t_shape ~version c m t2
           | SV3 ->
-            let m1 = pat_rename_alpha c m p in
-            let acc = t_shape ~version ~push c m1 acc t2 in
-            pat_shape ~push c m acc p
+            pat_rename_alpha c m p;
+            t_shape ~version c m t2;
+            pat_shape c m p
         in
         begin match version with
         | SV1 | SV2 ->
-          List.fold_left br_shape (fn (push tag_case acc) t1) bl
+                 pushc tag_case;
+                 fn t1;
+                 List.iter br_shape bl
         | SV3 ->
-          let acc = push tag_case acc in
-          let acc = List.fold_left br_shape acc bl in
-          fn acc t1
+           pushc tag_case;
+           List.iter br_shape bl;
+           fn t1
         end
     | Teps b ->
+        pushc tag_eps;
         let u,f = t_open_bound b in
-        let m = vs_rename_alpha c m u in
-        t_shape ~version ~push c m (push tag_eps acc) f
+        vs_rename_alpha c m u;
+        t_shape ~version c m f
     | Tquant (q,b) ->
         let vl,triggers,f1 = t_open_quant b in
-        let m = vl_rename_alpha c m vl in
-        let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
+        vl_rename_alpha c m vl;
         (* argument first, intentionally, to give more weight on A in
            forall x,A *)
-        let acc = push hq (t_shape ~version ~push c m acc f1) in
-        List.fold_right
-          (fun trigger acc ->
-             List.fold_right
-               (fun t acc ->
-                  t_shape ~version ~push c m acc t)
-               trigger acc)
-          triggers acc
+        t_shape ~version c m f1;
+        let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
+        pushc hq;
+        List.iter
+          (fun trigger ->
+             List.iter
+               (fun t -> t_shape ~version c m t)
+               trigger)
+          triggers
     | Tbinop (o,f,g) ->
-        let tag = match o with
-          | Tand -> tag_and
-          | Tor -> tag_or
-          | Timplies -> tag_impl
-          | Tiff -> tag_iff
-        in
-        fn (push tag (fn acc g)) f
-          (* g first, intentionally, to give more weight on B in A->B *)
+       (* g first, intentionally, to give more weight on B in A->B *)
+       fn g;
+       let tag = match o with
+         | Tand -> tag_and
+         | Tor -> tag_or
+         | Timplies -> tag_impl
+         | Tiff -> tag_iff
+       in
+       pushc tag;
+       fn f
     | Tlet (t1,b) ->
         let u,t2 = t_open_bound b in
-        let m = vs_rename_alpha c m u in
+        vs_rename_alpha c m u;
         begin
           match version with
             | SV1 ->
-              t_shape ~version ~push c m (fn (push tag_let acc) t1) t2
+               pushc tag_let; fn t1; t_shape ~version c m t2
             | SV2 | SV3 ->
-              (* t2 first, intentionally *)
-              fn (push tag_let (t_shape ~version ~push c m acc t2)) t1
+                     (* t2 first, intentionally *)
+                     t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
-      | SV1 | SV2 -> push tag_not (fn acc f)
-      | SV3 -> fn (push tag_not acc) f
+      | SV1 | SV2 -> fn f; pushc tag_not
+      | SV3 -> pushc tag_not; fn f
       end
-    | Ttrue -> push tag_true acc
-    | Tfalse -> push tag_false acc
+    | Ttrue -> pushc tag_true
+    | Tfalse -> pushc tag_false
 
-(* dead code
-let t_shape_buf ?(version=current_shape_version) t =
-  let b = Buffer.create 17 in
-  let push t () = Buffer.add_string b t in
-  let () = t_shape ~version ~push (ref (-1)) Mvs.empty () t in
-  Buffer.contents b
-*)
 
-let t_shape_task ~version t =
-  let b = Buffer.create 17 in
-  let push t () = Buffer.add_string b t in
+let t_shape_task ~version ~expl t =
+  Buffer.clear shape_buffer;
   begin match version with
   | SV1 | SV2 -> ()
-  | SV3 ->
-    let _, expl, _ = goal_expl_task ~root:false t in
-    match expl with
-      | None -> ()
-      | Some expl -> id_string_shape ~push expl ()
+  | SV3 -> push expl
   end;
   let f = Task.task_goal_fmla t in
-  let () = t_shape ~version ~push (ref (-1)) Mvs.empty () f in
-  Buffer.contents b
+  let () =
+    try
+      t_shape ~version (ref (-1)) (ref Ident.Mid.empty) f
+    with Exit -> ()
+  in
+  Buffer.contents shape_buffer
 
-let t_shape_task ?(version=current_shape_version) t =
+(*
+let time = ref 0.0
+ *)
+
+let t_shape_task ?(version=current_shape_version) ~expl t =
   let version = match version with
     | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3
     | _ -> assert false
   in
-  t_shape_task ~version t
+(*
+  let tim = Unix.gettimeofday () in
+ *)
+  let s = t_shape_task ~version ~expl t in
+(*
+  let tim = Unix.gettimeofday () -. tim in
+  time := !time +. tim;
+  Format.eprintf "[Shape times] %f/%f@." tim !time;
+*)
+  s
 
 (* Checksums *)
 
@@ -432,6 +473,7 @@ module Checksum = struct
   let char (_,_,_,buf) c = Buffer.add_char buf c
   let int (_,_,_,buf as b) i =
     char b 'i'; Buffer.add_string buf (string_of_int i)
+  let raw_string (_,_,_,buf) s = Buffer.add_string buf s
   let string (_,_,_,buf as b) s =
     char b '"'; Buffer.add_string buf (String.escaped s); char b '"'
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
@@ -456,10 +498,30 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
+  let integer_const b = function
+    | IConstDec s -> raw_string b s
+    | IConstHex s -> raw_string b "0x"; raw_string b s
+    | IConstOct s -> raw_string b "0o"; raw_string b s
+    | IConstBin s -> raw_string b "0b"; raw_string b s
+
+  let real_const b = function
+    | RConstDec (i,f,None)   ->
+       raw_string b i; raw_string b "."; raw_string b f
+    | RConstDec (i,f,Some e) ->
+       raw_string b i; raw_string b "."; raw_string b f; raw_string b "e"; raw_string b e
+    | RConstHex (i,f,Some e) ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f;
+       raw_string b "p"; raw_string b e
+    | RConstHex (i,f,None)   ->
+       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f
+
+  let sign b is_negative =
+    if is_negative then raw_string b "-"
+
   let const b c =
-    Number.print_constant Format.str_formatter c;
-    let s = Format.flush_str_formatter () in
-    string b s
+    match c with
+    | ConstInt c -> sign b c.ic_negative; integer_const b c.ic_abs
+    | ConstReal c -> sign b c.rc_negative; real_const b c.rc_abs
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -671,13 +733,26 @@ module Checksum = struct
 
 end
 
+(*
+let time = ref 0.0
+ *)
+
 let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
     | 4 -> CV2
     | _ -> assert false
   in
-  Checksum.task ~version t
+(*
+  let tim = Unix.gettimeofday () in
+*)
+  let s = Checksum.task ~version t in
+(*
+  let tim = Unix.gettimeofday () -. tim in
+  time := !time +. tim;
+  Format.eprintf "[Checksum times] %f/%f@." tim !time;
+*)
+  s
 
 (* not used anymore
 let theory_checksum ?(version=current_shape_version) t =

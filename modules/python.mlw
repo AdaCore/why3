@@ -1,16 +1,3 @@
-module MapOcc
-  use import int.Int
-  use import map.Map
-  use import map.Occ
-
-  lemma occ_exchange :
-    forall m: map int 'a, l u i j: int, x y z: 'a.
-      l <= i < u ->
-      l <= j < u ->
-        Occ.occ z m[i <- x][j <- y] l u =
-        Occ.occ z m[i <- y][j <- x] l u
-end
-
 module Python
 
   use import int.Int
@@ -47,10 +34,10 @@ module Python
 
   (* ad-hoc facts about exchange *)
 
-  use MapOcc
+  use import map.Occ
 
   function occurrence (v: 'a) (l: list 'a) : int =
-    MapOcc.Occ.occ v l.Array.elts 0 l.Array.length
+    Occ.occ v l.Array.elts 0 l.Array.length
 
   (* Python's division and modulus according are neither Euclidean division,
      nor computer division, but something else defined in

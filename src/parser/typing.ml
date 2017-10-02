@@ -879,7 +879,9 @@ let check_public ~loc d name =
   if d.td_vis <> Public || d.td_mut then
     Loc.errorm ~loc "%s types cannot be abstract, private, or mutable" name;
   if d.td_inv <> [] then
-    Loc.errorm ~loc "%s types cannot have invariants" name
+    Loc.errorm ~loc "%s types cannot have invariants" name;
+  if d.td_wit <> [] then
+    Loc.errorm ~loc "%s types cannot have witnesses" name
 
 let add_types muc tdl =
   let add m ({td_ident = {id_str = x}; td_loc = loc} as d) =
@@ -942,14 +944,14 @@ let add_types muc tdl =
         let alg = Mstr.add x (id,args) alg in
         let get_fd nms fd =
           let {id_str = nm; id_loc = loc} = fd.f_ident in
-          let exn = Loc.Located (loc, Loc.Message ("Field " ^
-            nm ^ " is used more than once in a record")) in
-          let nms = Sstr.add_new exn nm nms in
           let id = create_user_id fd.f_ident in
           let ity = parse ~loc ~alias ~alg fd.f_pty in
           let ghost = d.td_vis = Abstract || fd.f_ghost in
-          nms, (fd.f_mutable, create_pvsymbol id ~ghost ity) in
-        let _,fl = Lists.map_fold_left get_fd Sstr.empty fl in
+          let pv = create_pvsymbol id ~ghost ity in
+          let exn = Loc.Located (loc, Loc.Message ("Field " ^
+            nm ^ " is used more than once in a record")) in
+          Mstr.add_new exn nm pv nms, (fd.f_mutable, pv) in
+        let nms,fl = Lists.map_fold_left get_fd Mstr.empty fl in
 (*      if not (Hstr.mem htd x) then *)
         begin match try Some (Hstr.find hts x) with Not_found -> None with
         | Some s ->
@@ -964,8 +966,23 @@ let add_types muc tdl =
             let add_fd m (_, v) = Mstr.add v.pv_vs.vs_name.id_string v m in
             let gvars = List.fold_left add_fd Mstr.empty fl in
             let type_inv f = type_fmla_pure muc gvars Dterm.denv_empty f in
-            let invl = List.map type_inv d.td_inv in
-            let itd = create_plain_record_decl ~priv ~mut id args fl invl in
+            let inv = List.map type_inv d.td_inv in
+            let add_w m (q,e) =
+              let v = try match q with
+                | Qident x -> Mstr.find x.id_str nms
+                | Qdot _ -> raise Not_found
+              with Not_found -> Loc.errorm ~loc:(qloc q)
+                "Unknown field %a" print_qualid q in
+              let dity = dity_of_ity v.pv_ity in
+              let de = dexpr muc denv_empty e in
+              let de = Dexpr.dexpr ?loc:de.de_loc (DEcast (de, dity)) in
+              Mpv.add v (expr ~keep_loc:true de) m in
+            let wit = List.fold_left add_w Mpv.empty d.td_wit in
+            let wit = if d.td_wit = [] then [] else
+              List.map (fun (_,v) -> try Mpv.find v wit with
+                | _ -> Loc.errorm ?loc:v.pv_vs.vs_name.Ident.id_loc
+                  "Missing field %s" v.pv_vs.vs_name.id_string) fl in
+            let itd = create_plain_record_decl ~priv ~mut id args fl inv wit in
             Hstr.add hts x itd.itd_its; Hstr.add htd x itd
         end
     | TDrange (lo,hi) ->

@@ -416,6 +416,13 @@ theory Sum
     forall f: int -> int, a b c: int. a <= b <= c ->
     sum f a c = sum f a b + sum f b c
 
+  let rec lemma shift_left (f g: int -> int) (a b c d: int)
+    requires { b - a = d - c }
+    requires { forall i. a <= i < b -> f i  = g (c + i - a) }
+    variant  { b - a }
+    ensures  { sum f a b = sum g c d }
+  = if a < b then shift_left f g (a+1) b (c+1) d
+
 end
 
 (** {2 Factorial function} *)

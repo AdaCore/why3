@@ -4,20 +4,20 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../ral.mlw">
-<theory name="RAL" sum="23b1953119a07d783af66468a25d4402">
+<theory name="RAL" sum="681ef3c18575b4542ada144c31b48687">
  <goal name="VC balancing" expl="VC for balancing">
  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
  </goal>
- <goal name="M.assoc">
+ <goal name="M.assoc" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="M.neutral">
+ <goal name="M.neutral" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="M.M.assoc">
+ <goal name="M.M.assoc" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="M.M.neutral">
+ <goal name="M.M.neutral" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
  <goal name="M.VC zero" expl="VC for zero">
@@ -35,10 +35,10 @@
  <goal name="VC selected_part" expl="VC for selected_part">
  <proof prover="0"><result status="valid" time="0.26" steps="761"/></proof>
  </goal>
- <goal name="Sel.M.assoc">
+ <goal name="Sel.M.assoc" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="Sel.M.neutral">
+ <goal name="Sel.M.neutral" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
  <goal name="Sel.M.VC zero" expl="VC for zero">
@@ -47,13 +47,13 @@
  <goal name="Sel.M.VC op" expl="VC for op">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="Sel.M.agg_empty">
+ <goal name="Sel.M.agg_empty" expl="">
  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
- <goal name="Sel.M.agg_sing">
+ <goal name="Sel.M.agg_sing" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
- <goal name="Sel.M.agg_cat">
+ <goal name="Sel.M.agg_cat" expl="">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="Sel.D.VC measure" expl="VC for measure">
@@ -62,7 +62,7 @@
  <goal name="Sel.VC balancing" expl="VC for balancing">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
- <goal name="Sel.selection_empty">
+ <goal name="Sel.selection_empty" expl="">
  <proof prover="0"><result status="valid" time="0.02" steps="34"/></proof>
  </goal>
  <goal name="Sel.VC selected_part" expl="VC for selected_part">
@@ -121,34 +121,34 @@
  </goal>
  <goal name="VC harness" expl="VC for harness">
  <transf name="split_goal_wp">
-  <goal name="VC harness.1" expl="1. precondition">
+  <goal name="VC harness.1" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
   </goal>
-  <goal name="VC harness.2" expl="2. precondition">
+  <goal name="VC harness.2" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
-  <goal name="VC harness.3" expl="3. precondition">
+  <goal name="VC harness.3" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC harness.4" expl="4. precondition">
+  <goal name="VC harness.4" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
   </goal>
-  <goal name="VC harness.5" expl="5. check">
+  <goal name="VC harness.5" expl="check">
   <proof prover="0"><result status="valid" time="0.06" steps="142"/></proof>
   </goal>
-  <goal name="VC harness.6" expl="6. check">
+  <goal name="VC harness.6" expl="check">
   <proof prover="0"><result status="valid" time="0.07" steps="142"/></proof>
   </goal>
-  <goal name="VC harness.7" expl="7. precondition">
+  <goal name="VC harness.7" expl="precondition">
   <proof prover="0"><result status="valid" time="0.03" steps="17"/></proof>
   </goal>
-  <goal name="VC harness.8" expl="8. precondition">
+  <goal name="VC harness.8" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="VC harness.9" expl="9. check">
+  <goal name="VC harness.9" expl="check">
   <proof prover="0"><result status="valid" time="0.58" steps="360"/></proof>
   </goal>
-  <goal name="VC harness.10" expl="10. check">
+  <goal name="VC harness.10" expl="check">
   <proof prover="0" timelimit="5"><result status="valid" time="1.81" steps="533"/></proof>
   </goal>
  </transf>

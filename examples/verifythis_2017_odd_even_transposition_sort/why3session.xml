@@ -3,286 +3,191 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2017_odd_even_transposition_sort.mlw">
-<theory name="Challenge3" sum="74ccd8a395d99d6b119d4b097336c387">
+<file name="../verifythis_2017_odd_even_transposition_sort.mlw" expanded="true">
+<theory name="Challenge3" sum="e617a97ccce0fa9289e0fc331dbd5958" expanded="true">
  <goal name="VC odd_even_sorted" expl="VC for odd_even_sorted">
  <transf name="split_goal_wp">
-  <goal name="VC odd_even_sorted.1" expl="1. loop invariant init">
+  <goal name="VC odd_even_sorted.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC odd_even_sorted.2" expl="2. assertion">
+  <goal name="VC odd_even_sorted.2" expl="assertion">
   <transf name="split_goal_wp">
-   <goal name="VC odd_even_sorted.2.1" expl="1. assertion">
+   <goal name="VC odd_even_sorted.2.1" expl="assertion">
    <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
-   <goal name="VC odd_even_sorted.2.2" expl="2. VC for odd_even_sorted">
+   <goal name="VC odd_even_sorted.2.2" expl="VC for odd_even_sorted">
    <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
-   <goal name="VC odd_even_sorted.2.3" expl="3. VC for odd_even_sorted">
-   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
+   <goal name="VC odd_even_sorted.2.3" expl="VC for odd_even_sorted">
+   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC odd_even_sorted.3" expl="3. loop invariant preservation">
+  <goal name="VC odd_even_sorted.3" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_sorted.4" expl="4. postcondition">
+  <goal name="VC odd_even_sorted.4" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="VC exchange_inversion" expl="VC for exchange_inversion">
- <transf name="split_goal_wp">
-  <goal name="VC exchange_inversion.1" expl="1. assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.2" expl="2. assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.3" expl="3. assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC exchange_inversion.3.1" expl="1. assertion">
-   <proof prover="1"><result status="valid" time="1.33"/></proof>
-   <proof prover="2"><result status="valid" time="0.05"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.2" expl="2. assertion">
-   <proof prover="2"><result status="valid" time="0.05"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.3" expl="3. assertion">
-   <proof prover="0"><result status="valid" time="1.32" steps="1134"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.4" expl="4. assertion">
-   <proof prover="0"><result status="valid" time="0.63" steps="636"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.5" expl="5. assertion">
-   <proof prover="2" timelimit="35"><result status="valid" time="28.90"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="0.70"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.3.7" expl="7. VC for exchange_inversion">
-   <transf name="introduce_premises">
-    <goal name="VC exchange_inversion.3.7.1" expl="1. VC for exchange_inversion">
-    <transf name="inline_goal">
-     <goal name="VC exchange_inversion.3.7.1.1" expl="1. VC for exchange_inversion">
-     <proof prover="2"><result status="valid" time="0.05"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC exchange_inversion.4" expl="4. assertion">
-  <proof prover="2"><result status="valid" time="1.81"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.5" expl="5. assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC exchange_inversion.5.1" expl="1. VC for exchange_inversion">
-   <proof prover="2"><result status="valid" time="0.38"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.5.2" expl="2. VC for exchange_inversion">
-   <proof prover="0"><result status="valid" time="1.77" steps="851"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC exchange_inversion.6" expl="6. assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC exchange_inversion.6.1" expl="1. VC for exchange_inversion">
-   <proof prover="0"><result status="valid" time="0.08" steps="156"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.6.2" expl="2. VC for exchange_inversion">
-   <proof prover="0"><result status="valid" time="0.02" steps="59"/></proof>
-   </goal>
-   <goal name="VC exchange_inversion.6.3" expl="3. VC for exchange_inversion">
-   <proof prover="2"><result status="valid" time="0.21"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC exchange_inversion.7" expl="7. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.8" expl="8. precondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.9" expl="9. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.10" expl="10. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.11" expl="11. postcondition">
-  <proof prover="0"><result status="valid" time="0.13" steps="44"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.12" expl="12. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.13" expl="13. precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
-  </goal>
-  <goal name="VC exchange_inversion.14" expl="14. postcondition">
-  <proof prover="2"><result status="valid" time="0.69"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC odd_even_transposition_sort" expl="VC for odd_even_transposition_sort">
  <transf name="split_goal_wp">
-  <goal name="VC odd_even_transposition_sort.1" expl="1. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.1" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.2" expl="2. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.2" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.3" expl="3. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.3" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.4" expl="4. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.4" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.5" expl="5. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.5" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.6" expl="6. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.6" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.7" expl="7. index in array bounds">
+  <goal name="VC odd_even_transposition_sort.7" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.8" expl="8. index in array bounds">
+  <goal name="VC odd_even_transposition_sort.8" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.9" expl="9. precondition">
+  <goal name="VC odd_even_transposition_sort.9" expl="precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.10" expl="10. loop variant decrease">
+  <goal name="VC odd_even_transposition_sort.10" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.11" expl="11. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.11" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.12" expl="12. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.12" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.12" steps="171"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.13" expl="13. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.13" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.08" steps="166"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.14" expl="14. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="116"/></proof>
+  <goal name="VC odd_even_transposition_sort.14" expl="loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.01" steps="128"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.15" expl="15. loop variant decrease">
+  <goal name="VC odd_even_transposition_sort.15" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.16" expl="16. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.16" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.17" expl="17. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.17" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.18" expl="18. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.18" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.19" expl="19. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.19" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.20" expl="20. assertion">
+  <goal name="VC odd_even_transposition_sort.20" expl="assertion">
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.21" expl="21. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.21" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.22" expl="22. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.22" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.23" expl="23. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.23" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.24" expl="24. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.24" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.25" expl="25. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.25" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.26" expl="26. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.26" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.27" expl="27. loop invariant init">
+  <goal name="VC odd_even_transposition_sort.27" expl="loop invariant init">
   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.28" expl="28. index in array bounds">
+  <goal name="VC odd_even_transposition_sort.28" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.29" expl="29. index in array bounds">
+  <goal name="VC odd_even_transposition_sort.29" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.30" expl="30. precondition">
+  <goal name="VC odd_even_transposition_sort.30" expl="precondition">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.31" expl="31. loop variant decrease">
+  <goal name="VC odd_even_transposition_sort.31" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.32" expl="32. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.32" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.33" expl="33. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.33" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.34" expl="34. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.13" steps="398"/></proof>
+  <goal name="VC odd_even_transposition_sort.34" expl="loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.25" steps="398"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.35" expl="35. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.35" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.36" expl="36. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.21" steps="285"/></proof>
+  <goal name="VC odd_even_transposition_sort.36" expl="loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.21" steps="366"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.37" expl="37. loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.04" steps="226"/></proof>
+  <goal name="VC odd_even_transposition_sort.37" expl="loop invariant preservation">
+  <proof prover="0"><result status="valid" time="0.04" steps="267"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.38" expl="38. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.38" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.08" steps="49"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.39" expl="39. loop variant decrease">
+  <goal name="VC odd_even_transposition_sort.39" expl="loop variant decrease">
   <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.40" expl="40. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.40" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.41" expl="41. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.41" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.42" expl="42. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.42" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.07" steps="28"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.43" expl="43. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.43" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.44" expl="44. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.44" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="39"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.45" expl="45. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.45" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.46" expl="46. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.46" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.47" expl="47. assertion">
+  <goal name="VC odd_even_transposition_sort.47" expl="assertion">
   <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.48" expl="48. loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <goal name="VC odd_even_transposition_sort.48" expl="loop variant decrease">
+  <proof prover="2"><result status="valid" time="0.42"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.49" expl="49. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.49" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.07" steps="22"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.50" expl="50. loop invariant preservation">
+  <goal name="VC odd_even_transposition_sort.50" expl="loop invariant preservation">
   <proof prover="0"><result status="valid" time="0.03" steps="59"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.51" expl="51. postcondition">
+  <goal name="VC odd_even_transposition_sort.51" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC odd_even_transposition_sort.52" expl="52. postcondition">
+  <goal name="VC odd_even_transposition_sort.52" expl="postcondition">
   <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
  </transf>

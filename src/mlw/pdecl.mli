@@ -22,16 +22,18 @@ type its_defn = private {
   itd_fields       : rsymbol list;
   itd_constructors : rsymbol list;
   itd_invariant    : term list;
+  itd_witness      : expr list;
 }
 
 val create_plain_record_decl : priv:bool -> mut:bool ->
-  preid -> tvsymbol list -> (bool * pvsymbol) list -> term list -> its_defn
-(** [create_plain_record_decl ~priv ~mut id args fields invl] creates
-    a declaration for a non-recursive record type, possibly private
-    and/or mutable. The known record fields are listed with their
-    mutability status. The [priv] flag should be set to [true] for
-    private records. The [mut] flag should be set to [true] to mark
-    the new type as mutable even if it has no known mutable fields.
+  preid -> tvsymbol list -> (bool * pvsymbol) list ->
+  term list -> expr list -> its_defn
+(** [create_plain_record_decl ~priv ~mut id args fields invl witn]
+    creates a declaration for a non-recursive record type, possibly
+    private and/or mutable. The known record fields are listed with
+    their mutability status. The [priv] flag should be set to [true]
+    for private records. The [mut] flag should be set to [true] to
+    mark the new type as mutable even if it has no known mutable fields.
     This is the case for private mutable records with no known mutable
     fields, as well as for non-private records that have an invariant:
     marking such a type as mutable gives every value of this type a
@@ -39,6 +41,8 @@ val create_plain_record_decl : priv:bool -> mut:bool ->
     The [invl] parameter contains the list of invariant formulas that may
     only depend on free variables from [fields]. If the type is private,
     then every field occurring in [invl] must have an immutable type.
+    The [witn] parameter provides a witness expression for each field
+    of a plain record type (can be empty if there is no user witness).
     Abstract types are considered to be private records with no fields. *)
 
 val create_rec_record_decl : itysymbol -> pvsymbol list -> its_defn

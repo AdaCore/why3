@@ -50,9 +50,6 @@ module SchorrWaite
   val left: ref (map loc loc)
   val right: ref (map loc loc)
 
-  (* FIXME: should we export this from map.Map? *)
-  let ([]) (m: map 'a 'b) (x: 'a) : 'b = m x
-
   val get_left (p: loc) : loc
     requires { p <> null }
     ensures  { result = !left[p] }
@@ -93,10 +90,10 @@ module SchorrWaite
       which records the path from the root (when relevant) *)
   val ghost path_from_root : ref (map loc (list loc))
 
-  val get_path_from_root (p : loc) : list loc
+  val ghost get_path_from_root (p : loc) : list loc
     ensures  { result = !path_from_root[p] }
 
-  val set_path_from_root (p: loc) (l : list loc) : unit
+  val ghost set_path_from_root (p: loc) (l : list loc) : unit
     requires { p <> null }
     writes   { path_from_root }
     ensures  { !path_from_root = set (old !path_from_root) p l }
@@ -292,7 +289,7 @@ module SchorrWaite
           let q = !t in
           t := !p;
           ghost stackNodes := tl_stackNodes !stackNodes;
-           p := !right[!p];
+           p := get_right !p;
            set_right !t q;
           ghost pth := get_path_from_root !p;
         end else begin (* swing *)

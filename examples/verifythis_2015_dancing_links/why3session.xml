@@ -4,38 +4,41 @@
 <why3session shape_version="4">
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2015_dancing_links.mlw" expanded="true">
-<theory name="DancingLinks" sum="4b4bf2a1899ca747c0074c91d452a520" expanded="true">
+<theory name="DancingLinks" sum="6da03c19828ccafc3450812ec12bdd7d" expanded="true">
+ <goal name="VC dll" expl="VC for dll" expanded="true">
+ <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ </goal>
  <goal name="VC remove" expl="VC for remove" expanded="true">
  <proof prover="2"><result status="valid" time="3.04" steps="1747"/></proof>
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC remove.1" expl="1. index in array bounds">
+  <goal name="VC remove.1" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC remove.2" expl="2. index in array bounds">
+  <goal name="VC remove.2" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC remove.3" expl="3. index in array bounds">
+  <goal name="VC remove.3" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC remove.4" expl="4. index in array bounds">
+  <goal name="VC remove.4" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC remove.5" expl="5. index in array bounds">
+  <goal name="VC remove.5" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="VC remove.6" expl="6. index in array bounds">
+  <goal name="VC remove.6" expl="index in array bounds">
   <proof prover="2"><result status="valid" time="0.02" steps="65"/></proof>
   </goal>
-  <goal name="VC remove.7" expl="7. assertion">
+  <goal name="VC remove.7" expl="assertion">
   <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC remove.8" expl="8. type invariant">
+  <goal name="VC remove.8" expl="type invariant">
   <proof prover="2"><result status="valid" time="0.02" steps="45"/></proof>
   </goal>
-  <goal name="VC remove.9" expl="9. postcondition">
+  <goal name="VC remove.9" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.06" steps="293"/></proof>
   </goal>
-  <goal name="VC remove.10" expl="10. postcondition">
+  <goal name="VC remove.10" expl="postcondition">
   <proof prover="2"><result status="valid" time="2.23" steps="1670"/></proof>
   </goal>
  </transf>

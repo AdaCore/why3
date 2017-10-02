@@ -36,9 +36,12 @@ lemma Occ_elements: forall a:array 'a, i j n:int.
        i <= j < n ->
          nb_occ a[j] (elements a i n) > 0
 
-lemma Elements_set_outside : forall a:array 'a, i j:int.
-       i <= j -> forall k : int. (k < i || k >= j) ->
-       forall e:'a. (elements (a[k <- e]) i j) = (elements a i j)
+let rec lemma elements_set_outside (a:array 'a) (i j:int)
+  requires { i <= j }
+  variant { j - i }
+  ensures { forall k : int. (k < i || k >= j) ->
+            forall e:'a. (elements (a[k <- e]) i j) = (elements a i j) }
+= if j > i then elements_set_outside a i (j-1)
 
 lemma Elements_set_inside : forall a:array 'a, i j n: int, e:'a, b:bag 'a.
        i <= j < n ->

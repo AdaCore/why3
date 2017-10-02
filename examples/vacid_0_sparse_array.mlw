@@ -36,6 +36,12 @@ back   +-+-+-+-------------------+
     forall i : int.
       0 <= i < card ->
       0 <= back[i] < A.length values /\ index[back[i]] = i
+  } by {
+    values = A.make 0 (any 'a);
+    index  = A.make 0 0;
+    back   = A.make 0 0;
+    card   = 0;
+    def    = any 'a
   }
 
   predicate is_elt (a: sparse_array 'a) (i: int) =
@@ -92,8 +98,9 @@ back   +-+-+-+-------------------+
     (* sparse_array invariant *)
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
-     by MI.injective a.back.elts a.card
-      /\ MI.range a.back.elts a.card
+      by MI.surjective a.back.elts a.card
+      so exists j. 0 <= j < a.card /\ a.back[j] = i
+
 
   let set (a: sparse_array 'a) i v
     requires { 0 <= i < length a }

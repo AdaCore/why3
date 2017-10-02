@@ -60,17 +60,6 @@ val get_model_trace_label : labels : Slab.t -> Slab.elt
 (** Return a label of the form ["model_trace:*"].
     Throws [Not_found] if there is no such label. *)
 
-(* functions for detecting optional and named arguments *)
-val optional_arg : label
-val named_arg : label
-
-val is_optional : labels:Slab.t -> bool
-(** [is_optional sl] tests if the set [sl] contains [optional_arg]. *)
-
-val is_named : labels:Slab.t -> bool
-(** [is_named sl] tests if the set [sl] contains [named_arg]. *)
-
-
 (** {2 Identifiers} *)
 
 type ident = private {

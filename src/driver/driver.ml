@@ -67,7 +67,7 @@ exception UnknownProp  of (string list * string list)
 exception FSymExpected of lsymbol
 exception PSymExpected of lsymbol
 
-let load_driver = let driver_tag = ref (-1) in fun env file extra_files ->
+let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files ->
   let prelude   = ref [] in
   let regexps   = ref [] in
   let exitcodes = ref [] in

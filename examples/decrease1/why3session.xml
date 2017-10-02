@@ -5,77 +5,77 @@
 <prover id="0" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../decrease1.mlw" expanded="true">
-<theory name="Decrease1" sum="55f466e42f61d728f3e0f4973c3cadce" expanded="true">
+<theory name="Decrease1" sum="26b3c9eafcf691a57c8cf349f0349c38" expanded="true">
  <goal name="VC decrease1_induction" expl="VC for decrease1_induction" expanded="true">
  <proof prover="9"><result status="valid" time="0.02" steps="35"/></proof>
  </goal>
  <goal name="VC search" expl="VC for search" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC search.1" expl="1. loop invariant init">
+  <goal name="VC search.1" expl="loop invariant init">
   <proof prover="9"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="VC search.2" expl="2. loop invariant init">
+  <goal name="VC search.2" expl="loop invariant init">
   <proof prover="9"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC search.3" expl="3. index in array bounds">
+  <goal name="VC search.3" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC search.4" expl="4. postcondition">
+  <goal name="VC search.4" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC search.5" expl="5. index in array bounds">
+  <goal name="VC search.5" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC search.6" expl="6. index in array bounds">
+  <goal name="VC search.6" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search.7" expl="7. loop variant decrease">
+  <goal name="VC search.7" expl="loop variant decrease">
   <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.8" expl="8. loop invariant preservation">
+  <goal name="VC search.8" expl="loop invariant preservation">
   <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.9" expl="9. loop invariant preservation" expanded="true">
+  <goal name="VC search.9" expl="loop invariant preservation" expanded="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC search.10" expl="10. loop variant decrease">
+  <goal name="VC search.10" expl="loop variant decrease">
   <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.11" expl="11. loop invariant preservation">
+  <goal name="VC search.11" expl="loop invariant preservation">
   <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.12" expl="12. loop invariant preservation">
+  <goal name="VC search.12" expl="loop invariant preservation">
   <proof prover="9"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC search.13" expl="13. postcondition">
+  <goal name="VC search.13" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC search_rec" expl="VC for search_rec" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="VC search_rec.1" expl="1. index in array bounds">
+  <goal name="VC search_rec.1" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC search_rec.2" expl="2. index in array bounds">
+  <goal name="VC search_rec.2" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC search_rec.3" expl="3. index in array bounds">
+  <goal name="VC search_rec.3" expl="index in array bounds">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.4" expl="4. variant decrease">
+  <goal name="VC search_rec.4" expl="variant decrease">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.5" expl="5. precondition">
+  <goal name="VC search_rec.5" expl="precondition">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.6" expl="6. variant decrease">
+  <goal name="VC search_rec.6" expl="variant decrease">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.7" expl="7. precondition">
+  <goal name="VC search_rec.7" expl="precondition">
   <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.8" expl="8. postcondition" expanded="true">
+  <goal name="VC search_rec.8" expl="postcondition" expanded="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>

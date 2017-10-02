@@ -1,0 +1,33 @@
+
+(* Gnome sort
+   https://en.wikipedia.org/wiki/Gnome_sort
+*)
+
+module GnomeSort
+
+  use import int.Int
+  use import ref.Refint
+  use import array.Array
+  use import array.ArrayPermut
+  use import array.IntArraySorted
+  use import array.ArraySwap
+  use import array.Inversions
+
+  let gnome_sort (a: array int) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  = let pos = ref 0 in
+    while !pos < length a do
+      invariant { 0 <= !pos <= length a }
+      invariant { sorted_sub a 0 !pos }
+      invariant { permut_all (old a) a }
+      variant   { inversions a, length a - !pos }
+      if !pos = 0 || a[!pos] >= a[!pos - 1] then
+        incr pos
+      else begin
+        swap a !pos (!pos - 1);
+        decr pos
+      end
+    done
+
+end

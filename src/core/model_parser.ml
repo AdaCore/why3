@@ -27,9 +27,18 @@ let debug = Debug.register_info_flag "model_parser"
 ****************************************************************
 *)
 
+type float_type =
+  | Plus_infinity
+  | Minus_infinity
+  | Plus_zero
+  | Minus_zero
+  | Not_a_number
+  | Float_value of string * string * string
+
 type model_value =
  | Integer of string
  | Decimal of (string * string)
+ | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record
@@ -67,14 +76,42 @@ let array_add_element ~array ~index ~value =
     arr_indices = arr_index::array.arr_indices;
   }
 
+let convert_float_value f =
+  match f with
+  | Plus_infinity ->
+      let m = Mstr.add "cons" (Json.String "Plus_infinity") Stdlib.Mstr.empty in
+      Json.Record m
+  | Minus_infinity ->
+      let m = Mstr.add "cons" (Json.String "Minus_infinity") Stdlib.Mstr.empty in
+      Json.Record m
+  | Plus_zero ->
+      let m = Mstr.add "cons" (Json.String "Plus_zero") Stdlib.Mstr.empty in
+      Json.Record m
+  | Minus_zero ->
+      let m = Mstr.add "cons" (Json.String "Minus_zero") Stdlib.Mstr.empty in
+      Json.Record m
+  | Not_a_number ->
+      let m = Mstr.add "cons" (Json.String "Not_a_number") Stdlib.Mstr.empty in
+      Json.Record m
+  | Float_value (b, eb, sb) ->
+      let m = Mstr.add "cons" (Json.String "Float_value") Stdlib.Mstr.empty in
+      let m = Mstr.add "sign" (Json.String b) m in
+      let m = Mstr.add "exponent" (Json.String eb) m in
+      let m = Mstr.add "significand" (Json.String sb) m in
+      Json.Record m
+
 let rec convert_model_value value : Json.json =
   match value with
   | Integer s ->
       let m = Mstr.add "type" (Json.String "Integer") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json.String s) m in
       Json.Record m
-  | Decimal (int_part, fract_part) ->
+  | Float f ->
       let m = Mstr.add "type" (Json.String "Float") Stdlib.Mstr.empty in
+      let m = Mstr.add "val" (convert_float_value f) m in
+      Json.Record m
+  | Decimal (int_part, fract_part) ->
+      let m = Mstr.add "type" (Json.String "Decimal") Stdlib.Mstr.empty in
       let m = Mstr.add "val" (Json.String (int_part^"."^fract_part)) m in
       Json.Record m
   | Unparsed s ->
@@ -200,8 +237,8 @@ let print_location fmt m_element =
 **  Model definitions
 ***************************************************************
 *)
-module IntMap = Map.Make(struct type t  = int let compare = compare end)
-module StringMap = Map.Make(String)
+module IntMap = Stdlib.Mint
+module StringMap = Stdlib.Mstr
 
 type model_file = model_element list IntMap.t
 type model_files = model_file StringMap.t
@@ -241,6 +278,9 @@ let print_model_elements ?(sep = "\n") me_name_trans fmt m_elements =
   Pp.print_list (fun fmt () -> Pp.string fmt sep) (print_model_element me_name_trans) fmt m_elements
 
 let print_model_file fmt me_name_trans filename model_file =
+  (* Relativize does not work on nighly bench: using basename instead. It
+     hides the local paths.  *)
+  let filename = Filename.basename filename  in
   fprintf fmt "File %s:" filename;
   IntMap.iter
     (fun line m_elements ->
@@ -259,7 +299,11 @@ let print_model
     ?(me_name_trans = why_name_trans)
     fmt
     model =
-  StringMap.iter (print_model_file fmt me_name_trans) model.model_files
+  (* Simple and easy way to print file sorted alphabetically
+   FIXME: but StringMap.iter is supposed to iter in alphabetic order, so waste of time and memory here !
+   *)
+  let l = StringMap.bindings model.model_files in
+  List.iter (fun (k, e) -> print_model_file fmt me_name_trans k e) l
 
 let model_to_string
     ?(me_name_trans = why_name_trans)
