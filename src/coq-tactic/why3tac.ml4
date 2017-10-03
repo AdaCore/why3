@@ -19,53 +19,6 @@ open Coqlib
 open Hipattern
 open Declarations
 open Pp
-
-IFDEF COQ84 THEN
-
-open Libnames
-
-let declare_summary name freeze unfreeze init =
-  Summary.declare_summary name
-    { Summary.freeze_function = freeze;
-      Summary.unfreeze_function = unfreeze;
-      Summary.init_function = init; }
-
-let body_of_constant _ c =
-  if Reductionops.is_transparent (ConstKey c) then
-    Declarations.body_of_constant (Global.lookup_constant c)
-  else None
-
-let get_transp_state _ =
-  Conv_oracle.get_transp_state ()
-
-let type_of_global = Global.type_of_global
-
-let pf_type_of env t = Evd.empty, Tacmach.pf_type_of env t
-
-let type_of env evd t = Evd.empty, Typing.type_of env evd t
-
-let finite_ind v = v
-
-let admit_as_an_axiom = Tactics.admit_as_an_axiom
-
-let map_to_list = Util.array_map_to_list
-
-let is_global evd c t =
-  match c, kind_of_term t with
-  | ConstRef c, Const c' -> eq_constant c c'
-  | IndRef i, Ind i' -> eq_ind i i'
-  | ConstructRef i, Construct i' -> eq_constructor i i'
-  | VarRef id, Var id' -> id = id'
-  | _ -> false
-
-let push_named = Environ.push_named
-
-let betadeltaiota = Closure.betadeltaiota
-
-module RedFlags = Closure.RedFlags
-
-ELSE
-
 open Universes
 open Globnames
 open Vars
@@ -101,12 +54,7 @@ let body_of_constant env c =
     | _ -> None
   else None
 
-let get_transp_state env =
-  Conv_oracle.get_transp_state (Environ.oracle env)
-
 let type_of = Typing.type_of
-
-let pf_type_of = Tacmach.pf_type_of
 
 let finite_ind v = v <> Decl_kinds.CoFinite
 
@@ -115,10 +63,6 @@ let pr_str = Pp.str
 let pr_spc = Pp.spc
 
 let pr_fnl = Pp.fnl
-
-let admit_as_an_axiom = Tacticals.tclIDTAC
-
-let map_to_list = CArray.map_to_list
 
 let force x = x
 
@@ -160,10 +104,8 @@ END
 
 DECLARE PLUGIN "why3tac"
 
-
 IFDEF COQ87 THEN
 
-let is_global evd c t = is_global evd (Lazy.force c) t
 let is_Set evd t = is_Set (to_constr evd t)
 let is_Type evd t = is_Type (to_constr evd t)
 let global_of_constr evd t = global_of_constr (to_constr evd t)
@@ -172,7 +114,7 @@ let type_of_global env c = of_constr (fst (Global.type_of_global_in_context env 
 ELSE
 
 let kind _evd t = kind_of_term t
-let is_global _evd c t = is_global (Lazy.force c) t
+let is_global _evd c t = is_global c t
 let is_Prop _evd t = is_Prop t
 let is_Set _evd t = is_Set t
 let is_Type _evd t = is_Type t
@@ -186,7 +128,7 @@ let decompose_app _evd t = decompose_app t
 
 END
 
-END
+let is_global evd c t = is_global evd (Lazy.force c) t
 
 module Why3tac = struct
 
@@ -319,7 +261,7 @@ let preid_of_id id = Ident.id_fresh (string_of_id id)
    raises NotFO *)
 let rec_names_for c =
   let mp,dp,_ = Names.repr_con c in
-  map_to_list
+  CArray.map_to_list
     (function
        | Name id ->
            let c' = Names.make_con mp dp (label_of_id id) in
@@ -578,7 +520,7 @@ let rec tr_arith_constant evd dep t = match kind evd t with
 let rec tr_type dep tvm env evd t =
   let t = Reductionops.clos_norm_flags
       (RedFlags.red_add_transparent
-	 betadeltaiota (get_transp_state env))
+	 betadeltaiota (Conv_oracle.get_transp_state (Environ.oracle env)))
       env evd t in
   if is_global evd coq_Z t then
     Ty.ty_int
@@ -1342,7 +1284,7 @@ let plugins_loaded = ref false
 
 let why3tac ?(timelimit=timelimit) s gl =
   (* print_dep Format.err_formatter; *)
-  let evd,concl_type = pf_type_of gl (pf_concl gl) in
+  let evd,concl_type = Tacmach.pf_type_of gl (pf_concl gl) in
   if not (is_Prop evd concl_type) then error "Conclusion is not a Prop";
   task := Task.use_export None Theory.builtin_theory;
   let res = try
@@ -1400,7 +1342,7 @@ let why3tac ?(timelimit=timelimit) s gl =
 *)
   in
   match res.pr_answer with
-  | Valid -> admit_as_an_axiom gl
+  | Valid -> Tacticals.tclIDTAC gl
   | Invalid -> error "Invalid"
   | Call_provers.Unknown (s, _) -> error ("Don't know: " ^ s)
   | Call_provers.Failure s -> error ("Failure: " ^ s)
@@ -1409,13 +1351,7 @@ let why3tac ?(timelimit=timelimit) s gl =
   | StepLimitExceeded -> error "Step Limit Exceeded"
   | HighFailure -> error ("Prover failure\n" ^ res.pr_output ^ "\n")
 
-IFDEF COQ84 THEN
-
-ELSE
-
 let why3tac ?timelimit s = Proofview.V82.tactic (why3tac ?timelimit s)
-
-END
 
 end
 

@@ -485,8 +485,11 @@ coq_compat_version=
 
 if test "$enable_coq_tactic" = no -a "$enable_coq_libs" = no; then
    enable_coq_support=no
-   AC_MSG_WARN(coq support disabled)
    reason_coq_support=" (disabled by user)"
+fi
+
+if test "$enable_coq_tactic" = no; then
+   reason_coq_tactic=" (disabled by user)"
 fi
 
 if test "$enable_coq_support" = yes; then
@@ -513,6 +516,10 @@ if test "$enable_coq_support" = yes; then
          coq_compat_version="COQ84"
          COQPPLIBS="$COQLIB/parsing/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
+         if test "$enable_coq_tactic" = yes; then
+            enable_coq_tactic=no
+            reason_coq_tactic=" (coq >= 8.5 not found)"
+         fi
          ;;
       8.5*)
          coq_compat_version="COQ85"
@@ -588,7 +595,6 @@ fi
 
 if test "$enable_pvs_libs" = no; then
     enable_pvs_support=no
-    AC_MSG_WARN(PVS support disabled)
     reason_pvs_support=" (disabled by user)"
 else
     AC_CHECK_PROG(PVS,pvs,pvs,no)
@@ -627,7 +633,6 @@ fi
 
 if test "$enable_isabelle_libs" = no; then
     enable_isabelle_support=no
-    AC_MSG_WARN(Isabelle support disabled)
     reason_isabelle_support=" (disabled by user)"
 else
     AC_CHECK_PROG(ISABELLE,isabelle,isabelle,no)

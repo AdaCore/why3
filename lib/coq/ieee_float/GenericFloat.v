@@ -1711,7 +1711,7 @@ Lemma non_zero_positive_to_real : forall {x:t},
 Proof.
   intros x h1 h2 h3.
   rewrite <-zeroF_to_real; apply lt_finite.
-  easy.
+  split; easy.
   destruct x; try easy.
   contradict h2; easy.
   simpl in h3.
@@ -1753,7 +1753,7 @@ Lemma non_zero_negative_to_real : forall {x:t},
 Proof.
   intros x h1 h2 h3.
   rewrite <-zeroF_to_real; apply lt_finite.
-  easy.
+  split; easy.
   destruct x; try easy.
   contradict h2; easy.
   simpl in h3.
@@ -3320,7 +3320,7 @@ Proof.
     simpl in H1.
     destruct b; try easy.
     assert (not (is_nan r)) by (destruct r; easy).
-    rewrite is_positive_Bsign with (1 := H).
+    rewrite (is_positive_Bsign _ H).
     apply h2.
     now apply Bool.not_true_is_false.
 Qed.

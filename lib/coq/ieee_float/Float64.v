@@ -1099,7 +1099,7 @@ Lemma fma_int : forall (x:t) (y:t) (z:t) (m:ieee_float.RoundingMode.mode),
   (is_int x) -> ((is_int y) -> ((is_int z) -> ((t'isFinite (fma m x y z)) ->
   (is_int (fma m x y z))))).
 Proof.
-  apply fma_int.
+  now apply fma_int.
 Qed.
 
 (* Why3 goal *)
