@@ -103,10 +103,12 @@ let connect_internal () =
   if is_connected () then raise AlreadyConnected;
   Buffer.clear recv_buf;
   let cwd = Unix.getcwd () in
-  Unix.chdir (Filename.get_temp_dir_name ());
-  let socket_name = (* Filename.concat (Unix.getcwd ())
-    ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") *)
-    Filename.temp_file "why3server" "sock"
+  let socket_name =
+    (* A socket_name cannot exceed 108 characters (socket
+       specifications vary and some allow more or less
+       characters than others). So, it is necessary to remove
+       the prefix of the file. *)
+    Filename.basename (Filename.temp_file "why3server" "sock")
   in
   let exec = "why3server" in
   let pid =
