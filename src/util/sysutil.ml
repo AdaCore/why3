@@ -143,6 +143,7 @@ let p1 = path_of_file "/bin/bash"
 let p1 = path_of_file "../src/f.why"
   *)
 
+                              (*
 let normalize_filename f =
   let rec aux af acc =
     match af, acc with
@@ -161,6 +162,7 @@ let normalize_filename f =
       | [], _ -> acc
   in
   file_of_path (List.rev (aux (path_of_file f) []))
+                               *)
 
 let relativize_filename base f =
   let rec aux ab af =

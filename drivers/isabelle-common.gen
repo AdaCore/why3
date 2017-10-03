@@ -156,6 +156,10 @@ theory number.Gcd
   syntax function gcd "<app><const name=\"GCD.gcd_class.gcd\"/>%1%2</app>"
 end
 
+theory number.Prime
+  syntax predicate prime "<app><const name=\"Factorial_Ring.normalization_semidom_class.prime\"/>%1</app>"
+end
+
 theory number.Coprime
   syntax predicate coprime "<app><const name=\"GCD.gcd_class.coprime\"/>%1%2</app>"
 end

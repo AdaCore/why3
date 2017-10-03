@@ -153,9 +153,6 @@ let run_normal dir filter_provers =
 
 (** By time *)
 
-let print_float_list =
-  Pp.print_list_delim ~start:Pp.lsquare ~stop:Pp.rsquare ~sep:Pp.semi Pp.float
-
 let grab_valid_time provers_time provers pa =
   let prover = pa.Session.proof_prover in
   if Whyconf.Sprover.mem prover provers then

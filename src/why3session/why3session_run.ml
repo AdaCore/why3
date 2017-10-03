@@ -145,13 +145,6 @@ end
 
 module M = Session_scheduler.Make(O)
 
-let print_res fname pa ps old_ps =
-  dprintf verbose
-    "@[<hov 2>From file %s:@\nResult@ for@ the@ proof@ attempt@ %a:\
-             @ %a@\nPreviously@ it@ was@ %a@]@."
-    fname print_external_proof pa print_attempt_status ps
-    print_attempt_status old_ps
-
 let print_proof_goal fmt pa =
   pp_print_string fmt (goal_name pa.proof_parent).Ident.id_string
 
@@ -166,13 +159,6 @@ let same_result r1 r2 =
     | Call_provers.Unknown u1, Call_provers.Unknown u2 -> u1 = u2
     | Call_provers.Failure f1, Call_provers.Failure f2 -> f1 = f2
     | _ -> false
-
-let same_status old_res new_res =
-  match old_res, new_res with
-  | InternalFailure old_exn, InternalFailure new_exn ->
-    (Printexc.to_string old_exn) = (Printexc.to_string new_exn)
-  | Done(old_res), Done(new_res) -> same_result old_res new_res
-  | _ -> false
 
 let is_valid pr =
   match pr.Call_provers.pr_answer with

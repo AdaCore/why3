@@ -1,5 +1,6 @@
 \chapter{Reference Manuals for the \why Tools}
 \label{chap:manpages}
+%HEVEA\cutname{manpages.html}
 
 This chapter details the usage of each of the command-line tools
 provided by the \why environment. The main command is \texttt{why3};
@@ -475,7 +476,7 @@ are grouped together under several tabs.
 
 When the selected prover finds (counterexample) model, it is possible to
 display parts of this model in the terms of the original Why3 input.
-Currently, this is supported for CVC4 prover version 1.5 and newer.
+Currently, this is supported for CVC4 prover version 1.5 and Z3.
 
 To display the counterexample in Why3 IDE, the counterexample model generation
 must be enabled in File -/> Preferences -/> get
@@ -489,7 +490,7 @@ displayed in a comment at the line below.
 An alternative way how to display a counterexample is to use the option
 \texttt{-{}-get-ce} of the \texttt{prove} command.
 
-Why3 source code elemets that should be a part of counterexample must be
+Why3 source code elements that should be a part of counterexample must be
 explicitly marked with \texttt{"model"} label. The following example shows a
 Why3 theory with some terms annotated with the \texttt{model} label and the
 generated counterexample in comments:

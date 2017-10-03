@@ -312,14 +312,6 @@ else
    fi
 fi
 
-# bin-annot
-case "$OCAMLVERSION" in
-  0.*|1.*|2.*|3.*)
-        enable_bin_annot=no;;
-  *)
-        enable_bin_annot=yes;;
-esac
-
 # checking for rubber
 if test "$enable_doc" = yes ; then
    AC_CHECK_PROG(RUBBER,rubber,rubber,no)
@@ -493,8 +485,11 @@ coq_compat_version=
 
 if test "$enable_coq_tactic" = no -a "$enable_coq_libs" = no; then
    enable_coq_support=no
-   AC_MSG_WARN(coq support disabled)
    reason_coq_support=" (disabled by user)"
+fi
+
+if test "$enable_coq_tactic" = no; then
+   reason_coq_tactic=" (disabled by user)"
 fi
 
 if test "$enable_coq_support" = yes; then
@@ -521,6 +516,10 @@ if test "$enable_coq_support" = yes; then
          coq_compat_version="COQ84"
          COQPPLIBS="$COQLIB/parsing/grammar.cma"
          AC_MSG_RESULT($COQVERSION)
+         if test "$enable_coq_tactic" = yes; then
+            enable_coq_tactic=no
+            reason_coq_tactic=" (coq >= 8.5 not found)"
+         fi
          ;;
       8.5*)
          coq_compat_version="COQ85"
@@ -596,7 +595,6 @@ fi
 
 if test "$enable_pvs_libs" = no; then
     enable_pvs_support=no
-    AC_MSG_WARN(PVS support disabled)
     reason_pvs_support=" (disabled by user)"
 else
     AC_CHECK_PROG(PVS,pvs,pvs,no)
@@ -635,7 +633,6 @@ fi
 
 if test "$enable_isabelle_libs" = no; then
     enable_isabelle_support=no
-    AC_MSG_WARN(Isabelle support disabled)
     reason_isabelle_support=" (disabled by user)"
 else
     AC_CHECK_PROG(ISABELLE,isabelle,isabelle,no)
@@ -653,16 +650,16 @@ else
                 ISABELLEVERSION=2016-1
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
-          2016*)
+          2017*)
 	        enable_isabelle_support=yes
-                ISABELLEVERSION=2016
+                ISABELLEVERSION=2017
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 ;;
           *)
                 AC_MSG_RESULT($ISABELLEDETECTEDVERSION)
                 enable_isabelle_support=no
-	        AC_MSG_WARN(You need Isabelle 2016 or later; Isabelle discarded)
-                reason_isabelle_support=" (need version >= 2016)"
+	        AC_MSG_WARN(You need Isabelle 2016-1 or later; Isabelle discarded)
+                reason_isabelle_support=" (need version >= 2016-1)"
                 ;;
         esac
     fi
@@ -765,7 +762,6 @@ dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
 AC_SUBST(enable_profiling)
-AC_SUBST(enable_bin_annot)
 
 AC_SUBST(COQCAMLP)
 AC_SUBST(COQCAMLPLIB)

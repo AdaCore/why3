@@ -320,27 +320,32 @@ let induction_ty_lex km t0 =
   let qvs, qvl, t = decompose_forall t0 in
   let lblvl = qvl_labeled qvl in
   let vset = t_candidates_lex km qvs lblvl t in
-  try
-    let vl = heuristic_lex vset in
-    let lexl, rightmost_qvl = qsplit km vl qvl in
-    let tcase = make_induction_lex lexl rightmost_qvl t in
+  let vl = heuristic_lex vset in
+  let lexl, rightmost_qvl = qsplit km vl qvl in
+  let tcase = make_induction_lex lexl rightmost_qvl t in
+  if Debug.test_flag debug then
+    begin
+      print_vset vset;
+      print_heuristic_lex vl;
+      print_lex lexl;
+      Format.printf "Old Task: %a \n@." Pretty.print_term t0;
+      Format.printf "New Task: %a \n@." Pretty.print_term tcase
+    end;
+  [tcase]
 
-    if Debug.test_flag debug then
-      begin
-	print_vset vset;
-	print_heuristic_lex vl;
-	print_lex lexl;
-	Format.printf "Old Task: %a \n@." Pretty.print_term t0;
-	Format.printf "New Task: %a \n@." Pretty.print_term tcase
-      end;
-    [tcase]
-  with No_candidates_found -> Format.printf "No candidates found\n"; [t0]
-
-let induction_ty_lex = function
+let induction_ty_lex task =
+  match task with
   | Some { task_decl = { td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = km } ->
-    List.map (add_prop_decl prev Pgoal pr) (induction_ty_lex km f)
+     begin try
+       let l = induction_ty_lex km f in
+       List.map (add_prop_decl prev Pgoal pr) l
+       with No_candidates_found ->
+         Format.eprintf "induction_ty_lex: no candidate variable found in goal %a@."
+                        Pretty.print_pr pr;
+         [task]
+     end
   | _ -> assert false
 
 
