@@ -10,6 +10,7 @@ function interp (x:t) (y:int->int) : int =
   | Mul x1 x2 -> interp x1 y * interp x2 y
   | Cst c -> c end
 
+predicate eq (x1 x2:t) = forall y: int -> int. interp x1 y = interp x2 y
 goal interp: forall y. interp (Add (Var 3) (Var 5)) y = y 3 + y 5
 
 (** Conversion *)
@@ -93,8 +94,6 @@ let rec function conv (x:t) : t'
 
 (** Normalisation *)
 
-use import list.Permut
-
 let rec function insert (x: int) (l: list int) : list int
   ensures  { eq_mon (Cons x l) result }
   variant  { l }
@@ -123,19 +122,46 @@ let rec function sort_mons (x:t') : t'
 
 (*lexicographic order on monomials with variables sorted using sort_mons*)
 let rec function le_mon (x1 x2: list int) : bool
-= match x1, x2 with
+= (length x1 < length x2) ||
+  ((length x1 = length x2) &&
+  match x1, x2 with
   | Nil, _ -> true
   | _, Nil -> false
   | Cons v1 r1, Cons v2 r2 ->  v1 <= v2 && le_mon r1 r2
+  end)
+
+let rec function same (l1 l2: list int) : bool
+  ensures { result -> eq_mon l1 l2 }
+= match l1, l2 with
+  | Nil, Nil -> true
+  | Nil, _ | _, Nil -> false
+  | Cons x1 l1, Cons x2 l2 -> x1 = x2 && same l1 l2
   end
+
+
+lemma squash_sum: forall a1 a2: int, l1 l2: list int. same l1 l2 ->
+      eq' (Cons (M a1 l1) (Cons (M a2 l2) Nil)) (Cons (M (a1+a2) l1) Nil)
+
+let lemma squash_append (a1 a2: int) (l1 l2: list int) (r:t')
+      requires { same l1 l2 }
+      ensures { eq' (Cons (M a1 l1) (Cons (M a2 l2) r)) (Cons (M (a1+a2) l1) r) }
+= ()
 
 let rec function insert_mon (m: m) (x: t') : t'
   ensures { eq' result (Cons m x) }
-  variant { x }
+  variant { length x }
 = match m,x with
   | _,Nil -> Cons m Nil
-  | M _ l1, Cons (M a2 l2) r ->
-      if le_mon l1 l2 then Cons m x else Cons (M a2 l2) (insert_mon m r)
+  | M a1 l1, Cons (M a2 l2) r ->
+      if same l1 l2
+      then
+        if a1+a2 = 0
+        then (assert { eq' r (Cons m x)
+                       by eq' r (Cons (M (a1+a2) l1) r)
+                       so eq' (Cons (M (a1+a2) l1) r) (Cons m x)};
+              r)
+        else Cons (M (a1+a2) l1) r
+      else if le_mon l1 l2 then Cons m x else Cons (M a2 l2) (insert_mon m r)
   end
 
 let rec function insertion_sort_mon (x: t') : t'
@@ -146,37 +172,13 @@ let rec function insertion_sort_mon (x: t') : t'
   | Cons m r -> insert_mon m (insertion_sort_mon r)
   end
 
-let rec function same (l1 l2: list int) : bool
-  ensures { result -> eq_mon l1 l2 }
-= match l1, l2 with
-  | Nil, Nil -> true
-  | Nil, _ | _, Nil -> false
-  | Cons x1 l1, Cons x2 l2 -> x1 = x2 && same l1 l2
-  end
-
-let rec squash (x: t') : t'
-  ensures { eq' result x }
-  variant { length x }
-= match x with
-  | Nil -> Nil
-  | Cons _ Nil -> x
-  | Cons (M a1 l1) (Cons (M a2 l2) r)
-      -> if same l1 l2
-         then squash (Cons (M (a1+a2) l1) r)
-         else Cons (M a1 l1) (squash (Cons (M a2 l2) r))
-  end
-
 let function normalize (x: t') : t'
   ensures { eq' result x }
 =
   (* sort inside each monomial *)
   let x = sort_mons x in
   (* sort monomials lexicographically *)
-  let x = insertion_sort_mon x in
-  (* squash together identical monoms *)
-  squash x
-
-
+  insertion_sort_mon x
 
 lemma norm: forall x1 x2:t', y:int -> int.
       normalize x1 = normalize x2 -> interp' x1 y = interp' x2 y
@@ -186,6 +188,7 @@ lemma norm: forall x1 x2:t', y:int -> int.
 
 constant radix : int = 1
 constant d : int = 0
+constant z : int = 2
 
 constant x1 : t = Add (Add (Var radix) (Cst (-1)))
                       (Mul (Var radix)
@@ -194,49 +197,61 @@ constant x1 : t = Add (Add (Var radix) (Cst (-1)))
 constant x2 : t = Add (Mul (Var radix) (Var radix))
                       (Add (Cst (-1)) (Mul (Cst (-1)) (Mul (Var radix) (Var d))))
 
-
-constant x3 : t = Mul (Add (Add (Var radix) (Cst (-1)))
+constant z1 : t = Add (Add (Var radix) (Var z))
                       (Mul (Var radix)
-                        (Add (Var radix) (Mul (Cst (-1)) (Add (Cst 1) (Var d))))))
-                      (Add (Add (Var radix) (Cst (-1)))
-                      (Mul (Var radix)
-                        (Add (Var radix) (Mul (Cst (-1)) (Add (Cst 1) (Var d))))))
+                        (Add (Var radix) (Mul (Var z) (Add (Cst 1) (Var d)))))
 
-constant x4 : t = Mul (Add (Mul (Var radix) (Var radix))
-                      (Add (Cst (-1)) (Mul (Cst (-1)) (Mul (Var radix) (Var d)))))
-                      (Add (Mul (Var radix) (Var radix))
-                      (Add (Cst (-1)) (Mul (Cst (-1)) (Mul (Var radix) (Var d)))))
-constant z : int = 2
+constant z2 : t = Add (Mul (Var radix) (Var radix))
+                      (Add (Var radix)
+                           (Mul (Var z)
+                                (Add (Cst 1)
+                                     (Add (Var radix) (Mul (Var radix) (Var d))))))
 
-constant x5 : t = Mul (Add (Add (Var radix) (Var z))
-                      (Mul (Var radix)
-                        (Add (Var radix) (Mul (Var z) (Add (Cst 1) (Var d))))))
-                      (Add (Add (Var radix) (Var z))
-                      (Mul (Var radix)
-                        (Add (Var radix) (Mul (Var z) (Add (Cst 1) (Var d))))))
-
-constant x6 : t = Mul (Add (Mul (Var radix) (Var radix))
-                      (Add (Var z) (Mul (Var z) (Mul (Var radix) (Var d)))))
-                      (Add (Mul (Var radix) (Var radix))
-                      (Add (Var z) (Mul (Var z) (Mul (Var radix) (Var d)))))
+constant x3 : t = Mul x1 x1
+constant x4 : t = Mul x2 x2
+constant x5 : t = Mul z1 z1
+constant x6 : t = Mul z2 z2
 
 constant x7 : t = Mul x3 x5
 constant x8 : t = Mul x4 x6
 constant x9 : t = Mul x3 x3
 constant x10 : t = Mul x4 x4
-meta "compute_max_steps" 0x1000000
 
-goal devel_1: forall y. interp x1 y = interp x2 y
-goal devel_2: forall y. interp x3 y = interp x4 y
-goal devel_3: forall y. interp x5 y = interp x6 y
-goal devel_4: forall y. interp x7 y = interp x8 y (*not proved*)
-goal devel_5: forall y. interp x9 y = interp x10 y
+meta "compute_max_steps" 0x10000000
+
+goal d: eq' (conv z1) (conv z2)
+goal d': eq' (conv z1) (conv z2) by normalize (conv z1) = normalize (conv z2)
+
+goal devel_1: eq x1 x2
+goal devel_2: eq x3 x4
+goal devel_3: eq x5 x6
+goal devel_4: eq x7 x8
+goal devel_5: eq x9 x10
 
 goal devel_conv_1: forall y. interp' (conv x1) y = interp' (conv x2) y
 goal devel_conv_2: forall y. interp' (conv x3) y = interp' (conv x4) y
 goal devel_conv_3: forall y. interp' (conv x5) y = interp' (conv x6) y
 goal devel_conv_4: forall y. interp' (conv x7) y = interp' (conv x8) y
-(* not proved *)
-
 goal devel_conv_5: forall y. interp' (conv x9) y = interp' (conv x10) y
-(*alt ergo solves in 2s *)
+
+goal devel_conv_1_norm: eq' (conv x1) (conv x2) by normalize (conv x1) = normalize (conv x2)
+goal devel_conv_2_norm: eq' (conv x3) (conv x4) by normalize (conv x3) = normalize (conv x4)
+goal devel_conv_3_norm: eq' (conv x5) (conv x6) by normalize (conv x5) = normalize (conv x6)
+goal devel_conv_4_norm: eq' (conv x7) (conv x8) by normalize (conv x7) = normalize (conv x8)
+goal devel_conv_5_norm: eq' (conv x9) (conv x10) by normalize (conv x9) = normalize (conv x10)
+
+constant g1 : t = Mul x9 x9
+constant g2 : t = Mul x10 x10
+constant g3 : t = Mul x5 x5
+constant g4 : t = Mul x6 x6
+constant g5 : t = Mul g3 x6
+constant g6 : t = Mul g4 x5
+
+goal devel_6 : eq g3 g4
+goal devel_conv_6: eq' (conv g3) (conv g4)
+goal devel_conv_6_norm: eq' (conv g3) (conv g4) by normalize (conv g3) = normalize (conv g4)
+(*
+goal devel_7 : eq g5 g6
+goal devel_conv_7: eq' (conv g5) (conv g6)
+goal devel_conv_7_norm: eq' (conv g5) (conv g6) by normalize (conv g5) = normalize (conv g6)
+*)
