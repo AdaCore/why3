@@ -208,7 +208,14 @@ let report_messages c obj =
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
 
-let c = Gnat_objectives.init_cont ()
+let c =
+  try
+    Gnat_objectives.init_cont ()
+  with
+  | e when Debug.test_flag Debug.stack_trace -> raise e
+  | e ->
+      let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
+      Gnat_util.abort_with_message ~internal:true s
 
 let _ =
    (* This is the main code. We read the file into the session if not already
@@ -290,4 +297,9 @@ let ending () =
 
 
 let _ =
-  Gnat_scheduler.main_loop ending
+  try
+    Gnat_scheduler.main_loop ending
+  with e when Debug.test_flag Debug.stack_trace -> raise e
+    | e ->
+       let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
+       Gnat_util.abort_with_message ~internal:true s
