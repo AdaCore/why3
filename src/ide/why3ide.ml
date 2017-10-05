@@ -994,13 +994,7 @@ let always_scroll = false
 let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   try
-    let (n, v, _, _) = get_source_view_table f in
-    if color = Goal_color then
-      begin
-        if always_scroll then
-          notebook#goto_page n;
-        move_to_line ~yalign:0.0 v l;
-      end;
+    let (_, v, _, _) = get_source_view_table f in
     let color = convert_color color in
     color_loc ~color v l b e
   with
@@ -1008,13 +1002,33 @@ let color_loc ~color loc =
       (* If the file is not present do nothing *)
       ()
 
+(* Scroll to a specific locations *)
+let scroll_to_loc loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some (loc, _) ->
+    let f, l, _, _ = Loc.get loc in
+    try
+      let (n, v, _, _) = get_source_view_table f in
+      if always_scroll then
+        notebook#goto_page n;
+      move_to_line ~yalign:0.0 v l
+    with Nosourceview _ -> ()
+
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) =
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
   List.iter (fun (loc, color) ->
-    color_loc ~color loc) l
-
+    color_loc ~color loc) l;
+  let loc_of_goal =
+    (* TODO the last location sent seems more relevant thus the rev. This
+       should be changed, the sent task should contain the information of where
+       to scroll and the list of locations is far too long. *)
+    try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
+    with Not_found -> None
+  in
+  scroll_to_loc loc_of_goal
 
 (*******************)
 (* The "View" menu *)
