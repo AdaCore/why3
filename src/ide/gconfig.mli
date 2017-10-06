@@ -15,6 +15,7 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;

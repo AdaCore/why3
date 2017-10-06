@@ -33,6 +33,7 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
@@ -68,6 +69,7 @@ type ide = {
   ide_window_width : int;
   ide_window_height : int;
   ide_tree_width : int;
+  ide_task_height : int;
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
@@ -92,6 +94,7 @@ let default_ide =
   { ide_window_width = 1024;
     ide_window_height = 768;
     ide_tree_width = 512;
+    ide_task_height = 400;
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
@@ -120,6 +123,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_window_height "window_height";
     ide_tree_width =
       get_int section ~default:default_ide.ide_tree_width "tree_width";
+    ide_task_height =
+      get_int section ~default:default_ide.ide_task_height "task_height";
     ide_current_tab =
       get_int section ~default:default_ide.ide_current_tab "current_tab";
     ide_font_size =
@@ -187,6 +192,7 @@ let load_config config original_config =
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
+    task_height   = ide.ide_task_height;
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
@@ -234,6 +240,7 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in

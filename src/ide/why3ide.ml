@@ -427,23 +427,23 @@ let connect_menu_item i ~callback =
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 let menu_add_file =
-  create_menu_item file_factory "_Add file to session"
+  create_menu_item file_factory "Add file to session"
                    "Insert another file in the current session"
 let menu_preferences =
-  create_menu_item file_factory "_Preferences"
+  create_menu_item file_factory "Preferences"
                    "Open Preferences Window"
-let menu_refresh =
-  create_menu_item file_factory ~key:GdkKeysyms._R "_Refresh session"
-                   "Refresh the proof session with updated source files."
 let menu_save_session =
-  create_menu_item file_factory "_Save session"
+  create_menu_item file_factory "Save session"
                    "Save the current proof session on disk"
 let menu_save_files =
-  create_menu_item file_factory "_Save files"
+  create_menu_item file_factory "Save files"
                    "Save the edited source files on disk"
 let menu_save_session_and_files =
   create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
-                   "Save the the current proof session and the files"
+                   "Save the current proof session and the source files"
+let menu_refresh =
+  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
+                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
 
 let menu_quit =
   create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
@@ -718,6 +718,8 @@ let reload_unsafe () =
   clear_tree_and_table goals_model;
   send_request Reload_req
 
+let save_and_reload () = save_sources (); reload_unsafe ()
+
 (* Same as reload_safe but propose to save edited sources before reload *)
 let reload_safe () =
   if files_need_saving () then
@@ -728,13 +730,13 @@ let reload_safe () =
         "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
     in
     match answer with
-    | 1 -> save_sources (); reload_unsafe ()
+    | 1 -> save_and_reload ()
     | 2 -> reload_unsafe ()
     | _ -> ()
   else
     reload_unsafe ()
 
-let () = connect_menu_item menu_refresh ~callback:reload_safe
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
 
 
 (* vpan222 contains:
@@ -761,9 +763,17 @@ let task_page,scrolled_task_view =
 
 let scrolled_task_view =
   GBin.scrolled_window
+    ~height:gconfig.task_height
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
     ~packing:scrolled_task_view#add ()
+
+let (_ : GtkSignal.id) =
+  scrolled_task_view#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
 
 (* Showing current task *)
 let task_view =
@@ -875,10 +885,11 @@ let print_message fmt =
     str_formatter
     fmt
 
-let add_to_msg_zone s =
+(*let add_to_msg_zone s =
   let s = message_zone#buffer#get_text () ^ "\n" ^ s in
   message_zone#buffer#set_text s;
   message_zone#scroll_to_mark `INSERT
+ *)
 
 (**** Monitor *****)
 
@@ -1304,7 +1315,7 @@ let (_ : GtkSignal.id) =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)                        -> print_message "%s" s
+  | Proof_error (_id, s)                        -> print_message "Proof_error: %s" s
   | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
         print_message "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
@@ -1323,19 +1334,19 @@ let treat_message_notification msg = match msg with
             ~stop:(start#forward_chars end_char)
             color
         end
-  | Strat_error (_id, s)                        -> print_message "%s" s
-  | Replay_Info s                               -> print_message "%s" s
-  | Query_Info (_id, s)                         -> print_message "%s" s
-  | Query_Error (_id, s)                        -> print_message "%s" s
-  | Help s                                      -> print_message "%s" s
-  | Information s                               -> print_message "%s" s
+  | Strat_error (_id, s)                        -> print_message "Strat_error: %s" s
+  | Replay_Info s                               -> print_message "Replay_info: %s" s
+  | Query_Info (_id, s)                         -> print_message "Query_info: %s" s
+  | Query_Error (_id, s)                        -> print_message "Query_error: %s" s
+  | Help s                                      -> print_message "Help: %s" s
+  | Information s                               -> print_message "Information: %s" s
   | Task_Monitor (t, s, r)                      -> update_monitor t s r
-  | Open_File_Error s                           -> print_message "%s" s
+  | Open_File_Error s                           -> print_message "Open_File_Error: %s" s
   | Parse_Or_Type_Error (loc, s)                ->
     begin
       (* TODO find a new color *)
       color_loc ~color:Goal_color loc;
-      print_message "%s" s
+      print_message "Parse_Or_Type_Error: %s" s
     end
   | File_Saved f                 ->
     begin
@@ -1346,13 +1357,10 @@ let treat_message_notification msg = match msg with
         print_message "%s was saved" f
       with
       | Not_found                ->
-          print_message "Please report: %s was not found in ide but was saved in session" f
+          print_message "Please report: %s was not found in IDE but was saved in session" f
     end
   | Error s                      ->
-      if Debug.test_flag debug then
-        print_message "%s" s
-      else
-        print_message "%s" "Request failed. You can get details using --debug ide_info"
+     print_message "Request failed: %s" s
 
 
 (***********************)
