@@ -427,17 +427,10 @@ module CumulativeTree
     requires { is_tree_for t a t.indexes.low t.indexes.high }
     requires { 0 <= t.indexes.low <= i < j <= t.indexes.high <= a.length }
     variant { t }
-(*
     ensures { !c - old !c <= 
          if i = t.indexes.low /\ j = t.indexes.high then 1 else
-         if i = t.indexes.low \/ j = t.indexes.high then depth t else
-          2 * depth t }
-*)
-    ensures {  
-         i = t.indexes.low /\ j = t.indexes.high -> !c - old !c <= 1 }
-    ensures {
-         i = t.indexes.low \/ j = t.indexes.high -> !c - old !c <= 1 + depth t }
-    ensures { !c - old !c <= 2 * depth t }
+         if i = t.indexes.low \/ j = t.indexes.high then 2 * depth t else
+          4 * depth t }
     ensures { result = sum a i j }
   = c := !c + 1;
     match t with
@@ -448,20 +441,9 @@ module CumulativeTree
       let k3 = ind.high in
       if i=k1 && j=k3 then ind.isum else
       let m = l.indexes.high in
-      if j <= m then 
-        begin
-          assert { depth l < depth t };
-          assert { i = t.indexes.low <-> i = l.indexes.low };
-          assert { j = t.indexes.high -> j = l.indexes.high };
-          query_aux_complexity l a i j c 
-        end
-      else
+      if j <= m then query_aux_complexity l a i j c else
       if i >= m then query_aux_complexity r a i j c else
-      begin
-        'L1: let tmp = query_aux_complexity l a i m c in
-        assert { !c - at !c 'L1 <= depth t };
-        tmp + query_aux_complexity r a m j c
-      end
+      query_aux_complexity l a i m c + query_aux_complexity r a m j c
     end
 
 
