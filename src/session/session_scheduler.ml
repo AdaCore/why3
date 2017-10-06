@@ -307,6 +307,13 @@ let update_session ~allow_obsolete ~release ~use_shapes
   init_session env_session.session;
   res
 
+let add_theories env_session ?format f t =
+  let mfile = add_theories ~keygen:O.create env_session ?format f t in
+  let any_file = (File mfile) in
+  init_any any_file;
+  O.notify any_file;
+  mfile
+
 let add_file env_session ?format f =
   let mfile = add_file ~keygen:O.create env_session ?format f in
   let any_file = (File mfile) in

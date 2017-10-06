@@ -21,6 +21,7 @@ why3.conf
 .*.aux
 *.elc
 *.summary
+.*.sw*
 \#*\#
 
 # /
@@ -54,39 +55,21 @@ why3.conf
 /bench/ce/*.out
 
 # /bin/
-/bin/why3.byte
-/bin/why3.opt
 /bin/why3
-/bin/why3ide.byte
-/bin/why3ide.opt
 /bin/why3ide
-/bin/why3config.byte
-/bin/why3config.opt
 /bin/why3config
-/bin/why3doc.byte
-/bin/why3doc.opt
 /bin/why3doc
-/bin/why3extract.byte
-/bin/why3extract.opt
 /bin/why3extract
-/bin/why3execute.byte
-/bin/why3execute.opt
 /bin/why3execute
-/bin/why3prove.byte
-/bin/why3prove.opt
+/bin/why3infer
 /bin/why3prove
-/bin/why3realize.byte
-/bin/why3realize.opt
 /bin/why3realize
-/bin/why3replay.byte
-/bin/why3replay.opt
 /bin/why3replay
-/bin/why3session.opt
-/bin/why3session.byte
 /bin/why3session
-/bin/why3wc.opt
-/bin/why3wc.byte
 /bin/why3wc
+/bin/*.byte
+/bin/*.opt
+
 
 # /doc/
 /doc/version.tex
@@ -332,3 +315,8 @@ pvsbin/
 
 /trash
 trywhy3.tar.gz
+**/*_inferred.mlw
+*.sw*
+*.vim
+bin/test_disjunction
+bin/test_infer

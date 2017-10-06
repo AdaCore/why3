@@ -1,0 +1,11 @@
+module Record1
+
+	use import int.Int
+	use import ref.Ref
+
+	type d = { mutable c: int; e: int; mutable f: bool; }
+
+	let a (x:int) : int =
+		let k = { c = 1; e = 2; f = false } in
+		k.c
+end

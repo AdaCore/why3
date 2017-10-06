@@ -76,7 +76,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
+INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -115,6 +115,10 @@ CMIHACK = -intf-suffix .cmi
 
 EXTOBJS = @MENHIRLIB@
 EXTLIBS = str unix nums dynlink @ZIPLIB@
+
+ifeq (@enable_infer@,yes)
+EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ elina bigarray
+endif
 
 EXTCMA	= $(addsuffix .cma,$(EXTLIBS)) $(addsuffix .cmo,$(EXTOBJS))
 EXTCMXA = $(addsuffix .cmxa,$(EXTLIBS)) $(addsuffix .cmx,$(EXTOBJS))
@@ -199,16 +203,25 @@ LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 LIB_SESSION = compress xml termcode session session_tools strategy \
               strategy_parser session_scheduler
 
+ifeq (@enable_infer@,yes)
+LIB_ABSINT = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg infer_ai
+endif
+
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW)) \
+	      $(addprefix src/absint/, $(LIB_ABSINT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
+ifeq (@enable_infer@,yes)
+LIBDIRS = util core driver mlw parser transform printer session absint
+else
 LIBDIRS = util core driver mlw parser transform printer session
+endif
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -240,6 +253,15 @@ else
 src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
+
+ifeq (@ELINA@,yes)
+src/absint/elina.ml: config.status src/session/compress_z.ml
+	cp src/session/compress_z.ml $@
+else
+src/session/compress.ml: config.status src/session/compress_none.ml
+	cp src/session/compress_none.ml $@
+endif
+
 
 # hide deprecated warnings for strings
 
@@ -486,8 +508,14 @@ install_no_local::
 
 TOOLSGENERATED = src/tools/why3wc.ml
 
+ifeq (@enable_infer@,yes)
 TOOLS_BIN = why3config why3execute why3extract why3prove \
-	    why3realize why3replay why3wc
+	    why3realize why3replay why3wc \
+		why3infer test_disjunction test_infer
+else
+TOOLS_BIN = why3config why3execute why3extract why3prove \
+		why3realize why3replay why3wc
+endif
 
 TOOLS_FILES = main $(TOOLS_BIN)
 
@@ -513,6 +541,14 @@ bin/why3execute.opt: lib/why3/why3.cmxa src/tools/why3execute.cmx
 bin/why3execute.byte: lib/why3/why3.cma src/tools/why3execute.cmo
 bin/why3extract.opt: lib/why3/why3.cmxa src/tools/why3extract.cmx
 bin/why3extract.byte: lib/why3/why3.cma src/tools/why3extract.cmo
+ifeq (@enable_infer@,yes)
+bin/why3infer.opt: lib/why3/why3.cmxa src/tools/why3infer.cmx
+bin/why3infer.byte: lib/why3/why3.cma src/tools/why3infer.cmo
+bin/test_disjunction.opt: lib/why3/why3.cmxa src/tools/test_disjunction.cmx
+bin/test_disjunction.byte: lib/why3/why3.cma src/tools/test_disjunction.cmo
+bin/test_infer.opt: lib/why3/why3.cmxa src/tools/test_infer.cmx
+bin/test_infer.byte: lib/why3/why3.cma src/tools/test_infer.cmo
+endif
 bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
@@ -526,6 +562,18 @@ clean_old_install::
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE)) $(BINDIR)/why3$(EXE)
 	rm -f $(BINDIR)/why3bench$(EXE) $(BINDIR)/why3replayer$(EXE)
 
+ifeq (@enable_infer@,yes)
+install_no_local::
+	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
+	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
+	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
+	$(INSTALL) bin/why3infer.@OCAMLBEST@   $(TOOLDIR)/why3infer$(EXE)
+	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
+	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
+	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
+	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+else
 install_no_local::
 	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
 	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
@@ -535,6 +583,7 @@ install_no_local::
 	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
 	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
 	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+endif
 
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
 
@@ -700,7 +749,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig gmain
+IDE_FILES = gconfig infer_gui gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -709,7 +758,7 @@ IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
 $(IDEDEP): DEPFLAGS += -I src/ide
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I src/absint
 
 # build targets
 
@@ -818,7 +867,7 @@ COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
 COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
-COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
+COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@ @INFERINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
 $(COQPCMO) $(COQPCMX): INCLUDES += $(COQPINCLUDES)
@@ -830,10 +879,12 @@ $(COQPDEP): $(COQPGENERATED)
 byte: src/coq-tactic/.why3-vo-byte
 opt:  src/coq-tactic/.why3-vo-opt
 
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
-lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
+lib/coq-tactic/why3tac.cmxs: OFLAGS += $(EXTCMXA)
 
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma,  @ZIPLIB@)
+ifeq (@enable_infer@,yes)
+lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cma, "gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ ppl polkaGrid bigarray")
+endif
 lib/coq-tactic/why3tac.cma:  BFLAGS += $(addsuffix .cmo,  @MENHIRLIB@)
 
 lib/coq-tactic/why3tac.cmxs: lib/why3/why3.cmxa $(COQPCMX)
@@ -1919,6 +1970,10 @@ clean::
 # lib/why3/why3extract.cmi for the interface (!!!)
 # same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
 src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+src/tools/why3extract.cmx src/ide/infer_gui.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 

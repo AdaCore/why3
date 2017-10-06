@@ -1,0 +1,33 @@
+
+
+module Uf1
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+	use import list.List
+
+	function ll (l: list 'a) : int
+
+	let cons(x:'a) (l: list 'a): list 'a
+	ensures { ll result = ll l + 1 }=
+	Cons x l
+
+	val test(u: list int) : unit
+	ensures { ll u = 0 }
+
+	let nil(unit) : list 'a
+	ensures { ll result = 0 } = Nil
+
+	let b(x:int): list int
+	ensures { ll result = 4 } =
+		let k = ref 0 in
+		let u = nil () in
+		let l = 5 in
+		while (!k < 3 && !k >= 0)
+		do 
+		variant { 10- !k }
+		incr k;
+		done;
+		Nil
+end

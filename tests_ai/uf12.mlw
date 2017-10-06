@@ -1,0 +1,20 @@
+module Uf1
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+
+	let b(x:int): int
+	ensures { result = x } =
+		let a = make x 0 in
+		a[0] <- 0;
+		let k = ref 0 in
+		while (!k+1 < length a)do 
+		variant { length a - !k }
+		let j = a[!k] + 1 in
+		a[!k+1] <- j;
+		incr k;
+		done;
+
+		a[x-1]
+end

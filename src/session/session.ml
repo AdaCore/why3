@@ -219,6 +219,7 @@ and 'a file =
       mutable file_verified : float option;
       mutable file_expanded : bool;
       mutable file_for_recovery : Theory.theory Mstr.t hide;
+      mutable file_loader: theory_loader option;
     }
 
 and 'a session =
@@ -227,6 +228,9 @@ and 'a session =
       session_prover_ids : int PHprover.t;
       session_dir   : string; (** Absolute path *)
     }
+
+and theory_loader = (unit -> ((Loc.position * Ident.ident * Theory.theory) list *
+  Theory.theory Stdlib.Mstr.t))
 
 type loaded_prover =
     { prover_config : Whyconf.config_prover;
@@ -1147,7 +1151,7 @@ let raw_add_theory ~(keygen:'a keygen) ~(expanded:bool)
   in
   mth
 
-let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) session f fmt =
+let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) ~(loader:theory_loader option) session f fmt =
   let key = keygen () in
   let mfile = { file_name = f;
                 file_key = key;
@@ -1157,6 +1161,7 @@ let raw_add_file ~(keygen:'a keygen) ~(expanded:bool) session f fmt =
                 file_expanded = expanded;
                 file_parent  = session;
                 file_for_recovery = None;
+                file_loader = loader
               }
   in
   PHstr.replace session.session_files f mfile;
@@ -1520,7 +1525,7 @@ let load_file ~keygen session old_provers f =
         let fn = string_attribute "name" f in
         let fmt = load_option "format" f in
         let expanded = bool_attribute "expanded" f false in
-        let mf = raw_add_file ~keygen:ctxt.keygen ~expanded session fn fmt in
+        let mf = raw_add_file ~keygen:ctxt.keygen ~expanded ~loader:None session fn fmt in
         mf.file_theories <-
           List.rev
           (List.fold_left
@@ -1737,6 +1742,9 @@ let set_file_expanded f b =
   if not b then
     List.iter (fun th -> set_theory_expanded th b) f.file_theories
 
+let set_file_loader f t =
+  f.file_loader <- Some t
+
 
 (* add a why file from a session *)
 (** Read file and sort theories by location *)
@@ -1757,7 +1765,7 @@ let read_file env ?format fn =
     (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
     ltheories,theories
 
-let add_file ~keygen env ?format filename =
+let add_theories ~keygen env ?format filename loader =
   let version = env.session.session_shape_version in
   let add_goal parent (acc,n) goal =
     let g =
@@ -1782,16 +1790,14 @@ let add_file ~keygen env ?format filename =
     rtheory::acc
   in
   let add_file session f_name fmt ordered_theories =
-    let rfile = raw_add_file ~keygen ~expanded:true session f_name fmt in
+    let rfile = raw_add_file ~keygen ~expanded:true ~loader:(Some loader) session f_name fmt in
     let theories =
       List.fold_left (fun acc (_,thname,th) -> add_theory acc rfile thname th)
         [] ordered_theories in
     rfile.file_theories <- List.rev theories;
     rfile
   in
-  let fname = Filename.concat env.session.session_dir filename in
-  Debug.dprintf debug "[Session] read file@\n";
-  let ordered_theories,theories = read_file env.env ?format fname in
+  let ordered_theories, theories = loader () in
   Debug.dprintf debug "[Session] create tasks@\n";
   let file = add_file env.session filename format ordered_theories in
   let fname =
@@ -1801,6 +1807,12 @@ let add_file ~keygen env ?format filename =
   file.file_for_recovery <- Some theories;
   check_file_verified notify file;
   file
+
+let add_file ~keygen env ?format filename =
+  Debug.dprintf debug "[Session] read file@\n";
+  add_theories ~keygen env ?format filename (fun () ->
+      let fname = Filename.concat env.session.session_dir filename in
+      read_file env.env ?format fname)
 
 let remove_file file =
   let s = file.file_parent in
@@ -2641,7 +2653,14 @@ let update_session ~ctxt old_session env whyconf =
   let files =
     PHstr.fold (fun _ old_file acc ->
       Debug.dprintf debug "[Load] file '%s'@\n" old_file.file_name;
-      let new_file = add_file
+      let new_file =
+        match old_file.file_loader with
+        | Some loader ->
+          add_theories
+        ~keygen:ctxt.keygen new_env_session
+        ?format:old_file.file_format old_file.file_name loader
+        | None ->
+          add_file
         ~keygen:ctxt.keygen new_env_session
         ?format:old_file.file_format old_file.file_name
       in

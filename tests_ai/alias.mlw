@@ -1,0 +1,17 @@
+module Alias
+use import int.Int
+use import ref.Ref
+
+	let b (i: ref int) (j: ref int)
+		ensures { result = !(old j) }
+		writes { i } =
+		i := 1;
+		!j
+
+	let c (u:int) =
+		let i = ref 0 in
+		let j = ref 0 in
+		let _ = b i j in
+		b i i
+	
+end

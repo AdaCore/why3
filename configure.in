@@ -64,6 +64,11 @@ AC_ARG_ENABLE(zip,
     AS_HELP_STRING([--enable-zip], [use LZ compression to store session files]),,
     enable_zip=yes)
 
+# infer
+
+AC_ARG_ENABLE(infer,
+    AS_HELP_STRING([--enable-infer], [use apron and fixpoint to infer loop invariants]),,
+    enable_infer=yes)
 # menhirLib
 
 AC_ARG_ENABLE(menhirLib,
@@ -381,6 +386,41 @@ else
    BIGINTPKG=num
 fi
 
+# checking for apron and fixpoint
+if test "$enable_infer" = yes; then
+   if test "$USEOCAMLFIND" = yes; then
+   	  # gmp is a dependency of apron
+      INFERINCLUDE=$(ocamlfind query apron apron.boxMPQ apron.octMPQ apron.polkaMPQ camllib)
+   fi
+   if test -n "$INFERINCLUDE"; then
+      INFERINCLUDE=$(ocamlfind query fixpoint)
+	  if test -n "$INFERINCLUDE"; then
+		  echo "ocamlfind found apron, apron.polkaMPQ, apron.polkaGrid, apron.ppl, apron.boxMPQ, apron.octMPQ, camllib and fixpoint in $INFERINCLUDE"
+		  # camllib is a dependency of fixpoint, so it should not be nedded to check for it
+		  INFERINCLUDE="-I $(ocamlfind query apron) -I $(ocamlfind query apron.polkaMPQ) -I $(ocamlfind query apron.boxMPQ) -I $(ocamlfind query apron.octMPQ)  -I $(ocamlfind query fixpoint) -I $(ocamlfind query camllib) -I $(ocamlfind query gmp)"
+		  INFERLIB="apron apron.polkaMPQ fixpoint apron.boxMPQ apron.octMPQ"
+	  else
+		 enable_infer=no
+		 AC_MSG_WARN([Lib fixpoint not found, infer will not be built.])
+         reason_infer=" (fixpoint not found)"
+	  fi
+      ELINAINCLUDE=$(ocamlfind query apron.elina)
+	  if test -n "$INFERINCLUDE"; then
+	  	echo "ocamlfind found elina in $ELINAINCLUDE"
+		ELINA=yes
+		INFERINCLUDE="$INFERINCLUDE -I $(ocamlfind query apron.elina)"
+		INFERLIB="$INFERLIB apron.elina"
+	  else
+	  	AC_MSG_WARN([Elina not found])
+	  fi
+   else
+     enable_infer=no
+	 reason_infer=" (apron or apron.polkaMPQ or apron.boxMPQ or apron.octMPQ or camllib not found)"
+	 AC_MSG_WARN([Lib apron or apron.polkaMPQ  not found or apron.boxMPQ or apron.octMPQ or camllib, infer will not be built.])
+   fi
+fi
+
+
 # checking for camlzip
 if test "$enable_zip" = yes; then
    if test "$USEOCAMLFIND" = yes; then
@@ -467,7 +507,7 @@ if test "$enable_ide" = yes ; then
 fi
 
 if test "$enable_ide" = yes ; then
-  LABLGTK2PKG="lablgtk2 lablgtk2.init lablgtk2.sourceview2"
+  LABLGTK2PKG="lablgtk2 lablgtk2.auto-init lablgtk2.sourceview2"
 else
   LABLGTK2PKG=
 fi
@@ -777,6 +817,10 @@ AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
 AC_SUBST(BIGINTPKG)
 
+AC_SUBST(enable_infer)
+AC_SUBST(INFERINCLUDE)
+AC_SUBST(INFERLIB)
+
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
@@ -860,6 +904,7 @@ echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "Components"
+echo "    Invariant inference     : $enable_infer$reason_infer"
 echo "    IDE command             : $enable_ide$reason_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"

@@ -698,10 +698,23 @@ let post_of_expr res e =
 
 (* let-definitions *)
 
+let let_var_raw v ?(ghost=false) e =
+  LDvar (v,e), v
+
 let let_var id ?(ghost=false) e =
   let ghost = ghost || mask_ghost e.e_mask in
   let v = create_pvsymbol id ~ghost e.e_ity in
   LDvar (v,e), v
+
+let let_sym_raw s ?(ghost=false) ?(kind=RKnone) c =
+  (* we do not compute implicit post-conditions for let-functions,
+     as this would be equivalent to auto-inlining of the generated
+     logical function definition. FIXME: Should we make exception
+     for local let-functions? We do have a mapping definition in
+     the antecedents of WP, but provers must perform beta-reduction
+     to apply it: auto-inlining might be really helpful here. *)
+  LDsym (s,c), s
+
 
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
   let cty = c_cty_enrich ghost kind c in

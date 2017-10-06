@@ -1,0 +1,40 @@
+
+module Test
+	use import array.Array
+	use import ref.Ref
+	use import ref.Refint
+	use import int.Int
+
+	let b(x:int): unit
+	=
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k = 0 \/ 0 <= !k <= x}
+		incr k;
+		()
+		done; ()
+
+	let c(x:int): unit
+	=
+		let k = ref 0 in
+		let j = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k = 0 \/ 0 <= !k <= x /\ !k *2 = !j}
+		incr k;
+		j := !j + 2;
+		()
+		done; ()
+
+	let e(x:int) : unit
+	requires { x > 0 }
+	=
+		let k = ref 0 in
+		k := x;
+		while (true) do
+		variant {0}
+		invariant { !k = x }
+		()
+		done; ()
+end

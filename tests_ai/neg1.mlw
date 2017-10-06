@@ -1,0 +1,14 @@
+module Neg1
+	use import int.Int
+	use import ref.Ref
+
+
+	let b(unit): int
+		ensures { result = 10 } =
+		let i = ref 0 in
+		while !i <> 10 && !i < 12 do
+		variant { 15 - !i }
+			i := !i + 1;
+		done;
+		!i
+end
