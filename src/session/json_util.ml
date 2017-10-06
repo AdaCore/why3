@@ -143,7 +143,7 @@ let convert_request_constructor (r: ide_request) =
   | Command_req _             -> String "Command_req"
   | Add_file_req _            -> String "Add_file_req"
   | Save_file_req _           -> String "Save_file_req"
-  | Set_max_tasks_req _       -> String "Set_max_tasks_req"
+  | Set_config_param _        -> String "Set_config_param"
   | Get_file_contents _       -> String "Get_file_contents"
   | Focus_req _               -> String "Focus_req"
   | Unfocus_req               -> String "Unfocus_req"
@@ -175,9 +175,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Save_file_req (f,_) ->
       convert_record ["ide_request", cc r;
            "file", String f]
-  | Set_max_tasks_req n ->
+  | Set_config_param(s,n) ->
       convert_record ["ide_request", cc r;
-           "tasks", Int n]
+           "param", String s; "value", Int n]
   | Get_task(n,b,loc) ->
       convert_record ["ide_request", cc r;
            "node_ID", Int n; "do_intros", Bool b; "loc", Bool loc]
@@ -441,9 +441,10 @@ let parse_request (constr: string) j =
     let f = get_string (get_field j "file") in
     Add_file_req f
 
-  | "Set_max_tasks_req" ->
-    let n = get_int (get_field j "tasks") in
-    Set_max_tasks_req n
+  | "Set_config_param" ->
+    let s = get_string (get_field j "param") in
+    let n = get_int (get_field j "value") in
+    Set_config_param(s,n)
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in

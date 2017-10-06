@@ -102,7 +102,7 @@ type notification =
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
-  | Set_max_tasks_req       of int
+  | Set_config_param        of string * int
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
   | Focus_req               of node_ID
@@ -126,7 +126,7 @@ let modify_session (r: ide_request) =
   match r with
   | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
   | Copy_detached _ | Replay_req | Clean_req | Mark_obsolete_req _ -> true
-  | Set_max_tasks_req _ | Get_file_contents _
+  | Set_config_param _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
   | Get_Session_Tree_req | Save_req | Reload_req | Exit_req
   | Interrupt_req | Focus_req _ | Unfocus_req -> false

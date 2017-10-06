@@ -489,6 +489,14 @@ let provers_factory =
 
 (* File menu signals *)
 
+let send_session_config_to_server () =
+  let nb = gconfig.session_nb_processes in
+  send_request (Set_config_param("max_tasks",nb));
+  let nb = gconfig.session_time_limit in
+  send_request (Set_config_param("timelimit",nb));
+  let nb = gconfig.session_mem_limit in
+  send_request (Set_config_param("memlimit",nb))
+
 let () =
   let callback () =
     Gconfig.preferences gconfig;
@@ -509,8 +517,7 @@ let () =
         (Whyconf.get_provers gconfig.config);
      *)
      *)
-    let nb = gconfig.session_nb_processes in
-    send_request (Set_max_tasks_req nb)
+    send_session_config_to_server ()
   in
   connect_menu_item menu_preferences ~callback
 
@@ -963,10 +970,7 @@ let _ =
       | _ -> false
       )
 
-let () =
-  let n = gconfig.session_nb_processes in
-  Debug.dprintf debug "setting max proof tasks to %d@." n;
-  send_request (Set_max_tasks_req n)
+let () = send_session_config_to_server ()
 
 (********************)
 (* Locations colors *)

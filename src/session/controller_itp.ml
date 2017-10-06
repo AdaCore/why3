@@ -82,6 +82,11 @@ type controller =
     controller_running_proof_attempts : unit Hpan.t;
   }
 
+let session_max_tasks = ref 1
+
+let set_session_max_tasks n =
+  session_max_tasks := n;
+  Prove_client.set_max_running_provers n
 
 let create_controller config env ses =
   let c =
@@ -253,11 +258,6 @@ let prover_tasks_edited = Queue.create ()
 
 let timeout_handler_running = ref false
 
-let max_number_of_running_provers = ref 1
-
-let set_max_tasks n =
-  max_number_of_running_provers := n;
-  Prove_client.set_max_running_provers n
 
 let number_of_running_provers = ref 0
 
@@ -439,7 +439,7 @@ let timeout_handler () =
   begin
     try
       for _i = Hashtbl.length prover_tasks_in_progress
-          to S.multiplier * !max_number_of_running_provers do
+          to S.multiplier * !session_max_tasks do
         let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
           Queue.pop scheduled_proof_attempts in
         try

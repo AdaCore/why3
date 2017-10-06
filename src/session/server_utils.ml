@@ -281,11 +281,16 @@ let return_prover name config =
   end else
     Some (snd (Whyconf.Mprover.choose provers))
 
+let session_timelimit = ref 2
+let session_memlimit = ref 1000
+let set_session_timelimit n = session_timelimit := n
+let set_session_memlimit n = session_memlimit := n
+
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
 let parse_prover_name config name args :
   (Whyconf.config_prover * Call_provers.resource_limit) option =
-  let main = Whyconf.get_main config in
   match (return_prover name config) with
   | None -> None
   | Some prover_config ->
@@ -294,12 +299,13 @@ let parse_prover_name config name args :
       match args with
       | [] ->
         let default_limit = Call_provers.{empty_limit with
-                                          limit_time = Whyconf.timelimit main;
-                                          limit_mem = Whyconf.memlimit main} in
+                                          limit_time = !session_timelimit;
+                                          limit_mem = !session_memlimit} in
           Some (prover_config, default_limit)
       | [timeout] -> Some (prover_config,
                            Call_provers.{empty_limit with
-                                         limit_time = int_of_string timeout})
+                                          limit_time = int_of_string timeout;
+                                          limit_mem = !session_memlimit})
       | [timeout; oom ] ->
         Some (prover_config, Call_provers.{empty_limit with
                                            limit_time = int_of_string timeout;

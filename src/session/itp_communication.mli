@@ -111,7 +111,7 @@ type ide_request =
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
-  | Set_max_tasks_req       of int
+  | Set_config_param        of string * int
   | Get_file_contents       of string
   | Get_task                of node_ID * bool * bool
   (** [Get_task(id,b, loc)] requests for the text of the task in node [id],

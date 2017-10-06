@@ -253,7 +253,7 @@ let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
   | Add_file_req f                  -> fprintf fmt "open file %s" f
-  | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
+  | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
   | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
@@ -1367,7 +1367,14 @@ end
         else
           () (* Eventually print debug here *)
 *)
-    | Set_max_tasks_req i     -> C.set_max_tasks i
+    | Set_config_param(s,i)   ->
+       begin
+         match s with
+         | "max_tasks" -> Controller_itp.set_session_max_tasks i
+         | "timelimit" -> Server_utils.set_session_timelimit i
+         | "memlimit" -> Server_utils.set_session_memlimit i
+         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
+       end
     | Exit_req                -> exit 0
      )
     with e when not (Debug.test_flag Debug.stack_trace)->

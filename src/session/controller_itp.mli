@@ -95,7 +95,14 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 (** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
 
+
+val set_session_max_tasks : int -> unit
+(** sets the maximum number of proof tasks that can be running at the
+    same time. Initially set to 1. *)
+
+
 val print_session : Format.formatter -> controller -> unit
+
 
 
 
@@ -167,10 +174,6 @@ val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 (** {2 Scheduled jobs} *)
 
 module Make(S : Scheduler) : sig
-
-val set_max_tasks : int -> unit
-(** sets the maximum number of proof tasks that can be running at the
-    same time. Initially set to 1. *)
 
 val register_observer : (int -> int -> int -> unit) -> unit
 (** records a hook that will be called with the number of waiting
