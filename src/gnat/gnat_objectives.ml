@@ -376,7 +376,7 @@ let iter_leafs s goal f =
   let tr_list = Session_itp.get_transformations s goal in
   (try
     let tr_gnat_split =
-      List.find (fun x -> Session_itp.get_transf_name s x = "split_goal_wp_conj")
+      List.find (fun x -> Session_itp.get_transf_name s x = first_transform)
                 tr_list
     in
     let subsubgoals = Session_itp.get_sub_tasks s tr_gnat_split in
