@@ -3,80 +3,72 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="1" name="Eprover" version="1.9.1-001" timelimit="55" steplimit="0" memlimit="2000"/>
-<prover id="2" name="CVC4" version="1.4" timelimit="55" steplimit="0" memlimit="2000"/>
-<prover id="3" name="Z3" version="4.4.1" timelimit="55" steplimit="0" memlimit="2000"/>
-<prover id="4" name="CVC3" version="2.4.1" timelimit="55" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <file name="../compute.mlw" expanded="true">
-<theory name="Top" sum="eb08265c7bc1c0ad93512c7c9b0cbf32" expanded="true">
- <goal name="interp" expl="">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
- </goal>
+<theory name="UnitaryCommutativeRingDecision" sum="b60d85f83e2113a07e31fb9ff218971f" expanded="true">
  <goal name="VC mon_append" expl="VC for mon_append">
- <proof prover="0"><result status="valid" time="0.01" steps="59"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="71"/></proof>
  </goal>
  <goal name="interp_nil" expl="">
- <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
  <goal name="interp_cons" expl="">
  <transf name="compute_in_goal">
   <goal name="interp_cons.1" expl="">
-  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC interp_sum" expl="VC for interp_sum">
- <transf name="split_goal_wp">
-  <goal name="VC interp_sum.1" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
-  </goal>
-  <goal name="VC interp_sum.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="72"/></proof>
  </goal>
  <goal name="VC append_mon" expl="VC for append_mon">
- <transf name="split_goal_wp">
-  <goal name="VC append_mon.1" expl="postcondition">
-  <transf name="compute_in_goal">
-   <goal name="VC append_mon.1.1" expl="postcondition">
-   <proof prover="0"><result status="valid" time="0.02" steps="53"/></proof>
-   </goal>
-  </transf>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="28"/></proof>
  </goal>
  <goal name="VC mul_mon" expl="VC for mul_mon">
  <transf name="split_goal_wp">
   <goal name="VC mul_mon.1" expl="assertion">
   <transf name="split_goal_wp">
    <goal name="VC mul_mon.1.1" expl="assertion">
-   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="VC mul_mon.1.2" expl="assertion">
-   <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
    </goal>
    <goal name="VC mul_mon.1.3" expl="assertion">
-   <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="VC mul_mon.1.4" expl="assertion">
-   <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC mul_mon.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  <transf name="compute_in_goal">
+   <goal name="VC mul_mon.2.1" expl="postcondition">
+   <proof prover="0"><result status="valid" time="0.49" steps="34"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
  <goal name="VC mul_devel" expl="VC for mul_devel">
- <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
  <transf name="split_goal_wp">
   <goal name="VC mul_devel.1" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <transf name="simplify_trivial_quantification">
+   <goal name="VC mul_devel.1.1" expl="VC for mul_devel">
+   <transf name="compute_in_goal">
+    <goal name="VC mul_devel.1.1.1" expl="VC for mul_devel">
+    <proof prover="1"><result status="valid" time="0.04"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC mul_devel.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
@@ -85,205 +77,209 @@
   <goal name="VC conv.1" expl="postcondition">
   <transf name="compute_in_goal">
    <goal name="VC conv.1.1" expl="postcondition">
-   <proof prover="0"><result status="valid" time="0.02" steps="101"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="225"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC conv.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC conv.3" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC conv.4" expl="postcondition">
   <transf name="compute_in_goal">
    <goal name="VC conv.4.1" expl="postcondition">
-   <proof prover="0"><result status="valid" time="0.02" steps="54"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="86"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="VC insert" expl="VC for insert">
- <transf name="split_goal_wp">
-  <goal name="VC insert.1" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
-  </goal>
-  <goal name="VC insert.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="53"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="104"/></proof>
  </goal>
  <goal name="VC insertion_sort" expl="VC for insertion_sort">
- <transf name="split_goal_wp">
-  <goal name="VC insertion_sort.1" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
-  </goal>
-  <goal name="VC insertion_sort.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.01" steps="50"/></proof>
  </goal>
  <goal name="VC sort_mon" expl="VC for sort_mon">
- <transf name="compute_in_goal">
-  <goal name="VC sort_mon.1" expl="VC for sort_mon">
-  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ <transf name="split_goal_wp">
+  <goal name="VC sort_mon.1" expl="postcondition">
+  <transf name="compute_in_goal">
+   <goal name="VC sort_mon.1.1" expl="postcondition">
+   <proof prover="0"><result status="valid" time="0.04" steps="88"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
  <goal name="VC sort_mons" expl="VC for sort_mons">
- <proof prover="0"><result status="valid" time="0.02" steps="65"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="70"/></proof>
  </goal>
  <goal name="VC le_mon" expl="VC for le_mon">
- <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
  <goal name="VC same" expl="VC for same">
- <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="33"/></proof>
  </goal>
  <goal name="squash_sum" expl="">
  <transf name="compute_in_goal">
   <goal name="squash_sum.1" expl="">
-  <proof prover="0"><result status="valid" time="0.26" steps="374"/></proof>
+  <proof prover="0"><result status="valid" time="1.29" steps="544"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC squash_append" expl="VC for squash_append">
- <transf name="compute_in_goal">
-  <goal name="VC squash_append.1" expl="VC for squash_append">
-  <proof prover="0"><result status="valid" time="0.61" steps="841"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.42" steps="93"/></proof>
  </goal>
  <goal name="VC insert_mon" expl="VC for insert_mon">
  <transf name="split_goal_wp">
   <goal name="VC insert_mon.1" expl="assertion">
   <transf name="split_goal_wp">
    <goal name="VC insert_mon.1.1" expl="VC for insert_mon">
-   <transf name="compute_in_goal">
-    <goal name="VC insert_mon.1.1.1" expl="VC for insert_mon">
-    <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
-    </goal>
-   </transf>
+   <proof prover="0"><result status="valid" time="0.05" steps="66"/></proof>
    </goal>
    <goal name="VC insert_mon.1.2" expl="VC for insert_mon">
-   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+   <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
    </goal>
    <goal name="VC insert_mon.1.3" expl="VC for insert_mon">
-   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC insert_mon.2" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
   <goal name="VC insert_mon.3" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.15" steps="158"/></proof>
+  <transf name="split_goal_wp">
+   <goal name="VC insert_mon.3.1" expl="postcondition">
+   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="VC insert_mon.3.2" expl="postcondition">
+   <transf name="compute_in_goal">
+    <goal name="VC insert_mon.3.2.1" expl="postcondition">
+    <proof prover="2"><result status="valid" time="3.00"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
  <goal name="VC insertion_sort_mon" expl="VC for insertion_sort_mon">
- <transf name="split_goal_wp">
-  <goal name="VC insertion_sort_mon.1" expl="variant decrease">
-  <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
-  </goal>
-  <goal name="VC insertion_sort_mon.2" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="67"/></proof>
  </goal>
  <goal name="VC normalize" expl="VC for normalize">
- <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
  <goal name="norm" expl="">
- <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+ <proof prover="0" timelimit="15"><result status="valid" time="0.02" steps="24"/></proof>
+ </goal>
+</theory>
+<theory name="Tests" sum="6dff474baec302c419f4992d0bd1a6cf">
+ <goal name="VC eq0_int" expl="VC for eq0_int">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="morph_zero" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="morph_one" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="morph_add" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="morph_mul" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="morph_inv" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="VC eq0" expl="VC for eq0">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="d" expl="">
+ <proof prover="0"><result status="timeout" time="5.00"/></proof>
  <transf name="compute_in_goal">
   <goal name="d.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="d&apos;" expl="">
- <transf name="split_goal_wp">
+ <transf name="compute_in_goal">
   <goal name="d&apos;.1" expl="">
-  <transf name="compute_in_goal">
-  </transf>
-  </goal>
-  <goal name="d&apos;.2" expl="">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_1" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_1.1" expl="">
-  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_2" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_2.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_3" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_3.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_4" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_4.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_5" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_5.1" expl="">
-  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_1" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_1.1" expl="">
-  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_2" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_2.1" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="2" timelimit="5"><result status="valid" time="0.01"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_3" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_3.1" expl="">
-  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_4" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_4.1" expl="">
-  <proof prover="0"><result status="valid" time="4.69" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="3.62" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_5" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_5.1" expl="">
-  <proof prover="0"><result status="valid" time="2.43" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="1.87" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
@@ -294,7 +290,7 @@
   </transf>
   </goal>
   <goal name="devel_conv_1_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
@@ -305,7 +301,7 @@
   </transf>
   </goal>
   <goal name="devel_conv_2_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
@@ -316,7 +312,7 @@
   </transf>
   </goal>
   <goal name="devel_conv_3_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
@@ -327,7 +323,7 @@
   </transf>
   </goal>
   <goal name="devel_conv_4_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
@@ -338,29 +334,22 @@
   </transf>
   </goal>
   <goal name="devel_conv_5_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_6" expl="">
- <transf name="inline_goal">
+ <transf name="compute_in_goal">
   <goal name="devel_6.1" expl="">
-  <transf name="compute_in_goal">
-   <goal name="devel_6.1.1" expl="">
-   <proof prover="0" timelimit="15"><result status="valid" time="0.04" steps="5"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="devel_conv_6" expl="">
  <transf name="compute_in_goal">
   <goal name="devel_conv_6.1" expl="">
-  <proof prover="0" timelimit="55"><result status="valid" time="7.42" steps="5"/></proof>
-  <proof prover="1"><result status="valid" time="3.42"/></proof>
-  <proof prover="2"><result status="valid" time="0.19"/></proof>
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="4"><result status="valid" time="0.74"/></proof>
+  <proof prover="0"><result status="timeout" time="5.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
@@ -371,7 +360,7 @@
   </transf>
   </goal>
   <goal name="devel_conv_6_norm.2" expl="">
-  <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
  </transf>
  </goal>

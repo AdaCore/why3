@@ -1,50 +1,68 @@
+module UnitaryCommutativeRingDecision
+
+clone algebra.UnitaryCommutativeRing as C
+
+clone algebra.UnitaryCommutativeRing as Z
+
+function morph Z.t : C.t
+
+axiom morph_zero: morph Z.zero = C.zero
+axiom morph_one: morph Z.one = C.one
+axiom morph_add: forall z1 z2:Z.t. morph (Z.(+) z1 z2) = C.(+) (morph z1) (morph z2)
+axiom morph_mul: forall z1 z2:Z.t. morph (Z.( *) z1 z2)
+                                   = C.( *) (morph z1) (morph z2)
+axiom morph_inv: forall z:Z.t. morph (Z.(-_) z) = C.(-_) (morph z)
+
+val predicate eq0 (x:Z.t) ensures { result <-> x = Z.zero }
+
 use import int.Int
 use import list.List
 
-type t = Var int | Add t t | Mul t t | Cst int
+type t = Var int | Add t t | Mul t t | Cst Z.t
 
-function interp (x:t) (y:int->int) : int =
+type vars = int -> C.t
+
+function interp (x:t) (y:vars) : C.t =
   match x with
   | Var n -> y n
-  | Add x1 x2 -> interp x1 y + interp x2 y
-  | Mul x1 x2 -> interp x1 y * interp x2 y
-  | Cst c -> c end
+  | Add x1 x2 -> C.(+) (interp x1 y) (interp x2 y)
+  | Mul x1 x2 -> C.( *) (interp x1 y) (interp x2 y)
+  | Cst c -> morph c end
 
-predicate eq (x1 x2:t) = forall y: int -> int. interp x1 y = interp x2 y
-goal interp: forall y. interp (Add (Var 3) (Var 5)) y = y 3 + y 5
+predicate eq (x1 x2:t) = forall y: vars. interp x1 y = interp x2 y
 
 (** Conversion *)
 
-type m = M int (list int)
+type m = M Z.t (list int)
 type t' = list m (* sum of monomials *)
 
-function mon (x:list int) (y:int -> int) : int =
+function mon (x:list int) (y:vars) : C.t =
   match x with
-  | Nil -> 1
-  | Cons x r -> (y x) * mon r y end
+  | Nil -> C.one
+  | Cons x r -> C.( *) (y x) (mon r y) end
 
-function interp' (x:t') (y:int->int) : int =
+function interp' (x:t') (y:vars) : C.t =
   match x with
-  | Nil -> 0
-  | Cons (M a m) r -> a * mon m y + interp' r y end
+  | Nil -> C.zero
+  | Cons (M a m) r -> C.(+) (C.( *) (morph a) (mon m y)) (interp' r y) end
 
-predicate eq_mon (m1 m2: list int) = forall y: int->int. mon m1 y = mon m2 y
-predicate eq' (x1 x2: t') = forall y: int->int. interp' x1 y = interp' x2 y
+predicate eq_mon (m1 m2: list int) = forall y: vars. mon m1 y = mon m2 y
+predicate eq' (x1 x2: t') = forall y: vars. interp' x1 y = interp' x2 y
 
 use import list.Append
 use import list.Length
 
-let rec lemma mon_append (x1 x2: list int) (y:int -> int)
-  ensures { mon (x1 ++ x2) y = mon x1 y * mon x2 y }
+let rec lemma mon_append (x1 x2: list int) (y:vars)
+  ensures { mon (x1 ++ x2) y = C.( *) (mon x1 y) (mon x2 y) }
   variant { x1 }
 =
   match x1 with Nil -> () | Cons _ x -> mon_append x x2 y end
 
-lemma interp_nil : forall y:int -> int. interp' Nil y = 0
-lemma interp_cons : forall m:m, x:t', y:int->int.
-      interp' (Cons m x) y = interp' (Cons m Nil) y + interp' x y
-let rec lemma interp_sum (x1 x2:t') (y:int->int)
-    ensures { interp' (x1 ++ x2) y = interp' x1 y + interp' x2 y }
+lemma interp_nil : forall y:vars. interp' Nil y = C.zero
+lemma interp_cons : forall m:m, x:t', y:vars.
+      interp' (Cons m x) y = C.(+) (interp' (Cons m Nil) y) (interp' x y)
+let rec lemma interp_sum (x1 x2:t') (y:vars)
+    ensures { interp' (x1 ++ x2) y = C.(+) (interp' x1 y) (interp' x2 y) }
     variant { x1 }
 =
   match x1 with
@@ -52,14 +70,14 @@ let rec lemma interp_sum (x1 x2:t') (y:int->int)
     | Cons _ x -> interp_sum x x2 y
   end
 
-let function append_mon (m1 m2:m)
+let ghost function append_mon (m1 m2:m)
   ensures { forall y. interp' (Cons result Nil) y
-              = interp' (Cons m1 Nil) y * interp' (Cons m2 Nil) y }
-= match m1,m2 with M a1 l1, M a2 l2 -> M (a1 * a2) (l1 ++ l2) end
+              = C.( *) (interp' (Cons m1 Nil) y) (interp' (Cons m2 Nil) y) }
+= match m1,m2 with M a1 l1, M a2 l2 -> M (Z.( *) a1 a2) (l1 ++ l2) end
 
-let rec function mul_mon (x:t') (mon:m) : t'
+let rec ghost function mul_mon (x:t') (mon:m) : t'
   ensures { forall y.
-            interp' result y = interp' x y * interp' (Cons mon Nil) y } =
+            interp' result y = C.( *) (interp' x y) (interp' (Cons mon Nil) y) } =
   match x with
   | Nil -> Nil
   | Cons m r ->
@@ -67,25 +85,26 @@ let rec function mul_mon (x:t') (mon:m) : t'
     let lr = mul_mon r mon in
     let res = Cons mr lr in
     assert { forall y. interp' res y
-             = interp' (Cons mr Nil) y + interp' lr y
-             = interp' (Cons m Nil) y * interp' (Cons mon Nil) y
-               + interp' r y * interp' (Cons mon Nil) y
-             = (interp' (Cons m Nil) y + interp' r y) * interp' (Cons mon Nil) y
-             = interp' x y * interp' (Cons mon Nil) y };
+             = C.(+) (interp' (Cons mr Nil) y) (interp' lr y)
+             = C.(+) (C.( *) (interp' (Cons m Nil) y) (interp' (Cons mon Nil) y))
+                     (C.( *) (interp' r y) (interp' (Cons mon Nil) y))
+             = C.( *) (C.(+) (interp' (Cons m Nil) y) (interp' r y))
+                      (interp' (Cons mon Nil) y)
+             = C.( *) (interp' x y) (interp' (Cons mon Nil) y) };
     res
 end
 
-let rec function mul_devel (x1 x2:t') : t'
-  ensures { forall y. interp' result y = interp' x1 y * interp' x2 y } =
+let rec ghost function mul_devel (x1 x2:t') : t'
+  ensures { forall y. interp' result y = C.( *) (interp' x1 y) (interp' x2 y) } =
   match x1 with
   | Nil -> Nil
   | Cons (M a m) r -> (mul_mon x2 (M a m)) ++ (mul_devel r x2)
   end
 
-let rec function conv (x:t) : t'
+let rec ghost function conv (x:t) : t'
   ensures { forall y. interp x y = interp' result y } =
   match x with
-  | Var v -> Cons (M 1 (Cons v Nil)) Nil
+  | Var v -> Cons (M Z.one (Cons v Nil)) Nil
   | Add x1 x2 -> (conv x1) ++ (conv x2)
   | Mul x1 x2 -> mul_devel (conv x1) (conv x2)
   | Cst n -> Cons (M n Nil) Nil
@@ -139,15 +158,16 @@ let rec function same (l1 l2: list int) : bool
   end
 
 
-lemma squash_sum: forall a1 a2: int, l1 l2: list int. same l1 l2 ->
-      eq' (Cons (M a1 l1) (Cons (M a2 l2) Nil)) (Cons (M (a1+a2) l1) Nil)
+lemma squash_sum: forall a1 a2:Z.t, l1 l2: list int. same l1 l2 ->
+      eq' (Cons (M a1 l1) (Cons (M a2 l2) Nil)) (Cons (M (Z.(+) a1 a2) l1) Nil)
 
-let lemma squash_append (a1 a2: int) (l1 l2: list int) (r:t')
+let lemma squash_append (a1 a2:Z.t) (l1 l2: list int) (r:t')
       requires { same l1 l2 }
-      ensures { eq' (Cons (M a1 l1) (Cons (M a2 l2) r)) (Cons (M (a1+a2) l1) r) }
+      ensures { eq' (Cons (M a1 l1) (Cons (M a2 l2) r))
+                    (Cons (M (Z.(+) a1 a2) l1) r) }
 = ()
 
-let rec function insert_mon (m: m) (x: t') : t'
+let rec ghost function insert_mon (m: m) (x: t') : t'
   ensures { eq' result (Cons m x) }
   variant { length x }
 = match m,x with
@@ -155,16 +175,17 @@ let rec function insert_mon (m: m) (x: t') : t'
   | M a1 l1, Cons (M a2 l2) r ->
       if same l1 l2
       then
-        if a1+a2 = 0
+        let s = Z.(+) a1 a2 in
+        if eq0 s
         then (assert { eq' r (Cons m x)
-                       by eq' r (Cons (M (a1+a2) l1) r)
-                       so eq' (Cons (M (a1+a2) l1) r) (Cons m x)};
+                       by eq' r (Cons (M s l1) r)
+                       so eq' (Cons (M s l1) r) (Cons m x)};
               r)
-        else Cons (M (a1+a2) l1) r
+        else Cons (M s l1) r
       else if le_mon l1 l2 then Cons m x else Cons (M a2 l2) (insert_mon m r)
   end
 
-let rec function insertion_sort_mon (x: t') : t'
+let rec ghost function insertion_sort_mon (x: t') : t'
   ensures { eq' result x }
   variant { x }
 = match x with
@@ -172,7 +193,7 @@ let rec function insertion_sort_mon (x: t') : t'
   | Cons m r -> insert_mon m (insertion_sort_mon r)
   end
 
-let function normalize (x: t') : t'
+let ghost function normalize (x: t') : t'
   ensures { eq' result x }
 =
   (* sort inside each monomial *)
@@ -180,11 +201,25 @@ let function normalize (x: t') : t'
   (* sort monomials lexicographically *)
   insertion_sort_mon x
 
-lemma norm: forall x1 x2:t', y:int -> int.
+lemma norm: forall x1 x2:t', y:vars.
       normalize x1 = normalize x2 -> interp' x1 y = interp' x2 y
+
+end
+
 
 
 (** Tests *)
+module Tests
+
+use import int.Int
+
+function id (x:int) : int = x
+let predicate eq0_int (x:int) = x = 0
+
+
+clone export UnitaryCommutativeRingDecision with type C.t = int, constant C.zero = zero, constant C.one = one, function C.(-_) = (-_), function C.(+) = (+), function C.(*) = (*), type Z.t = int, constant Z.zero = zero, constant Z.one = one, function Z.(-_) = (-_), function Z.(+) = (+), function Z.(*) = (*), function morph = id, goal morph_zero, goal morph_one, goal morph_add, goal morph_mul, goal morph_inv, val eq0 = eq0_int
+
+
 
 constant radix : int = 1
 constant d : int = 0
@@ -255,3 +290,6 @@ goal devel_7 : eq g5 g6
 goal devel_conv_7: eq' (conv g5) (conv g6)
 goal devel_conv_7_norm: eq' (conv g5) (conv g6) by normalize (conv g5) = normalize (conv g6)
 *)
+
+
+end
