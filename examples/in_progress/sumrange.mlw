@@ -357,48 +357,20 @@ module CumulativeTree
 
 *)
 
+  (** preliminaries: definition of the depth of a tree, and showing
+      that it is indeed logarithmic in function of the number of its
+      elements *)
+
   use import int.MinMax
 
   function depth (t:tree) : int =
     match t with
-    | Leaf _ -> 0
+    | Leaf _ -> 1
     | Node _ l r -> 1 + max (depth l) (depth r)
     end
 
-  use import ref.Ref
-
-  let rec update_compl (t:tree) (i:int) (ghost a :array int) (v:int) (ghost c:ref int): (tree,int)
-     requires { is_tree_for t a t.indexes.low t.indexes.high }
-     requires { t.indexes.low <= i < t.indexes.high }
-     requires { !c >= depth t }
-     variant { t }
-     returns { (t',delta) ->
-        delta = v - a[i] /\
-        t'.indexes.low = t.indexes.low /\
-        t'.indexes.high = t.indexes.high /\
-        is_tree_for t' a[i<-v] t'.indexes.low t'.indexes.high }
-  = c := !c - 1;
-    match t with
-    | Leaf ind ->
-      assert { i = ind.low };
-      (Leaf { ind with isum = v }, v - ind.isum)
-    | Node ind l r ->
-      let m = l.indexes.high in
-      if i < m then
-        let l',delta = update_compl l i a v c in
-        assert { is_tree_for l' a[i<-v] t.indexes.low m };
-        assert { is_tree_for r a[i<-v] m t.indexes.high };
-        (Node {ind with isum = ind.isum + delta } l' r, delta)
-      else
-        let r',delta = update_compl r i a v c in
-        assert { is_tree_for l a[i<-v] t.indexes.low m };
-        assert { is_tree_for r' a[i<-v] m t.indexes.high };
-        (Node {ind with isum = ind.isum + delta} l r',delta) (*>*)
-    end
-
-  (** auxiliary result: depth of a cumulative tree is indeed
-      logarithmic in function of the number of its elements *)
-
+  lemma depth_min : forall t. depth t >= 1
+  
   use import bv.Pow2int
 
   let rec lemma depth_is_log (t:tree) (a :array int) (k:int)
@@ -406,12 +378,91 @@ module CumulativeTree
      requires { is_tree_for t a t.indexes.low t.indexes.high }
      requires { t.indexes.high - t.indexes.low <= pow2 k }
      variant { t }
-     ensures { depth t <= k }
+     ensures { depth t <= k+1 }
   = match t with
     | Leaf _ -> ()
     | Node _ l r ->
        depth_is_log l a (k-1);
        depth_is_log r a (k-1)
     end
+
+
+  (** [update_aux] function instrumented with a credit *)
+
+  use import ref.Ref
+
+  let rec update_aux_complexity (t:tree) (i:int) (ghost a :array int) (v:int) (ghost c:ref int): (tree,int)
+     requires { is_tree_for t a t.indexes.low t.indexes.high }
+     requires { t.indexes.low <= i < t.indexes.high }
+     variant { t }
+     ensures { !c - old !c <= depth t }
+     returns { (t',delta) ->
+        delta = v - a[i] /\
+        t'.indexes.low = t.indexes.low /\
+        t'.indexes.high = t.indexes.high /\
+        is_tree_for t' a[i<-v] t'.indexes.low t'.indexes.high }
+  = c := !c + 1;
+    match t with
+    | Leaf ind ->
+      assert { i = ind.low };
+      (Leaf { ind with isum = v }, v - ind.isum)
+    | Node ind l r ->
+      let m = l.indexes.high in
+      if i < m then
+        let l',delta = update_aux_complexity l i a v c in
+        assert { is_tree_for l' a[i<-v] t.indexes.low m };
+        assert { is_tree_for r a[i<-v] m t.indexes.high };
+        (Node {ind with isum = ind.isum + delta } l' r, delta)
+      else
+        let r',delta = update_aux_complexity r i a v c in
+        assert { is_tree_for l a[i<-v] t.indexes.low m };
+        assert { is_tree_for r' a[i<-v] m t.indexes.high };
+        (Node {ind with isum = ind.isum + delta} l r',delta) (*>*)
+    end
+
+  (** [query_aux] function instrumented with a credit *)
+
+  let rec query_aux_complexity (t:tree) (ghost a: array int)
+      (i j:int) (ghost c:ref int) : int
+    requires { is_tree_for t a t.indexes.low t.indexes.high }
+    requires { 0 <= t.indexes.low <= i < j <= t.indexes.high <= a.length }
+    variant { t }
+(*
+    ensures { !c - old !c <= 
+         if i = t.indexes.low /\ j = t.indexes.high then 1 else
+         if i = t.indexes.low \/ j = t.indexes.high then depth t else
+          2 * depth t }
+*)
+    ensures {  
+         i = t.indexes.low /\ j = t.indexes.high -> !c - old !c <= 1 }
+    ensures {
+         i = t.indexes.low \/ j = t.indexes.high -> !c - old !c <= 1 + depth t }
+    ensures { !c - old !c <= 2 * depth t }
+    ensures { result = sum a i j }
+  = c := !c + 1;
+    match t with
+    | Leaf ind ->
+      ind.isum
+    | Node ind l r ->
+      let k1 = ind.low in
+      let k3 = ind.high in
+      if i=k1 && j=k3 then ind.isum else
+      let m = l.indexes.high in
+      if j <= m then 
+        begin
+          assert { depth l < depth t };
+          assert { i = t.indexes.low <-> i = l.indexes.low };
+          assert { j = t.indexes.high -> j = l.indexes.high };
+          query_aux_complexity l a i j c 
+        end
+      else
+      if i >= m then query_aux_complexity r a i j c else
+      begin
+        'L1: let tmp = query_aux_complexity l a i m c in
+        assert { !c - at !c 'L1 <= depth t };
+        tmp + query_aux_complexity r a m j c
+      end
+    end
+
 
 end

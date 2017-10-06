@@ -6,7 +6,7 @@
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../sumrange.mlw" proved="true">
+<file name="../sumrange.mlw">
 <theory name="ArraySum" proved="true" sum="c43abcc65051af09a54f471f27f69208">
  <goal name="sum_right" proved="true">
  <transf name="assert" proved="true" arg1="(forall x. 0 &lt; x &lt; j -&gt; sum a (j-x) j = sum a (j-x) (j-1) + a[j-1])">
@@ -121,7 +121,7 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="CumulativeTree" proved="true" sum="6f92715b7d5c25074deca072f60d514f">
+<theory name="CumulativeTree" sum="926714608746ce5cc75c06bb87a4995d">
  <goal name="WP_parameter tree_of_array" expl="VC for tree_of_array" proved="true">
  <proof prover="3"><result status="valid" time="0.43"/></proof>
  </goal>
@@ -190,62 +190,17 @@
  <goal name="WP_parameter update" expl="VC for update" proved="true">
  <proof prover="3"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter update_compl" expl="VC for update_compl" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="WP_parameter update_compl.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.1" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.09"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.2" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.3" expl="precondition" proved="true">
+ <goal name="depth_min" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="depth_min.0" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.6" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.7" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.63"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.47"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.9" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.79"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.14" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="WP_parameter update_compl.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.42"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter depth_is_log" expl="VC for depth_is_log" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter depth_is_log.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter depth_is_log.1" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.05"/></proof>
@@ -257,7 +212,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter depth_is_log.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.08" steps="143"/></proof>
+  <proof prover="1"><result status="valid" time="0.08" steps="146"/></proof>
   </goal>
   <goal name="WP_parameter depth_is_log.5" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
@@ -269,10 +224,202 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter depth_is_log.8" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="118"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="121"/></proof>
   </goal>
   <goal name="WP_parameter depth_is_log.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="120"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter update_aux_complexity" expl="VC for update_aux_complexity" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter update_aux_complexity.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="74"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.4" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.6" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.7" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.63"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.07" steps="123"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.42"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.10" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.11" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.13" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.79"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.14" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter update_aux_complexity.16" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.47"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="WP_parameter query_aux_complexity" expl="VC for query_aux_complexity">
+ <proof prover="0"><result status="unknown" time="2.01"/></proof>
+ <proof prover="1"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="3"><result status="unknown" time="1.97"/></proof>
+ <transf name="split_goal_wp" >
+  <goal name="WP_parameter query_aux_complexity.0" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="76"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.2" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="78"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.8" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.9" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.10" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.11" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.13" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.14" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="99"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.16" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.17" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.18" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.19" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="99"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.21" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.22" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.23" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.24" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.25" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.26" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.27" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.28" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.29" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.30" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="124"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.31" expl="postcondition">
+  <proof prover="0"><result status="timeout" time="2.00"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <proof prover="3"><result status="unknown" time="2.02"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.32" expl="postcondition">
+  <proof prover="3"><result status="unknown" time="1.07"/></proof>
+  </goal>
+  <goal name="WP_parameter query_aux_complexity.33" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
