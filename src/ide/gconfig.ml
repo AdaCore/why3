@@ -534,7 +534,7 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"The Why3 Verification Platform "
+      ~name:"The Why3 Verification Platform"
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
@@ -548,6 +548,7 @@ let show_about_window () =
                 "Martin Clochard";
                 "Simon Cruanes";
                 "Sylvain Dailler";
+                "Jacques-Pascal Deplaix";
                 "Clément Fumex";
                 "Leon Gondelman";
                 "David Hauzar";
@@ -556,6 +557,7 @@ let show_about_window () =
                 "Mikhail Mandrykin";
                 "David Mentré";
                 "Benjamin Monate";
+                "Kim Nguyễn";
                 "Thi-Minh-Tuyen Nguyen";
                 "Simão Melo de Sousa";
                 "Asma Tafat";
@@ -564,9 +566,11 @@ let show_about_window () =
                ]
       ~copyright:"Copyright 2010-2017 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
-      ~website:"http://why3.lri.fr"
-      ~website_label:"http://why3.lri.fr"
+      ~website:"http://why3.lri.fr/"
+      ~website_label:"http://why3.lri.fr/"
       ~version:Config.version
+      ~icon:!why_icon
+      ~logo:!why_icon
       ()
   in
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
