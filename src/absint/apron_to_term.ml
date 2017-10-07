@@ -12,8 +12,8 @@ module Apron_to_term(E: sig
   let int_tys = Theory.(ns_find_ts th_int.th_export ["int"])
   let ty_int = (Ty.ty_app int_tys [])
   (*let int_zero = fs_app Theory.(ns_find_ls th_int.th_export ["zero"]) [] ty_int (* not nice *) *)
-  let int_zero = t_const Number.(ConstInt (int_const_dec "0"))
-  let int_one = t_const Number.(ConstInt (int_const_dec "1"))
+  let int_zero = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "0"})) Ty.ty_int
+  let int_one = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "1"})) Ty.ty_int
   let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="])
   let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"])
   let int_add =  begin fun a ->
@@ -53,6 +53,7 @@ module Apron_to_term(E: sig
       let i = int_of_string (Scalar.to_string s) in
       let s = string_of_int (abs i) in
       let n = Number.int_const_dec s in
+      let n = Number.{ic_negative = false; ic_abs = n } in
       let n = Number.ConstInt n in
 
       if i = 1 then
@@ -60,9 +61,9 @@ module Apron_to_term(E: sig
       else if i = -1 then
         CMinusOne
       else if i > 0 then
-        CPos (t_const n)
+        CPos (t_const n Ty.ty_int)
       else if i < 0 then
-        CMinus (t_const n)
+        CMinus (t_const n Ty.ty_int)
       else
         CNone
     | Coeff.Interval(_) -> raise Cannot_be_expressed

@@ -38,10 +38,10 @@ module Make(S:sig
         |> e_case (r e)
       | Eraise(x, e_) ->
         e_raise x e_ e.e_ity
-      | Etry(e, pv) ->
-        Mexn.map (fun (pvs, e) ->
+      | Etry(e, case, pv) ->
+        Mxs.map (fun (pvs, e) ->
             pvs, r e) pv 
-        |> e_try (r e)
+        |> e_try ~case (r e)
       | Eghost(e) ->
         e_ghostify true (r e)
       | Ewhile(e_cond, inv, vari, e_loop) ->
@@ -65,18 +65,22 @@ module Make(S:sig
           let e = e_while e_cond inv vari e_loop in
           e
         end
-      | Efor(pv, (f, d, to_), inv, e_loop) ->
+      | Efor(pv, (f, d, to_), pv2, inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
         let t = AI.domain_to_term cfg context new_inv in
         let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
         let inv = t :: inv in
-        e_for pv (e_var f) d (e_var to_) inv (r e_loop)
+        e_for pv (e_var f) d (e_var to_) pv2 inv (r e_loop)
     in
 
     let clone_infer_pdecl pdecl =
       match pdecl.pd_node with
       | PDexn(e) -> Some (create_exn_decl e)
-      | PDtype(t) -> Some (create_type_decl t)
+      | PDtype(t) ->
+          begin match create_type_decl t with
+        | [a] -> Some a
+        | _ -> assert false
+          end
       | PDpure ->
         let [t] = pdecl.pd_pure in
         begin
@@ -128,8 +132,8 @@ module Make(S:sig
         end
       | Uclone(mod_inst) -> add_clone pmod_uc mod_inst
       | Umeta(m, margs) -> add_meta pmod_uc m margs
-      | Uscope(s, t, mis) -> List.fold_left add_to_pmod (open_scope pmod_uc s) mis
-                             |> fun p -> close_scope p ~import:t
+      | Uscope(s, mis) -> List.fold_left add_to_pmod (open_scope pmod_uc s) mis
+                             |> fun p -> close_scope p ~import:true
       | Uuse(pmod) -> use_export pmod_uc pmod
     in
 

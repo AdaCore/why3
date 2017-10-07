@@ -186,12 +186,12 @@ let do_input f =
   |> List.concat
   |> List.sort (fun (e1, _) (e2, _) -> 
                         let e1 = match e1.e_node with
-                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, _, e1)
                             -> e1
                           | _ -> assert false
                         in
                         let e2 = match e2.e_node with
-                          | Ewhile(_, _, _, e1) | Efor(_, _, _, e1)
+                          | Ewhile(_, _, _, e1) | Efor(_, _, _, _, e1)
                             -> e1
                           | _ -> assert false
                         in
@@ -199,7 +199,7 @@ let do_input f =
                       )
   |> List.iter begin fun (expr, inv) ->
     match expr.e_node with
-    | Ewhile(_, _, _, expr) | Efor(_, _, _, expr) ->
+    | Ewhile(_, _, _, expr) | Efor(_, _, _, _, expr) ->
       Pretty.forget_all ();
       ignore @@ Format.flush_str_formatter ();
       let file, line_number, _, _ = Expr.(expr.e_loc) |> unwrap |> Loc.get in

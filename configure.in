@@ -405,7 +405,7 @@ if test "$enable_infer" = yes; then
          reason_infer=" (fixpoint not found)"
 	  fi
       ELINAINCLUDE=$(ocamlfind query apron.elina)
-	  if test -n "$INFERINCLUDE"; then
+	  if test -n "$ELINAINCLUDE"; then
 	  	echo "ocamlfind found elina in $ELINAINCLUDE"
 		ELINA=yes
 		INFERINCLUDE="$INFERINCLUDE -I $(ocamlfind query apron.elina)"

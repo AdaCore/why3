@@ -153,8 +153,8 @@ let do_input way f =
                         r e
                       | Eraise(x, e_) ->
                         r e_
-                      | Etry(e, pv) ->
-                        Ity.Mexn.fold_left (fun l _ (pvs, e) ->
+                      | Etry(e, _, pv) ->
+                        Ity.Mxs.fold_left (fun l _ (pvs, e) ->
                             r e @ l) (r e) pv
                       | Eghost(e) ->
                         r e
@@ -168,7 +168,7 @@ let do_input way f =
                         end ::
                         r e_cond @
                         r e_loop
-                      | Efor(pv, (f, d, to_), inv, e_loop) ->
+                      | Efor(pv, (f, d, to_), inv, _, e_loop) ->
                         r e_loop;
                     in
                     List.iter (Abstract_interpreter.add_variable cfg context)

@@ -85,8 +85,8 @@ module Make_from_apron(M:sig
     let th_int = Env.read_theory env ["int"] "Int" in
     let int_tys = Theory.(ns_find_ts th_int.th_export ["int"]) in
     let ty_int = (Ty.ty_app int_tys []) in
-    let int_zero = t_const Number.(ConstInt (int_const_dec "0")) in
-    let int_one = t_const Number.(ConstInt (int_const_dec "1")) in
+    let int_zero = t_const Number.(ConstInt ({ic_negative = false; ic_abs= int_const_dec "0"})) Ty.ty_int in
+    let int_one = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "1"})) Ty.ty_int in
     let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="]) in
     let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"]) in
     let int_add =  begin fun a ->
@@ -127,6 +127,7 @@ module Make_from_apron(M:sig
         let i = int_of_s s in
         let s = string_of_int (abs i) in
         let n = Number.int_const_dec s in
+        let n = Number.{ic_negative = false; ic_abs = n } in
         let n = Number.ConstInt n in
 
         if i = 1 then
@@ -134,9 +135,9 @@ module Make_from_apron(M:sig
         else if i = -1 then
           CMinusOne
         else if i > 0 then
-          CPos (t_const n)
+          CPos (t_const n Ty.ty_int)
         else if i < 0 then
-          CMinus (t_const n)
+          CMinus (t_const n Ty.ty_int)
         else
           CNone
       | Coeff.Interval(_) -> raise Cannot_be_expressed
@@ -360,20 +361,20 @@ module Make_from_apron(M:sig
 end
 
 
-(*module Polyhedra = Make_from_apron(struct
+module Polyhedra = Make_from_apron(struct
   type man = Polka.strict Polka.t Manager.t
   type env = Environment.t
   type t = Polka.strict Polka.t Abstract1.t
   let create_manager = Polka.manager_alloc_strict
-  end)*)
+  end)
 
 
-module Polyhedra = Make_from_apron(struct
+(*module Polyhedra = Make_from_apron(struct
   type man = Elina.t Manager.t
   type env = Environment.t
   type t = Elina.t Abstract1.t
   let create_manager = Elina.manager_alloc
-  end)
+  end)*)
 
 module Box = Make_from_apron(struct
   type man = Box.t Manager.t

@@ -23,8 +23,8 @@ module Make(S: sig
   let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
   let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
   let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
-  let zero_int = t_const Number.(ConstInt (int_const_dec "0"))
-  let one_int = t_const Number.(ConstInt (int_const_dec "1"))
+  let zero_int = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "0"})) Ty.ty_int
+  let one_int = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "1"})) Ty.ty_int
   let int_add =  begin fun a ->
     match a with
     | [a; b] ->
@@ -59,6 +59,7 @@ module Make(S: sig
       let i = int_of_string (Scalar.to_string s) in
       let s = string_of_int (abs i) in
       let n = Number.int_const_dec s in
+      let n = Number.{ic_negative = false; ic_abs = n } in
       let n = Number.ConstInt n in
 
       if i = 1 then
@@ -66,9 +67,9 @@ module Make(S: sig
       else if i = -1 then
         CMinusOne
       else if i > 0 then
-        CPos (t_const n)
+        CPos (t_const n Ty.ty_int)
       else if i < 0 then
-        CMinus (t_const n)
+        CMinus (t_const n Ty.ty_int)
       else
         CNone
     | Coeff.Interval(_) -> raise Cannot_be_expressed

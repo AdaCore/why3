@@ -327,7 +327,7 @@ module Make(E: sig
         | None -> create_vreturn manpk Ty.ty_int
         | Some v -> v
       in
-      let postcondition = t_app ps_equ [t_const n; t_var vreturn] None in
+      let postcondition = t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
       let constraints = D.meet_term manpk postcondition in
 
       new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
@@ -405,11 +405,11 @@ module Make(E: sig
         );
       (* FIXME: exceptions while inside the condition *)
       before_loop_cp, after_loop_cp, loop_exn
-    | Etry(e, exc) ->
+    | Etry(e, _, exc) -> (* FIXME what is that second arg? *)
       let additional_exn = ref [] in
       let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
       let i = new_node_cfg cfg expr in
-      let exc = Ity.Mexn.map (fun (l, e) ->
+      let exc = Ity.Mxs.map (fun (l, e) ->
           List.iter (fun p ->
               D.add_variable_to_env manpk p) l;
 
@@ -438,7 +438,7 @@ module Make(E: sig
           l, before_assign_cp, e_end_cp
           ) exc in
       
-      let e_exn = Ity.Mexn.fold (fun exc_sym (_, cp_begin, _) e_exn ->
+      let e_exn = Ity.Mxs.fold (fun exc_sym (_, cp_begin, _) e_exn ->
           List.filter (fun (cp, exc_sym_) ->
               if Ity.xs_equal exc_sym exc_sym_ then
                 begin
@@ -541,7 +541,7 @@ module Make(E: sig
 
     | Eghost(e) -> put_expr_in_cfg ~ret cfg manpk e
 
-    | Efor(k, (lo, dir, up), _, e) ->
+    | Efor(k, (lo, dir, up), _, _, e) ->
       (* . before_loop
        * | k = 0      k = n -> forget_k
        * . start_loop ------------------> end_loop
@@ -583,7 +583,7 @@ module Make(E: sig
       let vret_k = create_vreturn manpk Ty.ty_int in
       let forget_vret = D.forget_var manpk vret_k in
       let forget_k = D.forget_var manpk Ity.(k.pv_vs) in
-      let res = t_app ad_int [k_term; Term.t_const ( Number.ConstInt (Number.int_const_bin "1"))] (Some Ty.ty_int) in
+      let res = t_app ad_int [k_term; Term.t_const ( Number.ConstInt (Number.{ic_negative = false; ic_abs = Number.int_const_bin "1";})) Ty.ty_int] (Some Ty.ty_int) in
       let next_assignation = t_app ps_equ [t_var vret_k; res] None |> D.meet_term manpk in
       let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> D.meet_term manpk in
       new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->

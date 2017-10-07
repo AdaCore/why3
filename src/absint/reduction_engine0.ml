@@ -10,7 +10,7 @@ let v_label_copy orig v =
   | Term t -> Term (t_label_copy orig t)
 
 let const_of_positive n =
-    t_const (Number.ConstInt (Number.int_const_dec (BigInt.to_string n)))
+  t_const (Number.ConstInt Number.{ ic_negative = false; ic_abs = Number.int_const_dec (BigInt.to_string n)}) Ty.ty_int
 
 let ls_minus = ref ps_equ (* temporary *)
 
@@ -28,7 +28,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int i
+    | Number.ConstInt i -> Number.compute_int_constant i
     | _ -> raise NotNum
 
 let big_int_of_value v =
@@ -834,7 +834,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
     begin
       match c1,c2 with
       | Number.ConstInt i1, Number.ConstInt i2 ->
-        let b = BigInt.eq (Number.compute_int i1) (Number.compute_int i2) in
+        let b = BigInt.eq (Number.compute_int_constant i1) (Number.compute_int_constant i2) in
         { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }

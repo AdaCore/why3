@@ -167,7 +167,7 @@ module Make(S:sig
         match t.t_node with
         | Tvar(vs) -> Some t, 0
         | Tconst(Number.ConstInt(n)) ->
-          let n = Number.compute_int n in
+          let n = Number.compute_int_constant n in
           (None, BigInt.to_int n)
         | Tapp(func, args) when Term.ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
@@ -466,10 +466,10 @@ module Make(S:sig
                 List.map (fun a -> Some a) pdecl
                 |> List.combine l
             end
-          | Decl.Dtype({ts_def = Some _; ts_args = _; _ }) ->
+          (*| Decl.Dtype({ts_def = _; ts_args = _; _ }) ->
             (* untested code*)
             let () = assert false in
-            aux ity
+            aux ity*)
           | Decl.Ddata([_; _]) ->
             warning_t "Multiple constructors is not supported in abstract interpretation." a; []
           | Decl.Ddata(_) ->
@@ -615,7 +615,7 @@ module Make(S:sig
             | None -> Format.eprintf "Variable undefined: "; Pretty.print_term Format.err_formatter t; Format.eprintf "@."; failwith "undefined var"
           end
         | Tconst(Number.ConstInt(n)) ->
-          let n = Number.compute_int n in
+          let n = Number.compute_int_constant n in
           ([], coeff * (BigInt.to_int n))
         | Tapp(func, args) when Term.ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
@@ -629,7 +629,7 @@ module Make(S:sig
           re (-coeff)  a;
         | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a])
         | Tapp(func, [a; {t_node = Tconst(Number.ConstInt(n)); _};]) when Term.ls_equal func mult_int ->
-          let n = Number.compute_int n in
+          let n = Number.compute_int_constant n in
           re ((BigInt.to_int n) * coeff) a
         | _ -> (* maybe a record access *)
           begin
