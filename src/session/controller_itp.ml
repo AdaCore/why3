@@ -289,7 +289,7 @@ let adapt_limits ~interactive ~use_steps limits a =
        but enforced to remain inside the interval [l,2l] where l is
        the previous time limit *)
        let t = truncate (1.0 +. 2.0 *. t) in
-       let increased_time = if interactive then t
+       let increased_time = if interactive then 0
                             else max timelimit (min t (2 * timelimit)) in
        (* increased mem limit is just 1.5 times the previous mem limit *)
        let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
