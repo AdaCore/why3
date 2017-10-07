@@ -322,6 +322,10 @@ let get_encapsulating_file s any =
       let th = get_encapsulating_theory s any in
       theory_parent s th
 
+let set_obsolete s paid b =
+  let pa = get_proof_attempt_node s paid in
+  pa.proof_obsolete <- b
+
 
 (* Iterations functions on the session tree *)
 
@@ -1315,7 +1319,10 @@ module CombinedTheoryChecksum = struct
     | Some c -> Buffer.add_string b (Termcode.string_of_checksum c)
 
   let compute s th =
-    let () = fold_all_sub_goals_of_theory s f () th in
+    let () =
+      List.fold_left (fun () id -> let pn = get_proofNode s id in f () pn)
+        () (theory_goals th)
+    in
     let c = Termcode.buffer_checksum b in
     Buffer.clear b; c
 
@@ -1550,7 +1557,30 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th)
+  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th);
+  (* If we are not using shapes, we want to recover the goals that were
+     "wrongly" marked as obsolete during AssoGoals.simple_associate. The
+     condition for this to be correct is to check that the checksum of the
+     theory was good and that we did not find any detached during the theory
+     merge. TODO: we may want to improve this by having a new mode which
+     merges the old_th without looking at shapes when checksums of theories is
+     the same (with or without shapes ?).
+  *)
+  if not (use_shapes || !found_detached)
+  then
+    begin
+      Debug.dprintf
+        debug
+        "[Session] since shapes were not used for pairing, we compute the \
+         checksum of the full theory, to estimate the obsolete status for \
+         goals.@.";
+      if same_theory_checksum then
+        (* we set all_goals as non obsolete *)
+        fold_all_any_of_theory s (fun () any ->
+          match any with
+          | APa pa -> set_obsolete s pa false
+          | _ -> ()) () th
+    end
 
 (* add a theory and its goals to a session. if a previous theory is
    provided in merge try to merge the new theory with the previous one *)
