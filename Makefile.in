@@ -398,6 +398,7 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
 		plugins/python/py_lexer.ml \
 		plugins/python/py_parser.ml plugins/python/py_parser.mli \
+		plugins/absint/absint.ml \
 		plugins/parser/dimacs.ml \
 
 PLUG_PARSER = genequlin dimacs
@@ -405,17 +406,23 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
+PLUG_ABSINT = absint
 
-PLUGINS = genequlin dimacs tptp python
+PLUGINS = genequlin dimacs tptp python absint
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
+ABSINTMODULES = $(addprefix plugins/absint/, $(PLUG_ABSINT))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
 
 PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
 PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
+
+ABSINTCMO = $(addsuffix .cmo, $(ABSINTMODULES))
+ABSINTCMX = $(addsuffix .cmx, $(ABSINTMODULES))
+
 
 ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
@@ -430,13 +437,13 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES) $(PYTHONMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES) $(ABSINTMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp python
+PLUGDIRS = parser printer transform tptp python absint
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
@@ -487,6 +494,14 @@ lib/plugins/python.cmxs: $(PYTHONCMX)
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
 lib/plugins/python.cmo: $(PYTHONCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
+lib/plugins/absint.cmxs: $(ABSINTCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/absint.cmo: $(ABSINTCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
