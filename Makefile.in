@@ -767,7 +767,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig infer_gui gmain
+IDE_FILES = gconfig gmain
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -1988,10 +1988,6 @@ clean::
 src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
-
-#src/tools/why3extract.cmx src/ide/infer_gui.cmx: %.cmx: %.ml
-#	$(SHOW) 'Ocamlopt $<'
-#	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'

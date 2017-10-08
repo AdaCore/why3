@@ -152,7 +152,6 @@ and 'a file = private
       mutable file_verified : float option;
       mutable file_expanded : bool;
       mutable file_for_recovery : Theory.theory Mstr.t hide;
-      mutable file_loader: theory_loader option;
     }
 
 and 'a session = private
@@ -161,8 +160,6 @@ and 'a session = private
       session_prover_ids : int PHprover.t;
       session_dir   : string;
     }
-and theory_loader = (unit -> ((Loc.position * Ident.ident * Theory.theory) list *
-  Theory.theory Stdlib.Mstr.t))
 
 val goal_key : 'a goal -> 'a
 val goal_name : 'a goal -> Ident.ident
@@ -341,9 +338,6 @@ val set_metas_expanded : 'key metas -> bool -> unit
 val set_goal_expanded : 'key goal -> bool -> unit
 val set_theory_expanded : 'key theory -> bool -> unit
 val set_file_expanded : 'key file -> bool -> unit
-
-val set_file_loader: 'key file -> theory_loader -> unit
-
 (** open one level or close all the sub-level *)
 
 (** {2 General type} *)
@@ -491,19 +485,6 @@ val add_file :
   'key file
 (** Add a real file by its filename. The filename must be relative to
     session_dir *)
-
-val add_theories :
-  keygen:'key keygen ->
-  'key env_session ->
-  ?format:string ->
-  string ->
-  theory_loader ->
-  'key file
-(** Add several theories corresponding to the file. The function
- * add_file should generally be used instead. This one is only useful when
- * doing some preprocessing on the theories before continuing normal loading
- * of the file. *)
-
 
 val remove_file : 'key file -> unit
 (** Remove a file *)
