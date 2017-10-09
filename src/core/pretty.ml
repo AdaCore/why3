@@ -543,7 +543,7 @@ let print_goal fmt d =
 
 let local_decls task symbmap =
   let rec skip t = function
-    | { td_node = Clone (th,_) } :: rest
+    | { td_node = Use th } :: rest
       when id_equal t.th_name th.th_name -> rest
     | _ :: rest -> skip t rest
     | [] -> []
