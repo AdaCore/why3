@@ -29,6 +29,7 @@ transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
+transformation "eliminate_literal"
 transformation "eliminate_epsilon"
 
 (* currently, princess does not support $let and $ite *)
@@ -315,4 +316,3 @@ end
 theory tptp.RatToReal
   syntax function to_real "$to_real(%1)"
 end
-

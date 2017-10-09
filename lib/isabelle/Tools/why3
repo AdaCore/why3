@@ -83,7 +83,7 @@ else
 fi
 
 if [ "$BATCH" = true ]; then
-  echo "use_thy \"$NAME\";" | "$ISABELLE_TOOL" console "${SESSION_DIR[@]}" -l "$SESSION"
+  "$ISABELLE_TOOL" process "${SESSION_DIR[@]}" -l "$SESSION" -T "$NAME"
 elif [ "$INTERACTIVE" = true ]; then
   make_theory "$NAME"
   if [ -f "$JEDIT_SETTINGS/$WHY3_JEDIT_SERVER" ]; then

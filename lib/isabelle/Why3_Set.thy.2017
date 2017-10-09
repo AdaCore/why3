@@ -1,11 +1,13 @@
 theory Why3_Set
-imports Why3_Setup "~~/src/HOL/Library/FSet"
+imports
+  Why3_Setup
+  "HOL-Library.FSet"
 begin
 
 section {* Potentially infinite sets *}
 
-definition choose :: "'a set \<Rightarrow> 'a" where
-  "choose S = (\<some>x. x \<in> S)"
+definition choose_elt :: "'a set \<Rightarrow> 'a" where
+  "choose_elt S = (\<some>x. x \<in> S)"
 
 why3_open "set/Set.xml"
   constants
@@ -16,7 +18,7 @@ why3_open "set/Set.xml"
     union = sup
     inter = inf
     diff = minus
-    choose = choose
+    choose = choose_elt
     all = top
   types
     set = set
@@ -37,7 +39,7 @@ why3_vc remove_add by (simp add: remove_def)
 
 why3_vc choose_def
   using assms
-  by (auto simp add: is_empty_def choose_def intro: someI_ex)
+  by (auto simp add: is_empty_def choose_elt_def intro: someI_ex)
 
 why3_vc empty_def1 by (simp add: is_empty_def)
 
@@ -148,7 +150,7 @@ next
     case (2 s'' y)
     with `s = finsert x s'` assms
     show ?thesis by (auto simp add: fcard_finsert_if fchoose_def
-      split add: split_if_asm)
+      split: if_split_asm)
   qed
 qed
 
