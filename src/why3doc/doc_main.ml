@@ -26,7 +26,7 @@ let opt_title = ref None
 let opt_body = ref false
 let opt_queue = Queue.create ()
 
-let option_list = Arg.align [
+let option_list = [
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
