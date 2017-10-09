@@ -169,8 +169,7 @@ module CumulativeArray
     ensures { a[i] = v }
     ensures { forall k. 0 <= k < a.length /\ k <> i ->
               a[k] = (old a)[k] }
-  = 'Init:
-    let incr = v - c[i+1] + c[i] in
+  = let incr = v - c[i+1] + c[i] in
     a[i] <- v;
     for j=i+1 to c.length-1 do
       invariant { forall k. j <= k < c.length -> c[k] = sum a 0 k - incr }
@@ -213,7 +212,7 @@ module CumulativeTree
 
   type tree = Leaf indexes | Node indexes tree tree
 
-  function indexes (t:tree) : indexes =
+  let function indexes (t:tree) : indexes =
     match t with
     | Leaf ind -> ind
     | Node ind _ _ -> ind
