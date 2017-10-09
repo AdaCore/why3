@@ -156,9 +156,11 @@ let force_support support do_it v =
 let simplify_max_int = BigInt.of_string "2147483646"
 
 let remove_minus e =
-  if e.[0] = '-' then
-    (let e' = Strings.copy e in Strings.set e' 0 'm'; e')
-  else e
+  if e.[0] = '-' then begin
+    let e = Bytes.of_string e in
+    Bytes.set e 0 'm';
+    Bytes.unsafe_to_string e
+  end else e
 
 let print_dec_int support fmt i =
   let fallback i =

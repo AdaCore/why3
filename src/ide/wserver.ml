@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Why3.Strings
 open Format
 
 let blocking = false
@@ -51,28 +50,29 @@ let decode s =
         match s.[i] with
           '%' when i + 2 < String.length s ->
             let v = hexa_val s.[i + 1] * 16 + hexa_val s.[i + 2] in
-            set s1 i1 (Char.chr v); i + 3
-        | '+' -> set s1 i1 ' '; succ i
-        | x -> set s1 i1 x; succ i
+            Bytes.set s1 i1 (Char.chr v); i + 3
+        | '+' -> Bytes.set s1 i1 ' '; succ i
+        | x -> Bytes.set s1 i1 x; succ i
       in
       copy_decode_in s1 i (succ i1)
     else s1
   in
   let rec strip_heading_and_trailing_spaces s =
-    if String.length s > 0 then
-      if s.[0] == ' ' then
+    let sl = Bytes.length s in
+    if sl > 0 then
+      if Bytes.get s 0 == ' ' then
         strip_heading_and_trailing_spaces
-          (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] == ' ' then
+          (Bytes.sub s 1 (sl - 1))
+      else if Bytes.get s (sl - 1) == ' ' then
         strip_heading_and_trailing_spaces
-          (String.sub s 0 (String.length s - 1))
+          (Bytes.sub s 0 (sl - 1))
       else s
     else s
   in
   if need_decode 0 then
     let len = compute_len 0 0 in
-    let s1 = create len in
-    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
+    let s1 = Bytes.create len in
+    Bytes.to_string (strip_heading_and_trailing_spaces (copy_decode_in s1 0 0))
   else s
 
 let special =
@@ -101,22 +101,23 @@ let encode s =
     if i < String.length s then
       let i1 =
         match s.[i] with
-          ' ' -> set s1 i1 '+'; succ i1
+          ' ' -> Bytes.set s1 i1 '+'; succ i1
         | c ->
             if special c then
               begin
-                set s1 i1 '%';
-                set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
-                set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
+                Bytes.set s1 i1 '%';
+                Bytes.set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
+                Bytes.set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
                 i1 + 3
               end
-            else begin set s1 i1 c; succ i1 end
+            else begin Bytes.set s1 i1 c; succ i1 end
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (create len) 0 0
+    let len = compute_len 0 0 in
+    Bytes.to_string (copy_code_in (Bytes.create len) 0 0)
   else s
 
 let nl = "\013\010"
@@ -176,7 +177,8 @@ let print_exc exc =
 
 let print_err_exc exc = print_exc exc; flush stderr
 
-let case_unsensitive_eq s1 s2 = lowercase s1 = lowercase s2
+let case_unsensitive_eq s1 s2 =
+  Why3.Strings.lowercase s1 = Why3.Strings.lowercase s2
 
 let rec extract_param name stop_char =
   function
@@ -196,26 +198,25 @@ let rec extract_param name stop_char =
       else extract_param name stop_char l
   | [] -> ""
 
-let buff = ref (create 80)
-let store len x =
-  if len >= String.length !buff then
-    buff := !buff ^ create (String.length !buff);
-  set !buff len x;
-  succ len
-let get_buff len = String.sub !buff 0 len
-
 let get_request strm =
-  let rec loop len (strm__ : _ Stream.t) =
+  let buff = Buffer.create 80 in
+  let rec loop (strm__ : _ Stream.t) =
     match Stream.peek strm__ with
-      Some '\010' ->
-        Stream.junk strm__;
-        let s = strm__ in
-        if len == 0 then [] else let str = get_buff len in str :: loop 0 s
-    | Some '\013' -> Stream.junk strm__; loop len strm__
-    | Some c -> Stream.junk strm__; loop (store len c) strm__
-    | _ -> if len == 0 then [] else [get_buff len]
+    | Some '\010' ->
+      Stream.junk strm__;
+      if Buffer.length buff = 0 then []
+      else
+        let str = Buffer.contents buff in
+        let () = Buffer.clear buff in
+        str :: loop strm__
+    | Some '\013' -> Stream.junk strm__; loop strm__
+    | Some c ->
+      Stream.junk strm__;
+      Buffer.add_char buff c;
+      loop strm__
+    | _ -> if Buffer.length buff = 0 then [] else [Buffer.contents buff]
   in
-  loop 0 strm
+  loop strm
 
 let get_request_and_content strm =
   let request = get_request strm in
@@ -223,15 +224,11 @@ let get_request_and_content strm =
     match extract_param "content-length: " ' ' request with
       "" -> ""
     | x ->
-        let str = create (int_of_string x) in
-        for i = 0 to String.length str - 1 do
-          set str i (
-            let (strm__ : _ Stream.t) = strm in
-            match Stream.peek strm__ with
-              Some x -> Stream.junk strm__; x
-            | _ -> ' ')
-        done;
-        str
+      String.init (int_of_string x) (fun _ ->
+        let (strm__ : _ Stream.t) = strm in
+        match Stream.peek strm__ with
+        | Some x -> Stream.junk strm__; x
+        | _ -> ' ')
   in
   request, content
 
@@ -244,9 +241,9 @@ let sockaddr_of_string s = Unix.ADDR_UNIX s
 let treat_connection _tmout callback addr fd fmt =
   let (request, contents__) =
     let strm =
-      let c = " " in
+      let c = Bytes.create 1 in
       Stream.from
-        (fun _ -> if Unix.read fd c 0 1 = 1 then Some c.[0] else None)
+        (fun _ -> if Unix.read fd c 0 1 = 1 then Some (Bytes.get c 0) else None)
     in
     get_request_and_content strm
   in
