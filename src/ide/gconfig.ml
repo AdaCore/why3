@@ -33,6 +33,7 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
@@ -52,7 +53,6 @@ type t =
       mutable error_color : string;
       mutable iconset : string;
       (** colors *)
-      mutable env : Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       (* mutable altern_provers : altern_provers; *)
@@ -70,6 +70,7 @@ type ide = {
   ide_window_width : int;
   ide_window_height : int;
   ide_tree_width : int;
+  ide_task_height : int;
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
@@ -95,6 +96,7 @@ let default_ide =
   { ide_window_width = 1024;
     ide_window_height = 768;
     ide_tree_width = 512;
+    ide_task_height = 400;
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
@@ -124,6 +126,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_window_height "window_height";
     ide_tree_width =
       get_int section ~default:default_ide.ide_tree_width "tree_width";
+    ide_task_height =
+      get_int section ~default:default_ide.ide_task_height "task_height";
     ide_current_tab =
       get_int section ~default:default_ide.ide_current_tab "current_tab";
     ide_font_size =
@@ -187,7 +191,7 @@ let set_locs_flag =
   fun b ->
     (if b then Debug.set_flag else Debug.unset_flag) fl
 
-let load_config config original_config env =
+let load_config config original_config =
   let main = get_main config in
   let ide  = match Whyconf.get_section config "ide" with
     | None -> default_ide
@@ -199,6 +203,7 @@ let load_config config original_config env =
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
+    task_height   = ide.ide_task_height;
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
@@ -218,7 +223,6 @@ let load_config config original_config env =
     default_editor = ide.ide_default_editor;
     config         = config;
     original_config = original_config;
-    env            = env;
     hidden_provers = ide.ide_hidden_provers;
     session_time_limit = Whyconf.timelimit main;
     session_mem_limit = Whyconf.memlimit main;
@@ -227,7 +231,7 @@ let load_config config original_config env =
 }
 
 let save_config t =
-  Debug.dprintf debug "[GUI config] saving IDE config file@.";
+  Debug.dprintf debug "[config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
   (* copy possibly modified settings to original config *)
@@ -248,6 +252,7 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
@@ -275,19 +280,57 @@ let config,load_config =
     match !config with
       | None -> invalid_arg "configuration not yet loaded"
       | Some conf -> conf),
-  (fun conf base_conf env ->
-    let c = load_config conf base_conf env in
+  (fun conf base_conf ->
+    let c = load_config conf base_conf in
     config := Some c)
 
 let save_config () = save_config (config ())
 
 let get_main () = (get_main (config ()).config)
 
+(*
+
+
+  font size
+
+
+ *)
+
+
+let sans_font_family = "Sans"
+let mono_font_family = "Monospace"
+
+let modifiable_sans_font_views = ref []
+let modifiable_mono_font_views = ref []
+
+let add_modifiable_sans_font_view v =
+  modifiable_sans_font_views := v :: !modifiable_sans_font_views
+
+let add_modifiable_mono_font_view v =
+  modifiable_mono_font_views := v :: !modifiable_mono_font_views
+
+let change_font size =
+(*
+  Tools.resize_images (!Colors.font_size * 2 - 4);
+*)
+  let sff = sans_font_family ^ " " ^ string_of_int size in
+  let mff = mono_font_family ^ " " ^ string_of_int size in
+  let sf = Pango.Font.from_string sff in
+  let mf = Pango.Font.from_string mff in
+  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
+  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
+
 let incr_font_size n =
   let c = config () in
   let s = max (c.font_size + n) 4 in
   c.font_size <- s;
   s
+
+let enlarge_fonts () = change_font (incr_font_size 1)
+
+let reduce_fonts () = change_font (incr_font_size (-1))
+
+let set_fonts () = change_font (incr_font_size 0)
 
 (*
 
@@ -337,11 +380,13 @@ let image ?size f =
     Filename.concat (datadir main)
       (Filename.concat "images" (f^".png"))
   in
+  try (
   match size with
     | None ->
         GdkPixbuf.from_file n
     | Some s ->
         GdkPixbuf.from_file_at_size ~width:s ~height:s n
+  ) with _ -> !image_default
 
 let iconname_default = ref ""
 let iconname_undone = ref ""
@@ -476,7 +521,7 @@ let resize_images size =
   ()
 
 let init () =
-  Debug.dprintf debug "[GUI config] reading icons...@?";
+  Debug.dprintf debug "[config] reading icons...@?";
   load_icon_names ();
   why_icon := image "logo-why";
   resize_images 20;
@@ -533,6 +578,12 @@ let show_legend_window () =
   i "   Valid but obsolete result\n";
   ib image_unknown_obs;
   i "   Answer not conclusive and obsolete\n";
+  ib image_timeout_obs;
+  i "   Time limit reached, obsolete\n";
+  ib image_outofmemory_obs;
+  i "   Out of memory, obsolete\n";
+  ib image_steplimitexceeded_obs;
+  i "   Step limit exceeded, obsolete\n";
   ib image_invalid_obs;
   i "   Prover disproved goal, but obsolete\n";
   ib image_failure_obs;
@@ -547,7 +598,7 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"The Why3 Verification Platform "
+      ~name:"The Why3 Verification Platform"
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
@@ -561,6 +612,7 @@ let show_about_window () =
                 "Martin Clochard";
                 "Simon Cruanes";
                 "Sylvain Dailler";
+                "Jacques-Pascal Deplaix";
                 "Clément Fumex";
                 "Leon Gondelman";
                 "David Hauzar";
@@ -569,6 +621,7 @@ let show_about_window () =
                 "Mikhail Mandrykin";
                 "David Mentré";
                 "Benjamin Monate";
+                "Kim Nguyễn";
                 "Thi-Minh-Tuyen Nguyen";
                 "Simão Melo de Sousa";
                 "Asma Tafat";
@@ -577,9 +630,11 @@ let show_about_window () =
                ]
       ~copyright:"Copyright 2010-2017 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
-      ~website:"http://why3.lri.fr"
-      ~website_label:"http://why3.lri.fr"
+      ~website:"http://why3.lri.fr/"
+      ~website_label:"http://why3.lri.fr/"
       ~version:Config.version
+      ~icon:!why_icon
+      ~logo:!why_icon
       ()
   in
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
@@ -1116,8 +1171,9 @@ let run_auto_detection gconfig =
   ()
 *)
 
-(*let () = Debug.dprintf debug "[GUI config] end of configuration initialization@."*)
+(*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
+(*
 let uninstalled_prover c eS unknown =
   try
     Whyconf.get_prover_upgrade_policy c.config unknown
@@ -1227,6 +1283,8 @@ let uninstalled_prover c eS unknown =
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
     policy
+ *)
+
 
 (*
 Local Variables:

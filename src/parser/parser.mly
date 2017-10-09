@@ -184,7 +184,18 @@
 (* Entry points *)
 
 %start <Pmodule.pmodule Stdlib.Mstr.t> mlw_file
+%start <Ptree.term> term_eof
+%start <Ptree.qualid> qualid_eof
+%start <Ptree.qualid list> qualid_comma_list_eof
+%start <Ptree.term list> term_comma_list_eof
+%start <Ptree.ident list> ident_comma_list_eof
+
 %%
+
+(* parsing of a single term *)
+
+term_eof:
+| term EOF { $1 }
 
 (* Modules and scopes *)
 
@@ -1259,3 +1270,18 @@ semicolon_list1(X):
 | x = X ; SEMICOLON ; xl = semicolon_list1(X) { x :: xl }
 
 located(X): X { $1, $startpos, $endpos }
+
+
+(* Parsing of a list of qualified identifiers for the ITP *)
+qualid_eof:
+| qualid EOF { $1 }
+
+qualid_comma_list_eof:
+| comma_list1(qualid) EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+(* TODO: Weird to not have any parser conflicts here *)
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }

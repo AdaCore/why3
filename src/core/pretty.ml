@@ -19,8 +19,19 @@ open Decl
 open Theory
 open Task
 
-let debug_print_labels = Debug.register_info_flag "print_labels"
-  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let why3_keywords =
+  ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
+   "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
+   "scope"; "import"; "export"; "end";
+   "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
+   "let"; "in"; "match"; "with"; "as"; "epsilon" ]
+
+let label_coercion = create_label "coercion"
+
+let debug_print_labels =
+  Debug.register_info_flag
+    "print_labels"
+    ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
@@ -28,29 +39,23 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
 let debug_print_coercions = Debug.register_info_flag "print_coercions"
   ~desc:"Print@ coercions@ in@ logical@ formulas."
 
-let iprinter,aprinter,tprinter,pprinter =
-  let bl = ["theory"; "type"; "constant"; "function"; "predicate"; "inductive";
-            "axiom"; "lemma"; "goal"; "use"; "clone"; "prop"; "meta";
-            "scope"; "import"; "export"; "end";
-            "forall"; "exists"; "not"; "true"; "false"; "if"; "then"; "else";
-            "let"; "in"; "match"; "with"; "as"; "epsilon" ] in
-  let isanitize = sanitizer char_to_alpha char_to_alnumus in
-  let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-  create_ident_printer bl ~sanitizer:isanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:lsanitize,
-  create_ident_printer bl ~sanitizer:isanitize
+let meta_introduced_hypotheses =
+  register_meta
+    ~desc:"marks beginning of hypotheses introduced by introduce_premises"
+    "introduced_premises" []
+
+let create iprinter aprinter tprinter pprinter do_forget_all =
+  (module (struct
 
 let forget_tvs () =
-  forget_all aprinter
+  (* we always forget type variables between each declaration *)
+  (* if do_forget_all then *) forget_all aprinter
 
 let forget_all () =
-  forget_all iprinter;
-  forget_all aprinter;
-  forget_all tprinter;
-  forget_all pprinter
-
-let label_coercion = create_label "coercion"
+  if do_forget_all then forget_all iprinter;
+  if do_forget_all then forget_all aprinter;
+  if do_forget_all then forget_all tprinter;
+  if do_forget_all then forget_all pprinter
 
 let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
 let print_labels = print_iter1 Slab.iter space print_label
@@ -220,19 +225,19 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
   | _, [] ->
       print_ls fmt ls
   | Some s, [t1] when tight_op s ->
-      fprintf fmt (protect_on (pri > 8) "%s%a")
+      fprintf fmt (protect_on (pri > 8) "@[%s%a@]")
         s (print_lterm 8) t1
   | Some s, [t1] ->
-      fprintf fmt (protect_on (pri > 5) "%s %a")
+      fprintf fmt (protect_on (pri > 5) "@[%s %a@]")
         s (print_lterm 6) t1
   | Some s, [t1;t2] ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a %s@ %a@]")
+      fprintf fmt (protect_on (pri > 5) "@[%a@ %s %a@]")
         (print_lterm 6) t1 s (print_lterm 6) t2
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a]@]")
         (print_lterm 7) t1 print_term t2
   | _, [t1;t2;t3] when ls.ls_name.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 7) "%a[%a <- %a]")
+      fprintf fmt (protect_on (pri > 7) "@[%a@,[%a <-@ %a]@]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, [t1;t2] when ls.ls_name.id_string = "mixfix [_..]" ->
       fprintf fmt (protect_on (pri > 7) "%a[%a..]")
@@ -244,7 +249,7 @@ and print_app pri ls fmt tl = match extract_op ls, tl with
       fprintf fmt (protect_on (pri > 7) "%a[%a..%a]")
         (print_lterm 7) t1 (print_lterm 6) t2 (print_lterm 6) t3
   | _, tl ->
-      fprintf fmt (protect_on (pri > 6) "@[<hov 1>%a@ %a@]")
+      fprintf fmt (protect_on (pri > 6) "@[%a@ %a@]")
         print_ls ls (print_list space (print_lterm 7)) tl
 
 and print_tnode pri fmt t = match t.t_node with
@@ -260,14 +265,15 @@ and print_tnode pri fmt t = match t.t_node with
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "%a:%a")
+      fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
         (print_app 5 fs) tl print_ty (t_type t)
   | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "if @[%a@] then %a@ else %a")
+      fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
         print_term f print_term t1 print_term t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0) "let %a%a = @[%a@] in@ %a")
+      fprintf fmt (protect_on (pri > 0)
+                              "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
         print_vs v print_id_labels v.vs_name (print_lterm 5) t1 print_term t2;
       forget_var v
   | Tcase (t1,bl) ->
@@ -305,7 +311,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
       let asym = Slab.mem Term.asym_split f1.t_label in
       let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[<hov 1>%a %a@ %a@]")
+      fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
@@ -524,6 +530,75 @@ let print_namespace fmt name th =
   let module P = Print_tree.Make(NsTree) in
   fprintf fmt "@[<hov>%a@]@." P.print
     (NsTree.Namespace (name, th.th_export, th.th_known))
+
+
+(* print task under the form of a sequent, with only local context, for the IDE *)
+
+(*
+let print_goal fmt d =
+   match d.d_node with
+   | Dprop (Pgoal,_pr,f) -> fprintf fmt "@[%a@]@\n" print_term f
+   | _ -> assert false
+*)
+
+let local_decls task symbmap =
+  let rec skip t = function
+    | { td_node = Clone (th,_) } :: rest
+      when id_equal t.th_name th.th_name -> rest
+    | _ :: rest -> skip t rest
+    | [] -> []
+  in
+  let rec filter ((b,acc1,acc2) as acc) = function
+    | { td_node = Meta (m,_) } :: rest
+         when meta_equal m meta_introduced_hypotheses ->
+       filter (true, acc2 @ acc1, []) rest
+    | { td_node = Decl d } :: rest ->
+        let id = Sid.choose d.d_news in
+        (try filter acc (skip (Mid.find id symbmap) rest)
+         with Not_found ->
+              filter (b,acc1,d::acc2) rest)
+    | _ :: rest -> filter acc rest
+    | [] -> if b then List.rev acc1, List.rev acc2
+            else match acc1,acc2 with
+            | [], g::r -> List.rev r, [g]
+            | _ -> assert false
+  in
+  filter (false,[],[]) (task_tdecls task)
+
+let print_sequent fmt task =
+  let ut = Task.used_symbols (Task.used_theories task) in
+  let (ld1,ld2) = local_decls task ut in
+  let rec aux fmt l =
+    match l with
+      | [] -> ()
+      | d :: r ->
+         fprintf fmt "@[%a@]@\n@\n" print_decl d;
+         aux fmt r
+  in
+  fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld1;
+  fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
+  fprintf fmt "@[<v 0>%a@]" aux ld2;
+
+
+
+            end) : Pretty_sig.Printer) (* end of the first class module *)
+
+
+
+module LegacyPrinter =
+  (val (let iprinter,aprinter,tprinter,pprinter =
+    let isanitize = sanitizer char_to_alpha char_to_alnumus in
+    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+    create_ident_printer why3_keywords ~sanitizer:isanitize,
+    create_ident_printer why3_keywords ~sanitizer:lsanitize,
+    create_ident_printer why3_keywords ~sanitizer:lsanitize,
+    create_ident_printer why3_keywords ~sanitizer:isanitize
+  in
+  create iprinter aprinter tprinter pprinter true))
+
+include LegacyPrinter
+
 
 (* Exception reporting *)
 

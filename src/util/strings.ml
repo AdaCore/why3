@@ -17,7 +17,7 @@ let create = String.create
 let copy = String.copy
 let set = String.set
 
-
+let lowercase = String.lowercase
 let capitalize = String.capitalize
 let uncapitalize = String.uncapitalize
 

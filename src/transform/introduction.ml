@@ -114,9 +114,22 @@ let intros ?known_map pr f =
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   Mtv.values decls @ intros known_map pr (t_ty_subst subst Mvs.empty f)
 
+(*
+FIXME [merge from itp]: What was the role of this known_map ??
+
 let introduce_premises = Trans.store (fun t ->
   let known_map = Task.task_known t in
   Trans.apply (Trans.goal (intros ~known_map)) t)
+
+ *)
+
+let intros_with_meta pr f =
+  let l = intros pr f in
+  Theory.create_meta Pretty.meta_introduced_hypotheses [] ::
+  List.rev (List.rev_map Theory.create_decl l)
+
+let introduce_premises = Trans.tgoal intros_with_meta
+
 
 let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \

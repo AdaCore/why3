@@ -451,11 +451,19 @@ void handle_msg(pclient client, int key) {
    //the read buffer also contains the newline, skip it
    r = parse_request(client->readbuf->data, client->readbuf->len - 1, key);
    if (r) {
-      if (list_length(processes) < parallel) {
-        run_request(r);
-        free_request(r);
-      } else {
+     switch (r->req_type) {
+     case REQ_RUN:
+       if (list_length(processes) < parallel) {
+         run_request(r);
+         free_request(r);
+       } else {
          queue_push(queue, (void*) r);
+       }
+        break;
+      case REQ_INTERRUPT:
+        // TODO: remove r from the queue if still there, or kill the process r->id;
+        free_request(r);
+        break;
       }
    }
 }

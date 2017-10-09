@@ -1,13 +1,16 @@
 
 * marks an incompatible change
 
+Version 0.88.0, October 6, 2017
+===============================
+
 Language
   o two new forms of type declarations: integer range types and
     floating-point types. To denote constants in such types, integer
     constants and real constants can be cast to such types. This
     support is exploited in drivers for provers that support bitvector
     theories (CVC4, Z3) and floating-point theory (Z3).
-    More details in the manual, section 7.2.4 "Theories"
+    More details in the manual, section 7.2.4 "Theories".
   * a quote character (') inside an identifier must either be at the
     end, or be followed by either a digit, the underscore character
     (_) or another quote. Identifiers with a quote followed by a
@@ -15,19 +18,18 @@ Language
 
 Standard library
   o new theory ieee_float formalizing floating-point arithmetic,
-    conformant to IEEE-754, mapped to SMT-LIB FP theory.
+    compliant to IEEE-754, mapped to SMT-LIB FP theory.
 
 User features
   o proof strategies: why3 config now generates default proof strategies
     using the installed provers. These are available under name "Auto
-    level 0", "Auto level 1" and "Auto level 2" in why3 ide.  More
-    details in the manual, section 10.6 "Proof Strategies"
-  o counterexamples: better support for array
-    values, support for floating-point values, support for Z3 in
-    addition to CVC4.
-    More details in the manual, section 6.3.5 "Displaying Counterexamples"
+    level 0", "Auto level 1" and "Auto level 2" in why3 ide.
+    More details in the manual, section 10.6 "Proof Strategies".
+  o counterexamples: better support for array values, support for
+    floating-point values, support for Z3 in addition to CVC4.
+    More details in the manual, section 6.3.5 "Displaying Counterexamples".
 
-Prover support
+Provers
   o support for Isabelle 2017
   * discarded support for Isabelle 2016 (2016-1 still supported)
   o support for Coq 8.6.1 (released Jul 25, 2017)
@@ -40,11 +42,11 @@ Prover support
 Version 0.87.3, January 12, 2017
 ================================
 
-bug fixes
+Bug fixes
   o fixed OCaml extraction with respect to ghost parameters
   o assorted bug fixes
 
-provers
+Provers
   o support for Alt-Ergo 1.30 (released Nov 21, 2016)
   o support for Coq 8.6 (released Dec 8, 2016)
   o support for Gappa 1.3 (released Jul 20, 2016)
@@ -55,14 +57,14 @@ provers
 Version 0.87.2, September 1, 2016
 =================================
 
-bug fixes
+Bug fixes
   o improved well-formedness of extracted OCaml code
   o assorted bug fixes
 
 Version 0.87.1, May 27, 2016
 ============================
 
-bug fixes
+Bug fixes
   o assorted bug fixes
 
 Version 0.87.0, March 15, 2016

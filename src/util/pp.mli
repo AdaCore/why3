@@ -68,6 +68,7 @@ val simple_comma : unit pp
 val semi : unit pp
 val colon : unit pp
 val underscore : unit pp
+val slash : unit pp
 val equal : unit pp
 val arrow : unit pp
 val lbrace : unit pp

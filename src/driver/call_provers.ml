@@ -385,6 +385,8 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
 
@@ -402,6 +404,17 @@ let query_result_buffer id =
   try let r = Hashtbl.find result_buffer id in
       Hashtbl.remove result_buffer id; r
   with Not_found -> NoUpdates
+
+let forward_results ~blocking =
+  get_new_results ~blocking;
+  let q = Queue.create () in
+  Hashtbl.iter (fun key element ->
+    if element = ProverStarted && blocking then
+      ()
+    else
+      Queue.push (ServerCall key, element) q) result_buffer;
+  Hashtbl.clear result_buffer;
+  q
 
 let editor_result ret = {
   pr_answer = Unknown ("", None);
