@@ -238,6 +238,17 @@ module mach.int.Random63
   syntax val random_int63  "Random.int %1"
 end
 
+module mach.int.State63
+  (* the most appropriate way to do this would be to have
+     something similar to [remove] from smt drivers:
+     remove val create *)
+  syntax val create       "SHOULD_NOT_BE_HERE"
+  syntax val init         "SHOULD_NOT_BE_HERE"
+  syntax val self_init    "SHOULD_NOT_BE_HERE"
+  syntax val random_bool  "SHOULD_NOT_BE_HERE"
+  syntax val random_int63 "SHOULD_NOT_BE_HERE"
+end
+
 module mach.peano.Peano
   syntax type t      "int"
   syntax val  to_int "Z.of_int %1"
@@ -360,4 +371,3 @@ module ocaml.Pervasives
   syntax val succ                   "succ %1"
   syntax val pred                   "pred %1"
 end
-

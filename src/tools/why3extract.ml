@@ -135,6 +135,14 @@ let get_cout_old ?fname fg m = match opt_output with
       Some (open_in backup) end else None in
     open_out file, old
 
+let print_preludes =
+  let ht = Hstr.create 8 in
+  let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
+  fun id_th fmt pm ->
+    let th_pm = Ident.Mid.find_def [] id_th pm in
+    let l = List.fold_left add [] th_pm in
+    Printer.print_prelude fmt l
+
 let print_mdecls ?fname m mdecls =
   let (fg,pargs,pr) = Pdriver.lookup_printer opt_driver in
   let test_decl_not_driver decl =
@@ -145,6 +153,9 @@ let print_mdecls ?fname m mdecls =
   if List.exists test_decl_not_driver mdecls then begin
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
+    (* print driver prelude *)
+    let pm = pargs.Pdriver.thprelude in
+    print_preludes m.mod_theory.Theory.th_name fmt pm;
     let flat = opt_modu_flat = Flat in
     let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
     Pp.print_list Pp.newline pr_decl fmt mdecls;
