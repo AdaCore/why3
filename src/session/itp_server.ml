@@ -799,8 +799,10 @@ end
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+(*
       if node_type = NFile then
         read_and_send node_name;
+ *)
       get_node_proved new_id node;
       new_id
 
@@ -1001,6 +1003,7 @@ end
     in
     Debug.dprintf debug "sending initialization infos@.";
     P.notify (Initialized infos);
+    load_files_session ();
     Debug.dprintf debug "reloading source files@.";
     let b = reload_files d.cont ~use_shapes in
     if b then
@@ -1011,8 +1014,6 @@ end
            focus on a specific node. *)
         get_focused_label := None
       end
-    else
-      load_files_session ()
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1356,9 +1357,10 @@ end
       end
     | Add_file_req f ->
       add_file_to_session d.cont f;
-      let f = Sysutil.relativize_filename
+(*      let f = Sysutil.relativize_filename
           (Session_itp.get_dir d.cont.controller_session) f in
-      read_and_send f
+         read_and_send f *)
+      ()
 (*
     | Open_session_req file_or_dir_name ->
         let b = init_cont file_or_dir_name in

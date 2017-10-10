@@ -794,7 +794,7 @@ let task_view =
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 2 in
+  let n = ref 1 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -1021,10 +1021,6 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
-(* TODO Do we want an option to choose if we aggressivily switch to the correct
-   source location each time we receive locations with task or not *)
-let always_scroll = false
-
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ~color loc =
@@ -1036,18 +1032,18 @@ let color_loc ~color loc =
   with
   | Nosourceview _ ->
       (* If the file is not present do nothing *)
-      ()
+      print_message ~kind:0 ~mark:"color_loc" "%s" "No source view yet"
 
 (* Scroll to a specific locations *)
-let scroll_to_loc loc_of_goal =
+let scroll_to_loc ~force_tab_switch loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some (loc, _) ->
     let f, l, _, _ = Loc.get loc in
     try
       let (n, v, _, _) = get_source_view_table f in
-      if always_scroll then
-        notebook#goto_page n;
+      if force_tab_switch then
+        (eprintf "tab switch to page %d@." n; notebook#goto_page n);
       move_to_line ~yalign:0.0 v l
     with Nosourceview _ -> ()
 
@@ -1064,7 +1060,7 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
     with Not_found -> None
   in
-  scroll_to_loc loc_of_goal
+  scroll_to_loc ~force_tab_switch:false loc_of_goal
 
 (*******************)
 (* The "View" menu *)
@@ -1380,6 +1376,7 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, s) ->
     begin
       (* TODO find a new color *)
+      scroll_to_loc ~force_tab_switch:true (Some (loc,0));
       color_loc ~color:Goal_color loc;
       print_message ~kind:1 ~mark:"Parse_Or_Type_Error]" "%s" s
     end
