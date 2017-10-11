@@ -1,0 +1,28 @@
+module M
+
+  use import bool.Bool
+  use import option.Option
+
+  exception A
+
+  let rec foo (x: option bool) : unit
+    diverges
+    raises { A -> true }
+  =
+    match x with
+    | None -> ()
+    | Some b ->
+      if b then
+        (
+          let rec aux (x: unit) : unit
+            diverges
+            raises { A -> true }
+          =
+            foo (Some false)
+          in
+          aux ()
+        )
+      else
+        raise A
+    end
+end
