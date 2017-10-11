@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../ordered_transition.mlw">
+<theory name="OrderedTransition" sum="0743565b22722e7dc4ac74b58a52df30">
+ <goal name="existence" expl="">
+ <transf name="split_goal_wp">
+  <goal name="existence.1" expl="">
+  <proof prover="1" timelimit="5"><result status="valid" time="1.27"/></proof>
+  </goal>
+  <goal name="existence.2" expl="">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="existence.3" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+  <goal name="existence.4" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="11"/></proof>
+  </goal>
+  <goal name="existence.5" expl="">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="existence.6" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC otrans" expl="VC for otrans">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+</theory>
+<theory name="OTGameCommon" sum="3f2be8421d6088399935de893fc2b373">
+ <goal name="substate_order" expl="">
+ <transf name="split_goal_wp">
+  <goal name="substate_order.1" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="34"/></proof>
+  </goal>
+  <goal name="substate_order.2" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
+  </goal>
+  <goal name="substate_order.3" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="substate_order.4" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
+  </goal>
+  <goal name="substate_order.5" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="substate_order.6" expl="">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="substate_order.7" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+  </goal>
+  <goal name="substate_order.8" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="51"/></proof>
+  </goal>
+  <goal name="substate_order.9" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="substate_order.10" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="40"/></proof>
+  </goal>
+  <goal name="substate_order.11" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="214"/></proof>
+  </goal>
+  <goal name="substate_order.12" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="45"/></proof>
+  </goal>
+  <goal name="substate_order.13" expl="">
+  <proof prover="0"><result status="valid" time="0.29" steps="715"/></proof>
+  </goal>
+  <goal name="substate_order.14" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="45"/></proof>
+  </goal>
+  <goal name="substate_order.15" expl="">
+  <proof prover="0"><result status="valid" time="0.65" steps="1762"/></proof>
+  </goal>
+  <goal name="substate_order.16" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="241"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC game_ex_ot" expl="VC for game_ex_ot">
+ <proof prover="0"><result status="valid" time="0.20" steps="395"/></proof>
+ </goal>
+ <goal name="VC game_unv_ot" expl="VC for game_unv_ot">
+ <proof prover="0"><result status="valid" time="0.18" steps="337"/></proof>
+ </goal>
+</theory>
+<theory name="OTGame" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="OTGameProof" sum="8318c0ecf6f69026d834159e01c812ca">
+ <goal name="VC increasing_trace" expl="VC for increasing_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC increasing_trace.1" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.04" steps="6"/></proof>
+  </goal>
+  <goal name="VC increasing_trace.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="6"/></proof>
+  </goal>
+  <goal name="VC increasing_trace.3" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
+  </goal>
+  <goal name="VC increasing_trace.4" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.12" steps="451"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="simulations" expl="">
+ <transf name="split_goal_wp">
+  <goal name="simulations.1" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.1.1" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="29"/></proof>
+   </goal>
+   <goal name="simulations.1.2" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
+   </goal>
+   <goal name="simulations.1.3" expl="">
+   <proof prover="0"><result status="valid" time="0.12" steps="29"/></proof>
+   </goal>
+   <goal name="simulations.1.4" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="49"/></proof>
+   </goal>
+   <goal name="simulations.1.5" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="117"/></proof>
+   </goal>
+   <goal name="simulations.1.6" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="222"/></proof>
+   </goal>
+   <goal name="simulations.1.7" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.2" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.2.1" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+   </goal>
+   <goal name="simulations.2.2" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
+   </goal>
+   <goal name="simulations.2.3" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="18"/></proof>
+   </goal>
+   <goal name="simulations.2.4" expl="">
+   <proof prover="0"><result status="valid" time="0.14" steps="313"/></proof>
+   </goal>
+   <goal name="simulations.2.5" expl="">
+   <proof prover="0"><result status="valid" time="0.42" steps="813"/></proof>
+   </goal>
+   <goal name="simulations.2.6" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="14"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.3" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.3.1" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="29"/></proof>
+   </goal>
+   <goal name="simulations.3.2" expl="">
+   <proof prover="0"><result status="valid" time="0.15" steps="39"/></proof>
+   </goal>
+   <goal name="simulations.3.3" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="36"/></proof>
+   </goal>
+   <goal name="simulations.3.4" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="82"/></proof>
+   </goal>
+   <goal name="simulations.3.5" expl="">
+   <proof prover="0"><result status="valid" time="0.23" steps="256"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.4" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.4.1" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="26"/></proof>
+   </goal>
+   <goal name="simulations.4.2" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="29"/></proof>
+   </goal>
+   <goal name="simulations.4.3" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+   </goal>
+   <goal name="simulations.4.4" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="77"/></proof>
+   </goal>
+   <goal name="simulations.4.5" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="208"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.5" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.5.1" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="20"/></proof>
+   </goal>
+   <goal name="simulations.5.2" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="9"/></proof>
+   </goal>
+   <goal name="simulations.5.3" expl="">
+   <proof prover="0"><result status="valid" time="0.15" steps="293"/></proof>
+   </goal>
+   <goal name="simulations.5.4" expl="">
+   <proof prover="0"><result status="valid" time="0.51" steps="619"/></proof>
+   </goal>
+   <goal name="simulations.5.5" expl="">
+   <proof prover="0"><result status="valid" time="0.14" steps="187"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.6" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.6.1" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
+   </goal>
+   <goal name="simulations.6.2" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
+   </goal>
+   <goal name="simulations.6.3" expl="">
+   <proof prover="0"><result status="valid" time="0.15" steps="269"/></proof>
+   </goal>
+   <goal name="simulations.6.4" expl="">
+   <proof prover="0"><result status="valid" time="0.44" steps="541"/></proof>
+   </goal>
+   <goal name="simulations.6.5" expl="">
+   <proof prover="0"><result status="valid" time="0.14" steps="295"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.7" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.7.1" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+   </goal>
+   <goal name="simulations.7.2" expl="">
+   <proof prover="0"><result status="valid" time="0.12" steps="188"/></proof>
+   </goal>
+   <goal name="simulations.7.3" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+   </goal>
+   <goal name="simulations.7.4" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="42"/></proof>
+   </goal>
+   <goal name="simulations.7.5" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="16"/></proof>
+   </goal>
+   <goal name="simulations.7.6" expl="">
+   <proof prover="1"><result status="valid" time="36.06"/></proof>
+   </goal>
+   <goal name="simulations.7.7" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
+   </goal>
+   <goal name="simulations.7.8" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+   </goal>
+   <goal name="simulations.7.9" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="81"/></proof>
+   </goal>
+   <goal name="simulations.7.10" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="75"/></proof>
+   </goal>
+   <goal name="simulations.7.11" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="22"/></proof>
+   </goal>
+   <goal name="simulations.7.12" expl="">
+   <proof prover="0"><result status="valid" time="0.12" steps="191"/></proof>
+   </goal>
+   <goal name="simulations.7.13" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="22"/></proof>
+   </goal>
+   <goal name="simulations.7.14" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+   </goal>
+   <goal name="simulations.7.15" expl="">
+   <proof prover="1"><result status="valid" time="10.37"/></proof>
+   </goal>
+   <goal name="simulations.7.16" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="111"/></proof>
+   </goal>
+   <goal name="simulations.7.17" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
+   </goal>
+   <goal name="simulations.7.18" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="127"/></proof>
+   </goal>
+   <goal name="simulations.7.19" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="207"/></proof>
+   </goal>
+   <goal name="simulations.7.20" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="27"/></proof>
+   </goal>
+   <goal name="simulations.7.21" expl="">
+   <proof prover="0"><result status="valid" time="0.11" steps="155"/></proof>
+   </goal>
+   <goal name="simulations.7.22" expl="">
+   <proof prover="0"><result status="valid" time="0.33" steps="582"/></proof>
+   </goal>
+   <goal name="simulations.7.23" expl="">
+   <proof prover="1" timelimit="5"><result status="valid" time="9.40"/></proof>
+   </goal>
+   <goal name="simulations.7.24" expl="">
+   <proof prover="0"><result status="valid" time="0.31" steps="544"/></proof>
+   </goal>
+   <goal name="simulations.7.25" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="161"/></proof>
+   </goal>
+   <goal name="simulations.7.26" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="240"/></proof>
+   </goal>
+   <goal name="simulations.7.27" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="277"/></proof>
+   </goal>
+   <goal name="simulations.7.28" expl="">
+   <proof prover="0"><result status="valid" time="0.34" steps="700"/></proof>
+   </goal>
+   <goal name="simulations.7.29" expl="">
+   <proof prover="0" timelimit="5"><result status="valid" time="1.79" steps="1827"/></proof>
+   </goal>
+   <goal name="simulations.7.30" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="121"/></proof>
+   </goal>
+   <goal name="simulations.7.31" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="167"/></proof>
+   </goal>
+   <goal name="simulations.7.32" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="84"/></proof>
+   </goal>
+   <goal name="simulations.7.33" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
+   </goal>
+   <goal name="simulations.7.34" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="102"/></proof>
+   </goal>
+   <goal name="simulations.7.35" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="27"/></proof>
+   </goal>
+   <goal name="simulations.7.36" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="33"/></proof>
+   </goal>
+   <goal name="simulations.7.37" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="160"/></proof>
+   </goal>
+   <goal name="simulations.7.38" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="162"/></proof>
+   </goal>
+   <goal name="simulations.7.39" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="71"/></proof>
+   </goal>
+   <goal name="simulations.7.40" expl="">
+   <proof prover="0"><result status="valid" time="0.24" steps="498"/></proof>
+   </goal>
+   <goal name="simulations.7.41" expl="">
+   <proof prover="2"><result status="valid" time="1.14"/></proof>
+   </goal>
+   <goal name="simulations.7.42" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="52"/></proof>
+   </goal>
+   <goal name="simulations.7.43" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="124"/></proof>
+   </goal>
+   <goal name="simulations.7.44" expl="">
+   <proof prover="0"><result status="valid" time="0.11" steps="385"/></proof>
+   </goal>
+   <goal name="simulations.7.45" expl="">
+   <proof prover="0"><result status="valid" time="0.34" steps="779"/></proof>
+   </goal>
+   <goal name="simulations.7.46" expl="">
+   <proof prover="0"><result status="valid" time="0.06" steps="75"/></proof>
+   </goal>
+   <goal name="simulations.7.47" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
+   </goal>
+   <goal name="simulations.7.48" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="18"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.8" expl="">
+  <transf name="split_goal_wp">
+   <goal name="simulations.8.1" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
+   </goal>
+   <goal name="simulations.8.2" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="64"/></proof>
+   </goal>
+   <goal name="simulations.8.3" expl="">
+   <proof prover="0"><result status="valid" time="0.15" steps="284"/></proof>
+   </goal>
+   <goal name="simulations.8.4" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="63"/></proof>
+   </goal>
+   <goal name="simulations.8.5" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="42"/></proof>
+   </goal>
+   <goal name="simulations.8.6" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="48"/></proof>
+   </goal>
+   <goal name="simulations.8.7" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="29"/></proof>
+   </goal>
+   <goal name="simulations.8.8" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
+   </goal>
+   <goal name="simulations.8.9" expl="">
+   <proof prover="0"><result status="valid" time="1.13" steps="1169"/></proof>
+   </goal>
+   <goal name="simulations.8.10" expl="">
+   <proof prover="0"><result status="valid" time="1.16" steps="1169"/></proof>
+   </goal>
+   <goal name="simulations.8.11" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="83"/></proof>
+   </goal>
+   <goal name="simulations.8.12" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="83"/></proof>
+   </goal>
+   <goal name="simulations.8.13" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="135"/></proof>
+   </goal>
+   <goal name="simulations.8.14" expl="">
+   <proof prover="0"><result status="valid" time="0.25" steps="229"/></proof>
+   </goal>
+   <goal name="simulations.8.15" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
+   </goal>
+   <goal name="simulations.8.16" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="71"/></proof>
+   </goal>
+   <goal name="simulations.8.17" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="89"/></proof>
+   </goal>
+   <goal name="simulations.8.18" expl="">
+   <proof prover="2"><result status="valid" time="0.93"/></proof>
+   </goal>
+   <goal name="simulations.8.19" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+   </goal>
+   <goal name="simulations.8.20" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+   </goal>
+   <goal name="simulations.8.21" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+   </goal>
+   <goal name="simulations.8.22" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+   </goal>
+   <goal name="simulations.8.23" expl="">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+   </goal>
+   <goal name="simulations.8.24" expl="">
+   <proof prover="0"><result status="valid" time="0.14" steps="413"/></proof>
+   </goal>
+   <goal name="simulations.8.25" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
+   </goal>
+   <goal name="simulations.8.26" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="20"/></proof>
+   </goal>
+   <goal name="simulations.8.27" expl="">
+   <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="simulations.9" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="304"/></proof>
+  </goal>
+  <goal name="simulations.10" expl="">
+  <proof prover="0"><result status="valid" time="0.09" steps="304"/></proof>
+  </goal>
+  <goal name="simulations.11" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="230"/></proof>
+  </goal>
+  <goal name="simulations.12" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="241"/></proof>
+  </goal>
+  <goal name="simulations.13" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
+  </goal>
+  <goal name="simulations.14" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="simulations.15" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="simulations.16" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="det_ecart" expl="">
+ <transf name="split_goal_wp">
+  <goal name="det_ecart.1" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="det_ecart.2" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="37"/></proof>
+  </goal>
+  <goal name="det_ecart.3" expl="">
+  <proof prover="0"><result status="valid" time="0.40" steps="704"/></proof>
+  </goal>
+  <goal name="det_ecart.4" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="4.39" steps="2368"/></proof>
+  </goal>
+  <goal name="det_ecart.5" expl="">
+  <proof prover="0"><result status="valid" time="0.15" steps="169"/></proof>
+  </goal>
+  <goal name="det_ecart.6" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="176"/></proof>
+  </goal>
+  <goal name="det_ecart.7" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="201"/></proof>
+  </goal>
+  <goal name="det_ecart.8" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+  <goal name="det_ecart.9" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="14"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ot_enforce_ex" expl="">
+ <transf name="split_goal_wp">
+  <goal name="ot_enforce_ex.1" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="23"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.2" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.3" expl="">
+  <proof prover="2"><result status="valid" time="0.95"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.4" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="21"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.5" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="201"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.6" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.7" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.8" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="90"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.9" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.10" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="26"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.11" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="46"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.12" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.13" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="99"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.14" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="38"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.15" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="39"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.16" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="52"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.17" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.18" expl="">
+  <proof prover="0"><result status="valid" time="0.13" steps="527"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.19" expl="">
+  <transf name="introduce_premises">
+   <goal name="ot_enforce_ex.19.1" expl="">
+   <transf name="inline_goal">
+    <goal name="ot_enforce_ex.19.1.1" expl="">
+    <transf name="split_goal_wp">
+     <goal name="ot_enforce_ex.19.1.1.1" expl="">
+     <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+     </goal>
+     <goal name="ot_enforce_ex.19.1.1.2" expl="">
+     <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="ot_enforce_ex.20" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="63"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.21" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="184"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.22" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="97"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.23" expl="">
+  <proof prover="0"><result status="valid" time="0.51" steps="1110"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.24" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="186"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.25" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="20"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.26" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.27" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="109"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.28" expl="">
+  <proof prover="0"><result status="valid" time="0.29" steps="470"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.29" expl="">
+  <proof prover="0"><result status="valid" time="0.86" steps="799"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.30" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.31" expl="">
+  <proof prover="2"><result status="valid" time="0.77"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.32" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="106"/></proof>
+  </goal>
+  <goal name="ot_enforce_ex.33" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="ot_enforce_unv" expl="">
+ <transf name="split_goal_wp">
+  <goal name="ot_enforce_unv.1" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.2" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.3" expl="">
+  <proof prover="0"><result status="valid" time="0.41" steps="664"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.4" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.5" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="37"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.6" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="30"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.7" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="46"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.8" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="88"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.9" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="13"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.10" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="26"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.11" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="46"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.12" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="9"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.13" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.14" expl="">
+  <proof prover="0"><result status="valid" time="0.09" steps="272"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.15" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="17"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.16" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="55"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.17" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.18" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="43"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.19" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="57"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.20" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="23"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.21" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="86"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.22" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="74"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.23" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="266"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.24" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="292"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.25" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="74"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.26" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="34"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.27" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.28" expl="">
+  <proof prover="0"><result status="valid" time="0.93" steps="2123"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.29" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="92"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.30" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="4.30" steps="2786"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.31" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="250"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.32" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="123"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.33" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.34" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.35" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.36" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="210"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.37" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="11"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.38" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="115"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.39" expl="">
+  <proof prover="0"><result status="valid" time="0.26" steps="666"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.40" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.41" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="42"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.42" expl="">
+  <proof prover="0"><result status="valid" time="0.62" steps="1465"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.43" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="29"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.44" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="11"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.45" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.46" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="22"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.47" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="437"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.48" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="43"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.49" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.50" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.51" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="178"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.52" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="38"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.53" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="132"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.54" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.55" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.56" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="109"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.57" expl="">
+  <proof prover="0"><result status="valid" time="0.28" steps="470"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.58" expl="">
+  <proof prover="0"><result status="valid" time="1.09" steps="799"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.59" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.60" expl="">
+  <proof prover="2"><result status="valid" time="0.80"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.61" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="106"/></proof>
+  </goal>
+  <goal name="ot_enforce_unv.62" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="OTGame.ot_enforce_ex" expl="">
+ <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
+ </goal>
+ <goal name="OTGame.ot_enforce_unv" expl="">
+ <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

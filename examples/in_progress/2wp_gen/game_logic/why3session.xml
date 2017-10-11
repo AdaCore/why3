@@ -6,7 +6,7 @@
 <prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../game_logic.mlw">
-<theory name="Fmla" sum="2b01f5e7ec39a6ecfcc03662e774fd99">
+<theory name="Fmla" sum="a215a297a0d31c460c6df2d8739c56be">
  <goal name="VC fmla" expl="VC for fmla">
  <proof prover="0"><result status="valid" time="0.02" steps="7"/></proof>
  </goal>
@@ -57,7 +57,7 @@
 </theory>
 <theory name="FmlaRules" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="FmlaProof" sum="ccc829d610e77f0fa08a10798e0c15c7">
+<theory name="FmlaProof" sum="e7c2dfeefdec159439769e57b1f0454c">
  <goal name="enforce_monotonic" expl="">
  <transf name="split_goal_wp">
   <goal name="enforce_monotonic.1" expl="">
@@ -92,7 +92,7 @@
   <proof prover="0"><result status="valid" time="0.21" steps="385"/></proof>
   </goal>
   <goal name="enforce_does_progress.6" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.85" steps="3186"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="1.12" steps="3186"/></proof>
   </goal>
   <goal name="enforce_does_progress.7" expl="">
   <proof prover="0"><result status="valid" time="0.12" steps="204"/></proof>
@@ -138,7 +138,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="44"/></proof>
   </goal>
   <goal name="kont_intro.8" expl="">
-  <proof prover="4"><result status="valid" time="1.43"/></proof>
+  <proof prover="4"><result status="valid" time="2.44"/></proof>
   </goal>
   <goal name="kont_intro.9" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
@@ -176,7 +176,7 @@
  <goal name="external_pre" expl="">
  <transf name="split_goal_wp">
   <goal name="external_pre.1" expl="">
-  <proof prover="1"><result status="valid" time="0.31"/></proof>
+  <proof prover="1"><result status="valid" time="0.46"/></proof>
   </goal>
   <goal name="external_pre.2" expl="">
   <proof prover="0"><result status="valid" time="0.05" steps="6"/></proof>
@@ -187,7 +187,7 @@
  </transf>
  </goal>
  <goal name="VC game_loop" expl="VC for game_loop">
- <proof prover="0"><result status="valid" time="0.81" steps="3139"/></proof>
+ <proof prover="0"><result status="valid" time="1.36" steps="3139"/></proof>
  </goal>
  <goal name="extends_pfun_related" expl="">
  <transf name="split_goal_wp">
@@ -201,7 +201,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="202"/></proof>
   </goal>
   <goal name="extends_pfun_related.4" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="2.56" steps="2025"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="4.17" steps="2025"/></proof>
   </goal>
   <goal name="extends_pfun_related.5" expl="">
   <proof prover="0"><result status="valid" time="0.04" steps="16"/></proof>
@@ -213,7 +213,7 @@
   <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="extends_pfun_related.8" expl="">
-  <proof prover="0"><result status="valid" time="0.82" steps="1770"/></proof>
+  <proof prover="0"><result status="valid" time="1.06" steps="1770"/></proof>
   </goal>
   <goal name="extends_pfun_related.9" expl="">
   <proof prover="0"><result status="valid" time="0.20" steps="631"/></proof>
@@ -283,10 +283,10 @@
    <proof prover="0"><result status="valid" time="0.35" steps="370"/></proof>
    </goal>
    <goal name="trampoline.5.12" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.73" steps="986"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.98" steps="986"/></proof>
    </goal>
    <goal name="trampoline.5.13" expl="">
-   <proof prover="0"><result status="valid" time="0.54" steps="855"/></proof>
+   <proof prover="0"><result status="valid" time="0.70" steps="855"/></proof>
    </goal>
    <goal name="trampoline.5.14" expl="">
    <proof prover="0"><result status="valid" time="0.05" steps="33"/></proof>
@@ -325,7 +325,7 @@
    <proof prover="0"><result status="valid" time="0.05" steps="24"/></proof>
    </goal>
    <goal name="trampoline.5.26" expl="">
-   <proof prover="0"><result status="valid" time="0.40" steps="786"/></proof>
+   <proof prover="0"><result status="valid" time="0.54" steps="786"/></proof>
    </goal>
    <goal name="trampoline.5.27" expl="">
    <proof prover="0"><result status="valid" time="0.43" steps="792"/></proof>
@@ -342,7 +342,7 @@
     <proof prover="1"><result status="valid" time="1.33"/></proof>
     </goal>
     <goal name="trampoline.5.30.2" expl="">
-    <proof prover="1"><result status="valid" time="1.17"/></proof>
+    <proof prover="1"><result status="valid" time="1.74"/></proof>
     </goal>
    </transf>
    </goal>
@@ -357,7 +357,7 @@
    <proof prover="0"><result status="valid" time="0.05" steps="12"/></proof>
    </goal>
    <goal name="trampoline.6.2" expl="">
-   <proof prover="0"><result status="valid" time="0.26" steps="630"/></proof>
+   <proof prover="0"><result status="valid" time="0.42" steps="630"/></proof>
    </goal>
    <goal name="trampoline.6.3" expl="">
    <proof prover="0"><result status="valid" time="0.05" steps="32"/></proof>
@@ -372,7 +372,7 @@
    <proof prover="0"><result status="valid" time="0.09" steps="47"/></proof>
    </goal>
    <goal name="trampoline.6.7" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="1.14" steps="1670"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="1.64" steps="1670"/></proof>
    </goal>
    <goal name="trampoline.6.8" expl="">
    <proof prover="0"><result status="valid" time="0.05" steps="44"/></proof>
@@ -459,7 +459,7 @@
    <proof prover="0"><result status="valid" time="0.35" steps="690"/></proof>
    </goal>
    <goal name="trampoline.6.36" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="2.17" steps="3231"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="3.20" steps="3231"/></proof>
    </goal>
    <goal name="trampoline.6.37" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="31"/></proof>
@@ -471,7 +471,7 @@
    <proof prover="0"><result status="valid" time="0.04" steps="41"/></proof>
    </goal>
    <goal name="trampoline.6.40" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="1.32" steps="1827"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="2.10" steps="1827"/></proof>
    </goal>
    <goal name="trampoline.6.41" expl="">
    <proof prover="0"><result status="valid" time="0.06" steps="60"/></proof>
@@ -480,19 +480,19 @@
    <proof prover="0"><result status="valid" time="0.05" steps="38"/></proof>
    </goal>
    <goal name="trampoline.6.43" expl="">
-   <proof prover="0"><result status="valid" time="1.10" steps="1562"/></proof>
+   <proof prover="0"><result status="valid" time="1.80" steps="1562"/></proof>
    </goal>
    <goal name="trampoline.6.44" expl="">
    <proof prover="0"><result status="valid" time="0.06" steps="49"/></proof>
    </goal>
    <goal name="trampoline.6.45" expl="">
-   <proof prover="1"><result status="valid" time="1.21"/></proof>
+   <proof prover="1"><result status="valid" time="1.68"/></proof>
    </goal>
    <goal name="trampoline.6.46" expl="">
    <proof prover="0"><result status="valid" time="0.14" steps="255"/></proof>
    </goal>
    <goal name="trampoline.6.47" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="2.10" steps="2762"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="2.91" steps="2762"/></proof>
    </goal>
    <goal name="trampoline.6.48" expl="">
    <proof prover="0"><result status="valid" time="0.04" steps="41"/></proof>
@@ -542,7 +542,7 @@
   <proof prover="0" timelimit="5"><result status="valid" time="0.50" steps="645"/></proof>
   </goal>
   <goal name="trampoline.9" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="2.39" steps="3624"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="3.62" steps="3624"/></proof>
   </goal>
   <goal name="trampoline.10" expl="">
   <proof prover="0"><result status="valid" time="0.12" steps="94"/></proof>
@@ -697,10 +697,10 @@
   <proof prover="0"><result status="valid" time="0.10" steps="177"/></proof>
   </goal>
   <goal name="stack_less_order.4" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="1.76" steps="1948"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="2.19" steps="2316"/></proof>
   </goal>
   <goal name="stack_less_order.5" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="1.79" steps="1965"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="2.44" steps="2333"/></proof>
   </goal>
   <goal name="stack_less_order.6" expl="">
   <proof prover="0"><result status="valid" time="0.29" steps="427"/></proof>
@@ -769,7 +769,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="38"/></proof>
   </goal>
   <goal name="stack_less_order.28" expl="">
-  <proof prover="0"><result status="valid" time="0.18" steps="156"/></proof>
+  <proof prover="0"><result status="valid" time="0.19" steps="156"/></proof>
   </goal>
   <goal name="stack_less_order.29" expl="">
   <transf name="introduce_premises">
@@ -826,7 +826,7 @@
      <proof prover="0"><result status="valid" time="0.58" steps="1099"/></proof>
      </goal>
      <goal name="stack_less_order.30.1.1.5" expl="">
-     <proof prover="1"><result status="valid" time="1.30"/></proof>
+     <proof prover="1"><result status="valid" time="1.06"/></proof>
      </goal>
      <goal name="stack_less_order.30.1.1.6" expl="">
      <proof prover="0"><result status="valid" time="0.17" steps="366"/></proof>
@@ -865,7 +865,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="40"/></proof>
   </goal>
   <goal name="stack_less_order.38" expl="">
-  <proof prover="0"><result status="valid" time="0.06" steps="48"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="48"/></proof>
   </goal>
   <goal name="stack_less_order.39" expl="">
   <transf name="introduce_premises">
@@ -907,7 +907,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="156"/></proof>
   </goal>
   <goal name="stack_less_order.41" expl="">
-  <proof prover="0" timelimit="5"><result status="valid" time="3.31" steps="4064"/></proof>
+  <proof prover="0" timelimit="5"><result status="valid" time="4.73" steps="4064"/></proof>
   </goal>
   <goal name="stack_less_order.42" expl="">
   <proof prover="0"><result status="valid" time="0.26" steps="268"/></proof>
@@ -940,7 +940,7 @@
    <proof prover="0"><result status="valid" time="0.07" steps="63"/></proof>
    </goal>
    <goal name="recursion_v1.1.7" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.19" steps="522"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.40" steps="522"/></proof>
    </goal>
   </transf>
   </goal>
@@ -965,7 +965,7 @@
    <proof prover="0"><result status="valid" time="0.18" steps="83"/></proof>
    </goal>
    <goal name="recursion_v1.2.7" expl="">
-   <proof prover="0"><result status="valid" time="0.66" steps="1245"/></proof>
+   <proof prover="0"><result status="valid" time="1.20" steps="1245"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1001,7 +1001,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="73"/></proof>
   </goal>
   <goal name="recursion_v1.7" expl="">
-  <proof prover="0"><result status="valid" time="0.75" steps="1924"/></proof>
+  <proof prover="0"><result status="valid" time="1.00" steps="1924"/></proof>
   </goal>
   <goal name="recursion_v1.8" expl="">
   <transf name="split_goal_wp">
@@ -1015,7 +1015,7 @@
       <proof prover="0" timelimit="5"><result status="valid" time="0.78" steps="1696"/></proof>
       </goal>
       <goal name="recursion_v1.8.1.1.1.2" expl="">
-      <proof prover="0" timelimit="5"><result status="valid" time="2.53" steps="3110"/></proof>
+      <proof prover="0" timelimit="5"><result status="valid" time="2.16" steps="3110"/></proof>
       </goal>
       <goal name="recursion_v1.8.1.1.1.3" expl="">
       <proof prover="0"><result status="valid" time="0.16" steps="207"/></proof>
@@ -1060,7 +1060,7 @@
    <proof prover="0"><result status="valid" time="0.15" steps="76"/></proof>
    </goal>
    <goal name="recursion_v1.8.8" expl="">
-   <proof prover="1"><result status="valid" time="2.50"/></proof>
+   <proof prover="1"><result status="valid" time="1.73"/></proof>
    </goal>
    <goal name="recursion_v1.8.9" expl="">
    <proof prover="0"><result status="valid" time="0.21" steps="196"/></proof>
@@ -1092,7 +1092,7 @@
     <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="20"/></proof>
     </goal>
     <goal name="recursion_v1.8.17.2" expl="">
-    <proof prover="1"><result status="valid" time="1.99"/></proof>
+    <proof prover="1"><result status="valid" time="1.52"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1103,15 +1103,15 @@
    <proof prover="0"><result status="valid" time="0.06" steps="40"/></proof>
    </goal>
    <goal name="recursion_v1.8.20" expl="">
-   <proof prover="1"><result status="valid" time="1.84"/></proof>
+   <proof prover="1"><result status="valid" time="1.36"/></proof>
    </goal>
    <goal name="recursion_v1.8.21" expl="">
-   <proof prover="1"><result status="valid" time="1.61"/></proof>
+   <proof prover="1"><result status="valid" time="1.32"/></proof>
    </goal>
    <goal name="recursion_v1.8.22" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.8.22.1" expl="">
-    <proof prover="1"><result status="valid" time="2.71"/></proof>
+    <proof prover="1"><result status="valid" time="1.95"/></proof>
     </goal>
     <goal name="recursion_v1.8.22.2" expl="">
     <proof prover="0" timelimit="5"><result status="valid" time="0.11" steps="26"/></proof>
@@ -1130,7 +1130,7 @@
    <goal name="recursion_v1.8.26" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.8.26.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.58" steps="3071"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.07" steps="3215"/></proof>
     </goal>
     <goal name="recursion_v1.8.26.2" expl="">
     <proof prover="1"><result status="valid" time="1.94"/></proof>
@@ -1177,7 +1177,7 @@
       <proof prover="0"><result status="valid" time="0.07" steps="41"/></proof>
       </goal>
       <goal name="recursion_v1.8.29.1.1.10" expl="">
-      <proof prover="0"><result status="valid" time="0.82" steps="1392"/></proof>
+      <proof prover="0"><result status="valid" time="1.36" steps="1392"/></proof>
       </goal>
       <goal name="recursion_v1.8.29.1.1.11" expl="">
       <proof prover="0"><result status="valid" time="0.30" steps="334"/></proof>
@@ -1209,7 +1209,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="20"/></proof>
   </goal>
   <goal name="recursion_v1.14" expl="">
-  <proof prover="0"><result status="valid" time="0.12" steps="250"/></proof>
+  <proof prover="0"><result status="valid" time="0.31" steps="250"/></proof>
   </goal>
   <goal name="recursion_v1.15" expl="">
   <proof prover="0"><result status="valid" time="0.05" steps="27"/></proof>
@@ -1221,16 +1221,16 @@
     <goal name="recursion_v1.16.1.1" expl="">
     <transf name="split_goal_wp">
      <goal name="recursion_v1.16.1.1.1" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="1.50" steps="2278"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="2.13" steps="2278"/></proof>
      </goal>
      <goal name="recursion_v1.16.1.1.2" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="3.00" steps="3798"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.47" steps="3824"/></proof>
      </goal>
      <goal name="recursion_v1.16.1.1.3" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="2.75" steps="3180"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.22" steps="3180"/></proof>
      </goal>
      <goal name="recursion_v1.16.1.1.4" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="1.56" steps="2300"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="1.88" steps="2300"/></proof>
      </goal>
      <goal name="recursion_v1.16.1.1.5" expl="">
      <proof prover="0" timelimit="5"><result status="valid" time="2.37" steps="3055"/></proof>
@@ -1251,7 +1251,7 @@
      <proof prover="1"><result status="valid" time="2.94"/></proof>
      </goal>
      <goal name="recursion_v1.16.1.1.11" expl="">
-     <proof prover="1"><result status="valid" time="2.77"/></proof>
+     <proof prover="1"><result status="valid" time="3.20"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1325,19 +1325,19 @@
    <proof prover="0"><result status="valid" time="0.07" steps="43"/></proof>
    </goal>
    <goal name="recursion_v1.19.20" expl="">
-   <proof prover="0"><result status="valid" time="0.06" steps="43"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="43"/></proof>
    </goal>
    <goal name="recursion_v1.19.21" expl="">
-   <proof prover="0"><result status="valid" time="1.62" steps="2186"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.78" steps="2186"/></proof>
    </goal>
    <goal name="recursion_v1.19.22" expl="">
    <proof prover="0"><result status="valid" time="0.07" steps="45"/></proof>
    </goal>
    <goal name="recursion_v1.19.23" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="4.92" steps="6334"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="6.48" steps="6334"/></proof>
    </goal>
    <goal name="recursion_v1.19.24" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.23" steps="250"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.37" steps="250"/></proof>
    </goal>
    <goal name="recursion_v1.19.25" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="1.97" steps="2577"/></proof>
@@ -1368,10 +1368,10 @@
    <proof prover="0"><result status="valid" time="0.20" steps="180"/></proof>
    </goal>
    <goal name="recursion_v1.20.5" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="2.31" steps="3408"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="3.14" steps="3408"/></proof>
    </goal>
    <goal name="recursion_v1.20.6" expl="">
-   <proof prover="0"><result status="valid" time="0.07" steps="44"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="44"/></proof>
    </goal>
    <goal name="recursion_v1.20.7" expl="">
    <proof prover="0"><result status="valid" time="0.13" steps="209"/></proof>
@@ -1405,7 +1405,7 @@
    <proof prover="0"><result status="valid" time="0.29" steps="463"/></proof>
    </goal>
    <goal name="recursion_v1.21.9" expl="">
-   <proof prover="1"><result status="valid" time="2.31"/></proof>
+   <proof prover="1"><result status="valid" time="1.60"/></proof>
    </goal>
    <goal name="recursion_v1.21.10" expl="">
    <transf name="split_goal_wp">
@@ -1413,7 +1413,7 @@
     <proof prover="0"><result status="valid" time="0.06" steps="21"/></proof>
     </goal>
     <goal name="recursion_v1.21.10.2" expl="">
-    <proof prover="1"><result status="valid" time="2.71"/></proof>
+    <proof prover="1"><result status="valid" time="1.58"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1423,30 +1423,30 @@
    <goal name="recursion_v1.21.12" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.21.12.1" expl="">
-    <proof prover="1"><result status="valid" time="2.31"/></proof>
+    <proof prover="1"><result status="valid" time="1.49"/></proof>
     </goal>
     <goal name="recursion_v1.21.12.2" expl="">
-    <proof prover="1"><result status="valid" time="2.19"/></proof>
+    <proof prover="1"><result status="valid" time="1.50"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.21.13" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.21.13.1" expl="">
-    <proof prover="1"><result status="valid" time="1.98"/></proof>
+    <proof prover="1"><result status="valid" time="1.50"/></proof>
     </goal>
     <goal name="recursion_v1.21.13.2" expl="">
-    <proof prover="1"><result status="valid" time="2.52"/></proof>
+    <proof prover="1"><result status="valid" time="2.10"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.21.14" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.21.14.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.06" steps="2768"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="1.68" steps="2768"/></proof>
     </goal>
     <goal name="recursion_v1.21.14.2" expl="">
-    <proof prover="1"><result status="valid" time="2.42"/></proof>
+    <proof prover="1"><result status="valid" time="1.50"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1456,7 +1456,7 @@
     <proof prover="0"><result status="valid" time="0.12" steps="24"/></proof>
     </goal>
     <goal name="recursion_v1.21.15.2" expl="">
-    <proof prover="1"><result status="valid" time="1.96"/></proof>
+    <proof prover="1"><result status="valid" time="1.60"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1466,15 +1466,15 @@
     <proof prover="0"><result status="valid" time="0.08" steps="74"/></proof>
     </goal>
     <goal name="recursion_v1.21.16.2" expl="">
-    <proof prover="1"><result status="valid" time="2.84"/></proof>
+    <proof prover="1"><result status="valid" time="3.39"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.21.17" expl="">
-   <proof prover="0"><result status="valid" time="0.30" steps="430"/></proof>
+   <proof prover="0"><result status="valid" time="0.44" steps="430"/></proof>
    </goal>
    <goal name="recursion_v1.21.18" expl="">
-   <proof prover="0"><result status="valid" time="0.07" steps="52"/></proof>
+   <proof prover="0"><result status="valid" time="0.20" steps="52"/></proof>
    </goal>
    <goal name="recursion_v1.21.19" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="3.64" steps="3662"/></proof>
@@ -1483,13 +1483,13 @@
    <proof prover="0"><result status="valid" time="0.30" steps="299"/></proof>
    </goal>
    <goal name="recursion_v1.21.21" expl="">
-   <proof prover="0"><result status="valid" time="0.07" steps="49"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="49"/></proof>
    </goal>
    <goal name="recursion_v1.21.22" expl="">
    <proof prover="0"><result status="valid" time="0.24" steps="206"/></proof>
    </goal>
    <goal name="recursion_v1.21.23" expl="">
-   <proof prover="0"><result status="valid" time="0.08" steps="55"/></proof>
+   <proof prover="0"><result status="valid" time="0.19" steps="55"/></proof>
    </goal>
    <goal name="recursion_v1.21.24" expl="">
    <proof prover="1"><result status="valid" time="2.44"/></proof>
@@ -1522,7 +1522,7 @@
    <proof prover="0" timelimit="5"><result status="valid" time="5.54" steps="6811"/></proof>
    </goal>
    <goal name="recursion_v1.21.34" expl="">
-   <proof prover="0"><result status="valid" time="0.37" steps="605"/></proof>
+   <proof prover="0"><result status="valid" time="0.52" steps="605"/></proof>
    </goal>
    <goal name="recursion_v1.21.35" expl="">
    <transf name="introduce_premises">
@@ -1531,7 +1531,7 @@
      <goal name="recursion_v1.21.35.1.1" expl="">
      <transf name="split_goal_wp">
       <goal name="recursion_v1.21.35.1.1.1" expl="">
-      <proof prover="0"><result status="valid" time="0.47" steps="867"/></proof>
+      <proof prover="0"><result status="valid" time="0.62" steps="867"/></proof>
       </goal>
       <goal name="recursion_v1.21.35.1.1.2" expl="">
       <proof prover="0"><result status="valid" time="0.13" steps="62"/></proof>
@@ -1543,7 +1543,7 @@
       <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
       </goal>
       <goal name="recursion_v1.21.35.1.1.5" expl="">
-      <proof prover="0"><result status="valid" time="0.06" steps="34"/></proof>
+      <proof prover="0"><result status="valid" time="0.17" steps="34"/></proof>
       </goal>
       <goal name="recursion_v1.21.35.1.1.6" expl="">
       <proof prover="0"><result status="valid" time="0.07" steps="31"/></proof>
@@ -1570,7 +1570,7 @@
    </transf>
    </goal>
    <goal name="recursion_v1.21.36" expl="">
-   <proof prover="0"><result status="valid" time="0.22" steps="151"/></proof>
+   <proof prover="0"><result status="valid" time="0.22" steps="152"/></proof>
    </goal>
    <goal name="recursion_v1.21.37" expl="">
    <proof prover="0"><result status="valid" time="0.09" steps="33"/></proof>
@@ -1583,10 +1583,10 @@
   <goal name="recursion_v1.22" expl="">
   <transf name="split_goal_wp">
    <goal name="recursion_v1.22.1" expl="">
-   <proof prover="0"><result status="valid" time="0.09" steps="75"/></proof>
+   <proof prover="0"><result status="valid" time="0.20" steps="75"/></proof>
    </goal>
    <goal name="recursion_v1.22.2" expl="">
-   <proof prover="1"><result status="valid" time="3.03"/></proof>
+   <proof prover="1"><result status="valid" time="2.41"/></proof>
    </goal>
    <goal name="recursion_v1.22.3" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="1.61" steps="2289"/></proof>
@@ -1595,13 +1595,13 @@
    <proof prover="0"><result status="valid" time="1.13" steps="1431"/></proof>
    </goal>
    <goal name="recursion_v1.22.5" expl="">
-   <proof prover="0"><result status="valid" time="1.05" steps="1321"/></proof>
+   <proof prover="0"><result status="valid" time="0.84" steps="1321"/></proof>
    </goal>
    <goal name="recursion_v1.22.6" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="1.46" steps="1733"/></proof>
    </goal>
    <goal name="recursion_v1.22.7" expl="">
-   <proof prover="0"><result status="valid" time="1.37" steps="1485"/></proof>
+   <proof prover="0"><result status="valid" time="0.96" steps="1485"/></proof>
    </goal>
    <goal name="recursion_v1.22.8" expl="">
    <proof prover="0"><result status="valid" time="0.08" steps="62"/></proof>
@@ -1622,7 +1622,7 @@
    <proof prover="0"><result status="valid" time="0.29" steps="380"/></proof>
    </goal>
    <goal name="recursion_v1.22.14" expl="">
-   <proof prover="0"><result status="valid" time="0.89" steps="1037"/></proof>
+   <proof prover="0"><result status="valid" time="0.70" steps="1037"/></proof>
    </goal>
    <goal name="recursion_v1.22.15" expl="">
    <proof prover="0"><result status="valid" time="0.07" steps="20"/></proof>
@@ -1634,13 +1634,13 @@
    <proof prover="0"><result status="valid" time="0.08" steps="34"/></proof>
    </goal>
    <goal name="recursion_v1.22.18" expl="">
-   <proof prover="1"><result status="valid" time="2.42"/></proof>
+   <proof prover="1"><result status="valid" time="1.70"/></proof>
    </goal>
    <goal name="recursion_v1.22.19" expl="">
-   <proof prover="1"><result status="valid" time="3.16"/></proof>
+   <proof prover="1"><result status="valid" time="3.62"/></proof>
    </goal>
    <goal name="recursion_v1.22.20" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.50" steps="892"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.71" steps="892"/></proof>
    </goal>
    <goal name="recursion_v1.22.21" expl="">
    <proof prover="0"><result status="valid" time="0.07" steps="37"/></proof>
@@ -1649,13 +1649,13 @@
    <proof prover="0"><result status="valid" time="0.11" steps="192"/></proof>
    </goal>
    <goal name="recursion_v1.22.23" expl="">
-   <proof prover="0"><result status="valid" time="1.01" steps="1261"/></proof>
+   <proof prover="0"><result status="valid" time="0.76" steps="1261"/></proof>
    </goal>
    <goal name="recursion_v1.22.24" expl="">
    <proof prover="0"><result status="valid" time="0.20" steps="46"/></proof>
    </goal>
    <goal name="recursion_v1.22.25" expl="">
-   <proof prover="0"><result status="valid" time="0.88" steps="913"/></proof>
+   <proof prover="0"><result status="valid" time="0.61" steps="913"/></proof>
    </goal>
    <goal name="recursion_v1.22.26" expl="">
    <proof prover="0"><result status="valid" time="0.12" steps="33"/></proof>
@@ -1700,7 +1700,7 @@
    <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
    </goal>
    <goal name="recursion_v1.22.40" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="2.93" steps="5315"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="5.51" steps="5315"/></proof>
    </goal>
    <goal name="recursion_v1.22.41" expl="">
    <proof prover="0"><result status="valid" time="0.09" steps="50"/></proof>
@@ -1712,7 +1712,7 @@
    <proof prover="0"><result status="valid" time="0.09" steps="91"/></proof>
    </goal>
    <goal name="recursion_v1.22.44" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="7.19" steps="5935"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="7.19" steps="5933"/></proof>
    </goal>
    <goal name="recursion_v1.22.45" expl="">
    <proof prover="0"><result status="valid" time="0.10" steps="122"/></proof>
@@ -1724,7 +1724,7 @@
    <proof prover="0"><result status="valid" time="0.27" steps="259"/></proof>
    </goal>
    <goal name="recursion_v1.22.48" expl="">
-   <proof prover="1"><result status="valid" time="2.94"/></proof>
+   <proof prover="1"><result status="valid" time="2.46"/></proof>
    </goal>
    <goal name="recursion_v1.22.49" expl="">
    <proof prover="1"><result status="valid" time="4.72"/></proof>
@@ -1748,7 +1748,7 @@
    <proof prover="0"><result status="valid" time="0.28" steps="309"/></proof>
    </goal>
    <goal name="recursion_v1.22.56" expl="">
-   <proof prover="0"><result status="valid" time="0.08" steps="85"/></proof>
+   <proof prover="0"><result status="valid" time="0.20" steps="85"/></proof>
    </goal>
    <goal name="recursion_v1.22.57" expl="">
    <proof prover="0"><result status="valid" time="0.19" steps="86"/></proof>
@@ -1757,13 +1757,13 @@
    <proof prover="0"><result status="valid" time="0.19" steps="155"/></proof>
    </goal>
    <goal name="recursion_v1.22.59" expl="">
-   <proof prover="0"><result status="valid" time="0.06" steps="51"/></proof>
+   <proof prover="0"><result status="valid" time="0.18" steps="51"/></proof>
    </goal>
    <goal name="recursion_v1.22.60" expl="">
    <proof prover="0"><result status="valid" time="0.08" steps="46"/></proof>
    </goal>
    <goal name="recursion_v1.22.61" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="5.37" steps="6591"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="6.28" steps="6591"/></proof>
    </goal>
    <goal name="recursion_v1.22.62" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="1.71" steps="2114"/></proof>
@@ -1775,7 +1775,7 @@
    <proof prover="0"><result status="valid" time="0.16" steps="231"/></proof>
    </goal>
    <goal name="recursion_v1.22.65" expl="">
-   <proof prover="0"><result status="valid" time="0.25" steps="529"/></proof>
+   <proof prover="0"><result status="valid" time="0.39" steps="529"/></proof>
    </goal>
    <goal name="recursion_v1.22.66" expl="">
    <proof prover="0"><result status="valid" time="0.10" steps="57"/></proof>
@@ -1841,7 +1841,7 @@
     <proof prover="0"><result status="valid" time="0.14" steps="117"/></proof>
     </goal>
     <goal name="recursion_v1.23.3.15" expl="">
-    <proof prover="1"><result status="valid" time="2.27"/></proof>
+    <proof prover="1"><result status="valid" time="2.83"/></proof>
     </goal>
     <goal name="recursion_v1.23.3.16" expl="">
     <proof prover="0"><result status="valid" time="0.10" steps="132"/></proof>
@@ -1884,7 +1884,7 @@
     <proof prover="0" timelimit="5"><result status="valid" time="0.65" steps="886"/></proof>
     </goal>
     <goal name="recursion_v1.23.4.12" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="5.78" steps="6548"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="7.62" steps="6902"/></proof>
     </goal>
     <goal name="recursion_v1.23.4.13" expl="">
     <proof prover="0"><result status="valid" time="0.14" steps="32"/></proof>
@@ -1909,7 +1909,7 @@
     <proof prover="0"><result status="valid" time="0.17" steps="154"/></proof>
     </goal>
     <goal name="recursion_v1.23.5.5" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.76" steps="2845"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="4.48" steps="2845"/></proof>
     </goal>
     <goal name="recursion_v1.23.5.6" expl="">
     <proof prover="0"><result status="valid" time="0.13" steps="26"/></proof>
@@ -1922,31 +1922,31 @@
    <goal name="recursion_v1.23.6" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.6.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.18" steps="2288"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="1.52" steps="2288"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.2" expl="">
-    <proof prover="1"><result status="valid" time="2.72"/></proof>
+    <proof prover="1"><result status="valid" time="4.12"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.3" expl="">
-    <proof prover="0"><result status="valid" time="0.45" steps="365"/></proof>
+    <proof prover="0"><result status="valid" time="0.65" steps="365"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.4" expl="">
-    <proof prover="0"><result status="valid" time="0.22" steps="374"/></proof>
+    <proof prover="0"><result status="valid" time="0.46" steps="374"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.5" expl="">
-    <proof prover="0"><result status="valid" time="0.25" steps="190"/></proof>
+    <proof prover="0"><result status="valid" time="0.40" steps="190"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.6" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.66" steps="1875"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="3.33" steps="1875"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.7" expl="">
-    <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
+    <proof prover="0"><result status="valid" time="0.22" steps="48"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.8" expl="">
-    <proof prover="0"><result status="valid" time="0.37" steps="520"/></proof>
+    <proof prover="0"><result status="valid" time="0.64" steps="520"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.9" expl="">
-    <proof prover="0"><result status="valid" time="0.31" steps="308"/></proof>
+    <proof prover="0"><result status="valid" time="0.45" steps="308"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.10" expl="">
     <proof prover="0" timelimit="5"><result status="valid" time="1.86" steps="2152"/></proof>
@@ -1955,10 +1955,10 @@
     <proof prover="0"><result status="valid" time="0.29" steps="223"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.12" expl="">
-    <proof prover="1"><result status="valid" time="5.59"/></proof>
+    <proof prover="1"><result status="valid" time="4.04"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.13" expl="">
-    <proof prover="1"><result status="valid" time="8.16"/></proof>
+    <proof prover="1"><result status="valid" time="6.47"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.14" expl="">
     <proof prover="0"><result status="valid" time="0.25" steps="345"/></proof>
@@ -1982,13 +1982,13 @@
     <proof prover="0"><result status="valid" time="0.16" steps="274"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.21" expl="">
-    <proof prover="0"><result status="valid" time="1.23" steps="1065"/></proof>
+    <proof prover="0"><result status="valid" time="0.96" steps="1065"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.22" expl="">
     <proof prover="0"><result status="valid" time="0.15" steps="101"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.23" expl="">
-    <proof prover="1"><result status="valid" time="5.81"/></proof>
+    <proof prover="1"><result status="valid" time="4.62"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.24" expl="">
     <proof prover="0"><result status="valid" time="0.09" steps="60"/></proof>
@@ -2000,28 +2000,28 @@
     <proof prover="0"><result status="valid" time="0.10" steps="53"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.27" expl="">
-    <proof prover="1"><result status="valid" time="3.16"/></proof>
+    <proof prover="1"><result status="valid" time="2.51"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.28" expl="">
     <proof prover="0"><result status="valid" time="0.07" steps="36"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.29" expl="">
-    <proof prover="1"><result status="valid" time="3.23"/></proof>
+    <proof prover="1"><result status="valid" time="2.54"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.30" expl="">
     <proof prover="0"><result status="valid" time="0.44" steps="682"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.31" expl="">
-    <proof prover="1"><result status="valid" time="5.68"/></proof>
+    <proof prover="1"><result status="valid" time="3.73"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.32" expl="">
-    <proof prover="1"><result status="valid" time="3.42"/></proof>
+    <proof prover="1"><result status="valid" time="2.44"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.33" expl="">
     <proof prover="0"><result status="valid" time="0.11" steps="107"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.34" expl="">
-    <proof prover="1"><result status="valid" time="5.41"/></proof>
+    <proof prover="1"><result status="valid" time="6.82"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.35" expl="">
     <proof prover="0"><result status="valid" time="0.51" steps="700"/></proof>
@@ -2063,7 +2063,7 @@
     </transf>
     </goal>
     <goal name="recursion_v1.23.6.37" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.69" steps="651"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.52" steps="651"/></proof>
     </goal>
     <goal name="recursion_v1.23.6.38" expl="">
     <proof prover="0"><result status="valid" time="0.53" steps="481"/></proof>
@@ -2094,7 +2094,7 @@
     <proof prover="0"><result status="valid" time="0.20" steps="184"/></proof>
     </goal>
     <goal name="recursion_v1.23.8.3" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="3.07" steps="2585"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="3.83" steps="2585"/></proof>
     </goal>
     <goal name="recursion_v1.23.8.4" expl="">
     <proof prover="0"><result status="valid" time="0.08" steps="41"/></proof>
@@ -2121,24 +2121,24 @@
     <proof prover="0"><result status="valid" time="0.24" steps="351"/></proof>
     </goal>
     <goal name="recursion_v1.23.8.12" expl="">
-    <proof prover="0" timelimit="20"><result status="valid" time="5.28" steps="6249"/></proof>
+    <proof prover="0" timelimit="20"><result status="valid" time="8.64" steps="6249"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.23.9" expl="">
-   <proof prover="0"><result status="valid" time="0.07" steps="35"/></proof>
+   <proof prover="0"><result status="valid" time="0.24" steps="35"/></proof>
    </goal>
    <goal name="recursion_v1.23.10" expl="">
-   <proof prover="1"><result status="valid" time="2.19"/></proof>
+   <proof prover="1"><result status="valid" time="3.18"/></proof>
    </goal>
    <goal name="recursion_v1.23.11" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="40"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.22" steps="40"/></proof>
    </goal>
    <goal name="recursion_v1.23.12" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="39"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.20" steps="39"/></proof>
    </goal>
    <goal name="recursion_v1.23.13" expl="">
-   <proof prover="0"><result status="valid" time="0.58" steps="868"/></proof>
+   <proof prover="0"><result status="valid" time="0.86" steps="868"/></proof>
    </goal>
    <goal name="recursion_v1.23.14" expl="">
    <transf name="split_goal_wp">
@@ -2152,10 +2152,10 @@
     <proof prover="0"><result status="valid" time="0.37" steps="555"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.4" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.87" steps="6010"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="4.40" steps="6010"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.5" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="5.38" steps="6041"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="4.17" steps="6041"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.6" expl="">
     <proof prover="0"><result status="valid" time="0.23" steps="221"/></proof>
@@ -2206,7 +2206,7 @@
     <proof prover="0"><result status="valid" time="0.27" steps="126"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.22" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.87" steps="2534"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="1.44" steps="2534"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.23" expl="">
     <proof prover="0"><result status="valid" time="0.39" steps="519"/></proof>
@@ -2236,14 +2236,14 @@
     <proof prover="0"><result status="valid" time="0.22" steps="116"/></proof>
     </goal>
     <goal name="recursion_v1.23.14.32" expl="">
-    <proof prover="0"><result status="valid" time="0.66" steps="938"/></proof>
+    <proof prover="0"><result status="valid" time="0.92" steps="938"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.23.15" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.15.1" expl="">
-    <proof prover="0"><result status="valid" time="0.16" steps="274"/></proof>
+    <proof prover="0"><result status="valid" time="0.29" steps="274"/></proof>
     </goal>
     <goal name="recursion_v1.23.15.2" expl="">
     <proof prover="0"><result status="valid" time="0.27" steps="380"/></proof>
@@ -2270,7 +2270,7 @@
     <proof prover="0"><result status="valid" time="0.57" steps="890"/></proof>
     </goal>
     <goal name="recursion_v1.23.15.10" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.50" steps="1180"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.75" steps="1180"/></proof>
     </goal>
     <goal name="recursion_v1.23.15.11" expl="">
     <proof prover="0"><result status="valid" time="0.92" steps="1180"/></proof>
@@ -2325,16 +2325,16 @@
     <proof prover="0"><result status="valid" time="0.40" steps="390"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.12" expl="">
-    <proof prover="1"><result status="valid" time="2.56"/></proof>
+    <proof prover="1"><result status="valid" time="2.93"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.13" expl="">
     <proof prover="0"><result status="valid" time="0.42" steps="377"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.14" expl="">
-    <proof prover="0"><result status="valid" time="0.47" steps="575"/></proof>
+    <proof prover="0"><result status="valid" time="0.63" steps="575"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.15" expl="">
-    <proof prover="0"><result status="valid" time="0.61" steps="941"/></proof>
+    <proof prover="0"><result status="valid" time="0.82" steps="941"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.16" expl="">
     <transf name="introduce_premises">
@@ -2388,7 +2388,7 @@
     <proof prover="0"><result status="valid" time="0.49" steps="873"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.28" expl="">
-    <proof prover="0"><result status="valid" time="0.72" steps="506"/></proof>
+    <proof prover="0"><result status="valid" time="0.96" steps="506"/></proof>
     </goal>
     <goal name="recursion_v1.23.16.29" expl="">
     <proof prover="0"><result status="valid" time="0.19" steps="78"/></proof>
@@ -2398,10 +2398,10 @@
    <goal name="recursion_v1.23.17" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.17.1" expl="">
-    <proof prover="0"><result status="valid" time="0.17" steps="226"/></proof>
+    <proof prover="0"><result status="valid" time="0.32" steps="226"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.2" expl="">
-    <proof prover="0"><result status="valid" time="0.34" steps="302"/></proof>
+    <proof prover="0"><result status="valid" time="0.49" steps="302"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.3" expl="">
     <proof prover="0"><result status="valid" time="0.23" steps="244"/></proof>
@@ -2422,7 +2422,7 @@
     <proof prover="0"><result status="valid" time="0.21" steps="236"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.9" expl="">
-    <proof prover="0"><result status="valid" time="0.49" steps="519"/></proof>
+    <proof prover="0"><result status="valid" time="0.75" steps="519"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.10" expl="">
     <proof prover="0"><result status="valid" time="0.16" steps="36"/></proof>
@@ -2443,24 +2443,24 @@
     <proof prover="0"><result status="valid" time="0.18" steps="122"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.16" expl="">
-    <proof prover="0"><result status="valid" time="0.14" steps="59"/></proof>
+    <proof prover="0"><result status="valid" time="0.26" steps="59"/></proof>
     </goal>
     <goal name="recursion_v1.23.17.17" expl="">
-    <proof prover="0"><result status="valid" time="0.09" steps="55"/></proof>
+    <proof prover="0"><result status="valid" time="0.25" steps="55"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.23.18" expl="">
-   <proof prover="0"><result status="valid" time="0.10" steps="69"/></proof>
+   <proof prover="0"><result status="valid" time="0.22" steps="69"/></proof>
    </goal>
    <goal name="recursion_v1.23.19" expl="">
    <proof prover="0"><result status="valid" time="0.11" steps="54"/></proof>
    </goal>
    <goal name="recursion_v1.23.20" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="3.23" steps="3933"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="4.18" steps="3933"/></proof>
    </goal>
    <goal name="recursion_v1.23.21" expl="">
-   <proof prover="0"><result status="valid" time="0.42" steps="523"/></proof>
+   <proof prover="0"><result status="valid" time="0.60" steps="523"/></proof>
    </goal>
    <goal name="recursion_v1.23.22" expl="">
    <proof prover="0"><result status="valid" time="0.21" steps="57"/></proof>
@@ -2498,7 +2498,7 @@
     <proof prover="0"><result status="valid" time="0.22" steps="86"/></proof>
     </goal>
     <goal name="recursion_v1.23.28.6" expl="">
-    <proof prover="0"><result status="valid" time="0.68" steps="823"/></proof>
+    <proof prover="0"><result status="valid" time="0.88" steps="823"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2560,10 +2560,10 @@
     </goal>
     <goal name="recursion_v1.23.29.19" expl="">
     <proof prover="0"><result status="valid" time="0.25" steps="118"/></proof>
-    <proof prover="1"><result status="valid" time="3.18"/></proof>
+    <proof prover="1"><result status="valid" time="2.45"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.20" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="3.08" steps="2252"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.40" steps="2252"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.21" expl="">
     <proof prover="0"><result status="valid" time="0.12" steps="46"/></proof>
@@ -2599,25 +2599,25 @@
     <proof prover="0"><result status="valid" time="0.18" steps="67"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.32" expl="">
-    <proof prover="0"><result status="valid" time="0.92" steps="756"/></proof>
+    <proof prover="0"><result status="valid" time="0.60" steps="756"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.33" expl="">
     <proof prover="1"><result status="valid" time="3.19"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.34" expl="">
-    <proof prover="1"><result status="valid" time="2.87"/></proof>
+    <proof prover="1"><result status="valid" time="2.21"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.35" expl="">
-    <proof prover="1"><result status="valid" time="2.73"/></proof>
+    <proof prover="1"><result status="valid" time="2.08"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.36" expl="">
     <proof prover="0"><result status="valid" time="0.93" steps="764"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.37" expl="">
-    <proof prover="1"><result status="valid" time="2.84"/></proof>
+    <proof prover="1"><result status="valid" time="2.06"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.38" expl="">
-    <proof prover="1"><result status="valid" time="5.59"/></proof>
+    <proof prover="1"><result status="valid" time="4.14"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.39" expl="">
     <proof prover="0"><result status="valid" time="0.28" steps="58"/></proof>
@@ -2629,7 +2629,7 @@
     <proof prover="0"><result status="valid" time="0.24" steps="66"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.42" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.32" steps="475"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.55" steps="475"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.43" expl="">
     <proof prover="0"><result status="valid" time="0.48" steps="366"/></proof>
@@ -2638,7 +2638,7 @@
     <proof prover="0"><result status="valid" time="0.84" steps="823"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.45" expl="">
-    <proof prover="1"><result status="valid" time="5.32"/></proof>
+    <proof prover="1"><result status="valid" time="4.07"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.46" expl="">
     <proof prover="0"><result status="valid" time="0.27" steps="67"/></proof>
@@ -2686,7 +2686,7 @@
     <proof prover="0"><result status="valid" time="0.25" steps="50"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.61" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.27" steps="1005"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.91" steps="1005"/></proof>
     </goal>
     <goal name="recursion_v1.23.29.62" expl="">
     <proof prover="0"><result status="valid" time="0.26" steps="52"/></proof>
@@ -2740,15 +2740,15 @@
    </transf>
    </goal>
    <goal name="recursion_v1.23.31" expl="">
-   <proof prover="0"><result status="valid" time="0.12" steps="101"/></proof>
+   <proof prover="0"><result status="valid" time="0.26" steps="101"/></proof>
    </goal>
    <goal name="recursion_v1.23.32" expl="">
-   <proof prover="0"><result status="valid" time="0.13" steps="105"/></proof>
+   <proof prover="0"><result status="valid" time="0.28" steps="105"/></proof>
    </goal>
    <goal name="recursion_v1.23.33" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.33.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="3.38" steps="2381"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.93" steps="2381"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.2" expl="">
     <proof prover="0"><result status="valid" time="0.47" steps="344"/></proof>
@@ -2772,10 +2772,10 @@
     <proof prover="1"><result status="valid" time="3.25"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.9" expl="">
-    <proof prover="0"><result status="valid" time="0.81" steps="749"/></proof>
+    <proof prover="0"><result status="valid" time="1.09" steps="749"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.10" expl="">
-    <proof prover="1"><result status="valid" time="3.13"/></proof>
+    <proof prover="1"><result status="valid" time="2.49"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.11" expl="">
     <proof prover="1"><result status="valid" time="3.92"/></proof>
@@ -2835,13 +2835,13 @@
     <proof prover="0"><result status="valid" time="0.24" steps="81"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.30" expl="">
-    <proof prover="0"><result status="valid" time="0.22" steps="228"/></proof>
+    <proof prover="0"><result status="valid" time="0.40" steps="228"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.31" expl="">
     <proof prover="0"><result status="valid" time="0.29" steps="107"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.32" expl="">
-    <proof prover="0"><result status="valid" time="0.17" steps="65"/></proof>
+    <proof prover="0"><result status="valid" time="0.32" steps="65"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.33" expl="">
     <proof prover="0"><result status="valid" time="0.25" steps="62"/></proof>
@@ -2853,10 +2853,10 @@
     <proof prover="0"><result status="valid" time="0.31" steps="119"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.36" expl="">
-    <proof prover="0"><result status="valid" time="0.61" steps="620"/></proof>
+    <proof prover="0"><result status="valid" time="0.79" steps="612"/></proof>
     </goal>
     <goal name="recursion_v1.23.33.37" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.10" steps="2971"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.95" steps="2971"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2875,7 +2875,7 @@
     <proof prover="0"><result status="valid" time="0.73" steps="612"/></proof>
     </goal>
     <goal name="recursion_v1.23.34.5" expl="">
-    <proof prover="0"><result status="valid" time="0.69" steps="883"/></proof>
+    <proof prover="0"><result status="valid" time="0.89" steps="883"/></proof>
     </goal>
     <goal name="recursion_v1.23.34.6" expl="">
     <proof prover="0"><result status="valid" time="0.37" steps="234"/></proof>
@@ -2891,10 +2891,10 @@
     <proof prover="0"><result status="valid" time="0.20" steps="58"/></proof>
     </goal>
     <goal name="recursion_v1.23.35.2" expl="">
-    <proof prover="1"><result status="valid" time="2.56"/></proof>
+    <proof prover="1"><result status="valid" time="1.83"/></proof>
     </goal>
     <goal name="recursion_v1.23.35.3" expl="">
-    <proof prover="1"><result status="valid" time="2.41"/></proof>
+    <proof prover="1"><result status="valid" time="3.14"/></proof>
     </goal>
     <goal name="recursion_v1.23.35.4" expl="">
     <proof prover="0"><result status="valid" time="0.31" steps="81"/></proof>
@@ -2930,7 +2930,7 @@
    </transf>
    </goal>
    <goal name="recursion_v1.23.37" expl="">
-   <proof prover="0"><result status="valid" time="0.13" steps="41"/></proof>
+   <proof prover="0"><result status="valid" time="0.26" steps="41"/></proof>
    </goal>
    <goal name="recursion_v1.23.38" expl="">
    <proof prover="0" timelimit="5"><result status="valid" time="3.10" steps="2556"/></proof>
@@ -2946,7 +2946,7 @@
      <proof prover="0"><result status="valid" time="0.24" steps="171"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.1.3" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="2.28" steps="1701"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="1.85" steps="1701"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.1.4" expl="">
      <proof prover="0"><result status="valid" time="0.21" steps="183"/></proof>
@@ -2961,7 +2961,7 @@
      <proof prover="0"><result status="valid" time="0.09" steps="47"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.1.8" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="1.84" steps="1974"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="1.54" steps="1976"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.1.9" expl="">
      <proof prover="0"><result status="valid" time="0.31" steps="338"/></proof>
@@ -2971,7 +2971,7 @@
     <goal name="recursion_v1.23.39.2" expl="">
     <transf name="split_goal_wp">
      <goal name="recursion_v1.23.39.2.1" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="3.94" steps="2631"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.00" steps="2631"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.2.2" expl="">
      <proof prover="0"><result status="valid" time="0.16" steps="72"/></proof>
@@ -2980,10 +2980,10 @@
      <proof prover="0"><result status="valid" time="0.25" steps="191"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.2.4" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="4.54" steps="3225"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="2.76" steps="3225"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.2.5" expl="">
-     <proof prover="1"><result status="valid" time="5.64"/></proof>
+     <proof prover="1"><result status="valid" time="4.18"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.2.6" expl="">
      <proof prover="0"><result status="valid" time="0.32" steps="333"/></proof>
@@ -3002,7 +3002,7 @@
     <goal name="recursion_v1.23.39.3" expl="">
     <transf name="split_goal_wp">
      <goal name="recursion_v1.23.39.3.1" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="4.20" steps="2650"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="2.76" steps="2650"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.2" expl="">
      <proof prover="0"><result status="valid" time="0.15" steps="72"/></proof>
@@ -3011,7 +3011,7 @@
      <proof prover="0"><result status="valid" time="0.42" steps="276"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.4" expl="">
-     <proof prover="0"><result status="valid" time="0.86" steps="1164"/></proof>
+     <proof prover="0"><result status="valid" time="0.63" steps="1164"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.5" expl="">
      <proof prover="0"><result status="valid" time="0.21" steps="183"/></proof>
@@ -3023,13 +3023,13 @@
      <proof prover="0"><result status="valid" time="0.25" steps="204"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.8" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="5.44" steps="3384"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.74" steps="3384"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.9" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="4.22" steps="3178"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.10" steps="3178"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.10" expl="">
-     <proof prover="0"><result status="valid" time="0.50" steps="458"/></proof>
+     <proof prover="0"><result status="valid" time="0.34" steps="458"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.3.11" expl="">
      <proof prover="0"><result status="valid" time="0.18" steps="46"/></proof>
@@ -3057,28 +3057,28 @@
      <proof prover="0"><result status="valid" time="0.25" steps="181"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.4" expl="">
-     <proof prover="0" timelimit="5"><result status="valid" time="2.73" steps="1817"/></proof>
+     <proof prover="0" timelimit="5"><result status="valid" time="3.20" steps="1817"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.5" expl="">
-     <proof prover="0"><result status="valid" time="0.29" steps="273"/></proof>
+     <proof prover="0"><result status="valid" time="0.47" steps="273"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.6" expl="">
      <proof prover="0" timelimit="5"><result status="valid" time="1.87" steps="1612"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.7" expl="">
-     <proof prover="0"><result status="valid" time="0.34" steps="425"/></proof>
+     <proof prover="0"><result status="valid" time="0.53" steps="425"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.8" expl="">
      <proof prover="0"><result status="valid" time="0.13" steps="41"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.9" expl="">
-     <proof prover="0"><result status="valid" time="0.10" steps="84"/></proof>
+     <proof prover="0"><result status="valid" time="0.26" steps="84"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.10" expl="">
-     <proof prover="1"><result status="valid" time="4.92"/></proof>
+     <proof prover="1"><result status="valid" time="3.33"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.11" expl="">
-     <proof prover="1"><result status="valid" time="3.61"/></proof>
+     <proof prover="1"><result status="valid" time="2.16"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.12" expl="">
      <proof prover="0"><result status="valid" time="0.17" steps="64"/></proof>
@@ -3105,22 +3105,22 @@
      <proof prover="0"><result status="valid" time="0.13" steps="205"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.20" expl="">
-     <proof prover="1"><result status="valid" time="3.79"/></proof>
+     <proof prover="1"><result status="valid" time="1.90"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.21" expl="">
-     <proof prover="1"><result status="valid" time="3.29"/></proof>
+     <proof prover="1"><result status="valid" time="1.78"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.22" expl="">
-     <proof prover="1"><result status="valid" time="3.39"/></proof>
+     <proof prover="1"><result status="valid" time="1.72"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.23" expl="">
-     <proof prover="1"><result status="valid" time="3.28"/></proof>
+     <proof prover="1"><result status="valid" time="1.70"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.24" expl="">
-     <proof prover="1"><result status="valid" time="4.10"/></proof>
+     <proof prover="1"><result status="valid" time="1.74"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.25" expl="">
-     <proof prover="1"><result status="valid" time="3.00"/></proof>
+     <proof prover="1"><result status="valid" time="2.43"/></proof>
      </goal>
      <goal name="recursion_v1.23.39.4.26" expl="">
      <proof prover="1"><result status="valid" time="3.08"/></proof>
@@ -3180,7 +3180,7 @@
    <goal name="recursion_v1.23.40" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.40.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="3.55" steps="1690"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.58" steps="1690"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.2" expl="">
     <proof prover="0"><result status="valid" time="0.16" steps="69"/></proof>
@@ -3189,13 +3189,13 @@
     <proof prover="0"><result status="valid" time="0.25" steps="182"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.4" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="3.45" steps="1809"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.32" steps="1809"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.5" expl="">
-    <proof prover="1"><result status="valid" time="5.88"/></proof>
+    <proof prover="1"><result status="valid" time="4.06"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.6" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.17" steps="1589"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="1.79" steps="1589"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.7" expl="">
     <proof prover="0"><result status="valid" time="0.23" steps="42"/></proof>
@@ -3222,22 +3222,22 @@
     <proof prover="0"><result status="valid" time="0.16" steps="63"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.15" expl="">
-    <proof prover="0"><result status="valid" time="0.58" steps="347"/></proof>
+    <proof prover="0"><result status="valid" time="0.42" steps="347"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.16" expl="">
     <proof prover="0"><result status="valid" time="0.20" steps="38"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.17" expl="">
-    <proof prover="0"><result status="valid" time="0.61" steps="473"/></proof>
+    <proof prover="0"><result status="valid" time="0.44" steps="473"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.18" expl="">
-    <proof prover="1"><result status="valid" time="3.72"/></proof>
+    <proof prover="1"><result status="valid" time="1.81"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.19" expl="">
     <proof prover="1"><result status="valid" time="3.47"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.20" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.75" steps="505"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.46" steps="507"/></proof>
     </goal>
     <goal name="recursion_v1.23.40.21" expl="">
     <proof prover="0"><result status="valid" time="0.10" steps="40"/></proof>
@@ -3253,7 +3253,7 @@
    <goal name="recursion_v1.23.41" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.41.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.82" steps="2451"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.68" steps="2451"/></proof>
     </goal>
     <goal name="recursion_v1.23.41.2" expl="">
     <proof prover="0"><result status="valid" time="0.17" steps="88"/></proof>
@@ -3306,25 +3306,25 @@
    <proof prover="0"><result status="valid" time="0.18" steps="163"/></proof>
    </goal>
    <goal name="recursion_v1.23.49" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.71" steps="1552"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="1.13" steps="1550"/></proof>
    </goal>
    <goal name="recursion_v1.23.50" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.50.1" expl="">
-    <proof prover="1"><result status="valid" time="1.59"/></proof>
+    <proof prover="1"><result status="valid" time="2.77"/></proof>
     </goal>
     <goal name="recursion_v1.23.50.2" expl="">
-    <proof prover="0"><result status="valid" time="0.57" steps="1405"/></proof>
+    <proof prover="0"><result status="valid" time="0.94" steps="1405"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="recursion_v1.23.51" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.51.1" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.46" steps="2682"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.23" steps="2682"/></proof>
     </goal>
     <goal name="recursion_v1.23.51.2" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.34" steps="3973"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="3.44" steps="3973"/></proof>
     </goal>
     <goal name="recursion_v1.23.51.3" expl="">
     <proof prover="0"><result status="valid" time="0.18" steps="142"/></proof>
@@ -3350,16 +3350,16 @@
    <goal name="recursion_v1.23.53" expl="">
    <transf name="split_goal_wp">
     <goal name="recursion_v1.23.53.1" expl="">
-    <proof prover="1"><result status="valid" time="2.89"/></proof>
+    <proof prover="1"><result status="valid" time="2.50"/></proof>
     </goal>
     <goal name="recursion_v1.23.53.2" expl="">
     <proof prover="1"><result status="valid" time="1.93"/></proof>
     </goal>
     <goal name="recursion_v1.23.53.3" expl="">
-    <proof prover="1"><result status="valid" time="2.26"/></proof>
+    <proof prover="1"><result status="valid" time="3.09"/></proof>
     </goal>
     <goal name="recursion_v1.23.53.4" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.96" steps="1794"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.41" steps="1794"/></proof>
     </goal>
     <goal name="recursion_v1.23.53.5" expl="">
     <proof prover="0"><result status="valid" time="0.12" steps="39"/></proof>
@@ -3372,7 +3372,7 @@
     <proof prover="0"><result status="valid" time="0.14" steps="52"/></proof>
     </goal>
     <goal name="recursion_v1.23.54.2" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="2.78" steps="1813"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="2.78" steps="1811"/></proof>
     </goal>
     <goal name="recursion_v1.23.54.3" expl="">
     <proof prover="0"><result status="valid" time="0.15" steps="75"/></proof>
@@ -3415,7 +3415,7 @@
     <proof prover="0"><result status="valid" time="0.09" steps="42"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.3" expl="">
-    <proof prover="0"><result status="valid" time="0.70" steps="1216"/></proof>
+    <proof prover="0"><result status="valid" time="0.94" steps="1214"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.4" expl="">
     <proof prover="0"><result status="valid" time="0.33" steps="386"/></proof>
@@ -3424,16 +3424,16 @@
     <proof prover="0"><result status="valid" time="0.13" steps="42"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.6" expl="">
-    <proof prover="1"><result status="valid" time="2.50"/></proof>
+    <proof prover="1"><result status="valid" time="2.92"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.7" expl="">
     <proof prover="0"><result status="valid" time="0.16" steps="52"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.8" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="4.58" steps="4589"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="6.06" steps="4580"/></proof>
     </goal>
     <goal name="recursion_v1.23.56.9" expl="">
-    <proof prover="0"><result status="valid" time="0.11" steps="59"/></proof>
+    <proof prover="0"><result status="valid" time="0.22" steps="59"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3446,7 +3446,7 @@
     <proof prover="0"><result status="valid" time="0.13" steps="57"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.3" expl="">
-    <proof prover="1"><result status="valid" time="1.69"/></proof>
+    <proof prover="1"><result status="valid" time="3.08"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.4" expl="">
     <proof prover="1"><result status="valid" time="3.04"/></proof>
@@ -3524,7 +3524,7 @@
     <proof prover="0"><result status="valid" time="0.11" steps="69"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.29" expl="">
-    <proof prover="0"><result status="valid" time="0.57" steps="671"/></proof>
+    <proof prover="0"><result status="valid" time="0.57" steps="673"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.30" expl="">
     <proof prover="0"><result status="valid" time="0.09" steps="71"/></proof>
@@ -3539,7 +3539,7 @@
     <proof prover="1"><result status="valid" time="3.37"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.34" expl="">
-    <proof prover="1"><result status="valid" time="4.80"/></proof>
+    <proof prover="1"><result status="valid" time="6.90"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.35" expl="">
     <proof prover="0" timelimit="5"><result status="valid" time="0.23" steps="220"/></proof>
@@ -3560,7 +3560,7 @@
     <proof prover="0"><result status="valid" time="0.19" steps="76"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.41" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="0.79" steps="940"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="0.79" steps="946"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.42" expl="">
     <proof prover="0"><result status="valid" time="0.11" steps="119"/></proof>
@@ -3572,7 +3572,7 @@
     <proof prover="0"><result status="valid" time="0.31" steps="377"/></proof>
     </goal>
     <goal name="recursion_v1.23.57.45" expl="">
-    <proof prover="0" timelimit="5"><result status="valid" time="1.56" steps="2778"/></proof>
+    <proof prover="0" timelimit="5"><result status="valid" time="1.96" steps="2778"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3592,7 +3592,7 @@
    <proof prover="0"><result status="valid" time="0.33" steps="228"/></proof>
    </goal>
    <goal name="recursion_v1.23.63" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="4.47" steps="3249"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="6.96" steps="3249"/></proof>
    </goal>
    <goal name="recursion_v1.23.64" expl="">
    <transf name="split_goal_wp">
@@ -3623,16 +3623,16 @@
    <proof prover="0" timelimit="5"><result status="valid" time="0.12" steps="54"/></proof>
    </goal>
    <goal name="recursion_v1.23.66" expl="">
-   <proof prover="0"><result status="valid" time="0.11" steps="81"/></proof>
+   <proof prover="0"><result status="valid" time="0.27" steps="81"/></proof>
    </goal>
    <goal name="recursion_v1.23.67" expl="">
    <proof prover="0"><result status="valid" time="0.26" steps="222"/></proof>
    </goal>
    <goal name="recursion_v1.23.68" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="1.45" steps="2215"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="2.72" steps="2215"/></proof>
    </goal>
    <goal name="recursion_v1.23.69" expl="">
-   <proof prover="0" timelimit="5"><result status="valid" time="2.30" steps="2684"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="3.70" steps="2562"/></proof>
    </goal>
    <goal name="recursion_v1.23.70" expl="">
    <proof prover="0"><result status="valid" time="0.12" steps="33"/></proof>
@@ -3646,10 +3646,10 @@
   </transf>
   </goal>
   <goal name="recursion_v1.24" expl="">
-  <proof prover="0"><result status="valid" time="0.07" steps="73"/></proof>
+  <proof prover="0"><result status="valid" time="0.20" steps="73"/></proof>
   </goal>
   <goal name="recursion_v1.25" expl="">
-  <proof prover="0"><result status="valid" time="0.40" steps="757"/></proof>
+  <proof prover="0"><result status="valid" time="0.62" steps="757"/></proof>
   </goal>
   <goal name="recursion_v1.26" expl="">
   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
@@ -3674,22 +3674,22 @@
   <proof prover="0"><result status="valid" time="0.07" steps="41"/></proof>
   </goal>
   <goal name="recursion_v2.5" expl="">
-  <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.16" steps="26"/></proof>
   </goal>
   <goal name="recursion_v2.6" expl="">
-  <proof prover="0"><result status="valid" time="0.20" steps="216"/></proof>
+  <proof prover="0"><result status="valid" time="0.33" steps="216"/></proof>
   </goal>
   <goal name="recursion_v2.7" expl="">
-  <proof prover="0"><result status="valid" time="0.08" steps="107"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="107"/></proof>
   </goal>
   <goal name="recursion_v2.8" expl="">
   <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
   </goal>
   <goal name="recursion_v2.9" expl="">
-  <proof prover="0"><result status="valid" time="0.70" steps="898"/></proof>
+  <proof prover="0"><result status="valid" time="1.04" steps="898"/></proof>
   </goal>
   <goal name="recursion_v2.10" expl="">
-  <proof prover="0"><result status="valid" time="0.13" steps="229"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="229"/></proof>
   </goal>
   <goal name="recursion_v2.11" expl="">
   <proof prover="0"><result status="valid" time="0.20" steps="232"/></proof>
@@ -3698,7 +3698,7 @@
   <proof prover="0"><result status="valid" time="0.11" steps="120"/></proof>
   </goal>
   <goal name="recursion_v2.13" expl="">
-  <proof prover="0"><result status="valid" time="0.06" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="89"/></proof>
   </goal>
   <goal name="recursion_v2.14" expl="">
   <proof prover="0"><result status="valid" time="0.10" steps="59"/></proof>
@@ -3707,7 +3707,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="26"/></proof>
   </goal>
   <goal name="recursion_v2.16" expl="">
-  <proof prover="0"><result status="valid" time="0.13" steps="175"/></proof>
+  <proof prover="0"><result status="valid" time="0.25" steps="175"/></proof>
   </goal>
   <goal name="recursion_v2.17" expl="">
   <proof prover="1"><result status="valid" time="1.32"/></proof>
