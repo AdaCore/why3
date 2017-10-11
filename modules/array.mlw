@@ -112,7 +112,9 @@ module Array
         a[ofs2 + k] <- a[ofs1 + k]
       done
 
-  val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
+(* FIXME: this ghost val seems just a bad hack to accept some examples from old system
+*)
+val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
     ensures { result.length = a.length }
     ensures { result.elts = a.elts[i <- v] }
 

@@ -37,14 +37,10 @@ module ArraySum
       if [i < j] then [sum a i j = a[i] + sum a (i+1) j]
 
   *)
-  function sum (array int) int int : int
-
-  axiom sum_def_empty :
-    forall a : array int, i j : int. j <= i -> sum a i j = 0
-
-  axiom sum_def_non_empty :
-    forall a: array int, i j : int. i < j /\ 0 <= i < a.length ->
-      sum a i j = a[i] + sum a (i+1) j
+  let rec function sum (a:array int) (i j:int) : int 
+   requires { 0 <= i <= j <= a.length }
+   variant { j - i }
+   = if j <= i then 0 else a[i] + sum a (i+1) j
 
   (** lemma for summation from the right:
 
@@ -339,6 +335,7 @@ module CumulativeTree
      ensures { forall k. 0 <= k < a.length /\ k <> i -> a[k] = (old a)[k] }
      ensures { is_tree_for result a 0 a.length }
   = let t,_ = update_aux t i a v in
+    assert { is_tree_for t a[i <- v] 0 a.length };
     a[i] <- v;
     t
 
