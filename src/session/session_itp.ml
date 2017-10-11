@@ -1592,7 +1592,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
     mk_proof_node ~version:s.session_shape_version ~expl
                   s name task parent id;
   in
-  let tasks = List.rev (Task.split_theory th None None) in
+  let tasks = Task.split_theory th None None in
   let goalsID = List.map (fun _ -> gen_proofNodeID s) tasks in
   let theory = { theory_name = th.Theory.th_name;
                  theory_checksum = None;
