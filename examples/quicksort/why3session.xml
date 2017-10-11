@@ -2,265 +2,265 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../quicksort.mlw" expanded="true">
-<theory name="Quicksort" sum="c814c7c618609261d9939909d0be8af0" expanded="true">
- <goal name="VC quick_rec" expl="VC for quick_rec" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC quick_rec.1" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../quicksort.mlw" proved="true">
+<theory name="Quicksort" proved="true" sum="f6b6fdce415e85e9d720257121352238">
+ <goal name="VC quicksort" expl="VC for quicksort" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+ </goal>
+ <goal name="VC quick_rec" expl="VC for quick_rec" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC quick_rec.0" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC quick_rec.2" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <goal name="VC quick_rec.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC quick_rec.3" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC quick_rec.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC quick_rec.4" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="VC quick_rec.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC quick_rec.5" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="VC quick_rec.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC quick_rec.6" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC quick_rec.5" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC quick_rec.7" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.8" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC quick_rec.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC quick_rec.9" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="50"/></proof>
+  <goal name="VC quick_rec.8" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
-  <goal name="VC quick_rec.10" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.06" steps="142"/></proof>
+  <goal name="VC quick_rec.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="142"/></proof>
   </goal>
-  <goal name="VC quick_rec.11" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.08" steps="177"/></proof>
+  <goal name="VC quick_rec.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="177"/></proof>
   </goal>
-  <goal name="VC quick_rec.12" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="141"/></proof>
+  <goal name="VC quick_rec.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="141"/></proof>
   </goal>
-  <goal name="VC quick_rec.13" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC quick_rec.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC quick_rec.14" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC quick_rec.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC quick_rec.15" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="VC quick_rec.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC quick_rec.16" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="VC quick_rec.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC quick_rec.17" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC quick_rec.16" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC quick_rec.18" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.21" steps="412"/></proof>
+  <goal name="VC quick_rec.17" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="412"/></proof>
   </goal>
-  <goal name="VC quick_rec.19" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC quick_rec.18" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC quick_rec.20" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="VC quick_rec.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC quick_rec.21" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.23" steps="445"/></proof>
+  <goal name="VC quick_rec.20" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.23" steps="445"/></proof>
   </goal>
-  <goal name="VC quick_rec.22" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.21" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.23" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.22" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.24" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.28" steps="500"/></proof>
+  <goal name="VC quick_rec.23" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.28" steps="500"/></proof>
   </goal>
-  <goal name="VC quick_rec.25" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.04" steps="188"/></proof>
+  <goal name="VC quick_rec.24" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="188"/></proof>
   </goal>
-  <goal name="VC quick_rec.26" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.11" steps="232"/></proof>
+  <goal name="VC quick_rec.25" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="232"/></proof>
   </goal>
-  <goal name="VC quick_rec.27" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.17" steps="442"/></proof>
+  <goal name="VC quick_rec.26" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="442"/></proof>
   </goal>
-  <goal name="VC quick_rec.28" expl="out of loop bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="VC quick_rec.27" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC quick_rec.29" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC quick_rec.28" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC quick_rec.30" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.29" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC quicksort" expl="VC for quicksort">
- <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
+</theory>
+<theory name="Shuffle" proved="true" sum="f9ccbfe5351a6469576b3b7242ebcaaf">
+ <goal name="VC shuffle" expl="VC for shuffle" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="53"/></proof>
  </goal>
 </theory>
-<theory name="Shuffle" sum="1956f32bc3da0f76bbc5e1b38d1e6b7b" expanded="true">
- <goal name="VC shuffle" expl="VC for shuffle" expanded="true">
- <proof prover="1"><result status="valid" time="0.01" steps="55"/></proof>
+<theory name="QuicksortWithShuffle" proved="true" sum="99534a12f4896fd6b91f30aa9e128637">
+ <goal name="VC qs" expl="VC for qs" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
 </theory>
-<theory name="QuicksortWithShuffle" sum="eac37347cbafe51f99e085923ac7a8f1">
- <goal name="VC qs" expl="VC for qs">
- <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+<theory name="Quicksort3way" proved="true" sum="9dffea094386ac2d15112cfaf0ab73e6">
+ <goal name="VC qs" expl="VC for qs" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
-</theory>
-<theory name="Quicksort3way" sum="65cfeacb4dd82330c0b55858fe27b6f9">
- <goal name="VC quick_rec" expl="VC for quick_rec">
- <proof prover="1"><result status="valid" time="3.51" steps="6499"/></proof>
- <transf name="split_goal_wp">
-  <goal name="VC quick_rec.1" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="VC quicksort" expl="VC for quicksort" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
+ </goal>
+ <goal name="VC quick_rec" expl="VC for quick_rec" proved="true">
+ <proof prover="0"><result status="valid" time="3.51" steps="6499"/></proof>
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC quick_rec.0" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC quick_rec.2" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="VC quick_rec.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC quick_rec.3" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="VC quick_rec.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC quick_rec.4" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="VC quick_rec.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC quick_rec.5" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="VC quick_rec.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC quick_rec.6" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC quick_rec.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC quick_rec.7" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC quick_rec.6" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC quick_rec.8" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="VC quick_rec.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.9" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC quick_rec.8" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC quick_rec.10" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="VC quick_rec.9" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.11" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.12" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.06" steps="136"/></proof>
+  <goal name="VC quick_rec.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="136"/></proof>
   </goal>
-  <goal name="VC quick_rec.13" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.08" steps="174"/></proof>
+  <goal name="VC quick_rec.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="174"/></proof>
   </goal>
-  <goal name="VC quick_rec.14" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.06" steps="147"/></proof>
+  <goal name="VC quick_rec.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="147"/></proof>
   </goal>
-  <goal name="VC quick_rec.15" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="131"/></proof>
+  <goal name="VC quick_rec.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="131"/></proof>
   </goal>
-  <goal name="VC quick_rec.16" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="VC quick_rec.15" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC quick_rec.17" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
+  <goal name="VC quick_rec.16" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC quick_rec.18" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <goal name="VC quick_rec.17" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="VC quick_rec.19" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.18" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.20" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.19" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC quick_rec.21" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05" steps="133"/></proof>
+  <goal name="VC quick_rec.20" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="133"/></proof>
   </goal>
-  <goal name="VC quick_rec.22" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05" steps="128"/></proof>
+  <goal name="VC quick_rec.21" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="128"/></proof>
   </goal>
-  <goal name="VC quick_rec.23" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.06" steps="128"/></proof>
+  <goal name="VC quick_rec.22" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="128"/></proof>
   </goal>
-  <goal name="VC quick_rec.24" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="130"/></proof>
+  <goal name="VC quick_rec.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="130"/></proof>
   </goal>
-  <goal name="VC quick_rec.25" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC quick_rec.24" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC quick_rec.26" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="VC quick_rec.25" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC quick_rec.27" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC quick_rec.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC quick_rec.28" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="VC quick_rec.27" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC quick_rec.29" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="24"/></proof>
+  <goal name="VC quick_rec.28" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
-  <goal name="VC quick_rec.30" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC quick_rec.29" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC quick_rec.31" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.01" steps="47"/></proof>
+  <goal name="VC quick_rec.30" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="47"/></proof>
   </goal>
-  <goal name="VC quick_rec.32" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC quick_rec.31" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC quick_rec.33" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="VC quick_rec.32" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC quick_rec.34" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.05" steps="164"/></proof>
+  <goal name="VC quick_rec.33" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="164"/></proof>
   </goal>
-  <goal name="VC quick_rec.35" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="VC quick_rec.34" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="VC quick_rec.36" expl="precondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="VC quick_rec.35" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC quick_rec.37" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.08" steps="248"/></proof>
+  <goal name="VC quick_rec.36" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="248"/></proof>
   </goal>
-  <goal name="VC quick_rec.38" expl="assertion">
-  <proof prover="1"><result status="valid" time="0.02" steps="97"/></proof>
+  <goal name="VC quick_rec.37" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="97"/></proof>
   </goal>
-  <goal name="VC quick_rec.39" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.05" steps="148"/></proof>
+  <goal name="VC quick_rec.38" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="148"/></proof>
   </goal>
-  <goal name="VC quick_rec.40" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.04" steps="179"/></proof>
+  <goal name="VC quick_rec.39" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="179"/></proof>
   </goal>
-  <goal name="VC quick_rec.41" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="VC quick_rec.40" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC quick_rec.42" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="VC quick_rec.41" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC quicksort" expl="VC for quicksort">
- <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
- </goal>
- <goal name="VC qs" expl="VC for qs">
- <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
- </goal>
 </theory>
-<theory name="Test" sum="6eaef82fdbe33e9646fe86a152df71b6">
- <goal name="VC test1" expl="VC for test1">
- <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+<theory name="Test" proved="true" sum="881c576ce30024f1d46377a931073e2c">
+ <goal name="VC bench" expl="VC for bench" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
  </goal>
- <goal name="VC test2" expl="VC for test2">
- <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
+ <goal name="VC test2" expl="VC for test2" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
  </goal>
- <goal name="VC bench" expl="VC for bench">
- <proof prover="1"><result status="valid" time="0.00" steps="28"/></proof>
+ <goal name="VC test1" expl="VC for test1" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
 </theory>
 </file>
