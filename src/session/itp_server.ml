@@ -938,7 +938,8 @@ end
             let b = add_file cont f in
             if b then
               let file = get_file cont.controller_session fn in
-              init_and_send_file file
+              init_and_send_file file;
+              read_and_send (file_name file)
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
