@@ -129,7 +129,7 @@ let files : string Queue.t = Queue.create ()
 
 let opt_parser = ref None
 
-let spec = Arg.align [
+let spec = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),

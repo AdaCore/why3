@@ -43,10 +43,7 @@ let cmdline_split s =
     | '\\' -> cstate := Escape
     | c when is_blank c ->
         let n = Queue.length cur_arg in
-        let s = Strings.create n in
-        for i = 0 to pred n do
-          Strings.set s i (Queue.take cur_arg)
-        done;
+        let s = String.init n (fun _ -> Queue.take cur_arg) in
         argv := s :: !argv;
         cstate := Blank
     | c -> Queue.add c cur_arg

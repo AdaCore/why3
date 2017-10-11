@@ -477,15 +477,18 @@ dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 
-# js_of_ocaml
-
-JSOFOCAML=$(ocamlfind query js_of_ocaml)
-
-if test -z "$JSOFCAML"; then
-   HASJSOFOCAML=no
-   reason_jsofocaml=" (js_of_ocaml not found)"
+# checking for js_of_ocaml
+if test "$USEOCAMLFIND" = yes; then
+   JSOFOCAML=$(ocamlfind query js_of_ocaml)
+   if test -z "$JSOFOCAML"; then
+      HASJSOFOCAML=no
+      reason_jsofocaml=" (js_of_ocaml not found)"
+   else
+      HASJSOFOCAML=yes
+   fi
 else
-   HASJSOFOCAML=yes
+   HASJSOFOCAML=no
+   reason_jsofocaml=" (ocamlfind not available)"
 fi
 
 # Coq

@@ -9,9 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
+#13 "src/session/compress_z.ml"
 let compression_supported = true
 
-module type S = sig 
+module type S = sig
 
 type out_channel
 
@@ -19,7 +20,7 @@ val open_out: string -> out_channel
 
 val output_char: out_channel -> char -> unit
 
-val output: out_channel -> string -> int -> int -> unit
+val output_substring: out_channel -> string -> int -> int -> unit
 
 val output_string: out_channel -> string -> unit
 
@@ -29,9 +30,9 @@ type in_channel
 
 val open_in: string -> in_channel
 
-val input: in_channel -> string -> int -> int -> int
+val input: in_channel -> bytes -> int -> int -> int
 
-val really_input: in_channel -> string -> int -> int -> unit
+val really_input: in_channel -> bytes -> int -> int -> unit
 
 val input_char: in_channel -> char
 
@@ -50,9 +51,9 @@ let open_out fn = Gzip.open_out ~level:6 fn
 
 let output_char = Gzip.output_char
 
-let output = Gzip.output
+let output_substring = Gzip.output_substring
 
-let output_string ch s = output ch s 0 (String.length s)
+let output_string ch s = output_substring ch s 0 (String.length s)
 
 let close_out = Gzip.close_out
 

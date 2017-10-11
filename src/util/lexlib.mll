@@ -98,10 +98,10 @@ and string = parse
         let nb = ref 0 in
         String.iter (fun c -> if c = '_' then incr nb) s;
         !nb in
-      let t = Strings.create (String.length s - count) in
+      let t = Bytes.create (String.length s - count) in
       let i = ref 0 in
-      String.iter (fun c -> if c <> '_' then (Strings.set t !i c; incr i)) s;
-      t
+      String.iter (fun c -> if c <> '_' then (Bytes.set t !i c; incr i)) s;
+      Bytes.unsafe_to_string t
     end else s
 
 }

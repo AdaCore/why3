@@ -81,7 +81,7 @@ let send_request = Protocol_shell.send_request
 (* files of the current task *)
 let files = Queue.create ()
 
-let spec = Arg.align []
+let spec = []
 
 (* --help *)
 let usage_str = Format.sprintf

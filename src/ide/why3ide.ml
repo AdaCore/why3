@@ -165,7 +165,7 @@ module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 let files : string Queue.t = Queue.create ()
 let opt_parser = ref None
 
-let spec = Arg.align [
+let spec = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
@@ -794,7 +794,7 @@ let task_view =
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 2 in
+  let n = ref 1 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -869,11 +869,31 @@ let monitor =
 
 let command_entry = GEdit.entry ~packing:hbox22221#add ()
 
-(* Part 2.2.2.2.2 contains message returned by the IDE/server *)
+(* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
+let messages_notebook = GPack.notebook ~packing:vbox2222#add ()
+
+let error_page,error_view =
+  let label = GMisc.label ~text:"Messages" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let log_page,log_view =
+  let label = GMisc.label ~text:"Log" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
 let message_zone =
   let sv = GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~shadow_type:`ETCHED_OUT ~packing:vbox2222#add ()
+      ~shadow_type:`ETCHED_OUT ~packing:error_view#add ()
+  in
+  GText.view ~editable:false ~cursor_visible:false
+    ~packing:sv#add ()
+
+let log_zone =
+  let sv = GBin.scrolled_window
+      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+      ~shadow_type:`ETCHED_OUT ~packing:log_view#add ()
   in
   GText.view ~editable:false ~cursor_visible:false
     ~packing:sv#add ()
@@ -884,19 +904,20 @@ let message_zone_error_tag = message_zone#buffer#create_tag
 
 (**** Message-zone printing functions *****)
 
+let add_to_log mark s =
+  log_zone#buffer#insert ("\n--------["^ mark ^"]--------\n");
+  log_zone#buffer#insert s;
+  log_zone#scroll_to_mark `INSERT
+
 (* Function used to print stuff on the message_zone *)
-let print_message fmt =
+let print_message ~kind ~mark fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
-              message_zone#buffer#set_text s)
+              add_to_log mark s;
+              if kind>0 then message_zone#buffer#set_text s)
     str_formatter
     fmt
 
-(*let add_to_msg_zone s =
-  let s = message_zone#buffer#get_text () ^ "\n" ^ s in
-  message_zone#buffer#set_text s;
-  message_zone#scroll_to_mark `INSERT
- *)
 
 (**** Monitor *****)
 
@@ -1000,10 +1021,6 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
-(* TODO Do we want an option to choose if we aggressivily switch to the correct
-   source location each time we receive locations with task or not *)
-let always_scroll = false
-
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ~color loc =
@@ -1015,18 +1032,18 @@ let color_loc ~color loc =
   with
   | Nosourceview _ ->
       (* If the file is not present do nothing *)
-      ()
+      print_message ~kind:0 ~mark:"color_loc" "%s" "No source view yet"
 
 (* Scroll to a specific locations *)
-let scroll_to_loc loc_of_goal =
+let scroll_to_loc ~force_tab_switch loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some (loc, _) ->
     let f, l, _, _ = Loc.get loc in
     try
       let (n, v, _, _) = get_source_view_table f in
-      if always_scroll then
-        notebook#goto_page n;
+      if force_tab_switch then
+        (eprintf "tab switch to page %d@." n; notebook#goto_page n);
       move_to_line ~yalign:0.0 v l
     with Nosourceview _ -> ()
 
@@ -1043,7 +1060,7 @@ let apply_loc_on_source (l: (Loc.position * color) list) =
     try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
     with Not_found -> None
   in
-  scroll_to_loc loc_of_goal
+  scroll_to_loc ~force_tab_switch:false loc_of_goal
 
 (*******************)
 (* The "View" menu *)
@@ -1319,16 +1336,19 @@ let (_ : GtkSignal.id) =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)                        -> print_message "Proof_error: %s" s
+  | Proof_error (_id, s)                        ->
+     print_message ~kind:1 ~mark:"[Proof_error]" "%s" s
   | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
-        print_message "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
+        print_message ~kind:1 ~mark:"Transformation Error"
+                      "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
       else
         begin
           let buf = message_zone#buffer in
           (* remove all coloration in message_zone *)
           buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
-          print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
+          print_message ~kind:1 ~mark:"Transformation Error"
+                        "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
           let color = "error" in
           let _, _, beg_char, end_char = Loc.get loc in
@@ -1338,19 +1358,27 @@ let treat_message_notification msg = match msg with
             ~stop:(start#forward_chars end_char)
             color
         end
-  | Strat_error (_id, s)                        -> print_message "Strat_error: %s" s
-  | Replay_Info s                               -> print_message "Replay_info: %s" s
-  | Query_Info (_id, s)                         -> print_message "Query_info: %s" s
-  | Query_Error (_id, s)                        -> print_message "Query_error: %s" s
-  | Help s                                      -> print_message "Help: %s" s
-  | Information s                               -> print_message "Information: %s" s
-  | Task_Monitor (t, s, r)                      -> update_monitor t s r
-  | Open_File_Error s                           -> print_message "Open_File_Error: %s" s
-  | Parse_Or_Type_Error (loc, s)                ->
+  | Strat_error (_id, s) ->
+     print_message ~kind:1 ~mark:"Strat_error" "%s" s
+  | Replay_Info s ->
+     print_message ~kind:0 ~mark:"Replay_info" "%s" s
+  | Query_Info (_id, s) ->
+     print_message ~kind:1 ~mark:"Query_info" "%s" s
+  | Query_Error (_id, s) ->
+     print_message ~kind:1 ~mark:"Query_error" "%s" s
+  | Help s ->
+     print_message ~kind:1 ~mark:"Help" "%s" s
+  | Information s ->
+     print_message ~kind:1 ~mark:"Information" "%s" s
+  | Task_Monitor (t, s, r) -> update_monitor t s r
+  | Open_File_Error s ->
+     print_message ~kind:0 ~mark:"Open_File_Error" "%s" s
+  | Parse_Or_Type_Error (loc, s) ->
     begin
       (* TODO find a new color *)
+      scroll_to_loc ~force_tab_switch:true (Some (loc,0));
       color_loc ~color:Goal_color loc;
-      print_message "Parse_Or_Type_Error: %s" s
+      print_message ~kind:1 ~mark:"Parse_Or_Type_Error]" "%s" s
     end
   | File_Saved f                 ->
     begin
@@ -1358,13 +1386,14 @@ let treat_message_notification msg = match msg with
         let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
         b := false;
         update_label_saved l;
-        print_message "%s was saved" f
+        print_message ~kind:1 ~mark:"File_Saved" "%s was saved" f
       with
       | Not_found                ->
-          print_message "Please report: %s was not found in IDE but was saved in session" f
+          print_message ~kind:1 ~mark:"File_Saved"
+                        "Please report: %s was not found in IDE but was saved in session" f
     end
   | Error s                      ->
-     print_message "Request failed: %s" s
+     print_message ~kind:1 ~mark:"General request failure" "%s" s
 
 
 (***********************)
@@ -1733,7 +1762,8 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Remove_subtree id)
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Remove_subtree error"
+                        "Select only one node to perform the remove node action");
   connect_menu_item
     edit_menu_item
     ~callback:(fun () ->
@@ -1741,7 +1771,8 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Command_req (id,"edit"))
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Edit error"
+                        "Select only one node to perform the edit action");
   connect_menu_item
     mark_obsolete_item
     ~callback:(fun () ->
@@ -1749,7 +1780,8 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Mark_obsolete_req id)
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
+                        "Select only one node to perform the mark obsolete action");
   connect_menu_item
     focus_item
     ~callback:(fun () ->
@@ -1760,7 +1792,8 @@ let () =
           (* TODO not efficient *)
           clear_tree_and_table goals_model;
           send_request (Get_Session_Tree_req);
-      | _ -> print_message "Select only one node to perform this action");
+      | _ -> print_message ~kind:1 ~mark:"Focus_req error"
+                        "Select only one node to perform the focus action");
   connect_menu_item
     unfocus_item
     ~callback:(fun () ->
@@ -1844,7 +1877,8 @@ let treat_notification n =
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
-      print_message "Session saved.";
+      print_message ~kind:1 ~mark:"Saved action info"
+                        "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
   | Message (msg)                 -> treat_message_notification msg
@@ -1866,7 +1900,8 @@ let treat_notification n =
       | Not_found -> create_source_view file_name content
     end
   | Dead _ ->
-     print_message "Serveur sent an unexpected notification '%a'. Please report."
+     print_message ~kind:1 ~mark:"Server Dead ?"
+                        "Server sent the notification '%a'. Please report."
         print_notify n
   end;
   ()
