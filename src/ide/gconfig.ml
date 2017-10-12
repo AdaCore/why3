@@ -40,6 +40,7 @@ type t =
       mutable default_prover : string; (* "" means none *)
       mutable default_editor : string;
       mutable intro_premises : bool;
+      mutable show_full_context : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -74,6 +75,7 @@ type ide = {
   ide_current_tab : int;
   ide_verbose : int;
   ide_intro_premises : bool;
+  ide_show_full_context : bool;
   ide_show_labels : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
@@ -99,6 +101,7 @@ let default_ide =
     ide_current_tab = 0;
     ide_verbose = 0;
     ide_intro_premises = true;
+    ide_show_full_context = false;
     ide_show_labels = false;
     ide_show_locs = false;
     ide_show_time_limit = false;
@@ -134,6 +137,9 @@ let load_ide section =
     ide_intro_premises =
       get_bool section ~default:default_ide.ide_intro_premises
         "intro_premises";
+    ide_show_full_context =
+      get_bool section ~default:default_ide.ide_show_full_context
+        "show_full_context";
     ide_show_labels =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
     ide_show_locs =
@@ -197,6 +203,7 @@ let load_config config original_config =
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
+    show_full_context= ide.ide_show_full_context ;
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
@@ -245,6 +252,7 @@ let save_config t =
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
+  let ide = set_bool ide "show_full_context" t.show_full_context in
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
@@ -791,6 +799,15 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
     intropremises#connect#toggled ~callback:
       (fun () -> c.intro_premises <- not c.intro_premises)
   in
+  let showfullcontext =
+    GButton.check_button ~label:"show full task context"
+      ~packing:display_options_box#add ()
+      ~active:c.show_full_context
+  in
+  let (_ : GtkSignal.id) =
+    showfullcontext#connect#toggled ~callback:
+      (fun () -> c.show_full_context <- not c.show_full_context)
+  in
   let showlabels =
     GButton.check_button
       ~label:"show labels in formulas"
@@ -1263,6 +1280,6 @@ let uninstalled_prover c eS unknown =
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.opt"
 End:
 *)

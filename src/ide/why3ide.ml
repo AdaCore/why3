@@ -1262,7 +1262,8 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         let b = gconfig.intro_premises in
-        send_request (Get_task(id,b, true))
+        let c = gconfig.show_full_context in
+        send_request (Get_task(id,b,c,true))
     | NProofAttempt ->
        let (pa, _obs, _l) = Hint.find node_id_pa id in
        let output_text =
@@ -1289,7 +1290,8 @@ let on_selected_row r =
        counterexample_view#scroll_to_mark `INSERT
     | _ ->
        let b = gconfig.intro_premises in
-       send_request (Get_task(id,b,true))
+       let c = gconfig.show_full_context in
+       send_request (Get_task(id,b,c,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
