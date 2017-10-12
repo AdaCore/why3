@@ -1,5 +1,8 @@
 theory Why3_BV
-imports Why3_Int "~~/src/HOL/Word/Word" "~~/src/HOL/Word/Bit_Comparison"
+imports
+  Why3_Int
+  "HOL-Word.Word"
+  "HOL-Word.Bit_Comparison"
 begin
 
 abbreviation (input) pow2 :: "int \<Rightarrow> int"
@@ -120,7 +123,7 @@ lemma rotater1_rotater_swap: "rotater1 (rotater n xs) = rotater n (rotater1 xs)"
   by (simp add: rotater_def funpow_swap1)
 
 lemma length_rotater1 [simp]: "length (rotater1 xs) = length xs"
-  by (simp add: rotater1_def split add: list.split)
+  by (simp add: rotater1_def split: list.split)
 
 lemma rotater1_nth:
   assumes "0 < length xs"
@@ -151,7 +154,7 @@ next
 qed
 
 lemma uint_pow: "uint ((b::'a::len word) ^ n) = uint b ^ n mod 2 ^ len_of TYPE('a)"
-  by (induct n) (simp_all add: mod_pos_pos_trivial uint_word_ariths pull_mods)
+  by (induct n) (simp_all add: mod_pos_pos_trivial uint_word_ariths mod_mult_right_eq)
 
 
 lemma eq_sub_equiv_aux:
@@ -172,10 +175,10 @@ lemma eq_sub_equiv_aux:
 lemma int_minus_mod: "((i::int) - j) mod n = (i + (n - j mod n)) mod n"
 proof -
   have "(i + (n - j mod n)) mod n = (i mod n + (n - j mod n) mod n) mod n"
-    by (simp only: pull_mods(1))
+    by (simp only: mod_add_eq)
   also have "(n - j mod n) mod n = (n mod n - j mod n) mod n"
-    by (simp add: pull_mods)
-  finally show ?thesis by (simp add: pull_mods)
+    by simp
+  finally show ?thesis by (simp add: pull_mods [symmetric])
 qed
 
 lemma nat_minus_mod:
@@ -185,7 +188,7 @@ proof -
   have "((n - i mod n) + i) mod n = (i + (n - i mod n)) mod n"
     by (simp add: add_ac)
   also have "\<dots> = (i mod n + (n - i mod n)) mod n"
-    by (simp add: pull_mods)
+    by (simp add: pull_mods [symmetric])
   also from assms have "\<dots> = (n mod n + (i mod n - i mod n)) mod n"
     by (simp add: add_ac)
   finally show ?thesis by simp
@@ -198,7 +201,7 @@ proof -
   have "(i + (n - j mod n) + j) mod n = (i + ((n - j mod n) + j)) mod n"
     by (simp add: add_ac)
   also have "\<dots> = (i mod n + ((n - j mod n) + j) mod n) mod n"
-    by (simp add: pull_mods)
+    by (simp add: pull_mods [symmetric])
   also note nat_minus_mod [OF assms]
   finally show ?thesis by simp
 qed
@@ -245,7 +248,7 @@ definition eq_sub_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a wor
     (b AND (mask (unat n) << unat i) = a AND (mask (unat n) << unat i))"
 
 definition size_bv :: "'a::len word" where
-  "size_bv = of_nat (len_of TYPE('a))"
+  "size_bv = of_nat LENGTH('a)"
 
 type_synonym word8 = "8 word"
 
@@ -262,7 +265,7 @@ why3_open "bv/BV8.xml"
     neg=uminus
     mul=times
     udiv=divide
-    urem=mod
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -428,7 +431,7 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods)
+    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
 
 why3_vc Extensionality
   using assms
@@ -458,7 +461,7 @@ why3_open "bv/BV16.xml"
     neg=uminus
     mul=times
     udiv=divide
-    urem=mod
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -624,7 +627,7 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods)
+    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
 
 why3_vc Extensionality
   using assms
@@ -654,7 +657,7 @@ why3_open "bv/BV32.xml"
     neg=uminus
     mul=times
     udiv=divide
-    urem=mod
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -820,7 +823,7 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods)
+    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
 
 why3_vc Extensionality
   using assms
@@ -850,7 +853,7 @@ why3_open "bv/BV64.xml"
     neg=uminus
     mul=times
     udiv=divide
-    urem=mod
+    urem=modulo
     lsr=lsr
     asr=asr
     lsl=lsl
@@ -1016,7 +1019,7 @@ why3_vc lsl_bv_is_lsl by (simp add: unat_def)
 
 why3_vc to_uint_lsl
   by (simp add: emod_def shiftl_t2n unat_def
-    uint_word_ariths mult_ac uint_pow pull_mods)
+    uint_word_ariths mult_ac uint_pow pull_mods [symmetric])
 
 why3_vc Extensionality
   using assms

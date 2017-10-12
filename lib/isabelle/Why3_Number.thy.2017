@@ -1,7 +1,7 @@
 theory Why3_Number
 imports
   Why3_Int
-  "~~/src/HOL/Number_Theory/Primes"
+  "HOL-Computational_Algebra.Primes"
 begin
 
 section {* Parity properties *}
@@ -81,7 +81,7 @@ why3_vc divides_bounds using assms by (simp add: dvd_imp_le_int)
 
 why3_vc mod_divides_euclidean
   using assms
-  by (auto simp add: emod_def split add: split_if_asm)
+  by (auto simp add: emod_def split: if_split_asm)
 
 why3_vc divides_mod_euclidean
   using assms
@@ -91,7 +91,7 @@ why3_vc mod_divides_computer
   using assms
   by (auto simp add: cmod_def zabs_def sgn_0_0 zmod_zminus1_eq_if
     not_sym [OF less_imp_neq [OF pos_mod_bound]]
-    split add: split_if_asm)
+    split: if_split_asm)
 
 why3_vc divides_mod_computer
   using assms
@@ -115,14 +115,14 @@ why3_vc gcd_def1 by simp
 
 why3_vc gcd_def2 by simp
 
-why3_vc gcd_def3 using assms by (rule gcd_greatest_int)
+why3_vc gcd_def3 using assms by (rule gcd_greatest)
 
 why3_vc gcd_unique using assms
   by (simp add: gcd_unique_int [symmetric])
 
-why3_vc Comm by (rule gcd_commute_int)
+why3_vc Comm by (rule gcd.commute)
 
-why3_vc Assoc by (rule gcd_assoc_int)
+why3_vc Assoc by (rule gcd.assoc)
 
 why3_vc gcd_0_pos using assms by simp
 
@@ -131,18 +131,18 @@ why3_vc gcd_0_neg using assms by simp
 why3_vc gcd_opp by simp
 
 why3_vc gcd_euclid
-  using gcd_add_mult_int [of a "- q" b]
+  using gcd_add_mult [of a "- q" b]
   by (simp add: sign_simps)
 
 why3_vc Gcd_computer_mod
-  using assms gcd_add_mult_int [of b "- 1" "a mod b"]
-  by (simp add: cmod_def zabs_def gcd_red_int [symmetric] sgn_if sign_simps)
-    (simp add: zmod_zminus2_eq_if gcd_red_int [of a b])
+  using assms gcd_add_mult [of b "- 1" "a mod b"]
+  by (simp add: cmod_def zabs_def gcd_red_int [symmetric] sgn_if sign_simps del: gcd_mod_right)
+    (simp add: zmod_zminus2_eq_if gcd_red_int [of a b] del: gcd_mod_right)
 
 why3_vc Gcd_euclidean_mod
-  using assms gcd_add_mult_int [of b "- 1" "a mod b"]
-  by (simp add: emod_def zabs_def gcd_red_int [symmetric] sign_simps)
-    (simp add: zmod_zminus2_eq_if gcd_red_int [of a b])
+  using assms gcd_add_mult [of b "- 1" "a mod b"]
+  by (simp add: emod_def zabs_def gcd_red_int [symmetric] sign_simps del: gcd_mod_right)
+    (simp add: zmod_zminus2_eq_if gcd_red_int [of a b] del: gcd_mod_right)
 
 why3_vc gcd_mult using assms
   by (simp add: gcd_mult_distrib_int [symmetric])
@@ -155,48 +155,7 @@ section {* Prime numbers *}
 why3_open "number/Prime.xml"
 
 why3_vc prime_def
-  unfolding prime_def
-proof
-  assume "1 < nat p \<and> (\<forall>m. m dvd nat p \<longrightarrow> m = 1 \<or> m = nat p)"
-  then have "1 < p" and H: "\<And>m. m \<ge> 0 \<Longrightarrow> m dvd p \<Longrightarrow> m = 1 \<or> m = p"
-    by (auto simp add: dvd_int_iff)
-  show "2 \<le> p \<and> (\<forall>n. 1 < n \<and> n < p \<longrightarrow> \<not> n dvd p)"
-  proof
-    from `1 < p` show "2 \<le> p" by simp
-
-    show "\<forall>n. 1 < n \<and> n < p \<longrightarrow> \<not> n dvd p"
-    proof (intro strip)
-      fix n
-      assume "1 < n \<and> n < p"
-      with H [of n] show "\<not> n dvd p" by auto
-    qed
-  qed
-next
-  assume "2 \<le> p \<and> (\<forall>n. 1 < n \<and> n < p \<longrightarrow> \<not> n dvd p)"
-  then have "2 \<le> p" and H: "\<And>n. 1 < n \<Longrightarrow> n < nat p \<Longrightarrow> \<not> n dvd p"
-    by auto
-  show "1 < nat p \<and> (\<forall>m. m dvd nat p \<longrightarrow> m = 1 \<or> m = nat p)"
-  proof
-    from `2 \<le> p` show "1 < nat p" by simp
-
-    show "\<forall>m. m dvd nat p \<longrightarrow> m = 1 \<or> m = nat p"
-    proof (intro strip)
-      fix m
-      assume "m dvd nat p"
-      with `2 \<le> p` have "1 \<le> m" by (cases "m = 0") auto
-      show "m = 1 \<or> m = nat p"
-      proof (cases "m = 1")
-        case False
-        show ?thesis
-        proof (cases "m = nat p")
-          case False
-          from `2 \<le> p` `m dvd nat p` have "m \<le> nat p" by (simp add: dvd_imp_le)
-          with False `m \<noteq> 1` `1 \<le> m` `m dvd nat p` H show ?thesis by (simp add: int_dvd_iff)
-        qed simp
-      qed simp
-    qed
-  qed
-qed
+  by (auto simp add: prime_int_iff')
 
 why3_vc not_prime_1 by simp
 
@@ -232,13 +191,13 @@ proof (induct n rule: less_induct)
   next
     case False
     with `1 < n` obtain k where "k dvd n" "k \<noteq> 1" "k \<noteq> n"
-      by (auto simp add: Primes.prime_def)
+      by (auto simp add: prime_nat_iff)
     with `1 < n` have "k \<le> n" by (simp add: dvd_imp_le)
     with `k \<noteq> n` have "k < n" by simp
     moreover from `k dvd n` `1 < n` have "k \<noteq> 0" by (rule_tac notI) simp
     with `k \<noteq> 1` have "1 < k" by simp
     moreover from `k < n` `n < p` have "k < p" by simp
-    moreover from `k dvd n` `n dvd p` have "k dvd p" by (rule dvd.order_trans)
+    moreover from `k dvd n` `n dvd p` have "k dvd p" by (rule dvd_trans)
     ultimately show ?thesis by (rule less)
   qed
 qed
@@ -261,30 +220,30 @@ proof
       then have "\<exists>d. prime d \<and> d * d \<le> nat p \<and> d dvd (nat p)"
         by (rule small_divisors_aux)
       with `2 \<le> p` obtain d
-        where d: "prime d" "d * d \<le> p" "d dvd p"
-        by (auto simp add: int_dvd_iff le_nat_iff int_mult)
-      from `prime d` have "2 \<le> d" by (simp add: prime_ge_2_nat)
+        where d: "prime (int d)" "int d * int d \<le> p" "int d dvd p"
+        by (auto simp add: int_dvd_iff le_nat_iff)
+      from `prime (int d)` have "2 \<le> int d" by (simp add: prime_ge_2_int)
       then have "2 \<le> int d" by simp
       with `2 \<le> int d` have "2 * 2 \<le> int d * int d"
         by (rule mult_mono) simp_all
-      with d assms `2 \<le> d` show False by auto
+      with d assms `2 \<le> int d` show False by auto
     qed
   qed
 qed
 
 why3_vc even_prime
 proof -
-  from `prime (nat p)` have "0 \<le> p" by (simp add: prime_def)
-  from `prime (nat p)` have "2 \<le> nat p" by (simp add: prime_ge_2_nat)
-  with `prime (nat p)` `even p` `0 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
+  from `prime p` have "0 \<le> p" by (simp add: prime_def)
+  from `prime p` have "2 \<le> p" by (simp add: prime_ge_2_int)
+  with `prime p` `even p` `0 \<le> p` show ?thesis
+    by (auto simp add: order_le_less prime_odd_int)
 qed
 
 why3_vc odd_prime
 proof -
-  from `prime (nat p)` have "2 \<le> nat p" by (simp add: prime_ge_2_nat)
-  with `prime (nat p)` `3 \<le> p` show ?thesis
-    by (auto simp add: order_le_less prime_odd_nat even_nat_iff [symmetric])
+  from `prime p` have "2 \<le> p" by (simp add: prime_ge_2_int)
+  with `prime p` `3 \<le> p` show ?thesis
+    by (auto simp add: order_le_less prime_odd_int)
 qed
 
 why3_end
@@ -340,24 +299,19 @@ why3_vc Gauss
 proof -
   from assms
   have "coprime a b" "a dvd c * b" by (simp_all add: mult.commute)
-  then show ?thesis by (rule coprime_dvd_mult_int)
+  then show ?thesis by (rule coprime_dvd_mult)
 qed
 
 why3_vc Euclid
-proof -
-  from `p dvd a * b` have "nat \<bar>p\<bar> dvd nat \<bar>a\<bar> * nat \<bar>b\<bar>"
-    by (simp add: dvd_int_iff abs_mult nat_mult_distrib)
-  moreover from `prime (nat p)` have "prime (nat \<bar>p\<bar>)"
-    by (simp add: prime_def)
-  ultimately show ?thesis by (simp add: dvd_int_iff)
-qed
+  using assms
+  by (simp add: prime_dvd_multD)
 
 why3_vc gcd_coprime
 proof -
-  have "gcd a (b * c) = gcd (b * c) a" by (simp add: gcd_commute_int)
-  also from assms have "coprime b a" by (simp add: gcd_commute_int)
-  then have "gcd (b * c) a = gcd c a" by (simp add: gcd_mult_cancel_int)
-  finally show ?thesis by (simp add: gcd_commute_int)
+  have "gcd a (b * c) = gcd (b * c) a" by (simp add: gcd.commute)
+  also from assms have "coprime b a" by (simp add: gcd.commute)
+  then have "gcd (b * c) a = gcd c a" by (simp add: gcd_mult_cancel)
+  finally show ?thesis by (simp add: gcd.commute)
 qed
 
 why3_end

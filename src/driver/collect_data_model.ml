@@ -245,7 +245,7 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   | Array a -> Model_parser.Array (convert_array_value a)
   | Record (_n, l) ->
       Model_parser.Record (convert_record l)
-  | Cvc4_Variable _v -> Model_parser.Unparsed "!"
+  | Cvc4_Variable _v -> raise Not_value (*Model_parser.Unparsed "!"*)
   (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
   | To_array t -> convert_to_model_value (Array (convert_z3_array t))
   | Function_Local_Variable _ | Variable _ | Ite _ | Discr _ -> raise Not_value

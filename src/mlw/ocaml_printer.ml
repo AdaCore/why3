@@ -278,7 +278,7 @@ module Print = struct
     (* here [rs] refers to a [val] declaration *)
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn     rs.rs_name with
-    | None, None when info.info_flat ->
+    | None, None (* when info.info_flat *) ->
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
@@ -319,7 +319,7 @@ module Print = struct
               else fprintf fmt "%s" s
           | _ -> assert false in
         syntax_arguments s print_constant fmt pvl
-    | _, Some s, _ ->
+    | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
     | _, None, tl when is_rs_tuple rs ->
         fprintf fmt "@[(%a)@]"
@@ -345,7 +345,7 @@ module Print = struct
         end
     | _, None, [] ->
         (print_lident info) fmt rs.rs_name
-    | _, None, tl ->
+    | _, _, tl -> (* FIXME? when is in driver but is not a local id *)
         fprintf fmt "@[<hov 2>%a %a@]"
           (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
@@ -396,6 +396,10 @@ module Print = struct
         List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
         print_list_next newline print_one fmt rdef;
         List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
+    | Lany (rs, res, []) when functor_arg ->
+        fprintf fmt "@[<hov 2>val %a : %a@]"
+          (print_lident info) rs.rs_name
+          (print_ty info) res;
     | Lany (rs, res, args) when functor_arg ->
         let print_ty_arg info fmt (_, ty, _) =
           fprintf fmt "@[%a@]" (print_ty info) ty in
@@ -601,18 +605,18 @@ module Print = struct
     | Dmodule (s, dl) ->
         let args, dl = extract_functor_args info dl in
         let info = { info with info_current_ph = s :: info.info_current_ph } in
-        fprintf fmt "@[@[<hov 2>module %s%a@ =@ struct@ %a@]@ end@]" s
+        fprintf fmt "@[@[<hov 2>module %s%a@ =@]@\n@[<hov 2>struct@ %a@]@ end" s
           (print_functor_args info) args
           (print_list newline2 (print_decl info)) dl
 
   and print_functor_args info fmt args =
     let print_sig info fmt dl =
       fprintf fmt "sig@ %a@ end"
-        (print_list space (print_decl info ~functor_arg:true)) dl in
+        (print_list newline (print_decl info ~functor_arg:true)) dl in
     let print_pair fmt (s, dl) =
       let info = { info with info_current_ph = s :: info.info_current_ph } in
       fprintf fmt "(%s:@ %a)" s (print_sig info) dl in
-    fprintf fmt "@[%a@]" (print_list space print_pair) args
+    fprintf fmt "%a" (print_list space print_pair) args
 
   let print_decl info fmt decl =
     (* avoids printing the same decl for mutually recursive decls *)

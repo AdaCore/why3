@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../transition.mlw">
+<theory name="Trace" sum="494f9d21134cfced6f9fa11e2515d0f2">
+ <goal name="existence" expl="">
+ <transf name="split_goal_wp">
+  <goal name="existence.1" expl="">
+  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="existence.2" expl="">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="existence.3" expl="">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC trace" expl="VC for trace">
+ <proof prover="1"><result status="valid" time="1.24"/></proof>
+ </goal>
+</theory>
+<theory name="TraceConstructors" sum="22f43d8fa370796652d7075854d2b4b3">
+ <goal name="VC singleton_trace" expl="VC for singleton_trace">
+ <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
+ </goal>
+ <goal name="VC add_suffix_trace" expl="VC for add_suffix_trace">
+ <proof prover="0"><result status="valid" time="0.06" steps="367"/></proof>
+ </goal>
+ <goal name="VC add_prefix_trace" expl="VC for add_prefix_trace">
+ <proof prover="0"><result status="valid" time="0.04" steps="253"/></proof>
+ </goal>
+ <goal name="VC cat_trace" expl="VC for cat_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC cat_trace.1" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC cat_trace.1.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+   </goal>
+   <goal name="VC cat_trace.1.2" expl="assertion">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC cat_trace.1.3" expl="VC for cat_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
+   </goal>
+   <goal name="VC cat_trace.1.4" expl="VC for cat_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="67"/></proof>
+   </goal>
+   <goal name="VC cat_trace.1.5" expl="VC for cat_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="76"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC cat_trace.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="6"/></proof>
+  </goal>
+  <goal name="VC cat_trace.3" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>
+  </goal>
+  <goal name="VC cat_trace.4" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.07" steps="602"/></proof>
+  </goal>
+  <goal name="VC cat_trace.5" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="VC cat_trace.6" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="VC cat_trace.7" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="VC cat_trace.8" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC cat_trace.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC prefix_trace" expl="VC for prefix_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC prefix_trace.1" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="2"/></proof>
+  </goal>
+  <goal name="VC prefix_trace.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="VC prefix_trace.3" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+  </goal>
+  <goal name="VC prefix_trace.4" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC suffix_trace" expl="VC for suffix_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC suffix_trace.1" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC suffix_trace.1.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+   </goal>
+   <goal name="VC suffix_trace.1.2" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+   </goal>
+   <goal name="VC suffix_trace.1.3" expl="VC for suffix_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC suffix_trace.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.3" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="36"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="3"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="7"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.6" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.7" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.08" steps="156"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.8" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.05" steps="87"/></proof>
+  </goal>
+  <goal name="VC suffix_trace.9" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="139"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC sup_chain_trace" expl="VC for sup_chain_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC sup_chain_trace.1" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.1.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.04" steps="108"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.1.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="67"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.2" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.2.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.2.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.2.3" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="87"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.2.4" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="31"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.2.5" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="45"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.2.6" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.3" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="5"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.4" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.4.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.4.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.5" expl="unreachable point">
+  <proof prover="0"><result status="valid" time="0.04" steps="62"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.6" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.16" steps="257"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.7" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.8" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="1"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.9" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.9.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.02" steps="35"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.9.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.04" steps="41"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.9.3" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="33"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.10" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.11" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.11.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.04" steps="186"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.11.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="112"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.12" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="21"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.13" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="60"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.14" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.14.1" expl="assertion">
+   <proof prover="1"><result status="valid" time="1.88"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.14.2" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.14.3" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.14.4" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="65"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.15" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="1"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.16" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.17" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="278"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.18" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.18.1" expl="assertion">
+   <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.2" expl="VC for sup_chain_trace">
+   <proof prover="1"><result status="valid" time="1.29"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.3" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="24"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.4" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.04" steps="19"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.5" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.6" expl="VC for sup_chain_trace">
+   <proof prover="1"><result status="valid" time="1.21"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.7" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.04" steps="32"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.8" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.04" steps="61"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.9" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="20"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.10" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.18.11" expl="VC for sup_chain_trace">
+   <proof prover="0"><result status="valid" time="0.03" steps="21"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sup_chain_trace.19" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.13" steps="372"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.20" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="158"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.21" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="28"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.22" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="62"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.23" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="113"/></proof>
+  </goal>
+  <goal name="VC sup_chain_trace.24" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="VC sup_chain_trace.24.1" expl="postcondition">
+   <proof prover="1"><result status="valid" time="0.54"/></proof>
+   </goal>
+   <goal name="VC sup_chain_trace.24.2" expl="postcondition">
+   <proof prover="1"><result status="valid" time="1.20"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TraceDef" sum="c4482dff163076cc405a8ab226fad44d">
+ <goal name="existence" expl="">
+ <transf name="split_goal_wp">
+  <goal name="existence.1" expl="">
+  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="existence.2" expl="">
+  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
+  </goal>
+  <goal name="existence.3" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
+  <goal name="existence.4" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="existence.5" expl="">
+  <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC t" expl="VC for t">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="sorder" expl="">
+ <transf name="split_goal_wp">
+  <goal name="sorder.1" expl="">
+  <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
+  </goal>
+  <goal name="sorder.2" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="446"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC create_trace" expl="VC for create_trace">
+ <transf name="split_goal_wp">
+  <goal name="VC create_trace.1" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="VC create_trace.2" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="VC create_trace.3" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.03" steps="81"/></proof>
+  </goal>
+  <goal name="VC create_trace.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  </goal>
+  <goal name="VC create_trace.5" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="VC create_trace.6" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  </goal>
+  <goal name="VC create_trace.7" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="VC create_trace.8" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Trace.VC trace" expl="VC for trace">
+ <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
+ </goal>
+ <goal name="Trace.subtrace_order" expl="">
+ <transf name="compute_in_goal">
+  <goal name="subtrace_order.1" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="142"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="Trace.VC create_trace" expl="VC for create_trace">
+ <proof prover="0"><result status="valid" time="0.01" steps="1"/></proof>
+ </goal>
+</theory>
+<theory name="TraceGameCommon" sum="b9c91613503c74b995afa59f0d2bc133">
+ <goal name="VC game_ex_trace" expl="VC for game_ex_trace">
+ <proof prover="0"><result status="valid" time="0.03" steps="36"/></proof>
+ </goal>
+ <goal name="VC game_unv_trace" expl="VC for game_unv_trace">
+ <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
+ </goal>
+</theory>
+<theory name="TraceGame" sum="d41d8cd98f00b204e9800998ecf8427e">
+</theory>
+<theory name="TraceGameProof" sum="d2f2cad89577eb329613d6aa4bc0d9df">
+ <goal name="trace_enforce_ex_1" expl="">
+ <transf name="split_goal_wp">
+  <goal name="trace_enforce_ex_1.1" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="3"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.2" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="5"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.3" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="35"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.4" expl="">
+  <proof prover="0"><result status="valid" time="0.14" steps="191"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.5" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="7.62" steps="10213"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.6" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.7" expl="">
+  <proof prover="0"><result status="valid" time="0.26" steps="479"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.8" expl="">
+  <proof prover="0"><result status="valid" time="0.28" steps="759"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.9" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="95"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.10" expl="">
+  <proof prover="0"><result status="valid" time="0.02" steps="97"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.11" expl="">
+  <proof prover="0"><result status="valid" time="0.66" steps="1538"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.12" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.13" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_1.14" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="19"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="trace_enforce_ex_2" expl="">
+ <transf name="split_goal_wp">
+  <goal name="trace_enforce_ex_2.1" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.2" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.3" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.4" expl="">
+  <proof prover="0"><result status="valid" time="0.44" steps="1043"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.5" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="312"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.6" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="8"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.7" expl="">
+  <proof prover="0"><result status="valid" time="0.42" steps="982"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.8" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="35"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.9" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="17"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.10" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="327"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.11" expl="">
+  <transf name="introduce_premises">
+   <goal name="trace_enforce_ex_2.11.1" expl="">
+   <transf name="inline_goal">
+    <goal name="trace_enforce_ex_2.11.1.1" expl="">
+    <transf name="split_goal_wp">
+     <goal name="trace_enforce_ex_2.11.1.1.1" expl="">
+     <proof prover="0"><result status="valid" time="0.04" steps="15"/></proof>
+     </goal>
+     <goal name="trace_enforce_ex_2.11.1.1.2" expl="">
+     <proof prover="0"><result status="valid" time="0.05" steps="133"/></proof>
+     </goal>
+     <goal name="trace_enforce_ex_2.11.1.1.3" expl="">
+     <proof prover="0"><result status="valid" time="0.32" steps="459"/></proof>
+     </goal>
+     <goal name="trace_enforce_ex_2.11.1.1.4" expl="">
+     <proof prover="0"><result status="valid" time="0.79" steps="545"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="trace_enforce_ex_2.12" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="trace_enforce_ex_2.13" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="46"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC uacc_prefix" expl="VC for uacc_prefix">
+ <transf name="split_goal_wp">
+  <goal name="VC uacc_prefix.1" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.2" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC uacc_prefix.2.1" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.04" steps="30"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.2.2" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.04" steps="34"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.2.3" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.05" steps="169"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC uacc_prefix.3" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.4" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.5" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.6" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.7" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.06" steps="12"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.8" expl="precondition">
+  <proof prover="0"><result status="valid" time="0.07" steps="41"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.9" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC uacc_prefix.9.1" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.15" steps="357"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.2" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.11" steps="199"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.3" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.21" steps="363"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.4" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.08" steps="63"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.5" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.13" steps="336"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.6" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.13" steps="360"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.7" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.06" steps="41"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.9.8" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.58" steps="1362"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC uacc_prefix.10" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="63"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.11" expl="assertion">
+  <transf name="split_goal_wp">
+   <goal name="VC uacc_prefix.11.1" expl="assertion">
+   <proof prover="0" timelimit="5"><result status="valid" time="1.78" steps="2510"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.11.2" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.06" steps="186"/></proof>
+   </goal>
+   <goal name="VC uacc_prefix.11.3" expl="VC for uacc_prefix">
+   <proof prover="0"><result status="valid" time="0.04" steps="79"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC uacc_prefix.12" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.05" steps="120"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.13" expl="postcondition">
+  <proof prover="0"><result status="valid" time="1.00" steps="2387"/></proof>
+  </goal>
+  <goal name="VC uacc_prefix.14" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.61" steps="1122"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="trace_enforce_unv_1" expl="">
+ <transf name="split_goal_wp">
+  <goal name="trace_enforce_unv_1.1" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.2" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.3" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="26"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.4" expl="">
+  <proof prover="0"><result status="valid" time="0.17" steps="338"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.5" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="16"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.6" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="20"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.7" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.8" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="206"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.9" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="17"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.10" expl="">
+  <proof prover="2"><result status="valid" time="0.48"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.11" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="121"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.12" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="193"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.13" expl="">
+  <proof prover="0"><result status="valid" time="0.44" steps="813"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.14" expl="">
+  <proof prover="0"><result status="valid" time="0.34" steps="682"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.15" expl="">
+  <transf name="split_goal_wp">
+   <goal name="trace_enforce_unv_1.15.1" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="27"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.2" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="27"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.3" expl="">
+   <proof prover="0"><result status="valid" time="0.16" steps="488"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.4" expl="">
+   <proof prover="0"><result status="valid" time="0.27" steps="577"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.5" expl="">
+   <proof prover="0"><result status="valid" time="0.27" steps="577"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.6" expl="">
+   <proof prover="2"><result status="valid" time="0.45"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.7" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="57"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.8" expl="">
+   <proof prover="0"><result status="valid" time="0.19" steps="664"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.9" expl="">
+   <proof prover="2"><result status="valid" time="0.31"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.10" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="82"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.11" expl="">
+   <proof prover="2"><result status="valid" time="0.48"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.12" expl="">
+   <proof prover="2"><result status="valid" time="0.34"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.13" expl="">
+   <proof prover="2"><result status="valid" time="4.60"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.14" expl="">
+   <proof prover="0"><result status="valid" time="0.12" steps="329"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.15" expl="">
+   <proof prover="0"><result status="valid" time="0.29" steps="941"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.16" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="129"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.15.17" expl="">
+   <proof prover="0"><result status="valid" time="0.20" steps="419"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="trace_enforce_unv_1.16" expl="">
+  <proof prover="0"><result status="valid" time="0.18" steps="316"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.17" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="78"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.18" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="165"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.19" expl="">
+  <proof prover="0"><result status="valid" time="0.09" steps="188"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.20" expl="">
+  <proof prover="0"><result status="valid" time="0.30" steps="647"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.21" expl="">
+  <proof prover="2"><result status="valid" time="2.84"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.22" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="23"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.23" expl="">
+  <transf name="split_goal_wp">
+   <goal name="trace_enforce_unv_1.23.1" expl="">
+   <proof prover="0"><result status="valid" time="0.15" steps="265"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.2" expl="">
+   <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.3" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="119"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.4" expl="">
+   <proof prover="0"><result status="valid" time="0.11" steps="166"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.5" expl="">
+   <proof prover="2"><result status="valid" time="0.34"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.6" expl="">
+   <proof prover="0"><result status="valid" time="0.19" steps="243"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.7" expl="">
+   <proof prover="0"><result status="valid" time="0.10" steps="110"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.8" expl="">
+   <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.9" expl="">
+   <proof prover="0"><result status="valid" time="0.19" steps="259"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.10" expl="">
+   <proof prover="0"><result status="valid" time="0.11" steps="170"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.11" expl="">
+   <proof prover="0"><result status="valid" time="0.05" steps="31"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.12" expl="">
+   <proof prover="0"><result status="valid" time="0.25" steps="573"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.13" expl="">
+   <proof prover="0"><result status="valid" time="0.19" steps="516"/></proof>
+   </goal>
+   <goal name="trace_enforce_unv_1.23.14" expl="">
+   <proof prover="0"><result status="valid" time="1.46" steps="1332"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="trace_enforce_unv_1.24" expl="">
+  <proof prover="2"><result status="valid" time="0.57"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.25" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="161"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.26" expl="">
+  <proof prover="0"><result status="valid" time="0.14" steps="349"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.27" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="28"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.28" expl="">
+  <proof prover="0"><result status="valid" time="0.10" steps="194"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.29" expl="">
+  <proof prover="0"><result status="valid" time="0.26" steps="524"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.30" expl="">
+  <proof prover="0"><result status="valid" time="0.12" steps="365"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.31" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="26"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.32" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="2.33" steps="4416"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.33" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.34" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="62"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.35" expl="">
+  <proof prover="0"><result status="valid" time="0.14" steps="245"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.36" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="28"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.37" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="34"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.38" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="33"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_1.39" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="5"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="trace_enforce_unv_2" expl="">
+ <transf name="split_goal_wp">
+  <goal name="trace_enforce_unv_2.1" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.2" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="39"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.3" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="264"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.4" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.5" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.6" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.80" steps="1958"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.7" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="113"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.8" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="106"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.9" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="450"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.10" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="84"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.11" expl="">
+  <proof prover="0"><result status="valid" time="0.21" steps="756"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.12" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.13" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="70"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.14" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="124"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.15" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="24"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.16" expl="">
+  <proof prover="0"><result status="valid" time="0.08" steps="92"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.17" expl="">
+  <proof prover="0"><result status="valid" time="0.14" steps="356"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.18" expl="">
+  <proof prover="0"><result status="valid" time="0.11" steps="235"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.19" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="15"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.20" expl="">
+  <proof prover="0"><result status="valid" time="0.20" steps="424"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.21" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.22" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.23" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="125"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.24" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="37"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.25" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="62"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.26" expl="">
+  <proof prover="0"><result status="valid" time="0.28" steps="559"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.27" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="161"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.28" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="163"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.29" expl="">
+  <proof prover="0"><result status="valid" time="0.07" steps="168"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.30" expl="">
+  <proof prover="0"><result status="valid" time="0.03" steps="25"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.31" expl="">
+  <proof prover="0" timelimit="5"><result status="valid" time="1.05" steps="2746"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.32" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="18"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.33" expl="">
+  <proof prover="0"><result status="valid" time="0.06" steps="17"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.34" expl="">
+  <proof prover="0"><result status="valid" time="0.04" steps="33"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.35" expl="">
+  <proof prover="0"><result status="valid" time="0.14" steps="331"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.36" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+  <goal name="trace_enforce_unv_2.37" expl="">
+  <proof prover="0"><result status="valid" time="0.05" steps="32"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="TraceGame.trace_enforce_ex" expl="">
+ <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+ </goal>
+ <goal name="TraceGame.trace_enforce_unv" expl="">
+ <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
