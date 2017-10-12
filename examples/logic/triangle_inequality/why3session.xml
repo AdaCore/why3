@@ -2,341 +2,111 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="4000"/>
-<prover id="7" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="11" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../triangle_inequality.why" expanded="true">
-<theory name="CauchySchwarzInequality" sum="fe28dcbe5c607f8d262f19f52615f771" expanded="true">
- <goal name="norm2_pos" expl="">
- <proof prover="7"><result status="valid" time="0.01"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.04"/></proof>
- </goal>
- <goal name="p_expr" expl="">
+<prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="MetiTarski" version="2.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<file name="../triangle_inequality.why" proved="true">
+<theory name="CauchySchwarzInequality" proved="true" sum="a92d91425929088af826a278c9ec1726">
+ <goal name="norm2_pos" proved="true">
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="6"><result status="valid" time="0.01"/></proof>
  <proof prover="7"><result status="valid" time="0.00"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="p_pos" expl="">
- <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.04"/></proof>
+ <goal name="p_expr" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="6"><result status="valid" time="0.00"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="mul_div_simpl" expl="">
- <proof prover="7"><result status="valid" time="0.02"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.06"/></proof>
+ <goal name="p_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="p_val_part" expl="">
- <metas>
-  <ls_pos name="one" id="one" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="one"/>
-  </ls_pos>
-  <ls_pos name="prefix -" id="prefix -" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="prefix -"/>
-  </ls_pos>
-  <ls_pos name="infix +" id="infix +" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="infix +"/>
-  </ls_pos>
-  <ls_pos name="infix *" id="infix *" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="infix *"/>
-  </ls_pos>
-  <ls_pos name="infix &lt;" id="infix &lt;" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="infix &lt;"/>
-  </ls_pos>
-  <ls_pos name="infix &lt;=" id="infix &lt;=" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="infix &lt;="/>
-  </ls_pos>
-  <ls_pos name="infix &gt;=" id="infix &gt;=" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="infix &gt;="/>
-  </ls_pos>
-  <ls_pos name="inv" id="inv" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="inv"/>
-  </ls_pos>
-  <ls_pos name="sqrt" id="sqrt" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="sqrt"/>
-  </ls_pos>
-  <pr_pos name="Mul_distr_l" id="Mul_distr_l" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Mul_distr_l"/>
-  </pr_pos>
-  <pr_pos name="Mul_distr_r" id="Mul_distr_r" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Mul_distr_r"/>
-  </pr_pos>
-  <pr_pos name="Unitary" id="Unitary" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Unitary"/>
-  </pr_pos>
-  <pr_pos name="NonTrivialRing" id="NonTrivialRing" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="NonTrivialRing"/>
-  </pr_pos>
-  <pr_pos name="Inverse" id="Inverse" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Inverse"/>
-  </pr_pos>
-  <pr_pos name="add_div" id="add_div" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="add_div"/>
-  </pr_pos>
-  <pr_pos name="sub_div" id="sub_div" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="sub_div"/>
-  </pr_pos>
-  <pr_pos name="neg_div" id="neg_div" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="neg_div"/>
-  </pr_pos>
-  <pr_pos name="assoc_div_mul" id="assoc_div_mul" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="assoc_div_mul"/>
-  </pr_pos>
-  <pr_pos name="assoc_div_div" id="assoc_div_div" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="assoc_div_div"/>
-  </pr_pos>
-  <pr_pos name="Refl" id="Refl" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Refl"/>
-  </pr_pos>
-  <pr_pos name="Trans" id="Trans" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Trans"/>
-  </pr_pos>
-  <pr_pos name="Antisymm" id="Antisymm" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Antisymm"/>
-  </pr_pos>
-  <pr_pos name="Total" id="Total" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="Total"/>
-  </pr_pos>
-  <pr_pos name="ZeroLessOne" id="ZeroLessOne" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="ZeroLessOne"/>
-  </pr_pos>
-  <pr_pos name="CompatOrderAdd" id="CompatOrderAdd" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="CompatOrderAdd"/>
-  </pr_pos>
-  <pr_pos name="CompatOrderMult" id="CompatOrderMult" ip_theory="Real">
-   <ip_library name="real"/>
-   <ip_qualid name="CompatOrderMult"/>
-  </pr_pos>
-  <pr_pos name="Sqrt_positive" id="Sqrt_positive" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="Sqrt_positive"/>
-  </pr_pos>
-  <pr_pos name="Sqrt_square" id="Sqrt_square" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="Sqrt_square"/>
-  </pr_pos>
-  <pr_pos name="Square_sqrt" id="Square_sqrt" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="Square_sqrt"/>
-  </pr_pos>
-  <pr_pos name="Sqrt_mul" id="Sqrt_mul" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="Sqrt_mul"/>
-  </pr_pos>
-  <pr_pos name="Sqrt_le" id="Sqrt_le" ip_theory="Square">
-   <ip_library name="real"/>
-   <ip_qualid name="Sqrt_le"/>
-  </pr_pos>
-  <pr_pos name="norm2_pos" id="norm2_pos"
-   ip_theory="CauchySchwarzInequality">
-   <ip_qualid name="norm2_pos"/>
-  </pr_pos>
-  <pr_pos name="p_expr" id="p_expr" ip_theory="CauchySchwarzInequality">
-   <ip_qualid name="p_expr"/>
-  </pr_pos>
-  <pr_pos name="p_pos" id="p_pos" ip_theory="CauchySchwarzInequality">
-   <ip_qualid name="p_pos"/>
-  </pr_pos>
-  <meta name="remove_logic">
-   <meta_arg_ls id="one"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="prefix -"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="infix +"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="infix *"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="infix &lt;"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="infix &lt;="/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="infix &gt;="/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="inv"/>
-  </meta>
-  <meta name="remove_logic">
-   <meta_arg_ls id="sqrt"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Mul_distr_l"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Mul_distr_r"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Unitary"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="NonTrivialRing"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Inverse"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="add_div"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="sub_div"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="neg_div"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="assoc_div_mul"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="assoc_div_div"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Refl"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Trans"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Antisymm"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Total"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="ZeroLessOne"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="CompatOrderAdd"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="CompatOrderMult"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Sqrt_positive"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Sqrt_square"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Square_sqrt"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Sqrt_mul"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="Sqrt_le"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="norm2_pos"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="p_expr"/>
-  </meta>
-  <meta name="remove_prop">
-   <meta_arg_pr id="p_pos"/>
-  </meta>
-  <goal name="p_val_part" expl="">
-  <transf name="eliminate_builtin">
-   <goal name="p_val_part.1" expl="">
-   <proof prover="1" timelimit="45"><result status="valid" time="52.45" steps="13"/></proof>
-   <proof prover="5"><result status="valid" time="0.01"/></proof>
-   <proof prover="8"><result status="valid" time="0.00"/></proof>
+ <goal name="mul_div_simpl" proved="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="p_val_part" proved="true">
+ <transf name="unfold" proved="true" arg1="p">
+  <goal name="p_val_part.0" proved="true">
+  <transf name="unfold" proved="true" arg1="norm2">
+   <goal name="p_val_part.0.0" proved="true">
+   <transf name="unfold" proved="true" arg1="dot">
+    <goal name="p_val_part.0.0.0" proved="true">
+    <transf name="unfold" proved="true" arg1="sqr">
+     <goal name="p_val_part.0.0.0.0" proved="true">
+     <proof prover="5"><result status="valid" time="0.08" steps="4"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
- </metas>
+ </transf>
  </goal>
- <goal name="p_val_part_pos" expl="">
- <proof prover="1"><result status="valid" time="0.02" steps="9"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.02"/></proof>
+ <goal name="p_val_part_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="p_val_part_pos_aux" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
- <proof prover="11"><result status="valid" time="0.03"/></proof>
+ <goal name="p_val_part_pos_aux" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_non_null" expl="">
+ <goal name="CauchySchwarz_aux_non_null" proved="true">
  <proof prover="2" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_aux_non_null_1.v"><result status="valid" time="0.42"/></proof>
- <proof prover="11"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="norm_null" expl="">
- <proof prover="11"><result status="valid" time="0.06"/></proof>
+ <goal name="norm_null" proved="true">
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux_null" expl="">
- <proof prover="1"><result status="valid" time="0.06" steps="18"/></proof>
+ <goal name="CauchySchwarz_aux_null" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="18"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="6"><result status="valid" time="0.28"/></proof>
+ <proof prover="7"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="CauchySchwarz_aux" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="7"><result status="valid" time="0.28"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
- <proof prover="11"><result status="valid" time="0.06"/></proof>
+ <proof prover="4"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="CauchySchwarz_aux" expl="">
- <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
+ <goal name="norm_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
  <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.01"/></proof>
- <proof prover="11"><result status="valid" time="0.05"/></proof>
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="6"><result status="valid" time="0.02"/></proof>
+ <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="norm_pos" expl="">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
- <proof prover="7"><result status="valid" time="0.02"/></proof>
- <proof prover="8"><result status="valid" time="0.01"/></proof>
- <proof prover="11"><result status="valid" time="0.02"/></proof>
+ <goal name="sqr_le_sqrt" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="18"/></proof>
+ <proof prover="4"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="sqr_le_sqrt" expl="">
- <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
- <proof prover="11"><result status="valid" time="0.07"/></proof>
- </goal>
- <goal name="CauchySchwarz" expl="">
+ <goal name="CauchySchwarz" proved="true">
  <proof prover="2" edited="triangle_inequality_CauchySchwarzInequality_CauchySchwarz_1.v"><result status="valid" time="0.48"/></proof>
  </goal>
 </theory>
-<theory name="TriangleInequality" sum="bd361513a47191de11baae161c72c830" expanded="true">
- <goal name="triangle_aux" expl="">
- <proof prover="8"><result status="valid" time="0.01"/></proof>
+<theory name="TriangleInequality" proved="true" sum="bd361513a47191de11baae161c72c830">
+ <goal name="triangle_aux" proved="true">
+ <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="sqr_sqrt_le" expl="">
- <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
- <proof prover="11"><result status="valid" time="0.04"/></proof>
+ <goal name="sqr_sqrt_le" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+ <proof prover="1"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="triangle" expl="">
+ <goal name="triangle" proved="true">
  <proof prover="2" edited="triangle_inequality_TriangleInequality_triangle_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
 </theory>
