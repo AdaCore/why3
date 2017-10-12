@@ -351,12 +351,15 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
-    let call =
-      Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace ~command
-                        ~limit driver task
-    in
-    let pa = (c.controller_session,id,pr,callback,false,call,ores) in
-    Hashtbl.replace prover_tasks_in_progress call pa
+    try
+      let call =
+        Driver.prove_task ?old:proof_script ~cntexample:cntexample ~inplace ~command
+                          ~limit driver task
+      in
+      let pa = (c.controller_session,id,pr,callback,false,call,ores) in
+      Hashtbl.replace prover_tasks_in_progress call pa
+    with Sys_error _ as e ->
+      callback (InternalFailure e)
   with Not_found (* goal has no task, it is detached *) ->
        callback Detached
 
@@ -494,15 +497,15 @@ let schedule_proof_attempt c id pr
          Hpan.remove c.controller_running_proof_attempts panid;
          update_proof_attempt ~obsolete:false notification ses id pr res;
          update_goal_node notification ses id
-      | Interrupted ->
+      | Interrupted
+      | InternalFailure _ ->
          Hpan.remove c.controller_running_proof_attempts panid;
          (* what to do ?
          update_proof_attempt ~obsolete:false notification ses id pr res;
           *)
          update_goal_node notification ses id
-      | Detached
-      | InternalFailure _
-      | Uninstalled _
+      | Detached -> assert false
+      | Uninstalled _ -> assert false
       | Undone -> assert false
     end;
     callback panid s
