@@ -71,20 +71,19 @@ let cont_from_session ~notify cont f : bool option =
       (* Case of user giving a file that gets chopped to an other file *)
       if not (Sys.is_directory dir) then
         begin
-          let s = "Not a directory: " ^ dir in
-          Format.eprintf "%s@." s;
+          Format.eprintf "Not a directory: %s@." dir;
           exit 1
         end
     end
   else
     begin
-      Format.eprintf "[session server info] '%s' does not exist. \
-               Creating directory of that name for the project@." dir;
+      Format.dprintf debug "'%s' does not exist. \
+               Creating directory of that name for the Why3 session@." dir;
       Unix.mkdir dir 0o777
     end;
   (* we load the session *)
   let ses,use_shapes = load_session dir in
-  Format.eprintf "[session server info] using shapes: %b@." use_shapes;
+  Format.dprintf debug "using shapes: %b@." use_shapes;
   (* temporary, this should not be donne like this ! *)
   Controller_itp.set_session cont ses;
   (* update the session *)
@@ -152,7 +151,7 @@ let load_strategies cont =
        Stdlib.Hstr.add cont.Controller_itp.controller_strategies shortcut
                        (name, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
-       Format.eprintf "[ERROR] Loading strategy '%s' failed: %s@." name msg;
+       Format.eprintf "Fatal: loading strategy '%s' failed: %s@." name msg;
        exit 1)
     strategies
 

@@ -388,7 +388,7 @@ let () =
   let get_server_data () =
     match !server_data with
     | None ->
-       Format.eprintf "not yet initialized@.";
+       Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
        exit 1
     | Some x -> x
 
@@ -620,14 +620,13 @@ end
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
-  (* Send source file from the controller to the IDE even if the controller's
-     status is not correct *)
+  (* Send all source files from the controller session to the IDE *)
   let load_files_session () =
     let d = get_server_data () in
     let s = d.cont.controller_session in
     let files = Session_itp.get_files s in
     Stdlib.Hstr.iter (fun _ f ->
-                      Format.eprintf "File : %s@." (file_name f);
+                      Debug.dprintf debug "load_files_session: loading '%s'@." (file_name f);
                       read_and_send (file_name f)) files
 
   let relativize_location s loc =
@@ -662,19 +661,6 @@ end
       let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
       P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
       false
-
-(*
-  let task_driver config env =
-    try
-      let main = Whyconf.get_main config in
-      let d = "why3_itp" in
-      let d = Whyconf.load_driver main env d [] in
-      Debug.dprintf debug "driver for task printing loaded@.";
-      d
-    with e ->
-      Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
-      exit 1
-*)
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -952,7 +938,8 @@ end
             let b = add_file cont f in
             if b then
               let file = get_file cont.controller_session fn in
-              init_and_send_file file
+              init_and_send_file file;
+              read_and_send (file_name file)
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -1054,7 +1041,7 @@ end
          P.notify (Node_change (node_ID, Proof_status_change(res, obs, limit)))
       | _ -> ()
     with Not_found when not (Debug.test_flag Debug.stack_trace)->
-      Format.eprintf "Anomaly: Itp_server.notify_change_proved@.";
+      Format.eprintf "Fatal anomaly in Itp_server.notify_change_proved@.";
       exit 1
 
   let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =

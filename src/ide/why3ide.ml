@@ -1043,7 +1043,8 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
     try
       let (n, v, _, _) = get_source_view_table f in
       if force_tab_switch then
-        (eprintf "tab switch to page %d@." n; notebook#goto_page n);
+        (Debug.dprintf debug "tab switch to page %d@." n;
+                       notebook#goto_page n);
       move_to_line ~yalign:0.0 v l
     with Nosourceview _ -> ()
 

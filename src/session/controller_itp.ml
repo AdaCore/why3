@@ -445,9 +445,6 @@ let timeout_handler () =
         try
           build_prover_call ?proof_script ~cntexample c id pr limit callback ores
         with e when not (Debug.test_flag Debug.stack_trace) ->
-          (*Format.eprintf
-            "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
-            Exn_printer.exn_printer e;*)
           callback (InternalFailure e)
       done
   with Queue.Empty -> ()
@@ -728,8 +725,7 @@ let schedule_transformation c id name args ~callback ~notification =
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, Noprogress))
       | e (* when not (Debug.test_flag Debug.stack_trace) *) ->
-        (* Format.eprintf
-          "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
+          (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
         callback (TSfailed (id, e))
     end;
