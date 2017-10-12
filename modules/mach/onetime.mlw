@@ -6,11 +6,10 @@ module OneTime
   use import int.Int
 
   type t = abstract { v: int; mutable valid: bool }
+  meta coercion function v
 
-  val function to_int (x: t) : int
+  val to_int (x: t) : int
     ensures { result = x.v }
-
-  meta coercion function to_int
 
   val zero (): t
     ensures { result.valid }

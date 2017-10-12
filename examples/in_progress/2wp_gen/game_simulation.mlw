@@ -19,10 +19,6 @@ module SimDef
     forall start win. have_uniform_winning_strat g1 start win ->
       have_uniform_winning_strat g2 (related r start) (related r win)
 
-  (* TODO: completely discard this in favor of rel_mapping. *)
-  predicate paired (r:rel 'a 'b) (ch:set ('a,'b)) =
-    forall x y. ch (x,y) -> r x y
-
   predicate rel_mapping (h:set 'a) (f:'a -> 'b) (r:rel 'a 'b) =
     forall x. h x -> r x (f x)
 
@@ -152,7 +148,6 @@ module SimCompleteDef
   function complete_invl (o:erel 'a) (invl:set 'a -> ('a -> 'b) -> set (set 'b))
     : set (set 'a) -> (set 'a -> 'b) -> set (set 'b) =
     fun hh fh -> invl (image (sup o) hh) (map_hist o hh fh)
-    (*TODO: remove memo comment. invl (image (map_fst (sup o)) hh)*)
 
 
 end
@@ -2475,7 +2470,6 @@ module SimExtendedProof_Forget
     )
     so let s = sup o1 hr1 in (supremum o1 h1 s so s = x)
     by supremum o1 hr1 s
-    (* TODO: extra arguments required here... *)
 
   use import ho_set.SetBigOps
   use import ho_rel.RelSet

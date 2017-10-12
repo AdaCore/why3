@@ -723,8 +723,10 @@ module Translate = struct
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         [Mltree.Dlet (Mltree.Lany (rs, res, args))]
-    | PDlet (LDsym (_, {c_node = Cfun e})) when is_val e.e_node ->
-        []
+    | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e}))
+      when is_val e.e_node -> (* zero argument functions *)
+        let res = mlty_of_ity cty.cty_mask cty.cty_result in
+        [Mltree.Dlet (Mltree.Lany (rs, res, []))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
@@ -815,14 +817,6 @@ module Translate = struct
       Mltree.mod_decl = mod_decl;
       Mltree.mod_known = mod_known;
     }
-
-  (* let () = Exn_printer.register (fun fmt e -> match e with *)
-  (*   | ExtractionAny -> *)
-  (*     Format.fprintf fmt "Cannot extract an undefined node" *)
-  (*   | ExtractionVal rs -> *)
-  (*     Format.fprintf fmt "Function %a cannot be extracted" *)
-  (*       print_rs rs *)
-  (*   | _ -> raise e) *)
 
 end
 
