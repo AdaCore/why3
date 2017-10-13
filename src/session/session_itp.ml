@@ -1436,7 +1436,7 @@ let add_registered_transformation s env old_tr goal_id =
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
         goal.proofn_transformations in
     (* NOTE: should not happen *)
-    Debug.dprintf debug "[merge_theory] transformation already present@.";
+    Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
     assert false
   with Not_found ->
     let subgoals =
@@ -1484,7 +1484,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,s), None) ->
-        Debug.dprintf debug "[merge_theory] missed subgoal: %s@."
+        Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
           (get_proofNode s id).proofn_name.Ident.id_string;
         found_detached := true)
     associated;
@@ -1499,12 +1499,18 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
 
 
 let merge_theory ~use_shapes env old_s old_th s th : unit =
+  let get_goal_name goal_node =
+    let name = goal_node.proofn_name in
+    try
+      let (_,_,l) = Theory.restore_path name in
+      String.concat "." l
+    with Not_found -> name.Ident.id_string in
   let old_goals_table = Hstr.create 7 in
   (* populate old_goals_table *)
   List.iter
     (fun id ->
        let pn = get_proofNode old_s id in
-       Hstr.add old_goals_table pn.proofn_name.Ident.id_string id)
+       Hstr.add old_goals_table (get_goal_name pn) id)
     old_th.theory_goals;
   let to_checksum = CombinedTheoryChecksum.compute s th in
   let same_theory_checksum =
@@ -1519,9 +1525,10 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
        try
          let new_goal = get_proofNode s ng_id in
          (* look for old_goal with matching name *)
+         let new_goal_name = get_goal_name new_goal in
          let old_goal = get_proofNode old_s
-           (Hstr.find old_goals_table new_goal.proofn_name.Ident.id_string) in
-         Hstr.remove old_goals_table new_goal.proofn_name.Ident.id_string;
+           (Hstr.find old_goals_table new_goal_name) in
+         Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
            match new_goal.proofn_checksum, old_goal.proofn_checksum with
            | None, _ -> assert false
@@ -1868,7 +1875,13 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt "</proof>@]"
 
 let save_ident fmt id =
-  let n = id.Ident.id_string in
+  let n =
+    try
+      let (_,_,l) = Theory.restore_path id in
+      if l = [] then raise Not_found;
+      String.concat "." l
+    with Not_found -> id.Ident.id_string
+  in
   fprintf fmt "name=\"%a\"" save_string n
 
 let save_checksum fmt s =

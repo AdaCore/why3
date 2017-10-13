@@ -782,7 +782,6 @@ let (_ : GtkSignal.id) =
        gconfig.task_height <- h)
 
 
-(* Showing current task *)
 let task_view =
   GSourceView2.source_view
     ~editable:false
@@ -791,10 +790,11 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
+
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 1 in
+  let n = ref 4 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -843,6 +843,9 @@ let create_source_view =
         Gconfig.set_fonts ()
       end in
   create_source_view
+
+
+
 (* End of notebook *)
 
 (*
@@ -879,8 +882,67 @@ let error_page,error_view =
 
 let log_page,log_view =
   let label = GMisc.label ~text:"Log" () in
-  0, GPack.vbox ~homogeneous:false ~packing:
+  1, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+(* tab 3: edited proof *)
+let edited_page,edited_tab =
+  let label = GMisc.label ~text:"Edited proof" () in
+  2, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_edited_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
+
+let edited_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_edited_view#add
+    ()
+
+(* tab 4: prover output *)
+let output_page,output_tab =
+  let label = GMisc.label ~text:"Prover output" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
+
+let output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_output_view#add
+    ()
+
+
+(* tab 5: counterexample *)
+let counterexample_page,counterexample_tab =
+  let label = GMisc.label ~text:"Counterexample" () in
+  4, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_counterexample_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
+
+let counterexample_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_counterexample_view#add
+    ()
+
+
+
+
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -1124,6 +1186,9 @@ let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
   Gconfig.add_modifiable_mono_font_view monitor#misc;
   Gconfig.add_modifiable_mono_font_view task_view#misc;
+  Gconfig.add_modifiable_mono_font_view edited_view#misc;
+  Gconfig.add_modifiable_mono_font_view output_view#misc;
+  Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   task_view#source_buffer#set_language why_lang;
@@ -1197,29 +1262,36 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         let b = gconfig.intro_premises in
-        send_request (Get_task(id,b, true))
+        let c = gconfig.show_full_context in
+        send_request (Get_task(id,b,c,true))
     | NProofAttempt ->
-      let (pa, _obs, _l) = Hint.find node_id_pa id in
-      (match pa with
-      | Controller_itp.Done pr ->
-          task_view#source_buffer#set_text pr.Call_provers.pr_output
-      | Controller_itp.Undone ->
-          task_view#source_buffer#set_text "Undone"
-      | Controller_itp.Detached ->
-          task_view#source_buffer#set_text "Detached"
-      | Controller_itp.Interrupted ->
-          task_view#source_buffer#set_text "Interrupted"
-      | Controller_itp.Scheduled ->
-          task_view#source_buffer#set_text "Scheduled"
-      | Controller_itp.Running ->
-          task_view#source_buffer#set_text "Running"
-      | Controller_itp.InternalFailure _e ->
-          task_view#source_buffer#set_text "Internal failure"
-      | Controller_itp.Uninstalled _p ->
-          task_view#source_buffer#set_text "Uninstalled")
+       let (pa, _obs, _l) = Hint.find node_id_pa id in
+       let output_text =
+         match pa with
+         | Controller_itp.Done pr -> pr.Call_provers.pr_output
+         | Controller_itp.Undone -> "no result known"
+         | Controller_itp.Detached -> "detached proof attempt: parent goal has no task"
+         | Controller_itp.Interrupted -> "prover run was interrupted"
+         | Controller_itp.Scheduled -> "proof scheduled but not running yet"
+         | Controller_itp.Running -> "prover currently running"
+         | Controller_itp.InternalFailure e ->
+            (Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e)
+         | Controller_itp.Uninstalled _p -> "uninstalled prover"
+       in
+       let output_text =
+         if output_text = "" then
+           "(no output known, you may consider running the prover again)"
+         else output_text
+       in
+       output_view#source_buffer#set_text output_text;
+       edited_view#source_buffer#set_text "(not yet available)";
+       edited_view#scroll_to_mark `INSERT;
+       counterexample_view#source_buffer#set_text "(not yet available)";
+       counterexample_view#scroll_to_mark `INSERT
     | _ ->
        let b = gconfig.intro_premises in
-       send_request (Get_task(id,b,true))
+       let c = gconfig.show_full_context in
+       send_request (Get_task(id,b,c,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
