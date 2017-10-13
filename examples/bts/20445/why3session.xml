@@ -2,25 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../20445.mlw">
 <theory name="A" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="B" sum="3e4e0db7222351ee8b39dde6ac341e91">
+<theory name="B" sum="33b151b5a1e9eb7bf74725f1b714ed71">
  <goal name="G">
- <proof prover="0"><result status="unknown" time="0.00"/></proof>
- <proof prover="1" timelimit="1"><result status="unknown" time="0.00"/></proof>
- <proof prover="2"><result status="unknown" time="0.02"/></proof>
- <proof prover="3"><result status="unknown" time="0.00"/></proof>
+ <proof prover="0" timelimit="1"><result status="unknown" time="0.00"/></proof>
  </goal>
- <goal name="G" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <goal name="A.G" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 </file>
