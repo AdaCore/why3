@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../vacid_0_red_black_trees.mlw" proved="true">
+<theory name="RedBlackTree" proved="true" sum="fd36ae2cb85ada782c00563ce3059234">
+ <goal name="memt_color" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="19"/></proof>
+ </goal>
+ <goal name="lt_leaf" proved="true">
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="gt_leaf" proved="true">
+ <proof prover="4"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="lt_tree_node" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="gt_tree_node" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="lt_node_lt" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="gt_node_gt" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="lt_left" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="lt_right" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="gt_left" proved="true">
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ </goal>
+ <goal name="gt_right" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="lt_tree_not_in" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="lt_tree_trans" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="gt_tree_not_in" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="gt_tree_trans" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="bst_Leaf" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="bst_left" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="bst_right" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="bst_color" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="rotate_left" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="rotate_right" proved="true">
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="rbtree_Leaf" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="rbtree_Node1" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="rbtree_left" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="rbtree_right" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC find" expl="VC for find" proved="true">
+ <proof prover="4"><result status="valid" time="0.13"/></proof>
+ </goal>
+ <goal name="rbtree_almost_rbtree" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="rbtree_almost_rbtree_ex" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="almost_rbtree_rbtree_black" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC lbalance" expl="VC for lbalance" proved="true">
+ <proof prover="1"><result status="valid" time="0.60"/></proof>
+ </goal>
+ <goal name="VC rbalance" expl="VC for rbalance" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC rbalance.0" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.50" steps="2398"/></proof>
+  </goal>
+  <goal name="VC rbalance.1" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC rbalance.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.43" steps="1975"/></proof>
+  </goal>
+  <goal name="VC rbalance.3" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC rbalance.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.36" steps="1705"/></proof>
+  </goal>
+  <goal name="VC rbalance.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.50" steps="2349"/></proof>
+  </goal>
+  <goal name="VC rbalance.7" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.8" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.9" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.10" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.40" steps="2014"/></proof>
+  </goal>
+  <goal name="VC rbalance.11" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.12" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC rbalance.13" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC rbalance.14" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC insert" expl="VC for insert" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC insert.0" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC insert.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insert.2" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC insert.3" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insert.4" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC insert.5" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insert.6" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC insert.7" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC insert.8" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC insert.9" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC insert.10" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC insert.10.0" expl="VC for insert" proved="true">
+   <proof prover="4"><result status="valid" time="0.73"/></proof>
+   </goal>
+   <goal name="VC insert.10.1" expl="VC for insert" proved="true">
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC insert.10.2" expl="VC for insert" proved="true">
+   <proof prover="4"><result status="valid" time="0.30"/></proof>
+   </goal>
+   <goal name="VC insert.10.3" expl="VC for insert" proved="true">
+   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC insert.10.4" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.45"/></proof>
+   </goal>
+   <goal name="VC insert.10.5" expl="VC for insert" proved="true">
+   <proof prover="4"><result status="valid" time="0.28"/></proof>
+   </goal>
+   <goal name="VC insert.10.6" expl="VC for insert" proved="true">
+   <proof prover="2"><result status="valid" time="0.24" steps="1085"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC add.0" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.1" expl="unreachable point" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.2" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC add.2.0" expl="VC for add" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC add.2.1" expl="VC for add" proved="true">
+   <proof prover="0" edited="vacid_0_red_black_trees_RedBlackTree_VC_add_1.v"><result status="valid" time="0.35"/></proof>
+   </goal>
+   <goal name="VC add.2.2" expl="VC for add" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   </goal>
+   <goal name="VC add.2.3" expl="VC for add" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC add.2.4" expl="VC for add" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC add.2.5" expl="VC for add" proved="true">
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Vacid0" proved="true" sum="c8823045eec16b7c4f7177c76ab784cd">
+ <goal name="VC default" expl="VC for default" proved="true">
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="4"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="VC replace" expl="VC for replace" proved="true">
+ <proof prover="4"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC lookup" expl="VC for lookup" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <proof prover="4"><result status="valid" time="0.02"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
