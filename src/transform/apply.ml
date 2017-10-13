@@ -293,7 +293,7 @@ let unfold unf hl =
    to_subst and t2 being term to substitute to if the equality found it a symbol
    definition. If equality found is a a decl then it is returned:
    Some (Some pr, t1, t2) *)
-let find_eq (to_subst: Term.lsymbol) =
+let find_eq (to_subst: Term.lsymbol list) =
   fold (fun d acc ->
     match d.d_node with
     | Dprop (k, pr, t) when k != Pgoal ->
@@ -302,22 +302,22 @@ let find_eq (to_subst: Term.lsymbol) =
             (* Allow to rewrite from the right *)
             begin
               match t1.t_node, t2.t_node with
-              | Tapp (ls, []), _ when ls_equal ls to_subst ->
-                  Some (Some pr, t1, t2)
-              | _, Tapp (ls, []) when ls_equal ls to_subst ->
-                  Some (Some pr, t2, t1)
+              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst ->
+                  Some (Some pr, t1, t2) :: acc
+              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst ->
+                  Some (Some pr, t2, t1) :: acc
               | _ -> acc
             end
         | _ -> acc) in
         acc
-    | Dlogic [(ls, ld)] when ls_equal to_subst ls ->
+    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst ->
       (* Function without arguments *)
       let vl, e = open_ls_defn ld in
       if vl = [] then
-        Some (None, t_app_infer ls [], e)
+        Some (None, t_app_infer ls [], e) :: acc
       else
         acc
-    | _ -> acc) None
+    | _ -> acc) []
 
 (* This found any equality which at one side contains a single lsymbol and is
    local. It gives same output as found_eq. *)
@@ -330,8 +330,9 @@ let find_eq2 is_local_decl =
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
             (match t1.t_node, t2.t_node with
             | Tapp (_, []), _ ->
-            (* t1 = t2. And t1 and t2 are constant litterals *)
-              Some (Some pr, t1, t2)
+                Some (Some pr, t1, t2)
+            | _, Tapp (_, []) ->
+                Some (Some pr, t2, t1)
             | _ -> acc)
           | _ -> acc) in
           acc
@@ -407,8 +408,19 @@ let subst_eq found_eq =
           | Dtype _ | Ddata _ | Dparam _ -> [d]) None
        end
 
-let subst (to_subst: Term.lsymbol) =
-  Trans.bind (find_eq to_subst) subst_eq
+let subst_eq_list found_eq_list =
+  List.fold_left (fun acc_tr found_eq ->
+    Trans.compose (subst_eq found_eq) acc_tr) Trans.identity found_eq_list
+
+let subst (to_subst: Term.lsymbol list) =
+  Trans.bind (find_eq to_subst) subst_eq_list
+
+let subst (to_subst: Term.term list) =
+  (* TODO allow list of lsymbols in type of tactics *)
+  subst (List.map
+           (fun t -> match t.t_node with
+           | Tapp (ls, []) -> ls
+           | _ -> raise (Arg_trans "subst_eq")) to_subst)
 
 let subst_all (is_local_decl: Decl.decl -> bool) =
    Trans.bind (find_eq2 is_local_decl) subst_eq
@@ -437,7 +449,7 @@ let repeat f = Trans.store (repeat f)
 
 let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
-    (Tlsymbol Ttrans) subst
+    (Ttermlist Ttrans) subst
 
 let subst_all = repeat subst_all
 
