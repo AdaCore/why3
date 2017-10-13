@@ -26,23 +26,12 @@
  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="Path_shortest_path" proved="true">
- <transf name="assert" proved="true" arg1="(forall sn. forall d. 0 &lt;= d &lt; sn -&gt; forall v.  path src v d -&gt; exists d&apos;:int. shortest_path src v d&apos; /\ d&apos; &lt;= d)">
+ <transf name="induction" proved="true" arg1="d">
   <goal name="Path_shortest_path.0" proved="true">
-  <transf name="induction" proved="true" arg1="sn">
-   <goal name="Path_shortest_path.0.0" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="Path_shortest_path.0.1" proved="true">
-   <transf name="instantiate" proved="true" arg1="Hrec" arg2="sn">
-    <goal name="Path_shortest_path.0.1.0" proved="true">
-    <proof prover="4" timelimit="5"><result status="valid" time="0.04"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="Path_shortest_path.1" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
  </transf>
  </goal>
@@ -166,23 +155,19 @@
   <proof prover="1"><result status="valid" time="0.10" steps="291"/></proof>
   </goal>
   <goal name="WP_parameter shortest_path_code.16" expl="loop invariant preservation" proved="true">
-  <transf name="introduce_premises" proved="true" >
+  <transf name="cut" proved="true" arg1="(is_empty su)">
    <goal name="WP_parameter shortest_path_code.16.0" expl="loop invariant preservation" proved="true">
-   <transf name="cut" proved="true" arg1="(is_empty su)">
+   <transf name="cut" proved="true" arg1="(inv_succ src visited q d)">
     <goal name="WP_parameter shortest_path_code.16.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="cut" proved="true" arg1="(inv_succ src visited q d)">
-     <goal name="WP_parameter shortest_path_code.16.0.0.0" expl="loop invariant preservation" proved="true">
-     <proof prover="3"><result status="valid" time="0.39"/></proof>
-     </goal>
-     <goal name="WP_parameter shortest_path_code.16.0.0.1" proved="true">
-     <proof prover="4"><result status="valid" time="0.08"/></proof>
-     </goal>
-    </transf>
+    <proof prover="3"><result status="valid" time="0.35"/></proof>
     </goal>
     <goal name="WP_parameter shortest_path_code.16.0.1" proved="true">
-    <proof prover="4"><result status="valid" time="0.02"/></proof>
+    <proof prover="4"><result status="valid" time="0.13"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="WP_parameter shortest_path_code.16.1" proved="true">
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
