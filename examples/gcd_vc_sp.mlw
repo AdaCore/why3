@@ -1,0 +1,130 @@
+
+(* Greatest common divisor, using the Euclidean algorithm *)
+
+module EuclideanAlgorithm
+
+  use import mach.int.Int
+  use import number.Gcd
+
+  let rec euclid (u v: int) : int
+    variant  { v }
+    requires { u >= 0 /\ v >= 0 }
+    ensures  { result = gcd u v }
+  = "vc:sp"
+    if v = 0 then
+      u
+    else
+      euclid v (u % v)
+
+end
+
+module EuclideanAlgorithmIterative
+
+  use import mach.int.Int
+  use import ref.Ref
+  use import number.Gcd
+
+  let euclid (u0 v0: int) : int
+    requires { u0 >= 0 /\ v0 >= 0 }
+    ensures  { result = gcd u0 v0 }
+  = "vc:sp"
+    let u = ref u0 in
+    let v = ref v0 in
+    while !v <> 0 do
+      invariant { !u >= 0 /\ !v >= 0 }
+      invariant { gcd !u !v = gcd u0 v0 }
+      variant   { !v }
+      let tmp = !v in
+      v := !u % !v;
+      u := tmp
+    done;
+    !u
+
+end
+
+module BinaryGcd
+
+  use import mach.int.Int
+  use import int.Lex2
+  use import number.Parity
+  use import number.Gcd
+
+  lemma even1: forall n: int. 0 <= n -> even n <-> n = 2 * div n 2
+  lemma odd1: forall n: int. 0 <= n -> not (even n) <-> n = 2 * div n 2 + 1
+  lemma div_nonneg: forall n: int. 0 <= n -> 0 <= div n 2
+
+  use number.Coprime
+
+  lemma gcd_even_even: forall u v: int. 0 <= v -> 0 <= u ->
+    gcd (2 * u) (2 * v) = 2 * gcd u v
+  lemma gcd_even_odd: forall u v: int. 0 <= v -> 0 <= u ->
+    gcd (2 * u) (2 * v + 1) = gcd u (2 * v + 1)
+  lemma gcd_even_odd2: forall u v: int. 0 <= v -> 0 <= u ->
+    even u -> odd v -> gcd u v = gcd (div u 2) v
+  lemma odd_odd_div2: forall u v: int. 0 <= v -> 0 <= u ->
+    div ((2*u+1) - (2*v+1)) 2 = u - v
+
+  let lemma gcd_odd_odd (u v: int)
+    requires { 0 <= v <= u }
+    ensures { gcd (2 * u + 1) (2 * v + 1) = gcd (u - v) (2 * v + 1) }
+  = assert { gcd (2 * u + 1) (2 * v + 1) =
+             gcd ((2*u+1) - 1*(2*v+1)) (2 * v + 1) }
+
+  lemma gcd_odd_odd2: forall u v: int. 0 <= v <= u ->
+    odd u -> odd v -> gcd u v = gcd (div (u - v) 2) v
+
+  let rec binary_gcd (u v: int) : int
+    variant  { (v, u) with lex }
+    requires { u >= 0 /\ v >= 0 }
+    ensures  { result = gcd u v }
+  = "vc:sp"
+    if v > u then binary_gcd v u else
+    if v = 0 then u else
+    if mod u 2 = 0 then
+      if mod v 2 = 0 then 2 * binary_gcd (u / 2) (v / 2)
+                     else binary_gcd (u / 2) v
+      else
+      if mod v 2 = 0 then binary_gcd u (v / 2)
+                     else binary_gcd ((u - v) / 2) v
+
+end
+
+(** With machine integers.
+    Note that we assume parameters u, v to be nonnegative.
+    Otherwise, for u = v = min_int, the gcd could not be represented. *)
+
+(* does not work with extraction driver ocaml64
+module EuclideanAlgorithm31
+
+  use import mach.int.Int31
+  use import number.Gcd
+
+  let rec euclid (u v: int31) : int31
+    variant  { to_int v }
+    requires { to_int u >= 0 /\ to_int v >= 0 }
+    ensures  { to_int result = gcd (to_int u) (to_int v) }
+  =
+    if Int31.eq v (of_int 0) then
+      u
+    else
+      euclid v (u % v)
+
+end
+*)
+
+module EuclideanAlgorithm63
+
+  use import mach.int.Int63
+  use import number.Gcd
+
+  let rec euclid (u v: int63) : int63
+    variant  { to_int v }
+    requires { to_int u >= 0 /\ to_int v >= 0 }
+    ensures  { to_int result = gcd (to_int u) (to_int v) }
+  = "vc:sp"
+    if Int63.eq v (of_int 0) then
+      u
+    else
+      euclid v (u % v)
+
+end

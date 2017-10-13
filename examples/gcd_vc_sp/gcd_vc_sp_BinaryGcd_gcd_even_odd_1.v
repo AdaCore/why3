@@ -39,7 +39,6 @@ Axiom gcd_even_even : forall (u:Z) (v:Z), (0%Z <= v)%Z -> ((0%Z <= u)%Z ->
 Theorem gcd_even_odd : forall (u:Z) (v:Z), (0%Z <= v)%Z -> ((0%Z <= u)%Z ->
   ((number.Gcd.gcd (2%Z * u)%Z ((2%Z * v)%Z + 1%Z)%Z) = (number.Gcd.gcd u
   ((2%Z * v)%Z + 1%Z)%Z))).
-(* Why3 intros u v h1 h2. *)
 intros u v h1 h2.
 rewrite Gcd.Comm.
 rewrite number.Coprime.gcd_coprime.
