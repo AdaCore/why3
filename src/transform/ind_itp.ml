@@ -20,8 +20,8 @@ open Args_wrapper
 (* Documentation of induction:
 
    From task [delta, x: int, delta'(x) |- G(x)], variable x and term bound, builds the tasks:
-   [delta, x: int, x <= bound, delta'(x) |- G(x)] and
-   [delta, x: int, x >= bound, (delta'(x) -> G(x)), delta'(x+1) |- G(x+1)]
+   [delta, x: int, x < bound, delta'(x) |- G(x)] and
+   [delta, x: int, x >= bound, (forall n, n < x -> delta'(n) -> G(n)), delta'(x) |- G(x)]
 
    x cannot occur in delta as it can only appear after its declaration (by
    construction of the task). Also, G is not part of delta'.
@@ -129,7 +129,7 @@ let collect_lsymbol s (d: decl) =
 (* s is a set of variables, g is a term. If d contains one of the elements of s
    then all variables of d are added to s and the declaration is prepended to g.
 *)
-let revert_only_stuff (g, s) (d: decl) =
+let revert_chosen_decls (g, s) (d: decl) =
   let d_set = collect_lsymbol Sls.empty d in
   let interp = Sls.inter s d_set in
   if Sls.equal interp Sls.empty then
@@ -140,10 +140,10 @@ let revert_only_stuff (g, s) (d: decl) =
 (* Build a term that generalizes all the declarations that were given in l and
    that contains at least one of the variables in the set s. Actually, only
    revert what is necessary to build a correct term. *)
-let revert_only_stuff_list s (l: decl list) (g: decl) (t: term) =
+let revert_chosen_decls_list s (l: decl list) (g: decl) (t: term) =
   (* The goal is a special case, we collect its variable independantly *)
   let s = collect_lsymbol s g in
-  fst (List.fold_left revert_only_stuff (t, s) l)
+  fst (List.fold_left revert_chosen_decls (t, s) l)
 
 let induction x bound env =
   (* Default bound is 0 if not given *)
@@ -160,9 +160,7 @@ let induction x bound env =
   (* Loading of needed symbols from int theory *)
   let th = Env.read_theory env ["int"] "Int" in
   let le_int = Theory.ns_find_ls th.Theory.th_export ["infix <="] in
-  let plus_int = Theory.ns_find_ls th.Theory.th_export ["infix +"] in
-  let one_int =
-    Term.t_const (Number.ConstInt (Number.int_const_dec "1")) Ty.ty_int in
+  let lt_int = Theory.ns_find_ls th.Theory.th_export ["infix <"] in
 
   (* Symbol associated to term x *)
   let lsx =
@@ -192,12 +190,12 @@ let induction x bound env =
           raise (Arg_trans "induction")
         else
           let t_delta' =
-            revert_only_stuff_list (Sls.add lsx Sls.empty) !delta' d t in
+            revert_chosen_decls_list (Sls.add lsx Sls.empty) !delta' d t in
           let n = Term.create_vsymbol (Ident.id_fresh "n") Ty.ty_int in
-          (* t_delta' = forall n, n <= x -> t_delta'[x <- n] *)
+          (* t_delta' = forall n, n < x -> t_delta'[x <- n] *)
           let t_delta' =
             t_forall_close [n] []
-              (t_implies (Term.t_app_infer le_int [t_var n; x]) (t_replace x (t_var n) t_delta'))
+              (t_implies (Term.t_app_infer lt_int [t_var n; x]) (t_replace x (t_var n) t_delta'))
           in
 
           (* x_ge_bound = bound <= x *)
@@ -205,19 +203,14 @@ let induction x bound env =
           let x_ge_bound =
             create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_ge_bound_t in
           let rec_pr = create_prsymbol (gen_ident "Hrec") in
-          let new_pr = create_prsymbol (gen_ident "G") in
-          (* new_goal: G[x <- x + 1] *)
-          let new_goal =
-            create_prop_decl Pgoal new_pr
-              (replace_in_term x (t_app_infer plus_int [x; one_int]) t) in
           let hrec = create_prop_decl Paxiom rec_pr t_delta' in
-          [x_ge_bound; hrec; new_goal]
-    | Dprop (p, pr, t) ->
+          [x_ge_bound; hrec; d]
+    | Dprop (_p, _pr, _t) ->
         if !x_is_passed then
           begin
             delta' := d :: !delta';
-            (* d [x <- x + 1] *)
-            [create_prop_decl p pr (replace_in_term x (t_app_infer plus_int [x; one_int]) t)]
+            (* d [x <- x] *)
+            [d]
           end
         else
           [d]
