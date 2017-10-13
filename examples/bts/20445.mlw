@@ -1,0 +1,8 @@
+module A
+axiom G : true
+end
+
+module B
+goal G : false
+clone A with goal G
+end
