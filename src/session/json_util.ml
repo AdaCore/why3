@@ -586,7 +586,7 @@ let parse_update j =
 *)
   | _ -> raise NotUpdate
 
-exception NotInfos
+exception NotInfos of string
 
 let parse_infos j =
   try
@@ -598,14 +598,14 @@ let parse_infos j =
                                  (get_string (get_field j "prover_shortcut"),
                                   get_string (get_field j "prover_name"),
                                   get_string (get_field j "prover_parseable_name"))
-                               with Not_found -> raise NotInfos) pr;
-     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
+                               with Not_found -> raise (NotInfos "provers")) pr;
+     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "transformations")) tr;
      strategies = List.map (fun j -> try
                                  (get_string (get_field j "strategy_shortcut"),
                                   get_string (get_field j "strategy_name"))
-                               with Not_found -> raise NotInfos) str;
-     commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
-  with _ -> raise NotInfos
+                               with Not_found -> raise (NotInfos "strategies")) str;
+     commands = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "commands")) com}
+  with Not_found -> raise (NotInfos "infos")
 
 exception NotMessage
 
@@ -737,7 +737,7 @@ let parse_notification_json j =
     let constr = get_string (get_field j "notification") in
     parse_notification constr j
   with
-  | _ -> raise (NotNotification "<from parse_notification_json>")
+  | Not_found -> raise (NotNotification "<from parse_notification_json>")
 
 let parse_json_object (s: string) =
   let lb = Lexing.from_string s in
@@ -758,7 +758,7 @@ let parse_list_notification (s: string): notification list =
   match json with
   | List [Null] -> []
   | List l -> List.map parse_notification_json l
-  | _ -> []
+  | _ -> raise (NotNotification "Not list")
 
 let parse_list_request (s: string): ide_request list =
   let json = parse_json_object s in

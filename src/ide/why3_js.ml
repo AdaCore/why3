@@ -622,7 +622,9 @@ let getNotification2 () =
     if xhr ##. readyState == XmlHttpRequest.DONE then
       if xhr ##. status == 200 then
         let r = readBody xhr in
-        let nl = Json_util.parse_list_notification r in
+        let nl =
+          try Json_util.parse_list_notification r with e ->
+            log (Printexc.to_string e ^ " " ^ r); [] in
         if nl != [] then
           PE.printAnswer ("r = |" ^ r ^ "|");
         interpNotifications nl
