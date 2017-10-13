@@ -162,7 +162,7 @@ let instantiate (pr: Decl.prsymbol) lt =
       match d.d_node with
       | Dprop (pk, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
           let t_subst = subst_forall_list ht lt in
-          let new_pr = create_prsymbol (Ident.id_clone dpr.pr_name) in
+          let new_pr = create_prsymbol (gen_ident "Hinst") in
           let new_decl = create_prop_decl pk new_pr t_subst in
           r := [new_decl];
           [d]
