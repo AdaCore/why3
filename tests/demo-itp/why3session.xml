@@ -30,6 +30,16 @@
  <goal name="g">
  </goal>
 </theory>
+<theory name="TestInduction" sum="7cd4f889593553a3efe96040db1cbe94">
+ <goal name="g">
+ <transf name="induction" arg1="n">
+  <goal name="g.0">
+  </goal>
+  <goal name="g.1">
+  </goal>
+ </transf>
+ </goal>
+</theory>
 <theory name="TestInfixSymbols" sum="1e2101112f2c37523da345d6bab356e6">
  <goal name="g">
  </goal>
@@ -54,16 +64,16 @@
   </goal>
  </transf>
  </goal>
- <goal name="power_sum" proved="true">
- <transf name="induction" proved="true" arg1="n">
+ <goal name="power_sum">
+ <transf name="induction" arg1="n">
   <goal name="power_sum.0" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="unknown" time="1.00"/></proof>
   </goal>
-  <goal name="power_sum.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.87" steps="15"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
-  <proof prover="2"><result status="unknown" time="1.01"/></proof>
+  <goal name="power_sum.1">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.87" steps="15"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="1.01"/></proof>
   </goal>
  </transf>
  </goal>
