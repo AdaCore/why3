@@ -562,7 +562,7 @@ let interpNotif (n: notification) =
       | Proof_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Proof error on selected node: \"%s\"" s)
-      | Transf_error (_nid, s) ->
+      | Transf_error (_ids, _tr, _args, _loc, s, _d) ->
         PE.error_print_msg
           (Format.asprintf "Transformation error on selected node: \"%s\"" s)
       | Strat_error (_nid, s) ->
@@ -589,7 +589,6 @@ let interpNotif (n: notification) =
   | Node_change (nid, up) ->
     begin
       match up with
-      | Obsolete _ -> assert false (* TODO *)
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
       | Proof_status_change (c, _obsolete, _rl) ->

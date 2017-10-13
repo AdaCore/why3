@@ -478,16 +478,20 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 
 # checking for js_of_ocaml
+HASJSOFOCAML=no
 if test "$USEOCAMLFIND" = yes; then
    JSOFOCAML=$(ocamlfind query js_of_ocaml)
    if test -z "$JSOFOCAML"; then
-      HASJSOFOCAML=no
       reason_jsofocaml=" (js_of_ocaml not found)"
    else
-      HASJSOFOCAML=yes
+      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml.ppx)
+      if test -z "$JSOFOCAMLPPX"; then
+         reason_jsofocaml=" (js_of_ocaml.ppx not found)"
+      else
+         HASJSOFOCAML=yes
+      fi
    fi
 else
-   HASJSOFOCAML=no
    reason_jsofocaml=" (ocamlfind not available)"
 fi
 
