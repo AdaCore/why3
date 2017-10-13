@@ -7,7 +7,7 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../sumrange.mlw" proved="true">
-<theory name="ArraySum" proved="true" sum="c43abcc65051af09a54f471f27f69208">
+<theory name="ArraySum" proved="true" sum="9c589f5858612dacf098c9434ffb74c2">
  <goal name="sum_right" proved="true">
  <transf name="assert" proved="true" arg1="(forall x. 0 &lt; x &lt; j -&gt; sum a (j-x) j = sum a (j-x) (j-1) + a[j-1])">
   <goal name="sum_right.0" proved="true">
@@ -16,7 +16,11 @@
    <proof prover="3"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="sum_right.0.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <transf name="instantiate" proved="true" arg1="Hrec" arg2="x">
+    <goal name="sum_right.0.1.0" proved="true">
+    <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -30,7 +34,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Simple" proved="true" sum="17809040d6493313e8bff554cd196ef3">
+<theory name="Simple" proved="true" sum="4c20541d262bc9deec1ea3531579a715">
  <goal name="WP_parameter query" expl="VC for query" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -59,14 +63,18 @@
  </transf>
  </goal>
 </theory>
-<theory name="ExtraLemmas" proved="true" sum="06d9ed7291283643f4ece6e481eb7dd6">
+<theory name="ExtraLemmas" proved="true" sum="19e80bf42f3115702df43c625a5b4d12">
  <goal name="sum_concat" proved="true">
  <transf name="induction" proved="true" arg1="k">
   <goal name="sum_concat.0" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="sum_concat.1" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <transf name="instantiate" proved="true" arg1="Hrec" arg2="k">
+   <goal name="sum_concat.1.0" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
@@ -78,7 +86,11 @@
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="sum_frame.0.1" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <transf name="instantiate" proved="true" arg1="Hrec" arg2="x">
+    <goal name="sum_frame.0.1.0" proved="true">
+    <proof prover="3" timelimit="5"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -103,7 +115,7 @@
   <goal name="sum_update.1" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="sum_update.1.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -121,7 +133,7 @@
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
 </theory>
-<theory name="CumulativeTree" proved="true" sum="27ac94e51ac30faab1b36fe9f2a7393a">
+<theory name="CumulativeTree" proved="true" sum="27793b09427965c733ab65af79f4722e">
  <goal name="WP_parameter tree_of_array" expl="VC for tree_of_array" proved="true">
  <proof prover="3"><result status="valid" time="0.43"/></proof>
  </goal>
