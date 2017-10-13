@@ -24,12 +24,12 @@ let convert_prover_to_json (p: Whyconf.prover) =
 
 let convert_infos (i: global_information) =
   let convert_prover (s,h,p) =
-    Record (convert_record ["prover_shorcut", String s;
+    Record (convert_record ["prover_shortcut", String s;
                             "prover_name", String h;
                             "prover_parseable_name", String p])
   in
   let convert_strategy (s,p) =
-    Record (convert_record ["strategy_shorcut", String s;
+    Record (convert_record ["strategy_shortcut", String s;
                             "strategy_name", String p])
   in
   Record (convert_record
@@ -334,9 +334,12 @@ let parse_loc (j: json) : Loc.position =
     Not_found -> raise Notposition
 
 let parse_loc_color (j: json): Loc.position * color =
-  let loc = parse_loc j in
-  let color = parse_color j in
-  (loc, color)
+  try
+    let loc = parse_loc (get_field j "loc") in
+    let color = parse_color (get_field j "color") in
+    (loc, color)
+  with
+    Not_found -> raise Notposition
 
 let parse_list_loc (j: json): (Loc.position * color) list =
   match j with
@@ -380,7 +383,7 @@ let print_notification_to_json (n: notification): json =
       convert_record ["notification", cc n;
            "node_ID", Int nid;
            "task", String s;
-           "list_loc", convert_list_loc list_loc]
+           "loc_list", convert_list_loc list_loc]
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
