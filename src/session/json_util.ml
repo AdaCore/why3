@@ -24,12 +24,12 @@ let convert_prover_to_json (p: Whyconf.prover) =
 
 let convert_infos (i: global_information) =
   let convert_prover (s,h,p) =
-    Record (convert_record ["prover_shorcut", String s;
+    Record (convert_record ["prover_shortcut", String s;
                             "prover_name", String h;
                             "prover_parseable_name", String p])
   in
   let convert_strategy (s,p) =
-    Record (convert_record ["strategy_shorcut", String s;
+    Record (convert_record ["strategy_shortcut", String s;
                             "strategy_name", String p])
   in
   Record (convert_record
@@ -334,9 +334,12 @@ let parse_loc (j: json) : Loc.position =
     Not_found -> raise Notposition
 
 let parse_loc_color (j: json): Loc.position * color =
-  let loc = parse_loc j in
-  let color = parse_color j in
-  (loc, color)
+  try
+    let loc = parse_loc (get_field j "loc") in
+    let color = parse_color (get_field j "color") in
+    (loc, color)
+  with
+    Not_found -> raise Notposition
 
 let parse_list_loc (j: json): (Loc.position * color) list =
   match j with
@@ -380,7 +383,7 @@ let print_notification_to_json (n: notification): json =
       convert_record ["notification", cc n;
            "node_ID", Int nid;
            "task", String s;
-           "list_loc", convert_list_loc list_loc]
+           "loc_list", convert_list_loc list_loc]
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
@@ -586,7 +589,7 @@ let parse_update j =
 *)
   | _ -> raise NotUpdate
 
-exception NotInfos
+exception NotInfos of string
 
 let parse_infos j =
   try
@@ -598,14 +601,14 @@ let parse_infos j =
                                  (get_string (get_field j "prover_shortcut"),
                                   get_string (get_field j "prover_name"),
                                   get_string (get_field j "prover_parseable_name"))
-                               with Not_found -> raise NotInfos) pr;
-     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
+                               with Not_found -> raise (NotInfos "provers")) pr;
+     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "transformations")) tr;
      strategies = List.map (fun j -> try
                                  (get_string (get_field j "strategy_shortcut"),
                                   get_string (get_field j "strategy_name"))
-                               with Not_found -> raise NotInfos) str;
-     commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
-  with _ -> raise NotInfos
+                               with Not_found -> raise (NotInfos "strategies")) str;
+     commands = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "commands")) com}
+  with Not_found -> raise (NotInfos "infos")
 
 exception NotMessage
 
@@ -737,7 +740,7 @@ let parse_notification_json j =
     let constr = get_string (get_field j "notification") in
     parse_notification constr j
   with
-  | _ -> raise (NotNotification "<from parse_notification_json>")
+  | Not_found -> raise (NotNotification "<from parse_notification_json>")
 
 let parse_json_object (s: string) =
   let lb = Lexing.from_string s in
@@ -758,7 +761,7 @@ let parse_list_notification (s: string): notification list =
   match json with
   | List [Null] -> []
   | List l -> List.map parse_notification_json l
-  | _ -> []
+  | _ -> raise (NotNotification "Not list")
 
 let parse_list_request (s: string): ide_request list =
   let json = parse_json_object s in

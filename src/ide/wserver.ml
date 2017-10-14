@@ -57,22 +57,17 @@ let decode s =
       copy_decode_in s1 i (succ i1)
     else s1
   in
-  let rec strip_heading_and_trailing_spaces s =
-    let sl = Bytes.length s in
-    if sl > 0 then
-      if Bytes.get s 0 == ' ' then
-        strip_heading_and_trailing_spaces
-          (Bytes.sub s 1 (sl - 1))
-      else if Bytes.get s (sl - 1) == ' ' then
-        strip_heading_and_trailing_spaces
-          (Bytes.sub s 0 (sl - 1))
-      else s
-    else s
-  in
+  let rec strip s i1 i2 =
+    if i1 >= i2 then ""
+    else if Bytes.get s i1 = ' ' then strip s (i1 + 1) i2
+    else if Bytes.get s (i2 - 1) = ' ' then strip s i1 (i2 - 1)
+    else Bytes.sub_string s i1 (i2 - i1) in
+  let strip_heading_and_trailing_spaces s =
+    strip s 0 (Bytes.length s) in
   if need_decode 0 then
     let len = compute_len 0 0 in
     let s1 = Bytes.create len in
-    Bytes.to_string (strip_heading_and_trailing_spaces (copy_decode_in s1 0 0))
+    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
   else s
 
 let special =
