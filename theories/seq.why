@@ -306,8 +306,12 @@ theory Mem
   predicate mem (x: 'a) (s: seq 'a) =
     exists i: int. 0 <= i < length s && s[i] = x
 
-  lemma mem_append : forall x:'a, s1 s2.
+  lemma mem_append : forall x: 'a, s1 s2.
     mem x (s1 ++ s2) <-> mem x s1 \/ mem x s2
+
+  lemma mem_tail: forall x: 'a, s.
+    length s > 0 ->
+    mem x s <-> (x = s[0] \/ mem x s[1 .. ])
 
 end
 
