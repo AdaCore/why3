@@ -1477,7 +1477,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
        | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
        | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
-  let associated,detached =
+  let associated,_detached =
     AssoGoals.associate ~use_shapes old_subtasks new_subtasks
   in
   List.iter (function
@@ -1489,8 +1489,10 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
         found_detached := true)
     associated;
   (* save the detached goals *)
-  let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id))
+  (* DISABLED TO AVOID ANY FUTURE ANOMALIES 'Not_found' *)
+  (*let detached = List.map (fun (a,_) -> a) detached in
+  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
+   *))
   with _ ->
     Debug.dprintf debug
       "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;

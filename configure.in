@@ -484,9 +484,9 @@ if test "$USEOCAMLFIND" = yes; then
    if test -z "$JSOFOCAML"; then
       reason_jsofocaml=" (js_of_ocaml not found)"
    else
-      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml.ppx)
+      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml-ppx)
       if test -z "$JSOFOCAMLPPX"; then
-         reason_jsofocaml=" (js_of_ocaml.ppx not found)"
+         reason_jsofocaml=" (js_of_ocaml-ppx not found)"
       else
          HASJSOFOCAML=yes
       fi

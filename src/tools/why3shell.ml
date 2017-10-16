@@ -235,6 +235,7 @@ let is_proof_attempt node_type =
 let treat_notification fmt n =
   fprintf fmt "Treat notifications@.";
   match n with
+  | Reset_whole_tree -> () (* something to do ? *)
   | Node_change (id, info)        ->
     change_node fmt id info
   | New_node (id, pid, typ, name, detached) ->

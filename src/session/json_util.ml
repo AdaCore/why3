@@ -115,6 +115,7 @@ let convert_update u =
 
 let convert_notification_constructor n =
   match n with
+  | Reset_whole_tree             -> String "Reset_whole_tree"
   | New_node _                   -> String "New_node"
   | Node_change _                -> String "Node_change"
   | Remove _                     -> String "Remove"
@@ -152,7 +153,6 @@ let convert_request_constructor (r: ide_request) =
   | Copy_paste _              -> String "Copy_paste"
   | Copy_detached _           -> String "Copy_detached"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
-  | Get_Session_Tree_req      -> String "Get_Session_Tree_req"
   | Mark_obsolete_req _       -> String "Mark_obsolete_req"
   | Clean_req                 -> String "Clean_req"
   | Save_req                  -> String "Save_req"
@@ -201,8 +201,6 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
                       "node_ID", Int id]
   | Unfocus_req ->
-      convert_record ["ide_request", cc r]
-  | Get_Session_Tree_req ->
       convert_record ["ide_request", cc r]
   | Mark_obsolete_req n ->
       convert_record ["ide_request", cc r;
@@ -350,6 +348,7 @@ let print_notification_to_json (n: notification): json =
   let cc = convert_notification_constructor in
   Record (
   match n with
+  | Reset_whole_tree -> convert_record ["notification", cc n]
   | New_node (nid, parent, node_type, name, detached) ->
       convert_record ["notification", cc n;
            "node_ID", Int nid;
@@ -468,10 +467,6 @@ let parse_request (constr: string) j =
   | "Copy_detached" ->
     let n = get_int (get_field j "node_ID") in
     Copy_detached n
-
-  | "Get_Session_Tree_req" ->
-    Get_Session_Tree_req
-
   | "Mark_obsolete_req" ->
     let n = get_int (get_field j "node_ID") in
     Mark_obsolete_req n

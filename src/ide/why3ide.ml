@@ -720,10 +720,7 @@ let clear_tree_and_table goals_model =
 (**************)
 
 
-let reload_unsafe () =
-  (* Clearing the tree *)
-  clear_tree_and_table goals_model;
-  send_request Reload_req
+let reload_unsafe () = send_request Reload_req
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
@@ -1861,19 +1858,12 @@ let () =
       match get_selected_row_references () with
       | [r] ->
           let id = get_node_id r#iter in
-          send_request (Focus_req id);
-          (* TODO not efficient *)
-          clear_tree_and_table goals_model;
-          send_request (Get_Session_Tree_req);
+          send_request (Focus_req id)
       | _ -> print_message ~kind:1 ~mark:"Focus_req error"
                         "Select only one node to perform the focus action");
   connect_menu_item
     unfocus_item
-    ~callback:(fun () ->
-      send_request Unfocus_req;
-      (* TODO not efficient *)
-      clear_tree_and_table goals_model;
-      send_request (Get_Session_Tree_req))
+    ~callback:(fun () -> send_request Unfocus_req)
 
 
 (* the command-line *)
@@ -1881,6 +1871,7 @@ let () =
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
+  | Reset_whole_tree -> clear_tree_and_table goals_model
   | Node_change (id, uinfo)        ->
      begin
        match uinfo with
@@ -1897,7 +1888,12 @@ let treat_notification n =
           in
           if old <> b then begin
               set_status_and_time_column (get_node_row id);
-              if not b then
+              if b then
+                (* Trying to move cursor on first unproven goal around
+             on all cases but not when proofAttempt is updated because
+             ad hoc debugging. *)
+                if_selected_alone id (fun _ -> send_request (Get_first_unproven_node id))
+              else
                 begin
                   try
                     let row = Hint.find node_id_to_gtree id in
@@ -1907,10 +1903,7 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-          end;
-          (* Trying to move cursor on first unproven goal around on all cases
-             but not when proofAttempt is updated because ad hoc debugging. *)
-          send_request (Get_first_unproven_node id)
+          end
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
