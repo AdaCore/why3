@@ -179,8 +179,6 @@ let get_files s = s.session_files
 let get_file s name = Hstr.find s.session_files name
 let get_dir s = s.session_dir
 
-let get_shape_version s = s.session_shape_version
-
 (*
 let get_node (s : session) (n : int) =
   let _ = Hint.find s.proofNode_table n in n
@@ -497,10 +495,11 @@ let _print_session fmt s =
   fprintf fmt "%a@." (print_s s) l;;
 
 
-let empty_session ?shape_version dir =
-  let shape_version = match shape_version with
-    | Some v -> v
-    | None -> Termcode.current_shape_version
+let empty_session ?from dir =
+  let prover_ids, shape_version =
+    match from with
+    | Some v -> v.session_prover_ids, v.session_shape_version
+    | None -> Hprover.create 7, Termcode.current_shape_version
   in
   { proofAttempt_table = Hint.create 97;
     next_proofAttemptID = 0;
@@ -511,7 +510,7 @@ let empty_session ?shape_version dir =
     session_dir = dir;
     session_files = Hstr.create 3;
     session_shape_version = shape_version;
-    session_prover_ids = Hprover.create 7;
+    session_prover_ids = prover_ids;
     session_raw_tasks = Hpn.create 97;
     session_tasks = Hpn.create 97;
     file_state = Hstr.create 3;

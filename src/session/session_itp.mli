@@ -56,7 +56,6 @@ val get_files : session -> file Stdlib.Hstr.t
 val get_file: session -> string -> file
 (* Get directory containing the session *)
 val get_dir : session -> string
-val get_shape_version : session -> int
 
 (** File *)
 val file_name : file -> string
@@ -146,7 +145,7 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-val empty_session : ?shape_version:int -> string -> session
+val empty_session : ?from:session -> string -> session
 (** create an empty_session in the directory specified by the
     argument *)
 

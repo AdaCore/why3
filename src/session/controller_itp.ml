@@ -224,8 +224,7 @@ let print_session fmt c =
 
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
-  c.controller_session <-
-    empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
+  c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
   try
     merge_files ~use_shapes c.controller_env c.controller_session old_ses
   with e ->
