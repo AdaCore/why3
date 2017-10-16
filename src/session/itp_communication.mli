@@ -80,6 +80,7 @@ type update_info =
       * Call_provers.resource_limit
 
 type notification =
+  | Reset_whole_tree
   | New_node     of node_ID * node_ID * node_type * string * bool
   (** Notification of creation of new_node:
      New_node (new_node, parent_node, node_type, name, detached). *)
@@ -129,7 +130,6 @@ type ide_request =
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
   | Mark_obsolete_req       of node_ID
-  | Get_Session_Tree_req
   | Clean_req
   | Save_req
   | Reload_req

@@ -262,7 +262,6 @@ let print_request fmt r =
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
-  | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_file_req _                 -> fprintf fmt "save file"
   | Mark_obsolete_req _             -> fprintf fmt "mark obsolete"
   | Clean_req                       -> fprintf fmt "clean"
@@ -301,13 +300,11 @@ let print_list_loc fmt l =
 
 let print_notify fmt n =
   match n with
-  | Node_change (ni, nf)               ->
+  | Reset_whole_tree -> fprintf fmt "reset whole tree"
+  | Node_change (ni, nf) ->
       begin
         match nf with
         | Proved b -> fprintf fmt "node change %d Proved %b" ni b
-(*
-        | Obsolete b -> fprintf fmt "node change %d Obsolete %b" ni b
-*)
         | Proof_status_change(st,b,_lim) ->
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
@@ -534,6 +531,7 @@ let get_locations t =
 
 let get_modified_node n =
   match n with
+  | Reset_whole_tree -> None
   | New_node (nid, _, _, _, _) -> Some nid
   | Node_change  (nid, _) -> Some nid
   | Remove nid -> Some nid
@@ -852,30 +850,27 @@ end
   (* Initialization of session tree *)
   (**********************************)
 
+(*
   let _init_the_tree (): unit =
     let f ~parent node_id = ignore (new_node ~parent node_id) in
     iter_the_files f root_node
+*)
 
-  let init_and_send_subtree_from_trans parent trans_id : unit =
+  let send_new_subtree_from_trans parent trans_id : unit =
     iter_subtree_from_trans
       (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
 
-  let init_and_send_file f =
+  let send_new_subtree_from_file f =
     iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
       root_node f
 
-  let init_and_send_the_tree (): unit =
+  let reset_and_send_the_whole_tree (): unit =
+    P.notify Reset_whole_tree;
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root_node
 
-  let resend_the_tree (): unit =
-    let send_node ~parent any =
-      let node_id = node_ID_from_any any in
-      let node_name = get_node_name any in
-      let node_type = get_node_type any in
-      let node_detached = get_node_detached any in
-      P.notify (New_node (node_id, parent, node_type, node_name, node_detached));
-      get_node_proved node_id any in
-    iter_the_files send_node root_node
+  let unfocus () =
+    focused_node := Unfocused;
+    reset_and_send_the_whole_tree ()
 
   (* -- send the task -- *)
   let task_of_id d id do_intros show_full_context loc =
@@ -938,7 +933,7 @@ end
             let b = add_file cont f in
             if b then
               let file = get_file cont.controller_session fn in
-              init_and_send_file file;
+              send_new_subtree_from_file file;
               read_and_send (file_name file)
           end
         else
@@ -996,7 +991,7 @@ end
     if b then
       begin
         (* Send the tree *)
-        init_and_send_the_tree ();
+        reset_and_send_the_whole_tree ();
         (* After initial sending, we don't check anymore that there is a need to
            focus on a specific node. *)
         get_focused_label := None
@@ -1084,7 +1079,7 @@ end
       let ses = d.cont.controller_session in
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
-      init_and_send_subtree_from_trans nid trans_id
+      send_new_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
@@ -1197,11 +1192,17 @@ end
 
   let reload_session () : unit =
     let d = get_server_data () in
+    (* interrupt all running provers and unfocus before reload *)
+    C.interrupt ();
+    let _old_focus = !focused_node in
+    unfocus ();
     clear_tables ();
-    (* Calling reload_files breaks the controller if it fails *)
     let b = reload_files d.cont ~use_shapes:true in
-    if b then init_and_send_the_tree ()
-
+    if b then
+      begin
+        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
+        reset_and_send_the_whole_tree ()
+      end
 
   let replay_session () : unit =
     let d = get_server_data () in
@@ -1272,33 +1273,23 @@ end
     let config = d.cont.controller_config in
     try (
     match r with
-(*
-    | Edit_req (nid, p)            ->
-      let p = try Some (get_prover p) with
-      | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))); None
-      in
-      begin match p with
-      | None -> ()
-      | Some p ->
-          schedule_edition nid p
-      end
- *)
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
-    | Get_Session_Tree_req         -> resend_the_tree ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
     | Focus_req nid ->
         let d = get_server_data () in
         let s = d.cont.controller_session in
         let any = any_from_node_ID nid in
-        (match any with
-        | APa pa ->
-          focused_node := Focus_on [APn (Session_itp.get_proof_attempt_parent s pa)]
-        | _ -> focused_node := Focus_on [any])
-    | Unfocus_req ->
-        focused_node := Unfocused
+        let focus_on =
+          match any with
+          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+          | _ -> any
+        in
+        focused_node := Focus_on [focus_on];
+        reset_and_send_the_whole_tree ()
+    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
