@@ -6,15 +6,16 @@
 <prover id="1" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Coq" version="8.6.1" timelimit="0" steplimit="0" memlimit="0"/>
 <file name="../vstte12_bfs.mlw">
-<theory name="Graph" proved="true" sum="6c04d6aed1130b5b8ff3aa7a91e5d888">
- <goal name="path_closure" proved="true">
+<theory name="Graph" proved="true" sum="8e37a9e21c8d4d37e6f9fb98b6bc91dc">
+ <goal name="path_nonneg" proved="true">
  <transf name="induction_pr" proved="true" >
-  <goal name="path_closure.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="path_nonneg.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="path_closure.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="path_nonneg.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
@@ -28,18 +29,85 @@
   </goal>
  </transf>
  </goal>
- <goal name="path_nonneg" proved="true">
+ <goal name="path_closure" proved="true">
  <transf name="induction_pr" proved="true" >
-  <goal name="path_nonneg.0" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="path_closure.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="path_nonneg.1" proved="true">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <goal name="path_closure.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="BFS" sum="2dea7f100e4034a4c7ca182744980002">
+<theory name="BFS" sum="e29d8288212bcb8945c3fe3decdd22b0">
+ <goal name="VC fill_next" expl="VC for fill_next" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC fill_next.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
+  </goal>
+  <goal name="VC fill_next.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
+  </goal>
+  <goal name="VC fill_next.2" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="49"/></proof>
+  </goal>
+  <goal name="VC fill_next.3" expl="loop invariant preservation" proved="true">
+  <transf name="introduce_premises" proved="true" >
+   <goal name="VC fill_next.3.0" expl="loop invariant preservation" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="VC fill_next.3.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC fill_next.3.0.0.0" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="116"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.1" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.2" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.03" steps="115"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.3" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.04" steps="150"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.4" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.01" steps="46"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.5" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.58" steps="2031"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.6" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.7" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.02" steps="72"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.8" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.9" expl="VC for fill_next" proved="true">
+     <proof prover="2"><result status="valid" time="0.11" steps="372"/></proof>
+     </goal>
+     <goal name="VC fill_next.3.0.0.10" expl="VC for fill_next" proved="true">
+     <proof prover="3"><result status="valid" time="0.33"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC fill_next.4" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
+  </goal>
+  <goal name="VC fill_next.5" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.36" steps="694"/></proof>
+  </goal>
+  <goal name="VC fill_next.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.26" steps="759"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="VC bfs" expl="VC for bfs">
  <transf name="split_goal_wp" >
   <goal name="VC bfs.0" expl="loop invariant init" proved="true">
@@ -135,74 +203,8 @@
   <goal name="VC bfs.6" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="83"/></proof>
   </goal>
-  <goal name="VC bfs.7" expl="postcondition">
-  </goal>
- </transf>
- </goal>
- <goal name="VC fill_next" expl="VC for fill_next" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="VC fill_next.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
-  </goal>
-  <goal name="VC fill_next.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  </goal>
-  <goal name="VC fill_next.2" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="49"/></proof>
-  </goal>
-  <goal name="VC fill_next.3" expl="loop invariant preservation" proved="true">
-  <transf name="introduce_premises" proved="true" >
-   <goal name="VC fill_next.3.0" expl="loop invariant preservation" proved="true">
-   <transf name="inline_goal" proved="true" >
-    <goal name="VC fill_next.3.0.0" expl="loop invariant preservation" proved="true">
-    <transf name="split_goal_wp" proved="true" >
-     <goal name="VC fill_next.3.0.0.0" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.03" steps="116"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.1" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.2" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.03" steps="115"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.3" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.04" steps="150"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.4" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.01" steps="46"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.5" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.58" steps="2031"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.6" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.7" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.02" steps="72"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.8" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.9" expl="VC for fill_next" proved="true">
-     <proof prover="2"><result status="valid" time="0.11" steps="372"/></proof>
-     </goal>
-     <goal name="VC fill_next.3.0.0.10" expl="VC for fill_next" proved="true">
-     <proof prover="3"><result status="valid" time="0.33"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC fill_next.4" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
-  </goal>
-  <goal name="VC fill_next.5" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.36" steps="694"/></proof>
-  </goal>
-  <goal name="VC fill_next.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.26" steps="759"/></proof>
+  <goal name="VC bfs.7" expl="postcondition" proved="true">
+  <proof prover="4" edited="vstte12_bfs_BFS_VC_bfs_1.v"><result status="valid" time="0.54"/></proof>
   </goal>
  </transf>
  </goal>
