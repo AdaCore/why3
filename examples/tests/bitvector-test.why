@@ -22,3 +22,20 @@ theory TestBv32
     let b = asr (lsr ones 1) 16 in nth b 16 = False
 
 end
+
+theory NthConvert
+
+  use import mach.int.Int
+
+  use bv.BV8
+  use bv.BV64
+  use bv.BVConverter_8_64 as BVC
+
+  lemma bv8_to_bv64_low:
+    forall x i. 0 <= i < 8 -> BV64.nth (BVC.toBig x) i = BV8.nth x i
+        by forall i. 
+             BV64.nth_bv (BVC.toBig x) (BVC.toBig i) = BV8.nth_bv x i
+        
+  lemma bv8_to_bv64_high:
+    forall x i. 8 <= i < 64 -> BV64.nth (BVC.toBig x) i = false
+end
