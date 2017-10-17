@@ -577,7 +577,7 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
   | Unsupported s ->
-      fprintf fmt "@[<hov 3> Uncatched exception 'Unsupported %s'@]" s
+      fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
       fprintf fmt "@[@[<hov 3> This type isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_ty e s

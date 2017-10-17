@@ -1493,5 +1493,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | FieldExpected s -> fprintf fmt
       "Function %a is not a mutable field" print_rs s
   | ExceptionLeak xs -> fprintf fmt
-      "Uncatched local exception %a" print_xs xs
+      "Uncaught local exception %a" print_xs xs
   | _ -> raise e)
