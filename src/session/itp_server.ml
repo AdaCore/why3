@@ -474,28 +474,29 @@ let color_loc list ~color ~loc =
   list := (loc, color) :: !list
 
 let rec color_locs list ~color formula =
-  let b = ref false in
-  Opt.iter (fun loc -> color_loc list ~color ~loc; b := true) formula.Term.t_loc;
-  Term.t_fold (fun b subf -> color_locs list ~color subf || b) !b formula
+  Opt.iter (fun loc -> color_loc list ~color ~loc) formula.Term.t_loc;
+  Term.t_iter (fun subf -> color_locs list ~color subf) formula
 
-let rec color_t_locs list f =
-  let premise_tag = function
-    | { Term.t_node = Term.Tnot _; t_loc = None } -> Neg_premise_color
-    | _ -> Premise_color
-  in
+let rec color_t_locs list premise f =
   match f.Term.t_node with
-    | Term.Tbinop (Term.Timplies,f1,f2) ->
-        let b = color_locs list ~color:(premise_tag f1) f1 in
-        color_t_locs list f2 || b
-    | Term.Tlet (t,fb) ->
-        let _,f1 = Term.t_open_bound fb in
-        let b = color_locs list ~color:(premise_tag t) t in
-        color_t_locs list f1 || b
-    | Term.Tquant (Term.Tforall,fq) ->
-        let _,_,f1 = Term.t_open_quant fq in
-        color_t_locs list f1
-    | _ ->
-        color_locs list ~color:Goal_color f
+  | Term.Tbinop (Term.Timplies,f1,f2) when not premise ->
+    color_t_locs list true f1;
+    color_t_locs list false f2
+  | Term.Tbinop (Term.Tand,f1,f2) when premise ->
+    color_t_locs list premise f1;
+    color_t_locs list premise f2
+  | Term.Tlet (_,fb) ->
+    let _,f1 = Term.t_open_bound fb in
+    color_t_locs list premise f1
+  | Term.Tquant (Term.Tforall,fq) when not premise ->
+    let _,_,f1 = Term.t_open_quant fq in
+    color_t_locs list premise f1
+  | Term.Tnot f1 when premise && f.Term.t_loc = None ->
+    color_locs list ~color:Neg_premise_color f1
+  | _ when premise ->
+    color_locs list ~color:Premise_color f
+  | _ ->
+    color_locs list ~color:Goal_color f
 
 exception No_loc_on_goal
 
@@ -514,15 +515,21 @@ let color_goal list loc =
 let get_locations list (task: Task.task) =
   let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
   color_goal list goal_id.Ident.id_loc;
-  match task with
+  let rec scan = function
     | Some
-        { Task.task_decl =
+        { Task.task_prev = prev;
+          Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        if not (color_t_locs list f) then
-          Opt.iter (fun loc -> color_loc list ~color:Goal_color ~loc) goal_id.Ident.id_loc
-    | _ ->
-        assert false
+                Theory.Decl { Decl.d_node = Decl.Dprop (k, _, f) }}} ->
+      begin match k with
+      | Decl.Pgoal -> color_t_locs list false f
+      | Decl.Paxiom -> color_t_locs list true f
+      | _ -> assert false
+      end;
+      scan prev
+    | Some { Task.task_prev = prev } -> scan prev
+    | _ -> () in
+  scan task
 
 let get_locations t =
   let l = ref [] in
