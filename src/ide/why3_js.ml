@@ -592,6 +592,7 @@ let interpNotif (n: notification) =
       match up with
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
+      | Name_change _n -> assert false (* TODO *)
       | Proof_status_change (c, _obsolete, _rl) ->
         begin
         (* TODO complete other tests *)

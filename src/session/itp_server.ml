@@ -304,7 +304,8 @@ let print_notify fmt n =
   | Node_change (ni, nf) ->
       begin
         match nf with
-        | Proved b -> fprintf fmt "node change %d Proved %b" ni b
+        | Proved b -> fprintf fmt "node change %d: proved=%b" ni b
+        | Name_change n -> fprintf fmt "node change %d: renamed to '%s'" ni n
         | Proof_status_change(st,b,_lim) ->
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
@@ -1012,6 +1013,12 @@ end
         let parent = node_ID_from_pn parent_id in
         new_node ~parent (APa panid)
     in
+    begin match pa_status with
+          | UpgradeProver _ ->
+             let n = get_node_name (APa panid) in
+             P.notify (Node_change (node_id, Name_change n))
+          | _ -> ()
+    end;
     let pa = get_proof_attempt_node ses panid in
     let new_status =
       Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)

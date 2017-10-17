@@ -25,6 +25,7 @@ type proof_attempt_status =
   | Detached (** parent goal has no task, is detached *)
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
+  | UpgradeProver of Whyconf.prover (** prover is upgraded *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 

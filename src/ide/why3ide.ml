@@ -1274,6 +1274,7 @@ let on_selected_row r =
          | Controller_itp.InternalFailure e ->
             (Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e)
          | Controller_itp.Uninstalled _p -> "uninstalled prover"
+         | Controller_itp.UpgradeProver _p -> "upgraded prover"
        in
        let output_text =
          if output_text = "" then
@@ -1516,6 +1517,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.InternalFailure _e -> !image_failure
   | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
+  | Controller_itp.UpgradeProver _p -> !image_undone
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
     begin
@@ -1606,6 +1608,7 @@ let set_status_and_time_column ?limit row =
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
         | C.Uninstalled _ -> "(uninstalled prover)"
+        | C.UpgradeProver _ -> "(upgraded prover)"
         | C.Scheduled -> "(scheduled)"
         | C.Running -> "(running)"
         | C.Detached -> "(detached)"
@@ -1913,7 +1916,10 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-          end
+            end
+       | Name_change n ->
+          let row = get_node_row id in
+          goals_model#set ~row:row#iter ~column:name_column n
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
