@@ -607,7 +607,7 @@ let view_name_column =
   let v = GTree.view_column ~title:"Theories/Goals" () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
-  v#pack icon_renderer ;
+  v#pack icon_renderer ~expand:false;
   v#add_attribute icon_renderer "pixbuf" icon_column;
   let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] in
   v#pack name_renderer;
