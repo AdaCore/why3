@@ -1907,7 +1907,11 @@ let treat_notification n =
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
-          set_status_and_time_column ~limit:l r
+          set_status_and_time_column ~limit:l r;
+          match pa with
+          | Controller_itp.Uninstalled p ->
+             uninstalled_prover_dialog gconfig p
+          | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id

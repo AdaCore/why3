@@ -404,7 +404,7 @@ let interp commands_table cont id s =
                                      pa.Session_itp.prover in
                            Edit p
                          with Not_found ->
-                              QError "prover not found"
+                              QError "cannot edit: uninstalled prover"
                        end
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
