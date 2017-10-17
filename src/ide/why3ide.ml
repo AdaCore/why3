@@ -1313,14 +1313,19 @@ let (_ : GtkSignal.id) =
     begin
       Debug.dprintf debug "button number %d was clicked on the tree view@." n;
       match n with
-      | 1 -> (* Left click *) false
-      | 2 -> (* Middle click *) false
       | 3 -> (* Right click *)
-         Debug.dprintf debug "before tools_menu#popup@.";
-         tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
-         Debug.dprintf debug "after tools_menu#popup@.";
-         true
-      | _ -> (* Error case TODO *) assert false
+        let sel = goals_view#selection in
+        let x = int_of_float (GdkEvent.Button.x ev) in
+        let y = int_of_float (GdkEvent.Button.y ev) in
+        begin match goals_view#get_path_at_pos ~x ~y with
+        | Some (path,_,_,_) when not (sel#path_is_selected path) ->
+          sel#unselect_all ();
+          sel#select_path path
+        | _ -> ()
+        end;
+        tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+        true
+      | _ -> (* Other buttons *) false
     end
   in
   goals_view#event#connect#button_press ~callback
