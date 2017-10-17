@@ -6,11 +6,11 @@ Require HighOrd.
 Require int.Int.
 Require int.Abs.
 Require int.ComputerDivision.
-Require option.Option.
-Require list.List.
-Require list.Mem.
 Require map.Map.
 Require map.Const.
+Require list.List.
+Require list.Mem.
+Require option.Option.
 
 Axiom array : forall (a:Type), Type.
 Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
@@ -99,6 +99,8 @@ Theorem VC_remove : forall {a:Type} {a_WT:WhyType a}, forall (h:(t a))
   | (Init.Datatypes.Some v) => (list.Mem.mem (k, v) l)
   end -> ((o1 = Init.Datatypes.None) -> (((view h)
   k) = Init.Datatypes.None))).
+(* Why3 intros a a_WT h h_view h_data h_size k (h1,(h2,h3)) o i (h4,h5) l o1
+        h6 h7. *)
 Proof.
 intros a a_WT h h_view h_data h_size k (h1,(h2,h3)) o i (h4,h5) l o1 h6 h7.
 subst i.
@@ -111,3 +113,4 @@ destruct (view h k); intuition.
 elim (h6 a0).
 now apply h8.
 Qed.
+
