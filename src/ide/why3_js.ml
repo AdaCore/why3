@@ -540,7 +540,7 @@ end
 
 let interpNotif (n: notification) =
   match n with
-  | Reset_whole_tree ->  PE.error_print_msg "Reset_whole_tree"
+  | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->
       PE.error_print_msg "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->

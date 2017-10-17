@@ -681,6 +681,8 @@ exception NotNotification of string
 
 let parse_notification constr j =
   match constr with
+  | "Reset_whole_tree" -> Reset_whole_tree
+
   | "New_node" ->
     let nid = get_int (get_field j "node_ID") in
     let parent = get_int (get_field j "parent_ID") in
