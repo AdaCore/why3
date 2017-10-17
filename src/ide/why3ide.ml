@@ -791,7 +791,7 @@ let task_view =
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 4 in
+  let n = ref 1 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -1274,6 +1274,7 @@ let on_selected_row r =
          | Controller_itp.InternalFailure e ->
             (Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e)
          | Controller_itp.Uninstalled _p -> "uninstalled prover"
+         | Controller_itp.UpgradeProver _p -> "upgraded prover"
        in
        let output_text =
          if output_text = "" then
@@ -1516,6 +1517,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.InternalFailure _e -> !image_failure
   | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
+  | Controller_itp.UpgradeProver _p -> !image_undone
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
     begin
@@ -1606,6 +1608,7 @@ let set_status_and_time_column ?limit row =
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
         | C.Uninstalled _ -> "(uninstalled prover)"
+        | C.UpgradeProver _ -> "(upgraded prover)"
         | C.Scheduled -> "(scheduled)"
         | C.Running -> "(running)"
         | C.Detached -> "(detached)"
@@ -1868,6 +1871,16 @@ let () =
 
 (* the command-line *)
 
+let check_uninstalled_prover =
+  let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
+  fun p ->
+  if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
+  then begin
+      Whyconf.Hprover.add uninstalled_prover_seen p ();
+      uninstalled_prover_dialog gconfig p
+    end
+
+
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
@@ -1903,11 +1916,17 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-          end
+            end
+       | Name_change n ->
+          let row = get_node_row id in
+          goals_model#set ~row:row#iter ~column:name_column n
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
-          set_status_and_time_column ~limit:l r
+          set_status_and_time_column ~limit:l r;
+          match pa with
+          | Controller_itp.Uninstalled p -> check_uninstalled_prover p
+          | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
       if_selected_alone asked_id

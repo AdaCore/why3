@@ -272,3 +272,8 @@ val load_driver : main -> Env.env -> string -> string list -> Driver.driver
 (** wrapper for loading a driver from a file that may be relative to the datadir.
     See [Driver.load_driver_absolute]
 *)
+
+val unknown_to_known_provers  :
+  config_prover Mprover.t -> prover ->
+  prover list * prover list * prover list
+(** return others, same name, same version *)

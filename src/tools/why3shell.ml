@@ -223,7 +223,9 @@ let change_node fmt (n: node_ID) (u: update_info) =
         node.node_proved <- b
     | Proof_status_change (_pas, _b, _rl) when node.node_type = SProofAttempt ->
         fprintf fmt "Not yet supported@." (* TODO *)
-    | _ -> fprintf fmt "Not yet supported@.") (* TODO *)
+    | Proof_status_change _ ->
+        fprintf fmt "Not yet supported@." (* TODO *)
+    | Name_change _ -> fprintf fmt "Not yet supported@.") (* TODO *)
   with
     Not_found -> fprintf fmt "Could not find node %d@." n
 

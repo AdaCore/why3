@@ -304,7 +304,8 @@ let print_notify fmt n =
   | Node_change (ni, nf) ->
       begin
         match nf with
-        | Proved b -> fprintf fmt "node change %d Proved %b" ni b
+        | Proved b -> fprintf fmt "node change %d: proved=%b" ni b
+        | Name_change n -> fprintf fmt "node change %d: renamed to '%s'" ni n
         | Proof_status_change(st,b,_lim) ->
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
@@ -462,72 +463,73 @@ let () =
 
 (* This section is used to get colored source as a function of the task *)
 
-
-(* These functions append stuff to a list which will then be passed to the
-   Task notification. *)
-let color_loc list ~color ~loc =
-  let d = get_server_data () in
-  let (f,l,b,e) = Loc.get loc in
-  let f = Sysutil.relativize_filename
-    (Session_itp.get_dir d.cont.controller_session) f in
-  let loc = Loc.user_position f l b e in
-  list := (loc, color) :: !list
-
-let rec color_locs list ~color formula =
-  let b = ref false in
-  Opt.iter (fun loc -> color_loc list ~color ~loc; b := true) formula.Term.t_loc;
-  Term.t_fold (fun b subf -> color_locs list ~color subf || b) !b formula
-
-let rec color_t_locs list f =
-  let premise_tag = function
-    | { Term.t_node = Term.Tnot _; t_loc = None } -> Neg_premise_color
-    | _ -> Premise_color
-  in
-  match f.Term.t_node with
-    | Term.Tbinop (Term.Timplies,f1,f2) ->
-        let b = color_locs list ~color:(premise_tag f1) f1 in
-        color_t_locs list f2 || b
-    | Term.Tlet (t,fb) ->
-        let _,f1 = Term.t_open_bound fb in
-        let b = color_locs list ~color:(premise_tag t) t in
-        color_t_locs list f1 || b
-    | Term.Tquant (Term.Tforall,fq) ->
-        let _,_,f1 = Term.t_open_quant fq in
-        color_t_locs list f1
-    | _ ->
-        color_locs list ~color:Goal_color f
-
 exception No_loc_on_goal
 
-let color_goal list loc =
-  match loc with
-  | None ->
+let get_locations (task: Task.task) =
+  let list = ref [] in
+  let file_cache = Hstr.create 17 in
+  let session_dir =
+    let d = get_server_data () in
+    Session_itp.get_dir d.cont.controller_session in
+  let relativize f =
+    try Hstr.find file_cache f
+    with Not_found ->
+      let g = Sysutil.relativize_filename session_dir f in
+      Hstr.replace file_cache f g;
+      g in
+  let color_loc ~color ~loc =
+    let (f,l,b,e) = Loc.get loc in
+    let loc = Loc.user_position (relativize f) l b e in
+    list := (loc, color) :: !list in
+  let rec color_locs ~color formula =
+    Opt.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
+    Term.t_iter (fun subf -> color_locs ~color subf) formula in
+  let rec color_t_locs ~premise f =
+    match f.Term.t_node with
+    | Term.Tbinop (Term.Timplies,f1,f2) when not premise ->
+      color_t_locs ~premise:true f1;
+      color_t_locs ~premise:false f2
+    | Term.Tbinop (Term.Tand,f1,f2) when premise ->
+      color_t_locs ~premise f1;
+      color_t_locs ~premise f2
+    | Term.Tlet (_,fb) ->
+      let _,f1 = Term.t_open_bound fb in
+      color_t_locs ~premise f1
+    | Term.Tquant (Term.Tforall,fq) when not premise ->
+      let _,_,f1 = Term.t_open_quant fq in
+      color_t_locs ~premise f1
+    | Term.Tnot f1 when premise && f.Term.t_loc = None ->
+      color_locs ~color:Neg_premise_color f1
+    | _ when premise ->
+      color_locs ~color:Premise_color f
+    | _ ->
+      color_locs ~color:Goal_color f in
+  let color_goal = function
+    | None ->
       (* This case can happen when after some transformations: for example, in
          an assert, the new goal asserted is not tagged with locations *)
       (* This error is harmless but we want to detect it when debugging. *)
       if Debug.test_flag Debug.stack_trace then
         raise No_loc_on_goal
-      else
-        ()
-  | Some loc -> color_loc list ~color:Goal_color ~loc
-
-let get_locations list (task: Task.task) =
+    | Some loc -> color_loc ~color:Goal_color ~loc in
   let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
-  color_goal list goal_id.Ident.id_loc;
-  match task with
+  color_goal goal_id.Ident.id_loc;
+  let rec scan = function
     | Some
-        { Task.task_decl =
+        { Task.task_prev = prev;
+          Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        if not (color_t_locs list f) then
-          Opt.iter (fun loc -> color_loc list ~color:Goal_color ~loc) goal_id.Ident.id_loc
-    | _ ->
-        assert false
-
-let get_locations t =
-  let l = ref [] in
-  get_locations l t;
-  !l
+                Theory.Decl { Decl.d_node = Decl.Dprop (k, _, f) }}} ->
+      begin match k with
+      | Decl.Pgoal  -> color_t_locs ~premise:false f
+      | Decl.Paxiom -> color_t_locs ~premise:true  f
+      | _ -> assert false
+      end;
+      scan prev
+    | Some { Task.task_prev = prev } -> scan prev
+    | _ -> () in
+  scan task;
+  !list
 
 let get_modified_node n =
   match n with
@@ -1011,6 +1013,12 @@ end
         let parent = node_ID_from_pn parent_id in
         new_node ~parent (APa panid)
     in
+    begin match pa_status with
+          | UpgradeProver _ ->
+             let n = get_node_name (APa panid) in
+             P.notify (Node_change (node_id, Name_change n))
+          | _ -> ()
+    end;
     let pa = get_proof_attempt_node ses panid in
     let new_status =
       Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)

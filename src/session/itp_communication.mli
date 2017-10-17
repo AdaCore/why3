@@ -74,6 +74,7 @@ type color =
 
 type update_info =
   | Proved of bool
+  | Name_change of string
   | Proof_status_change of
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)

@@ -94,6 +94,9 @@ let convert_proof_attempt (pas: proof_attempt_status) =
                       "exception", String (Pp.string_of Exn_printer.exn_printer e)]
   | Uninstalled p ->
       convert_record ["proof_attempt", String "Uninstalled";
+                      "prover", convert_prover_to_json p]
+  | UpgradeProver p ->
+      convert_record ["proof_attempt", String "UpgradeProver";
                       "prover", convert_prover_to_json p])
 
 let convert_update u =
@@ -101,17 +104,15 @@ let convert_update u =
   | Proved b ->
       convert_record ["update_info", String "Proved";
              "proved", Bool b]
+  | Name_change n ->
+      convert_record ["update_info", String "Name_change";
+             "name", String n]
   | Proof_status_change (pas, b, l) ->
       convert_record ["update_info", String "Proof_status_change";
              "proof_attempt", convert_proof_attempt pas;
              "obsolete", Bool b;
              "limit", convert_limit l]
-(*
-  | Obsolete b ->
-      convert_record ["update_info", String "Obsolete";
-           "obsolete", Bool b]
-*)
-         )
+  )
 
 let convert_notification_constructor n =
   match n with
@@ -562,6 +563,9 @@ let parse_proof_attempt j =
   | "Uninstalled" ->
     let p = get_field j "prover" in
     Uninstalled (parse_prover_from_json p)
+  | "UpgradeProver" ->
+    let p = get_field j "prover" in
+    UpgradeProver (parse_prover_from_json p)
   | _ -> raise NotProofAttempt
 
 exception NotUpdate
@@ -572,16 +576,14 @@ let parse_update j =
   | "Proved" ->
     let b = get_bool (get_field j "proved") in
     Proved b
+  | "Name_change" ->
+    let n = get_string (get_field j "name") in
+    Name_change n
   | "Proof_status_change" ->
     let pas = get_field j "proof_attempt" in
     let b = get_bool (get_field j "obsolete") in
     let l = get_field j "limit" in
     Proof_status_change (parse_proof_attempt pas, b, parse_limit_from_json l)
-(*
-  | "Obsolete" ->
-    let b = get_bool (get_field j "obsolete") in
-    Obsolete b
-*)
   | _ -> raise NotUpdate
 
 exception NotInfos of string
@@ -681,6 +683,8 @@ exception NotNotification of string
 
 let parse_notification constr j =
   match constr with
+  | "Reset_whole_tree" -> Reset_whole_tree
+
   | "New_node" ->
     let nid = get_int (get_field j "node_ID") in
     let parent = get_int (get_field j "parent_ID") in

@@ -540,7 +540,7 @@ end
 
 let interpNotif (n: notification) =
   match n with
-  | Reset_whole_tree ->  PE.error_print_msg "Reset_whole_tree"
+  | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->
       PE.error_print_msg "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
@@ -592,6 +592,7 @@ let interpNotif (n: notification) =
       match up with
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
+      | Name_change _n -> assert false (* TODO *)
       | Proof_status_change (c, _obsolete, _rl) ->
         begin
         (* TODO complete other tests *)

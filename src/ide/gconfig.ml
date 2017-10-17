@@ -1190,18 +1190,16 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-(*
-let uninstalled_prover c eS unknown =
-  try
-    Whyconf.get_prover_upgrade_policy c.config unknown
-  with Not_found ->
-    let others,names,versions = Session_tools.unknown_to_known_provers
-      (Whyconf.get_provers eS.Session.whyconf) unknown in
-    let dialog = GWindow.dialog
-      ~icon:(!why_icon) ~modal:true
-      ~title:"Why3: Uninstalled prover" ()
-    in
-    let vbox = dialog#vbox in
+let uninstalled_prover_dialog c unknown =
+  let others,names,versions =
+    Whyconf.unknown_to_known_provers
+      (Whyconf.get_provers c.config) unknown
+  in
+  let dialog = GWindow.dialog
+                 ~icon:(!why_icon) ~modal:true
+                 ~title:"Why3: Uninstalled prover" ()
+  in
+  let vbox = dialog#vbox in
 (* Does not work: why ??
     let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
     let hbox = GPack.hbox ~packing:vbox_pack () in
@@ -1299,8 +1297,7 @@ let uninstalled_prover c eS unknown =
         | _ -> assert false
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
-    policy
- *)
+    ()
 
 
 (*

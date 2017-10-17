@@ -1177,6 +1177,8 @@ let t_fold fn acc t = match t.t_node with
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
 
+let t_iter fn t = t_fold (fun () t -> fn t) () t
+
 let t_all pr t = Util.all t_fold pr t
 let t_any pr t = Util.any t_fold pr t
 
