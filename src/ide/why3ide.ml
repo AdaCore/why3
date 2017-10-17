@@ -646,9 +646,10 @@ let goals_model,goals_view =
   let () = view#set_rules_hint true in
 *)
   let () = view#set_enable_search false in
-  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_status_column in
+  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_time_column in
+  view#set_expander_column (Some view_name_column);
   Debug.dprintf debug "done@.";
   model,view
 
