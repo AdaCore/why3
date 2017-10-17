@@ -1868,6 +1868,16 @@ let () =
 
 (* the command-line *)
 
+let check_uninstalled_prover =
+  let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
+  fun p ->
+  if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
+  then begin
+      Whyconf.Hprover.add uninstalled_prover_seen p ();
+      uninstalled_prover_dialog gconfig p
+    end
+
+
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
@@ -1909,8 +1919,7 @@ let treat_notification n =
           Hint.replace node_id_pa id (pa, obs, l);
           set_status_and_time_column ~limit:l r;
           match pa with
-          | Controller_itp.Uninstalled p ->
-             uninstalled_prover_dialog gconfig p
+          | Controller_itp.Uninstalled p -> check_uninstalled_prover p
           | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
