@@ -372,6 +372,7 @@ val t_pred_app_beta_l : term -> term list -> term
 
 val t_map : (term -> term) -> term -> term
 val t_fold : ('a -> term -> 'a) -> 'a -> term -> 'a
+val t_iter : (term -> unit) -> term -> unit
 val t_map_fold : ('a -> term -> 'a * term) -> 'a -> term -> 'a * term
 
 val t_all : (term -> bool) -> term -> bool
