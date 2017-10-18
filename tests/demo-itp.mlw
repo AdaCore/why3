@@ -87,6 +87,16 @@ module TestAutoFocus
 
 end
 
+module TestRewritePoly
+
+  use import int.Int
+  use import list.List
+  use import list.Append
+  
+  goal g : (Cons 1 Nil) ++ ((Cons 2 Nil) ++ Nil) = Cons 1 (Cons 2 Nil)
+  
+end
+
 
 module Power
 
