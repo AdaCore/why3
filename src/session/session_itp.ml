@@ -1315,7 +1315,7 @@ module CombinedTheoryChecksum = struct
 
   let f () pn =
     match pn.proofn_checksum with
-    | None -> assert false
+    | None -> assert false (* TODO: may happen with detached nodes! *)
     | Some c -> Buffer.add_string b (Termcode.string_of_checksum c)
 
   let compute s th =
