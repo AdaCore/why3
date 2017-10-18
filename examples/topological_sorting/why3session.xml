@@ -5,7 +5,7 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../topological_sorting.mlw">
+<file name="../topological_sorting.mlw" proved="true">
 <theory name="Graph" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Static" proved="true" sum="19f45f71ad81b66fe840ed3f636e6b6e">
@@ -181,142 +181,162 @@
 </theory>
 <theory name="Online_graph" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Online_Basic" sum="9a7270dbb475914b835c358a952c3b00">
+<theory name="Online_Basic" proved="true" sum="a47dff0408e1bb28c15f74b551ca0109">
  <goal name="VC create" expl="VC for create" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC create.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC create.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC dfs" expl="VC for dfs">
- <transf name="split_goal_wp" >
+ <goal name="VC dfs" expl="VC for dfs" proved="true">
+ <transf name="split_goal_wp" proved="true" >
   <goal name="VC dfs.0" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC dfs.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.4" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC dfs.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC dfs.6" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="VC dfs.7" expl="variant decrease">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.98"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
-  <transf name="split_goal_wp" >
+  <goal name="VC dfs.7" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.98"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <transf name="split_goal_wp" proved="true" >
    <goal name="VC dfs.7.0" expl="VC for dfs" proved="true">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="VC dfs.7.1" expl="VC for dfs">
-   <proof prover="0" timelimit="1"><result status="unknown" time="1.00"/></proof>
-   <proof prover="1"><result status="timeout" time="1.00"/></proof>
-   <proof prover="2"><result status="timeout" time="1.00"/></proof>
+   <goal name="VC dfs.7.1" expl="VC for dfs" proved="true">
+   <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC dfs.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.15"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.15"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC dfs.10" expl="precondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.40"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <goal name="VC dfs.10" expl="precondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.40"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC dfs.11" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC dfs.12" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="VC dfs.14" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.07"/></proof>
-  </goal>
-  <goal name="VC dfs.15" expl="loop invariant preservation">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.98"/></proof>
-  <proof prover="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="123"/></proof>
   <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
+  <goal name="VC dfs.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC dfs.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.98"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
   <goal name="VC dfs.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.17" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC dfs.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC dfs.19" expl="postcondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.93"/></proof>
-  <proof prover="1"><result status="unknown" time="0.19"/></proof>
+  <goal name="VC dfs.19" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.93"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="156"/></proof>
   <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
-  <goal name="VC dfs.20" expl="postcondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.98"/></proof>
-  <proof prover="1"><result status="unknown" time="0.17"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <goal name="VC dfs.20" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.98"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="0.17"/></proof>
+  <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC dfs.21" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC dfs.22" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="VC dfs.23" expl="postcondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.32"/></proof>
-  <proof prover="1"><result status="unknown" time="0.02"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <goal name="VC dfs.23" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.32"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC dfs.24" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC dfs.25" expl="postcondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.99"/></proof>
-  <proof prover="1"><result status="unknown" time="0.02"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  <goal name="VC dfs.25" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.99"/></proof>
+  <proof prover="1" obsolete="true"><result status="unknown" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC add_edge" expl="VC for add_edge">
- <transf name="split_goal_wp" >
+ <goal name="VC add_edge" expl="VC for add_edge" proved="true">
+ <transf name="split_goal_wp" proved="true" >
   <goal name="VC add_edge.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC add_edge.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC add_edge.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.09"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC add_edge.3" expl="postcondition">
-  <proof prover="0" timelimit="1"><result status="unknown" time="1.99"/></proof>
-  <proof prover="1"><result status="unknown" time="0.40"/></proof>
+  <goal name="VC add_edge.3" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" obsolete="true"><result status="unknown" time="1.99"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="112"/></proof>
   <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC add_edge.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC add_edge.5" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>

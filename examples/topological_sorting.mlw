@@ -146,6 +146,7 @@ module Online_Basic
   use import set.Fset
 
   clone impset.Impset as S with type elt = vertex
+  clone appset.Appset as SA with type elt = vertex
   clone import impmap.ImpmapNoDom as M with type key = vertex
 
   val get_succs (g: graph) (v: vertex): S.t
@@ -185,14 +186,14 @@ module Online_Basic
         invariant { inv g }
         invariant { forall s:vertex. Fset.mem s (succs g.graph v) -> not (S.mem s p) -> min_depth < g.values[s] }
         invariant { S.subset p.S.contents (succs g.graph v) }
-        invariant { forall x:vertex. S.mem x seen -> g.values[x] = old g.values[x] }
+        invariant { forall x:vertex. SA.mem x seen -> g.values[x] = old g.values[x] }
         invariant { forall x:vertex. old g.values[x] <= g.values[x] }
         variant { S.cardinal p }
         let u = S.choose_and_remove p in
         dfs g u seen (min_depth + 1)
       done;
-    end;
-    g.values[v] <- min_depth
+      g.values[v] <- min_depth;
+    end
 
   let add_edge (g: t) (x y: vertex): unit
     requires { inv g }
@@ -203,7 +204,7 @@ module Online_Basic
     raises   { Cycle_found -> true }
   =
     let seen = SA.empty in
-    S.add x seen;
+    let seen = SA.add x seen in
     dfs g y seen (g.values[x] + 1);
     g.graph <- add_edge g.graph x y
 
