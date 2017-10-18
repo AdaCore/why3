@@ -821,7 +821,9 @@ let create_source_view =
         let has_changed = ref false in
         Hstr.add source_view_table f (source_page, source_view, has_changed, label);
         n := !n + 1;
+        source_view#source_buffer#begin_not_undoable_action ();
         source_view#source_buffer#set_text content;
+        source_view#source_buffer#end_not_undoable_action ();
         (* At initialization, file has not changed. When it changes, changes the
            name of the tab and update has_changed boolean. *)
         let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
@@ -1984,7 +1986,9 @@ let treat_notification n =
     begin
       try
         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
+        sc_view#source_buffer#begin_not_undoable_action ();
         sc_view#source_buffer#set_text content;
+        sc_view#source_buffer#end_not_undoable_action ();
         update_label_saved l;
         b := false;
       with
