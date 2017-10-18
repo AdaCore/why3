@@ -607,7 +607,7 @@ let view_name_column =
   let v = GTree.view_column ~title:"Theories/Goals" () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
-  v#pack icon_renderer ;
+  v#pack icon_renderer ~expand:false;
   v#add_attribute icon_renderer "pixbuf" icon_column;
   let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] in
   v#pack name_renderer;
@@ -646,9 +646,10 @@ let goals_model,goals_view =
   let () = view#set_rules_hint true in
 *)
   let () = view#set_enable_search false in
-  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_status_column in
+  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_time_column in
+  view#set_expander_column (Some view_name_column);
   Debug.dprintf debug "done@.";
   model,view
 
@@ -1312,14 +1313,19 @@ let (_ : GtkSignal.id) =
     begin
       Debug.dprintf debug "button number %d was clicked on the tree view@." n;
       match n with
-      | 1 -> (* Left click *) false
-      | 2 -> (* Middle click *) false
       | 3 -> (* Right click *)
-         Debug.dprintf debug "before tools_menu#popup@.";
-         tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
-         Debug.dprintf debug "after tools_menu#popup@.";
-         true
-      | _ -> (* Error case TODO *) assert false
+        let sel = goals_view#selection in
+        let x = int_of_float (GdkEvent.Button.x ev) in
+        let y = int_of_float (GdkEvent.Button.y ev) in
+        begin match goals_view#get_path_at_pos ~x ~y with
+        | Some (path,_,_,_) when not (sel#path_is_selected path) ->
+          sel#unselect_all ();
+          sel#select_path path
+        | _ -> ()
+        end;
+        tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+        true
+      | _ -> (* Other buttons *) false
     end
   in
   goals_view#event#connect#button_press ~callback

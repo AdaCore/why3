@@ -575,9 +575,9 @@ let print_sequent fmt task =
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
-  fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
+  fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld1;
-  fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
+  fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld2;
 
 
