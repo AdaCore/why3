@@ -1,0 +1,43 @@
+
+
+module ArrayUpdate
+
+  use import int.Int
+  use import array.Array
+
+  let test (a:array int) =
+    label L in 
+    a[0] <- 42;
+    assert { a = (a at L)[0 <- 42] }
+  
+
+end
+
+
+module ImpMapUpdate
+
+  clone import impmap.ImpmapNoDom with type key = int
+
+  let test (m:t int) =
+    label L in 
+    m[0] <- 42;
+    assert { m = (m at L)[0 <- 42] }
+  
+
+
+end
+
+module ArrayFunctionalUpdate
+
+  use import int.Int
+  use import array.Array
+
+  predicate p (array int)
+  
+  let test (a:array int) (i:int)
+    requires { 0 <= i < a.length }
+    requires { p (a[i<-42]) }
+  = a[i] <- 42;
+    assert { p a }
+
+end
