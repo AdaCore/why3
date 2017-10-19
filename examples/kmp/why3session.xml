@@ -238,7 +238,11 @@
   <proof prover="6"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
   <goal name="VC kmp.18" expl="loop invariant preservation" proved="true">
-  <proof prover="7"><result status="valid" time="0.11"/></proof>
+  <transf name="instantiate" proved="true" arg1="H9" arg2="(k-1)">
+   <goal name="VC kmp.18.0" expl="loop invariant preservation" proved="true">
+   <proof prover="7"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC kmp.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
