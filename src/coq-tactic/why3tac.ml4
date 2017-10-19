@@ -106,8 +106,6 @@ DECLARE PLUGIN "why3tac"
 
 IFDEF COQ87 THEN
 
-let is_Set evd t = is_Set (to_constr evd t)
-let is_Type evd t = is_Type (to_constr evd t)
 let global_of_constr evd t = global_of_constr (to_constr evd t)
 let type_of_global env c = of_constr (fst (Global.type_of_global_in_context env c))
 
