@@ -9,11 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-let create = String.create
-let copy = String.copy
-let set = String.set
-
 let capitalize = String.capitalize
 let uncapitalize = String.uncapitalize
 
@@ -58,10 +53,10 @@ let ends_with s suf =
 let pad_right c s i =
   let sl = String.length s in
   if sl < i then
-    let p = create i in
-    String.blit s 0 p 0 sl;
-    String.fill p sl (i-sl) c;
-    p
+    let p = Bytes.create i in
+    Bytes.blit_string s 0 p 0 sl;
+    Bytes.fill p sl (i-sl) c;
+    Bytes.unsafe_to_string p
   else if sl > i
   then String.sub s 0 i
   else s

@@ -489,10 +489,10 @@ let read_old_proof =
           Vernacular
         end in
       let len = pos_in ch - !start in
-      let s = Strings.create len in
+      let s = Bytes.create len in
       seek_in ch !start;
       really_input ch s 0 len;
-      Query (name, k, s)
+      Query (name, k, Bytes.unsafe_to_string s)
   with StringValue s -> Other s
 
 (* Load old-style proofs where users were confined to a few sections. *)

@@ -13,10 +13,6 @@
 
 (** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 
-val create : int -> string
-val copy : string -> string
-val set : string -> int -> char -> unit
-
 val capitalize : string -> string
 val uncapitalize : string -> string
 
