@@ -7,10 +7,10 @@ Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
+Require map.Map.
 Require number.Parity.
 Require number.Divisibility.
 Require number.Prime.
-Require map.Map.
 
 (* Why3 assumption *)
 Definition lt_nat (x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x < y)%Z.
@@ -82,9 +82,10 @@ Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
 Theorem VC_prime_numbers : forall (m:Z), (2%Z <= m)%Z -> forall (p:(array
   Z)), ((forall (i:Z), ((0%Z <= i)%Z /\ (i < m)%Z) -> ((mixfix_lbrb p
   i) = 0%Z)) /\ ((length p) = m)) -> forall (p1:(array Z)),
-  ((length p1) = (length p)) -> (((elts p1) = (map.Map.set (elts p) 0%Z
-  2%Z)) -> forall (p2:(array Z)), ((length p2) = (length p1)) ->
-  (((elts p2) = (map.Map.set (elts p1) 1%Z 3%Z)) -> let o := (m - 1%Z)%Z in
+  ((length p1) = (length p)) -> ((((elts p1) = (map.Map.set (elts p) 0%Z
+  2%Z)) /\ (p1 = (mixfix_lblsmnrb p 0%Z 2%Z))) -> forall (p2:(array Z)),
+  ((length p2) = (length p1)) -> ((((elts p2) = (map.Map.set (elts p1) 1%Z
+  3%Z)) /\ (p2 = (mixfix_lblsmnrb p1 1%Z 3%Z))) -> let o := (m - 1%Z)%Z in
   ((2%Z <= (o + 1%Z)%Z)%Z -> forall (n:Z) (p3:(array Z)),
   ((length p3) = (length p2)) -> forall (j:Z), (((2%Z <= j)%Z /\
   (j <= o)%Z) /\ ((first_primes (elts p3) j) /\ ((((mixfix_lbrb p3
@@ -101,19 +102,25 @@ Theorem VC_prime_numbers : forall (m:Z), (2%Z <= m)%Z -> forall (p:(array
   (n2 = (n1 + 2%Z)%Z) -> (((1%Z <= 1%Z)%Z /\ (1%Z < j)%Z) -> ((first_primes
   (elts p4) j) -> (n2 < (2%Z * (mixfix_lbrb p4 (j - 1%Z)%Z))%Z)%Z))))))).
 Proof.
+intros m h1 p (h2,h3) p1 h4 (h5,h6) p2 h7 (h8,h9) o h10 n p3 h11 j
+        ((h12,h13),(h14,((h15,h16),(h17,h18)))) n1 p4 h19 k
+        ((h20,h21),(h22,((h23,h24),(h25,(h26,h27))))) h28 h29 n2 h30
+        (h31,h32) h33.
+(*
 intros m h1 p (h2,h3) p1 h4 h5 p2 h6 h7 o h8 n p3 h9 j
 ((h10,h11),(h12,((h13,h14),(h15,h16)))) n1 p4 h17 k
 ((h18,h19),(h20,((h21,h22),(h23,(h24,h25))))) h26 h27 n2 h28 (h29,h30) h31.
+*)
 assert (case: (n2 < 2 * elts p4 (j-1) \/ n2 >= 2 * elts p4 (j-1))%Z) by omega.
 destruct case.
 auto.
 apply False_ind.
 apply Bertrand_postulate with (elts p4 (j-1)%Z); intuition.
-red in h20; decompose [and] h20; clear h20.
+red in h22; decompose [and] h22; clear h22.
 apply H1; omega.
 red; intros.
 assert (case: (x < n1 \/ x = n1 \/ x = n1+1)%Z) by omega. destruct case.
-apply h24.
+apply h26.
 unfold mixfix_lbrb.
 omega.
 destruct H1; subst x.

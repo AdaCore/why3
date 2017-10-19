@@ -2,304 +2,185 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="11" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="12" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="15" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../knuth_prime_numbers.mlw" expanded="true">
-<theory name="PrimeNumbers" sum="3524eb6ffee4c24ba4acc8ec5d611399" expanded="true">
- <goal name="exists_prime" expl="">
- <proof prover="3"><result status="timeout" time="4.99"/></proof>
- <proof prover="11"><result status="timeout" time="5.00"/></proof>
+<prover id="15" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../knuth_prime_numbers.mlw" proved="true">
+<theory name="PrimeNumbers" proved="true" sum="8deda8a35c1c0978bd4a14d0c605c64f">
+ <goal name="exists_prime" proved="true">
  <proof prover="13" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.46"/></proof>
- <proof prover="15"><result status="unknown" time="5.08"/></proof>
  </goal>
- <goal name="VC prime_numbers" expl="VC for prime_numbers">
- <transf name="split_goal_wp">
-  <goal name="VC prime_numbers.1" expl="array creation size">
-  <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+ <goal name="VC prime_numbers" expl="VC for prime_numbers" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC prime_numbers.0" expl="array creation size" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.2" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.1" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.3" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.2" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.4" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
+  <goal name="VC prime_numbers.3" expl="loop invariant init" proved="true">
   <proof prover="15"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="VC prime_numbers.5" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.4" expl="loop invariant init" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.6" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.5" expl="loop invariant init" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.7" expl="loop invariant init">
-  <proof prover="3"><result status="valid" time="0.01" steps="27"/></proof>
-  <proof prover="11"><result status="valid" time="0.04"/></proof>
+  <goal name="VC prime_numbers.6" expl="loop invariant init" proved="true">
   <proof prover="15"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="VC prime_numbers.8" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="27"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.7" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.9" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="82"/></proof>
-  <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <goal name="VC prime_numbers.8" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="VC prime_numbers.10" expl="assertion">
-  <proof prover="3" timelimit="10"><result status="timeout" time="10.00"/></proof>
-  <proof prover="11" timelimit="10"><result status="timeout" time="10.00"/></proof>
-  <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.45"/></proof>
-  <proof prover="15" timelimit="10"><result status="valid" time="4.81"/></proof>
+  <goal name="VC prime_numbers.9" expl="assertion" proved="true">
+  <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.62"/></proof>
   </goal>
-  <goal name="VC prime_numbers.11" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.10" expl="variant decrease" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.12" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.11" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.13" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="32"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.12" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.14" expl="precondition">
-  <transf name="split_goal_wp">
-   <goal name="VC prime_numbers.14.1" expl="VC for prime_numbers">
-   <proof prover="3"><result status="valid" time="0.01" steps="32"/></proof>
-   <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <goal name="VC prime_numbers.13" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC prime_numbers.13.0" expl="VC for prime_numbers" proved="true">
    <proof prover="15"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC prime_numbers.14.2" expl="VC for prime_numbers">
-   <proof prover="3"><result status="timeout" time="5.00"/></proof>
-   <proof prover="11"><result status="timeout" time="5.00"/></proof>
-   <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_VC_prime_numbers_1.v"><result status="valid" time="0.50"/></proof>
-   <proof prover="15"><result status="unknown" time="9.92"/></proof>
+   <goal name="VC prime_numbers.13.1" expl="VC for prime_numbers" proved="true">
+   <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_VC_prime_numbers_1.v"><result status="valid" time="0.37"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC prime_numbers.15" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="47"/></proof>
-  <proof prover="11"><result status="valid" time="0.08"/></proof>
+  <goal name="VC prime_numbers.14" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC prime_numbers.16" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="56"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
-  <proof prover="15"><result status="valid" time="0.24"/></proof>
+  <goal name="VC prime_numbers.15" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
-  <goal name="VC prime_numbers.17" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.02" steps="52"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.16" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC prime_numbers.18" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="33"/></proof>
-  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <goal name="VC prime_numbers.17" expl="postcondition" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.19" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.18" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.20" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="28"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.19" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.21" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.24" steps="331"/></proof>
-  <proof prover="10"><result status="valid" time="0.02"/></proof>
-  <proof prover="11"><result status="valid" time="0.03"/></proof>
+  <goal name="VC prime_numbers.20" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="VC prime_numbers.22" expl="variant decrease">
-  <proof prover="3"><result status="valid" time="0.01" steps="29"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.21" expl="variant decrease" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.23" expl="precondition">
-  <transf name="split_goal_wp">
-   <goal name="VC prime_numbers.23.1" expl="VC for prime_numbers">
-   <proof prover="3"><result status="valid" time="0.01" steps="29"/></proof>
-   <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.22" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC prime_numbers.22.0" expl="VC for prime_numbers" proved="true">
    <proof prover="15"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="VC prime_numbers.23.2" expl="VC for prime_numbers">
-   <proof prover="3"><result status="timeout" time="5.00"/></proof>
-   <proof prover="11"><result status="timeout" time="5.00"/></proof>
+   <goal name="VC prime_numbers.22.1" expl="VC for prime_numbers" proved="true">
    <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="0.58"/></proof>
-   <proof prover="15"><result status="unknown" time="4.96"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC prime_numbers.24" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <goal name="VC prime_numbers.23" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.25" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.24" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.26" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.25" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.27" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <goal name="VC prime_numbers.26" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.28" expl="precondition">
-  <proof prover="3"><result status="timeout" time="5.01"/></proof>
-  <proof prover="11"><result status="valid" time="0.04"/></proof>
-  <proof prover="12"><result status="valid" time="0.03"/></proof>
+  <goal name="VC prime_numbers.27" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="VC prime_numbers.29" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="32"/></proof>
-  <proof prover="10"><result status="valid" time="0.03"/></proof>
-  <proof prover="11"><result status="valid" time="0.01"/></proof>
+  <goal name="VC prime_numbers.28" expl="postcondition" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.30" expl="assertion">
-  <proof prover="3"><result status="timeout" time="5.00"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
+  <goal name="VC prime_numbers.29" expl="assertion" proved="true">
   <proof prover="13" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="0.95"/></proof>
-  <proof prover="15"><result status="unknown" time="4.96"/></proof>
   </goal>
-  <goal name="VC prime_numbers.31" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.30" expl="postcondition" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.32" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="19"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.31" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.33" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.00" steps="21"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.32" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.34" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.33" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.35" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.34" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.36" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.35" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.37" expl="precondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="31"/></proof>
-  <proof prover="10"><result status="valid" time="0.04"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.36" expl="precondition" proved="true">
   <proof prover="15"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="VC prime_numbers.38" expl="index in array bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.37" expl="index in array bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC prime_numbers.39" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.82" steps="638"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
-  <proof prover="15"><result status="unknown" time="4.98"/></proof>
-  <transf name="inline_goal">
-   <goal name="VC prime_numbers.39.1" expl="loop invariant preservation">
-   <transf name="split_goal_wp">
-    <goal name="VC prime_numbers.39.1.1" expl="VC for prime_numbers">
-    <proof prover="3"><result status="valid" time="0.02" steps="25"/></proof>
-    <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.38" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="VC prime_numbers.38.0" expl="loop invariant preservation" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC prime_numbers.38.0.0" expl="VC for prime_numbers" proved="true">
     <proof prover="15"><result status="valid" time="0.05"/></proof>
     </goal>
-    <goal name="VC prime_numbers.39.1.2" expl="VC for prime_numbers">
-    <proof prover="3"><result status="valid" time="0.45" steps="474"/></proof>
-    <proof prover="11"><result status="timeout" time="5.00"/></proof>
-    <proof prover="15"><result status="unknown" time="4.96"/></proof>
+    <goal name="VC prime_numbers.38.0.1" expl="VC for prime_numbers" proved="true">
+    <proof prover="3"><result status="valid" time="0.26" steps="242"/></proof>
     </goal>
-    <goal name="VC prime_numbers.39.1.3" expl="VC for prime_numbers">
-    <proof prover="3"><result status="valid" time="0.06" steps="131"/></proof>
-    <proof prover="11"><result status="timeout" time="5.00"/></proof>
+    <goal name="VC prime_numbers.38.0.2" expl="VC for prime_numbers" proved="true">
     <proof prover="15"><result status="valid" time="0.07"/></proof>
     </goal>
-    <goal name="VC prime_numbers.39.1.4" expl="VC for prime_numbers">
-    <proof prover="3"><result status="valid" time="0.05" steps="58"/></proof>
-    <proof prover="11"><result status="timeout" time="5.00"/></proof>
-    <proof prover="15"><result status="valid" time="0.08"/></proof>
+    <goal name="VC prime_numbers.38.0.3" expl="VC for prime_numbers" proved="true">
+    <proof prover="3"><result status="valid" time="0.05" steps="168"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="VC prime_numbers.40" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
-  <proof prover="15"><result status="valid" time="0.05"/></proof>
+  <goal name="VC prime_numbers.39" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="VC prime_numbers.41" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.04" steps="111"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
-  <proof prover="15"><result status="valid" time="0.07"/></proof>
+  <goal name="VC prime_numbers.40" expl="loop invariant preservation" proved="true">
+  <proof prover="15"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="VC prime_numbers.42" expl="loop invariant preservation">
-  <proof prover="3"><result status="valid" time="0.02" steps="93"/></proof>
-  <proof prover="11"><result status="timeout" time="5.00"/></proof>
-  <proof prover="15"><result status="valid" time="0.15"/></proof>
+  <goal name="VC prime_numbers.41" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
-  <goal name="VC prime_numbers.43" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.42" expl="postcondition" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC prime_numbers.44" expl="postcondition">
-  <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.43" expl="postcondition" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC prime_numbers.45" expl="out of loop bounds">
-  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
-  <proof prover="11"><result status="valid" time="0.02"/></proof>
+  <goal name="VC prime_numbers.44" expl="out of loop bounds" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC bench" expl="VC for bench">
- <proof prover="3"><result status="valid" time="0.01" steps="36"/></proof>
- <proof prover="11"><result status="valid" time="0.02"/></proof>
+ <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="15"><result status="valid" time="0.03"/></proof>
  </goal>
 </theory>

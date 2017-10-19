@@ -3,96 +3,96 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../remove_duplicate_hash.mlw" expanded="true">
-<theory name="Spec" sum="d41d8cd98f00b204e9800998ecf8427e">
+<file name="../remove_duplicate_hash.mlw" proved="true">
+<theory name="Spec" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="MutableSet" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MutableSet" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="RemoveDuplicate" sum="ac43052c2d1d8df3b56593f4e8f09c8d" expanded="true">
- <goal name="VC remove_duplicate" expl="VC for remove_duplicate" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC remove_duplicate.1" expl="loop invariant init">
+<theory name="RemoveDuplicate" proved="true" sum="b380a0fbf3ab1ab32a258283f3bb33e2">
+ <goal name="VC remove_duplicate" expl="VC for remove_duplicate" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC remove_duplicate.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.2" expl="index in array bounds">
+  <goal name="VC remove_duplicate.1" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.3" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.2" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="56"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.4" expl="index in array bounds">
+  <goal name="VC remove_duplicate.3" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.5" expl="array creation size">
+  <goal name="VC remove_duplicate.4" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.6" expl="loop invariant init">
+  <goal name="VC remove_duplicate.5" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.7" expl="loop invariant init">
+  <goal name="VC remove_duplicate.6" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.8" expl="loop invariant init">
+  <goal name="VC remove_duplicate.7" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.9" expl="loop invariant init">
+  <goal name="VC remove_duplicate.8" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.10" expl="loop invariant init">
+  <goal name="VC remove_duplicate.9" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.11" expl="index in array bounds">
+  <goal name="VC remove_duplicate.10" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.12" expl="index in array bounds">
+  <goal name="VC remove_duplicate.11" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.13" expl="index in array bounds">
+  <goal name="VC remove_duplicate.12" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.14" expl="index in array bounds">
+  <goal name="VC remove_duplicate.13" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="74"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.15" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="140"/></proof>
+  <goal name="VC remove_duplicate.14" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="146"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.16" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="222"/></proof>
+  <goal name="VC remove_duplicate.15" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="220"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.17" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="100"/></proof>
+  <goal name="VC remove_duplicate.16" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="95"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.18" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="130"/></proof>
+  <goal name="VC remove_duplicate.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="131"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.19" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="169"/></proof>
+  <goal name="VC remove_duplicate.18" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="167"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.20" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.19" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="67"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.21" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.20" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.22" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.21" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.23" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.22" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.24" expl="loop invariant preservation">
+  <goal name="VC remove_duplicate.23" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.25" expl="postcondition">
+  <goal name="VC remove_duplicate.24" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="92"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.26" expl="postcondition">
+  <goal name="VC remove_duplicate.25" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="123"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.27" expl="out of loop bounds">
+  <goal name="VC remove_duplicate.26" expl="out of loop bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.28" expl="out of loop bounds">
+  <goal name="VC remove_duplicate.27" expl="out of loop bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
  </transf>

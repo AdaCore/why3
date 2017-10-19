@@ -5,7 +5,9 @@ module ArrayUpdate
   use import int.Int
   use import array.Array
 
-  let test (a:array int) =
+  let test (a:array int)
+    requires { a.length >= 1 } 
+   =
     label L in 
     a[0] <- 42;
     assert { a = (a at L)[0 <- 42] }

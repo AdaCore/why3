@@ -36,12 +36,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="LCP_test" proved="true" sum="263f3211fea648579727614b60818fcb">
+<theory name="LCP_test" proved="true" sum="523fc5ff0f0b07599de4484009c7f2e5">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="SuffixSort" proved="true" sum="6b5fa48c4a1db8a52f1e8a4d9f790776">
+<theory name="SuffixSort" proved="true" sum="88f1e523c780e8550e1ad0c8c1d7b3ce">
  <goal name="VC compare" expl="VC for compare" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC compare.0" expl="precondition" proved="true">
@@ -63,7 +63,7 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC compare.6" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.60"/></proof>
   </goal>
   <goal name="VC compare.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
@@ -136,7 +136,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC sort.17" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="58"/></proof>
   </goal>
   <goal name="VC sort.18" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -145,19 +145,19 @@
   <proof prover="2"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC sort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.18"/></proof>
+  <proof prover="0"><result status="valid" time="0.47" steps="494"/></proof>
   </goal>
   <goal name="VC sort.21" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC sort.22" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC sort.23" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.65" steps="679"/></proof>
+  <proof prover="0"><result status="valid" time="0.51" steps="615"/></proof>
   </goal>
   <goal name="VC sort.24" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.21"/></proof>
+  <proof prover="0"><result status="valid" time="0.56" steps="550"/></proof>
   </goal>
   <goal name="VC sort.25" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
@@ -183,12 +183,12 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixSort_test" proved="true" sum="a3852c3b74a48255ced1becb8a99b600">
+<theory name="SuffixSort_test" proved="true" sum="daef7c8e6a363d4fa25db3f4a9adec19">
  <goal name="VC bench" expl="VC for bench" proved="true">
- <proof prover="2"><result status="valid" time="0.49"/></proof>
+ <proof prover="2"><result status="valid" time="0.34"/></proof>
  </goal>
 </theory>
-<theory name="SuffixArray" proved="true" sum="675ab450e637f03db9aed7ccb222d401">
+<theory name="SuffixArray" proved="true" sum="a9e9a5e332dedfbe15479a4d99b0e324">
  <goal name="VC suffixArray" expl="VC for suffixArray" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -210,7 +210,7 @@
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC create.3" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC create.4" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05"/></proof>
@@ -249,7 +249,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="SuffixArray_test" proved="true" sum="18d4ede8573fe425bb9b9ad4b1c44ac9">
+<theory name="SuffixArray_test" proved="true" sum="78ab0127c0cbd10e30c446b3435a219f">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.05"/></proof>
  </goal>
@@ -297,7 +297,7 @@
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC lrs.10" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  <proof prover="2"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC lrs.11" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
@@ -309,13 +309,32 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC lrs.14" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.38"/></proof>
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC lrs.15" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC lrs.16" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.10"/></proof>
+  <transf name="assert" proved="true" arg1="(surjective (suffixes sa).elts a.length)">
+   <goal name="VC lrs.16.0" proved="true">
+   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   </goal>
+   <goal name="VC lrs.16.1" expl="assertion" proved="true">
+   <transf name="unfold" proved="true" arg1="surjective" arg2="in" arg3="h">
+    <goal name="VC lrs.16.1.0" expl="assertion" proved="true">
+    <transf name="instantiate" proved="true" arg1="h" arg2="x">
+     <goal name="VC lrs.16.1.0.0" expl="assertion" proved="true">
+     <transf name="instantiate" proved="true" arg1="h" arg2="y">
+      <goal name="VC lrs.16.1.0.0.0" expl="assertion" proved="true">
+      <proof prover="2"><result status="valid" time="0.05"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC lrs.17" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
@@ -343,7 +362,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LRS_test" proved="true" sum="78b26dd6c930fe1e36b3bfff24491cc4">
+<theory name="LRS_test" proved="true" sum="4ab50b53ed3df0308fc01d271ab8fd26">
  <goal name="VC bench" expl="VC for bench" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
