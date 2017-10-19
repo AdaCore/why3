@@ -11,67 +11,45 @@
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../hackers-delight.mlw" proved="true">
-<theory name="Utils" proved="true" sum="4d0fcf473c388fba237651913487e3dc">
- <goal name="VC count" expl="VC for count" proved="true">
- <proof prover="7"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC lastbit" expl="VC for lastbit" proved="true">
+<theory name="Utils" proved="true" sum="5f92249129b764ddd536aab8b9b0025a">
+ <goal name="VC one" expl="VC for one" proved="true">
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC two" expl="VC for two" proved="true">
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="VC one" expl="VC for one" proved="true">
+ <goal name="VC lastbit" expl="VC for lastbit" proved="true">
+ <proof prover="7"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC count" expl="VC for count" proved="true">
  <proof prover="7"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="Utils_Spec" proved="true" sum="da1ad1e202d950a9e6c3332613320fba">
- <goal name="triangleInequality" proved="true">
- <proof prover="3"><result status="valid" time="0.55" steps="635"/></proof>
+<theory name="Utils_Spec" proved="true" sum="45bc6c7df4ff3158964393601b60d699">
+ <goal name="countZero" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="VC triangleInequalityInt" expl="VC for triangleInequalityInt" proved="true">
+ <goal name="numOfZero" proved="true">
+ <proof prover="1"><result status="valid" time="0.22" steps="252"/></proof>
+ </goal>
+ <goal name="countStep" proved="true">
  <transf name="split_goal_wp" proved="true" >
-  <goal name="VC triangleInequalityInt.0" expl="assertion" proved="true">
-  <transf name="split_goal_wp" proved="true" >
-   <goal name="VC triangleInequalityInt.0.0" expl="VC for triangleInequalityInt" proved="true">
-   <proof prover="1"><result status="valid" time="0.17" steps="217"/></proof>
-   <proof prover="5"><result status="valid" time="0.50"/></proof>
-   </goal>
-   <goal name="VC triangleInequalityInt.0.1" expl="VC for triangleInequalityInt" proved="true">
-   <proof prover="1"><result status="valid" time="0.32" steps="280"/></proof>
-   <proof prover="2"><result status="valid" time="0.64"/></proof>
-   <proof prover="5"><result status="valid" time="0.21"/></proof>
-   <proof prover="6"><result status="valid" time="0.58"/></proof>
-   </goal>
-  </transf>
+  <goal name="countStep.0" proved="true">
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="2.18"/></proof>
   </goal>
-  <goal name="VC triangleInequalityInt.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="146"/></proof>
+  <goal name="countStep.1" proved="true">
+  <proof prover="7"><result status="valid" time="0.32"/></proof>
+  </goal>
+  <goal name="countStep.2" proved="true">
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="2.29"/></proof>
+  </goal>
+  <goal name="countStep.3" proved="true">
+  <proof prover="7"><result status="valid" time="0.26"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC numof_or" expl="VC for numof_or" proved="true">
- <proof prover="0"><result status="valid" time="0.33"/></proof>
- </goal>
- <goal name="separation" proved="true">
- <proof prover="0"><result status="valid" time="0.19"/></proof>
- </goal>
- <goal name="symmetric" proved="true">
- <proof prover="0"><result status="valid" time="0.11"/></proof>
- </goal>
- <goal name="VC hamming_spec" expl="VC for hamming_spec" proved="true">
- <transf name="split_goal_wp" proved="true" >
-  <goal name="VC hamming_spec.0" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC hamming_spec.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
-  <proof prover="7" timelimit="5"><result status="valid" time="0.03"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="countSpec" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="81"/></proof>
+ <goal name="VC numof_shift" expl="VC for numof_shift" proved="true">
+ <proof prover="0"><result status="valid" time="0.24"/></proof>
  </goal>
  <goal name="VC countSpec_Aux" expl="VC for countSpec_Aux" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -103,149 +81,171 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC numof_shift" expl="VC for numof_shift" proved="true">
- <proof prover="0"><result status="valid" time="0.24"/></proof>
+ <goal name="countSpec" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="81"/></proof>
  </goal>
- <goal name="countStep" proved="true">
+ <goal name="VC hamming_spec" expl="VC for hamming_spec" proved="true">
  <transf name="split_goal_wp" proved="true" >
-  <goal name="countStep.0" proved="true">
-  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="2.18"/></proof>
+  <goal name="VC hamming_spec.0" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="countStep.1" proved="true">
-  <proof prover="7"><result status="valid" time="0.32"/></proof>
-  </goal>
-  <goal name="countStep.2" proved="true">
-  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="2.29"/></proof>
-  </goal>
-  <goal name="countStep.3" proved="true">
-  <proof prover="7"><result status="valid" time="0.26"/></proof>
+  <goal name="VC hamming_spec.1" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="7" timelimit="5"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="numOfZero" proved="true">
- <proof prover="1"><result status="valid" time="0.22" steps="252"/></proof>
- </goal>
- <goal name="countZero" proved="true">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
- </goal>
-</theory>
-<theory name="Hackers_delight" proved="true" sum="e8458821497ee606cf8bf07c3ae5aed7">
- <goal name="BP" proved="true">
- <proof prover="0"><result status="valid" time="0.10"/></proof>
- </goal>
- <goal name="RS_right" proved="true">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
- </goal>
- <goal name="RS_left" proved="true">
+ <goal name="symmetric" proved="true">
  <proof prover="0"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="SR1" proved="true">
+ <goal name="separation" proved="true">
+ <proof prover="0"><result status="valid" time="0.19"/></proof>
+ </goal>
+ <goal name="VC numof_or" expl="VC for numof_or" proved="true">
+ <proof prover="0"><result status="valid" time="0.33"/></proof>
+ </goal>
+ <goal name="VC triangleInequalityInt" expl="VC for triangleInequalityInt" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC triangleInequalityInt.0" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC triangleInequalityInt.0.0" expl="VC for triangleInequalityInt" proved="true">
+   <proof prover="1"><result status="valid" time="0.17" steps="217"/></proof>
+   <proof prover="5"><result status="valid" time="0.50"/></proof>
+   </goal>
+   <goal name="VC triangleInequalityInt.0.1" expl="VC for triangleInequalityInt" proved="true">
+   <proof prover="1"><result status="valid" time="0.32" steps="280"/></proof>
+   <proof prover="2"><result status="valid" time="0.64"/></proof>
+   <proof prover="5"><result status="valid" time="0.21"/></proof>
+   <proof prover="6"><result status="valid" time="0.58"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC triangleInequalityInt.1" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="146"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="triangleInequality" proved="true">
+ <proof prover="3"><result status="valid" time="0.55" steps="635"/></proof>
+ </goal>
+</theory>
+<theory name="Hackers_delight" proved="true" sum="35a425273b9c77381711b8246cd4e85c">
+ <goal name="VC ascii" expl="VC for ascii" proved="true">
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="asciiProp" proved="true">
+ <proof prover="0"><result status="valid" time="0.66"/></proof>
+ </goal>
+ <goal name="iso" proved="true">
+ <proof prover="0"><result status="valid" time="0.43"/></proof>
+ </goal>
+ <goal name="grayIsGray" proved="true">
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
+ </goal>
+ <goal name="nthGray" proved="true">
+ <proof prover="1"><result status="valid" time="0.45" steps="446"/></proof>
+ </goal>
+ <goal name="lastNthGray" proved="true">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="IE4" proved="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <goal name="nthBinary" proved="true">
+ <proof prover="0"><result status="valid" time="0.35"/></proof>
  </goal>
- <goal name="IE3" proved="true">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
+ <goal name="evenOdd" proved="true">
+ <proof prover="0"><result status="valid" time="0.14"/></proof>
  </goal>
- <goal name="IEb" proved="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <goal name="DM1" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="IEa" proved="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <goal name="DM2" proved="true">
+ <proof prover="0"><result status="valid" time="0.05"/></proof>
  </goal>
- <goal name="IE2" proved="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+ <goal name="DM3" proved="true">
+ <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="IE1" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="DM4" proved="true">
+ <proof prover="0"><result status="valid" time="0.11"/></proof>
  </goal>
- <goal name="Av" proved="true">
- <proof prover="0"><result status="valid" time="0.12"/></proof>
+ <goal name="DM5" proved="true">
+ <proof prover="0"><result status="valid" time="0.10"/></proof>
  </goal>
- <goal name="Au" proved="true">
- <proof prover="0"><result status="valid" time="0.13"/></proof>
+ <goal name="DM6" proved="true">
+ <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="At" proved="true">
- <proof prover="0"><result status="valid" time="0.12"/></proof>
- </goal>
- <goal name="Aq" proved="true">
+ <goal name="DM7" proved="true">
  <proof prover="0"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="Ao" proved="true">
- <proof prover="0"><result status="valid" time="0.13"/></proof>
+ <goal name="DM8" proved="true">
+ <proof prover="0"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="An" proved="true">
- <proof prover="0"><result status="valid" time="0.12"/></proof>
+ <goal name="DMtest" proved="true">
+ <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="Aj" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="Af" proved="true">
- <proof prover="0"><result status="valid" time="0.03"/></proof>
- </goal>
- <goal name="Ae" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="80"/></proof>
- </goal>
- <goal name="Ad" proved="true">
+ <goal name="Aa" proved="true">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="Ac" proved="true">
  <proof prover="1"><result status="valid" time="0.40" steps="465"/></proof>
  </goal>
- <goal name="Aa" proved="true">
+ <goal name="Ad" proved="true">
  <proof prover="0"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="DMtest" proved="true">
- <proof prover="0"><result status="valid" time="0.07"/></proof>
+ <goal name="Ae" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="80"/></proof>
  </goal>
- <goal name="DM8" proved="true">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <goal name="Af" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="DM7" proved="true">
+ <goal name="Aj" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="An" proved="true">
+ <proof prover="0"><result status="valid" time="0.12"/></proof>
+ </goal>
+ <goal name="Ao" proved="true">
+ <proof prover="0"><result status="valid" time="0.13"/></proof>
+ </goal>
+ <goal name="Aq" proved="true">
  <proof prover="0"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="DM6" proved="true">
- <proof prover="0"><result status="valid" time="0.07"/></proof>
+ <goal name="At" proved="true">
+ <proof prover="0"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="DM5" proved="true">
- <proof prover="0"><result status="valid" time="0.10"/></proof>
+ <goal name="Au" proved="true">
+ <proof prover="0"><result status="valid" time="0.13"/></proof>
  </goal>
- <goal name="DM4" proved="true">
- <proof prover="0"><result status="valid" time="0.11"/></proof>
+ <goal name="Av" proved="true">
+ <proof prover="0"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="DM3" proved="true">
- <proof prover="0"><result status="valid" time="0.07"/></proof>
+ <goal name="IE1" proved="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="DM2" proved="true">
- <proof prover="0"><result status="valid" time="0.05"/></proof>
- </goal>
- <goal name="DM1" proved="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="evenOdd" proved="true">
- <proof prover="0"><result status="valid" time="0.14"/></proof>
- </goal>
- <goal name="nthBinary" proved="true">
- <proof prover="0"><result status="valid" time="0.35"/></proof>
- </goal>
- <goal name="lastNthGray" proved="true">
+ <goal name="IE2" proved="true">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="nthGray" proved="true">
- <proof prover="1"><result status="valid" time="0.45" steps="446"/></proof>
+ <goal name="IEa" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
  </goal>
- <goal name="grayIsGray" proved="true">
+ <goal name="IEb" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="IE3" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="IE4" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="SR1" proved="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="RS_left" proved="true">
+ <proof prover="0"><result status="valid" time="0.11"/></proof>
+ </goal>
+ <goal name="RS_right" proved="true">
  <proof prover="0"><result status="valid" time="0.09"/></proof>
  </goal>
- <goal name="iso" proved="true">
- <proof prover="0"><result status="valid" time="0.43"/></proof>
- </goal>
- <goal name="asciiProp" proved="true">
- <proof prover="0"><result status="valid" time="0.66"/></proof>
- </goal>
- <goal name="VC ascii" expl="VC for ascii" proved="true">
- <proof prover="0"><result status="valid" time="0.09"/></proof>
+ <goal name="BP" proved="true">
+ <proof prover="0"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
 </file>
