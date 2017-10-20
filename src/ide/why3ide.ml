@@ -1811,9 +1811,9 @@ let () =
 
 let remove_item =
   create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations (shortcut: x)"
+                   "Remove the selected proof attempts or transformations (shortcut: del)"
 let () =
-  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._x
+  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._Delete
 
 
 let mark_obsolete_item =
