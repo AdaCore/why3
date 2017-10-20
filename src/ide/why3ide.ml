@@ -1507,12 +1507,11 @@ let get_parent node =
   | None -> None
   | Some parent -> Some (get_node_id parent)
 
-let if_selected_alone id f =
+let is_selected_alone id =
   match get_selected_row_references () with
-  | [r] ->
-     let i = get_node_id r#iter in
-     if i = id || Some i = get_parent id then f id
-  | _ -> ()
+  | [r] -> let i = get_node_id r#iter in i = id
+  | _ -> false
+
 
 
 (**************************)
@@ -1912,11 +1911,14 @@ let treat_notification n =
           in
           if old <> b then begin
               set_status_and_time_column (get_node_row id);
+              Debug.dprintf debug "proved status changed to %b for %d@." b id;
               if b then
-                (* Trying to move cursor on first unproven goal around
-             on all cases but not when proofAttempt is updated because
-             ad hoc debugging. *)
-                if_selected_alone id (fun _ -> send_request (Get_first_unproven_node id))
+                begin
+                  (* if the node newly proved is selected, then force
+                   moving the selection the next unproved goal *)
+                  if is_selected_alone id then
+                    send_request (Get_first_unproven_node id)
+                end
               else
                 begin
                   try
@@ -1940,14 +1942,15 @@ let treat_notification n =
           | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
-      if_selected_alone asked_id
-          (fun _ ->
-            (* Unselect the potentially selected goal to avoid having two tasks
-               selected at once when a prover successfully end. To continue the
-               proof, it is better to only have the new goal selected *)
-            goals_view#selection#unselect_all ();
-            let iter = (get_node_row next_unproved_id)#iter in
-            goals_view#selection#select_iter iter)
+      if is_selected_alone asked_id then
+        begin
+          (* Unselect the potentially selected goal to avoid having two tasks
+             selected at once when a prover successfully end. To continue the
+             proof, it is better to only have the new goal selected *)
+          goals_view#selection#unselect_all ();
+          let iter = (get_node_row next_unproved_id)#iter in
+          goals_view#selection#select_iter iter
+        end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
        let name =
@@ -1957,7 +1960,14 @@ let treat_notification n =
        in
        try
          let parent = get_node_row parent_id in
-         ignore (new_node ~parent id name typ detached)
+         ignore (new_node ~parent id name typ detached);
+         match typ with
+         | NTransformation ->
+            (* if this new node is a transformation, and its parent
+               goal is selected, then ask for the next goal to prove. *)
+            if is_selected_alone parent_id then
+              send_request (Get_first_unproven_node parent_id)
+         | _ -> ()
        with Not_found ->
          ignore (new_node id name typ detached)
      end
@@ -1979,12 +1989,13 @@ let treat_notification n =
         exit_function_safe ()
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc)        ->
-     if_selected_alone
-       id
-       (fun _ -> task_view#source_buffer#set_text s;
-                 apply_loc_on_source list_loc;
-                 (* scroll to end of text *)
-                 task_view#scroll_to_mark `INSERT)
+     if is_selected_alone id then
+       begin
+         task_view#source_buffer#set_text s;
+         apply_loc_on_source list_loc;
+         (* scroll to end of text *)
+         task_view#scroll_to_mark `INSERT
+       end
   | File_contents (file_name, content) ->
     begin
       try
