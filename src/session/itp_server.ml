@@ -634,33 +634,25 @@ end
     let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
     Loc.user_position f l b e
 
+  let capture_parse_or_type_errors f cont =
+    try let _ = f cont in None with
+    | Loc.Located (loc, e) ->
+      let loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a at %a@."
+          Exn_printer.exn_printer e Loc.report_position loc in
+      Some (loc, s)
+    | e ->
+      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+      Some (Loc.dummy_position, s)
+
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    try let _ = reload_files cont ~use_shapes in true with
-    | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      P.notify (Message (Parse_Or_Type_Error (loc, s)));
-      false
-    | e ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
-      false
+    capture_parse_or_type_errors (reload_files ~use_shapes) cont
 
   let add_file cont ?format fname =
-    try add_file cont ?format fname; true with
-    | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      P.notify (Message (Parse_Or_Type_Error (loc, s)));
-      false
-    | e ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
-      false
+    capture_parse_or_type_errors (fun c -> add_file c ?format fname) cont
+
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -932,11 +924,14 @@ end
     | None ->
         if (Sys.file_exists f) then
           begin
-            let b = add_file cont f in
-            if b then
-              let file = get_file cont.controller_session fn in
-              send_new_subtree_from_file file;
-              read_and_send (file_name file)
+            match add_file cont f with
+            | None ->
+               let file = get_file cont.controller_session fn in
+               send_new_subtree_from_file file;
+               read_and_send (file_name file)
+            | Some(loc,s) ->
+               read_and_send fn;
+               P.notify (Message (Parse_Or_Type_Error(loc,s)))
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -989,15 +984,15 @@ end
     P.notify (Initialized infos);
     load_files_session ();
     Debug.dprintf debug "reloading source files@.";
-    let b = reload_files d.cont ~use_shapes in
-    if b then
-      begin
-        (* Send the tree *)
-        reset_and_send_the_whole_tree ();
-        (* After initial sending, we don't check anymore that there is a need to
+    let x = reload_files d.cont ~use_shapes in
+    reset_and_send_the_whole_tree ();
+    (* After initial sending, we don't check anymore that there is a need to
            focus on a specific node. *)
-        get_focused_label := None
-      end
+    get_focused_label := None;
+    match x with
+    | None -> ()
+    | Some(loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1205,12 +1200,12 @@ end
     let _old_focus = !focused_node in
     unfocus ();
     clear_tables ();
-    let b = reload_files d.cont ~use_shapes:true in
-    if b then
-      begin
+    match reload_files d.cont ~use_shapes:true with
+    | None ->
         (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-        reset_and_send_the_whole_tree ()
-      end
+       reset_and_send_the_whole_tree ()
+    | Some(loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
   let replay_session () : unit =
     let d = get_server_data () in

@@ -1105,10 +1105,13 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
     try
       let (n, v, _, _) = get_source_view_table f in
       if force_tab_switch then
-        (Debug.dprintf debug "tab switch to page %d@." n;
-                       notebook#goto_page n);
+        begin
+          Debug.dprintf debug "tab switch to page %d@." n;
+          notebook#goto_page n;
+        end;
       move_to_line ~yalign:0.0 v l
-    with Nosourceview _ -> ()
+    with Nosourceview _ ->
+      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
@@ -1457,7 +1460,7 @@ let treat_message_notification msg = match msg with
       (* TODO find a new color *)
       scroll_to_loc ~force_tab_switch:true (Some (loc,0));
       color_loc ~color:Goal_color loc;
-      print_message ~kind:1 ~mark:"Parse_Or_Type_Error]" "%s" s
+      print_message ~kind:1 ~mark:"Parse_Or_Type_Error" "%s" s
     end
   | File_Saved f                 ->
     begin
