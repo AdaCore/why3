@@ -870,7 +870,10 @@ let monitor =
     ~xalign:0.0
     ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
-let command_entry = GEdit.entry ~packing:hbox22221#add ()
+let command_entry =
+  GEdit.entry
+    ~text:"type commands here"
+    ~packing:hbox22221#add ()
 
 (* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
 let messages_notebook = GPack.notebook ~packing:vbox2222#add ()
@@ -1254,6 +1257,15 @@ let (_ : GtkSignal.id) =
     ~callback:(fun () -> add_command list_commands command_entry#text;
       interp command_entry#text)
 
+(* remove the helper text from the command entry the first time it gets the focus *)
+let () =
+  let id = ref None in
+  let callback _ =
+    clear_command_entry ();
+    GtkSignal.disconnect command_entry#as_entry (Opt.get !id);
+    false in
+  id := Some (command_entry#event#connect#focus_in ~callback)
+
 let on_selected_row r =
   try
     let id = get_node_id r#iter in
@@ -1335,6 +1347,15 @@ let (_ : GtkSignal.id) =
   in
   goals_view#event#connect#button_press ~callback
 
+let (_ : GtkSignal.id) =
+  let callback ev =
+    match GdkEvent.Key.keyval ev with
+    | k when k = GdkKeysyms._Return ->
+      command_entry#misc#grab_focus ();
+      true
+    | _ -> false
+  in
+  goals_view#event#connect#key_press ~callback
 
 (*************************************)
 (* Commands of the Experimental menu *)
@@ -1811,9 +1832,9 @@ let () =
 
 let remove_item =
   create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations (shortcut: x)"
+                   "Remove the selected proof attempts or transformations (shortcut: del)"
 let () =
-  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._x
+  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._Delete
 
 
 let mark_obsolete_item =
