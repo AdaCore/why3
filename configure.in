@@ -280,6 +280,12 @@ if test "$MENHIR" = no ; then
 	AC_MSG_ERROR(Cannot find menhir.)
 fi
 
+MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version* *\(.*\)$,\1,p'`
+case "$MENHIRVERSION" in
+   200*|201[[0-4]]*|20150[[1-5]]*)
+      AC_MSG_ERROR(You need Menhir 20150629 or higher.);;
+esac
+
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
 # libraries
