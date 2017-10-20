@@ -870,7 +870,10 @@ let monitor =
     ~xalign:0.0
     ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
-let command_entry = GEdit.entry ~packing:hbox22221#add ()
+let command_entry =
+  GEdit.entry
+    ~text:"type commands here"
+    ~packing:hbox22221#add ()
 
 (* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
 let messages_notebook = GPack.notebook ~packing:vbox2222#add ()
@@ -1253,6 +1256,15 @@ let (_ : GtkSignal.id) =
   command_entry#connect#activate
     ~callback:(fun () -> add_command list_commands command_entry#text;
       interp command_entry#text)
+
+(* remove the helper text from the command entry the first time it gets the focus *)
+let () =
+  let id = ref None in
+  let callback _ =
+    clear_command_entry ();
+    GtkSignal.disconnect command_entry#as_entry (Opt.get !id);
+    false in
+  id := Some (command_entry#event#connect#focus_in ~callback)
 
 let on_selected_row r =
   try
