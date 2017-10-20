@@ -1335,6 +1335,15 @@ let (_ : GtkSignal.id) =
   in
   goals_view#event#connect#button_press ~callback
 
+let (_ : GtkSignal.id) =
+  let callback ev =
+    match GdkEvent.Key.keyval ev with
+    | k when k = GdkKeysyms._Return ->
+      command_entry#misc#grab_focus ();
+      true
+    | _ -> false
+  in
+  goals_view#event#connect#key_press ~callback
 
 (*************************************)
 (* Commands of the Experimental menu *)
