@@ -31,7 +31,13 @@ let subst_quant c tq x : term =
   (match vsl with
   | hdv :: tl ->
       (try
-        let new_t = t_subst_single hdv x te in
+        (* TODO this should be refined in the future. In particular, we may want
+           to investigate something more robust with respect to polymorphims.
+        *)
+        let ty_subst, subst =
+          Reduction_engine.first_order_matching (Svs.add hdv Svs.empty) [Term.t_var hdv] [x]
+        in
+        let new_t = t_ty_subst ty_subst subst te in
         t_quant_close c tl tr new_t
       with
       | Ty.TypeMismatch (ty1, ty2) ->
@@ -41,16 +47,28 @@ let subst_quant c tq x : term =
 
 let subst_quant_list quant term_quant list_term : term =
   let (vsl, triggers, te) = t_open_quant term_quant in
-  let rec create_mvs list_term vsl acc =
+  (* TODO this create_mvs function should be a fold. It also can and
+     should  be removed because we can use first_order_matching on list
+     of terms *)
+  let rec create_mvs list_term vsl acc acc_ty =
     match list_term, vsl with
     | t :: lt_tl, v :: vsl_tl ->
+        let (ty_subst, _) =
+          Reduction_engine.first_order_matching (Svs.add v Svs.empty) [Term.t_var v] [t]
+        in
         create_mvs lt_tl vsl_tl (Mvs.add v t acc)
+          (Ty.Mtv.union (fun _ _ y -> Some y) ty_subst acc_ty)
     | _ :: _, [] -> raise (Unnecessary_terms list_term)
-    | [], vsl_remaining -> acc, vsl_remaining
+    | [], vsl_remaining -> (acc_ty, acc), vsl_remaining
   in
-  let m_subst, variables_remaining = create_mvs list_term vsl Mvs.empty in
+
+  let (ty_subst, m_subst), variables_remaining =
+    try
+      create_mvs list_term vsl Mvs.empty Ty.Mtv.empty
+    with _ -> raise (Arg_trans ("subst_quant_list"))
+  in
   try
-    let new_t = t_subst m_subst te in
+    let new_t = t_ty_subst ty_subst m_subst te in
     t_quant_close quant variables_remaining triggers new_t
   with
   | Ty.TypeMismatch (ty1, ty2) ->
