@@ -7,6 +7,8 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="6" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="2000"/>
 <file name="../compute.mlw" expanded="true">
 <theory name="UnitaryCommutativeRingDecision" sum="f010a5ed2c748e31ccaccc0292b55495">
  <goal name="VC mon_append" expl="VC for mon_append">
@@ -185,7 +187,7 @@
 </theory>
 <theory name="AssocAlgebra" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="AssocAlgebraDecision" sum="bee23ddea5475b0e934c7a637429ecf5">
+<theory name="AssocAlgebraDecision" sum="cd72537220c542d80824e2433ae6eb82" expanded="true">
  <goal name="VC mon_append" expl="VC for mon_append">
  <proof prover="1"><result status="valid" time="0.08"/></proof>
  </goal>
@@ -321,25 +323,118 @@
  <goal name="VC normalize" expl="VC for normalize">
  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="norm" expl="">
+ <goal name="VC norm" expl="VC for norm">
  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
- <goal name="norm&apos;" expl="">
+ <goal name="VC norm&apos;" expl="VC for norm&apos;">
  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
  </goal>
+ <goal name="g" expl="" expanded="true">
+ <transf name="reify_in_goal" expanded="true">
+  <goal name="g.1" expl="">
+  </goal>
+ </transf>
+ </goal>
 </theory>
-<theory name="Matrix" sum="df65c6acebd2109674a28fa86f5a4661">
+<theory name="ReifyTests" sum="09053f82ecaf1fb136e738fe5030ac4c" expanded="true">
+ <goal name="VC eq0_int" expl="VC for eq0_int">
+ <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
+ </goal>
+ <goal name="A.Assoc" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="A.Unit_def_l" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="A.Unit_def_r" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="A.Comm" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="A.MulAssoc.Assoc" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="AUnitary" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="ANonTrivial" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="ExtDistSumA" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="ExtDistSumR" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="AssocMulExt" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="UnitExt" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="CommMulExt" expl="">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="VC eq0" expl="VC for eq0">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="g" expl="">
+ </goal>
+</theory>
+<theory name="Matrix" sum="dcd79758644cb2e40daabcc2e39533b1" expanded="true">
  <goal name="VC eq0_int" expl="VC for eq0_int">
  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
  </goal>
+ <goal name="A.Assoc" expl="" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.07"/></proof>
+ <proof prover="1"><result status="timeout" time="4.95"/></proof>
+ <proof prover="2"><result status="timeout" time="5.00"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ <proof prover="5"><result status="timeout" time="5.00"/></proof>
+ <transf name="compute_in_goal" expanded="true">
+  <goal name="Assoc.1" expl="" expanded="true">
+  <proof prover="0"><result status="unknown" time="0.02"/></proof>
+  <proof prover="1"><result status="timeout" time="4.98"/></proof>
+  <proof prover="2"><result status="timeout" time="5.00"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="A.Unit_def_l" expl="" expanded="true">
+ <proof prover="0"><result status="timeout" time="5.00"/></proof>
+ <proof prover="1"><result status="timeout" time="4.98"/></proof>
+ <proof prover="2"><result status="timeout" time="5.00"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ <proof prover="6"><result status="timeout" time="5.00"/></proof>
+ </goal>
+ <goal name="A.Unit_def_r" expl="" expanded="true">
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ </goal>
+ <goal name="A.Comm" expl="" expanded="true">
+ <proof prover="2"><result status="timeout" time="5.00"/></proof>
+ </goal>
+ <goal name="A.MulAssoc.Assoc" expl="">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <transf name="smoke_detector_top">
+  <goal name="Assoc.1" expl="">
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="AUnitary" expl="">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <transf name="smoke_detector_top">
+  <goal name="AUnitary.1" expl="">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="ANonTrivial" expl="">
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="ExtDistSumA" expl="">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="ExtDistSumR" expl="">
  <proof prover="1"><result status="valid" time="0.03"/></proof>
@@ -348,13 +443,37 @@
  <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="UnitExt" expl="">
+ <proof prover="0"><result status="timeout" time="4.99"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00"/></proof>
+ <proof prover="5"><result status="timeout" time="5.00"/></proof>
+ <transf name="compute_in_goal">
+  <goal name="UnitExt.1" expl="">
+  <proof prover="0"><result status="timeout" time="4.98"/></proof>
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="timeout" time="10.00"/></proof>
+  <proof prover="3"><result status="timeout" time="5.00"/></proof>
+  <proof prover="5"><result status="timeout" time="5.00"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="CommMulExt" expl="">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <transf name="smoke_detector_deep">
+  <goal name="CommMulExt.1" expl="">
+  <proof prover="1"><result status="valid" time="0.05"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="VC eq0" expl="VC for eq0">
  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+ </goal>
+ <goal name="VC naive_blocks" expl="VC for naive_blocks">
+ <transf name="smoke_detector_deep">
+  <goal name="VC naive_blocks.1" expl="VC for naive_blocks">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

@@ -777,6 +777,7 @@ module MLToC = struct
           end
       | Lsym _ -> raise (Unsupported "LDsym")
       | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
+      | Lany _ -> raise (Unsupported "Lany")
        end
     | Eif (cond, th, el) ->
        let cd,cs = expr info {env with computes_return_value = false} cond in

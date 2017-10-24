@@ -465,20 +465,49 @@ let ghost function normalize (x:t') : t'
   ensures { eq' result x }
 = insertion_sort_mon x
 
-lemma norm: forall x1 x2: t, y:vars.
-      normalize (conv x1) = normalize (conv x2) -> interp x1 y = interp x2 y
+let lemma norm (x1 x2: t) (y:vars)
+    requires { normalize (conv x1) = normalize (conv x2) }
+    ensures  { interp x1 y = interp x2 y }
+= ()
 
-lemma norm': forall x1 x2: t'. normalize x1 = normalize x2 -> eq' x1 x2
+let lemma norm' (x1 x2: t')
+    requires { normalize x1 = normalize x2 }
+    ensures  { eq' x1 x2 }
+= ()
+
+meta reify_target function interp
+
+goal g: forall x y. x * y = y * x
+
+end
+
+module ReifyTests
+
+use import int.Int
+
+let predicate eq0_int (x:int) = x=0
+
+clone export AssocAlgebra with type r = int, type a = int, constant R.zero = Int.zero, constant R.one = Int.one, function R.(+) = (+), function R.(-_) = (-_), function R.(*) = (*),constant A.zero = Int.zero, constant one = Int.one, function (+) = (+), function A.(-_) = (-_), function ( *) = ( *), function (@) = ( *), goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc
+
+use import AssocAlgebraDecision
+
+meta reify_target function interp
+
+goal g: forall x y. x * y = y * x
 
 end
 
 module Matrix
 
 use import int.Int
+use import int.MinMax
 
 use import matrices.Matrix
 use import matrices.MatrixArithmetic
 use import matrices.BlockMul
+
+constant d : int
+axiom DimNonNeg : d >= 0
 
 function extf (c: int) (a:mat int) : int -> int -> int =
   fun x y -> c * (get a x y)
@@ -486,16 +515,33 @@ function extf (c: int) (a:mat int) : int -> int -> int =
 function ext (c: int) (a:mat int) : mat int =
   create (rows a) (cols a) (extf c a)
 
+function addm (a b: mat int) : mat int =
+  create (max a.rows b.rows) (max a.cols b.cols) (add2f a b)
 
-constant d : int
-axiom DimNonNeg : d >= 0
-
-constant zero11 : mat int = zero d d
-constant one11 : mat int = create d d (fun _ _ -> 1)
+constant zero11 : mat int = zero 0 0
+constant one11 : mat int = create d d (fun x y -> if x=y then 1 else 0)
 
 let predicate eq0_int (x:int) = x=0
 
-clone export AssocAlgebra with type r = int, type a = mat int, constant R.zero = Int.zero, constant R.one = Int.one, function R.(+) = (+), function R.(-_) = (-_), function R.(*) = (*),constant A.zero = zero11, constant one = one11, function (+) = add, function A.(-_) = opp, function ( *) = mul, function (@) = ext, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int
+clone export AssocAlgebra with type r = int, type a = mat int, constant R.zero = Int.zero, constant R.one = Int.one, function R.(+) = (+), function R.(-_) = (-_), function R.(*) = (*),constant A.zero = zero11, constant one = one11, function (+) = add, function A.(-_) = opp, function ( *) = mul, function (@) = ext, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc
+
+predicate quarters (a a11 a12 a21 a22: mat int) =
+  (rows a11 = rows a12 = rows a21 = rows a22 = cols a11 = cols a12 = cols a21 = cols a22) /\
+  rows a = cols a = 2 * rows a11 /\
+  a11 = block a 0 a11.rows 0 a11.cols /\ a12 = block a 0 a11.rows a11.cols a11.cols /\
+  a21 = block a a11.rows a11.rows 0 a11.cols /\ a22 = block a a11.rows a11.rows a11.cols a11.cols
+
+let lemma naive_blocks (a b c a11 a12 a21 a22 b11 b12 b21 b22 c11 c12 c21 c22: mat int)
+  requires { quarters a a11 a12 a21 a22 }
+  requires { quarters b b11 b12 b21 b22 }
+  requires { quarters c c11 c12 c21 c22 }
+  requires { c11 = add (mul a11 b11) (mul b11 b22) }
+  requires { c12 = add (mul a11 b12) (mul a12 b22) }
+  requires { c21 = add (mul a21 b11) (mul a22 b21) }
+  requires { c22 = add (mul a21 b12) (mul a22 b22) }
+  ensures  { c = mul a b }
+=
+  ()
 
 use import AssocAlgebraDecision
 
