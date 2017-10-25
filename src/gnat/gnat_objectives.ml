@@ -890,7 +890,7 @@ let goal_has_splits session (goal: goal_id) =
 let schedule_goal_with_prover ~cntexample ~callback c g p =
 (* actually schedule the goal, i.e., call the prover. This function returns
    immediately. *)
-  if Gnat_config.debug then begin
+  if Gnat_config.debug || Gnat_config.debug_save_vcs then begin
     save_vc ~cntexample c g p;
   end;
   run_goal ~cntexample ~callback c p g

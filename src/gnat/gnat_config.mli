@@ -63,6 +63,9 @@ val lazy_ : bool
 val debug : bool
 (* true if option --debug was present *)
 
+val debug_save_vcs : bool
+(* true if option --debug-save-vcs was present *)
+
 val stand_alone : bool
 (* true if option --standalone was present *)
 

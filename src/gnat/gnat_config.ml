@@ -43,6 +43,7 @@ let opt_timeout : int option ref = ref None
 let opt_ce_timeout : int option ref = ref None
 let opt_steps : int option ref = ref None
 let opt_debug = ref false
+let opt_debug_save_vcs = ref false
 let opt_force = ref false
 let opt_proof_mode = ref Progressive
 let opt_lazy = ref true
@@ -192,6 +193,8 @@ let options = Arg.align [
             Arg.Unit (fun () -> Debug.set_flag Debug.stack_trace;
                                 Printexc.record_backtrace true)],
           " Enable debug mode; and gives stack_trace on any exception raised";
+   "--debug-save-vcs", Arg.Set opt_debug_save_vcs,
+          " Save VCs files when running provers";
    "--standalone", Arg.Set opt_standalone,
           " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
@@ -576,6 +579,7 @@ let limit ~prover =
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
 let debug = !opt_debug
+let debug_save_vcs = !opt_debug_save_vcs
 let force = !opt_force
 let limit_line = !opt_limit_line
 
