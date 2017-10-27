@@ -351,8 +351,9 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
     Debug.dprintf debug_sched "[build_prover_call] Script file = %a@."
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
+    let ce_prover = if cntexample then Some pr.Whyconf.prover_name else None in
     let call =
-      Driver.prove_task ?old:proof_script ~cntexample ~inplace ~command
+      Driver.prove_task ?old:proof_script ?ce_prover ~cntexample ~inplace ~command
                         ~limit driver task
     in
     let pa = (c.controller_session,id,pr,callback,false,call,ores) in
