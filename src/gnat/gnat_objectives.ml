@@ -1,6 +1,5 @@
 open Why3
 open Stdlib
-open Gnat_scheduler
 
 type goal_id = Session_itp.proofNodeID
 (* This is the type of identifier of goal. They can be queried from the session
