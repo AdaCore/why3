@@ -859,6 +859,8 @@ let check_literal c ty =
            | _ -> raise (InvalidRealLiteralType ty)
      end
 
+let t_const c ty = check_literal c ty; t_const c ty
+
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
   t_if (t_prop f) t1 t2
