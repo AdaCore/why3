@@ -1,0 +1,11 @@
+
+(* Issue #7:
+
+   https://gitlab.inria.fr/why3/why3/issues/7
+
+*)
+
+theory T
+  use ieee_float.Float32 as B32
+  goal g : (1.:B32.t) = (1:B32.t)
+end

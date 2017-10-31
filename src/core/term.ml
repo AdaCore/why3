@@ -835,26 +835,31 @@ let t_nat_const n =
 
 let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 
-exception InvalidLiteralType of ty
+exception InvalidIntegerLiteralType of ty
+exception InvalidRealLiteralType of ty
 
 let check_literal c ty =
   let ts = match ty.ty_node with
     | Tyapp (ts,[]) -> ts
-    | _ -> raise (InvalidLiteralType ty) in
+    | _ -> match c with
+           | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
+           | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
+  in
   match c with
-    | Number.ConstInt n when not (ts_equal ts ts_int) ->
-        begin match ts.ts_def with
-          | Range ir -> Number.(check_range n ir)
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | Number.ConstReal x when not (ts_equal ts ts_real) ->
-        begin match ts.ts_def with
-          | Float fp -> Number.(check_float x.Number.rc_abs fp)
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | _ -> ()
-
-let t_const c ty = check_literal c ty; t_const c ty
+  | Number.ConstInt _ when ts_equal ts ts_int ->
+     t_const c ty
+  | Number.ConstInt n ->
+     begin match ts.ts_def with
+           | Range ir -> Number.(check_range n ir)
+           | _ -> raise (InvalidIntegerLiteralType ty)
+     end
+  | Number.ConstReal _ when ts_equal ts ts_real ->
+     t_const c ty
+  | Number.ConstReal x ->
+     begin match ts.ts_def with
+           | Float fp -> Number.(check_float x.Number.rc_abs fp)
+           | _ -> raise (InvalidRealLiteralType ty)
+     end
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;

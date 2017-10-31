@@ -650,8 +650,10 @@ let () = Exn_printer.register
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
-  | Term.InvalidLiteralType ty ->
-      fprintf fmt "Type %a cannot be used for a numeric literal" print_ty ty
+  | Term.InvalidIntegerLiteralType ty ->
+      fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
+  | Term.InvalidRealLiteralType ty ->
+      fprintf fmt "Cannot cast a real literal to type %a" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
