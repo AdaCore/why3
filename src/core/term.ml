@@ -846,15 +846,13 @@ let check_literal c ty =
            | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
   in
   match c with
-  | Number.ConstInt _ when ts_equal ts ts_int ->
-     t_const c ty
+  | Number.ConstInt _ when ts_equal ts ts_int -> ()
   | Number.ConstInt n ->
      begin match ts.ts_def with
            | Range ir -> Number.(check_range n ir)
            | _ -> raise (InvalidIntegerLiteralType ty)
      end
-  | Number.ConstReal _ when ts_equal ts ts_real ->
-     t_const c ty
+  | Number.ConstReal _ when ts_equal ts ts_real -> ()
   | Number.ConstReal x ->
      begin match ts.ts_def with
            | Float fp -> Number.(check_float x.Number.rc_abs fp)
