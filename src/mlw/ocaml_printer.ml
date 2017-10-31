@@ -442,6 +442,10 @@ module Print = struct
           | _ ->
               fprintf fmt (protect_on paren "%a")
                 (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+    | Ematch (e1, [p, e2]) ->
+        fprintf fmt
+          (protect_on paren "let %a =@ %a in@ %a")
+          (print_pat info) p (print_expr info) e1 (print_expr info) e2
     | Ematch (e, pl) ->
         fprintf fmt
           (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
