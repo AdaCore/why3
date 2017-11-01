@@ -1329,7 +1329,7 @@ let why3tac ?(timelimit=timelimit) s gl =
     let limit =
     { Call_provers.empty_limit with Call_provers.limit_time = timelimit } in
     let call = Driver.prove_task ~command ~limit drv !task in
-    wait_on_call call
+    wait_on_call (ServerCall call)
   with
     | NotFO ->
         if debug then Printexc.print_backtrace stderr; flush stderr;
