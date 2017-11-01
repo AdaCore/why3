@@ -11,14 +11,14 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/../why3-itp-reports
+REPORTDIR=$PWD/../why3-reports
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
 DATE=`date --utc +%Y-%m-%d`
 
-SUBJECT="Why3 NEW SYSTEM + ITP nightly bench:"
+SUBJECT="Why3 NEW SYSTEM nightly bench:"
 
 notify() {
     if test "$REPORTBYMAIL" == "no"; then
