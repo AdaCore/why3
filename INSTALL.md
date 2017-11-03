@@ -1,5 +1,5 @@
-
-                  Installation instructions
+Installation instructions
+=========================
 
 
 Installation from a source distribution (tarball)
@@ -7,14 +7,14 @@ Installation from a source distribution (tarball)
 
 After unpacking, installation is done by
 
-  ./configure
-  make
-  make install (as root)
+    ./configure
+    make
+    make install (as root)
 
-To install also the Ocaml library do
+To install also the Ocaml library, do
 
-  make byte
-  make install-lib (as root)
+    make byte
+    make install-lib (as root)
 
 
 Installation from the git repository
@@ -22,15 +22,15 @@ Installation from the git repository
 
 First run
 
-      autoconf
-      automake --add-missing
+    autoconf
+    automake --add-missing
 
-to build the ./configure file and install the helper scripts, then follow
-instructions from the section above.
+to build the `./configure` file and install the helper scripts, then follow
+the instructions from the section above.
 
 
 Detailed instructions
 ---------------------
 
 For detailed instructions and required dependencies, please see
-the manual (doc/manual.pdf), Chapter 5 "Compilation, Installation".
+the manual `doc/manual.pdf`, Chapter 5 "Compilation, Installation".
