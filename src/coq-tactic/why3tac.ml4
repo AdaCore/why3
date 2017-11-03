@@ -175,18 +175,18 @@ let get_prover s =
 
 (* Coq constants *)
 
-let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"]
-let coq_Z = coq_ref_BinInt "Z"
-let coq_Zplus = coq_ref_BinInt "Zplus"
-let coq_Zmult = coq_ref_BinInt "Zmult"
-let coq_Zopp = coq_ref_BinInt "Zopp"
-let coq_Zminus = coq_ref_BinInt "Zminus"
-let coq_Zdiv = coq_reference "Why3" ["ZArith"; "Zdiv"] "Zdiv"
-let coq_Zgt = coq_ref_BinInt "Zgt"
-let coq_Zle = coq_ref_BinInt "Zle"
-let coq_Zge = coq_ref_BinInt "Zge"
-let coq_Zlt = coq_ref_BinInt "Zlt"
+let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"; "Z"]
+let coq_Zplus = coq_ref_BinInt "add"
+let coq_Zmult = coq_ref_BinInt "mul"
+let coq_Zopp = coq_ref_BinInt "opp"
+let coq_Zminus = coq_ref_BinInt "sub"
+let coq_Zdiv = coq_ref_BinInt "div"
+let coq_Zgt = coq_ref_BinInt "gt"
+let coq_Zle = coq_ref_BinInt "le"
+let coq_Zge = coq_ref_BinInt "ge"
+let coq_Zlt = coq_ref_BinInt "lt"
 let coq_ref_BinNums = coq_reference "Why3" ["Numbers"; "BinNums"]
+let coq_Z = coq_ref_BinNums "Z"
 let coq_Z0 = coq_ref_BinNums "Z0"
 let coq_Zpos = coq_ref_BinNums "Zpos"
 let coq_Zneg = coq_ref_BinNums "Zneg"
