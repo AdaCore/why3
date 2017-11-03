@@ -126,6 +126,7 @@ let reify_goal interp task =
              with Exit -> invert_pat vl (env, fr) (p2, f) t
        end
     | Pvar _, Tvar _, Tvar _ | Pvar _, Tvar _, Tapp (_, [])
+      | Pvar _, Tvar _, Tconst _
       -> if debug then Format.printf "case vars@.";
          (env, fr, t)
     | Pvar _, Tapp (ls, _la), _ when ls_equal ls interp
