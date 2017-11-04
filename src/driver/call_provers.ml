@@ -400,6 +400,18 @@ let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
     Hashtbl.add result_buffer id x)
     (wait_for_server_result ~blocking)
 
+let forward_results ~blocking =
+  get_new_results ~blocking;
+  let q = Queue.create () in
+  Hashtbl.iter (fun key element ->
+    if element = ProverStarted && blocking then
+      ()
+    else
+      Queue.push (ServerCall key, element) q) result_buffer;
+  Hashtbl.clear result_buffer;
+  q
+
+
 let query_result_buffer id =
   try let r = Hashtbl.find result_buffer id in
       Hashtbl.remove result_buffer id; r

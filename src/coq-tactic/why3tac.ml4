@@ -175,18 +175,18 @@ let get_prover s =
 
 (* Coq constants *)
 
-let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"]
-let coq_Z = coq_ref_BinInt "Z"
-let coq_Zplus = coq_ref_BinInt "Zplus"
-let coq_Zmult = coq_ref_BinInt "Zmult"
-let coq_Zopp = coq_ref_BinInt "Zopp"
-let coq_Zminus = coq_ref_BinInt "Zminus"
-let coq_Zdiv = coq_reference "Why3" ["ZArith"; "Zdiv"] "Zdiv"
-let coq_Zgt = coq_ref_BinInt "Zgt"
-let coq_Zle = coq_ref_BinInt "Zle"
-let coq_Zge = coq_ref_BinInt "Zge"
-let coq_Zlt = coq_ref_BinInt "Zlt"
+let coq_ref_BinInt = coq_reference "Why3" ["ZArith"; "BinInt"; "Z"]
+let coq_Zplus = coq_ref_BinInt "add"
+let coq_Zmult = coq_ref_BinInt "mul"
+let coq_Zopp = coq_ref_BinInt "opp"
+let coq_Zminus = coq_ref_BinInt "sub"
+let coq_Zdiv = coq_ref_BinInt "div"
+let coq_Zgt = coq_ref_BinInt "gt"
+let coq_Zle = coq_ref_BinInt "le"
+let coq_Zge = coq_ref_BinInt "ge"
+let coq_Zlt = coq_ref_BinInt "lt"
 let coq_ref_BinNums = coq_reference "Why3" ["Numbers"; "BinNums"]
+let coq_Z = coq_ref_BinNums "Z"
 let coq_Z0 = coq_ref_BinNums "Z0"
 let coq_Zpos = coq_ref_BinNums "Zpos"
 let coq_Zneg = coq_ref_BinNums "Zneg"
@@ -209,6 +209,11 @@ let coq_Rinv = coq_ref_Rdefinitions "Rinv"
 let coq_Rminus = coq_ref_Rdefinitions "Rminus"
 let coq_Rdiv = coq_ref_Rdefinitions "Rdiv"
 let coq_powerRZ = coq_reference "Why3" ["Reals"; "Rfunctions"] "powerRZ"
+IFDEF COQ87 THEN
+let coq_IZR = coq_ref_Rdefinitions "IZR"
+ELSE
+let coq_IZR = coq_reference "Why3" ["Reals"; "Raxioms"] "IZR"
+END
 
 let coq_Logic = coq_reference "Why3" ["Init"; "Logic"]
 let coq_False = coq_Logic "False"
@@ -479,7 +484,25 @@ let const_of_big_int b =
     (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
     ty_int
 
+let const_of_big_int_real b =
+  let s = Big_int.string_of_big_int b in
+  Term.t_const (Number.ConstReal (Number.real_const_dec s "0" None)) ty_real
+
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
+let rec tr_arith_constant_IZR evd dep t = match kind evd t with
+  | Construct _ when is_global evd coq_Z0 t ->
+    Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None)) ty_real
+  | App (f, [|a|]) when is_global evd coq_Zpos f ->
+    const_of_big_int_real (tr_positive evd a)
+  | App (f, [|a|]) when is_global evd coq_Zneg f ->
+    let t = const_of_big_int_real (tr_positive evd a) in
+    let fs = why_constant_real dep ["prefix -"] in
+    Term.fs_app fs [t] ty_real
+  | Cast (t, _, _) ->
+    tr_arith_constant_IZR evd dep t
+  | _ ->
+    raise NotArithConstant
+
 let rec tr_arith_constant evd dep t = match kind evd t with
   | Construct _ when is_global evd coq_Z0 t -> Term.t_nat_const 0
   | App (f, [|a|]) when is_global evd coq_Zpos f ->
@@ -488,6 +511,8 @@ let rec tr_arith_constant evd dep t = match kind evd t with
       let t = const_of_big_int (tr_positive evd a) in
       let fs = why_constant_int dep ["prefix -"] in
       Term.fs_app fs [t] Ty.ty_int
+  | App (f, [|a|]) when is_global evd coq_IZR f ->
+      tr_arith_constant_IZR evd dep a
   | Const _ when is_global evd coq_R0 t ->
       Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
         ty_real
