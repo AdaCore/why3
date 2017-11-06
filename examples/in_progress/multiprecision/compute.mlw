@@ -331,14 +331,22 @@ constant one : a
 
 clone export AssocAlgebra with type r = r, type a = a, constant one = one
 
-type t = Var int | Add t t | Mul t t | Ext r t
+type t = Var int | Add t t | Mul t t | Ext r t | Sub t t
 type vars = int -> a
+
+function asub (x y:a) : a
+
+axiom asub_def: forall x y: a. asub x y = x + (A.(-_) y)
+
+lemma ext_minone:
+  forall a: a. ($) (R.(-_) R.one) a = A.(-_) a
 
 function interp (x: t) (y: vars) : a =
   match x with
   | Var n -> y n
   | Add x1 x2 -> interp x1 y + interp x2 y
   | Mul x1 x2 -> interp x1 y * interp x2 y
+  | Sub x1 x2 -> asub (interp x1 y) (interp x2 y)
   | Ext r x -> ($) r (interp x y)
   end
 
@@ -374,12 +382,13 @@ let rec lemma mon_append (x1 x2: list int) (y: vars)
 lemma interp_cons : forall m:m, x:t', y:vars.
       interp' (Cons m x) y = interp' x y + interp' (Cons m Nil) y
 
-let rec lemma interp_sum (x1 x2: t') (y: vars)
-    ensures { interp' (x1++x2) y = interp' x1 y + interp' x2 y }
+let rec lemma interp_sum (x1 x2: t')
+    ensures { forall y: vars.
+              interp' (x1++x2) y = interp' x1 y + interp' x2 y }
     variant { x1 }
 = match x1 with
   | Nil -> ()
-  | Cons _ x -> interp_sum x x2 y end
+  | Cons _ x -> interp_sum x x2 end
 
 let ghost function append_mon (m1 m2:m)
   ensures { forall y. interp' (Cons result Nil) y
@@ -409,6 +418,9 @@ let rec ghost function ext (c:r) (x:t') : t'
   | Nil -> Nil
   | Cons (M r m) l -> Cons (M (R.( *) c r) m) (ext c l) end
 
+lemma ext_sub:
+  forall x:t', y:vars. interp' (ext (R.(-_) R.one) x) y = A.(-_) (interp' x y)
+
 let rec ghost function conv (x:t) : t'
   ensures { forall y. interp x y = interp' result y }
 = match x with
@@ -416,6 +428,7 @@ let rec ghost function conv (x:t) : t'
   | Add x1 x2 -> (conv x1) ++ (conv x2)
   | Mul x1 x2 -> mul_devel (conv x1) (conv x2)
   | Ext r x -> ext r (conv x)
+  | Sub x1 x2 -> (conv x1) ++ (ext (R.(-_) R.one) (conv x2))
   end
 
 
@@ -792,10 +805,12 @@ module InfIntMatrix
 
   lemma add_size:
     forall a b: mat, r c: int. size a r c -> size b r c -> size (add a b) r c
-    by (forall i j:int. (in_bounds a i j \/ in_bounds b i j) <-> in_bounds (add a b) i j)
+    by (forall i j:int.
+       (in_bounds a i j \/ in_bounds b i j) <-> in_bounds (add a b) i j)
 
   lemma add_assoc:
-    forall a b c: mat. add (add a b) c = add a (add b c) by add (add a b) c == add a (add b c)
+    forall a b c: mat. add (add a b) c = add a (add b c)
+    by add (add a b) c == add a (add b c)
 
   lemma add_commutative:
     forall a b: mat. add a b = add b a by add a b == add b a
@@ -811,6 +826,11 @@ module InfIntMatrix
     create (row_zeros a) (col_zeros a) (opp2f a)
 
   function sub (a b: mat) : mat = add a (opp b)
+
+  lemma sub_size:
+    forall a b: mat, r c: int. size a r c -> size b r c -> size (sub a b) r c
+    by (forall i j:int.
+       (in_bounds a i j \/ in_bounds b i j) <-> in_bounds (sub a b) i j)
 
   lemma opp_involutive:
     forall m. opp (opp m) = m by opp (opp m) == m
@@ -954,8 +974,31 @@ lemma assoc_mul_ext:
 lemma unit_ext:
   forall x: mat. extp 1 x = x by extp 1 x == x
 
+let lemma comm_mul_ext_ij (x y: mat) (r i j: int)
+  requires { 0 <= i /\ 0 <= j }
+  ensures { get (mul (extp r x) y) i j = r * (get (mul x y) i j) }
+  ensures { get (mul x (extp r y)) i j = r * (get (mul x y) i j) }
+=
+  let b = mul_cell_bound x y i j in
+  assert { mul_cell_bound (extp r x) y i j = b
+           = mul_cell_bound x (extp r y) i j };
+  sum_ext (mul_atom (extp r x) y i j) (smulf (mul_atom x y i j) r) 0 b;
+  sum_ext (mul_atom x (extp r y) i j) (smulf (mul_atom x y i j) r) 0 b;
+  sum_mult (mul_atom (extp r x) y i j) 0 b r;
+  sum_mult (mul_atom x (extp r y) i j) 0 b r;
+  assert { get (mul (extp r x) y) i j
+           = r * (get (mul x y) i j)
+           = get (mul x (extp r y)) i j
+           by get (mul (extp r x) y) i j
+              = mul_cell (extp r x) y i j
+              = r * mul_cell x y i j
+              = mul_cell x (extp r y) i j
+              = get (mul x (extp r y)) i j
+           so r * mul_cell x y i j = r * (get (mul x y) i j) }
+
 lemma comm_mul_ext:
-  forall x y: mat, r: int. extp r (mul x y) = mul (extp r x) y = mul x (extp r y)
+  forall x y: mat, r: int.
+     extp r (mul x y) = mul (extp r x) y = mul x (extp r y)
   by extp r (mul x y) == mul (extp r x) y == mul x (extp r y)
 
 end
@@ -967,7 +1010,7 @@ use import int.Int
 
 let predicate eq0_int (x:int) = x = 0
 
-clone export AssocAlgebraDecision with type r = int, type a = mat, constant R.zero = Int.zero, constant R.one = Int.one, function R.(+) = (+), function R.(-_) = (-_), function R.(*) = (*),constant A.zero = mzero, constant one = id, function (+) = add, function A.(-_) = opp, function ( *) = mul, function ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r
+clone export AssocAlgebraDecision with type r = int, type a = mat, constant R.zero = Int.zero, constant R.one = Int.one, function R.(+) = (+), function R.(-_) = (-_), function R.(*) = (*),constant A.zero = mzero, constant one = id, function (+) = add, function A.(-_) = opp, function ( *) = mul, function asub = sub, function ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r, goal asub_def
 
 end
 
@@ -1150,15 +1193,15 @@ module MatrixTests
       assert { c = mul a b };
       let m1 = strassen_pow2 (add a11 a22) (add b11 b22) (k-1) in
       let m2 = strassen_pow2 (add a21 a22) b11 (k-1) in
-      let m3 = strassen_pow2 a11 (add b12 (extp (-1) b22)) (k-1) in
-      let m4 = strassen_pow2 a22 (add b21 (extp (-1) b11)) (k-1) in
+      let m3 = strassen_pow2 a11 (sub b12 b22) (k-1) in
+      let m4 = strassen_pow2 a22 (sub b21 b11) (k-1) in
       let m5 = strassen_pow2 (add a11 a12) b22 (k-1) in
-      let m6 = strassen_pow2 (add a21 (extp (-1) a11)) (add b11 b12) (k-1) in
-      let m7 = strassen_pow2 (add a12 (extp (-1) a22)) (add b21 b22) (k-1) in
-      let s11 = add m1 (add m4 (add m7 (extp (-1) m5))) in
+      let m6 = strassen_pow2 (sub a21 a11) (add b11 b12) (k-1) in
+      let m7 = strassen_pow2 (sub a12 a22) (add b21 b22) (k-1) in
+      let s11 = add m1 (add m4 (sub m7 m5)) in
       let s12 = add m3 m5 in
       let s21 = add m2 m4 in
-      let s22 = add m1 (add m3 (add m6 (extp (-1) m2))) in
+      let s22 = add m1 (add m3 (sub m6 m2)) in
       assert { s11 = c11 };
       assert { s12 = c12 };
       assert { s21 = c21 };

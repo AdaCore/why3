@@ -27,6 +27,7 @@ let debug = true
 
 
 let expl_reified_goal = Ident.create_label "expl:reified goal"
+let expl_reification_check = Ident.create_label "expl:reification check"
 let expl_normalized_goal = Ident.create_label "expl:normalized goal"
 let expl_normalization_check = Ident.create_label "expl:normalization check"
 
@@ -157,14 +158,9 @@ let reify_goal interp task =
        aux bl
     | _ -> raise Exit
   in
-  let rec reify_term (env, fr) (t:term) =
+  let reify_term (env, fr) (t:term) =
     if debug then Format.printf "reify_term %a@." Pretty.print_term t;
     match t.t_node with
-    | Tapp(ls, [t1; t2]) when ls_equal ls ps_equ ->
-       if debug then Format.printf "case =@.";
-       let (env, fr, t1) = reify_term (env, fr) t1 in
-       let (env, fr, t2) = reify_term (env, fr) t2 in
-       env, fr, t_equ t1 t2
     | Tquant (Tforall, _) ->
        raise Exit (* we introduce premises before the transformation *)
     | _ when oty_equal t.t_ty interp.ls_value ->
@@ -178,7 +174,6 @@ let reify_goal interp task =
                        Pretty.print_ty (Opt.get interp.ls_value);
        raise Exit
   in
-
   let open Task in
   match task with
   | Some
@@ -187,12 +182,17 @@ let reify_goal interp task =
       task_prev = prev;
     } ->
      begin try
-         if debug then Format.printf "start@.";
-         let (env, _fr, t) = reify_term (Mterm.empty, 0) f in
-         if debug then Format.printf "building y map@.";
-         let d = create_param_decl ly in
-         let prev = Task.add_decl prev d in
-         let prev = Mterm.fold
+       if debug then Format.printf "start@.";
+       begin match f.t_node with
+       | Tapp(ls, [f1; f2]) when ls_equal ls ps_equ ->
+          if debug then Format.printf "case =@.";
+          let (env, fr, t1) = reify_term (Mterm.empty, 0) f1 in
+          let (env, _fr, t2) = reify_term (env, fr) f2 in
+          let t = t_equ t1 t2 in
+          if debug then Format.printf "building y map@.";
+          let d = create_param_decl ly in
+          let prev = Task.add_decl prev d in
+          let prev = Mterm.fold
                       (fun t i prev ->
                         let et = t_equ
                                    (t_app fs_func_app [y; t_nat_const i]
@@ -203,13 +203,30 @@ let reify_goal interp task =
                         let d = Decl.create_prop_decl Paxiom pr et in
                         Task.add_decl prev d)
                       env prev in
-         if debug then Format.printf "building goal@.";
-         let pr = Decl.create_prsymbol
-                    (id_fresh "reified_goal"
-                              ~label:(Slab.singleton expl_reified_goal)) in
-         let d = Decl.create_prop_decl Pgoal pr t in
-         Task.add_decl prev d
-       with Exit -> task end
+          if debug then Format.printf "building goal@.";
+          let pr = Decl.create_prsymbol
+                     (id_fresh "reified_goal"
+                               ~label:(Slab.singleton expl_reified_goal)) in
+          let d = Decl.create_prop_decl Pgoal pr t in
+          let task_r = Task.add_decl prev d in
+          let tc1 = t_app ps_equ [t1; f1] f.t_ty in
+          let tc2 = t_app ps_equ [t2; f2] f.t_ty in
+          let prc1 = Decl.create_prsymbol
+                       (id_fresh "reify_check"
+                                 ~label:(Slab.singleton
+                                           expl_reification_check)) in
+          let prc2 = Decl.create_prsymbol
+                       (id_fresh "reify_check"
+                                 ~label:(Slab.singleton
+                                           expl_reification_check)) in
+          let d1 = Decl.create_prop_decl Pgoal prc1 tc1 in
+          let d2 = Decl.create_prop_decl Pgoal prc2 tc2 in
+          let task_c1 = Task.add_decl prev d1 in
+          let task_c2 = Task.add_decl prev d2 in
+          [task_r; task_c1; task_c2]
+       | _ -> raise Exit
+       end
+       with Exit -> [task] end
   | _ -> assert false
 
 
@@ -268,7 +285,7 @@ let normalize_goal_t (interp, norm) = Trans.store (normalize_goal (interp, norm)
 
 let normalize_in_goal = Trans.bind collect_interp_normalize normalize_goal_t
 
-let () = Trans.register_transform
+let () = Trans.register_transform_l
            "reify_in_goal"
            ~desc:"Reify@ goal@ to@ declared@ target@ datatype."
            reify_in_goal
