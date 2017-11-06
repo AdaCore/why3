@@ -33,4 +33,5 @@ Detailed instructions
 ---------------------
 
 For detailed instructions and required dependencies, please see
-the manual `doc/manual.pdf`, Chapter 5 "Compilation, Installation".
+the manual [doc/manual.pdf](http://why3.lri.fr/manual.pdf), Chapter 5
+[Compilation, Installation](http://why3.lri.fr/doc/install.html).
