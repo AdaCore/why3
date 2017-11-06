@@ -402,31 +402,19 @@ let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
 
 let forward_results ~blocking =
   get_new_results ~blocking;
-  let q = Queue.create () in
+  let q = ref [] in
   Hashtbl.iter (fun key element ->
     if element = ProverStarted && blocking then
       ()
     else
-      Queue.push (ServerCall key, element) q) result_buffer;
+      q := (ServerCall key, element) :: !q) result_buffer;
   Hashtbl.clear result_buffer;
-  q
-
+  !q
 
 let query_result_buffer id =
   try let r = Hashtbl.find result_buffer id in
       Hashtbl.remove result_buffer id; r
   with Not_found -> NoUpdates
-
-let forward_results ~blocking =
-  get_new_results ~blocking;
-  let q = Queue.create () in
-  Hashtbl.iter (fun key element ->
-    if element = ProverStarted && blocking then
-      ()
-    else
-      Queue.push (ServerCall key, element) q) result_buffer;
-  Hashtbl.clear result_buffer;
-  q
 
 let editor_result ret = {
   pr_answer = Unknown ("", None);

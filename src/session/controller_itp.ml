@@ -377,19 +377,10 @@ let timeout_handler () =
      was not launched so getting results could fail. *)
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
     let results = Call_provers.forward_results ~blocking:S.blocking in
-    while not (Queue.is_empty results) do
-      let (call, prover_update) = Queue.pop results in
-      let c = try Some (Hashtbl.find prover_tasks_in_progress call)
-        with Not_found -> None in
-      match c with
-      | None -> () (* we do nothing. We probably received ProverStarted after
-                      ProverFinished because what is sent to and received from
-                      the server is not ordered. *)
-      | Some c ->
-      begin
-        let (ses,id,pr,callback,started,call,ores) = c in
-
-        match prover_update with
+    List.iter (fun (call, prover_update) ->
+      match Hashtbl.find prover_tasks_in_progress call with
+      | (ses,id,pr,callback,started,call,ores) ->
+        begin match prover_update with
         | Call_provers.NoUpdates -> ()
         | Call_provers.ProverStarted ->
             assert (not started);
@@ -413,8 +404,12 @@ let timeout_handler () =
             if started then decr number_of_running_provers;
             (* inform the callback *)
             callback (InternalFailure (exn))
-      end
-    done
+        end
+      | exception Not_found -> ()
+        (* We probably received ProverStarted after ProverFinished,
+           because what is sent to and received from the server is
+           not ordered. *)
+    ) results;
   end;
 
   (* When blocking is activated, we are in script mode and we don't want editors
