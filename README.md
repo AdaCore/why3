@@ -1,5 +1,5 @@
-WHY 3
-=====
+WHY3
+====
 
 Why3 is a platform for deductive program verification. It provides
 a rich language for specification and programming, called WhyML, and
