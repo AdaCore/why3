@@ -1,7 +1,7 @@
 :x: marks a potential source of incompatibility
 
 Version 0.88.1, November 6, 2017
------------------------
+--------------------------------
 
 API
   * exported function `Call_provers.get_new_results`
