@@ -22,8 +22,9 @@ https://gitlab.inria.fr/why3/why3
 DOCUMENTATION
 -------------
 
-The documentation (a tutorial and a reference manual) is in
-the file `doc/manual.pdf`.
+The documentation (a tutorial and a reference manual) is in the file
+[doc/manual.pdf](http://why3.lri.fr/manual.pdf) or online at
+http://why3.lri.fr/doc/.
 
 Various examples can be found in the subdirectories [theories/](theories)
 and [examples/](examples).
