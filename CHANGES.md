@@ -1,13 +1,18 @@
 :x: marks a potential source of incompatibility
 
-Version 0.88.1, ?, 2017
------------------------
+Version 0.88.1, November 6, 2017
+--------------------------------
 
 API
-  * exported function `forward_results` in `Call_provers` interface
+  * exported function `Call_provers.get_new_results`
 
 Provers
   * improved support for Isabelle 2017
+  * fixed support for Coq 8.7
+
+Miscellaneous
+  * fixed compilation for OCaml 4.06
+  * improved support for nullary `val` declarations with regions
 
 Version 0.88.0, October 6, 2017
 -------------------------------

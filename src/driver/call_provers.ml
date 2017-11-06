@@ -392,7 +392,7 @@ type prover_update =
 
 let result_buffer : (server_id, prover_update) Hashtbl.t = Hashtbl.create 17
 
-let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
+let fetch_new_results ~blocking = (* TODO: handle ProverStarted events *)
   List.iter (fun (id, r) ->
     let x = match r with
     | Some r -> ProverFinished r
@@ -400,8 +400,8 @@ let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
     Hashtbl.add result_buffer id x)
     (wait_for_server_result ~blocking)
 
-let forward_results ~blocking =
-  get_new_results ~blocking;
+let get_new_results ~blocking =
+  fetch_new_results ~blocking;
   let q = ref [] in
   Hashtbl.iter (fun key element ->
     if element = ProverStarted && blocking then
@@ -427,7 +427,7 @@ let editor_result ret = {
 
 let query_call = function
   | ServerCall id ->
-      get_new_results ~blocking:false;
+      fetch_new_results ~blocking:false;
       query_result_buffer id
   | EditorCall pid ->
       let pid, ret = Unix.waitpid [Unix.WNOHANG] pid in
@@ -439,7 +439,7 @@ let rec wait_on_call = function
       begin match query_result_buffer id with
         | ProverFinished r -> r
 	| _ ->
-            get_new_results ~blocking:true;
+            fetch_new_results ~blocking:true;
             wait_on_call pc
       end
   | EditorCall pid ->

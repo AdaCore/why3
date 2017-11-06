@@ -376,7 +376,7 @@ let timeout_handler () =
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
-    let results = Call_provers.forward_results ~blocking:S.blocking in
+    let results = Call_provers.get_new_results ~blocking:S.blocking in
     List.iter (fun (call, prover_update) ->
       match Hashtbl.find prover_tasks_in_progress call with
       | (ses,id,pr,callback,started,call,ores) ->
