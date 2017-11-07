@@ -41,11 +41,18 @@ let rec build_decls cls x =
   | (cs, _) :: tl ->
       let type_subst = my_ls_app_inst cs x.t_ty in
       let l = return_list cs.ls_args type_subst in
-      let ht = t_equ x
-           (t_app cs (List.map (fun x -> t_app_infer (fst x) []) l) x.t_ty) in
+      let teqx =
+        (t_app cs (List.map (fun x -> t_app_infer (fst x) []) l) x.t_ty) in
+      let ht = t_equ x teqx in
       let h = Decl.create_prsymbol (gen_ident "h") in
       let new_hyp = Decl.create_prop_decl Decl.Paxiom h ht in
       ((List.map snd l) @ [new_hyp]) :: build_decls tl x
+
+(* Enumerate all constants of a term *)
+let rec compounds_of acc (t: term) =
+  match t.t_node with
+  | Tapp (ls, _) -> Term.t_fold compounds_of (Term.Sls.add ls acc) t
+  | _ -> Term.t_fold compounds_of acc t
 
 (* This tactic acts on a term of algebraic type. It introduces one
    new goal per constructor of the type and introduce corresponding
@@ -54,17 +61,45 @@ let rec build_decls cls x =
  *)
 let destruct_alg (x: term) : Task.task Trans.tlist =
   let ty = x.t_ty in
+  (* We list all the constants used in x so that we know the first place in the
+task where we can introduce hypothesis about the destruction of x. *)
+  let ls_of_x = ref (compounds_of Term.Sls.empty x) in
+  let defined = ref false in
   let r = ref [] in
   match ty with
   | None -> raise (Cannot_infer_type "destruct")
   | Some ty ->
     begin
       match ty.Ty.ty_node with
-      | Ty.Tyvar _ -> raise (Cannot_infer_type "destruct")
+      | Ty.Tyvar _       -> raise (Cannot_infer_type "destruct")
       | Ty.Tyapp (ts, _) ->
         Trans.decl_l (fun d ->
           match d.d_node with
-          | Ddata dls ->
+          (* TODO not necessary to check this first: this can be optimized *)
+          | _ when (not !defined) && Term.Sls.is_empty !ls_of_x ->
+              if !r = [] then
+                [[d]]
+              else
+                begin
+                  defined := true;
+                  List.map (fun x -> x @ [d]) !r
+                end
+          | Dlogic dls          ->
+              ls_of_x :=
+                List.fold_left
+                  (fun acc (ls, _) -> Term.Sls.remove ls acc)
+                  !ls_of_x dls;
+              [[d]]
+          | Dparam ls ->
+              ls_of_x := Term.Sls.remove ls !ls_of_x;
+              [[d]]
+          | Dind (_, ils)       ->
+              ls_of_x :=
+                List.fold_left
+                  (fun acc (ls, _) -> Term.Sls.remove ls acc)
+                  !ls_of_x ils;
+              [[d]]
+          | Ddata dls           ->
               (try
                 (let cls = List.assoc ts dls in
                 r := build_decls cls x;
@@ -72,7 +107,7 @@ let destruct_alg (x: term) : Task.task Trans.tlist =
                 )
               with Not_found -> [[d]])
           | Dprop (Pgoal, _, _) ->
-              if !r = [] then [[d]] else List.map (fun x -> x @ [d]) !r
+              [[d]]
           | _ -> [[d]]) None
     end
 
