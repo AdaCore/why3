@@ -419,7 +419,8 @@ module Inversions
     assert { 1 + inversions_for a2 (i0+1) = inversions_for a1 i0
              by numof (inversion a1 i0) i0 (length a1)
               = numof (inversion a1 i0) (i0+1) (length a1)
-              = 1 + numof (inversion a1 i0) (i0+2) (length a1) };
+              = 1 + numof (inversion a1 i0) (i0+2) (length a1)
+              = 1 + numof (inversion a2 (i0+1)) (i0+2) (length a2) };
     let sum_decomp (a: array int) (i j k: int)
       requires { 0 <= i <= j <= k <= length a = length a1 }
       ensures  { sum (inversions_for a) i k =
