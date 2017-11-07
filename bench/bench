@@ -13,7 +13,7 @@ suffix=$1
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
-    echo "bench aborted due to the following errors:" > bench_errors
+    rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
 	echo -n "  $f... "
 	# running Why
@@ -32,6 +32,7 @@ goods () {
     done
     rm bench_error
     if test -n "$ERROR"; then
+        echo "bench aborted due to the following errors:"
         cat bench_errors
         rm bench_errors
         exit 1
