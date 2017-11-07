@@ -3,9 +3,9 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
-Require bool.Bool.
 Require int.Int.
 Require map.Map.
+Require bool.Bool.
 Require list.List.
 Require list.Length.
 Require list.Mem.
@@ -471,6 +471,7 @@ Ltac ae := why3 "Alt-Ergo,0.99.1," timelimit 3; admit.
 Theorem monotonicity : forall (s:stmt), forall (x:mident) (x1:term),
   (s = (Sassign x x1)) -> forall (p:fmla) (q:fmla), (valid_fmla (Fimplies p
   q)) -> (valid_fmla (Fimplies (wp s p) (wp s q))).
+(* Why3 intros s x x1 h1 p q h2. *)
 intros s x x1 h1 p q h2.
 subst s.
 unfold valid_fmla in *; simpl in *.

@@ -389,7 +389,7 @@ let rec k_print fmt k = match k with
       lab.lab_string k_print k
 
 (* check if a pure k-expression can be converted to a term.
-   We need this for simple conjuctions, disjuctions, and
+   We need this for simple conjunctions, disjunctions, and
    pattern-matching exprs, to avoid considering each branch
    separately; also to have a single substitutable term. *)
 let term_of_kode res k =
@@ -743,7 +743,7 @@ let rec k_expr env lps e res ?case_xmap xmap =
         let case_xmap, xmap =
           if case then Some cxmap, xmap else None, cxmap in
         let k = k_expr env lps e0 res ?case_xmap xmap in
-        (* catched xsymbols are converted to unique integers,
+        (* caught xsymbols are converted to unique integers,
            so that we can now serialise the "with" clauses
            and avoid capturing the wrong exceptions *)
         List.fold_left (fun k (i,xk) -> Kseq (k,i,xk)) k xl

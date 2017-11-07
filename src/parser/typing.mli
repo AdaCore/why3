@@ -28,3 +28,19 @@ val close_scope : Loc.position -> import:bool -> unit
 val import_scope : Loc.position -> Ptree.qualid -> unit
 
 val add_decl : Loc.position -> Ptree.decl -> unit
+
+
+
+val string_list_of_qualid : Ptree.qualid -> string list
+
+val print_qualid : Format.formatter -> Ptree.qualid -> unit
+
+type global_vars = string option -> Ptree.qualid -> Ity.pvsymbol option
+
+val type_term_in_namespace :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> global_vars ->
+  Ptree.term -> Term.term
+
+val type_fmla_in_namespace :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> global_vars ->
+  Ptree.term -> Term.term

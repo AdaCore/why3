@@ -368,18 +368,18 @@ let ty_of_dty_raw = function
   | Some dt_dty -> ty_of_dty_raw dt_dty
   | None        -> ty_bool
 
-let dterm_expected tuc dt dty =
+let dterm_expected crcmap dt dty =
   try
     let (ts1, ts2) = ts_of_dty dt.dt_dty, ts_of_dty dty in
     if (ts_equal ts1 ts2) then dt
     else
       let (ty1, ty2) = ty_of_dty_raw dt.dt_dty, ty_of_dty_raw dty in
-      let crc = Coercion.find tuc.Theory.uc_crcmap ty1 ty2 in
+      let crc = Coercion.find crcmap ty1 ty2 in
       apply_coercion crc dt
   with Not_found | Exit -> dt
 
-let dterm_expected_dterm tuc dt dty =
-  let dt = dterm_expected tuc dt (Some dty) in
+let dterm_expected_dterm crcmap dt dty =
+  let dt = dterm_expected crcmap dt (Some dty) in
   dterm_expected_type dt dty;
   dt
 
@@ -388,7 +388,7 @@ let dfmla_expected_dterm tuc dt =
   dfmla_expected_type dt;
   dt
 
-let dterm tuc ?loc node =
+let dterm crcmap ?loc node =
   let dterm_node loc node =
     let mk_dty ty = { dt_node = node; dt_dty = ty; dt_loc = loc } in
     match node with
@@ -411,10 +411,10 @@ let dterm tuc ?loc node =
                     (ty_of_dty_raw dt1.dt_dty, ty_of_dty_raw dt2.dt_dty)
                   in
                   begin
-                    try let _ = Coercion.find tuc.Theory.uc_crcmap ty1 ty2
+                    try let _ = Coercion.find crcmap ty1 ty2
                         in (true, List.rev dtl)
                     with Not_found ->
-                      try let _ = Coercion.find tuc.Theory.uc_crcmap ty2 ty1
+                      try let _ = Coercion.find crcmap ty2 ty1
                           in (false, dtl)
                       with Not_found -> (false, dtl)
                   end
@@ -425,14 +425,14 @@ let dterm tuc ?loc node =
        in
        let dtyl, dty = specialize_ls ls in
        let dtl = dty_unify_app_map ls
-                   (dterm_expected_dterm tuc) dtl dtyl in
+                   (dterm_expected_dterm crcmap) dtl dtyl in
        { dt_node = DTapp (ls, if swap then List.rev dtl else dtl);
          dt_dty  = dty;
          dt_loc  = loc }
     | DTapp (ls, dtl) ->
         let dtyl, dty = specialize_ls ls in
         { dt_node = DTapp (ls,
-            dty_unify_app_map ls (dterm_expected_dterm tuc) dtl dtyl);
+            dty_unify_app_map ls (dterm_expected_dterm crcmap) dtl dtyl);
           dt_dty  = dty;
           dt_loc  = loc }
     | DTfapp ({dt_dty = Some res} as dt1,dt2) ->
@@ -450,7 +450,7 @@ let dterm tuc ?loc node =
     | DTfapp ({dt_dty = None; dt_loc = loc},_) ->
         Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->
-        let df = dfmla_expected_dterm tuc df in
+        let df = dfmla_expected_dterm crcmap df in
         dexpr_expected_type dt2 dt1.dt_dty;
         { dt_node = DTif (df, dt1, dt2);
           dt_dty = if dt2.dt_dty = None then None else dt1.dt_dty;
@@ -492,7 +492,7 @@ let dterm tuc ?loc node =
            require explicit if-then-else conversion to bool *)
         mk_dty (Some dty_bool)
     | DTcast (dt,dty) ->
-        dterm_expected_dterm tuc dt dty
+        dterm_expected_dterm crcmap dt dty
     | DTuloc (dt,_)
     | DTlabel (dt,_) ->
         mk_dty (dt.dt_dty)

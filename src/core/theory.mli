@@ -32,6 +32,8 @@ val ns_find_ls : namespace -> string list -> lsymbol
 val ns_find_pr : namespace -> string list -> prsymbol
 val ns_find_ns : namespace -> string list -> namespace
 
+val import_namespace : namespace -> string list -> namespace
+
 (** {2 Meta properties} *)
 
 type meta_arg_type =

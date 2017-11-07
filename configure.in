@@ -280,6 +280,12 @@ if test "$MENHIR" = no ; then
 	AC_MSG_ERROR(Cannot find menhir.)
 fi
 
+MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version* *\(.*\)$,\1,p'`
+case "$MENHIRVERSION" in
+   200*|201[[0-4]]*|20150[[1-5]]*)
+      AC_MSG_ERROR(You need Menhir 20150629 or higher.);;
+esac
+
 ## Where are the library we need
 # we look for ocamlfind; if not present, we just don't use it to find
 # libraries
@@ -475,6 +481,25 @@ fi
 dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
+
+
+# checking for js_of_ocaml
+HASJSOFOCAML=no
+if test "$USEOCAMLFIND" = yes; then
+   JSOFOCAML=$(ocamlfind query js_of_ocaml)
+   if test -z "$JSOFOCAML"; then
+      reason_jsofocaml=" (js_of_ocaml not found)"
+   else
+      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml-ppx)
+      if test -z "$JSOFOCAMLPPX"; then
+         reason_jsofocaml=" (js_of_ocaml-ppx not found)"
+      else
+         HASJSOFOCAML=yes
+      fi
+   fi
+else
+   reason_jsofocaml=" (ocamlfind not available)"
+fi
 
 # Coq
 
@@ -770,6 +795,8 @@ AC_SUBST(enable_ide)
 AC_SUBST(LABLGTK2LIB)
 AC_SUBST(LABLGTK2PKG)
 
+AC_SUBST(HASJSOFOCAML)
+
 AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_zarith)
@@ -860,7 +887,8 @@ echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "Components"
-echo "    IDE command             : $enable_ide$reason_ide"
+echo "    GTK IDE                 : $enable_ide$reason_ide"
+echo "    Web IDE                 : $HASJSOFOCAML$reason_jsofocaml"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    MenhirLib support       : $enable_menhirLib$reason_menhirLib"

@@ -44,10 +44,12 @@ val common_options : spec_list
 val read_env_spec : unit -> Env.env * Whyconf.config * bool
 (** read_simple_spec also *)
 
+val read_session : string -> Session_itp.session * bool
+
 val read_update_session :
   allow_obsolete:bool -> Env.env ->
   Whyconf.config -> string ->
-  unit Session.env_session * bool * bool
+  Controller_itp.controller * bool * bool
 
 (** {2 Spec for filtering } *)
 type filter_prover
@@ -63,11 +65,14 @@ val filter_spec : spec_list
 val read_filter_spec : Whyconf.config -> filters * bool
 
 val theory_iter_proof_attempt_by_filter :
+  Session_itp.session ->
   filters ->
-  ('key Session.proof_attempt -> unit) -> 'key Session.theory -> unit
+  (Session_itp.proof_attempt_node -> unit) -> Session_itp.theory -> unit
+
 val session_iter_proof_attempt_by_filter :
+  Session_itp.session ->
   filters ->
-  ('key Session.proof_attempt -> unit) -> 'key Session.session -> unit
+  (Session_itp.proof_attempt_node -> unit) ->  unit
 
 
 (* quite ad-hoc *)
@@ -85,3 +90,35 @@ val ask_yn : unit -> bool
 val ask_yn_nonblock : callback:(bool -> unit) -> (unit -> bool)
 (** call the callback when an answer have been given,
     return true if it must be retried *)
+
+val get_used_provers : Session_itp.session -> Whyconf.Sprover.t
+(** [get_used_provers s] returns the set of provers used somewhere in
+    session [s] *)
+
+val get_used_provers_file : Session_itp.session -> Session_itp.file
+                              -> Whyconf.Sprover.t
+(** [get_used_provers_file s f] returns the set of provers used
+    somewhere in the file [f] of session [s] *)
+
+val get_used_provers_theory : Session_itp.session -> Session_itp.theory
+                              -> Whyconf.Sprover.t
+(** [get_used_provers_theory s th] returns the set of provers used
+    somewhere in the theory [th] of session [s] *)
+
+val get_used_provers_goal : Session_itp.session -> Session_itp.proofNodeID
+                            -> Whyconf.Sprover.t
+(** [get_used_provers_goal s g] returns the set of provers used
+    somewhere under the goal [g] of session [s] *)
+
+
+val goal_depth : Session_itp.session -> Session_itp.proofNodeID -> int
+(** [goal_depth s g] returns the depth of the tree under goal
+    [g] in session [s] *)
+
+val theory_depth : Session_itp.session -> Session_itp.theory -> int
+(** [theory_depth s th] returns the depth of the tree under theory
+    [th] in session [s] *)
+
+val file_depth : Session_itp.session -> Session_itp.file -> int
+(** [file_depth s f] returns the depth of the tree under file [f] in
+    session [s] *)

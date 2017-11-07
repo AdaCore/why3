@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../hashtbl_impl.mlw" proved="true">
+<theory name="HashtblImpl" proved="true" sum="70c64c39dfba335eb990c956a1038417">
+ <goal name="VC bucket" expl="VC for bucket" proved="true">
+ <proof prover="8"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="bucket_bounds" proved="true">
+ <proof prover="8"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="VC t" expl="VC for t" proved="true">
+ <proof prover="8"><result status="valid" time="0.08"/></proof>
+ </goal>
+ <goal name="VC create" expl="VC for create" proved="true">
+ <proof prover="8"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="VC clear" expl="VC for clear" proved="true">
+ <proof prover="8"><result status="valid" time="0.07"/></proof>
+ </goal>
+ <goal name="VC resize" expl="VC for resize" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC resize.0" expl="array creation size" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC resize.1" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.2" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.3" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.4" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.5" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.6" expl="variant decrease" proved="true">
+  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC resize.7" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.8" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,map,zero,one,(-),(-),(&gt;),(&gt;=),abs,div,mod,const,is_nil,is_none,hash,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,is_nil_spec,is_none_spec,hash_spec,bucket_spec,bucket_def,bucket_bounds">
+   <goal name="VC resize.8.0" expl="precondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.28"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC resize.9" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC resize.10" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.11" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC resize.12" expl="loop invariant init" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.13" expl="loop invariant init" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.14" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC resize.15" expl="precondition" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="VC resize.15.0" expl="precondition" proved="true">
+   <proof prover="8"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC resize.16" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.17" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC resize.18" expl="loop invariant preservation" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC resize.19" expl="loop invariant preservation" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.20" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC resize.21" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC resize.22" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC resize.23" expl="out of loop bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC list_find" expl="VC for list_find" proved="true">
+ <proof prover="8"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="VC find" expl="VC for find" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC find.0" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC find.1" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC find.2" expl="postcondition" proved="true">
+  <proof prover="3" edited="hashtbl_impl_HashtblImpl_WP_parameter_find_1.v"><result status="valid" time="0.34"/></proof>
+  <proof prover="5"><result status="valid" time="0.82"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC list_remove" expl="VC for list_remove" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC list_remove.0" expl="variant decrease" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC list_remove.1" expl="variant decrease" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC list_remove.2" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC remove" expl="VC for remove" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC remove.0" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC remove.1" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC remove.2" expl="postcondition" proved="true">
+  <proof prover="3" edited="hashtbl_impl_HashtblImpl_WP_parameter_remove_2.v"><result status="valid" time="0.30"/></proof>
+  <proof prover="5"><result status="valid" time="0.66"/></proof>
+  </goal>
+  <goal name="VC remove.3" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC remove.4" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC remove.5" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC remove.6" expl="type invariant" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC remove.7" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC remove.8" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC remove.9" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC add" expl="VC for add" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC add.0" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add.1" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC add.2" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.3" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add.4" expl="type invariant" proved="true">
+  <proof prover="6"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC add.5" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  </goal>
+  <goal name="VC add.6" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.7" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.8" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.9" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add.10" expl="index in array bounds" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add.11" expl="type invariant" proved="true">
+  <proof prover="8"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add.12" expl="type invariant" proved="true">
+  <proof prover="6"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add.13" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="VC add.14" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add.15" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

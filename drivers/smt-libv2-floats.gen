@@ -33,13 +33,13 @@ theory ieee_float.GenericFloat
 
    syntax predicate eq  "(fp.eq %1 %2)"
 
-   syntax predicate is_normal    "(fp.isNormal    %1)"
+   syntax predicate is_normal    "(fp.isNormal %1)"
    syntax predicate is_subnormal "(fp.isSubnormal %1)"
-   syntax predicate is_zero      "(fp.isZero      %1)"
-   syntax predicate is_infinite  "(fp.isInfinite  %1)"
-   syntax predicate is_nan       "(fp.isNaN       %1)"
-   syntax predicate is_positive  "(fp.isPositive  %1)"
-   syntax predicate is_negative  "(fp.isNegative  %1)"
+   syntax predicate is_zero      "(fp.isZero %1)"
+   syntax predicate is_infinite  "(fp.isInfinite %1)"
+   syntax predicate is_nan       "(fp.isNaN %1)"
+   syntax predicate is_positive  "(fp.isPositive %1)"
+   syntax predicate is_negative  "(fp.isNegative %1)"
 
    syntax predicate is_finite "(not (or (fp.isInfinite %1) (fp.isNaN %1)))"
 
@@ -86,7 +86,7 @@ end
 
 theory ieee_float.Float_BV_Converter
   (* Part I *)
-   syntax function to_ubv8  "((_ fp.to_ubv 8)  %1 %2)"
+   syntax function to_ubv8  "((_ fp.to_ubv 8) %1 %2)"
    syntax function to_ubv16 "((_ fp.to_ubv 16) %1 %2)"
    syntax function to_ubv32 "((_ fp.to_ubv 32) %1 %2)"
    syntax function to_ubv64 "((_ fp.to_ubv 64) %1 %2)"

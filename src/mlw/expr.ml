@@ -484,9 +484,7 @@ let e_const c ity =
 
 let e_nat_const n =
   assert (n >= 0);
-  let a =
-    Number.{ ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
-  in
+  let a = Number.int_const_of_int n in
   e_const (Number.ConstInt a) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
@@ -1493,5 +1491,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | FieldExpected s -> fprintf fmt
       "Function %a is not a mutable field" print_rs s
   | ExceptionLeak xs -> fprintf fmt
-      "Uncatched local exception %a" print_xs xs
+      "Uncaught local exception %a" print_xs xs
   | _ -> raise e)

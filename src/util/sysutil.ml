@@ -17,22 +17,22 @@ let backup_file f =
   end
 
 let channel_contents_fmt cin fmt =
-  let buff = String.make 1024 ' ' in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
     Format.pp_print_string fmt
       (if !n = 1024 then
-         buff
+         Bytes.unsafe_to_string buff
        else
-         String.sub buff 0 !n)
+         Bytes.sub_string buff 0 !n)
   done
 
 let channel_contents_buf cin =
-  let buf = Buffer.create 1024
-  and buff = String.make 1024 ' ' in
+  let buf = Buffer.create 1024 in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
-    Buffer.add_substring buf buff 0 !n
+    Buffer.add_subbytes buf buff 0 !n
   done;
   buf
 
@@ -62,6 +62,11 @@ let file_contents_buf f =
 
 let file_contents f = Buffer.contents (file_contents_buf f)
 
+let write_file f c =
+  let oc = open_out f in
+  output_string oc c;
+  close_out oc
+
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in
   try
@@ -78,7 +83,7 @@ let open_temp_file ?(debug=false) filesuffix usefile =
 let copy_file from to_ =
   let cin = open_in from in
   let cout = open_out to_ in
-  let buff = String.make 1024 ' ' in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
     output cout buff 0 !n

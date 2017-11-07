@@ -141,6 +141,8 @@ let rec eval_match kn stop env t =
   t_label_copy t (match t.t_node with
     | Tapp (ls, [t1;t2]) when ls_equal ls ps_equ ->
         cs_equ env (eval env t1) (eval env t2)
+    | Tnot { t_node = Tapp (ls, [t1;t2]) } when ls_equal ls ps_equ ->
+        t_not_simp (cs_equ env (eval env t1) (eval env t2))
     | Tapp (ls, [t1]) when is_projection ls ->
         let t1 = eval env t1 in
         let fn _env _t2 cs tl =

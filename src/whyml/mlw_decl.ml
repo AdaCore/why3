@@ -161,7 +161,12 @@ let check_vars vars =
       (Stv.choose vars.vars_tv).tv_name.id_string
 
 let letvar_news = function
-  | LetV pv -> check_vars pv.pv_ity.ity_vars; Sid.singleton pv.pv_vs.vs_name
+  | LetV pv ->
+    check_vars pv.pv_ity.ity_vars;
+    Sreg.fold
+      (fun r acc -> Sid.add r.reg_name acc)
+      pv.pv_ity.ity_vars.vars_reg
+      (Sid.singleton pv.pv_vs.vs_name)
   | LetA ps -> check_vars ps.ps_vars; Sid.singleton ps.ps_name
 
 let ids_of_pvset s pvs =

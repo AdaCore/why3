@@ -615,7 +615,8 @@ let clone_export uc m minst inst =
           let id = id_clone ps.ps_name in
           let aty = conv_aty !mvs ps.ps_aty in
           let vari = Spv.fold (fun pv l ->
-            (t_var (Mvs.find pv.pv_vs !mvs), None)::l) ps.ps_pvset [] in
+            (t_var (Mvs.find_def pv.pv_vs pv.pv_vs !mvs), None)::l)
+            ps.ps_pvset [] in
           (* we save all external pvsymbols to preserve the effects *)
           let spec = { aty.aty_spec with c_variant = vari } in
           let aty = vty_arrow ~spec aty.aty_args aty.aty_result in

@@ -329,7 +329,7 @@ module Translate = struct
       | Ityvar (tvs, _) ->
           Mltree.Tvar tvs
       | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
-          let itl = List.rev (visible_of_mask mask itl) in
+          let itl = visible_of_mask mask itl in
           Mltree.Ttuple (List.map loop itl)
       | Ityapp ({its_ts = ts}, itl, _) ->
           Mltree.Tapp (ts.ts_name, List.map loop itl)

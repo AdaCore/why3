@@ -14,7 +14,7 @@ open Why3
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
-module S = Session
+module S = Session_itp
 
 let output_dir = ref ""
 let opt_context = ref false
@@ -61,16 +61,16 @@ let spec =
   " use coqdoc to print Coq proofs") ::
   common_options
 
-open Session
+open Session_itp
 
 type context =
     (string ->
-     (formatter -> unit session -> unit) -> unit session
+     (formatter -> session -> unit) -> session
      -> unit, formatter, unit) format
 
 let run_file (context : context) print_session fname =
-  let project_dir = Session.get_project_dir fname in
-  let session,_use_shapes = Session.read_session project_dir in
+  let ses,_ = read_session fname in
+  let project_dir = get_dir ses in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir
   in
@@ -81,8 +81,8 @@ let run_file (context : context) print_session fname =
   in
   let fmt = formatter_of_out_channel cout in
   if !opt_context
-  then fprintf fmt context basename (print_session basename) session
-  else print_session basename fmt session;
+  then fprintf fmt context basename (print_session basename) ses
+  else print_session basename fmt ses;
   pp_print_flush fmt ();
   if output_dir <> "-" then close_out cout
 
@@ -90,22 +90,9 @@ let run_file (context : context) print_session fname =
 module Table =
 struct
 
-
-  let rec transf_depth tr =
-    List.fold_left
-      (fun depth g -> max depth (goal_depth g)) 0 tr.S.transf_goals
-  and goal_depth g =
-    S.PHstr.fold
-      (fun _st tr depth -> max depth (1 + transf_depth tr))
-      (S.goal_transformations g) 1
-
-  let theory_depth t =
-    List.fold_left
-      (fun depth g -> max depth (goal_depth g)) 0 t.S.theory_goals
-
-  let provers_stats provers theory =
-    S.theory_iter_proof_attempt (fun a ->
-      Hprover.replace provers a.S.proof_prover a.S.proof_prover) theory
+  let provers_stats s provers theory =
+    theory_iter_proof_attempt s (fun a ->
+      Hprover.replace provers a.prover a.prover) theory
 
   let print_prover = Whyconf.print_prover
 
@@ -115,16 +102,16 @@ struct
         if dark then "008000" else "C0FFC0"
       else "FF0000")
 
-let print_results fmt provers proofs =
+let print_results fmt s provers proofs =
   List.iter (fun p ->
     fprintf fmt "<td style=\"background-color:#";
     begin
       try
-        let pr = S.PHprover.find proofs p in
-        let s = pr.S.proof_state in
+        let pr = get_proof_attempt_node s (Hprover.find proofs p) in
+        let s = pr.proof_state in
         begin
           match s with
-	  | S.Done res ->
+	  | Some res ->
 	    begin
 	      match res.Call_provers.pr_answer with
 		| Call_provers.Valid ->
@@ -133,10 +120,10 @@ let print_results fmt provers proofs =
                   fprintf fmt "FF0000\">Invalid"
 		| Call_provers.Timeout ->
                   fprintf fmt "FF8000\">Timeout (%ds)"
-                    pr.S.proof_limit.Call_provers.limit_time
+                    pr.limit.Call_provers.limit_time
 		| Call_provers.OutOfMemory ->
                   fprintf fmt "FF8000\">Out Of Memory (%dM)"
-                    pr.S.proof_limit.Call_provers.limit_mem
+                    pr.limit.Call_provers.limit_mem
 		| Call_provers.StepLimitExceeded ->
                   fprintf fmt "FF8000\">Step limit exceeded"
 		| Call_provers.Unknown _ ->
@@ -146,81 +133,77 @@ let print_results fmt provers proofs =
 		| Call_provers.HighFailure ->
                   fprintf fmt "FF8000\">High Failure"
 	    end
-	  | S.InternalFailure _ -> fprintf fmt "E0E0E0\">Internal Failure"
-          | S.Interrupted -> fprintf fmt "E0E0E0\">Not yet run"
-          | S.Unedited -> fprintf fmt "E0E0E0\">Not yet edited"
-          | S.Scheduled | S.Running
-          | S.JustEdited -> assert false
+	  | None -> fprintf fmt "E0E0E0\">result missing"
         end;
         if pr.S.proof_obsolete then fprintf fmt " (obsolete)"
       with Not_found -> fprintf fmt "E0E0E0\">---"
     end;
     fprintf fmt "</td>") provers
 
-let rec num_lines acc tr =
+let rec num_lines s acc tr =
   List.fold_left
     (fun acc g -> 1 +
-      PHstr.fold (fun _ tr acc -> 1 + num_lines acc tr)
-      (goal_transformations g) acc)
-    acc tr.transf_goals
+      List.fold_left (fun acc tr -> 1 + num_lines s acc tr)
+      acc (get_transformations s g))
+    acc (get_sub_tasks s tr)
 
-  let rec print_transf fmt depth max_depth provers tr =
+  let rec print_transf fmt s depth max_depth provers tr =
     fprintf fmt "<tr>";
     for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false) (Opt.inhabited tr.S.transf_verified)
+      (color_of_status ~dark:false)  (tn_proved s tr)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    fprintf fmt "%s</td>" tr.transf_name ;
+    let name = (get_transf_name s tr) ^
+                 (String.concat "" (get_transf_args s tr)) in
+    fprintf fmt "%s</td>" name ;
     for _i=1 (* depth *) to (*max_depth - 1 + *) List.length provers do
       fprintf fmt "<td style=\"background-color:#E0E0E0\"></td>"
     done;
     fprintf fmt "</tr>@\n";
-    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines 0 tr);
+    fprintf fmt "<tr><td rowspan=\"%d\">&nbsp;&nbsp;</td>" (num_lines s 0 tr);
     let (_:bool) = List.fold_left
       (fun needs_tr g ->
-        print_goal fmt needs_tr (depth+1) max_depth provers g;
+        print_goal fmt s needs_tr (depth+1) max_depth provers g;
         true)
-      false tr.transf_goals
+      false (get_sub_tasks s tr)
     in ()
 
-  and print_goal fmt needs_tr depth max_depth provers g =
+  and print_goal fmt s needs_tr depth max_depth provers g =
     if needs_tr then fprintf fmt "<tr>";
     (* for i=1 to 0 (\* depth-1 *\) do fprintf fmt "<td></td>" done; *)
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false) (Opt.inhabited (S.goal_verified g))
+      (color_of_status ~dark:false) (pn_proved s g)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
-    fprintf fmt "%s</td>" (S.goal_user_name g);
+    fprintf fmt "%s</td>" (get_proof_name s g).Ident.id_string;
 (*    for i=depth to max_depth-1 do fprintf fmt "<td></td>" done; *)
-    print_results fmt provers (goal_external_proofs g);
+    print_results fmt s provers (get_proof_attempt_ids s g);
     fprintf fmt "</tr>@\n";
-    PHstr.iter
-      (fun _ tr -> print_transf fmt depth max_depth provers tr)
-      (goal_transformations g)
+    List.iter
+      (print_transf fmt s depth max_depth provers)
+      (get_transformations s g)
 
-  let print_theory fn fmt th =
-    let depth = theory_depth th in
+  let print_theory s fn fmt th =
+    let depth = theory_depth s th in
     if depth > 0 then
-    let provers = Hprover.create 9 in
-    provers_stats provers th;
+    let provers = get_used_provers_theory s th in
     let provers =
-      Hprover.fold (fun _ pr acc -> pr :: acc) provers []
+      Whyconf.Sprover.fold (fun pr acc -> pr :: acc) provers []
     in
     let provers = List.sort Whyconf.Prover.compare provers in
     let name =
       try
-        let (l,t,_) = Theory.restore_path th.theory_name in
+        let (l,t,_) = Theory.restore_path (theory_name th) in
         String.concat "." ([fn]@l@[t])
-      with Not_found -> fn ^ "." ^ th.theory_name.Ident.id_string
+      with Not_found -> fn ^ "." ^ (theory_name th).Ident.id_string
     in
     fprintf fmt "<h2><span style=\"color:#%a\">Theory \"%s\": "
-      (color_of_status ~dark:true) (Opt.inhabited th.S.theory_verified)
+      (color_of_status ~dark:true) (th_proved s th)
       name;
-    begin match th.S.theory_verified with
-    | Some t -> fprintf fmt "fully verified in %.02f s" t
-    | None -> fprintf fmt "not fully verified"
-    end;
+    if th_proved s th then
+      fprintf fmt "fully verified in (TODO)%%.02f s"
+    else fprintf fmt "not fully verified";
     fprintf fmt "</span></h2>@\n";
 
     fprintf fmt "<table border=\"1\"><tr><td colspan=\"%d\">Obligations</td>" depth;
@@ -229,21 +212,21 @@ let rec num_lines acc tr =
       (fun pr -> fprintf fmt "<td text-rotation=\"90\">%a</td>" print_prover pr)
       provers;
     fprintf fmt "</tr>@\n";
-    List.iter (print_goal fmt true 1 depth provers) th.theory_goals;
+    List.iter (print_goal fmt s true 1 depth provers) (theory_goals th);
     fprintf fmt "</table>@\n"
 
-  let print_file fmt f =
+  let print_file s fmt f =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
-    let fn = Filename.basename f.file_name in
+    let fn = Filename.basename (file_name f) in
     let fn = Filename.chop_extension fn in
     fprintf fmt "%a"
-      (Pp.print_list Pp.newline (print_theory fn)) f.file_theories
+      (Pp.print_list Pp.newline (print_theory s fn)) (file_theories f)
 
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
     fprintf fmt "%a"
-      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing
-         print_file) s.session_files
+      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+         (print_file s)) (get_files s)
 
 
   let context : context = "<!DOCTYPE html \
@@ -272,47 +255,45 @@ struct
   let print_prover = Whyconf.print_prover
 
   let print_proof_status fmt = function
-    | Interrupted -> fprintf fmt "Not yet run"
-    | Unedited -> fprintf fmt "Not yet edited"
-    | JustEdited | Scheduled | Running -> assert false
-    | Done pr -> fprintf fmt "Done: %a" Call_provers.print_prover_result pr
-    | InternalFailure exn ->
-      fprintf fmt "Failure: %a"Exn_printer.exn_printer exn
+    | None -> fprintf fmt "No result"
+    | Some res -> fprintf fmt "Done: %a" Call_provers.print_prover_result res
 
-  let print_proof_attempt fmt pa =
+  let print_proof_attempt s fmt pa =
+    let pa = get_proof_attempt_node s pa in
     fprintf fmt "<li>%a : %a</li>"
-      print_prover pa.proof_prover
+      print_prover pa.prover
       print_proof_status pa.proof_state
 
-  let rec print_transf fmt tr =
+  let rec print_transf s fmt tr =
+    let name = (get_transf_name s tr) ^
+                 (String.concat "" (get_transf_args s tr)) in
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      tr.transf_name
-      (Pp.print_list Pp.newline print_goal) tr.transf_goals
+      name
+      (Pp.print_list Pp.newline (print_goal s)) (get_sub_tasks s tr)
 
-  and print_goal fmt g =
+  and print_goal s fmt g =
     fprintf fmt "<li>%s : <ul>%a%a</ul></li>"
-      (goal_name g).Ident.id_string
-      (Pp.print_iter2 PHprover.iter Pp.newline Pp.nothing
-         Pp.nothing print_proof_attempt)
-      (goal_external_proofs g)
-      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing
-         Pp.nothing print_transf)
-      (goal_transformations g)
+      (get_proof_name s g).Ident.id_string
+      (Pp.print_iter2 Hprover.iter Pp.newline Pp.nothing
+         Pp.nothing (print_proof_attempt s))
+      (get_proof_attempt_ids s g)
+      (Pp.print_iter1 List.iter Pp.newline (print_transf s))
+      (get_transformations s g)
 
-  let print_theory fmt th =
+  let print_theory s fmt th =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      th.theory_name.Ident.id_string
-      (Pp.print_list Pp.newline print_goal) th.theory_goals
+      (theory_name th).Ident.id_string
+      (Pp.print_list Pp.newline (print_goal s)) (theory_goals th)
 
-  let print_file fmt f =
+  let print_file s fmt f =
     fprintf fmt "<li>%s : <ul>%a</ul></li>"
-      f.file_name
-      (Pp.print_list Pp.newline print_theory) f.file_theories
+      (file_name f)
+      (Pp.print_list Pp.newline (print_theory s)) (file_theories f)
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_iter2 PHstr.iter Pp.newline Pp.nothing Pp.nothing
-         print_file) s.session_files
+      (Pp.print_iter2 Stdlib.Hstr.iter Pp.newline Pp.nothing Pp.nothing
+         (print_file s)) (get_files s)
 
 
   let context : context = "<!DOCTYPE html \

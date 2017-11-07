@@ -23,9 +23,14 @@ module Array
     requires { "expl:index in array bounds" 0 <= i < length a }
     ensures  { result = a[i] }
 
+  val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
+    ensures { result.length = a.length }
+    ensures { result.elts = a.elts[i <- v] }
+
   val ([]<-) (a: array 'a) (i: int) (v: 'a) : unit writes {a}
     requires { "expl:index in array bounds" 0 <= i < length a }
-    ensures  { a.elts = (old a.elts)[i <- v] }
+    ensures  { a.elts = M.set (old a).elts i v }
+    ensures  { a = (old a)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
 
@@ -38,7 +43,8 @@ module Array
     a[i]
 
   let defensive_set (a: array 'a) (i: int) (v: 'a)
-    ensures { 0 <= i < length a /\ a.elts = (old a.elts)[i <- v] }
+    ensures { 0 <= i < length a }
+    ensures { a = (old a)[i <- v] }
     raises  { OutOfBounds -> i < 0 \/ i >= length a /\ a = old a }
   = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
@@ -111,10 +117,6 @@ module Array
           ofs2 <= i < ofs2 + k -> a[i] = (old a)[ofs1 + i - ofs2] }
         a[ofs2 + k] <- a[ofs1 + k]
       done
-
-  val ghost function ([<-]) (a: array 'a) (i: int) (v: 'a): array 'a
-    ensures { result.length = a.length }
-    ensures { result.elts = a.elts[i <- v] }
 
   (*** TODO?
      - concat : 'a array list -> 'a array

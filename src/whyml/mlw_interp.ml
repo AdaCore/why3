@@ -319,7 +319,7 @@ let rec value_equality v1 v2 =
 
 let eval_equ _ls l =
 (*
-  eprintf "[interp] eval_equ ? @.";
+  eprintf "eval_equ ? @.";
 *)
   let res =
   match l with
@@ -331,7 +331,7 @@ let eval_equ _ls l =
   | _ -> assert false
   in
 (*
-  Format.eprintf "[interp] eval_equ: OK@.";
+  Format.eprintf "eval_equ: OK@.";
 *)
   res
 
@@ -690,7 +690,7 @@ let exec_array_get _env s _vty args =
                 let t = eval_map_get !ls_map_get [m;Vnum i] in
 (*
                 eprintf
-                  "[interp] exec_array_get (on reg %a)@ state =@ %a@ t[%a] -> %a@."
+                  "exec_array_get (on reg %a)@ state =@ %a@ t[%a] -> %a@."
                   Mlw_pretty.print_reg r print_state s print_value (Vnum i) print_value t;
 *)
                 Normal t,s
@@ -698,7 +698,7 @@ let exec_array_get _env s _vty args =
 (*
                 let t = eval_map_get !ls_map_get [m;Vnum i] in
                 eprintf
-                  "[interp] exec_array_get (on map %a)@ state =@ %a@ t[%a] -> %a@."
+                  "exec_array_get (on map %a)@ state =@ %a@ t[%a] -> %a@."
                   print_value m print_state s print_value (Vnum i) print_value t;
                 Normal t,s
 *)
@@ -730,7 +730,7 @@ let exec_array_set _env s _vty args =
                 let m = Mreg.find r s in
 (*
                 eprintf
-                  "[interp] exec_array_set (on reg %a)@ state =@ %a@ t[%a] -> %a@."
+                  "exec_array_set (on reg %a)@ state =@ %a@ t[%a] -> %a@."
                   Mlw_pretty.print_reg r print_state s print_value i print_value t;
 *)
                 let t = eval_map_set !ls_map_set [m;i;v] in
@@ -747,7 +747,7 @@ let exec_array_set _env s _vty args =
               with Not_found -> reg
             in
             let s' = Mreg.add reg t s in
-            eprintf "[interp] t[%a] <- %a (state = %a)@."
+            eprintf "t[%a] <- %a (state = %a)@."
               print_value i print_value v print_state s';
             Normal Vvoid,s'
 *)
@@ -892,7 +892,7 @@ and eval_match env s u tbl =
   let rec iter tbl =
     match tbl with
     | [] ->
-      eprintf "[Exec] fatal error: pattern matching not exhaustive in evaluation.@.";
+      eprintf "fatal error: pattern matching not exhaustive in evaluation.@.";
       assert false
     | b::rem ->
       let p,t = t_open_branch b in
@@ -954,7 +954,7 @@ and eval_app env s ls tl =
           in iter dl
         | _ -> Vapp(ls,tl)
     with Not_found ->
-      Format.eprintf "[Exec] definition of logic symbol %s not found@."
+      Format.eprintf "definition of logic symbol %s not found@."
         ls.ls_name.Ident.id_string;
       Vapp(ls,tl)
 
@@ -1125,7 +1125,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eif(e1,e2,e3) ->
     begin
 (*
-      eprintf "[interp] condition of the if: @?";
+      eprintf "condition of the if : @?";
 *)
       match eval_expr env s e1 with
         | Normal t, s' ->
@@ -1136,7 +1136,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
               | _ ->
               begin
                 eprintf
-                  "@[[Exec] Cannot decide condition of if: @[%a@]@]@."
+                  "@[Cannot decide condition of if: @[%a@]@]@."
                   print_value t;
                 Irred e, s
               end
@@ -1184,7 +1184,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
           | DownTo -> BigInt.ge, BigInt.pred
         in
         let rec iter i s =
-          Debug.dprintf debug "[interp] for loop with index = %s@."
+          Debug.dprintf debug "for loop with index = %s@."
             (BigInt.to_string i);
           if le i b then
             let env' = bind_vs pvs.pv_vs (Vnum i) env in
@@ -1258,7 +1258,7 @@ let rec eval_expr env (s:state) (e : expr) : result * state =
   | Eany _
   | Eabstr _
   | Eabsurd ->
-    eprintf "@[[Exec] unsupported expression: @[%a@]@]@."
+    eprintf "@[unsupported expression: @[%a@]@]@."
       (if Debug.test_flag debug then p_expr else Mlw_pretty.print_expr) e;
     Irred e, s
 
@@ -1266,7 +1266,7 @@ and exec_match env t s ebl =
   let rec iter ebl =
     match ebl with
     | [] ->
-      eprintf "[Exec] Pattern matching not exhaustive in evaluation@.";
+      eprintf "Pattern matching not exhaustive in evaluation@.";
       assert false
     | (p,e)::rem ->
       try
@@ -1314,7 +1314,7 @@ and exec_app env s ps args (*spec*) ity_result =
           try
             Hps.find builtin_progs ps
           with Not_found ->
-            eprintf "[Exec] definition of psymbol %s not found@."
+            eprintf "definition of psymbol %s not found@."
               ps.ps_name.Ident.id_string;
             raise CannotCompute
         in
@@ -1335,7 +1335,7 @@ and exec_app env s ps args (*spec*) ity_result =
 
 let eval_global_expr env mkm tkm _writes e =
 (*
-  eprintf "@[<hov 2>[interp] eval_global_expr:@ %a@]@."
+  eprintf "@[<hov 2>eval_global_expr:@ %a@]@."
     p_expr e;
 *)
   get_builtins env;

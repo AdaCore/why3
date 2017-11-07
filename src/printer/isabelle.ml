@@ -301,8 +301,10 @@ let rec dest_forall vl t = match t.t_node with
 
 (** Declarations *)
 
-let print_constr info fmt (cs, _) =
-  elems "constr" (print_ls info) (print_ty info) fmt (cs, cs.ls_args)
+let print_constr info fmt (cs, pjl) =
+  elems "constr" (print_ls info)
+    (elem "carg" (print_option (print_ls info)) (print_ty info)) fmt
+    (cs, List.combine pjl cs.ls_args)
 
 let print_tparams = elems' "params" (empty_elem "param" (attrib "name" print_tv))
 

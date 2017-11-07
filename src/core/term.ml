@@ -92,11 +92,12 @@ type pattern = {
 }
 
 and pattern_node =
-  | Pwild
-  | Pvar of vsymbol
-  | Papp of lsymbol * pattern list
-  | Por  of pattern * pattern
+  | Pwild (* _ *)
+  | Pvar of vsymbol (* newly introduced variables *)
+  | Papp of lsymbol * pattern list (* application *)
+  | Por  of pattern * pattern (* | *)
   | Pas  of pattern * vsymbol
+  (* naming a term recognized by pattern as a variable *)
 
 (* h-consing constructors for patterns *)
 
@@ -274,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare t1 t2 =
+let t_compare trigger label t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -319,7 +320,7 @@ let t_compare t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      comp_raise (Slab.compare t1.t_label t2.t_label);
+      if label then comp_raise (Slab.compare t1.t_label t2.t_label) else ();
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -368,7 +369,7 @@ let t_compare t1 t2 =
               let vml1 = (bv1, b1.bv_subst) :: vml1 in
               let vml2 = (bv2, b2.bv_subst) :: vml2 in
               let tr_cmp t1 t2 = t_compare bnd vml1 vml2 t1 t2; 0 in
-              comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2);
+              if trigger then comp_raise (Lists.compare (Lists.compare tr_cmp) tr1 tr2) else ();
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
@@ -394,7 +395,11 @@ let t_compare t1 t2 =
   try t_compare 0 [] [] t1 t2; 0
   with CompLT -> -1 | CompGT -> 1
 
-let t_equal t1 t2 = (t_compare t1 t2 = 0)
+let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
+
+let t_equal_nt_nl t1 t2 = (t_compare false false t1 t2 = 0)
+
+let t_compare = t_compare true true
 
 let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
@@ -823,31 +828,34 @@ let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
   assert (n >= 0);
-  let a =
-    Number.{ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
-  in
+  let a = Number.int_const_of_int n in
   t_const (Number.ConstInt a) ty_int
 
 let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 
-exception InvalidLiteralType of ty
+exception InvalidIntegerLiteralType of ty
+exception InvalidRealLiteralType of ty
 
 let check_literal c ty =
   let ts = match ty.ty_node with
     | Tyapp (ts,[]) -> ts
-    | _ -> raise (InvalidLiteralType ty) in
+    | _ -> match c with
+           | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
+           | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
+  in
   match c with
-    | Number.ConstInt n when not (ts_equal ts ts_int) ->
-        begin match ts.ts_def with
-          | Range ir -> Number.(check_range n ir)
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | Number.ConstReal x when not (ts_equal ts ts_real) ->
-        begin match ts.ts_def with
-          | Float fp -> Number.(check_float x.Number.rc_abs fp)
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | _ -> ()
+  | Number.ConstInt _ when ts_equal ts ts_int -> ()
+  | Number.ConstInt n ->
+     begin match ts.ts_def with
+           | Range ir -> Number.(check_range n ir)
+           | _ -> raise (InvalidIntegerLiteralType ty)
+     end
+  | Number.ConstReal _ when ts_equal ts ts_real -> ()
+  | Number.ConstReal x ->
+     begin match ts.ts_def with
+           | Float fp -> Number.(check_float x.Number.rc_abs fp)
+           | _ -> raise (InvalidRealLiteralType ty)
+     end
 
 let t_const c ty = check_literal c ty; t_const c ty
 
@@ -1171,6 +1179,8 @@ let t_fold fn acc t = match t.t_node with
   | Tquant (_, b) ->
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
+
+let t_iter fn t = t_fold (fun () t -> fn t) () t
 
 let t_all pr t = Util.all t_fold pr t
 let t_any pr t = Util.any t_fold pr t

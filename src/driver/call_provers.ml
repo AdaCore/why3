@@ -385,18 +385,31 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
 
 let result_buffer : (server_id, prover_update) Hashtbl.t = Hashtbl.create 17
 
-let get_new_results ~blocking = (* TODO: handle ProverStarted events *)
+let fetch_new_results ~blocking = (* TODO: handle ProverStarted events *)
   List.iter (fun (id, r) ->
     let x = match r with
     | Some r -> ProverFinished r
     | None -> ProverStarted in
     Hashtbl.add result_buffer id x)
     (wait_for_server_result ~blocking)
+
+let get_new_results ~blocking =
+  fetch_new_results ~blocking;
+  let q = ref [] in
+  Hashtbl.iter (fun key element ->
+    if element = ProverStarted && blocking then
+      ()
+    else
+      q := (ServerCall key, element) :: !q) result_buffer;
+  Hashtbl.clear result_buffer;
+  !q
 
 let query_result_buffer id =
   try let r = Hashtbl.find result_buffer id in
@@ -414,7 +427,7 @@ let editor_result ret = {
 
 let query_call = function
   | ServerCall id ->
-      get_new_results ~blocking:false;
+      fetch_new_results ~blocking:false;
       query_result_buffer id
   | EditorCall pid ->
       let pid, ret = Unix.waitpid [Unix.WNOHANG] pid in
@@ -426,7 +439,7 @@ let rec wait_on_call = function
       begin match query_result_buffer id with
         | ProverFinished r -> r
 	| _ ->
-            get_new_results ~blocking:true;
+            fetch_new_results ~blocking:true;
             wait_on_call pc
       end
   | EditorCall pid ->

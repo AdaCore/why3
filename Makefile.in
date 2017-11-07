@@ -98,8 +98,8 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 WARNINGS = A-4-9-41-44-45-50-52@5@48
 
-OFLAGS = -w $(WARNINGS) -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
@@ -149,7 +149,10 @@ GENERATED =
 ##############
 
 LIBGENERATED = src/util/config.ml \
-	       src/util/rc.ml src/util/lexlib.ml src/parser/lexer.ml \
+	       src/util/rc.ml src/util/lexlib.ml \
+	       src/util/json_parser.mli src/util/json_parser.ml \
+	       src/util/json_lexer.ml \
+	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
@@ -161,11 +164,13 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl \
-	   hashcons stdlib exn_printer json debug loc lexlib print_tree \
+	   hashcons stdlib exn_printer \
+	   json_base json_parser json_lexer \
+	   debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number pqueue
 
 LIB_CORE = ident ty term pattern decl coercion theory \
-	   task pretty dterm env trans printer model_parser
+	   task pretty_sig pretty dterm env trans printer model_parser
 
 LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer driver \
 		whyconf autodetection \
@@ -190,14 +195,18 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_epsilon intro_projections_counterexmp \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		instantiate_predicate smoke_detector \
-		induction_pr prop_curry eliminate_literal reification
+		induction_pr prop_curry eliminate_literal reification \
+		args_wrapper generic_arg_trans_utils case apply \
+		ind_itp destruct cut
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
 	      simplify gappa cvc3 yices mathematica
 
-LIB_SESSION = compress xml termcode session session_tools strategy \
-              strategy_parser session_scheduler
+LIB_SESSION = compress xml termcode session_itp \
+              strategy strategy_parser controller_itp \
+	      server_utils itp_communication \
+	      itp_server json_util
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -517,8 +526,8 @@ bin/why3prove.opt: lib/why3/why3.cmxa src/tools/why3prove.cmx
 bin/why3prove.byte: lib/why3/why3.cma src/tools/why3prove.cmo
 bin/why3realize.opt: lib/why3/why3.cmxa src/tools/why3realize.cmx
 bin/why3realize.byte: lib/why3/why3.cma src/tools/why3realize.cmo
-bin/why3replay.opt: lib/why3/why3.cmxa src/tools/why3replay.cmx
-bin/why3replay.byte: lib/why3/why3.cma src/tools/why3replay.cmo
+bin/why3replay.opt: lib/why3/why3.cmxa src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
+bin/why3replay.byte: lib/why3/why3.cma src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -700,7 +709,7 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig gmain
+IDE_FILES = gconfig ide_utils why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -751,14 +760,63 @@ install_local:: bin/why3ide
 
 endif
 
+
+###############
+# WEBSERV
+###############
+
+WEBSERV_FILES = wserver why3web
+
+WEBSERVMODULES = $(addprefix src/ide/, $(WEBSERV_FILES))
+
+WEBSERVDEP = $(addsuffix .dep, $(WEBSERVMODULES))
+WEBSERVCMO = $(addsuffix .cmo, $(WEBSERVMODULES))
+WEBSERVCMX = $(addsuffix .cmx, $(WEBSERVMODULES))
+
+$(WEBSERVDEP): DEPFLAGS += -I src/ide
+$(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
+
+# build targets
+
+byte: bin/why3webserver.byte
+opt:  bin/why3webserver.opt
+
+bin/why3webserver.opt: lib/why3/why3.cmxa $(WEBSERVCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3webserver.byte: lib/why3/why3.cma $(WEBSERVCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(WEBSERVDEP)
+endif
+
+depend: $(WEBSERVDEP)
+
+CLEANDIRS += src/ide
+
+clean_old_install::
+	rm -f $(BINDIR)/why3webserver$(EXE)
+
+install_no_local::
+	$(INSTALL) bin/why3webserver.@OCAMLBEST@ $(TOOLDIR)/why3webserver$(EXE)
+
+install_local:: bin/why3webserver
+
+
 ###############
 # Session
 ###############
 
-SESSION_FILES = why3session_lib why3session_copy why3session_info \
-		why3session_latex why3session_html why3session_rm \
-		why3session_output why3session_run why3session_csv \
+SESSION_FILES = why3session_lib why3session_info \
+		why3session_html why3session_latex \
 		why3session_main
+# TODO: why3session_copy why3session_rm why3session_csv why3session_run
+#       why3session_output
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
@@ -799,6 +857,50 @@ install_no_local::
 	$(INSTALL) bin/why3session.@OCAMLBEST@ $(TOOLDIR)/why3session$(EXE)
 
 install_local:: bin/why3session
+
+###############
+# Why3 Shell
+###############
+
+SHELL_FILES = unix_scheduler why3shell
+
+SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
+
+SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
+SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
+SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
+
+$(SHELLDEP): DEPFLAGS += -I src/tools
+$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
+
+# build targets
+
+byte: bin/why3shell.byte
+opt:  bin/why3shell.opt
+
+bin/why3shell.opt: lib/why3/why3.cmxa $(SHELLCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3shell.byte: lib/why3/why3.cma $(SHELLCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(SHELLDEP)
+endif
+
+depend: $(SHELLDEP)
+
+clean_old_install::
+	rm -f $(BINDIR)/why3shell$(EXE)
+
+install_no_local::
+	$(INSTALL) bin/why3shell.@OCAMLBEST@ $(TOOLDIR)/why3shell$(EXE)
+
+install_local:: bin/why3shell
 
 
 ##############
@@ -1557,7 +1659,6 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
 
-
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
@@ -1566,7 +1667,6 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte
 
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
-
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +weak.js +nat.js +dynlink.js +toplevel.js $<
@@ -1591,6 +1691,30 @@ clean::
          src/trywhy3/worker_proto.cm* trywhy3.tar.gz
 
 CLEANDIRS += src/trywhy3
+
+
+#########
+# why3webserver and full web/js interface
+#########
+
+ifeq (@HASJSOFOCAML@,yes)
+
+JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+        -I src/ide
+
+src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
+	$(JSOCAMLCW) $(BFLAGS) -c $<
+
+src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
+	$(JSOCAMLCW) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+
+src/ide/why3_js.js: src/ide/why3_js.byte
+	js_of_ocaml +weak.js +nat.js +dynlink.js +toplevel.js $<
+
+opt: lib/why3/why3.cma bin/why3webserver.opt src/ide/why3_js.js
+byte: lib/why3/why3.cma bin/why3webserver.byte src/ide/why3_js.js
+
+endif
 
 ########
 # bench
@@ -1618,6 +1742,10 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 ###############
 # test targets
 ###############
+
+test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
+	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
+	$(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $<
 
 test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
@@ -1773,9 +1901,13 @@ MODULESTODOC = \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/stdlib util/rc util/debug \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
-	core/env core/task \
+	core/env core/task core/trans \
 	driver/whyconf driver/call_provers driver/driver \
-	session/session session/session_tools session/session_scheduler
+	transform/args_wrapper \
+	session/session_itp session/controller_itp \
+	session/itp_communication session/itp_server \
+	whyml/mlw_ty whyml/mlw_expr whyml/mlw_decl whyml/mlw_module \
+	whyml/mlw_wp
 
 FILESTODOC = $(addsuffix .mli, $(addprefix src/, $(MODULESTODOC)))
 
@@ -1918,7 +2050,7 @@ clean::
 # the generic rule cannot be applied since ocaml would confuse
 # lib/why3/why3extract.cmi for the interface (!!!)
 # same for ocaml/lablgtk2/gMain.cmi on case-insensitive filesystems
-src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
+src/tools/why3extract.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
