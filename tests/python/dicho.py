@@ -3,17 +3,13 @@ from random import randint
 
 n = 42
 a = [0] * n
+#@ assert len(a) == n
 
 a[0] = randint(0, 100)
-i = 1
-while i < n:
-    #@ invariant 1 <= i
+for i in range(1, n):
     #@ invariant forall i1, i2. 0 <= i1 <= i2 < i -> a[i1] <= a[i2]
-    #@ variant   n-i
     a[i] = a[i-1] + randint(0, 10)
-    i = i + 1
 
-#@ assert len(a) == n
 #@ assert forall i1, i2. 0 <= i1 <= i2 < len(a) -> a[i1] <= a[i2]
 
 print(a)

@@ -172,10 +172,8 @@ type prover_update =
   | ProverStarted
   | ProverFinished of prover_result
 
-
-val forward_results: blocking:bool -> (prover_call * prover_update) Queue.t
-(** returns new results that are given by why3server. *)
-
+val get_new_results: blocking:bool -> (prover_call * prover_update) list
+(** returns new results from why3server, in an unordered fashion. *)
 
 val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates
