@@ -828,9 +828,7 @@ let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
   assert (n >= 0);
-  let a =
-    Number.{ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
-  in
+  let a = Number.int_const_of_int n in
   t_const (Number.ConstInt a) ty_int
 
 let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
