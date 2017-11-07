@@ -1243,8 +1243,8 @@ module N
       assert { value r !i + (power radix !i) * !c =
                value x !i * y
                by
-                 value r !i + (power radix !i) * !c
-               = value r k + (power radix k) * res
+                 value r !i + !c * (power radix !i)
+               = value r k + res * (power radix k)
                      + (power radix !i) * !c
                = value r k + (power radix k) * res
                      + (power radix k) * radix * !c
