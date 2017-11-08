@@ -1053,6 +1053,9 @@ let _ =
           | None -> true
           | Some s ->
               (command_entry#set_text s; true))
+      | k when k = GdkKeysyms._Escape ->
+        goals_view#misc#grab_focus ();
+        true
       | _ -> false
       )
 
@@ -1253,9 +1256,15 @@ let interp cmd =
   clear_command_entry ()
 
 let (_ : GtkSignal.id) =
-  command_entry#connect#activate
-    ~callback:(fun () -> add_command list_commands command_entry#text;
-      interp command_entry#text)
+  let callback () =
+    let cmd = command_entry#text in
+    if cmd = "" then
+      goals_view#misc#grab_focus ()
+    else begin
+        add_command list_commands cmd;
+        interp cmd
+      end in
+  command_entry#connect#activate ~callback
 
 (* remove the helper text from the command entry the first time it gets the focus *)
 let () =
