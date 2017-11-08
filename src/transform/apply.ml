@@ -88,6 +88,12 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
       else ()); raise (Arg_trans_pattern ("apply", p1, p2))
   | Reduction_engine.NoMatch None -> raise (Arg_trans ("apply"))
   in
+  Svs.iter
+    (fun v ->
+     try ignore (Mvs.find v subst)
+     with Not_found ->
+       raise (Arg_trans ("no instance found for " ^ v.vs_name.Ident.id_string)))
+    lv;
   let inst_nt = t_ty_subst subst_ty subst nt in
   if (Term.t_equal_nt_nl inst_nt g) then
     let nlp = List.map (t_ty_subst subst_ty subst) lp in

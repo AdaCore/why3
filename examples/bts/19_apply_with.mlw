@@ -1,0 +1,31 @@
+module Issue19
+
+  use import int.Int
+
+  axiom H : forall x y z. x < y -> y < z -> x < z
+
+  goal g: 0 < 2
+
+  (* we want to do
+     apply H with 1
+     to generate two new goals "0 < 1" and "1 < 2"
+
+  *)
+
+  type t
+  predicate r t t
+  
+  axiom trans: forall x y z. r x y -> r y z -> r x z
+  
+  constant a:t
+  constant b:t
+  constant c:t
+  
+  axiom a1: r a b
+  
+  axiom a2: r b c
+  
+  goal test: r a c
+  (* apply trans with b *)
+
+end
