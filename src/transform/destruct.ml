@@ -17,6 +17,11 @@ open Generic_arg_trans_utils
 (** This file contains transformations with arguments that eliminates logic
     connectors (instantiate, destruct, destruct_alg). *)
 
+let is_lsymbol t =
+  match t.t_node with
+  | Tapp (_, []) -> true
+  | _ -> false
+
 let create_constant ty =
   let fresh_name = Ident.id_fresh "x" in
   let ls = create_lsymbol fresh_name [] (Some ty) in
@@ -58,11 +63,12 @@ let rec compounds_of acc (t: term) =
    new goal per constructor of the type and introduce corresponding
    variables. It also introduce the equality between the term and
    its destruction in the context.
+   When replace is set to true, a susbtitution is done when x is an lsymbol.
  *)
-let destruct_alg (x: term) : Task.task Trans.tlist =
+let destruct_alg replace (x: term) : Task.task Trans.tlist =
   let ty = x.t_ty in
   (* We list all the constants used in x so that we know the first place in the
-task where we can introduce hypothesis about the destruction of x. *)
+     task where we can introduce hypothesis about the destruction of x. *)
   let ls_of_x = ref (compounds_of Term.Sls.empty x) in
   let defined = ref false in
   let r = ref [] in
@@ -73,7 +79,7 @@ task where we can introduce hypothesis about the destruction of x. *)
       match ty.Ty.ty_node with
       | Ty.Tyvar _       -> raise (Cannot_infer_type "destruct")
       | Ty.Tyapp (ts, _) ->
-        Trans.decl_l (fun d ->
+        let trans = Trans.decl_l (fun d ->
           match d.d_node with
           (* TODO not necessary to check this first: this can be optimized *)
           | _ when (not !defined) && Term.Sls.is_empty !ls_of_x ->
@@ -109,6 +115,11 @@ task where we can introduce hypothesis about the destruction of x. *)
           | Dprop (Pgoal, _, _) ->
               [[d]]
           | _ -> [[d]]) None
+        in
+        if replace && is_lsymbol x then
+          Trans.compose_l trans (Trans.singleton (Apply.subst [x]))
+        else
+          trans
     end
 
 (* Destruct the head term of an hypothesis if it is either
@@ -213,4 +224,7 @@ let () = wrap_and_register ~desc:"destruct <name> destructs the head constructor
     "destruct" (Tprsymbol Ttrans_l) destruct
 
 let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type"
-    "destruct_alg" (Tterm Ttrans_l) destruct_alg
+    "destruct_alg" (Tterm Ttrans_l) (destruct_alg false)
+
+let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type and substitute the definition if an lsymbol was provided"
+    "destruct_alg_subst" (Tterm Ttrans_l) (destruct_alg true)

@@ -303,32 +303,37 @@ let unfold unf hl =
    This function returns None if not found, Some (None, t1, t2) with t1 being
    to_subst and t2 being term to substitute to if the equality found it a symbol
    definition. If equality found is a a decl then it is returned:
-   Some (Some pr, t1, t2) *)
+   Some (Some pr, t1, t2).
+   If the lsymbol to substitute appear in 2 equalities, only the first one is
+   used. *)
 let find_eq (to_subst: Term.lsymbol list) =
-  fold (fun d acc ->
+  fold (fun d (acc, used) ->
     match d.d_node with
     | Dprop (k, pr, t) when k != Pgoal ->
-        let acc = (match t.t_node with
+        let acc, used = (match t.t_node with
         | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
             (* Allow to rewrite from the right *)
             begin
               match t1.t_node, t2.t_node with
-              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst ->
-                  Some (Some pr, t1, t2) :: acc
-              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst ->
-                  Some (Some pr, t2, t1) :: acc
-              | _ -> acc
+              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst &&
+                                      not (List.exists (ls_equal ls) used) ->
+                  Some (Some pr, t1, t2) :: acc, ls :: used
+              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst &&
+                                      not (List.exists (ls_equal ls) used) ->
+                  Some (Some pr, t2, t1) :: acc, ls :: used
+              | _ -> acc, used
             end
-        | _ -> acc) in
-        acc
-    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst ->
+        | _ -> acc, used) in
+        acc, used
+    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst &&
+                             not (List.exists (ls_equal ls) used) ->
       (* Function without arguments *)
       let vl, e = open_ls_defn ld in
       if vl = [] then
-        Some (None, t_app_infer ls [], e) :: acc
+          Some (None, t_app_infer ls [], e) :: acc, ls :: used
       else
-        acc
-    | _ -> acc) []
+        acc, used
+    | _ -> acc, used) ([],[])
 
 (* This found any equality which at one side contains a single lsymbol and is
    local. It gives same output as found_eq. *)
@@ -419,7 +424,7 @@ let subst_eq found_eq =
           | Dtype _ | Ddata _ | Dparam _ -> [d]) None
        end
 
-let subst_eq_list found_eq_list =
+let subst_eq_list (found_eq_list, _) =
   List.fold_left (fun acc_tr found_eq ->
     Trans.compose (subst_eq found_eq) acc_tr) Trans.identity found_eq_list
 
