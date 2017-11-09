@@ -258,7 +258,7 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
-val clean_session: controller -> removed:notifier -> unit
+val clean: controller -> removed:notifier -> any -> unit
 (** Remove each proof attempt or transformation that are below proved
     goals, that are either obsolete or not valid. The [removed]
     notifier is called on each removed node.  *)
@@ -303,10 +303,11 @@ val replay:
     notification:notifier ->
     final_callback:
       ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
-            -> unit) ->
+            -> unit) -> any: Session_itp.any option ->
     unit
-(** This function reruns all the proofs of the session, and produces a report
-    comparing the results with the former ones.
+(** This function reruns all the proofs of the session under the given any (None
+    means the whole session), and produces a report comparing the results with
+    the former ones.
 
     The proofs are replayed asynchronously, and the states of these proofs are
     notified via [callback] similarly as for [schedule_proof_attempt].

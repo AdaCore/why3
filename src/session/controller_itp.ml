@@ -817,12 +817,12 @@ let proof_is_complete pa =
      not pa.Session_itp.proof_obsolete &&
        Call_provers.(pr.pr_answer = Valid)
 
-let clean_session c ~removed =
+let clean c ~removed nid =
   (* clean should not change proved status *)
   let notification _ = assert false in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
-  Session_itp.fold_all_session s
+  Session_itp.fold_all_any s
     (fun () any ->
       (match any with
       | APa pa ->
@@ -834,7 +834,7 @@ let clean_session c ~removed =
         let pn = get_trans_parent s tn in
         if pn_proved s pn && not (tn_proved s tn) then
           remove_subtree ~notification ~removed c (ATn tn)
-      | _ -> ())) ()
+      | _ -> ())) () nid
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)
@@ -951,7 +951,7 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
 let replay ?(obsolete_only=true) ?(use_steps=false)
-           c ~callback ~notification ~final_callback =
+           c ~callback ~notification ~final_callback ~any =
 
   let craft_report count s r id pr limits pa =
     match s with
@@ -979,8 +979,13 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
 
   (* TODO count the number of node in a more efficient way *)
   (* Counting the number of proof_attempt to print report only once *)
-  Session_itp.session_iter_proof_attempt
-    (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) session;
+  (match any with
+  | None ->
+      Session_itp.session_iter_proof_attempt
+        (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) session
+  | Some nid ->
+      Session_itp.any_iter_proof_attempt session
+        (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) nid);
 
   (* Replaying function *)
   let replay_pa id pa =
@@ -1008,7 +1013,9 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
 
   if !count = 0 then final_callback !report else
   (* Calling replay on all the proof_attempts of the session *)
-  Session_itp.session_iter_proof_attempt replay_pa session
+  match any with
+  | None -> Session_itp.session_iter_proof_attempt replay_pa session
+  | Some nid -> Session_itp.any_iter_proof_attempt session replay_pa nid
 
 
 

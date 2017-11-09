@@ -1864,10 +1864,22 @@ let unfocus_item =
 let () =
   connect_menu_item
     replay_menu_item
-    ~callback:(fun () -> send_request Replay_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "replay"))
+      | _   -> print_message ~kind:1 ~mark:"Replay error"
+            "Select only one node to perform the replay action");
   connect_menu_item
     clean_menu_item
-    ~callback:(fun _ -> send_request Clean_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "clean"))
+      | _   -> print_message ~kind:1 ~mark:"Clean error"
+            "Select only one node to perform the clean action");
   connect_menu_item
     remove_item
     ~callback:(fun () ->
@@ -1892,7 +1904,7 @@ let () =
                match get_selected_row_references () with
                | [r] ->
                    let id = get_node_id r#iter in
-                   send_request (Mark_obsolete_req id)
+                   send_request (Command_req (id, "mark"))
                | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
                         "Select only one node to perform the mark obsolete action");
   connect_menu_item

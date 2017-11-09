@@ -391,9 +391,9 @@ let goal_iter_proof_attempt s f g =
   fold_all_sub_goals_of_proofn
     s
     (fun _ pn -> Hprover.iter
-                 (fun _ pan ->
-                  let pan = get_proof_attempt_node s pan in
-                  f pan)
+                 (fun _ pa ->
+                  let pan = get_proof_attempt_node s pa in
+                  f pa pan)
                  pn.proofn_attempts) () g
 
 let fold_all_sub_goals_of_theory s f acc th =
@@ -406,9 +406,9 @@ let theory_iter_proofn s f th =
 
 let theory_iter_proof_attempt s f th =
   fold_all_sub_goals_of_theory s
-    (fun _ pn -> Hprover.iter (fun _ pan ->
-                             let pan = get_proof_attempt_node s pan in
-                             f pan)
+    (fun _ pn -> Hprover.iter (fun _ pa ->
+                             let pan = get_proof_attempt_node s pa in
+                             f pa pan)
          pn.proofn_attempts) () th
 
 let file_iter_proof_attempt s f file =
@@ -416,7 +416,15 @@ let file_iter_proof_attempt s f file =
     (theory_iter_proof_attempt s f)
     (file_theories file)
 
-
+let any_iter_proof_attempt s f any =
+  match any with
+  | AFile file -> file_iter_proof_attempt s f file
+  | ATh th -> theory_iter_proof_attempt s f th
+  | ATn tr ->
+      let subgoals = get_sub_tasks s tr in
+      List.iter (fun g -> goal_iter_proof_attempt s f g) subgoals
+  | APn pn -> goal_iter_proof_attempt s f pn
+  | APa pa -> f pa (get_proof_attempt_node s pa)
 
 
 

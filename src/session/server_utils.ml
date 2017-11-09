@@ -259,6 +259,7 @@ type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
   | Qtask of (Controller_itp.controller -> Trans.naming_table -> string list -> string)
 
+
 let help_on_queries fmt commands =
   let l = Stdlib.Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
@@ -354,6 +355,9 @@ type command =
   | Strategies   of string
   | Edit         of Whyconf.config_prover
   | Bisect
+  | Replay
+  | Clean
+  | Mark_Obsolete
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -361,18 +365,21 @@ type command =
 
 let interp commands_table cont id s =
   let cmd,args = split_args s in
-  try
-    let (_,f) = Stdlib.Hstr.find commands_table cmd in
-    match f,id with
-    | Qnotask f, _ -> Query (f cont args)
-    | Qtask f, Some (Session_itp.APn id) ->
-       let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
-       let s = try Query (f cont table args) with
-       | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
-       | Number_of_arguments -> QError "Bad number of arguments"
-       in s
-    | Qtask _, _ -> QError "please select a goal first"
-  with Not_found ->
+  match Stdlib.Hstr.find commands_table cmd with
+  | (_, f) ->
+    begin
+      match f,id with
+      | Qnotask f, _ -> Query (f cont args)
+      | Qtask f, Some (Session_itp.APn id) ->
+          let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+          let s = try Query (f cont table args) with
+            | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
+            | Number_of_arguments -> QError "Bad number of arguments"
+          in s
+      | Qtask _, _ -> QError "please select a goal first"
+    end
+  | exception Not_found ->
+     begin
        try
          let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
          match id with
@@ -414,6 +421,24 @@ let interp commands_table cont id s =
                     | Some (Session_itp.APa _) -> Bisect
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
+               | "replay", _ ->
+                   begin
+                     match id with
+                     | Some _ -> Replay
+                     | _ -> QError ("Please select a node in the task tree")
+                   end
+               | "mark", _ ->
+                   begin
+                     match id with
+                     | Some _ -> Mark_Obsolete
+                     | _ -> QError ("Please select a node in the task tree")
+                   end
+               | "clean", _ ->
+                   begin
+                     match id with
+                     | Some _ -> Clean
+                     | _ -> QError ("Please select a node in the task tree")
+                   end
                | "help", [trans] ->
                   let print_trans_desc fmt r =
                     Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
@@ -431,6 +456,10 @@ let interp commands_table cont id s =
                                 @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
                                 @ <query> [arguments]@\n\
                                 @ <strategy shortcut>@\n\
+                                @ mark @\n\
+                                @ clean @\n\
+                                @ replay @\n\
+                                @ bisect @\n\
                                 @ help <transformation_name> @\n\
                                 @\n\
                                 Available queries are:@\n@[%a@]" help_on_queries commands_table
@@ -438,6 +467,7 @@ let interp commands_table cont id s =
                   Help_message text
                | _ ->
                   Other (cmd, args)
+      end
 
 (***********************)
 (* First Unproven goal *)
