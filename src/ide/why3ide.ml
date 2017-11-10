@@ -979,7 +979,11 @@ let print_message ~kind ~mark fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               add_to_log mark s;
-              if kind>0 then message_zone#buffer#set_text s)
+              if kind>0 then
+                begin
+                  message_zone#buffer#set_text s;
+                  messages_notebook#goto_page error_page
+                end)
     str_formatter
     fmt
 
@@ -1253,7 +1257,10 @@ let interp cmd =
       | _ -> List.map (fun n -> get_node_id n#iter) rows
   in
   List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
-  clear_command_entry ()
+  clear_command_entry ();
+  (* clear previous error message if any *)
+  message_zone#buffer#set_text ""
+
 
 let (_ : GtkSignal.id) =
   let callback () =
