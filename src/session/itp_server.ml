@@ -822,19 +822,20 @@ end
     List.iter (iter_subtree_from_goal f nid)
                (theory_goals theory_id)
 
-  let iter_subtree_from_file
-    (f: parent:node_ID -> any -> unit) parent file =
-    f ~parent (AFile file);
+  let iter_subtree_from_file (f: parent:node_ID -> any -> unit) file =
+    f ~parent:root_node (AFile file);
     let nid = node_ID_from_file file in
     List.iter (iter_subtree_from_theory f nid) (file_theories file)
 
-  let iter_the_files (f: parent:node_ID -> any -> unit) parent : unit =
+  let iter_on_files ~(on_file: file -> unit)
+                    ~(on_subtree: parent:node_ID -> any -> unit) : unit =
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
     Stdlib.Hstr.iter
       (fun _ file ->
-        iter_subtree_from_file f parent file)
+       on_file file;
+       iter_subtree_from_file on_subtree file)
       files
 
   (**********************************)
@@ -853,11 +854,13 @@ end
 
   let send_new_subtree_from_file f =
     iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
-      root_node f
+      f
 
   let reset_and_send_the_whole_tree (): unit =
     P.notify Reset_whole_tree;
-    iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root_node
+    iter_on_files
+      ~on_file:(fun file -> read_and_send (file_name file))
+      ~on_subtree:(fun ~parent id -> ignore (new_node ~parent id))
 
   let unfocus () =
     focused_node := Unfocused;
