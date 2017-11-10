@@ -551,12 +551,37 @@ theory FoldLeft
   = if length s = 0 then acc
     else fold_left f (f acc s[0]) s[1 ..]
 
+  lemma fold_left_ext: forall f: 'b -> 'a -> 'b, acc: 'b, s1 s2: seq 'a.
+    s1 == s2 -> fold_left f acc s1 = fold_left f acc s2
+
   use import list.List
   use import OfList
   use list.FoldLeft as List
 
   lemma fold_left_equiv: forall l: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
     List.fold_left f acc l = fold_left f acc (of_list l)
+
+end
+
+theory FoldRight
+
+  use import Seq
+  use import int.Int
+
+  let rec function fold_right (f: 'b -> 'a -> 'a) (s: seq 'b) (acc: 'a) : 'a
+    variant { length s }
+  = if length s = 0 then acc
+    else f s[0] (fold_right f s[1 ..] acc)
+
+  lemma fold_right_ext: forall f: 'a -> 'b -> 'b, acc: 'b, s1 s2: seq 'a.
+    s1 == s2 -> fold_right f s1 acc = fold_right f s2 acc
+
+  use import list.List
+  use import OfList
+  use list.FoldRight as List
+
+  lemma fold_right_equiv: forall l: list 'a, f: 'a -> 'b -> 'b, acc : 'b.
+    List.fold_right f l acc = fold_right f (of_list l) acc
 
 end
 
