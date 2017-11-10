@@ -533,55 +533,6 @@ let schedule_proof_attempt c id pr
 
 
 
-(* replay *)
-
-
-let find_prover notification c goal_id pr =
-  if Hprover.mem c.controller_provers pr then Some pr else
-   match Whyconf.get_prover_upgrade_policy c.controller_config pr with
-   | exception Not_found -> None
-   | Whyconf.CPU_keep -> None
-   | Whyconf.CPU_upgrade new_pr ->
-      (* does a proof using new_pr already exists ? *)
-      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
-      then (* yes, then we do nothing *)
-        None
-      else
-        begin
-          (* we modify the prover in-place *)
-          Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
-          Some new_pr
-        end
-   | Whyconf.CPU_duplicate _new_pr ->
-      assert false (* TODO *)
-(*
-      (* does a proof using new_p already exists ? *)
-      if Hprover.mem (goal_external_proofs parid) new_pr
-      then (* yes, then we do nothing *)
-        None
-      else
-        begin
-          (* we duplicate the proof_attempt *)
-          let new_a = copy_external_proof
-                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
-          in
-          Some new_pr
-        end
-*)
-
-let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
-  (* The replay can be done on a different machine so we need
-     to check more things before giving the attempt to the scheduler *)
-  match find_prover notification c parid pr with
-  | None -> callback id (Uninstalled pr)
-  | Some pr' ->
-     try
-       if pr' <> pr then callback id (UpgradeProver pr');
-       let _ = get_raw_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
-     with Not_found ->
-       callback id Detached
-
 
 (*** { 2 edition of proof scripts} *)
 
@@ -913,6 +864,54 @@ let copy_detached ~copy c from_any =
 
 
 
+let find_prover notification c goal_id pr =
+  if Hprover.mem c.controller_provers pr then Some pr else
+   match Whyconf.get_prover_upgrade_policy c.controller_config pr with
+   | exception Not_found -> None
+   | Whyconf.CPU_keep -> None
+   | Whyconf.CPU_upgrade new_pr ->
+      (* does a proof using new_pr already exists ? *)
+      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we modify the prover in-place *)
+          Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
+          Some new_pr
+        end
+   | Whyconf.CPU_duplicate _new_pr ->
+      assert false (* TODO *)
+(*
+      (* does a proof using new_p already exists ? *)
+      if Hprover.mem (goal_external_proofs parid) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we duplicate the proof_attempt *)
+          let new_a = copy_external_proof
+                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
+          in
+          Some new_pr
+        end
+*)
+
+let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
+  (* The replay can be done on a different machine so we need
+     to check more things before giving the attempt to the scheduler *)
+  match find_prover notification c parid pr with
+  | None -> callback id (Uninstalled pr)
+  | Some pr' ->
+     try
+       if pr' <> pr then callback id (UpgradeProver pr');
+       let _ = get_raw_task c.controller_session parid in
+       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
+     with Not_found ->
+       callback id Detached
+
+
+
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   (** Result(new_result,old_result) *)
@@ -950,7 +949,7 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ?(obsolete_only=true) ?(use_steps=false)
+let replay ~valid_only ~obsolete_only ?(use_steps=false)
            c ~callback ~notification ~final_callback ~any =
 
   let craft_report count s r id pr limits pa =
@@ -973,6 +972,14 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
     | Detached -> decr count
   in
 
+  let need_replay pa =
+    (pa.proof_obsolete || not obsolete_only) &&
+      (not valid_only ||
+         match pa.Session_itp.proof_state with
+         | None -> false
+         | Some pr -> Call_provers.(pr.pr_answer = Valid))
+  in
+
   let session = c.controller_session in
   let count = ref 0 in
   let report = ref [] in
@@ -982,14 +989,14 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
   (match any with
   | None ->
       Session_itp.session_iter_proof_attempt
-        (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) session
+        (fun _ pa -> if need_replay pa then incr count) session
   | Some nid ->
       Session_itp.any_iter_proof_attempt session
-        (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) nid);
+        (fun _ pa -> if need_replay pa then incr count) nid);
 
   (* Replaying function *)
   let replay_pa id pa =
-    if pa.proof_obsolete || not obsolete_only then
+    if need_replay pa then
       begin
         let parid = pa.parent in
         let pr = pa.prover in

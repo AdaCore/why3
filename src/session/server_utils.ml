@@ -355,7 +355,7 @@ type command =
   | Strategies   of string
   | Edit         of Whyconf.config_prover
   | Bisect
-  | Replay
+  | Replay       of bool
   | Clean
   | Mark_Obsolete
   | Help_message of string
@@ -421,23 +421,34 @@ let interp commands_table cont id s =
                     | Some (Session_itp.APa _) -> Bisect
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
-               | "replay", _ ->
+               | "replay", args ->
                    begin
                      match id with
-                     | Some _ -> Replay
-                     | _ -> QError ("Please select a node in the task tree")
+                     | Some _ ->
+                        begin
+                          match args with
+                          | [] -> Replay true
+                          | ["all"] -> Replay false
+                          | _ -> QError ("replay expects either no arguments or `all`")
+                        end
+                     | _ -> (* TODO: replay the whole tree instead *)
+                        QError ("Please select a node in the task tree")
                    end
                | "mark", _ ->
                    begin
                      match id with
                      | Some _ -> Mark_Obsolete
-                     | _ -> QError ("Please select a node in the task tree")
+                     | _ ->
+                        (* TODO: replay the whole tree instead *)
+                        QError ("Please select a node in the task tree")
                    end
                | "clean", _ ->
                    begin
                      match id with
                      | Some _ -> Clean
-                     | _ -> QError ("Please select a node in the task tree")
+                     | _ ->
+                        (* TODO: replay the whole tree instead *)
+                        QError ("Please select a node in the task tree")
                    end
                | "help", [trans] ->
                   let print_trans_desc fmt r =

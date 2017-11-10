@@ -66,7 +66,7 @@ type command =
   | Strategies   of string
   | Edit         of Whyconf.config_prover
   | Bisect
-  | Replay
+  | Replay       of bool
   | Clean
   | Mark_Obsolete
   | Help_message of string

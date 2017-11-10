@@ -296,7 +296,8 @@ val replay_print:
         unit
 
 val replay:
-    ?obsolete_only:bool ->
+    valid_only:bool ->
+    obsolete_only:bool ->
     ?use_steps:bool ->
     controller ->
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->

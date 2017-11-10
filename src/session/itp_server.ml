@@ -1204,14 +1204,14 @@ end
     | Some(loc,s) ->
        P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
-  let replay nid : unit =
+  let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let any = any_from_node_ID nid in
     let callback = callback_update_tree_proof d.cont in
     let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false ~obsolete_only:true d.cont
+    C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
              ~callback ~notification:(notify_change_proved d.cont) ~final_callback ~any:(Some any)
 
 (*
@@ -1320,7 +1320,7 @@ end
             run_strategy_on_task ~counterexmp nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
-        | Replay                  -> replay nid
+        | Replay valid_only       -> replay ~valid_only nid
         | Clean                   ->
             let any = any_from_node_ID nid in
             clean any
