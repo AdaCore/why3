@@ -768,15 +768,16 @@ let proof_is_complete pa =
      not pa.Session_itp.proof_obsolete &&
        Call_provers.(pr.pr_answer = Valid)
 
+
 let clean c ~removed nid =
+
   (* clean should not change proved status *)
   let notification _ = assert false in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
-  Session_itp.fold_all_any s
-    (fun () any ->
-      (match any with
-      | APa pa ->
+  let clean_aux () any =
+    match any with
+    | APa pa ->
         let pa = Session_itp.get_proof_attempt_node s pa in
         if pn_proved s pa.parent then
           if not (proof_is_complete pa) then
@@ -785,7 +786,14 @@ let clean c ~removed nid =
         let pn = get_trans_parent s tn in
         if pn_proved s pn && not (tn_proved s tn) then
           remove_subtree ~notification ~removed c (ATn tn)
-      | _ -> ())) () nid
+      | _ -> ()
+  in
+
+  match nid with
+  | Some nid ->
+      Session_itp.fold_all_any s clean_aux () nid
+  | None ->
+      Session_itp.fold_all_session s clean_aux ()
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)
@@ -798,10 +806,16 @@ let mark_as_obsolete ~notification c any =
     notification (APa n);
     update_goal_node notification s parent
   in
-  fold_all_any s
-    (fun () any -> match any with
-    | APa n -> mark_as_obsolete_pa n
-    | _ -> ()) () any
+  match any with
+  | Some any ->
+      fold_all_any s
+        (fun () any -> match any with
+        | APa n -> mark_as_obsolete_pa n
+        | _ -> ()) () any
+  | None ->
+      session_iter_proof_attempt
+        (fun pa _pan ->
+          mark_as_obsolete_pa pa) s
 
 exception BadCopyPaste
 

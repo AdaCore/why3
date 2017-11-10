@@ -258,14 +258,15 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
-val clean: controller -> removed:notifier -> any -> unit
+val clean: controller -> removed:notifier -> any option -> unit
 (** Remove each proof attempt or transformation that are below proved
     goals, that are either obsolete or not valid. The [removed]
-    notifier is called on each removed node.  *)
+    notifier is called on each removed node.
+    On None, clean is done on the whole session. *)
 
 val mark_as_obsolete:
   notification:notifier ->
-  controller -> any -> unit
+  controller -> any option -> unit
 
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:

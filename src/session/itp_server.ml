@@ -1206,13 +1206,12 @@ end
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
-    let any = any_from_node_ID nid in
     let callback = callback_update_tree_proof d.cont in
     let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
     C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
-             ~callback ~notification:(notify_change_proved d.cont) ~final_callback ~any:(Some any)
+             ~callback ~notification:(notify_change_proved d.cont) ~final_callback ~any:nid
 
 (*
   let () = register_command "edit" "remove unsuccessful proof attempts that are below proved goals"
@@ -1231,13 +1230,7 @@ end
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
     let d = get_server_data () in
-    let any = any_from_node_ID n in
-(*
-    let node_obsolete x b =
-      let nid = node_ID_from_any x in
-      P.notify (Node_change (nid, Obsolete b)) in
- *)
-    C.mark_as_obsolete (* ~node_obsolete *) ~notification:(notify_change_proved d.cont) d.cont any
+    C.mark_as_obsolete ~notification:(notify_change_proved d.cont) d.cont n
 
   (* ----------------- locate next unproven node -------------------- *)
 
@@ -1320,11 +1313,9 @@ end
             run_strategy_on_task ~counterexmp nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
-        | Replay valid_only       -> replay ~valid_only nid
-        | Clean                   ->
-            let any = any_from_node_ID nid in
-            clean any
-        | Mark_Obsolete           -> mark_obsolete nid
+        | Replay valid_only       -> replay ~valid_only snid
+        | Clean                   -> clean snid
+        | Mark_Obsolete           -> mark_obsolete snid
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

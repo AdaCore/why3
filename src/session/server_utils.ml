@@ -423,33 +423,15 @@ let interp commands_table cont id s =
                   end
                | "replay", args ->
                    begin
-                     match id with
-                     | Some _ ->
-                        begin
-                          match args with
-                          | [] -> Replay true
-                          | ["all"] -> Replay false
-                          | _ -> QError ("replay expects either no arguments or `all`")
-                        end
-                     | _ -> (* TODO: replay the whole tree instead *)
-                        QError ("Please select a node in the task tree")
+                     match args with
+                     | [] -> Replay true
+                     | ["all"] -> Replay false
+                     | _ -> QError ("replay expects either no arguments or `all`")
                    end
                | "mark", _ ->
-                   begin
-                     match id with
-                     | Some _ -> Mark_Obsolete
-                     | _ ->
-                        (* TODO: replay the whole tree instead *)
-                        QError ("Please select a node in the task tree")
-                   end
+                   Mark_Obsolete
                | "clean", _ ->
-                   begin
-                     match id with
-                     | Some _ -> Clean
-                     | _ ->
-                        (* TODO: replay the whole tree instead *)
-                        QError ("Please select a node in the task tree")
-                   end
+                   Clean
                | "help", [trans] ->
                   let print_trans_desc fmt r =
                     Format.fprintf fmt "@[%s:\n%a@]" trans Pp.formatted r
