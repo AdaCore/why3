@@ -1853,6 +1853,10 @@ let () =
   mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
 
 
+let bisect_item =
+  create_menu_item tools_factory "Bisect on external proof"
+                   "Search for a maximal set of hypotheses to remove before calling a prover"
+
 let focus_item =
   create_menu_item tools_factory "Focus"
     "Focus on proof node"
@@ -1907,6 +1911,15 @@ let () =
                    send_request (Command_req (id, "mark"))
                | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
                         "Select only one node to perform the mark obsolete action");
+  connect_menu_item
+    bisect_item
+    ~callback:(fun () ->
+               match get_selected_row_references () with
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Command_req (id, "bisect"))
+               | _ -> print_message ~kind:1 ~mark:"Bisect error"
+                        "Select exactly one node to perform the bisect action");
   connect_menu_item
     focus_item
     ~callback:(fun () ->
