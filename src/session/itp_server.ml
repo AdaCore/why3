@@ -611,7 +611,8 @@ end
     try
       let d = get_server_data() in
       let fn = Sysutil.absolutize_filename
-          (Session_itp.get_dir d.cont.controller_session) f in
+                 (Session_itp.get_dir d.cont.controller_session) f in
+      Sysutil.backup_file fn;
       Sysutil.write_file fn file_content;
       P.notify (Message (File_Saved f))
     with Invalid_argument s ->

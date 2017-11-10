@@ -27,6 +27,7 @@ type t =
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
+      mutable allow_source_editing : bool;
       mutable saving_policy : int;
       mutable premise_color : string;
       mutable neg_premise_color : string;

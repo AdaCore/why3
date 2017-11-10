@@ -517,6 +517,10 @@ let () =
         (Whyconf.get_provers gconfig.config);
      *)
      *)
+    Hstr.iter
+      (fun _ (_,source_view,_,_) ->
+       source_view#set_editable gconfig.allow_source_editing)
+      source_view_table;
     send_session_config_to_server ()
   in
   connect_menu_item menu_preferences ~callback
@@ -815,7 +819,7 @@ let create_source_view =
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
             (* ~smart_home_end:true *)
-            ~editable:true
+            ~editable:gconfig.allow_source_editing
             ~packing:scrolled_source_view#add
             () in
         let has_changed = ref false in
