@@ -47,7 +47,7 @@ module VonNeumann16
     let ghost m = ref (8:t) in
     let ghost bits_g = ref (0x80:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
-    while !bits <> (0:t) do
+    while not (eq !bits (0:t)) do
       variant { t'int !bits }
       (* 0 <= m <= 8 *)
       invariant { ule !m (8:t) }
@@ -70,9 +70,9 @@ module VonNeumann16
 
       (* m is not null, let's subtract 1 *)
       assert { !m <> (0:t) };
-      'L1:
+      label L1 in
       ghost m := pred !m;
-      assert { (at !m 'L1) = succ !m };
+      assert { (!m at L1) = succ !m };
       assert { !res = mul !res_g (pow2 (succ !m)) };
       assert { !bits_g = pow2 !m };
       let b = bw_or !res !bits in
@@ -82,10 +82,10 @@ module VonNeumann16
       assert { !res = mul !res_g (pow2 !m) };
       if uge !num b then
         begin
-        num := sub !num b;
-        'L:
+        num := sub !num b; 
+        label L in
         res := bw_or !res !bits;
-        assert { !res = add (at !res 'L) !bits };
+        assert { !res = add (!res at L) !bits };
         assert { !res = mul (add !res_g !bits_g) (pow2 !m) };
         res_g := add !res_g !bits_g
         end;
@@ -96,8 +96,6 @@ module VonNeumann16
 
 
 end
-
-
 
 
 
@@ -124,7 +122,7 @@ module VonNeumann32
     let ghost m = ref (16:t) in
     let ghost bits_g = ref (0x8000:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
-    while !bits <> (0:t) do
+    while not (eq !bits (0:t)) do
       variant { t'int !bits }
       (* 0 <= m <= 16 *)
       invariant { ule !m (16:t) }
@@ -147,9 +145,9 @@ module VonNeumann32
 
       (* m is not null, let's subtract 1 *)
       assert { !m <> (0:t) };
-      'L1:
+      label L1 in
       ghost m := pred !m;
-      assert { (at !m 'L1) = succ !m };
+      assert { (!m at L1) = succ !m };
       assert { !res = mul !res_g (pow2 (succ !m)) };
       assert { !bits_g = pow2 !m };
       let b = bw_or !res !bits in
@@ -160,9 +158,9 @@ module VonNeumann32
       if uge !num b then
         begin
         num := sub !num b;
-        'L:
+        label L in
         res := bw_or !res !bits;
-        assert { !res = add (at !res 'L) !bits };
+        assert { !res = add (!res at L) !bits };
         assert { !res = mul (add !res_g !bits_g) (pow2 !m) };
         res_g := add !res_g !bits_g
         end;
@@ -210,7 +208,7 @@ module VonNeumann64
     let ghost m = ref (32:t) in
     let ghost bits_g = ref (0x8000_0000:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
-    while !bits <> (0:t) do
+    while not (eq !bits (0:t)) do
       variant { t'int !bits }
       (* 0 <= m <= 32 *)
       invariant { ule !m (32:t) }
@@ -231,9 +229,9 @@ module VonNeumann64
 
       (* m is not null, let's subtract 1 *)
       assert { !m <> (0:t) };
-      'L1:
+      label L1 in
       ghost m := pred !m;
-      assert { (at !m 'L1) = succ !m };
+      assert { (!m at L1) = succ !m };
       assert { !res = mul !res_g (pow2 (succ !m)) };
       assert { !bits_g = pow2 !m };
       let b = bw_or !res !bits in
@@ -244,9 +242,9 @@ module VonNeumann64
       if uge !num b then
         begin
         num := sub !num b;
-        'L:
+        label L in
         res := bw_or !res !bits;
-        assert { !res = add (at !res 'L) !bits };
+        assert { !res = add (!res at L) !bits };
         assert { !res = mul (add !res_g !bits_g) (pow2 !m) };
         res_g := add !res_g !bits_g
         end;
