@@ -263,11 +263,8 @@ let print_request fmt r =
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
   | Save_file_req _                 -> fprintf fmt "save file"
-  | Mark_obsolete_req _             -> fprintf fmt "mark obsolete"
-  | Clean_req                       -> fprintf fmt "clean"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
-  | Replay_req                      -> fprintf fmt "replay"
   | Exit_req                        -> fprintf fmt "exit"
   | Interrupt_req                   -> fprintf fmt "interrupt"
 
@@ -1159,9 +1156,9 @@ end
 
 
   (* ----------------- Clean session -------------------- *)
-  let clean_session () =
+  let clean nid =
     let d = get_server_data () in
-    C.clean_session d.cont ~removed
+    C.clean d.cont ~removed nid
 
 
   let remove_node nid =
@@ -1207,20 +1204,14 @@ end
     | Some(loc,s) ->
        P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
-  let replay_session () : unit =
+  let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
     let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false ~obsolete_only:true d.cont
-             ~callback ~notification:(notify_change_proved d.cont) ~final_callback
-
-  let () = register_command "replay" "replay obsolete proofs"
-    (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
-
-  let () = register_command "clean" "remove unsuccessful proof attempts that are below proved goals"
-    (Qnotask (fun _cont _args ->  clean_session (); "Cleaning done"))
+    C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
+             ~callback ~notification:(notify_change_proved d.cont) ~final_callback ~any:nid
 
 (*
   let () = register_command "edit" "remove unsuccessful proof attempts that are below proved goals"
@@ -1239,13 +1230,7 @@ end
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
     let d = get_server_data () in
-    let any = any_from_node_ID n in
-(*
-    let node_obsolete x b =
-      let nid = node_ID_from_any x in
-      P.notify (Node_change (nid, Obsolete b)) in
- *)
-    C.mark_as_obsolete (* ~node_obsolete *) ~notification:(notify_change_proved d.cont) d.cont any
+    C.mark_as_obsolete ~notification:(notify_change_proved d.cont) d.cont n
 
   (* ----------------- locate next unproven node -------------------- *)
 
@@ -1276,7 +1261,6 @@ end
     let config = d.cont.controller_config in
     try (
     match r with
-    | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
@@ -1311,11 +1295,9 @@ end
         C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
-    | Mark_obsolete_req n          -> mark_obsolete n
     | Save_file_req (name, text)   ->
         save_file name text;
     | Get_task(nid,b,c,loc)         -> send_task nid b c loc
-    | Replay_req                   -> replay_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
@@ -1331,6 +1313,9 @@ end
             run_strategy_on_task ~counterexmp nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
+        | Replay valid_only       -> replay ~valid_only snid
+        | Clean                   -> clean snid
+        | Mark_Obsolete           -> mark_obsolete snid
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

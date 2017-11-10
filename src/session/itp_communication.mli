@@ -130,16 +130,8 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
-  | Mark_obsolete_req       of node_ID
-  | Clean_req
   | Save_req
   | Reload_req
-  | Replay_req
-  (** replay all the proof attempts whose result is obsolete. TODO
-      [priority high]: have a similar request with a node id as
-      argument, to replay only in the corresponding subtree. TODO
-      [priority low]: have a extra boolean argument to force replay
-      also of non-obsolete goals. *)
   | Exit_req
   | Interrupt_req
 

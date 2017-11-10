@@ -1053,6 +1053,9 @@ let _ =
           | None -> true
           | Some s ->
               (command_entry#set_text s; true))
+      | k when k = GdkKeysyms._Escape ->
+        goals_view#misc#grab_focus ();
+        true
       | _ -> false
       )
 
@@ -1253,9 +1256,15 @@ let interp cmd =
   clear_command_entry ()
 
 let (_ : GtkSignal.id) =
-  command_entry#connect#activate
-    ~callback:(fun () -> add_command list_commands command_entry#text;
-      interp command_entry#text)
+  let callback () =
+    let cmd = command_entry#text in
+    if cmd = "" then
+      goals_view#misc#grab_focus ()
+    else begin
+        add_command list_commands cmd;
+        interp cmd
+      end in
+  command_entry#connect#activate ~callback
 
 (* remove the helper text from the command entry the first time it gets the focus *)
 let () =
@@ -1855,10 +1864,22 @@ let unfocus_item =
 let () =
   connect_menu_item
     replay_menu_item
-    ~callback:(fun () -> send_request Replay_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "replay"))
+      | _   -> print_message ~kind:1 ~mark:"Replay error"
+            "Select only one node to perform the replay action");
   connect_menu_item
     clean_menu_item
-    ~callback:(fun _ -> send_request Clean_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "clean"))
+      | _   -> print_message ~kind:1 ~mark:"Clean error"
+            "Select only one node to perform the clean action");
   connect_menu_item
     remove_item
     ~callback:(fun () ->
@@ -1883,7 +1904,7 @@ let () =
                match get_selected_row_references () with
                | [r] ->
                    let id = get_node_id r#iter in
-                   send_request (Mark_obsolete_req id)
+                   send_request (Command_req (id, "mark"))
                | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
                         "Select only one node to perform the mark obsolete action");
   connect_menu_item
