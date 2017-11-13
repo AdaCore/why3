@@ -994,22 +994,26 @@ let print_message ~kind ~mark fmt =
 
 (**** Monitor *****)
 
-let fan n =
-  match n mod 4 with
-    | 0 -> "|"
-    | 1 | -3 -> "\\"
-    | 2 | -2 -> "-"
-    | 3 | -1 -> "/"
-    | _ -> assert false
+let fan =
+  let s = Bytes.of_string "\o342\o226\o201" in
+  let c = Char.code (Bytes.get s 2) in
+  let a = Array.init 7 (fun i ->
+    Bytes.set s 2 (Char.chr (c + i));
+    Bytes.to_string s) in
+  fun n ->
+  let n = n mod 13 in
+  let n = if n < 0 then n + 13 else n in
+  let n = if n >= 7 then 13 - n else n in
+  a.(n)
 
 let update_monitor =
   let c = ref 0 in
   fun t s r ->
   reset_gc ();
   incr c;
-  let f = if r=0 then "  " else fan (!c / 2) ^ " " in
-  monitor#set_text
-    (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
+  let f = if r = 0 then " " else fan !c in
+  let text = Printf.sprintf "%s %d/%d/%d" f t s r in
+  monitor#set_text text
 
 
 
