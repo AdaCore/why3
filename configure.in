@@ -526,9 +526,9 @@ if test "$enable_coq_support" = yes; then
    COQVERSION=`$COQC -v | sed -n -e 's|.*version* *\([[^ ]]*\) .*$|\1|p' `
 
    #Even if the name of the variable is CAMLP4 the value can be camlp5
-   CAMLP4BIN=`coqtop -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
-   CAMLP4=`coqtop -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
-   COQCAMLPLIB=`coqtop -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
+   CAMLP4BIN=`$COQC -config | sed -n -e 's/CAMLP4BIN=\(.*\)$/\1/p'`
+   CAMLP4=`$COQC -config | sed -n -e 's/CAMLP4=\(.*\)$/\1/p'`
+   COQCAMLPLIB=`$COQC -config | sed -n -e 's/CAMLP4LIB=\(.*\)$/\1/p'`
 
    case $COQVERSION in
       8.4*)
@@ -593,6 +593,15 @@ if test "$enable_coq_tactic" = yes; then
       enable_coq_tactic=no
       AC_MSG_WARN(Cannot find camlpXo.)
       reason_coq_tactic=" (camlpXo not found)"
+   fi
+fi
+
+if test "$enable_coq_tactic" = yes -a "$OCAMLBEST" = "byte"; then
+   AC_CHECK_PROG(COQTOPBYTE,coqtop.byte,coqtop.byte,no)
+   if test "$COQTOPBYTE" = no; then
+      enable_coq_tactic=no
+      AC_MSG_WARN(Cannot find coqtop.byte.)
+      reason_coq_tactic=" (byte compilation needed but coqtop.byte not found)"
    fi
 fi
 
