@@ -997,13 +997,13 @@ let print_message ~kind ~mark fmt =
 let fan =
   let s = Bytes.of_string "\o342\o226\o201" in
   let c = Char.code (Bytes.get s 2) in
-  let a = Array.init 7 (fun i ->
+  let a = Array.init 8 (fun i ->
     Bytes.set s 2 (Char.chr (c + i));
     Bytes.to_string s) in
   fun n ->
-  let n = n mod 13 in
-  let n = if n < 0 then n + 13 else n in
-  let n = if n >= 7 then 13 - n else n in
+  let n = n mod 14 in
+  let n = if n < 0 then n + 14 else n in
+  let n = if n >= 8 then 14 - n else n in
   a.(n)
 
 let update_monitor =
