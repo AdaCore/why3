@@ -546,29 +546,21 @@ theory FoldLeft
   use import Seq
   use import int.Int
 
+  (** [fold_left f a [b1; ...; bn]] is [f (... (f (f a b1) b2) ...) bn] *)
   let rec function fold_left (f: 'a -> 'b -> 'a) (acc: 'a) (s: seq 'b) : 'a
     variant { length s }
-  = if length s = 0 then acc
-    else fold_left f (f acc s[0]) s[1 ..]
+  = if length s = 0 then acc else fold_left f (f acc s[0]) s[1 ..]
 
   lemma fold_left_ext: forall f: 'b -> 'a -> 'b, acc: 'b, s1 s2: seq 'a.
     s1 == s2 -> fold_left f acc s1 = fold_left f acc s2
 
   lemma fold_left_cons: forall s: seq 'a, x: 'a, f: 'b -> 'a -> 'b, acc: 'b.
-    fold_left f (f acc x) s = fold_left f acc (cons x s)
+    fold_left f acc (cons x s) = fold_left f (f acc x) s
 
   let rec lemma fold_left_app (s1 s2: seq 'a) (f: 'b -> 'a -> 'b) (acc: 'b)
-    ensures { fold_left f acc (Seq.(++) s1 s2)
-            = fold_left f (fold_left f acc s1) s2 }
+    ensures { fold_left f acc (s1 ++ s2) = fold_left f (fold_left f acc s1) s2 }
     variant { Seq.length s1 }
   = if Seq.length s1 > 0 then fold_left_app s1[1 ..] s2 f (f acc (Seq.get s1 0))
-
-  use import list.List
-  use import OfList
-  use list.FoldLeft as List
-
-  lemma fold_left_equiv: forall l: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
-    List.fold_left f acc l = fold_left f acc (of_list l)
 
 end
 
@@ -577,6 +569,7 @@ theory FoldRight
   use import Seq
   use import int.Int
 
+  (** [fold_right f [a1; ...; an] b] is [f a1 (f a2 (... (f an b) ...))] *)
   let rec function fold_right (f: 'b -> 'a -> 'a) (s: seq 'b) (acc: 'a) : 'a
     variant { length s }
   = if length s = 0 then acc
@@ -586,14 +579,7 @@ theory FoldRight
     s1 == s2 -> fold_right f s1 acc = fold_right f s2 acc
 
   lemma fold_right_snoc: forall s: seq 'a, x: 'a, f: 'a -> 'b -> 'b, acc: 'b.
-    fold_right f s (f x acc) = fold_right f (snoc s x) acc
-
-  (* use import list.List *)
-  (* use import OfList *)
-  (* use list.FoldRight as List *)
-
-  (* lemma fold_right_equiv: forall l: list 'a, f: 'a -> 'b -> 'b, acc : 'b. *)
-  (*   List.fold_right f l acc = fold_right f (of_list l) acc *)
+    fold_right f (snoc s x) acc = fold_right f s (f x acc)
 
 end
 
