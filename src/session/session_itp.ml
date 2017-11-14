@@ -1440,7 +1440,10 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
-    let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
+    let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
+                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                                        (get_transfNode s transID).transf_args
+                                        old_tr.transf_args)
         goal.proofn_transformations in
     (* NOTE: should not happen *)
     Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
