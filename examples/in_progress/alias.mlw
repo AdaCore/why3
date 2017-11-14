@@ -68,17 +68,18 @@ module Refptr
     alias   { result.data with x.pcontents.data }
   (*ensures { result = !!x } *) (* let ... = !!x => illegal alias when used*)
 
+(*
   let (::=) (r: refp) (v: ptr int) : unit
     requires { valid v 0 }
     writes { r }
     ensures { !!r =  v }
   = let _ = if true then r.pcontents.data else v.data in
     r.pcontents <- incr v (Int32.of_int 0)
-
+*)
 
 end
 
-
+(*
 module A
 
   use import map.Map
@@ -116,4 +117,4 @@ module A
     let b = get !!s in
     assert { b = 33 };
 end
-
+*)

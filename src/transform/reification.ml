@@ -1,14 +1,8 @@
 open Term
 open Ty
 open Decl
-open Theory
 open Ident
-
-let meta_reify_target = Theory.register_meta_excl "reify_target" [Theory.MTlsymbol]
-    ~desc:"Declares@ the@ given@ interpretation@ function@ as@ the@ function@ to@ be@ inverted@ at@ reification."
-
-let meta_normalize_function = Theory.register_meta_excl "reify_normalize" [Theory.MTlsymbol]
-    ~desc:"Declares@ the@ given@ function@ as@ the@ normalization@ function@ for@ reified@ terms@."
+open Args_wrapper
 
 (* target: t = V int | ...
    interp: t -> (int -> 'a) -> 'a *)
@@ -26,45 +20,13 @@ exception Exit
 let debug = true
 
 
-let expl_reified_goal = Ident.create_label "expl:reified goal"
 let expl_reification_check = Ident.create_label "expl:reification check"
-let expl_normalized_goal = Ident.create_label "expl:normalized goal"
-let expl_normalization_check = Ident.create_label "expl:normalization check"
-
-let collect_reify_targets_t =
-  Trans.on_meta_excl meta_reify_target
-                     (function
-                      | None ->
-                         if debug then Format.printf "no reify target declared@.";
-                         raise Exit
-                      | Some [Theory.MAls i]
-                        -> Trans.return i
-                      | _ -> assert false)
-
-let collect_normalize_t interp =
-  Trans.on_meta_excl meta_normalize_function
-                     (function
-                      | None ->
-                         if debug then Format.printf "no normalize declared@.";
-                         raise Exit
-                      | Some [Theory.MAls n]
-                        -> Trans.return (interp, n)
-                      | _ -> assert false)
-
-let collect_interp_normalize =
-  Trans.bind collect_reify_targets_t collect_normalize_t
 
 
-let reify_goal interp task =
-  let kn = Task.task_known task in
-  let ty_vars, ty_val = match interp.ls_args, interp.ls_value with
-    | [ _ty_target; ty_vars ], Some ty_val
-         when ty_equal ty_vars (ty_func ty_int ty_val)
-      -> ty_vars, ty_val
-    | _ -> raise Exit in
-  let ly = create_fsymbol (Ident.id_fresh "y") [] ty_vars in
-  let y = t_app ly [] (Some ty_vars) in
-  let rec invert_pat vl (env, fr) (p,f) t =
+let reflection_by_lemma pr : Task.task Trans.tlist = Trans.store (fun task ->
+  let open Task in
+  let kn = task_known task in
+  let rec invert_pat vl (env, fr) interp (p,f) t =
     if debug
     then Format.printf "invert_pat p %a f %a t %a@."
                        Pretty.print_pat p Pretty.print_term f Pretty.print_term t;
@@ -73,9 +35,9 @@ let reify_goal interp task =
     | Papp (cs, [{pat_node = Pvar v1}]),
       Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}]),
       Tvar _
-    | Papp (cs, [{pat_node = Pvar v1}]),
-      Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}]),
-      Tapp(_, [])
+      | Papp (cs, [{pat_node = Pvar v1}]),
+        Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}]),
+        Tapp(_, [])
          when ty_equal v1.vs_ty ty_int
               && Svs.mem v1 p.pat_vars
               && vs_equal v1 v2
@@ -103,7 +65,7 @@ let reify_goal interp task =
        let env, fr, rl =
          fold_left3
            (fun (env, fr, acc) p f t ->
-             let env, fr, nt = invert_pat vl (env, fr) (p, f) t in
+             let env, fr, nt = invert_pat vl (env, fr) interp (p, f) t in
              if debug
              then Format.printf "param %a matched@." Pretty.print_term t;
              (env, fr, nt::acc))
@@ -114,17 +76,17 @@ let reify_goal interp task =
                                    (Pp.print_list Pp.comma Pretty.print_term)
                                    (List.rev rl)
        ;
-       let t = t_app cs (List.rev rl) cs.ls_value in
-       if debug then Format.printf "app ok@.";
-       env, fr, t
+         let t = t_app cs (List.rev rl) cs.ls_value in
+         if debug then Format.printf "app ok@.";
+         env, fr, t
     | Papp _, Tapp (ls1, _), Tapp(ls2, _) ->
        if debug then Format.printf "head symbol mismatch %a %a@."
                                    Pretty.print_ls ls1 Pretty.print_ls ls2;
        raise Exit
     | Por (p1, p2), _, _ ->
        if debug then Format.printf "case or@.";
-       begin try invert_pat vl (env, fr) (p1, f) t
-             with Exit -> invert_pat vl (env, fr) (p2, f) t
+       begin try invert_pat vl (env, fr) interp (p1, f) t
+             with Exit -> invert_pat vl (env, fr) interp (p2, f) t
        end
     | Pvar _, Tvar _, Tvar _ | Pvar _, Tvar _, Tapp (_, [])
       | Pvar _, Tvar _, Tconst _
@@ -153,146 +115,101 @@ let reify_goal interp task =
        let rec aux = function
          | [] -> raise Exit
          | tb::l ->
-            try invert_pat vl (env, fr) (t_open_branch tb) t
+            try invert_pat vl (env, fr) ls (t_open_branch tb) t
             with Exit -> if debug then Format.printf "match failed@."; aux l in
        aux bl
     | _ -> raise Exit
   in
-  let reify_term (env, fr) (t:term) =
+  let reify_term (env, fr, subst) (lv, vy) t rt =
     if debug then Format.printf "reify_term %a@." Pretty.print_term t;
-    match t.t_node with
-    | Tquant (Tforall, _) ->
-       raise Exit (* we introduce premises before the transformation *)
-    | _ when oty_equal t.t_ty interp.ls_value ->
+    match t.t_node, rt.t_node with
+    | _, Tapp(interp, [{t_node = Tvar vx}; {t_node = Tvar vy'} ])
+         when oty_equal t.t_ty interp.ls_value && Svs.mem vx lv && vs_equal vy vy' ->
        if debug then Format.printf "case interp@.";
        let env, fr, x = invert_interp (env, fr) interp t in
-       env, fr, t_app interp [x; y] (Some ty_val)
+       env, fr, Mvs.add vx x subst (*t_app interp [x; y] (Some ty_val)*)
     | _ ->
-       if debug then
-         Format.printf "wrong type: t.ty %a interp.ls_value %a@."
-                       Pretty.print_ty (Opt.get t.t_ty)
-                       Pretty.print_ty (Opt.get interp.ls_value);
+       (*if debug then
+       Format.printf "wrong type: t.ty %a interp.ls_value %a@."
+                     Pretty.print_ty (Opt.get t.t_ty)
+                     Pretty.print_ty (Opt.get interp.ls_value);*)
        raise Exit
   in
-  let open Task in
-  match task with
-  | Some
-    { task_decl =
-        { td_node = Decl { d_node = Dprop (Pgoal, _, f) } };
-      task_prev = prev;
-    } ->
-     begin try
-       if debug then Format.printf "start@.";
-       begin match f.t_node with
-       | Tapp(ls, [f1; f2]) when ls_equal ls ps_equ ->
-          if debug then Format.printf "case =@.";
-          let (env, fr, t1) = reify_term (Mterm.empty, 0) f1 in
-          let (env, _fr, t2) = reify_term (env, fr) f2 in
-          let t = t_equ t1 t2 in
-          if debug then Format.printf "building y map@.";
-          let d = create_param_decl ly in
-          let prev = Task.add_decl prev d in
-          let prev = Mterm.fold
-                      (fun t i prev ->
-                        let et = t_equ
-                                   (t_app fs_func_app [y; t_nat_const i]
-                                          (Some ty_val))
-                                   t in
-                        if debug then Format.printf "eq_term ok@.";
-                        let pr = Decl.create_prsymbol (Ident.id_fresh "y_val") in
-                        let d = Decl.create_prop_decl Paxiom pr et in
-                        Task.add_decl prev d)
-                      env prev in
-          if debug then Format.printf "building goal@.";
-          let pr = Decl.create_prsymbol
-                     (id_fresh "reified_goal"
-                               ~label:(Slab.singleton expl_reified_goal)) in
-          let d = Decl.create_prop_decl Pgoal pr t in
-          let task_r = Task.add_decl prev d in
-          let tc1 = t_app ps_equ [t1; f1] f.t_ty in
-          let tc2 = t_app ps_equ [t2; f2] f.t_ty in
-          let prc1 = Decl.create_prsymbol
-                       (id_fresh "reify_check"
-                                 ~label:(Slab.singleton
-                                           expl_reification_check)) in
-          let prc2 = Decl.create_prsymbol
-                       (id_fresh "reify_check"
-                                 ~label:(Slab.singleton
-                                           expl_reification_check)) in
-          let d1 = Decl.create_prop_decl Pgoal prc1 tc1 in
-          let d2 = Decl.create_prop_decl Pgoal prc2 tc2 in
-          let task_c1 = Task.add_decl prev d1 in
-          let task_c2 = Task.add_decl prev d2 in
-          [task_r; task_c1; task_c2]
-       | _ -> raise Exit
-       end
-       with Exit -> [task] end
-  | _ -> assert false
-
-
-let reify_goal_t interp = Trans.store (reify_goal interp)
-
-let reify_in_goal = (Trans.compose Introduction.introduce_premises
-                          (Trans.bind collect_reify_targets_t reify_goal_t))
-
-let normalize_goal (interp, norm) task =
-  let normalize_term t =
-    if debug then Format.printf "normalize_term %a@." Pretty.print_term t;
-    match t.t_node with
-    | Tapp (i, [x;_y]) when ls_equal interp i ->
-       if debug then Format.printf "case interp@.";
-       t_app norm [x] norm.ls_value
+  let g, prev = Task.task_separate_goal task in
+  let g = Apply.term_decl g in
+  try
+    if debug then Format.printf "start@.";
+    let d = Apply.find_hypothesis pr.pr_name prev in
+    if d = None then raise Exit;
+    let d = Opt.get d in
+    let l = Apply.term_decl d in
+    let (lp, lv, rt) = Apply.intros l in
+    begin match (rt.t_node, g.t_node) with
+    | (Tapp(eq, [({t_node = Tapp(interp, [{t_node = Tvar x1};
+                                          {t_node = Tvar vy}])} as rt1);
+                 ({t_node = Tapp(interp', [{t_node = Tvar x2};
+                                           {t_node = Tvar vy'}])} as rt2)]),
+       Tapp(eq', [t1; t2]))
+         when ls_equal eq ps_equ && ls_equal eq' ps_equ
+              && ls_equal interp interp' && vs_equal vy vy' && Svs.mem x1 lv
+              && Svs.mem x2 lv && Svs.mem vy lv->
+       if debug then Format.printf "matched lemma conclusion@.";
+       let ty_vars, ty_val = match interp.ls_args, interp.ls_value with
+         | [ _ty_target; ty_vars ], Some ty_val
+              when ty_equal ty_vars (ty_func ty_int ty_val)
+           -> ty_vars, ty_val
+         | _ -> raise Exit in
+       let ly = create_fsymbol (Ident.id_fresh "y") [] ty_vars in
+       let y = t_app ly [] (Some ty_vars) in
+       let subst = Mvs.empty in
+        let subst = Mvs.add vy y subst in
+       let (env, fr, subst) =
+         reify_term (Mterm.empty, 0, subst) (lv, vy) t1 rt1 in
+       let (env, _fr, subst) =
+         reify_term (env, fr, subst) (lv, vy) t2 rt2 in
+       let inst_rt = t_subst subst rt in
+       let inst_lp = List.map (t_subst subst) lp in
+       if debug then Format.printf "building y map@.";
+       if not (Svs.for_all (fun v -> Mvs.mem v subst) lv)
+       then (if debug
+             then Format.printf "some vars not matched, todo use context";
+             raise Exit);
+       let d = create_param_decl ly in
+       let prev = Task.add_decl prev d in
+       let prev = Mterm.fold
+                    (fun t i prev ->
+                      let et = t_equ
+                                 (t_app fs_func_app [y; t_nat_const i]
+                                        (Some ty_val))
+                                 t in
+                      if debug then Format.printf "eq_term ok@.";
+                      let pr = create_prsymbol (Ident.id_fresh "y_val") in
+                      let d = create_prop_decl Paxiom pr et in
+                      Task.add_decl prev d)
+                    env prev in
+       if debug then Format.printf "building goals@.";
+       let d_r = create_prop_decl Paxiom
+                                  (create_prsymbol (id_fresh "HR")) inst_rt in
+       let pr = create_prsymbol
+                  (id_fresh "GR"
+                            ~label:(Slab.singleton expl_reification_check)) in
+       let d = create_prop_decl Pgoal pr g in
+       let task_r = Task.add_decl (Task.add_decl prev d_r) d in
+       let ci = t_and (t_equ (t_subst subst rt1) t1)
+                      (t_equ (t_subst subst rt2) t2) in
+       let ltask_r = Trans.apply (Cut.cut ci (Some "interp")) task_r in
+       let lt = List.map (fun ng -> Task.add_decl prev (create_prop_decl Pgoal
+                             (create_prsymbol (id_fresh "G")) ng)) inst_lp in
+       ltask_r@lt
     | _ -> raise Exit
-  in
-  let open Task in
-  match task with
-  | Some { task_decl =
-             { td_node = Decl { d_node = Dprop (Pgoal, _, t) } };
-      task_prev = prev;
-         } ->
-     begin match t.t_node with
-     | Tapp(ls, [t1; t2]) when ls_equal ls ps_equ ->
-        begin try
-        let t1 = normalize_term t1 in
-        let t2 = normalize_term t2 in
-        if debug then Format.printf "normalized terms@.";
-        let tn = t_app ps_equ [t1; t2] t.t_ty in
-        let prng = Decl.create_prsymbol
-                     (id_fresh "norm"
-                               ~label:(Slab.singleton expl_normalized_goal)) in
-        let dng = Decl.create_prop_decl Pgoal prng tn in
-        let task_n = Task.add_decl prev dng in
-        let prn = Decl.create_prsymbol (id_fresh "norm_eq") in
-        let dna = Decl.create_prop_decl Paxiom prn tn in
-        let prev = Task.add_decl prev dna in
-        let prc = Decl.create_prsymbol
-                    (Ident.id_fresh "check"
-                       ~label:(Slab.singleton expl_normalization_check)) in
-        let d = Decl.create_prop_decl Pgoal prc t in
-        let task = Task.add_decl prev d in
-        [task_n; task]
-          with Exit ->
-               if debug
-               then Format.printf "could not normalize term %a@."
-                                  Pretty.print_term t;
-               [task]
-        end
-     | _ -> [task]
-     end
-  | _ -> assert false
+    end
+  with Exit -> [task])
 
-let normalize_goal_t (interp, norm) = Trans.store (normalize_goal (interp, norm))
+let () = wrap_and_register
+           ~desc:"reflection_l <prop> attempts to prove the goal by reflection using the lemma prop"
+           "reflection_l"
+           (Tprsymbol Ttrans_l) reflection_by_lemma
 
-let normalize_in_goal = Trans.bind collect_interp_normalize normalize_goal_t
-
-let () = Trans.register_transform_l
-           "reify_in_goal"
-           ~desc:"Reify@ goal@ to@ declared@ target@ datatype."
-           reify_in_goal
-
-let () = Trans.register_transform_l "normalize_in_goal"
-           ~desc:"Prove@ goal@ using@ declared@ normalization@ function."
-           normalize_in_goal
 (*
 Local Variables:
 compile-command: "unset LANG; make -C ../.."
