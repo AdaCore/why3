@@ -733,7 +733,11 @@ module Translate = struct
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        let e = expr info Stv.empty e in
+        let svar =
+          let args' = List.map (fun (_, ty, _) -> ty) args in
+          let svar  = List.fold_left add_tvar Stv.empty args' in
+          add_tvar svar res in
+        let e = expr info svar e in
         let e = fun_expr_of_mask cty.cty_mask e in
         [Mltree.Dlet (Mltree.Lsym (rs, res, args, e))]
     | PDlet (LDrec rl) ->
