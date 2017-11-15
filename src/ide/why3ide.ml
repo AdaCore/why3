@@ -1881,46 +1881,49 @@ let unfocus_item =
     "Unfocus"
 
 let () =
-  let only_one ~mark ~action f () =
+  let on_selected_rows ~multiple ~mark ~action f () =
     match get_selected_row_references () with
-    | [r] ->
-      let id = get_node_id r#iter in
-      send_request (f id)
-    | _ ->
+    | [] ->
       print_message ~kind:1 ~mark
-        "Select one and only one node to perform the '%s' action" action
-    in
+                    "Select at least one node to perform the '%s' action" action
+    | [_] when not multiple ->
+       print_message ~kind:1 ~mark
+        "Select at most one node to perform the '%s' action" action
+    | l ->
+      List.iter (fun r -> send_request (f (get_node_id r#iter))) l
+  in
   connect_menu_item
     replay_menu_item
-    ~callback:(only_one ~mark:"Replay error" ~action:"replay"
-                        (fun id -> Command_req (id, "replay")));
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Replay error" ~action:"replay"
+                                (fun id -> Command_req (id, "replay")));
   connect_menu_item
     clean_menu_item
-    ~callback:(only_one ~mark:"Clean error" ~action:"clean"
-                        (fun id -> Command_req (id, "clean")));
-  connect_menu_item
-    remove_item
-    ~callback:(only_one ~mark:"Remove_subtree error" ~action:"remove"
-                        (fun id -> Remove_subtree id));
-  connect_menu_item
-    edit_menu_item
-    ~callback:(only_one ~mark:"Edit error" ~action:"edit"
-                        (fun id -> Command_req (id, "edit")));
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Clean error" ~action:"clean"
+                                (fun id -> Command_req (id, "clean")));
   connect_menu_item
     mark_obsolete_item
-    ~callback:(only_one ~mark:"Mark_obsolete error" ~action:"mark obsolete"
-                        (fun id -> Command_req (id, "mark")));
+    ~callback:(on_selected_rows ~multiple:true ~mark:"Mark_obsolete error" ~action:"mark obsolete"
+                                (fun id -> Command_req (id, "mark")));
+  connect_menu_item
+    edit_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Edit error" ~action:"edit"
+                                (fun id -> Command_req (id, "edit")));
   connect_menu_item
     bisect_item
-    ~callback:(only_one ~mark:"Bisect error" ~action:"bisect"
-                        (fun id -> Command_req (id, "bisect")));
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Bisect error" ~action:"bisect"
+                                (fun id -> Command_req (id, "bisect")));
   connect_menu_item
     focus_item
-    ~callback:(only_one ~mark:"Focus_req error" ~action:"focus"
-                        (fun id -> Focus_req id));
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Focus_req error" ~action:"focus"
+                                (fun id -> Focus_req id));
+  connect_menu_item
+    remove_item
+    ~callback:(on_selected_rows ~multiple:true ~mark:"Remove_subtree error" ~action:"remove"
+                                (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
     ~callback:(fun () -> send_request Unfocus_req)
+
 
 
 (* the command-line *)
