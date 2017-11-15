@@ -678,7 +678,7 @@ let schedule_transformation c id name args ~callback ~notification =
       | Exit ->
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, Noprogress))
-      | e (* when not (Debug.test_flag Debug.stack_trace) *) ->
+      | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
         callback (TSfailed (id, e))

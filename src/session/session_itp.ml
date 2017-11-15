@@ -1421,13 +1421,16 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
       else
         raw_task, new_task_list
     with
+    (* if apply_transform fails for any reason, we try to apply
+       the same transformation on the "introduced" task instead *)
     | Generic_arg_trans_utils.Arg_trans _
+    | Trans.TransFailure _
     | NoProgress as e ->
-       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised exception %a@."
+       Debug.dprintf debug "[apply_trans_to_goal] info: apply_transform raised exception %a@."
                      Exn_printer.exn_printer e;
        task, Trans.apply_transform_args name env args table task
     | e ->
-       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised %a@."
+       Debug.dprintf debug "[apply_trans_to_goal] warning: apply_transform raised unexpected %a@."
                      Exn_printer.exn_printer e;
        task, Trans.apply_transform_args name env args table task
   in
@@ -1503,7 +1506,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   (*let detached = List.map (fun (a,_) -> a) detached in
   new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
    *))
-  with _ ->
+  with _ when not (Debug.test_flag debug_stack_trace) ->
     Debug.dprintf debug
       "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;
     (* TODO should create a detached transformation *)

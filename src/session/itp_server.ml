@@ -646,7 +646,7 @@ end
       let s = Format.asprintf "%a at %a@."
           Exn_printer.exn_printer e Loc.report_position loc in
       Some (loc, s)
-    | e ->
+    | e when not (Debug.test_flag Debug.stack_trace) ->
       let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
       Some (Loc.dummy_position, s)
 
