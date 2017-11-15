@@ -29,9 +29,15 @@ let case t name =
   in
   let h = Decl.create_prsymbol (gen_ident name) in
   let hnot = Decl.create_prsymbol (gen_ident name) in
+  let lab_true = create_label "expl:true case" in
+  let lab_false = create_label "expl:false case" in
   let t_not_decl = Decl.create_prop_decl Decl.Paxiom hnot (Term.t_not t) in
   let t_decl = Decl.create_prop_decl Decl.Paxiom h t in
-  Trans.par [Trans.add_decls [t_decl]; Trans.add_decls [t_not_decl]]
+  let left_trans = Trans.compose (add_goal_label_trans lab_true)
+      (Trans.add_decls [t_decl]) in
+  let right_trans = Trans.compose (add_goal_label_trans lab_false)
+      (Trans.add_decls [t_not_decl]) in
+  Trans.par [left_trans; right_trans]
 
 let or_intro (left: bool) : Task.task Trans.trans =
   Trans.decl (fun d ->
