@@ -1,0 +1,30 @@
+
+module Issue16
+
+predicate p int
+predicate q int
+function f int : int
+
+goal g2: forall x. p x -> forall y:int. x = 42 -> q x
+
+goal g1: forall x. p x -> forall y. x = f y -> q x
+
+
+constant x : int
+
+axiom h1 : p x
+
+constant y:int
+
+axiom h2: x = f y
+
+goal g: q x
+
+use import int.Int
+
+goal g3: forall x:int.
+  forall z. z = x+1 ->
+  forall y. y = z -> 
+  x = f y -> y = f y + 1
+
+end
