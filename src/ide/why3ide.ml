@@ -517,6 +517,10 @@ let () =
         (Whyconf.get_provers gconfig.config);
      *)
      *)
+    Hstr.iter
+      (fun _ (_,source_view,_,_) ->
+       source_view#set_editable gconfig.allow_source_editing)
+      source_view_table;
     send_session_config_to_server ()
   in
   connect_menu_item menu_preferences ~callback
@@ -815,7 +819,7 @@ let create_source_view =
             ~show_line_numbers:true
             ~right_margin_position:80 ~show_right_margin:true
             (* ~smart_home_end:true *)
-            ~editable:true
+            ~editable:gconfig.allow_source_editing
             ~packing:scrolled_source_view#add
             () in
         let has_changed = ref false in
@@ -979,7 +983,11 @@ let print_message ~kind ~mark fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
               add_to_log mark s;
-              if kind>0 then message_zone#buffer#set_text s)
+              if kind>0 then
+                begin
+                  message_zone#buffer#set_text s;
+                  messages_notebook#goto_page error_page
+                end)
     str_formatter
     fmt
 
@@ -1053,6 +1061,9 @@ let _ =
           | None -> true
           | Some s ->
               (command_entry#set_text s; true))
+      | k when k = GdkKeysyms._Escape ->
+        goals_view#misc#grab_focus ();
+        true
       | _ -> false
       )
 
@@ -1250,12 +1261,21 @@ let interp cmd =
       | _ -> List.map (fun n -> get_node_id n#iter) rows
   in
   List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
-  clear_command_entry ()
+  clear_command_entry ();
+  (* clear previous error message if any *)
+  message_zone#buffer#set_text ""
+
 
 let (_ : GtkSignal.id) =
-  command_entry#connect#activate
-    ~callback:(fun () -> add_command list_commands command_entry#text;
-      interp command_entry#text)
+  let callback () =
+    let cmd = command_entry#text in
+    if cmd = "" then
+      goals_view#misc#grab_focus ()
+    else begin
+        add_command list_commands cmd;
+        interp cmd
+      end in
+  command_entry#connect#activate ~callback
 
 (* remove the helper text from the command entry the first time it gets the focus *)
 let () =
@@ -1844,6 +1864,10 @@ let () =
   mark_obsolete_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._o
 
 
+let bisect_item =
+  create_menu_item tools_factory "Bisect on external proof"
+                   "Search for a maximal set of hypotheses to remove before calling a prover"
+
 let focus_item =
   create_menu_item tools_factory "Focus"
     "Focus on proof node"
@@ -1855,10 +1879,22 @@ let unfocus_item =
 let () =
   connect_menu_item
     replay_menu_item
-    ~callback:(fun () -> send_request Replay_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "replay"))
+      | _   -> print_message ~kind:1 ~mark:"Replay error"
+            "Select only one node to perform the replay action");
   connect_menu_item
     clean_menu_item
-    ~callback:(fun _ -> send_request Clean_req);
+    ~callback:(fun () ->
+      match get_selected_row_references () with
+      | [r] ->
+          let id = get_node_id r#iter in
+          send_request (Command_req (id, "clean"))
+      | _   -> print_message ~kind:1 ~mark:"Clean error"
+            "Select only one node to perform the clean action");
   connect_menu_item
     remove_item
     ~callback:(fun () ->
@@ -1883,9 +1919,18 @@ let () =
                match get_selected_row_references () with
                | [r] ->
                    let id = get_node_id r#iter in
-                   send_request (Mark_obsolete_req id)
+                   send_request (Command_req (id, "mark"))
                | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
                         "Select only one node to perform the mark obsolete action");
+  connect_menu_item
+    bisect_item
+    ~callback:(fun () ->
+               match get_selected_row_references () with
+               | [r] ->
+                   let id = get_node_id r#iter in
+                   send_request (Command_req (id, "bisect"))
+               | _ -> print_message ~kind:1 ~mark:"Bisect error"
+                        "Select exactly one node to perform the bisect action");
   connect_menu_item
     focus_item
     ~callback:(fun () ->

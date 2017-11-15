@@ -46,6 +46,7 @@ type t =
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
+      mutable allow_source_editing : bool;
       mutable saving_policy : int;
       (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
@@ -82,6 +83,7 @@ type ide = {
   ide_show_locs : bool;
   ide_show_time_limit : bool;
   ide_max_boxes : int;
+  ide_allow_source_editing : bool;
   ide_saving_policy : int;
   ide_premise_color : string;
   ide_neg_premise_color : string;
@@ -109,6 +111,7 @@ let default_ide =
     ide_show_locs = false;
     ide_show_time_limit = false;
     ide_max_boxes = 16;
+    ide_allow_source_editing = true;
     ide_saving_policy = 2;
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
@@ -155,6 +158,8 @@ let load_ide section =
     ide_max_boxes =
       get_int section ~default:default_ide.ide_max_boxes
         "max_boxes";
+    ide_allow_source_editing =
+      get_bool section ~default:default_ide.ide_allow_source_editing "allow_source_editing";
     ide_saving_policy =
       get_int section ~default:default_ide.ide_saving_policy "saving_policy";
     ide_premise_color =
@@ -220,6 +225,7 @@ let load_config config original_config =
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
     max_boxes = ide.ide_max_boxes;
+    allow_source_editing = ide.ide_allow_source_editing ;
     saving_policy = ide.ide_saving_policy ;
     premise_color = ide.ide_premise_color;
     neg_premise_color = ide.ide_neg_premise_color;
@@ -270,6 +276,7 @@ let save_config t =
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
   let ide = set_int ide "max_boxes" t.max_boxes in
+  let ide = set_bool ide "allow_source_editing" t.allow_source_editing in
   let ide = set_int ide "saving_policy" t.saving_policy in
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
@@ -724,6 +731,15 @@ let general_settings (c : t) (notebook:GPack.notebook) =
   let (_: GtkSignal.id) =
     cntexample_check#connect#toggled ~callback:
       (fun () -> c.session_cntexample <- not c.session_cntexample)
+  in
+  (* source editing allowed *)
+  let source_editing_check = GButton.check_button ~label:"allow editing source files"
+    ~packing:vb#add ()
+    ~active:c.allow_source_editing
+  in
+  let (_: GtkSignal.id) =
+    source_editing_check#connect#toggled ~callback:
+      (fun () -> c.allow_source_editing <- not c.allow_source_editing)
   in
   (* session saving policy *)
   let set_saving_policy n () = c.saving_policy <- n in

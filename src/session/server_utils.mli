@@ -43,7 +43,8 @@ type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
   | Qtask of (Controller_itp.controller -> Trans.naming_table -> string list -> string)
 
-
+(* The first argument is not used: these functions are supposed to be given to a
+   Qtask. *)
 val print_id: 'a -> Trans.naming_table -> string list -> string
 val search_id: 'a -> Trans.naming_table -> string list -> string
 
@@ -65,6 +66,9 @@ type command =
   | Strategies   of string
   | Edit         of Whyconf.config_prover
   | Bisect
+  | Replay       of bool
+  | Clean
+  | Mark_Obsolete
   | Help_message of string
   | Query        of string
   | QError       of string
