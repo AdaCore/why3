@@ -1886,7 +1886,7 @@ let () =
     | [] ->
       print_message ~kind:1 ~mark
                     "Select at least one node to perform the '%s' action" action
-    | [_] when not multiple ->
+    | _ :: _ :: _ when not multiple ->
        print_message ~kind:1 ~mark
         "Select at most one node to perform the '%s' action" action
     | l ->
