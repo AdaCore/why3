@@ -77,7 +77,7 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
   | _ when diff < 0 ->
       Debug.dprintf debug_matching "Too many withed terms@.";
       raise (Arg_trans (trans_name ^ ": the last " ^
-                        string_of_int diff
+                        string_of_int (-diff)
                         ^ " terms in with are useless"))
   | _ when diff > 0 ->
       Debug.dprintf debug_matching "Not enough withed terms@.";
@@ -563,29 +563,10 @@ let () = wrap_and_register
     (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l)))) replace
 
 let _ = wrap_and_register
-    ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" "rewrite"
-    (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) (rewrite None)
-
-let _ = wrap_and_register
-    ~desc:"rewrite_with [<-] <name> [in] <name2> with <list term> rewrites equality defined in name into name2 using exactly all terms of the list as instance for what cannot be deduced directly" "rewrite_with"
+    ~desc:"rewrite [<-] <name> [in] <name2> [with] <list term> rewrites equality defined in name into name2 using exactly all terms of the list as instance for what cannot be deduced directly" "rewrite"
     (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol (Topt ("with", Ttermlist Ttrans_l))))))) (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
 
-
-  (* register_transform_with_args_l *)
-  (*   ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" *)
-  (*   "rewrite" *)
-  (*   (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite) *)
-
 let () = wrap_and_register
-    ~desc:"apply <prop> applies prop to the goal" "apply"
-    (Tprsymbol Ttrans_l) (fun x -> apply x None)
-
-let () = wrap_and_register
-    ~desc:"apply_with <prop> <list term> applies prop to the goal and \
-uses the list of terms to instantiate the variables that are not found." "apply_with"
-(* TODO ideally apply and apply_with should be the same tactic but with an
-   (Toptbool "with") inside it. This cannot currently be done because the change
-   would probably makes proof using apply detached. And detached are not handled
-   yet.
-*)
-    (Tprsymbol (Ttermlist Ttrans_l)) (fun x y -> apply x (Some y))
+    ~desc:"apply <prop> [with] <list term> applies prop to the goal and \
+uses the list of terms to instantiate the variables that are not found." "apply"
+    (Tprsymbol (Topt ("with", Ttermlist Ttrans_l))) (fun x y -> apply x y)
