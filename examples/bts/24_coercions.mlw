@@ -1,0 +1,20 @@
+
+
+module Issue24
+
+  use import int.Int
+  
+  type byte = < range 0 255 >
+  
+  meta coercion function byte'int
+
+  (* (42:byte) is coerced to (byte'int (42:byte)) *)
+  goal g : (42:byte) = 2 * 21
+  (* we should be able to do:
+    
+      replace 2 (3:byte)
+    
+    that is (3:byte) should be coerced to (byte'int (3:byte))
+    
+  *)
+end
