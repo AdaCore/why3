@@ -994,22 +994,26 @@ let print_message ~kind ~mark fmt =
 
 (**** Monitor *****)
 
-let fan n =
-  match n mod 4 with
-    | 0 -> "|"
-    | 1 | -3 -> "\\"
-    | 2 | -2 -> "-"
-    | 3 | -1 -> "/"
-    | _ -> assert false
+let fan =
+  let s = Bytes.of_string "\o342\o226\o201" in
+  let c = Char.code (Bytes.get s 2) in
+  let a = Array.init 8 (fun i ->
+    Bytes.set s 2 (Char.chr (c + i));
+    Bytes.to_string s) in
+  fun n ->
+  let n = n mod 14 in
+  let n = if n < 0 then n + 14 else n in
+  let n = if n >= 8 then 14 - n else n in
+  a.(n)
 
 let update_monitor =
   let c = ref 0 in
   fun t s r ->
   reset_gc ();
   incr c;
-  let f = if r=0 then "  " else fan (!c / 2) ^ " " in
-  monitor#set_text
-    (f ^ (string_of_int t) ^ "/" ^ (string_of_int s) ^ "/" ^ (string_of_int r))
+  let f = if r = 0 then " " else fan !c in
+  let text = Printf.sprintf "%s %d/%d/%d" f t s r in
+  monitor#set_text text
 
 
 
@@ -1877,72 +1881,49 @@ let unfocus_item =
     "Unfocus"
 
 let () =
+  let on_selected_rows ~multiple ~mark ~action f () =
+    match get_selected_row_references () with
+    | [] ->
+      print_message ~kind:1 ~mark
+                    "Select at least one node to perform the '%s' action" action
+    | _ :: _ :: _ when not multiple ->
+       print_message ~kind:1 ~mark
+        "Select at most one node to perform the '%s' action" action
+    | l ->
+      List.iter (fun r -> send_request (f (get_node_id r#iter))) l
+  in
   connect_menu_item
     replay_menu_item
-    ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] ->
-          let id = get_node_id r#iter in
-          send_request (Command_req (id, "replay"))
-      | _   -> print_message ~kind:1 ~mark:"Replay error"
-            "Select only one node to perform the replay action");
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Replay error" ~action:"replay"
+                                (fun id -> Command_req (id, "replay")));
   connect_menu_item
     clean_menu_item
-    ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] ->
-          let id = get_node_id r#iter in
-          send_request (Command_req (id, "clean"))
-      | _   -> print_message ~kind:1 ~mark:"Clean error"
-            "Select only one node to perform the clean action");
-  connect_menu_item
-    remove_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Remove_subtree id)
-               | _ -> print_message ~kind:1 ~mark:"Remove_subtree error"
-                        "Select only one node to perform the remove node action");
-  connect_menu_item
-    edit_menu_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Command_req (id,"edit"))
-               | _ -> print_message ~kind:1 ~mark:"Edit error"
-                        "Select only one node to perform the edit action");
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Clean error" ~action:"clean"
+                                (fun id -> Command_req (id, "clean")));
   connect_menu_item
     mark_obsolete_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Command_req (id, "mark"))
-               | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
-                        "Select only one node to perform the mark obsolete action");
+    ~callback:(on_selected_rows ~multiple:true ~mark:"Mark_obsolete error" ~action:"mark obsolete"
+                                (fun id -> Command_req (id, "mark")));
+  connect_menu_item
+    edit_menu_item
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Edit error" ~action:"edit"
+                                (fun id -> Command_req (id, "edit")));
   connect_menu_item
     bisect_item
-    ~callback:(fun () ->
-               match get_selected_row_references () with
-               | [r] ->
-                   let id = get_node_id r#iter in
-                   send_request (Command_req (id, "bisect"))
-               | _ -> print_message ~kind:1 ~mark:"Bisect error"
-                        "Select exactly one node to perform the bisect action");
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Bisect error" ~action:"bisect"
+                                (fun id -> Command_req (id, "bisect")));
   connect_menu_item
     focus_item
-    ~callback:(fun () ->
-      match get_selected_row_references () with
-      | [r] ->
-          let id = get_node_id r#iter in
-          send_request (Focus_req id)
-      | _ -> print_message ~kind:1 ~mark:"Focus_req error"
-                        "Select only one node to perform the focus action");
+    ~callback:(on_selected_rows ~multiple:false ~mark:"Focus_req error" ~action:"focus"
+                                (fun id -> Focus_req id));
+  connect_menu_item
+    remove_item
+    ~callback:(on_selected_rows ~multiple:true ~mark:"Remove_subtree error" ~action:"remove"
+                                (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
     ~callback:(fun () -> send_request Unfocus_req)
+
 
 
 (* the command-line *)

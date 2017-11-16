@@ -43,3 +43,6 @@ val get_local_task: Task.task -> Decl.decl list
 (* Returns same list of declarations but reorganized with constant/type
    definitions defined before axioms *)
 val sort: Task.task Trans.trans
+
+(* Add a label to a goal (useful to add an expl for example) *)
+val add_goal_label_trans: Ident.label -> Task.task Trans.trans

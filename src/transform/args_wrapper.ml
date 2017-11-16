@@ -310,6 +310,7 @@ let trans_typ_tail: type a b c. (a -> b, c) trans_typ -> (b, c) trans_typ =
     | Tstring t   -> t
     | Tformula t  -> t
     | Ttheory t   -> t
+    | Ttermlist t -> t
     | _           -> assert false
 
 type _ trans_typ_is_l = Yes : (task list) trans_typ_is_l | No : task trans_typ_is_l
@@ -485,6 +486,9 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
                 pr_list in
             let arg = Some pr_list in
             wrap_to_store t' (f arg) tail env tables task
+        | Ttermlist t' ->
+            let term_list = parse_and_type_list ~as_fmla:false s' tables in
+            wrap_to_store t' (f (Some term_list)) tail env tables task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
        end
     | Topt (_, t'), _ ->

@@ -88,6 +88,11 @@ let print_term s id fmt t =
 let print_type s id fmt t =
   let module P = (val (p s id)) in P.print_ty fmt t
 
+let print_opt_type s id fmt t =
+  match t with
+  | None -> Format.fprintf fmt "bool"
+  | Some t -> print_type s id fmt t
+
 let print_ts s id fmt t =
   let module P = (val (p s id)) in P.print_ts fmt t
 
@@ -215,13 +220,15 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
-      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a \n %a" s
-        (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
+      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
+        (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
+        (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_pattern (s, pa1, pa2) ->
       Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
         s (print_pat ses id) pa1 (print_pat ses id) pa2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
-      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
+      Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
         s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
@@ -236,10 +243,10 @@ let get_exception_message ses id e =
   | Args_wrapper.Arg_parse_type_error (loc, arg, e) ->
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Args_wrapper.Unnecessary_arguments l ->
-      Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+      Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Unnecessary_terms l ->
-      Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+      Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline
            (fun fmt s -> Format.fprintf fmt "%a" (print_term ses id) s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
@@ -639,7 +646,7 @@ end
       let s = Format.asprintf "%a at %a@."
           Exn_printer.exn_printer e Loc.report_position loc in
       Some (loc, s)
-    | e ->
+    | e when not (Debug.test_flag Debug.stack_trace) ->
       let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
       Some (Loc.dummy_position, s)
 

@@ -147,3 +147,8 @@ let sort local_decls =
 *)
 let sort =
   Trans.bind get_local sort
+
+
+(* Add a label to a goal (useful to add an expl for example) *)
+let add_goal_label_trans label =
+  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_label_add label g)])

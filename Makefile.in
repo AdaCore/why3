@@ -929,8 +929,8 @@ $(COQPCMX): OFLAGS += -rectypes
 
 $(COQPDEP): $(COQPGENERATED)
 
-byte: src/coq-tactic/.why3-vo-byte
-opt:  src/coq-tactic/.why3-vo-opt
+byte: lib/coq-tactic/why3tac.cma
+opt:  lib/coq-tactic/why3tac.cmxs
 
 lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmxa, @ZIPLIB@)
 lib/coq-tactic/why3tac.cmxs: OFLAGS += $(addsuffix .cmx,  @MENHIRLIB@)
@@ -945,24 +945,20 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 	$(SHOW) 'Camlp    $<'
 	$(HIDE)$(COQCAMLP) pr_dump.cmo @COQPPLIBS@ pa_macro.cmo -D@coq_compat_version@ -impl $^ -o $@
 
-COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
+COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3 -I lib/coq-tactic
 
-ifeq (@coq_compat_version@,COQ86)
-COQRTAC += -I lib/coq-tactic
+ifeq "$(OCAMLBEST)" "opt"
+COQTACEXT = cmxs
+else
+COQTACEXT = cma
+COQRTAC += -byte
 endif
-ifeq (@coq_compat_version@,COQ87)
-COQRTAC += -I lib/coq-tactic
-endif
 
-src/coq-tactic/.why3-vo-byte: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cma
+lib/coq-tactic/Why3.vo: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.$(COQTACEXT)
 	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -byte $(COQRTAC) $< && \
-	    touch src/coq-tactic/.why3-vo-byte
+	$(HIDE)WHY3CONFIG="" $(COQC) $(COQRTAC) $<
 
-src/coq-tactic/.why3-vo-opt: lib/coq-tactic/Why3.v lib/coq/BuiltIn.vo lib/coq-tactic/why3tac.cmxs
-	$(SHOW) 'Coqc     $<'
-	$(HIDE)WHY3CONFIG="" $(COQC) -opt $(COQRTAC) $< && \
-	    touch src/coq-tactic/.why3-vo-opt
+all: lib/coq-tactic/Why3.vo
 
 # depend and clean targets
 
@@ -978,7 +974,6 @@ GENERATED += $(COQPGENERATED)
 
 clean::
 	rm -f lib/coq-tactic/*.vo lib/coq-tactic/*.glob
-	rm -f src/coq-tactic/.why3-vo-*
 
 install_no_local::
 	$(MKDIR_P) $(LIBDIR)/why3/coq-tactic
@@ -1804,11 +1799,8 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
-test-coq-tactic.byte: src/coq-tactic/.why3-vo-byte
-	$(COQC) -byte $(COQRTAC) bench/coq-tactic/test.v
-
-test-coq-tactic.opt: src/coq-tactic/.why3-vo-opt
-	$(COQC) -opt $(COQRTAC) bench/coq-tactic/test.v
+test-coq-tactic: lib/coq-tactic/Why3.vo
+	$(COQC) $(COQRTAC) bench/coq-tactic/test.v
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
