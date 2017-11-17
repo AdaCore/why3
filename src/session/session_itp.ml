@@ -1836,7 +1836,7 @@ let save_result fmt r =
               else
                 None
   in
-  fprintf fmt "<result@ status=\"%s\"@ time=\"%.2f\"%a/>"
+  fprintf fmt "<result@ status=\"%s\"%a/>"
     (match r.Call_provers.pr_answer with
        | Call_provers.Valid -> "valid"
        | Call_provers.Failure _ -> "failure"
@@ -1846,7 +1846,6 @@ let save_result fmt r =
        | Call_provers.OutOfMemory -> "outofmemory"
        | Call_provers.StepLimitExceeded -> "steplimitexceeded"
        | Call_provers.Invalid -> "invalid")
-    r.Call_provers.pr_time
     (opt pp_print_int "steps") steps
 
 let save_status fmt s =
