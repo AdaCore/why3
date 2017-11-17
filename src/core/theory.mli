@@ -196,6 +196,9 @@ val add_clone_internal : unit -> theory_uc -> theory -> symbol_map -> theory_uc
 
 (** {2 Meta} *)
 
+(* Adding registered meta for coercion *)
+val meta_coercion: meta
+
 val create_meta : meta -> meta_arg list -> tdecl
 
 val add_meta : theory_uc -> meta -> meta_arg list -> theory_uc

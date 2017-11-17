@@ -170,6 +170,7 @@ val named : string -> 'a trans -> 'a trans
 type naming_table = {
     namespace : namespace;
     known_map : known_map;
+    coercion : Coercion.t;
     printer : Ident.ident_printer;
     aprinter : Ident.ident_printer;
  }

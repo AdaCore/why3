@@ -143,6 +143,22 @@ let add (d: decl) (tables: naming_table): naming_table =
       let s = id_unique tables id in
       add_unsafe s (Pr pr) tables
 
+(* Takes the set of meta defined in the tasks and build the coercions from it.
+   TODO we could have a set of coercions in the task ? Same problem for naming
+   table ?
+*)
+let build_coercion_map km_meta =
+  try
+    let crc_set = Theory.Mmeta.find Theory.meta_coercion km_meta in
+    let crc_map = Stdecl.fold (fun elem crc_map ->
+      match elem.Theory.td_node with
+      | Meta (m,([MAls ls] as _al)) when meta_equal m Theory.meta_coercion ->
+        Coercion.add crc_map ls
+      | _ -> crc_map) crc_set.tds_set Coercion.empty in
+    crc_map
+  with
+  | Not_found -> Coercion.empty
+
 let build_naming_tables task : naming_table =
   (** FIXME: using sanitizer here breaks the printing of infix symbols
    because it replaces "infix +" by "infix_+", which forbids to
@@ -152,9 +168,11 @@ let build_naming_tables task : naming_table =
   let pr = create_ident_printer Pretty.why3_keywords ?sanitizer:isanitizer in
   let apr = create_ident_printer Pretty.why3_keywords ~sanitizer:lsanitize in
   let km = Task.task_known task in
+  let km_meta = Task.task_meta task in
   let tables = {
       namespace = empty_ns;
       known_map = km;
+      coercion = Coercion.empty;
       printer = pr;
       aprinter = apr;
   } in
@@ -165,7 +183,10 @@ let build_naming_tables task : naming_table =
     added by the user are renamed on the fly. *)
   (* TODO:imported theories should be added in the namespace too *)
   let l = Mid.fold (fun _id d acc -> d :: acc) km [] in
-  List.fold_left (fun tables d -> add d tables) tables l
+  let tables = List.fold_left (fun tables d -> add d tables) tables l in
+  let crc_map = build_coercion_map km_meta in
+  {tables with coercion = crc_map}
+
 
 (************* wrapper  *************)
 
@@ -217,10 +238,10 @@ let find_symbol q tables =
 let type_ptree ~as_fmla t tables =
   let km = tables.known_map in
   let ns = tables.namespace in
-  (* TODO: put coercion table in naming_tables *)
+  let crc = tables.coercion in
   if as_fmla
-  then Typing.type_fmla_in_namespace ns km Coercion.empty (fun _ _ -> None) t
-  else Typing.type_term_in_namespace ns km Coercion.empty (fun _ _ -> None) t
+  then Typing.type_fmla_in_namespace ns km crc (fun _ _ -> None) t
+  else Typing.type_term_in_namespace ns km crc (fun _ _ -> None) t
 
 exception Arg_parse_type_error of Loc.position * string * exn
 
