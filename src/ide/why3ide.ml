@@ -973,16 +973,33 @@ let message_zone_error_tag = message_zone#buffer#create_tag
 
 (**** Message-zone printing functions *****)
 
-let add_to_log mark s =
-  log_zone#buffer#insert ("\n--------["^ mark ^"]--------\n");
-  log_zone#buffer#insert s;
+let add_to_log =
+  let old = ref None in
+  fun notif_kind s ->
+  let (_,_,_,n) as x =
+    match !old with
+    | Some(line,oldnotif_kind,olds,oldn)
+         when notif_kind = oldnotif_kind && s = olds ->
+       let start = log_zone#buffer#get_iter (`LINE line) in
+       let stop = log_zone#buffer#end_iter in
+       log_zone#buffer#delete ~start ~stop;
+       (line,oldnotif_kind,olds,oldn+1)
+    | _ ->
+       let line = log_zone#buffer#line_count in
+       (line,notif_kind,s,1)
+  in
+  old := Some x;
+  log_zone#buffer#insert ("["^ notif_kind);
+  if n>1 then
+    log_zone#buffer#insert (" (repeated " ^ (string_of_int n) ^ " times)");
+  log_zone#buffer#insert ("] " ^ s ^ "\n");
   log_zone#scroll_to_mark `INSERT
 
 (* Function used to print stuff on the message_zone *)
-let print_message ~kind ~mark fmt =
+let print_message ~kind ~notif_kind fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
-              add_to_log mark s;
+              add_to_log notif_kind s;
               if kind>0 then
                 begin
                   message_zone#buffer#set_text s;
@@ -1110,9 +1127,10 @@ let color_loc ~color loc =
     let color = convert_color color in
     color_loc ~color v l b e
   with
-  | Nosourceview _ ->
+  | Nosourceview f ->
       (* If the file is not present do nothing *)
-      print_message ~kind:0 ~mark:"color_loc" "%s" "No source view yet"
+     print_message ~kind:0 ~notif_kind:"color_loc" "No source view for file %s" f;
+     Debug.dprintf debug "color_loc: no source view for file %s@." f
 
 (* Scroll to a specific locations *)
 let scroll_to_loc ~force_tab_switch loc_of_goal =
@@ -1128,7 +1146,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           notebook#goto_page n;
         end;
       move_to_line ~yalign:0.0 v l
-    with Nosourceview _ ->
+    with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
 (* Erase the colors and apply the colors given by l (which come from the task)
@@ -1464,17 +1482,17 @@ let (_ : GtkSignal.id) =
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
-     print_message ~kind:1 ~mark:"[Proof_error]" "%s" s
+     print_message ~kind:1 ~notif_kind:"Proof_error" "%s" s
   | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
-        print_message ~kind:1 ~mark:"Transformation Error"
+        print_message ~kind:1 ~notif_kind:"Transformation Error"
                       "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
       else
         begin
           let buf = message_zone#buffer in
           (* remove all coloration in message_zone *)
           buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
-          print_message ~kind:1 ~mark:"Transformation Error"
+          print_message ~kind:1 ~notif_kind:"Transformation Error"
                         "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
           let color = "error" in
@@ -1486,26 +1504,26 @@ let treat_message_notification msg = match msg with
             color
         end
   | Strat_error (_id, s) ->
-     print_message ~kind:1 ~mark:"Strat_error" "%s" s
+     print_message ~kind:1 ~notif_kind:"Strat_error" "%s" s
   | Replay_Info s ->
-     print_message ~kind:0 ~mark:"Replay_info" "%s" s
+     print_message ~kind:0 ~notif_kind:"Replay_info" "%s" s
   | Query_Info (_id, s) ->
-     print_message ~kind:1 ~mark:"Query_info" "%s" s
+     print_message ~kind:1 ~notif_kind:"Query_info" "%s" s
   | Query_Error (_id, s) ->
-     print_message ~kind:1 ~mark:"Query_error" "%s" s
+     print_message ~kind:1 ~notif_kind:"Query_error" "%s" s
   | Help s ->
-     print_message ~kind:1 ~mark:"Help" "%s" s
+     print_message ~kind:1 ~notif_kind:"Help" "%s" s
   | Information s ->
-     print_message ~kind:1 ~mark:"Information" "%s" s
+     print_message ~kind:1 ~notif_kind:"Information" "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
-     print_message ~kind:0 ~mark:"Open_File_Error" "%s" s
+     print_message ~kind:0 ~notif_kind:"Open_File_Error" "%s" s
   | Parse_Or_Type_Error (loc, s) ->
     begin
       (* TODO find a new color *)
       scroll_to_loc ~force_tab_switch:true (Some (loc,0));
       color_loc ~color:Goal_color loc;
-      print_message ~kind:1 ~mark:"Parse_Or_Type_Error" "%s" s
+      print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
     end
   | File_Saved f                 ->
     begin
@@ -1513,14 +1531,14 @@ let treat_message_notification msg = match msg with
         let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
         b := false;
         update_label_saved l;
-        print_message ~kind:1 ~mark:"File_Saved" "%s was saved" f
+        print_message ~kind:1 ~notif_kind:"File_Saved" "%s was saved" f
       with
       | Not_found                ->
-          print_message ~kind:1 ~mark:"File_Saved"
+          print_message ~kind:1 ~notif_kind:"File_Saved"
                         "Please report: %s was not found in IDE but was saved in session" f
     end
   | Error s                      ->
-     print_message ~kind:1 ~mark:"General request failure" "%s" s
+     print_message ~kind:1 ~notif_kind:"General request failure" "%s" s
 
 
 (***********************)
@@ -1881,44 +1899,44 @@ let unfocus_item =
     "Unfocus"
 
 let () =
-  let on_selected_rows ~multiple ~mark ~action f () =
+  let on_selected_rows ~multiple ~notif_kind ~action f () =
     match get_selected_row_references () with
     | [] ->
-      print_message ~kind:1 ~mark
+      print_message ~kind:1 ~notif_kind
                     "Select at least one node to perform the '%s' action" action
     | _ :: _ :: _ when not multiple ->
-       print_message ~kind:1 ~mark
+       print_message ~kind:1 ~notif_kind
         "Select at most one node to perform the '%s' action" action
     | l ->
       List.iter (fun r -> send_request (f (get_node_id r#iter))) l
   in
   connect_menu_item
     replay_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~mark:"Replay error" ~action:"replay"
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
                                 (fun id -> Command_req (id, "replay")));
   connect_menu_item
     clean_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~mark:"Clean error" ~action:"clean"
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Clean error" ~action:"clean"
                                 (fun id -> Command_req (id, "clean")));
   connect_menu_item
     mark_obsolete_item
-    ~callback:(on_selected_rows ~multiple:true ~mark:"Mark_obsolete error" ~action:"mark obsolete"
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Mark_obsolete error" ~action:"mark obsolete"
                                 (fun id -> Command_req (id, "mark")));
   connect_menu_item
     edit_menu_item
-    ~callback:(on_selected_rows ~multiple:false ~mark:"Edit error" ~action:"edit"
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Edit error" ~action:"edit"
                                 (fun id -> Command_req (id, "edit")));
   connect_menu_item
     bisect_item
-    ~callback:(on_selected_rows ~multiple:false ~mark:"Bisect error" ~action:"bisect"
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Bisect error" ~action:"bisect"
                                 (fun id -> Command_req (id, "bisect")));
   connect_menu_item
     focus_item
-    ~callback:(on_selected_rows ~multiple:false ~mark:"Focus_req error" ~action:"focus"
+    ~callback:(on_selected_rows ~multiple:false ~notif_kind:"Focus_req error" ~action:"focus"
                                 (fun id -> Focus_req id));
   connect_menu_item
     remove_item
-    ~callback:(on_selected_rows ~multiple:true ~mark:"Remove_subtree error" ~action:"remove"
+    ~callback:(on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
                                 (fun id -> Remove_subtree id));
   connect_menu_item
     unfocus_item
@@ -2030,7 +2048,7 @@ let treat_notification n =
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
-      print_message ~kind:1 ~mark:"Saved action info"
+      print_message ~kind:1 ~notif_kind:"Saved action info"
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
@@ -2056,7 +2074,7 @@ let treat_notification n =
       | Not_found -> create_source_view file_name content
     end
   | Dead _ ->
-     print_message ~kind:1 ~mark:"Server Dead ?"
+     print_message ~kind:1 ~notif_kind:"Server Dead ?"
                         "Server sent the notification '%a'. Please report."
         print_notify n
   end;
