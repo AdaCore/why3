@@ -1518,13 +1518,20 @@ let treat_message_notification msg = match msg with
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
      print_message ~kind:0 ~notif_kind:"Open_File_Error" "%s" s
-  | Parse_Or_Type_Error (loc, s) ->
-    begin
-      (* TODO find a new color *)
-      scroll_to_loc ~force_tab_switch:true (Some (loc,0));
-      color_loc ~color:Goal_color loc;
-      print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
-    end
+  | Parse_Or_Type_Error (loc, rel_loc, s) ->
+     if gconfig.allow_source_editing then
+       begin
+         (* TODO find a new color *)
+         scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
+         color_loc ~color:Goal_color rel_loc;
+         print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
+       end
+     else
+       begin
+         Format.eprintf "%a: %s@." Loc.gen_report_position loc s;
+         exit 1
+       end
+
   | File_Saved f                 ->
     begin
       try

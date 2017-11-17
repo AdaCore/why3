@@ -286,7 +286,7 @@ let print_msg fmt m =
   | Help _s                                      -> fprintf fmt "help"
   | Information s                                -> fprintf fmt "info %s" s
   | Task_Monitor _                               -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error (_, s)                   -> fprintf fmt "parse_or_type_error:\n %s" s
+  | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
   | File_Saved s                                 -> fprintf fmt "file saved %s" s
   | Error s                                      -> fprintf fmt "%s" s
   | Open_File_Error s                            -> fprintf fmt "%s" s
@@ -642,13 +642,12 @@ end
   let capture_parse_or_type_errors f cont =
     try let _ = f cont in None with
     | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      Some (loc, s)
+      let rel_loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+      Some (loc, rel_loc, s)
     | e when not (Debug.test_flag Debug.stack_trace) ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      Some (Loc.dummy_position, s)
+      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+      Some (Loc.dummy_position, Loc.dummy_position, s)
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
@@ -937,9 +936,9 @@ end
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
                read_and_send (file_name file)
-            | Some(loc,s) ->
+            | Some(loc,rel_loc,s) ->
                read_and_send fn;
-               P.notify (Message (Parse_Or_Type_Error(loc,s)))
+               P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -999,8 +998,8 @@ end
     get_focused_label := None;
     match x with
     | None -> ()
-    | Some(loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,s)))
+    | Some(loc,rel_loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1212,8 +1211,8 @@ end
     | None ->
         (* TODO: try to restore the previous focus : focused_node := old_focus; *)
        reset_and_send_the_whole_tree ()
-    | Some(loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,s)))
+    | Some(loc,rel_loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
