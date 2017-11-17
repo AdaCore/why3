@@ -127,6 +127,6 @@ val merge_known : known_map -> known_map -> known_map
 
 val find_its_defn : known_map -> itysymbol -> its_defn
 
-(** {2 Pretty-printing *)
+(** {2 Pretty-printing} *)
 
 val print_pdecl : Format.formatter -> pdecl -> unit
