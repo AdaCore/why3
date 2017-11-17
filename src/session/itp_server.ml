@@ -1149,7 +1149,7 @@ end
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     try
-      let (n,_,st) = Hstr.find d.cont.controller_strategies s in
+      let (n,_,_,st) = Hstr.find d.cont.controller_strategies s in
       Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
       let callback sts =
         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts

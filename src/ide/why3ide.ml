@@ -1773,8 +1773,8 @@ let add_submenu_strategy (shortcut,strategy) =
   Opt.iter (fun (_,key,modi) -> i#add_accelerator ~group:tools_accel_group ~modi key)
           (parse_shortcut_as_key shortcut);
   let callback () =
-    Debug.dprintf debug "interp command '%s'@." shortcut;
-    interp shortcut
+    Debug.dprintf debug "interp command '%s'@." strategy;
+    interp strategy
   in
   connect_menu_item i ~callback
 
@@ -1816,6 +1816,13 @@ let init_completion provers transformations strategies commands =
   in
   List.iter add_submenu_prover provers_sorted;
 
+  let all_strings =
+    List.fold_left (fun acc (shortcut,strategy) ->
+                    Debug.dprintf debug "string for completion: '%s' '%s'@." shortcut strategy;
+                    if shortcut = "" then strategy :: acc else shortcut :: strategy :: acc)
+                   [] strategies
+  in
+  List.iter add_completion_entry all_strings;
   List.iter add_submenu_strategy strategies;
 
   command_entry_completion#set_text_column completion_col;
