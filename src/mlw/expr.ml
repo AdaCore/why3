@@ -772,7 +772,7 @@ let c_app s vl ityl ity =
   mk_cexp (Capp (s,vl)) cty
 
 let c_pur s vl ityl ity =
-  if not (ity_pure ity) then Loc.errorm "This expression must have pure type";
+  if not ity.ity_pure then Loc.errorm "This expression must have pure type";
   let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
@@ -1241,9 +1241,7 @@ let ambig_cty c =
   let sarg = List.fold_right freeze_pv c.cty_args isb_empty in
   let sarg = Spv.fold freeze_pv c.cty_effect.eff_reads sarg in
   let sres = ity_freeze isb_empty c.cty_result in
-  not (Mtv.set_submap sres.isb_var sarg.isb_var) ||
-  not (Mtv.set_submap sres.isb_pur
-       (Mtv.set_union sarg.isb_var sarg.isb_pur))
+  not (Mtv.set_submap sres.isb_var sarg.isb_var)
 
 let ambig_ls s =
   let sarg = List.fold_left ty_freevars Stv.empty s.ls_args in

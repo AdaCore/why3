@@ -1149,7 +1149,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
           (id_clone ts1.ts_name) tvl (ity_of_pty muc pty) in
         let ty2 = ity_app ts2 (List.map ity_var ts1.ts_args) [] in
         let check v ty = match ty.ity_node with
-          | Ityvar (u, _) -> tv_equal u v | _ -> false in
+          | Ityvar u -> tv_equal u v | _ -> false in
         begin match ty2.ity_node with
         | Ityapp (ts2, tyl, _) | Ityreg { reg_its = ts2; reg_args = tyl }
           when Lists.equal check tvl tyl ->

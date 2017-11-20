@@ -60,8 +60,7 @@ let app_map fn s tl rl = Dapp (s, List.map fn tl, List.map fn rl)
 let dity_of_ity ity =
   let hr = Hreg.create 3 in
   let rec dity ity = match ity.ity_node with
-    | Ityvar (v,false) -> Dutv v
-    | Ityvar (v,true)  -> dity_pur (Dutv v)
+    | Ityvar v -> Dutv v
     | Ityapp (s,tl,rl) -> app_map dity s tl rl
     | Ityreg ({reg_its = s; reg_args = tl; reg_regs = rl} as r) ->
         try Hreg.find hr r with Not_found ->
@@ -78,13 +77,12 @@ let rec ity_of_dity = function
       let rec refresh ity = match ity.ity_node with
         | Ityreg {reg_its = s; reg_args = tl} | Ityapp (s,tl,_) ->
             ity_app s (List.map refresh tl) []
-        | Ityvar (v,_) -> ity_var v in
+        | Ityvar v -> ity_var v in
       let rec dity ity = match ity.ity_node with
         | Ityreg r ->
             Durg (app_map dity r.reg_its r.reg_args r.reg_regs, r)
         | Ityapp (s,tl,rl) -> app_map dity s tl rl
-        | Ityvar (v,true)  -> dity_pur (Dutv v)
-        | Ityvar (v,false) -> Dutv v in
+        | Ityvar v -> Dutv v in
       let t = refresh (ity_of_dity d) in
       r := Dval (dity t); t
   | Dvar ({contents = Dreg (Dapp (s,tl,rl) as d,_)} as r) ->
@@ -132,8 +130,7 @@ let dity_app_fresh s dl =
   let hr = Hreg.create 3 in
   let rec ity_inst ity = match ity.ity_node with
     | Ityreg r -> reg_inst r
-    | Ityvar (v, false) -> Mtv.find v mv
-    | Ityvar (v, true) -> dity_pur (Mtv.find v mv)
+    | Ityvar v -> Mtv.find v mv
     | Ityapp (s,tl,rl) -> app_map ity_inst s tl rl
   and reg_inst ({reg_its = s; reg_args = tl; reg_regs = rl} as r) =
     try Hreg.find hr r with Not_found ->
@@ -148,10 +145,10 @@ let rec dity_refresh = function
   | Dvar {contents = Dtvs _} -> dity_fresh ()
   | Dapp (s,dl,_) ->
       let d = dity_app_fresh s (List.map dity_refresh dl) in
-      if its_immutable s then d else dity_reg d
+      if s.its_mutable then dity_reg d else d
 
 let rec dity_unify_asym d1 d2 = match d1,d2 with
-  | Durg _, _ | Dutv _, _ -> raise Exit (* we cannot be pure then *)
+  | Durg _, _ -> raise Exit (* we cannot be pure then *)
   | d1, Dvar {contents = (Dval d2|Dpur d2|Dsim (d2,_)|Dreg (d2,_))}
   | d1, Durg (d2,_)
   | Dvar {contents = Dval d1}, d2 ->
@@ -175,6 +172,8 @@ let rec dity_unify_asym d1 d2 = match d1,d2 with
       let d2 = dity_refresh d in
       dity_unify_asym d d2;
       r := Dval d2
+  | Dutv u, Dutv v when tv_equal u v ->
+      ()
   | Dapp (s1,dl1,rl1), Dapp (s2,dl2,rl2) when its_equal s1 s2 ->
       List.iter2 dity_unify_asym dl1 dl2;
       List.iter2 dity_unify_asym rl1 rl2
@@ -275,7 +274,7 @@ let rec print_dity pur pri fmt = function
   | Dapp (s,tl,_) when pur ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
         Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
-  | Dapp (s,tl,rl) when its_immutable s ->
+  | Dapp (s,tl,rl) when not s.its_mutable ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a")
         Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
@@ -319,14 +318,10 @@ let spec_ity hv hr frz ity =
         let d = app_map dity r.reg_its r.reg_args r.reg_regs in
         let nd = if Mreg.mem r frz.isb_reg then Durg (d,r) else dity_reg d in
         Hreg.add hr r nd; nd)
-    | Ityvar (v,pure) ->
-        let nd = try Htv.find hv v with Not_found ->
-          let nd =
-            if Mtv.mem v frz.isb_var then Dutv v else
-            if Mtv.mem v frz.isb_pur then dity_sim (Dutv v) else
-            dity_fresh () in
-          Htv.add hv v nd; nd in
-        if pure then dity_pur nd else nd
+    | Ityvar v ->
+        (try Htv.find hv v with Not_found ->
+        let nd = if Mtv.mem v frz.isb_var then Dutv v else dity_fresh () in
+        Htv.add hv v nd; nd)
     | Ityapp (s,tl,rl) -> app_map dity s tl rl in
   dity ity
 
@@ -1021,7 +1016,7 @@ let env_empty = {
 exception UnboundLabel of string
 
 let find_old pvm (ovm,old) v =
-  if v.pv_ity.ity_imm then v else
+  if v.pv_ity.ity_pure then v else
   let n = v.pv_vs.vs_name.id_string in
   (* if v is top-level, both ov and pv are None.
      If v is local, ov and pv must be equal to v.

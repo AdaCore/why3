@@ -38,7 +38,7 @@ and its_flag = private {
 
 and ity = private {
   ity_node : ity_node;
-  ity_imm  : bool;
+  ity_pure : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
@@ -47,8 +47,8 @@ and ity_node = private
     (** record with mutable fields and shareable components *)
   | Ityapp of itysymbol * ity list * ity list
     (** immutable type with shareable components *)
-  | Ityvar of tvsymbol * bool
-    (** type variable and its purity status *)
+  | Ityvar of tvsymbol
+    (** type variable *)
 
 and region = private {
   reg_name : ident;
@@ -140,17 +140,8 @@ val restore_its : tysymbol -> itysymbol
 
 (* {2 Basic properties} *)
 
-val its_immutable : itysymbol -> bool
-(** an immutable type symbol is not a mutable record nor an alias for one *)
-
 val its_pure : itysymbol -> bool
 (** a pure type symbol is immutable and has no mutable components *)
-
-val ity_immutable : ity -> bool
-(** an immutable type contains no regions (returns the [ity_imm] field) *)
-
-val ity_pure : ity -> bool
-(** a pure type is immutable and all type variables in it are pure *)
 
 val ity_closed : ity -> bool
 (** a closed type contains no type variables *)
@@ -182,17 +173,15 @@ val ity_reg : region -> ity
 
 val ity_var : tvsymbol -> ity
 
-val ity_var_pure : tvsymbol -> ity
-
 val ity_purify : ity -> ity
-(** replaces regions with pure snapshots and variables with pure variables. *)
+(** replaces regions with pure snapshots *)
 
 val ity_of_ty : ty -> ity
-(** fresh regions are created when needed and all variables are impure.
+(** fresh regions are created when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ity_of_ty_pure : ty -> ity
-(** pure snapshots are substituted when needed and all variables are pure.
+(** pure snapshots are substituted when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ty_of_ity : ity -> ty
@@ -268,12 +257,10 @@ val ity_tuple : ity list -> ity
 
 type ity_subst = private {
   isb_var : ity Mtv.t;
-  isb_pur : ity Mtv.t;
   isb_reg : ity Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
-exception ImpureType of tvsymbol * ity
 
 val isb_empty : ity_subst
 
@@ -342,6 +329,8 @@ val create_xsymbol : preid -> ?mask:mask -> ity -> xsymbol
 exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception AssignSnapshot of ity
+exception WriteImmutable of region * pvsymbol
 exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region

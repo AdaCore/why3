@@ -48,7 +48,7 @@ let check_field stv f =
   let ftv = ity_freevars Stv.empty f.pv_ity in
   if not (Stv.subset ftv stv) then Loc.error ?loc
     (UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
-  if not f.pv_ity.ity_imm then Loc.errorm ?loc
+  if not f.pv_ity.ity_pure then Loc.errorm ?loc
     "This field has non-pure type, it cannot be used \
      in a recursive type definition"
 
@@ -557,7 +557,7 @@ let create_let_decl ld =
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
     "Top-level exception %a has a polymorphic type" print_xs xs;
-  if not (ity_immutable xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
+  if not xs.xs_ity.ity_pure then Loc.errorm ?loc:xs.xs_name.id_loc
     "The type of top-level exception %a has mutable components" print_xs xs;
   mk_decl (PDexn xs) []
 

@@ -61,7 +61,7 @@ let overload_of_rs {rs_cty = cty} =
   | a::al when not a.pv_ghost && List.for_all (same_type a.pv_ity) al ->
       let res = cty.cty_result in
       if ity_equal res a.pv_ity then SameType else
-      if ity_closed res && ity_immutable res then FixedRes res else NoOver
+      if ity_closed res && res.ity_pure then FixedRes res else NoOver
   | _ -> NoOver
 
 let same_overload r1 r2 =
@@ -931,7 +931,7 @@ let clone_type_decl inst cl tdl kn =
              private types with no fields and no invariant? *)
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                  its_pure s && ity_immutable ity) then raise (BadInstance id);
+                  its_pure s && ity.ity_pure) then raise (BadInstance id);
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
