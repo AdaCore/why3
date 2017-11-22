@@ -10,7 +10,7 @@
 <prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../compiler.mlw" expanded="true">
-<theory name="Compile_aexpr" sum="acc2ccd176a3dff75fcfcc3ef5f89f52" expanded="true">
+<theory name="Compile_aexpr" sum="411273fbd1fd074bd85d168f5a46d8fc" expanded="true">
  <goal name="WP_parameter compile_aexpr" expl="VC for compile_aexpr">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_aexpr.1" expl="precondition">
@@ -26,10 +26,10 @@
     <goal name="WP_parameter compile_aexpr.3.1.1" expl="VC for compile_aexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_aexpr.3.1.1.1" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.05" steps="16"/></proof>
+     <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.3.1.1.2" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.07" steps="36"/></proof>
+     <proof prover="2"><result status="valid" time="0.14" steps="36"/></proof>
      </goal>
     </transf>
     </goal>
@@ -38,10 +38,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_aexpr.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.6" expl="precondition">
   <proof prover="2"><result status="valid" time="0.04" steps="12"/></proof>
@@ -56,10 +56,10 @@
     <goal name="WP_parameter compile_aexpr.8.1.1" expl="VC for compile_aexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_aexpr.8.1.1.1" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
+     <proof prover="2"><result status="valid" time="0.05" steps="16"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.8.1.1.2" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.39" steps="39"/></proof>
+     <proof prover="2"><result status="valid" time="0.37" steps="39"/></proof>
      </goal>
     </transf>
     </goal>
@@ -68,10 +68,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_aexpr.9" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.10" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="19"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.11" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06" steps="12"/></proof>
@@ -89,13 +89,13 @@
   <proof prover="2"><result status="valid" time="0.06" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.16" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.17" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.18" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.05" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.19" expl="precondition">
   <transf name="simplify_trivial_quantification_in_goal">
@@ -143,7 +143,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.27" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.28" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06" steps="30"/></proof>
@@ -161,13 +161,13 @@
      <proof prover="2"><result status="valid" time="0.08" steps="32"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.30.1.1.2" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.09" steps="36"/></proof>
+     <proof prover="2"><result status="valid" time="0.07" steps="36"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.30.1.1.3" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.19" steps="40"/></proof>
+     <proof prover="2"><result status="valid" time="0.11" steps="40"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.30.1.1.4" expl="VC for compile_aexpr">
-     <proof prover="1"><result status="valid" time="0.12"/></proof>
+     <proof prover="1"><result status="valid" time="0.10"/></proof>
      </goal>
     </transf>
     </goal>
@@ -203,7 +203,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.40" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="33"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter compile_aexpr.41" expl="precondition">
   <transf name="simplify_trivial_quantification_in_goal">
@@ -215,13 +215,13 @@
      <proof prover="2"><result status="valid" time="0.08" steps="32"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.41.1.1.2" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.07" steps="36"/></proof>
+     <proof prover="2"><result status="valid" time="0.09" steps="36"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.41.1.1.3" expl="VC for compile_aexpr">
-     <proof prover="2"><result status="valid" time="0.11" steps="40"/></proof>
+     <proof prover="2"><result status="valid" time="0.19" steps="40"/></proof>
      </goal>
      <goal name="WP_parameter compile_aexpr.41.1.1.4" expl="VC for compile_aexpr">
-     <proof prover="1"><result status="valid" time="0.10"/></proof>
+     <proof prover="1"><result status="valid" time="0.12"/></proof>
      </goal>
     </transf>
     </goal>
@@ -248,14 +248,14 @@
  </transf>
  </goal>
 </theory>
-<theory name="Compile_bexpr" sum="018d59d0f7bd29ff14cb48a6c6c6cf1d" expanded="true">
+<theory name="Compile_bexpr" sum="531c93a856e8ece901b02e05e097dd6b" expanded="true">
  <goal name="WP_parameter compile_bexpr" expl="VC for compile_bexpr">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_bexpr.1" expl="precondition">
   <proof prover="2"><result status="valid" time="0.08" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.3" expl="precondition">
   <transf name="simplify_trivial_quantification_in_goal">
@@ -300,10 +300,10 @@
      <proof prover="2"><result status="valid" time="0.05" steps="16"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.8.1.1.2" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.08" steps="25"/></proof>
+     <proof prover="2"><result status="valid" time="0.06" steps="25"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.8.1.1.3" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.06" steps="20"/></proof>
+     <proof prover="2"><result status="valid" time="0.07" steps="20"/></proof>
      </goal>
     </transf>
     </goal>
@@ -312,7 +312,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_bexpr.9" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.10" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.06" steps="20"/></proof>
@@ -330,7 +330,7 @@
     <goal name="WP_parameter compile_bexpr.13.1.1" expl="VC for compile_bexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_bexpr.13.1.1.1" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.05" steps="15"/></proof>
+     <proof prover="2"><result status="valid" time="0.06" steps="15"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.13.1.1.2" expl="VC for compile_bexpr">
      <proof prover="2"><result status="valid" time="0.07" steps="22"/></proof>
@@ -345,7 +345,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_bexpr.14" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.15" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.06" steps="20"/></proof>
@@ -354,7 +354,7 @@
   <proof prover="2"><result status="valid" time="0.05" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.17" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.18" expl="precondition">
   <transf name="simplify_trivial_quantification_in_goal">
@@ -363,13 +363,13 @@
     <goal name="WP_parameter compile_bexpr.18.1.1" expl="VC for compile_bexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_bexpr.18.1.1.1" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.06" steps="16"/></proof>
+     <proof prover="2"><result status="valid" time="0.05" steps="16"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.18.1.1.2" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.06" steps="24"/></proof>
+     <proof prover="2"><result status="valid" time="0.08" steps="24"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.18.1.1.3" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.07" steps="23"/></proof>
+     <proof prover="2"><result status="valid" time="0.06" steps="23"/></proof>
      </goal>
     </transf>
     </goal>
@@ -486,7 +486,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.40" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.41" expl="precondition">
   <proof prover="2"><result status="valid" time="0.07" steps="31"/></proof>
@@ -504,16 +504,16 @@
      <proof prover="1"><result status="valid" time="0.14"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.43.1.1.2" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.08" steps="36"/></proof>
+     <proof prover="2"><result status="valid" time="0.07" steps="36"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.43.1.1.3" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.09" steps="40"/></proof>
+     <proof prover="2"><result status="valid" time="0.08" steps="40"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.43.1.1.4" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.13"/></proof>
+     <proof prover="1"><result status="valid" time="0.12"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.43.1.1.5" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.13"/></proof>
+     <proof prover="1"><result status="valid" time="0.12"/></proof>
      </goal>
     </transf>
     </goal>
@@ -525,7 +525,7 @@
   <proof prover="2"><result status="valid" time="0.07" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.45" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.09" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.46" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06" steps="13"/></proof>
@@ -534,10 +534,10 @@
   <proof prover="2"><result status="valid" time="0.06" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.48" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.49" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.06" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.50" expl="precondition">
   <proof prover="2"><result status="valid" time="0.07" steps="31"/></proof>
@@ -552,16 +552,16 @@
     <goal name="WP_parameter compile_bexpr.52.1.1" expl="VC for compile_bexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_bexpr.52.1.1.1" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.08" steps="33"/></proof>
+     <proof prover="2"><result status="valid" time="0.09" steps="33"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.52.1.1.2" expl="VC for compile_bexpr">
-     <proof prover="2"><result status="valid" time="0.07" steps="37"/></proof>
+     <proof prover="2"><result status="valid" time="0.08" steps="37"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.52.1.1.3" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.12"/></proof>
+     <proof prover="1"><result status="valid" time="0.13"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.52.1.1.4" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.12"/></proof>
+     <proof prover="1"><result status="valid" time="0.13"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.52.1.1.5" expl="VC for compile_bexpr">
      <proof prover="1"><result status="valid" time="0.14"/></proof>
@@ -585,10 +585,10 @@
   <proof prover="2"><result status="valid" time="0.05" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.57" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.58" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.59" expl="precondition">
   <proof prover="2"><result status="valid" time="0.06" steps="31"/></proof>
@@ -603,7 +603,7 @@
     <goal name="WP_parameter compile_bexpr.61.1.1" expl="VC for compile_bexpr">
     <transf name="split_goal_wp">
      <goal name="WP_parameter compile_bexpr.61.1.1.1" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.13"/></proof>
+     <proof prover="1"><result status="valid" time="0.10"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.61.1.1.2" expl="VC for compile_bexpr">
      <proof prover="2"><result status="valid" time="0.09" steps="36"/></proof>
@@ -612,10 +612,10 @@
      <proof prover="2"><result status="valid" time="0.08" steps="40"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.61.1.1.4" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.13"/></proof>
+     <proof prover="1"><result status="valid" time="0.11"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.61.1.1.5" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.17"/></proof>
+     <proof prover="1"><result status="valid" time="0.21"/></proof>
      </goal>
     </transf>
     </goal>
@@ -660,13 +660,13 @@
      <proof prover="2"><result status="valid" time="0.09" steps="37"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.70.1.1.3" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.21"/></proof>
+     <proof prover="1"><result status="valid" time="0.17"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.70.1.1.4" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.11"/></proof>
+     <proof prover="1"><result status="valid" time="0.13"/></proof>
      </goal>
      <goal name="WP_parameter compile_bexpr.70.1.1.5" expl="VC for compile_bexpr">
-     <proof prover="1"><result status="valid" time="0.10"/></proof>
+     <proof prover="1"><result status="valid" time="0.13"/></proof>
      </goal>
     </transf>
     </goal>
@@ -678,7 +678,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter compile_bexpr.72" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="38"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1742,7 +1742,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Compile_com" sum="0c42e192ae7247357e407b2887326258" expanded="true">
+<theory name="Compile_com" sum="21971e866422bee2b6b3b8c63e4f10f0" expanded="true">
  <goal name="WP_parameter compile_com" expl="VC for compile_com">
  <transf name="split_goal_wp">
   <goal name="WP_parameter compile_com.1" expl="precondition">
@@ -1821,7 +1821,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_com.11" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.08" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter compile_com.12" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.07" steps="28"/></proof>
@@ -1878,7 +1878,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter compile_com.20" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.07" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter compile_com.21" expl="postcondition">
   <proof prover="2"><result status="valid" time="0.07" steps="27"/></proof>
