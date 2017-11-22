@@ -224,6 +224,7 @@ val t_false : term
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
     n must be non-negative *)
+val t_bigint_const : BigInt.t -> term
 
 val asym_label : label
 val t_and_asym : term -> term -> term

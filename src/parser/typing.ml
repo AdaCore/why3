@@ -531,19 +531,13 @@ let add_types dl th =
         let nm = ts.ts_name.id_string ^ "'maxInt" in
         let id = id_derive nm ts.ts_name in
         let ls = create_fsymbol id [] ty_int  in
-        let t =
-          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_upper)))
-            ty_int
-        in
+        let t = t_const Number.(const_of_big_int rg.ir_upper) ty_int in
         let uc = add_logic_decl uc [make_ls_defn ls [] t] in
         (* create min attribute *)
         let nm = ts.ts_name.id_string ^ "'minInt" in
         let id = id_derive nm ts.ts_name in
         let ls = create_fsymbol id [] ty_int  in
-        let t =
-          t_const Number.(ConstInt (int_const_dec (BigInt.to_string rg.ir_lower)))
-            ty_int
-        in
+        let t = t_const Number.(const_of_big_int rg.ir_lower) ty_int in
         add_logic_decl uc [make_ls_defn ls [] t]
     | Float fmt ->
         (* FIXME: "t'to_real" is probably better *)

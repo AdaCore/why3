@@ -220,6 +220,8 @@ rule token = parse
       { LTGT }
   | "="
       { EQUAL }
+  | "-"
+      { MINUS }
   | "["
       { LEFTSQ }
   | "]"

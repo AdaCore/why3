@@ -58,15 +58,15 @@ let elim le_int le_real neg_real type_kept kn
                && not (Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in
       let ir = match ts.ts_def with Range ir -> ir | _ -> assert false in
-      let lo = Number.int_const_dec (BigInt.to_string ir.Number.ir_lower) in
-      let hi = Number.int_const_dec (BigInt.to_string ir.Number.ir_upper) in
+      let lo = ir.Number.ir_lower in
+      let hi = ir.Number.ir_upper in
       let ty_decl = create_ty_decl ts in
       let ls_decl = create_param_decl to_int in
       let pr = create_prsymbol (id_fresh (ts.ts_name.id_string ^ "'axiom")) in
       let v = create_vsymbol (id_fresh "i") (ty_app ts []) in
       let v_term = t_app to_int [t_var v] (Some ty_int) in
-      let a_term = t_const (Number.ConstInt lo) ty_int in
-      let b_term = t_const (Number.ConstInt hi) ty_int in
+      let a_term = t_bigint_const lo in
+      let b_term = t_bigint_const hi in
       let f = t_and (t_app le_int [a_term; v_term] None)
           (t_app le_int [v_term; b_term] None)
       in
@@ -98,9 +98,11 @@ let elim le_int le_real neg_real type_kept kn
       let m_string = Format.flush_str_formatter () in
       Number.print_in_base 10 None Format.str_formatter e;
       let e_string = Format.flush_str_formatter () in
+      let e_val = Number.real_const_hex m_string "" (Some e_string) in
       let max_term = t_const
-          (Number.ConstReal
-             (Number.real_const_hex m_string "" (Some e_string))) ty_real in
+          Number.(ConstReal { rc_negative = false ; rc_abs = e_val })
+          ty_real
+      in
       (* compose axiom *)
       let f = t_and (t_app le_real [t_app neg_real [max_term] (Some ty_real); v_term] None)
           (t_app le_real [v_term; max_term] None) in
@@ -159,3 +161,39 @@ let eliminate_literal env =
 let () =
   Trans.register_env_transform "eliminate_literal" eliminate_literal
     ~desc:"Eliminate@ unsupported@ literals."
+
+
+
+(* simple transformation that just replace negative constants by application
+   of 'prefix -' to positive constant *)
+
+open Number
+
+let rec replace_negative_constants neg_int neg_real t =
+  match t.t_ty, t.t_node with
+  | (Some ty), (Tconst (ConstInt c)) ->
+     if c.ic_negative && ty_equal ty ty_int then
+       t_app neg_int
+             [t_const (ConstInt { c with ic_negative = false }) ty_int]
+             (Some ty_int)
+     else t
+  | (Some ty), (Tconst (ConstReal c)) ->
+     if c.rc_negative && ty_equal ty ty_real then
+       t_app neg_real
+             [t_const (ConstReal { c with rc_negative = false }) ty_real]
+             (Some ty_real)
+     else t
+  | _ -> t_map (replace_negative_constants neg_int neg_real) t
+
+let eliminate_negative_constants env =
+  (* FIXME: int.Int should be imported in the task *)
+  let th = Env.read_theory env ["int"] "Int" in
+  let neg_int = ns_find_ls th.th_export ["prefix -"] in
+  let th = Env.read_theory env ["real"] "Real" in
+  let neg_real = ns_find_ls th.th_export ["prefix -"] in
+  Trans.rewrite (replace_negative_constants neg_int neg_real) None
+
+let () =
+  Trans.register_env_transform "eliminate_negative_constants"
+                               eliminate_negative_constants
+                               ~desc:"Eliminate@ negative@ constants"

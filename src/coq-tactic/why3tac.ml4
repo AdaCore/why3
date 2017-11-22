@@ -479,25 +479,28 @@ let rec tr_positive evd p = match kind evd p with
   | _ ->
       raise NotArithConstant
 
-let const_of_big_int b =
+let const_of_big_int is_neg b =
   Term.t_const
-    (Number.ConstInt (Number.int_const_dec (Big_int.string_of_big_int b)))
+    (Number.(ConstInt { ic_negative = is_neg ;
+         ic_abs = Number.int_const_dec (Big_int.string_of_big_int b) }))
     ty_int
 
-let const_of_big_int_real b =
+let const_of_big_int_real is_neg b =
   let s = Big_int.string_of_big_int b in
-  Term.t_const (Number.ConstReal (Number.real_const_dec s "0" None)) ty_real
+  Term.t_const (Number.(ConstReal { rc_negative = is_neg ;
+                                    rc_abs = real_const_dec s "0" None}))
+    ty_real
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant_IZR evd dep t = match kind evd t with
   | Construct _ when is_global evd coq_Z0 t ->
-    Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None)) ty_real
+    Term.t_const (Number.(ConstReal { rc_negative = false ;
+                                      rc_abs = real_const_dec "0" "0" None}))
+      ty_real
   | App (f, [|a|]) when is_global evd coq_Zpos f ->
-    const_of_big_int_real (tr_positive evd a)
+    const_of_big_int_real false (tr_positive evd a)
   | App (f, [|a|]) when is_global evd coq_Zneg f ->
-    let t = const_of_big_int_real (tr_positive evd a) in
-    let fs = why_constant_real dep ["prefix -"] in
-    Term.fs_app fs [t] ty_real
+    const_of_big_int_real true (tr_positive evd a)
   | Cast (t, _, _) ->
     tr_arith_constant_IZR evd dep t
   | _ ->
@@ -506,18 +509,18 @@ let rec tr_arith_constant_IZR evd dep t = match kind evd t with
 let rec tr_arith_constant evd dep t = match kind evd t with
   | Construct _ when is_global evd coq_Z0 t -> Term.t_nat_const 0
   | App (f, [|a|]) when is_global evd coq_Zpos f ->
-      const_of_big_int (tr_positive evd a)
+      const_of_big_int false (tr_positive evd a)
   | App (f, [|a|]) when is_global evd coq_Zneg f ->
-      let t = const_of_big_int (tr_positive evd a) in
-      let fs = why_constant_int dep ["prefix -"] in
-      Term.fs_app fs [t] Ty.ty_int
+      const_of_big_int true (tr_positive evd a)
   | App (f, [|a|]) when is_global evd coq_IZR f ->
       tr_arith_constant_IZR evd dep a
   | Const _ when is_global evd coq_R0 t ->
-      Term.t_const (Number.ConstReal (Number.real_const_dec "0" "0" None))
+      Term.t_const (Number.(ConstReal { rc_negative = false ;
+        rc_abs = real_const_dec "0" "0" None }))
         ty_real
   | Const _ when is_global evd coq_R1 t ->
-      Term.t_const (Number.ConstReal (Number.real_const_dec "1" "0" None))
+      Term.t_const (Number.(ConstReal { rc_negative = false ;
+        rc_abs = real_const_dec "1" "0" None}))
         ty_real
 (*   | App (f, [|a;b|]) when f = Lazy.force coq_Rplus -> *)
 (*       let ta = tr_arith_constant a in *)
