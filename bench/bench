@@ -150,7 +150,7 @@ extract_and_run () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf "$1 "
+    printf '%s ' "$1"
     if $pgm $1 > /dev/null 2>&1; then
         echo "ok"
     else
