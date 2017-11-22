@@ -935,7 +935,8 @@ end
             | None ->
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
-               read_and_send (file_name file)
+               read_and_send (file_name file);
+               P.notify (Message (Information "file added in session"))
             | Some(loc,rel_loc,s) ->
                read_and_send fn;
                P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
@@ -997,7 +998,8 @@ end
            focus on a specific node. *)
     get_focused_label := None;
     match x with
-    | None -> ()
+    | None ->
+       P.notify (Message (Information "Session initialized succesfully"))
     | Some(loc,rel_loc,s) ->
        P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
@@ -1210,7 +1212,8 @@ end
     match reload_files d.cont ~use_shapes:true with
     | None ->
         (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       reset_and_send_the_whole_tree ()
+       reset_and_send_the_whole_tree ();
+       P.notify (Message (Information "Session refresh successful"))
     | Some(loc,rel_loc,s) ->
        P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
