@@ -1012,7 +1012,7 @@ let print_message ~kind ~notif_kind fmt =
 (**** Monitor *****)
 
 let fan =
-  let s = Bytes.of_string "\o342\o226\o201" in
+  let s = Bytes.of_string "\226\150\129" in
   let c = Char.code (Bytes.get s 2) in
   let a = Array.init 8 (fun i ->
     Bytes.set s 2 (Char.chr (c + i));
