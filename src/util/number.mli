@@ -16,6 +16,7 @@ open Format
 exception InvalidConstantLiteral of int * string
 
 type integer_literal = private
+  | IConstRaw of BigInt.t
   | IConstDec of string
   | IConstHex of string
   | IConstOct of string
@@ -50,7 +51,12 @@ val int_const_bin : string -> integer_literal
     InvalidConstantLiteral(base,s) is raised if [s] contains invalid
     characters for the given base. *)
 
+val int_literal_raw : BigInt.t -> integer_literal
+
 val int_const_of_int : int -> integer_constant
+val int_const_of_big_int : BigInt.t -> integer_constant
+
+val const_of_int : int -> constant
 val const_of_big_int : BigInt.t -> constant
 
 val real_const_dec : string -> string -> string option -> real_literal
