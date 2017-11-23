@@ -114,7 +114,7 @@ let found_upgraded_prover = ref false
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
 let () =
-  C.set_max_tasks (Whyconf.running_provers_max (Whyconf.get_main config));
+  Controller_itp.set_session_max_tasks (Whyconf.running_provers_max (Whyconf.get_main config));
   C.register_observer
     (fun w s r ->
       if Debug.test_flag debug then
@@ -363,7 +363,7 @@ let () =
          exit 1
     in
     Debug.dprintf debug " done.@.";
-    if !opt_obsolete_only && not found_detached
+    if !opt_obsolete_only && not (found_detached || found_obs)
     then
       begin
         eprintf "Session is not obsolete, hence not replayed@.";

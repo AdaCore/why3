@@ -71,20 +71,19 @@ let cont_from_session ~notify cont f : bool option =
       (* Case of user giving a file that gets chopped to an other file *)
       if not (Sys.is_directory dir) then
         begin
-          let s = "Not a directory: " ^ dir in
-          Format.eprintf "%s@." s;
+          Format.eprintf "Not a directory: %s@." dir;
           exit 1
         end
     end
   else
     begin
-      Format.eprintf "[session server info] '%s' does not exist. \
-               Creating directory of that name for the project@." dir;
+      Format.dprintf debug "'%s' does not exist. \
+               Creating directory of that name for the Why3 session@." dir;
       Unix.mkdir dir 0o777
     end;
   (* we load the session *)
   let ses,use_shapes = load_session dir in
-  Format.eprintf "[session server info] using shapes: %b@." use_shapes;
+  Format.dprintf debug "using shapes: %b@." use_shapes;
   (* temporary, this should not be donne like this ! *)
   Controller_itp.set_session cont ses;
   (* update the session *)
@@ -152,7 +151,7 @@ let load_strategies cont =
        Stdlib.Hstr.add cont.Controller_itp.controller_strategies shortcut
                        (name, st.Whyconf.strategy_desc, code)
      with Strategy_parser.SyntaxError msg ->
-       Format.eprintf "[ERROR] Loading strategy '%s' failed: %s@." name msg;
+       Format.eprintf "Fatal: loading strategy '%s' failed: %s@." name msg;
        exit 1)
     strategies
 
@@ -281,11 +280,16 @@ let return_prover name config =
   end else
     Some (snd (Whyconf.Mprover.choose provers))
 
+let session_timelimit = ref 2
+let session_memlimit = ref 1000
+let set_session_timelimit n = session_timelimit := n
+let set_session_memlimit n = session_memlimit := n
+
+
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
 let parse_prover_name config name args :
   (Whyconf.config_prover * Call_provers.resource_limit) option =
-  let main = Whyconf.get_main config in
   match (return_prover name config) with
   | None -> None
   | Some prover_config ->
@@ -294,12 +298,13 @@ let parse_prover_name config name args :
       match args with
       | [] ->
         let default_limit = Call_provers.{empty_limit with
-                                          limit_time = Whyconf.timelimit main;
-                                          limit_mem = Whyconf.memlimit main} in
+                                          limit_time = !session_timelimit;
+                                          limit_mem = !session_memlimit} in
           Some (prover_config, default_limit)
       | [timeout] -> Some (prover_config,
                            Call_provers.{empty_limit with
-                                         limit_time = int_of_string timeout})
+                                          limit_time = int_of_string timeout;
+                                          limit_mem = !session_memlimit})
       | [timeout; oom ] ->
         Some (prover_config, Call_provers.{empty_limit with
                                            limit_time = int_of_string timeout;
@@ -399,7 +404,7 @@ let interp commands_table cont id s =
                                      pa.Session_itp.prover in
                            Edit p
                          with Not_found ->
-                              QError "prover not found"
+                              QError "cannot edit: uninstalled prover"
                        end
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end

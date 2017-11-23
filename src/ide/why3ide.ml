@@ -165,7 +165,7 @@ module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 let files : string Queue.t = Queue.create ()
 let opt_parser = ref None
 
-let spec = Arg.align [
+let spec = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
@@ -427,23 +427,23 @@ let connect_menu_item i ~callback =
 let file_menu = factory#add_submenu "_File"
 let file_factory = new GMenu.factory file_menu ~accel_group
 let menu_add_file =
-  create_menu_item file_factory "_Add file to session"
+  create_menu_item file_factory "Add file to session"
                    "Insert another file in the current session"
 let menu_preferences =
-  create_menu_item file_factory "_Preferences"
+  create_menu_item file_factory "Preferences"
                    "Open Preferences Window"
-let menu_refresh =
-  create_menu_item file_factory ~key:GdkKeysyms._R "_Refresh session"
-                   "Refresh the proof session with updated source files."
 let menu_save_session =
-  create_menu_item file_factory "_Save session"
+  create_menu_item file_factory "Save session"
                    "Save the current proof session on disk"
 let menu_save_files =
-  create_menu_item file_factory "_Save files"
+  create_menu_item file_factory "Save files"
                    "Save the edited source files on disk"
 let menu_save_session_and_files =
   create_menu_item file_factory ~key:GdkKeysyms._S "_Save session and files"
-                   "Save the the current proof session and the files"
+                   "Save the current proof session and the source files"
+let menu_refresh =
+  create_menu_item file_factory ~key:GdkKeysyms._R "Save all and _Refresh session"
+                   "Save the current proof session and the source files, then refresh the proof session with updated source files."
 
 let menu_quit =
   create_menu_item file_factory ~key:GdkKeysyms._Q "_Quit"
@@ -489,6 +489,14 @@ let provers_factory =
 
 (* File menu signals *)
 
+let send_session_config_to_server () =
+  let nb = gconfig.session_nb_processes in
+  send_request (Set_config_param("max_tasks",nb));
+  let nb = gconfig.session_time_limit in
+  send_request (Set_config_param("timelimit",nb));
+  let nb = gconfig.session_mem_limit in
+  send_request (Set_config_param("memlimit",nb))
+
 let () =
   let callback () =
     Gconfig.preferences gconfig;
@@ -509,8 +517,7 @@ let () =
         (Whyconf.get_provers gconfig.config);
      *)
      *)
-    let nb = gconfig.session_nb_processes in
-    send_request (Set_max_tasks_req nb)
+    send_session_config_to_server ()
   in
   connect_menu_item menu_preferences ~callback
 
@@ -600,7 +607,7 @@ let view_name_column =
   let v = GTree.view_column ~title:"Theories/Goals" () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
-  v#pack icon_renderer ;
+  v#pack icon_renderer ~expand:false;
   v#add_attribute icon_renderer "pixbuf" icon_column;
   let name_renderer = GTree.cell_renderer_text [`XALIGN 0.] in
   v#pack name_renderer;
@@ -639,9 +646,10 @@ let goals_model,goals_view =
   let () = view#set_rules_hint true in
 *)
   let () = view#set_enable_search false in
-  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_status_column in
+  let _: int = view#append_column view_name_column in
   let _: int = view#append_column view_time_column in
+  view#set_expander_column (Some view_name_column);
   Debug.dprintf debug "done@.";
   model,view
 
@@ -713,10 +721,9 @@ let clear_tree_and_table goals_model =
 (**************)
 
 
-let reload_unsafe () =
-  (* Clearing the tree *)
-  clear_tree_and_table goals_model;
-  send_request Reload_req
+let reload_unsafe () = send_request Reload_req
+
+let save_and_reload () = save_sources (); reload_unsafe ()
 
 (* Same as reload_safe but propose to save edited sources before reload *)
 let reload_safe () =
@@ -728,13 +735,13 @@ let reload_safe () =
         "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
     in
     match answer with
-    | 1 -> save_sources (); reload_unsafe ()
+    | 1 -> save_and_reload ()
     | 2 -> reload_unsafe ()
     | _ -> ()
   else
     reload_unsafe ()
 
-let () = connect_menu_item menu_refresh ~callback:reload_safe
+let () = connect_menu_item menu_refresh ~callback:save_and_reload
 
 
 (* vpan222 contains:
@@ -761,11 +768,18 @@ let task_page,scrolled_task_view =
 
 let scrolled_task_view =
   GBin.scrolled_window
+    ~height:gconfig.task_height
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
     ~shadow_type:`ETCHED_OUT
     ~packing:scrolled_task_view#add ()
 
-(* Showing current task *)
+let (_ : GtkSignal.id) =
+  scrolled_task_view#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
+
 let task_view =
   GSourceView2.source_view
     ~editable:false
@@ -774,10 +788,11 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
+
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
-  let n = ref 2 in
+  let n = ref 1 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
   let create_source_view f content =
@@ -806,7 +821,9 @@ let create_source_view =
         let has_changed = ref false in
         Hstr.add source_view_table f (source_page, source_view, has_changed, label);
         n := !n + 1;
+        source_view#source_buffer#begin_not_undoable_action ();
         source_view#source_buffer#set_text content;
+        source_view#source_buffer#end_not_undoable_action ();
         (* At initialization, file has not changed. When it changes, changes the
            name of the tab and update has_changed boolean. *)
         let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
@@ -826,6 +843,9 @@ let create_source_view =
         Gconfig.set_fonts ()
       end in
   create_source_view
+
+
+
 (* End of notebook *)
 
 (*
@@ -850,13 +870,95 @@ let monitor =
     ~xalign:0.0
     ~packing:(hbox22221#pack ?from:None ?expand:None ?fill:None ?padding:None) ()
 
-let command_entry = GEdit.entry ~packing:hbox22221#add ()
+let command_entry =
+  GEdit.entry
+    ~text:"type commands here"
+    ~packing:hbox22221#add ()
 
-(* Part 2.2.2.2.2 contains message returned by the IDE/server *)
+(* Part 2.2.2.2.2 contains messages returned by the IDE/server *)
+let messages_notebook = GPack.notebook ~packing:vbox2222#add ()
+
+let error_page,error_view =
+  let label = GMisc.label ~text:"Messages" () in
+  0, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let log_page,log_view =
+  let label = GMisc.label ~text:"Log" () in
+  1, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+(* tab 3: edited proof *)
+let edited_page,edited_tab =
+  let label = GMisc.label ~text:"Edited proof" () in
+  2, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_edited_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
+
+let edited_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_edited_view#add
+    ()
+
+(* tab 4: prover output *)
+let output_page,output_tab =
+  let label = GMisc.label ~text:"Prover output" () in
+  3, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_output_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
+
+let output_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_output_view#add
+    ()
+
+
+(* tab 5: counterexample *)
+let counterexample_page,counterexample_tab =
+  let label = GMisc.label ~text:"Counterexample" () in
+  4, GPack.vbox ~homogeneous:false ~packing:
+    (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
+
+let scrolled_counterexample_view =
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
+
+let counterexample_view =
+  GSourceView2.source_view
+    ~editable:false
+    ~show_line_numbers:true
+    ~packing:scrolled_counterexample_view#add
+    ()
+
+
+
+
+
 let message_zone =
   let sv = GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~shadow_type:`ETCHED_OUT ~packing:vbox2222#add ()
+      ~shadow_type:`ETCHED_OUT ~packing:error_view#add ()
+  in
+  GText.view ~editable:false ~cursor_visible:false
+    ~packing:sv#add ()
+
+let log_zone =
+  let sv = GBin.scrolled_window
+      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
+      ~shadow_type:`ETCHED_OUT ~packing:log_view#add ()
   in
   GText.view ~editable:false ~cursor_visible:false
     ~packing:sv#add ()
@@ -867,18 +969,20 @@ let message_zone_error_tag = message_zone#buffer#create_tag
 
 (**** Message-zone printing functions *****)
 
+let add_to_log mark s =
+  log_zone#buffer#insert ("\n--------["^ mark ^"]--------\n");
+  log_zone#buffer#insert s;
+  log_zone#scroll_to_mark `INSERT
+
 (* Function used to print stuff on the message_zone *)
-let print_message fmt =
+let print_message ~kind ~mark fmt =
   Format.kfprintf
     (fun _ -> let s = flush_str_formatter () in
-              message_zone#buffer#set_text s)
+              add_to_log mark s;
+              if kind>0 then message_zone#buffer#set_text s)
     str_formatter
     fmt
 
-let add_to_msg_zone s =
-  let s = message_zone#buffer#get_text () ^ "\n" ^ s in
-  message_zone#buffer#set_text s;
-  message_zone#scroll_to_mark `INSERT
 
 (**** Monitor *****)
 
@@ -952,10 +1056,7 @@ let _ =
       | _ -> false
       )
 
-let () =
-  let n = gconfig.session_nb_processes in
-  Debug.dprintf debug "setting max proof tasks to %d@." n;
-  send_request (Set_max_tasks_req n)
+let () = send_session_config_to_server ()
 
 (********************)
 (* Locations colors *)
@@ -992,36 +1093,50 @@ let move_to_line ~yalign (v : GSourceView2.source_view) line =
   let mark = `MARK (v#buffer#create_mark it) in
   v#scroll_to_mark ~use_align:true ~yalign mark
 
-(* TODO Do we want an option to choose if we aggressivily switch to the correct
-   source location each time we receive locations with task or not *)
-let always_scroll = false
-
 (* Add a color tag on the right locations on the correct file.
    If the file was not open yet, nothing is done *)
 let color_loc ~color loc =
   let f, l, b, e = Loc.get loc in
   try
-    let (n, v, _, _) = get_source_view_table f in
-    if color = Goal_color then
-      begin
-        if always_scroll then
-          notebook#goto_page n;
-        move_to_line ~yalign:0.0 v l;
-      end;
+    let (_, v, _, _) = get_source_view_table f in
     let color = convert_color color in
     color_loc ~color v l b e
   with
   | Nosourceview _ ->
       (* If the file is not present do nothing *)
-      ()
+      print_message ~kind:0 ~mark:"color_loc" "%s" "No source view yet"
+
+(* Scroll to a specific locations *)
+let scroll_to_loc ~force_tab_switch loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some (loc, _) ->
+    let f, l, _, _ = Loc.get loc in
+    try
+      let (n, v, _, _) = get_source_view_table f in
+      if force_tab_switch then
+        begin
+          Debug.dprintf debug "tab switch to page %d@." n;
+          notebook#goto_page n;
+        end;
+      move_to_line ~yalign:0.0 v l
+    with Nosourceview _ ->
+      Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) =
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
   List.iter (fun (loc, color) ->
-    color_loc ~color loc) l
-
+    color_loc ~color loc) l;
+  let loc_of_goal =
+    (* TODO the last location sent seems more relevant thus the rev. This
+       should be changed, the sent task should contain the information of where
+       to scroll and the list of locations is far too long. *)
+    try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
+    with Not_found -> None
+  in
+  scroll_to_loc ~force_tab_switch:false loc_of_goal
 
 (*******************)
 (* The "View" menu *)
@@ -1084,6 +1199,9 @@ let () =
   Gconfig.add_modifiable_sans_font_view goals_view#misc;
   Gconfig.add_modifiable_mono_font_view monitor#misc;
   Gconfig.add_modifiable_mono_font_view task_view#misc;
+  Gconfig.add_modifiable_mono_font_view edited_view#misc;
+  Gconfig.add_modifiable_mono_font_view output_view#misc;
+  Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
   task_view#source_buffer#set_language why_lang;
@@ -1146,6 +1264,15 @@ let (_ : GtkSignal.id) =
     ~callback:(fun () -> add_command list_commands command_entry#text;
       interp command_entry#text)
 
+(* remove the helper text from the command entry the first time it gets the focus *)
+let () =
+  let id = ref None in
+  let callback _ =
+    clear_command_entry ();
+    GtkSignal.disconnect command_entry#as_entry (Opt.get !id);
+    false in
+  id := Some (command_entry#event#connect#focus_in ~callback)
+
 let on_selected_row r =
   try
     let id = get_node_id r#iter in
@@ -1157,29 +1284,37 @@ let on_selected_row r =
         task_view#source_buffer#set_text ""
       else
         let b = gconfig.intro_premises in
-        send_request (Get_task(id,b, true))
+        let c = gconfig.show_full_context in
+        send_request (Get_task(id,b,c,true))
     | NProofAttempt ->
-      let (pa, _obs, _l) = Hint.find node_id_pa id in
-      (match pa with
-      | Controller_itp.Done pr ->
-          task_view#source_buffer#set_text pr.Call_provers.pr_output
-      | Controller_itp.Undone ->
-          task_view#source_buffer#set_text "Undone"
-      | Controller_itp.Detached ->
-          task_view#source_buffer#set_text "Detached"
-      | Controller_itp.Interrupted ->
-          task_view#source_buffer#set_text "Interrupted"
-      | Controller_itp.Scheduled ->
-          task_view#source_buffer#set_text "Scheduled"
-      | Controller_itp.Running ->
-          task_view#source_buffer#set_text "Running"
-      | Controller_itp.InternalFailure _e ->
-          task_view#source_buffer#set_text "Internal failure"
-      | Controller_itp.Uninstalled _p ->
-          task_view#source_buffer#set_text "Uninstalled")
+       let (pa, _obs, _l) = Hint.find node_id_pa id in
+       let output_text =
+         match pa with
+         | Controller_itp.Done pr -> pr.Call_provers.pr_output
+         | Controller_itp.Undone -> "no result known"
+         | Controller_itp.Detached -> "detached proof attempt: parent goal has no task"
+         | Controller_itp.Interrupted -> "prover run was interrupted"
+         | Controller_itp.Scheduled -> "proof scheduled but not running yet"
+         | Controller_itp.Running -> "prover currently running"
+         | Controller_itp.InternalFailure e ->
+            (Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e)
+         | Controller_itp.Uninstalled _p -> "uninstalled prover"
+         | Controller_itp.UpgradeProver _p -> "upgraded prover"
+       in
+       let output_text =
+         if output_text = "" then
+           "(no output known, you may consider running the prover again)"
+         else output_text
+       in
+       output_view#source_buffer#set_text output_text;
+       edited_view#source_buffer#set_text "(not yet available)";
+       edited_view#scroll_to_mark `INSERT;
+       counterexample_view#source_buffer#set_text "(not yet available)";
+       counterexample_view#scroll_to_mark `INSERT
     | _ ->
        let b = gconfig.intro_premises in
-       send_request (Get_task(id,b,true))
+       let c = gconfig.show_full_context in
+       send_request (Get_task(id,b,c,true))
   with
     | Not_found -> task_view#source_buffer#set_text ""
 
@@ -1202,18 +1337,32 @@ let (_ : GtkSignal.id) =
     begin
       Debug.dprintf debug "button number %d was clicked on the tree view@." n;
       match n with
-      | 1 -> (* Left click *) false
-      | 2 -> (* Middle click *) false
       | 3 -> (* Right click *)
-         Debug.dprintf debug "before tools_menu#popup@.";
-         tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
-         Debug.dprintf debug "after tools_menu#popup@.";
-         true
-      | _ -> (* Error case TODO *) assert false
+        let sel = goals_view#selection in
+        let x = int_of_float (GdkEvent.Button.x ev) in
+        let y = int_of_float (GdkEvent.Button.y ev) in
+        begin match goals_view#get_path_at_pos ~x ~y with
+        | Some (path,_,_,_) when not (sel#path_is_selected path) ->
+          sel#unselect_all ();
+          sel#select_path path
+        | _ -> ()
+        end;
+        tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
+        true
+      | _ -> (* Other buttons *) false
     end
   in
   goals_view#event#connect#button_press ~callback
 
+let (_ : GtkSignal.id) =
+  let callback ev =
+    match GdkEvent.Key.keyval ev with
+    | k when k = GdkKeysyms._Return ->
+      command_entry#misc#grab_focus ();
+      true
+    | _ -> false
+  in
+  goals_view#event#connect#key_press ~callback
 
 (*************************************)
 (* Commands of the Experimental menu *)
@@ -1297,16 +1446,19 @@ let (_ : GtkSignal.id) =
 
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
-  | Proof_error (_id, s)                        -> print_message "%s" s
+  | Proof_error (_id, s)                        ->
+     print_message ~kind:1 ~mark:"[Proof_error]" "%s" s
   | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
-        print_message "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
+        print_message ~kind:1 ~mark:"Transformation Error"
+                      "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
       else
         begin
           let buf = message_zone#buffer in
           (* remove all coloration in message_zone *)
           buf#remove_tag_by_name "error" ~start:buf#start_iter ~stop:buf#end_iter;
-          print_message "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
+          print_message ~kind:1 ~mark:"Transformation Error"
+                        "%s\nTransformation failed. \nOn argument: \n%s \n%s\n\n%s"
             tr_name arg msg doc;
           let color = "error" in
           let _, _, beg_char, end_char = Loc.get loc in
@@ -1316,19 +1468,27 @@ let treat_message_notification msg = match msg with
             ~stop:(start#forward_chars end_char)
             color
         end
-  | Strat_error (_id, s)                        -> print_message "%s" s
-  | Replay_Info s                               -> print_message "%s" s
-  | Query_Info (_id, s)                         -> print_message "%s" s
-  | Query_Error (_id, s)                        -> print_message "%s" s
-  | Help s                                      -> print_message "%s" s
-  | Information s                               -> print_message "%s" s
-  | Task_Monitor (t, s, r)                      -> update_monitor t s r
-  | Open_File_Error s                           -> print_message "%s" s
-  | Parse_Or_Type_Error (loc, s)                ->
+  | Strat_error (_id, s) ->
+     print_message ~kind:1 ~mark:"Strat_error" "%s" s
+  | Replay_Info s ->
+     print_message ~kind:0 ~mark:"Replay_info" "%s" s
+  | Query_Info (_id, s) ->
+     print_message ~kind:1 ~mark:"Query_info" "%s" s
+  | Query_Error (_id, s) ->
+     print_message ~kind:1 ~mark:"Query_error" "%s" s
+  | Help s ->
+     print_message ~kind:1 ~mark:"Help" "%s" s
+  | Information s ->
+     print_message ~kind:1 ~mark:"Information" "%s" s
+  | Task_Monitor (t, s, r) -> update_monitor t s r
+  | Open_File_Error s ->
+     print_message ~kind:0 ~mark:"Open_File_Error" "%s" s
+  | Parse_Or_Type_Error (loc, s) ->
     begin
       (* TODO find a new color *)
+      scroll_to_loc ~force_tab_switch:true (Some (loc,0));
       color_loc ~color:Goal_color loc;
-      print_message "%s" s
+      print_message ~kind:1 ~mark:"Parse_Or_Type_Error" "%s" s
     end
   | File_Saved f                 ->
     begin
@@ -1336,16 +1496,14 @@ let treat_message_notification msg = match msg with
         let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
         b := false;
         update_label_saved l;
-        print_message "%s was saved" f
+        print_message ~kind:1 ~mark:"File_Saved" "%s was saved" f
       with
       | Not_found                ->
-          print_message "Please report: %s was not found in ide but was saved in session" f
+          print_message ~kind:1 ~mark:"File_Saved"
+                        "Please report: %s was not found in IDE but was saved in session" f
     end
   | Error s                      ->
-      if Debug.test_flag debug then
-        print_message "%s" s
-      else
-        print_message "%s" "Request failed. You can get details using --debug ide_info"
+     print_message ~kind:1 ~mark:"General request failure" "%s" s
 
 
 (***********************)
@@ -1377,12 +1535,11 @@ let get_parent node =
   | None -> None
   | Some parent -> Some (get_node_id parent)
 
-let if_selected_alone id f =
+let is_selected_alone id =
   match get_selected_row_references () with
-  | [r] ->
-     let i = get_node_id r#iter in
-     if i = id || Some i = get_parent id then f id
-  | _ -> ()
+  | [r] -> let i = get_node_id r#iter in i = id
+  | _ -> false
+
 
 
 (**************************)
@@ -1398,6 +1555,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.InternalFailure _e -> !image_failure
   | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
+  | Controller_itp.UpgradeProver _p -> !image_undone
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
     begin
@@ -1488,6 +1646,7 @@ let set_status_and_time_column ?limit row =
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
         | C.Uninstalled _ -> "(uninstalled prover)"
+        | C.UpgradeProver _ -> "(upgraded prover)"
         | C.Scheduled -> "(scheduled)"
         | C.Running -> "(running)"
         | C.Detached -> "(detached)"
@@ -1680,9 +1839,9 @@ let () =
 
 let remove_item =
   create_menu_item tools_factory "Remove"
-                   "Remove the selected proof attempts or transformations (shortcut: x)"
+                   "Remove the selected proof attempts or transformations (shortcut: del)"
 let () =
-  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._x
+  remove_item#add_accelerator ~group:tools_accel_group ~modi:[] GdkKeysyms._Delete
 
 
 let mark_obsolete_item =
@@ -1714,7 +1873,8 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Remove_subtree id)
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Remove_subtree error"
+                        "Select only one node to perform the remove node action");
   connect_menu_item
     edit_menu_item
     ~callback:(fun () ->
@@ -1722,7 +1882,8 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Command_req (id,"edit"))
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Edit error"
+                        "Select only one node to perform the edit action");
   connect_menu_item
     mark_obsolete_item
     ~callback:(fun () ->
@@ -1730,32 +1891,38 @@ let () =
                | [r] ->
                    let id = get_node_id r#iter in
                    send_request (Mark_obsolete_req id)
-               | _ -> print_message "Select only one node to perform this action");
+               | _ -> print_message ~kind:1 ~mark:"Mark_obsolete error"
+                        "Select only one node to perform the mark obsolete action");
   connect_menu_item
     focus_item
     ~callback:(fun () ->
       match get_selected_row_references () with
       | [r] ->
           let id = get_node_id r#iter in
-          send_request (Focus_req id);
-          (* TODO not efficient *)
-          clear_tree_and_table goals_model;
-          send_request (Get_Session_Tree_req);
-      | _ -> print_message "Select only one node to perform this action");
+          send_request (Focus_req id)
+      | _ -> print_message ~kind:1 ~mark:"Focus_req error"
+                        "Select only one node to perform the focus action");
   connect_menu_item
     unfocus_item
-    ~callback:(fun () ->
-      send_request Unfocus_req;
-      (* TODO not efficient *)
-      clear_tree_and_table goals_model;
-      send_request (Get_Session_Tree_req))
+    ~callback:(fun () -> send_request Unfocus_req)
 
 
 (* the command-line *)
 
+let check_uninstalled_prover =
+  let uninstalled_prover_seen = Whyconf.Hprover.create 3 in
+  fun p ->
+  if not (Whyconf.Hprover.mem uninstalled_prover_seen p)
+  then begin
+      Whyconf.Hprover.add uninstalled_prover_seen p ();
+      uninstalled_prover_dialog gconfig p
+    end
+
+
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
+  | Reset_whole_tree -> clear_tree_and_table goals_model
   | Node_change (id, uinfo)        ->
      begin
        match uinfo with
@@ -1772,7 +1939,15 @@ let treat_notification n =
           in
           if old <> b then begin
               set_status_and_time_column (get_node_row id);
-              if not b then
+              Debug.dprintf debug "proved status changed to %b for %d@." b id;
+              if b then
+                begin
+                  (* if the node newly proved is selected, then force
+                   moving the selection the next unproved goal *)
+                  if is_selected_alone id then
+                    send_request (Get_first_unproven_node id)
+                end
+              else
                 begin
                   try
                     let row = Hint.find node_id_to_gtree id in
@@ -1782,24 +1957,28 @@ let treat_notification n =
                   with Not_found ->
                     Debug.dprintf debug "Warning: no gtk row registered for node %d@." id
                 end
-          end;
-          (* Trying to move cursor on first unproven goal around on all cases
-             but not when proofAttempt is updated because ad hoc debugging. *)
-          send_request (Get_first_unproven_node id)
+            end
+       | Name_change n ->
+          let row = get_node_row id in
+          goals_model#set ~row:row#iter ~column:name_column n
        | Proof_status_change (pa, obs, l) ->
           let r = get_node_row id in
           Hint.replace node_id_pa id (pa, obs, l);
-          set_status_and_time_column ~limit:l r
+          set_status_and_time_column ~limit:l r;
+          match pa with
+          | Controller_itp.Uninstalled p -> check_uninstalled_prover p
+          | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
-      if_selected_alone asked_id
-          (fun _ ->
-            (* Unselect the potentially selected goal to avoid having two tasks
-               selected at once when a prover successfully end. To continue the
-               proof, it is better to only have the new goal selected *)
-            goals_view#selection#unselect_all ();
-            let iter = (get_node_row next_unproved_id)#iter in
-            goals_view#selection#select_iter iter)
+      if is_selected_alone asked_id then
+        begin
+          (* Unselect the potentially selected goal to avoid having two tasks
+             selected at once when a prover successfully end. To continue the
+             proof, it is better to only have the new goal selected *)
+          goals_view#selection#unselect_all ();
+          let iter = (get_node_row next_unproved_id)#iter in
+          goals_view#selection#select_iter iter
+        end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
        let name =
@@ -1809,7 +1988,14 @@ let treat_notification n =
        in
        try
          let parent = get_node_row parent_id in
-         ignore (new_node ~parent id name typ detached)
+         ignore (new_node ~parent id name typ detached);
+         match typ with
+         | NTransformation ->
+            (* if this new node is a transformation, and its parent
+               goal is selected, then ask for the next goal to prove. *)
+            if is_selected_alone parent_id then
+              send_request (Get_first_unproven_node parent_id)
+         | _ -> ()
        with Not_found ->
          ignore (new_node id name typ detached)
      end
@@ -1825,29 +2011,34 @@ let treat_notification n =
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
-      print_message "Session saved.";
+      print_message ~kind:1 ~mark:"Saved action info"
+                        "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc)        ->
-     if_selected_alone
-       id
-       (fun _ -> task_view#source_buffer#set_text s;
-                 apply_loc_on_source list_loc;
-                 (* scroll to end of text *)
-                 task_view#scroll_to_mark `INSERT)
+     if is_selected_alone id then
+       begin
+         task_view#source_buffer#set_text s;
+         apply_loc_on_source list_loc;
+         (* scroll to end of text *)
+         task_view#scroll_to_mark `INSERT
+       end
   | File_contents (file_name, content) ->
     begin
       try
         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
+        sc_view#source_buffer#begin_not_undoable_action ();
         sc_view#source_buffer#set_text content;
+        sc_view#source_buffer#end_not_undoable_action ();
         update_label_saved l;
         b := false;
       with
       | Not_found -> create_source_view file_name content
     end
   | Dead _ ->
-     print_message "Serveur sent an unexpected notification '%a'. Please report."
+     print_message ~kind:1 ~mark:"Server Dead ?"
+                        "Server sent the notification '%a'. Please report."
         print_notify n
   end;
   ()

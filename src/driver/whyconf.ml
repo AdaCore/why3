@@ -940,3 +940,15 @@ let absolute_driver_file main s =
 let load_driver main env file extras =
   let file = absolute_driver_file main file in
   Driver.load_driver_absolute env file extras
+
+
+let unknown_to_known_provers provers pu =
+  Mprover.fold (fun pk _ (others,name,version) ->
+    match
+      pk.prover_name = pu.prover_name,
+      pk.prover_version = pu.prover_version,
+      pk.prover_altern = pu.prover_altern with
+        | false, _, _ -> pk::others, name, version
+        | _, false, _ -> others, pk::name, version
+        | _           -> others, name, pk::version
+  ) provers ([],[],[])

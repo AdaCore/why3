@@ -75,7 +75,7 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let d = Opt.get d in
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
-  let (_ty, subst) = try first_order_matching lv [nt] [g] with
+  let (subst_ty, subst) = try first_order_matching lv [nt] [g] with
   | Reduction_engine.NoMatch (Some (t1, t2)) ->
       (if (Debug.test_flag debug_matching) then
         Format.printf "Term %a and %a can not be matched. Failure in matching@."
@@ -88,9 +88,9 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
       else ()); raise (Arg_trans_pattern ("apply", p1, p2))
   | Reduction_engine.NoMatch None -> raise (Arg_trans ("apply"))
   in
-  let inst_nt = t_subst subst nt in
+  let inst_nt = t_ty_subst subst_ty subst nt in
   if (Term.t_equal_nt_nl inst_nt g) then
-    let nlp = List.map (t_subst subst) lp in
+    let nlp = List.map (t_ty_subst subst_ty subst) lp in
     let lt = List.map (fun ng -> Task.add_decl task (create_prop_decl Pgoal
                           (create_prsymbol (gen_ident "G")) ng)) nlp in
     lt
@@ -121,7 +121,8 @@ let replace_subst lp lv f1 f2 t =
 
   let rec replace lv f1 f2 t : Term.term =
   match !is_replaced with
-  | Some subst -> replace_in_term (t_subst subst f1) (t_subst subst f2) t
+  | Some(subst_ty,subst) ->
+     replace_in_term (t_ty_subst subst_ty subst f1) (t_ty_subst subst_ty subst f2) t
   | None ->
     begin
       let fom = try Some (first_order_matching lv [f1] [t]) with
@@ -138,12 +139,12 @@ let replace_subst lp lv f1 f2 t =
       | Reduction_engine.NoMatch None -> None in
         (match fom with
         | None -> t_map (fun t -> replace lv f1 f2 t) t
-        | Some (_ty, subst) ->
-        let sf1 = t_subst subst f1 in
+        | Some (subst_ty, subst) ->
+        let sf1 = t_ty_subst subst_ty subst f1 in
         if (Term.t_equal sf1 t) then
         begin
-          is_replaced := Some subst;
-          t_subst subst f2
+          is_replaced := Some (subst_ty,subst);
+          t_ty_subst subst_ty subst f2
         end
         else
           replace lv f1 f2 t)
@@ -151,8 +152,8 @@ let replace_subst lp lv f1 f2 t =
   let t = t_map (replace lv f1 f2) t in
   match !is_replaced with
   | None -> raise (Arg_trans "matching/replace")
-  | Some subst ->
-    (List.map (t_subst subst) lp, t)
+  | Some(subst_ty,subst) ->
+    (List.map (t_ty_subst subst_ty subst) lp, t)
 
 let rewrite_in rev h h1 =
   let found_eq =
@@ -257,10 +258,14 @@ let t_replace_app unf ls_defn t =
   let (vl, tls) = ls_defn in
   match t.t_node with
   | Tapp (ls, tl) when ls_equal unf ls ->
-      let mvs =
-        List.fold_left2 (fun acc (v: vsymbol) (t: term) ->
-          Mvs.add v t acc) Mvs.empty vl tl in
-      t_subst mvs tls
+     let add (mt,mv) x y =
+       Ty.ty_match mt x.vs_ty (t_type y), Mvs.add x y mv
+     in
+     let mtv,mvs =
+       List.fold_left2 add (Ty.Mtv.empty,Mvs.empty) vl tl
+     in
+     let mtv = Ty.oty_match mtv tls.t_ty t.t_ty in
+     t_ty_subst mtv mvs tls
   | _ -> t
 
 let rec t_ls_replace ls ls_defn t =
@@ -293,7 +298,7 @@ let unfold unf hl =
    to_subst and t2 being term to substitute to if the equality found it a symbol
    definition. If equality found is a a decl then it is returned:
    Some (Some pr, t1, t2) *)
-let find_eq (to_subst: Term.lsymbol) =
+let find_eq (to_subst: Term.lsymbol list) =
   fold (fun d acc ->
     match d.d_node with
     | Dprop (k, pr, t) when k != Pgoal ->
@@ -302,22 +307,22 @@ let find_eq (to_subst: Term.lsymbol) =
             (* Allow to rewrite from the right *)
             begin
               match t1.t_node, t2.t_node with
-              | Tapp (ls, []), _ when ls_equal ls to_subst ->
-                  Some (Some pr, t1, t2)
-              | _, Tapp (ls, []) when ls_equal ls to_subst ->
-                  Some (Some pr, t2, t1)
+              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst ->
+                  Some (Some pr, t1, t2) :: acc
+              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst ->
+                  Some (Some pr, t2, t1) :: acc
               | _ -> acc
             end
         | _ -> acc) in
         acc
-    | Dlogic [(ls, ld)] when ls_equal to_subst ls ->
+    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst ->
       (* Function without arguments *)
       let vl, e = open_ls_defn ld in
       if vl = [] then
-        Some (None, t_app_infer ls [], e)
+        Some (None, t_app_infer ls [], e) :: acc
       else
         acc
-    | _ -> acc) None
+    | _ -> acc) []
 
 (* This found any equality which at one side contains a single lsymbol and is
    local. It gives same output as found_eq. *)
@@ -330,8 +335,9 @@ let find_eq2 is_local_decl =
           | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
             (match t1.t_node, t2.t_node with
             | Tapp (_, []), _ ->
-            (* t1 = t2. And t1 and t2 are constant litterals *)
-              Some (Some pr, t1, t2)
+                Some (Some pr, t1, t2)
+            | _, Tapp (_, []) ->
+                Some (Some pr, t2, t1)
             | _ -> acc)
           | _ -> acc) in
           acc
@@ -407,8 +413,19 @@ let subst_eq found_eq =
           | Dtype _ | Ddata _ | Dparam _ -> [d]) None
        end
 
-let subst (to_subst: Term.lsymbol) =
-  Trans.bind (find_eq to_subst) subst_eq
+let subst_eq_list found_eq_list =
+  List.fold_left (fun acc_tr found_eq ->
+    Trans.compose (subst_eq found_eq) acc_tr) Trans.identity found_eq_list
+
+let subst (to_subst: Term.lsymbol list) =
+  Trans.bind (find_eq to_subst) subst_eq_list
+
+let subst (to_subst: Term.term list) =
+  (* TODO allow list of lsymbols in type of tactics *)
+  subst (List.map
+           (fun t -> match t.t_node with
+           | Tapp (ls, []) -> ls
+           | _ -> raise (Arg_trans "subst_eq")) to_subst)
 
 let subst_all (is_local_decl: Decl.decl -> bool) =
    Trans.bind (find_eq2 is_local_decl) subst_eq
@@ -437,7 +454,7 @@ let repeat f = Trans.store (repeat f)
 
 let () = wrap_and_register ~desc:"remove a literal using an equality on it"
     "subst"
-    (Tlsymbol Ttrans) subst
+    (Ttermlist Ttrans) subst
 
 let subst_all = repeat subst_all
 

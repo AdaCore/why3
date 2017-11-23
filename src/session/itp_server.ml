@@ -253,16 +253,15 @@ let print_request fmt r =
   match r with
   | Command_req (_nid, s)           -> fprintf fmt "command \"%s\"" s
   | Add_file_req f                  -> fprintf fmt "open file %s" f
-  | Set_max_tasks_req i             -> fprintf fmt "set max tasks %i" i
+  | Set_config_param(s,i)           -> fprintf fmt "set config param %s %i" s i
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
+  | Get_task(nid,b,c,loc)           -> fprintf fmt "get task(%d,%b,%b,%b)" nid b c loc
   | Focus_req _nid                  -> fprintf fmt "focus"
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
-  | Get_Session_Tree_req            -> fprintf fmt "get session tree"
   | Save_file_req _                 -> fprintf fmt "save file"
   | Mark_obsolete_req _             -> fprintf fmt "mark obsolete"
   | Clean_req                       -> fprintf fmt "clean"
@@ -301,13 +300,12 @@ let print_list_loc fmt l =
 
 let print_notify fmt n =
   match n with
-  | Node_change (ni, nf)               ->
+  | Reset_whole_tree -> fprintf fmt "reset whole tree"
+  | Node_change (ni, nf) ->
       begin
         match nf with
-        | Proved b -> fprintf fmt "node change %d Proved %b" ni b
-(*
-        | Obsolete b -> fprintf fmt "node change %d Obsolete %b" ni b
-*)
+        | Proved b -> fprintf fmt "node change %d: proved=%b" ni b
+        | Name_change n -> fprintf fmt "node change %d: renamed to '%s'" ni n
         | Proof_status_change(st,b,_lim) ->
            fprintf fmt "node change %d Proof_status_change res=%a obsolete=%b limits=<TODO>"
                    ni Controller_itp.print_status st b
@@ -388,7 +386,7 @@ let () =
   let get_server_data () =
     match !server_data with
     | None ->
-       Format.eprintf "not yet initialized@.";
+       Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
        exit 1
     | Some x -> x
 
@@ -465,75 +463,77 @@ let () =
 
 (* This section is used to get colored source as a function of the task *)
 
-
-(* These functions append stuff to a list which will then be passed to the
-   Task notification. *)
-let color_loc list ~color ~loc =
-  let d = get_server_data () in
-  let (f,l,b,e) = Loc.get loc in
-  let f = Sysutil.relativize_filename
-    (Session_itp.get_dir d.cont.controller_session) f in
-  let loc = Loc.user_position f l b e in
-  list := (loc, color) :: !list
-
-let rec color_locs list ~color formula =
-  let b = ref false in
-  Opt.iter (fun loc -> color_loc list ~color ~loc; b := true) formula.Term.t_loc;
-  Term.t_fold (fun b subf -> color_locs list ~color subf || b) !b formula
-
-let rec color_t_locs list f =
-  let premise_tag = function
-    | { Term.t_node = Term.Tnot _; t_loc = None } -> Neg_premise_color
-    | _ -> Premise_color
-  in
-  match f.Term.t_node with
-    | Term.Tbinop (Term.Timplies,f1,f2) ->
-        let b = color_locs list ~color:(premise_tag f1) f1 in
-        color_t_locs list f2 || b
-    | Term.Tlet (t,fb) ->
-        let _,f1 = Term.t_open_bound fb in
-        let b = color_locs list ~color:(premise_tag t) t in
-        color_t_locs list f1 || b
-    | Term.Tquant (Term.Tforall,fq) ->
-        let _,_,f1 = Term.t_open_quant fq in
-        color_t_locs list f1
-    | _ ->
-        color_locs list ~color:Goal_color f
-
 exception No_loc_on_goal
 
-let color_goal list loc =
-  match loc with
-  | None ->
+let get_locations (task: Task.task) =
+  let list = ref [] in
+  let file_cache = Hstr.create 17 in
+  let session_dir =
+    let d = get_server_data () in
+    Session_itp.get_dir d.cont.controller_session in
+  let relativize f =
+    try Hstr.find file_cache f
+    with Not_found ->
+      let g = Sysutil.relativize_filename session_dir f in
+      Hstr.replace file_cache f g;
+      g in
+  let color_loc ~color ~loc =
+    let (f,l,b,e) = Loc.get loc in
+    let loc = Loc.user_position (relativize f) l b e in
+    list := (loc, color) :: !list in
+  let rec color_locs ~color formula =
+    Opt.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
+    Term.t_iter (fun subf -> color_locs ~color subf) formula in
+  let rec color_t_locs ~premise f =
+    match f.Term.t_node with
+    | Term.Tbinop (Term.Timplies,f1,f2) when not premise ->
+      color_t_locs ~premise:true f1;
+      color_t_locs ~premise:false f2
+    | Term.Tbinop (Term.Tand,f1,f2) when premise ->
+      color_t_locs ~premise f1;
+      color_t_locs ~premise f2
+    | Term.Tlet (_,fb) ->
+      let _,f1 = Term.t_open_bound fb in
+      color_t_locs ~premise f1
+    | Term.Tquant (Term.Tforall,fq) when not premise ->
+      let _,_,f1 = Term.t_open_quant fq in
+      color_t_locs ~premise f1
+    | Term.Tnot f1 when premise && f.Term.t_loc = None ->
+      color_locs ~color:Neg_premise_color f1
+    | _ when premise ->
+      color_locs ~color:Premise_color f
+    | _ ->
+      color_locs ~color:Goal_color f in
+  let color_goal = function
+    | None ->
       (* This case can happen when after some transformations: for example, in
          an assert, the new goal asserted is not tagged with locations *)
       (* This error is harmless but we want to detect it when debugging. *)
       if Debug.test_flag Debug.stack_trace then
         raise No_loc_on_goal
-      else
-        ()
-  | Some loc -> color_loc list ~color:Goal_color ~loc
-
-let get_locations list (task: Task.task) =
+    | Some loc -> color_loc ~color:Goal_color ~loc in
   let goal_id : Ident.ident = (Task.task_goal task).Decl.pr_name in
-  color_goal list goal_id.Ident.id_loc;
-  match task with
+  color_goal goal_id.Ident.id_loc;
+  let rec scan = function
     | Some
-        { Task.task_decl =
+        { Task.task_prev = prev;
+          Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (Decl.Pgoal, _, f)}}} ->
-        if not (color_t_locs list f) then
-          Opt.iter (fun loc -> color_loc list ~color:Goal_color ~loc) goal_id.Ident.id_loc
-    | _ ->
-        assert false
-
-let get_locations t =
-  let l = ref [] in
-  get_locations l t;
-  !l
+                Theory.Decl { Decl.d_node = Decl.Dprop (k, _, f) }}} ->
+      begin match k with
+      | Decl.Pgoal  -> color_t_locs ~premise:false f
+      | Decl.Paxiom -> color_t_locs ~premise:true  f
+      | _ -> assert false
+      end;
+      scan prev
+    | Some { Task.task_prev = prev } -> scan prev
+    | _ -> () in
+  scan task;
+  !list
 
 let get_modified_node n =
   match n with
+  | Reset_whole_tree -> None
   | New_node (nid, _, _, _, _) -> Some nid
   | Node_change  (nid, _) -> Some nid
   | Remove nid -> Some nid
@@ -620,14 +620,13 @@ end
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
-  (* Send source file from the controller to the IDE even if the controller's
-     status is not correct *)
+  (* Send all source files from the controller session to the IDE *)
   let load_files_session () =
     let d = get_server_data () in
     let s = d.cont.controller_session in
     let files = Session_itp.get_files s in
     Stdlib.Hstr.iter (fun _ f ->
-                      Format.eprintf "File : %s@." (file_name f);
+                      Debug.dprintf debug "load_files_session: loading '%s'@." (file_name f);
                       read_and_send (file_name f)) files
 
   let relativize_location s loc =
@@ -635,46 +634,25 @@ end
     let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
     Loc.user_position f l b e
 
+  let capture_parse_or_type_errors f cont =
+    try let _ = f cont in None with
+    | Loc.Located (loc, e) ->
+      let loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a at %a@."
+          Exn_printer.exn_printer e Loc.report_position loc in
+      Some (loc, s)
+    | e ->
+      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
+      Some (Loc.dummy_position, s)
+
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    try let _ = reload_files cont ~use_shapes in true with
-    | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      P.notify (Message (Parse_Or_Type_Error (loc, s)));
-      false
-    | e ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
-      false
+    capture_parse_or_type_errors (reload_files ~use_shapes) cont
 
   let add_file cont ?format fname =
-    try add_file cont ?format fname; true with
-    | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      P.notify (Message (Parse_Or_Type_Error (loc, s)));
-      false
-    | e ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      P.notify (Message (Parse_Or_Type_Error (Loc.dummy_position, s)));
-      false
+    capture_parse_or_type_errors (fun c -> add_file c ?format fname) cont
 
-(*
-  let task_driver config env =
-    try
-      let main = Whyconf.get_main config in
-      let d = "spark" in (* TODO replace this *)
-      let d = Whyconf.load_driver main env d [] in
-      Debug.dprintf debug "driver for task printing loaded@.";
-      d
-    with e ->
-      Format.eprintf "Fatal error while loading itp driver: %a@." Exn_printer.exn_printer e;
-      exit 1
-*)
 
   (* -----------------------------------   ------------------------------------- *)
 
@@ -799,8 +777,10 @@ end
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
+(*
       if node_type = NFile then
         read_and_send node_name;
+ *)
       get_node_proved new_id node;
       new_id
 
@@ -864,33 +844,30 @@ end
   (* Initialization of session tree *)
   (**********************************)
 
+(*
   let _init_the_tree (): unit =
     let f ~parent node_id = ignore (new_node ~parent node_id) in
     iter_the_files f root_node
+*)
 
-  let init_and_send_subtree_from_trans parent trans_id : unit =
+  let send_new_subtree_from_trans parent trans_id : unit =
     iter_subtree_from_trans
       (fun ~parent id -> ignore (new_node ~parent id)) parent trans_id
 
-  let init_and_send_file f =
+  let send_new_subtree_from_file f =
     iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
       root_node f
 
-  let init_and_send_the_tree (): unit =
+  let reset_and_send_the_whole_tree (): unit =
+    P.notify Reset_whole_tree;
     iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root_node
 
-  let resend_the_tree (): unit =
-    let send_node ~parent any =
-      let node_id = node_ID_from_any any in
-      let node_name = get_node_name any in
-      let node_type = get_node_type any in
-      let node_detached = get_node_detached any in
-      P.notify (New_node (node_id, parent, node_type, node_name, node_detached));
-      get_node_proved node_id any in
-    iter_the_files send_node root_node
+  let unfocus () =
+    focused_node := Unfocused;
+    reset_and_send_the_whole_tree ()
 
   (* -- send the task -- *)
-  let task_of_id d id do_intros loc =
+  let task_of_id d id do_intros show_full_context loc =
     let task,tables =
       if do_intros then get_task d.cont.controller_session id
       else
@@ -904,15 +881,15 @@ end
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
       let module P = (val Pretty.create pr apr pr pr false) in
-      Pp.string_of P.print_sequent task
+      Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
     task_text, loc_color_list
 
-  let send_task nid do_intros loc =
+  let send_task nid do_intros show_full_context loc =
     let d = get_server_data () in
     match any_from_node_ID nid with
     | APn id ->
-       let s, list_loc = task_of_id d id do_intros loc in
+       let s, list_loc = task_of_id d id do_intros show_full_context loc in
        P.notify (Task (nid, s, list_loc))
     | ATh t ->
        P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
@@ -920,7 +897,7 @@ end
        let pa = get_proof_attempt_node  d.cont.controller_session pid in
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
-       let s, list_loc = task_of_id d parid do_intros loc in
+       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
        P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
     | AFile f ->
        P.notify (Task (nid, "File " ^ file_name f, []))
@@ -928,7 +905,7 @@ end
        let name = get_transf_name d.cont.controller_session tid in
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
-       let s, list_loc = task_of_id d parid do_intros loc in
+       let s, list_loc = task_of_id d parid do_intros show_full_context loc in
        P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
@@ -947,10 +924,14 @@ end
     | None ->
         if (Sys.file_exists f) then
           begin
-            let b = add_file cont f in
-            if b then
-              let file = get_file cont.controller_session fn in
-              init_and_send_file file
+            match add_file cont f with
+            | None ->
+               let file = get_file cont.controller_session fn in
+               send_new_subtree_from_file file;
+               read_and_send (file_name file)
+            | Some(loc,s) ->
+               read_and_send fn;
+               P.notify (Message (Parse_Or_Type_Error(loc,s)))
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -1001,18 +982,17 @@ end
     in
     Debug.dprintf debug "sending initialization infos@.";
     P.notify (Initialized infos);
+    load_files_session ();
     Debug.dprintf debug "reloading source files@.";
-    let b = reload_files d.cont ~use_shapes in
-    if b then
-      begin
-        (* Send the tree *)
-        init_and_send_the_tree ();
-        (* After initial sending, we don't check anymore that there is a need to
+    let x = reload_files d.cont ~use_shapes in
+    reset_and_send_the_whole_tree ();
+    (* After initial sending, we don't check anymore that there is a need to
            focus on a specific node. *)
-        get_focused_label := None
-      end
-    else
-      load_files_session ()
+    get_focused_label := None;
+    match x with
+    | None -> ()
+    | Some(loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1028,6 +1008,12 @@ end
         let parent = node_ID_from_pn parent_id in
         new_node ~parent (APa panid)
     in
+    begin match pa_status with
+          | UpgradeProver _ ->
+             let n = get_node_name (APa panid) in
+             P.notify (Node_change (node_id, Name_change n))
+          | _ -> ()
+    end;
     let pa = get_proof_attempt_node ses panid in
     let new_status =
       Proof_status_change (pa_status, pa.proof_obsolete, pa.limit)
@@ -1053,7 +1039,7 @@ end
          P.notify (Node_change (node_ID, Proof_status_change(res, obs, limit)))
       | _ -> ()
     with Not_found when not (Debug.test_flag Debug.stack_trace)->
-      Format.eprintf "Anomaly: Itp_server.notify_change_proved@.";
+      Format.eprintf "Fatal anomaly in Itp_server.notify_change_proved@.";
       exit 1
 
   let schedule_proof_attempt ~counterexmp nid (p: Whyconf.config_prover) limit =
@@ -1096,7 +1082,7 @@ end
       let ses = d.cont.controller_session in
       let id = get_trans_parent ses trans_id in
       let nid = node_ID_from_pn id in
-      init_and_send_subtree_from_trans nid trans_id
+      send_new_subtree_from_trans nid trans_id
     | TSfailed (id, e) ->
       let doc = try
         Pp.sprintf "%s\n%a" tr Pp.formatted (Trans.lookup_trans_desc tr)
@@ -1209,11 +1195,17 @@ end
 
   let reload_session () : unit =
     let d = get_server_data () in
+    (* interrupt all running provers and unfocus before reload *)
+    C.interrupt ();
+    let _old_focus = !focused_node in
+    unfocus ();
     clear_tables ();
-    (* Calling reload_files breaks the controller if it fails *)
-    let b = reload_files d.cont ~use_shapes:true in
-    if b then init_and_send_the_tree ()
-
+    match reload_files d.cont ~use_shapes:true with
+    | None ->
+        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
+       reset_and_send_the_whole_tree ()
+    | Some(loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,s)))
 
   let replay_session () : unit =
     let d = get_server_data () in
@@ -1284,33 +1276,23 @@ end
     let config = d.cont.controller_config in
     try (
     match r with
-(*
-    | Edit_req (nid, p)            ->
-      let p = try Some (get_prover p) with
-      | Bad_prover_name p -> P.notify (Message (Proof_error (nid, "Bad prover name" ^ p))); None
-      in
-      begin match p with
-      | None -> ()
-      | Some p ->
-          schedule_edition nid p
-      end
- *)
     | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
-    | Get_Session_Tree_req         -> resend_the_tree ()
     | Get_first_unproven_node ni   ->
       notify_first_unproven_node d ni
     | Focus_req nid ->
         let d = get_server_data () in
         let s = d.cont.controller_session in
         let any = any_from_node_ID nid in
-        (match any with
-        | APa pa ->
-          focused_node := Focus_on [APn (Session_itp.get_proof_attempt_parent s pa)]
-        | _ -> focused_node := Focus_on [any])
-    | Unfocus_req ->
-        focused_node := Unfocused
+        let focus_on =
+          match any with
+          | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+          | _ -> any
+        in
+        focused_node := Focus_on [focus_on];
+        reset_and_send_the_whole_tree ()
+    | Unfocus_req -> unfocus ()
     | Remove_subtree nid           -> remove_node nid
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
@@ -1332,7 +1314,7 @@ end
     | Mark_obsolete_req n          -> mark_obsolete n
     | Save_file_req (name, text)   ->
         save_file name text;
-    | Get_task(nid,b, loc)         -> send_task nid b loc
+    | Get_task(nid,b,c,loc)         -> send_task nid b c loc
     | Replay_req                   -> replay_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
@@ -1356,9 +1338,10 @@ end
       end
     | Add_file_req f ->
       add_file_to_session d.cont f;
-      let f = Sysutil.relativize_filename
+(*      let f = Sysutil.relativize_filename
           (Session_itp.get_dir d.cont.controller_session) f in
-      read_and_send f
+         read_and_send f *)
+      ()
 (*
     | Open_session_req file_or_dir_name ->
         let b = init_cont file_or_dir_name in
@@ -1367,7 +1350,14 @@ end
         else
           () (* Eventually print debug here *)
 *)
-    | Set_max_tasks_req i     -> C.set_max_tasks i
+    | Set_config_param(s,i)   ->
+       begin
+         match s with
+         | "max_tasks" -> Controller_itp.set_session_max_tasks i
+         | "timelimit" -> Server_utils.set_session_timelimit i
+         | "memlimit" -> Server_utils.set_session_memlimit i
+         | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
+       end
     | Exit_req                -> exit 0
      )
     with e when not (Debug.test_flag Debug.stack_trace) ->

@@ -540,6 +540,7 @@ end
 
 let interpNotif (n: notification) =
   match n with
+  | Reset_whole_tree ->  TaskList.clear ()
   | Initialized _g ->
       PE.error_print_msg "Initialized"
   | New_node (nid, parent, ntype, name, detached) ->
@@ -562,7 +563,7 @@ let interpNotif (n: notification) =
       | Proof_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Proof error on selected node: \"%s\"" s)
-      | Transf_error (_nid, s) ->
+      | Transf_error (_ids, _tr, _args, _loc, s, _d) ->
         PE.error_print_msg
           (Format.asprintf "Transformation error on selected node: \"%s\"" s)
       | Strat_error (_nid, s) ->
@@ -589,9 +590,9 @@ let interpNotif (n: notification) =
   | Node_change (nid, up) ->
     begin
       match up with
-      | Obsolete _ -> assert false (* TODO *)
       | Proved true -> TaskList.update_status `Valid (string_of_int nid)
       | Proved false -> TaskList.update_status `Unknown (string_of_int nid)
+      | Name_change _n -> assert false (* TODO *)
       | Proof_status_change (c, _obsolete, _rl) ->
         begin
         (* TODO complete other tests *)
@@ -623,7 +624,9 @@ let getNotification2 () =
     if xhr ##. readyState == XmlHttpRequest.DONE then
       if xhr ##. status == 200 then
         let r = readBody xhr in
-        let nl = Json_util.parse_list_notification r in
+        let nl =
+          try Json_util.parse_list_notification r with e ->
+            log (Printexc.to_string e ^ " " ^ r); [] in
         if nl != [] then
           PE.printAnswer ("r = |" ^ r ^ "|");
         interpNotifications nl

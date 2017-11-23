@@ -74,12 +74,14 @@ type color =
 
 type update_info =
   | Proved of bool
+  | Name_change of string
   | Proof_status_change of
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
       * Call_provers.resource_limit
 
 type notification =
+  | Reset_whole_tree
   | New_node     of node_ID * node_ID * node_type * string * bool
   (** Notification of creation of new_node:
      New_node (new_node, parent_node, node_type, name, detached). *)
@@ -111,12 +113,13 @@ type ide_request =
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
-  | Set_max_tasks_req       of int
+  | Set_config_param        of string * int
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool
-  (** [Get_task(id,b, loc)] requests for the text of the task in node [id],
-      when [b] is true then quantified variables and hypotheses are
-      introduced as local definitions, when [loc] is false the locations are not
+  | Get_task                of node_ID * bool * bool * bool
+  (** [Get_task(id,b,c,loc)] requests for the text of the task in node
+      [id].  When [b] is true then quantified variables and hypotheses
+      are introduced as local definitions. When [c] is true then the
+      full context is show.  When [loc] is false the locations are not
       returned *)
   | Focus_req               of node_ID
   (** Focus on a node. The server only sends info about descendants of this ID *)
@@ -128,7 +131,6 @@ type ide_request =
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
   | Mark_obsolete_req       of node_ID
-  | Get_Session_Tree_req
   | Clean_req
   | Save_req
   | Reload_req

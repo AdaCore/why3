@@ -179,8 +179,6 @@ let get_files s = s.session_files
 let get_file s name = Hstr.find s.session_files name
 let get_dir s = s.session_dir
 
-let get_shape_version s = s.session_shape_version
-
 (*
 let get_node (s : session) (n : int) =
   let _ = Hint.find s.proofNode_table n in n
@@ -497,10 +495,11 @@ let _print_session fmt s =
   fprintf fmt "%a@." (print_s s) l;;
 
 
-let empty_session ?shape_version dir =
-  let shape_version = match shape_version with
-    | Some v -> v
-    | None -> Termcode.current_shape_version
+let empty_session ?from dir =
+  let prover_ids, shape_version =
+    match from with
+    | Some v -> v.session_prover_ids, v.session_shape_version
+    | None -> Hprover.create 7, Termcode.current_shape_version
   in
   { proofAttempt_table = Hint.create 97;
     next_proofAttemptID = 0;
@@ -511,7 +510,7 @@ let empty_session ?shape_version dir =
     session_dir = dir;
     session_files = Hstr.create 3;
     session_shape_version = shape_version;
-    session_prover_ids = Hprover.create 7;
+    session_prover_ids = prover_ids;
     session_raw_tasks = Hpn.create 97;
     session_tasks = Hpn.create 97;
     file_state = Hstr.create 3;
@@ -1182,9 +1181,9 @@ exception ShapesFileError of string
 module ReadShapes (C:Compress.S) = struct
 
 let shape = Buffer.create 97
-let sum = Strings.create 32
 
 let read_sum_and_shape ch =
+  let sum = Bytes.create 32 in
   let nsum = C.input ch sum 0 32 in
   if nsum = 0 then raise End_of_file;
   if nsum <> 32 then
@@ -1195,7 +1194,7 @@ let read_sum_and_shape ch =
         raise
           (ShapesFileError
              ("shapes files corrupted (checksum '" ^
-                 (String.sub sum 0 nsum) ^
+                 (Bytes.sub_string sum 0 nsum) ^
                  "' too short), ignored"))
     end;
   if try C.input_char ch <> ' ' with End_of_file -> true then
@@ -1211,7 +1210,7 @@ let read_sum_and_shape ch =
     with
       | End_of_file ->
         raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-      | Exit -> Strings.copy sum, Buffer.contents shape
+      | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
 
 
   let use_shapes = ref true
@@ -1435,7 +1434,7 @@ let add_registered_transformation s env old_tr goal_id =
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
         goal.proofn_transformations in
     (* NOTE: should not happen *)
-    Debug.dprintf debug "[merge_theory] transformation already present@.";
+    Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
     assert false
   with Not_found ->
     let subgoals =
@@ -1476,20 +1475,22 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
        | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
        | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
-  let associated,detached =
+  let associated,_detached =
     AssoGoals.associate ~use_shapes old_subtasks new_subtasks
   in
   List.iter (function
       | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
         merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
       | ((id,s), None) ->
-        Debug.dprintf debug "[merge_theory] missed subgoal: %s@."
+        Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
           (get_proofNode s id).proofn_name.Ident.id_string;
         found_detached := true)
     associated;
   (* save the detached goals *)
-  let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id))
+  (* DISABLED TO AVOID ANY FUTURE ANOMALIES 'Not_found' *)
+  (*let detached = List.map (fun (a,_) -> a) detached in
+  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
+   *))
   with _ ->
     Debug.dprintf debug
       "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;
@@ -1498,12 +1499,18 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
 
 
 let merge_theory ~use_shapes env old_s old_th s th : unit =
+  let get_goal_name goal_node =
+    let name = goal_node.proofn_name in
+    try
+      let (_,_,l) = Theory.restore_path name in
+      String.concat "." l
+    with Not_found -> name.Ident.id_string in
   let old_goals_table = Hstr.create 7 in
   (* populate old_goals_table *)
   List.iter
     (fun id ->
        let pn = get_proofNode old_s id in
-       Hstr.add old_goals_table pn.proofn_name.Ident.id_string id)
+       Hstr.add old_goals_table (get_goal_name pn) id)
     old_th.theory_goals;
   let to_checksum = CombinedTheoryChecksum.compute s th in
   let same_theory_checksum =
@@ -1518,9 +1525,10 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
        try
          let new_goal = get_proofNode s ng_id in
          (* look for old_goal with matching name *)
+         let new_goal_name = get_goal_name new_goal in
          let old_goal = get_proofNode old_s
-           (Hstr.find old_goals_table new_goal.proofn_name.Ident.id_string) in
-         Hstr.remove old_goals_table new_goal.proofn_name.Ident.id_string;
+           (Hstr.find old_goals_table new_goal_name) in
+         Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
            match new_goal.proofn_checksum, old_goal.proofn_checksum with
            | None, _ -> assert false
@@ -1866,7 +1874,13 @@ let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt "</proof>@]"
 
 let save_ident fmt id =
-  let n = id.Ident.id_string in
+  let n =
+    try
+      let (_,_,l) = Theory.restore_path id in
+      if l = [] then raise Not_found;
+      String.concat "." l
+    with Not_found -> id.Ident.id_string
+  in
   fprintf fmt "name=\"%a\"" save_string n
 
 let save_checksum fmt s =

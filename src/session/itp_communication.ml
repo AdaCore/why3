@@ -68,12 +68,14 @@ type color =
 
 type update_info =
   | Proved of bool
+  | Name_change of string
   | Proof_status_change of
       Controller_itp.proof_attempt_status
       * bool   (* obsolete or not *)
       * Call_provers.resource_limit
 
 type notification =
+  | Reset_whole_tree
   | New_node     of node_ID * node_ID * node_type * string * bool
   (* Notification of creation of new_node:
      New_node (new_node, parent_node, node_type, name, detached). *)
@@ -102,9 +104,9 @@ type notification =
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
-  | Set_max_tasks_req       of int
+  | Set_config_param        of string * int
   | Get_file_contents       of string
-  | Get_task                of node_ID * bool * bool
+  | Get_task                of node_ID * bool * bool * bool
   | Focus_req               of node_ID
   | Unfocus_req
   | Remove_subtree          of node_ID
@@ -113,7 +115,6 @@ type ide_request =
   | Save_file_req           of string * string
   | Get_first_unproven_node of node_ID
   | Mark_obsolete_req       of node_ID
-  | Get_Session_Tree_req
   | Clean_req
   | Save_req
   | Reload_req
@@ -126,7 +127,7 @@ let modify_session (r: ide_request) =
   match r with
   | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
   | Copy_detached _ | Replay_req | Clean_req | Mark_obsolete_req _ -> true
-  | Set_max_tasks_req _ | Get_file_contents _
+  | Set_config_param _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
-  | Get_Session_Tree_req | Save_req | Reload_req | Exit_req
+  | Save_req | Reload_req | Exit_req
   | Interrupt_req | Focus_req _ | Unfocus_req -> false

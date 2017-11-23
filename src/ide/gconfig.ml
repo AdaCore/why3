@@ -33,12 +33,14 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
       mutable default_prover : string; (* "" means none *)
       mutable default_editor : string;
       mutable intro_premises : bool;
+      mutable show_full_context : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -68,10 +70,12 @@ type ide = {
   ide_window_width : int;
   ide_window_height : int;
   ide_tree_width : int;
+  ide_task_height : int;
   ide_font_size : int;
   ide_current_tab : int;
   ide_verbose : int;
   ide_intro_premises : bool;
+  ide_show_full_context : bool;
   ide_show_labels : bool;
   ide_show_locs : bool;
   ide_show_time_limit : bool;
@@ -92,10 +96,12 @@ let default_ide =
   { ide_window_width = 1024;
     ide_window_height = 768;
     ide_tree_width = 512;
+    ide_task_height = 400;
     ide_font_size = 10;
     ide_current_tab = 0;
     ide_verbose = 0;
     ide_intro_premises = true;
+    ide_show_full_context = false;
     ide_show_labels = false;
     ide_show_locs = false;
     ide_show_time_limit = false;
@@ -120,6 +126,8 @@ let load_ide section =
       get_int section ~default:default_ide.ide_window_height "window_height";
     ide_tree_width =
       get_int section ~default:default_ide.ide_tree_width "tree_width";
+    ide_task_height =
+      get_int section ~default:default_ide.ide_task_height "task_height";
     ide_current_tab =
       get_int section ~default:default_ide.ide_current_tab "current_tab";
     ide_font_size =
@@ -129,6 +137,9 @@ let load_ide section =
     ide_intro_premises =
       get_bool section ~default:default_ide.ide_intro_premises
         "intro_premises";
+    ide_show_full_context =
+      get_bool section ~default:default_ide.ide_show_full_context
+        "show_full_context";
     ide_show_labels =
       get_bool section ~default:default_ide.ide_show_labels "print_labels";
     ide_show_locs =
@@ -187,10 +198,12 @@ let load_config config original_config =
   { window_height = ide.ide_window_height;
     window_width  = ide.ide_window_width;
     tree_width    = ide.ide_tree_width;
+    task_height   = ide.ide_task_height;
     current_tab   = ide.ide_current_tab;
     font_size     = ide.ide_font_size;
     verbose       = ide.ide_verbose;
     intro_premises= ide.ide_intro_premises ;
+    show_full_context= ide.ide_show_full_context ;
     show_labels   = ide.ide_show_labels ;
     show_locs     = ide.ide_show_locs ;
     show_time_limit = ide.ide_show_time_limit;
@@ -234,10 +247,12 @@ let save_config t =
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
   let ide = set_int ide "tree_width" t.tree_width in
+  let ide = set_int ide "task_height" t.task_height in
   let ide = set_int ide "current_tab" t.current_tab in
   let ide = set_int ide "font_size" t.font_size in
   let ide = set_int ide "verbose" t.verbose in
   let ide = set_bool ide "intro_premises" t.intro_premises in
+  let ide = set_bool ide "show_full_context" t.show_full_context in
   let ide = set_bool ide "print_labels" t.show_labels in
   let ide = set_bool ide "print_locs" t.show_locs in
   let ide = set_bool ide "print_time_limit" t.show_time_limit in
@@ -578,7 +593,7 @@ let show_legend_window () =
 let show_about_window () =
   let about_dialog =
     GWindow.about_dialog
-      ~name:"The Why3 Verification Platform "
+      ~name:"The Why3 Verification Platform"
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
                 "Claude Marché";
@@ -592,6 +607,7 @@ let show_about_window () =
                 "Martin Clochard";
                 "Simon Cruanes";
                 "Sylvain Dailler";
+                "Jacques-Pascal Deplaix";
                 "Clément Fumex";
                 "Leon Gondelman";
                 "David Hauzar";
@@ -600,6 +616,7 @@ let show_about_window () =
                 "Mikhail Mandrykin";
                 "David Mentré";
                 "Benjamin Monate";
+                "Kim Nguyễn";
                 "Thi-Minh-Tuyen Nguyen";
                 "Simão Melo de Sousa";
                 "Asma Tafat";
@@ -608,9 +625,11 @@ let show_about_window () =
                ]
       ~copyright:"Copyright 2010-2017 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
-      ~website:"http://why3.lri.fr"
-      ~website_label:"http://why3.lri.fr"
+      ~website:"http://why3.lri.fr/"
+      ~website_label:"http://why3.lri.fr/"
       ~version:Config.version
+      ~icon:!why_icon
+      ~logo:!why_icon
       ()
   in
   let ( _ : GWindow.Buttons.about) = about_dialog#run () in
@@ -779,6 +798,15 @@ let appearance_settings (c : t) (notebook:GPack.notebook) =
   let (_ : GtkSignal.id) =
     intropremises#connect#toggled ~callback:
       (fun () -> c.intro_premises <- not c.intro_premises)
+  in
+  let showfullcontext =
+    GButton.check_button ~label:"show full task context"
+      ~packing:display_options_box#add ()
+      ~active:c.show_full_context
+  in
+  let (_ : GtkSignal.id) =
+    showfullcontext#connect#toggled ~callback:
+      (fun () -> c.show_full_context <- not c.show_full_context)
   in
   let showlabels =
     GButton.check_button
@@ -1137,18 +1165,16 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-(*
-let uninstalled_prover c eS unknown =
-  try
-    Whyconf.get_prover_upgrade_policy c.config unknown
-  with Not_found ->
-    let others,names,versions = Session_tools.unknown_to_known_provers
-      (Whyconf.get_provers eS.Session.whyconf) unknown in
-    let dialog = GWindow.dialog
-      ~icon:(!why_icon) ~modal:true
-      ~title:"Why3: Uninstalled prover" ()
-    in
-    let vbox = dialog#vbox in
+let uninstalled_prover_dialog c unknown =
+  let others,names,versions =
+    Whyconf.unknown_to_known_provers
+      (Whyconf.get_provers c.config) unknown
+  in
+  let dialog = GWindow.dialog
+                 ~icon:(!why_icon) ~modal:true
+                 ~title:"Why3: Uninstalled prover" ()
+  in
+  let vbox = dialog#vbox in
 (* Does not work: why ??
     let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
     let hbox = GPack.hbox ~packing:vbox_pack () in
@@ -1246,12 +1272,11 @@ let uninstalled_prover c eS unknown =
         | _ -> assert false
     in
     c.config <- set_prover_upgrade_policy c.config unknown policy;
-    policy
- *)
+    ()
 
 
 (*
 Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3ide.byte"
+compile-command: "unset LANG; make -C ../.. bin/why3ide.opt"
 End:
 *)

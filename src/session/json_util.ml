@@ -24,12 +24,12 @@ let convert_prover_to_json (p: Whyconf.prover) =
 
 let convert_infos (i: global_information) =
   let convert_prover (s,h,p) =
-    Record (convert_record ["prover_shorcut", String s;
+    Record (convert_record ["prover_shortcut", String s;
                             "prover_name", String h;
                             "prover_parseable_name", String p])
   in
   let convert_strategy (s,p) =
-    Record (convert_record ["strategy_shorcut", String s;
+    Record (convert_record ["strategy_shortcut", String s;
                             "strategy_name", String p])
   in
   Record (convert_record
@@ -94,6 +94,9 @@ let convert_proof_attempt (pas: proof_attempt_status) =
                       "exception", String (Pp.string_of Exn_printer.exn_printer e)]
   | Uninstalled p ->
       convert_record ["proof_attempt", String "Uninstalled";
+                      "prover", convert_prover_to_json p]
+  | UpgradeProver p ->
+      convert_record ["proof_attempt", String "UpgradeProver";
                       "prover", convert_prover_to_json p])
 
 let convert_update u =
@@ -101,20 +104,19 @@ let convert_update u =
   | Proved b ->
       convert_record ["update_info", String "Proved";
              "proved", Bool b]
+  | Name_change n ->
+      convert_record ["update_info", String "Name_change";
+             "name", String n]
   | Proof_status_change (pas, b, l) ->
       convert_record ["update_info", String "Proof_status_change";
              "proof_attempt", convert_proof_attempt pas;
              "obsolete", Bool b;
              "limit", convert_limit l]
-(*
-  | Obsolete b ->
-      convert_record ["update_info", String "Obsolete";
-           "obsolete", Bool b]
-*)
-         )
+  )
 
 let convert_notification_constructor n =
   match n with
+  | Reset_whole_tree             -> String "Reset_whole_tree"
   | New_node _                   -> String "New_node"
   | Node_change _                -> String "Node_change"
   | Remove _                     -> String "Remove"
@@ -143,7 +145,7 @@ let convert_request_constructor (r: ide_request) =
   | Command_req _             -> String "Command_req"
   | Add_file_req _            -> String "Add_file_req"
   | Save_file_req _           -> String "Save_file_req"
-  | Set_max_tasks_req _       -> String "Set_max_tasks_req"
+  | Set_config_param _        -> String "Set_config_param"
   | Get_file_contents _       -> String "Get_file_contents"
   | Focus_req _               -> String "Focus_req"
   | Unfocus_req               -> String "Unfocus_req"
@@ -152,7 +154,6 @@ let convert_request_constructor (r: ide_request) =
   | Copy_paste _              -> String "Copy_paste"
   | Copy_detached _           -> String "Copy_detached"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
-  | Get_Session_Tree_req      -> String "Get_Session_Tree_req"
   | Mark_obsolete_req _       -> String "Mark_obsolete_req"
   | Clean_req                 -> String "Clean_req"
   | Save_req                  -> String "Save_req"
@@ -175,12 +176,12 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Save_file_req (f,_) ->
       convert_record ["ide_request", cc r;
            "file", String f]
-  | Set_max_tasks_req n ->
+  | Set_config_param(s,n) ->
       convert_record ["ide_request", cc r;
-           "tasks", Int n]
-  | Get_task(n,b,loc) ->
+           "param", String s; "value", Int n]
+  | Get_task(n,b,c,loc) ->
       convert_record ["ide_request", cc r;
-           "node_ID", Int n; "do_intros", Bool b; "loc", Bool loc]
+           "node_ID", Int n; "do_intros", Bool b; "full_context", Bool c ; "loc", Bool loc]
   | Get_file_contents s ->
       convert_record ["ide_request", cc r;
            "file", String s]
@@ -201,8 +202,6 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
                       "node_ID", Int id]
   | Unfocus_req ->
-      convert_record ["ide_request", cc r]
-  | Get_Session_Tree_req ->
       convert_record ["ide_request", cc r]
   | Mark_obsolete_req n ->
       convert_record ["ide_request", cc r;
@@ -334,9 +333,12 @@ let parse_loc (j: json) : Loc.position =
     Not_found -> raise Notposition
 
 let parse_loc_color (j: json): Loc.position * color =
-  let loc = parse_loc j in
-  let color = parse_color j in
-  (loc, color)
+  try
+    let loc = parse_loc (get_field j "loc") in
+    let color = parse_color (get_field j "color") in
+    (loc, color)
+  with
+    Not_found -> raise Notposition
 
 let parse_list_loc (j: json): (Loc.position * color) list =
   match j with
@@ -347,6 +349,7 @@ let print_notification_to_json (n: notification): json =
   let cc = convert_notification_constructor in
   Record (
   match n with
+  | Reset_whole_tree -> convert_record ["notification", cc n]
   | New_node (nid, parent, node_type, name, detached) ->
       convert_record ["notification", cc n;
            "node_ID", Int nid;
@@ -380,7 +383,7 @@ let print_notification_to_json (n: notification): json =
       convert_record ["notification", cc n;
            "node_ID", Int nid;
            "task", String s;
-           "list_loc", convert_list_loc list_loc]
+           "loc_list", convert_list_loc list_loc]
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
@@ -441,15 +444,17 @@ let parse_request (constr: string) j =
     let f = get_string (get_field j "file") in
     Add_file_req f
 
-  | "Set_max_tasks_req" ->
-    let n = get_int (get_field j "tasks") in
-    Set_max_tasks_req n
+  | "Set_config_param" ->
+    let s = get_string (get_field j "param") in
+    let n = get_int (get_field j "value") in
+    Set_config_param(s,n)
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in
     let b = get_bool_opt (get_field j "do_intros") false in
+    let c = get_bool_opt (get_field j "full_context") false in
     let loc = get_bool_opt (get_field j "loc") false in
-    Get_task(n,b,loc)
+    Get_task(n,b,c,loc)
 
   | "Remove_subtree" ->
     let n = get_int (get_field j "node_ID") in
@@ -463,10 +468,6 @@ let parse_request (constr: string) j =
   | "Copy_detached" ->
     let n = get_int (get_field j "node_ID") in
     Copy_detached n
-
-  | "Get_Session_Tree_req" ->
-    Get_Session_Tree_req
-
   | "Mark_obsolete_req" ->
     let n = get_int (get_field j "node_ID") in
     Mark_obsolete_req n
@@ -562,6 +563,9 @@ let parse_proof_attempt j =
   | "Uninstalled" ->
     let p = get_field j "prover" in
     Uninstalled (parse_prover_from_json p)
+  | "UpgradeProver" ->
+    let p = get_field j "prover" in
+    UpgradeProver (parse_prover_from_json p)
   | _ -> raise NotProofAttempt
 
 exception NotUpdate
@@ -572,19 +576,17 @@ let parse_update j =
   | "Proved" ->
     let b = get_bool (get_field j "proved") in
     Proved b
+  | "Name_change" ->
+    let n = get_string (get_field j "name") in
+    Name_change n
   | "Proof_status_change" ->
     let pas = get_field j "proof_attempt" in
     let b = get_bool (get_field j "obsolete") in
     let l = get_field j "limit" in
     Proof_status_change (parse_proof_attempt pas, b, parse_limit_from_json l)
-(*
-  | "Obsolete" ->
-    let b = get_bool (get_field j "obsolete") in
-    Obsolete b
-*)
   | _ -> raise NotUpdate
 
-exception NotInfos
+exception NotInfos of string
 
 let parse_infos j =
   try
@@ -596,14 +598,14 @@ let parse_infos j =
                                  (get_string (get_field j "prover_shortcut"),
                                   get_string (get_field j "prover_name"),
                                   get_string (get_field j "prover_parseable_name"))
-                               with Not_found -> raise NotInfos) pr;
-     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) tr;
+                               with Not_found -> raise (NotInfos "provers")) pr;
+     transformations = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "transformations")) tr;
      strategies = List.map (fun j -> try
                                  (get_string (get_field j "strategy_shortcut"),
                                   get_string (get_field j "strategy_name"))
-                               with Not_found -> raise NotInfos) str;
-     commands = List.map (fun j -> match j with | String x -> x | _ -> raise NotInfos) com}
-  with _ -> raise NotInfos
+                               with Not_found -> raise (NotInfos "strategies")) str;
+     commands = List.map (fun j -> match j with | String x -> x | _ -> raise (NotInfos "commands")) com}
+  with Not_found -> raise (NotInfos "infos")
 
 exception NotMessage
 
@@ -681,6 +683,8 @@ exception NotNotification of string
 
 let parse_notification constr j =
   match constr with
+  | "Reset_whole_tree" -> Reset_whole_tree
+
   | "New_node" ->
     let nid = get_int (get_field j "node_ID") in
     let parent = get_int (get_field j "parent_ID") in
@@ -735,7 +739,7 @@ let parse_notification_json j =
     let constr = get_string (get_field j "notification") in
     parse_notification constr j
   with
-  | _ -> raise (NotNotification "<from parse_notification_json>")
+  | Not_found -> raise (NotNotification "<from parse_notification_json>")
 
 let parse_json_object (s: string) =
   let lb = Lexing.from_string s in
@@ -756,7 +760,7 @@ let parse_list_notification (s: string): notification list =
   match json with
   | List [Null] -> []
   | List l -> List.map parse_notification_json l
-  | _ -> []
+  | _ -> raise (NotNotification "Not list")
 
 let parse_list_request (s: string): ide_request list =
   let json = parse_json_object s in

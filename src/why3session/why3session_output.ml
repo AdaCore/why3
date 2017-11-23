@@ -48,8 +48,6 @@ let rec interactive to_remove =
     | "n" -> false
     | _ -> interactive to_remove
 
-let keygen ?parent:_ _ = ()
-
 let fname_printer = Ident.create_ident_printer []
 
 let run_one env config filters dir fname =

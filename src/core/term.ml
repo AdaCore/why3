@@ -830,26 +830,32 @@ let ps_app ps tl    = t_app ps tl None
 let t_nat_const n =
   t_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ty_int
 
-exception InvalidLiteralType of ty
+exception InvalidIntegerLiteralType of ty
+exception InvalidRealLiteralType of ty
 
 let t_const c ty =
   let ts = match ty.ty_node with
     | Tyapp (ts,[]) -> ts
-    | _ -> raise (InvalidLiteralType ty) in
-  begin match c with
-    | Number.ConstInt c when not (ts_equal ts ts_int) ->
-        begin match ts.ts_def with
-          | Range ir -> Number.check_range c ir
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | Number.ConstReal c when not (ts_equal ts ts_real) ->
-        begin match ts.ts_def with
-          | Float fp -> Number.check_float c fp
-          | _ -> raise (InvalidLiteralType ty)
-        end
-    | _ -> ()
-  end;
-  t_const c ty
+    | _ ->
+       match c with
+             | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
+             | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
+  in
+  match c with
+  | Number.ConstInt _ when ts_equal ts ts_int ->
+     t_const c ty
+  | Number.ConstInt n ->
+     begin match ts.ts_def with
+           | Range ir -> Number.check_range n ir; t_const c ty
+           | _ -> raise (InvalidIntegerLiteralType ty)
+     end
+  | Number.ConstReal _ when ts_equal ts ts_real ->
+     t_const c ty
+  | Number.ConstReal r ->
+     begin match ts.ts_def with
+           | Float fp -> Number.check_float r fp; t_const c ty
+           | _ -> raise (InvalidRealLiteralType ty)
+     end
 
 let t_if f t1 t2 =
   t_ty_check t2 t1.t_ty;
@@ -1151,6 +1157,8 @@ let t_fold fn acc t = match t.t_node with
   | Tquant (_, b) ->
       let _, tl, f1 = t_open_quant b in tr_fold fn (fn acc f1) tl
   | _ -> t_fold_unsafe fn acc t
+
+let t_iter fn t = t_fold (fun () t -> fn t) () t
 
 let t_all pr t = Util.all t_fold pr t
 let t_any pr t = Util.any t_fold pr t

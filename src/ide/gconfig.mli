@@ -15,12 +15,14 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
       mutable default_prover : string;
       mutable default_editor : string;
       mutable intro_premises : bool;
+      mutable show_full_context : bool;
       mutable show_labels : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
@@ -114,10 +116,9 @@ val show_legend_window : unit -> unit
 val show_about_window : unit -> unit
 val preferences : t -> unit
 
-(*
-val uninstalled_prover :
-  t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
- *)
+val uninstalled_prover_dialog :
+  t -> Whyconf.prover -> unit
+
 
 (*
 val unknown_prover :

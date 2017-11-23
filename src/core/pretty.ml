@@ -527,21 +527,22 @@ let local_decls task symbmap =
     | _ :: rest -> skip t rest
     | [] -> []
   in
-  let rec filter ((acc1,acc2) as acc) = function
+  let rec filter ((b,acc1,acc2) as acc) = function
     | { td_node = Meta (m,_) } :: rest
          when meta_equal m meta_introduced_hypotheses ->
-       filter (acc2 @ acc1, []) rest
+       filter (true, acc2 @ acc1, []) rest
     | { td_node = Decl d } :: rest ->
         let id = Sid.choose d.d_news in
         (try filter acc (skip (Mid.find id symbmap) rest)
          with Not_found ->
-              filter (acc1,d::acc2) rest)
+              filter (b,acc1,d::acc2) rest)
     | _ :: rest -> filter acc rest
-    | [] -> match acc1,acc2 with
+    | [] -> if b then List.rev acc1, List.rev acc2
+            else match acc1,acc2 with
             | [], g::r -> List.rev r, [g]
-            | _ -> List.rev acc1, List.rev acc2
+            | _ -> assert false
   in
-  filter ([],[]) (task_tdecls task)
+  filter (false,[],[]) (task_tdecls task)
 
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
@@ -553,9 +554,9 @@ let print_sequent fmt task =
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
-  fprintf fmt "----------------------------- Local context ---------------------------@\n@\n";
+  fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld1;
-  fprintf fmt "----------------------------- Goal ---------------------------@\n@\n";
+  fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" aux ld2;
 
 
@@ -628,8 +629,10 @@ let () = Exn_printer.register
       fprintf fmt "Not a term: %a" print_term t
   | Term.FmlaExpected t ->
       fprintf fmt "Not a formula: %a" print_term t
-  | Term.InvalidLiteralType ty ->
-      fprintf fmt "Type %a cannot be used for a numeric literal" print_ty ty
+  | Term.InvalidIntegerLiteralType ty ->
+      fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
+  | Term.InvalidRealLiteralType ty ->
+      fprintf fmt "Cannot cast a real literal to type %a" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls

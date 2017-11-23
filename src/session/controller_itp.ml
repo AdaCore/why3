@@ -39,6 +39,7 @@ type proof_attempt_status =
   | Detached (** parent goal has no task, is detached *)
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
+  | UpgradeProver of Whyconf.prover (** prover is upgraded *)
 
 let print_status fmt st =
   match st with
@@ -53,6 +54,8 @@ let print_status fmt st =
       fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
   | Uninstalled pr    ->
       fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
+  | UpgradeProver pr    ->
+      fprintf fmt "Prover upgrade to %a" Whyconf.print_prover pr
 
 type transformation_status =
   | TSscheduled | TSdone of transID | TSfailed of (proofNodeID * exn)
@@ -82,6 +85,11 @@ type controller =
     controller_running_proof_attempts : unit Hpan.t;
   }
 
+let session_max_tasks = ref 1
+
+let set_session_max_tasks n =
+  session_max_tasks := n;
+  Prove_client.set_max_running_provers n
 
 let create_controller config env ses =
   let c =
@@ -219,8 +227,7 @@ let print_session fmt c =
 
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
-  c.controller_session <-
-    empty_session ~shape_version:(get_shape_version old_ses) (get_dir old_ses);
+  c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
   try
     merge_files ~use_shapes c.controller_env c.controller_session old_ses
   with e ->
@@ -253,11 +260,6 @@ let prover_tasks_edited = Queue.create ()
 
 let timeout_handler_running = ref false
 
-let max_number_of_running_provers = ref 1
-
-let set_max_tasks n =
-  max_number_of_running_provers := n;
-  Prove_client.set_max_running_provers n
 
 let number_of_running_provers = ref 0
 
@@ -352,12 +354,15 @@ let build_prover_call ?proof_script ~cntexample c id pr limit callback ores =
                   (Pp.print_option Pp.string) proof_script;
     let inplace = config_pr.Whyconf.in_place in
     let ce_prover = if cntexample then Some pr.Whyconf.prover_name else None in
-    let call =
-      Driver.prove_task ?old:proof_script ?ce_prover ~cntexample ~inplace ~command
+    try
+      let call =
+        Driver.prove_task ?old:proof_script ?ce_prover ~cntexample ~inplace ~command
                         ~limit driver task
-    in
-    let pa = (c.controller_session,id,pr,callback,false,call,ores) in
-    Hashtbl.replace prover_tasks_in_progress call pa
+      in
+      let pa = (c.controller_session,id,pr,callback,false,call,ores) in
+      Hashtbl.replace prover_tasks_in_progress call pa
+    with Sys_error _ as e ->
+      callback (InternalFailure e)
   with Not_found (* goal has no task, it is detached *) ->
        callback Detached
 
@@ -440,15 +445,12 @@ let timeout_handler () =
   begin
     try
       for _i = Hashtbl.length prover_tasks_in_progress
-          to S.multiplier * !max_number_of_running_provers do
+          to S.multiplier * !session_max_tasks do
         let (c,id,pr,limit,proof_script,callback,cntexample,ores) =
           Queue.pop scheduled_proof_attempts in
         try
           build_prover_call ?proof_script ~cntexample c id pr limit callback ores
         with e when not (Debug.test_flag Debug.stack_trace) ->
-          (*Format.eprintf
-            "@[Exception raised in Controller_itp.build_prover_call:@ %a@.@]"
-            Exn_printer.exn_printer e;*)
           callback (InternalFailure e)
       done
   with Queue.Empty -> ()
@@ -490,6 +492,7 @@ let schedule_proof_attempt c id pr
   let callback panid s =
     begin
       match s with
+      | UpgradeProver _ -> ()
       | Scheduled ->
          Hpan.add c.controller_running_proof_attempts panid ();
          update_goal_node notification ses id
@@ -498,15 +501,15 @@ let schedule_proof_attempt c id pr
          Hpan.remove c.controller_running_proof_attempts panid;
          update_proof_attempt ~obsolete:false notification ses id pr res;
          update_goal_node notification ses id
-      | Interrupted ->
+      | Interrupted
+      | InternalFailure _ ->
          Hpan.remove c.controller_running_proof_attempts panid;
          (* what to do ?
          update_proof_attempt ~obsolete:false notification ses id pr res;
           *)
          update_goal_node notification ses id
-      | Detached
-      | InternalFailure _
-      | Uninstalled _
+      | Detached -> assert false
+      | Uninstalled _ -> assert false
       | Undone -> assert false
     end;
     callback panid s
@@ -577,10 +580,11 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      to check more things before giving the attempt to the scheduler *)
   match find_prover notification c parid pr with
   | None -> callback id (Uninstalled pr)
-  | Some pr ->
+  | Some pr' ->
      try
+       if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_raw_task c.controller_session parid in
-       schedule_proof_attempt c parid pr ~counterexmp:false ~limit ~callback ~notification
+       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -679,6 +683,7 @@ let schedule_edition c id pr ~callback ~notification =
   let callback panid s =
     begin
       match s with
+      | UpgradeProver _ -> ()
       | Running -> ()
       | Done res ->
          (* set obsolete to true since we do not know if the manual
@@ -729,8 +734,7 @@ let schedule_transformation c id name args ~callback ~notification =
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, Noprogress))
       | e (* when not (Debug.test_flag Debug.stack_trace) *) ->
-        (* Format.eprintf
-          "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
+          (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
         callback (TSfailed (id, e))
     end;
@@ -753,7 +757,7 @@ let run_strategy_on_goal
          let callback panid res =
            callback_pa panid res;
            match res with
-           | Scheduled | Running -> (* nothing to do yet *) ()
+           | UpgradeProver _ | Scheduled | Running -> (* nothing to do yet *) ()
            | Done { Call_provers.pr_answer = Call_provers.Valid } ->
               (* proof succeeded, nothing more to do *)
               callback STShalt
@@ -957,7 +961,7 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
 
   let craft_report count s r id pr limits pa =
     match s with
-    | Scheduled | Running -> ()
+    | UpgradeProver _ | Scheduled | Running -> ()
     | Undone | Interrupted ->
        decr count;
        r := (id, pr, limits, Replay_interrupted ) :: !r
@@ -1075,7 +1079,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                 let callback paid st =
                   callback_pa paid st;
                   begin match st with
-                  | Scheduled | Running -> ()
+                  | UpgradeProver _ | Scheduled | Running -> ()
                   | Detached | Uninstalled _ -> assert false
                   | Undone | Interrupted -> Debug.dprintf debug "Bisecting interrupted.@."
                   | InternalFailure exn ->
@@ -1136,7 +1140,9 @@ later on. We do has if proof fails. *)
             let limit = { limit with Call_provers.limit_time = !timelimit; } in
             let callback paid st =
               callback_pa paid st;
-              begin match st with
+              begin
+              match st with
+              | UpgradeProver _ -> ()
               | Scheduled ->
                  Debug.dprintf
                    debug "[Bisect] prover on subtask is scheduled@."

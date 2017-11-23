@@ -55,12 +55,12 @@ let send_request_string msg =
       let to_write = String.length msg in
       let rec write pointer =
         if pointer < to_write then
-          let written = Unix.write sock msg pointer (to_write - pointer) in
+          let written = Unix.write_substring sock msg pointer (to_write - pointer) in
           write (pointer + written)
       in write 0
 
 let read_from_client =
-  let buf = String.make 1024 ' ' in
+  let buf = Bytes.make 1024 ' ' in
   fun blocking ->
     match !socket with
     | None -> raise NotConnected
@@ -73,7 +73,7 @@ let read_from_client =
         in
         if do_read then
           let read = Unix.read sock buf 0 1024 in
-          String.sub buf 0 read
+          Bytes.sub_string buf 0 read
         else ""
 
 (* TODO/FIXME: should we be able to change this setting when

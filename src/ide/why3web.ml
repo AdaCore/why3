@@ -69,8 +69,9 @@ let interp_request args =
       | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
   | args when Strings.has_prefix "gettask_" args ->
      let b = false (* TODO: allow user to customize printing with intros or not *) in
+     let c = false in
      let loc = true in
-     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),b,loc)
+     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),b,c,loc)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =
@@ -129,7 +130,7 @@ let files : string Queue.t = Queue.create ()
 
 let opt_parser = ref None
 
-let spec = Arg.align [
+let spec = [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),

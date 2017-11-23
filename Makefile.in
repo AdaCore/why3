@@ -99,19 +99,14 @@ INCLUDES = @ZIPINCLUDE@ @MENHIRINCLUDE@
 
 WARNINGS = A-4-9-41-44-45-50-52@5@48
 
-OFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -dtypes -g -I lib/why3 $(INCLUDES)
+OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
+BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g -I lib/why3 $(INCLUDES)
 
 OLINKFLAGS = -linkall $(EXTCMXA)
 BLINKFLAGS = -linkall $(EXTCMA)
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
-endif
-
-ifeq (@enable_bin_annot@,yes)
-OFLAGS += -bin-annot
-BFLAGS += -bin-annot
 endif
 
 # see http://caml.inria.fr/mantis/view.php?id=4991
@@ -1038,7 +1033,7 @@ COQPDEP = $(addsuffix .dep, $(COQPMODULES))
 COQPCMO = $(addsuffix .cmo, $(COQPMODULES))
 COQPCMX = $(addsuffix .cmx, $(COQPMODULES))
 
-COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel
+COQPTREES = engine interp intf kernel lib library ltac parsing pretyping printing proofs tactics toplevel vernac plugins/ltac
 COQPINCLUDES = -I src/coq-tactic -I $(COQCAMLPLIB) $(addprefix -I @COQLIB@/, $(COQPTREES)) @ZIPINCLUDE@
 
 $(COQPDEP): DEPFLAGS += -I src/coq-tactic
@@ -1067,6 +1062,9 @@ src/coq-tactic/why3tac.ml: src/coq-tactic/why3tac.ml4
 COQRTAC = -R lib/coq-tactic Why3 -R lib/coq Why3
 
 ifeq (@coq_compat_version@,COQ86)
+COQRTAC += -I lib/coq-tactic
+endif
+ifeq (@coq_compat_version@,COQ87)
 COQRTAC += -I lib/coq-tactic
 endif
 
@@ -1172,7 +1170,7 @@ COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
 COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
 
-COQLIBS_IEEEFLOAT_FILES = GenericFloat
+COQLIBS_IEEEFLOAT_FILES = RoundingMode GenericFloat Float32 Float64
 COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
@@ -1239,7 +1237,7 @@ ifeq (@enable_coq_fp_libs@,yes)
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
 
-update-coq: remove-coq-headers update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float headers-coq
+update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-seq update-coq-bv update-coq-ieee_float
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/int.why
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T int.$$f -o lib/coq/int/; done
@@ -1413,7 +1411,7 @@ clean::
 
 ifeq (@enable_isabelle_libs@,yes)
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_Bool.thy Why3_BV.thy Why3_Int.thy Why3_List.thy Why3_Number.thy Why3_Set.thy
+ISABELLEVERSIONSPECIFIC=ROOT why3.ML Why3_BV.thy Why3_Number.thy Why3_Real.thy Why3_Set.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1818,7 +1816,7 @@ CLEANDIRS += src/trywhy3
 # why3webserver and full web/js interface
 #########
 
-ifeq (@HASJSOFOCAML,yes)
+ifeq (@HASJSOFOCAML@,yes)
 
 JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
         -I src/ide
@@ -2296,22 +2294,15 @@ dist: $(MORE_DIST)
 # file headers
 ###############
 
-headers: headers-coq
+headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
 		src/*/*.ml src/*/*.ml[iyl4] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
-		lib/coq-tactic/*.v lib/coq/*.v \
+		lib/coq-tactic/*.v lib/coq/*.v lib/coq/*/*.v \
 		src/server/*.c src/server/*.h \
 		src/ide/resetgc.c \
 		examples/use_api/*.ml
-
-headers-coq:
-	headache -c misc/headache_config.txt -h misc/header.txt \
-		lib/coq/*/*.v
-
-remove-coq-headers:
-	headache -r -c misc/headache_config.txt lib/coq/*/*.v
 
 #########
 # myself

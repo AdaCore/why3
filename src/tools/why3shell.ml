@@ -81,7 +81,7 @@ let send_request = Protocol_shell.send_request
 (* files of the current task *)
 let files = Queue.create ()
 
-let spec = Arg.align []
+let spec = []
 
 (* --help *)
 let usage_str = Format.sprintf
@@ -223,7 +223,9 @@ let change_node fmt (n: node_ID) (u: update_info) =
         node.node_proved <- b
     | Proof_status_change (_pas, _b, _rl) when node.node_type = SProofAttempt ->
         fprintf fmt "Not yet supported@." (* TODO *)
-    | _ -> fprintf fmt "Not yet supported@.") (* TODO *)
+    | Proof_status_change _ ->
+        fprintf fmt "Not yet supported@." (* TODO *)
+    | Name_change _ -> fprintf fmt "Not yet supported@.") (* TODO *)
   with
     Not_found -> fprintf fmt "Could not find node %d@." n
 
@@ -235,6 +237,7 @@ let is_proof_attempt node_type =
 let treat_notification fmt n =
   fprintf fmt "Treat notifications@.";
   match n with
+  | Reset_whole_tree -> () (* something to do ? *)
   | Node_change (id, info)        ->
     change_node fmt id info
   | New_node (id, pid, typ, name, detached) ->
@@ -349,7 +352,8 @@ let interp _chout fmt cmd =
     | ["goto"; n] when int_of_string n < !max_ID ->
         cur_id := int_of_string n;
         let b = false (* TODO: allow user to customize printing with intros or not *) in
-        send_request (Get_task(!cur_id,b,false));
+        let c = false (* TODO *) in
+        send_request (Get_task(!cur_id,b,c,false));
         print_session fmt
     | _ ->
         begin
@@ -357,7 +361,8 @@ let interp _chout fmt cmd =
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" ->
              let b = false (* TODO: allow user to customize printing with intros or not *) in
-             send_request (Get_task(!cur_id,b,false))
+             let c = false (* TODO *) in
+             send_request (Get_task(!cur_id,b,c,false))
           | "p" -> print_session fmt
           | _ -> send_request (Command_req (!cur_id, cmd))
         end

@@ -102,17 +102,6 @@ type to_prover =
   | To_prover of prover
   | SameProver
 
-let unknown_to_known_provers provers pu =
-  Mprover.fold (fun pk _ (others,name,version) ->
-    match
-      pk.prover_name = pu.prover_name,
-      pk.prover_version = pu.prover_version,
-      pk.prover_altern = pu.prover_altern with
-        | false, _, _ -> pk::others, name, version
-        | _, false, _ -> others, pk::name, version
-        | _           -> others, name, pk::version
-  ) provers ([],[],[])
-
 let get_to_prover pk session config =
   match pk with
     | Some pk -> To_prover pk
