@@ -1737,6 +1737,9 @@ let merge_file  ~use_shapes env (ses : session) (old_ses : session) file =
       ~env file_name new_theories format;
     None
   with e -> (* TODO: capture only parsing and typing errors *)
+    merge_file_section
+      ses ~use_shapes ~old_ses ~old_theories
+      ~env file_name [] format;
     Some e
 
 let merge_files ~use_shapes env (ses:session)  (old_ses : session) =

@@ -644,7 +644,8 @@ end
       (function
         | Loc.Located (loc, e) ->
            let rel_loc = relativize_location cont.controller_session loc in
-           let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+           let s = Format.asprintf "%a: %a" Loc.gen_report_position rel_loc
+                                   Exn_printer.exn_printer e in
            (loc, rel_loc, s)
         | e when not (Debug.test_flag Debug.stack_trace) ->
            let s = Format.asprintf "%a" Exn_printer.exn_printer e in

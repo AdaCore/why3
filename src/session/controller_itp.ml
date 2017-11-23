@@ -228,11 +228,14 @@ let print_session fmt c =
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
-  try
+(*  try
+ *)
     merge_files ~use_shapes c.controller_env c.controller_session old_ses
+(* not need_anymore
   with e ->
     c.controller_session <- old_ses;
     raise e
+ *)
 
 let add_file c ?format fname =
   try
