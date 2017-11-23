@@ -203,10 +203,8 @@ module PSession = struct
        let name = get_transf_name s id in
        let name = if tn_proved s id then name^"!" else name^"?" in
        let sts = get_sub_tasks s id in
-       let dsts = get_detached_sub_tasks s id in
        name,
-       List.fold_right (fun g -> n (Goal g)) sts
-                       (List.fold_right (fun g -> n (Goal g)) dsts [])
+       List.fold_right (fun g -> n (Goal g)) sts []
 
 end
 

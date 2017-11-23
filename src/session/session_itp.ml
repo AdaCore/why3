@@ -77,7 +77,6 @@ type transformation_node = {
   transf_args                      : string list;
   transf_subtasks                  : proofNodeID list;
   transf_parent                    : proofNodeID;
-  mutable transf_detached_subtasks : proofNodeID list;
 }
 
 type file = {
@@ -251,9 +250,6 @@ let get_proof_attempts (s : session) (id : proofNodeID) =
 
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
-
-let get_detached_sub_tasks (s : session) (id : transID) =
-  (get_transfNode s id).transf_detached_subtasks
 
 let get_transf_args (s : session) (id : transID) =
   (get_transfNode s id).transf_args
@@ -611,46 +607,11 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
              transf_args = args;
              transf_subtasks = pnl;
              transf_parent = id;
-             transf_detached_subtasks = [] } in
+           }
+  in
   Hint.add s.trans_table node_id tn;
   Htn.add s.tn_state node_id proved;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
-
-let rec copy_structure ~notification s from_any to_any : unit =
-  match from_any, to_any with
-  | APn from_id, APn to_id ->
-    let transformations = get_transformations s from_id in
-    let new_transformations =
-      List.map (fun x ->
-        let tr_id = gen_transID s in
-        let old_tr = get_transfNode s x in
-        mk_transf_node s to_id tr_id old_tr.transf_name old_tr.transf_args
-                       ~proved:false [];
-        notification ~parent:to_any (ATn tr_id);
-        copy_structure ~notification s (ATn x) (ATn tr_id);
-        tr_id) transformations in
-    (get_proofNode s to_id).proofn_transformations <- new_transformations;
-    Hprover.iter (fun _k old_pa ->
-      let old_pa = get_proof_attempt_node s old_pa in
-      let pa_id =
-        add_proof_attempt s old_pa.prover old_pa.limit None true None to_id in
-      notification ~parent:to_any (APa pa_id))
-      (get_proofNode s from_id).proofn_attempts
-  | ATn from_tn, ATn to_tn ->
-    let sub_tasks = get_sub_tasks s from_tn in
-    let new_sub_tasks =
-      List.map (fun old_pn_id ->
-        let old_pn = get_proofNode s old_pn_id in
-        let pn_id = gen_proofNodeID s in
-        let new_id = Ident.id_register (Ident.id_clone old_pn.proofn_name) in
-        mk_proof_node_no_task s new_id (Trans to_tn)
-          pn_id old_pn.proofn_checksum old_pn.proofn_shape false;
-        notification ~parent:to_any (APn pn_id);
-        copy_structure ~notification s (APn old_pn_id) (APn pn_id);
-        pn_id) sub_tasks in
-    let tr = get_transfNode s to_tn in
-    tr.transf_detached_subtasks <- new_sub_tasks
-  | _ -> failwith "Session_itp.copy_structure"
 
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)

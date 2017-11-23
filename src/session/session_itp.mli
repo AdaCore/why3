@@ -98,7 +98,6 @@ val get_proof_attempt_node : session -> proofAttemptID -> proof_attempt_node
 val get_proof_attempt_parent : session -> proofAttemptID -> proofNodeID
 val get_proof_attempts : session -> proofNodeID -> proof_attempt_node list
 val get_sub_tasks : session -> transID -> proofNodeID list
-val get_detached_sub_tasks : session -> transID -> proofNodeID list
 
 val get_transf_args : session -> transID -> string list
 val get_transf_name : session -> transID -> string
@@ -230,11 +229,7 @@ val load_session : string -> session * bool
     cannot be read.
  *)
 
-(** {2 Copy and remove} *)
-
-(** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
-val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
-
+(** {2 remove} *)
 
 exception RemoveError
 
