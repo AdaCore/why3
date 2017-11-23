@@ -288,7 +288,7 @@ goal devel_conv_7_norm: eq' (conv g5) (conv g6) by normalize (conv g5) = normali
 
 end
 
-module AssocAlgebra
+theory AssocAlgebra
 
 type r
 type a
@@ -318,7 +318,7 @@ val predicate eq0 (r: r) ensures { result <-> r = R.zero }
 
 end
 
-module AssocAlgebraDecision
+theory AssocAlgebraDecision
 
 
 use import int.Int
@@ -1360,7 +1360,6 @@ module MatrixTests
     assert { a21 = block r s s 0 s by a21 == block r s s 0 s };
     assert { a22 = block r s s s s by a22 == block r s s s s };
     r
-
 
   meta "compute_max_steps" 0x100000
 
