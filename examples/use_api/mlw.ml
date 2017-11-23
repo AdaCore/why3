@@ -134,8 +134,7 @@ let d2 =
       (* e1 : the appropriate instance of "ref" *)
       let e1 = Mlw_expr.e_arrow ref_fun [Mlw_ty.ity_int] ity in
       (* we apply it to 0 *)
-      let c0 = Mlw_expr.e_const
-        Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec "0" }) Mlw_ty.ity_int in
+      let c0 = Mlw_expr.e_const (Number.const_of_int 0) Mlw_ty.ity_int in
       Mlw_expr.e_app e1 [c0]
     in
     (* building the first part of the let x = ref 0 *)

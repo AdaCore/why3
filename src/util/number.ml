@@ -58,19 +58,19 @@ let is_dec = function '0'..'9' -> true | _ -> false
 let is_oct = function '0'..'7' -> true | _ -> false
 let is_bin = function '0'..'1' -> true | _ -> false
 
-let int_const_dec s =
+let int_literal_dec s =
   check_integer_literal 10 is_dec s;
   IConstDec s
 
-let int_const_hex s =
+let int_literal_hex s =
   check_integer_literal 16 is_hex s;
   IConstHex s
 
-let int_const_oct s =
+let int_literal_oct s =
   check_integer_literal 8 is_oct s;
   IConstOct s
 
-let int_const_bin s =
+let int_literal_bin s =
   check_integer_literal 2 is_bin s;
   IConstBin s
 

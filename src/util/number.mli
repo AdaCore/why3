@@ -42,10 +42,10 @@ type constant =
 
 val is_negative : constant -> bool
 
-val int_const_dec : string -> integer_literal
-val int_const_hex : string -> integer_literal
-val int_const_oct : string -> integer_literal
-val int_const_bin : string -> integer_literal
+val int_literal_dec : string -> integer_literal
+val int_literal_hex : string -> integer_literal
+val int_literal_oct : string -> integer_literal
+val int_literal_bin : string -> integer_literal
 (** these four functions construct integer constant terms from some
     string [s] of digits in the corresponding base. Exception
     InvalidConstantLiteral(base,s) is raised if [s] contains invalid
