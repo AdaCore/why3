@@ -342,6 +342,8 @@ val create_xsymbol : preid -> ?mask:mask -> ity -> xsymbol
 exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception AssignSnapshot of ity
+exception WriteImmutable of region * pvsymbol
 exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
