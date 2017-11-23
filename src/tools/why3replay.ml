@@ -355,14 +355,15 @@ let () =
     let ses,use_shapes = S.load_session dir in
     let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
-    let found_obs, found_detached =
-      try
-        Controller_itp.reload_files cont ~use_shapes;
-      with
-      | e ->
-         Format.eprintf "%a@." Exn_printer.exn_printer e;
-         exit 1
+    let errors, found_obs, found_detached =
+      Controller_itp.reload_files cont ~use_shapes;
     in
+    begin match errors with
+    | [] -> ()
+    | l ->
+       List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
+       exit 1
+    end;
     Debug.dprintf debug " done.@.";
     if !opt_obsolete_only && not (found_detached || found_obs)
     then

@@ -235,9 +235,14 @@ let reload_files (c : controller) ~use_shapes =
     raise e
 
 let add_file c ?format fname =
-  let theories = Session_itp.read_file c.controller_env ?format fname in
-  let (_ : file) = add_file_section c.controller_session fname theories format in
-  ()
+  try
+    let theories = Session_itp.read_file c.controller_env ?format fname in
+    let (_ : file) = add_file_section c.controller_session fname (Some theories) format in
+    None
+  with e ->
+    let (_ : file) = add_file_section c.controller_session fname None format in
+    Some e
+
 
 
 module type Scheduler = sig

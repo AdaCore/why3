@@ -640,22 +640,30 @@ end
     Loc.user_position f l b e
 
   let capture_parse_or_type_errors f cont =
-    try let _ = f cont in None with
-    | Loc.Located (loc, e) ->
-      let rel_loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Some (loc, rel_loc, s)
-    | e when not (Debug.test_flag Debug.stack_trace) ->
-      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Some (Loc.dummy_position, Loc.dummy_position, s)
+    List.map
+      (function
+        | Loc.Located (loc, e) ->
+           let rel_loc = relativize_location cont.controller_session loc in
+           let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+           (loc, rel_loc, s)
+        | e when not (Debug.test_flag Debug.stack_trace) ->
+           let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+           (Loc.dummy_position, Loc.dummy_position, s)
+        | e -> raise e)
+      (f cont)
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    capture_parse_or_type_errors (reload_files ~use_shapes) cont
+    capture_parse_or_type_errors
+      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
 
   let add_file cont ?format fname =
-    capture_parse_or_type_errors (fun c -> add_file c ?format fname) cont
+    capture_parse_or_type_errors
+      (fun c ->
+       match add_file c ?format fname with
+       | None -> []
+       | Some e -> [e]) cont
 
 
   (* -----------------------------------   ------------------------------------- *)
@@ -932,14 +940,18 @@ end
         if (Sys.file_exists f) then
           begin
             match add_file cont f with
-            | None ->
+            | [] ->
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
                read_and_send (file_name file);
                P.notify (Message (Information "file added in session"))
-            | Some(loc,rel_loc,s) ->
+            | l ->
                read_and_send fn;
-               P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+               List.iter
+                 (function
+                   | (loc,rel_loc,s) ->
+                      P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+                 l
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -998,10 +1010,13 @@ end
            focus on a specific node. *)
     get_focused_label := None;
     match x with
-    | None ->
+    | [] ->
        P.notify (Message (Information "Session initialized succesfully"))
-    | Some(loc,rel_loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+    | l ->
+       List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1210,12 +1225,15 @@ end
     unfocus ();
     clear_tables ();
     match reload_files d.cont ~use_shapes:true with
-    | None ->
-        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
+    | [] ->
+       (* TODO: try to restore the previous focus : focused_node := old_focus; *)
        reset_and_send_the_whole_tree ();
        P.notify (Message (Information "Session refresh successful"))
-    | Some(loc,rel_loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+    | l ->
+       List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in

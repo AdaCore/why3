@@ -85,7 +85,8 @@ type transformation_node = {
 type file = {
   file_name              : string;
   file_format            : string option;
-  mutable file_theories          : theory list;
+  file_is_detached       : bool;
+  mutable file_theories  : theory list;
 }
 
 let file_name f = f.file_name
@@ -280,7 +281,7 @@ let get_detached_trans (_s: session) (_id: proofNodeID) =
 
 let rec is_detached (s: session) (a: any) =
   match a with
-  | AFile _file -> false
+  | AFile file -> file.file_is_detached
   | ATh th     -> th.theory_is_detached
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
@@ -1136,6 +1137,7 @@ let load_file session old_provers f =
            (load_theory session fn old_provers) [] f.Xml.elements) in
     let mf = { file_name = fn;
                file_format = fmt;
+               file_is_detached = true;
                file_theories = ft;
              } in
     Hstr.add session.session_files fn mf;
@@ -1634,7 +1636,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 
 (* add a why file to a session *)
 let add_file_section (s:session) (fn:string)
-    (theories:Theory.theory list) format : file =
+    (theories:Theory.theory list option) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
@@ -1643,22 +1645,33 @@ let add_file_section (s:session) (fn:string)
       assert false
     end
   else
-    let f = { file_name = fn;
-              file_format = format;
-              file_theories = [] }
-    in
-    Hstr.add s.session_files fn f;
-    let theories = List.map (make_theory_section ~detached:false s fn) theories in
-    f.file_theories <- theories;
-    f
+    match theories with
+    | None ->
+       let f = { file_name = fn;
+                 file_format = format;
+                 file_is_detached = true;
+                 file_theories = [] }
+       in
+       Hstr.add s.session_files fn f;
+       f
+    | Some ths ->
+       let f = { file_name = fn;
+                 file_format = format;
+                 file_is_detached = false;
+                 file_theories = [] }
+       in
+       Hstr.add s.session_files fn f;
+       let theories = List.map (make_theory_section ~detached:false s fn) ths in
+       f.file_theories <- theories;
+       f
 
-      (* add a why file to a session and try to merge its theories with the
+(* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
 let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
   Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
-  let f = add_file_section s fn [] format in
+  let f = add_file_section s fn (Some []) format in
   let fn = f.file_name in
   let theories,detached =
     let old_th_table = Hstr.create 7 in
@@ -1717,21 +1730,25 @@ let merge_file  ~use_shapes env (ses : session) (old_ses : session) file =
   let format = file_format file in
   let old_theories = file_theories file in
   let file_name = Filename.concat (get_dir old_ses) (file_name file) in
-  let new_theories =
-    try
-      read_file env file_name ?format
-    with e -> (* TODO: filter only syntax error and typing errors *)
-      raise e
-  in
-  merge_file_section
-    ses ~use_shapes ~old_ses ~old_theories
-    ~env file_name new_theories format
+  try
+    let new_theories = read_file env file_name ?format in
+    merge_file_section
+      ses ~use_shapes ~old_ses ~old_theories
+      ~env file_name new_theories format;
+    None
+  with e -> (* TODO: capture only parsing and typing errors *)
+    Some e
 
 let merge_files ~use_shapes env (ses:session)  (old_ses : session) =
-  Stdlib.Hstr.iter
-    (fun _ f -> merge_file ~use_shapes env ses old_ses f)
-    (get_files old_ses);
-  !found_obsolete,!found_detached
+  let errors =
+    Stdlib.Hstr.fold
+      (fun _ f acc ->
+       match merge_file ~use_shapes env ses old_ses f with
+       | None -> acc
+       | Some e -> e :: acc)
+      (get_files old_ses) []
+  in
+  (errors,!found_obsolete,!found_detached)
 
 
 (************************)

@@ -153,7 +153,7 @@ val empty_session : ?from:session -> string -> session
     argument *)
 
 val add_file_section :
-  session -> string -> (Theory.theory list) ->
+  session -> string -> Theory.theory list option ->
   Env.fformat option -> file
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
@@ -167,15 +167,16 @@ val read_file :
    signaled with exceptions.  *)
 
 val merge_files :
-  use_shapes:bool -> Env.env -> session -> session -> bool * bool
+  use_shapes:bool -> Env.env -> session -> session -> exn list * bool * bool
 (** [merge_files ~use_shapes env ses old_ses] merges the file sections
     of session [s] with file sections of the same name in old session
     [old_ses]. Recursively, for each theory whose name is identical to
     old theories, it is attempted to associate the old goals,
     proof_attempts and transformations to the goals of the new theory.
-    Returns a pair [(o,d)] such that [o] is true when obsolete proof
-    attempts where found and [d] is true id detached theories, goals
-    or transformations were found.  *)
+    Returns a triple [(e,o,d)] such that [e] is the list of parsing or
+    typing errors found, [o] is true when obsolete proof attempts
+    where found and [d] is true if detached theories, goals or
+    transformations were found.  *)
 
 val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
   Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
