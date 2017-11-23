@@ -20,6 +20,18 @@ val debug_type_only : Debug.flag
 
 (** incremental parsing *)
 
+val add_range_decl :
+  'a ->
+  ('a -> Decl.decl -> 'a) ->
+  ('a -> Theory.meta -> Theory.meta_arg list -> 'a) ->
+  Ty.tysymbol -> Number.int_range -> 'a
+
+val add_float_decl:
+  'a ->
+  ('a -> Decl.decl -> 'a) ->
+  ('a -> Theory.meta -> Theory.meta_arg list -> 'a) ->
+  Ty.tysymbol -> Number.float_format -> 'a
+
 val add_decl : Loc.position -> theory_uc -> Ptree.decl -> theory_uc
 
 val add_use_clone :
