@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" steplimit="0" memlimit="0"/>
@@ -10,8 +10,11 @@
 <prover id="6" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="11" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../decrease1.mlw" expanded="true">
-<theory name="Decrease1" sum="e498d06be6ac431d95eb341af5140b44" expanded="true">
+<theory name="Decrease1" sum="095ceb3b0449b764d13399f91bda1ab7" expanded="true">
  <goal name="decrease1_induction" expl="" expanded="true">
  <proof prover="3" edited="decrease1_Decrease1_decrease1_induction_2.v"><result status="valid" time="0.40"/></proof>
  </goal>
@@ -46,6 +49,7 @@
   <proof prover="6"><result status="valid" time="0.02"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   <proof prover="8"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="10"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter search.5" expl="index in array bounds" expanded="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -158,8 +162,10 @@
   <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.7" expl="postcondition" expanded="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
-  <proof prover="7"><result status="valid" time="0.05"/></proof>
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="6"><result status="valid" time="1.18"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
+  <proof prover="11"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.8" expl="variant decrease">
   <proof prover="8"><result status="valid" time="0.03" steps="6"/></proof>
@@ -173,10 +179,10 @@
   <proof prover="8"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.10" expl="postcondition" expanded="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
-  <proof prover="7"><result status="valid" time="0.02"/></proof>
-  <proof prover="8"><result status="valid" time="0.01" steps="42"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.05"/></proof>
+  <proof prover="9"><result status="valid" time="0.01"/></proof>
+  <proof prover="11"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter search_rec.11" expl="postcondition" expanded="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
