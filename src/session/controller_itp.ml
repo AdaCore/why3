@@ -182,7 +182,7 @@ module PSession = struct
        List.fold_right
          (fun g -> n (Goal g))
          (theory_goals th)
-         (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
+         []
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
@@ -857,24 +857,6 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
           List.iter2 (fun x y -> copy_paste c (APn x) (APn y)
               ~notification ~callback_pa ~callback_tr) from_tn_list to_tn_list
     | _ -> raise BadCopyPaste
-
-
-let copy_detached ~copy c from_any =
-  match from_any with
-  | APn from_pn ->
-    begin
-      let pn_id = copy_proof_node_as_detached c.controller_session from_pn in
-      let parent = get_any_parent c.controller_session from_any in
-      match parent with
-      | None -> raise (BadCopyDetached "copy_detached no parent")
-      | Some parent ->
-          copy ~parent (APn pn_id);
-          copy_structure
-            ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
-    end
-  (* Only goal can be detached *)
-  | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
-
 
 
 

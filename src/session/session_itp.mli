@@ -65,7 +65,6 @@ val file_theories : file -> theory list
 (** Theory *)
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
-val theory_detached_goals : theory -> proofNodeID list
 val theory_parent : session -> theory -> file
 
 type proof_attempt_node = private {
@@ -233,10 +232,7 @@ val load_session : string -> session * bool
 
 (** {2 Copy and remove} *)
 
-exception BadCopyDetached of string
-
 (** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
-val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID
 val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
 
 

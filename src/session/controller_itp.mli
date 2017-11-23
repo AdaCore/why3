@@ -277,9 +277,6 @@ val copy_paste:
     callback_tr:(string -> string list -> transformation_status -> unit) ->
     controller -> any -> any -> unit
 
-val copy_detached:
-    copy:(parent:any -> any -> unit) ->
-    controller -> any -> unit
 
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result

@@ -268,7 +268,6 @@ let print_request fmt r =
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
-  | Copy_detached _                 -> fprintf fmt "copy detached"
   | Save_file_req _                 -> fprintf fmt "save file"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
@@ -1317,14 +1316,6 @@ end
           ~callback_pa:(callback_update_tree_proof d.cont)
           ~callback_tr:(callback_update_tree_transform)
           d.cont from_any to_any
-
-    | Copy_detached from_id        ->
-        let from_any = any_from_node_ID from_id in
-        let copy ~parent p =
-          let parent = node_ID_from_any parent in
-          ignore (new_node ~parent p)
-        in
-        C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
     | Save_file_req (name, text)   ->

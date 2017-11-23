@@ -37,16 +37,14 @@ let print_proofAttemptID fmt id =
 
 type theory = {
   theory_name                   : Ident.ident;
-  theory_goals                  : proofNodeID list;
+  mutable theory_goals          : proofNodeID list;
   theory_parent_name            : string;
   theory_is_detached            : bool;
-  mutable theory_detached_goals : proofNodeID list;
   mutable theory_checksum       : Termcode.checksum option;
 }
 
 let theory_name t = t.theory_name
 let theory_goals t = t.theory_goals
-let theory_detached_goals t = t.theory_detached_goals
 
 type proof_parent = Trans of transID | Theory of theory
 
@@ -576,7 +574,6 @@ let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
              proofn_expl = expl;
-             (* proofn_table = Some tables; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -589,7 +586,6 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
     (parent : proof_parent) (node_id : proofNodeID) sum shape proved =
   let pn = { proofn_name = n;
              proofn_expl = "";
-             (* proofn_table = None; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -597,32 +593,6 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
              proofn_transformations = [] } in
   Hint.add s.proofNode_table node_id pn;
   Hint.add s.pn_state node_id proved
-
-(* Detach a new proof to a proof_parent *)
-let graft_detached_proof_on_parent s (pn: proofNodeID) (parent: proof_parent) =
-  match parent with
-  | Theory th ->
-      th.theory_detached_goals <- th.theory_detached_goals @ [pn]
-  | Trans tr_id ->
-      let tr = get_transfNode s tr_id in
-      tr.transf_detached_subtasks <- tr.transf_detached_subtasks @ [pn]
-
-(* Intended as a feature to save a proof (also for testing detached stuff) *)
-let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
-  let pn = get_proofNode s pn_id in
-  let new_pn_id = gen_proofNodeID s in
-  let parent = pn.proofn_parent in
-  let new_goal = Ident.id_register (Ident.id_clone pn.proofn_name) in
-  let checksum = pn.proofn_checksum in
-  let shape = pn.proofn_shape in
-  let _: unit = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape false in
-  graft_detached_proof_on_parent s new_pn_id parent;
-  new_pn_id
-
-let _mk_proof_node_task (s : session) (t : Task.task)
-    (parent : proof_parent) (node_id : proofNodeID) =
-  let name,_,_ = Termcode.goal_expl_task ~root:false t in
-  mk_proof_node ~version:s.session_shape_version s name t parent node_id
 
 let mk_transf_proof_node (s : session) (parent_name : string)
     (tid : transID) (index : int) (t : Task.task) =
@@ -645,8 +615,6 @@ let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
   Hint.add s.trans_table node_id tn;
   Htn.add s.tn_state node_id proved;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
-
-exception BadCopyDetached of string
 
 let rec copy_structure ~notification s from_any to_any : unit =
   match from_any, to_any with
@@ -682,7 +650,8 @@ let rec copy_structure ~notification s from_any to_any : unit =
         pn_id) sub_tasks in
     let tr = get_transfNode s to_tn in
     tr.transf_detached_subtasks <- new_sub_tasks
-  | _ -> raise (BadCopyDetached "copy_structure")
+  | _ -> failwith "Session_itp.copy_structure"
+
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
     (args : string list) (tl : Task.task list) =
@@ -1117,7 +1086,7 @@ let load_theory session parent_name old_provers acc th =
                 theory_is_detached = true;
                 theory_goals = goals;
                 theory_parent_name = parent_name;
-                theory_detached_goals = [] } in
+              } in
     List.iter2
       (load_goal session old_provers (Theory mth))
       th.Xml.elements goals;
@@ -1394,8 +1363,7 @@ let save_detached_theory parent_name old_s detached_theory s =
     theory_checksum = None;
     theory_is_detached = true;
     theory_goals = goalsID;
-    theory_parent_name = parent_name;
-    theory_detached_goals = [] }
+    theory_parent_name = parent_name }
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
@@ -1582,7 +1550,7 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th);
+  th.theory_goals <- th.theory_goals @ save_detached_goals old_s detached s (Theory th);
   (* If we are not using shapes, we want to recover the goals that were
      "wrongly" marked as obsolete during AssoGoals.simple_associate. The
      condition for this to be correct is to check that the checksum of the
@@ -1623,7 +1591,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
                  theory_is_detached = detached;
                  theory_goals = goalsID;
                  theory_parent_name = parent_name;
-                 theory_detached_goals = [] } in
+               } in
   let parent = Theory theory in
   List.iter2 (add_goal parent) tasks goalsID;
   begin

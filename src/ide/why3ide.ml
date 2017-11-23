@@ -1425,17 +1425,9 @@ let paste () =
     | None -> ())
   | _ -> ()
 
-let detached_copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    send_request (Copy_detached n)
-  | _ -> ()
-
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
 
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:detached_copy "Detached copy"
 
 (*********************************)
 (* add a new file in the project *)
