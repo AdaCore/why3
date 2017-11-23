@@ -66,7 +66,7 @@ type proof_node = {
   proofn_name                    : Ident.ident;
   proofn_expl                    : string;
   proofn_parent                  : proof_parent;
-  proofn_checksum                : Termcode.checksum option;
+  proofn_checksum                : Termcode.checksum;
   proofn_shape                   : Termcode.shape;
   proofn_attempts                : proofAttemptID Hprover.t;
   mutable proofn_transformations : transID list;
@@ -269,18 +269,13 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
-(* TODO to be done with detached transformations *)
-let get_detached_trans (_s: session) (_id: proofNodeID) =
-  []
-
 let rec is_detached (s: session) (a: any) =
   match a with
   | AFile file -> file.file_is_detached
   | ATh th     -> th.theory_is_detached
   | ATn tn     ->
     let pn_id = get_trans_parent s tn in
-    is_detached s (APn pn_id) ||
-    List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
+    is_detached s (APn pn_id)
   | APn pn     ->
     begin
       try let _ = get_raw_task s pn in false
@@ -464,7 +459,7 @@ let rec print_proof_node s (fmt: Format.formatter) p =
   fprintf fmt
     "@[<hv 1> Goal %s;@ parent %s;@ sum %s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@]@]"
     pn.proofn_name.id_string parent
-    (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
+    (Termcode.string_of_checksum pn.proofn_checksum)
     (Pp.print_list Pp.semi print_proof_attempt)
       (Hprover.fold (fun _key e l ->
                      let e = get_proof_attempt_node s e in
@@ -566,7 +561,7 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
 let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   (* let tables = Args_wrapper.build_naming_tables t in *)
-  let sum = Some (Termcode.task_checksum ~version t) in
+  let sum = Termcode.task_checksum ~version t in
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
              proofn_expl = expl;
@@ -959,8 +954,8 @@ let rec load_goal session old_provers parent g id =
     (* even if sum and shape are not in the XML file but in the shape
   file, these attributes are there thanks to ~fixattr on
   Xml.from_file *)
-    let csum = string_attribute_opt "sum" g in
-    let sum = Opt.map Termcode.checksum_of_string csum in
+    let csum = string_attribute_def "sum" g "" in
+    let sum = Termcode.checksum_of_string csum in
     let shape =
       try Termcode.shape_of_string (List.assoc "shape" g.Xml.attributes)
       with Not_found -> Termcode.shape_of_string ""
@@ -1254,9 +1249,8 @@ module CombinedTheoryChecksum = struct
   let b = Buffer.create 1024
 
   let f () pn =
-    match pn.proofn_checksum with
-    | None -> assert false
-    | Some c -> Buffer.add_string b (Termcode.string_of_checksum c)
+    let c = pn.proofn_checksum in
+    Buffer.add_string b (Termcode.string_of_checksum c)
 
   let compute s th =
     let () =
@@ -1272,7 +1266,7 @@ end
 
 module Goal = struct
   type 'a t = proofNodeID * session
-  let checksum (id,s) = (get_proofNode s id).proofn_checksum
+  let checksum (id,s) = Some (get_proofNode s id).proofn_checksum
   let shape (id,s)    = (get_proofNode s id).proofn_shape
   let name (id,s)     = (get_proofNode s id).proofn_name
 end
@@ -1282,6 +1276,7 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 let found_obsolete = ref false
 let found_detached = ref false
 
+(**)
 let save_detached_goals old_s detached_goals_id s parent =
   let save_proof parent old_pa_n =
     let old_pa = old_pa_n in
@@ -1291,8 +1286,8 @@ let save_detached_goals old_s detached_goals_id s parent =
   in
   let rec save_goal parent detached_goal_id id =
     let detached_goal = get_proofNode old_s detached_goal_id in
-    mk_proof_node_no_task s detached_goal.proofn_name parent id None
-      (Termcode.shape_of_string "") false;
+    mk_proof_node_no_task s detached_goal.proofn_name parent id detached_goal.proofn_checksum
+      detached_goal.proofn_shape false;
     Hprover.iter (fun _ pa ->
                   let pa = get_proof_attempt_node old_s pa in
                   save_proof id pa) detached_goal.proofn_attempts;
@@ -1325,6 +1320,7 @@ let save_detached_theory parent_name old_s detached_theory s =
     theory_is_detached = true;
     theory_goals = goalsID;
     theory_parent_name = parent_name }
+ (**)
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
@@ -1413,6 +1409,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   (* attach the session to the subtasks to be able to instantiate Pairing *)
   let new_subtasks = List.map (fun id -> id,new_s)
       new_tr.transf_subtasks in
+(*
   List.iter
     (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
        | Some _ -> Debug.dprintf debug "[merge] old subgoal has no checksum@."
@@ -1421,6 +1418,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
        | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
        | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
+*)
   let associated,_detached =
     AssoGoals.associate ~use_shapes old_subtasks new_subtasks
   in
@@ -1476,12 +1474,9 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
            (Hstr.find old_goals_table new_goal_name) in
          Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
-           match new_goal.proofn_checksum, old_goal.proofn_checksum with
-           | None, _ -> assert false
-           | Some _, None ->
-             Debug.dprintf debug "[merge_theory] goal has no checksum@.";
-             not same_theory_checksum
-           | Some s1, Some s2 ->
+           not same_theory_checksum &&
+             let s1 = new_goal.proofn_checksum in
+             let s2 = old_goal.proofn_checksum in
              Debug.dprintf debug "[merge_theory] goal has checksum@.";
              not (Termcode.equal_checksum s1 s2)
          in
@@ -1858,11 +1853,7 @@ let rec save_goal s ctxt fmt pnid =
     save_ident pn.proofn_name
     (save_string_attrib "expl") pn.proofn_expl
     (save_bool_def "proved" false) (pn_proved s pnid);
-  let sum =
-    match pn.proofn_checksum with
-    | None -> assert false
-    | Some s -> Termcode.string_of_checksum s
-  in
+  let sum = Termcode.string_of_checksum pn.proofn_checksum in
   let shape = Termcode.string_of_shape pn.proofn_shape in
   assert (shape <> "");
   Compress.Compress_z.output_string ctxt.ch_shapes sum;
