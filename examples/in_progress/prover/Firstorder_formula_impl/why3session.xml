@@ -2,14 +2,14 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="20" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="1" memlimit="1000"/>
-<prover id="10" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="11" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="1" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="0.99.1" timelimit="1" steplimit="1" memlimit="1000"/>
+<prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="11" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../Firstorder_formula_impl.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Logic" sum="2737fb4c39b06d3bda412e0a5099ef9c">
+<theory name="Logic" sum="fa109287137334518a7af03e853c0e66">
  <goal name="WP_parameter nlsize_positive_lemma_fo_formula" expl="VC for nlsize_positive_lemma_fo_formula">
  <transf name="split_goal_wp">
   <goal name="WP_parameter nlsize_positive_lemma_fo_formula.1" expl="1. variant decrease">
@@ -34,7 +34,7 @@
   <proof prover="9"><result status="valid" time="0.11" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter nlsize_positive_lemma_fo_formula.8" expl="8. variant decrease">
-  <proof prover="9"><result status="valid" time="0.20" steps="49"/></proof>
+  <proof prover="9"><result status="valid" time="0.07" steps="49"/></proof>
   </goal>
   <goal name="WP_parameter nlsize_positive_lemma_fo_formula.9" expl="9. variant decrease">
   <proof prover="9"><result status="valid" time="0.17" steps="54"/></proof>
@@ -128,7 +128,7 @@
   <proof prover="9"><result status="valid" time="0.11" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_formula.23" expl="23. postcondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="17"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_formula.24" expl="24. variant decrease">
   <proof prover="9"><result status="valid" time="0.14" steps="19"/></proof>
@@ -161,7 +161,7 @@
   <proof prover="9"><result status="valid" time="0.10" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_formula.34" expl="34. postcondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="17"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_formula.35" expl="35. variant decrease">
   <proof prover="9"><result status="valid" time="0.12" steps="15"/></proof>
@@ -206,7 +206,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter nlmodel_subst_commutation_lemma_fo_formula.49" expl="49. postcondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="29"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
  </transf>
  </goal>
@@ -440,7 +440,7 @@
   <proof prover="9"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_fo_formula.26" expl="26. precondition">
-  <proof prover="9"><result status="valid" time="0.20" steps="60"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_fo_formula.27" expl="27. postcondition">
   <proof prover="9"><result status="valid" time="0.12" steps="18"/></proof>
@@ -541,7 +541,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" sum="b4f40faf9011615a949ccb90cc423117" expanded="true">
+<theory name="Impl" sum="f4825b5988c7d035108a3408dad5bb6d" expanded="true">
  <goal name="WP_parameter bind_var_symbol_in_fo_formula" expl="VC for bind_var_symbol_in_fo_formula">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bind_var_symbol_in_fo_formula.1" expl="1. assertion">
@@ -785,23 +785,23 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="55"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_symbol_in_fo_formula.81" expl="81. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="60"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_symbol_in_fo_formula.82" expl="82. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.22" steps="162"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.22" steps="194"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_symbol_in_fo_formula.83" expl="83. postcondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_symbol_in_fo_formula.84" expl="84. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="60"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="58"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter bind_var_fo_term_in_fo_formula" expl="VC for bind_var_fo_term_in_fo_formula">
  <transf name="split_goal_wp">
   <goal name="WP_parameter bind_var_fo_term_in_fo_formula.1" expl="1. assertion">
-  <proof prover="9"><result status="valid" time="0.20" steps="49"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="49"/></proof>
   </goal>
   <goal name="WP_parameter bind_var_fo_term_in_fo_formula.2" expl="2. assertion">
   <proof prover="9"><result status="valid" time="0.18" steps="40"/></proof>
@@ -1150,7 +1150,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="83"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.37" expl="37. precondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="45"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.38" expl="38. precondition">
   <proof prover="9"><result status="valid" time="0.09" steps="14"/></proof>
@@ -1168,7 +1168,7 @@
   <proof prover="9"><result status="valid" time="0.16" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.43" expl="43. precondition">
-  <proof prover="9"><result status="valid" time="0.12" steps="78"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.44" expl="44. precondition">
   <proof prover="9"><result status="valid" time="0.14" steps="21"/></proof>
@@ -1195,7 +1195,7 @@
   <proof prover="9"><result status="valid" time="0.12" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.52" expl="52. assertion">
-  <proof prover="9"><result status="valid" time="0.19" steps="14"/></proof>
+  <proof prover="9"><result status="valid" time="0.06" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.53" expl="53. assertion">
   <proof prover="9"><result status="valid" time="0.13" steps="14"/></proof>
@@ -1216,7 +1216,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="83"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.59" expl="59. precondition">
-  <proof prover="9"><result status="valid" time="0.20" steps="45"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.60" expl="60. precondition">
   <proof prover="9"><result status="valid" time="0.15" steps="14"/></proof>
@@ -1234,7 +1234,7 @@
   <proof prover="9"><result status="valid" time="0.15" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.65" expl="65. precondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="78"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.66" expl="66. precondition">
   <proof prover="9"><result status="valid" time="0.15" steps="21"/></proof>
@@ -1342,7 +1342,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.101" expl="101. precondition">
-  <proof prover="9"><result status="valid" time="0.08" steps="46"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.102" expl="102. precondition">
   <proof prover="9"><result status="valid" time="0.17" steps="14"/></proof>
@@ -1357,16 +1357,16 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.106" expl="106. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="70"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="76"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.107" expl="107. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.108" expl="108. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.27" steps="212"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.27" steps="236"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.109" expl="109. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="65"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_symbol_in_fo_formula.110" expl="110. postcondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.11" steps="26"/></proof>
@@ -1418,7 +1418,7 @@
   <proof prover="9"><result status="valid" time="0.13" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_fo_term_in_fo_formula.14" expl="14. postcondition">
-  <proof prover="9"><result status="valid" time="0.21" steps="39"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_fo_term_in_fo_formula.15" expl="15. assertion">
   <proof prover="9"><result status="valid" time="0.11" steps="14"/></proof>
@@ -1451,7 +1451,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_fo_term_in_fo_formula.25" expl="25. postcondition">
-  <proof prover="9"><result status="valid" time="0.20" steps="26"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter unbind_var_fo_term_in_fo_formula.26" expl="26. postcondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="30"/></proof>
@@ -1740,7 +1740,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.6" expl="6. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="39"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.7" expl="7. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="12"/></proof>
@@ -1755,7 +1755,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="46"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.11" expl="11. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="34"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.12" expl="12. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="21"/></proof>
@@ -1773,7 +1773,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.17" expl="17. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="39"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.18" expl="18. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="12"/></proof>
@@ -1827,7 +1827,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="87"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.35" expl="35. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="71"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="65"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.36" expl="36. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="17"/></proof>
@@ -1881,7 +1881,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="87"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.53" expl="53. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="71"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="66"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.54" expl="54. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="17"/></proof>
@@ -1914,7 +1914,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.64" expl="64. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="39"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.65" expl="65. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="12"/></proof>
@@ -1929,7 +1929,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.69" expl="69. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="34"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.70" expl="70. postcondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="9"/></proof>
@@ -1965,7 +1965,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.81" expl="81. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="12"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.07" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.82" expl="82. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="12"/></proof>
@@ -1986,7 +1986,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.34" steps="171"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.88" expl="88. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="62"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.89" expl="89. precondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="17"/></proof>
@@ -2001,7 +2001,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_symbol_in_fo_formula.93" expl="93. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="59"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="61"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2092,7 +2092,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_fo_term_in_fo_formula.29" expl="29. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="14"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.07" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter subst_base_fo_term_in_fo_formula.30" expl="30. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="14"/></proof>
@@ -2306,7 +2306,7 @@
  <goal name="WP_parameter construct_fo_formula" expl="VC for construct_fo_formula">
  <transf name="split_goal_wp">
   <goal name="WP_parameter construct_fo_formula.1" expl="1. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.46" steps="998"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.25" steps="998"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.2" expl="2. precondition">
   <proof prover="9"><result status="valid" time="0.08" steps="10"/></proof>
@@ -2329,35 +2329,35 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="383"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.4.5" expl="5. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="229"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="231"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.4.6" expl="6. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="17"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter construct_fo_formula.5" expl="5. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter construct_fo_formula.5.1" expl="1. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.27" steps="257"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="259"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.2" expl="2. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="249"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="2.12" steps="897"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="1.68" steps="892"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.4" expl="4. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="20"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.5" expl="5. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.46" steps="448"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="450"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.6" expl="6. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="234"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="232"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.5.7" expl="7. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="17"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2371,10 +2371,10 @@
   <proof prover="9"><result status="valid" time="0.12" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.9" expl="9. assertion">
-  <proof prover="9"><result status="valid" time="0.40" steps="439"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="439"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.10" expl="10. assertion">
-  <proof prover="9"><result status="valid" time="0.28" steps="228"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="230"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.11" expl="11. precondition">
   <proof prover="9"><result status="valid" time="0.08" steps="6"/></proof>
@@ -2392,7 +2392,7 @@
   <proof prover="9"><result status="valid" time="0.13" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.16" expl="16. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="1.00" steps="1619"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.58" steps="1612"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.17" expl="17. postcondition">
   <transf name="inline_goal">
@@ -2402,16 +2402,16 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="97"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.2" expl="2. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.39" steps="340"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="340"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.3" expl="3. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.43" steps="455"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.22" steps="457"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.4" expl="4. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.42" steps="455"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.23" steps="457"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.5" expl="5. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.42" steps="373"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="373"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.6" expl="6. VC for construct_fo_formula">
     <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="72"/></proof>
@@ -2420,20 +2420,20 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="71"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.17.1.8" expl="8. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.43" steps="474"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.25" steps="474"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter construct_fo_formula.18" expl="18. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.49" steps="998"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.25" steps="998"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.19" expl="19. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.22" steps="10"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.08" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.20" expl="20. precondition">
-  <proof prover="9"><result status="valid" time="0.22" steps="12"/></proof>
+  <proof prover="9"><result status="valid" time="0.07" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.21" expl="21. assertion">
   <proof prover="9"><result status="valid" time="0.21" steps="429"/></proof>
@@ -2441,25 +2441,25 @@
   <goal name="WP_parameter construct_fo_formula.22" expl="22. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter construct_fo_formula.22.1" expl="1. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="257"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="259"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.2" expl="2. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="277"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="2.38" steps="897"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="1.68" steps="892"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.4" expl="4. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="20"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.5" expl="5. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.37" steps="476"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="478"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.6" expl="6. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.26" steps="260"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.26" steps="258"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.22.7" expl="7. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="17"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2469,7 +2469,7 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.10" steps="19"/></proof>
    </goal>
    <goal name="WP_parameter construct_fo_formula.23.2" expl="2. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="281"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="279"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2480,10 +2480,10 @@
   <proof prover="9"><result status="valid" time="0.14" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.26" expl="26. assertion">
-  <proof prover="9"><result status="valid" time="0.33" steps="472"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="472"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.27" expl="27. assertion">
-  <proof prover="9"><result status="valid" time="0.27" steps="253"/></proof>
+  <proof prover="9"><result status="valid" time="0.13" steps="255"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.28" expl="28. precondition">
   <proof prover="9"><result status="valid" time="0.16" steps="6"/></proof>
@@ -2501,20 +2501,20 @@
   <proof prover="9"><result status="valid" time="0.13" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.33" expl="33. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="1.02" steps="1719"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.61" steps="1712"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.34" expl="34. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.97" steps="1365"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.52" steps="1369"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.35" expl="35. assertion">
   <transf name="inline_goal">
    <goal name="WP_parameter construct_fo_formula.35.1" expl="1. assertion">
    <transf name="split_goal_wp">
     <goal name="WP_parameter construct_fo_formula.35.1.1" expl="1. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.35" steps="197"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.11" steps="197"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.35.1.2" expl="2. VC for construct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="226"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="164"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.35.1.3" expl="3. VC for construct_fo_formula">
     <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="237"/></proof>
@@ -2536,7 +2536,7 @@
   <proof prover="9"><result status="valid" time="0.32" steps="786"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.37" expl="37. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="22"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.08" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.38" expl="38. postcondition">
   <proof prover="9" timelimit="5"><result status="valid" time="0.08" steps="24"/></proof>
@@ -2545,22 +2545,22 @@
   <proof prover="9"><result status="valid" time="0.15" steps="248"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.40" expl="40. assertion">
-  <proof prover="9"><result status="valid" time="0.27" steps="250"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="250"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.41" expl="41. assertion">
   <proof prover="9"><result status="valid" time="0.17" steps="248"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.42" expl="42. assertion">
-  <proof prover="9"><result status="valid" time="0.29" steps="248"/></proof>
+  <proof prover="9"><result status="valid" time="0.15" steps="248"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.43" expl="43. assertion">
-  <proof prover="9"><result status="valid" time="0.35" steps="489"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="489"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.44" expl="44. assertion">
-  <proof prover="9"><result status="valid" time="0.46" steps="489"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="485"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.45" expl="45. assertion">
-  <proof prover="9"><result status="valid" time="0.22" steps="14"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.46" expl="46. assertion">
   <proof prover="9"><result status="valid" time="0.19" steps="15"/></proof>
@@ -2602,22 +2602,22 @@
   <proof prover="9"><result status="valid" time="0.13" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.59" expl="59. postcondition">
-  <proof prover="9"><result status="valid" time="0.87" steps="814"/></proof>
+  <proof prover="9"><result status="valid" time="0.48" steps="812"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.60" expl="60. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="1.86" steps="2630"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="1.14" steps="2697"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.61" expl="61. assertion">
-  <proof prover="9"><result status="valid" time="0.50" steps="1003"/></proof>
+  <proof prover="9"><result status="valid" time="0.25" steps="1003"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.62" expl="62. assertion">
-  <proof prover="9"><result status="valid" time="0.54" steps="786"/></proof>
+  <proof prover="9"><result status="valid" time="0.26" steps="786"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.63" expl="63. postcondition">
   <proof prover="9"><result status="valid" time="0.13" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.64" expl="64. postcondition">
-  <proof prover="9"><result status="valid" time="0.24" steps="24"/></proof>
+  <proof prover="9"><result status="valid" time="0.07" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.65" expl="65. assertion">
   <transf name="inline_goal">
@@ -2627,16 +2627,16 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="22"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.65.1.2" expl="2. assertion">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="140"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="138"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.65.1.3" expl="3. assertion">
     <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="23"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.65.1.4" expl="4. assertion">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="221"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="219"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.65.1.5" expl="5. assertion">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="146"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="144"/></proof>
     </goal>
     <goal name="WP_parameter construct_fo_formula.65.1.6" expl="6. assertion">
     <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="22"/></proof>
@@ -2646,7 +2646,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter construct_fo_formula.66" expl="66. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.28" steps="250"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="250"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.67" expl="67. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.22" steps="248"/></proof>
@@ -2655,10 +2655,10 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.24" steps="248"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.69" expl="69. assertion">
-  <proof prover="9"><result status="valid" time="0.37" steps="409"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="409"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.70" expl="70. assertion">
-  <proof prover="9"><result status="valid" time="0.32" steps="409"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="405"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.71" expl="71. assertion">
   <proof prover="9"><result status="valid" time="0.13" steps="14"/></proof>
@@ -2703,19 +2703,19 @@
   <proof prover="9"><result status="valid" time="0.12" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.85" expl="85. postcondition">
-  <proof prover="9"><result status="valid" time="0.55" steps="672"/></proof>
+  <proof prover="9"><result status="valid" time="0.55" steps="670"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.86" expl="86. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="1.65" steps="2630"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="1.17" steps="2697"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.87" expl="87. assertion">
-  <proof prover="9"><result status="valid" time="0.55" steps="967"/></proof>
+  <proof prover="9"><result status="valid" time="0.24" steps="967"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.88" expl="88. assertion">
-  <proof prover="9"><result status="valid" time="0.27" steps="198"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="198"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.89" expl="89. assertion">
-  <proof prover="9"><result status="valid" time="0.27" steps="198"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="198"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.90" expl="90. assertion">
   <proof prover="9"><result status="valid" time="0.13" steps="18"/></proof>
@@ -2747,16 +2747,16 @@
   <proof prover="9" timelimit="30"><result status="valid" time="0.12" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.97" expl="97. precondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="6"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.07" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.98" expl="98. precondition">
   <proof prover="9"><result status="valid" time="0.11" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.99" expl="99. postcondition">
-  <proof prover="9"><result status="valid" time="0.66" steps="951"/></proof>
+  <proof prover="9"><result status="valid" time="0.37" steps="981"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.100" expl="100. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.92" steps="1583"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.55" steps="1583"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.101" expl="101. assertion">
   <proof prover="9"><result status="valid" time="0.14" steps="8"/></proof>
@@ -2765,10 +2765,10 @@
   <proof prover="9"><result status="valid" time="0.13" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.103" expl="103. postcondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="66"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.104" expl="104. postcondition">
-  <proof prover="9"><result status="valid" time="0.15" steps="128"/></proof>
+  <proof prover="9"><result status="valid" time="0.15" steps="160"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.105" expl="105. assertion">
   <proof prover="9"><result status="valid" time="0.13" steps="8"/></proof>
@@ -2777,22 +2777,22 @@
   <proof prover="9"><result status="valid" time="0.13" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.107" expl="107. postcondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="66"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.108" expl="108. postcondition">
-  <proof prover="9"><result status="valid" time="0.26" steps="127"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="167"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.109" expl="109. assertion">
   <proof prover="9"><result status="valid" time="0.13" steps="283"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.110" expl="110. assertion">
-  <proof prover="9"><result status="valid" time="0.22" steps="250"/></proof>
+  <proof prover="9"><result status="valid" time="0.22" steps="270"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.111" expl="111. postcondition">
   <proof prover="9"><result status="valid" time="0.15" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.112" expl="112. assertion">
-  <proof prover="10"><result status="valid" time="0.58"/></proof>
+  <proof prover="10"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.113" expl="113. assertion">
   <proof prover="9"><result status="valid" time="0.16" steps="156"/></proof>
@@ -2801,7 +2801,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="155"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.115" expl="115. assertion">
-  <proof prover="9"><result status="valid" time="0.32" steps="475"/></proof>
+  <proof prover="9"><result status="valid" time="0.32" steps="335"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.116" expl="116. assertion">
   <proof prover="9"><result status="valid" time="0.18" steps="73"/></proof>
@@ -2819,7 +2819,7 @@
   <proof prover="9"><result status="valid" time="0.18" steps="65"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.121" expl="121. assertion">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="12"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.07" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.122" expl="122. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="13"/></proof>
@@ -2844,10 +2844,10 @@
   <proof prover="9"><result status="valid" time="0.11" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.128" expl="128. postcondition">
-  <proof prover="9"><result status="valid" time="0.76" steps="762"/></proof>
+  <proof prover="9"><result status="valid" time="0.35" steps="647"/></proof>
   </goal>
   <goal name="WP_parameter construct_fo_formula.129" expl="129. postcondition">
-  <proof prover="9" timelimit="5"><result status="valid" time="2.08" steps="2599"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="1.14" steps="2574"/></proof>
   </goal>
  </transf>
  </goal>
@@ -2894,7 +2894,7 @@
   <proof prover="9"><result status="valid" time="0.13" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.12" expl="12. precondition">
-  <proof prover="9"><result status="valid" time="0.23" steps="96"/></proof>
+  <proof prover="9"><result status="valid" time="0.10" steps="96"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.13" expl="13. precondition">
   <proof prover="9"><result status="valid" time="0.15" steps="22"/></proof>
@@ -2967,7 +2967,7 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="36"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.24.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.73" steps="424"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.54" steps="424"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.24.4" expl="4. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="41"/></proof>
@@ -2976,39 +2976,39 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="135"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.24.6" expl="6. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.67" steps="443"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.43" steps="435"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.25" expl="25. postcondition">
-  <proof prover="9"><result status="valid" time="0.40" steps="410"/></proof>
+  <proof prover="9"><result status="valid" time="0.21" steps="410"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.26" expl="26. postcondition">
-  <proof prover="9"><result status="valid" time="0.29" steps="100"/></proof>
+  <proof prover="9"><result status="valid" time="0.13" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.27" expl="27. postcondition">
-  <proof prover="9"><result status="valid" time="0.50" steps="356"/></proof>
+  <proof prover="9"><result status="valid" time="0.25" steps="356"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.28" expl="28. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.29" expl="29. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.30" expl="30. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.31" expl="31. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.32" expl="32. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.33" expl="33. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.34" expl="34. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.35" expl="35. postcondition">
   <proof prover="9"><result status="valid" time="0.14" steps="17"/></proof>
@@ -3017,7 +3017,7 @@
   <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.37" expl="37. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.38" expl="38. assertion">
   <proof prover="9"><result status="valid" time="0.15" steps="27"/></proof>
@@ -3092,7 +3092,7 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.18" steps="112"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.55.5" expl="5. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.34" steps="176"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="176"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3114,7 +3114,7 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="130"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.58.4" expl="4. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.69" steps="432"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.43" steps="432"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3127,7 +3127,7 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="36"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.59.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.92" steps="424"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.52" steps="424"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.59.4" expl="4. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="41"/></proof>
@@ -3136,45 +3136,45 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="135"/></proof>
    </goal>
    <goal name="WP_parameter destruct_fo_formula.59.6" expl="6. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.85" steps="443"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.43" steps="435"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.60" expl="60. postcondition">
-  <proof prover="9"><result status="valid" time="0.40" steps="407"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="407"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.61" expl="61. postcondition">
-  <proof prover="9"><result status="valid" time="0.29" steps="100"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.62" expl="62. postcondition">
   <proof prover="9"><result status="valid" time="0.34" steps="354"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.63" expl="63. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.64" expl="64. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.65" expl="65. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.66" expl="66. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.67" expl="67. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.68" expl="68. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.69" expl="69. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.10" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.70" expl="70. unreachable point">
-  <proof prover="9"><result status="valid" time="0.09" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.71" expl="71. unreachable point">
-  <proof prover="9"><result status="valid" time="0.08" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.72" expl="72. assertion">
   <proof prover="9"><result status="valid" time="0.16" steps="33"/></proof>
@@ -3234,7 +3234,7 @@
   <proof prover="9"><result status="valid" time="0.14" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.91" expl="91. precondition">
-  <proof prover="9"><result status="valid" time="0.22" steps="99"/></proof>
+  <proof prover="9"><result status="valid" time="0.10" steps="99"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.92" expl="92. precondition">
   <proof prover="9"><result status="valid" time="0.13" steps="28"/></proof>
@@ -3255,7 +3255,7 @@
   <proof prover="9"><result status="valid" time="0.21" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.98" expl="98. assertion">
-  <proof prover="9"><result status="valid" time="0.24" steps="84"/></proof>
+  <proof prover="9"><result status="valid" time="0.10" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.99" expl="99. assertion">
   <proof prover="9"><result status="valid" time="0.24" steps="84"/></proof>
@@ -3280,7 +3280,7 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="535"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.100.1.6" expl="6. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.38" steps="535"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="535"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.100.1.7" expl="7. VC for destruct_fo_formula">
     <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="42"/></proof>
@@ -3298,44 +3298,44 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="535"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.100.1.12" expl="12. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.34" steps="535"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="535"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.101" expl="101. postcondition">
-  <proof prover="9"><result status="valid" time="0.27" steps="86"/></proof>
+  <proof prover="9"><result status="valid" time="0.13" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.102" expl="102. postcondition">
   <proof prover="9"><result status="valid" time="0.37" steps="533"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.103" expl="103. unreachable point">
-  <proof prover="9"><result status="valid" time="0.22" steps="35"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.104" expl="104. unreachable point">
-  <proof prover="9"><result status="valid" time="0.22" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.105" expl="105. unreachable point">
-  <proof prover="9"><result status="valid" time="0.09" steps="34"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.106" expl="106. unreachable point">
-  <proof prover="9"><result status="valid" time="0.09" steps="34"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.107" expl="107. unreachable point">
-  <proof prover="9"><result status="valid" time="0.08" steps="35"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.108" expl="108. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.109" expl="109. unreachable point">
-  <proof prover="9"><result status="valid" time="0.08" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.110" expl="110. unreachable point">
-  <proof prover="9"><result status="valid" time="0.20" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.111" expl="111. unreachable point">
-  <proof prover="9"><result status="valid" time="0.09" steps="35"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.112" expl="112. assertion">
   <proof prover="9"><result status="valid" time="0.15" steps="33"/></proof>
@@ -3395,7 +3395,7 @@
   <proof prover="9"><result status="valid" time="0.13" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.131" expl="131. precondition">
-  <proof prover="9"><result status="valid" time="0.22" steps="99"/></proof>
+  <proof prover="9"><result status="valid" time="0.10" steps="99"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.132" expl="132. precondition">
   <proof prover="9"><result status="valid" time="0.16" steps="28"/></proof>
@@ -3419,7 +3419,7 @@
   <proof prover="9"><result status="valid" time="0.22" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.139" expl="139. assertion">
-  <proof prover="9"><result status="valid" time="0.25" steps="84"/></proof>
+  <proof prover="9"><result status="valid" time="0.11" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.140" expl="140. postcondition">
   <transf name="inline_goal">
@@ -3441,7 +3441,7 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="535"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.140.1.6" expl="6. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.38" steps="535"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="535"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.140.1.7" expl="7. VC for destruct_fo_formula">
     <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="42"/></proof>
@@ -3466,37 +3466,37 @@
   </transf>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.141" expl="141. postcondition">
-  <proof prover="9"><result status="valid" time="0.30" steps="86"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.142" expl="142. postcondition">
   <proof prover="9"><result status="valid" time="0.40" steps="533"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.143" expl="143. unreachable point">
-  <proof prover="9"><result status="valid" time="0.21" steps="33"/></proof>
+  <proof prover="9"><result status="valid" time="0.09" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.144" expl="144. unreachable point">
-  <proof prover="9"><result status="valid" time="0.21" steps="34"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.145" expl="145. unreachable point">
-  <proof prover="9"><result status="valid" time="0.08" steps="34"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.146" expl="146. unreachable point">
-  <proof prover="9"><result status="valid" time="0.20" steps="35"/></proof>
+  <proof prover="9"><result status="valid" time="0.08" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.147" expl="147. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.148" expl="148. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="28"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.149" expl="149. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="28"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.150" expl="150. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.151" expl="151. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.152" expl="152. assertion">
   <proof prover="9"><result status="valid" time="0.15" steps="26"/></proof>
@@ -3550,64 +3550,64 @@
   <proof prover="9"><result status="valid" time="0.22" steps="302"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.169" expl="169. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.170" expl="170. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="29"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.171" expl="171. unreachable point">
-  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="30"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.172" expl="172. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.12" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.173" expl="173. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.174" expl="174. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.175" expl="175. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.176" expl="176. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.177" expl="177. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.178" expl="178. postcondition">
   <proof prover="9"><result status="valid" time="0.20" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.179" expl="179. postcondition">
-  <proof prover="9"><result status="valid" time="0.29" steps="175"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="175"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.180" expl="180. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="31"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.181" expl="181. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.182" expl="182. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.183" expl="183. unreachable point">
-  <proof prover="9"><result status="valid" time="0.15" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.15" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.184" expl="184. unreachable point">
-  <proof prover="9"><result status="valid" time="0.15" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.15" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.185" expl="185. unreachable point">
-  <proof prover="9"><result status="valid" time="0.15" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.15" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.186" expl="186. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.187" expl="187. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.188" expl="188. unreachable point">
-  <proof prover="9"><result status="valid" time="0.16" steps="31"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.189" expl="189. postcondition">
   <proof prover="9"><result status="valid" time="0.20" steps="38"/></proof>
@@ -3616,31 +3616,31 @@
   <proof prover="9"><result status="valid" time="0.28" steps="175"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.191" expl="191. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="21"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.192" expl="192. assertion">
   <proof prover="9" timelimit="5"><result status="valid" time="0.13" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.193" expl="193. unreachable point">
-  <proof prover="9"><result status="valid" time="0.18" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.18" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.194" expl="194. unreachable point">
-  <proof prover="9"><result status="valid" time="0.18" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.18" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.195" expl="195. unreachable point">
-  <proof prover="9"><result status="valid" time="0.18" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.18" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.196" expl="196. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="32"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.197" expl="197. unreachable point">
-  <proof prover="9"><result status="valid" time="0.17" steps="30"/></proof>
+  <proof prover="9"><result status="valid" time="0.17" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.198" expl="198. unreachable point">
-  <proof prover="9"><result status="valid" time="0.18" steps="31"/></proof>
+  <proof prover="9"><result status="valid" time="0.18" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.199" expl="199. unreachable point">
-  <proof prover="9"><result status="valid" time="0.18" steps="31"/></proof>
+  <proof prover="9"><result status="valid" time="0.18" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.200" expl="200. assertion">
   <proof prover="9"><result status="valid" time="0.14" steps="30"/></proof>
@@ -3652,7 +3652,7 @@
   <proof prover="9"><result status="valid" time="0.17" steps="73"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.203" expl="203. assertion">
-  <proof prover="9"><result status="valid" time="0.14" steps="28"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.204" expl="204. assertion">
   <proof prover="9"><result status="valid" time="0.15" steps="67"/></proof>
@@ -3685,13 +3685,13 @@
   <proof prover="9"><result status="valid" time="0.12" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.214" expl="214. precondition">
-  <proof prover="9"><result status="valid" time="0.16" steps="61"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.215" expl="215. precondition">
   <proof prover="9"><result status="valid" time="0.17" steps="91"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.216" expl="216. precondition">
-  <proof prover="9"><result status="valid" time="0.14" steps="26"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.217" expl="217. precondition">
   <proof prover="9"><result status="valid" time="0.16" steps="28"/></proof>
@@ -3700,10 +3700,10 @@
   <proof prover="9"><result status="valid" time="0.14" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.219" expl="219. assertion">
-  <proof prover="9"><result status="valid" time="0.20" steps="83"/></proof>
+  <proof prover="9"><result status="valid" time="0.20" steps="85"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.220" expl="220. assertion">
-  <proof prover="9"><result status="valid" time="0.12" steps="130"/></proof>
+  <proof prover="9"><result status="valid" time="0.12" steps="119"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.221" expl="221. assertion">
   <proof prover="9"><result status="valid" time="0.23" steps="77"/></proof>
@@ -3716,13 +3716,13 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.14" steps="188"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.2" expl="2. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.11" steps="63"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.11" steps="123"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.3" expl="3. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.24" steps="48"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.09" steps="48"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.4" expl="4. VC for destruct_fo_formula">
-    <proof prover="11" timelimit="30"><result status="valid" time="0.63"/></proof>
+    <proof prover="11" timelimit="30"><result status="valid" time="0.44"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.5" expl="5. VC for destruct_fo_formula">
     <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="41"/></proof>
@@ -3737,20 +3737,20 @@
     <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="24"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.9" expl="9. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="273"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="289"/></proof>
     </goal>
     <goal name="WP_parameter destruct_fo_formula.222.1.10" expl="10. VC for destruct_fo_formula">
-    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="273"/></proof>
+    <proof prover="9" timelimit="5"><result status="valid" time="0.19" steps="289"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.223" expl="223. postcondition">
-  <proof prover="9"><result status="valid" time="0.32" steps="163"/></proof>
+  <proof prover="9"><result status="valid" time="0.14" steps="163"/></proof>
   </goal>
   <goal name="WP_parameter destruct_fo_formula.224" expl="224. postcondition">
-  <proof prover="9"><result status="valid" time="0.48" steps="325"/></proof>
+  <proof prover="9"><result status="valid" time="0.24" steps="397"/></proof>
   </goal>
  </transf>
  </goal>
@@ -3796,19 +3796,19 @@
    <proof prover="1"><result status="valid" time="5.49"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.10.2" expl="2. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.29" steps="272"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.29" steps="273"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.10.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="99"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.21" steps="100"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.10.4" expl="4. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="24"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="25"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.10.5" expl="5. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="36"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.10.6" expl="6. assertion">
-   <proof prover="1" timelimit="60"><result status="valid" time="4.33"/></proof>
+   <proof prover="1" timelimit="60"><result status="valid" time="2.32"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3821,14 +3821,14 @@
    <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="88"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.11.3" expl="3. assertion">
-   <proof prover="10"><result status="valid" time="0.84"/></proof>
+   <proof prover="10"><result status="valid" time="0.62"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_symbol_in_fo_formula.12" expl="12. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_fo_formula.12.1" expl="1. postcondition">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="202"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.20" steps="208"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3879,32 +3879,32 @@
   <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12" expl="12. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.1" expl="1. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="60"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.17" steps="61"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.2" expl="2. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="81"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="82"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.3" expl="3. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.56" steps="309"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.40" steps="309"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.4" expl="4. assertion">
-   <proof prover="11"><result status="valid" time="2.71"/></proof>
+   <proof prover="11"><result status="valid" time="1.45"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.5" expl="5. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.15" steps="28"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.12.6" expl="6. assertion">
-   <proof prover="1" timelimit="5"><result status="valid" time="1.02"/></proof>
+   <proof prover="1" timelimit="5"><result status="valid" time="0.72"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.13" expl="13. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.13.1" expl="1. assertion">
-   <proof prover="9" timelimit="5"><result status="valid" time="0.57" steps="308"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.39" steps="308"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.13.2" expl="2. assertion">
-   <proof prover="11"><result status="valid" time="0.73"/></proof>
+   <proof prover="11"><result status="valid" time="0.39"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.13.3" expl="3. assertion">
    <proof prover="9" timelimit="5"><result status="valid" time="0.16" steps="77"/></proof>
@@ -3920,7 +3920,7 @@
   <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.14" expl="14. postcondition">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_fo_formula.14.1" expl="1. postcondition">
-   <proof prover="9"><result status="valid" time="0.27" steps="131"/></proof>
+   <proof prover="9"><result status="valid" time="0.11" steps="131"/></proof>
    </goal>
   </transf>
   </goal>

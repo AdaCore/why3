@@ -13,19 +13,35 @@ open Format
 
 (** Construction *)
 
-type integer_constant =
+type integer_literal =
+  | IConstRaw of BigInt.t
   | IConstDec of string
   | IConstHex of string
   | IConstOct of string
   | IConstBin of string
 
-type real_constant =
+type integer_constant = {
+    ic_negative : bool;
+    ic_abs : integer_literal;
+  }
+
+type real_literal =
   | RConstDec of string * string * string option (* int / frac / exp *)
   | RConstHex of string * string * string option
+
+type real_constant = {
+    rc_negative : bool;
+    rc_abs : real_literal;
+  }
 
 type constant =
   | ConstInt  of integer_constant
   | ConstReal of real_constant
+
+let is_negative c =
+  match c with
+  | ConstInt i -> i.ic_negative
+  | ConstReal r -> r.rc_negative
 
 exception InvalidConstantLiteral of int * string
 let invalid_constant_literal n s = raise (InvalidConstantLiteral(n,s))
@@ -42,21 +58,43 @@ let is_dec = function '0'..'9' -> true | _ -> false
 let is_oct = function '0'..'7' -> true | _ -> false
 let is_bin = function '0'..'1' -> true | _ -> false
 
-let int_const_dec s =
+let int_literal_dec s =
   check_integer_literal 10 is_dec s;
   IConstDec s
 
-let int_const_hex s =
+let int_literal_hex s =
   check_integer_literal 16 is_hex s;
   IConstHex s
 
-let int_const_oct s =
+let int_literal_oct s =
   check_integer_literal 8 is_oct s;
   IConstOct s
 
-let int_const_bin s =
+let int_literal_bin s =
   check_integer_literal 2 is_bin s;
   IConstBin s
+
+let int_literal_raw i =
+  assert (BigInt.ge i BigInt.zero);
+  IConstRaw i
+
+let int_const_of_big_int n =
+  let neg, n =
+    if BigInt.ge n BigInt.zero then
+      false, n
+    else
+      true, BigInt.minus n
+  in
+  { ic_negative = neg; ic_abs = IConstRaw n }
+
+let int_const_of_int n =
+  int_const_of_big_int (BigInt.of_int n)
+
+let const_of_big_int n =
+  ConstInt (int_const_of_big_int n)
+
+let const_of_int n =
+  const_of_big_int (BigInt.of_int n)
 
 let check_exp e =
   let e = if e.[0] = '-' then String.sub e 1 (String.length e - 1) else e in
@@ -92,12 +130,26 @@ let compute_any radix s =
 
 (** Printing *)
 
-let compute_int c =
+let compute_int_literal c =
   match c with
+  | IConstRaw i -> i
   | IConstDec s -> compute_any 10 s
   | IConstHex s -> compute_any 16 s
   | IConstOct s -> compute_any 8 s
   | IConstBin s -> compute_any 2 s
+
+let compute_int_constant c =
+  let a = compute_int_literal c.ic_abs in
+  if c.ic_negative then BigInt.minus a else a
+
+let to_small_integer i =
+  match i with
+  | IConstRaw i -> BigInt.to_int i
+  | IConstDec s -> int_of_string s
+  | IConstHex s -> int_of_string ("0x"^s)
+  | IConstOct s -> int_of_string ("0o"^s)
+  | IConstBin s -> int_of_string ("0b"^s)
+
 
 let any_to_dec radix s =
   BigInt.to_string (compute_any radix s)
@@ -127,14 +179,19 @@ type 'a number_support_kind =
 
 type integer_support_kind = integer_format number_support_kind
 
+type 'a negative_format =
+  ((Format.formatter->'a->unit)->'a->unit,Format.formatter,unit) format
+
 type number_support = {
   long_int_support  : bool;
   extra_leading_zeros_support : bool;
+  negative_int_support  : (integer_literal negative_format) number_support_kind;
   dec_int_support   : integer_support_kind;
   hex_int_support   : integer_support_kind;
   oct_int_support   : integer_support_kind;
   bin_int_support   : integer_support_kind;
   def_int_support   : integer_support_kind;
+  negative_real_support  : (real_literal negative_format) number_support_kind;
   dec_real_support  : dec_real_format number_support_kind;
   hex_real_support  : real_format number_support_kind;
   frac_real_support : frac_real_format number_support_kind;
@@ -250,13 +307,45 @@ let print_hex_real support fmt =
       (match e with None -> "0" | Some e -> remove_minus e)))
   ))
 
+let print_int_literal support fmt = function
+  | IConstRaw i -> print_dec_int support fmt (BigInt.to_string i)
+  | IConstDec i -> print_dec_int support fmt i
+  | IConstHex i -> print_hex_int support fmt i
+  | IConstOct i -> print_oct_int support fmt i
+  | IConstBin i -> print_bin_int support fmt i
+
+let print_real_literal support fmt = function
+  | RConstDec (i, f, e) -> print_dec_real support fmt i f e
+  | RConstHex (i, f, e) -> print_hex_real support fmt i f e
+
+let print_int_constant support fmt i =
+  if i.ic_negative then
+    check_support support.negative_int_support (Some "(- %a)")
+                  (fun def n -> fprintf fmt def (print_int_literal support) n)
+                  (fun _ -> assert false)
+                  i.ic_abs
+  else
+    fprintf fmt "%a" (print_int_literal support) i.ic_abs
+
+let print_real_constant support fmt r =
+  if r.rc_negative then
+    check_support support.negative_real_support (Some "(- %a)")
+                  (fun def n -> fprintf fmt def (print_real_literal support) n)
+                  (fun _ -> assert false)
+                  r.rc_abs
+  else
+    fprintf fmt "%a" (print_real_literal support) r.rc_abs
+
+
 let print support fmt = function
-  | ConstInt (IConstDec i) -> print_dec_int support fmt i
-  | ConstInt (IConstHex i) -> print_hex_int support fmt i
-  | ConstInt (IConstOct i) -> print_oct_int support fmt i
-  | ConstInt (IConstBin i) -> print_bin_int support fmt i
-  | ConstReal (RConstDec (i, f, e)) -> print_dec_real support fmt i f e
-  | ConstReal (RConstHex (i, f, e)) -> print_hex_real support fmt i f e
+  | ConstInt i -> print_int_constant support fmt i
+  | ConstReal r -> print_real_constant support fmt r
+
+
+
+
+
+
 
 let char_of_int i =
   if i < 10 then
@@ -280,7 +369,7 @@ let rec print_in_base_aux radix digits fmt i =
     fprintf fmt "%c" (char_of_int (to_int i))
   end
   else
-    let d,m = computer_div_mod i radix in
+    let d,m = euclidean_div_mod i radix in
     let digits = Opt.map ((+) (-1)) digits in
     print_in_base_aux radix digits fmt d;
     fprintf fmt "%c" (char_of_int (to_int m))
@@ -298,7 +387,8 @@ type int_range = {
 exception OutOfRange of integer_constant
 
 let check_range c {ir_lower = lo; ir_upper = hi} =
-  let cval = compute_int c in
+  let cval = compute_int_literal c.ic_abs in
+  let cval = if c.ic_negative then BigInt.minus cval else cval in
   if BigInt.lt cval lo || BigInt.gt cval hi then raise (OutOfRange c)
 
 (** Float checks *)
@@ -308,7 +398,7 @@ type float_format = {
   fp_significand_digits : int; (* counting the hidden bit *)
 }
 
-exception NonRepresentableFloat of real_constant
+exception NonRepresentableFloat of real_literal
 
 let debug_float = Debug.register_info_flag "float"
   ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ \
@@ -446,28 +536,56 @@ let compute_float c fp =
 
 let check_float c fp = ignore (compute_float c fp)
 
-let print_integer_constant fmt = function
+
+let full_support =
+  {
+    long_int_support = true;
+    extra_leading_zeros_support = true;
+    negative_int_support = Number_default;
+    dec_int_support = Number_default;
+    hex_int_support = Number_default;
+    oct_int_support = Number_default;
+    bin_int_support = Number_default;
+    def_int_support = Number_default;
+    negative_real_support = Number_default;
+    dec_real_support = Number_default;
+    hex_real_support = Number_default;
+    frac_real_support = Number_default;
+    def_real_support = Number_default;
+  }
+
+(*
+
+let print_integer_literal fmt = function
   | IConstDec s -> fprintf fmt "%s" s
   | IConstHex s -> fprintf fmt "0x%s" s
   | IConstOct s -> fprintf fmt "0o%s" s
   | IConstBin s -> fprintf fmt "0b%s" s
 
-let print_real_constant fmt = function
+let print_real_literal fmt = function
   | RConstDec (i,f,None)   -> fprintf fmt "%s.%s" i f
   | RConstDec (i,f,Some e) -> fprintf fmt "%s.%se%s" i f e
   | RConstHex (i,f,Some e) -> fprintf fmt "0x%s.%sp%s" i f e
   | RConstHex (i,f,None)   -> fprintf fmt "0x%s.%s" i f
 
-let print_constant fmt = function
-  | ConstInt c  -> print_integer_constant fmt c
-  | ConstReal c -> print_real_constant fmt c
+let print_unsigned_constant fmt = function
+  | ConstInt c  -> print_integer_literal fmt c
+  | ConstReal c -> print_real_literal fmt c
+
+let print_constant fmt c =
+  if c.is_positive then print_unsigned_constant fmt c.abs_value
+  else fprintf fmt "-%a" print_unsigned_constant c.abs_value
+ *)
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | InvalidConstantLiteral (n,s) ->
       fprintf fmt "Invalid integer literal in base %d: '%s'" n s
   | NonRepresentableFloat c ->
       fprintf fmt "Invalid floating point literal: '%a'"
-        print_real_constant c
+        (print_real_literal full_support) c
   | OutOfRange c ->
-      fprintf fmt "Integer literal %a is out of range" print_integer_constant c
+      fprintf fmt "Integer literal %a is out of range"
+              (print_int_constant full_support) c
   | _ -> raise exn)
+
+let print_constant = print full_support

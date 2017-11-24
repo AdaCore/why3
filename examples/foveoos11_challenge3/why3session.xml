@@ -6,13 +6,13 @@
 <prover id="2" name="Coq" version="8.6.1" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../foveoos11_challenge3.mlw" expanded="true">
-<theory name="TwoEqualElements" sum="bec3c8506e7504067af283737d159789" expanded="true">
+<theory name="TwoEqualElements" sum="424177d437408534f82651a9345d18ad" expanded="true">
  <goal name="WP_parameter two_equal_elements" expl="VC for two_equal_elements">
  <transf name="split_goal_wp">
   <goal name="WP_parameter two_equal_elements.1" expl="array creation size">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter two_equal_elements.2" expl="postcondition">
+  <goal name="WP_parameter two_equal_elements.2" expl="VC for two_equal_elements">
   <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter two_equal_elements.3" expl="loop invariant init">

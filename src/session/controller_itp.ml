@@ -182,7 +182,7 @@ module PSession = struct
        List.fold_right
          (fun g -> n (Goal g))
          (theory_goals th)
-         (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
+         []
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
@@ -203,10 +203,8 @@ module PSession = struct
        let name = get_transf_name s id in
        let name = if tn_proved s id then name^"!" else name^"?" in
        let sts = get_sub_tasks s id in
-       let dsts = get_detached_sub_tasks s id in
        name,
-       List.fold_right (fun g -> n (Goal g)) sts
-                       (List.fold_right (fun g -> n (Goal g)) dsts [])
+       List.fold_right (fun g -> n (Goal g)) sts []
 
 end
 
@@ -228,16 +226,24 @@ let print_session fmt c =
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
-  try
+(*  try
+ *)
     merge_files ~use_shapes c.controller_env c.controller_session old_ses
+(* not need_anymore
   with e ->
     c.controller_session <- old_ses;
     raise e
+ *)
 
 let add_file c ?format fname =
-  let theories = Session_itp.read_file c.controller_env ?format fname in
-  let (_ : file) = add_file_section c.controller_session fname theories format in
-  ()
+  try
+    let theories = Session_itp.read_file c.controller_env ?format fname in
+    let (_ : file) = add_file_section c.controller_session fname (Some theories) format in
+    None
+  with e ->
+    let (_ : file) = add_file_section c.controller_session fname None format in
+    Some e
+
 
 
 module type Scheduler = sig
@@ -849,24 +855,6 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
           List.iter2 (fun x y -> copy_paste c (APn x) (APn y)
               ~notification ~callback_pa ~callback_tr) from_tn_list to_tn_list
     | _ -> raise BadCopyPaste
-
-
-let copy_detached ~copy c from_any =
-  match from_any with
-  | APn from_pn ->
-    begin
-      let pn_id = copy_proof_node_as_detached c.controller_session from_pn in
-      let parent = get_any_parent c.controller_session from_any in
-      match parent with
-      | None -> raise (BadCopyDetached "copy_detached no parent")
-      | Some parent ->
-          copy ~parent (APn pn_id);
-          copy_structure
-            ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
-    end
-  (* Only goal can be detached *)
-  | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
-
 
 
 

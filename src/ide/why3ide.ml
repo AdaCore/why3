@@ -302,7 +302,7 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
-(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab):
+(* Contains quadruples (tab page, source_view, file_has_been_modified, label_of_tab):
    - tab_page is a unique number for each pages of the notebook
    - source_view is the graphical element inside a tab
    - has_been_modified is a reference to a boolean stating if the current tab
@@ -1012,7 +1012,7 @@ let print_message ~kind ~notif_kind fmt =
 (**** Monitor *****)
 
 let fan =
-  let s = Bytes.of_string "\o342\o226\o201" in
+  let s = Bytes.of_string "\226\150\129" in
   let c = Char.code (Bytes.get s 2) in
   let a = Array.init 8 (fun i ->
     Bytes.set s 2 (Char.chr (c + i));
@@ -1425,17 +1425,9 @@ let paste () =
     | None -> ())
   | _ -> ()
 
-let detached_copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    send_request (Copy_detached n)
-  | _ -> ()
-
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
 
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:detached_copy "Detached copy"
 
 (*********************************)
 (* add a new file in the project *)

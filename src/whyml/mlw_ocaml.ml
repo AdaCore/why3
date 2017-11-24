@@ -512,7 +512,7 @@ module Translate = struct
         when pv_equal pv' pv
              && Mid.mem a.ps_name info.converters && is_int_constant e1 ->
           let s = fst (Mid.find a.ps_name info.converters) in
-          let n = Number.compute_int (get_int_constant e1) in
+          let n = Number.compute_int_constant (get_int_constant e1) in
           let e1 = ML.Esyntax (BigInt.to_string n, []) in
           ML.Esyntax (s, [e1])
       | Eapp (e, v, _) when v.pv_ghost ->
@@ -898,14 +898,17 @@ module Print = struct
   let max_int31 = BigInt.of_int    0x3FFFFFFF
 
   let print_const ~paren fmt c =
-    let n = Number.compute_int c in
+    let n = Number.compute_int_constant c in
     if BigInt.eq n BigInt.zero then
       fprintf fmt "Why3extract.Why3__BigInt.zero"
     else if BigInt.eq n BigInt.one then
       fprintf fmt "Why3extract.Why3__BigInt.one"
     else if BigInt.le min_int31 n && BigInt.le n max_int31 then
       let m = BigInt.to_int n in
-      fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int %d") m
+      if m < 0 then
+        fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int (%d)") m
+      else
+        fprintf fmt (protect_on paren "Why3extract.Why3__BigInt.of_int %d") m
     else
       let s = BigInt.to_string n in
       fprintf fmt
@@ -926,7 +929,9 @@ module Print = struct
     | Ebool b ->
         fprintf fmt "%b" b
     | Econst c when info.unsafe_int ->
-        fprintf fmt "%s" (BigInt.to_string (Number.compute_int c))
+        let s = BigInt.to_string (Number.compute_int_constant c) in
+        if c.Number.ic_negative then fprintf fmt "(%s)" s
+        else fprintf fmt "%s" s
     | Econst c ->
         print_const ~paren fmt c
     | Etuple el ->

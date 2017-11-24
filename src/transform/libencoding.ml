@@ -83,11 +83,13 @@ let lsdecl_of_ts ts = create_param_decl (ls_of_ts ts)
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
   Hty.memo 3 (fun ty_base ->
-  Hterm.memo 63 (fun t -> match t.t_node with
-    | Tconst _ ->
-        let s = "const_" ^ Pp.string_of_wnl Pretty.print_term t in
-        create_fsymbol (id_fresh s) [] ty_base
-    | _ -> assert false))
+             Hterm.memo 63 (fun t ->
+                          match t.t_node with
+                          | Tconst c ->
+                             assert (not (Number.is_negative c));
+                             let s = "const_" ^ Pp.string_of_wnl Pretty.print_term t in
+                             create_fsymbol (id_fresh s) [] ty_base
+                          | _ -> assert false))
 
 let ls_of_const ty_base t = ls_of_const ty_base (t_label Slab.empty t)
 

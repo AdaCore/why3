@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="9" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="10" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../Firstorder_tableau_impl.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Logic" sum="82e8b0a9356c3bcbcb4f0e1497059669">
+<theory name="Logic" sum="feef5ef72018b38b2375c38c32dd1376">
  <goal name="WP_parameter nlsize_positive_lemma_tableau" expl="VC for nlsize_positive_lemma_tableau">
- <proof prover="8"><result status="valid" time="0.26" steps="91"/></proof>
+ <proof prover="8"><result status="valid" time="0.12" steps="91"/></proof>
  </goal>
  <goal name="WP_parameter nlmodel_subst_commutation_lemma_tableau" expl="VC for nlmodel_subst_commutation_lemma_tableau">
  <transf name="split_goal_wp">
@@ -66,10 +66,10 @@
  <proof prover="8"><result status="valid" time="0.20" steps="33"/></proof>
  </goal>
  <goal name="WP_parameter bound_depth_of_symbol_in_tableau_nonnegative" expl="VC for bound_depth_of_symbol_in_tableau_nonnegative">
- <proof prover="8"><result status="valid" time="0.32" steps="130"/></proof>
+ <proof prover="8"><result status="valid" time="0.14" steps="130"/></proof>
  </goal>
  <goal name="WP_parameter bound_depth_of_fo_term_in_tableau_nonnegative" expl="VC for bound_depth_of_fo_term_in_tableau_nonnegative">
- <proof prover="8"><result status="valid" time="0.37" steps="138"/></proof>
+ <proof prover="8"><result status="valid" time="0.16" steps="138"/></proof>
  </goal>
  <goal name="WP_parameter model_equal_tableau" expl="VC for model_equal_tableau">
  <transf name="split_goal_wp">
@@ -80,7 +80,7 @@
   <proof prover="8"><result status="valid" time="0.19" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_tableau.3" expl="3. precondition">
-  <proof prover="8"><result status="valid" time="0.25" steps="58"/></proof>
+  <proof prover="8"><result status="valid" time="0.12" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_tableau.4" expl="4. precondition">
   <proof prover="8"><result status="valid" time="0.16" steps="12"/></proof>
@@ -95,7 +95,7 @@
   <proof prover="8"><result status="valid" time="0.19" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_tableau.8" expl="8. precondition">
-  <proof prover="8"><result status="valid" time="0.25" steps="73"/></proof>
+  <proof prover="8"><result status="valid" time="0.12" steps="73"/></proof>
   </goal>
   <goal name="WP_parameter model_equal_tableau.9" expl="9. precondition">
   <proof prover="8"><result status="valid" time="0.16" steps="16"/></proof>
@@ -130,21 +130,21 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" sum="3cba7432aed70b28436e6a97f11cae26">
+<theory name="Impl" sum="96a2dc51095efd401fe352a05b8f38c7">
  <goal name="WP_parameter bind_var_symbol_in_tableau" expl="VC for bind_var_symbol_in_tableau">
- <proof prover="9"><result status="valid" time="1.23"/></proof>
+ <proof prover="9"><result status="valid" time="0.98"/></proof>
  </goal>
  <goal name="WP_parameter bind_var_fo_term_in_tableau" expl="VC for bind_var_fo_term_in_tableau">
- <proof prover="9"><result status="valid" time="1.46"/></proof>
+ <proof prover="9"><result status="valid" time="0.99"/></proof>
  </goal>
  <goal name="WP_parameter unbind_var_symbol_in_tableau" expl="VC for unbind_var_symbol_in_tableau">
- <proof prover="9"><result status="valid" time="1.57"/></proof>
+ <proof prover="9"><result status="valid" time="1.03"/></proof>
  </goal>
  <goal name="WP_parameter unbind_var_fo_term_in_tableau" expl="VC for unbind_var_fo_term_in_tableau">
- <proof prover="9"><result status="valid" time="1.15"/></proof>
+ <proof prover="9"><result status="valid" time="0.66"/></proof>
  </goal>
  <goal name="WP_parameter subst_base_symbol_in_tableau" expl="VC for subst_base_symbol_in_tableau">
- <proof prover="9"><result status="valid" time="1.58"/></proof>
+ <proof prover="9"><result status="valid" time="1.01"/></proof>
  </goal>
  <goal name="WP_parameter subst_base_fo_term_in_tableau" expl="VC for subst_base_fo_term_in_tableau">
  <proof prover="9"><result status="valid" time="0.81"/></proof>
@@ -167,10 +167,10 @@
   <proof prover="8"><result status="valid" time="0.23" steps="181"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.6" expl="6. assertion">
-  <proof prover="8"><result status="valid" time="0.22" steps="157"/></proof>
+  <proof prover="8"><result status="valid" time="0.22" steps="127"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.7" expl="7. assertion">
-  <proof prover="8"><result status="valid" time="0.24" steps="111"/></proof>
+  <proof prover="8"><result status="valid" time="0.24" steps="146"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.8" expl="8. postcondition">
   <proof prover="8"><result status="valid" time="0.19" steps="29"/></proof>
@@ -191,13 +191,13 @@
   <proof prover="8"><result status="valid" time="0.17" steps="77"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.14" expl="14. assertion">
-  <proof prover="8"><result status="valid" time="0.35" steps="88"/></proof>
+  <proof prover="8"><result status="valid" time="0.13" steps="88"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.15" expl="15. assertion">
   <proof prover="8"><result status="valid" time="0.18" steps="88"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.16" expl="16. assertion">
-  <proof prover="8"><result status="valid" time="0.18" steps="76"/></proof>
+  <proof prover="8"><result status="valid" time="0.18" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.17" expl="17. assertion">
   <proof prover="8"><result status="valid" time="0.15" steps="76"/></proof>
@@ -272,10 +272,10 @@
   <proof prover="8"><result status="valid" time="0.19" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.41" expl="41. postcondition">
-  <proof prover="8"><result status="valid" time="0.54" steps="311"/></proof>
+  <proof prover="8"><result status="valid" time="0.29" steps="311"/></proof>
   </goal>
   <goal name="WP_parameter construct_tableau.42" expl="42. postcondition">
-  <proof prover="8"><result status="valid" time="0.41" steps="181"/></proof>
+  <proof prover="8"><result status="valid" time="0.21" steps="181"/></proof>
   </goal>
  </transf>
  </goal>
@@ -291,13 +291,13 @@
   <proof prover="8"><result status="valid" time="0.20" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.4" expl="4. unreachable point">
-  <proof prover="8"><result status="valid" time="0.19" steps="31"/></proof>
+  <proof prover="8"><result status="valid" time="0.19" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.5" expl="5. assertion">
   <proof prover="8"><result status="valid" time="0.18" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.6" expl="6. unreachable point">
-  <proof prover="8"><result status="valid" time="0.20" steps="31"/></proof>
+  <proof prover="8"><result status="valid" time="0.20" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.7" expl="7. assertion">
   <proof prover="8"><result status="valid" time="0.19" steps="31"/></proof>
@@ -309,19 +309,19 @@
   <proof prover="8"><result status="valid" time="0.20" steps="29"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.10" expl="10. assertion">
-  <proof prover="8"><result status="valid" time="0.26" steps="75"/></proof>
+  <proof prover="8"><result status="valid" time="0.12" steps="75"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.11" expl="11. assertion">
   <proof prover="8"><result status="valid" time="0.20" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.12" expl="12. assertion">
-  <proof prover="8"><result status="valid" time="0.25" steps="77"/></proof>
+  <proof prover="8"><result status="valid" time="0.12" steps="77"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.13" expl="13. assertion">
   <proof prover="8"><result status="valid" time="0.20" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.14" expl="14. assertion">
-  <proof prover="8"><result status="valid" time="0.27" steps="94"/></proof>
+  <proof prover="8"><result status="valid" time="0.13" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.15" expl="15. assertion">
   <proof prover="8"><result status="valid" time="0.20" steps="28"/></proof>
@@ -426,13 +426,13 @@
   <proof prover="8"><result status="valid" time="0.16" steps="93"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.49" expl="49. postcondition">
-  <proof prover="8"><result status="valid" time="2.02" steps="3093"/></proof>
+  <proof prover="8"><result status="valid" time="1.35" steps="3093"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.50" expl="50. postcondition">
-  <proof prover="8"><result status="valid" time="0.28" steps="97"/></proof>
+  <proof prover="8"><result status="valid" time="0.13" steps="97"/></proof>
   </goal>
   <goal name="WP_parameter destruct_tableau.51" expl="51. postcondition">
-  <proof prover="8"><result status="valid" time="0.39" steps="181"/></proof>
+  <proof prover="8"><result status="valid" time="0.19" steps="181"/></proof>
   </goal>
  </transf>
  </goal>
@@ -468,37 +468,37 @@
   <goal name="WP_parameter nlsubst_symbol_in_tableau.10" expl="10. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="2.96"/></proof>
+   <proof prover="2"><result status="valid" time="5.11"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.2" expl="2. assertion">
-   <proof prover="8"><result status="valid" time="0.45" steps="189"/></proof>
+   <proof prover="8"><result status="valid" time="0.25" steps="190"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.3" expl="3. assertion">
-   <proof prover="8"><result status="valid" time="0.25" steps="89"/></proof>
+   <proof prover="8"><result status="valid" time="0.25" steps="90"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.4" expl="4. assertion">
-   <proof prover="8"><result status="valid" time="0.16" steps="26"/></proof>
+   <proof prover="8"><result status="valid" time="0.16" steps="27"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.5" expl="5. assertion">
    <proof prover="8"><result status="valid" time="0.21" steps="35"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.10.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="3.09"/></proof>
+   <proof prover="2"><result status="valid" time="1.96"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_symbol_in_tableau.11" expl="11. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_symbol_in_tableau.11.1" expl="1. assertion">
-   <proof prover="2"><result status="valid" time="2.24"/></proof>
+   <proof prover="2"><result status="valid" time="1.60"/></proof>
    <proof prover="8"><result status="valid" time="0.40" steps="232"/></proof>
-   <proof prover="9"><result status="valid" time="1.82"/></proof>
+   <proof prover="9"><result status="valid" time="0.88"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.11.2" expl="2. assertion">
    <proof prover="8"><result status="valid" time="0.22" steps="78"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_symbol_in_tableau.11.3" expl="3. assertion">
-   <proof prover="9"><result status="valid" time="1.13"/></proof>
+   <proof prover="9"><result status="valid" time="0.76"/></proof>
    </goal>
   </transf>
   </goal>
@@ -545,29 +545,29 @@
   <goal name="WP_parameter nlsubst_fo_term_in_tableau.12" expl="12. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.1" expl="1. assertion">
-   <proof prover="8" timelimit="20"><result status="valid" time="0.18" steps="50"/></proof>
+   <proof prover="8" timelimit="20"><result status="valid" time="0.18" steps="51"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.2" expl="2. assertion">
-   <proof prover="8"><result status="valid" time="0.23" steps="71"/></proof>
+   <proof prover="8"><result status="valid" time="0.23" steps="72"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.3" expl="3. assertion">
    <proof prover="8"><result status="valid" time="0.50" steps="226"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.4" expl="4. assertion">
-   <proof prover="10"><result status="valid" time="2.70"/></proof>
+   <proof prover="10"><result status="valid" time="1.90"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.5" expl="5. assertion">
    <proof prover="8"><result status="valid" time="0.18" steps="30"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.12.6" expl="6. assertion">
-   <proof prover="2"><result status="valid" time="1.14"/></proof>
+   <proof prover="2"><result status="valid" time="0.65"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter nlsubst_fo_term_in_tableau.13" expl="13. assertion">
   <transf name="split_goal_wp">
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.13.1" expl="1. assertion">
-   <proof prover="8"><result status="valid" time="0.56" steps="225"/></proof>
+   <proof prover="8"><result status="valid" time="0.36" steps="225"/></proof>
    </goal>
    <goal name="WP_parameter nlsubst_fo_term_in_tableau.13.2" expl="2. assertion">
    <proof prover="10"><result status="valid" time="1.94"/></proof>

@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" timelimit="5" memlimit="1000"/>
-<prover id="6" name="Z3" version="4.3.2" timelimit="5" memlimit="1000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="1" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="1" memlimit="1000"/>
 <file name="../BacktrackArray.mlw" expanded="true">
 <theory name="Types" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Logic" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Impl" sum="915f2729db9ec2d3726d5cb6a70d8272" expanded="true">
+<theory name="Impl" sum="7aea9847ca1d7bd0de9cb83469741536" expanded="true">
  <goal name="WP_parameter create" expl="VC for create">
  <proof prover="4"><result status="valid" time="0.11" steps="82"/></proof>
  </goal>
@@ -65,7 +65,7 @@
   <proof prover="4"><result status="valid" time="0.05" steps="44"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.10" expl="10. postcondition">
-  <proof prover="4"><result status="valid" time="0.14" steps="31"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.11" expl="11. postcondition">
   <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
@@ -169,7 +169,7 @@
   <proof prover="4"><result status="valid" time="0.85" steps="94"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.39" expl="39. postcondition">
-  <proof prover="4"><result status="valid" time="0.41" steps="106"/></proof>
+  <proof prover="4"><result status="valid" time="0.22" steps="106"/></proof>
   </goal>
   <goal name="WP_parameter resize_for.40" expl="40. postcondition">
   <proof prover="4"><result status="valid" time="0.15" steps="41"/></proof>
@@ -198,9 +198,9 @@
   </goal>
   <goal name="WP_parameter iadd.7" expl="7. assertion">
   <transf name="introduce_premises">
-   <goal name="WP_parameter iadd.7.1" expl="1. VC for iadd">
+   <goal name="WP_parameter iadd.7.1" expl="1. assertion">
    <transf name="inline_goal">
-    <goal name="WP_parameter iadd.7.1.1" expl="1. VC for iadd">
+    <goal name="WP_parameter iadd.7.1.1" expl="1. assertion">
     <transf name="split_goal_wp">
      <goal name="WP_parameter iadd.7.1.1.1" expl="1. VC for iadd">
      <proof prover="1"><result status="valid" time="0.42"/></proof>
@@ -237,7 +237,7 @@
     <proof prover="1"><result status="valid" time="0.23"/></proof>
     </goal>
     <goal name="WP_parameter iadd.10.1.4" expl="4. VC for iadd">
-    <proof prover="1"><result status="valid" time="0.72"/></proof>
+    <proof prover="1"><result status="valid" time="0.52"/></proof>
     </goal>
    </transf>
    </goal>
@@ -309,7 +309,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter get.2" expl="2. postcondition">
-  <proof prover="4"><result status="valid" time="0.03" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter get.3" expl="3. index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="4"/></proof>
@@ -328,7 +328,7 @@
  <goal name="WP_parameter backtrack" expl="VC for backtrack">
  <transf name="split_goal_wp">
   <goal name="WP_parameter backtrack.1" expl="1. unreachable point">
-  <proof prover="4"><result status="valid" time="0.04" steps="26"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.2" expl="2. array creation size">
   <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
@@ -345,7 +345,7 @@
    <proof prover="1"><result status="valid" time="0.44"/></proof>
    </goal>
    <goal name="WP_parameter backtrack.5.2" expl="2. assertion">
-   <proof prover="1"><result status="valid" time="0.48"/></proof>
+   <proof prover="1"><result status="valid" time="0.28"/></proof>
    <proof prover="4"><result status="valid" time="0.95" steps="392"/></proof>
    </goal>
    <goal name="WP_parameter backtrack.5.3" expl="3. assertion">
@@ -409,7 +409,7 @@
   <proof prover="4"><result status="valid" time="0.21" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.24" expl="24. unreachable point">
-  <proof prover="4"><result status="valid" time="0.11" steps="54"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.25" expl="25. index in array bounds">
   <proof prover="4"><result status="valid" time="0.02" steps="24"/></proof>
@@ -457,7 +457,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter backtrack.33" expl="33. precondition">
-  <proof prover="1"><result status="valid" time="0.26"/></proof>
+  <proof prover="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.34" expl="34. precondition">
   <proof prover="4"><result status="valid" time="0.03" steps="28"/></proof>
@@ -466,7 +466,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.36" expl="36. precondition">
-  <proof prover="5"><result status="valid" time="1.63"/></proof>
+  <proof prover="5"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.37" expl="37. precondition">
   <proof prover="1"><result status="valid" time="0.07"/></proof>
@@ -488,13 +488,13 @@
   <proof prover="4"><result status="valid" time="0.05" steps="54"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.43" expl="43. postcondition">
-  <proof prover="1"><result status="valid" time="0.33"/></proof>
+  <proof prover="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.44" expl="44. index in array bounds">
   <proof prover="4"><result status="valid" time="0.03" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.45" expl="45. unreachable point">
-  <proof prover="4"><result status="valid" time="0.17" steps="47"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.46" expl="46. index in array bounds">
   <proof prover="4"><result status="valid" time="0.03" steps="23"/></proof>
@@ -515,7 +515,7 @@
   <proof prover="4"><result status="valid" time="0.18" steps="112"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.52" expl="52. precondition">
-  <proof prover="1"><result status="valid" time="0.29"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="WP_parameter backtrack.53" expl="53. precondition">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
