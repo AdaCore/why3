@@ -149,7 +149,7 @@ let induction x bound env =
   (* Default bound is 0 if not given *)
   let bound =
     match bound with
-    | None -> Term.t_const (Number.ConstInt (Number.int_const_of_int 0)) Ty.ty_int
+    | None -> Term.t_nat_const 0
     | Some bound -> bound
   in
 

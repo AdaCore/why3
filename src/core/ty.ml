@@ -191,7 +191,7 @@ let create_tysymbol name args def =
         ignore (ty_v_all check def)
     | Range ir ->
         if args <> [] then raise IllegalTypeParameters;
-        if BigInt.lt ir.Number.ir_upper_val ir.Number.ir_lower_val
+        if BigInt.lt ir.Number.ir_upper ir.Number.ir_lower
         then raise EmptyRange
     | Float fp ->
         if args <> [] then raise IllegalTypeParameters;

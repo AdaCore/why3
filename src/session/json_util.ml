@@ -271,9 +271,10 @@ let convert_message (m: message_notification) =
   | Task_Monitor (n, k, p) ->
       convert_record ["mess_notif", cc m;
            "monitor", List [Int n; Int k; Int p]]
-  | Parse_Or_Type_Error (loc, s) ->
+  | Parse_Or_Type_Error (loc, rel_loc,s) ->
       convert_record ["mess_notif", cc m;
                       "loc", convert_loc loc;
+                      "rel_loc", convert_loc rel_loc;
                       "error", String s]
   | Error s ->
       convert_record ["mess_notif", cc m;
@@ -652,8 +653,9 @@ let parse_message constr j =
 
   | "Parse_Or_Type_Error" ->
     let loc = parse_loc (get_field j "loc") in
+    let rel_loc = parse_loc (get_field j "rel_loc") in
     let error = get_string (get_field j "error") in
-    Parse_Or_Type_Error (loc, error)
+    Parse_Or_Type_Error (loc, rel_loc, error)
 
   | _ -> raise NotMessage
 

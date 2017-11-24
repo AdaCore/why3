@@ -44,10 +44,10 @@ let deref_id ~loc id =
   mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
-let constantd ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec s})))
-let constant ~loc n =
-  mk_expr ~loc (Econst (Number.(ConstInt (int_const_of_int n))))
+let constant ~loc i =
+  mk_expr ~loc (Econst (Number.const_of_int i))
+let constant_s ~loc s =
+  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s})))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =
@@ -137,7 +137,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Ebool b ->
     mk_expr ~loc (if b then Etrue else Efalse)
   | Py_ast.Eint s ->
-    constantd ~loc s
+    constant_s ~loc s
   | Py_ast.Estring _s ->
     mk_unit ~loc (*FIXME*)
   | Py_ast.Eident id ->

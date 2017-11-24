@@ -484,8 +484,7 @@ let e_const c ity =
 
 let e_nat_const n =
   assert (n >= 0);
-  let a = Number.int_const_of_int n in
-  e_const (Number.ConstInt a) ity_int
+  e_const (Number.const_of_int n) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else

@@ -65,8 +65,8 @@ let elim le_int le_real neg_real type_kept kn
       let pr = create_prsymbol (id_fresh (ts.ts_name.id_string ^ "'axiom")) in
       let v = create_vsymbol (id_fresh "i") (ty_app ts []) in
       let v_term = t_app to_int [t_var v] (Some ty_int) in
-      let a_term = t_const (Number.ConstInt lo) ty_int in
-      let b_term = t_const (Number.ConstInt hi) ty_int in
+      let a_term = t_bigint_const lo in
+      let b_term = t_bigint_const hi in
       let f = t_and (t_app le_int [a_term; v_term] None)
           (t_app le_int [v_term; b_term] None)
       in

@@ -45,7 +45,7 @@ type message_notification =
   | Help                  of string
   | Information           of string
   | Task_Monitor          of int * int * int
-  | Parse_Or_Type_Error   of Loc.position * string
+  | Parse_Or_Type_Error   of Loc.position * Loc.position * string
   | File_Saved            of string
   | Error                 of string
   | Open_File_Error       of string

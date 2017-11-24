@@ -354,7 +354,7 @@ let generate_auto_strategies config =
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto0 = {
-      strategy_name = "Auto level 0";
+      strategy_name = "Auto_level_0";
       strategy_desc = "Automatic@ run@ of@ main@ provers";
       strategy_shortcut = "0";
       strategy_code = code }
@@ -365,7 +365,7 @@ let generate_auto_strategies config =
   List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto1 = {
-      strategy_name = "Auto level 1";
+      strategy_name = "Auto_level_1";
       strategy_desc = "Automatic@ run@ of@ main@ provers";
       strategy_shortcut = "1";
       strategy_code = code }
@@ -392,7 +392,7 @@ let generate_auto_strategies config =
   List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level2;
   let code = flush_str_formatter () in
   let auto2 = {
-      strategy_name = "Auto level 2";
+      strategy_name = "Auto_level_2";
       strategy_desc = "Automatic@ run@ of@ provers@ and@ most@ useful@ transformations";
       strategy_shortcut = "2";
       strategy_code = code }

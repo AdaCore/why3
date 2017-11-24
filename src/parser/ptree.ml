@@ -172,7 +172,7 @@ type type_def =
   | TDalias     of pty
   | TDalgebraic of (Loc.position * ident * param list) list
   | TDrecord    of field list
-  | TDrange     of Number.integer_constant * Number.integer_constant
+  | TDrange     of BigInt.t * BigInt.t
   | TDfloat     of int * int
 
 type visibility = Public | Private | Abstract (* = Private + ghost fields *)

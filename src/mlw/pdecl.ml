@@ -346,12 +346,12 @@ let create_type_decl dl =
         (* create max attribute *)
         let max_id = id_derive (nm ^ "'maxInt") id in
         let max_ls = create_fsymbol max_id [] ty_int  in
-        let max_defn = t_const Number.(ConstInt ir.ir_upper) ty_int in
+        let max_defn = t_const Number.(const_of_big_int ir.ir_upper) ty_int in
         let max_decl = create_logic_decl [make_ls_defn max_ls [] max_defn] in
         (* create min attribute *)
         let min_id = id_derive (nm ^ "'minInt") id in
         let min_ls = create_fsymbol min_id [] ty_int  in
-        let min_defn = t_const Number.(ConstInt ir.ir_lower) ty_int in
+        let min_defn = t_const Number.(const_of_big_int ir.ir_lower) ty_int in
         let min_decl = create_logic_decl [make_ls_defn min_ls [] min_defn] in
         let pure = [create_ty_decl ts; pj_decl; max_decl; min_decl] in
         let meta = Theory.(meta_range, [MAts ts; MAls pj_ls]) in

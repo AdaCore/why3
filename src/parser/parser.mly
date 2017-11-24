@@ -323,15 +323,14 @@ typedefn:
     { $2, TDalias $3 }
 (* FIXME: allow negative bounds *)
 | EQUAL LT RANGE int_constant int_constant GT
-    { (Public, false),
-      TDrange ($4,$5) }
+    { (Public, false), TDrange ($4, $5) }
 | EQUAL LT FLOAT INTEGER INTEGER GT
     { (Public, false),
       TDfloat (Number.to_small_integer $4, Number.to_small_integer $5) }
 
 int_constant:
-| INTEGER       { mk_int_const false $1 }
-| MINUS INTEGER { mk_int_const true $2 }
+| INTEGER       { Number.compute_int_literal $1 }
+| MINUS INTEGER { BigInt.minus (Number.compute_int_literal $2) }
 
 vis_mut:
 | (* epsilon *)     { Public, false }

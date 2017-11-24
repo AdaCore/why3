@@ -15,7 +15,7 @@ esac
 cd $dir
 
 run_cvc4_15 () {
-  echo -n "  $1... "
+  printf "  $1... "
   ../bin/why3prove.opt -P "CVC4,1.5" --timelimit 1 --get-ce $1 | \
   # This ad hoc sed removes any timing information from counterexamples output.
   # Counterexamples in JSON format cannot match this regexp.
