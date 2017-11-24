@@ -302,7 +302,7 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
-(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab):
+(* Contains quadruples (tab page, source_view, file_has_been_modified, label_of_tab):
    - tab_page is a unique number for each pages of the notebook
    - source_view is the graphical element inside a tab
    - has_been_modified is a reference to a boolean stating if the current tab

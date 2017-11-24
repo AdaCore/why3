@@ -122,7 +122,8 @@ type ide_request =
 let modify_session (r: ide_request) =
   match r with
   | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
+  | Reload_req -> true
   | Set_config_param _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
-  | Save_req | Reload_req | Exit_req
+  | Save_req | Exit_req
   | Interrupt_req | Focus_req _ | Unfocus_req -> false

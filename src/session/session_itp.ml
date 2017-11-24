@@ -1316,7 +1316,7 @@ let save_detached_theory parent_name old_s detached_theory s =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory) in
     (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
   { theory_name = detached_theory.theory_name;
-    theory_checksum = None;
+    theory_checksum = detached_theory.theory_checksum;
     theory_is_detached = true;
     theory_goals = goalsID;
     theory_parent_name = parent_name }
@@ -1623,7 +1623,7 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
                      (fun _key th tl ->
                       (save_detached_theory fn old_ses th s) :: tl)
                      old_th_table [] in
-    theories, detached
+    theories, List.rev detached
   in
   f.file_theories <- theories @ detached;
   update_file_node (fun _ -> ()) s f

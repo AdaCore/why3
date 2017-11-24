@@ -1224,10 +1224,11 @@ end
     let _old_focus = !focused_node in
     unfocus ();
     clear_tables ();
-    match reload_files d.cont ~use_shapes:true with
+    let l = reload_files d.cont ~use_shapes:true in
+    reset_and_send_the_whole_tree ();
+    match l with
     | [] ->
        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       reset_and_send_the_whole_tree ();
        P.notify (Message (Information "Session refresh successful"))
     | l ->
        List.iter
