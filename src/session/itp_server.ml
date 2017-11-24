@@ -789,10 +789,6 @@ end
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
-(*
-      if node_type = NFile then
-        read_and_send node_name;
- *)
       get_node_proved new_id node;
       new_id
 

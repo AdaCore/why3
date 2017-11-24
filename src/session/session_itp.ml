@@ -1328,8 +1328,8 @@ and save_detached_trans old_s s parent_id old_id =
 
 let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
-    save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory) in
-    (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
+    save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
+  in
   { theory_name = detached_theory.theory_name;
     theory_checksum = detached_theory.theory_checksum;
     theory_is_detached = true;

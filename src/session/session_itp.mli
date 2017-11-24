@@ -240,7 +240,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
     whose proved state changes.
 
     raises [RemoveError] when removal is forbidden, e.g. when called on
-    a theory, or a goal that is not detached
+    a file, a theory or a goal that is not detached
  *)
 
 (** {2 proved status} *)
