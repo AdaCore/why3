@@ -14,6 +14,7 @@ open Format
 (** Construction *)
 
 type integer_literal =
+  | IConstRaw of BigInt.t
   | IConstDec of string
   | IConstHex of string
   | IConstOct of string
@@ -57,42 +58,43 @@ let is_dec = function '0'..'9' -> true | _ -> false
 let is_oct = function '0'..'7' -> true | _ -> false
 let is_bin = function '0'..'1' -> true | _ -> false
 
-let int_const_dec s =
+let int_literal_dec s =
   check_integer_literal 10 is_dec s;
   IConstDec s
 
-let int_const_hex s =
+let int_literal_hex s =
   check_integer_literal 16 is_hex s;
   IConstHex s
 
-let int_const_oct s =
+let int_literal_oct s =
   check_integer_literal 8 is_oct s;
   IConstOct s
 
-let int_const_bin s =
+let int_literal_bin s =
   check_integer_literal 2 is_bin s;
   IConstBin s
 
-let int_const_of_int n =
-  let neg,a =
-    if n >= 0 then
-      false,n
+let int_literal_raw i =
+  assert (BigInt.ge i BigInt.zero);
+  IConstRaw i
+
+let int_const_of_big_int n =
+  let neg, n =
+    if BigInt.ge n BigInt.zero then
+      false, n
     else
-      true,-n
+      true, BigInt.minus n
   in
-  assert (a >= 0);
-  let a = int_const_dec (string_of_int a) in
-  {ic_negative = neg ;ic_abs = a}
+  { ic_negative = neg; ic_abs = IConstRaw n }
+
+let int_const_of_int n =
+  int_const_of_big_int (BigInt.of_int n)
 
 let const_of_big_int n =
-  let neg,a =
-    if BigInt.ge n BigInt.zero then
-      false,n
-    else
-      true,BigInt.minus n
-  in
-  let a = int_const_dec (BigInt.to_string a) in
-  ConstInt {ic_negative = neg ;ic_abs = a}
+  ConstInt (int_const_of_big_int n)
+
+let const_of_int n =
+  const_of_big_int (BigInt.of_int n)
 
 let check_exp e =
   let e = if e.[0] = '-' then String.sub e 1 (String.length e - 1) else e in
@@ -130,6 +132,7 @@ let compute_any radix s =
 
 let compute_int_literal c =
   match c with
+  | IConstRaw i -> i
   | IConstDec s -> compute_any 10 s
   | IConstHex s -> compute_any 16 s
   | IConstOct s -> compute_any 8 s
@@ -141,6 +144,7 @@ let compute_int_constant c =
 
 let to_small_integer i =
   match i with
+  | IConstRaw i -> BigInt.to_int i
   | IConstDec s -> int_of_string s
   | IConstHex s -> int_of_string ("0x"^s)
   | IConstOct s -> int_of_string ("0o"^s)
@@ -304,6 +308,7 @@ let print_hex_real support fmt =
   ))
 
 let print_int_literal support fmt = function
+  | IConstRaw i -> print_dec_int support fmt (BigInt.to_string i)
   | IConstDec i -> print_dec_int support fmt i
   | IConstHex i -> print_hex_int support fmt i
   | IConstOct i -> print_oct_int support fmt i
