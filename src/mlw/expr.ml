@@ -763,11 +763,13 @@ let c_fun ?(mask=MaskVisible) args p q xq old e =
     | StaleVariable (v,r) -> localize_reset_stale v r [e] in
   mk_cexp (Cfun e) c
 
+let is_rs_tuple s = match s.rs_logic with
+  | RLls ls -> is_fs_tuple ls
+  | _ -> false
+
 let c_app s vl ityl ity =
   let cty = cty_apply s.rs_cty vl ityl ity in
-  let cty = match s.rs_logic with
-    | RLls ls when ityl = [] && is_fs_tuple ls -> cty_tuple vl
-    | _ -> cty in
+  let cty = if ityl = [] && is_rs_tuple s then cty_tuple vl else cty in
   mk_cexp (Capp (s,vl)) cty
 
 let c_pur s vl ityl ity =
@@ -793,12 +795,14 @@ let let_head hd e = List.fold_left (fun e ld -> e_let ld e) e hd
 
 let e_app s el ityl ity =
   let trues l = List.map Util.ttrue l in
+  let falses l = List.map Util.ffalse l in
   let rec down al el = match al, el with
     | {pv_ghost = gh}::al, {e_mask = m}::el ->
         if not gh && mask_ghost m then raise Exit;
         gh :: down al el
     | _, el -> trues el in
   let ghl = if rs_ghost s then trues el else
+    if ityl = [] && is_rs_tuple s then falses el else
     try down s.rs_cty.cty_args el with Exit -> trues el in
   let hd, vl = List.fold_right2 add_proxy ghl el ([],[]) in
   let_head hd (e_exec (c_app s vl ityl ity))
@@ -830,8 +834,6 @@ let e_false = e_app rs_false [] [] ity_bool
 
 let rs_tuple = Hint.memo 17 (fun n ->
   ignore (its_tuple n); rs_of_ls (fs_tuple n))
-
-let is_rs_tuple rs = rs_equal rs (rs_tuple (List.length rs.rs_cty.cty_args))
 
 let e_tuple el =
   let ity = ity_tuple (List.map (fun e -> e.e_ity) el) in

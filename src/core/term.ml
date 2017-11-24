@@ -969,7 +969,8 @@ let fs_tuple = Hint.memo 17 (fun n ->
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 
-let is_fs_tuple fs = ls_equal fs (fs_tuple (List.length fs.ls_args))
+let is_fs_tuple fs =
+  fs.ls_constr = 1 && Hid.mem fs_tuple_ids fs.ls_name
 
 let is_fs_tuple_id id =
   try Some (Hid.find fs_tuple_ids id) with Not_found -> None

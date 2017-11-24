@@ -1189,14 +1189,14 @@ and cexp uloc env ({de_loc = loc} as de) lpl =
 and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
   let rec drop vl al = match vl, al with
     | _::vl, _::al -> drop vl al | _ -> al in
-  let rec eval_args ghost plp al lpl = match al, lpl with
+  let rec eval_args tpl ghost plp al lpl = match al, lpl with
     | gh::al, DA (env, de) :: lpl ->
         let env = {env with ugh = env.ugh || ghost || gh} in
         let e = e_ghostify env.cgh (expr uloc env de) in
-        let ghost = ghost || (not gh && mask_ghost e.e_mask) in
-        eval_args ghost (EA (gh, e) :: plp) al lpl
+        let gha = not tpl && not gh && mask_ghost e.e_mask in
+        eval_args tpl (ghost || gha) (EA (gh, e) :: plp) al lpl
     | al, LD hd :: lpl ->
-        eval_args ghost (HD hd :: plp) al lpl
+        eval_args tpl ghost (HD hd :: plp) al lpl
     | [], _::_ -> assert false (* ill-typed *)
     | _, [] -> ghost, plp in
   let rec proxy_args ghost ldl vl = function
@@ -1210,19 +1210,24 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     | HD hd :: plp ->
         proxy_args ghost (hd :: ldl) vl plp
     | [] -> ldl, vl in
-  let apply app gh s al lpl =
-    let gh, plp = eval_args gh [] al lpl in
+  let apply app tpl gh s al lpl =
+    let gh, plp = eval_args tpl gh [] al lpl in
     let ldl, vl = proxy_args gh [] [] plp in
     let argl = List.map ity_of_dity (drop vl argl) in
     env.cgh, ldl, app s vl argl (ity_of_dity res) in
   let c_app s lpl =
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
-    apply c_app (env.ghs || env.lgh || rs_ghost s) s al lpl in
+    let rec full_app al lpl = match al, lpl with
+      | _::al, DA _::lpl -> full_app al lpl
+      | al, LD _::lpl -> full_app al lpl
+      | [], [] -> true | _ -> false in
+    let tpl = is_rs_tuple s && full_app al lpl in
+    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
     if not (ugh || env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
       "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
-    apply c_pur true s (List.map Util.ttrue s.ls_args) lpl in
+    apply c_pur false true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
     let rs = Srs.choose s in
     let loc = Opt.get_def de0.de_loc uloc in
@@ -1263,7 +1268,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
             "No suitable match found for notation %a" print_rs rs
       | _ -> Loc.errorm ?loc "Ambiguous notation: %a" print_rs rs in
     let al = List.map Util.ffalse rs.rs_cty.cty_args in
-    apply app (env.ghs || env.lgh) s al lpl in
+    apply app false (env.ghs || env.lgh) s al lpl in
   let proxy c =
     try
       let ld_of_lp = function LD ld -> ld | DA _ -> raise Exit in
