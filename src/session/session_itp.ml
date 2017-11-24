@@ -77,6 +77,7 @@ type transformation_node = {
   transf_args                      : string list;
   mutable transf_subtasks          : proofNodeID list;
   transf_parent                    : proofNodeID;
+  transf_is_detached               : bool;
 }
 
 type file = {
@@ -273,9 +274,7 @@ let rec is_detached (s: session) (a: any) =
   match a with
   | AFile file -> file.file_is_detached
   | ATh th     -> th.theory_is_detached
-  | ATn tn     ->
-    let pn_id = get_trans_parent s tn in
-    is_detached s (APn pn_id)
+  | ATn tn     -> (get_transfNode s tn).transf_is_detached
   | APn pn     ->
     begin
       try let _ = get_raw_task s pn in false
@@ -596,12 +595,14 @@ let mk_transf_proof_node (s : session) (parent_name : string)
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
-    (name : string) (args : string list) ~(proved:bool) (pnl : proofNodeID list) =
+                   (name : string) (args : string list) ~(proved:bool) ~(detached:bool)
+                   (pnl : proofNodeID list) =
   let pn = get_proofNode s id in
   let tn = { transf_name = name;
              transf_args = args;
              transf_subtasks = pnl;
              transf_parent = id;
+             transf_is_detached  = detached;
            }
   in
   Hint.add s.trans_table node_id tn;
@@ -615,7 +616,7 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
   let parent_name = (get_proofNode s id).proofn_name.Ident.id_string in
   let sub_tasks = List.mapi (mk_transf_proof_node s parent_name tid) tl in
   let proved = sub_tasks = [] in
-  mk_transf_node s id tid name args ~proved sub_tasks;
+  mk_transf_node s id tid name args ~proved sub_tasks ~detached:false;
   tid
 
 
@@ -1029,7 +1030,7 @@ and load_proof_or_transf session old_provers pid a =
                        | "goal" -> (gen_proofNodeID session) :: goals
                        | _ -> goals) [] a.Xml.elements)
       in
-      mk_transf_node session pid tid trname args ~proved subtasks_ids;
+      mk_transf_node session pid tid trname args ~proved subtasks_ids ~detached:true;
       List.iter2
         (load_goal session old_provers (Trans tid))
         a.Xml.elements subtasks_ids;
@@ -1321,7 +1322,7 @@ and save_detached_trans old_s s parent_id old_id =
     let id = gen_transID s in
     let subtasks_id = List.map (fun _ -> gen_proofNodeID s) old_tr.transf_subtasks in
     let proved = subtasks_id = [] in
-    mk_transf_node s parent_id id name args ~proved subtasks_id;
+    mk_transf_node s parent_id id name args ~proved subtasks_id ~detached:true;
     List.iter2 (fun pn_id -> save_detached_goal old_s s (Trans id) pn_id)
       old_tr.transf_subtasks subtasks_id
 
