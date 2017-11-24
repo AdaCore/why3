@@ -1412,44 +1412,37 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
   let old_subtasks = List.map (fun id -> id,old_s)
       old_tr.transf_subtasks in
-  (* add_registered_transformation actually apply the transformation. It can fail *)
-  try (
-  let new_tr_id =
-    add_registered_transformation new_s env old_tr new_goal_id
-  in
-  let new_tr = get_transfNode new_s new_tr_id in
-  (* attach the session to the subtasks to be able to instantiate Pairing *)
-  let new_subtasks = List.map (fun id -> id,new_s)
-      new_tr.transf_subtasks in
-(*
-  List.iter
-    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
-       | Some _ -> Debug.dprintf debug "[merge] old subgoal has no checksum@."
-       | None ->  Debug.dprintf debug "[merge] old subgoal has no checksum@.") old_subtasks;
-  List.iter
-    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
-       | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
-       | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
-*)
-  let associated,_detached =
-    AssoGoals.associate ~use_shapes old_subtasks new_subtasks
-  in
-  List.iter (function
-      | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
-        merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
-      | ((id,s), None) ->
-        Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
-          (get_proofNode s id).proofn_name.Ident.id_string;
-        found_detached := true)
-    associated;
-  (* save the detached goals *)
-  (* DISABLED TO AVOID ANY FUTURE ANOMALIES 'Not_found' *)
-  (*let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
-   *))
+  try
+    (* add_registered_transformation actually apply the transformation. It can fail *)
+    let new_tr_id =
+      add_registered_transformation new_s env old_tr new_goal_id
+    in
+    let new_tr = get_transfNode new_s new_tr_id in
+    (* attach the session to the subtasks to be able to instantiate Pairing *)
+    let new_subtasks = List.map (fun id -> id,new_s)
+                                new_tr.transf_subtasks in
+    let associated,detached =
+      AssoGoals.associate ~use_shapes old_subtasks new_subtasks
+    in
+    List.iter
+      (function
+        | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
+           merge_goal ~use_shapes env new_s old_s ~goal_obsolete
+                      (get_proofNode old_s old_goal_id) new_goal_id
+        | ((id,s), None) ->
+           Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
+                         (get_proofNode s id).proofn_name.Ident.id_string;
+           found_detached := true)
+      associated;
+    (* save the detached goals *)
+    let detached = List.map (fun (a,_) -> a) detached in
+    new_tr.transf_subtasks <-
+      new_tr.transf_subtasks @
+        save_detached_goals old_s detached new_s (Trans new_tr_id)
   with _ when not (Debug.test_flag debug_stack_trace) ->
     Debug.dprintf debug
-      "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;
+                  "[Session_itp.merge_trans] transformation failed: %s@."
+                  old_tr.transf_name;
     (* TODO should create a detached transformation *)
     found_detached := true
 
