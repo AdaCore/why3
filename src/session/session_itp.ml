@@ -75,7 +75,7 @@ type proof_node = {
 type transformation_node = {
   transf_name                      : string;
   transf_args                      : string list;
-  transf_subtasks                  : proofNodeID list;
+  mutable transf_subtasks          : proofNodeID list;
   transf_parent                    : proofNodeID;
 }
 
@@ -812,8 +812,20 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
     | ATn tn -> remove_transformation s tn
     | APa pa -> remove_proof_attempt_pa s pa
     | AFile f -> Hstr.remove s.session_files f.file_name
-    | APn pn -> Hint.remove s.proofNode_table pn
-    | ATh _th -> (* Not in any table *)  ()
+    | APn pn ->
+       let node = Hint.find s.proofNode_table pn in
+       Hint.remove s.proofNode_table pn;
+       begin
+         match node.proofn_parent with
+         | Theory th ->
+            th.theory_goals <- List.filter ((<>) pn) th.theory_goals
+         | Trans tr ->
+            let nt = get_transfNode s tr in
+            nt.transf_subtasks <- List.filter ((<>) pn) nt.transf_subtasks
+       end
+    | ATh th ->
+       let f = theory_parent s th in
+       f.file_theories <- List.filter ((!=) th) f.file_theories
   in
   match n with
   | (AFile _ | APn _ | ATh _) when not (is_detached s n) ->
