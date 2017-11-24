@@ -938,7 +938,7 @@ let reflow vc_wp k =
         let k, _ = mark WP k in
         Kaxiom k, Mint.singleton 0 true
     | Ktag ((Off _) as tag, k) ->
-        let k, out = mark tag k in
+        let k, out = mark vc_tag k in
         Ktag (tag, k), out
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
