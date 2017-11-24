@@ -1288,25 +1288,33 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 let found_obsolete = ref false
 let found_detached = ref false
 
-(**)
-let save_detached_goals old_s detached_goals_id s parent =
-  let save_proof parent old_pa_n =
-    let old_pa = old_pa_n in
-    ignore (add_proof_attempt s old_pa.prover old_pa.limit
-      old_pa.proof_state true old_pa.proof_script
-      parent)
-  in
-  let rec save_goal parent detached_goal_id id =
+let save_detached_proof s parent old_pa_n =
+  let old_pa = old_pa_n in
+  ignore (add_proof_attempt s old_pa.prover old_pa.limit
+                            old_pa.proof_state true old_pa.proof_script
+                            parent)
+
+let rec save_detached_goal old_s s parent detached_goal_id id =
     let detached_goal = get_proofNode old_s detached_goal_id in
     mk_proof_node_no_task s detached_goal.proofn_name parent id detached_goal.proofn_checksum
       detached_goal.proofn_shape false;
     Hprover.iter (fun _ pa ->
                   let pa = get_proof_attempt_node old_s pa in
-                  save_proof id pa) detached_goal.proofn_attempts;
-    List.iter (save_trans id) detached_goal.proofn_transformations;
+                  save_detached_proof s id pa) detached_goal.proofn_attempts;
+    List.iter (save_detached_trans old_s s id) detached_goal.proofn_transformations;
     let new_trans = (get_proofNode s id) in
     new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
-  and save_trans parent_id old_id =
+
+
+and save_detached_goals old_s detached_goals_id s parent =
+  List.map
+    (fun detached_goal ->
+     let id = gen_proofNodeID s in
+     save_detached_goal old_s s parent detached_goal id;
+     id)
+    detached_goals_id
+
+and save_detached_trans old_s s parent_id old_id =
     let old_tr = get_transfNode old_s old_id in
     let name = old_tr.transf_name in
     let args = old_tr.transf_args in
@@ -1314,14 +1322,8 @@ let save_detached_goals old_s detached_goals_id s parent =
     let subtasks_id = List.map (fun _ -> gen_proofNodeID s) old_tr.transf_subtasks in
     let proved = subtasks_id = [] in
     mk_transf_node s parent_id id name args ~proved subtasks_id;
-    List.iter2 (fun pn_id -> save_goal (Trans id) pn_id)
+    List.iter2 (fun pn_id -> save_detached_goal old_s s (Trans id) pn_id)
       old_tr.transf_subtasks subtasks_id
-  in
-  List.map
-      (fun detached_goal -> let id = gen_proofNodeID s in
-        save_goal parent detached_goal id;
-        id)
-      detached_goals_id
 
 let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
@@ -1332,7 +1334,8 @@ let save_detached_theory parent_name old_s detached_theory s =
     theory_is_detached = true;
     theory_goals = goalsID;
     theory_parent_name = parent_name }
- (**)
+
+
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
@@ -1443,7 +1446,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
     Debug.dprintf debug
                   "[Session_itp.merge_trans] transformation failed: %s@."
                   old_tr.transf_name;
-    (* TODO should create a detached transformation *)
+    save_detached_trans old_s new_s new_goal_id old_tr_id;
     found_detached := true
 
 
