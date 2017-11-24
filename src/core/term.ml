@@ -828,7 +828,13 @@ let fs_app fs tl ty = t_app fs tl (Some ty)
 let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
-  t_const (Number.ConstInt (Number.int_const_dec (string_of_int n))) ty_int
+  assert (n >= 0);
+  let a =
+    Number.{ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
+  in
+  t_const (Number.ConstInt a) ty_int
+
+let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
@@ -853,7 +859,7 @@ let t_const c ty =
      t_const c ty
   | Number.ConstReal r ->
      begin match ts.ts_def with
-           | Float fp -> Number.check_float r fp; t_const c ty
+           | Float fp -> Number.(check_float r.rc_abs) fp; t_const c ty
            | _ -> raise (InvalidRealLiteralType ty)
      end
 

@@ -39,11 +39,11 @@ export shapes=""
 run_dir () {
     for f in `ls $1/*/why3session.xml`; do
         d=`dirname $f`
-	echo -n "Replaying $d ... "
+	printf "Replaying $d ... "
         ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
         ret=$?
 	if test "$ret" != "0"  ; then
-	    echo -n "FAILED (ret code=$ret):"
+	    printf "FAILED (ret code=$ret):"
             out=`head -1 $TMP`
             if test -z "$out" ; then
                echo "standard error: (standard output empty)"
@@ -53,7 +53,7 @@ run_dir () {
             fi
 	    res=1
 	else
-	    echo -n "OK"
+	    printf "OK"
 	    cat $TMP $TMPERR
             success=`expr $success + 1`
 	fi

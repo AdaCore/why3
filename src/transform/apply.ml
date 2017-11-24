@@ -34,9 +34,9 @@ let intros f =
         intros_aux (f1 :: lp) lv f2
     | Tquant (Tforall, fq) ->
         let vsl, _, fs = t_open_quant fq in
-        intros_aux lp (List.fold_left (fun v lv -> Svs.add lv v) lv vsl) fs
+        intros_aux lp (lv @ vsl) fs
     | _ -> (lp, lv, f) in
-  intros_aux [] Svs.empty f
+  intros_aux [] [] f
 
 let term_decl d =
   match d.td_node with
@@ -57,6 +57,95 @@ let find_hypothesis (name:Ident.ident) task =
     | Some pr -> Ident.id_equal pr.pr_name name) then ndecl := Some x) task in
   !ndecl
 
+(* [with_terms subst_ty subst lv wt]: Takes the list of variables in lv that are
+   not part of the substitution and try to match them with the list of values
+   from wt (ordered). *)
+(* TODO we could use something simpler than first_order_matching here. *)
+let with_terms ~trans_name subst_ty subst lv withed_terms =
+  Debug.dprintf debug_matching "Calling with_terms@.";
+  (* Get the list of variables of lv that are not in subst. *)
+  let lv, slv = List.fold_left (fun (acc, accs) v ->
+    match (Mvs.find v subst) with
+    | _ -> acc, accs
+    | exception Not_found -> t_var v :: acc, Svs.add v accs) ([], Svs.empty) lv
+  in
+  let lv = List.rev lv in
+
+  (* Length checking for nice errors *)
+  let diff = Svs.cardinal slv - List.length withed_terms in
+  match diff with
+  | _ when diff < 0 ->
+      Debug.dprintf debug_matching "Too many withed terms@.";
+      raise (Arg_trans (trans_name ^ ": the last " ^
+                        string_of_int (-diff)
+                        ^ " terms in with are useless"))
+  | _ when diff > 0 ->
+      Debug.dprintf debug_matching "Not enough withed terms@.";
+      raise (Arg_trans (trans_name ^ ": there are " ^
+                        string_of_int diff
+                        ^ " terms missing"))
+  | _ (* when diff = 0 *) ->
+      let new_subst_ty, new_subst =
+        try first_order_matching slv lv withed_terms with
+        | Reduction_engine.NoMatch (Some (t1, t2)) ->
+            Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
+                Pretty.print_term t1 Pretty.print_term t2;
+            raise (Arg_trans_term (trans_name, t1, t2))
+        | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
+            Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
+              Pretty.print_pat p1 Pretty.print_pat p2;
+            raise (Arg_trans_pattern (trans_name, p1, p2))
+        | Reduction_engine.NoMatch None ->
+            Debug.dprintf debug_matching "with_terms: No match@.";
+            raise (Arg_trans trans_name)
+      in
+      let subst_ty = Ty.Mtv.union
+          (fun _x y z ->
+            if Ty.ty_equal y z then
+              Some y
+            else
+              raise (Arg_trans_type (trans_name ^ ": ", y, z)))
+          subst_ty new_subst_ty
+      in
+      let subst =
+        Mvs.union (fun _x y z ->
+          if Term.t_equal_nt_nl y z then
+            Some y
+          else
+            raise (Arg_trans_term (trans_name ^ ": ", y, z)))
+          subst new_subst
+      in
+      subst_ty, subst
+
+(* This function first try to match left_term and right_term with a substitution
+   on lv/slv. It then tries to fill the holes with the list of withed_terms.
+   trans_name is used for nice error messages. Errors are returned when the size
+   of withed_terms is incorrect.
+*)
+(* TODO Having both slv and lv is redundant but we need both an Svs and the
+   order of elements: to be improved.
+*)
+let matching_with_terms ~trans_name slv lv left_term right_term withed_terms =
+  let (subst_ty, subst) =
+    try first_order_matching slv [left_term] [right_term] with
+    | Reduction_engine.NoMatch (Some (t1, t2)) ->
+      Debug.dprintf debug_matching
+        "Term %a and %a can not be matched. Failure in matching@."
+        Pretty.print_term t1 Pretty.print_term t2;
+      raise (Arg_trans_term (trans_name, t1, t2))
+    | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
+      Debug.dprintf debug_matching
+        "Term %a and %a can not be matched. Failure in matching@."
+        Pretty.print_pat p1 Pretty.print_pat p2;
+      raise (Arg_trans_pattern (trans_name, p1, p2))
+    | Reduction_engine.NoMatch None -> raise (Arg_trans trans_name)
+  in
+  let subst_ty, subst =
+    let withed_terms = match withed_terms with None -> [] | Some l -> l in
+    with_terms ~trans_name subst_ty subst lv withed_terms
+  in
+  subst_ty, subst
+
 (* Apply:
    1) takes the hypothesis and introduce parts of it to keep only the last
       element of the implication. It gathers the premises and variables in a
@@ -66,7 +155,7 @@ let find_hypothesis (name:Ident.ident) task =
    3) generate new goals corresponding to premises with variables instantiated
       with values found in 2).
  *)
-let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
+let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
   let name = pr.pr_name in
   let g, task = Task.task_separate_goal task in
   let g = term_decl g in
@@ -75,27 +164,17 @@ let apply pr : Task.task Trans.tlist = Trans.store (fun task ->
   let d = Opt.get d in
   let t = term_decl d in
   let (lp, lv, nt) = intros t in
-  let (subst_ty, subst) = try first_order_matching lv [nt] [g] with
-  | Reduction_engine.NoMatch (Some (t1, t2)) ->
-      (if (Debug.test_flag debug_matching) then
-        Format.printf "Term %a and %a can not be matched. Failure in matching@."
-          Pretty.print_term t1 Pretty.print_term t2
-      else ()); raise (Arg_trans_term ("apply", t1, t2))
-  | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
-      (if (Debug.test_flag debug_matching) then
-        Format.printf "Term %a and %a can not be matched. Failure in matching@."
-          Pretty.print_pat p1 Pretty.print_pat p2
-      else ()); raise (Arg_trans_pattern ("apply", p1, p2))
-  | Reduction_engine.NoMatch None -> raise (Arg_trans ("apply"))
-  in
-  let inst_nt = t_ty_subst subst_ty subst nt in
-  if (Term.t_equal_nt_nl inst_nt g) then
-    let nlp = List.map (t_ty_subst subst_ty subst) lp in
-    let lt = List.map (fun ng -> Task.add_decl task (create_prop_decl Pgoal
-                          (create_prsymbol (gen_ident "G")) ng)) nlp in
-    lt
-  else
-    raise (Arg_trans_term ("apply", inst_nt, g)))
+  let slv = List.fold_left (fun acc v -> Svs.add v acc) Svs.empty lv in
+  match matching_with_terms ~trans_name:"apply" slv lv nt g withed_terms with
+  | exception e -> raise e
+  | subst_ty, subst ->
+      let inst_nt = t_ty_subst subst_ty subst nt in
+      if (Term.t_equal_nt_nl inst_nt g) then
+        let nlp = List.map (t_ty_subst subst_ty subst) lp in
+        List.map (fun ng -> Task.add_decl task
+              (create_prop_decl Pgoal (create_prsymbol (gen_ident "G")) ng)) nlp
+      else
+        raise (Arg_trans_term ("apply", inst_nt, g)))
 
 let replace rev f1 f2 t =
   match rev with
@@ -112,52 +191,48 @@ let fold (f: decl -> 'a -> 'a) (acc: 'a): 'a Trans.trans =
      occurences of s.f1 with s.f2 in the rest of the term
    - Else call recursively on subterms of t *)
 (* If a substitution s is found then new premises are computed as e -> s.e *)
-let replace_subst lp lv f1 f2 t =
+let replace_subst lp lv f1 f2 withed_terms t =
   (* is_replced is common to the whole execution of replace_subst. Once an
      occurence is found, it changes to Some (s) so that only one instanciation
      is rewrritten during execution *)
-  (* Note that we can't use an accumulator to do this *)
-  let is_replaced = ref None in
 
-  let rec replace lv f1 f2 t : Term.term =
-  match !is_replaced with
-  | Some(subst_ty,subst) ->
-     replace_in_term (t_ty_subst subst_ty subst f1) (t_ty_subst subst_ty subst f2) t
-  | None ->
-    begin
-      let fom = try Some (first_order_matching lv [f1] [t]) with
-      | Reduction_engine.NoMatch (Some (t1, t2)) ->
-        (if (Debug.test_flag debug_matching) then
-          Format.printf "Term %a and %a can not be matched. Failure in matching@."
-          Pretty.print_term t1 Pretty.print_term t2
-        else ()); None
-      | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
-        (if (Debug.test_flag debug_matching) then
-          Format.printf "Term %a and %a can not be matched. Failure in matching@."
-          Pretty.print_pat p1 Pretty.print_pat p2
-        else ()); None
-      | Reduction_engine.NoMatch None -> None in
-        (match fom with
-        | None -> t_map (fun t -> replace lv f1 f2 t) t
-        | Some (subst_ty, subst) ->
-        let sf1 = t_ty_subst subst_ty subst f1 in
-        if (Term.t_equal sf1 t) then
-        begin
-          is_replaced := Some (subst_ty,subst);
-          t_ty_subst subst_ty subst f2
-        end
-        else
-          replace lv f1 f2 t)
-    end in
-  let t = t_map (replace lv f1 f2) t in
-  match !is_replaced with
+  (* first_order_matching requires an Svs but we still need the order in
+     with_terms. *)
+  let slv = List.fold_left (fun acc v -> Svs.add v acc) Svs.empty lv in
+
+  let rec replace is_replaced f1 f2 t : _ * Term.term =
+    match is_replaced with
+    | Some(subst_ty,subst) ->
+        is_replaced, replace_in_term (t_ty_subst subst_ty subst f1) (t_ty_subst subst_ty subst f2) t
+    | None ->
+      begin
+        (* Catch any error from first_order_matching or with_terms. *)
+        match matching_with_terms ~trans_name:"rewrite" slv lv f1 t (Some withed_terms) with
+        | exception _ -> Term.t_map_fold
+                (fun is_replaced t -> replace is_replaced f1 f2 t)
+                is_replaced t
+        | subst_ty, subst ->
+              let sf1 = t_ty_subst subst_ty subst f1 in
+              if (Term.t_equal_nt_nl sf1 t) then
+                Some (subst_ty, subst), t_ty_subst subst_ty subst f2
+              else
+                t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t)
+                  is_replaced t
+      end
+  in
+
+  let is_replaced, t =
+    t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t) None t in
+  match is_replaced with
   | None -> raise (Arg_trans "matching/replace")
   | Some(subst_ty,subst) ->
-    (List.map (t_ty_subst subst_ty subst) lp, t)
+      (List.map (t_ty_subst subst_ty subst) lp, t)
 
-let rewrite_in rev h h1 =
+let rewrite_in rev with_terms h h1 =
   let found_eq =
     (* Used to find the equality we are rewriting on *)
+    (* TODO here should fold with a boolean stating if we found equality yet to
+       not go through all possible hypotheses *)
     fold (fun d acc ->
       match d.d_node with
       | Dprop (Paxiom, pr, t) when Ident.id_equal pr.pr_name h.pr_name ->
@@ -179,7 +254,7 @@ let rewrite_in rev h h1 =
         | Dprop (p, pr, t)
             when (Ident.id_equal pr.pr_name h1.pr_name &&
                  (p = Paxiom || p = Pgoal)) ->
-          let lp, new_term = replace_subst lp lv t1 t2 t in
+          let lp, new_term = replace_subst lp lv t1 t2 with_terms t in
             Some (lp, create_prop_decl p pr new_term)
         | _ -> acc) None in
   (* Pass the premises as new goals. Replace the former toberewritten
@@ -218,7 +293,13 @@ let find_target_prop h : prsymbol trans =
                  | Some pr -> pr
                  | None -> Task.task_goal task)
 
-let rewrite rev h h1 = Trans.bind (find_target_prop h1) (rewrite_in (not rev) h)
+let rewrite with_terms rev h h1 =
+  let with_terms =
+    match with_terms with
+    | None -> []
+    | Some l -> l
+  in
+  Trans.bind (find_target_prop h1) (rewrite_in (not rev) with_terms h)
 
 (* This function is used to detect when we found the hypothesis/goal we want
    to replace/unfold into. *)
@@ -297,32 +378,37 @@ let unfold unf hl =
    This function returns None if not found, Some (None, t1, t2) with t1 being
    to_subst and t2 being term to substitute to if the equality found it a symbol
    definition. If equality found is a a decl then it is returned:
-   Some (Some pr, t1, t2) *)
+   Some (Some pr, t1, t2).
+   If the lsymbol to substitute appear in 2 equalities, only the first one is
+   used. *)
 let find_eq (to_subst: Term.lsymbol list) =
-  fold (fun d acc ->
+  fold (fun d (acc, used) ->
     match d.d_node with
     | Dprop (k, pr, t) when k != Pgoal ->
-        let acc = (match t.t_node with
+        let acc, used = (match t.t_node with
         | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
             (* Allow to rewrite from the right *)
             begin
               match t1.t_node, t2.t_node with
-              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst ->
-                  Some (Some pr, t1, t2) :: acc
-              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst ->
-                  Some (Some pr, t2, t1) :: acc
-              | _ -> acc
+              | Tapp (ls, []), _ when List.exists (ls_equal ls) to_subst &&
+                                      not (List.exists (ls_equal ls) used) ->
+                  Some (Some pr, t1, t2) :: acc, ls :: used
+              | _, Tapp (ls, []) when List.exists (ls_equal ls) to_subst &&
+                                      not (List.exists (ls_equal ls) used) ->
+                  Some (Some pr, t2, t1) :: acc, ls :: used
+              | _ -> acc, used
             end
-        | _ -> acc) in
-        acc
-    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst ->
+        | _ -> acc, used) in
+        acc, used
+    | Dlogic [(ls, ld)] when List.exists (ls_equal ls) to_subst &&
+                             not (List.exists (ls_equal ls) used) ->
       (* Function without arguments *)
       let vl, e = open_ls_defn ld in
       if vl = [] then
-        Some (None, t_app_infer ls [], e) :: acc
+          Some (None, t_app_infer ls [], e) :: acc, ls :: used
       else
-        acc
-    | _ -> acc) []
+        acc, used
+    | _ -> acc, used) ([],[])
 
 (* This found any equality which at one side contains a single lsymbol and is
    local. It gives same output as found_eq. *)
@@ -413,7 +499,7 @@ let subst_eq found_eq =
           | Dtype _ | Ddata _ | Dparam _ -> [d]) None
        end
 
-let subst_eq_list found_eq_list =
+let subst_eq_list (found_eq_list, _) =
   List.fold_left (fun acc_tr found_eq ->
     Trans.compose (subst_eq found_eq) acc_tr) Trans.identity found_eq_list
 
@@ -477,14 +563,10 @@ let () = wrap_and_register
     (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l)))) replace
 
 let _ = wrap_and_register
-    ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" "rewrite"
-    (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite
-
-  (* register_transform_with_args_l *)
-  (*   ~desc:"rewrite [<-] <name> [in] <name2> rewrites equality defined in name into name2" *)
-  (*   "rewrite" *)
-  (*   (wrap_l (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol Ttrans_l))))) rewrite) *)
+    ~desc:"rewrite [<-] <name> [in] <name2> [with] <list term> rewrites equality defined in name into name2 using exactly all terms of the list as instance for what cannot be deduced directly" "rewrite"
+    (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol (Topt ("with", Ttermlist Ttrans_l))))))) (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
 
 let () = wrap_and_register
-    ~desc:"apply <prop> applies prop to the goal" "apply"
-    (Tprsymbol Ttrans_l) apply
+    ~desc:"apply <prop> [with] <list term> applies prop to the goal and \
+uses the list of terms to instantiate the variables that are not found." "apply"
+    (Tprsymbol (Topt ("with", Ttermlist Ttrans_l))) (fun x y -> apply x y)

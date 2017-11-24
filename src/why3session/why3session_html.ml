@@ -91,7 +91,7 @@ module Table =
 struct
 
   let provers_stats s provers theory =
-    theory_iter_proof_attempt s (fun a ->
+    theory_iter_proof_attempt s (fun _ a ->
       Hprover.replace provers a.prover a.prover) theory
 
   let print_prover = Whyconf.print_prover

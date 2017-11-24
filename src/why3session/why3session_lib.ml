@@ -248,7 +248,7 @@ let iter_proof_attempt_by_filter ses iter filters f =
 let theory_iter_proof_attempt_by_filter s filters f th =
   iter_proof_attempt_by_filter
     s
-    (fun f s -> S.theory_iter_proof_attempt s f)
+    (fun f s -> S.theory_iter_proof_attempt s (fun _ -> f))
     filters f th
 
 let session_iter_proof_attempt_by_filter s filters f =
@@ -305,21 +305,21 @@ let ask_yn_nonblock ~callback =
 let get_used_provers_goal session g =
   let sprover = ref Whyconf.Sprover.empty in
   Session_itp.goal_iter_proof_attempt session
-    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
     g;
   !sprover
 
 let get_used_provers_theory session th =
   let sprover = ref Whyconf.Sprover.empty in
   Session_itp.theory_iter_proof_attempt session
-    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
     th;
   !sprover
 
 let get_used_provers_file session f =
   let sprover = ref Whyconf.Sprover.empty in
   Session_itp.file_iter_proof_attempt session
-    (fun pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
+    (fun _ pa -> sprover := Whyconf.Sprover.add pa.Session_itp.prover !sprover)
     f;
   !sprover
 

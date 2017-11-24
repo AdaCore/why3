@@ -324,7 +324,7 @@ let intro_vc_vars_counterexmp2 task =
     | None -> ""
     | Some loc ->
       let (file, line, col1, col2) = Loc.get loc in
-      file ^ ":" ^ (string_of_int line) ^ ":" ^ (string_of_int col1) ^ ":" ^ (string_of_int col2)
+      Printf.sprintf "%s:%d:%d:%d" file line col1 col2
   in
   let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
   Task.add_tdecl task g

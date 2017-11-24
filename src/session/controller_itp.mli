@@ -88,7 +88,7 @@ type controller = private
     controller_config : Whyconf.config;
     controller_env : Env.env;
     controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
@@ -258,14 +258,15 @@ val run_strategy_on_goal :
     [schedule_transformation]). [callback] is called on each step of
     execution of the strategy.  *)
 
-val clean_session: controller -> removed:notifier -> unit
+val clean: controller -> removed:notifier -> any option -> unit
 (** Remove each proof attempt or transformation that are below proved
     goals, that are either obsolete or not valid. The [removed]
-    notifier is called on each removed node.  *)
+    notifier is called on each removed node.
+    On None, clean is done on the whole session. *)
 
 val mark_as_obsolete:
   notification:notifier ->
-  controller -> any -> unit
+  controller -> any option -> unit
 
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
@@ -296,17 +297,19 @@ val replay_print:
         unit
 
 val replay:
-    ?obsolete_only:bool ->
+    valid_only:bool ->
+    obsolete_only:bool ->
     ?use_steps:bool ->
     controller ->
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->
     notification:notifier ->
     final_callback:
       ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
-            -> unit) ->
+            -> unit) -> any: Session_itp.any option ->
     unit
-(** This function reruns all the proofs of the session, and produces a report
-    comparing the results with the former ones.
+(** This function reruns all the proofs of the session under the given any (None
+    means the whole session), and produces a report comparing the results with
+    the former ones.
 
     The proofs are replayed asynchronously, and the states of these proofs are
     notified via [callback] similarly as for [schedule_proof_attempt].

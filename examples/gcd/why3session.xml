@@ -11,7 +11,7 @@
 <prover id="7" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../gcd.mlw" expanded="true">
-<theory name="EuclideanAlgorithm" sum="06656e1fb3cbf8b50293d0d1fd336a4d">
+<theory name="EuclideanAlgorithm" sum="be2015934b1733ec15064dd0125ec72f">
  <goal name="WP_parameter euclid" expl="VC for euclid">
  <transf name="split_goal_wp">
   <goal name="WP_parameter euclid.1" expl="postcondition">
@@ -37,7 +37,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithmIterative" sum="99bc338d838b3af20e5590384616c105">
+<theory name="EuclideanAlgorithmIterative" sum="d7bc7ef298b94e2df3ea0bc86ca4ceb6">
  <goal name="WP_parameter euclid" expl="VC for euclid">
  <transf name="split_goal_wp">
   <goal name="WP_parameter euclid.1" expl="loop invariant init">
@@ -62,7 +62,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BinaryGcd" sum="4b02a13c7de6c50ddf1e53881a109c27">
+<theory name="BinaryGcd" sum="9d3eecda31edce8deb8ce92d4e801019">
  <goal name="even1" expl="">
  <proof prover="5"><result status="valid" time="0.06" steps="18"/></proof>
  </goal>
@@ -166,13 +166,13 @@
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter binary_gcd.21" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.50"/></proof>
+  <proof prover="4"><result status="valid" time="0.34"/></proof>
   <proof prover="6"><result status="valid" time="0.03"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithm31" sum="add284a4d262858bcfc5350f33e1e2da">
+<theory name="EuclideanAlgorithm31" sum="832519421a65d58b4e39490fd1543db3">
  <goal name="WP_parameter euclid" expl="VC for euclid">
  <transf name="split_goal_wp">
   <goal name="WP_parameter euclid.1" expl="integer overflow">

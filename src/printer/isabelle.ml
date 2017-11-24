@@ -200,11 +200,13 @@ let rec print_term info defs fmt t = match t.t_node with
       let number_format = {
           Number.long_int_support = true;
           Number.extra_leading_zeros_support = true;
+          Number.negative_int_support = Number.Number_unsupported;
           Number.dec_int_support = Number.Number_default;
           Number.hex_int_support = Number.Number_unsupported;
           Number.oct_int_support = Number.Number_unsupported;
           Number.bin_int_support = Number.Number_unsupported;
           Number.def_int_support = Number.Number_unsupported;
+          Number.negative_real_support = Number.Number_unsupported;
           Number.dec_real_support = Number.Number_unsupported;
           Number.hex_real_support = Number.Number_unsupported;
           Number.frac_real_support = Number.Number_custom
@@ -299,8 +301,10 @@ let rec dest_forall vl t = match t.t_node with
 
 (** Declarations *)
 
-let print_constr info fmt (cs, _) =
-  elems "constr" (print_ls info) (print_ty info) fmt (cs, cs.ls_args)
+let print_constr info fmt (cs, pjl) =
+  elems "constr" (print_ls info)
+    (elem "carg" (print_option (print_ls info)) (print_ty info)) fmt
+    (cs, List.combine pjl cs.ls_args)
 
 let print_tparams = elems' "params" (empty_elem "param" (attrib "name" print_tv))
 

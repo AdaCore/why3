@@ -124,13 +124,16 @@ val get_encapsulating_file: session -> any -> file
 (** {2 iterators on sessions} *)
 
 val goal_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> proofNodeID -> unit
+    session -> (proofAttemptID -> proof_attempt_node -> unit) -> proofNodeID -> unit
 
 val theory_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> theory -> unit
+    session -> (proofAttemptID -> proof_attempt_node -> unit) -> theory -> unit
 
 val file_iter_proof_attempt:
-    session -> (proof_attempt_node -> unit) -> file -> unit
+    session -> (proofAttemptID -> proof_attempt_node -> unit) -> file -> unit
+
+val any_iter_proof_attempt:
+    session -> (proofAttemptID -> proof_attempt_node -> unit) -> any -> unit
 
 val session_iter_proof_attempt:
     (proofAttemptID -> proof_attempt_node -> unit) -> session -> unit

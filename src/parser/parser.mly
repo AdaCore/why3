@@ -82,6 +82,12 @@ end
 
   let id_anonymous loc = { id_str = "_"; id_lab = []; id_loc = loc }
 
+  let mk_int_const neg lit =
+    Number.{ ic_negative = neg ; ic_abs = lit}
+
+  let mk_real_const neg lit =
+    Number.{ rc_negative = neg ; rc_abs = lit}
+
   let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
 
   let get_op s e = Qident (mk_id (mixfix "[]") s e)
@@ -128,14 +134,6 @@ end
     { e with expr_desc = Emark (init, e) }
 *)
 
-  let small_integer i =
-    try match i with
-      | Number.IConstDec s -> int_of_string s
-      | Number.IConstHex s -> int_of_string ("0x"^s)
-      | Number.IConstOct s -> int_of_string ("0o"^s)
-      | Number.IConstBin s -> int_of_string ("0b"^s)
-    with Failure _ -> raise Error
-
   let error_param loc =
     Loc.errorm ~loc "cannot determine the type of the parameter"
 
@@ -149,9 +147,9 @@ end
 (* Tokens *)
 
 %token <string> LIDENT LIDENT_QUOTE UIDENT UIDENT_QUOTE
-%token <Ptree.integer_constant> INTEGER
+%token <Number.integer_literal> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Ptree.real_constant> REAL
+%token <Number.real_literal> REAL
 %token <string> STRING
 %token <Loc.position> POSITION
 %token <string> QUOTE_UIDENT QUOTE_LIDENT OPAQUE_QUOTE_LIDENT
@@ -177,7 +175,7 @@ end
 %token AND ARROW
 %token BAR
 %token COLON COMMA
-%token DOT DOTDOT EQUAL LAMBDA LT GT LTGT
+%token DOT DOTDOT EQUAL LAMBDA LT GT LTGT MINUS
 %token LEFTPAR LEFTPAR_STAR_RIGHTPAR LEFTSQ
 %token LARROW LRARROW OR
 %token RIGHTPAR RIGHTSQ
@@ -208,10 +206,11 @@ end
 %left EQUAL LTGT LT GT OP1
 %nonassoc LARROW
 %nonassoc RIGHTSQ    (* stronger than <- for e1[e2 <- e3] *)
-%left OP2
+%left OP2 MINUS
 %left OP3
 %left OP4
 %nonassoc prec_prefix_op
+%nonassoc INTEGER REAL
 %nonassoc LEFTSQ
 %nonassoc OPPREF
 
@@ -324,7 +323,7 @@ meta_arg:
 | PREDICATE qualid  { Mps $2 }
 | PROP      qualid  { Mpr $2 }
 | STRING            { Mstr $1 }
-| INTEGER           { Mint (small_integer $1) }
+| INTEGER           { Mint (Number.to_small_integer $1) }
 
 (* Type declarations *)
 
@@ -354,13 +353,15 @@ typedefn:
     { $1, $2, TDrecord $4, $6 }
 | model abstract ty invariant*
     { $1, $2, TDalias $3, $4 }
-(* FIXME: allow negative bounds *)
-| EQUAL LT RANGE INTEGER INTEGER GT
-    { false, Public,
-      TDrange (Number.compute_int $4, Number.compute_int $5), [] }
+| EQUAL LT RANGE int_constant int_constant GT
+    { false, Public, TDrange ($4, $5), [] }
 | EQUAL LT FLOAT INTEGER INTEGER GT
     { false, Public,
-      TDfloat (small_integer $4, small_integer $5), [] }
+      TDfloat (Number.to_small_integer $4, Number.to_small_integer $5), [] }
+
+int_constant:
+| INTEGER       { Number.compute_int_literal $1 }
+| MINUS INTEGER { BigInt.minus (Number.compute_int_literal $2) }
 
 model:
 | EQUAL         { false }
@@ -553,6 +554,10 @@ term_:
     { Tunop (Tnot, $2) }
 | prefix_op term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Tconst (Number.ConstInt (mk_int_const true $2)) }
+| MINUS REAL
+    { Tconst (Number.ConstReal (mk_real_const true $2)) }
 | l = term ; o = bin_op ; r = term
     { Tbinop (l, o, r) }
 | l = term ; o = infix_op ; r = term
@@ -654,9 +659,9 @@ quant:
 | LAMBDA  { Tlambda }
 
 numeral:
-| INTEGER { Number.ConstInt $1 }
-| REAL    { Number.ConstReal $1 }
-
+| INTEGER { Number.ConstInt (mk_int_const false $1) }
+| REAL    { Number.ConstReal (mk_real_const false $1) }
+ 
 (* Program declarations *)
 
 pdecl:
@@ -719,6 +724,10 @@ expr_:
     { Enot $2 }
 | prefix_op expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
+| MINUS INTEGER
+    { Econst (Number.ConstInt (mk_int_const true $2)) }
+| MINUS REAL
+    { Econst (Number.ConstReal (mk_real_const true $2)) }
 | l = expr ; o = lazy_op ; r = expr
     { Elazy (l,o,r) }
 | l = expr ; o = infix_op ; r = expr
@@ -998,7 +1007,9 @@ lident_op_id:
 lident_op:
 | op_symbol               { infix $1 }
 | op_symbol UNDERSCORE    { prefix $1 }
+| MINUS     UNDERSCORE    { prefix "-" }
 | EQUAL                   { infix "=" }
+| MINUS                   { infix "-" }
 | OPPREF                  { prefix $1 }
 | LEFTSQ RIGHTSQ          { mixfix "[]" }
 | LEFTSQ LARROW RIGHTSQ   { mixfix "[<-]" }
@@ -1020,6 +1031,7 @@ op_symbol:
 
 prefix_op:
 | op_symbol { mk_id (prefix $1)  $startpos $endpos }
+| MINUS     { mk_id (prefix "-") $startpos $endpos }
 
 %inline infix_op:
 | o = OP1   { mk_id (infix o)    $startpos $endpos }
@@ -1030,6 +1042,7 @@ prefix_op:
 | LTGT      { mk_id (infix "<>") $startpos $endpos }
 | LT        { mk_id (infix "<")  $startpos $endpos }
 | GT        { mk_id (infix ">")  $startpos $endpos }
+| MINUS     { mk_id (infix "-")  $startpos $endpos }
 
 (* Qualified idents *)
 

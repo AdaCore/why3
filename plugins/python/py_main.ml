@@ -45,7 +45,7 @@ let deref_id ~loc id =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
 let constant ~loc s =
-  mk_expr ~loc (Econst (Number.ConstInt (Number.int_const_dec s)))
+  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec s})))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =

@@ -391,9 +391,9 @@ let goal_iter_proof_attempt s f g =
   fold_all_sub_goals_of_proofn
     s
     (fun _ pn -> Hprover.iter
-                 (fun _ pan ->
-                  let pan = get_proof_attempt_node s pan in
-                  f pan)
+                 (fun _ pa ->
+                  let pan = get_proof_attempt_node s pa in
+                  f pa pan)
                  pn.proofn_attempts) () g
 
 let fold_all_sub_goals_of_theory s f acc th =
@@ -406,9 +406,9 @@ let theory_iter_proofn s f th =
 
 let theory_iter_proof_attempt s f th =
   fold_all_sub_goals_of_theory s
-    (fun _ pn -> Hprover.iter (fun _ pan ->
-                             let pan = get_proof_attempt_node s pan in
-                             f pan)
+    (fun _ pn -> Hprover.iter (fun _ pa ->
+                             let pan = get_proof_attempt_node s pa in
+                             f pa pan)
          pn.proofn_attempts) () th
 
 let file_iter_proof_attempt s f file =
@@ -416,7 +416,15 @@ let file_iter_proof_attempt s f file =
     (theory_iter_proof_attempt s f)
     (file_theories file)
 
-
+let any_iter_proof_attempt s f any =
+  match any with
+  | AFile file -> file_iter_proof_attempt s f file
+  | ATh th -> theory_iter_proof_attempt s f th
+  | ATn tr ->
+      let subgoals = get_sub_tasks s tr in
+      List.iter (fun g -> goal_iter_proof_attempt s f g) subgoals
+  | APn pn -> goal_iter_proof_attempt s f pn
+  | APa pa -> f pa (get_proof_attempt_node s pa)
 
 
 
@@ -1412,13 +1420,16 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
       else
         raw_task, new_task_list
     with
+    (* if apply_transform fails for any reason, we try to apply
+       the same transformation on the "introduced" task instead *)
     | Generic_arg_trans_utils.Arg_trans _
+    | Trans.TransFailure _
     | NoProgress as e ->
-       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised exception %a@."
+       Debug.dprintf debug "[apply_trans_to_goal] info: apply_transform raised exception %a@."
                      Exn_printer.exn_printer e;
        task, Trans.apply_transform_args name env args table task
     | e ->
-       Debug.dprintf debug "[apply_trans_to_goal] apply_transform raised %a@."
+       Debug.dprintf debug "[apply_trans_to_goal] warning: apply_transform raised unexpected %a@."
                      Exn_printer.exn_printer e;
        task, Trans.apply_transform_args name env args table task
   in
@@ -1431,7 +1442,10 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
-    let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name)
+    let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
+                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                                        (get_transfNode s transID).transf_args
+                                        old_tr.transf_args)
         goal.proofn_transformations in
     (* NOTE: should not happen *)
     Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
@@ -1491,7 +1505,7 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   (*let detached = List.map (fun (a,_) -> a) detached in
   new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
    *))
-  with _ ->
+  with _ when not (Debug.test_flag debug_stack_trace) ->
     Debug.dprintf debug
       "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;
     (* TODO should create a detached transformation *)

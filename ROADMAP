@@ -142,9 +142,11 @@
 * upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
 
 * upload the documentation on the web page
- - cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
- - cp -r doc/html /users/www-perso/projets/why3/doc-0.86
  - cp share/why3session.dtd /users/www-perso/projets/why3/
+ - cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
+   ln -s -n -f download/manual-0.86.pdf /users/www-perso/projets/why3/manual.pdf
+ - cp -r doc/html /users/www-perso/projets/why3/doc-0.86
+   ln -s -n -f doc-0.86 /users/www-perso/projets/why3/doc
  - cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
    ln -s -n -f stdlib-0.86 /users/www-perso/projets/why3/stdlib
  - cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86

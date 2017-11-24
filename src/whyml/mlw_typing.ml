@@ -1056,25 +1056,10 @@ let add_types ~wp uc tdl =
     let uc = add_decl_with_tuples uc (Decl.create_ty_decl ts) in
     match ts.ts_def with
     | NoDef | Alias _ -> uc
-    | Range _ ->
-        (* FIXME: "t'to_int" is probably better *)
-        let nm = ts.ts_name.id_string ^ "'int" in
-        let id = id_derive nm ts.ts_name in
-        let pj = create_fsymbol id [ty_app ts []] ty_int in
-        let uc = add_decl uc (Decl.create_param_decl pj) in
-        add_meta uc meta_range [MAts ts; MAls pj]
-    | Float _ ->
-        (* FIXME: "t'to_real" is probably better *)
-        let nm = ts.ts_name.id_string ^ "'real" in
-        let id = id_derive nm ts.ts_name in
-        let pj = create_fsymbol id [ty_app ts []] ty_real in
-        let uc = add_decl uc (Decl.create_param_decl pj) in
-        (* FIXME: "t'is_finite" is probably better *)
-        let nm = ts.ts_name.id_string ^ "'isFinite" in
-        let id = id_derive nm ts.ts_name in
-        let iF = Term.create_psymbol id [ty_app ts []] in
-        let uc = add_decl uc (Decl.create_param_decl iF) in
-        add_meta uc meta_float [MAts ts; MAls pj; MAls iF]
+    | Range rg ->
+       Typing.add_range_decl uc add_decl add_meta ts rg
+    | Float fmt ->
+       Typing.add_float_decl uc add_decl add_meta ts fmt
   in
   let add_type_decl uc = function
     | PT ts -> add_pdecl_with_tuples ~wp uc (create_ty_decl ts)

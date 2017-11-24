@@ -22,8 +22,11 @@ exception Unnecessary_terms of term list
 
 let gen_ident = Ident.id_fresh
 
+let rec t_replace_nt_nl t1 t2 t =
+  if t_equal_nt_nl t t1 then t2 else t_map (t_replace_nt_nl t1 t2) t
+
 (* Replace all occurences of f1 by f2 in t *)
-let replace_in_term = Term.t_replace
+let replace_in_term = t_replace_nt_nl
 (* TODO be careful with label copy in t_map *)
 
 let subst_quant c tq x : term =
@@ -148,3 +151,8 @@ let sort local_decls =
 *)
 let sort =
   Trans.bind get_local sort
+
+
+(* Add a label to a goal (useful to add an expl for example) *)
+let add_goal_label_trans label =
+  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_label_add label g)])

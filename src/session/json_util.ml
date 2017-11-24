@@ -154,11 +154,8 @@ let convert_request_constructor (r: ide_request) =
   | Copy_paste _              -> String "Copy_paste"
   | Copy_detached _           -> String "Copy_detached"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
-  | Mark_obsolete_req _       -> String "Mark_obsolete_req"
-  | Clean_req                 -> String "Clean_req"
   | Save_req                  -> String "Save_req"
   | Reload_req                -> String "Reload_req"
-  | Replay_req                -> String "Replay_req"
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
 
@@ -203,16 +200,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
                       "node_ID", Int id]
   | Unfocus_req ->
       convert_record ["ide_request", cc r]
-  | Mark_obsolete_req n ->
-      convert_record ["ide_request", cc r;
-           "node_ID", Int n]
-  | Clean_req ->
-      convert_record ["ide_request", cc r]
   | Save_req ->
       convert_record ["ide_request", cc r]
   | Reload_req ->
-      convert_record ["ide_request", cc r]
-  | Replay_req ->
       convert_record ["ide_request", cc r]
   | Exit_req ->
       convert_record ["ide_request", cc r]
@@ -281,9 +271,10 @@ let convert_message (m: message_notification) =
   | Task_Monitor (n, k, p) ->
       convert_record ["mess_notif", cc m;
            "monitor", List [Int n; Int k; Int p]]
-  | Parse_Or_Type_Error (loc, s) ->
+  | Parse_Or_Type_Error (loc, rel_loc,s) ->
       convert_record ["mess_notif", cc m;
                       "loc", convert_loc loc;
+                      "rel_loc", convert_loc rel_loc;
                       "error", String s]
   | Error s ->
       convert_record ["mess_notif", cc m;
@@ -468,17 +459,10 @@ let parse_request (constr: string) j =
   | "Copy_detached" ->
     let n = get_int (get_field j "node_ID") in
     Copy_detached n
-  | "Mark_obsolete_req" ->
-    let n = get_int (get_field j "node_ID") in
-    Mark_obsolete_req n
-  | "Clean_req" ->
-    Clean_req
   | "Save_req" ->
     Save_req
   | "Reload_req" ->
     Reload_req
-  | "Replay_req" ->
-    Replay_req
   | "Exit_req" ->
     Exit_req
   | _ -> raise (NotRequest "")
@@ -669,8 +653,9 @@ let parse_message constr j =
 
   | "Parse_Or_Type_Error" ->
     let loc = parse_loc (get_field j "loc") in
+    let rel_loc = parse_loc (get_field j "rel_loc") in
     let error = get_string (get_field j "error") in
-    Parse_Or_Type_Error (loc, error)
+    Parse_Or_Type_Error (loc, rel_loc, error)
 
   | _ -> raise NotMessage
 

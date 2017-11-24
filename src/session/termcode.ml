@@ -306,26 +306,9 @@ let id_string_shape id = push id
 let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
-open Number
-
-let integer_const_shape = function
-  | IConstDec s -> push s
-  | IConstHex s -> push "0x"; push s
-  | IConstOct s -> push "0o"; push s
-  | IConstBin s -> push "0b"; push s
-
-let real_const_shape = function
-  | RConstDec (i,f,None)   -> push i; push "."; push f
-  | RConstDec (i,f,Some e) -> push i; push "."; push f; push "e"; push e
-  | RConstHex (i,f,Some e) -> push "0x"; push i; push "."; push f; push "p"; push e
-  | RConstHex (i,f,None)   -> push "0x"; push i; push "."; push f
-
-
 let const_shape c =
-  match c with
-  | ConstInt c -> integer_const_shape c
-  | ConstReal c -> real_const_shape c
-
+  Format.fprintf Format.str_formatter "%a" Number.print_constant c;
+  push (Format.flush_str_formatter ())
 
 let rec pat_shape c m p : 'a =
   match p.pat_node with
@@ -511,27 +494,9 @@ module Checksum = struct
     string b s
 *)
 
-  let integer_const b = function
-    | IConstDec s -> raw_string b s
-    | IConstHex s -> raw_string b "0x"; raw_string b s
-    | IConstOct s -> raw_string b "0o"; raw_string b s
-    | IConstBin s -> raw_string b "0b"; raw_string b s
-
-  let real_const b = function
-    | RConstDec (i,f,None)   ->
-       raw_string b i; raw_string b "."; raw_string b f
-    | RConstDec (i,f,Some e) ->
-       raw_string b i; raw_string b "."; raw_string b f; raw_string b "e"; raw_string b e
-    | RConstHex (i,f,Some e) ->
-       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f;
-       raw_string b "p"; raw_string b e
-    | RConstHex (i,f,None)   ->
-       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f
-
   let const b c =
-    match c with
-    | ConstInt c -> integer_const b c
-    | ConstReal c -> real_const b c
+    Format.fprintf Format.str_formatter "%a" Number.print_constant c;
+    raw_string b (Format.flush_str_formatter ())
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 

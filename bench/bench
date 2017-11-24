@@ -12,7 +12,7 @@ suffix=$1
 goods () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.[wm][hl][yw] ; do
-	echo -n "  $f... "
+	printf "  $f... "
 	# running Why
 	if ! $pgm $2 $f > /dev/null 2>&1; then
 	    echo "FAILED!"
@@ -29,7 +29,7 @@ goods () {
 bads () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.[wm][hl][yw] ; do
-	echo -n "  $f... "
+	printf "  $f... "
 	if $pgm $2 $f > /dev/null 2>&1; then
 	    echo "SHOULD FAIL!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
@@ -44,7 +44,7 @@ drivers () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
-	echo -n "  $f... "
+	printf "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F why --driver $f - > /dev/null 2>&1; then
 	    echo "why FAILED"
@@ -58,7 +58,7 @@ drivers () {
 valid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
-	echo -n "  "$f"... "
+	printf "  "$f"... "
 	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
 	    echo "valid test $f failed!"
 	    echo "$pgm -P alt-ergo $f"
@@ -73,7 +73,7 @@ valid_goals () {
 invalid_goals () {
     pgm="bin/why3prove$suffix"
     for f in $1/*.mlw; do
-	echo -n "  "$f"... "
+	printf "  "$f"... "
 	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
 	    echo "invalid test $f failed!"
 	    echo "$pgm -P alt-ergo $f"
@@ -87,7 +87,7 @@ invalid_goals () {
 
 execute () {
     pgm="bin/why3execute$suffix"
-    echo -n "$1 $2... "
+    printf "$1 $2... "
     if $pgm $1 $2 > /dev/null 2>&1; then
         echo "ok"
     else
@@ -103,17 +103,17 @@ extract_and_run () {
     shift
     prg=$1
     shift
-    echo -n "$dir... "
+    printf "$dir... "
     rm -f $dir/$prg
-    echo -n "clean... "
+    printf "clean... "
     if BENCH=yes make -C $dir clean > /dev/null 2>&1; then
-        echo -n "extract... "
+        printf "extract... "
         if BENCH=yes make -C $dir extract > /dev/null 2>&1; then
-            echo -n "compile... "
+            printf "compile... "
             if BENCH=yes make -C $dir > /dev/null 2>&1; then
-                echo -n "execute... "
+                printf "execute... "
                 if $dir/main.opt "$@" > /dev/null 2>&1; then
-                    echo -n "doc... "
+                    printf "doc... "
                     if BENCH=yes make -C $dir doc > /dev/null 2>&1; then
                         echo "ok"
                     else
@@ -150,7 +150,7 @@ extract_and_run () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    echo -n "$1 "
+    printf '%s ' "$1"
     if $pgm $1 > /dev/null 2>&1; then
         echo "ok"
     else

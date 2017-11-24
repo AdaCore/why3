@@ -88,6 +88,11 @@ let print_term s id fmt t =
 let print_type s id fmt t =
   let module P = (val (p s id)) in P.print_ty fmt t
 
+let print_opt_type s id fmt t =
+  match t with
+  | None -> Format.fprintf fmt "bool"
+  | Some t -> print_type s id fmt t
+
 let print_ts s id fmt t =
   let module P = (val (p s id)) in P.print_ts fmt t
 
@@ -215,13 +220,15 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
-      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a \n %a" s
-        (print_term ses id) t1 (print_term ses id) t2, Loc.dummy_position, ""
+      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
+        (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
+        (print_term ses id) t2 (print_opt_type ses id) t2.Term.t_ty,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_pattern (s, pa1, pa2) ->
       Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
         s (print_pat ses id) pa1 (print_pat ses id) pa2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_type (s, ty1, ty2) ->
-      Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
+      Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
         s (print_type ses id) ty1 (print_type ses id) ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
@@ -236,10 +243,10 @@ let get_exception_message ses id e =
   | Args_wrapper.Arg_parse_type_error (loc, arg, e) ->
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Args_wrapper.Unnecessary_arguments l ->
-      Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+      Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Unnecessary_terms l ->
-      Pp.sprintf "First arguments were parsed and typed correcly but the last following are useless:\n%a"
+      Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline
            (fun fmt s -> Format.fprintf fmt "%a" (print_term ses id) s)) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
@@ -263,11 +270,8 @@ let print_request fmt r =
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Copy_detached _                 -> fprintf fmt "copy detached"
   | Save_file_req _                 -> fprintf fmt "save file"
-  | Mark_obsolete_req _             -> fprintf fmt "mark obsolete"
-  | Clean_req                       -> fprintf fmt "clean"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
-  | Replay_req                      -> fprintf fmt "replay"
   | Exit_req                        -> fprintf fmt "exit"
   | Interrupt_req                   -> fprintf fmt "interrupt"
 
@@ -282,7 +286,7 @@ let print_msg fmt m =
   | Help _s                                      -> fprintf fmt "help"
   | Information s                                -> fprintf fmt "info %s" s
   | Task_Monitor _                               -> fprintf fmt "task montor"
-  | Parse_Or_Type_Error (_, s)                   -> fprintf fmt "parse_or_type_error:\n %s" s
+  | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
   | File_Saved s                                 -> fprintf fmt "file saved %s" s
   | Error s                                      -> fprintf fmt "%s" s
   | Open_File_Error s                            -> fprintf fmt "%s" s
@@ -614,7 +618,8 @@ end
     try
       let d = get_server_data() in
       let fn = Sysutil.absolutize_filename
-          (Session_itp.get_dir d.cont.controller_session) f in
+                 (Session_itp.get_dir d.cont.controller_session) f in
+      Sysutil.backup_file fn;
       Sysutil.write_file fn file_content;
       P.notify (Message (File_Saved f))
     with Invalid_argument s ->
@@ -637,13 +642,12 @@ end
   let capture_parse_or_type_errors f cont =
     try let _ = f cont in None with
     | Loc.Located (loc, e) ->
-      let loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a at %a@."
-          Exn_printer.exn_printer e Loc.report_position loc in
-      Some (loc, s)
-    | e ->
-      let s = Format.asprintf "%a@." Exn_printer.exn_printer e in
-      Some (Loc.dummy_position, s)
+      let rel_loc = relativize_location cont.controller_session loc in
+      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+      Some (loc, rel_loc, s)
+    | e when not (Debug.test_flag Debug.stack_trace) ->
+      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+      Some (Loc.dummy_position, Loc.dummy_position, s)
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
@@ -825,19 +829,20 @@ end
     List.iter (iter_subtree_from_goal f nid)
                (theory_goals theory_id)
 
-  let iter_subtree_from_file
-    (f: parent:node_ID -> any -> unit) parent file =
-    f ~parent (AFile file);
+  let iter_subtree_from_file (f: parent:node_ID -> any -> unit) file =
+    f ~parent:root_node (AFile file);
     let nid = node_ID_from_file file in
     List.iter (iter_subtree_from_theory f nid) (file_theories file)
 
-  let iter_the_files (f: parent:node_ID -> any -> unit) parent : unit =
+  let iter_on_files ~(on_file: file -> unit)
+                    ~(on_subtree: parent:node_ID -> any -> unit) : unit =
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
     Stdlib.Hstr.iter
       (fun _ file ->
-        iter_subtree_from_file f parent file)
+       on_file file;
+       iter_subtree_from_file on_subtree file)
       files
 
   (**********************************)
@@ -856,11 +861,13 @@ end
 
   let send_new_subtree_from_file f =
     iter_subtree_from_file (fun ~parent id -> ignore (new_node ~parent id))
-      root_node f
+      f
 
   let reset_and_send_the_whole_tree (): unit =
     P.notify Reset_whole_tree;
-    iter_the_files (fun ~parent id -> ignore (new_node ~parent id)) root_node
+    iter_on_files
+      ~on_file:(fun file -> read_and_send (file_name file))
+      ~on_subtree:(fun ~parent id -> ignore (new_node ~parent id))
 
   let unfocus () =
     focused_node := Unfocused;
@@ -928,10 +935,11 @@ end
             | None ->
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
-               read_and_send (file_name file)
-            | Some(loc,s) ->
+               read_and_send (file_name file);
+               P.notify (Message (Information "file added in session"))
+            | Some(loc,rel_loc,s) ->
                read_and_send fn;
-               P.notify (Message (Parse_Or_Type_Error(loc,s)))
+               P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -990,9 +998,10 @@ end
            focus on a specific node. *)
     get_focused_label := None;
     match x with
-    | None -> ()
-    | Some(loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,s)))
+    | None ->
+       P.notify (Message (Information "Session initialized succesfully"))
+    | Some(loc,rel_loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1141,7 +1150,7 @@ end
     let d = get_server_data () in
     let unproven_goals = unproven_goals_below_id d.cont (any_from_node_ID nid) in
     try
-      let (n,_,st) = Hstr.find d.cont.controller_strategies s in
+      let (n,_,_,st) = Hstr.find d.cont.controller_strategies s in
       Debug.dprintf debug_strat "[strategy_exec] running strategy '%s'@." n;
       let callback sts =
         Debug.dprintf debug_strat "[strategy_exec] strategy status: %a@." print_strategy_status sts
@@ -1159,9 +1168,9 @@ end
 
 
   (* ----------------- Clean session -------------------- *)
-  let clean_session () =
+  let clean nid =
     let d = get_server_data () in
-    C.clean_session d.cont ~removed
+    C.clean d.cont ~removed nid
 
 
   let remove_node nid =
@@ -1203,24 +1212,19 @@ end
     match reload_files d.cont ~use_shapes:true with
     | None ->
         (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       reset_and_send_the_whole_tree ()
-    | Some(loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,s)))
+       reset_and_send_the_whole_tree ();
+       P.notify (Message (Information "Session refresh successful"))
+    | Some(loc,rel_loc,s) ->
+       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
 
-  let replay_session () : unit =
+  let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
     let final_callback lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
-    C.replay ~use_steps:false ~obsolete_only:true d.cont
-             ~callback ~notification:(notify_change_proved d.cont) ~final_callback
-
-  let () = register_command "replay" "replay obsolete proofs"
-    (Qnotask (fun _cont _args ->  replay_session (); "replay in progress, be patient"))
-
-  let () = register_command "clean" "remove unsuccessful proof attempts that are below proved goals"
-    (Qnotask (fun _cont _args ->  clean_session (); "Cleaning done"))
+    C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
+             ~callback ~notification:(notify_change_proved d.cont) ~final_callback ~any:nid
 
 (*
   let () = register_command "edit" "remove unsuccessful proof attempts that are below proved goals"
@@ -1239,13 +1243,7 @@ end
   (* ---------------- Mark obsolete ------------------ *)
   let mark_obsolete n =
     let d = get_server_data () in
-    let any = any_from_node_ID n in
-(*
-    let node_obsolete x b =
-      let nid = node_ID_from_any x in
-      P.notify (Node_change (nid, Obsolete b)) in
- *)
-    C.mark_as_obsolete (* ~node_obsolete *) ~notification:(notify_change_proved d.cont) d.cont any
+    C.mark_as_obsolete ~notification:(notify_change_proved d.cont) d.cont n
 
   (* ----------------- locate next unproven node -------------------- *)
 
@@ -1276,7 +1274,6 @@ end
     let config = d.cont.controller_config in
     try (
     match r with
-    | Clean_req                    -> clean_session ()
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
@@ -1311,11 +1308,9 @@ end
         C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
-    | Mark_obsolete_req n          -> mark_obsolete n
     | Save_file_req (name, text)   ->
         save_file name text;
     | Get_task(nid,b,c,loc)         -> send_task nid b c loc
-    | Replay_req                   -> replay_session ()
     | Interrupt_req                -> C.interrupt ()
     | Command_req (nid, cmd)       ->
       begin
@@ -1331,6 +1326,9 @@ end
             run_strategy_on_task ~counterexmp nid st
         | Edit p                  -> schedule_edition nid p
         | Bisect                  -> schedule_bisection nid
+        | Replay valid_only       -> replay ~valid_only snid
+        | Clean                   -> clean snid
+        | Mark_Obsolete           -> mark_obsolete snid
         | Help_message s          -> P.notify (Message (Help s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->

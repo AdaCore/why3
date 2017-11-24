@@ -81,7 +81,7 @@ type controller =
     controller_env: Env.env;
     controller_provers:
       (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
-    controller_strategies : (string * string * Strategy.instruction array) Stdlib.Hstr.t;
+    controller_strategies : (string * string * string * Strategy.instruction array) Stdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
@@ -377,20 +377,11 @@ let timeout_handler () =
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
   if Hashtbl.length prover_tasks_in_progress != 0 then begin
-    let results = Call_provers.forward_results ~blocking:S.blocking in
-    while not (Queue.is_empty results) do
-      let (call, prover_update) = Queue.pop results in
-      let c = try Some (Hashtbl.find prover_tasks_in_progress call)
-        with Not_found -> None in
-      match c with
-      | None -> () (* we do nothing. We probably received ProverStarted after
-                      ProverFinished because what is sent to and received from
-                      the server is not ordered. *)
-      | Some c ->
-      begin
-        let (ses,id,pr,callback,started,call,ores) = c in
-
-        match prover_update with
+    let results = Call_provers.get_new_results ~blocking:S.blocking in
+    List.iter (fun (call, prover_update) ->
+      match Hashtbl.find prover_tasks_in_progress call with
+      | (ses,id,pr,callback,started,call,ores) ->
+        begin match prover_update with
         | Call_provers.NoUpdates -> ()
         | Call_provers.ProverStarted ->
             assert (not started);
@@ -414,8 +405,12 @@ let timeout_handler () =
             if started then decr number_of_running_provers;
             (* inform the callback *)
             callback (InternalFailure (exn))
-      end
-    done
+        end
+      | exception Not_found -> ()
+        (* We probably received ProverStarted after ProverFinished,
+           because what is sent to and received from the server is
+           not ordered. *)
+    ) results;
   end;
 
   (* When blocking is activated, we are in script mode and we don't want editors
@@ -538,55 +533,6 @@ let schedule_proof_attempt c id pr
   run_timeout_handler ()
 
 
-
-(* replay *)
-
-
-let find_prover notification c goal_id pr =
-  if Hprover.mem c.controller_provers pr then Some pr else
-   match Whyconf.get_prover_upgrade_policy c.controller_config pr with
-   | exception Not_found -> None
-   | Whyconf.CPU_keep -> None
-   | Whyconf.CPU_upgrade new_pr ->
-      (* does a proof using new_pr already exists ? *)
-      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
-      then (* yes, then we do nothing *)
-        None
-      else
-        begin
-          (* we modify the prover in-place *)
-          Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
-          Some new_pr
-        end
-   | Whyconf.CPU_duplicate _new_pr ->
-      assert false (* TODO *)
-(*
-      (* does a proof using new_p already exists ? *)
-      if Hprover.mem (goal_external_proofs parid) new_pr
-      then (* yes, then we do nothing *)
-        None
-      else
-        begin
-          (* we duplicate the proof_attempt *)
-          let new_a = copy_external_proof
-                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
-          in
-          Some new_pr
-        end
-*)
-
-let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
-  (* The replay can be done on a different machine so we need
-     to check more things before giving the attempt to the scheduler *)
-  match find_prover notification c parid pr with
-  | None -> callback id (Uninstalled pr)
-  | Some pr' ->
-     try
-       if pr' <> pr then callback id (UpgradeProver pr');
-       let _ = get_raw_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
-     with Not_found ->
-       callback id Detached
 
 
 (*** { 2 edition of proof scripts} *)
@@ -733,7 +679,7 @@ let schedule_transformation c id name args ~callback ~notification =
       | Exit ->
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, Noprogress))
-      | e (* when not (Debug.test_flag Debug.stack_trace) *) ->
+      | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
         callback (TSfailed (id, e))
@@ -823,15 +769,16 @@ let proof_is_complete pa =
      not pa.Session_itp.proof_obsolete &&
        Call_provers.(pr.pr_answer = Valid)
 
-let clean_session c ~removed =
+
+let clean c ~removed nid =
+
   (* clean should not change proved status *)
   let notification _ = assert false in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
-  Session_itp.fold_all_session s
-    (fun () any ->
-      (match any with
-      | APa pa ->
+  let clean_aux () any =
+    match any with
+    | APa pa ->
         let pa = Session_itp.get_proof_attempt_node s pa in
         if pn_proved s pa.parent then
           if not (proof_is_complete pa) then
@@ -840,7 +787,14 @@ let clean_session c ~removed =
         let pn = get_trans_parent s tn in
         if pn_proved s pn && not (tn_proved s tn) then
           remove_subtree ~notification ~removed c (ATn tn)
-      | _ -> ())) ()
+      | _ -> ()
+  in
+
+  match nid with
+  | Some nid ->
+      Session_itp.fold_all_any s clean_aux () nid
+  | None ->
+      Session_itp.fold_all_session s clean_aux ()
 
 (* This function folds on any subelements of given node and tries to mark all
    proof attempts it encounters *)
@@ -853,10 +807,16 @@ let mark_as_obsolete ~notification c any =
     notification (APa n);
     update_goal_node notification s parent
   in
-  fold_all_any s
-    (fun () any -> match any with
-    | APa n -> mark_as_obsolete_pa n
-    | _ -> ()) () any
+  match any with
+  | Some any ->
+      fold_all_any s
+        (fun () any -> match any with
+        | APa n -> mark_as_obsolete_pa n
+        | _ -> ()) () any
+  | None ->
+      session_iter_proof_attempt
+        (fun pa _pan ->
+          mark_as_obsolete_pa pa) s
 
 exception BadCopyPaste
 
@@ -919,6 +879,54 @@ let copy_detached ~copy c from_any =
 
 
 
+let find_prover notification c goal_id pr =
+  if Hprover.mem c.controller_provers pr then Some pr else
+   match Whyconf.get_prover_upgrade_policy c.controller_config pr with
+   | exception Not_found -> None
+   | Whyconf.CPU_keep -> None
+   | Whyconf.CPU_upgrade new_pr ->
+      (* does a proof using new_pr already exists ? *)
+      if Hprover.mem (get_proof_attempt_ids c.controller_session goal_id) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we modify the prover in-place *)
+          Session_itp.change_prover notification c.controller_session goal_id pr new_pr;
+          Some new_pr
+        end
+   | Whyconf.CPU_duplicate _new_pr ->
+      assert false (* TODO *)
+(*
+      (* does a proof using new_p already exists ? *)
+      if Hprover.mem (goal_external_proofs parid) new_pr
+      then (* yes, then we do nothing *)
+        None
+      else
+        begin
+          (* we duplicate the proof_attempt *)
+          let new_a = copy_external_proof
+                        ~notify ~keygen:O.create ~prover:new_p ~env_session:eS a
+          in
+          Some new_pr
+        end
+*)
+
+let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
+  (* The replay can be done on a different machine so we need
+     to check more things before giving the attempt to the scheduler *)
+  match find_prover notification c parid pr with
+  | None -> callback id (Uninstalled pr)
+  | Some pr' ->
+     try
+       if pr' <> pr then callback id (UpgradeProver pr');
+       let _ = get_raw_task c.controller_session parid in
+       schedule_proof_attempt c parid pr' ~counterexmp:false ~limit ~callback ~notification
+     with Not_found ->
+       callback id Detached
+
+
+
 type report =
   | Result of Call_provers.prover_result * Call_provers.prover_result
   (** Result(new_result,old_result) *)
@@ -956,8 +964,8 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ?(obsolete_only=true) ?(use_steps=false)
-           c ~callback ~notification ~final_callback =
+let replay ~valid_only ~obsolete_only ?(use_steps=false)
+           c ~callback ~notification ~final_callback ~any =
 
   let craft_report count s r id pr limits pa =
     match s with
@@ -979,18 +987,31 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
     | Detached -> decr count
   in
 
+  let need_replay pa =
+    (pa.proof_obsolete || not obsolete_only) &&
+      (not valid_only ||
+         match pa.Session_itp.proof_state with
+         | None -> false
+         | Some pr -> Call_provers.(pr.pr_answer = Valid))
+  in
+
   let session = c.controller_session in
   let count = ref 0 in
   let report = ref [] in
 
   (* TODO count the number of node in a more efficient way *)
   (* Counting the number of proof_attempt to print report only once *)
-  Session_itp.session_iter_proof_attempt
-    (fun _ pa -> if pa.proof_obsolete || not obsolete_only then incr count) session;
+  (match any with
+  | None ->
+      Session_itp.session_iter_proof_attempt
+        (fun _ pa -> if need_replay pa then incr count) session
+  | Some nid ->
+      Session_itp.any_iter_proof_attempt session
+        (fun _ pa -> if need_replay pa then incr count) nid);
 
   (* Replaying function *)
   let replay_pa id pa =
-    if pa.proof_obsolete || not obsolete_only then
+    if need_replay pa then
       begin
         let parid = pa.parent in
         let pr = pa.prover in
@@ -1014,7 +1035,9 @@ let replay ?(obsolete_only=true) ?(use_steps=false)
 
   if !count = 0 then final_callback !report else
   (* Calling replay on all the proof_attempts of the session *)
-  Session_itp.session_iter_proof_attempt replay_pa session
+  match any with
+  | None -> Session_itp.session_iter_proof_attempt replay_pa session
+  | Some nid -> Session_itp.any_iter_proof_attempt session replay_pa nid
 
 
 
