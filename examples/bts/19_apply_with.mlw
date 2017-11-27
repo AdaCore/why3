@@ -1,4 +1,4 @@
-module Issue19
+module I19_simplint
 
   use import int.Int
 
@@ -6,26 +6,50 @@ module Issue19
 
   goal g: 0 < 2
 
-  (* we want to do
-     apply H with 1
-     to generate two new goals "0 < 1" and "1 < 2"
+end
 
-  *)
+module I19_simplpoly
 
   type t
+
   predicate r t t
-  
+
   axiom trans: forall x y z. r x y -> r y z -> r x z
-  
+
   constant a:t
   constant b:t
   constant c:t
-  
+
   axiom a1: r a b
-  
+
   axiom a2: r b c
-  
+
   goal test: r a c
+
+end
+
+module I19_simplpoly2
+
+  type t
+  type t'
+
+  predicate r 'a t t
+
+  axiom trans: forall a:'a. forall a':'a. forall x y z. r a x y -> r a y z -> r a' x z
+
+  constant a:t
+  constant b:t
+  constant c:t
+
+  axiom trans_eq: forall x y z. r 4 x y -> r 5 y z -> a = z
+
+  axiom a1: forall x:'a. r x a b
+
+  axiom a2: forall x:'a. r x b c
+
+  (* apply trans 1,b,b does not work *)
+
+  goal test: r 1 a c
   (* apply trans with b *)
 
 end

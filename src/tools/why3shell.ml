@@ -119,7 +119,7 @@ g -> print the current task\n\
 p -> print the session@." s
   | Information s          -> fprintf fmt "%s@." s
   | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
-  | Parse_Or_Type_Error (_, s)  -> fprintf fmt "%s@." s
+  | Parse_Or_Type_Error (_, _, s)  -> fprintf fmt "%s@." s
   | Error s                ->
       fprintf fmt "%s@." s
   | Open_File_Error s -> fprintf fmt "%s@." s

@@ -300,6 +300,7 @@ let ident_shape id = id_string_shape id.Ident.id_string
 open Number
 
 let integer_const_shape = function
+  | IConstRaw i -> push (BigInt.to_string i)
   | IConstDec s -> push s
   | IConstHex s -> push "0x"; push s
   | IConstOct s -> push "0o"; push s
@@ -499,6 +500,7 @@ module Checksum = struct
     | CV2 -> ident_v2 b id
 
   let integer_const b = function
+    | IConstRaw i -> raw_string b (BigInt.to_string i)
     | IConstDec s -> raw_string b s
     | IConstHex s -> raw_string b "0x"; raw_string b s
     | IConstOct s -> raw_string b "0o"; raw_string b s

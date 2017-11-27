@@ -893,6 +893,8 @@ module Mxs = Exn.M
 exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception AssignSnapshot of ity
+exception WriteImmutable of region * pvsymbol
 exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
@@ -1008,8 +1010,8 @@ let eff_read_single_pre v e = eff_read_pre (Spv.singleton v) e
 let eff_read_single_post e v = eff_read_post e (Spv.singleton v)
 let eff_bind_single v e = eff_bind (Spv.singleton v) e
 
-let check_mutable_field fn r f =
-  if not (List.memq f r.reg_its.its_mfields) then invalid_arg fn
+let check_mutable_field r f =
+  if not (List.memq f r.reg_its.its_mfields) then raise (WriteImmutable (r,f))
 
 let read_regs rd =
   Spv.fold (fun v s -> ity_rch_regs s v.pv_ity) rd Sreg.empty
@@ -1020,7 +1022,7 @@ let eff_write rd wr =
   let kn = read_regs rd in
   let wr = Mreg.filter (fun ({reg_its = s} as r) fs ->
     if Spv.is_empty fs && not s.its_private then invalid_arg "Ity.eff_write";
-    Spv.iter (check_mutable_field "Ity.eff_write" r) fs; Sreg.mem r kn) wr in
+    Spv.iter (check_mutable_field r) fs; Sreg.mem r kn) wr in
   reset_taints { eff_empty with
     eff_reads = rd; eff_writes = wr; eff_covers = Mreg.domain wr }
 
@@ -1046,10 +1048,10 @@ let eff_assign asl =
   (* compute all effects except eff_resets *)
   let get_reg = function
     | {pv_ity = {ity_node = Ityreg r}} -> r
-    | _ -> invalid_arg "Ity.eff_assign" in
+    | v -> raise (AssignSnapshot v.pv_ity) in
   let writes = List.fold_left (fun wr (r,f,v) ->
     let r = get_reg r and ity = v.pv_ity in
-    check_mutable_field "Ity.eff_assign" r f;
+    check_mutable_field r f;
     if r.reg_its.its_private then raise (AssignPrivate r);
     Mreg.change (fun fs -> Some (match fs with
       | Some fs -> Mpv.add_new (DuplicateField (r,f)) f ity fs
@@ -1747,11 +1749,11 @@ let () = Exn_printer.register (fun fmt e -> match e with
         print_pv v
   | AssignPrivate r -> fprintf fmt
       "This assignment modifies a value of the private type %a" print_reg r
-(*
+  | AssignSnapshot t -> fprintf fmt
+      "This assignment modifies a value of the immutable type %a" print_ity t
   | WriteImmutable (r, v) -> fprintf fmt
-      "In the type constructor %a, the field %s is immutable"
+      "In the type symbol %a, the field %s is immutable"
         print_its r.reg_its v.pv_vs.vs_name.id_string
-*)
   | DuplicateField (_r, v) -> fprintf fmt
       "In this assignment, the field %s is modified twice"
         v.pv_vs.vs_name.id_string

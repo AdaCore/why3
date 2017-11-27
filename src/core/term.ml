@@ -330,7 +330,14 @@ let t_compare trigger label t1 t2 =
           | Tvar v1, Tvar v2 ->
               comp_raise (vs_compare v1 v2)
           | Tconst c1, Tconst c2 ->
-              perv_compare c1 c2
+              let open Number in
+              begin match c1, c2 with
+              | ConstInt { ic_negative = s1; ic_abs = IConstRaw b1 },
+                ConstInt { ic_negative = s2; ic_abs = IConstRaw b2 } ->
+                  perv_compare s1 s2;
+                  comp_raise (BigInt.compare b1 b2)
+              | _, _ -> perv_compare c1 c2
+              end
           | Tapp (s1,l1), Tapp (s2,l2) ->
               comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
@@ -828,8 +835,7 @@ let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
   assert (n >= 0);
-  let a = Number.int_const_of_int n in
-  t_const (Number.ConstInt a) ty_int
+  t_const (Number.const_of_int n) ty_int
 
 let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
 
@@ -963,7 +969,8 @@ let fs_tuple = Hint.memo 17 (fun n ->
   Hid.add fs_tuple_ids fs.ls_name n;
   fs)
 
-let is_fs_tuple fs = ls_equal fs (fs_tuple (List.length fs.ls_args))
+let is_fs_tuple fs =
+  fs.ls_constr = 1 && Hid.mem fs_tuple_ids fs.ls_name
 
 let is_fs_tuple_id id =
   try Some (Hid.find fs_tuple_ids id) with Not_found -> None

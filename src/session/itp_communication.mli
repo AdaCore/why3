@@ -48,8 +48,9 @@ type message_notification =
   | Information           of string
   (** Number of task scheduled, running, etc *)
   | Task_Monitor          of int * int * int
-  (** A file was read or reloaded and now contains a parsing or typing error *)
-  | Parse_Or_Type_Error   of Loc.position * string
+  (** A file was read or reloaded and now contains a parsing or typing error.
+     second loc is relative to the session file *)
+  | Parse_Or_Type_Error   of Loc.position * Loc.position * string
   (** [File_Saved f] f was saved *)
   | File_Saved            of string
   (** An error happened that could not be identified in server *)

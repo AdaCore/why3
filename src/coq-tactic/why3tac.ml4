@@ -463,17 +463,15 @@ exception NotArithConstant
 
 (* translates a closed Coq term p:positive into a FOL term of type int *)
 
-let big_two = Big_int.succ_big_int Big_int.unit_big_int
-
 let rec tr_positive evd p = match kind evd p with
   | Construct _ when is_global evd coq_xH p ->
-      Big_int.unit_big_int
+      BigInt.one
   | App (f, [|a|]) when is_global evd coq_xI f ->
       (* Plus (Mult (Cst 2, tr_positive a), Cst 1) *)
-      Big_int.succ_big_int (Big_int.mult_big_int big_two (tr_positive evd a))
+      BigInt.succ (BigInt.mul_int 2 (tr_positive evd a))
   | App (f, [|a|]) when is_global evd coq_xO f ->
       (* Mult (Cst 2, tr_positive a) *)
-      Big_int.mult_big_int big_two (tr_positive evd a)
+      BigInt.mul_int 2 (tr_positive evd a)
   | Cast (p, _, _) ->
       tr_positive evd p
   | _ ->
@@ -482,21 +480,21 @@ let rec tr_positive evd p = match kind evd p with
 let const_of_big_int is_neg b =
   Term.t_const
     (Number.(ConstInt { ic_negative = is_neg ;
-         ic_abs = Number.int_const_dec (Big_int.string_of_big_int b) }))
+                        ic_abs = int_literal_raw b }))
     ty_int
 
 let const_of_big_int_real is_neg b =
-  let s = Big_int.string_of_big_int b in
-  Term.t_const
-    (Number.(ConstReal { rc_negative = is_neg ;
-                         rc_abs = real_const_dec s "0" None}))
+  let s = BigInt.to_string b in
+  Term.t_const (Number.(ConstReal { rc_negative = is_neg ;
+                                    rc_abs = real_const_dec s "0" None}))
     ty_real
 
 (* translates a closed Coq term t:Z or R into a FOL term of type int or real *)
 let rec tr_arith_constant_IZR evd dep t = match kind evd t with
   | Construct _ when is_global evd coq_Z0 t ->
     Term.t_const (Number.(ConstReal { rc_negative = false ;
-      rc_abs = real_const_dec "0" "0" None })) ty_real
+                                      rc_abs = real_const_dec "0" "0" None}))
+      ty_real
   | App (f, [|a|]) when is_global evd coq_Zpos f ->
     const_of_big_int_real false (tr_positive evd a)
   | App (f, [|a|]) when is_global evd coq_Zneg f ->

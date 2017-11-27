@@ -149,7 +149,7 @@ let induction x bound env =
   (* Default bound is 0 if not given *)
   let bound =
     match bound with
-    | None -> Term.t_const (Number.ConstInt (Number.int_const_of_int 0)) Ty.ty_int
+    | None -> Term.t_nat_const 0
     | Some bound -> bound
   in
 
@@ -171,11 +171,13 @@ let induction x bound env =
 
   (* Transformation used for the init case *)
   let init_trans = Trans.decl (fun d -> match d.d_node with
-    | Dprop (Pgoal, _pr, _t) ->
+    | Dprop (Pgoal, pr, t) ->
         let nt = Term.t_app_infer le_int [x; bound] in
-        let pr =
+        let lab_base = Ident.create_label "expl:base case" in
+        let d = create_prop_decl Pgoal pr (t_label_add lab_base t) in
+        let pr_init =
           create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) nt in
-        [pr; d]
+        [pr_init; d]
     | _ -> [d]) None in
 
   (* Transformation used for the recursive case *)
@@ -185,7 +187,7 @@ let induction x bound env =
     Trans.decl (fun d -> match d.d_node with
     | Dparam ls when (Term.ls_equal lsx ls) ->
         (x_is_passed := true; [d])
-    | Dprop (Pgoal, _pr, t) ->
+    | Dprop (Pgoal, pr, t) ->
         if not (!x_is_passed) then
           raise (Arg_trans "induction")
         else
@@ -204,6 +206,8 @@ let induction x bound env =
             create_prop_decl Paxiom (Decl.create_prsymbol (gen_ident "Init")) x_ge_bound_t in
           let rec_pr = create_prsymbol (gen_ident "Hrec") in
           let hrec = create_prop_decl Paxiom rec_pr t_delta' in
+          let lab_rec = Ident.create_label "expl:recursive case" in
+          let d = create_prop_decl Pgoal pr (t_label_add lab_rec t) in
           [x_ge_bound; hrec; d]
     | Dprop (_p, _pr, _t) ->
         if !x_is_passed then

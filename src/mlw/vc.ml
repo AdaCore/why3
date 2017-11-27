@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -938,7 +938,7 @@ let reflow vc_wp k =
         let k, _ = mark WP k in
         Kaxiom k, Mint.singleton 0 true
     | Ktag ((Off _) as tag, k) ->
-        let k, out = mark tag k in
+        let k, out = mark vc_tag k in
         Ktag (tag, k), out
     | Ktag ((WP|SP) as tag, k) when tag <> vc_tag ->
         let k, out = mark tag k in
