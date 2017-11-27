@@ -481,8 +481,8 @@ module Impl
         assert { forall x:int. is_fo_term_free_var_in_fo_formula x bm ->
           is_fo_term_free_var_in_fo_formula x phi0m && x >= 0 } ;
         let rmg = construct_fo_formula_list (NLC_FOFCons b remaining) in
-        let rmg'm = rmg.model_fo_formula_list_field in
-        assert { rmg'm = FOFCons bm rmgm } ;
+        let rmg'_m = rmg.model_fo_formula_list_field in
+        assert { rmg'_m = FOFCons bm rmgm } ;
         decompose base tab unifb unif fresh a clause rmg depth goalnum
       | NLC_And a b -> let am = a.model_fo_formula_field in
         let bm = b.model_fo_formula_field in
@@ -623,8 +623,8 @@ module Impl
           | NLC_Root -> (* Topmost decomposition,
                 do not look for contradiction here. *)
             let tab' = construct_tableau (NLC_Node tab phi0 clause) in
-            let tab'm = tab'.model_tableau_field in
-            assert { tab'm = Node tabm phi0m clausem } ;
+            let tab'_m = tab'.model_tableau_field in
+            assert { tab'_m = Node tabm phi0m clausem } ;
             if depth = 0 then raise Failure else
             select_lemma base base tab' unifb unif fresh (depth-1) goalnum (-1)
           | NLC_Node tnext phi1 phib ->

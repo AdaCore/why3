@@ -571,15 +571,15 @@ module Impl
         assert { phism = FOFCons phim qm } ;
         let (q',gnum') = nnf_simpl_list q (gnum-1) fvp in
         let phi' = nnf_simpl phi fvp in
-        let phi'm = phi'.model_fo_formula_field in
-        let q'm = q'.model_fo_formula_list_field in
+        let phi'_m = phi'.model_fo_formula_field in
+        let q'_m = q'.model_fo_formula_list_field in
         match destruct_fo_formula phi' with
           | NLC_FTrue -> (q',if gnum > 0 then gnum' else gnum'+1)
           | NLC_FFalse -> raise Unsat
           | _ -> assert { is_simpl phi'.model_fo_formula_field } ;
             let res = construct_fo_formula_list (NLC_FOFCons phi' q') in
             let resm = res.model_fo_formula_list_field in
-            assert { resm = FOFCons phi'm q'm } ;
+            assert { resm = FOFCons phi'_m q'_m } ;
             (res,gnum'+1)
         end
     end
@@ -662,8 +662,8 @@ module Impl
         let skenv = acc.skolem_env in
         let varx = construct_fo_term (NLCVar_fo_term x) in
         let accl' = construct_fo_term_list (NLC_FOCons varx accl) in
-        let (acclm,accl'm) = (accl.model_fo_term_list_field ,accl'.model_fo_term_list_field) in
-        assert { accl'm = FOCons (Var_fo_term x) acclm } ;
+        let (acclm,accl'_m) = (accl.model_fo_term_list_field ,accl'.model_fo_term_list_field) in
+        assert { accl'_m = FOCons (Var_fo_term x) acclm } ;
         let skenv' = extend_env skenv x in
         let acc' = {
           skolemized_fv_list = accl' ;
@@ -722,9 +722,9 @@ module Impl
         free_var_list = if b
           then term_list_free_vars l fvp
           else Nil }
-      | NLC_Not phi' -> let phi'm = phi'.model_fo_formula_field in
-        assert { phim = Not phi'm } ;
-        assert { match phi'm with
+      | NLC_Not phi' -> let phi'_m = phi'.model_fo_formula_field in
+        assert { phim = Not phi'_m } ;
+        assert { match phi'_m with
         | PApp _ _ -> true | _ -> false end } ;
         { skolemized = phi ;
           skolem_bound = skb ;
@@ -1242,13 +1242,13 @@ module Impl
     match l with
       | Nil -> phi
       | Cons x q -> let phi' = construct_fo_formula (NLC_Exists x phi) in
-        let phi'm = phi'.model_fo_formula_field in
+        let phi'_m = phi'.model_fo_formula_field in
         let phi1m = rename_fo_formula phim identity (some[x <- None]) in
-        assert { phi'm = Exists phi1m } ;
+        assert { phi'_m = Exists phi1m } ;
         assert { forall xf:int.
           (forall y:int. is_fo_term_free_var_in_fo_formula y phim /\
             eval (some[x<-None]) y = Some xf -> y <> x &&
-            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phi'm ->
+            Some xf = Some y && xf = y) && is_fo_term_free_var_in_fo_formula xf phi'_m ->
           is_fo_term_free_var_in_fo_formula (Some xf) phi1m &&
           (exists y:int. is_fo_term_free_var_in_fo_formula y phim /\
             eval (some[x <- None]) y = Some xf) && is_fo_term_free_var_in_fo_formula xf phim
@@ -1262,7 +1262,7 @@ module Impl
           phi1m = subst_fo_formula phim subst_id_symbol (rcompose (some[x <- None]) subst_id_fo_term) &&
           formula_semantic phi1m m rhos &&
           (exists xm:'st. formula_semantic phi1m m (ocase rho xm)) &&
-          formula_semantic phi'm m rho } ;
+          formula_semantic phi'_m m rho } ;
         exists_quantify q phi'
     end
 
@@ -1303,10 +1303,10 @@ module Impl
         assert { lm = FOFCons xm qm } ;
         let cr = combine_with q x fvp in
         let phi' = cr.form in
-        let phi'm = phi'.model_fo_formula_field in
+        let phi'_m = phi'.model_fo_formula_field in
         let phir = construct_fo_formula (NLC_And phi0 phi') in
         let phirm = phir.model_fo_formula_field in
-        assert { phirm = And phi0m phi'm } ;
+        assert { phirm = And phi0m phi'_m } ;
         { form = phir ; llen = cr.llen + 1 }
     end
 
