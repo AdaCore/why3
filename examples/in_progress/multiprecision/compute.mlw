@@ -318,7 +318,7 @@ val predicate eq0 (r: r) ensures { result <-> r = R.zero }
 
 end
 
-theory AssocAlgebraDecision
+module AssocAlgebraDecision
 
 
 use import int.Int
@@ -330,7 +330,7 @@ type a
 val constant rzero : r
 val constant rone : r
 val constant aone : a
-val constant azero : a
+val ghost constant azero : a
 
 val function rplus r r : r
 val function rtimes r r : r
@@ -340,9 +340,9 @@ val function aplus a a : a
 val function atimes a a : a
 val function aopp a : a
 
-clone export AssocAlgebra with type r = r, type a = a, constant one = aone, constant R.zero = rzero, constant R.one = rone, function R.(+) = rplus, function R.( *) = rtimes, function R.(-_) = ropp, function (+) = aplus, function ( *) = atimes, function A.(-_) = aopp
+clone export AssocAlgebra with type r = r, type a = a, constant one = aone, constant A.zero = azero, constant R.zero = rzero, constant R.one = rone, function R.(+) = rplus, function R.( *) = rtimes, function R.(-_) = ropp, function (+) = aplus, function ( *) = atimes, function A.(-_) = aopp
 
-axiom azero_def: azero = A.zero (* FIXME *)
+(*axiom azero_def: azero = A.zero*) (* FIXME *)
 
 type t = Var int | Add t t | Mul t t | Ext r t | Sub t t
 type vars = int -> a
@@ -376,7 +376,7 @@ let rec function mon (x: list int) (y: vars) : a =
   | Cons x l -> atimes (y x) (mon l y)
   end
 
-let rec function interp' (x: t') (y: vars) : a =
+let rec ghost function interp' (x: t') (y: vars) : a =
   match x with
   | Nil -> azero
   | Cons (M r m) l -> aplus (($) r (mon m y)) (interp' l y) end
@@ -513,7 +513,7 @@ let lemma norm' (x1 x2: t')
     ensures  { eq' x1 x2 }
 = ()
 
-let function norm_f (x1 x2: t) : bool
+let norm_f (x1 x2: t) : bool
   ensures { forall y: vars. result = true -> interp x1 y = interp x2 y }
 = match normalize' (conv (Sub x1 x2)) with
   | Nil -> true
@@ -847,9 +847,11 @@ module InfIntMatrix
 
   let constant zerof : int -> int -> int = fun _ _ -> 0
 
-  val constant mzero : mat
+  (*val constant mzero : mat
 
-  axiom mzero_def: mzero = fcreate 0 0 zerof (*FIXME*)
+  axiom mzero_def: mzero = fcreate 0 0 zerof*) (*FIXME*)
+
+  let ghost constant mzero : mat = fcreate 0 0 zerof
 
   let ghost function zerorc (r c: int) : mat = fcreate r c zerof
 
