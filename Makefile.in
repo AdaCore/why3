@@ -651,13 +651,14 @@ gallery-simple::
 
 .PHONY: gallery-subs
 
-GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp
+GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp prover
 
 gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
+	  mkdir $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
 	  why3 -L . doc --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
