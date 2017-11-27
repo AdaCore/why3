@@ -22,7 +22,7 @@ type reify_env = { kn: known_map;
                    store: (vsymbol * int) Mterm.t;
                    fr: int;
                    subst: term Mvs.t;
-                   lv: Svs.t;
+                   lv: vsymbol list;
                    var_maps: ty Mvs.t; (* type of values pointed by each map*)
                    ty_to_map: vsymbol Mty.t;
                  }
@@ -144,7 +144,7 @@ let rec reify_term renv t rt =
         raise NoReification);
   match t.t_node, rt.t_node with
   | _, Tapp(interp, [{t_node = Tvar vx}; {t_node = Tvar vy} ])
-       when Svs.mem vx renv.lv && Svs.mem vy renv.lv  ->
+       when List.mem vx renv.lv && List.mem vy renv.lv  ->
      if debug then Format.printf "case interp@.";
      let var_maps, ty_to_map =
        if Mty.mem vy.vs_ty renv.ty_to_map
@@ -172,7 +172,7 @@ let build_vars_map renv prev =
                   let prev = Task.add_decl prev d in
                   Mvs.add vy y subst, prev)
                 renv.var_maps (renv.subst, prev) in
-  if not (Svs.for_all (fun v -> Mvs.mem v subst) renv.lv)
+  if not (List.for_all (fun v -> Mvs.mem v subst) renv.lv)
   then (if debug
         then Format.printf "some vars not matched, todo use context@.";
         raise Exit);
@@ -636,7 +636,7 @@ let reflection_by_function s env = Trans.store (fun task ->
           then Format.printf "post: %a, %a@."
                              Pretty.print_vs vres Pretty.print_term p;
           let (lp, lv, rt) = Apply.intros p in
-          let lv = List.fold_left Svs.add_left lv args in
+          let lv = lv @  args in
           let renv = reify_term (init_renv kn lv) g rt in
           let info = { env = env;
                        mm = mm;
