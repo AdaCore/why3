@@ -336,6 +336,7 @@ exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
 exception IllegalAssign of region * region * region
+exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
 type effect = private {
@@ -345,6 +346,7 @@ type effect = private {
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sxs.t;         (* raised exceptions *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -372,6 +374,8 @@ val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
 
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
+
+val eff_spoil : effect -> ity -> effect
 
 val eff_diverge : effect -> effect                (* forbidden if ghost *)
 val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)

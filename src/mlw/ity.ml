@@ -864,6 +864,7 @@ exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
 exception IllegalAssign of region * region * region
+exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
 type effect = {
@@ -873,6 +874,7 @@ type effect = {
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sxs.t;         (* raised exceptions *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -884,6 +886,7 @@ let eff_empty = {
   eff_covers = Sreg.empty;
   eff_resets = Sreg.empty;
   eff_raises = Sxs.empty;
+  eff_spoils = Stv.empty;
   eff_oneway = false;
   eff_ghost  = false;
 }
@@ -895,6 +898,7 @@ let eff_equal e1 e2 =
   Sreg.equal e1.eff_covers e2.eff_covers &&
   Sreg.equal e1.eff_resets e2.eff_resets &&
   Sxs.equal e1.eff_raises e2.eff_raises &&
+  Stv.equal e1.eff_spoils e2.eff_spoils &&
   e1.eff_oneway = e2.eff_oneway &&
   e1.eff_ghost = e2.eff_ghost
 
@@ -1071,6 +1075,7 @@ let eff_assign asl =
     eff_covers = Mreg.domain (Mreg.set_diff writes resets);
     eff_resets = resets;
     eff_raises = Sxs.empty;
+    eff_spoils = Stv.empty;
     eff_oneway = false;
     eff_ghost  = ghost } in
   (* verify that we can rebuild every value *)
@@ -1098,6 +1103,8 @@ let eff_reset_overwritten ({eff_writes = wr} as e) =
 let eff_raise e x = { e with eff_raises = Sxs.add x e.eff_raises }
 let eff_catch e x = { e with eff_raises = Sxs.remove x e.eff_raises }
 
+let eff_spoil e t = { e with eff_spoils = ity_rch_vars e.eff_spoils t }
+
 let merge_fields _ f1 f2 = Some (Spv.union f1 f2)
 
 let remove_stale e srg =
@@ -1111,6 +1118,7 @@ let eff_union e1 e2 = {
                           (remove_stale e1 e2.eff_covers);
   eff_resets = Sreg.union e1.eff_resets e2.eff_resets;
   eff_raises = Sxs.union e1.eff_raises e2.eff_raises;
+  eff_spoils = Stv.union e1.eff_spoils e2.eff_spoils;
   eff_oneway = e1.eff_oneway || e2.eff_oneway;
   eff_ghost  = e1.eff_ghost && e2.eff_ghost }
 
@@ -1148,6 +1156,11 @@ let eff_union_seq e1 e2 =
 (* NOTE: never export this function: it ignores eff_reads
    and eff_ghost, which are handled in cty_apply below. *)
 let eff_inst sbs e =
+  (* Immutable type variables can only be instantiated with pure types.
+     All type variables in these types become immutable. *)
+  let spoils = Mtv.fold (fun v i s -> if i.ity_pure then
+      ity_rch_vars s i else raise (ImpureVariable (v,i)))
+    (Mtv.set_inter sbs.isb_var e.eff_spoils) Stv.empty in
   (* All modified or reset regions in e must be instantiated into
      distinct regions. We allow regions that are not affected directly
      to be aliased, even if they contain modified or reset subregions:
@@ -1168,7 +1181,7 @@ let eff_inst sbs e =
   let taints = inst e.eff_taints in
   let covers = inst e.eff_covers in
   let impact = inst impact in
-  (* all type variables and unaffected regions must be instantiated
+  (* All type variables and unaffected regions must be instantiated
      outside [impact]. Every region in the instantiated execution
      is either brought in by the type substitution or instantiates
      one of the original regions. *)
@@ -1179,7 +1192,8 @@ let eff_inst sbs e =
   let dst = Mtv.fold (fun _ i s -> ity_rch_regs s i) sbs.isb_var dst in
   ignore (Mreg.inter (fun r _ _ -> raise (IllegalAlias r)) dst impact);
   { e with eff_writes = writes; eff_taints = taints;
-           eff_covers = covers; eff_resets = resets }
+           eff_covers = covers; eff_resets = resets;
+           eff_spoils = spoils }
 
 let mask_adjust eff ity mask =
   if eff.eff_ghost then MaskGhost else
@@ -1327,6 +1341,17 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
     eff_writes = Mreg.set_inter effect.eff_writes rknown;
     eff_covers = Mreg.set_inter effect.eff_covers rknown;
     eff_resets = Mreg.set_inter effect.eff_resets vknown} in
+  (* only spoil the type variables that escape *)
+  let escape = ity_rch_vars Stv.empty result in
+  let add_xs xs s = ity_rch_vars s xs.xs_ity in
+  let escape = Sxs.fold add_xs raises escape in
+  let add_wr r fs s =
+    let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
+    let add_fd f s = ity_rch_vars s (ity_full_inst sbs f.pv_ity) in
+    Spv.fold add_fd fs s in
+  let escape = Mreg.fold add_wr effect.eff_writes escape in
+  let spoils = Stv.inter effect.eff_spoils escape in
+  let effect = { effect with eff_spoils = spoils } in
   (* remove the formal parameters from eff_reads *)
   let effect = { effect with eff_reads = xreads } in
   cty_unsafe args pre post xpost oldies effect result mask freeze
@@ -1713,6 +1738,9 @@ let () = Exn_printer.register (fun fmt e -> match e with
         print_ity t
   | IllegalAlias _reg -> fprintf fmt
       "This application creates an illegal alias"
+  | ImpureVariable (v,t) -> fprintf fmt
+      "This application instantiates pure type variable %a \
+        with a mutable type %a" Pretty.print_tv v print_ity t
   | IllegalAssign (r1,r2,r3) -> fprintf fmt
       "This assignment mismatches regions (%a: %a - %a)"
         print_reg r1 print_reg r2 print_reg r3

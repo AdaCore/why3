@@ -777,7 +777,7 @@ let c_pur s vl ityl ity =
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
-  let eff = eff_ghostify true eff_empty in
+  let eff = eff_ghostify true (eff_spoil eff_empty ity) in
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
@@ -1011,6 +1011,9 @@ let e_exn xs e =
 let e_pure t =
   let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
+  let eff = match t.t_node with
+    | Tvar _ -> eff (* no magic *)
+    | _ -> eff_spoil eff ity in
   mk_expr (Epure t) ity MaskGhost eff
 
 let e_assert ak f =
