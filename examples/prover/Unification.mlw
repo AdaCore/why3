@@ -291,8 +291,8 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term y
       t.model_fo_term_field -> y >= 0 }
-    variant { 0 }
-    (*variant { it , size_fo_term t.model_fo_term_field }*)
+    diverges
+    (* variant { it , size_fo_term t.model_fo_term_field } *)
     ensures { not(is_fo_term_free_var_in_fo_term x
       (st t.model_fo_term_field rho.unifier)) }
     raises { UnificationFailure (*->
@@ -341,7 +341,7 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term_list y
       t.model_fo_term_list_field -> y >= 0 }
-   variant { 0 }
+    diverges
     (*variant { it , size_fo_term_list t.model_fo_term_list_field }*)
     ensures { not(is_fo_term_free_var_in_fo_term_list x
         (stl t.model_fo_term_list_field rho.unifier)) }
@@ -871,7 +871,7 @@ module Impl
     (*-> forall s:func int (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' <> st t2.model_fo_term_field s'*) }
-    variant { 0 }
+    diverges
     (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term t1.model_fo_term_field +
       size_fo_term t2.model_fo_term_field }*)
@@ -1076,7 +1076,7 @@ module Impl
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' <>
         stl t2.model_fo_term_list_field s'*) }
-    variant { 0 }
+    diverges
      (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term_list t1.model_fo_term_list_field +
       size_fo_term_list t2.model_fo_term_list_field }*)
