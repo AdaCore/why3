@@ -55,6 +55,7 @@ let debug_json = Debug.register_flag "json_proto"
 (* server protocol *)
 (*******************)
 
+
 module Protocol_why3ide = struct
 
   let debug_proto = Debug.register_flag "ide_proto"
@@ -302,7 +303,7 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
-(* Contains a quadruplets (tab page, source_view, file_has_been_modified, label_of_tab):
+(* Contains quadruples (tab page, source_view, file_has_been_modified, label_of_tab):
    - tab_page is a unique number for each pages of the notebook
    - source_view is the graphical element inside a tab
    - has_been_modified is a reference to a boolean stating if the current tab
@@ -1425,17 +1426,9 @@ let paste () =
     | None -> ())
   | _ -> ()
 
-let detached_copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    send_request (Copy_detached n)
-  | _ -> ()
-
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
 
 let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:detached_copy "Detached copy"
 
 (*********************************)
 (* add a new file in the project *)
@@ -1479,6 +1472,8 @@ let (_ : GtkSignal.id) =
 (* Notification Handling *)
 (*************************)
 
+let initialization_complete = ref false
+
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
@@ -1514,13 +1509,16 @@ let treat_message_notification msg = match msg with
   | Help s ->
      print_message ~kind:1 ~notif_kind:"Help" "%s" s
   | Information s ->
+     if not !initialization_complete then main_window#show ();
+     initialization_complete := true;
      print_message ~kind:1 ~notif_kind:"Information" "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
      print_message ~kind:0 ~notif_kind:"Open_File_Error" "%s" s
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
-     if gconfig.allow_source_editing then
+     if gconfig.allow_source_editing || !initialization_complete then
        begin
+         if not !initialization_complete then main_window#show ();
          (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
          color_loc ~color:Goal_color rel_loc;
@@ -2144,5 +2142,4 @@ let () =
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
   message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
-  main_window#show ();
   GMain.main ()

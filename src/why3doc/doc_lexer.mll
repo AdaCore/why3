@@ -74,7 +74,7 @@
               Doc_def.pp_locate id Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
-        pp_print_string fmt s
+        Pp.html_string fmt s
     end
 
 }

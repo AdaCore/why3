@@ -151,7 +151,7 @@ let rec num_lines s acc tr =
     fprintf fmt "<tr>";
     for _i=1 to 0 (* depth-1 *) do fprintf fmt "<td></td>" done;
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
-      (color_of_status ~dark:false)  (tn_proved s tr)
+      (color_of_status ~dark:false) (tn_proved s tr)
       (max_depth - depth + 1);
     (* for i=1 to depth-1 do fprintf fmt "&nbsp;&nbsp;&nbsp;&nbsp;" done; *)
     let name = (get_transf_name s tr) ^

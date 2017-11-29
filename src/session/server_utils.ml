@@ -25,6 +25,9 @@ let get_session_dir ~allow_mkdir files =
       if Sys.is_directory first then
         (* first is a directory *)
         first
+      else if Filename.basename first = "why3session.xml" then
+        (* first is a session file *)
+        Filename.dirname first
       else
         if Queue.is_empty files then
           (* first was the only file *)

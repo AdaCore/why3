@@ -65,7 +65,6 @@ val file_theories : file -> theory list
 (** Theory *)
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
-val theory_detached_goals : theory -> proofNodeID list
 val theory_parent : session -> theory -> file
 
 type proof_attempt_node = private {
@@ -99,7 +98,6 @@ val get_proof_attempt_node : session -> proofAttemptID -> proof_attempt_node
 val get_proof_attempt_parent : session -> proofAttemptID -> proofNodeID
 val get_proof_attempts : session -> proofNodeID -> proof_attempt_node list
 val get_sub_tasks : session -> transID -> proofNodeID list
-val get_detached_sub_tasks : session -> transID -> proofNodeID list
 
 val get_transf_args : session -> transID -> string list
 val get_transf_name : session -> transID -> string
@@ -110,7 +108,6 @@ val get_proof_expl : session -> proofNodeID -> string
 val get_proof_parent : session -> proofNodeID -> proof_parent
 val get_trans_parent : session -> transID -> proofNodeID
 
-val get_detached_trans : session -> proofNodeID -> transID list
 val get_any_parent: session -> any -> any option
 
 (* Answers true if a node is in a detached subtree *)
@@ -153,7 +150,7 @@ val empty_session : ?from:session -> string -> session
     argument *)
 
 val add_file_section :
-  session -> string -> (Theory.theory list) ->
+  session -> string -> Theory.theory list option ->
   Env.fformat option -> file
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
@@ -167,15 +164,16 @@ val read_file :
    signaled with exceptions.  *)
 
 val merge_files :
-  use_shapes:bool -> Env.env -> session -> session -> bool * bool
+  use_shapes:bool -> Env.env -> session -> session -> exn list * bool * bool
 (** [merge_files ~use_shapes env ses old_ses] merges the file sections
     of session [s] with file sections of the same name in old session
     [old_ses]. Recursively, for each theory whose name is identical to
     old theories, it is attempted to associate the old goals,
     proof_attempts and transformations to the goals of the new theory.
-    Returns a pair [(o,d)] such that [o] is true when obsolete proof
-    attempts where found and [d] is true id detached theories, goals
-    or transformations were found.  *)
+    Returns a triple [(e,o,d)] such that [e] is the list of parsing or
+    typing errors found, [o] is true when obsolete proof attempts
+    where found and [d] is true if detached theories, goals or
+    transformations were found.  *)
 
 val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
   Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
@@ -230,14 +228,7 @@ val load_session : string -> session * bool
     cannot be read.
  *)
 
-(** {2 Copy and remove} *)
-
-exception BadCopyDetached of string
-
-(** [copy s pn] copy pn and add the copy as detached subgoal of its parent *)
-val copy_proof_node_as_detached: session -> proofNodeID -> proofNodeID
-val copy_structure: notification:(parent:any -> any -> unit) -> session -> any -> any -> unit
-
+(** {2 remove} *)
 
 exception RemoveError
 
@@ -249,7 +240,7 @@ val remove_subtree: notification:notifier -> removed:notifier ->
     whose proved state changes.
 
     raises [RemoveError] when removal is forbidden, e.g. when called on
-    a theory, or a goal that is not detached
+    a file, a theory or a goal that is not detached
  *)
 
 (** {2 proved status} *)

@@ -80,18 +80,33 @@ let t_type_close fn f =
 (* convert a type declaration to a list of lsymbol declarations *)
 let lsdecl_of_ts ts = create_param_decl (ls_of_ts ts)
 
+let ls_of_const_format = Number.({
+  long_int_support = true;
+  extra_leading_zeros_support = false;
+  negative_int_support = Number_unsupported;
+  dec_int_support = Number_default;
+  hex_int_support = Number_unsupported;
+  oct_int_support = Number_unsupported;
+  bin_int_support = Number_unsupported;
+  def_int_support = Number_unsupported;
+  negative_real_support = Number_unsupported;
+  dec_real_support = Number_unsupported;
+  hex_real_support = Number_unsupported;
+  frac_real_support = Number_custom (PrintFracReal ("%s", "%sx%s", "%s_%s"));
+  def_real_support = Number_unsupported;
+})
+
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =
   Hty.memo 3 (fun ty_base ->
-             Hterm.memo 63 (fun t ->
-                          match t.t_node with
-                          | Tconst c ->
-                             assert (not (Number.is_negative c));
-                             let s = "const_" ^ Pp.string_of_wnl Pretty.print_term t in
-                             create_fsymbol (id_fresh s) [] ty_base
-                          | _ -> assert false))
-
-let ls_of_const ty_base t = ls_of_const ty_base (t_label Slab.empty t)
+    let cst = Stdlib.Hstr.memo 63 (fun s ->
+      let s = "const_" ^ s in
+      create_fsymbol (id_fresh s) [] ty_base) in
+    Hterm.memo 63 (fun t ->
+      match t.t_node with
+      | Tconst c ->
+        cst (Pp.string_of_wnl (Number.print ls_of_const_format) c)
+      | _ -> assert false))
 
 (* unprotected and unprotecting idents *)
 
