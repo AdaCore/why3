@@ -17,7 +17,6 @@ model_parser "smtv2"
 
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
-import "cvc4_bv.gen"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -73,3 +72,5 @@ theory int.ComputerDivision
    remove prop Div_1
 end
 *)
+
+import "cvc4_bv.gen"
