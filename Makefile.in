@@ -649,13 +649,13 @@ gallery-simple::
 	@for x in examples/*/why3session.xml ; do \
 	  d=`dirname $$x`; \
 	  f=`basename $$d`; \
-	  why3 session html $$x; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  cp examples/$$f.mlw examples/$$f/why3session.html $(GALLERYDIR)/$$f/; \
-	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
+	  WHY3CONFIG="" bin/why3session.@OCAMLBEST@ html $$x -o $(GALLERYDIR)/$$f; \
+	  cp examples/$$f.mlw $(GALLERYDIR)/$$f/; \
 	  cd examples/; \
-	  zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
+	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
+	  zip -q -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
 	  cd ..; \
 	done
 
@@ -668,11 +668,12 @@ gallery-subs::
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
-	  mkdir $(GALLERYDIR)/$$d; \
+	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  why3 -L . doc --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ -L ../../theories -L ../../modules -L . --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
-	  zip -r $(GALLERYDIR)/$$d/$$d.zip $$d; \
+	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
+	  zip -q -r $(GALLERYDIR)/$$d/$$d.zip $$d; \
 	  cd ..; \
 	done
 
@@ -682,16 +683,15 @@ gallery-subs::
 	x=$*/why3session.xml; \
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
-	why3 session html $$d; \
-	rm $$d/*.bak; \
 	echo "exporting $$f"; \
+	rm $$d/*.bak; \
 	mkdir -p $(GALLERYDIR)/$$f; \
+	WHY3CONFIG="" bin/why3session.@OCAMLBEST@ html $$d -o $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
 	if test -f examples/$$f.why; then cp examples/$$f.why $(GALLERYDIR)/$$f/; fi; \
-	cp examples/$$f/why3session.html $(GALLERYDIR)/$$f/; \
-	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
 	cd examples/; \
-	zip -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f
+	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
+	zip -q -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f
 
 ########
 # XML DTD validation
@@ -1815,7 +1815,7 @@ test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat opt
 
-test-runstrat: test-runstrat.$(OCAMLBEST)
+test-runstrat: test-runstrat.@OCAMLBEST@
 
 test-ocaml-extraction: bin/why3.opt bin/why3extract.opt lib/why3/why3extract.cmxa
 	@echo "driver ocaml32"
