@@ -624,15 +624,6 @@ end
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
-  (* Send all source files from the controller session to the IDE *)
-  let load_files_session () =
-    let d = get_server_data () in
-    let s = d.cont.controller_session in
-    let files = Session_itp.get_files s in
-    Stdlib.Hstr.iter (fun _ f ->
-                      Debug.dprintf debug "load_files_session: loading '%s'@." (file_name f);
-                      read_and_send (file_name f)) files
-
   let relativize_location s loc =
     let f, l, b, e = Loc.get loc in
     let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
@@ -998,7 +989,6 @@ end
     in
     Debug.dprintf debug "sending initialization infos@.";
     P.notify (Initialized infos);
-    load_files_session ();
     Debug.dprintf debug "reloading source files@.";
     let x = reload_files d.cont ~use_shapes in
     reset_and_send_the_whole_tree ();
@@ -1007,7 +997,7 @@ end
     get_focused_label := None;
     match x with
     | [] ->
-       P.notify (Message (Information "Session initialized succesfully"))
+       P.notify (Message (Information "Session initialized successfully"))
     | l ->
        List.iter
          (function (loc,rel_loc,s) ->

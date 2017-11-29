@@ -93,6 +93,7 @@ run_dir WP_revisited
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir avl "-L avl"
 run_dir double_wp "-L double_wp"
+run_dir prover "-L prover"
 echo ""
 
 echo "Summary       : $success/$total"
