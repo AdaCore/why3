@@ -208,7 +208,7 @@ let sprintf_wnl p =
 let html_char fmt c =
   match c with
   | '\"' -> pp_print_string fmt "&quot;"
-  | '\'' -> pp_print_string fmt "&apos;"
+  | '\'' -> pp_print_string fmt "&#39;"
   | '<' -> pp_print_string fmt "&lt;"
   | '>' -> pp_print_string fmt "&gt;"
   | '&' -> pp_print_string fmt "&amp;"
