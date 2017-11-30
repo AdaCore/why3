@@ -45,6 +45,8 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
+val fprintf_any: Format.formatter -> any -> unit
+
 type notifier = any -> unit
 
 

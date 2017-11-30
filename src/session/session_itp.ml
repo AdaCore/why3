@@ -98,6 +98,14 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
+let fprintf_any fmt a =
+  match a with
+  | AFile f -> Format.fprintf fmt "<AFile %s>" f.file_name
+  | ATh th ->  Format.fprintf fmt "<ATh %s>" th.theory_name.Ident.id_string
+  | ATn trid -> Format.fprintf fmt "<ATn %d>" trid
+  | APn pnid -> Format.fprintf fmt "<APn %d>" pnid
+  | APa paid -> Format.fprintf fmt "<APa %d>" paid
+
 module Hpn = Hint
 module Htn = Hint
 module Hpan = Hint

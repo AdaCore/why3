@@ -778,7 +778,9 @@ let proof_is_complete pa =
 let clean c ~removed nid =
 
   (* clean should not change proved status *)
-  let notification _ = assert false in
+  let notification any =
+    Format.eprintf "Cleaning error: cleaning attempts to change status of node %a@." fprintf_any any
+  in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
   let clean_aux () any =
