@@ -8,7 +8,7 @@
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
-(*
+
 open Format
 open Why3
 open Why3session_lib
@@ -76,4 +76,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
-*)
