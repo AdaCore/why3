@@ -386,6 +386,8 @@ val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
 
 val mask_adjust : effect -> ity -> mask -> mask
 
+val eff_escape : effect -> ity -> Sity.t
+
 (** {2 Computation types (higher-order types with effects)} *)
 
 type pre = term   (** precondition: pre_fmla *)

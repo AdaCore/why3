@@ -1199,6 +1199,16 @@ let mask_adjust eff ity mask =
   if eff.eff_ghost then MaskGhost else
   if ity_equal ity ity_unit then MaskVisible else mask
 
+let eff_escape eff ity =
+  let esc = Sity.singleton ity in
+  let add_xs xs esc = Sity.add xs.xs_ity esc in
+  let esc = Sxs.fold add_xs eff.eff_raises esc in
+  let add_write r fs esc =
+    let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
+    let add_fd f s = Sity.add (ity_full_inst sbs f.pv_ity) s in
+    Spv.fold add_fd fs esc in
+  Mreg.fold add_write eff.eff_writes esc
+
 (** specification *)
 
 type pre = term   (* precondition: pre_fmla *)
@@ -1341,16 +1351,10 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
     eff_writes = Mreg.set_inter effect.eff_writes rknown;
     eff_covers = Mreg.set_inter effect.eff_covers rknown;
     eff_resets = Mreg.set_inter effect.eff_resets vknown} in
-  (* only spoil the type variables that escape *)
-  let escape = ity_rch_vars Stv.empty result in
-  let add_xs xs s = ity_rch_vars s xs.xs_ity in
-  let escape = Sxs.fold add_xs raises escape in
-  let add_wr r fs s =
-    let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
-    let add_fd f s = ity_rch_vars s (ity_full_inst sbs f.pv_ity) in
-    Spv.fold add_fd fs s in
-  let escape = Mreg.fold add_wr effect.eff_writes escape in
-  let spoils = Stv.inter effect.eff_spoils escape in
+  (* only spoil the escaping type variables *)
+  let esc = eff_escape effect result in
+  let esc = Sity.fold_left ity_rch_vars Stv.empty esc in
+  let spoils = Stv.inter effect.eff_spoils esc in
   let effect = { effect with eff_spoils = spoils } in
   (* remove the formal parameters from eff_reads *)
   let effect = { effect with eff_reads = xreads } in

@@ -212,8 +212,9 @@ let rs_of_ls ls =
     create_pvsymbol (id_fresh "u") (ity_of_ty ty)) ls.ls_args in
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
   let q = make_post (t_app ls t_args ls.ls_value) in
-  let ity = ity_of_ty (t_type q) in
-  let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff_empty ity in
+  let ity = ity_of_ty (t_type q) and eff = eff_empty in
+  let eff = if ls.ls_constr = 0 then eff_spoil eff ity else eff in
+  let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let ls_of_rs rs = match rs.rs_logic with
