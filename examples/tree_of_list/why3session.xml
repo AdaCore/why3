@@ -3,49 +3,49 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../tree_of_list.mlw">
-<theory name="TreeOfList" sum="12d1a0ff628823b4f6f62c68ba956168">
- <goal name="WP_parameter tree_of_list_aux" expl="VC for tree_of_list_aux">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter tree_of_list_aux.1" expl="postcondition">
+<prover id="1" name="Alt-Ergo" version="1.30" timelimit="6" steplimit="0" memlimit="1000"/>
+<file name="../tree_of_list.mlw" proved="true">
+<theory name="TreeOfList" proved="true" sum="2050454f03b72dc532ec8a04d950d1c0">
+ <goal name="WP_parameter tree_of_list_aux" expl="VC for tree_of_list_aux" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter tree_of_list_aux.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.12"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.2" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="6"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.1" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.3" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.03" steps="7"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.4" expl="unreachable point">
-  <proof prover="2"><result status="valid" time="0.01" steps="29"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.3" expl="unreachable point" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.5" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.4" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.6" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="47"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_list_aux.7" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter tree_of_list_aux.7.1" expl="postcondition">
-   <proof prover="2"><result status="valid" time="0.00" steps="47"/></proof>
+  <goal name="WP_parameter tree_of_list_aux.6" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter tree_of_list_aux.6.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.00" steps="25"/></proof>
    </goal>
-   <goal name="WP_parameter tree_of_list_aux.7.2" expl="postcondition">
-   <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+   <goal name="WP_parameter tree_of_list_aux.6.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
-   <goal name="WP_parameter tree_of_list_aux.7.3" expl="postcondition">
+   <goal name="WP_parameter tree_of_list_aux.6.2" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.09"/></proof>
    </goal>
-   <goal name="WP_parameter tree_of_list_aux.7.4" expl="postcondition">
+   <goal name="WP_parameter tree_of_list_aux.6.3" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.08"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter tree_of_list" expl="VC for tree_of_list">
- <proof prover="2"><result status="valid" time="0.02" steps="99"/></proof>
+ <goal name="WP_parameter tree_of_list" expl="VC for tree_of_list" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="99"/></proof>
  </goal>
 </theory>
 </file>

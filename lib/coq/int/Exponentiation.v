@@ -39,9 +39,6 @@ Hypothesis Unit_def_l : forall (x:t), ((infix_as one x) = x).
 Hypothesis Unit_def_r : forall (x:t), ((infix_as x one) = x).
 
 (* Why3 goal *)
-Hypothesis Comm : forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)).
-
-(* Why3 goal *)
 Definition power: t -> Z -> t.
 intros x n.
 exact (iter_nat (Zabs_nat n) t (fun acc => infix_as x acc) one).
@@ -66,6 +63,7 @@ Qed.
 (* Why3 goal *)
 Lemma Power_s_alt : forall (x:t) (n:Z), (0%Z < n)%Z -> ((power x
   n) = (infix_as x (power x (n - 1%Z)%Z))).
+Proof.
 intros x n h1.
 rewrite <- Power_s; auto with zarith.
 f_equal; omega.
@@ -102,25 +100,48 @@ apply natlike_ind.
 now rewrite Zmult_0_r, 2!Power_0.
 intros m Hm IHm.
 replace (n * Zsucc m)%Z with (n * m + n)%Z by ring.
-rewrite Power_sum by auto with zarith.
+unfold Zsucc.
+rewrite 2!Power_sum by auto with zarith.
 rewrite IHm.
-now rewrite Comm, <- Power_s.
+now rewrite Power_1.
+Qed.
+
+
+(* Why3 goal *)
+Lemma Power_comm1 : forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) ->
+  forall (n:Z), (0%Z <= n)%Z -> ((infix_as (power x n) y) = (infix_as y
+  (power x n))).
+Proof.
+intros x y comm.
+apply natlike_ind.
+now rewrite Power_0, Unit_def_r, Unit_def_l.
+intros n Hn IHn.
+unfold Zsucc.
+rewrite (Power_s _ _ Hn).
+rewrite Assoc.
+rewrite IHn.
+rewrite <- Assoc.
+rewrite <- Assoc.
+now rewrite comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_mult2 : forall (x:t) (y:t) (n:Z), (0%Z <= n)%Z ->
-  ((power (infix_as x y) n) = (infix_as (power x n) (power y n))).
+Lemma Power_comm2 : forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) ->
+  forall (n:Z), (0%Z <= n)%Z -> ((power (infix_as x y)
+  n) = (infix_as (power x n) (power y n))).
 Proof.
-intros x y.
+intros x y comm.
 apply natlike_ind.
-apply sym_eq.
 rewrite 3!Power_0.
-apply Unit_def_r.
+now rewrite Unit_def_r.
 intros n Hn IHn.
 unfold Zsucc.
 rewrite 3!(Power_s _ _ Hn).
 rewrite IHn.
-now rewrite Assoc, <- (Assoc y), (Comm y), 2!Assoc.
+rewrite <- Assoc.
+rewrite (Assoc x).
+rewrite <- (Power_comm1 _ _ comm _ Hn).
+now rewrite <- 2!Assoc.
 Qed.
 
 End Exponentiation.

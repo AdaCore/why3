@@ -88,12 +88,21 @@ apply Power_mult ; auto with real.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_mult2 : forall (x:R) (y:R) (n:Z), (0%Z <= n)%Z ->
+Lemma Power_comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R) ->
+  forall (n:Z), (0%Z <= n)%Z ->
+  (((Reals.Rfunctions.powerRZ x n) * y)%R = (y * (Reals.Rfunctions.powerRZ x n))%R).
+intros x y h1 n h2.
+apply Rmult_comm.
+Qed.
+
+(* Why3 goal *)
+Lemma Power_comm2 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R) ->
+  forall (n:Z), (0%Z <= n)%Z ->
   ((Reals.Rfunctions.powerRZ (x * y)%R n) = ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ y n))%R).
 Proof.
-intros x y n h1.
+intros x y h1 n h2.
 rewrite 3!power_is_exponentiation by auto with zarith.
-apply Power_mult2 ; auto with real.
+apply Power_comm2 ; auto with real.
 Qed.
 
 (* Why3 goal *)
