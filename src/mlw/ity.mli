@@ -38,7 +38,7 @@ and its_flag = private {
 
 and ity = private {
   ity_node : ity_node;
-  ity_imm  : bool;
+  ity_pure : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
@@ -47,8 +47,8 @@ and ity_node = private
     (** record with mutable fields and shareable components *)
   | Ityapp of itysymbol * ity list * ity list
     (** immutable type with shareable components *)
-  | Ityvar of tvsymbol * bool
-    (** type variable and its purity status *)
+  | Ityvar of tvsymbol
+    (** type variable *)
 
 and region = private {
   reg_name : ident;
@@ -140,17 +140,8 @@ val restore_its : tysymbol -> itysymbol
 
 (* {2 Basic properties} *)
 
-val its_immutable : itysymbol -> bool
-(** an immutable type symbol is not a mutable record nor an alias for one *)
-
 val its_pure : itysymbol -> bool
 (** a pure type symbol is immutable and has no mutable components *)
-
-val ity_immutable : ity -> bool
-(** an immutable type contains no regions (returns the [ity_imm] field) *)
-
-val ity_pure : ity -> bool
-(** a pure type is immutable and all type variables in it are pure *)
 
 val ity_closed : ity -> bool
 (** a closed type contains no type variables *)
@@ -182,17 +173,15 @@ val ity_reg : region -> ity
 
 val ity_var : tvsymbol -> ity
 
-val ity_var_pure : tvsymbol -> ity
-
 val ity_purify : ity -> ity
-(** replaces regions with pure snapshots and variables with pure variables. *)
+(** replaces regions with pure snapshots *)
 
 val ity_of_ty : ty -> ity
-(** fresh regions are created when needed and all variables are impure.
+(** fresh regions are created when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ity_of_ty_pure : ty -> ity
-(** pure snapshots are substituted when needed and all variables are pure.
+(** pure snapshots are substituted when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ty_of_ity : ity -> ty
@@ -268,12 +257,10 @@ val ity_tuple : ity list -> ity
 
 type ity_subst = private {
   isb_var : ity Mtv.t;
-  isb_pur : ity Mtv.t;
   isb_reg : ity Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
-exception ImpureType of tvsymbol * ity
 
 val isb_empty : ity_subst
 
@@ -349,6 +336,7 @@ exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
 exception IllegalAssign of region * region * region
+exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
 type effect = private {
@@ -358,6 +346,7 @@ type effect = private {
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sxs.t;         (* raised exceptions *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
   eff_oneway : bool;          (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
@@ -386,6 +375,8 @@ val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
 
+val eff_spoil : effect -> ity -> effect
+
 val eff_diverge : effect -> effect                (* forbidden if ghost *)
 val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)
 val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
@@ -394,6 +385,8 @@ val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
 
 val mask_adjust : effect -> ity -> mask -> mask
+
+val eff_escape : effect -> ity -> Sity.t
 
 (** {2 Computation types (higher-order types with effects)} *)
 

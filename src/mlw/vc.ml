@@ -252,7 +252,7 @@ let old_of_pv {pv_vs = v; pv_ity = ity} =
 
 let oldify_variant varl =
   let fpv = Mpv.mapi_filter (fun v _ -> (* oldify mutable vars *)
-    if ity_immutable v.pv_ity then None else Some (old_of_pv v))
+    if v.pv_ity.ity_pure then None else Some (old_of_pv v))
     (List.fold_left (fun s (t,_) -> t_freepvs s t) Spv.empty varl) in
   if Mpv.is_empty fpv then Mpv.empty, varl else
   let o2v = Mpv.fold (fun v o s -> Mpv.add o v s) fpv Mpv.empty in
@@ -1025,7 +1025,7 @@ let advancement dst0 dst1 =
 (* express shared region values as "v.f1.f2.f3" when possible *)
 
 let rec explore_paths kn aff regs t ity =
-  if ity.ity_imm then regs else
+  if ity.ity_pure then regs else
   match ity.ity_node with
   | Ityvar _ -> assert false
   | Ityreg r when not (Sreg.mem r aff) -> regs
@@ -1222,8 +1222,8 @@ let rec sp_expr kn k rdm dst = match k with
       let get_wr _ (_, w) m = Mpv.set_union w m in
       let wr2 = Mint.fold get_wr sp2 Mpv.empty in
       let fresh_wr2 v _ = clone_pv v in
-      let fresh_rd2 v _ = if ity_immutable v.pv_ity
-                          then None else Some (clone_pv v) in
+      let fresh_rd2 v _ = if v.pv_ity.ity_pure then None
+                          else Some (clone_pv v) in
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
