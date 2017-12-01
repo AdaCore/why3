@@ -488,6 +488,18 @@ module Translate = struct
     | Mltree.Tapp (_, tyl) | Mltree.Ttuple tyl ->
         List.fold_left add_tvar acc tyl
 
+  let exp_of_mask e = function
+    | MaskGhost   -> e_void
+    | MaskVisible -> e
+    (* | MaskTuple l -> match e with *)
+    (*   | Capp (rs, pvl) -> assert (is_rs_tuple rs); *)
+    (*       let rec add_exp acc pv = begin function *)
+    (*         | MaskGhost   -> acc *)
+    (*         | MaskVisible -> pv *)
+    (*         | MaskTuple l ->  *)
+    (*       end *)
+      | _ -> assert false
+
   (* expressions *)
   let rec expr info svar ({e_effect = eff; e_label = lbl} as e) =
     assert (not (e_ghost e));
@@ -616,16 +628,17 @@ module Translate = struct
           List.map (fun (xs, (pvl, e)) -> xs, pvl, expr info svar e) bl_map in
         ML.mk_expr (Mltree.Etry (etry, bl)) (Mltree.I e.e_ity) eff lbl
     | Eraise (xs, ex) ->
-        let ex =
-          match expr info svar ex with
+        let ex = exp_of_mask ex xs.xs_mask in
+        let ex = match expr info svar ex with
           | {Mltree.e_node = Mltree.Eblock []} -> None
-          | e -> Some e
-        in
+          | e -> Some e in
         ML.mk_expr (Mltree.Eraise (xs, ex)) (Mltree.I e.e_ity) eff lbl
     | Eexn (xs, e1) ->
-        let e1 = expr info svar e1 in
-        let ty = if ity_equal xs.xs_ity ity_unit
-          then None else Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
+        if mask_ghost e1.e_mask then ML.mk_expr
+            (Mltree.Eexn (xs, None, ML.e_unit)) (Mltree.I e.e_ity) eff lbl
+        else let e1 = expr info svar e1 in
+          let ty = if ity_equal xs.xs_ity ity_unit then None else
+              Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
         ML.mk_expr (Mltree.Eexn (xs, ty, e1)) (Mltree.I e.e_ity) eff lbl
     | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
     | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
@@ -761,7 +774,8 @@ module Translate = struct
         let itsd = List.map tdef itl in
         [Mltree.Dtype itsd]
     | PDexn xs ->
-        if ity_equal xs.xs_ity ity_unit then [Mltree.Dexn (xs, None)]
+        if ity_equal xs.xs_ity ity_unit || xs.xs_mask = MaskGhost then
+          [Mltree.Dexn (xs, None)]
         else [Mltree.Dexn (xs, Some (mlty_of_ity xs.xs_mask xs.xs_ity))]
 
   let pdecl_m m pd =
