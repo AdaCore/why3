@@ -326,7 +326,7 @@ module Translate = struct
   let mlty_of_ity mask t =
     let rec loop t = match t.ity_node with
       | _ when mask_equal mask MaskGhost -> ML.tunit
-      | Ityvar (tvs, _) ->
+      | Ityvar tvs ->
           Mltree.Tvar tvs
       | Ityapp ({its_ts = ts}, itl, _) when is_ts_tuple ts ->
           let itl = visible_of_mask mask itl in
