@@ -636,9 +636,9 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
 void init() {
    GetCurrentDirectory(MAX_PATH, current_dir);
    // on windows, named pipes live in a special address space
-   socket_name = (char*) malloc(sizeof(char) * (strlen(basename) + 10));
+   socket_name = (char*) malloc(sizeof(char) * (strlen(socketname) + 10));
    strcpy(socket_name, TEXT("\\\\.\\pipe\\"));
-   strcat(socket_name, basename);
+   strcat(socket_name, socketname);
 
    queue = init_queue(100);
    clients = init_list(16);

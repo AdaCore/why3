@@ -24,10 +24,16 @@ let client_connect ~fail socket_name =
       if Sys.os_type = "Win32" then
         let name = "\\\\.\\pipe\\" ^ socket_name in
         Unix.openfile name [Unix.O_RDWR] 0
-      else
-      let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-      Unix.connect sock (Unix.ADDR_UNIX socket_name);
-      sock
+      else begin
+        let curdir = Sys.getcwd () in
+        let dir = Filename.dirname socket_name in
+        let fn = Filename.basename socket_name in
+        Sys.chdir dir;
+        let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
+        Unix.connect sock (Unix.ADDR_UNIX fn);
+        Sys.chdir curdir;
+        sock
+      end
     in
     socket := Some sock
   with
