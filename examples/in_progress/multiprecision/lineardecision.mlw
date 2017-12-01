@@ -1,0 +1,461 @@
+module LinearEquationsCoeffs
+
+use import int.Int
+
+type t
+type vars = int -> int
+
+exception Unknown
+
+function interp t vars : int
+
+val constant zero : t
+val constant one : t
+
+axiom zero_def: forall y. interp zero y = 0
+axiom one_def: forall y. interp one y = 1
+
+function add_f t t : t
+function opp_f t : t
+function mul_f t t : t
+function inv_f t : t
+predicate (<=) t t
+
+val add (a b: t) : t
+  ensures { forall v: vars. interp result v = interp a v + interp b v }
+  ensures { result = add_f a b }
+  raises  { Unknown -> true }
+
+val mul (a b: t) : t
+  ensures { forall v: vars. interp result v = interp a v * interp b v }
+  ensures { result = mul_f a b }
+
+val opp (a:t) : t
+  ensures { forall v: vars. interp result v = - (interp a v) }
+  ensures { result = opp_f a }
+
+val predicate eq (a b:t)
+  ensures { result <-> forall y:vars. interp a y = interp b y }
+
+axiom eq_def: forall a b: t. a=b -> eq a b
+
+(* ax + b = 0 *)
+(*
+val solve (a b:t) : t
+  ensures { add_f (mul_f result a) b = zero }
+  raises  { Unknown -> true }
+*)
+
+val inv (a:t) : t
+  requires { not (eq a zero) }
+  ensures { mul_f result a = one }
+  ensures { not (eq result zero) }
+
+val le (a b:t) : bool
+  ensures { result <-> a <= b }
+  ensures { result -> forall y:vars. Int.(<=) (interp a y) (interp b y) }
+  raises  { Unknown -> true }
+
+clone export algebra.OrderedField with type t, function (+) = add_f, function (-_) = opp_f, function ( *) = mul_f, function inv = inv_f, constant zero = zero, constant one = one, predicate (<=) = (<=)
+
+(*FIXME equality test ? *)
+
+end
+
+module LinearEquationsDecision
+
+use import int.Int
+
+type coeff
+
+clone LinearEquationsCoeffs as C with type t = coeff
+
+type var = int
+
+type expr = Term coeff var | Add expr expr | Cst coeff
+
+let rec predicate valid_expr (e:expr)
+  variant { e }
+= match e with
+  | Term _ i -> 0 <= i
+  | Cst _ -> true
+  | Add e1 e2 -> valid_expr e1 && valid_expr e2
+  end
+
+let rec predicate expr_bound (e:expr) (b:int)
+  variant { e }
+= match e with
+  | Term _ i -> 0 <= i <= b
+  | Cst _ -> true
+  | Add e1 e2 -> expr_bound e1 b && expr_bound e2 b
+  end
+
+type vars = var -> int
+
+function interp (e:expr) (y: vars) (z:C.vars) : int
+= match e with
+  | Term c v -> (C.interp c z) * (y v)
+  | Add e1 e2 -> interp e1 y z + interp e2 y z
+  | Cst c -> C.interp c z
+  end
+
+use import bool.Bool
+use import list.List
+
+type equality = (expr, expr)
+type context = list equality
+
+let predicate valid_eq (eq:equality)
+= match eq with (e1,e2) -> valid_expr e1 && valid_expr e2 end
+
+let predicate eq_bound (eq:equality) (b:int)
+= match eq with (e1,e2) -> expr_bound e1 b && expr_bound e2 b end
+
+let rec predicate valid_ctx (ctx:context)
+= match ctx with Nil -> true | Cons eq t -> valid_eq eq && valid_ctx t end
+
+let rec predicate ctx_bound (ctx:context) (b:int)
+= match ctx with Nil -> true | Cons eq t -> eq_bound eq b && ctx_bound t b end
+
+let rec lemma expr_bound_w (e:expr) (b1 b2:int)
+  requires { b1 <= b2 }
+  requires { expr_bound e b1 }
+  ensures  { expr_bound e b2 }
+  variant  { e }
+= match e with
+  | Add e1 e2 -> expr_bound_w e1 b1 b2; expr_bound_w e2 b1 b2
+  | Cst _ -> ()
+  | Term _ _ -> ()
+  end
+
+lemma eq_bound_w: forall e:equality, b1 b2:int. eq_bound e b1 -> b1 <= b2 -> eq_bound e b2
+
+let rec lemma ctx_bound_w (l:context) (b1 b2:int)
+  requires { ctx_bound l b1 }
+  requires { b1 <= b2 }
+  ensures  { ctx_bound l b2 }
+  variant  { l }
+= match l with Nil -> () | Cons _ t -> ctx_bound_w t b1 b2 end
+
+function interp_eq (g:equality) (y:vars) (z:C.vars) : bool
+  (*TODO semantics?*)
+  = match g with (g1, g2) -> interp g1 y z = interp g2 y z end
+
+function interp_ctx (l: context) (g: equality) (y: vars) (z:C.vars) : bool
+= match l with
+  | Nil -> interp_eq g y z
+  | Cons h t->  implb (interp_eq h y z) (interp_ctx t g y z)
+  end
+
+use import array.Array
+use import matrix.Matrix
+
+let apply_r (m: matrix coeff) (v: array coeff) : array coeff
+  requires { v.length = m.columns }
+  ensures  { result.length = m.rows }
+  raises   { C.Unknown -> true }
+  (*TODO semantics*)
+= let r = Array.make m.rows C.zero in
+  for i = 0 to m.rows - 1 do
+    for j = 0 to m.columns - 1 do
+      r[i] <- C.add r[i] (C.mul (get m i j) v[j]);
+    done
+  done;
+  r
+
+let apply_l (v: array coeff) (m: matrix coeff) : array coeff
+  requires { v.length = m.rows }
+  ensures  { result.length = m.columns }
+  raises   { C.Unknown -> true }
+= let r = Array.make m.columns C.zero in
+  for j = 0 to m.columns - 1 do
+    for i = 0 to m.rows - 1 do
+      r[j] <- C.add r[j] (C.mul (get m i j) v[i]);
+    done
+  done;
+  r
+
+use import ref.Ref
+
+let sprod (a b: array coeff) : coeff
+  requires { a.length = b.length }
+  raises   { C.Unknown -> true }
+= let r = ref C.zero in
+  for i = 0 to a.length - 1 do
+    r := C.add !r (C.mul a[i] b[i]);
+  done;
+  !r
+
+let m_append (m: matrix coeff) (v:array coeff) : matrix coeff
+  requires { m.rows = v.length }
+  ensures  { result.rows = m.rows }
+  ensures  { result.columns = m.columns + 1 }
+  ensures  { forall i j. 0 <= i < m.rows -> 0 <= j < m.columns ->
+             result.elts i j = m.elts i j }
+  ensures  { forall i. 0 <= i < m.rows -> result.elts i m.columns = v[i] }
+= let r = Matrix.make m.rows (m.columns + 1) C.zero in
+  for i = 0 to m.rows - 1 do
+    invariant { forall k j. 0 <= k < i -> 0 <= j < m.columns ->
+                r.elts k j = m.elts k j }
+    invariant { forall k. 0 <= k < i -> r.elts k m.columns = v[k] }
+    for j = 0 to m.columns - 1 do
+      invariant { forall k j. 0 <= k < i -> 0 <= j < m.columns ->
+                r.elts k j = m.elts k j }
+      invariant { forall k. 0 <= k < i -> r.elts k m.columns = v[k] }
+      invariant { forall l. 0 <= l < j -> r.elts i l = m.elts i l }
+      set r i j (get m i j)
+    done;
+    set r i m.columns v[i]
+  done;
+  r
+
+let v_append (v: array coeff) (c: coeff) : array coeff
+  ensures { length result = length v + 1 }
+  ensures { forall k. 0 <= k < v.length -> result[k] = v[k] }
+  ensures { result[v.length] = c }
+= let r = Array.make (v.length + 1) c in
+  for i = 0 to v.length - 1 do
+    invariant { forall k. 0 <= k < i -> r[k] = v[k] }
+    invariant { r[v.length] = c }
+    r[i] <- v[i]
+  done;
+  r
+
+val predicate (==) (a b: array coeff)
+  ensures { result = true -> length a = length b /\
+            forall i. 0 <= i < length a -> C.eq a[i] b[i] }
+(*
+val gaussian_elim (a: matrix coeff) (b c: array coeff) (d:coeff) : bool
+  ensures { result = true -> forall x. apply_r a x == b -> sprod c x = d }
+  raises  { Unknown -> true }
+*)
+
+use import int.MinMax
+use import list.Length
+
+let rec function max_var (e:expr) : int
+  variant { e }
+  requires { valid_expr e }
+  ensures { 0 <= result }
+  ensures { expr_bound e result }
+= match e with
+  | Term _ i -> i
+  | Cst _ -> 0
+  | Add e1 e2 -> max (max_var e1) (max_var e2)
+  end
+
+let function max_var_e (e:equality) : int
+  requires { valid_eq e }
+  ensures { 0 <= result }
+  ensures { eq_bound e result }
+= match e with (e1,e2) -> max (max_var e1) (max_var e2) end
+
+let rec function max_var_ctx (l:context) : int
+  variant { l }
+  requires { valid_ctx l }
+  ensures { 0 <= result }
+  ensures { ctx_bound l result }
+= match l with
+  | Nil -> 0
+  | Cons e t -> max (max_var_e e) (max_var_ctx t)
+  end
+
+let rec function opp_expr (e:expr) : expr
+  ensures { forall y z. interp result y z = - (interp e y z) }
+  ensures { forall b. expr_bound e b -> expr_bound result b }
+  variant { e }
+= match e with
+  | Cst c -> Cst (C.opp c)
+  | Term c j -> Term (C.opp c) j
+  | Add e1 e2 -> Add (opp_expr e1) (opp_expr e2)
+  end
+
+predicate no_cst (e:expr)
+= match e with
+  | Cst c -> C.eq c C.zero
+  | Term _ _ -> true
+  | Add e1 e2 -> no_cst e1 && no_cst e2
+  end
+
+let norm_eq (e:equality) : (expr, coeff)
+  returns { (ex, c) -> forall y z.
+            interp_eq e y z -> interp_eq (ex, Cst c) y z }
+  returns { (ex, _) -> no_cst ex }
+  returns { (ex, _) -> forall b:int. eq_bound e b -> expr_bound ex b }
+  raises  { C.Unknown -> true }
+= match e with
+  | (e1, e2) ->
+    let rec aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
+      requires { no_cst acc_e }
+      returns { (rex, rc) -> forall y z.
+                interp rex y z + interp (Cst rc) y z
+                = interp ex y z + interp acc_e y z + interp (Cst acc_c) y z }
+      returns { (rex, _) -> no_cst rex }
+      returns { (rex, _) -> forall b:int. expr_bound ex b /\ expr_bound acc_e b
+                            -> expr_bound rex b }
+      raises  { C.Unknown -> true }
+      variant { ex }
+    = match ex with
+      | Cst c -> acc_e, (C.add c acc_c)
+      | Term _ _ -> (Add acc_e ex, acc_c)
+      | Add e1 e2 -> let ae, ac = aux e1 acc_e acc_c in
+                     aux e2 ae ac
+      end
+    in
+    let s = Add e1 (opp_expr e2) in
+    assert { forall b. eq_bound e b -> expr_bound s b };
+    match aux s (Cst C.zero) C.zero with
+      (e, c) -> e, C.opp c
+    end
+  end
+
+(*TODO: predicate that says that matrices a, b represent the context*)
+
+let transpose (m:matrix coeff) : matrix coeff
+  ensures { result.rows = m.columns /\ result.columns = m.rows }
+=
+  let r = Matrix.make m.columns m.rows C.zero in
+  for i = 0 to m.rows - 1 do
+    for j = 0 to m.columns - 1 do
+      set r j i (get m i j)
+    done
+  done;
+  r
+
+let swap_rows (m:matrix coeff) (i1 i2: int) : unit
+  requires { 0 <= i1 < m.rows /\ 0 <= i2 < m.rows }
+= for j = 0 to m.columns - 1 do
+    let c = get m i1 j in
+    set m i1 j (get m i2 j);
+    set m i2 j c
+  done
+
+let mul_row (m:matrix coeff) (i: int) (c: coeff) : unit
+  requires { 0 <= i < m.rows }
+  requires { not (C.eq c C.zero) }
+= for j = 0 to m.columns - 1 do
+    set m i j (C.mul c (get m i j))
+  done
+
+let addmul_row (m:matrix coeff) (src dst: int) (c: coeff) : unit
+  requires { 0 <= src < m.rows /\ 0 <= dst < m.rows }
+  raises   { C.Unknown -> true }
+= for j = 0 to m.columns - 1 do
+    set m dst j (C.add (get m dst j) (C.mul c (get m src j)))
+  done
+
+use import ref.Refint
+use import option.Option
+
+let gauss_jordan (a: matrix coeff) : option (array coeff)
+  (*AX=B, a=(A|B), result=X*)
+  returns { Some r -> Array.length r = a.columns - 1 | None -> true }
+  requires { 1 <= a.rows /\ 1 <= a.columns }
+  raises { C.Unknown -> true }
+=
+  let n = a.rows in
+  let m = a.columns in
+  let rec find_nonz i j
+    requires { 0 <= i <= n }
+    requires { 0 <= j < m }
+    variant { n-i }
+    ensures { i <= result <= n }
+    ensures { result < n -> not (C.eq (a.elts result j) C.zero) }
+  = if i >= n then n
+    else
+      if C.eq (get a i j) C.zero
+      then find_nonz (i+1) j
+      else i
+  in
+  let pivots = Array.make n 0 in
+  let r = ref (-1) in
+  for j = 0 to m-1 do
+    invariant { -1 <= !r < n }
+    invariant { forall i. 0 <= i <= !r -> 0 <= pivots[i] }
+    invariant { forall i1 i2: int. 0 <= i1 < i2 <= !r -> pivots[i1] < pivots[i2] }
+    invariant { !r >= 0 -> pivots[!r] < j }
+    label Start in
+    let k = find_nonz (!r+1) j in
+    if k < n
+    then begin
+      incr r;
+      pivots[!r] <- j;
+      mul_row a k (C.inv(get a k j));
+      if k <> !r then swap_rows a k !r;
+      for i = 0 to n-1 do
+        if i <> !r
+        then addmul_row a !r i (C.opp(get a i j))
+      done;
+    end
+  done;
+  if !r < 0 then None (* matrix is all zeroes *)
+  else if pivots[!r] >= m-1 then None (*pivot on last column, no solution*)
+  else begin
+    let v = Array.make (m-1) C.zero in
+    for i = 0 to !r do
+      v[pivots[i]] <- get a i (m-1)
+    done;
+    Some v
+  end
+
+let linear_decision (l: context) (g: equality) : bool
+  requires { valid_ctx l }
+  requires { valid_eq g }
+  (*ensures { result = true -> forall y z. interp_ctx l g y z = true }*)
+  raises  { C.Unknown -> true }
+=
+  let nv = max (max_var_e g) (max_var_ctx l) in
+  let a = Matrix.make (length l) (nv+1) C.zero in
+  let b = Array.make (length l) C.zero in      (* ax = b *)
+  let v = Array.make (nv+1) C.zero in      (* goal *)
+  let rec fill_expr (ex: expr) (i:int) : unit
+    variant { ex }
+    requires { no_cst ex }
+    raises  { C.Unknown -> true }
+    requires { 0 <= i < length l }
+    requires { expr_bound ex nv }
+  = match ex with
+    | Cst c -> if C.eq c C.zero then () else absurd
+    | Term c j -> set a i j (C.add (get a i j) c)
+    | Add e1 e2 -> fill_expr e1 i; fill_expr e2 i
+    end
+  in
+  let rec fill_ctx (ctx:context) (i:int) : unit
+    requires { ctx_bound ctx nv }
+    variant { length l - i }
+    requires { length l - i = length ctx }
+    requires { 0 <= i <= length l }
+    raises  { C.Unknown -> true }
+  = match ctx with
+    | Nil -> ()
+    | Cons e t ->
+      assert { i < length l };
+      let ex, c = norm_eq e in
+      if (not (C.eq c C.zero)) then b[i] <- C.add b[i] c;
+      fill_expr ex i;
+      fill_ctx t (i+1)
+    end
+  in
+  let rec fill_goal (ex:expr) : unit
+    requires { expr_bound ex nv }
+    variant { ex }
+    requires { no_cst ex }
+    raises { C.Unknown -> true }
+  = match ex with
+    | Cst c -> if C.eq c C.zero then () else absurd
+    | Term c j -> v[j] <- C.add v[j] c
+    | Add e1 e2 -> fill_goal e1; fill_goal e2
+    end
+  in
+  fill_ctx l 0;
+  let (ex, d) = norm_eq g in
+  fill_goal ex;
+  let ab = m_append a b in
+  let cd = v_append v d in
+  let ab' = transpose ab in
+  match gauss_jordan (m_append ab' cd) with
+    | Some r -> apply_l r a == v && C.eq (sprod r b) d
+    | None -> false
+  end
+
+end

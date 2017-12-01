@@ -251,7 +251,8 @@ type value =
   | Vint of BigInt.t
   | Vbool of bool
   | Vvoid
- (*  | Varray of value array *)
+  | Varray of value array
+  | Vmatrix of value array array
 
 and field = Fimmutable of value | Fmutable of value ref
 
@@ -264,10 +265,16 @@ let rec print_value fmt = function
   | Vconstr (rs, lf) -> fprintf fmt "Vconstr(%a, %a)"
                                 Expr.print_rs rs
                                 (Pp.print_list Pp.space print_field) lf
-
+  | Varray a -> fprintf fmt "Varray [|%a|]"
+                        (Pp.print_list Pp.space print_value) (Array.to_list a)
+  | Vmatrix m -> fprintf fmt "Vmatrix %a" print_matrix m
 and print_field fmt = function
   | Fimmutable v -> fprintf fmt "Fimmutable %a" print_value v
   | Fmutable vr -> fprintf fmt "Fmutable %a" print_value !vr
+and print_matrix fmt m =
+  Array.iter (fun a -> fprintf fmt "[|%a|]\n"
+                               (Pp.print_list Pp.space print_value)
+                               (Array.to_list a)) m
 
 let field_get f = match f with
   | Fimmutable v -> v
@@ -335,6 +342,113 @@ let eval_int_rel r _ l =
      Vbool (r i1 i2)
   | _ -> raise CannotReduce
 
+let builtin_array_type _kn _its = ()
+
+let exec_array_make _ args =
+  match args with
+    | [Vint n;def] ->
+      begin
+        try
+          let n = BigInt.to_int n in
+          let v = Varray(Array.make n def) in
+          v
+        with _ -> raise CannotReduce
+      end
+    | _ ->
+      raise CannotReduce
+
+let exec_array_copy _ args =
+  match args with
+    | [Varray a] -> Varray(Array.copy a)
+    | _ ->
+      raise CannotReduce
+
+let exec_array_get _ args =
+  match args with
+    | [Varray a;Vint i] ->
+      begin
+        try
+          a.(BigInt.to_int i)
+        with _ -> raise CannotReduce
+      end
+    | _ -> raise CannotReduce
+
+let exec_array_length _ args =
+  match args with
+    | [Varray a] -> Vint (BigInt.of_int (Array.length a))
+    | _ -> raise CannotReduce
+
+let exec_array_set _ args =
+  match args with
+    | [Varray a;Vint i;v] ->
+      begin
+        try
+          a.(BigInt.to_int i) <- v;
+          Vvoid
+        with _ -> raise CannotReduce
+      end
+    | _ -> raise CannotReduce
+
+let builtin_matrix_type _kn _its = ()
+
+let exec_matrix_make _ args =
+  match args with
+  | [Vint r; Vint c; def] ->
+     begin
+       try
+         let r = BigInt.to_int r in
+         let c = BigInt.to_int c in
+         Vmatrix(Array.make_matrix r c def)
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_matrix_get _ args =
+  match args with
+  | [Vmatrix m; Vint i; Vint j] ->
+     begin
+       try
+         m.(BigInt.to_int i).(BigInt.to_int j)
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_matrix_set _ args =
+  match args with
+  | [Vmatrix m; Vint i; Vint j; v] ->
+     begin
+       try
+         m.(BigInt.to_int i).(BigInt.to_int j) <- v;
+         Vvoid
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_matrix_rows _ args =
+  match args with
+  | [Vmatrix m] -> Vint (BigInt.of_int (Array.length m))
+  | _ -> raise CannotReduce
+
+(* FIXME fails if rows=0 *)
+let exec_matrix_cols _ args =
+  match args with
+  | [Vmatrix m] ->
+     begin
+       try Vint (BigInt.of_int (Array.length m.(0)))
+       with _ -> raise CannotReduce
+     end
+  | _ -> raise CannotReduce
+
+let exec_matrix_copy _ args =
+  match args with
+  | [Vmatrix m] ->
+     let a = Array.copy m in
+     for i = 0 to (Array.length m - 1) do
+       a.(i) <- Array.copy m.(i)
+     done;
+     Vmatrix a
+  | _ -> raise CannotReduce
+
 let built_in_modules =
   [
     ["bool"],"Bool", [],
@@ -365,15 +479,23 @@ let built_in_modules =
     [ "div", eval_int_op BigInt.euclidean_div;
       "mod", eval_int_op BigInt.euclidean_mod;
     ] ;
-    (*
-   ["array"],"Array",
+    ["array"],"Array",
     ["array", builtin_array_type],
     ["make", exec_array_make ;
      "mixfix []", exec_array_get ;
      "length", exec_array_length ;
      "mixfix []<-", exec_array_set ;
      "copy", exec_array_copy ;
-    ] ;*) (* TODO array support*)
+    ] ;
+    ["matrix"],"Matrix",
+    ["matrix", builtin_matrix_type],
+    ["make", exec_matrix_make ;
+     "get", exec_matrix_get ;
+     "rows", exec_matrix_rows ;
+     "columns", exec_matrix_cols ;
+     "set", exec_matrix_set ;
+     "copy", exec_matrix_copy ;
+    ] ;
   ]
 
 let add_builtin_mo env (l,n,t,d) =
@@ -591,6 +713,8 @@ let rec term_of_value = function
      t_app (ls_of_rs rs) (List.map (fun f -> term_of_value (field_get f)) lf)
            (ls_of_rs rs).ls_value
   | Vvoid -> t_void
+  | Varray _ -> raise CannotReduce
+  | Vmatrix _ -> raise CannotReduce
 
 (*exception FunctionNotFound*)
 
