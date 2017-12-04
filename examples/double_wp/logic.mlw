@@ -37,7 +37,7 @@ module Compiler_logic
     forall c_glob. codeseq_at c_glob p c -> transition_star c_glob ms1 ms2
 
   (* Hoare triples with explicit pre & post *)
-  type hl 'a = { code: code; ghost pre : pre {'a}; ghost post: post {'a} }
+  type hl 'a = { code: code; ghost pre : pre 'a; ghost post: post 'a }
     (* (Total) correctness for hoare triple. *)
     invariant { forall x:'a,p ms. pre x p ms ->
       exists ms'. post x p ms ms' /\ contextual_irrelevance code p ms ms' }
@@ -48,7 +48,7 @@ module Compiler_logic
   type wp_trans 'a = 'a -> pos -> pred -> pred
 
   (* Code with backward predicate transformer. *)
-  type wp 'a = { wcode : code; ghost wp : wp_trans {'a} }
+  type wp 'a = { wcode : code; ghost wp : wp_trans 'a }
     (* Similar invariant for backward predicate transformers *)
     invariant { forall x:'a,p post ms. wp x p post ms ->
       exists ms'. post ms' /\ contextual_irrelevance wcode p ms ms' }
@@ -90,7 +90,7 @@ module Compiler_logic
   (* Code combinator for conditional execution.
      Similar to WP calculus for (if cond then s). *)
 
-  let (%) (s:wp 'a) (ghost cond:pre {'a}) : wp 'a
+  let (%) (s:wp 'a) (ghost cond:pre 'a) : wp 'a
     ensures  { result.wp --> fork_wp s.wp cond }
     ensures  { result.wcode.length --> s.wcode.length }
   = { wcode = s.wcode; wp = fork_wp s.wp cond }
@@ -114,7 +114,7 @@ module Compiler_logic
   (* Equip code with pre/post-condition. That is here that proof happen.
      (P -> wp (c,Q)). Anologous to checking function/abstract block
      specification. *)
-  let hoare (ghost pre:pre {'a}) (c:wp 'a) (ghost post:post {'a}) : hl 'a
+  let hoare (ghost pre:pre 'a) (c:wp 'a) (ghost post:post 'a) : hl 'a
     requires { forall x p ms. pre x p ms -> (c.wp x p (post x p ms)) ms }
     ensures { result.pre --> pre }
     ensures { result.post --> post }
@@ -154,8 +154,8 @@ module Compiler_logic
   meta rewrite lemma loop_wp_lemma
 
   (* Code combinator for looping construct. *)
-  let make_loop (c:wp 'a) (ghost inv cont:pre {'a})
-                          (ghost var:post {'a}) : wp 'a
+  let make_loop (c:wp 'a) (ghost inv cont:pre 'a)
+                          (ghost var:post 'a) : wp 'a
     ensures { result.wp --> loop_wp c.wp inv cont var }
     ensures { result.wcode.length --> c.wcode.length }
   = let ghost wpt = loop_wp c.wp inv cont var in
