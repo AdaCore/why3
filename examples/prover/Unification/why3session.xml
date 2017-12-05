@@ -12,7 +12,7 @@
 <prover id="7" name="Spass" version="3.7" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Vampire" version="0.6" timelimit="30" steplimit="0" memlimit="1000"/>
-<file name="../Unification.mlw" proved="true">
+<file name="../Unification.mlw">
 <theory name="Types" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Logic" proved="true" sum="49f19b295ec56b99abf9291d836f58d1">
@@ -25,7 +25,7 @@
    <proof prover="1"><result status="valid" time="0.22"/></proof>
    <proof prover="2"><result status="valid" time="0.13"/></proof>
    <proof prover="6"><result status="valid" time="0.32"/></proof>
-   <proof prover="7" timelimit="5"><result status="valid" time="1.36"/></proof>
+   <proof prover="7" timelimit="5"><result status="valid" time="1.11"/></proof>
    </goal>
   </transf>
   </goal>
@@ -35,7 +35,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" proved="true" sum="26528a038a2f071b3a4a0f93d9c053df">
+<theory name="Impl" sum="e64374a367f6b6688efb50a47b2cd9ea">
  <goal name="WP_parameter bottomvar" expl="VC for bottomvar" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter bottomvar.0" expl="assertion" proved="true">
@@ -198,7 +198,7 @@
   <proof prover="1"><result status="valid" time="0.54"/></proof>
   </goal>
   <goal name="WP_parameter assign.3" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.46"/></proof>
+  <proof prover="1"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter assign.4" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="11"/></proof>
@@ -216,7 +216,7 @@
   <proof prover="5"><result status="valid" time="0.10" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter assign.9" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="4.22"/></proof>
+  <proof prover="6"><result status="valid" time="3.11"/></proof>
   </goal>
   <goal name="WP_parameter assign.10" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
@@ -234,7 +234,7 @@
    <proof prover="5"><result status="valid" time="0.13" steps="37"/></proof>
    </goal>
    <goal name="WP_parameter assign.10.4" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.70"/></proof>
+   <proof prover="1"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="WP_parameter assign.10.5" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.12" steps="35"/></proof>
@@ -373,7 +373,7 @@
    <proof prover="5"><result status="valid" time="0.14" steps="56"/></proof>
    </goal>
    <goal name="WP_parameter assign.19.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.50"/></proof>
+   <proof prover="1"><result status="valid" time="0.34"/></proof>
    <proof prover="5"><result status="valid" time="0.17" steps="57"/></proof>
    </goal>
    <goal name="WP_parameter assign.19.2" expl="assertion" proved="true">
@@ -461,7 +461,7 @@
    <proof prover="5"><result status="valid" time="0.20" steps="101"/></proof>
    </goal>
    <goal name="WP_parameter assign.23.4" expl="VC for assign" proved="true">
-   <proof prover="5"><result status="valid" time="1.80" steps="191"/></proof>
+   <proof prover="5"><result status="valid" time="1.47" steps="191"/></proof>
    </goal>
    <goal name="WP_parameter assign.23.5" expl="VC for assign" proved="true">
    <proof prover="5"><result status="valid" time="0.17" steps="314"/></proof>
@@ -547,7 +547,7 @@
    <proof prover="5"><result status="valid" time="0.16" steps="56"/></proof>
    </goal>
    <goal name="WP_parameter assign.26.8" expl="VC for assign" proved="true">
-   <proof prover="4"><result status="valid" time="2.02"/></proof>
+   <proof prover="4"><result status="valid" time="1.71"/></proof>
    <proof prover="5"><result status="valid" time="0.18" steps="88"/></proof>
    </goal>
    <goal name="WP_parameter assign.26.9" expl="VC for assign" proved="true">
@@ -565,7 +565,7 @@
    <proof prover="5"><result status="valid" time="0.22" steps="424"/></proof>
    </goal>
    <goal name="WP_parameter assign.27.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.35" steps="424"/></proof>
+   <proof prover="5"><result status="valid" time="0.21" steps="424"/></proof>
    </goal>
    <goal name="WP_parameter assign.27.3" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.20" steps="82"/></proof>
@@ -595,7 +595,7 @@
   <proof prover="5"><result status="valid" time="0.54" steps="1176"/></proof>
   </goal>
   <goal name="WP_parameter assign.29" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.84"/></proof>
+  <proof prover="1"><result status="valid" time="0.63"/></proof>
   </goal>
   <goal name="WP_parameter assign.30" expl="postcondition" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -636,7 +636,7 @@
   <proof prover="5"><result status="valid" time="0.12" steps="4"/></proof>
   </goal>
   <goal name="WP_parameter assign.33" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.67"/></proof>
+  <proof prover="3"><result status="valid" time="0.48"/></proof>
   </goal>
   <goal name="WP_parameter assign.34" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="60"/></proof>
@@ -695,7 +695,7 @@
   <proof prover="1"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.11" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.76"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.12" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="29"/></proof>
@@ -704,7 +704,7 @@
   <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.14" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="4.02"/></proof>
+  <proof prover="7"><result status="valid" time="3.24"/></proof>
   <proof prover="8"><result status="valid" time="0.33"/></proof>
   <proof prover="10"><result status="valid" time="0.12"/></proof>
   </goal>
@@ -715,7 +715,7 @@
   <proof prover="5"><result status="valid" time="0.17" steps="110"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="1.69"/></proof>
+  <proof prover="1"><result status="valid" time="1.40"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.18" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.29"/></proof>
@@ -724,7 +724,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.20" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="2.77"/></proof>
+  <proof prover="1"><result status="valid" time="2.10"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.21" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="102"/></proof>
@@ -745,7 +745,7 @@
   <proof prover="5"><result status="valid" time="0.10" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.27" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.60"/></proof>
+  <proof prover="3"><result status="valid" time="0.43"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.28" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="234"/></proof>
@@ -870,7 +870,7 @@
   <proof prover="5"><result status="valid" time="0.24" steps="372"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.68" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.61"/></proof>
+  <proof prover="3"><result status="valid" time="0.43"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.69" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="402"/></proof>
@@ -1412,7 +1412,7 @@
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.248" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="2.44"/></proof>
+  <proof prover="1"><result status="valid" time="1.80"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.249" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
@@ -1421,9 +1421,9 @@
   <proof prover="5"><result status="valid" time="0.13" steps="129"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.251" expl="precondition" proved="true">
-  <proof prover="1" timelimit="30"><result status="valid" time="3.62"/></proof>
-  <proof prover="6" timelimit="30"><result status="valid" time="17.85"/></proof>
-  <proof prover="7"><result status="valid" time="12.51"/></proof>
+  <proof prover="1" timelimit="30"><result status="valid" time="2.70"/></proof>
+  <proof prover="6" timelimit="30"><result status="valid" time="11.68"/></proof>
+  <proof prover="7"><result status="valid" time="9.33"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.252" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="40"/></proof>
@@ -1438,13 +1438,13 @@
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.256" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.19" steps="39"/></proof>
+  <proof prover="5"><result status="valid" time="0.07" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.257" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="64"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.258" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.72"/></proof>
+  <proof prover="6"><result status="valid" time="1.21"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.259" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="39"/></proof>
@@ -1459,7 +1459,7 @@
   <proof prover="5"><result status="valid" time="0.11" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.263" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.18" steps="39"/></proof>
+  <proof prover="5"><result status="valid" time="0.06" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.264" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="29"/></proof>
@@ -1498,7 +1498,7 @@
   <proof prover="5"><result status="valid" time="0.13" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.276" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.58"/></proof>
+  <proof prover="6"><result status="valid" time="1.24"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.277" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="31"/></proof>
@@ -1507,7 +1507,7 @@
   <proof prover="5"><result status="valid" time="0.38" steps="465"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.279" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.54"/></proof>
+  <proof prover="1"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.280" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="31"/></proof>
@@ -1600,7 +1600,7 @@
   <proof prover="1"><result status="valid" time="0.53"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.310" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.70"/></proof>
+  <proof prover="1"><result status="valid" time="0.50"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.311" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="42"/></proof>
@@ -1660,7 +1660,7 @@
   <proof prover="5"><result status="valid" time="0.21" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.330" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="2.51"/></proof>
+  <proof prover="1"><result status="valid" time="1.98"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.331" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="25"/></proof>
@@ -1669,7 +1669,7 @@
   <proof prover="5"><result status="valid" time="0.12" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.333" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.48"/></proof>
+  <proof prover="1"><result status="valid" time="2.64"/></proof>
   </goal>
   <goal name="WP_parameter unification_term.334" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.19" steps="128"/></proof>
@@ -1853,7 +1853,7 @@
   <proof prover="1"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.26"/></proof>
+  <proof prover="3"><result status="valid" time="0.92"/></proof>
   <proof prover="5"><result status="valid" time="0.12" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.10" expl="postcondition" proved="true">
@@ -1876,19 +1876,19 @@
   <proof prover="5"><result status="valid" time="0.20" steps="218"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.57"/></proof>
+  <proof prover="3"><result status="valid" time="0.41"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.15" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.58"/></proof>
+  <proof prover="3"><result status="valid" time="0.40"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.16" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.17" steps="16"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.91"/></proof>
+  <proof prover="1"><result status="valid" time="0.66"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.18" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.91"/></proof>
+  <proof prover="1"><result status="valid" time="0.67"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.19" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="31"/></proof>
@@ -1897,7 +1897,7 @@
   <proof prover="5"><result status="valid" time="0.14" steps="179"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.21" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.45" steps="1809"/></proof>
+  <proof prover="5"><result status="valid" time="1.09" steps="1809"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.22" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.17" steps="257"/></proof>
@@ -1909,7 +1909,7 @@
   <proof prover="1"><result status="valid" time="0.31"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.25" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.60"/></proof>
+  <proof prover="8"><result status="valid" time="0.44"/></proof>
   </goal>
   <goal name="WP_parameter unification_term_list.26" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.61"/></proof>
@@ -2018,7 +2018,7 @@
     <proof prover="5"><result status="valid" time="0.08" steps="45"/></proof>
     </goal>
     <goal name="WP_parameter conflict.11.0.4" expl="VC for conflict" proved="true">
-    <proof prover="1"><result status="valid" time="0.90"/></proof>
+    <proof prover="1"><result status="valid" time="0.62"/></proof>
     </goal>
     <goal name="WP_parameter conflict.11.0.5" expl="VC for conflict" proved="true">
     <proof prover="5"><result status="valid" time="0.09" steps="47"/></proof>
@@ -2034,7 +2034,7 @@
   <proof prover="5"><result status="valid" time="0.11" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter conflict.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.66"/></proof>
+  <proof prover="3"><result status="valid" time="0.45"/></proof>
   </goal>
   <goal name="WP_parameter conflict.14" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="49"/></proof>
@@ -2042,10 +2042,10 @@
   <goal name="WP_parameter conflict.15" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter conflict.15.0" expl="VC for conflict" proved="true">
-   <proof prover="1" timelimit="30"><result status="valid" time="5.20"/></proof>
-   <proof prover="6" timelimit="30"><result status="valid" time="6.61"/></proof>
-   <proof prover="7"><result status="valid" time="6.42"/></proof>
-   <proof prover="8"><result status="valid" time="8.34"/></proof>
+   <proof prover="1" timelimit="30"><result status="valid" time="3.82"/></proof>
+   <proof prover="6" timelimit="30"><result status="valid" time="4.64"/></proof>
+   <proof prover="7"><result status="valid" time="4.97"/></proof>
+   <proof prover="8"><result status="valid" time="5.70"/></proof>
    </goal>
    <goal name="WP_parameter conflict.15.1" expl="VC for conflict" proved="true">
    <proof prover="4"><result status="valid" time="0.27"/></proof>
@@ -2057,13 +2057,13 @@
    <proof prover="5"><result status="valid" time="0.15" steps="72"/></proof>
    </goal>
    <goal name="WP_parameter conflict.15.4" expl="VC for conflict" proved="true">
-   <proof prover="1"><result status="valid" time="2.10"/></proof>
+   <proof prover="1"><result status="valid" time="1.52"/></proof>
    </goal>
    <goal name="WP_parameter conflict.15.5" expl="VC for conflict" proved="true">
    <proof prover="5"><result status="valid" time="0.17" steps="73"/></proof>
    </goal>
    <goal name="WP_parameter conflict.15.6" expl="VC for conflict" proved="true">
-   <proof prover="1"><result status="valid" time="1.38"/></proof>
+   <proof prover="1"><result status="valid" time="0.94"/></proof>
    </goal>
    <goal name="WP_parameter conflict.15.7" expl="VC for conflict" proved="true">
    <proof prover="5"><result status="valid" time="0.10" steps="149"/></proof>
@@ -2091,13 +2091,13 @@
   <goal name="WP_parameter conflict.16" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter conflict.16.0" expl="VC for conflict" proved="true">
-   <proof prover="1"><result status="valid" time="0.62"/></proof>
+   <proof prover="1"><result status="valid" time="0.40"/></proof>
    </goal>
    <goal name="WP_parameter conflict.16.1" expl="VC for conflict" proved="true">
    <proof prover="1"><result status="valid" time="0.41"/></proof>
    </goal>
    <goal name="WP_parameter conflict.16.2" expl="VC for conflict" proved="true">
-   <proof prover="5"><result status="valid" time="1.01" steps="984"/></proof>
+   <proof prover="5"><result status="valid" time="0.72" steps="984"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2111,7 +2111,7 @@
     <goal name="WP_parameter conflict.17.0.1" expl="VC for conflict" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="WP_parameter conflict.17.0.1.0" expl="VC for conflict" proved="true">
-     <proof prover="1"><result status="valid" time="2.79"/></proof>
+     <proof prover="1"><result status="valid" time="2.14"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2183,58 +2183,58 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter conflicts" expl="VC for conflicts" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <goal name="WP_parameter conflicts" expl="VC for conflicts">
+ <transf name="split_goal_wp" >
   <goal name="WP_parameter conflicts.0" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter conflicts.1" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.2" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="60"/></proof>
-  </goal>
-  <goal name="WP_parameter conflicts.3" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.2" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.4" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.3" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.09" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.5" expl="postcondition" proved="true">
+  <goal name="WP_parameter conflicts.4" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.6" expl="postcondition" proved="true">
+  <goal name="WP_parameter conflicts.5" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.7" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter conflicts.6" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.8" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.7" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.9" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.8" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.10" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="73"/></proof>
-  </goal>
-  <goal name="WP_parameter conflicts.11" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.9" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="47"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.12" expl="precondition" proved="true">
+  <goal name="WP_parameter conflicts.10" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.13" expl="postcondition" proved="true">
+  <goal name="WP_parameter conflicts.11" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.14" expl="postcondition" proved="true">
+  <goal name="WP_parameter conflicts.12" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.15" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter conflicts.13" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.16" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter conflicts.14" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.09" steps="13"/></proof>
+  </goal>
+  <goal name="WP_parameter conflicts.10">
+  <proof prover="5" obsolete="true"><result status="valid" time="0.14" steps="73"/></proof>
+  </goal>
+  <goal name="WP_parameter conflicts.2">
+  <proof prover="5" obsolete="true"><result status="valid" time="0.14" steps="60"/></proof>
   </goal>
  </transf>
  </goal>

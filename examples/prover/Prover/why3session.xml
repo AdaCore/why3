@@ -7,17 +7,17 @@
 <prover id="4" name="Z3" version="4.3.1" timelimit="20" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="20" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Prover.mlw" proved="true">
+<file name="../Prover.mlw">
 <theory name="Types" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Logic" proved="true" sum="ace7d1c8d0de42163b1a6dc24c1c2e0a">
  <goal name="WP_parameter is_atom_subst" expl="VC for is_atom_subst" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter is_atom_subst.0" expl="postcondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.40" steps="224"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="224"/></proof>
   </goal>
   <goal name="WP_parameter is_atom_subst.1" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.94"/></proof>
+  <proof prover="6"><result status="valid" time="0.74"/></proof>
   </goal>
   <goal name="WP_parameter is_atom_subst.2" expl="unreachable point" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="196"/></proof>
@@ -49,7 +49,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="13"/></proof>
   </goal>
   <goal name="WP_parameter is_procedure_tableau_subst.1" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="15"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.11" steps="15"/></proof>
   </goal>
   <goal name="WP_parameter is_procedure_tableau_subst.2" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="21"/></proof>
@@ -60,11 +60,11 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" proved="true" sum="0c854b49d19aab7b868447182dd2e2df">
+<theory name="Impl" sum="8c4866f4d9efa2c75f03233d0360c84c">
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter merge.0" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="14"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.12" steps="14"/></proof>
   </goal>
   <goal name="WP_parameter merge.1" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="17"/></proof>
@@ -79,7 +79,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter merge.5" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.53" steps="314"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="314"/></proof>
   </goal>
   <goal name="WP_parameter merge.6" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="135"/></proof>
@@ -187,7 +187,7 @@
   <goal name="WP_parameter contract_tableau.17" expl="postcondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter contract_tableau.17.0" expl="VC for contract_tableau" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.61" steps="796"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.44" steps="796"/></proof>
    </goal>
    <goal name="WP_parameter contract_tableau.17.1" expl="VC for contract_tableau" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.33" steps="442"/></proof>
@@ -207,7 +207,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.50" steps="314"/></proof>
   </goal>
   <goal name="WP_parameter contract_tableau.19" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.48" steps="355"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="355"/></proof>
   </goal>
   <goal name="WP_parameter contract_tableau.20" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="231"/></proof>
@@ -226,8 +226,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter branch_conflict_atom" expl="VC for branch_conflict_atom" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <goal name="WP_parameter branch_conflict_atom" expl="VC for branch_conflict_atom">
+ <transf name="split_goal_wp" >
   <goal name="WP_parameter branch_conflict_atom.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="15"/></proof>
   </goal>
@@ -261,113 +261,113 @@
   <goal name="WP_parameter branch_conflict_atom.10" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.11" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="110"/></proof>
-  </goal>
-  <goal name="WP_parameter branch_conflict_atom.12" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.11" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.13" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.12" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.20" steps="174"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.14" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.13" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.40" steps="296"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.15" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.14" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.21" steps="193"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.16" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.15" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.17" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.16" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="173"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.18" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.17" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="70"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.19" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.18" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.20" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.19" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="68"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.21" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.20" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.22" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.29" steps="101"/></proof>
-  </goal>
-  <goal name="WP_parameter branch_conflict_atom.23" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.21" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.24" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.22" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="161"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.25" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.23" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="238"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.26" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.24" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="179"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.27" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.25" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.28" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.26" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="160"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.29" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.27" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.30" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.28" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.31" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.29" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.32" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="93"/></proof>
-  </goal>
-  <goal name="WP_parameter branch_conflict_atom.33" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.30" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.34" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.31" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.20" steps="199"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.35" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.32" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.37" steps="255"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.36" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.33" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.21" steps="220"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.37" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.34" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.38" expl="precondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.35" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.30" steps="198"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.39" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.36" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.40" expl="postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.37" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.41" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.38" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter branch_conflict_atom.42" expl="unreachable point" proved="true">
+  <goal name="WP_parameter branch_conflict_atom.39" expl="unreachable point" proved="true">
   <transf name="eliminate_recursion" proved="true" >
-   <goal name="WP_parameter branch_conflict_atom.42.0" expl="unreachable point" proved="true">
+   <goal name="WP_parameter branch_conflict_atom.39.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
-    <goal name="WP_parameter branch_conflict_atom.42.0.0" expl="unreachable point" proved="true">
+    <goal name="WP_parameter branch_conflict_atom.39.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
-     <goal name="WP_parameter branch_conflict_atom.42.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5" timelimit="5"><result status="valid" time="1.93" steps="3964"/></proof>
+     <goal name="WP_parameter branch_conflict_atom.39.0.0.0" expl="unreachable point" proved="true">
+     <proof prover="5" timelimit="5"><result status="valid" time="1.63" steps="3964"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
   </transf>
+  </goal>
+  <goal name="WP_parameter branch_conflict_atom.11">
+  <proof prover="5" timelimit="5" obsolete="true"><result status="valid" time="0.32" steps="110"/></proof>
+  </goal>
+  <goal name="WP_parameter branch_conflict_atom.32">
+  <proof prover="5" timelimit="5" obsolete="true"><result status="valid" time="0.27" steps="93"/></proof>
+  </goal>
+  <goal name="WP_parameter branch_conflict_atom.22">
+  <proof prover="5" timelimit="5" obsolete="true"><result status="valid" time="0.29" steps="101"/></proof>
   </goal>
  </transf>
  </goal>
@@ -453,7 +453,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter branch_conflict_neg_atom.23" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="31"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter branch_conflict_neg_atom.24" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="460"/></proof>
@@ -526,8 +526,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter clause_conflicts" expl="VC for clause_conflicts" proved="true">
- <transf name="split_goal_wp" proved="true" >
+ <goal name="WP_parameter clause_conflicts" expl="VC for clause_conflicts">
+ <transf name="split_goal_wp" >
   <goal name="WP_parameter clause_conflicts.0" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="16"/></proof>
   </goal>
@@ -565,7 +565,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.20" steps="179"/></proof>
   </goal>
   <goal name="WP_parameter clause_conflicts.12" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="27"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter clause_conflicts.13" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="161"/></proof>
@@ -576,118 +576,112 @@
   <goal name="WP_parameter clause_conflicts.15" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.11" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.16" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="81"/></proof>
-  </goal>
-  <goal name="WP_parameter clause_conflicts.17" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.16" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="192"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.18" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.17" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="174"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.19" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.18" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.37" steps="315"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.20" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.19" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.30" steps="175"/></proof>
   </goal>
+  <goal name="WP_parameter clause_conflicts.20" expl="precondition" proved="true">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="31"/></proof>
+  </goal>
   <goal name="WP_parameter clause_conflicts.21" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="31"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
   </goal>
   <goal name="WP_parameter clause_conflicts.22" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.23" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
-  </goal>
-  <goal name="WP_parameter clause_conflicts.24" expl="postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.23" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="75"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.25" expl="postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.24" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.26" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.25" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="73"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.27" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.26" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.28" expl="assertion" proved="true">
+  <goal name="WP_parameter clause_conflicts.27" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.36" steps="666"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.29" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.28" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.45" steps="617"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.30" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.29" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.51" steps="977"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.31" expl="assertion" proved="true">
+  <goal name="WP_parameter clause_conflicts.30" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.88" steps="1706"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.32" expl="assertion" proved="true">
+  <goal name="WP_parameter clause_conflicts.31" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="68"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.33" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.32" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.46" steps="845"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.34" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.33" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.35" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.34" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.36" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.35" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="455"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.37" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.36" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.38" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.37" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.39" expl="variant decrease" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="102"/></proof>
-  </goal>
-  <goal name="WP_parameter clause_conflicts.40" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.38" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.34" steps="503"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.41" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.39" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="474"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.42" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.40" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.40" steps="409"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.43" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.41" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="475"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.44" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.42" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.45" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.43" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.46" expl="precondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.44" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.47" expl="postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.45" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="84"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.48" expl="postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.46" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.49" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.47" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="82"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.50" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter clause_conflicts.48" expl="exceptional postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter clause_conflicts.51" expl="unreachable point" proved="true">
+  <goal name="WP_parameter clause_conflicts.49" expl="unreachable point" proved="true">
   <transf name="eliminate_recursion" proved="true" >
-   <goal name="WP_parameter clause_conflicts.51.0" expl="unreachable point" proved="true">
+   <goal name="WP_parameter clause_conflicts.49.0" expl="unreachable point" proved="true">
    <transf name="eliminate_algebraic" proved="true" >
-    <goal name="WP_parameter clause_conflicts.51.0.0" expl="unreachable point" proved="true">
+    <goal name="WP_parameter clause_conflicts.49.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
-     <goal name="WP_parameter clause_conflicts.51.0.0.0" expl="unreachable point" proved="true">
+     <goal name="WP_parameter clause_conflicts.49.0.0.0" expl="unreachable point" proved="true">
      <proof prover="5" timelimit="5"><result status="valid" time="2.07" steps="6255"/></proof>
      </goal>
     </transf>
@@ -696,8 +690,14 @@
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter clause_conflicts.52" expl="unreachable point" proved="true">
+  <goal name="WP_parameter clause_conflicts.50" expl="unreachable point" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="1.37" steps="2571"/></proof>
+  </goal>
+  <goal name="WP_parameter clause_conflicts.39">
+  <proof prover="5" timelimit="5" obsolete="true"><result status="valid" time="0.31" steps="102"/></proof>
+  </goal>
+  <goal name="WP_parameter clause_conflicts.16">
+  <proof prover="5" timelimit="5" obsolete="true"><result status="valid" time="0.28" steps="81"/></proof>
   </goal>
  </transf>
  </goal>
@@ -713,7 +713,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="66"/></proof>
   </goal>
   <goal name="WP_parameter decompose.3" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="65"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="65"/></proof>
   </goal>
   <goal name="WP_parameter decompose.4" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.54" steps="696"/></proof>
@@ -1038,7 +1038,7 @@
   <goal name="WP_parameter decompose.102" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter decompose.102.0" expl="VC for decompose" proved="true">
-   <proof prover="6" timelimit="20"><result status="valid" time="4.10"/></proof>
+   <proof prover="6" timelimit="20"><result status="valid" time="3.36"/></proof>
    </goal>
    <goal name="WP_parameter decompose.102.1" expl="VC for decompose" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.85" steps="1681"/></proof>
@@ -1049,18 +1049,18 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="211"/></proof>
   </goal>
   <goal name="WP_parameter decompose.104" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.47" steps="380"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="380"/></proof>
   </goal>
   <goal name="WP_parameter decompose.105" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="4.39" steps="6102"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="2.60" steps="6102"/></proof>
   </goal>
   <goal name="WP_parameter decompose.106" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter decompose.106.0" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.42" steps="394"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="394"/></proof>
    </goal>
    <goal name="WP_parameter decompose.106.1" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.64" steps="465"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.43" steps="465"/></proof>
    </goal>
    <goal name="WP_parameter decompose.106.2" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="86"/></proof>
@@ -1069,10 +1069,10 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="88"/></proof>
    </goal>
    <goal name="WP_parameter decompose.106.4" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.62" steps="418"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.40" steps="418"/></proof>
    </goal>
    <goal name="WP_parameter decompose.106.5" expl="assertion" proved="true">
-   <proof prover="6" timelimit="20"><result status="valid" time="10.57"/></proof>
+   <proof prover="6" timelimit="20"><result status="valid" time="8.11"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1085,7 +1085,7 @@
    <proof prover="5"><result status="valid" time="0.15" steps="49"/></proof>
    </goal>
    <goal name="WP_parameter decompose.107.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="1.39" steps="821"/></proof>
+   <proof prover="5"><result status="valid" time="1.05" steps="821"/></proof>
    </goal>
    <goal name="WP_parameter decompose.107.3" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.15" steps="49"/></proof>
@@ -1100,7 +1100,7 @@
    <proof prover="5"><result status="valid" time="0.17" steps="90"/></proof>
    </goal>
    <goal name="WP_parameter decompose.107.7" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="1.39" steps="822"/></proof>
+   <proof prover="5"><result status="valid" time="1.02" steps="822"/></proof>
    </goal>
    <goal name="WP_parameter decompose.107.8" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.31" steps="391"/></proof>
@@ -1132,7 +1132,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter decompose.115" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.45" steps="340"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="340"/></proof>
   </goal>
   <goal name="WP_parameter decompose.116" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="45"/></proof>
@@ -1183,7 +1183,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="85"/></proof>
   </goal>
   <goal name="WP_parameter decompose.132" expl="precondition" proved="true">
-  <proof prover="6" timelimit="20"><result status="valid" time="3.42"/></proof>
+  <proof prover="6" timelimit="20"><result status="valid" time="2.84"/></proof>
   </goal>
   <goal name="WP_parameter decompose.133" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="92"/></proof>
@@ -1216,7 +1216,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.143" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="32"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.144" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="118"/></proof>
@@ -1246,13 +1246,13 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.153" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.53" steps="537"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.36" steps="537"/></proof>
   </goal>
   <goal name="WP_parameter decompose.154" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.155" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="32"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.156" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="32"/></proof>
@@ -1276,7 +1276,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter decompose.163" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="1.03" steps="1174"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.62" steps="1174"/></proof>
   </goal>
   <goal name="WP_parameter decompose.164" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
@@ -1318,7 +1318,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.177" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="32"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.178" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
@@ -1327,7 +1327,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter decompose.180" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.63" steps="614"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.43" steps="614"/></proof>
   </goal>
   <goal name="WP_parameter decompose.181" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="32"/></proof>
@@ -1382,7 +1382,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.7" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="37"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.8" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="131"/></proof>
@@ -1397,31 +1397,31 @@
   <proof prover="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="37"/></proof>
+  <proof prover="5"><result status="valid" time="0.26" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.13" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="131"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.14" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.76" steps="339"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.55" steps="339"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.15" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="37"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.16" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.17" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.18" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
-  </goal>
-  <goal name="WP_parameter decompose_literal.19" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
+  <goal name="WP_parameter decompose_literal.19" expl="precondition" proved="true">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="37"/></proof>
+  </goal>
   <goal name="WP_parameter decompose_literal.20" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="37"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.21" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="165"/></proof>
@@ -1439,10 +1439,10 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.26" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.72" steps="1258"/></proof>
+  <proof prover="5"><result status="valid" time="1.30" steps="1258"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.27" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="1.47" steps="565"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="1.12" steps="565"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.28" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.25" steps="252"/></proof>
@@ -1460,19 +1460,19 @@
   <proof prover="5"><result status="valid" time="0.19" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.33" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="5.84" steps="2799"/></proof>
+  <proof prover="5"><result status="valid" time="4.88" steps="2799"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.34" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.37"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.35" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.89" steps="1128"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.69" steps="1128"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.36" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.27" steps="91"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.37" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.66" steps="941"/></proof>
+  <proof prover="5"><result status="valid" time="0.49" steps="941"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.38" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="48"/></proof>
@@ -1496,7 +1496,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.45" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.95" steps="695"/></proof>
+  <proof prover="5"><result status="valid" time="0.75" steps="695"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.46" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="48"/></proof>
@@ -1508,7 +1508,7 @@
   <proof prover="5"><result status="valid" time="0.23" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.49" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.80" steps="1071"/></proof>
+  <proof prover="5"><result status="valid" time="0.57" steps="1071"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.50" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.23" steps="263"/></proof>
@@ -1559,16 +1559,16 @@
   <proof prover="5"><result status="valid" time="0.18" steps="91"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.66" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.72" steps="905"/></proof>
+  <proof prover="5"><result status="valid" time="0.49" steps="905"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.67" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.42" steps="1989"/></proof>
+  <proof prover="5"><result status="valid" time="0.98" steps="1989"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.68" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.69" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.81" steps="1090"/></proof>
+  <proof prover="5"><result status="valid" time="0.55" steps="1090"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.70" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="53"/></proof>
@@ -1589,10 +1589,10 @@
   <proof prover="5"><result status="valid" time="0.40" steps="610"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.76" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.28" steps="53"/></proof>
+  <proof prover="5"><result status="valid" time="0.15" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.77" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.32" steps="1165"/></proof>
+  <proof prover="5"><result status="valid" time="1.00" steps="1165"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.78" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="53"/></proof>
@@ -1604,7 +1604,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.81" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.88" steps="1215"/></proof>
+  <proof prover="5"><result status="valid" time="0.62" steps="1215"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.82" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.36" steps="645"/></proof>
@@ -1613,7 +1613,7 @@
   <proof prover="5"><result status="valid" time="0.24" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.84" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.28" steps="53"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="53"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.85" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="53"/></proof>
@@ -1634,7 +1634,7 @@
   <proof prover="5"><result status="valid" time="0.18" steps="101"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.91" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.61" steps="696"/></proof>
+  <proof prover="5"><result status="valid" time="0.42" steps="696"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.92" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="107"/></proof>
@@ -1649,7 +1649,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="59"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.96" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="6.81" steps="8633"/></proof>
+  <proof prover="5"><result status="valid" time="4.05" steps="8633"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.97" expl="unreachable point" proved="true">
   <transf name="eliminate_recursion" proved="true" >
@@ -1658,7 +1658,7 @@
     <goal name="WP_parameter decompose_literal.97.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter decompose_literal.97.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5"><result status="valid" time="2.74" steps="4419"/></proof>
+     <proof prover="5"><result status="valid" time="2.19" steps="4419"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1667,7 +1667,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter decompose_literal.98" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.68" steps="1214"/></proof>
+  <proof prover="5"><result status="valid" time="1.15" steps="1214"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.99" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="61"/></proof>
@@ -1679,7 +1679,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.102" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="1.63" steps="1263"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="1.27" steps="1263"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.103" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="33"/></proof>
@@ -1724,7 +1724,7 @@
   <proof prover="5"><result status="valid" time="0.24" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.117" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.13" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.118" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="33"/></proof>
@@ -1739,7 +1739,7 @@
   <proof prover="5"><result status="valid" time="0.18" steps="142"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.122" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.51" steps="661"/></proof>
+  <proof prover="5"><result status="valid" time="1.11" steps="661"/></proof>
   </goal>
   <goal name="WP_parameter decompose_literal.123" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.30" steps="143"/></proof>
@@ -1776,7 +1776,7 @@
   <proof prover="5"><result status="valid" time="0.14" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.2" expl="assertion" proved="true">
-  <proof prover="1" timelimit="5"><result status="valid" time="1.54"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="1.08"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.3" expl="assertion" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.34"/></proof>
@@ -1785,13 +1785,13 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.13" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.5" expl="assertion" proved="true">
-  <proof prover="1" timelimit="30"><result status="valid" time="0.58"/></proof>
+  <proof prover="1" timelimit="30"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.6" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="420"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.7" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.68" steps="714"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.50" steps="714"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.8" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="287"/></proof>
@@ -1800,19 +1800,19 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.25" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.10" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.63" steps="796"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.45" steps="796"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.11" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="77"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.12" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.64" steps="696"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.46" steps="696"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.13" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.76" steps="1090"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.57" steps="1090"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.14" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="1.48" steps="1913"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="1.05" steps="1913"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.15" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="91"/></proof>
@@ -1827,7 +1827,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="451"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.19" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.73" steps="930"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.54" steps="930"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.20" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.32" steps="482"/></proof>
@@ -1836,13 +1836,13 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="46"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.22" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="52"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.23" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.35" steps="489"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.24" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.52" steps="462"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.35" steps="462"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.25" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.37" steps="521"/></proof>
@@ -1854,7 +1854,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.36" steps="488"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.28" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.53" steps="501"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.38" steps="501"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.29" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="56"/></proof>
@@ -1863,7 +1863,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.31" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.52" steps="501"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.34" steps="501"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.32" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="56"/></proof>
@@ -1872,7 +1872,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.21" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.34" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="56"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.15" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.35" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="126"/></proof>
@@ -1911,13 +1911,13 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.20" steps="127"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.36.9" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="5.62" steps="2530"/></proof>
+   <proof prover="5"><result status="valid" time="4.46" steps="2530"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.36.10" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="4.54" steps="2096"/></proof>
+   <proof prover="5"><result status="valid" time="3.69" steps="2096"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.36.11" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="2.55"/></proof>
+   <proof prover="1"><result status="valid" time="2.18"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.36.12" expl="assertion" proved="true">
    <proof prover="5"><result status="valid" time="0.72" steps="1089"/></proof>
@@ -1945,10 +1945,10 @@
   <goal name="WP_parameter contradiction_atom.43" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter contradiction_atom.43.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="1.36" steps="2025"/></proof>
+   <proof prover="5"><result status="valid" time="1.03" steps="2025"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.43.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="1.57"/></proof>
+   <proof prover="1"><result status="valid" time="1.18"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1961,10 +1961,10 @@
   <goal name="WP_parameter contradiction_atom.46" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter contradiction_atom.46.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="3.38" steps="5159"/></proof>
+   <proof prover="5"><result status="valid" time="2.46" steps="5159"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_atom.46.1" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="4.78" steps="3677"/></proof>
+   <proof prover="5"><result status="valid" time="3.71" steps="3677"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1978,10 +1978,10 @@
   <proof prover="5"><result status="valid" time="0.64" steps="692"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.50" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.37" steps="1978"/></proof>
+  <proof prover="5"><result status="valid" time="1.00" steps="1978"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.51" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="3.63" steps="2059"/></proof>
+  <proof prover="5"><result status="valid" time="2.80" steps="2059"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.52" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.17" steps="62"/></proof>
@@ -2031,19 +2031,19 @@
   <proof prover="5"><result status="valid" time="0.18" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.63" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.67" steps="701"/></proof>
+  <proof prover="5"><result status="valid" time="0.45" steps="701"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.64" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.44" steps="2011"/></proof>
+  <proof prover="5"><result status="valid" time="1.01" steps="2011"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.65" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="4.04" steps="2078"/></proof>
+  <proof prover="5"><result status="valid" time="2.89" steps="2078"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.66" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.28" steps="62"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.67" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.65" steps="698"/></proof>
+  <proof prover="5"><result status="valid" time="0.46" steps="698"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.68" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.28" steps="62"/></proof>
@@ -2071,7 +2071,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_atom.74" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.81" steps="770"/></proof>
+  <proof prover="5"><result status="valid" time="0.58" steps="770"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.75" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="67"/></proof>
@@ -2081,10 +2081,10 @@
    <goal name="WP_parameter contradiction_atom.76.0" expl="assertion" proved="true">
    <transf name="split_goal_wp" proved="true" >
     <goal name="WP_parameter contradiction_atom.76.0.0" expl="VC for contradiction_atom" proved="true">
-    <proof prover="1"><result status="valid" time="6.99"/></proof>
+    <proof prover="1"><result status="valid" time="5.90"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.76.0.1" expl="VC for contradiction_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.33" steps="745"/></proof>
+    <proof prover="5"><result status="valid" time="1.10" steps="745"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.76.0.2" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.40" steps="246"/></proof>
@@ -2093,7 +2093,7 @@
     <proof prover="5"><result status="valid" time="0.28" steps="114"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.76.0.4" expl="VC for contradiction_atom" proved="true">
-    <proof prover="1"><result status="valid" time="10.72"/></proof>
+    <proof prover="1"><result status="valid" time="8.26"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.76.0.5" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.30" steps="118"/></proof>
@@ -2106,10 +2106,10 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_atom.77" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="5.47" steps="2958"/></proof>
+  <proof prover="5"><result status="valid" time="4.25" steps="2958"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.78" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.83" steps="915"/></proof>
+  <proof prover="5"><result status="valid" time="0.63" steps="915"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.79" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="79"/></proof>
@@ -2118,25 +2118,25 @@
   <proof prover="5"><result status="valid" time="0.20" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.81" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.79" steps="759"/></proof>
+  <proof prover="5"><result status="valid" time="0.56" steps="759"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.82" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.19" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.83" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.77" steps="759"/></proof>
+  <proof prover="5"><result status="valid" time="0.57" steps="759"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.84" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.20" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.85" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.82" steps="759"/></proof>
+  <proof prover="5"><result status="valid" time="0.56" steps="759"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.86" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.87" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.88" steps="794"/></proof>
+  <proof prover="5"><result status="valid" time="0.58" steps="794"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.88" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="79"/></proof>
@@ -2145,7 +2145,7 @@
   <proof prover="5"><result status="valid" time="0.20" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.90" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.88" steps="759"/></proof>
+  <proof prover="5"><result status="valid" time="0.55" steps="759"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.91" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.19" steps="79"/></proof>
@@ -2166,7 +2166,7 @@
   <proof prover="5"><result status="valid" time="0.17" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.97" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.83" steps="846"/></proof>
+  <proof prover="5"><result status="valid" time="0.60" steps="846"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.98" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="159"/></proof>
@@ -2175,7 +2175,7 @@
   <proof prover="5"><result status="valid" time="0.29" steps="159"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.100" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="2.98" steps="3118"/></proof>
+  <proof prover="5"><result status="valid" time="2.20" steps="3118"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.101" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="163"/></proof>
@@ -2214,10 +2214,10 @@
    <goal name="WP_parameter contradiction_atom.107.0" expl="assertion" proved="true">
    <transf name="split_goal_wp" proved="true" >
     <goal name="WP_parameter contradiction_atom.107.0.0" expl="VC for contradiction_atom" proved="true">
-    <proof prover="1"><result status="valid" time="6.86"/></proof>
+    <proof prover="1"><result status="valid" time="5.96"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.107.0.1" expl="VC for contradiction_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.26" steps="714"/></proof>
+    <proof prover="5"><result status="valid" time="1.02" steps="714"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.107.0.2" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.37" steps="232"/></proof>
@@ -2302,7 +2302,7 @@
   <proof prover="5"><result status="valid" time="0.22" steps="134"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.129" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.92" steps="2185"/></proof>
+  <proof prover="5"><result status="valid" time="1.62" steps="2185"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.130" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="141"/></proof>
@@ -2327,7 +2327,7 @@
     <proof prover="5"><result status="valid" time="0.25" steps="85"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.135.0.1" expl="VC for contradiction_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.10" steps="671"/></proof>
+    <proof prover="5"><result status="valid" time="0.86" steps="671"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.135.0.2" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.34" steps="212"/></proof>
@@ -2336,7 +2336,7 @@
     <proof prover="5"><result status="valid" time="0.23" steps="86"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.135.0.4" expl="VC for contradiction_atom" proved="true">
-    <proof prover="1"><result status="valid" time="12.18"/></proof>
+    <proof prover="1"><result status="valid" time="8.51"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_atom.135.0.5" expl="VC for contradiction_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.24" steps="88"/></proof>
@@ -2412,7 +2412,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="111"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.157" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.78" steps="1712"/></proof>
+  <proof prover="5"><result status="valid" time="1.12" steps="1712"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.158" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.30" steps="124"/></proof>
@@ -2487,7 +2487,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="88"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.182" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.26" steps="1696"/></proof>
+  <proof prover="5"><result status="valid" time="0.88" steps="1696"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.183" expl="postcondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="98"/></proof>
@@ -2505,7 +2505,7 @@
     <goal name="WP_parameter contradiction_atom.186.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter contradiction_atom.186.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5" timelimit="5"><result status="valid" time="3.56" steps="7166"/></proof>
+     <proof prover="5" timelimit="5"><result status="valid" time="2.50" steps="7166"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2529,7 +2529,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.31" steps="194"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.192" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.43" steps="329"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="329"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_atom.193" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.34" steps="214"/></proof>
@@ -2595,7 +2595,7 @@
     <goal name="WP_parameter contradiction_atom.212.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter contradiction_atom.212.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5" timelimit="5"><result status="valid" time="2.44" steps="3630"/></proof>
+     <proof prover="5" timelimit="5"><result status="valid" time="1.73" steps="3630"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2614,7 +2614,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.2" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.73" steps="1317"/></proof>
+  <proof prover="5"><result status="valid" time="1.22" steps="1317"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.3" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="60"/></proof>
@@ -2638,11 +2638,11 @@
   <proof prover="5"><result status="valid" time="0.27" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.10" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.66" steps="751"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.49" steps="751"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.11" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.94" steps="1065"/></proof>
-  <proof prover="6"><result status="valid" time="1.95"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.74" steps="1065"/></proof>
+  <proof prover="6"><result status="valid" time="1.60"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.12" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="82"/></proof>
@@ -2657,7 +2657,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="218"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.16" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.72" steps="764"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.49" steps="764"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.17" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.24" steps="238"/></proof>
@@ -2675,7 +2675,7 @@
   <proof prover="5"><result status="valid" time="0.30" steps="372"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.22" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.40" steps="272"/></proof>
+  <proof prover="5"><result status="valid" time="0.25" steps="272"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.23" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.27" steps="47"/></proof>
@@ -2693,7 +2693,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="51"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.28" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.40" steps="262"/></proof>
+  <proof prover="5"><result status="valid" time="0.24" steps="262"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.29" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="51"/></proof>
@@ -2725,10 +2725,10 @@
    <proof prover="5"><result status="valid" time="0.23" steps="118"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.33.5" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.94" steps="848"/></proof>
+   <proof prover="5"><result status="valid" time="0.60" steps="848"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.33.6" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.43" steps="306"/></proof>
+   <proof prover="5"><result status="valid" time="0.28" steps="306"/></proof>
    <proof prover="6"><result status="valid" time="1.58"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.33.7" expl="assertion" proved="true">
@@ -2746,11 +2746,11 @@
    <proof prover="6"><result status="valid" time="1.56"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.33.11" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="2.52" steps="1661"/></proof>
+   <proof prover="5"><result status="valid" time="1.97" steps="1661"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.33.12" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.68" steps="644"/></proof>
-   <proof prover="6"><result status="valid" time="3.82"/></proof>
+   <proof prover="5"><result status="valid" time="0.48" steps="644"/></proof>
+   <proof prover="6"><result status="valid" time="3.14"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2767,7 +2767,7 @@
   <proof prover="5"><result status="valid" time="0.39" steps="273"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.38" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.29" steps="55"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="55"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.39" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="55"/></proof>
@@ -2793,7 +2793,7 @@
   <goal name="WP_parameter contradiction_neg_atom.43" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter contradiction_neg_atom.43.0" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="1.16" steps="1820"/></proof>
+   <proof prover="5"><result status="valid" time="0.83" steps="1820"/></proof>
    <proof prover="6"><result status="valid" time="1.61"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_neg_atom.43.1" expl="assertion" proved="true">
@@ -2814,7 +2814,7 @@
   <proof prover="5"><result status="valid" time="0.57" steps="989"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.48" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.78" steps="1035"/></proof>
+  <proof prover="5"><result status="valid" time="1.37" steps="1035"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.49" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="57"/></proof>
@@ -2856,7 +2856,7 @@
   <proof prover="5"><result status="valid" time="0.59" steps="1007"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.62" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.74" steps="1045"/></proof>
+  <proof prover="5"><result status="valid" time="1.35" steps="1045"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.63" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="57"/></proof>
@@ -2869,7 +2869,7 @@
   <proof prover="5"><result status="valid" time="0.29" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.66" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.30" steps="57"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="57"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.67" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="57"/></proof>
@@ -2894,10 +2894,10 @@
    <goal name="WP_parameter contradiction_neg_atom.73.0" expl="assertion" proved="true">
    <transf name="split_goal_wp" proved="true" >
     <goal name="WP_parameter contradiction_neg_atom.73.0.0" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="1"><result status="valid" time="5.14"/></proof>
+    <proof prover="1"><result status="valid" time="3.56"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.73.0.1" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.09" steps="471"/></proof>
+    <proof prover="5"><result status="valid" time="0.84" steps="471"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.73.0.2" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.38" steps="190"/></proof>
@@ -2906,7 +2906,7 @@
     <proof prover="5"><result status="valid" time="0.30" steps="108"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.73.0.4" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="1"><result status="valid" time="7.34"/></proof>
+    <proof prover="1"><result status="valid" time="5.51"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.73.0.5" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.30" steps="112"/></proof>
@@ -2919,7 +2919,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.74" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="2.65" steps="1137"/></proof>
+  <proof prover="5"><result status="valid" time="1.86" steps="1137"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.75" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.44" steps="491"/></proof>
@@ -2988,7 +2988,7 @@
   <proof prover="5"><result status="valid" time="0.24" steps="150"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.97" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.33" steps="1456"/></proof>
+  <proof prover="5"><result status="valid" time="1.03" steps="1456"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.98" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.34" steps="154"/></proof>
@@ -3016,7 +3016,7 @@
     <proof prover="5"><result status="valid" time="0.77" steps="601"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.104.0.1" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.07" steps="440"/></proof>
+    <proof prover="5"><result status="valid" time="0.75" steps="440"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.104.0.2" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.34" steps="176"/></proof>
@@ -3025,7 +3025,7 @@
     <proof prover="5"><result status="valid" time="0.24" steps="98"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.104.0.4" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="1"><result status="valid" time="8.03"/></proof>
+    <proof prover="1"><result status="valid" time="6.28"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.104.0.5" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.26" steps="101"/></proof>
@@ -3101,7 +3101,7 @@
   <proof prover="5"><result status="valid" time="0.27" steps="125"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.126" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.92" steps="870"/></proof>
+  <proof prover="5"><result status="valid" time="0.66" steps="870"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.127" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.20" steps="132"/></proof>
@@ -3126,7 +3126,7 @@
     <proof prover="5"><result status="valid" time="0.23" steps="79"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.132.0.1" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="5"><result status="valid" time="1.01" steps="477"/></proof>
+    <proof prover="5"><result status="valid" time="0.72" steps="477"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.132.0.2" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.29" steps="156"/></proof>
@@ -3135,7 +3135,7 @@
     <proof prover="5"><result status="valid" time="0.23" steps="80"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.132.0.4" expl="VC for contradiction_neg_atom" proved="true">
-    <proof prover="1"><result status="valid" time="7.86"/></proof>
+    <proof prover="1"><result status="valid" time="6.38"/></proof>
     </goal>
     <goal name="WP_parameter contradiction_neg_atom.132.0.5" expl="VC for contradiction_neg_atom" proved="true">
     <proof prover="5"><result status="valid" time="0.34" steps="82"/></proof>
@@ -3163,7 +3163,7 @@
   <proof prover="5"><result status="valid" time="0.28" steps="241"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.138" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.53" steps="372"/></proof>
+  <proof prover="5"><result status="valid" time="0.36" steps="372"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.139" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="263"/></proof>
@@ -3184,7 +3184,7 @@
   <proof prover="5"><result status="valid" time="0.26" steps="241"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.145" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.28" steps="52"/></proof>
+  <proof prover="5"><result status="valid" time="0.15" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.146" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="52"/></proof>
@@ -3199,7 +3199,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="52"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.150" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.41" steps="240"/></proof>
+  <proof prover="5"><result status="valid" time="0.27" steps="240"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.151" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="224"/></proof>
@@ -3226,7 +3226,7 @@
   <proof prover="5"><result status="valid" time="0.26" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.159" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="40"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.160" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="220"/></proof>
@@ -3247,7 +3247,7 @@
   <proof prover="5"><result status="valid" time="0.25" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.166" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.37" steps="240"/></proof>
+  <proof prover="5"><result status="valid" time="0.22" steps="240"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.167" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="40"/></proof>
@@ -3286,7 +3286,7 @@
   <proof prover="5"><result status="valid" time="0.16" steps="79"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.179" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.63" steps="725"/></proof>
+  <proof prover="5"><result status="valid" time="0.44" steps="725"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.180" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="89"/></proof>
@@ -3349,19 +3349,19 @@
   <proof prover="5"><result status="valid" time="0.26" steps="36"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.200" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.37" steps="254"/></proof>
+  <proof prover="5"><result status="valid" time="0.23" steps="254"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.201" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.23" steps="235"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.202" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.30" steps="72"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.203" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.204" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.74" steps="937"/></proof>
+  <proof prover="5"><result status="valid" time="0.52" steps="937"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_neg_atom.205" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="82"/></proof>
@@ -3379,7 +3379,7 @@
     <goal name="WP_parameter contradiction_neg_atom.208.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter contradiction_neg_atom.208.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5"><result status="valid" time="2.33" steps="3638"/></proof>
+     <proof prover="5"><result status="valid" time="1.58" steps="3638"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3401,10 +3401,10 @@
   <proof prover="5"><result status="valid" time="0.25" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="23"/></proof>
+  <proof prover="5"><result status="valid" time="0.26" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.15" steps="70"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="70"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.5" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="23"/></proof>
@@ -3416,31 +3416,31 @@
   <proof prover="5"><result status="valid" time="0.14" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="23"/></proof>
+  <proof prover="5"><result status="valid" time="0.13" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.16" steps="70"/></proof>
+  <proof prover="5"><result status="valid" time="0.15" steps="70"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.10" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.11" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.13" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter extend_branch.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter extend_branch.13" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="23"/></proof>
-  </goal>
-  <goal name="WP_parameter extend_branch.14" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter extend_branch.15" expl="precondition" proved="true">
+  <goal name="WP_parameter extend_branch.12" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter extend_branch.16" expl="precondition" proved="true">
+  <goal name="WP_parameter extend_branch.13" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.25" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter extend_branch.14" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.13" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter extend_branch.15" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.26" steps="23"/></proof>
+  </goal>
+  <goal name="WP_parameter extend_branch.16" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.14" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.17" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.23" steps="40"/></proof>
@@ -3467,7 +3467,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.25" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="5.24" steps="1906"/></proof>
+  <proof prover="5"><result status="valid" time="4.05" steps="1906"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.26" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.35"/></proof>
@@ -3480,7 +3480,7 @@
   </transf>
   </goal>
   <goal name="WP_parameter extend_branch.28" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.74" steps="787"/></proof>
+  <proof prover="5"><result status="valid" time="0.49" steps="787"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.29" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.27" steps="52"/></proof>
@@ -3510,13 +3510,13 @@
   <proof prover="5"><result status="valid" time="0.29" steps="280"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.38" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.21" steps="188"/></proof>
+  <proof prover="5"><result status="valid" time="0.22" steps="188"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.39" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="280"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.40" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.22" steps="188"/></proof>
+  <proof prover="5"><result status="valid" time="0.21" steps="188"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.41" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.23" steps="30"/></proof>
@@ -3540,10 +3540,10 @@
   <proof prover="5"><result status="valid" time="0.20" steps="169"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.48" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.49" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.50" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
@@ -3606,16 +3606,16 @@
   <proof prover="5"><result status="valid" time="0.29" steps="387"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.70" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.35" steps="421"/></proof>
-  </goal>
-  <goal name="WP_parameter extend_branch.71" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.42" steps="416"/></proof>
-  </goal>
-  <goal name="WP_parameter extend_branch.72" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.31" steps="421"/></proof>
   </goal>
-  <goal name="WP_parameter extend_branch.73" expl="precondition" proved="true">
+  <goal name="WP_parameter extend_branch.71" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.30" steps="416"/></proof>
+  </goal>
+  <goal name="WP_parameter extend_branch.72" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.35" steps="421"/></proof>
+  </goal>
+  <goal name="WP_parameter extend_branch.73" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.42" steps="416"/></proof>
   </goal>
   <goal name="WP_parameter extend_branch.74" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.15" steps="35"/></proof>
@@ -3701,13 +3701,13 @@
   <proof prover="5"><result status="valid" time="0.15" steps="63"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter contradiction_find_atom.3" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
+  <goal name="WP_parameter contradiction_find_atom.3" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
+  </goal>
   <goal name="WP_parameter contradiction_find_atom.4" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.17" steps="109"/></proof>
+  <proof prover="5"><result status="valid" time="0.18" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.5" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
@@ -3719,28 +3719,28 @@
   <proof prover="5"><result status="valid" time="0.15" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.8" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.18" steps="109"/></proof>
+  <proof prover="5"><result status="valid" time="0.17" steps="109"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.10" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.11" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.15" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.13" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.14" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.15" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.15" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.13" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.16" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
@@ -4142,7 +4142,7 @@
   <proof prover="5"><result status="valid" time="0.18" steps="70"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.129" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.34" steps="139"/></proof>
+  <proof prover="5"><result status="valid" time="0.20" steps="139"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.130" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.83" steps="1313"/></proof>
@@ -4319,7 +4319,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.184" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.46" steps="440"/></proof>
+  <proof prover="5"><result status="valid" time="0.30" steps="440"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.185" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="43"/></proof>
@@ -4343,7 +4343,7 @@
   <proof prover="5"><result status="valid" time="0.49" steps="820"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.192" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="5.48" steps="4723"/></proof>
+  <proof prover="5"><result status="valid" time="4.44" steps="4723"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.193" expl="postcondition" proved="true">
   <proof prover="6" timelimit="20"><result status="valid" time="0.56"/></proof>
@@ -4355,7 +4355,7 @@
   <proof prover="5"><result status="valid" time="0.28" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.196" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="6.10" steps="8218"/></proof>
+  <proof prover="5"><result status="valid" time="4.05" steps="8218"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_atom.197" expl="unreachable point" proved="true">
   <transf name="eliminate_recursion" proved="true" >
@@ -4364,7 +4364,7 @@
     <goal name="WP_parameter contradiction_find_atom.197.0.0" expl="unreachable point" proved="true">
     <transf name="split_goal_wp" proved="true" >
      <goal name="WP_parameter contradiction_find_atom.197.0.0.0" expl="unreachable point" proved="true">
-     <proof prover="5"><result status="valid" time="2.59" steps="4284"/></proof>
+     <proof prover="5"><result status="valid" time="1.79" steps="4284"/></proof>
      </goal>
     </transf>
     </goal>
@@ -4410,22 +4410,22 @@
   <proof prover="5"><result status="valid" time="0.25" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.11" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter contradiction_find_neg_atom.12" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.25" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter contradiction_find_neg_atom.13" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
-  </goal>
-  <goal name="WP_parameter contradiction_find_neg_atom.14" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="30"/></proof>
   </goal>
+  <goal name="WP_parameter contradiction_find_neg_atom.12" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter contradiction_find_neg_atom.13" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.24" steps="30"/></proof>
+  </goal>
+  <goal name="WP_parameter contradiction_find_neg_atom.14" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.26" steps="30"/></proof>
+  </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.15" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.25" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.16" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.24" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="30"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.17" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="63"/></proof>
@@ -4437,7 +4437,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.20" expl="exceptional postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.21" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="222"/></proof>
@@ -4452,7 +4452,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="66"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.25" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="5.92" steps="2964"/></proof>
+  <proof prover="5"><result status="valid" time="4.82" steps="2964"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.26" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.38"/></proof>
@@ -4500,7 +4500,7 @@
   <proof prover="5"><result status="valid" time="0.24" steps="252"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.41" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="34"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="34"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.42" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="252"/></proof>
@@ -4533,7 +4533,7 @@
   <proof prover="5"><result status="valid" time="0.38" steps="502"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.52" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="7.40" steps="7258"/></proof>
+  <proof prover="5"><result status="valid" time="5.16" steps="7258"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.53" expl="postcondition" proved="true">
   <proof prover="6" timelimit="20"><result status="valid" time="0.55"/></proof>
@@ -4545,13 +4545,13 @@
   <proof prover="5"><result status="valid" time="0.16" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.56" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.75" steps="847"/></proof>
+  <proof prover="5"><result status="valid" time="0.57" steps="847"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.57" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.17" steps="75"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.58" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.70" steps="705"/></proof>
+  <proof prover="5"><result status="valid" time="0.45" steps="705"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.59" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.14" steps="37"/></proof>
@@ -4592,7 +4592,7 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.22" steps="97"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.5" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.84" steps="867"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.60" steps="867"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.6" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="281"/></proof>
@@ -4604,7 +4604,7 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="97"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.9" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="1.82" steps="1131"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="1.46" steps="1131"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.10" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.51" steps="510"/></proof>
@@ -4613,10 +4613,10 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.38" steps="514"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.12" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="2.39" steps="1154"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="1.89" steps="1154"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.13" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="2.13" steps="1331"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="1.70" steps="1331"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.14" expl="assertion" proved="true">
    <proof prover="5" timelimit="5"><result status="valid" time="0.33" steps="485"/></proof>
@@ -4625,7 +4625,7 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.28" steps="101"/></proof>
    </goal>
    <goal name="WP_parameter contradiction_find_neg_atom.66.16" expl="assertion" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.78" steps="1094"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.59" steps="1094"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4652,7 +4652,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.73" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="3.58"/></proof>
+  <proof prover="6"><result status="valid" time="2.93"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.74" expl="precondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
@@ -4686,7 +4686,7 @@
   <proof prover="5"><result status="valid" time="0.29" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.83" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.29" steps="48"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.84" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.29" steps="98"/></proof>
@@ -4713,7 +4713,7 @@
   <proof prover="5"><result status="valid" time="0.58" steps="957"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.92" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.62" steps="988"/></proof>
+  <proof prover="5"><result status="valid" time="1.18" steps="988"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.93" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.18" steps="48"/></proof>
@@ -4818,7 +4818,7 @@
   <proof prover="5"><result status="valid" time="0.17" steps="65"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.127" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.34" steps="130"/></proof>
+  <proof prover="5"><result status="valid" time="0.20" steps="130"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.128" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.51" steps="630"/></proof>
@@ -4884,7 +4884,7 @@
   <proof prover="5"><result status="valid" time="0.27" steps="232"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.145" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.29" steps="50"/></proof>
+  <proof prover="5"><result status="valid" time="0.15" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.146" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.24" steps="232"/></proof>
@@ -4920,10 +4920,10 @@
   <proof prover="5"><result status="valid" time="0.17" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.157" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.27" steps="50"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.158" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.28" steps="50"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.159" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="50"/></proof>
@@ -4938,7 +4938,7 @@
   <proof prover="5"><result status="valid" time="0.37" steps="382"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.163" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="10.82" steps="5914"/></proof>
+  <proof prover="5"><result status="valid" time="7.87" steps="5914"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.164" expl="postcondition" proved="true">
   <proof prover="6" timelimit="20"><result status="valid" time="0.60"/></proof>
@@ -4980,7 +4980,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.177" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.28" steps="38"/></proof>
+  <proof prover="5"><result status="valid" time="0.14" steps="38"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.178" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.25" steps="210"/></proof>
@@ -5019,7 +5019,7 @@
   <proof prover="5"><result status="valid" time="0.32" steps="358"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.190" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="5.23" steps="4416"/></proof>
+  <proof prover="5"><result status="valid" time="4.14" steps="4416"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.191" expl="postcondition" proved="true">
   <proof prover="6" timelimit="20"><result status="valid" time="0.55"/></proof>
@@ -5031,7 +5031,7 @@
   <proof prover="5"><result status="valid" time="0.29" steps="43"/></proof>
   </goal>
   <goal name="WP_parameter contradiction_find_neg_atom.194" expl="unreachable point" proved="true">
-  <proof prover="5"><result status="valid" time="2.44" steps="3339"/></proof>
+  <proof prover="5"><result status="valid" time="1.82" steps="3339"/></proof>
   </goal>
  </transf>
  </goal>
@@ -5047,7 +5047,7 @@
   <proof prover="5"><result status="valid" time="0.14" steps="48"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.3" expl="assertion" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.60" steps="358"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.41" steps="358"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.4" expl="assertion" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="51"/></proof>
@@ -5083,19 +5083,19 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.34" steps="189"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.15" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.30" steps="132"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.16" steps="132"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.16" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="32"/></proof>
-  </goal>
-  <goal name="WP_parameter select_lemma.17" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="88"/></proof>
-  </goal>
-  <goal name="WP_parameter select_lemma.18" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter select_lemma.19" expl="precondition" proved="true">
+  <goal name="WP_parameter select_lemma.17" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.17" steps="88"/></proof>
+  </goal>
+  <goal name="WP_parameter select_lemma.18" expl="precondition" proved="true">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="32"/></proof>
+  </goal>
+  <goal name="WP_parameter select_lemma.19" expl="precondition" proved="true">
+  <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="88"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.20" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.23" steps="32"/></proof>
@@ -5104,7 +5104,7 @@
   <proof prover="5" timelimit="5"><result status="valid" time="0.26" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.22" expl="precondition" proved="true">
-  <proof prover="5" timelimit="5"><result status="valid" time="0.27" steps="32"/></proof>
+  <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter select_lemma.23" expl="precondition" proved="true">
   <proof prover="5" timelimit="5"><result status="valid" time="0.14" steps="32"/></proof>
@@ -5165,7 +5165,7 @@
     <proof prover="5" timelimit="5"><result status="valid" time="0.20" steps="69"/></proof>
     </goal>
     <goal name="WP_parameter select_lemma.37.0.4" expl="VC for select_lemma" proved="true">
-    <proof prover="1"><result status="valid" time="2.61"/></proof>
+    <proof prover="1"><result status="valid" time="1.96"/></proof>
     </goal>
     <goal name="WP_parameter select_lemma.37.0.5" expl="VC for select_lemma" proved="true">
     <proof prover="5" timelimit="5"><result status="valid" time="0.29" steps="71"/></proof>

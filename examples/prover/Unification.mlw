@@ -418,6 +418,7 @@ module Impl
       let s1 = rho.unifier in
       sc s0 s1 = s0 = sc s1 s0 }
 
+    diverges
     (* Variant post-conditions. *)
     (*ensures { cardinal result.unassigned_set < cardinal s }
     ensures { forall x:int.
@@ -1157,6 +1158,7 @@ module Impl
   let conflict (t1 t2:nlimpl_fo_term_list) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { sdata_inv (PConflict t1 t2) }
     requires { unifier_subst_ok rhob rho }
+    diverges
     ensures { unifier_subst_ok rhob rho }
     (* Useless : trivial consequence of unifier_subst_ok rhob rho.
     ensures { smodel (current_timestamp rhob) =
@@ -1223,7 +1225,7 @@ module Impl
     ensures { unifier_subst_ok rhob rho }
     (*ensures { smodel (current_timestamp rhob) = smodel (current_timestamp (old rhob)) }*)
     ensures { precede (old rhob) rhob }
-    variant { lv }
+    diverges (* variant { lv } *)
     raises { UnificationFailure -> correct rhob /\ precede (old rhob) rhob }
   =
     match lv with
@@ -1237,7 +1239,7 @@ module Impl
     requires { unifier_subst_ok rhob rho }
     ensures { unifier_subst_ok rhob rho }
     ensures { precede (old rhob) rhob }
-    variant { lv }
+    diverges (* variant { lv } *)
     raises { UnificationFailure -> correct rhob /\ precede (old rhob) rhob }
   =
     match lv with
@@ -1256,6 +1258,7 @@ module Impl
     requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
       t2.model_fo_term_list_field -> x >= 0 }
     requires { unifier_subst_ok rhob rho }
+    diverges
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { result.final_unifier.unifier = sc rho.unifier result.unifier_factor }
     ensures { precede (old rhob) rhob }

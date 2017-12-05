@@ -257,7 +257,7 @@ module Impl
     ensures { precede (old rhob) rhob }
     ensures { unifier_subst_ok rhob rho }
     raises { Failure -> precede (old rhob) rhob /\ correct rhob }
-    variant { size_tableau tab.model_tableau_field }
+    diverges (* variant { size_tableau tab.model_tableau_field } *)
   =
     let tabm = tab.model_tableau_field in
     match destruct_tableau tab with
@@ -303,7 +303,7 @@ module Impl
     ensures { precede (old rhob) rhob }
     ensures { unifier_subst_ok rhob rho }
     raises { Failure -> precede (old rhob) rhob /\ correct rhob }
-    variant { size_tableau tab.model_tableau_field }
+    diverges (* variant { size_tableau tab.model_tableau_field } *)
   =
     let tabm = tab.model_tableau_field in
     match destruct_tableau tab with
@@ -355,7 +355,7 @@ module Impl
     ensures { precede (old rhob) rhob }
     ensures { unifier_subst_ok rhob rho }
     raises { Failure -> precede (old rhob) rhob /\ correct rhob }
-    variant { size_fo_formula_list phil.model_fo_formula_list_field }
+    diverges (* variant { size_fo_formula_list phil.model_fo_formula_list_field } *)
   =
     let philm = phil.model_fo_formula_list_field in
     match destruct_fo_formula_list phil with
