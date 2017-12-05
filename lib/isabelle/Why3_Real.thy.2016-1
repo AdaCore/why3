@@ -285,7 +285,9 @@ why3_vc Power_mult
   using assms
   by (simp add: nat_mult_distrib power_mult)
 
-why3_vc Power_mult2 by (simp only:Power.comm_monoid_mult_class.power_mult_distrib)
+why3_vc Power_comm1 by simp
+
+why3_vc Power_comm2 by (simp add: semiring_normalization_rules(30))
 
 why3_vc Power_s_alt
 proof -
