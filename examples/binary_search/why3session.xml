@@ -6,108 +6,108 @@
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../binary_search.mlw" expanded="true">
-<theory name="BinarySearch" sum="7bf7883d6e8fde9d87f261fd912923e0" expanded="true">
- <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
+<file name="../binary_search.mlw" proved="true">
+<theory name="BinarySearch" proved="true" sum="7bf7883d6e8fde9d87f261fd912923e0">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.03"/></proof>
  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
  <proof prover="5" timelimit="10"><result status="valid" time="0.17" steps="59"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchAnyMidPoint" sum="617e28329136ba275ecf8ba02bcc2957" expanded="true">
- <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
+<theory name="BinarySearchAnyMidPoint" proved="true" sum="617e28329136ba275ecf8ba02bcc2957">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="0" timelimit="10"><result status="valid" time="0.03"/></proof>
  <proof prover="2" timelimit="10"><result status="valid" time="0.02"/></proof>
  <proof prover="5" timelimit="10"><result status="valid" time="0.02" steps="44"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" sum="d40ebb1dbba84353a007cae5cf938f85" expanded="true">
- <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter binary_search.1" expl="integer overflow">
+<theory name="BinarySearchInt32" proved="true" sum="bf7b08f3631f7a99219dd72d9ff9e24f">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter binary_search.0" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.2" expl="integer overflow">
+  <goal name="WP_parameter binary_search.1" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="75"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.3" expl="integer overflow">
+  <goal name="WP_parameter binary_search.2" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="105"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.4" expl="loop invariant init">
+  <goal name="WP_parameter binary_search.3" expl="loop invariant init" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="76"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.5" expl="loop invariant init">
+  <goal name="WP_parameter binary_search.4" expl="loop invariant init" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="79"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.6" expl="integer overflow">
+  <goal name="WP_parameter binary_search.5" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="87"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.7" expl="integer overflow">
+  <goal name="WP_parameter binary_search.6" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="91"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.8" expl="division by zero">
+  <goal name="WP_parameter binary_search.7" expl="division by zero" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="84"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.9" expl="integer overflow">
+  <goal name="WP_parameter binary_search.8" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.04" steps="99"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.10" expl="integer overflow">
+  <goal name="WP_parameter binary_search.9" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="127"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.11" expl="assertion">
+  <goal name="WP_parameter binary_search.10" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.27" steps="158"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.12" expl="index in array bounds">
+  <goal name="WP_parameter binary_search.11" expl="index in array bounds" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="91"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.13" expl="integer overflow">
+  <goal name="WP_parameter binary_search.12" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="95"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.14" expl="integer overflow">
+  <goal name="WP_parameter binary_search.13" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.03" steps="112"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.15" expl="loop invariant preservation">
+  <goal name="WP_parameter binary_search.14" expl="loop invariant preservation" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.16" expl="loop invariant preservation">
+  <goal name="WP_parameter binary_search.15" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="3.48"/></proof>
   <proof prover="5"><result status="valid" time="1.34" steps="202"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.17" expl="loop variant decrease">
+  <goal name="WP_parameter binary_search.16" expl="loop variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="99"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.18" expl="index in array bounds">
+  <goal name="WP_parameter binary_search.17" expl="index in array bounds" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="95"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.19" expl="integer overflow">
+  <goal name="WP_parameter binary_search.18" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="97"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.20" expl="integer overflow">
+  <goal name="WP_parameter binary_search.19" expl="integer overflow" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="113"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.21" expl="loop invariant preservation">
+  <goal name="WP_parameter binary_search.20" expl="loop invariant preservation" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="101"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.22" expl="loop invariant preservation">
+  <goal name="WP_parameter binary_search.21" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="2"><result status="valid" time="3.46"/></proof>
   <proof prover="5"><result status="valid" time="1.35" steps="203"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.23" expl="loop variant decrease">
+  <goal name="WP_parameter binary_search.22" expl="loop variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="101"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.24" expl="postcondition">
+  <goal name="WP_parameter binary_search.23" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.08" steps="137"/></proof>
   </goal>
-  <goal name="WP_parameter binary_search.25" expl="exceptional postcondition">
+  <goal name="WP_parameter binary_search.24" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.01" steps="90"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="BinarySearchBoolean" sum="665a5152cccd5f2361968000d62eb210" expanded="true">
- <goal name="WP_parameter binary_search" expl="VC for binary_search" expanded="true">
+<theory name="BinarySearchBoolean" proved="true" sum="665a5152cccd5f2361968000d62eb210">
+ <goal name="WP_parameter binary_search" expl="VC for binary_search" proved="true">
  <proof prover="1"><result status="valid" time="0.07" steps="118"/></proof>
  </goal>
 </theory>

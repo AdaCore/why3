@@ -2,24 +2,24 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../bitvector_examples.mlw" proved="true">
-<theory name="Test_proofinuse" proved="true" sum="3be3c8769b30e9cdf5be7cc5ab7c0ebf">
+<theory name="Test_proofinuse" proved="true" sum="01b0e3ea2dbeb34a2ed0b7b225a3c3b8">
  <goal name="WP_parameter shift_is_div" expl="VC for shift_is_div" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter shift_is_div.0" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter shift_is_div.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="96"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="74"/></proof>
   </goal>
   <goal name="WP_parameter shift_is_div.2" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="WP_parameter shift_is_div.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="96"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="77"/></proof>
   </goal>
  </transf>
  </goal>
@@ -33,7 +33,7 @@
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight" proved="true" sum="e8df673927d4283d55605cb67efe0a99">
+<theory name="Hackers_delight" proved="true" sum="0a3a87726c10610797cdac4f4c5be0e8">
  <goal name="DM1" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -92,7 +92,7 @@
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
 </theory>
-<theory name="Hackers_delight_mod" proved="true" sum="1d16fc37232b5b1681032eb68a290f19">
+<theory name="Hackers_delight_mod" proved="true" sum="b9cd3e140469a9653469727c9946d6ef">
  <goal name="WP_parameter dm1" expl="VC for dm1" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -144,7 +144,7 @@
  <goal name="WP_parameter bp1" expl="VC for bp1" proved="true">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
- <goal name="WP_parameter bp1&#39;" expl="VC for bp1'" proved="true">
+ <goal name="WP_parameter bp1&apos;" expl="VC for bp1'" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="WP_parameter bp2" expl="VC for bp2" proved="true">
@@ -154,27 +154,27 @@
  <proof prover="2"><result status="valid" time="0.07"/></proof>
  </goal>
 </theory>
-<theory name="Test_imperial_violet" proved="true" sum="e1422ff2751327867185a34b23404d0a">
+<theory name="Test_imperial_violet" proved="true" sum="107b1b7a2c9f11468f35ee7193c45056">
  <goal name="bv32_bounds_bv" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
  <goal name="to_int_ule" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="71"/></proof>
  </goal>
  <goal name="to_int_ult" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="72"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="71"/></proof>
  </goal>
  <goal name="bv32_bounds_0" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="71"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="70"/></proof>
  </goal>
  <goal name="bv32_bounds" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="73"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="72"/></proof>
  </goal>
  <goal name="WP_parameter add" expl="VC for add" proved="true">
  <proof prover="4"><result status="valid" time="0.25"/></proof>
  </goal>
 </theory>
-<theory name="Test_from_bitvector_example" proved="true" sum="2d8219908bc50228f5f5bdfdac5307c6">
+<theory name="Test_from_bitvector_example" proved="true" sum="68925566e2ba50715cef85e7d3b365da">
  <goal name="Test1" proved="true">
  <proof prover="2"><result status="valid" time="0.03"/></proof>
  </goal>
