@@ -66,6 +66,7 @@ struct pollfd* poll_list;
 int poll_num = 0;
 int poll_len = 0;
 
+// global pointers are initialized with NULL by C semantics
 plist processes;
 plist clients;
 char *current_dir;
