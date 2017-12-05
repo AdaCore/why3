@@ -9,6 +9,7 @@ model_parser "smtv2"
 
 import "smt-libv2.drv"
 import "smt-libv2-bv.gen"
+import "z3_bv.gen"
 import "smt-libv2-floats.gen"
 import "discrimination.gen"
 
@@ -76,41 +77,6 @@ theory real.Trigonometry
 
 end
 *)
-
-
-(* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
-   have the same name for the function to_uint *)
-theory bv.BV64
-  syntax converter of_int "((_ int2bv 64) %1)"
-  syntax function t'int "(bv2int %1)"
-
-  remove prop Nth_bv_is_nth
-  remove prop Nth_bv_is_nth2
-end
-
-theory bv.BV32
-  syntax converter of_int "((_ int2bv 32) %1)"
-  syntax function t'int "(bv2int %1)"
-
-  remove prop Nth_bv_is_nth
-  remove prop Nth_bv_is_nth2
-end
-
-theory bv.BV16
-  syntax converter of_int "((_ int2bv 16) %1)"
-  syntax function t'int "(bv2int %1)"
-
-  remove prop Nth_bv_is_nth
-  remove prop Nth_bv_is_nth2
-end
-
-theory bv.BV8
-  syntax converter of_int "((_ int2bv 8) %1)"
-  syntax function t'int "(bv2int %1)"
-
-  remove prop Nth_bv_is_nth
-  remove prop Nth_bv_is_nth2
-end
 
 theory ieee_float.Float64
 (* check the sign bit; if pos |%1| else |%1| - 2^1025 *)
