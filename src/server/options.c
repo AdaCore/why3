@@ -16,7 +16,8 @@
 #include "options.h"
 
 int parallel = 1;
-char* socketname = NULL;
+/* global data doesn't need null initialization, so none provided here */
+char* socketname;
 bool logging = false;
 bool single_client = false;
 
