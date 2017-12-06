@@ -22,7 +22,7 @@ let client_connect ~fail socket_name =
   try
     let sock =
       if Sys.os_type = "Win32" then
-        let name = "\\\\.\\pipe\\" ^ socket_name in
+        let name = "\\\\.\\pipe\\" ^ (Filename.basename socket_name) in
         Unix.openfile name [Unix.O_RDWR] 0
       else begin
         let curdir = Sys.getcwd () in

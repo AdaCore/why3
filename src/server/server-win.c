@@ -20,6 +20,7 @@
 
 #include <ntstatus.h>
 #include <windows.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -102,7 +103,7 @@ int key_of_ms_key(ULONG_PTR ms) {
 
 void init();
 
-char* socket_name;
+char* pipe_name;
 
 HANDLE completion_port;
 
@@ -184,7 +185,7 @@ void create_server_socket (int socket_num) {
    int key = keygen();
    server = (pserver) malloc(sizeof(t_server));
    server->handle = CreateNamedPipe(
-      socket_name,
+      pipe_name,
       PIPE_ACCESS_DUPLEX |
       FILE_FLAG_OVERLAPPED,     // non-blocking IO
       PIPE_TYPE_MESSAGE |       // message-type pipe
@@ -635,11 +636,17 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
 }
 
 void init() {
+   // The socketname variable may contain a full path, but on Windows,
+   // pipe sockets live in a special address space. We throw away the
+   // path info and just use the basename of the socketname variable.
+   char* socketname_copy, *my_pipe_name;
    GetCurrentDirectory(MAX_PATH, current_dir);
+   socketname_copy = strdup(socketname);
+   my_pipe_name = basename(socketname_copy);
    // on windows, named pipes live in a special address space
-   socket_name = (char*) malloc(sizeof(char) * (strlen(socketname) + 10));
-   strcpy(socket_name, TEXT("\\\\.\\pipe\\"));
-   strcat(socket_name, socketname);
+   pipe_name = (char*) malloc(sizeof(char) * (strlen(my_pipe_name) + 10));
+   strcpy(pipe_name, TEXT("\\\\.\\pipe\\"));
+   strcat(pipe_name, my_pipe_name);
 
    queue = init_queue(100);
    clients = init_list(16);
@@ -652,6 +659,7 @@ void init() {
    for (int i = 0; i < parallel; i++) {
       create_server_socket(i);
    }
+   free(socketname_copy);
 }
 
 // If the key in argument corresponds to a server socket, return the server
