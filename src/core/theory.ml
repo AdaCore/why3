@@ -160,7 +160,8 @@ type theory = {
   th_name   : ident;          (* theory name *)
   th_path   : string list;    (* environment qualifiers *)
   th_decls  : tdecl list;     (* theory declarations *)
-  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_ranges : tdecl Mts.t;    (* range type projections *)
+  th_floats : tdecl Mts.t;    (* float type projections *)
   th_crcmap : Coercion.t;     (* implicit coercions *)
   th_export : namespace;      (* exported namespace *)
   th_known  : known_map;      (* known identifiers *)
@@ -265,7 +266,8 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
-  uc_ranges : lsymbol Mts.t;
+  uc_ranges : tdecl Mts.t;
+  uc_floats : tdecl Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -283,6 +285,7 @@ let empty_theory n p = {
   uc_path   = p;
   uc_decls  = [];
   uc_ranges = Mts.empty;
+  uc_floats = Mts.empty;
   uc_crcmap = Coercion.empty;
   uc_prefix = [];
   uc_import = [empty_ns];
@@ -298,6 +301,7 @@ let close_theory uc = match uc.uc_export with
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_ranges = uc.uc_ranges;
+      th_floats = uc.uc_floats;
       th_crcmap = uc.uc_crcmap;
       th_export = e;
       th_known  = uc.uc_known;
@@ -359,6 +363,7 @@ let known_meta kn al =
 let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
 
 exception RangeConflict of tysymbol
+exception FloatConflict of tysymbol
 
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
@@ -372,13 +377,21 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
-  | Meta (m,([MAts ts; MAls ls] as al)) when meta_equal m meta_range ->
+  | Meta (m,((MAts ts :: _) as al)) when meta_equal m meta_range ->
       known_meta uc.uc_known al;
       let add b = match b with
-        | None -> Some ls
-        | Some s when ls_equal s ls -> b
+        | None -> Some td
+        | Some d when td_equal d td -> b
         | _ -> raise (RangeConflict ts) in
       { uc with uc_ranges = Mts.change add ts uc.uc_ranges;
+                uc_decls = td :: uc.uc_decls }
+  | Meta (m,((MAts ts :: _) as al)) when meta_equal m meta_float ->
+      known_meta uc.uc_known al;
+      let add b = match b with
+        | None -> Some td
+        | Some d when td_equal d td -> b
+        | _ -> raise (FloatConflict ts) in
+      { uc with uc_floats = Mts.change add ts uc.uc_floats;
                 uc_decls = td :: uc.uc_decls }
   | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
       known_meta uc.uc_known al;
@@ -506,13 +519,16 @@ let create_use th = mk_tdecl (Use th)
 
 let use_export uc th =
   let uc = add_tdecl uc (create_use th) in
-  let comb ts s1 s2 = if ls_equal s1 s2 then Some s1
+  let urng ts d1 d2 = if td_equal d1 d2 then Some d1
                       else raise (RangeConflict ts) in
+  let uflt ts d1 d2 = if td_equal d1 d2 then Some d1
+                      else raise (FloatConflict ts) in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
       uc_export = merge_ns true  th.th_export e0 :: ste;
-      uc_ranges = Mts.union comb uc.uc_ranges th.th_ranges;
+      uc_ranges = Mts.union urng uc.uc_ranges th.th_ranges;
+      uc_floats = Mts.union uflt uc.uc_floats th.th_floats;
       uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
@@ -966,6 +982,9 @@ let () = Exn_printer.register
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | RangeConflict ts ->
       Format.fprintf fmt "Conflicting definitions for range type %s"
+        ts.ts_name.id_string
+  | FloatConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for float type %s"
         ts.ts_name.id_string
   | _ -> raise exn
   end

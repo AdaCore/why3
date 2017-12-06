@@ -219,7 +219,7 @@ module Bitwalker
     let k = BV32.urem_check left (8:BV32.t) in
     addr[BV32.to_uint i] <- poke_8bit addr[BV32.to_uint i] k flag
 
-  let poke (start : BV32.t) (len : BV32.t) (addr : array BV8.t) (value : BV64.t)
+  let poke (start : BV32.t) (len : BV32.t) (addr : array BV8.t) (value : BV64.t) : int
     writes  { addr }
     requires{ BV32.t'int len < 64 } (* could be lower or equal if maxvalue and the condition to return -2 is corrected *)
     requires{ BV32.t'int start + BV32.t'int len < BV32.two_power_size }

@@ -694,8 +694,14 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst (Number.ConstInt _ as c) -> DEconst(c, dity_int)
-  | Ptree.Econst (Number.ConstReal _ as c) -> DEconst(c, dity_real)
+  | Ptree.Econst (Number.ConstInt _ as c) ->
+      let dty = if Mts.is_empty muc.muc_theory.uc_ranges
+                then dity_int else dity_fresh () in
+      DEconst(c, dty)
+  | Ptree.Econst (Number.ConstReal _ as c) ->
+      let dty = if Mts.is_empty muc.muc_theory.uc_floats
+                then dity_real else dity_fresh () in
+      DEconst(c, dty)
   | Ptree.Erecord fl ->
       let ls_of_rs rs = match rs.rs_logic with
         | RLls ls -> ls | _ -> assert false in

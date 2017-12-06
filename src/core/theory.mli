@@ -89,7 +89,8 @@ type theory = private {
   th_name   : ident;          (* theory name *)
   th_path   : string list;    (* environment qualifiers *)
   th_decls  : tdecl list;     (* theory declarations *)
-  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_ranges : tdecl Mts.t;    (* range type projections *)
+  th_floats : tdecl Mts.t;    (* float type projections *)
   th_crcmap : Coercion.t;     (* implicit coercions *)
   th_export : namespace;      (* exported namespace *)
   th_known  : known_map;      (* known identifiers *)
@@ -128,7 +129,8 @@ type theory_uc = private {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
-  uc_ranges : lsymbol Mts.t;
+  uc_ranges : tdecl Mts.t;
+  uc_floats : tdecl Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -240,3 +242,4 @@ exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
 exception RangeConflict of tysymbol
+exception FloatConflict of tysymbol

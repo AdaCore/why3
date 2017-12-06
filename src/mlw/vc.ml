@@ -65,7 +65,7 @@ let vc_labels = Slab.add kp_label (Slab.add wb_label
 
 type vc_env = {
   known_map : Pdecl.known_map;
-  ts_ranges : lsymbol Mts.t;
+  ts_ranges : Theory.tdecl Mts.t;
   ps_int_le : lsymbol;
   ps_int_ge : lsymbol;
   ps_int_lt : lsymbol;
@@ -797,7 +797,10 @@ let rec k_expr env lps e res ?case_xmap xmap =
           | Tyapp (s,_) when ts_equal s ts_int ->
               fun v -> t_var v.pv_vs
           | Tyapp (s,_) ->
-              let s = Mts.find s env.ts_ranges in
+              let td = Mts.find s env.ts_ranges in
+              let s = match td.Theory.td_node with
+                | Theory.Meta (_, [_; Theory.MAls s]) -> s
+                | _ -> assert false (* never *) in
               fun v -> fs_app s [t_var v.pv_vs] ty_int
           | Tyvar _ -> assert false (* never *) in
         let a = int_of_pv a and i = t_var vi.pv_vs in
