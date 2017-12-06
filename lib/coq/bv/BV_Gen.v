@@ -583,12 +583,14 @@ Lemma bvec_to_nat_zeros : forall {l}, bvec_to_nat l (Vector.const false l) = 0.
   induction l; [easy|simpl; omega].
 Qed.
 
-Definition twos_complement n (v : Bvector n) : Z :=
-  match v with
-    | Vector.nil _ => 0%Z
-    | Vector.cons _ false n v => Z.of_nat (bvec_to_nat n v)
-    | Vector.cons _ true n v => (Z.of_nat (bvec_to_nat n v) - Pow2int.pow2 (Z.of_nat (S n)))%Z
-  end.
+Definition twos_complement n (v : Bvector n) : Z.
+destruct n.
+exact 0%Z.
+exact (match Bsign _ v with
+        | false => Z.of_nat (bvec_to_nat _ v)
+        | true  => (Z.of_nat (bvec_to_nat _ v) - Pow2int.pow2 (Z.of_nat (S n)))%Z
+       end).
+Defined.
 
 Require Arith.Div2.
 
@@ -705,51 +707,74 @@ Lemma bvec_to_nat_range : forall {n} v, bvec_to_nat n v < Z.to_nat (Pow2int.pow2
   apply Zlt_le_weak, Pow2int.pow2pos; omega.
 Qed.
 
-Lemma twos_complement_neg : forall {n} v, (twos_complement (S n) (true :: v) < 0)%Z.
+Lemma twos_complement_neg : forall {n} v, Bsign n v = true -> (twos_complement (S n) v < 0)%Z.
   intros.
   unfold twos_complement.
+  rewrite H.
   apply Z.lt_sub_0.
-  apply Zlt_trans with (m := Pow2int.pow2 (Z.of_nat n)).
+  apply Zlt_le_trans with (m := Pow2int.pow2 (Z.of_nat (S n))).
   rewrite Z2Nat.inj_lt.
   rewrite Nat2Z.id.
   apply bvec_to_nat_range.
   omega.
   apply Zlt_le_weak, Pow2int.pow2pos; omega.
-  apply pow2_lt_mono_nat; omega.
+  omega.
 Qed.
 
-Lemma twos_complement_pos : forall {n} v, (twos_complement (S n) (false :: v) >= 0)%Z.
+Lemma twos_complement_pos : forall {n} v, Bsign n v = false -> (twos_complement (S n) v >= 0)%Z.
   intros.
-  unfold twos_complement; omega.
+  unfold twos_complement; rewrite H; omega.
 Qed.
+
+
 
 Lemma twos_complement_extensionality : forall {m} (v v' : Bvector m),
   (twos_complement m v = twos_complement m v' -> v = v').
-  destruct v; intros.
-  apply Vector.case0 with (v := v'); trivial.
-  revert v h H.
-  apply Vector.caseS with (v := v'); intros.
-  assert (tmp : forall {n} v v',
-       twos_complement (S n) (false :: v) <> twos_complement (S n) (true :: v')).
-    intros n1 v0 v'0 H1.
-    assert ((twos_complement (S n1) (true :: v'0) >= 0)%Z).
-    rewrite <- H1; apply twos_complement_pos.
-    assert ((twos_complement (S n1) (true :: v'0) < 0)%Z).
-    apply twos_complement_neg.
-    easy.
-  case h, h0; intros.
-  inversion H.
-  apply bvec_to_nat_extensionality; simpl; omega.
-  assert (twos_complement (S n0) (false :: v) <>
-          twos_complement (S n0) (true :: t0)).
-  apply tmp.
-  assert False by omega; easy.
-  assert (twos_complement (S n0) (false :: t0) <>
-          twos_complement (S n0) (true :: v)).
-  apply tmp.
-  assert False by omega; easy.
-  inversion H.
-  apply bvec_to_nat_extensionality; simpl; omega.
+
+  destruct m.
+  (* v = v' = nil *)
+  - simpl. intros. apply Vector.case0; eauto.
+    symmetry. apply Vector.case0; eauto.
+  (* Non empty vector *)
+  - intros.
+    assert (Bsign m v = Bsign m v').
+    { unfold twos_complement in H. destruct Bsign.
+      destruct Bsign. reflexivity.
+      assert (Z.of_nat (bvec_to_nat (S m) v') >= 0 /\
+              Z.of_nat (bvec_to_nat (S m) v') < 0)%Z.
+      {
+        split.
+        + omega.
+        + rewrite <- H. generalize (bvec_to_nat_range v). intros.
+          eapply Z.lt_sub_0. rewrite <- Z2Nat.id.
+          apply inj_lt. assumption.
+          eapply Zle_trans. apply (max_int_nat (S m)).
+          omega.
+      }
+      omega.
+      destruct Bsign.
+      (* TODO improve this (copy/paste) *)
+      assert (Z.of_nat (bvec_to_nat (S m) v) >= 0 /\
+              Z.of_nat (bvec_to_nat (S m) v) < 0)%Z.
+      {
+        split.
+        + omega.
+        + rewrite H. generalize (bvec_to_nat_range v'). intros.
+          eapply Z.lt_sub_0. rewrite <- Z2Nat.id.
+          apply inj_lt. assumption.
+          eapply Zle_trans. apply (max_int_nat (S m)).
+          omega.
+      }
+      omega.
+      reflexivity.
+    }
+    unfold twos_complement in H. rewrite <- H0 in H.
+    destruct Bsign.
+    apply bvec_to_nat_extensionality. apply Z.sub_cancel_r in H.
+    apply Nat2Z.inj in H. assumption.
+
+    apply bvec_to_nat_extensionality.
+    apply Nat2Z.inj in H. assumption.
 Qed.
 
 (* even / odd helper lemmas *)
@@ -1128,8 +1153,8 @@ Lemma max_int_val : (max_int = (two_power_size - 1%Z)%Z).
 Qed.
 
 (* Why3 goal *)
-Definition to_int: t -> Z.
-  exact (twos_complement size_nat).
+Definition is_signed_positive: t -> Prop.
+  exact (fun v => if Bsign _ v then False else True).
 Defined.
 
 (* Why3 goal *)
@@ -1145,6 +1170,34 @@ Qed.
 Definition of_int: Z -> t.
   exact (fun x => nat_to_bvec size_nat (Z.to_nat x)).
 Defined.
+
+(* Why3 goal *)
+Definition to_int: t -> Z.
+  exact (twos_complement size_nat).
+Defined.
+
+(* Why3 goal *)
+Lemma to_int_def : forall (x:t), ((is_signed_positive x) ->
+  ((to_int x) = (to_uint x))) /\ ((~ (is_signed_positive x)) ->
+  ((to_int x) = (-(two_power_size - (to_uint x))%Z)%Z)).
+  intros. split.
+  - unfold to_int, to_uint,is_signed_positive, twos_complement, size_nat.
+    intros.
+    assert (Bsign last_bit x = false).
+    {
+      destruct Bsign; try (now destruct H); auto.
+    }
+    rewrite H0. reflexivity.
+
+  - unfold two_power_size, to_int, to_uint,is_signed_positive,
+           twos_complement, size, size_nat.
+    intros.
+    assert (Bsign last_bit x = true).
+    {
+      destruct Bsign; try (now destruct H); auto.
+    }
+    rewrite H0. ring.
+Qed.
 
 (* Why3 goal *)
 Lemma to_uint_extensionality : forall (v:t) (v':t),
@@ -1365,6 +1418,35 @@ Definition sgt (v1:t) (v2:t): Prop := ((to_int v2) < (to_int v1))%Z.
 
 (* Why3 assumption *)
 Definition sge (v1:t) (v2:t): Prop := ((to_int v2) <= (to_int v1))%Z.
+
+Lemma zeros_sign_aux: forall A n (h: A), Vector.last (Vector.const h (S n)) = h.
+  induction n; eauto.
+Qed.
+
+Lemma zeros_sign_false: Bsign last_bit zeros = false.
+  apply zeros_sign_aux.
+Qed.
+
+(* Why3 goal *)
+Lemma positive_is_ge_zeros : forall (x:t), (is_signed_positive x) <-> (sge x
+  zeros).
+  intros.
+  unfold is_signed_positive, sge, to_int, twos_complement, size_nat.
+  rewrite zeros_sign_false. destruct Bsign.
+  intuition.
+  unfold zeros, zeros_aux, size_nat in *. rewrite bvec_to_nat_zeros in H.
+  generalize (bvec_to_nat_range x). intros.
+  simpl (Z.of_nat 0) in H.
+  assert (Pow2int.pow2 (Z.of_nat (S last_bit)) <= Z.of_nat (bvec_to_nat (S last_bit) x)).
+  omega. unfold size_nat in *.
+  apply Z2Nat.inj_le in H1; try omega.
+  rewrite Nat2Z.id in H1; try omega.
+  eapply Zle_trans. apply (max_int_nat (S last_bit)). omega.
+
+  intuition.
+  unfold zeros, zeros_aux.
+  rewrite bvec_to_nat_zeros. simpl. omega.
+Qed.
 
 (* Why3 goal *)
 Definition add: t -> t -> t.

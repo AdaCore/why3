@@ -98,6 +98,14 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
+let fprintf_any fmt a =
+  match a with
+  | AFile f -> Format.fprintf fmt "<AFile %s>" f.file_name
+  | ATh th ->  Format.fprintf fmt "<ATh %s>" th.theory_name.Ident.id_string
+  | ATn trid -> Format.fprintf fmt "<ATn %d>" trid
+  | APn pnid -> Format.fprintf fmt "<APn %d>" pnid
+  | APa paid -> Format.fprintf fmt "<APa %d>" paid
+
 module Hpn = Hint
 module Htn = Hint
 module Hpan = Hint
@@ -270,20 +278,24 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
-let rec is_detached (s: session) (a: any) =
+let goal_is_detached s pn =
+  try let (_:Task.task) = get_raw_task s pn in false
+  with Not_found -> true
+
+let transf_is_detached s tn =
+  (get_transfNode s tn).transf_is_detached
+
+let proof_attempt_is_detached s pa =
+  let pa = get_proof_attempt_node s pa in
+  goal_is_detached s pa.parent
+
+let is_detached (s: session) (a: any) =
   match a with
   | AFile file -> file.file_is_detached
   | ATh th     -> th.theory_is_detached
-  | ATn tn     -> (get_transfNode s tn).transf_is_detached
-  | APn pn     ->
-    begin
-      try let _ = get_raw_task s pn in false
-      with Not_found -> true
-    end
-  | APa pa     ->
-    let pa = get_proof_attempt_node s pa in
-    let pn_id = pa.parent in
-    is_detached s (APn pn_id)
+  | ATn tn     -> transf_is_detached s tn
+  | APn pn     -> goal_is_detached s pn
+  | APa pa     -> proof_attempt_is_detached s pa
 
 let rec get_encapsulating_theory s any =
   match any with
@@ -694,7 +706,9 @@ let update_file_node notification s f =
     (* No updates if ths is empty *)
     ()
   else
-    let proved = List.for_all (th_proved s) ths in
+    let proved =
+      List.for_all (fun th -> th.theory_is_detached || th_proved s th) ths
+    in
     if proved <> file_proved s f then
       begin
         Stdlib.Hstr.replace s.file_state f.file_name proved;
@@ -703,7 +717,9 @@ let update_file_node notification s f =
 
 let update_theory_node notification s th =
   let goals = theory_goals th in
-  let proved = List.for_all (pn_proved s) goals in
+  let proved =
+    List.for_all (fun pn -> goal_is_detached s pn || pn_proved s pn) goals
+  in
   if proved <> th_proved s th then
     begin
       Debug.dprintf debug "[Session] setting theory %s to status proved=%b@."
@@ -720,7 +736,15 @@ let update_theory_node notification s th =
 let rec update_goal_node notification s id =
   let tr_list = get_transformations s id in
   let pa_list = get_proof_attempts s id in
-  let proved = List.exists (tn_proved s) tr_list || List.exists pa_ok pa_list in
+  let proved =
+    List.exists
+      (fun tr -> not (transf_is_detached s tr) &&
+                   tn_proved s tr) tr_list
+    ||
+      List.exists
+        (fun pa -> not (goal_is_detached s pa.parent) &&
+                     pa_ok pa) pa_list
+  in
   if proved <> pn_proved s id then
     begin
       Debug.dprintf debug "[Session] setting goal node %a to status proved=%b@."

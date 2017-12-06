@@ -109,7 +109,7 @@ module VonNeumann32
   function pred (x:t) : t = sub x (1:t)
   function pow2 (n:t) : t = lsl_bv (1:t) n
   predicate is_pow2 (x:t) (n:t) = bw_and x (pred (pow2 n)) = (0:t)
-
+    
   lemma sqr_add: forall x y.
     sqr (add x y) = add (sqr x) (add (sqr y) (mul (2:t) (mul x y)))
 
@@ -173,18 +173,6 @@ module VonNeumann32
 end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 module VonNeumann64
 
   use import ref.Ref
@@ -196,12 +184,19 @@ module VonNeumann64
   function pow2 (n:t) : t = lsl_bv (1:t) n
   predicate is_pow2 (x:t) (n:t) = bw_and x (pred (pow2 n)) = (0:t)
 
+
   lemma sqr_add: forall x y.
     sqr (add x y) = add (sqr x) (add (sqr y) (mul (2:t) (mul x y)))
 
+  lemma sqr_add2: forall x y.
+    sqr (add x y) = add (sqr x) (mul y (add (mul (2:t) x) y))
+    (*
+          pragma Assert ((X + Y) * (X + Y) = X * X + Y * (2 * X + Y));*)
+
+
   let isqrt64 (x:t) : t
     ensures { ule (sqr result) x }
-    (* ensures { ult x (sqr (succ result))  } *)
+    ensures { ule x (pred (sqr (succ result))) }
   = let num = ref x in
     let bits = ref (0x4000_0000_0000_0000:t) in
     let res = ref (0:t) in
@@ -226,6 +221,10 @@ module VonNeumann64
       invariant { ule !num x }
       (* (x - num) est le carré de (res / 2^m) *)
       invariant { sub x !num = sqr !res_g }
+      invariant {ule (add !res_g (pow2 !m)) (0x1_0000_0000:t)}
+
+      (* x < (res_g + 2^m)^2 *)
+      invariant { ule x (pred (sqr (add !res_g (pow2 !m)))) }
 
       (* m is not null, let's subtract 1 *)
       assert { !m <> (0:t) };

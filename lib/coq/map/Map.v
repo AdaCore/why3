@@ -13,7 +13,6 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
-Require HighOrd.
 
 Require Import ClassicalEpsilon.
 

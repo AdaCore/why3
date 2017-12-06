@@ -291,7 +291,7 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term y
       t.model_fo_term_field -> y >= 0 }
-    diverges
+    diverges (* variant { 0 } *)
     (* variant { it , size_fo_term t.model_fo_term_field } *)
     ensures { not(is_fo_term_free_var_in_fo_term x
       (st t.model_fo_term_field rho.unifier)) }
@@ -341,7 +341,7 @@ module Impl
     (*requires { it >= 0 }*)
     requires { forall y:int. is_fo_term_free_var_in_fo_term_list y
       t.model_fo_term_list_field -> y >= 0 }
-    diverges
+    diverges (* variant { 0 } *)
     (*variant { it , size_fo_term_list t.model_fo_term_list_field }*)
     ensures { not(is_fo_term_free_var_in_fo_term_list x
         (stl t.model_fo_term_list_field rho.unifier)) }
@@ -418,6 +418,7 @@ module Impl
       let s1 = rho.unifier in
       sc s0 s1 = s0 = sc s1 s0 }
 
+    diverges
     (* Variant post-conditions. *)
     (*ensures { cardinal result.unassigned_set < cardinal s }
     ensures { forall x:int.
@@ -871,7 +872,7 @@ module Impl
     (*-> forall s:func int (fo_term int int).
       let s' = sc rho.unifier s in
       st t1.model_fo_term_field s' <> st t2.model_fo_term_field s'*) }
-    diverges
+    diverges (* variant { 0 } *)
     (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term t1.model_fo_term_field +
       size_fo_term t2.model_fo_term_field }*)
@@ -1076,7 +1077,7 @@ module Impl
       let s' = sc rho.unifier s in
       stl t1.model_fo_term_list_field s' <>
         stl t2.model_fo_term_list_field s'*) }
-    diverges
+    diverges (* variant { 0 } *)
      (*variant { S.cardinal s , it1 + it2 ,
       size_fo_term_list t1.model_fo_term_list_field +
       size_fo_term_list t2.model_fo_term_list_field }*)
@@ -1157,6 +1158,7 @@ module Impl
   let conflict (t1 t2:nlimpl_fo_term_list) (rhob:subst) (ghost rho:unifier_subst) : unit
     requires { sdata_inv (PConflict t1 t2) }
     requires { unifier_subst_ok rhob rho }
+    diverges
     ensures { unifier_subst_ok rhob rho }
     (* Useless : trivial consequence of unifier_subst_ok rhob rho.
     ensures { smodel (current_timestamp rhob) =
@@ -1223,7 +1225,7 @@ module Impl
     ensures { unifier_subst_ok rhob rho }
     (*ensures { smodel (current_timestamp rhob) = smodel (current_timestamp (old rhob)) }*)
     ensures { precede (old rhob) rhob }
-    variant { lv }
+    diverges (* variant { lv } *)
     raises { UnificationFailure -> correct rhob /\ precede (old rhob) rhob }
   =
     match lv with
@@ -1237,7 +1239,7 @@ module Impl
     requires { unifier_subst_ok rhob rho }
     ensures { unifier_subst_ok rhob rho }
     ensures { precede (old rhob) rhob }
-    variant { lv }
+    diverges (* variant { lv } *)
     raises { UnificationFailure -> correct rhob /\ precede (old rhob) rhob }
   =
     match lv with
@@ -1256,6 +1258,7 @@ module Impl
     requires { forall x:int. is_fo_term_free_var_in_fo_term_list x
       t2.model_fo_term_list_field -> x >= 0 }
     requires { unifier_subst_ok rhob rho }
+    diverges
     ensures { unifier_subst_ok rhob result.final_unifier }
     ensures { result.final_unifier.unifier = sc rho.unifier result.unifier_factor }
     ensures { precede (old rhob) rhob }
