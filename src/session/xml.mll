@@ -167,6 +167,9 @@ and string_val = parse
   | "&apos;"
       { Buffer.add_char buf '\'';
         string_val lexbuf }
+  | "&#39;"
+      { Buffer.add_char buf '\'';
+        string_val lexbuf }
   | "&amp;"
       { Buffer.add_char buf '&';
         string_val lexbuf }
