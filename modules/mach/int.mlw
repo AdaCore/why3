@@ -71,18 +71,11 @@ module Bounded_int
     requires { "expl:integer overflow" in_bounds (- a) }
     ensures  { result = - a }
 
-  val eq (a:t) (b:t) : bool
-    ensures { to_int a = to_int b -> result } (* leave this to_int ? *)
-    ensures { result -> a = b }
-
-  val ne (a:t) (b:t) : bool
-    ensures { a <> b -> result }
-    ensures { result -> to_int a <> to_int b }
-
   axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
 
   val (=) (a:t) (b:t) : bool
-    ensures  { result <-> to_int a = to_int b }
+    ensures { to_int a = to_int b -> result }
+    ensures { result -> a = b }
 
   val (<=) (a:t) (b:t) : bool
     ensures  { result <-> to_int a <= to_int b }
