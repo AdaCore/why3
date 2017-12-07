@@ -762,7 +762,7 @@ let rec update_goal_node notification s id =
 
 and update_trans_node notification s trid =
   let proof_list = get_sub_tasks s trid in
-  let proved = List.for_all (pn_proved s) proof_list in
+  let proved = List.for_all (fun pn -> goal_is_detached s pn || pn_proved s pn) proof_list in
   if proved <> tn_proved s trid then
     begin
       Htn.replace s.tn_state trid proved;
