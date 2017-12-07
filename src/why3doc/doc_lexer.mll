@@ -51,15 +51,18 @@
 
   let current_file = ref ""
 
-  let print_ident fmt lexbuf s =
+  let print_ident ?(parentheses=false) fmt lexbuf s =
     if is_keyword1 s then
       fprintf fmt "<span class=\"keyword1\">%s</span>" s
     else if is_keyword2 s then
       fprintf fmt "<span class=\"keyword2\">%s</span>" s
     else begin
-      let (* f,l,c as *) loc = get_loc lexbuf in
-      (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
-      (* is this a def point? *)
+      let loc =
+        let loc = get_loc lexbuf in
+        if parentheses then
+          let (f,l,s,e) = Loc.get loc in
+          Loc.user_position f l (s + 1) (e - 1)
+        else loc in
       try
         let id, def = Glob.find loc in
         match id.Ident.id_loc with
@@ -105,8 +108,9 @@ let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
 let special = ['\'' '"' '<' '>' '&']
 
 rule scan fmt empty delayed = parse
-  | "(*)" as s
-          { pp_print_string fmt s;
+  | "(*)" { pp_print_char fmt '(';
+            print_ident ~parentheses:true fmt lexbuf "*";
+            pp_print_char fmt ')';
             scan fmt false delayed lexbuf }
   | space* "(***"
           { comment fmt false lexbuf;
