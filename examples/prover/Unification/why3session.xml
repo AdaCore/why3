@@ -12,7 +12,7 @@
 <prover id="7" name="Spass" version="3.7" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Vampire" version="0.6" timelimit="30" steplimit="0" memlimit="1000"/>
-<file name="../Unification.mlw">
+<file name="../Unification.mlw" proved="true">
 <theory name="Types" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
 <theory name="Logic" proved="true" sum="49f19b295ec56b99abf9291d836f58d1">
@@ -35,7 +35,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Impl" sum="e64374a367f6b6688efb50a47b2cd9ea">
+<theory name="Impl" proved="true" sum="632134a20c048499b72cffc51630da8e">
  <goal name="WP_parameter bottomvar" expl="VC for bottomvar" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter bottomvar.0" expl="assertion" proved="true">
@@ -2183,8 +2183,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter conflicts" expl="VC for conflicts">
- <transf name="split_goal_wp" >
+ <goal name="WP_parameter conflicts" expl="VC for conflicts" proved="true">
+ <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter conflicts.0" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="8"/></proof>
   </goal>
@@ -2230,12 +2230,6 @@
   <goal name="WP_parameter conflicts.14" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.09" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter conflicts.10">
-  <proof prover="5" obsolete="true"><result status="valid" time="0.14" steps="73"/></proof>
-  </goal>
-  <goal name="WP_parameter conflicts.2">
-  <proof prover="5" obsolete="true"><result status="valid" time="0.14" steps="60"/></proof>
-  </goal>
  </transf>
  </goal>
  <goal name="WP_parameter unif_conflicts" expl="VC for unif_conflicts" proved="true">
@@ -2258,25 +2252,22 @@
   <goal name="WP_parameter unif_conflicts.5" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="10"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.6" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.15" steps="65"/></proof>
-  </goal>
-  <goal name="WP_parameter unif_conflicts.7" expl="precondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.8" expl="precondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.7" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.9" expl="postcondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.8" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.11" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.10" expl="postcondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.9" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.11" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.10" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.12" steps="32"/></proof>
   </goal>
-  <goal name="WP_parameter unif_conflicts.12" expl="exceptional postcondition" proved="true">
+  <goal name="WP_parameter unif_conflicts.11" expl="exceptional postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.10" steps="14"/></proof>
   </goal>
  </transf>
