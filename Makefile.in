@@ -289,10 +289,13 @@ GENERATED += $(LIBGENERATED)
 clean_old_install::
 	rm -rf $(LIBDIR)/why3
 	rm -rf $(DATADIR)/why3
-	rm -rf $(OCAMLINSTALLLIB)/why3
 
+clean_old_install-lib::
+	if test -d $(OCAMLINSTALLLIB) -a -w $(OCAMLINSTALLLIB); then \
+	  rm -f $(OCAMLINSTALLLIB)/why3; \
+	fi
 
-install_no_local:: clean_old_install
+install_no_local::
 	$(MKDIR_P) $(BINDIR)
 	$(MKDIR_P) $(LIBDIR)/why3
 	$(MKDIR_P) $(TOOLDIR)
@@ -335,7 +338,7 @@ install install-lib:
 	@echo "To install Why3, run ./configure --disable-local ; make ; make install"
 else
 install: clean_old_install install_no_local
-install-lib: install_no_local_lib
+install-lib: clean_old_install-lib install_no_local_lib
 endif
 
 install-all: install install-lib
@@ -344,7 +347,12 @@ install-all: install install-lib
 # Uninstallation
 ##################
 
-uninstall: clean_old_install
+ifeq (@enable_local@,yes)
+uninstall:
+	@echo "Why3 is configured in local installation mode."
+else
+uninstall: clean_old_install clean_old_install-lib
+endif
 
 ##################
 # Why3 emacs mode
@@ -1810,10 +1818,6 @@ doc/apidoc/dg.svg: doc/apidoc/dg.dot
 doc/apidoc/dg.png: doc/apidoc/dg.dot
 	dot -T png $< > $@
 
-# what is this ? api doc is in why3.lri.fr/api instead...
-# install_apidoc: apidoc
-# 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
-
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
@@ -1822,11 +1826,13 @@ clean::
 	rm -f doc/apidoc/*
 
 ##########
-# Install rules that require root, and thus appear last in the file!
+# Install rules for bash completions
 ##########
 
 clean_old_install::
-	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then rm -f /etc/bash_completion.d/why3; fi
+	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
+	  rm -f /etc/bash_completion.d/why3; \
+	fi
 
 install_no_local::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
