@@ -1412,14 +1412,16 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
+    (* check if transformation already present with the same parameters.
+       this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
                         List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in
-    (* NOTE: should not happen *)
-    Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
-    assert false
+    Printexc.print_backtrace stderr;
+    Format.eprintf "[add_registered_transformation] FATAL transformation already present@.";
+    exit 2
   with Not_found ->
     let subgoals =
       apply_trans_to_goal ~allow_no_effect:true s env old_tr.transf_name old_tr.transf_args goal_id
@@ -1443,10 +1445,12 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_subtasks = List.map (fun id -> id,old_s)
       old_tr.transf_subtasks in
   try
+    match
     (* add_registered_transformation actually apply the transformation. It can fail *)
-    let new_tr_id =
-      add_registered_transformation new_s env old_tr new_goal_id
-    in
+    try Some (add_registered_transformation new_s env old_tr new_goal_id)
+    with _ -> None
+  with
+  | Some new_tr_id ->
     let new_tr = get_transfNode new_s new_tr_id in
     (* attach the session to the subtasks to be able to instantiate Pairing *)
     let new_subtasks = List.map (fun id -> id,new_s)
@@ -1460,21 +1464,29 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
            merge_goal ~use_shapes env new_s old_s ~goal_obsolete
                       (get_proofNode old_s old_goal_id) new_goal_id
         | ((id,s), None) ->
-           Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
+           Debug.dprintf debug "[merge_trans] missed new subgoal: %s@."
                          (get_proofNode s id).proofn_name.Ident.id_string;
            found_detached := true)
       associated;
     (* save the detached goals *)
-    let detached = List.map (fun (a,_) -> a) detached in
+    let detached = List.map (fun (id,_) ->
+                Debug.dprintf debug "[merge_trans] detached subgoal: %s@."
+                              (get_proofNode old_s id).proofn_name.Ident.id_string;
+                found_detached := true;
+                id) detached in
     new_tr.transf_subtasks <-
       new_tr.transf_subtasks @
         save_detached_goals old_s detached new_s (Trans new_tr_id)
-  with _ when not (Debug.test_flag debug_stack_trace) ->
-    Debug.dprintf debug
-                  "[Session_itp.merge_trans] transformation failed: %s@."
-                  old_tr.transf_name;
-    save_detached_trans old_s new_s new_goal_id old_tr_id;
-    found_detached := true
+  | None ->
+     Debug.dprintf debug
+                   "[Session_itp.merge_trans] transformation failed: %s@."
+                   old_tr.transf_name;
+     save_detached_trans old_s new_s new_goal_id old_tr_id;
+     found_detached := true
+  with e when not (Debug.test_flag debug_stack_trace) ->
+    Printexc.print_backtrace stderr;
+    Format.eprintf "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
+    exit 2
 
 
 let merge_theory ~use_shapes env old_s old_th s th : unit =
@@ -1600,8 +1612,8 @@ let add_file_section (s:session) (fn:string)
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
     begin
-      Format.eprintf "[session] FATAL: file %s already in database@\n%s@." fn
-                     (Printexc.get_backtrace ());
+      Printexc.print_backtrace stderr;
+      Format.eprintf "[session] FATAL: file %s already in database@." fn;
       exit 2
     end
   else
