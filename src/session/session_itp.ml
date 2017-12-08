@@ -747,8 +747,10 @@ let rec update_goal_node notification s id =
   in
   if proved <> pn_proved s id then
     begin
+      (* too noisy, uncomment if you really need it
       Debug.dprintf debug "[Session] setting goal node %a to status proved=%b@."
                     print_proofNodeID id proved;
+       *)
       Hpn.replace s.pn_state id proved;
       notification (APn id);
       match get_proof_parent s id with
@@ -1598,8 +1600,9 @@ let add_file_section (s:session) (fn:string)
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
     begin
-      Debug.dprintf debug "[session] file %s already in database@." fn;
-      assert false
+      Format.eprintf "[session] FATAL: file %s already in database@\n%s@." fn
+                     (Printexc.get_backtrace ());
+      exit 2
     end
   else
     match theories with
