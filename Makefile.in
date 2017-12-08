@@ -299,10 +299,13 @@ GENERATED += $(LIBGENERATED)
 clean_old_install::
 	rm -rf $(LIBDIR)/why3
 	rm -rf $(DATADIR)/why3
-	rm -rf $(OCAMLINSTALLLIB)/why3
 
+clean_old_install-lib::
+	if test -d $(OCAMLINSTALLLIB) -a -w $(OCAMLINSTALLLIB); then \
+	  rm -f $(OCAMLINSTALLLIB)/why3; \
+	fi
 
-install_no_local:: clean_old_install
+install_no_local::
 	$(MKDIR_P) $(BINDIR)
 	$(MKDIR_P) $(LIBDIR)/why3
 	$(MKDIR_P) $(TOOLDIR)
@@ -345,7 +348,7 @@ install install-lib:
 	@echo "To install Why3, run ./configure --disable-local ; make ; make install"
 else
 install: clean_old_install install_no_local
-install-lib: install_no_local_lib
+install-lib: clean_old_install-lib install_no_local_lib
 endif
 
 install-all: install install-lib
@@ -354,7 +357,12 @@ install-all: install install-lib
 # Uninstallation
 ##################
 
-uninstall: clean_old_install
+ifeq (@enable_local@,yes)
+uninstall:
+	@echo "Why3 is configured in local installation mode."
+else
+uninstall: clean_old_install clean_old_install-lib
+endif
 
 ##################
 # Why3 emacs mode
@@ -667,7 +675,6 @@ gallery-subs::
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
-	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
 	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ -L ../../theories -L ../../modules -L . --stdlib-url http://why3.lri.fr/stdlib/ *.mlw -o $(GALLERYDIR)/$$d; \
@@ -684,7 +691,7 @@ gallery-subs::
 	d=`dirname $$x`; \
 	f=`basename $$d`; \
 	echo "exporting $$f"; \
-	rm $$d/*.bak; \
+	rm -f $$d/*.bak; \
 	mkdir -p $(GALLERYDIR)/$$f; \
 	WHY3CONFIG="" bin/why3session.@OCAMLBEST@ html $$d -o $(GALLERYDIR)/$$f; \
 	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
@@ -1942,10 +1949,6 @@ doc/apidoc/dg.svg: doc/apidoc/dg.dot
 doc/apidoc/dg.png: doc/apidoc/dg.dot
 	dot -T png $< > $@
 
-# what is this ? api doc is in why3.lri.fr/api instead...
-# install_apidoc: apidoc
-# 	rsync -av doc/apidoc/ marche@scm.gforge.inria.fr:/home/groups/why3/htdocs/apidoc/
-
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
 		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
@@ -1954,11 +1957,13 @@ clean::
 	rm -f doc/apidoc/*
 
 ##########
-# Install rules that require root, and thus appear last in the file!
+# Install rules for bash completions
 ##########
 
 clean_old_install::
-	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then rm -f /etc/bash_completion.d/why3; fi
+	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
+	  rm -f /etc/bash_completion.d/why3; \
+	fi
 
 install_no_local::
 	if test -d /etc/bash_completion.d -a -w /etc/bash_completion.d; then \
