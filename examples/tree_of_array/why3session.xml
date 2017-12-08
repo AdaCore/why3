@@ -4,8 +4,9 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="1.30" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../tree_of_array.mlw" expanded="true">
-<theory name="TreeOfArray" sum="e6cc07771b58c81603582477098238ac" expanded="true">
+<theory name="TreeOfArray" sum="415ae15d24148530a5b2281791ece1b0" expanded="true">
  <goal name="WP_parameter tree_of_array_aux" expl="VC for tree_of_array_aux" expanded="true">
  <transf name="split_goal_wp" expanded="true">
   <goal name="WP_parameter tree_of_array_aux.1" expl="postcondition">
@@ -26,16 +27,16 @@
   <goal name="WP_parameter tree_of_array_aux.6" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter tree_of_array_aux.7" expl="postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
+  <goal name="WP_parameter tree_of_array_aux.7" expl="postcondition">
+  <transf name="split_goal_wp">
    <goal name="WP_parameter tree_of_array_aux.7.1" expl="postcondition">
    <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
    </goal>
    <goal name="WP_parameter tree_of_array_aux.7.2" expl="postcondition">
-   <proof prover="0"><result status="valid" time="0.17" steps="274"/></proof>
+   <proof prover="0"><result status="valid" time="0.17" steps="270"/></proof>
    </goal>
    <goal name="WP_parameter tree_of_array_aux.7.3" expl="postcondition">
-   <proof prover="0"><result status="valid" time="2.41" steps="1188"/></proof>
+   <proof prover="2"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="WP_parameter tree_of_array_aux.7.4" expl="postcondition">
    <proof prover="1"><result status="valid" time="0.13"/></proof>
@@ -44,7 +45,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter tree_of_array" expl="VC for tree_of_array" expanded="true">
+ <goal name="WP_parameter tree_of_array" expl="VC for tree_of_array">
  <proof prover="0"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
 </theory>

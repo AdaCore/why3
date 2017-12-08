@@ -2,67 +2,65 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="6" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../power.mlw" expanded="true">
-<theory name="FastExponentiation" sum="372e3fedff8ee241c0b52de2f675ae3a" expanded="true">
- <goal name="WP_parameter fast_exp" expl="VC for fast_exp" expanded="true">
- <proof prover="4" timelimit="3"><result status="valid" time="0.57" steps="55"/></proof>
+<theory name="FastExponentiation" sum="b571612c8c075ebc18bdee600ab0d856" expanded="true">
+ <goal name="WP_parameter fast_exp" expl="VC for fast_exp">
+ <proof prover="2"><result status="valid" time="0.13" steps="44"/></proof>
  </goal>
  <goal name="WP_parameter fast_exp_imperative" expl="VC for fast_exp_imperative" expanded="true">
  <transf name="split_goal_wp" expanded="true">
-  <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init" expanded="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.00"/></proof>
-  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
-  <proof prover="6"><result status="valid" time="0.00"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.1" expl="loop invariant init">
+  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
+  <proof prover="5"><result status="valid" time="0.01"/></proof>
+  <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.2" expl="assertion" expanded="true">
-  <proof prover="0"><result status="valid" time="0.19" steps="14"/></proof>
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.2" expl="assertion">
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.3" expl="loop invariant preservation" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.3.1" expl="VC for fast_exp_imperative" expanded="true">
-   <proof prover="4" timelimit="10" memlimit="1000"><result status="valid" time="0.13" steps="13"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.3" expl="loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter fast_exp_imperative.3.1" expl="VC for fast_exp_imperative">
+   <proof prover="2"><result status="valid" time="0.04" steps="11"/></proof>
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative.3.2" expl="VC for fast_exp_imperative" expanded="true">
-   <proof prover="0"><result status="valid" time="0.80" steps="19"/></proof>
+   <goal name="WP_parameter fast_exp_imperative.3.2" expl="VC for fast_exp_imperative">
+   <proof prover="2"><result status="valid" time="0.50" steps="20"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.4" expl="loop variant decrease" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="4" timelimit="10"><result status="valid" time="0.09" steps="13"/></proof>
-  <proof prover="6"><result status="valid" time="0.01"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.4" expl="loop variant decrease">
+  <proof prover="2"><result status="valid" time="0.56" steps="11"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="WP_parameter fast_exp_imperative.5" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.10" steps="21"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.6" expl="loop invariant preservation" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.6.1" expl="VC for fast_exp_imperative" expanded="true">
-   <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
-   <proof prover="1"><result status="valid" time="0.01"/></proof>
-   <proof prover="4"><result status="valid" time="0.02" steps="16"/></proof>
-   <proof prover="6"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.6" expl="loop invariant preservation">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter fast_exp_imperative.6.1" expl="VC for fast_exp_imperative">
+   <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
+   <proof prover="5"><result status="valid" time="0.02"/></proof>
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter fast_exp_imperative.6.2" expl="VC for fast_exp_imperative" expanded="true">
-   <proof prover="0"><result status="valid" time="1.81" steps="25"/></proof>
+   <goal name="WP_parameter fast_exp_imperative.6.2" expl="VC for fast_exp_imperative">
+   <proof prover="2"><result status="valid" time="0.49" steps="24"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.7" expl="loop variant decrease" expanded="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="4" timelimit="10"><result status="valid" time="1.15" steps="21"/></proof>
-  <proof prover="6"><result status="valid" time="0.02"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.7" expl="loop variant decrease">
+  <proof prover="2"><result status="valid" time="0.29" steps="22"/></proof>
+  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter fast_exp_imperative.8" expl="postcondition" expanded="true">
-  <transf name="split_goal_wp" expanded="true">
-   <goal name="WP_parameter fast_exp_imperative.8.1" expl="postcondition" expanded="true">
-   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="WP_parameter fast_exp_imperative.8" expl="postcondition">
+  <transf name="split_goal_wp">
+   <goal name="WP_parameter fast_exp_imperative.8.1" expl="postcondition">
+   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
