@@ -99,13 +99,11 @@ revert m Hm.
 apply natlike_ind.
 now rewrite Zmult_0_r, 2!Power_0.
 intros m Hm IHm.
-replace (n * Zsucc m)%Z with (n * m + n)%Z by ring.
-unfold Zsucc.
-rewrite 2!Power_sum by auto with zarith.
+replace (n * Zsucc m)%Z with (n + n * m)%Z by ring.
+rewrite Power_sum by auto with zarith.
 rewrite IHm.
-now rewrite Power_1.
+now rewrite <- Power_s.
 Qed.
-
 
 (* Why3 goal *)
 Lemma Power_comm1 : forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) ->

@@ -167,12 +167,16 @@ and string_val = parse
   | "&apos;"
       { Buffer.add_char buf '\'';
         string_val lexbuf }
-  | "&#39;"
-      { Buffer.add_char buf '\'';
-        string_val lexbuf }
   | "&amp;"
       { Buffer.add_char buf '&';
         string_val lexbuf }
+  | "&#" (digit+ as n) ';'
+      { let n = try int_of_string n with _ -> 256 in
+        if n >= 128 then parse_error "unrecognized entity";
+        Buffer.add_char buf (Char.chr n);
+        string_val lexbuf }
+  | '&'
+      { parse_error "unrecognized entity" }
   | [^ '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }
