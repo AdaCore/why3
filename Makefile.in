@@ -182,7 +182,7 @@ LIB_MLW = ity expr dexpr pdecl pmodule
 
 LIB_PARSER = ptree glob parser typing lexer
 
-LIB_TRANSFORM = simplify_formula inlining split_goal induction \
+LIB_TRANSFORM = simplify_formula inlining split_goal \
 		detect_polymorphism reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
@@ -194,10 +194,10 @@ LIB_TRANSFORM = simplify_formula inlining split_goal induction \
 		eliminate_epsilon intro_projections_counterexmp \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
-		induction_pr prop_curry \
+		prop_curry \
 		args_wrapper generic_arg_trans_utils case apply \
 		ind_itp destruct cut \
-		eliminate_literal
+		eliminate_literal induction induction_pr
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
