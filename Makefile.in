@@ -1262,64 +1262,64 @@ update-isabelle: $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $
 $(ISABELLELIBS_INT): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/int.why
 	$(SHOW) "Generating Isabelle realization for int.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/int
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/int
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T int.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/int/
 
 $(ISABELLELIBS_BOOL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bool.why
 	$(SHOW) "Generating Isabelle realization for bool.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/bool
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bool
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bool.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bool/
 
 $(ISABELLELIBS_REAL): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/real.why
 	$(SHOW) "Generating Isabelle realization for real.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/real
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/real
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T real.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/real/
 
 $(ISABELLELIBS_NUMBER): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/number.why
 	$(SHOW) "Generating Isabelle realization for number.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/number
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/number
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T number.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/number/
 
 $(ISABELLELIBS_SET): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/set.why
 	$(SHOW) "Generating Isabelle realization for set.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/set
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/set
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T set.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/set/
 
 $(ISABELLELIBS_MAP): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/map.why
 	$(SHOW) "Generating Isabelle realization for map.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/map
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/map
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T map.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/map/
 
 $(ISABELLELIBS_LIST): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/list.why
 	$(SHOW) "Generating Isabelle realization for list.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/list
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/list
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T list.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/list/
 
 $(ISABELLELIBS_OPTION): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/option.why
 	$(SHOW) "Generating Isabelle realization for option.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/option
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/option
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T option.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/option/
 
 $(ISABELLELIBS_BV): bin/why3realize.@OCAMLBEST@ drivers/isabelle-realizations.aux \
   $(ISABELLEREALIZEDRV) drivers/isabelle-common.gen theories/bv.why
 	$(SHOW) "Generating Isabelle realization for bv.$(notdir $(basename $@))"
-	$(HIDE)mkdir -p lib/isabelle/bv
+	$(HIDE)mkdir -p $(GENERATED_PREFIX_ISABELLE)/bv
 	$(HIDE)WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D $(ISABELLEREALIZEDRV) -T bv.$(notdir $(basename $@)) -o $(GENERATED_PREFIX_ISABELLE)/bv/
 
-lib/isabelle/last_build: $(ISABELLEVERSIONSPECIFICTARGETS)
+$(GENERATED_PREFIX_ISABELLE)/last_build: $(ISABELLEVERSIONSPECIFICTARGETS)
 # $(ISABELLELIBS_INT) $(ISABELLELIBS_BOOL) $(ISABELLELIBS_REAL) $(ISABELLELIBS_NUMBER) $(ISABELLELIBS_SET) $(ISABELLELIBS_MAP) $(ISABELLELIBS_LIST) $(ISABELLELIBS_OPTION) $(ISABELLELIBS_BV)
 
 ifeq (@enable_isabelle_libs@,yes)
 
 ifneq (@enable_local@,yes)
-	cp -r lib/isabelle "$(LIBDIR)/why3"
+	cp -r $(GENERATED_PREFIX_ISABELLE) "$(LIBDIR)/why3"
 endif
 	@(if isabelle components -l | grep -q "$(ISABELLE_TARGET_DIR)$$"; then \
 	    echo "Building the Why3 heap for Isabelle/HOL:"; \
@@ -1334,9 +1334,9 @@ endif
 install_no_local::
 	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
-install_no_local:: lib/isabelle/last_build
+install_no_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
 
-install_local:: lib/isabelle/last_build
+install_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
 
 
 # do not update isabelle realizations systematically
@@ -1344,23 +1344,23 @@ install_local:: lib/isabelle/last_build
 
 # Removed cleaning of xml
 #clean::
-#	rm -f lib/isabelle/*/*.xml
+#	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
 
 else
 
 install_no_local::
 	$(INSTALL_DATA) drivers/isabelle-realizations.aux $(DATADIR)/why3/drivers/
 
-install_no_local:: lib/isabelle/last_build
+install_no_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
 
-install_local:: lib/isabelle/last_build
+install_local:: $(GENERATED_PREFIX_ISABELLE)/last_build
 
 # do not update isabelle realizations systematically
 # all: update-isabelle
 
 # Removed cleaning of xml
 #clean::
-#	rm -f lib/isabelle/*/*.xml
+#	rm -f $(GENERATED_PREFIX_ISABELLE)/*/*.xml
 
 endif
 

@@ -35,7 +35,7 @@ done
 
 TMP=$PWD/why3regtests.out
 TMPERR=$PWD/why3regtests.err
-TMPREAL=/tmp
+TMPREAL=$(mktemp -d /tmp/why3realizations-XXXXXXX)
 
 # Current directory is /examples
 cd `dirname $0`
@@ -58,7 +58,7 @@ test_generated () {
   # We want to use the makefile to be sure to check exhaustively the
   # realizations that are built
   make -C .. GENERATED_PREFIX_ISABELLE="$TMPREAL/lib/isabelle" update-isabelle > /dev/null 2> /dev/null
-  TMPDIFF=`diff -r -q -x '*.bak' ../lib/isabelle $TMPREAL/lib/isabelle`
+  TMPDIFF=`diff -r -q -x '*.bak' -x '*~' -x '*.aux' ../lib/isabelle $TMPREAL/lib/isabelle`
   if test "$TMPDIFF" = "" ; then
     printf "Isabelle realizations OK\n"
   else
@@ -74,7 +74,7 @@ test_generated () {
   # We want to use the makefile to be sure to check exhaustively the
   # realizations that are built
   make -C .. GENERATED_PREFIX_COQ="$TMPREAL/lib/coq" update-coq > /dev/null 2> /dev/null
-  TMPDIFF=`diff -r -q -x '*.bak' ../lib/coq $TMPREAL/lib/coq`
+  TMPDIFF=`diff -r -q -x '*.bak' -x '*~' -x '*.aux'  ../lib/coq $TMPREAL/lib/coq`
   if test "$TMPDIFF" = "" ; then
     printf "Coq realizations OK\n"
   else
