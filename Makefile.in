@@ -1342,8 +1342,9 @@ install_local:: lib/isabelle/last_build
 # do not update isabelle realizations systematically
 # all: update-isabelle
 
-clean::
-	rm -f lib/isabelle/*/*.xml
+# Removed cleaning of xml
+#clean::
+#	rm -f lib/isabelle/*/*.xml
 
 else
 

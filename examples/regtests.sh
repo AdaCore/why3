@@ -19,10 +19,10 @@ case "$1" in
         REPLAYOPT="$REPLAYOPT --prover $2"
         shift
         ;;
-  "--check-realization")
+  "--check-realizations")
         CHECK_REALIZATION="true"
         ;;
-  "--only-realization")
+  "--only-realizations")
         ONLY_REALIZATION="true"
         CHECK_REALIZATION="true"
         ;;
@@ -52,35 +52,35 @@ export shapes=""
 test_generated () {
   # Current directory is /why3
   mkdir -p $TMPREAL/lib
-  echo "Testing isabelle realization"
-  # First copy current realization in a tmp directory
+  echo "Testing isabelle realizations"
+  # First copy current realizations in a tmp directory
   cp -r ../lib/isabelle/ $TMPREAL/lib/
   # We want to use the makefile to be sure to check exhaustively the
   # realizations that are built
   make -C .. GENERATED_PREFIX_ISABELLE="$TMPREAL/lib/isabelle" update-isabelle > /dev/null 2> /dev/null
   TMPDIFF=`diff -r -q -x '*.bak' ../lib/isabelle $TMPREAL/lib/isabelle`
   if test "$TMPDIFF" = "" ; then
-    printf "ISABELLE realization OK\n"
+    printf "Isabelle realizations OK\n"
   else
-    printf "ISABELLE REALIZATION FAILED, please regenerate and prove it\n"
+    printf "ISABELLE REALIZATIONS FAILED, please regenerate and prove them\n"
     printf "$TMPDIFF\n"
-    printf "Generated realization are in /tmp. Use --only-realization to only test realization\n"
+    printf "Generated realizations are in /tmp. Use --only-realizations to only test realizations\n"
     res=1
   fi
 
-  echo "Testing coq realization"
-  # First copy current realization in a tmp directory
+  echo "Testing coq realizations"
+  # First copy current realizations in a tmp directory
   cp -r ../lib/coq/ $TMPREAL/lib/
   # We want to use the makefile to be sure to check exhaustively the
   # realizations that are built
   make -C .. GENERATED_PREFIX_COQ="$TMPREAL/lib/coq" update-coq > /dev/null 2> /dev/null
   TMPDIFF=`diff -r -q -x '*.bak' ../lib/coq $TMPREAL/lib/coq`
   if test "$TMPDIFF" = "" ; then
-    printf "COQ realization OK\n"
+    printf "Coq realizations OK\n"
   else
-    printf "COQ REALIZATION FAILED, please regenerate and prove it\n"
+    printf "COQ REALIZATIONS FAILED, please regenerate and prove it\n"
     printf "$TMPDIFF\n"
-    printf "Generated realization are in /tmp. Use --only-realization to only test realization\n"
+    printf "Generated realizations are in /tmp. Use --only-realizations to only test realizations\n"
     res=1
   fi
 }
