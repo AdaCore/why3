@@ -130,7 +130,7 @@ fi
 
 
 # replay proofs
-examples/regtests.sh &> $OUT
+examples/regtests.sh --check-realization &> $OUT
 if test "$?" != "0" ; then
     SUBJECT="$SUBJECT failed"
     echo "Proof replay failed" >> $REPORT

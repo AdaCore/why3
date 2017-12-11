@@ -27,3 +27,6 @@ bin/why3config --detect-provers
 
 # run the bench
 make bench
+
+# check that the realizations are ok
+examples/regtests.sh --only-realizations
