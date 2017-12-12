@@ -338,6 +338,8 @@ module Translate = struct
           Mltree.Tapp (its.its_ts.ts_name, args) in
     loop t
 
+  let ty_int = mlty_of_ity MaskVisible ity_int
+
   let pvty pv =
     if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
     else let (vs, vs_ty) = vsty pv.pv_vs in
@@ -457,7 +459,6 @@ module Translate = struct
         ML.e_seq body_expr rec_call ML.ity_unit eff Slab.empty in
       ML.mk_expr (Mltree.Eif (test, seq_expr, ML.e_unit)) ML.ity_unit
         eff Slab.empty in
-    let ty_int = mlty_of_ity MaskVisible ity_int in
     let for_call_expr = let for_call = Mltree.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff Slab.empty in
     let pv_name pv = pv.pv_vs.vs_name in
@@ -685,9 +686,12 @@ module Translate = struct
                 ML.mk_its_defn id args is_private (Some (Mltree.Drecord pjl))
           end
       | Alias t, _, _ ->
-          ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
+          ML.mk_its_defn id args is_private (* FIXME? is this a good mask? *)
             (Some (Mltree.Dalias (mlty_of_ity MaskVisible t)))
-      | Range _, _, _ -> assert false (* TODO *)
+      | Range _, [], [] ->
+          assert (args = []); (* a range type is not polymorphic *)
+          ML.mk_its_defn id [] is_private (Some (Mltree.Dalias ty_int))
+      | Range _, _, _ -> assert false (* a range type has no field/constructor *)
       | Float _, _, _ -> assert false (* TODO *)
     end
 

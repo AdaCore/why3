@@ -205,12 +205,14 @@ module mach.int.Int
 end
 
 module mach.int.Int63
-  syntax val of_int "Z.to_int %1"
-  syntax converter of_int "%1"
-
-  syntax function to_int "Z.of_int %1"
-
   syntax type     int63     "int"
+
+  syntax literal   int63    "%1"
+  syntax converter of_int   "%1"
+
+  syntax val      of_int    "Z.to_int %1"
+  syntax function to_int    "Z.of_int %1"
+
   syntax constant min_int63 "Z.of_int min_int"
   syntax constant max_int63 "Z.of_int max_int"
   syntax constant min_int   "min_int"

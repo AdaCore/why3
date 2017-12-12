@@ -28,6 +28,7 @@ open Printer
 type info = {
   info_syn          : syntax_map;
   info_convert      : syntax_map;
+  info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;
   info_th_known_map : Decl.known_map;
@@ -281,6 +282,13 @@ module Print = struct
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
+  let print_constant fmt e = begin match e.e_node with
+    | Econst c ->
+        let s = BigInt.to_string (Number.compute_int_constant c) in
+        if c.Number.ic_negative then fprintf fmt "(%s)" s
+        else fprintf fmt "%s" s
+    | _ -> assert false end
+
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
         if is_optional ~labels:(pv_name pv).id_label then
@@ -311,12 +319,6 @@ module Print = struct
     match query_syntax info.info_convert rs.rs_name,
           query_syntax info.info_syn rs.rs_name, pvl with
     | Some s, _, [{e_node = Econst _}] ->
-        let print_constant fmt e = match e.e_node with
-          | Econst c ->
-              let s = BigInt.to_string (Number.compute_int_constant c) in
-              if c.Number.ic_negative then fprintf fmt "(%s)" s
-              else fprintf fmt "%s" s
-          | _ -> assert false in
         syntax_arguments s print_constant fmt pvl
     | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
@@ -409,10 +411,16 @@ module Print = struct
         forget_vars args
     | Lany (rs, _, _) -> check_val_in_drv info rs
 
-  and print_enode ?(paren=false) info fmt = function
+  and print_expr ?(paren=false) info fmt e = match e.e_node with
     | Econst c ->
         let n = Number.compute_int_constant c in
-        fprintf fmt "(Z.of_string \"%s\")" (BigInt.to_string n)
+        let n = BigInt.to_string n in
+        let id = match e.e_ity with
+          | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name
+          | _ -> assert false in
+        (match query_syntax info.info_literal id with
+         | Some s -> syntax_arguments s print_constant fmt [e]
+         | None   -> fprintf fmt "(Z.of_string \"%s\")" n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
@@ -432,12 +440,6 @@ module Print = struct
     | Eapp (rs, pvl) ->
         begin match query_syntax info.info_convert rs.rs_name, pvl with
           | Some s, [{e_node = Econst _}] ->
-              let print_constant fmt e = begin match e.e_node with
-                | Econst c ->
-                    let s = BigInt.to_string (Number.compute_int_constant c) in
-                    if c.Number.ic_negative then fprintf fmt "(%s)" s
-                    else fprintf fmt "%s" s
-                | _ -> assert false end in
               syntax_arguments s print_constant fmt pvl
           | _ ->
               fprintf fmt (protect_on paren "%a")
@@ -546,9 +548,6 @@ module Print = struct
         fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) (xs.xs_name)
           (print_list nothing print_var) pvl (print_expr info) e
 
-  and print_expr ?(paren=false) info fmt e =
-    print_enode ~paren info fmt e.e_node
-
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =
       match cs_args with
@@ -641,6 +640,7 @@ let print_decl =
     let info = {
       info_syn          = pargs.Pdriver.syntax;
       info_convert      = pargs.Pdriver.converter;
+      info_literal      = pargs.Pdriver.literal;
       info_current_th   = th;
       info_current_mo   = Some m;
       info_th_known_map = th.th_known;
