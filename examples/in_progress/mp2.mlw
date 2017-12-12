@@ -347,7 +347,7 @@ module N
        assert { 0 <= p2i !i < p2i sz };
        lx := get_ofs x !i;
        ly := get_ofs y !i;
-       if (UInt32.ne !lx !ly)
+       if !lx <> !ly
        then begin
             value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+ p2i sz);
             value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+ p2i sz);
@@ -411,7 +411,7 @@ module N
          i := Int32.(-) !i (Int32.of_int 1);
          assert { 0 <= p2i !i < p2i sz };
          lx := get_ofs x !i;
-         if (UInt32.ne !lx uzero)
+         if !lx <> uzero
          then begin
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
@@ -463,7 +463,7 @@ module N
     let c = ref y in
     let lx = ref limb_zero in
     let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && UInt32.ne !c limb_zero do
+    while Int32.(<) !i sz && !c <> limb_zero do
       invariant { 0 <= p2i !i <= p2i sz }
       invariant { p2i !i > 0 -> 0 <= l2i !c <= 1 }
       invariant { value_sub_shift r (p2i !i) + (power radix (p2i !i)) * l2i !c =
@@ -499,7 +499,7 @@ module N
     done;
     assert { p2i !i = p2i sz \/ l2i !c = 0 };
     assert { p2i !i < p2i sz -> l2i !c = 0 };
-    if Int32.eq !i sz then !c
+    if !i = sz then !c
     else begin
     while Int32.(<) !i sz do
       invariant { l2i !c  = 0 }

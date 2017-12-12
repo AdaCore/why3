@@ -562,9 +562,9 @@ this is true but with 2 different possible reasons:
     let n1 = of_int 1 in
     let n9 = of_int 9 in
     let n81 = of_int 81 in
-    if Int31.eq i n81 then raise SolutionFound;
+    if i = n81 then raise SolutionFound;
     (* assert { is_index i }; *)
-    if not (Int31.eq g[i] n0) then
+    if g[i] <> n0 then
       try
         (* assert { 1 <= t g[i] <= 9 }; *)
         check_valid_chunk g i s.column_start s.column_offsets;
