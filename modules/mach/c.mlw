@@ -87,6 +87,7 @@ module C
   val realloc (p:ptr 'a) (sz:int32) : ptr 'a
     requires { Int32.to_int sz > 0 } (* for simplicity, though 0 is legal in C *)
     requires { p.offset = 0 }
+    requires { plength p > 0 }
     writes { p.data }
     ensures { plength result = Int32.to_int sz \/ plength result = 0 }
     ensures { plength result = Int32.to_int sz -> plength p = 0 }
