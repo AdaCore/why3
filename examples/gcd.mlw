@@ -122,7 +122,7 @@ module EuclideanAlgorithm63
     requires { to_int u >= 0 /\ to_int v >= 0 }
     ensures  { to_int result = gcd (to_int u) (to_int v) }
   =
-    if Int63.eq v (of_int 0) then
+    if v = of_int 0 then
       u
     else
       euclid v (u % v)
