@@ -25,19 +25,24 @@ type reify_env = { kn: known_map;
                    lv: vsymbol list;
                    var_maps: ty Mvs.t; (* type of values pointed by each map*)
                    ty_to_map: vsymbol Mty.t;
+                   env: Env.env;
+                   task: Task.task;
                  }
 
-let init_renv kn lv = { kn=kn;
-                        store = Mterm.empty;
-                        fr = 0;
-                        subst = Mvs.empty;
-                        lv = lv;
-                        var_maps = Mvs.empty;
-                        ty_to_map = Mty.empty;
-                      }
+let init_renv kn lv env task =
+  { kn=kn;
+    store = Mterm.empty;
+    fr = 0;
+    subst = Mvs.empty;
+    lv = lv;
+    var_maps = Mvs.empty;
+    ty_to_map = Mty.empty;
+    env = env;
+    task = task;
+  }
 
 let rec reify_term renv t rt =
-  let rec invert_pat vl (renv:reify_env) interp (p,f) t =
+  let rec invert_nonvar_pat vl (renv:reify_env) interp (p,f) t =
     if debug
     then Format.printf
            "invert_pat p %a f %a t %a@."
@@ -58,11 +63,15 @@ let rec reify_term renv t rt =
            (renv, []) pl la1 la2 in
        if debug then Format.printf "building app %a of type %a with args %a@."
                                    Pretty.print_ls cs
-                                   Pretty.print_ty (Opt.get cs.ls_value)
+                                   Pretty.print_ty p.pat_ty
                                    (Pp.print_list Pp.comma Pretty.print_term)
                                    (List.rev rl);
-       let t = t_app cs (List.rev rl) cs.ls_value in
+       let t = t_app cs (List.rev rl) (Some p.pat_ty) in
        if debug then Format.printf "app ok@.";
+       renv, t
+    | Pvar v, Tapp (ls, [{t_node = Tvar v'}]), Tapp (ls', [t])
+         when ls_equal ls ls' && vs_equal v v' ->
+       if debug then Format.printf "case app_var@.";
        renv, t
     | Papp _, Tapp (ls1, _), Tapp(ls2, _) ->
        if debug then Format.printf "head symbol mismatch %a %a@."
@@ -77,20 +86,23 @@ let rec reify_term renv t rt =
       | Pvar _, Tvar _, Tconst _
       -> if debug then Format.printf "case vars@.";
          (renv, t)
-    | Pvar _, Tapp (ls, _la), _ when ls_equal ls interp
+    | Pvar _, Tapp (ls, _hd::_tl), _ (*when ls_equal ls interp FIXME ?*)
       -> if debug then Format.printf "case interp@.";
          invert_interp renv ls t
-    (*| Papp (cs, pl), Tapp (ls1, la1), _ when Sls.mem ls1 !reify_invert
-    -> (* Cst c -> morph c <- 42 ? *) *)
+    | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), Tconst _
+      -> if debug then Format.printf "case const@.";
+         let renv, rt = invert_interp renv ls t in
+         renv, (t_app cs [rt] (Some p.pat_ty))
     | _ -> raise NoReification
-  and invert_var_pat  vl (renv:reify_env) _interp (p,f) t =
+  and invert_var_pat vl (renv:reify_env) _interp (p,f) t =
     if debug
     then Format.printf
            "invert_var_pat p %a f %a t %a@."
            Pretty.print_pat p Pretty.print_term f Pretty.print_term t;
-    match p.pat_node, f.t_node, t.t_node with
-    | Papp (cs, [{pat_node = Pvar v1}]),
-      Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}]), _
+    match p.pat_node, f.t_node with
+    | Papp (_, [{pat_node = Pvar v1}]),
+      Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}])
+      | Pvar v1, Tapp (ffa,[{t_node = Tvar vy}; {t_node = Tvar v2}])
          when ty_equal v1.vs_ty ty_int
               && Svs.mem v1 p.pat_vars
               && vs_equal v1 v2
@@ -98,12 +110,16 @@ let rec reify_term renv t rt =
               && List.exists (fun vs -> vs_equal vs vy) vl (*FIXME*)
       ->
        if debug then Format.printf "case var@.";
-       let rty = cs.ls_value in
+       let rty = (Some p.pat_ty) in
+       let app_pat trv = match p.pat_node with
+         | Papp (cs, _) -> t_app cs [trv] rty
+         | Pvar _ -> trv
+         | _ -> assert false in
        if Mterm.mem t renv.store
        then
          begin
            if debug then Format.printf "%a exists@." Pretty.print_term t;
-           (renv, t_app cs [t_nat_const (snd (Mterm.find t renv.store))] rty)
+           (renv, app_pat (t_nat_const (snd (Mterm.find t renv.store))))
          end
        else
          begin
@@ -112,20 +128,34 @@ let rec reify_term renv t rt =
            let vy = Mty.find vy.vs_ty renv.ty_to_map in
            let store = Mterm.add t (vy, fr) renv.store in
            let renv = { renv with store = store; fr = fr + 1 } in
-           (renv, t_app cs [t_nat_const fr] rty)
+           (renv, app_pat (t_nat_const fr))
          end
     | _ -> raise NoReification
+  and invert_pat vl renv interp (p,f) t =
+    try invert_nonvar_pat vl renv interp (p,f) t
+    with NoReification -> invert_var_pat vl renv interp (p,f) t
   and invert_interp renv ls (t:term) = (*la ?*)
-    let ld = Opt.get (find_logic_definition renv.kn ls) in
+    let ld = try Opt.get (find_logic_definition renv.kn ls)
+             with _ ->
+                  if debug
+                  then Format.printf "did not find def of %a@." Pretty.print_ls ls;
+                  raise NoReification
+    in
     let vl, f = open_ls_defn ld in
     if debug then Format.printf "invert_interp ls %a t %a@."
                                 Pretty.print_ls ls Pretty.print_term t;
-    match f.t_node, t.t_node with
-    | Tcase (x, bl), _ ->
-       assert (List.length vl = 2);
+    invert_body renv ls vl f t
+  and invert_body renv ls vl f t =
+    match f.t_node with
+    | Tvar v when vs_equal v (List.hd vl) -> renv, t
+    | Tif (f, th, el) when t_equal th t_bool_true && t_equal el t_bool_false ->
+       invert_body renv ls vl f t
+    | Tcase (x, bl)
+      ->
        (match x.t_node with
         | Tvar v when vs_equal v (List.hd vl) -> ()
-        | _ -> assert false);
+        | _ -> if debug then Format.printf "not matching on first param@.";
+               raise NoReification);
        if debug then Format.printf "case match@.";
        let rec aux invert = function
          | [] -> raise NoReification
@@ -133,38 +163,145 @@ let rec reify_term renv t rt =
             try invert vl renv ls (t_open_branch tb) t
             with NoReification ->
                  if debug then Format.printf "match failed@."; aux invert l in
-       (try aux invert_pat bl with NoReification -> aux invert_var_pat bl)
-    | _ -> raise NoReification in
+       (try aux invert_nonvar_pat bl with NoReification -> aux invert_var_pat bl)
+    | _ -> if debug then Format.printf "function body not handled@.";
+           if debug then Format.printf "f: %a@." Pretty.print_term f;
+           raise NoReification
+  and invert_ctx_interp renv ls t l g =
+    let ld = try Opt.get (find_logic_definition renv.kn ls)
+             with _ ->
+                  if debug
+                  then Format.printf "did not find def of %a@." Pretty.print_ls ls;
+                  raise NoReification
+    in
+    let vl, f = open_ls_defn ld in
+    if debug then Format.printf "invert_ctx_interp ls %a @."
+                                Pretty.print_ls ls;
+    match f.t_node with
+    | Tcase ({t_node = Tvar v}, [tbn; tbc] )
+         when vs_equal v (List.hd vl) ->
+       let open Theory in
+       let th_list = Env.read_theory renv.env ["list"] "List" in
+       let ty_g = g.vs_ty in
+       let ty_list = ns_find_ts th_list.th_export ["list"] in
+       let ty_list_g = ty_app ty_list [ty_g] in
+       if (not (ty_equal ty_list_g l.vs_ty))
+       then (if debug
+             then Format.printf "bad type for context interp function@.";
+             raise NoReification);
+       let nil = ns_find_ls th_list.th_export ["Nil"] in
+       let cons = ns_find_ls th_list.th_export ["Cons"] in
+       let th_bool = Env.read_theory renv.env ["bool"] "Bool" in
+       (* FIXME add use export list.List and bool.Bool to the task ? *)
+       let implb = ns_find_ls th_bool.th_export ["implb"] in
+       let (pn, fn) = t_open_branch tbn in
+       let (pc, fc) = t_open_branch tbc in
+       begin match pn.pat_node, fn.t_node, pc.pat_node, fc.t_node with
+       | Papp(n, []), Tapp(leq,{t_node = Tvar g'}::_),
+         Papp (c, [{pat_node = Pvar hdl};{pat_node = Pvar tll}]),
+         Tapp(ib, [({t_node = Tapp(leq', _)} as thd);
+                   ({t_node =
+                       Tapp(ls', {t_node = Tvar tll'}::{t_node=Tvar g''}::_)}
+                    as ttl)])
+            when ls_equal n nil && ls_equal c cons && ls_equal ls ls'
+                 && ls_equal ib implb && vs_equal tll tll'
+                 && vs_equal g' g'' && ls_equal leq leq'
+                 && List.mem g' vl
+                 && not (Mvs.mem tll (t_vars thd))
+                 && not (Mvs.mem hdl (t_vars ttl))
+         ->
+          if debug then Format.printf "reifying goal@.";
+          let (renv, rg) = invert_interp renv leq t in
+          let renv = { renv with subst = Mvs.add g rg renv.subst } in
+          if debug then Format.printf "filling context@.";
+          let renv, ctx =
+              task_fold
+                (fun (renv,ctx) td ->
+                  match td.td_node with
+                  | Decl {d_node = Dprop (Paxiom, _, e)}
+                    ->
+                     begin try
+                         let (renv,req) = invert_interp renv leq e in
+                         (renv,(t_app cons [req; ctx] (Some ty_list_g)))
+                       with
+                       | NoReification -> renv,ctx
+                       | TypeMismatch _ -> raise NoReification
+                     end
+                  | _-> renv,ctx)
+                             (renv, (t_app nil [] (Some ty_list_g))) renv.task in
+          { renv with subst = Mvs.add l ctx renv.subst }
+       | _ -> if debug then Format.printf "unhandled interp structure@.";
+              raise NoReification
+       end
+    | _ -> if debug then Format.printf "not a match on list@.";
+           raise NoReification
+  in
+  let add_to_maps renv vyl =
+     let var_maps, ty_to_map =
+       List.fold_left
+         (fun (var_maps, ty_to_map) vy ->
+           if Mty.mem vy.vs_ty ty_to_map
+           then (Mvs.add vy vy.vs_ty var_maps, ty_to_map)
+           else (Mvs.add vy vy.vs_ty var_maps,
+                 Mty.add vy.vs_ty vy ty_to_map))
+         (renv.var_maps, renv.ty_to_map)
+         (List.map
+            (fun t -> match t.t_node with Tvar vy -> vy | _ -> assert false)
+            vyl)
+     in
+     { renv with var_maps = var_maps; ty_to_map = ty_to_map }
+  in
   if debug then Format.printf "reify_term t %a rt %a@."
                               Pretty.print_term t Pretty.print_term rt;
   if not (oty_equal t.t_ty rt.t_ty)
   then (if debug
         then Format.printf "reification type mismatch %a %a@."
-                           Pretty.print_ty (Opt.get t.t_ty) Pretty.print_ty (Opt.get rt.t_ty);
+                           Pretty.print_ty (Opt.get t.t_ty)
+                           Pretty.print_ty (Opt.get rt.t_ty);
         raise NoReification);
   match t.t_node, rt.t_node with
-  | _, Tapp(interp, [{t_node = Tvar vx}; {t_node = Tvar vy} ])
-       when List.mem vx renv.lv && List.mem vy renv.lv  ->
+  | _, Tapp(interp, {t_node = Tvar vx}::vyl)
+       when List.mem vx renv.lv
+            && List.for_all
+                 (fun t -> match t.t_node with
+                           | Tvar vy -> List.mem vy renv.lv
+                           | _ -> false)
+                 vyl  ->
      if debug then Format.printf "case interp@.";
-     let var_maps, ty_to_map =
-       if Mty.mem vy.vs_ty renv.ty_to_map
-       then renv.var_maps, renv.ty_to_map
-       else (Mvs.add vy (Opt.get interp.ls_value) renv.var_maps,
-             Mty.add vy.vs_ty vy renv.ty_to_map) in
-     let renv = { renv with var_maps = var_maps; ty_to_map = ty_to_map } in
+     let renv = add_to_maps renv vyl in
      let renv, x = invert_interp renv interp t in
      { renv with subst = Mvs.add vx x renv.subst }
   | Tapp(eq, [t1; t2]), Tapp (eq', [rt1; rt2])
-       when ls_equal eq ps_equ && ls_equal eq' ps_equ ->
+       when ls_equal eq ps_equ && ls_equal eq' ps_equ
+            && oty_equal t1.t_ty rt1.t_ty && oty_equal t2.t_ty rt2.t_ty
+    ->
      if debug then Format.printf "case eq@.";
      reify_term (reify_term renv t1 rt1) t2 rt2
-  | _ -> if debug then Format.printf "no reify_term match@."; raise NoReification
+  | _, Tapp(eq,[{t_node=Tapp(interp, {t_node = Tvar l}::{t_node = Tvar g}::vyl)}; tr])
+       when ls_equal eq ps_equ && t_equal tr t_bool_true
+            && List.mem l renv.lv
+            && List.mem g renv.lv
+            && List.for_all
+                 (fun t -> match t.t_node with
+                           | Tvar vy -> List.mem vy renv.lv
+                           | _ -> false)
+                 vyl
+    ->
+     if debug then Format.printf "case context@.";
+     let renv = add_to_maps renv vyl in
+     invert_ctx_interp renv interp t l g
+  | _ -> if debug then Format.printf "no reify_term match@.";
+         if debug then Format.printf "lv = [%a]@."
+                                     (Pp.print_list Pp.space Pretty.print_vs)
+                                     renv.lv;
+         raise NoReification
 
 let build_vars_map renv prev =
   if debug then Format.printf "building vars map@.";
   let subst, prev = Mvs.fold
-                (fun vy ty_val (subst, prev) ->
-                  let ty_vars = ty_func ty_int ty_val in
+                (fun vy ty_vars (subst, prev) ->
+                  if debug then Format.printf "creating var map %a@."
+                                              Pretty.print_vs vy;
                   let ly = create_fsymbol (Ident.id_fresh vy.vs_name.id_string)
                                           [] ty_vars in
                   let y = t_app ly [] (Some ty_vars) in
@@ -172,19 +309,38 @@ let build_vars_map renv prev =
                   let prev = Task.add_decl prev d in
                   Mvs.add vy y subst, prev)
                 renv.var_maps (renv.subst, prev) in
+  let prev = Mvs.fold
+               (fun vy _ prev ->
+                 if debug then Format.printf "checking %a@." Pretty.print_vs vy;
+                 let vs = Mty.find vy.vs_ty renv.ty_to_map in
+                 if vs_equal vy vs then prev
+                 else begin
+                   if debug
+                   then Format.printf "aliasing %a and %a@."
+                                      Pretty.print_vs vy Pretty.print_vs vs;
+                   let y = Mvs.find vy subst in
+                   let z = Mvs.find vs subst in
+                   let et = t_equ y z in
+                   let pr = create_prsymbol (Ident.id_fresh "map_alias") in
+                   let d = create_prop_decl Paxiom pr et in
+                   Task.add_decl prev d end)
+               renv.var_maps prev in
   if not (List.for_all (fun v -> Mvs.mem v subst) renv.lv)
   then (if debug
-        then Format.printf "some vars not matched, todo use context@.";
+        then Format.printf "vars not matched: %a@."
+                           (Pp.print_list Pp.space Pretty.print_vs)
+                           (List.filter (fun v -> not (Mvs.mem v subst)) renv.lv);
         raise Exit);
+  if debug then Format.printf "all vars matched@.";
   let prev = Mterm.fold
                (fun t (vy,i) prev ->
                  let y = Mvs.find vy subst in
-                 let ty_val = Mvs.find vy renv.var_maps in
                  let et = t_equ
                             (t_app fs_func_app [y; t_nat_const i]
-                                   (Some ty_val))
+                                   t.t_ty)
                             t in
-                 if debug then Format.printf "eq_term ok@.";
+                 if debug then Format.printf "%a %d = %a@."
+                                             Pretty.print_vs vy i Pretty.print_term t;
                  let pr = create_prsymbol (Ident.id_fresh "y_val") in
                  let d = create_prop_decl Paxiom pr et in
                  Task.add_decl prev d)
@@ -204,27 +360,29 @@ let build_goals prev subst lp g rt =
                        ~label:(Slab.singleton expl_reification_check)) in
   let d = create_prop_decl Pgoal pr g in
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
-  if debug then Format.printf "building cut indication@.";
-  let ci =
-    match (rt.t_node, g.t_node) with
-    | (Tapp(eq, rh::rl),
-       Tapp(eq', h::l))
-         when ls_equal eq eq' ->
-       List.fold_left2 (fun ci st rst -> t_and ci (t_equ (t_subst subst rst) st))
-                       (t_equ (t_subst subst rh) h)
-                       l rl
-    | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
-    | _ -> raise Exit in
-  if debug then Format.printf "building tasks@.";
-  let ltask_r = Trans.apply (Cut.cut ci (Some "interp")) task_r in
-  if debug then Format.printf "cut ok@.";
+  if debug then Format.printf "building cut indication rt %a g %a@."
+                              Pretty.print_term rt Pretty.print_term g;
+  let ltask_r =
+    try let ci =
+          match (rt.t_node, g.t_node) with
+          | (Tapp(eq, rh::rl),
+             Tapp(eq', h::l))
+               when ls_equal eq eq' ->
+             List.fold_left2 (fun ci st rst -> t_and ci (t_equ (t_subst subst rst) st))
+                             (t_equ (t_subst subst rh) h)
+                             l rl
+          | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
+          | _ -> raise Exit in
+        if debug then Format.printf "cut ok@.";
+        Trans.apply (Cut.cut ci (Some "interp")) task_r
+    with _ -> if debug then Format.printf "no cut found@."; [task_r] in
   let lt = List.map (fun ng -> Task.add_decl prev
                        (create_prop_decl Pgoal (create_prsymbol (id_fresh "G")) ng))
                     inst_lp in
   if debug then Format.printf "done@.";
   ltask_r@lt
 
-let reflection_by_lemma pr : Task.task Trans.tlist = Trans.store (fun task ->
+let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task ->
   let kn = task_known task in
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
@@ -235,7 +393,7 @@ let reflection_by_lemma pr : Task.task Trans.tlist = Trans.store (fun task ->
     let d = Opt.get d in
     let l = Apply.term_decl d in
     let (lp, lv, rt) = Apply.intros l in
-    let renv = reify_term (init_renv kn lv) g rt in
+    let renv = reify_term (init_renv kn lv env prev) g rt in
     let subst, prev = build_vars_map renv prev in
     build_goals prev subst lp g rt
   with NoReification | Exit -> [task])
@@ -253,6 +411,7 @@ type value =
   | Vvoid
   | Varray of value array
   | Vmatrix of value array array
+  | Vref of value ref
 
 and field = Fimmutable of value | Fmutable of value ref
 
@@ -268,6 +427,8 @@ let rec print_value fmt = function
   | Varray a -> fprintf fmt "Varray [|%a|]"
                         (Pp.print_list Pp.space print_value) (Array.to_list a)
   | Vmatrix m -> fprintf fmt "Vmatrix %a" print_matrix m
+  | Vref r -> fprintf fmt "Vref %a" print_value !r
+
 and print_field fmt = function
   | Fimmutable v -> fprintf fmt "Fimmutable %a" print_value v
   | Fmutable vr -> fprintf fmt "Fmutable %a" print_value !vr
@@ -282,7 +443,11 @@ let field_get f = match f with
 
 open Stdlib
 
-let find_module_path env mm path m = match path with
+let find_module_path env mm path m =
+  if debug
+  then Format.printf "find_module_path path %a m %s@."
+                     (Pp.print_list Pp.space Pp.string) path m;
+  match path with
   | [] -> Mstr.find m mm
   | path -> let mm = Env.read_library Pmodule.mlw_language env path in
             Mstr.find m mm
@@ -301,11 +466,16 @@ let translate_module =
       pm
 
 exception Constructor
+exception Field
 
 let get_decl env mm rs =
   let open Pdecl in
+  if debug then Format.printf "get_decl@.";
   let id = rs.rs_name in
+  if debug then Format.printf "looking for rs %s@." id.id_string;
   let pm = find_module_id env mm id in
+  if debug then Format.printf "pmodule %s@."
+                              (pm.Pmodule.mod_theory.Theory.th_name.id_string);
   let tm = translate_module pm in
   if Mid.mem id tm.mod_known
   then Mid.find id tm.mod_known
@@ -314,10 +484,12 @@ let get_decl env mm rs =
     match pd.pd_node with
     | PDtype l ->
        let rec aux = function
-         | [] -> false
-         | d::t -> List.mem rs d.itd_constructors || aux t
+         | [] -> raise Not_found
+         | d::t -> if List.mem rs d.itd_constructors then raise Constructor
+                   else if List.mem rs d.itd_fields then raise Field
+                   else aux t
        in
-       if aux l then raise Constructor else raise Not_found
+       aux l
     | _ -> raise Not_found
 
 let builtin_progs = Hrs.create 17
@@ -449,6 +621,24 @@ let exec_matrix_copy _ args =
      Vmatrix a
   | _ -> raise CannotReduce
 
+let exec_ref_make _ args =
+  match args with
+  | [v] ->
+     Vref (ref v)
+  | _ -> raise CannotReduce
+
+let exec_ref_get _ args =
+  match args with
+  | [Vref r] -> !r
+  | _ -> raise CannotReduce
+
+let exec_ref_set _ args =
+  match args with
+  | [Vref r; v] ->
+     r := v;
+     Vvoid
+  | _ -> raise CannotReduce
+
 let built_in_modules =
   [
     ["bool"],"Bool", [],
@@ -496,6 +686,12 @@ let built_in_modules =
      "set", exec_matrix_set ;
      "copy", exec_matrix_copy ;
     ] ;
+    ["ref"],"Ref",
+    [], (* ? *)
+    ["ref", exec_ref_make ;
+     "prefix !", exec_ref_get;
+     "infix :=", exec_ref_set;
+    ] ;
   ]
 
 let add_builtin_mo env (l,n,t,d) =
@@ -521,6 +717,7 @@ type info = {
     mm  : Pmodule.pmodule Mstr.t;
     vars: value Mid.t;
     recs: rsymbol Mrs.t;
+    funs: decl Mrs.t;
   }
 
 let print_id fmt id = fprintf fmt "%s" id.id_string
@@ -530,6 +727,10 @@ let get pv info : value =  Mid.find pv.pv_vs.vs_name info.vars
 let add_id id v info = {info with vars = Mid.add id v info.vars}
 let add_vs vs = add_id vs.vs_name
 let add_pv pv = add_vs pv.pv_vs
+
+let add_fundecl rs decl info =
+  if debug then Format.printf "adding decl for %s@." rs.rs_name.id_string;
+  { info with funs = Mrs.add rs decl info.funs }
 
 exception NoMatch
 
@@ -560,11 +761,9 @@ let rec matching info v pat =
      | _ -> raise CannotReduce
 
 let rec interp_expr info (e:Mltree.expr) : value =
-  if debug then Format.printf "interp_expr@.";
   Mltree.(match e.e_node with
   | Econst nc -> Vint (Number.compute_int_constant nc)
   | Evar pv ->
-     if debug then Format.printf "Evar %a@." print_pv pv;
      (try get pv info
       with Not_found ->
            if debug
@@ -592,22 +791,25 @@ let rec interp_expr info (e:Mltree.expr) : value =
           let f = Hrs.find builtin_progs rs in
           f rs (List.map (interp_expr info) le)
         else begin
-        let decl = get_decl info.env info.mm rs in
-        if debug then Format.printf "decl found@.";
-        match decl with
-        | Dlet (Lsym (_rs, _ty, vl, e)) ->
-           eval_call info vl e
-        | Dlet(Lrec([{rec_args = vl; rec_exp = e;
-                      rec_sym = rs; rec_rsym = rrs; rec_res=_ty}])) ->
-           eval_call { info with recs = Mrs.add rrs rs info.recs } vl e
-        | Dlet (Lrec _) ->
-           if debug then Format.printf "Lrec@."; raise CannotReduce
-        | Dlet (Lvar _) ->
-           if debug then Format.printf "Lvar@."; raise CannotReduce
-        | Dlet (Lany _) ->
-           if debug then Format.printf "Lany@."; raise CannotReduce
-        | _ -> if debug then Format.printf "not a let decl@.";
-               raise CannotReduce
+          let decl = try Mrs.find rs info.funs
+                     with Not_found -> get_decl info.env info.mm rs in
+          if debug then Format.printf "decl found@.";
+          match decl with
+          | Dlet (Lsym (_rs, _ty, vl, e)) ->
+             eval_call info vl e
+          | Dlet(Lrec([{rec_args = vl; rec_exp = e;
+                        rec_sym = rs; rec_rsym = rrs; rec_res=_ty}])) ->
+             eval_call { info with recs = Mrs.add rrs rs info.recs } vl e
+          | Dlet (Lrec _) ->
+             if debug
+             then Format.printf "unhandled mutually recursive functions@.";
+             raise CannotReduce
+          | Dlet (Lvar _) ->
+             if debug then Format.printf "Lvar@."; raise CannotReduce
+          | Dlet (Lany _) ->
+             if debug then Format.printf "Lany@."; raise CannotReduce
+          | _ -> if debug then Format.printf "not a let decl@.";
+                 raise CannotReduce
           end
         end
       with
@@ -622,15 +824,18 @@ let rec interp_expr info (e:Mltree.expr) : value =
            if is_mutable then Fmutable (ref v) else Fimmutable v
          in
          Vconstr(rs, List.map2 field_of_expr rs.rs_cty.cty_args le)
+      | Field ->
+         if debug then Format.printf "field@.";
+         (* TODO keep field info when applying constructors, use here ?*)
+         raise CannotReduce
       | Not_found ->
          if debug
          then Format.printf "decl not found@.";
          raise CannotReduce end
-  | Efun _ -> raise CannotReduce
+  | Efun _ -> if debug then Format.printf "Efun@."; raise CannotReduce
   | Elet (Lvar(pv, e), ein) ->
      let v = interp_expr info e in
      interp_expr (add_pv pv v info) ein
-  (* FIXME other let decls *)
   | Eif (c, th, el) ->
      begin match interp_expr info c with
      | Vbool true -> interp_expr info th
@@ -678,13 +883,46 @@ let rec interp_expr info (e:Mltree.expr) : value =
        Vvoid l
   | Eignore e -> ignore (interp_expr info e); Vvoid
   | Ewhile (c, b) ->
+     if debug then Format.printf "while@.";
      begin match interp_expr info c with
      | Vbool true ->
         ignore (interp_expr info b);
         interp_expr info e
      | Vbool false -> Vvoid
      | _ -> raise CannotReduce end
-  | _ -> raise CannotReduce)
+  | Efor (x, pv1, dir, pv2, e) ->
+     if debug then Format.printf "for@.";
+     begin match (get pv1 info, get pv2 info) with
+     | (Vint i1, Vint i2) ->
+        if dir = To
+        then
+          for i = BigInt.to_int i1 to BigInt.to_int i2 do
+            ignore (interp_expr (add_pv x (Vint (BigInt.of_int i)) info) e)
+          done
+        else
+          for i = BigInt.to_int i1 downto BigInt.to_int i2 do
+            ignore (interp_expr (add_pv x (Vint (BigInt.of_int i)) info) e)
+          done;
+        Vvoid
+     | _ -> if debug then Format.printf "Non-integer for bounds@.";
+            raise CannotReduce
+     end
+  | Elet (Lany _,_) -> if debug then Format.printf "unhandled Lany@.";
+                       raise CannotReduce
+  | Elet ((Lsym(rs,_,_,_) as ld), e) ->
+     interp_expr (add_fundecl rs (Dlet ld) info) e
+  | Elet ((Lrec rdl as ld), e) ->
+     let info = List.fold_left
+                  (fun info rd -> add_fundecl rd.rec_sym (Dlet ld) info)
+                  info rdl in
+     interp_expr info e
+  | Eexn _ | Eraise _ -> if debug then Format.printf "unhandled exn/raise@.";
+                         raise CannotReduce
+  | Eabsurd -> if debug then Format.printf "Eabsurd@.";
+               raise CannotReduce
+  | Ehole -> if debug then Format.printf "Ehole@.";
+             raise CannotReduce
+  | Etry _-> if debug then Format.printf "Etry@."; raise CannotReduce)
 
 let eval_fun decl info = match decl with
   | Dlet (Lsym (_rs, _, _vl, expr)) ->
@@ -713,6 +951,7 @@ let rec term_of_value = function
      t_app (ls_of_rs rs) (List.map (fun f -> term_of_value (field_get f)) lf)
            (ls_of_rs rs).ls_value
   | Vvoid -> t_void
+  | Vref _ -> raise CannotReduce (* TODO ? *)
   | Varray _ -> raise CannotReduce
   | Vmatrix _ -> raise CannotReduce
 
@@ -735,24 +974,32 @@ let reflection_by_function s env = Trans.store (fun task ->
                 raise Exit)
         with Not_found -> o)
       ths None in
-  let (pmod, rs) = if o = None
+  let (_pmod, rs) = if o = None
                    then (if debug then Format.printf "Symbol %s not found@." s;
                          raise Exit)
                    else Opt.get o in
-  let (_, ms, _) = Pmodule.restore_path rs.rs_name in
+  (*let (_, ms, _) = Pmodule.restore_path rs.rs_name in*) (*FIXME remove or adapt*)
   let lpost = List.map open_post rs.rs_cty.cty_post in
   if List.exists (fun pv -> pv.pv_ghost) rs.rs_cty.cty_args
   then (if debug then Format.printf "ghost parameter@.";
         raise Exit);
   if debug then Format.printf "building module map@.";
-  let mm = Mstr.singleton ms pmod in
+  let mm = Mid.fold
+             (fun id th acc ->
+               try
+                 let pm = Pmodule.restore_module th in
+                 Mstr.add id.id_string pm acc
+               with Not_found -> acc)
+             ths Mstr.empty in
+  (*let mm = Mstr.singleton ms pmod in*)
   if debug then Format.printf "module map built@.";
   get_builtin_progs env;
   let decl = get_decl env mm rs in
   if debug then Format.printf "initial decl found@.";
   let args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
   let rec reify_post = function
-    | [] -> raise NoReification
+    | [] -> if debug then Format.printf "no postcondition reifies@.";
+            raise NoReification
     | (vres, p)::t -> begin
         try
           if debug then Format.printf "new post@.";
@@ -760,10 +1007,11 @@ let reflection_by_function s env = Trans.store (fun task ->
           then Format.printf "post: %a, %a@."
                              Pretty.print_vs vres Pretty.print_term p;
           let (lp, lv, rt) = Apply.intros p in
-          let lv = lv @  args in
-          let renv = reify_term (init_renv kn lv) g rt in
+          let lv = lv @ args in
+          let renv = reify_term (init_renv kn lv env prev) g rt in
           let info = { env = env;
                        mm = mm;
+                       funs = Mrs.empty;
                        recs = Mrs.empty;
                        vars =
                          List.fold_left
@@ -789,10 +1037,10 @@ let reflection_by_function s env = Trans.store (fun task ->
 let () = wrap_and_register
            ~desc:"reflection_l <prop> attempts to prove the goal by reflection using the lemma prop"
            "reflection_l"
-           (Tprsymbol Ttrans_l) reflection_by_lemma
+           (Tprsymbol Tenvtrans_l) reflection_by_lemma
 
 let () = wrap_and_register
-           ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the function f"
+           ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the program function f"
            "reflection_f"
            (Tstring Tenvtrans_l) reflection_by_function
 
