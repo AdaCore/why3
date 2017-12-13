@@ -15,6 +15,7 @@ open Term
 open Decl
 open Theory
 open Task
+open Args_wrapper
 
 let lab_ind = create_label "induction"
 let lab_inv = create_label "inversion"
@@ -227,7 +228,19 @@ let induction_l label induct task = match task with
     with Ind_not_found -> [task] end
   | _ -> assert false
 
+let induction_on_hyp lab b h =
+  Trans.compose (Ind_itp.revert_tr_symbol [Tsprsymbol h])
+    (Trans.store (induction_l lab b))
 
+let () = wrap_and_register
+    ~desc:"induction_arg_pr <pr> performs induction_pr on pr."
+    "induction_arg_pr"
+    (Tprsymbol Ttrans_l) (induction_on_hyp lab_ind true)
+
+let () = wrap_and_register
+    ~desc:"induction_arg_pr <pr> performs inversion_pr on pr."
+    "inversion_arg_pr"
+    (Tprsymbol Ttrans_l) (induction_on_hyp lab_inv false)
 
 let () =
   Trans.register_transform_l "induction_pr" (Trans.store (induction_l lab_ind true))

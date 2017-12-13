@@ -1,5 +1,13 @@
 :x: marks a potential source of incompatibility
 
+Version 0.88.2, December 7, 2017
+--------------------------------
+
+Bug fixes
+  * `why3 session html`: improved compliance of generated files
+  * `why3 doc`: fixed missing anchors for operator definitions
+  * improved build process when `coqtop.byte` is missing
+
 Version 0.88.1, November 6, 2017
 --------------------------------
 
@@ -8,7 +16,7 @@ API
 
 Provers
   * improved support for Isabelle 2017
-  * fixed support for Coq 8.7
+  * fixed support for Coq 8.7 (released Oct 17, 2017)
 
 Miscellaneous
   * fixed compilation for OCaml 4.06
@@ -34,16 +42,16 @@ Standard library
     compliant to IEEE-754, mapped to SMT-LIB FP theory.
 
 User features
-  * proof strategies: why3 config now generates default proof strategies
+  * proof strategies: `why3 config` now generates default proof strategies
     using the installed provers. These are available under name "Auto
-    level 0", "Auto level 1" and "Auto level 2" in why3 ide.
+    level 0", "Auto level 1" and "Auto level 2" in `why3 ide`.
     More details in the manual, section 10.6 "Proof Strategies".
   * counterexamples: better support for array values, support for
     floating-point values, support for Z3 in addition to CVC4.
     More details in the manual, section 6.3.5 "Displaying Counterexamples".
 
 Provers
-  * support for Isabelle 2017
+  * support for Isabelle 2017 (released Oct 2017)
   * discarded support for Isabelle 2016 (2016-1 still supported) :x:
   * support for Coq 8.6.1 (released Jul 25, 2017)
   * tentative support for Coq 8.7
@@ -89,7 +97,7 @@ Language
 Tools
   * added a command-line option `--extra-expl-prefix` to specify
     additional possible prefixes for VC explanations. Available for
-    why3 commands `prove` and `ide`.
+    `why3` commands `prove` and `ide`.
   * removed `jstree` style from the `session` command :x:
 
 Transformations
@@ -158,7 +166,7 @@ Provers
   * support for Gappa 1.2 (released May 19, 2015)
 
 Bug fixes
-  * why3doc: garbled output
+  * `why3doc`: garbled output
 
 Version 0.86, May 11, 2015
 --------------------------

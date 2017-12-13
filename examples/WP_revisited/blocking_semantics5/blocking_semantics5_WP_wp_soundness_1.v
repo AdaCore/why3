@@ -2,30 +2,36 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require bool.Bool.
 Require int.Int.
+Require map.Map.
+Require list.List.
+Require list.Length.
+Require list.Mem.
+Require list.Append.
 
 (* Why3 assumption *)
-Inductive datatype  :=
-  | TYunit : datatype 
-  | TYint : datatype 
-  | TYbool : datatype .
+Inductive datatype :=
+  | TYunit : datatype
+  | TYint : datatype
+  | TYbool : datatype.
 Axiom datatype_WhyType : WhyType datatype.
 Existing Instance datatype_WhyType.
 
 (* Why3 assumption *)
-Inductive value  :=
-  | Vvoid : value 
-  | Vint : Z -> value 
-  | Vbool : bool -> value .
+Inductive value :=
+  | Vvoid : value
+  | Vint : Z -> value
+  | Vbool : bool -> value.
 Axiom value_WhyType : WhyType value.
 Existing Instance value_WhyType.
 
 (* Why3 assumption *)
-Inductive operator  :=
-  | Oplus : operator 
-  | Ominus : operator 
-  | Omult : operator 
-  | Ole : operator .
+Inductive operator :=
+  | Oplus : operator
+  | Ominus : operator
+  | Omult : operator
+  | Ole : operator.
 Axiom operator_WhyType : WhyType operator.
 Existing Instance operator_WhyType.
 
@@ -43,77 +49,43 @@ Existing Instance ident_WhyType.
 Axiom ident_decide : forall (m1:ident) (m2:ident), (m1 = m2) \/ ~ (m1 = m2).
 
 (* Why3 assumption *)
-Inductive term  :=
-  | Tvalue : value -> term 
-  | Tvar : ident -> term 
-  | Tderef : mident -> term 
-  | Tbin : term -> operator -> term -> term .
+Inductive term :=
+  | Tvalue : value -> term
+  | Tvar : ident -> term
+  | Tderef : mident -> term
+  | Tbin : term -> operator -> term -> term.
 Axiom term_WhyType : WhyType term.
 Existing Instance term_WhyType.
 
 (* Why3 assumption *)
-Inductive fmla  :=
-  | Fterm : term -> fmla 
-  | Fand : fmla -> fmla -> fmla 
-  | Fnot : fmla -> fmla 
-  | Fimplies : fmla -> fmla -> fmla 
-  | Flet : ident -> term -> fmla -> fmla 
-  | Fforall : ident -> datatype -> fmla -> fmla .
+Inductive fmla :=
+  | Fterm : term -> fmla
+  | Fand : fmla -> fmla -> fmla
+  | Fnot : fmla -> fmla
+  | Fimplies : fmla -> fmla -> fmla
+  | Flet : ident -> term -> fmla -> fmla
+  | Fforall : ident -> datatype -> fmla -> fmla.
 Axiom fmla_WhyType : WhyType fmla.
 Existing Instance fmla_WhyType.
 
 (* Why3 assumption *)
-Inductive stmt  :=
-  | Sskip : stmt 
-  | Sassign : mident -> term -> stmt 
-  | Sseq : stmt -> stmt -> stmt 
-  | Sif : term -> stmt -> stmt -> stmt 
-  | Sassert : fmla -> stmt 
-  | Swhile : term -> fmla -> stmt -> stmt .
+Inductive stmt :=
+  | Sskip : stmt
+  | Sassign : mident -> term -> stmt
+  | Sseq : stmt -> stmt -> stmt
+  | Sif : term -> stmt -> stmt -> stmt
+  | Sassert : fmla -> stmt
+  | Swhile : term -> fmla -> stmt -> stmt.
 Axiom stmt_WhyType : WhyType stmt.
 Existing Instance stmt_WhyType.
 
 Axiom decide_is_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 
-Axiom map : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, Type.
-Parameter map_WhyType : forall (a:Type) {a_WT:WhyType a}
-  (b:Type) {b_WT:WhyType b}, WhyType (map a b).
-Existing Instance map_WhyType.
-
-Parameter get: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b.
-
-Parameter set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (map a b) -> a -> b -> (map a b).
-
-Axiom Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
-
-Axiom Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
-  forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
-
-Parameter const: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  b -> (map a b).
-
-Axiom Const : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (b1:b) (a1:a), ((get (const b1:(map a b)) a1) = b1).
+(* Why3 assumption *)
+Definition env := (map.Map.map mident value).
 
 (* Why3 assumption *)
-Inductive list (a:Type) {a_WT:WhyType a} :=
-  | Nil : list a
-  | Cons : a -> (list a) -> list a.
-Axiom list_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (list a).
-Existing Instance list_WhyType.
-Implicit Arguments Nil [[a] [a_WT]].
-Implicit Arguments Cons [[a] [a_WT]].
-
-(* Why3 assumption *)
-Definition env  := (map mident value).
-
-(* Why3 assumption *)
-Definition stack  := (list (ident* value)%type).
+Definition stack := (list (ident* value)%type).
 
 Parameter get_stack: ident -> (list (ident* value)%type) -> value.
 
@@ -366,53 +338,6 @@ Axiom type_preservation : forall (s1:stmt) (s2:stmt) (sigma1:(map mident
   pi2 pit)).
 
 (* Why3 assumption *)
-Fixpoint infix_plpl {a:Type} {a_WT:WhyType a}(l1:(list a)) (l2:(list
-  a)) {struct l1}: (list a) :=
-  match l1 with
-  | Nil => l2
-  | (Cons x1 r1) => (Cons x1 (infix_plpl r1 l2))
-  end.
-
-Axiom Append_assoc : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), ((infix_plpl l1 (infix_plpl l2
-  l3)) = (infix_plpl (infix_plpl l1 l2) l3)).
-
-Axiom Append_l_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((infix_plpl l (Nil :(list a))) = l).
-
-(* Why3 assumption *)
-Fixpoint length {a:Type} {a_WT:WhyType a}(l:(list a)) {struct l}: Z :=
-  match l with
-  | Nil => 0%Z
-  | (Cons _ r) => (1%Z + (length r))%Z
-  end.
-
-Axiom Length_nonnegative : forall {a:Type} {a_WT:WhyType a}, forall (l:(list
-  a)), (0%Z <= (length l))%Z.
-
-Axiom Length_nil : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  ((length l) = 0%Z) <-> (l = (Nil :(list a))).
-
-Axiom Append_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), ((length (infix_plpl l1
-  l2)) = ((length l1) + (length l2))%Z).
-
-(* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a}(x:a) (l:(list a)) {struct l}: Prop :=
-  match l with
-  | Nil => False
-  | (Cons y r) => (x = y) \/ (mem x r)
-  end.
-
-Axiom mem_append : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l1:(list
-  a)) (l2:(list a)), (mem x (infix_plpl l1 l2)) <-> ((mem x l1) \/ (mem x
-  l2)).
-
-Axiom mem_decomp : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (l:(list
-  a)), (mem x l) -> exists l1:(list a), exists l2:(list a),
-  (l = (infix_plpl l1 (Cons x l2))).
-
-(* Why3 assumption *)
 Fixpoint fresh_in_term(x:ident) (t:term) {struct t}: Prop :=
   match t with
   | (Tvalue _) => True
@@ -508,7 +433,7 @@ Axiom abstract_effects_distrib_conj : forall (s:stmt) (p:fmla) (q:fmla)
   q))).
 
 (* Why3 assumption *)
-Fixpoint wp(s:stmt) (q:fmla) {struct s}: fmla :=
+Fixpoint wp (s:stmt) (q:fmla) {struct s}: fmla :=
   match s with
   | Sskip => q
   | (Sassert f) => (Fand f (Fimplies f q))

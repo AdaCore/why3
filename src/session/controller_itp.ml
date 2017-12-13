@@ -236,13 +236,12 @@ let reload_files (c : controller) ~use_shapes =
  *)
 
 let add_file c ?format fname =
-  try
-    let theories = Session_itp.read_file c.controller_env ?format fname in
-    let (_ : file) = add_file_section c.controller_session fname (Some theories) format in
-    None
-  with e ->
-    let (_ : file) = add_file_section c.controller_session fname None format in
-    Some e
+  let theories,errors =
+    try Some (Session_itp.read_file c.controller_env ?format fname), None
+    with e -> None, Some e
+  in
+  let (_ : file) = add_file_section c.controller_session fname theories format in
+  errors
 
 
 
