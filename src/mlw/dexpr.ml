@@ -1100,16 +1100,10 @@ let cty_of_spec env bl mask dsp dity =
   let _, eff = effect_of_dspec dsp in
   let eff = eff_ghostify env.ghs eff in
   let eff = eff_reset_overwritten eff in
-  let out = ity_freeregs Sreg.empty ity in
-  let add_xs xs s = ity_freeregs s xs.xs_ity in
-  let out = Sxs.fold add_xs eff.eff_raises out in
-  let eff = eff_reset eff out in
-  let esc = eff_escape eff ity in
-  let eff = Sity.fold_left eff_spoil eff esc in
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
-  create_cty ~mask bl p q xq (get_oldies old) eff ity
+  create_cty ~mask ~defensive:true bl p q xq (get_oldies old) eff ity
 
 (** Expressions *)
 
