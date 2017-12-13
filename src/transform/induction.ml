@@ -15,7 +15,7 @@ open Term
 open Decl
 open Theory
 open Task
-
+open Args_wrapper
 
 
 
@@ -352,6 +352,15 @@ let induction_ty_lex task =
 let () =
   Trans.register_transform_l "induction_ty_lex" (Trans.store induction_ty_lex)
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
+
+let induction_on_hyp ls =
+  Trans.compose (Ind_itp.revert_tr_symbol [Tslsymbol ls])
+    (Trans.store induction_ty_lex)
+
+let () = wrap_and_register
+    ~desc:"induction_arg_ty_lex <ls> performs induction_ty_lex on ls."
+    "induction_arg_ty_lex"
+    (Tlsymbol Ttrans_l) induction_on_hyp
 
 
 (***************************************************************************)

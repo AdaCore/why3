@@ -27,6 +27,7 @@ type driver = {
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_converter   : Printer.syntax_map;
+  drv_literal     : Printer.syntax_map;
 }
 
 type printer_args = {
@@ -36,6 +37,7 @@ type printer_args = {
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;
+  literal     : Printer.syntax_map;
 }
 
 let load_file file =
@@ -85,6 +87,7 @@ let load_driver env file extra_files =
   let thprelude = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let converter_map = ref Mid.empty in
+  let literal_map = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try Theory.ns_find_pr th.th_export q
@@ -106,6 +109,8 @@ let load_driver env file extra_files =
     syntax_map := Mid.add id (s,if b then 1 else 0) !syntax_map in
   let add_converter id s b =
     converter_map := Mid.add id (s,if b then 1 else 0) !converter_map in
+  let add_literal id s b =
+    literal_map := Mid.add id (s,if b then 1 else 0) !literal_map in
   let add_local th = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
@@ -124,6 +129,9 @@ let load_driver env file extra_files =
         add_syntax ps.ls_name s b
     | Rconverter _ ->
         Loc.errorm "Syntax converter cannot be used in pure theories"
+    | Rliteral (q,s,b) ->
+        let ts = find_ts th q in
+        add_literal ts.ts_name s b
     | Rremovepr (q) ->
       ignore (find_pr th q)
     | Rremoveall ->
@@ -156,7 +164,6 @@ let load_driver env file extra_files =
         in
         let m = lookup_meta s in
         ignore (create_meta m (List.map convert al))
-    | Rliteral _ -> assert false (* TODO *)
   in
   let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
   let open Pmodule in
@@ -214,6 +221,7 @@ let load_driver env file extra_files =
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_converter   = !converter_map;
+    drv_literal     = !literal_map;
   }
 
 (* registering printers for programs *)
@@ -250,6 +258,7 @@ let lookup_printer drv =
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       converter   = drv.drv_converter;
+      literal     = drv.drv_literal;
     }
   in
   try
@@ -258,12 +267,6 @@ let lookup_printer drv =
 
 let list_printers () =
   Hstr.fold (fun k (desc,_,_) acc -> (k,desc)::acc) printers []
-
-(*
-let extract_module ?old drv fmt m =
-  let printer = lookup_printer p printer_args in
-  Format.fprintf fmt "@[%a@]@?" (printer ?old) m
- *)
 
 (* exception report *)
 
@@ -289,6 +292,8 @@ let () = Exn_printer.register (fun fmt exn ->
       "%a is not a function symbol" Pretty.print_ls ls
   | PSymExpected ls -> fprintf fmt
       "%a is not a predicate symbol" Pretty.print_ls ls
+  | NoPrinter ->
+      fprintf fmt "Missing printer in driver"
   | KnownPrinter s ->
       fprintf fmt "Program printer '%s' is already registered" s
   | UnknownPrinter s ->

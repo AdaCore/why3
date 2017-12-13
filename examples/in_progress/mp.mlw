@@ -252,7 +252,7 @@ module N
         invariant { value_sub x.elts (p2i !i) (p2i x2) = 0 }
         variant { p2i !i }
         i := Int31.(-) !i one;
-        if Limb.ne x[!i] limb_zero then
+        if not (Limb.(=) x[!i] limb_zero) then
           begin
             assert { l2i x[p2i !i] >= 1 };
             assert { value_sub x.elts (p2i x1) (p2i !i + 1) >=
@@ -325,7 +325,7 @@ module N
     let one = Int31.of_int 1 in
     let i = ref x1 in
     let c = ref y in
-    while Int31.(<) !i x2 && Limb.ne !c limb_zero do
+    while Int31.(<) !i x2 && not (Limb.(=) !c limb_zero) do
       invariant { forall j. 0 <= j < p2i x1 \/ p2i x2 <= j < p2i x.length ->
                   x[j] = (old x)[j] }
       invariant { p2i x1 <= p2i !i <= p2i x2 }
@@ -404,10 +404,10 @@ module N
     assert {
       value x + power radix (p2i lx) * l2i c =
       value (old x) + value_array y };
-    if Limb.eq c limb_zero then () else
+    if Limb.(=) c limb_zero then () else
     begin
     (* we enlarge x *)
-    if Int31.eq lx (of_int 0x3FFFFFFF) then raise TooManyDigits;
+    if lx = of_int 0x3FFFFFFF then raise TooManyDigits;
     label L in
     enlarge x (Int31.(+) lx one);
     assert { l2i x.digits[p2i lx] = 0 };
@@ -435,7 +435,7 @@ module N
     let one = Int31.of_int 1 in
     let limb_zero = Limb.of_int 0 in
     let lx = x.length in
-    if Int31.eq lx (of_int 0x3FFFFFFF) then raise TooManyDigits;
+    if lx = of_int 0x3FFFFFFF then raise TooManyDigits;
     let r = Array31.make (Int31.(+) lx one) limb_zero in
     Array31.blit x zero r zero lx;
     assert { MapEq.map_eq_sub x.elts r.elts 0 (p2i lx) };

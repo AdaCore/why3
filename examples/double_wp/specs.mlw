@@ -16,7 +16,7 @@ module VM_instr_spec
 
   (* General specification builder for determinstic machine
      instructions. *)
-  let ifunf (ghost pre:pre {'a}) (code_f:code)
+  let ifunf (ghost pre:pre 'a) (code_f:code)
     (ghost f:machine_state -> machine_state) : hl 'a
     requires { forall c p. codeseq_at c p code_f ->
         forall x ms. pre x p ms -> transition c ms (f ms) }

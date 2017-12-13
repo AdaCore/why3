@@ -11,14 +11,20 @@ case "$1" in
         exit 2
 esac
 
-REPORTDIR=$PWD/../why3-new-reports
+GITBRANCH=`git rev-parse --abbrev-ref HEAD`
+REPORTDIR=$PWD/../why3-reports-$GITBRANCH
+
+if ! test -e "$REPORTDIR"; then
+    echo "directory '$REPORTDIR' for reports does not exist, aborting."
+    exit 2
+fi
+
 OUT=$REPORTDIR/nightly-bench.out
 PREVIOUS=$REPORTDIR/nightly-bench.previous
 DIFF=$REPORTDIR/nightly-bench.diff
 REPORT=$REPORTDIR/nightly-bench.report
 DATE=`date --utc +%Y-%m-%d`
-
-SUBJECT="Why3 NEW SYSTEM nightly bench:"
+SUBJECT="Why3 [$GITBRANCH] bench : "
 
 notify() {
     if test "$REPORTBYMAIL" == "no"; then
@@ -32,6 +38,8 @@ notify() {
 
 echo "== Why3 bench on $DATE ==" > $REPORT
 echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
+echo "Current branch: "$GITBRANCH >> $REPORT
+echo "Current commit: "`git rev-parse HEAD` >> $REPORT
 
 # configuration
 autoconf
@@ -122,13 +130,13 @@ fi
 
 
 # replay proofs
-examples/regtests.sh &> $OUT
+examples/regtests.sh --check-realizations &> $OUT
 if test "$?" != "0" ; then
     SUBJECT="$SUBJECT failed"
     echo "Proof replay failed" >> $REPORT
 else
     SUBJECT="$SUBJECT successful"
-    echo " !!! REPLAY SUCCEEDED !!!  YAHOOOO !!! " >> $REPORT
+    echo "REPLAY SUCCEEDED" >> $REPORT
 fi
 
 # store the state for this day
@@ -136,9 +144,9 @@ cp $OUT $REPORTDIR/regtests-$DATE
 
 echo "Ending time (UTC): "`date --utc +%H:%M` >> $REPORT
 
-# 3-line summary
+# 3-line summary + 4 lines check realizations
 echo "" >> $REPORT
-tail -3 $OUT >> $REPORT
+tail -7 $OUT >> $REPORT
 echo "" >> $REPORT
 
 # output the diff against previous run

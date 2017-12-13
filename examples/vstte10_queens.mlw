@@ -190,7 +190,7 @@ module NQueens63
     variant  { n - pos }
     ensures  { is_board board (pos) }
   =
-    if eq pos n then
+    if pos = n then
       solutions := P.succ !solutions
     else
       let i = ref (of_int 0) in

@@ -236,13 +236,12 @@ let reload_files (c : controller) ~use_shapes =
  *)
 
 let add_file c ?format fname =
-  try
-    let theories = Session_itp.read_file c.controller_env ?format fname in
-    let (_ : file) = add_file_section c.controller_session fname (Some theories) format in
-    None
-  with e ->
-    let (_ : file) = add_file_section c.controller_session fname None format in
-    Some e
+  let theories,errors =
+    try Some (Session_itp.read_file c.controller_env ?format fname), None
+    with e -> None, Some e
+  in
+  let (_ : file) = add_file_section c.controller_session fname theories format in
+  errors
 
 
 
@@ -778,21 +777,25 @@ let proof_is_complete pa =
 let clean c ~removed nid =
 
   (* clean should not change proved status *)
-  let notification _ = assert false in
+  let notification any =
+    Format.eprintf "Cleaning error: cleaning attempts to change status of node %a@." fprintf_any any
+  in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
   let clean_aux () any =
-    match any with
-    | APa pa ->
-        let pa = Session_itp.get_proof_attempt_node s pa in
-        if pn_proved s pa.parent then
-          if not (proof_is_complete pa) then
-            remove_subtree ~notification ~removed c any
+    let do_remove =
+      Session_itp.is_detached s any ||
+      match any with
+      | APa pa ->
+         let pa = Session_itp.get_proof_attempt_node s pa in
+         pn_proved s pa.parent && not (proof_is_complete pa)
       | ATn tn ->
-        let pn = get_trans_parent s tn in
-        if pn_proved s pn && not (tn_proved s tn) then
-          remove_subtree ~notification ~removed c (ATn tn)
-      | _ -> ()
+         let pn = get_trans_parent s tn in
+         pn_proved s pn && not (tn_proved s tn)
+      | _ -> false
+    in
+    if do_remove then
+      remove_subtree ~notification ~removed c any
   in
 
   match nid with
