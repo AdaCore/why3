@@ -78,6 +78,7 @@
     sp_xpost   = [];
     sp_reads   = [];
     sp_writes  = [];
+    sp_alias   = [];
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
@@ -89,6 +90,7 @@
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_alias   = s1.sp_alias @ s2.sp_alias;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
@@ -128,7 +130,7 @@
 
 (* program keywords *)
 
-%token ABSTRACT ABSURD ANY ASSERT ASSUME AT BEGIN BREAK CHECK
+%token ABSTRACT ABSURD ALIAS ANY ASSERT ASSUME AT BEGIN BREAK CHECK
 %token CONTINUE DIVERGES DO DONE DOWNTO ENSURES EXCEPTION FOR
 %token FUN GHOST INVARIANT LABEL MODULE MUTABLE OLD
 %token PRIVATE PURE RAISE RAISES READS REC REQUIRES
@@ -159,7 +161,7 @@
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES DIVERGES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
@@ -998,12 +1000,17 @@ single_spec:
     { { empty_spec with sp_reads = $3; sp_checkrw = true } }
 | WRITES LEFTBRC comma_list0(single_term) RIGHTBRC
     { { empty_spec with sp_writes = $3; sp_checkrw = true } }
+| ALIAS LEFTBRC comma_list0(alias) RIGHTBRC
+    { { empty_spec with sp_alias = $3; sp_checkrw = true } }
 | RAISES LEFTBRC comma_list1(xsymbol) RIGHTBRC
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | DIVERGES
     { { empty_spec with sp_diverge = true } }
 | variant
     { { empty_spec with sp_variant = $1 } }
+
+alias:
+| term WITH term  { $1, $3 }
 
 ensures:
 | term
@@ -1162,10 +1169,11 @@ lident_rich:
 lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
 | LEFTPAR_STAR_RIGHTPAR
-    { (* parentheses are removed from the location *)
-      let s = let s = $startpos in { s with pos_cnum = s.pos_cnum + 1 } in
-      let e = let e = $endpos   in { e with pos_cnum = e.pos_cnum - 1 } in
-      mk_id (infix "*") s e }
+  { (* parentheses are removed from the location *)
+    let s = $startpos and e = $endpos in
+    let s = { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
+    let e = { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
+    mk_id (infix "*") s e }
 
 lident_op:
 | op_symbol               { infix $1 }

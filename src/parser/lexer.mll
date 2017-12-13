@@ -24,6 +24,7 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
+        "alias", ALIAS;
         "as", AS;
         "axiom", AXIOM;
         "break", BREAK;

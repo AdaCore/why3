@@ -39,8 +39,9 @@
   let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
 
   let empty_spec = {
-    sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
-    sp_reads   = [];    sp_writes  = [];  sp_variant = [];
+    sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
+    sp_reads   = [];    sp_writes  = [];  sp_alias  = [];
+    sp_variant = [];
     sp_checkrw = false; sp_diverge = false;
   }
 
@@ -50,6 +51,7 @@
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_alias   = s1.sp_alias @ s2.sp_alias;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;

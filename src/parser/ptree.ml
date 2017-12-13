@@ -103,6 +103,7 @@ type spec = {
   sp_xpost   : xpost list;
   sp_reads   : qualid list;
   sp_writes  : term list;
+  sp_alias   : (term * term) list;
   sp_variant : variant;
   sp_checkrw : bool;
   sp_diverge : bool;
