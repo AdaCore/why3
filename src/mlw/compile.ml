@@ -338,8 +338,6 @@ module Translate = struct
           Mltree.Tapp (its.its_ts.ts_name, args) in
     loop t
 
-  let ty_int = mlty_of_ity MaskVisible ity_int
-
   let pvty pv =
     if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
     else let (vs, vs_ty) = vsty pv.pv_vs in
@@ -390,21 +388,19 @@ module Translate = struct
   let is_empty_record info rs =
     Opt.fold (fun _ -> is_empty_record_itd) false (get_record_itd info rs)
 
-  let mk_eta_expansion rsc pvl cty_app =
+  let mk_eta_expansion rs pvl ({cty_args = ca; cty_effect = ce} as c) =
     (* FIXME : effects and types of the expression in this situation *)
     let args_f =
-      let def pv = (pv_name pv, mlty_of_ity (mask_of_pv pv) pv.pv_ity,
-                    pv.pv_ghost) in
-      filter_ghost_params pv_not_ghost def cty_app.cty_args in
+      let def pv =
+        (pv_name pv, mlty_of_ity (mask_of_pv pv) pv.pv_ity, pv.pv_ghost) in
+      filter_ghost_params pv_not_ghost def ca in
     let args =
-      let def pv = ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty
-          Slab.empty in
+      let def pv =
+        ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty Slab.empty in
       let args = filter_ghost_params pv_not_ghost def pvl in
-      let extra_args = List.map def cty_app.cty_args in args @ extra_args in
-    let eapp = ML.mk_expr (Mltree.Eapp (rsc, args)) (Mltree.C cty_app)
-        cty_app.cty_effect Slab.empty in
-    ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C cty_app)
-      cty_app.cty_effect Slab.empty
+      let extra_args = List.map def ca in args @ extra_args in
+    let eapp = ML.mk_expr (Mltree.Eapp (rs, args)) (Mltree.C c) ce Slab.empty in
+    ML.mk_expr (Mltree.Efun (args_f, eapp)) (Mltree.C c) ce Slab.empty
 
   (* function arguments *)
   let filter_params args =
@@ -421,8 +417,7 @@ module Translate = struct
     let rec loop = function
       | [], _ -> []
       | pv :: l1, arg :: l2 ->
-          if p pv && p arg then def pv :: loop (l1, l2)
-          else loop (l1, l2)
+          if p pv && p arg then def pv :: loop (l1, l2) else loop (l1, l2)
       | _ -> assert false
     in loop (pvl, cty_args)
 
@@ -459,6 +454,7 @@ module Translate = struct
         ML.e_seq body_expr rec_call ML.ity_unit eff Slab.empty in
       ML.mk_expr (Mltree.Eif (test, seq_expr, ML.e_unit)) ML.ity_unit
         eff Slab.empty in
+    let ty_int = mlty_of_ity MaskVisible ity_int in
     let for_call_expr = let for_call = Mltree.Eapp (for_rs, [from_expr]) in
       ML.mk_expr for_call ML.ity_unit eff Slab.empty in
     let pv_name pv = pv.pv_vs.vs_name in
@@ -686,12 +682,9 @@ module Translate = struct
                 ML.mk_its_defn id args is_private (Some (Mltree.Drecord pjl))
           end
       | Alias t, _, _ ->
-          ML.mk_its_defn id args is_private (* FIXME? is this a good mask? *)
+          ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
             (Some (Mltree.Dalias (mlty_of_ity MaskVisible t)))
-      | Range _, [], [] ->
-          assert (args = []); (* a range type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (Mltree.Dalias ty_int))
-      | Range _, _, _ -> assert false (* a range type has no field/constructor *)
+      | Range _, _, _ -> assert false (* TODO *)
       | Float _, _, _ -> assert false (* TODO *)
     end
 
