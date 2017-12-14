@@ -29,7 +29,7 @@ module TestExtraction
   use import array.Array
 
   let test_array () =
-    let a = Array.make 43 0 in
+    let a = Array.make 43 (0:int63) in
     for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
     a[42]
 
@@ -134,7 +134,7 @@ module TestExtraction
 *)
   let constructor1 () =
     let x = Cons in
-    x 42
+    x (42:int63)
 
   let foofoo (x: int) : int =
     let ghost y = x + 1 in
@@ -162,7 +162,7 @@ module TestExtraction
   (* functions with ghost arguments *)
 
   let test_filter_ghost_args (x: int) (ghost y: int) =
-    1 / 0
+    (1:int) / 0
 
   let test_call (x: int) : int =
     test_filter_ghost_args x 0 + 1
@@ -180,7 +180,7 @@ module TestExtraction
   let many_args (a b c d e f g h i j k l m: int) : int = 42
 
   let foo (x: int) : int =
-    let _ = 42 in (* FIXME? print _ in OCaml *)
+    let _ = (42:int63) in (* FIXME? print _ in OCaml *)
     x
 
   let test_fun (x: int) : int -> int =
@@ -214,10 +214,12 @@ module TestExtraction
 
   (** for loops *)
 
+(*
   let for_loop1 () =
-    let r = ref 0 in
+    let r = ref (0:int63) in
     for i = 0 to 10 do r := !r + i done;
     !r
+*)
 
   (** optional and named arguments *)
 
@@ -239,7 +241,7 @@ module TestExtraction
   use import ocaml.Pervasives
 
   let test1 () raises { AssertFailure } =
-    ocaml_assert (1 + 1 = 2)
+    ocaml_assert ((1:int63) + 1 = 2)
 
   (** parallel assignement *)
 

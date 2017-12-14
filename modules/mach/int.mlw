@@ -44,8 +44,11 @@ module Bounded_int
   constant min : int
   constant max : int
 
-  val function to_int (n:t) : int
+  function to_int (n:t) : int
   meta coercion function to_int
+
+  val to_int (n:t) : int
+    ensures { result = n }
 
   predicate in_bounds (n:int) = min <= n <= max
 
@@ -140,15 +143,19 @@ module Int31
 
   use import int.Int
 
-  type int31
+  type int31 = < range -0x4000_0000 0x3fff_ffff >
 
-  let constant min_int31 : int = - 0x40000000
-  let constant max_int31 : int =   0x3fffffff
+  let constant min_int31 : int = - 0x4000_0000
+  let constant max_int31 : int =   0x3fff_ffff
+  function to_int (x : int31) : int = int31'int x
 
   clone export Bounded_int with
     type t = int31,
-    constant min = min_int31,
-    constant max = max_int31
+    constant min = int31'minInt,
+    constant max = int31'maxInt,
+    function to_int = int31'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
 (*  use bv.BV31
 
@@ -163,15 +170,19 @@ module Int32
 
   use import int.Int
 
-  type int32
+  type int32 = < range -0x8000_0000 0x7fff_ffff >
 
-  let constant min_int32 : int = - 0x80000000
-  let constant max_int32 : int =   0x7fffffff
+  let constant min_int32 : int = - 0x8000_0000
+  let constant max_int32 : int =   0x7fff_ffff
+  function to_int (x : int32) : int = int32'int x
 
   clone export Bounded_int with
     type t = int32,
-    constant min = min_int32,
-    constant max = max_int32
+    constant min = int32'minInt,
+    constant max = int32'maxInt,
+    function to_int = int32'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
   use bv.BV32
 
@@ -184,13 +195,20 @@ end
 
 module UInt32
 
-  type uint32
+  use import int.Int
 
-  let constant max_uint32 : int = 0xffffffff
+  type uint32 = < range 0 0xffff_ffff >
+
+  let constant max_uint32 : int = 0xffff_ffff
+  function to_int (x : uint32) : int = uint32'int x
 
   clone export Unsigned with
     type t = uint32,
-    constant max = max_uint32
+    constant max = uint32'maxInt,
+    function to_int = uint32'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
 (*  use bv.BV32
 
@@ -205,15 +223,19 @@ module Int63
 
   use import int.Int
 
-  type int63
+  type int63 = < range -0x4000_0000_0000_0000 0x3fff_ffff_ffff_ffff >
 
-  let constant min_int63 : int = - 0x4000000000000000
-  let constant max_int63 : int =   0x3fffffffffffffff
+  let constant min_int63 : int = - 0x4000_0000_0000_0000
+  let constant max_int63 : int =   0x3fff_ffff_ffff_ffff
+  function to_int (x : int63) : int = int63'int x
 
   clone export Bounded_int with
     type t = int63,
-    constant min = min_int63,
-    constant max = max_int63
+    constant min = int63'minInt,
+    constant max = int63'maxInt,
+    function to_int = int63'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
   let constant zero = of_int 0
   let constant one = of_int 1
@@ -332,15 +354,19 @@ module Int64
 
   use import int.Int
 
-  type int64
+  type int64 = < range -0x8000_0000_0000_0000 0x7fff_ffff_ffff_ffff >
 
-  let constant min_int64 : int = - 0x8000000000000000
-  let constant max_int64 : int =   0x7fffffffffffffff
+  let constant min_int64 : int = - 0x8000_0000_0000_0000
+  let constant max_int64 : int =   0x7fff_ffff_ffff_ffff
+  function to_int (x : int64) : int = int64'int x
 
   clone export Bounded_int with
     type t = int64,
-    constant min = min_int64,
-    constant max = max_int64
+    constant min = int64'minInt,
+    constant max = int64'maxInt,
+    function to_int = int64'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
 (*  use bv.BV64
 
@@ -355,13 +381,18 @@ module UInt64
 
   use import int.Int
 
-  type uint64
+  type uint64 = < range 0 0xffff_ffff_ffff_ffff >
 
-  constant max_uint64 : int =  0xffffffffffffffff
+  constant max_uint64 : int = uint64'maxInt
+  function to_int (x : uint64) : int = uint64'int x
 
   clone export Unsigned with
     type t = uint64,
-    constant max = max_uint64
+    constant max = uint64'maxInt,
+    function to_int = uint64'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
 
 (*  use bv.BV64
 
