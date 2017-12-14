@@ -10,10 +10,9 @@ module TestExtraction
   let test_int () = f 31 + (div 33 3 + 2 - 4) - -1
 
   use import mach.int.Int63
-  let f63 (x: int63) : int63 = x + of_int 1
+  let f63 (x: int63) : int63 = x + 1
   let test_int63 () =
-    to_int (f63 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+    to_int (f63 31 + (33 / 3 + 2 - 4) - (-1))
 
   use import int.Int
   use import ref.Ref
@@ -36,9 +35,9 @@ module TestExtraction
   use import mach.array.Array63
 
   let test_array63 () : int =
-    let a = Array63.make (Int63.of_int 43) 0 in
+    let a = Array63.make 43 0 in
     for i = 1 to 42 do a[Int63.of_int i] <- a[Int63.of_int (i - 1)] + 1 done;
-    a[Int63.of_int 42]
+    a[42]
 
   use import seq.Seq
   use import int.Int
@@ -241,7 +240,7 @@ module TestExtraction
   use import ocaml.Pervasives
 
   let test1 () raises { AssertFailure } =
-    ocaml_assert ((1:int63) + 1 = 2)
+    ocaml_assert ((1:int) + 1 = 2)
 
   (** parallel assignement *)
 
@@ -261,25 +260,25 @@ module TestExtraction
   = min_int63
 
   let test2 () raises { AssertFailure }
-  = ocaml_assert (of_int 1 + of_int 1 = of_int 2)
+  = ocaml_assert ((1:int63) + 1 = 2)
 
   (* testing proxy-variables inlining mechanism inside a lambda *)
   let test3 () raises { AssertFailure }
-  = let i = ref (of_int 42) in
+  = let i = ref (42:int63) in
     let c = Cons !i in
-    i := (of_int 0);
+    i := 0;
     let c = c Nil in
-    ocaml_assert (match c with Cons x _ -> x = of_int 42 | _ -> true end)
+    ocaml_assert (match c with Cons x _ -> x = 42 | _ -> true end)
 
   (* testing proxy-variables inlining with conflicting effects *)
   let test4 () raises { AssertFailure }
   = let f (x y: int63) raises { AssertFailure }
-    = ocaml_assert (y = of_int 42);
+    = ocaml_assert (y = 42);
       x + y in
-    let i = ref (of_int 42) in
-    let res = f (i := of_int 0; !i) !i in
-    ocaml_assert (!i = of_int 0);
-    ocaml_assert (res = of_int 42)
+    let i = ref 42 in
+    let res = f (i := 0; !i) !i in
+    ocaml_assert (!i = 0);
+    ocaml_assert (res = 42)
 
   let main () raises { AssertFailure } =
     test1 ();
