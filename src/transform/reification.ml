@@ -73,10 +73,6 @@ let rec reify_term renv t rt =
          when ls_equal ls ls' && vs_equal v v' ->
        if debug then Format.printf "case app_var@.";
        renv, t
-    | Papp _, Tapp (ls1, _), Tapp(ls2, _) ->
-       if debug then Format.printf "head symbol mismatch %a %a@."
-                                   Pretty.print_ls ls1 Pretty.print_ls ls2;
-       raise NoReification
     | Por (p1, p2), _, _ ->
        if debug then Format.printf "case or@.";
        begin try invert_pat vl renv interp (p1, f) t
@@ -89,10 +85,14 @@ let rec reify_term renv t rt =
     | Pvar _, Tapp (ls, _hd::_tl), _ (*when ls_equal ls interp FIXME ?*)
       -> if debug then Format.printf "case interp@.";
          invert_interp renv ls t
-    | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), Tconst _
+    | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), _
       -> if debug then Format.printf "case const@.";
          let renv, rt = invert_interp renv ls t in
          renv, (t_app cs [rt] (Some p.pat_ty))
+    | Papp _, Tapp (ls1, _), Tapp(ls2, _) ->
+       if debug then Format.printf "head symbol mismatch %a %a@."
+                                   Pretty.print_ls ls1 Pretty.print_ls ls2;
+       raise NoReification
     | _ -> raise NoReification
   and invert_var_pat vl (renv:reify_env) _interp (p,f) t =
     if debug
@@ -177,9 +177,10 @@ let rec reify_term renv t rt =
     let vl, f = open_ls_defn ld in
     if debug then Format.printf "invert_ctx_interp ls %a @."
                                 Pretty.print_ls ls;
+    invert_ctx_body renv ls vl f t l g
+  and invert_ctx_body renv ls vl f t l g =
     match f.t_node with
-    | Tcase ({t_node = Tvar v}, [tbn; tbc] )
-         when vs_equal v (List.hd vl) ->
+    | Tcase ({t_node = Tvar v}, [tbn; tbc] ) when vs_equal v (List.hd vl) ->
        let open Theory in
        let th_list = Env.read_theory renv.env ["list"] "List" in
        let ty_g = g.vs_ty in
@@ -191,24 +192,27 @@ let rec reify_term renv t rt =
              raise NoReification);
        let nil = ns_find_ls th_list.th_export ["Nil"] in
        let cons = ns_find_ls th_list.th_export ["Cons"] in
-       let th_bool = Env.read_theory renv.env ["bool"] "Bool" in
-       (* FIXME add use export list.List and bool.Bool to the task ? *)
-       let implb = ns_find_ls th_bool.th_export ["implb"] in
        let (pn, fn) = t_open_branch tbn in
        let (pc, fc) = t_open_branch tbc in
        begin match pn.pat_node, fn.t_node, pc.pat_node, fc.t_node with
-       | Papp(n, []), Tapp(leq,{t_node = Tvar g'}::_),
+       | Papp(n, []),
+         Tapp(eq'', [{t_node=Tapp(leq,{t_node = Tvar g'}::_)};btr'']),
          Papp (c, [{pat_node = Pvar hdl};{pat_node = Pvar tll}]),
-         Tapp(ib, [({t_node = Tapp(leq', _)} as thd);
-                   ({t_node =
-                       Tapp(ls', {t_node = Tvar tll'}::{t_node=Tvar g''}::_)}
-                    as ttl)])
+         Tbinop(Timplies,
+                {t_node=(Tapp(eq, [({t_node = Tapp(leq', _)} as thd); btr]))},
+                {t_node = (Tapp(eq',
+                    [({t_node =
+                         Tapp(ls', {t_node = Tvar tll'}::{t_node=Tvar g''}::_)}
+                         as ttl); btr']))})
             when ls_equal n nil && ls_equal c cons && ls_equal ls ls'
-                 && ls_equal ib implb && vs_equal tll tll'
+                 && vs_equal tll tll'
                  && vs_equal g' g'' && ls_equal leq leq'
                  && List.mem g' vl
                  && not (Mvs.mem tll (t_vars thd))
                  && not (Mvs.mem hdl (t_vars ttl))
+                 && ls_equal eq ps_equ && ls_equal eq' ps_equ
+                 && ls_equal eq'' ps_equ && t_equal btr t_bool_true
+                 && t_equal btr' t_bool_true && t_equal btr'' t_bool_true
          ->
           if debug then Format.printf "reifying goal@.";
           let (renv, rg) = invert_interp renv leq t in
@@ -233,6 +237,8 @@ let rec reify_term renv t rt =
        | _ -> if debug then Format.printf "unhandled interp structure@.";
               raise NoReification
        end
+    | Tif (c, th, el) when t_equal th t_bool_true && t_equal el t_bool_false ->
+       invert_ctx_body renv ls vl c t l g
     | _ -> if debug then Format.printf "not a match on list@.";
            raise NoReification
   in
@@ -353,8 +359,8 @@ let build_goals prev subst lp g rt =
   if debug then Format.printf "reified goal instantiated@.";
   let inst_lp = List.map (t_subst subst) lp in
   if debug then Format.printf "premises instantiated@.";
-  let d_r = create_prop_decl Paxiom
-                             (create_prsymbol (id_fresh "HR")) inst_rt in
+  let hr = create_prsymbol (id_fresh "HR") in
+  let d_r = create_prop_decl Paxiom hr inst_rt in
   let pr = create_prsymbol
              (id_fresh "GR"
                        ~label:(Slab.singleton expl_reification_check)) in
@@ -373,6 +379,8 @@ let build_goals prev subst lp g rt =
                              l rl
           | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
           | _ -> raise Exit in
+        (* todo on context interp, revert post 
+           and compute_specified interp functions*)
         if debug then Format.printf "cut ok@.";
         Trans.apply (Cut.cut ci (Some "interp")) task_r
     with _ -> if debug then Format.printf "no cut found@."; [task_r] in
