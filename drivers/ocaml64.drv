@@ -323,9 +323,9 @@ end
 module mach.int.Refint63
   syntax val incr "incr %1"
   syntax val decr "decr %1"
-  syntax val (+=) "%1 := !%1 + %2" (*"(fun r v -> Pervasives.(:=) r (Pervasives.(!) r + v))"*)
-  syntax val (-=) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r - v))"
-  syntax val ( *= ) "(fun r v -> Pervasives.(:=) r (Pervasives.(!) r * v))"
+  syntax val (+=) "%1 := !%1 + %2"
+  syntax val (-=) "%1 := !%1 - %2"
+  syntax val ( *= ) "%1 := !%1 * %2"
 end
 module mach.int.MinMax63
   syntax val min "Pervasives.min %1 %2"

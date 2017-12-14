@@ -263,6 +263,7 @@ module Print = struct
   (** Expressions *)
 
   let pv_name pv = pv.pv_vs.vs_name
+  let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
   let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
@@ -288,6 +289,10 @@ module Print = struct
         if c.Number.ic_negative then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
     | _ -> assert false end
+
+  let print_for_direction fmt = function
+    | To     -> fprintf fmt "to"
+    | DownTo -> fprintf fmt "downto"
 
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
@@ -420,7 +425,7 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
-         | None   -> fprintf fmt "(Z.of_string \"%s\")" n)
+         | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
@@ -492,16 +497,25 @@ module Print = struct
           (print_expr info) e1 (print_expr info) e2
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
-    (* | Etuple _ -> (\* TODO *\) assert false *)
-    | Efor (pv1, pv2, direction, pv3, e) ->
-        let print_for_direction fmt = function
-          | To -> fprintf fmt "to"
-          | DownTo -> fprintf fmt "downto"
-        in
+    | Efor (pv1, pv2, dir, pv3, e) ->
+        let for_id  = id_register (id_fresh "for_loop_to") in
+        let cmp, op = match dir with
+          | To -> "Z.leq", "Z.succ"
+          | DownTo -> "Z.geq", "Z.pred" in
+        fprintf fmt (protect_on paren
+               "@[<hov 2>let rec %a %a =@ if %s %a %a then \
+                begin@ %a; %a (%s %a) end@ in@ %a %a@]")
+          (* let rec *) (print_lident info) for_id (print_pv info) pv1
+          (* if      *)  cmp (print_pv info) pv1 (print_pv info) pv3
+          (* then    *) (print_expr info) e (print_lident info) for_id
+                        op (print_pv info) pv1
+          (* in      *) (print_lident info) for_id (print_pv info) pv2
+        (*
         fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
           (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
           print_for_direction direction (print_lident info) (pv_name pv3)
           (print_expr info) e
+        *)
     | Etry (e, bl) ->
         fprintf fmt
           "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
