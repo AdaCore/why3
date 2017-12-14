@@ -208,7 +208,7 @@ let pvs_affected wr pvs =
 
 let decrease_alg env loc old_t t =
   let oty = t_type old_t and nty = t_type t in
-  let quit () = Loc.errorm ?loc "no default order for %a" Pretty.print_term t in
+  let quit () = Loc.errorm ?loc "no default order for %a" Pretty.print_ty nty in
   let ts = match oty with {ty_node = Tyapp (ts,_)} -> ts | _ -> quit () in
   let itd = find_its_defn env.known_map (restore_its ts) in
   let get_cs rs = match rs.rs_logic with RLls cs -> cs | _ -> quit () in
