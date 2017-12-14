@@ -101,10 +101,10 @@ module EuclideanAlgorithm31
 
   let rec euclid (u v: int31) : int31
     variant  { to_int v }
-    requires { to_int u >= 0 /\ to_int v >= 0 }
-    ensures  { to_int result = gcd (to_int u) (to_int v) }
+    requires { u >= 0 /\ v >= 0 }
+    ensures  { result = gcd u v }
   =
-    if Int31.eq v (of_int 0) then
+    if v = 0 then
       u
     else
       euclid v (u % v)
@@ -119,10 +119,10 @@ module EuclideanAlgorithm63
 
   let rec euclid (u v: int63) : int63
     variant  { to_int v }
-    requires { to_int u >= 0 /\ to_int v >= 0 }
-    ensures  { to_int result = gcd (to_int u) (to_int v) }
+    requires { u >= 0 /\ v >= 0 }
+    ensures  { result = gcd u v }
   = "vc:sp"
-    if v = of_int 0 then
+    if v = 0 then
       u
     else
       euclid v (u % v)
