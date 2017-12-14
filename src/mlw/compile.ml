@@ -71,6 +71,7 @@ module ML = struct
         List.iter (fun (_, tyl) -> List.iter (iter_deps_ty f) tyl) constrl
     | Drecord pjl -> List.iter (fun (_, _, ty) -> iter_deps_ty f ty) pjl
     | Dalias ty -> iter_deps_ty f ty
+    | Drange _ | Dfloat _ -> ()
 
   let iter_deps_its_defn f its_d =
     Opt.iter (iter_deps_typedef f) its_d.its_def
@@ -339,8 +340,6 @@ module Translate = struct
           let args = List.map loop args in
           Mltree.Tapp (its.its_ts.ts_name, args) in
     loop t
-
-  let ty_int = mlty_of_ity MaskVisible ity_int
 
   let pvty pv =
     if pv.pv_ghost then ML.mk_var (pv_name pv) ML.tunit true
@@ -633,11 +632,15 @@ module Translate = struct
       | Alias t, _, _ ->
           ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
             (Some (Mltree.Dalias (mlty_of_ity MaskVisible t)))
-      | Range _, [], [] ->
+      | Range r, [], [] ->
           assert (args = []); (* a range type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (Mltree.Dalias ty_int))
-      | Range _, _, _ -> assert false (* a range type has no field/constr. *)
-      | Float _, _, _ -> assert false (* TODO *)
+          ML.mk_its_defn id [] is_private (Some (Mltree.Drange r))
+      | Float ff, [], [] ->
+          assert (args = []); (* a range type is not polymorphic *)
+          ML.mk_its_defn id [] is_private (Some (Mltree.Dfloat ff))
+      | (Range _ | Float _), _, _ ->
+          assert false (* cannot have constructors or fields *)
+
     end
 
   (* exception ExtractionVal of rsymbol *)

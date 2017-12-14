@@ -88,6 +88,8 @@ type typedef =
   | Ddata     of (ident * ty list) list
   | Drecord   of (is_mutable * ident * ty) list
   | Dalias    of ty
+  | Drange    of Number.int_range
+  | Dfloat    of Number.float_format
 
 type its_defn = {
   its_name    : ident;

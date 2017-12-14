@@ -283,6 +283,24 @@ module Print = struct
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
+  (* a range type that fits in 31-bit sign integers is mapped to type "int" *)
+  let min_int31 = BigInt.of_string "-1073741824"
+  let max_int31 = BigInt.of_string "1073741823"
+  let is_small_range r =
+    BigInt.le min_int31 r.Number.ir_lower &&
+    BigInt.le r.Number.ir_upper max_int31
+  let is_small_range_ity ity = match ity.ity_node with
+    | Ityapp ({ Ity.its_def = Range r }, _, _) -> is_small_range r
+    | _ -> false
+  let is_small_range_type = function
+    | I ity -> is_small_range_ity ity | C _ -> false
+  let driver_type_int info ity = match ity.ity_node with
+    | Ityapp ({ its_ts = ts }, _, _) ->
+        query_syntax info.info_syn ts.ts_name = Some "int"
+    | _ -> false
+  let is_mapped_to_int info ity =
+    is_small_range_ity ity || driver_type_int info ity
+
   let print_constant fmt e = begin match e.e_node with
     | Econst c ->
         let s = BigInt.to_string (Number.compute_int_constant c) in
@@ -425,6 +443,7 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
+         | None when is_small_range_type e.e_ity -> pp_print_string fmt n
          | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
@@ -498,24 +517,24 @@ module Print = struct
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
     | Efor (pv1, pv2, dir, pv3, e) ->
-        let for_id  = id_register (id_fresh "for_loop_to") in
-        let cmp, op = match dir with
-          | To -> "Z.leq", "Z.succ"
-          | DownTo -> "Z.geq", "Z.pred" in
-        fprintf fmt (protect_on paren
-               "@[<hov 2>let rec %a %a =@ if %s %a %a then \
-                begin@ %a; %a (%s %a) end@ in@ %a %a@]")
+        if is_mapped_to_int info pv1.pv_ity then
+          fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
+            (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
+            print_for_direction dir (print_lident info) (pv_name pv3)
+            (print_expr info) e
+        else
+          let for_id  = id_register (id_fresh "for_loop_to") in
+          let cmp, op = match dir with
+            | To     -> "Z.leq", "Z.succ"
+            | DownTo -> "Z.geq", "Z.pred" in
+          fprintf fmt (protect_on paren
+                         "@[<hov 2>let rec %a %a =@ if %s %a %a then \
+                          begin@ %a; %a (%s %a) end@ in@ %a %a@]")
           (* let rec *) (print_lident info) for_id (print_pv info) pv1
           (* if      *)  cmp (print_pv info) pv1 (print_pv info) pv3
           (* then    *) (print_expr info) e (print_lident info) for_id
                         op (print_pv info) pv1
           (* in      *) (print_lident info) for_id (print_pv info) pv2
-        (*
-        fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
-          (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
-          print_for_direction direction (print_lident info) (pv_name pv3)
-          (print_expr info) e
-        *)
     | Etry (e, bl) ->
         fprintf fmt
           "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
@@ -582,6 +601,12 @@ module Print = struct
             (print_list newline print_field) fl
       | Some (Dalias ty) ->
           fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
+      | Some (Drange r) when is_small_range r ->
+          fprintf fmt " =@ int"
+      | Some (Drange _) ->
+          fprintf fmt " =@ Z.t"
+      | Some (Dfloat _) ->
+          assert false (*TODO*)
     in
     let labels = its.its_name.id_label in
     if not (is_ocaml_remove ~labels) then
