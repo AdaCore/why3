@@ -213,7 +213,6 @@ let induction_l label induct kn t =
   let (ctx, (ls, argl, cl), goal) = locate kn label t in
   let fold vsi p t = if p then vsi else t_freevars vsi t in
   let vsi = List.fold_left2 fold Mvs.empty (parameters ls cl) argl in
-  (*let vsi = t_vars (t_app_infer ls argl) in*)
   let cindep, cdep = partition ctx vsi in
   let goal = zip cdep goal in
   List.map (fun (_,c) ->
