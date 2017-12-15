@@ -226,7 +226,7 @@ module ArrayPermut
     M.permut a1.elts a2.elts l u
   (** [permut a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
-      Values outside of the interval (l..u-1) are ignored. *)
+      Values outside of the interval [(l..u-1)] are ignored. *)
 
   predicate permut_sub (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts 0 l /\
@@ -234,7 +234,7 @@ module ArrayPermut
     map_eq_sub a1.elts a2.elts u (length a1)
   (** [permut_sub a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
-      and values outside of the interval (l..u-1) are equal. *)
+      and values outside of the interval [(l..u-1)] are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
     a1.length = a2.length /\ M.permut a1.elts a2.elts 0 a1.length
@@ -247,13 +247,10 @@ module ArrayPermut
     0 <= l -> u <= length a1 -> permut_sub a1 a2 l u
 
   (** we can always enlarge the interval *)
-
   lemma permut_sub_weakening:
     forall a1 a2: array 'a, l1 u1 l2 u2: int.
     permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
     permut_sub a1 a2 l2 u2
-
-  (** {3 lemmas about [permut_all]} *)
 
   lemma exchange_permut_all:
     forall a1 a2: array 'a, i j: int.

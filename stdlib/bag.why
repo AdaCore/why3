@@ -52,7 +52,7 @@ theory Bag
     forall x: 'a, a b: bag 'a.
     nb_occ x (union a b) = nb_occ x a + nb_occ x b
 
-  (** union commutative, associative with identity empty_bag *)
+  (** [union] is commutative, associative with identity [empty_bag] *)
 
   lemma Union_comm: forall a b: bag 'a. union a b = union b a
 

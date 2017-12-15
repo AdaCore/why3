@@ -37,7 +37,7 @@ theory SpecialValues
     | Neg_case: forall x:real. x < 0.0 -> same_sign_real Neg x
     | Pos_case: forall x:real. x > 0.0 -> same_sign_real Pos x
 
-(* useful ???
+(*** useful ???
 
 lemma sign_not_pos_neg : forall x:t.
       sign(x) <> Pos -> sign(x) = Neg
@@ -128,6 +128,7 @@ theory GenFloat
         round m (from_int i) = from_int i
 
   (** rounding up and down *)
+
   axiom Round_down_le:
     forall x:real. round Down x <= x
   axiom Round_up_ge:
@@ -138,6 +139,7 @@ theory GenFloat
     forall x:real. round Up (-x) = - round Down x
 
   (** rounding into a float instead of a real *)
+
   function round_logic mode real : t
   axiom Round_logic_def:
     forall m:mode, x:real.
@@ -280,6 +282,7 @@ theory GenFloatFull
   clone export GenFloat
 
   (** {3 special values} *)
+
   function class t : class
 
   predicate is_finite (x:t) = class x = Finite
@@ -401,7 +404,7 @@ theory GenFloatFull
     is_finite (round_logic m x) /\ value (round_logic m x) < 0.0 /\
     sign (round_logic m x) = Neg
 
-  (** lemmas on gen_zero *)
+  (** lemmas on [gen_zero] *)
 
   lemma is_gen_zero_comp1 : forall x y:t.
     is_gen_zero x /\ value x = value y /\ is_finite y -> is_gen_zero y
@@ -715,9 +718,9 @@ theory GenFloatSpecMultiRounding
 end
 
 
-(* TODO: find constants for type single *)
+(*** TODO: find constants for type single *)
 
-(*
+(***
 theory SingleMultiRounding
 
   constant min_normalized_single : real =

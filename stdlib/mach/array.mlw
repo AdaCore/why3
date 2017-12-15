@@ -28,6 +28,7 @@ module Array32
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
+
   exception OutOfBounds
 
   let defensive_get (a: array 'a) (i: int32)
@@ -127,6 +128,7 @@ module Array31
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
+
   exception OutOfBounds
 
   let defensive_get (a: array 'a) (i: int31)
@@ -226,6 +228,7 @@ module Array63
     ensures  { a.elts = (old a.elts)[i <- v] }
 
   (** unsafe get/set operations with no precondition *)
+
   exception OutOfBounds
 
   let defensive_get (a: array 'a) (i: int63)
@@ -347,7 +350,7 @@ module Array63Permut
     MP.permut a1.elts a2.elts l u
   (** [permut a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)].
-      Values outside of the interval (l..u-1) are ignored. *)
+      Values outside of the interval [(l..u-1)] are ignored. *)
 
   predicate array_eq (a1 a2: array 'a) (l u: int) =
     map_eq_sub a1.elts a2.elts l u
@@ -358,7 +361,7 @@ module Array63Permut
     map_eq_sub a1.elts a2.elts u (length a1)
   (** [permut_sub a1 a2 l u] is true when the segment
       [a1(l..u-1)] is a permutation of the segment [a2(l..u-1)]
-      and values outside of the interval (l..u-1) are equal. *)
+      and values outside of the interval [(l..u-1)] are equal. *)
 
   predicate permut_all (a1 a2: array 'a) =
     a1.length = a2.length /\ MP.permut a1.elts a2.elts 0 a1.length
@@ -366,7 +369,6 @@ module Array63Permut
       of array [a2]. *)
 
   (** we can always enlarge the interval *)
-
   lemma permut_sub_weakening:
     forall a1 a2: array 'a, l1 u1 l2 u2: int.
     permut_sub a1 a2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length a1 ->
