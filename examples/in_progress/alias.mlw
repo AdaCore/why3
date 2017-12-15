@@ -6,11 +6,11 @@ module Test
 
   let a () : unit diverges =
     let zero = Int32.of_int 0 in
-    let r = ref 0 in
+    let r = ref zero in
     let rr = ref r in
-    let x = ref (ref 0) in
+    let x = ref (ref zero) in
     x := !x;
-    !x := 42;
+    !x := Int32.of_int 42;
     let p = malloc (UInt32.of_int 2) in
     c_assert (is_not_null p);
     let b = ref p in

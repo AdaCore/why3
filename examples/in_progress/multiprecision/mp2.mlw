@@ -298,7 +298,7 @@ module N
        assert { 0 <= !i < sz };
        let lx = get_ofs x !i in
        let ly = get_ofs y !i in
-       if (Limb.ne lx ly)
+       if (not (Limb.(=) lx ly))
        then begin
             value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+p2i sz);
             value_sub_concat (pelts y) y.offset (y.offset+k) (y.offset+p2i sz);
@@ -361,7 +361,7 @@ module N
          i := Int32.(-) !i (Int32.of_int 1);
          assert { 0 <= !i < sz };
          lx := get_ofs x !i;
-         if (Limb.ne !lx uzero)
+         if not (Limb.(=) !lx uzero)
          then begin
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
@@ -411,7 +411,7 @@ module N
     let c = ref y in
     let lx = ref limb_zero in
     let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && Limb.ne !c limb_zero do
+    while Int32.(<) !i sz && (not (Limb.(=) !c limb_zero)) do
       invariant { 0 <= !i <= sz }
       invariant { !i > 0 -> 0 <= !c <= 1 }
       invariant { value r !i + (power radix !i) * !c =
@@ -444,7 +444,7 @@ module N
              = value x k + y + (power radix k) * !lx
              = value x !i + y }
     done;
-    if Int32.eq !i sz then !c
+    if Int32.(=) !i sz then !c
     else begin
     while Int32.(<) !i sz do
       invariant { !c  = 0 }
@@ -811,7 +811,7 @@ module N
     let b = ref y in
     let lx = ref limb_zero in
     let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && Limb.ne !b limb_zero do
+    while Int32.(<) !i sz && (not (Limb.(=) !b limb_zero)) do
       invariant { 0 <= !i <= sz }
       invariant { !i > 0 -> 0 <= !b <= 1 }
       invariant { value r !i - power radix !i * !b
@@ -845,7 +845,7 @@ module N
              = value x !i - y
       };
     done;
-    if Int32.eq !i sz then !b
+    if Int32.(=) !i sz then !b
     else begin
     while Int32.(<) !i sz do
       invariant { !b = 0 }
@@ -3621,7 +3621,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   >= (pelts x)[(!xp).offset] + radix * !x1 }
     let ghost ox = pelts x in
     begin "vc:sp"
-    if Limb.ne qh limb_zero
+    if (not (Limb.(=) qh limb_zero))
     then begin
          assert { qh = 1 };
          let b = sub_in_place xd y sy sy in
@@ -4574,7 +4574,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                         - power radix sy * cy2
                   };
         end;
-        if "ex:unlikely" Limb.ne cy2 limb_zero
+        if "ex:unlikely" (not (Limb.(=) cy2 limb_zero))
         then begin
           label Adjust in
           assert { cy2 = 1 };

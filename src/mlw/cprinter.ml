@@ -360,6 +360,7 @@ type info = Pdriver.printer_args = private {
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   converter   : Printer.syntax_map;
+  literal     : Printer.syntax_map; (*TODO handle literals*)
 }
 
 let debug = false

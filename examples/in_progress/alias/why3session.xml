@@ -6,67 +6,62 @@
 <prover id="1" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="2000"/>
-<file name="../alias.mlw" expanded="true">
-<theory name="Test" sum="60d2c661058fee260304cc03a8554cad" expanded="true">
- <goal name="VC a" expl="VC for a">
- <proof prover="0"><result status="valid" time="0.03" steps="88"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+<file name="../alias.mlw" proved="true">
+<theory name="Test" proved="true" sum="773ba2f1c5327babb485c13dcb1be597">
+ <goal name="VC a" expl="VC for a" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="93"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="VC t_alias" expl="VC for t_alias" expanded="true">
+ <goal name="VC t_alias" expl="VC for t_alias" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="72"/></proof>
  </goal>
- <goal name="VC test" expl="VC for test">
- <transf name="split_goal_wp">
-  <goal name="VC test.1" expl="1. assertion">
+ <goal name="VC test" expl="VC for test" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC test.0" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="73"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
-  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC test.2" expl="2. assertion">
+  <goal name="VC test.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="74"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.00"/></proof>
-  <proof prover="2" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="Refptr" sum="28e6ccc93811975085d494b96cfc79ef" expanded="true">
- <goal name="VC refp" expl="VC for refp" expanded="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="1"/></proof>
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC refp.1" expl="1. integer overflow">
+<theory name="Refptr" proved="true" sum="e0c18f7f9852ffa63bd288fd26538a90">
+ <goal name="VC refp" expl="VC for refp" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="82"/></proof>
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC refp.0" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
-  <goal name="VC refp.2" expl="2. precondition">
+  <goal name="VC refp.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="75"/></proof>
   </goal>
-  <goal name="VC refp.3" expl="3. postcondition">
+  <goal name="VC refp.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="76"/></proof>
   </goal>
-  <goal name="VC refp.4" expl="4. postcondition">
+  <goal name="VC refp.3" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="76"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC infix ::=" expl="VC for infix ::=" expanded="true">
+ <goal name="VC infix ::=">
  <proof prover="0" timelimit="55" obsolete="true"><result status="outofmemory" time="29.53"/></proof>
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC infix ::=.1" expl="1. integer overflow">
-  <proof prover="0"><result status="valid" time="0.02" steps="78"/></proof>
+ <transf name="split_goal_wp" >
+  <goal name="VC infix ::=.1">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
-  <goal name="VC infix ::=.2" expl="2. precondition" expanded="true">
-  <proof prover="0" obsolete="true"><undone/></proof>
-  <proof prover="3"><undone/></proof>
+  <goal name="VC infix ::=.2">
+  <proof prover="0" obsolete="true"><result status="failure" time="0.00"/></proof>
+  <proof prover="3" obsolete="true"><result status="failure" time="0.00"/></proof>
   </goal>
-  <goal name="VC infix ::=.3" expl="3. postcondition">
-  <proof prover="0"><result status="valid" time="0.02" steps="82"/></proof>
+  <goal name="VC infix ::=.3">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
  </transf>
- </goal>
-</theory>
-<theory name="A" sum="01e2c7b0173f54ae866bc2d6700edd1a" expanded="true">
- <goal name="VC test" expl="VC for test" expanded="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.29" steps="475"/></proof>
  </goal>
 </theory>
 </file>
