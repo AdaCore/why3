@@ -2031,8 +2031,21 @@ let treat_notification n =
   | New_node (id, parent_id, typ, name, detached) ->
      begin
        let name =
+         (* Reduce the name of the goals to the minimum: "0" instead of
+            "WP_Parameter.0" for example.
+            In cases where we want the explanation to be printed, and the
+            explanation contains filename (with '.'), this does not work. So, we
+            additionally check that the first part of the name is a number.
+         *)
          if typ = NGoal then
-           List.hd (Strings.rev_split '.' name)
+           let new_name = List.hd (Strings.rev_split '.' name) in
+           try
+             let name_number = List.hd (Strings.split ' ' new_name) in
+             ignore (int_of_string name_number);
+             new_name
+           with _ ->
+             (* The name is empty or the first part is not a number *)
+             name
          else name
        in
        try
