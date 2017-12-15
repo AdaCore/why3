@@ -7,132 +7,132 @@
 <prover id="3" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../gcd.mlw" expanded="true">
-<theory name="EuclideanAlgorithm" sum="7aa7887c1d4eda9747b55d845d4f7a9e" expanded="true">
- <goal name="VC euclid" expl="VC for euclid">
- <transf name="split_goal_wp">
-  <goal name="VC euclid.1" expl="check modulo by zero">
+<file name="../gcd.mlw" proved="true">
+<theory name="EuclideanAlgorithm" proved="true" sum="44d7bb87668a49a2f2a4f5b307eac883">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC euclid.0" expl="check modulo by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC euclid.2" expl="variant decrease">
+  <goal name="VC euclid.1" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="21"/></proof>
   </goal>
-  <goal name="VC euclid.3" expl="precondition">
+  <goal name="VC euclid.2" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC euclid.4" expl="postcondition">
+  <goal name="VC euclid.3" expl="postcondition" proved="true">
   <proof prover="9"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithmIterative" sum="3ff6d7d9dd6e825392762f38be2bf072" expanded="true">
- <goal name="VC euclid" expl="VC for euclid">
+<theory name="EuclideanAlgorithmIterative" proved="true" sum="3ff6d7d9dd6e825392762f38be2bf072">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
-<theory name="BinaryGcd" sum="2492b58eb155597878f9d226ab7b345b" expanded="true">
- <goal name="even1" expl="">
+<theory name="BinaryGcd" proved="true" sum="f288abe81fe0bb1c65550b0d7201e3b9">
+ <goal name="even1" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
  </goal>
- <goal name="odd1" expl="">
+ <goal name="odd1" proved="true">
  <proof prover="9"><result status="valid" time="0.02" steps="21"/></proof>
  </goal>
- <goal name="div_nonneg" expl="">
+ <goal name="div_nonneg" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="gcd_even_even" expl="">
+ <goal name="gcd_even_even" proved="true">
  <proof prover="9"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
- <goal name="gcd_even_odd" expl="">
+ <goal name="gcd_even_odd" proved="true">
  <proof prover="3" edited="gcd_BinaryGcd_gcd_even_odd_2.v"><result status="valid" time="0.28"/></proof>
  </goal>
- <goal name="gcd_even_odd2" expl="">
+ <goal name="gcd_even_odd2" proved="true">
  <proof prover="9"><result status="valid" time="0.05" steps="29"/></proof>
  </goal>
- <goal name="odd_odd_div2" expl="">
+ <goal name="odd_odd_div2" proved="true">
  <proof prover="9"><result status="valid" time="0.63" steps="389"/></proof>
  </goal>
- <goal name="VC gcd_odd_odd" expl="VC for gcd_odd_odd">
+ <goal name="VC gcd_odd_odd" expl="VC for gcd_odd_odd" proved="true">
  <proof prover="9"><result status="valid" time="0.02" steps="32"/></proof>
  </goal>
- <goal name="gcd_odd_odd2" expl="">
+ <goal name="gcd_odd_odd2" proved="true">
  <proof prover="9"><result status="valid" time="0.07" steps="30"/></proof>
  </goal>
- <goal name="VC binary_gcd" expl="VC for binary_gcd">
- <transf name="split_goal_wp">
-  <goal name="VC binary_gcd.1" expl="variant decrease">
+ <goal name="VC binary_gcd" expl="VC for binary_gcd" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC binary_gcd.0" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC binary_gcd.2" expl="precondition">
+  <goal name="VC binary_gcd.1" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="VC binary_gcd.3" expl="precondition">
+  <goal name="VC binary_gcd.2" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC binary_gcd.4" expl="precondition">
+  <goal name="VC binary_gcd.3" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC binary_gcd.5" expl="check division by zero">
+  <goal name="VC binary_gcd.4" expl="check division by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC binary_gcd.6" expl="check division by zero">
+  <goal name="VC binary_gcd.5" expl="check division by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC binary_gcd.7" expl="variant decrease">
+  <goal name="VC binary_gcd.6" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="VC binary_gcd.8" expl="precondition">
+  <goal name="VC binary_gcd.7" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC binary_gcd.9" expl="check division by zero">
+  <goal name="VC binary_gcd.8" expl="check division by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC binary_gcd.10" expl="variant decrease">
+  <goal name="VC binary_gcd.9" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC binary_gcd.11" expl="precondition">
+  <goal name="VC binary_gcd.10" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC binary_gcd.12" expl="precondition">
+  <goal name="VC binary_gcd.11" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC binary_gcd.13" expl="check division by zero">
+  <goal name="VC binary_gcd.12" expl="check division by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC binary_gcd.14" expl="variant decrease">
+  <goal name="VC binary_gcd.13" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC binary_gcd.15" expl="precondition">
+  <goal name="VC binary_gcd.14" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC binary_gcd.16" expl="check division by zero">
+  <goal name="VC binary_gcd.15" expl="check division by zero" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC binary_gcd.17" expl="variant decrease">
+  <goal name="VC binary_gcd.16" expl="variant decrease" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="VC binary_gcd.18" expl="precondition">
+  <goal name="VC binary_gcd.17" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC binary_gcd.19" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC binary_gcd.19.1" expl="postcondition">
+  <goal name="VC binary_gcd.18" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC binary_gcd.18.0" expl="postcondition" proved="true">
    <proof prover="9"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
-   <goal name="VC binary_gcd.19.2" expl="postcondition">
+   <goal name="VC binary_gcd.18.1" expl="postcondition" proved="true">
    <proof prover="9"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="VC binary_gcd.19.3" expl="postcondition">
+   <goal name="VC binary_gcd.18.2" expl="postcondition" proved="true">
    <proof prover="9"><result status="valid" time="0.12" steps="89"/></proof>
    </goal>
-   <goal name="VC binary_gcd.19.4" expl="postcondition">
+   <goal name="VC binary_gcd.18.3" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
-   <goal name="VC binary_gcd.19.5" expl="postcondition">
+   <goal name="VC binary_gcd.18.4" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="VC binary_gcd.19.6" expl="postcondition">
+   <goal name="VC binary_gcd.18.5" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
@@ -140,8 +140,8 @@
  </transf>
  </goal>
 </theory>
-<theory name="EuclideanAlgorithm63" sum="b8b13e83f3d237bbc360c6f9f88ef153" expanded="true">
- <goal name="VC euclid" expl="VC for euclid">
+<theory name="EuclideanAlgorithm63" proved="true" sum="2957f2c27fa5f1ab089e561053c1d9ac">
+ <goal name="VC euclid" expl="VC for euclid" proved="true">
  <proof prover="1"><result status="valid" time="0.24"/></proof>
  </goal>
 </theory>

@@ -24,6 +24,7 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
+        "alias", ALIAS;
         "as", AS;
         "axiom", AXIOM;
         "break", BREAK;
@@ -64,7 +65,6 @@
         (* programs *)
         "abstract", ABSTRACT;
         "absurd", ABSURD;
-        "alias", ALIAS;
         "any", ANY;
         "assert", ASSERT;
         "assume", ASSUME;

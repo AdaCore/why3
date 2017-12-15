@@ -1296,7 +1296,8 @@ let check_post exn ity post =
     | Teps _ -> Ty.ty_equal_check ty (t_type q)
     | _ -> raise exn) post
 
-let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
+let create_cty ?(mask=MaskVisible) ?(defensive=false)
+               args pre post xpost oldies effect result =
   let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
   check_pre pre; check_post exn result post;
@@ -1352,10 +1353,15 @@ let create_cty ?(mask=MaskVisible) args pre post xpost oldies effect result =
     eff_covers = Mreg.set_inter effect.eff_covers rknown;
     eff_resets = Mreg.set_inter effect.eff_resets vknown} in
   (* only spoil the escaping type variables *)
-  let esc = eff_escape effect result in
-  let esc = Sity.fold_left ity_rch_vars Stv.empty esc in
-  let spoils = Stv.inter effect.eff_spoils esc in
+  let escape = eff_escape effect result in
+  let escape = Sity.fold_left ity_rch_vars Stv.empty escape in
+  let spoils = Stv.inter effect.eff_spoils escape in
   let effect = { effect with eff_spoils = spoils } in
+  (* be defensive in abstract function declarations *)
+  let effect = if not defensive then effect else
+    let resets = Mreg.set_diff vknown rknown in
+    let resets = Mreg.set_union effect.eff_resets resets in
+    { effect with eff_resets = resets; eff_spoils = escape } in
   (* remove the formal parameters from eff_reads *)
   let effect = { effect with eff_reads = xreads } in
   cty_unsafe args pre post xpost oldies effect result mask freeze
@@ -1675,10 +1681,12 @@ let print_spec args pre post xpost oldies eff fmt ity =
     (Pp.print_list Pp.comma print_pv) (Spv.elements reads);
   if not (Mreg.is_empty eff.eff_writes) then fprintf fmt "@\nwrites { @[%a@] }"
     (Pp.print_list Pp.comma print_write) (Mreg.bindings eff.eff_writes);
-  if not (Mreg.is_empty eff.eff_covers) then fprintf fmt "@\ncovers { @[%a@] }"
+  if not (Sreg.is_empty eff.eff_covers) then fprintf fmt "@\ncovers { @[%a@] }"
     (Pp.print_list Pp.comma print_region) (Sreg.elements eff.eff_covers);
-  if not (Mreg.is_empty eff.eff_resets) then fprintf fmt "@\nresets { @[%a@] }"
+  if not (Sreg.is_empty eff.eff_resets) then fprintf fmt "@\nresets { @[%a@] }"
     (Pp.print_list Pp.comma print_region) (Sreg.elements eff.eff_resets);
+  if not (Stv.is_empty eff.eff_spoils) then fprintf fmt "@\nspoils { @[%a@] }"
+    (Pp.print_list Pp.comma Pretty.print_tv) (Stv.elements eff.eff_spoils);
   Pp.print_list Pp.nothing print_pre fmt pre;
   Pp.print_list Pp.nothing print_old fmt (Mpv.bindings oldies);
   Pp.print_list Pp.nothing print_post fmt post;

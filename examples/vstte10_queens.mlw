@@ -163,7 +163,7 @@ module NQueens63
     requires { 0 <= pos < (length board) }
     requires { is_board board (pos + 1) }
   = try
-      let q = ref (of_int 0) in
+      let q = ref 0 in
       while !q < pos do
         invariant { 0 <= !q <= pos }
         invariant { is_board board (pos + 1) }
@@ -173,7 +173,7 @@ module NQueens63
         if bq        = bpos     then raise MInconsistent;
         if bq - bpos = pos - !q then raise MInconsistent;
         if bpos - bq = pos - !q then raise MInconsistent;
-        q := !q + of_int 1
+        q := !q + 1
       done;
       True
     with MInconsistent ->
@@ -193,28 +193,28 @@ module NQueens63
     if pos = n then
       solutions := P.succ !solutions
     else
-      let i = ref (of_int 0) in
+      let i = ref 0 in
       while !i < n do
         invariant { 0 <= !i <= n }
         invariant { is_board board (pos) }
         variant   { n - !i }
         board[pos] <- !i;
         if check_is_consistent board pos then
-          count_bt_queens solutions board n (pos + of_int 1);
-        i := !i + of_int 1
+          count_bt_queens solutions board n (pos + 1);
+        i := !i + 1
       done
 
   let count_queens (n: int63) : P.t
     requires { n >= 0 }
     ensures  { true }
   =
-     let solutions = ref P.zero in
-     let board = Array63.make n (of_int 0) in
-     count_bt_queens solutions board n (of_int 0);
-     !solutions
+    let solutions = ref P.zero in
+    let board = Array63.make n 0 in
+    count_bt_queens solutions board n 0;
+    !solutions
 
   let test_count_8 () =
-    let n = of_int 8 in
+    let n = 8 in
     count_queens n
 
 end

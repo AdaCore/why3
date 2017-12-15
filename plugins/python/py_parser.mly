@@ -39,9 +39,9 @@
   let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
 
   let empty_spec = {
-    sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
-    sp_reads   = [];    sp_writes  = [];  sp_variant = [];
-    sp_alias   = [];
+    sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
+    sp_reads   = [];    sp_writes  = [];  sp_alias  = [];
+    sp_variant = [];
     sp_checkrw = false; sp_diverge = false;
   }
 

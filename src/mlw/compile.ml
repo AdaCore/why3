@@ -71,6 +71,7 @@ module ML = struct
         List.iter (fun (_, tyl) -> List.iter (iter_deps_ty f) tyl) constrl
     | Drecord pjl -> List.iter (fun (_, _, ty) -> iter_deps_ty f ty) pjl
     | Dalias ty -> iter_deps_ty f ty
+    | Drange _ | Dfloat _ -> ()
 
   let iter_deps_its_defn f its_d =
     Opt.iter (iter_deps_typedef f) its_d.its_def
@@ -177,7 +178,6 @@ module ML = struct
 
   let tunit = Ttuple []
 
-  let ity_int  = I Ity.ity_int
   let ity_unit = I Ity.ity_unit
 
   let is_unit = function
@@ -223,6 +223,9 @@ module ML = struct
 
   let e_while e1 e2 =
     mk_expr (Mltree.Ewhile (e1, e2)) ity_unit
+
+  let e_for pv1 pv2 dir pv3 e1 =
+    mk_expr (Mltree.Efor (pv1, pv2, dir, pv3, e1)) ity_unit
 
   let e_match e bl =
     mk_expr (Mltree.Ematch (e, bl))
@@ -298,13 +301,13 @@ module Translate = struct
     | Pvar vs when (restore_pv vs).pv_ghost ->
         Mltree.Pwild
     | Pvar vs ->
-      Mltree.Pvar vs
+        Mltree.Pvar vs
     | Por (p1, p2) ->
         Mltree.Por (pat m p1, pat m p2)
     | Pas (p, vs) when (restore_pv vs).pv_ghost ->
         pat m p
     | Pas (p, vs) ->
-      Mltree.Pas (pat m p, vs)
+        Mltree.Pas (pat m p, vs)
     | Papp (ls, pl) when is_fs_tuple ls ->
         let pl = visible_of_mask m pl in
         begin match pl with
@@ -343,9 +346,9 @@ module Translate = struct
     else let (vs, vs_ty) = vsty pv.pv_vs in
       ML.mk_var vs vs_ty false
 
-  (* let for_direction = function *)
-  (*   | To -> Mltree.To *)
-  (*   | DownTo -> Mltree.DownTo *)
+  let for_direction = function
+    | To -> Mltree.To
+    | DownTo -> Mltree.DownTo
 
   let isconstructor info rs =
     match Mid.find_opt rs.rs_name info.Mltree.from_km with
@@ -425,59 +428,6 @@ module Translate = struct
     let def pv =
       ML.mk_expr (Mltree.Evar pv) (Mltree.I pv.pv_ity) eff_empty Slab.empty in
     filter_params_cty pv_not_ghost def pvl cty_args
-
-  let mk_for op_b_rs op_a_rs i_pv from_pv to_pv body_expr eff =
-    let i_expr, from_expr, to_expr =
-      let int_ity = ML.ity_int in let eff_e = eff_empty in
-      ML.mk_expr (Mltree.Evar i_pv)    int_ity eff_e Slab.empty,
-      ML.mk_expr (Mltree.Evar from_pv) int_ity eff_e Slab.empty,
-      ML.mk_expr (Mltree.Evar to_pv)   int_ity eff_e Slab.empty in
-    let for_rs    =
-      let for_id  = id_fresh "for_loop_to" in
-      let for_cty = create_cty [i_pv] [] [] Mxs.empty Mpv.empty eff ity_unit in
-      create_rsymbol for_id for_cty in
-    let for_expr =
-      let test =
-        ML.mk_expr (Mltree.Eapp (op_b_rs, [i_expr; to_expr]))
-          (Mltree.I ity_bool) eff_empty Slab.empty in
-      let next_expr =
-        let one_const = Number.int_const_of_int 1 in
-        let one_expr  =
-          ML.mk_expr (Mltree.Econst one_const) ML.ity_int
-            eff_empty Slab.empty in
-        let i_op_one = Mltree.Eapp (op_a_rs, [i_expr; one_expr]) in
-        ML.mk_expr i_op_one ML.ity_int eff_empty Slab.empty in
-      let rec_call  =
-        ML.mk_expr (Mltree.Eapp (for_rs, [next_expr])) ML.ity_unit
-          eff Slab.empty in
-      let seq_expr =
-        ML.e_seq body_expr rec_call ML.ity_unit eff Slab.empty in
-      ML.mk_expr (Mltree.Eif (test, seq_expr, ML.e_unit)) ML.ity_unit
-        eff Slab.empty in
-    let ty_int = mlty_of_ity MaskVisible ity_int in
-    let for_call_expr = let for_call = Mltree.Eapp (for_rs, [from_expr]) in
-      ML.mk_expr for_call ML.ity_unit eff Slab.empty in
-    let pv_name pv = pv.pv_vs.vs_name in
-    let args = [ pv_name i_pv, ty_int, false ] in
-    let for_rec_def = {
-      Mltree.rec_sym  = for_rs;   Mltree.rec_args = args;
-      Mltree.rec_rsym = for_rs;   Mltree.rec_exp  = for_expr;
-      Mltree.rec_res  = ML.tunit; Mltree.rec_svar = Stv.empty;
-    } in
-    let for_let = Mltree.Elet (Mltree.Lrec [for_rec_def], for_call_expr) in
-    ML.mk_expr for_let ML.ity_unit eff
-
-  let mk_for_downto info i_pv from_pv to_pv body eff =
-    let ge_rs, minus_rs =
-      let ns = (Opt.get info.Mltree.from_mod).mod_export in
-      ns_find_rs ns ["Int"; "infix >="], ns_find_rs ns ["Int"; "infix -"] in
-    mk_for ge_rs minus_rs i_pv from_pv to_pv body eff
-
-  let mk_for_to info i_pv from_pv to_pv body eff =
-    let le_rs, plus_rs =
-      let ns = (Opt.get info.Mltree.from_mod).mod_export in
-      ns_find_rs ns ["Int"; "infix <="], ns_find_rs ns ["Int"; "infix +"] in
-    mk_for le_rs plus_rs i_pv from_pv to_pv body eff
 
   (* build the set of type variables from functions arguments *)
   let rec add_tvar acc = function
@@ -607,12 +557,10 @@ module Translate = struct
         ML.e_if e1 e2 e3 eff lbl
     | Ewhile (e1, _, _, e2) ->
         ML.e_while (expr info svar e1) (expr info svar e2) eff lbl
-    | Efor (pv1, (pv2, To, pv3), _, _, efor) ->
+    | Efor (pv1, (pv2, dir, pv3), _, _, efor) ->
+        let dir = for_direction dir in
         let efor = expr info svar efor in
-        mk_for_to info pv1 pv2 pv3 efor eff lbl
-    | Efor (pv1, (pv2, DownTo, pv3), _, _, efor) ->
-        let efor = expr info svar efor in
-        mk_for_downto info pv1 pv2 pv3 efor eff lbl
+        ML.e_for pv1 pv2 dir pv3 efor eff lbl
     | Eghost _ -> assert false
     | Eassign al ->
         ML.e_assign al (Mltree.I e.e_ity) eff lbl
@@ -684,8 +632,15 @@ module Translate = struct
       | Alias t, _, _ ->
           ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
             (Some (Mltree.Dalias (mlty_of_ity MaskVisible t)))
-      | Range _, _, _ -> assert false (* TODO *)
-      | Float _, _, _ -> assert false (* TODO *)
+      | Range r, [], [] ->
+          assert (args = []); (* a range type is not polymorphic *)
+          ML.mk_its_defn id [] is_private (Some (Mltree.Drange r))
+      | Float ff, [], [] ->
+          assert (args = []); (* a range type is not polymorphic *)
+          ML.mk_its_defn id [] is_private (Some (Mltree.Dfloat ff))
+      | (Range _ | Float _), _, _ ->
+          assert false (* cannot have constructors or fields *)
+
     end
 
   (* exception ExtractionVal of rsymbol *)
@@ -914,9 +869,7 @@ module Transform = struct
         mk (Ewhile (e1, e2)), Spv.union s1 s2
     | Efor (x, pv1, dir, pv2, e) ->
         let e, spv = expr info subst e in
-        let e = mk (Efor (x, pv1, dir, pv2, e)) in
-        (* be careful when pv1 and pv2 are in subst *)
-        mk_let subst pv1 (mk_let subst pv2 e), spv
+        mk (Efor (x, pv1, dir, pv2, e)), spv
     | Eraise (exn, None) -> mk (Eraise (exn, None)), Spv.empty
     | Eraise (exn, Some e) ->
         let e, spv = expr info subst e in
@@ -933,10 +886,10 @@ module Transform = struct
         let e, spv = expr info subst e in
         mk (Eignore e), spv
 
-  and mk_let subst pv e =
-    try let e1 = Mpv.find pv subst in
-      { e with e_node = Elet (Lvar (pv, e1), e) }
-    with Not_found -> e
+  (* and mk_let subst pv e = *)
+  (*   try let e1 = Mpv.find pv subst in *)
+  (*     { e with e_node = Elet (Lvar (pv, e1), e) } *)
+  (*   with Not_found -> e *)
 
   and branch info subst (pat, e) =
     let e, spv = expr info subst e in (pat, e), spv

@@ -90,25 +90,25 @@ module BinarySearchInt32
   exception Not_found   (* raised to signal a search failure *)
 
   let binary_search (a : array int32) (v : int32) : int32
-    requires { forall i1 i2 : int. 0 <= i1 <= i2 < to_int a.length ->
-               to_int a[i1] <= to_int a[i2] }
-    ensures  { 0 <= to_int result < to_int a.length /\ a[to_int result] = v }
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < a.length ->
+               a[i1] <= a[i2] }
+    ensures  { 0 <= result < a.length /\ a[result] = v }
     raises   { Not_found ->
-                 forall i:int. 0 <= i < to_int a.length -> a[i] <> v }
+                 forall i:int. 0 <= i < a.length -> a[i] <> v }
   =
-    let l = ref (of_int 0) in
-    let u = ref (length a - of_int 1) in
+    let l = ref 0 in
+    let u = ref (length a - 1) in
     while !l <= !u do
-      invariant { 0 <= to_int !l /\ to_int !u < to_int a.length }
-      invariant { forall i : int. 0 <= i < to_int a.length ->
-                  a[i] = v -> to_int !l <= i <= to_int !u }
-      variant   { to_int !u - to_int !l }
-      let m = !l + (!u - !l) / of_int 2 in
-      assert { to_int !l <= to_int m <= to_int !u };
+      invariant { 0 <= !l /\ !u < a.length }
+      invariant { forall i : int. 0 <= i < a.length ->
+                  a[i] = v -> !l <= i <= !u }
+      variant   { !u - !l }
+      let m = !l + (!u - !l) / 2 in
+      assert { !l <= m <= !u };
       if a[m] < v then
-        l := m + of_int 1
+        l := m + 1
       else if a[m] > v then
-        u := m - of_int 1
+        u := m - 1
       else
         return m
     done;

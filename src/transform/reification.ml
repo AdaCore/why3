@@ -379,7 +379,7 @@ let build_goals prev subst lp g rt =
                              l rl
           | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
           | _ -> raise Exit in
-        (* todo on context interp, revert post 
+        (* todo on context interp, revert post
            and compute_specified interp functions*)
         if debug then Format.printf "cut ok@.";
         Trans.apply (Cut.cut ci (Some "interp")) task_r

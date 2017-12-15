@@ -564,18 +564,9 @@ let dreads muc rl lvm =
 
 let dwrites muc wl lvm =
   let old _ _ = Loc.errorm
-    "`at' and `old' cannot be used in a `writes' clause" in
+    "`at' and `old' cannot be used in the `writes' clause" in
   let dwrites t = type_term muc lvm old t in
   List.map dwrites wl
-
-let dalias muc al lvm ity =
-  let old _ _ = Loc.errorm
-    "`at' and `old' cannot be used in an `alias' clause" in
-  let dalias (t1,t2) =
-    let v = create_pvsymbol (id_fresh "result") ity in
-    let lvm = Mstr.add "result" v lvm in
-    type_term muc lvm old t1, type_term muc lvm old t2 in
-  List.map dalias al
 
 let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
@@ -592,7 +583,6 @@ let dspec muc sp lvm xsm old ity = {
   ds_xpost   = dxpost muc sp.sp_xpost lvm xsm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
-  ds_alias   = dalias muc sp.sp_alias lvm ity;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge; }
 
@@ -633,6 +623,48 @@ let update_any kind e = match e.expr_desc with
 let local_kind = function
   | RKfunc | RKpred -> RKlocal
   | k -> k
+
+let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
+  let expr_app loc e el =
+    List.fold_left (fun e1 e2 ->
+      DEapp (Dexpr.dexpr ~loc e1, e2)) e el
+  in
+  let qualid_app loc q el =
+    let e = try DEsym (find_prog_symbol muc q) with
+      | _ -> DEls_pure (find_lsymbol muc.muc_theory q, false) in
+    expr_app loc e el
+  in
+  let qualid_app loc q el = match q with
+    | Qident {id_str = n} ->
+        (match denv_get_opt denv n with
+        | Some d -> expr_app loc d el
+        | None -> qualid_app loc q el)
+    | _ -> qualid_app loc q el
+  in
+  Dexpr.dexpr ~loc (match desc with
+  | Ptree.Tident q ->
+      qualid_app loc q []
+  | Ptree.Tidapp (q, [e1]) ->
+      qualid_app loc q [eff_dterm muc denv e1]
+  | Ptree.Tapply (e1, e2) ->
+      DEapp (eff_dterm muc denv e1, eff_dterm muc denv e2)
+  | Ptree.Tscope (q, e1) ->
+      let muc = open_scope muc "dummy" in
+      let muc = import_scope muc (string_list_of_qualid q) in
+      DElabel (eff_dterm muc denv e1, Slab.empty)
+  | Ptree.Tnamed (Lpos uloc, e1) ->
+      DEuloc (eff_dterm muc denv e1, uloc)
+  | Ptree.Tnamed (Lstr lab, e1) ->
+      DElabel (eff_dterm muc denv e1, Slab.singleton lab)
+  | Ptree.Tcast (e1, pty) ->
+      let d1 = eff_dterm muc denv e1 in
+      DEcast (d1, dity_of_pty muc pty)
+  | Ptree.Tat _ -> Loc.errorm ~loc "`at' and `old' cannot be used here"
+  | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
+  | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tmatch _ | Ptree.Tif _
+  | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
+  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
+      Loc.errorm ~loc "unsupported effect expression")
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =
@@ -757,7 +789,18 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | RKlemma, None -> ity_unit
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
-      DEany (pl, dity_of_ity ity, msk, ds)
+      let dity = dity_of_ity ity in
+      let res = Some (id_fresh "result"), false, dity in
+      let denv = denv_add_args denv (res::pl) in
+      let add_alias (t1, t2) =
+        let bty = dity_fresh () in
+        let dt1 = eff_dterm muc denv t1 in
+        let dt2 = eff_dterm muc denv t2 in
+        ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
+        ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
+      in
+      List.iter add_alias sp.sp_alias;
+      DEany (pl, dity, msk, ds)
   | Ptree.Ematch (e1, bl) ->
       let e1 = dexpr muc denv e1 in
       let branch (pp, e) =

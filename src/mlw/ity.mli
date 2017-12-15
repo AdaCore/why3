@@ -413,11 +413,11 @@ type cty = private {
   cty_freeze : ity_subst;
 }
 
-val create_cty : ?mask:mask -> pvsymbol list ->
-  pre list -> post list -> post list Mxs.t ->
+val create_cty : ?mask:mask -> ?defensive:bool ->
+  pvsymbol list -> pre list -> post list -> post list Mxs.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
-(** [create_cty ?mask args pre post xpost oldies effect result] creates
-    a computation type. [post] and [mask] must be consistent with [result].
+(** [create_cty ?mask ?defensive args pre post xpost oldies effect result]
+    creates a new cty. [post] and [mask] must be consistent with [result].
     The [cty_xpost] field does not have to cover all raised exceptions.
     [cty_effect.eff_reads] is completed wrt the specification and [args].
     [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
@@ -426,7 +426,10 @@ val create_cty : ?mask:mask -> pvsymbol list ->
     [post], and [xpost] must come from [cty_reads], [args] or [result].
     [oldies] maps ghost pure snapshots of the parameters and external
     reads to the original pvsymbols: these snapshots are removed from
-    [cty_effect.eff_reads] and replaced with the originals. *)
+    [cty_effect.eff_reads] and replaced with the originals. If [defensive]
+    is [true], then type variables in the result and exceptional results
+    are spoiled and fresh regions in the result and exceptional results
+    are reset. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in

@@ -10,10 +10,9 @@ module TestExtraction
   let test_int () = f 31 + (div 33 3 + 2 - 4) - -1
 
   use import mach.int.Int63
-  let f63 (x: int63) : int63 = x + of_int 1
+  let f63 (x: int63) : int63 = x + 1
   let test_int63 () =
-    to_int (f63 (of_int 31) +
-      (of_int 33 / of_int 3 + of_int 2 - of_int 4) - (- of_int 1))
+    to_int (f63 31 + (33 / 3 + 2 - 4) - (-1))
 
   use import int.Int
   use import ref.Ref
@@ -29,16 +28,16 @@ module TestExtraction
   use import array.Array
 
   let test_array () =
-    let a = Array.make 43 0 in
+    let a = Array.make 43 (0:int63) in
     for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
     a[42]
 
   use import mach.array.Array63
 
   let test_array63 () : int =
-    let a = Array63.make (Int63.of_int 43) 0 in
+    let a = Array63.make 43 0 in
     for i = 1 to 42 do a[Int63.of_int i] <- a[Int63.of_int (i - 1)] + 1 done;
-    a[Int63.of_int 42]
+    a[42]
 
   use import seq.Seq
   use import int.Int
@@ -134,7 +133,7 @@ module TestExtraction
 *)
   let constructor1 () =
     let x = Cons in
-    x 42
+    x (42:int63)
 
   let foofoo (x: int) : int =
     let ghost y = x + 1 in
@@ -162,7 +161,7 @@ module TestExtraction
   (* functions with ghost arguments *)
 
   let test_filter_ghost_args (x: int) (ghost y: int) =
-    1 / 0
+    (1:int) / 0
 
   let test_call (x: int) : int =
     test_filter_ghost_args x 0 + 1
@@ -180,7 +179,7 @@ module TestExtraction
   let many_args (a b c d e f g h i j k l m: int) : int = 42
 
   let foo (x: int) : int =
-    let _ = 42 in (* FIXME? print _ in OCaml *)
+    let _ = (42:int63) in (* FIXME? print _ in OCaml *)
     x
 
   let test_fun (x: int) : int -> int =
@@ -215,7 +214,7 @@ module TestExtraction
   (** for loops *)
 
   let for_loop1 () =
-    let r = ref 0 in
+    let r = ref (0: int63) in
     for i = 0 to 10 do r := !r + i done;
     !r
 
@@ -239,7 +238,7 @@ module TestExtraction
   use import ocaml.Pervasives
 
   let test1 () raises { AssertFailure } =
-    ocaml_assert (1 + 1 = 2)
+    ocaml_assert ((1:int) + 1 = 2)
 
   (** parallel assignement *)
 
@@ -259,25 +258,25 @@ module TestExtraction
   = min_int63
 
   let test2 () raises { AssertFailure }
-  = ocaml_assert (of_int 1 + of_int 1 = of_int 2)
+  = ocaml_assert ((1:int63) + 1 = 2)
 
   (* testing proxy-variables inlining mechanism inside a lambda *)
   let test3 () raises { AssertFailure }
-  = let i = ref (of_int 42) in
+  = let i = ref (42:int63) in
     let c = Cons !i in
-    i := (of_int 0);
+    i := 0;
     let c = c Nil in
-    ocaml_assert (match c with Cons x _ -> x = of_int 42 | _ -> true end)
+    ocaml_assert (match c with Cons x _ -> x = 42 | _ -> true end)
 
   (* testing proxy-variables inlining with conflicting effects *)
   let test4 () raises { AssertFailure }
   = let f (x y: int63) raises { AssertFailure }
-    = ocaml_assert (y = of_int 42);
+    = ocaml_assert (y = 42);
       x + y in
-    let i = ref (of_int 42) in
-    let res = f (i := of_int 0; !i) !i in
-    ocaml_assert (!i = of_int 0);
-    ocaml_assert (res = of_int 42)
+    let i = ref 42 in
+    let res = f (i := 0; !i) !i in
+    ocaml_assert (!i = 0);
+    ocaml_assert (res = 42)
 
   let main () raises { AssertFailure } =
     test1 ();
@@ -298,6 +297,22 @@ module TestExtraction
   end
 
   let test_foo () = foo 42
+
+  (* range types *)
+
+  type small_range = <range 1 10>
+
+  let test_small_range () =
+    for x = 1: small_range to 3 do
+      ()
+    done
+
+  type big_range = <range 1 0x4000_0000>
+
+  let test_big_range () =
+    for x = 1: big_range to 3 do
+      ()
+    done
 
 end
 
