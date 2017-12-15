@@ -54,9 +54,6 @@ module N
 
   use import array.Array
   use import map.Map
-  use import mach.int.Int32
-  use import ref.Ref
-  use import map.Map
   use map.MapEq
   use map.Const
   use import int.Int
@@ -85,8 +82,10 @@ module N
                      x[n+j] = y[n+j] -> x[i] = y[i]};
       map_eq_shift_zero x y (n+1) m;
     end
-    else assert { 1+2=3 }
+    else ()
 
+  use import mach.int.Int32
+  use import ref.Ref
   use import mach.int.UInt64 as Limb
   use import int.Int
   use import int.Power
@@ -109,6 +108,11 @@ module N
     requires { 0 <= a < b }
     requires { 0 < c }
     ensures { c * a < c * b }
+  = ()
+  let lemma prod_compat_r (a b c:int)
+    requires { 0 <= a <= b }
+    requires { 0 <= c }
+    ensures { c * a <= c * b }
   = ()
 
   (** {3 Integer value of a natural number} *)
@@ -494,7 +498,8 @@ module N
       let res, carry = add_with_carry !lx !ly !c in
       set_ofs r !i res;
       assert { value r !i + (power radix !i) * !c =
-                value x !i + value y !i };
+                value x !i + value y !i
+               by value r !i = (value r !i at StartLoop) };
       c := carry;
       let ghost k = p2i !i in
       i := Int32.(+) !i (Int32.of_int 1);
@@ -1760,7 +1765,9 @@ module N
                                r.offset (r.offset + p2i sx - 1) c;
     set_ofs r sx c;
     value_sub_tail (pelts r) r.offset (r.offset + p2i sx);
-    assert { value r (sx + 1) = value x sx * value y 1 };
+    assert { value r (sx + 1) = value x sx * value y 1
+             by value y 1 = !ly
+             so value r sx + power radix sx * c = value x sx * value y 1 };
     let one = Int32.of_int 1 in
     let rp = ref (C.incr r (Int32.of_int 1)) in
     let i = ref (Int32.of_int 1) in
@@ -2354,6 +2361,7 @@ module N
              = mod cr radix };
     assert { radix * cr = uh * k + ul * (radix - d) + q0 * d - radix * d };
     prod_compat_strict_r (l2i ul) radix (radix - l2i d);
+    prod_compat_strict_r (l2i d) radix (radix - q0);
     assert { (* Theorem 2 of Möller&Granlund 2010 *)
              (max (radix - d) (q0 + 1)) - radix <= cr < max (radix - d) q0
              by radix * cr = uh * k + ul * (radix - d) + q0 * d - radix * d
@@ -3996,7 +4004,22 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                             ((!qp).offset + 1)
                             ((!qp).offset + p2i sx - p2i sy - p2i !i)
                             !ql;
+        label QUp in
         C.set !qp !ql;
+        assert { value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                    = value (!qp at StartLoop)
+                              (sx - sy - k)
+                by value_sub (pelts q) ((!qp).offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                   = value_sub (pelts q at QUp) (!qp.offset + 1)
+                              ((!qp).offset + sx - sy - !i)
+                   = value (!qp at StartLoop) (sx - sy - k)
+                (* by offset !qp at StartLoop = (!qp).offset + 1
+                so offset (!qp at StartLoop) + sx - sy - k
+                   = (!qp).offset + sx - sy - !i
+                so map_eq_sub_shift (pelts q) (pelts !qp at StartLoop)
+                              ((!qp).offset + 1) ((!qp).offset + 1) (sx + sy - k) *) };
         value_sub_head (pelts q) (!qp).offset
           ((!qp).offset + p2i sx - p2i sy - p2i !i);
         value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
@@ -4130,10 +4153,13 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                     = !ql + radix *
                           value_sub (pelts q) ((!qp).offset + 1)
                                     ((!qp).offset + sx - sy - !i)
-                 so value_sub (pelts q) ((!qp).offset + 1)
+                 so (value_sub (pelts q) ((!qp).offset + 1)
                               ((!qp).offset + sx - sy - !i)
                     = value (!qp at StartLoop)
                               (sx - sy - k)
+                     by value (!qp at StartLoop) (sx - sy - k)
+                      = value_sub (pelts q at StartLoop)
+                                  (!qp.offset + 1) (!qp.offset + sx - sy - !i))
                  so value !qp (sx - sy - !i)
                     = !ql + radix * value (!qp at StartLoop)
                                     (sx - sy - k)
@@ -5544,7 +5570,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                                x.offset (!xp.offset) !x1;
     C.set_ofs !xp one !x1;
     assert { value x (sy - 1) =
-             value (x at EndLoop) (sy - 1) };
+             value (x at EndLoop) (sy - 1)
+             by pelts x = Map.set (pelts x at EndLoop) (x.offset + sy - 1) !x1 };
     value_sub_tail (pelts x) x.offset (!xp.offset+1);
     assert { value (old x) sx =
               (value q (sx - sy)
@@ -6438,7 +6465,11 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
               value_sub_shift_no_change (pelts x) x.offset
                                         (p2i sx) (p2i sx) limb_zero;
               set_ofs q (Int32.(-) sx sy) limb_zero;
-              value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy)
+              value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+              assert { value q (sx - sy + 1) = value (q at Ret_s) (sx - sy)
+                       by value q (sx - sy + 1)
+                          = value (q at Ret_s) (sx - sy) + power radix (sx - sy) * 0
+                          = value (q at Ret_s) (sx - sy) }
             end
           end;
           ()
