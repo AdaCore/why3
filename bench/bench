@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # auto bench for why
@@ -10,17 +9,20 @@
 
 suffix=$1
 
+# TODO: remove the hack about int.why once it has become builtin
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
+        opts="$2"
+        if test $f = stdlib/int.why; then opts="$2 --type-only"; fi
 	# running Why
-	if ! $pgm $2 $f > /dev/null 2> bench_error; then
+	if ! $pgm $opts $f > /dev/null 2> bench_error; then
 	    echo "FAILED!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
-            echo "invocation: $pgm $2 $f" | tee -a bench_errors
+            echo "invocation: $pgm $opts $f" | tee -a bench_errors
             cat bench_error | tee -a bench_errors
             ERROR=yes
 	elif test -s bench_error; then
@@ -174,13 +176,9 @@ list_stuff () {
     fi
 }
 
-echo "=== Checking theories ==="
-goods theories --type-only # FIXME remove --type-only
-echo ""
-
-echo "=== Checking modules ==="
-goods modules
-goods modules/mach
+echo "=== Checking stdlib ==="
+goods stdlib
+goods stdlib/mach
 echo ""
 
 echo "=== Checking drivers ==="
