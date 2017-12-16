@@ -283,23 +283,11 @@ module Print = struct
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
-  (* a range type that fits in 31-bit sign integers is mapped to type "int" *)
-  let min_int31 = BigInt.of_string "-1073741824"
-  let max_int31 = BigInt.of_string "1073741823"
-  let is_small_range r =
-    BigInt.le min_int31 r.Number.ir_lower &&
-    BigInt.le r.Number.ir_upper max_int31
-  let is_small_range_ity ity = match ity.ity_node with
-    | Ityapp ({ Ity.its_def = Range r }, _, _) -> is_small_range r
-    | _ -> false
-  let is_small_range_type = function
-    | I ity -> is_small_range_ity ity | C _ -> false
-  let driver_type_int info ity = match ity.ity_node with
+  let is_mapped_to_int info ity =
+    match ity.ity_node with
     | Ityapp ({ its_ts = ts }, _, _) ->
         query_syntax info.info_syn ts.ts_name = Some "int"
     | _ -> false
-  let is_mapped_to_int info ity =
-    is_small_range_ity ity || driver_type_int info ity
 
   let print_constant fmt e = begin match e.e_node with
     | Econst c ->
@@ -443,7 +431,6 @@ module Print = struct
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
-         | None when is_small_range_type e.e_ity -> pp_print_string fmt n
          | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
@@ -601,8 +588,6 @@ module Print = struct
             (print_list newline print_field) fl
       | Some (Dalias ty) ->
           fprintf fmt " =@ %a" (print_ty ~paren:false info) ty
-      | Some (Drange r) when is_small_range r ->
-          fprintf fmt " =@ int"
       | Some (Drange _) ->
           fprintf fmt " =@ Z.t"
       | Some (Dfloat _) ->
