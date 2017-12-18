@@ -327,13 +327,15 @@ let init_cont () =
       true, (Session_itp.empty_session session_dir, false) in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
   if is_new_session || not (has_file session) then begin
-    Controller_itp.add_file c Gnat_config.filename;
+    let (_: exn option) = Controller_itp.add_file c Gnat_config.filename in
+    ();
   end;
   (* Init why3server *)
   init ();
   (* Reloading file to get an up to date controller/session. *)
   try
-    let _, _ = Controller_itp.reload_files c ~use_shapes in
+    let (_: exn list), (_: bool), (_: bool) =
+      Controller_itp.reload_files c ~use_shapes in
     c
   with
   | e ->
