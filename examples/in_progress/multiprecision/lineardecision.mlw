@@ -4,8 +4,11 @@ type a
 function (+) a a : a
 function ( *) a a : a
 function (-_) a : a
+function azero: a
+function aone: a
+predicate ale a a
 
-clone algebra.OrderedUnitaryCommutativeRing as A with type t = a, function (+) = (+), function ( *) = ( *), function (-_) = (-_)
+clone algebra.OrderedUnitaryCommutativeRing as A with type t = a, function (+) = (+), function ( *) = ( *), function (-_) = (-_), constant zero = azero, constant one=aone, predicate (<=) = ale
 
 type t
 type vars = int -> a
@@ -17,10 +20,9 @@ function interp t vars : a
 val constant czero : t
 val constant cone : t
 
-axiom zero_def: forall y. interp czero y = A.zero
-axiom one_def: forall y. interp cone y = A.one
+axiom zero_def: forall y. interp czero y = azero
+axiom one_def: forall y. interp cone y = aone
 
-predicate (<=) t t
 
 val add (a b: t) : t
   ensures { forall v: vars. interp result v = interp a v + interp b v }
@@ -39,13 +41,12 @@ axiom eq_def: forall a b: t. a=b -> eq a b
 
 val inv (a:t) : t
   requires { not (eq a czero) }
-  ensures { forall v: vars. interp result v * interp a v = A.one }
+  ensures { forall v: vars. interp result v * interp a v = aone }
   ensures { not (eq result czero) }
   raises { Unknown -> true }
 
 val le (a b:t) : bool
-  ensures { result <-> a <= b }
-  ensures { result -> forall y:vars. A.(<=) (interp a y) (interp b y) }
+  ensures { result -> forall y:vars. ale (interp a y) (interp b y) }
   raises  { Unknown -> true }
 
 
@@ -410,6 +411,7 @@ let linear_decision (l: context) (g: equality) : bool
   let a = Matrix.make (length l) (nv+1) C.czero in
   let b = Array.make (length l) C.czero in      (* ax = b *)
   let v = Array.make (nv+1) C.czero in          (* goal *)
+  (*v[0] <- any coeff;*)
   let rec fill_expr (ex: expr) (i:int): unit
     variant { ex }
     requires { no_cst ex }
@@ -447,7 +449,7 @@ let linear_decision (l: context) (g: equality) : bool
     | Term c j -> v[j] <- C.add v[j] c
     | UTerm j -> v[j] <- C.add v[j] C.cone
     | Add e1 e2 -> fill_goal e1; fill_goal e2
-    end in  
+    end in
   fill_ctx l 0;
   let (ex, d) = norm_eq g in
   fill_goal ex;
@@ -565,12 +567,81 @@ use import RationalCoeffs
 use import real.RealInfix
 use import real.FromInt
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), type coeff = t, function C.interp=rinterp, val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, lemma C.eq_def, predicate C.(<=)=(<=), val C.le=rle(*, goal ZeroLessOne, goal C.CompatOrderAdd, goal C.CompatOrderMult, goal C.Unitary, goal C.NonTrivialRing, goal C.Mul_distr_l, goal C.Mul_distr_r, goal C.Inv_def_l, goal C.Inv_def_r, goal C.MulAssoc.Assoc, goal C.Assoc, goal C.MulComm.Comm, goal C.Comm, goal C.Unit_def_l, goal C.Unit_def_r*)
-
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), type coeff = t, function C.interp=rinterp, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, lemma C.eq_def, val C.le=rle(*, goal ZeroLessOne, goal C.CompatOrderAdd, goal C.CompatOrderMult, goal C.Unitary, goal C.NonTrivialRing, goal C.Mul_distr_l, goal C.Mul_distr_r, goal C.Inv_def_l, goal C.Inv_def_r, goal C.MulAssoc.Assoc, goal C.Assoc, goal C.MulComm.Comm, goal C.Comm, goal C.Unit_def_l, goal C.Unit_def_r*)
 
 end
 
-theory Test
+module LinearDecisionInt
+
+use import int.Int
+
+function id (t:int) (v:int -> int) : int = t
+let predicate eq (a b:int) = a=b
+
+exception Unknown
+let inv (t:int) : int
+  ensures { forall v: int -> int. id result v * id t v = one }
+  ensures { not (eq result zero) }
+  raises { Unknown -> true }
+= raise Unknown
+
+clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), type coeff = int, function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = ( *), val C.opp = (-_), val C.eq = eq, val C.inv = inv, lemma C.eq_def, val C.le = (<=)(*, goal ZeroLessOne, goal C.CompatOrderAdd, goal C.CompatOrderMult, goal C.Unitary, goal C.NonTrivialRing, goal C.Mul_distr_l, goal C.Mul_distr_r, goal C.Inv_def_l, goal C.Inv_def_r, goal C.MulAssoc.Assoc, goal C.Assoc, goal C.MulComm.Comm, goal C.Comm, goal C.Unit_def_l, goal C.Unit_def_r*)
+
+
+use import real.FromInt
+
+axiom from_int_ext: forall x y: int. from_int x = from_int y -> x = y
+(*FIXME put this in real.why ?*)
+
+use import RationalCoeffs
+use LinearDecisionRational as R
+use import list.List
+let function m (x:int) : (int, int)
+  ensures { forall z. rinterp result z = from_int x }
+  = (x,1)
+
+val function m_y (y:int->int): (int -> real)
+  ensures { forall i. result i = from_int (y i) }
+
+let rec function m_expr (e:expr) : R.expr
+  ensures { forall y z. R.interp result (m_y y) (m_y z) = from_int (interp e y z) }
+  ensures { valid_expr e -> R.valid_expr result }
+= match e with
+  | Cst c -> R.Cst (m c)
+  | Add e1 e2 -> R.Add (m_expr e1) (m_expr e2)
+  | Term c n -> R.Term (m c) n
+  | UTerm n -> R.UTerm n
+  end
+
+let function m_eq (eq:equality) : R.equality
+  ensures { forall y z. R.interp_eq result (m_y y) (m_y z)
+                        <-> interp_eq eq y z }
+  ensures { valid_eq eq -> R.valid_eq result }
+= match eq with (e1,e2) -> (m_expr e1, m_expr e2) end
+
+let rec function m_ctx (ctx:context) : R.context
+  ensures { forall y z g. R.interp_ctx result (m_eq g) (m_y y) (m_y z) <->
+                        interp_ctx ctx g y z }
+  ensures { valid_ctx ctx -> R.valid_ctx result }
+  variant { ctx }
+= match ctx with
+  | Nil -> Nil
+  | Cons h t ->
+    let r = Cons (m_eq h) (m_ctx t) in
+    r
+    end
+
+let int_decision (l: context) (g: equality) : bool
+  requires { valid_ctx l }
+  requires { valid_eq g }
+  ensures { forall y z. result -> interp_ctx l g y z }
+  (*raises  { R.Unknown -> true } ??? *)
+= R.linear_decision (m_ctx l) (m_eq g)
+
+end
+
+
+module Test
 
 use import RationalCoeffs
 use import LinearDecisionRational
@@ -584,4 +655,16 @@ goal g: forall x y: real.
         (from_int 3 /. from_int 1) *. x +. (from_int 2/. from_int 1) *. y = (from_int 21/. from_int 1) ->
         (from_int 7 /. from_int 1) *. x +. (from_int 4/. from_int 1) *. y = (from_int 47/. from_int 1) ->
         x = (from_int 5 /. from_int 1)
+end
+
+module TestInt
+
+use import LinearDecisionInt
+use import int.Int
+
+goal g: forall x y:int.
+     3 * x + 2 * y = 21 ->
+     7 * x + 4 * y = 47 ->
+     x = 5
+
 end

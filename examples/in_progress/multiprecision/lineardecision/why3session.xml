@@ -7,7 +7,7 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <file name="../lineardecision.mlw">
-<theory name="LinearEquationsCoeffs" proved="true" sum="9a492c8352466a6dee74d1090e1a1957">
+<theory name="LinearEquationsCoeffs" proved="true" sum="685014f973f4d07d28f06838ac5cdd5b">
  <goal name="VC czero" expl="VC for czero" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -16,7 +16,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LinearEquationsDecision" sum="91c33aade3c83b1b80d8470fd201fc98">
+<theory name="LinearEquationsDecision" sum="b695f28a460bd340d97cabf1d4fc961e">
  <goal name="VC valid_expr" expl="VC for valid_expr" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -915,7 +915,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="LinearDecisionRational" sum="144503a85d2c74be8d0cd6efa1bcf82a">
+<theory name="LinearDecisionRational" sum="6d1c037b8daef1dcbc5771dc012e19e8">
  <goal name="C.VC czero" expl="VC for czero" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -930,7 +930,9 @@
   <goal name="one_def.0" proved="true">
   <transf name="replace" proved="true" arg1="one" arg2="1.0">
    <goal name="one_def.0.0" proved="true">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="one_def.0.1" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -940,41 +942,132 @@
  </transf>
  </goal>
  <goal name="C.VC add" expl="VC for add">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.01"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.01"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <transf name="compute_in_goal" >
+  <goal name="VC add.0" expl="VC for add">
+  <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="unknown" time="0.05"/></proof>
+  <transf name="split_goal_wp" >
+   <goal name="VC add.0.0" expl="postcondition">
+   <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.01"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+   <proof prover="2" obsolete="true"><result status="unknown" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="C.VC mul" expl="VC for mul">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="C.VC opp" expl="VC for opp">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.08"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="C.VC eq" expl="VC for eq">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="2.02"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="C.eq_def" proved="true">
  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.01" steps="7"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="C.VC inv" expl="VC for inv">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="1.83"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="C.VC le" expl="VC for le">
- <proof prover="0" timelimit="1" memlimit="1000"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
  </goal>
 </theory>
-<theory name="Test" proved="true" sum="33853f7837c4f4d6bab68b027a33b66e">
+<theory name="LinearDecisionInt" proved="true" sum="afb9a8464da81d5b3ccb3102d55744d8">
+ <goal name="VC eq" expl="VC for eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="VC inv" expl="VC for inv" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.VC czero" expl="VC for czero" proved="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="C.VC cone" expl="VC for cone" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.zero_def" proved="true">
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="C.one_def" proved="true">
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.VC add" expl="VC for add" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.VC mul" expl="VC for mul" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.VC opp" expl="VC for opp" proved="true">
+ <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="C.VC eq" expl="VC for eq" proved="true">
+ <proof prover="2"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="C.eq_def" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="C.VC inv" expl="VC for inv" proved="true">
+ <proof prover="0" timelimit="1" memlimit="1000" obsolete="true"><result status="unknown" time="0.02"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.01"/></proof>
+ <proof prover="2"><result status="valid" time="0.03"/></proof>
+ <proof prover="3" obsolete="true"><result status="timeout" time="4.90"/></proof>
+ </goal>
+ <goal name="C.VC le" expl="VC for le" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC le.0" expl="postcondition" proved="true">
+  <transf name="compute_in_goal" proved="true" >
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC m" expl="VC for m" proved="true">
+ <proof prover="2"><result status="valid" time="0.08"/></proof>
+ </goal>
+ <goal name="VC m_expr" expl="VC for m_expr" proved="true">
+ <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.22" steps="948"/></proof>
+ </goal>
+ <goal name="VC m_eq" expl="VC for m_eq" proved="true">
+ <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.20" steps="502"/></proof>
+ <proof prover="2" obsolete="true"><result status="timeout" time="1.00"/></proof>
+ </goal>
+ <goal name="VC m_ctx" expl="VC for m_ctx" proved="true">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="VC int_decision" expl="VC for int_decision" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC int_decision.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC int_decision.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC int_decision.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test" proved="true" sum="ab0b253dc8934f6b8b809d076e773229">
  <goal name="g" proved="true">
  <transf name="introduce_premises" proved="true" >
   <goal name="g.0" proved="true">
@@ -1002,6 +1095,35 @@
    <transf name="compute_in_goal" proved="true" >
    </transf>
    </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestInt" proved="true" sum="0beb25acdb946ef5d3faa0985649b949">
+ <goal name="g" proved="true">
+ <transf name="reflection_f" proved="true" arg1="int_decision">
+  <goal name="g.0" expl="reification check" proved="true">
+  <transf name="revert" proved="true" arg1="HR">
+   <goal name="g.0.0" expl="reification check" proved="true">
+   <transf name="compute_in_goal" proved="true" >
+    <goal name="g.0.0.0" expl="reification check" proved="true">
+    <proof prover="3"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="g.1" proved="true">
+  <transf name="compute_in_goal" proved="true" >
+  </transf>
+  </goal>
+  <goal name="g.2" proved="true">
+  <transf name="compute_in_goal" proved="true" >
+  </transf>
+  </goal>
+  <goal name="g.3" proved="true">
+  <transf name="compute_in_goal" proved="true" >
   </transf>
   </goal>
  </transf>

@@ -41,6 +41,13 @@ let init_renv kn lv env task =
     task = task;
   }
 
+let rec is_const t = match t.t_node with
+  | Tconst _ -> true
+  | Tvar _ -> false
+  | Tapp (_, []) -> false
+  | Tapp (_, l) -> List.for_all is_const l
+  | _ -> false
+
 let rec reify_term renv t rt =
   let rec invert_nonvar_pat vl (renv:reify_env) interp (p,f) t =
     if debug
@@ -86,6 +93,7 @@ let rec reify_term renv t rt =
       -> if debug then Format.printf "case interp@.";
          invert_interp renv ls t
     | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), _
+         when is_const t
       -> if debug then Format.printf "case const@.";
          let renv, rt = invert_interp renv ls t in
          renv, (t_app cs [rt] (Some p.pat_ty))
@@ -132,6 +140,13 @@ let rec reify_term renv t rt =
          end
     | _ -> raise NoReification
   and invert_pat vl renv interp (p,f) t =
+    (if not (oty_equal f.t_ty t.t_ty)
+     then
+       (if debug
+        then Format.printf "type mismatch between %a and %a@."
+                           Pretty.print_ty (Opt.get f.t_ty)
+                           Pretty.print_ty (Opt.get t.t_ty);
+        raise NoReification));
     try invert_nonvar_pat vl renv interp (p,f) t
     with NoReification -> invert_var_pat vl renv interp (p,f) t
   and invert_interp renv ls (t:term) = (*la ?*)
@@ -229,7 +244,7 @@ let rec reify_term renv t rt =
                          (renv,(t_app cons [req; ctx] (Some ty_list_g)))
                        with
                        | NoReification -> renv,ctx
-                       | TypeMismatch _ -> raise NoReification
+                                                 (* | TypeMismatch _ -> raise NoReification*)
                      end
                   | _-> renv,ctx)
                              (renv, (t_app nil [] (Some ty_list_g))) renv.task in
@@ -1017,18 +1032,25 @@ let reflection_by_function s env = Trans.store (fun task ->
           let (lp, lv, rt) = Apply.intros p in
           let lv = lv @ args in
           let renv = reify_term (init_renv kn lv env prev) g rt in
+          if debug then Format.printf "computing args@.";
+          let vars =
+            List.fold_left
+              (fun vars (vs, t) ->
+                if List.mem vs args
+                then begin
+                    if debug then Format.printf "value of term %a for arg %a@."
+                                                Pretty.print_term t
+                                                Pretty.print_vs vs;
+                    Mid.add vs.vs_name (value_of_term t) vars end
+                else vars)
+              Mid.empty
+              (Mvs.bindings renv.subst) in
           let info = { env = env;
                        mm = mm;
                        funs = Mrs.empty;
                        recs = Mrs.empty;
-                       vars =
-                         List.fold_left
-                           (fun vars (vs, t) ->
-                             if List.mem vs args
-                             then Mid.add vs.vs_name (value_of_term t) vars
-                             else vars)
-                           Mid.empty
-                           (Mvs.bindings renv.subst) } in
+                       vars = vars
+                       } in
           if debug then Format.printf "eval_fun@.";
           let res = term_of_value (eval_fun decl info) in
           if debug then Format.printf "res %a@." Pretty.print_term res;
