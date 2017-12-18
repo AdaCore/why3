@@ -25,6 +25,9 @@ let get_session_dir ~allow_mkdir files =
       if Sys.is_directory first then
         (* first is a directory *)
         first
+      else if Filename.basename first = "why3session.xml" then
+        (* first is a session file *)
+        Filename.dirname first
       else
         if Queue.is_empty files then
           (* first was the only file *)
@@ -363,6 +366,13 @@ type command =
   | QError       of string
   | Other        of string * string list
 
+let query_on_task cont f id args =
+  let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+  try Query (f cont table args) with
+    | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
+    | Number_of_arguments -> QError "Bad number of arguments"
+
+
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   match Stdlib.Hstr.find commands_table cmd with
@@ -371,11 +381,12 @@ let interp commands_table cont id s =
       match f,id with
       | Qnotask f, _ -> Query (f cont args)
       | Qtask f, Some (Session_itp.APn id) ->
-          let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
-          let s = try Query (f cont table args) with
-            | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
-            | Number_of_arguments -> QError "Bad number of arguments"
-          in s
+          query_on_task cont f id args
+      | Qtask f, Some (Session_itp.APa pid) ->
+          let id = Session_itp.get_proof_attempt_parent
+              cont.Controller_itp.controller_session pid
+          in
+          query_on_task cont f id args
       | Qtask _, _ -> QError "please select a goal first"
     end
   | exception Not_found ->

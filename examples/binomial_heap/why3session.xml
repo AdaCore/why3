@@ -3,11 +3,11 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.01" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="1.8-001" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="1.30" timelimit="6" steplimit="0" memlimit="1000"/>
 <file name="../binomial_heap.mlw" proved="true">
-<theory name="BinomialHeap" proved="true" sum="47aab63125552c14ea0a3014f1716162">
+<theory name="BinomialHeap" proved="true" sum="c73423ae83bf256f76beff55439dbfd7">
  <goal name="WP_parameter size_nonnneg" expl="VC for size_nonnneg" proved="true">
  <proof prover="0"><result status="valid" time="0.09"/></proof>
  </goal>
@@ -80,7 +80,7 @@
    <goal name="has_order_length.0.1" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="has_order_length.0.1.0" proved="true">
-    <proof prover="1"><result status="valid" time="0.45" steps="629"/></proof>
+    <proof prover="4"><result status="valid" time="0.09" steps="412"/></proof>
     </goal>
    </transf>
    </goal>
@@ -99,18 +99,18 @@
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter inv_reverse.0" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01" steps="33"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="59"/></proof>
   </goal>
   <goal name="WP_parameter inv_reverse.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.14" steps="293"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="128"/></proof>
   </goal>
   <goal name="WP_parameter inv_reverse.2" expl="variant decrease" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter inv_reverse.2.0" expl="VC for inv_reverse" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
    </goal>
    <goal name="WP_parameter inv_reverse.2.1" expl="VC for inv_reverse" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
    </goal>
   </transf>
   </goal>
@@ -122,11 +122,11 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="WP_parameter inv_reverse.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="WP_parameter inv_reverse.6" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="WP_parameter inv_reverse.7" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -138,35 +138,35 @@
   </goal>
   <goal name="WP_parameter inv_reverse.8" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter empty" expl="VC for empty" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
  <goal name="WP_parameter is_empty" expl="VC for is_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="2"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="WP_parameter get_min" expl="VC for get_min" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter get_min.0" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="WP_parameter get_min.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter get_min.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter get_min.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter get_min.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter get_min.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="100"/></proof>
   </goal>
   <goal name="WP_parameter get_min.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
@@ -188,19 +188,19 @@
  <goal name="WP_parameter add_tree" expl="VC for add_tree" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter add_tree.0" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.1" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="21"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="4" timelimit="21"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="60"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="87"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.4" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="21"><result status="valid" time="0.01" steps="45"/></proof>
+  <proof prover="4" timelimit="21"><result status="valid" time="0.01" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.5" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.14"/></proof>
@@ -208,12 +208,12 @@
   <goal name="WP_parameter add_tree.6" expl="assertion" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="WP_parameter add_tree.6.0" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.05" steps="55"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="151"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter add_tree.7" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.8" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.23"/></proof>
@@ -221,12 +221,12 @@
   <goal name="WP_parameter add_tree.9" expl="precondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="WP_parameter add_tree.9.0" expl="precondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.37" steps="1339"/></proof>
+   <proof prover="4"><result status="valid" time="0.95" steps="4247"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter add_tree.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="72"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="69"/></proof>
   </goal>
   <goal name="WP_parameter add_tree.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07"/></proof>
@@ -244,110 +244,110 @@
  </goal>
  <goal name="WP_parameter add" expl="VC for add" proved="true">
  <proof prover="0"><result status="valid" time="0.04"/></proof>
- <proof prover="1"><result status="valid" time="0.02" steps="171"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="259"/></proof>
  </goal>
  <goal name="WP_parameter merge" expl="VC for merge" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter merge.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter merge.6" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter merge.8" expl="postcondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="WP_parameter merge.8.0" expl="postcondition" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="1"><result status="valid" time="0.02" steps="52"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter merge.9" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
   <goal name="WP_parameter merge.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="59"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter merge.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="25"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="WP_parameter merge.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter merge.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="46"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="72"/></proof>
   </goal>
   <goal name="WP_parameter merge.14" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="82"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="83"/></proof>
   </goal>
   <goal name="WP_parameter merge.15" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="55"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="81"/></proof>
   </goal>
   <goal name="WP_parameter merge.16" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.07" steps="90"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="91"/></proof>
   </goal>
   <goal name="WP_parameter merge.17" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
   <goal name="WP_parameter merge.18" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter merge.19" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="47"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="73"/></proof>
   </goal>
   <goal name="WP_parameter merge.20" expl="precondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="WP_parameter merge.20.0" expl="precondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.03" steps="464"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="698"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter merge.21" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="26"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter merge.22" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="1"><result status="valid" time="0.02" steps="83"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="84"/></proof>
   </goal>
   <goal name="WP_parameter merge.23" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="56"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
   </goal>
   <goal name="WP_parameter merge.24" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="91"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="92"/></proof>
   </goal>
   <goal name="WP_parameter merge.25" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
   <goal name="WP_parameter merge.26" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="64"/></proof>
   </goal>
   <goal name="WP_parameter merge.27" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter merge.28" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="63"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="64"/></proof>
   </goal>
   <goal name="WP_parameter merge.29" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
   <goal name="WP_parameter merge.30" expl="precondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
@@ -360,13 +360,13 @@
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="WP_parameter merge.32" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="WP_parameter merge.33" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter merge.34" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
   <goal name="WP_parameter merge.35" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
@@ -379,69 +379,69 @@
  <goal name="WP_parameter extract_min_tree" expl="VC for extract_min_tree" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter extract_min_tree.0" expl="unreachable point" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extract_min_tree.1" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="45"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="146"/></proof>
   </goal>
   <goal name="WP_parameter extract_min_tree.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
   <goal name="WP_parameter extract_min_tree.3" expl="precondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="WP_parameter extract_min_tree.3.0" expl="precondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="247"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="309"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="WP_parameter extract_min_tree.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter extract_min_tree.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter extract_min_tree.6" expl="postcondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter extract_min_tree.6.0" expl="VC for extract_min_tree" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="1"><result status="valid" time="0.02" steps="109"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="106"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.1" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
+   <proof prover="4"><result status="valid" time="0.00" steps="19"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.2" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="80"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.3" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="67"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="111"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.4" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="51"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="52"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.5" expl="VC for extract_min_tree" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
-   <proof prover="1"><result status="valid" time="0.09" steps="107"/></proof>
+   <proof prover="4"><result status="valid" time="0.09" steps="108"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.6" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.7" expl="VC for extract_min_tree" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="1"><result status="valid" time="0.02" steps="162"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="112"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.8" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="76"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="118"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.9" expl="VC for extract_min_tree" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="50"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.10" expl="VC for extract_min_tree" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
    </goal>
    <goal name="WP_parameter extract_min_tree.6.11" expl="VC for extract_min_tree" proved="true">
    <proof prover="0"><result status="valid" time="0.02"/></proof>
-   <proof prover="1"><result status="valid" time="0.06" steps="117"/></proof>
+   <proof prover="4"><result status="valid" time="0.06" steps="118"/></proof>
    </goal>
   </transf>
   </goal>
@@ -450,64 +450,64 @@
  <goal name="WP_parameter extract_min" expl="VC for extract_min" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter extract_min.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="63"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="WP_parameter extract_min.7" expl="postcondition" proved="true">
   <transf name="split_goal_wp" proved="true" >
    <goal name="WP_parameter extract_min.7.0" expl="VC for extract_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
    <goal name="WP_parameter extract_min.7.1" expl="VC for extract_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
    <goal name="WP_parameter extract_min.7.2" expl="VC for extract_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="115"/></proof>
    </goal>
    <goal name="WP_parameter extract_min.7.3" expl="VC for extract_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="196"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="133"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="WP_parameter has_order_size" expl="VC for has_order_size" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="116"/></proof>
+ <proof prover="4"><result status="valid" time="0.14" steps="499"/></proof>
  </goal>
  <goal name="binomial_tree_size" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
  <goal name="WP_parameter inv_size" expl="VC for inv_size" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="WP_parameter inv_size.0" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="WP_parameter inv_size.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
   <goal name="WP_parameter inv_size.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter inv_size.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
   <goal name="WP_parameter inv_size.4" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>

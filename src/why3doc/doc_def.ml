@@ -13,7 +13,12 @@ open Why3
 open Ident
 
 let stdlib_url = ref None
-let set_stdlib_url u = stdlib_url := Some u
+let set_stdlib_url u =
+  let u =
+    let l = String.length u in
+    if l = 0 || u.[l - 1] = '/' then u
+    else u ^ "/" in
+  stdlib_url := Some u
 
 let output_dir = ref None
 let set_output_dir d = output_dir := d
@@ -59,7 +64,7 @@ let pp_url fmt lp =
     let fn = String.concat "." lp in
     match !stdlib_url with
     | Some www when not (is_local_file fn) ->
-      Format.fprintf fmt "%s/%s.html" www fn
+      Format.fprintf fmt "%s%s.html" www fn
     | _ ->
       Format.fprintf fmt "%s.html" fn
 

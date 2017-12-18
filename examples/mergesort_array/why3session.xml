@@ -2,3847 +2,800 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Alt-Ergo" version="1.30" timelimit="2" steplimit="0" memlimit="1000"/>
 <prover id="15" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../mergesort_array.mlw" expanded="true">
-<theory name="Elt" sum="d41d8cd98f00b204e9800998ecf8427e">
+<file name="../mergesort_array.mlw" proved="true">
+<theory name="Elt" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="Merge" sum="9699a6a79e068edee565509cfbb13ddc">
- <goal name="WP_parameter merge" expl="VC for merge">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter merge.1" expl="postcondition">
+<theory name="Merge" proved="true" sum="926a420600859df1bf7956dacc4cace8">
+ <goal name="WP_parameter merge" expl="VC for merge" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter merge.0" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.2" expl="postcondition">
+  <goal name="WP_parameter merge.1" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge.3" expl="loop invariant init">
+  <goal name="WP_parameter merge.2" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.4" expl="loop invariant init">
+  <goal name="WP_parameter merge.3" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.5" expl="loop invariant init">
+  <goal name="WP_parameter merge.4" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.6" expl="loop invariant init">
+  <goal name="WP_parameter merge.5" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.7" expl="loop invariant init">
+  <goal name="WP_parameter merge.6" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter merge.8" expl="loop invariant init">
+  <goal name="WP_parameter merge.7" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge.9" expl="index in array bounds">
+  <goal name="WP_parameter merge.8" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge.10" expl="type invariant">
+  <goal name="WP_parameter merge.9" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter merge.11" expl="index in array bounds">
+  <goal name="WP_parameter merge.10" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter merge.12" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.11" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter merge.13" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.12" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter merge.14" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.13" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.15" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.14" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.16" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.15" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter merge.17" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.16" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.12" steps="157"/></proof>
   </goal>
-  <goal name="WP_parameter merge.18" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.17" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter merge.19" expl="index in array bounds">
+  <goal name="WP_parameter merge.18" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge.20" expl="index in array bounds">
+  <goal name="WP_parameter merge.19" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter merge.21" expl="index in array bounds">
+  <goal name="WP_parameter merge.20" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.22" expl="type invariant">
+  <goal name="WP_parameter merge.21" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.23" expl="index in array bounds">
+  <goal name="WP_parameter merge.22" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.24" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.23" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter merge.25" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.24" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter merge.26" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.25" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.27" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.26" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.28" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.27" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter merge.29" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.28" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.14" steps="166"/></proof>
   </goal>
-  <goal name="WP_parameter merge.30" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.29" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter merge.31" expl="index in array bounds">
+  <goal name="WP_parameter merge.30" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.32" expl="type invariant">
+  <goal name="WP_parameter merge.31" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.33" expl="index in array bounds">
+  <goal name="WP_parameter merge.32" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.34" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.33" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter merge.35" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.34" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter merge.36" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.35" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter merge.37" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.36" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter merge.38" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.37" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.39" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.38" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.12" steps="164"/></proof>
   </goal>
-  <goal name="WP_parameter merge.40" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.39" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter merge.41" expl="index in array bounds">
+  <goal name="WP_parameter merge.40" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter merge.42" expl="type invariant">
+  <goal name="WP_parameter merge.41" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter merge.43" expl="index in array bounds">
+  <goal name="WP_parameter merge.42" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter merge.44" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.43" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.45" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.44" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge.46" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.45" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.47" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.46" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter merge.48" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.47" expl="loop invariant preservation" proved="true">
   <proof prover="15"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter merge.49" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.48" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.23" steps="201"/></proof>
   </goal>
-  <goal name="WP_parameter merge.50" expl="loop invariant preservation">
+  <goal name="WP_parameter merge.49" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="33"/></proof>
   </goal>
-  <goal name="WP_parameter merge.51" expl="type invariant">
+  <goal name="WP_parameter merge.50" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter merge.52" expl="postcondition">
+  <goal name="WP_parameter merge.51" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter merge.53" expl="postcondition">
-  <transf name="inline_goal">
-   <goal name="WP_parameter merge.53.1" expl="postcondition">
-   <transf name="split_goal_wp">
-    <goal name="WP_parameter merge.53.1.1" expl="VC for merge">
+  <goal name="WP_parameter merge.52" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter merge.52.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="WP_parameter merge.52.0.0" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.00" steps="3"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.2" expl="VC for merge">
+    <goal name="WP_parameter merge.52.0.1" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.3" expl="VC for merge">
+    <goal name="WP_parameter merge.52.0.2" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.01" steps="10"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.4" expl="VC for merge">
+    <goal name="WP_parameter merge.52.0.3" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.02" steps="10"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.5" expl="VC for merge">
+    <goal name="WP_parameter merge.52.0.4" expl="VC for merge" proved="true">
     <proof prover="13"><result status="valid" time="0.02" steps="4"/></proof>
     </goal>
-    <goal name="WP_parameter merge.53.1.6" expl="VC for merge">
+    <goal name="WP_parameter merge.52.0.5" expl="VC for merge" proved="true">
     <proof prover="15"><result status="valid" time="0.03"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge.54" expl="postcondition">
+  <goal name="WP_parameter merge.53" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter merge_using" expl="VC for merge_using">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter merge_using.1" expl="index in array bounds">
+ <goal name="WP_parameter merge_using" expl="VC for merge_using" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter merge_using.0" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.2" expl="index in array bounds">
+  <goal name="WP_parameter merge_using.1" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.3" expl="assertion">
+  <goal name="WP_parameter merge_using.2" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.4" expl="postcondition">
+  <goal name="WP_parameter merge_using.3" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="46"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.5" expl="postcondition">
+  <goal name="WP_parameter merge_using.4" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.6" expl="precondition">
+  <goal name="WP_parameter merge_using.5" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.7" expl="precondition">
+  <goal name="WP_parameter merge_using.6" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.8" expl="precondition">
+  <goal name="WP_parameter merge_using.7" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.9" expl="precondition">
+  <goal name="WP_parameter merge_using.8" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.10" expl="precondition">
+  <goal name="WP_parameter merge_using.9" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.11" expl="assertion">
-  <transf name="inline_goal">
-   <goal name="WP_parameter merge_using.11.1" expl="assertion">
-   <transf name="split_goal_wp">
-    <goal name="WP_parameter merge_using.11.1.1" expl="VC for merge_using">
+  <goal name="WP_parameter merge_using.10" expl="assertion" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="WP_parameter merge_using.10.0" expl="assertion" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="WP_parameter merge_using.10.0.0" expl="VC for merge_using" proved="true">
     <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.2" expl="VC for merge_using">
+    <goal name="WP_parameter merge_using.10.0.1" expl="VC for merge_using" proved="true">
     <proof prover="13"><result status="valid" time="1.16" steps="1436"/></proof>
     </goal>
-    <goal name="WP_parameter merge_using.11.1.3" expl="VC for merge_using">
+    <goal name="WP_parameter merge_using.10.0.2" expl="VC for merge_using" proved="true">
     <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter merge_using.12" expl="postcondition">
+  <goal name="WP_parameter merge_using.11" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="25"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.13" expl="postcondition">
+  <goal name="WP_parameter merge_using.12" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.14" expl="postcondition">
+  <goal name="WP_parameter merge_using.13" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.15" expl="postcondition">
+  <goal name="WP_parameter merge_using.14" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter merge_using.16" expl="postcondition">
+  <goal name="WP_parameter merge_using.15" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="TopDownMergesort" sum="e33329cda608f4d61547cc30ddc4e377">
- <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter mergesort_rec.1" expl="check division by zero">
+<theory name="TopDownMergesort" proved="true" sum="e983d83a289b51846a0fd2cf8915d7cd">
+ <goal name="WP_parameter mergesort_rec" expl="VC for mergesort_rec" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter mergesort_rec.0" expl="check division by zero" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.2" expl="assertion">
+  <goal name="WP_parameter mergesort_rec.1" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.3" expl="variant decrease">
+  <goal name="WP_parameter mergesort_rec.2" expl="variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.4" expl="precondition">
+  <goal name="WP_parameter mergesort_rec.3" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.5" expl="assertion">
+  <goal name="WP_parameter mergesort_rec.4" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.6" expl="variant decrease">
+  <goal name="WP_parameter mergesort_rec.5" expl="variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.7" expl="precondition">
+  <goal name="WP_parameter mergesort_rec.6" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.8" expl="assertion">
+  <goal name="WP_parameter mergesort_rec.7" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.9" expl="precondition">
+  <goal name="WP_parameter mergesort_rec.8" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.10" expl="precondition">
+  <goal name="WP_parameter mergesort_rec.9" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.10" steps="131"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.11" expl="precondition">
+  <goal name="WP_parameter mergesort_rec.10" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.12" expl="postcondition">
+  <goal name="WP_parameter mergesort_rec.11" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.13" expl="postcondition">
+  <goal name="WP_parameter mergesort_rec.12" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.17" steps="220"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.14" expl="postcondition">
+  <goal name="WP_parameter mergesort_rec.13" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter mergesort_rec.15" expl="postcondition">
+  <goal name="WP_parameter mergesort_rec.14" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter mergesort" expl="VC for mergesort">
+ <goal name="WP_parameter mergesort" expl="VC for mergesort" proved="true">
  <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
  </goal>
 </theory>
-<theory name="BottomUpMergesort" sum="1abd3287c1836a726fd4bd680b496be8" expanded="true">
- <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter bottom_up_mergesort.1" expl="loop invariant init">
+<theory name="BottomUpMergesort" proved="true" sum="6210fbc75810fa2473d31a291282e174">
+ <goal name="WP_parameter bottom_up_mergesort" expl="VC for bottom_up_mergesort" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter bottom_up_mergesort.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.2" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.1" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.3" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.2" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.4" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.3" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.5" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.4" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.6" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.5" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.7" expl="loop invariant init">
+  <goal name="WP_parameter bottom_up_mergesort.6" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.8" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.7" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.9" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.8" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.10" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.9" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.11" expl="type invariant">
+  <goal name="WP_parameter bottom_up_mergesort.10" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.12" expl="type invariant">
+  <goal name="WP_parameter bottom_up_mergesort.11" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.13" expl="precondition">
+  <goal name="WP_parameter bottom_up_mergesort.12" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.14" expl="precondition">
+  <goal name="WP_parameter bottom_up_mergesort.13" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.15" expl="precondition">
+  <goal name="WP_parameter bottom_up_mergesort.14" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.16" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.15" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.04" steps="53"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.17" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.16" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.34"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.18" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.17" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.19" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.18" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.20" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.20.1" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.19" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter bottom_up_mergesort.19.0" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="47"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.20.2" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.19.1" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="1.24" steps="695"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.21" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.21.1" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.20" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter bottom_up_mergesort.20.0" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.06"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.2" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.20.1" expl="assertion" proved="true">
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.3" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.20.2" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.03" steps="56"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="6508"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="zero" id="746"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="747"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="748"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="751"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1917"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1918"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1919"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="1987"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="abs" id="2032"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="abs"/>
-    </ls_pos>
-    <ls_pos name="max" id="2079"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="max"/>
-    </ls_pos>
-    <ls_pos name="div" id="2237"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="div"/>
-    </ls_pos>
-    <ls_pos name="mod" id="2240"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="mod"/>
-    </ls_pos>
-    <ls_pos name="get" id="2774"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="get"/>
-    </ls_pos>
-    <ls_pos name="set" id="2777"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="2797"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="2882"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="occ" id="3004"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ"/>
-    </ls_pos>
-    <ls_pos name="set" id="3224"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="3266"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="array_eq_sub" id="3657"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="array_eq" id="3678"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="3690"
-     ip_theory="ArrayExchange">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="6514"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="le" id="12657"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="sorted" id="12696"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="sorted"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1920"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1927"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1930"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1933"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1936"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1939"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1944"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1951"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1958"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1976"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1981"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1984"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1996"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1999"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="2006"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="2011"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="2016"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="2017"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="2024"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Abs_le" id="2037"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_le"/>
-    </pr_pos>
-    <pr_pos name="Abs_pos" id="2042"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_pos"/>
-    </pr_pos>
-    <pr_pos name="Min_r" id="2088"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_r"/>
-    </pr_pos>
-    <pr_pos name="Max_l" id="2093"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_l"/>
-    </pr_pos>
-    <pr_pos name="Min_comm" id="2098"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_comm"/>
-    </pr_pos>
-    <pr_pos name="Max_comm" id="2103"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_comm"/>
-    </pr_pos>
-    <pr_pos name="Min_assoc" id="2108"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_assoc"/>
-    </pr_pos>
-    <pr_pos name="Max_assoc" id="2115"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_assoc"/>
-    </pr_pos>
-    <pr_pos name="Div_mod" id="2243"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mod"/>
-    </pr_pos>
-    <pr_pos name="Div_bound" id="2248"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_bound"/>
-    </pr_pos>
-    <pr_pos name="Mod_bound" id="2253"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_bound"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_pos" id="2258"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_neg" id="2263"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_pos" id="2268"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_neg" id="2273"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Rounds_toward_zero" id="2278"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Rounds_toward_zero"/>
-    </pr_pos>
-    <pr_pos name="Div_1" id="2283"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_1"/>
-    </pr_pos>
-    <pr_pos name="Mod_1" id="2286"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_1"/>
-    </pr_pos>
-    <pr_pos name="Div_inf" id="2289"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_inf"/>
-    </pr_pos>
-    <pr_pos name="Mod_inf" id="2294"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_inf"/>
-    </pr_pos>
-    <pr_pos name="Div_mult" id="2299"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mult"/>
-    </pr_pos>
-    <pr_pos name="Mod_mult" id="2306"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_mult"/>
-    </pr_pos>
-    <pr_pos name="Select_eq" id="2810"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_eq"/>
-    </pr_pos>
-    <pr_pos name="Select_neq" id="2819"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_neq"/>
-    </pr_pos>
-    <pr_pos name="exchange_set" id="2910"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange_set"/>
-    </pr_pos>
-    <pr_pos name="occ_empty" id="3009"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_empty"/>
-    </pr_pos>
-    <pr_pos name="occ_right_no_add" id="3018"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_right_add" id="3027"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_add"/>
-    </pr_pos>
-    <pr_pos name="occ_bounds" id="3036"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_bounds"/>
-    </pr_pos>
-    <pr_pos name="occ_append" id="3045"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_append"/>
-    </pr_pos>
-    <pr_pos name="occ_neq" id="3056"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_neq"/>
-    </pr_pos>
-    <pr_pos name="occ_exists" id="3067"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exists"/>
-    </pr_pos>
-    <pr_pos name="occ_pos" id="3078"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_pos"/>
-    </pr_pos>
-    <pr_pos name="occ_eq" id="3087"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_eq"/>
-    </pr_pos>
-    <pr_pos name="permut_trans" id="3121"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_trans"/>
-    </pr_pos>
-    <pr_pos name="permut_exists" id="3132"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_exists"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_sub" id="3765"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_sub"/>
-    </pr_pos>
-    <pr_pos name="permut_sub_weakening" id="3784"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub_weakening"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_all" id="3803"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_all"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="12658"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="12661"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Total" id="12668"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="746"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="747"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="748"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="751"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1917"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1918"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1919"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1987"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2032"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2079"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2237"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2240"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2774"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2777"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2797"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2882"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3004"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3224"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3266"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3678"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3690"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="6514"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12696"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1920"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1927"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1930"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1933"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1936"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1939"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1944"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1951"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1958"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1976"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1981"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1984"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1996"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1999"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2006"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2011"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2016"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2017"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2024"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2037"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2042"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2088"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2103"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2108"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2115"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2243"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2248"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2253"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2258"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2263"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2268"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2273"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2278"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2283"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2286"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2289"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2294"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2299"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2306"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2810"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2819"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2910"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3009"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3018"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3027"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3036"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3045"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3056"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3067"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3078"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3087"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3121"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3132"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3765"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3784"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3803"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12658"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12661"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12668"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="6508"/>
-    </meta>
-    <goal name="WP_parameter bottom_up_mergesort.21.3" expl="assertion">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter bottom_up_mergesort.21.3.1" expl="assertion">
-     <proof prover="13"><result status="valid" time="0.03" steps="51"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.4" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.20.3" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.90" steps="624"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="6508"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="zero" id="746"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="747"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="748"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="751"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1917"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1918"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1919"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="1987"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="abs" id="2032"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="abs"/>
-    </ls_pos>
-    <ls_pos name="max" id="2079"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="max"/>
-    </ls_pos>
-    <ls_pos name="div" id="2237"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="div"/>
-    </ls_pos>
-    <ls_pos name="mod" id="2240"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="mod"/>
-    </ls_pos>
-    <ls_pos name="get" id="2774"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="get"/>
-    </ls_pos>
-    <ls_pos name="set" id="2777"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="2797"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="2882"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="occ" id="3004"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ"/>
-    </ls_pos>
-    <ls_pos name="set" id="3224"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="3266"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="array_eq_sub" id="3657"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="array_eq" id="3678"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="3690"
-     ip_theory="ArrayExchange">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="6514"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="le" id="12657"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="sorted" id="12696"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="sorted"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1920"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1927"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1930"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1933"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1936"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1939"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1944"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1951"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1958"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1976"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1981"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1984"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1996"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1999"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="2006"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="2011"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="2016"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="2017"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="2024"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Abs_le" id="2037"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_le"/>
-    </pr_pos>
-    <pr_pos name="Abs_pos" id="2042"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_pos"/>
-    </pr_pos>
-    <pr_pos name="Min_r" id="2088"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_r"/>
-    </pr_pos>
-    <pr_pos name="Max_l" id="2093"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_l"/>
-    </pr_pos>
-    <pr_pos name="Min_comm" id="2098"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_comm"/>
-    </pr_pos>
-    <pr_pos name="Max_comm" id="2103"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_comm"/>
-    </pr_pos>
-    <pr_pos name="Min_assoc" id="2108"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_assoc"/>
-    </pr_pos>
-    <pr_pos name="Max_assoc" id="2115"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_assoc"/>
-    </pr_pos>
-    <pr_pos name="Div_mod" id="2243"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mod"/>
-    </pr_pos>
-    <pr_pos name="Div_bound" id="2248"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_bound"/>
-    </pr_pos>
-    <pr_pos name="Mod_bound" id="2253"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_bound"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_pos" id="2258"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_neg" id="2263"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_pos" id="2268"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_neg" id="2273"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Rounds_toward_zero" id="2278"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Rounds_toward_zero"/>
-    </pr_pos>
-    <pr_pos name="Div_1" id="2283"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_1"/>
-    </pr_pos>
-    <pr_pos name="Mod_1" id="2286"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_1"/>
-    </pr_pos>
-    <pr_pos name="Div_inf" id="2289"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_inf"/>
-    </pr_pos>
-    <pr_pos name="Mod_inf" id="2294"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_inf"/>
-    </pr_pos>
-    <pr_pos name="Div_mult" id="2299"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mult"/>
-    </pr_pos>
-    <pr_pos name="Mod_mult" id="2306"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_mult"/>
-    </pr_pos>
-    <pr_pos name="Select_eq" id="2810"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_eq"/>
-    </pr_pos>
-    <pr_pos name="Select_neq" id="2819"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_neq"/>
-    </pr_pos>
-    <pr_pos name="exchange_set" id="2910"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange_set"/>
-    </pr_pos>
-    <pr_pos name="occ_empty" id="3009"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_empty"/>
-    </pr_pos>
-    <pr_pos name="occ_right_no_add" id="3018"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_right_add" id="3027"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_add"/>
-    </pr_pos>
-    <pr_pos name="occ_bounds" id="3036"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_bounds"/>
-    </pr_pos>
-    <pr_pos name="occ_append" id="3045"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_append"/>
-    </pr_pos>
-    <pr_pos name="occ_neq" id="3056"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_neq"/>
-    </pr_pos>
-    <pr_pos name="occ_exists" id="3067"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exists"/>
-    </pr_pos>
-    <pr_pos name="occ_pos" id="3078"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_pos"/>
-    </pr_pos>
-    <pr_pos name="occ_eq" id="3087"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_eq"/>
-    </pr_pos>
-    <pr_pos name="permut_trans" id="3121"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_trans"/>
-    </pr_pos>
-    <pr_pos name="permut_exists" id="3132"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_exists"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_sub" id="3765"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_sub"/>
-    </pr_pos>
-    <pr_pos name="permut_sub_weakening" id="3784"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub_weakening"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_all" id="3803"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_all"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="12658"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="12661"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Total" id="12668"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="746"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="747"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="748"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="751"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1917"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1918"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1919"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1987"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2032"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2079"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2237"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2240"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2774"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2777"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2797"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2882"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3004"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3224"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3266"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3678"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3690"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="6514"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12696"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1920"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1927"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1930"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1933"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1936"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1939"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1944"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1951"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1958"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1976"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1981"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1984"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1996"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1999"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2006"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2011"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2016"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2017"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2024"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2037"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2042"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2088"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2103"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2108"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2115"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2243"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2248"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2253"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2258"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2263"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2268"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2273"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2278"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2283"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2286"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2289"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2294"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2299"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2306"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2810"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2819"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2910"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3009"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3018"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3027"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3036"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3045"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3056"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3067"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3078"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3087"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3121"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3132"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3765"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3784"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3803"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12658"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12661"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12668"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="6508"/>
-    </meta>
-    <goal name="WP_parameter bottom_up_mergesort.21.4" expl="assertion">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter bottom_up_mergesort.21.4.1" expl="assertion">
-     <proof prover="13"><result status="valid" time="0.05" steps="72"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.5" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.20.4" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="6508"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="zero" id="746"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="747"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="748"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="751"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1917"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1918"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1919"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="1987"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="abs" id="2032"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="abs"/>
-    </ls_pos>
-    <ls_pos name="max" id="2079"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="max"/>
-    </ls_pos>
-    <ls_pos name="div" id="2237"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="div"/>
-    </ls_pos>
-    <ls_pos name="mod" id="2240"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="mod"/>
-    </ls_pos>
-    <ls_pos name="get" id="2774"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="get"/>
-    </ls_pos>
-    <ls_pos name="set" id="2777"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="2797"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="2882"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="occ" id="3004"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ"/>
-    </ls_pos>
-    <ls_pos name="set" id="3224"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="3266"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="array_eq_sub" id="3657"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="array_eq" id="3678"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="3690"
-     ip_theory="ArrayExchange">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="6514"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="le" id="12657"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="sorted" id="12696"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="sorted"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1920"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1927"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1930"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1933"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1936"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1939"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1944"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1951"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1958"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1976"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1981"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1984"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1996"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1999"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="2006"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="2011"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="2016"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="2017"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="2024"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Abs_le" id="2037"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_le"/>
-    </pr_pos>
-    <pr_pos name="Abs_pos" id="2042"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_pos"/>
-    </pr_pos>
-    <pr_pos name="Min_r" id="2088"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_r"/>
-    </pr_pos>
-    <pr_pos name="Max_l" id="2093"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_l"/>
-    </pr_pos>
-    <pr_pos name="Min_comm" id="2098"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_comm"/>
-    </pr_pos>
-    <pr_pos name="Max_comm" id="2103"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_comm"/>
-    </pr_pos>
-    <pr_pos name="Min_assoc" id="2108"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_assoc"/>
-    </pr_pos>
-    <pr_pos name="Max_assoc" id="2115"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_assoc"/>
-    </pr_pos>
-    <pr_pos name="Div_mod" id="2243"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mod"/>
-    </pr_pos>
-    <pr_pos name="Div_bound" id="2248"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_bound"/>
-    </pr_pos>
-    <pr_pos name="Mod_bound" id="2253"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_bound"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_pos" id="2258"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_neg" id="2263"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_pos" id="2268"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_neg" id="2273"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Rounds_toward_zero" id="2278"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Rounds_toward_zero"/>
-    </pr_pos>
-    <pr_pos name="Div_1" id="2283"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_1"/>
-    </pr_pos>
-    <pr_pos name="Mod_1" id="2286"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_1"/>
-    </pr_pos>
-    <pr_pos name="Div_inf" id="2289"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_inf"/>
-    </pr_pos>
-    <pr_pos name="Mod_inf" id="2294"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_inf"/>
-    </pr_pos>
-    <pr_pos name="Div_mult" id="2299"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mult"/>
-    </pr_pos>
-    <pr_pos name="Mod_mult" id="2306"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_mult"/>
-    </pr_pos>
-    <pr_pos name="Select_eq" id="2810"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_eq"/>
-    </pr_pos>
-    <pr_pos name="Select_neq" id="2819"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_neq"/>
-    </pr_pos>
-    <pr_pos name="exchange_set" id="2910"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange_set"/>
-    </pr_pos>
-    <pr_pos name="occ_empty" id="3009"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_empty"/>
-    </pr_pos>
-    <pr_pos name="occ_right_no_add" id="3018"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_right_add" id="3027"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_add"/>
-    </pr_pos>
-    <pr_pos name="occ_bounds" id="3036"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_bounds"/>
-    </pr_pos>
-    <pr_pos name="occ_append" id="3045"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_append"/>
-    </pr_pos>
-    <pr_pos name="occ_neq" id="3056"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_neq"/>
-    </pr_pos>
-    <pr_pos name="occ_exists" id="3067"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exists"/>
-    </pr_pos>
-    <pr_pos name="occ_pos" id="3078"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_pos"/>
-    </pr_pos>
-    <pr_pos name="occ_eq" id="3087"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_eq"/>
-    </pr_pos>
-    <pr_pos name="permut_trans" id="3121"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_trans"/>
-    </pr_pos>
-    <pr_pos name="permut_exists" id="3132"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_exists"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_sub" id="3765"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_sub"/>
-    </pr_pos>
-    <pr_pos name="permut_sub_weakening" id="3784"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub_weakening"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_all" id="3803"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_all"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="12658"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="12661"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Total" id="12668"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="746"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="747"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="748"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="751"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1917"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1918"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1919"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1987"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2032"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2079"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2237"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2240"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2774"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2777"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2797"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2882"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3004"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3224"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3266"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3678"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3690"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="6514"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12696"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1920"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1927"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1930"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1933"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1936"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1939"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1944"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1951"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1958"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1976"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1981"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1984"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1996"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1999"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2006"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2011"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2016"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2017"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2024"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2037"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2042"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2088"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2103"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2108"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2115"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2243"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2248"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2253"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2258"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2263"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2268"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2273"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2278"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2283"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2286"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2289"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2294"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2299"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2306"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2810"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2819"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2910"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3009"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3018"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3027"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3036"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3045"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3056"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3067"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3078"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3087"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3121"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3132"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3765"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3784"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3803"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12658"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12661"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12668"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="6508"/>
-    </meta>
-    <goal name="WP_parameter bottom_up_mergesort.21.5" expl="assertion">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter bottom_up_mergesort.21.5.1" expl="assertion">
-     <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.21.6" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.20.5" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-   <metas>
-    <ts_pos name="real" arity="0" id="2"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="real"/>
-    </ts_pos>
-    <ts_pos name="bool" arity="0" id="3"
-     ip_theory="Bool">
-     <ip_library name="why3"/>
-     <ip_library name="Bool"/>
-     <ip_qualid name="bool"/>
-    </ts_pos>
-    <ts_pos name="tuple0" arity="0" id="20"
-     ip_theory="Tuple0">
-     <ip_library name="why3"/>
-     <ip_library name="Tuple0"/>
-     <ip_qualid name="tuple0"/>
-    </ts_pos>
-    <ts_pos name="unit" arity="0" id="21"
-     ip_theory="Unit">
-     <ip_library name="why3"/>
-     <ip_library name="Unit"/>
-     <ip_qualid name="unit"/>
-    </ts_pos>
-    <ts_pos name="ref" arity="1" id="6508"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="ref"/>
-    </ts_pos>
-    <ls_pos name="infix =" id="10"
-     ip_theory="BuiltIn">
-     <ip_library name="why3"/>
-     <ip_library name="BuiltIn"/>
-     <ip_qualid name="infix ="/>
-    </ls_pos>
-    <ls_pos name="zero" id="746"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="zero"/>
-    </ls_pos>
-    <ls_pos name="one" id="747"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="one"/>
-    </ls_pos>
-    <ls_pos name="infix &lt;" id="748"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &lt;"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;" id="751"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;"/>
-    </ls_pos>
-    <ls_pos name="infix +" id="1917"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix +"/>
-    </ls_pos>
-    <ls_pos name="prefix -" id="1918"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="prefix -"/>
-    </ls_pos>
-    <ls_pos name="infix *" id="1919"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix *"/>
-    </ls_pos>
-    <ls_pos name="infix &gt;=" id="1987"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="infix &gt;="/>
-    </ls_pos>
-    <ls_pos name="abs" id="2032"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="abs"/>
-    </ls_pos>
-    <ls_pos name="max" id="2079"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="max"/>
-    </ls_pos>
-    <ls_pos name="div" id="2237"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="div"/>
-    </ls_pos>
-    <ls_pos name="mod" id="2240"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="mod"/>
-    </ls_pos>
-    <ls_pos name="get" id="2774"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="get"/>
-    </ls_pos>
-    <ls_pos name="set" id="2777"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="2797"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="2882"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="occ" id="3004"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ"/>
-    </ls_pos>
-    <ls_pos name="set" id="3224"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="set"/>
-    </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="3266"
-     ip_theory="Array">
-     <ip_library name="array"/>
-     <ip_qualid name="mixfix [&lt;-]"/>
-    </ls_pos>
-    <ls_pos name="array_eq_sub" id="3657"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq_sub"/>
-    </ls_pos>
-    <ls_pos name="array_eq" id="3678"
-     ip_theory="ArrayEq">
-     <ip_library name="array"/>
-     <ip_qualid name="array_eq"/>
-    </ls_pos>
-    <ls_pos name="exchange" id="3690"
-     ip_theory="ArrayExchange">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange"/>
-    </ls_pos>
-    <ls_pos name="prefix !" id="6514"
-     ip_theory="Ref">
-     <ip_library name="ref"/>
-     <ip_qualid name="prefix !"/>
-    </ls_pos>
-    <ls_pos name="le" id="12657"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="le"/>
-    </ls_pos>
-    <ls_pos name="sorted" id="12696"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="sorted"/>
-    </ls_pos>
-    <pr_pos name="Assoc" id="1920"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_l" id="1927"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_l"/>
-    </pr_pos>
-    <pr_pos name="Unit_def_r" id="1930"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Unit_def_r"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_l" id="1933"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_l"/>
-    </pr_pos>
-    <pr_pos name="Inv_def_r" id="1936"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Inv_def_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1939"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CommutativeGroup"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Assoc" id="1944"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Assoc"/>
-     <ip_qualid name="Assoc"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_l" id="1951"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_l"/>
-    </pr_pos>
-    <pr_pos name="Mul_distr_r" id="1958"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Mul_distr_r"/>
-    </pr_pos>
-    <pr_pos name="Comm" id="1976"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Comm"/>
-     <ip_qualid name="Comm"/>
-    </pr_pos>
-    <pr_pos name="Unitary" id="1981"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Unitary"/>
-    </pr_pos>
-    <pr_pos name="NonTrivialRing" id="1984"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="NonTrivialRing"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="1996"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="1999"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Antisymm" id="2006"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Antisymm"/>
-    </pr_pos>
-    <pr_pos name="Total" id="2011"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <pr_pos name="ZeroLessOne" id="2016"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="ZeroLessOne"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderAdd" id="2017"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderAdd"/>
-    </pr_pos>
-    <pr_pos name="CompatOrderMult" id="2024"
-     ip_theory="Int">
-     <ip_library name="int"/>
-     <ip_qualid name="CompatOrderMult"/>
-    </pr_pos>
-    <pr_pos name="Abs_le" id="2037"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_le"/>
-    </pr_pos>
-    <pr_pos name="Abs_pos" id="2042"
-     ip_theory="Abs">
-     <ip_library name="int"/>
-     <ip_qualid name="Abs_pos"/>
-    </pr_pos>
-    <pr_pos name="Min_r" id="2088"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_r"/>
-    </pr_pos>
-    <pr_pos name="Max_l" id="2093"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_l"/>
-    </pr_pos>
-    <pr_pos name="Min_comm" id="2098"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_comm"/>
-    </pr_pos>
-    <pr_pos name="Max_comm" id="2103"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_comm"/>
-    </pr_pos>
-    <pr_pos name="Min_assoc" id="2108"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Min_assoc"/>
-    </pr_pos>
-    <pr_pos name="Max_assoc" id="2115"
-     ip_theory="MinMax">
-     <ip_library name="int"/>
-     <ip_qualid name="Max_assoc"/>
-    </pr_pos>
-    <pr_pos name="Div_mod" id="2243"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mod"/>
-    </pr_pos>
-    <pr_pos name="Div_bound" id="2248"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_bound"/>
-    </pr_pos>
-    <pr_pos name="Mod_bound" id="2253"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_bound"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_pos" id="2258"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Div_sign_neg" id="2263"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_pos" id="2268"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_pos"/>
-    </pr_pos>
-    <pr_pos name="Mod_sign_neg" id="2273"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_sign_neg"/>
-    </pr_pos>
-    <pr_pos name="Rounds_toward_zero" id="2278"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Rounds_toward_zero"/>
-    </pr_pos>
-    <pr_pos name="Div_1" id="2283"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_1"/>
-    </pr_pos>
-    <pr_pos name="Mod_1" id="2286"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_1"/>
-    </pr_pos>
-    <pr_pos name="Div_inf" id="2289"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_inf"/>
-    </pr_pos>
-    <pr_pos name="Mod_inf" id="2294"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_inf"/>
-    </pr_pos>
-    <pr_pos name="Div_mult" id="2299"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Div_mult"/>
-    </pr_pos>
-    <pr_pos name="Mod_mult" id="2306"
-     ip_theory="ComputerDivision">
-     <ip_library name="int"/>
-     <ip_qualid name="Mod_mult"/>
-    </pr_pos>
-    <pr_pos name="Select_eq" id="2810"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_eq"/>
-    </pr_pos>
-    <pr_pos name="Select_neq" id="2819"
-     ip_theory="Map">
-     <ip_library name="map"/>
-     <ip_qualid name="Select_neq"/>
-    </pr_pos>
-    <pr_pos name="exchange_set" id="2910"
-     ip_theory="MapExchange">
-     <ip_library name="map"/>
-     <ip_qualid name="exchange_set"/>
-    </pr_pos>
-    <pr_pos name="occ_empty" id="3009"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_empty"/>
-    </pr_pos>
-    <pr_pos name="occ_right_no_add" id="3018"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_no_add"/>
-    </pr_pos>
-    <pr_pos name="occ_right_add" id="3027"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_right_add"/>
-    </pr_pos>
-    <pr_pos name="occ_bounds" id="3036"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_bounds"/>
-    </pr_pos>
-    <pr_pos name="occ_append" id="3045"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_append"/>
-    </pr_pos>
-    <pr_pos name="occ_neq" id="3056"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_neq"/>
-    </pr_pos>
-    <pr_pos name="occ_exists" id="3067"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_exists"/>
-    </pr_pos>
-    <pr_pos name="occ_pos" id="3078"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_pos"/>
-    </pr_pos>
-    <pr_pos name="occ_eq" id="3087"
-     ip_theory="Occ">
-     <ip_library name="map"/>
-     <ip_qualid name="occ_eq"/>
-    </pr_pos>
-    <pr_pos name="permut_trans" id="3121"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_trans"/>
-    </pr_pos>
-    <pr_pos name="permut_exists" id="3132"
-     ip_theory="MapPermut">
-     <ip_library name="map"/>
-     <ip_qualid name="permut_exists"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_sub" id="3765"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_sub"/>
-    </pr_pos>
-    <pr_pos name="permut_sub_weakening" id="3784"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="permut_sub_weakening"/>
-    </pr_pos>
-    <pr_pos name="exchange_permut_all" id="3803"
-     ip_theory="ArrayPermut">
-     <ip_library name="array"/>
-     <ip_qualid name="exchange_permut_all"/>
-    </pr_pos>
-    <pr_pos name="Refl" id="12658"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Refl"/>
-    </pr_pos>
-    <pr_pos name="Trans" id="12661"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Trans"/>
-    </pr_pos>
-    <pr_pos name="Total" id="12668"
-     ip_theory="BottomUpMergesort">
-     <ip_qualid name="Merge"/>
-     <ip_qualid name="TotalPreOrder"/>
-     <ip_qualid name="Total"/>
-    </pr_pos>
-    <meta name="remove_logic">
-     <meta_arg_ls id="10"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="746"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="747"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="748"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="751"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1917"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1918"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1919"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="1987"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2032"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2079"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2237"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2240"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2774"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2777"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2797"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="2882"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3004"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3224"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3266"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3678"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3690"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="6514"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12657"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="12696"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1920"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1927"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1930"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1933"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1936"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1939"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1944"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1951"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1958"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1976"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1981"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1984"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1996"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="1999"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2006"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2011"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2016"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2017"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2024"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2037"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2042"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2088"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2093"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2098"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2103"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2108"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2115"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2243"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2248"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2253"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2258"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2263"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2268"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2273"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2278"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2283"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2286"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2289"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2294"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2299"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2306"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2810"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2819"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="2910"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3009"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3018"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3027"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3036"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3045"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3056"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3067"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3078"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3087"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3121"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3132"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3765"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3784"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="3803"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12658"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12661"/>
-    </meta>
-    <meta name="remove_prop">
-     <meta_arg_pr id="12668"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="2"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="3"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="20"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="21"/>
-    </meta>
-    <meta name="remove_type">
-     <meta_arg_ts id="6508"/>
-    </meta>
-    <goal name="WP_parameter bottom_up_mergesort.21.6" expl="assertion">
-    <transf name="eliminate_builtin">
-     <goal name="WP_parameter bottom_up_mergesort.21.6.1" expl="assertion">
-     <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
-     </goal>
-    </transf>
-    </goal>
-   </metas>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.22" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.21" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.23" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.22" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.24" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.23" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="55"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.25" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.24" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.03" steps="55"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.26" expl="loop variant decrease">
+  <goal name="WP_parameter bottom_up_mergesort.25" expl="loop variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.27" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter bottom_up_mergesort.27.1" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.26" expl="assertion" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter bottom_up_mergesort.26.0" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.2" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.26.1" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.3" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.26.2" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.4" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.26.3" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="31"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.5" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.26.4" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
-   <goal name="WP_parameter bottom_up_mergesort.27.6" expl="assertion">
+   <goal name="WP_parameter bottom_up_mergesort.26.5" expl="assertion" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.28" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.27" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.29" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.28" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.30" expl="loop invariant preservation">
+  <goal name="WP_parameter bottom_up_mergesort.29" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.31" expl="loop variant decrease">
+  <goal name="WP_parameter bottom_up_mergesort.30" expl="loop variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.32" expl="assertion">
+  <goal name="WP_parameter bottom_up_mergesort.31" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.33" expl="type invariant">
+  <goal name="WP_parameter bottom_up_mergesort.32" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.34" expl="postcondition">
+  <goal name="WP_parameter bottom_up_mergesort.33" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter bottom_up_mergesort.35" expl="postcondition">
+  <goal name="WP_parameter bottom_up_mergesort.34" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
-<theory name="NaturalMergesort" sum="8f8fa14093e6b96c9ddd283064053622" expanded="true">
- <goal name="WP_parameter find_run" expl="VC for find_run">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter find_run.1" expl="loop invariant init">
+<theory name="NaturalMergesort" proved="true" sum="58d60bf468fdcac4a3d847e617bfc16b">
+ <goal name="WP_parameter find_run" expl="VC for find_run" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter find_run.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.2" expl="loop invariant init">
+  <goal name="WP_parameter find_run.1" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.3" expl="index in array bounds">
+  <goal name="WP_parameter find_run.2" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.4" expl="index in array bounds">
+  <goal name="WP_parameter find_run.3" expl="index in array bounds" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.5" expl="loop invariant preservation">
+  <goal name="WP_parameter find_run.4" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.6" expl="loop invariant preservation">
+  <goal name="WP_parameter find_run.5" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.7" expl="loop variant decrease">
+  <goal name="WP_parameter find_run.6" expl="loop variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.8" expl="postcondition">
+  <goal name="WP_parameter find_run.7" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.9" expl="postcondition">
+  <goal name="WP_parameter find_run.8" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.10" expl="postcondition">
+  <goal name="WP_parameter find_run.9" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.11" expl="postcondition">
+  <goal name="WP_parameter find_run.10" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.12" expl="postcondition">
+  <goal name="WP_parameter find_run.11" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter find_run.13" expl="postcondition">
+  <goal name="WP_parameter find_run.12" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter natural_mergesort.1" expl="loop invariant init">
+ <goal name="WP_parameter natural_mergesort" expl="VC for natural_mergesort" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter natural_mergesort.0" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.2" expl="loop invariant init">
+  <goal name="WP_parameter natural_mergesort.1" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.3" expl="loop invariant init">
+  <goal name="WP_parameter natural_mergesort.2" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.4" expl="loop invariant init">
+  <goal name="WP_parameter natural_mergesort.3" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.5" expl="loop invariant init">
+  <goal name="WP_parameter natural_mergesort.4" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.6" expl="loop invariant init">
+  <goal name="WP_parameter natural_mergesort.5" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.7" expl="type invariant">
+  <goal name="WP_parameter natural_mergesort.6" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.8" expl="precondition">
+  <goal name="WP_parameter natural_mergesort.7" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.9" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort.8" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.10" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort.9" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.11" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.10" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.12" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.11" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.13" expl="loop variant decrease">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.13.1" expl="VC for natural_mergesort">
+  <goal name="WP_parameter natural_mergesort.12" expl="loop variant decrease" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter natural_mergesort.12.0" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="24"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.13.2" expl="VC for natural_mergesort">
+   <goal name="WP_parameter natural_mergesort.12.1" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="24"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter natural_mergesort.14" expl="precondition">
+  <goal name="WP_parameter natural_mergesort.13" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.15" expl="type invariant">
+  <goal name="WP_parameter natural_mergesort.14" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.16" expl="precondition">
+  <goal name="WP_parameter natural_mergesort.15" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.17" expl="precondition">
+  <goal name="WP_parameter natural_mergesort.16" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.18" expl="precondition">
+  <goal name="WP_parameter natural_mergesort.17" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.19" expl="assertion">
+  <goal name="WP_parameter natural_mergesort.18" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.04" steps="84"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.20" expl="assertion">
+  <goal name="WP_parameter natural_mergesort.19" expl="assertion" proved="true">
   <proof prover="15"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.21" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.20" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.22" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.21" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="85"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.23" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.22" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.24" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.23" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.03" steps="104"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.25" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.24" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="51"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.26" expl="loop variant decrease">
+  <goal name="WP_parameter natural_mergesort.25" expl="loop variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.27" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.26" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.28" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.27" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.29" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.28" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.07" steps="134"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.30" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.29" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.31" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.30" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="52"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.32" expl="loop variant decrease">
+  <goal name="WP_parameter natural_mergesort.31" expl="loop variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.33" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.32" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.34" expl="loop invariant preservation">
+  <goal name="WP_parameter natural_mergesort.33" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.35" expl="loop variant decrease">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter natural_mergesort.35.1" expl="VC for natural_mergesort">
+  <goal name="WP_parameter natural_mergesort.34" expl="loop variant decrease" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter natural_mergesort.34.0" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.02" steps="16"/></proof>
    </goal>
-   <goal name="WP_parameter natural_mergesort.35.2" expl="VC for natural_mergesort">
+   <goal name="WP_parameter natural_mergesort.34.1" expl="VC for natural_mergesort" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter natural_mergesort.36" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort.35" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort.37" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort.36" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter naturalrec" expl="VC for naturalrec">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter naturalrec.1" expl="postcondition">
+ <goal name="WP_parameter naturalrec" expl="VC for naturalrec" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter naturalrec.0" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.2" expl="postcondition">
+  <goal name="WP_parameter naturalrec.1" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.3" expl="postcondition">
+  <goal name="WP_parameter naturalrec.2" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.4" expl="precondition">
+  <goal name="WP_parameter naturalrec.3" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.5" expl="postcondition">
+  <goal name="WP_parameter naturalrec.4" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.6" expl="postcondition">
+  <goal name="WP_parameter naturalrec.5" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.7" expl="postcondition">
+  <goal name="WP_parameter naturalrec.6" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.8" expl="postcondition">
+  <goal name="WP_parameter naturalrec.7" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.9" expl="postcondition">
+  <goal name="WP_parameter naturalrec.8" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.10" expl="postcondition">
+  <goal name="WP_parameter naturalrec.9" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.11" expl="loop invariant init">
+  <goal name="WP_parameter naturalrec.10" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.12" expl="loop invariant init">
+  <goal name="WP_parameter naturalrec.11" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.13" expl="loop invariant init">
+  <goal name="WP_parameter naturalrec.12" expl="loop invariant init" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.14" expl="variant decrease">
+  <goal name="WP_parameter naturalrec.13" expl="variant decrease" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.15" expl="type invariant">
+  <goal name="WP_parameter naturalrec.14" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.16" expl="type invariant">
+  <goal name="WP_parameter naturalrec.15" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.17" expl="precondition">
+  <goal name="WP_parameter naturalrec.16" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.18" expl="precondition">
+  <goal name="WP_parameter naturalrec.17" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.19" expl="assertion">
-  <proof prover="4"><result status="valid" time="1.28"/></proof>
+  <goal name="WP_parameter naturalrec.18" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.20" expl="precondition">
-  <transf name="split_goal_wp">
-   <goal name="WP_parameter naturalrec.20.1" expl="VC for naturalrec">
+  <goal name="WP_parameter naturalrec.19" expl="precondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="WP_parameter naturalrec.19.0" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.00" steps="26"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.2" expl="VC for naturalrec">
+   <goal name="WP_parameter naturalrec.19.1" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.3" expl="VC for naturalrec">
+   <goal name="WP_parameter naturalrec.19.2" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.4" expl="VC for naturalrec">
+   <goal name="WP_parameter naturalrec.19.3" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.00" steps="36"/></proof>
    </goal>
-   <goal name="WP_parameter naturalrec.20.5" expl="VC for naturalrec">
+   <goal name="WP_parameter naturalrec.19.4" expl="VC for naturalrec" proved="true">
    <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="WP_parameter naturalrec.21" expl="precondition">
+  <goal name="WP_parameter naturalrec.20" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.05" steps="142"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.22" expl="precondition">
+  <goal name="WP_parameter naturalrec.21" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.23" expl="assertion">
+  <goal name="WP_parameter naturalrec.22" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.03" steps="108"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.24" expl="assertion">
+  <goal name="WP_parameter naturalrec.23" expl="assertion" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="51"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.25" expl="postcondition">
+  <goal name="WP_parameter naturalrec.24" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.26" expl="postcondition">
+  <goal name="WP_parameter naturalrec.25" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.27" expl="postcondition">
+  <goal name="WP_parameter naturalrec.26" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.04" steps="103"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.28" expl="postcondition">
+  <goal name="WP_parameter naturalrec.27" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="77"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.29" expl="loop invariant preservation">
+  <goal name="WP_parameter naturalrec.28" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.30" expl="loop invariant preservation">
+  <goal name="WP_parameter naturalrec.29" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.31" expl="loop invariant preservation">
+  <goal name="WP_parameter naturalrec.30" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.03" steps="105"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.32" expl="loop invariant preservation">
+  <goal name="WP_parameter naturalrec.31" expl="loop invariant preservation" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="79"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.33" expl="type invariant">
+  <goal name="WP_parameter naturalrec.32" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.34" expl="type invariant">
+  <goal name="WP_parameter naturalrec.33" expl="type invariant" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.35" expl="postcondition">
+  <goal name="WP_parameter naturalrec.34" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.36" expl="postcondition">
+  <goal name="WP_parameter naturalrec.35" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.37" expl="postcondition">
+  <goal name="WP_parameter naturalrec.36" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter naturalrec.38" expl="postcondition">
+  <goal name="WP_parameter naturalrec.37" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter natural_mergesort2.1" expl="precondition">
+ <goal name="WP_parameter natural_mergesort2" expl="VC for natural_mergesort2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter natural_mergesort2.0" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.2" expl="precondition">
+  <goal name="WP_parameter natural_mergesort2.1" expl="precondition" proved="true">
   <proof prover="13"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.3" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort2.2" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="WP_parameter natural_mergesort2.4" expl="postcondition">
+  <goal name="WP_parameter natural_mergesort2.3" expl="postcondition" proved="true">
   <proof prover="13"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
  </transf>

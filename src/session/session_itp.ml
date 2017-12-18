@@ -37,16 +37,14 @@ let print_proofAttemptID fmt id =
 
 type theory = {
   theory_name                   : Ident.ident;
-  theory_goals                  : proofNodeID list;
+  mutable theory_goals          : proofNodeID list;
   theory_parent_name            : string;
   theory_is_detached            : bool;
-  mutable theory_detached_goals : proofNodeID list;
   mutable theory_checksum       : Termcode.checksum option;
 }
 
 let theory_name t = t.theory_name
 let theory_goals t = t.theory_goals
-let theory_detached_goals t = t.theory_detached_goals
 
 type proof_parent = Trans of transID | Theory of theory
 
@@ -68,7 +66,7 @@ type proof_node = {
   proofn_name                    : Ident.ident;
   proofn_expl                    : string;
   proofn_parent                  : proof_parent;
-  proofn_checksum                : Termcode.checksum option;
+  proofn_checksum                : Termcode.checksum;
   proofn_shape                   : Termcode.shape;
   proofn_attempts                : proofAttemptID Hprover.t;
   mutable proofn_transformations : transID list;
@@ -77,15 +75,16 @@ type proof_node = {
 type transformation_node = {
   transf_name                      : string;
   transf_args                      : string list;
-  transf_subtasks                  : proofNodeID list;
+  mutable transf_subtasks          : proofNodeID list;
   transf_parent                    : proofNodeID;
-  mutable transf_detached_subtasks : proofNodeID list;
+  transf_is_detached               : bool;
 }
 
 type file = {
   file_name              : string;
   file_format            : string option;
-  mutable file_theories          : theory list;
+  file_is_detached       : bool;
+  mutable file_theories  : theory list;
 }
 
 let file_name f = f.file_name
@@ -98,6 +97,14 @@ type any =
   | ATn of transID
   | APn of proofNodeID
   | APa of proofAttemptID
+
+let fprintf_any fmt a =
+  match a with
+  | AFile f -> Format.fprintf fmt "<AFile %s>" f.file_name
+  | ATh th ->  Format.fprintf fmt "<ATh %s>" th.theory_name.Ident.id_string
+  | ATn trid -> Format.fprintf fmt "<ATn %d>" trid
+  | APn pnid -> Format.fprintf fmt "<APn %d>" pnid
+  | APa paid -> Format.fprintf fmt "<APa %d>" paid
 
 module Hpn = Hint
 module Htn = Hint
@@ -253,9 +260,6 @@ let get_proof_attempts (s : session) (id : proofNodeID) =
 let get_sub_tasks (s : session) (id : transID) =
   (get_transfNode s id).transf_subtasks
 
-let get_detached_sub_tasks (s : session) (id : transID) =
-  (get_transfNode s id).transf_detached_subtasks
-
 let get_transf_args (s : session) (id : transID) =
   (get_transfNode s id).transf_args
 
@@ -274,27 +278,24 @@ let get_proof_parent (s : session) (id : proofNodeID) =
 let get_trans_parent (s : session) (id : transID) =
   (get_transfNode s id).transf_parent
 
-(* TODO to be done with detached transformations *)
-let get_detached_trans (_s: session) (_id: proofNodeID) =
-  []
+let goal_is_detached s pn =
+  try let (_:Task.task) = get_raw_task s pn in false
+  with Not_found -> true
 
-let rec is_detached (s: session) (a: any) =
+let transf_is_detached s tn =
+  (get_transfNode s tn).transf_is_detached
+
+let proof_attempt_is_detached s pa =
+  let pa = get_proof_attempt_node s pa in
+  goal_is_detached s pa.parent
+
+let is_detached (s: session) (a: any) =
   match a with
-  | AFile _file -> false
+  | AFile file -> file.file_is_detached
   | ATh th     -> th.theory_is_detached
-  | ATn tn     ->
-    let pn_id = get_trans_parent s tn in
-    is_detached s (APn pn_id) ||
-    List.exists (fun x -> x = tn) (get_detached_trans s pn_id)
-  | APn pn     ->
-    begin
-      try let _ = get_raw_task s pn in false
-      with Not_found -> true
-    end
-  | APa pa     ->
-    let pa = get_proof_attempt_node s pa in
-    let pn_id = pa.parent in
-    is_detached s (APn pn_id)
+  | ATn tn     -> transf_is_detached s tn
+  | APn pn     -> goal_is_detached s pn
+  | APa pa     -> proof_attempt_is_detached s pa
 
 let rec get_encapsulating_theory s any =
   match any with
@@ -469,7 +470,7 @@ let rec print_proof_node s (fmt: Format.formatter) p =
   fprintf fmt
     "@[<hv 1> Goal %s;@ parent %s;@ sum %s;@ @[<hv 1>[%a]@]@ @[<hv 1>[%a]@]@]"
     pn.proofn_name.id_string parent
-    (Opt.fold (fun _ a -> Termcode.string_of_checksum a) "None" pn.proofn_checksum)
+    (Termcode.string_of_checksum pn.proofn_checksum)
     (Pp.print_list Pp.semi print_proof_attempt)
       (Hprover.fold (fun _key e l ->
                      let e = get_proof_attempt_node s e in
@@ -571,11 +572,10 @@ let graft_proof_attempt ?file (s : session) (id : proofNodeID) (pr : Whyconf.pro
 let mk_proof_node ~version ~expl (s : session) (n : Ident.ident) (t : Task.task)
     (parent : proof_parent) (node_id : proofNodeID) =
   (* let tables = Args_wrapper.build_naming_tables t in *)
-  let sum = Some (Termcode.task_checksum ~version t) in
+  let sum = Termcode.task_checksum ~version t in
   let shape = Termcode.t_shape_task ~version ~expl t in
   let pn = { proofn_name = n;
              proofn_expl = expl;
-             (* proofn_table = Some tables; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -588,7 +588,6 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
     (parent : proof_parent) (node_id : proofNodeID) sum shape proved =
   let pn = { proofn_name = n;
              proofn_expl = "";
-             (* proofn_table = None; *)
              proofn_parent = parent;
              proofn_checksum = sum;
              proofn_shape = shape;
@@ -596,32 +595,6 @@ let mk_proof_node_no_task (s : session) (n : Ident.ident)
              proofn_transformations = [] } in
   Hint.add s.proofNode_table node_id pn;
   Hint.add s.pn_state node_id proved
-
-(* Detach a new proof to a proof_parent *)
-let graft_detached_proof_on_parent s (pn: proofNodeID) (parent: proof_parent) =
-  match parent with
-  | Theory th ->
-      th.theory_detached_goals <- th.theory_detached_goals @ [pn]
-  | Trans tr_id ->
-      let tr = get_transfNode s tr_id in
-      tr.transf_detached_subtasks <- tr.transf_detached_subtasks @ [pn]
-
-(* Intended as a feature to save a proof (also for testing detached stuff) *)
-let copy_proof_node_as_detached (s: session) (pn_id: proofNodeID) =
-  let pn = get_proofNode s pn_id in
-  let new_pn_id = gen_proofNodeID s in
-  let parent = pn.proofn_parent in
-  let new_goal = Ident.id_register (Ident.id_clone pn.proofn_name) in
-  let checksum = pn.proofn_checksum in
-  let shape = pn.proofn_shape in
-  let _: unit = mk_proof_node_no_task s new_goal parent new_pn_id checksum shape false in
-  graft_detached_proof_on_parent s new_pn_id parent;
-  new_pn_id
-
-let _mk_proof_node_task (s : session) (t : Task.task)
-    (parent : proof_parent) (node_id : proofNodeID) =
-  let name,_,_ = Termcode.goal_expl_task ~root:false t in
-  mk_proof_node ~version:s.session_shape_version s name t parent node_id
 
 let mk_transf_proof_node (s : session) (parent_name : string)
     (tid : transID) (index : int) (t : Task.task) =
@@ -634,54 +607,20 @@ let mk_transf_proof_node (s : session) (parent_name : string)
   id
 
 let mk_transf_node (s : session) (id : proofNodeID) (node_id : transID)
-    (name : string) (args : string list) ~(proved:bool) (pnl : proofNodeID list) =
+                   (name : string) (args : string list) ~(proved:bool) ~(detached:bool)
+                   (pnl : proofNodeID list) =
   let pn = get_proofNode s id in
   let tn = { transf_name = name;
              transf_args = args;
              transf_subtasks = pnl;
              transf_parent = id;
-             transf_detached_subtasks = [] } in
+             transf_is_detached  = detached;
+           }
+  in
   Hint.add s.trans_table node_id tn;
   Htn.add s.tn_state node_id proved;
   pn.proofn_transformations <- node_id::pn.proofn_transformations
 
-exception BadCopyDetached of string
-
-let rec copy_structure ~notification s from_any to_any : unit =
-  match from_any, to_any with
-  | APn from_id, APn to_id ->
-    let transformations = get_transformations s from_id in
-    let new_transformations =
-      List.map (fun x ->
-        let tr_id = gen_transID s in
-        let old_tr = get_transfNode s x in
-        mk_transf_node s to_id tr_id old_tr.transf_name old_tr.transf_args
-                       ~proved:false [];
-        notification ~parent:to_any (ATn tr_id);
-        copy_structure ~notification s (ATn x) (ATn tr_id);
-        tr_id) transformations in
-    (get_proofNode s to_id).proofn_transformations <- new_transformations;
-    Hprover.iter (fun _k old_pa ->
-      let old_pa = get_proof_attempt_node s old_pa in
-      let pa_id =
-        add_proof_attempt s old_pa.prover old_pa.limit None true None to_id in
-      notification ~parent:to_any (APa pa_id))
-      (get_proofNode s from_id).proofn_attempts
-  | ATn from_tn, ATn to_tn ->
-    let sub_tasks = get_sub_tasks s from_tn in
-    let new_sub_tasks =
-      List.map (fun old_pn_id ->
-        let old_pn = get_proofNode s old_pn_id in
-        let pn_id = gen_proofNodeID s in
-        let new_id = Ident.id_register (Ident.id_clone old_pn.proofn_name) in
-        mk_proof_node_no_task s new_id (Trans to_tn)
-          pn_id old_pn.proofn_checksum old_pn.proofn_shape false;
-        notification ~parent:to_any (APn pn_id);
-        copy_structure ~notification s (APn old_pn_id) (APn pn_id);
-        pn_id) sub_tasks in
-    let tr = get_transfNode s to_tn in
-    tr.transf_detached_subtasks <- new_sub_tasks
-  | _ -> raise (BadCopyDetached "copy_structure")
 
 let graft_transf  (s : session) (id : proofNodeID) (name : string)
     (args : string list) (tl : Task.task list) =
@@ -689,7 +628,7 @@ let graft_transf  (s : session) (id : proofNodeID) (name : string)
   let parent_name = (get_proofNode s id).proofn_name.Ident.id_string in
   let sub_tasks = List.mapi (mk_transf_proof_node s parent_name tid) tl in
   let proved = sub_tasks = [] in
-  mk_transf_node s id tid name args ~proved sub_tasks;
+  mk_transf_node s id tid name args ~proved sub_tasks ~detached:false;
   tid
 
 
@@ -767,7 +706,9 @@ let update_file_node notification s f =
     (* No updates if ths is empty *)
     ()
   else
-    let proved = List.for_all (th_proved s) ths in
+    let proved =
+      List.for_all (fun th -> th.theory_is_detached || th_proved s th) ths
+    in
     if proved <> file_proved s f then
       begin
         Stdlib.Hstr.replace s.file_state f.file_name proved;
@@ -776,7 +717,9 @@ let update_file_node notification s f =
 
 let update_theory_node notification s th =
   let goals = theory_goals th in
-  let proved = List.for_all (pn_proved s) goals in
+  let proved =
+    List.for_all (fun pn -> goal_is_detached s pn || pn_proved s pn) goals
+  in
   if proved <> th_proved s th then
     begin
       Debug.dprintf debug "[Session] setting theory %s to status proved=%b@."
@@ -793,11 +736,21 @@ let update_theory_node notification s th =
 let rec update_goal_node notification s id =
   let tr_list = get_transformations s id in
   let pa_list = get_proof_attempts s id in
-  let proved = List.exists (tn_proved s) tr_list || List.exists pa_ok pa_list in
+  let proved =
+    List.exists
+      (fun tr -> not (transf_is_detached s tr) &&
+                   tn_proved s tr) tr_list
+    ||
+      List.exists
+        (fun pa -> not (goal_is_detached s pa.parent) &&
+                     pa_ok pa) pa_list
+  in
   if proved <> pn_proved s id then
     begin
+      (* too noisy, uncomment if you really need it
       Debug.dprintf debug "[Session] setting goal node %a to status proved=%b@."
                     print_proofNodeID id proved;
+       *)
       Hpn.replace s.pn_state id proved;
       notification (APn id);
       match get_proof_parent s id with
@@ -811,7 +764,7 @@ let rec update_goal_node notification s id =
 
 and update_trans_node notification s trid =
   let proof_list = get_sub_tasks s trid in
-  let proved = List.for_all (pn_proved s) proof_list in
+  let proved = List.for_all (fun pn -> goal_is_detached s pn || pn_proved s pn) proof_list in
   if proved <> tn_proved s trid then
     begin
       Htn.replace s.tn_state trid proved;
@@ -886,8 +839,20 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
     | ATn tn -> remove_transformation s tn
     | APa pa -> remove_proof_attempt_pa s pa
     | AFile f -> Hstr.remove s.session_files f.file_name
-    | APn pn -> Hint.remove s.proofNode_table pn
-    | ATh _th -> (* Not in any table *)  ()
+    | APn pn ->
+       let node = Hint.find s.proofNode_table pn in
+       Hint.remove s.proofNode_table pn;
+       begin
+         match node.proofn_parent with
+         | Theory th ->
+            th.theory_goals <- List.filter ((<>) pn) th.theory_goals
+         | Trans tr ->
+            let nt = get_transfNode s tr in
+            nt.transf_subtasks <- List.filter ((<>) pn) nt.transf_subtasks
+       end
+    | ATh th ->
+       let f = theory_parent s th in
+       f.file_theories <- List.filter ((!=) th) f.file_theories
   in
   match n with
   | (AFile _ | APn _ | ATh _) when not (is_detached s n) ->
@@ -1028,8 +993,8 @@ let rec load_goal session old_provers parent g id =
     (* even if sum and shape are not in the XML file but in the shape
   file, these attributes are there thanks to ~fixattr on
   Xml.from_file *)
-    let csum = string_attribute_opt "sum" g in
-    let sum = Opt.map Termcode.checksum_of_string csum in
+    let csum = string_attribute_def "sum" g "" in
+    let sum = Termcode.checksum_of_string csum in
     let shape =
       try Termcode.shape_of_string (List.assoc "shape" g.Xml.attributes)
       with Not_found -> Termcode.shape_of_string ""
@@ -1091,7 +1056,7 @@ and load_proof_or_transf session old_provers pid a =
                        | "goal" -> (gen_proofNodeID session) :: goals
                        | _ -> goals) [] a.Xml.elements)
       in
-      mk_transf_node session pid tid trname args ~proved subtasks_ids;
+      mk_transf_node session pid tid trname args ~proved subtasks_ids ~detached:true;
       List.iter2
         (load_goal session old_provers (Trans tid))
         a.Xml.elements subtasks_ids;
@@ -1116,7 +1081,7 @@ let load_theory session parent_name old_provers acc th =
                 theory_is_detached = true;
                 theory_goals = goals;
                 theory_parent_name = parent_name;
-                theory_detached_goals = [] } in
+              } in
     List.iter2
       (load_goal session old_provers (Theory mth))
       th.Xml.elements goals;
@@ -1136,6 +1101,7 @@ let load_file session old_provers f =
            (load_theory session fn old_provers) [] f.Xml.elements) in
     let mf = { file_name = fn;
                file_format = fmt;
+               file_is_detached = true;
                file_theories = ft;
              } in
     Hstr.add session.session_files fn mf;
@@ -1321,9 +1287,8 @@ module CombinedTheoryChecksum = struct
   let b = Buffer.create 1024
 
   let f () pn =
-    match pn.proofn_checksum with
-    | None -> assert false
-    | Some c -> Buffer.add_string b (Termcode.string_of_checksum c)
+    let c = pn.proofn_checksum in
+    Buffer.add_string b (Termcode.string_of_checksum c)
 
   let compute s th =
     let () =
@@ -1339,7 +1304,7 @@ end
 
 module Goal = struct
   type 'a t = proofNodeID * session
-  let checksum (id,s) = (get_proofNode s id).proofn_checksum
+  let checksum (id,s) = Some (get_proofNode s id).proofn_checksum
   let shape (id,s)    = (get_proofNode s id).proofn_shape
   let name (id,s)     = (get_proofNode s id).proofn_name
 end
@@ -1349,50 +1314,54 @@ module AssoGoals = Termcode.Pairing(Goal)(Goal)
 let found_obsolete = ref false
 let found_detached = ref false
 
-let save_detached_goals old_s detached_goals_id s parent =
-  let save_proof parent old_pa_n =
-    let old_pa = old_pa_n in
-    ignore (add_proof_attempt s old_pa.prover old_pa.limit
-      old_pa.proof_state true old_pa.proof_script
-      parent)
-  in
-  let rec save_goal parent detached_goal_id id =
+let save_detached_proof s parent old_pa_n =
+  let old_pa = old_pa_n in
+  ignore (add_proof_attempt s old_pa.prover old_pa.limit
+                            old_pa.proof_state true old_pa.proof_script
+                            parent)
+
+let rec save_detached_goal old_s s parent detached_goal_id id =
     let detached_goal = get_proofNode old_s detached_goal_id in
-    mk_proof_node_no_task s detached_goal.proofn_name parent id None
-      (Termcode.shape_of_string "") false;
+    mk_proof_node_no_task s detached_goal.proofn_name parent id detached_goal.proofn_checksum
+      detached_goal.proofn_shape false;
     Hprover.iter (fun _ pa ->
                   let pa = get_proof_attempt_node old_s pa in
-                  save_proof id pa) detached_goal.proofn_attempts;
-    List.iter (save_trans id) detached_goal.proofn_transformations;
+                  save_detached_proof s id pa) detached_goal.proofn_attempts;
+    List.iter (save_detached_trans old_s s id) detached_goal.proofn_transformations;
     let new_trans = (get_proofNode s id) in
     new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
-  and save_trans parent_id old_id =
+
+
+and save_detached_goals old_s detached_goals_id s parent =
+  List.map
+    (fun detached_goal ->
+     let id = gen_proofNodeID s in
+     save_detached_goal old_s s parent detached_goal id;
+     id)
+    detached_goals_id
+
+and save_detached_trans old_s s parent_id old_id =
     let old_tr = get_transfNode old_s old_id in
     let name = old_tr.transf_name in
     let args = old_tr.transf_args in
     let id = gen_transID s in
     let subtasks_id = List.map (fun _ -> gen_proofNodeID s) old_tr.transf_subtasks in
     let proved = subtasks_id = [] in
-    mk_transf_node s parent_id id name args ~proved subtasks_id;
-    List.iter2 (fun pn_id -> save_goal (Trans id) pn_id)
+    mk_transf_node s parent_id id name args ~proved subtasks_id ~detached:true;
+    List.iter2 (fun pn_id -> save_detached_goal old_s s (Trans id) pn_id)
       old_tr.transf_subtasks subtasks_id
-  in
-  List.map
-      (fun detached_goal -> let id = gen_proofNodeID s in
-        save_goal parent detached_goal id;
-        id)
-      detached_goals_id
 
 let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
-    save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory) in
-    (* List.map (fun _ -> gen_proofNodeID s) detached_theory.theory_goals in *)
+    save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
+  in
   { theory_name = detached_theory.theory_name;
-    theory_checksum = None;
+    theory_checksum = detached_theory.theory_checksum;
     theory_is_detached = true;
     theory_goals = goalsID;
-    theory_parent_name = parent_name;
-    theory_detached_goals = [] }
+    theory_parent_name = parent_name }
+
+
 
 let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
   let old_pa = old_pa_n in
@@ -1442,14 +1411,16 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
+    (* check if transformation already present with the same parameters.
+       this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
                         List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in
-    (* NOTE: should not happen *)
-    Debug.dprintf debug "[add_registered_transformation] transformation already present@.";
-    assert false
+    Printexc.print_backtrace stderr;
+    Format.eprintf "[add_registered_transformation] FATAL transformation already present@.";
+    exit 2
   with Not_found ->
     let subgoals =
       apply_trans_to_goal ~allow_no_effect:true s env old_tr.transf_name old_tr.transf_args goal_id
@@ -1472,44 +1443,49 @@ and merge_trans ~use_shapes env old_s new_s new_goal_id old_tr_id =
   let old_tr = get_transfNode old_s old_tr_id in
   let old_subtasks = List.map (fun id -> id,old_s)
       old_tr.transf_subtasks in
-  (* add_registered_transformation actually apply the transformation. It can fail *)
-  try (
-  let new_tr_id =
-    add_registered_transformation new_s env old_tr new_goal_id
-  in
-  let new_tr = get_transfNode new_s new_tr_id in
-  (* attach the session to the subtasks to be able to instantiate Pairing *)
-  let new_subtasks = List.map (fun id -> id,new_s)
-      new_tr.transf_subtasks in
-  List.iter
-    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
-       | Some _ -> Debug.dprintf debug "[merge] old subgoal has no checksum@."
-       | None ->  Debug.dprintf debug "[merge] old subgoal has no checksum@.") old_subtasks;
-  List.iter
-    (fun (id,s) -> match (get_proofNode s id).proofn_checksum with
-       | Some _ -> Debug.dprintf debug "[merge] new subgoal has no checksum@."
-       | None ->  Debug.dprintf debug "[merge] new subgoal has no checksum@.") new_subtasks;
-  let associated,_detached =
-    AssoGoals.associate ~use_shapes old_subtasks new_subtasks
-  in
-  List.iter (function
-      | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
-        merge_goal ~use_shapes env new_s old_s ~goal_obsolete (get_proofNode old_s old_goal_id) new_goal_id
-      | ((id,s), None) ->
-        Debug.dprintf debug "[merge_trans] missed subgoal: %s@."
-          (get_proofNode s id).proofn_name.Ident.id_string;
-        found_detached := true)
-    associated;
-  (* save the detached goals *)
-  (* DISABLED TO AVOID ANY FUTURE ANOMALIES 'Not_found' *)
-  (*let detached = List.map (fun (a,_) -> a) detached in
-  new_tr.transf_detached_subtasks <- save_detached_goals old_s detached new_s (Trans new_tr_id)
-   *))
-  with _ when not (Debug.test_flag debug_stack_trace) ->
-    Debug.dprintf debug
-      "[Session_itp.merge_trans] transformation failed: %s@." old_tr.transf_name;
-    (* TODO should create a detached transformation *)
-    found_detached := true
+  try
+    match
+    (* add_registered_transformation actually apply the transformation. It can fail *)
+    try Some (add_registered_transformation new_s env old_tr new_goal_id)
+    with _ -> None
+  with
+  | Some new_tr_id ->
+    let new_tr = get_transfNode new_s new_tr_id in
+    (* attach the session to the subtasks to be able to instantiate Pairing *)
+    let new_subtasks = List.map (fun id -> id,new_s)
+                                new_tr.transf_subtasks in
+    let associated,detached =
+      AssoGoals.associate ~use_shapes old_subtasks new_subtasks
+    in
+    List.iter
+      (function
+        | ((new_goal_id,_), Some ((old_goal_id,_), goal_obsolete)) ->
+           merge_goal ~use_shapes env new_s old_s ~goal_obsolete
+                      (get_proofNode old_s old_goal_id) new_goal_id
+        | ((id,s), None) ->
+           Debug.dprintf debug "[merge_trans] missed new subgoal: %s@."
+                         (get_proofNode s id).proofn_name.Ident.id_string;
+           found_detached := true)
+      associated;
+    (* save the detached goals *)
+    let detached = List.map (fun (id,_) ->
+                Debug.dprintf debug "[merge_trans] detached subgoal: %s@."
+                              (get_proofNode old_s id).proofn_name.Ident.id_string;
+                found_detached := true;
+                id) detached in
+    new_tr.transf_subtasks <-
+      new_tr.transf_subtasks @
+        save_detached_goals old_s detached new_s (Trans new_tr_id)
+  | None ->
+     Debug.dprintf debug
+                   "[Session_itp.merge_trans] transformation failed: %s@."
+                   old_tr.transf_name;
+     save_detached_trans old_s new_s new_goal_id old_tr_id;
+     found_detached := true
+  with e when not (Debug.test_flag debug_stack_trace) ->
+    Printexc.print_backtrace stderr;
+    Format.eprintf "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
+    exit 2
 
 
 let merge_theory ~use_shapes env old_s old_th s th : unit =
@@ -1544,12 +1520,9 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
            (Hstr.find old_goals_table new_goal_name) in
          Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
-           match new_goal.proofn_checksum, old_goal.proofn_checksum with
-           | None, _ -> assert false
-           | Some _, None ->
-             Debug.dprintf debug "[merge_theory] goal has no checksum@.";
-             not same_theory_checksum
-           | Some s1, Some s2 ->
+           not same_theory_checksum &&
+             let s1 = new_goal.proofn_checksum in
+             let s2 = old_goal.proofn_checksum in
              Debug.dprintf debug "[merge_theory] goal has checksum@.";
              not (Termcode.equal_checksum s1 s2)
          in
@@ -1579,7 +1552,7 @@ let merge_theory ~use_shapes env old_s old_th s th : unit =
     associated;
   (* store the detached goals *)
   let detached = List.map (fun (a,_) -> a) detached in
-  th.theory_detached_goals <- save_detached_goals old_s detached s (Theory th);
+  th.theory_goals <- th.theory_goals @ save_detached_goals old_s detached s (Theory th);
   (* If we are not using shapes, we want to recover the goals that were
      "wrongly" marked as obsolete during AssoGoals.simple_associate. The
      condition for this to be correct is to check that the checksum of the
@@ -1620,7 +1593,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
                  theory_is_detached = detached;
                  theory_goals = goalsID;
                  theory_parent_name = parent_name;
-                 theory_detached_goals = [] } in
+               } in
   let parent = Theory theory in
   List.iter2 (add_goal parent) tasks goalsID;
   begin
@@ -1633,31 +1606,43 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 
 (* add a why file to a session *)
 let add_file_section (s:session) (fn:string)
-    (theories:Theory.theory list) format : file =
+    (theories:Theory.theory list option) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
   Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
   if Hstr.mem s.session_files fn then
     begin
-      Debug.dprintf debug "[session] file %s already in database@." fn;
-      assert false
+      Printexc.print_backtrace stderr;
+      Format.eprintf "[session] FATAL: file %s already in database@." fn;
+      exit 2
     end
   else
-    let f = { file_name = fn;
-              file_format = format;
-              file_theories = [] }
-    in
-    Hstr.add s.session_files fn f;
-    let theories = List.map (make_theory_section ~detached:false s fn) theories in
-    f.file_theories <- theories;
-    f
+    match theories with
+    | None ->
+       let f = { file_name = fn;
+                 file_format = format;
+                 file_is_detached = true;
+                 file_theories = [] }
+       in
+       Hstr.add s.session_files fn f;
+       f
+    | Some ths ->
+       let f = { file_name = fn;
+                 file_format = format;
+                 file_is_detached = false;
+                 file_theories = [] }
+       in
+       Hstr.add s.session_files fn f;
+       let theories = List.map (make_theory_section ~detached:false s fn) ths in
+       f.file_theories <- theories;
+       f
 
-      (* add a why file to a session and try to merge its theories with the
+(* add a why file to a session and try to merge its theories with the
    provided ones with matching names *)
 let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
     (s:session) (fn:string) (theories:Theory.theory list) format
     : unit =
   Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
-  let f = add_file_section s fn [] format in
+  let f = add_file_section s fn (Some []) format in
   let fn = f.file_name in
   let theories,detached =
     let old_th_table = Hstr.create 7 in
@@ -1685,7 +1670,7 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~env
                      (fun _key th tl ->
                       (save_detached_theory fn old_ses th s) :: tl)
                      old_th_table [] in
-    theories, detached
+    theories, List.rev detached
   in
   f.file_theories <- theories (*@ detached*);
   update_file_node (fun _ -> ()) s f
@@ -1716,21 +1701,28 @@ let merge_file  ~use_shapes env (ses : session) (old_ses : session) file =
   let format = file_format file in
   let old_theories = file_theories file in
   let file_name = Filename.concat (get_dir old_ses) (file_name file) in
-  let new_theories =
-    try
-      read_file env file_name ?format
-    with e -> (* TODO: filter only syntax error and typing errors *)
-      raise e
-  in
-  merge_file_section
-    ses ~use_shapes ~old_ses ~old_theories
-    ~env file_name new_theories format
+  try
+    let new_theories = read_file env file_name ?format in
+    merge_file_section
+      ses ~use_shapes ~old_ses ~old_theories
+      ~env file_name new_theories format;
+    None
+  with e -> (* TODO: capture only parsing and typing errors *)
+    merge_file_section
+      ses ~use_shapes ~old_ses ~old_theories
+      ~env file_name [] format;
+    Some e
 
 let merge_files ~use_shapes env (ses:session)  (old_ses : session) =
-  Stdlib.Hstr.iter
-    (fun _ f -> merge_file ~use_shapes env ses old_ses f)
-    (get_files old_ses);
-  !found_obsolete,!found_detached
+  let errors =
+    Stdlib.Hstr.fold
+      (fun _ f acc ->
+       match merge_file ~use_shapes env ses old_ses f with
+       | None -> acc
+       | Some e -> e :: acc)
+      (get_files old_ses) []
+  in
+  (errors,!found_obsolete,!found_detached)
 
 
 (************************)
@@ -1907,11 +1899,7 @@ let rec save_goal s ctxt fmt pnid =
     save_ident pn.proofn_name
     (save_string_attrib "expl") pn.proofn_expl
     (save_bool_def "proved" false) (pn_proved s pnid);
-  let sum =
-    match pn.proofn_checksum with
-    | None -> assert false
-    | Some s -> Termcode.string_of_checksum s
-  in
+  let sum = Termcode.string_of_checksum pn.proofn_checksum in
   let shape = Termcode.string_of_shape pn.proofn_shape in
   assert (shape <> "");
   Compress.Compress_z.output_string ctxt.ch_shapes sum;

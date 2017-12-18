@@ -44,8 +44,10 @@ let deref_id ~loc id =
   mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (mixfix ~loc "[]<-", [a; i; v]))
-let constant ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec s})))
+let constant ~loc i =
+  mk_expr ~loc (Econst (Number.const_of_int i))
+let constant_s ~loc s =
+  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s})))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =
@@ -142,7 +144,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Ebool b ->
     mk_expr ~loc (if b then Etrue else Efalse)
   | Py_ast.Eint s ->
-    constant ~loc s
+    constant_s ~loc s
   | Py_ast.Estring _s ->
     mk_unit ~loc (*FIXME*)
   | Py_ast.Eident id ->
@@ -180,15 +182,15 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Emake (e1, e2) -> (* [e1]*e2 *)
     array_make ~loc (expr env e2) (expr env e1)
   | Py_ast.Elist [] ->
-    array_make ~loc (constant ~loc "0") (constant ~loc "0")
+    array_make ~loc (constant ~loc 0) (constant ~loc 0)
   | Py_ast.Elist el ->
     let n = List.length el in
-    let n = constant ~loc (string_of_int n) in
+    let n = constant ~loc n in
     let id = mk_id ~loc "new array" in
-    mk_expr ~loc (Elet (id, Gnone, array_make ~loc n (constant ~loc "0"),
+    mk_expr ~loc (Elet (id, Gnone, array_make ~loc n (constant ~loc 0),
     let i = ref (-1) in
     let init seq e =
-      incr i; let i = constant ~loc (string_of_int !i) in
+      incr i; let i = constant ~loc !i in
       let assign = array_set ~loc (mk_var ~loc id) i (expr env e) in
       mk_expr ~loc (Esequence (assign, seq)) in
     List.fold_left init (mk_var ~loc id) el))
@@ -242,7 +244,7 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
                  inv, body) ->
     let inv = List.map (deref env) inv in
     let e_to = expr env e2 in
-    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [e_to;constant ~loc "1"])) in
+    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [e_to;constant ~loc 1])) in
     mk_expr ~loc (Efor (id, expr env e1, To, ub, inv,
     mk_expr ~loc (Elet (id, Gnone, mk_ref ~loc (mk_var ~loc id),
     let env = add_var env id in
@@ -263,9 +265,9 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     let i, l, env = for_vars ~loc env in
     let e = expr env e in
     mk_expr ~loc (Elet (l, Gnone, e, (* evaluate e only once *)
-    let lb = constant ~loc "0" in
+    let lb = constant ~loc 0 in
     let lenl = mk_expr ~loc (Eidapp (len ~loc, [mk_var ~loc l])) in
-    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl;constant ~loc "1"])) in
+    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl;constant ~loc 1])) in
     let invariant inv =
       let loc = inv.term_loc in
       let li = mk_term ~loc

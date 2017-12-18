@@ -97,7 +97,7 @@ let mk_lexpr p = { term_loc = Loc.dummy_position;
                    term_desc = p }
 
 let mk_const s =
-  mk_lexpr (Tconst Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec s }))
+  mk_lexpr (Tconst Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s }))
 
 let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 

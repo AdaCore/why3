@@ -84,18 +84,25 @@ let revert g d : Term.term =
   | Dprop (Pgoal, _, _) -> raise (Arg_trans "revert: cannot revert goal")
   | _ -> raise (Arg_trans "revert: please report")
 
+(* Transformation to use fold_map only on declarations. *)
+let fold_map f init =
+  Trans.fold_map (fun thd (acc, task) ->
+    match thd.Task.task_decl.Theory.td_node with
+    | Theory.Use _
+    | Theory.Clone _
+    | Theory.Meta _ -> (acc, Task.add_tdecl task thd.Task.task_decl)
+    | Theory.Decl d -> f d (acc, task)) init None
 
 (* Takes a list of prop l and a goal g and reverts the list
    of prop to the goal g *)
 let revert_list (l: decl list) g =
   List.fold_left revert g l
 
-(* TODO To be checked *)
+(* Go through a term and collect constants *)
 let add_ls_term s t =
   let rec my_fold s t =
     match t.t_node with
     | Tapp (ls, []) ->
-        (* Interesting case *)
         Sls.add ls s
     | _ -> Term.t_fold my_fold s t
   in
@@ -105,7 +112,7 @@ let add_lsymbol s (ls_def: Decl.ls_defn) =
   let _vsl, t = Decl.open_ls_defn ls_def in
   add_ls_term s t
 
-(* This collects the lsymbols appearing in a decl. It is useful to have
+(* This collects the constant lsymbols appearing in a decl. It is useful to have
    dependencies during induction. We want to generalize all decls that contain
    some lsymbols (the one which appears in the goal or the symbol on which we do
    the induction. *)
@@ -124,7 +131,53 @@ let collect_lsymbol s (d: decl) =
   | Dprop (_k, _pr, t) ->
       add_ls_term s t
 
+(* [depends dep d]: returns true if there is a constant that is both in dep and
+   used in the declaration d.  *)
+let depends dep d =
+  let new_set = collect_lsymbol Sls.empty d in
+  if Sls.equal (Sls.inter dep new_set) Sls.empty then
+    false
+  else
+    true
 
+(* TODO Do a transformation as a fold that reverts automatically dependencies
+   but that could be used elsewhere instead of all those adhoc functions. *)
+let revert_tr prlist lslist =
+  fold_map (fun d ((acc, dep), task) ->
+    match d.d_node with
+    | Dparam ls when (depends dep d ||
+      List.exists (fun ls1 -> ls_equal ls ls1) lslist) ->
+        ((d :: acc, Sls.add ls dep), task)
+    | Dprop (k, pr1, _) when k != Pgoal
+          && (depends dep d || List.exists (fun pr -> pr_equal pr pr1) prlist)
+      ->
+        ((d :: acc, dep), task)
+    | Dprop (k, pr1, g) when k = Pgoal ->
+      begin
+        match acc with
+        | [] ->
+            raise (Arg_trans "prsymbol not found")
+        | drevlist ->
+          let new_goal = Decl.create_prop_decl k pr1 (revert_list drevlist g) in
+          (([], Sls.empty), Task.add_decl task new_goal)
+      end
+    | _ -> ((acc, dep), Task.add_decl task d)
+    )
+    ([], Sls.empty)
+
+let revert_tr_symbol symbol_list =
+
+  (* Order does not matter *)
+  let rec convert_list pr_acc ls_acc symbollist =
+    match symbollist with
+    | [] -> (pr_acc, ls_acc)
+    | Tsprsymbol pr :: tl -> convert_list (pr :: pr_acc) ls_acc tl
+    | Tslsymbol ls :: tl -> convert_list pr_acc (ls :: ls_acc) tl
+    | Tstysymbol _ :: tl ->
+        raise (Arg_trans "Tysymbol should not appear here. Please report")
+  in
+  let (prlist, lslist) = convert_list [] [] symbol_list in
+  revert_tr prlist lslist
 
 (* s is a set of variables, g is a term. If d contains one of the elements of s
    then all variables of d are added to s and the declaration is prepended to g.
@@ -243,3 +296,8 @@ let () = wrap_and_register
     ~desc:"induction <term1> [from] <term2> performs a strong induction on int term1 from int term2. term2 is optional and default to 0."
     "induction"
     (Tterm (Topt ("from", Tterm Tenvtrans_l))) induction
+
+let () = wrap_and_register
+    ~desc:"revert <list> puts list back in the goal."
+    "revert"
+    (Tlist Ttrans) revert_tr_symbol

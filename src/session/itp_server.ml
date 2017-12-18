@@ -268,7 +268,6 @@ let print_request fmt r =
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
-  | Copy_detached _                 -> fprintf fmt "copy detached"
   | Save_file_req _                 -> fprintf fmt "save file"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
@@ -625,37 +624,37 @@ end
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
-  (* Send all source files from the controller session to the IDE *)
-  let load_files_session () =
-    let d = get_server_data () in
-    let s = d.cont.controller_session in
-    let files = Session_itp.get_files s in
-    Stdlib.Hstr.iter (fun _ f ->
-                      Debug.dprintf debug "load_files_session: loading '%s'@." (file_name f);
-                      read_and_send (file_name f)) files
-
   let relativize_location s loc =
     let f, l, b, e = Loc.get loc in
     let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
     Loc.user_position f l b e
 
   let capture_parse_or_type_errors f cont =
-    try let _ = f cont in None with
-    | Loc.Located (loc, e) ->
-      let rel_loc = relativize_location cont.controller_session loc in
-      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Some (loc, rel_loc, s)
-    | e when not (Debug.test_flag Debug.stack_trace) ->
-      let s = Format.asprintf "%a" Exn_printer.exn_printer e in
-      Some (Loc.dummy_position, Loc.dummy_position, s)
+    List.map
+      (function
+        | Loc.Located (loc, e) ->
+           let rel_loc = relativize_location cont.controller_session loc in
+           let s = Format.asprintf "%a: %a" Loc.gen_report_position rel_loc
+                                   Exn_printer.exn_printer e in
+           (loc, rel_loc, s)
+        | e when not (Debug.test_flag Debug.stack_trace) ->
+           let s = Format.asprintf "%a" Exn_printer.exn_printer e in
+           (Loc.dummy_position, Loc.dummy_position, s)
+        | e -> raise e)
+      (f cont)
 
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~use_shapes =
-    capture_parse_or_type_errors (reload_files ~use_shapes) cont
+    capture_parse_or_type_errors
+      (fun c -> let (e,_,_) = reload_files ~use_shapes c in e) cont
 
   let add_file cont ?format fname =
-    capture_parse_or_type_errors (fun c -> add_file c ?format fname) cont
+    capture_parse_or_type_errors
+      (fun c ->
+       match add_file c ?format fname with
+       | None -> []
+       | Some e -> [e]) cont
 
 
   (* -----------------------------------   ------------------------------------- *)
@@ -781,10 +780,6 @@ end
       (* Specific to auto-focus at initialization of itp_server *)
       focus_on_label node;
       P.notify (New_node (new_id, parent, node_type, node_name, node_detached));
-(*
-      if node_type = NFile then
-        read_and_send node_name;
- *)
       get_node_proved new_id node;
       new_id
 
@@ -932,14 +927,18 @@ end
         if (Sys.file_exists f) then
           begin
             match add_file cont f with
-            | None ->
+            | [] ->
                let file = get_file cont.controller_session fn in
                send_new_subtree_from_file file;
                read_and_send (file_name file);
                P.notify (Message (Information "file added in session"))
-            | Some(loc,rel_loc,s) ->
+            | l ->
                read_and_send fn;
-               P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+               List.iter
+                 (function
+                   | (loc,rel_loc,s) ->
+                      P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+                 l
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
@@ -990,7 +989,6 @@ end
     in
     Debug.dprintf debug "sending initialization infos@.";
     P.notify (Initialized infos);
-    load_files_session ();
     Debug.dprintf debug "reloading source files@.";
     let x = reload_files d.cont ~use_shapes in
     reset_and_send_the_whole_tree ();
@@ -998,10 +996,13 @@ end
            focus on a specific node. *)
     get_focused_label := None;
     match x with
-    | None ->
-       P.notify (Message (Information "Session initialized succesfully"))
-    | Some(loc,rel_loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+    | [] ->
+       P.notify (Message (Information "Session initialized successfully"))
+    | l ->
+       List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
 
 
   (* ----------------- Schedule proof attempt -------------------- *)
@@ -1209,13 +1210,17 @@ end
     let _old_focus = !focused_node in
     unfocus ();
     clear_tables ();
-    match reload_files d.cont ~use_shapes:true with
-    | None ->
-        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       reset_and_send_the_whole_tree ();
+    let l = reload_files d.cont ~use_shapes:true in
+    reset_and_send_the_whole_tree ();
+    match l with
+    | [] ->
+       (* TODO: try to restore the previous focus : focused_node := old_focus; *)
        P.notify (Message (Information "Session refresh successful"))
-    | Some(loc,rel_loc,s) ->
-       P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s)))
+    | l ->
+       List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
@@ -1298,14 +1303,6 @@ end
           ~callback_pa:(callback_update_tree_proof d.cont)
           ~callback_tr:(callback_update_tree_transform)
           d.cont from_any to_any
-
-    | Copy_detached from_id        ->
-        let from_any = any_from_node_ID from_id in
-        let copy ~parent p =
-          let parent = node_ID_from_any parent in
-          ignore (new_node ~parent p)
-        in
-        C.copy_detached ~copy d.cont from_any
     | Get_file_contents f          ->
         read_and_send f
     | Save_file_req (name, text)   ->

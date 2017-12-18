@@ -182,7 +182,7 @@ module PSession = struct
        List.fold_right
          (fun g -> n (Goal g))
          (theory_goals th)
-         (List.fold_right (fun g -> n (Goal g)) (theory_detached_goals th) [])
+         []
     | Goal id ->
        let gid = get_proof_name s id in
        let name = gid.Ident.id_string in
@@ -203,10 +203,8 @@ module PSession = struct
        let name = get_transf_name s id in
        let name = if tn_proved s id then name^"!" else name^"?" in
        let sts = get_sub_tasks s id in
-       let dsts = get_detached_sub_tasks s id in
        name,
-       List.fold_right (fun g -> n (Goal g)) sts
-                       (List.fold_right (fun g -> n (Goal g)) dsts [])
+       List.fold_right (fun g -> n (Goal g)) sts []
 
 end
 
@@ -228,16 +226,23 @@ let print_session fmt c =
 let reload_files (c : controller) ~use_shapes =
   let old_ses = c.controller_session in
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
-  try
+(*  try
+ *)
     merge_files ~use_shapes c.controller_env c.controller_session old_ses
+(* not need_anymore
   with e ->
     c.controller_session <- old_ses;
     raise e
+ *)
 
 let add_file c ?format fname =
-  let theories = Session_itp.read_file c.controller_env ?format fname in
+  let theories,errors =
+    try Some (Session_itp.read_file c.controller_env ?format fname), None
+    with e -> None, Some e
+  in
   let (_ : file) = add_file_section c.controller_session fname theories format in
-  ()
+  errors
+
 
 
 module type Scheduler = sig
@@ -773,21 +778,25 @@ let proof_is_complete pa =
 let clean c ~removed nid =
 
   (* clean should not change proved status *)
-  let notification _ = assert false in
+  let notification any =
+    Format.eprintf "Cleaning error: cleaning attempts to change status of node %a@." fprintf_any any
+  in
   let s = c.controller_session in
   (* This function is applied on leafs first for the case of removes *)
   let clean_aux () any =
-    match any with
-    | APa pa ->
-        let pa = Session_itp.get_proof_attempt_node s pa in
-        if pn_proved s pa.parent then
-          if not (proof_is_complete pa) then
-            remove_subtree ~notification ~removed c any
+    let do_remove =
+      Session_itp.is_detached s any ||
+      match any with
+      | APa pa ->
+         let pa = Session_itp.get_proof_attempt_node s pa in
+         pn_proved s pa.parent && not (proof_is_complete pa)
       | ATn tn ->
-        let pn = get_trans_parent s tn in
-        if pn_proved s pn && not (tn_proved s tn) then
-          remove_subtree ~notification ~removed c (ATn tn)
-      | _ -> ()
+         let pn = get_trans_parent s tn in
+         pn_proved s pn && not (tn_proved s tn)
+      | _ -> false
+    in
+    if do_remove then
+      remove_subtree ~notification ~removed c any
   in
 
   match nid with
@@ -850,24 +859,6 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
           List.iter2 (fun x y -> copy_paste c (APn x) (APn y)
               ~notification ~callback_pa ~callback_tr) from_tn_list to_tn_list
     | _ -> raise BadCopyPaste
-
-
-let copy_detached ~copy c from_any =
-  match from_any with
-  | APn from_pn ->
-    begin
-      let pn_id = copy_proof_node_as_detached c.controller_session from_pn in
-      let parent = get_any_parent c.controller_session from_any in
-      match parent with
-      | None -> raise (BadCopyDetached "copy_detached no parent")
-      | Some parent ->
-          copy ~parent (APn pn_id);
-          copy_structure
-            ~notification:copy c.controller_session (APn from_pn) (APn pn_id)
-    end
-  (* Only goal can be detached *)
-  | _ -> raise (BadCopyDetached "copy_detached. Can only copy goal")
-
 
 
 

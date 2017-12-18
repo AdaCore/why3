@@ -4,652 +4,652 @@
 <why3session shape_version="4">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="3" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_PrefixSumRec.mlw" expanded="true">
-<theory name="PrefixSumRec" sum="1b00a2c5d7d1afdcb80528b764df8954" expanded="true">
- <goal name="Div_mod_2" expl="">
+<file name="../verifythis_PrefixSumRec.mlw" proved="true">
+<theory name="PrefixSumRec" proved="true" sum="8ac44d7d2579498bbc4a9b2019e229d8">
+ <goal name="Div_mod_2" proved="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
  <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
  <proof prover="3"><result status="valid" time="0.02"/></proof>
- <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
  <proof prover="7"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="is_power_of_2_1" expl="">
+ <goal name="is_power_of_2_1" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  <proof prover="1"><result status="valid" time="0.02"/></proof>
- <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="WP_parameter phase1_frame" expl="VC for phase1_frame">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter phase1_frame.1" expl="variant decrease">
+ <goal name="WP_parameter phase1_frame" expl="VC for phase1_frame" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter phase1_frame.0" expl="variant decrease" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.2" expl="precondition">
+  <goal name="WP_parameter phase1_frame.1" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.3" expl="precondition">
+  <goal name="WP_parameter phase1_frame.2" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="8"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.4" expl="variant decrease">
+  <goal name="WP_parameter phase1_frame.3" expl="variant decrease" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.5" expl="precondition">
+  <goal name="WP_parameter phase1_frame.4" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.6" expl="precondition">
+  <goal name="WP_parameter phase1_frame.5" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.7" expl="postcondition">
+  <goal name="WP_parameter phase1_frame.6" expl="postcondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame.8" expl="postcondition">
+  <goal name="WP_parameter phase1_frame.7" expl="postcondition" proved="true">
   <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.04"/></proof>
   <proof prover="3" timelimit="30" memlimit="4000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter phase1_frame2" expl="VC for phase1_frame2">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter phase1_frame2.1" expl="variant decrease">
+ <goal name="WP_parameter phase1_frame2" expl="VC for phase1_frame2" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter phase1_frame2.0" expl="variant decrease" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.2" expl="precondition">
+  <goal name="WP_parameter phase1_frame2.1" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.3" expl="precondition">
+  <goal name="WP_parameter phase1_frame2.2" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.4" expl="variant decrease">
+  <goal name="WP_parameter phase1_frame2.3" expl="variant decrease" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.5" expl="precondition">
+  <goal name="WP_parameter phase1_frame2.4" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
   <proof prover="7" timelimit="5"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.6" expl="precondition">
+  <goal name="WP_parameter phase1_frame2.5" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.7" expl="postcondition">
+  <goal name="WP_parameter phase1_frame2.6" expl="postcondition" proved="true">
   <proof prover="0" timelimit="30"><result status="valid" time="0.32"/></proof>
   <proof prover="1" timelimit="30"><result status="valid" time="0.27"/></proof>
   </goal>
-  <goal name="WP_parameter phase1_frame2.8" expl="postcondition">
+  <goal name="WP_parameter phase1_frame2.7" expl="postcondition" proved="true">
   <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="0.04"/></proof>
   <proof prover="3" timelimit="30" memlimit="4000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter upsweep" expl="VC for upsweep">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter upsweep.1" expl="variant decrease">
-  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
+ <goal name="WP_parameter upsweep" expl="VC for upsweep" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter upsweep.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.2" expl="precondition">
+  <goal name="WP_parameter upsweep.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
   <proof prover="3"><result status="valid" time="1.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.3" expl="precondition">
+  <goal name="WP_parameter upsweep.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="10"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.4" expl="precondition">
+  <goal name="WP_parameter upsweep.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="37"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.5" expl="variant decrease">
-  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="WP_parameter upsweep.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.6" expl="precondition">
+  <goal name="WP_parameter upsweep.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="14"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.7" expl="precondition">
+  <goal name="WP_parameter upsweep.6" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.8" expl="precondition">
+  <goal name="WP_parameter upsweep.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.9" expl="assertion">
+  <goal name="WP_parameter upsweep.8" expl="assertion" proved="true">
   <proof prover="1" timelimit="15"><result status="valid" time="0.53"/></proof>
-  <proof prover="6"><result status="valid" time="1.36" steps="152"/></proof>
+  <proof prover="2"><result status="valid" time="0.16" steps="192"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.10" expl="assertion">
+  <goal name="WP_parameter upsweep.9" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.48"/></proof>
-  <proof prover="6"><result status="valid" time="1.25" steps="156"/></proof>
+  <proof prover="2"><result status="valid" time="0.13" steps="193"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.11" expl="assertion">
+  <goal name="WP_parameter upsweep.10" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.21" steps="82"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="64"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.12" expl="assertion">
+  <goal name="WP_parameter upsweep.11" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.36"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.13" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.12" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.00" steps="24"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.14" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.13" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.15" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.14" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.16" expl="assertion">
+  <goal name="WP_parameter upsweep.15" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.85"/></proof>
   <proof prover="1"><result status="valid" time="1.16"/></proof>
-  <proof prover="6"><result status="valid" time="0.10" steps="67"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="59"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.17" expl="assertion">
+  <goal name="WP_parameter upsweep.16" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.37"/></proof>
-  <proof prover="1"><result status="valid" time="1.22"/></proof>
-  <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
+  <proof prover="1"><result status="valid" time="1.60"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="54"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.18" expl="postcondition">
+  <goal name="WP_parameter upsweep.17" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.60"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.19" expl="postcondition">
+  <goal name="WP_parameter upsweep.18" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.44"/></proof>
-  <proof prover="6"><result status="valid" time="0.75" steps="162"/></proof>
+  <proof prover="2"><result status="valid" time="0.18" steps="240"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.20" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.19" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="7"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.21" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.20" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="9"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.22" expl="index in array bounds">
+  <goal name="WP_parameter upsweep.21" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="10"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="9"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.23" expl="assertion">
+  <goal name="WP_parameter upsweep.22" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.24" expl="assertion">
+  <goal name="WP_parameter upsweep.23" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.25" expl="postcondition">
+  <goal name="WP_parameter upsweep.24" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="18"/></proof>
   <proof prover="7"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter upsweep.26" expl="postcondition">
+  <goal name="WP_parameter upsweep.25" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="1"><result status="valid" time="0.20"/></proof>
-  <proof prover="6"><result status="valid" time="0.16" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="44"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter downsweep" expl="VC for downsweep">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter downsweep.1" expl="index in array bounds">
+ <goal name="WP_parameter downsweep" expl="VC for downsweep" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter downsweep.0" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="10"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="9"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.2" expl="assertion">
+  <goal name="WP_parameter downsweep.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.00" steps="10"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.3" expl="assertion">
+  <goal name="WP_parameter downsweep.2" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.00"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.4" expl="index in array bounds">
+  <goal name="WP_parameter downsweep.3" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="7"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.5" expl="index in array bounds">
+  <goal name="WP_parameter downsweep.4" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="13"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.6" expl="index in array bounds">
+  <goal name="WP_parameter downsweep.5" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="12"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.7" expl="index in array bounds">
+  <goal name="WP_parameter downsweep.6" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.8" expl="assertion">
+  <goal name="WP_parameter downsweep.7" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="54"/></proof>
   <proof prover="3"><result status="valid" time="5.56"/></proof>
-  <proof prover="6"><result status="valid" time="0.24" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.9" expl="assertion">
+  <goal name="WP_parameter downsweep.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.04" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="22"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.10" expl="assertion">
+  <goal name="WP_parameter downsweep.9" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.04" steps="25"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="45"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.11" expl="assertion">
-  <proof prover="1" timelimit="5"><result status="valid" time="0.54"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.12" steps="58"/></proof>
+  <goal name="WP_parameter downsweep.10" expl="assertion" proved="true">
+  <proof prover="1" timelimit="5"><result status="valid" time="0.84"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.12" steps="49"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.12" expl="variant decrease">
-  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
+  <goal name="WP_parameter downsweep.11" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.13" expl="precondition">
+  <goal name="WP_parameter downsweep.12" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="27"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="27"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.14" expl="precondition">
+  <goal name="WP_parameter downsweep.13" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="22"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.15" expl="precondition">
+  <goal name="WP_parameter downsweep.14" expl="precondition" proved="true">
   <proof prover="1" timelimit="5"><result status="valid" time="0.23"/></proof>
-  <proof prover="6" memlimit="1000"><result status="valid" time="0.11" steps="42"/></proof>
+  <proof prover="2" memlimit="1000"><result status="valid" time="0.11" steps="72"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.16" expl="precondition">
+  <goal name="WP_parameter downsweep.15" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="65"/></proof>
   <proof prover="3"><result status="valid" time="6.83"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="30"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.17" expl="precondition">
+  <goal name="WP_parameter downsweep.16" expl="precondition" proved="true">
   <proof prover="0" timelimit="30"><result status="valid" time="2.93"/></proof>
   <proof prover="3" timelimit="30"><result status="valid" time="1.28"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.18" expl="assertion">
-  <proof prover="0" timelimit="30"><result status="valid" time="7.83"/></proof>
+  <goal name="WP_parameter downsweep.17" expl="assertion" proved="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="4.99"/></proof>
   <proof prover="1" timelimit="30"><result status="valid" time="3.47"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.19" expl="variant decrease">
-  <proof prover="6"><result status="valid" time="0.06" steps="43"/></proof>
+  <goal name="WP_parameter downsweep.18" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="43"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.20" expl="precondition">
+  <goal name="WP_parameter downsweep.19" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="32"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.00" steps="27"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.21" expl="precondition">
+  <goal name="WP_parameter downsweep.20" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="27"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.22" expl="precondition">
+  <goal name="WP_parameter downsweep.21" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="27"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.23" expl="precondition">
+  <goal name="WP_parameter downsweep.22" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09"/></proof>
   <proof prover="1"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.24" steps="67"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="64"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.24" expl="precondition">
+  <goal name="WP_parameter downsweep.23" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.17"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="34"/></proof>
   <proof prover="3"><result status="valid" time="0.01"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="35"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.25" expl="assertion">
+  <goal name="WP_parameter downsweep.24" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="1.57"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="75"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.25" steps="64"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.26" expl="assertion">
+  <goal name="WP_parameter downsweep.25" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="35"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.27" expl="postcondition">
+  <goal name="WP_parameter downsweep.26" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.26"/></proof>
-  <proof prover="1"><result status="valid" time="0.52"/></proof>
-  <proof prover="6"><result status="valid" time="0.42" steps="119"/></proof>
+  <proof prover="1"><result status="valid" time="0.71"/></proof>
+  <proof prover="2"><result status="valid" time="0.14" steps="144"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.28" expl="postcondition">
+  <goal name="WP_parameter downsweep.27" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="3.36"/></proof>
   <proof prover="1" timelimit="15"><result status="valid" time="1.58"/></proof>
-  <proof prover="6"><result status="valid" time="0.24" steps="83"/></proof>
+  <proof prover="2"><result status="valid" time="0.24" steps="127"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.29" expl="postcondition">
+  <goal name="WP_parameter downsweep.28" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="4.55"/></proof>
-  <proof prover="1"><result status="valid" time="1.27"/></proof>
+  <proof prover="1"><result status="valid" time="1.54"/></proof>
+  <proof prover="2"><result status="valid" time="0.11" steps="83"/></proof>
   <proof prover="3"><result status="valid" time="0.74"/></proof>
-  <proof prover="6"><result status="valid" time="0.11" steps="47"/></proof>
   <proof prover="7"><result status="valid" time="0.11"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.30" expl="postcondition">
+  <goal name="WP_parameter downsweep.29" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.12"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.31" expl="postcondition">
+  <goal name="WP_parameter downsweep.30" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="3"><result status="valid" time="0.15"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="WP_parameter downsweep.32" expl="postcondition">
+  <goal name="WP_parameter downsweep.31" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="3"><result status="valid" time="0.11"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter compute_sums" expl="VC for compute_sums">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter compute_sums.1" expl="precondition">
+ <goal name="WP_parameter compute_sums" expl="VC for compute_sums" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter compute_sums.0" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="12"/></proof>
   <proof prover="3"><result status="valid" time="1.12"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.2" expl="precondition">
+  <goal name="WP_parameter compute_sums.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="11"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.3" expl="precondition">
+  <goal name="WP_parameter compute_sums.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="36"/></proof>
   <proof prover="3"><result status="valid" time="6.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.10" steps="26"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.4" expl="assertion">
+  <goal name="WP_parameter compute_sums.3" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.28"/></proof>
   <proof prover="1"><result status="valid" time="0.23"/></proof>
-  <proof prover="6"><result status="valid" time="0.61" steps="141"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="155"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.5" expl="index in array bounds">
+  <goal name="WP_parameter compute_sums.4" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="13"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.6" expl="precondition">
+  <goal name="WP_parameter compute_sums.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.7" expl="precondition">
+  <goal name="WP_parameter compute_sums.6" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="15"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.8" expl="precondition">
+  <goal name="WP_parameter compute_sums.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="16"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="15"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.9" expl="precondition">
+  <goal name="WP_parameter compute_sums.8" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="31"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.10" expl="precondition">
+  <goal name="WP_parameter compute_sums.9" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.18"/></proof>
   <proof prover="1"><result status="valid" time="0.37"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="31"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.11" expl="assertion">
+  <goal name="WP_parameter compute_sums.10" expl="assertion" proved="true">
   <proof prover="1" timelimit="15"><result status="valid" time="0.27"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.20" steps="47"/></proof>
   <proof prover="7"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter compute_sums.12" expl="postcondition">
+  <goal name="WP_parameter compute_sums.11" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.49"/></proof>
   <proof prover="1"><result status="valid" time="0.19"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter test_harness" expl="VC for test_harness">
- <transf name="split_goal_wp">
-  <goal name="WP_parameter test_harness.1" expl="array creation size">
+ <goal name="WP_parameter test_harness" expl="VC for test_harness" proved="true">
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="WP_parameter test_harness.0" expl="array creation size" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="0"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.2" expl="assertion">
+  <goal name="WP_parameter test_harness.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="13"/></proof>
   <proof prover="3"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.07" steps="12"/></proof>
   <proof prover="7"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.3" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.2" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="4"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.4" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.3" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="7"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.5" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.4" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="10"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.6" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.5" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.7" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.6" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="16"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.8" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.7" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.00" steps="20"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.00" steps="19"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.9" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.8" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="22"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.10" expl="index in array bounds">
+  <goal name="WP_parameter test_harness.9" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="25"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.11" expl="precondition">
+  <goal name="WP_parameter test_harness.10" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="29"/></proof>
   <proof prover="3"><result status="valid" time="0.00"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="28"/></proof>
   <proof prover="7"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.12" expl="precondition">
+  <goal name="WP_parameter test_harness.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="30"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="29"/></proof>
   <proof prover="7"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.13" expl="assertion">
+  <goal name="WP_parameter test_harness.12" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
   <proof prover="3"><result status="valid" time="0.02"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="35"/></proof>
   <proof prover="7"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.14" expl="assertion">
+  <goal name="WP_parameter test_harness.13" expl="assertion" proved="true">
   <proof prover="0" timelimit="30"><result status="valid" time="0.03"/></proof>
   <proof prover="1" timelimit="30"><result status="valid" time="0.06"/></proof>
-  <proof prover="3" timelimit="30"><result status="valid" time="0.60"/></proof>
-  <proof prover="6" timelimit="30" memlimit="1000"><result status="valid" time="0.02" steps="41"/></proof>
+  <proof prover="2" timelimit="30" memlimit="1000"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="3" timelimit="30"><result status="valid" time="0.78"/></proof>
   <proof prover="7" timelimit="30"><result status="valid" time="0.16"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.15" expl="assertion">
+  <goal name="WP_parameter test_harness.14" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="37"/></proof>
   <proof prover="3"><result status="valid" time="9.94"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="42"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.16" expl="assertion">
+  <goal name="WP_parameter test_harness.15" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="43"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.17" expl="assertion">
+  <goal name="WP_parameter test_harness.16" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.03" steps="44"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="39"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.18" expl="assertion">
+  <goal name="WP_parameter test_harness.17" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="45"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="40"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.19" expl="assertion">
+  <goal name="WP_parameter test_harness.18" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="6"><result status="valid" time="0.02" steps="46"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="41"/></proof>
   </goal>
-  <goal name="WP_parameter test_harness.20" expl="assertion">
+  <goal name="WP_parameter test_harness.19" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.13"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="42"/></proof>
   <proof prover="3"><result status="valid" time="0.62"/></proof>
-  <proof prover="6"><result status="valid" time="0.01" steps="48"/></proof>
   <proof prover="7"><result status="valid" time="0.16"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="WP_parameter bench" expl="VC for bench">
- <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
+ <goal name="WP_parameter bench" expl="VC for bench" proved="true">
+ <proof prover="2"><result status="valid" time="2.24" steps="64"/></proof>
  </goal>
 </theory>
 </file>

@@ -147,13 +147,13 @@ rule token = parse
   | uident_quote as id
       { UIDENT_QUOTE id }
   | ['0'-'9'] ['0'-'9' '_']* as s
-      { INTEGER (Number.int_const_dec (Lexlib.remove_underscores s)) }
+      { INTEGER (Number.int_literal_dec (Lexlib.remove_underscores s)) }
   | '0' ['x' 'X'] (['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']* as s)
-      { INTEGER (Number.int_const_hex (Lexlib.remove_underscores s)) }
+      { INTEGER (Number.int_literal_hex (Lexlib.remove_underscores s)) }
   | '0' ['o' 'O'] (['0'-'7'] ['0'-'7' '_']* as s)
-      { INTEGER (Number.int_const_oct (Lexlib.remove_underscores s)) }
+      { INTEGER (Number.int_literal_oct (Lexlib.remove_underscores s)) }
   | '0' ['b' 'B'] (['0'-'1'] ['0'-'1' '_']* as s)
-      { INTEGER (Number.int_const_bin (Lexlib.remove_underscores s)) }
+      { INTEGER (Number.int_literal_bin (Lexlib.remove_underscores s)) }
   | (digit+ as i) ("" as f) ['e' 'E'] (['-' '+']? digit+ as e)
   | (digit+ as i) '.' (digit* as f) (['e' 'E'] (['-' '+']? digit+ as e))?
   | (digit* as i) '.' (digit+ as f) (['e' 'E'] (['-' '+']? digit+ as e))?

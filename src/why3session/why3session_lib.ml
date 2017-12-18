@@ -88,14 +88,16 @@ let read_update_session ~allow_obsolete env config fname =
   S.update_session ~ctxt session env config
  *)
   let cont = Controller_itp.create_controller config env session in
-  let found_obs, some_merge_miss =
-    try
-      Controller_itp.reload_files cont ~use_shapes
-    with
-    | e ->
-       Format.eprintf "%a@." Exn_printer.exn_printer e;
-       exit 1
+  let errors, found_obs, some_merge_miss =
+    Controller_itp.reload_files cont ~use_shapes
   in
+  begin
+    match errors with
+    | [] -> ()
+    | l ->
+       List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
+       exit 1
+  end;
   if (found_obs || some_merge_miss) && not allow_obsolete then raise Exit;
   cont, found_obs, some_merge_miss
 
