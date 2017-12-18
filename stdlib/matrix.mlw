@@ -24,6 +24,7 @@ module Matrix
     ensures  { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
 
   (** unsafe get/set operations with no precondition *)
+
   exception OutOfBounds
 
   let defensive_get (a: matrix 'a) (r c: int) : 'a

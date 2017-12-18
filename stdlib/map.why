@@ -57,6 +57,7 @@ theory MapSorted
 end
 
 (** {2 Maps Equality (indexed by integers)} *)
+
 theory MapEq
 
   use import int.Int
@@ -85,6 +86,7 @@ theory MapExchange
 end
 
 (** {2 Sum of elements of a map (indexed by integers)} *)
+
 theory MapSum
 
   use import int.Int
@@ -106,7 +108,7 @@ theory Occ
   use import Map
 
   function occ (v: 'a) (m: map int 'a) (l u: int) : int
-    (** number of occurrences of v in m between l included and u excluded *)
+    (** number of occurrences of [v] in [m] between [l] included and [u] excluded *)
 
   axiom occ_empty:
     forall v: 'a, m: map int 'a, l u: int.
@@ -186,6 +188,7 @@ end
 
 
 (** {2 Injectivity and surjectivity for maps (indexed by integers)} *)
+
 theory MapInjection
 
   use import int.Int
@@ -220,11 +223,10 @@ theory MapInjection
 
 end
 
-
+(***
 
 (** {2 Parametric Maps} *)
 
-(*
 theory MapParam
 
   type idx

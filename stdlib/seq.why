@@ -11,23 +11,19 @@ theory Seq
   use import int.Int
 
   (** the polymorphic type of sequences *)
-
   type seq 'a
 
   (** [seq 'a] is an infinite type *)
   meta "infinite_type" type seq
-
-  (** length *)
 
   val function length (seq 'a) : int
 
   axiom length_nonnegative:
     forall s: seq 'a. 0 <= length s
 
-  (** n-th element *)
   val function get (seq 'a) int : 'a
-    (** [get s i] is the ([i]+1)-th element of sequence [s]
-        (the first element has index 0) *)
+  (** [get s i] is the ([i]+1)-th element of sequence [s]
+      (the first element has index 0) *)
 
   let function ([]) (s: seq 'a) (i: int) : 'a =
     get s i
@@ -44,25 +40,25 @@ theory Seq
     ensures { length result = len }
     ensures { forall i. 0 <= i < len -> result[i] = f i }
 
-  (** empty sequence *)
-  (* FIXME: could be defined, but let constant does
+  (*** FIXME: could be defined, but let constant does
      not accept spec. *)
-  val constant empty : seq 'a
-    ensures { length result = 0 }
-  (* let constant empty : seq 'a
+  (*** let constant empty : seq 'a
     ensures { length result = 0 }
   = while false do variant { 0 } () done;
     create 0 (fun _ requires { false } -> absurd)
    *)
 
-  (** update *)
+  (** empty sequence *)
+  val constant empty : seq 'a
+    ensures { length result = 0 }
+
+  (** [set s i v] is a new sequence [u] such that
+      [u[i] = v] and [u[j] = s[j]] otherwise *)
   let function set (s:seq 'a) (i:int) (v:'a) : seq 'a
     requires { 0 <= i < length s }
     ensures { length result = length s }
     ensures { result[i] = v }
     ensures { forall j. 0 <= j < length s /\ j <> i -> result[j] = s[j] }
-    (** [set s i v] is a new sequence [u] such that
-        [u[i] = v] and [u[j] = s[j]] otherwise *)
   = while false do variant { 0 } () done;
     create s.length (fun j -> if j = i then v else s[j])
 
@@ -93,13 +89,12 @@ theory Seq
   = while false do variant { 0 } () done;
     create (1 + length s) (fun i -> if i = length s then x else s[i])
 
-  (** sub-sequence *)
+  (** [s[i..j]] is the sub-sequence of [s] from element [i] included
+      to element [j] excluded *)
   let function ([_.._]) (s:seq 'a) (i:int) (j:int) : seq 'a
     requires { 0 <= i <= j <= length s }
     ensures { length result = j - i }
     ensures { forall k. 0 <= k < j - i -> result[k] = s[i + k] }
-    (** [s[i..j]] is the sub-sequence of [s] from element [i] included
-        to element [j] excluded *)
   = while false do variant { 0 } () done;
     create (j-i) (fun k -> s[i+k])
 
@@ -126,8 +121,9 @@ theory Seq
 
 end
 
-(** {2 lemma library about algebraic interactions between
-       empty/singleton/cons/snoc/++/[ .. ]} *)
+(** {2 Lemma library about algebraic interactions between
+       [empty]/[singleton]/[cons]/[snoc]/[++]/[[ .. ]]} *)
+
 theory FreeMonoid
 
   use import int.Int
@@ -377,14 +373,12 @@ theory Sorted
 
   predicate sorted_sub (s: seq t) (l u: int) =
     forall i1 i2. l <= i1 <= i2 < u -> le s[i1] s[i2]
-
-(** sorted_sub s l u is true whenever the sub-sequence s[l .. u-1] is
-    sorted  w.r.t. order relation le *)
+  (** [sorted_sub s l u] is true whenever the sub-sequence [s[l .. u-1]] is
+      sorted  w.r.t. order relation [le] *)
 
   predicate sorted (s: seq t) =
     sorted_sub s 0 (length s)
-
-(** sorted s is true whenever the sequence s is sorted w.r.t le  *)
+  (** [sorted s] is true whenever the sequence [s] is sorted w.r.t [le]  *)
 
   lemma sorted_cons:
     forall x: t, s: seq t.
@@ -478,25 +472,22 @@ theory Permut
     length s1 = length s2 /\
     0 <= l <= length s1 /\ 0 <= u <= length s1 /\
     forall v: 'a. occ v s1 l u = occ v s2 l u
-
-  (** permut s1 s2 l u is true when the segment s1[l..u-1] is a
-  permutation of the segment s2[l..u-1]. Values outside this range are
+  (** [permut s1 s2 l u] is true when the segment [s1[l..u-1]] is a
+  permutation of the segment [s2[l..u-1]]. Values outside this range are
   ignored. *)
 
   predicate permut_sub (s1 s2: seq 'a) (l u: int) =
     seq_eq_sub s1 s2 0 l /\
     permut s1 s2 l u /\
     seq_eq_sub s1 s2 u (length s1)
-
-  (** permut_sub s1 s2 l u is true when the segment s1[l..u-1] is a
-  permutation of the segment s2[l..u-1] and values outside this range
+  (** [permut_sub s1 s2 l u] is true when the segment [s1[l..u-1]] is a
+  permutation of the segment [s2[l..u-1]] and values outside this range
   are equal. *)
 
   predicate permut_all (s1 s2: seq 'a) =
     length s1 = length s2 /\ permut s1 s2 0 (length s1)
-
-  (** permut_all s1 s2 is true when sequence s1 is a permutation of
-  sequence s2 *)
+  (** [permut_all s1 s2] is true when sequence [s1] is a permutation of
+  sequence [s2] *)
 
   lemma exchange_permut_sub:
     forall s1 s2: seq 'a, i j l u: int.
@@ -504,13 +495,12 @@ theory Permut
     0 <= l -> u <= length s1 -> permut_sub s1 s2 l u
 
   (** enlarge the interval *)
-
   lemma Permut_sub_weakening:
     forall s1 s2: seq 'a, l1 u1 l2 u2: int.
     permut_sub s1 s2 l1 u1 -> 0 <= l2 <= l1 -> u1 <= u2 <= length s1 ->
     permut_sub s1 s2 l2 u2
 
-  (** {2 Lemmas about permut} *)
+  (** {3 Lemmas about permut} *)
 
   lemma permut_refl: forall s: seq 'a, l u: int.
     0 <= l <= length s -> 0 <= u <= length s ->
@@ -528,7 +518,7 @@ theory Permut
     permut s1 s2 l u -> l <= i < u ->
     exists j: int. l <= j < u /\ s1[j] = s2[i]
 
-  (** {2 Lemmas about permut_all} *)
+  (** {3 Lemmas about permut_all} *)
 
   use import Mem
 
@@ -583,7 +573,7 @@ theory FoldRight
 
 end
 
-(* TODO / TO DISCUSS
+(*** TODO / TO DISCUSS
 
   - what about s[i..j] when i..j is not a valid range?
     left undefined? empty sequence?

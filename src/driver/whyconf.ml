@@ -42,8 +42,7 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Config.datadir "theories";
-    Filename.concat Config.datadir "modules"; ]
+  [ Filename.concat Config.datadir "stdlib" ]
 
 let default_conf_file =
   match Config.localdir with
@@ -184,7 +183,7 @@ let set_strategies rc strategies =
 type main = {
   libdir   : string;      (* "/usr/local/lib/why/" *)
   datadir  : string;      (* "/usr/local/share/why/" *)
-  loadpath  : string list;  (* "/usr/local/lib/why/theories" *)
+  loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
   timelimit : int;
   (* default prover time limit in seconds (0 unlimited) *)
   memlimit  : int;

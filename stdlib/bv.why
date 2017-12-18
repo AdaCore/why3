@@ -1,6 +1,7 @@
 (** {1 Bit Vectors} *)
 
-(** {2 Powers of two } *)
+(** {2 Powers of two} *)
+
 theory Pow2int
 
   use import int.Int
@@ -110,7 +111,7 @@ theory BV_Gen
 
   type t
 
-  (** [nth b n] is the n-th bit of b. Bit 0 is
+  (** [nth b n] is the [n]-th bit of [b]. Bit 0 is
       the least significant bit *)
   val function nth t int : bool
 
@@ -210,7 +211,7 @@ theory BV_Gen
       nth (rotate_left v n) i = nth v (mod (i - n) size)
 
 
-  (* Conversions from/to integers *)
+  (** Conversions from/to integers *)
 
   use import Pow2int
 
@@ -256,7 +257,7 @@ theory BV_Gen
   axiom to_uint_one     : to_uint one = 1
   axiom to_uint_ones    : to_uint ones = max_int
 
-  (* comparison operators *)
+  (** comparison operators *)
 
   let predicate ult (x y : t) =
     Int.(<) (to_uint x) (to_uint y)
@@ -355,6 +356,7 @@ theory BV_Gen
          to_uint (lsl_bv v n) = mod (Int.( * ) (to_uint v) (pow2 (to_uint n))) two_power_size
 
   (** rotations *)
+
   val function rotate_right_bv (v n : t) : t
 
   val function rotate_left_bv (v n : t) : t
@@ -365,7 +367,6 @@ theory BV_Gen
   axiom rotate_right_bv_is_rotate_right :
     forall v n. rotate_right_bv v n = rotate_right v (to_uint n)
 
-  (** nth_bv *)
   val function nth_bv t t: bool
 
   axiom nth_bv_def:
@@ -380,7 +381,7 @@ theory BV_Gen
     forall x i. 0 <= i < two_power_size ->
       nth_bv x (of_int i) = nth x i
 
-  (* equality axioms *)
+  (** equality axioms *)
 
   predicate eq_sub_bv t t t t
 
