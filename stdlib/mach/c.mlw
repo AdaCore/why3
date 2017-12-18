@@ -14,7 +14,7 @@ module C
      to give implementations to the following routines
      pb with specifying alias in the surface language
    *)
-  type ptr 'a = {
+  type ptr 'a = private {
     mutable data : array 'a ;
     offset : int ;
   }

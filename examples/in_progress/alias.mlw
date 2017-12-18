@@ -7,7 +7,7 @@ module Test
   let a () : unit diverges =
     let zero = Int32.of_int 0 in
     let r = ref zero in
-    let rr = ref r in
+    let _ = ref r in
     let x = ref (ref zero) in
     x := !x;
     !x := Int32.of_int 42;
@@ -15,8 +15,8 @@ module Test
     c_assert (is_not_null p);
     let b = ref p in
     b := !b;
-    let c = get p in
-    let d = get !b in
+    let _ = get p in
+    let _ = get !b in
 (*    b := incr p zero;*)
     ()
 
