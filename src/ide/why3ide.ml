@@ -1210,16 +1210,17 @@ let collapse_proven_goals () =
 let () =
   let i = view_factory#add_item
             "Collapse proven goals"
+            ~key: GdkKeysyms._C
             ~callback:(fun () -> collapse_proven_goals ())
   in
   i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
+
   let i = view_factory#add_item
             "Expand all"
+            ~key:GdkKeysyms._E
             ~callback:(fun () -> goals_view#expand_all ())
   in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: Ctrl-E)";
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: Ctrl-E)"
 
 
 let () =
@@ -1246,6 +1247,105 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
+(**********************)
+(* Contextual actions *)
+(**********************)
+let expand_row ~all =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      goals_view#expand_row path ~all
+  | _ -> ()
+
+let collapse_row () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      goals_view#collapse_row path
+  | _ -> ()
+
+let move_current_row_selection_to_parent () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      begin
+        goals_view#selection#unselect_all ();
+        match goals_model#iter_parent row#iter with
+        | None -> ()
+        | Some iter ->
+            goals_view#selection#select_iter iter
+      end
+  | _ -> ()
+
+let move_current_row_selection_to_first_child () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let n = goals_model#iter_n_children (Some row#iter) in
+      if n = 0 then
+        ()
+      else
+        begin
+          goals_view#selection#unselect_all ();
+          let iter = goals_model#iter_children ?nth:(Some 0) (Some row#iter) in
+          goals_view#selection#select_iter iter
+        end
+  | _ -> ()
+
+let move_to_next_unproven_node_id () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let row_id = get_node_id row#iter in
+      send_request (Get_first_unproven_node row_id)
+  | _ -> ()
+
+(* TODO random shortcut: to be set. *)
+let () =
+  let i = view_factory#add_item
+            "Collapse under node"
+            ~key:GdkKeysyms._asterisk
+            ~callback:(fun () -> collapse_row ())
+  in
+  i#misc#set_tooltip_markup "Collapse current node (shortcut: * )";
+
+  let i = view_factory#add_item
+            "Expand below node "
+            ~key:GdkKeysyms._comma
+            ~callback:(fun () -> expand_row ~all:false)
+  in
+  i#misc#set_tooltip_markup "Expand only one node (shortcut: ,)";
+
+  let i = view_factory#add_item
+            "Expand all below node "
+            ~key:GdkKeysyms._dollar
+            ~callback:(fun () -> expand_row ~all:true)
+  in
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: $)";
+
+  let i = view_factory#add_item
+            "Select parent node"
+            ~key:GdkKeysyms._exclam
+            ~callback:(fun () -> move_current_row_selection_to_parent ())
+  in
+  i#misc#set_tooltip_markup "Move to parent (shortcut: ! )";
+
+  let i = view_factory#add_item
+            "Select first child"
+            ~key:GdkKeysyms._percent
+            ~callback:(fun () -> move_current_row_selection_to_first_child ())
+  in
+  i#misc#set_tooltip_markup "Move to parent (shortcut: %)";
+
+  let i = view_factory#add_item
+            "Select next unproven goal"
+            ~key:GdkKeysyms._space
+            ~callback:(fun () -> move_to_next_unproven_node_id ())
+  in
+  i#misc#set_tooltip_markup "Select next unproven goal (shortcut: ' ')"
+
 (* unused
 let rec update_status_column_from_iter cont iter =
   set_status_column iter;
@@ -1254,47 +1354,68 @@ let rec update_status_column_from_iter cont iter =
   | None -> ()
 *)
 
-(* TODO Unused functions. Map these to a key or remove it *)
-let move_current_row_selection_up () =
-  let current_view = List.hd (goals_view#selection#get_selected_rows) in
-  ignore (GTree.Path.up current_view);
-  let row_up = goals_model#get_row_reference current_view in
-  goals_view#selection#select_iter row_up#iter
-
-let move_current_row_selection_down () =
-  let current_iter =
-    try
-      let current_view = List.hd (goals_view#selection#get_selected_rows) in
-      let current_row = goals_model#get_row_reference current_view in
-      Some current_row#iter
-    with Not_found ->
-      None
-  in
-  let child = goals_model#iter_children current_iter in
-  goals_view#selection#select_iter child
-
 let clear_command_entry () = command_entry#set_text ""
+
+let ide_command_list =
+  ["up", "Select the parent of the current node";
+   "down", "Select the first child of the current node";
+   "next", "Select the \"next\" unproved node";
+   "expand", "Expand the node";
+   "ex_all", "Expand the node recursively";
+   "collapse", "Collapse the node";
+   "list_ide_command", "show this help text"]
+
+let ide_command cmd =
+  List.exists (fun x -> fst x = cmd) ide_command_list
+
+let interp_ide cmd =
+  match cmd with
+  | "up" ->
+      move_current_row_selection_to_parent ()
+  | "down" ->
+      move_current_row_selection_to_first_child ()
+  | "next" ->
+      move_to_next_unproven_node_id ()
+  | "expand" ->
+      expand_row ~all:false
+  | "ex_all" ->
+      expand_row ~all:true
+  | "collapse" ->
+      collapse_row ()
+  | "list_ide_command" ->
+      let s = List.fold_left (fun acc x -> (fst x) ^ ": " ^
+                              (snd x) ^ "\n" ^ acc) "" ide_command_list in
+      clear_command_entry ();
+      message_zone#buffer#set_text s
+  | _ ->
+      clear_command_entry ();
+      message_zone#buffer#set_text ("Error: " ^ cmd ^ "\nPlease report.")
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
-  let rows = get_selected_row_references () in
-  let ids =
-    match rows with
-      | [] -> [root_node]
-      | _ -> List.map (fun n -> get_node_id n#iter) rows
-  in
-  List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
+  message_zone#buffer#set_text "";
   clear_command_entry ();
-  (* clear previous error message if any *)
-  message_zone#buffer#set_text ""
-
+  if ide_command cmd then
+    interp_ide cmd
+  else
+    begin
+      let rows = get_selected_row_references () in
+      let ids =
+        match rows with
+        | [] -> [root_node]
+        | _ -> List.map (fun n -> get_node_id n#iter) rows
+      in
+      List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
+      (* clear previous error message if any *)
+    end
 
 let (_ : GtkSignal.id) =
   let callback () =
     let cmd = command_entry#text in
-    if cmd = "" then
-      goals_view#misc#grab_focus ()
-    else begin
+    match cmd with
+    | ""     -> goals_view#misc#grab_focus ()
+    | _ ->
+      begin
         add_command list_commands cmd;
         interp cmd
       end in
