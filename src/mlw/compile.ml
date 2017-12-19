@@ -655,6 +655,9 @@ module Translate = struct
     (* assert (mask <> MaskGhost); *)
     match e.e_node with
     | Econst _ | Evar _   | Efun _ | Eassign _ | Ewhile _
+    | Efor   _ | Eraise _ | Eexn _ | Eabsurd   | Ehole when mask = MaskGhost ->
+        ML.e_unit
+    | Econst _ | Evar _   | Efun _ | Eassign _ | Ewhile _
     | Efor   _ | Eraise _ | Eexn _ | Eabsurd   | Ehole    -> e
     | Eapp (rs, el) when is_rs_tuple rs ->
         begin match visible_of_mask mask el with

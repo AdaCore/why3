@@ -253,6 +253,21 @@ module mach.int.State63
   syntax val random_int63 "SHOULD_NOT_BE_HERE"
 end
 
+module set.Fset
+  syntax val mem      "SHOULD_NOT_BE_HERE"
+  syntax val (==)     "SHOULD_NOT_BE_HERE"
+  syntax val subset   "SHOULD_NOT_BE_HERE"
+  syntax val is_empty "SHOULD_NOT_BE_HERE"
+  syntax val empty    "SHOULD_NOT_BE_HERE"
+  syntax val add      "SHOULD_NOT_BE_HERE"
+  syntax val remove   "SHOULD_NOT_BE_HERE"
+  syntax val union    "SHOULD_NOT_BE_HERE"
+  syntax val inter    "SHOULD_NOT_BE_HERE"
+  syntax val diff     "SHOULD_NOT_BE_HERE"
+  syntax val choose   "SHOULD_NOT_BE_HERE"
+  syntax val cardinal "SHOULD_NOT_BE_HERE"
+end
+
 module mach.peano.Peano
   syntax type t      "int"
   syntax val  to_int "Z.of_int %1"

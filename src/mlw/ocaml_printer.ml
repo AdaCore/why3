@@ -534,9 +534,6 @@ module Print = struct
           (print_uident info) xs.xs_name (print_ty ~paren:true info) t
           (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
-  (* | Enot _ -> (\* TODO *\) assert false *)
-  (* | Ebinop _ -> (\* TODO *\) assert false *)
-  (* | Ecast _ -> (\* TODO *\) assert false *)
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
