@@ -1217,10 +1217,9 @@ let () =
 
   let i = view_factory#add_item
             "Expand all"
-            ~key:GdkKeysyms._E
             ~callback:(fun () -> goals_view#expand_all ())
   in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: Ctrl-E)"
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view"
 
 
 let () =
@@ -1306,45 +1305,44 @@ let move_to_next_unproven_node_id () =
 let () =
   let i = view_factory#add_item
             "Collapse under node"
-            ~key:GdkKeysyms._asterisk
+            ~key:GdkKeysyms._Left
             ~callback:(fun () -> collapse_row ())
   in
-  i#misc#set_tooltip_markup "Collapse current node (shortcut: * )";
+  i#misc#set_tooltip_markup "Collapse current node";
 
   let i = view_factory#add_item
             "Expand below node "
-            ~key:GdkKeysyms._comma
+            ~key:GdkKeysyms._Right
             ~callback:(fun () -> expand_row ~all:false)
   in
-  i#misc#set_tooltip_markup "Expand only one node (shortcut: ,)";
+  i#misc#set_tooltip_markup "Expand only one node";
 
   let i = view_factory#add_item
             "Expand all below node "
-            ~key:GdkKeysyms._dollar
+            ~key:GdkKeysyms._E
             ~callback:(fun () -> expand_row ~all:true)
   in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: $)";
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view";
 
   let i = view_factory#add_item
-            "Select parent node"
-            ~key:GdkKeysyms._exclam
+            "Go to parent node"
+            ~key:GdkKeysyms._Up
             ~callback:(fun () -> move_current_row_selection_to_parent ())
   in
-  i#misc#set_tooltip_markup "Move to parent (shortcut: ! )";
+  i#misc#set_tooltip_markup "Go to parent";
 
   let i = view_factory#add_item
-            "Select first child"
-            ~key:GdkKeysyms._percent
+            "Go to first child"
             ~callback:(fun () -> move_current_row_selection_to_first_child ())
   in
-  i#misc#set_tooltip_markup "Move to parent (shortcut: %)";
+  i#misc#set_tooltip_markup "Go to first child";
 
   let i = view_factory#add_item
             "Select next unproven goal"
-            ~key:GdkKeysyms._space
+            ~key:GdkKeysyms._Down
             ~callback:(fun () -> move_to_next_unproven_node_id ())
   in
-  i#misc#set_tooltip_markup "Select next unproven goal (shortcut: ' ')"
+  i#misc#set_tooltip_markup "Select next unproven goal"
 
 (* unused
 let rec update_status_column_from_iter cont iter =

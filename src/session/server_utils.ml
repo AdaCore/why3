@@ -467,8 +467,7 @@ let interp commands_table cont id s =
                                 @ help <transformation_name> @\n\
                                 @ list_ide_command @ \n\
                                 @\n\
-                                Available queries are:@\n@
-                                [%a@]" help_on_queries commands_table
+                                Available queries are:@\n@[%a@]" help_on_queries commands_table
                   in
                   Help_message text
                | _ ->
