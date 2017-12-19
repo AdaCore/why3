@@ -2181,7 +2181,24 @@ let treat_notification n =
          ignore (new_node id name typ detached)
      end
   | Remove id                     ->
+     (* In the case where id is an ancestor of a selected node, this node will
+        be erased. So we try to select the parent. *)
      let n = get_node_row id in
+     let is_ancestor =
+       List.exists
+         (fun row -> let row_id = get_node_id row#iter in
+           row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
+         (get_selected_row_references ())
+     in
+     if is_ancestor then
+       (match goals_model#iter_parent n#iter with
+       | None -> goals_view#selection#unselect_all ()
+       | Some parent ->
+          goals_view#selection#unselect_all ();
+          goals_view#selection#select_iter parent
+          (* TODO Go to the next unproved goal ?
+            let parent_id = get_node_id parent in
+          send_request (Get_first_unproven_node parent_id)*));
      ignore (goals_model#remove(n#iter));
      Hint.remove node_id_to_gtree id;
      Hint.remove node_id_type id;
