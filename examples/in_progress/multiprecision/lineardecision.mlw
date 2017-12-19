@@ -254,14 +254,23 @@ let rec function max_var_ctx (l:context) : int
   end
 
 let rec function opp_expr (e:expr) : expr
- (* ensures { forall y z. interp result y z = C.(-_) (interp e y z) }*)
+  ensures { forall y z. interp result y z = C.(-_) (interp e y z) }
   ensures { forall b. expr_bound e b -> expr_bound result b }
   variant { e }
 = match e with
   | Cst c -> Cst (C.opp c)
   | Term c j -> Term (C.opp c) j
   | UTerm j -> Term (C.opp C.cone) j
-  | Add e1 e2 -> Add (opp_expr e1) (opp_expr e2)
+  | Add e1 e2 ->
+      let e1' = opp_expr e1 in
+      let e2' = opp_expr e2 in
+      assert { forall a1 a2. C.(+) (C.(-_) a1) (C.(-_) a2) = C.(-_) (C.(+) a1 a2) };
+      assert { forall y z. interp (Add e1' e2') y z = C.(-_) (interp e y z) by
+               interp (Add e1' e2') y z = C.(+) (interp e1' y z) (interp e2' y z)
+               = C.(+) (C.(-_) (interp e1 y z)) (C.(-_) (interp e2 y z))
+               = C.(-_) (C.(+) (interp e1 y z) (interp e2 y z))
+               = C.(-_) (interp e y z) };
+      Add e1' e2'
   end
 
 predicate no_cst (e:expr)
@@ -269,6 +278,11 @@ predicate no_cst (e:expr)
   | Cst c -> C.eq c C.czero
   | Term _ _ | UTerm _ -> true
   | Add e1 e2 -> no_cst e1 && no_cst e2
+  end
+
+predicate atom (e:expr)
+= match e with
+  | Add _ _ -> false | _ -> true
   end
 
 (*TODO put this back in norm_eq*)
@@ -291,8 +305,8 @@ let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
   end
 
 let norm_eq (e:equality) : (expr, coeff)
- (* returns { (ex, c) -> forall y z.
-            interp_eq e y z -> interp_eq (ex, Cst c) y z }*)
+  returns { (ex, c) -> forall y z.
+            interp_eq e y z -> interp_eq (ex, Cst c) y z }
   returns { (ex, _) -> no_cst ex }
   returns { (ex, _) -> forall b:int. eq_bound e b -> expr_bound ex b }
   raises  { C.Unknown -> true }
@@ -301,11 +315,134 @@ let norm_eq (e:equality) : (expr, coeff)
     let s = Add e1 (opp_expr e2) in
     assert { forall b. eq_bound e b -> expr_bound s b };
     match norm_eq_aux s (Cst C.czero) C.czero with
-      (e, c) -> e, C.opp c
+      (e, c) ->
+        let ec = C.opp c in
+        assert { forall a1 a2. C.(+) a1 a2 = C.azero -> a1 = C.(-_) a2 };
+        assert { forall y z. interp_eq (e1,e2) y z -> interp_eq (e, Cst ec) y z
+                 by interp_eq (s, Cst C.czero) y z so interp s y z = C.azero
+                 so C.(+) (interp e y z) (interp (Cst c) y z) = C.azero
+                 so interp e y z = C.(-_) (interp (Cst c) y z)
+                    = interp (Cst ec) y z };
+        e, ec
     end
   end
 
-(*TODO: predicate that says that matrices a, b represent the context*)
+let rec mul_expr (e:expr) (c:coeff) : expr
+  ensures { forall y z. interp result y z
+            = C.( *) (C.interp c z) (interp e y z) }
+  variant { e }
+= match e with
+  | Cst c1 -> Cst (C.mul c c1)
+  | UTerm v -> Term c v
+  | Term c1 v -> Term (C.mul c c1) v
+  | Add e1 e2 -> Add (mul_expr e1 c) (mul_expr e2 c)
+  end
+
+let rec add_expr (e1 e2: expr) : expr
+  ensures { forall y z. interp result y z
+                     = C.(+) (interp e1 y z) (interp e2 y z) }
+  variant { e2 }
+  raises  { C.Unknown -> true }
+= let rec add_atom (e a:expr) : (expr, bool)
+    requires { atom a }
+    returns { r,b -> forall y z. interp r y z
+                     = C.(+) (interp e y z) (interp a y z) }
+    variant { e }
+    raises  { C.Unknown -> true }
+  = match (e,a) with
+    | Term ce ie, Term ca ia ->
+      if ie = ia then (Term (C.add ce ca) ie, True) else (Add e a, False)
+    | UTerm ie, Term ca ia -> if ie = ia then (Term (C.add ca C.cone) ie, True) else (Add e a, False)
+    | Term ce ie, UTerm ia -> if ie = ia then (Term (C.add ce C.cone) ie, True) else (Add e a, False)
+    | UTerm ie, UTerm ia -> if ie = ia then (Term (C.add C.cone C.cone) ie, True) else (Add e a, False)
+    | Cst ce, Cst ca -> Cst (C.add ce ca), True
+    | Cst _, _ | _, Cst _ -> Add e a, False
+    | Add e1 e2, _ ->
+      let r, b = add_atom e1 a in
+      if b then Add r e2, True else let r,b = add_atom e2 a in Add e1 r, b
+    | _, Add _ _ -> absurd
+    end
+  in
+  match e2 with
+    | Add e1' e2' -> add_expr (add_expr e1 e1') e2'
+    | _ -> let r,_= add_atom e1 e2 in r
+  end
+
+let mul_eq (eq:equality) (c:coeff)
+  ensures { forall y z. interp_eq eq y z -> interp_eq result y z }
+= match eq with (e1,e2) -> (mul_expr e1 c, mul_expr e2 c) end
+
+let add_eq (eq1 eq2:equality)
+  ensures { forall y z. interp_eq eq1 y z -> interp_eq eq2 y z
+            -> interp_eq result y z }
+  raises  { C.Unknown -> true }
+= match eq1, eq2 with ((a1,b1), (a2,b2)) -> (add_expr a1 a2, add_expr b1 b2) end
+
+let rec function zero_expr (e:expr) : bool
+  ensures { result -> forall y z. interp e y z = C.azero }
+  variant { e }
+= match e with
+  | Cst c -> C.eq c C.czero
+  | Term c _ -> C.eq c C.czero
+  | UTerm _ -> false
+  | Add e1 e2 -> zero_expr e1 && zero_expr e2
+  end
+
+let sub_expr (e1 e2:expr)
+  ensures { forall y z. C.(+) (interp result y z) (interp e2 y z)
+                        = interp e1 y z }
+  raises  { C.Unknown -> true }
+= let r = add_expr e1 (mul_expr e2 (C.opp C.cone)) in
+  assert { forall y z.
+           let v1 = interp e1 y z in
+           let v2 = interp e2 y z in
+           let vr = interp r y z in
+           C.(+) vr v2 = v1
+           by C.( *) v2 (C.(-_) C.aone) = C.(-_) v2
+           so C.(+) vr v2
+           = C.(+) (C.(+) v1 (C.( *) v2 (C.(-_) C.aone))) v2
+           = C.(+) (C.(+) v1 (C.(-_) v2)) v2 = v1 };
+  r
+           
+
+let rec same_eq (eq1 eq2: equality) : bool
+  ensures { result -> forall y z. interp_eq eq1 y z -> interp_eq eq2 y z }
+  raises  { C.Unknown -> true }
+= match (eq1, eq2) with
+  | (a1,b1), (a2,b2) ->
+    let a = sub_expr a1 a2 in let b = sub_expr b1 b2 in
+    zero_expr a && zero_expr b
+  end
+
+use import option.Option
+
+lemma interp_ctx_impl:
+  forall ctx g1 g2 y z. (interp_eq g1 y z -> interp_eq g2 y z) -> interp_ctx ctx g1 y z -> interp_ctx ctx g2 y z
+
+let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
+  ensures  { result = true -> forall y z. interp_ctx ctx g y z}
+  raises  { C.Unknown -> true }
+=
+  let rec aux (ctx:context) (s:equality) (v:list coeff) : option equality
+    requires { forall y z. interp_ctx ctx s y z }
+    returns  { Some r -> forall y z. interp_ctx ctx r y z | None -> true }
+    raises  { C.Unknown -> true }
+    variant { ctx }
+  = match (ctx, v) with
+    | Nil, Nil -> Some s
+    | Cons eq te, Cons c tc ->
+      let ex, c' = norm_eq eq in
+      let eq = (ex, Cst c') in
+      aux te (add_eq s (mul_eq eq c)) tc
+    | _ -> None
+    end
+  in
+  match aux ctx (Cst C.czero, Cst C.czero) v with
+  | Some sum -> same_eq sum g
+  | None -> false
+  end
+    
+    
 
 let transpose (m:matrix coeff) : matrix coeff
   ensures { result.rows = m.columns /\ result.columns = m.rows }
@@ -341,13 +478,12 @@ let addmul_row (m:matrix coeff) (src dst: int) (c: coeff) : unit
   done
 
 use import ref.Refint
-use import option.Option
 
 (*TODO this goes inside gauss_jordan*)
-val breakpoint (a: matrix coeff) : unit writes { a }
+(*val breakpoint (a: matrix coeff) : unit writes { a }
 
 let a_breakpoint (v:array coeff) : unit
-  = any unit
+  = v[0] <- any coeff*)
 
 let gauss_jordan (a: matrix coeff) : option (array coeff)
   (*AX=B, a=(A|B), result=X*)
@@ -400,6 +536,7 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
     Some v
   end
 
+use import array.ToList
 
 let linear_decision (l: context) (g: equality) : bool
   requires { valid_ctx l }
@@ -408,8 +545,9 @@ let linear_decision (l: context) (g: equality) : bool
   raises  { C.Unknown -> true }
 =
   let nv = max (max_var_e g) (max_var_ctx l) in
-  let a = Matrix.make (length l) (nv+1) C.czero in
-  let b = Array.make (length l) C.czero in      (* ax = b *)
+  let ll = length l in
+  let a = Matrix.make ll (nv+1) C.czero in
+  let b = Array.make ll C.czero in      (* ax = b *)
   let v = Array.make (nv+1) C.czero in          (* goal *)
   (*v[0] <- any coeff;*)
   let rec fill_expr (ex: expr) (i:int): unit
@@ -459,7 +597,8 @@ let linear_decision (l: context) (g: equality) : bool
   let cd = v_append v d in
   let ab' = transpose ab in
   match gauss_jordan (m_append ab' cd) with
-    | Some r -> apply_l r a == v && C.eq (sprod r b) d
+    | Some r ->
+      check_combination l g (to_list r 0 ll) (*apply_l r a == v && C.eq (sprod r b) d*)
     | None -> false
   end
 
@@ -567,7 +706,7 @@ use import RationalCoeffs
 use import real.RealInfix
 use import real.FromInt
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), type coeff = t, function C.interp=rinterp, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, lemma C.eq_def, val C.le=rle(*, goal ZeroLessOne, goal C.CompatOrderAdd, goal C.CompatOrderMult, goal C.Unitary, goal C.NonTrivialRing, goal C.Mul_distr_l, goal C.Mul_distr_r, goal C.Inv_def_l, goal C.Inv_def_r, goal C.MulAssoc.Assoc, goal C.Assoc, goal C.MulComm.Comm, goal C.Comm, goal C.Unit_def_l, goal C.Unit_def_r*)
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), type coeff = t, function C.interp=rinterp, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, lemma C.eq_def, val C.le=rle, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 end
 
@@ -585,7 +724,7 @@ let inv (t:int) : int
   raises { Unknown -> true }
 = raise Unknown
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), type coeff = int, function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = ( *), val C.opp = (-_), val C.eq = eq, val C.inv = inv, lemma C.eq_def, val C.le = (<=)(*, goal ZeroLessOne, goal C.CompatOrderAdd, goal C.CompatOrderMult, goal C.Unitary, goal C.NonTrivialRing, goal C.Mul_distr_l, goal C.Mul_distr_r, goal C.Inv_def_l, goal C.Inv_def_r, goal C.MulAssoc.Assoc, goal C.Assoc, goal C.MulComm.Comm, goal C.Comm, goal C.Unit_def_l, goal C.Unit_def_r*)
+clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), type coeff = int, function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = ( *), val C.opp = (-_), val C.eq = eq, val C.inv = inv, lemma C.eq_def, val C.le = (<=), goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 
 use import real.FromInt
@@ -635,7 +774,6 @@ let int_decision (l: context) (g: equality) : bool
   requires { valid_ctx l }
   requires { valid_eq g }
   ensures { forall y z. result -> interp_ctx l g y z }
-  (*raises  { R.Unknown -> true } ??? *)
 = R.linear_decision (m_ctx l) (m_eq g)
 
 end
