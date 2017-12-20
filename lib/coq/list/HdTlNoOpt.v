@@ -23,8 +23,9 @@ exact h.
 Defined.
 
 (* Why3 goal *)
-Lemma hd_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (r:(list a)),
-  ((hd (Init.Datatypes.cons x r)) = x).
+Lemma hd_cons :
+forall {a:Type} {a_WT:WhyType a},
+forall (x:a) (r:(list a)), ((hd (Init.Datatypes.cons x r)) = x).
 Proof.
 now intros a a_WT x r.
 Qed.
@@ -37,8 +38,9 @@ exact t.
 Defined.
 
 (* Why3 goal *)
-Lemma tl_cons : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (r:(list a)),
-  ((tl (Init.Datatypes.cons x r)) = r).
+Lemma tl_cons :
+forall {a:Type} {a_WT:WhyType a},
+forall (x:a) (r:(list a)), ((tl (Init.Datatypes.cons x r)) = r).
 Proof.
 now intros a a_WT x r.
 Qed.

@@ -216,23 +216,28 @@ Qed.
 
 
 (* Why3 assumption *)
-Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z) (j:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> (((0%Z <= j)%Z /\ (j < n)%Z) ->
-  ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
+Definition injective (a:(map.Map.map Z Z)) (n:Z): Prop :=
+  forall (i:Z) (j:Z),
+   ((0%Z <= i)%Z /\ (i < n)%Z) ->
+   (((0%Z <= j)%Z /\ (j < n)%Z) ->
+    ((~ (i = j)) -> ~ ((map.Map.get a i) = (map.Map.get a j)))).
 
 (* Why3 assumption *)
-Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\
-  ((map.Map.get a j) = i).
+Definition surjective (a:(map.Map.map Z Z)) (n:Z): Prop :=
+  forall (i:Z),
+   ((0%Z <= i)%Z /\ (i < n)%Z) ->
+   exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((map.Map.get a j) = i).
 
 (* Why3 assumption *)
-Definition range (a:(map.Map.map Z Z)) (n:Z): Prop := forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (map.Map.get a i))%Z /\
-  ((map.Map.get a i) < n)%Z).
+Definition range (a:(map.Map.map Z Z)) (n:Z): Prop :=
+  forall (i:Z),
+   ((0%Z <= i)%Z /\ (i < n)%Z) ->
+   ((0%Z <= (map.Map.get a i))%Z /\ ((map.Map.get a i) < n)%Z).
 
 (* Why3 goal *)
-Lemma injective_surjective : forall (a:(map.Map.map Z Z)) (n:Z), (injective a
-  n) -> ((range a n) -> (surjective a n)).
+Lemma injective_surjective :
+forall (a:(map.Map.map Z Z)) (n:Z),
+ (injective a n) -> ((range a n) -> (surjective a n)).
 unfold injective, range, surjective.
 intros a n h1 h2.
 intros.
@@ -247,8 +252,9 @@ Qed.
 Import Occ.
 
 (* Why3 goal *)
-Lemma injection_occ : forall (m:(map.Map.map Z Z)) (n:Z), (injective m n) <->
-  forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z.
+Lemma injection_occ :
+forall (m:(map.Map.map Z Z)) (n:Z),
+ (injective m n) <-> forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z.
 intros m n; split.
 (* -> *)
 intros inj v.

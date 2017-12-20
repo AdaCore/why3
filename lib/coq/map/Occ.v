@@ -51,8 +51,10 @@ now rewrite <- minus_n_O, Nat2Z.id.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_empty : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (u <= l)%Z -> ((occ v m l u) = 0%Z).
+Lemma occ_empty :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (u <= l)%Z -> ((occ v m l u) = 0%Z).
 Proof.
 intros a a_WT v m l u h1.
 assert (u - l <= 0)%Z as h1' by omega.
@@ -62,9 +64,12 @@ now elim h1'.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_right_no_add : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (l < u)%Z -> ((~ ((map.Map.get m
-  (u - 1%Z)%Z) = v)) -> ((occ v m l u) = (occ v m l (u - 1%Z)%Z))).
+Lemma occ_right_no_add :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (l < u)%Z ->
+ ((~ ((map.Map.get m (u - 1%Z)%Z) = v)) ->
+  ((occ v m l u) = (occ v m l (u - 1%Z)%Z))).
 Proof.
 intros a a_WT v m l u h1 h2.
 rewrite occ_equation with (1 := h1).
@@ -72,9 +77,12 @@ now destruct why_decidable_eq as [H|H].
 Qed.
 
 (* Why3 goal *)
-Lemma occ_right_add : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (l < u)%Z -> (((map.Map.get m
-  (u - 1%Z)%Z) = v) -> ((occ v m l u) = (1%Z + (occ v m l (u - 1%Z)%Z))%Z)).
+Lemma occ_right_add :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (l < u)%Z ->
+ (((map.Map.get m (u - 1%Z)%Z) = v) ->
+  ((occ v m l u) = (1%Z + (occ v m l (u - 1%Z)%Z))%Z)).
 Proof.
 intros a a_WT v m l u h1 h2.
 rewrite occ_equation with (1 := h1).
@@ -82,9 +90,10 @@ now destruct why_decidable_eq as [H|H].
 Qed.
 
 (* Why3 goal *)
-Lemma occ_bounds : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (l <= u)%Z -> ((0%Z <= (occ v m l
-  u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z).
+Lemma occ_bounds :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (l <= u)%Z -> ((0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z).
 Proof.
 intros a a_WT v m l u h1.
 cut (0 <= u - l)%Z. 2: omega.
@@ -115,9 +124,11 @@ replace (l + (u-l))%Z with u by ring. trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_append : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (mid:Z) (u:Z), ((l <= mid)%Z /\
-  (mid <= u)%Z) -> ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
+Lemma occ_append :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (mid:Z) (u:Z),
+ ((l <= mid)%Z /\ (mid <= u)%Z) ->
+ ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
 Proof.
 intros a a_WT v m l mid u (h1,h2).
 cut (0 <= u - mid)%Z. 2: omega.
@@ -159,9 +170,11 @@ replace (mid + (u-mid))%Z with u by ring. trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_neq : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (forall (i:Z), ((l <= i)%Z /\
-  (i < u)%Z) -> ~ ((map.Map.get m i) = v)) -> ((occ v m l u) = 0%Z).
+Lemma occ_neq :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ~ ((map.Map.get m i) = v)) ->
+ ((occ v m l u) = 0%Z).
 Proof.
 intros a a_WT v m l u.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
@@ -186,9 +199,11 @@ trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_exists : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m:(map.Map.map Z a)) (l:Z) (u:Z), (0%Z < (occ v m l u))%Z -> exists i:Z,
-  ((l <= i)%Z /\ (i < u)%Z) /\ ((map.Map.get m i) = v).
+Lemma occ_exists :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m:(map.Map.map Z a)) (l:Z) (u:Z),
+ (0%Z < (occ v m l u))%Z ->
+ exists i:Z, ((l <= i)%Z /\ (i < u)%Z) /\ ((map.Map.get m i) = v).
 Proof.
 intros a a_WT v m l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
@@ -211,9 +226,10 @@ exists i. split. omega. assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_pos : forall {a:Type} {a_WT:WhyType a}, forall (m:(map.Map.map Z
-  a)) (l:Z) (u:Z) (i:Z), ((l <= i)%Z /\ (i < u)%Z) ->
-  (0%Z < (occ (map.Map.get m i) m l u))%Z.
+Lemma occ_pos :
+forall {a:Type} {a_WT:WhyType a},
+forall (m:(map.Map.map Z a)) (l:Z) (u:Z) (i:Z),
+ ((l <= i)%Z /\ (i < u)%Z) -> (0%Z < (occ (map.Map.get m i) m l u))%Z.
 Proof.
 intros a a_WT m l u i (h1,h2).
 pose (v := (Map.get m i)). fold v.
@@ -232,10 +248,12 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma occ_eq : forall {a:Type} {a_WT:WhyType a}, forall (v:a)
-  (m1:(map.Map.map Z a)) (m2:(map.Map.map Z a)) (l:Z) (u:Z), (forall (i:Z),
-  ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get m1 i) = (map.Map.get m2 i))) ->
-  ((occ v m1 l u) = (occ v m2 l u)).
+Lemma occ_eq :
+forall {a:Type} {a_WT:WhyType a},
+forall (v:a) (m1:(map.Map.map Z a)) (m2:(map.Map.map Z a)) (l:Z) (u:Z),
+ (forall (i:Z),
+   ((l <= i)%Z /\ (i < u)%Z) -> ((map.Map.get m1 i) = (map.Map.get m2 i))) ->
+ ((occ v m1 l u) = (occ v m2 l u)).
 Proof.
 intros a a_WT v m1 m2 l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.

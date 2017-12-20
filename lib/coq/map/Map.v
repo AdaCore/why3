@@ -53,9 +53,11 @@ exact (m x').
 Defined.
 
 (* Why3 goal *)
-Lemma Select_eq : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (m:(map a b)), forall (a1:a) (a2:a), forall (b1:b), (a1 = a2) ->
-  ((get (set m a1 b1) a2) = b1).
+Lemma Select_eq :
+forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+forall (m:(map a b)),
+ forall (a1:a) (a2:a),
+  forall (b1:b), (a1 = a2) -> ((get (set m a1 b1) a2) = b1).
 Proof.
 intros a a_WT b b_WT (m) a1 a2 b1 h1.
 unfold get, set.
@@ -63,8 +65,10 @@ now case why_decidable_eq.
 Qed.
 
 (* Why3 goal *)
-Lemma Select_neq : forall {a:Type} {a_WT:WhyType a}
-  {b:Type} {b_WT:WhyType b}, forall (m:(map a b)), forall (a1:a) (a2:a),
+Lemma Select_neq :
+forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+forall (m:(map a b)),
+ forall (a1:a) (a2:a),
   forall (b1:b), (~ (a1 = a2)) -> ((get (set m a1 b1) a2) = (get m a2)).
 Proof.
 intros a a_WT b b_WT (m) a1 a2 b1 h1.
