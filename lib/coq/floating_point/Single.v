@@ -53,9 +53,9 @@ Definition total_error (x:floating_point.SingleFormat.single): R :=
 
 (* Why3 assumption *)
 Definition no_overflow (m:floating_point.Rounding.mode) (x:R): Prop :=
-  ((Reals.Rbasic_fun.Rabs (round m x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
+  ((Reals.Rbasic_fun.Rabs (round m x)) <= 340282346638528859811704183484516925440%R)%R.
 
-Lemma max_single_eq: (33554430 * 10141204801825835211973625643008 = max 24 128)%R.
+Lemma max_single_eq: (340282346638528859811704183484516925440 = max 24 128)%R.
 unfold max, Fcore_defs.F2R; simpl.
 ring.
 Qed.
@@ -63,7 +63,7 @@ Qed.
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
 forall (m:floating_point.Rounding.mode) (x:R),
- ((Reals.Rbasic_fun.Rabs x) <= (33554430 * 10141204801825835211973625643008)%R)%R ->
+ ((Reals.Rbasic_fun.Rabs x) <= 340282346638528859811704183484516925440%R)%R ->
  (no_overflow m x).
 intros m x Hx.
 unfold no_overflow.
@@ -97,7 +97,7 @@ Qed.
 (* Why3 goal *)
 Lemma Bounded_value :
 forall (x:floating_point.SingleFormat.single),
- ((Reals.Rbasic_fun.Rabs (value x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
+ ((Reals.Rbasic_fun.Rabs (value x)) <= 340282346638528859811704183484516925440%R)%R.
 rewrite max_single_eq.
 now apply Bounded_value.
 Qed.
