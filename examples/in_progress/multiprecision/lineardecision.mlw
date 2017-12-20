@@ -327,6 +327,32 @@ let norm_eq (e:equality) : (expr, coeff)
     end
   end
 
+
+let rec lemma interp_ctx_impl (ctx: context) (g1 g2:equality)
+  requires { forall y z. interp_eq g1 y z -> interp_eq g2 y z }
+  ensures  { forall y z. interp_ctx ctx g1 y z -> interp_ctx ctx g2 y z }
+  variant  { ctx }
+= match ctx with Nil -> () | Cons _ t -> interp_ctx_impl t g1 g2 end
+
+let rec lemma interp_ctx_valid (ctx:context) (g:equality)
+  ensures { forall y z. interp_eq g y z -> interp_ctx ctx g y z }
+  variant  { ctx }
+= match ctx with Nil -> () | Cons _ t -> interp_ctx_valid t g end
+
+use import list.Append
+
+let rec lemma interp_ctx_wr (ctx l:context) (g:equality)
+  ensures { forall y z. interp_ctx ctx g y z -> interp_ctx (ctx ++ l) g y z }
+  variant { ctx }
+= match ctx with
+  | Nil -> ()
+  | Cons h t -> interp_ctx_wr t l g  end
+
+let rec lemma interp_ctx_wl (ctx l: context) (g:equality)
+  ensures { forall y z. interp_ctx ctx g y z -> interp_ctx (l ++ ctx) g y z }
+  variant { l }
+= match l with Nil -> () | Cons h t -> interp_ctx_wl ctx t g  end
+
 let rec mul_expr (e:expr) (c:coeff) : expr
   ensures { forall y z. interp result y z
             = C.( *) (C.interp c z) (interp e y z) }
@@ -375,8 +401,19 @@ let mul_eq (eq:equality) (c:coeff)
 let add_eq (eq1 eq2:equality)
   ensures { forall y z. interp_eq eq1 y z -> interp_eq eq2 y z
             -> interp_eq result y z }
+  ensures { forall y z ctx. interp_ctx ctx eq1 y z -> interp_ctx ctx eq2 y z
+            -> interp_ctx ctx result y z }
   raises  { C.Unknown -> true }
-= match eq1, eq2 with ((a1,b1), (a2,b2)) -> (add_expr a1 a2, add_expr b1 b2) end
+= match eq1, eq2 with ((a1,b1), (a2,b2)) ->
+  let a = add_expr a1 a2 in let b =  add_expr b1 b2 in
+  let r = (a,b) in
+  let rec lemma aux (l:context)
+    ensures { forall y z. interp_ctx l eq1 y z -> interp_ctx l eq2 y z
+              -> interp_ctx l r y z }
+    variant { l }
+  = match l with Nil -> () | Cons _ t -> aux t end in
+  r
+  end
 
 let rec function zero_expr (e:expr) : bool
   ensures { result -> forall y z. interp e y z = C.azero }
@@ -416,28 +453,42 @@ let rec same_eq (eq1 eq2: equality) : bool
 
 use import option.Option
 
-lemma interp_ctx_impl:
-  forall ctx g1 g2 y z. (interp_eq g1 y z -> interp_eq g2 y z) -> interp_ctx ctx g1 y z -> interp_ctx ctx g2 y z
+let rec norm_context (l:context) : context
+  ensures { forall g y z. interp_ctx result g y z -> interp_ctx l g y z }
+  raises  { C.Unknown -> true }
+  variant { l }
+= match l with
+  | Nil -> Nil
+  | Cons h t ->
+    let ex, c = norm_eq h in
+    Cons (ex, Cst c) (norm_context t)
+  end
 
 let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
   ensures  { result = true -> forall y z. interp_ctx ctx g y z}
   raises  { C.Unknown -> true }
 =
-  let rec aux (ctx:context) (s:equality) (v:list coeff) : option equality
-    requires { forall y z. interp_ctx ctx s y z }
+  let ctx = norm_context ctx in
+  let rec aux (l:context) (ghost acc: context) (s:equality) (v:list coeff) : option equality
+    requires { forall y z. interp_ctx acc s y z }
+    requires { ctx = acc ++ l }
     returns  { Some r -> forall y z. interp_ctx ctx r y z | None -> true }
     raises  { C.Unknown -> true }
-    variant { ctx }
-  = match (ctx, v) with
+    variant { l }
+  = match (l, v) with
     | Nil, Nil -> Some s
     | Cons eq te, Cons c tc ->
-      let ex, c' = norm_eq eq in
-      let eq = (ex, Cst c') in
-      aux te (add_eq s (mul_eq eq c)) tc
+      let ns = (add_eq s (mul_eq eq c)) in
+      let ghost nacc = acc ++ (Cons eq Nil) in
+      interp_ctx_wr ctx (Cons eq Nil) s;
+      interp_ctx_wl ctx (Cons eq Nil) eq;
+      assert { forall y z. interp_ctx nacc ns y z
+               by interp_ctx nacc s y z /\ interp_ctx nacc eq y z };
+      aux te nacc ns tc
     | _ -> None
     end
   in
-  match aux ctx (Cst C.czero, Cst C.czero) v with
+  match aux ctx Nil (Cst C.czero, Cst C.czero) v with
   | Some sum -> same_eq sum g
   | None -> false
   end
