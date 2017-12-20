@@ -30,27 +30,19 @@ val add (a b: t) : t
 
 val mul (a b: t) : t
   ensures { forall v: vars. interp result v = interp a v * interp b v }
+  raises  { Unknown -> true } (* removing this is ok ??? *)
 
 val opp (a:t) : t
   ensures { forall v: vars. interp result v = - (interp a v) }
 
 val predicate eq (a b:t)
-  ensures { result <-> forall y:vars. interp a y = interp b y }
-
-axiom eq_def: forall a b: t. a=b -> eq a b
+  ensures { result -> forall y:vars. interp a y = interp b y }
 
 val inv (a:t) : t
   requires { not (eq a czero) }
   ensures { forall v: vars. interp result v * interp a v = aone }
   ensures { not (eq result czero) }
   raises { Unknown -> true }
-
-val le (a b:t) : bool
-  ensures { result -> forall y:vars. ale (interp a y) (interp b y) }
-  raises  { Unknown -> true }
-
-
-(*FIXME equality test, extensionality, specs for le and eq ? *)
 
 end
 
@@ -259,7 +251,14 @@ let rec function opp_expr (e:expr) : expr
   variant { e }
 = match e with
   | Cst c -> Cst (C.opp c)
-  | Term c j -> Term (C.opp c) j
+  | Term c j ->
+    let oc = C.opp c in
+    let r = Term oc j in
+    assert { forall y z. interp r y z = C.( *) (C.interp oc z) (y j)
+             = C.( *) (C.(-_) (C.interp c z)) (y j)
+             = C.(-_) (C.( *) (C.interp c z) (y j))
+             = C.(-_) (interp e y z) };
+    r
   | UTerm j -> Term (C.opp C.cone) j
   | Add e1 e2 ->
       let e1' = opp_expr e1 in
@@ -273,13 +272,6 @@ let rec function opp_expr (e:expr) : expr
       Add e1' e2'
   end
 
-predicate no_cst (e:expr)
-= match e with
-  | Cst c -> C.eq c C.czero
-  | Term _ _ | UTerm _ -> true
-  | Add e1 e2 -> no_cst e1 && no_cst e2
-  end
-
 predicate atom (e:expr)
 = match e with
   | Add _ _ -> false | _ -> true
@@ -287,12 +279,10 @@ predicate atom (e:expr)
 
 (*TODO put this back in norm_eq*)
 let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
-  requires { no_cst acc_e }
   returns { (rex, rc) -> forall y z.
               C.(+) (interp rex y z) (interp (Cst rc) y z)
             = C.(+) (interp ex y z)
                     (C.(+) (interp acc_e y z) (interp (Cst acc_c) y z)) }
-  returns { (rex, _) -> no_cst rex }
   returns { (rex, _) -> forall b:int. expr_bound ex b /\ expr_bound acc_e b
                         -> expr_bound rex b }
   raises  { C.Unknown -> true }
@@ -307,7 +297,6 @@ let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
 let norm_eq (e:equality) : (expr, coeff)
   returns { (ex, c) -> forall y z.
             interp_eq e y z -> interp_eq (ex, Cst c) y z }
-  returns { (ex, _) -> no_cst ex }
   returns { (ex, _) -> forall b:int. eq_bound e b -> expr_bound ex b }
   raises  { C.Unknown -> true }
 = match e with
@@ -346,17 +335,18 @@ let rec lemma interp_ctx_wr (ctx l:context) (g:equality)
   variant { ctx }
 = match ctx with
   | Nil -> ()
-  | Cons h t -> interp_ctx_wr t l g  end
+  | Cons _ t -> interp_ctx_wr t l g  end
 
 let rec lemma interp_ctx_wl (ctx l: context) (g:equality)
   ensures { forall y z. interp_ctx ctx g y z -> interp_ctx (l ++ ctx) g y z }
   variant { l }
-= match l with Nil -> () | Cons h t -> interp_ctx_wl ctx t g  end
+= match l with Nil -> () | Cons _ t -> interp_ctx_wl ctx t g  end
 
 let rec mul_expr (e:expr) (c:coeff) : expr
   ensures { forall y z. interp result y z
             = C.( *) (C.interp c z) (interp e y z) }
   variant { e }
+  raises  { C.Unknown -> true }
 = match e with
   | Cst c1 -> Cst (C.mul c c1)
   | UTerm v -> Term c v
@@ -396,6 +386,7 @@ let rec add_expr (e1 e2: expr) : expr
 
 let mul_eq (eq:equality) (c:coeff)
   ensures { forall y z. interp_eq eq y z -> interp_eq result y z }
+  raises  { C.Unknown -> true }
 = match eq with (e1,e2) -> (mul_expr e1 c, mul_expr e2 c) end
 
 let add_eq (eq1 eq2:equality)
@@ -440,7 +431,7 @@ let sub_expr (e1 e2:expr)
            = C.(+) (C.(+) v1 (C.( *) v2 (C.(-_) C.aone))) v2
            = C.(+) (C.(+) v1 (C.(-_) v2)) v2 = v1 };
   r
-           
+
 
 let rec same_eq (eq1 eq2: equality) : bool
   ensures { result -> forall y z. interp_eq eq1 y z -> interp_eq eq2 y z }
@@ -492,8 +483,8 @@ let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
   | Some sum -> same_eq sum g
   | None -> false
   end
-    
-    
+
+
 
 let transpose (m:matrix coeff) : matrix coeff
   ensures { result.rows = m.columns /\ result.columns = m.rows }
@@ -517,6 +508,7 @@ let swap_rows (m:matrix coeff) (i1 i2: int) : unit
 let mul_row (m:matrix coeff) (i: int) (c: coeff) : unit
   requires { 0 <= i < m.rows }
   requires { not (C.eq c C.czero) }
+  raises  { C.Unknown -> true }
 = for j = 0 to m.columns - 1 do
     set m i j (C.mul c (get m i j))
   done
@@ -589,26 +581,28 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
 
 use import array.ToList
 
+exception Absurd
+
 let linear_decision (l: context) (g: equality) : bool
   requires { valid_ctx l }
   requires { valid_eq g }
   ensures { forall y z. result -> interp_ctx l g y z }
   raises  { C.Unknown -> true }
+  raises  { Absurd -> true }
 =
   let nv = max (max_var_e g) (max_var_ctx l) in
   let ll = length l in
   let a = Matrix.make ll (nv+1) C.czero in
-  let b = Array.make ll C.czero in      (* ax = b *)
+  let b = Array.make ll C.czero in            (* ax = b *)
   let v = Array.make (nv+1) C.czero in          (* goal *)
-  (*v[0] <- any coeff;*)
   let rec fill_expr (ex: expr) (i:int): unit
     variant { ex }
-    requires { no_cst ex }
     raises  { C.Unknown -> true }
     requires { 0 <= i < length l }
     requires { expr_bound ex nv }
+    raises  { Absurd -> true }
   = match ex with
-    | Cst c -> if C.eq c C.czero then () else absurd
+    | Cst c -> if C.eq c C.czero then () else raise Absurd
     | Term c j -> set a i j (C.add (get a i j) c)
     | UTerm j -> set a i j (C.add (get a i j) C.cone)
     | Add e1 e2 -> fill_expr e1 i; fill_expr e2 i
@@ -619,6 +613,7 @@ let linear_decision (l: context) (g: equality) : bool
     requires { length l - i = length ctx }
     requires { 0 <= i <= length l }
     raises  { C.Unknown -> true }
+    raises  { Absurd -> true }
   = match ctx with
     | Nil -> ()
     | Cons e t ->
@@ -631,10 +626,10 @@ let linear_decision (l: context) (g: equality) : bool
   let rec fill_goal (ex:expr) : unit
     requires { expr_bound ex nv }
     variant { ex }
-    requires { no_cst ex }
     raises { C.Unknown -> true }
+    raises  { Absurd -> true }
   = match ex with
-    | Cst c -> if C.eq c C.czero then () else absurd
+    | Cst c -> if C.eq c C.czero then () else raise Absurd
     | Term c j -> v[j] <- C.add v[j] c
     | UTerm j -> v[j] <- C.add v[j] C.cone
     | Add e1 e2 -> fill_goal e1; fill_goal e2
@@ -649,11 +644,9 @@ let linear_decision (l: context) (g: equality) : bool
   let ab' = transpose ab in
   match gauss_jordan (m_append ab' cd) with
     | Some r ->
-      check_combination l g (to_list r 0 ll) (*apply_l r a == v && C.eq (sprod r b) d*)
+      check_combination l g (to_list r 0 ll)
     | None -> false
   end
-
-(* forall eq in list interp_eq  est vraie -> interp_eq (toute combinaison linéaire) est vraie *)
 
 end
 module RationalCoeffs
@@ -671,23 +664,57 @@ type rvars = int -> real
 function of_int (n:int) : t = (n,1)
 (*meta coercion function of_int*)
 
+exception DZero
 
 let constant rzero = (0,1)
 let constant rone = (1,1)
 
 function rinterp (t:t) (v:rvars) : real
 = match t with
-  | (n,d) ->  from_int n /. from_int d (*todo if d = 1 then n...*)
+  | (n,d) ->  from_int n /. from_int d
   end
+
+let lemma prod_compat_eq (a b c:real)
+  requires { c <> 0.0 }
+  requires { a *. c = b *. c }
+  ensures  { a = b }
+= ()
+
+
+let lemma cross_d (n1 d1 n2 d2:int)
+  requires { d1 <> 0 /\ d2 <> 0 }
+  requires { n1 * d2 = n2 * d1 }
+  ensures { forall v. rinterp (n1,d1) v = rinterp (n2,d2) v }
+= let d = from_int (d1 * d2) in
+  assert { forall v. rinterp (n1, d1) v = rinterp (n2, d2) v
+           by rinterp (n1, d1) v *. d = rinterp (n2,d2) v *. d }
+
+let lemma cross_ind (n1 d1 n2 d2:int)
+  requires { d1 <> 0 /\ d2 <> 0 }
+  requires { forall v. rinterp (n1,d1) v = rinterp (n2,d2) v }
+  ensures  { n1 * d2 = n2 * d1 }
+= assert { from_int d1 <> 0.0 /\ from_int d2 <> 0.0 };
+  assert { from_int n1 /. from_int d1 = from_int n2 /. from_int d2 };
+  assert { from_int n1 *. from_int d2 = from_int n2 *. from_int d1
+           by from_int n1 *. from_int d2
+              = (from_int n1 /. from_int d1) *. from_int d1 *. from_int d2
+              = (from_int n2 /. from_int d2) *. from_int d1 *. from_int d2
+              = from_int n2 *. from_int d1 };
+  assert { from_int (n1*d2) = from_int (n2 * d1) }
+
+
+lemma cross: forall n1 d1 n2 d2: int. d1 <> 0 -> d2 <> 0 ->
+             n1 * d2 = n2 * d1 <->
+             forall v. rinterp (n1,d1) v = rinterp (n2,d2) v
 
 use import int.ComputerDivision
 use import ref.Ref
 use import number.Gcd
 
 let gcd (x:int) (y:int)
-  requires { x >= 0 /\ y >= 0 }
+  requires { x > 0 /\ y > 0 }
   ensures { result = gcd x y }
-  ensures { x > 0 -> result > 0 }
+  ensures { result > 0 }
   =
   let ghost ox = x in
   let x = ref x in let y = ref y in
@@ -702,52 +729,77 @@ let gcd (x:int) (y:int)
      x := !y; y := r;
   done;
   !x
-(*
+
 let simp (t:t) : t
   ensures { forall v:rvars. rinterp result v = rinterp t v }
 = match t with
   | (n,d) ->
+    if d = 0 then t
+    else if n = 0 then rzero
+    else
     let g = gcd (abs n) (abs d) in
-    if g > 1
-    then
-      let n', d' = (div n g, div d g) in
-      assert { n = g * n' /\ d = g * d' };
-      assert { n /. d = n' /. d' };
-      (n', d')
-    else (n, d)
-  end
-*)
-let radd (a b:t)
-= match (a,b) with
-  | (n1,d1), (n2,d2) -> (*simp*) ((n1*d2 + n2*d1),(d1*d2))
+    let n', d' = (div n g, div d g) in
+    assert { n = g * n' /\ d = g * d' };
+    assert { n' * d = n * d' };
+    (n', d')
   end
 
-let rmul (a b:t)
+let radd (a b:t)
+  ensures { forall y. rinterp result y = rinterp a y +. rinterp b y }
+  raises  { DZero -> true }
 = match (a,b) with
-  | (n1,d1), (n2, d2) -> (*simp*) (n1*n2, d1*d2)
+  | (n1,d1), (n2,d2) ->
+  if d1 = 0 || d2 = 0 then raise DZero
+  else begin
+    let r = (n1*d2 + n2*d1, d1*d2) in
+    let ghost d = from_int d1 *. from_int d2 in
+    assert { forall y.
+             rinterp a y +. rinterp b y = rinterp r y
+             by rinterp a y *. d = from_int n1 *. from_int d2
+             so rinterp b y *. d = from_int n2 *. from_int d1
+             so (rinterp a y +. rinterp b y) *. d
+                = from_int (n1*d2 + n2*d1)
+                = rinterp r y *. d };
+    simp r end
+ end
+
+let rmul (a b:t)
+  ensures { forall y. rinterp result y = rinterp a y *. rinterp b y }
+  raises  { DZero -> true }
+= match (a,b) with
+  | (n1,d1), (n2, d2) ->
+    if d1 = 0 || d2 = 0 then raise DZero
+    else begin
+      let r =  (n1*n2, d1*d2) in
+      assert { forall y. rinterp r y = rinterp a y *. rinterp b y
+               by rinterp r y = from_int (n1*n2) /. from_int(d1*d2)
+                  = (from_int n1 *. from_int n2) /. (from_int d1 *. from_int d2)
+                  = (from_int n1 /. from_int d1) *. (from_int n2 /. from_int d2)
+                  = rinterp a y *. rinterp b y };
+      simp r
+    end
   end
 
 let ropp (a:t)
+  ensures { forall y. rinterp result y = -. rinterp a y }
 = match a with
   | (n,d) -> (-n, d)
   end
 
 let predicate req (a b:t)
+  ensures { result -> forall y. rinterp a y = rinterp b y }
 = match (a,b) with
-  | (n1,d1), (n2,d2) -> n1 * d2 = n2 * d1
+  | (n1,d1), (n2,d2) -> n1 = n2 && d1 = d2 || (d1 <> 0 && d2 <> 0 && n1 * d2 = n2 * d1)
   end
 
-let rinv a
+let rinv (a:t)
+  requires { not req a rzero }
+  ensures { not req result rzero }
+  ensures { forall y. rinterp result y *. rinterp a y = 1.0 }
+  raises  { DZero -> true }
 = match a with
-  | (n,d) -> (d,n)
+  | (n,d) -> if n = 0 || d = 0 then raise DZero else (d,n)
   end
-
-let function rle (a b:t)
-= match (a,b) with
-  | (n1,d1), (n2,d2) -> n1 * d2 <= n2 * d1
-  end
-
-predicate (<=) (a b:t) = rle a b
 
 end
 
@@ -757,7 +809,7 @@ use import RationalCoeffs
 use import real.RealInfix
 use import real.FromInt
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), type coeff = t, function C.interp=rinterp, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, lemma C.eq_def, val C.le=rle, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.( *) = ( *.), function C.(-_) = (-._), type coeff = t, function C.interp=rinterp, exception C.Unknown = DZero, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 end
 
@@ -775,13 +827,10 @@ let inv (t:int) : int
   raises { Unknown -> true }
 = raise Unknown
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), type coeff = int, function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = ( *), val C.opp = (-_), val C.eq = eq, val C.inv = inv, lemma C.eq_def, val C.le = (<=), goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
+clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), type coeff = int, function C.interp = id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = zero, val C.cone = one, lemma C.zero_def, lemma C.one_def, val C.add = (+), val C.mul = ( *), val C.opp = (-_), val C.eq = eq, val C.inv = inv, goal C.A.ZeroLessOne, goal C.A.CompatOrderAdd, goal C.A.CompatOrderMult, goal C.A.Unitary, goal C.A.NonTrivialRing, goal C.A.Mul_distr_l, goal C.A.Mul_distr_r, goal C.A.Inv_def_l, goal C.A.Inv_def_r, goal C.A.MulAssoc.Assoc, goal C.A.Assoc, goal C.A.MulComm.Comm, goal C.A.Comm, goal C.A.Unit_def_l, goal C.A.Unit_def_r
 
 
 use import real.FromInt
-
-axiom from_int_ext: forall x y: int. from_int x = from_int y -> x = y
-(*FIXME put this in real.why ?*)
 
 use import RationalCoeffs
 use LinearDecisionRational as R
@@ -825,6 +874,8 @@ let int_decision (l: context) (g: equality) : bool
   requires { valid_ctx l }
   requires { valid_eq g }
   ensures { forall y z. result -> interp_ctx l g y z }
+  raises  { R.Absurd -> true }
+  raises  { DZero -> true }
 = R.linear_decision (m_ctx l) (m_eq g)
 
 end
