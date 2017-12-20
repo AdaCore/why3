@@ -296,7 +296,7 @@ and print_tnode _opl opr info fmt t =
       let vl,_,t0 = t_open_lambda t in
       if vl = [] then begin
         let v,f = t_open_bound fb in
-        fprintf fmt (protect_on opr "epsilon %a.@ %a")
+        fprintf fmt (protect_on opr "@[<hov 1>epsilon %a.@ %a@]")
           (print_vsty info) v (print_opl_fmla info) f;
         forget_var v
       end else begin
@@ -928,16 +928,16 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
   if stt <> "" then
     match prev with
     | Some (Axiom _) when stt = "Lemma" ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Hypothesis %a : %a%a.@]@\n@\n"
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Hypothesis %a :@.%a%a.@]@\n@\n"
         print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a : %a%a.@]@\n%a@\n"
+      fprintf fmt "(* Why3 goal *)@\n@[<hov 2>%s %a :@.%a%a.@]@\n%a@\n"
         stt print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
         (print_previous_proof (Some (params,f)) info) prev
   else
-    fprintf fmt "@[<hov 2>Axiom %a : %a%a.@]@\n@\n"
+    fprintf fmt "@[<hov 2>Axiom %a :@.%a%a.@]@\n@\n"
       print_pr pr (print_params info ~whytypes:true) params
       (print_fmla info) f;
   forget_tvs ()

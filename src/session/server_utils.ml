@@ -465,6 +465,7 @@ let interp commands_table cont id s =
                                 @ replay @\n\
                                 @ bisect @\n\
                                 @ help <transformation_name> @\n\
+                                @ list_ide_command @ \n\
                                 @\n\
                                 Available queries are:@\n@[%a@]" help_on_queries commands_table
                   in
@@ -489,6 +490,20 @@ let rec unproven_goals_below_node ~proved ~children ~is_goal acc node =
       List.fold_left (unproven_goals_below_node ~proved ~children ~is_goal)
         acc nodes
 
+(* [split_list l node] returns a pair of list which contains the elements that
+   appear before node (respectively after node). *)
+let split_list l node =
+  let rec split_list l acc =
+    match l with
+    | [] -> ([], List.rev acc)
+    | hd :: tl ->
+        if hd = node then
+          (List.rev acc, tl)
+        else
+          split_list tl (hd :: acc)
+  in
+  split_list l []
+
 let get_first_unproven_goal_around
     ~proved ~children ~get_parent ~is_goal ~is_pa node =
   let rec look_around node =
@@ -501,6 +516,16 @@ let get_first_unproven_goal_around
           unproven_goals_below_node ~proved ~children ~is_goal [] parent
   in
   let node = if is_pa node then Opt.get (get_parent node) else node in
-  match List.rev (look_around node) with
-  | [] -> None
+  let node_list = look_around node in
+  (* We look into this list of brothers in case the original node is inside it.
+     If it is inside the list, we want to get the first non proved node after
+     the original node. *)
+  let (before_node, after_node) = split_list (List.rev node_list) node in
+  match after_node with
+  | [] ->
+    begin
+      match before_node with
+      | [] -> None
+      | hd :: _tl -> Some hd
+    end
   | hd :: _tl  -> Some hd

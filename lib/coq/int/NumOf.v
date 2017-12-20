@@ -28,8 +28,8 @@ Definition numof: (Z -> bool) -> Z -> Z -> Z.
 Defined.
 
 (* Why3 goal *)
-Lemma Numof_empty : forall (p:(Z -> bool)) (a:Z) (b:Z), (b <= a)%Z ->
-  ((numof p a b) = 0%Z).
+Lemma Numof_empty :
+forall (p:(Z -> bool)) (a:Z) (b:Z), (b <= a)%Z -> ((numof p a b) = 0%Z).
   intros p a b h1.
   unfold numof.
   assert (Z.to_nat (b - a) = 0).
@@ -44,9 +44,10 @@ Lemma Numof_empty : forall (p:(Z -> bool)) (a:Z) (b:Z), (b <= a)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_right_no_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
-  ((~ ((p (b - 1%Z)%Z) = true)) -> ((numof p a b) = (numof p a
-  (b - 1%Z)%Z))).
+Lemma Numof_right_no_add :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a < b)%Z ->
+ ((~ ((p (b - 1%Z)%Z) = true)) -> ((numof p a b) = (numof p a (b - 1%Z)%Z))).
 intros p a b h1 h2.
 unfold numof, numof.
 rewrite S_pred with (m := 0) (n := Z.to_nat (b - a)).
@@ -61,9 +62,11 @@ rewrite <-Z2Nat.inj_lt; omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_right_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z -> (((p
-  (b - 1%Z)%Z) = true) -> ((numof p a b) = (1%Z + (numof p a
-  (b - 1%Z)%Z))%Z)).
+Lemma Numof_right_add :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a < b)%Z ->
+ (((p (b - 1%Z)%Z) = true) ->
+  ((numof p a b) = (1%Z + (numof p a (b - 1%Z)%Z))%Z)).
 intros p a b h1 h2.
 unfold numof, numof.
 rewrite S_pred with (m := 0) (n := Z.to_nat (b - a)), <-Z2Nat.inj_pred.
@@ -76,8 +79,9 @@ rewrite <-Z2Nat.inj_lt; omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_bounds : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
-  ((0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z).
+Lemma Numof_bounds :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a < b)%Z -> ((0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z).
   intros p a b h1.
   unfold numof.
   set (x := Z.to_nat (b - a)).
@@ -90,8 +94,10 @@ Lemma Numof_bounds : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_append : forall (p:(Z -> bool)) (a:Z) (b:Z) (c:Z), ((a <= b)%Z /\
-  (b <= c)%Z) -> ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
+Lemma Numof_append :
+forall (p:(Z -> bool)) (a:Z) (b:Z) (c:Z),
+ ((a <= b)%Z /\ (b <= c)%Z) ->
+ ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
   intros p a b c (h1,h2).
   pattern c.
   apply Zlt_lower_bound_ind with (z := b); auto.
@@ -125,8 +131,10 @@ Lemma numof_pred: forall p a, numof p (a - 1) a = (if p (a - 1)%Z then 1%Z else 
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_left_no_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
-  ((~ ((p a) = true)) -> ((numof p a b) = (numof p (a + 1%Z)%Z b))).
+Lemma Numof_left_no_add :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a < b)%Z ->
+ ((~ ((p a) = true)) -> ((numof p a b) = (numof p (a + 1%Z)%Z b))).
   intros p a b h1 h2.
   rewrite Numof_append with (b := (a+1)%Z) by omega.
   rewrite (numof_succ p a).
@@ -135,8 +143,10 @@ Lemma Numof_left_no_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_left_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z -> (((p
-  a) = true) -> ((numof p a b) = (1%Z + (numof p (a + 1%Z)%Z b))%Z)).
+Lemma Numof_left_add :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a < b)%Z ->
+ (((p a) = true) -> ((numof p a b) = (1%Z + (numof p (a + 1%Z)%Z b))%Z)).
   intros p a b h1 h2.
   rewrite Numof_append with (b := (a+1)%Z) by omega.
   rewrite (numof_succ p a).
@@ -144,8 +154,10 @@ Lemma Numof_left_add : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z -> (((p
 Qed.
 
 (* Why3 goal *)
-Lemma Empty : forall (p:(Z -> bool)) (a:Z) (b:Z), (forall (n:Z),
-  ((a <= n)%Z /\ (n < b)%Z) -> ~ ((p n) = true)) -> ((numof p a b) = 0%Z).
+Lemma Empty :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ~ ((p n) = true)) ->
+ ((numof p a b) = 0%Z).
   intros p a b.
   case (Z_lt_le_dec a b); intro; [|intro; apply Numof_empty]; auto.
   pattern b.
@@ -163,9 +175,11 @@ Lemma Empty : forall (p:(Z -> bool)) (a:Z) (b:Z), (forall (n:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma Full : forall (p:(Z -> bool)) (a:Z) (b:Z), (a <= b)%Z ->
-  ((forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ((p n) = true)) -> ((numof p a
-  b) = (b - a)%Z)).
+Lemma Full :
+forall (p:(Z -> bool)) (a:Z) (b:Z),
+ (a <= b)%Z ->
+ ((forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ((p n) = true)) ->
+  ((numof p a b) = (b - a)%Z)).
   intros p a b h1.
   pattern b.
   apply Zlt_lower_bound_ind with (z := a); auto with zarith; intros.
@@ -212,8 +226,9 @@ Lemma numof_pos: forall p a b k, (a <= k < b)%Z -> p k = true -> (0 < numof p a 
 Qed.
 
 (* Why3 goal *)
-Lemma numof_increasing : forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z),
-  ((i <= j)%Z /\ (j <= k)%Z) -> ((numof p i j) <= (numof p i k))%Z.
+Lemma numof_increasing :
+forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z),
+ ((i <= j)%Z /\ (j <= k)%Z) -> ((numof p i j) <= (numof p i k))%Z.
 intros p i j k (h1,h2).
 rewrite (Numof_append p i j k) by omega.
 rewrite <-Z.le_sub_le_add_l, Zminus_diag.
@@ -221,9 +236,10 @@ apply numof_nat.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_strictly_increasing : forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z)
-  (l:Z), ((i <= j)%Z /\ ((j <= k)%Z /\ (k < l)%Z)) -> (((p k) = true) ->
-  ((numof p i j) < (numof p i l))%Z).
+Lemma numof_strictly_increasing :
+forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z) (l:Z),
+ ((i <= j)%Z /\ ((j <= k)%Z /\ (k < l)%Z)) ->
+ (((p k) = true) -> ((numof p i j) < (numof p i l))%Z).
 intros p i j k l (h1,(h2,h3)) h4.
 rewrite (Numof_append p i j l) by omega.
 rewrite <-Z.lt_sub_lt_add_l, Zminus_diag.
@@ -231,9 +247,11 @@ apply numof_pos with (k := k); auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_change_any : forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z)
-  (b:Z), (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) -> ((p2
-  j) = true))) -> ((numof p1 a b) <= (numof p2 a b))%Z.
+Lemma numof_change_any :
+forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z) (b:Z),
+ (forall (j:Z),
+   ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) -> ((p2 j) = true))) ->
+ ((numof p1 a b) <= (numof p2 a b))%Z.
   intros p1 p2 a b.
   case (Z_lt_le_dec a b); intro; [|rewrite Numof_empty, Numof_empty; omega].
   pattern b.
@@ -252,10 +270,13 @@ Lemma numof_change_any : forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z)
 Qed.
 
 (* Why3 goal *)
-Lemma numof_change_some : forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z)
-  (b:Z) (i:Z), ((a <= i)%Z /\ (i < b)%Z) -> ((forall (j:Z), ((a <= j)%Z /\
-  (j < b)%Z) -> (((p1 j) = true) -> ((p2 j) = true))) -> ((~ ((p1
-  i) = true)) -> (((p2 i) = true) -> ((numof p1 a b) < (numof p2 a b))%Z))).
+Lemma numof_change_some :
+forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z) (b:Z) (i:Z),
+ ((a <= i)%Z /\ (i < b)%Z) ->
+ ((forall (j:Z),
+    ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) -> ((p2 j) = true))) ->
+  ((~ ((p1 i) = true)) ->
+   (((p2 i) = true) -> ((numof p1 a b) < (numof p2 a b))%Z))).
   intros p1 p2 a b i (h1,h2) h3 h4 h5.
   generalize (Z_le_lt_eq_dec _ _ (numof_change_any p1 p2 a b h3)).
   intro H; destruct H; trivial.
@@ -275,9 +296,11 @@ Lemma le_ge_eq: forall a b, (a <= b)%Z /\ (b <= a)%Z -> (a = b)%Z.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_change_equiv : forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z)
-  (b:Z), (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) <->
-  ((p2 j) = true))) -> ((numof p2 a b) = (numof p1 a b)).
+Lemma numof_change_equiv :
+forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z) (b:Z),
+ (forall (j:Z),
+   ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) <-> ((p2 j) = true))) ->
+ ((numof p2 a b) = (numof p1 a b)).
 intros p1 p2 a b h1.
 apply le_ge_eq.
 split; apply numof_change_any; apply h1.

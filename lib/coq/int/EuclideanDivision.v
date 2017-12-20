@@ -31,16 +31,18 @@ exact (x - y * div x y)%Z.
 Defined.
 
 (* Why3 goal *)
-Lemma Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
-  y))%Z + (mod1 x y))%Z).
+Lemma Div_mod :
+forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x y))%Z + (mod1 x y))%Z).
 intros x y Zy.
 unfold mod1, div.
 case Z_le_dec ; intros H ; ring.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
+Lemma Mod_bound :
+forall (x:Z) (y:Z),
+ (~ (y = 0%Z)) ->
+ ((0%Z <= (mod1 x y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
 intros x y Zy.
 zify.
 assert (H1 := Z_mod_neg x y).
@@ -55,8 +57,10 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_unique : forall (x:Z) (y:Z) (q:Z), (0%Z < y)%Z ->
-  ((((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z) -> ((div x y) = q)).
+Lemma Div_unique :
+forall (x:Z) (y:Z) (q:Z),
+ (0%Z < y)%Z ->
+ ((((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z) -> ((div x y) = q)).
 intros x y q h1 (h2,h3).
 assert (h:(~(y=0))%Z) by omega.
 generalize (Mod_bound x y h); intro h0.
@@ -77,8 +81,10 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
-  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
+Lemma Div_bound :
+forall (x:Z) (y:Z),
+ ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
+ ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
 intros x y (Hx,Hy).
 unfold div.
 case Z_le_dec ; intros H.
@@ -97,7 +103,8 @@ now apply Zlt_gt.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
+Lemma Mod_1 :
+forall (x:Z), ((mod1 x 1%Z) = 0%Z).
 intros x.
 unfold mod1, div.
 rewrite Zmod_1_r, Zdiv_1_r, Zmult_1_l.
@@ -105,15 +112,16 @@ apply Zminus_diag.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1 : forall (x:Z), ((div x 1%Z) = x).
+Lemma Div_1 :
+forall (x:Z), ((div x 1%Z) = x).
 intros x.
 unfold div.
 now rewrite Zmod_1_r, Zdiv_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x
-  y) = 0%Z).
+Lemma Div_inf :
+forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x y) = 0%Z).
 intros x y Hxy.
 unfold div.
 case Z_le_dec ; intros H.
@@ -123,8 +131,9 @@ now rewrite Zmod_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf_neg : forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (x <= y)%Z) ->
-  ((div (-x)%Z y) = (-1%Z)%Z).
+Lemma Div_inf_neg :
+forall (x:Z) (y:Z),
+ ((0%Z < x)%Z /\ (x <= y)%Z) -> ((div (-x)%Z y) = (-1%Z)%Z).
 intros x y Hxy.
 assert (h: (x < y \/ x = y)%Z) by omega.
 destruct h.
@@ -155,7 +164,8 @@ rewrite Z_div_same_full; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_0 : forall (y:Z), (~ (y = 0%Z)) -> ((mod1 0%Z y) = 0%Z).
+Lemma Mod_0 :
+forall (y:Z), (~ (y = 0%Z)) -> ((mod1 0%Z y) = 0%Z).
 intros y Hy.
 unfold mod1, div.
 rewrite Zmod_0_l.
@@ -164,14 +174,15 @@ now rewrite Zdiv_0_l, Zmult_0_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1_left : forall (y:Z), (1%Z < y)%Z -> ((div 1%Z y) = 0%Z).
+Lemma Div_1_left :
+forall (y:Z), (1%Z < y)%Z -> ((div 1%Z y) = 0%Z).
 intros y Hy.
 rewrite Div_inf; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((div (-1%Z)%Z
-  y) = (-1%Z)%Z).
+Lemma Div_minus1_left :
+forall (y:Z), (1%Z < y)%Z -> ((div (-1%Z)%Z y) = (-1%Z)%Z).
 intros y Hy.
 unfold div.
 assert (h1: (1 mod y = 1)%Z).
@@ -185,15 +196,16 @@ rewrite Zdiv_small; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 1%Z y) = 1%Z).
+Lemma Mod_1_left :
+forall (y:Z), (1%Z < y)%Z -> ((mod1 1%Z y) = 1%Z).
 intros y Hy.
 unfold mod1.
 rewrite Div_1_left; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 (-1%Z)%Z
-  y) = (y - 1%Z)%Z).
+Lemma Mod_minus1_left :
+forall (y:Z), (1%Z < y)%Z -> ((mod1 (-1%Z)%Z y) = (y - 1%Z)%Z).
 intros y Hy.
 unfold mod1.
 rewrite Div_minus1_left; auto with zarith.
@@ -202,8 +214,9 @@ Qed.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
+Lemma Div_mult :
+forall (x:Z) (y:Z) (z:Z),
+ (0%Z < x)%Z -> ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
 intros x y z h.
 unfold div.
 destruct (Z_le_dec 0 (z mod x)).
@@ -215,8 +228,9 @@ generalize (Z_mod_lt z x); auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
+Lemma Mod_mult :
+forall (x:Z) (y:Z) (z:Z),
+ (0%Z < x)%Z -> ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
 intros x y z h.
 unfold mod1.
 rewrite Div_mult.
