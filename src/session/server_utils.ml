@@ -366,6 +366,13 @@ type command =
   | QError       of string
   | Other        of string * string list
 
+let query_on_task cont f id args =
+  let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+  try Query (f cont table args) with
+    | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
+    | Number_of_arguments -> QError "Bad number of arguments"
+
+
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   match Stdlib.Hstr.find commands_table cmd with
@@ -374,11 +381,12 @@ let interp commands_table cont id s =
       match f,id with
       | Qnotask f, _ -> Query (f cont args)
       | Qtask f, Some (Session_itp.APn id) ->
-          let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
-          let s = try Query (f cont table args) with
-            | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
-            | Number_of_arguments -> QError "Bad number of arguments"
-          in s
+          query_on_task cont f id args
+      | Qtask f, Some (Session_itp.APa pid) ->
+          let id = Session_itp.get_proof_attempt_parent
+              cont.Controller_itp.controller_session pid
+          in
+          query_on_task cont f id args
       | Qtask _, _ -> QError "please select a goal first"
     end
   | exception Not_found ->
@@ -457,6 +465,7 @@ let interp commands_table cont id s =
                                 @ replay @\n\
                                 @ bisect @\n\
                                 @ help <transformation_name> @\n\
+                                @ list_ide_command @ \n\
                                 @\n\
                                 Available queries are:@\n@[%a@]" help_on_queries commands_table
                   in
@@ -481,6 +490,20 @@ let rec unproven_goals_below_node ~proved ~children ~is_goal acc node =
       List.fold_left (unproven_goals_below_node ~proved ~children ~is_goal)
         acc nodes
 
+(* [split_list l node] returns a pair of list which contains the elements that
+   appear before node (respectively after node). *)
+let split_list l node =
+  let rec split_list l acc =
+    match l with
+    | [] -> ([], List.rev acc)
+    | hd :: tl ->
+        if hd = node then
+          (List.rev acc, tl)
+        else
+          split_list tl (hd :: acc)
+  in
+  split_list l []
+
 let get_first_unproven_goal_around
     ~proved ~children ~get_parent ~is_goal ~is_pa node =
   let rec look_around node =
@@ -493,6 +516,16 @@ let get_first_unproven_goal_around
           unproven_goals_below_node ~proved ~children ~is_goal [] parent
   in
   let node = if is_pa node then Opt.get (get_parent node) else node in
-  match List.rev (look_around node) with
-  | [] -> None
+  let node_list = look_around node in
+  (* We look into this list of brothers in case the original node is inside it.
+     If it is inside the list, we want to get the first non proved node after
+     the original node. *)
+  let (before_node, after_node) = split_list (List.rev node_list) node in
+  match after_node with
+  | [] ->
+    begin
+      match before_node with
+      | [] -> None
+      | hd :: _tl -> Some hd
+    end
   | hd :: _tl  -> Some hd

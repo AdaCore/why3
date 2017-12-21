@@ -1270,6 +1270,23 @@ end
             P.notify (Next_Unproven_Node_Id (ni, node_ID_from_any any))
       end
 
+   (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
+   let request_is_valid r =
+     match r with
+     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
+     | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req -> true
+     | Get_first_unproven_node ni ->
+         Hint.mem model_any ni
+     | Focus_req nid ->
+         Hint.mem model_any nid
+     | Remove_subtree nid ->
+         Hint.mem model_any nid
+     | Copy_paste (from_id, to_id) ->
+         Hint.mem model_any from_id && Hint.mem model_any to_id
+     | Get_task(nid,_,_,_) ->
+         Hint.mem model_any nid
+     | Command_req (nid, _) ->
+         Hint.mem model_any nid
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1277,6 +1294,22 @@ end
   let treat_request r =
     let d = get_server_data () in
     let config = d.cont.controller_config in
+    (* Check that the request does not refer to obsolete node_ids *)
+    if not (request_is_valid r) then
+      begin
+        (* These errors come from the client-server behavior of itp. They cannot
+           be completely avoided and could be safely ignored.
+           They are ignored if a debug flag is not added.
+         *)
+        if Debug.test_flag Debug.stack_trace then
+          raise Not_found;
+        if Debug.test_flag debug then
+          P.notify (Message (Error (Pp.string_of
+            (fun fmt r -> Format.fprintf fmt
+              "The following request refer to obsolete node_ids:\n %a\n"
+             print_request r) r)))
+      end
+    else
     try (
     match r with
     | Save_req                     -> save_session ()
