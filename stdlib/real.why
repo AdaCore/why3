@@ -128,7 +128,8 @@ theory FromInt
   axiom Neg:
     forall x:int. from_int (Int.(-_) (x)) = - from_int x
 
-  axiom Injective: forall x y: int. from_int x = from_int y -> x = y
+  axiom Injective:
+    forall x y: int. from_int x = from_int y -> x = y
   axiom Monotonic:
     forall x y:int. Int.(<=) x y -> from_int x <= from_int y
 
