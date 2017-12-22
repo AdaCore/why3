@@ -363,7 +363,9 @@ let () =
     "print", "<id> print the declaration where <id> was defined",
     Qtask print_id;
     "search", "<ids> print the declarations where all <ids> appears",
-    Qtask search_id;
+    Qtask (search_id ~search_both:false);
+    "search_all", "<ids> print the declarations where one of <ids> appears",
+    Qtask (search_id ~search_both:true);
 (*
     "r", "reload the session (test only)", test_reload;
     "s", "save the current session", test_save_session;
