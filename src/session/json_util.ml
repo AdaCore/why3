@@ -157,6 +157,7 @@ let convert_request_constructor (r: ide_request) =
   | Reload_req                -> String "Reload_req"
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
+  | Get_global_infos          -> String "Get_global_infos"
 
 let print_request_to_json (r: ide_request): Json_base.json =
   let cc = convert_request_constructor in
@@ -194,16 +195,13 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Focus_req id ->
       convert_record ["ide_request", cc r;
                       "node_ID", Int id]
-  | Unfocus_req ->
-      convert_record ["ide_request", cc r]
-  | Save_req ->
-      convert_record ["ide_request", cc r]
-  | Reload_req ->
-      convert_record ["ide_request", cc r]
-  | Exit_req ->
-      convert_record ["ide_request", cc r]
-  | Interrupt_req ->
-      convert_record ["ide_request", cc r])
+  | Unfocus_req
+  | Save_req
+  | Reload_req
+  | Exit_req
+  | Interrupt_req
+  | Get_global_infos ->
+     convert_record ["ide_request", cc r])
 
 let convert_constructor_message (m: message_notification) =
   match m with
@@ -213,7 +211,6 @@ let convert_constructor_message (m: message_notification) =
   | Replay_Info _         -> String "Replay_Info"
   | Query_Info _          -> String "Query_Info"
   | Query_Error _         -> String "Query_Error"
-  | Help _                -> String "Help"
   | Information _         -> String "Information"
   | Task_Monitor _        -> String "Task_Monitor"
   | Parse_Or_Type_Error _ -> String "Parse_Or_Type_Error"
@@ -258,9 +255,6 @@ let convert_message (m: message_notification) =
       convert_record ["mess_notif", cc m;
            "node_ID", Int nid;
            "qerror", String s]
-  | Help s ->
-      convert_record ["mess_notif", cc m;
-           "qhelp", String s]
   | Information s ->
       convert_record ["mess_notif", cc m;
            "information", String s]
@@ -619,10 +613,6 @@ let parse_message constr j =
     let nid = get_int (get_field j "node_ID") in
     let s = get_string (get_field j "qerror") in
     Query_Error (nid, s)
-
-  | "Help" ->
-    let s = get_string (get_field j "qhelp") in
-    Help s
 
   | "Information" ->
     let s = get_string (get_field j "information") in

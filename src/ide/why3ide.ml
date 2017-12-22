@@ -195,23 +195,6 @@ let env, gconfig = try
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(* Initialization of config, provers, task_driver and controller in the server *)
-let () =
-  let dir =
-    try
-      Server_utils.get_session_dir ~allow_mkdir:true files
-    with Invalid_argument s ->
-      Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
-  in
-  Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files
-
-let () =
-  Debug.dprintf debug "Init the GTK interface...@?";
-  ignore (GtkMain.Main.init ());
-  Debug.dprintf debug " done.@.";
-  Gconfig.init ()
 
 
 (********************************)
@@ -377,6 +360,23 @@ let update_label_saved (label: GMisc.label) =
 (* Graphical elements *)
 (**********************)
 
+let initialization_complete = ref false
+
+let () =
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:true files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage spec usage_str
+  in
+  Server.init_server gconfig.config env dir;
+  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  send_request Get_global_infos;
+  Debug.dprintf debug "Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  Debug.dprintf debug " done.@.";
+  Gconfig.init ()
 
 let main_window : GWindow.window =
   let w = GWindow.window
@@ -393,7 +393,8 @@ let main_window : GWindow.window =
       (fun {Gtk.width=w;Gtk.height=h} ->
        gconfig.window_height <- h;
        gconfig.window_width <- w)
-  in w
+  in
+  w
 
 (* the main window contains a vertical box, containing:
    1. the menu [menubar]
@@ -475,13 +476,6 @@ let provers_factory =
 (****************************)
 (* actions of the interface *)
 (****************************)
-
-
-
-
-
-
-
 
 
 (***********************************)
@@ -1591,8 +1585,6 @@ let (_ : GtkSignal.id) =
 (* Notification Handling *)
 (*************************)
 
-let initialization_complete = ref false
-
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
@@ -1625,11 +1617,7 @@ let treat_message_notification msg = match msg with
      print_message ~kind:1 ~notif_kind:"Query_info" "%s" s
   | Query_Error (_id, s) ->
      print_message ~kind:1 ~notif_kind:"Query_error" "%s" s
-  | Help s ->
-     print_message ~kind:1 ~notif_kind:"Help" "%s" s
   | Information s ->
-     if not !initialization_complete then main_window#show ();
-     initialization_complete := true;
      print_message ~kind:1 ~notif_kind:"Information" "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
@@ -1637,7 +1625,6 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         if not !initialization_complete then main_window#show ();
          (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
          color_loc ~color:Goal_color rel_loc;
@@ -2205,7 +2192,8 @@ let treat_notification n =
      Hint.remove node_id_proved id;
      Hint.remove node_id_pa id
   | Initialized g_info            ->
-     (* TODO: treat other *)
+     initialization_complete := true;
+     main_window#show ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;
