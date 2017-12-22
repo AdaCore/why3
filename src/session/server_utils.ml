@@ -224,19 +224,24 @@ let occurs_in_decl d id =
   | Dprop ((Paxiom|Plemma), pr, t) -> Ident.id_equal pr.pr_name id || occurs_in_term id t
   | Dprop _ -> false)
 
-let do_search km idl =
+let do_search ~search_both km idl =
   Ident.Mid.fold
     (fun _ d acc ->
-     if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc) km Decl.Sdecl.empty
+      if search_both then
+        (if List.exists (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)
+      else
+        (if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)) km Decl.Sdecl.empty
 
-let search s tables =
+let search ~search_both s tables =
   let ids = List.rev_map
               (fun s -> try symbol_name (Args_wrapper.find_symbol s tables)
                         with Args_wrapper.Arg_parse_type_error _ |
                              Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s)) s
   in
-  let l = do_search tables.Trans.known_map ids in
+  let l = do_search ~search_both tables.Trans.known_map ids in
   if Decl.Sdecl.is_empty l then
+    (* In case where search_both is true, this error cannot appear because there
+       is at least one declaration: the definition of the ident. *)
        Pp.sprintf
          "No declaration contain all the %d identifiers @[%a@]"
          (List.length ids)
@@ -253,10 +258,10 @@ let print_id _cont task args =
   | [s] -> print_id s task
   | _ -> raise Number_of_arguments
 
-let search_id _cont task args =
+let search_id ~search_both _cont task args =
   match args with
   | [] -> raise Number_of_arguments
-  | _ -> search args task
+  | _ -> search ~search_both args task
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)

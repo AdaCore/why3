@@ -28,6 +28,7 @@ val print_list_delim :
 
 val print_pair_delim :
   unit pp -> unit pp -> unit pp -> 'a pp -> 'b pp -> ('a * 'b) pp
+(** [print_pair_delim left_delim middle_delim right_delim] *)
 val print_pair : 'a pp -> 'b pp -> ('a * 'b) pp
 
 val print_iter1 :

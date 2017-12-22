@@ -128,9 +128,11 @@ else
     echo "Counterexample regression tests succeeded. " >> $REPORT
 fi
 
+# check realizations
+misc/check-realizations.sh >> $REPORT
 
 # replay proofs
-examples/regtests.sh --check-realizations &> $OUT
+examples/regtests.sh &> $OUT
 if test "$?" != "0" ; then
     SUBJECT="$SUBJECT failed"
     echo "Proof replay failed" >> $REPORT
@@ -144,9 +146,9 @@ cp $OUT $REPORTDIR/regtests-$DATE
 
 echo "Ending time (UTC): "`date --utc +%H:%M` >> $REPORT
 
-# 3-line summary + 4 lines check realizations
+# 3-line summary
 echo "" >> $REPORT
-tail -7 $OUT >> $REPORT
+tail -3 $OUT >> $REPORT
 echo "" >> $REPORT
 
 # output the diff against previous run

@@ -573,7 +573,6 @@ let interpNotif (n: notification) =
         PE.error_print_msg
           (Format.asprintf "Query error on selected node: \"%s\"" s)
       | Query_Info (_nid, s) -> PE.error_print_msg s
-      | Help s -> PE.error_print_msg s
       | Information s -> PE.error_print_msg s
       | Error s ->
           PE.error_print_msg
