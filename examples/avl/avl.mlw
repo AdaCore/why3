@@ -433,16 +433,16 @@ module AVL
     ensures { let hl = l.hgt in let hr = r.hgt in
       let he = 1 + if hl < hr then hr else hl in let hres = result.hgt in
       0 <= he - hres <= 1 }
-    variant { l.hgt + r.hgt }
+    variant { if l.hgt > r.hgt then l.hgt - r.hgt else r.hgt - l.hgt }
   = match view l with
     | AEmpty -> cons d r
     | ANode ll ld lr lh _ -> match view r with
       | AEmpty -> snoc l d
       | ANode rl rd rr rh _ ->
         let df = I.sub lh rh (I.neg rh) lh in
-        if I.ge df balancing
+        if I.gt df balancing
         then balance ll ld (join lr d r)
-        else if I.le df (I.neg balancing)
+        else if I.lt df (I.neg balancing)
         then balance (join l d rl) rd rr
         else node l d r
       end
