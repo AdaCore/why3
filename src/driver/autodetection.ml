@@ -61,9 +61,9 @@ type prover_autodetection_data =
       execs : string list;
       version_switch : string;
       version_regexp : string;
-      versions_ok : Str.regexp list;
-      versions_old : Str.regexp list;
-      versions_bad : Str.regexp list;
+      versions_ok : (string * Str.regexp) list;
+      versions_old : (string * Str.regexp) list;
+      versions_bad : (string * Str.regexp) list;
       (** If none it's a fake prover (very bad version) *)
       prover_command : string option;
       prover_command_steps : string option;
@@ -84,7 +84,7 @@ let prover_keys =
 
 let load_prover kind (id,section) =
   check_exhaustive section prover_keys;
-  let reg_map = List.rev_map why3_regexp_of_string in
+  let reg_map = List.rev_map (fun s -> (s,why3_regexp_of_string s)) in
   let prover = { kind = kind;
     prover_id = id;
     prover_name = get_string section "name";
@@ -158,7 +158,7 @@ type env =
                                   unknown version (neither good or bad)
                      | None               there is a good version *)
     prover_unknown_version :
-      (int * string * config_prover) option Hstr.t;
+      (prover_autodetection_data * int * string * config_prover) option Hstr.t;
     (* string -> priority * prover  *)
     prover_shortcuts : (int * prover) Hstr.t;
     mutable possible_prover_shortcuts : (filter_prover * string) list;
@@ -254,15 +254,15 @@ let ask_prover_version env exec_name version_switch =
     Hstr2.add env.prover_output (exec_name,version_switch) res;
     res
 
-let check_version version schema = Str.string_match schema version 0
+let check_version version (_,schema) = Str.string_match schema version 0
 
 let known_version env exec_name =
   Hstr.replace env.prover_unknown_version exec_name None
 
-let unknown_version env exec_name prover_id prover_config priority =
+let unknown_version env exec_name prover_id prover_config data priority =
   if not (Hstr.mem env.prover_unknown_version exec_name)
   then Hstr.replace env.prover_unknown_version exec_name
-    (Some (priority,prover_id,prover_config))
+    (Some (data,priority,prover_id,prover_config))
 
 
 let empty_alt s = if s = "" then "alt" else s
@@ -516,22 +516,29 @@ let detect_exec env data acc exec_name =
       if level > 0 then record_prover_for_auto_mode prover level;
       add_prover_with_uniq_id prover_config acc
     end
-    else (unknown_version env exec_name data.prover_id prover_config priority;
+    else (unknown_version env exec_name data.prover_id prover_config data priority;
           acc)
 
 let detect_prover env acc data =
   List.fold_left (detect_exec env data) acc data.execs
+
+let pp_versions =
+  Pp.print_list Pp.comma
+                (Pp.print_pair_delim Pp.nothing Pp.nothing Pp.nothing Pp.string Pp.nothing)
 
 (** add the prover unknown *)
 let detect_unknown env detected =
   Hstr.fold (fun _ pc acc ->
     match pc with
     | None -> acc
-    | Some (priority,prover_id,prover_config) ->
+    | Some (prover_data,priority,prover_id,prover_config) ->
       let prover = prover_config.prover in
-      Warning.emit "Warning: prover %s version %s is not known to be \
-                     supported.@."
-        prover.Wc.prover_name prover.prover_version;
+      Warning.emit "@[Prover %s version %s is not known to be supported.@\n\
+                    Known versions for this prover:@ %a@\n\
+                    Known old versions for this prover:@ %a@]@."
+                   prover.Wc.prover_name prover.prover_version
+                   pp_versions prover_data.versions_ok
+                   pp_versions prover_data.versions_old;
       (* Pb: Even if it match the first prover section (normally
          highest priority) since it is unknown it has the lower
          priority for its id as shortcut. Perhaps we don't want
