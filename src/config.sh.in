@@ -31,16 +31,19 @@ let localdir  = $localdir
 let compile_time_support = [ @COMPILETIMECOQ@ @COMPILETIMEPVS@ ]
 " > $config
 
+echo "
+OCAMLBEST   = @OCAMLBEST@
+BIGINTLIB   = @BIGINTLIB@
+INCLUDE     = @BIGINTINCLUDE@ -I @OCAMLINSTALLLIB@/why3
+INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I @OCAMLINSTALLLIB@/why3
+" > $makefileconfig
+
 if [ "@enable_relocation@" = "no" ]; then
 
 echo "
 BINDIR      = $bindir
 LIBDIR      = $libdir
 DATADIR     = $datadir
-OCAMLBEST   = @OCAMLBEST@
-BIGINTLIB   = @BIGINTLIB@
-INCLUDE     = @BIGINTINCLUDE@ -I @OCAMLINSTALLLIB@/why3
-INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I @OCAMLINSTALLLIB@/why3
-" > $makefileconfig
+" >> $makefileconfig
 
 fi
