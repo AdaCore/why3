@@ -2,6 +2,7 @@
 
 Provers
   * support for Alt-Ergo 2.0.0 (released Nov 14, 2017)
+  * support for Z3 4.6.0 (released Dec 18, 2017)
 
 Standard library
   * fix compatibility of theory int.Exponentiation with instances
