@@ -18,7 +18,7 @@
 
 (** {2 Rounding Modes} *)
 
-theory RoundingMode
+module RoundingMode
   type mode = RNE | RNA | RTP | RTN | RTZ
   (** {h <ul>
      <li>RNE : Round Nearest ties to Even
@@ -31,7 +31,7 @@ theory RoundingMode
   predicate to_nearest (m:mode) = m = RNE \/ m = RNA
 end
 
-theory GenericFloat
+module GenericFloat
 
   use import int.Int
   use import bv.Pow2int
@@ -788,7 +788,7 @@ end
 
 (** {2 Conversions to/from bitvectors} *)
 
-theory Float_BV_Converter
+module Float_BV_Converter
   use bv.BV8
   use bv.BV16
   use bv.BV32
@@ -844,7 +844,7 @@ end
 
 (** {2 Standard simple precision floats (32 bits)} *)
 
-theory Float32
+module Float32
   use int.Int
   use import real.Real
 
@@ -879,7 +879,7 @@ end
 
 (** {2 Standard double precision floats (64 bits)} *)
 
-theory Float64
+module Float64
   use int.Int
   use import real.Real
 
@@ -914,7 +914,7 @@ end
 
 (** {2 Conversions between float formats} *)
 
-theory FloatConverter
+module FloatConverter
 
   use Float64
   use Float32
@@ -941,7 +941,7 @@ theory FloatConverter
 
 end
 
-theory Float32_BV_Converter
+module Float32_BV_Converter
   use import Float32
 
   clone export Float_BV_Converter with
@@ -955,7 +955,7 @@ theory Float32_BV_Converter
     t'real (of_ubv32 m x) = round m (FromInt.from_int (BV32.t'int x))
 end
 
-theory Float64_BV_Converter
+module Float64_BV_Converter
   use import Float64
 
   clone export Float_BV_Converter with

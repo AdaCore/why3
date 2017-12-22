@@ -3,7 +3,7 @@
 
 (** {2 Associativity} *)
 
-theory Assoc
+module Assoc
 
   type t
   function op t t : t
@@ -13,7 +13,7 @@ end
 
 (** {2 Commutativity} *)
 
-theory Comm
+module Comm
 
   type t
   function op t t : t
@@ -23,7 +23,7 @@ end
 
 (** {2 Associativity and Commutativity} *)
 
-theory AC
+module AC
 
   clone export Assoc
   clone export Comm with type t = t, function op = op
@@ -33,7 +33,7 @@ end
 
 (** {2 Monoids} *)
 
-theory Monoid
+module Monoid
 
   clone export Assoc
   constant unit : t
@@ -44,7 +44,7 @@ end
 
 (** {2 Commutative Monoids} *)
 
-theory CommutativeMonoid
+module CommutativeMonoid
 
   clone export Monoid
   clone export Comm with type t = t, function op = op
@@ -54,7 +54,7 @@ end
 
 (** {2 Groups} *)
 
-theory Group
+module Group
 
   clone export Monoid
   function inv t : t
@@ -69,7 +69,7 @@ end
 
 (** {2 Commutative Groups} *)
 
-theory CommutativeGroup
+module CommutativeGroup
 
   clone export Group
   clone export Comm with type t = t, function op = op
@@ -79,7 +79,7 @@ end
 
 (** {2 Rings} *)
 
-theory Ring
+module Ring
 
   type t
   constant zero : t
@@ -101,7 +101,7 @@ end
 
 (** {2 Commutative Rings} *)
 
-theory CommutativeRing
+module CommutativeRing
 
   clone export Ring
   clone Comm as MulComm with type t = t, function op = (*)
@@ -111,7 +111,7 @@ end
 
 (** {2 Commutative Rings with Unit} *)
 
-theory UnitaryCommutativeRing
+module UnitaryCommutativeRing
 
   clone export CommutativeRing
   constant one : t
@@ -122,7 +122,7 @@ end
 
 (** {2 Ordered Commutative Rings} *)
 
-theory OrderedUnitaryCommutativeRing
+module OrderedUnitaryCommutativeRing
 
   clone export UnitaryCommutativeRing
 
@@ -142,7 +142,7 @@ end
 
 (** {2 Field theory} *)
 
-theory Field
+module Field
 
   clone export UnitaryCommutativeRing
 
@@ -178,7 +178,7 @@ end
 
 (** {2 Ordered Fields} *)
 
-theory OrderedField
+module OrderedField
 
   clone export Field
 

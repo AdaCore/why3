@@ -8,7 +8,7 @@ theories for classical functions.
 
 (** {2 Integers and the basic operators} *)
 
-theory Int
+module Int
 
   let constant zero : int = 0
   let constant one  : int = 1
@@ -36,7 +36,7 @@ end
 
 (** {2 Absolute Value} *)
 
-theory Abs
+module Abs
 
   use import Int
 
@@ -54,7 +54,7 @@ end
 
 (** {2 Minimum and Maximum} *)
 
-theory MinMax
+module MinMax
 
   use import Int
 
@@ -76,7 +76,7 @@ end
 
 (** {2 The Basic Well-Founded Order on Integers} *)
 
-theory Lex2
+module Lex2
 
   use import Int
 
@@ -97,7 +97,7 @@ rounds up when divisor is negative.
 
 *)
 
-theory EuclideanDivision
+module EuclideanDivision
 
   use import Int
   use import Abs
@@ -160,7 +160,7 @@ The particular case of Euclidean division by 2
 
 *)
 
-theory Div2
+module Div2
 
   use import Int
 
@@ -177,7 +177,7 @@ towards zero, and thus [mod x y] has the same sign as [x].
 
 *)
 
-theory ComputerDivision
+module ComputerDivision
 
   use import Int
   use import Abs
@@ -237,7 +237,7 @@ end
 
 (** {2 Generic Exponentiation of something to an integer exponent} *)
 
-theory Exponentiation
+module Exponentiation
 
   use import Int
 
@@ -288,7 +288,7 @@ end
 
 (** {2 Power of an integer to an integer } *)
 
-theory Power
+module Power
 
   use import Int
 
@@ -310,7 +310,7 @@ end
 
 (** {2 Number of integers satisfying a given predicate} *)
 
-theory NumOf
+module NumOf
 
   use import Int
 
@@ -379,7 +379,7 @@ end
 
 (** {2 Sum} *)
 
-theory Sum
+module Sum
 
   use import Int
 
@@ -427,7 +427,7 @@ end
 
 (** {2 Factorial function} *)
 
-theory Fact
+module Fact
 
   use import Int
 
@@ -440,7 +440,7 @@ end
 
 (** {2 Generic iteration of a function} *)
 
-theory Iter
+module Iter
 
   use import Int
 
@@ -458,7 +458,7 @@ end
 
 (** {2 Integers extended with an infinite value} *)
 
-theory IntInf
+module IntInf
 
   use import Int
 
@@ -506,7 +506,7 @@ integers greater or equal a given bound.
 
 *)
 
-theory SimpleInduction
+module SimpleInduction
 
   use import Int
 
@@ -520,7 +520,7 @@ theory SimpleInduction
 
 end
 
-theory Induction
+module Induction
 
   use import Int
 
@@ -539,7 +539,7 @@ theory Induction
 
 end
 
-theory Fibonacci "Fibonacci numbers"
+module Fibonacci "Fibonacci numbers"
 
   use import Int
 

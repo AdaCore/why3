@@ -4,7 +4,7 @@
 
 (** {2 Generic Maps} *)
 
-theory Map
+module Map
 
   type map 'a 'b = 'a -> 'b
 
@@ -19,7 +19,7 @@ theory Map
 
 end
 
-theory Const
+module Const
 
   use import Map
 
@@ -27,7 +27,7 @@ theory Const
 
 end
 
-theory MapExt
+module MapExt
 
   predicate (==) (m1 m2: 'a -> 'b) = forall x: 'a. m1 x = m2 x
 
@@ -40,7 +40,7 @@ end
 
 (** {2 Sorted Maps (indexed by integers)} *)
 
-theory MapSorted
+module MapSorted
 
   use import int.Int
   use import Map
@@ -58,7 +58,7 @@ end
 
 (** {2 Maps Equality (indexed by integers)} *)
 
-theory MapEq
+module MapEq
 
   use import int.Int
   use import Map
@@ -68,7 +68,7 @@ theory MapEq
 
 end
 
-theory MapExchange
+module MapExchange
 
   use import int.Int
   use import Map
@@ -87,7 +87,7 @@ end
 
 (** {2 Sum of elements of a map (indexed by integers)} *)
 
-theory MapSum
+module MapSum
 
   use import int.Int
   use export Map
@@ -102,7 +102,7 @@ end
 (** {2 Number of occurrences} *)
 
 (* TODO: we could define Occ using theory int.NumOf *)
-theory Occ
+module Occ
 
   use import int.Int
   use import Map
@@ -166,7 +166,7 @@ theory Occ
 
 end
 
-theory MapPermut
+module MapPermut
 
   use import int.Int
   use import Map
@@ -189,7 +189,7 @@ end
 
 (** {2 Injectivity and surjectivity for maps (indexed by integers)} *)
 
-theory MapInjection
+module MapInjection
 
   use import int.Int
   use export Map
@@ -227,7 +227,7 @@ end
 
 (** {2 Parametric Maps} *)
 
-theory MapParam
+module MapParam
 
   type idx
   type elt

@@ -1,7 +1,7 @@
 
 (** {1 Graph theory} *)
 
-theory Path
+module Path
 
   use import list.List
   use import list.Append
@@ -42,7 +42,7 @@ theory Path
 
 end
 
-theory IntPathWeight
+module IntPathWeight
 
   clone export Path
   use import int.Int
@@ -70,7 +70,7 @@ theory IntPathWeight
 end
 
 (***
-theory SimplePath
+module SimplePath
 
   use import list.List
   use import list.Mem

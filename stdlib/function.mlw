@@ -1,4 +1,4 @@
-theory Injective
+module Injective
 
   type a
   type v
@@ -12,7 +12,7 @@ theory Injective
 
 end
 
-theory Surjective
+module Surjective
 
   type a
   type v
@@ -24,7 +24,7 @@ theory Surjective
 
 end
 
-theory Bijective
+module Bijective
 
   clone export Injective
   clone Surjective as S with type v = v, type a = a,

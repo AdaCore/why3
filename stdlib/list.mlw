@@ -3,7 +3,7 @@
 
 (** {2 Basic theory of polymorphic lists} *)
 
-theory List
+module List
 
   type list 'a = Nil | Cons 'a (list 'a)
 
@@ -16,7 +16,7 @@ end
 
 (** {2 Length of a list} *)
 
-theory Length
+module Length
 
   use import int.Int
   use import List
@@ -58,7 +58,7 @@ end
 
 (** {2 Membership in a list} *)
 
-theory Mem
+module Mem
   use import List
 
   predicate mem (x: 'a) (l: list 'a) = match l with
@@ -68,7 +68,7 @@ theory Mem
 
 end
 
-theory Elements
+module Elements
 
   use import List
   use import Mem
@@ -87,7 +87,7 @@ end
 
 (** {2 Nth element of a list} *)
 
-theory Nth
+module Nth
 
   use import List
   use import option.Option
@@ -101,7 +101,7 @@ theory Nth
 
 end
 
-theory NthNoOpt
+module NthNoOpt
 
   use import List
   use import int.Int
@@ -114,7 +114,7 @@ theory NthNoOpt
 
 end
 
-theory NthLength
+module NthLength
 
   use import int.Int
   use import option.Option
@@ -135,7 +135,7 @@ end
 
 (** {2 Head and tail} *)
 
-theory HdTl
+module HdTl
 
   use import List
   use import option.Option
@@ -152,7 +152,7 @@ theory HdTl
 
 end
 
-theory HdTlNoOpt
+module HdTlNoOpt
 
   use import List
 
@@ -168,7 +168,7 @@ end
 
 (** {2 Relation between head, tail, and nth} *)
 
-theory NthHdTl
+module NthHdTl
 
   use import int.Int
   use import option.Option
@@ -187,7 +187,7 @@ end
 
 (** {2 Appending two lists} *)
 
-theory Append
+module Append
 
   use import List
 
@@ -222,7 +222,7 @@ theory Append
 
 end
 
-theory NthLengthAppend
+module NthLengthAppend
 
   use import int.Int
   use import List
@@ -241,7 +241,7 @@ end
 
 (** {2 Reversing a list} *)
 
-theory Reverse
+module Reverse
 
   use import List
   use import Append
@@ -282,7 +282,7 @@ end
 
 (** {2 Reverse append} *)
 
-theory RevAppend
+module RevAppend
 
   use import List
 
@@ -318,7 +318,7 @@ end
 
 (** {2 Zip} *)
 
-theory Combine
+module Combine
 
   use import List
 
@@ -332,7 +332,7 @@ end
 
 (** {2 Sorted lists for some order as parameter} *)
 
-theory Sorted
+module Sorted
 
   use import List
 
@@ -367,14 +367,14 @@ end
 
 (** {2 Sorted lists of integers} *)
 
-theory SortedInt
+module SortedInt
 
   use import int.Int
   clone export Sorted with type t = int, predicate le = (<=), goal Transitive.Trans
 
 end
 
-theory RevSorted
+module RevSorted
 
   type t
   predicate le t t
@@ -408,7 +408,7 @@ end
 
 (** {2 Number of occurrences in a list} *)
 
-theory NumOcc
+module NumOcc
 
   use import int.Int
   use import List
@@ -443,7 +443,7 @@ end
 
 (** {2 Permutation of lists} *)
 
-theory Permut
+module Permut
 
   use import NumOcc
   use import List
@@ -497,7 +497,7 @@ end
 
 (** {2 List with pairwise distinct elements} *)
 
-theory Distinct
+module Distinct
 
   use import List
   use import Mem
@@ -518,7 +518,7 @@ theory Distinct
 
 end
 
-theory Prefix
+module Prefix
 
   use import List
   use import int.Int
@@ -532,7 +532,7 @@ theory Prefix
 
 end
 
-theory Sum
+module Sum
 
   use import List
   use import int.Int
@@ -548,7 +548,7 @@ end
 (*
 (** {2 Induction on lists} *)
 
-theory Induction
+module Induction
 
   use import List
 
@@ -567,7 +567,7 @@ end
 
 (** {2 Maps as lists of pairs} *)
 
-theory Map
+module Map
 
   use import List
 
@@ -580,7 +580,7 @@ end
 
 (** {2 Generic recursors on lists} *)
 
-theory FoldLeft
+module FoldLeft
 
   use import List
 
@@ -598,7 +598,7 @@ theory FoldLeft
 
 end
 
-theory FoldRight
+module FoldRight
 
   use import List
 
@@ -618,7 +618,7 @@ end
 
 (** {2 Importation of all list theories in one} *)
 
-theory ListRich
+module ListRich
 
   use export List
   use export Length

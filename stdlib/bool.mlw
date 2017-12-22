@@ -3,7 +3,7 @@
 
 (** {2 Basic theory of Booleans} *)
 
-theory Bool
+module Bool
 
   let function andb (x y : bool) : bool =
     match x with
@@ -39,7 +39,7 @@ end
 
 (** {2 Operator if-then-else} *)
 
-theory Ite
+module Ite
 
   let function ite (b:bool) (x y : 'a) : 'a =
     match b with

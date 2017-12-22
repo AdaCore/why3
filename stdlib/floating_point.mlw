@@ -9,7 +9,7 @@ standard</a>}.
 
 (** {2 Definition of IEEE-754 rounding modes} *)
 
-theory Rounding
+module Rounding
 
   type mode = NearestTiesToEven | ToZero | Up | Down | NearestTiesToAway
   (** nearest ties to even, to zero, upward, downward, nearest ties to away *)
@@ -25,7 +25,7 @@ href="http://www.lri.fr/~marche/ayad10ijcar.pdf">[Ayad, Marché, IJCAR,
 
 *)
 
-theory SpecialValues
+module SpecialValues
 
   type class = Finite | Infinite | NaN
 
@@ -81,7 +81,7 @@ every integer between [0] and [n] are representable.
 
 *)
 
-theory GenFloat
+module GenFloat
 
   use import Rounding
   use import real.Real
@@ -155,7 +155,7 @@ A.k.a. binary32 numbers.
 
 *)
 
-theory SingleFormat
+module SingleFormat
 
   type single
 
@@ -177,7 +177,7 @@ A.k.a. binary64 numbers.
 
 *)
 
-theory DoubleFormat
+module DoubleFormat
 
   type double
 
@@ -193,7 +193,7 @@ theory DoubleFormat
 
 end
 
-theory GenFloatSpecStrict
+module GenFloatSpecStrict
 
   use import Rounding
   use import real.Real
@@ -240,7 +240,7 @@ theory GenFloatSpecStrict
 end
 
 
-theory Single
+module Single
 
   use export SingleFormat
 
@@ -253,7 +253,7 @@ theory Single
 end
 
 
-theory Double
+module Double
 
   use export DoubleFormat
 
@@ -273,7 +273,7 @@ This theory extends the generic theory above by adding the special values.
 
 *)
 
-theory GenFloatFull
+module GenFloatFull
 
   use import SpecialValues
   use import Rounding
@@ -415,7 +415,7 @@ theory GenFloatFull
 
 end
 
-theory GenFloatSpecFull
+module GenFloatSpecFull
 
   use import real.Real
   use import real.Square
@@ -609,7 +609,7 @@ end
 
 (** {2 Full theory of single precision floats} *)
 
-theory SingleFull
+module SingleFull
 
   use export SingleFormat
 
@@ -625,7 +625,7 @@ end
 
 (** {2 Full theory of double precision floats} *)
 
-theory DoubleFull
+module DoubleFull
 
   use export DoubleFormat
 
@@ -641,7 +641,7 @@ end
 
 
 
-theory GenFloatSpecMultiRounding
+module GenFloatSpecMultiRounding
 
   use import Rounding
   use import real.Real
@@ -721,7 +721,7 @@ end
 (*** TODO: find constants for type single *)
 
 (***
-theory SingleMultiRounding
+module SingleMultiRounding
 
   constant min_normalized_single : real =
   constant eps_normalized_single : real =
@@ -740,7 +740,7 @@ end
 
 *)
 
-theory DoubleMultiRounding
+module DoubleMultiRounding
 
   use export DoubleFormat
 
