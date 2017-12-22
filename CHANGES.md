@@ -1,5 +1,17 @@
 :x: marks a potential source of incompatibility
 
+Provers
+  * support for Alt-Ergo 2.0.0 (released Nov 14, 2017)
+
+Standard library
+  * fix compatibility of theory int.Exponentiation with instances
+    where multiplication is not commutative.
+    fix corresponding realizations in Coq and Isabelle/HOL :x:
+
+Bug fixes
+  * Fix issue #50:
+    share/Makefile.config is missing when enable_relocation=yes
+
 Version 0.88.2, December 7, 2017
 --------------------------------
 

@@ -19,13 +19,15 @@
 <prover id="14" name="Vampire" version="0.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="15" name="Alt-Ergo" version="1.00.prv" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="16" name="veriT" version="201410" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="17" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="18" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../einstein.why" expanded="true">
 <theory name="Bijection" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
 <theory name="Einstein" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
 </theory>
 <theory name="Goals" sum="9fe1211e777a560b454f17977bc1a636" expanded="true">
- <goal name="G1">
+ <goal name="G1" expl="" expanded="true">
  <proof prover="0"><result status="timeout" time="2.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.17"/></proof>
@@ -43,8 +45,10 @@
  <proof prover="14"><result status="valid" time="1.50"/></proof>
  <proof prover="15"><result status="timeout" time="2.00"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
+ <proof prover="17"><result status="valid" time="1.17" steps="983"/></proof>
+ <proof prover="18"><result status="valid" time="1.41" steps="989"/></proof>
  </goal>
- <goal name="Wrong">
+ <goal name="Wrong" expl="" expanded="true">
  <proof prover="0"><result status="timeout" time="2.00"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
@@ -62,8 +66,10 @@
  <proof prover="14"><result status="unknown" time="1.00"/></proof>
  <proof prover="15"><result status="unknown" time="1.33"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
+ <proof prover="17"><result status="unknown" time="0.57"/></proof>
+ <proof prover="18"><result status="unknown" time="0.66"/></proof>
  </goal>
- <goal name="G2">
+ <goal name="G2" expl="" expanded="true">
  <proof prover="0"><result status="timeout" time="1.99"/></proof>
  <proof prover="1"><result status="timeout" time="2.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.06"/></proof>
@@ -81,6 +87,8 @@
  <proof prover="14"><result status="valid" time="1.27"/></proof>
  <proof prover="15"><result status="valid" time="1.82" steps="523"/></proof>
  <proof prover="16"><result status="timeout" time="1.00"/></proof>
+ <proof prover="17"><result status="valid" time="0.78" steps="1152"/></proof>
+ <proof prover="18"><result status="valid" time="0.95" steps="1156"/></proof>
  </goal>
 </theory>
 </file>
