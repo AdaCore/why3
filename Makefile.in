@@ -1739,7 +1739,7 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 	@if test "@enable_coq_tactic@" = "yes"; then \
 	   echo ; \
 	   echo "=== Checking the Coq tactic ==="; \
-	   $(MAKE) test-coq-tactic.@OCAMLBEST@; fi
+	   $(MAKE) test-coq-tactic; fi
 
 ###############
 # test targets
