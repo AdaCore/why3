@@ -101,6 +101,5 @@ echo ""
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`
 echo "Shapes   size : "`wc -cl $shapes | tail -1`
-fi
 
 exit $res
