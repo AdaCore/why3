@@ -250,10 +250,10 @@ definition eq_sub_bv :: "'a::len word \<Rightarrow> 'a word \<Rightarrow> 'a wor
 definition size_bv :: "'a::len word" where
   "size_bv = of_nat LENGTH('a)"
 
-type_synonym word8 = "8 word"
+definition is_signed_positive :: "'a::len word \<Rightarrow> bool" where
+  "is_signed_positive w = (0 \<le> sint w)"
 
-abbreviation is_signed_positive :: "word8 \<Rightarrow> bool"
-  where "is_signed_positive v \<equiv> \<not> (msb v)"
+type_synonym word8 = "8 word"
 
 why3_open "bv/BV8.xml"
   constants
@@ -351,10 +351,19 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
+why3_vc to_int_extensionality
+  using assms uint_lt [of v] uint_lt [of vqt]
+  by (simp add: to_int_def is_signed_positive_def
+    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+
+why3_vc positive_is_ge_zeros
+  using uint_lt [of x]
+  by (simp add: to_int_def is_signed_positive_def sge_def)
+
 why3_vc to_uint_bounds
   using uint_lt [of v]
   by simp_all
-  
+
 why3_vc to_uint_of_int
   using assms
   by (simp add: uint_in_range_def word_of_int uint_word_of_int mod_pos_pos_trivial)
@@ -444,54 +453,10 @@ why3_vc eq_sub_equiv
 why3_vc eq_sub_bv_def
   by (simp add: eq_sub_bv_defn mask_def)
 
-
-lemma to_int_positive:
-  assumes "is_signed_positive v"
-  shows "to_int v \<ge> 0"
-  using assms
-  using to_int_def [of v]
-  by simp
-
-lemma to_int_negative:
-  assumes "\<not> (is_signed_positive v)"
-  shows "to_int v < 0"
-  using assms
-  using to_int_def [of v]
-  by (simp add: to_uint_bounds(2))
-
-lemma to_int_is_signed_positive:
-  assumes "to_int v = to_int vt"
-  shows "is_signed_positive v = is_signed_positive vt"
-  using assms
-  using to_int_negative [of v]
-  using to_int_positive [of v]
-  using to_int_negative [of vt]
-  using to_int_positive [of vt]
-  by linarith
-
-why3_vc to_int_extensionality
-  using assms
-  using to_int_def [of v]
-  using to_int_def [of vqt]
-  using to_int_is_signed_positive [of v vqt]
-proof -
-  have "uint vqt = uint v"
-    using \<open>to_int v = (if is_signed_positive v then uint v else - (256 - uint v))\<close> \<open>to_int v = to_int vqt \<Longrightarrow> is_signed_positive v = is_signed_positive vqt\<close> \<open>to_int v = to_int vqt\<close> \<open>to_int vqt = (if is_signed_positive vqt then uint vqt else - (256 - uint vqt))\<close> by fastforce
-  then show ?thesis
-    using to_uint_extensionality by blast
-qed
-
-why3_vc positive_is_ge_zeros
-  using sge_def [of x 0]
-  using not_le to_int_def to_int_negative by auto
-
 why3_end
 
 
 type_synonym word16 = "16 word"
-
-abbreviation is_signed_positive16 :: "word16 \<Rightarrow> bool"
-  where "is_signed_positive16 v \<equiv> \<not> (msb v)"
 
 why3_open "bv/BV16.xml"
   constants
@@ -524,7 +489,7 @@ why3_open "bv/BV16.xml"
     eq_sub_bv=eq_sub_bv
     size_bv=size_bv
     one=one_class.one
-    is_signed_positive=is_signed_positive16
+    is_signed_positive=is_signed_positive
   types
     t=word16
 
@@ -589,6 +554,15 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
+why3_vc to_int_extensionality
+  using assms uint_lt [of v] uint_lt [of vqt]
+  by (simp add: to_int_def is_signed_positive_def
+    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+
+why3_vc positive_is_ge_zeros
+  using uint_lt [of x]
+  by (simp add: to_int_def is_signed_positive_def sge_def)
+
 why3_vc to_uint_bounds
   using uint_lt [of v]
   by simp_all
@@ -682,55 +656,10 @@ why3_vc eq_sub_equiv
 why3_vc eq_sub_bv_def
   by (simp add: eq_sub_bv_defn mask_def)
 
-
-lemma to_int_positive16:
-  assumes "is_signed_positive16 v"
-  shows "to_int v \<ge> 0"
-  using assms
-  using to_int_def [of v]
-  by simp
-
-lemma to_int_negative16:
-  assumes "\<not> (is_signed_positive16 v)"
-  shows "to_int v < 0"
-  using assms
-  using to_int_def [of v]
-  by (simp add: to_uint_bounds(2))
-
-lemma to_int_is_signed_positive16:
-  assumes "to_int v = to_int vt"
-  shows "is_signed_positive16 v = is_signed_positive16 vt"
-  using assms
-  using to_int_negative16 [of v]
-  using to_int_positive16 [of v]
-  using to_int_negative16 [of vt]
-  using to_int_positive16 [of vt]
-  by linarith
-
-why3_vc to_int_extensionality
-  using assms
-  using to_int_def [of v]
-  using to_int_def [of vqt]
-  using to_int_is_signed_positive16 [of v vqt]
-proof -
-  have "uint vqt = uint v"
-    using \<open>to_int v = (if is_signed_positive16 v then uint v else - (65536 - uint v))\<close> \<open>to_int v = to_int vqt \<Longrightarrow> is_signed_positive16 v = is_signed_positive16 vqt\<close> \<open>to_int v = to_int vqt\<close> 
-          \<open>to_int vqt = (if is_signed_positive16 vqt then uint vqt else - (65536 - uint vqt))\<close> by fastforce
-  then show ?thesis
-    using to_uint_extensionality by blast
-qed
-
-why3_vc positive_is_ge_zeros
-  using sge_def [of x 0]
-  using not_le to_int_def to_int_negative16 by auto
-
 why3_end
 
 
 type_synonym word32 = "32 word"
-
-abbreviation is_signed_positive32 :: "word32 \<Rightarrow> bool"
-  where "is_signed_positive32 v \<equiv> \<not> (msb v)"
 
 why3_open "bv/BV32.xml"
   constants
@@ -763,7 +692,7 @@ why3_open "bv/BV32.xml"
     eq_sub_bv=eq_sub_bv
     size_bv=size_bv
     one=one_class.one
-    is_signed_positive=is_signed_positive32
+    is_signed_positive=is_signed_positive
   types
     t=word32
 
@@ -828,6 +757,15 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
+why3_vc to_int_extensionality
+  using assms uint_lt [of v] uint_lt [of vqt]
+  by (simp add: to_int_def is_signed_positive_def
+    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+
+why3_vc positive_is_ge_zeros
+  using uint_lt [of x]
+  by (simp add: to_int_def is_signed_positive_def sge_def)
+
 why3_vc to_uint_bounds
   using uint_lt [of v]
   by simp_all
@@ -921,55 +859,10 @@ why3_vc eq_sub_equiv
 why3_vc eq_sub_bv_def
   by (simp add: eq_sub_bv_defn mask_def)
 
-
-lemma to_int_positive32:
-  assumes "is_signed_positive32 v"
-  shows "to_int v \<ge> 0"
-  using assms
-  using to_int_def [of v]
-  by simp
-
-lemma to_int_negative32:
-  assumes "\<not> (is_signed_positive32 v)"
-  shows "to_int v < 0"
-  using assms
-  using to_int_def [of v]
-  by (simp add: to_uint_bounds(2))
-
-lemma to_int_is_signed_positive32:
-  assumes "to_int v = to_int vt"
-  shows "is_signed_positive32 v = is_signed_positive32 vt"
-  using assms
-  using to_int_negative32 [of v]
-  using to_int_positive32 [of v]
-  using to_int_negative32 [of vt]
-  using to_int_positive32 [of vt]
-  by linarith
-
-why3_vc to_int_extensionality
-  using assms
-  using to_int_def [of v]
-  using to_int_def [of vqt]
-  using to_int_is_signed_positive32 [of v vqt]
-proof -
-  have "uint vqt = uint v"
-    using \<open>to_int v = (if is_signed_positive32 v then uint v else - (4294967296 - uint v))\<close> \<open>to_int v = to_int vqt \<Longrightarrow> is_signed_positive32 v = is_signed_positive32 vqt\<close> \<open>to_int v = to_int vqt\<close> 
-          \<open>to_int vqt = (if is_signed_positive32 vqt then uint vqt else - (4294967296 - uint vqt))\<close> by fastforce
-  then show ?thesis
-    using to_uint_extensionality by blast
-qed
-
-why3_vc positive_is_ge_zeros
-  using sge_def [of x 0]
-  using not_le to_int_def to_int_negative32 by auto
-
 why3_end
 
 
 type_synonym word64 = "64 word"
-
-abbreviation is_signed_positive64 :: "word64 \<Rightarrow> bool"
-  where "is_signed_positive64 v \<equiv> \<not> (msb v)"
 
 why3_open "bv/BV64.xml"
   constants
@@ -1002,7 +895,7 @@ why3_open "bv/BV64.xml"
     eq_sub_bv=eq_sub_bv
     size_bv=size_bv
     one=one_class.one
-    is_signed_positive=is_signed_positive64
+    is_signed_positive=is_signed_positive
   types
     t=word64
 
@@ -1067,6 +960,15 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
+why3_vc to_int_extensionality
+  using assms uint_lt [of v] uint_lt [of vqt]
+  by (simp add: to_int_def is_signed_positive_def
+    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+
+why3_vc positive_is_ge_zeros
+  using uint_lt [of x]
+  by (simp add: to_int_def is_signed_positive_def sge_def)
+
 why3_vc to_uint_bounds
   using uint_lt [of v]
   by simp_all
@@ -1159,49 +1061,6 @@ why3_vc eq_sub_equiv
 
 why3_vc eq_sub_bv_def
   by (simp add: eq_sub_bv_defn mask_def)
-
-
-lemma to_int_positive64:
-  assumes "is_signed_positive64 v"
-  shows "to_int v \<ge> 0"
-  using assms
-  using to_int_def [of v]
-  by simp
-
-lemma to_int_negative64:
-  assumes "\<not> (is_signed_positive64 v)"
-  shows "to_int v < 0"
-  using assms
-  using to_int_def [of v]
-  by (simp add: to_uint_bounds(2))
-
-lemma to_int_is_signed_positive64:
-  assumes "to_int v = to_int vt"
-  shows "is_signed_positive64 v = is_signed_positive64 vt"
-  using assms
-  using to_int_negative64 [of v]
-  using to_int_positive64 [of v]
-  using to_int_negative64 [of vt]
-  using to_int_positive64 [of vt]
-  by linarith
-
-why3_vc to_int_extensionality
-  using assms
-  using to_int_def [of v]
-  using to_int_def [of vqt]
-  using to_int_is_signed_positive64 [of v vqt]
-proof -
-  have "uint vqt = uint v"
-    using \<open>to_int v = (if is_signed_positive64 v then uint v else - (18446744073709551616 - uint v))\<close> \<open>to_int v = to_int vqt \<Longrightarrow> is_signed_positive64 v = is_signed_positive64 vqt\<close> \<open>to_int v = to_int vqt\<close> 
-          \<open>to_int vqt = (if is_signed_positive64 vqt then uint vqt else - (18446744073709551616 - uint vqt))\<close> by fastforce
-  then show ?thesis
-    using to_uint_extensionality by blast
-qed
-
-why3_vc positive_is_ge_zeros
-  using sge_def [of x 0]
-  using not_le to_int_def to_int_negative64 by auto
-
 
 why3_end
 
