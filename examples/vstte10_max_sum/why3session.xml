@@ -3,9 +3,9 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../vstte10_max_sum.mlw" expanded="true">
@@ -30,7 +30,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.6" expl="loop invariant preservation">
-  <proof prover="4" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"><result status="valid" time="0.29"/></proof>
+  <proof prover="1" edited="vstte10_max_sum_MaxAndSum_WP_parameter_max_sum_1.v"><result status="valid" time="0.29"/></proof>
   </goal>
   <goal name="WP_parameter max_sum.7" expl="index in array bounds">
   <proof prover="0"><result status="valid" time="0.01" steps="8"/></proof>
@@ -74,7 +74,7 @@
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="WP_parameter max_sum.6.3" expl="VC for max_sum">
-   <proof prover="4" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v"><result status="valid" time="0.30"/></proof>
+   <proof prover="1" edited="vstte10_max_sum_WP_MaxAndSum2_WP_parameter_max_sum_1.v"><result status="valid" time="0.30"/></proof>
    </goal>
   </transf>
   </goal>
