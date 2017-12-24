@@ -437,45 +437,24 @@ LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
 plugins.byte: $(LIBPLUGCMO)
 plugins.opt : $(LIBPLUGCMXS)
 
+lib/plugins/%.cmxs:
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/%.cmo:
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
 lib/plugins/%.cmxs: plugins/parser/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/parser/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/%.cmxs: plugins/printer/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/printer/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/%.cmxs: plugins/transform/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/transform/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/tptp.cmxs: $(TPTPCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
 lib/plugins/tptp.cmo: $(TPTPCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
-
 lib/plugins/python.cmxs: $(PYTHONCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
 lib/plugins/python.cmo: $(PYTHONCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 # depend and clean targets
 
