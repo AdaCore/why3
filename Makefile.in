@@ -437,11 +437,14 @@ LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
 plugins.byte: $(LIBPLUGCMO)
 plugins.opt : $(LIBPLUGCMXS)
 
-lib/plugins/%.cmxs:
+lib/plugins:
+	mkdir lib/plugins
+
+lib/plugins/%.cmxs: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
 
-lib/plugins/%.cmo:
+lib/plugins/%.cmo: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
@@ -495,6 +498,9 @@ $(TOOLSDEP): $(TOOLSGENERATED)
 
 byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
 opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
+
+bin:
+	mkdir bin
 
 bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
@@ -1933,11 +1939,11 @@ src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
-%.opt:
+bin/%.opt: | bin
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-%.byte:
+bin/%.byte: | bin
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
