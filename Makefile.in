@@ -730,14 +730,10 @@ opt:  bin/why3ide.opt
 
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
+bin/why3ide.byte: BLINKFLAGS += -custom
 
 bin/why3ide.opt: lib/why3/why3.cmxa src/ide/resetgc.o $(IDECMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3ide.byte: lib/why3/why3.cma src/ide/resetgc.o $(IDECMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
 src/ide/resetgc.o: src/ide/resetgc.c
 	$(SHOW) 'Ocamlc   $<'
@@ -787,12 +783,7 @@ byte: bin/why3session.byte
 opt:  bin/why3session.opt
 
 bin/why3session.opt: lib/why3/why3.cmxa $(SESSIONCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -1467,12 +1458,7 @@ byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
 bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
