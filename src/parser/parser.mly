@@ -991,8 +991,8 @@ lident_op_id:
 | LEFTPAR lident_op RIGHTPAR  { mk_id $2 $startpos($2) $endpos($2) }
 | LEFTPAR_STAR_RIGHTPAR
     { (* parentheses are removed from the location *)
-      let s = let s = $startpos in { s with pos_cnum = s.pos_cnum + 1 } in
-      let e = let e = $endpos   in { e with pos_cnum = e.pos_cnum - 1 } in
+      let s = let s = $startpos in { s with Lexing.pos_cnum = s.Lexing.pos_cnum + 1 } in
+      let e = let e = $endpos   in { e with Lexing.pos_cnum = e.Lexing.pos_cnum - 1 } in
       mk_id (infix "*") s e }
 
 lident_op:

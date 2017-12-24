@@ -441,45 +441,27 @@ LIBPLUGCMXS = $(addsuffix .cmxs, $(addprefix lib/plugins/, $(PLUGINS)))
 plugins.byte: $(LIBPLUGCMO)
 plugins.opt : $(LIBPLUGCMXS)
 
+lib/plugins:
+	mkdir lib/plugins
+
+lib/plugins/%.cmxs: | lib/plugins
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
+
+lib/plugins/%.cmo: | lib/plugins
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
+
 lib/plugins/%.cmxs: plugins/parser/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/parser/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/%.cmxs: plugins/printer/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/printer/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/%.cmxs: plugins/transform/%.cmx
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $<
-
 lib/plugins/%.cmo: plugins/transform/%.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $<
-
 lib/plugins/tptp.cmxs: $(TPTPCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
 lib/plugins/tptp.cmo: $(TPTPCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
-
 lib/plugins/python.cmxs: $(PYTHONCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
 lib/plugins/python.cmo: $(PYTHONCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 # depend and clean targets
 
@@ -520,6 +502,9 @@ $(TOOLSDEP): $(TOOLSGENERATED)
 
 byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.byte)
 opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.opt)
+
+bin:
+	mkdir bin
 
 bin/why3.opt: lib/why3/why3.cmxa src/tools/main.cmx
 bin/why3.byte: lib/why3/why3.cma src/tools/main.cmo
@@ -734,14 +719,10 @@ opt:  bin/why3ide.opt
 
 bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
+bin/why3ide.byte: BLINKFLAGS += -custom
 
 bin/why3ide.opt: lib/why3/why3.cmxa src/ide/resetgc.o $(IDECMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3ide.byte: lib/why3/why3.cma src/ide/resetgc.o $(IDECMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
 src/ide/resetgc.o: src/ide/resetgc.c
 	$(SHOW) 'Ocamlc   $<'
@@ -791,12 +772,7 @@ byte: bin/why3session.byte
 opt:  bin/why3session.opt
 
 bin/why3session.opt: lib/why3/why3.cmxa $(SESSIONCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3session.byte: lib/why3/why3.cma $(SESSIONCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -1469,12 +1445,7 @@ byte: bin/why3doc.byte
 opt:  bin/why3doc.opt
 
 bin/why3doc.opt: lib/why3/why3.cmxa $(WHY3DOCCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3doc.byte: lib/why3/why3.cma $(WHY3DOCCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -1970,11 +1941,11 @@ src/tools/why3extract.cmx src/ide/gmain.cmx: %.cmx: %.ml
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
-%.opt:
+bin/%.opt: | bin
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-%.byte:
+bin/%.byte: | bin
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
