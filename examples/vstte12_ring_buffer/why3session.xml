@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
-<prover id="0" name="Coq" version="8.6.1" timelimit="20" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.7.1" timelimit="20" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -69,7 +69,7 @@
   <proof prover="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="WP_parameter head.2" expl="postcondition">
-  <proof prover="0" timelimit="5" memlimit="1000" edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v"><result status="valid" time="0.62"/></proof>
+  <proof prover="2" timelimit="5" memlimit="1000" edited="vstte12_ring_buffer_2_RingBuffer_WP_parameter_head_1.v"><result status="valid" time="0.62"/></proof>
   </goal>
  </transf>
  </goal>
@@ -176,12 +176,12 @@
      <ip_library name="Mark"/>
      <ip_qualid name="&apos;mark"/>
     </ts_pos>
-    <ts_pos name="array" arity="1" id="4389"
+    <ts_pos name="array" arity="1" id="4402"
      ip_theory="Array">
      <ip_library name="array"/>
      <ip_qualid name="array"/>
     </ts_pos>
-    <ts_pos name="buffer" arity="1" id="5965"
+    <ts_pos name="buffer" arity="1" id="5978"
      ip_theory="RingBuffer">
      <ip_qualid name="buffer"/>
     </ts_pos>
@@ -221,61 +221,61 @@
      <ip_library name="int"/>
      <ip_qualid name="infix *"/>
     </ls_pos>
-    <ls_pos name="mem" id="2349"
+    <ls_pos name="mem" id="2362"
      ip_theory="Mem">
      <ip_library name="list"/>
      <ip_qualid name="mem"/>
     </ls_pos>
-    <ls_pos name="get" id="2999"
+    <ls_pos name="get" id="3012"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="get"/>
     </ls_pos>
-    <ls_pos name="set" id="3002"
+    <ls_pos name="set" id="3015"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="set"/>
     </ls_pos>
-    <ls_pos name="mixfix []" id="3009"
+    <ls_pos name="mixfix []" id="3022"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="mixfix []"/>
     </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="3022"
+    <ls_pos name="mixfix [&lt;-]" id="3035"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="mixfix [&lt;-]"/>
     </ls_pos>
-    <ls_pos name="infix ++" id="3718"
+    <ls_pos name="infix ++" id="3731"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="infix ++"/>
     </ls_pos>
-    <ls_pos name="get" id="4397"
+    <ls_pos name="get" id="4410"
      ip_theory="Array">
      <ip_library name="array"/>
      <ip_qualid name="get"/>
     </ls_pos>
-    <ls_pos name="set" id="4412"
+    <ls_pos name="set" id="4425"
      ip_theory="Array">
      <ip_library name="array"/>
      <ip_qualid name="set"/>
     </ls_pos>
-    <ls_pos name="mixfix []" id="4437"
+    <ls_pos name="mixfix []" id="4450"
      ip_theory="Array">
      <ip_library name="array"/>
      <ip_qualid name="mixfix []"/>
     </ls_pos>
-    <ls_pos name="mixfix [&lt;-]" id="4454"
+    <ls_pos name="mixfix [&lt;-]" id="4467"
      ip_theory="Array">
      <ip_library name="array"/>
      <ip_qualid name="mixfix [&lt;-]"/>
     </ls_pos>
-    <ls_pos name="size" id="5979"
+    <ls_pos name="size" id="5992"
      ip_theory="RingBuffer">
      <ip_qualid name="size"/>
     </ls_pos>
-    <ls_pos name="length" id="5988"
+    <ls_pos name="length" id="6001"
      ip_theory="RingBuffer">
      <ip_qualid name="length"/>
     </ls_pos>
@@ -383,67 +383,67 @@
      <ip_library name="int"/>
      <ip_qualid name="CompatOrderMult"/>
     </pr_pos>
-    <pr_pos name="Length_nonnegative" id="2342"
+    <pr_pos name="Length_nonnegative" id="2355"
      ip_theory="Length">
      <ip_library name="list"/>
      <ip_qualid name="Length_nonnegative"/>
     </pr_pos>
-    <pr_pos name="Length_nil" id="2345"
+    <pr_pos name="Length_nil" id="2358"
      ip_theory="Length">
      <ip_library name="list"/>
      <ip_qualid name="Length_nil"/>
     </pr_pos>
-    <pr_pos name="Select_eq" id="3035"
+    <pr_pos name="Select_eq" id="3048"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="Select_eq"/>
     </pr_pos>
-    <pr_pos name="Select_neq" id="3044"
+    <pr_pos name="Select_neq" id="3057"
      ip_theory="Map">
      <ip_library name="map"/>
      <ip_qualid name="Select_neq"/>
     </pr_pos>
-    <pr_pos name="nth_none_1" id="3644"
+    <pr_pos name="nth_none_1" id="3657"
      ip_theory="NthLength">
      <ip_library name="list"/>
      <ip_qualid name="nth_none_1"/>
     </pr_pos>
-    <pr_pos name="nth_none_2" id="3649"
+    <pr_pos name="nth_none_2" id="3662"
      ip_theory="NthLength">
      <ip_library name="list"/>
      <ip_qualid name="nth_none_2"/>
     </pr_pos>
-    <pr_pos name="Append_assoc" id="3735"
+    <pr_pos name="Append_assoc" id="3748"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="Append_assoc"/>
     </pr_pos>
-    <pr_pos name="Append_l_nil" id="3742"
+    <pr_pos name="Append_l_nil" id="3755"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="Append_l_nil"/>
     </pr_pos>
-    <pr_pos name="Append_length" id="3745"
+    <pr_pos name="Append_length" id="3758"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="Append_length"/>
     </pr_pos>
-    <pr_pos name="mem_append" id="3750"
+    <pr_pos name="mem_append" id="3763"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="mem_append"/>
     </pr_pos>
-    <pr_pos name="mem_decomp" id="3757"
+    <pr_pos name="mem_decomp" id="3770"
      ip_theory="Append">
      <ip_library name="list"/>
      <ip_qualid name="mem_decomp"/>
     </pr_pos>
-    <pr_pos name="nth_append_1" id="3767"
+    <pr_pos name="nth_append_1" id="3780"
      ip_theory="NthLengthAppend">
      <ip_library name="list"/>
      <ip_qualid name="nth_append_1"/>
     </pr_pos>
-    <pr_pos name="nth_append_2" id="3774"
+    <pr_pos name="nth_append_2" id="3787"
      ip_theory="NthLengthAppend">
      <ip_library name="list"/>
      <ip_qualid name="nth_append_2"/>
@@ -470,40 +470,40 @@
      <meta_arg_ls id="1469"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="2349"/>
+     <meta_arg_ls id="2362"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="2999"/>
+     <meta_arg_ls id="3012"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="3002"/>
-    </meta>
-    <meta name="remove_logic">
-     <meta_arg_ls id="3009"/>
+     <meta_arg_ls id="3015"/>
     </meta>
     <meta name="remove_logic">
      <meta_arg_ls id="3022"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="3718"/>
+     <meta_arg_ls id="3035"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="4397"/>
+     <meta_arg_ls id="3731"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="4412"/>
+     <meta_arg_ls id="4410"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="4437"/>
+     <meta_arg_ls id="4425"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="4454"/>
+     <meta_arg_ls id="4450"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="5979"/>
+     <meta_arg_ls id="4467"/>
     </meta>
     <meta name="remove_logic">
-     <meta_arg_ls id="5988"/>
+     <meta_arg_ls id="5992"/>
+    </meta>
+    <meta name="remove_logic">
+     <meta_arg_ls id="6001"/>
     </meta>
     <meta name="remove_prop">
      <meta_arg_pr id="1470"/>
@@ -563,43 +563,43 @@
      <meta_arg_pr id="1574"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2342"/>
+     <meta_arg_pr id="2355"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2345"/>
+     <meta_arg_pr id="2358"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3035"/>
+     <meta_arg_pr id="3048"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3044"/>
+     <meta_arg_pr id="3057"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3644"/>
+     <meta_arg_pr id="3657"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3649"/>
+     <meta_arg_pr id="3662"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3735"/>
+     <meta_arg_pr id="3748"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3742"/>
+     <meta_arg_pr id="3755"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3745"/>
+     <meta_arg_pr id="3758"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3750"/>
+     <meta_arg_pr id="3763"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3757"/>
+     <meta_arg_pr id="3770"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3767"/>
+     <meta_arg_pr id="3780"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3774"/>
+     <meta_arg_pr id="3787"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="2"/>
@@ -617,10 +617,10 @@
      <meta_arg_ts id="68"/>
     </meta>
     <meta name="remove_type">
-     <meta_arg_ts id="4389"/>
+     <meta_arg_ts id="4402"/>
     </meta>
     <meta name="remove_type">
-     <meta_arg_ts id="5965"/>
+     <meta_arg_ts id="5978"/>
     </meta>
     <goal name="WP_parameter pop.6.7" expl="VC for pop">
     <transf name="eliminate_builtin">
@@ -643,7 +643,7 @@
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
    <goal name="WP_parameter pop.8.2" expl="VC for pop">
-   <proof prover="0" edited="vstte12_ring_buffer_RingBuffer_WP_parameter_pop_2.v"><result status="valid" time="0.52"/></proof>
+   <proof prover="2" edited="vstte12_ring_buffer_RingBuffer_WP_parameter_pop_2.v"><result status="valid" time="0.77"/></proof>
    </goal>
    <goal name="WP_parameter pop.8.3" expl="VC for pop">
    <proof prover="5" timelimit="5" memlimit="1000"><result status="valid" time="0.02" steps="24"/></proof>

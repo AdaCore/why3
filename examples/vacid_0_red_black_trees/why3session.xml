@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="0"/>
+<prover id="1" name="Coq" version="8.7.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="Coq" version="8.6.1" timelimit="10" steplimit="0" memlimit="0"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Vampire" version="0.6" timelimit="10" steplimit="0" memlimit="1000"/>
@@ -27,10 +27,10 @@
  <proof prover="0" timelimit="10"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
  <goal name="lt_node_lt" expl="">
- <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.30"/></proof>
+ <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_lt_node_lt_1.v"><result status="valid" time="0.30"/></proof>
  </goal>
  <goal name="gt_node_gt" expl="">
- <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.25"/></proof>
+ <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_gt_node_gt_1.v"><result status="valid" time="0.25"/></proof>
  </goal>
  <goal name="lt_left" expl="">
  <proof prover="2" timelimit="10"><result status="valid" time="0.06"/></proof>
@@ -310,111 +310,111 @@
      <ip_library name="int"/>
      <ip_qualid name="CompatOrderMult"/>
     </pr_pos>
-    <pr_pos name="lt_leaf" id="2529"
+    <pr_pos name="lt_leaf" id="2542"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_leaf"/>
     </pr_pos>
-    <pr_pos name="gt_leaf" id="2533"
+    <pr_pos name="gt_leaf" id="2546"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_leaf"/>
     </pr_pos>
-    <pr_pos name="lt_tree_node" id="2537"
+    <pr_pos name="lt_tree_node" id="2550"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_tree_node"/>
     </pr_pos>
-    <pr_pos name="gt_tree_node" id="2556"
+    <pr_pos name="gt_tree_node" id="2569"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_tree_node"/>
     </pr_pos>
-    <pr_pos name="lt_node_lt" id="2575"
+    <pr_pos name="lt_node_lt" id="2588"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_node_lt"/>
     </pr_pos>
-    <pr_pos name="gt_node_gt" id="2594"
+    <pr_pos name="gt_node_gt" id="2607"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_node_gt"/>
     </pr_pos>
-    <pr_pos name="lt_left" id="2613"
+    <pr_pos name="lt_left" id="2626"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_left"/>
     </pr_pos>
-    <pr_pos name="lt_right" id="2632"
+    <pr_pos name="lt_right" id="2645"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_right"/>
     </pr_pos>
-    <pr_pos name="gt_left" id="2651"
+    <pr_pos name="gt_left" id="2664"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_left"/>
     </pr_pos>
-    <pr_pos name="gt_right" id="2670"
+    <pr_pos name="gt_right" id="2683"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_right"/>
     </pr_pos>
-    <pr_pos name="lt_tree_not_in" id="2689"
+    <pr_pos name="lt_tree_not_in" id="2702"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_tree_not_in"/>
     </pr_pos>
-    <pr_pos name="lt_tree_trans" id="2699"
+    <pr_pos name="lt_tree_trans" id="2712"
      ip_theory="RedBlackTree">
      <ip_qualid name="lt_tree_trans"/>
     </pr_pos>
-    <pr_pos name="gt_tree_not_in" id="2709"
+    <pr_pos name="gt_tree_not_in" id="2722"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_tree_not_in"/>
     </pr_pos>
-    <pr_pos name="gt_tree_trans" id="2719"
+    <pr_pos name="gt_tree_trans" id="2732"
      ip_theory="RedBlackTree">
      <ip_qualid name="gt_tree_trans"/>
     </pr_pos>
-    <pr_pos name="bst_Leaf" id="2763"
+    <pr_pos name="bst_Leaf" id="2776"
      ip_theory="RedBlackTree">
      <ip_qualid name="bst_Leaf"/>
     </pr_pos>
-    <pr_pos name="bst_left" id="2764"
+    <pr_pos name="bst_left" id="2777"
      ip_theory="RedBlackTree">
      <ip_qualid name="bst_left"/>
     </pr_pos>
-    <pr_pos name="bst_right" id="2780"
+    <pr_pos name="bst_right" id="2793"
      ip_theory="RedBlackTree">
      <ip_qualid name="bst_right"/>
     </pr_pos>
-    <pr_pos name="bst_color" id="2796"
+    <pr_pos name="bst_color" id="2809"
      ip_theory="RedBlackTree">
      <ip_qualid name="bst_color"/>
     </pr_pos>
-    <pr_pos name="rotate_left" id="2815"
+    <pr_pos name="rotate_left" id="2828"
      ip_theory="RedBlackTree">
      <ip_qualid name="rotate_left"/>
     </pr_pos>
-    <pr_pos name="rotate_right" id="2849"
+    <pr_pos name="rotate_right" id="2862"
      ip_theory="RedBlackTree">
      <ip_qualid name="rotate_right"/>
     </pr_pos>
-    <pr_pos name="rbtree_Leaf" id="2944"
+    <pr_pos name="rbtree_Leaf" id="2957"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_Leaf"/>
     </pr_pos>
-    <pr_pos name="rbtree_Node1" id="2945"
+    <pr_pos name="rbtree_Node1" id="2958"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_Node1"/>
     </pr_pos>
-    <pr_pos name="rbtree_left" id="2952"
+    <pr_pos name="rbtree_left" id="2965"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_left"/>
     </pr_pos>
-    <pr_pos name="rbtree_right" id="2974"
+    <pr_pos name="rbtree_right" id="2987"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_right"/>
     </pr_pos>
-    <pr_pos name="rbtree_almost_rbtree" id="3276"
+    <pr_pos name="rbtree_almost_rbtree" id="3289"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_almost_rbtree"/>
     </pr_pos>
-    <pr_pos name="rbtree_almost_rbtree_ex" id="3283"
+    <pr_pos name="rbtree_almost_rbtree_ex" id="3296"
      ip_theory="RedBlackTree">
      <ip_qualid name="rbtree_almost_rbtree_ex"/>
     </pr_pos>
-    <pr_pos name="almost_rbtree_rbtree_black" id="3293"
+    <pr_pos name="almost_rbtree_rbtree_black" id="3306"
      ip_theory="RedBlackTree">
      <ip_qualid name="almost_rbtree_rbtree_black"/>
     </pr_pos>
@@ -506,85 +506,85 @@
      <meta_arg_pr id="1745"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2529"/>
+     <meta_arg_pr id="2542"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2533"/>
+     <meta_arg_pr id="2546"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2537"/>
+     <meta_arg_pr id="2550"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2556"/>
+     <meta_arg_pr id="2569"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2575"/>
+     <meta_arg_pr id="2588"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2594"/>
+     <meta_arg_pr id="2607"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2613"/>
+     <meta_arg_pr id="2626"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2632"/>
+     <meta_arg_pr id="2645"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2651"/>
+     <meta_arg_pr id="2664"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2670"/>
+     <meta_arg_pr id="2683"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2689"/>
+     <meta_arg_pr id="2702"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2699"/>
+     <meta_arg_pr id="2712"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2709"/>
+     <meta_arg_pr id="2722"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2719"/>
+     <meta_arg_pr id="2732"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2763"/>
+     <meta_arg_pr id="2776"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2764"/>
+     <meta_arg_pr id="2777"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2780"/>
+     <meta_arg_pr id="2793"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2796"/>
+     <meta_arg_pr id="2809"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2815"/>
+     <meta_arg_pr id="2828"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2849"/>
+     <meta_arg_pr id="2862"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2944"/>
+     <meta_arg_pr id="2957"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2945"/>
+     <meta_arg_pr id="2958"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2952"/>
+     <meta_arg_pr id="2965"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="2974"/>
+     <meta_arg_pr id="2987"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3276"/>
+     <meta_arg_pr id="3289"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3283"/>
+     <meta_arg_pr id="3296"/>
     </meta>
     <meta name="remove_prop">
-     <meta_arg_pr id="3293"/>
+     <meta_arg_pr id="3306"/>
     </meta>
     <meta name="remove_type">
      <meta_arg_ts id="383"/>
@@ -898,111 +898,111 @@
     <ip_library name="int"/>
     <ip_qualid name="CompatOrderMult"/>
    </pr_pos>
-   <pr_pos name="lt_leaf" id="2529"
+   <pr_pos name="lt_leaf" id="2542"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_leaf"/>
    </pr_pos>
-   <pr_pos name="gt_leaf" id="2533"
+   <pr_pos name="gt_leaf" id="2546"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_leaf"/>
    </pr_pos>
-   <pr_pos name="lt_tree_node" id="2537"
+   <pr_pos name="lt_tree_node" id="2550"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_tree_node"/>
    </pr_pos>
-   <pr_pos name="gt_tree_node" id="2556"
+   <pr_pos name="gt_tree_node" id="2569"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_tree_node"/>
    </pr_pos>
-   <pr_pos name="lt_node_lt" id="2575"
+   <pr_pos name="lt_node_lt" id="2588"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_node_lt"/>
    </pr_pos>
-   <pr_pos name="gt_node_gt" id="2594"
+   <pr_pos name="gt_node_gt" id="2607"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_node_gt"/>
    </pr_pos>
-   <pr_pos name="lt_left" id="2613"
+   <pr_pos name="lt_left" id="2626"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_left"/>
    </pr_pos>
-   <pr_pos name="lt_right" id="2632"
+   <pr_pos name="lt_right" id="2645"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_right"/>
    </pr_pos>
-   <pr_pos name="gt_left" id="2651"
+   <pr_pos name="gt_left" id="2664"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_left"/>
    </pr_pos>
-   <pr_pos name="gt_right" id="2670"
+   <pr_pos name="gt_right" id="2683"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_right"/>
    </pr_pos>
-   <pr_pos name="lt_tree_not_in" id="2689"
+   <pr_pos name="lt_tree_not_in" id="2702"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_tree_not_in"/>
    </pr_pos>
-   <pr_pos name="lt_tree_trans" id="2699"
+   <pr_pos name="lt_tree_trans" id="2712"
     ip_theory="RedBlackTree">
     <ip_qualid name="lt_tree_trans"/>
    </pr_pos>
-   <pr_pos name="gt_tree_not_in" id="2709"
+   <pr_pos name="gt_tree_not_in" id="2722"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_tree_not_in"/>
    </pr_pos>
-   <pr_pos name="gt_tree_trans" id="2719"
+   <pr_pos name="gt_tree_trans" id="2732"
     ip_theory="RedBlackTree">
     <ip_qualid name="gt_tree_trans"/>
    </pr_pos>
-   <pr_pos name="bst_Leaf" id="2763"
+   <pr_pos name="bst_Leaf" id="2776"
     ip_theory="RedBlackTree">
     <ip_qualid name="bst_Leaf"/>
    </pr_pos>
-   <pr_pos name="bst_left" id="2764"
+   <pr_pos name="bst_left" id="2777"
     ip_theory="RedBlackTree">
     <ip_qualid name="bst_left"/>
    </pr_pos>
-   <pr_pos name="bst_right" id="2780"
+   <pr_pos name="bst_right" id="2793"
     ip_theory="RedBlackTree">
     <ip_qualid name="bst_right"/>
    </pr_pos>
-   <pr_pos name="bst_color" id="2796"
+   <pr_pos name="bst_color" id="2809"
     ip_theory="RedBlackTree">
     <ip_qualid name="bst_color"/>
    </pr_pos>
-   <pr_pos name="rotate_left" id="2815"
+   <pr_pos name="rotate_left" id="2828"
     ip_theory="RedBlackTree">
     <ip_qualid name="rotate_left"/>
    </pr_pos>
-   <pr_pos name="rotate_right" id="2849"
+   <pr_pos name="rotate_right" id="2862"
     ip_theory="RedBlackTree">
     <ip_qualid name="rotate_right"/>
    </pr_pos>
-   <pr_pos name="rbtree_Leaf" id="2944"
+   <pr_pos name="rbtree_Leaf" id="2957"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_Leaf"/>
    </pr_pos>
-   <pr_pos name="rbtree_Node1" id="2945"
+   <pr_pos name="rbtree_Node1" id="2958"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_Node1"/>
    </pr_pos>
-   <pr_pos name="rbtree_left" id="2952"
+   <pr_pos name="rbtree_left" id="2965"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_left"/>
    </pr_pos>
-   <pr_pos name="rbtree_right" id="2974"
+   <pr_pos name="rbtree_right" id="2987"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_right"/>
    </pr_pos>
-   <pr_pos name="rbtree_almost_rbtree" id="3276"
+   <pr_pos name="rbtree_almost_rbtree" id="3289"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_almost_rbtree"/>
    </pr_pos>
-   <pr_pos name="rbtree_almost_rbtree_ex" id="3283"
+   <pr_pos name="rbtree_almost_rbtree_ex" id="3296"
     ip_theory="RedBlackTree">
     <ip_qualid name="rbtree_almost_rbtree_ex"/>
    </pr_pos>
-   <pr_pos name="almost_rbtree_rbtree_black" id="3293"
+   <pr_pos name="almost_rbtree_rbtree_black" id="3306"
     ip_theory="RedBlackTree">
     <ip_qualid name="almost_rbtree_rbtree_black"/>
    </pr_pos>
@@ -1094,85 +1094,85 @@
     <meta_arg_pr id="1745"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2529"/>
+    <meta_arg_pr id="2542"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2533"/>
+    <meta_arg_pr id="2546"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2537"/>
+    <meta_arg_pr id="2550"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2556"/>
+    <meta_arg_pr id="2569"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2575"/>
+    <meta_arg_pr id="2588"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2594"/>
+    <meta_arg_pr id="2607"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2613"/>
+    <meta_arg_pr id="2626"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2632"/>
+    <meta_arg_pr id="2645"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2651"/>
+    <meta_arg_pr id="2664"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2670"/>
+    <meta_arg_pr id="2683"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2689"/>
+    <meta_arg_pr id="2702"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2699"/>
+    <meta_arg_pr id="2712"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2709"/>
+    <meta_arg_pr id="2722"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2719"/>
+    <meta_arg_pr id="2732"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2763"/>
+    <meta_arg_pr id="2776"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2764"/>
+    <meta_arg_pr id="2777"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2780"/>
+    <meta_arg_pr id="2793"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2796"/>
+    <meta_arg_pr id="2809"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2815"/>
+    <meta_arg_pr id="2828"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2849"/>
+    <meta_arg_pr id="2862"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2944"/>
+    <meta_arg_pr id="2957"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2945"/>
+    <meta_arg_pr id="2958"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2952"/>
+    <meta_arg_pr id="2965"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="2974"/>
+    <meta_arg_pr id="2987"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3276"/>
+    <meta_arg_pr id="3289"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3283"/>
+    <meta_arg_pr id="3296"/>
    </meta>
    <meta name="remove_prop">
-    <meta_arg_pr id="3293"/>
+    <meta_arg_pr id="3306"/>
    </meta>
    <meta name="remove_type">
     <meta_arg_ts id="383"/>
@@ -1503,7 +1503,7 @@
    <goal name="WP_parameter add.2.2" expl="VC for add">
    <transf name="inline_goal">
     <goal name="WP_parameter add.2.2.1" expl="VC for add">
-    <proof prover="3" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.32"/></proof>
+    <proof prover="1" edited="vacid_0_red_black_trees_WP_RedBlackTree_WP_parameter_add_1.v"><result status="valid" time="0.32"/></proof>
     </goal>
    </transf>
    </goal>

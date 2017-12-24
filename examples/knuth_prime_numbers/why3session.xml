@@ -5,8 +5,8 @@
 <prover id="0" name="CVC4" version="1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="1.01" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="0"/>
-<prover id="3" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="2.19" timelimit="10" steplimit="0" memlimit="0"/>
+<prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.3.1" timelimit="120" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Alt-Ergo" version="0.95.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -17,7 +17,7 @@
 <file name="../knuth_prime_numbers.mlw" expanded="true">
 <theory name="PrimeNumbers" sum="e2a314751058a1b7fbec2e3e897e29da" expanded="true">
  <goal name="exists_prime" expl="">
- <proof prover="3" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.40"/></proof>
+ <proof prover="5" timelimit="10" memlimit="0" edited="knuth_prime_numbers_WP_PrimeNumbers_exists_prime_1.v"><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="WP_parameter prime_numbers" expl="VC for prime_numbers">
  <transf name="split_goal_wp">
@@ -58,7 +58,7 @@
   <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.11" expl="assertion">
-  <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.65"/></proof>
+  <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_2.v"><result status="valid" time="0.65"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.12" expl="variant decrease">
   <proof prover="9"><result status="valid" time="0.02" steps="33"/></proof>
@@ -79,7 +79,7 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="33"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.15.2" expl="VC for prime_numbers">
-   <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_3.v"><result status="valid" time="0.42"/></proof>
+   <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_3.v"><result status="valid" time="0.42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -115,7 +115,7 @@
    <proof prover="9" memlimit="1000"><result status="valid" time="0.02" steps="32"/></proof>
    </goal>
    <goal name="WP_parameter prime_numbers.23.2" expl="VC for prime_numbers">
-   <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="0.48"/></proof>
+   <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_5.v"><result status="valid" time="0.48"/></proof>
    </goal>
   </transf>
   </goal>
@@ -138,7 +138,7 @@
   <proof prover="10"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.30" expl="assertion">
-  <proof prover="3" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="1.12"/></proof>
+  <proof prover="5" edited="knuth_prime_numbers_PrimeNumbers_WP_parameter_prime_numbers_4.v"><result status="valid" time="1.12"/></proof>
   </goal>
   <goal name="WP_parameter prime_numbers.31" expl="postcondition">
   <proof prover="9"><result status="valid" time="0.01" steps="33"/></proof>
@@ -231,7 +231,7 @@
       <ip_library name="Tuple2"/>
       <ip_qualid name="tuple2"/>
      </ts_pos>
-     <ts_pos name="ref" arity="1" id="2926"
+     <ts_pos name="ref" arity="1" id="2939"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="ref"/>
@@ -317,52 +317,52 @@
       <ip_library name="int"/>
       <ip_qualid name="mod"/>
      </ls_pos>
-     <ls_pos name="even" id="2595"
+     <ls_pos name="even" id="2608"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even"/>
      </ls_pos>
-     <ls_pos name="odd" id="2603"
+     <ls_pos name="odd" id="2616"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd"/>
      </ls_pos>
-     <ls_pos name="prefix !" id="2932"
+     <ls_pos name="prefix !" id="2945"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="prefix !"/>
      </ls_pos>
-     <ls_pos name="get" id="3078"
+     <ls_pos name="get" id="3091"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="get"/>
      </ls_pos>
-     <ls_pos name="set" id="3081"
+     <ls_pos name="set" id="3094"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix []" id="3088"
+     <ls_pos name="mixfix []" id="3101"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix []"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3101"
+     <ls_pos name="mixfix [&lt;-]" id="3114"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="set" id="3528"
+     <ls_pos name="set" id="3541"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3570"
+     <ls_pos name="mixfix [&lt;-]" id="3583"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6730"
+     <ls_pos name="first_primes" id="6743"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -625,226 +625,226 @@
       <ip_library name="int"/>
       <ip_qualid name="Mod_mult"/>
      </pr_pos>
-     <pr_pos name="even_or_odd" id="2611"
+     <pr_pos name="even_or_odd" id="2624"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_or_odd"/>
      </pr_pos>
-     <pr_pos name="even_not_odd" id="2614"
+     <pr_pos name="even_not_odd" id="2627"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_not_odd"/>
      </pr_pos>
-     <pr_pos name="odd_not_even" id="2617"
+     <pr_pos name="odd_not_even" id="2630"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_not_even"/>
      </pr_pos>
-     <pr_pos name="even_odd" id="2620"
+     <pr_pos name="even_odd" id="2633"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_odd"/>
      </pr_pos>
-     <pr_pos name="odd_even" id="2623"
+     <pr_pos name="odd_even" id="2636"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_even"/>
      </pr_pos>
-     <pr_pos name="even_even" id="2626"
+     <pr_pos name="even_even" id="2639"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_even"/>
      </pr_pos>
-     <pr_pos name="odd_odd" id="2629"
+     <pr_pos name="odd_odd" id="2642"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_odd"/>
      </pr_pos>
-     <pr_pos name="even_2k" id="2632"
+     <pr_pos name="even_2k" id="2645"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_2k"/>
      </pr_pos>
-     <pr_pos name="odd_2k1" id="2635"
+     <pr_pos name="odd_2k1" id="2648"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_2k1"/>
      </pr_pos>
-     <pr_pos name="divides_refl" id="2651"
+     <pr_pos name="divides_refl" id="2664"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_refl"/>
      </pr_pos>
-     <pr_pos name="divides_1_n" id="2654"
+     <pr_pos name="divides_1_n" id="2667"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_1_n"/>
      </pr_pos>
-     <pr_pos name="divides_0" id="2657"
+     <pr_pos name="divides_0" id="2670"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_0"/>
      </pr_pos>
-     <pr_pos name="divides_left" id="2660"
+     <pr_pos name="divides_left" id="2673"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_left"/>
      </pr_pos>
-     <pr_pos name="divides_right" id="2667"
+     <pr_pos name="divides_right" id="2680"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_right"/>
      </pr_pos>
-     <pr_pos name="divides_oppr" id="2674"
+     <pr_pos name="divides_oppr" id="2687"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr"/>
      </pr_pos>
-     <pr_pos name="divides_oppl" id="2679"
+     <pr_pos name="divides_oppl" id="2692"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl"/>
      </pr_pos>
-     <pr_pos name="divides_oppr_rev" id="2684"
+     <pr_pos name="divides_oppr_rev" id="2697"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr_rev"/>
      </pr_pos>
-     <pr_pos name="divides_oppl_rev" id="2689"
+     <pr_pos name="divides_oppl_rev" id="2702"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl_rev"/>
      </pr_pos>
-     <pr_pos name="divides_plusr" id="2694"
+     <pr_pos name="divides_plusr" id="2707"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_plusr"/>
      </pr_pos>
-     <pr_pos name="divides_minusr" id="2701"
+     <pr_pos name="divides_minusr" id="2714"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_minusr"/>
      </pr_pos>
-     <pr_pos name="divides_multl" id="2708"
+     <pr_pos name="divides_multl" id="2721"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multl"/>
      </pr_pos>
-     <pr_pos name="divides_multr" id="2715"
+     <pr_pos name="divides_multr" id="2728"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multr"/>
      </pr_pos>
-     <pr_pos name="divides_factorl" id="2722"
+     <pr_pos name="divides_factorl" id="2735"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorl"/>
      </pr_pos>
-     <pr_pos name="divides_factorr" id="2727"
+     <pr_pos name="divides_factorr" id="2740"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorr"/>
      </pr_pos>
-     <pr_pos name="divides_n_1" id="2732"
+     <pr_pos name="divides_n_1" id="2745"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_n_1"/>
      </pr_pos>
-     <pr_pos name="divides_antisym" id="2735"
+     <pr_pos name="divides_antisym" id="2748"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_antisym"/>
      </pr_pos>
-     <pr_pos name="divides_trans" id="2740"
+     <pr_pos name="divides_trans" id="2753"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_trans"/>
      </pr_pos>
-     <pr_pos name="divides_bounds" id="2747"
+     <pr_pos name="divides_bounds" id="2760"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_bounds"/>
      </pr_pos>
-     <pr_pos name="mod_divides_euclidean" id="2752"
+     <pr_pos name="mod_divides_euclidean" id="2765"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_euclidean"/>
      </pr_pos>
-     <pr_pos name="divides_mod_euclidean" id="2757"
+     <pr_pos name="divides_mod_euclidean" id="2770"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_euclidean"/>
      </pr_pos>
-     <pr_pos name="mod_divides_computer" id="2762"
+     <pr_pos name="mod_divides_computer" id="2775"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_computer"/>
      </pr_pos>
-     <pr_pos name="divides_mod_computer" id="2767"
+     <pr_pos name="divides_mod_computer" id="2780"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_computer"/>
      </pr_pos>
-     <pr_pos name="even_divides" id="2772"
+     <pr_pos name="even_divides" id="2785"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="even_divides"/>
      </pr_pos>
-     <pr_pos name="odd_divides" id="2775"
+     <pr_pos name="odd_divides" id="2788"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="odd_divides"/>
      </pr_pos>
-     <pr_pos name="not_prime_1" id="2869"
+     <pr_pos name="not_prime_1" id="2882"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="not_prime_1"/>
      </pr_pos>
-     <pr_pos name="prime_2" id="2870"
+     <pr_pos name="prime_2" id="2883"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_2"/>
      </pr_pos>
-     <pr_pos name="prime_3" id="2871"
+     <pr_pos name="prime_3" id="2884"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_3"/>
      </pr_pos>
-     <pr_pos name="prime_divisors" id="2872"
+     <pr_pos name="prime_divisors" id="2885"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_divisors"/>
      </pr_pos>
-     <pr_pos name="small_divisors" id="2877"
+     <pr_pos name="small_divisors" id="2890"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="small_divisors"/>
      </pr_pos>
-     <pr_pos name="even_prime" id="2882"
+     <pr_pos name="even_prime" id="2895"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="even_prime"/>
      </pr_pos>
-     <pr_pos name="odd_prime" id="2885"
+     <pr_pos name="odd_prime" id="2898"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="odd_prime"/>
      </pr_pos>
-     <pr_pos name="Select_eq" id="3114"
+     <pr_pos name="Select_eq" id="3127"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_eq"/>
      </pr_pos>
-     <pr_pos name="Select_neq" id="3123"
+     <pr_pos name="Select_neq" id="3136"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6757"
+     <pr_pos name="exists_prime" id="6770"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6770"
+     <pr_pos name="Bertrand_postulate" id="6783"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -897,34 +897,34 @@
       <meta_arg_ls id="2064"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2595"/>
+      <meta_arg_ls id="2608"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2603"/>
+      <meta_arg_ls id="2616"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2932"/>
+      <meta_arg_ls id="2945"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3078"/>
+      <meta_arg_ls id="3091"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3081"/>
-     </meta>
-     <meta name="remove_logic">
-      <meta_arg_ls id="3088"/>
+      <meta_arg_ls id="3094"/>
      </meta>
      <meta name="remove_logic">
       <meta_arg_ls id="3101"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3528"/>
+      <meta_arg_ls id="3114"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3570"/>
+      <meta_arg_ls id="3541"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6730"/>
+      <meta_arg_ls id="3583"/>
+     </meta>
+     <meta name="remove_logic">
+      <meta_arg_ls id="6743"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1744"/>
@@ -1077,79 +1077,70 @@
       <meta_arg_pr id="2130"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2611"/>
+      <meta_arg_pr id="2624"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2614"/>
+      <meta_arg_pr id="2627"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2617"/>
+      <meta_arg_pr id="2630"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2620"/>
+      <meta_arg_pr id="2633"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2623"/>
+      <meta_arg_pr id="2636"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2626"/>
+      <meta_arg_pr id="2639"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2629"/>
+      <meta_arg_pr id="2642"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2632"/>
+      <meta_arg_pr id="2645"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2635"/>
+      <meta_arg_pr id="2648"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2651"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2654"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2657"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2660"/>
+      <meta_arg_pr id="2664"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2667"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2674"/>
+      <meta_arg_pr id="2670"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2679"/>
+      <meta_arg_pr id="2673"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2684"/>
+      <meta_arg_pr id="2680"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2689"/>
+      <meta_arg_pr id="2687"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2694"/>
+      <meta_arg_pr id="2692"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2701"/>
+      <meta_arg_pr id="2697"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2708"/>
+      <meta_arg_pr id="2702"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2715"/>
+      <meta_arg_pr id="2707"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2722"/>
+      <meta_arg_pr id="2714"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2727"/>
+      <meta_arg_pr id="2721"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2732"/>
+      <meta_arg_pr id="2728"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2735"/>
@@ -1158,58 +1149,67 @@
       <meta_arg_pr id="2740"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2747"/>
+      <meta_arg_pr id="2745"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2752"/>
+      <meta_arg_pr id="2748"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2757"/>
+      <meta_arg_pr id="2753"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2762"/>
+      <meta_arg_pr id="2760"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2767"/>
+      <meta_arg_pr id="2765"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2772"/>
+      <meta_arg_pr id="2770"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2775"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2869"/>
+      <meta_arg_pr id="2780"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2870"/>
+      <meta_arg_pr id="2785"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2871"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2872"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2877"/>
+      <meta_arg_pr id="2788"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2882"/>
      </meta>
      <meta name="remove_prop">
+      <meta_arg_pr id="2883"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="2884"/>
+     </meta>
+     <meta name="remove_prop">
       <meta_arg_pr id="2885"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3114"/>
+      <meta_arg_pr id="2890"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3123"/>
+      <meta_arg_pr id="2895"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6757"/>
+      <meta_arg_pr id="2898"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3127"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3136"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="6770"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="6783"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
@@ -1230,7 +1230,7 @@
       <meta_arg_ts id="1286"/>
      </meta>
      <meta name="remove_type">
-      <meta_arg_ts id="2926"/>
+      <meta_arg_ts id="2939"/>
      </meta>
      <goal name="WP_parameter prime_numbers.40.1.2" expl="VC for prime_numbers">
      <transf name="eliminate_builtin">
@@ -1282,7 +1282,7 @@
       <ip_library name="Tuple2"/>
       <ip_qualid name="tuple2"/>
      </ts_pos>
-     <ts_pos name="ref" arity="1" id="2926"
+     <ts_pos name="ref" arity="1" id="2939"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="ref"/>
@@ -1368,52 +1368,52 @@
       <ip_library name="int"/>
       <ip_qualid name="mod"/>
      </ls_pos>
-     <ls_pos name="even" id="2595"
+     <ls_pos name="even" id="2608"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even"/>
      </ls_pos>
-     <ls_pos name="odd" id="2603"
+     <ls_pos name="odd" id="2616"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd"/>
      </ls_pos>
-     <ls_pos name="prefix !" id="2932"
+     <ls_pos name="prefix !" id="2945"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="prefix !"/>
      </ls_pos>
-     <ls_pos name="get" id="3078"
+     <ls_pos name="get" id="3091"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="get"/>
      </ls_pos>
-     <ls_pos name="set" id="3081"
+     <ls_pos name="set" id="3094"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix []" id="3088"
+     <ls_pos name="mixfix []" id="3101"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix []"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3101"
+     <ls_pos name="mixfix [&lt;-]" id="3114"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="set" id="3528"
+     <ls_pos name="set" id="3541"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3570"
+     <ls_pos name="mixfix [&lt;-]" id="3583"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6730"
+     <ls_pos name="first_primes" id="6743"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -1676,226 +1676,226 @@
       <ip_library name="int"/>
       <ip_qualid name="Mod_mult"/>
      </pr_pos>
-     <pr_pos name="even_or_odd" id="2611"
+     <pr_pos name="even_or_odd" id="2624"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_or_odd"/>
      </pr_pos>
-     <pr_pos name="even_not_odd" id="2614"
+     <pr_pos name="even_not_odd" id="2627"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_not_odd"/>
      </pr_pos>
-     <pr_pos name="odd_not_even" id="2617"
+     <pr_pos name="odd_not_even" id="2630"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_not_even"/>
      </pr_pos>
-     <pr_pos name="even_odd" id="2620"
+     <pr_pos name="even_odd" id="2633"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_odd"/>
      </pr_pos>
-     <pr_pos name="odd_even" id="2623"
+     <pr_pos name="odd_even" id="2636"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_even"/>
      </pr_pos>
-     <pr_pos name="even_even" id="2626"
+     <pr_pos name="even_even" id="2639"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_even"/>
      </pr_pos>
-     <pr_pos name="odd_odd" id="2629"
+     <pr_pos name="odd_odd" id="2642"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_odd"/>
      </pr_pos>
-     <pr_pos name="even_2k" id="2632"
+     <pr_pos name="even_2k" id="2645"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_2k"/>
      </pr_pos>
-     <pr_pos name="odd_2k1" id="2635"
+     <pr_pos name="odd_2k1" id="2648"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_2k1"/>
      </pr_pos>
-     <pr_pos name="divides_refl" id="2651"
+     <pr_pos name="divides_refl" id="2664"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_refl"/>
      </pr_pos>
-     <pr_pos name="divides_1_n" id="2654"
+     <pr_pos name="divides_1_n" id="2667"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_1_n"/>
      </pr_pos>
-     <pr_pos name="divides_0" id="2657"
+     <pr_pos name="divides_0" id="2670"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_0"/>
      </pr_pos>
-     <pr_pos name="divides_left" id="2660"
+     <pr_pos name="divides_left" id="2673"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_left"/>
      </pr_pos>
-     <pr_pos name="divides_right" id="2667"
+     <pr_pos name="divides_right" id="2680"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_right"/>
      </pr_pos>
-     <pr_pos name="divides_oppr" id="2674"
+     <pr_pos name="divides_oppr" id="2687"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr"/>
      </pr_pos>
-     <pr_pos name="divides_oppl" id="2679"
+     <pr_pos name="divides_oppl" id="2692"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl"/>
      </pr_pos>
-     <pr_pos name="divides_oppr_rev" id="2684"
+     <pr_pos name="divides_oppr_rev" id="2697"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr_rev"/>
      </pr_pos>
-     <pr_pos name="divides_oppl_rev" id="2689"
+     <pr_pos name="divides_oppl_rev" id="2702"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl_rev"/>
      </pr_pos>
-     <pr_pos name="divides_plusr" id="2694"
+     <pr_pos name="divides_plusr" id="2707"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_plusr"/>
      </pr_pos>
-     <pr_pos name="divides_minusr" id="2701"
+     <pr_pos name="divides_minusr" id="2714"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_minusr"/>
      </pr_pos>
-     <pr_pos name="divides_multl" id="2708"
+     <pr_pos name="divides_multl" id="2721"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multl"/>
      </pr_pos>
-     <pr_pos name="divides_multr" id="2715"
+     <pr_pos name="divides_multr" id="2728"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multr"/>
      </pr_pos>
-     <pr_pos name="divides_factorl" id="2722"
+     <pr_pos name="divides_factorl" id="2735"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorl"/>
      </pr_pos>
-     <pr_pos name="divides_factorr" id="2727"
+     <pr_pos name="divides_factorr" id="2740"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorr"/>
      </pr_pos>
-     <pr_pos name="divides_n_1" id="2732"
+     <pr_pos name="divides_n_1" id="2745"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_n_1"/>
      </pr_pos>
-     <pr_pos name="divides_antisym" id="2735"
+     <pr_pos name="divides_antisym" id="2748"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_antisym"/>
      </pr_pos>
-     <pr_pos name="divides_trans" id="2740"
+     <pr_pos name="divides_trans" id="2753"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_trans"/>
      </pr_pos>
-     <pr_pos name="divides_bounds" id="2747"
+     <pr_pos name="divides_bounds" id="2760"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_bounds"/>
      </pr_pos>
-     <pr_pos name="mod_divides_euclidean" id="2752"
+     <pr_pos name="mod_divides_euclidean" id="2765"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_euclidean"/>
      </pr_pos>
-     <pr_pos name="divides_mod_euclidean" id="2757"
+     <pr_pos name="divides_mod_euclidean" id="2770"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_euclidean"/>
      </pr_pos>
-     <pr_pos name="mod_divides_computer" id="2762"
+     <pr_pos name="mod_divides_computer" id="2775"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_computer"/>
      </pr_pos>
-     <pr_pos name="divides_mod_computer" id="2767"
+     <pr_pos name="divides_mod_computer" id="2780"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_computer"/>
      </pr_pos>
-     <pr_pos name="even_divides" id="2772"
+     <pr_pos name="even_divides" id="2785"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="even_divides"/>
      </pr_pos>
-     <pr_pos name="odd_divides" id="2775"
+     <pr_pos name="odd_divides" id="2788"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="odd_divides"/>
      </pr_pos>
-     <pr_pos name="not_prime_1" id="2869"
+     <pr_pos name="not_prime_1" id="2882"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="not_prime_1"/>
      </pr_pos>
-     <pr_pos name="prime_2" id="2870"
+     <pr_pos name="prime_2" id="2883"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_2"/>
      </pr_pos>
-     <pr_pos name="prime_3" id="2871"
+     <pr_pos name="prime_3" id="2884"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_3"/>
      </pr_pos>
-     <pr_pos name="prime_divisors" id="2872"
+     <pr_pos name="prime_divisors" id="2885"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_divisors"/>
      </pr_pos>
-     <pr_pos name="small_divisors" id="2877"
+     <pr_pos name="small_divisors" id="2890"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="small_divisors"/>
      </pr_pos>
-     <pr_pos name="even_prime" id="2882"
+     <pr_pos name="even_prime" id="2895"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="even_prime"/>
      </pr_pos>
-     <pr_pos name="odd_prime" id="2885"
+     <pr_pos name="odd_prime" id="2898"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="odd_prime"/>
      </pr_pos>
-     <pr_pos name="Select_eq" id="3114"
+     <pr_pos name="Select_eq" id="3127"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_eq"/>
      </pr_pos>
-     <pr_pos name="Select_neq" id="3123"
+     <pr_pos name="Select_neq" id="3136"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6757"
+     <pr_pos name="exists_prime" id="6770"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6770"
+     <pr_pos name="Bertrand_postulate" id="6783"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -1948,34 +1948,34 @@
       <meta_arg_ls id="2064"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2595"/>
+      <meta_arg_ls id="2608"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2603"/>
+      <meta_arg_ls id="2616"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2932"/>
+      <meta_arg_ls id="2945"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3078"/>
+      <meta_arg_ls id="3091"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3081"/>
-     </meta>
-     <meta name="remove_logic">
-      <meta_arg_ls id="3088"/>
+      <meta_arg_ls id="3094"/>
      </meta>
      <meta name="remove_logic">
       <meta_arg_ls id="3101"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3528"/>
+      <meta_arg_ls id="3114"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3570"/>
+      <meta_arg_ls id="3541"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6730"/>
+      <meta_arg_ls id="3583"/>
+     </meta>
+     <meta name="remove_logic">
+      <meta_arg_ls id="6743"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1744"/>
@@ -2128,79 +2128,70 @@
       <meta_arg_pr id="2130"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2611"/>
+      <meta_arg_pr id="2624"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2614"/>
+      <meta_arg_pr id="2627"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2617"/>
+      <meta_arg_pr id="2630"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2620"/>
+      <meta_arg_pr id="2633"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2623"/>
+      <meta_arg_pr id="2636"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2626"/>
+      <meta_arg_pr id="2639"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2629"/>
+      <meta_arg_pr id="2642"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2632"/>
+      <meta_arg_pr id="2645"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2635"/>
+      <meta_arg_pr id="2648"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2651"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2654"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2657"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2660"/>
+      <meta_arg_pr id="2664"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2667"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2674"/>
+      <meta_arg_pr id="2670"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2679"/>
+      <meta_arg_pr id="2673"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2684"/>
+      <meta_arg_pr id="2680"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2689"/>
+      <meta_arg_pr id="2687"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2694"/>
+      <meta_arg_pr id="2692"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2701"/>
+      <meta_arg_pr id="2697"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2708"/>
+      <meta_arg_pr id="2702"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2715"/>
+      <meta_arg_pr id="2707"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2722"/>
+      <meta_arg_pr id="2714"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2727"/>
+      <meta_arg_pr id="2721"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2732"/>
+      <meta_arg_pr id="2728"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2735"/>
@@ -2209,58 +2200,67 @@
       <meta_arg_pr id="2740"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2747"/>
+      <meta_arg_pr id="2745"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2752"/>
+      <meta_arg_pr id="2748"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2757"/>
+      <meta_arg_pr id="2753"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2762"/>
+      <meta_arg_pr id="2760"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2767"/>
+      <meta_arg_pr id="2765"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2772"/>
+      <meta_arg_pr id="2770"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2775"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2869"/>
+      <meta_arg_pr id="2780"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2870"/>
+      <meta_arg_pr id="2785"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2871"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2872"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2877"/>
+      <meta_arg_pr id="2788"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2882"/>
      </meta>
      <meta name="remove_prop">
+      <meta_arg_pr id="2883"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="2884"/>
+     </meta>
+     <meta name="remove_prop">
       <meta_arg_pr id="2885"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3114"/>
+      <meta_arg_pr id="2890"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3123"/>
+      <meta_arg_pr id="2895"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6757"/>
+      <meta_arg_pr id="2898"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3127"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3136"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="6770"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="6783"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
@@ -2281,7 +2281,7 @@
       <meta_arg_ts id="1286"/>
      </meta>
      <meta name="remove_type">
-      <meta_arg_ts id="2926"/>
+      <meta_arg_ts id="2939"/>
      </meta>
      <goal name="WP_parameter prime_numbers.40.1.3" expl="VC for prime_numbers">
      <transf name="eliminate_builtin">
@@ -2332,7 +2332,7 @@
       <ip_library name="Tuple2"/>
       <ip_qualid name="tuple2"/>
      </ts_pos>
-     <ts_pos name="ref" arity="1" id="2926"
+     <ts_pos name="ref" arity="1" id="2939"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="ref"/>
@@ -2418,52 +2418,52 @@
       <ip_library name="int"/>
       <ip_qualid name="mod"/>
      </ls_pos>
-     <ls_pos name="even" id="2595"
+     <ls_pos name="even" id="2608"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even"/>
      </ls_pos>
-     <ls_pos name="odd" id="2603"
+     <ls_pos name="odd" id="2616"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd"/>
      </ls_pos>
-     <ls_pos name="prefix !" id="2932"
+     <ls_pos name="prefix !" id="2945"
       ip_theory="Ref">
       <ip_library name="ref"/>
       <ip_qualid name="prefix !"/>
      </ls_pos>
-     <ls_pos name="get" id="3078"
+     <ls_pos name="get" id="3091"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="get"/>
      </ls_pos>
-     <ls_pos name="set" id="3081"
+     <ls_pos name="set" id="3094"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix []" id="3088"
+     <ls_pos name="mixfix []" id="3101"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix []"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3101"
+     <ls_pos name="mixfix [&lt;-]" id="3114"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="set" id="3528"
+     <ls_pos name="set" id="3541"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="set"/>
      </ls_pos>
-     <ls_pos name="mixfix [&lt;-]" id="3570"
+     <ls_pos name="mixfix [&lt;-]" id="3583"
       ip_theory="Array">
       <ip_library name="array"/>
       <ip_qualid name="mixfix [&lt;-]"/>
      </ls_pos>
-     <ls_pos name="first_primes" id="6730"
+     <ls_pos name="first_primes" id="6743"
       ip_theory="PrimeNumbers">
       <ip_qualid name="first_primes"/>
      </ls_pos>
@@ -2726,226 +2726,226 @@
       <ip_library name="int"/>
       <ip_qualid name="Mod_mult"/>
      </pr_pos>
-     <pr_pos name="even_or_odd" id="2611"
+     <pr_pos name="even_or_odd" id="2624"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_or_odd"/>
      </pr_pos>
-     <pr_pos name="even_not_odd" id="2614"
+     <pr_pos name="even_not_odd" id="2627"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_not_odd"/>
      </pr_pos>
-     <pr_pos name="odd_not_even" id="2617"
+     <pr_pos name="odd_not_even" id="2630"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_not_even"/>
      </pr_pos>
-     <pr_pos name="even_odd" id="2620"
+     <pr_pos name="even_odd" id="2633"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_odd"/>
      </pr_pos>
-     <pr_pos name="odd_even" id="2623"
+     <pr_pos name="odd_even" id="2636"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_even"/>
      </pr_pos>
-     <pr_pos name="even_even" id="2626"
+     <pr_pos name="even_even" id="2639"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_even"/>
      </pr_pos>
-     <pr_pos name="odd_odd" id="2629"
+     <pr_pos name="odd_odd" id="2642"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_odd"/>
      </pr_pos>
-     <pr_pos name="even_2k" id="2632"
+     <pr_pos name="even_2k" id="2645"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="even_2k"/>
      </pr_pos>
-     <pr_pos name="odd_2k1" id="2635"
+     <pr_pos name="odd_2k1" id="2648"
       ip_theory="Parity">
       <ip_library name="number"/>
       <ip_qualid name="odd_2k1"/>
      </pr_pos>
-     <pr_pos name="divides_refl" id="2651"
+     <pr_pos name="divides_refl" id="2664"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_refl"/>
      </pr_pos>
-     <pr_pos name="divides_1_n" id="2654"
+     <pr_pos name="divides_1_n" id="2667"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_1_n"/>
      </pr_pos>
-     <pr_pos name="divides_0" id="2657"
+     <pr_pos name="divides_0" id="2670"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_0"/>
      </pr_pos>
-     <pr_pos name="divides_left" id="2660"
+     <pr_pos name="divides_left" id="2673"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_left"/>
      </pr_pos>
-     <pr_pos name="divides_right" id="2667"
+     <pr_pos name="divides_right" id="2680"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_right"/>
      </pr_pos>
-     <pr_pos name="divides_oppr" id="2674"
+     <pr_pos name="divides_oppr" id="2687"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr"/>
      </pr_pos>
-     <pr_pos name="divides_oppl" id="2679"
+     <pr_pos name="divides_oppl" id="2692"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl"/>
      </pr_pos>
-     <pr_pos name="divides_oppr_rev" id="2684"
+     <pr_pos name="divides_oppr_rev" id="2697"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppr_rev"/>
      </pr_pos>
-     <pr_pos name="divides_oppl_rev" id="2689"
+     <pr_pos name="divides_oppl_rev" id="2702"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_oppl_rev"/>
      </pr_pos>
-     <pr_pos name="divides_plusr" id="2694"
+     <pr_pos name="divides_plusr" id="2707"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_plusr"/>
      </pr_pos>
-     <pr_pos name="divides_minusr" id="2701"
+     <pr_pos name="divides_minusr" id="2714"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_minusr"/>
      </pr_pos>
-     <pr_pos name="divides_multl" id="2708"
+     <pr_pos name="divides_multl" id="2721"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multl"/>
      </pr_pos>
-     <pr_pos name="divides_multr" id="2715"
+     <pr_pos name="divides_multr" id="2728"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_multr"/>
      </pr_pos>
-     <pr_pos name="divides_factorl" id="2722"
+     <pr_pos name="divides_factorl" id="2735"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorl"/>
      </pr_pos>
-     <pr_pos name="divides_factorr" id="2727"
+     <pr_pos name="divides_factorr" id="2740"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_factorr"/>
      </pr_pos>
-     <pr_pos name="divides_n_1" id="2732"
+     <pr_pos name="divides_n_1" id="2745"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_n_1"/>
      </pr_pos>
-     <pr_pos name="divides_antisym" id="2735"
+     <pr_pos name="divides_antisym" id="2748"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_antisym"/>
      </pr_pos>
-     <pr_pos name="divides_trans" id="2740"
+     <pr_pos name="divides_trans" id="2753"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_trans"/>
      </pr_pos>
-     <pr_pos name="divides_bounds" id="2747"
+     <pr_pos name="divides_bounds" id="2760"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_bounds"/>
      </pr_pos>
-     <pr_pos name="mod_divides_euclidean" id="2752"
+     <pr_pos name="mod_divides_euclidean" id="2765"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_euclidean"/>
      </pr_pos>
-     <pr_pos name="divides_mod_euclidean" id="2757"
+     <pr_pos name="divides_mod_euclidean" id="2770"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_euclidean"/>
      </pr_pos>
-     <pr_pos name="mod_divides_computer" id="2762"
+     <pr_pos name="mod_divides_computer" id="2775"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="mod_divides_computer"/>
      </pr_pos>
-     <pr_pos name="divides_mod_computer" id="2767"
+     <pr_pos name="divides_mod_computer" id="2780"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="divides_mod_computer"/>
      </pr_pos>
-     <pr_pos name="even_divides" id="2772"
+     <pr_pos name="even_divides" id="2785"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="even_divides"/>
      </pr_pos>
-     <pr_pos name="odd_divides" id="2775"
+     <pr_pos name="odd_divides" id="2788"
       ip_theory="Divisibility">
       <ip_library name="number"/>
       <ip_qualid name="odd_divides"/>
      </pr_pos>
-     <pr_pos name="not_prime_1" id="2869"
+     <pr_pos name="not_prime_1" id="2882"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="not_prime_1"/>
      </pr_pos>
-     <pr_pos name="prime_2" id="2870"
+     <pr_pos name="prime_2" id="2883"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_2"/>
      </pr_pos>
-     <pr_pos name="prime_3" id="2871"
+     <pr_pos name="prime_3" id="2884"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_3"/>
      </pr_pos>
-     <pr_pos name="prime_divisors" id="2872"
+     <pr_pos name="prime_divisors" id="2885"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="prime_divisors"/>
      </pr_pos>
-     <pr_pos name="small_divisors" id="2877"
+     <pr_pos name="small_divisors" id="2890"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="small_divisors"/>
      </pr_pos>
-     <pr_pos name="even_prime" id="2882"
+     <pr_pos name="even_prime" id="2895"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="even_prime"/>
      </pr_pos>
-     <pr_pos name="odd_prime" id="2885"
+     <pr_pos name="odd_prime" id="2898"
       ip_theory="Prime">
       <ip_library name="number"/>
       <ip_qualid name="odd_prime"/>
      </pr_pos>
-     <pr_pos name="Select_eq" id="3114"
+     <pr_pos name="Select_eq" id="3127"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_eq"/>
      </pr_pos>
-     <pr_pos name="Select_neq" id="3123"
+     <pr_pos name="Select_neq" id="3136"
       ip_theory="Map">
       <ip_library name="map"/>
       <ip_qualid name="Select_neq"/>
      </pr_pos>
-     <pr_pos name="exists_prime" id="6757"
+     <pr_pos name="exists_prime" id="6770"
       ip_theory="PrimeNumbers">
       <ip_qualid name="exists_prime"/>
      </pr_pos>
-     <pr_pos name="Bertrand_postulate" id="6770"
+     <pr_pos name="Bertrand_postulate" id="6783"
       ip_theory="PrimeNumbers">
       <ip_qualid name="Bertrand_postulate"/>
      </pr_pos>
@@ -2998,34 +2998,34 @@
       <meta_arg_ls id="2064"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2595"/>
+      <meta_arg_ls id="2608"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2603"/>
+      <meta_arg_ls id="2616"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="2932"/>
+      <meta_arg_ls id="2945"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3078"/>
+      <meta_arg_ls id="3091"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3081"/>
-     </meta>
-     <meta name="remove_logic">
-      <meta_arg_ls id="3088"/>
+      <meta_arg_ls id="3094"/>
      </meta>
      <meta name="remove_logic">
       <meta_arg_ls id="3101"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3528"/>
+      <meta_arg_ls id="3114"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="3570"/>
+      <meta_arg_ls id="3541"/>
      </meta>
      <meta name="remove_logic">
-      <meta_arg_ls id="6730"/>
+      <meta_arg_ls id="3583"/>
+     </meta>
+     <meta name="remove_logic">
+      <meta_arg_ls id="6743"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="1744"/>
@@ -3178,79 +3178,70 @@
       <meta_arg_pr id="2130"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2611"/>
+      <meta_arg_pr id="2624"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2614"/>
+      <meta_arg_pr id="2627"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2617"/>
+      <meta_arg_pr id="2630"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2620"/>
+      <meta_arg_pr id="2633"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2623"/>
+      <meta_arg_pr id="2636"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2626"/>
+      <meta_arg_pr id="2639"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2629"/>
+      <meta_arg_pr id="2642"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2632"/>
+      <meta_arg_pr id="2645"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2635"/>
+      <meta_arg_pr id="2648"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2651"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2654"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2657"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2660"/>
+      <meta_arg_pr id="2664"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2667"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2674"/>
+      <meta_arg_pr id="2670"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2679"/>
+      <meta_arg_pr id="2673"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2684"/>
+      <meta_arg_pr id="2680"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2689"/>
+      <meta_arg_pr id="2687"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2694"/>
+      <meta_arg_pr id="2692"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2701"/>
+      <meta_arg_pr id="2697"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2708"/>
+      <meta_arg_pr id="2702"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2715"/>
+      <meta_arg_pr id="2707"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2722"/>
+      <meta_arg_pr id="2714"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2727"/>
+      <meta_arg_pr id="2721"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2732"/>
+      <meta_arg_pr id="2728"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2735"/>
@@ -3259,58 +3250,67 @@
       <meta_arg_pr id="2740"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2747"/>
+      <meta_arg_pr id="2745"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2752"/>
+      <meta_arg_pr id="2748"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2757"/>
+      <meta_arg_pr id="2753"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2762"/>
+      <meta_arg_pr id="2760"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2767"/>
+      <meta_arg_pr id="2765"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2772"/>
+      <meta_arg_pr id="2770"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2775"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2869"/>
+      <meta_arg_pr id="2780"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2870"/>
+      <meta_arg_pr id="2785"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="2871"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2872"/>
-     </meta>
-     <meta name="remove_prop">
-      <meta_arg_pr id="2877"/>
+      <meta_arg_pr id="2788"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="2882"/>
      </meta>
      <meta name="remove_prop">
+      <meta_arg_pr id="2883"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="2884"/>
+     </meta>
+     <meta name="remove_prop">
       <meta_arg_pr id="2885"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3114"/>
+      <meta_arg_pr id="2890"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="3123"/>
+      <meta_arg_pr id="2895"/>
      </meta>
      <meta name="remove_prop">
-      <meta_arg_pr id="6757"/>
+      <meta_arg_pr id="2898"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3127"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="3136"/>
      </meta>
      <meta name="remove_prop">
       <meta_arg_pr id="6770"/>
+     </meta>
+     <meta name="remove_prop">
+      <meta_arg_pr id="6783"/>
      </meta>
      <meta name="remove_type">
       <meta_arg_ts id="2"/>
@@ -3331,7 +3331,7 @@
       <meta_arg_ts id="1286"/>
      </meta>
      <meta name="remove_type">
-      <meta_arg_ts id="2926"/>
+      <meta_arg_ts id="2939"/>
      </meta>
      <goal name="WP_parameter prime_numbers.40.1.4" expl="VC for prime_numbers">
      <transf name="eliminate_builtin">
