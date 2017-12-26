@@ -82,7 +82,7 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 
 # add uninstalled prover substitution policies
 
-COQVER=`bin/why3 --list-provers | sed -n -e 's/  Coq (\(.*\))/\1/p'`
+COQVER=`bin/why3 --list-provers | sed -n -e 's/  Coq \(.*\)/\1/p'`
 if test "$COQVER" != "" ; then
 cat >> why3.conf <<EOF
 
