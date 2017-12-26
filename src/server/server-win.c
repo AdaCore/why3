@@ -132,6 +132,9 @@ void send_msg_to_client(pclient client,
                         bool timeout,
                         char* outfile);
 //send msg to [client] about the result of VC [id]
+//
+void send_started_msg_to_client(pclient client, char* id);
+//send msg to [client] that the VC [id] has been started
 
 void add_to_completion_port(HANDLE h, ULONG_PTR key) {
    HANDLE tmp = CreateIoCompletionPort(h, completion_port, key, 1);
@@ -516,7 +519,8 @@ void send_started_msg_to_client(pclient client,
    if (used != len - 1) {
       shutdown_with_msg("message for client too long");
    }
-   queue_write(client, msgbuf);
+   push_write_data(client->writebuf, msgbuf);
+   try_write(client);
 }
 
 
