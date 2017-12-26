@@ -87,7 +87,7 @@ invalid_goals () {
 
 execute () {
     pgm="bin/why3execute$suffix"
-    echo -n "$1 $2... "
+    echo -n "  $1 $2... "
     if $pgm $1 $2 > /dev/null 2>&1; then
         echo "ok"
     else
@@ -103,7 +103,7 @@ extract_and_run () {
     shift
     prg=$1
     shift
-    echo -n "$dir... "
+    echo -n "  $dir... "
     rm -f $dir/$prg
     echo -n "clean... "
     if BENCH=yes make -C $dir clean > /dev/null 2>&1; then
@@ -150,7 +150,7 @@ extract_and_run () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    echo -n "$1 "
+    echo -n "  $1 "
     if $pgm $1 > /dev/null 2>&1; then
         echo "ok"
     else
