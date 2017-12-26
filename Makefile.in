@@ -1780,7 +1780,8 @@ apidot: doc/apidoc/dg.svg doc/apidoc/dg.png
 doc/apidoc/dg.dot: doc/apidoc $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc/dg.dot.tmp -dot $(INCLUDES) \
 		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
-	sed -e "s/  \(size\|ratio\|rotate\|fontsize\).*$$//" doc/apidoc/dg.dot.tmp > doc/apidoc/dg.dot
+	sed -e "s/  \(size\|ratio\|rotate\|fontsize\).*$$//" doc/apidoc/dg.dot.tmp \
+	  | tred > doc/apidoc/dg.dot
 	rm -f doc/apidoc/dg.dot.tmp
 
 doc/apidoc/dg.svg: doc/apidoc/dg.dot
