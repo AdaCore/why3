@@ -137,9 +137,6 @@ else
     echo "Counterexample regression tests succeeded. " >> $REPORT
 fi
 
-# check realizations
-misc/check-realizations.sh >> $REPORT
-
 # replay proofs
 examples/regtests.sh &> $OUT
 if test "$?" != "0" ; then
