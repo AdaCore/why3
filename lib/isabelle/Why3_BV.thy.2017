@@ -253,6 +253,45 @@ definition size_bv :: "'a::len word" where
 definition is_signed_positive :: "'a::len word \<Rightarrow> bool" where
   "is_signed_positive w = (0 \<le> sint w)"
 
+lemma to_int_eq:
+  "sint (x::'a::len word) =
+   (if is_signed_positive x then uint x else - (2 ^ LENGTH('a) - uint x))"
+proof (cases "0 \<le> sint x")
+  case True
+  note sint_lt [of x]
+  also have "(2::int) ^ (LENGTH('a) - 1) < 2 ^ LENGTH('a)"
+    by (rule power_strict_increasing) simp_all
+  finally have "sint x < 2 ^ LENGTH('a)" .
+  with True show ?thesis
+    by (simp add: is_signed_positive_def uint_sint bintrunc_mod2p mod_pos_pos_trivial)
+next
+  case False
+  from sint_ge [of x]
+  have "- sint x \<le> 2 ^ (LENGTH('a) - 1)" by simp
+  also have "(2::int) ^ (LENGTH('a) - 1) < 2 ^ LENGTH('a)"
+    by (rule power_strict_increasing) simp_all
+  finally have "- sint x < 2 ^ LENGTH('a)" .
+  then have "- (2 ^ LENGTH('a)) < sint x" by simp
+  moreover from False have "0 < - sint x" by simp
+  ultimately have "- sint x = - sint x mod 2 ^ LENGTH('a)"
+    by (simp add: mod_pos_pos_trivial)
+  also have "sint x mod 2 ^ LENGTH('a) \<noteq> 0"
+  proof
+    assume "sint x mod 2 ^ LENGTH('a) = 0"
+    then obtain y where y: "sint x = y * 2 ^ LENGTH('a)" by auto
+    with False have "\<not> 0 \<le> y" by auto
+    then have "y \<le> - 1" by simp
+    then have "y * 2 ^ LENGTH('a) \<le> - 1 * 2 ^ LENGTH('a)"
+      by (rule mult_right_mono) simp
+    with y have "sint x \<le> - (2 ^ LENGTH('a))" by simp
+    with \<open>- (2 ^ LENGTH('a)) < sint x\<close> show False by simp
+  qed
+  then have "- sint x mod 2 ^ LENGTH('a) = 2 ^ LENGTH('a) - sint x mod 2 ^ LENGTH('a)"
+    by (simp add: zmod_zminus1_eq_if)
+  finally show ?thesis using False
+    by (simp add: is_signed_positive_def uint_sint bintrunc_mod2p)
+qed
+
 type_synonym word8 = "8 word"
 
 why3_open "bv/BV8.xml"
@@ -351,14 +390,12 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_extensionality
-  using assms uint_lt [of v] uint_lt [of vqt]
-  by (simp add: to_int_def is_signed_positive_def
-    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+why3_vc to_int_def by (simp add: to_int_eq)
+
+why3_vc to_int_extensionality using assms by simp
 
 why3_vc positive_is_ge_zeros
-  using uint_lt [of x]
-  by (simp add: to_int_def is_signed_positive_def sge_def)
+  by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
   using uint_lt [of v]
@@ -554,14 +591,12 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_extensionality
-  using assms uint_lt [of v] uint_lt [of vqt]
-  by (simp add: to_int_def is_signed_positive_def
-    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+why3_vc to_int_def by (simp add: to_int_eq)
+
+why3_vc to_int_extensionality using assms by simp
 
 why3_vc positive_is_ge_zeros
-  using uint_lt [of x]
-  by (simp add: to_int_def is_signed_positive_def sge_def)
+  by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
   using uint_lt [of v]
@@ -757,14 +792,12 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_extensionality
-  using assms uint_lt [of v] uint_lt [of vqt]
-  by (simp add: to_int_def is_signed_positive_def
-    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+why3_vc to_int_def by (simp add: to_int_eq)
+
+why3_vc to_int_extensionality using assms by simp
 
 why3_vc positive_is_ge_zeros
-  using uint_lt [of x]
-  by (simp add: to_int_def is_signed_positive_def sge_def)
+  by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
   using uint_lt [of v]
@@ -960,14 +993,12 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_extensionality
-  using assms uint_lt [of v] uint_lt [of vqt]
-  by (simp add: to_int_def is_signed_positive_def
-    diff_eq_eq trans [OF eq_commute diff_eq_eq] split: if_split_asm)
+why3_vc to_int_def by (simp add: to_int_eq)
+
+why3_vc to_int_extensionality using assms by simp
 
 why3_vc positive_is_ge_zeros
-  using uint_lt [of x]
-  by (simp add: to_int_def is_signed_positive_def sge_def)
+  by (simp add: is_signed_positive_def sge_def)
 
 why3_vc to_uint_bounds
   using uint_lt [of v]

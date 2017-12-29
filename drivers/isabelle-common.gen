@@ -226,5 +226,9 @@ theory real.Trigonometry
   syntax function tan "<app><const name=\"Transcendental.tan\"/>%1</app>"
 end
 
+theory bv.BV_Gen
+  syntax function to_int "<app><const name=\"Word.sint\"/>%1</app>"
+end
+
 (* this file has an extension .aux rather than .gen since it should not be distributed *)
 import "isabelle-realizations.aux"
