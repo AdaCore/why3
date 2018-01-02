@@ -649,7 +649,7 @@ module Print = struct
       if query_syntax info.info_syn id = None &&
          not (Hashtbl.mem memo decl) then begin
         Hashtbl.add memo decl (); print_decl info fmt decl;
-        fprintf fmt "@." end in
+        fprintf fmt "@\n@." end in
     List.iter decide_print decl_name
 
 end

@@ -44,7 +44,13 @@ module ML = struct
   open Mltree
 
   let rec get_decl_name = function
-    | Dtype itdefl -> List.map (fun {its_name = id} -> id) itdefl
+    | Dtype itdefl ->
+        let add_id = function
+          | Some (Ddata l)   -> List.map (fun (idc,    _) -> idc) l
+          | Some (Drecord l) -> List.map (fun (_, idp, _) -> idp) l
+          | _ -> [] in
+        let add_td_ids {its_name = id; its_def = def} = id :: (add_id def) in
+        List.flatten (List.map add_td_ids itdefl)
     | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
     | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
     | Dlet (Lsym ({rs_name=id}, _, _, _))
@@ -602,13 +608,11 @@ module Translate = struct
       List.map (fun ({rs_cty = cty} as rs) ->
           rs.rs_name,
           let args = List.filter pv_not_ghost cty.cty_args in
-          List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)
-    in
+          List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args) in
     let drecord_fields ({rs_cty = cty} as rs) =
       (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields),
       rs.rs_name,
-      mlty_of_ity cty.cty_mask cty.cty_result
-    in
+      mlty_of_ity cty.cty_mask cty.cty_result in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
@@ -636,11 +640,10 @@ module Translate = struct
           assert (args = []); (* a range type is not polymorphic *)
           ML.mk_its_defn id [] is_private (Some (Mltree.Drange r))
       | Float ff, [], [] ->
-          assert (args = []); (* a range type is not polymorphic *)
+          assert (args = []); (* a float type is not polymorphic *)
           ML.mk_its_defn id [] is_private (Some (Mltree.Dfloat ff))
       | (Range _ | Float _), _, _ ->
           assert false (* cannot have constructors or fields *)
-
     end
 
   (* exception ExtractionVal of rsymbol *)
