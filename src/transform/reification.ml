@@ -50,21 +50,18 @@ let rec is_const t =
   | _ -> false in
   if debug then Format.printf "is_const %a: %b@." Pretty.print_term t r;
   r
-                              
 
 let rec reify_term renv t rt =
- (* let is_pvar p = match p.pat_node with Pvar _ -> true | _ -> false in
-  let rec find_vars svs (renv, acc) f t =
-    match f.t_node, t.t_node with
-    | Tvar v, _ when Svs.mem v svs ->
-       if debug then Format.printf "found var %a = %a@."
-                                   Pretty.print_vs v Pretty.print_term t;
-       renv, Mvs.add v t acc
-    | Tapp (ls1, la1), Tapp (ls2, la2) when ls_equal ls1 ls2 ->
-       List.fold_left2 (find_vars svs) (renv,acc) la1 la2
-    | Tapp (ls, _), _ -> 
-    | _ -> renv,acc*)
-  let rec invert_nonvar_pat vl (renv:reify_env) (p,f) t =
+  let is_pvar p = match p.pat_node with Pvar _ -> true | _ -> false in
+  let rec find_var vl v p (renv, acc) f t =
+    if acc = None
+    then if t_v_occurs v f > 0
+         then let renv, rt = (invert_pat vl renv (p, f) t) in
+              renv, Some rt
+         else renv, acc
+    else (assert (t_v_occurs v f = 0);
+          renv, acc)
+  and invert_nonvar_pat vl (renv:reify_env) (p,f) t =
     if debug
     then Format.printf
            "invert_nonvar_pat p %a f %a t %a@."
@@ -73,31 +70,7 @@ let rec reify_term renv t rt =
     | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_nl f t ->
        if debug then Format.printf "case equal@.";
        renv, t
-    (*| Papp (cs, pl), Tapp(ls1, _), Tapp(ls2, _)
-         when ls_equal ls1 ls2
-              && Svs.for_all (fun v -> t_v_occurs v f = 1) p.pat_vars
-              && List.for_all is_pvar pl
-             (* could remove this with a bit more work in term reconstruction *)
-      ->
-       if debug then Format.printf "case app@.";
-       let renv,mvs = find_vars p.pat_vars (renv,Mvs.empty) f t in
-       let rt = t_app cs
-                      (List.map
-                         (fun p -> match p.pat_node with
-                                   | Pvar v ->
-                                      (try Mvs.find v mvs
-                                       with Not_found ->
-                                            if debug
-                                            then Format.printf "%a not found@."
-                                                               Pretty.print_vs v;
-                                            raise NoReification)
-                                   (* no invert_pat here? *)
-                                   | _ -> assert false)
-                         pl) (Some p.pat_ty) in
-       (* if not_found happens too often here when another case should be taken,
-          we can add a forall Mvs.mem condition in the pattern *)
-       renv, rt*)
-    | Papp (cs, pl), Tapp(ls1, la1), Tapp(ls2, la2)
+    (*| Papp (cs, pl), Tapp(ls1, la1), Tapp(ls2, la2)
          when ls_equal ls1 ls2 && List.length pl = List.length la1
       ->
        if debug then Format.printf "case app@.";
@@ -117,17 +90,44 @@ let rec reify_term renv t rt =
                                    (List.rev rl);
        let t = t_app cs (List.rev rl) (Some p.pat_ty) in
        if debug then Format.printf "app ok@.";
-       renv, t
-  (*  | Pvar v, Tapp (ls, [{t_node = Tvar v'}]), Tapp (ls', [t])
-         when ls_equal ls ls' && vs_equal v v' ->
-       if debug then Format.printf "case app_var@.";
        renv, t*)
+    | Papp (cs, pl), Tapp(ls1, _), Tapp(ls2, _)
+         when ls_equal ls1 ls2
+              && Svs.for_all (fun v -> t_v_occurs v f = 1) p.pat_vars
+              && List.for_all is_pvar pl
+              (* could remove this with a bit more work in term reconstruction *)
+      ->
+       if debug then Format.printf "case app@.";
+       let rec rt_of_var svs f t v (renv, acc) =
+         assert (not (Mvs.mem v acc));
+         if debug then Format.printf "rt_of_var %a %a@."
+                                     Pretty.print_vs v Pretty.print_term f;
+         if t_v_occurs v f = 1
+            && Svs.for_all (fun v' -> vs_equal v v' || t_v_occurs v' f = 0) svs
+         then let renv, rt = invert_pat vl renv (pat_var v, f) t in
+              renv, Mvs.add v rt acc
+         else
+           match f.t_node, t.t_node with
+           | Tapp(ls1, la1), Tapp(ls2, la2) when ls_equal ls1 ls2 ->
+              let rec aux la1 la2 =
+                match la1, la2 with
+                | f'::l1, t'::l2 ->
+                   if t_v_occurs v f' = 1 then rt_of_var svs f' t' v (renv, acc)
+                   else aux l1 l2
+                | _ -> assert false in
+              aux la1 la2
+           | _ -> raise NoReification
+       in
+       let renv, mvs = Svs.fold (rt_of_var p.pat_vars f t) p.pat_vars (renv, Mvs.empty) in
+       let lrt = List.map (function | {pat_node = Pvar v} -> Mvs.find v mvs
+                                    | _ -> assert false) pl in
+       renv, t_app cs lrt (Some p.pat_ty)
     | Pvar v, Tapp (ls1, la1), Tapp(ls2, la2)
          when ls_equal ls1 ls2 && t_v_occurs v f = 1
       -> if debug then Format.printf "case app_var@.";
          let renv, rt =
-           List.fold_left2
-             (fun (renv, acc) f t ->
+           List.fold_left2 (find_var vl v p) (renv, None) la1 la2 in
+         (*(fun (renv, acc) f t ->
                if acc = None
                then if t_v_occurs v f > 0
                     then let renv, rt = (invert_pat vl renv (p, f) t) in
@@ -136,8 +136,14 @@ let rec reify_term renv t rt =
                else (assert (t_v_occurs v f = 0);
                      renv, acc))
              (renv,None) la1 la2
-         in
+         in*)
          renv, Opt.get rt
+    (*| Papp(cs, [({pat_node = Pvar v} as vp)]), Tapp (ls1, la1), Tapp(ls2, la2)
+         when ls_equal ls1 ls2 && t_v_occurs v f = 1
+      -> if debug then Format.printf "case capp_var@.";
+         let renv, rt =
+           List.fold_left2 (find_var vl v vp) (renv, None) la1 la2 in
+         renv, t_app cs [(Opt.get rt)] (Some p.pat_ty)*)
     | Por (p1, p2), _, _ ->
        if debug then Format.printf "case or@.";
        begin try invert_pat vl renv (p1, f) t
@@ -208,7 +214,7 @@ let rec reify_term renv t rt =
         then Format.printf "type mismatch between %a and %a@."
                            Pretty.print_ty (Opt.get f.t_ty)
                            Pretty.print_ty (Opt.get t.t_ty);
-        raise NoReification));
+        raise NoReification)); (*FIXME at least check coercions ?*)
     try invert_nonvar_pat vl renv (p,f) t
     with NoReification -> invert_var_pat vl renv (p,f) t
   and invert_interp renv ls (t:term) = (*la ?*)
@@ -302,8 +308,11 @@ let rec reify_term renv t rt =
                   | Decl {d_node = Dprop (Paxiom, _, e)}
                     ->
                      begin try
-                         let (renv,req) = invert_interp renv leq e in
-                         (renv,(t_app cons [req; ctx] (Some ty_list_g)))
+                         (match e.t_node with
+                          | Tquant _ | Teps _ | Tbinop _ -> renv, ctx
+                          | _ ->
+                             let (renv,req) = invert_interp renv leq e in
+                             (renv,(t_app cons [req; ctx] (Some ty_list_g))))
                        with
                        | NoReification -> renv,ctx
                                                  (* | TypeMismatch _ -> raise NoReification*)
@@ -921,7 +930,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
       in
       if debug then Format.printf "result: %a@." print_value res;
       res
-    end          
+    end
   | Efun _ -> if debug then Format.printf "Efun@."; raise CannotReduce
   | Elet (Lvar(pv, e), ein) ->
      let v = interp_expr info e in
@@ -1102,6 +1111,12 @@ let reflection_by_function s env = Trans.store (fun task ->
           let (lp, lv, rt) = Apply.intros p in
           let lv = lv @ args in
           let renv = reify_term (init_renv kn lv env prev) g rt in
+          (*ignore (build_vars_map renv prev);
+          Mvs.iter (fun v t -> if debug then Format.printf "%a %a@."
+                                           Pretty.print_vs v
+                                           Pretty.print_term t)
+                   renv.subst;
+          assert false;*)   (*stop at reification and dump context*)
           if debug then Format.printf "computing args@.";
           let vars =
             List.fold_left
