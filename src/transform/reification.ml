@@ -191,6 +191,8 @@ let rec reify_term renv t rt =
          | Papp (cs, _) -> t_app cs [trv] rty
          | Pvar _ -> trv
          | _ -> assert false in
+       let t = t_label ?loc:t.t_loc Slab.empty t in
+       (* remove labels to identify terms that are equal modulo labels *)
        if Mterm.mem t renv.store
        then
          begin

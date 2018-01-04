@@ -77,6 +77,7 @@ function interp (e:expr) (y:vars) (z:C.cvars) : C.a
 = match e with
   | UTerm v -> y v
   | Term c v -> C.( *) (C.interp c z) (y v)
+  | Term c v -> C.( *) (y v) (C.interp c z)  (* needed to reify both interpretations *)
   | Add e1 e2 -> C.(+) (interp e1 y z) (interp e2 y z)
   | Cst c -> C.interp c z
   end
@@ -296,7 +297,7 @@ let rec norm_eq_aux (ex acc_e:expr) (acc_c:coeff) : (expr, coeff)
 
 let norm_eq (e:equality) : (expr, coeff)
   returns { (ex, c) -> forall y z.
-            interp_eq e y z -> interp_eq (ex, Cst c) y z }
+            interp_eq e y z <-> interp_eq (ex, Cst c) y z }
   returns { (ex, _) -> forall b:int. eq_bound e b -> expr_bound ex b }
   raises  { C.Unknown -> true }
 = match e with
@@ -409,14 +410,34 @@ let add_eq (eq1 eq2:equality)
 let rec zero_expr (e:expr) : bool
   ensures { result -> forall y z. interp e y z = C.azero }
   variant { e }
-  (*raises  { C.Unknown -> true }*)
-= (*raise C.Unknown;*)
-  match e with
+  raises  { C.Unknown -> true }
+=
+  let nv = max_var e in
+  let coeffs = Array.make (nv+1) C.czero in
+  let rec fill_c (e:expr) : unit
+    variant { e }
+    raises  { C.Unknown -> true }
+    (*define interp_sub for coeff array as sum, ensures interp coeffs = interp e*)
+    = match e with
+      | Cst c -> coeffs[nv] <- C.add c coeffs[nv]
+      | Term c i -> coeffs[i] <- C.add c coeffs[i]
+      | UTerm i -> coeffs[i] <- C.add C.cone coeffs[i]
+      | Add e1 e2 -> fill_c e1; fill_c e2
+      end
+  in
+  fill_c e;
+  let res = ref true in
+  for i = 0 to nv do
+    (* invariant res -> interp_sub 0 i = C.azero *)
+    if not (C.eq coeffs[i] C.czero) then res := false;
+  done;
+  !res
+  (* match e with
   | Cst c -> C.eq c C.czero
   | Term c _ -> C.eq c C.czero
   | UTerm _ -> false
   | Add e1 e2 -> zero_expr e1 && zero_expr e2
-  end
+  end *)
 
 let sub_expr (e1 e2:expr)
   ensures { forall y z. C.(+) (interp result y z) (interp e2 y z)
@@ -437,11 +458,10 @@ let sub_expr (e1 e2:expr)
 let rec same_eq (eq1 eq2: equality) : bool
   ensures { result -> forall y z. interp_eq eq1 y z -> interp_eq eq2 y z }
   raises  { C.Unknown -> true }
-= match (eq1, eq2) with
-  | (a1,b1), (a2,b2) ->
-    let a = sub_expr a1 a2 in let b = sub_expr b1 b2 in
-    zero_expr a && zero_expr b
-  end
+= let (e1,c1) = norm_eq eq1 in
+  let (e2,c2) = norm_eq eq2 in
+  let e = sub_expr e1 e2 in
+  zero_expr e && C.eq c1 c2
 
 use import option.Option
 
@@ -460,7 +480,9 @@ let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
   ensures  { result = true -> forall y z. interp_ctx ctx g y z}
   raises  { C.Unknown -> true }
 =
-  let ctx = norm_context ctx in
+  (*let ctx = norm_context ctx in
+  let (g,c) = norm_eq g in*)
+  (* normalize before for fewer Unknown exceptions in computations ? *)
   let rec aux (l:context) (ghost acc: context) (s:equality) (v:list coeff) : option equality
     requires { forall y z. interp_ctx acc s y z }
     requires { ctx = acc ++ l }
@@ -510,14 +532,16 @@ let mul_row (m:matrix coeff) (i: int) (c: coeff) : unit
   requires { 0 <= i < m.rows }
   requires { not (C.eq c C.czero) }
   raises  { C.Unknown -> true }
-= for j = 0 to m.columns - 1 do
+= if C.eq c C.cone then () else
+  for j = 0 to m.columns - 1 do
     set m i j (C.mul c (get m i j))
   done
 
 let addmul_row (m:matrix coeff) (src dst: int) (c: coeff) : unit
   requires { 0 <= src < m.rows /\ 0 <= dst < m.rows }
   raises   { C.Unknown -> true }
-= for j = 0 to m.columns - 1 do
+= if C.eq c C.czero then () else
+  for j = 0 to m.columns - 1 do
     set m dst j (C.add (get m dst j) (C.mul c (get m src j)))
   done
 
@@ -969,7 +993,7 @@ let rec predicate same_exp (e1 e2: exp)
 let rec add_exp (e1 e2:exp)
   ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
   raises  { Unknown -> true }
-  variant { e2 }
+  variant { e2, e1 }
 =
   let rec add_atom (e a:exp) : (exp, bool)
     returns { r, b -> forall y. interp_exp r y = interp_exp e y + interp_exp a y }
@@ -987,7 +1011,11 @@ let rec add_exp (e1 e2:exp)
     | Minus _, Minus _ -> Plus e a, False
     | Plus e1 e2, _ ->
       let r, b = add_atom e1 a in
-      if b then Plus r e2, True
+      if b then
+        match r with
+        | Lit n -> if n = 0 then e2, True else Plus r e2, True
+        | _ -> Plus r e2, True
+        end
       else let r, b = add_atom e2 a in Plus e1 r, b
     | _ -> raise Unknown
     end
@@ -1001,7 +1029,6 @@ let rec add_exp (e1 e2:exp)
      end
    | _ -> let r, _ = add_atom e1 e2 in r
   end
-
 let rec opp_exp (e:exp)
   ensures { forall y. interp_exp result y = - interp_exp e y }
   variant { e }
@@ -1240,10 +1267,14 @@ use import int.Int
 use import int.Power
 
 goal g: forall i x c r: int.
-  radix * power radix i = power radix (i+1) ->
-  x + (2 * (power radix i)) * c = r ->
+  0 <= i ->
+  x + (2 * (power radix i) * c) = r ->
   radix * x + (2 * (power radix (i+1)) * c) = radix * r
 
-(* recognizes that radix * eq2 = goal, but can't see radix * pow radix i = pow radix (i+1) in check_combination *)
+goal g': forall a b i j: int.
+  0 <= i -> 0 <= j ->
+  (power radix i) * a = b ->
+  i = j ->
+  (power radix j) * a = b
 
 end
