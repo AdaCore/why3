@@ -187,7 +187,7 @@ LIB_MLW = ity expr dexpr pdecl pmodule
 LIB_PARSER = ptree glob parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
-		detect_polymorphism reduction_engine compute \
+		args_wrapper detect_polymorphism reduction_engine compute \
 		eliminate_definition eliminate_algebraic \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
@@ -199,7 +199,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		eval_match instantiate_predicate smoke_detector \
 		prop_curry \
-		args_wrapper generic_arg_trans_utils case apply \
+		generic_arg_trans_utils case apply \
 		ind_itp destruct cut \
 		eliminate_literal induction induction_pr
 
