@@ -76,6 +76,43 @@ module BinarySearchAnyMidPoint
 
 end
 
+(* The following version of binary search is faster in practice, by being
+   friendlier with the branch predictor of most processors. It also happens
+   to be stable, since it always return the highest index. *)
+
+module BinarySearchBranchless
+
+  use import int.Int
+  use import int.ComputerDivision
+  use import ref.Ref
+  use import array.Array
+
+  exception Not_found (* raised to signal a search failure *)
+
+  let binary_search (a : array int) (v : int) : int
+    requires { forall i1 i2 : int. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result < length a /\ a[result] = v }
+    ensures  { forall i : int. result < i < length a -> a[i] <> v }
+    raises   { Not_found -> forall i:int. 0 <= i < length a -> a[i] <> v }
+  =
+    let l = ref 0 in
+    let s = ref (length a) in
+    if !s = 0 then raise Not_found;
+    while !s > 1 do
+      invariant { 0 <= !l /\ !l + !s <= length a /\ !s >= 1 }
+      invariant {
+        forall i : int. 0 <= i < length a -> a[i] = v -> a[!l] <= v /\ i < !l + !s }
+      variant { !s }
+      let h = div !s 2 in
+      let m = !l + h in
+      l := if a[m] > v then !l else m;
+      s := !s - h;
+    done;
+    if a[!l] = v then !l
+    else raise Not_found
+
+end
+
 (* binary search using 32-bit integers *)
 
 module BinarySearchInt32
@@ -84,8 +121,6 @@ module BinarySearchInt32
   use import mach.int.Int32
   use import ref.Ref
   use import mach.array.Array32
-
-  (* the code and its specification *)
 
   exception Not_found   (* raised to signal a search failure *)
 

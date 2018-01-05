@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../binary_search.mlw" proved="true">
 <theory name="BinarySearch" proved="true" sum="a87eac5cc232a78b8d8da4a5e55ee897">
@@ -12,6 +13,11 @@
 <theory name="BinarySearchAnyMidPoint" proved="true" sum="6461e35169c0e5653c907b27049a389f">
  <goal name="VC binary_search" expl="VC for binary_search" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="63"/></proof>
+ </goal>
+</theory>
+<theory name="BinarySearchBranchless" proved="true" sum="3b2dad84c0bdc39e32b7664b11a669ff">
+ <goal name="VC binary_search" expl="VC for binary_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="147"/></proof>
  </goal>
 </theory>
 <theory name="BinarySearchInt32" proved="true" sum="189de117608870d3dac4a21f7234eef5">
