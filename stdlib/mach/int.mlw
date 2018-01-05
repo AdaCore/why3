@@ -200,14 +200,14 @@ module Int32
     function to_int = int32'int,
     lemma to_int_in_bounds,
     lemma extensionality
-
+(*
   use bv.BV32
 
   val to_bv (x: int32) : BV32.t
     ensures { BV32.to_int result = to_int x }
   val of_bv (x: BV32.t) : int32
     ensures { to_int result = BV32.to_int x }
-
+*)
 end
 
 module UInt32

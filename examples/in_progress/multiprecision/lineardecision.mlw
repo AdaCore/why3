@@ -376,7 +376,28 @@ let rec add_expr (e1 e2: expr) : expr
     | Cst _, _ | _, Cst _ -> Add e a, False
     | Add e1 e2, _ ->
       let r, b = add_atom e1 a in
-      if b then Add r e2, True else let r,b = add_atom e2 a in Add e1 r, b
+      if b
+      then
+        match r with
+          | Cst c ->
+            if C.eq c C.czero
+            then begin
+              assert { forall y z. C.(+) (interp e1 y z) (interp a y z) = C.azero };
+              e2, True end
+            else Add r e2, True
+          | _ -> Add r e2, True
+        end
+      else
+        let r,b = add_atom e2 a in
+        match r with
+          | Cst c ->
+            if C.eq c C.czero
+            then begin
+              assert { forall y z. C.(+) (interp e2 y z) (interp a y z) = C.azero };
+              e1, True end
+            else Add e1 r, b
+          | _ -> Add e1 r, b
+        end
     | _, Add _ _ -> absurd
     end
   in
@@ -412,32 +433,18 @@ let rec zero_expr (e:expr) : bool
   variant { e }
   raises  { C.Unknown -> true }
 =
-  let nv = max_var e in
-  let coeffs = Array.make (nv+1) C.czero in
-  let rec fill_c (e:expr) : unit
+  let rec all_zero (e:expr) : bool
+    ensures { result -> forall y z. interp e y z = C.azero }
     variant { e }
-    raises  { C.Unknown -> true }
-    (*define interp_sub for coeff array as sum, ensures interp coeffs = interp e*)
     = match e with
-      | Cst c -> coeffs[nv] <- C.add c coeffs[nv]
-      | Term c i -> coeffs[i] <- C.add c coeffs[i]
-      | UTerm i -> coeffs[i] <- C.add C.cone coeffs[i]
-      | Add e1 e2 -> fill_c e1; fill_c e2
-      end
+    | Cst c -> C.eq c C.czero
+    | Term c _ -> C.eq c C.czero
+    | UTerm _ -> false
+    | Add e1 e2 -> all_zero e1 && all_zero e2
+    end
   in
-  fill_c e;
-  let res = ref true in
-  for i = 0 to nv do
-    (* invariant res -> interp_sub 0 i = C.azero *)
-    if not (C.eq coeffs[i] C.czero) then res := false;
-  done;
-  !res
-  (* match e with
-  | Cst c -> C.eq c C.czero
-  | Term c _ -> C.eq c C.czero
-  | UTerm _ -> false
-  | Add e1 e2 -> zero_expr e1 && zero_expr e2
-  end *)
+  let e' = add_expr (Cst C.czero) e in (* simplifies expr *)
+  all_zero e'
 
 let sub_expr (e1 e2:expr)
   ensures { forall y z. C.(+) (interp result y z) (interp e2 y z)

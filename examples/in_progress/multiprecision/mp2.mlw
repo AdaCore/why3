@@ -90,6 +90,8 @@ module N
   use import int.Int
   use import int.Power
 
+  meta compute_max_steps 0x100000
+
   (** {3 Long integers as arrays of libs} *)
 
   type limb = uint64
@@ -245,6 +247,13 @@ module N
 
   function value (x:t) (sz:int) : int =
      value_sub (pelts x) x.offset (x.offset + sz)
+
+  let lemma value_tail (x:t) (sz:int32)
+    requires { 0 <= sz }
+    ensures  { value x (sz+1) = value x sz + (pelts x)[x.offset + sz] * power radix sz }
+  = value_sub_tail (pelts x) x.offset (x.offset + p2i sz)
+
+  meta remove_prop axiom value_tail
 
   function compare_int (x y:int) : int =
     if x < y then -1 else if x=y then 0 else 1
@@ -423,18 +432,19 @@ module N
       variant { sz - !i }
       label StartLoop in
       lx := get_ofs x !i;
+      assert { (pelts x)[offset x + !i] = !lx };
       let (res, carry) = add_with_carry !lx !c limb_zero in
       set_ofs r !i res;
       assert { value r !i + (power radix !i) * !c =
                   value x !i + y };
+      assert { res + radix * carry = !lx + !c };   (* add_with_carry post *)
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      assert { value r !i + (power radix !i) * !c
-             = value x !i + y
-             by
+      assert { (pelts r)[offset r + !i] = res };
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r (!i+1) + (power radix (!i+1)) * !c
+             = value x (!i+1) + y
+             (* by
              value r !i + (power radix !i) * !c
              = value r k + (power radix k) * res
                                + (power radix !i) * !c
@@ -446,7 +456,8 @@ module N
              = value r k + (power radix k) * (!c at StartLoop)
                                + (power radix k) * !lx
              = value x k + y + (power radix k) * !lx
-             = value x !i + y }
+             = value x !i + y*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     if Int32.(=) !i sz then !c
     else begin
@@ -693,6 +704,12 @@ module N
       ly := get_ofs y !i;
       let res, carry = add_with_carry !lx !ly !c in
       set_ofs x !i res;
+      assert { forall j. !i < j < sx ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j]
+                 by (pelts x)[x.offset + j]
+                 = (pelts (x at StartLoop))[x.offset + j]
+                 = (pelts ox)[x.offset + j]};
       assert { value x !i + (power radix !i) * !c = value ox !i + value y !i };
       c := carry;
       let ghost k = p2i !i in
@@ -1096,6 +1113,12 @@ module N
       ly := get_ofs y !i;
       let res, borrow = sub_with_borrow !lx !ly !b in
       set_ofs x !i res;
+      assert { forall j. !i < j < sx ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j]
+                 by (pelts x)[x.offset + j]
+                 = (pelts (x at StartLoop))[x.offset + j]
+                 = (pelts ox)[x.offset + j]};
       assert { value x !i - power radix !i * !b = value ox !i - value y !i };
       b := borrow;
       let ghost k = p2i !i in
@@ -6550,3 +6573,9 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
     free ny;
 
 end
+
+(*
+Local Variables:
+compile-command: "why3 ide -L . mp2.mlw"
+End:
+*)
