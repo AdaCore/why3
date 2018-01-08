@@ -4,7 +4,7 @@
 
 (** {2 Parity properties} *)
 
-theory Parity
+module Parity
 
   use import int.Int
 
@@ -34,7 +34,7 @@ end
 
 (** {2 Divisibility} *)
 
-theory Divisibility
+module Divisibility
 
   use export int.Int
   use import int.ComputerDivision
@@ -103,7 +103,7 @@ end
 
 (** {2 Greateast Common Divisor} *)
 
-theory Gcd
+module Gcd
 
   use export int.Int
   use import Divisibility
@@ -151,7 +151,7 @@ end
 
 (** {2 Prime numbers} *)
 
-theory Prime
+module Prime
 
   use export int.Int
   use import Divisibility
@@ -182,7 +182,7 @@ end
 
 (** {2 Coprime numbers} *)
 
-theory Coprime
+module Coprime
 
   use export int.Int
   use import Divisibility

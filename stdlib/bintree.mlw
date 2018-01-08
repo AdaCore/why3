@@ -1,7 +1,7 @@
 
 (** {1 Polymorphic binary trees with elements at nodes} *)
 
-theory Tree
+module Tree
 
   type tree 'a = Empty | Node (tree 'a) 'a (tree 'a)
 
@@ -11,7 +11,7 @@ theory Tree
 
 end
 
-theory Size "number of nodes"
+module Size "number of nodes"
 
   use import Tree
   use import int.Int
@@ -27,7 +27,7 @@ theory Size "number of nodes"
 
 end
 
-theory Occ "occurrences in a binary tree"
+module Occ "occurrences in a binary tree"
 
   use import Tree
   use import int.Int
@@ -45,7 +45,7 @@ theory Occ "occurrences in a binary tree"
 
 end
 
-theory Height "height of a tree"
+module Height "height of a tree"
 
   use import Tree
   use import int.Int
@@ -61,7 +61,7 @@ theory Height "height of a tree"
 
 end
 
-theory Inorder "inorder traversal"
+module Inorder "inorder traversal"
 
   use import Tree
   use import list.List
@@ -74,7 +74,7 @@ theory Inorder "inorder traversal"
 
 end
 
-theory Preorder "preorder traversal"
+module Preorder "preorder traversal"
 
   use import Tree
   use import list.List
@@ -87,7 +87,7 @@ theory Preorder "preorder traversal"
 
 end
 
-theory InorderLength
+module InorderLength
 
   use import Tree
   use import Size
@@ -99,7 +99,7 @@ theory InorderLength
 
 end
 
-theory Zipper "Huet's zipper"
+module Zipper "Huet's zipper"
 
   use import Tree
 

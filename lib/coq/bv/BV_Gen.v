@@ -37,7 +37,8 @@ Lemma size_int_S : size = Z.succ (Z.of_nat last_bit).
 Qed.
 
 (* Why3 goal *)
-Lemma size_pos : (0%Z < size)%Z.
+Lemma size_pos :
+(0%Z < size)%Z.
   rewrite size_int_S; omega.
 Qed.
 
@@ -212,8 +213,8 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma nth_out_of_bound : forall (x:t) (n:Z), ((n < 0%Z)%Z \/
-  (size <= n)%Z) -> ((nth x n) = false).
+Lemma nth_out_of_bound :
+forall (x:t) (n:Z), ((n < 0%Z)%Z \/ (size <= n)%Z) -> ((nth x n) = false).
 intros.
 unfold nth.
 rewrite nth_aux_out_of_bound; auto with zarith.
@@ -236,7 +237,8 @@ Lemma Nth_zeros_aux : forall {l} (n:Z), ((@nth_aux l zeros_aux n) = false).
 Qed.
 
 (* Why3 goal *)
-Lemma Nth_zeros : forall (n:Z), ((nth zeros n) = false).
+Lemma Nth_zeros :
+forall (n:Z), ((nth zeros n) = false).
 intros n; apply Nth_zeros_aux.
 Qed.
 
@@ -259,8 +261,8 @@ Definition ones: t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_ones : forall (n:Z), ((0%Z <= n)%Z /\ (n < size)%Z) -> ((nth ones
-  n) = true).
+Lemma Nth_ones :
+forall (n:Z), ((0%Z <= n)%Z /\ (n < size)%Z) -> ((nth ones n) = true).
   intros; apply nth_const; easy.
 Qed.
 
@@ -270,9 +272,10 @@ Definition bw_and: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_and : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_and v1 v2) n) = (Init.Datatypes.andb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_and :
+forall (v1:t) (v2:t) (n:Z),
+ ((0%Z <= n)%Z /\ (n < size)%Z) ->
+ ((nth (bw_and v1 v2) n) = (Init.Datatypes.andb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2 with (f := fun x y => x && y); easy.
 Qed.
@@ -283,9 +286,10 @@ Definition bw_or: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_or : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_or v1 v2) n) = (Init.Datatypes.orb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_or :
+forall (v1:t) (v2:t) (n:Z),
+ ((0%Z <= n)%Z /\ (n < size)%Z) ->
+ ((nth (bw_or v1 v2) n) = (Init.Datatypes.orb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2; easy.
 Qed.
@@ -296,9 +300,10 @@ Definition bw_xor: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_xor : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_xor v1 v2) n) = (Init.Datatypes.xorb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_xor :
+forall (v1:t) (v2:t) (n:Z),
+ ((0%Z <= n)%Z /\ (n < size)%Z) ->
+ ((nth (bw_xor v1 v2) n) = (Init.Datatypes.xorb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2; easy.
 Qed.
@@ -309,8 +314,10 @@ Definition bw_not: t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_not : forall (v:t) (n:Z), ((0%Z <= n)%Z /\ (n < size)%Z) ->
-  ((nth (bw_not v) n) = (Init.Datatypes.negb (nth v n))).
+Lemma Nth_bw_not :
+forall (v:t) (n:Z),
+ ((0%Z <= n)%Z /\ (n < size)%Z) ->
+ ((nth (bw_not v) n) = (Init.Datatypes.negb (nth v n))).
   symmetry.
   apply nth_aux_map; easy.
 Qed.
@@ -337,17 +344,21 @@ Lemma bshiftRl_iter_nth : forall b s m,
 Qed.
 
 (* Why3 goal *)
-Lemma Lsr_nth_low : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
-  ((0%Z <= n)%Z -> (((n + s)%Z < size)%Z -> ((nth (lsr b s) n) = (nth b
-  (n + s)%Z)))).
+Lemma Lsr_nth_low :
+forall (b:t) (n:Z) (s:Z),
+ (0%Z <= s)%Z ->
+ ((0%Z <= n)%Z ->
+  (((n + s)%Z < size)%Z -> ((nth (lsr b s) n) = (nth b (n + s)%Z)))).
 intros b n s h1 h2 h3.
 rewrite <-Z2Nat.id with (n := s) at 2; auto.
 apply bshiftRl_iter_nth; omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Lsr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
-  ((0%Z <= n)%Z -> ((size <= (n + s)%Z)%Z -> ((nth (lsr b s) n) = false))).
+Lemma Lsr_nth_high :
+forall (b:t) (n:Z) (s:Z),
+ (0%Z <= s)%Z ->
+ ((0%Z <= n)%Z -> ((size <= (n + s)%Z)%Z -> ((nth (lsr b s) n) = false))).
   intros b n s h1 h2 h3.
   unfold nth,lsr.
   cut (nth_aux b (n + Z.of_nat (Z.to_nat s)) = false).
@@ -359,7 +370,8 @@ Lemma Lsr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma lsr_zeros : forall (x:t), ((lsr x 0%Z) = x).
+Lemma lsr_zeros :
+forall (x:t), ((lsr x 0%Z) = x).
 auto.
 Qed.
 
@@ -440,9 +452,11 @@ Lemma BshiftRa_iter_nth_low : forall (b:t) (s:nat) (n:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma Asr_nth_low : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
-  (((0%Z <= n)%Z /\ (n < size)%Z) -> (((n + s)%Z < size)%Z -> ((nth (asr b s)
-  n) = (nth b (n + s)%Z)))).
+Lemma Asr_nth_low :
+forall (b:t) (n:Z) (s:Z),
+ (0%Z <= s)%Z ->
+ (((0%Z <= n)%Z /\ (n < size)%Z) ->
+  (((n + s)%Z < size)%Z -> ((nth (asr b s) n) = (nth b (n + s)%Z)))).
   unfold nth, lsr.
   intros.
   assert ((n + s)%Z = (n + Z.of_nat (Z.to_nat s))%Z).
@@ -486,9 +500,11 @@ Lemma BhiftRa_iter_nth_high : forall (b:t) (s:nat) (n:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma Asr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
-  (((0%Z <= n)%Z /\ (n < size)%Z) -> ((size <= (n + s)%Z)%Z -> ((nth (asr b
-  s) n) = (nth b (size - 1%Z)%Z)))).
+Lemma Asr_nth_high :
+forall (b:t) (n:Z) (s:Z),
+ (0%Z <= s)%Z ->
+ (((0%Z <= n)%Z /\ (n < size)%Z) ->
+  ((size <= (n + s)%Z)%Z -> ((nth (asr b s) n) = (nth b (size - 1%Z)%Z)))).
   unfold nth, asr.
   intros.
   apply BhiftRa_iter_nth_high.
@@ -497,7 +513,8 @@ Lemma Asr_nth_high : forall (b:t) (n:Z) (s:Z), (0%Z <= s)%Z ->
 Qed.
 
 (* Why3 goal *)
-Lemma asr_zeros : forall (x:t), ((asr x 0%Z) = x).
+Lemma asr_zeros :
+forall (x:t), ((asr x 0%Z) = x).
 auto.
 Qed.
 
@@ -523,8 +540,10 @@ Lemma bshiftL_iter_nth_high : forall {l} v s m, (0 <= Z.of_nat s)%Z -> (Z.of_nat
 Qed.
 
 (* Why3 goal *)
-Lemma Lsl_nth_high : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  ((s <= n)%Z /\ (n < size)%Z)) -> ((nth (lsl b s) n) = (nth b (n - s)%Z)).
+Lemma Lsl_nth_high :
+forall (b:t) (n:Z) (s:Z),
+ ((0%Z <= s)%Z /\ ((s <= n)%Z /\ (n < size)%Z)) ->
+ ((nth (lsl b s) n) = (nth b (n - s)%Z)).
   intros.
   unfold lsl, nth.
   rewrite <-Z2Nat.id with (n := s) at 2 by omega.
@@ -552,15 +571,17 @@ Lemma Lsl_nth_low_aux : forall {l} x b (n : int),
 Qed.
 
 (* Why3 goal *)
-Lemma Lsl_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= n)%Z /\ (n < s)%Z) ->
-  ((nth (lsl b s) n) = false).
+Lemma Lsl_nth_low :
+forall (b:t) (n:Z) (s:Z),
+ ((0%Z <= n)%Z /\ (n < s)%Z) -> ((nth (lsl b s) n) = false).
   intros.
   apply Lsl_nth_low_aux.
   rewrite Z2Nat.id; omega.
 Qed.
 
 (* Why3 goal *)
-Lemma lsl_zeros : forall (x:t), ((lsl x 0%Z) = x).
+Lemma lsl_zeros :
+forall (x:t), ((lsl x 0%Z) = x).
 auto.
 Qed.
 
@@ -1092,9 +1113,12 @@ Definition rotate_right: t -> Z -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_rotate_right : forall (v:t) (n:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i < size)%Z) -> ((0%Z <= n)%Z -> ((nth (rotate_right v n) i) = (nth v
-  (int.EuclideanDivision.mod1 (i + n)%Z size)))).
+Lemma Nth_rotate_right :
+forall (v:t) (n:Z) (i:Z),
+ ((0%Z <= i)%Z /\ (i < size)%Z) ->
+ ((0%Z <= n)%Z ->
+  ((nth (rotate_right v n) i) = (nth v
+                                  (int.EuclideanDivision.mod1 (i + n)%Z size)))).
   intros v n i h1 h2.
   revert h2; revert n.
   apply Z_of_nat_prop.
@@ -1115,9 +1139,12 @@ Definition rotate_left: t -> Z -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_rotate_left : forall (v:t) (n:Z) (i:Z), ((0%Z <= i)%Z /\
-  (i < size)%Z) -> ((0%Z <= n)%Z -> ((nth (rotate_left v n) i) = (nth v
-  (int.EuclideanDivision.mod1 (i - n)%Z size)))).
+Lemma Nth_rotate_left :
+forall (v:t) (n:Z) (i:Z),
+ ((0%Z <= i)%Z /\ (i < size)%Z) ->
+ ((0%Z <= n)%Z ->
+  ((nth (rotate_left v n) i) = (nth v
+                                 (int.EuclideanDivision.mod1 (i - n)%Z size)))).
   intros v n i h1 h2.
   revert h2; revert n.
   apply Z_of_nat_prop.
@@ -1143,12 +1170,14 @@ Definition max_int: Z.
 Defined.
 
 (* Why3 goal *)
-Lemma two_power_size_val : (two_power_size = (bv.Pow2int.pow2 size)).
+Lemma two_power_size_val :
+(two_power_size = (bv.Pow2int.pow2 size)).
   trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma max_int_val : (max_int = (two_power_size - 1%Z)%Z).
+Lemma max_int_val :
+(max_int = (two_power_size - 1%Z)%Z).
   trivial.
 Qed.
 
@@ -1177,9 +1206,11 @@ Definition to_int: t -> Z.
 Defined.
 
 (* Why3 goal *)
-Lemma to_int_def : forall (x:t), ((is_signed_positive x) ->
-  ((to_int x) = (to_uint x))) /\ ((~ (is_signed_positive x)) ->
-  ((to_int x) = (-(two_power_size - (to_uint x))%Z)%Z)).
+Lemma to_int_def :
+forall (x:t),
+ ((is_signed_positive x) -> ((to_int x) = (to_uint x)))
+ /\ ((~ (is_signed_positive x)) ->
+     ((to_int x) = (-(two_power_size - (to_uint x))%Z)%Z)).
   intros. split.
   - unfold to_int, to_uint,is_signed_positive, twos_complement, size_nat.
     intros.
@@ -1200,8 +1231,8 @@ Lemma to_int_def : forall (x:t), ((is_signed_positive x) ->
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_extensionality : forall (v:t) (v':t),
-  ((to_uint v) = (to_uint v')) -> (v = v').
+Lemma to_uint_extensionality :
+forall (v:t) (v':t), ((to_uint v) = (to_uint v')) -> (v = v').
   unfold to_uint.
   intros v v'.
   rewrite Nat2Z.inj_iff.
@@ -1209,8 +1240,8 @@ Lemma to_uint_extensionality : forall (v:t) (v':t),
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_extensionality : forall (v:t) (v':t),
-  ((to_int v) = (to_int v')) -> (v = v').
+Lemma to_int_extensionality :
+forall (v:t) (v':t), ((to_int v) = (to_int v')) -> (v = v').
   apply twos_complement_extensionality.
 Qed.
 
@@ -1218,8 +1249,8 @@ Qed.
 Definition uint_in_range (i:Z): Prop := (0%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
-Lemma to_uint_bounds : forall (v:t), (0%Z <= (to_uint v))%Z /\
-  ((to_uint v) < two_power_size)%Z.
+Lemma to_uint_bounds :
+forall (v:t), (0%Z <= (to_uint v))%Z /\ ((to_uint v) < two_power_size)%Z.
   intros v.
   unfold to_uint, uint_in_range.
   split.
@@ -1323,8 +1354,9 @@ Qed.
 (* end of to_uint helpers *)
 
 (* Why3 goal *)
-Lemma to_uint_of_int : forall (i:Z), ((0%Z <= i)%Z /\
-  (i < two_power_size)%Z) -> ((to_uint (of_int i)) = i).
+Lemma to_uint_of_int :
+forall (i:Z),
+ ((0%Z <= i)%Z /\ (i < two_power_size)%Z) -> ((to_uint (of_int i)) = i).
   intros i h1; destruct h1.
   unfold to_uint, of_int.
   rewrite bvec_to_nat_nat_to_bvec.
@@ -1338,7 +1370,8 @@ Definition size_bv: t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_size_bv : ((to_uint size_bv) = size).
+Lemma to_uint_size_bv :
+((to_uint size_bv) = size).
   apply to_uint_of_int.
   rewrite max_int_S.
   destruct size_in_range; auto with zarith.
@@ -1349,7 +1382,8 @@ apply Nat_to_bvec_zeros.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_zeros : ((to_uint zeros) = 0%Z).
+Lemma to_uint_zeros :
+((to_uint zeros) = 0%Z).
   rewrite Of_int_zeros.
   apply to_uint_of_int; easy.
 Qed.
@@ -1372,7 +1406,8 @@ Lemma Of_int_one_aux : forall {l}, one_aux l = nat_to_bvec (S l) 1%nat.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_one : ((to_uint one) = 1%Z).
+Lemma to_uint_one :
+((to_uint one) = 1%Z).
   unfold to_uint, one.
   simpl.
   rewrite bvec_to_nat_zeros.
@@ -1388,7 +1423,8 @@ Lemma Of_int_ones: ones = of_int max_int.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_ones : ((to_uint ones) = max_int).
+Lemma to_uint_ones :
+((to_uint ones) = max_int).
   rewrite Of_int_ones.
   apply to_uint_of_int.
   rewrite max_int_S.
@@ -1428,8 +1464,8 @@ Lemma zeros_sign_false: Bsign last_bit zeros = false.
 Qed.
 
 (* Why3 goal *)
-Lemma positive_is_ge_zeros : forall (x:t), (is_signed_positive x) <-> (sge x
-  zeros).
+Lemma positive_is_ge_zeros :
+forall (x:t), (is_signed_positive x) <-> (sge x zeros).
   intros.
   unfold is_signed_positive, sge, to_int, twos_complement, size_nat.
   rewrite zeros_sign_false. destruct Bsign.
@@ -1454,18 +1490,20 @@ Definition add: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_add : forall (v1:t) (v2:t), ((to_uint (add v1
-  v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) + (to_uint v2))%Z
-  two_power_size)).
+Lemma to_uint_add :
+forall (v1:t) (v2:t),
+ ((to_uint (add v1 v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) + 
+                            (to_uint v2))%Z two_power_size)).
   intros v1 v2.
   apply to_uint_of_int.
   apply mod1_in_range2.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_add_bounded : forall (v1:t) (v2:t),
-  (((to_uint v1) + (to_uint v2))%Z < two_power_size)%Z -> ((to_uint (add v1
-  v2)) = ((to_uint v1) + (to_uint v2))%Z).
+Lemma to_uint_add_bounded :
+forall (v1:t) (v2:t),
+ (((to_uint v1) + (to_uint v2))%Z < two_power_size)%Z ->
+ ((to_uint (add v1 v2)) = ((to_uint v1) + (to_uint v2))%Z).
   intros v1 v2 h1.
   rewrite <-(mod1_out (to_uint v1 + to_uint v2) two_power_size).
   apply to_uint_add.
@@ -1478,18 +1516,20 @@ Definition sub: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_sub : forall (v1:t) (v2:t), ((to_uint (sub v1
-  v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) - (to_uint v2))%Z
-  two_power_size)).
+Lemma to_uint_sub :
+forall (v1:t) (v2:t),
+ ((to_uint (sub v1 v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) - 
+                            (to_uint v2))%Z two_power_size)).
   intros v1 v2.
   apply to_uint_of_int, mod1_in_range2.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_sub_bounded : forall (v1:t) (v2:t),
-  ((0%Z <= ((to_uint v1) - (to_uint v2))%Z)%Z /\
-  (((to_uint v1) - (to_uint v2))%Z < two_power_size)%Z) -> ((to_uint (sub v1
-  v2)) = ((to_uint v1) - (to_uint v2))%Z).
+Lemma to_uint_sub_bounded :
+forall (v1:t) (v2:t),
+ ((0%Z <= ((to_uint v1) - (to_uint v2))%Z)%Z
+  /\ (((to_uint v1) - (to_uint v2))%Z < two_power_size)%Z) ->
+ ((to_uint (sub v1 v2)) = ((to_uint v1) - (to_uint v2))%Z).
   intros v1 v2 (h1,h2).
   rewrite <-(mod1_out (to_uint v1 - to_uint v2) two_power_size) by auto.
   apply to_uint_sub.
@@ -1501,9 +1541,10 @@ Definition neg: t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_neg : forall (v:t),
-  ((to_uint (neg v)) = (int.EuclideanDivision.mod1 (-(to_uint v))%Z
-  two_power_size)).
+Lemma to_uint_neg :
+forall (v:t),
+ ((to_uint (neg v)) = (int.EuclideanDivision.mod1 (-(to_uint v))%Z
+                        two_power_size)).
   intros v.
   apply to_uint_of_int, mod1_in_range2.
 Qed.
@@ -1514,17 +1555,19 @@ Definition mul: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_mul : forall (v1:t) (v2:t), ((to_uint (mul v1
-  v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) * (to_uint v2))%Z
-  two_power_size)).
+Lemma to_uint_mul :
+forall (v1:t) (v2:t),
+ ((to_uint (mul v1 v2)) = (int.EuclideanDivision.mod1 ((to_uint v1) * 
+                            (to_uint v2))%Z two_power_size)).
   intros v1 v2.
   apply to_uint_of_int, mod1_in_range2.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_mul_bounded : forall (v1:t) (v2:t),
-  (((to_uint v1) * (to_uint v2))%Z < two_power_size)%Z -> ((to_uint (mul v1
-  v2)) = ((to_uint v1) * (to_uint v2))%Z).
+Lemma to_uint_mul_bounded :
+forall (v1:t) (v2:t),
+ (((to_uint v1) * (to_uint v2))%Z < two_power_size)%Z ->
+ ((to_uint (mul v1 v2)) = ((to_uint v1) * (to_uint v2))%Z).
   intros v1 v2 h1.
   rewrite <-(mod1_out (to_uint v1 * to_uint v2) two_power_size).
   apply to_uint_mul.
@@ -1539,8 +1582,10 @@ Definition udiv: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_udiv : forall (v1:t) (v2:t), ((to_uint (udiv v1
-  v2)) = (int.EuclideanDivision.div (to_uint v1) (to_uint v2))).
+Lemma to_uint_udiv :
+forall (v1:t) (v2:t),
+ ((to_uint (udiv v1 v2)) = (int.EuclideanDivision.div (to_uint v1)
+                             (to_uint v2))).
   intros v1 v2.
   apply to_uint_of_int.
   case (Z.eq_dec (to_uint v2) 0); intro.
@@ -1561,8 +1606,10 @@ Definition urem: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_urem : forall (v1:t) (v2:t), ((to_uint (urem v1
-  v2)) = (int.EuclideanDivision.mod1 (to_uint v1) (to_uint v2))).
+Lemma to_uint_urem :
+forall (v1:t) (v2:t),
+ ((to_uint (urem v1 v2)) = (int.EuclideanDivision.mod1 (to_uint v1)
+                             (to_uint v2))).
   intros v1 v2.
   apply to_uint_of_int.
   case (Z.eq_dec (to_uint v2) 0); intro.
@@ -1582,15 +1629,16 @@ Definition lsr_bv: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma lsr_bv_is_lsr : forall (x:t) (n:t), ((lsr_bv x n) = (lsr x
-  (to_uint n))).
+Lemma lsr_bv_is_lsr :
+forall (x:t) (n:t), ((lsr_bv x n) = (lsr x (to_uint n))).
   easy.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_lsr : forall (v:t) (n:t), ((to_uint (lsr_bv v
-  n)) = (int.EuclideanDivision.div (to_uint v)
-  (bv.Pow2int.pow2 (to_uint n)))).
+Lemma to_uint_lsr :
+forall (v:t) (n:t),
+ ((to_uint (lsr_bv v n)) = (int.EuclideanDivision.div (to_uint v)
+                             (bv.Pow2int.pow2 (to_uint n)))).
   intros v n.
   apply to_uint_lsr_aux.
 Qed.
@@ -1601,8 +1649,8 @@ Definition asr_bv: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma asr_bv_is_asr : forall (x:t) (n:t), ((asr_bv x n) = (asr x
-  (to_uint n))).
+Lemma asr_bv_is_asr :
+forall (x:t) (n:t), ((asr_bv x n) = (asr x (to_uint n))).
   easy.
 Qed.
 
@@ -1612,15 +1660,16 @@ Definition lsl_bv: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma lsl_bv_is_lsl : forall (x:t) (n:t), ((lsl_bv x n) = (lsl x
-  (to_uint n))).
+Lemma lsl_bv_is_lsl :
+forall (x:t) (n:t), ((lsl_bv x n) = (lsl x (to_uint n))).
   easy.
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_lsl : forall (v:t) (n:t), ((to_uint (lsl_bv v
-  n)) = (int.EuclideanDivision.mod1 ((to_uint v) * (bv.Pow2int.pow2 (to_uint n)))%Z
-  two_power_size)).
+Lemma to_uint_lsl :
+forall (v:t) (n:t),
+ ((to_uint (lsl_bv v n)) = (int.EuclideanDivision.mod1 ((to_uint v) * 
+                             (bv.Pow2int.pow2 (to_uint n)))%Z two_power_size)).
   intros v n.
   apply to_uint_lsl_aux.
 Qed.
@@ -1636,14 +1685,14 @@ Definition rotate_left_bv: t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma rotate_left_bv_is_rotate_left : forall (v:t) (n:t), ((rotate_left_bv v
-  n) = (rotate_left v (to_uint n))).
+Lemma rotate_left_bv_is_rotate_left :
+forall (v:t) (n:t), ((rotate_left_bv v n) = (rotate_left v (to_uint n))).
 trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma rotate_right_bv_is_rotate_right : forall (v:t) (n:t),
-  ((rotate_right_bv v n) = (rotate_right v (to_uint n))).
+Lemma rotate_right_bv_is_rotate_right :
+forall (v:t) (n:t), ((rotate_right_bv v n) = (rotate_right v (to_uint n))).
 trivial.
 Qed.
 
@@ -1678,8 +1727,9 @@ Lemma nth_bv_def_aux : forall {l} (x:Vector.t bool (S l)) (i:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
-  ~ ((bw_and (lsr_bv x i) one) = zeros).
+Lemma nth_bv_def :
+forall (x:t) (i:t),
+ ((nth_bv x i) = true) <-> ~ ((bw_and (lsr_bv x i) one) = zeros).
   intros; unfold nth_bv.
   case (Z_lt_ge_dec (to_uint i) size); intro.
   rewrite <-(Zplus_0_l (to_uint i)).
@@ -1711,14 +1761,16 @@ Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
 Qed.
 
 (* Why3 goal *)
-Lemma Nth_bv_is_nth : forall (x:t) (i:t), ((nth x (to_uint i)) = (nth_bv x
-  i)).
+Lemma Nth_bv_is_nth :
+forall (x:t) (i:t), ((nth x (to_uint i)) = (nth_bv x i)).
   trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma Nth_bv_is_nth2 : forall (x:t) (i:Z), ((0%Z <= i)%Z /\
-  (i < two_power_size)%Z) -> ((nth_bv x (of_int i)) = (nth x i)).
+Lemma Nth_bv_is_nth2 :
+forall (x:t) (i:Z),
+ ((0%Z <= i)%Z /\ (i < two_power_size)%Z) ->
+ ((nth_bv x (of_int i)) = (nth x i)).
   intros x i h1.
   rewrite <-Nth_bv_is_nth.
   rewrite to_uint_of_int by auto.
@@ -1733,16 +1785,17 @@ Definition eq_sub_bv: t -> t -> t -> t -> Prop.
 Defined.
 
 (* Why3 goal *)
-Lemma eq_sub_bv_def : forall (a:t) (b:t) (i:t) (n:t), let mask :=
-  (lsl_bv (sub (lsl_bv one n) one) i) in ((eq_sub_bv a b i n) <-> ((bw_and b
-  mask) = (bw_and a mask))).
+Lemma eq_sub_bv_def :
+forall (a:t) (b:t) (i:t) (n:t),
+ let mask := (lsl_bv (sub (lsl_bv one n) one) i) in
+ ((eq_sub_bv a b i n) <-> ((bw_and b mask) = (bw_and a mask))).
   rewrite Of_int_one.
   easy.
 Qed.
 
 (* Why3 assumption *)
-Definition eq_sub (a:t) (b:t) (i:Z) (n:Z): Prop := forall (j:Z),
-  ((i <= j)%Z /\ (j < (i + n)%Z)%Z) -> ((nth a j) = (nth b j)).
+Definition eq_sub (a:t) (b:t) (i:Z) (n:Z): Prop :=
+  forall (j:Z), ((i <= j)%Z /\ (j < (i + n)%Z)%Z) -> ((nth a j) = (nth b j)).
 
 Lemma in_range_1 : uint_in_range 1.
   split; auto with zarith.
@@ -2063,8 +2116,9 @@ Lemma mask_correctness :
 Qed.
 
 (* Why3 goal *)
-Lemma eq_sub_equiv : forall (a:t) (b:t) (i:t) (n:t), (eq_sub a b (to_uint i)
-  (to_uint n)) <-> (eq_sub_bv a b i n).
+Lemma eq_sub_equiv :
+forall (a:t) (b:t) (i:t) (n:t),
+ (eq_sub a b (to_uint i) (to_uint n)) <-> (eq_sub_bv a b i n).
   intros a b i n.
   unfold eq_sub, eq_sub_bv.
   transitivity (eq_aux (bw_and b (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))
@@ -2102,7 +2156,8 @@ Lemma eq_sub_equiv : forall (a:t) (b:t) (i:t) (n:t), (eq_sub a b (to_uint i)
 Qed.
 
 (* Why3 goal *)
-Lemma Extensionality : forall (x:t) (y:t), (eq_sub x y 0%Z size) -> (x = y).
+Lemma Extensionality :
+forall (x:t) (y:t), (eq_sub x y 0%Z size) -> (x = y).
   intros x y.
   apply Extensionality_aux.
 Qed.

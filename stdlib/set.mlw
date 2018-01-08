@@ -3,7 +3,7 @@
 
 (** {2 Potentially infinite sets} *)
 
-theory Set
+module Set
 
   use import map.Map
   use import map.Const
@@ -94,7 +94,7 @@ end
 
 (** {2 Set Comprehension} *)
 
-theory SetMap
+module SetMap
 
   use export Set
 
@@ -110,7 +110,7 @@ end
 
 (** {2 Finite sets} *)
 
-theory Fset
+module Fset
 
   use import int.Int
 
@@ -217,7 +217,7 @@ end
 
 (** {2 Finite Set Comprehension} *)
 
-theory FsetComprehension
+module FsetComprehension
 
   use export Fset
   use import int.Int
@@ -250,7 +250,7 @@ end
 
 (** {2 N-th element of a finite set} *)
 
-theory FsetNth
+module FsetNth
 
   use import int.Int
   use import Fset
@@ -269,7 +269,7 @@ end
 
 (** {2 Induction principle on finite sets} *)
 
-theory FsetInduction
+module FsetInduction
 
   use import Fset
 
@@ -287,7 +287,7 @@ end
 
 (** {2 Finite sets of integers} *)
 
-theory Fsetint
+module Fsetint
 
   use export int.Int
   use export Fset
@@ -312,7 +312,7 @@ end
 
 (** {2 Finite set iterators} *)
 
-theory Min
+module Min
 
   use import Fset
   use import int.Int
@@ -335,7 +335,7 @@ theory Min
 end
 
 (** sum on finite set *)
-theory FsetSum "Sum of a function over a finite set"
+module FsetSum "Sum of a function over a finite set"
 
   use import int.Int
   use import Fset as S

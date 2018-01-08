@@ -46,7 +46,7 @@ type query =
 (* The first argument is not used: these functions are supposed to be given to a
    Qtask. *)
 val print_id: 'a -> Trans.naming_table -> string list -> string
-val search_id: 'a -> Trans.naming_table -> string list -> string
+val search_id: search_both:bool -> 'a -> Trans.naming_table -> string list -> string
 
 val list_strategies : Controller_itp.controller -> (string * string) list
 val list_provers: Controller_itp.controller -> _ -> string

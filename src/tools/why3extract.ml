@@ -158,7 +158,7 @@ let print_mdecls ?fname m mdecls =
     print_preludes m.mod_theory.Theory.th_name fmt pm;
     let flat = opt_modu_flat = Flat in
     let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
-    Pp.print_list Pp.newline pr_decl fmt mdecls;
+    Pp.print_list Pp.nothing pr_decl fmt mdecls;
     if cout <> stdout then close_out cout end
 
 let find_module_path mm path m = match path with
@@ -353,7 +353,7 @@ let () =
       let idl = match opt_rec_single with
         | Single -> List.filter is_local idl
         | Recursive -> idl in
-      Pp.print_list Pp.newline extract fmt idl;
+      Pp.print_list Pp.nothing extract fmt idl;
       if cout <> stdout then close_out cout
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;

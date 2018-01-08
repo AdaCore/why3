@@ -21,21 +21,22 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 goal *)
-Lemma rev_append_def1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(list a))
-  (t:(list a)),
-  ((Lists.List.rev_append s t) = match s with
-  | (Init.Datatypes.cons x r) =>
-      (Lists.List.rev_append r (Init.Datatypes.cons x t))
-  | Init.Datatypes.nil => t
-  end).
+Lemma rev_append_def1 : forall {a:Type} {a_WT:WhyType a},
+  forall (s:(list a)) (t:(list a)),
+   ((Lists.List.rev_append s t) = match s with
+                                  | (Init.Datatypes.cons x r) =>
+                                      (Lists.List.rev_append r (Init.Datatypes.cons x t))
+                                  | Init.Datatypes.nil => t
+                                  end).
 intros a a_WT s t.
 destruct s; simpl; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma rev_append_append_l : forall {a:Type} {a_WT:WhyType a},
-  forall (r:(list a)) (s:(list a)) (t:(list a)),
-  ((Lists.List.rev_append (Init.Datatypes.app r s) t) = (Lists.List.rev_append s (Lists.List.rev_append r t))).
+Lemma rev_append_append_l :
+forall {a:Type} {a_WT:WhyType a},
+forall (r:(list a)) (s:(list a)) (t:(list a)),
+ ((Lists.List.rev_append (Init.Datatypes.app r s) t) = (Lists.List.rev_append s (Lists.List.rev_append r t))).
 Proof.
 intros a a_WT r s.
 induction r as [|rh rt IHr].
@@ -44,9 +45,11 @@ now simpl.
 Qed.
 
 (* Why3 goal *)
-Lemma rev_append_length : forall {a:Type} {a_WT:WhyType a},
-  forall (s:(list a)) (t:(list a)),
-  ((list.Length.length (Lists.List.rev_append s t)) = ((list.Length.length s) + (list.Length.length t))%Z).
+Lemma rev_append_length :
+forall {a:Type} {a_WT:WhyType a},
+forall (s:(list a)) (t:(list a)),
+ ((list.Length.length (Lists.List.rev_append s t)) = ((list.Length.length s) + 
+ (list.Length.length t))%Z).
 Proof.
 intros a a_WT s.
 induction s as [|sh st IHs].
@@ -60,9 +63,10 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma rev_append_def : forall {a:Type} {a_WT:WhyType a}, forall (r:(list a))
-  (s:(list a)),
-  ((Lists.List.rev_append r s) = (Init.Datatypes.app (Lists.List.rev r) s)).
+Lemma rev_append_def :
+forall {a:Type} {a_WT:WhyType a},
+forall (r:(list a)) (s:(list a)),
+ ((Lists.List.rev_append r s) = (Init.Datatypes.app (Lists.List.rev r) s)).
 Proof.
 induction r; simpl.
 now auto.
@@ -72,9 +76,10 @@ simpl. reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma rev_append_append_r : forall {a:Type} {a_WT:WhyType a},
-  forall (r:(list a)) (s:(list a)) (t:(list a)),
-  ((Lists.List.rev_append r (Init.Datatypes.app s t)) = (Lists.List.rev_append (Lists.List.rev_append s r) t)).
+Lemma rev_append_append_r :
+forall {a:Type} {a_WT:WhyType a},
+forall (r:(list a)) (s:(list a)) (t:(list a)),
+ ((Lists.List.rev_append r (Init.Datatypes.app s t)) = (Lists.List.rev_append (Lists.List.rev_append s r) t)).
 Proof.
 intros a a_WT r s t.
 revert r.

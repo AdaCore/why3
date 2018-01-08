@@ -195,23 +195,6 @@ let env, gconfig = try
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(* Initialization of config, provers, task_driver and controller in the server *)
-let () =
-  let dir =
-    try
-      Server_utils.get_session_dir ~allow_mkdir:true files
-    with Invalid_argument s ->
-      Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
-  in
-  Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files
-
-let () =
-  Debug.dprintf debug "Init the GTK interface...@?";
-  ignore (GtkMain.Main.init ());
-  Debug.dprintf debug " done.@.";
-  Gconfig.init ()
 
 
 (********************************)
@@ -377,6 +360,30 @@ let update_label_saved (label: GMisc.label) =
 (* Graphical elements *)
 (**********************)
 
+let initialization_complete = ref false
+let warnings = Queue.create ()
+
+let record_warning ?loc msg =
+  Format.eprintf "%awarning: %s@."
+    (Pp.print_option Loc.report_position) loc msg;
+  Queue.push (loc,msg) warnings
+
+let () =
+  Warning.set_hook record_warning;
+  let dir =
+    try
+      Server_utils.get_session_dir ~allow_mkdir:true files
+    with Invalid_argument s ->
+      Format.eprintf "Error: %s@." s;
+      Whyconf.Args.exit_with_usage spec usage_str
+  in
+  Server.init_server gconfig.config env dir;
+  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  send_request Get_global_infos;
+  Debug.dprintf debug "Init the GTK interface...@?";
+  ignore (GtkMain.Main.init ());
+  Debug.dprintf debug " done.@.";
+  Gconfig.init ()
 
 let main_window : GWindow.window =
   let w = GWindow.window
@@ -393,7 +400,8 @@ let main_window : GWindow.window =
       (fun {Gtk.width=w;Gtk.height=h} ->
        gconfig.window_height <- h;
        gconfig.window_width <- w)
-  in w
+  in
+  w
 
 (* the main window contains a vertical box, containing:
    1. the menu [menubar]
@@ -475,13 +483,6 @@ let provers_factory =
 (****************************)
 (* actions of the interface *)
 (****************************)
-
-
-
-
-
-
-
 
 
 (***********************************)
@@ -1003,12 +1004,47 @@ let print_message ~kind ~notif_kind fmt =
               add_to_log notif_kind s;
               if kind>0 then
                 begin
-                  message_zone#buffer#set_text s;
+                  message_zone#buffer#insert (s ^ "\n");
                   messages_notebook#goto_page error_page
                 end)
     str_formatter
     fmt
 
+let display_warnings () =
+  if Queue.is_empty warnings then () else
+    begin
+      let nwarn = ref 0 in
+      begin try
+      Queue.iter
+        (fun (loc,msg) ->
+         if !nwarn = 4 then
+           begin
+             Format.fprintf Format.str_formatter "[%d more warnings. See stderr for details]@\n" (Queue.length warnings - !nwarn);
+             raise Exit
+           end
+         else
+           begin
+             incr nwarn;
+             match loc with
+             | None ->
+                Format.fprintf Format.str_formatter "%s@\n@\n" msg
+             | Some l ->
+                (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
+                Format.fprintf Format.str_formatter "%a: %s@\n@\n"
+                               Loc.gen_report_position l msg
+           end) warnings;
+        with Exit -> ();
+      end;
+      Queue.clear warnings;
+      let msg =
+        Format.flush_str_formatter ()
+      in
+      print_message ~kind:1 ~notif_kind:"warning" "%s" msg
+    end
+
+
+let () =
+  Warning.set_hook (fun ?loc s -> record_warning ?loc s; display_warnings ())
 
 (**** Monitor *****)
 
@@ -1210,16 +1246,16 @@ let collapse_proven_goals () =
 let () =
   let i = view_factory#add_item
             "Collapse proven goals"
+            ~key: GdkKeysyms._C
             ~callback:(fun () -> collapse_proven_goals ())
   in
   i#misc#set_tooltip_markup "Collapse all sub-nodes of proven nodes (shortcut: Ctrl-C)";
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._C;
+
   let i = view_factory#add_item
             "Expand all"
             ~callback:(fun () -> goals_view#expand_all ())
   in
-  i#misc#set_tooltip_markup "Expand all nodes of the tree view (shortcut: Ctrl-E)";
-  i#add_accelerator ~group:tools_accel_group ~modi:[`CONTROL] GdkKeysyms._E
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view"
 
 
 let () =
@@ -1246,6 +1282,104 @@ let get_selected_row_references () =
     (fun path -> goals_model#get_row_reference path)
     goals_view#selection#get_selected_rows
 
+(**********************)
+(* Contextual actions *)
+(**********************)
+let expand_row ~all =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      goals_view#expand_row path ~all
+  | _ -> ()
+
+let collapse_row () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      goals_view#collapse_row path
+  | _ -> ()
+
+let move_current_row_selection_to_parent () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      begin
+        goals_view#selection#unselect_all ();
+        match goals_model#iter_parent row#iter with
+        | None -> ()
+        | Some iter ->
+            goals_view#selection#select_iter iter
+      end
+  | _ -> ()
+
+let move_current_row_selection_to_first_child () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let n = goals_model#iter_n_children (Some row#iter) in
+      if n = 0 then
+        ()
+      else
+        begin
+          goals_view#selection#unselect_all ();
+          let iter = goals_model#iter_children ?nth:(Some 0) (Some row#iter) in
+          goals_view#selection#select_iter iter
+        end
+  | _ -> ()
+
+let move_to_next_unproven_node_id () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let row_id = get_node_id row#iter in
+      send_request (Get_first_unproven_node row_id)
+  | _ -> ()
+
+(* TODO random shortcut: to be set. *)
+let () =
+  let i = view_factory#add_item
+            "Collapse under node"
+            ~key:GdkKeysyms._Left
+            ~callback:(fun () -> collapse_row ())
+  in
+  i#misc#set_tooltip_markup "Collapse current node";
+
+  let i = view_factory#add_item
+            "Expand below node "
+            ~key:GdkKeysyms._Right
+            ~callback:(fun () -> expand_row ~all:false)
+  in
+  i#misc#set_tooltip_markup "Expand only one node";
+
+  let i = view_factory#add_item
+            "Expand all below node "
+            ~key:GdkKeysyms._E
+            ~callback:(fun () -> expand_row ~all:true)
+  in
+  i#misc#set_tooltip_markup "Expand all nodes of the tree view";
+
+  let i = view_factory#add_item
+            "Go to parent node"
+            ~key:GdkKeysyms._Up
+            ~callback:(fun () -> move_current_row_selection_to_parent ())
+  in
+  i#misc#set_tooltip_markup "Go to parent";
+
+  let i = view_factory#add_item
+            "Go to first child"
+            ~callback:(fun () -> move_current_row_selection_to_first_child ())
+  in
+  i#misc#set_tooltip_markup "Go to first child";
+
+  let i = view_factory#add_item
+            "Select next unproven goal"
+            ~key:GdkKeysyms._Down
+            ~callback:(fun () -> move_to_next_unproven_node_id ())
+  in
+  i#misc#set_tooltip_markup "Select next unproven goal"
+
 (* unused
 let rec update_status_column_from_iter cont iter =
   set_status_column iter;
@@ -1254,47 +1388,68 @@ let rec update_status_column_from_iter cont iter =
   | None -> ()
 *)
 
-(* TODO Unused functions. Map these to a key or remove it *)
-let move_current_row_selection_up () =
-  let current_view = List.hd (goals_view#selection#get_selected_rows) in
-  ignore (GTree.Path.up current_view);
-  let row_up = goals_model#get_row_reference current_view in
-  goals_view#selection#select_iter row_up#iter
-
-let move_current_row_selection_down () =
-  let current_iter =
-    try
-      let current_view = List.hd (goals_view#selection#get_selected_rows) in
-      let current_row = goals_model#get_row_reference current_view in
-      Some current_row#iter
-    with Not_found ->
-      None
-  in
-  let child = goals_model#iter_children current_iter in
-  goals_view#selection#select_iter child
-
 let clear_command_entry () = command_entry#set_text ""
+
+let ide_command_list =
+  ["up", "Select the parent of the current node";
+   "down", "Select the first child of the current node";
+   "next", "Select the \"next\" unproved node";
+   "expand", "Expand the node";
+   "ex_all", "Expand the node recursively";
+   "collapse", "Collapse the node";
+   "list_ide_command", "show this help text"]
+
+let ide_command cmd =
+  List.exists (fun x -> fst x = cmd) ide_command_list
+
+let interp_ide cmd =
+  match cmd with
+  | "up" ->
+      move_current_row_selection_to_parent ()
+  | "down" ->
+      move_current_row_selection_to_first_child ()
+  | "next" ->
+      move_to_next_unproven_node_id ()
+  | "expand" ->
+      expand_row ~all:false
+  | "ex_all" ->
+      expand_row ~all:true
+  | "collapse" ->
+      collapse_row ()
+  | "list_ide_command" ->
+      let s = List.fold_left (fun acc x -> (fst x) ^ ": " ^
+                              (snd x) ^ "\n" ^ acc) "" ide_command_list in
+      clear_command_entry ();
+      message_zone#buffer#set_text s
+  | _ ->
+      clear_command_entry ();
+      message_zone#buffer#set_text ("Error: " ^ cmd ^ "\nPlease report.")
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
-  let rows = get_selected_row_references () in
-  let ids =
-    match rows with
-      | [] -> [root_node]
-      | _ -> List.map (fun n -> get_node_id n#iter) rows
-  in
-  List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
+  message_zone#buffer#set_text "";
   clear_command_entry ();
-  (* clear previous error message if any *)
-  message_zone#buffer#set_text ""
-
+  if ide_command cmd then
+    interp_ide cmd
+  else
+    begin
+      let rows = get_selected_row_references () in
+      let ids =
+        match rows with
+        | [] -> [root_node]
+        | _ -> List.map (fun n -> get_node_id n#iter) rows
+      in
+      List.iter (fun id -> send_request (Command_req (id, cmd))) ids;
+      (* clear previous error message if any *)
+    end
 
 let (_ : GtkSignal.id) =
   let callback () =
     let cmd = command_entry#text in
-    if cmd = "" then
-      goals_view#misc#grab_focus ()
-    else begin
+    match cmd with
+    | ""     -> goals_view#misc#grab_focus ()
+    | _ ->
+      begin
         add_command list_commands cmd;
         interp cmd
       end in
@@ -1472,8 +1627,6 @@ let (_ : GtkSignal.id) =
 (* Notification Handling *)
 (*************************)
 
-let initialization_complete = ref false
-
 let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
@@ -1506,11 +1659,7 @@ let treat_message_notification msg = match msg with
      print_message ~kind:1 ~notif_kind:"Query_info" "%s" s
   | Query_Error (_id, s) ->
      print_message ~kind:1 ~notif_kind:"Query_error" "%s" s
-  | Help s ->
-     print_message ~kind:1 ~notif_kind:"Help" "%s" s
   | Information s ->
-     if not !initialization_complete then main_window#show ();
-     initialization_complete := true;
      print_message ~kind:1 ~notif_kind:"Information" "%s" s
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
@@ -1518,7 +1667,6 @@ let treat_message_notification msg = match msg with
   | Parse_Or_Type_Error (loc, rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         if not !initialization_complete then main_window#show ();
          (* TODO find a new color *)
          scroll_to_loc ~force_tab_switch:true (Some (rel_loc,0));
          color_loc ~color:Goal_color rel_loc;
@@ -2031,8 +2179,21 @@ let treat_notification n =
   | New_node (id, parent_id, typ, name, detached) ->
      begin
        let name =
+         (* Reduce the name of the goals to the minimum: "0" instead of
+            "WP_Parameter.0" for example.
+            In cases where we want the explanation to be printed, and the
+            explanation contains filename (with '.'), this does not work. So, we
+            additionally check that the first part of the name is a number.
+         *)
          if typ = NGoal then
-           List.hd (Strings.rev_split '.' name)
+           let new_name = List.hd (Strings.rev_split '.' name) in
+           try
+             let name_number = List.hd (Strings.split ' ' new_name) in
+             ignore (int_of_string name_number);
+             new_name
+           with _ ->
+             (* The name is empty or the first part is not a number *)
+             name
          else name
        in
        try
@@ -2049,14 +2210,33 @@ let treat_notification n =
          ignore (new_node id name typ detached)
      end
   | Remove id                     ->
+     (* In the case where id is an ancestor of a selected node, this node will
+        be erased. So we try to select the parent. *)
      let n = get_node_row id in
+     let is_ancestor =
+       List.exists
+         (fun row -> let row_id = get_node_id row#iter in
+           row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
+         (get_selected_row_references ())
+     in
+     if is_ancestor then
+       (match goals_model#iter_parent n#iter with
+       | None -> goals_view#selection#unselect_all ()
+       | Some parent ->
+          goals_view#selection#unselect_all ();
+          goals_view#selection#select_iter parent
+          (* TODO Go to the next unproved goal ?
+            let parent_id = get_node_id parent in
+          send_request (Get_first_unproven_node parent_id)*));
      ignore (goals_model#remove(n#iter));
      Hint.remove node_id_to_gtree id;
      Hint.remove node_id_type id;
      Hint.remove node_id_proved id;
      Hint.remove node_id_pa id
   | Initialized g_info            ->
-     (* TODO: treat other *)
+     initialization_complete := true;
+     main_window#show ();
+     display_warnings ();
      init_completion g_info.provers g_info.transformations g_info.strategies g_info.commands;
   | Saved                         ->
       session_needs_saving := false;

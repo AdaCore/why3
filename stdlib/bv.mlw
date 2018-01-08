@@ -2,7 +2,7 @@
 
 (** {2 Powers of two} *)
 
-theory Pow2int
+module Pow2int
 
   use import int.Int
 
@@ -101,7 +101,7 @@ end
 
 (** {2 Generic theory of Bit Vectors (arbitrary length)} *)
 
-theory BV_Gen
+module BV_Gen
 
   use export bool.Bool
   use import int.Int
@@ -409,7 +409,7 @@ end
 
 (** {2 Bit Vectors of common sizes, 8/16/32/64} *)
 
-theory BV64
+module BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
 
@@ -429,7 +429,7 @@ theory BV64
 
 end
 
-theory BV32
+module BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
 
@@ -449,7 +449,7 @@ theory BV32
 
 end
 
-theory BV16
+module BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
 
@@ -469,7 +469,7 @@ theory BV16
 
 end
 
-theory BV8
+module BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
 
@@ -491,7 +491,7 @@ end
 
 (** {2 Generic Converter} *)
 
-theory BVConverter_Gen
+module BVConverter_Gen
 
   type bigBV
   type smallBV
@@ -516,7 +516,7 @@ end
 
 (** {2 Converters of common size_bvs} *)
 
-theory BVConverter_32_64
+module BVConverter_32_64
   use BV32
   use BV64
 
@@ -530,7 +530,7 @@ theory BVConverter_32_64
     function to_uint_big = BV64.t'int
 end
 
-theory BVConverter_16_64
+module BVConverter_16_64
   use BV16
   use BV64
 
@@ -544,7 +544,7 @@ theory BVConverter_16_64
     function to_uint_big = BV64.t'int
 end
 
-theory BVConverter_8_64
+module BVConverter_8_64
   use BV8
   use BV64
 
@@ -558,7 +558,7 @@ theory BVConverter_8_64
     function to_uint_big = BV64.t'int
 end
 
-theory BVConverter_16_32
+module BVConverter_16_32
   use BV16
   use BV32
 
@@ -572,7 +572,7 @@ theory BVConverter_16_32
     function to_uint_big = BV32.t'int
 end
 
-theory BVConverter_8_32
+module BVConverter_8_32
   use BV8
   use BV32
 
@@ -586,7 +586,7 @@ theory BVConverter_8_32
     function to_uint_big = BV32.t'int
 end
 
-theory BVConverter_8_16
+module BVConverter_8_16
   use BV8
   use BV16
 

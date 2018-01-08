@@ -6,7 +6,7 @@
 
 (** {2 Sequences and basic operations} *)
 
-theory Seq
+module Seq
 
   use import int.Int
 
@@ -124,7 +124,7 @@ end
 (** {2 Lemma library about algebraic interactions between
        [empty]/[singleton]/[cons]/[snoc]/[++]/[[ .. ]]} *)
 
-theory FreeMonoid
+module FreeMonoid
 
   use import int.Int
   use import Seq
@@ -207,7 +207,7 @@ theory FreeMonoid
 
 end
 
-theory ToList
+module ToList
   use import int.Int
   use import Seq
   use import list.List
@@ -240,7 +240,7 @@ theory ToList
 
 end
 
-theory OfList
+module OfList
   use import int.Int
   use import option.Option
   use import list.List
@@ -294,7 +294,7 @@ theory OfList
 
 end
 
-theory Mem
+module Mem
 
   use import int.Int
   use import Seq
@@ -311,7 +311,7 @@ theory Mem
 
 end
 
-theory Distinct
+module Distinct
   use import int.Int
   use import Seq
 
@@ -321,7 +321,7 @@ theory Distinct
 
 end
 
-theory Reverse
+module Reverse
 
   use import int.Int
   use import Seq
@@ -331,7 +331,7 @@ theory Reverse
 
 end
 
-theory ToFset
+module ToFset
   use import int.Int
   use import Seq as S
   use import Mem as SM
@@ -362,7 +362,7 @@ end
 
 (** {2 Sorted Sequences} *)
 
-theory Sorted
+module Sorted
 
   use import Seq
   use import int.Int
@@ -398,7 +398,7 @@ theory Sorted
 
 end
 
-theory SortedInt (** sorted sequences of integers *)
+module SortedInt (** sorted sequences of integers *)
 
   use import int.Int
   clone export Sorted with type t = int, predicate le = (<=),
@@ -409,7 +409,7 @@ end
 
 (** {2 Number of occurences in a sequence} *)
 
-theory Occ
+module Occ
 
   use import int.Int
   use int.NumOf as N
@@ -430,7 +430,7 @@ end
 
 (** {2 Sequences Equality} *)
 
-theory SeqEq
+module SeqEq
 
   use import int.Int
   use import Seq
@@ -440,7 +440,7 @@ theory SeqEq
 
 end
 
-theory Exchange
+module Exchange
 
   use import int.Int
   use import Seq
@@ -460,7 +460,7 @@ end
 
 (** {2 Permutation of sequences} *)
 
-theory Permut
+module Permut
 
   use import int.Int
   use import Seq
@@ -531,7 +531,7 @@ theory Permut
 
 end
 
-theory FoldLeft
+module FoldLeft
 
   use import Seq
   use import int.Int
@@ -554,7 +554,7 @@ theory FoldLeft
 
 end
 
-theory FoldRight
+module FoldRight
 
   use import Seq
   use import int.Int

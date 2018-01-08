@@ -43,7 +43,6 @@ type message_notification =
   | Replay_Info           of string
   | Query_Info            of node_ID * string
   | Query_Error           of node_ID * string
-  | Help                  of string
   (** General information *)
   | Information           of string
   (** Number of task scheduled, running, etc *)
@@ -134,6 +133,7 @@ type ide_request =
   | Reload_req
   | Exit_req
   | Interrupt_req
+  | Get_global_infos
 
 (* Return true if the request modify the session *)
 val modify_session: ide_request -> bool

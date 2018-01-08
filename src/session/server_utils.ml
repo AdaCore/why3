@@ -224,19 +224,24 @@ let occurs_in_decl d id =
   | Dprop ((Paxiom|Plemma), pr, t) -> Ident.id_equal pr.pr_name id || occurs_in_term id t
   | Dprop _ -> false)
 
-let do_search km idl =
+let do_search ~search_both km idl =
   Ident.Mid.fold
     (fun _ d acc ->
-     if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc) km Decl.Sdecl.empty
+      if search_both then
+        (if List.exists (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)
+      else
+        (if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)) km Decl.Sdecl.empty
 
-let search s tables =
+let search ~search_both s tables =
   let ids = List.rev_map
               (fun s -> try symbol_name (Args_wrapper.find_symbol s tables)
                         with Args_wrapper.Arg_parse_type_error _ |
                              Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s)) s
   in
-  let l = do_search tables.Trans.known_map ids in
+  let l = do_search ~search_both tables.Trans.known_map ids in
   if Decl.Sdecl.is_empty l then
+    (* In case where search_both is true, this error cannot appear because there
+       is at least one declaration: the definition of the ident. *)
        Pp.sprintf
          "No declaration contain all the %d identifiers @[%a@]"
          (List.length ids)
@@ -253,10 +258,10 @@ let print_id _cont task args =
   | [s] -> print_id s task
   | _ -> raise Number_of_arguments
 
-let search_id _cont task args =
+let search_id ~search_both _cont task args =
   match args with
   | [] -> raise Number_of_arguments
-  | _ -> search args task
+  | _ -> search ~search_both args task
 
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
@@ -366,6 +371,13 @@ type command =
   | QError       of string
   | Other        of string * string list
 
+let query_on_task cont f id args =
+  let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
+  try Query (f cont table args) with
+    | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
+    | Number_of_arguments -> QError "Bad number of arguments"
+
+
 let interp commands_table cont id s =
   let cmd,args = split_args s in
   match Stdlib.Hstr.find commands_table cmd with
@@ -374,11 +386,12 @@ let interp commands_table cont id s =
       match f,id with
       | Qnotask f, _ -> Query (f cont args)
       | Qtask f, Some (Session_itp.APn id) ->
-          let _,table = Session_itp.get_task cont.Controller_itp.controller_session id in
-          let s = try Query (f cont table args) with
-            | Undefined_id s -> QError ("No existing id corresponding to " ^ s)
-            | Number_of_arguments -> QError "Bad number of arguments"
-          in s
+          query_on_task cont f id args
+      | Qtask f, Some (Session_itp.APa pid) ->
+          let id = Session_itp.get_proof_attempt_parent
+              cont.Controller_itp.controller_session pid
+          in
+          query_on_task cont f id args
       | Qtask _, _ -> QError "please select a goal first"
     end
   | exception Not_found ->
@@ -457,6 +470,7 @@ let interp commands_table cont id s =
                                 @ replay @\n\
                                 @ bisect @\n\
                                 @ help <transformation_name> @\n\
+                                @ list_ide_command @ \n\
                                 @\n\
                                 Available queries are:@\n@[%a@]" help_on_queries commands_table
                   in
@@ -481,6 +495,20 @@ let rec unproven_goals_below_node ~proved ~children ~is_goal acc node =
       List.fold_left (unproven_goals_below_node ~proved ~children ~is_goal)
         acc nodes
 
+(* [split_list l node] returns a pair of list which contains the elements that
+   appear before node (respectively after node). *)
+let split_list l node =
+  let rec split_list l acc =
+    match l with
+    | [] -> ([], List.rev acc)
+    | hd :: tl ->
+        if hd = node then
+          (List.rev acc, tl)
+        else
+          split_list tl (hd :: acc)
+  in
+  split_list l []
+
 let get_first_unproven_goal_around
     ~proved ~children ~get_parent ~is_goal ~is_pa node =
   let rec look_around node =
@@ -493,6 +521,16 @@ let get_first_unproven_goal_around
           unproven_goals_below_node ~proved ~children ~is_goal [] parent
   in
   let node = if is_pa node then Opt.get (get_parent node) else node in
-  match List.rev (look_around node) with
-  | [] -> None
+  let node_list = look_around node in
+  (* We look into this list of brothers in case the original node is inside it.
+     If it is inside the list, we want to get the first non proved node after
+     the original node. *)
+  let (before_node, after_node) = split_list (List.rev node_list) node in
+  match after_node with
+  | [] ->
+    begin
+      match before_node with
+      | [] -> None
+      | hd :: _tl -> Some hd
+    end
   | hd :: _tl  -> Some hd

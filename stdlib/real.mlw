@@ -8,7 +8,7 @@ additional theories for classical real functions.
 
 (** {2 Real numbers and the basic unary and binary operators} *)
 
-theory Real
+module Real
 
   constant zero : real = 0.0
   constant one  : real = 1.0
@@ -49,7 +49,7 @@ integer and real binary operators.
 
 *)
 
-theory RealInfix
+module RealInfix
 
   use import Real
 
@@ -73,7 +73,7 @@ end
 
 (** {2 Absolute Value} *)
 
-theory Abs
+module Abs
 
   use import Real
 
@@ -98,7 +98,7 @@ end
 
 (** {2 Minimum and Maximum} *)
 
-theory MinMax
+module MinMax
 
   use import Real
   clone export relations.MinMax with type t = real, predicate le = (<=),
@@ -109,7 +109,7 @@ end
 
 (** {2 Injection of integers into reals} *)
 
-theory FromInt
+module FromInt
 
   use int.Int
   use import Real
@@ -137,7 +137,7 @@ end
 
 (** {2 Various truncation functions} *)
 
-theory Truncate
+module Truncate
 
   use import Real
   use import FromInt
@@ -196,7 +196,7 @@ end
 
 (** {2 Square and Square Root} *)
 
-theory Square
+module Square
 
   use import Real
 
@@ -224,7 +224,7 @@ end
 
 (** {2 Exponential and Logarithm} *)
 
-theory ExpLog
+module ExpLog
 
   use import Real
 
@@ -250,7 +250,7 @@ end
 
 (** {2 Power of a real to an integer} *)
 
-theory PowerInt
+module PowerInt
 
   use import int.Int
   use import RealInfix
@@ -266,7 +266,7 @@ end
 
 (** {2 Power of a real to a real exponent} *)
 
-theory PowerReal
+module PowerReal
 
   use import Real
   use import ExpLog
@@ -317,7 +317,7 @@ See the {h <a href="http://en.wikipedia.org/wiki/Trigonometric_function">wikiped
 
 *)
 
-theory Trigonometry
+module Trigonometry
 
   use import Real
   use import Square
@@ -381,7 +381,7 @@ See the {h <a href="http://en.wikipedia.org/wiki/Hyperbolic_function">wikipedia 
 
 *)
 
-theory Hyperbolic
+module Hyperbolic
 
   use import Real
   use import Square
@@ -407,7 +407,7 @@ See the {h <a href="http://en.wikipedia.org/wiki/Atan2">wikipedia page</a>}.
 
 *)
 
-theory Polar
+module Polar
 
   use import Real
   use import Square

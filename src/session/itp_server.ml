@@ -273,6 +273,7 @@ let print_request fmt r =
   | Reload_req                      -> fprintf fmt "reload"
   | Exit_req                        -> fprintf fmt "exit"
   | Interrupt_req                   -> fprintf fmt "interrupt"
+  | Get_global_infos                -> fprintf fmt "get_global_infos"
 
 let print_msg fmt m =
   match m with
@@ -282,7 +283,6 @@ let print_msg fmt m =
   | Replay_Info s                                -> fprintf fmt "replay info %s" s
   | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
   | Query_Error (_ids, s)                        -> fprintf fmt "query error %s" s
-  | Help _s                                      -> fprintf fmt "help"
   | Information s                                -> fprintf fmt "info %s" s
   | Task_Monitor _                               -> fprintf fmt "task montor"
   | Parse_Or_Type_Error (_, _, s)                -> fprintf fmt "parse_or_type_error:\n %s" s
@@ -363,7 +363,9 @@ let () =
     "print", "<id> print the declaration where <id> was defined",
     Qtask print_id;
     "search", "<ids> print the declarations where all <ids> appears",
-    Qtask search_id;
+    Qtask (search_id ~search_both:false);
+    "search_all", "<ids> print the declarations where one of <ids> appears",
+    Qtask (search_id ~search_both:true);
 (*
     "r", "reload the session (test only)", test_reload;
     "s", "save the current session", test_save_session;
@@ -382,6 +384,7 @@ let () =
       send_source: bool;
       (* If true the server is parametered to send source mlw files as
          notifications *)
+      global_infos : Itp_communication.global_information;
     }
 
   let server_data = ref None
@@ -942,7 +945,7 @@ end
           end
         else
           P.notify (Message (Open_File_Error ("File not found: " ^ f)))
-    | Some _ -> P.notify (Message (Open_File_Error ("File already in session: " ^ fn)))
+    | Some _ -> P.notify (Message (Information ("File already in session: " ^ fn)))
 
 
   (* ------------ init server ------------ *)
@@ -952,13 +955,6 @@ end
     let ses,use_shapes = Session_itp.load_session f in
     Debug.dprintf debug "creating controller@.";
     let c = create_controller config env ses in
-    (* let task_driver = task_driver config env in*)
-    server_data := Some
-                     { (* task_driver = task_driver; *)
-                       cont = c;
-                       send_source = send_source;
-                     };
-    let d = get_server_data () in
     let shortcuts =
       Mstr.fold
         (fun s p acc -> Whyconf.Mprover.add p s acc)
@@ -987,9 +983,13 @@ end
           Hstr.fold (fun c _ acc -> c :: acc) commands_table []
       }
     in
-    Debug.dprintf debug "sending initialization infos@.";
-    P.notify (Initialized infos);
+    server_data := Some
+                     { cont = c;
+                       send_source = send_source;
+                       global_infos = infos;
+                     };
     Debug.dprintf debug "reloading source files@.";
+    let d = get_server_data () in
     let x = reload_files d.cont ~use_shapes in
     reset_and_send_the_whole_tree ();
     (* After initial sending, we don't check anymore that there is a need to
@@ -1270,6 +1270,24 @@ end
             P.notify (Next_Unproven_Node_Id (ni, node_ID_from_any any))
       end
 
+   (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
+   let request_is_valid r =
+     match r with
+     | Save_req | Reload_req | Unfocus_req | Get_file_contents _ | Save_file_req _
+     | Interrupt_req | Add_file_req _ | Set_config_param _ | Exit_req
+     | Get_global_infos -> true
+     | Get_first_unproven_node ni ->
+         Hint.mem model_any ni
+     | Focus_req nid ->
+         Hint.mem model_any nid
+     | Remove_subtree nid ->
+         Hint.mem model_any nid
+     | Copy_paste (from_id, to_id) ->
+         Hint.mem model_any from_id && Hint.mem model_any to_id
+     | Get_task(nid,_,_,_) ->
+         Hint.mem model_any nid
+     | Command_req (nid, _) ->
+         Hint.mem model_any nid
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1277,8 +1295,28 @@ end
   let treat_request r =
     let d = get_server_data () in
     let config = d.cont.controller_config in
+    (* Check that the request does not refer to obsolete node_ids *)
+    if not (request_is_valid r) then
+      begin
+        (* These errors come from the client-server behavior of itp. They cannot
+           be completely avoided and could be safely ignored.
+           They are ignored if a debug flag is not added.
+         *)
+        if Debug.test_flag Debug.stack_trace then
+          raise Not_found;
+        if Debug.test_flag debug then
+          P.notify (Message (Error (Pp.string_of
+            (fun fmt r -> Format.fprintf fmt
+              "The following request refer to obsolete node_ids:\n %a\n"
+             print_request r) r)))
+      end
+    else
     try (
-    match r with
+      match r with
+      | Get_global_infos ->
+         let d= get_server_data () in
+         Debug.dprintf debug "sending initialization infos@.";
+         P.notify (Initialized d.global_infos)
     | Save_req                     -> save_session ()
     | Reload_req                   -> reload_session ()
     | Get_first_unproven_node ni   ->
@@ -1326,7 +1364,7 @@ end
         | Replay valid_only       -> replay ~valid_only snid
         | Clean                   -> clean snid
         | Mark_Obsolete           -> mark_obsolete snid
-        | Help_message s          -> P.notify (Message (Help s))
+        | Help_message s          -> P.notify (Message (Information s))
         | QError s                -> P.notify (Message (Query_Error (nid, s)))
         | Other (s, _args)        ->
             P.notify (Message (Information ("Unknown command: "^s)))

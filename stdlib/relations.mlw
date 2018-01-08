@@ -3,82 +3,82 @@
 
 (** {2 Relations and orders} *)
 
-theory EndoRelation
+module EndoRelation
   type t
   predicate rel t t
 end
 
-theory Reflexive
+module Reflexive
   clone export EndoRelation
   axiom Refl : forall x:t. rel x x
 end
 
-theory Irreflexive
+module Irreflexive
   clone export EndoRelation
   axiom Strict : forall x:t. not rel x x
 end
 
-theory Transitive
+module Transitive
   clone export EndoRelation
   axiom Trans : forall x y z:t. rel x y -> rel y z -> rel x z
 end
 
-theory Symmetric
+module Symmetric
   clone export EndoRelation
   axiom Symm : forall x y:t. rel x y -> rel y x
 end
 
-theory Asymmetric
+module Asymmetric
   clone export EndoRelation
   axiom Asymm : forall x y:t. rel x y -> not rel y x
 end
 
-theory Antisymmetric
+module Antisymmetric
   clone export EndoRelation
   axiom Antisymm : forall x y:t. rel x y -> rel y x -> x = y
 end
 
-theory Total
+module Total
   clone export EndoRelation
   axiom Total : forall x y:t. rel x y \/ rel y x
 end
 
-theory PreOrder
+module PreOrder
   clone export Reflexive
   clone export Transitive with type t = t, predicate rel = rel
 end
 
-theory Equivalence
+module Equivalence
   clone export PreOrder
   clone export Symmetric with type t = t, predicate rel = rel
 end
 
-theory TotalPreOrder
+module TotalPreOrder
   clone export PreOrder
   clone export Total with type t = t, predicate rel = rel
 end
 
-theory PartialOrder
+module PartialOrder
   clone export PreOrder
   clone export Antisymmetric with type t = t, predicate rel = rel
 end
 
-theory TotalOrder
+module TotalOrder
   clone export PartialOrder
   clone export Total with type t = t, predicate rel = rel
 end
 
-theory PartialStrictOrder
+module PartialStrictOrder
   clone export Transitive
   clone export Asymmetric with type t = t, predicate rel = rel
 end
 
-theory TotalStrictOrder
+module TotalStrictOrder
   clone export PartialStrictOrder
   axiom Trichotomy : forall x y:t. rel x y \/ rel y x \/ x = y
 end
 
-theory Inverse
+module Inverse
   clone export EndoRelation
 
   predicate inv_rel (x y : t) = rel y x
@@ -86,7 +86,7 @@ end
 
 (** {2 Closures} *)
 
-theory ReflClosure
+module ReflClosure
   clone export EndoRelation
 
   inductive relR t t =
@@ -94,7 +94,7 @@ theory ReflClosure
   | StepRefl : forall x y:t. rel x y -> relR x y
 end
 
-theory TransClosure
+module TransClosure
   clone export EndoRelation
 
   inductive relT t t =
@@ -105,7 +105,7 @@ theory TransClosure
     forall x y z: t. relT x y -> relT y z -> relT x z
 end
 
-theory ReflTransClosure
+module ReflTransClosure
   clone export EndoRelation
 
   inductive relTR t t =
@@ -118,7 +118,7 @@ end
 
 (** {2 Lexicographic ordering} *)
 
-theory Lex
+module Lex
 
   type t1
   type t2
@@ -136,7 +136,7 @@ end
 
 (** {2 Minimum and maximum for total orders} *)
 
-theory MinMax
+module MinMax
 
   type t
   predicate le t t
@@ -159,7 +159,7 @@ end
 
 (** {2 Well-founded relation} *)
 
-theory WellFounded
+module WellFounded
 
   type t
 

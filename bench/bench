@@ -9,7 +9,7 @@
 
 suffix=$1
 
-# TODO: remove the hack about int.why once it has become builtin
+# TODO: remove the hack about int.mlw once it has become builtin
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
@@ -17,7 +17,7 @@ goods () {
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
         opts="$2"
-        if test $f = stdlib/int.why; then opts="$2 --type-only"; fi
+        if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
 	# running Why
 	if ! $pgm $opts $f > /dev/null 2> bench_error; then
 	    echo "FAILED!"

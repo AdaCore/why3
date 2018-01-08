@@ -42,7 +42,6 @@ type message_notification =
   | Replay_Info           of string
   | Query_Info            of node_ID * string
   | Query_Error           of node_ID * string
-  | Help                  of string
   | Information           of string
   | Task_Monitor          of int * int * int
   | Parse_Or_Type_Error   of Loc.position * Loc.position * string
@@ -117,13 +116,15 @@ type ide_request =
   | Reload_req
   | Exit_req
   | Interrupt_req
+  | Get_global_infos
 
 (* Return true if the request modify the session *)
 let modify_session (r: ide_request) =
   match r with
   | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
   | Reload_req -> true
+
   | Set_config_param _ | Get_file_contents _
   | Get_task _ | Save_file_req _ | Get_first_unproven_node _
-  | Save_req | Exit_req
+  | Save_req | Exit_req | Get_global_infos
   | Interrupt_req | Focus_req _ | Unfocus_req -> false

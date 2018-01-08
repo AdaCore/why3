@@ -535,9 +535,6 @@ module Print = struct
           (print_uident info) xs.xs_name (print_ty ~paren:true info) t
           (print_expr info) e
     | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
-  (* | Enot _ -> (\* TODO *\) assert false *)
-  (* | Ebinop _ -> (\* TODO *\) assert false *)
-  (* | Ecast _ -> (\* TODO *\) assert false *)
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
@@ -653,7 +650,7 @@ module Print = struct
       if query_syntax info.info_syn id = None &&
          not (Hashtbl.mem memo decl) then begin
         Hashtbl.add memo decl (); print_decl info fmt decl;
-        fprintf fmt "@." end in
+        fprintf fmt "@\n@." end in
     List.iter decide_print decl_name
 
 end
