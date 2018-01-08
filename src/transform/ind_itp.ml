@@ -173,7 +173,7 @@ let revert_tr_symbol symbol_list =
     | [] -> (pr_acc, ls_acc)
     | Tsprsymbol pr :: tl -> convert_list (pr :: pr_acc) ls_acc tl
     | Tslsymbol ls :: tl -> convert_list pr_acc (ls :: ls_acc) tl
-    | Tstysymbol _ :: tl ->
+    | Tstysymbol _ :: _tl ->
         raise (Arg_trans "Tysymbol should not appear here. Please report")
   in
   let (prlist, lslist) = convert_list [] [] symbol_list in
