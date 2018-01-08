@@ -758,18 +758,19 @@ end
      having a given property (label_detection) in the session tree. To change
      the property, one need to call function register_label_detection. *)
   let focus_on_label node =
-    match !get_focused_label with
-    | Some label_detection ->
-        let d = get_server_data () in
-        let session = d.cont.Controller_itp.controller_session in
-        (match node with
-        | APn pr_node ->
-            let task = Session_itp.get_raw_task session pr_node in
-            let b = label_detection task in
-            if b then
-              add_focused_node node
-        | _ -> ())
-    | None -> ()
+    let d = get_server_data () in
+    let session = d.cont.Controller_itp.controller_session in
+    if not (Session_itp.is_detached session node) then
+      match !get_focused_label with
+      | Some label_detection ->
+          (match node with
+          | APn pr_node ->
+              let task = Session_itp.get_raw_task session pr_node in
+              let b = label_detection task in
+              if b then
+                add_focused_node node
+          | _ -> ())
+      | None -> ()
 
   (* Create a new node in the_tree, update the tables and send a
      notification about it *)
