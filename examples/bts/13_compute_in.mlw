@@ -3,7 +3,9 @@ module Test
 
   use import int.Int
 
-  axiom a : 15 = 2 + 3 + 6
+  constant c : int
+
+  axiom a : c * 0 + 15 = 2 + 3 + 6
 
   goal g: True
 
