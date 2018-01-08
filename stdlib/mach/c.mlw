@@ -37,7 +37,7 @@ module C
 
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     requires { p.offset + ofs <= plength p }
-    ensures { result.offset = p.offset + Int32.to_int ofs }
+    ensures { result.offset = p.offset + ofs }
     ensures { plength result = plength p }
     ensures { pelts result = pelts p }
     ensures { result.data = p.data }
@@ -48,8 +48,8 @@ module C
     ensures { result = (pelts p)[p.offset] }
 
   let get_ofs (p:ptr 'a) (ofs:int32) : 'a
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
-    ensures { result = (pelts p)[p.offset + Int32.to_int ofs] }
+    requires { 0 <= p.offset + ofs < plength p }
+    ensures { result = (pelts p)[p.offset + ofs] }
   = get (incr p ofs)
 
   val set (p:ptr 'a) (v:'a) : unit
@@ -58,9 +58,10 @@ module C
     writes { p.data.elts }
 
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
-    requires { 0 <= p.offset + Int32.to_int ofs < plength p }
+    requires { 0 <= p.offset + ofs < plength p }
     ensures { pelts p = Map.set (pelts (old p))
-              (p.offset + Int32.to_int ofs) v }
+              (p.offset + ofs) v }
+    ensures { (pelts p)[p.offset + ofs] = v }
     writes { p.data.elts }
  =
     set (incr p ofs) v
@@ -78,7 +79,7 @@ module C
 
   val malloc (sz:uint32) : ptr 'a
     requires { sz > 0 }
-    ensures { plength result = UInt32.to_int sz \/ plength result = 0 }
+    ensures { plength result = sz \/ plength result = 0 }
     ensures { result.offset = 0 }
 
   val free (p:ptr 'a) : unit
@@ -87,16 +88,16 @@ module C
     ensures { plength p = 0 }
 
   val realloc (p:ptr 'a) (sz:int32) : ptr 'a
-    requires { Int32.to_int sz > 0 } (* for simplicity, though 0 is legal in C *)
+    requires { sz > 0 } (* for simplicity, though 0 is legal in C *)
     requires { p.offset = 0 }
     requires { plength p > 0 }
     writes { p.data }
-    ensures { plength result = Int32.to_int sz \/ plength result = 0 }
-    ensures { plength result = Int32.to_int sz -> plength p = 0 }
-    ensures { plength result = Int32.to_int sz ->
-                forall i:int. 0 <= i < plength (old p) /\ i < Int32.to_int sz ->
+    ensures { plength result = sz \/ plength result = 0 }
+    ensures { plength result = sz -> plength p = 0 }
+    ensures { plength result = sz ->
+                forall i:int. 0 <= i < plength (old p) /\ i < sz ->
                   (pelts result)[i] = (pelts (old p))[i] }
-    ensures { plength result <> Int32.to_int sz -> p = old p }
+    ensures { plength result <> sz -> p = old p }
 
   val predicate is_not_null (p:ptr 'a) : bool
     ensures { result <-> plength p <> 0 }

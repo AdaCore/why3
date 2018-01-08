@@ -151,7 +151,19 @@ let rec reify_term renv t rt =
          | Papp (cs, _) -> t_app cs [trv] rty
          | Pvar _ -> trv
          | _ -> assert false in
-       let t = t_label ?loc:t.t_loc Slab.empty t in
+       let rec rm t =
+         let t = match t.t_node with
+           | Tapp (f,tl) -> t_app f (List.map rm tl) t.t_ty
+           | Tvar _ | Tconst _ -> t
+           | Tif (f,t1,t2) -> t_if (rm f) (rm t1) (rm t2)
+           | Tbinop (op,f1,f2) -> t_binary op (rm f1) (rm f2)
+           | Tnot f1 -> t_not (rm f1)
+           | Ttrue | Tfalse -> t
+           | _ -> t (* FIXME some cases missing *)
+         in
+         t_label ?loc:t.t_loc Slab.empty t
+       in               
+       let t = rm t in
        (* remove labels to identify terms that are equal modulo labels *)
        if Mterm.mem t renv.store
        then
@@ -274,22 +286,24 @@ let rec reify_term renv t rt =
           let (renv, rg) = invert_interp renv leq t in
           let renv = { renv with subst = Mvs.add g rg renv.subst } in
           if debug then Format.printf "filling context@.";
+          let rec add_to_ctx (renv, ctx) e =
+            try
+              match e.t_node with
+              | Tquant _ | Teps _ -> (renv, ctx)
+              | Tbinop (Tand,e1,e2) ->
+                 add_to_ctx (add_to_ctx (renv, ctx) e1) e2
+              | _ ->
+                 let (renv,req) = invert_interp renv leq e in
+                 (renv,(t_app cons [req; ctx] (Some ty_list_g)))
+            with
+            | NoReification -> renv,ctx
+          in
           let renv, ctx =
               task_fold
                 (fun (renv,ctx) td ->
                   match td.td_node with
                   | Decl {d_node = Dprop (Paxiom, _, e)}
-                    ->
-                     begin try
-                         (match e.t_node with
-                          | Tquant _ | Teps _ | Tbinop _ -> renv, ctx
-                          | _ ->
-                             let (renv,req) = invert_interp renv leq e in
-                             (renv,(t_app cons [req; ctx] (Some ty_list_g))))
-                       with
-                       | NoReification -> renv,ctx
-                                                 (* | TypeMismatch _ -> raise NoReification*)
-                     end
+                    -> add_to_ctx (renv, ctx) e
                   | _-> renv,ctx)
                              (renv, (t_app nil [] (Some ty_list_g))) renv.task in
           { renv with subst = Mvs.add l ctx renv.subst }

@@ -120,38 +120,42 @@ module Unsigned
 
   axiom zero_unsigned_is_zero : to_int zero_unsigned = 0
 
+  constant radix : int
+
+  axiom radix_def : radix = max+1
+
   val add_mod (x y:t) : t
     ensures { to_int result = mod (to_int x + to_int y) (max+1) }
 
   val add_with_carry (x y:t) (c:t) : (t,t)
     requires { 0 <= to_int c <= 1 }
     returns { (r,d) ->
-      to_int r + (max+1) * to_int d =
+      to_int r + radix * to_int d =
       to_int x + to_int y + to_int c
       /\ 0 <= to_int d <= 1 }
 
   val sub_mod (x y:t) : t
-    ensures { to_int result = mod (to_int x - to_int y) (max+1) }
+    ensures { to_int result = mod (to_int x - to_int y) radix }
 
   val sub_with_borrow (x y:t) (b:t) : (t,t)
     requires { 0 <= to_int b <= 1 }
     returns { (r, d) ->
-      to_int r - (max+1) * to_int d  =
+      to_int r - radix * to_int d  =
       to_int x - to_int y - to_int b
       /\ 0 <= to_int d <= 1 }
 
   val add3 (x y z:t) : (t,t)
     returns { (r,d) ->
-      to_int r + (max+1) * to_int d =
+      to_int r + radix * to_int d =
       to_int x + to_int y + to_int z
       /\ 0 <= to_int d <= 2 }
 
   val mul_mod (x y:t) : t
-    ensures { to_int result = mod (to_int x * to_int y) (max+1) }
+    ensures { to_int result = mod (to_int x * to_int y) radix }
 
   val mul_double (x y:t) : (t,t)
     returns { (r,d) ->
-      to_int r + (max+1) * to_int d =
+      to_int r + radix * to_int d =
       to_int x * to_int y }
 
 end
@@ -210,6 +214,19 @@ module Int32
 *)
 end
 
+module Int32BV
+
+  use export Int32
+
+  use bv.BV32
+
+  val to_bv (x: int32) : BV32.t
+    ensures { BV32.to_int result = to_int x }
+  val of_bv (x: BV32.t) : int32
+    ensures { to_int result = BV32.to_int x }
+
+end
+
 module UInt32
 
   use import int.Int
@@ -227,6 +244,8 @@ module UInt32
   clone export Unsigned with
     type t = uint32,
     constant max = uint32'maxInt,
+    constant radix = radix,
+    goal radix_def,
     function to_int = uint32'int,
     lemma zero_unsigned_is_zero,
     lemma to_int_in_bounds,
@@ -458,12 +477,14 @@ module UInt64
   clone export Unsigned with
     type t = uint64,
     constant max = uint64'maxInt,
+    constant radix = radix,
+    goal radix_def,
     function to_int = uint64'int,
     lemma zero_unsigned_is_zero,
     lemma to_int_in_bounds,
     lemma extensionality
 
- val lsld (x cnt:uint64) : (uint64,uint64)
+  val lsld (x cnt:uint64) : (uint64,uint64)
     requires { 0 < to_int cnt < 64 }
     returns { (r,d) -> to_int r + (max_uint64+1) * to_int d =
               (power 2 (to_int cnt)) * to_int x }

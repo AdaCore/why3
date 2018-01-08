@@ -30,7 +30,7 @@ val add (a b: t) : t
 
 val mul (a b: t) : t
   ensures { forall v: cvars. interp result v = interp a v * interp b v }
-  raises  { Unknown -> true } (* removing this is ok ??? *)
+  raises  { Unknown -> true }
 
 val opp (a:t) : t
   ensures { forall v: cvars. interp result v = - (interp a v) }
@@ -687,7 +687,7 @@ use import real.RealInfix
 use import real.FromInt
 use import int.Abs
 
-meta coercion function from_int
+(*meta coercion function from_int*)
 
 type t = (int, int)
 type rvars = int -> real
@@ -941,11 +941,11 @@ end
 module MP64Coeffs
 
 use mach.int.UInt64 as M
-use import int.Int
 use import real.RealInfix
 use import real.FromInt
 use import real.PowerReal
 use RationalCoeffs as Q
+use import int.Int
 
 type evars = int -> int
 
@@ -1173,9 +1173,7 @@ use LinearDecisionRationalMP as R
 use import real.FromInt
 use import real.PowerReal
 use import real.RealInfix
-
-axiom pow_from_int: forall x y: int. 0 <= x -> 0 <= y ->
-                    pow (from_int x) (from_int y) = from_int (power x y)
+use import int.Int
 
 use import list.List
 
@@ -1281,7 +1279,19 @@ goal g: forall i x c r: int.
 goal g': forall a b i j: int.
   0 <= i -> 0 <= j ->
   (power radix i) * a = b ->
-  i = j ->
-  (power radix j) * a = b
+  i+1 = j ->
+  (power radix j) * a = radix*b
 
+end
+
+module TI
+
+use import real.RealInfix
+use import int.Int
+
+(*constant y : real = 0.0 + 0.0*)
+
+constant x : int = 0 + 0
+
+goal g: True
 end

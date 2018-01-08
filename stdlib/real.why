@@ -302,6 +302,13 @@ theory PowerReal
   lemma Pow_half:
     forall x:real. x > 0.0 -> pow x 0.5 = sqrt x
 
+  use import FromInt
+  use import int.Power
+
+  axiom pow_from_int: forall x y: int. Int.(<=) 0 x -> Int.(<=) 0 y ->
+                      pow (from_int x) (from_int y) = from_int (power x y)
+
+
 end
 
 (** {2 Trigonometric Functions}

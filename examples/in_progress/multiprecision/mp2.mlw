@@ -432,14 +432,11 @@ module N
       variant { sz - !i }
       label StartLoop in
       lx := get_ofs x !i;
-      assert { (pelts x)[offset x + !i] = !lx };
       let (res, carry) = add_with_carry !lx !c limb_zero in
       set_ofs r !i res;
       assert { value r !i + (power radix !i) * !c =
                   value x !i + y };
-      assert { res + radix * carry = !lx + !c };   (* add_with_carry post *)
       c := carry;
-      assert { (pelts r)[offset r + !i] = res };
       value_tail r !i;
       value_tail x !i;
       assert { value r (!i+1) + (power radix (!i+1)) * !c
