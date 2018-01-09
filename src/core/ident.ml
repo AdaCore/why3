@@ -108,8 +108,9 @@ let get_name_label ~labels = Slab.choose (Slab.filter is_name_label labels)
 let get_element_name ~labels =
   let name_label = get_name_label ~labels in
   let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+  let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_]*\\)$" in
   match splitted1 with
-  | ["name"; content] ->
+  | ["name"; content] when Str.string_match correct_word content 0 ->
     begin
       content
     end;
@@ -239,12 +240,13 @@ let id_unique_label printer ?(sanitizer = same) id =
     Hid.find printer.values id
   with Not_found ->
     let labels =  id.id_label in
-    if Slab.exists is_name_label labels then
+    try
       let name = sanitizer (get_element_name ~labels) in
       let name = find_unique printer.indices name in
       Hid.replace printer.values id name;
       name
-    else
+    with
+    | _ ->
       let name = sanitizer (printer.sanitizer id.id_string) in
       let name = find_unique printer.indices name in
       Hid.replace printer.values id name;
