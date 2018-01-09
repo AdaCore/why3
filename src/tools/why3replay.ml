@@ -247,19 +247,16 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   C.register_observer update_monitor;
   if !opt_provers = [] then
     let () =
-      C.replay ~valid_only:false ~obsolete_only:false ~use_steps:!opt_use_steps
+      C.replay ~valid_only:false ~obsolete_only:!opt_obsolete_only ~use_steps:!opt_use_steps
                ~callback ~notification ~final_callback cont ~any:None
     in ()
   else
-    failwith "option -P not yet supported"
-(*
     let filter a =
       List.exists
-        (fun p -> Whyconf.filter_prover p a.Session.proof_prover)
+        (fun p -> Whyconf.filter_prover p a.Session_itp.prover)
         !opt_provers in
-    M.check_all ~release:true ~use_steps:!opt_use_steps
-      ~filter ~callback env_session sched
- *)
+    C.replay ~valid_only:false ~obsolete_only:!opt_obsolete_only ~use_steps:!opt_use_steps
+             ~filter ~callback ~notification ~final_callback cont ~any:None
 
 (*
 

@@ -954,7 +954,7 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
   in
   Format.fprintf fmt "%a@." (Pp.print_list Pp.newline pp_elem) lr
 
-let replay ~valid_only ~obsolete_only ?(use_steps=false)
+let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
            c ~callback ~notification ~final_callback ~any =
 
   let craft_report count s r id pr limits pa =
@@ -978,11 +978,12 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false)
   in
 
   let need_replay pa =
-    (pa.proof_obsolete || not obsolete_only) &&
-      (not valid_only ||
-         match pa.Session_itp.proof_state with
-         | None -> false
-         | Some pr -> Call_provers.(pr.pr_answer = Valid))
+    filter pa &&
+      (pa.proof_obsolete || not obsolete_only) &&
+        (not valid_only ||
+           match pa.Session_itp.proof_state with
+           | None -> false
+           | Some pr -> Call_provers.(pr.pr_answer = Valid))
   in
 
   let session = c.controller_session in
