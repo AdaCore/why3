@@ -4,12 +4,12 @@
 <why3session shape_version="4">
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../hashtbl_impl.mlw" proved="true">
-<theory name="HashtblImpl" proved="true" sum="30f5106c44030a9cdf3c12f15983519e">
+<theory name="HashtblImpl" proved="true" sum="331f1b2d1a0952e60733252f44b4585b">
  <goal name="bucket_bounds" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
  </goal>
@@ -150,7 +150,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="WP_parameter find.1" expl="postcondition" proved="true">
-  <proof prover="2" edited="hashtbl_impl_HashtblImpl_WP_parameter_find_1.v"><result status="valid" time="0.34"/></proof>
+  <proof prover="6" edited="hashtbl_impl_HashtblImpl_WP_parameter_find_1.v"><result status="valid" time="0.34"/></proof>
   </goal>
  </transf>
  </goal>
@@ -181,7 +181,7 @@
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter remove.1" expl="postcondition" proved="true">
-  <proof prover="2" edited="hashtbl_impl_HashtblImpl_WP_parameter_remove_2.v"><result status="valid" time="0.35"/></proof>
+  <proof prover="6" edited="hashtbl_impl_HashtblImpl_WP_parameter_remove_2.v"><result status="valid" time="0.35"/></proof>
   </goal>
   <goal name="WP_parameter remove.2" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="5"/></proof>
@@ -237,7 +237,7 @@
   <proof prover="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="WP_parameter add.3" expl="type invariant" proved="true">
-  <proof prover="2" edited="hashtbl_impl_HashtblImpl_WP_parameter_add_1.v"><result status="valid" time="2.74"/></proof>
+  <proof prover="6" edited="hashtbl_impl_HashtblImpl_WP_parameter_add_1.v"><result status="valid" time="2.74"/></proof>
   </goal>
   <goal name="WP_parameter add.4" expl="type invariant" proved="true">
   <transf name="inline_all" proved="true" >
