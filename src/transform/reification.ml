@@ -162,7 +162,7 @@ let rec reify_term renv t rt =
            | _ -> t (* FIXME some cases missing *)
          in
          t_label ?loc:t.t_loc Slab.empty t
-       in               
+       in
        let t = rm t in
        (* remove labels to identify terms that are equal modulo labels *)
        if Mterm.mem t renv.store
@@ -486,7 +486,10 @@ open Expr
 open Ity
 
 exception CannotReduce
+exception Raised of string * string
 
+let append l = List.fold_left (fun acc s -> acc^":"^s) "" l
+  
 type value =
   | Vconstr of rsymbol * field list
   | Vint of BigInt.t
@@ -560,20 +563,17 @@ let get_decl env mm rs =
   if debug then Format.printf "pmodule %s@."
                               (pm.Pmodule.mod_theory.Theory.th_name.id_string);
   let tm = translate_module pm in
-  if Mid.mem id tm.mod_known
-  then Mid.find id tm.mod_known
-  else
-    let pd = Mid.find id tm.mod_from.from_km in
-    match pd.pd_node with
-    | PDtype l ->
-       let rec aux = function
-         | [] -> raise Not_found
-         | d::t -> if List.mem rs d.itd_constructors then raise Constructor
-                   else if List.mem rs d.itd_fields then raise Field
-                   else aux t
-       in
-       aux l
-    | _ -> raise Not_found
+  let pd = Mid.find id tm.mod_from.from_km in
+  match pd.pd_node with
+  | PDtype l ->
+     let rec aux = function
+       | [] -> raise Not_found
+       | d::t -> if List.mem rs d.itd_constructors then raise Constructor
+                 else if List.mem rs d.itd_fields then raise Field
+                 else aux t
+     in
+     aux l
+  | _ -> Mid.find id tm.mod_known
 
 let builtin_progs = Hrs.create 17
 
@@ -801,6 +801,7 @@ type info = {
     vars: value Mid.t;
     recs: rsymbol Mrs.t;
     funs: decl Mrs.t;
+    cs: string list; (* callstack for debugging *)
   }
 
 let print_id fmt id = fprintf fmt "%s" id.id_string
@@ -854,7 +855,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
            raise CannotReduce)
   | Eapp (rs, le) -> begin
       if debug then Format.printf "Eapp %a@." Expr.print_rs rs;
-      let eval_call info vl e =
+      let eval_call info vl e rs =
         if debug then Format.printf "eval params@.";
         let info' =
           List.fold_left2
@@ -865,7 +866,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
               then Format.printf "arg %a : %a@." print_id id print_value v;
               add_id id v info)
             info le vl in
-        interp_expr info' e in
+        interp_expr { info' with cs = rs.rs_name.id_string::(info'.cs) } e in
       if debug then Format.printf "eval call@.";
       let res = try begin
         let rs = if Mrs.mem rs info.recs then Mrs.find rs info.recs else rs in
@@ -879,11 +880,11 @@ let rec interp_expr info (e:Mltree.expr) : value =
                      with Not_found -> get_decl info.env info.mm rs in
           if debug then Format.printf "decl found@.";
           match decl with
-          | Dlet (Lsym (_rs, _ty, vl, e)) ->
-             eval_call info vl e
+          | Dlet (Lsym (rs, _ty, vl, e)) ->
+             eval_call info vl e rs
           | Dlet(Lrec([{rec_args = vl; rec_exp = e;
                         rec_sym = rs; rec_rsym = rrs; rec_res=_ty}])) ->
-             eval_call { info with recs = Mrs.add rrs rs info.recs } vl e
+             eval_call { info with recs = Mrs.add rrs rs info.recs } vl e rs
           | Dlet (Lrec _) ->
              if debug
              then Format.printf "unhandled mutually recursive functions@.";
@@ -1006,7 +1007,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
      interp_expr info e
   | Eraise (xs,_)  ->
      if debug then Format.printf "Eraise %s@." xs.xs_name.id_string;
-     raise CannotReduce
+     raise (Raised (xs.xs_name.id_string, append info.cs))
   | Eexn  _ -> if debug then Format.printf "Eexn@.";
                          raise CannotReduce
   | Eabsurd -> if debug then Format.printf "Eabsurd@.";
@@ -1125,7 +1126,8 @@ let reflection_by_function s env = Trans.store (fun task ->
                        mm = mm;
                        funs = Mrs.empty;
                        recs = Mrs.empty;
-                       vars = vars
+                       vars = vars;
+                       cs = [];
                        } in
           if debug then Format.printf "eval_fun@.";
           let res = term_of_value (eval_fun decl info) in

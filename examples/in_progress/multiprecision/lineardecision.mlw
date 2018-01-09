@@ -830,7 +830,6 @@ let rinv (a:t)
   end
 
 end
-
 module LinearDecisionRational
 
 use import RationalCoeffs
@@ -1074,18 +1073,21 @@ let mmul (a b:t)
 = match a, b with
   | (q1,e1), (q2,e2) ->
     let q = Q.rmul q1 q2 in
-    let e = add_exp e1 e2 in
-    assert { forall y. minterp (q,e) y = minterp a y *. minterp b y
-             by let p1 = pow rradix (from_int (interp_exp e1 y)) in
-                let p2 = pow rradix (from_int (interp_exp e2 y)) in
-                let p  = pow rradix (from_int (interp_exp e y)) in
-                interp_exp e y = interp_exp e1 y + interp_exp e2 y
-                so p = p1 *. p2
-                so minterp (q,e) y = qinterp q *. p
-                   = (qinterp q1 *. qinterp q2) *. p
-                   = (qinterp q1 *. qinterp q2) *. p1 *. p2
-                   = minterp a y *. minterp b y };
-    (q,e)
+    if Q.req q Q.rzero then mzero
+    else begin
+      let e = add_exp e1 e2 in
+      assert { forall y. minterp (q,e) y = minterp a y *. minterp b y
+               by let p1 = pow rradix (from_int (interp_exp e1 y)) in
+                  let p2 = pow rradix (from_int (interp_exp e2 y)) in
+                  let p  = pow rradix (from_int (interp_exp e y)) in
+                  interp_exp e y = interp_exp e1 y + interp_exp e2 y
+                  so p = p1 *. p2
+                  so minterp (q,e) y = qinterp q *. p
+                     = (qinterp q1 *. qinterp q2) *. p
+                     = (qinterp q1 *. qinterp q2) *. p1 *. p2
+                     = minterp a y *. minterp b y };
+      (q,e)
+    end
   end
 
 let mopp (a:t)
@@ -1281,6 +1283,16 @@ goal g': forall a b i j: int.
   (power radix i) * a = b ->
   i+1 = j ->
   (power radix j) * a = radix*b
+
+goal g'': forall r r' i c x x' y l: int.
+  c = 0 ->
+  r + power radix i * c = x + y ->
+  r' = r + power radix i * l ->
+  x' = x + power radix i * l ->
+  r' + power radix (i+1) * c = x' + y
+
+(*tries to add power radix i and power radix (i+1), fails
+  -> cst propagation ? *)
 
 end
 

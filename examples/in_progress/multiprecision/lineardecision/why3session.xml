@@ -1895,7 +1895,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="MP64Coeffs" proved="true" sum="59e49ba42437c8635bc3d6235c8d7438">
+<theory name="MP64Coeffs" proved="true" sum="3a8c8b51b01ad073535e1a8f5b36fc15">
  <goal name="VC mzero" expl="VC for mzero" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2144,38 +2144,41 @@
  </goal>
  <goal name="VC mmul" expl="VC for mmul" proved="true">
  <transf name="split_goal_wp" proved="true" >
-  <goal name="VC mmul.0" expl="assertion" proved="true">
+  <goal name="VC mmul.0" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  </goal>
+  <goal name="VC mmul.1" expl="assertion" proved="true">
   <transf name="split_goal_wp" proved="true" >
-   <goal name="VC mmul.0.0" expl="assertion" proved="true">
+   <goal name="VC mmul.1.0" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.01"/></proof>
    </goal>
-   <goal name="VC mmul.0.1" expl="VC for mmul" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="10"/></proof>
+   <goal name="VC mmul.1.1" expl="VC for mmul" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
    </goal>
-   <goal name="VC mmul.0.2" expl="VC for mmul" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <goal name="VC mmul.1.2" expl="VC for mmul" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="VC mmul.0.3" expl="VC for mmul" proved="true">
+   <goal name="VC mmul.1.3" expl="VC for mmul" proved="true">
    <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="VC mmul.0.4" expl="VC for mmul" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
+   <goal name="VC mmul.1.4" expl="VC for mmul" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
    </goal>
-   <goal name="VC mmul.0.5" expl="VC for mmul" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+   <goal name="VC mmul.1.5" expl="VC for mmul" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
    </goal>
-   <goal name="VC mmul.0.6" expl="VC for mmul" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+   <goal name="VC mmul.1.6" expl="VC for mmul" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC mmul.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC mmul.2" expl="exceptional postcondition" proved="true">
+  <goal name="VC mmul.2" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC mmul.3" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC mmul.4" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
@@ -2438,7 +2441,7 @@
  <proof prover="2"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
-<theory name="TestMP" proved="true" sum="affc07b7daa8e76697c500d698debc64">
+<theory name="TestMP" sum="e261877e08f5a8ba4f1586cc3e8e3b4f">
  <goal name="g" proved="true">
  <transf name="reflection_f" proved="true" arg1="mp_decision">
   <goal name="g.0" expl="reification check" proved="true">
@@ -2511,6 +2514,22 @@
    <proof prover="2"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g&#39;&#39;">
+ <transf name="replace" arg1="c" arg2="0">
+  <goal name="g&#39;&#39;.0">
+  <transf name="replace" arg1="c" arg2="0" arg3="in" arg4="H2">
+   <goal name="g&#39;&#39;.0.0">
+   </goal>
+   <goal name="g&#39;&#39;.0.1" proved="true">
+   <proof prover="2"><result status="valid" time="0.01"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="g&#39;&#39;.1" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
  </goal>

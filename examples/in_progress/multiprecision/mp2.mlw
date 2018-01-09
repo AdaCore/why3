@@ -509,14 +509,12 @@ module N
                 value x !i + value y !i
                by value r !i = (value r !i at StartLoop) };
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      assert { value r !i + (power radix !i) * !c =
-                value x !i + value y !i
-              by
+      value_tail r !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value r (!i+1) + (power radix (!i+1)) * !c =
+                value x (!i+1) + value y (!i+1)
+              (*by
               value r !i + (power radix !i) * !c
               = value r k + (power radix k) * res
                    + (power radix !i) * !c
@@ -535,7 +533,8 @@ module N
                  + value y k + (power radix k) * !ly
               = value x !i
                  + (value y k + (power radix k) * !ly)
-              = value x !i + value y !i }
+              = value x !i + value y !i*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
 
@@ -571,14 +570,12 @@ module N
       assert { value r !i + (power radix !i) * !c =
                 value x !i + value y !i };
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      assert { value r !i + (power radix !i) * !c =
-                value x !i + value y !i
-              by
+      value_tail r !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value r (!i+1) + (power radix (!i+1)) * !c =
+                value x (!i+1) + value y (!i+1)
+              (*by
               value r !i + (power radix !i) * !c
               = value r k + (power radix k) * res
                    + (power radix !i) * !c
@@ -597,7 +594,8 @@ module N
                  + value y k + (power radix k) * !ly
               = value x !i
                  + (value y k + (power radix k) * !ly)
-              = value x !i + value y !i };
+              = value x !i + value y !i*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     try
     begin while Int32.(<) !i sx do
@@ -614,13 +612,11 @@ module N
       assert { value r !i + (power radix !i) * !c =
                 value x !i + value y sy };
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      assert { value r !i + (power radix !i) * !c =
-                value x !i + value y sy
-              by
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r (!i+1) + (power radix (!i+1)) * !c =
+                value x (!i+1) + value y sy
+              (*by
               value r !i + (power radix !i) * !c
               = value r k + (power radix k) * res
                    + (power radix !i) * !c
@@ -634,7 +630,8 @@ module N
               = value x k + value y sy
                  + (power radix k) * !lx
               = value x !i
-                 + value y sy }
+                 + value y sy*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     assert { !i = sx }
     end
@@ -649,12 +646,14 @@ module N
       assert { !c = 0 by !i < sx };
       lx := get_ofs x !i;
       set_ofs r !i !lx;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      assert { value r !i + power radix !i * !c
-               = value x !i + value y sy
+      (*assert { value r !i + (power radix !i) * !c =
+                value x !i + value y sy };*) (* false without this, cannotreduce with this *)
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r !i = value x !i + value y sy }; (* true with this, should not be needed *)
+      assert { value r (!i+1) + power radix (!i+1) * !c
+               = value x (!i+1) + value y sy
+               (*
                by
                value r !i + power radix !i * !c
                  = value r !i
@@ -663,8 +662,8 @@ module N
                   = value x k + power radix k * !lx
                so value r k
                   = value r k + power radix k * !c
-                  = value x k + value y sy
-             }
+                  = value x k + value y sy*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     !c
 
@@ -697,7 +696,7 @@ module N
                   (pelts x)[j] = (pelts (old x))[j] }
       label StartLoop in
       lx := get_ofs x !i;
-      assert { !lx = (pelts ox)[x.offset + !i] };
+      assert { !lx = (pelts ox)[ox.offset + !i] };
       ly := get_ofs y !i;
       let res, carry = add_with_carry !lx !ly !c in
       set_ofs x !i res;
@@ -709,14 +708,12 @@ module N
                  = (pelts ox)[x.offset + j]};
       assert { value x !i + (power radix !i) * !c = value ox !i + value y !i };
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      value_sub_tail (pelts ox) x.offset (x.offset + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      assert { value x !i + (power radix !i) * !c =
-                value ox !i + value y !i
-              by value ox k + (power radix k) * !lx
+      value_tail x !i;
+      value_tail ox !i;
+      value_tail y !i;
+      assert { value x (!i+1) + (power radix (!i+1)) * !c =
+                value ox (!i+1) + value y (!i+1)
+              (*by value ox k + (power radix k) * !lx
                  = value ox !i
               so value x !i + (power radix !i) * !c
               = value x k + (power radix k) * res
@@ -736,7 +733,8 @@ module N
                  + (value y k + (power radix k) * !ly)
               = value ox !i
                  + (value y k + (power radix k) * !ly)
-              = value ox !i + value y !i };
+              = value ox !i + value y !i*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     try
     while Int32.(<) !i sx do
@@ -752,7 +750,7 @@ module N
       (if (Limb.(=) !c limb_zero) then raise ReturnLimb limb_zero);
       label StartLoop2 in
       lx := get_ofs x !i;
-      assert { !lx = (pelts ox)[x.offset + !i] };
+      assert { !lx = (pelts ox)[ox.offset + !i] };
       let res, carry = add_with_carry !lx limb_zero !c in
       value_sub_update_no_change (pelts x) (x.offset + p2i !i)
                                            (x.offset + p2i !i + 1)
@@ -760,15 +758,13 @@ module N
       set_ofs x !i res;
       assert { value x !i + (power radix !i) * !c = value ox !i + value y sy };
       c := carry;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      assert { forall j. !i <= j < sx ->
+      assert { forall j. !i < j < sx ->
                   (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] };
-      value_sub_tail (pelts ox) x.offset (x.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      assert { value x !i + (power radix !i) * !c =
-                value ox !i + value y sy
-              by value ox k + (power radix k) * !lx
+      value_tail ox !i;
+      value_tail x !i;
+      assert { value x (!i+1) + (power radix (!i+1)) * !c =
+                value ox (!i+1) + value y sy
+              (*by value ox k + (power radix k) * !lx
                  = value ox !i
               so
               value x !i + (power radix !i) * !c
@@ -784,7 +780,8 @@ module N
               = value ox k + value y sy
                  + (power radix k) * !lx
               = value ox !i
-                 + value y sy }
+                 + value y sy*) };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     assert { !i = sx };
     !c
@@ -798,17 +795,7 @@ module N
       value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sx);
       value_sub_concat (pelts x) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
       value_sub_concat (pelts ox) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
-      assert { value x sx = value (old x) sx + value y sy
-               by value x sx
-                  = value x !i
-                    + (power radix !i)
-                      * value_sub (pelts ox) (x.offset + !i) (x.offset + sx)
-                  = value ox !i
-                    + (power radix !i)
-                      * value_sub (pelts ox) (x.offset + !i) (x.offset + sx)
-                    + value y sy
-                  = value_sub (pelts ox) x.offset (x.offset + sx) + value y sy
-                  = value ox sx + value y sy };
+      assert { value x sx = value (old x) sx + value y sy };
       n
       end
     end
@@ -843,13 +830,11 @@ module N
       assert { value r !i - power radix !i * !b =
                  value x !i - y };
       b := borrow;
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
-      assert { value r !i - power radix !i * !b
-                  = value x !i - y
-             by
+      value_tail r !i;
+      value_tail x !i;
+      assert { value r (!i+1) - power radix (!i+1) * !b
+                  = value x (!i+1) - y
+             (*by
                value r !i - power radix !i * !b
              = value r k + power radix k * res
                  - power radix !i * !b
@@ -861,8 +846,9 @@ module N
              = value r k - power radix k * (!b at StartLoop)
                  + power radix k * !lx
              = value x k - y + power radix k * !lx
-             = value x !i - y
+             = value x !i - y*)
       };
+      i := Int32.(+) !i (Int32.of_int 1);
     done;
     if Int32.(=) !i sz then !b
     else begin
