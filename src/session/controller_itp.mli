@@ -304,8 +304,9 @@ val replay:
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->
     notification:notifier ->
     final_callback:
-      ((proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
-            -> unit) -> any: Session_itp.any option ->
+      (bool ->
+       (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
+       -> unit) -> any: Session_itp.any option ->
     unit
 (** This function reruns all the proofs of the session under the given any (None
     means the whole session), and produces a report comparing the results with
@@ -317,8 +318,9 @@ val replay:
     The session state is changed, all changes are notified via the
     callback [notification]
 
-    When finished, call the callback [final_callback] with the report,
-a list of 4-uples [(goalID, prover, limits, report)]
+    When finished, call the callback [final_callback] with a boolean
+    telling if some prover was upgraded, and the report, a list of
+    4-uples [(goalID, prover, limits, report)]
 
     When [obsolete_only] is set, only obsolete proofs are replayed (default)
 

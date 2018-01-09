@@ -957,23 +957,29 @@ let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_
 let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
            c ~callback ~notification ~final_callback ~any =
 
-  let craft_report count s r id pr limits pa =
+  let session = c.controller_session in
+  let count = ref 0 in
+  let report = ref [] in
+  let found_upgraded_prover = ref false in
+
+  let craft_report s id pr limits pa =
     match s with
-    | UpgradeProver _ | Scheduled | Running -> ()
+    | UpgradeProver _ -> found_upgraded_prover := true
+    | Scheduled | Running -> ()
     | Undone | Interrupted ->
        decr count;
-       r := (id, pr, limits, Replay_interrupted ) :: !r
+       report := (id, pr, limits, Replay_interrupted ) :: !report
     | Done new_r ->
        decr count;
         (match pa.Session_itp.proof_state with
-        | None -> (r := (id, pr, limits, No_former_result new_r) :: !r)
-        | Some old_r -> r := (id, pr, limits, Result (new_r, old_r)) :: !r)
+        | None -> (report := (id, pr, limits, No_former_result new_r) :: !report)
+        | Some old_r -> report := (id, pr, limits, Result (new_r, old_r)) :: !report)
     | InternalFailure e ->
        decr count;
-        r := (id, pr, limits, CallFailed (e)) :: !r
+       report := (id, pr, limits, CallFailed (e)) :: !report
     | Uninstalled _ ->
        decr count;
-       r := (id, pr, limits, Prover_not_installed) :: !r;
+       report := (id, pr, limits, Prover_not_installed) :: !report;
     | Detached -> decr count
   in
 
@@ -986,9 +992,6 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
            | Some pr -> Call_provers.(pr.pr_answer = Valid))
   in
 
-  let session = c.controller_session in
-  let count = ref 0 in
-  let report = ref [] in
 
   (* TODO count the number of node in a more efficient way *)
   (* Counting the number of proof_attempt to print report only once *)
@@ -1018,13 +1021,14 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
         in
         replay_proof_attempt c pr limit parid id
                              ~callback:(fun id s ->
-                                        craft_report count s report parid pr limit pa;
+                                        craft_report s parid pr limit pa;
                                         callback id s;
-                                        if !count = 0 then final_callback !report)
+                                        if !count = 0 then
+                                          final_callback !found_upgraded_prover !report)
                              ~notification
       end in
 
-  if !count = 0 then final_callback !report else
+  if !count = 0 then final_callback !found_upgraded_prover !report else
   (* Calling replay on all the proof_attempts of the session *)
   match any with
   | None -> Session_itp.session_iter_proof_attempt replay_pa session

@@ -109,8 +109,6 @@ let add_file f = Queue.push f files
 let config, _, env =
   Whyconf.Args.initialize option_list add_file usage_msg
 
-let found_upgraded_prover = ref false
-
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
 let () =
@@ -193,7 +191,7 @@ let same_result r1 r2 =
 
 let add_to_check_no_smoke some_merge_miss found_obs cont =
   let session = cont.Controller_itp.controller_session in
-  let final_callback report =
+  let final_callback found_upgraded_prover report =
     Debug.dprintf debug "@.";
     let files,n,m =
       Stdlib.Hstr.fold (file_statistics session)
@@ -216,10 +214,10 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
       begin
         printf "(replay OK%s%s)@."
           (if found_obs then ", obsolete session" else "")
-          (if !found_upgraded_prover then ", upgraded prover" else "");
+          (if found_upgraded_prover then ", upgraded prover" else "");
         if true (* !opt_stats *) && n<m then print_statistics session files;
         Debug.dprintf debug "Everything replayed OK.@.";
-        if !opt_force || found_obs || !found_upgraded_prover then save ();
+        if !opt_force || found_obs || found_upgraded_prover then save ();
         exit 0
       end
     else

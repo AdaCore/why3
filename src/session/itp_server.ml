@@ -1226,7 +1226,7 @@ end
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
-    let final_callback lr =
+    let final_callback _ lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
     C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont
