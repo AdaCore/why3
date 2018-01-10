@@ -151,7 +151,13 @@ let set_limit_subp s = opt_limit_subp := Some s
 let usage_msg =
   "Usage: gnatwhy3 [options] file"
 
+let print_version_info () =
+  Format.printf "Why3 for gnatprove version %s@." Config.version;
+  exit 0
+
 let options = Arg.align [
+   "--version", Arg.Unit print_version_info,
+          " Print version information and exit";
    "-t", Arg.Int set_timeout,
           " Set the timeout in seconds (default is 1 second)";
    "--timeout", Arg.Int set_timeout,
