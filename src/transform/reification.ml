@@ -37,18 +37,23 @@ let init_renv kn crc lv env task =
     task = task;
   }
 
-let rec is_const t =
-  let r = match t.t_node with
-  | Tconst _ -> true
-  | Tvar _ -> false
-  | Tapp (_, []) -> false
-  | Tapp (_, l) -> List.for_all is_const l
-  | _ -> false in
-  if debug then Format.printf "is_const %a: %b@." Pretty.print_term t r;
-  r
-
 let rec reify_term renv t rt =
   let is_pvar p = match p.pat_node with Pvar _ -> true | _ -> false in
+  let rec use_interp t =
+    let r = match t.t_node with
+      | Tconst _ -> true
+      | Tvar _ -> false
+      | Tapp (ls, []) ->
+         begin match find_logic_definition renv.kn ls with
+         | None -> false
+         | Some ld ->
+            let _,t = open_ls_defn ld in
+            use_interp t
+         end
+      | Tapp (_, _) -> true
+      | _ -> false in
+    if debug then Format.printf "use_interp %a: %b@." Pretty.print_term t r;
+    r in
   let rec invert_nonvar_pat vl (renv:reify_env) (p,f) t =
     if debug
     then Format.printf
@@ -116,15 +121,15 @@ let rec reify_term renv t rt =
     | Pvar _, Tapp (ls, _hd::_tl), _
       -> if debug then Format.printf "case interp@.";
          invert_interp renv ls t
-    | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), _
-         when is_const t
-      -> if debug then Format.printf "case interp_const@.";
-         let renv, rt = invert_interp renv ls t in
-         renv, (t_app cs [rt] (Some p.pat_ty))
     | Papp (cs, [{pat_node = Pvar v}]), Tvar v', Tconst _
          when vs_equal v v'
       -> if debug then Format.printf "case var_const@.";
          renv, t_app cs [t] (Some p.pat_ty)
+    | Papp (cs, [{pat_node = Pvar _}]), Tapp(ls, _hd::_tl), _
+         when use_interp t (*FIXME*)
+      -> if debug then Format.printf "case interp_var@.";
+         let renv, rt = invert_interp renv ls t in
+         renv, (t_app cs [rt] (Some p.pat_ty))
     | Papp _, Tapp (ls1, _), Tapp(ls2, _) ->
        if debug then Format.printf "head symbol mismatch %a %a@."
                                    Pretty.print_ls ls1 Pretty.print_ls ls2;
@@ -489,7 +494,7 @@ exception CannotReduce
 exception Raised of string * string
 
 let append l = List.fold_left (fun acc s -> acc^":"^s) "" l
-  
+
 type value =
   | Vconstr of rsymbol * field list
   | Vint of BigInt.t
@@ -1070,7 +1075,7 @@ let reflection_by_function s env = Trans.store (fun task ->
       ths None in
   let (_pmod, rs) = if o = None
                    then (if debug then Format.printf "Symbol %s not found@." s;
-                         raise Exit)
+                         raise Not_found)
                    else Opt.get o in
   (*let (_, ms, _) = Pmodule.restore_path rs.rs_name in*) (*FIXME remove or adapt*)
   let lpost = List.map open_post rs.rs_cty.cty_post in
