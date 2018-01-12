@@ -40,7 +40,7 @@
 
 }
 
-let newline = '\n'
+let newline = '\r'* '\n'
 
 rule comment = parse
   | "(*)"
@@ -61,15 +61,20 @@ and string = parse
       { let s = Buffer.contents string_buf in
         Buffer.clear string_buf;
         s }
+  | "\\" newline
+      { newline lexbuf; string_skip_spaces lexbuf }
   | "\\" (_ as c)
-      { if c = '\n' then newline lexbuf;
-        Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
+      { Buffer.add_char string_buf (char_for_backslash c); string lexbuf }
   | newline
       { newline lexbuf; Buffer.add_char string_buf '\n'; string lexbuf }
   | eof
       { raise (Loc.Located (!string_start_loc, UnterminatedString)) }
   | _ as c
       { Buffer.add_char string_buf c; string lexbuf }
+
+and string_skip_spaces = parse
+  | [' ' '\t']*
+      { string lexbuf }
 
 {
   let loc lb = Loc.extract (lexeme_start_p lb, lexeme_end_p lb)
