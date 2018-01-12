@@ -103,21 +103,20 @@ let get_model_trace_string ~labels =
 let is_name_label label =
   Strings.has_prefix "name:" label.lab_string
 
-let get_name_label ~labels = Slab.choose (Slab.filter is_name_label labels)
+let get_name_label ~labels =
+  try Some (Slab.choose (Slab.filter is_name_label labels))
+  with Not_found -> None
 
 let get_element_name ~labels =
-  let name_label = get_name_label ~labels in
-  let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
-  let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_]*\\)$" in
-  match splitted1 with
-  | ["name"; content] when Str.string_match correct_word content 0 ->
-    begin
-      content
-    end;
-  | [_] -> ""
-  | _ -> assert false
-
-
+  match get_name_label ~labels with
+  | None -> None
+  | Some name_label ->
+    let splitted1 = Strings.bounded_split ':' name_label.lab_string 2 in
+    let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
+    match splitted1 with
+    | ["name"; content] when Str.string_match correct_word content 0 ->
+        Some content
+    | _ -> None
 
 (** Identifiers *)
 
@@ -257,18 +256,16 @@ let id_unique_label printer ?(sanitizer = same) id =
   try
     Hid.find printer.values id
   with Not_found ->
-    let labels =  id.id_label in
-    try
-      let name = sanitizer (get_element_name ~labels) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
-    with
-    | _ ->
-      let name = sanitizer (printer.sanitizer id.id_string) in
-      let name = find_unique printer.indices name in
-      Hid.replace printer.values id name;
-      name
+    let labels = id.id_label in
+    let name =
+      match (get_element_name ~labels) with
+      | Some x -> x
+      | None -> printer.sanitizer id.id_string
+    in
+    let name = sanitizer name in
+    let name = find_unique printer.indices name in
+    Hid.replace printer.values id name;
+    name
 
 let string_unique printer s = find_unique printer.indices s
 
