@@ -1113,7 +1113,13 @@ end
       let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
       let parent = node_ID_from_pn parent_id in
       apply_transform parent t args
-    | ATn _ | AFile _ | ATh _ ->
+    | ATn tnid ->
+      let child_ids = get_sub_tasks d.cont.controller_session tnid in
+      let callback = callback_update_tree_transform t args in
+      List.iter (fun id -> C.schedule_transformation d.cont id t args ~callback
+                           ~notification:(notify_change_proved d.cont))
+                child_ids
+    | AFile _ | ATh _ ->
       (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
       ()
 

@@ -400,7 +400,8 @@ let interp commands_table cont id s =
          let t = Trans.lookup_trans cont.Controller_itp.controller_env cmd in
          match id with
          | Some (Session_itp.APn _id) -> Transform (cmd,t,args)
-         | _ -> QError ("Please select a goal node in the task tree")
+         | Some (Session_itp.ATn _tid) -> Transform (cmd, t, args)
+         | _ -> QError ("Please select a goal or trans node in the task tree")
        with
        | Trans.UnknownTrans _ ->
           match parse_prover_name cont.Controller_itp.controller_config cmd args with
