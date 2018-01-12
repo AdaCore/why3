@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 0.88.3, January 11, 2018
+--------------------------------
+
 Provers
   * support for Alt-Ergo 2.0.0 (released Nov 14, 2017)
   * support for Coq 8.7.1 (released Dec 16, 2017)
