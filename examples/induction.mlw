@@ -23,7 +23,9 @@ theory Hyps
 
 end
 
-module Induction1 "with a simple induction"
+(** {2 With a simple induction} *)
+
+module Induction1
   use import Hyps
 
   predicate pr (k: int) = p k && p (k+1)
@@ -34,7 +36,9 @@ module Induction1 "with a simple induction"
 
 end
 
-module Induction2 "with a strong induction"
+(** {2 With a strong induction} *)
+
+module Induction2
   use import Hyps
 
   clone import int.Induction
@@ -44,7 +48,9 @@ module Induction2 "with a strong induction"
 
 end
 
-module LemmaFunction1 "with a recursive lemma function"
+(** {2 With a recursive lemma function} *)
+
+module LemmaFunction1
   use import Hyps
 
   let rec lemma ind (n: int) requires { 0 <= n} ensures { p n }
@@ -57,7 +63,9 @@ module LemmaFunction1 "with a recursive lemma function"
 
 end
 
-module LemmaFunction2 "with a while loop"
+(** {2 With a while loop} *)
+
+module LemmaFunction2
   use import Hyps
   use import ref.Ref
 
@@ -73,7 +81,9 @@ module LemmaFunction2 "with a while loop"
 
 end
 
-module LemmaFunction3 "with an ascending while loop"
+(** {2 With an ascending while loop} *)
+
+module LemmaFunction3
   use import Hyps
   use import ref.Ref
 

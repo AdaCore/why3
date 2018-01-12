@@ -66,9 +66,11 @@ module Quicksort
 
 end
 
+(** {2 Knuth' shuffle} *)
+
 (* a realistic quicksort first shuffles the array *)
 
-module Shuffle "Knuth shuffle"
+module Shuffle
 
   use import int.Int
   use import array.Array

@@ -134,7 +134,9 @@ module BitsSpec
     ensures  { result.mdl = interval 0 (BV32.t'int n) }
 end
 
-module Bits "the 1-bits of an integer, as a set of integers"
+(** {2 The 1-bits of an integer, as a set of integers} *)
+
+module Bits
 
   use import S
   use import bv.BV32
