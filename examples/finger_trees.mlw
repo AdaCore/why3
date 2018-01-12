@@ -30,7 +30,7 @@ module FingerTrees
 
   let lemma node_cons_app (nd:node 'a) (p q:list 'a)
     ensures { node_cons nd (p++q) = node_cons nd p ++ q }
-  = match nd with Node2 _ _ -> "keep_on_simp" () | _ -> () end
+  = match nd with Node2 _ _ -> [@keep_on_simp] () | _ -> () end
 
   function flatten (l:list (node 'a)) : list 'a = match l with
     | Nil -> Nil

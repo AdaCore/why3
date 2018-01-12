@@ -87,7 +87,7 @@ module Lemmas
     | Cons f tl -> mem_forest n f || mem_stack n tl
     end
 
-  lemma mem_app: forall n st1 "induction" st2.
+  lemma mem_app: forall n st1 [@induction] st2.
     mem_stack n (st1 ++ st2) -> mem_stack n st1 || mem_stack n st2
 
   function size_stack (st: stack) : int = match st with

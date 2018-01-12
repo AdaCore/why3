@@ -24,11 +24,11 @@ module Matrix63
     0 <= to_int r < to_int a.rows /\ 0 <= to_int c < to_int a.columns
 
   val get (a: matrix 'a) (r c: int63) : 'a
-    requires { "expl:index in array bounds" valid_index a r c }
+    requires { [@expl:index in array bounds] valid_index a r c }
     ensures  { result = get_unsafe a (to_int r) (to_int c) }
 
   val set (a: matrix 'a) (r c: int63) (v: 'a) : unit
-    requires { "expl:index in array bounds" valid_index a r c }
+    requires { [@expl:index in array bounds] valid_index a r c }
     writes   { a }
     ensures  { a.elts = M.set (old a.elts) (to_int r)
                (M.set (M.get (old a.elts) (to_int r)) (to_int c) v)}
@@ -37,7 +37,7 @@ module Matrix63
   exception OutOfBounds
 
   let defensive_get (a: matrix 'a) (r c: int63) : 'a
-    ensures { "expl:index in array bounds" valid_index a r c }
+    ensures { [@expl:index in array bounds] valid_index a r c }
     ensures { result = get_unsafe a (to_int r) (to_int c) }
     raises  { OutOfBounds -> not (valid_index a r c) }
   = if r < of_int 0 || r >= a.rows || c < of_int 0 || c >= a.columns then
@@ -45,7 +45,7 @@ module Matrix63
     get a r c
 
   let defensive_set (a: matrix 'a) (r c: int63) (v: 'a) : unit
-    ensures { "expl:index in array bounds" valid_index a r c }
+    ensures { [@expl:index in array bounds] valid_index a r c }
     ensures { a.elts = M.set (old a.elts) (to_int r)
               (M.set (M.get (old a.elts) (to_int r)) (to_int c) v)}
     raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }

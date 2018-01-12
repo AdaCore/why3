@@ -57,7 +57,7 @@ let forget_all () =
   if do_forget_all then forget_all tprinter;
   if do_forget_all then forget_all pprinter
 
-let print_label fmt l = fprintf fmt "\"%s\"" l.lab_string
+let print_label fmt l = fprintf fmt "[@%s]" l.lab_string
 let print_labels = print_iter1 Slab.iter space print_label
 
 let print_loc fmt l =

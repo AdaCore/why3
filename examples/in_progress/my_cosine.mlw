@@ -13,17 +13,17 @@ module M
     ensures { value result = x }
 
   val add (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) +. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) +. (value y))}
 
   val sub (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) -. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) -. (value y))}
 
   val mul (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) *. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) *. (value y))}
 
@@ -47,15 +47,15 @@ module IEEEfloat
   use import ieee_float.Float32
 
   val add (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .+ y) }
+    requires { [@expl:floating-point overflow] t'isFinite (x .+ y) }
     ensures  { result = x .+ y }
 
   val sub (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .- y)}
+    requires { [@expl:floating-point overflow] t'isFinite (x .- y)}
     ensures  { result = x .- y }
 
   val mul (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .* y)}
+    requires { [@expl:floating-point overflow] t'isFinite (x .* y)}
     ensures  { result = x .* y }
 
   let my_cosine (x:t) : t

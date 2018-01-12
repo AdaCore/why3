@@ -376,7 +376,7 @@ predicate compatible_env (sigma:env) (sigmat:type_env) (pi:stack) (pit: type_sta
   (forall id: mident. type_value (get_env id sigma) = get_reftype id sigmat) /\
   (forall id: ident. type_value (get_stack id pi) = get_vartype id pit)
 
-lemma type_inversion : forall v "induction":value.
+lemma type_inversion : forall v [@induction]:value.
    match (type_value v) with
     | TYbool -> exists b: bool. v = Vbool b
     | TYint -> exists n: int. v = Vint n
@@ -393,7 +393,7 @@ lemma type_preservation :
          sigmat:type_env, pit:type_stack.
      type_stmt sigmat pit s1 ->
      compatible_env sigma1 sigmat pi1 pit ->
-     ("induction" one_step sigma1 pi1 s1 sigma2 pi2 s2) ->
+     ([@induction] one_step sigma1 pi1 s1 sigma2 pi2 s2) ->
      type_stmt sigmat pit s2 /\
      compatible_env sigma2 sigmat pi2 pit
 
@@ -460,25 +460,25 @@ predicate fresh_in_fmla (id:ident) (f:fmla) =
 
 (* Needed for monotonicity and wp_reduction *)
 lemma eval_msubst_term:
-  forall e "induction":term, sigma:env, pi:stack, x:mident, v:ident.
+  forall e [@induction]:term, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_term v e ->
     eval_term sigma pi (msubst_term e x v) =
     eval_term (IdMap.set sigma x (get_stack v pi)) pi e
 
 lemma eval_msubst:
-  forall f "induction":fmla, sigma:env, pi:stack, x:mident, v:ident.
+  forall f [@induction]:fmla, sigma:env, pi:stack, x:mident, v:ident.
     fresh_in_fmla v f ->
     (eval_fmla sigma pi (msubst f x v) <->
      eval_fmla (IdMap.set sigma x (get_stack v pi)) pi f)
 
 lemma eval_swap_term:
-  forall t "induction":term, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
+  forall t [@induction]:term, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
   id1 <> id2 ->
   (eval_term sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) t =
    eval_term sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) t)
 
 lemma eval_swap_gen:
-  forall f "induction":fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
+  forall f [@induction]:fmla, sigma:env, pi l:stack, id1 id2:ident, v1 v2:value.
     id1 <> id2 ->
     (eval_fmla sigma (l++(Cons (id1,v1) (Cons (id2,v2) pi))) f <->
     eval_fmla sigma (l++(Cons (id2,v2) (Cons (id1,v1) pi))) f)
@@ -490,13 +490,13 @@ lemma eval_swap:
     eval_fmla sigma (Cons (id2,v2) (Cons (id1,v1) pi)) f)
 
 lemma eval_term_change_free :
-  forall t "induction":term, sigma:env, pi:stack, id:ident, v:value.
+  forall t [@induction]:term, sigma:env, pi:stack, id:ident, v:value.
     fresh_in_term id t ->
     eval_term sigma (Cons (id,v) pi) t = eval_term sigma pi t
 
  (* Need it for monotonicity*)
 lemma eval_change_free :
-  forall f "induction":fmla, sigma:env, pi:stack, id:ident, v:value.
+  forall f [@induction]:fmla, sigma:env, pi:stack, id:ident, v:value.
     fresh_in_fmla id f ->
     (eval_fmla sigma (Cons (id,v) pi) f <-> eval_fmla sigma pi f)
 
@@ -688,7 +688,7 @@ function wp (s:stmt) (q:fmla) : fmla =
        eval_fmla sigma pi f -> eval_fmla sigma pi (wp body f)
 
   lemma monotonicity:
-    forall s "induction":stmt, p q:fmla.
+    forall s [@induction]:stmt, p q:fmla.
       valid_fmla (Fimplies p q)
      -> valid_fmla (Fimplies (wp s p) (wp s q) )
 
@@ -704,7 +704,7 @@ function wp (s:stmt) (q:fmla) : fmla =
   *)
 
   lemma distrib_conj:
-    forall s "induction":stmt, sigma:env, pi:stack, p q:fmla.
+    forall s [@induction]:stmt, sigma:env, pi:stack, p q:fmla.
      (eval_fmla sigma pi (wp s p)) /\
      (eval_fmla sigma pi (wp s q)) ->
      eval_fmla sigma pi (wp s (Fand p q))
@@ -717,7 +717,7 @@ function wp (s:stmt) (q:fmla) : fmla =
       eval_fmla sigma' pi' (wp s' q)
 
   lemma progress:
-    forall s "induction":stmt, sigma:env, pi:stack,
+    forall s [@induction]:stmt, sigma:env, pi:stack,
            sigmat: type_env, pit: type_stack, q:fmla.
       compatible_env sigma sigmat pi pit ->
       type_stmt sigmat pit s ->

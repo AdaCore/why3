@@ -224,7 +224,7 @@ module N
     ensures  {
       value_sub x n (m+1) =
         value_sub x n m + l2i (Map.get x m) * power radix (m-n) }
-  = "vc:sp" if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
+  = [@vc:sp] if n < m then value_sub_tail x (n+1) m else ()(*assert { 1+2=3 }*)
 
   let rec lemma value_sub_concat (x:map int limb) (n m l:int)
     requires { n <= m <= l}

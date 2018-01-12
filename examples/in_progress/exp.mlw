@@ -9,13 +9,13 @@ module Exp
   val ( +. ) (x y : t) : t
     requires {t'isFinite x}
     requires {t'isFinite y}
-    requires {"expl:no_overflow" t'isFinite (x .+ y)}
+    requires {[@expl:no_overflow] t'isFinite (x .+ y)}
     ensures  {result = x .+ y}
 
   val ( *. ) (x y : t) : t
     requires {t'isFinite x}
     requires {t'isFinite y}
-    requires {"expl:no_overflow" t'isFinite (x .* y)}
+    requires {[@expl:no_overflow] t'isFinite (x .* y)}
     ensures  {result = x .* y}
 
   let my_exp (x: t) : t

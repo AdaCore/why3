@@ -13,12 +13,12 @@ module Int
   use export int.ComputerDivision
 
   let (/) (x: int) (y: int)
-    requires { "expl:check division by zero" y <> 0 }
+    requires { [@expl:check division by zero] y <> 0 }
     ensures  { result = div x y }
   = div x y
 
   let (%) (x: int) (y: int)
-    requires { "expl:check modulo by zero" y <> 0 }
+    requires { [@expl:check modulo by zero] y <> 0 }
     ensures  { result = mod x y }
   = mod x y
 
@@ -55,23 +55,23 @@ module Bounded_int
   axiom to_int_in_bounds: forall n:t. in_bounds n
 
   val of_int (n:int) : t
-    requires { "expl:integer overflow" in_bounds n }
+    requires { [@expl:integer overflow] in_bounds n }
     ensures  { result = n }
 
   val (+) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (a + b) }
+    requires { [@expl:integer overflow] in_bounds (a + b) }
     ensures   { result = a + b }
 
   val (-) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (a - b) }
+    requires { [@expl:integer overflow] in_bounds (a - b) }
     ensures  { result = a - b }
 
   val ( * ) (a:t) (b:t) : t
-    requires { "expl:integer overflow" in_bounds (a * b) }
+    requires { [@expl:integer overflow] in_bounds (a * b) }
     ensures  { result = a * b }
 
   val (-_) (a:t) : t
-    requires { "expl:integer overflow" in_bounds (- a) }
+    requires { [@expl:integer overflow] in_bounds (- a) }
     ensures  { result = - a }
 
   axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
@@ -95,13 +95,13 @@ module Bounded_int
   use import int.ComputerDivision
 
   val (/) (a:t) (b:t) : t
-    requires { "expl:division by zero" b <> 0 }
-    requires { "expl:integer overflow" in_bounds (div a b) }
+    requires { [@expl:division by zero] b <> 0 }
+    requires { [@expl:integer overflow] in_bounds (div a b) }
     ensures  { result = div a b }
 
   val (%) (a:t) (b:t) : t
-    requires { "expl:division by zero" b <> 0 }
-    requires { "expl:integer overflow" in_bounds (mod a b) }
+    requires { [@expl:division by zero] b <> 0 }
+    requires { [@expl:integer overflow] in_bounds (mod a b) }
     ensures  { result = mod a b }
 
 end
@@ -258,26 +258,26 @@ module Refint63
   use export ref.Ref
 
   let incr (r: ref int63) : unit
-    requires { "expl:integer overflow" to_int !r < max_int63 }
+    requires { [@expl:integer overflow] to_int !r < max_int63 }
     ensures  { to_int !r = to_int (old !r) + 1 }
   = r := !r + of_int 1
   let decr (r: ref int63) : unit
-    requires { "expl:integer overflow" min_int63 < to_int !r }
+    requires { [@expl:integer overflow] min_int63 < to_int !r }
     ensures  { to_int !r = to_int (old !r) - 1 }
   = r := !r - of_int 1
 
   let (+=) (r: ref int63) (v: int63) : unit
-    requires { "expl:integer overflow" in_bounds (to_int !r + to_int v) }
+    requires { [@expl:integer overflow] in_bounds (to_int !r + to_int v) }
     ensures { to_int !r = to_int (old !r) + to_int v }
   = r := !r + v
 
   let (-=) (r: ref int63) (v: int63) : unit
-    requires { "expl:integer overflow" in_bounds (to_int !r - to_int v) }
+    requires { [@expl:integer overflow] in_bounds (to_int !r - to_int v) }
     ensures  { to_int !r = to_int (old !r) - to_int v }
   = r := !r - v
 
   let ( *= ) (r: ref int63) (v: int63) : unit
-    requires { "expl:integer overflow" in_bounds (to_int !r * to_int v) }
+    requires { [@expl:integer overflow] in_bounds (to_int !r * to_int v) }
     ensures { to_int !r = to_int (old !r) * to_int v }
   = r := !r * v
 

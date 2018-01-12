@@ -19,11 +19,11 @@ module Pervasives
   use import mach.int.Int63
 
   val succ (x: int63) : int63
-    requires { "expl:integer overflow" in_bounds (to_int x + 1) }
+    requires { [@expl:integer overflow] in_bounds (to_int x + 1) }
     ensures  { to_int result = to_int x + 1 }
 
   val pred (x: int63) : int63
-    requires { "expl:integer overflow" in_bounds (to_int x - 1) }
+    requires { [@expl:integer overflow] in_bounds (to_int x - 1) }
     ensures  { to_int result = to_int x - 1 }
 
   exception AssertFailure

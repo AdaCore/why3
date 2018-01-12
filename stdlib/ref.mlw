@@ -13,7 +13,7 @@
 
 module Ref
 
-  type ref 'a = { mutable contents "model_trace:" : 'a }
+  type ref 'a = { mutable contents [@model_trace:] : 'a }
 
   function (!) (x: ref 'a) : 'a = x.contents
 

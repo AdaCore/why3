@@ -315,7 +315,7 @@ module SchorrWaite
       (* Need induction to recover path-based specification. *)
       assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
         mem x graph /\ black memo.colors[x] ->
-        ("induction" path m x y) -> black memo.colors[y] }
+        ([@induction] path m x y) -> black memo.colors[y] }
     end
 
 end

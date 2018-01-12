@@ -15,11 +15,11 @@ module Matrix
     0 <= r < a.rows /\ 0 <= c < a.columns
 
   val get (a: matrix 'a) (r c: int) : 'a
-    requires { "expl:index in matrix bounds" valid_index a r c }
+    requires { [@expl:index in matrix bounds] valid_index a r c }
     ensures  { result = a.elts r c }
 
   val set (a: matrix 'a) (r c: int) (v: 'a) : unit
-    requires { "expl:index in matrix bounds" valid_index a r c }
+    requires { [@expl:index in matrix bounds] valid_index a r c }
     writes   { a }
     ensures  { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
 
@@ -28,14 +28,14 @@ module Matrix
   exception OutOfBounds
 
   let defensive_get (a: matrix 'a) (r c: int) : 'a
-    ensures { "expl:index in matrix bounds" valid_index a r c }
+    ensures { [@expl:index in matrix bounds] valid_index a r c }
     ensures { result = a.elts r c }
     raises  { OutOfBounds -> not (valid_index a r c) }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
     get a r c
 
   let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
-    ensures { "expl:index in matrix bounds" valid_index a r c }
+    ensures { [@expl:index in matrix bounds] valid_index a r c }
     ensures { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
     raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
   = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;

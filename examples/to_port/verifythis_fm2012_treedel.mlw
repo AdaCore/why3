@@ -1,5 +1,5 @@
 
-(* {1 The VerifyThis competition at FM2012: Problem 3}
+(** {1 The VerifyThis competition at FM2012: Problem 3}
 
    See {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
 
@@ -112,7 +112,7 @@ module Treedel
     end
 
   lemma inorder_zip:
-     forall z "induction": zipper 'a, x: 'a, l r: tree 'a.
+     forall z [@induction]: zipper 'a, x: 'a, l r: tree 'a.
      inorder (zip (Node l x r) z) = inorder l ++ Cons x (inorder (zip r z))
 
   let ghost tree_left (t: tree loc) : tree loc

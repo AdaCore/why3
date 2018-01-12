@@ -399,7 +399,7 @@ module BV_Gen
   predicate (==) (v1 v2 : t) =
     eq_sub v1 v2 0 size
 
-  axiom Extensionality "W:non_conservative_extension:N" :
+  axiom Extensionality [@W:non_conservative_extension:N] :
     forall x y : t [x == y]. x == y -> x = y
 
   val eq (v1 v2 : t) : bool

@@ -12,7 +12,7 @@ module FastExponentiation
   let rec fast_exp x n variant { n }
     requires { 0 <= n }
     ensures { result = power x n }
-  = "vc:sp"
+  = [@vc:sp]
     if n = 0 then
       1
     else begin
@@ -27,7 +27,7 @@ module FastExponentiation
   let fast_exp_imperative x n
     requires { 0 <= n }
     ensures { result = power x n }
-  = "vc:sp"
+  = [@vc:sp]
     let r = ref 1 in
     let p = ref x in
     let e = ref n in

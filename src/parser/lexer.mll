@@ -137,6 +137,8 @@ rule token = parse
     (digit+ as echar) space* "#"
       { POSITION (Loc.user_position file (int_of_string line)
                  (int_of_string bchar) (int_of_string echar)) }
+  | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
+      { ATTRIBUTE lbl }
   | '\n'
       { Lexlib.newline lexbuf; token lexbuf }
   | space+

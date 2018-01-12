@@ -222,9 +222,9 @@ module TestExtraction
 
   use import option.Option
 
-  let opt_f (x "ocaml:named": int) (y "ocaml:named") = x+y
+  let opt_f (x [@ocaml:named]: int) (y [@ocaml:named]) = x+y
   let constant opt_a = opt_f 40 2
-  let opt_g (x "ocaml:optional") (y "ocaml:named": int) =
+  let opt_g (x [@ocaml:optional]) (y [@ocaml:named]: int) =
      match x with None -> y | Some x -> x + y end
   let constant opt_b = opt_g None 42
   let constant opt_c = opt_g (Some 40) 2

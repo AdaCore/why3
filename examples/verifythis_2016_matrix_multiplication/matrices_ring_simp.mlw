@@ -309,7 +309,7 @@ module Symb
     e_cols : int;
   }
 
-  predicate (-->) (x y:'a) = "rewrite" x = y
+  predicate (-->) (x y:'a) = [@rewrite] x = y
   meta rewrite_def predicate (-->)
 
   predicate e_vld (env:env) (e:expr) =

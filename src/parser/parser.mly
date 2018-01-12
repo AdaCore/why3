@@ -117,6 +117,7 @@
 %token <string> OP1 OP2 OP3 OP4 OPPREF
 %token <Number.real_literal> REAL
 %token <string> STRING
+%token <string> ATTRIBUTE
 %token <Loc.position> POSITION
 %token <string> QUOTE_LIDENT
 
@@ -1256,7 +1257,7 @@ sident:
 labels(X): X label* { add_lab $1 $2 }
 
 label:
-| STRING    { Lstr (Ident.create_label $1) }
+| ATTRIBUTE { Lstr (Ident.create_label $1) }
 | POSITION  { Lpos $1 }
 
 (* Miscellaneous *)

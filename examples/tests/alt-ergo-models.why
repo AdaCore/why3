@@ -5,15 +5,15 @@ theory T
 
   goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
 
-  goal g_lab0 : forall x "model:0":int. ("model:cond" x >= 42) ->
-    ("model:concl" x + 3 <= 50)
+  goal g_lab0 : forall x [@model:0]:int. ([@model:cond] x >= 42) ->
+    ([@model:concl] x + 3 <= 50)
 
-  goal g_lab1 : forall x "model:1":int. ("model:cond" x >= 42) ->
-    ("model:concl" x + 3 <= 50)
+  goal g_lab1 : forall x [@model:1]:int. ([@model:cond] x >= 42) ->
+    ([@model:concl] x + 3 <= 50)
 
   constant g : int
 
-  goal g2_lab : forall x "model:0":int. ("model:concl" g >= x)
+  goal g2_lab : forall x [@model:0]:int. ([@model:concl] g >= x)
 
 
 end
@@ -22,49 +22,49 @@ theory ModelInt
 
 use import int.Int
 
-goal test0 : forall x "model:0":int. not (0 < x < 1)
+goal test0 : forall x [@model:0]:int. not (0 < x < 1)
 
-goal test1 : forall x "model:0":int. not (0 <= x <= 1)
+goal test1 : forall x [@model:0]:int. not (0 <= x <= 1)
 
 use import int.EuclideanDivision
 
-goal test2 : forall x "model:0":int. div x x = 1
+goal test2 : forall x [@model:0]:int. div x x = 1
 
 goal test_overflow:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      0 <= x <= 65535 /\ 0 <= y <= 65535 -> 0 <= x + y <= 65535
 
 goal test_overflow2:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      -2 <= x <= 65535 /\ -2 <= y <= 65535 -> -2 <= x + y <= 65535
 
 predicate is_int16 (x:int) = -65536 <= x <= 65535
 
 goal test_overflow_int16:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      is_int16 x /\ is_int16 y -> is_int16 (x + y)
 
 goal test_overflow_int16_alt:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
       -65536 <= x <= 65535 /\ -65536 <= y <= 65535 -> -65536 <= x+y <= 65535
 
 goal test_overflow_int16_bis:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      is_int16 x /\ is_int16 y /\
-     ("model:cond1" 0 <= x) /\ (x <= y) -> is_int16 (x + y)
+     ([@model:cond1] 0 <= x) /\ (x <= y) -> is_int16 (x + y)
 
 predicate is_int32 (x:int) = -2147483648 <= x <= 2147483647
 
 goal test_overflow_int32:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      is_int32 x /\ is_int32 y -> is_int32 (x + y)
 
 goal test_overflow_int32_bis:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      is_int32 x /\ is_int32 y /\ 0 <= x <= y -> is_int32 (x + y)
 
 goal test_overflow_int32_bis_inline:
-  forall x "model:0" y "model:0" :  int.
+  forall x [@model:0] y [@model:0] :  int.
      -2147483648 <= x <= 2147483647 /\ -2147483648 <= y <= 2147483647 /\ 0 <= x <= y -> -2147483648 <= x + y <= 2147483647
 
 end
@@ -73,9 +73,9 @@ theory ModelReal
 
 use import real.Real
 
-goal test1 : forall x "model:0":real. not (0.0 < x < 1.0)
+goal test1 : forall x [@model:0]:real. not (0.0 < x < 1.0)
 
-goal test2 : forall x "model:0":real. x/x=1.0
+goal test2 : forall x [@model:0]:real. x/x=1.0
 
 end
 
@@ -83,7 +83,7 @@ theory ModelArray
 
 use import map.Map
 
-goal t1 : forall t "model:0" :map int int, i "model:0" : int.
+goal t1 : forall t [@model:0] :map int int, i [@model:0] : int.
    get (set t 0 42) i = get t i
 
 end

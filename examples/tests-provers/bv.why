@@ -323,7 +323,7 @@ theory Extras
 
   use import bv.BV64
 
-  lemma mod_mult: forall x "model" a "model" b "model".
+  lemma mod_mult: forall x [@model] a [@model] b [@model].
       ule zeros x ->
       ult zeros a ->
       ult zeros b ->

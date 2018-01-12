@@ -233,7 +233,7 @@ module GenericFloat
 
   (* Axioms on round *)
 
-  axiom Bounded_real_no_overflow "W:non_conservative_extension:N" :
+  axiom Bounded_real_no_overflow [@W:non_conservative_extension:N] :
     forall m:mode, x:real. in_range x -> no_overflow m x
 
   axiom Round_monotonic :

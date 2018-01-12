@@ -274,7 +274,7 @@ module OfList
     | Cons _ r -> of_list_app r l2
     end
 
-  lemma of_list_app_length: forall l1"induction" l2: list 'a.
+  lemma of_list_app_length: forall l1 [@induction] l2: list 'a.
     length (of_list (l1 ++ l2)) = L.length l1 + L.length l2
 
   let rec lemma of_list_snoc (l: list 'a) (x: 'a)
