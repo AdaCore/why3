@@ -140,7 +140,7 @@ rule token = parse
   | "[@" space* ([^ ' ' '\n' ']']+ (' '+ [^ ' ' '\n' ']']+)* as lbl) space* ']'
       { ATTRIBUTE lbl }
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | '_'

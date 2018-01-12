@@ -17,11 +17,6 @@
   open Lexing
   open Why3
 
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
   let backtrack lexbuf =
     lexbuf.lex_curr_pos <- lexbuf.lex_start_pos;
     lexbuf.lex_curr_p <- lexbuf.lex_start_p
@@ -135,7 +130,7 @@ rule scan fmt empty delayed = parse
           { print_ident fmt lexbuf s;
             scan fmt false delayed lexbuf }
   | space* '\n'
-          { newline lexbuf;
+          { new_line lexbuf;
             match empty, delayed with
             | false, d ->
               pp_print_char fmt '\n';
@@ -165,7 +160,7 @@ and scan_isolated fmt empty in_pre delayed = parse
   | eof   { if in_pre then pp_print_string fmt "</pre>\n";
             if delayed <> "" then pp_print_string fmt delayed }
   | space* '\n'
-          { newline lexbuf;
+          { new_line lexbuf;
             match empty, delayed with
             | false, d | true, ("" as d) ->
               scan_isolated fmt true in_pre d lexbuf
@@ -188,7 +183,7 @@ and scan_embedded fmt depth = parse
   | ident as s
           { print_ident fmt lexbuf s;
             scan_embedded fmt depth lexbuf }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              pp_print_char fmt '\n';
              scan_embedded fmt depth lexbuf }
   | '"'    { pp_print_string fmt "&quot;";
@@ -204,7 +199,7 @@ and comment fmt do_output = parse
              comment fmt do_output lexbuf }
   | "*)"   { if do_output then pp_print_string fmt "*)" }
   | eof    { () }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              if do_output then pp_print_char fmt '\n';
              comment fmt do_output lexbuf }
   | '"'    { if do_output then pp_print_string fmt "&quot;";
@@ -218,7 +213,7 @@ and comment fmt do_output = parse
              comment fmt do_output lexbuf }
 
 and string fmt do_output = parse
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              if do_output then pp_print_char fmt '\n';
              string fmt do_output lexbuf }
   | '"'    { if do_output then pp_print_string fmt "&quot;" }
@@ -233,12 +228,12 @@ and doc fmt block headings = parse
   | ' '* "*)"
            { if block then pp_print_string fmt "</p>\n" }
   | eof    { () }
-  | "\n" space* "\n" { newline lexbuf;
-             newline lexbuf;
+  | "\n" space* "\n" { new_line lexbuf;
+             new_line lexbuf;
              if block then pp_print_string fmt "</p>";
              pp_print_char fmt '\n';
              doc fmt false headings lexbuf }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              pp_print_char fmt '\n';
              doc fmt block headings lexbuf }
   | '{' (['1'-'6'] as c) ' '*
@@ -283,7 +278,7 @@ and doc fmt block headings = parse
 and raw_html fmt depth = parse
   | "*)"  { backtrack lexbuf }
   | eof    { () }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              pp_print_char fmt '\n';
              raw_html fmt depth lexbuf }
   | '{'    { pp_print_char fmt '{'; raw_html fmt (succ depth) lexbuf }

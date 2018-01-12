@@ -72,7 +72,7 @@ let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
 
 rule token = parse
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | "(*)"

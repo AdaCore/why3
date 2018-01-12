@@ -45,11 +45,6 @@
     fun s -> try Hashtbl.find h s with Not_found ->
       raise (Lexing_error ("no such annotation '" ^ s ^ "'"))
 
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
   let string_buffer = Buffer.create 1024
 
   let stack = ref [0]  (* indentation stack *)
@@ -77,7 +72,7 @@ let space = ' ' | '\t'
 let comment = "#" [^'@''\n'] [^'\n']*
 
 rule next_tokens = parse
-  | '\n'    { newline lexbuf; update_stack (indentation lexbuf) }
+  | '\n'    { new_line lexbuf; update_stack (indentation lexbuf) }
   | (space | comment)+
             { next_tokens lexbuf }
   | "\\" space* '\n' space* "#@"?
@@ -120,7 +115,7 @@ rule next_tokens = parse
 and indentation = parse
   | (space | comment)* '\n'
       (* skip empty lines *)
-      { newline lexbuf; indentation lexbuf }
+      { new_line lexbuf; indentation lexbuf }
   | space* as s
       { String.length s }
 
