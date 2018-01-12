@@ -1963,50 +1963,50 @@ install_no_local::
 .PHONY: stdlibdoc
 
 STDLIBS = \
-	algebra.why \
-	array.mlw \
-	bag.why \
-	bintree.why \
-	bool.why \
-	bv.why \
-	floating_point.why \
-	graph.why \
-	hashtbl.mlw \
-	ieee_float.why \
-	impset.mlw \
-	int.why \
-	list.why \
-	map.why \
-	matrix.mlw \
-	number.why \
-	option.why \
-	pigeon.why \
-	pqueue.mlw \
-	queue.mlw \
-	random.mlw \
-	real.why \
-	ref.mlw \
-	relations.why \
-	seq.why \
-	set.why \
-	stack.mlw \
-	string.mlw \
-	sum.why \
-	mach/array.mlw \
-	mach/int.mlw
+	algebra \
+	array \
+	bag \
+	bintree \
+	bool \
+	bv \
+	floating_point \
+	graph \
+	hashtbl \
+	ieee_float \
+	impset \
+	int \
+	list \
+	map \
+	matrix \
+	number \
+	option \
+	pigeon \
+	pqueue \
+	queue \
+	random \
+	real \
+	ref \
+	relations \
+	seq \
+	set \
+	stack \
+	string \
+	sum \
+	mach/array \
+	mach/int
 # function ? tptp ?
 
-STDLIBFILES = $(addprefix stdlib/, $(STDLIBS))
+STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 
 # TODO: remove the hack about int.why once it has become builtin
 stdlibdoc: $(STDLIBFILES) bin/why3doc.@OCAMLBEST@
 	mkdir -p doc/stdlibdoc
-	sed -e "s/use import Int/use import int.Int/" stdlib/int.why > int.why
+	sed -e "s/use import Int/use import int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
 	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ -L stdlib \
           -o doc/stdlibdoc --title "Why3 Standard Library" \
-	  $(subst stdlib/int.why,int.why,$(STDLIBFILES))
-	rm int.why
+	  $(subst stdlib/int.mlw,int.mlw,$(STDLIBFILES))
+	rm int.mlw
 	cd doc/stdlibdoc; \
 	  for f in stdlib.*.html; \
 	    do mv "$$f" "$${f#stdlib.}"; done
