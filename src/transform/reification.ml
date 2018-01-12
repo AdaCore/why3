@@ -10,6 +10,8 @@ exception Exit
 
 let debug = false
 
+let print_id fmt id = Format.fprintf fmt "%s" id.id_string
+              
 let expl_reification_check = Ident.create_label "expl:reification check"
 
 type reify_env = { kn: known_map;
@@ -393,22 +395,23 @@ let build_vars_map renv prev =
                   let prev = Task.add_decl prev d in
                   Mvs.add vy y subst, prev)
                 renv.var_maps (renv.subst, prev) in
-  let prev = Mvs.fold
-               (fun vy _ prev ->
-                 if debug then Format.printf "checking %a@." Pretty.print_vs vy;
-                 let vs = Mty.find vy.vs_ty renv.ty_to_map in
-                 if vs_equal vy vs then prev
-                 else begin
-                   if debug
-                   then Format.printf "aliasing %a and %a@."
-                                      Pretty.print_vs vy Pretty.print_vs vs;
-                   let y = Mvs.find vy subst in
-                   let z = Mvs.find vs subst in
-                   let et = t_equ y z in
-                   let pr = create_prsymbol (Ident.id_fresh "map_alias") in
-                   let d = create_prop_decl Paxiom pr et in
-                   Task.add_decl prev d end)
-               renv.var_maps prev in
+  let prev, prs =
+    Mvs.fold
+      (fun vy _ (prev,prs) ->
+        if debug then Format.printf "checking %a@." Pretty.print_vs vy;
+        let vs = Mty.find vy.vs_ty renv.ty_to_map in
+        if vs_equal vy vs then prev,prs
+        else begin
+            if debug
+            then Format.printf "aliasing %a and %a@."
+                               Pretty.print_vs vy Pretty.print_vs vs;
+            let y = Mvs.find vy subst in
+            let z = Mvs.find vs subst in
+            let et = t_equ y z in
+            let pr = create_prsymbol (Ident.id_fresh "map_alias") in
+            let d = create_prop_decl Paxiom pr et in
+            Task.add_decl prev d, pr::prs end)
+      renv.var_maps (prev, []) in
   if not (List.for_all (fun v -> Mvs.mem v subst) renv.lv)
   then (if debug
         then Format.printf "vars not matched: %a@."
@@ -416,22 +419,23 @@ let build_vars_map renv prev =
                            (List.filter (fun v -> not (Mvs.mem v subst)) renv.lv);
         raise Exit);
   if debug then Format.printf "all vars matched@.";
-  let prev = Mterm.fold
-               (fun t (vy,i) prev ->
-                 let y = Mvs.find vy subst in
-                 let et = t_equ
-                            (t_app fs_func_app [y; t_nat_const i]
-                                   t.t_ty)
-                            t in
-                 if debug then Format.printf "%a %d = %a@."
-                                             Pretty.print_vs vy i Pretty.print_term t;
-                 let pr = create_prsymbol (Ident.id_fresh "y_val") in
-                 let d = create_prop_decl Paxiom pr et in
-                 Task.add_decl prev d)
-               renv.store prev in
-  subst, prev
+  let prev, prs =
+    Mterm.fold
+      (fun t (vy,i) (prev,prs) ->
+        let y = Mvs.find vy subst in
+        let et = t_equ
+                   (t_app fs_func_app [y; t_nat_const i]
+                          t.t_ty)
+                   t in
+        if debug then Format.printf "%a %d = %a@."
+                                    Pretty.print_vs vy i Pretty.print_term t;
+        let pr = create_prsymbol (Ident.id_fresh "y_val") in
+        let d = create_prop_decl Paxiom pr et in
+        Task.add_decl prev d, pr::prs)
+      renv.store (prev,prs) in
+  subst, prev, prs
 
-let build_goals prev subst lp g rt =
+let build_goals prev prs subst env lp g rt =
   if debug then Format.printf "building goals@.";
   let inst_rt = t_subst subst rt in
   if debug then Format.printf "reified goal instantiated@.";
@@ -446,6 +450,7 @@ let build_goals prev subst lp g rt =
   let task_r = Task.add_decl (Task.add_decl prev d_r) d in
   if debug then Format.printf "building cut indication rt %a g %a@."
                               Pretty.print_term rt Pretty.print_term g;
+  let compute_in_goal = Compute.normalize_goal_transf_all env in
   let ltask_r =
     try let ci =
           match (rt.t_node, g.t_node) with
@@ -457,14 +462,34 @@ let build_goals prev subst lp g rt =
                              l rl
           | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
           | _ -> raise Exit in
-        (* todo on context interp, revert post
-           and compute_specified interp functions*)
-        if debug then Format.printf "cut ok@.";
+        if debug then Format.printf "cut ok@."; 
         Trans.apply (Cut.cut ci (Some "interp")) task_r
-    with _ -> if debug then Format.printf "no cut found@."; [task_r] in
+    with _ ->
+         if debug then Format.printf "no cut found@.";
+         let t = Trans.apply (Ind_itp.revert_tr_symbol [Tsprsymbol hr]) task_r in
+         let t = Trans.apply compute_in_goal t in
+         match t with
+         | [t] ->
+            let rewrite pr = Apply.rewrite None false pr None in
+            let lt, prs =
+              List.fold_left
+                (fun (acc, f) pr ->
+                  try (Lists.apply (Trans.apply (rewrite pr)) acc,f)
+                  with _ -> acc, pr::f)
+                ([t],[]) prs in
+            (* for the prs that failed once, trying again seems to work ? *)
+            List.fold_left
+              (fun acc pr ->
+                try Lists.apply (Trans.apply (rewrite pr)) acc
+                with _ -> acc)
+              lt (List.rev prs)
+            
+         | [] -> []
+         | _ -> assert false in
   let lt = List.map (fun ng -> Task.add_decl prev
                        (create_prop_decl Pgoal (create_prsymbol (id_fresh "G")) ng))
                     inst_lp in
+  let lt = Lists.apply (Trans.apply compute_in_goal) lt in
   if debug then Format.printf "done@.";
   ltask_r@lt
 
@@ -482,8 +507,8 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
     let nt = Args_wrapper.build_naming_tables task in
     let crc = nt.Trans.coercion in
     let renv = reify_term (init_renv kn crc lv env prev) g rt in
-    let subst, prev = build_vars_map renv prev in
-    build_goals prev subst lp g rt
+    let subst, prev, prs= build_vars_map renv prev in
+    build_goals prev prs subst env lp g rt
   with NoReification | Exit -> [task])
 
 open Mltree
@@ -808,8 +833,6 @@ type info = {
     funs: decl Mrs.t;
     cs: string list; (* callstack for debugging *)
   }
-
-let print_id fmt id = fprintf fmt "%s" id.id_string
 
 let get pv info : value =  Mid.find pv.pv_vs.vs_name info.vars
 
@@ -1144,8 +1167,8 @@ let reflection_by_function s env = Trans.store (fun task ->
   in
   let rinfo, lp, _lv, rt = reify_post lpost in
   let lp = (rs.rs_cty.cty_pre)@lp in
-  let subst, prev = build_vars_map rinfo prev in
-  build_goals prev subst lp g rt)
+  let subst, prev, prs = build_vars_map rinfo prev in
+  build_goals prev prs subst env lp g rt)
 
 let () = wrap_and_register
            ~desc:"reflection_l <prop> attempts to prove the goal by reflection using the lemma prop"

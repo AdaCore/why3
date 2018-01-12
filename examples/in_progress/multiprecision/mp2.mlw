@@ -255,6 +255,16 @@ module N
 
   meta remove_prop axiom value_tail
 
+  let lemma value_concat (x:t) (n m:int32)
+    requires { 0 <= n <= m }
+    ensures  { value x m
+             = value x n + power radix n
+                            * value_sub (pelts x) (x.offset + n) (x.offset + m) }
+
+  = value_sub_concat (pelts x) x.offset (x.offset + p2i n) (x.offset + p2i m)
+
+  meta remove_prop axiom value_concat
+
   function compare_int (x y:int) : int =
     if x < y then -1 else if x=y then 0 else 1
 
@@ -1409,7 +1419,7 @@ module N
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }
-    requires { valid r (sz +  sz) }
+    requires { valid r (sz + sz) }
     writes { r.data.elts }
     ensures { value r (sz + sz)
               = value x sz * value y sz }
@@ -1433,18 +1443,11 @@ module N
       invariant { 0 <= !c <= 1 }
       variant { sz - !i }
       label StartLoop in
-      let ghost k = p2i !i in
-      value_sub_concat (pelts r) r.offset (r.offset + k)
-                       (r.offset + k + p2i sz);
-      assert { value r k
-             + (power radix k) * value_sub (pelts r) (r.offset + k)
-                                                   (r.offset + k + sz)
-             = value r (k + sz) };
+      value_concat r !i (!i + sz);
       ly := get_ofs y !i;
       let c' =  addmul_limb !rp x !ly sz in
       assert { value !rp sz + power radix sz * c'
-              = value (!rp at StartLoop) sz
-                + value x sz * !ly };
+              = value (!rp at StartLoop) sz + value x sz * !ly };
       assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
                 r.offset (!rp).offset
                 by (!rp).offset = r.offset + !i
@@ -1456,30 +1459,33 @@ module N
       let (res, carry) = add_with_carry c' limb_zero !c in
       label BeforeCarry in
       value_sub_update_no_change (pelts r) ((!rp).offset + p2i sz)
-                        r.offset  (r.offset + p2i !i) res;
+                        r.offset (r.offset + p2i !i) res;
       set_ofs !rp sz res;
+      assert { (pelts !rp)[offset !rp + sz] = res = (pelts r)[offset r + (!i + sz)] };
       c:= carry;
-      i := Int32.(+) !i one;
-      assert { value r k = value (r at BeforeCarry) k
-             = value (r at StartLoop) k};
-      value_sub_tail (pelts r) r.offset (r.offset + p2i sz + k);
-      value_sub_tail (pelts y) y.offset (y.offset + k);
-      value_sub_concat (pelts r) r.offset (r.offset + k) (r.offset + k + p2i sz);
-      assert { value_sub (pelts r) (r.offset+k) (r.offset+k+sz)
+      assert { value r !i = value (r at BeforeCarry) !i
+             = value (r at StartLoop) !i};
+      value_tail r (!i + sz);
+      assert { value r (!i + sz + 1) = value r (!i + sz)
+                     + power radix (!i + sz) * (pelts r)[offset r + (!i + sz)] };
+      value_tail y !i;
+      value_concat r !i (!i + sz);
+      assert { value_sub (pelts r) (r.offset + !i) (r.offset + (!i + sz))
                = value !rp sz };
-      assert { value r (!i + sz)
-                    + (power radix (!i + sz)) * !c
-                  = value x sz
-                      * value y !i
-               by (value !rp sz + power radix sz * c'
-                  = value (!rp at StartLoop) sz + value x sz * !ly
-                  by value !rp sz = value (!rp at BeforeCarry) sz)
-               so power radix (k + sz) = power radix k * power radix sz
-               so
-                 value (r at StartLoop) k
-                 + (power radix k) * value_sub (pelts r at StartLoop)
-                                   (r.offset + k) (r.offset + k + sz)
-                 = value (r at StartLoop) (k + sz)
+      assert { value !rp sz = value (!rp at BeforeCarry) sz };
+      assert { value !rp sz + power radix sz * c'
+                 = value (!rp at StartLoop) sz + value x sz * !ly };
+      assert { value (r at StartLoop) !i
+                 + (power radix !i) * value_sub (pelts r at StartLoop)
+                                   (r.offset + !i) (r.offset + (!i + sz))
+                 = value (r at StartLoop) (!i + sz) };
+      assert { value x sz * value y (!i + 1)
+               = value x sz * value y !i + (power radix !i) * (value x sz * !ly) };
+             (* nonlinear *)
+      assert { value r (!i + sz + 1)
+                    + (power radix (!i + sz + 1)) * !c
+                  = value x sz * value y (!i+1)
+               (*by power radix (k + sz) = power radix k * power radix sz
                so
                  value r (!i + sz)
                     + (power radix (!i + sz)) * !c
@@ -1543,8 +1549,9 @@ module N
                 + power radix k * value x sz * !ly
                = value x sz *
                  (value y k + power radix k * !ly)
-               = value x sz * value y !i
+               = value x sz * value y !i *)
              };
+      i := Int32.(+) !i one;
       rp.contents <- C.incr !rp one;
     done;
     value_sub_lower_bound (pelts r) r.offset (r.offset + p2i sz + p2i sz);
@@ -1893,11 +1900,10 @@ module N
 
   let lsld_ext (x cnt:limb) : (limb,limb)
     requires { 0 <= cnt < Limb.length }
-    returns { (r,d) -> l2i r + radix * l2i d =
-              (power 2 (cnt)) * x }
-    returns { (r,_d) ->  mod (l2i r) (power 2 (cnt)) = 0 }
-    returns { (r,_d) ->  l2i r <= radix - (power 2 (cnt)) }
-    returns { (_r,d) -> l2i d < power 2 (cnt) }
+    returns { (r,d) -> uint64'int r + radix * uint64'int d = (power 2 cnt) * x }
+    returns { (r,_d) -> mod (l2i r) (power 2 cnt) = 0 }
+    returns { (r,_d) -> l2i r <= radix - (power 2 cnt) }
+    returns { (_r,d) -> l2i d < power 2 cnt }
   =
     let uzero = Limb.of_int 0 in
     if (Limb.(=) cnt uzero) then (x, uzero)
@@ -2148,7 +2154,6 @@ module N
       invariant { pelts !xp = pelts x }
       invariant { !low < power 2 (tnc) }
       label StartLoop in
-      let ghost k = p2i !i in
       xp.contents <- C.incr !xp one;
       high := C.get !xp;
       let l,h = lsld_ext !high tnc in
@@ -2156,15 +2161,17 @@ module N
       let ghost v = Limb.(+) !low l in
       value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) v;
       C.set !rp (Limb.(+) !low l);
-      assert { value r k = value (r at StartLoop) k };
-      rp.contents <- C.incr !rp one;
+      assert { value r !i = value (r at StartLoop) !i };
+      value_tail r !i;
+      value_tail x (!i+1);
+      assert { (pelts r)[r.offset + !i] = !low + l };
       low := h;
+      let ghost k = p2i !i in
       i := Int32.(+) !i one;
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + p2i !i);
+      (*todo let c = power 2 tnc in... replace occurences by c and try reflection*)
       assert { retval + radix * (value r !i
                  + (power radix !i) * !low)
-                 = value x (1 + !i) * (power 2 (tnc))
+                 = value x (!i+1) * (power 2 tnc)
                by
                  (pelts r)[r.offset + k]
                = (pelts r)[(!rp.offset at StartLoop)]
@@ -2210,6 +2217,7 @@ module N
                  * power 2 (tnc)
                = value x (1 + !i) * power 2 (tnc)
       };
+      rp.contents <- C.incr !rp one;
     done;
     label EndLoop in
     assert { retval + radix * (value r msb
