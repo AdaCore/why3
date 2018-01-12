@@ -79,8 +79,8 @@ let forget_var vs = forget_id iprinter vs.vs_name
 
 (* pretty-print infix and prefix logic symbols *)
 
-let extract_op ls =
-  let s = ls.ls_name.id_string in
+let extract_op s =
+  (*let s = ls.ls_name.id_string in*)
   let len = String.length s in
   if len < 7 then None else
   let inf = String.sub s 0 6 in
@@ -109,9 +109,10 @@ let print_ts fmt ts =
 let print_ls fmt ls =
   if ls.ls_name.id_string = "mixfix []" then fprintf fmt "([])" else
   if ls.ls_name.id_string = "mixfix [<-]" then fprintf fmt "([<-])" else
-  match extract_op ls with
+  let s = id_unique iprinter ls.ls_name in
+  match extract_op s with
   | Some s -> fprintf fmt "(%s)" (escape_op s)
-  | None   -> fprintf fmt "%s" (id_unique iprinter ls.ls_name)
+  | None   -> fprintf fmt "%s" s
 
 let print_cs fmt ls =
   let sanitizer = Strings.capitalize in
@@ -212,7 +213,9 @@ and print_lterm pri fmt t =
     else print_tlab pri fmt t in
   print_tloc pri fmt t
 
-and print_app pri ls fmt tl = match extract_op ls, tl with
+and print_app pri ls fmt tl =
+  let s = id_unique iprinter ls.ls_name in
+  match extract_op s, tl with
   | _, [] ->
       print_ls fmt ls
   | Some s, [t1] when tight_op s ->
@@ -567,12 +570,11 @@ let print_sequent fmt task =
 
 module LegacyPrinter =
   (val (let iprinter,aprinter,tprinter,pprinter =
-    let isanitize = sanitizer char_to_alpha char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
-    create_ident_printer why3_keywords ~sanitizer:isanitize,
-    create_ident_printer why3_keywords ~sanitizer:lsanitize,
-    create_ident_printer why3_keywords ~sanitizer:lsanitize,
-    create_ident_printer why3_keywords ~sanitizer:isanitize
+    let same = fun x -> x in
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same,
+    create_ident_printer why3_keywords ~sanitizer:same
   in
   create iprinter aprinter tprinter pprinter true))
 

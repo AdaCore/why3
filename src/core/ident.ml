@@ -191,8 +191,26 @@ type ident_printer = {
   blacklist : string list;
 }
 
+(* name is already sanitized *)
 let find_unique indices name =
-  let specname ind = name ^ string_of_int ind in
+  let specname ind =
+    let rec repeat n s =
+      if n <= 0 then s else repeat (n-1) (s ^ "^")
+    in
+    (* In the case, the symbol is infix/prefix *and* the name has not been
+       sanitized for provers (the space " " is still there), we don't want to
+       disambiguate with a number but with a symbol: "+" becomes "+." "+.." etc.
+       It allows to parse the ident again (for transformations).
+    *)
+    if Strings.has_prefix "infix " name ||
+       Strings.has_prefix "prefix " name then
+      (repeat ind name)
+    else
+      if ind < 0 then
+        name
+      else
+        name ^ string_of_int ind
+  in
   let testname ind = Hstr.mem indices (specname ind) in
   let rec advance ind =
     if testname ind then advance (succ ind) else ind in
