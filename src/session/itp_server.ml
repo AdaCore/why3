@@ -1103,25 +1103,36 @@ end
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
 
-  let rec apply_transform nid t args =
+  let apply_transform node_id t args =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-      let callback = callback_update_tree_transform t args in
-      C.schedule_transformation d.cont id t args ~callback ~notification:(notify_change_proved d.cont)
-    | APa panid ->
-      let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
-      let parent = node_ID_from_pn parent_id in
-      apply_transform parent t args
-    | ATn tnid ->
-      let child_ids = get_sub_tasks d.cont.controller_session tnid in
-      let callback = callback_update_tree_transform t args in
-      List.iter (fun id -> C.schedule_transformation d.cont id t args ~callback
-                           ~notification:(notify_change_proved d.cont))
-                child_ids
-    | AFile _ | ATh _ ->
-      (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
-      ()
+
+    let check_if_already_exists s pid t args =
+      let sub_transfs = get_transformations s pid in
+      List.exists (fun tr_id -> get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
+        not (is_detached s (ATn tr_id))) sub_transfs
+    in
+
+    let rec apply_transform nid t args =
+      match nid with
+      | APn id ->
+        if check_if_already_exists d.cont.controller_session id t args then
+          P.notify (Message (Information "Transformation already applied"))
+        else
+          let callback = callback_update_tree_transform t args in
+          C.schedule_transformation d.cont id t args ~callback
+            ~notification:(notify_change_proved d.cont)
+      | APa panid ->
+        let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
+        apply_transform (APn parent_id) t args
+      | ATn tnid ->
+        let child_ids = get_sub_tasks d.cont.controller_session tnid in
+        List.iter (fun id -> apply_transform (APn id) t args) child_ids
+      | AFile _ | ATh _ ->
+        (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
+        ()
+    in
+    let nid = any_from_node_ID node_id in
+    apply_transform nid t args
 
   let removed x =
     let nid = node_ID_from_any x in
