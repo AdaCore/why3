@@ -362,7 +362,11 @@ let rec add_expr (e1 e2: expr) : expr
                      = C.(+) (interp e1 y z) (interp e2 y z) }
   variant { e2 }
   raises  { C.Unknown -> true }
-= let rec add_atom (e a:expr) : (expr, bool)
+=
+  let term_or_cst c i
+    ensures { forall y z. interp result y z = interp (Term c i) y z }
+  = if C.eq C.czero c then Cst C.czero else Term c i in
+  let rec add_atom (e a:expr) : (expr, bool)
     requires { atom a }
     returns { r,b -> forall y z. interp r y z
                      = C.(+) (interp e y z) (interp a y z) }
@@ -370,9 +374,19 @@ let rec add_expr (e1 e2: expr) : expr
     raises  { C.Unknown -> true }
   = match (e,a) with
     | Term ce ie, Term ca ia ->
-      if ie = ia then (Term (C.add ce ca) ie, True) else (Add e a, False)
+      if ie = ia then (term_or_cst (C.add ce ca) ie, True)
+      else if C.eq ce C.czero then (term_or_cst ca ia, True)
+      else if C.eq ca C.czero then (e,True)
+      else (Add e a, False)
     | Cst ce, Cst ca -> Cst (C.add ce ca), True
-    | Cst _, _ | _, Cst _ -> Add e a, False
+    | Cst ce, Term ca _ ->
+      if C.eq ca C.czero then (e, True)
+      else if C.eq ce C.czero then (a, True)
+      else (Add e a, False)
+    | Term ce _, Cst ca ->
+      if C.eq ce C.czero then (a, True)
+      else if C.eq ca C.czero then (e, True)
+      else (Add e a, False)
     | Add e1 e2, _ ->
       let r, b = add_atom e1 a in
       if b
@@ -460,13 +474,16 @@ let sub_expr (e1 e2:expr)
            = C.(+) (C.(+) v1 (C.(-_) v2)) v2 = v1 };
   r
 
+use import debug.Debug
+
 let rec same_eq (eq1 eq2: equality) : bool
   ensures { result -> forall y z. interp_eq eq1 y z -> interp_eq eq2 y z }
   raises  { C.Unknown -> true }
 = let (e1,c1) = norm_eq eq1 in
   let (e2,c2) = norm_eq eq2 in
   let e = sub_expr e1 e2 in
-  zero_expr e && C.eq c1 c2
+  if zero_expr e && C.eq c1 c2 then true
+  else (print (add_expr (Cst C.czero) e); print c1; print c2; false)
 
 use import option.Option
 
@@ -479,6 +496,16 @@ let rec norm_context (l:context) : context
   | Cons h t ->
     let ex, c = norm_eq h in
     Cons (ex, Cst c) (norm_context t)
+  end
+
+let rec print_lc ctx v : unit variant { ctx }
+= match ctx, v with
+  | Nil, Nil -> ()
+  | Cons l t, Cons v t2 ->
+    (if C.eq C.czero v then ()
+    else (print l; print v));
+    print_lc t t2
+  | _ -> ()
   end
 
 let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
@@ -510,7 +537,7 @@ let check_combination (ctx:context) (g:equality) (v:list coeff) : bool
     end
   in
   match aux ctx Nil (Cst C.czero, Cst C.czero) v with
-  | Some sum -> same_eq sum g
+  | Some sum -> if same_eq sum g then true else (print_lc ctx v; false)
   | None -> false
   end
 
@@ -559,7 +586,7 @@ let a_breakpoint (v:array coeff) : unit
 
 let gauss_jordan (a: matrix coeff) : option (array coeff)
   (*AX=B, a=(A|B), result=X*)
-  returns { Some r -> Array.length r = a.columns - 1 | None -> true }
+  returns { Some r -> Array.length r = a.columns | None -> true }
   requires { 1 <= a.rows /\ 1 <= a.columns }
   raises { C.Unknown -> true }
 =
@@ -578,7 +605,7 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
       else i in
   let pivots = Array.make n 0 in
   let r = ref (-1) in
-  for j = 0 to m-1 do
+  for j = 0 to m-2 do
     invariant { -1 <= !r < n }
     invariant { forall i. 0 <= i <= !r -> 0 <= pivots[i] }
     invariant { forall i1 i2: int. 0 <= i1 < i2 <= !r -> pivots[i1] < pivots[i2] }
@@ -598,14 +625,13 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
     end
   done;
   if !r < 0 then None (* matrix is all zeroes *)
-  else if pivots[!r] >= m-1 then None (*pivot on last column, no solution*)
   else begin
-    let v = Array.make (m-1) C.czero in
+    let v = Array.make m(*(m-1)*) C.czero in
     for i = 0 to !r do
       v[pivots[i]] <- get a i (m-1)
     done;
    (* a_breakpoint v;*)
-    Some v
+    Some v (*pivots[!r] < m-1*)  (*pivot on last column, no solution*)
   end
 
 use import array.ToList
@@ -1069,6 +1095,8 @@ use import real.PowerReal
 use RationalCoeffs as Q
 use import int.Int
 
+use import debug.Debug
+
 type evars = int -> int
 
 type exp = Lit int | Var int | Plus exp exp | Minus exp
@@ -1106,18 +1134,6 @@ function minterp (t:t) (y:evars) : real
 
 exception Unknown
 
-let rec predicate same_exp (e1 e2: exp)
-  ensures { result -> forall y. interp_exp e1 y = interp_exp e2 y }
-  variant { e1, e2 }
-= match e1, e2 with
-  | Lit n1, Lit n2 -> n1 = n2
-  | Var v1, Var v2 -> v1 = v2
-  | Plus a1 b1, Plus a2 b2 ->
-    ((same_exp a1 a2) && (same_exp b1 b2))
-    || ((same_exp a1 b2) && (same_exp b1 a2))
-  | Minus e1', Minus e2' -> same_exp e1' e2'
-  | _ -> false
-  end
 
 let rec add_exp (e1 e2:exp)
   ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
@@ -1166,6 +1182,35 @@ let rec opp_exp (e:exp)
   | Minus e' -> e'
   | Plus e1 e2 -> Plus (opp_exp e1) (opp_exp e2)
   | Var _ -> Minus e
+  end
+
+let rec zero_exp (e:exp) : bool
+  ensures { result -> forall y. interp_exp e y = 0 }
+  variant { e }
+  raises  { Unknown -> true }
+=
+  let rec all_zero (e:exp) : bool
+    ensures { result -> forall y. interp_exp e y = 0 }
+    variant { e }
+  = match e with
+    | Lit n -> n = 0
+    | Var _ -> false
+    | Minus e -> all_zero e
+    | Plus e1 e2 -> all_zero e1 && all_zero e2
+    end
+  in
+  let e' = add_exp (Lit 0) e in (* simplifies exp *)
+  all_zero e'
+
+let rec same_exp (e1 e2: exp)
+  ensures { result -> forall y. interp_exp e1 y = interp_exp e2 y }
+  variant { e1, e2 }
+  raises  { Unknown -> true }
+= match e1, e2 with
+  | Lit n1, Lit n2 -> n1 = n2
+  | Var v1, Var v2 -> v1 = v2
+  | Minus e1', Minus e2' -> same_exp e1' e2'
+  | _ -> zero_exp (add_exp e1 (opp_exp e2))
   end
 
 let madd (a b:t)
@@ -1217,10 +1262,23 @@ let mopp (a:t)
   ensures { forall y. minterp result y = -. minterp a y }
 = match a with (q,e) -> (Q.ropp q, e) end
 
+let rec predicate pure_same_exp (e1 e2: exp)
+  ensures { result -> forall y. interp_exp e1 y = interp_exp e2 y }
+  variant { e1, e2 }
+= match e1, e2 with
+  | Lit n1, Lit n2 -> n1 = n2
+  | Var v1, Var v2 -> v1 = v2
+  | Minus e1', Minus e2' -> pure_same_exp e1' e2'
+  | Plus a1 a2, Plus b1 b2 ->
+    (pure_same_exp a1 b1 && pure_same_exp a2 b2) ||
+    (pure_same_exp a1 b2 && pure_same_exp a2 b1)
+  | _ -> false
+  end
+
 let predicate meq (a b:t)
   ensures { result -> forall y. minterp a y = minterp b y }
 = match (a,b) with
-  | (q1,e1), (q2,e2) -> (Q.req q1 q2 && same_exp e1 e2) || (Q.req q1 Q.rzero && Q.req q2 Q.rzero)
+  | (q1,e1), (q2,e2) -> (Q.req q1 q2 && pure_same_exp e1 e2) || (Q.req q1 Q.rzero && Q.req q2 Q.rzero)
   end
 
 let minv (a:t)
@@ -1434,5 +1492,17 @@ goal g'': forall r r' i c x x' y l: int.
 
 (*tries to add power radix i and power radix (i+1), fails
   -> cst propagation ? *)
+
+end
+
+module Test2
+
+use import int.Int
+use import LinearDecisionInt
+
+goal g: forall x y z: int.
+  x + y = 0 ->
+  y - z = 0 ->
+  x = 0
 
 end

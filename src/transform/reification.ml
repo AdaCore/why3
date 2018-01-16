@@ -11,7 +11,7 @@ exception Exit
 let debug = false
 
 let print_id fmt id = Format.fprintf fmt "%s" id.id_string
-              
+
 let expl_reification_check = Ident.create_label "expl:reification check"
 
 type reify_env = { kn: known_map;
@@ -92,7 +92,33 @@ let rec reify_term renv t rt =
               aux la1 la2
            | _ -> raise NoReification
        in
-       let renv, mvs = Svs.fold (rt_of_var p.pat_vars f t) p.pat_vars (renv, Mvs.empty) in
+       let rec check_nonvar f t =
+         match f.t_node, t.t_node with
+         | Tapp (ls1, la1), Tapp (ls2, la2) ->
+            if Svs.for_all (fun v -> t_v_occurs v f = 0) p.pat_vars
+            then (if not (ls_equal ls1 ls2)
+                  then raise NoReification);
+            if ls_equal ls1 ls2 then List.iter2 check_nonvar la1 la2;
+         | Tapp (ls,_), Tconst _ ->
+            (* reject constants that do not match the
+               definitions of logic constants*)
+            if Svs.for_all (fun v -> t_v_occurs v f = 0) p.pat_vars
+            then
+              match find_logic_definition renv.kn ls with
+              | None -> raise NoReification
+              | Some ld -> let v,f = open_ls_defn ld in
+                           assert (v = []);
+                           check_nonvar f t
+            else ()
+         | Tconst (Number.ConstInt c1), Tconst (Number.ConstInt c2) ->
+            let open Number in
+            if not (BigInt.eq (compute_int_constant c1) (compute_int_constant c2))
+            then raise NoReification
+         | _ -> () (* FIXME add more failure cases if needed *)
+       in
+       check_nonvar f t;
+       let renv, mvs = Svs.fold (rt_of_var p.pat_vars f t) p.pat_vars
+                                (renv, Mvs.empty) in
        let lrt = List.map (function | {pat_node = Pvar v} -> Mvs.find v mvs
                                     | _ -> assert false) pl in
        renv, t_app cs lrt (Some p.pat_ty)
@@ -462,7 +488,7 @@ let build_goals prev prs subst env lp g rt =
                              l rl
           | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
           | _ -> raise Exit in
-        if debug then Format.printf "cut ok@."; 
+        if debug then Format.printf "cut ok@.";
         Trans.apply (Cut.cut ci (Some "interp")) task_r
     with _ ->
          if debug then Format.printf "no cut found@.";
@@ -483,7 +509,7 @@ let build_goals prev prs subst env lp g rt =
                 try Lists.apply (Trans.apply (rewrite pr)) acc
                 with _ -> acc)
               lt (List.rev prs)
-            
+
          | [] -> []
          | _ -> assert false in
   let lt = List.map (fun ng -> Task.add_decl prev
@@ -534,19 +560,19 @@ and field = Fimmutable of value | Fmutable of value ref
 open Format
 
 let rec print_value fmt = function
-  | Vvoid -> fprintf fmt "Vvoid"
-  | Vbool b -> fprintf fmt "Vbool %b" b
-  | Vint i -> fprintf fmt "Vint %a" Number.print_constant (Number.const_of_big_int i)
-  | Vconstr (rs, lf) -> fprintf fmt "Vconstr(%a, %a)"
+  | Vvoid -> fprintf fmt "()"
+  | Vbool b -> fprintf fmt "%b" b
+  | Vint i -> fprintf fmt "%a" Number.print_constant (Number.const_of_big_int i)
+  | Vconstr (rs, lf) -> fprintf fmt "@[<hov 2>(%a@ %a)@]"
                                 Expr.print_rs rs
                                 (Pp.print_list Pp.space print_field) lf
-  | Varray a -> fprintf fmt "Varray [|%a|]"
+  | Varray a -> fprintf fmt "[|%a|]"
                         (Pp.print_list Pp.space print_value) (Array.to_list a)
   | Vmatrix m -> fprintf fmt "Vmatrix %a" print_matrix m
   | Vref r -> fprintf fmt "Vref %a" print_value !r
 
 and print_field fmt = function
-  | Fimmutable v -> fprintf fmt "Fimmutable %a" print_value v
+  | Fimmutable v -> fprintf fmt "%a" print_value v
   | Fmutable vr -> fprintf fmt "Fmutable %a" print_value !vr
 and print_matrix fmt m =
   Array.iter (fun a -> fprintf fmt "[|%a|]\n"
@@ -752,6 +778,11 @@ let exec_ref_set _ args =
      Vvoid
   | _ -> raise CannotReduce
 
+let exec_print _ args =
+  List.iter (eprintf "%a@." print_value) args;
+  Vvoid
+
+
 let built_in_modules =
   [
     ["bool"],"Bool", [],
@@ -805,6 +836,9 @@ let built_in_modules =
      "prefix !", exec_ref_get;
      "infix :=", exec_ref_set;
     ] ;
+    ["debug"],"Debug",
+    [],
+    ["print", exec_print ] ;
   ]
 
 let add_builtin_mo env (l,n,t,d) =
@@ -1158,7 +1192,7 @@ let reflection_by_function s env = Trans.store (fun task ->
                        cs = [];
                        } in
           if debug then Format.printf "eval_fun@.";
-          let res = term_of_value (eval_fun decl info) in
+          let res = term_of_value (eval_fun decl info) (*(try eval_fun decl info with Raised _ -> Vbool false)*) in
           if debug then Format.printf "res %a@." Pretty.print_term res;
           let rinfo = {renv with subst = Mvs.add vres res renv.subst} in
           rinfo, lp, lv, rt
