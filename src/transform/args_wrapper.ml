@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -160,10 +160,7 @@ let build_coercion_map km_meta =
   | Not_found -> Coercion.empty
 
 let build_naming_tables task : naming_table =
-  (** FIXME: using sanitizer here breaks the printing of infix symbols
-   because it replaces "infix +" by "infix_+", which forbids to
-   parse transformation arguments containing "+" such as "cut 1+2=3" *)
-  let isanitizer = None (* Some (sanitizer char_to_alpha char_to_alnumus) *) in
+  let isanitizer = None (* sanitizer do not seem to be necessary *) in
   let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
   let pr = create_ident_printer Pretty.why3_keywords ?sanitizer:isanitizer in
   let apr = create_ident_printer Pretty.why3_keywords ~sanitizer:lsanitize in

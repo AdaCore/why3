@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -758,18 +758,19 @@ end
      having a given property (label_detection) in the session tree. To change
      the property, one need to call function register_label_detection. *)
   let focus_on_label node =
-    match !get_focused_label with
-    | Some label_detection ->
-        let d = get_server_data () in
-        let session = d.cont.Controller_itp.controller_session in
-        (match node with
-        | APn pr_node ->
-            let task = Session_itp.get_raw_task session pr_node in
-            let b = label_detection task in
-            if b then
-              add_focused_node node
-        | _ -> ())
-    | None -> ()
+    let d = get_server_data () in
+    let session = d.cont.Controller_itp.controller_session in
+    if not (Session_itp.is_detached session node) then
+      match !get_focused_label with
+      | Some label_detection ->
+          (match node with
+          | APn pr_node ->
+              let task = Session_itp.get_raw_task session pr_node in
+              let b = label_detection task in
+              if b then
+                add_focused_node node
+          | _ -> ())
+      | None -> ()
 
   (* Create a new node in the_tree, update the tables and send a
      notification about it *)
@@ -1102,19 +1103,36 @@ end
       P.notify (Message (Transf_error (node_ID_from_pn id, tr_applied, arg_opt, loc, msg, doc)))
     | _ -> ()
 
-  let rec apply_transform nid t args =
+  let apply_transform node_id t args =
     let d = get_server_data () in
-    match any_from_node_ID nid with
-    | APn id ->
-      let callback = callback_update_tree_transform t args in
-      C.schedule_transformation d.cont id t args ~callback ~notification:(notify_change_proved d.cont)
-    | APa panid ->
-      let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
-      let parent = node_ID_from_pn parent_id in
-      apply_transform parent t args
-    | ATn _ | AFile _ | ATh _ ->
-      (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
-      ()
+
+    let check_if_already_exists s pid t args =
+      let sub_transfs = get_transformations s pid in
+      List.exists (fun tr_id -> get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
+        not (is_detached s (ATn tr_id))) sub_transfs
+    in
+
+    let rec apply_transform nid t args =
+      match nid with
+      | APn id ->
+        if check_if_already_exists d.cont.controller_session id t args then
+          P.notify (Message (Information "Transformation already applied"))
+        else
+          let callback = callback_update_tree_transform t args in
+          C.schedule_transformation d.cont id t args ~callback
+            ~notification:(notify_change_proved d.cont)
+      | APa panid ->
+        let parent_id = get_proof_attempt_parent d.cont.controller_session panid in
+        apply_transform (APn parent_id) t args
+      | ATn tnid ->
+        let child_ids = get_sub_tasks d.cont.controller_session tnid in
+        List.iter (fun id -> apply_transform (APn id) t args) child_ids
+      | AFile _ | ATh _ ->
+        (* TODO: propagate trans to all subgoals, just the first one, do nothing ... ?  *)
+        ()
+    in
+    let nid = any_from_node_ID node_id in
+    apply_transform nid t args
 
   let removed x =
     let nid = node_ID_from_any x in
@@ -1225,7 +1243,7 @@ end
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
     let callback = callback_update_tree_proof d.cont in
-    let final_callback lr =
+    let final_callback _ lr =
       P.notify (Message (Replay_Info (Pp.string_of C.replay_print lr))) in
     (* TODO make replay print *)
     C.replay ~valid_only ~use_steps:false ~obsolete_only:true d.cont

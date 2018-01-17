@@ -103,7 +103,7 @@ invalid_goals () {
 
 execute () {
     pgm="bin/why3execute$suffix"
-    printf "$1 $2... "
+    printf "  $1 $2... "
     if $pgm $1 $2 > /dev/null; then
         echo "ok"
     else
@@ -119,7 +119,7 @@ extract_and_run () {
     shift
     prg=$1
     shift
-    printf "$dir... "
+    printf "  $dir... "
     rm -f $dir/$prg
     printf "clean... "
     if BENCH=yes make -C $dir clean > /dev/null; then
@@ -166,7 +166,7 @@ extract_and_run () {
 
 list_stuff () {
     pgm="bin/why3$suffix"
-    printf '%s ' "$1"
+    printf '  %s ' "$1"
     if $pgm $1 > /dev/null; then
         echo "ok"
     else
@@ -272,3 +272,7 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+
+echo "=== Checking realizations ==="
+echo "temporarily disabled"
+#exec bench/check_realizations.sh

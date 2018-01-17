@@ -30,7 +30,7 @@ build: [
   [make "-j%{jobs}%" "all" "opt" "byte"]
 ]
 
-install: [make "install" "install-lib"]
+install: [make "install_no_local" "install_no_local_lib"]
 
 remove: [
   ["rm" "%{bin}%/why3"]
@@ -44,7 +44,7 @@ build-doc: [
 ]
 
 depends: [
-  "ocamlfind"
+  "ocamlfind" {build}
   "menhir" {>= 20150629}
   "num"
 ]

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -249,13 +249,13 @@ type engine =
     model([t],[]) = t
 
     model(t1::..::tn::t,f::s) = model(f(t1,..,tn)::t,s)
-      where f as arity n
+      where f is of arity n
 
   A given term can be "exploded" into a configuration by reversing the
   rules above
 
   During reduction, the terms in the first stack are kept in normal
-  form. The normalization process can be defined as the repeated
+  form (value). The normalization process can be defined as the repeated
   application of the following rules.
 
   ([t],[]) --> t  // t is in normal form
@@ -290,6 +290,11 @@ type config = {
   (* second term is the original term, for label and loc copy *)
 }
 
+
+(* This global variable is used to approximate a count of the elementary
+   simplifications that are done during normalization. This is used for
+   transformation step. *)
+let rec_step_limit = ref 0
 
 exception NoMatch of (term * term) option
 exception NoMatchpat of (pattern * pattern) option
@@ -547,9 +552,11 @@ let rec reduce engine c =
     begin
       match v with
       | Term { t_node = Ttrue } ->
+        incr(rec_step_limit);
         { value_stack = st ;
           cont_stack = (Keval(t2,sigma),t_label_copy orig t2)  :: rem }
       | Term { t_node = Tfalse } ->
+        incr(rec_step_limit);
         { value_stack = st ;
           cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
       | Term t1 -> begin
@@ -557,6 +564,7 @@ let rec reduce engine c =
           | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
             when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
               ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
+            incr(rec_step_limit);
             { value_stack = Term (t_label_copy orig b0) :: st;
               cont_stack = rem }
           | _ ->
@@ -571,6 +579,7 @@ let rec reduce engine c =
     end
   | [], (Klet _, _) :: _ -> assert false
   | t1 :: st, (Klet(v,t2,sigma), orig) :: rem ->
+    incr(rec_step_limit);
     let t1 = term_of_value t1 in
     { value_stack = st;
       cont_stack =
@@ -583,12 +592,14 @@ let rec reduce engine c =
   | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _),
     (Kbinop _, _) :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, (Kbinop op, orig) :: rem ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig (t_binary_simp op t2 t1)) :: st;
       cont_stack = rem;
     }
   | [], (Knot,_) :: _ -> assert false
   | Int _ :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
@@ -640,6 +651,7 @@ and reduce_match st u ~orig tbl sigma cont =
           mv'';
         Format.eprintf "@]@.";
 *)
+        incr(rec_step_limit);
         { value_stack = st;
           cont_stack = (Keval(t,mv''), t_label_copy orig t) :: cont;
         }
@@ -664,6 +676,7 @@ and reduce_eval st t ~orig sigma rem =
     begin
       try
         let t = Mvs.find v sigma in
+        incr(rec_step_limit);
         { value_stack = Term (t_label_copy orig t) :: st ;
           cont_stack = rem;
         }
@@ -882,6 +895,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
             Format.eprintf "@.";
 *)
             let mv,rhs = t_subst_types mt mv rhs in
+            incr(rec_step_limit);
             { value_stack = rem_st;
               cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
@@ -957,6 +971,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
+      incr(rec_step_limit);
       { value_stack = Term (t_label_copy orig b) :: st;
         cont_stack = cont;
       }
@@ -965,6 +980,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
         try
           let n' = big_int_of_const c in
           let b = to_bool (BigInt.eq n n') in
+          incr(rec_step_limit);
           { value_stack = Term (t_label_copy orig b) :: st;
             cont_stack = cont;
           }
@@ -981,6 +997,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
 
 and reduce_term_equ ~orig st t1 t2 cont =
   if t_equal t1 t2 then
+    let () = incr(rec_step_limit) in
     { value_stack = Term (t_label_copy orig t_true) :: st;
       cont_stack = cont;
     }
@@ -994,6 +1011,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
           BigInt.eq (Number.compute_int_constant i1)
                     (Number.compute_int_constant i2)
         in
+        incr(rec_step_limit);
         { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }
@@ -1016,6 +1034,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
       let sigma,t =
         aux Mvs.empty t_true ls1.ls_args tl1 tl2
       in
+      let () = incr(rec_step_limit) in
       { value_stack = st;
         cont_stack = (Keval(t,sigma),orig) :: cont;
       }
@@ -1026,6 +1045,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
     when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
          ls_equal ls2 fs_bool_false ->
+    incr(rec_step_limit);
     { value_stack = Term (t_label_copy orig b) :: st;
       cont_stack = cont }
   | _ -> raise Undetermined
@@ -1072,7 +1092,8 @@ let rec reconstruct c =
 
 (** iterated reductions *)
 
-let normalize ~limit engine t0 =
+let normalize ?step_limit ~limit engine t0 =
+  rec_step_limit := 0;
   let rec many_steps c n =
     match c.value_stack, c.cont_stack with
     | [Term t], [] -> t
@@ -1084,20 +1105,24 @@ let normalize ~limit engine t0 =
             Pretty.print_term t0 limit;
           reconstruct c
         end
-      else
-        let c = reduce engine c in
-        many_steps c (n+1)
+      else begin
+        match step_limit with
+        | None ->
+            let c = reduce engine c in
+            many_steps c (n+1)
+        | Some step_limit ->
+            if !rec_step_limit >= step_limit then
+              reconstruct c
+            else
+              let c = reduce engine c in
+              many_steps c (n+1)
+      end
   in
   let c = { value_stack = [];
             cont_stack = [Keval(t0,Mvs.empty),t0] ;
           }
   in
   many_steps c 0
-
-
-
-
-
 
 (* the rewrite engine *)
 
@@ -1130,7 +1155,9 @@ let extract_rule _km t =
 *)
 
   let check_vars acc t1 t2 =
-    (* check that quantified variables all appear in the lefthand side *)
+    (* check that quantified variables all appear in the lefthand side
+       (quantified variables not appearing could be removed and those appearing
+       on right hand side cannot be guessed during rewriting). *)
     let vars_lhs = t_vars t1 in
     if Svs.exists (fun vs -> not (Mvs.mem vs vars_lhs)) acc
     then raise (NotARewriteRule "lhs should contain all variables");
@@ -1141,7 +1168,6 @@ let extract_rule _km t =
     then raise (NotARewriteRule "lhs should contain all type variables")
 
   in
-
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->

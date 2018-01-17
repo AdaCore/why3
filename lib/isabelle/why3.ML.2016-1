@@ -576,9 +576,44 @@ fun pretty_decls thy sel decls =
       map_filter (pretty_decl_timing sel ctxt) ds) decls')
   end;
 
-fun show_status thy sel =
+fun add_type_names (Type (s, Ts)) = insert (op =) (Long_Name.base_name s) #> fold add_type_names Ts
+  | add_type_names _ = I;
+
+val add_term_names = fold_term_types
+  (fn (Const (s, _)) =>
+        apfst (insert (op =) (Long_Name.base_name s)) oo apsnd o add_type_names
+    | _ => apsnd o add_type_names);
+
+fun add_decl_names (Lemma (_, prems, concls)) =
+      fold add_term_names prems #> fold add_term_names concls
+  | add_decl_names (Axiom (_, ts)) = fold add_term_names ts
+  | add_decl_names (Typedecl ((s, _), _, opT)) =
+      apsnd (insert (op =) s #> (case opT of SOME T => add_type_names T | _ => I))
+  | add_decl_names (Param ((s, _), T)) =
+      apfst (insert (op =) s) #> apsnd (add_type_names T)
+  | add_decl_names (Definition (_, eqn)) =
+      apfst (insert (op =) (fst (head_of_eqn eqn))) #> add_term_names eqn
+  | add_decl_names (Datatype dts) = fold (fn ((tyname, _), _, constrs) =>
+      apsnd (insert (op =) tyname) #> fold (fn ((cname, _), cargs) =>
+        apfst (insert (op =) cname) #> fold
+          (fn (NONE, T) => apsnd (add_type_names T)
+            | (SOME (sel, _), T) => apfst (insert (op =) sel) #> apsnd (add_type_names T))
+          cargs) constrs) dts
+  | add_decl_names (Inductive (_, preds)) = fold (fn ((s, _), _, intrs) =>
+      apfst (insert (op =) s) #> fold (add_term_names o snd) intrs) preds
+  | add_decl_names (Function eqnss) = fold (fn (_, eqns) =>
+      apfst (insert (op =) (fst (head_of_eqn (hd eqns)))) #>
+      fold add_term_names eqns) eqnss;
+
+fun mk_decl_filter (p, s) = filter (fn (decl, _) => p s (add_decl_names decl ([], [])));
+
+fun has_cname s (cnames, _) = exists (String.isSubstring s) cnames;
+fun has_tyname s (_, tynames) = exists (String.isSubstring s) tynames;
+fun has_name s names = has_cname s names orelse has_tyname s names;
+
+fun show_status thy (flt, sel) =
   (case Why3_Data.get thy of
-     {env = SOME {decls, ...}, ...} => Pretty.writeln (pretty_decls thy sel decls)
+     {env = SOME {decls, ...}, ...} => Pretty.writeln (pretty_decls thy sel (flt decls))
    | _ => ());
 
 
@@ -1033,6 +1068,11 @@ val _ =
   Outer_Syntax.command @{command_keyword "why3_status"}
     "show the name and state of all loaded verification conditions"
     (Scan.optional
+       ((   Args.$$$ "cname" >> K has_cname
+         || Args.$$$ "tyname" >> K has_tyname
+         || Args.$$$ "name" >> K has_name) --|
+        Args.colon -- Args.name >> mk_decl_filter) I --
+     Scan.optional
        (Args.parens
           (   Args.$$$ "proved" >> K (is_some, K "")
            || Args.$$$ "unproved" >> K (is_none, K "")))

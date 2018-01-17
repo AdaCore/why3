@@ -27,6 +27,3 @@ bin/why3config --detect-provers
 
 # run the bench
 make bench
-
-# check that the realizations are ok (temporarily disabled)
-# misc/check_realizations.sh
