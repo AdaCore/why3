@@ -502,7 +502,7 @@ let rec print_lc ctx v : unit variant { ctx }
 = match ctx, v with
   | Nil, Nil -> ()
   | Cons l t, Cons v t2 ->
-    (if C.eq C.czero v then ()
+   (if C.eq C.czero v then ()
     else (print l; print v));
     print_lc t t2
   | _ -> ()
@@ -579,11 +579,6 @@ let addmul_row (m:matrix coeff) (src dst: int) (c: coeff) : unit
 
 use import ref.Refint
 
-(*val breakpoint (a: matrix coeff) : unit writes { a }
-
-let a_breakpoint (v:array coeff) : unit
-  = v[0] <- any coeff*)
-
 let gauss_jordan (a: matrix coeff) : option (array coeff)
   (*AX=B, a=(A|B), result=X*)
   returns { Some r -> Array.length r = a.columns | None -> true }
@@ -630,7 +625,6 @@ let gauss_jordan (a: matrix coeff) : option (array coeff)
     for i = 0 to !r do
       v[pivots[i]] <- get a i (m-1)
     done;
-   (* a_breakpoint v;*)
     Some v (*pivots[!r] < m-1*)  (*pivot on last column, no solution*)
   end
 
@@ -689,8 +683,6 @@ let linear_decision (l: context) (g: equality) : bool
   fill_ctx l 0;
   let (ex, d) = norm_eq g in
   fill_goal ex;
-  (*let show (a: matrix coeff) (b v: array coeff) (d: coeff) = breakpoint a in
-  show a b v d;*)
   let ab = m_append a b in
   let cd = v_append v d in
   let ab' = transpose ab in
