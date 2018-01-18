@@ -532,15 +532,10 @@
  <goal name="VC add_expr" expl="VC for add_expr" proved="true">
  <transf name="split_goal_wp" proved="true" >
   <goal name="VC add_expr.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="timeout" time="1.00"/></proof>
-  <proof prover="1"><result status="unknown" time="1.86"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   <proof prover="3"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC add_expr.1" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="15"/></proof>
-  <proof prover="1" obsolete="true"><result status="unknown" time="1.88"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC add_expr.2" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -556,9 +551,6 @@
   </transf>
   </goal>
   <goal name="VC add_expr.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="timeout" time="1.00"/></proof>
-  <proof prover="1"><result status="timeout" time="2.00"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="VC add_expr.5" expl="variant decrease" proved="true">
@@ -598,9 +590,6 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC add_expr.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="timeout" time="0.98"/></proof>
-  <proof prover="1"><result status="timeout" time="2.00"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   <proof prover="3"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC add_expr.18" expl="variant decrease" proved="true">
@@ -611,7 +600,6 @@
   </goal>
   <goal name="VC add_expr.20" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="50"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC add_expr.21" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.20" steps="209"/></proof>
@@ -624,7 +612,6 @@
   </goal>
   <goal name="VC add_expr.24" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="50"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC add_expr.25" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.35" steps="391"/></proof>
@@ -846,7 +833,6 @@
  </goal>
  <goal name="VC print_lc" expl="VC for print_lc" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="VC check_combination" expl="VC for check_combination" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -915,9 +901,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="VC check_combination.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="unknown" time="0.02"/></proof>
   <proof prover="1"><result status="valid" time="0.21"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC check_combination.19" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
@@ -1966,7 +1950,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="MP64Coeffs" proved="true" sum="8b9a452f172ba77815a2f8394b0aab35">
+<theory name="MP64Coeffs" proved="true" sum="40b2cdc253d809f5f63e5451e3f7a21b">
  <goal name="VC mzero" expl="VC for mzero" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -1977,177 +1961,363 @@
  <transf name="compute_in_goal" proved="true" >
  </transf>
  </goal>
- <goal name="VC add_exp" expl="VC for add_exp" proved="true">
+ <goal name="VC opp_exp" expl="VC for opp_exp" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="196"/></proof>
+ </goal>
+ <goal name="VC add_sub_exp" expl="VC for add_sub_exp" proved="true">
  <transf name="split_goal_wp" proved="true" >
-  <goal name="VC add_exp.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
+  <goal name="VC add_sub_exp.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="VC add_exp.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12"/></proof>
+  <goal name="VC add_sub_exp.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="VC add_exp.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
+  <goal name="VC add_sub_exp.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="VC add_exp.3" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="349"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.5" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC add_exp.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="111"/></proof>
+  <goal name="VC add_sub_exp.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="61"/></proof>
   </goal>
-  <goal name="VC add_exp.5" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.7" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.8" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.9" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC add_exp.6" expl="postcondition" proved="true">
+  <goal name="VC add_sub_exp.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="356"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.11" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.12" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="122"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.13" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.14" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="50"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.16" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="48"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.17" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.18" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.19" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="353"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.21" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.22" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="61"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.23" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.24" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.25" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.26" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="360"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.27" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.28" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="122"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.29" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.30" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.31" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.32" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="50"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.33" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.34" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.35" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="398"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.36" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.37" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="68"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.38" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.39" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.40" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.41" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="405"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.42" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.43" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="135"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.44" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.45" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.46" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="29"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.47" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
-  <goal name="VC add_exp.7" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.8" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC add_exp.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12"/></proof>
-  </goal>
-  <goal name="VC add_exp.10" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
-  </goal>
-  <goal name="VC add_exp.11" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.12" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="9"/></proof>
-  </goal>
-  <goal name="VC add_exp.13" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="VC add_exp.14" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="112"/></proof>
-  </goal>
-  <goal name="VC add_exp.15" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.48" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC add_exp.16" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
+  <goal name="VC add_sub_exp.49" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="1648"/></proof>
   </goal>
-  <goal name="VC add_exp.17" expl="exceptional postcondition" proved="true">
+  <goal name="VC add_sub_exp.50" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.51" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="152"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.52" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC add_exp.18" expl="exceptional postcondition" proved="true">
+  <goal name="VC add_sub_exp.53" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.54" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.55" expl="postcondition" proved="true">
+  <transf name="split_goal_wp" proved="true" >
+   <goal name="VC add_sub_exp.55.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_sub_exp.55.0.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.04" steps="121"/></proof>
+    </goal>
+    <goal name="VC add_sub_exp.55.0.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="122"/></proof>
+    </goal>
+    <goal name="VC add_sub_exp.55.0.2" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="481"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC add_sub_exp.55.1" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_sub_exp.55.1.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="40"/></proof>
+    </goal>
+    <goal name="VC add_sub_exp.55.1.1" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+    </goal>
+    <goal name="VC add_sub_exp.55.1.2" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.02" steps="43"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC add_sub_exp.56" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.57" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="430"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.58" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.59" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC add_exp.19" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+  <goal name="VC add_sub_exp.60" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="VC add_exp.20" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="36"/></proof>
+  <goal name="VC add_sub_exp.61" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC add_exp.21" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+  <goal name="VC add_sub_exp.62" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="344"/></proof>
   </goal>
-  <goal name="VC add_exp.22" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.63" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.64" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="97"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.65" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.66" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.67" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.68" expl="postcondition" proved="true">
+  <transf name="eliminate_if" proved="true" >
+   <goal name="VC add_sub_exp.68.0" expl="postcondition" proved="true">
+   <transf name="split_goal_wp" proved="true" >
+    <goal name="VC add_sub_exp.68.0.0" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC add_sub_exp.68.0.0.0" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="38"/></proof>
+     </goal>
+     <goal name="VC add_sub_exp.68.0.0.1" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="17"/></proof>
+     </goal>
+     <goal name="VC add_sub_exp.68.0.0.2" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC add_sub_exp.68.0.1" expl="postcondition" proved="true">
+    <transf name="split_goal_wp" proved="true" >
+     <goal name="VC add_sub_exp.68.0.1.0" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="19"/></proof>
+     </goal>
+     <goal name="VC add_sub_exp.68.0.1.1" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
+     </goal>
+     <goal name="VC add_sub_exp.68.0.1.2" expl="postcondition" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="15"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC add_sub_exp.69" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC add_exp.23" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="126"/></proof>
+  <goal name="VC add_sub_exp.70" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="213"/></proof>
   </goal>
-  <goal name="VC add_exp.24" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.71" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.72" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.73" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.74" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC add_exp.25" expl="postcondition" proved="true">
+  <goal name="VC add_sub_exp.75" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="37"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.76" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.77" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC add_exp.26" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.27" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC add_exp.28" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
-  </goal>
-  <goal name="VC add_exp.29" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="9"/></proof>
-  </goal>
-  <goal name="VC add_exp.30" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="VC add_exp.31" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="128"/></proof>
-  </goal>
-  <goal name="VC add_exp.32" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="VC add_exp.33" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="VC add_exp.34" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.35" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.36" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC add_exp.37" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC add_exp.38" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="115"/></proof>
-  </goal>
-  <goal name="VC add_exp.39" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC add_exp.40" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="18"/></proof>
-  </goal>
-  <goal name="VC add_exp.41" expl="exceptional postcondition" proved="true">
+  <goal name="VC add_sub_exp.78" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00"/></proof>
   </goal>
-  <goal name="VC add_exp.42" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
-  </goal>
-  <goal name="VC add_exp.43" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.44" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC add_exp.45" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
-  </goal>
-  <goal name="VC add_exp.46" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="VC add_exp.47" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
-  </goal>
-  <goal name="VC add_exp.48" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC add_exp.49" expl="variant decrease" proved="true">
+  <goal name="VC add_sub_exp.79" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC add_exp.50" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="8"/></proof>
+  <goal name="VC add_sub_exp.80" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
-  <goal name="VC add_exp.51" expl="exceptional postcondition" proved="true">
+  <goal name="VC add_sub_exp.81" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC add_exp.52" expl="exceptional postcondition" proved="true">
+  <goal name="VC add_sub_exp.82" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
-  <goal name="VC add_exp.53" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="8"/></proof>
+  <goal name="VC add_sub_exp.83" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC add_exp.54" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <goal name="VC add_sub_exp.84" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="37"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.85" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.86" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.87" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.88" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.89" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.90" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.91" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.92" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC add_sub_exp.93" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC opp_exp" expl="VC for opp_exp" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="153"/></proof>
+ <goal name="VC add_exp" expl="VC for add_exp" proved="true">
+ <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <transf name="split_goal_wp" proved="true" >
+  <goal name="VC add_exp.0" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="79"/></proof>
+  </goal>
+  <goal name="VC add_exp.1" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="VC zero_exp" expl="VC for zero_exp" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -2160,13 +2330,19 @@
   <goal name="VC zero_exp.2" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
-  <goal name="VC zero_exp.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="39"/></proof>
+  <goal name="VC zero_exp.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="VC zero_exp.4" expl="postcondition" proved="true">
+  <goal name="VC zero_exp.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC zero_exp.5" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="50"/></proof>
+  </goal>
+  <goal name="VC zero_exp.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC zero_exp.5" expl="exceptional postcondition" proved="true">
+  <goal name="VC zero_exp.7" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
  </transf>
@@ -2192,7 +2368,7 @@
   <proof prover="2"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC same_exp.6" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC same_exp.7" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -2202,7 +2378,6 @@
   </goal>
   <goal name="VC same_exp.9" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC same_exp.10" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -2211,7 +2386,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC same_exp.12" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC same_exp.13" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -2321,8 +2496,7 @@
  </transf>
  </goal>
  <goal name="VC pure_same_exp" expl="VC for pure_same_exp" proved="true">
- <proof prover="0"><result status="valid" time="0.10" steps="644"/></proof>
- <proof prover="2"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0"><result status="valid" time="0.24" steps="802"/></proof>
  </goal>
  <goal name="VC meq" expl="VC for meq" proved="true">
  <transf name="split_goal_wp" proved="true" >
@@ -2348,7 +2522,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="LinearDecisionRationalMP" proved="true" sum="9b3e919edb6818308e2d0766723720b2">
+<theory name="LinearDecisionRationalMP" proved="true" sum="487f8ba2ad5982403e241a9e5ec93289">
  <goal name="C.A.Assoc" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2425,7 +2599,7 @@
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
 </theory>
-<theory name="LinearDecisionIntMP" proved="true" sum="2164748930db23e541e9346d5b978ccb">
+<theory name="LinearDecisionIntMP" proved="true" sum="3c4d4e0c4648780078dd2690cd550e95">
  <goal name="VC mpzero" expl="VC for mpzero" proved="true">
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -2555,7 +2729,7 @@
    <goal name="VC m.1.1" expl="postcondition" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="VC m.1.1.0" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.06" steps="66"/></proof>
+    <proof prover="0"><result status="valid" time="0.06" steps="68"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2596,14 +2770,14 @@
  <proof prover="2"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
-<theory name="TestMP" proved="true" sum="120fbd1ddad622d8519753be48a182c7">
+<theory name="TestMP" proved="true" sum="772ba346049009c99e431140871e0a1c">
  <goal name="g" proved="true">
  <transf name="reflection_f" proved="true" arg1="mp_decision">
   <goal name="g.0" expl="reification check" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
   <goal name="g.1" proved="true">
-  <proof prover="2"><result status="valid" time="0.11"/></proof>
+  <proof prover="2"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="g.2" proved="true">
   <proof prover="2"><result status="valid" time="0.11"/></proof>

@@ -1091,7 +1091,8 @@ use import debug.Debug
 
 type evars = int -> int
 
-type exp = Lit int | Var int | Plus exp exp | Minus exp
+
+type exp = Lit int | Var int | Plus exp exp | Minus exp | Sub exp exp
 type t = (Q.t, exp)
 
 let constant mzero = (Q.rzero, Lit 0)
@@ -1109,6 +1110,7 @@ function interp_exp (e:exp) (y:evars) : int
   | Lit n -> n
   | Var v -> y v
   | Plus e1 e2 -> interp_exp e1 y + interp_exp e2 y
+  | Sub e1 e2 -> interp_exp e1 y - interp_exp e2 y
   | Minus e' -> - (interp_exp e' y)
   end
 (*
@@ -1126,46 +1128,6 @@ function minterp (t:t) (y:evars) : real
 
 exception Unknown
 
-
-let rec add_exp (e1 e2:exp)
-  ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
-  raises  { Unknown -> true }
-  variant { e2, e1 }
-=
-  let rec add_atom (e a:exp) : (exp, bool)
-    returns { r, b -> forall y. interp_exp r y = interp_exp e y + interp_exp a y }
-    raises { Unknown -> true }
-    variant { e }
-  = match (e,a) with
-    | Lit n1, Lit n2 -> (Lit (n1+n2), true)
-    | Lit n, Var i | Var i, Lit n
-      -> if n = 0 then (Var i, true) else (Plus e a, False)
-    | Lit n, Minus e' | Minus e', Lit n ->
-      if n = 0 then Minus e', True else Plus e a, False
-    | Var i, Minus (Var j) | Minus (Var j), Var i ->
-      if i = j then (Lit 0, true) else (Plus e a, False)
-    | Var _, Var _ -> Plus e a, False
-    | Minus _, Minus _ -> Plus e a, False
-    | Plus e1 e2, _ ->
-      let r, b = add_atom e1 a in
-      if b then
-        match r with
-        | Lit n -> if n = 0 then e2, True else Plus r e2, True
-        | _ -> Plus r e2, True
-        end
-      else let r, b = add_atom e2 a in Plus e1 r, b
-    | _ -> raise Unknown
-    end
-  in
-  match e2 with
-   | Plus e1' e2' ->
-     let r = add_exp e1 e1' in
-     match r with
-     | Lit n -> if n = 0 then e2' else add_exp r e2'
-     | _ -> add_exp r e2'
-     end
-   | _ -> let r, _ = add_atom e1 e2 in r
-  end
 let rec opp_exp (e:exp)
   ensures { forall y. interp_exp result y = - interp_exp e y }
   variant { e }
@@ -1173,8 +1135,93 @@ let rec opp_exp (e:exp)
   | Lit n -> Lit (-n)
   | Minus e' -> e'
   | Plus e1 e2 -> Plus (opp_exp e1) (opp_exp e2)
+  | Sub e1 e2 -> Sub e2 e1
   | Var _ -> Minus e
   end
+
+let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
+  ensures { forall y.
+            if s
+            then interp_exp result y = interp_exp e1 y + interp_exp e2 y
+            else interp_exp result y = interp_exp e1 y - interp_exp e2 y }
+  raises  { Unknown -> true }
+  variant { e2, e1 }
+=
+  let rec add_atom (e a:exp) (s:bool) : (exp, bool)
+    returns { r, b -> forall y.
+              if s then interp_exp r y = interp_exp e y + interp_exp a y
+                   else interp_exp r y = interp_exp e y - interp_exp a y }
+    raises { Unknown -> true }
+    variant { e }
+  = match (e,a) with
+    | Lit n1, Lit n2 -> (if s then Lit (n1+n2) else Lit (n1-n2)), true
+    | Lit n, Var i
+      -> if n = 0 then (if s then Var i else Minus (Var i)), true
+         else (if s then Plus e a else Sub e a), False
+    | Var i, Lit n
+      -> if n = 0 then Var i, true
+      else (if s then Plus e a else Sub e a), False
+    | Lit n, Minus e' ->
+      if n = 0 then (if s then Minus e' else e'), True
+      else (if s then Plus e a else Sub e a), False
+    | Minus e', Lit n ->
+      if n = 0 then Minus e', True
+      else (if s then Plus e a else Sub e a), False
+    | Var i, Minus (Var j) | Minus (Var j), Var i ->
+      if s && (i = j) then (Lit 0, true)
+      else (if s then Plus e a else Sub e a), False
+    | Var i, Var j -> if s then Plus e a, False
+                      else
+                        if i = j then Lit 0, True
+                        else Sub e a, False
+    | Minus _, Minus _ -> (if s then Plus e a else Sub e a), False
+    | Plus e1 e2, _ ->
+      let r, b = add_atom e1 a s in
+      if b then
+        match r with
+        | Lit n -> if n = 0 then e2, True else Plus r e2, True
+        | _ -> Plus r e2, True
+        end
+      else let r, b = add_atom e2 a s in Plus e1 r, b
+    | Sub e1 e2, _ ->
+      let r, b = add_atom e1 a s in
+      if b then
+        match r with
+        | Lit n -> if n = 0 then opp_exp e2, True else Sub r e2, True
+        | _ -> Sub r e2, True
+        end
+      else let r, b = add_atom e2 a (not s) in
+           if b then Sub e1 r, True
+           else if s then Sub (Plus e1 a) e2, False
+                else Sub e1 (Plus e2 a), False
+    | _ -> raise Unknown
+    end
+  in
+  match e2 with
+   | Plus e1' e2' ->
+     let r = add_sub_exp e1 e1' s in
+     match r with
+     | Lit n -> if n = 0
+                then (if s then e2' else opp_exp e2')
+                else add_sub_exp r e2' s
+     | _ -> add_sub_exp r e2' s
+     end
+   | Sub e1' e2' ->
+     let r = add_sub_exp e1 e1' s in
+     match r with
+     | Lit n -> if n = 0
+                then (if s then opp_exp e2' else e2')
+                else add_sub_exp r e2' (not s)
+     | _ -> add_sub_exp r e2' (not s)
+     end
+   | _ -> let r, _ = add_atom e1 e2 s in r
+  end
+
+let add_exp (e1 e2:exp) : exp
+  ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
+  raises  { Unknown -> True }
+= add_sub_exp e1 e2 True
+
 
 let rec zero_exp (e:exp) : bool
   ensures { result -> forall y. interp_exp e y = 0 }
@@ -1189,6 +1236,7 @@ let rec zero_exp (e:exp) : bool
     | Var _ -> false
     | Minus e -> all_zero e
     | Plus e1 e2 -> all_zero e1 && all_zero e2
+    | Sub e1 e2 -> all_zero e1 && all_zero e2
     end
   in
   let e' = add_exp (Lit 0) e in (* simplifies exp *)

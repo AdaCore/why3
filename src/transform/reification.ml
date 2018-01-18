@@ -6,7 +6,7 @@ open Task
 open Args_wrapper
 
 exception NoReification
-exception Exit
+exception Exit of string
 
 let debug = false
 
@@ -443,7 +443,7 @@ let build_vars_map renv prev =
         then Format.printf "vars not matched: %a@."
                            (Pp.print_list Pp.space Pretty.print_vs)
                            (List.filter (fun v -> not (Mvs.mem v subst)) renv.lv);
-        raise Exit);
+        raise (Exit "vars not matched"));
   if debug then Format.printf "all vars matched@.";
   let prev, prs =
     Mterm.fold
@@ -487,7 +487,7 @@ let build_goals prev prs subst env lp g rt =
                              (t_equ (t_subst subst rh) h)
                              l rl
           | _,_ when g.t_ty <> None -> t_equ (t_subst subst rt) g
-          | _ -> raise Exit in
+          | _ -> raise Not_found in
         if debug then Format.printf "cut ok@.";
         Trans.apply (Cut.cut ci (Some "interp")) task_r
     with _ ->
@@ -523,19 +523,17 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
   let kn = task_known task in
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
-  try
-    if debug then Format.printf "start@.";
-    let d = Apply.find_hypothesis pr.pr_name prev in
-    if d = None then raise Exit;
-    let d = Opt.get d in
-    let l = Apply.term_decl d in
-    let (lp, lv, rt) = Apply.intros l in
-    let nt = Args_wrapper.build_naming_tables task in
-    let crc = nt.Trans.coercion in
-    let renv = reify_term (init_renv kn crc lv env prev) g rt in
-    let subst, prev, prs= build_vars_map renv prev in
-    build_goals prev prs subst env lp g rt
-  with NoReification | Exit -> [task])
+  if debug then Format.printf "start@.";
+  let d = Apply.find_hypothesis pr.pr_name prev in
+  if d = None then raise (Exit "lemma not found");
+  let d = Opt.get d in
+  let l = Apply.term_decl d in
+  let (lp, lv, rt) = Apply.intros l in
+  let nt = Args_wrapper.build_naming_tables task in
+  let crc = nt.Trans.coercion in
+  let renv = reify_term (init_renv kn crc lv env prev) g rt in
+  let subst, prev, prs= build_vars_map renv prev in
+  build_goals prev prs subst env lp g rt)
 
 open Mltree
 open Expr
@@ -1127,7 +1125,7 @@ let reflection_by_function s env = Trans.store (fun task ->
           let rs = Pmodule.ns_find_rs pmod.Pmodule.mod_export [s] in
           if o = None then Some (pmod, rs)
           else (if debug then Format.printf "Name conflict %s@." s;
-                raise Exit)
+                raise (Exit "module found twice"))
         with Not_found -> o)
       ths None in
   let (_pmod, rs) = if o = None
@@ -1138,7 +1136,7 @@ let reflection_by_function s env = Trans.store (fun task ->
   let lpost = List.map open_post rs.rs_cty.cty_post in
   if List.exists (fun pv -> pv.pv_ghost) rs.rs_cty.cty_args
   then (if debug then Format.printf "ghost parameter@.";
-        raise Exit);
+        raise (Exit "function has ghost parameters"));
   if debug then Format.printf "building module map@.";
   let mm = Mid.fold
              (fun id th acc ->

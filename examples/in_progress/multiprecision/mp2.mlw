@@ -4525,16 +4525,28 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
           assert { power radix sy
                    = power radix (sy - 2) * radix * radix };
           assert { xp0 + radix * xp1
-                   + radix * radix * !x1 at StartLoop
+                   + power radix 2 * !x1 at StartLoop (* radix * radix *)
                    - !ql * (dl + radix * dh)
                   = rl + radix * rh };
-          assert { value (xd at SubProd) sy
+          begin ensures { value (xd at SubProd) sy
                      + power radix sy * (!x1 at StartLoop)
                      - !ql * vy
                    = value xd (sy - 2)
                      - power radix (sy - 2) * cy
                      + power radix (sy - 2) *
-                       (rl + radix * rh)
+                       (rl + radix * rh) }
+            assert { value (xd at SubProd) sy
+                     = vlx + power radix (sy - 2) * xp0
+                           + power radix (sy - 1) * xp1 }; (*nonlinear*)
+            assert { !ql * vy = !ql * vly
+                                + power radix (sy - 2)
+                                  * (!ql * (dl + radix * dh)) }; (*nonlinear*)
+            (*assert { value (xd at SubProd) sy
+                       + power radix sy * (!x1 at StartLoop)
+                       - !ql * vy
+                     = value xd (sy - 2)
+                       - power radix (sy - 2) * cy
+                       + power radix (sy - 2) * (rl + radix * rh)
                    by
                    value (xd at SubProd) sy
                      + power radix sy * (!x1 at StartLoop)
@@ -4573,7 +4585,14 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                      - power radix (sy - 2) * cy
                      + power radix (sy - 2) *
                        (rl + radix * rh)
-                  };
+                  } *)
+           end;
+           begin ensures { value xd (sy - 2)
+                     - power radix (sy - 2) * cy
+                     + power radix (sy - 2) * (rl + radix * rh)
+                    =  value xd (sy - 1)
+                    + power radix (sy - 1) * !x1
+                    - power radix sy * cy2 }
            value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 2);
            assert { value xd (sy - 1)
                     = value xd (sy - 2)
@@ -4585,8 +4604,27 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                          + power radix (sy - 2) * !x0
                        = value xd (sy - 2)
                          + power radix (sy - 2) * !x0 };
-           (* TODO refl *)
-           assert { value xd (sy - 2)
+           assert { rl + radix * rh - cy
+                     = !x0 + radix * !x1 - power radix 2 * cy2
+                     by
+                        (!x0 - radix * cy1 = rl - cy
+                         by
+                         !x0 = mod (rl - cy) radix
+                         so - radix < rl - cy < radix
+                         so (if rl < cy
+                             then cy1 = 1
+                                  /\ (- radix < rl - cy < 0
+                                     so
+                                     div (rl - cy) radix = - 1
+                                     so rl - cy
+                                     = radix * div (rl - cy) radix
+                                       + mod (rl - cy) radix
+                                     = !x0 - radix
+                                     = !x0 - radix * cy1)
+                             else cy1 = 0 /\ rl - cy = l2i !x0)) }
+                    (* nonlinear *)
+          (* refl example *)
+          (* assert { value xd (sy - 2)
                      - power radix (sy - 2) * cy
                      + power radix (sy - 2) *
                        (rl + radix * rh)
@@ -4650,7 +4688,8 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                       = value xd (sy - 1)
                         + power radix (sy - 1) * !x1
                         - power radix sy * cy2
-                  };
+                  }*)
+           end;
         end;
         if "ex:unlikely" (not (Limb.(=) cy2 limb_zero))
         then begin
