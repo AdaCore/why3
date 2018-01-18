@@ -249,7 +249,13 @@ let find_driver_file fn =
     | None -> raise Exit
   with Exit ->
       let driver_file = Filename.basename fn in
-      file_concat [spark_prefix;"share";"why3";"drivers";driver_file]
+      let full_path =
+        file_concat [spark_prefix;"share";"why3";"drivers";driver_file] in
+      if Sys.file_exists full_path then full_path
+      else
+        Gnat_util.abort_with_message ~internal:false
+          (Format.sprintf "Could not find driver file %s" fn)
+
 
 let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
@@ -339,8 +345,13 @@ let provers, prover_ce, config, env =
         end
      with e when Debug.test_flag Debug.stack_trace -> raise e
      | Rc.CannotOpen (f,s) ->
-       Gnat_util.abort_with_message ~internal:true
+       Gnat_util.abort_with_message ~internal:false
          (Format.sprintf "cannot read file %s: %s" f s)
+     | Whyconf.ConfigFailure (_,s) ->
+         (* no need to mention the file, it is already mentioned in the error
+            message s *)
+       Gnat_util.abort_with_message ~internal:false
+         (Format.sprintf "%s" s)
   in
 
   (* now we build the Whyconf.config_prover for all requested provers
