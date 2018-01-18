@@ -31,15 +31,14 @@ exact (fix num_occ (l : list a) : int :=
 Defined.
 
 (* Why3 goal *)
-Lemma num_occ_def :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l:(list a)),
- match l with
- | Init.Datatypes.nil => ((num_occ x l) = 0%Z)
- | (Init.Datatypes.cons y r) =>
-     ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z))
-     /\ ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
- end.
+Lemma num_occ_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)),
+  match l with
+  | Init.Datatypes.nil => ((num_occ x l) = 0%Z)
+  | (Init.Datatypes.cons y r) => ((x = y) -> ((num_occ x
+      l) = (1%Z + (num_occ x r))%Z)) /\ ((~ (x = y)) -> ((num_occ x
+      l) = (0%Z + (num_occ x r))%Z))
+  end.
 Proof.
 intros a a_WT x [|y r].
 easy.
@@ -51,9 +50,8 @@ now case why_decidable_eq.
 Qed.
 
 (* Why3 goal *)
-Lemma Num_Occ_NonNeg :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l:(list a)), (0%Z <= (num_occ x l))%Z.
+Lemma Num_Occ_NonNeg : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), (0%Z <= (num_occ x l))%Z.
 intros a a_WT x l.
 induction l as [|lh lt IHl].
 easy.
@@ -64,9 +62,8 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Mem_Num_Occ :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l:(list a)), (list.Mem.mem x l) <-> (0%Z < (num_occ x l))%Z.
+Lemma Mem_Num_Occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), (list.Mem.mem x l) <-> (0%Z < (num_occ x l))%Z.
 Proof.
 intros a a_WT x l.
 induction l as [|lh lt IHl].
@@ -85,10 +82,9 @@ now apply IHl.
 Qed.
 
 (* Why3 goal *)
-Lemma Append_Num_Occ :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l1:(list a)) (l2:(list a)),
- ((num_occ x (Init.Datatypes.app l1 l2)) = ((num_occ x l1) + (num_occ x l2))%Z).
+Lemma Append_Num_Occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l1:(list a)) (l2:(list a)), ((num_occ x
+  (Init.Datatypes.app l1 l2)) = ((num_occ x l1) + (num_occ x l2))%Z).
 Proof.
 intros a a_WT x l1 l2.
 induction l1 as [|l1h l1t IHl1].
@@ -100,9 +96,8 @@ now case why_decidable_eq.
 Qed.
 
 (* Why3 goal *)
-Lemma reverse_num_occ :
-forall {a:Type} {a_WT:WhyType a},
-forall (x:a) (l:(list a)), ((num_occ x l) = (num_occ x (Lists.List.rev l))).
+Lemma reverse_num_occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
+  (l:(list a)), ((num_occ x l) = (num_occ x (Lists.List.rev l))).
 intros a a_WT x l.
 induction l; simpl.
 auto.

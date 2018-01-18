@@ -23,10 +23,8 @@ Require number.Divisibility.
 Import Znumtheory.
 
 (* Why3 assumption *)
-Definition prime (p:Z): Prop :=
-  (2%Z <= p)%Z
-  /\ forall (n:Z),
-      ((1%Z < n)%Z /\ (n < p)%Z) -> ~ (number.Divisibility.divides n p).
+Definition prime (p:Z): Prop := (2%Z <= p)%Z /\ forall (n:Z), ((1%Z < n)%Z /\
+  (n < p)%Z) -> ~ (number.Divisibility.divides n p).
 
 Lemma prime_is_Zprime :
   forall p, prime p <-> Znumtheory.prime p.
@@ -38,37 +36,29 @@ intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma not_prime_1 :
-~ (prime 1%Z).
+Lemma not_prime_1 : ~ (prime 1%Z).
 intros (H1,_).
 now elim H1.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_2 :
-(prime
-2%Z).
+Lemma prime_2 : (prime 2%Z).
 Proof.
 apply <- prime_is_Zprime.
 apply prime_2.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_3 :
-(prime
-3%Z).
+Lemma prime_3 : (prime 3%Z).
 Proof.
 apply <- prime_is_Zprime.
 apply prime_3.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_divisors :
-forall (p:Z),
- (prime p) ->
- forall (d:Z),
-  (number.Divisibility.divides d p) ->
-  ((d = 1%Z) \/ ((d = (-1%Z)%Z) \/ ((d = p) \/ (d = (-p)%Z)))).
+Lemma prime_divisors : forall (p:Z), (prime p) -> forall (d:Z),
+  (number.Divisibility.divides d p) -> ((d = 1%Z) \/ ((d = (-1%Z)%Z) \/
+  ((d = p) \/ (d = (-p)%Z)))).
 Proof.
 intros p Hp d Hd.
 apply -> prime_is_Zprime in Hp.
@@ -76,14 +66,10 @@ destruct (prime_divisors p Hp d Hd) ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma small_divisors :
-forall (p:Z),
- (2%Z <= p)%Z ->
- ((forall (d:Z),
-    (2%Z <= d)%Z ->
-    ((prime d) ->
-     (((1%Z < (d * d)%Z)%Z /\ ((d * d)%Z <= p)%Z) ->
-      ~ (number.Divisibility.divides d p)))) -> (prime p)).
+Lemma small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
+  (2%Z <= d)%Z -> ((prime d) -> (((1%Z < (d * d)%Z)%Z /\
+  ((d * d)%Z <= p)%Z) -> ~ (number.Divisibility.divides d p)))) -> (prime
+  p)).
 Proof.
 intros p Hp H.
 apply <- prime_is_Zprime.
@@ -175,8 +161,8 @@ exact Hy2.
 Qed.
 
 (* Why3 goal *)
-Lemma even_prime :
-forall (p:Z), (prime p) -> ((number.Parity.even p) -> (p = 2%Z)).
+Lemma even_prime : forall (p:Z), (prime p) -> ((number.Parity.even p) ->
+  (p = 2%Z)).
 Proof.
 intros p Pp (q,Hq).
 generalize (proj2 Pp q).
@@ -194,8 +180,8 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma odd_prime :
-forall (p:Z), (prime p) -> ((3%Z <= p)%Z -> (number.Parity.odd p)).
+Lemma odd_prime : forall (p:Z), (prime p) -> ((3%Z <= p)%Z ->
+  (number.Parity.odd p)).
 Proof.
 intros p Pp Hp.
 apply <- Divisibility.odd_divides.
