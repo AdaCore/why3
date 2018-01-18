@@ -38,13 +38,13 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition t'real: t -> R.
+Definition t'real : t -> R.
 Proof.
   apply B2R.
 Defined.
 
 (* Why3 goal *)
-Definition t'isFinite: t -> Prop.
+Definition t'isFinite : t -> Prop.
 Proof.
   apply is_finite.
 Defined.
@@ -81,153 +81,153 @@ now apply bpow_le.
 Qed.
 
 (* Why3 goal *)
-Definition zeroF: t.
+Definition zeroF : t.
 Proof.
   apply zeroF.
 Defined.
 
 (* Why3 goal *)
-Definition add: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition add : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   now apply add.
 Defined.
 
 (* Why3 goal *)
-Definition sub: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition sub : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   now apply sub.
 Defined.
 
 (* Why3 goal *)
-Definition mul: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition mul : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   now apply mul.
 Defined.
 
 (* Why3 goal *)
-Definition div: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition div : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   now apply div.
 Defined.
 
 (* Why3 goal *)
-Definition abs: t -> t.
+Definition abs : t -> t.
 Proof.
   apply abs.
 Defined.
 
 (* Why3 goal *)
-Definition neg: t -> t.
+Definition neg : t -> t.
 Proof.
   apply neg.
 Defined.
 
 (* Why3 goal *)
-Definition fma: ieee_float.RoundingMode.mode -> t -> t -> t -> t.
+Definition fma : ieee_float.RoundingMode.mode -> t -> t -> t -> t.
 Proof.
   now apply fma.
 Defined.
 
 (* Why3 goal *)
-Definition sqrt: ieee_float.RoundingMode.mode -> t -> t.
+Definition sqrt : ieee_float.RoundingMode.mode -> t -> t.
 Proof.
   now apply GenericFloat.sqrt.
 Defined.
 
 (* Why3 goal *)
-Definition roundToIntegral: ieee_float.RoundingMode.mode -> t -> t.
+Definition roundToIntegral : ieee_float.RoundingMode.mode -> t -> t.
 Proof.
   now apply roundToIntegral.
 Defined.
 
 (* Why3 goal *)
-Definition min: t -> t -> t.
+Definition min : t -> t -> t.
 Proof.
   now apply min.
 Defined.
 
 (* Why3 goal *)
-Definition max: t -> t -> t.
+Definition max : t -> t -> t.
 Proof.
   now apply max.
 Defined.
 
 (* Why3 goal *)
-Definition le: t -> t -> Prop.
+Definition le : t -> t -> Prop.
 Proof.
   apply le.
 Defined.
 
 (* Why3 goal *)
-Definition lt: t -> t -> Prop.
+Definition lt : t -> t -> Prop.
 Proof.
   apply lt.
 Defined.
 
 (* Why3 goal *)
-Definition eq: t -> t -> Prop.
+Definition eq : t -> t -> Prop.
 Proof.
   apply eq.
 Defined.
 
 (* Why3 goal *)
-Definition is_normal: t -> Prop.
+Definition is_normal : t -> Prop.
 Proof.
   apply is_normal.
 Defined.
 
 (* Why3 goal *)
-Definition is_subnormal: t -> Prop.
+Definition is_subnormal : t -> Prop.
 Proof.
   apply is_subnormal.
 Defined.
 
 (* Why3 goal *)
-Definition is_zero: t -> Prop.
+Definition is_zero : t -> Prop.
 Proof.
   apply is_zero.
 Defined.
 
 (* Why3 goal *)
-Definition is_infinite: t -> Prop.
+Definition is_infinite : t -> Prop.
 Proof.
   apply is_infinite.
 Defined.
 
 (* Why3 goal *)
-Definition is_nan: t -> Prop.
+Definition is_nan : t -> Prop.
 Proof.
   apply is_nan.
 Defined.
 
 (* Why3 goal *)
-Definition is_positive: t -> Prop.
+Definition is_positive : t -> Prop.
 Proof.
   apply is_positive.
 Defined.
 
 (* Why3 goal *)
-Definition is_negative: t -> Prop.
+Definition is_negative : t -> Prop.
 Proof.
   apply is_negative.
 Defined.
 
 (* Why3 assumption *)
-Definition is_plus_infinity (x:t): Prop := (is_infinite x) /\ (is_positive
-  x).
+Definition is_plus_infinity (x:t) : Prop :=
+  (is_infinite x) /\ (is_positive x).
 
 (* Why3 assumption *)
-Definition is_minus_infinity (x:t): Prop := (is_infinite x) /\ (is_negative
-  x).
+Definition is_minus_infinity (x:t) : Prop :=
+  (is_infinite x) /\ (is_negative x).
 
 (* Why3 assumption *)
-Definition is_plus_zero (x:t): Prop := (is_zero x) /\ (is_positive x).
+Definition is_plus_zero (x:t) : Prop := (is_zero x) /\ (is_positive x).
 
 (* Why3 assumption *)
-Definition is_minus_zero (x:t): Prop := (is_zero x) /\ (is_negative x).
+Definition is_minus_zero (x:t) : Prop := (is_zero x) /\ (is_negative x).
 
 (* Why3 assumption *)
-Definition is_not_nan (x:t): Prop := (t'isFinite x) \/ (is_infinite x).
+Definition is_not_nan (x:t) : Prop := (t'isFinite x) \/ (is_infinite x).
 
 (* Why3 goal *)
 Lemma is_not_nan1 : forall (x:t), (is_not_nan x) <-> ~ (is_nan x).
@@ -236,8 +236,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma is_not_finite : forall (x:t), (~ (t'isFinite x)) <-> ((is_infinite
-  x) \/ (is_nan x)).
+Lemma is_not_finite :
+  forall (x:t), (~ (t'isFinite x)) <-> ((is_infinite x) \/ (is_nan x)).
 Proof.
   apply is_not_finite.
 Qed.
@@ -268,7 +268,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition to_int: ieee_float.RoundingMode.mode -> t -> Z.
+Definition to_int : ieee_float.RoundingMode.mode -> t -> Z.
 Proof.
   now apply fp_to_z.
 Defined.
@@ -281,7 +281,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition round: ieee_float.RoundingMode.mode -> R -> R.
+Definition round : ieee_float.RoundingMode.mode -> R -> R.
 Proof.
   apply (round 11 53).
 Defined.
@@ -295,7 +295,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition max_int: Z.
+Definition max_int : Z.
 Proof.
   exact (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%Z.
 Defined.
@@ -308,7 +308,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_range (x:R): Prop :=
+Definition in_range (x:R) : Prop :=
   ((-(9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R <= x)%R /\
   (x <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 
@@ -326,7 +326,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R): Prop :=
+Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R) : Prop :=
   (in_range (round m x)).
 
 (* Why3 goal *)

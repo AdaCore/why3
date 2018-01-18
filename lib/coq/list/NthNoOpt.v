@@ -17,7 +17,7 @@ Require int.Int.
 Require list.List.
 
 (* Why3 goal *)
-Definition nth: forall {a:Type} {a_WT:WhyType a}, Z -> (list a) -> a.
+Definition nth : forall {a:Type} {a_WT:WhyType a}, Z -> (list a) -> a.
 intros a a_WT.
 exact (fix nth n l := match l with nil => why_inhabitant | cons h t => if Zeq_bool n Z0 then h else nth (n - 1)%Z t end).
 Defined.

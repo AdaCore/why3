@@ -24,37 +24,36 @@ Require floating_point.SingleFormat.
 Require Import floating_point.GenFloat.
 
 (* Why3 goal *)
-Definition round: floating_point.Rounding.mode -> R -> R.
+Definition round : floating_point.Rounding.mode -> R -> R.
 exact (round 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition value: floating_point.SingleFormat.single -> R.
+Definition value : floating_point.SingleFormat.single -> R.
 exact (value 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition exact: floating_point.SingleFormat.single -> R.
+Definition exact : floating_point.SingleFormat.single -> R.
 exact (exact 24 128).
 Defined.
 
 (* Why3 goal *)
-Definition model: floating_point.SingleFormat.single -> R.
+Definition model : floating_point.SingleFormat.single -> R.
 exact (model 24 128).
 Defined.
 
 (* Why3 assumption *)
-Definition round_error (x:floating_point.SingleFormat.single): R :=
+Definition round_error (x:floating_point.SingleFormat.single) : R :=
   (Reals.Rbasic_fun.Rabs ((value x) - (exact x))%R).
 
 (* Why3 assumption *)
-Definition total_error (x:floating_point.SingleFormat.single): R :=
+Definition total_error (x:floating_point.SingleFormat.single) : R :=
   (Reals.Rbasic_fun.Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
-Definition no_overflow (m:floating_point.Rounding.mode) (x:R): Prop :=
-  ((Reals.Rbasic_fun.Rabs (round m
-  x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
+Definition no_overflow (m:floating_point.Rounding.mode) (x:R) : Prop :=
+  ((Reals.Rbasic_fun.Rabs (round m x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
 
 Lemma max_single_eq: (33554430 * 10141204801825835211973625643008 = max 24 128)%R.
 unfold max, Fcore_defs.F2R; simpl.
@@ -62,8 +61,8 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_real_no_overflow : forall (m:floating_point.Rounding.mode)
-  (x:R),
+Lemma Bounded_real_no_overflow :
+  forall (m:floating_point.Rounding.mode) (x:R),
   ((Reals.Rbasic_fun.Rabs x) <= (33554430 * 10141204801825835211973625643008)%R)%R ->
   (no_overflow m x).
 intros m x Hx.
@@ -73,7 +72,8 @@ exact (Bounded_real_no_overflow 24 128 (refl_equal true) (refl_equal true) m x H
 Qed.
 
 (* Why3 goal *)
-Lemma Round_monotonic : forall (m:floating_point.Rounding.mode) (x:R) (y:R),
+Lemma Round_monotonic :
+  forall (m:floating_point.Rounding.mode) (x:R) (y:R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
 apply Round_monotonic.
 easy.
@@ -93,7 +93,8 @@ now apply Round_value.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_value : forall (x:floating_point.SingleFormat.single),
+Lemma Bounded_value :
+  forall (x:floating_point.SingleFormat.single),
   ((Reals.Rbasic_fun.Rabs (value x)) <= (33554430 * 10141204801825835211973625643008)%R)%R.
 rewrite max_single_eq.
 now apply Bounded_value.
@@ -109,14 +110,14 @@ now apply Exact_rounding_for_integers.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_le : forall (x:R), ((round floating_point.Rounding.Down
-  x) <= x)%R.
+Lemma Round_down_le :
+  forall (x:R), ((round floating_point.Rounding.Down x) <= x)%R.
 now apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_ge : forall (x:R), (x <= (round floating_point.Rounding.Up
-  x))%R.
+Lemma Round_up_ge :
+  forall (x:R), (x <= (round floating_point.Rounding.Up x))%R.
 now apply Round_up_ge.
 Qed.
 

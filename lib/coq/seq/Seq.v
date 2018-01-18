@@ -32,7 +32,7 @@ decide equality.
 Qed.
 
 (* Why3 goal *)
-Definition length: forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z.
+Definition length : forall {a:Type} {a_WT:WhyType a}, (seq a) -> Z.
 intros a a_WT.
 exact (fix len l := match l with
   | nil => 0 | cons _ t => 1 + len t end)%Z.

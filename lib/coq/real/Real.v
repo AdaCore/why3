@@ -27,8 +27,8 @@ Require BuiltIn.
 (* infix_ls is replaced with (x < x1)%R by the coq driver *)
 
 (* Why3 goal *)
-Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
-  (x = y)).
+Lemma infix_lseq_def :
+  forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/ (x = y)).
 Proof.
 reflexivity.
 Qed.
@@ -196,8 +196,8 @@ exact Rle_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma Trans : forall (x:R) (y:R) (z:R), (x <= y)%R -> ((y <= z)%R ->
-  (x <= z)%R).
+Lemma Trans :
+  forall (x:R) (y:R) (z:R), (x <= y)%R -> ((y <= z)%R -> (x <= z)%R).
 Proof.
 exact Rle_trans.
 Qed.
@@ -225,8 +225,8 @@ exact Rle_0_1.
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderAdd : forall (x:R) (y:R) (z:R), (x <= y)%R ->
-  ((x + z)%R <= (y + z)%R)%R.
+Lemma CompatOrderAdd :
+  forall (x:R) (y:R) (z:R), (x <= y)%R -> ((x + z)%R <= (y + z)%R)%R.
 Proof.
 intros x y z.
 exact (Rplus_le_compat_r z x y).

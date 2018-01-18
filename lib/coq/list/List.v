@@ -15,7 +15,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)): Prop :=
+Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)) : Prop :=
   match l with
   | Init.Datatypes.nil => True
   | (Init.Datatypes.cons _ _) => False

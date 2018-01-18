@@ -16,7 +16,7 @@ Require BuiltIn.
 Require int.Int.
 
 (* Why3 goal *)
-Definition pow2: Z -> Z.
+Definition pow2 : Z -> Z.
   exact (two_p).
 Defined.
 
@@ -26,8 +26,8 @@ Lemma Power_0 : ((pow2 0%Z) = 1%Z).
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s : forall (n:Z), (0%Z <= n)%Z ->
-  ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
+Lemma Power_s :
+  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
   apply two_p_S.
 Qed.
 
@@ -37,7 +37,9 @@ Lemma Power_1 : ((pow2 1%Z) = 2%Z).
 Qed.
 
 (* Why3 goal *)
-Lemma Power_sum : forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
+Lemma Power_sum :
+  forall (n:Z) (m:Z),
+  ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
   unfold pow2.
   intros n m [H1 H2].

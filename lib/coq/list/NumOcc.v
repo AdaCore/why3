@@ -21,7 +21,7 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 goal *)
-Definition num_occ: forall {a:Type} {a_WT:WhyType a}, a -> (list a) -> Z.
+Definition num_occ : forall {a:Type} {a_WT:WhyType a}, a -> (list a) -> Z.
 intros a a_WT x.
 exact (fix num_occ (l : list a) : int :=
   match l with

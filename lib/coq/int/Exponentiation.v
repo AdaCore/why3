@@ -29,8 +29,9 @@ Variable one: t.
 Variable infix_as: t -> t -> t.
 
 (* Why3 goal *)
-Hypothesis Assoc : forall (x:t) (y:t) (z:t), ((infix_as (infix_as x y)
-  z) = (infix_as x (infix_as y z))).
+Hypothesis Assoc :
+  forall (x:t) (y:t) (z:t),
+  ((infix_as (infix_as x y) z) = (infix_as x (infix_as y z))).
 
 (* Why3 goal *)
 Hypothesis Unit_def_l : forall (x:t), ((infix_as one x) = x).
@@ -39,7 +40,7 @@ Hypothesis Unit_def_l : forall (x:t), ((infix_as one x) = x).
 Hypothesis Unit_def_r : forall (x:t), ((infix_as x one) = x).
 
 (* Why3 goal *)
-Definition power: t -> Z -> t.
+Definition power : t -> Z -> t.
 intros x n.
 exact (iter_nat (Zabs_nat n) t (fun acc => infix_as x acc) one).
 Defined.

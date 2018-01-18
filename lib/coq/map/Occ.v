@@ -18,8 +18,8 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 goal *)
-Definition occ: forall {a:Type} {a_WT:WhyType a}, a -> (Z -> a) -> Z -> Z ->
-  Z.
+Definition occ :
+  forall {a:Type} {a_WT:WhyType a}, a -> (Z -> a) -> Z -> Z -> Z.
 Proof.
 intros a a_WT v m l u.
 induction (Z.to_nat (u-l)) as [|delta occ_].

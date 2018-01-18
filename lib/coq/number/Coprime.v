@@ -23,7 +23,7 @@ Require number.Gcd.
 Require number.Prime.
 
 (* Why3 assumption *)
-Definition coprime (a:Z) (b:Z): Prop := ((number.Gcd.gcd a b) = 1%Z).
+Definition coprime (a:Z) (b:Z) : Prop := ((number.Gcd.gcd a b) = 1%Z).
 
 Lemma coprime_is_Zrel_prime :
   forall a b, coprime a b <-> Znumtheory.rel_prime a b.

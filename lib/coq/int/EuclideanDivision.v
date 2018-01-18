@@ -17,7 +17,7 @@ Require int.Int.
 Require int.Abs.
 
 (* Why3 goal *)
-Definition div: Z -> Z -> Z.
+Definition div : Z -> Z -> Z.
 intros x y.
 case (Z_le_dec 0 (Zmod x y)) ; intros H.
 exact (Zdiv x y).
@@ -25,7 +25,7 @@ exact (Zdiv x y + 1)%Z.
 Defined.
 
 (* Why3 goal *)
-Definition mod1: Z -> Z -> Z.
+Definition mod1 : Z -> Z -> Z.
 intros x y.
 exact (x - y * div x y)%Z.
 Defined.

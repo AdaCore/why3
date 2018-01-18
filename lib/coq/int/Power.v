@@ -50,8 +50,9 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s_alt : forall (x:Z) (n:Z), (0%Z < n)%Z -> ((power x
-  n) = (x * (power x (n - 1%Z)%Z))%Z).
+Lemma Power_s_alt :
+  forall (x:Z) (n:Z),
+  (0%Z < n)%Z -> ((power x n) = (x * (power x (n - 1%Z)%Z))%Z).
 intros x n h1.
 rewrite <- Power_s.
 f_equal; auto with zarith.

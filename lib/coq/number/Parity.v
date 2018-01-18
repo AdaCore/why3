@@ -18,10 +18,10 @@ Require int.Abs.
 Require int.ComputerDivision.
 
 (* Why3 assumption *)
-Definition even (n:Z): Prop := exists k:Z, (n = (2%Z * k)%Z).
+Definition even (n:Z) : Prop := exists k:Z, (n = (2%Z * k)%Z).
 
 (* Why3 assumption *)
-Definition odd (n:Z): Prop := exists k:Z, (n = ((2%Z * k)%Z + 1%Z)%Z).
+Definition odd (n:Z) : Prop := exists k:Z, (n = ((2%Z * k)%Z + 1%Z)%Z).
 
 Lemma even_is_Zeven :
   forall n, even n <-> Zeven n.
@@ -126,8 +126,8 @@ now exists k.
 Qed.
 
 (* Why3 goal *)
-Lemma even_mod2 : forall (n:Z), (even n) <->
-  ((ZArith.BinInt.Z.rem n 2%Z) = 0%Z).
+Lemma even_mod2 :
+  forall (n:Z), (even n) <-> ((ZArith.BinInt.Z.rem n 2%Z) = 0%Z).
 Proof.
 intros n.
 rewrite even_is_Zeven.

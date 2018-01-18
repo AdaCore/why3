@@ -24,31 +24,31 @@ Require floating_point.DoubleFormat.
 Require Import floating_point.GenFloat.
 
 (* Why3 goal *)
-Definition round: floating_point.Rounding.mode -> R -> R.
+Definition round : floating_point.Rounding.mode -> R -> R.
 exact (round 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition value: floating_point.DoubleFormat.double -> R.
+Definition value : floating_point.DoubleFormat.double -> R.
 exact (value 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition exact: floating_point.DoubleFormat.double -> R.
+Definition exact : floating_point.DoubleFormat.double -> R.
 exact (exact 53 1024).
 Defined.
 
 (* Why3 goal *)
-Definition model: floating_point.DoubleFormat.double -> R.
+Definition model : floating_point.DoubleFormat.double -> R.
 exact (model 53 1024).
 Defined.
 
 (* Why3 assumption *)
-Definition round_error (x:floating_point.DoubleFormat.double): R :=
+Definition round_error (x:floating_point.DoubleFormat.double) : R :=
   (Reals.Rbasic_fun.Rabs ((value x) - (exact x))%R).
 
 (* Why3 assumption *)
-Definition total_error (x:floating_point.DoubleFormat.double): R :=
+Definition total_error (x:floating_point.DoubleFormat.double) : R :=
   (Reals.Rbasic_fun.Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
@@ -57,15 +57,16 @@ Definition no_overflow (m:floating_point.Rounding.mode) (x:R): Prop :=
   x)) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 
 (* Why3 goal *)
-Lemma Bounded_real_no_overflow : forall (m:floating_point.Rounding.mode)
-  (x:R),
+Lemma Bounded_real_no_overflow :
+  forall (m:floating_point.Rounding.mode) (x:R),
   ((Reals.Rbasic_fun.Rabs x) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R ->
   (no_overflow m x).
 exact (Bounded_real_no_overflow 53 1024 (refl_equal true) (refl_equal true)).
 Qed.
 
 (* Why3 goal *)
-Lemma Round_monotonic : forall (m:floating_point.Rounding.mode) (x:R) (y:R),
+Lemma Round_monotonic :
+  forall (m:floating_point.Rounding.mode) (x:R) (y:R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
 now apply Round_monotonic.
 Qed.
@@ -99,14 +100,14 @@ now apply Exact_rounding_for_integers.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_le : forall (x:R), ((round floating_point.Rounding.Down
-  x) <= x)%R.
+Lemma Round_down_le :
+  forall (x:R), ((round floating_point.Rounding.Down x) <= x)%R.
 now apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_ge : forall (x:R), (x <= (round floating_point.Rounding.Up
-  x))%R.
+Lemma Round_up_ge :
+  forall (x:R), (x <= (round floating_point.Rounding.Up x))%R.
 now apply Round_up_ge.
 Qed.
 
@@ -123,13 +124,14 @@ now apply Round_up_neg.
 Qed.
 
 (* Why3 goal *)
-Definition round_logic: floating_point.Rounding.mode -> R ->
-  floating_point.DoubleFormat.double.
+Definition round_logic :
+  floating_point.Rounding.mode -> R -> floating_point.DoubleFormat.double.
 exact (round_logic 53 1024 (refl_equal true) (refl_equal true)).
 Defined.
 
 (* Why3 goal *)
-Lemma Round_logic_def : forall (m:floating_point.Rounding.mode) (x:R),
+Lemma Round_logic_def :
+  forall (m:floating_point.Rounding.mode) (x:R),
   (no_overflow m x) -> ((value (round_logic m x)) = (round m x)).
 Proof.
 exact (Round_logic_def 53 1024 (refl_equal true) (refl_equal true)).

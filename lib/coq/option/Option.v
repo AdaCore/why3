@@ -15,7 +15,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)): Prop :=
+Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)) : Prop :=
   match o with
   | Init.Datatypes.None => True
   | (Init.Datatypes.Some _) => False

@@ -16,7 +16,7 @@ Require BuiltIn.
 Require list.List.
 
 (* Why3 goal *)
-Definition hd: forall {a:Type} {a_WT:WhyType a}, (list a) -> a.
+Definition hd : forall {a:Type} {a_WT:WhyType a}, (list a) -> a.
 intros a a_WT [|h _].
 exact why_inhabitant.
 exact h.
@@ -30,7 +30,7 @@ now intros a a_WT x r.
 Qed.
 
 (* Why3 goal *)
-Definition tl: forall {a:Type} {a_WT:WhyType a}, (list a) -> (list a).
+Definition tl : forall {a:Type} {a_WT:WhyType a}, (list a) -> (list a).
 intros a a_WT [|_ t].
 exact nil.
 exact t.

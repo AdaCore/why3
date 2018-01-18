@@ -61,13 +61,13 @@ Section GenericFloat.
 Variable eb_pos sb_pos : positive.
 
 (* Why3 goal *)
-Definition eb: Z.
+Definition eb : Z.
 Proof.
   exact (Z.pos eb_pos).
 Defined.
 
 (* Why3 goal *)
-Definition sb: Z.
+Definition sb : Z.
 Proof.
   exact (Z.pos sb_pos).
 Defined.
@@ -102,7 +102,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition zeroF: t.
+Definition zeroF : t.
 Proof.
   exact (B754_zero false).
 Defined.
@@ -228,47 +228,47 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition add: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition add : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   exact (Bplus sb emax _ Hemax' nan_bf).
 Defined.
 
 (* Why3 goal *)
-Definition sub: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition sub : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   exact (Bminus sb emax _ Hemax' nan_bf).
 Defined.
 
 (* Why3 goal *)
-Definition mul: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition mul : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   exact (Bmult sb emax _ Hemax' nan_bf).
 Defined.
 
 (* Why3 goal *)
-Definition div: ieee_float.RoundingMode.mode -> t -> t -> t.
+Definition div : ieee_float.RoundingMode.mode -> t -> t -> t.
 Proof.
   exact (Bdiv sb emax _ Hemax' nan_bf).
 Defined.
 
 (* Why3 goal *)
-Definition abs: t -> t.
+Definition abs : t -> t.
 Proof.
   exact (Babs sb emax pair).
 Defined.
 
 (* Why3 goal *)
-Definition neg: t -> t.
+Definition neg : t -> t.
 Proof.
   exact (Bopp sb emax pair).
 Defined.
 
 (* Why3 goal *)
-Definition fma: ieee_float.RoundingMode.mode -> t -> t -> t -> t.
+Definition fma : ieee_float.RoundingMode.mode -> t -> t -> t -> t.
 Admitted.
 
 (* Why3 goal *)
-Definition sqrt: ieee_float.RoundingMode.mode -> t -> t.
+Definition sqrt : ieee_float.RoundingMode.mode -> t -> t.
 Proof.
   exact (Bsqrt sb emax Hsb' Hemax' (fun b => (true,One_Nan_pl))).
 Defined.
@@ -287,7 +287,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition roundToIntegral: ieee_float.RoundingMode.mode -> t -> t.
+Definition roundToIntegral : ieee_float.RoundingMode.mode -> t -> t.
 Proof.
   exact (fun m x =>
            match x with
@@ -304,7 +304,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition min: t -> t -> t.
+Definition min : t -> t -> t.
 Proof.
   exact (fun x y => match Bcompare _ _ x y with
            | Some Lt => x
@@ -314,7 +314,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition max: t -> t -> t.
+Definition max : t -> t -> t.
 Proof.
   exact (fun x y => match Bcompare _ _ x y with
            | Some Lt => y
@@ -324,7 +324,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition le: t -> t -> Prop.
+Definition le : t -> t -> Prop.
 Proof.
   exact (fun a b => Bcompare _ _ a b = Some Lt \/ Bcompare _ _ a b = Some Eq).
 Defined.
@@ -332,7 +332,7 @@ Defined.
 Hint Unfold le.
 
 (* Why3 goal *)
-Definition lt: t -> t -> Prop.
+Definition lt : t -> t -> Prop.
 Proof.
   exact (fun a b => Bcompare _ _ a b = Some Lt).
 Defined.
@@ -362,7 +362,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition eq: t -> t -> Prop.
+Definition eq : t -> t -> Prop.
 Proof.
   exact (fun a b => Bcompare _ _ a b = Some Eq).
 Defined.
@@ -394,7 +394,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_normal: t -> Prop.
+Definition is_normal : t -> Prop.
 Proof.
   exact (fun x => match x with
                     | B754_zero _ => True
@@ -404,7 +404,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition is_subnormal: t -> Prop.
+Definition is_subnormal : t -> Prop.
 Proof.
   exact (fun x => match x with
                     | B754_finite _ _ e _ => (emin = e)%Z
@@ -413,7 +413,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition is_zero: t -> Prop.
+Definition is_zero : t -> Prop.
 Proof.
   exact (fun x => eq zeroF x).
 Defined.
@@ -442,7 +442,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_infinite: t -> Prop.
+Definition is_infinite : t -> Prop.
 Proof.
   exact (fun x => match x with
                   | B754_infinity _ => True
@@ -458,7 +458,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_nan: t -> Prop.
+Definition is_nan : t -> Prop.
 Proof.
   exact (is_nan sb emax).
 Defined.
@@ -518,7 +518,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_positive: t -> Prop.
+Definition is_positive : t -> Prop.
 Proof.
   exact (fun x => match x with
                     | B754_zero false => True
@@ -546,7 +546,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_negative: t -> Prop.
+Definition is_negative : t -> Prop.
 Proof.
   exact (fun x => match x with
                     | B754_zero true => True
@@ -573,7 +573,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_finite: t -> Prop.
+Definition is_finite : t -> Prop.
   exact (is_finite sb emax).
 Defined.
 
@@ -663,21 +663,21 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition is_plus_infinity (x:t): Prop := (is_infinite x) /\ (is_positive
-  x).
+Definition is_plus_infinity (x:t) : Prop :=
+  (is_infinite x) /\ (is_positive x).
 
 (* Why3 assumption *)
-Definition is_minus_infinity (x:t): Prop := (is_infinite x) /\ (is_negative
-  x).
+Definition is_minus_infinity (x:t) : Prop :=
+  (is_infinite x) /\ (is_negative x).
 
 (* Why3 assumption *)
-Definition is_plus_zero (x:t): Prop := (is_zero x) /\ (is_positive x).
+Definition is_plus_zero (x:t) : Prop := (is_zero x) /\ (is_positive x).
 
 (* Why3 assumption *)
-Definition is_minus_zero (x:t): Prop := (is_zero x) /\ (is_negative x).
+Definition is_minus_zero (x:t) : Prop := (is_zero x) /\ (is_negative x).
 
 (* Why3 assumption *)
-Definition is_not_nan (x:t): Prop := (is_finite x) \/ (is_infinite x).
+Definition is_not_nan (x:t) : Prop := (is_finite x) \/ (is_infinite x).
 
 (* Why3 goal *)
 Lemma is_not_nan1 : forall (x:t), (is_not_nan x) <-> ~ (is_nan x).
@@ -702,7 +702,7 @@ destruct h as [h|h]; contradict h; easy.
 Qed.
 
 (* Why3 goal *)
-Definition to_real: t -> R.
+Definition to_real : t -> R.
 Proof.
   exact (B2R sb emax).
 Defined.

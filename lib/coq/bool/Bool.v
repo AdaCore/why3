@@ -15,7 +15,8 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 goal *)
-Lemma andb_def : forall (x:bool) (y:bool),
+Lemma andb_def :
+  forall (x:bool) (y:bool),
   ((Init.Datatypes.andb x y) = match x with
   | true => y
   | false => false
@@ -26,7 +27,8 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma orb_def : forall (x:bool) (y:bool),
+Lemma orb_def :
+  forall (x:bool) (y:bool),
   ((Init.Datatypes.orb x y) = match x with
   | false => y
   | true => true
@@ -37,7 +39,8 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma notb_def : forall (x:bool),
+Lemma notb_def :
+  forall (x:bool),
   ((Init.Datatypes.negb x) = match x with
   | false => true
   | true => false
@@ -48,7 +51,8 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma xorb_def : forall (x:bool) (y:bool),
+Lemma xorb_def :
+  forall (x:bool) (y:bool),
   ((Init.Datatypes.xorb x y) = match x with
   | false => y
   | true => (Init.Datatypes.negb y)
@@ -59,7 +63,8 @@ destruct x; destruct y; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma implb_def : forall (x:bool) (y:bool),
+Lemma implb_def :
+  forall (x:bool) (y:bool),
   ((Init.Datatypes.implb x y) = match x with
   | false => true
   | true => y

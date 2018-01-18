@@ -23,7 +23,7 @@ Fixpoint numof_aux (f : Z -> bool) (a : Z) (n : nat) : Z :=
   end.
 
 (* Why3 goal *)
-Definition numof: (Z -> bool) -> Z -> Z -> Z.
+Definition numof : (Z -> bool) -> Z -> Z -> Z.
 Proof.
   exact (fun f a b => numof_aux f a (Z.to_nat (b - a))).
 Defined.

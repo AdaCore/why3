@@ -37,8 +37,8 @@ apply excluded_middle_informative.
 Qed.
 
 (* Why3 assumption *)
-Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:(a -> bool)): Prop := ((s
-  x) = true).
+Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:(a -> bool)) : Prop :=
+  ((s x) = true).
 
 Hint Unfold mem.
 
