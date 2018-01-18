@@ -13,11 +13,6 @@ module Gnat_Protocol = struct
     let r = parse_request s in
     requests := r :: !requests
 
-  (* In a string, there can be several requests separated by ">>>>". *)
-  let push_request_string (s: string) =
-    let list_request = Str.split (Str.regexp ">>>>") s in
-    List.iter push_one_request_string list_request
-
   let push_request r =
     requests := r :: !requests
 
@@ -27,20 +22,17 @@ module Gnat_Protocol = struct
     requests := [];
     List.rev l
 
-  let length_notif () : int =
-    Queue.length notification_queue
+  let has_notification () : bool =
+    not (Queue.is_empty notification_queue)
 
   let notify n =
     Queue.add n notification_queue
 
   (* Communicate n notifications *)
   let communicate_notification () =
-    try
       let n = Queue.pop notification_queue in
 (* TODO think of a better way of separating stuff than > *)
       Format.printf "%a>>>>@." print_notification n
-    with
-    _ -> ()
 
 end
 
@@ -91,54 +83,72 @@ let timeout ~ms f =
   let time = Unix.gettimeofday () in
   insert_timeout_handler ms (time +. ms) f
 
-(* buffer for storing character read on stdin.
-   4096 is arbitrary (cf spark plugin) *)
-let buf = Bytes.create 4096
+let read_from_client fd =
+  let buf = Bytes.make 4096 ' ' in
+  fun blocking ->
+      let do_read =
+        blocking ||
+        (let l,_,_ = Unix.select [fd] [] [] 0.0 in l <> [])
+      in
+      if do_read then
+        let read = Unix.read fd buf 0 1024 in
+        Bytes.sub_string buf 0 read
+      else ""
 
-let main_loop treat_requests length_notif communicate_notification =
+let read_lines fd =
+  let filter l =
+    List.filter (fun y -> String.length y > 0) l
+  in
+  let recv_buf : Buffer.t = Buffer.create 65536 in
+  let read_from_client = read_from_client fd in
+  let rec aux blocking =
+    let s = read_from_client blocking in
+    (* TODO: should we detect and handle EOF here? *)
+    if s = "" then [] else
+    if String.contains s '\n' then begin
+      let s = Buffer.contents recv_buf ^ s in
+      Buffer.clear recv_buf;
+      let l = Strings.rev_split '\n' s in
+      match l with
+      | [] -> assert false
+      | [x] when x = "" -> []
+      | [x] -> [x]
+      | x::xs ->
+        if x = "" then List.rev (filter xs) else
+(* ??? This case cannot happen  if x.[String.length x - 1] = '\n'
+then List.rev (filter l) *)
+        begin
+          Buffer.add_string recv_buf x;
+          List.rev (filter xs)
+        end
+    end else begin
+      Buffer.add_string recv_buf s;
+      aux blocking
+    end
+  in aux
 
-  let delay_comm = ref 0 in
+let main_loop () =
+
+  let read_lines = read_lines Unix.stdin in
   (* attempt to run the first timeout handler *)
   while true do
-    delay_comm := !delay_comm + 1;
-    try (
-      (* We want to avoid too many communications. We use delay_comm to avoid
-         selecting on stdin/stdout too often. TODO there must be a better way
-         for this. 10 is arbitrary *)
-      (* Communications *)
-      if !delay_comm = 10 then
-        begin
-          delay_comm := 0;
-          (* TODO why 0.1 ? *)
-          let (todo, _, _) = Unix.select [Unix.stdin] [] [] 0.1 in
-          if todo != [] then
-            let n = try Unix.read Unix.stdin buf 0 4096 with _ -> 0 in
-            if n < 1 then
-              ()
-            else
-              let s = Bytes.sub_string buf 0 (n-1) in
-              (* TODO: Note that, here, we probably assume that stdin is of size
-                 less than 4096. If requests are sent really fast (or ITP server
-                 is busy doing something else), this could not be true. So, we
-                 should change this on the long term. Easy to end up with
-                 partial requests which we do not want here. *)
-              treat_requests s
-          else
-            ();
-          (* Here we only query stdout if we have something to write *)
-          if length_notif () > 0 then
-            (* TODO why 0.1 ? *)
-            let (_, tonotify, _) = Unix.select [] [Unix.stdout] [] 0.1 in
-            if tonotify != [] then
-              for _i = 0 to length_notif() do
-                try communicate_notification () with _ -> ()
-              done
-            else
-              ()
-          else
-            ()
-        end;
+    try
       let time = Unix.gettimeofday () in
+      let delay =
+        match !timeout_handler, !idle_handler with
+        | _, [_] -> 0.0
+        | [], _ -> 1.0
+        | (_, t, _) :: _ , _ -> min (time -. t) 0.0
+      in
+      let output =
+        if Gnat_Protocol.has_notification () then [Unix.stdout] else [] in
+      let l1, l2, _ = Unix.select [Unix.stdin] output [] delay in
+      if l1 <> [] then
+          List.iter Gnat_Protocol.push_one_request_string (read_lines true);
+      if l2 <> [] then
+          while Gnat_Protocol.has_notification () do
+            Gnat_Protocol.communicate_notification ()
+          done;
       match !timeout_handler with
       | (ms,t,f) :: rem when t <= time ->
           timeout_handler := rem;
@@ -156,9 +166,10 @@ let main_loop treat_requests length_notif communicate_notification =
                 if b then insert_idle_handler p f
             | [] -> ()
           end
-     ) with e ->  Format.printf "FAIL TODO %a>>>>@." Exn_printer.exn_printer e;
-       if debug then
-         raise e
+    with e ->
+      Format.printf "{ Failure: \"%a\"}>>>>@." Exn_printer.exn_printer e;
+      if debug then
+        raise e
   done
 end
 
@@ -230,4 +241,4 @@ let () =
 (***********************)
 
 let () =
-  Gnat_Scheduler.main_loop Gnat_Protocol.push_request_string Gnat_Protocol.length_notif Gnat_Protocol.communicate_notification
+  Gnat_Scheduler.main_loop ()
