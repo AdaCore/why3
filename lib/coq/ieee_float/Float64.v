@@ -255,14 +255,14 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma zero_to_real : forall (x:t), (is_zero x) <-> ((t'isFinite x) /\
-  ((t'real x) = 0%R)).
+Lemma zero_to_real :
+  forall (x:t), (is_zero x) <-> ((t'isFinite x) /\ ((t'real x) = 0%R)).
 Proof.
   apply zero_to_real.
 Qed.
 
 (* Why3 goal *)
-Definition of_int: ieee_float.RoundingMode.mode -> Z -> t.
+Definition of_int : ieee_float.RoundingMode.mode -> Z -> t.
 Proof.
   now apply z_to_fp.
 Defined.
@@ -313,8 +313,8 @@ Definition in_range (x:R) : Prop :=
   (x <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 
 (* Why3 assumption *)
-Definition in_int_range (i:Z): Prop := ((-max_int)%Z <= i)%Z /\
-  (i <= max_int)%Z.
+Definition in_int_range (i:Z) : Prop :=
+  ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
 Lemma is_finite : forall (x:t), (t'isFinite x) -> (in_range (t'real x)).
@@ -361,15 +361,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_le : forall (x:R), ((round ieee_float.RoundingMode.RTN
-  x) <= x)%R.
+Lemma Round_down_le :
+  forall (x:R), ((round ieee_float.RoundingMode.RTN x) <= x)%R.
 Proof.
   apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_ge : forall (x:R), (x <= (round ieee_float.RoundingMode.RTP
-  x))%R.
+Lemma Round_up_ge :
+  forall (x:R), (x <= (round ieee_float.RoundingMode.RTP x))%R.
 Proof.
   apply Round_up_ge.
 Qed.
@@ -389,7 +389,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_safe_int_range (i:Z): Prop :=
+Definition in_safe_int_range (i:Z) : Prop :=
   ((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z.
 
 (* Why3 goal *)
@@ -436,8 +436,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma eq_trans : forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x
-  z)).
+Lemma eq_trans :
+  forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x z)).
 Proof.
   apply eq_trans.
 Qed.
@@ -478,15 +478,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma le_lt_trans : forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x
-  z).
+Lemma le_lt_trans :
+  forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x z).
 Proof.
   apply le_lt_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_le_trans : forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x
-  z).
+Lemma lt_le_trans :
+  forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x z).
 Proof.
   apply lt_le_trans.
 Qed.
@@ -620,7 +620,7 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
   end.
 
 (* Why3 assumption *)
-Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
+Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   (is_zero x) ->
   match m with
   | ieee_float.RoundingMode.RTN => (is_negative x)
@@ -1033,7 +1033,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_int: t -> Prop.
+Definition is_int : t -> Prop.
 Proof.
   apply is_int.
 Defined.
@@ -1123,8 +1123,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma is_int_to_int : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int
-  x) -> (in_int_range (to_int m x)).
+Lemma is_int_to_int :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (is_int x) -> (in_int_range (to_int m x)).
 Proof.
   now apply is_int_to_int.
 Qed.
@@ -1136,15 +1137,17 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma int_to_real : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int
-  x) -> ((t'real x) = (BuiltIn.IZR (to_int m x))).
+Lemma int_to_real :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (is_int x) -> ((t'real x) = (BuiltIn.IZR (to_int m x))).
 Proof.
   apply int_to_real.
 Qed.
 
 (* Why3 goal *)
-Lemma truncate_int : forall (m:ieee_float.RoundingMode.mode) (i:t), (is_int
-  i) -> (eq (roundToIntegral m i) i).
+Lemma truncate_int :
+  forall (m:ieee_float.RoundingMode.mode) (i:t),
+  (is_int i) -> (eq (roundToIntegral m i) i).
 Proof.
   now apply truncate_int.
 Qed.
@@ -1300,8 +1303,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma neg_to_int : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int
-  x) -> ((to_int m (neg x)) = (-(to_int m x))%Z).
+Lemma neg_to_int :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (is_int x) -> ((to_int m (neg x)) = (-(to_int m x))%Z).
 Proof.
   apply neg_to_int.
 Qed.

@@ -688,8 +688,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma is_not_finite : forall (x:t), (~ (is_finite x)) <-> ((is_infinite x) \/
-  (is_nan x)).
+Lemma is_not_finite :
+  forall (x:t), (~ (is_finite x)) <-> ((is_infinite x) \/ (is_nan x)).
 Proof.
 intros x.
 destruct x; split; intro h; try easy.
@@ -863,13 +863,13 @@ auto.
 Qed.
 
 (* Why3 goal *)
-Definition round: ieee_float.RoundingMode.mode -> R -> R.
+Definition round : ieee_float.RoundingMode.mode -> R -> R.
 Proof.
   exact (fun m => round radix2 fexp (round_mode m)).
 Defined.
 
 (* Why3 goal *)
-Definition max_real: R.
+Definition max_real : R.
 Proof.
   exact ((1 - bpow radix2 (- sb)) * bpow radix2 emax).
 Defined.
@@ -952,7 +952,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition max_int: Z.
+Definition max_int : Z.
 Proof.
   exact (2 ^ emax - 2 ^ (emax - sb))%Z.
 Defined.
@@ -975,12 +975,12 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_range (x:R): Prop := ((-max_real)%R <= x)%R /\
-  (x <= max_real)%R.
+Definition in_range (x:R) : Prop :=
+  ((-max_real)%R <= x)%R /\ (x <= max_real)%R.
 
 (* Why3 assumption *)
-Definition in_int_range (i:Z): Prop := ((-max_int)%Z <= i)%Z /\
-  (i <= max_int)%Z.
+Definition in_int_range (i:Z) : Prop :=
+  ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 Lemma in_range_bpow_radix2_emax: forall x, in_range x -> Rabs x < bpow radix2 emax.
 Proof.
@@ -1029,7 +1029,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R): Prop :=
+Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R) : Prop :=
   (in_range (round m x)).
 
 Lemma no_overflow_Rabs_round_max_real: forall {m} {x}, no_overflow m x <-> Rabs (round m x) <= max_real.
@@ -1079,8 +1079,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_real_no_overflow : forall (m:ieee_float.RoundingMode.mode)
-  (x:R), (in_range x) -> (no_overflow m x).
+Lemma Bounded_real_no_overflow :
+  forall (m:ieee_float.RoundingMode.mode) (x:R),
+  (in_range x) -> (no_overflow m x).
 Proof.
 intros m x h1.
 rewrite no_overflow_Rabs_round_max_real.
@@ -1092,7 +1093,8 @@ rewrite Abs.Abs_le; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_monotonic : forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R),
+Lemma Round_monotonic :
+  forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R),
   (x <= y)%R -> ((round m x) <= (round m y))%R.
 Proof.
   intros m x y h1.
@@ -1133,16 +1135,16 @@ apply generic_format_B2R.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_le : forall (x:R), ((round ieee_float.RoundingMode.RTN
-  x) <= x)%R.
+Lemma Round_down_le :
+  forall (x:R), ((round ieee_float.RoundingMode.RTN x) <= x)%R.
 Proof with auto with typeclass_instances.
 intros x.
 apply round_DN_pt...
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_ge : forall (x:R), (x <= (round ieee_float.RoundingMode.RTP
-  x))%R.
+Lemma Round_up_ge :
+  forall (x:R), (x <= (round ieee_float.RoundingMode.RTP x))%R.
 Proof with auto with typeclass_instances.
 intros x.
 apply round_UP_pt...
@@ -1167,7 +1169,7 @@ now rewrite Ropp_involutive.
 Qed.
 
 (* Why3 goal *)
-Definition pow2sb: Z.
+Definition pow2sb : Z.
 Proof.
   exact (Zpower 2 sb).
 Defined.
@@ -1179,8 +1181,8 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_safe_int_range (i:Z): Prop := ((-pow2sb)%Z <= i)%Z /\
-  (i <= pow2sb)%Z.
+Definition in_safe_int_range (i:Z) : Prop :=
+  ((-pow2sb)%Z <= i)%Z /\ (i <= pow2sb)%Z.
 
 Lemma max_rep_int_bounded: bounded sb emax (shift_pos (sb_pos - 1) 1) 1 = true.
 Proof.
@@ -1300,8 +1302,9 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition same_sign (x:t) (y:t): Prop := ((is_positive x) /\ (is_positive
-  y)) \/ ((is_negative x) /\ (is_negative y)).
+Definition same_sign (x:t) (y:t) : Prop :=
+  ((is_positive x) /\ (is_positive y)) \/
+  ((is_negative x) /\ (is_negative y)).
 
 Hint Unfold same_sign.
 
@@ -1314,8 +1317,9 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition diff_sign (x:t) (y:t): Prop := ((is_positive x) /\ (is_negative
-  y)) \/ ((is_negative x) /\ (is_positive y)).
+Definition diff_sign (x:t) (y:t) : Prop :=
+  ((is_positive x) /\ (is_negative y)) \/
+  ((is_negative x) /\ (is_positive y)).
 
 Hint Unfold same_sign.
 
@@ -1403,8 +1407,8 @@ unfold eq; intro h; rewrite Bcompare_swap, h; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma eq_trans : forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x
-  z)).
+Lemma eq_trans :
+  forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x z)).
 Proof.
   intros x y z h1 h2.
   destruct x, y, z; auto; destruct b, b0, b1; auto; try easy;
@@ -1545,8 +1549,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma le_lt_trans : forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x
-  z).
+Lemma le_lt_trans :
+  forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x z).
 Proof.
   intros x y z (h,h1).
   destruct h as [h|h].
@@ -1555,8 +1559,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_le_trans : forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x
-  z).
+Lemma lt_le_trans :
+  forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x z).
 Proof.
   intros x y z (h1,h2).
   destruct h2 as [h2|h2].
@@ -1687,8 +1691,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_lt_finite : forall (x:t) (y:t) (z:t), (lt x y) -> ((lt y z) ->
-  (is_finite y)).
+Lemma lt_lt_finite :
+  forall (x:t) (y:t) (z:t), (lt x y) -> ((lt y z) -> (is_finite y)).
 Proof.
 intros x y z h1 h2.
 destruct x, y, z; destruct b, b0, b1; easy.
@@ -1844,11 +1848,12 @@ destruct h3 as [(h3,h4)|(h3,h4)].
 Qed.
 
 (* Why3 assumption *)
-Definition product_sign (z:t) (x:t) (y:t): Prop := ((same_sign x y) ->
-  (is_positive z)) /\ ((diff_sign x y) -> (is_negative z)).
+Definition product_sign (z:t) (x:t) (y:t) : Prop :=
+  ((same_sign x y) -> (is_positive z)) /\
+  ((diff_sign x y) -> (is_negative z)).
 
 (* Why3 assumption *)
-Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
+Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   match m with
   | ieee_float.RoundingMode.RTN => ((is_positive x) -> ((is_finite x) /\
       ((to_real x) = max_real))) /\ ((~ (is_positive x)) -> (is_infinite x))
@@ -2237,8 +2242,8 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition same_sign_real (x:t) (r:R): Prop := ((is_positive x) /\
-  (0%R < r)%R) \/ ((is_negative x) /\ (r < 0%R)%R).
+Definition same_sign_real (x:t) (r:R) : Prop :=
+  ((is_positive x) /\ (0%R < r)%R) \/ ((is_negative x) /\ (r < 0%R)%R).
 
 Lemma sign_FF_overflow : forall m b,
     sign_FF (binary_overflow sb emax m b) = b.

@@ -38,8 +38,9 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s : forall (x:Z) (n:Z), (0%Z <= n)%Z -> ((power x
-  (n + 1%Z)%Z) = (x * (power x n))%Z).
+Lemma Power_s :
+  forall (x:Z) (n:Z),
+  (0%Z <= n)%Z -> ((power x (n + 1%Z)%Z) = (x * (power x n))%Z).
 Proof.
 intros x n h1.
 rewrite Zpower_exp.

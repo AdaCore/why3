@@ -437,8 +437,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma eq_trans : forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x
-  z)).
+Lemma eq_trans :
+  forall (x:t) (y:t) (z:t), (eq x y) -> ((eq y z) -> (eq x z)).
 Proof.
   apply eq_trans.
 Qed.
@@ -479,15 +479,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma le_lt_trans : forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x
-  z).
+Lemma le_lt_trans :
+  forall (x:t) (y:t) (z:t), ((le x y) /\ (lt y z)) -> (lt x z).
 Proof.
   apply le_lt_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_le_trans : forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x
-  z).
+Lemma lt_le_trans :
+  forall (x:t) (y:t) (z:t), ((lt x y) /\ (le y z)) -> (lt x z).
 Proof.
   apply lt_le_trans.
 Qed.
@@ -1034,7 +1034,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_int: t -> Prop.
+Definition is_int : t -> Prop.
 Proof.
   apply is_int.
 Defined.
@@ -1124,8 +1124,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma is_int_to_int : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int
-  x) -> (in_int_range (to_int m x)).
+Lemma is_int_to_int :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (is_int x) -> (in_int_range (to_int m x)).
 Proof.
   now apply is_int_to_int.
 Qed.
@@ -1137,15 +1138,17 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma int_to_real : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int
-  x) -> ((t'real x) = (BuiltIn.IZR (to_int m x))).
+Lemma int_to_real :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (is_int x) -> ((t'real x) = (BuiltIn.IZR (to_int m x))).
 Proof.
   apply int_to_real.
 Qed.
 
 (* Why3 goal *)
-Lemma truncate_int : forall (m:ieee_float.RoundingMode.mode) (i:t), (is_int
-  i) -> (eq (roundToIntegral m i) i).
+Lemma truncate_int :
+  forall (m:ieee_float.RoundingMode.mode) (i:t),
+  (is_int i) -> (eq (roundToIntegral m i) i).
 Proof.
   now apply truncate_int.
 Qed.
@@ -1167,8 +1170,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma ceil_le : forall (x:t), (t'isFinite x) -> (le x
-  (roundToIntegral ieee_float.RoundingMode.RTP x)).
+Lemma ceil_le :
+  forall (x:t),
+  (t'isFinite x) -> (le x (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
   now apply ceil_le.
 Qed.

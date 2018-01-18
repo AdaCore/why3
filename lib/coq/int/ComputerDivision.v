@@ -127,8 +127,9 @@ exact Z.rem_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) ->
+Lemma Div_mult :
+  forall (x:Z) (y:Z) (z:Z),
+  ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\ (0%Z <= z)%Z)) ->
   ((ZArith.BinInt.Z.quot ((x * y)%Z + z)%Z x) = (y + (ZArith.BinInt.Z.quot z x))%Z).
 intros x y z (Hx&Hy&Hz).
 rewrite (Zplus_comm y).
@@ -143,8 +144,9 @@ now rewrite H in Hx.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\
-  (0%Z <= z)%Z)) ->
+Lemma Mod_mult :
+  forall (x:Z) (y:Z) (z:Z),
+  ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\ (0%Z <= z)%Z)) ->
   ((ZArith.BinInt.Z.rem ((x * y)%Z + z)%Z x) = (ZArith.BinInt.Z.rem z x)).
 intros x y z (Hx&Hy&Hz).
 rewrite Zplus_comm, Zmult_comm.
