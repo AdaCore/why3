@@ -183,16 +183,10 @@ let unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-(* unused
-let lparen_l fmt () = fprintf fmt "@ ("
-*)
-let lparen_r fmt () = fprintf fmt "(@,"
-(* unused
-let print_paren_l fmt x =
-  print_list_delim ~start:lparen_l ~stop:rparen ~sep:comma fmt x
-*)
+let lparen_r fmt () = fprintf fmt "@[<hov 1>("
+let rparen_r fmt () = fprintf fmt ")@]"
 let print_paren_r fmt x =
-  print_list_delim ~start:lparen_r ~stop:rparen ~sep:comma fmt x
+  print_list_delim ~start:lparen_r ~stop:rparen_r ~sep:comma fmt x
 
 let arrow fmt () = fprintf fmt " ->@ "
 let print_arrow_list fmt x = print_list_suf arrow fmt x
