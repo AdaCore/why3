@@ -270,6 +270,8 @@ val mark_as_obsolete:
   notification:notifier ->
   controller -> any option -> unit
 
+exception BadCopyPaste
+
 (* [copy_paste c a b] try to copy subtree originating at node a to node b *)
 val copy_paste:
     notification:notifier ->

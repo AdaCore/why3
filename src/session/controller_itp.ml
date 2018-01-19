@@ -829,15 +829,15 @@ let mark_as_obsolete ~notification c any =
 exception BadCopyPaste
 
 (* Reproduce the transformation made on node on an other one *)
-let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
+let rec copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any =
   let s = c.controller_session in
-  if (not (is_below s from_any to_any) &&
-      not (is_below s to_any from_any)) then
-    match from_any, to_any with
+  match from_any, to_any with
+(*
     | AFile _, AFile _ ->
         raise BadCopyPaste
     | ATh _from_th, ATh _to_th ->
         raise BadCopyPaste
+ *)
     | APn from_pn, APn to_pn ->
       let from_pa_list = get_proof_attempts s from_pn in
       List.iter (fun x -> schedule_pa_with_same_arguments c x to_pn ~counterexmp:false
@@ -846,7 +846,7 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
       let callback x tr args st = callback_tr tr args st;
         match st with
         | TSdone tid ->
-          copy_paste c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
+          copy_rec c (ATn x) (ATn tid) ~notification ~callback_pa ~callback_tr
         | _ -> ()
       in
       List.iter (fun x -> schedule_tr_with_same_arguments c x to_pn
@@ -854,10 +854,35 @@ let rec copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
     | ATn from_tn, ATn to_tn ->
         let from_tn_list = get_sub_tasks s from_tn in
         let to_tn_list = get_sub_tasks s to_tn in
-        if (List.length from_tn_list = List.length to_tn_list) then
-          List.iter2 (fun x y -> copy_paste c (APn x) (APn y)
-              ~notification ~callback_pa ~callback_tr) from_tn_list to_tn_list
+        let rec iter_copy l1 l2 =
+          match l1,l2 with
+          | x::r1, y::r2 ->
+             copy_rec c (APn x) (APn y)
+                      ~notification ~callback_pa ~callback_tr;
+             iter_copy r1 r2
+          | _ -> ()
+        in iter_copy from_tn_list to_tn_list
     | _ -> raise BadCopyPaste
+
+
+let copy_paste ~notification ~callback_pa ~callback_tr c from_any to_any =
+  let s = c.controller_session in
+  if is_below s from_any to_any || is_below s to_any from_any
+  then raise BadCopyPaste;
+  match from_any, to_any with
+  | APn _, APn _ ->
+     copy_rec ~notification ~callback_pa ~callback_tr c from_any to_any
+  | ATn from_tn, APn to_pn ->
+     let callback tr args st =
+       callback_tr tr args st;
+       match st with
+       | TSdone tid ->
+          copy_rec c (ATn from_tn) (ATn tid) ~notification ~callback_pa ~callback_tr
+       | _ -> ()
+     in
+     schedule_tr_with_same_arguments c from_tn to_pn ~callback ~notification
+  | _ -> raise BadCopyPaste
+
 
 
 

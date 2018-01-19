@@ -6,13 +6,51 @@
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../demo-itp.mlw">
+<theory name="TestCopyPaste" sum="22d35cc9b3a5547f481892208f0547bc">
+ <goal name="g1">
+ <transf name="split_goal_wp" >
+  <goal name="g1.0">
+  <proof prover="6"><result status="unknown" time="0.00"/></proof>
+  </goal>
+  <goal name="g1.1">
+  <proof prover="2"><result status="unknown" time="0.00"/></proof>
+  <proof prover="3"><result status="unknown" time="0.00"/></proof>
+  <proof prover="4"><result status="unknown" time="0.01"/></proof>
+  <proof prover="6" timelimit="1"><result status="unknown" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="split_goal_wp" >
+  <goal name="g2.0">
+  <proof prover="6"><result status="unknown" time="0.01"/></proof>
+  </goal>
+  <goal name="g2.1">
+  <proof prover="2"><result status="unknown" time="0.00"/></proof>
+  <proof prover="3"><result status="unknown" time="0.00"/></proof>
+  <proof prover="4"><result status="unknown" time="0.01"/></proof>
+  <proof prover="6" timelimit="1"><result status="unknown" time="0.01"/></proof>
+  </goal>
+  <goal name="g2.2">
+  <proof prover="5"><result status="timeout" time="4.89"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
 <theory name="M" proved="true" sum="d41d8cd98f00b204e9800998ecf8427e">
 </theory>
-<theory name="TestTaskPrinting" sum="01fbd777d08f356d2f390e335249eeb9">
+<theory name="TestWarnings" sum="aeca3388f2e65d42f78feba3152450b6">
  <goal name="g1">
  </goal>
  <goal name="g2">
+ </goal>
+</theory>
+<theory name="TestTaskPrinting" sum="801f15aa4345fd2ac2cb9efbcefa4d4b">
+ <goal name="g1">
  </goal>
  <goal name="g3">
  </goal>
@@ -26,6 +64,8 @@
  </goal>
  <goal name="g8">
  </goal>
+ <goal name="g2">
+ </goal>
 </theory>
 <theory name="TestAutomaticIntro" sum="6566463f1ee0314d808add53aa21307c">
  <goal name="g">
@@ -34,9 +74,9 @@
 <theory name="TestInduction" sum="7cd4f889593553a3efe96040db1cbe94">
  <goal name="g">
  <transf name="induction" arg1="n">
-  <goal name="g.0">
+  <goal name="g.0" expl="base case">
   </goal>
-  <goal name="g.1">
+  <goal name="g.1" expl="recursive case">
   </goal>
  </transf>
  </goal>
@@ -75,32 +115,32 @@
  </goal>
  <goal name="power_sum" proved="true">
  <transf name="induction" proved="true" arg1="n">
-  <goal name="power_sum.0" proved="true">
+  <goal name="power_sum.0" expl="base case" proved="true">
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="2"><result status="unknown" time="1.00"/></proof>
   </goal>
-  <goal name="power_sum.1" proved="true">
+  <goal name="power_sum.1" expl="recursive case" proved="true">
   <proof prover="0" obsolete="true"><result status="valid" time="0.87" steps="15"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
   <proof prover="2" obsolete="true"><result status="unknown" time="1.01"/></proof>
   <transf name="case" proved="true" arg1="(n=0)">
-   <goal name="power_sum.1.0" proved="true">
+   <goal name="power_sum.1.0" expl="true case (recursive case)" proved="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>
    <proof prover="2"><result status="unknown" time="1.00"/></proof>
    </goal>
-   <goal name="power_sum.1.1" proved="true">
+   <goal name="power_sum.1.1" expl="false case (recursive case)" proved="true">
    <proof prover="0"><result status="timeout" time="1.00"/></proof>
    <proof prover="1"><result status="timeout" time="1.00"/></proof>
    <proof prover="2"><result status="unknown" time="1.10"/></proof>
    <proof prover="3"><result status="unknown" time="0.00"/></proof>
    <transf name="instantiate" proved="true" arg1="Hrec" arg2="(n-1)">
-    <goal name="power_sum.1.1.0" proved="true">
+    <goal name="power_sum.1.1.0" expl="false case (recursive case)" proved="true">
     <proof prover="0"><result status="timeout" time="1.01"/></proof>
     <proof prover="1"><result status="timeout" time="1.00"/></proof>
     <proof prover="2"><result status="timeout" time="1.00"/></proof>
     <proof prover="3"><result status="unknown" time="0.00"/></proof>
     <transf name="replace" proved="true" arg1="(n+m)" arg2="((n-1)+m+1)">
-     <goal name="power_sum.1.1.0.0" proved="true">
+     <goal name="power_sum.1.1.0.0" expl="false case (recursive case)" proved="true">
      <proof prover="0"><result status="valid" time="0.08" steps="14"/></proof>
      <proof prover="1"><result status="timeout" time="1.00"/></proof>
      <proof prover="2"><result status="timeout" time="1.00"/></proof>
@@ -114,9 +154,9 @@
    </goal>
   </transf>
   <transf name="instantiate" proved="true" arg1="Hrec" arg2="(n-1)">
-   <goal name="power_sum.1.0" proved="true">
+   <goal name="power_sum.1.0" expl="recursive case" proved="true">
    <transf name="replace" proved="true" arg1="(n+m)" arg2="((n-1)+m+1)">
-    <goal name="power_sum.1.0.0" proved="true">
+    <goal name="power_sum.1.0.0" expl="recursive case" proved="true">
     <proof prover="0"><result status="valid" time="0.22" steps="29"/></proof>
     <proof prover="1"><result status="timeout" time="1.00"/></proof>
     <proof prover="2"><result status="timeout" time="1.00"/></proof>
@@ -128,7 +168,7 @@
    </goal>
   </transf>
   <transf name="replace" arg1="(n+m)" arg2="((n-1)+m+1)">
-   <goal name="power_sum.1.0">
+   <goal name="power_sum.1.0" expl="recursive case">
    <proof prover="0"><result status="timeout" time="1.00"/></proof>
    <proof prover="1"><result status="timeout" time="1.00"/></proof>
    <proof prover="2"><result status="unknown" time="1.74"/></proof>

@@ -1355,10 +1355,16 @@ end
     | Copy_paste (from_id, to_id)    ->
         let from_any = any_from_node_ID from_id in
         let to_any = any_from_node_ID to_id in
-        C.copy_paste ~notification:(notify_change_proved d.cont)
-          ~callback_pa:(callback_update_tree_proof d.cont)
-          ~callback_tr:(callback_update_tree_transform)
-          d.cont from_any to_any
+        begin
+          try
+            C.copy_paste
+              ~notification:(notify_change_proved d.cont)
+              ~callback_pa:(callback_update_tree_proof d.cont)
+              ~callback_tr:(callback_update_tree_transform)
+              d.cont from_any to_any
+          with C.BadCopyPaste ->
+               P.notify (Message (Error "invalid copy"))
+        end
     | Get_file_contents f          ->
         read_and_send f
     | Save_file_req (name, text)   ->
