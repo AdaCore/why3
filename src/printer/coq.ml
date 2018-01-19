@@ -79,7 +79,7 @@ let print_tv_binders_list info ~whytypes ~implicit fmt ltv =
 
 let print_params info ~whytypes fmt stv =
   if Stv.is_empty stv then () else
-    fprintf fmt "forall%a,@ "
+    fprintf fmt "@[<hov 2>forall%a,@]@ "
       (print_tv_binders info ~whytypes ~implicit:true) stv
 
 let print_params_list info ~whytypes fmt ltv =
@@ -789,7 +789,7 @@ let print_param_decl ~prev info fmt ls =
         (print_expr info) e;
       List.iter forget_var vl
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition %a :@ @[<hov>%a%a%a.@]@]@\n%a@\n"
+      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition %a :@ @[<hv>%a@[<hov>%a%a.@]@]@]@\n%a@\n"
         print_ls ls (print_params info ~whytypes:true) all_ty_params
         (print_arrow_list (print_ty info)) ls.ls_args
         (print_ls_type info) ls.ls_value
@@ -915,7 +915,7 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
         print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
     | _ ->
-      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s %a :@ @[<hov>%a%a.@]@]@\n%a@\n"
+      fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s %a :@ @[<hv>%a@[<hov>%a.@]@]@]@\n%a@\n"
         stt print_pr pr (print_params info ~whytypes:true) params
         (print_fmla info) f
         (print_previous_proof (Some (params,f)) info) prev
