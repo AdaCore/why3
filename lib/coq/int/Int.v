@@ -165,8 +165,9 @@ exact Zplus_le_compat_r.
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderMult : forall (x:Z) (y:Z) (z:Z), (x <= y)%Z ->
-  ((0%Z <= z)%Z -> ((x * z)%Z <= (y * z)%Z)%Z).
+Lemma CompatOrderMult :
+  forall (x:Z) (y:Z) (z:Z),
+  (x <= y)%Z -> ((0%Z <= z)%Z -> ((x * z)%Z <= (y * z)%Z)%Z).
 Proof.
 exact Zmult_le_compat_r.
 Qed.

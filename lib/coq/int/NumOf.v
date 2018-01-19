@@ -215,7 +215,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_increasing : forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z),
+Lemma numof_increasing :
+  forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z),
   ((i <= j)%Z /\ (j <= k)%Z) -> ((numof p i j) <= (numof p i k))%Z.
 Proof.
 intros p i j k (h1,h2).

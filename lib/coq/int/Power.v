@@ -102,8 +102,9 @@ apply Power_comm2 ; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_non_neg : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z <= y)%Z) ->
-  (0%Z <= (power x y))%Z.
+Lemma Power_non_neg :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (0%Z <= y)%Z) -> (0%Z <= (power x y))%Z.
 intros x y (h1,h2).
 now apply Z.pow_nonneg.
 Qed.
@@ -111,8 +112,10 @@ Qed.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Lemma Power_monotonic : forall (x:Z) (n:Z) (m:Z), ((0%Z < x)%Z /\
-  ((0%Z <= n)%Z /\ (n <= m)%Z)) -> ((power x n) <= (power x m))%Z.
+Lemma Power_monotonic :
+  forall (x:Z) (n:Z) (m:Z),
+  ((0%Z < x)%Z /\ ((0%Z <= n)%Z /\ (n <= m)%Z)) ->
+  ((power x n) <= (power x m))%Z.
 intros.
 apply Z.pow_le_mono_r; auto with zarith.
 Qed.

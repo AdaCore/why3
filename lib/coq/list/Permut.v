@@ -27,8 +27,8 @@ Definition permut {a:Type} {a_WT:WhyType a} (l1:(list a))
   l1) = (list.NumOcc.num_occ x l2)).
 
 (* Why3 goal *)
-Lemma Permut_refl : forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)),
-  (permut l l).
+Lemma Permut_refl :
+  forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)), (permut l l).
 Proof.
 now intros a a_WT l.
 Qed.
@@ -41,9 +41,10 @@ now intros a a_WT l1 l2 h1.
 Qed.
 
 (* Why3 goal *)
-Lemma Permut_trans : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)) (l3:(list a)), (permut l1 l2) -> ((permut l2 l3) -> (permut
-  l1 l3)).
+Lemma Permut_trans :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (l1:(list a)) (l2:(list a)) (l3:(list a)),
+  (permut l1 l2) -> ((permut l2 l3) -> (permut l1 l3)).
 Proof.
 intros a a_WT l1 l2 l3 h1 h2 x.
 now rewrite h1.
@@ -104,9 +105,10 @@ now apply f_equal2.
 Qed.
 
 (* Why3 goal *)
-Lemma Permut_append_swap : forall {a:Type} {a_WT:WhyType a},
-  forall (l1:(list a)) (l2:(list a)), (permut (Init.Datatypes.app l1 l2)
-  (Init.Datatypes.app l2 l1)).
+Lemma Permut_append_swap :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (l1:(list a)) (l2:(list a)),
+  (permut (Init.Datatypes.app l1 l2) (Init.Datatypes.app l2 l1)).
 Proof.
 intros a a_WT l1 l2 y.
 rewrite 2!NumOcc.Append_Num_Occ.
@@ -114,9 +116,10 @@ apply Zplus_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Permut_mem : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), (permut l1 l2) -> ((list.Mem.mem x l1) ->
-  (list.Mem.mem x l2)).
+Lemma Permut_mem :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (l1:(list a)) (l2:(list a)),
+  (permut l1 l2) -> ((list.Mem.mem x l1) -> (list.Mem.mem x l2)).
 Proof.
 intros a a_WT x l1 l2 h1 h2.
 apply NumOcc.Mem_Num_Occ.
@@ -125,9 +128,10 @@ now apply NumOcc.Mem_Num_Occ.
 Qed.
 
 (* Why3 goal *)
-Lemma Permut_length : forall {a:Type} {a_WT:WhyType a}, forall (l1:(list a))
-  (l2:(list a)), (permut l1 l2) ->
-  ((list.Length.length l1) = (list.Length.length l2)).
+Lemma Permut_length :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (l1:(list a)) (l2:(list a)),
+  (permut l1 l2) -> ((list.Length.length l1) = (list.Length.length l2)).
 Proof.
 intros a a_WT l1 l2 h1.
 revert l2 h1.

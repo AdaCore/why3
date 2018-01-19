@@ -52,8 +52,8 @@ now apply ln_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma Log_exp : forall (x:R),
-  ((Reals.Rpower.ln (Reals.Rtrigo_def.exp x)) = x).
+Lemma Log_exp :
+  forall (x:R), ((Reals.Rpower.ln (Reals.Rtrigo_def.exp x)) = x).
 exact ln_exp.
 Qed.
 

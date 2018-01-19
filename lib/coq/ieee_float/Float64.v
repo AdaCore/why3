@@ -1172,8 +1172,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma ceil_le : forall (x:t), (t'isFinite x) -> (le x
-  (roundToIntegral ieee_float.RoundingMode.RTP x)).
+Lemma ceil_le :
+  forall (x:t),
+  (t'isFinite x) -> (le x (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
   now apply ceil_le.
 Qed.
@@ -1276,7 +1277,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_roundToIntegral : forall (m:ieee_float.RoundingMode.mode) (x:t),
+Lemma to_int_roundToIntegral :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
   ((to_int m x) = (to_int m (roundToIntegral m x))).
 Proof.
   now apply to_int_roundToIntegral.
@@ -1291,7 +1293,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_of_int : forall (m:ieee_float.RoundingMode.mode) (i:Z),
+Lemma to_int_of_int :
+  forall (m:ieee_float.RoundingMode.mode) (i:Z),
   (in_safe_int_range i) -> ((to_int m (of_int m i)) = i).
 Proof.
   intros m i h1.
@@ -1299,7 +1302,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma eq_to_int : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+Lemma eq_to_int :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
   (t'isFinite x) -> ((eq x y) -> ((to_int m x) = (to_int m y))).
 Proof.
   apply eq_to_int.
@@ -1314,8 +1318,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma roundToIntegral_is_finite : forall (m:ieee_float.RoundingMode.mode)
-  (x:t), (t'isFinite x) -> (t'isFinite (roundToIntegral m x)).
+Lemma roundToIntegral_is_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  (t'isFinite x) -> (t'isFinite (roundToIntegral m x)).
 Proof.
   now apply roundToIntegral_is_finite.
 Qed.

@@ -91,8 +91,9 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:(a -> bool)) : Prop :=
   forall (x:a), ~ (mem x s).
 
 (* Why3 goal *)
-Lemma mem_empty : forall {a:Type} {a_WT:WhyType a}, (is_empty
-  (map.Const.const false: (a -> bool))).
+Lemma mem_empty :
+  forall {a:Type} {a_WT:WhyType a},
+  (is_empty (map.Const.const false: (a -> bool))).
 Proof.
 now intros a a_WT x.
 Qed.
@@ -118,8 +119,10 @@ destruct why_decidable_eq ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(a ->
-  bool)), (mem x s) -> ((map.Map.set (map.Map.set s x false) x true) = s).
+Lemma add_remove :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:(a -> bool)),
+  (mem x s) -> ((map.Map.set (map.Map.set s x false) x true) = s).
 Proof.
 intros a a_WT x s h1.
 apply extensionality; intro y.
@@ -129,9 +132,10 @@ destruct (why_decidable_eq y x) as [->|H] ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(a ->
-  bool)), ((map.Map.set (map.Map.set s x true) x false) = (map.Map.set s x
-  false)).
+Lemma remove_add :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:(a -> bool)),
+  ((map.Map.set (map.Map.set s x true) x false) = (map.Map.set s x false)).
 Proof.
 intros a a_WT x s.
 apply extensionality; intro y.
@@ -151,17 +155,19 @@ now intros [_ H].
 Qed.
 
 (* Why3 goal *)
-Definition union: forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> (a ->
-  bool) -> (a -> bool).
+Definition union :
+  forall {a:Type} {a_WT:WhyType a},
+  (a -> bool) -> (a -> bool) -> (a -> bool).
 Proof.
 intros a a_WT s1 s2.
 exact (fun x => orb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma union_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
-  (s2:(a -> bool)) (x:a), (((union s1 s2) x) = true) <-> (((s1 x) = true) \/
-  ((s2 x) = true)).
+Lemma union_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:(a -> bool)) (s2:(a -> bool)) (x:a),
+  (((union s1 s2) x) = true) <-> (((s1 x) = true) \/ ((s2 x) = true)).
 Proof.
 intros a a_WT s1 s2 x.
 apply Bool.orb_true_iff.
@@ -176,17 +182,19 @@ exact @union_def.
 Qed.
 
 (* Why3 goal *)
-Definition inter: forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> (a ->
-  bool) -> (a -> bool).
+Definition inter :
+  forall {a:Type} {a_WT:WhyType a},
+  (a -> bool) -> (a -> bool) -> (a -> bool).
 Proof.
 intros a a_WT s1 s2.
 exact (fun x => andb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma inter_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
-  (s2:(a -> bool)) (x:a), (((inter s1 s2) x) = true) <-> (((s1 x) = true) /\
-  ((s2 x) = true)).
+Lemma inter_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:(a -> bool)) (s2:(a -> bool)) (x:a),
+  (((inter s1 s2) x) = true) <-> (((s1 x) = true) /\ ((s2 x) = true)).
 Proof.
 intros a a_WT s1 s2 x.
 apply Bool.andb_true_iff.
@@ -201,17 +209,19 @@ exact @inter_def.
 Qed.
 
 (* Why3 goal *)
-Definition diff: forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> (a ->
-  bool) -> (a -> bool).
+Definition diff :
+  forall {a:Type} {a_WT:WhyType a},
+  (a -> bool) -> (a -> bool) -> (a -> bool).
 Proof.
 intros a a_WT s1 s2.
 exact (fun x => andb (s1 x) (negb (s2 x))).
 Defined.
 
 (* Why3 goal *)
-Lemma diff_def : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a -> bool))
-  (s2:(a -> bool)) (x:a), (((diff s1 s2) x) = true) <-> (((s1 x) = true) /\
-  ~ ((s2 x) = true)).
+Lemma diff_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:(a -> bool)) (s2:(a -> bool)) (x:a),
+  (((diff s1 s2) x) = true) <-> (((s1 x) = true) /\ ~ ((s2 x) = true)).
 Proof.
 intros a a_WT s1 s2 x.
 unfold mem, diff.
@@ -246,8 +256,10 @@ exact (fun x => negb (s x)).
 Defined.
 
 (* Why3 goal *)
-Lemma complement_def : forall {a:Type} {a_WT:WhyType a}, forall (s:(a ->
-  bool)) (x:a), (((complement s) x) = true) <-> ~ ((s x) = true).
+Lemma complement_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:(a -> bool)) (x:a),
+  (((complement s) x) = true) <-> ~ ((s x) = true).
 Proof.
 intros a a_WT s x.
 unfold complement.

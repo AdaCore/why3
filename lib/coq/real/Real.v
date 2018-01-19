@@ -136,8 +136,9 @@ reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma add_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
+Lemma add_div :
+  forall (x:R) (y:R) (z:R),
+  (~ (z = 0%R)) -> (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -145,8 +146,9 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma sub_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
+Lemma sub_div :
+  forall (x:R) (y:R) (z:R),
+  (~ (z = 0%R)) -> (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -154,8 +156,8 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma neg_div : forall (x:R) (y:R), (~ (y = 0%R)) ->
-  (((-x)%R / y)%R = (-(x / y)%R)%R).
+Lemma neg_div :
+  forall (x:R) (y:R), (~ (y = 0%R)) -> (((-x)%R / y)%R = (-(x / y)%R)%R).
 Proof.
 intros.
 field.
@@ -163,16 +165,18 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x * y)%R / z)%R = (x * (y / z)%R)%R).
+Lemma assoc_mul_div :
+  forall (x:R) (y:R) (z:R),
+  (~ (z = 0%R)) -> (((x * y)%R / z)%R = (x * (y / z)%R)%R).
 Proof.
 intros x y z _.
 apply Rmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
+Lemma assoc_div_mul :
+  forall (x:R) (y:R) (z:R),
+  ((~ (y = 0%R)) /\ ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
 unfold Rdiv.
@@ -181,8 +185,9 @@ now rewrite Rinv_mult_distr.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
+Lemma assoc_div_div :
+  forall (x:R) (y:R) (z:R),
+  ((~ (y = 0%R)) /\ ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
 Proof.
 intros x y z (Zy, Zz).
 field.
@@ -233,8 +238,9 @@ exact (Rplus_le_compat_r z x y).
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderMult : forall (x:R) (y:R) (z:R), (x <= y)%R ->
-  ((0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R).
+Lemma CompatOrderMult :
+  forall (x:R) (y:R) (z:R),
+  (x <= y)%R -> ((0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R).
 Proof.
 intros x y z H Zz.
 now apply Rmult_le_compat_r.

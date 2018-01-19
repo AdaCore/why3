@@ -31,13 +31,14 @@ exact (fix num_occ (l : list a) : int :=
 Defined.
 
 (* Why3 goal *)
-Lemma num_occ_def : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l:(list a)),
+Lemma num_occ_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (l:(list a)),
   match l with
   | Init.Datatypes.nil => ((num_occ x l) = 0%Z)
-  | (Init.Datatypes.cons y r) => ((x = y) -> ((num_occ x
-      l) = (1%Z + (num_occ x r))%Z)) /\ ((~ (x = y)) -> ((num_occ x
-      l) = (0%Z + (num_occ x r))%Z))
+  | (Init.Datatypes.cons y r) =>
+      ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
+      ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
   end.
 Proof.
 intros a a_WT x [|y r].
@@ -82,9 +83,10 @@ now apply IHl.
 Qed.
 
 (* Why3 goal *)
-Lemma Append_Num_Occ : forall {a:Type} {a_WT:WhyType a}, forall (x:a)
-  (l1:(list a)) (l2:(list a)), ((num_occ x
-  (Init.Datatypes.app l1 l2)) = ((num_occ x l1) + (num_occ x l2))%Z).
+Lemma Append_Num_Occ :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (l1:(list a)) (l2:(list a)),
+  ((num_occ x (Init.Datatypes.app l1 l2)) = ((num_occ x l1) + (num_occ x l2))%Z).
 Proof.
 intros a a_WT x l1 l2.
 induction l1 as [|l1h l1t IHl1].

@@ -80,7 +80,9 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
+Lemma Div_bound :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
 intros x y (Hx,Hy).
 unfold div.
@@ -126,8 +128,9 @@ now rewrite Zmod_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf_neg : forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (x <= y)%Z) ->
-  ((div (-x)%Z y) = (-1%Z)%Z).
+Lemma Div_inf_neg :
+  forall (x:Z) (y:Z),
+  ((0%Z < x)%Z /\ (x <= y)%Z) -> ((div (-x)%Z y) = (-1%Z)%Z).
 intros x y Hxy.
 assert (h: (x < y \/ x = y)%Z) by omega.
 destruct h.
@@ -205,8 +208,9 @@ Qed.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
+Lemma Div_mult :
+  forall (x:Z) (y:Z) (z:Z),
+  (0%Z < x)%Z -> ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
 intros x y z h.
 unfold div.
 destruct (Z_le_dec 0 (z mod x)).
@@ -218,8 +222,9 @@ generalize (Z_mod_lt z x); auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
+Lemma Mod_mult :
+  forall (x:Z) (y:Z) (z:Z),
+  (0%Z < x)%Z -> ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
 intros x y z h.
 unfold mod1.
 rewrite Div_mult.

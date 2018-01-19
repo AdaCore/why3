@@ -30,7 +30,8 @@ apply excluded_middle_informative.
 Qed.
 
 (* Why3 goal *)
-Definition set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+Definition set :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
   (a -> b) -> a -> b -> (a -> b).
 Proof.
 intros a a_WT b b_WT m x y.
@@ -41,9 +42,11 @@ exact (m x').
 Defined.
 
 (* Why3 goal *)
-Lemma set_def : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:(a -> b)) (x:a) (v:b) (y:a), ((y = x) -> (((set f x v)
-  y) = v)) /\ ((~ (y = x)) -> (((set f x v) y) = (f y))).
+Lemma set_def :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:(a -> b)) (x:a) (v:b) (y:a),
+  ((y = x) -> (((set f x v) y) = v)) /\
+  ((~ (y = x)) -> (((set f x v) y) = (f y))).
 Proof.
 intros a a_WT b b_WT f x v y.
 unfold set.

@@ -64,15 +64,17 @@ now apply Zlt_le_weak.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
-  (0%Z <= (ZArith.BinInt.Z.quot x y))%Z.
+Lemma Div_sign_pos :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (0%Z < y)%Z) -> (0%Z <= (ZArith.BinInt.Z.quot x y))%Z.
 intros x y (Hx, Hy).
 now apply Z.quot_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ (0%Z < y)%Z) ->
-  ((ZArith.BinInt.Z.quot x y) <= 0%Z)%Z.
+Lemma Div_sign_neg :
+  forall (x:Z) (y:Z),
+  ((x <= 0%Z)%Z /\ (0%Z < y)%Z) -> ((ZArith.BinInt.Z.quot x y) <= 0%Z)%Z.
 intros x y (Hx, Hy).
 generalize (Z.quot_pos (-x) y).
 rewrite Zquot_opp_l.
@@ -80,15 +82,17 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_sign_pos : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ ~ (y = 0%Z)) ->
-  (0%Z <= (ZArith.BinInt.Z.rem x y))%Z.
+Lemma Mod_sign_pos :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ ~ (y = 0%Z)) -> (0%Z <= (ZArith.BinInt.Z.rem x y))%Z.
 intros x y (Hx, Zy).
 now apply Zrem_lt_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_sign_neg : forall (x:Z) (y:Z), ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) ->
-  ((ZArith.BinInt.Z.rem x y) <= 0%Z)%Z.
+Lemma Mod_sign_neg :
+  forall (x:Z) (y:Z),
+  ((x <= 0%Z)%Z /\ ~ (y = 0%Z)) -> ((ZArith.BinInt.Z.rem x y) <= 0%Z)%Z.
 intros x y (Hx, Zy).
 now apply Zrem_lt_neg.
 Qed.
@@ -115,14 +119,16 @@ exact Z.rem_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) ->
-  ((ZArith.BinInt.Z.quot x y) = 0%Z).
+Lemma Div_inf :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (x < y)%Z) -> ((ZArith.BinInt.Z.quot x y) = 0%Z).
 exact Z.quot_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) ->
-  ((ZArith.BinInt.Z.rem x y) = x).
+Lemma Mod_inf :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (x < y)%Z) -> ((ZArith.BinInt.Z.rem x y) = x).
 exact Z.rem_small.
 Qed.
 

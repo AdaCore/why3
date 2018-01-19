@@ -270,9 +270,10 @@ Definition bw_and : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_and : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_and v1 v2) n) = (Init.Datatypes.andb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_and :
+  forall (v1:t) (v2:t) (n:Z),
+  ((0%Z <= n)%Z /\ (n < size)%Z) ->
+  ((nth (bw_and v1 v2) n) = (Init.Datatypes.andb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2 with (f := fun x y => x && y); easy.
 Qed.
@@ -283,9 +284,10 @@ Definition bw_or : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_or : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_or v1 v2) n) = (Init.Datatypes.orb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_or :
+  forall (v1:t) (v2:t) (n:Z),
+  ((0%Z <= n)%Z /\ (n < size)%Z) ->
+  ((nth (bw_or v1 v2) n) = (Init.Datatypes.orb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2; easy.
 Qed.
@@ -296,9 +298,10 @@ Definition bw_xor : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma Nth_bw_xor : forall (v1:t) (v2:t) (n:Z), ((0%Z <= n)%Z /\
-  (n < size)%Z) -> ((nth (bw_xor v1 v2) n) = (Init.Datatypes.xorb (nth v1
-  n) (nth v2 n))).
+Lemma Nth_bw_xor :
+  forall (v1:t) (v2:t) (n:Z),
+  ((0%Z <= n)%Z /\ (n < size)%Z) ->
+  ((nth (bw_xor v1 v2) n) = (Init.Datatypes.xorb (nth v1 n) (nth v2 n))).
   symmetry.
   apply nth_aux_map2; easy.
 Qed.
@@ -525,8 +528,10 @@ Lemma bshiftL_iter_nth_high : forall {l} v s m, (0 <= Z.of_nat s)%Z -> (Z.of_nat
 Qed.
 
 (* Why3 goal *)
-Lemma Lsl_nth_high : forall (b:t) (n:Z) (s:Z), ((0%Z <= s)%Z /\
-  ((s <= n)%Z /\ (n < size)%Z)) -> ((nth (lsl b s) n) = (nth b (n - s)%Z)).
+Lemma Lsl_nth_high :
+  forall (b:t) (n:Z) (s:Z),
+  ((0%Z <= s)%Z /\ ((s <= n)%Z /\ (n < size)%Z)) ->
+  ((nth (lsl b s) n) = (nth b (n - s)%Z)).
   intros.
   unfold lsl, nth.
   rewrite <-Z2Nat.id with (n := s) at 2 by omega.
@@ -554,8 +559,9 @@ Lemma Lsl_nth_low_aux : forall {l} x b (n : int),
 Qed.
 
 (* Why3 goal *)
-Lemma Lsl_nth_low : forall (b:t) (n:Z) (s:Z), ((0%Z <= n)%Z /\ (n < s)%Z) ->
-  ((nth (lsl b s) n) = false).
+Lemma Lsl_nth_low :
+  forall (b:t) (n:Z) (s:Z),
+  ((0%Z <= n)%Z /\ (n < s)%Z) -> ((nth (lsl b s) n) = false).
   intros.
   apply Lsl_nth_low_aux.
   rewrite Z2Nat.id; omega.
@@ -1721,8 +1727,10 @@ Lemma Nth_bv_is_nth :
 Qed.
 
 (* Why3 goal *)
-Lemma Nth_bv_is_nth2 : forall (x:t) (i:Z), ((0%Z <= i)%Z /\
-  (i < two_power_size)%Z) -> ((nth_bv x (of_int i)) = (nth x i)).
+Lemma Nth_bv_is_nth2 :
+  forall (x:t) (i:Z),
+  ((0%Z <= i)%Z /\ (i < two_power_size)%Z) ->
+  ((nth_bv x (of_int i)) = (nth x i)).
   intros x i h1.
   rewrite <-Nth_bv_is_nth.
   rewrite to_uint_of_int by auto.
@@ -1737,9 +1745,10 @@ Definition eq_sub_bv : t -> t -> t -> t -> Prop.
 Defined.
 
 (* Why3 goal *)
-Lemma eq_sub_bv_def : forall (a:t) (b:t) (i:t) (n:t), let mask :=
-  (lsl_bv (sub (lsl_bv one n) one) i) in ((eq_sub_bv a b i n) <-> ((bw_and b
-  mask) = (bw_and a mask))).
+Lemma eq_sub_bv_def :
+  forall (a:t) (b:t) (i:t) (n:t),
+  let mask := (lsl_bv (sub (lsl_bv one n) one) i) in
+  ((eq_sub_bv a b i n) <-> ((bw_and b mask) = (bw_and a mask))).
   rewrite Of_int_one.
   easy.
 Qed.

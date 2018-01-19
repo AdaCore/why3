@@ -83,8 +83,9 @@ now apply  Rtrigo_def.exp_0.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_x_two : forall (x:R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
+Lemma Pow_x_two :
+  forall (x:R),
+  (0%R < x)%R -> ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
 Proof.
 intros x h1.
 rewrite (Rpower_pow 2) by easy.
