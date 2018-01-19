@@ -255,8 +255,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma zero_to_real : forall (x:t), (is_zero x) <-> ((t'isFinite x) /\
-  ((t'real x) = 0%R)).
+Lemma zero_to_real :
+  forall (x:t), (is_zero x) <-> ((t'isFinite x) /\ ((t'real x) = 0%R)).
 Proof.
   apply zero_to_real.
 Qed.
@@ -274,8 +274,8 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Lemma zero_of_int : forall (m:ieee_float.RoundingMode.mode),
-  (zeroF = (of_int m 0%Z)).
+Lemma zero_of_int :
+  forall (m:ieee_float.RoundingMode.mode), (zeroF = (of_int m 0%Z)).
 Proof.
   apply zero_of_int.
 Qed.
@@ -302,7 +302,8 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Lemma max_real_int : ((33554430 * 10141204801825835211973625643008)%R = (BuiltIn.IZR max_int)).
+Lemma max_real_int :
+  ((33554430 * 10141204801825835211973625643008)%R = (BuiltIn.IZR max_int)).
 Proof.
   unfold max_int.
   now rewrite mult_IZR, <- !Z2R_IZR.
@@ -314,8 +315,8 @@ Definition in_range (x:R) : Prop :=
   (x <= (33554430 * 10141204801825835211973625643008)%R)%R.
 
 (* Why3 assumption *)
-Definition in_int_range (i:Z): Prop := ((-max_int)%Z <= i)%Z /\
-  (i <= max_int)%Z.
+Definition in_int_range (i:Z) : Prop :=
+  ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
 Lemma is_finite : forall (x:t), (t'isFinite x) -> (in_range (t'real x)).
@@ -362,15 +363,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_le : forall (x:R), ((round ieee_float.RoundingMode.RTN
-  x) <= x)%R.
+Lemma Round_down_le :
+  forall (x:R), ((round ieee_float.RoundingMode.RTN x) <= x)%R.
 Proof.
   apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_ge : forall (x:R), (x <= (round ieee_float.RoundingMode.RTP
-  x))%R.
+Lemma Round_up_ge :
+  forall (x:R), (x <= (round ieee_float.RoundingMode.RTP x))%R.
 Proof.
   apply Round_up_ge.
 Qed.
@@ -390,8 +391,8 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_safe_int_range (i:Z): Prop := ((-16777216%Z)%Z <= i)%Z /\
-  (i <= 16777216%Z)%Z.
+Definition in_safe_int_range (i:Z) : Prop :=
+  ((-16777216%Z)%Z <= i)%Z /\ (i <= 16777216%Z)%Z.
 
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers : forall (m:ieee_float.RoundingMode.mode)
@@ -403,12 +404,14 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition same_sign (x:t) (y:t): Prop := ((is_positive x) /\ (is_positive
-  y)) \/ ((is_negative x) /\ (is_negative y)).
+Definition same_sign (x:t) (y:t) : Prop :=
+  ((is_positive x) /\ (is_positive y)) \/
+  ((is_negative x) /\ (is_negative y)).
 
 (* Why3 assumption *)
-Definition diff_sign (x:t) (y:t): Prop := ((is_positive x) /\ (is_negative
-  y)) \/ ((is_negative x) /\ (is_positive y)).
+Definition diff_sign (x:t) (y:t) : Prop :=
+  ((is_positive x) /\ (is_negative y)) \/
+  ((is_negative x) /\ (is_positive y)).
 
 (* Why3 goal *)
 Lemma feq_eq : forall (x:t) (y:t), (t'isFinite x) -> ((t'isFinite y) ->
@@ -530,50 +533,50 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_lt_finite : forall (x:t) (y:t) (z:t), (lt x y) -> ((lt y z) ->
-  (t'isFinite y)).
+Lemma lt_lt_finite :
+  forall (x:t) (y:t) (z:t), (lt x y) -> ((lt y z) -> (t'isFinite y)).
 Proof.
   apply lt_lt_finite.
 Qed.
 
 (* Why3 goal *)
-Lemma positive_to_real : forall (x:t), (t'isFinite x) -> ((is_positive x) ->
-  (0%R <= (t'real x))%R).
+Lemma positive_to_real :
+  forall (x:t), (t'isFinite x) -> ((is_positive x) -> (0%R <= (t'real x))%R).
 Proof.
   apply positive_to_real.
 Qed.
 
 (* Why3 goal *)
-Lemma to_real_positive : forall (x:t), (t'isFinite x) ->
-  ((0%R < (t'real x))%R -> (is_positive x)).
+Lemma to_real_positive :
+  forall (x:t), (t'isFinite x) -> ((0%R < (t'real x))%R -> (is_positive x)).
 Proof.
   apply to_real_positive.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_to_real : forall (x:t), (t'isFinite x) -> ((is_negative x) ->
-  ((t'real x) <= 0%R)%R).
+Lemma negative_to_real :
+  forall (x:t), (t'isFinite x) -> ((is_negative x) -> ((t'real x) <= 0%R)%R).
 Proof.
   apply negative_to_real.
 Qed.
 
 (* Why3 goal *)
-Lemma to_real_negative : forall (x:t), (t'isFinite x) ->
-  (((t'real x) < 0%R)%R -> (is_negative x)).
+Lemma to_real_negative :
+  forall (x:t), (t'isFinite x) -> (((t'real x) < 0%R)%R -> (is_negative x)).
 Proof.
   apply to_real_negative.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_xor_positive : forall (x:t), ~ ((is_positive x) /\
-  (is_negative x)).
+Lemma negative_xor_positive :
+  forall (x:t), ~ ((is_positive x) /\ (is_negative x)).
 Proof.
   apply negative_xor_positive.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_or_positive : forall (x:t), (is_not_nan x) -> ((is_positive
-  x) \/ (is_negative x)).
+Lemma negative_or_positive :
+  forall (x:t), (is_not_nan x) -> ((is_positive x) \/ (is_negative x)).
 Proof.
   apply negative_or_positive.
 Qed.
@@ -600,8 +603,9 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition product_sign (z:t) (x:t) (y:t): Prop := ((same_sign x y) ->
-  (is_positive z)) /\ ((diff_sign x y) -> (is_negative z)).
+Definition product_sign (z:t) (x:t) (y:t) : Prop :=
+  ((same_sign x y) -> (is_positive z)) /\
+  ((diff_sign x y) -> (is_negative z)).
 
 (* Why3 assumption *)
 Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
@@ -621,7 +625,7 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
   end.
 
 (* Why3 assumption *)
-Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
+Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   (is_zero x) ->
   match m with
   | ieee_float.RoundingMode.RTN => (is_negative x)

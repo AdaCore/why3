@@ -38,8 +38,8 @@ exact Zle_lt_or_eq_iff.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc : forall (x:Z) (y:Z) (z:Z),
-  (((x + y)%Z + z)%Z = (x + (y + z)%Z)%Z).
+Lemma Assoc :
+  forall (x:Z) (y:Z) (z:Z), (((x + y)%Z + z)%Z = (x + (y + z)%Z)%Z).
 Proof.
 intros x y z.
 apply sym_eq.
@@ -77,8 +77,8 @@ exact Zplus_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc1 : forall (x:Z) (y:Z) (z:Z),
-  (((x * y)%Z * z)%Z = (x * (y * z)%Z)%Z).
+Lemma Assoc1 :
+  forall (x:Z) (y:Z) (z:Z), (((x * y)%Z * z)%Z = (x * (y * z)%Z)%Z).
 Proof.
 intros x y z.
 apply sym_eq.
@@ -86,16 +86,16 @@ apply Zmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_l : forall (x:Z) (y:Z) (z:Z),
-  ((x * (y + z)%Z)%Z = ((x * y)%Z + (x * z)%Z)%Z).
+Lemma Mul_distr_l :
+  forall (x:Z) (y:Z) (z:Z), ((x * (y + z)%Z)%Z = ((x * y)%Z + (x * z)%Z)%Z).
 Proof.
 intros x y z.
 apply Zmult_plus_distr_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_r : forall (x:Z) (y:Z) (z:Z),
-  (((y + z)%Z * x)%Z = ((y * x)%Z + (z * x)%Z)%Z).
+Lemma Mul_distr_r :
+  forall (x:Z) (y:Z) (z:Z), (((y + z)%Z * x)%Z = ((y * x)%Z + (z * x)%Z)%Z).
 Proof.
 intros x y z.
 apply Zmult_plus_distr_l.
@@ -127,8 +127,8 @@ apply Zle_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma Trans : forall (x:Z) (y:Z) (z:Z), (x <= y)%Z -> ((y <= z)%Z ->
-  (x <= z)%Z).
+Lemma Trans :
+  forall (x:Z) (y:Z) (z:Z), (x <= y)%Z -> ((y <= z)%Z -> (x <= z)%Z).
 Proof.
 exact Zle_trans.
 Qed.
@@ -158,8 +158,8 @@ now left.
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderAdd : forall (x:Z) (y:Z) (z:Z), (x <= y)%Z ->
-  ((x + z)%Z <= (y + z)%Z)%Z.
+Lemma CompatOrderAdd :
+  forall (x:Z) (y:Z) (z:Z), (x <= y)%Z -> ((x + z)%Z <= (y + z)%Z)%Z.
 Proof.
 exact Zplus_le_compat_r.
 Qed.

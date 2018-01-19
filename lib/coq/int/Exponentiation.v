@@ -52,8 +52,9 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s : forall (x:t) (n:Z), (0%Z <= n)%Z -> ((power x
-  (n + 1%Z)%Z) = (infix_as x (power x n))).
+Lemma Power_s :
+  forall (x:t) (n:Z),
+  (0%Z <= n)%Z -> ((power x (n + 1%Z)%Z) = (infix_as x (power x n))).
 Proof.
 intros x n h1.
 unfold power.
@@ -62,8 +63,9 @@ now rewrite Zabs_nat_Zsucc.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_s_alt : forall (x:t) (n:Z), (0%Z < n)%Z -> ((power x
-  n) = (infix_as x (power x (n - 1%Z)%Z))).
+Lemma Power_s_alt :
+  forall (x:t) (n:Z),
+  (0%Z < n)%Z -> ((power x n) = (infix_as x (power x (n - 1%Z)%Z))).
 Proof.
 intros x n h1.
 rewrite <- Power_s; auto with zarith.

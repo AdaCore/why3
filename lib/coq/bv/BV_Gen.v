@@ -212,8 +212,8 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma nth_out_of_bound : forall (x:t) (n:Z), ((n < 0%Z)%Z \/
-  (size <= n)%Z) -> ((nth x n) = false).
+Lemma nth_out_of_bound :
+  forall (x:t) (n:Z), ((n < 0%Z)%Z \/ (size <= n)%Z) -> ((nth x n) = false).
 intros.
 unfold nth.
 rewrite nth_aux_out_of_bound; auto with zarith.
@@ -1202,8 +1202,8 @@ Lemma to_int_def : forall (x:t), ((is_signed_positive x) ->
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_extensionality : forall (v:t) (v':t),
-  ((to_uint v) = (to_uint v')) -> (v = v').
+Lemma to_uint_extensionality :
+  forall (v:t) (v':t), ((to_uint v) = (to_uint v')) -> (v = v').
   unfold to_uint.
   intros v v'.
   rewrite Nat2Z.inj_iff.
@@ -1211,8 +1211,8 @@ Lemma to_uint_extensionality : forall (v:t) (v':t),
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_extensionality : forall (v:t) (v':t),
-  ((to_int v) = (to_int v')) -> (v = v').
+Lemma to_int_extensionality :
+  forall (v:t) (v':t), ((to_int v) = (to_int v')) -> (v = v').
   apply twos_complement_extensionality.
 Qed.
 
@@ -1220,8 +1220,8 @@ Qed.
 Definition uint_in_range (i:Z) : Prop := (0%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
-Lemma to_uint_bounds : forall (v:t), (0%Z <= (to_uint v))%Z /\
-  ((to_uint v) < two_power_size)%Z.
+Lemma to_uint_bounds :
+  forall (v:t), (0%Z <= (to_uint v))%Z /\ ((to_uint v) < two_power_size)%Z.
   intros v.
   unfold to_uint, uint_in_range.
   split.
@@ -1430,8 +1430,8 @@ Lemma zeros_sign_false: Bsign last_bit zeros = false.
 Qed.
 
 (* Why3 goal *)
-Lemma positive_is_ge_zeros : forall (x:t), (is_signed_positive x) <-> (sge x
-  zeros).
+Lemma positive_is_ge_zeros :
+  forall (x:t), (is_signed_positive x) <-> (sge x zeros).
   intros.
   unfold is_signed_positive, sge, to_int, twos_complement, size_nat.
   rewrite zeros_sign_false. destruct Bsign.
@@ -1586,8 +1586,8 @@ Definition lsr_bv : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma lsr_bv_is_lsr : forall (x:t) (n:t), ((lsr_bv x n) = (lsr x
-  (to_uint n))).
+Lemma lsr_bv_is_lsr :
+  forall (x:t) (n:t), ((lsr_bv x n) = (lsr x (to_uint n))).
   easy.
 Qed.
 
@@ -1616,8 +1616,8 @@ Definition lsl_bv : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma lsl_bv_is_lsl : forall (x:t) (n:t), ((lsl_bv x n) = (lsl x
-  (to_uint n))).
+Lemma lsl_bv_is_lsl :
+  forall (x:t) (n:t), ((lsl_bv x n) = (lsl x (to_uint n))).
   easy.
 Qed.
 
@@ -1640,14 +1640,14 @@ Definition rotate_left_bv : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma rotate_left_bv_is_rotate_left : forall (v:t) (n:t), ((rotate_left_bv v
-  n) = (rotate_left v (to_uint n))).
+Lemma rotate_left_bv_is_rotate_left :
+  forall (v:t) (n:t), ((rotate_left_bv v n) = (rotate_left v (to_uint n))).
 trivial.
 Qed.
 
 (* Why3 goal *)
-Lemma rotate_right_bv_is_rotate_right : forall (v:t) (n:t),
-  ((rotate_right_bv v n) = (rotate_right v (to_uint n))).
+Lemma rotate_right_bv_is_rotate_right :
+  forall (v:t) (n:t), ((rotate_right_bv v n) = (rotate_right v (to_uint n))).
 trivial.
 Qed.
 

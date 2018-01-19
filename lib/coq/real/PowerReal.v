@@ -33,8 +33,8 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_pos : forall (x:R) (y:R), (0%R < x)%R ->
-  (0%R < (Reals.Rpower.Rpower x y))%R.
+Lemma Pow_pos :
+  forall (x:R) (y:R), (0%R < x)%R -> (0%R < (Reals.Rpower.Rpower x y))%R.
 Proof.
 intros x y h1.
 apply Exp_prop.exp_pos.
@@ -57,16 +57,16 @@ now apply Rpower_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_x_zero : forall (x:R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower x 0%R) = 1%R).
+Lemma Pow_x_zero :
+  forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 0%R) = 1%R).
 Proof.
 intros x h1.
 now apply Rpower_O.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_x_one : forall (x:R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower x 1%R) = x).
+Lemma Pow_x_one :
+  forall (x:R), (0%R < x)%R -> ((Reals.Rpower.Rpower x 1%R) = x).
 Proof.
 intros x h1.
 now apply Rpower_1.

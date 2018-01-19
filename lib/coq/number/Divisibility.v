@@ -22,7 +22,8 @@ Require number.Parity.
 (* Hack so that Why3 does not override the notation below.
 
 (* Why3 assumption *)
-Definition divides (d:Z) (n:Z): Prop := ((d = 0%Z) -> (n = 0%Z)) /\
+Definition divides (d:Z) (n:Z) : Prop :=
+  ((d = 0%Z) -> (n = 0%Z)) /\
   ((~ (d = 0%Z)) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
 
 *)
@@ -31,8 +32,8 @@ Require Import Znumtheory.
 Notation divides := Zdivide (only parsing).
 
 (* Why3 goal *)
-Lemma divides_spec : forall (d:Z) (n:Z), (divides d n) <-> exists q:Z,
-  (n = (q * d)%Z).
+Lemma divides_spec :
+  forall (d:Z) (n:Z), (divides d n) <-> exists q:Z, (n = (q * d)%Z).
 Proof.
 intros d n.
 easy.
@@ -57,15 +58,15 @@ exact Zdivide_0.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_left : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
-  (c * a)%Z (c * b)%Z).
+Lemma divides_left :
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides (c * a)%Z (c * b)%Z).
 Proof.
 exact Zmult_divide_compat_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_right : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
-  (a * c)%Z (b * c)%Z).
+Lemma divides_right :
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides (a * c)%Z (b * c)%Z).
 Proof.
 exact Zmult_divide_compat_r.
 Qed.
@@ -83,15 +84,15 @@ exact Zdivide_opp_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppr_rev : forall (a:Z) (b:Z), (divides (-a)%Z b) -> (divides a
-  b).
+Lemma divides_oppr_rev :
+  forall (a:Z) (b:Z), (divides (-a)%Z b) -> (divides a b).
 Proof.
 exact Zdivide_opp_l_rev.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppl_rev : forall (a:Z) (b:Z), (divides a (-b)%Z) -> (divides a
-  b).
+Lemma divides_oppl_rev :
+  forall (a:Z) (b:Z), (divides a (-b)%Z) -> (divides a b).
 Proof.
 exact Zdivide_opp_r_rev.
 Qed.
@@ -111,16 +112,16 @@ exact Zdivide_minus_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_multl : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
-  (c * b)%Z).
+Lemma divides_multl :
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a (c * b)%Z).
 Proof.
 intros a b c.
 apply Zdivide_mult_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_multr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
-  (b * c)%Z).
+Lemma divides_multr :
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a (b * c)%Z).
 Proof.
 exact Zdivide_mult_l.
 Qed.
@@ -138,8 +139,8 @@ exact Zdivide_factor_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_n_1 : forall (n:Z), (divides n 1%Z) -> ((n = 1%Z) \/
-  (n = (-1%Z)%Z)).
+Lemma divides_n_1 :
+  forall (n:Z), (divides n 1%Z) -> ((n = 1%Z) \/ (n = (-1%Z)%Z)).
 Proof.
 exact Zdivide_1.
 Qed.
@@ -152,8 +153,8 @@ exact Zdivide_antisym.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_trans : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b
-  c) -> (divides a c)).
+Lemma divides_trans :
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b c) -> (divides a c)).
 Proof.
 exact Zdivide_trans.
 Qed.
@@ -213,16 +214,16 @@ apply Zquot.Z_rem_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma even_divides : forall (a:Z), (number.Parity.even a) <-> (divides 2%Z
-  a).
+Lemma even_divides :
+  forall (a:Z), (number.Parity.even a) <-> (divides 2%Z a).
 Proof.
 split ;
   intros (q,H) ; exists q ; now rewrite Zmult_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma odd_divides : forall (a:Z), (number.Parity.odd a) <-> ~ (divides 2%Z
-  a).
+Lemma odd_divides :
+  forall (a:Z), (number.Parity.odd a) <-> ~ (divides 2%Z a).
 Proof.
 split.
 intros H.

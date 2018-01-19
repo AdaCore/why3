@@ -27,8 +27,8 @@ Qed.
 (* sqrt is replaced with (Reals.R_sqrt.sqrt x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Sqrt_positive : forall (x:R), (0%R <= x)%R ->
-  (0%R <= (Reals.R_sqrt.sqrt x))%R.
+Lemma Sqrt_positive :
+  forall (x:R), (0%R <= x)%R -> (0%R <= (Reals.R_sqrt.sqrt x))%R.
 intros x _.
 apply sqrt_pos.
 Qed.
@@ -40,8 +40,8 @@ exact sqrt_sqrt.
 Qed.
 
 (* Why3 goal *)
-Lemma Square_sqrt : forall (x:R), (0%R <= x)%R ->
-  ((Reals.R_sqrt.sqrt (x * x)%R) = x).
+Lemma Square_sqrt :
+  forall (x:R), (0%R <= x)%R -> ((Reals.R_sqrt.sqrt (x * x)%R) = x).
 exact sqrt_square.
 Qed.
 

@@ -161,8 +161,8 @@ exact Hy2.
 Qed.
 
 (* Why3 goal *)
-Lemma even_prime : forall (p:Z), (prime p) -> ((number.Parity.even p) ->
-  (p = 2%Z)).
+Lemma even_prime :
+  forall (p:Z), (prime p) -> ((number.Parity.even p) -> (p = 2%Z)).
 Proof.
 intros p Pp (q,Hq).
 generalize (proj2 Pp q).
@@ -180,8 +180,8 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma odd_prime : forall (p:Z), (prime p) -> ((3%Z <= p)%Z ->
-  (number.Parity.odd p)).
+Lemma odd_prime :
+  forall (p:Z), (prime p) -> ((3%Z <= p)%Z -> (number.Parity.odd p)).
 Proof.
 intros p Pp Hp.
 apply <- Divisibility.odd_divides.

@@ -59,8 +59,8 @@ exact opp_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Monotonic : forall (x:Z) (y:Z), (x <= y)%Z ->
-  ((BuiltIn.IZR x) <= (BuiltIn.IZR y))%R.
+Lemma Monotonic :
+  forall (x:Z) (y:Z), (x <= y)%Z -> ((BuiltIn.IZR x) <= (BuiltIn.IZR y))%R.
 Proof.
 exact (IZR_le).
 Qed.

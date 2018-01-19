@@ -782,8 +782,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma zero_to_real : forall (x:t), (is_zero x) <-> ((is_finite x) /\
-  ((to_real x) = 0%R)).
+Lemma zero_to_real :
+  forall (x:t), (is_zero x) <-> ((is_finite x) /\ ((to_real x) = 0%R)).
 Proof.
   unfold is_zero.
   assert (is_finite zeroF) by easy.
@@ -856,8 +856,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma zero_of_int : forall (m:ieee_float.RoundingMode.mode),
-  (zeroF = (of_int m 0%Z)).
+Lemma zero_of_int :
+  forall (m:ieee_float.RoundingMode.mode), (zeroF = (of_int m 0%Z)).
 Proof.
 auto.
 Qed.
@@ -1699,8 +1699,8 @@ destruct x, y, z; destruct b, b0, b1; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma positive_to_real : forall (x:t), (is_finite x) -> ((is_positive x) ->
-  (0%R <= (to_real x))%R).
+Lemma positive_to_real :
+  forall (x:t), (is_finite x) -> ((is_positive x) -> (0%R <= (to_real x))%R).
 Proof.
   intros x h1 h2.
   assert (is_finite zeroF) as zero_is_finite by easy.
@@ -1731,8 +1731,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma to_real_positive : forall (x:t), (is_finite x) ->
-  ((0%R < (to_real x))%R -> (is_positive x)).
+Lemma to_real_positive :
+  forall (x:t), (is_finite x) -> ((0%R < (to_real x))%R -> (is_positive x)).
 Proof.
   intros x h1 h2.
   assert (is_finite zeroF) as zero_is_finite by easy.
@@ -1741,8 +1741,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_to_real : forall (x:t), (is_finite x) -> ((is_negative x) ->
-  ((to_real x) <= 0%R)%R).
+Lemma negative_to_real :
+  forall (x:t), (is_finite x) -> ((is_negative x) -> ((to_real x) <= 0%R)%R).
 Proof.
   intros x h1 h2.
   assert (is_finite zeroF) as zero_is_finite by easy.
@@ -1773,8 +1773,8 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma to_real_negative : forall (x:t), (is_finite x) ->
-  (((to_real x) < 0%R)%R -> (is_negative x)).
+Lemma to_real_negative :
+  forall (x:t), (is_finite x) -> (((to_real x) < 0%R)%R -> (is_negative x)).
 Proof.
   intros x h1 h2.
   assert (is_finite zeroF) as zero_is_finite by easy.
@@ -1783,16 +1783,16 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_xor_positive : forall (x:t), ~ ((is_positive x) /\
-  (is_negative x)).
+Lemma negative_xor_positive :
+  forall (x:t), ~ ((is_positive x) /\ (is_negative x)).
 Proof.
 intros x.
 destruct x ; destruct b; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma negative_or_positive : forall (x:t), (is_not_nan x) -> ((is_positive
-  x) \/ (is_negative x)).
+Lemma negative_or_positive :
+  forall (x:t), (is_not_nan x) -> ((is_positive x) \/ (is_negative x)).
 Proof.
 intros x h1.
 destruct x ; destruct b; simpl; auto; now elim h1.
@@ -1868,7 +1868,7 @@ Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   end.
 
 (* Why3 assumption *)
-Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t): Prop :=
+Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   (is_zero x) ->
   match m with
   | ieee_float.RoundingMode.RTN => (is_negative x)
@@ -3507,7 +3507,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition is_int: t -> Prop.
+Definition is_int : t -> Prop.
 Proof.
  exact (fun x => is_finite x /\ is_intR (to_real x)).
 Defined.

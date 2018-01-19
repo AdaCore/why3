@@ -49,8 +49,9 @@ Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:(a -> bool)) (s2:(a ->
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
 (* Why3 goal *)
-Lemma extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a ->
-  bool)) (s2:(a -> bool)), (infix_eqeq s1 s2) -> (s1 = s2).
+Lemma extensionality :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:(a -> bool)) (s2:(a -> bool)), (infix_eqeq s1 s2) -> (s1 = s2).
 Proof.
 intros a a_WT s1 s2 h1.
 apply predicate_extensionality.
@@ -70,8 +71,8 @@ Definition subset {a:Type} {a_WT:WhyType a} (s1:(a -> bool)) (s2:(a ->
   bool)): Prop := forall (x:a), (mem x s1) -> (mem x s2).
 
 (* Why3 goal *)
-Lemma subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(a -> bool)),
-  (subset s s).
+Lemma subset_refl :
+  forall {a:Type} {a_WT:WhyType a}, forall (s:(a -> bool)), (subset s s).
 Proof.
 now intros a a_WT s x.
 Qed.
@@ -86,7 +87,7 @@ now apply h2, h1.
 Qed.
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:(a -> bool)): Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:(a -> bool)) : Prop :=
   forall (x:a), ~ (mem x s).
 
 (* Why3 goal *)
@@ -237,8 +238,8 @@ now intros [H _].
 Qed.
 
 (* Why3 goal *)
-Definition complement: forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> (a ->
-  bool).
+Definition complement :
+  forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> (a -> bool).
 Proof.
 intros a a_WT s.
 exact (fun x => negb (s x)).
@@ -255,7 +256,7 @@ apply Bool.negb_true_iff.
 Qed.
 
 (* Why3 goal *)
-Definition choose: forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> a.
+Definition choose : forall {a:Type} {a_WT:WhyType a}, (a -> bool) -> a.
 Proof.
 intros a a_WT s.
 assert (i: inhabited a) by (apply inhabits, why_inhabitant).

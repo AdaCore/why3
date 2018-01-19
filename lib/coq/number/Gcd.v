@@ -112,8 +112,8 @@ apply Zgcd_is_gcd.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_euclid : forall (a:Z) (b:Z) (q:Z), ((gcd a b) = (gcd a
-  (b - (q * a)%Z)%Z)).
+Lemma gcd_euclid :
+  forall (a:Z) (b:Z) (q:Z), ((gcd a b) = (gcd a (b - (q * a)%Z)%Z)).
 Proof.
 intros a b c.
 apply Zis_gcd_gcd.

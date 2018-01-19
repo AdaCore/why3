@@ -21,9 +21,10 @@ Require Import Rbasic_fun.
 (* min is replaced with (Reals.Rbasic_fun.Rmin x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma min_def : forall (x:R) (y:R), ((x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmin x y) = x)) /\ ((~ (x <= y)%R) ->
-  ((Reals.Rbasic_fun.Rmin x y) = y)).
+Lemma min_def :
+  forall (x:R) (y:R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
+  ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
@@ -36,9 +37,10 @@ Qed.
 (* max is replaced with (Reals.Rbasic_fun.Rmax x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma max_def : forall (x:R) (y:R), ((x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmax x y) = y)) /\ ((~ (x <= y)%R) ->
-  ((Reals.Rbasic_fun.Rmax x y) = x)).
+Lemma max_def :
+  forall (x:R) (y:R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
+  ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
 intros x y.
 split ; intros H.
@@ -48,14 +50,14 @@ now apply Rlt_le, Rnot_le_lt.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_r : forall (x:R) (y:R), (y <= x)%R ->
-  ((Reals.Rbasic_fun.Rmin x y) = y).
+Lemma Min_r :
+  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmin x y) = y).
 exact Rmin_right.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_l : forall (x:R) (y:R), (y <= x)%R ->
-  ((Reals.Rbasic_fun.Rmax x y) = x).
+Lemma Max_l :
+  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmax x y) = x).
 exact Rmax_left.
 Qed.
 

@@ -34,8 +34,8 @@ reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc : forall (x:R) (y:R) (z:R),
-  (((x + y)%R + z)%R = (x + (y + z)%R)%R).
+Lemma Assoc :
+  forall (x:R) (y:R) (z:R), (((x + y)%R + z)%R = (x + (y + z)%R)%R).
 Proof.
 exact Rplus_assoc.
 Qed.
@@ -71,23 +71,23 @@ exact Rplus_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc1 : forall (x:R) (y:R) (z:R),
-  (((x * y)%R * z)%R = (x * (y * z)%R)%R).
+Lemma Assoc1 :
+  forall (x:R) (y:R) (z:R), (((x * y)%R * z)%R = (x * (y * z)%R)%R).
 Proof.
 exact Rmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_l : forall (x:R) (y:R) (z:R),
-  ((x * (y + z)%R)%R = ((x * y)%R + (x * z)%R)%R).
+Lemma Mul_distr_l :
+  forall (x:R) (y:R) (z:R), ((x * (y + z)%R)%R = ((x * y)%R + (x * z)%R)%R).
 Proof.
 intros x y z.
 apply Rmult_plus_distr_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_r : forall (x:R) (y:R) (z:R),
-  (((y + z)%R * x)%R = ((y * x)%R + (z * x)%R)%R).
+Lemma Mul_distr_r :
+  forall (x:R) (y:R) (z:R), (((y + z)%R * x)%R = ((y * x)%R + (z * x)%R)%R).
 Proof.
 intros x y z.
 apply Rmult_plus_distr_r.
@@ -116,8 +116,8 @@ Qed.
 (* inv is replaced with (Reals.Rdefinitions.Rinv x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Inverse : forall (x:R), (~ (x = 0%R)) ->
-  ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
+Lemma Inverse :
+  forall (x:R), (~ (x = 0%R)) -> ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
 Proof.
 exact Rinv_r.
 Qed.
@@ -129,8 +129,8 @@ reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_sl_def : forall (x:R) (y:R),
-  ((x / y)%R = (x * (Reals.Rdefinitions.Rinv y))%R).
+Lemma infix_sl_def :
+  forall (x:R) (y:R), ((x / y)%R = (x * (Reals.Rdefinitions.Rinv y))%R).
 Proof.
 reflexivity.
 Qed.
