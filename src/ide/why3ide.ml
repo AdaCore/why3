@@ -1042,9 +1042,11 @@ let display_warnings () =
       print_message ~kind:1 ~notif_kind:"warning" "%s" msg
     end
 
+let print_message ~kind ~notif_kind fmt =
+  display_warnings (); print_message ~kind ~notif_kind fmt
 
-let () =
-  Warning.set_hook (fun ?loc s -> record_warning ?loc s; display_warnings ())
+
+
 
 (**** Monitor *****)
 
@@ -1420,10 +1422,10 @@ let interp_ide cmd =
       let s = List.fold_left (fun acc x -> (fst x) ^ ": " ^
                               (snd x) ^ "\n" ^ acc) "" ide_command_list in
       clear_command_entry ();
-      message_zone#buffer#set_text s
+      print_message ~kind:1 ~notif_kind:"Info" "%s" s
   | _ ->
       clear_command_entry ();
-      message_zone#buffer#set_text ("Error: " ^ cmd ^ "\nPlease report.")
+      print_message ~kind:1 ~notif_kind:"error" "Error: %s\nPlease report." cmd
 
 let interp cmd =
   (* TODO: do some preprocessing for queries, or leave everything to server ? *)
@@ -2321,5 +2323,5 @@ let () =
     (fun () -> List.iter treat_notification (get_notified ()); true);
   main_window#add_accel_group accel_group;
   main_window#set_icon (Some !Gconfig.why_icon);
-  message_zone#buffer#set_text "Welcome to Why3 IDE\ntype 'help' for help";
+  print_message ~kind:1 ~notif_kind:"Info" "Welcome to Why3 IDE\ntype 'help' for help\n";
   GMain.main ()

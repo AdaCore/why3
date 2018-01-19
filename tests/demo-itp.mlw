@@ -7,6 +7,20 @@ module M
 
 end
 
+module TestWarnings
+
+  use import int.Int
+  
+  function f (x y : int) :int = x
+  
+  axiom a : forall x:int. x*x >= 0
+  
+  goal g1: forall z:int. 42 > 0
+
+  goal g2: let z=1 in 42 > 0
+
+end
+
 module TestTaskPrinting
 
   use import int.Int
