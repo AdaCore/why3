@@ -1503,7 +1503,14 @@ let on_selected_row r =
        edited_view#source_buffer#set_text "(not yet available)";
        edited_view#scroll_to_mark `INSERT;
        counterexample_view#source_buffer#set_text "(not yet available)";
-       counterexample_view#scroll_to_mark `INSERT
+       counterexample_view#scroll_to_mark `INSERT;
+       let detached = get_node_detached id in
+       if detached then
+         task_view#source_buffer#set_text ""
+       else
+         let b = gconfig.intro_premises in
+         let c = gconfig.show_full_context in
+         send_request (Get_task(id,b,c,true))
     | _ ->
        let b = gconfig.intro_premises in
        let c = gconfig.show_full_context in

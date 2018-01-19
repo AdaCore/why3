@@ -904,7 +904,23 @@ end
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
+       let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
+       (* Display the result of the prover *)
+       let prover_ce =
+         match pa.proof_state with
+         | Some res ->
+             let result =
+               Pp.string_of Call_provers.print_prover_answer
+                 res.Call_provers.pr_answer
+             in
+             let ce_result =
+               Pp.string_of (Model_parser.print_model ?me_name_trans:None)
+                 res.Call_provers.pr_model
+             in
+             result ^ "\n\n" ^ ce_result
+         | None -> "Result of the prover not available.\n"
+       in
+       P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
     | AFile f ->
        P.notify (Task (nid, "File " ^ file_name f, []))
     | ATn tid ->
@@ -912,7 +928,8 @@ end
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
+       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
+                       String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 
