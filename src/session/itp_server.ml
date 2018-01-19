@@ -914,7 +914,7 @@ end
                  res.Call_provers.pr_answer
              in
              let ce_result =
-               Pp.string_of (Model_parser.print_model ?me_name_trans:None)
+               Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
                  res.Call_provers.pr_model
              in
              result ^ "\n\n" ^ ce_result
