@@ -365,7 +365,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
         (print_list newline (print_fbranch info)) bl
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr
-        "@[<hov>if @[<hov>%a@] then@ [@<hov>%a@]@ else@ [@<hov>%a@]@]")
+        "@[<hov>if @[<hov>%a@] then@ @[<hov>%a@]@ else@ @[<hov>%a@]@]")
         (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
@@ -795,7 +795,7 @@ let print_param_decl ~prev info fmt ls =
         (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
   else
-    fprintf fmt "@[<hv 2>Parameter %a:@ @<hov>%a%a%a.@]@]@\n@\n"
+    fprintf fmt "@[<hv 2>Parameter %a:@ @[<hov>%a%a%a.@]@]@\n@\n"
       print_ls ls (print_params info ~whytypes:true) all_ty_params
       (print_arrow_list (print_ty info)) ls.ls_args
       (print_ls_type info) ls.ls_value
