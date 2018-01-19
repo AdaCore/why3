@@ -1,5 +1,15 @@
 
 
+module TestCopyPaste
+
+ use import int.Int
+
+ goal g1: 1=2 /\ 3=4
+
+ goal g2: 5=6 /\ 7=8 /\ 9=10
+
+end
+
 module M
   use import int.Int
 
@@ -10,11 +20,11 @@ end
 module TestWarnings
 
   use import int.Int
-  
+
   function f (x y : int) :int = x
-  
+
   axiom a : forall x:int. x*x >= 0
-  
+
   goal g1: forall z:int. 42 > 0
 
   goal g2: let z=1 in 42 > 0
@@ -30,7 +40,7 @@ module TestTaskPrinting
   goal g1: averyveryveryveryveryverylongname 1 + averyveryveryveryveryverylongname 2 +
            averyveryveryveryveryverylongname 3 + averyveryveryveryveryverylongname 4 >= 0
 
-  goal g2: let x = 1 in x + 1 >= 0
+  (*goal g2: let x = 1 in x + 1 >= 0*)
 
   goal g3: let x = 1 in averyveryveryveryveryverylongname x + averyveryveryveryveryverylongname 1 >= 0
 
@@ -66,11 +76,11 @@ end
 module TestInduction
 
   use import int.Int
-  
+
   predicate p int
-  
+
   goal g : forall n. p n
-  
+
 end
 
 module TestInfixSymbols
@@ -106,9 +116,9 @@ module TestRewritePoly
   use import int.Int
   use import list.List
   use import list.Append
-  
+
   goal g : (Cons 1 Nil) ++ ((Cons 2 Nil) ++ Nil) = Cons 1 (Cons 2 Nil)
-  
+
 end
 
 
