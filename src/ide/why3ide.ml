@@ -1557,36 +1557,6 @@ let (_ : GtkSignal.id) =
   in
   goals_view#event#connect#key_press ~callback
 
-(*************************************)
-(* Commands of the Experimental menu *)
-(*************************************)
-
-let exp_menu = factory#add_submenu "_Experimental"
-let exp_factory = new GMenu.factory exp_menu ~accel_group
-
-
-(* Current copied node *)
-let saved_copy = ref None
-
-let copy () =
-  match get_selected_row_references () with
-  | [r] -> let n = get_node_id r#iter in
-    saved_copy := Some n
-  | _ -> ()
-
-let paste () =
-  match get_selected_row_references () with
-  | [r] ->
-      let m = get_node_id r#iter in
-    (match !saved_copy with
-    | Some n -> send_request (Copy_paste (n, m))
-    | None -> ())
-  | _ -> ()
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:copy "Copy"
-
-let (_ : GMenu.menu_item) = exp_factory#add_item ~callback:paste "Paste"
-
 (*********************************)
 (* add a new file in the project *)
 (*********************************)
@@ -2052,6 +2022,8 @@ let bisect_item =
   create_menu_item tools_factory "Bisect on external proof"
                    "Search for a maximal set of hypotheses to remove before calling a prover"
 
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
 let focus_item =
   create_menu_item tools_factory "Focus"
     "Focus on proof node"
@@ -2059,6 +2031,14 @@ let focus_item =
 let unfocus_item =
   create_menu_item tools_factory "Unfocus"
     "Unfocus"
+
+let ( _ : GMenu.menu_item) = tools_factory#add_separator ()
+
+let copy_item = create_menu_item tools_factory "Copy" "Copy the current tree node"
+
+let paste_item = create_menu_item tools_factory "Paste"
+                                  "Paste the copied node below the current node"
+
 
 let () =
   let on_selected_rows ~multiple ~notif_kind ~action f () =
@@ -2104,6 +2084,36 @@ let () =
     unfocus_item
     ~callback:(fun () -> send_request Unfocus_req)
 
+
+(*************************************)
+(* Copy paste                        *)
+(*************************************)
+
+(* Current copied node *)
+let saved_copy = ref None
+
+let copy () =
+  match get_selected_row_references () with
+  | [r] -> let n = get_node_id r#iter in
+           saved_copy := Some n;
+           paste_item#misc#set_sensitive true
+  | _ ->
+     saved_copy := None;
+     paste_item#misc#set_sensitive false
+
+let paste () =
+  match get_selected_row_references () with
+  | [r] ->
+      let m = get_node_id r#iter in
+    (match !saved_copy with
+    | Some n -> send_request (Copy_paste (n, m))
+    | None -> ())
+  | _ -> ()
+
+let () =
+  paste_item#misc#set_sensitive false;
+  connect_menu_item copy_item ~callback:copy;
+  connect_menu_item paste_item ~callback:paste
 
 
 (* the command-line *)
