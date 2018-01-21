@@ -32,9 +32,11 @@ apply Z.quot_rem'.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
+Lemma Div_bound :
+  forall (x:Z) (y:Z),
+  ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
   ((0%Z <= (ZArith.BinInt.Z.quot x y))%Z /\
-  ((ZArith.BinInt.Z.quot x y) <= x)%Z).
+   ((ZArith.BinInt.Z.quot x y) <= x)%Z).
 intros x y (Hx,Hy).
 split.
 now apply Z.quot_pos.
@@ -49,9 +51,11 @@ now rewrite <- H', Zquot_0_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) ->
+Lemma Mod_bound :
+  forall (x:Z) (y:Z),
+  (~ (y = 0%Z)) ->
   (((-(ZArith.BinInt.Z.abs y))%Z < (ZArith.BinInt.Z.rem x y))%Z /\
-  ((ZArith.BinInt.Z.rem x y) < (ZArith.BinInt.Z.abs y))%Z).
+   ((ZArith.BinInt.Z.rem x y) < (ZArith.BinInt.Z.abs y))%Z).
 intros x y Zy.
 destruct (Zle_or_lt 0 x) as [Hx|Hx].
 refine ((fun H => conj (Zlt_le_trans _ 0 _ _ (proj1 H)) (proj2 H)) _).
@@ -136,7 +140,8 @@ Qed.
 Lemma Div_mult :
   forall (x:Z) (y:Z) (z:Z),
   ((0%Z < x)%Z /\ ((0%Z <= y)%Z /\ (0%Z <= z)%Z)) ->
-  ((ZArith.BinInt.Z.quot ((x * y)%Z + z)%Z x) = (y + (ZArith.BinInt.Z.quot z x))%Z).
+  ((ZArith.BinInt.Z.quot ((x * y)%Z + z)%Z x) =
+   (y + (ZArith.BinInt.Z.quot z x))%Z).
 intros x y z (Hx&Hy&Hz).
 rewrite (Zplus_comm y).
 rewrite <- Z_quot_plus.

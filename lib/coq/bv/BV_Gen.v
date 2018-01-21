@@ -1497,8 +1497,8 @@ Qed.
 Lemma to_uint_sub_bounded :
   forall (v1:t) (v2:t),
   ((0%Z <= ((to_uint v1) - (to_uint v2))%Z)%Z /\
-  (((to_uint v1) - (to_uint v2))%Z < two_power_size)%Z) -> ((to_uint (sub v1
-  v2)) = ((to_uint v1) - (to_uint v2))%Z).
+   (((to_uint v1) - (to_uint v2))%Z < two_power_size)%Z) ->
+  ((to_uint (sub v1 v2)) = ((to_uint v1) - (to_uint v2))%Z).
   intros v1 v2 (h1,h2).
   rewrite <-(mod1_out (to_uint v1 - to_uint v2) two_power_size) by auto.
   apply to_uint_sub.
@@ -1512,8 +1512,8 @@ Defined.
 (* Why3 goal *)
 Lemma to_uint_neg :
   forall (v:t),
-  ((to_uint (neg v)) = (int.EuclideanDivision.mod1 (-(to_uint v))%Z
-  two_power_size)).
+  ((to_uint (neg v)) =
+   (int.EuclideanDivision.mod1 (-(to_uint v))%Z two_power_size)).
   intros v.
   apply to_uint_of_int, mod1_in_range2.
 Qed.
@@ -1532,9 +1532,10 @@ Lemma to_uint_mul : forall (v1:t) (v2:t), ((to_uint (mul v1
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_mul_bounded : forall (v1:t) (v2:t),
-  (((to_uint v1) * (to_uint v2))%Z < two_power_size)%Z -> ((to_uint (mul v1
-  v2)) = ((to_uint v1) * (to_uint v2))%Z).
+Lemma to_uint_mul_bounded :
+  forall (v1:t) (v2:t),
+  (((to_uint v1) * (to_uint v2))%Z < two_power_size)%Z ->
+  ((to_uint (mul v1 v2)) = ((to_uint v1) * (to_uint v2))%Z).
   intros v1 v2 h1.
   rewrite <-(mod1_out (to_uint v1 * to_uint v2) two_power_size).
   apply to_uint_mul.
@@ -1549,8 +1550,10 @@ Definition udiv : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_udiv : forall (v1:t) (v2:t), ((to_uint (udiv v1
-  v2)) = (int.EuclideanDivision.div (to_uint v1) (to_uint v2))).
+Lemma to_uint_udiv :
+  forall (v1:t) (v2:t),
+  ((to_uint (udiv v1 v2)) =
+   (int.EuclideanDivision.div (to_uint v1) (to_uint v2))).
   intros v1 v2.
   apply to_uint_of_int.
   case (Z.eq_dec (to_uint v2) 0); intro.
@@ -1571,8 +1574,10 @@ Definition urem : t -> t -> t.
 Defined.
 
 (* Why3 goal *)
-Lemma to_uint_urem : forall (v1:t) (v2:t), ((to_uint (urem v1
-  v2)) = (int.EuclideanDivision.mod1 (to_uint v1) (to_uint v2))).
+Lemma to_uint_urem :
+  forall (v1:t) (v2:t),
+  ((to_uint (urem v1 v2)) =
+   (int.EuclideanDivision.mod1 (to_uint v1) (to_uint v2))).
   intros v1 v2.
   apply to_uint_of_int.
   case (Z.eq_dec (to_uint v2) 0); intro.
@@ -1598,9 +1603,10 @@ Lemma lsr_bv_is_lsr :
 Qed.
 
 (* Why3 goal *)
-Lemma to_uint_lsr : forall (v:t) (n:t), ((to_uint (lsr_bv v
-  n)) = (int.EuclideanDivision.div (to_uint v)
-  (bv.Pow2int.pow2 (to_uint n)))).
+Lemma to_uint_lsr :
+  forall (v:t) (n:t),
+  ((to_uint (lsr_bv v n)) =
+   (int.EuclideanDivision.div (to_uint v) (bv.Pow2int.pow2 (to_uint n)))).
   intros v n.
   apply to_uint_lsr_aux.
 Qed.
@@ -1688,8 +1694,9 @@ Lemma nth_bv_def_aux : forall {l} (x:Vector.t bool (S l)) (i:Z),
 Qed.
 
 (* Why3 goal *)
-Lemma nth_bv_def : forall (x:t) (i:t), ((nth_bv x i) = true) <->
-  ~ ((bw_and (lsr_bv x i) one) = zeros).
+Lemma nth_bv_def :
+  forall (x:t) (i:t),
+  ((nth_bv x i) = true) <-> ~ ((bw_and (lsr_bv x i) one) = zeros).
   intros; unfold nth_bv.
   case (Z_lt_ge_dec (to_uint i) size); intro.
   rewrite <-(Zplus_0_l (to_uint i)).

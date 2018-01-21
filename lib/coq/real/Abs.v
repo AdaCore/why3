@@ -68,21 +68,24 @@ Qed.
 (* Why3 goal *)
 Lemma Abs_sum :
   forall (x:R) (y:R),
-  ((Reals.Rbasic_fun.Rabs (x + y)%R) <= ((Reals.Rbasic_fun.Rabs x) + (Reals.Rbasic_fun.Rabs y))%R)%R.
+  ((Reals.Rbasic_fun.Rabs (x + y)%R) <=
+   ((Reals.Rbasic_fun.Rabs x) + (Reals.Rbasic_fun.Rabs y))%R)%R.
 exact Rabs_triang.
 Qed.
 
 (* Why3 goal *)
 Lemma Abs_prod :
   forall (x:R) (y:R),
-  ((Reals.Rbasic_fun.Rabs (x * y)%R) = ((Reals.Rbasic_fun.Rabs x) * (Reals.Rbasic_fun.Rabs y))%R).
+  ((Reals.Rbasic_fun.Rabs (x * y)%R) =
+   ((Reals.Rbasic_fun.Rabs x) * (Reals.Rbasic_fun.Rabs y))%R).
 exact Rabs_mult.
 Qed.
 
 (* Why3 goal *)
 Lemma triangular_inequality :
   forall (x:R) (y:R) (z:R),
-  ((Reals.Rbasic_fun.Rabs (x - z)%R) <= ((Reals.Rbasic_fun.Rabs (x - y)%R) + (Reals.Rbasic_fun.Rabs (y - z)%R))%R)%R.
+  ((Reals.Rbasic_fun.Rabs (x - z)%R) <=
+   ((Reals.Rbasic_fun.Rabs (x - y)%R) + (Reals.Rbasic_fun.Rabs (y - z)%R))%R)%R.
 intros x y z.
 replace (x - z)%R with ((x - y) + (y - z))%R by ring.
 apply Rabs_triang.

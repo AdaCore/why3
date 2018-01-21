@@ -53,10 +53,11 @@ Qed.
 (* Why3 goal *)
 Lemma xorb_def :
   forall (x:bool) (y:bool),
-  ((Init.Datatypes.xorb x y) = match x with
-  | false => y
-  | true => (Init.Datatypes.negb y)
-  end).
+  ((Init.Datatypes.xorb x y) =
+   match x with
+   | false => y
+   | true => (Init.Datatypes.negb y)
+   end).
 Proof.
 intros x y.
 destruct x; destruct y; auto.

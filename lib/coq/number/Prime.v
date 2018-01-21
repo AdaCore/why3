@@ -23,8 +23,10 @@ Require number.Divisibility.
 Import Znumtheory.
 
 (* Why3 assumption *)
-Definition prime (p:Z): Prop := (2%Z <= p)%Z /\ forall (n:Z), ((1%Z < n)%Z /\
-  (n < p)%Z) -> ~ (number.Divisibility.divides n p).
+Definition prime (p:Z) : Prop :=
+  (2%Z <= p)%Z /\
+  forall (n:Z),
+  ((1%Z < n)%Z /\ (n < p)%Z) -> ~ (number.Divisibility.divides n p).
 
 Lemma prime_is_Zprime :
   forall p, prime p <-> Znumtheory.prime p.

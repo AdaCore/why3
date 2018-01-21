@@ -86,7 +86,8 @@ Qed.
 Lemma Append_Num_Occ :
   forall {a:Type} {a_WT:WhyType a},
   forall (x:a) (l1:(list a)) (l2:(list a)),
-  ((num_occ x (Init.Datatypes.app l1 l2)) = ((num_occ x l1) + (num_occ x l2))%Z).
+  ((num_occ x (Init.Datatypes.app l1 l2)) =
+   ((num_occ x l1) + (num_occ x l2))%Z).
 Proof.
 intros a a_WT x l1 l2.
 induction l1 as [|l1h l1t IHl1].

@@ -34,8 +34,9 @@ apply sqrt_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma Sqrt_square : forall (x:R), (0%R <= x)%R ->
-  ((Reals.RIneq.Rsqr (Reals.R_sqrt.sqrt x)) = x).
+Lemma Sqrt_square :
+  forall (x:R),
+  (0%R <= x)%R -> ((Reals.RIneq.Rsqr (Reals.R_sqrt.sqrt x)) = x).
 exact sqrt_sqrt.
 Qed.
 
@@ -46,13 +47,18 @@ exact sqrt_square.
 Qed.
 
 (* Why3 goal *)
-Lemma Sqrt_mul : forall (x:R) (y:R), ((0%R <= x)%R /\ (0%R <= y)%R) ->
-  ((Reals.R_sqrt.sqrt (x * y)%R) = ((Reals.R_sqrt.sqrt x) * (Reals.R_sqrt.sqrt y))%R).
+Lemma Sqrt_mul :
+  forall (x:R) (y:R),
+  ((0%R <= x)%R /\ (0%R <= y)%R) ->
+  ((Reals.R_sqrt.sqrt (x * y)%R) =
+   ((Reals.R_sqrt.sqrt x) * (Reals.R_sqrt.sqrt y))%R).
 intros x y (hx & hy); now apply sqrt_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma Sqrt_le : forall (x:R) (y:R), ((0%R <= x)%R /\ (x <= y)%R) ->
+Lemma Sqrt_le :
+  forall (x:R) (y:R),
+  ((0%R <= x)%R /\ (x <= y)%R) ->
   ((Reals.R_sqrt.sqrt x) <= (Reals.R_sqrt.sqrt y))%R.
 intros x y (h1 & h2); apply sqrt_le_1; auto.
 apply Rle_trans with x; auto.

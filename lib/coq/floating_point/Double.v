@@ -52,14 +52,15 @@ Definition total_error (x:floating_point.DoubleFormat.double) : R :=
   (Reals.Rbasic_fun.Rabs ((value x) - (model x))%R).
 
 (* Why3 assumption *)
-Definition no_overflow (m:floating_point.Rounding.mode) (x:R): Prop :=
-  ((Reals.Rbasic_fun.Rabs (round m
-  x)) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
+Definition no_overflow (m:floating_point.Rounding.mode) (x:R) : Prop :=
+  ((Reals.Rbasic_fun.Rabs (round m x)) <=
+   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
   forall (m:floating_point.Rounding.mode) (x:R),
-  ((Reals.Rbasic_fun.Rabs x) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R ->
+  ((Reals.Rbasic_fun.Rabs x) <=
+   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R ->
   (no_overflow m x).
 exact (Bounded_real_no_overflow 53 1024 (refl_equal true) (refl_equal true)).
 Qed.
@@ -91,8 +92,9 @@ now apply Bounded_value.
 Qed.
 
 (* Why3 goal *)
-Lemma Exact_rounding_for_integers : forall (m:floating_point.Rounding.mode)
-  (i:Z), (((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z) ->
+Lemma Exact_rounding_for_integers :
+  forall (m:floating_point.Rounding.mode) (i:Z),
+  (((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z) ->
   ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof.
 intros m i Hi.
@@ -112,14 +114,18 @@ now apply Round_up_ge.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_down_neg : forall (x:R), ((round floating_point.Rounding.Down
-  (-x)%R) = (-(round floating_point.Rounding.Up x))%R).
+Lemma Round_down_neg :
+  forall (x:R),
+  ((round floating_point.Rounding.Down (-x)%R) =
+   (-(round floating_point.Rounding.Up x))%R).
 now apply Round_down_neg.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_up_neg : forall (x:R), ((round floating_point.Rounding.Up
-  (-x)%R) = (-(round floating_point.Rounding.Down x))%R).
+Lemma Round_up_neg :
+  forall (x:R),
+  ((round floating_point.Rounding.Up (-x)%R) =
+   (-(round floating_point.Rounding.Down x))%R).
 now apply Round_up_neg.
 Qed.
 

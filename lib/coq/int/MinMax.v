@@ -74,7 +74,8 @@ Qed.
 (* Why3 goal *)
 Lemma Min_assoc :
   forall (x:Z) (y:Z) (z:Z),
-  ((ZArith.BinInt.Z.min (ZArith.BinInt.Z.min x y) z) = (ZArith.BinInt.Z.min x (ZArith.BinInt.Z.min y z))).
+  ((ZArith.BinInt.Z.min (ZArith.BinInt.Z.min x y) z) =
+   (ZArith.BinInt.Z.min x (ZArith.BinInt.Z.min y z))).
 Proof.
 intros x y z.
 apply eq_sym, Zmin_assoc.
@@ -83,7 +84,8 @@ Qed.
 (* Why3 goal *)
 Lemma Max_assoc :
   forall (x:Z) (y:Z) (z:Z),
-  ((ZArith.BinInt.Z.max (ZArith.BinInt.Z.max x y) z) = (ZArith.BinInt.Z.max x (ZArith.BinInt.Z.max y z))).
+  ((ZArith.BinInt.Z.max (ZArith.BinInt.Z.max x y) z) =
+   (ZArith.BinInt.Z.max x (ZArith.BinInt.Z.max y z))).
 Proof.
 intros x y z.
 apply eq_sym, Zmax_assoc.

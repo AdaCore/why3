@@ -31,8 +31,10 @@ Qed.
 Require Import Exp_prop.
 
 (* Why3 goal *)
-Lemma Exp_sum : forall (x:R) (y:R),
-  ((Reals.Rtrigo_def.exp (x + y)%R) = ((Reals.Rtrigo_def.exp x) * (Reals.Rtrigo_def.exp y))%R).
+Lemma Exp_sum :
+  forall (x:R) (y:R),
+  ((Reals.Rtrigo_def.exp (x + y)%R) =
+   ((Reals.Rtrigo_def.exp x) * (Reals.Rtrigo_def.exp y))%R).
 exact exp_plus.
 Qed.
 
@@ -45,8 +47,11 @@ exact ln_1.
 Qed.
 
 (* Why3 goal *)
-Lemma Log_mul : forall (x:R) (y:R), ((0%R < x)%R /\ (0%R < y)%R) ->
-  ((Reals.Rpower.ln (x * y)%R) = ((Reals.Rpower.ln x) + (Reals.Rpower.ln y))%R).
+Lemma Log_mul :
+  forall (x:R) (y:R),
+  ((0%R < x)%R /\ (0%R < y)%R) ->
+  ((Reals.Rpower.ln (x * y)%R) =
+   ((Reals.Rpower.ln x) + (Reals.Rpower.ln y))%R).
 intros x y (Hx,Hy).
 now apply ln_mult.
 Qed.
@@ -58,8 +63,9 @@ exact ln_exp.
 Qed.
 
 (* Why3 goal *)
-Lemma Exp_log : forall (x:R), (0%R < x)%R ->
-  ((Reals.Rtrigo_def.exp (Reals.Rpower.ln x)) = x).
+Lemma Exp_log :
+  forall (x:R),
+  (0%R < x)%R -> ((Reals.Rtrigo_def.exp (Reals.Rpower.ln x)) = x).
 exact exp_ln.
 Qed.
 

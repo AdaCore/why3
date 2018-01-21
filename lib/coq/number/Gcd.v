@@ -136,8 +136,9 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma Gcd_euclidean_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((gcd b
-  (int.EuclideanDivision.mod1 a b)) = (gcd a b)).
+Lemma Gcd_euclidean_mod :
+  forall (a:Z) (b:Z),
+  (~ (b = 0%Z)) -> ((gcd b (int.EuclideanDivision.mod1 a b)) = (gcd a b)).
 Proof.
 intros a b Zb.
 rewrite (Zgcd_comm a b).

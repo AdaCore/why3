@@ -65,8 +65,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_bounds : forall (p:(Z -> bool)) (a:Z) (b:Z), (a < b)%Z ->
-  ((0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z).
+Lemma Numof_bounds :
+  forall (p:(Z -> bool)) (a:Z) (b:Z),
+  (a < b)%Z -> ((0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z).
 Proof.
   intros p a b h1.
   unfold numof.
@@ -80,8 +81,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Numof_append : forall (p:(Z -> bool)) (a:Z) (b:Z) (c:Z), ((a <= b)%Z /\
-  (b <= c)%Z) -> ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
+Lemma Numof_append :
+  forall (p:(Z -> bool)) (a:Z) (b:Z) (c:Z),
+  ((a <= b)%Z /\ (b <= c)%Z) ->
+  ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
 Proof.
   intros p a b c (h1,h2).
   pattern c.
@@ -143,8 +146,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Empty : forall (p:(Z -> bool)) (a:Z) (b:Z), (forall (n:Z),
-  ((a <= n)%Z /\ (n < b)%Z) -> ~ ((p n) = true)) -> ((numof p a b) = 0%Z).
+Lemma Empty :
+  forall (p:(Z -> bool)) (a:Z) (b:Z),
+  (forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ~ ((p n) = true)) ->
+  ((numof p a b) = 0%Z).
 Proof.
   intros p a b.
   case (Z_lt_le_dec a b); intro; [|intro; apply Numof_empty]; auto.
@@ -226,9 +231,10 @@ apply numof_nat.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_strictly_increasing : forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z)
-  (l:Z), ((i <= j)%Z /\ ((j <= k)%Z /\ (k < l)%Z)) -> (((p k) = true) ->
-  ((numof p i j) < (numof p i l))%Z).
+Lemma numof_strictly_increasing :
+  forall (p:(Z -> bool)) (i:Z) (j:Z) (k:Z) (l:Z),
+  ((i <= j)%Z /\ ((j <= k)%Z /\ (k < l)%Z)) ->
+  (((p k) = true) -> ((numof p i j) < (numof p i l))%Z).
 Proof.
 intros p i j k l (h1,(h2,h3)) h4.
 rewrite (Numof_append p i j l) by omega.
@@ -284,9 +290,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma numof_change_equiv : forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z)
-  (b:Z), (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) <->
-  ((p2 j) = true))) -> ((numof p2 a b) = (numof p1 a b)).
+Lemma numof_change_equiv :
+  forall (p1:(Z -> bool)) (p2:(Z -> bool)) (a:Z) (b:Z),
+  (forall (j:Z),
+   ((a <= j)%Z /\ (j < b)%Z) -> (((p1 j) = true) <-> ((p2 j) = true))) ->
+  ((numof p2 a b) = (numof p1 a b)).
 Proof.
 intros p1 p2 a b h1.
 apply le_ge_eq.

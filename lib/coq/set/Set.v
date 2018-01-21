@@ -78,9 +78,10 @@ now intros a a_WT s x.
 Qed.
 
 (* Why3 goal *)
-Lemma subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(a ->
-  bool)) (s2:(a -> bool)) (s3:(a -> bool)), (subset s1 s2) -> ((subset s2
-  s3) -> (subset s1 s3)).
+Lemma subset_trans :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:(a -> bool)) (s2:(a -> bool)) (s3:(a -> bool)),
+  (subset s1 s2) -> ((subset s2 s3) -> (subset s1 s3)).
 Proof.
 intros a a_WT s1 s2 s3 h1 h2 x H.
 now apply h2, h1.

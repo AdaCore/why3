@@ -98,15 +98,17 @@ exact Zdivide_opp_r_rev.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_plusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
-  c) -> (divides a (b + c)%Z)).
+Lemma divides_plusr :
+  forall (a:Z) (b:Z) (c:Z),
+  (divides a b) -> ((divides a c) -> (divides a (b + c)%Z)).
 Proof.
 exact Zdivide_plus_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_minusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
-  c) -> (divides a (b - c)%Z)).
+Lemma divides_minusr :
+  forall (a:Z) (b:Z) (c:Z),
+  (divides a b) -> ((divides a c) -> (divides a (b - c)%Z)).
 Proof.
 exact Zdivide_minus_l.
 Qed.
@@ -146,8 +148,9 @@ exact Zdivide_1.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_antisym : forall (a:Z) (b:Z), (divides a b) -> ((divides b
-  a) -> ((a = b) \/ (a = (-b)%Z))).
+Lemma divides_antisym :
+  forall (a:Z) (b:Z),
+  (divides a b) -> ((divides b a) -> ((a = b) \/ (a = (-b)%Z))).
 Proof.
 exact Zdivide_antisym.
 Qed.
@@ -195,8 +198,9 @@ now elim H1.
 Qed.
 
 (* Why3 goal *)
-Lemma mod_divides_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
-  (((ZArith.BinInt.Z.rem a b) = 0%Z) -> (divides b a)).
+Lemma mod_divides_computer :
+  forall (a:Z) (b:Z),
+  (~ (b = 0%Z)) -> (((ZArith.BinInt.Z.rem a b) = 0%Z) -> (divides b a)).
 Proof.
 intros a b Zb H.
 exists (Z.quot a b).
@@ -205,8 +209,9 @@ now apply Zquot.Z_quot_exact_full.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_mod_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b
-  a) -> ((ZArith.BinInt.Z.rem a b) = 0%Z)).
+Lemma divides_mod_computer :
+  forall (a:Z) (b:Z),
+  (~ (b = 0%Z)) -> ((divides b a) -> ((ZArith.BinInt.Z.rem a b) = 0%Z)).
 Proof.
 intros a b Zb (q,H).
 rewrite H.

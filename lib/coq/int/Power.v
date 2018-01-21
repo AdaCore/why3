@@ -84,7 +84,9 @@ apply Power_mult ; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_comm1 : forall (x:Z) (y:Z), ((x * y)%Z = (y * x)%Z) ->
+Lemma Power_comm1 :
+  forall (x:Z) (y:Z),
+  ((x * y)%Z = (y * x)%Z) ->
   forall (n:Z), (0%Z <= n)%Z -> (((power x n) * y)%Z = (y * (power x n))%Z).
 Proof.
 intros x y h1 n h2.
