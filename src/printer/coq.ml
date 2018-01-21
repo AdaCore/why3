@@ -168,7 +168,7 @@ let rec print_ty info fmt ty =
         begin
           match tl with
             | []  -> (print_ts_real info) fmt ts
-            | l   -> fprintf fmt "@[<hov>(%a@ %a)@]" (print_ts_real info) ts
+            | l   -> fprintf fmt "@[<hov 1>(%a@ %a)@]" (print_ts_real info) ts
               (print_list space (print_ty info)) l
         end
     end
@@ -210,7 +210,7 @@ let rec print_pat info fmt p = match p.pat_node with
       begin match query_syntax info.info_syn cs.ls_name with
         | Some s -> syntax_arguments s (print_pat info) fmt pl
         | _ when pl = [] -> (print_ls_real info) fmt cs
-        | _ -> fprintf fmt "(%a %a)"
+        | _ -> fprintf fmt "@[<hov 1>(%a@ %a)@]"
           (print_ls_real info) cs (print_list space (print_pat info)) pl
       end
 
@@ -321,7 +321,7 @@ and print_tnode _opl opr info fmt t = match t.t_node with
             else fprintf fmt "@[<hov 1>(%a@ %a)@]"
               (print_ls_real info) fs
               (print_list space (print_opr_term info)) tl
-          else fprintf fmt "@[<hov>(%a %a: %a)@]"
+          else fprintf fmt "@[<hov 1>(@[<hov>%a@ %a@]:@ %a)@]"
             (print_ls_real info) fs (print_list space (print_opr_term info)) tl
             (print_ty info) (t_type t)
     end
@@ -376,7 +376,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
   | Tapp (ps, tl) ->
     begin match query_syntax info.info_syn ps.ls_name with
       | Some s -> syntax_arguments s (print_opr_term info) fmt tl
-      | _ -> fprintf fmt "(%a%a)" (print_ls_real info) ps
+      | _ -> fprintf fmt "@[<hov 1>(%a%a)@]" (print_ls_real info) ps
           (print_list_pre space (print_opr_term info)) tl
     end
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
