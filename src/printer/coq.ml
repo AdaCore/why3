@@ -35,6 +35,12 @@ let char_to_alnumus c =
     | '\'' -> String.make 1 c
     | _ -> Ident.char_to_alnumus c
 
+let syntax_arguments s f fmt l =
+  let sl = Strings.split ' ' s in
+  pp_open_hovbox fmt 1;
+  print_list space (fun fmt s -> syntax_arguments s f fmt l) fmt sl;
+  pp_close_box fmt ()
+
 let fresh_printer () =
   let isanitize = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer black_list ~sanitizer:isanitize
