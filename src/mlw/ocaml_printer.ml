@@ -563,9 +563,12 @@ module Print = struct
     | Some s ->
         fprintf fmt "@[<hov 4>| %a ->@ %a@]"
           (syntax_arguments s print_var) pvl (print_expr info ~paren:true) e
-    | None   ->
-        fprintf fmt "@[<hov 4>| %a %a ->@ %a@]" (print_uident info) (xs.xs_name)
-          (print_list nothing print_var) pvl (print_expr info) e
+    | None when pvl = []->
+        fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_uident info)
+          (xs.xs_name) (print_expr info) e
+    | None ->
+        fprintf fmt "@[<hov 4>| %a (%a) ->@ %a@]" (print_uident info)
+          (xs.xs_name) (print_list comma print_var) pvl (print_expr info) e
 
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =

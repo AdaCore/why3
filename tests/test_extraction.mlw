@@ -226,10 +226,10 @@ module TestExtraction
   let constant opt_a = opt_f 40 2
   let opt_g (x [@ocaml:optional]) (y [@ocaml:named]: int) =
      match x with None -> y | Some x -> x + y end
-  let constant opt_b = opt_g None 42
   let constant opt_c = opt_g (Some 40) 2
 
   (* FIXME: partial application with named arguments not yet supported *)
+  let constant opt_b = fun y -> opt_g y 42
   let opt_h () = fun y -> opt_f 40 y
   let opt_i () = opt_h () 2
 
