@@ -18,6 +18,7 @@ type strategy = string
 type node_ID = int
 let root_node : node_ID = 0
 
+let is_root n = n = root_node
 
 type global_information =
   {

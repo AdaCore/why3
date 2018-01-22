@@ -1329,7 +1329,10 @@ end
      | Get_task(nid,_,_,_) ->
          Hint.mem model_any nid
      | Command_req (nid, _) ->
-         Hint.mem model_any nid
+         if not (Itp_communication.is_root nid) then
+           Hint.mem model_any nid
+         else
+           true
 
   (* ----------------- treat_request -------------------- *)
 

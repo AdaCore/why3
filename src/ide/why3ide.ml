@@ -2134,7 +2134,6 @@ let check_uninstalled_prover =
       uninstalled_prover_dialog gconfig p
     end
 
-
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
