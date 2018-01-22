@@ -303,13 +303,15 @@ module Print = struct
   let rec print_apply_args info fmt = function
     | expr :: exprl, pv :: pvl ->
         if is_optional ~labels:(pv_name pv).id_label then
-          fprintf fmt "?%s:%a" (pv_name pv).id_string
-            (print_expr ~paren:true info) expr
+          begin match expr.e_node with
+            | Eapp (rs, _)
+              when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
+            | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
+                     (print_expr ~paren:true info) expr end
         else if is_named ~labels:(pv_name pv).id_label then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
             (print_expr ~paren:true info) expr
-        else
-          fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        else fprintf fmt "%a" (print_expr ~paren:true info) expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
     | [], _ -> ()
