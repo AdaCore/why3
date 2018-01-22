@@ -185,7 +185,9 @@ let unambig_fs fs =
     | Tyvar u when not (lookup u) -> false
     | _ -> ty_all inspect ty
   in
-  inspect (Opt.get fs.ls_value)
+  match fs.ls_value with
+  | None -> true
+  | Some v -> inspect v
 
 (** Patterns, terms, and formulas *)
 
@@ -232,30 +234,10 @@ let print_label fmt (l,_) = fprintf fmt "(*%s*)" l
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_term info fmt t = print_lrterm false false info fmt t
-and     print_fmla info fmt f = print_lrfmla false false info fmt f
-and print_opl_term info fmt t = print_lrterm true  false info fmt t
-and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
-and print_opr_term info fmt t = print_lrterm false true  info fmt t
-and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
-
-and print_lrterm opl opr info fmt t = match t.t_label with
-  | _ -> print_tnode opl opr info fmt t
-(*
-  | [] -> print_tnode opl opr info fmt t
-  | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_tnode false false info) t
-*)
-
-and print_lrfmla opl opr info fmt f = match f.t_label with
-  | _ -> print_fnode opl opr info fmt f
-(*
-  | [] -> print_fnode opl opr info fmt f
-  | ll -> fprintf fmt "(%a %a)"
-      (print_list space print_label) ll (print_fnode false false info) f
-*)
-
-and print_tnode _opl opr info fmt t = match t.t_node with
+let rec print_term info fmt t = print_tnode false false info fmt t
+and print_opl_term info fmt f = print_tnode true  false info fmt f
+and print_opr_term info fmt t = print_tnode false true  info fmt t
+and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
@@ -278,9 +260,6 @@ and print_tnode _opl opr info fmt t = match t.t_node with
           Number.def_real_support = Number.Number_unsupported;
         } in
       Number.print number_format fmt c
-  | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on opr "@[<hov>if %a@ then %a@ else %a@]")
-        (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "@[<hov>let %a :=@[<hov 1>@ %a@] in@ %a@]")
@@ -295,7 +274,7 @@ and print_tnode _opl opr info fmt t = match t.t_node with
       if vl = [] then begin
         let v,f = t_open_bound fb in
         fprintf fmt (protect_on opr "@[<hov 1>epsilon %a.@ %a@]")
-          (print_vsty info) v (print_opl_fmla info) f;
+          (print_vsty info) v (print_opl_term info) f;
         forget_var v
       end else begin
         if t0.t_ty = None then unsupportedTerm t
@@ -325,20 +304,17 @@ and print_tnode _opl opr info fmt t = match t.t_node with
             (print_ls_real info) fs (print_list space (print_opr_term info)) tl
             (print_ty info) (t_type t)
     end
-  | Tquant _ | Tbinop _ | Tnot _ | Ttrue | Tfalse -> raise (TermExpected t)
-
-and print_fnode opl opr info fmt f = match f.t_node with
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
       fprintf fmt (protect_on opr "@[<hov>forall @[<hov>%a@],@ @[<hov>%a@]@]")
         (print_list space (print_vsty info)) vl
-        (* (print_tl info) tl *) (print_fmla info) f;
+        (* (print_tl info) tl *) (print_term info) f;
       List.iter forget_var vl
   | Tquant (Texists,fq) ->
       let vl,_tl,f = t_open_quant fq in
       let rec aux fmt vl =
         match vl with
-          | [] -> print_fmla info fmt f
+          | [] -> print_term info fmt f
           | v::vr ->
               fprintf fmt (protect_on opr "@[<hov>exists @[<hov>%a@],@ @[<hov>%a@]@]")
                 (print_vsty_nopar info) v
@@ -354,32 +330,16 @@ and print_fnode opl opr info fmt f = match f.t_node with
      (match b with
      | Tand | Tor ->
        fprintf fmt (protect_on (opl || opr) "@[<hov>%a %a@ %a@]")
-               (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2
+               (print_opr_term info) f1 print_binop b (print_opl_term info) f2
      | Timplies | Tiff ->
          fprintf fmt (protect_on (opl || opr) "@[<hov>%a %a@ %a@]")
-               (print_opr_fmla info) f1 print_binop b (print_opl_fmla info) f2)
+               (print_opr_term info) f1 print_binop b (print_opl_term info) f2)
   | Tnot f ->
-      fprintf fmt (protect_on opr "@[<hov>~ %a@]") (print_opl_fmla info) f
-  | Tlet (t,f) ->
-      let v,f = t_open_bound f in
-      fprintf fmt (protect_on opr "@[<hov>let %a :=@ @[<hov>%a@] in@ %a@]")
-        print_vs v (print_term info) t (print_opl_fmla info) f;
-      forget_var v
-  | Tcase (t,bl) ->
-      fprintf fmt "@[<hov>match %a with@\n%a@\nend@]"
-        (print_term info) t
-        (print_list newline (print_fbranch info)) bl
+      fprintf fmt (protect_on opr "@[<hov>~ %a@]") (print_opl_term info) f
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr
         "@[<hov>if @[<hov>%a@] then@ @[<hov>%a@]@ else@ @[<hov>%a@]@]")
-        (print_fmla info) f1 (print_fmla info) f2 (print_opl_fmla info) f3
-  | Tapp (ps, tl) ->
-    begin match query_syntax info.info_syn ps.ls_name with
-      | Some s -> syntax_arguments s (print_opr_term info) fmt tl
-      | _ -> fprintf fmt "@[<hov 1>(%a%a)@]" (print_ls_real info) ps
-          (print_list_pre space (print_opr_term info)) tl
-    end
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+        (print_term info) f1 (print_term info) f2 (print_opl_term info) f3
 
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in
@@ -387,14 +347,8 @@ and print_tbranch info fmt br =
     (print_pat info) p (print_term info) t;
   Svs.iter forget_var p.pat_vars
 
-and print_fbranch info fmt br =
-  let p,f = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a =>@ %a@]"
-    (print_pat info) p (print_fmla info) f;
-  Svs.iter forget_var p.pat_vars
-
 let print_expr info fmt =
-  TermTF.t_select (print_term info fmt) (print_fmla info fmt)
+  TermTF.t_select (print_term info fmt) (print_term info fmt)
 
 (** Declarations *)
 
@@ -880,7 +834,7 @@ let print_recursive_decl ~old info fmt dl =
   List.iter (print_equivalence_lemma ~old info fmt) dl_syn
 
 let print_ind info fmt (pr,f) =
-  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_fmla info) f
+  fprintf fmt "@[<hov 4>| %a : %a@]" print_pr pr (print_term info) f
 
 let print_ind_decl info fmt ps bl =
   let _, _, all_ty_params = ls_ty_vars ps in
@@ -919,16 +873,16 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Some (Axiom _) when stt = "Lemma" ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Hypothesis %a :@ @[<hov>%a%a.@]@]@\n@\n"
         print_pr pr (print_params info ~whytypes:true) params
-        (print_fmla info) f
+        (print_term info) f
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s %a :@ @[<hv>%a@[<hov>%a.@]@]@]@\n%a@\n"
         stt print_pr pr (print_params info ~whytypes:true) params
-        (print_fmla info) f
+        (print_term info) f
         (print_previous_proof (Some (params,f)) info) prev
   else
     fprintf fmt "@[<hv 2>Axiom %a :@ @[%a%a.@]@]@\n@\n"
       print_pr pr (print_params info ~whytypes:true) params
-      (print_fmla info) f;
+      (print_term info) f;
   forget_tvs ()
 
 let print_decl ~old info fmt d =
