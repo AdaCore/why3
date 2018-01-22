@@ -362,9 +362,11 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                   let (vl1, _tl1, term1) = t_open_quant bv1 in
                   let (vl2, _tl2, term2) = t_open_quant bv2 in
                   let (mt, mv) =
-                    List.fold_left2 (fun (mt, mv) e1 e2 ->
+                    try List.fold_left2 (fun (mt, mv) e1 e2 ->
                       let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
-                      (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2 in
+                      (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2
+                    with Invalid_argument _ -> raise (NoMatch (Some (t1,t2)))
+                  in
                   loop (mt, mv) (T term1 :: r1) (T term2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
