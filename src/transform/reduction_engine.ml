@@ -365,7 +365,8 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     try List.fold_left2 (fun (mt, mv) e1 e2 ->
                       let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
                       (mt, Mvs.add e1 (t_var e2) mv)) (mt, mv) vl1 vl2
-                    with Invalid_argument _ -> raise (NoMatch (Some (t1,t2)))
+                    with Invalid_argument _ | Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2)))
                   in
                   loop (mt, mv) (T term1 :: r1) (T term2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
@@ -385,15 +386,16 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                       (T t21 :: T t22 :: T t23 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
-            | Tlet (t1, tb1) ->
+            | Tlet (td1, tb1) ->
               begin
                 match t2.t_node with
-                | Tlet (t2, tb2) ->
+                | Tlet (td2, tb2) ->
                   let (v1, tl1) = t_open_bound tb1 in
                   let (v2, tl2) = t_open_bound tb2 in
-                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
                   let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (T t1 :: T tl1 :: r1) (T t2 :: T tl2 :: r2)
+                  loop (mt, mv) (T td1 :: T tl1 :: r1) (T td2 :: T tl2 :: r2)
                 | _ ->
                   raise (NoMatch (Some (t1, t2)))
               end
@@ -401,25 +403,26 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                and that it is not possible to have an occurence of a pattern
                introduced variable into a branch that does not depend on this
                pattern *)
-            | Tcase (t1, tbl1) ->
+            | Tcase (ts1, tbl1) ->
               begin
                 match t2.t_node with
-                | Tcase (t2, tbl2) ->
+                | Tcase (ts2, tbl2) ->
                   let list_p1, list_t1 = open_branches [] [] tbl1 in
                   let list_p2, list_t2 = open_branches [] [] tbl2 in
-                  loop sigma (T t1 :: list_p1 @ list_t1 @ r1)
-                    (T t2 :: list_p2 @ list_t2 @ r2)
+                  loop sigma (T ts1 :: list_p1 @ list_t1 @ r1)
+                    (T ts2 :: list_p2 @ list_t2 @ r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Teps tb1 ->
               begin
                 match t2.t_node with
                 | Teps tb2 ->
-                  let (v1, t1) = t_open_bound tb1 in
-                  let (v2, t2) = t_open_bound tb2 in
-                  let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+                  let (v1, td1) = t_open_bound tb1 in
+                  let (v2, td2) = t_open_bound tb2 in
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
                   let mv = Mvs.add v1 (t_var v2) mv in
-                  loop (mt, mv) (T t1 :: r1) (T t2 :: r2)
+                  loop (mt, mv) (T td1 :: r1) (T td2 :: r2)
                 | _ -> raise (NoMatch (Some (t1, t2)))
               end
             | Tnot t1 ->
@@ -480,13 +483,13 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                 loop (mt, mv) (P p11 :: P p12 :: r1) (P p21 :: P p22 :: r2)
               | _ -> raise (NoMatchpat (Some (p1, p2)))
             end
-          | Pas (p1, v1) ->
+          | Pas (pa1, v1) ->
             begin
               match p2.pat_node with
-              | Pas (p2, v2) ->
-                let mt= Ty.ty_match mt v1.vs_ty v2.vs_ty in
+              | Pas (pa2, v2) ->
+                let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
                 let mv = Mvs.add v1 (t_var v2) mv in
-                loop (mt, mv) (P p1 :: r1) (P p2 :: r2)
+                loop (mt, mv) (P pa1 :: r1) (P pa2 :: r2)
               | _ -> raise (NoMatchpat (Some (p1, p2)))
             end
         end
