@@ -22,20 +22,24 @@
  <transf name="remove" arg1="h1,h2">
   <goal name="g3.0">
   <transf name="case" arg1="x=0">
-   <goal name="g3.0.0">
+   <goal name="g3.0.0" expl="true case">
    </goal>
-   <goal name="g3.0.1">
+   <goal name="g3.0.1" expl="false case">
    </goal>
   </transf>
   <transf name="induction" arg1="x" arg2="from" arg3="42">
-   <goal name="g3.0.0">
+   <goal name="g3.0.0" expl="base case">
    </goal>
-   <goal name="g3.0.1">
+   <goal name="g3.0.1" expl="recursive case">
    </goal>
   </transf>
   </goal>
  </transf>
- <transf name="subst" arg1="x,y,z">
+ <transf name="subst" arg1="x,y">
+  <goal name="g3.0">
+  </goal>
+ </transf>
+ <transf name="subst" arg1="x,z">
   <goal name="g3.0">
   </goal>
  </transf>

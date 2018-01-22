@@ -111,6 +111,9 @@ let print_pr s id fmt t =
 let print_pat s id fmt t =
   let module P = (val (p s id)) in P.print_pat fmt t
 
+let print_tdecl s id fmt t =
+  let module P = (val (p s id)) in P.print_tdecl fmt t
+
 (* Exception reporting *)
 
 (* TODO remove references to id.id_string in this function *)
@@ -219,6 +222,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
+      Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
+        (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty

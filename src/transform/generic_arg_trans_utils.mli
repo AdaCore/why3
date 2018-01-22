@@ -12,6 +12,7 @@
 open Term
 
 exception Arg_trans of string
+exception Arg_trans_decl of (string * Theory.tdecl list)
 exception Arg_trans_term of (string * term * term)
 exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
@@ -46,3 +47,16 @@ val sort: Task.task Trans.trans
 
 (* Add a label to a goal (useful to add an expl for example) *)
 val add_goal_label_trans: Ident.label -> Task.task Trans.trans
+
+
+(****************************)
+(* Substitution of terms    *)
+(****************************)
+
+type term_subst = term Mterm.t
+
+val replace_subst: term_subst -> Term.term -> Term.term
+
+val replace_decl: term_subst -> Decl.decl -> Decl.decl
+
+val replace_tdecl: term_subst -> Theory.tdecl -> Theory.tdecl
