@@ -1130,16 +1130,10 @@ end
   let apply_transform node_id t args =
     let d = get_server_data () in
 
-    let check_if_already_exists s pid t args =
-      let sub_transfs = get_transformations s pid in
-      List.exists (fun tr_id -> get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
-        not (is_detached s (ATn tr_id))) sub_transfs
-    in
-
     let rec apply_transform nid t args =
       match nid with
       | APn id ->
-        if check_if_already_exists d.cont.controller_session id t args then
+        if Session_itp.check_if_already_exists d.cont.controller_session id t args then
           P.notify (Message (Information "Transformation already applied"))
         else
           let callback = callback_update_tree_transform t args in
@@ -1444,7 +1438,11 @@ end
        end
     | Exit_req                -> exit 0
      )
-    with e when not (Debug.test_flag Debug.stack_trace)->
+    with
+    | C.TransAlreadyExists (name,args) ->
+        P.notify (Message (Error
+          (Pp.sprintf "Transformation %s with arg [%s] already exists" name args)))
+    | e when not (Debug.test_flag Debug.stack_trace)->
       P.notify (Message (Error (Pp.string_of
           (fun fmt (r,e) -> Format.fprintf fmt
              "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"

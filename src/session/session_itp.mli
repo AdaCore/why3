@@ -119,6 +119,9 @@ val is_detached: session -> any -> bool
 val get_encapsulating_theory: session -> any -> theory
 val get_encapsulating_file: session -> any -> file
 
+(* Check if a transformation already exists *)
+val check_if_already_exists:
+    session -> proofNodeID -> string -> string list -> bool
 
 (** {2 iterators on sessions} *)
 

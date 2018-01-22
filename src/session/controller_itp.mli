@@ -231,6 +231,7 @@ val prepare_edition :
     of node [id] with prover [pr], using the file name given. The
     editor is not launched. *)
 
+exception TransAlreadyExists of string * string
 
 val schedule_transformation :
   controller ->
