@@ -65,7 +65,7 @@ Qed.
 Lemma Bounded_real_no_overflow :
   forall (m:floating_point.Rounding.mode) (x:R),
   ((Reals.Rbasic_fun.Rabs x) <=
-   (33554430 * 10141204801825835211973625643008)%R)%R -> (no_overflow m x).
+   (33554430 * 10141204801825835211973625643008)%R)%R -> no_overflow m x.
 intros m x Hx.
 unfold no_overflow.
 rewrite max_single_eq in *.

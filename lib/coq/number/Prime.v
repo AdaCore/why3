@@ -44,14 +44,14 @@ now elim H1.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_2 : (prime 2%Z).
+Lemma prime_2 : prime 2%Z.
 Proof.
 apply <- prime_is_Zprime.
 apply prime_2.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_3 : (prime 3%Z).
+Lemma prime_3 : prime 3%Z.
 Proof.
 apply <- prime_is_Zprime.
 apply prime_3.
@@ -183,7 +183,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma odd_prime :
-  forall (p:Z), (prime p) -> (3%Z <= p)%Z -> (number.Parity.odd p).
+  forall (p:Z), (prime p) -> (3%Z <= p)%Z -> number.Parity.odd p.
 Proof.
 intros p Pp Hp.
 apply <- Divisibility.odd_divides.

@@ -32,16 +32,14 @@ exact Zgcd_is_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_def1 :
-  forall (a:Z) (b:Z), (number.Divisibility.divides (gcd a b) a).
+Lemma gcd_def1 : forall (a:Z) (b:Z), number.Divisibility.divides (gcd a b) a.
 Proof.
 intros a b.
 apply Zgcd_is_gcd.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_def2 :
-  forall (a:Z) (b:Z), (number.Divisibility.divides (gcd a b) b).
+Lemma gcd_def2 : forall (a:Z) (b:Z), number.Divisibility.divides (gcd a b) b.
 Proof.
 intros a b.
 apply Zgcd_is_gcd.
@@ -52,7 +50,7 @@ Lemma gcd_def3 :
   forall (a:Z) (b:Z) (x:Z),
   (number.Divisibility.divides x a) ->
   (number.Divisibility.divides x b) ->
-  (number.Divisibility.divides x (gcd a b)).
+  number.Divisibility.divides x (gcd a b).
 Proof.
 intros a b x.
 apply Zgcd_is_gcd.

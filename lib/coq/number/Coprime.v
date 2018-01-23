@@ -39,7 +39,7 @@ Qed.
 Lemma prime_coprime :
   forall (p:Z),
   (number.Prime.prime p) <->
-  ((2%Z <= p)%Z /\ forall (n:Z), ((1%Z <= n)%Z /\ (n < p)%Z) -> (coprime n p)).
+  ((2%Z <= p)%Z /\ forall (n:Z), ((1%Z <= n)%Z /\ (n < p)%Z) -> coprime n p).
 intros p.
 (*
 Znumtheory.prime_intro:
@@ -66,7 +66,7 @@ Qed.
 Lemma Gauss :
   forall (a:Z) (b:Z) (c:Z),
   ((number.Divisibility.divides a (b * c)%Z) /\ (coprime a b)) ->
-  (number.Divisibility.divides a c).
+  number.Divisibility.divides a c.
 intros a b c (h1,h2).
 apply Znumtheory.Gauss with b; auto.
 rewrite <- coprime_is_Zrel_prime; auto.

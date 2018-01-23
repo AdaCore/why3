@@ -72,7 +72,7 @@ Definition subset {a:Type} {a_WT:WhyType a} (s1:(a -> bool)) (s2:(a ->
 
 (* Why3 goal *)
 Lemma subset_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:(a -> bool)), (subset s s).
+  forall {a:Type} {a_WT:WhyType a}, forall (s:(a -> bool)), subset s s.
 Proof.
 now intros a a_WT s x.
 Qed.
@@ -81,7 +81,7 @@ Qed.
 Lemma subset_trans :
   forall {a:Type} {a_WT:WhyType a},
   forall (s1:(a -> bool)) (s2:(a -> bool)) (s3:(a -> bool)),
-  (subset s1 s2) -> (subset s2 s3) -> (subset s1 s3).
+  (subset s1 s2) -> (subset s2 s3) -> subset s1 s3.
 Proof.
 intros a a_WT s1 s2 s3 h1 h2 x H.
 now apply h2, h1.
@@ -94,7 +94,7 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:(a -> bool)) : Prop :=
 (* Why3 goal *)
 Lemma mem_empty :
   forall {a:Type} {a_WT:WhyType a},
-  (is_empty (map.Const.const false: (a -> bool))).
+  is_empty (map.Const.const false: (a -> bool)).
 Proof.
 now intros a a_WT x.
 Qed.

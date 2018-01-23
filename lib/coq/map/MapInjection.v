@@ -237,8 +237,7 @@ Definition range (a:(Z -> Z)) (n:Z) : Prop :=
 
 (* Why3 goal *)
 Lemma injective_surjective :
-  forall (a:(Z -> Z)) (n:Z),
-  (injective a n) -> (range a n) -> (surjective a n).
+  forall (a:(Z -> Z)) (n:Z), (injective a n) -> (range a n) -> surjective a n.
 Proof.
 unfold injective, range, surjective.
 intros a n h1 h2.

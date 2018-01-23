@@ -40,59 +40,59 @@ easy.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_refl : forall (n:Z), (divides n n).
+Lemma divides_refl : forall (n:Z), divides n n.
 Proof.
 exact Zdivide_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_1_n : forall (n:Z), (divides 1%Z n).
+Lemma divides_1_n : forall (n:Z), divides 1%Z n.
 Proof.
 exact Zone_divide.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_0 : forall (n:Z), (divides n 0%Z).
+Lemma divides_0 : forall (n:Z), divides n 0%Z.
 Proof.
 exact Zdivide_0.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_left :
-  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides (c * a)%Z (c * b)%Z).
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> divides (c * a)%Z (c * b)%Z.
 Proof.
 exact Zmult_divide_compat_l.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_right :
-  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides (a * c)%Z (b * c)%Z).
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> divides (a * c)%Z (b * c)%Z.
 Proof.
 exact Zmult_divide_compat_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppr : forall (a:Z) (b:Z), (divides a b) -> (divides a (-b)%Z).
+Lemma divides_oppr : forall (a:Z) (b:Z), (divides a b) -> divides a (-b)%Z.
 Proof.
 exact Zdivide_opp_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppl : forall (a:Z) (b:Z), (divides a b) -> (divides (-a)%Z b).
+Lemma divides_oppl : forall (a:Z) (b:Z), (divides a b) -> divides (-a)%Z b.
 Proof.
 exact Zdivide_opp_l.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_oppr_rev :
-  forall (a:Z) (b:Z), (divides (-a)%Z b) -> (divides a b).
+  forall (a:Z) (b:Z), (divides (-a)%Z b) -> divides a b.
 Proof.
 exact Zdivide_opp_l_rev.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_oppl_rev :
-  forall (a:Z) (b:Z), (divides a (-b)%Z) -> (divides a b).
+  forall (a:Z) (b:Z), (divides a (-b)%Z) -> divides a b.
 Proof.
 exact Zdivide_opp_r_rev.
 Qed.
@@ -100,7 +100,7 @@ Qed.
 (* Why3 goal *)
 Lemma divides_plusr :
   forall (a:Z) (b:Z) (c:Z),
-  (divides a b) -> (divides a c) -> (divides a (b + c)%Z).
+  (divides a b) -> (divides a c) -> divides a (b + c)%Z.
 Proof.
 exact Zdivide_plus_r.
 Qed.
@@ -108,14 +108,14 @@ Qed.
 (* Why3 goal *)
 Lemma divides_minusr :
   forall (a:Z) (b:Z) (c:Z),
-  (divides a b) -> (divides a c) -> (divides a (b - c)%Z).
+  (divides a b) -> (divides a c) -> divides a (b - c)%Z.
 Proof.
 exact Zdivide_minus_l.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_multl :
-  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a (c * b)%Z).
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> divides a (c * b)%Z.
 Proof.
 intros a b c.
 apply Zdivide_mult_r.
@@ -123,19 +123,19 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_multr :
-  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a (b * c)%Z).
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> divides a (b * c)%Z.
 Proof.
 exact Zdivide_mult_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_factorl : forall (a:Z) (b:Z), (divides a (b * a)%Z).
+Lemma divides_factorl : forall (a:Z) (b:Z), divides a (b * a)%Z.
 Proof.
 exact Zdivide_factor_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_factorr : forall (a:Z) (b:Z), (divides a (a * b)%Z).
+Lemma divides_factorr : forall (a:Z) (b:Z), divides a (a * b)%Z.
 Proof.
 exact Zdivide_factor_r.
 Qed.
@@ -157,7 +157,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_trans :
-  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides b c) -> (divides a c).
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides b c) -> divides a c.
 Proof.
 exact Zdivide_trans.
 Qed.
@@ -174,7 +174,7 @@ Import EuclideanDivision.
 (* Why3 goal *)
 Lemma mod_divides_euclidean :
   forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> ((int.EuclideanDivision.mod1 a b) = 0%Z) -> (divides b a).
+  ~ (b = 0%Z) -> ((int.EuclideanDivision.mod1 a b) = 0%Z) -> divides b a.
 Proof.
 intros a b Zb H.
 exists (div a b).
@@ -202,7 +202,7 @@ Qed.
 (* Why3 goal *)
 Lemma mod_divides_computer :
   forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> ((ZArith.BinInt.Z.rem a b) = 0%Z) -> (divides b a).
+  ~ (b = 0%Z) -> ((ZArith.BinInt.Z.rem a b) = 0%Z) -> divides b a.
 Proof.
 intros a b Zb H.
 exists (Z.quot a b).

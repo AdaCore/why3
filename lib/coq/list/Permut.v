@@ -28,7 +28,7 @@ Definition permut {a:Type} {a_WT:WhyType a} (l1:(list a))
 
 (* Why3 goal *)
 Lemma Permut_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)), (permut l l).
+  forall {a:Type} {a_WT:WhyType a}, forall (l:(list a)), permut l l.
 Proof.
 now intros a a_WT l.
 Qed.
@@ -44,7 +44,7 @@ Qed.
 Lemma Permut_trans :
   forall {a:Type} {a_WT:WhyType a},
   forall (l1:(list a)) (l2:(list a)) (l3:(list a)),
-  (permut l1 l2) -> (permut l2 l3) -> (permut l1 l3).
+  (permut l1 l2) -> (permut l2 l3) -> permut l1 l3.
 Proof.
 intros a a_WT l1 l2 l3 h1 h2 x.
 now rewrite h1.
@@ -108,7 +108,7 @@ Qed.
 Lemma Permut_append_swap :
   forall {a:Type} {a_WT:WhyType a},
   forall (l1:(list a)) (l2:(list a)),
-  (permut (Init.Datatypes.app l1 l2) (Init.Datatypes.app l2 l1)).
+  permut (Init.Datatypes.app l1 l2) (Init.Datatypes.app l2 l1).
 Proof.
 intros a a_WT l1 l2 y.
 rewrite 2!NumOcc.Append_Num_Occ.
@@ -119,7 +119,7 @@ Qed.
 Lemma Permut_mem :
   forall {a:Type} {a_WT:WhyType a},
   forall (x:a) (l1:(list a)) (l2:(list a)),
-  (permut l1 l2) -> (list.Mem.mem x l1) -> (list.Mem.mem x l2).
+  (permut l1 l2) -> (list.Mem.mem x l1) -> list.Mem.mem x l2.
 Proof.
 intros a a_WT x l1 l2 h1 h2.
 apply NumOcc.Mem_Num_Occ.

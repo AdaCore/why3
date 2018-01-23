@@ -1754,8 +1754,8 @@ Defined.
 (* Why3 goal *)
 Lemma eq_sub_bv_def :
   forall (a:t) (b:t) (i:t) (n:t),
-  let mask := (lsl_bv (sub (lsl_bv one n) one) i) in
-  ((eq_sub_bv a b i n) <-> ((bw_and b mask) = (bw_and a mask))).
+  let mask := lsl_bv (sub (lsl_bv one n) one) i in
+  (eq_sub_bv a b i n) <-> ((bw_and b mask) = (bw_and a mask)).
   rewrite Of_int_one.
   easy.
 Qed.
