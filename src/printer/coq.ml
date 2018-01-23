@@ -149,27 +149,31 @@ let print_ts_tv info fmt ts =
   | _ -> fprintf fmt "(%a %a)" print_ts ts
     (print_list space (print_tv info ~whytypes:false)) ts.ts_args
 
-let rec print_ty info fmt ty =
+let protect_on x s = if x then "@[<hov 1>(" ^^ s ^^ ")@]" else "@[<hov>" ^^ s ^^ "@]"
+
+let rec print_type info fmt ty = print_ty false info fmt ty
+and print_op_type info fmt ty = print_ty true info fmt ty
+and print_ty op info fmt ty =
   begin match ty.ty_node with
   | Tyvar v -> print_tv info ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
       begin
         match tl with
-          | []  -> fprintf fmt "unit"
-          | [ty] -> print_ty info fmt ty
-          | _   -> fprintf fmt "(%a)%%type" (print_list star (print_ty info)) tl
+        | [] -> fprintf fmt "unit"
+        | [ty] -> print_ty op info fmt ty
+        | _ -> fprintf fmt "(%a)%%type" (print_list star (print_op_type info)) tl
       end
   | Tyapp (ts, [l;r]) when ts_equal ts ts_func ->
-      fprintf fmt "(%a ->@ %a)" (print_ty info) l (print_ty info) r
+      fprintf fmt (protect_on op "%a ->@ %a") (print_op_type info) l (print_type info) r
   | Tyapp (ts, tl) ->
     begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_ty info) fmt tl
+      | Some s -> syntax_arguments s (print_op_type info) fmt tl
       | None ->
         begin
           match tl with
-            | []  -> (print_ts_real info) fmt ts
-            | l   -> fprintf fmt "@[<hov 1>(%a@ %a)@]" (print_ts_real info) ts
-              (print_list space (print_ty info)) l
+          | [] -> (print_ts_real info) fmt ts
+          | l -> fprintf fmt (protect_on op "%a%a") (print_ts_real info) ts
+             (print_list_pre space (print_op_type info)) l
         end
     end
   end
@@ -216,19 +220,14 @@ let rec print_pat info fmt p = match p.pat_node with
           (print_ls_real info) cs (print_list space (print_pat info)) pl
       end
 
-let print_vsty_nopar info fmt v =
-  fprintf fmt "@[<hov>%a:@,%a@]" print_vs v (print_ty info) v.vs_ty
-
 let print_vsty info fmt v =
-  fprintf fmt "(%a)" (print_vsty_nopar info) v
+  fprintf fmt "@[<hov 1>(%a:@,%a)@]" print_vs v (print_type info) v.vs_ty
 
 let print_binop fmt = function
   | Tand -> fprintf fmt "/\\"
   | Tor -> fprintf fmt "\\/"
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
-
-let protect_on x s = if x then "@[<hov 1>(" ^^ s ^^ ")@]" else "@[<hov>" ^^ s ^^ "@]"
 
 (* [opl] means that there is no delimiter on the left of the term, so
    parentheses should be put around the term if it does not start with a
@@ -296,9 +295,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
             else fprintf fmt (protect_on (opl || opr) "%a@ %a")
               (print_ls_real info) fs
               (print_list space (print_opr_term info)) tl
-          else fprintf fmt (protect_on (opl || opr) "@[<hov>%a@ %a@]:@ %a")
-            (print_ls_real info) fs (print_list space (print_opr_term info)) tl
-            (print_ty info) (t_type t)
+          else fprintf fmt (protect_on (opl || opr) "@[<hov>%a%a@] :@ %a")
+            (print_ls_real info) fs (print_list_pre space (print_opr_term info)) tl
+            (print_type info) (t_type t)
     end
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
@@ -312,7 +311,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         match vl with
         | [] -> print_term info fmt f
         | v::vr ->
-            fprintf fmt "exists %a,@ %a" (print_vsty_nopar info) v aux vr in
+            fprintf fmt "exists %a:@,%a,@ %a" print_vs v (print_type info) v.vs_ty aux vr in
       fprintf fmt (protect_on opr "%a") aux vl;
       List.iter forget_var vl
   | Ttrue ->
@@ -351,7 +350,7 @@ let print_expr info fmt =
 
 let print_constr info ts fmt (cs,_) =
   fprintf fmt "@[<hov 4>| %a : %a%a%a@]" print_ls cs
-    (print_arrow_list (print_ty info)) cs.ls_args
+    (print_arrow_list (print_op_type info)) cs.ls_args
     print_ts ts
       (print_list_pre space (print_tv info ~whytypes:false)) ts.ts_args
 
@@ -669,7 +668,7 @@ let print_type_decl ~prev info fmt ts =
         print_ts ts
           (print_list_pre space
              (print_tv_binder info ~whytypes:false ~implicit:false)) ts.ts_args
-        (print_ty info) ty
+        (print_type info) ty
 
 let print_type_decl ~prev info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn) then
@@ -722,7 +721,7 @@ let print_data_decls info fmt tl =
 
 let print_ls_type info fmt = function
   | None -> fprintf fmt "Prop"
-  | Some ty -> print_ty info fmt ty
+  | Some ty -> print_type info fmt ty
 
 let print_param_decl ~prev info fmt ls =
   let _, _, all_ty_params = ls_ty_vars ls in
@@ -733,7 +732,7 @@ let print_param_decl ~prev info fmt ls =
     | Some (Axiom _) ->
       fprintf fmt "(* Why3 goal *)@\n@[<hov 2>Variable %a: %a%a%a.@]@\n@\n"
         print_ls ls (print_params info ~whytypes:true) all_ty_params
-        (print_arrow_list (print_ty info)) ls.ls_args
+        (print_arrow_list (print_op_type info)) ls.ls_args
         (print_ls_type info) ls.ls_value
     | (* Some Info *) _ when Mid.mem ls.ls_name info.info_syn ->
       let vl =
@@ -748,13 +747,13 @@ let print_param_decl ~prev info fmt ls =
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition %a :@ @[<hv>%a@[<hov>%a%a.@]@]@]@\n%a@\n"
         print_ls ls (print_params info ~whytypes:true) all_ty_params
-        (print_arrow_list (print_ty info)) ls.ls_args
+        (print_arrow_list (print_op_type info)) ls.ls_args
         (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
   else
     fprintf fmt "@[<hv 2>Parameter %a:@ @[<hov>%a%a%a.@]@]@\n@\n"
       print_ls ls (print_params info ~whytypes:true) all_ty_params
-      (print_arrow_list (print_ty info)) ls.ls_args
+      (print_arrow_list (print_op_type info)) ls.ls_args
       (print_ls_type info) ls.ls_value
 
 let print_param_decl ~prev info fmt ls =
@@ -838,7 +837,7 @@ let print_ind_decl info fmt ps bl =
   fprintf fmt " %a%a: %aProp :=@ @[<hov>%a@]"
     print_ls ps
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
-    (print_arrow_list (print_ty info)) ps.ls_args
+    (print_arrow_list (print_op_type info)) ps.ls_args
     (print_list newline (print_ind info)) bl
 
 let print_ind_decls info s fmt tl =
