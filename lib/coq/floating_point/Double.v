@@ -67,27 +67,32 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_monotonic :
-  forall (m:floating_point.Rounding.mode) (x:R) (y:R),
-  (x <= y)%R -> ((round m x) <= (round m y))%R.
+  forall (m:floating_point.Rounding.mode) (x:R) (y:R), (x <= y)%R ->
+  ((round m x) <= (round m y))%R.
 now apply Round_monotonic.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_idempotent : forall (m1:floating_point.Rounding.mode)
-  (m2:floating_point.Rounding.mode) (x:R), ((round m1 (round m2
-  x)) = (round m2 x)).
+Lemma Round_idempotent :
+  forall (m1:floating_point.Rounding.mode) (m2:floating_point.Rounding.mode)
+    (x:R),
+  ((round m1 (round m2 x)) = (round m2 x)).
 now apply Round_idempotent.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_value : forall (m:floating_point.Rounding.mode)
-  (x:floating_point.DoubleFormat.double), ((round m (value x)) = (value x)).
+Lemma Round_value :
+  forall (m:floating_point.Rounding.mode)
+    (x:floating_point.DoubleFormat.double),
+  ((round m (value x)) = (value x)).
 now apply Round_value.
 Qed.
 
 (* Why3 goal *)
-Lemma Bounded_value : forall (x:floating_point.DoubleFormat.double),
-  ((Reals.Rbasic_fun.Rabs (value x)) <= (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
+Lemma Bounded_value :
+  forall (x:floating_point.DoubleFormat.double),
+  ((Reals.Rbasic_fun.Rabs (value x)) <=
+   (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 now apply Bounded_value.
 Qed.
 
@@ -137,8 +142,8 @@ Defined.
 
 (* Why3 goal *)
 Lemma Round_logic_def :
-  forall (m:floating_point.Rounding.mode) (x:R),
-  (no_overflow m x) -> ((value (round_logic m x)) = (round m x)).
+  forall (m:floating_point.Rounding.mode) (x:R), (no_overflow m x) ->
+  ((value (round_logic m x)) = (round m x)).
 Proof.
 exact (Round_logic_def 53 1024 (refl_equal true) (refl_equal true)).
 Qed.

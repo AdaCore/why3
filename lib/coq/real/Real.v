@@ -137,8 +137,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma add_div :
-  forall (x:R) (y:R) (z:R),
-  ~ (z = 0%R) -> (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
+  forall (x:R) (y:R) (z:R), ~ (z = 0%R) ->
+  (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -147,8 +147,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma sub_div :
-  forall (x:R) (y:R) (z:R),
-  ~ (z = 0%R) -> (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
+  forall (x:R) (y:R) (z:R), ~ (z = 0%R) ->
+  (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -166,8 +166,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_mul_div :
-  forall (x:R) (y:R) (z:R),
-  ~ (z = 0%R) -> (((x * y)%R / z)%R = (x * (y / z)%R)%R).
+  forall (x:R) (y:R) (z:R), ~ (z = 0%R) ->
+  (((x * y)%R / z)%R = (x * (y / z)%R)%R).
 Proof.
 intros x y z _.
 apply Rmult_assoc.
@@ -175,8 +175,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_mul :
-  forall (x:R) (y:R) (z:R),
-  (~ (y = 0%R) /\ ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
+  forall (x:R) (y:R) (z:R), (~ (y = 0%R) /\ ~ (z = 0%R)) ->
+  (((x / y)%R / z)%R = (x / (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
 unfold Rdiv.
@@ -186,8 +186,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_div :
-  forall (x:R) (y:R) (z:R),
-  (~ (y = 0%R) /\ ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
+  forall (x:R) (y:R) (z:R), (~ (y = 0%R) /\ ~ (z = 0%R)) ->
+  ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
 Proof.
 intros x y z (Zy, Zz).
 field.
@@ -239,8 +239,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma CompatOrderMult :
-  forall (x:R) (y:R) (z:R),
-  (x <= y)%R -> (0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R.
+  forall (x:R) (y:R) (z:R), (x <= y)%R -> (0%R <= z)%R ->
+  ((x * z)%R <= (y * z)%R)%R.
 Proof.
 intros x y z H Zz.
 now apply Rmult_le_compat_r.

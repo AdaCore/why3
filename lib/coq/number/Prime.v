@@ -25,8 +25,8 @@ Import Znumtheory.
 (* Why3 assumption *)
 Definition prime (p:Z) : Prop :=
   (2%Z <= p)%Z /\
-  forall (n:Z),
-  ((1%Z < n)%Z /\ (n < p)%Z) -> ~ (number.Divisibility.divides n p).
+  forall (n:Z), ((1%Z < n)%Z /\ (n < p)%Z) ->
+  ~ (number.Divisibility.divides n p).
 
 Lemma prime_is_Zprime :
   forall p, prime p <-> Znumtheory.prime p.
@@ -58,9 +58,10 @@ apply prime_3.
 Qed.
 
 (* Why3 goal *)
-Lemma prime_divisors : forall (p:Z), (prime p) -> forall (d:Z),
-  (number.Divisibility.divides d p) -> ((d = 1%Z) \/ ((d = (-1%Z)%Z) \/
-  ((d = p) \/ (d = (-p)%Z)))).
+Lemma prime_divisors :
+  forall (p:Z), (prime p) -> forall (d:Z),
+  (number.Divisibility.divides d p) ->
+  (d = 1%Z) \/ ((d = (-1%Z)%Z) \/ ((d = p) \/ (d = (-p)%Z))).
 Proof.
 intros p Hp d Hd.
 apply -> prime_is_Zprime in Hp.
@@ -68,10 +69,12 @@ destruct (prime_divisors p Hp d Hd) ; intuition.
 Qed.
 
 (* Why3 goal *)
-Lemma small_divisors : forall (p:Z), (2%Z <= p)%Z -> ((forall (d:Z),
-  (2%Z <= d)%Z -> ((prime d) -> (((1%Z < (d * d)%Z)%Z /\
-  ((d * d)%Z <= p)%Z) -> ~ (number.Divisibility.divides d p)))) -> (prime
-  p)).
+Lemma small_divisors :
+  forall (p:Z), (2%Z <= p)%Z ->
+  (forall (d:Z), (2%Z <= d)%Z -> (prime d) ->
+   ((1%Z < (d * d)%Z)%Z /\ ((d * d)%Z <= p)%Z) ->
+   ~ (number.Divisibility.divides d p)) ->
+  prime p.
 Proof.
 intros p Hp H.
 apply <- prime_is_Zprime.

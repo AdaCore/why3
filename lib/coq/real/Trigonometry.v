@@ -34,7 +34,8 @@ Require Import Reals.
 Lemma Pythagorean_identity :
   forall (x:R),
   (((Reals.RIneq.Rsqr (Reals.Rtrigo_def.cos x)) +
-    (Reals.RIneq.Rsqr (Reals.Rtrigo_def.sin x)))%R = 1%R).
+    (Reals.RIneq.Rsqr (Reals.Rtrigo_def.sin x)))%R
+   = 1%R).
 Proof.
 intros x.
 rewrite Rplus_comm.

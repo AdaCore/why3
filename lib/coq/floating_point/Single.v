@@ -65,7 +65,8 @@ Qed.
 Lemma Bounded_real_no_overflow :
   forall (m:floating_point.Rounding.mode) (x:R),
   ((Reals.Rbasic_fun.Rabs x) <=
-   (33554430 * 10141204801825835211973625643008)%R)%R -> no_overflow m x.
+   (33554430 * 10141204801825835211973625643008)%R)%R ->
+  no_overflow m x.
 intros m x Hx.
 unfold no_overflow.
 rewrite max_single_eq in *.
@@ -74,22 +75,25 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_monotonic :
-  forall (m:floating_point.Rounding.mode) (x:R) (y:R),
-  (x <= y)%R -> ((round m x) <= (round m y))%R.
+  forall (m:floating_point.Rounding.mode) (x:R) (y:R), (x <= y)%R ->
+  ((round m x) <= (round m y))%R.
 apply Round_monotonic.
 easy.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_idempotent : forall (m1:floating_point.Rounding.mode)
-  (m2:floating_point.Rounding.mode) (x:R), ((round m1 (round m2
-  x)) = (round m2 x)).
+Lemma Round_idempotent :
+  forall (m1:floating_point.Rounding.mode) (m2:floating_point.Rounding.mode)
+    (x:R),
+  ((round m1 (round m2 x)) = (round m2 x)).
 now apply Round_idempotent.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_value : forall (m:floating_point.Rounding.mode)
-  (x:floating_point.SingleFormat.single), ((round m (value x)) = (value x)).
+Lemma Round_value :
+  forall (m:floating_point.Rounding.mode)
+    (x:floating_point.SingleFormat.single),
+  ((round m (value x)) = (value x)).
 now apply Round_value.
 Qed.
 
@@ -148,8 +152,8 @@ Defined.
 
 (* Why3 goal *)
 Lemma Round_logic_def :
-  forall (m:floating_point.Rounding.mode) (x:R),
-  (no_overflow m x) -> ((value (round_logic m x)) = (round m x)).
+  forall (m:floating_point.Rounding.mode) (x:R), (no_overflow m x) ->
+  ((value (round_logic m x)) = (round m x)).
 Proof.
 intros m x.
 unfold no_overflow.

@@ -26,7 +26,8 @@ Import Rpower.
 (* pow is replaced with (Reals.Rpower.Rpower x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma Pow_def : forall (x:R) (y:R), (0%R < x)%R ->
+Lemma Pow_def :
+  forall (x:R) (y:R), (0%R < x)%R ->
   ((Reals.Rpower.Rpower x y) =
    (Reals.Rtrigo_def.exp (y * (Reals.Rpower.ln x))%R)).
 Proof.
@@ -42,7 +43,8 @@ apply Exp_prop.exp_pos.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_plus : forall (x:R) (y:R) (z:R), (0%R < z)%R ->
+Lemma Pow_plus :
+  forall (x:R) (y:R) (z:R), (0%R < z)%R ->
   ((Reals.Rpower.Rpower z (x + y)%R) =
    ((Reals.Rpower.Rpower z x) * (Reals.Rpower.Rpower z y))%R).
 Proof.
@@ -51,7 +53,8 @@ now apply Rpower_plus.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_mult : forall (x:R) (y:R) (z:R), (0%R < x)%R ->
+Lemma Pow_mult :
+  forall (x:R) (y:R) (z:R), (0%R < x)%R ->
   ((Reals.Rpower.Rpower (Reals.Rpower.Rpower x y) z) =
    (Reals.Rpower.Rpower x (y * z)%R)).
 Proof.
@@ -87,8 +90,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_x_two :
-  forall (x:R),
-  (0%R < x)%R -> ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
+  forall (x:R), (0%R < x)%R ->
+  ((Reals.Rpower.Rpower x 2%R) = (Reals.RIneq.Rsqr x)).
 Proof.
 intros x h1.
 rewrite (Rpower_pow 2) by easy.
@@ -97,7 +100,8 @@ now rewrite Rmult_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Pow_half : forall (x:R), (0%R < x)%R ->
+Lemma Pow_half :
+  forall (x:R), (0%R < x)%R ->
   ((Reals.Rpower.Rpower x (05 / 10)%R) = (Reals.R_sqrt.sqrt x)).
 Proof.
 intros x h1.

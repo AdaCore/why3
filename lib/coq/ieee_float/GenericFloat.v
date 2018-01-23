@@ -1083,8 +1083,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
-  forall (m:ieee_float.RoundingMode.mode) (x:R),
-  (in_range x) -> no_overflow m x.
+  forall (m:ieee_float.RoundingMode.mode) (x:R), (in_range x) ->
+  no_overflow m x.
 Proof.
 intros m x h1.
 rewrite no_overflow_Rabs_round_max_real.
@@ -1097,8 +1097,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_monotonic :
-  forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R),
-  (x <= y)%R -> ((round m x) <= (round m y))%R.
+  forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R), (x <= y)%R ->
+  ((round m x) <= (round m y))%R.
 Proof.
   intros m x y h1.
   apply round_le.
@@ -1119,9 +1119,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma Round_idempotent : forall (m1:ieee_float.RoundingMode.mode)
-  (m2:ieee_float.RoundingMode.mode) (x:R), ((round m1 (round m2
-  x)) = (round m2 x)).
+Lemma Round_idempotent :
+  forall (m1:ieee_float.RoundingMode.mode) (m2:ieee_float.RoundingMode.mode)
+    (x:R),
+  ((round m1 (round m2 x)) = (round m2 x)).
 Proof with auto with typeclass_instances.
 intros m1 m2 x.
 apply round_generic...
@@ -1130,8 +1131,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_to_real :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite x) -> ((round m (to_real x)) = (to_real x)).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
+  ((round m (to_real x)) = (to_real x)).
 Proof with auto with typeclass_instances.
 intros m x h.
 apply round_generic...
@@ -1270,8 +1271,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z),
-  (in_safe_int_range i) -> ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
+  forall (m:ieee_float.RoundingMode.mode) (i:Z), (in_safe_int_range i) ->
+  ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
@@ -1333,8 +1334,8 @@ Hint Unfold same_sign.
 
 (* Why3 goal *)
 Lemma feq_eq :
-  forall (x:t) (y:t),
-  (is_finite x) -> (is_finite y) -> ~ (is_zero x) -> (eq x y) -> (x = y).
+  forall (x:t) (y:t), (is_finite x) -> (is_finite y) -> ~ (is_zero x) ->
+  (eq x y) -> (x = y).
 Proof.
 intros x y h1 h2 h3 h4.
 destruct x, y; try easy.
@@ -1434,8 +1435,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma eq_to_real_finite :
-  forall (x:t) (y:t),
-  ((is_finite x) /\ (is_finite y)) ->
+  forall (x:t) (y:t), ((is_finite x) /\ (is_finite y)) ->
   (eq x y) <-> ((to_real x) = (to_real y)).
 Proof.
 intros x y (h1,h2).
@@ -1443,9 +1443,12 @@ apply (to_real_eq h1 h2).
 Qed.
 
 (* Why3 goal *)
-Lemma eq_special : forall (x:t) (y:t), (eq x y) -> ((is_not_nan x) /\
-  ((is_not_nan y) /\ (((is_finite x) /\ (is_finite y)) \/ ((is_infinite x) /\
-  ((is_infinite y) /\ (same_sign x y)))))).
+Lemma eq_special :
+  forall (x:t) (y:t), (eq x y) ->
+  (is_not_nan x) /\
+  ((is_not_nan y) /\
+   (((is_finite x) /\ (is_finite y)) \/
+    ((is_infinite x) /\ ((is_infinite y) /\ (same_sign x y))))).
 Proof.
   intros x y h1.
   rewrite is_not_nan1, is_not_nan1.
@@ -1459,8 +1462,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma lt_finite :
-  forall (x:t) (y:t),
-  ((is_finite x) /\ (is_finite y)) ->
+  forall (x:t) (y:t), ((is_finite x) /\ (is_finite y)) ->
   (lt x y) <-> ((to_real x) < (to_real y))%R.
 Proof.
 intros x y (h1,h2).
@@ -1472,8 +1474,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma le_finite :
-  forall (x:t) (y:t),
-  ((is_finite x) /\ (is_finite y)) ->
+  forall (x:t) (y:t), ((is_finite x) /\ (is_finite y)) ->
   (le x y) <-> ((to_real x) <= (to_real y))%R.
 Proof.
 intros x y (h1,h2).
@@ -1621,8 +1622,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma not_lt_ge :
-  forall (x:t) (y:t),
-  (~ (lt x y) /\ ((is_not_nan x) /\ (is_not_nan y))) -> le y x.
+  forall (x:t) (y:t), (~ (lt x y) /\ ((is_not_nan x) /\ (is_not_nan y))) ->
+  le y x.
 Proof.
   intros x y.
   rewrite is_not_nan1; rewrite is_not_nan1.
@@ -1645,8 +1646,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma not_gt_le :
-  forall (x:t) (y:t),
-  (~ (lt y x) /\ ((is_not_nan x) /\ (is_not_nan y))) -> le x y.
+  forall (x:t) (y:t), (~ (lt y x) /\ ((is_not_nan x) /\ (is_not_nan y))) ->
+  le x y.
 Proof.
   intros x y.
   rewrite is_not_nan1; rewrite is_not_nan1.
@@ -1668,8 +1669,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma le_special :
-  forall (x:t) (y:t),
-  (le x y) ->
+  forall (x:t) (y:t), (le x y) ->
   ((is_finite x) /\ (is_finite y)) \/
   (((is_minus_infinity x) /\ (is_not_nan y)) \/
    ((is_not_nan x) /\ (is_plus_infinity y))).
@@ -1690,10 +1690,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma lt_special : forall (x:t) (y:t), (lt x y) -> (((is_finite x) /\
-  (is_finite y)) \/ (((is_minus_infinity x) /\ ((is_not_nan y) /\
-  ~ (is_minus_infinity y))) \/ ((is_not_nan x) /\ ((~ (is_plus_infinity
-  x)) /\ (is_plus_infinity y))))).
+Lemma lt_special :
+  forall (x:t) (y:t), (lt x y) ->
+  ((is_finite x) /\ (is_finite y)) \/
+  (((is_minus_infinity x) /\ ((is_not_nan y) /\ ~ (is_minus_infinity y))) \/
+   ((is_not_nan x) /\ (~ (is_plus_infinity x) /\ (is_plus_infinity y)))).
 Proof.
   intros x y h.
   rewrite is_not_nan1; rewrite is_not_nan1.
@@ -1819,8 +1820,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma diff_sign_trans :
-  forall (x:t) (y:t) (z:t),
-  ((diff_sign x y) /\ (diff_sign y z)) -> same_sign x z.
+  forall (x:t) (y:t) (z:t), ((diff_sign x y) /\ (diff_sign y z)) ->
+  same_sign x z.
 Proof.
   unfold diff_sign, same_sign.
   intros x y z (h1,h2).
@@ -1880,18 +1881,16 @@ Definition product_sign (z:t) (x:t) (y:t) : Prop :=
 Definition overflow_value (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   match m with
   | ieee_float.RoundingMode.RTN =>
-      ((is_positive x) -> ((is_finite x) /\ ((to_real x) = max_real))) /\
-      ((~ (is_positive x)) -> (is_infinite x))
+      ((is_positive x) -> (is_finite x) /\ ((to_real x) = max_real)) /\
+      (~ (is_positive x) -> is_infinite x)
   | ieee_float.RoundingMode.RTP =>
-      ((is_positive x) -> (is_infinite x)) /\
-      ((~ (is_positive x)) ->
-       ((is_finite x) /\ ((to_real x) = (-max_real)%R)))
+      ((is_positive x) -> is_infinite x) /\
+      (~ (is_positive x) -> (is_finite x) /\ ((to_real x) = (-max_real)%R))
   | ieee_float.RoundingMode.RTZ =>
-      ((is_positive x) -> ((is_finite x) /\ ((to_real x) = max_real))) /\
-      ((~ (is_positive x)) ->
-       ((is_finite x) /\ ((to_real x) = (-max_real)%R)))
+      ((is_positive x) -> (is_finite x) /\ ((to_real x) = max_real)) /\
+      (~ (is_positive x) -> (is_finite x) /\ ((to_real x) = (-max_real)%R))
   | (ieee_float.RoundingMode.RNA|ieee_float.RoundingMode.RNE) =>
-      (is_infinite x)
+      is_infinite x
   end.
 
 (* Why3 assumption *)
@@ -1903,10 +1902,11 @@ Definition sign_zero_result (m:ieee_float.RoundingMode.mode) (x:t) : Prop :=
   end.
 
 (* Why3 goal *)
-Lemma add_finite : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> ((is_finite y) -> ((no_overflow m
-  ((to_real x) + (to_real y))%R) -> ((is_finite (add m x y)) /\
-  ((to_real (add m x y)) = (round m ((to_real x) + (to_real y))%R))))).
+Lemma add_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (is_finite y) -> (no_overflow m ((to_real x) + (to_real y))%R) ->
+  (is_finite (add m x y)) /\
+  ((to_real (add m x y)) = (round m ((to_real x) + (to_real y))%R)).
 Proof.
 intros m x y h1 h2 h3.
 generalize (Bplus_correct sb emax Hsb'' Hemax' nan_bf m x y h1 h2); rewrite Rlt_bool_true.
@@ -1924,10 +1924,11 @@ destruct x, y; try easy; destruct b, b0; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma add_finite_rev_n : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (ieee_float.RoundingMode.to_nearest m) -> ((is_finite (add m x y)) ->
-  ((no_overflow m ((to_real x) + (to_real y))%R) /\ ((to_real (add m x
-  y)) = (round m ((to_real x) + (to_real y))%R)))).
+Lemma add_finite_rev_n :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  (ieee_float.RoundingMode.to_nearest m) -> (is_finite (add m x y)) ->
+  (no_overflow m ((to_real x) + (to_real y))%R) /\
+  ((to_real (add m x y)) = (round m ((to_real x) + (to_real y))%R)).
 Proof.
 intros m x y h1 h2.
 destruct (add_finite_rev m x y h2).
@@ -1952,10 +1953,11 @@ destruct (add RNA x y); easy.
 Qed.
 
 (* Why3 goal *)
-Lemma sub_finite : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> ((is_finite y) -> ((no_overflow m
-  ((to_real x) - (to_real y))%R) -> ((is_finite (sub m x y)) /\
-  ((to_real (sub m x y)) = (round m ((to_real x) - (to_real y))%R))))).
+Lemma sub_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (is_finite y) -> (no_overflow m ((to_real x) - (to_real y))%R) ->
+  (is_finite (sub m x y)) /\
+  ((to_real (sub m x y)) = (round m ((to_real x) - (to_real y))%R)).
 Proof.
 intros m x y h1 h2 h3.
 generalize (Bminus_correct sb emax Hsb'' Hemax' nan_bf m x y h1 h2); rewrite Rlt_bool_true.
@@ -1973,10 +1975,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma sub_finite_rev_n : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (ieee_float.RoundingMode.to_nearest m) -> ((is_finite (sub m x y)) ->
-  ((no_overflow m ((to_real x) - (to_real y))%R) /\ ((to_real (sub m x
-  y)) = (round m ((to_real x) - (to_real y))%R)))).
+Lemma sub_finite_rev_n :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  (ieee_float.RoundingMode.to_nearest m) -> (is_finite (sub m x y)) ->
+  (no_overflow m ((to_real x) - (to_real y))%R) /\
+  ((to_real (sub m x y)) = (round m ((to_real x) - (to_real y))%R)).
 Proof.
 intros m x y h1 h2.
 destruct (sub_finite_rev m x y h2).
@@ -2004,10 +2007,11 @@ destruct (sub RNA x y); easy.
 Qed.
 
 (* Why3 goal *)
-Lemma mul_finite : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> ((is_finite y) -> ((no_overflow m
-  ((to_real x) * (to_real y))%R) -> ((is_finite (mul m x y)) /\
-  ((to_real (mul m x y)) = (round m ((to_real x) * (to_real y))%R))))).
+Lemma mul_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (is_finite y) -> (no_overflow m ((to_real x) * (to_real y))%R) ->
+  (is_finite (mul m x y)) /\
+  ((to_real (mul m x y)) = (round m ((to_real x) * (to_real y))%R)).
 Proof.
 intros m x y h1 h2 h3.
 generalize (Bmult_correct sb emax Hsb'' Hemax' nan_bf m x y); rewrite Rlt_bool_true, h1, h2.
@@ -2025,10 +2029,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma mul_finite_rev_n : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (ieee_float.RoundingMode.to_nearest m) -> ((is_finite (mul m x y)) ->
-  ((no_overflow m ((to_real x) * (to_real y))%R) /\ ((to_real (mul m x
-  y)) = (round m ((to_real x) * (to_real y))%R)))).
+Lemma mul_finite_rev_n :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  (ieee_float.RoundingMode.to_nearest m) -> (is_finite (mul m x y)) ->
+  (no_overflow m ((to_real x) * (to_real y))%R) /\
+  ((to_real (mul m x y)) = (round m ((to_real x) * (to_real y))%R)).
 Proof.
 intros m x y h1 h2.
 destruct (mul_finite_rev m x y h2).
@@ -2053,10 +2058,12 @@ destruct (mul RNA x y); easy.
 Qed.
 
 (* Why3 goal *)
-Lemma div_finite : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> ((is_finite y) -> ((~ (is_zero y)) -> ((no_overflow m
-  ((to_real x) / (to_real y))%R) -> ((is_finite (div m x y)) /\
-  ((to_real (div m x y)) = (round m ((to_real x) / (to_real y))%R)))))).
+Lemma div_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (is_finite y) -> ~ (is_zero y) ->
+  (no_overflow m ((to_real x) / (to_real y))%R) ->
+  (is_finite (div m x y)) /\
+  ((to_real (div m x y)) = (round m ((to_real x) / (to_real y))%R)).
 Proof.
   intros m x y h1 h2 h3 h4.
   assert (is_finite zeroF) as zero_is_finite by easy.
@@ -2083,10 +2090,12 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma div_finite_rev_n : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (ieee_float.RoundingMode.to_nearest m) -> ((is_finite (div m x y)) ->
-  ((is_finite y) -> ((no_overflow m ((to_real x) / (to_real y))%R) /\
-  ((to_real (div m x y)) = (round m ((to_real x) / (to_real y))%R))))).
+Lemma div_finite_rev_n :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  (ieee_float.RoundingMode.to_nearest m) -> (is_finite (div m x y)) ->
+  (is_finite y) ->
+  (no_overflow m ((to_real x) / (to_real y))%R) /\
+  ((to_real (div m x y)) = (round m ((to_real x) / (to_real y))%R)).
 Proof.
   intros m x y h1 h2 h3.
   destruct (div_finite_rev m x y h2) as [(h4,(h5,h6))|(h4,(h5,h6))].
@@ -2113,8 +2122,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma neg_finite :
-  forall (x:t),
-  (is_finite x) ->
+  forall (x:t), (is_finite x) ->
   (is_finite (neg x)) /\ ((to_real (neg x)) = (-(to_real x))%R).
 Proof.
 intros x h1.
@@ -2126,8 +2134,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma neg_finite_rev :
-  forall (x:t),
-  (is_finite (neg x)) ->
+  forall (x:t), (is_finite (neg x)) ->
   (is_finite x) /\ ((to_real (neg x)) = (-(to_real x))%R).
 Proof.
   intros x h1.
@@ -2136,9 +2143,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma abs_finite : forall (x:t), (is_finite x) -> ((is_finite (abs x)) /\
-  (((to_real (abs x)) = (Reals.Rbasic_fun.Rabs (to_real x))) /\ (is_positive
-  (abs x)))).
+Lemma abs_finite :
+  forall (x:t), (is_finite x) ->
+  (is_finite (abs x)) /\
+  (((to_real (abs x)) = (Reals.Rbasic_fun.Rabs (to_real x))) /\
+   (is_positive (abs x))).
 Proof.
   intros x h1.
   pose proof (is_finite_abs x h1).
@@ -2204,8 +2213,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma abs_finite_rev : forall (x:t), (is_finite (abs x)) -> ((is_finite x) /\
-  ((to_real (abs x)) = (Reals.Rbasic_fun.Rabs (to_real x)))).
+Lemma abs_finite_rev :
+  forall (x:t), (is_finite (abs x)) ->
+  (is_finite x) /\ ((to_real (abs x)) = (Reals.Rbasic_fun.Rabs (to_real x))).
 Proof.
 intros x h1.
 assert (is_finite x) by (destruct x; easy).
@@ -2219,11 +2229,13 @@ destruct x; easy.
 Qed.
 
 (* Why3 goal *)
-Lemma fma_finite : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t) (z:t),
-  (is_finite x) -> ((is_finite y) -> ((is_finite z) -> ((no_overflow m
-  (((to_real x) * (to_real y))%R + (to_real z))%R) -> ((is_finite (fma m x y
-  z)) /\ ((to_real (fma m x y z)) = (round m
-  (((to_real x) * (to_real y))%R + (to_real z))%R)))))).
+Lemma fma_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t) (z:t), (is_finite x) ->
+  (is_finite y) -> (is_finite z) ->
+  (no_overflow m (((to_real x) * (to_real y))%R + (to_real z))%R) ->
+  (is_finite (fma m x y z)) /\
+  ((to_real (fma m x y z)) =
+   (round m (((to_real x) * (to_real y))%R + (to_real z))%R)).
 Proof.
 intros m x y z h1 h2 h3 h4.
 Admitted.
@@ -2238,19 +2250,22 @@ intros m x y z h1.
 Admitted.
 
 (* Why3 goal *)
-Lemma fma_finite_rev_n : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t)
-  (z:t), (ieee_float.RoundingMode.to_nearest m) -> ((is_finite (fma m x y
-  z)) -> ((no_overflow m (((to_real x) * (to_real y))%R + (to_real z))%R) /\
-  ((to_real (fma m x y z)) = (round m
-  (((to_real x) * (to_real y))%R + (to_real z))%R)))).
+Lemma fma_finite_rev_n :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t) (z:t),
+  (ieee_float.RoundingMode.to_nearest m) -> (is_finite (fma m x y z)) ->
+  (no_overflow m (((to_real x) * (to_real y))%R + (to_real z))%R) /\
+  ((to_real (fma m x y z)) =
+   (round m (((to_real x) * (to_real y))%R + (to_real z))%R)).
 Proof.
 intros m x y z h1 h2.
 Admitted.
 
 (* Why3 goal *)
-Lemma sqrt_finite : forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite
-  x) -> ((0%R <= (to_real x))%R -> ((is_finite (sqrt m x)) /\
-  ((to_real (sqrt m x)) = (round m (Reals.R_sqrt.sqrt (to_real x)))))).
+Lemma sqrt_finite :
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
+  (0%R <= (to_real x))%R ->
+  (is_finite (sqrt m x)) /\
+  ((to_real (sqrt m x)) = (round m (Reals.R_sqrt.sqrt (to_real x)))).
 Proof.
   intros m x h1 h2.
   destruct (Bsqrt_correct sb emax Hsb' Hemax' (fun b => (true,One_Nan_pl)) m x) as (g,(g1,g2)).
@@ -2261,9 +2276,11 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma sqrt_finite_rev : forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite (sqrt m x)) -> ((is_finite x) /\ ((0%R <= (to_real x))%R /\
-  ((to_real (sqrt m x)) = (round m (Reals.R_sqrt.sqrt (to_real x)))))).
+Lemma sqrt_finite_rev :
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite (sqrt m x)) ->
+  (is_finite x) /\
+  ((0%R <= (to_real x))%R /\
+   ((to_real (sqrt m x)) = (round m (Reals.R_sqrt.sqrt (to_real x))))).
 Proof.
   intros m x h1.
   assert (is_finite x) by (destruct x ; destruct b; easy).
@@ -2296,18 +2313,23 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma add_special : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  let r := (add m x y) in ((((is_nan x) \/ (is_nan y)) -> (is_nan r)) /\
-  ((((is_finite x) /\ (is_infinite y)) -> ((is_infinite r) /\ (same_sign r
-  y))) /\ ((((is_infinite x) /\ (is_finite y)) -> ((is_infinite r) /\
-  (same_sign r x))) /\ ((((is_infinite x) /\ ((is_infinite y) /\ (same_sign x
-  y))) -> ((is_infinite r) /\ (same_sign r x))) /\ ((((is_infinite x) /\
-  ((is_infinite y) /\ (diff_sign x y))) -> (is_nan r)) /\ ((((is_finite x) /\
-  ((is_finite y) /\ ~ (no_overflow m ((to_real x) + (to_real y))%R))) ->
-  ((same_sign_real r ((to_real x) + (to_real y))%R) /\ (overflow_value m
-  r))) /\ (((is_finite x) /\ (is_finite y)) -> (((same_sign x y) ->
-  (same_sign r x)) /\ ((~ (same_sign x y)) -> (sign_zero_result m
-  r)))))))))).
+Lemma add_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  let r := add m x y in
+  (((is_nan x) \/ (is_nan y)) -> is_nan r) /\
+  ((((is_finite x) /\ (is_infinite y)) -> (is_infinite r) /\ (same_sign r y)) /\
+   ((((is_infinite x) /\ (is_finite y)) ->
+     (is_infinite r) /\ (same_sign r x)) /\
+    ((((is_infinite x) /\ ((is_infinite y) /\ (same_sign x y))) ->
+      (is_infinite r) /\ (same_sign r x)) /\
+     ((((is_infinite x) /\ ((is_infinite y) /\ (diff_sign x y))) -> is_nan r) /\
+      ((((is_finite x) /\
+         ((is_finite y) /\ ~ (no_overflow m ((to_real x) + (to_real y))%R))) ->
+        (same_sign_real r ((to_real x) + (to_real y))%R) /\
+        (overflow_value m r)) /\
+       (((is_finite x) /\ (is_finite y)) ->
+        ((same_sign x y) -> same_sign r x) /\
+        (~ (same_sign x y) -> sign_zero_result m r))))))).
 Proof.
 intros m x y r.
   unfold same_sign, diff_sign, same_sign, same_sign_real.
@@ -2549,18 +2571,23 @@ destruct (add m x y); destruct b, m; simpl in *; try easy;
 Qed.
 
 (* Why3 goal *)
-Lemma sub_special : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  let r := (sub m x y) in ((((is_nan x) \/ (is_nan y)) -> (is_nan r)) /\
-  ((((is_finite x) /\ (is_infinite y)) -> ((is_infinite r) /\ (diff_sign r
-  y))) /\ ((((is_infinite x) /\ (is_finite y)) -> ((is_infinite r) /\
-  (same_sign r x))) /\ ((((is_infinite x) /\ ((is_infinite y) /\ (same_sign x
-  y))) -> (is_nan r)) /\ ((((is_infinite x) /\ ((is_infinite y) /\ (diff_sign
-  x y))) -> ((is_infinite r) /\ (same_sign r x))) /\ ((((is_finite x) /\
-  ((is_finite y) /\ ~ (no_overflow m ((to_real x) - (to_real y))%R))) ->
-  ((same_sign_real r ((to_real x) - (to_real y))%R) /\ (overflow_value m
-  r))) /\ (((is_finite x) /\ (is_finite y)) -> (((diff_sign x y) ->
-  (same_sign r x)) /\ ((~ (diff_sign x y)) -> (sign_zero_result m
-  r)))))))))).
+Lemma sub_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  let r := sub m x y in
+  (((is_nan x) \/ (is_nan y)) -> is_nan r) /\
+  ((((is_finite x) /\ (is_infinite y)) -> (is_infinite r) /\ (diff_sign r y)) /\
+   ((((is_infinite x) /\ (is_finite y)) ->
+     (is_infinite r) /\ (same_sign r x)) /\
+    ((((is_infinite x) /\ ((is_infinite y) /\ (same_sign x y))) -> is_nan r) /\
+     ((((is_infinite x) /\ ((is_infinite y) /\ (diff_sign x y))) ->
+       (is_infinite r) /\ (same_sign r x)) /\
+      ((((is_finite x) /\
+         ((is_finite y) /\ ~ (no_overflow m ((to_real x) - (to_real y))%R))) ->
+        (same_sign_real r ((to_real x) - (to_real y))%R) /\
+        (overflow_value m r)) /\
+       (((is_finite x) /\ (is_finite y)) ->
+        ((diff_sign x y) -> same_sign r x) /\
+        (~ (diff_sign x y) -> sign_zero_result m r))))))).
 Proof.
   intros m x y r.
   unfold same_sign, diff_sign, same_sign, same_sign_real.
@@ -2799,15 +2826,20 @@ destruct (sub m x y); destruct b, m; simpl in *; try easy;
 Qed.
 
 (* Why3 goal *)
-Lemma mul_special : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  let r := (mul m x y) in ((((is_nan x) \/ (is_nan y)) -> (is_nan r)) /\
-  ((((is_zero x) /\ (is_infinite y)) -> (is_nan r)) /\ ((((is_finite x) /\
-  ((is_infinite y) /\ ~ (is_zero x))) -> (is_infinite r)) /\ ((((is_infinite
-  x) /\ (is_zero y)) -> (is_nan r)) /\ ((((is_infinite x) /\ ((is_finite
-  y) /\ ~ (is_zero y))) -> (is_infinite r)) /\ ((((is_infinite x) /\
-  (is_infinite y)) -> (is_infinite r)) /\ ((((is_finite x) /\ ((is_finite
-  y) /\ ~ (no_overflow m ((to_real x) * (to_real y))%R))) -> (overflow_value
-  m r)) /\ ((~ (is_nan r)) -> (product_sign r x y))))))))).
+Lemma mul_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  let r := mul m x y in
+  (((is_nan x) \/ (is_nan y)) -> is_nan r) /\
+  ((((is_zero x) /\ (is_infinite y)) -> is_nan r) /\
+   ((((is_finite x) /\ ((is_infinite y) /\ ~ (is_zero x))) -> is_infinite r) /\
+    ((((is_infinite x) /\ (is_zero y)) -> is_nan r) /\
+     ((((is_infinite x) /\ ((is_finite y) /\ ~ (is_zero y))) ->
+       is_infinite r) /\
+      ((((is_infinite x) /\ (is_infinite y)) -> is_infinite r) /\
+       ((((is_finite x) /\
+          ((is_finite y) /\ ~ (no_overflow m ((to_real x) * (to_real y))%R))) ->
+         overflow_value m r) /\
+        (~ (is_nan r) -> product_sign r x y))))))).
 Proof.
   intros m x y r.
   unfold product_sign, same_sign, diff_sign.
@@ -3009,15 +3041,20 @@ destruct (mul m x y); destruct b, m; simpl in *; try easy;
 Qed.
 
 (* Why3 goal *)
-Lemma div_special : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  let r := (div m x y) in ((((is_nan x) \/ (is_nan y)) -> (is_nan r)) /\
-  ((((is_finite x) /\ (is_infinite y)) -> (is_zero r)) /\ ((((is_infinite
-  x) /\ (is_finite y)) -> (is_infinite r)) /\ ((((is_infinite x) /\
-  (is_infinite y)) -> (is_nan r)) /\ ((((is_finite x) /\ ((is_finite y) /\
-  ((~ (is_zero y)) /\ ~ (no_overflow m ((to_real x) / (to_real y))%R)))) ->
-  (overflow_value m r)) /\ ((((is_finite x) /\ ((is_zero y) /\ ~ (is_zero
-  x))) -> (is_infinite r)) /\ ((((is_zero x) /\ (is_zero y)) -> (is_nan
-  r)) /\ ((~ (is_nan r)) -> (product_sign r x y))))))))).
+Lemma div_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
+  let r := div m x y in
+  (((is_nan x) \/ (is_nan y)) -> is_nan r) /\
+  ((((is_finite x) /\ (is_infinite y)) -> is_zero r) /\
+   ((((is_infinite x) /\ (is_finite y)) -> is_infinite r) /\
+    ((((is_infinite x) /\ (is_infinite y)) -> is_nan r) /\
+     ((((is_finite x) /\
+        ((is_finite y) /\
+         (~ (is_zero y) /\ ~ (no_overflow m ((to_real x) / (to_real y))%R)))) ->
+       overflow_value m r) /\
+      ((((is_finite x) /\ ((is_zero y) /\ ~ (is_zero x))) -> is_infinite r) /\
+       ((((is_zero x) /\ (is_zero y)) -> is_nan r) /\
+        (~ (is_nan r) -> product_sign r x y))))))).
 Proof.
   intros m x y r.
   unfold product_sign, same_sign, diff_sign.
@@ -3278,32 +3315,47 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma fma_special : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t)
-  (z:t), let r := (fma m x y z) in ((((is_nan x) \/ ((is_nan y) \/ (is_nan
-  z))) -> (is_nan r)) /\ ((((is_zero x) /\ (is_infinite y)) -> (is_nan r)) /\
-  ((((is_infinite x) /\ (is_zero y)) -> (is_nan r)) /\ ((((is_finite x) /\
-  ((~ (is_zero x)) /\ ((is_infinite y) /\ (is_finite z)))) -> ((is_infinite
-  r) /\ (product_sign r x y))) /\ ((((is_finite x) /\ ((~ (is_zero x)) /\
-  ((is_infinite y) /\ (is_infinite z)))) -> (((product_sign z x y) ->
-  ((is_infinite r) /\ (same_sign r z))) /\ ((~ (product_sign z x y)) ->
-  (is_nan r)))) /\ ((((is_infinite x) /\ ((is_finite y) /\ ((~ (is_zero
-  y)) /\ (is_finite z)))) -> ((is_infinite r) /\ (product_sign r x y))) /\
-  ((((is_infinite x) /\ ((is_finite y) /\ ((~ (is_zero y)) /\ (is_infinite
-  z)))) -> (((product_sign z x y) -> ((is_infinite r) /\ (same_sign r z))) /\
-  ((~ (product_sign z x y)) -> (is_nan r)))) /\ ((((is_infinite x) /\
-  ((is_infinite y) /\ (is_finite z))) -> ((is_infinite r) /\ (product_sign r
-  x y))) /\ ((((is_finite x) /\ ((is_finite y) /\ (is_infinite z))) ->
-  ((is_infinite r) /\ (same_sign r z))) /\ ((((is_infinite x) /\
-  ((is_infinite y) /\ (is_infinite z))) -> (((product_sign z x y) ->
-  ((is_infinite r) /\ (same_sign r z))) /\ ((~ (product_sign z x y)) ->
-  (is_nan r)))) /\ ((((is_finite x) /\ ((is_finite y) /\ ((is_finite z) /\
-  ~ (no_overflow m (((to_real x) * (to_real y))%R + (to_real z))%R)))) ->
-  ((same_sign_real r (((to_real x) * (to_real y))%R + (to_real z))%R) /\
-  (overflow_value m r))) /\ (((is_finite x) /\ ((is_finite y) /\ (is_finite
-  z))) -> (((product_sign z x y) -> (same_sign r z)) /\ ((~ (product_sign z x
-  y)) -> (((((to_real x) * (to_real y))%R + (to_real z))%R = 0%R) ->
-  (((m = ieee_float.RoundingMode.RTN) -> (is_negative r)) /\
-  ((~ (m = ieee_float.RoundingMode.RTN)) -> (is_positive r)))))))))))))))))).
+Lemma fma_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t) (z:t),
+  let r := fma m x y z in
+  (((is_nan x) \/ ((is_nan y) \/ (is_nan z))) -> is_nan r) /\
+  ((((is_zero x) /\ (is_infinite y)) -> is_nan r) /\
+   ((((is_infinite x) /\ (is_zero y)) -> is_nan r) /\
+    ((((is_finite x) /\
+       (~ (is_zero x) /\ ((is_infinite y) /\ (is_finite z)))) ->
+      (is_infinite r) /\ (product_sign r x y)) /\
+     ((((is_finite x) /\
+        (~ (is_zero x) /\ ((is_infinite y) /\ (is_infinite z)))) ->
+       ((product_sign z x y) -> (is_infinite r) /\ (same_sign r z)) /\
+       (~ (product_sign z x y) -> is_nan r)) /\
+      ((((is_infinite x) /\
+         ((is_finite y) /\ (~ (is_zero y) /\ (is_finite z)))) ->
+        (is_infinite r) /\ (product_sign r x y)) /\
+       ((((is_infinite x) /\
+          ((is_finite y) /\ (~ (is_zero y) /\ (is_infinite z)))) ->
+         ((product_sign z x y) -> (is_infinite r) /\ (same_sign r z)) /\
+         (~ (product_sign z x y) -> is_nan r)) /\
+        ((((is_infinite x) /\ ((is_infinite y) /\ (is_finite z))) ->
+          (is_infinite r) /\ (product_sign r x y)) /\
+         ((((is_finite x) /\ ((is_finite y) /\ (is_infinite z))) ->
+           (is_infinite r) /\ (same_sign r z)) /\
+          ((((is_infinite x) /\ ((is_infinite y) /\ (is_infinite z))) ->
+            ((product_sign z x y) -> (is_infinite r) /\ (same_sign r z)) /\
+            (~ (product_sign z x y) -> is_nan r)) /\
+           ((((is_finite x) /\
+              ((is_finite y) /\
+               ((is_finite z) /\
+                ~ (no_overflow m
+                   (((to_real x) * (to_real y))%R + (to_real z))%R)))) ->
+             (same_sign_real r
+              (((to_real x) * (to_real y))%R + (to_real z))%R) /\
+             (overflow_value m r)) /\
+            (((is_finite x) /\ ((is_finite y) /\ (is_finite z))) ->
+             ((product_sign z x y) -> same_sign r z) /\
+             (~ (product_sign z x y) ->
+              ((((to_real x) * (to_real y))%R + (to_real z))%R = 0%R) ->
+              ((m = ieee_float.RoundingMode.RTN) -> is_negative r) /\
+              (~ (m = ieee_float.RoundingMode.RTN) -> is_positive r))))))))))))).
 Proof.
 intros m x y z r.
 Admitted.
@@ -3329,12 +3381,15 @@ destruct (fma m x y z); destruct b, m; simpl in *; try easy;
 Qed.
 
 (* Why3 goal *)
-Lemma sqrt_special : forall (m:ieee_float.RoundingMode.mode) (x:t), let r :=
-  (sqrt m x) in (((is_nan x) -> (is_nan r)) /\ (((is_plus_infinity x) ->
-  (is_plus_infinity r)) /\ (((is_minus_infinity x) -> (is_nan r)) /\
-  ((((is_finite x) /\ ((to_real x) < 0%R)%R) -> (is_nan r)) /\ (((is_zero
-  x) -> (same_sign r x)) /\ (((is_finite x) /\ (0%R < (to_real x))%R) ->
-  (is_positive r))))))).
+Lemma sqrt_special :
+  forall (m:ieee_float.RoundingMode.mode) (x:t),
+  let r := sqrt m x in
+  ((is_nan x) -> is_nan r) /\
+  (((is_plus_infinity x) -> is_plus_infinity r) /\
+   (((is_minus_infinity x) -> is_nan r) /\
+    ((((is_finite x) /\ ((to_real x) < 0%R)%R) -> is_nan r) /\
+     (((is_zero x) -> same_sign r x) /\
+      (((is_finite x) /\ (0%R < (to_real x))%R) -> is_positive r))))).
 Proof.
   intros m x r.
   unfold sqrt in r.
@@ -3382,10 +3437,12 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_add_exact : forall (m:ieee_float.RoundingMode.mode)
-  (n:ieee_float.RoundingMode.mode) (i:Z) (j:Z), (in_safe_int_range i) ->
-  ((in_safe_int_range j) -> ((in_safe_int_range (i + j)%Z) -> (eq (of_int m
-  (i + j)%Z) (add n (of_int m i) (of_int m j))))).
+Lemma of_int_add_exact :
+  forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
+    (i:Z) (j:Z),
+  (in_safe_int_range i) -> (in_safe_int_range j) ->
+  (in_safe_int_range (i + j)%Z) ->
+  eq (of_int m (i + j)%Z) (add n (of_int m i) (of_int m j)).
 Proof.
   intros m n i j h1 h2 h3.
   assert (h1':= in_safe_int_range_no_overflow m h1).
@@ -3408,10 +3465,12 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_sub_exact : forall (m:ieee_float.RoundingMode.mode)
-  (n:ieee_float.RoundingMode.mode) (i:Z) (j:Z), (in_safe_int_range i) ->
-  ((in_safe_int_range j) -> ((in_safe_int_range (i - j)%Z) -> (eq (of_int m
-  (i - j)%Z) (sub n (of_int m i) (of_int m j))))).
+Lemma of_int_sub_exact :
+  forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
+    (i:Z) (j:Z),
+  (in_safe_int_range i) -> (in_safe_int_range j) ->
+  (in_safe_int_range (i - j)%Z) ->
+  eq (of_int m (i - j)%Z) (sub n (of_int m i) (of_int m j)).
 Proof.
   intros m n i j h1 h2 h3.
   assert (h1':= in_safe_int_range_no_overflow m h1).
@@ -3434,10 +3493,12 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma of_int_mul_exact : forall (m:ieee_float.RoundingMode.mode)
-  (n:ieee_float.RoundingMode.mode) (i:Z) (j:Z), (in_safe_int_range i) ->
-  ((in_safe_int_range j) -> ((in_safe_int_range (i * j)%Z) -> (eq (of_int m
-  (i * j)%Z) (mul n (of_int m i) (of_int m j))))).
+Lemma of_int_mul_exact :
+  forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
+    (i:Z) (j:Z),
+  (in_safe_int_range i) -> (in_safe_int_range j) ->
+  (in_safe_int_range (i * j)%Z) ->
+  eq (of_int m (i * j)%Z) (mul n (of_int m i) (of_int m j)).
 Proof.
   intros m n i j h1 h2 h3.
   assert (h1':= in_safe_int_range_no_overflow m h1).
@@ -3624,8 +3685,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma of_int_is_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:Z),
-  (in_int_range x) -> is_int (of_int m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:Z), (in_int_range x) ->
+  is_int (of_int m x).
 Proof.
   intros m x (h1,h2).
   assert (no_overflow m (IZR x)) as h3.
@@ -3721,8 +3782,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma big_float_is_int :
-  forall (m:ieee_float.RoundingMode.mode) (i:t),
-  (is_finite i) ->
+  forall (m:ieee_float.RoundingMode.mode) (i:t), (is_finite i) ->
   ((le i (neg (of_int m pow2sb))) \/ (le (of_int m pow2sb) i)) -> is_int i.
 Proof.
   intros m i h1 h2.
@@ -3812,8 +3872,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma roundToIntegral_is_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite x) -> is_int (roundToIntegral m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
+  is_int (roundToIntegral m x).
 Proof.
   intros m x h1.
   destruct x; try easy.
@@ -3843,8 +3903,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma add_int :
-  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode),
-  (is_int x) -> (is_int y) -> (is_finite (add m x y)) -> is_int (add m x y).
+  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), (is_int x) ->
+  (is_int y) -> (is_finite (add m x y)) -> is_int (add m x y).
 Proof.
 intros x y m (h1,h1') (h2,h2') h3.
 destruct (add_finite_rev_n' m x y h3).
@@ -3867,8 +3927,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma sub_int :
-  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode),
-  (is_int x) -> (is_int y) -> (is_finite (sub m x y)) -> is_int (sub m x y).
+  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), (is_int x) ->
+  (is_int y) -> (is_finite (sub m x y)) -> is_int (sub m x y).
 Proof.
 intros x y m (h1,h1') (h2,h2') h3.
 destruct (sub_finite_rev_n' m x y h3).
@@ -3891,8 +3951,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma mul_int :
-  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode),
-  (is_int x) -> (is_int y) -> (is_finite (mul m x y)) -> is_int (mul m x y).
+  forall (x:t) (y:t) (m:ieee_float.RoundingMode.mode), (is_int x) ->
+  (is_int y) -> (is_finite (mul m x y)) -> is_int (mul m x y).
 Proof.
 intros x y m (h1,h1') (h2,h2') h3.
 destruct (mul_finite_rev_n' m x y h3).
@@ -3914,9 +3974,10 @@ destruct (mul_finite_rev_n' m x y h3).
 Qed.
 
 (* Why3 goal *)
-Lemma fma_int : forall (x:t) (y:t) (z:t) (m:ieee_float.RoundingMode.mode),
-  (is_int x) -> ((is_int y) -> ((is_int z) -> ((is_finite (fma m x y z)) ->
-  (is_int (fma m x y z))))).
+Lemma fma_int :
+  forall (x:t) (y:t) (z:t) (m:ieee_float.RoundingMode.mode), (is_int x) ->
+  (is_int y) -> (is_int z) -> (is_finite (fma m x y z)) ->
+  is_int (fma m x y z).
 Proof.
 intros x y z m (h1,h1') (h2,h2') (h3,h3') h4.
 destruct (fma_finite_rev_n' m x y z h4).
@@ -3964,9 +4025,10 @@ apply f_equal, h2.
 Qed.
 
 (* Why3 goal *)
-Lemma is_int_of_int : forall (x:t) (m:ieee_float.RoundingMode.mode)
-  (m':ieee_float.RoundingMode.mode), (is_int x) -> (eq x (of_int m' (to_int m
-  x))).
+Lemma is_int_of_int :
+  forall (x:t) (m:ieee_float.RoundingMode.mode)
+    (m':ieee_float.RoundingMode.mode),
+  (is_int x) -> eq x (of_int m' (to_int m x)).
 Proof.
   intros x m m' h1.
   assert (h1':=h1).
@@ -3981,8 +4043,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma is_int_to_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_int x) -> in_int_range (to_int m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int x) ->
+  in_int_range (to_int m x).
 Proof.
 intros m x h1.
 pose proof (@int_to_real_ m x h1).
@@ -4002,8 +4064,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma int_to_real :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_int x) -> ((to_real x) = (BuiltIn.IZR (to_int m x))).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int x) ->
+  ((to_real x) = (BuiltIn.IZR (to_int m x))).
 Proof.
 intros m x.
 apply int_to_real_.
@@ -4075,8 +4137,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma truncate_int :
-  forall (m:ieee_float.RoundingMode.mode) (i:t),
-  (is_int i) -> eq (roundToIntegral m i) i.
+  forall (m:ieee_float.RoundingMode.mode) (i:t), (is_int i) ->
+  eq (roundToIntegral m i) i.
 Proof.
   intros m i (h1,h2).
   pose proof (roundToIntegral_finite m h1).
@@ -4088,9 +4150,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma truncate_neg : forall (x:t), (is_finite x) -> ((is_negative x) ->
-  ((roundToIntegral ieee_float.RoundingMode.RTZ
-  x) = (roundToIntegral ieee_float.RoundingMode.RTP x))).
+Lemma truncate_neg :
+  forall (x:t), (is_finite x) -> (is_negative x) ->
+  ((roundToIntegral ieee_float.RoundingMode.RTZ x) =
+   (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
   intros x h1 h2.
   destruct x; try easy.
@@ -4103,9 +4166,10 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma truncate_pos : forall (x:t), (is_finite x) -> ((is_positive x) ->
-  ((roundToIntegral ieee_float.RoundingMode.RTZ
-  x) = (roundToIntegral ieee_float.RoundingMode.RTN x))).
+Lemma truncate_pos :
+  forall (x:t), (is_finite x) -> (is_positive x) ->
+  ((roundToIntegral ieee_float.RoundingMode.RTZ x) =
+   (roundToIntegral ieee_float.RoundingMode.RTN x)).
 Proof.
   intros x h1 h2.
   destruct x; try easy.
@@ -4119,8 +4183,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma ceil_le :
-  forall (x:t),
-  (is_finite x) -> le x (roundToIntegral ieee_float.RoundingMode.RTP x).
+  forall (x:t), (is_finite x) ->
+  le x (roundToIntegral ieee_float.RoundingMode.RTP x).
 Proof.
 intros x h1.
 pose proof (roundToIntegral_finite RTP h1).
@@ -4132,8 +4196,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma ceil_lest :
-  forall (x:t) (y:t),
-  ((le x y) /\ (is_int y)) ->
+  forall (x:t) (y:t), ((le x y) /\ (is_int y)) ->
   le (roundToIntegral ieee_float.RoundingMode.RTP x) y.
 Proof.
 intros x y (h1,h2).
@@ -4156,8 +4219,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma ceil_to_real :
-  forall (x:t),
-  (is_finite x) ->
+  forall (x:t), (is_finite x) ->
   ((to_real (roundToIntegral ieee_float.RoundingMode.RTP x)) =
    (BuiltIn.IZR (real.Truncate.ceil (to_real x)))).
 Proof.
@@ -4169,8 +4231,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma ceil_to_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite x) ->
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
   ((to_int m (roundToIntegral ieee_float.RoundingMode.RTP x)) =
    (real.Truncate.ceil (to_real x))).
 Proof.
@@ -4183,8 +4244,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma floor_le :
-  forall (x:t),
-  (is_finite x) -> le (roundToIntegral ieee_float.RoundingMode.RTN x) x.
+  forall (x:t), (is_finite x) ->
+  le (roundToIntegral ieee_float.RoundingMode.RTN x) x.
 Proof.
   intros x h1.
   pose proof (roundToIntegral_finite RTN h1).
@@ -4196,8 +4257,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma floor_lest :
-  forall (x:t) (y:t),
-  ((le y x) /\ (is_int y)) ->
+  forall (x:t) (y:t), ((le y x) /\ (is_int y)) ->
   le y (roundToIntegral ieee_float.RoundingMode.RTN x).
 Proof.
   intros x y (h1,h2).
@@ -4220,8 +4280,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma floor_to_real :
-  forall (x:t),
-  (is_finite x) ->
+  forall (x:t), (is_finite x) ->
   ((to_real (roundToIntegral ieee_float.RoundingMode.RTN x)) =
    (BuiltIn.IZR (real.Truncate.floor (to_real x)))).
 Proof.
@@ -4233,8 +4292,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma floor_to_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite x) ->
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
   ((to_int m (roundToIntegral ieee_float.RoundingMode.RTN x)) =
    (real.Truncate.floor (to_real x))).
 Proof.
@@ -4333,12 +4391,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma RNA_down : forall (x:t), (lt (sub ieee_float.RoundingMode.RNE x
-  (roundToIntegral ieee_float.RoundingMode.RTN x))
-  (sub ieee_float.RoundingMode.RNE
-  (roundToIntegral ieee_float.RoundingMode.RTP x) x)) ->
-  ((roundToIntegral ieee_float.RoundingMode.RNA
-  x) = (roundToIntegral ieee_float.RoundingMode.RTN x)).
+Lemma RNA_down :
+  forall (x:t),
+  (lt
+   (sub ieee_float.RoundingMode.RNE x
+    (roundToIntegral ieee_float.RoundingMode.RTN x))
+   (sub ieee_float.RoundingMode.RNE
+    (roundToIntegral ieee_float.RoundingMode.RTP x) x)) ->
+  ((roundToIntegral ieee_float.RoundingMode.RNA x) =
+   (roundToIntegral ieee_float.RoundingMode.RTN x)).
 Proof.
   intros x h.
   destruct x; try easy.
@@ -4384,12 +4445,15 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma RNA_up : forall (x:t), (lt (sub ieee_float.RoundingMode.RNE
-  (roundToIntegral ieee_float.RoundingMode.RTP x) x)
-  (sub ieee_float.RoundingMode.RNE x
-  (roundToIntegral ieee_float.RoundingMode.RTN x))) ->
-  ((roundToIntegral ieee_float.RoundingMode.RNA
-  x) = (roundToIntegral ieee_float.RoundingMode.RTP x)).
+Lemma RNA_up :
+  forall (x:t),
+  (lt
+   (sub ieee_float.RoundingMode.RNE
+    (roundToIntegral ieee_float.RoundingMode.RTP x) x)
+   (sub ieee_float.RoundingMode.RNE x
+    (roundToIntegral ieee_float.RoundingMode.RTN x))) ->
+  ((roundToIntegral ieee_float.RoundingMode.RNA x) =
+   (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
   intros x h.
   destruct x; try easy.
@@ -4782,12 +4846,16 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma RNA_down_tie : forall (x:t), (eq (sub ieee_float.RoundingMode.RNE x
-  (roundToIntegral ieee_float.RoundingMode.RTN x))
-  (sub ieee_float.RoundingMode.RNE
-  (roundToIntegral ieee_float.RoundingMode.RTP x) x)) -> ((is_negative x) ->
-  ((roundToIntegral ieee_float.RoundingMode.RNA
-  x) = (roundToIntegral ieee_float.RoundingMode.RTN x))).
+Lemma RNA_down_tie :
+  forall (x:t),
+  (eq
+   (sub ieee_float.RoundingMode.RNE x
+    (roundToIntegral ieee_float.RoundingMode.RTN x))
+   (sub ieee_float.RoundingMode.RNE
+    (roundToIntegral ieee_float.RoundingMode.RTP x) x)) ->
+  (is_negative x) ->
+  ((roundToIntegral ieee_float.RoundingMode.RNA x) =
+   (roundToIntegral ieee_float.RoundingMode.RTN x)).
 Proof.
   intros x h h'.
   destruct x; try easy.
@@ -4844,12 +4912,16 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma RNA_up_tie : forall (x:t), (eq (sub ieee_float.RoundingMode.RNE
-  (roundToIntegral ieee_float.RoundingMode.RTP x) x)
-  (sub ieee_float.RoundingMode.RNE x
-  (roundToIntegral ieee_float.RoundingMode.RTN x))) -> ((is_positive x) ->
-  ((roundToIntegral ieee_float.RoundingMode.RNA
-  x) = (roundToIntegral ieee_float.RoundingMode.RTP x))).
+Lemma RNA_up_tie :
+  forall (x:t),
+  (eq
+   (sub ieee_float.RoundingMode.RNE
+    (roundToIntegral ieee_float.RoundingMode.RTP x) x)
+   (sub ieee_float.RoundingMode.RNE x
+    (roundToIntegral ieee_float.RoundingMode.RTN x))) ->
+  (is_positive x) ->
+  ((roundToIntegral ieee_float.RoundingMode.RNA x) =
+   (roundToIntegral ieee_float.RoundingMode.RTP x)).
 Proof.
   intros x h h'.
   destruct x; try easy.
@@ -4919,9 +4991,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Lemma to_int_monotonic : forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> ((is_finite y) -> ((le x y) -> ((to_int m x) <= (to_int m
-  y))%Z)).
+Lemma to_int_monotonic :
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (is_finite y) -> (le x y) -> ((to_int m x) <= (to_int m y))%Z.
 Proof.
 intros m x y h1 h2 h3.
 now apply to_int_le.
@@ -4929,8 +5001,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma to_int_of_int :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z),
-  (in_safe_int_range i) -> ((to_int m (of_int m i)) = i).
+  forall (m:ieee_float.RoundingMode.mode) (i:Z), (in_safe_int_range i) ->
+  ((to_int m (of_int m i)) = i).
 Proof.
 intros m i (h1,h2).
 apply eq_IZR.
@@ -4946,8 +5018,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma eq_to_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t),
-  (is_finite x) -> (eq x y) -> ((to_int m x) = (to_int m y)).
+  forall (m:ieee_float.RoundingMode.mode) (x:t) (y:t), (is_finite x) ->
+  (eq x y) -> ((to_int m x) = (to_int m y)).
 Proof.
 intros m x y h1 h2.
 apply to_int_eq, h2.
@@ -4955,8 +5027,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma neg_to_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_int x) -> ((to_int m (neg x)) = (-(to_int m x))%Z).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_int x) ->
+  ((to_int m (neg x)) = (-(to_int m x))%Z).
 Proof.
 intros m x h1.
 apply neg_int_to_int; auto.
@@ -4964,8 +5036,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma roundToIntegral_is_finite :
-  forall (m:ieee_float.RoundingMode.mode) (x:t),
-  (is_finite x) -> is_finite (roundToIntegral m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:t), (is_finite x) ->
+  is_finite (roundToIntegral m x).
 Proof.
 intros m x h1.
 apply roundToIntegral_finite, h1.

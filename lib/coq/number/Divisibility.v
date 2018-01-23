@@ -99,16 +99,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_plusr :
-  forall (a:Z) (b:Z) (c:Z),
-  (divides a b) -> (divides a c) -> divides a (b + c)%Z.
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a c) ->
+  divides a (b + c)%Z.
 Proof.
 exact Zdivide_plus_r.
 Qed.
 
 (* Why3 goal *)
 Lemma divides_minusr :
-  forall (a:Z) (b:Z) (c:Z),
-  (divides a b) -> (divides a c) -> divides a (b - c)%Z.
+  forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a c) ->
+  divides a (b - c)%Z.
 Proof.
 exact Zdivide_minus_l.
 Qed.
@@ -149,8 +149,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_antisym :
-  forall (a:Z) (b:Z),
-  (divides a b) -> (divides b a) -> (a = b) \/ (a = (-b)%Z).
+  forall (a:Z) (b:Z), (divides a b) -> (divides b a) ->
+  (a = b) \/ (a = (-b)%Z).
 Proof.
 exact Zdivide_antisym.
 Qed.
@@ -163,8 +163,9 @@ exact Zdivide_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_bounds : forall (a:Z) (b:Z), (divides a b) -> ((~ (b = 0%Z)) ->
-  ((ZArith.BinInt.Z.abs a) <= (ZArith.BinInt.Z.abs b))%Z).
+Lemma divides_bounds :
+  forall (a:Z) (b:Z), (divides a b) -> ~ (b = 0%Z) ->
+  ((ZArith.BinInt.Z.abs a) <= (ZArith.BinInt.Z.abs b))%Z.
 Proof.
 exact Zdivide_bounds.
 Qed.
@@ -173,8 +174,8 @@ Import EuclideanDivision.
 
 (* Why3 goal *)
 Lemma mod_divides_euclidean :
-  forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> ((int.EuclideanDivision.mod1 a b) = 0%Z) -> divides b a.
+  forall (a:Z) (b:Z), ~ (b = 0%Z) ->
+  ((int.EuclideanDivision.mod1 a b) = 0%Z) -> divides b a.
 Proof.
 intros a b Zb H.
 exists (div a b).
@@ -185,8 +186,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_mod_euclidean :
-  forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> (divides b a) -> ((int.EuclideanDivision.mod1 a b) = 0%Z).
+  forall (a:Z) (b:Z), ~ (b = 0%Z) -> (divides b a) ->
+  ((int.EuclideanDivision.mod1 a b) = 0%Z).
 Proof.
 intros a b Zb H.
 assert (Zmod a b = Z0).
@@ -201,8 +202,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma mod_divides_computer :
-  forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> ((ZArith.BinInt.Z.rem a b) = 0%Z) -> divides b a.
+  forall (a:Z) (b:Z), ~ (b = 0%Z) -> ((ZArith.BinInt.Z.rem a b) = 0%Z) ->
+  divides b a.
 Proof.
 intros a b Zb H.
 exists (Z.quot a b).
@@ -212,8 +213,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma divides_mod_computer :
-  forall (a:Z) (b:Z),
-  ~ (b = 0%Z) -> (divides b a) -> ((ZArith.BinInt.Z.rem a b) = 0%Z).
+  forall (a:Z) (b:Z), ~ (b = 0%Z) -> (divides b a) ->
+  ((ZArith.BinInt.Z.rem a b) = 0%Z).
 Proof.
 intros a b Zb (q,H).
 rewrite H.

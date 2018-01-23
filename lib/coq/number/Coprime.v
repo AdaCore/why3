@@ -84,8 +84,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma gcd_coprime :
-  forall (a:Z) (b:Z) (c:Z),
-  (coprime a b) -> ((number.Gcd.gcd a (b * c)%Z) = (number.Gcd.gcd a c)).
+  forall (a:Z) (b:Z) (c:Z), (coprime a b) ->
+  ((number.Gcd.gcd a (b * c)%Z) = (number.Gcd.gcd a c)).
 intros a b c h1.
 apply Z.gcd_unique.
 - apply Z.gcd_nonneg.

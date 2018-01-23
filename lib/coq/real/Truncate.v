@@ -33,8 +33,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_down_pos :
-  forall (x:R),
-  (0%R <= x)%R ->
+  forall (x:R), (0%R <= x)%R ->
   ((BuiltIn.IZR (truncate x)) <= x)%R /\
   (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R.
 Proof.
@@ -48,8 +47,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_up_neg :
-  forall (x:R),
-  (x <= 0%R)%R ->
+  forall (x:R), (x <= 0%R)%R ->
   ((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
   (x <= (BuiltIn.IZR (truncate x)))%R.
 Proof.

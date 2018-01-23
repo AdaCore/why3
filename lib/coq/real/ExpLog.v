@@ -48,8 +48,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Log_mul :
-  forall (x:R) (y:R),
-  ((0%R < x)%R /\ (0%R < y)%R) ->
+  forall (x:R) (y:R), ((0%R < x)%R /\ (0%R < y)%R) ->
   ((Reals.Rpower.ln (x * y)%R) =
    ((Reals.Rpower.ln x) + (Reals.Rpower.ln y))%R).
 intros x y (Hx,Hy).
@@ -64,8 +63,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Exp_log :
-  forall (x:R),
-  (0%R < x)%R -> ((Reals.Rtrigo_def.exp (Reals.Rpower.ln x)) = x).
+  forall (x:R), (0%R < x)%R ->
+  ((Reals.Rtrigo_def.exp (Reals.Rpower.ln x)) = x).
 exact exp_ln.
 Qed.
 

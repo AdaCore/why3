@@ -42,8 +42,7 @@ Hint Unfold length.
 
 (* Why3 goal *)
 Lemma length_nonnegative :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:(seq a)), (0%Z <= (length s))%Z.
+  forall {a:Type} {a_WT:WhyType a}, forall (s:seq a), (0%Z <= (length s))%Z.
 intros a a_WT.
 induction s.
 auto with *.
