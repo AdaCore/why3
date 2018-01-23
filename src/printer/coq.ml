@@ -228,7 +228,7 @@ let print_binop fmt = function
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+let protect_on x s = if x then "@[<hov 1>(" ^^ s ^^ ")@]" else "@[<hov>" ^^ s ^^ "@]"
 
 (* [opl] means that there is no delimiter on the left of the term, so
    parentheses should be put around the term if it does not start with a
@@ -262,7 +262,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       Number.print number_format fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on opr "@[<hov>let %a :=@ %a in@ %a@]")
+      fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
         print_vs v (print_term info) t1 (print_term info) t2;
       forget_var v
   | Tcase (t,bl) ->
@@ -285,7 +285,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
-      fprintf fmt "@[<hov 1>(%a@ %a)@]" (print_opr_term info) l (print_opl_term info) r
+      fprintf fmt (protect_on (opl || opr) "%a@ %a") (print_opr_term info) l (print_opl_term info) r
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
@@ -293,16 +293,16 @@ and print_tnode opl opr info fmt t = match t.t_node with
       | _ -> if unambig_fs fs
           then
             if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
-            else fprintf fmt "@[<hov 1>(%a@ %a)@]"
+            else fprintf fmt (protect_on (opl || opr) "%a@ %a")
               (print_ls_real info) fs
               (print_list space (print_opr_term info)) tl
-          else fprintf fmt "@[<hov 1>(@[<hov>%a@ %a@]:@ %a)@]"
+          else fprintf fmt (protect_on (opl || opr) "@[<hov>%a@ %a@]:@ %a")
             (print_ls_real info) fs (print_list space (print_opr_term info)) tl
             (print_ty info) (t_type t)
     end
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
-      fprintf fmt (protect_on opr "@[<hov>forall @[<hov>%a@],@ %a@]")
+      fprintf fmt (protect_on opr "forall @[<hov>%a@],@ %a")
         (print_list space (print_vsty info)) vl
         (* (print_tl info) tl *) (print_term info) f;
       List.iter forget_var vl
@@ -313,7 +313,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         | [] -> print_term info fmt f
         | v::vr ->
             fprintf fmt "exists %a,@ %a" (print_vsty_nopar info) v aux vr in
-      fprintf fmt (protect_on opr "@[<hov>%a@]") aux vl;
+      fprintf fmt (protect_on opr "%a") aux vl;
       List.iter forget_var vl
   | Ttrue ->
       fprintf fmt "True"
@@ -322,20 +322,20 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tbinop (b,f1,f2) ->
      (match b with
      | Tand | Tor ->
-       fprintf fmt (protect_on (opl || opr) "@[<hov>%a %a@ %a@]")
+       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
                (print_opr_term info) f1 print_binop b (print_opl_term info) f2
      | Timplies ->
          (* implication has so low a precedence that its rhs does not need protection *)
-         fprintf fmt (protect_on (opl || opr) "@[<hov>%a ->@ %a@]")
+         fprintf fmt (protect_on (opl || opr) "%a ->@ %a")
            (print_opr_term info) f1 (print_term info) f2
      | Tiff ->
-         fprintf fmt (protect_on (opl || opr) "@[<hov>%a <->@ %a@]")
+         fprintf fmt (protect_on (opl || opr) "%a <->@ %a")
            (print_opr_term info) f1 (print_opl_term info) f2)
   | Tnot f ->
       fprintf fmt "~ %a" (print_tnode true true info) f
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr
-        "@[<hov>if %a then@ %a@ else@ %a@]")
+        "if %a then@ %a@ else@ %a")
         (print_term info) f1 (print_term info) f2 (print_term info) f3
 
 and print_tbranch info fmt br =
