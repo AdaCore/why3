@@ -149,7 +149,10 @@ let print_ts_tv info fmt ts =
   | _ -> fprintf fmt "(%a %a)" print_ts ts
     (print_list space (print_tv info ~whytypes:false)) ts.ts_args
 
-let protect_on x s = if x then "@[<hov 1>(" ^^ s ^^ ")@]" else "@[<hov>" ^^ s ^^ "@]"
+let protect_on ?(boxed=false) x s =
+  if x then "@[<hov 1>(" ^^ s ^^ ")@]"
+  else if not boxed then "@[<hov>" ^^ s ^^ "@]"
+  else s
 
 let rec print_type info fmt ty = print_ty false info fmt ty
 and print_op_type info fmt ty = print_ty true info fmt ty
@@ -236,7 +239,7 @@ let print_binop fmt = function
 let rec print_term info fmt t = print_tnode false false info fmt t
 and print_opl_term info fmt f = print_tnode true  false info fmt f
 and print_opr_term info fmt t = print_tnode false true  info fmt t
-and print_tnode opl opr info fmt t = match t.t_node with
+and print_tnode ?(boxed=false) opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
@@ -301,9 +304,9 @@ and print_tnode opl opr info fmt t = match t.t_node with
     end
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
-      fprintf fmt (protect_on opr "forall @[<hov>%a@],@ %a")
+      fprintf fmt (protect_on ~boxed opr "@[<hov 2>forall %a@],@ %a")
         (print_list space (print_vsty info)) vl
-        (* (print_tl info) tl *) (print_term info) f;
+        (print_tnode ~boxed:true false false info) f;
       List.iter forget_var vl
   | Tquant (Texists,fq) ->
       let vl,_tl,f = t_open_quant fq in
@@ -325,8 +328,8 @@ and print_tnode opl opr info fmt t = match t.t_node with
                (print_opr_term info) f1 print_binop b (print_opl_term info) f2
      | Timplies ->
          (* implication has so low a precedence that its rhs does not need protection *)
-         fprintf fmt (protect_on (opl || opr) "%a ->@ %a")
-           (print_opr_term info) f1 (print_term info) f2
+         fprintf fmt (protect_on ~boxed (opl || opr) "%a ->@ %a")
+           (print_opr_term info) f1 (print_tnode ~boxed:true false false info) f2
      | Tiff ->
          fprintf fmt (protect_on (opl || opr) "%a <->@ %a")
            (print_opr_term info) f1 (print_opl_term info) f2)
