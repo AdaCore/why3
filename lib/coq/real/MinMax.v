@@ -24,7 +24,7 @@ Require Import Rbasic_fun.
 Lemma min_def :
   forall (x:R) (y:R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
-  ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmin x y) = y)).
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
@@ -40,7 +40,7 @@ Qed.
 Lemma max_def :
   forall (x:R) (y:R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
-  ((~ (x <= y)%R) -> ((Reals.Rbasic_fun.Rmax x y) = x)).
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
 intros x y.
 split ; intros H.

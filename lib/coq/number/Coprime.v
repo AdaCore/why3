@@ -76,7 +76,7 @@ Qed.
 Lemma Euclid :
   forall (p:Z) (a:Z) (b:Z),
   ((number.Prime.prime p) /\ (number.Divisibility.divides p (a * b)%Z)) ->
-  ((number.Divisibility.divides p a) \/ (number.Divisibility.divides p b)).
+  (number.Divisibility.divides p a) \/ (number.Divisibility.divides p b).
 intros p a b (h1,h2).
 apply Znumtheory.prime_mult; auto.
 now rewrite <- Prime.prime_is_Zprime.

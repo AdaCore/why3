@@ -32,7 +32,7 @@ Lemma nth_def :
   | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)
   | (Init.Datatypes.cons x r) =>
       ((n = 0%Z) -> ((nth n l) = (Init.Datatypes.Some x))) /\
-      ((~ (n = 0%Z)) -> ((nth n l) = (nth (n - 1%Z)%Z r)))
+      (~ (n = 0%Z) -> ((nth n l) = (nth (n - 1%Z)%Z r)))
   end.
 Proof.
 intros a a_WT n l.

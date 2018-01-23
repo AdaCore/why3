@@ -117,7 +117,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Inverse :
-  forall (x:R), (~ (x = 0%R)) -> ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
+  forall (x:R), ~ (x = 0%R) -> ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
 Proof.
 exact Rinv_r.
 Qed.
@@ -138,7 +138,7 @@ Qed.
 (* Why3 goal *)
 Lemma add_div :
   forall (x:R) (y:R) (z:R),
-  (~ (z = 0%R)) -> (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
+  ~ (z = 0%R) -> (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -148,7 +148,7 @@ Qed.
 (* Why3 goal *)
 Lemma sub_div :
   forall (x:R) (y:R) (z:R),
-  (~ (z = 0%R)) -> (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
+  ~ (z = 0%R) -> (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -157,7 +157,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma neg_div :
-  forall (x:R) (y:R), (~ (y = 0%R)) -> (((-x)%R / y)%R = (-(x / y)%R)%R).
+  forall (x:R) (y:R), ~ (y = 0%R) -> (((-x)%R / y)%R = (-(x / y)%R)%R).
 Proof.
 intros.
 field.
@@ -167,7 +167,7 @@ Qed.
 (* Why3 goal *)
 Lemma assoc_mul_div :
   forall (x:R) (y:R) (z:R),
-  (~ (z = 0%R)) -> (((x * y)%R / z)%R = (x * (y / z)%R)%R).
+  ~ (z = 0%R) -> (((x * y)%R / z)%R = (x * (y / z)%R)%R).
 Proof.
 intros x y z _.
 apply Rmult_assoc.
@@ -176,7 +176,7 @@ Qed.
 (* Why3 goal *)
 Lemma assoc_div_mul :
   forall (x:R) (y:R) (z:R),
-  ((~ (y = 0%R)) /\ ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
+  (~ (y = 0%R) /\ ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
 unfold Rdiv.
@@ -187,7 +187,7 @@ Qed.
 (* Why3 goal *)
 Lemma assoc_div_div :
   forall (x:R) (y:R) (z:R),
-  ((~ (y = 0%R)) /\ ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
+  (~ (y = 0%R) /\ ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
 Proof.
 intros x y z (Zy, Zz).
 field.
@@ -202,13 +202,13 @@ Qed.
 
 (* Why3 goal *)
 Lemma Trans :
-  forall (x:R) (y:R) (z:R), (x <= y)%R -> ((y <= z)%R -> (x <= z)%R).
+  forall (x:R) (y:R) (z:R), (x <= y)%R -> (y <= z)%R -> (x <= z)%R.
 Proof.
 exact Rle_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma Antisymm : forall (x:R) (y:R), (x <= y)%R -> ((y <= x)%R -> (x = y)).
+Lemma Antisymm : forall (x:R) (y:R), (x <= y)%R -> (y <= x)%R -> (x = y).
 Proof.
 exact Rle_antisym.
 Qed.
@@ -240,7 +240,7 @@ Qed.
 (* Why3 goal *)
 Lemma CompatOrderMult :
   forall (x:R) (y:R) (z:R),
-  (x <= y)%R -> ((0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R).
+  (x <= y)%R -> (0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R.
 Proof.
 intros x y z H Zz.
 now apply Rmult_le_compat_r.

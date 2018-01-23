@@ -22,7 +22,7 @@ Require int.Int.
 Lemma abs_def :
   forall (x:Z),
   ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x)) /\
-  ((~ (0%Z <= x)%Z) -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
+  (~ (0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
 intros x.
 split ; intros H.
 now apply Zabs_eq.

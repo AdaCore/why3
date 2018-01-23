@@ -135,7 +135,7 @@ Qed.
 Lemma occ_bounds :
   forall {a:Type} {a_WT:WhyType a},
   forall (v:a) (m:(Z -> a)) (l:Z) (u:Z),
-  (l <= u)%Z -> ((0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z).
+  (l <= u)%Z -> (0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z.
 Proof.
 intros a a_WT v m l u h1.
 cut (0 <= u - l)%Z. 2: omega.

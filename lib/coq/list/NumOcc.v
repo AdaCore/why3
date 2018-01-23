@@ -38,7 +38,7 @@ Lemma num_occ_def :
   | Init.Datatypes.nil => ((num_occ x l) = 0%Z)
   | (Init.Datatypes.cons y r) =>
       ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
-      ((~ (x = y)) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
+      (~ (x = y) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
   end.
 Proof.
 intros a a_WT x [|y r].

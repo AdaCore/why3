@@ -128,13 +128,13 @@ Qed.
 
 (* Why3 goal *)
 Lemma Trans :
-  forall (x:Z) (y:Z) (z:Z), (x <= y)%Z -> ((y <= z)%Z -> (x <= z)%Z).
+  forall (x:Z) (y:Z) (z:Z), (x <= y)%Z -> (y <= z)%Z -> (x <= z)%Z.
 Proof.
 exact Zle_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma Antisymm : forall (x:Z) (y:Z), (x <= y)%Z -> ((y <= x)%Z -> (x = y)).
+Lemma Antisymm : forall (x:Z) (y:Z), (x <= y)%Z -> (y <= x)%Z -> (x = y).
 Proof.
 exact Zle_antisym.
 Qed.
@@ -167,7 +167,7 @@ Qed.
 (* Why3 goal *)
 Lemma CompatOrderMult :
   forall (x:Z) (y:Z) (z:Z),
-  (x <= y)%Z -> ((0%Z <= z)%Z -> ((x * z)%Z <= (y * z)%Z)%Z).
+  (x <= y)%Z -> (0%Z <= z)%Z -> ((x * z)%Z <= (y * z)%Z)%Z.
 Proof.
 exact Zmult_le_compat_r.
 Qed.

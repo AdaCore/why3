@@ -35,8 +35,8 @@ Qed.
 Lemma Truncate_down_pos :
   forall (x:R),
   (0%R <= x)%R ->
-  (((BuiltIn.IZR (truncate x)) <= x)%R /\
-   (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R).
+  ((BuiltIn.IZR (truncate x)) <= x)%R /\
+  (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R.
 Proof.
   intros x h.
   rewrite (Ztrunc_floor x h), <-Z2R_IZR, <-Z2R_IZR.
@@ -50,8 +50,8 @@ Qed.
 Lemma Truncate_up_neg :
   forall (x:R),
   (x <= 0%R)%R ->
-  (((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
-   (x <= (BuiltIn.IZR (truncate x)))%R).
+  ((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
+  (x <= (BuiltIn.IZR (truncate x)))%R.
 Proof.
   intros x h.
   rewrite (Ztrunc_ceil x h), <-Z2R_IZR, <-Z2R_IZR.

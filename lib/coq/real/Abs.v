@@ -25,7 +25,7 @@ Import Rbasic_fun.
 Lemma abs_def :
   forall (x:R),
   ((0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = x)) /\
-  ((~ (0%R <= x)%R) -> ((Reals.Rbasic_fun.Rabs x) = (-x)%R)).
+  (~ (0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = (-x)%R)).
 split ; intros H.
 apply Rabs_right.
 now apply Rle_ge.

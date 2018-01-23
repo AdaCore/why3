@@ -22,7 +22,7 @@ Require int.Int.
 Lemma min_def :
   forall (x:Z) (y:Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = x)) /\
-  ((~ (x <= y)%Z) -> ((ZArith.BinInt.Z.min x y) = y)).
+  (~ (x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
@@ -38,7 +38,7 @@ Qed.
 Lemma max_def :
   forall (x:Z) (y:Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = y)) /\
-  ((~ (x <= y)%Z) -> ((ZArith.BinInt.Z.max x y) = x)).
+  (~ (x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = x)).
 Proof.
 intros x y.
 split ; intros H.

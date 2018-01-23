@@ -27,7 +27,8 @@ Import Rpower.
 
 (* Why3 goal *)
 Lemma Pow_def : forall (x:R) (y:R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower x y) = (Reals.Rtrigo_def.exp (y * (Reals.Rpower.ln x))%R)).
+  ((Reals.Rpower.Rpower x y) =
+   (Reals.Rtrigo_def.exp (y * (Reals.Rpower.ln x))%R)).
 Proof.
 easy.
 Qed.
@@ -42,7 +43,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_plus : forall (x:R) (y:R) (z:R), (0%R < z)%R ->
-  ((Reals.Rpower.Rpower z (x + y)%R) = ((Reals.Rpower.Rpower z x) * (Reals.Rpower.Rpower z y))%R).
+  ((Reals.Rpower.Rpower z (x + y)%R) =
+   ((Reals.Rpower.Rpower z x) * (Reals.Rpower.Rpower z y))%R).
 Proof.
 intros x y z h1.
 now apply Rpower_plus.
@@ -50,7 +52,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_mult : forall (x:R) (y:R) (z:R), (0%R < x)%R ->
-  ((Reals.Rpower.Rpower (Reals.Rpower.Rpower x y) z) = (Reals.Rpower.Rpower x (y * z)%R)).
+  ((Reals.Rpower.Rpower (Reals.Rpower.Rpower x y) z) =
+   (Reals.Rpower.Rpower x (y * z)%R)).
 Proof.
 intros x y z h1.
 now apply Rpower_mult.

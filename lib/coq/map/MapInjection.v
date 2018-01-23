@@ -233,12 +233,12 @@ Definition surjective (a:(Z -> Z)) (n:Z) : Prop :=
 (* Why3 assumption *)
 Definition range (a:(Z -> Z)) (n:Z) : Prop :=
   forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((0%Z <= (a i))%Z /\ ((a i) < n)%Z).
+  ((0%Z <= i)%Z /\ (i < n)%Z) -> (0%Z <= (a i))%Z /\ ((a i) < n)%Z.
 
 (* Why3 goal *)
 Lemma injective_surjective :
   forall (a:(Z -> Z)) (n:Z),
-  (injective a n) -> ((range a n) -> (surjective a n)).
+  (injective a n) -> (range a n) -> (surjective a n).
 Proof.
 unfold injective, range, surjective.
 intros a n h1 h2.

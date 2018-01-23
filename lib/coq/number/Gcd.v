@@ -48,9 +48,11 @@ apply Zgcd_is_gcd.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_def3 : forall (a:Z) (b:Z) (x:Z), (number.Divisibility.divides x
-  a) -> ((number.Divisibility.divides x b) -> (number.Divisibility.divides x
-  (gcd a b))).
+Lemma gcd_def3 :
+  forall (a:Z) (b:Z) (x:Z),
+  (number.Divisibility.divides x a) ->
+  (number.Divisibility.divides x b) ->
+  (number.Divisibility.divides x (gcd a b)).
 Proof.
 intros a b x.
 apply Zgcd_is_gcd.
@@ -124,8 +126,9 @@ apply Zgcd_is_gcd.
 Qed.
 
 (* Why3 goal *)
-Lemma Gcd_computer_mod : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((gcd b
-  (ZArith.BinInt.Z.rem a b)) = (gcd a b)).
+Lemma Gcd_computer_mod :
+  forall (a:Z) (b:Z),
+  ~ (b = 0%Z) -> ((gcd b (ZArith.BinInt.Z.rem a b)) = (gcd a b)).
 Proof.
 intros a b _.
 rewrite (Zgcd_comm a b).
@@ -138,7 +141,7 @@ Qed.
 (* Why3 goal *)
 Lemma Gcd_euclidean_mod :
   forall (a:Z) (b:Z),
-  (~ (b = 0%Z)) -> ((gcd b (int.EuclideanDivision.mod1 a b)) = (gcd a b)).
+  ~ (b = 0%Z) -> ((gcd b (int.EuclideanDivision.mod1 a b)) = (gcd a b)).
 Proof.
 intros a b Zb.
 rewrite (Zgcd_comm a b).
@@ -149,8 +152,9 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma gcd_mult : forall (a:Z) (b:Z) (c:Z), (0%Z <= c)%Z -> ((gcd (c * a)%Z
-  (c * b)%Z) = (c * (gcd a b))%Z).
+Lemma gcd_mult :
+  forall (a:Z) (b:Z) (c:Z),
+  (0%Z <= c)%Z -> ((gcd (c * a)%Z (c * b)%Z) = (c * (gcd a b))%Z).
 Proof.
 intros a b c H.
 apply Zis_gcd_gcd.
