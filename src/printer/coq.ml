@@ -262,7 +262,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       Number.print number_format fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on opr "@[<hov>let %a :=@[<hov 1>@ %a@] in@ %a@]")
+      fprintf fmt (protect_on opr "@[<hov>let %a :=@ %a in@ %a@]")
         print_vs v (print_term info) t1 (print_opl_term info) t2;
       forget_var v
   | Tcase (t,bl) ->
@@ -289,7 +289,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tapp (fs,pl) when is_fs_tuple fs ->
       fprintf fmt "%a" (print_paren_r (print_term info)) pl
   | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
-      fprintf fmt "(%a@ %a)" (print_opr_term info) l (print_opr_term info) r
+      fprintf fmt "@[<hov 1>(%a@ %a)@]" (print_opr_term info) l (print_opr_term info) r
   | Tapp (fs, tl) ->
     begin match query_syntax info.info_syn fs.ls_name with
       | Some s ->
@@ -306,7 +306,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
     end
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
-      fprintf fmt (protect_on opr "@[<hov>forall @[<hov>%a@],@ @[<hov>%a@]@]")
+      fprintf fmt (protect_on opr "@[<hov>forall @[<hov>%a@],@ %a@]")
         (print_list space (print_vsty info)) vl
         (* (print_tl info) tl *) (print_term info) f;
       List.iter forget_var vl
@@ -316,7 +316,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
         match vl with
           | [] -> print_term info fmt f
           | v::vr ->
-              fprintf fmt (protect_on opr "@[<hov>exists @[<hov>%a@],@ @[<hov>%a@]@]")
+              fprintf fmt (protect_on opr "@[<hov>exists %a,@ %a@]")
                 (print_vsty_nopar info) v
                 aux vr
       in
@@ -338,7 +338,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
       fprintf fmt (protect_on opr "@[<hov>~ %a@]") (print_opl_term info) f
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr
-        "@[<hov>if @[<hov>%a@] then@ @[<hov>%a@]@ else@ @[<hov>%a@]@]")
+        "@[<hov>if %a then@ %a@ else@ %a@]")
         (print_term info) f1 (print_term info) f2 (print_opl_term info) f3
 
 and print_tbranch info fmt br =
