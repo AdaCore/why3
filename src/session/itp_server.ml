@@ -924,7 +924,7 @@ end
                Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
                  res.Call_provers.pr_model
              in
-             result ^ "\n\n" ^ ce_result
+             result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
          | None -> "Result of the prover not available.\n"
        in
        P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
