@@ -1,4 +1,15 @@
 
+module ApplyRewrite
+
+  use import int.Int
+
+  (* Use apply H require some cases of quantifications in first_order_matching *)
+  goal g: (forall y. exists x. x <= y /\ y = 0) -> forall x. exists y. y <= x /\ x = 0
+
+
+end
+
+
 module TestCEX
 
   use import int.Int
