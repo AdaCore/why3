@@ -24,6 +24,7 @@ let usage_msg =
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
+let resetloadpath = ref false
 
 let opt_list_prover_ids = ref false
 
@@ -49,8 +50,8 @@ let option_list = Arg.align [
   " search for provers in $PATH";
   "--detect-plugins", Arg.Set autoplugins,
   " search for plugins in the default library directory";
-  "--detect", Arg.Unit (fun () -> autoprovers := true; autoplugins := true),
-  " search for both provers and plugins";
+  "--detect", Arg.Unit (fun () -> resetloadpath := true; autoprovers := true; autoplugins := true),
+  " search for both provers and plugins, and resets the default loadpath";
   "--add-prover", Arg.Tuple
     (let id = ref "" in
      [Arg.Set_string id;
@@ -162,7 +163,12 @@ let main () =
   if not (Sys.file_exists conf_file) then begin
     autoprovers := true;
     autoplugins := true;
-  end;
+    end;
+  let config =
+    if !resetloadpath then
+      set_main config (set_loadpath (get_main config) default_loadpath)
+    else config
+  in
   let config =
     if !autoprovers
     then Autodetection.run_auto_detection config
