@@ -3,12 +3,55 @@ module ApplyRewrite
 
   use import int.Int
 
-  (* Use apply H require some cases of quantifications in first_order_matching *)
-  goal g: (forall y. exists x. x <= y /\ y = 0) -> forall x. exists y. y <= x /\ x = 0
+  function f int int : int
 
+  use HighOrd
+
+  axiom H: forall x. (\z: int. x + z) =  f x
+
+  goal g1: (\toto. 42 + toto) = f 42
+  
+  axiom Ha: forall x. (\z: int. x + z) 2 = 2
+  
+  goal g3: (\toto. 42 + toto) 2 = 2 
+    
+  goal g2: (\y. y + y) = f 24
+end
+
+module A
+  
+  use import int.Int
+  use HighOrd
+
+  function f int: int
+
+  axiom H: forall y. exists x. f x = x + y
+  
+  goal g1: exists x. f x = x + 42
+  
+  goal g: (\y. f y) 0 = 3
+
+  constant b: bool
+
+  axiom Ha: forall y. if b = true then let x = 3 in f x = x + y else false
+  
+  goal ga: if b = true then let z = 3 in f z = z + 42 else false
+
+  goal gb: if b  = true then let z = 453 in f z = z + 42 else false
 
 end
 
+module Soundness
+  use import int.Int
+  use HighOrd
+  function f0 (x y z:int) : int = x * y + z
+  predicate p (f:int -> int) =
+    f (-1) = 0 && forall n:int. f n = f 0 + (f 1 - f 0) * n
+  lemma A : forall y z:int. p (\x. f0 x y z) <-> y = z
+  meta rewrite prop A
+  lemma Fail : p (\x. f0 x x x)
+  lemma Absurd : false
+end
 
 module TestCEX
 

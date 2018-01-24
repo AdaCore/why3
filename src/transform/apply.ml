@@ -208,7 +208,8 @@ let replace_subst lp lv f1 f2 withed_terms t =
       begin
         (* Catch any error from first_order_matching or with_terms. *)
         match matching_with_terms ~trans_name:"rewrite" slv lv f1 t (Some withed_terms) with
-        | exception _ -> Term.t_map_fold
+        | exception _e ->
+            Term.t_map_fold
                 (fun is_replaced t -> replace is_replaced f1 f2 t)
                 is_replaced t
         | subst_ty, subst ->
@@ -224,7 +225,7 @@ let replace_subst lp lv f1 f2 withed_terms t =
   let is_replaced, t =
     t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t) None t in
   match is_replaced with
-  | None -> raise (Arg_trans "matching/replace")
+  | None -> raise (Arg_trans "rewrite: no term matching the given pattern")
   | Some(subst_ty,subst) ->
       (List.map (t_ty_subst subst_ty subst) lp, t)
 
