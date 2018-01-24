@@ -10,6 +10,17 @@
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../demo-itp.mlw">
+<theory name="ApplyRewrite" proved="true" sum="06c28a672d2fbb0de6998078f2cfe895">
+ <goal name="g" proved="true">
+ <transf name="apply" proved="true" arg1="H">
+ </transf>
+ </goal>
+</theory>
+<theory name="TestCEX" sum="55ceea8b24a88c1829a53af2c814f1a6">
+ <goal name="g">
+ <proof prover="2" timelimit="5"><result status="unknown" time="0.00"/></proof>
+ </goal>
+</theory>
 <theory name="TestCopyPaste" sum="22d35cc9b3a5547f481892208f0547bc">
  <goal name="g1">
  <transf name="split_goal_wp" >
@@ -49,8 +60,10 @@
  <goal name="g2">
  </goal>
 </theory>
-<theory name="TestTaskPrinting" sum="801f15aa4345fd2ac2cb9efbcefa4d4b">
+<theory name="TestTaskPrinting" sum="01fbd777d08f356d2f390e335249eeb9">
  <goal name="g1">
+ </goal>
+ <goal name="g2">
  </goal>
  <goal name="g3">
  </goal>
@@ -63,8 +76,6 @@
  <goal name="g7">
  </goal>
  <goal name="g8">
- </goal>
- <goal name="g2">
  </goal>
 </theory>
 <theory name="TestAutomaticIntro" sum="6566463f1ee0314d808add53aa21307c">
@@ -120,9 +131,9 @@
   <proof prover="2"><result status="unknown" time="1.00"/></proof>
   </goal>
   <goal name="power_sum.1" expl="recursive case" proved="true">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.87" steps="15"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
-  <proof prover="2" obsolete="true"><result status="unknown" time="1.01"/></proof>
+  <proof prover="0"><result status="valid" time="0.87" steps="15"/></proof>
+  <proof prover="1"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="unknown" time="1.01"/></proof>
   <transf name="case" proved="true" arg1="(n=0)">
    <goal name="power_sum.1.0" expl="true case (recursive case)" proved="true">
    <proof prover="1"><result status="valid" time="0.01"/></proof>

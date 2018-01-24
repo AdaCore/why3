@@ -72,6 +72,8 @@ val set_main : config -> main -> config
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
+val set_loadpath : main -> string list -> main
+val default_loadpath : string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int

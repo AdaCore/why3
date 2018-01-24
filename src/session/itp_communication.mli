@@ -16,6 +16,8 @@ type strategy = string
 type node_ID = int
 val root_node : node_ID
 
+val is_root : node_ID -> bool
+
 (* --------------------------- types to be expanded if needed --------------------------------- *)
 
 (** Global information known when server process has started and that can be

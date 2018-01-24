@@ -659,6 +659,8 @@ let schedule_edition c id pr ~callback ~notification =
             prover_tasks_edited;
   run_timeout_handler ()
 
+exception TransAlreadyExists of string * string
+
 (*** { 2 transformations} *)
 
 let schedule_transformation c id name args ~callback ~notification =
@@ -690,6 +692,8 @@ let schedule_transformation c id name args ~callback ~notification =
     end;
     false
   in
+  if Session_itp.check_if_already_exists c.controller_session id name args then
+    raise (TransAlreadyExists (name, List.fold_left (fun acc s -> s ^ " " ^ acc) "" args));
   S.idle ~prio:0 apply_trans;
   callback TSscheduled
 
@@ -764,6 +768,7 @@ let schedule_tr_with_same_arguments
   let args = get_transf_args s tr in
   let name = get_transf_name s tr in
   let callback = callback name args in
+
   schedule_transformation c pn name args ~callback ~notification
 
 let proof_is_complete pa =

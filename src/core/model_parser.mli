@@ -149,6 +149,16 @@ val print_model :
     @param model the counter-example model to print
 *)
 
+val print_model_human :
+  ?me_name_trans:(model_element_name -> string) ->
+  Format.formatter ->
+  model ->
+  unit
+(** Same as print_model but is intended to be human readable.
+
+*)
+
+
 val model_to_string :
   ?me_name_trans:(model_element_name -> string) ->
   model ->

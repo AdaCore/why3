@@ -219,6 +219,8 @@ let loadpath m =
     Strings.split ':' d
   with Not_found -> m.loadpath
 
+let set_loadpath m l = { m with loadpath = l}
+
 let timelimit m = m.timelimit
 let memlimit m = m.memlimit
 let running_provers_max m = m.running_provers_max

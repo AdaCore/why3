@@ -111,6 +111,9 @@ let print_pr s id fmt t =
 let print_pat s id fmt t =
   let module P = (val (p s id)) in P.print_pat fmt t
 
+let print_tdecl s id fmt t =
+  let module P = (val (p s id)) in P.print_tdecl fmt t
+
 (* Exception reporting *)
 
 (* TODO remove references to id.id_string in this function *)
@@ -219,6 +222,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
       Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
+      Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
+        (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") (print_tdecl ses id)) ld,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_term (s, t1, t2) ->
       Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a" s
         (print_term ses id) t1 (print_opt_type ses id) t1.Term.t_ty
@@ -904,7 +911,23 @@ end
        let parid = pa.parent in
        let name = Pp.string_of Whyconf.print_prover pa.prover in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid,s ^ "\n====================> Prover: " ^ name ^ "\n", list_loc))
+       let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
+       (* Display the result of the prover *)
+       let prover_ce =
+         match pa.proof_state with
+         | Some res ->
+             let result =
+               Pp.string_of Call_provers.print_prover_answer
+                 res.Call_provers.pr_answer
+             in
+             let ce_result =
+               Pp.string_of (Model_parser.print_model_human ?me_name_trans:None)
+                 res.Call_provers.pr_model
+             in
+             result ^ "\n\n" ^ ce_result
+         | None -> "Result of the prover not available.\n"
+       in
+       P.notify (Task (nid, prover_text ^ prover_ce, list_loc))
     | AFile f ->
        P.notify (Task (nid, "File " ^ file_name f, []))
     | ATn tid ->
@@ -912,7 +935,8 @@ end
        let args = get_transf_args d.cont.controller_session tid in
        let parid = get_trans_parent d.cont.controller_session tid in
        let s, list_loc = task_of_id d parid do_intros show_full_context loc in
-       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^ String.concat " " (name :: args) ^ "\n", list_loc))
+       P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
+                       String.concat " " (name :: args) ^ "\n", list_loc))
 
   (* -------------------- *)
 
@@ -1106,16 +1130,10 @@ end
   let apply_transform node_id t args =
     let d = get_server_data () in
 
-    let check_if_already_exists s pid t args =
-      let sub_transfs = get_transformations s pid in
-      List.exists (fun tr_id -> get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
-        not (is_detached s (ATn tr_id))) sub_transfs
-    in
-
     let rec apply_transform nid t args =
       match nid with
       | APn id ->
-        if check_if_already_exists d.cont.controller_session id t args then
+        if Session_itp.check_if_already_exists d.cont.controller_session id t args then
           P.notify (Message (Information "Transformation already applied"))
         else
           let callback = callback_update_tree_transform t args in
@@ -1305,7 +1323,10 @@ end
      | Get_task(nid,_,_,_) ->
          Hint.mem model_any nid
      | Command_req (nid, _) ->
-         Hint.mem model_any nid
+         if not (Itp_communication.is_root nid) then
+           Hint.mem model_any nid
+         else
+           true
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1417,7 +1438,11 @@ end
        end
     | Exit_req                -> exit 0
      )
-    with e when not (Debug.test_flag Debug.stack_trace)->
+    with
+    | C.TransAlreadyExists (name,args) ->
+        P.notify (Message (Error
+          (Pp.sprintf "Transformation %s with arg [%s] already exists" name args)))
+    | e when not (Debug.test_flag Debug.stack_trace)->
       P.notify (Message (Error (Pp.string_of
           (fun fmt (r,e) -> Format.fprintf fmt
              "There was an unrecoverable error during treatment of request:\n %a\nwith exception: %a"
